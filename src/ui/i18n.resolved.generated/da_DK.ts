@@ -2208,6 +2208,7 @@ export const da_DK: EnTranslations = {
       "showDevBadges": "Vis udviklermærker",
       "showOwnNameplate": "Vis mit navneskilt",
       "showPlayerNameplates": "Vis spillernavneskilte",
+      "showPetNames": "Show Pet Names",
       "uiScale": "UI-skala",
       "playerFrameScale": "Spillerrammens skala",
       "targetFrameScale": "Målrammens skala",
@@ -2843,6 +2844,9 @@ export const da_DK: EnTranslations = {
       "gossipOptionAria": "Gennemse Krigsførelsessæt-butikken tilbudt af {name}",
       "jewelry": "Smykker",
       "weapons": "Våben",
+      "companions": "Companions",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "groupSeason2": "Krigsudspring Sæson 2: Forsporinger",
       "groupEntry": "Krigsudspring Sæson 1",
       "owned": "Ejet",
@@ -3580,6 +3584,14 @@ export const da_DK: EnTranslations = {
       "watchKick": "Se på Kick",
       "watchYouTube": "Se på YouTube",
       "streamerBadgeTitle": "Verificeret streamer"
+    },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "Enable Autoloot",
+      "autolootDisable": "Disable Autoloot",
+      "autolootHint": "Your buddy fetches loot from your own corpses within 30 yards.",
+      "cancel": "Cancel"
     },
     "lootSettings": {
       "title": "Bytteindstillinger",
@@ -4950,6 +4962,59 @@ export const da_DK: EnTranslations = {
       "logCharterFee": "{actor} betalte laugets stiftelsesgebyr på {amount}",
       "logAdminPurge": "En administrator fjernede {count} {item}"
     },
+    "collections": {
+      "tabs": {
+        "buddies": "Buddies"
+      },
+      "state": {
+        "owned": "Collected",
+        "notOwned": "Not collected",
+        "unavailable": "Not obtainable yet",
+        "pending": "A presence follows you"
+      },
+      "presenceDefault": "You feel a presence watching you.",
+      "revealed": "{name} has decided to follow you.",
+      "presence": {
+        "ember_fox": "Something small and warm is padding along behind you.",
+        "moss_hare": "A rustle in the peat keeps pace with your steps.",
+        "frog": "A wet croak answers every step you take.",
+        "crimson_claw_crab": "Something clicks and scuttles just out of sight.",
+        "golden_sentinel": "A faint gilded glint watches from the grass.",
+        "nightfang": "Silent paws follow where you cannot see.",
+        "tuskhorn_boar": "A snort and a stamp: something stubborn is trailing you.",
+        "emerald_wolf": "Green eyes blink in the undergrowth, then follow.",
+        "tiger": "Stripes shift at the edge of your vision.",
+        "cate_coin": "You hear the faint ring of a coin that is not yours.",
+        "alon": "You feel watched, and quietly approved of.",
+        "trollface": "Somewhere behind you, something is grinning.",
+        "ansem": "A whisper of doors and darkness follows you.",
+        "triple_t": "Three footsteps fall where there should be one.",
+        "kekius": "A stifled laugh trails you down the road.",
+        "solbot": "A soft ticking keeps time with your stride.",
+        "frostfire": "Steam and frost swirl in your wake.",
+        "rocky": "Pebbles shift behind you with no wind to move them.",
+        "proud_grunt": "A boot stamps to attention somewhere behind you.",
+        "loot_goblin": "Something is counting your coins under its breath.",
+        "penny_goldspark": "Tiny tools clink in a pocket that is not yours.",
+        "stag": "A shadow with antlers falls across your path.",
+        "alpaca": "Something woolly and unhurried has decided to come along.",
+        "horse": "Hooves keep an easy, patient beat somewhere behind you.",
+        "sapling": "Little roots patter behind you, stirring the fallen leaves.",
+        "bull": "A low huff of breath stirs the dust behind you.",
+        "spider": "A thread of silk brushes your shoulder.",
+        "raptor": "Quick claws tick over stone at your heels.",
+        "skeleton": "Dry bones rattle in step with yours.",
+        "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
+        "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "crystal_tide": "A drop of the sea refuses to fall from your line.",
+        "phantom": "The air behind you is a shade too still.",
+        "emberfall_phoenix": "A warmth like a banked fire settles at your back."
+      },
+      "actions": {
+        "summon": "Summon",
+        "dismiss": "Dismiss"
+      }
+    },
     "calendar": {
       "title": "Begivenhedskalender",
       "close": "Luk kalenderen",
@@ -6011,6 +6076,8 @@ export const da_DK: EnTranslations = {
       "tabMounts": "Ridedyr",
       "tabSkins": "Skind",
       "tabMech": "Mech",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "Konto: deles af alle figurer. Figur: kun denne figur.",
       "scopeAccount": "Konto",
       "scopeCharacter": "Figur",
@@ -6231,6 +6298,14 @@ export const da_DK: EnTranslations = {
       "bordersSection": "Rammer",
       "bordersNone": "Ingen ramme",
       "bordersEmpty": "Udfør en bedrift, der giver en ramme, for at låse denne hylde op.",
+      "buddiesSection": "Buddies",
+      "buddiesNone": "No Buddy",
+      "buddiesEmpty": "Collect a companion to summon it from this shelf.",
+      "buddyDragHint": "Drag onto your action bar",
+      "looksSection": "Buddy Looks",
+      "looksNone": "Own Look",
+      "looksNoBuddy": "Summon a companion to choose its look here.",
+      "looksEmpty": "This companion has no looks unlocked yet.",
       "unlockedBanner": "Bedrift fuldbragt: {name}",
       "unlockedTitleHint": "Ny titel opnået: {title}. Vælg den i Bedrifternes Bog.",
       "unlockedBorderHint": "Ny ramme optjent: {name}. Bær den fra Bedrifternes Bog.",
@@ -12737,7 +12812,9 @@ export const da_DK: EnTranslations = {
       "flask": "Flaske",
       "scroll": "Rulle",
       "bag": "Taske",
-      "mount": "Ridedyr"
+      "mount": "Ridedyr",
+      "buddy": "Buddy",
+      "buddyCosmetic": "Buddy cosmetic"
     },
     "stats": {
       "armor": "Rustning",
@@ -16879,6 +16956,15 @@ export const da_DK: EnTranslations = {
       "ps_passing_stone": {
         "name": "Hvilesten"
       },
+      "whistle_horse": {
+        "name": "Horse Whistle"
+      },
+      "whistle_crystal_lich": {
+        "name": "Crystal Lich Whistle"
+      },
+      "whistle_forgemaw": {
+        "name": "Forgemaw The Molten Whistle"
+      },
       "lastflame_core": {
         "name": "Den sidste flammes kerne"
       },
@@ -20102,6 +20188,108 @@ export const da_DK: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "Zulgar, Bassinets Stemme"
+      },
+      "buddy_ember_fox": {
+        "name": "Ember Fox"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "Emberfall Phoenix"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "Crimson Claw Crab"
+      },
+      "buddy_golden_sentinel": {
+        "name": "Golden Sentinel"
+      },
+      "buddy_nightfang": {
+        "name": "Nightfang"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "Tuskhorn Boar"
+      },
+      "buddy_emerald_wolf": {
+        "name": "Emerald Wolf"
+      },
+      "buddy_tiger": {
+        "name": "Tiger"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "Trollface"
+      },
+      "buddy_ansem": {
+        "name": "Ansem"
+      },
+      "buddy_triple_t": {
+        "name": "Triple T"
+      },
+      "buddy_kekius": {
+        "name": "Kekius"
+      },
+      "buddy_solbot": {
+        "name": "Solbot"
+      },
+      "buddy_frostfire": {
+        "name": "Frostfire"
+      },
+      "buddy_rocky": {
+        "name": "Rocky"
+      },
+      "buddy_proud_grunt": {
+        "name": "Proud Grunt"
+      },
+      "buddy_loot_goblin": {
+        "name": "Loot Goblin"
+      },
+      "buddy_penny_goldspark": {
+        "name": "Penny Goldspark"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "Alpaca"
+      },
+      "buddy_horse": {
+        "name": "Tug, the Warhorse"
+      },
+      "buddy_sapling": {
+        "name": "Sapling"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "Spider"
+      },
+      "buddy_raptor": {
+        "name": "Raptor"
+      },
+      "buddy_skeleton": {
+        "name": "Skeleton"
+      },
+      "buddy_crystal_lich": {
+        "name": "Crystal Lich"
+      },
+      "buddy_forgemaw": {
+        "name": "Forgemaw The Molten"
+      },
+      "buddy_crystal_tide": {
+        "name": "Crystal Tide"
+      },
+      "buddy_phantom": {
+        "name": "Phantom"
       },
       "ironvein_foreman": {
         "name": "Jernåre-Formand"

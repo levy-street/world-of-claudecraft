@@ -8688,9 +8688,10 @@
   .vendor-item.warfare-owned .vi-sub {
     color: var(--gold);
   }
-  /* A group heading (Warfare Season 2 above the entry tier) reads a level
-     above the set titles under it: larger, spaced caps, and a heavier rule,
-     so the Season 2 banner never reads as one more set. */
+  /* A group heading (Warfare Season 2 above the entry tier, then the
+     companions) reads a level above the set titles under it: larger, spaced
+     caps, and a heavier rule, so the Season 2 banner never reads as one
+     more set. */
   #warfare-window .warfare-group-title {
     margin-top: 14px;
     padding-top: 9px;
@@ -11780,6 +11781,7 @@
   .cos-tabs {
     flex: none;
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     min-height: 48px;
     border-bottom: 1px solid var(--color-border-default);
@@ -11876,6 +11878,16 @@
     align-items: center;
     gap: var(--spacing-xs);
     font-size: 12px;
+  }
+  .cos-buddy-icon {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    object-fit: contain;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    user-select: none;
   }
   .cos-scope {
     padding: 4px 8px;

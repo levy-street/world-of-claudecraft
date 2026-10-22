@@ -54,6 +54,11 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
     permission: 'moderation.act',
   },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/grant-buddy$/,
+    permission: 'moderation.act',
+  },
   // The phase 13 legendary-name strip: it DESTROYS a player-authored name
   // with no in-game undo, so like the guild bank purge below it carries its
   // OWN superadmin-only permission, never moderation.act.

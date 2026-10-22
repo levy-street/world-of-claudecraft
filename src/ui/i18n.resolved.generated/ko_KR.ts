@@ -2208,6 +2208,7 @@ export const ko_KR: EnTranslations = {
       "showDevBadges": "개발자 배지 표시",
       "showOwnNameplate": "내 이름표 표시",
       "showPlayerNameplates": "플레이어 이름표 표시",
+      "showPetNames": "펫 이름 표시",
       "uiScale": "UI 배율",
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
@@ -2843,6 +2844,9 @@ export const ko_KR: EnTranslations = {
       "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
       "jewelry": "장신구",
       "weapons": "무기",
+      "companions": "동료",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "groupSeason2": "워페어 시즌 2: 선봉대",
       "groupEntry": "워페어 시즌 1",
       "owned": "보유 중",
@@ -3580,6 +3584,14 @@ export const ko_KR: EnTranslations = {
       "watchKick": "Kick에서 시청",
       "watchYouTube": "YouTube에서 시청",
       "streamerBadgeTitle": "인증된 스트리머"
+    },
+    "buddyMenu": {
+      "rename": "버디 이름 변경",
+      "nameLabel": "버디 이름",
+      "autolootEnable": "자동 전리품 켜기",
+      "autolootDisable": "자동 전리품 끄기",
+      "autolootHint": "버디가 30야드 이내에 있는 당신 소유의 시체에서 전리품을 가져옵니다.",
+      "cancel": "취소"
     },
     "lootSettings": {
       "title": "전리품 설정",
@@ -4950,6 +4962,59 @@ export const ko_KR: EnTranslations = {
       "logCharterFee": "{actor}님이 길드 창설 비용 {amount}을(를) 지불했습니다",
       "logAdminPurge": "관리자가 {item} {count}개를 삭제했습니다"
     },
+    "collections": {
+      "tabs": {
+        "buddies": "버디"
+      },
+      "state": {
+        "owned": "수집함",
+        "notOwned": "수집 안 함",
+        "unavailable": "아직 획득 불가",
+        "pending": "무언가가 당신을 따라옵니다"
+      },
+      "presenceDefault": "무언가가 당신을 지켜보는 기척이 느껴집니다.",
+      "revealed": "{name}이(가) 당신을 따르기로 했습니다.",
+      "presence": {
+        "ember_fox": "작고 따뜻한 무언가가 당신 뒤를 살금살금 따라오고 있습니다.",
+        "moss_hare": "이탄 속의 바스락 소리가 당신의 발걸음에 맞춰 따라옵니다.",
+        "frog": "당신이 한 걸음 내디딜 때마다 축축한 개구리 울음이 답합니다.",
+        "crimson_claw_crab": "시야 바로 밖에서 무언가가 딸깍거리며 종종걸음칩니다.",
+        "golden_sentinel": "풀숲에서 희미한 금빛 반짝임이 당신을 지켜봅니다.",
+        "nightfang": "보이지 않는 곳에서 소리 없는 발이 따라옵니다.",
+        "tuskhorn_boar": "콧김과 발구름 소리. 고집 센 무언가가 당신을 따라옵니다.",
+        "emerald_wolf": "덤불 속에서 초록 눈이 깜빡이더니 따라옵니다.",
+        "tiger": "시야 가장자리에서 줄무늬가 움직입니다.",
+        "cate_coin": "당신 것이 아닌 동전이 희미하게 울리는 소리가 들립니다.",
+        "alon": "누군가 지켜보며 조용히 인정해 주는 느낌이 듭니다.",
+        "trollface": "당신 뒤 어딘가에서 무언가가 씩 웃고 있습니다.",
+        "ansem": "문과 어둠의 속삭임이 당신을 따라옵니다.",
+        "triple_t": "발소리 하나가 있어야 할 곳에 셋이 울립니다.",
+        "kekius": "억눌린 웃음소리가 길을 따라 당신을 쫓아옵니다.",
+        "solbot": "부드러운 째깍 소리가 당신의 보폭에 맞춰 울립니다.",
+        "frostfire": "증기와 서리가 당신의 뒤에서 소용돌이칩니다.",
+        "rocky": "바람도 없는데 뒤에서 자갈이 움직입니다.",
+        "proud_grunt": "당신 뒤 어딘가에서 군화가 차렷 자세로 발을 구릅니다.",
+        "loot_goblin": "무언가가 당신의 동전을 소곤소곤 세고 있습니다.",
+        "penny_goldspark": "당신 것이 아닌 주머니에서 작은 도구들이 짤랑거립니다.",
+        "stag": "뿔 달린 그림자가 당신의 길 위에 드리웁니다.",
+        "alpaca": "털북숭이에 느긋한 무언가가 함께 가기로 했습니다.",
+        "horse": "어딘가 뒤에서 발굽이 느긋하고 끈기 있는 박자를 맞춥니다.",
+        "sapling": "작은 뿌리들이 뒤에서 종종걸음을 치며 낙엽을 흩뜨립니다.",
+        "bull": "낮은 콧김이 당신 뒤의 먼지를 일으킵니다.",
+        "spider": "거미줄 한 가닥이 당신의 어깨를 스칩니다.",
+        "raptor": "재빠른 발톱이 당신 뒤꿈치의 돌 위를 톡톡 두드립니다.",
+        "skeleton": "마른 뼈가 당신의 걸음에 맞춰 덜그럭거립니다.",
+        "crystal_lich": "잔해에서 차가운 웅웅거림이 피어오르고, 그것이 당신을 지켜봅니다.",
+        "forgemaw": "용광로의 열기가 아직 당신을 떠나지 않았습니다. 무언가가 그것과 함께 걸어 나왔습니다.",
+        "crystal_tide": "바닷물 한 방울이 당신의 낚싯줄에서 떨어지기를 거부합니다.",
+        "phantom": "당신 뒤의 공기가 조금 지나치게 고요합니다.",
+        "emberfall_phoenix": "재에 묻은 불처럼 은근한 온기가 당신의 등 뒤에 내려앉습니다."
+      },
+      "actions": {
+        "summon": "소환",
+        "dismiss": "해제"
+      }
+    },
     "calendar": {
       "title": "이벤트 달력",
       "close": "달력 닫기",
@@ -6011,6 +6076,8 @@ export const ko_KR: EnTranslations = {
       "tabMounts": "탈것",
       "tabSkins": "스킨",
       "tabMech": "메카",
+      "buddyActive": "소환됨",
+      "buddyDrag": "행동 단축바로 끌기",
       "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
       "scopeAccount": "계정",
       "scopeCharacter": "캐릭터",
@@ -6223,7 +6290,7 @@ export const ko_KR: EnTranslations = {
       "watchFull": "추적 목록이 가득 찼습니다 (최대 {cap}개)",
       "watchAria": "HUD 추적기에서 {name} 추적",
       "unwatchAria": "{name} 추적 중지",
-      "cosmeticsSection": "칭호와 테두리",
+      "cosmeticsSection": "칭호, 테두리, 동료",
       "titlesSection": "칭호",
       "titlesAria": "표시할 칭호 선택",
       "titlesNone": "칭호 없음",
@@ -6231,6 +6298,14 @@ export const ko_KR: EnTranslations = {
       "bordersSection": "테두리",
       "bordersNone": "테두리 없음",
       "bordersEmpty": "테두리가 걸린 업적을 획득하면 이 선반이 열립니다.",
+      "buddiesSection": "동료",
+      "buddiesNone": "동료 없음",
+      "buddiesEmpty": "동료를 모으면 여기서 소환할 수 있습니다.",
+      "buddyDragHint": "행동 단축바로 끌어다 놓기",
+      "looksSection": "동료 외형",
+      "looksNone": "기본 외형",
+      "looksNoBuddy": "동료를 소환하면 여기서 외형을 고를 수 있습니다.",
+      "looksEmpty": "이 동료는 아직 해금된 외형이 없습니다.",
       "unlockedBanner": "업적 달성: {name}",
       "unlockedTitleHint": "새 칭호 획득: {title}. 업적의 서에서 선택할 수 있습니다.",
       "unlockedBorderHint": "새 테두리 획득: {name}. 업적의 서에서 착용할 수 있습니다.",
@@ -12737,7 +12812,9 @@ export const ko_KR: EnTranslations = {
       "flask": "플라스크",
       "scroll": "두루마리",
       "bag": "가방",
-      "mount": "탈것"
+      "mount": "탈것",
+      "buddy": "버디",
+      "buddyCosmetic": "동료 외형"
     },
     "stats": {
       "armor": "방어도",
@@ -16879,6 +16956,15 @@ export const ko_KR: EnTranslations = {
       "ps_passing_stone": {
         "name": "안식의 돌"
       },
+      "whistle_horse": {
+        "name": "말의 호루라기"
+      },
+      "whistle_crystal_lich": {
+        "name": "수정 리치의 호루라기"
+      },
+      "whistle_forgemaw": {
+        "name": "용융의 화로아귀의 호루라기"
+      },
       "lastflame_core": {
         "name": "마지막 불꽃의 핵"
       },
@@ -20102,6 +20188,108 @@ export const ko_KR: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "분지의 목소리 줄가르"
+      },
+      "buddy_ember_fox": {
+        "name": "잉걸불 여우"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "잿불낙하 불사조"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "진홍 집게 게"
+      },
+      "buddy_golden_sentinel": {
+        "name": "황금 파수병"
+      },
+      "buddy_nightfang": {
+        "name": "밤엄니"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "엄니뿔 멧돼지"
+      },
+      "buddy_emerald_wolf": {
+        "name": "에메랄드 늑대"
+      },
+      "buddy_tiger": {
+        "name": "호랑이"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "트롤페이스"
+      },
+      "buddy_ansem": {
+        "name": "안셈"
+      },
+      "buddy_triple_t": {
+        "name": "트리플 T"
+      },
+      "buddy_kekius": {
+        "name": "케키우스"
+      },
+      "buddy_solbot": {
+        "name": "솔봇"
+      },
+      "buddy_frostfire": {
+        "name": "서리불꽃"
+      },
+      "buddy_rocky": {
+        "name": "로키"
+      },
+      "buddy_proud_grunt": {
+        "name": "자랑스러운 병졸"
+      },
+      "buddy_loot_goblin": {
+        "name": "전리품 고블린"
+      },
+      "buddy_penny_goldspark": {
+        "name": "페니 골드스파크"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "알파카"
+      },
+      "buddy_horse": {
+        "name": "말"
+      },
+      "buddy_sapling": {
+        "name": "어린 나무"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "거미"
+      },
+      "buddy_raptor": {
+        "name": "랩터"
+      },
+      "buddy_skeleton": {
+        "name": "해골"
+      },
+      "buddy_crystal_lich": {
+        "name": "수정 리치"
+      },
+      "buddy_forgemaw": {
+        "name": "용융의 화로아귀"
+      },
+      "buddy_crystal_tide": {
+        "name": "수정 물결"
+      },
+      "buddy_phantom": {
+        "name": "팬텀"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"

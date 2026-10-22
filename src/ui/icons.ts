@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { BUDDY_ART_PENDING_ITEM_IDS } from '../sim/content/buddies';
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
@@ -5543,6 +5544,7 @@ export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
+  ...BUDDY_ART_PENDING_ITEM_IDS,
   // Warfare Season 2 armor: painted icons owned by a follow-up art pass; the
   // procedural icon stands in until then. The season weapons never park here:
   // an unpainted weapon already draws its procedural icon.

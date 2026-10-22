@@ -2544,7 +2544,9 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // them, plus the Boneyard's rift_marrow_golem) ship untagged like every rift
     // template the release already carries, so they grow MOBS without touching
     // `tagged`.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(216);
+    // 219 at the release/v0.45.0 merge into the buddy companions branch: the
+    // three retained cosmetic buddy templates also ship untagged.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(219);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

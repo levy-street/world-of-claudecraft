@@ -20,6 +20,8 @@ export interface MobTooltipQuestLine {
 export interface MobTooltipModel {
   /** Already-localized display name. */
   name: string;
+  /** Localized original buddy type, present only when different from its nickname. */
+  buddyType?: string;
   level: number;
   /** Already-localized creature-type label (e.g. "Beasts"). */
   familyLabel: string;
@@ -47,6 +49,7 @@ export interface MobTooltipI18n {
 export function mobTooltipHtml(m: MobTooltipModel, deps: MobTooltipI18n): string {
   const level = deps.fmt(m.level, { maximumFractionDigits: 0 });
   const title = `<div class="tt-title" style="color:${m.color}">${esc(m.name)}</div>`;
+  const buddyType = m.buddyType ? `<div class="tt-sub">${esc(m.buddyType)}</div>` : '';
   const sub = `<div class="tt-sub" style="color:${m.color}">${esc(
     deps.t('hudChrome.mobTooltip.levelFamily', { level, family: m.familyLabel }),
   )}</div>`;
@@ -69,5 +72,5 @@ export function mobTooltipHtml(m: MobTooltipModel, deps: MobTooltipI18n): string
   const reactionClass = m.hostile ? 'tt-red' : 'tt-green';
   const reactionKey = m.hostile ? 'hudChrome.mobTooltip.hostile' : 'hudChrome.mobTooltip.friendly';
   const reaction = `<div class="${reactionClass}">${esc(deps.t(reactionKey))}</div>`;
-  return title + sub + rank + quests + reaction;
+  return title + buddyType + sub + rank + quests + reaction;
 }

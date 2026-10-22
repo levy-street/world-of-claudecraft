@@ -6747,6 +6747,19 @@
       ]
     },
     {
+      "batchId": "buddy-whistle-icons-2026-08-28",
+      "source": "In-engine render of the committed buddy GLB models (scripts/assets/render_buddy_item_icons.mjs: public/models/buddies/*.glb, plus the shipped creature and skeleton rigs the beast and undead buddies reuse, tinted per species, through the asset-pipeline's shared hero-view preview renderer). Not composited onto the painted-icon radial vignette the rest of the catalog uses; the renderer's own dark-neutral clear color stands in for it.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "the buddy's own shipped in-game model, not the existing painted WebP catalog",
+      "provenanceRecord": "scripts/assets/render_buddy_item_icons.mjs",
+      "itemIds": [
+        "whistle_crystal_lich",
+        "whistle_forgemaw"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed GLB model (hero three-quarter turntable view, auto-framed to the model's bounding sphere) resized to 128px."
+    },
+    {
       "batchId": "trinket-slot-icons-2026-09-23",
       "source": "Tripo text-to-image (openapi.tripo3d.ai v3 /generation/text-to-image), one text-prompt call per item; square crop to about 72 percent subject fill, 512px sRGB master, 128px opaque WebP (sharp) reviewed locally",
       "owner": "World of ClaudeCraft",

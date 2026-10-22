@@ -630,7 +630,12 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   const zoneId = p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id;
   const table = bandTables[zoneId] ?? bandTables.eastbrook_vale;
   const total = table.reduce((sum, e) => sum + e.weight, 0);
-  let roll = ctx.rng.next() * total;
+  // ONE draw per cast (a pinned determinism contract). The angler's
+  // companion is no longer a slice of it: Crystal Tide is the Master Angler
+  // deed's pet (content/buddy_sources.ts), so the whole uniform rides the
+  // catch table again.
+  const u = ctx.rng.next();
+  let roll = u * total;
   let caught: string | null = null;
   for (const entry of table) {
     roll -= entry.weight;

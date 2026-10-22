@@ -7,6 +7,7 @@ import {
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
   BAG_RECIPES,
+  BUDDY_CHARM_RECIPES,
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
@@ -467,6 +468,7 @@ describe('craftItem command (#1127)', () => {
       // The five quartermaster rows (the 2026-09-28 release/v0.44.0 merge
       // into feature/buried-hoards): 204 to 209.
       ...FACTION_REWARD_RECIPES,
+      ...BUDDY_CHARM_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -495,7 +497,9 @@ describe('craftItem command (#1127)', () => {
         BAG_RECIPES.length +
         CRUCIBLE_COLLECTION_RECIPES.length +
         FORGEBREAKER_RECIPES.length +
-        FACTION_REWARD_RECIPES.length,
+        FACTION_REWARD_RECIPES.length +
+        // + the buddy charm look (content/recipes.ts BUDDY_CHARM_RECIPES).
+        BUDDY_CHARM_RECIPES.length,
     );
     expect(FACTION_REWARD_RECIPES).toHaveLength(5);
     expect(CRUCIBLE_COLLECTION_RECIPES).toHaveLength(33);

@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "1c3e30093abd51f886f97051e73f0f155c2f851016a45fbf484916c6f0af2ee2",
+  "rendererFingerprint": "84cab1affd61d6154200b5c12ec0df6127c1f8479845ed46a2186dfb59c35451",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "win32",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "153",
-    "browserVersion": "Chrome/153.0.8010.53",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "155",
+    "browserVersion": "Edg/155.0.4283.62",
     "requestedBackend": "swiftshader",
-    "fingerprint": "0a3b64b4bd845e00754f67090cf5f9d89309cc7c18d44ad56c12b92ae55548ce"
+    "fingerprint": "9e98302f0df8b738abb95d91c36845ee1f078ce639f22cd177aa8a00341efd0e"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5232363,
-      "sha256": "abd95b6cdeee7fab9b5524a27c46100f056479ed40e6c156ff5604aee37e874f",
+      "bytes": 5246781,
+      "sha256": "4de884fe77ad6997ac45cf4d2a28280109ac8230a968274b9b079093bb765937",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 270,
+  "portraitCount": 273,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -659,6 +659,108 @@
         "path": "public/ui/mobs/brutok_skullsmasher.webp",
         "bytes": 2386,
         "sha256": "6620acb712b1c7288db5f8d6dae250df203bbca75abcc4b6f77d66b491cf44d0"
+      }
+    },
+    {
+      "id": "buddy_crystal_lich",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "buddy_crystal_lich",
+      "renderSpec": {
+        "model": {
+          "url": "models/buddies/crystal_lich.glb",
+          "path": "public/models/buddies/crystal_lich.glb",
+          "bytes": 1086652,
+          "sha256": "3b059ea9fe433ec7d5fce385903eed788ff2ff0dbc77c76b8658c5adf19167c9"
+        },
+        "idle": "Idle",
+        "height": 0.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "62d798a79006a70007c8da0be74cc5a6ac011b57d96dcefbb9a10a7e67258b81",
+      "output": {
+        "path": "public/ui/mobs/buddy_crystal_lich.webp",
+        "bytes": 3228,
+        "sha256": "5d1ab205a47d240cee82695f40f985cd3cee073d6d65339e762d02d42ef811fe"
+      }
+    },
+    {
+      "id": "buddy_forgemaw",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "buddy_forgemaw",
+      "renderSpec": {
+        "model": {
+          "url": "models/buddies/forgemaw.glb",
+          "path": "public/models/buddies/forgemaw.glb",
+          "bytes": 1766084,
+          "sha256": "e3260fb461e14bde99de7ade63cd8c5b08497722a19483cf6bf0bbf5160d6ca7"
+        },
+        "idle": "Idle",
+        "height": 0.85,
+        "yaw": 3.141592653589793,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "465e996767b89dc33af6a2d87c3773a3b8931817e92b2c0feb31fb587e4fdeda",
+      "output": {
+        "path": "public/ui/mobs/buddy_forgemaw.webp",
+        "bytes": 3698,
+        "sha256": "b5b20ad54e84436962660513b1c5fcd10385fe163edbef10ed6936e39392e82f"
+      }
+    },
+    {
+      "id": "buddy_horse",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "buddy_horse",
+      "renderSpec": {
+        "model": {
+          "url": "models/buddies/horse.glb",
+          "path": "public/models/buddies/horse.glb",
+          "bytes": 744960,
+          "sha256": "8bc151cc5729d9ea4304d1105c61fe75875a8167efce295f085a0e415040023f"
+        },
+        "idle": "Idle",
+        "height": 0.75,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "166f5559b029f464e9f77c718ee2b965a7808cbbeddec4e5c4f84e7b39daa869",
+      "output": {
+        "path": "public/ui/mobs/buddy_horse.webp",
+        "bytes": 2048,
+        "sha256": "fde4514bad3d15aea978daa0ea1f50f003a267b5e40fac3ab9e955d58a05d7cf"
       }
     },
     {

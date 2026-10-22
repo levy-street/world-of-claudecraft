@@ -103,6 +103,7 @@ function setup() {
     countIpSessions: vi.fn(() => 0),
     hasSessionForCharacter: vi.fn(() => false),
     join: vi.fn(() => session),
+    drainBuddyGrants: vi.fn(async () => {}),
     clients: { size: 1 },
     sim: { resetDay: '2026-09-24' },
     handleMessage: vi.fn(),

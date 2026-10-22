@@ -198,8 +198,14 @@ describe('targetPortraitUrl', () => {
     const assets = readdirSync(resolve(process.cwd(), 'public/ui/mobs'))
       .filter((file) => !file.startsWith('.'))
       .sort();
+    // The render ledger (tests/mob_portrait_source_manifest.test.ts) covers
+    // every live template, so a buddy companion keeps its /ui/mobs render even
+    // though its target frame reads the reviewed art in public/ui/portraits.
     expect(assets).toEqual(
       Object.keys(MOBS)
+        .filter(
+          (id) => targetPortraitUrl(id, true)?.startsWith('/ui/mobs/') || id.startsWith('buddy_'),
+        )
         .map((id) => `${id}.webp`)
         .sort(),
     );

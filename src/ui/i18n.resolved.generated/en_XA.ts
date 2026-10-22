@@ -2208,6 +2208,7 @@ export const en_XA: EnTranslations = {
       "showDevBadges": "[Šĥóŵ Ðéʋéļóþéŕ Ɓáðĝéš]",
       "showOwnNameplate": "[Šĥóŵ Ɱý Ñáɱéþļáţé]",
       "showPlayerNameplates": "[Šĥóŵ Þļáýéŕ Ñáɱéþļáţéš]",
+      "showPetNames": "[Šĥóŵ Þéţ Ñáɱéš]",
       "uiScale": "[ÚÍ Šçáļé]",
       "playerFrameScale": "[Þļáýéŕ Ƒŕáɱé Šçáļé]",
       "targetFrameScale": "[Ţáŕĝéţ Ƒŕáɱé Šçáļé]",
@@ -2843,6 +2844,9 @@ export const en_XA: EnTranslations = {
       "gossipOptionAria": "[Ɓŕóŵšé ţĥé Ŵáŕƒáŕé šéţ šĥóþ óƒƒéŕéð ƀý {name}]",
       "jewelry": "[Ĵéŵéļŕý]",
       "weapons": "[Ŵéáþóñš]",
+      "companions": "[Çóɱþáñíóñš]",
+      "companionPurchase": "[Þéŕɱáñéñţļý úñļóçķš ţĥíš ƀúððý áñð šúɱɱóñš íţ íɱɱéðíáţéļý. Ñó íţéɱ íš áððéð ţó ýóúŕ ƀáĝš.]",
+      "companionOwnedAria": "[{item}, áļŕéáðý çóļļéçţéð óŕ áŵáíţíñĝ ŕéʋéáļ]",
       "groupSeason2": "[Ŵáŕƒáŕé Šéášóñ 2: Ʋáñĝúáŕð]",
       "groupEntry": "[Ŵáŕƒáŕé Šéášóñ 1]",
       "owned": "[Óŵñéð]",
@@ -3580,6 +3584,14 @@ export const en_XA: EnTranslations = {
       "watchKick": "[Ŵáţçĥ óñ Ķíçķ]",
       "watchYouTube": "[Ŵáţçĥ óñ ÝóúŢúƀé]",
       "streamerBadgeTitle": "[Ʋéŕíƒíéð šţŕéáɱéŕ]"
+    },
+    "buddyMenu": {
+      "rename": "[Ŕéñáɱé Ɓúððý]",
+      "nameLabel": "[Ɓúððý ñáɱé]",
+      "autolootEnable": "[Éñáƀļé Áúţóļóóţ]",
+      "autolootDisable": "[Ðíšáƀļé Áúţóļóóţ]",
+      "autolootHint": "[Ýóúŕ ƀúððý ƒéţçĥéš ļóóţ ƒŕóɱ ýóúŕ óŵñ çóŕþšéš ŵíţĥíñ 30 ýáŕðš.]",
+      "cancel": "[Çáñçéļ]"
     },
     "lootSettings": {
       "title": "[Ļóóţ Šéţţíñĝš]",
@@ -4950,6 +4962,59 @@ export const en_XA: EnTranslations = {
       "logCharterFee": "[{actor} þáíð ţĥé ĝúíļð çĥáŕţéŕ ƒéé óƒ {amount}]",
       "logAdminPurge": "[Áñ áðɱíñíšţŕáţóŕ ŕéɱóʋéð {count} {item}]"
     },
+    "collections": {
+      "tabs": {
+        "buddies": "[Ɓúððíéš]"
+      },
+      "state": {
+        "owned": "[Çóļļéçţéð]",
+        "notOwned": "[Ñóţ çóļļéçţéð]",
+        "unavailable": "[Ñóţ óƀţáíñáƀļé ýéţ]",
+        "pending": "[Á þŕéšéñçé ƒóļļóŵš ýóú]"
+      },
+      "presenceDefault": "[Ýóú ƒééļ á þŕéšéñçé ŵáţçĥíñĝ ýóú.]",
+      "revealed": "[{name} ĥáš ðéçíðéð ţó ƒóļļóŵ ýóú.]",
+      "presence": {
+        "ember_fox": "[Šóɱéţĥíñĝ šɱáļļ áñð ŵáŕɱ íš þáððíñĝ áļóñĝ ƀéĥíñð ýóú.]",
+        "moss_hare": "[Á ŕúšţļé íñ ţĥé þéáţ ķééþš þáçé ŵíţĥ ýóúŕ šţéþš.]",
+        "frog": "[Á ŵéţ çŕóáķ áñšŵéŕš éʋéŕý šţéþ ýóú ţáķé.]",
+        "crimson_claw_crab": "[Šóɱéţĥíñĝ çļíçķš áñð šçúţţļéš ĵúšţ óúţ óƒ šíĝĥţ.]",
+        "golden_sentinel": "[Á ƒáíñţ ĝíļðéð ĝļíñţ ŵáţçĥéš ƒŕóɱ ţĥé ĝŕášš.]",
+        "nightfang": "[Šíļéñţ þáŵš ƒóļļóŵ ŵĥéŕé ýóú çáññóţ šéé.]",
+        "tuskhorn_boar": "[Á šñóŕţ áñð á šţáɱþ: šóɱéţĥíñĝ šţúƀƀóŕñ íš ţŕáíļíñĝ ýóú.]",
+        "emerald_wolf": "[Ĝŕééñ éýéš ƀļíñķ íñ ţĥé úñðéŕĝŕóŵţĥ, ţĥéñ ƒóļļóŵ.]",
+        "tiger": "[Šţŕíþéš šĥíƒţ áţ ţĥé éðĝé óƒ ýóúŕ ʋíšíóñ.]",
+        "cate_coin": "[Ýóú ĥéáŕ ţĥé ƒáíñţ ŕíñĝ óƒ á çóíñ ţĥáţ íš ñóţ ýóúŕš.]",
+        "alon": "[Ýóú ƒééļ ŵáţçĥéð, áñð ɋúíéţļý áþþŕóʋéð óƒ.]",
+        "trollface": "[Šóɱéŵĥéŕé ƀéĥíñð ýóú, šóɱéţĥíñĝ íš ĝŕíññíñĝ.]",
+        "ansem": "[Á ŵĥíšþéŕ óƒ ðóóŕš áñð ðáŕķñéšš ƒóļļóŵš ýóú.]",
+        "triple_t": "[Ţĥŕéé ƒóóţšţéþš ƒáļļ ŵĥéŕé ţĥéŕé šĥóúļð ƀé óñé.]",
+        "kekius": "[Á šţíƒļéð ļáúĝĥ ţŕáíļš ýóú ðóŵñ ţĥé ŕóáð.]",
+        "solbot": "[Á šóƒţ ţíçķíñĝ ķééþš ţíɱé ŵíţĥ ýóúŕ šţŕíðé.]",
+        "frostfire": "[Šţéáɱ áñð ƒŕóšţ šŵíŕļ íñ ýóúŕ ŵáķé.]",
+        "rocky": "[Þéƀƀļéš šĥíƒţ ƀéĥíñð ýóú ŵíţĥ ñó ŵíñð ţó ɱóʋé ţĥéɱ.]",
+        "proud_grunt": "[Á ƀóóţ šţáɱþš ţó áţţéñţíóñ šóɱéŵĥéŕé ƀéĥíñð ýóú.]",
+        "loot_goblin": "[Šóɱéţĥíñĝ íš çóúñţíñĝ ýóúŕ çóíñš úñðéŕ íţš ƀŕéáţĥ.]",
+        "penny_goldspark": "[Ţíñý ţóóļš çļíñķ íñ á þóçķéţ ţĥáţ íš ñóţ ýóúŕš.]",
+        "stag": "[Á šĥáðóŵ ŵíţĥ áñţļéŕš ƒáļļš áçŕóšš ýóúŕ þáţĥ.]",
+        "alpaca": "[Šóɱéţĥíñĝ ŵóóļļý áñð úñĥúŕŕíéð ĥáš ðéçíðéð ţó çóɱé áļóñĝ.]",
+        "horse": "[Ĥóóʋéš ķééþ áñ éášý, þáţíéñţ ƀéáţ šóɱéŵĥéŕé ƀéĥíñð ýóú.]",
+        "sapling": "[Ļíţţļé ŕóóţš þáţţéŕ ƀéĥíñð ýóú, šţíŕŕíñĝ ţĥé ƒáļļéñ ļéáʋéš.]",
+        "bull": "[Á ļóŵ ĥúƒƒ óƒ ƀŕéáţĥ šţíŕš ţĥé ðúšţ ƀéĥíñð ýóú.]",
+        "spider": "[Á ţĥŕéáð óƒ šíļķ ƀŕúšĥéš ýóúŕ šĥóúļðéŕ.]",
+        "raptor": "[Ɋúíçķ çļáŵš ţíçķ óʋéŕ šţóñé áţ ýóúŕ ĥééļš.]",
+        "skeleton": "[Ðŕý ƀóñéš ŕáţţļé íñ šţéþ ŵíţĥ ýóúŕš.]",
+        "crystal_lich": "[Á çóļð ĥúɱ ŕíšéš ƒŕóɱ ţĥé ŵŕéçķáĝé, áñð íţ íš ŵáţçĥíñĝ ýóú.]",
+        "forgemaw": "[Ţĥé ĥéáţ óƒ ţĥé ƒóŕĝé ĥáš ñóţ ļéƒţ ýóú. Šóɱéţĥíñĝ ŵáļķéð óúţ ŵíţĥ íţ.]",
+        "crystal_tide": "[Á ðŕóþ óƒ ţĥé šéá ŕéƒúšéš ţó ƒáļļ ƒŕóɱ ýóúŕ ļíñé.]",
+        "phantom": "[Ţĥé áíŕ ƀéĥíñð ýóú íš á šĥáðé ţóó šţíļļ.]",
+        "emberfall_phoenix": "[Á ŵáŕɱţĥ ļíķé á ƀáñķéð ƒíŕé šéţţļéš áţ ýóúŕ ƀáçķ.]"
+      },
+      "actions": {
+        "summon": "[Šúɱɱóñ]",
+        "dismiss": "[Ðíšɱíšš]"
+      }
+    },
     "calendar": {
       "title": "[Éʋéñţ Çáļéñðáŕ]",
       "close": "[Çļóšé çáļéñðáŕ]",
@@ -6011,6 +6076,8 @@ export const en_XA: EnTranslations = {
       "tabMounts": "[Ɱóúñţš]",
       "tabSkins": "[Šķíñš]",
       "tabMech": "[Ɱéçĥ]",
+      "buddyActive": "[Šúɱɱóñéð]",
+      "buddyDrag": "[Ðŕáĝ ţó áçţíóñ ƀáŕ]",
       "legend": "[Áççóúñţ: šĥáŕéð ƀý éʋéŕý çĥáŕáçţéŕ. Çĥáŕáçţéŕ: ţĥíš çĥáŕáçţéŕ óñļý.]",
       "scopeAccount": "[Áççóúñţ]",
       "scopeCharacter": "[Çĥáŕáçţéŕ]",
@@ -6231,6 +6298,14 @@ export const en_XA: EnTranslations = {
       "bordersSection": "[Ɓóŕðéŕš]",
       "bordersNone": "[Ñó Ɓóŕðéŕ]",
       "bordersEmpty": "[Éáŕñ á ƀóŕðéŕ-ƀéáŕíñĝ ðééð ţó úñļóçķ ţĥíš šĥéļƒ.]",
+      "buddiesSection": "[Ɓúððíéš]",
+      "buddiesNone": "[Ñó Ɓúððý]",
+      "buddiesEmpty": "[Çóļļéçţ á çóɱþáñíóñ ţó šúɱɱóñ íţ ƒŕóɱ ţĥíš šĥéļƒ.]",
+      "buddyDragHint": "[Ðŕáĝ óñţó ýóúŕ áçţíóñ ƀáŕ]",
+      "looksSection": "[Ɓúððý Ļóóķš]",
+      "looksNone": "[Óŵñ Ļóóķ]",
+      "looksNoBuddy": "[Šúɱɱóñ á çóɱþáñíóñ ţó çĥóóšé íţš ļóóķ ĥéŕé.]",
+      "looksEmpty": "[Ţĥíš çóɱþáñíóñ ĥáš ñó ļóóķš úñļóçķéð ýéţ.]",
       "unlockedBanner": "[Ðééð áççóɱþļíšĥéð: {name}]",
       "unlockedTitleHint": "[Ñéŵ ţíţļé éáŕñéð: {title}. Çĥóóšé íţ íñ ţĥé Ɓóóķ óƒ Ðééðš.]",
       "unlockedBorderHint": "[Ñéŵ ƀóŕðéŕ éáŕñéð: {name}. Ŵéáŕ íţ ƒŕóɱ ţĥé Ɓóóķ óƒ Ðééðš.]",
@@ -12737,7 +12812,9 @@ export const en_XA: EnTranslations = {
       "flask": "[Ƒļášķ]",
       "scroll": "[Šçŕóļļ]",
       "bag": "[Ɓáĝ]",
-      "mount": "[Ɱóúñţ]"
+      "mount": "[Ɱóúñţ]",
+      "buddy": "[Ɓúððý]",
+      "buddyCosmetic": "[Ɓúððý çóšɱéţíç]"
     },
     "stats": {
       "armor": "[Áŕɱóŕ]",
@@ -16879,6 +16956,15 @@ export const en_XA: EnTranslations = {
       "ps_passing_stone": {
         "name": "[Þáššíñĝ Šţóñé]"
       },
+      "whistle_horse": {
+        "name": "[Ĥóŕšé Ŵĥíšţļé]"
+      },
+      "whistle_crystal_lich": {
+        "name": "[Çŕýšţáļ Ļíçĥ Ŵĥíšţļé]"
+      },
+      "whistle_forgemaw": {
+        "name": "[Ƒóŕĝéɱáŵ Ţĥé Ɱóļţéñ Ŵĥíšţļé]"
+      },
       "lastflame_core": {
         "name": "[Çóŕé óƒ ţĥé Ļášţ Ƒļáɱé]"
       },
@@ -20102,6 +20188,108 @@ export const en_XA: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "[Žúļĝáŕ, Ʋóíçé óƒ ţĥé Ɓášíñ]"
+      },
+      "buddy_ember_fox": {
+        "name": "[Éɱƀéŕ Ƒóẋ]"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "[Éɱƀéŕƒáļļ Þĥóéñíẋ]"
+      },
+      "buddy_moss_hare": {
+        "name": "[Ɱóšš Ĥáŕé]"
+      },
+      "buddy_frog": {
+        "name": "[Ƒŕóĝ]"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "[Çŕíɱšóñ Çļáŵ Çŕáƀ]"
+      },
+      "buddy_golden_sentinel": {
+        "name": "[Ĝóļðéñ Šéñţíñéļ]"
+      },
+      "buddy_nightfang": {
+        "name": "[Ñíĝĥţƒáñĝ]"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "[Ţúšķĥóŕñ Ɓóáŕ]"
+      },
+      "buddy_emerald_wolf": {
+        "name": "[Éɱéŕáļð Ŵóļƒ]"
+      },
+      "buddy_tiger": {
+        "name": "[Ţíĝéŕ]"
+      },
+      "buddy_cate_coin": {
+        "name": "[Çáţé Çóíñ]"
+      },
+      "buddy_alon": {
+        "name": "[Áļóñ]"
+      },
+      "buddy_trollface": {
+        "name": "[Ţŕóļļƒáçé]"
+      },
+      "buddy_ansem": {
+        "name": "[Áñšéɱ]"
+      },
+      "buddy_triple_t": {
+        "name": "[Ţŕíþļé Ţ]"
+      },
+      "buddy_kekius": {
+        "name": "[Ķéķíúš]"
+      },
+      "buddy_solbot": {
+        "name": "[Šóļƀóţ]"
+      },
+      "buddy_frostfire": {
+        "name": "[Ƒŕóšţƒíŕé]"
+      },
+      "buddy_rocky": {
+        "name": "[Ŕóçķý]"
+      },
+      "buddy_proud_grunt": {
+        "name": "[Þŕóúð Ĝŕúñţ]"
+      },
+      "buddy_loot_goblin": {
+        "name": "[Ļóóţ Ĝóƀļíñ]"
+      },
+      "buddy_penny_goldspark": {
+        "name": "[Þéññý Ĝóļðšþáŕķ]"
+      },
+      "buddy_stag": {
+        "name": "[Šţáĝ]"
+      },
+      "buddy_alpaca": {
+        "name": "[Áļþáçá]"
+      },
+      "buddy_horse": {
+        "name": "[Ţúĝ, ţĥé Ŵáŕĥóŕšé]"
+      },
+      "buddy_sapling": {
+        "name": "[Šáþļíñĝ]"
+      },
+      "buddy_bull": {
+        "name": "[Ɓúļļ]"
+      },
+      "buddy_spider": {
+        "name": "[Šþíðéŕ]"
+      },
+      "buddy_raptor": {
+        "name": "[Ŕáþţóŕ]"
+      },
+      "buddy_skeleton": {
+        "name": "[Šķéļéţóñ]"
+      },
+      "buddy_crystal_lich": {
+        "name": "[Çŕýšţáļ Ļíçĥ]"
+      },
+      "buddy_forgemaw": {
+        "name": "[Ƒóŕĝéɱáŵ Ţĥé Ɱóļţéñ]"
+      },
+      "buddy_crystal_tide": {
+        "name": "[Çŕýšţáļ Ţíðé]"
+      },
+      "buddy_phantom": {
+        "name": "[Þĥáñţóɱ]"
       },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"

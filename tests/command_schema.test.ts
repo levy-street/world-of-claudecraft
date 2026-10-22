@@ -185,9 +185,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // dispatched beside bg_flag), at the second release/v0.44.0 base merge: 243/257/14.
 // The third release/v0.44.0 base merge adds the market buy orders (three
 // commands) and guild custom ranks (guild_set_ranks): 247/261/14.
-const EXPECTED_SEND_COUNT = 247;
-const EXPECTED_DISPATCH_COUNT = 261;
-const EXPECTED_DISPATCH_ONLY_COUNT = 14;
+// Plus the buddy companion merge (codex/buddy-companions-restored): four
+// client-send/dispatch pairs (buddy_toggle, buddy_autoloot, buddy_summon,
+// buddy_rename) and the retired dispatch-only buddy_cosmetic: 251/266/15.
+const EXPECTED_SEND_COUNT = 251;
+const EXPECTED_DISPATCH_COUNT = 266;
+const EXPECTED_DISPATCH_ONLY_COUNT = 15;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

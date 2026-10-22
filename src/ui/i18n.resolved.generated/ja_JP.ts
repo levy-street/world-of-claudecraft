@@ -2208,6 +2208,7 @@ export const ja_JP: EnTranslations = {
       "showDevBadges": "開発者バッジを表示",
       "showOwnNameplate": "自分のネームプレートを表示",
       "showPlayerNameplates": "プレイヤーのネームプレートを表示",
+      "showPetNames": "ペット名を表示",
       "uiScale": "UIスケール",
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
@@ -2843,6 +2844,9 @@ export const ja_JP: EnTranslations = {
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
+      "companions": "コンパニオン",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "groupSeason2": "ウォーフェア シーズン2：ヴァンガード",
       "groupEntry": "ウォーフェア シーズン1",
       "owned": "所有済み",
@@ -3580,6 +3584,14 @@ export const ja_JP: EnTranslations = {
       "watchKick": "Kick で視聴",
       "watchYouTube": "YouTube で視聴",
       "streamerBadgeTitle": "認証済み配信者"
+    },
+    "buddyMenu": {
+      "rename": "バディの名前を変更",
+      "nameLabel": "バディの名前",
+      "autolootEnable": "自動収集を有効化",
+      "autolootDisable": "自動収集を無効化",
+      "autolootHint": "バディが30ヤード以内にあるあなた自身の死体から戦利品を回収します。",
+      "cancel": "キャンセル"
     },
     "lootSettings": {
       "title": "分配設定",
@@ -4950,6 +4962,59 @@ export const ja_JP: EnTranslations = {
       "logCharterFee": "{actor} がギルド設立費用 {amount} を支払いました",
       "logAdminPurge": "管理者が {item} を {count} 個削除しました"
     },
+    "collections": {
+      "tabs": {
+        "buddies": "バディ"
+      },
+      "state": {
+        "owned": "収集済み",
+        "notOwned": "未収集",
+        "unavailable": "まだ入手不可",
+        "pending": "何かが付いてきている"
+      },
+      "presenceDefault": "何かに見られている気がする。",
+      "revealed": "{name}があなたに付いていくことに決めた。",
+      "presence": {
+        "ember_fox": "小さく温かい何かが、あなたの後ろをそっと歩いている。",
+        "moss_hare": "泥炭の中のかさかさという音が、あなたの歩みに合わせて続く。",
+        "frog": "あなたの一歩ごとに、湿った鳴き声が応える。",
+        "crimson_claw_crab": "視界の端で、何かがカチカチと音を立てて走り回る。",
+        "golden_sentinel": "草むらから、かすかな金色の光がこちらを見ている。",
+        "nightfang": "見えないところを、音のない足が付いてくる。",
+        "tuskhorn_boar": "鼻息とひづめの音。頑固な何かがあなたを追ってくる。",
+        "emerald_wolf": "下草の中で緑の目が瞬き、そして付いてくる。",
+        "tiger": "視界の端で縞模様が動く。",
+        "cate_coin": "自分のものではない硬貨の、かすかな音が聞こえる。",
+        "alon": "見られている。そして、静かに認められている気がする。",
+        "trollface": "あなたの後ろのどこかで、何かがにやりと笑っている。",
+        "ansem": "扉と闇のささやきがあなたに付いてくる。",
+        "triple_t": "一つのはずの足音が、三つ聞こえる。",
+        "kekius": "押し殺した笑い声が道の上であなたを追ってくる。",
+        "solbot": "柔らかな時を刻む音が、あなたの歩幅に合わせて鳴る。",
+        "frostfire": "蒸気と霜があなたの後ろで渦を巻く。",
+        "rocky": "風もないのに、後ろで小石が動く。",
+        "proud_grunt": "あなたの後ろのどこかで、軍靴が気をつけの音を鳴らす。",
+        "loot_goblin": "何かがあなたの硬貨をぼそぼそと数えている。",
+        "penny_goldspark": "自分のものではないポケットで、小さな道具がかちゃかちゃ鳴る。",
+        "stag": "角のある影が、あなたの道に落ちる。",
+        "alpaca": "毛むくじゃらで急がない何かが、一緒に来ることに決めたようだ。",
+        "horse": "どこか後ろで、蹄がゆったりと辛抱強い拍子を刻んでいる。",
+        "sapling": "小さな根が後ろで軽い足音を立て、落ち葉を揺らす。",
+        "bull": "低い鼻息が、あなたの後ろの土埃を舞い上げる。",
+        "spider": "一筋の糸があなたの肩をかすめる。",
+        "raptor": "すばやい爪が、あなたのかかとのそばで石を鳴らす。",
+        "skeleton": "乾いた骨があなたの歩みに合わせてかたかた鳴る。",
+        "crystal_lich": "残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。",
+        "forgemaw": "炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。",
+        "crystal_tide": "海のひとしずくが、あなたの釣り糸から落ちようとしない。",
+        "phantom": "あなたの後ろの空気が、ほんの少し静かすぎる。",
+        "emberfall_phoenix": "埋み火のような温もりが、あなたの背に落ち着く。"
+      },
+      "actions": {
+        "summon": "呼び出す",
+        "dismiss": "下がらせる"
+      }
+    },
     "calendar": {
       "title": "イベントカレンダー",
       "close": "カレンダーを閉じる",
@@ -6011,6 +6076,8 @@ export const ja_JP: EnTranslations = {
       "tabMounts": "マウント",
       "tabSkins": "スキン",
       "tabMech": "メカ",
+      "buddyActive": "呼び出し中",
+      "buddyDrag": "アクションバーへドラッグ",
       "legend": "アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。",
       "scopeAccount": "アカウント",
       "scopeCharacter": "キャラクター",
@@ -6223,7 +6290,7 @@ export const ja_JP: EnTranslations = {
       "watchFull": "追跡リストが満杯です（最大 {cap} 件）",
       "watchAria": "{name}をHUDトラッカーで追跡",
       "unwatchAria": "{name}の追跡をやめる",
-      "cosmeticsSection": "称号と枠飾り",
+      "cosmeticsSection": "称号、枠、相棒",
       "titlesSection": "称号",
       "titlesAria": "表示する称号を選択",
       "titlesNone": "称号なし",
@@ -6231,6 +6298,14 @@ export const ja_JP: EnTranslations = {
       "bordersSection": "枠飾り",
       "bordersNone": "枠飾りなし",
       "bordersEmpty": "枠飾り付きの功績を獲得するとこの棚が解放されます。",
+      "buddiesSection": "相棒",
+      "buddiesNone": "相棒なし",
+      "buddiesEmpty": "相棒を集めると、ここから呼び出せる。",
+      "buddyDragHint": "アクションバーへドラッグ",
+      "looksSection": "相棒の姿",
+      "looksNone": "元の姿",
+      "looksNoBuddy": "相棒を呼び出すと、ここで姿を選べる。",
+      "looksEmpty": "この相棒にはまだ解放された姿がない。",
       "unlockedBanner": "功績達成: {name}",
       "unlockedTitleHint": "新しい称号を獲得: {title}。功績の書で選択できます。",
       "unlockedBorderHint": "新しい枠飾りを獲得: {name}。功績の書で着用できます。",
@@ -12737,7 +12812,9 @@ export const ja_JP: EnTranslations = {
       "flask": "フラスコ",
       "scroll": "巻物",
       "bag": "バッグ",
-      "mount": "マウント"
+      "mount": "マウント",
+      "buddy": "バディ",
+      "buddyCosmetic": "相棒の姿"
     },
     "stats": {
       "armor": "防御力",
@@ -16879,6 +16956,15 @@ export const ja_JP: EnTranslations = {
       "ps_passing_stone": {
         "name": "たましいの石"
       },
+      "whistle_horse": {
+        "name": "馬の笛"
+      },
+      "whistle_crystal_lich": {
+        "name": "クリスタルリッチの笛"
+      },
+      "whistle_forgemaw": {
+        "name": "溶けたフォージモウの笛"
+      },
       "lastflame_core": {
         "name": "最後の炎の核"
       },
@@ -20102,6 +20188,108 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
+      },
+      "buddy_ember_fox": {
+        "name": "燃えさし狐"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "エンバーフォール・フェニックス"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "紅爪ガニ"
+      },
+      "buddy_golden_sentinel": {
+        "name": "黄金の歩哨"
+      },
+      "buddy_nightfang": {
+        "name": "ナイトファング"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "タスクホーン・ボア"
+      },
+      "buddy_emerald_wolf": {
+        "name": "エメラルドウルフ"
+      },
+      "buddy_tiger": {
+        "name": "トラ"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "トロールフェイス"
+      },
+      "buddy_ansem": {
+        "name": "アンセム"
+      },
+      "buddy_triple_t": {
+        "name": "トリプルT"
+      },
+      "buddy_kekius": {
+        "name": "ケキウス"
+      },
+      "buddy_solbot": {
+        "name": "ソルボット"
+      },
+      "buddy_frostfire": {
+        "name": "フロストファイア"
+      },
+      "buddy_rocky": {
+        "name": "ロッキー"
+      },
+      "buddy_proud_grunt": {
+        "name": "誇り高きグラント"
+      },
+      "buddy_loot_goblin": {
+        "name": "戦利品ゴブリン"
+      },
+      "buddy_penny_goldspark": {
+        "name": "ペニー・ゴールドスパーク"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "アルパカ"
+      },
+      "buddy_horse": {
+        "name": "馬"
+      },
+      "buddy_sapling": {
+        "name": "若木"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "クモ"
+      },
+      "buddy_raptor": {
+        "name": "ラプター"
+      },
+      "buddy_skeleton": {
+        "name": "スケルトン"
+      },
+      "buddy_crystal_lich": {
+        "name": "クリスタルリッチ"
+      },
+      "buddy_forgemaw": {
+        "name": "溶けたフォージモウ"
+      },
+      "buddy_crystal_tide": {
+        "name": "クリスタルタイド"
+      },
+      "buddy_phantom": {
+        "name": "ファントム"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"

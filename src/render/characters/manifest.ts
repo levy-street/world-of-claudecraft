@@ -257,7 +257,7 @@ export interface VisualDef {
    *  (the Nythraxis Bone Spike, which shares its footprint with the raider
    *  it pins). Presentation-side targeting help only: the sim never reads it. */
   clickRadius?: number;
-  /** material tint: explicit color, 'entity' (use e.color), or none */
+  /** Material tint: an explicit color, 'entity' (use e.color), or none. */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
   tintStrength?: number;
@@ -444,6 +444,11 @@ const animal = (attack: string[]): ClipMap => ({
   hit: ['Idle_HitReact_Left', 'Idle_HitReact_Right'],
   death: 'Death',
 });
+
+// Every buddy rig (public/models/buddies/) ships exactly Idle + Walk, renamed
+// in-place to this convention (see the buddy_* VISUALS entries below); run
+// and death alias Walk/Idle since a buddy never plays either.
+const BUDDY_CLIPS: ClipMap = { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' };
 
 // Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
 // locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
@@ -1209,6 +1214,7 @@ const WEAPONS = 'models/weapons';
 /** Worn NPC gear, attached to a body bone rather than held (npc_looks.ts `harbormaster`). */
 const NPC_GEAR = 'models/chars/npc_gear';
 const MOUNTS_DIR = 'models/mounts';
+const BUDDIES_DIR = 'models/buddies';
 
 /** Exported for the authored-surface guard (tests/authored_surfaces.test.ts),
  *  which sweeps every shipped held model; render code resolves through
@@ -2564,6 +2570,25 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // Cosmetic followers: each active buddy keeps its authored rig and colors.
+  buddy_horse: {
+    url: `${BUDDIES_DIR}/horse.glb`,
+    height: 0.75,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_crystal_lich: {
+    url: `${BUDDIES_DIR}/crystal_lich.glb`,
+    height: 0.9,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_forgemaw: {
+    url: `${BUDDIES_DIR}/forgemaw.glb`,
+    height: 0.85,
+    clips: BUDDY_CLIPS,
+    // The rig is authored facing -Z, so without this it heels the owner
+    // back-to-front: chest toward the camera while its owner walks away.
+    yaw: Math.PI,
   },
   // Yumi, the Protect Yumi objective cat familiar (Meshy rig, scale baked by
   // scripts/_bake_meshy_scale.mjs, meshopt + 1024 webp). The GLB ships ONE
@@ -4558,6 +4583,10 @@ const MOB_KEYS: Record<string, string> = {
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
   guardian_tithefiend: 'mob_demonalt',
+  // Active cosmetic buddy followers.
+  buddy_horse: 'buddy_horse',
+  buddy_crystal_lich: 'buddy_crystal_lich',
+  buddy_forgemaw: 'buddy_forgemaw',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.
   // Give the three summoned beasts distinct existing bodies instead of the
   // generic humanoid bandit fallback.
@@ -4827,17 +4856,24 @@ const NPC_KEYS: Record<string, string> = {
   huntsman_deral: 'npc_scout',
 };
 
+/** The rig a mob TEMPLATE renders through: its per-template override, else its
+ *  family's shared body, else the humanoid fallback. Split out of visualKeyFor
+ *  so a caller holding a template id but no live entity (the Collections
+ *  window's idle preview) resolves the same key the world draws, instead of
+ *  guessing at VISUALS directly and missing every family-keyed mob. */
+export function mobVisualKey(templateId: string): string {
+  const override = MOB_KEYS[templateId];
+  if (override) return override;
+  const family = MOBS[templateId]?.family;
+  return (family && FAMILY_KEYS[family]) || 'mob_bandit';
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
-  if (e.kind === 'mob') {
-    const override = MOB_KEYS[e.templateId];
-    if (override) return override;
-    const family = MOBS[e.templateId]?.family;
-    return (family && FAMILY_KEYS[family]) || 'mob_bandit';
-  }
+  if (e.kind === 'mob') return mobVisualKey(e.templateId);
   // npcs — Brother Aldric recurs in every hub under suffixed ids
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';

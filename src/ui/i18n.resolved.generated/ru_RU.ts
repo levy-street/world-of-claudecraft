@@ -2208,6 +2208,7 @@ export const ru_RU: EnTranslations = {
       "showDevBadges": "Показывать значки разработчика",
       "showOwnNameplate": "Показывать свою табличку с именем",
       "showPlayerNameplates": "Показывать таблички с именами игроков",
+      "showPetNames": "Показывать имена питомцев",
       "uiScale": "Масштаб интерфейса",
       "playerFrameScale": "Размер рамки игрока",
       "targetFrameScale": "Размер рамки цели",
@@ -2843,6 +2844,9 @@ export const ru_RU: EnTranslations = {
       "gossipOptionAria": "Просмотреть магазин комплектов Боевой мощи у {name}",
       "jewelry": "Украшения",
       "weapons": "Оружие",
+      "companions": "Спутники",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "groupSeason2": "Боевой сезон 2: Авангард",
       "groupEntry": "Боевой сезон 1",
       "owned": "Получено",
@@ -3580,6 +3584,14 @@ export const ru_RU: EnTranslations = {
       "watchKick": "Смотреть на Kick",
       "watchYouTube": "Смотреть на YouTube",
       "streamerBadgeTitle": "Проверенный стример"
+    },
+    "buddyMenu": {
+      "rename": "Переименовать спутника",
+      "nameLabel": "Имя спутника",
+      "autolootEnable": "Включить автосбор",
+      "autolootDisable": "Выключить автосбор",
+      "autolootHint": "Спутник соберёт добычу с ваших собственных трупов в радиусе 30 ярдов.",
+      "cancel": "Отмена"
     },
     "lootSettings": {
       "title": "Настройки добычи",
@@ -4950,6 +4962,59 @@ export const ru_RU: EnTranslations = {
       "logCharterFee": "{actor} оплатил(а) устав гильдии: {amount}",
       "logAdminPurge": "Администратор удалил {count} шт. {item}"
     },
+    "collections": {
+      "tabs": {
+        "buddies": "Спутники"
+      },
+      "state": {
+        "owned": "Собрано",
+        "notOwned": "Не собрано",
+        "unavailable": "Пока недоступно",
+        "pending": "Кто-то следует за вами"
+      },
+      "presenceDefault": "Вы чувствуете, что за вами кто-то наблюдает.",
+      "revealed": "{name} решает следовать за вами.",
+      "presence": {
+        "ember_fox": "Что-то маленькое и тёплое тихо семенит у вас за спиной.",
+        "moss_hare": "Шорох в торфе идёт в ногу с вашими шагами.",
+        "frog": "На каждый ваш шаг отвечает влажное кваканье.",
+        "crimson_claw_crab": "Что-то щёлкает и суетится за краем зрения.",
+        "golden_sentinel": "Из травы за вами следит слабый золотистый блеск.",
+        "nightfang": "Бесшумные лапы следуют там, где вам не видно.",
+        "tuskhorn_boar": "Фырканье и топот: что-то упрямое идёт за вами.",
+        "emerald_wolf": "В подлеске моргают зелёные глаза, а затем идут следом.",
+        "tiger": "На краю зрения мелькают полосы.",
+        "cate_coin": "Вы слышите тихий звон монеты, которая вам не принадлежит.",
+        "alon": "Вы чувствуете, что за вами наблюдают и молча одобряют.",
+        "trollface": "Где-то позади вас что-то ухмыляется.",
+        "ansem": "Шёпот о дверях и тьме следует за вами.",
+        "triple_t": "Там, где должен быть один шаг, слышны три.",
+        "kekius": "Сдавленный смешок тянется за вами по дороге.",
+        "solbot": "Тихое тиканье отсчитывает ритм вашего шага.",
+        "frostfire": "Пар и иней кружатся у вас за спиной.",
+        "rocky": "Позади вас шевелятся камешки, хотя ветра нет.",
+        "proud_grunt": "Где-то позади вас сапог щёлкает по стойке смирно.",
+        "loot_goblin": "Что-то шёпотом пересчитывает ваши монеты.",
+        "penny_goldspark": "В чужом кармане позвякивают крошечные инструменты.",
+        "stag": "На вашу тропу ложится тень с рогами.",
+        "alpaca": "Что-то шерстистое и неторопливое решило пойти с вами.",
+        "horse": "Где-то позади копыта отбивают неспешный, терпеливый ритм.",
+        "sapling": "Позади топают маленькие корни, вороша опавшую листву.",
+        "bull": "Низкое фырканье поднимает пыль у вас за спиной.",
+        "spider": "Шелковая нить касается вашего плеча.",
+        "raptor": "Быстрые когти постукивают по камню у ваших пят.",
+        "skeleton": "Сухие кости гремят в такт вашим шагам.",
+        "crystal_lich": "Из обломков поднимается холодный гул, и он смотрит на вас.",
+        "forgemaw": "Жар кузни не оставил вас. Что-то вышло вместе с ним.",
+        "crystal_tide": "Капля моря отказывается сорваться с вашей лески.",
+        "phantom": "Воздух позади вас чуть слишком неподвижен.",
+        "emberfall_phoenix": "Тепло, словно от притушенного огня, ложится вам на спину."
+      },
+      "actions": {
+        "summon": "Призвать",
+        "dismiss": "Отпустить"
+      }
+    },
     "calendar": {
       "title": "Календарь событий",
       "close": "Закрыть календарь",
@@ -6011,6 +6076,8 @@ export const ru_RU: EnTranslations = {
       "tabMounts": "Ездовые животные",
       "tabSkins": "Облики",
       "tabMech": "Мех",
+      "buddyActive": "Призван",
+      "buddyDrag": "Перетащите на панель действий",
       "legend": "Аккаунт: общее для всех персонажей. Персонаж: только этот персонаж.",
       "scopeAccount": "Аккаунт",
       "scopeCharacter": "Персонаж",
@@ -6223,7 +6290,7 @@ export const ru_RU: EnTranslations = {
       "watchFull": "Список отслеживания полон (не более {cap})",
       "watchAria": "Следить за деянием {name} на экране",
       "unwatchAria": "Перестать следить за деянием {name}",
-      "cosmeticsSection": "Звания и рамки",
+      "cosmeticsSection": "Звания, рамки и спутники",
       "titlesSection": "Звания",
       "titlesAria": "Выберите отображаемое звание",
       "titlesNone": "Без звания",
@@ -6231,6 +6298,14 @@ export const ru_RU: EnTranslations = {
       "bordersSection": "Рамки",
       "bordersNone": "Без рамки",
       "bordersEmpty": "Получите деяние с рамкой, чтобы открыть эту полку.",
+      "buddiesSection": "Спутники",
+      "buddiesNone": "Без спутника",
+      "buddiesEmpty": "Соберите спутника, чтобы призывать его отсюда.",
+      "buddyDragHint": "Перетащите на панель действий",
+      "looksSection": "Облики спутника",
+      "looksNone": "Собственный облик",
+      "looksNoBuddy": "Призовите спутника, чтобы выбрать его облик здесь.",
+      "looksEmpty": "У этого спутника пока нет открытых обликов.",
       "unlockedBanner": "Деяние совершено: {name}",
       "unlockedTitleHint": "Новое звание: {title}. Выберите его в Книге деяний.",
       "unlockedBorderHint": "Новая рамка: {name}. Наденьте её в Книге деяний.",
@@ -12737,7 +12812,9 @@ export const ru_RU: EnTranslations = {
       "flask": "Фляга",
       "scroll": "Свиток",
       "bag": "Сумка",
-      "mount": "Транспорт"
+      "mount": "Транспорт",
+      "buddy": "Спутник",
+      "buddyCosmetic": "Облик спутника"
     },
     "stats": {
       "armor": "Броня",
@@ -16879,6 +16956,15 @@ export const ru_RU: EnTranslations = {
       "ps_passing_stone": {
         "name": "Камень Ухода"
       },
+      "whistle_horse": {
+        "name": "Свисток: Лошадь"
+      },
+      "whistle_crystal_lich": {
+        "name": "Свисток: Хрустальный лич"
+      },
+      "whistle_forgemaw": {
+        "name": "Свисток: Горнилозев Расплавленный"
+      },
       "lastflame_core": {
         "name": "Ядро Последнего Пламени"
       },
@@ -20102,6 +20188,108 @@ export const ru_RU: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "Зулгар, Голос Котловины"
+      },
+      "buddy_ember_fox": {
+        "name": "Тлеющая лисица"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "Феникс Пепелопада"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "Багровоклешневый краб"
+      },
+      "buddy_golden_sentinel": {
+        "name": "Золотой страж"
+      },
+      "buddy_nightfang": {
+        "name": "Ночной Клык"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "Клыкорогий вепрь"
+      },
+      "buddy_emerald_wolf": {
+        "name": "Изумрудный волк"
+      },
+      "buddy_tiger": {
+        "name": "Тигр"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "Тролльфейс"
+      },
+      "buddy_ansem": {
+        "name": "Ансем"
+      },
+      "buddy_triple_t": {
+        "name": "Тройное Т"
+      },
+      "buddy_kekius": {
+        "name": "Кекиус"
+      },
+      "buddy_solbot": {
+        "name": "Солбот"
+      },
+      "buddy_frostfire": {
+        "name": "Ледяное пламя"
+      },
+      "buddy_rocky": {
+        "name": "Рокки"
+      },
+      "buddy_proud_grunt": {
+        "name": "Гордый рубака"
+      },
+      "buddy_loot_goblin": {
+        "name": "Гоблин-барыга"
+      },
+      "buddy_penny_goldspark": {
+        "name": "Пенни Златоискра"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "Альпака"
+      },
+      "buddy_horse": {
+        "name": "Лошадь"
+      },
+      "buddy_sapling": {
+        "name": "Деревце"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "Паук"
+      },
+      "buddy_raptor": {
+        "name": "Раптор"
+      },
+      "buddy_skeleton": {
+        "name": "Скелет"
+      },
+      "buddy_crystal_lich": {
+        "name": "Хрустальный лич"
+      },
+      "buddy_forgemaw": {
+        "name": "Горнилозев Расплавленный"
+      },
+      "buddy_crystal_tide": {
+        "name": "Хрустальный прилив"
+      },
+      "buddy_phantom": {
+        "name": "Фантом"
       },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"

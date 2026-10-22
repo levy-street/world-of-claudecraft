@@ -121,6 +121,7 @@ import {
   isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
+import { buyBuddyOffer } from './vendor_buddy_purchase';
 import {
   bulkBuyQuantity,
   buyPurchaseTotals,
@@ -1294,6 +1295,9 @@ export function useItem(
     // first. Reins are never consumed: mountOwned() derives ownership from holding
     // the item, so removing it here would delete the mount.
     summonMountItem(ctx, meta.entityId, def.mount);
+  } else if (def.kind === 'buddy' || def.kind === 'buddy_cosmetic') {
+    // Neither is usable: every buddy is granted straight into the collection,
+    // and summoning an owned one is a Cosmetics-window command, not an item use.
   } else if (def.kind === 'recipe') {
     // A pattern teaches the recipe it names and is spent doing so.
     // useRecipePatternItem owns every gate and the consume; it sits here, below
@@ -1508,6 +1512,7 @@ export function buyItem(
     ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
+  if (buyBuddyOffer(ctx, meta.entityId, def, copperCost, honorCost)) return;
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;

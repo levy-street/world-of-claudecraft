@@ -427,6 +427,43 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // One whistle per active buddy. Every buddy is granted straight into the
+  // collection (the honor vendors' direct purchase, the boss drops, the deed
+  // rewards), so no whistle ever lands in a bag and none is usable. Tug's
+  // whistle is the honor vendors' stock row (src/sim/vendor_buddy_purchase.ts
+  // grants the buddy instead of the item). The retired buddies' whistles and
+  // charms were minted on the buddy branch, never shipped, and are deleted.
+  whistle_horse: {
+    id: 'whistle_horse',
+    name: 'Horse Whistle',
+    kind: 'buddy',
+    buddy: 'horse',
+    soulbound: true,
+    quality: 'common',
+    priceHonor: 10_000,
+    sellValue: 0,
+    noVendorSell: true,
+  },
+  // Nythraxis's raid chase (content/buddy_sources.ts).
+  whistle_crystal_lich: {
+    id: 'whistle_crystal_lich',
+    name: 'Crystal Lich Whistle',
+    kind: 'buddy',
+    buddy: 'crystal_lich',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g
+  },
+  // The heroic-only companion from the Crucible bosses (content/buddy_sources.ts).
+  whistle_forgemaw: {
+    id: 'whistle_forgemaw',
+    name: 'Forgemaw The Molten Whistle',
+    kind: 'buddy',
+    buddy: 'forgemaw',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g
+  },
   // The Rift Watch's Champion mount: sold by Quartermaster Vaelen in
   // Drifthaven behind Champion standing (content/faction_vendors.ts,
   // docs/design/factions.md). Priced at the classic epic-mount ratio, ten

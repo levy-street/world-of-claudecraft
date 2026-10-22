@@ -8,6 +8,7 @@
 
 import type { ClientSession, GameServer } from '../../server/game';
 import { ActionBarLayoutUploader } from '../../src/net/action_bar_upload';
+import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
 import { ClientWorld } from '../../src/net/online';
@@ -75,6 +76,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
     weaponSkinLoadout: {},
   };
   c.accountAdmin = false;
+  c.selfBuddies = emptyBuddySelfMirror();
   c.petSpecialCommandsSupported = false;
   c.movementWireVersion = 1;
   c.reconAuthoritativeX = null;

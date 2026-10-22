@@ -364,6 +364,9 @@ export function rollLoot(
       }
     }
   }
+  // Buddies are deliberately NOT corpse loot: the per-player companion roll
+  // rides the boss death site instead (src/sim/buddy_drops.ts, content/
+  // buddy_sources.ts), so no kill anywhere draws for one here.
   if (copper > 0 || items.length > 0) {
     // A soulbound drop pins its bind-on-pickup trade group NOW, from the
     // kill-time `eligible` set, so a member who disconnects before the roll

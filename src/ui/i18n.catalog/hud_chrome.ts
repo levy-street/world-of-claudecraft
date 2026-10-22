@@ -2590,6 +2590,10 @@ export const hudChromeStrings = {
     // Interface panel toggle: render other players' overhead nameplates (on by
     // default); off declutters crowded hubs, the current target stays visible.
     showPlayerNameplates: 'Show Player Nameplates',
+    // Interface panel toggle: render a cosmetic buddy follower's nameplate,
+    // name only, never a health bar (off by default: a buddy cannot be
+    // attacked and has no health worth showing).
+    showPetNames: 'Show Pet Names',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
@@ -3450,6 +3454,12 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Direct buddy unlocks. Their own heading so a
+    // companion never reads as a set piece the collection count is waiting on.
+    companions: 'Companions',
+    companionPurchase:
+      'Permanently unlocks this buddy and summons it immediately. No item is added to your bags.',
+    companionOwnedAria: '{item}, already collected or awaiting reveal',
     // Group headings: Warfare Season 2 (the viewer's class sets and weapons)
     // listed above the Season 1 entry tier (warfare_vendor_window.ts).
     groupSeason2: 'Warfare Season 2: Vanguard',
@@ -4590,6 +4600,21 @@ export const hudChromeStrings = {
     // The chat-line badge marking a verified streamer's name; opens the same
     // player menu the name itself opens, with the channel link(s) up top.
     streamerBadgeTitle: 'Verified streamer',
+  },
+  // Right-click (desktop) / double-tap (touch) menu on the target frame when
+  // the target is your OWN cosmetic buddy. A buddy takes no pet commands, so
+  // this menu is only the autoloot errand: while it is on, the buddy walks to
+  // your own lootable corpses within 30 yards and loots them for you.
+  buddyMenu: {
+    rename: 'Rename Buddy',
+    nameLabel: 'Buddy name',
+    autolootEnable: 'Enable Autoloot',
+    autolootDisable: 'Disable Autoloot',
+    // Hover/`title` explanation on whichever of the two rows is showing, so the
+    // 30-yard rule and the "your corpses only" rule are discoverable from the
+    // menu itself rather than only from patch notes.
+    autolootHint: 'Your buddy fetches loot from your own corpses within 30 yards.',
+    cancel: 'Cancel',
   },
   lootSettings: {
     title: 'Loot Settings',
@@ -6869,6 +6894,67 @@ export const hudChromeStrings = {
     // carrier, a bystander who did not order it.
     logAdminPurge: 'An administrator removed {count} {item}',
   },
+  // Buddy companion copy: the Cosmetics pane's buddy tab, card states and
+  // Summon/Dismiss, plus the presence and reveal chat lines.
+  collections: {
+    tabs: {
+      buddies: 'Buddies',
+    },
+    state: {
+      owned: 'Collected',
+      notOwned: 'Not collected',
+      // The catalog carries entries with no source assigned yet. The row still
+      // renders: "not in the game yet" is the answer a collector needs.
+      unavailable: 'Not obtainable yet',
+      // A boss-roll win the player has read the presence line for, not yet
+      // revealed (src/sim/buddies.ts pending).
+      pending: 'A presence follows you',
+    },
+    // The two text-free buddy events (src/ui/buddy_event_lines.ts). One
+    // presence line per companion; the default covers a companion without one.
+    presenceDefault: 'You feel a presence watching you.',
+    revealed: '{name} has decided to follow you.',
+    presence: {
+      ember_fox: 'Something small and warm is padding along behind you.',
+      moss_hare: 'A rustle in the peat keeps pace with your steps.',
+      frog: 'A wet croak answers every step you take.',
+      crimson_claw_crab: 'Something clicks and scuttles just out of sight.',
+      golden_sentinel: 'A faint gilded glint watches from the grass.',
+      nightfang: 'Silent paws follow where you cannot see.',
+      tuskhorn_boar: 'A snort and a stamp: something stubborn is trailing you.',
+      emerald_wolf: 'Green eyes blink in the undergrowth, then follow.',
+      tiger: 'Stripes shift at the edge of your vision.',
+      cate_coin: 'You hear the faint ring of a coin that is not yours.',
+      alon: 'You feel watched, and quietly approved of.',
+      trollface: 'Somewhere behind you, something is grinning.',
+      ansem: 'A whisper of doors and darkness follows you.',
+      triple_t: 'Three footsteps fall where there should be one.',
+      kekius: 'A stifled laugh trails you down the road.',
+      solbot: 'A soft ticking keeps time with your stride.',
+      frostfire: 'Steam and frost swirl in your wake.',
+      rocky: 'Pebbles shift behind you with no wind to move them.',
+      proud_grunt: 'A boot stamps to attention somewhere behind you.',
+      loot_goblin: 'Something is counting your coins under its breath.',
+      penny_goldspark: 'Tiny tools clink in a pocket that is not yours.',
+      stag: 'A shadow with antlers falls across your path.',
+      alpaca: 'Something woolly and unhurried has decided to come along.',
+      horse: 'Hooves keep an easy, patient beat somewhere behind you.',
+      sapling: 'Little roots patter behind you, stirring the fallen leaves.',
+      bull: 'A low huff of breath stirs the dust behind you.',
+      spider: 'A thread of silk brushes your shoulder.',
+      raptor: 'Quick claws tick over stone at your heels.',
+      skeleton: 'Dry bones rattle in step with yours.',
+      crystal_lich: 'A cold hum rises from the wreckage, and it is watching you.',
+      forgemaw: 'The heat of the forge has not left you. Something walked out with it.',
+      crystal_tide: 'A drop of the sea refuses to fall from your line.',
+      phantom: 'The air behind you is a shade too still.',
+      emberfall_phoenix: 'A warmth like a banked fire settles at your back.',
+    },
+    actions: {
+      summon: 'Summon',
+      dismiss: 'Dismiss',
+    },
+  },
   // The event calendar window: recurring system events plus the guild lane
   // (booked by officers and the Guild Master, mirrored via socialInfo).
   calendar: {
@@ -9091,6 +9177,17 @@ export const hudChromeStrings = {
     bordersSection: 'Borders',
     bordersNone: 'No Border',
     bordersEmpty: 'Earn a border-bearing deed to unlock this shelf.',
+    // The buddy shelf (owner request 2026-09-09): pick a collected companion
+    // to summon it, drag one onto the action bar, and dress the one that is
+    // out in an unlocked look.
+    buddiesSection: 'Buddies',
+    buddiesNone: 'No Buddy',
+    buddiesEmpty: 'Collect a companion to summon it from this shelf.',
+    buddyDragHint: 'Drag onto your action bar',
+    looksSection: 'Buddy Looks',
+    looksNone: 'Own Look',
+    looksNoBuddy: 'Summon a companion to choose its look here.',
+    looksEmpty: 'This companion has no looks unlocked yet.',
     unlockedBanner: 'Deed accomplished: {name}',
     unlockedTitleHint: 'New title earned: {title}. Choose it in the Book of Deeds.',
     // The border sibling. It names the DEED rather than a reward text, since a

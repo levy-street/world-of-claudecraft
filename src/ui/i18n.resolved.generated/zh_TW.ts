@@ -2208,6 +2208,7 @@ export const zh_TW: EnTranslations = {
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
       "showPlayerNameplates": "顯示玩家姓名板",
+      "showPetNames": "顯示寵物名稱",
       "uiScale": "介面縮放",
       "playerFrameScale": "玩家框縮放",
       "targetFrameScale": "目標框縮放",
@@ -2843,6 +2844,9 @@ export const zh_TW: EnTranslations = {
       "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
       "jewelry": "飾品",
       "weapons": "武器",
+      "companions": "夥伴",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "groupSeason2": "戰爭賽季 2：先鋒",
       "groupEntry": "戰爭賽季 1",
       "owned": "已擁有",
@@ -3580,6 +3584,14 @@ export const zh_TW: EnTranslations = {
       "watchKick": "在 Kick 觀看",
       "watchYouTube": "在 YouTube 觀看",
       "streamerBadgeTitle": "認證主播"
+    },
+    "buddyMenu": {
+      "rename": "重新命名夥伴",
+      "nameLabel": "夥伴名稱",
+      "autolootEnable": "開啟自動拾取",
+      "autolootDisable": "關閉自動拾取",
+      "autolootHint": "你的夥伴會去拾取 30 碼內屬於你自己的屍體上的戰利品。",
+      "cancel": "取消"
     },
     "lootSettings": {
       "title": "拾取設定",
@@ -4950,6 +4962,59 @@ export const zh_TW: EnTranslations = {
       "logCharterFee": "{actor} 支付了 {amount} 的公會創建費用",
       "logAdminPurge": "管理員移除了 {count} 個 {item}"
     },
+    "collections": {
+      "tabs": {
+        "buddies": "夥伴"
+      },
+      "state": {
+        "owned": "已收集",
+        "notOwned": "未收集",
+        "unavailable": "尚無法獲得",
+        "pending": "有什麼在跟著你"
+      },
+      "presenceDefault": "你感覺到有什麼在注視著你。",
+      "revealed": "{name}決定跟隨你。",
+      "presence": {
+        "ember_fox": "有個溫暖的小東西正輕手輕腳地跟在你身後。",
+        "moss_hare": "泥炭裡的一陣窸窣聲與你的腳步保持著同步。",
+        "frog": "你每走一步，就有一聲濕漉漉的蛙鳴回應。",
+        "crimson_claw_crab": "視線之外有什麼東西喀嗒作響地爬來爬去。",
+        "golden_sentinel": "草叢中有一抹微弱的金光在注視著你。",
+        "nightfang": "無聲的腳爪在你看不見的地方尾隨。",
+        "tuskhorn_boar": "一聲哼鼻、一記跺腳：有個倔強的傢伙正跟著你。",
+        "emerald_wolf": "灌木叢中一雙綠眼睛眨了眨，然後跟了上來。",
+        "tiger": "你的視野邊緣有條紋在晃動。",
+        "cate_coin": "你聽到一枚不屬於你的硬幣發出微弱的響聲。",
+        "alon": "你感到被注視著，還被默默地讚許著。",
+        "trollface": "在你身後的某處，有什麼東西正咧嘴笑著。",
+        "ansem": "關於門與黑暗的低語跟隨著你。",
+        "triple_t": "本該只有一個腳步聲的地方，響起了三個。",
+        "kekius": "一聲壓抑的笑聲沿著路尾隨著你。",
+        "solbot": "一陣輕柔的滴答聲與你的步伐合拍。",
+        "frostfire": "蒸汽與寒霜在你身後盤旋。",
+        "rocky": "你身後的碎石在沒有風的情況下移動了。",
+        "proud_grunt": "你身後某處，一隻軍靴跺腳立正。",
+        "loot_goblin": "有什麼東西正小聲數著你的錢幣。",
+        "penny_goldspark": "不屬於你的口袋裡，小工具叮噹作響。",
+        "stag": "一道長著鹿角的影子橫過你的路。",
+        "alpaca": "有個毛茸茸、不慌不忙的傢伙決定跟你走。",
+        "horse": "身後某處，馬蹄正踏著從容而耐心的節拍。",
+        "sapling": "細小的樹根在你身後輕快地踏過，撥動了落葉。",
+        "bull": "一聲低沉的喘息揚起了你身後的塵土。",
+        "spider": "一縷蛛絲拂過你的肩膀。",
+        "raptor": "你腳跟後有敏捷的爪子在石頭上嗒嗒作響。",
+        "skeleton": "乾枯的骨頭隨著你的腳步喀喀作響。",
+        "crystal_lich": "一陣寒冷的嗡鳴從殘骸中升起，它正注視著你。",
+        "forgemaw": "熔爐的熱度還沒有離開你。有什麼東西隨之走了出來。",
+        "crystal_tide": "一滴海水拒絕從你的釣線上落下。",
+        "phantom": "你身後的空氣靜得有些過分。",
+        "emberfall_phoenix": "一股如同封火般的暖意落在你的背後。"
+      },
+      "actions": {
+        "summon": "召喚",
+        "dismiss": "解散"
+      }
+    },
     "calendar": {
       "title": "活動日曆",
       "close": "關閉日曆",
@@ -6011,6 +6076,8 @@ export const zh_TW: EnTranslations = {
       "tabMounts": "坐騎",
       "tabSkins": "造型",
       "tabMech": "機甲",
+      "buddyActive": "已召喚",
+      "buddyDrag": "拖到動作條",
       "legend": "帳號：所有角色共用。角色：僅此角色。",
       "scopeAccount": "帳號",
       "scopeCharacter": "角色",
@@ -6223,7 +6290,7 @@ export const zh_TW: EnTranslations = {
       "watchFull": "追蹤清單已滿（最多 {cap} 項）",
       "watchAria": "在介面追蹤器中追蹤{name}",
       "unwatchAria": "停止追蹤{name}",
-      "cosmeticsSection": "頭銜與邊框",
+      "cosmeticsSection": "頭銜、邊框與夥伴",
       "titlesSection": "頭銜",
       "titlesAria": "選擇要展示的頭銜",
       "titlesNone": "無頭銜",
@@ -6231,6 +6298,14 @@ export const zh_TW: EnTranslations = {
       "bordersSection": "邊框",
       "bordersNone": "無邊框",
       "bordersEmpty": "獲得帶邊框的功績後即可解鎖此欄。",
+      "buddiesSection": "夥伴",
+      "buddiesNone": "無夥伴",
+      "buddiesEmpty": "收集一個夥伴，即可從此處召喚。",
+      "buddyDragHint": "拖到你的動作條上",
+      "looksSection": "夥伴外觀",
+      "looksNone": "原本外觀",
+      "looksNoBuddy": "召喚一個夥伴後在此選擇牠的外觀。",
+      "looksEmpty": "這個夥伴還沒有解鎖任何外觀。",
       "unlockedBanner": "達成功績：{name}",
       "unlockedTitleHint": "獲得新頭銜：{title}。可在功績之書中選用。",
       "unlockedBorderHint": "獲得新邊框：{name}。可在功績之書中佩戴。",
@@ -12737,7 +12812,9 @@ export const zh_TW: EnTranslations = {
       "flask": "藥壺",
       "scroll": "卷軸",
       "bag": "背包",
-      "mount": "坐騎"
+      "mount": "坐騎",
+      "buddy": "夥伴",
+      "buddyCosmetic": "夥伴外觀"
     },
     "stats": {
       "armor": "護甲",
@@ -16879,6 +16956,15 @@ export const zh_TW: EnTranslations = {
       "ps_passing_stone": {
         "name": "往生石"
       },
+      "whistle_horse": {
+        "name": "馬的哨子"
+      },
+      "whistle_crystal_lich": {
+        "name": "水晶巫妖的哨子"
+      },
+      "whistle_forgemaw": {
+        "name": "熔顎·熔融者的哨子"
+      },
       "lastflame_core": {
         "name": "末焰之核"
       },
@@ -20102,6 +20188,108 @@ export const zh_TW: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地之聲祖爾加"
+      },
+      "buddy_ember_fox": {
+        "name": "餘燼狐"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "燼落鳳凰"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "赤鉗蟹"
+      },
+      "buddy_golden_sentinel": {
+        "name": "黃金哨兵"
+      },
+      "buddy_nightfang": {
+        "name": "夜牙"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "獠角野豬"
+      },
+      "buddy_emerald_wolf": {
+        "name": "翡翠狼"
+      },
+      "buddy_tiger": {
+        "name": "猛虎"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "巨魔臉"
+      },
+      "buddy_ansem": {
+        "name": "安塞姆"
+      },
+      "buddy_triple_t": {
+        "name": "三重T"
+      },
+      "buddy_kekius": {
+        "name": "凱基烏斯"
+      },
+      "buddy_solbot": {
+        "name": "索爾機偶"
+      },
+      "buddy_frostfire": {
+        "name": "霜火"
+      },
+      "buddy_rocky": {
+        "name": "岩仔"
+      },
+      "buddy_proud_grunt": {
+        "name": "驕傲的步兵"
+      },
+      "buddy_loot_goblin": {
+        "name": "戰利品哥布林"
+      },
+      "buddy_penny_goldspark": {
+        "name": "潘妮·金火花"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "羊駝"
+      },
+      "buddy_horse": {
+        "name": "馬"
+      },
+      "buddy_sapling": {
+        "name": "小樹苗"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "蜘蛛"
+      },
+      "buddy_raptor": {
+        "name": "迅猛龍"
+      },
+      "buddy_skeleton": {
+        "name": "骷髏"
+      },
+      "buddy_crystal_lich": {
+        "name": "水晶巫妖"
+      },
+      "buddy_forgemaw": {
+        "name": "熔顎·熔融者"
+      },
+      "buddy_crystal_tide": {
+        "name": "水晶潮汐"
+      },
+      "buddy_phantom": {
+        "name": "幻魂"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"

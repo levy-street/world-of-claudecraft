@@ -88,6 +88,7 @@ import type { FactionId } from '../sim/factions';
 import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import {
   computeRespecCost,
@@ -187,6 +188,7 @@ import {
 } from './banner_queue';
 import { blockLandingLogKey } from './block_landing_feedback_core';
 import { BootcampOverlay } from './bootcamp';
+import { buddyDisplayName, buddyEventLogArgs } from './buddy_event_lines';
 import { CalendarWindow } from './calendar_window';
 import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
@@ -281,6 +283,7 @@ import {
   itemDisplayNameFromSource,
   itemStackDisplayName,
   mobDisplayName,
+  mobHoverIdentity,
   npcDisplayName,
   npcDisplayTitle,
   npcGreeting,
@@ -390,7 +393,6 @@ import {
 import {
   applyLoadoutBar as applyLoadoutBarActions,
   assignAttackSlotAction,
-  attackDragDisposition,
   clearHotbarSlot,
   type FreedAttackSlotAbility,
   freedAttackSlotDisplayAbility,
@@ -399,10 +401,14 @@ import {
   loadoutKnownAbilityIds,
   placeAbilityOnSlot,
   placeItemOnSlot,
-  readHotbarDragData,
   swapHotbarSlots,
-  writeHotbarDragData,
 } from './hud/action_bar/hotbar';
+import {
+  acceptAttackDrag,
+  type HotbarActionExists,
+  readDraggedAction,
+  writeDraggedAction,
+} from './hud/action_bar/hotbar_drag';
 import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
   clampMobilePage,
@@ -429,6 +435,7 @@ import {
   buildBgTimeWarningView,
 } from './hud/battleground';
 import { BgProposalPopup } from './hud/battleground/battleground_proposal_popup';
+import { openBuddyMenu as openBuddyMenuPopup } from './hud/buddy_menu';
 import { ChatAnnouncer, ChatScrollFollow } from './hud/chat';
 import { chatChannelColor } from './hud/chat/chat_channels';
 import { ChatGeometryController } from './hud/chat/chat_geometry_controller';
@@ -589,6 +596,7 @@ import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
+import { targetFrameMenuKind } from './hud/target_frame_menu';
 import { FerryHudPainter } from './hud/transport';
 import { TreasureMapWindow } from './hud/treasure';
 import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
@@ -3502,7 +3510,7 @@ export class Hud {
   // the viewport in that same space, keeping `reserveRight`/`reserveBottom`
   // author px clear so the popup never spills off-screen. minTop pins it below
   // the top edge. Z=1 (default uiScale) leaves the math identical to before.
-  private placePopupAt(
+  placePopupAt(
     el: HTMLElement,
     x: number,
     y: number,
@@ -3524,7 +3532,7 @@ export class Hud {
   // on a short landscape phone; getBoundingClientRect reflects the laid-out box (so it
   // is reliable even on the first open, where an offset read can still be stale), and
   // this only ever moves the popup UP/LEFT, never past the top/left edge.
-  private keepPopupOnScreen(el: HTMLElement): void {
+  keepPopupOnScreen(el: HTMLElement): void {
     const clamp = () => {
       const z = getUiScale();
       const r = el.getBoundingClientRect();
@@ -5193,6 +5201,10 @@ export class Hud {
   // surface: world reads, cross-window mode flags + commands, pet-feed / drag /
   // wallet plumbing. The cross-window modes stay HUD state, read each click.
   private readonly bagsWindow = new BagsWindow({
+    setDragAction: (action) => {
+      this.dragAction = action ? { action, sourceIndex: null } : null;
+    },
+    clearActionDropTargets: () => this.clearActionDropTargets(),
     ...this.presentationBag,
     root: () => $('#bags'),
     world: () => this.sim,
@@ -5245,10 +5257,6 @@ export class Hud {
       }
       return false;
     },
-    setDragAction: (action) => {
-      this.dragAction = action ? { action, sourceIndex: null } : null;
-    },
-    clearActionDropTargets: () => this.clearActionDropTargets(),
     dragState: this.itemDragState,
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId, slotIndex) => this.charWindow.markDropTargets(itemId, slotIndex),
@@ -5558,6 +5566,9 @@ export class Hud {
     ...this.windowFocus('#arena-window'),
   });
 
+  // Dungeon Finder (cold window; docs/prd/dungeon-finder.md). Composes the
+  // shared presentation bag for loot icons/tooltips and a narrow map hook for
+  // the non-teleporting "Show on Map" action.
   private readonly dungeonFinderWindow = new DungeonFinderWindow({
     ...this.presentationBag,
     root: () => $('#dungeon-finder-window'),
@@ -5920,6 +5931,10 @@ export class Hud {
   // drag / tooltip seams through these lazy closures. refreshHotbarControls keeps
   // the +/- toggles in sync from hud.update() while the window is open.
   private readonly spellbookWindow = new SpellbookWindow({
+    setDragAction: (action) => {
+      this.dragAction = action ? { action, sourceIndex: null } : null;
+    },
+    clearActionDropTargets: () => this.clearActionDropTargets(),
     root: () => $('#spellbook'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#spellbook'),
@@ -5949,10 +5964,6 @@ export class Hud {
     removeFromBar: (id) => this.removeAbilityFromHotbar(id),
     hasFormBars: () => this.classHasFormBars(),
     resetFormBar: () => this.resetActiveFormBarToDefault(),
-    setDragAction: (action) => {
-      this.dragAction = action ? { action, sourceIndex: null } : null;
-    },
-    clearActionDropTargets: () => this.clearActionDropTargets(),
     openBarEditor: (abilityId) => this.openBarEditor(abilityId),
   });
   // Shared so a swap or clear also refreshes the spellbook's hotbar toggles.
@@ -6376,7 +6387,7 @@ export class Hud {
     const questKey = mobQuests
       .map((q) => `${q.questId}#${q.objectiveIndex}:${q.current}/${q.total}`)
       .join(',');
-    const key = `mob:${entity.id}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
+    const key = `mob:${entity.id}:${entity.name}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
     if (key === this.lastHoverTooltipId) return;
     this.lastHoverTooltipId = key;
     const template = MOBS[entity.templateId];
@@ -6391,7 +6402,7 @@ export class Hud {
         ? t('hudChrome.mobTooltip.familyDemon')
         : t(`guide.family.${template.family}.name` as TranslationKey);
     const model: MobTooltipModel = {
-      name: mobDisplayName(entity.templateId),
+      ...mobHoverIdentity(entity),
       level: entity.level,
       familyLabel,
       color: mobTooltipConColor(diff, entity.dead, friendlyPet),
@@ -7590,34 +7601,24 @@ export class Hud {
     window.setTimeout(() => btn.classList.remove('used'), 180);
   }
 
-  private readDraggedAction(dt: DataTransfer | null): Exclude<HotbarAction, null> | null {
-    return readHotbarDragData(
-      dt,
-      (id) => this.sim.known.some((k) => k.def.id === id),
-      (id) => this.isHotbarItemId(id),
-    );
+  /** What a dropped payload can resolve to here (hotbar_drag.ts readDraggedAction). */
+  private hotbarActionExists(): HotbarActionExists {
+    return {
+      ability: (id) => this.sim.known.some((k) => k.def.id === id),
+      item: (id) => this.isHotbarItemId(id),
+    };
   }
 
-  // Attack is accepted only by slot 0, its fixed destination. The pure disposition
-  // keeps that behavior testable and lets every other slot reject the drag truthfully.
   private tryAcceptAttackDrag(
     e: DragEvent,
     btn: HTMLButtonElement,
     slot: number,
     phase: 'over' | 'drop',
-  ): boolean {
-    const disposition = attackDragDisposition(e.dataTransfer?.types, slot, phase);
-    if (disposition === 'ignore') return false;
-    e.preventDefault();
-    if (phase === 'over') {
-      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-      btn.classList.toggle('drop-target', disposition === 'highlight');
-    } else {
-      btn.classList.remove('drop-target');
+  ) {
+    return acceptAttackDrag(e, btn, slot, phase, () => {
       this.optionsHooks?.settings.set('showAttackButton', true);
       this.hideTooltip();
-    }
-    return true;
+    });
   }
 
   private actionBarsLocked(): boolean {
@@ -7729,14 +7730,15 @@ export class Hud {
             return;
           }
           this.dragAction = { action, sourceIndex: slot - 1 };
-          writeHotbarDragData(e.dataTransfer, action);
+          writeDraggedAction(e.dataTransfer, action);
           if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
           this.hideTooltip();
         });
         btn.addEventListener('dragover', (e) => {
           if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
-          const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
+          const dragged =
+            this.dragAction?.action ?? readDraggedAction(e.dataTransfer, this.hotbarActionExists());
           if (!dragged) return;
           if (!this.actionBarController.isAssignableAction(dragged)) return;
           if (this.dragAction?.sourceIndex === slot - 1) return;
@@ -7745,7 +7747,7 @@ export class Hud {
             e.dataTransfer.dropEffect =
               this.dragAction?.sourceIndex === null &&
               !this.dragAction?.sourceAttackSlot &&
-              dragged.type === 'item'
+              dragged.type !== 'ability'
                 ? 'copy'
                 : 'move';
           btn.classList.add('drop-target');
@@ -7757,7 +7759,7 @@ export class Hud {
           e.preventDefault();
           btn.classList.remove('drop-target');
           const dragged = this.dragAction ?? {
-            action: this.readDraggedAction(e.dataTransfer),
+            action: readDraggedAction(e.dataTransfer, this.hotbarActionExists()),
             sourceIndex: null,
             sourceAttackSlot: false,
           };
@@ -7831,7 +7833,7 @@ export class Hud {
             sourceIndex: null,
             sourceAttackSlot: true,
           };
-          writeHotbarDragData(e.dataTransfer, action);
+          writeDraggedAction(e.dataTransfer, action);
           if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
           this.hideTooltip();
         });
@@ -7841,7 +7843,8 @@ export class Hud {
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           if (this.attackSlotIsAttack()) return;
           if (this.dragAction?.sourceAttackSlot) return;
-          const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
+          const dragged =
+            this.dragAction?.action ?? readDraggedAction(e.dataTransfer, this.hotbarActionExists());
           if (!dragged) return;
           if (!this.actionBarController.isAssignableAction(dragged)) return;
           e.preventDefault();
@@ -7855,7 +7858,7 @@ export class Hud {
           btn.classList.remove('drop-target');
           if (this.attackSlotIsAttack()) return;
           const dragged = this.dragAction ?? {
-            action: this.readDraggedAction(e.dataTransfer),
+            action: readDraggedAction(e.dataTransfer, this.hotbarActionExists()),
             sourceIndex: null,
             sourceAttackSlot: false,
           };
@@ -8119,7 +8122,8 @@ export class Hud {
     const ability = this.abilityForSlot(slot);
     if (ability) return abilityDisplayName(ability.def);
     const item = this.itemForSlot(slot);
-    return item ? itemDisplayName(item) : null;
+    if (item) return itemDisplayName(item);
+    return null;
   }
 
   private buildXpTicks(): void {
@@ -11803,6 +11807,11 @@ export class Hud {
           // executes it.
           this.handleProfessionEvent(ev);
           break;
+        case 'buddyPresence':
+        case 'buddyRevealed':
+          if (this.openWarfareVendorNpcId !== null) this.renderWarfareVendor();
+          this.log(...buddyEventLogArgs(ev));
+          break;
         case 'gatherResult':
           // Node-harvest feedback: line, cue, and rare-tier stinger (extracted
           // to gathering_result_feedback.ts; Hud is the host seam).
@@ -14917,14 +14926,14 @@ export class Hud {
   private requestWarfarePurchase(npcId: number, itemId: string): void {
     const item = ITEMS[itemId];
     if (!item) return;
-    // COUPLING: the title / accept / cancel labels are BORROWED from the Heroic
-    // Marks shop because they are currency-neutral today. Specializing any of
-    // the three heroicShop.buyConfirm* values for Marks would silently retitle
-    // this Honor dialog; mint warfareShop.* replacements here if that happens.
+    // Shared Heroic shop title/accept/cancel keys must remain currency-neutral.
     this.confirmDialog(
       t('heroicShop.buyConfirmTitle'),
       t('hudChrome.warfareShop.buyConfirmBody', {
-        item: itemDisplayName(item),
+        item:
+          item.kind === 'buddy' && item.buddy
+            ? buddyDisplayName(item.buddy)
+            : itemDisplayName(item),
         honor: t('hudChrome.warfare.honorAmount', {
           amount: formatNumber(Math.max(0, Math.floor(item.priceHonor ?? 0)), {
             maximumFractionDigits: 0,
@@ -16265,6 +16274,8 @@ export class Hud {
       offhand: string | null;
       /** The active Armory weapon-skin cosmetic (null = the item's own model). */
       weaponSkinId: string | null;
+      /** Entity dye for a tinted rig; white (the default) leaves baked art alone. */
+      tint?: number;
       framing: PreviewFramingName;
       /** Compose the turntable from this authored look instead of mounting the
        *  stock class rig. Set for the SELF sheet, whose body must match the one
@@ -16295,7 +16306,13 @@ export class Hud {
       // Mech is class-agnostic; mirror the wearer class's hand layout so the
       // paperdoll matches the in-world render.
       const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
-      this.charPreview.setVisualKey(opts.previewKey, opts.mainhand, override, opts.offhand);
+      this.charPreview.setVisualKey(
+        opts.previewKey,
+        opts.mainhand,
+        override,
+        opts.offhand,
+        opts.tint,
+      );
     } else {
       this.charPreview.setClass(opts.cls, opts.mainhand, opts.offhand);
     }
@@ -17193,28 +17210,19 @@ export class Hud {
   }
 
   // Open the target-frame unit menu at a viewport point, shared by the desktop
-  // right-click (contextmenu) and the touch double-tap. A friendly player (not
-  // you) gets the social/party menu; your own pet gets the pet menu; a live wild
-  // hostile mob (in a party) gets the raid-marker menu, mirroring Sim.setMarker's
-  // markable criteria so the menu never appears where it would be a no-op.
-  // `tid` defaults to the current target (the target frame's own right-click);
-  // the target-of-target frame passes ITS unit through the same menu builder.
+  // right-click (contextmenu) and the touch double-tap. WHICH menu a target
+  // opens is targetFrameMenuKind's rule (hud/target_frame_menu.ts); this only
+  // dispatches to the matching opener. `tid` defaults to the current target (the
+  // target frame's own right-click); the target-of-target frame passes ITS unit
+  // through the same menu builder.
   private openTargetFrameMenuAt(x: number, y: number, tid = this.sim.player.targetId): void {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
-    if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
-      this.openContextMenu(t.id, t.name, x, y);
-    } else if (t && isControllableOwnedPet(t, this.sim.playerId)) {
-      this.openPetMenu(t.id, t.name, t.dead, x, y);
-    } else if (
-      t &&
-      t.kind === 'mob' &&
-      !t.dead &&
-      t.hostile &&
-      t.ownerId === null &&
-      this.sim.partyInfo
-    ) {
-      this.openMarkerMenu(t.id, t.name, x, y);
-    }
+    if (!t) return;
+    const kind = targetFrameMenuKind(t, this.sim.playerId, !!this.sim.partyInfo);
+    if (kind === 'player') this.openContextMenu(t.id, t.name, x, y);
+    else if (kind === 'pet') this.openPetMenu(t.id, t.name, t.dead, x, y);
+    else if (kind === 'buddy') this.openBuddyMenu(t.id, entityDisplayName(t), x, y);
+    else if (kind === 'marker') this.openMarkerMenu(t.id, t.name, x, y);
   }
 
   /**
@@ -17566,6 +17574,15 @@ export class Hud {
     });
   }
 
+  /** Your own cosmetic buddy's target-frame menu: one row, the autoloot errand
+   *  (src/sim/pet/buddy_autoloot.ts owns its rules). The armed state is read off
+   *  the entity mirror (Entity.buddyAutoloot, terse `budal`) exactly as the rest
+   *  of the HUD reads buddyKey, so the row offers the flip the SERVER would
+   *  make; the write is server-authoritative and lands on the next snapshot. */
+  openBuddyMenu(buddyId: number, name: string, x: number, y: number): void {
+    openBuddyMenuPopup(this, this.sim, buddyId, name, x, y, (opts) => this.inputDialog(opts));
+  }
+
   private openChatPlayerContextMenu(
     name: string,
     x: number,
@@ -17652,7 +17669,7 @@ export class Hud {
     });
   }
 
-  private bindContextMenuActions(onActivate: (act: string) => void): void {
+  bindContextMenuActions(onActivate: (act: string) => void): void {
     const el = $('#ctx-menu');
     el.querySelectorAll<HTMLElement>('.ctx-item').forEach((item) => {
       item.setAttribute('role', 'button');

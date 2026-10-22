@@ -102,8 +102,11 @@ describe('mob portrait source manifest', () => {
     // goblin that sometimes runs through a hoard with a sack of gold. 266: the
     // Mother of Mushrooms, the first cave boss, with her sporeling and her
     // Bloated Cap. 270: the other three cave bosses (Deeprake, the Colossal Bat,
-    // the Voracious Chest) and the bat's swarm.
-    expect(liveIds).toHaveLength(270);
+    // the Voracious Chest) and the bat's swarm. 273: the three retained buddy
+    // companions (Horse, Crystal Lich, Forgemaw). The ledger renders every
+    // live template, so they carry rows here even though their target frames
+    // read the reviewed static art in public/ui/portraits.
+    expect(liveIds).toHaveLength(273);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

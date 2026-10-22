@@ -19,6 +19,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { talentsFor } from '../src/sim/content/talents';
+import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { FocusManager } from '../src/ui/focus_manager';
 import type {
@@ -194,6 +195,92 @@ describe('renderWarfareVendorWindow: painted Honor identity', () => {
     ]);
     expect(icons[0].closest('.warfare-balance')).not.toBeNull();
     expect(icons[1].closest('.warfare-price')).not.toBeNull();
+  });
+});
+
+describe('renderWarfareVendorWindow: direct buddy purchases', () => {
+  function companionView(owned: boolean): WarfareShopView {
+    return view([
+      {
+        kind: 'companions',
+        group: 'companions',
+        key: 'companions',
+        offers: [
+          {
+            itemId: 'whistle_horse',
+            item: ITEMS.whistle_horse,
+            honor: 10_000,
+            affordable: true,
+            owned,
+          },
+        ],
+      },
+    ]);
+  }
+
+  it('offers Tug, the Warhorse by name and explains the immediate unlock without an inventory item', () => {
+    const el = mount();
+    const onBuy = vi.fn();
+    const itemTooltip = vi.fn();
+    let tooltip = '';
+    renderWarfareVendorWindow(
+      el,
+      'FURY',
+      companionView(false),
+      deps({
+        onBuy,
+        itemTooltip,
+        attachTooltip: (_el, build) => {
+          tooltip = build();
+        },
+      }),
+    );
+    const horse = tile(el, 'buy:companions:whistle_horse');
+    expect(horse.querySelector('.vi-name')?.textContent).toBe('Tug, the Warhorse');
+    expect(horse.getAttribute('aria-label')).toBe('Buy Tug, the Warhorse for 10,000 Honor');
+    expect(tooltip).toContain('Permanently unlocks this buddy and summons it immediately.');
+    expect(tooltip).toContain('No item is added to your bags.');
+    expect(itemTooltip).not.toHaveBeenCalled();
+    horse.click();
+    expect(onBuy).toHaveBeenCalledExactlyOnceWith('whistle_horse');
+  });
+
+  it('disables an acquired buddy while owned gear remains purchasable', () => {
+    const el = mount();
+    const onBuy = vi.fn();
+    const model = companionView(true);
+    model.sections.unshift(section(SET_A, [offer('a_one', 'helmet', { owned: true })]));
+    renderWarfareVendorWindow(el, 'FURY', model, deps({ onBuy }));
+    const horse = tile(el, 'buy:companions:whistle_horse');
+    expect(horse.disabled).toBe(true);
+    expect(horse.getAttribute('aria-label')).toBe(
+      'Tug, the Warhorse, already collected or awaiting reveal',
+    );
+    horse.click();
+    expect(onBuy).not.toHaveBeenCalled();
+    const gear = tile(el, `buy:${SET_A}:a_one`);
+    expect(gear.disabled).toBe(false);
+    gear.click();
+    expect(onBuy).toHaveBeenCalledExactlyOnceWith('a_one');
+  });
+
+  it('heads the companions with their own group, never under Warfare Season 1', () => {
+    const el = mount();
+    const model = companionView(false);
+    model.sections.unshift(section(SET_A, [offer('a_one', 'helmet')]));
+    renderWarfareVendorWindow(el, 'FURY', model, deps());
+    const groups = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')].map(
+      (h) => h.textContent,
+    );
+    expect(groups).toEqual(['Warfare Season 1', 'Companions']);
+    // The group heading names the one companions section, so no second
+    // "Companions" section title repeats it, and the grid follows directly.
+    const titles = [...el.querySelectorAll<HTMLElement>('.vendor-section-title')].map(
+      (h) => h.textContent,
+    );
+    expect(titles.filter((text) => text === 'Companions')).toHaveLength(1);
+    const companionsHead = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')][1];
+    expect(companionsHead.nextElementSibling?.getAttribute('data-grid')).toBe('companions');
   });
 });
 

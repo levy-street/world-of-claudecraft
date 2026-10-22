@@ -8,6 +8,7 @@ import { isOwnAura } from '../sim/aura_classify';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
 import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
@@ -22,6 +23,7 @@ import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
 import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
+import { entityDisplayName } from '../ui/entity_display_core';
 import { tEntity } from '../ui/entity_i18n';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
@@ -162,6 +164,7 @@ export interface NameplatePainterDeps {
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
+  showPetNames: () => boolean;
   /** The nameplate dot row's SIZE, with 0 meaning off: the showNameplateDots
    *  toggle and the nameplateDotScale slider fold into this one number at the
    *  settings site. A player preference, never a graphics tier. Defaults to the
@@ -190,6 +193,7 @@ export class NameplatePainter {
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
+  private readonly showPetNames: () => boolean;
   private readonly nameplateDotScale: () => number;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
@@ -247,6 +251,7 @@ export class NameplatePainter {
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
+    this.showPetNames = deps.showPetNames;
     this.nameplateDotScale = deps.nameplateDotScale ?? nameplateDotScaleSetting;
     this.isHostilePlayer = deps.isHostilePlayer;
     this.surface = new NameplateCanvasSurface(deps.layer);
@@ -269,6 +274,7 @@ export class NameplatePainter {
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
+    const showPetNames = this.showPetNames();
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
     if (fullPass) this.questMarkerCtx = null;
@@ -326,6 +332,7 @@ export class NameplatePainter {
         showNameplates,
         showOwnNameplate,
         showPlayerNameplates,
+        showPetNames,
         standIn,
       );
       if (plan.hidden) continue;
@@ -724,8 +731,9 @@ export class NameplatePainter {
     const elite = !!template?.elite;
     const boss = !!template?.boss;
     state.friendlyPet = isFriendlyPet(entity, this.world.entities, this.isHostilePlayer);
-    const mobName =
-      entity.ownerId !== null
+    const mobName = isBuddyMob(entity)
+      ? entityDisplayName(entity)
+      : entity.ownerId !== null
         ? (localizeSimAuraName(entity.name) ?? entity.name)
         : mobDisplayName(entity.templateId);
     state.name = entity.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
@@ -736,7 +744,7 @@ export class NameplatePainter {
           level: formatNumber(entity.level, NAMEPLATE_LEVEL_NUMBER_OPTIONS),
         });
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
-    state.hpVisible = !entity.dead;
+    state.hpVisible = !entity.dead && !plan.noHealthBar;
     // What this body still offers THIS viewer, never the bare lootable flag: a
     // harvest-only body keeps `lootable` true through its grace window, and a
     // stranger's owner-locked kill is lootable for someone else. Ordinary loot

@@ -20,6 +20,7 @@ import {
 import {
   ALL_RECIPES,
   BAG_RECIPES,
+  BUDDY_CHARM_RECIPES,
   COMBO_RECIPES,
   ENGINEERING_ONRAMP_RECIPES,
   FARM_DROP_RUNG_FLOOR,
@@ -649,7 +650,9 @@ describe('REFERENTIAL INTEGRITY', () => {
         TROPHY_RECIPES.length +
         ENGINEERING_ONRAMP_RECIPES.length +
         BAG_RECIPES.length +
-        farmTrainerRows,
+        farmTrainerRows +
+        // The buddy charm look (content/recipes.ts), trainer-taught at the tannery.
+        BUDDY_CHARM_RECIPES.length,
     );
     // The sibling literal for the 11o term: two rows, both trainer-taught.
     expect(ENGINEERING_ONRAMP_RECIPES, 'the engineering on-ramp is two rows').toHaveLength(2);

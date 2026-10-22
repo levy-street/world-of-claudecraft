@@ -67,6 +67,9 @@ export const MODERATION_ACTIONS = [
   // folded into the stored reason text.
   'restore_item',
   'restore_slot',
+  // Buddy grants (server/buddy_wire.ts): the seasonal award channel. Same
+  // shape as the restores: value minted onto a character, reason required.
+  'grant_buddy',
   // Stamped-legendary-name removal (Masterwrought phase 13,
   // server/clear_item_name.ts): moderation of PLAYER-AUTHORED content on an
   // item copy, so the reason is REQUIRED and the stripped target is folded
@@ -1320,7 +1323,7 @@ export async function forceCharacterRename(input: {
 export async function recordProfessionsRestore(input: {
   characterId: number;
   adminAccountId: number;
-  action: 'restore_item' | 'restore_slot';
+  action: 'restore_item' | 'restore_slot' | 'grant_buddy';
   detail: string;
   reason: unknown;
 }): Promise<{ accountId: number }> {

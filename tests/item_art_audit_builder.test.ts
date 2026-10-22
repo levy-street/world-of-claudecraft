@@ -864,29 +864,35 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
-      catalogSha256: 'e3f58abc4acad903941898542c592ca749451e776bdb34935821a6e79e32e7c6',
-      catalogBytes: 801291,
+      // 1498 / 1516 at the release/v0.45.0 merge into the buddy companions branch
+      // (34 rendered whistle and charm icons, two more groups and sheet pages),
+      // re-measured with `--verify-only` on the merged tree.
+      // 1466 / 1484 after the buddy trim (three whistles kept, the 31 other
+      // whistles and both charms deleted with the charm batch), re-measured
+      // with `--verify-only` on this tree.
+      catalogSha256: '8b352a1bbef71792fb52e31a54c0b9cfc6f7244c499862b45c78b4fddb46b95e',
+      catalogBytes: 803047,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1464,
-      liveItemCount: 1482,
+      catalogCount: 1466,
+      liveItemCount: 1484,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
-      groupCount: 26,
-      sheetPageCount: 36,
-      sheetCount: 288,
+      groupCount: 27,
+      sheetPageCount: 37,
+      sheetCount: 296,
       sheetModeCounts: {
-        '128-color': 36,
-        '40-color': 36,
-        '28-color': 36,
-        '22-color': 36,
-        '28-grayscale': 36,
-        '64-circle': 36,
-        'small-multiview': 36,
-        identity: 36,
+        '128-color': 37,
+        '40-color': 37,
+        '28-color': 37,
+        '22-color': 37,
+        '28-grayscale': 37,
+        '64-circle': 37,
+        'small-multiview': 37,
+        identity: 37,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '53d42dd05b8370ad9bf62c5b1d779efc05f02f28fe129a7fe8b53c1b863557fc',
+      shippingCatalogSha256: 'ec9a60de69eb40d55f15ff31741acee5f0ada86ab430efa3a3737b1575d86bd5',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -9,13 +9,18 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
-import { FURY_STOCK, HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
+import {
+  FURY_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
+  HONOR_VENDOR_STOCK,
+} from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef, ItemSet } from '../src/sim/types';
 import {
   buildWarfareVendorView,
   isWarfareVendorNpc,
+  WARFARE_SHOP_COMPANIONS_KEY,
   WARFARE_SHOP_JEWELRY_KEY,
   WARFARE_SHOP_SEASON2_WEAPONS_KEY,
   WARFARE_SHOP_SET_ORDER,
@@ -116,6 +121,7 @@ function viewer(over: Partial<WarfareShopViewer> = {}): WarfareShopViewer {
     honor: 100_000,
     ownedItemIds: new Set<string>(),
     equippedItemIds: new Set<string>(),
+    acquiredBuddyKeys: new Set<string>(),
     ...over,
   };
 }
@@ -416,6 +422,48 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
     expect(fromClient.honor).toBe(fromSim.honor);
     expect([...fromClient.equippedItemIds].sort()).toEqual([...fromSim.equippedItemIds].sort());
     expect([...fromClient.ownedItemIds].sort()).toEqual([...fromSim.ownedItemIds].sort());
+  });
+
+  it.each(['collected', 'pending'] as const)(
+    'marks a %s buddy as acquired even without a whistle in the bags',
+    (state) => {
+      const world: WarfareShopWorld = {
+        honor: 100_000,
+        equipment: {},
+        inventory: [],
+        ownedBuddies: () => (state === 'collected' ? ['horse'] : []),
+        pendingBuddies: () => (state === 'pending' ? ['horse'] : []),
+        cfg: { playerClass: 'warrior' } as WarfareShopWorld['cfg'],
+      };
+      const model = warfareShopViewer(world);
+      const view = buildWarfareVendorView(['whistle_horse'], ITEMS, ITEM_SETS, model);
+      expect(model.acquiredBuddyKeys.has('horse')).toBe(true);
+      expect(view.sections[0].offers[0]).toMatchObject({ owned: true, affordable: true });
+    },
+  );
+
+  it('lists the honor counter companions last, in their own group after the entry tier', () => {
+    const view = buildWarfareVendorView(HONOR_VENDOR_STOCK, ITEMS, ITEM_SETS, viewer());
+    const last = view.sections[view.sections.length - 1];
+    expect(last).toMatchObject({
+      kind: 'companions',
+      group: 'companions',
+      key: WARFARE_SHOP_COMPANIONS_KEY,
+    });
+    expect(last.offers.length).toBeGreaterThan(0);
+    for (const o of last.offers) expect(o.item.kind, o.itemId).toBe('buddy');
+    // The only companions-group section, and no companion leaks into a gear group.
+    expect(view.sections.filter((s) => s.group === 'companions')).toEqual([last]);
+    for (const s of view.sections.slice(0, -1)) {
+      expect(s.group, s.key).not.toBe('companions');
+      for (const o of s.offers) expect(o.item.kind, o.itemId).not.toBe('buddy');
+    }
+  });
+
+  it('does not mistake a legacy whistle in a bag for a permanent buddy unlock', () => {
+    const model = viewer({ ownedItemIds: new Set(['whistle_horse']) });
+    const view = buildWarfareVendorView(['whistle_horse'], ITEMS, ITEM_SETS, model);
+    expect(view.sections[0].offers[0].owned).toBe(false);
   });
 
   it('drops the empty equipment slots rather than counting them as worn ids', () => {

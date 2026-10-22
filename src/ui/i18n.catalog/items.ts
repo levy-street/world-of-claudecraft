@@ -2832,6 +2832,9 @@ const ITEM_ENTITY_IDS = [
   'ps_lustrous_pearl',
   'mother_of_pearl',
   'ps_passing_stone',
+  'whistle_horse',
+  'whistle_crystal_lich',
+  'whistle_forgemaw',
   // Crucible raid professions (docs/prd/ignivar-raid-professions.md).
   'lastflame_core',
   'forgefathers_ember',
@@ -3773,6 +3776,11 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   ps_lustrous_pearl: 'Lustrous Pearl',
   mother_of_pearl: 'Mother of Pearl',
   ps_passing_stone: 'Passing Stone',
+  // Buddies (cosmetic followers), same English-appended treatment until the
+  // release fill folds them into the per-locale arrays.
+  whistle_horse: 'Horse Whistle',
+  whistle_crystal_lich: 'Crystal Lich Whistle',
+  whistle_forgemaw: 'Forgemaw The Molten Whistle',
   // Crucible raid professions, English-appended like the waves above (the
   // maintainer fills every locale at release).
   lastflame_core: 'Core of the Last Flame',

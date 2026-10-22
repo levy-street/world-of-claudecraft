@@ -5924,10 +5924,14 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // soulbound, no-sell-value shape.
     for (const id of honorRows) {
       // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
-      expect(
-        id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
-        id,
-      ).toBe(true);
+      // The one non-Warfare honor row is the companion whistle (kind 'buddy',
+      // HONOR_VENDOR_STOCK): it holds the same final-sale terms.
+      if (ITEMS[id].kind !== 'buddy') {
+        expect(
+          id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
+          id,
+        ).toBe(true);
+      }
       expect(ITEMS[id].soulbound, id).toBe(true);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }
