@@ -1240,6 +1240,7 @@ const RENDER_PURE_CORES = [
   'src/render/program_variant_settle_core.ts',
   'src/render/camera_director_core.ts',
   'src/render/vehicle_camera_core.ts',
+  'src/render/first_person_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',

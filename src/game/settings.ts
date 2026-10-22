@@ -109,6 +109,11 @@ export const SETTING_RANGES = {
   // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
   // to Input on boot via the startup apply-all loop and on Reset (issue 1657).
   cameraZoom: { min: 3, max: 22, def: 12 },
+  // First person at the closest zoom (render/first_person_core.ts): 0 off (the
+  // shipped chase camera), 1 first person showing the body below the head, 2
+  // first person with the whole model hidden. Display-only framing; the closest
+  // zoom stays third person unless the player opts in.
+  firstPersonMode: { min: 0, max: 2, def: 0 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // Desktop-shell window mode: 1 = borderless fullscreen (what the shell opens

@@ -868,6 +868,7 @@ const GENERAL_KEYS = [
   'colorblindMode',
   'reduceMotion',
   'invertLookY',
+  'firstPersonMode',
   'landingHighContrast',
   'showDevBadges',
   'showWalletOnCharacterScreen',
@@ -1689,5 +1690,25 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
       expect(find(controls, 'displayMode')).toBeUndefined();
       expect(find(controls, 'fullscreen')).toMatchObject({ control: 'toggle' });
     }
+  });
+});
+
+describe('options_view: first-person camera row', () => {
+  it('offers off, show body and no body in the General tab, reading the stored mode', () => {
+    const all = buildInterfaceControls(makeSource({ firstPersonMode: 2 }));
+    const row = all.find((c) => 'key' in c && c.key === 'firstPersonMode');
+    expect(row).toMatchObject({
+      control: 'choice',
+      category: 'general',
+      labelKey: 'hudChrome.options.firstPersonMode',
+      current: 2,
+    });
+    if (row?.control !== 'choice') throw new Error('no first-person row');
+    expect(row.options).toEqual([
+      { value: 0, labelKey: 'hudChrome.options.firstPersonOff' },
+      { value: 1, labelKey: 'hudChrome.options.firstPersonBody' },
+      { value: 2, labelKey: 'hudChrome.options.firstPersonNoBody' },
+    ]);
+    expect(SETTING_RANGES.firstPersonMode).toEqual({ min: 0, max: 2, def: 0 });
   });
 });

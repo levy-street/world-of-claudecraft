@@ -9,11 +9,16 @@ import { Settings } from '../src/game/settings';
 import type { ActionCamSide } from '../src/render/action_cam_core';
 
 function fakeRenderer() {
-  const calls: { fov: number[]; action: Array<[boolean, ActionCamSide]> } = { fov: [], action: [] };
+  const calls: { fov: number[]; action: Array<[boolean, ActionCamSide]>; firstPerson: number[] } = {
+    fov: [],
+    action: [],
+    firstPerson: [],
+  };
   return {
     calls,
     setCameraFov: (deg: number) => calls.fov.push(deg),
     actionCam: { set: (on: boolean, side: ActionCamSide) => calls.action.push([on, side]) },
+    firstPerson: { setMode: (mode: number) => calls.firstPerson.push(mode) },
   };
 }
 
@@ -35,6 +40,19 @@ describe('camera_view_settings', () => {
     applyCameraViewSettings(r, settings);
     expect(r.calls.fov).toEqual([72]);
     expect(r.calls.action).toEqual([[true, -1]]);
+    expect(r.calls.firstPerson).toEqual([0]);
+  });
+
+  it('persists and pushes the first-person mode, clamped to its range', () => {
+    const settings = new Settings();
+    const r = fakeRenderer();
+    expect(applyCameraViewSetting(r, settings, 'firstPersonMode', 2)).toBe(true);
+    expect(settings.get('firstPersonMode')).toBe(2);
+    expect(r.calls.firstPerson).toEqual([2]);
+    expect(applyCameraViewSetting(r, settings, 'firstPersonMode', 9)).toBe(true);
+    expect(settings.get('firstPersonMode')).toBe(2);
+    expect(applyCameraViewSetting(r, settings, 'firstPersonMode', 1)).toBe(true);
+    expect(r.calls.firstPerson.at(-1)).toBe(1);
   });
 
   it('persists and pushes the Action Cam keys, keeping the other half', () => {

@@ -2905,6 +2905,14 @@ export const hudChromeStrings = {
     actionCamShoulderLeft: 'Left {pct}',
     actionCamShoulderRight: 'Right {pct}',
     actionCamShoulderCenter: 'Center',
+    // Interface panel picker for the opt-in first-person camera, which takes
+    // over only at the closest zoom (scroll all the way in). The three choices:
+    // off, first person that still shows your body below the head, and first
+    // person with your character hidden entirely.
+    firstPersonMode: 'First Person (Fully Zoomed In)',
+    firstPersonOff: 'Off',
+    firstPersonBody: 'Show Body',
+    firstPersonNoBody: 'No Body',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.

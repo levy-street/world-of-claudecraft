@@ -16949,6 +16949,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderLeft': 'Слева {pct}',
   'hudChrome.options.actionCamShoulderRight': 'Справа {pct}',
   'hudChrome.options.actionCamShoulderCenter': 'По центру',
+  'hudChrome.options.firstPersonMode': 'Вид от первого лица (при максимальном приближении)',
   'hudChrome.breath.label': 'Дыхание',
   'hudChrome.breath.drowning': 'Вы тонете!',
   'abilityUi.resources.devotion': 'Преданность',

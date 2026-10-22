@@ -1045,7 +1045,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12405 -> 12400 with the torched mudfin hut fire: the burn cue's two
     // inline bursts moved into hut_fire_fx.ts (the particle cloud owns and ticks it),
     // leaving a one-line hand-off plus the light-pool hook. Same headroom as before.
-    ceiling: 12400,
+    // LOWERED 12400 -> 12392 when the camera's spatial-audio block moved to
+    // src/render/camera_audio_listener.ts, which also paid for the first-person
+    // hook (src/render/first_person_camera.ts). Same headroom as before.
+    ceiling: 12392,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -16618,6 +16618,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderLeft': '왼쪽 {pct}',
   'hudChrome.options.actionCamShoulderRight': '오른쪽 {pct}',
   'hudChrome.options.actionCamShoulderCenter': '중앙',
+  'hudChrome.options.firstPersonMode': '1인칭 시점 (최대 확대 시)',
   'hudChrome.breath.label': '숨',
   'hudChrome.breath.drowning': '익사 중!',
   'abilityUi.resources.devotion': '헌신',

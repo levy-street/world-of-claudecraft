@@ -16661,6 +16661,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
   'hudChrome.options.actionCamShoulderRight': '右 {pct}',
   'hudChrome.options.actionCamShoulderCenter': '中央',
+  'hudChrome.options.firstPersonMode': '一人称視点（最大ズーム時）',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
   'abilityUi.resources.devotion': '献身',

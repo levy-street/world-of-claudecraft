@@ -63,7 +63,7 @@ import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { AbyssalRiftFx } from './abyssal_rift_fx';
 import { ActionCamRig } from './action_cam_core';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
-import { createAmbienceState, sampleAmbienceInto } from './ambience_state_core';
+import { createAmbienceState } from './ambience_state_core';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME } from './aoe_ring';
 import { buildAoeRingMesh } from './aoe_ring_mesh';
@@ -116,6 +116,7 @@ import { createBuildLedger } from './build_ledger_core';
 import { BuildRetryGate } from './build_retry_gate';
 import { setBuildSpanSink } from './build_spans';
 import { BurningPactMarkers } from './burning_pact_markers';
+import { updateCameraAudioListener } from './camera_audio_listener';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
   cancelCameraDirective,
@@ -389,6 +390,7 @@ import {
   runFireLightBudgetPass,
 } from './fire_light_registry';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
+import { FirstPersonRig } from './first_person_camera';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
 import { applyFloorVfxLayer } from './floor_vfx_layer';
@@ -1455,6 +1457,7 @@ export class Renderer {
   private readonly camDirector = createCameraDirector();
   private readonly vehicleCamera = createVehicleCamera();
   readonly actionCam = new ActionCamRig(); // opt-in over-the-shoulder shift + stride bob
+  readonly firstPerson = new FirstPersonRig(); // opt-in first person, fully zoomed in
   private readonly ambience = createAmbienceState();
   private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
@@ -12286,32 +12289,21 @@ export class Renderer {
     // Later readers (occluder fades, ambience) want the AVATAR eye, not the
     // Action Cam aim: a wall hiding the player must still fade.
     this.cameraLookAt.set(px - shoulder.x, eyeY + shoulder.drop, pz - shoulder.z);
-    const eye = this.cameraLookAt;
-
+    // Opt-in first person (first_person_camera.ts) overrides the finished pose
+    // fully zoomed in; a dead body, a directed move or a vehicle keep the chase.
+    const fpBlocked = p.dead || this.camDirector.kind !== null || !!this.sim.vehicleSession;
+    this.firstPerson.place(
+      this.camera,
+      this.cameraLookAt,
+      this.views.get(p.id),
+      selfPos,
+      pose.yaw,
+      pose.pitch,
+      this.camDist,
+      fpBlocked,
+    );
     // Spatial-audio listener (at the camera, facing the player) + ambience state.
-    const sink = this.audioSink;
-    if (sink) {
-      const cpx = this.camera.position.x,
-        cpy = this.camera.position.y,
-        cpz = this.camera.position.z;
-      const fx = eye.x - cpx,
-        fy = eye.y - cpy,
-        fz = eye.z - cpz;
-      const fl = Math.hypot(fx, fy, fz) || 1;
-      sink.setListener(cpx, cpy, cpz, fx / fl, fy / fl, fz / fl);
-      const amb = sampleAmbienceInto(this.ambience, eye.x, eye.z, seed, this.weatherOn);
-      this.riftAmbience.collect(this.sim, this.sim.player.pos.x, this.riftAmbienceScratch);
-      // Early-out: no live rift ambience this frame, so skip building the
-      // merged array entirely and hand the static set straight through.
-      let points: readonly AmbientPointSource[] = this.ambientPointSources;
-      if (this.riftAmbienceScratch.length > 0) {
-        this.ambientPointsMergedScratch.length = 0;
-        for (const p of this.ambientPointSources) this.ambientPointsMergedScratch.push(p);
-        for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
-        points = this.ambientPointsMergedScratch;
-      }
-      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points, eye);
-    }
+    updateCameraAudioListener(this, this.cameraLookAt);
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and

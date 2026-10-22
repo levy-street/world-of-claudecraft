@@ -15900,6 +15900,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
   'hudChrome.options.actionCamShoulderRight': '右 {pct}',
   'hudChrome.options.actionCamShoulderCenter': '居中',
+  'hudChrome.options.firstPersonMode': '第一人称（完全拉近时）',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
   'abilityUi.resources.devotion': '虔诚',

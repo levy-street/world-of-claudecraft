@@ -985,6 +985,13 @@ export function buildInterfaceControls(
     // Camera comfort (mouse-look direction), so it sits with the comfort
     // toggles rather than the Combat tab's attack/action-bar cluster.
     boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
+    // First person at the closest zoom: off, with the body below the head, or
+    // with no body at all (render/first_person_core.ts).
+    choice(s, 'firstPersonMode', 'hudChrome.options.firstPersonMode', [
+      { value: 0, labelKey: 'hudChrome.options.firstPersonOff' },
+      { value: 1, labelKey: 'hudChrome.options.firstPersonBody' },
+      { value: 2, labelKey: 'hudChrome.options.firstPersonNoBody' },
+    ]),
     boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
     boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
     boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),

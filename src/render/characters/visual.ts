@@ -335,6 +335,9 @@ const CLIMB_ARM_ROLL_RAD = 0.45;
 const CLIMB_ELBOW_RAD = 0.55;
 /** Chin up at the lip while the hands fly to it: the eyes lead the grab. */
 const CLIMB_HEAD_TILT_RAD = -0.35;
+// First-person head hide: near zero rather than zero, so no skinned normal
+// built from the collapsed bone divides by zero.
+const HEAD_HIDDEN_SCALE = 1e-4;
 /** The off hand plants this far (in phase) behind the lead hand. */
 const CLIMB_ARM_LEAD = 0.05;
 const CLIMB_LEG_BONES = ['upperlegl', 'upperlegr'] as const;
@@ -5150,6 +5153,25 @@ export class CharacterVisual {
     }
     return scan;
   }
+
+  /**
+   * The first-person camera's head hide (render/first_person_camera.ts):
+   * collapse the `head` bone so the head, its hair, face parts and a worn
+   * helm (all skinned to or parented under it) stop drawing while the body
+   * below keeps rendering. Called every frame while hidden, after the mixer,
+   * because a clip that keys the bone's scale would restore it.
+   */
+  setHeadHidden(hidden: boolean): void {
+    if (!hidden && !this.headHidden) return;
+    this.firstPersonHeadBone ??= this.model.getObjectByName('head') ?? null;
+    const head = this.firstPersonHeadBone;
+    this.headHidden = hidden;
+    if (!head) return;
+    head.scale.setScalar(hidden ? HEAD_HIDDEN_SCALE : 1);
+    this.skeletonUpdates.markPoseChanged();
+  }
+  private headHidden = false;
+  private firstPersonHeadBone: THREE.Object3D | null | undefined;
 
   /** Measured requests vs actual palette rebuilds for browser-side accounting. */
   skeletonUpdateStats(): SkeletonUpdateStats {
