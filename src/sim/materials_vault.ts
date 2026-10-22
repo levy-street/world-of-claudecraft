@@ -86,6 +86,7 @@ import type { VaultInfo, VaultSpecialRef } from '../world_api';
 
 export type { VaultSpecialRef } from '../world_api';
 
+import type { PoolCapacity } from './bag_pools';
 import { addStacked, bagPools, bagsFullError, countFit } from './bags';
 import { nearBanker } from './bank';
 import { warnDroppedInstanceKeys } from './item_instance_load';
@@ -631,19 +632,54 @@ export function vaultWithdraw(
     return;
   }
   if (typeof itemId !== 'string' || itemId === '') return;
-  const vault = meta.vault;
   // Both payout representations return to the same carried two-pool budget.
-  // Bind it once so the special and compact branches cannot drift onto
-  // different capacity models.
-  const carriedPools = bagPools(meta.bags);
+  const outcome = withdrawVaultInto(
+    meta.vault,
+    meta.inventory,
+    bagPools(meta.bags),
+    itemId,
+    count,
+    specialRef,
+    selection,
+  );
+  if (outcome === 'full') bagsFullError(ctx, meta.entityId);
+  else if (outcome === 'full_item') bagsFullError(ctx, meta.entityId, itemId);
+  else if (outcome === 'moved') {
+    bumpVaultWireRev(meta);
+    ctx.onInventoryChangedForQuests(meta);
+  }
+}
+
+/** What one vault payout did: moved, refused silently (malformed or stale), or
+ *  stopped by the destination's room ('full_item' names the material in the
+ *  player line, the pooled arm's shipped wording). */
+type VaultPayoutOutcome = 'moved' | 'refused' | 'full' | 'full_item';
+
+/** The payout body shared by the banker command and the courier: take from the
+ *  vault into `inventory` within `pools`. Writes nothing on any refusal, emits
+ *  no line and bumps no revision; the caller owns both. */
+function withdrawVaultInto(
+  vault: MaterialsVaultState,
+  inventory: InvSlot[],
+  pools: PoolCapacity,
+  itemId: string,
+  count: number | undefined,
+  specialRef: VaultSpecialRef | undefined,
+  selection: VaultWithdrawSelection | undefined,
+): VaultPayoutOutcome {
+  // Both payout representations use the one destination budget, so the special
+  // and compact branches cannot drift onto different capacity models.
+  const carriedPools = pools;
   if (specialRef !== undefined) {
     let selectedSources = selection?.sources;
     let selectedCount: number | undefined;
     if (specialRef.selection !== undefined) {
       const requested = specialRef.selection;
-      if (requested.itemId !== itemId || requested.target.slotIndex !== specialRef.index) return;
+      if (requested.itemId !== itemId || requested.target.slotIndex !== specialRef.index)
+        return 'refused';
       const resolved = resolveMaterialSourceTransferSelection(vault.special, requested);
-      if (!resolved.ok || (count ?? resolved.value.count) !== resolved.value.count) return;
+      if (!resolved.ok || (count ?? resolved.value.count) !== resolved.value.count)
+        return 'refused';
       selectedSources = resolved.value.sources;
       selectedCount = resolved.value.count;
     }
@@ -653,17 +689,17 @@ export function vaultWithdraw(
       specialRef,
       specialRef.selection === undefined ? selection?.expectedSources : undefined,
     );
-    if (index < 0) return;
+    if (index < 0) return 'refused';
     const slot = vault.special[index];
     const held = safeStoredCount(slot.count);
-    if (held <= 0) return;
+    if (held <= 0) return 'refused';
     const requested = count === undefined ? (selectedCount ?? held) : Math.floor(count);
-    if (!(requested > 0)) return;
+    if (!(requested > 0)) return 'refused';
     const want = selectedCount === undefined ? Math.min(requested, held) : requested;
     // A charge-bearing or locked payload is one identity per unit and moves
     // whole; every other payload and recipe-only provenance may withdraw
     // partially (vault_slot_ops.ts vaultRowMovesWhole).
-    if (vaultRowMovesWhole(slot.instance) && want !== held) return;
+    if (vaultRowMovesWhole(slot.instance) && want !== held) return 'refused';
     // A MATERIAL row takes the source-aware path: the exact buckets ride out
     // with the units, the remainder keeps the rest, and the fit is modelled
     // against the stack that would really land. A row the taxonomy no longer
@@ -681,7 +717,7 @@ export function vaultWithdraw(
         // grant differently re-opens the overflow class (#2139).
         (preview) =>
           countFit(
-            meta.inventory,
+            inventory,
             carriedPools,
             itemId,
             want,
@@ -690,43 +726,33 @@ export function vaultWithdraw(
             preview.materialSources,
           ),
       );
-      if (outcome.kind === 'refused') return;
-      if (outcome.kind === 'full') {
-        bagsFullError(ctx, meta.entityId);
-        return;
-      }
+      if (outcome.kind === 'refused') return 'refused';
+      if (outcome.kind === 'full') return 'full';
       if (outcome.remaining === null) vault.special.splice(index, 1);
       else vault.special[index] = outcome.remaining;
       addStacked(
-        meta.inventory,
+        inventory,
         itemId,
         outcome.moved,
         outcome.taken.instance,
         outcome.taken.craftedRecipeId,
         outcome.taken.materialSources,
       );
-      bumpVaultWireRev(meta);
-      ctx.onInventoryChangedForQuests(meta);
-      return;
+      return 'moved';
     }
     const moved = countFit(
-      meta.inventory,
+      inventory,
       carriedPools,
       itemId,
       want,
       slot.instance,
       slot.craftedRecipeId,
     );
-    if (moved <= 0 || (vaultRowMovesWhole(slot.instance) && moved !== want)) {
-      bagsFullError(ctx, meta.entityId);
-      return;
-    }
+    if (moved <= 0 || (vaultRowMovesWhole(slot.instance) && moved !== want)) return 'full';
     if (moved >= held) vault.special.splice(index, 1);
     else slot.count = held - moved;
-    addStacked(meta.inventory, itemId, moved, slot.instance, slot.craftedRecipeId);
-    bumpVaultWireRev(meta);
-    ctx.onInventoryChangedForQuests(meta);
-    return;
+    addStacked(inventory, itemId, moved, slot.instance, slot.craftedRecipeId);
+    return 'moved';
   }
   // hasOwn, not a plain index: withdraw is un-gated on the material set, so a
   // prototype-named itemId ('constructor', 'toString') would otherwise read an
@@ -740,23 +766,77 @@ export function vaultWithdraw(
   const held = Object.hasOwn(vault.stock, itemId) ? vault.stock[itemId] : 0;
   // Nothing stocked under that id: malformed or stale input (cheat/desync), the
   // bank's silent-refusal idiom, no player line.
-  if (!(held > 0)) return;
+  if (!(held > 0)) return 'refused';
   const want = count === undefined ? held : Math.min(Math.floor(count), held);
-  if (!(want > 0)) return;
+  if (!(want > 0)) return 'refused';
   // countFit models the bags exactly the way addStacked below fills them (#2139:
   // a capacity pre-check that models the grant differently re-opens the overflow
   // class) and already caps its answer at the requested count.
-  const moved = countFit(meta.inventory, carriedPools, itemId, want);
-  if (moved <= 0) {
-    bagsFullError(ctx, meta.entityId, itemId);
-    return;
-  }
+  const moved = countFit(inventory, carriedPools, itemId, want);
+  if (moved <= 0) return 'full_item';
   // Atomic, like the deposit: the take and the grant commit together.
   if (moved >= held) delete vault.stock[itemId];
   else vault.stock[itemId] = held - moved;
-  addStacked(meta.inventory, itemId, moved);
+  addStacked(inventory, itemId, moved);
+  return 'moved';
+}
+
+/** Courier delivery at the banker: deposit one carried cargo stack into the
+ *  vault as far as its headroom allows, under the targeted deposit's rules
+ *  (material set, sane count, whole-move payloads, unlocked vault). Units that
+ *  do not fit stay in `cargo` and ride home. No banker gate and no player line:
+ *  the courier is at the banker, and the window shows the result. */
+export function vaultDepositFromCourier(
+  meta: PlayerMeta,
+  cargo: InvSlot[],
+  slotIndex: number,
+): boolean {
+  const slot = cargo[slotIndex];
+  if (!slot || !isVaultDepositableSlot(slot, vaultMaterialIds())) return false;
+  const vault = meta.vault;
+  const headroom = Math.max(
+    0,
+    vaultCapacityPerMaterial(vault) - vaultStoredCount(vault, slot.itemId),
+  );
+  if (headroom <= 0 || (vaultRowMovesWhole(slot.instance) && headroom < slot.count)) return false;
+  const pooled = Object.hasOwn(vault.stock, slot.itemId) ? vault.stock[slot.itemId] : 0;
+  if (!applyVaultDeposit(vault, cargo, slotIndex, Math.min(slot.count, headroom), pooled))
+    return false;
   bumpVaultWireRev(meta);
-  ctx.onInventoryChangedForQuests(meta);
+  return true;
+}
+
+/** Courier delivery at the banker: pay a vault row into courier cargo within
+ *  `pools`, the banker withdraw's payout body with the cargo as destination.
+ *  `fits` vets the planned cargo (the courier's byte budget) on copies first,
+ *  so a refusal leaves both stores untouched. */
+export function vaultWithdrawToCourier(
+  meta: PlayerMeta,
+  cargo: InvSlot[],
+  pools: PoolCapacity,
+  itemId: string,
+  count: number | undefined,
+  specialRef: VaultSpecialRef | undefined,
+  fits: (plannedCargo: readonly InvSlot[]) => boolean,
+  sources?: MaterialComposition,
+): boolean {
+  if (typeof itemId !== 'string' || itemId === '') return false;
+  const selection = sources ? { sources } : undefined;
+  const trial = {
+    ...meta.vault,
+    stock: { ...meta.vault.stock },
+    special: meta.vault.special.map(cloneInvSlot),
+  };
+  const plannedCargo = cargo.map(cloneInvSlot);
+  if (
+    withdrawVaultInto(trial, plannedCargo, pools, itemId, count, specialRef, selection) !== 'moved'
+  )
+    return false;
+  if (!fits(plannedCargo)) return false;
+  if (withdrawVaultInto(meta.vault, cargo, pools, itemId, count, specialRef, selection) !== 'moved')
+    return false;
+  bumpVaultWireRev(meta);
+  return true;
 }
 
 /** How many units of `itemId` a vault stock RECORD can actually pay out: the
@@ -1060,7 +1140,17 @@ export function vaultWireRevFor(ctx: SimContext, pid: number): number | null {
 
 export function vaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {
   const meta = vaultViewerFor(ctx, pid);
-  if (!meta) return null;
+  return meta ? vaultInfoOf(ctx, meta) : null;
+}
+
+/** Owned-vault projection for courier custody, which reaches the vault from
+ *  wherever its owner stands (the personalBankInfoFor sibling). */
+export function personalVaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {
+  const meta = ctx.resolve(pid)?.meta;
+  return meta?.vault ? vaultInfoOf(ctx, meta) : null;
+}
+
+function vaultInfoOf(ctx: SimContext, meta: PlayerMeta): VaultInfo {
   const vault = meta.vault;
   return {
     stock: { ...vault.stock },

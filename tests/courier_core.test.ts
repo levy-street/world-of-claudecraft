@@ -3,10 +3,15 @@ import type { CourierInfo } from '../src/sim/courier/types';
 import type { InvSlot } from '../src/sim/types';
 import {
   canDispatchCourier,
+  courierDispatchRequest,
+  courierVaultRowSelected,
+  courierVaultRows,
   emptyCourierDraft,
   reconcileCourierDraft,
   toggleCourierStack,
+  toggleCourierVaultRow,
 } from '../src/ui/hud/courier/courier_core';
+import type { VaultInfo } from '../src/world_api/bank';
 
 describe('courier selection custody', () => {
   const bags: InvSlot[] = [
@@ -54,5 +59,42 @@ describe('courier selection custody', () => {
     expect(canDispatchCourier({ ...info, active: false }, draft)).toBe(false);
     expect(canDispatchCourier({ ...info, phase: 'returning' }, draft)).toBe(false);
     expect(canDispatchCourier(info, emptyCourierDraft())).toBe(false);
+  });
+
+  it('sends a carried stack to one store, moving it between bank and vault picks', () => {
+    const ore: InvSlot[] = [{ itemId: 'copper_ore', count: 5 }];
+    let draft = toggleCourierStack(emptyCourierDraft(), 'deposits', 0, ore);
+    draft = toggleCourierStack(draft, 'vaultDeposits', 0, ore);
+    expect(draft.deposits).toEqual([]);
+    expect(draft.vaultDeposits).toHaveLength(1);
+    // Only materials go in the vault.
+    expect(toggleCourierStack(emptyCourierDraft(), 'vaultDeposits', 1, bags)).toEqual(
+      emptyCourierDraft(),
+    );
+  });
+  it('picks whole vault rows and drops a pick once the row changes', () => {
+    const vault: VaultInfo = {
+      stock: { copper_ore: 6 },
+      special: [{ itemId: 'wolf_fang', count: 2, craftedRecipeId: 'tan_fang' }],
+      upgrades: 1,
+      perMaterialCap: 40,
+      nextUpgradeCost: 50000,
+    };
+    const rows = courierVaultRows(vault);
+    expect(rows.map((r) => [r.itemId, r.count, r.special?.index])).toEqual([
+      ['copper_ore', 6, undefined],
+      ['wolf_fang', 2, 0],
+    ]);
+    let draft = toggleCourierVaultRow(emptyCourierDraft(), rows[1]);
+    expect(courierVaultRowSelected(draft, rows[1])).toBe(true);
+    expect(draft.vaultWithdrawals[0]).toMatchObject({ itemId: 'wolf_fang', count: 2 });
+    draft = toggleCourierVaultRow(draft, rows[0]);
+    const grown = { ...vault, stock: { copper_ore: 9 } };
+    expect(reconcileCourierDraft(draft, [], [], grown).vaultWithdrawals).toHaveLength(1);
+    expect(toggleCourierVaultRow(draft, rows[1]).vaultWithdrawals).toHaveLength(1);
+  });
+  it('leaves empty vault lists off the wire so a bank-only trip reads as before', () => {
+    const draft = toggleCourierStack(emptyCourierDraft(), 'deposits', 0, bags);
+    expect(Object.keys(courierDispatchRequest(draft))).toEqual(['deposits', 'withdrawals']);
   });
 });

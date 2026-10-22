@@ -70,6 +70,7 @@ const info = (): CourierInfo => ({
   bankRevision: 1,
   bankSlots: [{ itemId: 'wolf_fang', count: 3 }],
   bankCapacity: 24,
+  vault: null,
 });
 function host() {
   let value: CourierInfo | null = info();
@@ -91,6 +92,7 @@ function host() {
     ),
     courierWireRevisionFor: () => rev,
     courierBankInfoFor: vi.fn(() => null),
+    ctx: { players: new Map(), resolve: () => null } as never,
     meta: () => ({ characterId: 10 }),
   };
   return {

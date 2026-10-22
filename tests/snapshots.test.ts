@@ -5740,6 +5740,7 @@ const ALL_DELTA_KEYS = [
   'courier',
   'courierData',
   'courierLegTicks',
+  'courierStores',
   'courierTravelTicks',
   'cprof',
   'crat',
@@ -5891,6 +5892,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   courier: 'courierInfo',
   courierData: 'courierInfo',
   courierLegTicks: 'courierInfo',
+  courierStores: 'courierInfo',
   courierTravelTicks: 'courierInfo',
   cprof: 'craftingIdentity',
   crat: 'critRating',
@@ -7330,7 +7332,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 124 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 125 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
@@ -7396,8 +7398,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The buddy collection adds budOwn and budPend to the integration keys.
     // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
     // +2: the courier's courierTravelTicks and courierLegTicks leg timing (PR 4281), for 124.
-    expect(ALL_DELTA_KEYS).toHaveLength(124);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(124);
+    // +1: the courier's courierStores (its vault and other-character legs), for 125.
+    expect(ALL_DELTA_KEYS).toHaveLength(125);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(125);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7575,7 +7578,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The buddy collection adds budOwn and budPend.
     // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
     // The courier's courierTravelTicks and courierLegTicks make 124.
-    expect(scraped.size).toBe(124);
+    // The courier's courierStores (vault and other-character legs) makes 125.
+    expect(scraped.size).toBe(125);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7657,6 +7661,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       courier: 'courierInfo',
       courierData: 'courierInfo',
       courierLegTicks: 'courierInfo',
+      courierStores: 'courierInfo',
       courierTravelTicks: 'courierInfo',
     };
     for (const [terse, iworld] of Object.entries(required)) {

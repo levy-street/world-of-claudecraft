@@ -230,6 +230,7 @@ describe('only players start his fight', () => {
           withdraw();
           return true;
         },
+        () => 'settled',
       ),
       dayNightNowMs: () => noon,
     });

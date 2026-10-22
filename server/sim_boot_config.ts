@@ -24,6 +24,7 @@ export function buildRealmSimConfig(
   perfLap: SimConfig['perfLap'],
   vaultConsumptionAdmission: VaultConsumptionAdmission,
   courierBankExchange: NonNullable<SimConfig['courierBankExchange']>,
+  courierAccountExchange: NonNullable<SimConfig['courierAccountExchange']>,
 ): SimConfig {
   return {
     seed: WORLD_SEED,
@@ -75,6 +76,7 @@ export function buildRealmSimConfig(
     perfLap,
     vaultConsumptionAdmission,
     courierBankExchange,
+    courierAccountExchange,
     // Boot-time construction input: the optional STORAGE_PRICES env override
     // (server/storage_prices.ts), resolved once by the Sim ctor.
     storagePrices: STORAGE_PRICES,

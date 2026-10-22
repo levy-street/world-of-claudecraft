@@ -48,6 +48,7 @@ it.each([
         { itemId: 'linen_scrap', count: 20 },
       ],
       bankCapacity: 24,
+      vault: null,
     };
     const dispatch = vi.fn();
     const courier = new CourierWindow(

@@ -140,6 +140,7 @@ describe('the muster stands from boot on both live hosts', () => {
         withdraw();
         return true;
       },
+      () => 'settled',
     );
     expect(cfg.mirefenMuster).toBe(true);
     const server = new GameServer();

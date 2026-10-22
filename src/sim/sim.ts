@@ -2277,7 +2277,7 @@ export class Sim {
     // S0b seam: the shared SimContext every extracted slice routes through. Built
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
-    this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission, cfg.courierBankExchange);
+    this.ctx = this.buildSimContext(cfg);
     ferryMod.syncFerryGates(this.ctx); // this world's own deck gates before any placement query
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
@@ -4944,10 +4944,7 @@ export class Sim {
   // routes straight back to the Sim method of the same name (the callback registry
   // in 02-WORKING-MEMORY.md). As a later slice owns one of these, it reimplements the
   // callback in its own module without renaming it here, so consumers never change.
-  private buildSimContext(
-    reserveVaultConsumption = inertVaultConsumptionAdmission,
-    courierBankExchange?: courierMod.CourierBankExchange,
-  ): SimContext {
+  private buildSimContext(cfg: SimConfig): SimContext {
     const sim = this;
     const host: SimContextHost = {
       get rng() {
@@ -5106,8 +5103,9 @@ export class Sim {
       get storagePrices() {
         return sim.storagePrices;
       },
-      reserveVaultConsumption,
-      courierBankExchange,
+      reserveVaultConsumption: cfg.vaultConsumptionAdmission ?? inertVaultConsumptionAdmission,
+      courierBankExchange: cfg.courierBankExchange,
+      courierAccountExchange: cfg.courierAccountExchange,
       // A2: duel + arena state stays on Sim, exposed as live views (backing fields
       // mutated in place / the queues reassigned by the matchmaker filter).
       get trades() {

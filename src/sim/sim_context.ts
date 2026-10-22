@@ -17,7 +17,7 @@ import type { AccountCosmetics } from '../world_api';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
-import type { CourierBankExchange } from './courier';
+import type { CourierAccountExchange, CourierBankExchange } from './courier';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { GuildBankState } from './guild_bank';
@@ -110,6 +110,7 @@ export type RuntimeSimConfig = Required<
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
     | 'courierBankExchange'
+    | 'courierAccountExchange'
     | 'gathererIdentity'
     // Deliberately NOT defaulted: undefined is the "no day/night clock" world
     // (dayNightPhase() answers null), which tests and the RL env rely on.
@@ -1245,6 +1246,9 @@ export interface SimContextCallbacks {
 // The seam consumed by extracted modules.
 export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
   readonly courierBankExchange?: CourierBankExchange;
+  // Installed by the host after boot (the membership services own it); absent in
+  // offline worlds, where a courier has no other characters to visit.
+  readonly courierAccountExchange?: CourierAccountExchange;
   // The resolved storage price table (storage_prices.ts): bank expansions,
   // bank bag sockets, vault rungs. Frozen at Sim construction from the
   // cfg.storagePrices override; the ONE price truth every bank/vault charge
@@ -1270,6 +1274,7 @@ export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
 // caller must pass the exported inert constant by name.
 export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
   readonly courierBankExchange?: CourierBankExchange;
+  readonly courierAccountExchange?: CourierAccountExchange;
   readonly storagePrices: StoragePrices;
 }
 
@@ -1283,6 +1288,9 @@ export function createSimContext(host: SimContextHost): SimContext {
   return {
     get courierBankExchange() {
       return host.courierBankExchange;
+    },
+    get courierAccountExchange() {
+      return host.courierAccountExchange;
     },
     get rng() {
       return host.rng;

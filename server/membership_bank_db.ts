@@ -1,11 +1,14 @@
 import type { PoolClient } from 'pg';
+import type { SavedBankState } from '../src/sim/bank';
 import type { CharacterState } from '../src/sim/character_state';
+import { type CourierState, planCourierAccountExchange } from '../src/sim/courier';
 import { savedMembershipBags } from '../src/sim/membership_bag_slot';
 import {
   type MembershipBankTransferRequest,
   membershipBankView,
   planMembershipBankTransfer,
 } from '../src/sim/membership_bank';
+import type { InvSlot } from '../src/sim/types';
 import type { BankInfo } from '../src/world_api/bank';
 import type { BankLedgerSaveEffects } from './bank_ledger_save_effects_db';
 import { lockCharacterSaveAccountParentOnClient } from './bank_ledger_save_effects_db';
@@ -110,14 +113,46 @@ class BankRefusal extends Error {
   }
 }
 
+/** The actor half every cross-character bank write shares. */
+interface CrossBankWrite {
+  accountId: number;
+  characterId: number;
+  targetCharacterId: number;
+  leaseNonce: string;
+  state: CharacterState;
+  membership: MembershipAuthorization;
+  storageEffects?: readonly StorageAppliedEffect[];
+  ledgerEffects?: BankLedgerSaveEffects;
+  stillAuthorized(): boolean;
+}
+/** One movement in the other character's bank, for its ledger. */
+interface CrossBankMove {
+  direction: 'deposit' | 'withdraw';
+  item: InvSlot;
+  moved: number;
+}
+/** What a write decides against the locked target bank: the actor state to save,
+ *  the target bank, its ledger movements, and the caller's result. */
+type CrossBankPlan<T> =
+  | { ok: false; error: MembershipBankError }
+  | {
+      ok: true;
+      state: CharacterState;
+      bank: SavedBankState;
+      moves: readonly CrossBankMove[];
+      value: T;
+    };
+
 /** Host MUST hold its inventory guard and serialize this whole call on the
  * actor's save FIFO. No live state is mutated until this returns a proven COMMIT.
  * Account parent -> two character rows ascending -> lease rows. The offline
  * target's FOR UPDATE excludes new lease FK inserts; deleting expired leases
  * prevents their heartbeat revival from undoing the offline write. */
-export async function transferMembershipBank(
-  input: MembershipBankSave,
-): Promise<MembershipBankResult<MembershipBankCommitted>> {
+async function writeCrossCharacterBank<T>(
+  input: CrossBankWrite,
+  operation: string,
+  plan: (targetBank: SavedBankState | undefined) => CrossBankPlan<T>,
+): Promise<MembershipBankResult<T>> {
   const { accountId, characterId, targetCharacterId } = input;
   if (
     ![accountId, characterId, targetCharacterId].every(validId) ||
@@ -128,7 +163,7 @@ export async function transferMembershipBank(
   }
   const client = await pool.connect();
   const tx = createDbTransactionDeadline(client, {
-    operation: 'membership bank transfer',
+    operation,
     timeoutMs: MEMBERSHIP_BANK_TRANSACTION_MS,
     cancelBackend: cancelDetachedBackend,
   });
@@ -184,75 +219,67 @@ export async function transferMembershipBank(
     );
     if (targetLease.rows.length !== 0) throw new BankRefusal('online');
     if (!input.stillAuthorized()) throw new BankRefusal('invalid');
-    const plan = planMembershipBankTransfer(
-      { ...input.state, bags: savedMembershipBags(input.state) },
-      target.bank ?? undefined,
-      input.request,
-    );
-    if (!plan.ok) throw new BankRefusal(plan.error);
+    const planned = plan(target.bank ?? undefined);
+    if (!planned.ok) throw new BankRefusal(planned.error);
     // A growing save must not make the deliberate read unrepresentable.
-    if (Buffer.byteLength(JSON.stringify(plan.bank), 'utf8') > MEMBERSHIP_BANK_MAX_BYTES) {
+    if (Buffer.byteLength(JSON.stringify(planned.bank), 'utf8') > MEMBERSHIP_BANK_MAX_BYTES) {
       throw new BankRefusal('too_large');
     }
     const saved = await saveCharacterStateOnClient(
       bounded,
       characterId,
       input.state.level,
-      { ...input.state, inventory: plan.inventory },
+      planned.state,
       input.leaseNonce,
       input.storageEffects,
       input.ledgerEffects,
       parentLock,
     );
     if (!saved) throw new BankRefusal('lease_lost');
-    // Patch only the bank subtree. Unrelated fields and future save keys of
-    // the offline character stay byte-for-byte semantically untouched.
-    const targetSaved = await tx.query(
-      `UPDATE characters SET state = jsonb_set(state, '{bank}', $4::jsonb), updated_at = now()
-       WHERE id = $1 AND account_id = $2 AND realm = $3
-       AND NOT EXISTS (SELECT 1 FROM character_leases WHERE character_id = $1 AND expires_at > now())`,
-      [targetCharacterId, accountId, REALM, JSON.stringify(plan.bank)],
-    );
-    if (targetSaved.rowCount !== 1) throw new BankRefusal('online');
-    await journalCharacterSaveSources(
-      bounded,
-      targetCharacterId,
-      { bank: target.bank, vault: undefined },
-      targetSaved,
-      { bank: plan.bank },
-    );
+    if (planned.moves.length > 0) {
+      // Patch only the bank subtree. Unrelated fields and future save keys of
+      // the offline character stay byte-for-byte semantically untouched.
+      const targetSaved = await tx.query(
+        `UPDATE characters SET state = jsonb_set(state, '{bank}', $4::jsonb), updated_at = now()
+         WHERE id = $1 AND account_id = $2 AND realm = $3
+         AND NOT EXISTS (SELECT 1 FROM character_leases WHERE character_id = $1 AND expires_at > now())`,
+        [targetCharacterId, accountId, REALM, JSON.stringify(planned.bank)],
+      );
+      if (targetSaved.rowCount !== 1) throw new BankRefusal('online');
+      await journalCharacterSaveSources(
+        bounded,
+        targetCharacterId,
+        { bank: target.bank, vault: undefined },
+        targetSaved,
+        { bank: planned.bank },
+      );
+    }
     // Uses the existing keep-forever, hard-budgeted personal-bank ledger. The
     // character_id names the BANK OWNER so the existing audit replays it.
-    await tx.query(
-      `INSERT INTO bank_ledger
-       (realm, character_id, account_id, op, item_id, count, instance, copper_delta,
-        purchased_slots_after, container, container_id, counterparty_count)
-       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 0, $8, 'personal', NULL, $9)`,
-      [
-        REALM,
-        targetCharacterId,
-        accountId,
-        input.request.direction,
-        plan.item.itemId,
-        plan.moved,
-        plan.item.instance === undefined ? null : JSON.stringify(plan.item.instance),
-        plan.bank.purchasedSlots,
-        input.request.direction === 'deposit' ? -plan.moved : plan.moved,
-      ],
-    );
+    for (const move of planned.moves) {
+      await tx.query(
+        `INSERT INTO bank_ledger
+         (realm, character_id, account_id, op, item_id, count, instance, copper_delta,
+          purchased_slots_after, container, container_id, counterparty_count)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 0, $8, 'personal', NULL, $9)`,
+        [
+          REALM,
+          targetCharacterId,
+          accountId,
+          move.direction,
+          move.item.itemId,
+          move.moved,
+          move.item.instance === undefined ? null : JSON.stringify(move.item.instance),
+          planned.bank.purchasedSlots,
+          move.direction === 'deposit' ? -move.moved : move.moved,
+        ],
+      );
+    }
     if (!input.stillAuthorized() || !(Number(expiresAt) > Date.now()))
       throw new BankRefusal('membership_required');
     commitStarted = true;
     await tx.commit();
-    return {
-      ok: true,
-      value: {
-        inventoryBefore: input.state.inventory,
-        inventory: plan.inventory,
-        bank: membershipBankView(plan.bank),
-        moved: plan.moved,
-      },
-    };
+    return { ok: true, value: planned.value };
   } catch (error) {
     await tx.rollback();
     if (error instanceof BankRefusal) return { ok: false, error: error.error };
@@ -263,4 +290,63 @@ export async function transferMembershipBank(
   } finally {
     tx.release();
   }
+}
+
+/** The bank window's direct move between the actor's bags and an offline bank. */
+export function transferMembershipBank(
+  input: MembershipBankSave,
+): Promise<MembershipBankResult<MembershipBankCommitted>> {
+  return writeCrossCharacterBank(input, 'membership bank transfer', (targetBank) => {
+    const plan = planMembershipBankTransfer(
+      { ...input.state, bags: savedMembershipBags(input.state) },
+      targetBank,
+      input.request,
+    );
+    if (!plan.ok) return plan;
+    return {
+      ok: true,
+      state: { ...input.state, inventory: plan.inventory },
+      bank: plan.bank,
+      moves: [{ direction: input.request.direction, item: plan.item, moved: plan.moved }],
+      value: {
+        inventoryBefore: input.state.inventory,
+        inventory: plan.inventory,
+        bank: membershipBankView(plan.bank),
+        moved: plan.moved,
+      },
+    };
+  });
+}
+
+export interface CourierAccountSave extends Omit<CrossBankWrite, 'targetCharacterId'> {
+  /** Vets the courier's homeward cargo (its stack and byte budget). */
+  fits(cargo: readonly InvSlot[]): boolean;
+}
+
+/** The courier's other-character leg, at the banker: the captured state's
+ *  courier carries the leg; the saved courier has it settled (homeward cargo,
+ *  no leg), so a crash after COMMIT can never replay it. */
+export function transferCourierAccountLeg(
+  input: CourierAccountSave,
+): Promise<MembershipBankResult<CourierState>> {
+  const courier = input.state.courier;
+  const leg = courier?.account;
+  if (!courier || !leg || courier.phase !== 'outbound' || courier.banked !== true)
+    return Promise.resolve({ ok: false, error: 'invalid' });
+  return writeCrossCharacterBank(
+    { ...input, targetCharacterId: leg.characterId },
+    'courier account leg',
+    (targetBank) => {
+      const plan = planCourierAccountExchange(leg, courier.cargo, targetBank, input.fits);
+      const { account: _settled, ...rest } = courier;
+      const next: CourierState = { ...rest, cargo: plan.cargo, revision: courier.revision + 1 };
+      return {
+        ok: true,
+        state: { ...input.state, courier: next },
+        bank: plan.bank,
+        moves: plan.moves,
+        value: next,
+      };
+    },
+  );
 }

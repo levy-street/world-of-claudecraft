@@ -96,6 +96,7 @@ describe('the STORAGE_PRICES boot chain, executed end to end', () => {
         withdraw();
         return true;
       },
+      () => 'settled',
     );
     expect(cfg.storagePrices).toStrictEqual({
       vaultUpgrades: [333, 50000, 100000, 200000, 400000],

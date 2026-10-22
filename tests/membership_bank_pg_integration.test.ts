@@ -227,4 +227,87 @@ describe.skipIf(!url)('membership banks real PostgreSQL exclusion', () => {
       await db.pool.query('ALTER TABLE bank_ledger DROP CONSTRAINT refuse_bank_transfer');
     }
   });
+
+  // The courier's other-character leg: the captured courier carries the leg and
+  // the saved one has it settled, so a crash after COMMIT can never replay it.
+  const courierLeg = () => {
+    const state = actor();
+    state.inventory = [];
+    state.courier = {
+      phase: 'outbound',
+      x: 0,
+      z: 0,
+      bankerId: 2,
+      travelDistance: 0,
+      cargo: [{ itemId: 'baked_bread', count: 2 }],
+      withdrawals: [],
+      account: { characterId: 10, cargo: [structuredClone(item)], withdrawals: [] },
+      banked: true,
+      revision: 4,
+      retryRemaining: 0,
+    };
+    return {
+      accountId: 1,
+      characterId: 20,
+      leaseNonce: 'source-nonce',
+      state,
+      membership: input().membership,
+      stillAuthorized: () => true,
+      fits: () => true,
+    };
+  };
+
+  it('commits the courier leg: that bank, the settled courier and the ledger together', async () => {
+    const result = await banks.transferCourierAccountLeg(courierLeg());
+    expect(result).toMatchObject({ ok: true, value: { revision: 5 } });
+    const states = await db.pool.query('SELECT id, state FROM characters ORDER BY id');
+    expect(states.rows[0].state.bank.inventory).toEqual([item]);
+    expect(states.rows[0].state.futureField).toEqual({ preserved: true });
+    const courier = states.rows[1].state.courier;
+    expect(courier.account).toBeUndefined();
+    expect(courier.cargo).toEqual([{ itemId: 'baked_bread', count: 2 }]);
+    expect(
+      (await db.pool.query('SELECT character_id, op, count, counterparty_count FROM bank_ledger'))
+        .rows,
+    ).toEqual([{ character_id: 10, op: 'deposit', count: 3, counterparty_count: -3 }]);
+  });
+
+  it('refuses the courier leg while that character is logged in, writing nothing', async () => {
+    await db.pool.query(
+      `INSERT INTO character_leases VALUES (10, 'other', 'alt', now() + interval '1 minute')`,
+    );
+    expect(await banks.transferCourierAccountLeg(courierLeg())).toEqual({
+      ok: false,
+      error: 'online',
+    });
+    const states = await db.pool.query('SELECT state FROM characters ORDER BY id');
+    expect(states.rows[0].state).toEqual(target());
+    expect(states.rows[1].state.courier).toBeUndefined();
+    expect((await db.pool.query('SELECT * FROM bank_ledger')).rows).toEqual([]);
+  });
+
+  it('brings a picked stack back from that bank into the homeward cargo', async () => {
+    const stored = { itemId: 'wolf_fang', count: 4 };
+    await db.pool.query(
+      `UPDATE characters SET state = jsonb_set(state, '{bank,inventory}', $1::jsonb) WHERE id = 10`,
+      [JSON.stringify([stored])],
+    );
+    const { courierSlotFingerprint } = await import('../src/sim/courier');
+    const leg = courierLeg();
+    leg.state.courier!.account = {
+      characterId: 10,
+      cargo: [],
+      withdrawals: [{ index: 0, fingerprint: courierSlotFingerprint(stored) }],
+    };
+    expect(await banks.transferCourierAccountLeg(leg)).toMatchObject({ ok: true });
+    const states = await db.pool.query('SELECT id, state FROM characters ORDER BY id');
+    expect(states.rows[0].state.bank.inventory).toEqual([]);
+    expect(states.rows[1].state.courier.cargo).toMatchObject([
+      { itemId: 'baked_bread', count: 2 },
+      { itemId: 'wolf_fang', count: 4 },
+    ]);
+    expect((await db.pool.query('SELECT op, count FROM bank_ledger')).rows).toEqual([
+      { op: 'withdraw', count: 4 },
+    ]);
+  });
 });

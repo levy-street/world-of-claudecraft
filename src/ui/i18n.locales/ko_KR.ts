@@ -54,9 +54,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.select': '{item}, {count} 선택',
   'hudChrome.courier.selectedItem': '{item}, {count} 선택 해제',
   'hudChrome.courier.instructions':
-    '묶음 전체를 선택하세요. 배달부가 먼저 맡긴 뒤 요청한 아이템을 찾습니다. 퀘스트 아이템은 보낼 수 없습니다.',
+    '내 은행, 보관소 또는 다른 캐릭터에게 보낼 묶음 전체를 선택하세요. 배달부가 먼저 맡긴 뒤 요청한 아이템을 찾습니다. 퀘스트 아이템은 보낼 수 없습니다.',
   'hudChrome.courier.membership': '새 배달을 시작하려면 멤버십을 갱신하세요.',
   'hudChrome.courier.unavailable': '배달부를 소환하여 배달을 계획하세요.',
+  'hudChrome.courier.bagsVault': '재료를 보관소로 보내기',
+  'hudChrome.courier.vault': '보관소에서 가져오기. 고른 줄은 통째로 가져옵니다.',
+  'hudChrome.courier.vaultTitle': '보관소',
+  'hudChrome.courier.storeTabs': '배달부 보관 장소',
+  'hudChrome.courier.vaultCap': '재료당 최대 {cap}개',
+  'hudChrome.courier.vaultEmpty': '보관소가 비어 있습니다.',
+  'hudChrome.courier.vaultLocked': '배달부와 함께 쓰려면 은행원에게서 보관소를 해제하세요.',
+  'hudChrome.courier.boundBank': '은행으로 보낼 예정',
+  'hudChrome.courier.boundVault': '보관소로 보낼 예정',
+  'hudChrome.courier.boundAccount': '다른 캐릭터의 은행으로 보낼 예정',
+  'hudChrome.courier.accountTitle': '다른 캐릭터',
+  'hudChrome.courier.accountBank':
+    '이 은행에서 가져오기. 배달부가 도착할 때 해당 캐릭터는 로그아웃 상태여야 합니다.',
+  'hudChrome.courier.bagsAccount': '{name}의 은행으로 보내기',
+  'hudChrome.courier.bagsAccountNone': '아이템을 보낼 캐릭터를 고르세요.',
+  'hudChrome.courier.accountPlanned':
+    '{name}에게 {count}묶음 예정. 다른 캐릭터를 고르면 대체됩니다.',
   'entities.abilities.courier.name': '배달부',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '활성 멤버십 혜택',

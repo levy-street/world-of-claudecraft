@@ -1551,10 +1551,12 @@ describe('the vault material scope', () => {
     expect(fnBody('vaultDeposit')).toContain('Object.hasOwn(vault.stock,');
     expect(fnBody('vaultWithdraw')).toContain('Object.hasOwn(vault.stock,');
     expect(fnBody('vaultDepositAll')).toContain('Object.hasOwn(vault.stock,');
+    expect(fnBody('vaultDepositFromCourier')).toContain('Object.hasOwn(vault.stock,');
     const guarded = src.match(/Object\.hasOwn\(vault\.stock,/g) ?? [];
-    // Exact total: a FOURTH read is a review trip-wire (the third was reviewed
-    // in with the Phase 03 deposit-all sweep).
-    expect(guarded).toHaveLength(3);
+    // Exact total: a FIFTH read is a review trip-wire (the third was reviewed
+    // in with the Phase 03 deposit-all sweep, the fourth with the courier's
+    // vault delivery).
+    expect(guarded).toHaveLength(4);
     // Bank Storage phase 04 moved this pin to cover the two-pool crafting
     // reads as well. They take the stock RECORD rather than the vault, so they
     // guard a differently-named binding and the totals above cannot see them.

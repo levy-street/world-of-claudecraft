@@ -1704,6 +1704,9 @@ export class GameServer {
         ...courierWire.storageAdmissionsFor(
           () => this.sim,
           (pid) => this.clients.get(pid),
+          // The courier's other-character leg runs on the membership bank path
+          // (constructed below; the Sim only calls it on a later tick).
+          (pid) => this.membership.courierAccountExchange(pid),
         ),
       ),
     );

@@ -27542,8 +27542,17 @@
     align-items: start;
     gap: 16px;
   }
-  #courier-window .courier-storage {
+  #courier-window .courier-storage,
+  #courier-window .courier-store {
     min-width: 0;
+  }
+  /* The Bank / Materials Vault strip over the left column. */
+  #courier-window .courier-store-tabs {
+    margin: 0 0 8px;
+  }
+  #courier-window .courier-store-tab {
+    flex: 1;
+    min-height: 40px;
   }
   #courier-window .courier-storage-head {
     display: flex;

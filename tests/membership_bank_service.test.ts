@@ -218,4 +218,18 @@ describe('membership bank admission and live apply', () => {
       vi.useRealTimers();
     }
   });
+
+  it('reads the roster beside a courier, but still moves items only at a banker', async () => {
+    const { host, service, db } = fixture();
+    vi.mocked(host.authorized).mockReturnValue(false);
+    host.authorizedRead = vi.fn(() => true);
+    await service.list(session());
+    expect(db.list).toHaveBeenCalled();
+    await service.transfer(session(), 12, request);
+    expect(db.transfer).not.toHaveBeenCalled();
+    expect(host.publish).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({ error: 'invalid' }),
+    );
+  });
 });

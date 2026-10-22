@@ -48,6 +48,23 @@ export function membershipBankView(saved: SavedBankState | undefined): BankInfo 
   };
 }
 
+/** A copy that may cross character ownership: no quest, soulbound, unlisted,
+ *  transfer-locked or locked stacks. The courier's other-character leg uses
+ *  the same rule as the bank window's direct transfer. */
+export function membershipBankTransferable(item: InvSlot): boolean {
+  const def = ITEMS[item.itemId];
+  return (
+    !!def &&
+    Number.isSafeInteger(item.count) &&
+    item.count > 0 &&
+    def.kind !== 'quest' &&
+    !def.soulbound &&
+    !def.noMarketList &&
+    !isTransferLockedInstance(item.instance) &&
+    !item.instance?.locked
+  );
+}
+
 export function planMembershipBankTransfer(
   actor: Pick<CharacterState, 'inventory' | 'bags'>,
   saved: SavedBankState | undefined,
@@ -83,15 +100,7 @@ export function planMembershipBankTransfer(
   if (!def || !Number.isSafeInteger(item.count) || item.count <= 0) {
     return { ok: false, error: 'invalid' };
   }
-  if (
-    def.kind === 'quest' ||
-    def.soulbound ||
-    def.noMarketList ||
-    isTransferLockedInstance(item.instance) ||
-    item.instance?.locked
-  ) {
-    return { ok: false, error: 'bound' };
-  }
+  if (!membershipBankTransferable(item)) return { ok: false, error: 'bound' };
   const copiedItem = cloneMaterialData(item);
   const result = moveBetweenContainers(
     source,

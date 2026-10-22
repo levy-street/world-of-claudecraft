@@ -1,4 +1,4 @@
-import type { CourierBankExchange } from './courier';
+import type { CourierAccountExchange, CourierBankExchange } from './courier';
 import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
@@ -12340,6 +12340,9 @@ export interface SimConfig {
   // headless hosts omit it and receive an inert successful reservation.
   vaultConsumptionAdmission?: VaultConsumptionAdmission;
   courierBankExchange?: CourierBankExchange;
+  // The courier's other-character leg (server membership services); offline
+  // hosts omit it and a courier there has no other characters to visit.
+  courierAccountExchange?: CourierAccountExchange;
   // The material-gatherer identity for the player this constructor MINTS (the
   // primary offline/headless character), allocated by the HOST outside the sim
   // and passed in whole (src/sim/material_gatherer.ts). A VALUE, never a

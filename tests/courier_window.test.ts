@@ -26,6 +26,7 @@ function rig() {
     revision: 1,
     bankSlots: [{ itemId: 'healing_potion', count: 2 }],
     bankCapacity: 24,
+    vault: null,
   };
   const deps = {
     info: () => info,
@@ -223,5 +224,118 @@ describe('courier window', () => {
     const portrait = root.querySelector('.courier-companion')!;
     expect(portrait.querySelector('p')).toBeNull();
     expect(portrait.textContent).not.toMatch(/seconds/i);
+  });
+
+  it('opens the Materials Vault tab, sending carried materials and vault rows', () => {
+    const { root, info, deps, window, replaceBags } = rig();
+    info.vault = {
+      stock: { copper_ore: 6 },
+      special: [],
+      upgrades: 1,
+      perMaterialCap: 40,
+      nextUpgradeCost: 50000,
+    };
+    replaceBags([
+      { itemId: 'copper_ore', count: 3 },
+      { itemId: 'healing_potion', count: 1 },
+    ]);
+    window.render(true);
+    root.querySelector<HTMLButtonElement>('.courier-store-tab[data-tab="vault"]')!.click();
+    expect(root.querySelector('[data-courier-storage="vault"]')).not.toBeNull();
+    // Only materials can be picked for the vault.
+    expect(
+      root.querySelector<HTMLButtonElement>(
+        '[data-courier-side="vaultDeposits"][data-courier-index="1"]',
+      )!.disabled,
+    ).toBe(true);
+    root
+      .querySelector<HTMLButtonElement>(
+        '[data-courier-side="vaultDeposits"][data-courier-index="0"]',
+      )!
+      .click();
+    root.querySelector<HTMLButtonElement>('[data-courier-vault-row="0"]')!.click();
+    // The pick stays marked for the vault when the bank tab is showing.
+    root.querySelector<HTMLButtonElement>('.courier-store-tab[data-tab="bank"]')!.click();
+    expect(root.querySelector('.courier-selected--vault')).not.toBeNull();
+    root.querySelector<HTMLButtonElement>('.courier-send')!.click();
+    expect(deps.dispatch.mock.calls[0][0]).toMatchObject({
+      deposits: [],
+      withdrawals: [],
+      vaultDeposits: [{ index: 0 }],
+      vaultWithdrawals: [{ itemId: 'copper_ore', count: 6 }],
+    });
+  });
+  it('shows no store tabs for a courier without a vault and explains a locked vault', () => {
+    const { root, info, window } = rig();
+    expect(root.querySelector('.courier-store-tab')).toBeNull();
+    info.vault = { stock: {}, special: [], upgrades: 0, perMaterialCap: 0, nextUpgradeCost: 20000 };
+    window.render(true);
+    root.querySelector<HTMLButtonElement>('.courier-store-tab[data-tab="vault"]')!.click();
+    expect(root.textContent).toContain('Unlock the Materials Vault');
+  });
+
+  it('plans a delivery to another character from the Other characters tab', () => {
+    const { root, deps, window, replaceBags } = rig();
+    let accounts: import('../src/world_api/bank').AccountBankInfo | null = null;
+    const requestAccountBanks = vi.fn();
+    const selectAccountBank = vi.fn();
+    Object.assign(deps, {
+      accounts: () => ({
+        get accountBankInfo() {
+          return accounts;
+        },
+        requestAccountBanks,
+        selectAccountBank,
+      }),
+    });
+    replaceBags([
+      { itemId: 'healing_potion', count: 3 },
+      { itemId: 'membership_helmet', count: 1 },
+    ]);
+    window.render(true);
+    root.querySelector<HTMLButtonElement>('.courier-store-tab[data-tab="account"]')!.click();
+    expect(requestAccountBanks).toHaveBeenCalledWith(true);
+    expect(root.textContent).toContain('Loading your characters');
+    accounts = {
+      characters: [{ characterId: 12, name: 'Alt' }],
+      selectedCharacterId: 12,
+      bank: {
+        slots: [{ itemId: 'wolf_fang', count: 5 }],
+        capacity: 24,
+        purchasedSlots: 0,
+        bonusSlots: 0,
+        nextExpansionCost: null,
+        bonusSources: [],
+        socketsUnlocked: 0,
+        socketBags: [null, null, null, null],
+        nextSocketCost: null,
+        generalCapacity: 24,
+        materialsCapacity: 0,
+        generalUsed: 1,
+        materialsUsed: 0,
+      },
+    };
+    window.refreshIfChanged();
+    expect(root.querySelector('[data-courier-storage="account"] h3')?.textContent).toBe(
+      "Alt's bank",
+    );
+    // Soulbound gear cannot go to another character.
+    expect(
+      root.querySelector<HTMLButtonElement>(
+        '[data-courier-side="accountDeposits"][data-courier-index="1"]',
+      )!.disabled,
+    ).toBe(true);
+    root
+      .querySelector<HTMLButtonElement>(
+        '[data-courier-side="accountDeposits"][data-courier-index="0"]',
+      )!
+      .click();
+    root.querySelector<HTMLButtonElement>('[data-courier-side="accountWithdrawals"]')!.click();
+    root.querySelector<HTMLButtonElement>('.courier-send')!.click();
+    expect(deps.dispatch.mock.calls[0][0]).toMatchObject({
+      deposits: [],
+      withdrawals: [],
+      account: { characterId: 12, deposits: [{ index: 0 }], withdrawals: [{ index: 0 }] },
+    });
   });
 });

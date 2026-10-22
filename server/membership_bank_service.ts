@@ -30,6 +30,8 @@ export interface MembershipBankCapture {
 export interface MembershipBankHost<S extends MembershipBankSession> {
   /** Alive, at a banker, still the same session, and not quarantined. */
   authorized(session: S): boolean;
+  /** Who may read the roster and a bank (defaults to `authorized`). */
+  authorizedRead?(session: S): boolean;
   membership(accountId: number): Promise<MembershipAuthorization>;
   /** Acquire shared inventory guard, flush conflicting books, enter the existing
    * save FIFO, and release only when job has settled. Abort unstarted jobs. */
@@ -79,12 +81,16 @@ export function createMembershipBankService<S extends MembershipBankSession>(
   const membershipActive = (member: MembershipAuthorization): boolean =>
     member.active && Number(member.expiresAt) > now() && member.authorizedUntil > now();
 
+  const readable = (session: S): boolean =>
+    host.authorizedRead ? host.authorizedRead(session) : host.authorized(session);
   async function run(
     session: S,
     work: (membership: MembershipAuthorization) => Promise<void>,
     keep?: number,
+    read = false,
   ): Promise<void> {
-    if (!host.authorized(session)) {
+    const authorized = read ? readable : host.authorized;
+    if (!authorized(session)) {
       fail(session, 'invalid');
       return;
     }
@@ -111,7 +117,7 @@ export function createMembershipBankService<S extends MembershipBankSession>(
         fail(session, 'membership_required');
         return;
       }
-      if (!host.authorized(session)) {
+      if (!authorized(session)) {
         fail(session, 'invalid');
         return;
       }
@@ -125,37 +131,47 @@ export function createMembershipBankService<S extends MembershipBankSession>(
   }
   return {
     list(session: S): Promise<void> {
-      return run(session, async (member) => {
-        const characters = await database.list(session.accountId);
-        if (!host.authorized(session) || !membershipActive(member)) {
-          fail(session, 'membership_required');
-          return;
-        }
-        send(session, {
-          characters: characters.filter((row) => row.characterId !== session.characterId),
-          selectedCharacterId: null,
-          bank: null,
-        });
-      });
+      return run(
+        session,
+        async (member) => {
+          const characters = await database.list(session.accountId);
+          if (!readable(session) || !membershipActive(member)) {
+            fail(session, 'membership_required');
+            return;
+          }
+          send(session, {
+            characters: characters.filter((row) => row.characterId !== session.characterId),
+            selectedCharacterId: null,
+            bank: null,
+          });
+        },
+        undefined,
+        true,
+      );
     },
     select(session: S, characterId: number): Promise<void> {
-      return run(session, async (member) => {
-        if (characterId === session.characterId) {
-          fail(session, 'invalid');
-          return;
-        }
-        const result = await database.load(session.accountId, characterId);
-        if (!host.authorized(session) || !membershipActive(member)) {
-          fail(session, 'membership_required');
-          return;
-        }
-        send(session, {
-          ...(views.get(session) ?? empty()),
-          selectedCharacterId: characterId,
-          bank: result.ok ? result.value : null,
-          error: result.ok ? undefined : result.error,
-        });
-      });
+      return run(
+        session,
+        async (member) => {
+          if (characterId === session.characterId) {
+            fail(session, 'invalid');
+            return;
+          }
+          const result = await database.load(session.accountId, characterId);
+          if (!readable(session) || !membershipActive(member)) {
+            fail(session, 'membership_required');
+            return;
+          }
+          send(session, {
+            ...(views.get(session) ?? empty()),
+            selectedCharacterId: characterId,
+            bank: result.ok ? result.value : null,
+            error: result.ok ? undefined : result.error,
+          });
+        },
+        undefined,
+        true,
+      );
     },
     transfer(
       session: S,

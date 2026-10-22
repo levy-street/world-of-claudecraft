@@ -1,5 +1,6 @@
 import { bankPools, personalBankInfoFor } from '../bank';
 import { INSTANCE_X_BASE } from '../data';
+import { personalVaultInfoFor } from '../materials_vault';
 import { membershipActive } from '../membership';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -53,7 +54,7 @@ export function courierWireRevisionFor(ctx: SimContext, pid: number): string | n
   const meta = ctx.players.get(pid);
   const state = meta?.courier;
   return meta && state
-    ? `${state.revision}:${state.phase === 'ready' ? meta.bankWireRev : 0}:${membershipActive(meta, ctx.time)}`
+    ? `${state.revision}:${state.phase === 'ready' ? `${meta.bankWireRev}:${meta.vaultWireRev}` : 0}:${membershipActive(meta, ctx.time)}`
     : null;
 }
 export function courierInfoFor(ctx: SimContext, pid: number): CourierInfo | null {
@@ -77,15 +78,43 @@ export function courierInfoFor(ctx: SimContext, pid: number): CourierInfo | null
     ...courierPoseFor(ctx, pid)!,
     cargo: state.cargo.map(cloneInvSlot),
     withdrawals: state.withdrawals.map((s) => ({ ...s })),
+    ...(state.vaultCargo ? { vaultCargo: state.vaultCargo.map(cloneInvSlot) } : {}),
+    ...(state.vaultWithdrawals
+      ? {
+          vaultWithdrawals: state.vaultWithdrawals.map((s) => ({
+            ...s,
+            ...(s.special ? { special: { ...s.special } } : {}),
+          })),
+        }
+      : {}),
+    ...(state.account
+      ? {
+          account: {
+            characterId: state.account.characterId,
+            cargo: state.account.cargo.map(cloneInvSlot),
+            withdrawals: state.account.withdrawals.map((s) => ({ ...s })),
+          },
+        }
+      : {}),
     revision: state.revision + meta.bankWireRev,
     active: membershipActive(meta, ctx.time),
     bankSlots: state.phase === 'ready' ? meta.bank.inventory.map(cloneInvSlot) : [],
     bankCapacity: pools.general + pools.materials,
     inventoryRevision: meta.wireRev,
     bankRevision: meta.bankWireRev,
+    // The vault rides only while the courier waits beside its owner, like bankSlots.
+    vault: state.phase === 'ready' ? personalVaultInfoFor(ctx, pid) : null,
   };
   snapshots.set(meta, { key, state, info });
   return info;
+}
+/** The vault leg of the current trip, read straight off custody (no heavy projection). */
+export function courierVaultTripFor(ctx: SimContext, pid: number) {
+  const state = ctx.players.get(pid)?.courier;
+  return state ? { vaultCargo: state.vaultCargo, vaultWithdrawals: state.vaultWithdrawals } : null;
+}
+export function courierVaultInfoFor(ctx: SimContext, pid: number) {
+  return ctx.players.get(pid)?.courier ? personalVaultInfoFor(ctx, pid) : null;
 }
 export function courierBankInfoFor(ctx: SimContext, pid: number) {
   return ctx.players.get(pid)?.courier ? personalBankInfoFor(ctx, pid) : null;
