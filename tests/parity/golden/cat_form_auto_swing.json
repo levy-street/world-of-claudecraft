@@ -8,13 +8,13 @@
     "Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll",
     "bear-form control swinging at the equipped weapon speed on the same loadout"
   ],
-  "draws": 1479,
-  "drawDigest": "039d2a21",
+  "draws": 1451,
+  "drawDigest": "a799287c",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1007,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1015,
-      "state": "6cb507ef",
-      "events": "1ea487dd",
+      "nextId": 1011,
+      "state": "d8943419",
+      "events": "2d7b47b9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,8 +39,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1015,
-      "state": "6e2befeb",
+      "nextId": 1011,
+      "state": "83230491",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -50,364 +50,364 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 1015,
-      "state": "a4e6be31",
-      "events": "0afe8a2b",
+      "nextId": 1011,
+      "state": "006e292f",
+      "events": "44163571",
       "rng": {
         "draws": 8,
-        "digest": "fe9b8e82"
+        "digest": "e92caf0d"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1015,
-      "state": "4ed6ea87",
-      "events": "3f5a7a0c",
+      "nextId": 1011,
+      "state": "2a10b730",
+      "events": "cfa8a0ec",
       "rng": {
         "draws": 8,
-        "digest": "fe9b8e82"
+        "digest": "e92caf0d"
       }
     },
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1015,
-      "state": "3bc692d3",
+      "nextId": 1011,
+      "state": "7fd0e23e",
       "events": "741638a5",
       "rng": {
         "draws": 8,
-        "digest": "fe9b8e82"
+        "digest": "e92caf0d"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1015,
-      "state": "ff41e100",
+      "nextId": 1011,
+      "state": "c06a95b4",
       "events": "741638a5",
       "rng": {
         "draws": 8,
-        "digest": "fe9b8e82"
+        "digest": "e92caf0d"
       }
     },
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 1015,
-      "state": "e6ee23ef",
-      "events": "741ce20f",
+      "nextId": 1011,
+      "state": "275ffeba",
+      "events": "4680a856",
       "rng": {
         "draws": 12,
-        "digest": "39b2d95f"
+        "digest": "7dffff5b"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1015,
-      "state": "f5649749",
+      "nextId": 1011,
+      "state": "78e1251f",
       "events": "741638a5",
       "rng": {
         "draws": 12,
-        "digest": "39b2d95f"
+        "digest": "7dffff5b"
       }
     },
     {
       "tick": 45,
       "time": 2.25,
-      "nextId": 1015,
-      "state": "845c8d2d",
+      "nextId": 1011,
+      "state": "d27593eb",
       "events": "741638a5",
       "rng": {
-        "draws": 38,
-        "digest": "da0578fb"
+        "draws": 36,
+        "digest": "e09298bd"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1015,
-      "state": "1b296624",
+      "nextId": 1011,
+      "state": "cb222513",
       "events": "741638a5",
       "rng": {
         "draws": 76,
-        "digest": "5862136a"
+        "digest": "2b6fac19"
       }
     },
     {
       "tick": 55,
       "time": 2.75,
-      "nextId": 1015,
-      "state": "16f98ec7",
-      "events": "741ce20f",
+      "nextId": 1011,
+      "state": "a48a882e",
+      "events": "4680a856",
       "rng": {
         "draws": 106,
-        "digest": "d67b5579"
+        "digest": "48df0f3f"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1015,
-      "state": "370dfaa2",
-      "events": "e87172bc",
+      "nextId": 1011,
+      "state": "c7dd94ba",
+      "events": "504da610",
       "rng": {
-        "draws": 150,
-        "digest": "462cc876"
+        "draws": 152,
+        "digest": "f1e1aaff"
       }
     },
     {
       "tick": 65,
       "time": 3.25,
-      "nextId": 1015,
-      "state": "53abe63a",
+      "nextId": 1011,
+      "state": "9c53c3f8",
       "events": "741638a5",
       "rng": {
-        "draws": 195,
-        "digest": "6c0535ed"
+        "draws": 198,
+        "digest": "002e6b89"
       }
     },
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1015,
-      "state": "e5054763",
-      "events": "012e70d8",
+      "nextId": 1011,
+      "state": "07694820",
+      "events": "ac2d2867",
       "rng": {
-        "draws": 233,
-        "digest": "76e894a1"
+        "draws": 235,
+        "digest": "092d871c"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1015,
-      "state": "04cde514",
-      "events": "3f1be3be",
+      "nextId": 1011,
+      "state": "7d59303e",
+      "events": "988a59ad",
       "rng": {
-        "draws": 283,
-        "digest": "b17963f9"
+        "draws": 281,
+        "digest": "9d993abc"
       }
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1015,
-      "state": "bd864063",
+      "nextId": 1011,
+      "state": "85590f76",
       "events": "741638a5",
       "rng": {
-        "draws": 329,
-        "digest": "39d61440"
+        "draws": 324,
+        "digest": "52c68131"
       }
     },
     {
       "tick": 85,
       "time": 4.25,
-      "nextId": 1015,
-      "state": "aa4d7306",
+      "nextId": 1011,
+      "state": "02a97009",
       "events": "741638a5",
       "rng": {
-        "draws": 372,
-        "digest": "a34088f1"
+        "draws": 368,
+        "digest": "e7fa802a"
       }
     },
     {
       "tick": 90,
       "time": 4.5,
-      "nextId": 1015,
-      "state": "e784b65c",
+      "nextId": 1011,
+      "state": "6d4acb20",
       "events": "741638a5",
       "rng": {
-        "draws": 405,
-        "digest": "edf372b4"
+        "draws": 402,
+        "digest": "a8faa93f"
       }
     },
     {
       "tick": 95,
       "time": 4.75,
-      "nextId": 1015,
-      "state": "8744a67c",
-      "events": "741ce20f",
+      "nextId": 1011,
+      "state": "0b0fe09e",
+      "events": "5f444f33",
       "rng": {
-        "draws": 475,
-        "digest": "72b7fbe2"
+        "draws": 465,
+        "digest": "1bfd1524"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1015,
-      "state": "91490f3b",
+      "nextId": 1011,
+      "state": "06691ec6",
       "events": "741638a5",
       "rng": {
-        "draws": 517,
-        "digest": "25005a64"
+        "draws": 511,
+        "digest": "610f44e0"
       }
     },
     {
       "tick": 105,
       "time": 5.25,
-      "nextId": 1015,
-      "state": "2da94b34",
+      "nextId": 1011,
+      "state": "8ab869dd",
       "events": "741638a5",
       "rng": {
-        "draws": 576,
-        "digest": "2b99b2f1"
+        "draws": 571,
+        "digest": "7d3f6953"
       }
     },
     {
       "tick": 110,
       "time": 5.5,
-      "nextId": 1015,
-      "state": "76e85388",
+      "nextId": 1011,
+      "state": "0b58c30a",
       "events": "741638a5",
       "rng": {
-        "draws": 631,
-        "digest": "29197bb8"
+        "draws": 628,
+        "digest": "5f4ecf84"
       }
     },
     {
       "tick": 115,
       "time": 5.75,
-      "nextId": 1015,
-      "state": "f5cc5f5b",
-      "events": "741ce20f",
+      "nextId": 1011,
+      "state": "1fa69b9b",
+      "events": "4680a856",
       "rng": {
-        "draws": 697,
-        "digest": "c4126cf8"
+        "draws": 684,
+        "digest": "7908c31d"
       }
     },
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1015,
-      "state": "bf8f1c7a",
+      "nextId": 1011,
+      "state": "01ff81c1",
       "events": "741638a5",
       "rng": {
-        "draws": 763,
-        "digest": "25338553"
+        "draws": 743,
+        "digest": "98db1e94"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1015,
-      "state": "e86ba0cd",
+      "nextId": 1011,
+      "state": "5773004c",
       "events": "741638a5",
       "rng": {
-        "draws": 816,
-        "digest": "ba333ccc"
+        "draws": 805,
+        "digest": "a134d97c"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
-      "nextId": 1015,
-      "state": "4928d83a",
-      "events": "0021a333",
+      "nextId": 1011,
+      "state": "9c24992a",
+      "events": "38584e6e",
       "rng": {
-        "draws": 872,
-        "digest": "53bd0f68"
+        "draws": 859,
+        "digest": "03ebf302"
       }
     },
     {
       "tick": 135,
       "time": 6.75,
-      "nextId": 1015,
-      "state": "97a43fe8",
-      "events": "741ce20f",
+      "nextId": 1011,
+      "state": "2200dd9d",
+      "events": "4680a856",
       "rng": {
-        "draws": 921,
-        "digest": "4663e4c6"
+        "draws": 914,
+        "digest": "8524e491"
       }
     },
     {
       "tick": 140,
       "time": 7,
-      "nextId": 1015,
-      "state": "c96063f6",
+      "nextId": 1011,
+      "state": "44ea03e1",
       "events": "741638a5",
       "rng": {
-        "draws": 988,
-        "digest": "085fb958"
+        "draws": 985,
+        "digest": "18ce9507"
       }
     },
     {
       "tick": 145,
       "time": 7.25,
-      "nextId": 1015,
-      "state": "4efc38a8",
+      "nextId": 1011,
+      "state": "10c76fa9",
       "events": "741638a5",
       "rng": {
-        "draws": 1056,
-        "digest": "c3a10785"
+        "draws": 1053,
+        "digest": "508a408d"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 1015,
-      "state": "30c4d0ed",
+      "nextId": 1011,
+      "state": "27bccce3",
       "events": "741638a5",
       "rng": {
-        "draws": 1100,
-        "digest": "e2962881"
+        "draws": 1092,
+        "digest": "3d719d73"
       }
     },
     {
       "tick": 155,
       "time": 7.75,
-      "nextId": 1015,
-      "state": "6903b818",
-      "events": "741ce20f",
+      "nextId": 1011,
+      "state": "82544e8b",
+      "events": "9739adef",
       "rng": {
-        "draws": 1168,
-        "digest": "171bfbdd"
+        "draws": 1154,
+        "digest": "a343c4ce"
       }
     },
     {
       "tick": 160,
       "time": 8,
-      "nextId": 1015,
-      "state": "e4975c5e",
+      "nextId": 1011,
+      "state": "5150d981",
       "events": "741638a5",
       "rng": {
-        "draws": 1235,
-        "digest": "081630f3"
+        "draws": 1219,
+        "digest": "b69dcddb"
       }
     },
     {
       "tick": 165,
       "time": 8.25,
-      "nextId": 1015,
-      "state": "2fb2b79a",
+      "nextId": 1011,
+      "state": "aefe2db5",
       "events": "741638a5",
       "rng": {
-        "draws": 1286,
-        "digest": "cfafc133"
+        "draws": 1265,
+        "digest": "a87c9050"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
-      "nextId": 1015,
-      "state": "e580b2c9",
+      "nextId": 1011,
+      "state": "a8255af7",
       "events": "741638a5",
       "rng": {
-        "draws": 1349,
-        "digest": "2cefc31d"
+        "draws": 1331,
+        "digest": "89bf92be"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
-      "nextId": 1015,
-      "state": "e580b2c9",
+      "nextId": 1011,
+      "state": "a8255af7",
       "events": "741638a5",
       "rng": {
-        "draws": 1349,
-        "digest": "2cefc31d"
+        "draws": 1331,
+        "digest": "89bf92be"
       },
       "label": "after-swings",
       "players": [
@@ -437,13 +437,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 105
+            "damageDealt": 121
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 105
+              "dummyDamage": 121
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -485,7 +485,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1007,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -556,13 +556,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 139
+            "damageDealt": 142
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 139
+              "dummyDamage": 142
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -604,7 +604,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1008,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -662,8 +662,21 @@
               "name": "Cat Form",
               "remaining": 3591.5,
               "school": "physical",
-              "sourceId": 1011,
+              "sourceId": 1007,
               "value": 0.71
+            },
+            {
+              "duration": 10,
+              "empowerAbilities": [
+                "rejuvenation",
+                "barkskin"
+              ],
+              "id": "natures_boon",
+              "kind": "next_cast_free",
+              "name": "Nature's Boon",
+              "remaining": 5,
+              "school": "nature",
+              "sourceId": 1007
             }
           ],
           "autoAttack": true,
@@ -672,11 +685,11 @@
           "critChance": 0.072,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.072,
-          "fallStartY": 0.552596,
+          "fallStartY": 0.54952,
           "fiveSecondRule": 8.5,
           "healPower": 29,
           "hp": 802,
-          "id": 1011,
+          "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -689,7 +702,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -704,7 +717,7 @@
           "savedMana": 1073,
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 29,
@@ -717,7 +730,7 @@
             "str": 34
           },
           "swingTimer": 0.05,
-          "targetId": 1013,
+          "targetId": 1009,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -736,8 +749,21 @@
               "name": "Bruin Form",
               "remaining": 3591.5,
               "school": "physical",
-              "sourceId": 1012,
+              "sourceId": 1008,
               "value": 0.65
+            },
+            {
+              "duration": 10,
+              "empowerAbilities": [
+                "rejuvenation",
+                "barkskin"
+              ],
+              "id": "natures_boon",
+              "kind": "next_cast_free",
+              "name": "Nature's Boon",
+              "remaining": 7.9,
+              "school": "nature",
+              "sourceId": 1008
             }
           ],
           "autoAttack": true,
@@ -746,11 +772,11 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 2.932068,
+          "fallStartY": 4.59188,
           "fiveSecondRule": 8.5,
           "healPower": 29,
           "hp": 1043,
-          "id": 1012,
+          "id": 1008,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -763,7 +789,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -773,12 +799,12 @@
               "dru_loping_stride": 11.5
             }
           },
-          "resource": 14.377327,
+          "resource": 14.687629,
           "resourceType": "rage",
           "savedMana": 1073,
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 29,
@@ -791,7 +817,7 @@
             "str": 34
           },
           "swingTimer": 0.85,
-          "targetId": 1014,
+          "targetId": 1010,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -800,23 +826,23 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1007,
           "aiState": "chase",
           "combatTimer": 1,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 0.552596,
+          "fallStartY": 0.54952,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999895,
-          "id": 1013,
+          "hp": 999879,
+          "id": 1009,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -43.5
           },
           "level": 1,
@@ -827,22 +853,22 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -43.5
           },
           "stats": {},
-          "tappedById": 1011,
+          "tappedById": 1007,
           "templateId": "training_dummy",
           "threat": [
             [
-              1011,
-              125.0075
+              1007,
+              143.7515
             ]
           ],
           "weapon": {
@@ -850,23 +876,23 @@
           }
         },
         {
-          "aggroTargetId": 1012,
+          "aggroTargetId": 1008,
           "aiState": "chase",
           "combatTimer": 2.1,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 2.932068,
+          "fallStartY": 4.59188,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999861,
-          "id": 1014,
+          "hp": 999858,
+          "id": 1010,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -43.5
           },
           "level": 1,
@@ -877,22 +903,22 @@
           "petMode": "defensive",
           "pos": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -43.5
           },
           "stats": {},
-          "tappedById": 1012,
+          "tappedById": 1008,
           "templateId": "training_dummy",
           "threat": [
             [
-              1012,
-              300.155
+              1008,
+              306.59
             ]
           ],
           "weapon": {
@@ -904,34 +930,34 @@
     {
       "tick": 175,
       "time": 8.75,
-      "nextId": 1015,
-      "state": "2a8adfc6",
+      "nextId": 1011,
+      "state": "9c69c51b",
       "events": "741638a5",
       "rng": {
-        "draws": 1406,
-        "digest": "8bd888ba"
+        "draws": 1390,
+        "digest": "a4290463"
       }
     },
     {
       "tick": 180,
       "time": 9,
-      "nextId": 1015,
-      "state": "3a56d150",
+      "nextId": 1011,
+      "state": "7dc6e983",
       "events": "741638a5",
       "rng": {
-        "draws": 1479,
-        "digest": "039d2a21"
+        "draws": 1451,
+        "digest": "a799287c"
       }
     },
     {
       "tick": 180,
       "time": 9,
-      "nextId": 1015,
-      "state": "3a56d150",
+      "nextId": 1011,
+      "state": "7dc6e983",
       "events": "741638a5",
       "rng": {
-        "draws": 1479,
-        "digest": "039d2a21"
+        "draws": 1451,
+        "digest": "a799287c"
       },
       "label": "final",
       "players": [
@@ -961,13 +987,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 105
+            "damageDealt": 121
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 105
+              "dummyDamage": 121
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1009,7 +1035,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1007,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -1080,13 +1106,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 139
+            "damageDealt": 142
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 139
+              "dummyDamage": 142
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1128,7 +1154,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1008,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -1186,8 +1212,21 @@
               "name": "Cat Form",
               "remaining": 3591,
               "school": "physical",
-              "sourceId": 1011,
+              "sourceId": 1007,
               "value": 0.71
+            },
+            {
+              "duration": 10,
+              "empowerAbilities": [
+                "rejuvenation",
+                "barkskin"
+              ],
+              "id": "natures_boon",
+              "kind": "next_cast_free",
+              "name": "Nature's Boon",
+              "remaining": 4.5,
+              "school": "nature",
+              "sourceId": 1007
             }
           ],
           "combatTimer": 1.5,
@@ -1195,11 +1234,11 @@
           "critChance": 0.072,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.072,
-          "fallStartY": 0.552596,
+          "fallStartY": 0.54952,
           "fiveSecondRule": 9,
           "healPower": 29,
           "hp": 802,
-          "id": 1011,
+          "id": 1007,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1212,7 +1251,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -1227,7 +1266,7 @@
           "savedMana": 1073,
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 29,
@@ -1239,7 +1278,7 @@
             "sta": 69,
             "str": 34
           },
-          "targetId": 1013,
+          "targetId": 1009,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -1258,8 +1297,21 @@
               "name": "Bruin Form",
               "remaining": 3591,
               "school": "physical",
-              "sourceId": 1012,
+              "sourceId": 1008,
               "value": 0.65
+            },
+            {
+              "duration": 10,
+              "empowerAbilities": [
+                "rejuvenation",
+                "barkskin"
+              ],
+              "id": "natures_boon",
+              "kind": "next_cast_free",
+              "name": "Nature's Boon",
+              "remaining": 7.4,
+              "school": "nature",
+              "sourceId": 1008
             }
           ],
           "combatTimer": 2.6,
@@ -1267,11 +1319,11 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 2.932068,
+          "fallStartY": 4.59188,
           "fiveSecondRule": 9,
           "healPower": 29,
           "hp": 1043,
-          "id": 1012,
+          "id": 1008,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1284,7 +1336,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -45
           },
           "potionCooldownUntil": -1,
@@ -1294,12 +1346,12 @@
               "dru_loping_stride": 11
             }
           },
-          "resource": 14.377327,
+          "resource": 14.687629,
           "resourceType": "rage",
           "savedMana": 1073,
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 29,
@@ -1312,7 +1364,7 @@
             "str": 34
           },
           "swingTimer": 0.35,
-          "targetId": 1014,
+          "targetId": 1010,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -1321,23 +1373,23 @@
           }
         },
         {
-          "aggroTargetId": 1011,
+          "aggroTargetId": 1007,
           "aiState": "chase",
           "combatTimer": 1.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 0.552596,
+          "fallStartY": 0.54952,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999895,
-          "id": 1013,
+          "hp": 999879,
+          "id": 1009,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -43.5
           },
           "level": 1,
@@ -1348,22 +1400,22 @@
           "petMode": "defensive",
           "pos": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -30,
-            "y": 0.552596,
+            "y": 0.54952,
             "z": -43.5
           },
           "stats": {},
-          "tappedById": 1011,
+          "tappedById": 1007,
           "templateId": "training_dummy",
           "threat": [
             [
-              1011,
-              125.0075
+              1007,
+              143.7515
             ]
           ],
           "weapon": {
@@ -1371,23 +1423,23 @@
           }
         },
         {
-          "aggroTargetId": 1012,
+          "aggroTargetId": 1008,
           "aiState": "chase",
           "combatTimer": 2.6,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 2.932068,
+          "fallStartY": 4.59188,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999861,
-          "id": 1014,
+          "hp": 999858,
+          "id": 1010,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -43.5
           },
           "level": 1,
@@ -1398,22 +1450,22 @@
           "petMode": "defensive",
           "pos": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -43.5
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 30,
-            "y": 2.932068,
+            "y": 4.59188,
             "z": -43.5
           },
           "stats": {},
-          "tappedById": 1012,
+          "tappedById": 1008,
           "templateId": "training_dummy",
           "threat": [
             [
-              1012,
-              300.155
+              1008,
+              306.59
             ]
           ],
           "weapon": {

@@ -40,6 +40,7 @@ export interface PlacedTownBuildingRecord {
     readonly rotation: number;
     readonly scale: number;
     readonly lift: number;
+    readonly groundY?: number;
   };
   readonly reach: {
     readonly center: { readonly x: number; readonly z: number };
@@ -177,7 +178,7 @@ export function buildPlacedTownBuilding(
   wrap.add(clone);
   wrap.scale.setScalar(placement.scale);
 
-  const ground = groundAt(placement.x, placement.z);
+  const ground = placement.groundY ?? groundAt(placement.x, placement.z);
   const group = new THREE.Group();
   group.name = `${town}Building:${building.id}`;
   group.userData[`${town}BuildingId`] = building.id;

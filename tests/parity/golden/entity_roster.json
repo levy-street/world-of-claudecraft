@@ -10,13 +10,13 @@
     "releaseSpirit ghost release + Spirit Healer resurrect (Resurrection Sickness)"
   ],
   "draws": 4,
-  "drawDigest": "0d8664bb",
+  "drawDigest": "2a1d4e5f",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "caf53a89",
+      "nextId": 1008,
+      "state": "49417dcc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -65,7 +65,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -117,7 +117,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -127,11 +127,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -144,14 +144,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -175,34 +175,34 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1014,
-      "state": "55d169de",
-      "events": "02e6c9c0",
+      "nextId": 1010,
+      "state": "f2b990f9",
+      "events": "72518360",
       "rng": {
         "draws": 4,
-        "digest": "0d8664bb"
+        "digest": "2a1d4e5f"
       }
     },
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1014,
-      "state": "72803bef",
+      "nextId": 1010,
+      "state": "ef98aed0",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "0d8664bb"
+        "digest": "2a1d4e5f"
       }
     },
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1014,
-      "state": "d7de09db",
+      "nextId": 1010,
+      "state": "7b0760e8",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "0d8664bb"
+        "digest": "2a1d4e5f"
       },
       "label": "post-churn",
       "players": [
@@ -261,7 +261,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -315,7 +315,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -325,11 +325,11 @@
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99.25,
           "healPower": 5,
           "hp": 50000,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -342,14 +342,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -373,12 +373,12 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1014,
-      "state": "c9f9b2d7",
+      "nextId": 1010,
+      "state": "e3b07dac",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "0d8664bb"
+        "digest": "2a1d4e5f"
       },
       "label": "ghost-release",
       "players": [
@@ -437,7 +437,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -489,19 +489,19 @@
           "comboUntil": -1,
           "corpsePos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "critChance": 0.0645,
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99.25,
           "ghost": true,
           "healPower": 5,
           "hp": 442,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -513,15 +513,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 37.5,
-            "y": -0.251617,
-            "z": -99.3
+            "x": 33,
+            "y": -0.27656,
+            "z": -96.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -545,12 +545,12 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1014,
-      "state": "ff264465",
-      "events": "557f26d5",
+      "nextId": 1010,
+      "state": "d4abc459",
+      "events": "b389ea61",
       "rng": {
         "draws": 4,
-        "digest": "0d8664bb"
+        "digest": "2a1d4e5f"
       },
       "label": "healer-resurrect",
       "players": [
@@ -609,7 +609,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -663,7 +663,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "undispellable": true,
               "value": -0.75
             }
@@ -676,11 +676,11 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0535,
           "facing": 1.570796,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99.25,
           "healPower": 2,
           "hp": 44,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -692,15 +692,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 37.5,
-            "y": -0.251617,
-            "z": -99.3
+            "x": 33,
+            "y": -0.27656,
+            "z": -96.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 2,
@@ -724,23 +724,23 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1014,
-      "state": "892a529f",
-      "events": "0eaaa8ed",
+      "nextId": 1010,
+      "state": "d9e9a220",
+      "events": "d0914475",
       "rng": {
         "draws": 4,
-        "digest": "0d8664bb"
+        "digest": "2a1d4e5f"
       }
     },
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 1014,
-      "state": "4a2e8fbe",
+      "nextId": 1010,
+      "state": "ca1b8a9d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "0d8664bb"
+        "digest": "2a1d4e5f"
       },
       "label": "final",
       "players": [
@@ -799,7 +799,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -853,7 +853,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "undispellable": true,
               "value": -0.75
             },
@@ -864,7 +864,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -875,11 +875,11 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0535,
           "facing": 1.570796,
-          "fallStartY": -0.251617,
+          "fallStartY": -0.27656,
           "fiveSecondRule": 99.35,
           "healPower": 2,
           "hp": 44,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -891,15 +891,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 37.5,
-            "y": -0.251617,
-            "z": -99.3
+            "x": 33,
+            "y": -0.27656,
+            "z": -96.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 2,

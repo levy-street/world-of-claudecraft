@@ -827,7 +827,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       ev.filter((e) => e.type === 'castStart' && e.ability === 'farming'),
       'no plant starts a cast any more',
     ).toHaveLength(0);
-    expect(PLANTS, 'the session plants 44 crops').toBe(44);
+    expect(PLANTS, 'the session plants 49 crops').toBe(49);
 
     // THE READY NOTICE (Phase 8): the fifth plant is left standing across two
     // 1 Hz boundaries, so the sweep fires EXACTLY once for it: a second event
@@ -902,7 +902,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // The composed total, stated ONCE as a literal beside the arithmetic:
     // without it a term that halved while another doubled would keep every sum
     // above self-consistent and the whole ledger would slide together.
-    expect(TOTAL, 'the whole session costs 178 draws').toBe(178);
+    expect(TOTAL, 'the whole session costs 198 draws').toBe(198);
 
     // The knobbed plant really stored all three paid flags (farmPlanted is
     // knob-free on the wire, so the drive stashes the stored plot's flags).
@@ -917,21 +917,20 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(harvested).toHaveLength(6);
     // The Phase 8 closing harvest: skill sits at 75-and-change by now, and its
     // yieldSeed mints at a stream position the upstream rolls decide, so the
-    // expansion's exact count is the recorded truth of the re-recorded golden,
-    // a literal for the drawsAt reason above. It moved 3 -> 4 at Phase 11f
-    // because the golden BONUS draw re-seated every later mint by one per
-    // harvest; the SHAPE is what the arm is really about and did not move: no
-    // fine fields and no seed-back on a tier-1 crop, and no goldenBonusItemId
-    // because this harvest's own golden roll loses, so nothing multiplied.
+    // expansion's exact count is pinned below. Epoch 46's camp changes shift
+    // the pre-rolled yield seed: two base and two fine crops now land at skill
+    // 75. There is still no tier-1 seed-back and its golden roll loses.
     expect(harvested[3]).toEqual({
       type: 'farmHarvested',
       pid,
       bedId: 'bed_eastbrook_1',
       cropId: 'vale_wheat',
       itemId: 'vale_wheat',
-      count: 4,
+      count: 2,
+      fineItemId: 'fine_vale_wheat',
+      fineCount: 2,
     });
-    expect('fineItemId' in harvested[3]).toBe(false);
+    expect('fineItemId' in harvested[3]).toBe(true);
     expect('seedBackCount' in harvested[3]).toBe(false);
     expect(harvested[0].bedId).toBe('bed_eastbrook_1');
     expect(harvested[0].itemId).toBe('vale_wheat');
@@ -951,7 +950,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // Phase 11f re-probe moved this by construction rather than by hand.
     const WITHERED = 1 + FARM_GOLDEN_PADDING_CYCLES + 1;
     expect(withered).toHaveLength(WITHERED);
-    expect(WITHERED, 'the session withers 38 plots').toBe(38);
+    expect(WITHERED, 'the session withers 43 plots').toBe(43);
     expect(withered[0].bedId).toBe('bed_eastbrook_2');
     expect(withered[0].count).toBe(2);
     expect('seedBackCount' in withered[0]).toBe(false);
@@ -1006,11 +1005,10 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(barleyEv.bedId).toBe('bed_thornpeak_1');
     expect(barleyEv.cropId).toBe('highland_barley');
     const seedBack = (barleyEv.seedBackCount as number | undefined) ?? 0;
-    expect(seedBack).toBe(2);
-    // Present, because it is positive: the omit-zero doctrine says the field
-    // appears exactly when the roll paid, and this stream position now lands
-    // in the two-seed band.
-    expect('seedBackCount' in barleyEv).toBe(true);
+    expect(seedBack).toBe(0);
+    // Epoch 46 lands in the zero band here, so the wire omits the field.
+    // The final barley beat below still proves the paying arm and bag grant.
+    expect('seedBackCount' in barleyEv).toBe(false);
     // The band constants themselves are UNTOUCHED by the phase, stated here so
     // "the shift is a re-seat, not a retune" is asserted rather than asserted
     // in a comment. Their own literal pin lives in
@@ -1182,7 +1180,9 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
         (harvested[3].count as number) +
         goldenExpansion.count * 5,
     );
-    expect(countOf('fine_vale_wheat')).toBe(goldenExpansion.fine * 5);
+    expect(countOf('fine_vale_wheat')).toBe(
+      (harvested[3].fineCount as number) + goldenExpansion.fine * 5,
+    );
     expect(countOf('withered_husks')).toBe(
       withered.slice(1).reduce((n, w) => n + (w.count as number), 0),
     );

@@ -27,6 +27,7 @@ import {
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
+import { propHutCenter, propSourceIndex } from '../sim/world_layout/props';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { activeWorldHasAuthoredTown } from './authored_town_gate';
@@ -1810,6 +1811,7 @@ export function buildProps(
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
+    i = propSourceIndex(activeContent.props, 'stalls', i);
     if (eastbrookTown && isEastbrookRebuildStall(s)) return;
     if (fenbridgeTown && isFenbridgeRebuildStall(s)) return;
     const key = s.x * 7.7 + s.z * 2.3;
@@ -2036,6 +2038,7 @@ export function buildProps(
   // footprint (walking up to it leaves it fully visible) and keeps it casting a
   // shadow, the same treatment tents, crates and trees already get.
   getActiveWorldContent().props.marshReeds.forEach(([x, z], i) => {
+    i = propSourceIndex(getActiveWorldContent().props, 'marshReeds', i);
     const kind: PropKey = 'marshReeds';
     const a = propAsset(kind);
     const s = 3.0 + propRand(x, z, i + 5) * 0.6;
@@ -2057,6 +2060,7 @@ export function buildProps(
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
   getActiveWorldContent().props.crates.forEach(([x, z, stack], i) => {
+    i = propSourceIndex(getActiveWorldContent().props, 'crates', i);
     const kind: PropKey = i % 3 === 2 ? 'barrel' : 'crateWooden';
     const s = kind === 'barrel' ? 1.25 : 1.3 + propRand(x, z, 5) * 0.15;
     // Unit height mirrors campCrateShape (prop_layout.ts): barrel 1.13,
@@ -2085,13 +2089,7 @@ export function buildProps(
   });
 
   // ---- murloc mud huts: giant swamp mushrooms, doorway facing camp center --
-  const hutCenter = getActiveWorldContent().props.mudHuts.reduce(
-    (acc, [hx, hz]) => ({
-      x: acc.x + hx / getActiveWorldContent().props.mudHuts.length,
-      z: acc.z + hz / getActiveWorldContent().props.mudHuts.length,
-    }),
-    { x: 0, z: 0 },
-  );
+  const hutCenter = propHutCenter(getActiveWorldContent().props);
   for (const [x, z] of getActiveWorldContent().props.mudHuts) {
     const y = ground(x, z);
     // The Mirefen camp stands the painted mudfin huts at the size, turn and

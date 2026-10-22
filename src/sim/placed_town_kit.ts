@@ -4,6 +4,9 @@
 // Pure geometry and record building: no engine imports, no randomness, no
 // clocks, nothing mutable, so a frozen layout module can import it.
 
+import { WORLD_LAYOUT } from './world_layout/active';
+import { placeLayoutBuilding } from './world_layout/building';
+
 export interface Point2 {
   x: number;
   z: number;
@@ -137,7 +140,7 @@ export function makePlacedTownBuilding<Kind extends 'house' | 'inn' | 'chapel'>(
     spec.doorX,
     wallFrontZ - seat.frontClearance,
   );
-  return {
+  const building = {
     id: spec.id,
     assetId: spec.assetId,
     kind: spec.kind,
@@ -192,6 +195,7 @@ export function makePlacedTownBuilding<Kind extends 'house' | 'inn' | 'chapel'>(
       rotation: spec.rotation,
     },
   };
+  return placeLayoutBuilding(building, WORLD_LAYOUT.buildings[spec.id]);
 }
 
 export type PlacedTownBuilding = ReturnType<typeof makePlacedTownBuilding>;

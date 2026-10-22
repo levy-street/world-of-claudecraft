@@ -13,6 +13,7 @@
 
 import { authoredLaddersForPath } from './asset_collision';
 import { getActiveWorldContent } from './data';
+import { worldCollisionPlacements } from './placement_sources';
 import type { Entity, MoveInput, WorldContent } from './types';
 import { groundHeightNear, terrainHeight } from './world';
 
@@ -68,7 +69,7 @@ function laddersFor(content: WorldContent, seed: number): WorldLadder[] {
   let out = bySeed.get(seed);
   if (out) return out;
   out = [];
-  for (const p of content.placements ?? []) {
+  for (const p of worldCollisionPlacements(content)) {
     // Collision off is a real choice: no ladder to climb either.
     if (!p.collideRadius || p.collideRadius <= 0) continue;
     const authored = authoredLaddersForPath(p.path);

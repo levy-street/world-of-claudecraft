@@ -13,6 +13,7 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
+import { pushCampCrateColliders } from './camp_crate_colliders';
 import {
   cellKey,
   cellKeyAt,
@@ -69,6 +70,9 @@ import {
   SUPPORT_OVERLAP,
 } from './parkour_heights';
 import { invalidatePlacementRamps } from './placement_ramps';
+import { pushWellColliders } from './well_colliders';
+import { civicGroundY } from './world_layout/civic';
+import { placeLayoutStreetlamps } from './world_layout/streetlamps';
 
 // Re-exported from the extracted cell-index module so existing importers keep
 // their './colliders' path.
@@ -128,7 +132,6 @@ import {
   CHAPEL_HALL_ROOF_EAVE,
   CHAPEL_HALL_ROOF_TOP,
   CHAPEL_TOWER,
-  campCrateShape,
   DELVE_ARCH_HD,
   DELVE_ARCH_HEIGHT,
   DELVE_ARCH_HW,
@@ -160,7 +163,8 @@ import {
   planStreetlamps,
   styleStreetlampSites,
 } from './streetlamp_layout';
-import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
+import { streetlampPostColliders } from './streetlamp_post_colliders';
+import { STREETLAMP_COLLIDER_RADIUS } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
 import { transportBerthColliders, transportGatesClosedAtBuild } from './transport_gates';
 import type { WorldContent } from './types';
@@ -317,15 +321,7 @@ function staticWorldColliders(seed: number): Collider[] {
       : topY(seed, b.x, b.z, buildingCameraHeight(b));
     out.push(...buildingRecordColliders(b, cameraTopY, (x, z) => topY(seed, x, z, 0), seed));
   }
-  for (const w of PROPS.wells)
-    out.push({
-      type: 'circle',
-      x: w.x,
-      z: w.z,
-      r: w.r,
-      cameraTopY: topY(seed, w.x, w.z, w.height ?? 3.7),
-      underY: topY(seed, w.x, w.z, 0),
-    });
+  pushWellColliders(out, PROPS.wells, (x, z) => topY(seed, x, z, 0));
   // the collider runs wider than the data radius: the modeled trunks flare
   // at the base, and the r that sizes the tree understates the bark line
   for (const t of PROPS.greatTrees ?? [])
@@ -472,7 +468,8 @@ function staticWorldColliders(seed: number): Collider[] {
         cameraTopY: topY(seed, p.x, p.z, 7),
       });
   for (const s of PROPS.stalls) {
-    const cameraTopY = topY(seed, s.x, s.z, s.height ?? 3.1);
+    const seat = civicGroundY(s.id, s, (x, z) => topY(seed, x, z, 0));
+    const cameraTopY = seat + (s.height ?? 3.1);
     if (s.w !== undefined && s.d !== undefined) {
       // Sized entries (the Eastbrook rebuild's authored market stalls and any
       // editor-authored stall): the authored OBB drives collision, exactly as
@@ -481,7 +478,7 @@ function staticWorldColliders(seed: number): Collider[] {
       // tallest element is the flat canopy deck, so the drawn canopy surface
       // sits at exactly the authored height: a standable roof a jump at the
       // counter's edge grabs, the rebuild's counterpart of the legacy gable.
-      const canopyTop = s.height !== undefined ? topY(seed, s.x, s.z, s.height) : undefined;
+      const canopyTop = s.height !== undefined ? seat + s.height : undefined;
       out.push({
         type: 'obb',
         x: s.x,
@@ -835,25 +832,7 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, t.x, t.z, 3.4 * t.scale),
       underY: topY(seed, t.x, t.z, 0),
     });
-  PROPS.crates.forEach(([x, z, stack], i) => {
-    // Camp clutter renders as a wooden crate OR (every third) a barrel, with
-    // a per-point scale roll: the collider takes the SAME roll, so its
-    // footprint and top match the exact mesh drawn at this point. A stacked
-    // point (the Gauntlet's parkour ledge) multiplies the same unit height,
-    // exactly what the renderer draws.
-    const shape = campCrateShape(x, z, i);
-    const top = shape.top * (stack ?? 1);
-    out.push({
-      type: 'circle',
-      x,
-      z,
-      r: shape.r,
-      cameraTopY: topY(seed, x, z, top),
-      moveTopY: topY(seed, x, z, top),
-      underY: topY(seed, x, z, 0),
-      standable: true,
-    });
-  });
+  pushCampCrateColliders(out, PROPS, (x, z, height) => topY(seed, x, z, height));
   for (const [x, z] of PROPS.campfires)
     out.push({
       type: 'circle',
@@ -1434,7 +1413,11 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
       authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
     },
   );
-  const styled = styleStreetlampSites(plan.sites, content.zones);
+  const styled = placeLayoutStreetlamps(
+    styleStreetlampSites(plan.sites, content.zones),
+    content.sceneryLamps,
+    (x, z) => terrainHeight(x, z, seed),
+  );
   // Remember the PRISTINE builtin plan for the editor's streetlamp promotion:
   // planned before any post stands, so nothing self-blocks. A plan computed
   // against a world that already carries lamps (as colliders or as promoted
@@ -1486,19 +1469,10 @@ function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
   streetlampsByGrid.set(grid, placements);
   if (placements.length === 0) return;
   const npcSpots = townNpcPositions();
-  const posts: Collider[] = [];
-  for (const lamp of placements) {
-    const r = STREETLAMP_COLLIDER_RADIUS[lamp.style];
-    if (standsOnNpcSpot(lamp.x, lamp.z, r, npcSpots)) continue;
-    posts.push({
-      type: 'circle',
-      x: lamp.x,
-      z: lamp.z,
-      r,
-      cameraTopY: lamp.y + STREETLAMP_FIXTURE_HEIGHT,
-    });
-  }
-  addLateColliders(grid, posts);
+  addLateColliders(
+    grid,
+    streetlampPostColliders(placements, (x, z, r) => standsOnNpcSpot(x, z, r, npcSpots)),
+  );
 }
 
 /**

@@ -3,6 +3,7 @@ import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/typ
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
 import type { MaterialComposition } from './material_sources';
+import type { LayoutDeck } from './world_layout/decks';
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
@@ -6315,6 +6316,10 @@ export interface StaticObbPropDef {
 // Static prop placement per zone - the renderer builds meshes from these and
 // the collider grid blocks movement against them, so they must stay in sync.
 export interface ZonePropsDef {
+  /** Original family indices retained when a world layout replaces individual props. */
+  layoutSourceIndices?: Record<string, number[]>;
+  /** Preserve camp-facing hut dressing when individual huts are replaced. */
+  layoutHutCenter?: { x: number; z: number };
   buildings: BuildingDef[];
   wells: {
     id?: string;
@@ -11995,6 +12000,19 @@ export interface WorldContent {
   // Freely placed GLB models (editor). Rendered by the placed-asset instancer;
   // records with collideRadius also feed the sim's static colliders.
   placements?: PlacedAsset[];
+  /** Reviewed collision for canonical scenery whose models still use their original renderer. */
+  sceneryCollisions?: PlacedAsset[];
+  sceneryLamps?: import('./world_layout/streetlamps').LayoutStreetlamp[];
+  sceneryDecks?: LayoutDeck[];
+  /** Ambience retained when a canonical prop becomes an authored placement. */
+  sceneryAmbience?: {
+    id: string;
+    kind: 'campfire' | 'forge';
+    x: number;
+    z: number;
+    offsetY: number;
+    groundY?: number;
+  }[];
   // Invisible blocker walls (editor). Collision-only OBBs in the sim's static
   // colliders; never rendered. Absent for the built-in world.
   blockers?: BlockerDef[];

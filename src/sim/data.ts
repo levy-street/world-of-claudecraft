@@ -2,6 +2,17 @@ import { MEMBERSHIP_ITEMS } from './content/membership';
 import { REFERRAL_ITEMS } from './content/referral';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
+import { WORLD_LAYOUT } from './world_layout/active';
+import { placeLayoutCamps, placeLayoutNpcs, placeLayoutObjects } from './world_layout/compose';
+import { placeLayoutEnvironment } from './world_layout/environment';
+import { placeLayoutProps } from './world_layout/props';
+import { placeLayoutRoads } from './world_layout/roads';
+import { placeLayoutScenery } from './world_layout/scenery';
+import {
+  placeLayoutGraveyards,
+  placeLayoutStations,
+  placeLayoutZoneGraveyards,
+} from './world_layout/services';
 // Content merge layer. Actual game content lives in sim/content/* — one
 // module per zone plus classes (abilities), shared items, and dungeons —
 // so content can grow without everything colliding in one file. This module
@@ -151,10 +162,10 @@ import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
 import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
+  OVERWORLD_GRAVEYARDS as BASE_GRAVEYARDS,
   type GraveyardDef,
   LAST_KEEP_GRAVEYARD_ID,
   LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
-  OVERWORLD_GRAVEYARDS,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
@@ -209,7 +220,7 @@ import {
   PRACTICE_DUMMY_CAMPS,
   PRACTICE_DUMMY_MOBS,
 } from './content/practice_dummies';
-import { STATIONS } from './content/professions';
+import { STATIONS as BASE_STATIONS } from './content/professions';
 import {
   PROVING_SHORE_CAMPS,
   PROVING_SHORE_ITEMS,
@@ -416,7 +427,7 @@ export type {
   ZoneDef,
   ZonePropsDef,
 } from './types';
-export { STATIONS };
+export const STATIONS = placeLayoutStations(BASE_STATIONS, WORLD_LAYOUT.stations);
 
 // ---------------------------------------------------------------------------
 // Merged content tables
@@ -519,7 +530,7 @@ Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
 // before camps, so existing entity ids stay stable (determinism).
-export const NPCS: Record<string, NpcDef> = {
+const BASE_NPCS: Record<string, NpcDef> = {
   ...ZONE1_NPCS,
   ...ZONE2_NPCS,
   [MUSTER_COMMANDER_NPC.id]: MUSTER_COMMANDER_NPC,
@@ -577,6 +588,7 @@ export const NPCS: Record<string, NpcDef> = {
   // Its seated patrons (content/mirefen_tavern_patrons.ts), dynamic singletons too.
   ...MIREFEN_TAVERN_PATRON_NPCS,
 };
+export const NPCS: Record<string, NpcDef> = placeLayoutNpcs(BASE_NPCS, WORLD_LAYOUT.npcs);
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
 // whole death-loop data surface from this one merge module.
@@ -584,10 +596,11 @@ export {
   type GraveyardDef,
   LAST_KEEP_GRAVEYARD_ID,
   LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
-  OVERWORLD_GRAVEYARDS,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 };
+
+export const OVERWORLD_GRAVEYARDS = placeLayoutGraveyards(BASE_GRAVEYARDS, WORLD_LAYOUT.graveyards);
 
 export const QUESTS: Record<string, QuestDef> = {
   ...ZONE1_QUESTS,
@@ -649,7 +662,7 @@ export const QUEST_ORDER: string[] = [
 // before others shifts their spawn positions. New rare-elite camps
 // (ZONE1_CHAPEL_CAMPS) and the Eastbrook rare Grix are appended LAST so every
 // existing zone camp keeps its exact draw order (determinism).
-export const CAMPS: CampDef[] = [
+const BASE_CAMPS: CampDef[] = [
   ...ZONE1_CAMPS,
   ...ZONE2_CAMPS,
   ...ZONE3_CAMPS,
@@ -701,6 +714,7 @@ export const CAMPS: CampDef[] = [
   // The Eastbrook hub dummy is NOT a camp: it spawns with its sparring master
   // after the player (sim/hub_practice.ts), so it consumes only trailing ids.
 ];
+export const CAMPS: CampDef[] = placeLayoutCamps(BASE_CAMPS, WORLD_LAYOUT.camps);
 // NOTE: FROSTVEIL_CAMPS_EXTRA (the Reach rebuild's 41 extra camps) is
 // deliberately NOT registered here. Camps draw from the SHARED world-gen Rng,
 // so adding any camp anywhere advances the stream that every seeded combat
@@ -720,7 +734,7 @@ export const ESCORTS: Record<string, EscortDef> = {
   ...WORLD_QUEST_ESCORTS,
 };
 
-export const GROUND_OBJECTS: GroundObjectDef[] = [
+const BASE_GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE1_OBJECTS,
   ...ZONE2_OBJECTS,
   ...ZONE3_OBJECTS,
@@ -739,6 +753,10 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...PROVING_SHORE_OBJECTS,
   ...WORLD_QUEST_OBJECTS,
 ];
+export const GROUND_OBJECTS: GroundObjectDef[] = placeLayoutObjects(
+  BASE_GROUND_OBJECTS,
+  WORLD_LAYOUT.groundObjects,
+);
 
 // The content table itself (deep-frozen there), so every reader resolves a
 // map's moved nodes against ONE memo key (moved_objects.ts gatherNodesFor).
@@ -890,7 +908,7 @@ export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT, ...TOOL_RECIPES_CONTEN
 // reachable in normal play.
 export const ALL_RECIPES = [...ALL_RECIPES_CONTENT];
 
-export const ROADS: { x: number; z: number }[][] = [
+const BASE_ROADS: { x: number; z: number }[][] = [
   ...ZONE1_ROADS,
   ...ZONE2_ROADS,
   ...ZONE3_ROADS,
@@ -907,6 +925,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...FARSHORE_ROADS,
   ...PROVING_SHORE_ROADS,
 ];
+export const ROADS = placeLayoutRoads(BASE_ROADS, WORLD_LAYOUT.roads);
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
 export const PORTALS: PortalDef[] = [
@@ -923,24 +942,28 @@ export const PORTALS: PortalDef[] = [
   ...PROVING_SHORE_PORTALS,
 ];
 
-export const PROPS: ZonePropsDef = mergeProps([
-  ZONE1_PROPS,
-  ZONE2_PROPS,
-  ZONE3_PROPS,
-  TEMPLE_PROPS,
-  REALM_PROPS,
-  DRAKELANDS_PROPS,
-  FROSTVEIL_PROPS,
-  AMBERFALL_PROPS,
-  WILLOWFEN_PROPS,
-  NIGHTBLOOM_PROPS,
-  WRAITHWOOD_PROPS,
-  PALMREACH_PROPS,
-  EVERGARDEN_PROPS,
-  GALECREST_PROPS,
-  FARSHORE_PROPS,
-  PROVING_SHORE_PROPS,
-]);
+export const PROPS: ZonePropsDef = placeLayoutProps(
+  mergeProps([
+    ZONE1_PROPS,
+    ZONE2_PROPS,
+    ZONE3_PROPS,
+    TEMPLE_PROPS,
+    REALM_PROPS,
+    DRAKELANDS_PROPS,
+    FROSTVEIL_PROPS,
+    AMBERFALL_PROPS,
+    WILLOWFEN_PROPS,
+    NIGHTBLOOM_PROPS,
+    WRAITHWOOD_PROPS,
+    PALMREACH_PROPS,
+    EVERGARDEN_PROPS,
+    GALECREST_PROPS,
+    FARSHORE_PROPS,
+    PROVING_SHORE_PROPS,
+  ]),
+  WORLD_LAYOUT.scenery?.propRemovals,
+  WORLD_LAYOUT.scenery?.retainedFences,
+);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
   return {
@@ -1006,7 +1029,7 @@ export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
 // graveyard, its lakes, and a biome palette the renderer keys off.
 // ---------------------------------------------------------------------------
 
-export const ZONES: ZoneDef[] = [
+const BASE_ZONES: ZoneDef[] = [
   ZONE1_ZONE,
   ZONE2_ZONE,
   ZONE3_ZONE,
@@ -1023,6 +1046,7 @@ export const ZONES: ZoneDef[] = [
   FARSHORE_ZONE,
   PROVING_SHORE_ZONE,
 ];
+export const ZONES: ZoneDef[] = placeLayoutZoneGraveyards(BASE_ZONES, WORLD_LAYOUT.zoneGraveyards);
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)
 // A zone without an explicit x-range spans the original strip column.
@@ -1054,51 +1078,60 @@ export const PLAYER_START = { ...EASTBROOK_LAYOUT.services.playerStart.position 
 // the Sim+renderer; the default game never touches it.
 // ---------------------------------------------------------------------------
 
-export const BUILTIN_WORLD: WorldContent = {
-  zones: ZONES,
-  camps: CAMPS,
-  npcs: NPCS,
-  groundObjects: GROUND_OBJECTS,
-  roads: ROADS,
-  props: PROPS,
-  playerStart: PLAYER_START,
-  services: {
-    stations: STATIONS,
-    mailboxes: MAILBOXES,
-    noticeboards: NOTICEBOARDS,
-    musterBoards: MUSTER_BOARDS,
-    graveyards: OVERWORLD_GRAVEYARDS,
-  },
-  // invisible collision walls: the moderation cage plus the Last Keep's
-  blockers: [...JAIL_BLOCKERS],
-  terrainEdits: [
-    ...JAIL_TERRAIN_EDITS,
-    // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
-    // each stands on a level pad at the plateau's height, eased out by a soft
-    // apron (sim/fenbridge_layout.ts pads). No other stamp reaches that
-    // ground, so their place in this list moves no height. Copied, as
-    // Highwatch's are.
-    ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
-    ...COPPER_DIG_TERRAIN_EDITS,
-    ...TOWN_PLAT_TERRAIN_EDITS,
-    ...SOWFIELD_BEACH_TERRAIN_EDITS,
-    ...EASTBROOK_QUAY_TERRAIN_EDITS,
-    ...HARBOR_SAND_TERRAIN_EDITS,
-    ...SOWFIELD_SEABED_TERRAIN_EDITS,
-    ...FORGEFATHER_ISLE_TERRAIN_EDITS,
-    // last, as the Studio rebuild map applies them: over the plat and the strand
-    ...EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
-    // Highwatch's painted buildings stand on level pads cut into the shelf's
-    // rim, eased out by wide aprons (sim/highwatch_layout.ts pads); no other
-    // stamp touches that ground. The calm skirts round nearby anchors are sized
-    // from the finished ground, so heights move a little further out too.
-    // Copied: the layout's records are frozen, and edit lists are plain data.
-    ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
-    // ...and every painted town after it (sim/painted_towns/), town by town in
-    // the list's order, each on its own ground far from every other stamp.
-    ...PAINTED_TOWNS.flatMap((town) => town.pads.map((pad) => ({ ...pad }))),
-  ],
-};
+export const BUILTIN_WORLD: WorldContent = placeLayoutScenery(
+  placeLayoutEnvironment(
+    {
+      zones: ZONES,
+      camps: CAMPS,
+      npcs: NPCS,
+      groundObjects: GROUND_OBJECTS,
+      roads: ROADS,
+      props: PROPS,
+      playerStart: PLAYER_START,
+      ...(Object.keys(WORLD_LAYOUT.objectMoves).length
+        ? { objectMoves: freezeObjectMoves(WORLD_LAYOUT.objectMoves) }
+        : {}),
+      services: {
+        stations: STATIONS,
+        mailboxes: MAILBOXES,
+        noticeboards: NOTICEBOARDS,
+        musterBoards: MUSTER_BOARDS,
+        graveyards: OVERWORLD_GRAVEYARDS,
+      },
+      // invisible collision walls: the moderation cage plus the Last Keep's
+      blockers: [...JAIL_BLOCKERS],
+      terrainEdits: [
+        ...JAIL_TERRAIN_EDITS,
+        // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
+        // each stands on a level pad at the plateau's height, eased out by a soft
+        // apron (sim/fenbridge_layout.ts pads). No other stamp reaches that
+        // ground, so their place in this list moves no height. Copied, as
+        // Highwatch's are.
+        ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
+        ...COPPER_DIG_TERRAIN_EDITS,
+        ...TOWN_PLAT_TERRAIN_EDITS,
+        ...SOWFIELD_BEACH_TERRAIN_EDITS,
+        ...EASTBROOK_QUAY_TERRAIN_EDITS,
+        ...HARBOR_SAND_TERRAIN_EDITS,
+        ...SOWFIELD_SEABED_TERRAIN_EDITS,
+        ...FORGEFATHER_ISLE_TERRAIN_EDITS,
+        // last, as the Studio rebuild map applies them: over the plat and the strand
+        ...EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
+        // Highwatch's painted buildings stand on level pads cut into the shelf's
+        // rim, eased out by wide aprons (sim/highwatch_layout.ts pads); no other
+        // stamp touches that ground. The calm skirts round nearby anchors are sized
+        // from the finished ground, so heights move a little further out too.
+        // Copied: the layout's records are frozen, and edit lists are plain data.
+        ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
+        // ...and every painted town after it (sim/painted_towns/), town by town in
+        // the list's order, each on its own ground far from every other stamp.
+        ...PAINTED_TOWNS.flatMap((town) => town.pads.map((pad) => ({ ...pad }))),
+      ],
+    },
+    WORLD_LAYOUT.environment,
+  ),
+  WORLD_LAYOUT.scenery,
+);
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
 // Bumped on every content swap so content-derived caches (the terrain

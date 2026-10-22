@@ -56,6 +56,8 @@ export interface AuthoredTownBuildingRecord {
     readonly rotation: number;
     readonly scale: number;
     readonly lift: number;
+    /** Fixed ground seat for a detached Studio placement; otherwise sample terrain. */
+    readonly groundY?: number;
     /** Walk-in towns only: the model's largest dimension at authored size. */
     readonly modelSize?: number;
   };

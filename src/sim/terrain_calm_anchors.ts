@@ -21,7 +21,6 @@
 // computes the same rings from the one shipped WORLD_SEED.
 
 import { FARSHORE_HULL_FRAGMENT_PLACEMENT } from './content/farshore_shipwreck_layout';
-import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
 import { TAVERN_KEEPER_NPC_ID } from './content/mirefen_tavern';
 import { TAVERN_PATRON_NPC_IDS } from './content/mirefen_tavern_patrons';
@@ -38,6 +37,7 @@ import {
   GATHER_NODES,
   GROUND_OBJECTS,
   NPCS,
+  OVERWORLD_GRAVEYARDS,
   PORTALS,
   PROPS,
   ZONES,

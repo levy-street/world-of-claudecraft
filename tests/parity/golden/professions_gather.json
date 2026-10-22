@@ -15,13 +15,13 @@
     "gatherResult qty/rareEvent payload fields"
   ],
   "draws": 204,
-  "drawDigest": "545d7bf1",
+  "drawDigest": "f6f06e05",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "caf53a89",
+      "nextId": 1008,
+      "state": "49417dcc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,7 +70,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -122,7 +122,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -132,11 +132,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -149,14 +149,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -180,12 +180,12 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 1012,
-      "state": "076921ef",
-      "events": "46947db5",
+      "nextId": 1008,
+      "state": "4cde7916",
+      "events": "49c55ac0",
       "rng": {
         "draws": 2,
-        "digest": "00a2a78c"
+        "digest": "7e7a4a18"
       },
       "label": "harvest-ore-common-and-denial",
       "players": [
@@ -235,10 +235,15 @@
             ],
             "visited": [
               "gather:eastbrook_vale:ore",
+              "gather_event:pristine_vein",
               "poi:eastbrook_vale:copper_dig"
             ]
           },
           "deedsEarned": [
+            [
+              "col_pristine_vein",
+              ""
+            ],
             [
               "exp_first_ore",
               ""
@@ -250,7 +255,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -285,12 +290,14 @@
               "itemId": "gathering_sickle"
             },
             {
-              "count": 1,
+              "count": 5,
               "itemId": "copper_ore",
               "materialSources": [
                 {
-                  "count": 1,
-                  "source": {}
+                  "count": 5,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             }
@@ -303,7 +310,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 10,
           "talents": {
@@ -331,7 +344,7 @@
               "name": "Battle Stance",
               "remaining": 3597.45,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -342,11 +355,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.477872,
+          "fallStartY": -0.591261,
           "fiveSecondRule": 101.55,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -359,14 +372,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -20,
-            "y": -0.477872,
+            "y": -0.591261,
             "z": 153
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -390,12 +403,12 @@
     {
       "tick": 104,
       "time": 5.2,
-      "nextId": 1012,
-      "state": "198526a1",
-      "events": "406e1423",
+      "nextId": 1008,
+      "state": "7b455e8b",
+      "events": "b006b93d",
       "rng": {
         "draws": 4,
-        "digest": "49d036fe"
+        "digest": "2d8252d0"
       },
       "label": "harvest-wood-max-proficiency",
       "players": [
@@ -447,11 +460,15 @@
             "visited": [
               "gather:eastbrook_vale:ore",
               "gather:eastbrook_vale:wood",
-              "poi:eastbrook_vale:copper_dig",
-              "poi:eastbrook_vale:sableweb"
+              "gather_event:pristine_vein",
+              "poi:eastbrook_vale:copper_dig"
             ]
           },
           "deedsEarned": [
+            [
+              "col_pristine_vein",
+              ""
+            ],
             [
               "exp_first_ore",
               ""
@@ -471,7 +488,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -507,12 +524,14 @@
               "itemId": "gathering_sickle"
             },
             {
-              "count": 1,
+              "count": 5,
               "itemId": "copper_ore",
               "materialSources": [
                 {
-                  "count": 1,
-                  "source": {}
+                  "count": 5,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             },
@@ -522,9 +541,7 @@
               "materialSources": [
                 {
                   "count": 2,
-                  "source": {
-                    "signer": "Adventurer"
-                  }
+                  "source": {}
                 }
               ]
             }
@@ -539,7 +556,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 25,
           "talents": {
@@ -567,7 +590,7 @@
               "name": "Battle Stance",
               "remaining": 3594.8,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -578,11 +601,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.791371,
+          "fallStartY": -3.15996,
           "fiveSecondRule": 104.2,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -594,15 +617,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -62,
-            "y": -0.791371,
-            "z": 8
+            "x": -22.354354,
+            "y": -3.15996,
+            "z": 67.984647
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -626,122 +649,122 @@
     {
       "tick": 500,
       "time": 25,
-      "nextId": 1012,
-      "state": "c29f78d2",
-      "events": "399a72b1",
+      "nextId": 1008,
+      "state": "86313ba5",
+      "events": "7e54d1e1",
       "rng": {
         "draws": 18,
-        "digest": "9145b740"
+        "digest": "5a6a7e56"
       }
     },
     {
       "tick": 1000,
       "time": 50,
-      "nextId": 1012,
-      "state": "3ba394fe",
-      "events": "421df635",
+      "nextId": 1008,
+      "state": "e8d1922b",
+      "events": "7c6c14bd",
       "rng": {
         "draws": 38,
-        "digest": "d0aec0bd"
+        "digest": "f471fddd"
       }
     },
     {
       "tick": 1500,
       "time": 75,
-      "nextId": 1012,
-      "state": "a6fe8ade",
-      "events": "3d8583ba",
+      "nextId": 1008,
+      "state": "637a5f19",
+      "events": "1a8bd492",
       "rng": {
         "draws": 58,
-        "digest": "7a44de5f"
+        "digest": "8fe0c130"
       }
     },
     {
       "tick": 2000,
       "time": 100,
-      "nextId": 1012,
-      "state": "5058ee5f",
-      "events": "9a716cef",
+      "nextId": 1008,
+      "state": "273f03f2",
+      "events": "17466fef",
       "rng": {
         "draws": 78,
-        "digest": "a53e3a06"
+        "digest": "56a048e2"
       }
     },
     {
       "tick": 2500,
       "time": 125,
-      "nextId": 1012,
-      "state": "81b45f86",
-      "events": "391a89a0",
+      "nextId": 1008,
+      "state": "363af235",
+      "events": "689b98fc",
       "rng": {
         "draws": 96,
-        "digest": "618fafda"
+        "digest": "83cfe081"
       }
     },
     {
       "tick": 3000,
       "time": 150,
-      "nextId": 1012,
-      "state": "f3908cca",
-      "events": "9a716cef",
+      "nextId": 1008,
+      "state": "4dce63cf",
+      "events": "17466fef",
       "rng": {
         "draws": 116,
-        "digest": "6fbace71"
+        "digest": "0ffc25cf"
       }
     },
     {
       "tick": 3500,
       "time": 175,
-      "nextId": 1012,
-      "state": "61318a2d",
-      "events": "a8a0ee9b",
+      "nextId": 1008,
+      "state": "03037500",
+      "events": "6b32491f",
       "rng": {
         "draws": 136,
-        "digest": "33a83e8b"
+        "digest": "7e9c2148"
       }
     },
     {
       "tick": 4000,
       "time": 200,
-      "nextId": 1012,
-      "state": "5a339950",
-      "events": "41ec692b",
+      "nextId": 1008,
+      "state": "2e2e1e15",
+      "events": "30cc5aeb",
       "rng": {
         "draws": 156,
-        "digest": "f0dbf356"
+        "digest": "255c86a2"
       }
     },
     {
       "tick": 4500,
       "time": 225,
-      "nextId": 1012,
-      "state": "e17fab61",
-      "events": "86982f6d",
+      "nextId": 1008,
+      "state": "0c50eda1",
+      "events": "30cc5aeb",
       "rng": {
         "draws": 176,
-        "digest": "a0b21a12"
+        "digest": "d7412ae7"
       }
     },
     {
       "tick": 5000,
       "time": 250,
-      "nextId": 1012,
-      "state": "fba8780a",
-      "events": "bc44bdfc",
+      "nextId": 1008,
+      "state": "9d34d87a",
+      "events": "61eba97b",
       "rng": {
         "draws": 194,
-        "digest": "6647d061"
+        "digest": "05ca6dbc"
       }
     },
     {
       "tick": 5206,
       "time": 260.3,
-      "nextId": 1012,
-      "state": "a92de8d5",
-      "events": "30ca4427",
+      "nextId": 1008,
+      "state": "f44030f4",
+      "events": "e7585887",
       "rng": {
         "draws": 204,
-        "digest": "545d7bf1"
+        "digest": "f6f06e05"
       },
       "label": "rare-event-window",
       "players": [
@@ -797,8 +820,8 @@
               "gather:eastbrook_vale:ore",
               "gather:eastbrook_vale:wood",
               "gather_event:moonlit_bloom",
-              "poi:eastbrook_vale:copper_dig",
-              "poi:eastbrook_vale:sableweb"
+              "gather_event:pristine_vein",
+              "poi:eastbrook_vale:copper_dig"
             ]
           },
           "deedsEarned": [
@@ -808,6 +831,10 @@
             ],
             [
               "col_moonlit_bloom",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -837,7 +864,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -870,25 +897,9 @@
               "itemId": "gathering_sickle"
             },
             {
-              "count": 2,
-              "itemId": "ironbark_log",
+              "count": 5,
+              "itemId": "copper_ore",
               "materialSources": [
-                {
-                  "count": 2,
-                  "source": {
-                    "signer": "Adventurer"
-                  }
-                }
-              ]
-            },
-            {
-              "count": 20,
-              "itemId": "silverleaf_herb",
-              "materialSources": [
-                {
-                  "count": 15,
-                  "source": {}
-                },
                 {
                   "count": 5,
                   "source": {
@@ -898,12 +909,18 @@
               ]
             },
             {
-              "count": 1,
+              "count": 13,
               "itemId": "silverleaf_herb",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 8,
                   "source": {}
+                },
+                {
+                  "count": 5,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             }
@@ -921,9 +938,11 @@
             "counts": {},
             "firstFind": {},
             "marks": [
-              "gather_event:moonlit_bloom"
+              "gather_event:moonlit_bloom",
+              "gather_event:pristine_vein"
             ],
             "recent": [
+              "gather_event:pristine_vein",
               "gather_event:moonlit_bloom"
             ]
           },
@@ -953,7 +972,7 @@
               "name": "Battle Stance",
               "remaining": 3339.7,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -964,11 +983,11 @@
           "critChance": 0.061,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.061,
-          "fallStartY": -4.19148,
+          "fallStartY": -4.092524,
           "fiveSecondRule": 359.3,
           "healPower": 5,
           "hp": 176,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 3,
           "lootFfaTimer": "Infinity",
@@ -980,15 +999,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -59,
-            "y": -4.19148,
+            "x": -58,
+            "y": -4.092524,
             "z": 91
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1012,12 +1031,12 @@
     {
       "tick": 5208,
       "time": 260.4,
-      "nextId": 1012,
-      "state": "946ea244",
+      "nextId": 1008,
+      "state": "dc9eefb5",
       "events": "741638a5",
       "rng": {
         "draws": 204,
-        "digest": "545d7bf1"
+        "digest": "f6f06e05"
       },
       "label": "final",
       "players": [
@@ -1073,8 +1092,8 @@
               "gather:eastbrook_vale:ore",
               "gather:eastbrook_vale:wood",
               "gather_event:moonlit_bloom",
-              "poi:eastbrook_vale:copper_dig",
-              "poi:eastbrook_vale:sableweb"
+              "gather_event:pristine_vein",
+              "poi:eastbrook_vale:copper_dig"
             ]
           },
           "deedsEarned": [
@@ -1084,6 +1103,10 @@
             ],
             [
               "col_moonlit_bloom",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -1113,7 +1136,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1146,25 +1169,9 @@
               "itemId": "gathering_sickle"
             },
             {
-              "count": 2,
-              "itemId": "ironbark_log",
+              "count": 5,
+              "itemId": "copper_ore",
               "materialSources": [
-                {
-                  "count": 2,
-                  "source": {
-                    "signer": "Adventurer"
-                  }
-                }
-              ]
-            },
-            {
-              "count": 20,
-              "itemId": "silverleaf_herb",
-              "materialSources": [
-                {
-                  "count": 15,
-                  "source": {}
-                },
                 {
                   "count": 5,
                   "source": {
@@ -1174,12 +1181,18 @@
               ]
             },
             {
-              "count": 1,
+              "count": 13,
               "itemId": "silverleaf_herb",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 8,
                   "source": {}
+                },
+                {
+                  "count": 5,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             }
@@ -1197,9 +1210,11 @@
             "counts": {},
             "firstFind": {},
             "marks": [
-              "gather_event:moonlit_bloom"
+              "gather_event:moonlit_bloom",
+              "gather_event:pristine_vein"
             ],
             "recent": [
+              "gather_event:pristine_vein",
               "gather_event:moonlit_bloom"
             ]
           },
@@ -1229,7 +1244,7 @@
               "name": "Battle Stance",
               "remaining": 3339.6,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1240,11 +1255,11 @@
           "critChance": 0.061,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.061,
-          "fallStartY": -4.19148,
+          "fallStartY": -4.092524,
           "fiveSecondRule": 359.4,
           "healPower": 5,
           "hp": 176,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 3,
           "lootFfaTimer": "Infinity",
@@ -1256,15 +1271,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -59,
-            "y": -4.19148,
+            "x": -58,
+            "y": -4.092524,
             "z": 91
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,

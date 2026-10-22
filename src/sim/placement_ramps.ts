@@ -15,6 +15,7 @@
 import { authoredRampsForPath } from './asset_collision';
 import { ASSET_RAMPS } from './asset_collision.generated';
 import { invalidateLadders } from './ladders';
+import { worldCollisionPlacements } from './placement_sources';
 import { nearTownWalkIn, townWalkInPlacements } from './town_walk_in';
 import type { WorldContent } from './types';
 import { terrainHeight } from './world';
@@ -93,7 +94,7 @@ function rampTable(content: WorldContent, seed: number): RampTable {
   const cached = bySeed.get(seed);
   if (cached) return cached;
   const ramps: WorldRamp[] = [];
-  for (const p of content.placements ?? []) {
+  for (const p of worldCollisionPlacements(content)) {
     // Collision OFF is a real choice: no blocker and no raised floor.
     //
     // Note what is NOT gated here: `collideCustom` (the 'basic' simple-footprint
@@ -183,7 +184,7 @@ function rampTable(content: WorldContent, seed: number): RampTable {
   for (const p of townWalkInPlacements(content)) {
     // the model's seat never moves, so its ground is read once here rather
     // than on every ground query inside the town
-    const seat = terrainHeight(p.x, p.z, seed);
+    const seat = p.detached ? (p.groundY ?? 0) : terrainHeight(p.x, p.z, seed);
     for (const r of authoredRampsForPath(p.path)) {
       ramps.push({
         x: p.x,
@@ -303,6 +304,7 @@ function rampFloorAt(r: WorldRamp, x: number, z: number, seed: number): number |
 export function decksMayStand(content: WorldContent, x: number, z: number): boolean {
   return (
     content.placements !== undefined ||
+    (content.sceneryCollisions?.length ?? 0) > 0 ||
     (content.colliderVolumes?.length ?? 0) > 0 ||
     nearTownWalkIn(x, z)
   );

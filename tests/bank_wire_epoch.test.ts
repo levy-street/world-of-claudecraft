@@ -120,9 +120,11 @@ describe('wire compatibility epoch', () => {
     // (the scheduled ferry whose deck exists only where it lies docked) composed
     // with the branch's 44, so an epoch-44 client (which draws the ship moored
     // forever) and an epoch-30 client (no world-quest wire) are both fenced out.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(45);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(46);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-45');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-46');
+    // Epoch 45 renders the geography before the reviewed Studio migration.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-45');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-44');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-42');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-43');

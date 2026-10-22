@@ -271,7 +271,9 @@ export type { VehicleSession } from './world_api/vehicles';
 // Above both parents: an epoch-44 client would draw the ship moored and predict
 // a deck the server has sailed away; an epoch-30 client lacks the world-quest
 // wire. Both must fail closed.
-export const ONLINE_WORLD_LAYOUT_VERSION = 45 as const;
+// Epoch 46 activates the reviewed Studio layout on every host: buildings,
+// terrain, roads, service anchors and camp positions must match the server.
+export const ONLINE_WORLD_LAYOUT_VERSION = 46 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

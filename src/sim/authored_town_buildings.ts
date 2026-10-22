@@ -20,6 +20,7 @@ import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { walkInPlacementFor } from './town_walk_in';
 import type { BuildingDef, PromotedScenery } from './types';
 import { terrainHeight } from './world';
+import { civicGroundY } from './world_layout/civic';
 
 const EPSILON = 1e-6;
 
@@ -77,9 +78,12 @@ export function buildingRecordColliders(
   const baked = walkIn ? bakedBoxesForPath(walkIn.path) : null;
   if (walkIn && seed !== undefined && baked && baked.length > 0) {
     const walls: Collider[] = [];
-    emitPlacementBoxes(walls, walkIn, baked, terrainHeight(walkIn.x, walkIn.z, seed));
+    const seat = walkIn.detached ? (walkIn.groundY ?? 0) : terrainHeight(walkIn.x, walkIn.z, seed);
+    emitPlacementBoxes(walls, walkIn, baked, seat);
     return walls;
   }
+  const base = groundAt(building.x, building.z);
+  const seat = civicGroundY(building.id, building, groundAt, base);
   const out: Collider[] = [
     {
       type: 'obb',
@@ -88,8 +92,8 @@ export function buildingRecordColliders(
       hw: building.w / 2,
       hd: building.d / 2,
       rot: building.rot,
-      cameraTopY,
-      underY: groundAt(building.x, building.z),
+      cameraTopY: seat === base ? cameraTopY : cameraTopY + seat - base,
+      underY: seat,
     },
   ];
   for (const annex of placedBuildingAnnexes(building)) {

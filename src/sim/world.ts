@@ -32,7 +32,7 @@ import {
   zoneAt,
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
-import { dockSurfaceHeight, onHarborPlanks } from './deck_surfaces';
+import { onHarborPlanks, worldDockSurfaceHeight } from './deck_surfaces';
 import { isExcludedDecoration } from './decoration_exclusions';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
@@ -3781,18 +3781,11 @@ function groundHeightFor(
   // The Old Beacon's stair, the Last Keep's walls and flights, and the
   // Forgefather stair ramps all ride the same idiom, summed by the
   // walk_lifts leaf: raised walkable ground the render terrain never sees.
-  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed), seed);
+  const terrainAt = (sx: number, sz: number) => terrainHeight(sx, sz, seed);
+  const terrain = overworldWalkSurface(x, z, terrainAt(x, z), seed);
   const content = getActiveWorldContent();
-  let h = Math.max(
-    terrain,
-    dockSurfaceHeight(
-      x,
-      z,
-      (sx, sz) => terrainHeight(sx, sz, seed),
-      WATER_LEVEL,
-      content.props.docks,
-    ),
-  );
+  const reach = prevY === undefined ? Number.POSITIVE_INFINITY : prevY + deckReach;
+  let h = Math.max(terrain, worldDockSurfaceHeight(x, z, terrainAt, WATER_LEVEL, content, reach));
   // Editor-authored walkable floors, both raised ground rather than blockers, so
   // they belong here and not in the collider set:
   //   ramp decks    a placement's stair treads / rampart walk (placement_ramps),
@@ -3803,7 +3796,6 @@ function groundHeightFor(
   if (!decksMayStand(content, x, z)) return h; // no placements, volumes or walk-in town floor
   const rampFloor = placementRampFloorAt(content, seed, x, z, prevY, deckReach);
   if (rampFloor > h) h = rampFloor;
-  const reach = prevY === undefined ? Number.POSITIVE_INFINITY : prevY + deckReach;
   for (const v of content.colliderVolumes ?? []) {
     if (v.kind !== 'plane') continue;
     // The floor at the plane centre: detached anchor or live terrain, plus the

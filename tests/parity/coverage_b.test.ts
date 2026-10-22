@@ -219,7 +219,8 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // camp fix: the tie SHAPE is preserved (two rollers level at the top), only
     // which rollers tie, the third roll, and the tie-break's winner move, because
     // these branches shift the shared rng and never master-loot logic itself.
-    expect(needRolls).toEqual([46, 60, 60]); // c and d tie at the top, b below
+    // Epoch 46: seed 1384 restores the same tie and winner after camp migration.
+    expect(needRolls).toEqual([75, 76, 76]); // c and d tie at the top, b below
     // The tie-break picked d, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a

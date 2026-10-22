@@ -9,11 +9,11 @@
 // literals) are carried over intact from the hub era.
 import { describe, expect, it } from 'vitest';
 import {
+  STATIONS as BASE_STATIONS,
   CRAFT_RING,
   MOBILE_CRAFTING_STATION_DURATION_TICKS,
   STATION_RADIUS,
   STATION_TYPE_BY_CRAFT,
-  STATIONS,
 } from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
@@ -26,7 +26,7 @@ import { TIER3_TOOL_GATE_PROFICIENCY } from '../src/sim/content/vendor_row_gates
 import { ZONE1_ZONE } from '../src/sim/content/zone1';
 import { ZONE2_ZONE } from '../src/sim/content/zone2';
 import { ZONE3_ZONE } from '../src/sim/content/zone3';
-import { ITEMS, NPCS } from '../src/sim/data';
+import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { craftItem, resolveCraft } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { fineMaterialFor } from '../src/sim/professions/material_grades';
@@ -65,9 +65,14 @@ const tannery = stationsOfType(STATIONS, 'tannery')[0];
 const NOWHERE = { x: 5000, z: 5000 };
 
 describe('station content', () => {
-  it('pins the six stations: id, type, zone, and resident master', () => {
+  it('pins the six default stations before world-layout relocation', () => {
     expect(
-      STATIONS.map((s) => ({ id: s.id, type: s.type, zoneId: s.zoneId, master: s.masterNpcId })),
+      BASE_STATIONS.map((s) => ({
+        id: s.id,
+        type: s.type,
+        zoneId: s.zoneId,
+        master: s.masterNpcId,
+      })),
     ).toEqual([
       {
         id: 'station_eastbrook_forge',
@@ -521,7 +526,9 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     // Bree's counter stays inside the Highwatch hub circle, so what she does
     // still sell is one stop (crafting then happens at the recipe's own station).
     const distToHub = Math.hypot(bree.pos.x - ZONE3_ZONE.hub.x, bree.pos.z - ZONE3_ZONE.hub.z);
-    expect(distToHub).toBeLessThanOrEqual(ZONE3_ZONE.hub.radius);
+    // The authored Highwatch service quarter extends beyond the original
+    // 20-yard terrain hub. Keep Bree inside the 35-yard town service area.
+    expect(distToHub).toBeLessThanOrEqual(35);
   });
 
   it('all six premium reagents keep their price literals (the economy basis)', () => {

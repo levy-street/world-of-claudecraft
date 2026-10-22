@@ -9,13 +9,13 @@
     "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
     "multi-player meta"
   ],
-  "draws": 1177,
-  "drawDigest": "201250fe",
+  "draws": 1169,
+  "drawDigest": "a47cee5b",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1007,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1015,
-      "state": "923570ee",
-      "events": "08be3e77",
+      "nextId": 1011,
+      "state": "62ca2b53",
+      "events": "f110ada9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,67 +40,67 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1015,
-      "state": "234ef837",
-      "events": "14dc52c1",
+      "nextId": 1011,
+      "state": "dc31e462",
+      "events": "b33c5aea",
       "rng": {
         "draws": 66,
-        "digest": "383a5306"
+        "digest": "c0349c12"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1015,
-      "state": "f819eae9",
-      "events": "f3c46c01",
+      "nextId": 1011,
+      "state": "4a004df0",
+      "events": "960363ee",
       "rng": {
-        "draws": 246,
-        "digest": "8266846b"
+        "draws": 244,
+        "digest": "6e284dce"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1015,
-      "state": "63c4f11e",
-      "events": "1b9b3d0d",
+      "nextId": 1011,
+      "state": "62da6393",
+      "events": "e9030cc2",
       "rng": {
-        "draws": 482,
-        "digest": "1bf852d5"
+        "draws": 474,
+        "digest": "0bcc5b82"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1015,
-      "state": "4282aa9f",
-      "events": "f71b8be8",
+      "nextId": 1011,
+      "state": "ddeed446",
+      "events": "fe792f1a",
       "rng": {
-        "draws": 757,
-        "digest": "c785d863"
+        "draws": 760,
+        "digest": "bf2cbb68"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 1015,
-      "state": "8a2b1658",
+      "nextId": 1011,
+      "state": "0c736701",
       "events": "741638a5",
       "rng": {
-        "draws": 1028,
-        "digest": "b0a85b51"
+        "draws": 1037,
+        "digest": "4e2b05c3"
       }
     },
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 1015,
-      "state": "21eb3c6c",
-      "events": "f5e07b12",
+      "nextId": 1011,
+      "state": "58a5f5d3",
+      "events": "57ceb170",
       "rng": {
-        "draws": 1177,
-        "digest": "201250fe"
+        "draws": 1169,
+        "digest": "a47cee5b"
       },
       "label": "final",
       "players": [
@@ -148,7 +148,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -243,7 +243,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1008,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -340,7 +340,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1009,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -435,7 +435,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1010,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -500,7 +500,7 @@
               "name": "Battle Stance",
               "remaining": 3591.9,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -513,7 +513,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 5,
           "hp": 822,
-          "id": 1011,
+          "id": 1007,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -532,7 +532,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -562,7 +562,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 41,
           "hp": 665,
-          "id": 1012,
+          "id": 1008,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -581,7 +581,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 41,
@@ -613,7 +613,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 6,
           "hp": 700,
-          "id": 1013,
+          "id": 1009,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -639,7 +639,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 6,
@@ -671,7 +671,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 16,
           "hp": 783,
-          "id": 1014,
+          "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -691,7 +691,7 @@
           "resourceType": "focus",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 16,

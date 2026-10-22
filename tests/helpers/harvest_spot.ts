@@ -6,13 +6,13 @@
 // walks a deterministic ring inside INTERACT_RANGE for the nearest standable
 // point. Draw-free and content-driven, so fixtures never hand-pick magic
 // coordinates per node.
-import { GATHER_NODES } from '../../src/sim/content/gather_nodes';
 import { PLAYER_SWIM_DEPTH } from '../../src/sim/pathfind';
+import { gatherNodeById } from '../../src/sim/professions/gathering';
 import type { Sim } from '../../src/sim/sim';
 import { groundHeight, terrainHeight, waterLevelAt } from '../../src/sim/world';
 
 export function placeAtHarvestSpot(sim: Sim, pid: number, nodeId: string): void {
-  const node = GATHER_NODES.find((n) => n.id === nodeId);
+  const node = gatherNodeById(nodeId, sim.ctx.objectMoves);
   if (!node) throw new Error(`missing node ${nodeId}`);
   const p = sim.entities.get(pid);
   if (!p) throw new Error(`missing entity ${pid}`);

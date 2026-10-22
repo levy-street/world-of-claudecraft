@@ -1,3 +1,4 @@
+import { propHutCenter, propSourceIndex } from '../sim/world_layout/props';
 // The built-in world's renderer-owned scenery (render/props.ts buildProps and
 // the zones' great-tree builders) as editable placements that draw EXACTLY
 // what the game draws.
@@ -410,6 +411,7 @@ export function worldMajorPropPlacements(
 
   // ---- market stalls (smith and armorer stalls carry an anvil and a rack)
   props.stalls.forEach((s, index) => {
+    index = propSourceIndex(props, 'stalls', index);
     if (isEastbrookRebuildStall(s) || isFenbridgeRebuildStall(s)) return;
     const key = s.x * 7.7 + s.z * 2.3;
     const label = `Market stall ${index + 1}`;
@@ -446,6 +448,7 @@ export function worldMajorPropPlacements(
 
   // ---- wells
   props.wells.forEach((w, index) => {
+    index = propSourceIndex(props, 'wells', index);
     if (isEastbrookRebuildWell(w) || isFenbridgeRebuildWell(w)) return;
     const size = gamePropSize('well');
     add(
@@ -459,6 +462,7 @@ export function worldMajorPropPlacements(
   // ---- graveyards: four headstone shapes, leaning (instanced in props.ts)
   const graveKinds: PropKey[] = ['graveRound', 'graveCross', 'graveBevel', 'graveDecor'];
   props.graveyards.forEach((yard, yardIndex) => {
+    yardIndex = propSourceIndex(props, 'graveyards', yardIndex);
     for (let i = 0; i < 6; i++) {
       const gx = yard.x + (i % 3) * 2.2;
       const gz = yard.z + Math.floor(i / 3) * 2.6;
@@ -483,6 +487,7 @@ export function worldMajorPropPlacements(
 
   // ---- campfires: the bonfire base (the flame rides placement.fire)
   props.campfires.forEach(([x, z], index) => {
+    index = propSourceIndex(props, 'campfires', index);
     const p = add('bonfire', `Campfire ${index + 1}`, groupMatrix(x, ground(x, z), z), {
       y: -0.05,
       rot: propRand(x, z, 1) * Math.PI * 2,
@@ -493,6 +498,7 @@ export function worldMajorPropPlacements(
 
   // ---- bandit and war tents
   props.tents.forEach((t, index) => {
+    index = propSourceIndex(props, 'tents', index);
     const kind: PropKey = propRand(t.x, t.z, 2) < 0.55 ? 'tentOpen' : 'tentSmall';
     const size = gamePropSize(kind);
     const s = (3.0 * t.scale) / Math.max(size.x, size.z);
@@ -515,6 +521,7 @@ export function worldMajorPropPlacements(
 
   // ---- camp crates and barrels (a stack is one placement per level)
   props.crates.forEach(([x, z, stack], index) => {
+    index = propSourceIndex(props, 'crates', index);
     const barrel = index % 3 === 2;
     const kind: PropKey = barrel ? 'barrel' : 'crateWooden';
     const s = barrel ? 1.25 : 1.3 + propRand(x, z, 5) * 0.15;
@@ -536,11 +543,9 @@ export function worldMajorPropPlacements(
 
   // ---- murloc mud huts: giant swamp mushrooms, a toadstool cluster at the foot
   const huts = props.mudHuts;
-  const hutCenter = huts.reduce(
-    (center, [x, z]) => ({ x: center.x + x / huts.length, z: center.z + z / huts.length }),
-    { x: 0, z: 0 },
-  );
+  const hutCenter = propHutCenter(props);
   huts.forEach(([x, z], index) => {
+    index = propSourceIndex(props, 'mudHuts', index);
     const hut = groupMatrix(x, ground(x, z), z);
     // the Mirefen camp's painted mudfin huts (sim/mudfin_huts.ts), no toadstools
     const mudfin = mudfinHutAt(x, z);
@@ -580,6 +585,7 @@ export function worldMajorPropPlacements(
 
   // ---- ruin rings: the columns, then the toppled relics at the ring's heart
   props.ruinRings.forEach((ring, ringIndex) => {
+    ringIndex = propSourceIndex(props, 'ruinRings', ringIndex);
     if (ring.bare || ring.columns <= 0) return;
     for (const col of ruinRingColumns(ring)) {
       const i = col.index;
@@ -698,6 +704,7 @@ export function worldMajorPropPlacements(
 
   // ---- fishing docks: pitched plank sections, stone hut, shore clutter, rowboat
   props.docks.forEach((d, dockIndex) => {
+    dockIndex = propSourceIndex(props, 'docks', dockIndex);
     const label = `Dock ${dockIndex + 1}`;
     const y = ground(d.x, d.z);
     const key = d.x * 3.3 + d.z * 1.7;
@@ -796,6 +803,7 @@ export function worldMajorPropPlacements(
 
   // ---- marsh reeds
   (props.marshReeds ?? []).forEach(([x, z], i) => {
+    i = propSourceIndex(props, 'marshReeds', i);
     add('marshReeds', `Marsh reeds ${i + 1}`, groupMatrix(x, ground(x, z) - 0.05, z), {
       scale: 3.0 + propRand(x, z, i + 5) * 0.6,
       euler: new THREE.Euler(

@@ -9,14 +9,14 @@
     "riftControlSuppressed: guard rolls drawn, effects skipped inside the window",
     "clearRiftBossDeathZones on boss death (riftDeathZoneClear emit + floor claim)"
   ],
-  "draws": 1377,
-  "drawDigest": "e83d02e4",
+  "draws": 1350,
+  "drawDigest": "2b89f058",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "caf53a89",
+      "nextId": 1008,
+      "state": "49417dcc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -65,7 +65,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -117,7 +117,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -127,11 +127,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -144,14 +144,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -175,67 +175,67 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1029,
-      "state": "c82a122e",
-      "events": "e410a261",
+      "nextId": 1025,
+      "state": "cfc8a947",
+      "events": "f4ff92d1",
       "rng": {
         "draws": 58,
-        "digest": "d526240a"
+        "digest": "388c2ef8"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1029,
-      "state": "21bb2504",
+      "nextId": 1025,
+      "state": "1b9b8b49",
       "events": "741638a5",
       "rng": {
         "draws": 58,
-        "digest": "d526240a"
+        "digest": "388c2ef8"
       }
     },
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 1029,
-      "state": "970d203c",
+      "nextId": 1025,
+      "state": "59117465",
       "events": "741638a5",
       "rng": {
         "draws": 58,
-        "digest": "d526240a"
+        "digest": "388c2ef8"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1029,
-      "state": "dd440f2a",
-      "events": "309eb1ee",
+      "nextId": 1025,
+      "state": "817da056",
+      "events": "d899667e",
       "rng": {
         "draws": 59,
-        "digest": "3933f18d"
+        "digest": "a13cb224"
       }
     },
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1029,
-      "state": "8bd21ed8",
-      "events": "106cfe87",
-      "rng": {
-        "draws": 59,
-        "digest": "3933f18d"
-      }
-    },
-    {
-      "tick": 25,
-      "time": 1.25,
-      "nextId": 1029,
-      "state": "8bd21ed8",
+      "nextId": 1025,
+      "state": "40a2321e",
       "events": "741638a5",
       "rng": {
         "draws": 59,
-        "digest": "3933f18d"
+        "digest": "a13cb224"
+      }
+    },
+    {
+      "tick": 25,
+      "time": 1.25,
+      "nextId": 1025,
+      "state": "40a2321e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 59,
+        "digest": "a13cb224"
       },
       "label": "cast-armed",
       "players": [
@@ -306,7 +306,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -360,7 +360,7 @@
               "name": "Battle Stance",
               "remaining": 3598.75,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             },
             {
               "duration": 30,
@@ -369,8 +369,21 @@
               "name": "Test Slow",
               "remaining": 28.75,
               "school": "nature",
-              "sourceId": 1027,
+              "sourceId": 1023,
               "value": 0.5
+            },
+            {
+              "duration": 10,
+              "id": "stackpoison_rift_boss_venom",
+              "kind": "dot",
+              "name": "Deadly Venom",
+              "remaining": 8.8,
+              "school": "nature",
+              "sourceId": 1023,
+              "stacks": 1,
+              "tickInterval": 2,
+              "tickTimer": 0.8,
+              "value": 7
             }
           ],
           "blockChance": 0.05,
@@ -384,7 +397,7 @@
           "gm": true,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -404,7 +417,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -424,13 +437,13 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "aoeSlowTimer": 997.75,
           "autoAttack": true,
           "bigCastTimer": 997.75,
           "castRemaining": 6.05,
-          "castTargetId": 1004,
+          "castTargetId": 1000,
           "castTotal": 6.3,
           "castingAbility": "rift_venom_execution",
           "combatTimer": 100.25,
@@ -444,7 +457,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 4365,
-          "id": 1027,
+          "id": 1023,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -471,12 +484,12 @@
           },
           "stompTimer": 999,
           "swingTimer": 0.7,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],
@@ -487,7 +500,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 100.25,
@@ -495,11 +508,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 1.811159,
+          "facing": -0.506808,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 975,
-          "id": 1028,
+          "id": 1024,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -510,8 +523,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108398.251747,
-            "z": -1260.571501
+            "x": 108400.8737,
+            "z": -1262.573737
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -522,11 +535,11 @@
             "armor": 252
           },
           "swingTimer": 0.6,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_venom_weaver",
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],
@@ -541,287 +554,287 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1029,
-      "state": "6d619a59",
+      "nextId": 1025,
+      "state": "5b375a6a",
       "events": "741638a5",
       "rng": {
         "draws": 59,
-        "digest": "3933f18d"
+        "digest": "a13cb224"
       }
     },
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 1029,
-      "state": "79d3021d",
+      "nextId": 1025,
+      "state": "51e48ef1",
       "events": "741638a5",
       "rng": {
         "draws": 59,
-        "digest": "3933f18d"
+        "digest": "a13cb224"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1029,
-      "state": "d5c0cebf",
-      "events": "4547b205",
+      "nextId": 1025,
+      "state": "805b47fa",
+      "events": "741638a5",
       "rng": {
         "draws": 69,
-        "digest": "9fd56823"
+        "digest": "dba93010"
       }
     },
     {
       "tick": 45,
       "time": 2.25,
-      "nextId": 1029,
-      "state": "44289157",
-      "events": "741638a5",
+      "nextId": 1025,
+      "state": "0a5d712c",
+      "events": "7010710e",
       "rng": {
-        "draws": 95,
-        "digest": "1231f33e"
+        "draws": 97,
+        "digest": "65982faf"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1029,
-      "state": "2457409c",
+      "nextId": 1025,
+      "state": "ab4ae797",
       "events": "741638a5",
       "rng": {
-        "draws": 135,
-        "digest": "4ae2b792"
+        "draws": 137,
+        "digest": "5e9a75b8"
       }
     },
     {
       "tick": 55,
       "time": 2.75,
-      "nextId": 1029,
-      "state": "a4f36fa5",
+      "nextId": 1025,
+      "state": "38ac9410",
       "events": "741638a5",
       "rng": {
-        "draws": 174,
-        "digest": "26a6c674"
+        "draws": 176,
+        "digest": "f97bafc6"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1029,
-      "state": "f53f0bde",
+      "nextId": 1025,
+      "state": "045b5e0f",
       "events": "741638a5",
       "rng": {
-        "draws": 222,
-        "digest": "93cd6aa3"
+        "draws": 227,
+        "digest": "a95429ca"
       }
     },
     {
       "tick": 65,
       "time": 3.25,
-      "nextId": 1029,
-      "state": "7578ef9c",
+      "nextId": 1025,
+      "state": "87b60a59",
       "events": "741638a5",
       "rng": {
-        "draws": 261,
-        "digest": "acbdaa11"
+        "draws": 268,
+        "digest": "2ef1b7ba"
       }
     },
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1029,
-      "state": "ce54515e",
+      "nextId": 1025,
+      "state": "3521d731",
       "events": "741638a5",
       "rng": {
-        "draws": 308,
-        "digest": "48bd95f1"
+        "draws": 316,
+        "digest": "cb373fa2"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1029,
-      "state": "dda69269",
+      "nextId": 1025,
+      "state": "8f3480bc",
       "events": "741638a5",
       "rng": {
-        "draws": 356,
-        "digest": "32eed25b"
+        "draws": 359,
+        "digest": "f2a07fc1"
       }
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1029,
-      "state": "10760c07",
-      "events": "b6490ce5",
+      "nextId": 1025,
+      "state": "958eda38",
+      "events": "c7d73f02",
       "rng": {
-        "draws": 405,
-        "digest": "86f8bcd2"
+        "draws": 414,
+        "digest": "27d7f5ca"
       }
     },
     {
       "tick": 85,
       "time": 4.25,
-      "nextId": 1029,
-      "state": "0186e557",
-      "events": "741638a5",
+      "nextId": 1025,
+      "state": "b9929d95",
+      "events": "7010710e",
       "rng": {
-        "draws": 467,
-        "digest": "141ce285"
+        "draws": 474,
+        "digest": "5d4a1df6"
       }
     },
     {
       "tick": 90,
       "time": 4.5,
-      "nextId": 1029,
-      "state": "d71e5940",
+      "nextId": 1025,
+      "state": "e2aa2996",
       "events": "741638a5",
       "rng": {
-        "draws": 514,
-        "digest": "64d004ea"
+        "draws": 521,
+        "digest": "ff655ab6"
       }
     },
     {
       "tick": 95,
       "time": 4.75,
-      "nextId": 1029,
-      "state": "e1a693cc",
+      "nextId": 1025,
+      "state": "6202c3fe",
       "events": "741638a5",
       "rng": {
-        "draws": 564,
-        "digest": "095d10f5"
+        "draws": 565,
+        "digest": "b183a435"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1029,
-      "state": "29493441",
+      "nextId": 1025,
+      "state": "8fedd422",
       "events": "741638a5",
       "rng": {
-        "draws": 621,
-        "digest": "f8c13fee"
+        "draws": 622,
+        "digest": "20dad7bb"
       }
     },
     {
       "tick": 105,
       "time": 5.25,
-      "nextId": 1029,
-      "state": "ca01c471",
+      "nextId": 1025,
+      "state": "3e18902f",
       "events": "741638a5",
       "rng": {
-        "draws": 669,
-        "digest": "084e6f7e"
+        "draws": 670,
+        "digest": "768635ca"
       }
     },
     {
       "tick": 110,
       "time": 5.5,
-      "nextId": 1029,
-      "state": "fa9127d1",
-      "events": "f77cfd01",
+      "nextId": 1025,
+      "state": "41307c1e",
+      "events": "741638a5",
       "rng": {
-        "draws": 737,
-        "digest": "9a39de9a"
+        "draws": 736,
+        "digest": "691ed419"
       }
     },
     {
       "tick": 115,
       "time": 5.75,
-      "nextId": 1029,
-      "state": "e4d74577",
-      "events": "741638a5",
+      "nextId": 1025,
+      "state": "2e673e90",
+      "events": "c92ea6c0",
       "rng": {
-        "draws": 789,
-        "digest": "485053ed"
+        "draws": 774,
+        "digest": "22d2ee2d"
       }
     },
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1029,
-      "state": "f31c7873",
-      "events": "d4d8e4ae",
+      "nextId": 1025,
+      "state": "c29edbd9",
+      "events": "741638a5",
       "rng": {
-        "draws": 838,
-        "digest": "beebc0b7"
+        "draws": 826,
+        "digest": "29eab79a"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1029,
-      "state": "eb58ce7d",
-      "events": "741638a5",
+      "nextId": 1025,
+      "state": "93279be4",
+      "events": "7010710e",
       "rng": {
-        "draws": 895,
-        "digest": "241a9977"
+        "draws": 885,
+        "digest": "c96c15e5"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
-      "nextId": 1029,
-      "state": "35cb432a",
+      "nextId": 1025,
+      "state": "eeab9595",
       "events": "741638a5",
       "rng": {
-        "draws": 947,
-        "digest": "83920ba3"
+        "draws": 938,
+        "digest": "dc07c242"
       }
     },
     {
       "tick": 135,
       "time": 6.75,
-      "nextId": 1029,
-      "state": "da718155",
+      "nextId": 1025,
+      "state": "f47e6a78",
       "events": "741638a5",
       "rng": {
-        "draws": 1013,
-        "digest": "5a35c0d8"
+        "draws": 1002,
+        "digest": "418ed291"
       }
     },
     {
       "tick": 140,
       "time": 7,
-      "nextId": 1029,
-      "state": "54ac1775",
+      "nextId": 1025,
+      "state": "6ecdb313",
       "events": "741638a5",
       "rng": {
-        "draws": 1054,
-        "digest": "257626d9"
+        "draws": 1048,
+        "digest": "d53c81f2"
       }
     },
     {
       "tick": 145,
       "time": 7.25,
-      "nextId": 1029,
-      "state": "3ba88376",
-      "events": "ea19f5fd",
-      "rng": {
-        "draws": 1108,
-        "digest": "7e5e4015"
-      }
-    },
-    {
-      "tick": 150,
-      "time": 7.5,
-      "nextId": 1029,
-      "state": "f874b6f3",
-      "events": "5892e82e",
-      "rng": {
-        "draws": 1161,
-        "digest": "96aa8619"
-      }
-    },
-    {
-      "tick": 150,
-      "time": 7.5,
-      "nextId": 1029,
-      "state": "f874b6f3",
+      "nextId": 1025,
+      "state": "07132a95",
       "events": "741638a5",
       "rng": {
-        "draws": 1161,
-        "digest": "96aa8619"
+        "draws": 1103,
+        "digest": "b29028d0"
+      }
+    },
+    {
+      "tick": 150,
+      "time": 7.5,
+      "nextId": 1025,
+      "state": "2e21ffc4",
+      "events": "bf2f8b48",
+      "rng": {
+        "draws": 1163,
+        "digest": "cedcca44"
+      }
+    },
+    {
+      "tick": 150,
+      "time": 7.5,
+      "nextId": 1025,
+      "state": "2e21ffc4",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1163,
+        "digest": "cedcca44"
       },
       "label": "detonated",
       "players": [
@@ -892,7 +905,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -946,7 +959,7 @@
               "name": "Battle Stance",
               "remaining": 3592.5,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             },
             {
               "duration": 30,
@@ -955,7 +968,7 @@
               "name": "Test Slow",
               "remaining": 22.5,
               "school": "nature",
-              "sourceId": 1027,
+              "sourceId": 1023,
               "value": 0.5
             },
             {
@@ -963,25 +976,13 @@
               "id": "stackpoison_rift_boss_venom",
               "kind": "dot",
               "name": "Deadly Venom",
-              "remaining": 4.45,
+              "remaining": 6.35,
               "school": "nature",
-              "sourceId": 1027,
-              "stacks": 1,
+              "sourceId": 1023,
+              "stacks": 2,
               "tickInterval": 2,
-              "tickTimer": 0.45,
-              "value": 7
-            },
-            {
-              "duration": 8,
-              "id": "venom_rift_venom_weaver",
-              "kind": "dot",
-              "name": "Venom",
-              "remaining": 5.95,
-              "school": "nature",
-              "sourceId": 1028,
-              "tickInterval": 2,
-              "tickTimer": 1.95,
-              "value": 8
+              "tickTimer": 0.55,
+              "value": 14
             }
           ],
           "blockChance": 0.05,
@@ -995,7 +996,7 @@
           "gm": true,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1015,7 +1016,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1035,7 +1036,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "aoeSlowTimer": 991.5,
           "autoAttack": true,
@@ -1051,7 +1052,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 4365,
-          "id": 1027,
+          "id": 1023,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -1078,12 +1079,12 @@
           },
           "stompTimer": 999,
           "swingTimer": 0.15,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],
@@ -1094,7 +1095,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 106.5,
@@ -1102,11 +1103,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 1.811159,
+          "facing": -0.506808,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 975,
-          "id": 1028,
+          "id": 1024,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -1117,8 +1118,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108397.882671,
-            "z": -1260.48104
+            "x": 108401.058148,
+            "z": -1262.905971
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1129,11 +1130,11 @@
             "armor": 252
           },
           "swingTimer": 1.55,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_venom_weaver",
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],
@@ -1148,45 +1149,45 @@
     {
       "tick": 155,
       "time": 7.75,
-      "nextId": 1029,
-      "state": "f3e877d2",
-      "events": "fb526faf",
+      "nextId": 1025,
+      "state": "069262d5",
+      "events": "47e3a96b",
       "rng": {
-        "draws": 1226,
-        "digest": "0530985d"
+        "draws": 1231,
+        "digest": "e776cfed"
       }
     },
     {
       "tick": 160,
       "time": 8,
-      "nextId": 1029,
-      "state": "8eb16521",
-      "events": "af39ce1a",
+      "nextId": 1025,
+      "state": "a956f88d",
+      "events": "0b6e44db",
       "rng": {
-        "draws": 1295,
-        "digest": "f2a765d4"
+        "draws": 1280,
+        "digest": "50bdb084"
       }
     },
     {
       "tick": 165,
       "time": 8.25,
-      "nextId": 1029,
-      "state": "4af7d018",
-      "events": "741638a5",
+      "nextId": 1025,
+      "state": "1b1d7e27",
+      "events": "7010710e",
       "rng": {
-        "draws": 1359,
-        "digest": "ec813109"
+        "draws": 1334,
+        "digest": "16cabe63"
       }
     },
     {
       "tick": 166,
       "time": 8.3,
-      "nextId": 1029,
-      "state": "0ff8fc76",
+      "nextId": 1025,
+      "state": "3f626cbb",
       "events": "741638a5",
       "rng": {
-        "draws": 1377,
-        "digest": "e83d02e4"
+        "draws": 1350,
+        "digest": "2b89f058"
       },
       "label": "boss-dead-clear",
       "players": [
@@ -1257,7 +1258,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1311,7 +1312,7 @@
               "name": "Battle Stance",
               "remaining": 3591.7,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             },
             {
               "duration": 30,
@@ -1320,7 +1321,7 @@
               "name": "Test Slow",
               "remaining": 21.7,
               "school": "nature",
-              "sourceId": 1027,
+              "sourceId": 1023,
               "value": 0.5
             },
             {
@@ -1328,25 +1329,13 @@
               "id": "stackpoison_rift_boss_venom",
               "kind": "dot",
               "name": "Deadly Venom",
-              "remaining": 3.65,
+              "remaining": 5.55,
               "school": "nature",
-              "sourceId": 1027,
-              "stacks": 1,
+              "sourceId": 1023,
+              "stacks": 2,
               "tickInterval": 2,
-              "tickTimer": 1.65,
-              "value": 7
-            },
-            {
-              "duration": 8,
-              "id": "venom_rift_venom_weaver",
-              "kind": "dot",
-              "name": "Venom",
-              "remaining": 5.15,
-              "school": "nature",
-              "sourceId": 1028,
-              "tickInterval": 2,
-              "tickTimer": 1.15,
-              "value": 8
+              "tickTimer": 1.75,
+              "value": 14
             }
           ],
           "blockChance": 0.05,
@@ -1360,7 +1349,7 @@
           "gm": true,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1380,7 +1369,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1400,13 +1389,13 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "aoeSlowTimer": 991.1,
           "autoAttack": true,
           "bigCastTimer": 991.1,
           "castRemaining": 5.95,
-          "castTargetId": 1004,
+          "castTargetId": 1000,
           "castTotal": 6.3,
           "castingAbility": "rift_venom_execution",
           "combatTimer": 106.9,
@@ -1421,7 +1410,7 @@
           "escapeWindowUntil": 13.85,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1027,
+          "id": 1023,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -1449,12 +1438,12 @@
           },
           "stompTimer": 999,
           "swingTimer": 1.65,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],
@@ -1465,7 +1454,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 107.3,
@@ -1473,11 +1462,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 1.811159,
+          "facing": -0.506808,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 975,
-          "id": 1028,
+          "id": 1024,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -1488,8 +1477,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108397.882671,
-            "z": -1260.48104
+            "x": 108401.058148,
+            "z": -1262.905971
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1500,11 +1489,11 @@
             "armor": 252
           },
           "swingTimer": 0.75,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_venom_weaver",
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],
@@ -1519,12 +1508,12 @@
     {
       "tick": 166,
       "time": 8.3,
-      "nextId": 1029,
-      "state": "0ff8fc76",
+      "nextId": 1025,
+      "state": "3f626cbb",
       "events": "741638a5",
       "rng": {
-        "draws": 1377,
-        "digest": "e83d02e4"
+        "draws": 1350,
+        "digest": "2b89f058"
       },
       "label": "final",
       "players": [
@@ -1595,7 +1584,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1649,7 +1638,7 @@
               "name": "Battle Stance",
               "remaining": 3591.7,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             },
             {
               "duration": 30,
@@ -1658,7 +1647,7 @@
               "name": "Test Slow",
               "remaining": 21.7,
               "school": "nature",
-              "sourceId": 1027,
+              "sourceId": 1023,
               "value": 0.5
             },
             {
@@ -1666,25 +1655,13 @@
               "id": "stackpoison_rift_boss_venom",
               "kind": "dot",
               "name": "Deadly Venom",
-              "remaining": 3.65,
+              "remaining": 5.55,
               "school": "nature",
-              "sourceId": 1027,
-              "stacks": 1,
+              "sourceId": 1023,
+              "stacks": 2,
               "tickInterval": 2,
-              "tickTimer": 1.65,
-              "value": 7
-            },
-            {
-              "duration": 8,
-              "id": "venom_rift_venom_weaver",
-              "kind": "dot",
-              "name": "Venom",
-              "remaining": 5.15,
-              "school": "nature",
-              "sourceId": 1028,
-              "tickInterval": 2,
-              "tickTimer": 1.15,
-              "value": 8
+              "tickTimer": 1.75,
+              "value": 14
             }
           ],
           "blockChance": 0.05,
@@ -1698,7 +1675,7 @@
           "gm": true,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1718,7 +1695,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1738,13 +1715,13 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "aoeSlowTimer": 991.1,
           "autoAttack": true,
           "bigCastTimer": 991.1,
           "castRemaining": 5.95,
-          "castTargetId": 1004,
+          "castTargetId": 1000,
           "castTotal": 6.3,
           "castingAbility": "rift_venom_execution",
           "combatTimer": 106.9,
@@ -1759,7 +1736,7 @@
           "escapeWindowUntil": 13.85,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1027,
+          "id": 1023,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -1787,12 +1764,12 @@
           },
           "stompTimer": 999,
           "swingTimer": 1.65,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],
@@ -1803,7 +1780,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 107.3,
@@ -1811,11 +1788,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 1.811159,
+          "facing": -0.506808,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 975,
-          "id": 1028,
+          "id": 1024,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -1826,8 +1803,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108397.882671,
-            "z": -1260.48104
+            "x": 108401.058148,
+            "z": -1262.905971
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1838,11 +1815,11 @@
             "armor": 252
           },
           "swingTimer": 0.75,
-          "targetId": 1004,
+          "targetId": 1000,
           "templateId": "rift_venom_weaver",
           "threat": [
             [
-              1004,
+              1000,
               1000
             ]
           ],

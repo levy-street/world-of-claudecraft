@@ -17,13 +17,13 @@
     "R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)"
   ],
   "draws": 6,
-  "drawDigest": "1272a77a",
+  "drawDigest": "e2d99dbb",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "caf53a89",
+      "nextId": 1008,
+      "state": "49417dcc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,7 +72,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -124,7 +124,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -134,11 +134,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -151,14 +151,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -182,9 +182,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "4b7b5fb1",
-      "events": "57bba503",
+      "nextId": 1008,
+      "state": "653770f0",
+      "events": "829864cf",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -237,7 +237,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -304,7 +304,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -314,11 +314,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -331,14 +331,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -362,12 +362,12 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 1012,
-      "state": "b454eb60",
-      "events": "5522c295",
+      "nextId": 1008,
+      "state": "ef988a3f",
+      "events": "45fa1866",
       "rng": {
         "draws": 2,
-        "digest": "00a2a78c"
+        "digest": "7e7a4a18"
       },
       "label": "harvest-with-effect-applied",
       "players": [
@@ -416,12 +416,17 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "gather_event:pristine_vein",
               "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "col_first_rare",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -435,7 +440,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -462,12 +467,14 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 3,
+              "count": 11,
               "itemId": "fine_iron_ore",
               "materialSources": [
                 {
-                  "count": 3,
-                  "source": {}
+                  "count": 11,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             }
@@ -481,7 +488,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 10,
           "talents": {
@@ -518,7 +531,7 @@
               "name": "Battle Stance",
               "remaining": 3597.45,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -533,7 +546,7 @@
           "fiveSecondRule": 101.55,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -553,7 +566,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -577,12 +590,12 @@
     {
       "tick": 53,
       "time": 2.65,
-      "nextId": 1012,
-      "state": "4639bcf1",
-      "events": "d27aa7ba",
+      "nextId": 1008,
+      "state": "e43f3324",
+      "events": "afa64076",
       "rng": {
         "draws": 2,
-        "digest": "00a2a78c"
+        "digest": "7e7a4a18"
       },
       "label": "same-vein-denied-by-own-timer",
       "players": [
@@ -631,12 +644,17 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "gather_event:pristine_vein",
               "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "col_first_rare",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -650,7 +668,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -677,12 +695,14 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 3,
+              "count": 11,
               "itemId": "fine_iron_ore",
               "materialSources": [
                 {
-                  "count": 3,
-                  "source": {}
+                  "count": 11,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             }
@@ -696,7 +716,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 10,
           "talents": {
@@ -733,7 +759,7 @@
               "name": "Battle Stance",
               "remaining": 3597.35,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -748,7 +774,7 @@
           "fiveSecondRule": 101.65,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -768,7 +794,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -792,12 +818,12 @@
     {
       "tick": 55,
       "time": 2.75,
-      "nextId": 1012,
-      "state": "639d6261",
-      "events": "feef7003",
+      "nextId": 1008,
+      "state": "fbc9afe6",
+      "events": "50a0f4e3",
       "rng": {
         "draws": 2,
-        "digest": "00a2a78c"
+        "digest": "7e7a4a18"
       },
       "label": "prompt-mode-reslotted",
       "players": [
@@ -846,12 +872,17 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "gather_event:pristine_vein",
               "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "col_first_rare",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -865,7 +896,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -892,12 +923,14 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 3,
+              "count": 11,
               "itemId": "fine_iron_ore",
               "materialSources": [
                 {
-                  "count": 3,
-                  "source": {}
+                  "count": 11,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             }
@@ -911,7 +944,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 10,
           "talents": {
@@ -948,7 +987,7 @@
               "name": "Battle Stance",
               "remaining": 3597.25,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -963,7 +1002,7 @@
           "fiveSecondRule": 101.75,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -983,7 +1022,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1007,12 +1046,12 @@
     {
       "tick": 106,
       "time": 5.3,
-      "nextId": 1012,
-      "state": "defe5cf4",
-      "events": "0c996522",
+      "nextId": 1008,
+      "state": "1b9ba1bb",
+      "events": "930e74a8",
       "rng": {
         "draws": 4,
-        "digest": "49d036fe"
+        "digest": "2d8252d0"
       },
       "label": "prompt-unconfirmed-skips-whole",
       "players": [
@@ -1062,12 +1101,17 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "gather_event:pristine_vein",
               "quality:rare"
             ]
           },
           "deedsEarned": [
             [
               "col_first_rare",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -1081,7 +1125,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1108,12 +1152,14 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 3,
+              "count": 11,
               "itemId": "fine_iron_ore",
               "materialSources": [
                 {
-                  "count": 3,
-                  "source": {}
+                  "count": 11,
+                  "source": {
+                    "signer": "Adventurer"
+                  }
                 }
               ]
             },
@@ -1123,9 +1169,7 @@
               "materialSources": [
                 {
                   "count": 2,
-                  "source": {
-                    "signer": "Adventurer"
-                  }
+                  "source": {}
                 }
               ]
             }
@@ -1140,7 +1184,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 10,
           "talents": {
@@ -1177,7 +1227,7 @@
               "name": "Battle Stance",
               "remaining": 3594.7,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1192,7 +1242,7 @@
           "fiveSecondRule": 104.3,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1212,7 +1262,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1236,12 +1286,12 @@
     {
       "tick": 157,
       "time": 7.85,
-      "nextId": 1012,
-      "state": "6cb64804",
-      "events": "bb2884c2",
+      "nextId": 1008,
+      "state": "58f7c7a1",
+      "events": "a76a865a",
       "rng": {
         "draws": 6,
-        "digest": "1272a77a"
+        "digest": "e2d99dbb"
       },
       "label": "prompt-confirmed-fires-and-spends",
       "players": [
@@ -1291,6 +1341,7 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "gather_event:pristine_vein",
               "poi:mirefen_marsh:the_sunken_bastion",
               "quality:rare"
             ]
@@ -1298,6 +1349,10 @@
           "deedsEarned": [
             [
               "col_first_rare",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -1311,7 +1366,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1338,15 +1393,15 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 7,
+              "count": 13,
               "itemId": "fine_iron_ore",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 },
                 {
-                  "count": 4,
+                  "count": 11,
                   "source": {
                     "signer": "Adventurer"
                   }
@@ -1359,9 +1414,7 @@
               "materialSources": [
                 {
                   "count": 2,
-                  "source": {
-                    "signer": "Adventurer"
-                  }
+                  "source": {}
                 }
               ]
             }
@@ -1377,7 +1430,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 10,
           "talents": {
@@ -1414,7 +1473,7 @@
               "name": "Battle Stance",
               "remaining": 3592.15,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1429,7 +1488,7 @@
           "fiveSecondRule": 106.85,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1449,7 +1508,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1473,12 +1532,12 @@
     {
       "tick": 159,
       "time": 7.95,
-      "nextId": 1012,
-      "state": "eb7ca873",
+      "nextId": 1008,
+      "state": "df239c74",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "1272a77a"
+        "digest": "e2d99dbb"
       },
       "label": "final",
       "players": [
@@ -1528,6 +1587,7 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "gather_event:pristine_vein",
               "poi:mirefen_marsh:the_sunken_bastion",
               "quality:rare"
             ]
@@ -1535,6 +1595,10 @@
           "deedsEarned": [
             [
               "col_first_rare",
+              ""
+            ],
+            [
+              "col_pristine_vein",
               ""
             ],
             [
@@ -1548,7 +1612,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1575,15 +1639,15 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 7,
+              "count": 13,
               "itemId": "fine_iron_ore",
               "materialSources": [
                 {
-                  "count": 3,
+                  "count": 2,
                   "source": {}
                 },
                 {
-                  "count": 4,
+                  "count": 11,
                   "source": {
                     "signer": "Adventurer"
                   }
@@ -1596,9 +1660,7 @@
               "materialSources": [
                 {
                   "count": 2,
-                  "source": {
-                    "signer": "Adventurer"
-                  }
+                  "source": {}
                 }
               ]
             }
@@ -1614,7 +1676,13 @@
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
-            "firstFind": {}
+            "firstFind": {},
+            "marks": [
+              "gather_event:pristine_vein"
+            ],
+            "recent": [
+              "gather_event:pristine_vein"
+            ]
           },
           "renown": 10,
           "talents": {
@@ -1651,7 +1719,7 @@
               "name": "Battle Stance",
               "remaining": 3592.05,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1666,7 +1734,7 @@
           "fiveSecondRule": 106.95,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1686,7 +1754,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,

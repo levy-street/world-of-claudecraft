@@ -11,7 +11,22 @@ import { ferryPierSurface } from './ferry_piers';
 import { galeDeckSurface } from './gale_harbor';
 import { gliderWharfSurface } from './glider_wharf_layout';
 import { reachDeckSurface } from './reach_decks';
-import type { ZonePropsDef } from './types';
+import type { WorldContent, ZonePropsDef } from './types';
+import { layoutDeckFloorAt } from './world_layout/decks';
+
+export function worldDockSurfaceHeight(
+  x: number,
+  z: number,
+  terrainAt: (x: number, z: number) => number,
+  waterLevel: number,
+  content: WorldContent,
+  maxLayoutFloor = Infinity,
+): number {
+  return Math.max(
+    dockSurfaceHeight(x, z, terrainAt, waterLevel, content.props.docks),
+    layoutDeckFloorAt(content.sceneryDecks, x, z, terrainAt, maxLayoutFloor),
+  );
+}
 
 export function dockSurfaceHeight(
   x: number,

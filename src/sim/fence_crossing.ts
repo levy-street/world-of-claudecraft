@@ -8,6 +8,7 @@ import { promotedColliderProps } from './authored_town_dressing';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import { getActiveWorldContent } from './data';
 import { FENCE_END_PAD } from './fence_dims';
+import { worldCollisionPlacements } from './placement_sources';
 
 export function crossesFence(
   fromX: number,
@@ -65,7 +66,7 @@ export function crossesFence(
   // placement's local x axis keeps the jump-aware crossing (click-to-move
   // auto-jump, pathfind) on them. Only authored maps carry placements, so the
   // built-in world skips the loop entirely.
-  for (const p of content.placements ?? []) {
+  for (const p of worldCollisionPlacements(content)) {
     if (p.worldPropKind !== 'fence' || !p.worldPropWidth) continue;
     const half = (p.worldPropWidth * p.scale * (p.scaleX ?? 1)) / 2;
     const dx = Math.cos(p.rotY) * half;

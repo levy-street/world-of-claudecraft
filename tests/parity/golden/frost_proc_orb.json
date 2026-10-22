@@ -9,14 +9,14 @@
     "Fingers of Frost proc draw from frostbolt",
     "Brain Freeze proc draw from frostbolt"
   ],
-  "draws": 356,
-  "drawDigest": "6ca1a356",
+  "draws": 348,
+  "drawDigest": "61ca03cf",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "1d9ae481",
+      "nextId": 1008,
+      "state": "3dd4e59c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -65,7 +65,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -117,11 +117,11 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 54,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -133,7 +133,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -141,7 +141,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 13,
@@ -165,56 +165,56 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "d60ce3ba",
-      "events": "2e58cdfb",
+      "nextId": 1009,
+      "state": "6281d313",
+      "events": "6da13fd2",
       "rng": {
         "draws": 1,
-        "digest": "cf5e57a1"
+        "digest": "7fb58d2e"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "5447eba3",
-      "events": "74bccb9b",
+      "nextId": 1009,
+      "state": "aa6443f3",
+      "events": "1056521b",
       "rng": {
         "draws": 2,
-        "digest": "6d172bb5"
+        "digest": "944dd076"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "f4faa6ce",
-      "events": "eb94ef71",
+      "nextId": 1009,
+      "state": "4244f6ec",
+      "events": "a286eec3",
       "rng": {
-        "draws": 150,
-        "digest": "478ace8d"
+        "draws": 149,
+        "digest": "3d8f3fb1"
       }
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1013,
-      "state": "a452e70a",
-      "events": "849c9d6d",
+      "nextId": 1009,
+      "state": "e076e4a7",
+      "events": "82d6681d",
       "rng": {
-        "draws": 316,
-        "digest": "650546d2"
+        "draws": 310,
+        "digest": "826f7236"
       }
     },
     {
       "tick": 84,
       "time": 4.2,
-      "nextId": 1013,
-      "state": "c4bae465",
-      "events": "8606ddc2",
+      "nextId": 1009,
+      "state": "26867820",
+      "events": "4c4b88e6",
       "rng": {
-        "draws": 356,
-        "digest": "6ca1a356"
+        "draws": 348,
+        "digest": "61ca03cf"
       },
       "label": "frost-procs",
       "players": [
@@ -245,13 +245,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 219
+            "damageDealt": 213
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 219
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -296,7 +296,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -354,7 +354,7 @@
               "name": "Icicles",
               "remaining": 29.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "stacks": 5
             }
           ],
@@ -370,11 +370,11 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 0.25,
           "healPower": 41,
           "hp": 665,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -387,7 +387,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -395,7 +395,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 41,
@@ -407,7 +407,7 @@
             "sta": 52,
             "str": 10
           },
-          "targetId": 1012,
+          "targetId": 1008,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -425,7 +425,7 @@
               "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "value": 0.7
             },
             {
@@ -435,7 +435,7 @@
               "name": "Rimelance",
               "remaining": 8.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "value": 0.6
             }
           ],
@@ -444,16 +444,16 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499781,
-          "id": 1012,
+          "hp": 499787,
+          "id": 1008,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -54
           },
           "level": 20,
@@ -464,22 +464,22 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -54
           },
           "stats": {},
-          "tappedById": 1004,
+          "tappedById": 1000,
           "templateId": "training_dummy",
           "threat": [
             [
-              1004,
-              219
+              1000,
+              213
             ]
           ],
           "weapon": {
@@ -491,12 +491,12 @@
     {
       "tick": 84,
       "time": 4.2,
-      "nextId": 1013,
-      "state": "c4bae465",
+      "nextId": 1009,
+      "state": "26867820",
       "events": "741638a5",
       "rng": {
-        "draws": 356,
-        "digest": "6ca1a356"
+        "draws": 348,
+        "digest": "61ca03cf"
       },
       "label": "final",
       "players": [
@@ -527,13 +527,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 219
+            "damageDealt": 213
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 219
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -578,7 +578,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -636,7 +636,7 @@
               "name": "Icicles",
               "remaining": 29.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "stacks": 5
             }
           ],
@@ -652,11 +652,11 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 0.25,
           "healPower": 41,
           "hp": 665,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -669,7 +669,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -677,7 +677,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 41,
@@ -689,7 +689,7 @@
             "sta": 52,
             "str": 10
           },
-          "targetId": 1012,
+          "targetId": 1008,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -707,7 +707,7 @@
               "name": "Frostglobe",
               "remaining": 2.25,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "value": 0.7
             },
             {
@@ -717,7 +717,7 @@
               "name": "Rimelance",
               "remaining": 8.95,
               "school": "frost",
-              "sourceId": 1004,
+              "sourceId": 1000,
               "value": 0.6
             }
           ],
@@ -726,16 +726,16 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499781,
-          "id": 1012,
+          "hp": 499787,
+          "id": 1008,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -54
           },
           "level": 20,
@@ -746,22 +746,22 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -54
           },
           "stats": {},
-          "tappedById": 1004,
+          "tappedById": 1000,
           "templateId": "training_dummy",
           "threat": [
             [
-              1004,
-              219
+              1000,
+              213
             ]
           ],
           "weapon": {

@@ -1,3 +1,4 @@
+import { propHutCenter, propSourceIndex } from '../sim/world_layout/props';
 // Converts the overworld scenery records that makers most often need to adjust
 // into ordinary map placements. They then use the editor's existing selection,
 // transform, undo, collision, and export pipeline instead of renderer-only props.
@@ -324,6 +325,7 @@ export function legacyWorldMajorPropPlacements(
   }
 
   props.stalls.forEach((stall, index) => {
+    index = propSourceIndex(props, 'stalls', index);
     if (isEastbrookRebuildStall(stall) || isFenbridgeRebuildStall(stall)) return;
     const assetId = index % 2 === 0 ? 'props/market_stand_1' : 'props/market_stand_2';
     addFitted(
@@ -389,6 +391,7 @@ export function legacyWorldMajorPropPlacements(
   });
 
   props.wells.forEach((well, index) => {
+    index = propSourceIndex(props, 'wells', index);
     if (isEastbrookRebuildWell(well) || isFenbridgeRebuildWell(well)) return;
     addFitted(
       out,
@@ -405,6 +408,7 @@ export function legacyWorldMajorPropPlacements(
   });
 
   props.graveyards.forEach((graveyard, graveyardIndex) => {
+    graveyardIndex = propSourceIndex(props, 'graveyards', graveyardIndex);
     const kinds = [
       'props/gravestone_round',
       'props/gravestone_cross',
@@ -433,6 +437,7 @@ export function legacyWorldMajorPropPlacements(
   });
 
   props.campfires.forEach(([x, z], index) => {
+    index = propSourceIndex(props, 'campfires', index);
     const placement = addFitted(
       out,
       'props/bonfire',
@@ -449,6 +454,7 @@ export function legacyWorldMajorPropPlacements(
   });
 
   props.tents.forEach((tent, index) => {
+    index = propSourceIndex(props, 'tents', index);
     const assetId = propRand(tent.x, tent.z, 2) < 0.55 ? 'props/tent_open' : 'props/tent_small';
     const placement = addFitted(
       out,
@@ -467,6 +473,7 @@ export function legacyWorldMajorPropPlacements(
   });
 
   props.crates.forEach(([x, z], index) => {
+    index = propSourceIndex(props, 'crates', index);
     const barrel = index % 3 === 2;
     addFitted(
       out,
@@ -482,14 +489,9 @@ export function legacyWorldMajorPropPlacements(
     );
   });
 
-  const hutCenter = props.mudHuts.reduce(
-    (center, [x, z]) => ({
-      x: center.x + x / props.mudHuts.length,
-      z: center.z + z / props.mudHuts.length,
-    }),
-    { x: 0, z: 0 },
-  );
+  const hutCenter = propHutCenter(props);
   props.mudHuts.forEach(([x, z], index) => {
+    index = propSourceIndex(props, 'mudHuts', index);
     const yaw = Math.atan2(hutCenter.x - x, hutCenter.z - z);
     const hut = addFitted(
       out,
@@ -521,6 +523,7 @@ export function legacyWorldMajorPropPlacements(
   });
 
   props.ruinRings.forEach((ring, ringIndex) => {
+    ringIndex = propSourceIndex(props, 'ruinRings', ringIndex);
     for (let index = 0; index < ring.columns; index++) {
       const angle = (index / ring.columns) * Math.PI * 2;
       const x = ring.x + Math.sin(angle) * ring.ringR;
@@ -648,6 +651,7 @@ export function legacyWorldMajorPropPlacements(
   });
 
   props.docks.forEach((dock, dockIndex) => {
+    dockIndex = propSourceIndex(props, 'docks', dockIndex);
     for (let index = 0; index < 4; index++) {
       const point = localPoint(dock.x, dock.z, dock.rot, 0, -index * 2.2);
       addFitted(
@@ -731,6 +735,7 @@ export function legacyWorldMajorPropPlacements(
   // the editable-all tier promotes them too rather than leaving them as static
   // props a maker cannot select or delete.
   (props.marshReeds ?? []).forEach(([x, z], index) => {
+    index = propSourceIndex(props, 'marshReeds', index);
     addFitted(
       out,
       'props/reeds',
@@ -1167,9 +1172,11 @@ export function streetlampPropPlacements(seed: number): MapPlacement[] {
       name: `Streetlamp ${index + 1}`,
       x: site.x,
       z: site.z,
-      y: 0,
+      y: site.placementY ?? 0,
+      ...(site.groundY === undefined ? {} : { detached: true, groundY: site.groundY }),
       rotY: cleanZero(
-        fixture ? lampFixtureYaw(site.roadYaw, fixture.axis[0], fixture.axis[1]) : site.roadYaw,
+        site.fixtureYaw ??
+          (fixture ? lampFixtureYaw(site.roadYaw, fixture.axis[0], fixture.axis[1]) : site.roadYaw),
       ),
       scale:
         STREETLAMP_FIXTURE_HEIGHT /

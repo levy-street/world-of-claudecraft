@@ -38,7 +38,6 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
-import { farmBedById } from '../src/sim/content/farm_patches';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
 import { broadcast, lastSnap } from './helpers/bare_client';
 
@@ -379,7 +378,8 @@ function clearHeavyDirty(session: ClientSession): void {
 }
 
 function standAtBed(server: GameServer, pid: number, bedId: string): void {
-  const bed = farmBedById(bedId);
+  // Exercise the bed in this world's layout, including published map moves.
+  const bed = server.sim.farmPatches.flatMap((patch) => patch.beds).find((b) => b.id === bedId);
   if (!bed) throw new Error(`no such bed: ${bedId}`);
   const p = server.sim.entities.get(pid);
   if (!p) throw new Error(`no entity for pid ${pid}`);

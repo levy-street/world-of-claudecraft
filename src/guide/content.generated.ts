@@ -18589,7 +18589,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           },
           {
             "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
+            "hub": "Highwatch"
           },
           {
             "name": "Provisioner Hale",
@@ -18799,7 +18799,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           },
           {
             "name": "Weaver Ottilie",
-            "hub": "Eastbrook"
+            "hub": "Fenbridge"
           },
           {
             "name": "Provisioner Hale",
@@ -19012,7 +19012,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           },
           {
             "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
+            "hub": "Highwatch"
           },
           {
             "name": "Provisioner Hale",
@@ -21496,7 +21496,7 @@ export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
         "id": "q_prof_workorder_loom",
         "name": "Loom Work Order",
         "master": "Weaver Ottilie",
-        "hub": "Eastbrook",
+        "hub": "Fenbridge",
         "material": "Spider Silk",
         "count": 6,
         "coinCopper": 15
@@ -21505,7 +21505,7 @@ export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
         "id": "q_prof_workorder_toolworks",
         "name": "Toolworks Work Order",
         "master": "Tinker Gizzel",
-        "hub": "Eastbrook",
+        "hub": "Highwatch",
         "material": "Ironbark Log",
         "count": 8,
         "coinCopper": 16

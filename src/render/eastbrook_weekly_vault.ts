@@ -1,8 +1,10 @@
 // Static stone hall. Built before the town's reveal roots are registered, so
 // the existing town GPU gate prepares every mesh and its occluder-fade twin.
+
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { EASTBROOK_LAYOUT, localToWorld } from '../sim/eastbrook_layout';
+import { civicGroundY } from '../sim/world_layout/civic';
 import { surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
@@ -116,7 +118,7 @@ export function buildEastbrookWeeklyVault(groundAt: (x: number, z: number) => nu
   const box = (m: number, w: number, h: number, d: number, x: number, y: number, z: number) =>
     parts[m].push(new THREE.BoxGeometry(w, h, d).translate(x, y, z));
   const entrance = localToWorld(layout, layout.rot, 0, layout.d / 2);
-  const y = groundAt(entrance.x, entrance.z);
+  const y = civicGroundY(layout.id, layout, groundAt, groundAt(entrance.x, entrance.z));
   // A document that owns the vault as a placement (promotedScenery.eastbrookVault)
   // draws and moves that one. The town keeps the hall's slot, so its building
   // lists stay aligned, but the slot is an empty group with nothing to fade.

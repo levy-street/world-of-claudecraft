@@ -8,6 +8,7 @@ import {
   placedTownSeat,
   scalePlacedTownMeasurements,
 } from './placed_town_kit';
+import { civicPosition } from './world_layout/civic';
 
 export interface Point2 {
   x: number;
@@ -513,11 +514,13 @@ const BANK_BASE = makePlacedTownBuilding(
 
 // Provisioner Hale's stall stands on the main street in front of the inn's
 // south half, its counter facing the street (the stall's front is its +Z).
-const PROVISION_STALL_POSITION = { x: 3, z: 294.5 } as const;
-const PROVISION_STALL_ROTATION = facingToward(PROVISION_STALL_POSITION, {
-  x: 0,
-  z: PROVISION_STALL_POSITION.z,
-});
+const PROVISION_STALL_SEAT = civicPosition(
+  'fenbridge_provision_stall',
+  { x: 3, z: 294.5 },
+  -Math.PI / 2,
+);
+const PROVISION_STALL_POSITION = PROVISION_STALL_SEAT.position;
+const PROVISION_STALL_ROTATION = PROVISION_STALL_SEAT.rotation;
 const PROVISION_STALL_WIDTH = 3.2;
 const PROVISION_STALL_DEPTH = 1.6;
 // By the south entrance, board facing the square (readable on approach).
@@ -966,7 +969,8 @@ export const FENBRIDGE_LAYOUT = deepFreeze({
     cistern: {
       id: 'fenbridge_mirelight_cistern',
       assetId: '/models/props/fenbridge_mirelight_cistern.glb',
-      position: CIVIC_CENTER,
+      position: civicPosition('fenbridge_mirelight_cistern', CIVIC_CENTER).position,
+      rotation: civicPosition('fenbridge_mirelight_cistern', CIVIC_CENTER).rotation,
       radius: 1.8,
       height: 2.6,
       nativeDimensions: { width: 3.6, height: 2.6, depth: 3.6 },

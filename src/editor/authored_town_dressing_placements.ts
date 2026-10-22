@@ -20,6 +20,7 @@ import { FENBRIDGE_LAYOUT, localToWorld } from '../sim/fenbridge_layout';
 import type { MapPlacement } from '../sim/map_doc';
 import { pitchedSegmentPlacement } from '../sim/pitched_segment';
 import { terrainHeight } from '../sim/world';
+import { civicPlacementFields } from '../sim/world_layout/civic';
 
 /** Bounding size of each model at scale 1, in the GLB's own units, measured
  *  from the files (POSITION accessor bounds through the node hierarchy, the
@@ -87,6 +88,7 @@ function boxPlacement(
     scaleY: height / natural.y,
     scaleZ: depth / natural.z,
     collide,
+    ...civicPlacementFields(id),
   };
   if (collide) placement.collisionMode = 'baked';
   return placement;
@@ -192,7 +194,7 @@ function fenbridgeDressing(seed: number): MapPlacement[] {
       cistern.id,
       cistern.position.x,
       cistern.position.z,
-      0,
+      cistern.rotation,
       cistern.nativeDimensions.width,
       cistern.nativeDimensions.height,
       cistern.nativeDimensions.depth,

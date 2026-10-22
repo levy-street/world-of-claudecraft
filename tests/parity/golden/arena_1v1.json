@@ -8,13 +8,13 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 965,
-  "drawDigest": "35722fe7",
+  "draws": 951,
+  "drawDigest": "aee62c98",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1007,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1013,
-      "state": "c98b4c83",
-      "events": "7198efe6",
+      "nextId": 1009,
+      "state": "a800cdc2",
+      "events": "5ef71262",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,56 +39,56 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1013,
-      "state": "32adb314",
-      "events": "213df85c",
+      "nextId": 1009,
+      "state": "3b465e23",
+      "events": "ea20e95a",
       "rng": {
-        "draws": 70,
-        "digest": "2db3d6b8"
+        "draws": 72,
+        "digest": "e21a7441"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1013,
-      "state": "850e7d8a",
-      "events": "edbd9ff6",
+      "nextId": 1009,
+      "state": "db333bef",
+      "events": "32d03438",
       "rng": {
-        "draws": 293,
-        "digest": "69add3b2"
+        "draws": 289,
+        "digest": "1a8bb3b5"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1013,
-      "state": "3a5cf03d",
-      "events": "bea5f2c8",
+      "nextId": 1009,
+      "state": "6c419e80",
+      "events": "8ea900fe",
       "rng": {
-        "draws": 518,
-        "digest": "4c356c2e"
+        "draws": 524,
+        "digest": "19a3f64b"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1013,
-      "state": "ffecc162",
-      "events": "d4e598c3",
+      "nextId": 1009,
+      "state": "b4f2562d",
+      "events": "afef6e5d",
       "rng": {
-        "draws": 781,
-        "digest": "bba8277e"
+        "draws": 771,
+        "digest": "9cfa22bd"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 1013,
-      "state": "fef9bbd5",
+      "nextId": 1009,
+      "state": "14b435ac",
       "events": "741638a5",
       "rng": {
-        "draws": 965,
-        "digest": "35722fe7"
+        "draws": 951,
+        "digest": "aee62c98"
       },
       "label": "final",
       "players": [
@@ -161,7 +161,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -297,7 +297,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1008,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -363,7 +363,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -376,7 +376,7 @@
           "fiveSecondRule": 106.1,
           "healPower": 5,
           "hp": 632,
-          "id": 1011,
+          "id": 1007,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -395,7 +395,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -426,7 +426,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
           "healPower": 34,
-          "id": 1012,
+          "id": 1008,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -445,7 +445,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 34,

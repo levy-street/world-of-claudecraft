@@ -179,6 +179,7 @@ export interface PlacedTownInteriorBuilding {
     readonly rotation: number;
     readonly scale: number;
     readonly lift: number;
+    readonly groundY?: number;
   };
 }
 

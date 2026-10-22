@@ -106,6 +106,7 @@ export function walkInPlacementFor(building: BuildingDef): PlacedAsset | null {
     rotY: placement.rotation,
     scale: (placement.scale * placement.modelSize) / PLACED_TARGET_HEIGHT,
     y: placement.lift,
+    ...(placement.groundY === undefined ? {} : { detached: true, groundY: placement.groundY }),
     collideRadius: 1,
   };
 }

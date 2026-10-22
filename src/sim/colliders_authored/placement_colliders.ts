@@ -16,6 +16,7 @@ import {
 import { type Collider, rotY, type TopSlope } from '../collider_shapes';
 import { FENCE_END_PAD, FENCE_HALF_DEPTH, FENCE_RAIL_HEIGHT } from '../fence_dims';
 import type { CollisionPrism } from '../mesh_prisms';
+import { worldCollisionPlacements } from '../placement_sources';
 import { AUTHORED_TRAVERSAL_BAND } from '../traversal_band';
 import type { PlacedAsset, WorldContent } from '../types';
 import { groundHeight, terrainHeight } from '../world';
@@ -311,7 +312,7 @@ export function emitPlacementBoxes(
 //                     catalogue assets a real shape.
 //   circle / square   the legacy footprint.
 export function pushPlacementColliders(out: Collider[], content: WorldContent, seed: number): void {
-  for (const p of content.placements ?? []) {
+  for (const p of worldCollisionPlacements(content)) {
     // The opt-in gate, and it must stay FIRST. custom_map.ts only writes
     // collideRadius when the placement's collision mode is not 'none', so an
     // absent radius IS the maker's "this one is decoration", and every shape

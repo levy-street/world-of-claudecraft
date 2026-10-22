@@ -1,0 +1,365 @@
+{
+  "sourceBeforeSha256": "b452dd3a14a5bad7d8ad20024c10d0ec3a90f1a9adbfe94943f57963a1a7a8b2",
+  "sourceAfterSha256": "e16c7eb5de9ea6274fc7bbeb7de2ad3138632f93c8a6b8fb380ee6c18e3e12ee",
+  "corrections": [
+    {
+      "identity": "npc:keeper_saelwyn",
+      "before": {
+        "pos": {
+          "x": -42.566621994079554,
+          "z": 1018.2301948044825
+        }
+      },
+      "after": {
+        "pos": {
+          "x": -43,
+          "z": 1017.75
+        }
+      },
+      "reason": "Move the authored NPC less than one yard clear of the preserved great-tree trunk."
+    },
+    {
+      "identity": "npc:scout_einna",
+      "before": {
+        "pos": {
+          "x": -12,
+          "z": 1502
+        }
+      },
+      "after": {
+        "pos": {
+          "x": -11,
+          "z": 1502
+        }
+      },
+      "reason": "Keep the existing scout outside the newly authored muster-tent wall, one yard east."
+    },
+    {
+      "identity": "npc:weekly_emissary",
+      "before": {
+        "pos": {
+          "x": -72.28,
+          "z": -95.59
+        }
+      },
+      "after": {
+        "pos": {
+          "x": -71,
+          "z": -95
+        }
+      },
+      "reason": "Clear the moved weekly-vault corner while retaining the keeper at its entrance."
+    },
+    {
+      "identity": "npc:alchemist_verane",
+      "before": {
+        "pos": {
+          "x": -36.673076440757015,
+          "z": 690.2918836759166
+        }
+      },
+      "after": {
+        "pos": {
+          "x": -38.673076440757015,
+          "z": 690.2918836759166
+        }
+      },
+      "reason": "Shift the alchemist and bound station two yards west so its barrel does not block the Highwatch counting-house entrance."
+    },
+    {
+      "identity": "gatherNode:herb_thornpeak_t2b",
+      "before": {
+        "x": -106.61319834689037,
+        "z": 693.0779875381146
+      },
+      "after": {
+        "x": -107.674,
+        "z": 692.017
+      },
+      "reason": "Move the herb 1.5 yards onto the accessible side of the authored terrain edge; retain its stable node ID."
+    },
+    {
+      "identity": "placement:56b1d485e484",
+      "before": {
+        "x": 343.56434982899475,
+        "z": 1420.412642436985
+      },
+      "after": {
+        "x": 350,
+        "z": 1407
+      },
+      "reason": "Keep the authored copied house south of the square while opening the current Gibbetmere inn entrance, which its original footprint enclosed."
+    },
+    {
+      "identity": "placement:469fe71a20cd",
+      "buildingId": "highwatch_summit_inn",
+      "before": {
+        "y": -1.25,
+        "groundY": 12.10031932706995,
+        "detached": true
+      },
+      "after": {
+        "y": -1.25
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:517ae9f3c66c",
+      "buildingId": "highwatch_counting_house",
+      "before": {
+        "groundY": 15.699507100020211,
+        "detached": true
+      },
+      "after": {
+        "y": -1.55
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:4c8c1941ed1e",
+      "buildingId": "hedgewick_inn",
+      "before": {
+        "groundY": 2.714221976544385,
+        "detached": true
+      },
+      "after": {
+        "y": -1.25
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:d299f08cc6cb",
+      "buildingId": "drifthaven_wreckline_inn",
+      "before": {
+        "groundY": 1.5461084158268061,
+        "detached": true
+      },
+      "after": {
+        "y": -1.25
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:92ae6953a286",
+      "buildingId": "drifthaven_provisioner",
+      "before": {
+        "groundY": 2.6539346803931565,
+        "detached": true
+      },
+      "after": {
+        "y": -1.55
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:842496d2d86d",
+      "buildingId": "bridgemere_island_inn",
+      "before": {
+        "groundY": 2,
+        "detached": true
+      },
+      "after": {
+        "y": -1.05
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:b1949ea5d7e4",
+      "buildingId": "moonrest_inn",
+      "before": {
+        "groundY": 1.4310446212285672,
+        "detached": true
+      },
+      "after": {
+        "y": -1.25
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:ec5d73be0799",
+      "buildingId": "moonrest_moon_shrine",
+      "before": {
+        "y": -1.05,
+        "groundY": 2.919151567569723,
+        "detached": true
+      },
+      "after": {
+        "y": -1.05
+      },
+      "reason": "Restore the native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Jamie confirmed native footing for these eight entrances (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "placement:aee7bfdee547",
+      "buildingId": "eldershine_market",
+      "before": {
+        "y": -0.5,
+        "groundY": 1.8266575671609822,
+        "detached": true
+      },
+      "after": {
+        "y": -0.5
+      },
+      "reason": "Retain Jamie-confirmed authored lift -0.5 and attach to current terrain instead of the stale frozen Studio seat. A separate doorway approach makes the authored lift walkable (Skynet 1b33f2ac-34ed-4498-af02-560cc1b0e915)."
+    },
+    {
+      "identity": "terrainEdit:integration-highwatch-bank-approach",
+      "before": null,
+      "after": {
+        "x": -37.2617811263419,
+        "z": 692.9803304239049,
+        "radius": 14,
+        "delta": 15.7,
+        "gx": 0,
+        "gz": 0,
+        "falloff": "smooth",
+        "shape": "circle",
+        "mode": "level",
+        "hardness": 0.65,
+        "id": "integration-highwatch-bank-approach"
+      },
+      "reason": "Smooth the bank approach and alchemist station into one level landing at the surrounding town height. The first narrow ramp left the alchemist on a steep edge; current render inspection, all 38 entrance walks and 409 access probes pass."
+    },
+    {
+      "identity": "terrainEdit:integration-highwatch-bank-landing",
+      "before": null,
+      "after": {
+        "x": -35.025009512458915,
+        "z": 696.2964807141251,
+        "radius": 5,
+        "delta": 15.7,
+        "falloff": "smooth",
+        "shape": "circle",
+        "mode": "level",
+        "hardness": 0.5,
+        "id": "integration-highwatch-bank-landing"
+      },
+      "reason": "Grade a walkable approach and landing at the detached Highwatch counting-house entrance; verified with a real Sim walker from the square."
+    },
+    {
+      "identity": "terrainEdit:integration-eastbrook-bank-approach",
+      "before": null,
+      "after": {
+        "id": "integration-eastbrook-bank-approach",
+        "x": -55.69261104734991,
+        "z": -111.6926110473499,
+        "radius": 4.5,
+        "delta": 2.1,
+        "falloff": "smooth",
+        "shape": "circle",
+        "mode": "level",
+        "hardness": 0.5
+      },
+      "reason": "Blend a local doorway approach up to the first step while retaining the Jamie-confirmed building lift, horizontal placement and terrain height at the building anchor."
+    },
+    {
+      "identity": "terrainEdit:integration-icemantle-trade-hall-approach",
+      "before": null,
+      "after": {
+        "id": "integration-icemantle-trade-hall-approach",
+        "x": -21.095515413746007,
+        "z": 1575.6751952953098,
+        "radius": 4.5,
+        "delta": 2.05,
+        "falloff": "smooth",
+        "shape": "circle",
+        "mode": "level",
+        "hardness": 0.5
+      },
+      "reason": "Blend a local doorway approach up to the first step while retaining the Jamie-confirmed building lift, horizontal placement and terrain height at the building anchor."
+    },
+    {
+      "identity": "terrainEdit:integration-eldershine-market-approach",
+      "before": null,
+      "after": {
+        "id": "integration-eldershine-market-approach",
+        "x": 4.680006033511325,
+        "z": 1029.435467580807,
+        "radius": 4.5,
+        "delta": 2.55,
+        "falloff": "smooth",
+        "shape": "circle",
+        "mode": "level",
+        "hardness": 0.5
+      },
+      "reason": "Blend a local doorway approach up to the first step while retaining the Jamie-confirmed building lift, horizontal placement and terrain height at the building anchor."
+    }
+  ],
+  "batches": [
+    {
+      "sourceBeforeSha256": "d207165104301726ad3a49a5ab58bab3bbce9760bedab49633d6c6dd6006e7bc",
+      "sourceAfterSha256": "acc887bbd2d00c3518e2c71aaa0de8eba14a884be34dd5e7d69ca02e0403b70a",
+      "reason": "Real walking regression: 11 entrances failed before correction; 38 of 38 pass in the isolated corrected candidate."
+    },
+    {
+      "sourceBeforeSha256": "acc887bbd2d00c3518e2c71aaa0de8eba14a884be34dd5e7d69ca02e0403b70a",
+      "sourceAfterSha256": "7368b818e9acec8eb1643be1cd6d2a428e1ee5b5c8c93b8f7c5d5ad18bad688d",
+      "reason": "Replace measured entry offsets with verified native footing/terrain attachment; all 38 walking approaches also pass this simpler correction."
+    },
+    {
+      "sourceBeforeSha256": "7368b818e9acec8eb1643be1cd6d2a428e1ee5b5c8c93b8f7c5d5ad18bad688d",
+      "sourceAfterSha256": "f737a21754762c291eaa0d53c07b1a236bec43724d16d08bb1b11f7dbed87041",
+      "reason": "Broaden and level the Highwatch bank approach to support the adjacent alchemist and station; retain authored horizontal placement.",
+      "supersededApproachStamp": {
+        "x": -37.2617811263419,
+        "z": 692.9803304239049,
+        "radius": 8,
+        "delta": 14.5,
+        "gx": 0.44735432277659753,
+        "gz": 0.6632300580440335,
+        "falloff": "smooth",
+        "shape": "circle",
+        "mode": "level",
+        "hardness": 0.5,
+        "id": "integration-highwatch-bank-approach"
+      }
+    },
+    {
+      "sourceBeforeSha256": "f737a21754762c291eaa0d53c07b1a236bec43724d16d08bb1b11f7dbed87041",
+      "sourceAfterSha256": "2291b17039e7f555ad6fa711c00adbfca88a4b6b12880b86755003c81f3b71c8",
+      "reason": "Jamie confirmed the three rounded building lifts are intentional. Restore them and grade only the doorway approaches; the other eight native-footing corrections remain confirmed.",
+      "skynetMessageId": "1b33f2ac-34ed-4498-af02-560cc1b0e915",
+      "supersededCorrections": [
+        {
+          "identity": "placement:f32027eb7020",
+          "buildingId": "icemantle_trade_hall",
+          "before": {
+            "y": -1
+          },
+          "after": {
+            "y": -1.55
+          },
+          "reason": "Restore the current native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Real Sim walking failed before correction. Studio drag/seat behavior and source history support this interpretation; rounded edits on Eastbrook bank, Icemantle trade hall and Eldershine market remain flagged for Jamie (Skynet 358e973a-da23-41ca-8bb0-69c523cd8378)."
+        },
+        {
+          "identity": "placement:aee7bfdee547",
+          "buildingId": "eldershine_market",
+          "before": {
+            "y": -0.5,
+            "groundY": 1.8266575671609822,
+            "detached": true
+          },
+          "after": {
+            "y": -1.55
+          },
+          "reason": "Restore the current native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Real Sim walking failed before correction. Studio drag/seat behavior and source history support this interpretation; rounded edits on Eastbrook bank, Icemantle trade hall and Eldershine market remain flagged for Jamie (Skynet 358e973a-da23-41ca-8bb0-69c523cd8378)."
+        },
+        {
+          "identity": "placement:9f55209138d4",
+          "buildingId": "eastbrook_bank",
+          "before": {
+            "y": -0.5
+          },
+          "after": {
+            "y": -1.35
+          },
+          "reason": "Restore the current native buried-footing lift and terrain attachment, retaining authored x/z, yaw and scale. Real Sim walking failed before correction. Studio drag/seat behavior and source history support this interpretation; rounded edits on Eastbrook bank, Icemantle trade hall and Eldershine market remain flagged for Jamie (Skynet 358e973a-da23-41ca-8bb0-69c523cd8378)."
+        }
+      ]
+    },
+    {
+      "sourceBeforeSha256": "2291b17039e7f555ad6fa711c00adbfca88a4b6b12880b86755003c81f3b71c8",
+      "sourceAfterSha256": "e16c7eb5de9ea6274fc7bbeb7de2ad3138632f93c8a6b8fb380ee6c18e3e12ee",
+      "reason": "Restore existing compact repo formatting after the confirmed-height correction. Deep-equal parsed documents; no map values changed."
+    }
+  ]
+}

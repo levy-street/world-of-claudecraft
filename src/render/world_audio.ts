@@ -6,12 +6,13 @@ import { DUNGEON_X_THRESHOLD, getActiveWorldContent, isBuiltinWorldActive } from
 import { dockSectionAt } from '../sim/dock_layout';
 import type { MapPointSound } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import { layoutDeckFloorAt } from '../sim/world_layout/decks';
 import type { AmbientPointSource, PointSoundSource, Surface } from './audio_sink';
 
 export function isOnDockDeck(x: number, z: number): boolean {
   for (const dock of getActiveWorldContent().props.docks)
     if (dockSectionAt(dock, x, z) >= 0) return true;
-  return false;
+  return layoutDeckFloorAt(getActiveWorldContent().sceneryDecks, x, z, () => 0) !== -Infinity;
 }
 
 export function footstepSurfaceAt(
@@ -34,6 +35,15 @@ export function footstepSurfaceAt(
 
 export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
   const sources: AmbientPointSource[] = [];
+  for (const source of getActiveWorldContent().sceneryAmbience ?? []) {
+    sources.push({
+      id: source.id,
+      kind: source.kind,
+      x: source.x,
+      z: source.z,
+      y: (source.groundY ?? groundHeight(source.x, source.z, seed)) + source.offsetY,
+    });
+  }
   const props = getActiveWorldContent().props;
   for (let i = 0; i < props.campfires.length; i++) {
     const [x, z] = props.campfires[i];

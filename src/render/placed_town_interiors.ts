@@ -41,7 +41,7 @@ export function createPlacedTownInteriors(): PlacedTownInteriors {
     },
     add(building, groundAt): CameraInterior | null {
       const p = building.placement;
-      const interior = placedTownCameraInterior(building, groundAt(p.x, p.z));
+      const interior = placedTownCameraInterior(building, p.groundY ?? groundAt(p.x, p.z));
       if (!interior) return null;
       // registering an id again replaces that room (interior_camera.ts), never doubles it
       registerCameraInterior(interior);

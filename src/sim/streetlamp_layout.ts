@@ -332,6 +332,11 @@ export function planStreetlamps(
 
 /** A planned site with the fixture identity resolved onto it. */
 export interface PlacedStreetlamp extends LampSite {
+  /** Explicit Studio fixture yaw, independent of the nearest road direction. */
+  fixtureYaw?: number;
+  /** Fixed Studio ground seat, retained when exporting the world back to Studio. */
+  groundY?: number;
+  placementY?: number;
   style: StreetlampStyleId;
   /** Hand-placed venue fixture (the Forgefather fortress lamps): stands
    *  off the road network by design, so the road-relative layout

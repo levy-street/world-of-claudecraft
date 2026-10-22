@@ -10,13 +10,13 @@
     "chest opens at LOW tier (attemptAvailable=false, looted=true), no deed, no coffer + surface exit opens"
   ],
   "draws": 5,
-  "drawDigest": "50aeceb5",
+  "drawDigest": "6b765497",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "c1c475ce",
+      "nextId": 1008,
+      "state": "eec7bfe1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -64,7 +64,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -114,11 +114,11 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -137,7 +137,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -145,7 +145,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 6,
@@ -170,78 +170,78 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1026,
-      "state": "5ca7e968",
-      "events": "97101503",
+      "nextId": 1019,
+      "state": "74133ec3",
+      "events": "2f150d38",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1026,
-      "state": "0e307e86",
-      "events": "def3f5b8",
+      "nextId": 1019,
+      "state": "4ae3b6cd",
+      "events": "eb794834",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1026,
-      "state": "8e0bf2b0",
+      "nextId": 1019,
+      "state": "43d697ab",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1026,
-      "state": "eef316b2",
+      "nextId": 1019,
+      "state": "eb344d69",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1026,
-      "state": "fa885a08",
+      "nextId": 1019,
+      "state": "d2484a63",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1026,
-      "state": "cb253e56",
+      "nextId": 1019,
+      "state": "8351fbbd",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8261aa7c"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 1027,
-      "state": "f08d2cc4",
-      "events": "ad6935d3",
+      "nextId": 1020,
+      "state": "ae01241a",
+      "events": "cbcf4087",
       "rng": {
         "draws": 5,
-        "digest": "50aeceb5"
+        "digest": "6b765497"
       },
       "label": "lockpick-tries-exhausted",
       "players": [
@@ -271,7 +271,7 @@
           },
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 10,
+          "copper": 11,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
@@ -326,7 +326,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -382,7 +382,7 @@
           "fiveSecondRule": 102.45,
           "healPower": 6,
           "hp": 50000,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -409,7 +409,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 6,
@@ -439,7 +439,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1025,
+          "id": 1018,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -472,23 +472,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1027,
-      "state": "bfe280fa",
+      "nextId": 1020,
+      "state": "46001adc",
       "events": "741638a5",
       "rng": {
         "draws": 5,
-        "digest": "50aeceb5"
+        "digest": "6b765497"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 1027,
-      "state": "bbdc0a6c",
+      "nextId": 1020,
+      "state": "f9f76f22",
       "events": "741638a5",
       "rng": {
         "draws": 5,
-        "digest": "50aeceb5"
+        "digest": "6b765497"
       },
       "label": "final",
       "players": [
@@ -518,7 +518,7 @@
           },
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 10,
+          "copper": 11,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
@@ -573,7 +573,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -629,7 +629,7 @@
           "fiveSecondRule": 102.55,
           "healPower": 6,
           "hp": 50000,
-          "id": 1004,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -656,7 +656,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 6,
@@ -686,7 +686,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1025,
+          "id": 1018,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

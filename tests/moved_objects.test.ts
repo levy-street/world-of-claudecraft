@@ -1,9 +1,8 @@
 // Studio-movable gameplay objects (src/sim/moved_objects.ts): farm beds,
 // practice dummies, gather nodes and dungeon doors keep their ids and spawn
 // slots and only change position per map. Every arm below pins one read site
-// against a moved position, plus the built-in identity contract: a world that
-// moves nothing reads the very shipped tables, so the built-in world cannot
-// drift.
+// against a moved position, plus the identity contract: a world that moves
+// nothing reads the very shipped tables, regardless of the active migration.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import {
@@ -153,7 +152,7 @@ describe('moved objects: activating a world', () => {
   });
 });
 
-describe('moved objects: the built-in world cannot drift', () => {
+describe('moved objects: an unmoved world preserves table identity', () => {
   it('every resolver hands back the shipped table or row itself when nothing moved', () => {
     expect(farmPatchesFor(undefined, FARM_PATCHES)).toBe(FARM_PATCHES);
     expect(gatherNodesFor(undefined, GATHER_NODES)).toBe(GATHER_NODES);
@@ -170,8 +169,10 @@ describe('moved objects: the built-in world cannot drift', () => {
     expect(dungeonDoorPos(undefined, crypt)).toBe(crypt.doorPos);
   });
 
-  it('the built-in Sim and the active built-in world read the shipped tables', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+  it('an unmoved Sim and its active world read the shipped tables', () => {
+    const world = movedWorld({});
+    setActiveWorldContent(world);
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world });
     expect(sim.farmPatches).toBe(FARM_PATCHES);
     expect(getActiveWorldContent().objectMoves).toBeUndefined();
     expect(gatherNodesInActiveWorld()).toBe(GATHER_NODES);
@@ -257,7 +258,7 @@ describe('moved objects: practice dummies', () => {
       [objectMoveKey('practiceDummy', HUB_HEALING_DUMMY_ID)]: { x: -72, z: -58 },
       [objectMoveKey('practiceDummy', healingRow.mobId)]: { x: -60, z: -30 },
     });
-    const shipped = new Sim({ seed: 5, playerClass: 'priest', world: { ...BUILTIN_WORLD } });
+    const shipped = new Sim({ seed: 5, playerClass: 'priest', world: movedWorld({}) });
     const moved = new Sim({ seed: 5, playerClass: 'priest', world });
     const a = spawnRows(shipped);
     const b = spawnRows(moved);

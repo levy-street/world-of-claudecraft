@@ -2388,7 +2388,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2288 -> 2281 with the Mirefen mudfin huts: the mud hut collider
     // moved to mudfin_huts.ts mudHutCollider, beside the table the renderer
     // draws the huts from. wc -l. Exact count.
-    ceiling: 2281,
+    // Camp crate emission now lives in camp_crate_colliders.ts, including stable variants.
+    // Native lamp post emission now lives in streetlamp_post_colliders.ts.
+    // Native well seat/camera emission now lives in well_colliders.ts.
+    ceiling: 2255,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

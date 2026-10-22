@@ -1,4 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+afterEach(() => vi.restoreAllMocks());
 
 // Mock the db layer so no Postgres is needed for the online-routing
 // suite at the bottom (the corpse_harvest_sim.test.ts idiom); the offline
@@ -1037,6 +1039,9 @@ describe('node tool gating over the live server', () => {
       server.sim.tick();
     };
 
+    // Pin common rarity so unrelated world spawn draws cannot change this
+    // consent and charge-routing test's exact item counts.
+    vi.spyOn(server.sim.rng, 'next').mockReturnValue(0.5);
     const charges = slot.durability;
     driveFrame({ confirmUse: true });
     expect(server.sim.countItem('fine_iron_ore', s.pid)).toBe(1);
@@ -1044,12 +1049,7 @@ describe('node tool gating over the live server', () => {
 
     meta.nodeHarvestReadyAt.ore_mirefen_t2 = server.sim.time;
     driveFrame({});
-    // Re-hunted for the release/v0.34.0 merge: both parents re-pinned these two
-    // literals independently (the release to 2 and 3 in a456bb5150, this branch
-    // via the dedupe re-hunt in 955d33d032), and the merged content stream lands
-    // on neither. Both unconfirmed mints draw common rarity (1 unit each) under
-    // the merged rng, so the cumulative counts are 1 then 2. Only the rarity
-    // draw moved: the prompt still does not fire, so the charge is kept in both.
+    // Each unconfirmed common mint adds one base-grade unit.
     expect(server.sim.countItem('iron_ore', s.pid)).toBe(1);
     expect(slot.durability).toBe(charges - 1);
 
@@ -1363,6 +1363,8 @@ describe('fine material grades on the live harvest path', () => {
     expect(sim.ctx.canAddItem('iron_ore', 1, pid)).toBe(true);
     expect(sim.ctx.canAddItem('fine_iron_ore', 1, pid)).toBe(false);
 
+    // Isolate consent/capacity from the world's spawn-dependent rarity draw.
+    vi.spyOn(sim.rng, 'next').mockReturnValue(0.5);
     teleportOntoNode(sim, pid, MIREFEN_T2);
     sim.drainEvents();
     // The cast STARTS: the start pre-gate reserved the base grade.
@@ -1371,12 +1373,8 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
     // And COMPLETES: the completion re-gate reserved the same base grade,
     // the grant minted it, and the unfired prompt effect kept its charge.
-    // 3 = the 1-ore partial stack plus a 2-unit rare-rarity mint. Content
-    // commits keep shifting the shared rng stream and with it the seed-42
-    // rarity draw: common (1 unit) before the zones 1-3 quest-dedupe pass,
-    // epic (3 units) after it, rare (2 units) since the v0.35.0 release
-    // content commits (enchant offhand, hunter offhand, the deeds catalog).
-    expect(sim.countItem('iron_ore', pid)).toBe(4);
+    // One starting ore plus the one-unit common mint.
+    expect(sim.countItem('iron_ore', pid)).toBe(2);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(
       sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
@@ -1406,6 +1404,8 @@ describe('fine material grades on the live harvest path', () => {
     sim.addItem('gathering_sickle', 1, pid);
     sim.addItem('gatherers_cache', 1, pid);
 
+    // Isolate consent/capacity from the world's spawn-dependent rarity draw.
+    vi.spyOn(sim.rng, 'next').mockReturnValue(0.5);
     teleportOntoNode(sim, pid, MIREFEN_T2);
     expect(sim.harvestNode(MIREFEN_T2, true, pid)).toBe(true);
     sim.slotToolEffect('herbalism', 'gatherers_cache', undefined, pid);
@@ -1413,9 +1413,8 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // The confirmed mining use survived the herbalism mint: fine grade
-    // minted, mining charge spent. 2 units since the v0.35.0 release content
-    // commits moved the seed-42 rarity draw to rare (2 per mint).
-    expect(sim.countItem('fine_iron_ore', pid)).toBe(3);
+    // minted as one common unit, mining charge spent.
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(1);
     expect(slot.durability).toBe(chargesBefore - 1);
   });
 
@@ -1435,6 +1434,8 @@ describe('fine material grades on the live harvest path', () => {
     meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     expect(meta.toolEffectSlots?.mining?.confirmMode).toBe('always');
 
+    // Isolate consent/capacity from the world's spawn-dependent rarity draw.
+    vi.spyOn(sim.rng, 'next').mockReturnValue(0.5);
     teleportOntoNode(sim, pid, MIREFEN_T2);
     expect(sim.harvestNode(MIREFEN_T2, true, pid)).toBe(true);
     // Replace the casting profession's own slot mid-cast, prompt-mode mint.
@@ -1446,11 +1447,9 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // Consent retired with the old slot: the new prompt slot did not fire,
-    // the harvest minted base grade, and the fresh charge is intact. 2 units
-    // since the v0.35.0 release content commits moved the seed-42 rarity draw
-    // to rare (2 per mint).
+    // the harvest minted one common base-grade unit, and the fresh charge is intact.
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
-    expect(sim.countItem('iron_ore', pid)).toBe(3);
+    expect(sim.countItem('iron_ore', pid)).toBe(1);
     expect(minted?.durability).toBe(mintedCharges);
   });
 

@@ -16,6 +16,13 @@
 //  - loot distribution (L1):   l1_loot_distribution (fair-split remainder draw, need/greed/pass, personal/looter-takes-all)
 //  - master loot:              master_loot (assign direct/duplicate-pid/convert, tie-break draw)
 //
+// Epoch 46 map migration: current service positions and civic ground seats are
+// resolved by identity. Constructor RNG changes required bounded seed re-hunts:
+// master loot 38 -> 1384, heroic claim 4504 -> 4500, craft 5 -> 1,
+// perfecting 1 -> 2, and rift A/B/S 4332/4353/4333 -> 4339/4338/4331.
+// Coverage still requires the actual tie-break, proc, failure and pattern arms;
+// no random draws or trace fields are skipped to preserve the old goldens.
+//
 // All drives are MOVE-safe: they only call public Sim methods + the documented
 // internal plumbing the existing tests use (createMob/addEntity, dealDamage,
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
@@ -67,6 +74,7 @@ import { NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS } from '../../src/sim/nythra
 import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
 import { convertHusks, harvestCrop, plantCrop } from '../../src/sim/professions/farming';
+import { civicGroundY } from '../../src/sim/world_layout/civic';
 
 // The 41-tick window the farming session used to spend riding out the plant
 // flavor cast (2 sec at DT plus one). The cast was retired by the farming-tools
@@ -196,7 +204,7 @@ function requireEntity(sim: AnySim, id: number, context: string): AnyEntity {
 // golden when content moves, since position is sampled, and that is the gate
 // doing its job; what it buys is that the HARVEST stays a harvest.
 function standOnNode(sim: AnySim, e: AnyEntity, nodeId: string): void {
-  const node = gatherNodeById(nodeId);
+  const node = gatherNodeById(nodeId, sim.ctx.objectMoves);
   if (!node) throw new Error(`parity scenario: no gather node ${nodeId}`);
   teleport(sim, e, node.pos.x, node.pos.z);
 }
@@ -846,6 +854,9 @@ function petCommands(): Scenario {
       beef(warlock);
       warlock.resource = warlock.maxResource;
       rec.track(wpid);
+      // Resolve the teleported pose against the authored terrain/colliders
+      // before starting a channel; a collision correction counts as movement.
+      rec.tick(20);
 
       asHarness(sim).summonPet(warlock, 'emberkin'); // createDemonPet -> "answers your summons"
       const imp = sim.petOf(wpid) as AnyEntity;
@@ -1730,7 +1741,7 @@ function masterLoot(): Scenario {
     // re-recorded to whatever the new draw happens to be.
     build: () =>
       new Sim({
-        seed: 38,
+        seed: 1384,
         playerClass: 'warrior',
         noPlayer: true,
       }),
@@ -3572,7 +3583,7 @@ function nythraxisHeroicClaim(): Scenario {
       'class:warrior',
     ],
     sampleEvery: 10,
-    build: () => new Sim({ seed: 4504, playerClass: 'warrior', noPlayer: true }),
+    build: () => new Sim({ seed: 4500, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim;
       const tankPid = sim.addPlayer('warrior', 'HeroicTank') as number;
@@ -5053,7 +5064,7 @@ function cardDuel(): Scenario {
 // byte-identical, exactly what a markVisited-only change predicts. The visit
 // write landed one commit before the re-record, so a bisect straddling that
 // pair sees a false parity red on the intermediate commit.
-function professionsCraft(seed = 5): Scenario {
+function professionsCraft(seed = 1): Scenario {
   return {
     name: 'professions_craft',
     coverage: [
@@ -5310,7 +5321,7 @@ function professionsGather(seed = 1): Scenario {
       // proficiency ceiling (zero common weight), so the rolled tier plus the
       // signed-or-fungible grant shape land in the state sample.
       meta.gatheringProficiency.logging = 100;
-      teleport(sim, p, -62, 8); // wood_eastbrook_1
+      standOnNode(sim, p, 'wood_eastbrook_1');
       sim.harvestNode('wood_eastbrook_1', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('harvest-wood-max-proficiency');
@@ -5337,7 +5348,7 @@ function professionsGather(seed = 1): Scenario {
       // byte-identical, and what moved is this position, the state digests that
       // hash it, and the mirror_lake POI visit the old spot only earned by
       // being underwater. The two-draw-per-harvest contract is untouched.
-      teleport(sim, p, -59, 91); // herb_eastbrook_1
+      standOnNode(sim, p, 'herb_eastbrook_1');
       for (let i = 0; i < 100; i++) {
         meta.gatheringProficiency.herbalism = 0;
         // The retention filter keeps the three tools (ahead of the gate,
@@ -5996,7 +6007,9 @@ export const FARM_GOLDEN_WIN_YIELD_SEED = 7;
  *  describes: re-align a fresh Rng on the observed drive stream, then solve for
  *  the padding count whose golden beat lands under GATHER_RARE_EVENT_CHANCE.
  *  36 is the ONLY count in 0 to 40 that does. */
-export const FARM_GOLDEN_PADDING_CYCLES = 36;
+// World-layout epoch 46 changes the shared constructor stream. Five additional
+// real four-draw cycles reach the same golden roll (0.004931045463308692).
+export const FARM_GOLDEN_PADDING_CYCLES = 41;
 
 function professionsFarmingSession(seed = 1): Scenario {
   // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
@@ -6061,11 +6074,19 @@ function professionsFarmingSession(seed = 1): Scenario {
       sim.addItem('vale_wheat_seed', 2, pid);
       // The step-12 hoe gate: plantCrop now refuses without a wieldable hoe.
       sim.addItem('garden_hoe', 1, pid);
-      // Midway between bed_eastbrook_1 (-24, -84) and bed_eastbrook_2 (-19, -84),
-      // both in reach. The patch moved from the north lane (beds at z 30) to the
-      // rebuilt town's north-east edge at the release/v0.41.0 merge, when the
-      // second wolf run landed on the old site.
-      teleport(sim, p, -21.5, -84);
+      // Use the shipped patch geometry; authored layouts move individual beds.
+      const bedPosition = (id: string) =>
+        requireValue(
+          sim.farmPatches.flatMap((patch) => patch.beds).find((bed) => bed.id === id),
+          id,
+        );
+      const firstBed = bedPosition(BED_READY);
+      const secondBed = bedPosition(BED_WITHERED);
+      const eastbrookStand = {
+        x: (firstBed.x + secondBed.x) / 2,
+        z: (firstBed.z + secondBed.z) / 2,
+      };
+      teleport(sim, p, eastbrookStand.x, eastbrookStand.z);
 
       // Plant one: the first two draws of the session.
       plantCrop(sim.ctx, p, meta, BED_READY, CROP);
@@ -6147,6 +6168,13 @@ function professionsFarmingSession(seed = 1): Scenario {
 
       // HUSK CONVERSION: the withered beat above paid exactly 2 husks, one
       // batch, so this trades them into exactly one compost. Zero draws.
+      const farmer = requireValue(
+        [...sim.entities.values()].find(
+          (entity) => entity.kind === 'npc' && entity.templateId === 'farmer_jessica',
+        ),
+        'Eastbrook farmer',
+      );
+      teleport(sim, p, farmer.pos.x + 1, farmer.pos.z);
       convertHusks(sim.ctx, p, meta);
       rec.snapshot('husks-converted');
 
@@ -6155,7 +6183,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // also drains the toniced harvest's queued gain BEFORE the proficiency
       // write below, so the write is the last word.
       rec.tick(FARM_PLANT_WINDOW_TICKS);
-      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      teleport(sim, p, bedPosition(BED_T3).x, bedPosition(BED_T3).z);
       meta.gatheringProficiency.farming = 75;
       sim.addItem('skysilver_hoe', 1, pid);
       sim.addItem('highland_barley_seed', 1, pid);
@@ -6183,7 +6211,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // fact: a draw or a repeat here moves the event digest and nothing
       // else in the suite would see it. ----
       sim.addItem('vale_wheat_seed', 1, pid);
-      teleport(sim, p, -21.5, -84); // back to the freed Eastbrook bed (the pair's midpoint)
+      teleport(sim, p, eastbrookStand.x, eastbrookStand.z);
       // Ride out the t3 plant's flavor cast remainder (its harvest landed
       // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
       rec.tick(FARM_PLANT_WINDOW_TICKS);
@@ -6285,7 +6313,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       padFinal.survivalRoll = 0.99;
       harvestCrop(sim.ctx, p, meta, BED_WITHERED);
       meta.gatheringProficiency.farming = 75; // restore for the tier-3 beat
-      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      teleport(sim, p, bedPosition(BED_T3).x, bedPosition(BED_T3).z);
       sim.addItem('highland_barley_seed', 1, pid);
       rec.tick(FARM_PLANT_WINDOW_TICKS);
       plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
@@ -6862,7 +6890,7 @@ function catFormAutoSwing(): Scenario {
 // records a miss: the B and S seeds were hunted for an in-window pattern hit
 // (about 1 in 12 seeds). C needs no hunt because its arm RETURNS after draw 0
 // and never reaches the pattern roll at all.
-function riftClearRewards(baseLevel = 25, seed = 4332): Scenario {
+function riftClearRewards(baseLevel = 25, seed = 4339): Scenario {
   const rank = riftRankForBaseLevel(baseLevel);
   // Per-rank coverage: what each rank's arm actually reaches in the numbered
   // ladder, so a reader can see the four rows tile it between them.
@@ -6971,13 +6999,15 @@ function supportedElevationLineOfSight(): Scenario {
       const healer = requireEntity(sim, healerId, 'elevated healer');
       const ally = requireEntity(sim, allyId, 'line-of-sight ally');
       const stall = EASTBROOK_LAYOUT.market.stalls[0];
-      const terrainY = groundHeight(stall.position.x, stall.position.z, WORLD_SEED);
+      const seatY = civicGroundY(stall.id, stall.position, (x, z) =>
+        groundHeight(x, z, WORLD_SEED),
+      );
       const canopyY = supportHeightAt(
         WORLD_SEED,
         stall.position.x,
         stall.position.z,
         PLAYER_BODY_RADIUS,
-        terrainY + stall.height,
+        seatY + stall.height,
       );
       const place = (
         entity: AnyEntity,
@@ -7093,7 +7123,7 @@ export const PERFECTING_WALK_ATTEMPT_CAP = 12;
 // can ever deny for want of a stack mid-walk; the materials denial at the end
 // is staged by removing the ember stack outright.
 const PERFECTING_WALK_STACK = PERFECTING_WALK_ATTEMPT_CAP + 2;
-function perfectingWalk(seed = 1): Scenario {
+function perfectingWalk(seed = 2): Scenario {
   return {
     name: 'perfecting_walk',
     coverage: [
@@ -8091,8 +8121,8 @@ export const SCENARIOS: Scenario[] = [
   // The hunt measured 3 B hits and 4 S hits in 40 consecutive seeds, which is
   // the 0.08 rate showing up where it should.
   riftClearRewards(20, 4332),
-  riftClearRewards(22, 4353),
-  riftClearRewards(28, 4333),
+  riftClearRewards(22, 4338),
+  riftClearRewards(28, 4331),
   // The heroic claim on the raid boss (masterwrought Phase 11f, closing the
   // sibling residual the base table's own append comment records). Appended
   // last, so it lands in the final shard automatically like every other

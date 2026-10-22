@@ -8,6 +8,7 @@ import { DUNGEON_X_THRESHOLD, getActiveWorldContent, isBgPos } from './data';
 import { placementRampCeilingAt } from './placement_ramps';
 import { planeFloorAt } from './plane_floor';
 import { terrainHeight } from './world';
+import { layoutDeckCeilingAt } from './world_layout/decks';
 
 /** The lowest deck or plane floor strictly above `aboveY` at (x, z), or
  *  Infinity. Open world only, like the deck folding in world.ts groundHeightFor
@@ -15,7 +16,16 @@ import { terrainHeight } from './world';
 export function deckCeilingAt(seed: number, x: number, z: number, aboveY: number): number {
   if (isBgPos(x) || x > DUNGEON_X_THRESHOLD) return Number.POSITIVE_INFINITY;
   const content = getActiveWorldContent();
-  let best = placementRampCeilingAt(content, seed, x, z, aboveY);
+  let best = Math.min(
+    placementRampCeilingAt(content, seed, x, z, aboveY),
+    layoutDeckCeilingAt(
+      content.sceneryDecks,
+      x,
+      z,
+      (sx, sz) => terrainHeight(sx, sz, seed),
+      aboveY,
+    ),
+  );
   for (const v of content.colliderVolumes ?? []) {
     if (v.kind !== 'plane') continue;
     const base =

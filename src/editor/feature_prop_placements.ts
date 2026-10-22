@@ -36,6 +36,7 @@ import { MAX_PLACEMENTS, type MapPlacement } from '../sim/map_doc';
 import { PAINTED_TOWNS } from '../sim/painted_towns';
 import type { ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
+import { civicPlacementFields } from '../sim/world_layout/civic';
 import { authoredTownDressingPlacements } from './authored_town_dressing_placements';
 import { decorPropPlacements, worldMajorPropPlacements } from './world_prop_placements';
 
@@ -477,6 +478,7 @@ export function eastbrookVaultPlacements(seed: number): MapPlacement[] {
         WEEKLY_VAULT_FOOTING,
       rotY: cleanZero(vault.rot),
       scale: WEEKLY_VAULT_MAX_DIM / TARGET_HEIGHT,
+      ...civicPlacementFields(vault.id),
       collide: true,
       collisionMode: 'baked',
     },

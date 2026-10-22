@@ -8,12 +8,12 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "6f587c5e",
+  "drawDigest": "029c49fa",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1007,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 1014,
-      "state": "405d7c31",
-      "events": "54c1ac8e",
+      "nextId": 1010,
+      "state": "a59b40eb",
+      "events": "b44b1fec",
       "rng": {
         "draws": 2,
-        "digest": "6f587c5e"
+        "digest": "029c49fa"
       },
       "label": "final",
       "players": [
@@ -84,7 +84,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1007,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -173,7 +173,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1008,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -240,7 +240,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1007
             }
           ],
           "blockChance": 0.05,
@@ -250,11 +250,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.26881,
+          "fallStartY": -0.216451,
           "fiveSecondRule": 99.15,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1007,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -267,14 +267,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 0.26881,
+            "y": -0.216451,
             "z": 20
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -301,11 +301,11 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.282622,
+          "fallStartY": 0.564662,
           "fiveSecondRule": 99.15,
           "healPower": 13,
           "hp": 54,
-          "id": 1012,
+          "id": 1008,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -317,7 +317,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 0.282622,
+            "y": 0.564662,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -325,7 +325,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 13,
@@ -353,11 +353,11 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 0.756301,
+          "fallStartY": -0.543244,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 1013,
+          "id": 1009,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -369,20 +369,20 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 0.756301,
+            "y": -0.543244,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.15,
           "spawnPos": {
             "x": 20,
-            "y": 0.756301,
+            "y": -0.543244,
             "z": 22
           },
           "stats": {
             "armor": 10
           },
-          "tappedById": 1011,
+          "tappedById": 1007,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

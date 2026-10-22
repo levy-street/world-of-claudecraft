@@ -1,6 +1,6 @@
 {
   "scenario": "perfecting_walk",
-  "seed": 1,
+  "seed": 2,
   "sampleEvery": 20,
   "ticks": 0,
   "coverage": [
@@ -16,14 +16,14 @@
     "not-apex denial (a held prismglass_setting): the not-masterwrought line above the material gate, ZERO draws",
     "lock-only shortfall (every material cell locked, raw counts intact): the DEDICATED locked line, not the missing-materials one, ZERO draws"
   ],
-  "draws": 8,
-  "drawDigest": "3c3c49a7",
+  "draws": 6,
+  "drawDigest": "4df3b9ff",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "e889f096",
+      "nextId": 1008,
+      "state": "d52645c9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,7 +71,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -123,7 +123,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -133,11 +133,11 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -150,14 +150,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -181,9 +181,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "110e4baf",
-      "events": "8c88bb71",
+      "nextId": 1008,
+      "state": "fed63dbe",
+      "events": "0998ef3d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -240,7 +240,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -319,7 +319,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -329,11 +329,11 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -346,14 +346,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -377,9 +377,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "110e4baf",
-      "events": "8886a5fa",
+      "nextId": 1008,
+      "state": "fed63dbe",
+      "events": "204f9df6",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -436,7 +436,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -515,7 +515,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -525,11 +525,11 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -542,14 +542,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -573,12 +573,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "6191d42c",
-      "events": "4ac06e05",
+      "nextId": 1008,
+      "state": "7281495d",
+      "events": "e3139c0e",
       "rng": {
-        "draws": 6,
-        "digest": "1272a77a"
+        "draws": 4,
+        "digest": "cfd9a34a"
       },
       "label": "perfect-bagged-walked",
       "players": [
@@ -632,7 +632,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -655,7 +655,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -670,19 +670,19 @@
               "itemId": "warhewn_signet"
             },
             {
-              "count": 8,
+              "count": 10,
               "itemId": "makers_ember"
             },
             {
-              "count": 8,
+              "count": 10,
               "itemId": "sundered_essence"
             },
             {
-              "count": 8,
+              "count": 10,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 8,
+                  "count": 10,
                   "source": {}
                 }
               ]
@@ -720,7 +720,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -730,11 +730,11 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -747,14 +747,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -778,12 +778,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "6191d42c",
-      "events": "53e31299",
+      "nextId": 1008,
+      "state": "7281495d",
+      "events": "e6a134ad",
       "rng": {
-        "draws": 6,
-        "digest": "1272a77a"
+        "draws": 4,
+        "digest": "cfd9a34a"
       },
       "label": "perfect-denied-perfected",
       "players": [
@@ -837,7 +837,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -860,7 +860,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -875,19 +875,19 @@
               "itemId": "warhewn_signet"
             },
             {
-              "count": 8,
+              "count": 10,
               "itemId": "makers_ember"
             },
             {
-              "count": 8,
+              "count": 10,
               "itemId": "sundered_essence"
             },
             {
-              "count": 8,
+              "count": 10,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 8,
+                  "count": 10,
                   "source": {}
                 }
               ]
@@ -925,7 +925,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -935,11 +935,11 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -952,14 +952,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -983,12 +983,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "a1679fa8",
-      "events": "c9480ba7",
+      "nextId": 1008,
+      "state": "e5295d03",
+      "events": "b2b18356",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-worn-attempted",
       "players": [
@@ -1042,7 +1042,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1051,7 +1051,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -1071,7 +1071,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -1082,19 +1082,19 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "makers_ember"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -1132,7 +1132,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1142,13 +1142,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1161,14 +1161,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1192,12 +1192,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2ec01bec",
+      "nextId": 1008,
+      "state": "d9bf5809",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-embers-stripped",
       "players": [
@@ -1251,7 +1251,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1260,7 +1260,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -1280,7 +1280,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -1291,15 +1291,15 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -1337,7 +1337,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1347,13 +1347,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1366,14 +1366,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1397,12 +1397,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2ec01bec",
-      "events": "3882eb79",
+      "nextId": 1008,
+      "state": "d9bf5809",
+      "events": "c70f38f5",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-denied-materials",
       "players": [
@@ -1456,7 +1456,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1465,7 +1465,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -1485,7 +1485,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -1496,15 +1496,15 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -1542,7 +1542,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1552,13 +1552,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1571,14 +1571,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1602,12 +1602,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2ec01bec",
+      "nextId": 1008,
+      "state": "d9bf5809",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-staged-noitem",
       "players": [
@@ -1661,7 +1661,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1670,7 +1670,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -1690,7 +1690,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -1701,15 +1701,15 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -1747,7 +1747,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1757,13 +1757,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1776,14 +1776,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -1807,12 +1807,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2ec01bec",
-      "events": "d35a2997",
+      "nextId": 1008,
+      "state": "d9bf5809",
+      "events": "4cf6c66b",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-denied-noitem",
       "players": [
@@ -1866,7 +1866,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1875,7 +1875,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -1895,7 +1895,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -1906,15 +1906,15 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -1952,7 +1952,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -1962,13 +1962,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1981,14 +1981,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -2012,12 +2012,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2ec01bec",
-      "events": "e2d61bdb",
+      "nextId": 1008,
+      "state": "d9bf5809",
+      "events": "4a67a8d7",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-denied-notapex",
       "players": [
@@ -2071,7 +2071,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2080,7 +2080,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -2100,7 +2100,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -2111,15 +2111,15 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -2157,7 +2157,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -2167,13 +2167,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2186,14 +2186,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -2217,12 +2217,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "74becd0c",
-      "events": "e19b9d05",
+      "nextId": 1008,
+      "state": "96f96a8f",
+      "events": "95a399a1",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-materials-locked",
       "players": [
@@ -2276,7 +2276,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2285,7 +2285,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -2305,7 +2305,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -2316,21 +2316,21 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "instance": {
                 "locked": true
               },
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "instance": {
                 "locked": true
               },
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -2375,7 +2375,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -2385,13 +2385,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2404,14 +2404,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -2435,12 +2435,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "74becd0c",
-      "events": "32e75385",
+      "nextId": 1008,
+      "state": "96f96a8f",
+      "events": "c93e6309",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "perfect-denied-locked",
       "players": [
@@ -2494,7 +2494,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2503,7 +2503,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -2523,7 +2523,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -2534,21 +2534,21 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "instance": {
                 "locked": true
               },
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "instance": {
                 "locked": true
               },
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -2593,7 +2593,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -2603,13 +2603,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2622,14 +2622,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,
@@ -2653,12 +2653,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "74becd0c",
+      "nextId": 1008,
+      "state": "96f96a8f",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 6,
+        "digest": "4df3b9ff"
       },
       "label": "final",
       "players": [
@@ -2712,7 +2712,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2721,7 +2721,7 @@
           },
           "equipmentInstance": {
             "ring1": {
-              "boundTo": 1004,
+              "boundTo": 1000,
               "perfecting": 1
             }
           },
@@ -2741,7 +2741,7 @@
             {
               "count": 1,
               "instance": {
-                "boundTo": 1004,
+                "boundTo": 1000,
                 "perfected": true,
                 "rolled": {
                   "stats": {
@@ -2752,21 +2752,21 @@
               "itemId": "wyrmfall_pendant"
             },
             {
-              "count": 6,
+              "count": 8,
               "instance": {
                 "locked": true
               },
               "itemId": "sundered_essence"
             },
             {
-              "count": 6,
+              "count": 8,
               "instance": {
                 "locked": true
               },
               "itemId": "prismglass_setting",
               "materialSources": [
                 {
-                  "count": 6,
+                  "count": 8,
                   "source": {}
                 }
               ]
@@ -2811,7 +2811,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1004
+              "sourceId": 1000
             }
           ],
           "blockChance": 0.05,
@@ -2821,13 +2821,13 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hitBonus": 0.025,
           "hitRating": 25,
           "hp": 872,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2840,14 +2840,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 5,

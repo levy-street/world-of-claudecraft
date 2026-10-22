@@ -10,6 +10,7 @@ import {
 } from '../sim/pitched_segment';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
+import { civicGroundY } from '../sim/world_layout/civic';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
@@ -1007,7 +1008,7 @@ function buildMicroBatches(
       placementMatrix(
         template,
         stall.position.x,
-        groundAt(stall.position.x, stall.position.z),
+        civicGroundY(stall.id, stall.position, groundAt),
         stall.position.z,
         stall.rotation,
         stall.width,

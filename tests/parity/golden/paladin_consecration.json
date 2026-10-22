@@ -8,14 +8,14 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 1698,
-  "drawDigest": "70c13361",
+  "draws": 1699,
+  "drawDigest": "477ca829",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "b52bbc9a",
+      "nextId": 1008,
+      "state": "05f6cf59",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -65,7 +65,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -120,11 +120,11 @@
           "critChance": 0.0585,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0585,
-          "fallStartY": -2,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "healPower": 7,
           "hp": 105,
-          "id": 1004,
+          "id": 1000,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -138,7 +138,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "potionCooldownUntil": -1,
@@ -146,7 +146,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 7,
@@ -170,122 +170,122 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "48133999",
-      "events": "de1879d9",
+      "nextId": 1009,
+      "state": "018f616e",
+      "events": "2dcc32f1",
       "rng": {
-        "draws": 6,
-        "digest": "a5c359b6"
+        "draws": 4,
+        "digest": "a92b4058"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "3d3cb0d2",
-      "events": "eab2d3da",
+      "nextId": 1009,
+      "state": "c341919a",
+      "events": "9bd55f5e",
       "rng": {
-        "draws": 7,
-        "digest": "2e7e1c59"
+        "draws": 5,
+        "digest": "81b97e74"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "f349909b",
-      "events": "59c5cd4f",
+      "nextId": 1009,
+      "state": "3f215516",
+      "events": "b81b6897",
       "rng": {
-        "draws": 191,
-        "digest": "cf1c80b6"
+        "draws": 184,
+        "digest": "17964c84"
       }
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1013,
-      "state": "ba5521d3",
-      "events": "eab2d3da",
+      "nextId": 1009,
+      "state": "7aebb0e0",
+      "events": "adadda62",
       "rng": {
-        "draws": 348,
-        "digest": "83fac9ec"
+        "draws": 343,
+        "digest": "3eaabd72"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1013,
-      "state": "acc68c53",
-      "events": "4b43ec03",
+      "nextId": 1009,
+      "state": "ffffa69e",
+      "events": "4c876bc6",
       "rng": {
-        "draws": 547,
-        "digest": "9e0ba47b"
+        "draws": 542,
+        "digest": "aa464e6d"
       }
     },
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1013,
-      "state": "0ee131f1",
-      "events": "c990449c",
+      "nextId": 1009,
+      "state": "554742ff",
+      "events": "f0bd79f7",
       "rng": {
-        "draws": 750,
-        "digest": "3fd9f210"
+        "draws": 746,
+        "digest": "eaee93db"
       }
     },
     {
       "tick": 140,
       "time": 7,
-      "nextId": 1013,
-      "state": "76d2c0cd",
-      "events": "5f537afa",
+      "nextId": 1009,
+      "state": "2431eb13",
+      "events": "12d06820",
       "rng": {
-        "draws": 974,
-        "digest": "d3cf8e0f"
+        "draws": 959,
+        "digest": "f8d396c6"
       }
     },
     {
       "tick": 160,
       "time": 8,
-      "nextId": 1013,
-      "state": "5c11f173",
-      "events": "f454ebfb",
+      "nextId": 1009,
+      "state": "c3562a11",
+      "events": "adadda62",
       "rng": {
-        "draws": 1210,
-        "digest": "812869f6"
+        "draws": 1192,
+        "digest": "1016c143"
       }
     },
     {
       "tick": 180,
       "time": 9,
-      "nextId": 1013,
-      "state": "e2d98e9e",
-      "events": "3262094d",
+      "nextId": 1009,
+      "state": "3fd1d87e",
+      "events": "440fbe93",
       "rng": {
-        "draws": 1431,
-        "digest": "9fb6d4ce"
+        "draws": 1425,
+        "digest": "83ba4666"
       }
     },
     {
       "tick": 200,
       "time": 10,
-      "nextId": 1013,
-      "state": "f3fb66f3",
+      "nextId": 1009,
+      "state": "89372e41",
       "events": "741638a5",
       "rng": {
         "draws": 1696,
-        "digest": "f6c2317d"
+        "digest": "f0ef7404"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
-      "nextId": 1013,
-      "state": "03e02a92",
+      "nextId": 1009,
+      "state": "06c83d16",
       "events": "741638a5",
       "rng": {
-        "draws": 1698,
-        "digest": "70c13361"
+        "draws": 1699,
+        "digest": "477ca829"
       },
       "label": "final",
       "players": [
@@ -316,14 +316,14 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 237,
-            "damageTaken": 20
+            "damageDealt": 246,
+            "damageTaken": 21
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 237
+              "damageDealt": 246
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -369,7 +369,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1000,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -433,11 +433,11 @@
           "critChance": 0.068,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.068,
-          "fallStartY": -2,
+          "fallStartY": -0.005501,
           "fiveSecondRule": 10,
           "healPower": 16,
-          "hp": 49980,
-          "id": 1004,
+          "hp": 49979,
+          "id": 1000,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -454,7 +454,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005501,
             "z": -57
           },
           "potionCooldownUntil": -1,
@@ -462,7 +462,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -58
           },
           "spellPower": 16,
@@ -474,7 +474,7 @@
             "sta": 82,
             "str": 60
           },
-          "targetId": 1012,
+          "targetId": 1008,
           "templateId": "paladin",
           "weapon": {
             "max": 5,
@@ -483,7 +483,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1000,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 2.05,
@@ -491,18 +491,18 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -3.084978,
-          "fallStartY": -2,
+          "facing": -3.073511,
+          "fallStartY": -0.005965,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39763,
-          "id": 1012,
+          "hp": 39754,
+          "id": 1008,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": -93.891676,
-            "y": -2,
-            "z": -55.08869
+            "x": -93.862013,
+            "y": -0.005387,
+            "z": -54.976344
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -512,32 +512,32 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -93.891676,
-            "y": -2,
-            "z": -55.08869
+            "x": -93.862013,
+            "y": -0.005387,
+            "z": -54.976344
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -94,
-            "y": -2,
+            "y": -0.005965,
             "z": -55
           },
           "stats": {
             "armor": 40
           },
           "swingTimer": 0.05,
-          "tappedById": 1004,
+          "tappedById": 1000,
           "templateId": "forest_wolf",
           "threat": [
             [
-              1004,
-              1079.35
+              1000,
+              1120.3
             ]
           ],
           "wanderTarget": {
-            "x": -90.255738,
-            "y": -2,
-            "z": -58.065624
+            "x": -92.027061,
+            "y": -0.01193,
+            "z": -54.661764
           },
           "wanderTimer": 30,
           "weapon": {

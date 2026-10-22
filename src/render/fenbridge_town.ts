@@ -10,6 +10,7 @@ import {
 } from '../sim/pitched_segment';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
+import { civicGroundY } from '../sim/world_layout/civic';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
@@ -542,7 +543,7 @@ function microPlacements() {
       id: cistern.id,
       assetId: cistern.assetId,
       position: cistern.position,
-      rotation: 0,
+      rotation: cistern.rotation,
       width: cistern.nativeDimensions.width,
       height: cistern.nativeDimensions.height,
       depth: cistern.nativeDimensions.depth,
@@ -582,7 +583,7 @@ function buildMicroBatches(
     const matrix = placementMatrix(
       template,
       placement.position.x,
-      groundAt(placement.position.x, placement.position.z),
+      civicGroundY(placement.id, placement.position, groundAt),
       placement.position.z,
       placement.rotation,
       placement.width,

@@ -288,7 +288,7 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
       style: site.style,
       // Turn the fixture's own lit end over the road: a hanging lantern reaches
       // out across the track, its post left standing out on the verge.
-      yaw: lampFixtureYaw(site.roadYaw, axis?.[0] ?? 0, axis?.[1] ?? 0),
+      yaw: site.fixtureYaw ?? lampFixtureYaw(site.roadYaw, axis?.[0] ?? 0, axis?.[1] ?? 0),
     };
   });
 

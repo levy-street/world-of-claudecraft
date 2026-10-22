@@ -1,3 +1,7 @@
+import { WORLD_LAYOUT } from './world_layout/active';
+import { placeLayoutBuilding } from './world_layout/building';
+import { civicPosition } from './world_layout/civic';
+
 export interface Point2 {
   x: number;
   z: number;
@@ -648,7 +652,7 @@ function makePlacedBuilding(spec: {
     halfDepth: (annex.depth * size) / 2,
     rotation: spec.rotation,
   }));
-  return {
+  const building = {
     id: spec.id,
     assetId: spec.assetId,
     kind: spec.kind,
@@ -698,6 +702,7 @@ function makePlacedBuilding(spec: {
       rotation: spec.rotation,
     },
   };
+  return placeLayoutBuilding(building, WORLD_LAYOUT.buildings[spec.id]);
 }
 
 // Where a visitor stands at a placed building's door: at the foot of its
@@ -1010,23 +1015,26 @@ const MARKET_STALL_SPECS = [
   ['eastbrook_market_stall_world_market', 'gold', { x: -20.5, z: -94 }, 2.4805494847391065],
   ['eastbrook_market_stall_provisions', 'green', { x: -19, z: -108 }, 0.6610431688506869],
 ] as const;
-const MARKET_STALLS = MARKET_STALL_SPECS.map(([id, canopyVariant, position, rotation]) => {
-  const base = makeObbPlacement(
-    id,
-    '/models/props/eastbrook_market_stall.glb',
-    position,
-    2.8,
-    2.2,
-    rotation,
-  );
-  return {
-    ...base,
-    canopyVariant,
-    radiusFromCivic: Math.hypot(position.x - CIVIC_CENTER.x, position.z - CIVIC_CENTER.z),
-    height: 2.7,
-    frontStandingPoint: localToWorld(position, rotation, 0, 1.6),
-  };
-});
+const MARKET_STALLS = MARKET_STALL_SPECS.map(
+  ([id, canopyVariant, originalPosition, originalRotation]) => {
+    const { position, rotation } = civicPosition(id, originalPosition, originalRotation);
+    const base = makeObbPlacement(
+      id,
+      '/models/props/eastbrook_market_stall.glb',
+      position,
+      2.8,
+      2.2,
+      rotation,
+    );
+    return {
+      ...base,
+      canopyVariant,
+      radiusFromCivic: Math.hypot(position.x - CIVIC_CENTER.x, position.z - CIVIC_CENTER.z),
+      height: 2.7,
+      frontStandingPoint: localToWorld(position, rotation, 0, 1.6),
+    };
+  },
+);
 
 function makeFence(
   id: string,
@@ -1478,7 +1486,8 @@ const GRAVEYARD_ANCHOR = { x: 37.5, z: -99.3 } as const;
 // Studio map's own spot its box ran 0.34 yd into the bank's wall, so it
 // stands half a yard further out along its own width; it stands on the
 // bank's shelf (EASTBROOK_LAYOUT.pads).
-const WEEKLY_VAULT = { x: -73.73, z: -103.4, rot: Math.PI / 4 } as const;
+const VAULT_SEAT = civicPosition('eastbrook_weekly_vault', { x: -73.73, z: -103.4 }, Math.PI / 4);
+const WEEKLY_VAULT = { ...VAULT_SEAT.position, rot: VAULT_SEAT.rotation };
 
 const SERVICES = {
   playerStart: {
