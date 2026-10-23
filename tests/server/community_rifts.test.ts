@@ -92,7 +92,7 @@ describe('rift population boot and persistence (one-per-zone rotation)', () => {
 
     fillPopulation(server.sim);
     const zoneCount = eligibleRiftZones().length;
-    expect(zoneCount).toBe(11);
+    expect(zoneCount).toBe(8);
     // Literal cadence pins: the tuning itself is load-bearing (an uncleared
     // collapse replaces immediately only while the lifetime stays an exact
     // multiple of the cycle, so the collapse lands on a boundary).

@@ -24,8 +24,8 @@ export const DRAKELANDS_ZONE: ZoneDef = {
   id: 'drakelands',
   worldPvp: 'ffa',
   name: 'The Drakelands',
-  riftPortalEligible: true,
-  riftTierWeights: { B: 0.45, A: 0.4, S: 0.15 },
+  // No natural Rift portals in the northern row (Amberfall, Frostveil,
+  // Drakelands): maintainer decision, pinned in tests/rift_portals.test.ts.
   zMin: 1820,
   zMax: 2420,
   xMin: 180,

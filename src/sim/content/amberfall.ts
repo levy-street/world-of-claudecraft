@@ -22,8 +22,8 @@ export const AMBERFALL_ZONE: ZoneDef = {
   id: 'amberfall',
   worldPvp: 'ffa',
   name: 'The Amberfall',
-  riftPortalEligible: true,
-  riftTierWeights: { B: 0.15, A: 0.55, S: 0.3 },
+  // No natural Rift portals in the northern row (Amberfall, Frostveil,
+  // Drakelands): maintainer decision, pinned in tests/rift_portals.test.ts.
   zMin: 1820,
   zMax: 2380,
   xMin: -540,
