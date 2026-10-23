@@ -5,10 +5,12 @@
 //
 // Loading contract: fetches kick off at module import and register with the
 // preload registry; main.ts awaits assetsReady() before the Renderer exists,
-// so everything here can assume resolved GLTFs synchronously afterwards. The
-// landing character-creation preview is the one exception: it awaits the
-// narrower charactersReady() below instead (this file's boot GLBs + skin
-// atlases only, with its own retries), since gating it on the site-wide
+// so everything here can assume resolved GLTFs synchronously afterwards. Mob
+// bodies do not fetch at import: they wait in the deferred lane until a play
+// screen opens or startGame begins (see launcherUrls). The landing
+// character-creation preview does not await assetsReady(): it awaits the
+// narrower launcherCharactersReady() below instead (this file's launcher GLBs,
+// with its own retries), since gating it on the site-wide
 // assetsReady() left an unrelated preload failure anywhere on the site
 // permanently blanking it on a cold, first-visit cache.
 import * as THREE from 'three';
@@ -21,7 +23,7 @@ import {
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { type LoadedGltf, loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
-import { registerPreload } from '../assets/preload';
+import { registerDeferredPreload, registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
@@ -99,6 +101,7 @@ import {
 } from './paladin_templars_verdict_clip';
 import {
   characterStreamPlan,
+  isStreamedBodyUrl,
   RiftBodyLanes,
   RiftBodyStreamTrigger,
   type RiftBodyStreamWorld,
@@ -684,8 +687,38 @@ function residentOrEnsure(url: string | null): string | null {
   return null;
 }
 
-for (const url of preloadUrls) {
+// Desktop and Android keep the mob bodies in the gate (above), but nothing the
+// launcher draws needs one: the character preview builds player bodies and
+// weapons only (druid forms live under models/creatures/ and build in-world). So they wait in the deferred lane instead of downloading on
+// the home page, where they were about 78 MB of the first visit. assetsReady()
+// still awaits them before the Renderer exists (beginDeferredPreloads runs first
+// in startGame), so a mob's view and click target are still there at spawn, and
+// warmWorldCharacterBodies() starts them early once the player opens a play
+// screen. iOS streams these bodies after entry instead, so its set is empty.
+const launcherUrls = preloadUrls.filter((url) => !isStreamedBodyUrl(url));
+const deferredMobBodyUrls = preloadUrls.filter(isStreamedBodyUrl);
+for (const url of launcherUrls) {
   registerPreload(prepareCharacterUrl(url));
+}
+for (const url of deferredMobBodyUrls) {
+  registerDeferredPreload(() => prepareCharacterUrl(url));
+}
+
+let worldBodiesWarmed = false;
+/**
+ * Start the deferred mob-body fetches ahead of world entry (idempotent; returns
+ * how many fetches this call started). main.ts calls it when a play screen opens
+ * (character select, character creation, offline select), so the bodies are
+ * usually resident by the time the player enters the world. prepareCharacterUrl
+ * memoizes in-flight loads, so the deferred lane later reuses these same tasks.
+ */
+export function warmWorldCharacterBodies(): number {
+  if (worldBodiesWarmed) return 0;
+  worldBodiesWarmed = true;
+  for (const url of deferredMobBodyUrls) {
+    void prepareCharacterUrl(url).catch(() => undefined);
+  }
+  return deferredMobBodyUrls.length;
 }
 
 let streamedStarted = false;
@@ -812,10 +845,25 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
  *  retry has already spent that whole window failing. Waiting again before the
  *  next outer attempt (same schedule, reused) widens the retry window instead
  *  of hammering a still-flaky connection three more times back to back in one
- *  tick. */
-export async function charactersReady(maxAttempts = 3): Promise<void> {
+ *  tick.
+ *
+ *  Covers the whole gate set, the deferred mob bodies included, for callers that
+ *  build mob bodies directly (the cannon encounter). The launcher preview uses
+ *  launcherCharactersReady() instead. */
+export function charactersReady(maxAttempts = 3): Promise<void> {
+  return charactersResident(preloadUrls, maxAttempts);
+}
+
+/** charactersReady() over the launcher set only, for the character-creation
+ *  preview: the deferred mob bodies are world content, and waiting on them here
+ *  would pull them back onto the home page. */
+export function launcherCharactersReady(maxAttempts = 3): Promise<void> {
+  return charactersResident(launcherUrls, maxAttempts);
+}
+
+async function charactersResident(urls: readonly string[], maxAttempts: number): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
+    const missingGltf = urls.filter((u) => !gltfByUrl.has(assetUrl(u)));
     // Deferred atlases (every host, see eagerSkinAtlases above) are not boot
     // assets: gating the preview on them would re-create the exact
     // entry-footprint spike the deferral removes.

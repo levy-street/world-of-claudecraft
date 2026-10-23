@@ -18,24 +18,30 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `assets.ts`: eager `registerPreload` of `characterPreloadUrls()`, the
   tier-INDEPENDENT union of every graphics tier's URL set (the why lives in
   the Asset loading section of `src/render/CLAUDE.md` and the P0 comment in
-  `manifest.ts`). `prepareVisual(key)` memoizes normalize transform, resolved
-  clips, click-capsule radius, and a baked idle-pose geo (far-LOD/shadow
-  proxy). `charactersReady()` is deliberately NARROWER than the site-wide
-  `assetsReady()`: only this file's boot GLBs (the skin atlases defer on every
-  host and rejoin this gate only if the eagerSkinAtlases kill-switch in
-  `assets.ts` is ever flipped back), with its own
-  delayed, backed-off retry loop, so a transient failure anywhere else on the
-  site can never permanently blank the landing character-creation preview
-  (`src/main.ts` awaits it there instead of `assetsReady()`;
-  `tests/character_preview_boot.test.ts`). Which GLBs leave that gate is
-  `rift_body_stream_core.ts` `characterStreamPlan`: on the iOS memory profile
+  `manifest.ts`), except the mob bodies (`models/creatures/`,
+  `models/chars/enemies/`): the launcher draws none, so on desktop and Android
+  they register in the deferred lane, still gating the Renderer, and
+  `warmWorldCharacterBodies()` starts them early when a play screen opens
+  (`tests/defer_mob_bodies.test.ts`). iOS streams them after entry instead.
+  `prepareVisual(key)` memoizes normalize transform, resolved clips,
+  click-capsule radius, and a baked idle-pose geo (far-LOD/shadow proxy).
+  `launcherCharactersReady()` is deliberately NARROWER than the site-wide
+  `assetsReady()`: only this file's launcher GLBs (the skin atlases defer on
+  every host and rejoin this gate only if the eagerSkinAtlases kill-switch in
+  `assets.ts` is ever flipped back), with its own delayed, backed-off retry
+  loop, so a transient failure anywhere else on the site can never permanently
+  blank the landing character-creation preview (`src/main.ts` awaits it there
+  instead of `assetsReady()`; `tests/character_preview_boot.test.ts`).
+  `charactersReady()` is the same loop over every gate GLB, mob bodies
+  included, for in-world callers that build mob bodies directly. Which GLBs
+  leave the gate is `rift_body_stream_core.ts` `characterStreamPlan`: on the iOS memory profile
   every creature body streams, the overworld ones right after first paint and
   the Rift-only ones (derived from the Rift and Buried Hoard templates, never a
   file name) in two paced lanes (`RiftBodyLanes`: the Rift lane a natural Rift
   needs, the hoard lane only a Buried Hoard needs) that `RiftBodyStreamTrigger`
   opens on a read treasure map, a reachable entrance, or the player inside;
-  every other profile gates them all. The client loop polls it through
-  `pollRiftCharacterStream`. `tests/ios_rift_body_stream.test.ts` pins the class,
+  every other profile gates them all, in the deferred lane above. The client
+  loop polls it through `pollRiftCharacterStream`. `tests/ios_rift_body_stream.test.ts` pins the class,
   the lanes, the pacing, and the on-disk budget of the iOS post-entry creature
   stream.
 - `armor_dye.ts`: the outfit-colorway dye shader layer (`attachArmorDye`, plus

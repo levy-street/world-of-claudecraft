@@ -97,6 +97,9 @@ const INVENTORY: Record<string, Answer> = {
     exempt: 'CPU: asset-load listeners',
   },
   'src/render/characters/assets.ts:streamedStarted': { exempt: 'CPU: the asset stream started' },
+  'src/render/characters/assets.ts:worldBodiesWarmed': {
+    exempt: 'CPU: the mob-body downloads started',
+  },
   'src/render/characters/portrait.ts:readyListeners': {
     exempt: 'CPU: asset-load listeners of the portrait context',
   },
