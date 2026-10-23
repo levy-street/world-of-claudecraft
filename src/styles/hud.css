@@ -6732,6 +6732,9 @@
     width: var(--tracker-w);
     padding: 3px 5px 4px;
   }
+  .mt-mobile-tools {
+    display: none;
+  }
   .mt-panel .panel-title {
     display: flex;
     align-items: center;

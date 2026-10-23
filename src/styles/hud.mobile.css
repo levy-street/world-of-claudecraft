@@ -4134,20 +4134,82 @@
     display: none;
   }
   body.mobile-touch #meters-window {
+    /* Touch owns a stable physical footprint, independent of desktop meter
+       zoom and global HUD zoom. Preserve saved settings for desktop. */
+    zoom: calc(1 / var(--ui-scale, 1));
     position: fixed;
-    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    left: calc(max(18px, env(safe-area-inset-left)) + 144px);
     right: auto;
     top: auto;
-    bottom: calc(31px + env(safe-area-inset-bottom));
-    width: min(220px, calc(50vw - 144px));
+    bottom: calc(var(--mobile-button-row-lift) + 12px);
+    width: min(190px, calc(100vw - 180px));
     min-width: 142px;
-    max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 128px));
-    /* Scroll vertically instead of clipping: the empty-state discoverability
-       hint can wrap to several lines in this narrow column, and a clipped hint
-       with no scroll affordance would silently hide it. */
+    height: auto !important;
+    max-height: min(200px, calc(var(--app-vh) - var(--mobile-button-row-lift) - 32px));
+    overflow: visible;
+    z-index: 25;
+  }
+  body.mobile-touch #meters-window .panel-title {
+    flex-wrap: nowrap;
+    height: auto;
+    min-height: 40px;
+    gap: 2px;
+    margin-bottom: 2px;
+    padding: 0;
+  }
+  body.mobile-touch #meters-window .mt-view {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  body.mobile-touch #meters-window .mt-tools-host {
+    gap: 0;
+    margin-left: 0;
+  }
+  body.mobile-touch #meters-window .mt-tools-host > .mt-new-window,
+  body.mobile-touch #meters-window .mt-tools-host > .mt-reset,
+  body.mobile-touch #meters-window .mt-tools-host > .mt-settings,
+  body.mobile-touch #meters-window .mt-seg-trigger {
+    display: none;
+  }
+  body.mobile-touch #meters-window .mt-mobile-tools,
+  body.mobile-touch #meters-window .mt-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+  }
+  body.mobile-touch #meters-window .mt-mode-trigger,
+  body.mobile-touch #meters-window .mt-back-btn {
+    flex: 1 1 auto;
+    display: block;
+    min-width: 40px;
+    min-height: 40px;
+    line-height: 40px;
+    padding: 0 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch #meters-window .mt-rows {
+    max-height: 80px;
     overflow-y: auto;
     overflow-x: hidden;
-    z-index: 25;
+    overscroll-behavior: contain;
+  }
+  body.mobile-touch #meters-window .mt-row {
+    height: 40px;
+  }
+  body.mobile-touch #meters-window .mt-label,
+  body.mobile-touch #meters-window .mt-num,
+  body.mobile-touch #meters-window .mt-rank {
+    line-height: 40px;
+  }
+  body.mobile-touch #meters-window .mt-icon {
+    top: 12px;
   }
   body.mobile-touch #target-auras-window {
     display: none !important;
@@ -4370,7 +4432,7 @@
      player frame, symmetric by construction.) */
   body.mobile-touch.mobile-left-handed #meters-window {
     left: auto;
-    right: calc(max(18px, env(safe-area-inset-right)) + 132px);
+    right: calc(max(18px, env(safe-area-inset-right)) + 144px);
   }
   body.mobile-touch #banner {
     top: 18%;
@@ -9464,14 +9526,7 @@
       );
     }
     body.mobile-touch #meters-window {
-      position: fixed;
-      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
-      right: auto;
-      top: auto;
-      bottom: calc(26px + env(safe-area-inset-bottom));
-      width: min(190px, calc(50vw - 142px));
-      min-width: 128px;
-      max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));
+      width: min(170px, calc(100vw - 180px));
       transform: none;
     }
     /* The centre-top lane is clear of the target/party stack on the left and

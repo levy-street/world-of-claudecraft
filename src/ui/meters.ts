@@ -58,6 +58,7 @@ import { fmtDuration, fmtNum, fmtPercent, fmtPerSecond, fmtPerSecondRow } from '
 import { MeterFrame } from './meters_frame';
 import { METER_FRAME_LIMITS } from './meters_frame_core';
 import { buildMeterTabMenu, type MeterMenuRow } from './meters_menu_view';
+import { wireMobileMeterTools } from './meters_mobile_tools';
 import { MetersOptionsDialog } from './meters_options_dialog';
 import {
   EncounterPhaseManager,
@@ -1254,6 +1255,7 @@ export class MetersPanel {
   private frame: MeterFrame | null = null;
   private settings: MetersSettings;
   private optionsDialog: MetersOptionsDialog | null = null;
+  private readonly mobileTools: ReturnType<typeof wireMobileMeterTools>;
   private readonly deps?: MetersDeps;
   /** Resolved ONCE at construction (static children of `root`, never
    *  rebuilt): tabButtonElement/historyArrowElement used to re-query on
@@ -1479,6 +1481,18 @@ export class MetersPanel {
         this.openSettingsMenu(rect.left, rect.bottom + 2);
       });
     }
+
+    this.mobileTools =
+      !spec.lockedTab && host.openMenu
+        ? wireMobileMeterTools(this.root, {
+            openMenu: host.openMenu,
+            metric: (x, y) => this.openModeMenu(x, y),
+            history: (x, y) => this.openEncounterMenu(x, y),
+            settings: () => this.openOptionsDialog(),
+            resetCurrent: () => host.resetCurrent(),
+            resetAll: () => host.resetAll(),
+          })
+        : null;
 
     // The panel title doubles as the move handle (the chat box uses its tab
     // strip the same way); a press on any button inside it stays that button's.
@@ -1710,6 +1724,7 @@ export class MetersPanel {
       settingsBtn.setAttribute('aria-label', t('hudChrome.meters.settingsTitle'));
     }
     this.optionsDialog?.relocalize();
+    this.mobileTools?.relocalize();
     this.refreshTabs();
     this.render(true);
   }
