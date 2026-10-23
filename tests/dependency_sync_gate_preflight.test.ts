@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { delimiter, join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -136,8 +136,16 @@ describe('dependency-sync gate preflight', () => {
         JSON.stringify({ name: 'fixture', version: '1.0.0' }),
       );
       const fakeNpmDir = mkdtempSync(join(tmpdir(), 'woc-depsync-fakenpm-'));
-      const fakeNpm = join(fakeNpmDir, 'npm');
-      writeFileSync(fakeNpm, '#!/bin/sh\necho "not json at all"\nexit 1\n', { mode: 0o755 });
+      const windows = process.platform === 'win32';
+      const fakeNpm = join(fakeNpmDir, windows ? 'npm.cmd' : 'npm');
+      const invocationMarker = join(fakeNpmDir, 'npm-invoked');
+      writeFileSync(
+        fakeNpm,
+        windows
+          ? '@echo off\r\necho fixture> "%WOC_FAKE_NPM_MARKER%"\r\necho not json at all\r\nexit /b 1\r\n'
+          : '#!/bin/sh\nprintf "fixture\\n" > "$WOC_FAKE_NPM_MARKER"\necho "not json at all"\nexit 1\n',
+        { mode: 0o755 },
+      );
       try {
         const result = spawnSync(process.execPath, [GATE_SCRIPT], {
           cwd: dir,
@@ -146,9 +154,11 @@ describe('dependency-sync gate preflight', () => {
             ...process.env,
             ...FORCE_FFMPEG_FAIL,
             PATH: `${fakeNpmDir}${delimiter}${process.env.PATH ?? ''}`,
+            WOC_FAKE_NPM_MARKER: invocationMarker,
           },
         });
 
+        expect(readFileSync(invocationMarker, 'utf8').trim()).toBe('fixture');
         expect(result.stderr).toContain('[gate] WARN: dependency sync check skipped');
         expect(result.stderr).not.toContain('[gate] FAIL at "dependency sync"');
         // Still proceeds to (and fails at) the next preflight rather than exiting clean.

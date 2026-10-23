@@ -84,9 +84,16 @@ describe('painted crest routing', () => {
           .raw()
           .toBuffer({ resolveWithObject: true });
         expect([decoded.info.width, decoded.info.height], `${id} dimensions`).toEqual([256, 256]);
+        // Inspect every alpha byte, but allocate an assertion only once per image.
+        // Millions of matcher objects made this guard time out under gate load.
+        let firstNonOpaquePixel = -1;
         for (let offset = 3; offset < decoded.data.length; offset += decoded.info.channels) {
-          expect(decoded.data[offset], `${id} must remain opaque`).toBe(255);
+          if (decoded.data[offset] !== 255) {
+            firstNonOpaquePixel = (offset - 3) / decoded.info.channels;
+            break;
+          }
         }
+        expect(firstNonOpaquePixel, `${id} must remain opaque at every pixel`).toBe(-1);
       }
     }
   });

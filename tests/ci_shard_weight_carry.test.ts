@@ -873,7 +873,9 @@ describe('the harvest entry: full harvest and local-carry modes (injected I/O)',
     base[victim] = 55;
     base.__provenance = { ...base.__provenance, files: 2, harvestedFiles: 1 };
     entryIo.readFileSync.mockReturnValue(JSON.stringify(base));
-    entryIo.existsSync.mockImplementation(((p: string) => !String(p).endsWith(victim)) as never);
+    entryIo.existsSync.mockImplementation(
+      ((p: string) => !String(p).replaceAll('\\', '/').endsWith(victim)) as never,
+    );
     const { exitCode, out } = await runEntry(['--prune-missing']);
     expect(exitCode).toBe(0);
     expect(out).toContain(`dropped ${victim}`);

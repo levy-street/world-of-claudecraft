@@ -5,7 +5,17 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+
+// These mutable temporary images must not stay open in libvips' operation cache.
+const cache = sharp.cache();
+beforeAll(() => {
+  sharp.cache(false);
+});
+afterAll(() => {
+  sharp.cache({ memory: cache.memory.max, files: cache.files.max, items: cache.items.max });
+});
+
 import {
   assertItemArtAuditPass,
   buildItemArtAudit,

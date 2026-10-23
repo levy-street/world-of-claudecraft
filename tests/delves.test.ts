@@ -1007,7 +1007,8 @@ describe('delve interactables and affixes', () => {
       for (const id of run.affixes) expect(DELVE_IMPLEMENTED_AFFIXES.has(id)).toBe(true);
       expect(run.affixes.length).toBe(1); // Heroic affixCount = 1
     }
-  });
+    // Keep all 60 real instance boots under shared gate load.
+  }, 60_000);
 
   it('Deacon Vandric enrages on Heroic but not on Normal (PRD §7.4)', () => {
     for (const tier of ['normal', 'heroic'] as const) {
