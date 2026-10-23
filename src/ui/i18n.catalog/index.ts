@@ -314,6 +314,19 @@ export const en = {
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     discordLabel: 'Join the Discord',
+    // Footer row linking the player guides (the /mmorpgs, /games-like and /browser
+    // pages served beside the game). English page titles; the pages are English-only.
+    guidesLabel: 'Player guides',
+    guideFree: 'Free MMORPGs',
+    guideGamesLikeWow: 'Games like WoW',
+    guideBest: 'Best MMORPGs',
+    guideNew: 'New MMORPGs',
+    guideBrowser: 'Browser MMORPGs',
+    guideGamesLikeDiablo: 'Games like Diablo',
+    // The section hubs on the guides site, each listing every page in its section.
+    guideAllLists: 'All MMORPG lists',
+    guideAllGamesLike: 'All games-like guides',
+    guideAllBrowser: 'All browser checks',
   },
   settings: {
     languageLoading: 'Loading language...',

@@ -90,6 +90,11 @@ const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), '
   /\r\n/g,
   '\n',
 );
+// The server's pretty-URL alias table (STATIC_PAGE_ALIASES), imported by server/main.ts.
+const serverAliases = readFileSync(
+  new URL('../server/static_fallback.ts', import.meta.url),
+  'utf8',
+);
 const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -1009,11 +1014,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("alternateName: 'World of Claudecraft'");
     expect(mainTs).toContain("'https://github.com/levy-street/world-of-claudecraft'");
     expect(robotsTxt.trim()).toBe(
-      'User-agent: *\nAllow: /\n\nSitemap: https://worldofclaudecraft.com/sitemap.xml\nSitemap: https://worldofclaudecraft.com/sitemap-characters.xml',
+      'User-agent: *\nAllow: /\n\nSitemap: https://worldofclaudecraft.com/sitemap.xml\nSitemap: https://worldofclaudecraft.com/sitemap-characters.xml\nSitemap: https://worldofclaudecraft.com/sitemap-marketing.xml',
     );
     expect(robotsTxt).toContain('Sitemap: https://worldofclaudecraft.com/sitemap.xml');
     // The dynamic per-character sitemap (served by the game server) is advertised too.
     expect(robotsTxt).toContain('Sitemap: https://worldofclaudecraft.com/sitemap-characters.xml');
+    // The player-guide pages are served by nginx beside the game (woc-marketing-website);
+    // their sitemap index is advertised here so crawlers find them from the game's robots.txt.
+    expect(robotsTxt).toContain('Sitemap: https://worldofclaudecraft.com/sitemap-marketing.xml');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/</loc>');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/links</loc>');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/play</loc>');
@@ -1069,10 +1077,10 @@ describe('client HTML shell', () => {
     expect(viteConfig).toContain("['/terms', '/terms.html']");
     expect(viteConfig).toContain("['/data-deletion', '/data-deletion.html']");
     expect(viteConfig).toContain("['/support', '/support.html']");
-    expect(serverMain).toContain("['/privacy', '/privacy.html']");
-    expect(serverMain).toContain("['/terms', '/terms.html']");
-    expect(serverMain).toContain("['/data-deletion', '/data-deletion.html']");
-    expect(serverMain).toContain("['/support', '/support.html']");
+    expect(serverAliases).toContain("['/privacy', '/privacy.html']");
+    expect(serverAliases).toContain("['/terms', '/terms.html']");
+    expect(serverAliases).toContain("['/data-deletion', '/data-deletion.html']");
+    expect(serverAliases).toContain("['/support', '/support.html']");
   });
 
   it('loads Meta Pixel outside local development and tracks level 5', () => {

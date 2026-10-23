@@ -7187,7 +7187,14 @@ export const it_IT: EnTranslations = {
       "discord": "Unisciti al Discord",
       "communityWiki": "Wiki della Comunità",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Collegamenti al gioco e alla community"
+      "linksLabel": "Collegamenti al gioco e alla community",
+      "guidesLabel": "Player guides",
+      "guideFree": "Free MMORPGs",
+      "guideGamesLikeWow": "Games like WoW",
+      "guideBest": "Best MMORPGs",
+      "guideNew": "New MMORPGs",
+      "guideBrowser": "Browser MMORPGs",
+      "guideGamesLikeDiablo": "Games like Diablo"
     },
     "language": {
       "label": "Lingua",
@@ -9834,7 +9841,17 @@ export const it_IT: EnTranslations = {
     "whitepaper": "Libro bianco",
     "terms": "Termini di servizio",
     "privacy": "Informativa sulla privacy",
-    "discordLabel": "Entra nel Discord"
+    "discordLabel": "Entra nel Discord",
+    "guidesLabel": "Player guides",
+    "guideFree": "Free MMORPGs",
+    "guideGamesLikeWow": "Games like WoW",
+    "guideBest": "Best MMORPGs",
+    "guideNew": "New MMORPGs",
+    "guideBrowser": "Browser MMORPGs",
+    "guideGamesLikeDiablo": "Games like Diablo",
+    "guideAllLists": "All MMORPG lists",
+    "guideAllGamesLike": "All games-like guides",
+    "guideAllBrowser": "All browser checks"
   },
   "settings": {
     "languageLoading": "Caricamento della lingua...",

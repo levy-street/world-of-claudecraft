@@ -7187,7 +7187,14 @@ export const nl_NL: EnTranslations = {
       "discord": "Word lid van de Discord",
       "communityWiki": "Community-wiki",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Speel- en communitylinks"
+      "linksLabel": "Speel- en communitylinks",
+      "guidesLabel": "Player guides",
+      "guideFree": "Free MMORPGs",
+      "guideGamesLikeWow": "Games like WoW",
+      "guideBest": "Best MMORPGs",
+      "guideNew": "New MMORPGs",
+      "guideBrowser": "Browser MMORPGs",
+      "guideGamesLikeDiablo": "Games like Diablo"
     },
     "language": {
       "label": "Taal",
@@ -9834,7 +9841,17 @@ export const nl_NL: EnTranslations = {
     "whitepaper": "Whitepaper",
     "terms": "Servicevoorwaarden",
     "privacy": "Privacybeleid",
-    "discordLabel": "Word lid van de Discord"
+    "discordLabel": "Word lid van de Discord",
+    "guidesLabel": "Player guides",
+    "guideFree": "Free MMORPGs",
+    "guideGamesLikeWow": "Games like WoW",
+    "guideBest": "Best MMORPGs",
+    "guideNew": "New MMORPGs",
+    "guideBrowser": "Browser MMORPGs",
+    "guideGamesLikeDiablo": "Games like Diablo",
+    "guideAllLists": "All MMORPG lists",
+    "guideAllGamesLike": "All games-like guides",
+    "guideAllBrowser": "All browser checks"
   },
   "settings": {
     "languageLoading": "Taal laden...",

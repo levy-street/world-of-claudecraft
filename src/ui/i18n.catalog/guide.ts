@@ -110,6 +110,14 @@ export const guideStrings = {
     communityWiki: 'Community Wiki',
     rights: 'World of ClaudeCraft',
     linksLabel: 'Play and community links',
+    // Player-guide links (the English /mmorpgs, /games-like pages beside the game).
+    guidesLabel: 'Player guides',
+    guideFree: 'Free MMORPGs',
+    guideGamesLikeWow: 'Games like WoW',
+    guideBest: 'Best MMORPGs',
+    guideNew: 'New MMORPGs',
+    guideBrowser: 'Browser MMORPGs',
+    guideGamesLikeDiablo: 'Games like Diablo',
   },
 
   // Language picker.

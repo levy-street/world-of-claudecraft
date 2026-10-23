@@ -7187,7 +7187,14 @@ export const ru_RU: EnTranslations = {
       "discord": "Присоединиться к Discord",
       "communityWiki": "Вики сообщества",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Ссылки на игру и сообщество"
+      "linksLabel": "Ссылки на игру и сообщество",
+      "guidesLabel": "Гайды для игроков",
+      "guideFree": "Free MMORPGs",
+      "guideGamesLikeWow": "Игры, похожие на WoW",
+      "guideBest": "Best MMORPGs",
+      "guideNew": "New MMORPGs",
+      "guideBrowser": "Браузерные MMORPG",
+      "guideGamesLikeDiablo": "Игры, похожие на Diablo"
     },
     "language": {
       "label": "Язык",
@@ -9834,7 +9841,17 @@ export const ru_RU: EnTranslations = {
     "whitepaper": "Белая книга",
     "terms": "Условия использования",
     "privacy": "Политика конфиденциальности",
-    "discordLabel": "Присоединиться к Discord"
+    "discordLabel": "Присоединиться к Discord",
+    "guidesLabel": "Гайды для игроков",
+    "guideFree": "Free MMORPGs",
+    "guideGamesLikeWow": "Игры, похожие на WoW",
+    "guideBest": "Best MMORPGs",
+    "guideNew": "New MMORPGs",
+    "guideBrowser": "Браузерные MMORPG",
+    "guideGamesLikeDiablo": "Игры, похожие на Diablo",
+    "guideAllLists": "Все списки MMORPG",
+    "guideAllGamesLike": "Все подборки похожих игр",
+    "guideAllBrowser": "Все проверки браузерных версий"
   },
   "settings": {
     "languageLoading": "Загрузка языка...",

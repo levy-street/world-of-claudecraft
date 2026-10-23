@@ -7187,7 +7187,14 @@ export const id_ID: EnTranslations = {
       "discord": "Gabung Discord",
       "communityWiki": "Wiki Komunitas",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Tautan main dan komunitas"
+      "linksLabel": "Tautan main dan komunitas",
+      "guidesLabel": "Player guides",
+      "guideFree": "Free MMORPGs",
+      "guideGamesLikeWow": "Games like WoW",
+      "guideBest": "Best MMORPGs",
+      "guideNew": "New MMORPGs",
+      "guideBrowser": "Browser MMORPGs",
+      "guideGamesLikeDiablo": "Games like Diablo"
     },
     "language": {
       "label": "Bahasa",
@@ -9834,7 +9841,17 @@ export const id_ID: EnTranslations = {
     "whitepaper": "Whitepaper",
     "terms": "Ketentuan Layanan",
     "privacy": "Kebijakan Privasi",
-    "discordLabel": "Gabung Discord"
+    "discordLabel": "Gabung Discord",
+    "guidesLabel": "Player guides",
+    "guideFree": "Free MMORPGs",
+    "guideGamesLikeWow": "Games like WoW",
+    "guideBest": "Best MMORPGs",
+    "guideNew": "New MMORPGs",
+    "guideBrowser": "Browser MMORPGs",
+    "guideGamesLikeDiablo": "Games like Diablo",
+    "guideAllLists": "All MMORPG lists",
+    "guideAllGamesLike": "All games-like guides",
+    "guideAllBrowser": "All browser checks"
   },
   "settings": {
     "languageLoading": "Memuat bahasa...",

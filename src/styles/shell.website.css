@@ -1223,6 +1223,17 @@
       padding-top: 22px;
       border-top: 1px solid color-mix(in srgb, var(--website-gold) 25%, transparent);
     }
+    /* Player-guide links: a second full-width row under the legal row, same link style. */
+    & .footer-guides-row {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: flex-start;
+      gap: 0 24px;
+      margin-top: -20px;
+    }
     & .footer-link {
       display: inline-flex;
       align-items: center;
@@ -1516,6 +1527,9 @@
       & .footer-legal-row {
         grid-row: 3;
       }
+      & .footer-guides-row {
+        grid-row: 4;
+      }
       & #homepage-views-container {
         padding-left: max(32px, env(safe-area-inset-left));
         padding-right: max(32px, env(safe-area-inset-right));
@@ -1724,6 +1738,11 @@
         flex-wrap: wrap;
         gap: 8px 16px;
         justify-content: flex-start;
+      }
+      & .footer-guides-row {
+        grid-row: 5;
+        gap: 0 16px;
+        margin-top: -16px;
       }
       & .footer-lang-row {
         justify-content: flex-start;

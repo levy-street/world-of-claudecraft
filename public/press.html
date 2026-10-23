@@ -690,6 +690,40 @@
     }
 
     /* ---------- footer ---------- */
+    /* Player guides: plain text links to the /mmorpgs and /games-like pages. */
+    .guides {
+      margin-top: clamp(18px, 3.5vw, 24px);
+      text-align: center;
+    }
+    .guides__title {
+      margin: 0 0 6px;
+      color: var(--gold-parch);
+      font: 700 12px/1 var(--font-ui);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .guides__list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0 18px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .guides__list a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      color: var(--muted-safe);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      text-decoration: underline;
+      text-decoration-color: var(--line);
+      text-underline-offset: 3px;
+    }
+    .guides__list a:hover { color: var(--gold-soft); }
+    .guides__list a:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; color: var(--gold-soft); }
     .foot {
       margin-top: clamp(18px, 3.5vw, 24px);
       padding-top: var(--sp-3);
@@ -875,6 +909,18 @@
       </ul>
     </nav>
 
+    <nav class="guides" aria-labelledby="guides-title">
+      <h2 id="guides-title" class="guides__title" data-i18n="guidesTitle">Player guides</h2>
+      <ul class="guides__list">
+        <li><a href="/mmorpgs/free" data-i18n="guideFree">Free MMORPGs</a></li>
+        <li><a href="/games-like/world-of-warcraft" data-i18n="guideGamesLikeWow">Games like WoW</a></li>
+        <li><a href="/mmorpgs/best" data-i18n="guideBest">Best MMORPGs</a></li>
+        <li><a href="/mmorpgs/new" data-i18n="guideNew">New MMORPGs</a></li>
+        <li><a href="/mmorpgs/browser" data-i18n="guideBrowser">Browser MMORPGs</a></li>
+        <li><a href="/games-like/diablo" data-i18n="guideGamesLikeDiablo">Games like Diablo</a></li>
+      </ul>
+    </nav>
+
     <footer class="foot">
       <p class="foot__note" data-i18n="footNote">No press kit is live yet. Any 'official statement' not from our channels is not us.</p>
       <p class="foot__copy" data-i18n="copyright">2026 World of ClaudeCraft</p>
@@ -918,7 +964,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (opens in new tab)",
           footNote: "No press kit is live yet. Any 'official statement' not from our channels is not us.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Player guides",
+          guideFree: "Free MMORPGs",
+          guideGamesLikeWow: "Games like WoW",
+          guideBest: "Best MMORPGs",
+          guideNew: "New MMORPGs",
+          guideBrowser: "Browser MMORPGs",
+          guideGamesLikeDiablo: "Games like Diablo"
         },
         es: {
           pageTitle: "World of ClaudeCraft - Prensa",
@@ -950,7 +1003,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (se abre en una pestaña nueva)",
           footNote: "Todavía no hay ningún kit de prensa activo. Cualquier 'declaración oficial' que no provenga de nuestros canales no somos nosotros.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guías para jugadores",
+          guideFree: "MMORPG gratis",
+          guideGamesLikeWow: "Juegos como WoW",
+          guideBest: "Mejores MMORPG",
+          guideNew: "MMORPG nuevos",
+          guideBrowser: "MMORPG de navegador",
+          guideGamesLikeDiablo: "Juegos como Diablo"
         },
         es_ES: {
           pageTitle: "World of ClaudeCraft - Prensa",
@@ -982,7 +1042,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (se abre en una pestaña nueva)",
           footNote: "Todavía no hay ningún kit de prensa activo. Cualquier 'declaración oficial' que no proceda de nuestros canales no somos nosotros.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guías para jugadores",
+          guideFree: "MMORPG gratis",
+          guideGamesLikeWow: "Juegos como WoW",
+          guideBest: "Mejores MMORPG",
+          guideNew: "MMORPG nuevos",
+          guideBrowser: "MMORPG de navegador",
+          guideGamesLikeDiablo: "Juegos como Diablo"
         },
         fr_FR: {
           pageTitle: "World of ClaudeCraft - Presse",
@@ -1014,7 +1081,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (s'ouvre dans un nouvel onglet)",
           footNote: "Aucun kit presse n'est encore en ligne. Toute 'déclaration officielle' qui ne provient pas de nos canaux n'est pas de nous.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guides pour les joueurs",
+          guideFree: "MMORPG gratuits",
+          guideGamesLikeWow: "Jeux comme WoW",
+          guideBest: "Meilleurs MMORPG",
+          guideNew: "Nouveaux MMORPG",
+          guideBrowser: "MMORPG sur navigateur",
+          guideGamesLikeDiablo: "Jeux comme Diablo"
         },
         fr_CA: {
           pageTitle: "World of ClaudeCraft - Presse",
@@ -1046,7 +1120,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (s'ouvre dans un nouvel onglet)",
           footNote: "Aucune trousse de presse n'est encore en ligne. Toute 'déclaration officielle' qui ne provient pas de nos canaux n'est pas de nous.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guides pour les joueurs",
+          guideFree: "MMORPG gratuits",
+          guideGamesLikeWow: "Jeux comme WoW",
+          guideBest: "Meilleurs MMORPG",
+          guideNew: "Nouveaux MMORPG",
+          guideBrowser: "MMORPG sur navigateur",
+          guideGamesLikeDiablo: "Jeux comme Diablo"
         },
         en_CA: {
           pageTitle: "World of ClaudeCraft - Press",
@@ -1078,7 +1159,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (opens in new tab)",
           footNote: "No press kit is live yet. Any 'official statement' not from our channels is not us.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Player guides",
+          guideFree: "Free MMORPGs",
+          guideGamesLikeWow: "Games like WoW",
+          guideBest: "Best MMORPGs",
+          guideNew: "New MMORPGs",
+          guideBrowser: "Browser MMORPGs",
+          guideGamesLikeDiablo: "Games like Diablo"
         },
         it_IT: {
           pageTitle: "World of ClaudeCraft - Stampa",
@@ -1110,7 +1198,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (si apre in una nuova scheda)",
           footNote: "Nessun kit stampa è ancora attivo. Qualsiasi 'dichiarazione ufficiale' che non provenga dai nostri canali non siamo noi.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guide per i giocatori",
+          guideFree: "MMORPG gratuiti",
+          guideGamesLikeWow: "Giochi come WoW",
+          guideBest: "Migliori MMORPG",
+          guideNew: "Nuovi MMORPG",
+          guideBrowser: "MMORPG su browser",
+          guideGamesLikeDiablo: "Giochi come Diablo"
         },
         de_DE: {
           pageTitle: "World of ClaudeCraft - Presse",
@@ -1142,7 +1237,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (wird in einem neuen Tab geöffnet)",
           footNote: "Es ist noch kein Pressekit live. Jede 'offizielle Aussage', die nicht von unseren Kanälen stammt, sind nicht wir.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Ratgeber für Spieler",
+          guideFree: "Kostenlose MMORPGs",
+          guideGamesLikeWow: "Spiele wie WoW",
+          guideBest: "Die besten MMORPGs",
+          guideNew: "Neue MMORPGs",
+          guideBrowser: "Browser-MMORPGs",
+          guideGamesLikeDiablo: "Spiele wie Diablo"
         },
         zh_CN: {
           pageTitle: "World of ClaudeCraft - 媒体",
@@ -1174,7 +1276,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: "（在新标签页中打开）",
           footNote: "目前尚无媒体资料包上线。任何并非来自我们渠道的'官方声明'都不是我们。",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "玩家指南",
+          guideFree: "免费 MMORPG",
+          guideGamesLikeWow: "类似 WoW 的游戏",
+          guideBest: "最佳 MMORPG",
+          guideNew: "新 MMORPG",
+          guideBrowser: "浏览器 MMORPG",
+          guideGamesLikeDiablo: "类似《暗黑破坏神》的游戏"
         },
         zh_TW: {
           pageTitle: "World of ClaudeCraft - 媒體",
@@ -1206,7 +1315,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: "（在新分頁中開啟）",
           footNote: "目前尚無媒體資料包上線。任何並非來自我們管道的'官方聲明'都不是我們。",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "玩家指南",
+          guideFree: "免費 MMORPG",
+          guideGamesLikeWow: "類似 WoW 的遊戲",
+          guideBest: "最佳 MMORPG",
+          guideNew: "新 MMORPG",
+          guideBrowser: "瀏覽器 MMORPG",
+          guideGamesLikeDiablo: "類似《暗黑破壞神》的遊戲"
         },
         ko_KR: {
           pageTitle: "World of ClaudeCraft - 보도",
@@ -1238,7 +1354,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (새 탭에서 열림)",
           footNote: "아직 공개된 보도 자료집이 없습니다. 저희 채널에서 나오지 않은 '공식 성명'은 저희가 아닙니다.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "플레이어 가이드",
+          guideFree: "무료 MMORPG",
+          guideGamesLikeWow: "WoW 같은 게임",
+          guideBest: "최고의 MMORPG",
+          guideNew: "신작 MMORPG",
+          guideBrowser: "브라우저 MMORPG",
+          guideGamesLikeDiablo: "디아블로 같은 게임"
         },
         ja_JP: {
           pageTitle: "World of ClaudeCraft - プレス",
@@ -1270,7 +1393,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: "（新しいタブで開きます）",
           footNote: "プレスキットはまだ公開されていません。当方のチャンネル以外の'公式声明'は当方ではありません。",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "プレイヤーガイド",
+          guideFree: "無料MMORPG",
+          guideGamesLikeWow: "WoWに似たゲーム",
+          guideBest: "おすすめMMORPG",
+          guideNew: "新作MMORPG",
+          guideBrowser: "ブラウザMMORPG",
+          guideGamesLikeDiablo: "ディアブロに似たゲーム"
         },
         pt_BR: {
           pageTitle: "World of ClaudeCraft - Imprensa",
@@ -1302,7 +1432,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (abre em uma nova aba)",
           footNote: "Nenhum kit de imprensa está ativo ainda. Qualquer 'declaração oficial' que não venha dos nossos canais não somos nós.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guias para jogadores",
+          guideFree: "MMORPGs grátis",
+          guideGamesLikeWow: "Jogos como WoW",
+          guideBest: "Melhores MMORPGs",
+          guideNew: "MMORPGs novos",
+          guideBrowser: "MMORPGs de navegador",
+          guideGamesLikeDiablo: "Jogos como Diablo"
         },
         ru_RU: {
           pageTitle: "World of ClaudeCraft - Пресса",
@@ -1334,7 +1471,14 @@
           playSub: "worldofclaudecraft.com",
           opensNewTab: " (откроется в новой вкладке)",
           footNote: "Пресс-кит ещё не запущен. Любое 'официальное заявление' не с наших каналов - это не мы.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Гайды для игроков",
+          guideFree: "Бесплатные MMORPG",
+          guideGamesLikeWow: "Игры, похожие на WoW",
+          guideBest: "Лучшие MMORPG",
+          guideNew: "Новые MMORPG",
+          guideBrowser: "Браузерные MMORPG",
+          guideGamesLikeDiablo: "Игры, похожие на Diablo"
         }
       };
 

@@ -7187,7 +7187,14 @@ export const ko_KR: EnTranslations = {
       "discord": "Discord 참여하기",
       "communityWiki": "커뮤니티 위키",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "플레이 및 커뮤니티 링크"
+      "linksLabel": "플레이 및 커뮤니티 링크",
+      "guidesLabel": "플레이어 가이드",
+      "guideFree": "Free MMORPGs",
+      "guideGamesLikeWow": "WoW 같은 게임",
+      "guideBest": "Best MMORPGs",
+      "guideNew": "New MMORPGs",
+      "guideBrowser": "브라우저 MMORPG",
+      "guideGamesLikeDiablo": "디아블로 같은 게임"
     },
     "language": {
       "label": "언어",
@@ -9834,7 +9841,17 @@ export const ko_KR: EnTranslations = {
     "whitepaper": "백서",
     "terms": "서비스 이용약관",
     "privacy": "개인정보 처리방침",
-    "discordLabel": "Discord 참여하기"
+    "discordLabel": "Discord 참여하기",
+    "guidesLabel": "플레이어 가이드",
+    "guideFree": "Free MMORPGs",
+    "guideGamesLikeWow": "WoW 같은 게임",
+    "guideBest": "Best MMORPGs",
+    "guideNew": "New MMORPGs",
+    "guideBrowser": "브라우저 MMORPG",
+    "guideGamesLikeDiablo": "디아블로 같은 게임",
+    "guideAllLists": "MMORPG 목록 전체",
+    "guideAllGamesLike": "비슷한 게임 가이드 전체",
+    "guideAllBrowser": "브라우저 확인 전체"
   },
   "settings": {
     "languageLoading": "언어를 불러오는 중...",

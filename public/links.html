@@ -571,6 +571,40 @@
     }
 
     /* ---------- footer ---------- */
+    /* Player guides: plain text links to the /mmorpgs and /games-like pages. */
+    .guides {
+      margin-top: clamp(18px, 3.5vw, 24px);
+      text-align: center;
+    }
+    .guides__title {
+      margin: 0 0 6px;
+      color: var(--gold-parch);
+      font: 700 12px/1 var(--font-ui);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .guides__list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0 18px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .guides__list a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      color: var(--muted-safe);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      text-decoration: underline;
+      text-decoration-color: var(--line);
+      text-underline-offset: 3px;
+    }
+    .guides__list a:hover { color: var(--gold-soft); }
+    .guides__list a:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; color: var(--gold-soft); }
     .foot {
       margin-top: clamp(18px, 3.5vw, 24px);
       padding-top: var(--sp-3);
@@ -792,6 +826,18 @@
       </ul>
     </nav>
 
+    <nav class="guides" aria-labelledby="guides-title">
+      <h2 id="guides-title" class="guides__title" data-i18n="guidesTitle">Player guides</h2>
+      <ul class="guides__list">
+        <li><a href="/mmorpgs/free" data-i18n="guideFree">Free MMORPGs</a></li>
+        <li><a href="/games-like/world-of-warcraft" data-i18n="guideGamesLikeWow">Games like WoW</a></li>
+        <li><a href="/mmorpgs/best" data-i18n="guideBest">Best MMORPGs</a></li>
+        <li><a href="/mmorpgs/new" data-i18n="guideNew">New MMORPGs</a></li>
+        <li><a href="/mmorpgs/browser" data-i18n="guideBrowser">Browser MMORPGs</a></li>
+        <li><a href="/games-like/diablo" data-i18n="guideGamesLikeDiablo">Games like Diablo</a></li>
+      </ul>
+    </nav>
+
     <footer class="foot">
       <p class="foot__note" data-i18n="footNote">If it is not listed on this page, it is not us. Stay sharp out there, adventurer.</p>
       <p class="foot__copy" data-i18n="copyright">2026 World of ClaudeCraft</p>
@@ -829,7 +875,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (opens in new tab)",
           footNote: "If it is not listed on this page, it is not us. Stay sharp out there, adventurer.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Player guides",
+          guideFree: "Free MMORPGs",
+          guideGamesLikeWow: "Games like WoW",
+          guideBest: "Best MMORPGs",
+          guideNew: "New MMORPGs",
+          guideBrowser: "Browser MMORPGs",
+          guideGamesLikeDiablo: "Games like Diablo"
         },
         es: {
           pageTitle: "World of ClaudeCraft - Enlaces oficiales",
@@ -857,7 +910,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (se abre en una pestaña nueva)",
           footNote: "Si no figura en esta página, no somos nosotros. Mantente alerta ahí afuera, aventurero.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guías para jugadores",
+          guideFree: "MMORPG gratis",
+          guideGamesLikeWow: "Juegos como WoW",
+          guideBest: "Mejores MMORPG",
+          guideNew: "MMORPG nuevos",
+          guideBrowser: "MMORPG de navegador",
+          guideGamesLikeDiablo: "Juegos como Diablo"
         },
         es_ES: {
           pageTitle: "World of ClaudeCraft - Enlaces oficiales",
@@ -885,7 +945,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (se abre en una pestaña nueva)",
           footNote: "Si no aparece en esta página, no somos nosotros. Mantente alerta ahí fuera, aventurero.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guías para jugadores",
+          guideFree: "MMORPG gratis",
+          guideGamesLikeWow: "Juegos como WoW",
+          guideBest: "Mejores MMORPG",
+          guideNew: "MMORPG nuevos",
+          guideBrowser: "MMORPG de navegador",
+          guideGamesLikeDiablo: "Juegos como Diablo"
         },
         fr_FR: {
           pageTitle: "World of ClaudeCraft - Liens officiels",
@@ -913,7 +980,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (s'ouvre dans un nouvel onglet)",
           footNote: "Si cela ne figure pas sur cette page, ce n'est pas nous. Restez vigilant, aventurier.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guides pour les joueurs",
+          guideFree: "MMORPG gratuits",
+          guideGamesLikeWow: "Jeux comme WoW",
+          guideBest: "Meilleurs MMORPG",
+          guideNew: "Nouveaux MMORPG",
+          guideBrowser: "MMORPG sur navigateur",
+          guideGamesLikeDiablo: "Jeux comme Diablo"
         },
         fr_CA: {
           pageTitle: "World of ClaudeCraft - Liens officiels",
@@ -941,7 +1015,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (s'ouvre dans un nouvel onglet)",
           footNote: "Si ce n'est pas inscrit sur cette page, ce n'est pas nous. Restez vigilant, aventurier.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guides pour les joueurs",
+          guideFree: "MMORPG gratuits",
+          guideGamesLikeWow: "Jeux comme WoW",
+          guideBest: "Meilleurs MMORPG",
+          guideNew: "Nouveaux MMORPG",
+          guideBrowser: "MMORPG sur navigateur",
+          guideGamesLikeDiablo: "Jeux comme Diablo"
         },
         en_CA: {
           pageTitle: "World of ClaudeCraft - Official Links",
@@ -969,7 +1050,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (opens in new tab)",
           footNote: "If it is not listed on this page, it is not us. Stay sharp out there, adventurer.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Player guides",
+          guideFree: "Free MMORPGs",
+          guideGamesLikeWow: "Games like WoW",
+          guideBest: "Best MMORPGs",
+          guideNew: "New MMORPGs",
+          guideBrowser: "Browser MMORPGs",
+          guideGamesLikeDiablo: "Games like Diablo"
         },
         it_IT: {
           pageTitle: "World of ClaudeCraft - Canali ufficiali",
@@ -997,7 +1085,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (si apre in una nuova scheda)",
           footNote: "Se non figura in questa pagina, non siamo noi. Tieni gli occhi aperti là fuori, avventuriero.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guide per i giocatori",
+          guideFree: "MMORPG gratuiti",
+          guideGamesLikeWow: "Giochi come WoW",
+          guideBest: "Migliori MMORPG",
+          guideNew: "Nuovi MMORPG",
+          guideBrowser: "MMORPG su browser",
+          guideGamesLikeDiablo: "Giochi come Diablo"
         },
         de_DE: {
           pageTitle: "World of ClaudeCraft - Offizielle Links",
@@ -1025,7 +1120,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (wird in neuem Tab geöffnet)",
           footNote: "Was nicht auf dieser Seite steht, stammt nicht von uns. Bleib wachsam da draußen, Abenteurer.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Ratgeber für Spieler",
+          guideFree: "Kostenlose MMORPGs",
+          guideGamesLikeWow: "Spiele wie WoW",
+          guideBest: "Die besten MMORPGs",
+          guideNew: "Neue MMORPGs",
+          guideBrowser: "Browser-MMORPGs",
+          guideGamesLikeDiablo: "Spiele wie Diablo"
         },
         zh_CN: {
           pageTitle: "World of ClaudeCraft - 官方链接",
@@ -1053,7 +1155,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (在新标签页中打开)",
           footNote: "若未列于此页之上，便绝非我等。在外多加小心，冒险者。",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "玩家指南",
+          guideFree: "免费 MMORPG",
+          guideGamesLikeWow: "类似 WoW 的游戏",
+          guideBest: "最佳 MMORPG",
+          guideNew: "新 MMORPG",
+          guideBrowser: "浏览器 MMORPG",
+          guideGamesLikeDiablo: "类似《暗黑破坏神》的游戏"
         },
         zh_TW: {
           pageTitle: "World of ClaudeCraft - 官方連結",
@@ -1081,7 +1190,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " （在新分頁開啟）",
           footNote: "若未列於本頁，便非我方。在外多加留心，冒險者。",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "玩家指南",
+          guideFree: "免費 MMORPG",
+          guideGamesLikeWow: "類似 WoW 的遊戲",
+          guideBest: "最佳 MMORPG",
+          guideNew: "新 MMORPG",
+          guideBrowser: "瀏覽器 MMORPG",
+          guideGamesLikeDiablo: "類似《暗黑破壞神》的遊戲"
         },
         ko_KR: {
           pageTitle: "World of ClaudeCraft - 공식 링크",
@@ -1109,7 +1225,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (새 탭에서 열림)",
           footNote: "이 페이지에 없다면 우리가 아닙니다. 모험가여, 늘 경계를 늦추지 마십시오.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "플레이어 가이드",
+          guideFree: "무료 MMORPG",
+          guideGamesLikeWow: "WoW 같은 게임",
+          guideBest: "최고의 MMORPG",
+          guideNew: "신작 MMORPG",
+          guideBrowser: "브라우저 MMORPG",
+          guideGamesLikeDiablo: "디아블로 같은 게임"
         },
         ja_JP: {
           pageTitle: "World of ClaudeCraft - 公式リンク",
@@ -1137,7 +1260,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (新しいタブで開きます)",
           footNote: "このページに記載がなければ、我らではない。道中、油断するでないぞ、冒険者よ。",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "プレイヤーガイド",
+          guideFree: "無料MMORPG",
+          guideGamesLikeWow: "WoWに似たゲーム",
+          guideBest: "おすすめMMORPG",
+          guideNew: "新作MMORPG",
+          guideBrowser: "ブラウザMMORPG",
+          guideGamesLikeDiablo: "ディアブロに似たゲーム"
         },
         pt_BR: {
           pageTitle: "World of ClaudeCraft - Links Oficiais",
@@ -1165,7 +1295,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (abre em uma nova aba)",
           footNote: "Se não estiver listado nesta página, não somos nós. Fique atento lá fora, aventureiro.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Guias para jogadores",
+          guideFree: "MMORPGs grátis",
+          guideGamesLikeWow: "Jogos como WoW",
+          guideBest: "Melhores MMORPGs",
+          guideNew: "MMORPGs novos",
+          guideBrowser: "MMORPGs de navegador",
+          guideGamesLikeDiablo: "Jogos como Diablo"
         },
         ru_RU: {
           pageTitle: "World of ClaudeCraft - Официальные ссылки",
@@ -1193,7 +1330,14 @@
           githubHandle: "levy-street/world-of-claudecraft",
           opensNewTab: " (открывается в новой вкладке)",
           footNote: "Чего нет на этой странице, то не от нас. Будьте начеку, искатель приключений.",
-          copyright: "2026 World of ClaudeCraft"
+          copyright: "2026 World of ClaudeCraft",
+          guidesTitle: "Гайды для игроков",
+          guideFree: "Бесплатные MMORPG",
+          guideGamesLikeWow: "Игры, похожие на WoW",
+          guideBest: "Лучшие MMORPG",
+          guideNew: "Новые MMORPG",
+          guideBrowser: "Браузерные MMORPG",
+          guideGamesLikeDiablo: "Игры, похожие на Diablo"
         }
       };
 

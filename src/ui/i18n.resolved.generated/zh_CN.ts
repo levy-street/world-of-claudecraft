@@ -7187,7 +7187,14 @@ export const zh_CN: EnTranslations = {
       "discord": "加入 Discord",
       "communityWiki": "社区维基",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "游玩与社区链接"
+      "linksLabel": "游玩与社区链接",
+      "guidesLabel": "玩家指南",
+      "guideFree": "Free MMORPGs",
+      "guideGamesLikeWow": "类似 WoW 的游戏",
+      "guideBest": "Best MMORPGs",
+      "guideNew": "New MMORPGs",
+      "guideBrowser": "浏览器 MMORPG",
+      "guideGamesLikeDiablo": "类似《暗黑破坏神》的游戏"
     },
     "language": {
       "label": "语言",
@@ -9834,7 +9841,17 @@ export const zh_CN: EnTranslations = {
     "whitepaper": "白皮书",
     "terms": "服务条款",
     "privacy": "隐私政策",
-    "discordLabel": "加入Discord社区"
+    "discordLabel": "加入Discord社区",
+    "guidesLabel": "玩家指南",
+    "guideFree": "Free MMORPGs",
+    "guideGamesLikeWow": "类似 WoW 的游戏",
+    "guideBest": "Best MMORPGs",
+    "guideNew": "New MMORPGs",
+    "guideBrowser": "浏览器 MMORPG",
+    "guideGamesLikeDiablo": "类似《暗黑破坏神》的游戏",
+    "guideAllLists": "全部 MMORPG 榜单",
+    "guideAllGamesLike": "全部同类游戏指南",
+    "guideAllBrowser": "全部浏览器检查"
   },
   "settings": {
     "languageLoading": "正在加载语言...",

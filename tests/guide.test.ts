@@ -233,6 +233,11 @@ const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), '
   /\r\n/g,
   '\n',
 );
+// The server's pretty-URL alias table (STATIC_PAGE_ALIASES), imported by server/main.ts.
+const serverAliases = readFileSync(
+  new URL('../server/static_fallback.ts', import.meta.url),
+  'utf8',
+);
 const sitemapXml = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -320,7 +325,7 @@ describe('Guide routes', () => {
 describe('Guide entry wiring', () => {
   it('registers the /wiki pretty URL in BOTH alias tables (kept in sync)', () => {
     expect(viteConfig).toContain("['/wiki', '/guide.html']");
-    expect(serverMain).toContain("['/wiki', '/guide.html']");
+    expect(serverAliases).toContain("['/wiki', '/guide.html']");
   });
 
   it('falls back deep /wiki paths to the guide shell in dev and prod', () => {

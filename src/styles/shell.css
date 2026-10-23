@@ -838,11 +838,13 @@
 
   /* Footer donate link keeps the social-link shape but warms up on hover. */
   .footer-lang-row,
-  .footer-legal-row {
+  .footer-legal-row,
+  .footer-guides-row {
     display: flex;
     justify-content: center;
   }
-  .footer-legal-row {
+  .footer-legal-row,
+  .footer-guides-row {
     gap: 14px;
     flex-wrap: wrap;
   }

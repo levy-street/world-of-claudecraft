@@ -138,6 +138,14 @@ export function buildChrome(
           <a href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener">${esc(t('guide.footer.github'))}</a>
           <a href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener">${esc(t('guide.footer.discord'))}</a>
         </nav>
+        <nav class="guide-footer-links guide-footer-guides" aria-label="${esc(t('guide.footer.guidesLabel'))}">
+          <a href="/mmorpgs/free">${esc(t('guide.footer.guideFree'))}</a>
+          <a href="/games-like/world-of-warcraft">${esc(t('guide.footer.guideGamesLikeWow'))}</a>
+          <a href="/mmorpgs/best">${esc(t('guide.footer.guideBest'))}</a>
+          <a href="/mmorpgs/new">${esc(t('guide.footer.guideNew'))}</a>
+          <a href="/mmorpgs/browser">${esc(t('guide.footer.guideBrowser'))}</a>
+          <a href="/games-like/diablo">${esc(t('guide.footer.guideGamesLikeDiablo'))}</a>
+        </nav>
         <p class="guide-footer-rights">&copy; ${esc(t('guide.footer.rights'))}</p>
       </div>
     </footer>`;
