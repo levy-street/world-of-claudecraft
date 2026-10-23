@@ -6,12 +6,14 @@ import { GLIDER_COURSE, GLIDER_QUEST_ID } from '../sim/content/world_quest_glide
 import { GLIDER_COURSES } from '../sim/content/world_quest_glider_levels';
 import { gliderCourseForCycle } from '../sim/world_quest_glider_generation';
 import type { IWorld } from '../world_api';
-import { loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { attachSceneGroupGated } from './gated_scene_attach';
+import { createGliderApparatusMesh } from './glider_apparatus';
 import { gliderCourseVisible } from './glider_course_core';
 import { gliderApparatusPitch } from './glider_flight_pose_core';
 import { GliderWindVisual } from './glider_wind_visual';
+
+// Preserve the asset-fit and preload test seams at the original import path.
+export { fitGliderApparatus, gliderCourseVisualPreloadInternalsForTest } from './glider_apparatus';
 
 export class GliderCourseVisual {
   readonly group = new THREE.Group();
@@ -54,7 +56,7 @@ export class GliderCourseVisual {
   private readonly ringMeshes: THREE.Mesh[] = [];
   private readonly landingMesh: THREE.Mesh;
   private readonly landingBeacon: THREE.Mesh;
-  private readonly apparatus: { group: THREE.Group; dispose: () => void };
+  private readonly apparatus: ReturnType<typeof createGliderApparatusMesh>;
   private readonly winds = new Map<string, GliderWindVisual>();
   private course = GLIDER_COURSE;
 
@@ -116,7 +118,13 @@ export class GliderCourseVisual {
       this.group.add(wind.group);
     }
 
-    this.readyForEntry = attachSceneGroupGated(scene, this.group, compileGate, () => this.disposed)
+    const attach = () => attachSceneGroupGated(scene, this.group, compileGate, () => this.disposed);
+    // A late asset must be attached before the gate enumerates its material carriers.
+    this.readyForEntry = (
+      this.apparatus.group.children.length > 0
+        ? attach()
+        : this.apparatus.readyForEntry.then(attach)
+    )
       .then(() => {
         this.ready = !this.disposed;
         this.group.visible = false;
@@ -208,125 +216,4 @@ export class GliderCourseVisual {
     this.futureRingMat.dispose();
     this.landingPadMat.dispose();
   }
-}
-
-// The airborne glider itself: a Tripo-built GLB (world quests round 2 replaced
-// the procedural wing-and-spars mesh). Loaded once through the deferred preload
-// arm like every other GLB feature, then cloned per visual and fitted to the
-// span the flight pose was tuned for: nose along +z (the flight facing), the
-// wing above the pilot's chest, the control bar below.
-const GLIDER_APPARATUS_URL = '/models/props/windrider_glider_flight.glb';
-/** Tip-to-tip span in yards; the procedural apparatus this replaces spanned 4.8. */
-const GLIDER_APPARATUS_WINGSPAN = 4.8;
-/** How far the wing's top sits above the pilot's chest (the apparatus origin). */
-const GLIDER_APPARATUS_TOP_Y = 0.42;
-/** The built prop's keel runs along its own x axis, nose at +x, wing tips at
- *  +/-z (the pipeline's front render shows it side-on); the flight nose is +z
- *  and the span is x, so the clone turns a quarter turn about y. */
-const GLIDER_APPARATUS_YAW = -Math.PI / 2;
-
-let apparatusScene: THREE.Group | null = null;
-let apparatusSettled = false;
-const apparatusWaiters: Array<() => void> = [];
-const settleApparatus = (): void => {
-  apparatusSettled = true;
-  for (const waiter of apparatusWaiters.splice(0)) waiter();
-};
-if (typeof window !== 'undefined') {
-  // Deferred, never eager (the affliction_familiar precedent): a module-import
-  // registerPreload joins the launch fetch burst the deferred gate exists to
-  // spread out. A failed load settles too, so the fallback wing below is fitted
-  // instead of leaving the pilot on an invisible glider.
-  registerDeferredPreload(() =>
-    loadGltf(GLIDER_APPARATUS_URL)
-      .then((gltf) => {
-        apparatusScene = gltf.scene;
-      })
-      .catch(() => {})
-      .then(settleApparatus),
-  );
-}
-
-/** A plain wing and keel, fitted only when the prop fails to load: the pilot
- *  still reads the pitch feedback (gliderApparatusPitch) off something. */
-function buildFallbackApparatus(): { object: THREE.Object3D; dispose: () => void } {
-  const wingGeo = new THREE.PlaneGeometry(GLIDER_APPARATUS_WINGSPAN, 1.6);
-  const wingMat = new THREE.MeshLambertMaterial({ color: 0xd8c8a0, side: THREE.DoubleSide });
-  const wing = new THREE.Mesh(wingGeo, wingMat);
-  wing.rotation.x = -Math.PI / 2;
-  wing.position.y = GLIDER_APPARATUS_TOP_Y;
-  const keelGeo = new THREE.BoxGeometry(0.08, 0.08, 1.6);
-  const keelMat = new THREE.MeshLambertMaterial({ color: 0x5a4632 });
-  const keel = new THREE.Mesh(keelGeo, keelMat);
-  keel.position.y = GLIDER_APPARATUS_TOP_Y - 0.06;
-  const object = new THREE.Group();
-  object.name = 'glider-apparatus-fallback';
-  object.add(wing, keel);
-  return {
-    object,
-    dispose: () => {
-      wingGeo.dispose();
-      wingMat.dispose();
-      keelGeo.dispose();
-      keelMat.dispose();
-    },
-  };
-}
-
-export const gliderCourseVisualPreloadInternalsForTest = {
-  apparatusAssetUrl: GLIDER_APPARATUS_URL,
-  apparatusWingspan: GLIDER_APPARATUS_WINGSPAN,
-};
-
-/** A clone of the loaded prop, scaled to the wingspan, centred, nose to +z. */
-export function fitGliderApparatus(source: THREE.Object3D): THREE.Object3D {
-  const clone = source.clone(true);
-  clone.rotation.y = GLIDER_APPARATUS_YAW;
-  clone.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(clone);
-  const span = box.max.x - box.min.x || 1;
-  const scale = GLIDER_APPARATUS_WINGSPAN / span;
-  const holder = new THREE.Group();
-  holder.name = 'glider-apparatus-model';
-  holder.add(clone);
-  holder.scale.setScalar(scale);
-  holder.updateMatrixWorld(true);
-  const fitted = new THREE.Box3().setFromObject(holder);
-  const center = fitted.getCenter(new THREE.Vector3());
-  holder.position.set(-center.x, GLIDER_APPARATUS_TOP_Y - fitted.max.y, -center.z);
-  return holder;
-}
-
-function createGliderApparatusMesh(): {
-  group: THREE.Group;
-  dispose: () => void;
-} {
-  const group = new THREE.Group();
-  group.name = 'glider-apparatus';
-  group.visible = false;
-  let disposed = false;
-  let fallback: { object: THREE.Object3D; dispose: () => void } | null = null;
-  const attach = (): void => {
-    if (disposed || group.children.length > 0) return;
-    if (apparatusScene) {
-      group.add(fitGliderApparatus(apparatusScene));
-      return;
-    }
-    fallback = buildFallbackApparatus();
-    group.add(fallback.object);
-  };
-  if (apparatusSettled) attach();
-  else apparatusWaiters.push(attach);
-  return {
-    group,
-    dispose: () => {
-      disposed = true;
-      // The clone shares its geometry and materials with the cached prop scene,
-      // which other visuals still clone: detach only. The fallback is this
-      // visual's own and goes with it.
-      group.clear();
-      fallback?.dispose();
-      fallback = null;
-    },
-  };
 }
