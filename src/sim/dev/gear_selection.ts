@@ -8,6 +8,7 @@ import {
 import { devKitRole } from '../content/dev_kit_roles';
 import {
   canEquipItemInSlot,
+  classListAllows,
   displacedSlotForEquip,
   masterwroughtConflictSlot,
   uniqueEquipConflictSlot,
@@ -33,7 +34,7 @@ export function collectionFitsRole(
   const collection = crucibleCollectionForItem(item.id);
   if (!collection) return true;
   return (
-    (!item.requiredClass || item.requiredClass.includes(cls)) &&
+    (!item.requiredClass || classListAllows(item.requiredClass, cls)) &&
     (role === undefined || collection.role === role)
   );
 }

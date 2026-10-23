@@ -96,6 +96,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'That ability is not ready yet.': 'hud.errors.abilityNotReady',
     'Not enough rage!': 'hud.errors.notEnoughRage',
     'Not enough energy!': 'hud.errors.notEnoughEnergy',
+    'Not enough Instability!': 'hud.errors.notEnoughInstability',
     'Not enough mana!': 'hud.errors.notEnoughMana',
     'Not enough Devotion!': 'hud.errors.notEnoughDevotion',
     'Not enough health.': 'hud.errors.notEnoughHealth',

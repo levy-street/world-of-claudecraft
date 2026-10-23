@@ -102,7 +102,8 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
     // this test requires (its bodies would otherwise have no Hit_B_Stagger).
     // One literal in the loop covers every derived def, so the count moved by
     // one rather than by the number of prop sets.
-    expect(occurrences).toBe(37);
+    // 38 with the Glitch class rig (player_glitch).
+    expect(occurrences).toBe(38);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).

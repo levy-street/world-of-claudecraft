@@ -179,7 +179,7 @@ describe('dev kit bestBy: the near-tie-chain census', () => {
     // Non-vacuity for the sweep below: a census over 0 roles or empty pools is
     // the way this class of guard goes green while covering nothing.
     const roles = everyRole();
-    expect(roles.length, 'roles swept').toBe(27);
+    expect(roles.length, 'roles swept').toBe(30);
     let populated = 0;
     let biggest = 0;
     for (const { cls, role } of roles) {

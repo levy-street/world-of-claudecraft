@@ -30,7 +30,7 @@ export interface RecorderEntityView {
    * than assumed fixed for the fight. */
   resource?: number;
   maxResource?: number;
-  resourceType?: 'rage' | 'mana' | 'energy' | 'focus' | null;
+  resourceType?: 'rage' | 'mana' | 'energy' | 'focus' | 'corruption' | null;
   auras?: readonly { id: string; name: string; sourceId: number; stacks?: number }[];
 }
 

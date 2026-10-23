@@ -7815,7 +7815,8 @@ export const es_ES: EnTranslations = {
       "rage": "Ira",
       "mana": "Maná",
       "energy": "Energía",
-      "focus": "Concentración"
+      "focus": "Concentración",
+      "corruption": "Instability"
     },
     "classPage": {
       "back": "Todas las clases",
@@ -7886,6 +7887,11 @@ export const es_ES: EnTranslations = {
       "none": "Ninguna clase coincide con todos los filtros. Quita uno para ver más."
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "Corrupts a target with a lingering fault that feeds your Instability the longer it runs.",
+      "glitch_noise_field": "Fills a spot you choose with static that hurts and slows everything inside.",
+      "glitch_phase_skip": "Skips you to a spot you choose in an instant.",
+      "glitch_overflow": "Dumps your stored Instability into a target in one hit.",
+      "glitch_cascade": "Stretches every fault you have running in a chosen area.",
       "evil_eye": "Señala al enemigo cuyas acciones y sufrimiento alimentarán tu Condena.",
       "heroic_strike": "Prepara un golpe más fuerte que gasta ira en tu próximo ataque.",
       "revenge": "Golpea a los enemigos frente a ti y puede volverse gratis después de esquivar o parar.",
@@ -10258,6 +10264,7 @@ export const es_ES: EnTranslations = {
     "mage": "Mago",
     "warlock": "Brujo",
     "druid": "Druida",
+    "glitch": "Glitch",
     "warriorAria": "Clase Guerrero",
     "paladinAria": "Clase Paladín",
     "hunterAria": "Clase Cazador",
@@ -10266,7 +10273,8 @@ export const es_ES: EnTranslations = {
     "shamanAria": "Clase Chamán",
     "mageAria": "Clase Mago",
     "warlockAria": "Clase Brujo",
-    "druidAria": "Clase Druida"
+    "druidAria": "Clase Druida",
+    "glitchAria": "Glitch class"
   },
   "controls": {
     "title": "Guía de controles",
@@ -11335,7 +11343,8 @@ export const es_ES: EnTranslations = {
       "mana": "Maná",
       "energy": "Energía",
       "rage": "Ira",
-      "focus": "Concentración"
+      "focus": "Concentración",
+      "corruption": "Instability"
     },
     "roles": {
       "warrior": "Tanque / DPS cuerpo a cuerpo",
@@ -11346,7 +11355,8 @@ export const es_ES: EnTranslations = {
       "shaman": "Sanador / DPS cuerpo a cuerpo o a distancia",
       "mage": "DPS a distancia",
       "warlock": "DPS a distancia",
-      "druid": "Tanque / Sanador / DPS cuerpo a cuerpo o a distancia"
+      "druid": "Tanque / Sanador / DPS cuerpo a cuerpo o a distancia",
+      "glitch": "Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Malla, cuero, tela",
@@ -11370,7 +11380,8 @@ export const es_ES: EnTranslations = {
       "shaman": "Los chamanes dominan los elementos, imbuyen armas con poder, golpean con relámpagos y restauran a sus aliados.",
       "mage": "Los magos moldean Fuego, Escarcha y fuerza Arcana para destruir enemigos, invocar agua y congelar amenazas.",
       "warlock": "Los brujos invocan demonios, lanzan maldiciones y magia de daño continuo, y sorben la vida de sus enemigos para aguantar.",
-      "druid": "Los druidas canalizan la naturaleza, curan heridas, enredan enemigos y cambian a formas animales para defender o dañar."
+      "druid": "Los druidas canalizan la naturaleza, curan heridas, enredan enemigos y cambian a formas animales para defender o dañar.",
+      "glitch": "Glitches corrupt the world around them, seeding effects and fields that build Instability the longer they run, then dumping it in bursts."
     },
     "aria": "Detalles de clase para {className}: rol {role}. Atributos iniciales: Fuerza {str}, Agilidad {agi}, Aguante {sta}, Intelecto {int}, Espíritu {spi}.",
     "statBarAria": "{stat}: {value} de 25"
@@ -11895,6 +11906,7 @@ export const es_ES: EnTranslations = {
       "abilityNotReady": "Esa habilidad aún no está lista.",
       "notEnoughRage": "¡No tienes suficiente ira!",
       "notEnoughEnergy": "¡No tienes suficiente energía!",
+      "notEnoughInstability": "Not enough Instability!",
       "notEnoughMana": "¡No tienes suficiente maná!",
       "notEnoughDevotion": "¡Devoción insuficiente!",
       "notEnoughResource": "¡No tienes suficiente {resource}!",
@@ -12238,7 +12250,8 @@ export const es_ES: EnTranslations = {
       "rage": "ira",
       "energy": "energía",
       "focus": "concentración",
-      "devotion": "Devoción"
+      "devotion": "Devoción",
+      "corruption": "Instability"
     },
     "forms": {
       "bear": "oso",
@@ -13111,6 +13124,54 @@ export const es_ES: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "Corrupt Byte",
+        "description": "Corrupts the target, dealing {damage} Shadow damage over 12 sec. Builds Corruption while it runs."
+      },
+      "glitch_noise_field": {
+        "name": "Noise Field",
+        "description": "Fills the target area with static for 8 sec, dealing 6 to 8 Arcane damage each second and slowing enemies inside by 30%. Builds Corruption while it lasts."
+      },
+      "glitch_phase_skip": {
+        "name": "Phase Skip",
+        "description": "Skip to the target location up to 20 yards away, breaking roots."
+      },
+      "glitch_overflow": {
+        "name": "Overflow",
+        "description": "Dumps stored Corruption into the target, dealing {damage} Shadow damage. Costs 30 Corruption."
+      },
+      "glitch_memory_leak": {
+        "name": "Memory Leak",
+        "description": "Leaks the target's strength away, dealing {damage} Shadow damage over 15 sec. Builds Corruption while it runs."
+      },
+      "glitch_packet_loss": {
+        "name": "Packet Loss",
+        "description": "Drops the target's spell mid-cast, preventing any spell in that school from being cast for 6 sec."
+      },
+      "glitch_null_pointer": {
+        "name": "Null Pointer",
+        "description": "Points the target at nothing, rooting it in place for 4 sec."
+      },
+      "glitch_rollback": {
+        "name": "Rollback",
+        "description": "Restores 25% of your maximum health. Costs 50 Instability."
+      },
+      "glitch_cascade": {
+        "name": "Cascade",
+        "description": "Extends every Glitch effect you have on enemies in the target area by 4 sec. Extended effects keep their age, so they keep building Instability faster. Costs 20 Instability."
+      },
+      "glitch_fork_bomb": {
+        "name": "Fork Bomb",
+        "description": "Detonates the target area, dealing {damage} Arcane damage to every enemy inside. Costs 40 Corruption. (Overclock signature)"
+      },
+      "glitch_bit_rot": {
+        "name": "Bit Rot",
+        "description": "Rots the target, dealing {damage} Shadow damage over 10 sec. Builds Corruption while it runs. (Entropy signature)"
+      },
+      "glitch_sandbox": {
+        "name": "Sandbox",
+        "description": "Isolates you in a shield that absorbs damage equal to 20% of your maximum health for 10 sec. Costs 20 Corruption. (Sandbox signature)"
+      },
       "sport_kick": {
         "name": "Patada",
         "description": "Empuja el balón a ras de suelo hacia el punto de mira."

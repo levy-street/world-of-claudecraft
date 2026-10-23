@@ -273,6 +273,8 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   ],
   mage: [{ id: 'frost', weights: { int: 1, spi: 0.6, sta: 0.4 }, melee: false }],
   warlock: [{ id: 'demonology', weights: { int: 1, sta: 0.6, spi: 0.5 }, melee: false }],
+  // The Glitch wears the same cloth-caster pool as the warlock.
+  glitch: [{ id: 'entropy', weights: { int: 1, sta: 0.6, spi: 0.5 }, melee: false }],
   druid: [
     { id: 'balance', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
     { id: 'feral', weights: { str: 1, agi: 0.6, sta: 0.6 }, melee: true },

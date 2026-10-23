@@ -90,6 +90,7 @@ export const ENGINE_AURAS: Readonly<Record<PlayerClass, readonly EngineRow[]>> =
     { kind: 'destruction_ruin', name: 'Ruin' },
     { kind: 'desolation', name: 'Desolation' },
   ],
+  glitch: [],
   druid: [
     { kind: 'old_blood', name: 'Old Blood' },
     { kind: 'moontide', name: 'Moontide' },

@@ -74,9 +74,9 @@ describe('mastery formatter fails closed on unmapped effect fields', () => {
     expect(rendered).toBe('Increases synthetic output by 70%.');
   });
 
-  it('sweep: none of the 27 real masteries renders "undefined" in any supported locale', () => {
+  it('sweep: none of the 30 real masteries renders "undefined" in any supported locale', () => {
     const specs = Object.values(TALENTS).flatMap((classTalents) => classTalents.specs);
-    expect(specs).toHaveLength(27);
+    expect(specs).toHaveLength(30);
     for (const lang of supportedLanguages) {
       setLanguage(lang);
       for (const spec of specs) {

@@ -7815,7 +7815,8 @@ export const da_DK: EnTranslations = {
       "rage": "Raseri",
       "mana": "Mana",
       "energy": "Energi",
-      "focus": "Fokus"
+      "focus": "Fokus",
+      "corruption": "Instability"
     },
     "classPage": {
       "back": "Alle klasser",
@@ -7886,6 +7887,11 @@ export const da_DK: EnTranslations = {
       "none": "Ingen klasse matcher alle filtre. Ryd et for at se flere."
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "Corrupts a target with a lingering fault that feeds your Instability the longer it runs.",
+      "glitch_noise_field": "Fills a spot you choose with static that hurts and slows everything inside.",
+      "glitch_phase_skip": "Skips you to a spot you choose in an instant.",
+      "glitch_overflow": "Dumps your stored Instability into a target in one hit.",
+      "glitch_cascade": "Stretches every fault you have running in a chosen area.",
       "evil_eye": "Navngiver den fjende, hvis handlinger og lidelse vil fodre din Fordømmelse.",
       "heroic_strike": "Sætter et tungere sving i kø der bruger raseri på dit næste slag.",
       "revenge": "Svinger gennem fjender foran dig og kan blive gratis efter en undvigelse eller parering.",
@@ -10258,6 +10264,7 @@ export const da_DK: EnTranslations = {
     "mage": "Magiker",
     "warlock": "Heksemester",
     "druid": "Druide",
+    "glitch": "Glitch",
     "warriorAria": "Kriger-klasse",
     "paladinAria": "Paladin-klasse",
     "hunterAria": "Jæger-klasse",
@@ -10266,7 +10273,8 @@ export const da_DK: EnTranslations = {
     "shamanAria": "Shaman-klasse",
     "mageAria": "Magiker-klasse",
     "warlockAria": "Heksemester-klasse",
-    "druidAria": "Druide-klasse"
+    "druidAria": "Druide-klasse",
+    "glitchAria": "Glitch class"
   },
   "controls": {
     "title": "Guide til Styring",
@@ -11335,7 +11343,8 @@ export const da_DK: EnTranslations = {
       "mana": "Mana",
       "energy": "Energi",
       "rage": "Raseri",
-      "focus": "Fokus"
+      "focus": "Fokus",
+      "corruption": "Instability"
     },
     "roles": {
       "warrior": "Tank / Nærkamps-DPS",
@@ -11346,7 +11355,8 @@ export const da_DK: EnTranslations = {
       "shaman": "Healer / Nærkamps- eller Afstands-DPS",
       "mage": "Afstands-DPS",
       "warlock": "Afstands-DPS",
-      "druid": "Tank / Healer / Nærkamps- eller Afstands-DPS"
+      "druid": "Tank / Healer / Nærkamps- eller Afstands-DPS",
+      "glitch": "Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Ringbrynje, Læder, Stof",
@@ -11370,7 +11380,8 @@ export const da_DK: EnTranslations = {
       "shaman": "Shamaner befaler elementerne, gennemtrænger våben med kraft, chokerer fjender med lyn og genopretter allierede.",
       "mage": "Magikere bøjer Ild-, Frost- og arkankraft for at tilintetgøre fjender, frembringe vand og fryse trusler på stedet.",
       "warlock": "Heksemestre tilkalder dæmoner, kaster forbandelser og skade-over-tid-magi og suger liv fra fjender for at holde ud.",
-      "druid": "Druider kanaliserer naturen, helbreder sår, omslynger fjender og skifter til dyreformer til forsvar eller skade."
+      "druid": "Druider kanaliserer naturen, helbreder sår, omslynger fjender og skifter til dyreformer til forsvar eller skade.",
+      "glitch": "Glitches corrupt the world around them, seeding effects and fields that build Instability the longer they run, then dumping it in bursts."
     },
     "aria": "Klassedetaljer for {className}: rolle {role}. Startværdier: Styrke {str}, Smidighed {agi}, Udholdenhed {sta}, Intellekt {int}, Ånd {spi}.",
     "statBarAria": "{stat}: {value} ud af 25"
@@ -11895,6 +11906,7 @@ export const da_DK: EnTranslations = {
       "abilityNotReady": "Den evne er ikke klar endnu.",
       "notEnoughRage": "Ikke nok raseri!",
       "notEnoughEnergy": "Ikke nok energi!",
+      "notEnoughInstability": "Not enough Instability!",
       "notEnoughMana": "Ikke nok mana!",
       "notEnoughDevotion": "Ikke nok Hengivenhed!",
       "notEnoughResource": "Ikke nok {resource}!",
@@ -12238,7 +12250,8 @@ export const da_DK: EnTranslations = {
       "rage": "Raseri",
       "energy": "Energi",
       "focus": "fokus",
-      "devotion": "Hengivenhed"
+      "devotion": "Hengivenhed",
+      "corruption": "Instability"
     },
     "forms": {
       "bear": "Bruin",
@@ -13111,6 +13124,54 @@ export const da_DK: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "Corrupt Byte",
+        "description": "Corrupts the target, dealing {damage} Shadow damage over 12 sec. Builds Corruption while it runs."
+      },
+      "glitch_noise_field": {
+        "name": "Noise Field",
+        "description": "Fills the target area with static for 8 sec, dealing 6 to 8 Arcane damage each second and slowing enemies inside by 30%. Builds Corruption while it lasts."
+      },
+      "glitch_phase_skip": {
+        "name": "Phase Skip",
+        "description": "Skip to the target location up to 20 yards away, breaking roots."
+      },
+      "glitch_overflow": {
+        "name": "Overflow",
+        "description": "Dumps stored Corruption into the target, dealing {damage} Shadow damage. Costs 30 Corruption."
+      },
+      "glitch_memory_leak": {
+        "name": "Memory Leak",
+        "description": "Leaks the target's strength away, dealing {damage} Shadow damage over 15 sec. Builds Corruption while it runs."
+      },
+      "glitch_packet_loss": {
+        "name": "Packet Loss",
+        "description": "Drops the target's spell mid-cast, preventing any spell in that school from being cast for 6 sec."
+      },
+      "glitch_null_pointer": {
+        "name": "Null Pointer",
+        "description": "Points the target at nothing, rooting it in place for 4 sec."
+      },
+      "glitch_rollback": {
+        "name": "Rollback",
+        "description": "Restores 25% of your maximum health. Costs 50 Instability."
+      },
+      "glitch_cascade": {
+        "name": "Cascade",
+        "description": "Extends every Glitch effect you have on enemies in the target area by 4 sec. Extended effects keep their age, so they keep building Instability faster. Costs 20 Instability."
+      },
+      "glitch_fork_bomb": {
+        "name": "Fork Bomb",
+        "description": "Detonates the target area, dealing {damage} Arcane damage to every enemy inside. Costs 40 Corruption. (Overclock signature)"
+      },
+      "glitch_bit_rot": {
+        "name": "Bit Rot",
+        "description": "Rots the target, dealing {damage} Shadow damage over 10 sec. Builds Corruption while it runs. (Entropy signature)"
+      },
+      "glitch_sandbox": {
+        "name": "Sandbox",
+        "description": "Isolates you in a shield that absorbs damage equal to 20% of your maximum health for 10 sec. Costs 20 Corruption. (Sandbox signature)"
+      },
       "sport_kick": {
         "name": "Spark",
         "description": "Spark bolden langs jorden mod sigtepunktet."

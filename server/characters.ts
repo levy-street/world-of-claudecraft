@@ -159,6 +159,7 @@ const VALID_CLASSES: readonly string[] = [
   'mage',
   'warlock',
   'druid',
+  'glitch',
 ];
 /** Highest selectable skin index (mirrors the legacy Math.min(7, ...) clamp). */
 const MAX_SKIN = 7;

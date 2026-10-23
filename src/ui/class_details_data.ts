@@ -69,6 +69,12 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     armorKey: 'classDetails.armor.cloth',
     weaponsKey: 'classDetails.weapons.staves',
   },
+  glitch: {
+    roleKey: 'classDetails.roles.glitch',
+    roleType: 'ranged',
+    armorKey: 'classDetails.armor.cloth',
+    weaponsKey: 'classDetails.weapons.staves',
+  },
   druid: {
     roleKey: 'classDetails.roles.druid',
     roleType: 'hybrid',
@@ -89,6 +95,7 @@ export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   shaman: ['lightning_bolt', 'rockbiter_weapon', 'ghost_wolf'],
   mage: ['fireball', 'frostbolt', 'polymorph'],
   warlock: ['shadow_bolt', 'corruption', 'life_tap'],
+  glitch: ['glitch_corrupt_byte', 'glitch_noise_field', 'glitch_overflow'],
   druid: ['wrath', 'bear_form', 'rejuvenation'],
 };
 
@@ -243,6 +250,23 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
       primaryStat: 'int',
       complexity: 'low',
       examples: ['conflagrate', 'immolate', 'shadowburn', 'rain_of_fire'],
+    },
+  },
+  glitch: {
+    overclock: {
+      primaryStat: 'int',
+      complexity: 'medium',
+      examples: ['glitch_fork_bomb', 'glitch_overflow', 'glitch_noise_field', 'glitch_cascade'],
+    },
+    entropy: {
+      primaryStat: 'int',
+      complexity: 'high',
+      examples: ['glitch_bit_rot', 'glitch_corrupt_byte', 'glitch_memory_leak', 'glitch_cascade'],
+    },
+    sandbox: {
+      primaryStat: 'int',
+      complexity: 'low',
+      examples: ['glitch_sandbox', 'glitch_rollback', 'glitch_phase_skip', 'glitch_overflow'],
     },
   },
   druid: {

@@ -9,6 +9,7 @@ import {
   SHAMAN_CHOICE_ROWS,
   WARLOCK_CHOICE_ROWS,
 } from './choice_rows_classic';
+import { GLITCH_CHOICE_ROWS } from './glitch_talents';
 import type { TalentEffect } from './talents';
 import { WARRIOR_ROWS } from './warrior_rows';
 
@@ -46,6 +47,7 @@ export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> & Record<string, 
   mage: MAGE_CHOICE_ROWS,
   warlock: WARLOCK_CHOICE_ROWS,
   druid: DRUID_CHOICE_ROWS,
+  glitch: GLITCH_CHOICE_ROWS,
 };
 
 const CHOICE_ROW_LEVEL_SET = new Set<number>(CHOICE_ROW_LEVELS);

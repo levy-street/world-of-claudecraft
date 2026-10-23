@@ -7815,7 +7815,8 @@ export const nl_NL: EnTranslations = {
       "rage": "Woede",
       "mana": "Mana",
       "energy": "Energie",
-      "focus": "Focus"
+      "focus": "Focus",
+      "corruption": "Instability"
     },
     "classPage": {
       "back": "Alle klassen",
@@ -7886,6 +7887,11 @@ export const nl_NL: EnTranslations = {
       "none": "Geen klasse voldoet aan elk filter. Wis er een om meer te zien."
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "Corrupts a target with a lingering fault that feeds your Instability the longer it runs.",
+      "glitch_noise_field": "Fills a spot you choose with static that hurts and slows everything inside.",
+      "glitch_phase_skip": "Skips you to a spot you choose in an instant.",
+      "glitch_overflow": "Dumps your stored Instability into a target in one hit.",
+      "glitch_cascade": "Stretches every fault you have running in a chosen area.",
       "evil_eye": "Noemt de vijand wiens daden en lijden je Verdoemenis zullen voeden.",
       "heroic_strike": "Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.",
       "revenge": "Raakt vijanden voor je en kan gratis worden na een ontwijking of parering.",
@@ -10258,6 +10264,7 @@ export const nl_NL: EnTranslations = {
     "mage": "Magiër",
     "warlock": "Heksenmeester",
     "druid": "Druïde",
+    "glitch": "Glitch",
     "warriorAria": "Klasse Krijger",
     "paladinAria": "Klasse Paladijn",
     "hunterAria": "Klasse Jager",
@@ -10266,7 +10273,8 @@ export const nl_NL: EnTranslations = {
     "shamanAria": "Klasse Sjamaan",
     "mageAria": "Klasse Magiër",
     "warlockAria": "Klasse Heksenmeester",
-    "druidAria": "Klasse Druïde"
+    "druidAria": "Klasse Druïde",
+    "glitchAria": "Glitch class"
   },
   "controls": {
     "title": "Besturingsgids",
@@ -11335,7 +11343,8 @@ export const nl_NL: EnTranslations = {
       "mana": "Mana",
       "energy": "Energie",
       "rage": "Woede",
-      "focus": "Focus"
+      "focus": "Focus",
+      "corruption": "Instability"
     },
     "roles": {
       "warrior": "Tank / Melee-DPS",
@@ -11346,7 +11355,8 @@ export const nl_NL: EnTranslations = {
       "shaman": "Genezer / Melee- of Ranged-DPS",
       "mage": "Ranged-DPS",
       "warlock": "Ranged-DPS",
-      "druid": "Tank / Genezer / Melee- of Ranged-DPS"
+      "druid": "Tank / Genezer / Melee- of Ranged-DPS",
+      "glitch": "Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Maliënkolder, Leer, Stof",
@@ -11370,7 +11380,8 @@ export const nl_NL: EnTranslations = {
       "shaman": "Sjamanen gebieden de elementen, doordringen wapens met kracht, schokken vijanden met bliksem en herstellen bondgenoten.",
       "mage": "Magiërs buigen Vuur-, Vorst- en arcane kracht om vijanden te vernietigen, water op te roepen en dreigingen ter plaatse te bevriezen.",
       "warlock": "Heksenmeesters roepen demonen op, leggen vloeken en schade-over-tijd-magie op, en tappen leven af bij vijanden om vol te houden.",
-      "druid": "Druïden kanaliseren de natuur, genezen wonden, verstrikken vijanden en veranderen in diergedaanten voor verdediging of schade."
+      "druid": "Druïden kanaliseren de natuur, genezen wonden, verstrikken vijanden en veranderen in diergedaanten voor verdediging of schade.",
+      "glitch": "Glitches corrupt the world around them, seeding effects and fields that build Instability the longer they run, then dumping it in bursts."
     },
     "aria": "Klassedetails voor {className}: rol {role}. Beginstatistieken: Kracht {str}, Behendigheid {agi}, Uithoudingsvermogen {sta}, Intellect {int}, Geest {spi}.",
     "statBarAria": "{stat}: {value} van 25"
@@ -11895,6 +11906,7 @@ export const nl_NL: EnTranslations = {
       "abilityNotReady": "Die vaardigheid is nog niet gereed.",
       "notEnoughRage": "Niet genoeg woede!",
       "notEnoughEnergy": "Niet genoeg energie!",
+      "notEnoughInstability": "Not enough Instability!",
       "notEnoughMana": "Niet genoeg mana!",
       "notEnoughDevotion": "Niet genoeg Toewijding!",
       "notEnoughResource": "Niet genoeg {resource}!",
@@ -12238,7 +12250,8 @@ export const nl_NL: EnTranslations = {
       "rage": "Woede",
       "energy": "Energie",
       "focus": "focus",
-      "devotion": "Toewijding"
+      "devotion": "Toewijding",
+      "corruption": "Instability"
     },
     "forms": {
       "bear": "Bruin",
@@ -13111,6 +13124,54 @@ export const nl_NL: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "Corrupt Byte",
+        "description": "Corrupts the target, dealing {damage} Shadow damage over 12 sec. Builds Corruption while it runs."
+      },
+      "glitch_noise_field": {
+        "name": "Noise Field",
+        "description": "Fills the target area with static for 8 sec, dealing 6 to 8 Arcane damage each second and slowing enemies inside by 30%. Builds Corruption while it lasts."
+      },
+      "glitch_phase_skip": {
+        "name": "Phase Skip",
+        "description": "Skip to the target location up to 20 yards away, breaking roots."
+      },
+      "glitch_overflow": {
+        "name": "Overflow",
+        "description": "Dumps stored Corruption into the target, dealing {damage} Shadow damage. Costs 30 Corruption."
+      },
+      "glitch_memory_leak": {
+        "name": "Memory Leak",
+        "description": "Leaks the target's strength away, dealing {damage} Shadow damage over 15 sec. Builds Corruption while it runs."
+      },
+      "glitch_packet_loss": {
+        "name": "Packet Loss",
+        "description": "Drops the target's spell mid-cast, preventing any spell in that school from being cast for 6 sec."
+      },
+      "glitch_null_pointer": {
+        "name": "Null Pointer",
+        "description": "Points the target at nothing, rooting it in place for 4 sec."
+      },
+      "glitch_rollback": {
+        "name": "Rollback",
+        "description": "Restores 25% of your maximum health. Costs 50 Instability."
+      },
+      "glitch_cascade": {
+        "name": "Cascade",
+        "description": "Extends every Glitch effect you have on enemies in the target area by 4 sec. Extended effects keep their age, so they keep building Instability faster. Costs 20 Instability."
+      },
+      "glitch_fork_bomb": {
+        "name": "Fork Bomb",
+        "description": "Detonates the target area, dealing {damage} Arcane damage to every enemy inside. Costs 40 Corruption. (Overclock signature)"
+      },
+      "glitch_bit_rot": {
+        "name": "Bit Rot",
+        "description": "Rots the target, dealing {damage} Shadow damage over 10 sec. Builds Corruption while it runs. (Entropy signature)"
+      },
+      "glitch_sandbox": {
+        "name": "Sandbox",
+        "description": "Isolates you in a shield that absorbs damage equal to 20% of your maximum health for 10 sec. Costs 20 Corruption. (Sandbox signature)"
+      },
       "sport_kick": {
         "name": "Trap",
         "description": "Trap de bal over de grond richting het richtpunt."

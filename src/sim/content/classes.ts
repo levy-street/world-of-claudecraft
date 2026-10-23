@@ -7,6 +7,7 @@ import {
   type CoreStats,
   type PlayerClass,
   type PoisonCoat,
+  type ResourceType,
   TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE,
   TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
   TEMPORAL_HOURGLASS_DURATION,
@@ -24,6 +25,7 @@ import {
   TEMPORAL_ECHO_DURATION_SECONDS,
   TEMPORAL_ECHO_SINGLE_CONVERSION,
 } from './chronomancy_tuning';
+import { GLITCH_ABILITIES, GLITCH_KIT } from './glitch';
 import {
   CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE,
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
@@ -54,7 +56,7 @@ export interface ClassDef {
   hpPerLevel: number;
   baseMana: number;
   manaPerLevel: number;
-  resourceType: 'rage' | 'mana' | 'energy' | 'focus';
+  resourceType: ResourceType;
   startWeapon: string;
   startOffhand?: string;
   startChest: string;
@@ -623,6 +625,34 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'grove_awakening',
     ],
     color: 0xff8c1a,
+  },
+  glitch: {
+    id: 'glitch',
+    name: 'Glitch',
+    // A ranged hybrid on the warlock's caster chassis. It has no mana: its bar
+    // is Instability (0 to 100), built by its running effects
+    // (combat/glitch_corruption.ts), so baseMana is the cap like rage.
+    baseStats: { str: 11, agi: 12, sta: 15, int: 21, spi: 21, armor: 22 },
+    statsPerLevel: { str: 0, agi: 0, sta: 2, int: 3, spi: 2, armor: 4 },
+    baseHp: 42,
+    hpPerLevel: 15,
+    baseMana: 100, // corruption cap
+    manaPerLevel: 0,
+    resourceType: 'corruption',
+    startWeapon: 'gnarled_staff',
+    startChest: 'apprentice_robe',
+    startItems: START_RATIONS,
+    ranged: {
+      min: 3,
+      max: 6,
+      speed: 1.8,
+      maxRange: 30,
+      minRange: 0,
+      wand: true,
+      school: 'arcane',
+    },
+    abilities: GLITCH_KIT,
+    color: 0x3df2e0,
   },
 };
 
@@ -8706,6 +8736,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // and become known only through the selected row's `grant` effect.
   ...TALENT_ABILITIES_V2,
   ...PRIEST_ABILITIES,
+  ...GLITCH_ABILITIES,
 
   // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)

@@ -144,6 +144,7 @@ import {
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
 import { glacialFrontContains } from './glacial_front';
+import { applyGlitchCascade } from './glitch_corruption';
 import {
   applyGreaterInvisibilityAftereffect,
   GREATER_INVISIBILITY_DR_AURA_ID,
@@ -3690,6 +3691,24 @@ export function runEffects(
           fx: 'blinkStep',
           ability: ability.id,
         });
+        break;
+      }
+      case 'blinkToAim': {
+        if (hasUnbreakableMovementLock(p)) break;
+        if (eff.breakRoots) removeRootAuras(ctx, p);
+        relocateSwept(ctx, p, p.castAim ?? p.pos);
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'blinkStep',
+          ability: ability.id,
+        });
+        break;
+      }
+      case 'glitchCascade': {
+        applyGlitchCascade(ctx, p, p.castAim ?? p.pos, eff.radius, eff.seconds, ability);
         break;
       }
       case 'selfBuff': {

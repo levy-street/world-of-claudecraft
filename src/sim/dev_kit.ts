@@ -27,7 +27,13 @@ import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
 import { WARFARE_ITEMS } from './content/pvp_honor';
 import { DUNGEONS, ITEMS, MOBS } from './data';
-import { canEquipItem, canEquipItemInSlot, isShieldItem, weaponHand } from './equipment_rules';
+import {
+  canEquipItem,
+  canEquipItemInSlot,
+  classListAllows,
+  isShieldItem,
+  weaponHand,
+} from './equipment_rules';
 import { itemFromRaid, itemSourceLevel } from './item_level';
 import { meetsLevelRequirement } from './item_level_req';
 import type { EquipSlot, ItemDef, PlayerClass } from './types';
@@ -173,7 +179,7 @@ export function isFreshTwentyItem(cls: PlayerClass, item: ItemDef): boolean {
   // canEquipItem returns on the armor-rank check for anything with an armorType, so
   // a class-locked plate piece never reaches its own requiredClass test. Re-check it
   // here or a mail class ends up wearing warrior-only tier pieces.
-  if (item.requiredClass && !item.requiredClass.includes(cls)) return false;
+  if (item.requiredClass && !classListAllows(item.requiredClass, cls)) return false;
   return meetsLevelRequirement(DEV_KIT_LEVEL, item);
 }
 

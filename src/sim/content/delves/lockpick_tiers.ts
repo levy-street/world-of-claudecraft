@@ -67,6 +67,7 @@ const LOOT_ARCHETYPE: Record<PlayerClass, 'WAR' | 'ROG' | 'MAG'> = {
   priest: 'MAG',
   warlock: 'MAG',
   druid: 'MAG',
+  glitch: 'MAG',
 };
 
 /**

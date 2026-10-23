@@ -85,9 +85,12 @@ describe('the Season 2 stock', () => {
     expect(SEASON2_WEAPON_IDS).toHaveLength(5);
     expect(SEASON2_JEWELRY_IDS).toHaveLength(8);
     expect(SEASON2_STOCK).toHaveLength(27 * 5 + 5 + 8);
-    const specs = Object.entries(DEV_KIT_ROLES).flatMap(([cls, roles]) =>
-      roles.map((r) => `vanguard_${cls}_${r.spec}`),
-    );
+    // The Glitch postdates Season 2 and has no Vanguard sets yet: a visible
+    // content gap, named here rather than silently skipped.
+    const classesWithoutSeason2Sets = new Set(['glitch']);
+    const specs = Object.entries(DEV_KIT_ROLES)
+      .filter(([cls]) => !classesWithoutSeason2Sets.has(cls))
+      .flatMap(([cls, roles]) => roles.map((r) => `vanguard_${cls}_${r.spec}`));
     expect(SEASON2_SETS.map((s) => s.setId).sort()).toEqual([...new Set(specs)].sort());
     for (const npcId of ['fury', 'warmarshal_draven_kole']) {
       const sold = new Set(NPCS[npcId]?.vendorItems ?? []);

@@ -311,6 +311,9 @@ describe('kit construction', () => {
       'warlock/destruction',
       'druid/balance',
       'druid/restoration',
+      'glitch/overclock',
+      'glitch/entropy',
+      'glitch/sandbox',
     ];
     // druid/feral takes the str ring and then the rung-50 INT ring, and it is
     // not a mistake. It is the one TANK_AGI role, and stamina leads outright

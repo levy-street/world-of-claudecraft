@@ -241,6 +241,7 @@ const RESOURCE_NAME_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'guide.resourceName.mana',
   energy: 'guide.resourceName.energy',
   focus: 'guide.resourceName.focus',
+  corruption: 'guide.resourceName.corruption',
 };
 
 function factsHtml(c: GuideClassInfo): string {

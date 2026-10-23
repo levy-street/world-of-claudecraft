@@ -98,6 +98,7 @@ describe('groupLootExplorerBySource: preserves per-drop conditional metadata', (
     for (const drop of restrictedDrops) expect(drop.restrictedToClass).toBeDefined();
     expect(restrictedDrops.map((d) => d.restrictedToClass).sort()).toEqual([
       'druid',
+      'glitch',
       'mage',
       'priest',
       'warlock',

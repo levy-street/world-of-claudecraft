@@ -111,6 +111,7 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { glitchFeedbackMult } from './glitch_corruption';
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { clearPacklordState } from './hunter_packlord';
 import {
@@ -325,6 +326,9 @@ export function dealDamage(
   // (combat/fire_mage.ts). Returns 1x for everyone else and for the self-burn, so all
   // other damage is byte-identical.
   if (!alreadyFinal) amount = Math.round(amount * cauterizeFireDamageMult(source, target, school));
+  // Glitch Feedback: amplified per other Glitch effect on the target
+  // (combat/glitch_corruption.ts); 1x for every other source.
+  if (!alreadyFinal) amount = Math.round(amount * glitchFeedbackMult(source, target));
 
   // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
   // through raid bosses to inspect drops without one-shotting them past their phase

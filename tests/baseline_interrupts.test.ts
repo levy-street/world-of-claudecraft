@@ -17,6 +17,7 @@ const INTERRUPTS: Record<string, string> = {
   hunter: 'counter_shot',
   druid: 'skull_bash',
   warlock: 'spell_lock',
+  glitch: 'glitch_packet_loss',
 };
 
 // The paladin is the exception: its overhauled kit retired Reproach (see

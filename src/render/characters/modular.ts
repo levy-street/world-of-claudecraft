@@ -550,6 +550,7 @@ export const CLASS_ARMOR_SETS: Record<string, ArmorSetId> = {
   mage: 'mage',
   warlock: 'mage',
   druid: 'druid',
+  glitch: 'mage',
 };
 
 /** The default kit for a class, knight (the warrior's) when unknown. */

@@ -119,6 +119,7 @@ describe('world quest class loot tables', () => {
       mage: 28,
       warlock: 27,
       druid: 28,
+      glitch: 27,
     });
   });
 });

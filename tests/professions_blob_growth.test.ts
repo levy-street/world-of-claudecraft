@@ -2452,7 +2452,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
         4711 +
         // Five earned PvP flag deed IDs plus fixed dates, isolated below.
-        138,
+        138 +
+        // Plus 48 for the Glitch class: one `"glitch":99,` row (12 bytes) in each
+        // of the four per-opponent-class honorArenaDaily maps. MEASURED.
+        48,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2540,7 +2543,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
       // 231,943 -> 232,631 for the eight Season 2 rings and necks (+688,
       // attributed above, kept here).
-    ).toBe(232631);
+      // 232,631 -> 232,679 for the Glitch class (+48, attributed above, kept).
+    ).toBe(232679);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2569,7 +2573,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
       // 233,562 -> 234,250 for the eight Season 2 rings and necks (+688, kept).
-    ).toBe(234250);
+      // 234,250 -> 234,298 for the Glitch class (+48, kept).
+    ).toBe(234298);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2674,7 +2679,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       delete withoutPvpTitles.deeds![id];
     }
     expect(bytes - Buffer.byteLength(JSON.stringify(withoutPvpTitles), 'utf8')).toBe(138);
-    expect(Buffer.byteLength(JSON.stringify(withoutPvpTitles), 'utf8')).toBe(234124);
+    expect(Buffer.byteLength(JSON.stringify(withoutPvpTitles), 'utf8')).toBe(234172);
     const withoutFeralStaff = JSON.parse(JSON.stringify(s2)) as CharacterState;
     expect(withoutFeralStaff.deedStats?.itemsDiscovered).toContain('vanguard_feral_staff');
     withoutFeralStaff.deedStats!.itemsDiscovered =
@@ -2706,10 +2711,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(bytes - Buffer.byteLength(JSON.stringify(withoutSeason2Jewelry), 'utf8')).toBe(688);
     // Re-measured 233,574, then 234,262 with the eight Season 2 rings and necks
     // (+688, 2026-10-02); the band re-based to measured minus 380 and plus one,
-    // the save warning limit unchanged.
-    expect(bytes).toBe(234262);
-    expect(bytes, reMint).toBeGreaterThan(233882);
-    expect(bytes, reMint).toBeLessThan(234263);
+    // the save warning limit unchanged. Then 234,310 with the Glitch class
+    // (+48, its four per-opponent honor rows), the band moving with it.
+    expect(bytes).toBe(234310);
+    expect(bytes, reMint).toBeGreaterThan(233930);
+    expect(bytes, reMint).toBeLessThan(234311);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

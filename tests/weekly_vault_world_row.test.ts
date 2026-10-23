@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { BUILTIN_WORLD, ITEMS, NPCS } from '../src/sim/data';
-import { canEquipItem } from '../src/sim/equipment_rules';
+import { canEquipItem, classListAllows } from '../src/sim/equipment_rules';
 import { itemLevel } from '../src/sim/item_level';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -86,7 +86,10 @@ describe('the world pool', () => {
         expect(['weapon', 'armor', 'held_offhand'], `${cls} ${id} kind`).toContain(item.kind);
         expect(['rare', 'epic'], `${cls} ${id} quality`).toContain(item.quality);
         expect(canEquipItem(cls, item), `${cls} can wear ${id}`).toBe(true);
-        if (item.requiredClass) expect(item.requiredClass, `${id} class lock`).toContain(cls);
+        // The Glitch passes the shared cloth-caster lists (equipment_rules classListAllows).
+        if (item.requiredClass) {
+          expect(classListAllows(item.requiredClass, cls), `${cls} ${id} class lock`).toBe(true);
+        }
         expect(item.heroicOf, `${id} is a Normal piece`).toBeUndefined();
         expect(itemLevel(item), `${cls} ${id} item level`).toBe(PREVIOUS_TIER_ITEM_LEVEL);
         expect(IGNIVAR_LOOT_ITEM_IDS, `${id} is not the current tier`).not.toContain(id);

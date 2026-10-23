@@ -1295,7 +1295,9 @@ export function castAbility(
               ? 'Not enough energy!'
               : p.resourceType === 'focus'
                 ? 'Not enough Focus!'
-                : 'Not enough mana!',
+                : p.resourceType === 'corruption'
+                  ? 'Not enough Instability!'
+                  : 'Not enough mana!',
     );
     return;
   }

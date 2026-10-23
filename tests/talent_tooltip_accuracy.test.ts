@@ -65,7 +65,7 @@ function allEntries(): Entry[] {
 
 const NO_EFFECT = 'Provides a specialization benefit.';
 
-describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
+describe('talent tooltip accuracy (all 10 classes x 3 specs)', () => {
   beforeAll(async () => {
     await ensureLocaleLoaded('en');
     setLanguage('en');
@@ -73,9 +73,9 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
 
   const entries = allEntries();
 
-  it('covers every class, all 162 row options, and all 27 masteries', () => {
-    expect(new Set(entries.map((e) => e.cls)).size).toBe(9);
-    expect(entries).toHaveLength(189);
+  it('covers every class, all 180 row options, and all 30 masteries', () => {
+    expect(new Set(entries.map((e) => e.cls)).size).toBe(10);
+    expect(entries).toHaveLength(210);
   });
 
   it('every talent describes a real effect (none fall back to the generic blurb)', () => {
@@ -729,9 +729,9 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
   const specs = specEntries();
 
   it('covers every class, every spec, and every choice row option', () => {
-    expect(new Set(effects.map((e) => e.cls)).size).toBe(9);
-    expect(specs).toHaveLength(27);
-    expect(effects.length).toBe(27 + 9 * 6 * 3);
+    expect(new Set(effects.map((e) => e.cls)).size).toBe(10);
+    expect(specs).toHaveLength(30);
+    expect(effects.length).toBe(30 + 10 * 6 * 3);
   });
 
   it('every spec tooltip names its signature ability', () => {

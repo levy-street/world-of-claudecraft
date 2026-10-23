@@ -18714,4 +18714,52 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.godlike': '{name}已经接近神了！',
   'hudChrome.hill.callout.legendary': '{name}已经超越神了！',
   'hudChrome.hill.callout.shutDown': '{killer}终结了{victim}！',
+  'classes.glitch': '故障者',
+  'classes.glitchAria': '故障者职业',
+  'classDetails.lore.glitch':
+    '故障者扰乱周遭的世界，播撒效果与力场，持续越久积累的不稳定值越多，然后一举倾泻而出。',
+  'hud.errors.notEnoughInstability': '不稳定值不足！',
+  'guide.resourceName.corruption': '不稳定值',
+  'abilityUi.resources.corruption': '不稳定值',
+  'classDetails.resources.corruption': '不稳定值',
+  'classDetails.roles.glitch': '远程 DPS',
+  'guide.abilityHook.glitch_corrupt_byte': '以持续的故障侵蚀目标，持续越久越能滋养你的不稳定值。',
+  'guide.abilityHook.glitch_noise_field': '在你选定的地点布满静电，伤害并减速其中的所有目标。',
+  'guide.abilityHook.glitch_phase_skip': '瞬间将你跳跃到你选定的地点。',
+  'guide.abilityHook.glitch_overflow': '将储存的不稳定值一次性倾泻到目标身上。',
+  'guide.abilityHook.glitch_cascade': '延长你在选定区域内所有正在运行的故障。',
+  'entities.abilities.glitch_corrupt_byte.name': '数据腐蚀',
+  'entities.abilities.glitch_corrupt_byte.description':
+    '腐蚀目标，在 12 秒内造成 {damage} 点暗影伤害。持续期间积累不稳定值。',
+  'entities.abilities.glitch_noise_field.name': '噪声力场',
+  'entities.abilities.glitch_noise_field.description':
+    '在目标区域布满静电 8 秒，每秒造成 6 到 8 点奥术伤害，并使其中的敌人减速 30%。持续期间积累不稳定值。',
+  'entities.abilities.glitch_phase_skip.name': '相位跳跃',
+  'entities.abilities.glitch_phase_skip.description':
+    '跳跃到最远 20 码外的目标地点，并解除定身效果。',
+  'entities.abilities.glitch_overflow.name': '溢出',
+  'entities.abilities.glitch_overflow.description':
+    '将储存的不稳定值倾泻到目标身上，造成 {damage} 点暗影伤害。消耗 30 点不稳定值。',
+  'entities.abilities.glitch_memory_leak.name': '内存泄漏',
+  'entities.abilities.glitch_memory_leak.description':
+    '耗散目标的力量，在 15 秒内造成 {damage} 点暗影伤害。持续期间积累不稳定值。',
+  'entities.abilities.glitch_rollback.name': '回滚',
+  'entities.abilities.glitch_rollback.description': '恢复你最大生命值的 25%。消耗 50 点不稳定值。',
+  'entities.abilities.glitch_cascade.name': '级联',
+  'entities.abilities.glitch_cascade.description':
+    '使你在目标区域内敌人身上的所有故障效果延长 4 秒。被延长的效果保留其已持续时间，因此会持续更快地积累不稳定值。消耗 20 点不稳定值。',
+  'entities.abilities.glitch_fork_bomb.name': '分叉炸弹',
+  'entities.abilities.glitch_fork_bomb.description':
+    '引爆目标区域，对其中的每个敌人造成 {damage} 点奥术伤害。消耗 40 点不稳定值。（超频招牌技能）',
+  'entities.abilities.glitch_bit_rot.name': '位腐',
+  'entities.abilities.glitch_bit_rot.description':
+    '腐蚀目标，在 10 秒内造成 {damage} 点暗影伤害。持续期间积累不稳定值。（熵增招牌技能）',
+  'entities.abilities.glitch_sandbox.name': '沙盒',
+  'entities.abilities.glitch_sandbox.description':
+    '将你隔离在一个护盾中，吸收相当于你最大生命值 20% 的伤害，持续 10 秒。消耗 20 点不稳定值。（沙盒招牌技能）',
+  'entities.abilities.glitch_packet_loss.name': '丢包',
+  'entities.abilities.glitch_packet_loss.description':
+    '打断目标正在施放的法术，使其在 6 秒内无法施放该系的任何法术。',
+  'entities.abilities.glitch_null_pointer.name': '空指针',
+  'entities.abilities.glitch_null_pointer.description': '让目标指向虚无，使其定身 4 秒。',
 };

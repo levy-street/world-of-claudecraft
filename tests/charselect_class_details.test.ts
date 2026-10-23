@@ -46,12 +46,12 @@ describe('character-select class details parity', () => {
 });
 
 describe('specialization card metadata', () => {
-  it('covers all 27 specs of all nine classes with complete panel data', () => {
+  it('covers all 30 specs of all ten classes with complete panel data', () => {
     const specCount = Object.values(TALENTS).reduce(
       (count, classTalents) => count + classTalents.specs.length,
       0,
     );
-    expect(specCount).toBe(27);
+    expect(specCount).toBe(30);
     for (const [cls, classTalents] of Object.entries(TALENTS) as [
       PlayerClass,
       (typeof TALENTS)[PlayerClass],

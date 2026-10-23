@@ -7815,7 +7815,8 @@ export const vi_VN: EnTranslations = {
       "rage": "Cuồng Nộ",
       "mana": "Mana",
       "energy": "Năng Lượng",
-      "focus": "Tập Trung"
+      "focus": "Tập Trung",
+      "corruption": "Instability"
     },
     "classPage": {
       "back": "Tất cả lớp nhân vật",
@@ -7886,6 +7887,11 @@ export const vi_VN: EnTranslations = {
       "none": "Không có lớp nào khớp mọi bộ lọc. Xóa bớt một cái để thấy thêm."
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "Corrupts a target with a lingering fault that feeds your Instability the longer it runs.",
+      "glitch_noise_field": "Fills a spot you choose with static that hurts and slows everything inside.",
+      "glitch_phase_skip": "Skips you to a spot you choose in an instant.",
+      "glitch_overflow": "Dumps your stored Instability into a target in one hit.",
+      "glitch_cascade": "Stretches every fault you have running in a chosen area.",
       "evil_eye": "Chỉ định kẻ địch mà hành động và sự thống khổ của nó sẽ nuôi dưỡng Kết Án của bạn.",
       "heroic_strike": "Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.",
       "revenge": "Quét trúng kẻ địch phía trước và có thể không tốn tài nguyên sau khi né hoặc đỡ đòn.",
@@ -10258,6 +10264,7 @@ export const vi_VN: EnTranslations = {
     "mage": "Pháp Sư",
     "warlock": "Thuật Sĩ Hắc Ám",
     "druid": "Druid",
+    "glitch": "Glitch",
     "warriorAria": "Lớp nhân vật Chiến Binh",
     "paladinAria": "Lớp nhân vật Thánh Kỵ Sĩ",
     "hunterAria": "Lớp nhân vật Thợ Săn",
@@ -10266,7 +10273,8 @@ export const vi_VN: EnTranslations = {
     "shamanAria": "Lớp nhân vật Shaman",
     "mageAria": "Lớp nhân vật Pháp Sư",
     "warlockAria": "Lớp nhân vật Thuật Sĩ Hắc Ám",
-    "druidAria": "Lớp nhân vật Druid"
+    "druidAria": "Lớp nhân vật Druid",
+    "glitchAria": "Glitch class"
   },
   "controls": {
     "title": "Hướng Dẫn Điều Khiển",
@@ -11335,7 +11343,8 @@ export const vi_VN: EnTranslations = {
       "mana": "Mana",
       "energy": "Năng Lượng",
       "rage": "Nộ Khí",
-      "focus": "Tập Trung"
+      "focus": "Tập Trung",
+      "corruption": "Instability"
     },
     "roles": {
       "warrior": "Đỡ Đòn / DPS Cận Chiến",
@@ -11346,7 +11355,8 @@ export const vi_VN: EnTranslations = {
       "shaman": "Trị Liệu / DPS Cận Chiến hoặc Tầm Xa",
       "mage": "DPS Tầm Xa",
       "warlock": "DPS Tầm Xa",
-      "druid": "Đỡ Đòn / Trị Liệu / DPS Cận Chiến hoặc Tầm Xa"
+      "druid": "Đỡ Đòn / Trị Liệu / DPS Cận Chiến hoặc Tầm Xa",
+      "glitch": "Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Giáp Xích, Giáp Da, Giáp Vải",
@@ -11370,7 +11380,8 @@ export const vi_VN: EnTranslations = {
       "shaman": "Shaman điều khiển các nguyên tố, ban sức mạnh cho vũ khí, gây choáng kẻ thù bằng sấm sét, và hồi phục cho đồng minh.",
       "mage": "Pháp Sư điều khiển sức mạnh Hỏa, Băng và uy lực bí thuật để tiêu diệt kẻ thù, triệu hồi nước, và đóng băng các mối đe dọa tại chỗ.",
       "warlock": "Thuật Sĩ Hắc Ám triệu hồi quỷ dữ, gieo lời nguyền và ma thuật sát thương theo thời gian, và hút sinh lực từ kẻ thù để trường tồn.",
-      "druid": "Druid khơi dẫn sức mạnh thiên nhiên, chữa lành vết thương, trói buộc kẻ thù, và biến hình thành các dạng thú để phòng thủ hoặc gây sát thương."
+      "druid": "Druid khơi dẫn sức mạnh thiên nhiên, chữa lành vết thương, trói buộc kẻ thù, và biến hình thành các dạng thú để phòng thủ hoặc gây sát thương.",
+      "glitch": "Glitches corrupt the world around them, seeding effects and fields that build Instability the longer they run, then dumping it in bursts."
     },
     "aria": "Chi tiết lớp {className}: vai trò {role}. Chỉ số khởi đầu: Sức Mạnh {str}, Nhanh Nhẹn {agi}, Sức Bền {sta}, Trí Tuệ {int}, Tinh Thần {spi}.",
     "statBarAria": "{stat}: {value} trên 25"
@@ -11895,6 +11906,7 @@ export const vi_VN: EnTranslations = {
       "abilityNotReady": "Kỹ năng đó chưa sẵn sàng.",
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
+      "notEnoughInstability": "Not enough Instability!",
       "notEnoughMana": "Không đủ mana!",
       "notEnoughDevotion": "Không đủ Sùng Tín!",
       "notEnoughResource": "Không đủ {resource}!",
@@ -12238,7 +12250,8 @@ export const vi_VN: EnTranslations = {
       "rage": "Nộ Khí",
       "energy": "Năng Lượng",
       "focus": "tập trung",
-      "devotion": "Sùng Tín"
+      "devotion": "Sùng Tín",
+      "corruption": "Instability"
     },
     "forms": {
       "bear": "Bruin",
@@ -13111,6 +13124,54 @@ export const vi_VN: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "Corrupt Byte",
+        "description": "Corrupts the target, dealing {damage} Shadow damage over 12 sec. Builds Corruption while it runs."
+      },
+      "glitch_noise_field": {
+        "name": "Noise Field",
+        "description": "Fills the target area with static for 8 sec, dealing 6 to 8 Arcane damage each second and slowing enemies inside by 30%. Builds Corruption while it lasts."
+      },
+      "glitch_phase_skip": {
+        "name": "Phase Skip",
+        "description": "Skip to the target location up to 20 yards away, breaking roots."
+      },
+      "glitch_overflow": {
+        "name": "Overflow",
+        "description": "Dumps stored Corruption into the target, dealing {damage} Shadow damage. Costs 30 Corruption."
+      },
+      "glitch_memory_leak": {
+        "name": "Memory Leak",
+        "description": "Leaks the target's strength away, dealing {damage} Shadow damage over 15 sec. Builds Corruption while it runs."
+      },
+      "glitch_packet_loss": {
+        "name": "Packet Loss",
+        "description": "Drops the target's spell mid-cast, preventing any spell in that school from being cast for 6 sec."
+      },
+      "glitch_null_pointer": {
+        "name": "Null Pointer",
+        "description": "Points the target at nothing, rooting it in place for 4 sec."
+      },
+      "glitch_rollback": {
+        "name": "Rollback",
+        "description": "Restores 25% of your maximum health. Costs 50 Instability."
+      },
+      "glitch_cascade": {
+        "name": "Cascade",
+        "description": "Extends every Glitch effect you have on enemies in the target area by 4 sec. Extended effects keep their age, so they keep building Instability faster. Costs 20 Instability."
+      },
+      "glitch_fork_bomb": {
+        "name": "Fork Bomb",
+        "description": "Detonates the target area, dealing {damage} Arcane damage to every enemy inside. Costs 40 Corruption. (Overclock signature)"
+      },
+      "glitch_bit_rot": {
+        "name": "Bit Rot",
+        "description": "Rots the target, dealing {damage} Shadow damage over 10 sec. Builds Corruption while it runs. (Entropy signature)"
+      },
+      "glitch_sandbox": {
+        "name": "Sandbox",
+        "description": "Isolates you in a shield that absorbs damage equal to 20% of your maximum health for 10 sec. Costs 20 Corruption. (Sandbox signature)"
+      },
       "sport_kick": {
         "name": "Đá Bóng",
         "description": "Đẩy bóng lăn sệt trên mặt đất về phía điểm ngắm."

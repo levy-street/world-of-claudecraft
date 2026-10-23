@@ -36,7 +36,13 @@ export const TICKS_PER_RESOURCE_SAMPLE = 20;
 export const MAX_SAMPLED_MOBS = 8;
 
 /** Compact wire codes for ResourceType. 0 is "no pool" (most mobs). */
-export const RESOURCE_TYPE_CODES = { mana: 1, rage: 2, energy: 3, focus: 4 } as const;
+export const RESOURCE_TYPE_CODES = {
+  mana: 1,
+  rage: 2,
+  energy: 3,
+  focus: 4,
+  corruption: 5,
+} as const;
 
 export function resourceTypeCode(type: RecorderEntityView['resourceType']): number {
   if (type === undefined || type === null) return 0;

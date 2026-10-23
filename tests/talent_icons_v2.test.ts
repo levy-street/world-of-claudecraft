@@ -53,7 +53,7 @@ describe('Talents V2 icon routing', () => {
       .flatMap((row) => row.options)
       .filter((option) => option.icon !== undefined);
 
-    expect(authored).toHaveLength(144);
+    expect(authored).toHaveLength(162);
     for (const option of authored) {
       // The paladin rows author real painted webp art (PALADIN_TALENT_IMAGE_IDS):
       // those route to a bare image ref the browser fetches directly, not a

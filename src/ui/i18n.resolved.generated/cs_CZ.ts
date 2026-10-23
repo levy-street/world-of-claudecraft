@@ -7815,7 +7815,8 @@ export const cs_CZ: EnTranslations = {
       "rage": "Vztek",
       "mana": "Mana",
       "energy": "Energie",
-      "focus": "Soustředění"
+      "focus": "Soustředění",
+      "corruption": "Instability"
     },
     "classPage": {
       "back": "Všechny třídy",
@@ -7886,6 +7887,11 @@ export const cs_CZ: EnTranslations = {
       "none": "Žádná třída nesplňuje všechny filtry. Vyčisti jeden a uvidíš víc."
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "Corrupts a target with a lingering fault that feeds your Instability the longer it runs.",
+      "glitch_noise_field": "Fills a spot you choose with static that hurts and slows everything inside.",
+      "glitch_phase_skip": "Skips you to a spot you choose in an instant.",
+      "glitch_overflow": "Dumps your stored Instability into a target in one hit.",
+      "glitch_cascade": "Stretches every fault you have running in a chosen area.",
       "evil_eye": "Pojmenuje nepřítele, jehož činy a utrpení krmí tvé Odsouzení.",
       "heroic_strike": "Zařadí těžší švih, který utratí vztek při příštím zásahu.",
       "revenge": "Sekne nepřátele před tebou a po úhybu nebo odražení může být zdarma.",
@@ -10258,6 +10264,7 @@ export const cs_CZ: EnTranslations = {
     "mage": "Mág",
     "warlock": "Černokněžník",
     "druid": "Druid",
+    "glitch": "Glitch",
     "warriorAria": "Třída válečník",
     "paladinAria": "Třída paladin",
     "hunterAria": "Třída lovec",
@@ -10266,7 +10273,8 @@ export const cs_CZ: EnTranslations = {
     "shamanAria": "Třída šaman",
     "mageAria": "Třída mág",
     "warlockAria": "Třída černokněžník",
-    "druidAria": "Třída druid"
+    "druidAria": "Třída druid",
+    "glitchAria": "Glitch class"
   },
   "controls": {
     "title": "Průvodce ovládáním",
@@ -11335,7 +11343,8 @@ export const cs_CZ: EnTranslations = {
       "mana": "Mana",
       "energy": "Energie",
       "rage": "Vztek",
-      "focus": "Soustředění"
+      "focus": "Soustředění",
+      "corruption": "Instability"
     },
     "roles": {
       "warrior": "Tank / DPS na blízko",
@@ -11346,7 +11355,8 @@ export const cs_CZ: EnTranslations = {
       "shaman": "Léčitel / DPS na blízko nebo na dálku",
       "mage": "DPS na dálku",
       "warlock": "DPS na dálku",
-      "druid": "Tank / léčitel / DPS na blízko nebo na dálku"
+      "druid": "Tank / léčitel / DPS na blízko nebo na dálku",
+      "glitch": "Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Kroužková zbroj, kůže, látka",
@@ -11370,7 +11380,8 @@ export const cs_CZ: EnTranslations = {
       "shaman": "Šamani ovládají živly, naplňují zbraně silou, zasahují nepřátele blesky a obnovují spojence.",
       "mage": "Mágové ohýbají oheň, mráz a arkánní sílu, aby ničili nepřátele, vyvolávali vodu a zmrazovali hrozby na místě.",
       "warlock": "Černokněžníci vyvolávají démony, sesílají kletby a průběžné poškození a vysávají život z nepřátel, aby vydrželi.",
-      "druid": "Druidové usměrňují síly přírody, léčí zranění, spoutávají nepřátele a mění se do zvířecích podob pro obranu nebo poškození."
+      "druid": "Druidové usměrňují síly přírody, léčí zranění, spoutávají nepřátele a mění se do zvířecích podob pro obranu nebo poškození.",
+      "glitch": "Glitches corrupt the world around them, seeding effects and fields that build Instability the longer they run, then dumping it in bursts."
     },
     "aria": "Detaily třídy {className}: role {role}. Počáteční statistiky: Síla {str}, Obratnost {agi}, Výdrž {sta}, Intelekt {int}, Duch {spi}.",
     "statBarAria": "{stat}: {value} z 25"
@@ -11895,6 +11906,7 @@ export const cs_CZ: EnTranslations = {
       "abilityNotReady": "Tato schopnost ještě není připravená.",
       "notEnoughRage": "Nedostatek vzteku!",
       "notEnoughEnergy": "Nedostatek energie!",
+      "notEnoughInstability": "Not enough Instability!",
       "notEnoughMana": "Nedostatek many!",
       "notEnoughDevotion": "Nedostatek Oddanosti!",
       "notEnoughResource": "Nedostatek zdroje: {resource}!",
@@ -12238,7 +12250,8 @@ export const cs_CZ: EnTranslations = {
       "rage": "Vztek",
       "energy": "Energie",
       "focus": "soustředění",
-      "devotion": "Oddanost"
+      "devotion": "Oddanost",
+      "corruption": "Instability"
     },
     "forms": {
       "bear": "Medvěd",
@@ -13111,6 +13124,54 @@ export const cs_CZ: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "Corrupt Byte",
+        "description": "Corrupts the target, dealing {damage} Shadow damage over 12 sec. Builds Corruption while it runs."
+      },
+      "glitch_noise_field": {
+        "name": "Noise Field",
+        "description": "Fills the target area with static for 8 sec, dealing 6 to 8 Arcane damage each second and slowing enemies inside by 30%. Builds Corruption while it lasts."
+      },
+      "glitch_phase_skip": {
+        "name": "Phase Skip",
+        "description": "Skip to the target location up to 20 yards away, breaking roots."
+      },
+      "glitch_overflow": {
+        "name": "Overflow",
+        "description": "Dumps stored Corruption into the target, dealing {damage} Shadow damage. Costs 30 Corruption."
+      },
+      "glitch_memory_leak": {
+        "name": "Memory Leak",
+        "description": "Leaks the target's strength away, dealing {damage} Shadow damage over 15 sec. Builds Corruption while it runs."
+      },
+      "glitch_packet_loss": {
+        "name": "Packet Loss",
+        "description": "Drops the target's spell mid-cast, preventing any spell in that school from being cast for 6 sec."
+      },
+      "glitch_null_pointer": {
+        "name": "Null Pointer",
+        "description": "Points the target at nothing, rooting it in place for 4 sec."
+      },
+      "glitch_rollback": {
+        "name": "Rollback",
+        "description": "Restores 25% of your maximum health. Costs 50 Instability."
+      },
+      "glitch_cascade": {
+        "name": "Cascade",
+        "description": "Extends every Glitch effect you have on enemies in the target area by 4 sec. Extended effects keep their age, so they keep building Instability faster. Costs 20 Instability."
+      },
+      "glitch_fork_bomb": {
+        "name": "Fork Bomb",
+        "description": "Detonates the target area, dealing {damage} Arcane damage to every enemy inside. Costs 40 Corruption. (Overclock signature)"
+      },
+      "glitch_bit_rot": {
+        "name": "Bit Rot",
+        "description": "Rots the target, dealing {damage} Shadow damage over 10 sec. Builds Corruption while it runs. (Entropy signature)"
+      },
+      "glitch_sandbox": {
+        "name": "Sandbox",
+        "description": "Isolates you in a shield that absorbs damage equal to 20% of your maximum health for 10 sec. Costs 20 Corruption. (Sandbox signature)"
+      },
       "sport_kick": {
         "name": "Kop",
         "description": "Pošli míč po zemi směrem k zaměřovanému bodu."

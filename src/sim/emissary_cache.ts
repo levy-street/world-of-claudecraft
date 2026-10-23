@@ -5,11 +5,13 @@
 // stack of Heroic Marks. Server-authoritative:
 // the pick draws ctx.rng once, and the item leaves the bag only when the
 // contents have landed.
+
 import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
 import { DUNGEON_MOBS } from './content/dungeons';
 import { NYTHRAXIS_RAID_BOSS_ID } from './content/heroic_loot';
 import { IGNIVAR_LOOT_ITEM_IDS } from './content/ignivar_loot';
 import { ITEMS } from './data';
+import { classListAllows } from './equipment_rules';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { ItemDef, ItemInstancePayload, PlayerClass } from './types';
@@ -45,7 +47,7 @@ export function emissaryCacheRaidPool(): readonly string[] {
 export function emissaryCachePoolForClass(cls: PlayerClass): readonly string[] {
   return emissaryCacheRaidPool().filter((id) => {
     const locked = ITEMS[id]?.requiredClass;
-    return !locked || locked.includes(cls);
+    return !locked || classListAllows(locked, cls);
   });
 }
 

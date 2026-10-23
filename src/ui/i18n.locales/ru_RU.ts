@@ -20056,4 +20056,57 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.godlike': '{name}: подобен богу!',
   'hudChrome.hill.callout.legendary': '{name}: легендарен!',
   'hudChrome.hill.callout.shutDown': '{killer} прервал серию {victim}!',
+  'classes.glitch': 'Глитч',
+  'classes.glitchAria': 'Класс Глитч',
+  'classDetails.lore.glitch':
+    'Глитчи искажают мир вокруг себя, рассеивая эффекты и поля, которые копят Нестабильность тем быстрее, чем дольше действуют, а затем выплёскивают её разом.',
+  'hud.errors.notEnoughInstability': 'Недостаточно Нестабильности!',
+  'guide.resourceName.corruption': 'Нестабильность',
+  'abilityUi.resources.corruption': 'Нестабильность',
+  'classDetails.resources.corruption': 'Нестабильность',
+  'classDetails.roles.glitch': 'Дальний DPS',
+  'guide.abilityHook.glitch_corrupt_byte':
+    'Поражает цель затяжным сбоем, который тем сильнее питает Нестабильность, чем дольше длится.',
+  'guide.abilityHook.glitch_noise_field':
+    'Заполняет выбранное место помехами, которые ранят и замедляют всех внутри.',
+  'guide.abilityHook.glitch_phase_skip': 'Мгновенно переносит вас в выбранное место.',
+  'guide.abilityHook.glitch_overflow':
+    'Выплёскивает накопленную Нестабильность в цель одним ударом.',
+  'guide.abilityHook.glitch_cascade': 'Продлевает все ваши действующие сбои в выбранной области.',
+  'entities.abilities.glitch_corrupt_byte.name': 'Сбой байта',
+  'entities.abilities.glitch_corrupt_byte.description':
+    'Поражает цель, нанося {damage} ед. урона от темной магии за 12 сек. Пока действует, копит Нестабильность.',
+  'entities.abilities.glitch_noise_field.name': 'Поле помех',
+  'entities.abilities.glitch_noise_field.description':
+    'Заполняет выбранную область помехами на 8 сек., нанося 6-8 ед. урона от тайной магии каждую секунду и замедляя врагов внутри на 30%. Пока действует, копит Нестабильность.',
+  'entities.abilities.glitch_phase_skip.name': 'Фазовый скачок',
+  'entities.abilities.glitch_phase_skip.description':
+    'Мгновенно переносит вас в выбранную точку на расстоянии до 20 м и снимает обездвиживание.',
+  'entities.abilities.glitch_overflow.name': 'Переполнение',
+  'entities.abilities.glitch_overflow.description':
+    'Выплёскивает накопленную Нестабильность в цель, нанося {damage} ед. урона от темной магии. Стоит 30 ед. Нестабильности.',
+  'entities.abilities.glitch_memory_leak.name': 'Утечка памяти',
+  'entities.abilities.glitch_memory_leak.description':
+    'Истощает силы цели, нанося {damage} ед. урона от темной магии за 15 сек. Пока действует, копит Нестабильность.',
+  'entities.abilities.glitch_rollback.name': 'Откат',
+  'entities.abilities.glitch_rollback.description':
+    'Восстанавливает 25% максимального запаса здоровья. Стоит 50 ед. Нестабильности.',
+  'entities.abilities.glitch_cascade.name': 'Каскад',
+  'entities.abilities.glitch_cascade.description':
+    'Продлевает все ваши эффекты Глитча на врагах в выбранной области на 4 сек. Продлённые эффекты сохраняют свой возраст и продолжают копить Нестабильность быстрее. Стоит 20 ед. Нестабильности.',
+  'entities.abilities.glitch_fork_bomb.name': 'Форк-бомба',
+  'entities.abilities.glitch_fork_bomb.description':
+    'Взрывает выбранную область, нанося {damage} ед. урона от тайной магии каждому врагу внутри. Стоит 40 ед. Нестабильности. (Фирменный приём Разгона)',
+  'entities.abilities.glitch_bit_rot.name': 'Гниль битов',
+  'entities.abilities.glitch_bit_rot.description':
+    'Гноит цель, нанося {damage} ед. урона от темной магии за 10 сек. Пока действует, копит Нестабильность. (Фирменный приём Энтропии)',
+  'entities.abilities.glitch_sandbox.name': 'Песочница',
+  'entities.abilities.glitch_sandbox.description':
+    'Изолирует вас щитом, поглощающим урон в размере 20% максимального запаса здоровья, на 10 сек. Стоит 20 ед. Нестабильности. (Фирменный приём Песочницы)',
+  'entities.abilities.glitch_packet_loss.name': 'Потеря пакетов',
+  'entities.abilities.glitch_packet_loss.description':
+    'Обрывает заклинание цели, не давая ей произносить заклинания этой школы 6 сек.',
+  'entities.abilities.glitch_null_pointer.name': 'Нулевой указатель',
+  'entities.abilities.glitch_null_pointer.description':
+    'Направляет цель в никуда, обездвиживая её на 4 сек.',
 };

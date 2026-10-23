@@ -867,6 +867,7 @@ export const en = {
     mage: 'Mage',
     warlock: 'Warlock',
     druid: 'Druid',
+    glitch: 'Glitch',
     warriorAria: 'Warrior class',
     paladinAria: 'Paladin class',
     hunterAria: 'Hunter class',
@@ -876,6 +877,7 @@ export const en = {
     mageAria: 'Mage class',
     warlockAria: 'Warlock class',
     druidAria: 'Druid class',
+    glitchAria: 'Glitch class',
   },
   controls: {
     title: 'Controls Guide',

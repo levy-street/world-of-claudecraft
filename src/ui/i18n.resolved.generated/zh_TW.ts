@@ -7815,7 +7815,8 @@ export const zh_TW: EnTranslations = {
       "rage": "怒氣",
       "mana": "法力",
       "energy": "能量",
-      "focus": "集中"
+      "focus": "集中",
+      "corruption": "不穩定值"
     },
     "classPage": {
       "back": "所有職業",
@@ -7886,6 +7887,11 @@ export const zh_TW: EnTranslations = {
       "none": "沒有職業符合所有篩選條件。清除一項以查看更多。"
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "以持續的故障侵蝕目標，持續越久越能滋養你的不穩定值。",
+      "glitch_noise_field": "在你選定的地點布滿靜電，傷害並減速其中的所有目標。",
+      "glitch_phase_skip": "瞬間將你跳躍到你選定的地點。",
+      "glitch_overflow": "將儲存的不穩定值一次性傾瀉到目標身上。",
+      "glitch_cascade": "延長你在選定區域內所有正在運行的故障。",
       "evil_eye": "標記一名敵人，使其行動與承受的苦難為你累積譴罪。",
       "heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
       "revenge": "橫掃你前方的敵人，並可能在閃躲或招架後不消耗資源。",
@@ -10258,6 +10264,7 @@ export const zh_TW: EnTranslations = {
     "mage": "法師",
     "warlock": "術士",
     "druid": "德魯伊",
+    "glitch": "故障者",
     "warriorAria": "戰士職業",
     "paladinAria": "聖騎士職業",
     "hunterAria": "獵人職業",
@@ -10266,7 +10273,8 @@ export const zh_TW: EnTranslations = {
     "shamanAria": "薩滿職業",
     "mageAria": "法師職業",
     "warlockAria": "術士職業",
-    "druidAria": "德魯伊職業"
+    "druidAria": "德魯伊職業",
+    "glitchAria": "故障者職業"
   },
   "controls": {
     "title": "操作指南",
@@ -11335,7 +11343,8 @@ export const zh_TW: EnTranslations = {
       "mana": "法力",
       "energy": "能量",
       "rage": "怒氣",
-      "focus": "集中值"
+      "focus": "集中值",
+      "corruption": "不穩定值"
     },
     "roles": {
       "warrior": "坦克 / 近戰 DPS",
@@ -11346,7 +11355,8 @@ export const zh_TW: EnTranslations = {
       "shaman": "治療 / 近戰或遠程 DPS",
       "mage": "遠程 DPS",
       "warlock": "遠程 DPS",
-      "druid": "坦克 / 治療 / 近戰或遠程 DPS"
+      "druid": "坦克 / 治療 / 近戰或遠程 DPS",
+      "glitch": "遠程 DPS"
     },
     "armor": {
       "chainLeatherCloth": "鎖甲、皮甲、布甲",
@@ -11370,7 +11380,8 @@ export const zh_TW: EnTranslations = {
       "shaman": "薩滿掌控元素，強化武器，以閃電震擊敵人並恢復盟友。",
       "mage": "法師操縱火焰、冰霜與祕法之力來毀滅敵人，召喚清水並凍結威脅。",
       "warlock": "術士召喚惡魔，施放詛咒與持續傷害魔法，並從敵人身上汲取生命來支撐自己。",
-      "druid": "德魯伊引導自然之力，治療傷口、纏繞敵人，並變形成動物來防禦或輸出。"
+      "druid": "德魯伊引導自然之力，治療傷口、纏繞敵人，並變形成動物來防禦或輸出。",
+      "glitch": "故障者擾亂周遭的世界，播撒效果與力場，持續越久累積的不穩定值越多，然後一舉傾瀉而出。"
     },
     "aria": "{className} 職業詳情：職責 {role}。初始屬性：力量 {str}，敏捷 {agi}，耐力 {sta}，智力 {int}，精神 {spi}。",
     "statBarAria": "{stat}：{value}/25"
@@ -11895,6 +11906,7 @@ export const zh_TW: EnTranslations = {
       "abilityNotReady": "該技能尚未準備好。",
       "notEnoughRage": "怒氣不足！",
       "notEnoughEnergy": "能量不足！",
+      "notEnoughInstability": "不穩定值不足！",
       "notEnoughMana": "法力不足！",
       "notEnoughDevotion": "虔誠值不足！",
       "notEnoughResource": "{resource}不足！",
@@ -12238,7 +12250,8 @@ export const zh_TW: EnTranslations = {
       "rage": "怒氣",
       "energy": "能量",
       "focus": "集中值",
-      "devotion": "虔誠"
+      "devotion": "虔誠",
+      "corruption": "不穩定值"
     },
     "forms": {
       "bear": "巨熊",
@@ -13111,6 +13124,54 @@ export const zh_TW: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "資料腐蝕",
+        "description": "腐蝕目標，在 12 秒內造成 {damage} 點暗影傷害。持續期間累積不穩定值。"
+      },
+      "glitch_noise_field": {
+        "name": "噪聲力場",
+        "description": "在目標區域布滿靜電 8 秒，每秒造成 6 到 8 點奧術傷害，並使其中的敵人減速 30%。持續期間累積不穩定值。"
+      },
+      "glitch_phase_skip": {
+        "name": "相位跳躍",
+        "description": "跳躍到最遠 20 碼外的目標地點，並解除定身效果。"
+      },
+      "glitch_overflow": {
+        "name": "溢位",
+        "description": "將儲存的不穩定值傾瀉到目標身上，造成 {damage} 點暗影傷害。消耗 30 點不穩定值。"
+      },
+      "glitch_memory_leak": {
+        "name": "記憶體洩漏",
+        "description": "耗散目標的力量，在 15 秒內造成 {damage} 點暗影傷害。持續期間累積不穩定值。"
+      },
+      "glitch_packet_loss": {
+        "name": "封包遺失",
+        "description": "打斷目標正在施放的法術，使其在 6 秒內無法施放該系的任何法術。"
+      },
+      "glitch_null_pointer": {
+        "name": "空指標",
+        "description": "讓目標指向虛無，使其定身 4 秒。"
+      },
+      "glitch_rollback": {
+        "name": "回溯",
+        "description": "恢復你最大生命值的 25%。消耗 50 點不穩定值。"
+      },
+      "glitch_cascade": {
+        "name": "級聯",
+        "description": "使你在目標區域內敵人身上的所有故障效果延長 4 秒。被延長的效果保留其已持續時間，因此會持續更快地累積不穩定值。消耗 20 點不穩定值。"
+      },
+      "glitch_fork_bomb": {
+        "name": "分叉炸彈",
+        "description": "引爆目標區域，對其中的每個敵人造成 {damage} 點奧術傷害。消耗 40 點不穩定值。（超頻招牌技能）"
+      },
+      "glitch_bit_rot": {
+        "name": "位元腐朽",
+        "description": "腐蝕目標，在 10 秒內造成 {damage} 點暗影傷害。持續期間累積不穩定值。（熵增招牌技能）"
+      },
+      "glitch_sandbox": {
+        "name": "沙盒",
+        "description": "將你隔離在一個護盾中，吸收相當於你最大生命值 20% 的傷害，持續 10 秒。消耗 20 點不穩定值。（沙盒招牌技能）"
+      },
       "sport_kick": {
         "name": "踢球",
         "description": "沿地面把球踢向瞄準點。"

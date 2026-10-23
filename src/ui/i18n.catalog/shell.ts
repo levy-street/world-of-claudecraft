@@ -331,6 +331,7 @@ export const shellStrings = {
         energy: 'Energy',
         rage: 'Rage',
         focus: 'Focus',
+        corruption: 'Instability',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -342,6 +343,7 @@ export const shellStrings = {
         mage: 'Ranged DPS',
         warlock: 'Ranged DPS',
         druid: 'Tank / Healer / Melee or Ranged DPS',
+        glitch: 'Ranged DPS',
       },
       armor: {
         chainLeatherCloth: 'Chainmail, Leather, Cloth',
@@ -374,6 +376,8 @@ export const shellStrings = {
           'Warlocks summon demons, apply curses and damage-over-time magic, and leech life from enemies to endure.',
         druid:
           'Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage.',
+        glitch:
+          'Glitches corrupt the world around them, seeding effects and fields that build Instability the longer they run, then dumping it in bursts.',
       },
       aria: 'Class details for {className}: role {role}. Starting stats: Strength {str}, Agility {agi}, Stamina {sta}, Intellect {int}, Spirit {spi}.',
       statBarAria: '{stat}: {value} out of 25',

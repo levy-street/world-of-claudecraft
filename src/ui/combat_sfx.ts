@@ -629,6 +629,7 @@ export function weaponSwingCue(entity: Entity): SfxId {
   switch (entity.templateId) {
     case 'rogue':
     case 'warlock':
+    case 'glitch':
       return 'melee_swing_light';
     case 'hunter':
       return 'melee_bow';

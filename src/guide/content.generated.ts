@@ -5,7 +5,7 @@
 // live through src/ui/talent_i18n.ts. No balance numbers or instanced spoilers here.
 
 export type GuideRole = 'tank' | 'healer' | 'dps';
-export type GuideResource = 'rage' | 'mana' | 'energy' | 'focus';
+export type GuideResource = 'rage' | 'mana' | 'energy' | 'focus' | 'corruption';
 
 export interface GuideAbilityRef { id: string; name: string; }
 export interface GuideClassSpec { id: string; name: string; role: GuideRole; signature: string; }
@@ -2125,6 +2125,98 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_druid",
     "still": "/guide-stills/player_druid.webp"
+  },
+  {
+    "id": "glitch",
+    "color": "#3df2e0",
+    "resource": "corruption",
+    "roles": [
+      "dps"
+    ],
+    "specs": [
+      {
+        "id": "overclock",
+        "name": "Overclock",
+        "role": "dps",
+        "signature": "glitch_fork_bomb"
+      },
+      {
+        "id": "entropy",
+        "name": "Entropy",
+        "role": "dps",
+        "signature": "glitch_bit_rot"
+      },
+      {
+        "id": "sandbox",
+        "name": "Sandbox",
+        "role": "dps",
+        "signature": "glitch_sandbox"
+      }
+    ],
+    "signatureAbilities": [
+      {
+        "id": "glitch_corrupt_byte",
+        "name": "Corrupt Byte"
+      },
+      {
+        "id": "glitch_noise_field",
+        "name": "Noise Field"
+      },
+      {
+        "id": "glitch_overflow",
+        "name": "Overflow"
+      },
+      {
+        "id": "glitch_phase_skip",
+        "name": "Phase Skip"
+      },
+      {
+        "id": "glitch_cascade",
+        "name": "Cascade"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "glitch_corrupt_byte",
+        "name": "Corrupt Byte"
+      },
+      {
+        "id": "glitch_noise_field",
+        "name": "Noise Field"
+      },
+      {
+        "id": "glitch_overflow",
+        "name": "Overflow"
+      },
+      {
+        "id": "glitch_phase_skip",
+        "name": "Phase Skip"
+      },
+      {
+        "id": "glitch_memory_leak",
+        "name": "Memory Leak"
+      },
+      {
+        "id": "glitch_rollback",
+        "name": "Rollback"
+      },
+      {
+        "id": "glitch_packet_loss",
+        "name": "Packet Loss"
+      },
+      {
+        "id": "glitch_null_pointer",
+        "name": "Null Pointer"
+      },
+      {
+        "id": "glitch_cascade",
+        "name": "Cascade"
+      }
+    ],
+    "model": "player_glitch",
+    "tint": "#3df2e0",
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_glitch__3df2e0__s12.webp"
   }
 ];
 
@@ -21620,6 +21712,24 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ]
+  },
+  "player_glitch": {
+    "url": "models/chars/players/mage.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "show": [],
+    "attach": [
+      {
+        "url": "models/weapons/wand.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/spellbook_open.glb",
+        "bone": "handslot.l",
+        "gripRef": "Spellbook_open"
+      }
+    ],
+    "tintStrength": 0.12
   },
   "form_bear": {
     "url": "models/creatures/bear_form.glb",

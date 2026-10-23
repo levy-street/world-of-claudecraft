@@ -45,6 +45,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   valkyrsCalling: 'damage',
   repositionToAim: 'other',
   blinkForward: 'other',
+  blinkToAim: 'other',
+  glitchCascade: 'other',
   finisherDamage: 'damage',
   dot: 'damage',
   extendDot: 'other',

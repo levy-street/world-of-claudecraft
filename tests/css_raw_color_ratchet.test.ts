@@ -162,7 +162,9 @@ const CEILINGS: Record<string, number> = {
   'layout.css': 0,
   'library.css': 0,
   'play.extra.css': 1,
-  'shell.css': 719,
+  // +2 for the Glitch class: tests/class_colors.test.ts pins every class's two
+  // --class-color blocks in shell.css as literal hex, so a new class must add them.
+  'shell.css': 721,
   'shell.website.css': 0,
   'shell.website-pages.css': 0,
 };

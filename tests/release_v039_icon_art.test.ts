@@ -382,7 +382,8 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // the release arm's two new abilities riding the v0.40.0 sync merge.
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
-        abilities: { live: 408, painted: 408 },
+        // 420 with the Glitch class's twelve abilities (placeholder paintings).
+        abilities: { live: 420, painted: 420 },
         // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
@@ -489,7 +490,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(408);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(420);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',

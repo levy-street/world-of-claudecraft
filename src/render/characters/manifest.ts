@@ -1479,6 +1479,8 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
     `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
+  // Default look only (SKIN_COUNTS.glitch).
+  player_glitch: [null],
   player_shaman: [
     null,
     `${SKINS_DIR}/barbarian/alt_a.png`,
@@ -2042,6 +2044,29 @@ export const VISUALS: Record<string, VisualDef> = {
     // already uses elsewhere (mob_troll) to differentiate a shared model
     // without hiding its base texture.
     tint: 0x8d5fd3,
+    tintStrength: 0.12,
+  }),
+  // The Glitch shares the caster rig (mage.glb) with the warlock's wand and
+  // open spellbook, told apart by a faint cyan lift (same strength as the
+  // warlock's violet). No bespoke ability clips yet: every cast plays the wand zap.
+  player_glitch: swims({
+    url: `${PLAYERS}/mage.glb`,
+    height: HUMANOID_H,
+    clips: {
+      ...kaykit(['Spellcast_Shoot']),
+    },
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
+    show: [],
+    attach: [
+      { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
+      {
+        url: `${WEAPONS}/spellbook_open.glb`,
+        bone: 'handslot.l',
+        gripRef: 'Spellbook_open',
+      },
+    ],
+    weaponSlots: [0],
+    tint: 0x3df2e0,
     tintStrength: 0.12,
   }),
   player_druid: swims({

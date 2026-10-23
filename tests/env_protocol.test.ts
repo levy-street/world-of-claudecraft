@@ -28,11 +28,11 @@ describe('headless environment protocol validation', () => {
   });
 
   it('accepts every declared player class and rejects anything else', () => {
-    // all 9 classes are valid env inputs, not just warrior/mage
+    // all 10 classes are valid env inputs, not just warrior/mage
     for (const cls of ALL_CLASSES) {
       expect(validatePlayerClass(cls)).toBe(cls);
     }
-    expect(ALL_CLASSES.length).toBe(9);
+    expect(ALL_CLASSES.length).toBe(10);
     expect(validatePlayerClass('warlock')).toBe('warlock');
     expect(validatePlayerClass('necromancer')).toBeNull();
     expect(validatePlayerClass('')).toBeNull();

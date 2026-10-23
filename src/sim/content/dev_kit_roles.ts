@@ -96,6 +96,11 @@ export const DEV_KIT_ROLES: Readonly<Record<PlayerClass, readonly DevKitRole[]>>
     { spec: 'demonology', weights: CASTER, melee: false },
     { spec: 'destruction', weights: CASTER, melee: false },
   ],
+  glitch: [
+    { spec: 'overclock', weights: CASTER, melee: false },
+    { spec: 'entropy', weights: CASTER, melee: false },
+    { spec: 'sandbox', weights: CASTER, melee: false },
+  ],
   druid: [
     { spec: 'balance', weights: CASTER, melee: false },
     // Declared TANK in talents.ts. Agility-led rather than strength-led, and no
@@ -105,8 +110,8 @@ export const DEV_KIT_ROLES: Readonly<Record<PlayerClass, readonly DevKitRole[]>>
   ],
 });
 
-// Every class-and-spec pair, flattened. 27 entries: 9 classes times 3 specs.
-export const DEV_KIT_ROLE_COUNT = 27;
+// Every class-and-spec pair, flattened. 30 entries: 10 classes times 3 specs.
+export const DEV_KIT_ROLE_COUNT = 30;
 
 export function devKitRole(cls: PlayerClass, spec: string): DevKitRole | null {
   return DEV_KIT_ROLES[cls]?.find((role) => role.spec === spec) ?? null;

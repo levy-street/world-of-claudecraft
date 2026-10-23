@@ -12,6 +12,7 @@
 import { bagsFullError } from '../bags';
 import { CRUCIBLE_VENDOR_STOCK } from '../content/ignivar_loot';
 import { ITEMS, NPCS } from '../data';
+import { classListAllows } from '../equipment_rules';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, INTERACT_RANGE } from '../types';
 
@@ -55,7 +56,7 @@ export function buyCrucibleVendorItem(ctx: SimContext, itemId: string, pid?: num
   // sigil makes the cross-class conversion reachable without this). Below the
   // range check to match buyHeroicVendorItem's refusal ladder. The refusal
   // reuses the established equip-gate line (error.cannotEquip in sim_i18n.ts).
-  if (def.requiredClass && !def.requiredClass.includes(meta.cls)) {
+  if (def.requiredClass && !classListAllows(def.requiredClass, meta.cls)) {
     ctx.error(meta.entityId, 'You cannot equip that.');
     return;
   }

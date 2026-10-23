@@ -40,7 +40,8 @@ export type AuraOverlayTheme =
   | 'priest'
   | 'shaman'
   | 'warlock'
-  | 'druid';
+  | 'druid'
+  | 'glitch';
 
 export interface AuraOverlayProcDef {
   id: AuraOverlayProcId;

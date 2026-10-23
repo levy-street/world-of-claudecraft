@@ -2332,14 +2332,15 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   const unreachable = [...livePoor].filter((id) => !reachable.has(id)).sort();
 
   it('the chest walk visits every entry of both tables (a count that cannot rot silently)', () => {
-    // 3 tiers x 9 classes x 2 bountiful arms x 2 stubs = 108 calls per table:
-    // 189 Litany entries and 166 lockpick entries at the 11l QA, pinned PER
+    // 3 tiers x 10 classes x 2 bountiful arms x 2 stubs = 120 calls per table:
+    // 210 Litany entries and 184 lockpick entries (189 and 166 before the
+    // Glitch's caster-archetype rows), pinned PER
     // TABLE so a drift in one cannot hide behind a compensating drift in the
     // other. A table that stopped contributing (a renamed export, a tier the
     // satisfies clause missed) shrinks its own count before it could hide a
     // poor id.
-    expect(litanyEntries).toBe(189);
-    expect(lockpickEntries).toBe(166);
+    expect(litanyEntries).toBe(210);
+    expect(lockpickEntries).toBe(184);
   });
 
   it('the reachable poor set is exactly the thirteen survivors with an acquisition route', () => {

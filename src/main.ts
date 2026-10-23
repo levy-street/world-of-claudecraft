@@ -698,6 +698,7 @@ const RESOURCE_KEYS = {
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
   focus: 'classDetails.resources.focus',
+  corruption: 'classDetails.resources.corruption',
 } satisfies Record<string, TranslationKey>;
 
 function classDisplayDescription(className: PlayerClass): string {

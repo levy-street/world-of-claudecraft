@@ -556,6 +556,54 @@
       "spec": "7f054fd6f25c3a93f0e41bea9d69651329dcfde77032315d3b61e7cba2b0a4d8",
       "full": "d56206bae7e30c54db0eddfcb1553e05f951bddee3cdb80c337c42832fda151b"
     },
+    "glitch_bit_rot": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_cascade": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_corrupt_byte": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_fork_bomb": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_memory_leak": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_noise_field": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_null_pointer": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_overflow": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_packet_loss": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_phase_skip": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_rollback": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "glitch_sandbox": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "gouge": {
       "spec": "181311355830193e8a1a48d303e93aab6a54a272b6e13199b787a908053cb1be",
       "full": "fb2e29683b21819e52df13831e02d34ad3173c1a70d84bc4e45118554ed7e6d9"

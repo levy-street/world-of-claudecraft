@@ -55,6 +55,7 @@ import {
 } from './crafted_collection_effects';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
+import { regenGlitchCorruption } from './glitch_corruption';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
@@ -143,6 +144,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
   } else if (p.resourceType === 'focus') {
     // Hunter Focus returns at 5 per second on the classic two-second tick.
     p.resource = Math.min(p.maxResource, p.resource + 10);
+  } else if (p.resourceType === 'corruption') {
+    // Glitch Instability builds from its running effects (combat/glitch_corruption.ts).
+    regenGlitchCorruption(ctx, p);
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }

@@ -235,6 +235,15 @@ function supplementalRuntimeUrl(asset: SupplementalAsset): string {
   }
 }
 
+// The Glitch class postdates the v0.36 campaign: its class crest and spec
+// emblems are its own batch, so the campaign inventory is the live registry
+// minus them (the same carve-out the weapon lists below make).
+const POST_CAMPAIGN_CLASSES: readonly string[] = ['glitch'];
+const CAMPAIGN_SPEC_ART_IDS = [...SPEC_ART_IDS].filter(
+  (id) => !POST_CAMPAIGN_CLASSES.includes(id.split('/')[0]),
+);
+const CAMPAIGN_CLASSES = ALL_CLASSES.filter((cls) => !POST_CAMPAIGN_CLASSES.includes(cls));
+
 describe('v0.36 placeholder-art completion evidence', () => {
   it('pins the accepted batch identity, exact scope, and shipping contracts', () => {
     const value = manifest();
@@ -332,7 +341,7 @@ describe('v0.36 placeholder-art completion evidence', () => {
     expect(targets.itemCleanup).toEqual([...CLEANUP_ITEM_IDS]);
 
     const generatedSpecs = sorted(
-      [...SPEC_ART_IDS].filter((id) => !id.startsWith('mage/') && !id.startsWith('warrior/')),
+      CAMPAIGN_SPEC_ART_IDS.filter((id) => !id.startsWith('mage/') && !id.startsWith('warrior/')),
     );
     expect(targets.generatedSpecializations).toEqual(generatedSpecs);
     expect(targets.convertedSpecializations).toEqual(['mage/arcane', 'mage/fire', 'mage/frost']);
@@ -347,11 +356,13 @@ describe('v0.36 placeholder-art completion evidence', () => {
         ...targets.convertedSpecializations,
         ...targets.preexistingSpecializations,
       ]),
-    ).toEqual(sorted(SPEC_ART_IDS));
+    ).toEqual(sorted(CAMPAIGN_SPEC_ART_IDS));
 
     expect(targets.generatedFamilyCrests).toEqual(sorted(FAMILY_CREST_ART_IDS));
     expect(targets.generatedStatusCrests).toEqual(sorted(STATUS_CREST_ART_IDS));
-    expect(targets.reusedClassCrests).toEqual(sorted(ALL_CLASSES.map((cls) => `class_${cls}`)));
+    expect(targets.reusedClassCrests).toEqual(
+      sorted(CAMPAIGN_CLASSES.map((cls) => `class_${cls}`)),
+    );
     expect(targets.rerenderedMobPortraits).toEqual([...RERENDERED_PORTRAIT_IDS]);
   });
 
@@ -395,11 +406,11 @@ describe('v0.36 placeholder-art completion evidence', () => {
 
   it('pins every generated, converted, reused, and deterministically rerendered companion asset', () => {
     const value = manifest();
-    const expected = [...SPEC_ART_IDS].map((id) => `specialization:${id}`);
+    const expected = CAMPAIGN_SPEC_ART_IDS.map((id) => `specialization:${id}`);
     expected.push(
       ...[...FAMILY_CREST_ART_IDS].map((id) => `familyCrest:${id}`),
       ...[...STATUS_CREST_ART_IDS].map((id) => `statusCrest:${id}`),
-      ...ALL_CLASSES.map((id) => `classCrest:class_${id}`),
+      ...CAMPAIGN_CLASSES.map((id) => `classCrest:class_${id}`),
       ...RERENDERED_PORTRAIT_IDS.map((id) => `mobPortrait:${id}`),
     );
     expect(value.supplementalAssets.map((asset) => `${asset.kind}:${asset.id}`).sort()).toEqual(

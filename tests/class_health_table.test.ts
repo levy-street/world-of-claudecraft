@@ -24,6 +24,7 @@ const HP_PER_LEVEL: Record<PlayerClass, number> = {
   mage: 15,
   priest: 15,
   warlock: 15,
+  glitch: 15,
 };
 
 // A naked level-20 character's pool: baseHp + hpPerLevel * 19 + the classic
@@ -40,6 +41,7 @@ const NAKED_LEVEL_20_HP: Record<PlayerClass, number> = {
   mage: 665,
   priest: 653,
   warlock: 677,
+  glitch: 677,
 };
 
 function nakedMaxHp(cls: PlayerClass): number {

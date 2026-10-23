@@ -282,7 +282,8 @@ export type PlayerClass =
   | 'shaman'
   | 'mage'
   | 'warlock'
-  | 'druid';
+  | 'druid'
+  | 'glitch';
 
 // Sanguine Aura's class-level melee recipient filter. It excludes the pure
 // casters and Hunter, whose primary attack loop is ranged.
@@ -337,8 +338,9 @@ export const ALL_CLASSES: PlayerClass[] = [
   'mage',
   'warlock',
   'druid',
+  'glitch',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus' | 'corruption';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',
@@ -3211,6 +3213,10 @@ export type AbilityEffect =
   // Swept teleport: travel facing-forward (Shadeslip snaps behind the target),
   // stopping at walls, steep slopes, and deep water.
   | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
+  // Glitch Phase Skip: swept teleport to the (range-clamped) cast aim.
+  | { type: 'blinkToAim'; breakRoots?: boolean }
+  // Glitch Cascade: extend the caster's Glitch effects on enemies near the aim.
+  | { type: 'glitchCascade'; radius: number; seconds: number }
   | {
       type: 'heal';
       min: number;

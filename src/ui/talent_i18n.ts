@@ -21,6 +21,7 @@ import {
   type SupportedLanguage,
   t,
 } from './i18n';
+import { GLITCH_TITLE_OVERRIDES } from './talent_i18n.glitch';
 import { TALENT_NEW, TALENT_NEW_TITLE_OVERRIDES } from './talent_i18n.newlocales';
 import { RETAINED_ROW_DESCRIPTION_OVERRIDES } from './talent_i18n.row_description_overrides';
 import { RETAINED_ROW_TITLE_OVERRIDES } from './talent_i18n.row_title_overrides';
@@ -10648,7 +10649,7 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   if (retained !== undefined) return retained;
   const core = CORE_TITLE_OVERRIDES[lang]?.[source];
   if (core !== undefined) return core;
-  const override = titleOverrides[lang]?.[source];
+  const override = titleOverrides[lang]?.[source] ?? GLITCH_TITLE_OVERRIDES[lang]?.[source];
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
   // ability name (resolved above). A bare return here only triggers for a newly-added
@@ -11037,7 +11038,8 @@ export function hasTalentTitleOverride(lang: SupportedLanguage, source: string):
     RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
     CORE_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
     grantAbilityIdByTitle.has(source) ||
-    titleOverrides[lang]?.[source] !== undefined
+    titleOverrides[lang]?.[source] !== undefined ||
+    GLITCH_TITLE_OVERRIDES[lang]?.[source] !== undefined
   );
 }
 

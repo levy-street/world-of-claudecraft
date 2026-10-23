@@ -127,7 +127,7 @@ describe('the cracked fetish inscription exclusion, recomputed', () => {
   // dominated by the trainer's OWN rows recipe_goldleaf_folio and
   // recipe_silverleaf_primer ... No other uncrafted caster offhand sits in
   // (14, 178]".
-  const CASTER_LOCK = ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'];
+  const CASTER_LOCK = ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid', 'glitch'];
 
   it('exactly one uncrafted CASTER offhand sits in the band', () => {
     const inBandOffhands = pool((d) => d.kind === 'held_offhand' && inBand(d, 14, 178));

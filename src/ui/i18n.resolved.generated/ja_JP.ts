@@ -7815,7 +7815,8 @@ export const ja_JP: EnTranslations = {
       "rage": "レイジ",
       "mana": "マナ",
       "energy": "エナジー",
-      "focus": "フォーカス"
+      "focus": "フォーカス",
+      "corruption": "不安定値"
     },
     "classPage": {
       "back": "すべてのクラス",
@@ -7886,6 +7887,11 @@ export const ja_JP: EnTranslations = {
       "none": "すべての条件に合うクラスはありません。一つ解除するともっと表示されます。"
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "長く続くほど不安定値を育てる持続性の障害で対象を蝕む。",
+      "glitch_noise_field": "選んだ地点を静電気で満たし、内部の全員にダメージを与えて減速させる。",
+      "glitch_phase_skip": "選んだ地点へ一瞬で跳躍する。",
+      "glitch_overflow": "蓄えた不安定値を一撃で対象に叩き込む。",
+      "glitch_cascade": "選んだ範囲で動作中のすべての障害を引き延ばす。",
       "evil_eye": "敵を一体指定し、その行動と苦痛から断罪を蓄積します。",
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
       "revenge": "前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。",
@@ -10258,6 +10264,7 @@ export const ja_JP: EnTranslations = {
     "mage": "メイジ",
     "warlock": "ウォーロック",
     "druid": "ドルイド",
+    "glitch": "グリッチ",
     "warriorAria": "戦士クラス",
     "paladinAria": "パラディンクラス",
     "hunterAria": "ハンタークラス",
@@ -10266,7 +10273,8 @@ export const ja_JP: EnTranslations = {
     "shamanAria": "シャーマンクラス",
     "mageAria": "メイジクラス",
     "warlockAria": "ウォーロッククラス",
-    "druidAria": "ドルイドクラス"
+    "druidAria": "ドルイドクラス",
+    "glitchAria": "グリッチクラス"
   },
   "controls": {
     "title": "操作ガイド",
@@ -11335,7 +11343,8 @@ export const ja_JP: EnTranslations = {
       "mana": "マナ",
       "energy": "エネルギー",
       "rage": "怒り",
-      "focus": "集中値"
+      "focus": "集中値",
+      "corruption": "不安定値"
     },
     "roles": {
       "warrior": "タンク / 近接DPS",
@@ -11346,7 +11355,8 @@ export const ja_JP: EnTranslations = {
       "shaman": "ヒーラー / 近接または遠隔DPS",
       "mage": "遠隔DPS",
       "warlock": "遠隔DPS",
-      "druid": "タンク / ヒーラー / 近接または遠隔DPS"
+      "druid": "タンク / ヒーラー / 近接または遠隔DPS",
+      "glitch": "遠隔DPS"
     },
     "armor": {
       "chainLeatherCloth": "鎖、革、布",
@@ -11370,7 +11380,8 @@ export const ja_JP: EnTranslations = {
       "shaman": "シャーマンは元素を操り、武器に力を宿し、稲妻で敵を打ち、味方を回復します。",
       "mage": "メイジは火炎、氷霜、秘術の力で敵を破壊し、水を召喚し、脅威をその場で凍りつかせます。",
       "warlock": "ウォーロックは悪魔を召喚し、呪いと継続ダメージ魔法をかけ、敵から生命力を吸収して耐えます。",
-      "druid": "ドルイドは自然の力を導き、傷を癒やし、敵を絡め取り、動物形態に変身して守りまたは攻めます。"
+      "druid": "ドルイドは自然の力を導き、傷を癒やし、敵を絡め取り、動物形態に変身して守りまたは攻めます。",
+      "glitch": "グリッチは周囲の世界を歪め、効果やフィールドを撒き散らす。それらが長く続くほど不安定値が蓄積し、やがて一気に解き放つ。"
     },
     "aria": "{className}のクラス詳細: 役割 {role}。開始ステータス: 筋力 {str}、敏捷性 {agi}、スタミナ {sta}、知力 {int}、精神力 {spi}。",
     "statBarAria": "{stat}: {value}/25"
@@ -11895,6 +11906,7 @@ export const ja_JP: EnTranslations = {
       "abilityNotReady": "その能力はまだ準備できていません。",
       "notEnoughRage": "怒りが足りません！",
       "notEnoughEnergy": "エネルギーが足りません！",
+      "notEnoughInstability": "不安定値が足りません！",
       "notEnoughMana": "マナが足りません！",
       "notEnoughDevotion": "献身が足りない！",
       "notEnoughResource": "{resource}が足りません！",
@@ -12238,7 +12250,8 @@ export const ja_JP: EnTranslations = {
       "rage": "怒り",
       "energy": "エネルギー",
       "focus": "集中値",
-      "devotion": "献身"
+      "devotion": "献身",
+      "corruption": "不安定値"
     },
     "forms": {
       "bear": "熊",
@@ -13111,6 +13124,54 @@ export const ja_JP: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "コラプトバイト",
+        "description": "対象を蝕み、12秒かけて{damage}の闇ダメージを与える。持続中は不安定値が蓄積する。"
+      },
+      "glitch_noise_field": {
+        "name": "ノイズフィールド",
+        "description": "対象地点を8秒間静電気で満たし、毎秒6～8の秘術ダメージを与え、内部の敵の移動速度を30%低下させる。持続中は不安定値が蓄積する。"
+      },
+      "glitch_phase_skip": {
+        "name": "フェイズスキップ",
+        "description": "最大20ヤード先の対象地点へ跳躍し、移動不能効果を解除する。"
+      },
+      "glitch_overflow": {
+        "name": "オーバーフロー",
+        "description": "蓄えた不安定値を対象に叩き込み、{damage}の闇ダメージを与える。不安定値を30消費する。"
+      },
+      "glitch_memory_leak": {
+        "name": "メモリリーク",
+        "description": "対象の力を漏出させ、15秒かけて{damage}の闇ダメージを与える。持続中は不安定値が蓄積する。"
+      },
+      "glitch_packet_loss": {
+        "name": "パケットロス",
+        "description": "対象の詠唱中の呪文を落とし、6秒間その系統の呪文を詠唱できなくする。"
+      },
+      "glitch_null_pointer": {
+        "name": "ヌルポインタ",
+        "description": "対象を虚無へ向け、4秒間その場に拘束する。"
+      },
+      "glitch_rollback": {
+        "name": "ロールバック",
+        "description": "最大HPの25%を回復する。不安定値を50消費する。"
+      },
+      "glitch_cascade": {
+        "name": "カスケード",
+        "description": "対象範囲内の敵にかかっている自分のグリッチ効果をすべて4秒延長する。延長された効果は経過時間を保つため、より速く不安定値を蓄積し続ける。不安定値を20消費する。"
+      },
+      "glitch_fork_bomb": {
+        "name": "フォークボム",
+        "description": "対象範囲を爆発させ、内部のすべての敵に{damage}の秘術ダメージを与える。不安定値を40消費する。（オーバークロックの代表技）"
+      },
+      "glitch_bit_rot": {
+        "name": "ビットロット",
+        "description": "対象を腐らせ、10秒かけて{damage}の闇ダメージを与える。持続中は不安定値が蓄積する。（エントロピーの代表技）"
+      },
+      "glitch_sandbox": {
+        "name": "サンドボックス",
+        "description": "最大HPの20%に相当するダメージを吸収するシールドで自分を隔離する。10秒間持続。不安定値を20消費する。（サンドボックスの代表技）"
+      },
       "sport_kick": {
         "name": "キック",
         "description": "狙った地点へボールをグラウンダーで蹴り出す。"

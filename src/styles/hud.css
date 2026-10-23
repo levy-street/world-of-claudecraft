@@ -3355,6 +3355,9 @@
   .focus {
     --bar-color: var(--color-focus);
   }
+  .corruption {
+    --bar-color: var(--color-corruption);
+  }
   /* Damage-absorb shield overlay (Power Word: Shield, Ice Barrier, …): a hatched
      translucent segment laid over the health bar, extending past current health. */
   .bar-absorb {
@@ -13433,6 +13436,9 @@
   }
   .aura-overlay-druid {
     --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-glitch {
+    --aura-color: var(--color-aura-rpg-electric);
   }
   body.reduce-motion .aura-overlay-frame {
     transition: none;

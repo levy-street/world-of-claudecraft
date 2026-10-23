@@ -93,7 +93,10 @@ describe('community test character templates', () => {
       const player = reloaded.entities.get(pid);
       if (!player) throw new Error(`failed to reload ${name}`);
       expect(player.hp).toBe(player.maxHp);
-      if (player.resourceType !== 'rage') expect(player.resource).toBe(player.maxResource);
+      // Rage and the Glitch's bar both start empty; every other pool starts full.
+      if (player.resourceType !== 'rage' && player.resourceType !== 'corruption') {
+        expect(player.resource).toBe(player.maxResource);
+      }
     }
   });
 

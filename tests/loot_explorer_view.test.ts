@@ -201,6 +201,7 @@ describe('buildLootExplorerIndex', () => {
         ?.sources.filter((s) => s.category === 'quest_reward' && s.sourceId === 'q_bandits') ?? [];
     expect(staffRewards.map((s) => s.restrictedToClass).sort()).toEqual([
       'druid',
+      'glitch',
       'mage',
       'priest',
       'warlock',

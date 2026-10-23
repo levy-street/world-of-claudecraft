@@ -90,7 +90,13 @@ export const KILL_PROMPT_RANGE = 12;
 /** The classes whose first real button is the SPELL on slot 2, not the
  *  melee Attack on slot 1: their combat lessons teach {attackKey} = the
  *  slot1 bind and speak of casting, not swinging. */
-export const CASTER_CLASSES: ReadonlySet<string> = new Set(['mage', 'warlock', 'priest', 'druid']);
+export const CASTER_CLASSES: ReadonlySet<string> = new Set([
+  'mage',
+  'warlock',
+  'priest',
+  'druid',
+  'glitch',
+]);
 
 /** Which action-bar bind the combat lessons teach for this class. */
 export function attackBindFor(playerClass: string): 'slot0' | 'slot1' {

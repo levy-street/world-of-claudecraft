@@ -547,6 +547,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
       priest: 'mother_of_pearl',
       shaman: 'mother_of_pearl',
       druid: 'mother_of_pearl',
+      glitch: 'mother_of_pearl',
     },
     requiresQuest: 'q_ps_shell_and_claw',
   },

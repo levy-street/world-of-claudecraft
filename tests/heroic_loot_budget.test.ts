@@ -53,7 +53,7 @@ const BASELINE = {
       'shadowpulse_slippers',
     ],
     normalDigest: '608ad38c9ea77cb6a20f75c9aac2fc5bf6787ccf9ac41a8a50ae9b9cd7ddef13',
-    gearDigest: '15bfce8c44bf22ca36d68b5315fd10e2ae00662c4f9c0e258487fe598a3c8edb',
+    gearDigest: '11bfe967b55d0aba843fa88f5816fc89856fb819e4b681a9779be368839e4faa',
   },
   knight_commander_olen: {
     gearIds: [
@@ -65,7 +65,7 @@ const BASELINE = {
       'trollhide_leggings',
     ],
     normalDigest: '9165d82e66547ae3ab98bcab284ee171842737273727a4701d140fd7c2922016',
-    gearDigest: '0b7bcbadd3c806ae4c788945cccb7cb71b6297372784fff8f4890bdf652153eb',
+    gearDigest: '5604ab7753a08c8f65789d5b9932bf47d34b42b106ef830b025f62a1af91c2ab',
   },
   vael_the_mistcaller: {
     gearIds: [
@@ -89,7 +89,7 @@ const BASELINE = {
       'trollhide_leggings',
     ],
     normalDigest: '213a53c89b1da7a01abf0c4ea3849f9390368a6163a358f3fdad2f2007f0bcb1',
-    gearDigest: '22c9fd554829d688bd6cbc8bb79d99c89c30b250e40ee297452a98197fbb6942',
+    gearDigest: '9a810c97b4a6542fb1f7adfe9aea7d0d571d72e280396989b74b3b3a8887595c',
   },
   choirmother_selthe: {
     gearIds: ['heroic_selthes_seastriders'],
@@ -112,7 +112,7 @@ const BASELINE = {
       'tidewoven_trousers',
     ],
     normalDigest: 'aa4c9a380d095266e6cd74de3869ac1652f4a896af53c6bdd4cf406fa35ee01c',
-    gearDigest: 'b8d1423096dfc7c658a939b0ee7145b33e35305782d3884c640e27fd57dcfe65',
+    gearDigest: '09003cb42848d4e855c76e122320585a52584fdc3e8edd697a3543e28d491791',
   },
   korgath_the_bound: {
     gearIds: [
@@ -131,7 +131,7 @@ const BASELINE = {
       'zealotsbane_blade',
     ],
     normalDigest: '48c75a437f0d7672490273450f6a49fbc974378155beefd3184a71cea13c2521',
-    gearDigest: '3b2983de5d71e532d19a604a4cbdbf843d264f7ac974d8b44562892cba824dc7',
+    gearDigest: '20788f81d67e96d84402b8acc565f0a55f66be3d9c077ceb44eb9c07ed3689bb',
   },
   grand_necromancer_velkhar: {
     gearIds: [
@@ -148,7 +148,7 @@ const BASELINE = {
       'revenant_silk_robe',
     ],
     normalDigest: 'e9b35e13c5de33a5bf786cdba760f19b6b769a4bf712de6ee2ff0698ed1fcb09',
-    gearDigest: '19d839abf88e5d2efdbd0230589c511e709e2ec65cd13c9da3df67a2207bbda5',
+    gearDigest: '17c0e98017ea4344d6337a09f379186c96ce9c9a09db5c72feef79924b079226',
   },
   korzul_the_gravewyrm: {
     gearIds: [
@@ -181,7 +181,7 @@ const BASELINE = {
       'wyrmchoir_handwraps',
     ],
     normalDigest: '0ac50f2ff6acdc808e5c24f721c84b337eade18ea81d2463f77bdd437599946a',
-    gearDigest: '483612e11a843da003d682b74a7934bc686b57107e8a39dc779285efdb198c6a',
+    gearDigest: 'e16e7221a3c3124aa8280deb8cfca6fc02422d1365810d9f5a17c6d9a822162d',
   },
   wildheart_high_priest: {
     gearIds: [
@@ -200,7 +200,7 @@ const BASELINE = {
       'vineclaw_stalking_breeches',
     ],
     normalDigest: 'dc4c6a27f87b5cd5ab11237b791de5a2707e2b55329f7c1aada4a4fb9cfe34f8',
-    gearDigest: '62b6f9de2378727e1e5e2c42d127d08705f32fcd284410b4326e7ec950931da8',
+    gearDigest: '28d190c34c6c62194975dbc9ad47cc128360f538351ccb3df89dd5118c5eb9cc',
   },
 } as const;
 

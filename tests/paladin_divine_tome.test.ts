@@ -121,6 +121,7 @@ describe('paladin Divine Tome: the chain is class-locked and ordered', () => {
       'mage',
       'warlock',
       'druid',
+      'glitch',
     ];
     expect(others).toHaveLength(ALL_CLASSES.length - 1);
     expect(others).not.toContain('paladin');

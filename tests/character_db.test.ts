@@ -66,7 +66,7 @@ beforeEach(() => {
 });
 
 describe('community test account transaction', () => {
-  it('atomically inserts the account and all nine level-20 character states when enabled', async () => {
+  it('atomically inserts the account and all ten level-20 character states when enabled', async () => {
     configureCommunityTestAccounts(true);
     const client = clientStub();
     dbMock.connect.mockResolvedValue(client as any);
@@ -92,8 +92,8 @@ describe('community test account transaction', () => {
     const accountInsert = calls.find((call) => /INSERT INTO accounts/i.test(call[0]));
     expect(accountInsert?.[1]?.[4]).toBe(false);
     const characterInserts = calls.filter((call) => /INSERT INTO characters/i.test(call[0]));
-    expect(characterInserts).toHaveLength(9);
-    expect(new Set(characterInserts.map((call) => call[1]?.[1]))).toHaveLength(9);
+    expect(characterInserts).toHaveLength(10);
+    expect(new Set(characterInserts.map((call) => call[1]?.[1]))).toHaveLength(10);
     for (const [, params] of characterInserts) {
       expect(params?.[0]).toBe(42);
       expect(params?.[3]).toBe(REALM);
@@ -124,7 +124,7 @@ describe('community test account transaction', () => {
     const characterInserts = client.query.mock.calls.filter((call) =>
       /INSERT INTO characters/i.test(call[0]),
     );
-    expect(characterInserts).toHaveLength(10);
+    expect(characterInserts).toHaveLength(11);
     expect(characterInserts[0][1]?.[2]).toBe('warrior');
     expect(characterInserts[1][1]?.[2]).toBe('warrior');
     expect(characterInserts[1][1]?.[1]).not.toBe(characterInserts[0][1]?.[1]);

@@ -114,6 +114,7 @@ describe('the item zones', () => {
       mage: 'architects_cornerstone',
       warlock: 'staff_of_velkhar',
       druid: 'grovewardens_grips',
+      glitch: 'staff_of_velkhar',
     });
   });
 });

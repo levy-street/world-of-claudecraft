@@ -356,6 +356,7 @@ import { SEASON2_ITEMS } from './content/pvp_honor_season2';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
+import { admitGlitchToCasterGear } from './equipment_rules';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -468,6 +469,9 @@ export const MOBS: Record<string, MobTemplate> = {
 // merged into ITEMS in place, so a "Heroic X" copy is a first-class item everywhere.
 // Must run after both ITEMS and MOBS are assembled (it reads their loot tables).
 Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
+// After every item (heroic copies included) exists: the Glitch joins the
+// shared cloth-caster class lists.
+admitGlitchToCasterGear(ITEMS);
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
 // before camps, so existing entity ids stay stable (determinism).
@@ -770,6 +774,7 @@ export const REWARD_ARCHETYPE: Record<PlayerClass, PlayerClass> = {
   priest: 'mage',
   warlock: 'mage',
   druid: 'mage',
+  glitch: 'mage',
 };
 
 // Resolve the item a quest awards a given class: a class-specific reward if the

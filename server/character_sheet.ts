@@ -415,6 +415,7 @@ const CLASS_LABELS: Record<PlayerClass, string> = {
   mage: 'Mage',
   warlock: 'Warlock',
   druid: 'Druid',
+  glitch: 'Glitch',
 };
 
 export function splitCopper(copper: number): MoneySplit {

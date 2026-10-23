@@ -39,6 +39,7 @@ const CLASS_IDS = new Set([
   'shaman',
   'mage',
   'warlock',
+  'glitch',
   'druid',
 ]);
 

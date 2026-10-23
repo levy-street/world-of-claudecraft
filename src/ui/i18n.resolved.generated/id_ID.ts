@@ -7815,7 +7815,8 @@ export const id_ID: EnTranslations = {
       "rage": "Amukan",
       "mana": "Mana",
       "energy": "Energi",
-      "focus": "Fokus"
+      "focus": "Fokus",
+      "corruption": "Instability"
     },
     "classPage": {
       "back": "Semua kelas",
@@ -7886,6 +7887,11 @@ export const id_ID: EnTranslations = {
       "none": "Tak ada kelas yang cocok dengan semua saringan. Bersihkan satu untuk melihat lebih banyak."
     },
     "abilityHook": {
+      "glitch_corrupt_byte": "Corrupts a target with a lingering fault that feeds your Instability the longer it runs.",
+      "glitch_noise_field": "Fills a spot you choose with static that hurts and slows everything inside.",
+      "glitch_phase_skip": "Skips you to a spot you choose in an instant.",
+      "glitch_overflow": "Dumps your stored Instability into a target in one hit.",
+      "glitch_cascade": "Stretches every fault you have running in a chosen area.",
       "evil_eye": "Menandai musuh yang tindakan dan penderitaannya akan mengisi Kecaman-mu.",
       "heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
       "revenge": "Menyapu musuh di depanmu dan dapat menjadi gratis setelah menghindar atau menangkis.",
@@ -10258,6 +10264,7 @@ export const id_ID: EnTranslations = {
     "mage": "Penyihir",
     "warlock": "Penyihir Iblis",
     "druid": "Druid",
+    "glitch": "Glitch",
     "warriorAria": "Kelas Prajurit",
     "paladinAria": "Kelas Paladin",
     "hunterAria": "Kelas Pemburu",
@@ -10266,7 +10273,8 @@ export const id_ID: EnTranslations = {
     "shamanAria": "Kelas Dukun",
     "mageAria": "Kelas Penyihir",
     "warlockAria": "Kelas Penyihir Iblis",
-    "druidAria": "Kelas Druid"
+    "druidAria": "Kelas Druid",
+    "glitchAria": "Glitch class"
   },
   "controls": {
     "title": "Panduan Kontrol",
@@ -11335,7 +11343,8 @@ export const id_ID: EnTranslations = {
       "mana": "Mana",
       "energy": "Energi",
       "rage": "Amukan",
-      "focus": "Fokus"
+      "focus": "Fokus",
+      "corruption": "Instability"
     },
     "roles": {
       "warrior": "Tank / DPS Jarak Dekat",
@@ -11346,7 +11355,8 @@ export const id_ID: EnTranslations = {
       "shaman": "Penyembuh / DPS Jarak Dekat atau Jauh",
       "mage": "DPS Jarak Jauh",
       "warlock": "DPS Jarak Jauh",
-      "druid": "Tank / Penyembuh / DPS Jarak Dekat atau Jauh"
+      "druid": "Tank / Penyembuh / DPS Jarak Dekat atau Jauh",
+      "glitch": "Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Zirah Rantai, Kulit, Kain",
@@ -11370,7 +11380,8 @@ export const id_ID: EnTranslations = {
       "shaman": "Dukun memerintah unsur-unsur alam, mengisi senjata dengan kekuatan, mengejutkan musuh dengan petir, dan memulihkan sekutu.",
       "mage": "Penyihir menundukkan kekuatan Api, Beku, dan Arkana untuk membinasakan musuh, memanggil air, dan membekukan ancaman di tempat.",
       "warlock": "Penyihir Iblis memanggil iblis, menebar kutukan dan sihir kerusakan berkelanjutan, serta menyedot nyawa musuh untuk bertahan.",
-      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang."
+      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang.",
+      "glitch": "Glitches corrupt the world around them, seeding effects and fields that build Instability the longer they run, then dumping it in bursts."
     },
     "aria": "Detail kelas untuk {className}: peran {role}. Statistik awal: Kekuatan {str}, Kegesitan {agi}, Stamina {sta}, Kecerdasan {int}, Semangat {spi}.",
     "statBarAria": "{stat}: {value} dari 25"
@@ -11895,6 +11906,7 @@ export const id_ID: EnTranslations = {
       "abilityNotReady": "Kemampuan itu belum siap.",
       "notEnoughRage": "Amarah tidak cukup!",
       "notEnoughEnergy": "Energi tidak cukup!",
+      "notEnoughInstability": "Not enough Instability!",
       "notEnoughMana": "Mana tidak cukup!",
       "notEnoughDevotion": "Pengabdian tidak cukup!",
       "notEnoughResource": "{resource} tidak cukup!",
@@ -12238,7 +12250,8 @@ export const id_ID: EnTranslations = {
       "rage": "Amukan",
       "energy": "Energi",
       "focus": "fokus",
-      "devotion": "Pengabdian"
+      "devotion": "Pengabdian",
+      "corruption": "Instability"
     },
     "forms": {
       "bear": "Bruin",
@@ -13111,6 +13124,54 @@ export const id_ID: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "glitch_corrupt_byte": {
+        "name": "Corrupt Byte",
+        "description": "Corrupts the target, dealing {damage} Shadow damage over 12 sec. Builds Corruption while it runs."
+      },
+      "glitch_noise_field": {
+        "name": "Noise Field",
+        "description": "Fills the target area with static for 8 sec, dealing 6 to 8 Arcane damage each second and slowing enemies inside by 30%. Builds Corruption while it lasts."
+      },
+      "glitch_phase_skip": {
+        "name": "Phase Skip",
+        "description": "Skip to the target location up to 20 yards away, breaking roots."
+      },
+      "glitch_overflow": {
+        "name": "Overflow",
+        "description": "Dumps stored Corruption into the target, dealing {damage} Shadow damage. Costs 30 Corruption."
+      },
+      "glitch_memory_leak": {
+        "name": "Memory Leak",
+        "description": "Leaks the target's strength away, dealing {damage} Shadow damage over 15 sec. Builds Corruption while it runs."
+      },
+      "glitch_packet_loss": {
+        "name": "Packet Loss",
+        "description": "Drops the target's spell mid-cast, preventing any spell in that school from being cast for 6 sec."
+      },
+      "glitch_null_pointer": {
+        "name": "Null Pointer",
+        "description": "Points the target at nothing, rooting it in place for 4 sec."
+      },
+      "glitch_rollback": {
+        "name": "Rollback",
+        "description": "Restores 25% of your maximum health. Costs 50 Instability."
+      },
+      "glitch_cascade": {
+        "name": "Cascade",
+        "description": "Extends every Glitch effect you have on enemies in the target area by 4 sec. Extended effects keep their age, so they keep building Instability faster. Costs 20 Instability."
+      },
+      "glitch_fork_bomb": {
+        "name": "Fork Bomb",
+        "description": "Detonates the target area, dealing {damage} Arcane damage to every enemy inside. Costs 40 Corruption. (Overclock signature)"
+      },
+      "glitch_bit_rot": {
+        "name": "Bit Rot",
+        "description": "Rots the target, dealing {damage} Shadow damage over 10 sec. Builds Corruption while it runs. (Entropy signature)"
+      },
+      "glitch_sandbox": {
+        "name": "Sandbox",
+        "description": "Isolates you in a shield that absorbs damage equal to 20% of your maximum health for 10 sec. Costs 20 Corruption. (Sandbox signature)"
+      },
       "sport_kick": {
         "name": "Tendang",
         "description": "Tendang bola menyusur tanah ke arah titik bidik."

@@ -74,6 +74,7 @@ const abilityStringsEn = {
       energy: 'Energy',
       focus: 'Focus',
       devotion: 'Devotion',
+      corruption: 'Instability',
     },
     forms: {
       bear: 'Bruin',
@@ -135,6 +136,63 @@ function abilityTranslations(
 const classAbilityNamesEn = {
   entities: {
     abilities: abilityTranslations([
+      // The Glitch kit (src/sim/content/glitch.ts).
+      [
+        'glitch_corrupt_byte',
+        'Corrupt Byte',
+        'Corrupts the target, dealing {damage} Shadow damage over 12 sec. Builds Corruption while it runs.',
+      ],
+      [
+        'glitch_noise_field',
+        'Noise Field',
+        'Fills the target area with static for 8 sec, dealing 6 to 8 Arcane damage each second and slowing enemies inside by 30%. Builds Corruption while it lasts.',
+      ],
+      [
+        'glitch_phase_skip',
+        'Phase Skip',
+        'Skip to the target location up to 20 yards away, breaking roots.',
+      ],
+      [
+        'glitch_overflow',
+        'Overflow',
+        'Dumps stored Corruption into the target, dealing {damage} Shadow damage. Costs 30 Corruption.',
+      ],
+      [
+        'glitch_memory_leak',
+        'Memory Leak',
+        "Leaks the target's strength away, dealing {damage} Shadow damage over 15 sec. Builds Corruption while it runs.",
+      ],
+      [
+        'glitch_packet_loss',
+        'Packet Loss',
+        "Drops the target's spell mid-cast, preventing any spell in that school from being cast for 6 sec.",
+      ],
+      [
+        'glitch_null_pointer',
+        'Null Pointer',
+        'Points the target at nothing, rooting it in place for 4 sec.',
+      ],
+      ['glitch_rollback', 'Rollback', 'Restores 25% of your maximum health. Costs 50 Instability.'],
+      [
+        'glitch_cascade',
+        'Cascade',
+        'Extends every Glitch effect you have on enemies in the target area by 4 sec. Extended effects keep their age, so they keep building Instability faster. Costs 20 Instability.',
+      ],
+      [
+        'glitch_fork_bomb',
+        'Fork Bomb',
+        'Detonates the target area, dealing {damage} Arcane damage to every enemy inside. Costs 40 Corruption. (Overclock signature)',
+      ],
+      [
+        'glitch_bit_rot',
+        'Bit Rot',
+        'Rots the target, dealing {damage} Shadow damage over 10 sec. Builds Corruption while it runs. (Entropy signature)',
+      ],
+      [
+        'glitch_sandbox',
+        'Sandbox',
+        'Isolates you in a shield that absorbs damage equal to 20% of your maximum health for 10 sec. Costs 20 Corruption. (Sandbox signature)',
+      ],
       // The Vale Cup sport kit (docs/prd/vale-cup.md).
       ['sport_kick', 'Kick', 'Knock the ball along the ground toward the aim point.'],
       [
