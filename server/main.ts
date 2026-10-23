@@ -431,6 +431,7 @@ import {
   requestedSfxVersion,
   sfxBlobIntegrityMatches,
 } from './static_cache';
+import { contentTypeFor } from './static_content_type';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import {
@@ -1418,24 +1419,6 @@ const desktopLoginRouteDeps: DesktopLoginRouteDeps = {
   saveToken,
 };
 
-const MIME: Record<string, string> = {
-  '.html': 'text/html',
-  '.js': 'application/javascript',
-  '.css': 'text/css',
-  '.png': 'image/png',
-  '.svg': 'image/svg+xml',
-  '.json': 'application/json',
-  '.glb': 'model/gltf-binary',
-  '.gltf': 'model/gltf+json',
-  '.bin': 'application/octet-stream',
-  '.hdr': 'application/octet-stream',
-  '.ktx2': 'image/ktx2',
-  '.wasm': 'application/wasm',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.webp': 'image/webp',
-  '.mp3': 'audio/mpeg',
-};
 // Stream a static file into a response with full teardown: bare pipe() never
 // destroys the SOURCE stream when the response side closes first, so every
 // client-aborted transfer leaked its file descriptor for the life of the
@@ -1545,7 +1528,7 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   }
   res.writeHead(200, {
     ...validators,
-    'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream',
+    'Content-Type': contentTypeFor(file),
     'Content-Length': verifiedSfx?.bytes.length ?? stats.size,
   });
   if (req.method === 'HEAD') {
