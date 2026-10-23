@@ -53,6 +53,9 @@ export const CRYPT_KIT_SLOTS = {
   nets: 5,
   embers: 2,
   objects: 8,
+  /** Gargoyle rubble heaps lying at once (the crypt holds five gargoyles, and
+   *  a dev spawn makes six). */
+  rubble: 6,
 } as const;
 
 /**

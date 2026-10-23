@@ -5,7 +5,10 @@
 //    Rupture blast and its heroic pool, the Splinter Burst, the Marrow Crush;
 //  - crypt_mark_fx.ts: the marks on a body (the gargoyle's Granite Skin crust
 //    and its Cracked Stone, the Carrion Eye bolt, glyph and crow streaks, the
-//    Rimesilk strand and web net) and the drake's heroic Barrow Embers.
+//    Rimesilk strand and web net) and the drake's heroic Barrow Embers;
+//  - crypt_gargoyle_crumble_fx.ts: the Chapel Gargoyle's death (the cracks
+//    racing over it, the body breaking into falling blocks, the rolling dust)
+//    and the rubble heap that is its corpse.
 //
 // The floor telegraphs that decide outcomes (the rupture ring, the pool's and
 // the embers' edges, the lanes and kick glyphs) are crypt_trash_fx.ts's, on
@@ -49,6 +52,7 @@ import {
   ParticlePool,
   type ParticleSpec,
 } from './crypt_fx_particles';
+import { CryptGargoyleCrumbleFx } from './crypt_gargoyle_crumble_fx';
 import { CryptMarkFx } from './crypt_mark_fx';
 import { inHollowCrypt, KIT_SCAN_SECONDS } from './crypt_trash_kit_fx_core';
 
@@ -195,6 +199,10 @@ export interface CryptKitHost {
   now(): number;
   rand(): number;
   shakeAt(x: number, z: number, amount: number): void;
+  /** The reduced-motion setting, read live. */
+  calm(): boolean;
+  /** Send a presentation gesture to an entity's rig (a no-op with no view). */
+  gesture(entityId: number, gesture: string): void;
   patch(
     rings: number,
     segments: number,
@@ -248,6 +256,7 @@ export class CryptTrashKitFx implements CryptKitHost {
   readonly uTime = { value: 0 };
   private readonly bones: CryptBoneFx;
   private readonly marks: CryptMarkFx;
+  private readonly crumble: CryptGargoyleCrumbleFx;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly glyphGeo: THREE.BufferGeometry;
@@ -264,6 +273,7 @@ export class CryptTrashKitFx implements CryptKitHost {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shake?: (amount: number) => void,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'crypt-trash-kit-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -313,6 +323,7 @@ export class CryptTrashKitFx implements CryptKitHost {
     this.beamGeo = this.own(beamGeometry(20));
     this.bones = new CryptBoneFx(this);
     this.marks = new CryptMarkFx(this);
+    this.crumble = new CryptGargoyleCrumbleFx(this, low);
     for (const child of this.root.children) tagVfxSubtree(child);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
@@ -340,6 +351,14 @@ export class CryptTrashKitFx implements CryptKitHost {
     if (!me) return;
     const d = Math.hypot(me.pos.x - x, me.pos.z - z);
     if (d < 30) this.shake(amount * (1 - d / 30));
+  }
+
+  calm(): boolean {
+    return this.reducedMotion();
+  }
+
+  gesture(entityId: number, gesture: string): void {
+    this.playGesture?.(entityId, gesture);
   }
 
   patch(
@@ -449,24 +468,28 @@ export class CryptTrashKitFx implements CryptKitHost {
     }
     this.bones.update(dt);
     this.marks.update(dt);
+    this.crumble.update(dt);
     this.dust.update(this.clock);
     this.shards.update(this.clock);
     this.fire.update(this.clock);
     this.glow.update(this.clock);
   }
 
-  /** One roster walk feeds both parts, and only inside the crypt's claim. */
+  /** One roster walk feeds every part, and only inside the crypt's claim. */
   private walk(): void {
     this.bones.beginScan();
     this.marks.beginScan();
+    this.crumble.beginScan();
     if (inHollowCrypt(this.world.player.pos.x)) {
       for (const e of this.world.entities.values()) {
         this.bones.see(e);
         this.marks.see(e);
+        this.crumble.see(e);
       }
     }
     this.bones.endScan();
     this.marks.endScan();
+    this.crumble.endScan();
   }
 
   dispose(): void {
@@ -474,6 +497,7 @@ export class CryptTrashKitFx implements CryptKitHost {
     this.disposed = true;
     this.root.removeFromParent();
     this.marks.dispose();
+    this.crumble.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

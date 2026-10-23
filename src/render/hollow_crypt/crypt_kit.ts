@@ -167,6 +167,9 @@ function fallbackGeometry(piece: string): THREE.BufferGeometry {
     if (/CurtainWall/.test(piece)) return new THREE.BoxGeometry(6, 8, 2.4).translate(0, 4, 0);
     if (/Candle/.test(piece))
       return new THREE.CylinderGeometry(0.9, 1.1, 3.5, 10).translate(0, 1.75, 0);
+    if (/GargoyleRubble/.test(piece))
+      return new THREE.CylinderGeometry(1.4, 2.1, 0.5, 9).translate(0, 0.25, 0);
+    if (/Gargoyle/.test(piece)) return new THREE.BoxGeometry(1, 0.8, 0.9);
     return new THREE.BoxGeometry(2, 1.2, 1.4).translate(0, 0.6, 0);
   })();
   const n = g.index ? g.toNonIndexed() : g;
@@ -186,6 +189,25 @@ function pieceGeometry(piece: string): BakedPiece {
     fallbacks.set(piece, fb);
   }
   return fb;
+}
+
+/**
+ * One piece's lit geometry and the kit's lit material, for a painter that
+ * draws a kit piece itself (the Chapel Gargoyle's rubble,
+ * crypt_gargoyle_crumble_fx.ts). Drawn as an InstancedMesh it is the kit's own
+ * batch shape (the same attributes on the same material), so it draws on the
+ * program the kit already linked. The stand-in until the kit lands: ask again
+ * before use, the geometry object changes when it does.
+ */
+export function cryptKitStonePiece(piece: string): {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+} {
+  const geo = pieceGeometry(piece);
+  return {
+    geometry: geo.stone ?? (pieceGeometry('Kit_Rubble').stone as THREE.BufferGeometry),
+    material: slotMaterial('stone'),
+  };
 }
 
 /** Instance the whole kit over the layout (instance-local frame). A kit still

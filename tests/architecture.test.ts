@@ -889,6 +889,8 @@ const RENDER_PURE_CORES = [
   'src/render/hollow_crypt/crypt_trash_fx_core.ts',
   // The crypt trash mechanics pass's hero effects (bone pile, rupture, granite, marks).
   'src/render/hollow_crypt/crypt_trash_kit_fx_core.ts',
+  // The Chapel Gargoyle's death: the beat, the falling blocks, the heap that is its corpse.
+  'src/render/hollow_crypt/crypt_gargoyle_crumble_core.ts',
   'src/render/hollow_crypt/crypt_creature_fx_core.ts',
   'src/render/hollow_crypt/crypt_set_dressing_core.ts',
   'src/render/hollow_crypt/crypt_gate_state_core.ts',

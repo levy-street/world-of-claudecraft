@@ -135,8 +135,9 @@ void main() {
 `;
 
 /** A hot amber fissure on the cracked body: a jagged vein with a branch and a
- *  heat glow round it. `uSeed` turns and reshapes each sprite. */
-const CRACK_GLYPH_FRAG = /* glsl */ `
+ *  heat glow round it. `uSeed` turns and reshapes each sprite. Shared with the
+ *  gargoyle's death (crypt_gargoyle_crumble_fx.ts), on this one program. */
+export const CRACK_GLYPH_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uAlpha;
 uniform float uSeed;

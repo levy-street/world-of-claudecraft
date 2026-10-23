@@ -130,6 +130,7 @@ export class CryptTrashFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     reducedMotion?: () => boolean,
     shake?: (amount: number) => void,
+    playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'crypt-trash-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -160,7 +161,7 @@ export class CryptTrashFx {
         this.flashes.push({ ...this.kit.fan(21), age: -1, radius: 1, x: 0, z: 0 });
     }
     this.kitFx = world
-      ? new CryptTrashKitFx(scene, groundY, world, compileGate, reducedMotion, shake)
+      ? new CryptTrashKitFx(scene, groundY, world, compileGate, reducedMotion, shake, playGesture)
       : null;
     const own = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed);
     this.readyForEntry = Promise.all([own, this.kitFx?.readyForEntry])

@@ -118,7 +118,11 @@ import {
   shadowStandInShown,
 } from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
-import { GestureMeshToggles } from './gesture_mesh_toggles';
+import {
+  GestureMeshToggles,
+  type MeshToggleRemains,
+  remainsPickHeight,
+} from './gesture_mesh_toggles';
 import { GloamPresence } from './gloam_climb';
 import { GLOAM_CUE_HIDDEN, type GloamCue } from './gloam_climb_core';
 import { GlowPulse } from './glow_pulse';
@@ -571,7 +575,8 @@ export class CharacterVisual {
    *  shadow all read the body actually drawn. The renderer re-reads it every
    *  frame, so a live size change needs no view rebuild. */
   get height(): number {
-    return this.baseHeight * this.bodyScale;
+    // What a whole-model hide left behind (a gargoyle's rubble) is what is drawn.
+    return (this.remains ? this.remains.height : this.baseHeight) * this.bodyScale;
   }
   /** invisible capsule for picking (userData.entityId set by the renderer) */
   readonly clickProxy: THREE.Mesh;
@@ -1418,6 +1423,8 @@ export class CharacterVisual {
   private dials: BoneDials | null = null;
   /** VisualDef.meshToggles: mesh nodes hidden or shown by gestures (gesture_mesh_toggles.ts). */
   private meshToggles: GestureMeshToggles | null = null;
+  /** What the toggles left where they hid the whole model (MeshToggleDef.remains), or null. */
+  private remains: MeshToggleRemains | null = null;
   /** VisualDef.glowPulses: the emissive map flared by gestures (glow_pulse.ts). */
   private glowPulse: GlowPulse | null = null;
   /** VisualDef.turnRate / ClipMap.turn: the rooted body's drawn heading
@@ -2824,6 +2831,7 @@ export class CharacterVisual {
   playAttack(abilityId?: string, gestureOnly = false, kind?: 'melee' | 'wand'): number {
     if (abilityId && this.meshToggles?.handle(abilityId)) {
       this.syncFarVisibility();
+      this.syncRemains();
       return 0;
     }
     if (abilityId && this.dials?.handle(abilityId)) return 0;
@@ -3739,6 +3747,15 @@ export class CharacterVisual {
     this.entranceFor = undefined;
     this.wasSwimming = false;
     if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+    // What a gesture hid on the last entity (a crumbled gargoyle's whole
+    // model, with its capsule on the heap) is not the next one's: a rig
+    // parked hidden would otherwise be handed out invisible. The effect that
+    // owns the hide sends it again for a body that should still be hidden.
+    if (this.meshToggles && this.meshToggles.hidden() !== 'none' && !this.disposed) {
+      this.meshToggles.reset();
+      this.syncFarVisibility();
+      this.syncRemains();
+    }
   }
 
   clearElementResponse(): void {
@@ -5238,9 +5255,30 @@ export class CharacterVisual {
     // A statue holds the pose it was struck in.
     this.mixer.update(this.petrified ? 0 : dt);
     this.dials?.apply(dt);
-    if (this.meshToggles?.update(dt, this.current?.getClip().name ?? null))
+    if (this.meshToggles?.update(dt, this.current?.getClip().name ?? null)) {
       this.syncFarVisibility();
+      this.syncRemains();
+    }
     this.skeletonUpdates.markPoseChanged();
+  }
+
+  /** The click capsule of the body, or of what a whole-model hide left of it
+   *  (MeshToggleDef.remains: a low capsule on the remains, dropped onto them
+   *  when they lie under a body the sim left in the air). Written only where
+   *  the toggles change. */
+  private syncRemains(): void {
+    const remains = this.meshToggles?.remains() ?? null;
+    if (!remains && !this.remains) return;
+    this.remains = remains;
+    const r = remains ? remains.radius : this.clickRadius;
+    this.clickProxy.scale.set(
+      r * 2,
+      remains
+        ? remainsPickHeight(remains)
+        : pickProxyHeight(this.baseHeight, this.clickRadius, this.deadLock),
+      r * 2,
+    );
+    this.clickProxy.position.y = remains && remains.drop > 0 ? -remains.drop : 0;
   }
 
   /** Nothing is driving the rig (see `needsAnimRepair`): drop the stale handle
@@ -6018,7 +6056,9 @@ export class CharacterVisual {
     // a lootable corpse remains clickable. Restored in revive(). Set here (not the
     // per-frame update) since it only changes on the death/revive edge, and this
     // runs on every enterDeath path including the created-already-dead snapshot.
-    this.clickProxy.scale.y = pickProxyHeight(this.baseHeight, this.clickRadius, true);
+    // (Remains already standing in for the body keep their own capsule: syncRemains.)
+    if (!this.remains)
+      this.clickProxy.scale.y = pickProxyHeight(this.baseHeight, this.clickRadius, true);
     const death = this.action(this.def.clips.death);
     if (!death) {
       // No death clip: the corpse holds whatever pose was driving it. dead-lock
@@ -6068,6 +6108,7 @@ export class CharacterVisual {
     this.modelWrap.position.y = this.modelWrapGroundY;
     this.applyCorpseMeshSwap(false);
     this.meshToggles?.reset();
+    this.syncRemains();
     // Release the one-shot latch: a `finished` that never arrived (the rig was
     // throttled, or the clip was cut) would otherwise leave every later base
     // change committing its state while silently skipping its fade.

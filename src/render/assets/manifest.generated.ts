@@ -1675,7 +1675,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/hollow_crypt_entrance_growth.glb": "/media/models/props/hollow_crypt_entrance_growth.d24dac1186a3.glb",
   "models/props/hollow_crypt_entrance_props.glb": "/media/models/props/hollow_crypt_entrance_props.ecc3ee3ea99f.glb",
   "models/props/hollow_crypt_entrance_walls.glb": "/media/models/props/hollow_crypt_entrance_walls.b834314b5a8a.glb",
-  "models/props/hollow_crypt_kit.glb": "/media/models/props/hollow_crypt_kit.41bfeba1b19f.glb",
+  "models/props/hollow_crypt_kit.glb": "/media/models/props/hollow_crypt_kit.1b4153e28721.glb",
   "models/props/hollow_gate_crystal.glb": "/media/models/props/hollow_gate_crystal.d6303ad81ae4.glb",
   "models/props/hollow_gate_tree.glb": "/media/models/props/hollow_gate_tree.157f24608613.glb",
   "models/props/house_1.glb": "/media/models/props/house_1.87c8306f95e3.glb",

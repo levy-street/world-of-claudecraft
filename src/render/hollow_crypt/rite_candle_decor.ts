@@ -1,8 +1,10 @@
 // The four Remembrance Candles' decor, as each crypt interior built it: the
-// kit's baked flame (one instance each of the `Kit_RemembranceCandle:glow`
-// batch, crypt_kit.ts) and the crypt lights' flame cone, halo and budgeted
-// point light (crypt_lights.ts). Morthen's Rite gutters them out and the group
-// lights them again (morthen_candle_fx.ts).
+// kit's baked lights (one instance each of the `Kit_RemembranceCandle:glow`
+// batch, crypt_kit.ts: the flame, the molten well it stands in, the names cut
+// in the plinth and the votive lights at its foot, so a guttered candle is
+// iron, stone and cold wax on every graphics tier) and the crypt lights' flame
+// cone, halo and budgeted point light (crypt_lights.ts). Morthen's Rite gutters
+// them out and the group lights them again (morthen_candle_fx.ts).
 //
 // No module registry: the builders TAG what they built (userData, so the tags
 // live and die with the objects), and a RiteCandleDecor finds the decor of the
