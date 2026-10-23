@@ -245,40 +245,47 @@ describe('Reserve at accept: rejected never spends, an accepted-then-interrupted
 });
 
 describe('Complete-hit damage: the promised multiplier, including AP, at identical rng draw', () => {
-  it('Long Draw lands +50% and Fell Shot lands +75% versus an unarmed baseline', () => {
-    const seed = 309001;
+  it.each([0, 300])(
+    'Long Draw lands +60% and Fell Shot +85% at %i Ranged Attack Power',
+    (power) => {
+      const seed = 309001;
 
-    function runAimedShot(armed: boolean): number {
-      const sim = marksmanHunter(seed);
-      const target = addDummy(sim);
-      if (armed) armColdsightRead(sim, target);
-      sim.targetEntity(target.id);
-      sim.player.resource = sim.player.maxResource;
-      sim.castAbility('aimed_shot');
-      return landedHit(advance(sim, 4), 'Long Draw');
-    }
-    function runArcaneShot(armed: boolean): number {
-      const sim = marksmanHunter(seed + 1);
-      const target = addDummy(sim);
-      if (armed) armColdsightRead(sim, target);
-      sim.targetEntity(target.id);
-      sim.player.resource = sim.player.maxResource;
-      sim.castAbility('arcane_shot');
-      return landedHit(advance(sim, 1), 'Fell Shot');
-    }
+      function runAimedShot(armed: boolean): number {
+        const sim = marksmanHunter(seed);
+        const target = addDummy(sim);
+        if (armed) armColdsightRead(sim, target);
+        // Applying the Read aura recalculates derived stats; pin RAP afterward.
+        sim.player.rangedPower = power;
+        sim.targetEntity(target.id);
+        sim.player.resource = sim.player.maxResource;
+        sim.castAbility('aimed_shot');
+        return landedHit(advance(sim, 4), 'Long Draw');
+      }
+      function runArcaneShot(armed: boolean): number {
+        const sim = marksmanHunter(seed + 1);
+        const target = addDummy(sim);
+        if (armed) armColdsightRead(sim, target);
+        // Applying the Read aura recalculates derived stats; pin RAP afterward.
+        sim.player.rangedPower = power;
+        sim.targetEntity(target.id);
+        sim.player.resource = sim.player.maxResource;
+        sim.castAbility('arcane_shot');
+        return landedHit(advance(sim, 1), 'Fell Shot');
+      }
 
-    // The real pipeline applies damageMult to the unrounded hit and rounds
-    // ONCE; comparing against an already-rounded baseline double-rounds, so
-    // allow the resulting +/-1 slack rather than exact equality.
-    const baseAimed = runAimedShot(false);
-    const boostedAimed = runAimedShot(true);
-    expect(Math.abs(boostedAimed - baseAimed * 1.5)).toBeLessThanOrEqual(1);
-    expect(boostedAimed).toBeGreaterThan(baseAimed); // substantial: base+AP both scaled
+      // The real pipeline applies damageMult to the unrounded hit and rounds
+      // ONCE; comparing against an already-rounded baseline double-rounds, so
+      // allow the resulting +/-1 slack rather than exact equality.
+      const baseAimed = runAimedShot(false);
+      const boostedAimed = runAimedShot(true);
+      expect(Math.abs(boostedAimed - baseAimed * 1.6)).toBeLessThanOrEqual(1);
+      expect(boostedAimed).toBeGreaterThan(baseAimed); // substantial: base+AP both scaled
 
-    const baseArcane = runArcaneShot(false);
-    const boostedArcane = runArcaneShot(true);
-    expect(Math.abs(boostedArcane - baseArcane * 1.75)).toBeLessThanOrEqual(1);
-  });
+      const baseArcane = runArcaneShot(false);
+      const boostedArcane = runArcaneShot(true);
+      expect(Math.abs(boostedArcane - baseArcane * 1.85)).toBeLessThanOrEqual(1);
+    },
+  );
 
   it('keeps one empowered Long Draw after pushback extends the cast beyond ten seconds', () => {
     function run(armed: boolean): number {
@@ -302,7 +309,7 @@ describe('Complete-hit damage: the promised multiplier, including AP, at identic
     }
     const ordinary = run(false);
     const empowered = run(true);
-    expect(Math.abs(empowered - ordinary * 1.5)).toBeLessThanOrEqual(1);
+    expect(Math.abs(empowered - ordinary * 1.6)).toBeLessThanOrEqual(1);
   });
 });
 

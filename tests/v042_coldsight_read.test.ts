@@ -3,7 +3,7 @@
 // shortening) grants one visible, non-stacking 10 sec opportunity; an
 // accepted Long Draw or Fell Shot reserves it immediately (so a later
 // interruption still spends it), and the reservation resolves into a
-// +50%/+75% damageMult on the complete hit exactly once. This suite covers
+// +60%/+85% damageMult on the complete hit exactly once. This suite covers
 // the exported state machine (src/sim/combat/hunter_coldsight_read.ts)
 // directly; the real coordinator flow (a live Sim channeling, casting,
 // interrupting) is tests/v042_coldsight_integration.test.ts.
@@ -235,7 +235,7 @@ describe('consumeColdsightReadReservation: a damageMult rider on the complete hi
     return eff;
   }
 
-  it('bakes +50% as damageMult into a reserved Long Draw, leaving min/max (and any AP scaling) untouched', () => {
+  it('bakes +60% as damageMult into a reserved Long Draw, leaving min/max (and any AP scaling) untouched', () => {
     const sim = hunterSim('marksmanship', 216);
     const base = sim.resolvedAbility('aimed_shot');
     if (!base) throw new Error('expected aimed_shot to resolve');
@@ -246,17 +246,17 @@ describe('consumeColdsightReadReservation: a damageMult rider on the complete hi
     const boostedEff = directDamageOf(boosted);
     expect(boostedEff.min).toBe(baseEff.min);
     expect(boostedEff.max).toBe(baseEff.max);
-    expect(boostedEff.damageMult ?? 1).toBeCloseTo(1.5);
+    expect(boostedEff.damageMult ?? 1).toBeCloseTo(1.6);
   });
 
-  it('bakes +75% for a reserved Fell Shot', () => {
+  it('bakes +85% for a reserved Fell Shot', () => {
     const sim = hunterSim('marksmanship', 217);
     const base = sim.resolvedAbility('arcane_shot');
     if (!base) throw new Error('expected arcane_shot to resolve');
     fullFeveredDraw(sim, liveTarget(sim));
     coldsightReserveRead(sim.ctx, sim.player, 'arcane_shot');
     const boosted = consumeColdsightReadReservation(sim.ctx, sim.player, base);
-    expect(directDamageOf(boosted).damageMult ?? 1).toBeCloseTo(1.75);
+    expect(directDamageOf(boosted).damageMult ?? 1).toBeCloseTo(1.85);
   });
 
   it('composes with an existing damageMult rather than overwriting it', () => {
@@ -272,7 +272,7 @@ describe('consumeColdsightReadReservation: a damageMult rider on the complete hi
     fullFeveredDraw(sim, liveTarget(sim));
     coldsightReserveRead(sim.ctx, sim.player, 'aimed_shot');
     const boosted = consumeColdsightReadReservation(sim.ctx, sim.player, withExistingMult);
-    expect(directDamageOf(boosted).damageMult).toBeCloseTo(1.2 * 1.5);
+    expect(directDamageOf(boosted).damageMult).toBeCloseTo(1.2 * 1.6);
   });
 
   it('leaves the resolved ability unchanged (same reference) when nothing is reserved', () => {

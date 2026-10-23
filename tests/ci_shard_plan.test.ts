@@ -367,6 +367,7 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/druid_balance_probe.test.ts',
       'tests/eastbrook_gameplay_integration.test.ts',
       'tests/hunter_dps_balance.test.ts',
+      'tests/marksmanship_damage_budget.test.ts',
       'tests/nythraxis_matrix.test.ts',
       'tests/owned_class_balance_dps_metrics.test.ts',
       'tests/owned_class_balance_dps_probes.test.ts',
@@ -395,6 +396,7 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/druid_balance_probe.test.ts',
       'tests/eastbrook_gameplay_integration.test.ts',
       'tests/hunter_dps_balance.test.ts',
+      'tests/marksmanship_damage_budget.test.ts',
       'tests/owned_class_balance_groveheart.test.ts',
       'tests/owned_class_balance_healer_contract.test.ts',
       'tests/owned_class_raid_sustain_bands.test.ts',
@@ -485,6 +487,7 @@ describe('the long-sims lane (Phase 4)', () => {
       .sort();
     expect(readers).toEqual([
       'tests/hunter_dps_balance.test.ts',
+      'tests/marksmanship_damage_budget.test.ts',
       'tests/owned_class_balance_dps_metrics.test.ts',
       'tests/owned_class_balance_druid_bands.test.ts',
       'tests/owned_class_balance_healer_contract.test.ts',
@@ -995,7 +998,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // ZERO legs here: the documented empty-lane path, exercised on the real
     // tree (the fixture-based cases above cover the non-empty shapes).
     expect(runB.log).toContain(
-      'plan: mode=selective (selective: 0 of 7 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 0 of 8 lane file(s) on the floor or changed)',
     );
     expect(runB.log).toContain('lane runs: nothing');
     // Binding negative: zero legs means no npm test invocation is printed at

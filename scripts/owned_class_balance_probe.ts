@@ -12,6 +12,7 @@ import {
   type Entity,
   type EquipSlot,
   type PlayerClass,
+  type SimConfig,
   type SimEvent,
 } from '../src/sim/types';
 import { anchorProbeInOpenField } from './probe_anchor';
@@ -846,9 +847,16 @@ export function runOwnedClassDpsProbe(
   // fresh-alt player experiences.
   gear: 'pbe' | 'naked' = 'pbe',
   setupEquipment?: (sim: Sim) => void,
+  beforeTick?: (sim: Sim, tick: number) => string | undefined,
+  probeWorld?: SimConfig['world'],
 ): OwnedClassBalanceResult {
   const fixture = FIXTURES[spec];
-  const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
+  const sim = new Sim({
+    seed,
+    playerClass: fixture.cls,
+    autoEquip: false,
+    world: probeWorld,
+  }) as ProbeSim;
   sim.setPlayerLevel(20);
   anchorProbeInOpenField(sim);
   const talents = pbeTalents(spec, fixture.talentSpec);
@@ -895,13 +903,14 @@ export function runOwnedClassDpsProbe(
   };
   let totalDamage = 0;
   for (let tick = 0; tick < scenario.seconds * 20; tick++) {
+    const requestedAbility = beforeTick?.(sim, tick);
     const wasReady =
       !sim.player.dead &&
       !sim.player.castingAbility &&
       sim.player.gcdRemaining <= 0.001 &&
       sim.player.chargeTargetId === null;
     const buttonsBefore = state.buttonsPressed;
-    runRotation(state);
+    if (!requestedAbility || !tryCast(state, requestedAbility)) runRotation(state);
     if (wasReady && state.buttonsPressed === buttonsBefore) state.readyIdleTicks++;
     totalDamage += collectDamage(state, sim.tick(), damageByTarget, damageBySource, outcomes);
   }
