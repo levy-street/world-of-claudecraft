@@ -301,6 +301,8 @@ export function gearedArrivalAppearance(index) {
     },
     // 5% either way of the authored size, in the size slider's whole percents
     bodyScale: (95 + ((index * 7) % 11)) / 100,
+    // every fourth bot a dwarf, so a crowd draws both races
+    race: index % 4 === 3 ? 'dwarf' : 'human',
   };
 }
 

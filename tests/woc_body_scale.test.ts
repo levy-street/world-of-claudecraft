@@ -96,10 +96,10 @@ describe('CharacterVisual.setBodyScale', () => {
     expect(h.visual.height).toBe(HEIGHT);
   });
 
-  it('clamps to the slider range: 5% either way of the authored size', () => {
+  it('clamps to the drawn range: the smallest dwarf to the tallest human', () => {
     const h = harness();
     h.visual.setBodyScale(0.1);
-    expect(h.poseWrap.scale.x).toBe(0.95);
+    expect(h.poseWrap.scale.x).toBeCloseTo(0.7125);
     h.visual.setBodyScale(3);
     expect(h.poseWrap.scale.x).toBe(1.05);
     h.visual.setBodyScale(Number.NaN);

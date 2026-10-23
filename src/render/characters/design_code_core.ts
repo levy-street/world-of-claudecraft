@@ -32,6 +32,7 @@ import {
   normalizeAppearance,
   OUTFIT_COLORWAY_IDS,
   SHADOW_SHADES,
+  WOC_RACES,
 } from './modular';
 import {
   WOC_HEAD_MORPH_KEYS,
@@ -81,7 +82,8 @@ type StylePick =
   | 'headBrows'
   | 'headEars'
   | 'headEyes'
-  | 'headPiercing';
+  | 'headPiercing'
+  | 'race';
 
 type ColorTriple = readonly [
   hue: keyof ModularAppearance,
@@ -289,6 +291,8 @@ export const DESIGN_FIELDS: readonly DesignField[] = [
   // size (normalizeAppearance), and an older build imports these around.
   pickField('headbeard', 'headBeard', wocHeadSlotIds('beard')),
   sizeField,
+  // Additive too: a code minted before races imports as a human.
+  pickField('race', 'race', WOC_RACES),
 ];
 
 /** Serialize a look as a shareable one-line code. The input is normalized

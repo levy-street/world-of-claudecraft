@@ -17,7 +17,7 @@ import {
   type VisualDef,
   visualKeyFor,
 } from './manifest';
-import { MODULAR_WARRIOR_KEY, type ModularLook, wocBodyScaleOf } from './modular';
+import { MODULAR_WARRIOR_KEY, type ModularLook, wocDrawScaleOf } from './modular';
 import { npcLookFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 import { ensureWocHeadForAppearance } from './woc_head_packs';
@@ -206,14 +206,14 @@ export function createCharacterVisual(
     // (no-op elsewhere), so it never draws one frame at the wrong size.
     if (!formKey && e.kind === 'player') {
       visual.setWocHeadLook(e.modularAppearance);
-      visual.setBodyScale(wocBodyScaleOf(e.modularAppearance));
+      visual.setBodyScale(wocDrawScaleOf(e.modularAppearance));
     }
     // ...and an NPC its authored one, in its class kit with the head bare, so no
     // helm or hood ever covers the face. Nothing diffs an NPC per frame
     // (live_look_diff.ts dresses players only): its look never changes.
     if (npcLook) {
       visual.setWocHeadLook(npcLook.app);
-      visual.setBodyScale(wocBodyScaleOf(npcLook.app));
+      visual.setBodyScale(wocDrawScaleOf(npcLook.app));
       visual.setWocDefaultEquipment(true);
     }
     return visual;

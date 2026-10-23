@@ -129,7 +129,7 @@ import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
 import { noteLookAttached } from './look_pieces';
 import type { ClipMap, EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
-import { clampWocBodyScale, type ModularAppearance, type ModularLook } from './modular';
+import { clampWocDrawScale, type ModularAppearance, type ModularLook } from './modular';
 import {
   PALADIN_BASTION_SWEEP_CLIP,
   PALADIN_BASTION_SWEEP_DURATION,
@@ -3825,8 +3825,8 @@ export class CharacterVisual {
     this.poseWrap.scale.setScalar(next * this.bodyScale);
   }
 
-  /** A WOC player's chosen body size (ModularAppearance.bodyScale, clamped to
-   *  WOC_BODY_SCALE_RANGE): the drawn body scales uniformly about its feet on
+  /** A WOC player's drawn size (wocDrawScaleOf: the race's factor times
+   *  ModularAppearance.bodyScale, clamped to WOC_DRAW_SCALE_RANGE): the drawn body scales uniformly about its feet on
    *  the pose wrap, so the far mesh and shadow proxy (wrap children) follow,
    *  and `height` follows, so the nameplate and every overhead anchor sit on
    *  the drawn head, shorter or taller. Presentation only: the pick capsule (a
@@ -3836,7 +3836,7 @@ export class CharacterVisual {
    *  on a repeat, so the renderer calls it every frame. True when it changed. */
   setBodyScale(scale: number): boolean {
     if (!this.def.wocCharacter || this.disposed) return false;
-    const next = clampWocBodyScale(scale);
+    const next = clampWocDrawScale(scale);
     if (next === this.bodyScale) return false;
     this.bodyScale = next;
     this.poseWrap.scale.setScalar(this.presentationScale * next);

@@ -13303,6 +13303,7 @@ export const ja_JP: EnTranslations = {
       "cat": {
         "bodyType": "Body Type",
         "skinTone": "Skin Tone",
+        "race": "種族",
         "face": "Face",
         "eyesBrows": "目と眉",
         "eyeColor": "目の色",
@@ -13327,6 +13328,10 @@ export const ja_JP: EnTranslations = {
         "browHeight": "眉の高さ",
         "chinWidth": "あごの幅",
         "bodyScale": "Body Size"
+      },
+      "race": {
+        "human": "ヒューマン",
+        "dwarf": "ドワーフ"
       },
       "bodyGlyph": {
         "a": "A",

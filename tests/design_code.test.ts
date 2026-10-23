@@ -25,6 +25,7 @@ import {
   OUTFIT_COLORWAY_IDS,
   randomizeAppearance,
   SHADOW_SHADES,
+  WOC_RACES,
 } from '../src/render/characters/modular';
 import {
   resolveWocHeadLook,
@@ -85,6 +86,7 @@ describe('design code field registry', () => {
       'headshape',
       'headbeard',
       'size',
+      'race',
     ]);
   });
 
@@ -108,6 +110,7 @@ describe('design code drift guard', () => {
     hair: HAIR_STYLES,
     beard: BEARD_STYLES,
     brows: BROW_STYLES,
+    race: WOC_RACES,
     earrings: EARRING_STYLES,
     earringMaterial: EARRING_MATERIAL_IDS,
     mouth: MOUTH_STYLES,

@@ -25,7 +25,7 @@ describe('geared arrival fixture', () => {
     const right = gearedArrivalFixtureManifest(20);
     expect(left).toEqual(right);
     expect(gearedArrivalFixtureSha256(20)).toBe(
-      'ade3d342785b24aa6ef91ed06d26747c60af15ab9998118361519b43bc87b880',
+      'e68f71d87aed94b9e5c2a04e52c65ab94feb5b8231276953889826cab28c1ff0',
     );
     for (const bot of left) {
       expect(sanitizeAppearance(bot.appearance)).toEqual(bot.appearance);

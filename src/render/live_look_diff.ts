@@ -12,7 +12,7 @@
 import type { Entity, EquipSlot, PlayerClass } from '../sim/types';
 import { isMechWearer } from '../sim/types';
 import { modularLookFor } from './characters';
-import { wocBodyScaleOf } from './characters/modular';
+import { wocDrawScaleOf } from './characters/modular';
 import { modularLookChanged } from './characters/player_look_core';
 import type { WocHeadAppearanceInput } from './characters/woc_head_look_core';
 import { classBodyComposes } from './characters/woc_parts_core';
@@ -103,6 +103,6 @@ export function diffWornArmor(e: Entity, visual: WocDressable): boolean {
   const head = visual.setWocHeadLook?.(e.modularAppearance) ?? false;
   // the body size: one read and a compare per frame, a pose-wrap scale on change
   // (it runs before the renderer reads the frame's height for the nameplate)
-  const size = visual.setBodyScale?.(wocBodyScaleOf(e.modularAppearance)) ?? false;
+  const size = visual.setBodyScale?.(wocDrawScaleOf(e.modularAppearance)) ?? false;
   return dressed || head || size;
 }

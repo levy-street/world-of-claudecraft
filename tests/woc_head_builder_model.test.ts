@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_APPEARANCE, WOC_BODY_SCALE_RANGE } from '../src/render/characters/modular';
+import {
+  DEFAULT_APPEARANCE,
+  normalizeAppearance,
+  WOC_BODY_SCALE_RANGE,
+  wocDrawScaleOf,
+} from '../src/render/characters/modular';
 import {
   creationFocusPose,
   easeCamPose,
@@ -70,6 +75,7 @@ describe('menu', () => {
     expect(WOC_BUILDER_CATEGORIES).toEqual([
       'bodyType',
       'skinTone',
+      'race',
       'face',
       'eyesBrows',
       'eyeColor',
@@ -81,10 +87,11 @@ describe('menu', () => {
     ]);
   });
 
-  it('frames the body for the body pick and the face for everything else', () => {
+  it('frames the body for the body pick and the race, the face for everything else', () => {
     expect(focusForCategory('bodyType')).toBe('body');
+    expect(focusForCategory('race')).toBe('body');
     expect(focusForCategory(null)).toBe('body');
-    for (const c of WOC_BUILDER_CATEGORIES.filter((c) => c !== 'bodyType')) {
+    for (const c of WOC_BUILDER_CATEGORIES.filter((c) => c !== 'bodyType' && c !== 'race')) {
       expect(focusForCategory(c)).toBe('face');
     }
     expect(focusForCategory('facialHair')).toBe('face');
@@ -607,6 +614,41 @@ describe('transitions', () => {
   it('randomize is a pure function of the stream', () => {
     const base = readFace({ gender: 'male' });
     expect(randomizeFace(base, seeded(42))).toEqual(randomizeFace(base, seeded(42)));
+  });
+});
+
+describe('race', () => {
+  it('sits right under Skin Tone and offers Human then Dwarf, Human by default', () => {
+    expect(WOC_BUILDER_CATEGORIES.indexOf('race')).toBe(
+      WOC_BUILDER_CATEGORIES.indexOf('skinTone') + 1,
+    );
+    const [section] = categorySections('race', readFace(null));
+    expect(section.kind).toBe('options');
+    if (section.kind !== 'options') return;
+    expect(section.options.map((o) => [o.id, o.selected])).toEqual([
+      ['human', true],
+      ['dwarf', false],
+    ]);
+  });
+
+  it('picks a dwarf, and Reset and Random keep the race like the body', () => {
+    const dwarf = pickOption(readFace(null), 'race', 'dwarf');
+    expect(dwarf.race).toBe('dwarf');
+    expect(resetFace(dwarf).race).toBe('dwarf');
+    expect(randomizeFace(dwarf, () => 0.5).race).toBe('dwarf');
+    expect(pickOption(dwarf, 'race', 'human').race).toBe('human');
+  });
+
+  it('reads junk or a look saved before races as a human', () => {
+    expect(readFace({ race: 'giant' } as never).race).toBe('human');
+    expect(normalizeAppearance({}).race).toBe('human');
+  });
+
+  it('draws a dwarf at 75% of the human height, on top of the Body Size slider', () => {
+    expect(wocDrawScaleOf({ race: 'human', bodyScale: 1 })).toBe(1);
+    expect(wocDrawScaleOf({ race: 'dwarf', bodyScale: 1 })).toBe(0.75);
+    expect(wocDrawScaleOf({ race: 'dwarf', bodyScale: 1.05 })).toBeCloseTo(0.7875);
+    expect(wocDrawScaleOf(null)).toBe(1);
   });
 });
 

@@ -285,6 +285,44 @@ export function clampWocBodyScale(v: unknown): number {
 export function wocBodyScaleOf(app: { readonly bodyScale?: unknown } | null | undefined): number {
   return clampWocBodyScale(app?.bodyScale);
 }
+
+/** A WOC character's race (ModularAppearance.race). A dwarf is the human body
+ *  drawn at 75% of its height with the proportions kept: one uniform factor on top
+ *  of the Body Size slider, no model of its own. Presentation only, like the
+ *  body size: the sim, the pick capsule and the chase camera never read it. */
+export type WocRace = 'human' | 'dwarf';
+
+export const WOC_RACES: readonly WocRace[] = ['human', 'dwarf'];
+
+/** Each race's size against the authored (human) body. */
+export const WOC_RACE_SCALE: Readonly<Record<WocRace, number>> = { human: 1, dwarf: 0.75 };
+
+/** The race a stored, wire or normalized look carries (human for no look, a
+ *  missing field, or junk). */
+export function wocRaceOf(app: { readonly race?: unknown } | null | undefined): WocRace {
+  return app?.race === 'dwarf' ? 'dwarf' : 'human';
+}
+
+/** Every size a WOC body can be DRAWN at: the race factor times the body size,
+ *  smallest dwarf to tallest human. CharacterVisual.setBodyScale clamps here. */
+export const WOC_DRAW_SCALE_RANGE: { readonly min: number; readonly max: number } = {
+  min: Math.min(...WOC_RACES.map((r) => WOC_RACE_SCALE[r])) * WOC_BODY_SCALE_RANGE.min,
+  max: Math.max(...WOC_RACES.map((r) => WOC_RACE_SCALE[r])) * WOC_BODY_SCALE_RANGE.max,
+};
+
+/** A drawn size clamped into WOC_DRAW_SCALE_RANGE (the authored size for junk). */
+export function clampWocDrawScale(v: unknown): number {
+  const { min, max } = WOC_DRAW_SCALE_RANGE;
+  return typeof v === 'number' && Number.isFinite(v) ? Math.max(min, Math.min(max, v)) : 1;
+}
+
+/** The size a look's body is DRAWN at: its race's factor times its body size.
+ *  What the renderer hands CharacterVisual.setBodyScale every frame. */
+export function wocDrawScaleOf(
+  app: { readonly bodyScale?: unknown; readonly race?: unknown } | null | undefined,
+): number {
+  return WOC_RACE_SCALE[wocRaceOf(app)] * wocBodyScaleOf(app);
+}
 /** Jewellery: earrings, and on some sets a face piercing too. One slot, because
  *  a set is a LOOK, the elf's crescent comes with the brow bar that matches it
  * and because a second picker row for two pieces of metal is not a feature.
@@ -565,6 +603,9 @@ export interface ModularAppearance {
   /** The WOC body's size, WOC_BODY_SCALE_RANGE (1 = as authored, 0.95 / 1.05 =
    *  5% shorter / taller). Visual only, see WOC_BODY_SCALE_RANGE. */
   bodyScale: number;
+  /** Human, or a dwarf drawn at 75% size on top of bodyScale. Visual only,
+   *  see WocRace. */
+  race: WocRace;
 }
 
 export const DEFAULT_APPEARANCE: ModularAppearance = {
@@ -616,6 +657,7 @@ export const DEFAULT_APPEARANCE: ModularAppearance = {
   browLight: 0.24,
   headShape: NEUTRAL_HEAD_SHAPE,
   bodyScale: WOC_BODY_SCALE_RANGE.def,
+  race: 'human',
 };
 
 /** The seven KayKit class kits, all carved into the same slots and all fitted
@@ -2372,6 +2414,7 @@ export function normalizeAppearance(
       }),
     ) as WocHeadShape,
     bodyScale: wocBodyScaleOf(a),
+    race: wocRaceOf(a),
   };
 }
 

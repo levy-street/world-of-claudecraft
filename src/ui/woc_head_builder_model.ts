@@ -18,6 +18,9 @@ import {
   clampWocBodyScale,
   DEFAULT_APPEARANCE,
   WOC_BODY_SCALE_RANGE,
+  WOC_RACES,
+  type WocRace,
+  wocRaceOf,
 } from '../render/characters/modular';
 import {
   resolveWocHeadLook,
@@ -44,6 +47,8 @@ export interface WocFaceAppearance {
   gender: 'male' | 'female';
   /** Uniform body size, WOC_BODY_SCALE_RANGE (1 = as authored). */
   bodyScale: number;
+  /** Human, or a dwarf: the same body at 75% size (WOC_RACE_SCALE). */
+  race: WocRace;
   skinHue: number;
   skinSat: number;
   skinLight: number;
@@ -71,6 +76,7 @@ export interface WocFaceAppearance {
 export type WocBuilderCategory =
   | 'bodyType'
   | 'skinTone'
+  | 'race'
   | 'face'
   | 'eyesBrows'
   | 'eyeColor'
@@ -83,6 +89,7 @@ export type WocBuilderCategory =
 export const WOC_BUILDER_CATEGORIES: readonly WocBuilderCategory[] = [
   'bodyType',
   'skinTone',
+  'race',
   'face',
   'eyesBrows',
   'eyeColor',
@@ -103,7 +110,7 @@ export function categoryLabelKey(cat: WocBuilderCategory): string {
 export type WocBuilderFocus = 'face' | 'body';
 
 export function focusForCategory(cat: WocBuilderCategory | null): WocBuilderFocus {
-  return cat === null || cat === 'bodyType' ? 'body' : 'face';
+  return cat === null || cat === 'bodyType' || cat === 'race' ? 'body' : 'face';
 }
 
 // --- palettes ----------------------------------------------------------------
@@ -286,6 +293,7 @@ export function readFace(a: AnyLook | null | undefined): WocFaceAppearance {
     gender,
     // the normalizer's own clamp, so the builder and the stored look agree
     bodyScale: clampWocBodyScale(a?.bodyScale),
+    race: wocRaceOf(a),
     skinHue: num(a?.skinHue, d.skinHue, 0, 360),
     skinSat: num(a?.skinSat, d.skinSat, 0, 1),
     skinLight: num(a?.skinLight, d.skinLight, 0, 1),
@@ -372,7 +380,7 @@ export type WocSliderReadout = 'signed' | 'percent' | 'offset';
 
 /** What an options section writes: a head slot, the body pick, or the
  *  piercing preset. */
-export type WocOptionTarget = WocHeadSlot | 'bodyType' | 'piercing';
+export type WocOptionTarget = WocHeadSlot | 'bodyType' | 'race' | 'piercing';
 
 /** One block inside a category's panel. */
 export type WocBuilderSection =
@@ -555,6 +563,19 @@ export function categorySections(
       ];
     case 'skinTone':
       return [swatchSection('skin', WOC_SKIN_TONES, a)];
+    case 'race':
+      return [
+        {
+          kind: 'options',
+          target: 'race',
+          labelKey: null,
+          options: WOC_RACES.map((race) => ({
+            id: race,
+            labelKey: `auth.wocBuilder.race.${race}`,
+            selected: a.race === race,
+          })),
+        },
+      ];
     case 'face':
       return [
         slotSection(a, 'nose', true),
@@ -645,6 +666,7 @@ export function pickOption(
   id: string,
 ): WocFaceAppearance {
   if (target === 'bodyType') return setBodyType(a, id === 'female' ? 'female' : 'male');
+  if (target === 'race') return readFace({ ...a, race: id as WocRace });
   if (target === 'piercing') return readFace({ ...a, headPiercing: id });
   return readFace({ ...a, [SLOT_FIELD[target]]: id });
 }
@@ -706,14 +728,13 @@ export function setSlider(
     : setShape(a, target, morphShown(target, value));
 }
 
-/** Reset to the default look, keeping the body: its type AND its size (both
- *  live in the Body Type category, a pick about the character's frame rather
- *  than its face). */
+/** Reset to the default look, keeping the body: its type, its size and its
+ *  race (picks about the character's frame rather than its face). */
 export function resetFace(a: WocFaceAppearance): WocFaceAppearance {
-  return readFace({ gender: a.gender, bodyScale: a.bodyScale });
+  return readFace({ gender: a.gender, bodyScale: a.bodyScale, race: a.race });
 }
 
-/** A random look for the same body (type and size kept, as Reset keeps them).
+/** A random look for the same body (type, size and race kept, as Reset keeps them).
  *  Colours come from the palettes (a random swatch reads as a choice, a random
  *  HSL reads as a bug); piercings and strong shape values stay the exception
  *  rather than the rule. Facial hair follows the owner's roll rule (Troy,
@@ -748,6 +769,7 @@ export function randomizeFace(a: WocFaceAppearance, rand: () => number): WocFace
   return readFace({
     gender: a.gender,
     bodyScale: a.bodyScale,
+    race: a.race,
     skinHue: skin.hue,
     skinSat: skin.sat,
     skinLight: skin.light,

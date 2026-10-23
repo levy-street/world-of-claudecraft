@@ -13303,6 +13303,7 @@ export const en_XA: EnTranslations = {
       "cat": {
         "bodyType": "[Ɓóðý Ţýþé]",
         "skinTone": "[Šķíñ Ţóñé]",
+        "race": "[Ŕáçé]",
         "face": "[Ƒáçé]",
         "eyesBrows": "[Éýéš áñð Ɓŕóŵš]",
         "eyeColor": "[Éýé Çóļóŕ]",
@@ -13327,6 +13328,10 @@ export const en_XA: EnTranslations = {
         "browHeight": "[Ɓŕóŵ Ĥéíĝĥţ]",
         "chinWidth": "[Çĥíñ Ŵíðţĥ]",
         "bodyScale": "[Ɓóðý Šížé]"
+      },
+      "race": {
+        "human": "[Ĥúɱáñ]",
+        "dwarf": "[Ðŵáŕƒ]"
       },
       "bodyGlyph": {
         "a": "[Á]",

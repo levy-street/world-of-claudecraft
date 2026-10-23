@@ -58,7 +58,7 @@ afterEach(() => {
 });
 
 describe('menu', () => {
-  it('draws the ten categories as a tablist, Facial Hair after Hairstyle', () => {
+  it('draws the eleven categories as a tablist, Facial Hair after Hairstyle', () => {
     mount();
     const cats = [...host.querySelectorAll<HTMLButtonElement>('.whb-cat')].map((b) => ({
       cat: b.dataset.cat,
@@ -67,6 +67,7 @@ describe('menu', () => {
     expect(cats.map((c) => c.cat)).toEqual([
       'bodyType',
       'skinTone',
+      'race',
       'face',
       'eyesBrows',
       'eyeColor',

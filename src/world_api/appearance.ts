@@ -78,6 +78,9 @@ export const APPEARANCE_WIRE_KEYS: readonly string[] = [
   'headBeard',
   // the WOC body size (WOC_BODY_SCALE_RANGE in src/render/characters/modular.ts)
   'bodyScale',
+  // the WOC race (WOC_RACES in src/render/characters/modular.ts): a dwarf draws
+  // the same body at 75% size
+  'race',
 ];
 
 /** The slider names each nested map may carry: ALLOWLISTED, exactly like the
@@ -182,9 +185,9 @@ const STYLE_ID_RE = /^[a-z0-9_]{1,24}$/;
  * reasoning quotes comes from. The gap between that and this is all numeric
  * precision, and the charset bound is what stops the gap being unbounded text.
  * (The WOC head builder took the ceiling from 1489; its beard, the chin
- * control and the body size from 2038.)
+ * control and the body size from 2038, and the race from 2154.)
  */
-export const APPEARANCE_MAX_WIRE_BYTES = 2154;
+export const APPEARANCE_MAX_WIRE_BYTES = 2188;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

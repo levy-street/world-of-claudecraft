@@ -496,6 +496,7 @@ export const en = {
       cat: {
         bodyType: 'Body Type',
         skinTone: 'Skin Tone',
+        race: 'Race',
         face: 'Face',
         eyesBrows: 'Eyes and Brows',
         eyeColor: 'Eye Color',
@@ -520,6 +521,10 @@ export const en = {
         browHeight: 'Brow Height',
         chinWidth: 'Chin Width',
         bodyScale: 'Body Size',
+      },
+      race: {
+        human: 'Human',
+        dwarf: 'Dwarf',
       },
       // The letter on each body-type tile. Decorative (the tile's label names
       // the type), and kept a Latin letter in every locale, like "Type A".
