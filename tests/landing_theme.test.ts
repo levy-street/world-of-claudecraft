@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createLandingThemeAudio, type ThemeAudioContextLike } from '../src/game/landing_theme';
 
@@ -96,5 +97,21 @@ describe('landing theme WebAudio routing', () => {
     // Constructing with the default factory must not throw under plain Node
     // (no AudioContext global); creation is deferred to the first prepare().
     expect(() => createLandingThemeAudio()).not.toThrow();
+  });
+
+  it('keeps the theme file off the home page until it first plays', () => {
+    // The theme is 2.9 MB and cannot play before a gesture on a fresh visit, so
+    // preloading it competed with the home page's first paint for nothing. With
+    // preload 'none' the element fetches when play() first runs: the autoplay
+    // attempt where the browser allows it, else the first interaction.
+    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const start = main.indexOf('function initHomepageMusic(): void {');
+    const end = main.indexOf('function fadeOutHomepageMusic(', start);
+    expect(start).toBeGreaterThan(0);
+    expect(end).toBeGreaterThan(start);
+    const init = main.slice(start, end);
+    expect(init).toContain("new Audio('/audio/main-theme.mp3')");
+    expect(init).toContain("el.preload = 'none';");
+    expect(init).not.toMatch(/preload\s*=\s*'(auto|metadata)'/);
   });
 });

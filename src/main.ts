@@ -10824,15 +10824,15 @@ function wireStartScreens(): Promise<void> {
   return localized;
 }
 
-// Looping home-page theme. Browsers block audio autoplay until a user gesture,
-// so we try immediately and otherwise start on the first interaction. It keeps
-// playing through the loading screen and fades out once the game is on screen.
+// Looping home-page theme. Autoplay is blocked until a user gesture, so we try now and
+// otherwise start on the first interaction; preload 'none' keeps the file off the home
+// page until it plays. It plays through the loading screen and fades once in game.
 function initHomepageMusic(): void {
   if (homepageMusic) return;
   const el = new Audio('/audio/main-theme.mp3');
   el.loop = true;
   el.muted = homepageMusicMuted;
-  el.preload = 'auto';
+  el.preload = 'none';
   el.volume = HOMEPAGE_MUSIC_VOLUME;
   homepageMusic = el;
 
