@@ -682,6 +682,7 @@ import { lootQualityAriaName } from './loot_quality_view';
 import { lootRollWinBanner } from './loot_roll_win_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
+import { blurIfPointerClick } from './pointer_blur';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
@@ -9596,6 +9597,7 @@ export class Hud {
     el.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
+      blurIfPointerClick(ev, el);
       this.openMailbox();
     });
     el.addEventListener('keydown', (ev) => {
