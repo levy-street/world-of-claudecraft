@@ -5,6 +5,12 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { celShadingSettings } from './cel_shading';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
+import {
+  disposeActiveFireSimulation,
+  mountFireSimulation,
+  setFireShedRung,
+  stepActiveFireSimulation,
+} from './fire';
 import { GFX, sharedUniforms } from './gfx';
 import {
   GPU_TIMER_SCENE_AO_BRACKET,
@@ -298,6 +304,7 @@ export function buildComposer(
   const sceneCapture = sceneDraw
     ? new OpaqueSceneCapture(webgl, scene, sceneDraw.width, sceneDraw.height)
     : null;
+  mountFireSimulation(webgl, scene);
 
   let bloom: UnrealBloomPass | null = null;
   if (plan.composerPasses.includes('bloom')) {
@@ -456,16 +463,19 @@ export function buildComposer(
       grade.setInputUvRect(region.uvScaleX, region.uvScaleY, region.uvMaxX, region.uvMaxY);
     },
     render(): void {
+      stepActiveFireSimulation(sharedUniforms.uTime.value);
       sceneCapture?.begin();
       composer.render();
     },
     setShedLevel(level: number): void {
       shed.apply(level);
-      // The water's per-frame extras answer to the same rungs: its simulation
-      // steps slower once bloom is shed, and with AO shed the opaque-scene copy
-      // stops, so the sea (and the ability VFX) take their unsampled arms.
+      // The water's and fire's per-frame extras answer to the same rungs: their
+      // simulations step slower once bloom is shed, and with AO shed the
+      // opaque-scene copy stops, so the sea, fire, and ability VFX take their
+      // unsampled arms.
       const rung = shed.rung();
       setOceanShedRung(rung);
+      setFireShedRung(rung);
       sceneCapture?.setSuppressed(rung === 'ao-off');
     },
     shedRung(): PostShedRung | 'full' {
@@ -483,6 +493,7 @@ export function buildComposer(
       shed.dispose();
       for (const pass of composer.passes) pass.dispose();
       composer.dispose();
+      disposeActiveFireSimulation();
       // Last: the capture owns a scene child and its own attachments, nothing
       // the composer teardown depends on, and a throw here cannot then skip it.
       sceneCapture?.dispose();

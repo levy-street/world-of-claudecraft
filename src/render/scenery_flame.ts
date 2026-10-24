@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { syncFlameVolumeLod } from './fire';
 import {
   cadenceIntervalForProjectedPixels,
   cadenceRefreshDue,
@@ -66,24 +67,27 @@ export function updateSceneryFlame(
 
   state.active = true;
   const projectedPixels = projectedPixelSize(state.referenceHeight, viewDepth, projectionPixels);
+  const volumetric = syncFlameVolumeLod(flame, projectedPixels);
   const cadence = cadenceIntervalForProjectedPixels(projectedPixels);
   if (cadenceRefreshDue(time, state.lastFlickerAt, cadence)) {
-    if (flame.userData.legacyFlame === true) {
-      // The built-in world's single Lambert lathe (campfire_flame.ts
-      // buildLegacyCampfireFlame) keeps the fast flicker it shipped with.
-      const scale =
-        0.85 + Math.sin(time * 9 + index * 2.4) * 0.12 + Math.sin(time * 23 + index) * 0.06;
-      flame.scale.set(scale, scale * (1 + Math.sin(time * 13 + index) * 0.12), scale);
-    } else {
-      // The SLOW breath only, a log catching, sampled at the perceptual-LOD
-      // cadence. The fast licking lives in the flame's vertex shader now
-      // (campfire_flame.ts), where it runs per vertex and per frame; this used
-      // to carry both and the whole flame pumped like a bellows. Kept
-      // byte-for-byte in step with campfireFlameScale(), which is the same
-      // curve for flames outside this lane (the editor's placed campfires).
-      const scale =
-        0.97 + Math.sin(time * 1.7 + index * 2.4) * 0.035 + Math.sin(time * 4.1 + index) * 0.02;
-      flame.scale.set(scale, scale * (1 + Math.sin(time * 2.3 + index) * 0.05), scale);
+    if (!volumetric) {
+      if (flame.userData.legacyFlame === true) {
+        // The built-in world's single Lambert lathe (campfire_flame.ts
+        // buildLegacyCampfireFlame) keeps the fast flicker it shipped with.
+        const scale =
+          0.85 + Math.sin(time * 9 + index * 2.4) * 0.12 + Math.sin(time * 23 + index) * 0.06;
+        flame.scale.set(scale, scale * (1 + Math.sin(time * 13 + index) * 0.12), scale);
+      } else {
+        // The SLOW breath only, a log catching, sampled at the perceptual-LOD
+        // cadence. The fast licking lives in the flame's vertex shader now
+        // (campfire_flame.ts), where it runs per vertex and per frame; this used
+        // to carry both and the whole flame pumped like a bellows. Kept
+        // byte-for-byte in step with campfireFlameScale(), which is the same
+        // curve for flames outside this lane (the editor's placed campfires).
+        const scale =
+          0.97 + Math.sin(time * 1.7 + index * 2.4) * 0.035 + Math.sin(time * 4.1 + index) * 0.02;
+        flame.scale.set(scale, scale * (1 + Math.sin(time * 2.3 + index) * 0.05), scale);
+      }
     }
     state.lastFlickerAt = time;
   }
