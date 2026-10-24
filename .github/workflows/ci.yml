@@ -1446,7 +1446,16 @@ jobs:
     # excluded from the base exactly like the lane stalls). 16.43 x 1.60 x
     # 1.37 = 36.0, so 36: the same arithmetic that first produced 35, one
     # minute looser now that the base is measured rather than projected.
-    timeout-minutes: 36
+    # 2026-10-24 re-derivation for v0.45.0: run 40113294880 shard 5
+    # completed successfully in 35m29s (job 120929304710), including a
+    # healthy 2m35s checkout. Seven of sixteen release shard jobs across
+    # that PR run and push run 40113280475 hit the old 36-minute wall;
+    # shard 8 had already reported all 766 files passed when it was killed.
+    # Use the COMPLETED job wall, not extrapolation from killed progress:
+    # (35 + 29/60) x 1.60 x 1.37 = 77.78, rounded up to 78 minutes.
+    # The cost is a longer ceiling for a hung release job. Per-test limits,
+    # coverage and the merge-queue PR-tier bound remain independent.
+    timeout-minutes: 78
     runs-on: ubuntu-latest
 
     # Same real-SQL wiring as pr-gate (ruling R16): a per-leg Postgres and

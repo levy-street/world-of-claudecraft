@@ -1440,11 +1440,11 @@ describe('CI workflow parity', () => {
       // can draw four of them at once and the bound has to cover a slow
       // runner rather than the healthy median. 20 was sized from a 14.63
       // minute healthy worst case and was bound-killing shard 1 by 2026-08-11
-      // at b160a1ba18; 36 is the 2026-08-14 re-derivation from the measured
-      // post-split release-push worst (16.43 minutes, checkout-stall walls
-      // excluded) at the same 1.60 ratio and 1.37 margin; evidence on the
-      // ci.yml bound.
-      ['release-gate', 36],
+      // at b160a1ba18. The August 36-minute budget was overtaken by the
+      // v0.45 workload: run 40113294880 shard 5 completed in 35m29s with
+      // a healthy checkout. The same 1.60 ratio and 1.37 margin give
+      // 77.78 minutes, rounded up to 78; evidence on the ci.yml bound.
+      ['release-gate', 78],
       // The lanes: 28 is the 2026-08-14 re-derivation from post-rebalance
       // healthy walls (worst lane 12.5 minutes, same formula as pr-gate).
       // The 60-to-20-to-30 history, including the falsified under-10
