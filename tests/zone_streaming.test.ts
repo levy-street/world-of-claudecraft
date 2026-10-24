@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
+import { fogFarForBuiltGround } from '../src/render/chunk_residency_core';
 import {
   ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+  claimZoneStreamRecheck,
+  createZoneStreamRecheck,
   distanceSqToZone,
   INITIAL_SKY_PREWARM_RADIUS,
   ZONE_STREAM_RECHECK_DISTANCE,
   zoneEntryPoint,
   zonesWithinStreamingHorizon,
 } from '../src/render/zone_streaming';
-import { ZONES, zoneAt } from '../src/sim/data';
+import {
+  activeZoneList,
+  BUILTIN_WORLD,
+  setActiveWorldContent,
+  ZONES,
+  zoneAt,
+} from '../src/sim/data';
 
 // The outdoor fog clamp itself moved to chunk_residency_core (it keys off the
 // nearest unbuilt CHUNK now, not the nearest unprepared zone rectangle), so its
@@ -77,6 +86,27 @@ describe('renderer zone-streaming horizon', () => {
     expect(ZONE_STREAM_RECHECK_DISTANCE).toBeGreaterThan(0);
   });
 
+  it('claims a recheck on the first call, on travel, and on a horizon change, never in between', () => {
+    const check = createZoneStreamRecheck();
+    expect(claimZoneStreamRecheck(check, 10, 20, 340)).toBe(true);
+    expect(check).toEqual({ x: 10, z: 20, far: 340 });
+    // Less than the threshold away, same horizon: the frame loop skips.
+    expect(claimZoneStreamRecheck(check, 10 + ZONE_STREAM_RECHECK_DISTANCE - 0.5, 20, 340)).toBe(
+      false,
+    );
+    expect(claimZoneStreamRecheck(check, 10, 20, 340.5)).toBe(false);
+    expect(check).toEqual({ x: 10, z: 20, far: 340 });
+    // Travel is measured from the last CLAIMED position, not the last call.
+    expect(claimZoneStreamRecheck(check, 10, 20 + ZONE_STREAM_RECHECK_DISTANCE, 340)).toBe(true);
+    expect(check).toEqual({ x: 10, z: 20 + ZONE_STREAM_RECHECK_DISTANCE, far: 340 });
+    // A yard of horizon change re-claims in place.
+    expect(claimZoneStreamRecheck(check, 10, 44, 341)).toBe(true);
+    // Forcing the next recheck (a failed prepare) is a NaN position.
+    check.x = Number.NaN;
+    expect(claimZoneStreamRecheck(check, 10, 44, 341)).toBe(true);
+    expect(check.x).toBe(10);
+  });
+
   it('every entry point resolves back to its own zone, even from a boundary camera', () => {
     // Regression for the willowfen starvation: the un-inset nearest rectangle
     // point of a zone west of the camera lands exactly on its exclusive max-x
@@ -141,5 +171,59 @@ describe('teleport-arrival neighbourhood', () => {
     // the common arrival pays exactly what it paid before.
     const arrival = zonesWithinStreamingHorizon(ZONES, 0, 0, ARRIVAL_NEIGHBOR_STREAM_RADIUS);
     expect(arrival.map((zone) => zone.id)).toEqual(['eastbrook_vale']);
+  });
+
+  it('caps built-ground visibility at the current outdoor ceiling', () => {
+    const grid = { size: 60, countX: 4, countZ: 4, originX: -120, originZ: -120 };
+    expect(fogFarForBuiltGround(grid, () => false, 0, 0, 500)).toBe(500);
+    expect(fogFarForBuiltGround(grid, () => false, 0, 0, 2100)).toBe(850);
+  });
+});
+
+describe('active world streaming zones', () => {
+  it('is the ZONES table itself for the built-in world', () => {
+    setActiveWorldContent(null);
+    expect(activeZoneList()).toBe(ZONES);
+  });
+
+  it('streams an authored world using its own explicit rectangles', () => {
+    const world = {
+      ...BUILTIN_WORLD,
+      worldHalfX: 400,
+      zones: [
+        {
+          id: 'blank_world',
+          name: '',
+          xMin: -400,
+          xMax: 400,
+          zMin: -400,
+          zMax: 400,
+          levelRange: [1, 1] as [number, number],
+          biome: 'vale' as const,
+          hub: { x: 0, z: 0, radius: 8, name: '' },
+          graveyard: { x: 0, z: 0 },
+          lakes: [],
+          pois: [],
+          welcome: '',
+        },
+      ],
+    };
+    setActiveWorldContent(world);
+    try {
+      const zones = activeZoneList();
+      expect(zones).toBe(world.zones);
+      expect(zones.map((zone) => zone.id)).toEqual(['blank_world']);
+      // A camera in the authored west margin queues its owning rectangle,
+      // rather than looking for unrelated shipped zone ids.
+      const margin = { x: -380, z: -380 };
+      expect(zones.some((zone) => distanceSqToZone(zone, margin.x, margin.z) === 0)).toBe(true);
+      // ...and the zone the queue prepares is the one the sim clamp (zoneAt)
+      // resolves for that position, so ownership and preparation agree.
+      const containing = zones.filter((zone) => distanceSqToZone(zone, margin.x, margin.z) === 0);
+      expect(containing.map((zone) => zone.id)).toContain(zoneAt(margin.x, margin.z).id);
+      expect(zonesWithinStreamingHorizon(zones, margin.x, margin.z, 0)).toEqual(world.zones);
+    } finally {
+      setActiveWorldContent(null);
+    }
   });
 });

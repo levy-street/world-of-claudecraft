@@ -49,8 +49,8 @@
 // removed rather than left as documented-but-unused advice.
 
 import { anchorMatchesSelection, type ItemCopyAnchor } from './item_copy_anchor';
-import { isMaterialItemId } from './material_ids';
 import { takeMaterialUnit, takeMaterialUnitFromSlot } from './material_item_custody';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { cloneItemInstancePayload, type InventoryUnit, type InvSlot } from './types';
 
 /** Stable, order-independent JSON, so a pin does not depend on key insertion
@@ -136,7 +136,8 @@ export function consumeSelectedInventorySlot(
   // unit carries its exact source and the stack keeps the canonical remainder,
   // which a `count -= 1` cannot express. A named stack that cannot give a unit
   // (a locked copy) refuses like any other invalid selection.
-  if (isMaterialItemId(itemId)) return takeMaterialUnitFromSlot(inventory, itemId, slotIndex);
+  if (isStackProvenanceItemId(itemId))
+    return takeMaterialUnitFromSlot(inventory, itemId, slotIndex);
   const instance =
     slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
   const craftedRecipeId = slot.craftedRecipeId;
@@ -165,7 +166,7 @@ export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string)
   // while plain units sat in an earlier one. The newest bias survives only as
   // the planner's tie-break between stacks holding the same descriptor.
   // Nothing matched still answers the empty unit this has always returned.
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return (
       takeMaterialUnit(inventory, itemId) ?? { instance: undefined, craftedRecipeId: undefined }
     );

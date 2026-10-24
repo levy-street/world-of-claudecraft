@@ -36,19 +36,19 @@ function actorWith(...auras: Array<{ kind: AuraKind; stacks?: number }>): Entity
 describe('resolveActionReplacement', () => {
   it('returns the base untouched when the def carries no replacement rules', () => {
     const base = resolved('overbloom');
-    const out = resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 5 }));
+    const out = resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 3 }));
     expect(out).toBe(base);
   });
 
   it('returns the base when the driving aura is missing or under minStacks', () => {
     const base = resolved('swiftmend');
     expect(resolveActionReplacement(base, actorWith())).toBe(base);
-    expect(resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 4 }))).toBe(base);
+    expect(resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 2 }))).toBe(base);
   });
 
-  it('transforms Fleetmend into Overbloom at 5 Verdance and stamps the shared clock', () => {
+  it('transforms Fleetmend into Overbloom at 3 Verdance and stamps the shared clock', () => {
     const base = resolved('swiftmend');
-    const out = resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 5 }));
+    const out = resolveActionReplacement(base, actorWith({ kind: 'verdance', stacks: 3 }));
     expect(out.def.id).toBe('overbloom');
     // One slot, one clock: the cooldown-carrying transform arms the BASE
     // button's cooldown key, so Fleetmend and Overbloom share one 8 sec clock.

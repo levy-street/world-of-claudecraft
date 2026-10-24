@@ -1,16 +1,26 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { GUILDMASTER_NPC_ID, HIGHWATCH_GUILD_ENTITY_IDS } from '../src/sim/content/highwatch_guild';
+import { inertCharacters } from './helpers/inert_characters';
 
-// The real craft-name helpers import char_window, which reaches portrait_chip.
-// Keep that unrelated renderer boundary inert: its GLB loads can otherwise
-// outlive happy-dom teardown and reject with "ProgressEvent is not defined".
+// char_window's portrait chip reaches the character model preload; keep it
+// inert (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
+// This suite drives the quest dialog DOM, not WebGL portraits. char_window and
+// craft-name helpers can reach the portrait chip; keep that unrelated renderer
+// boundary inert so asset loads cannot outlive happy-dom teardown.
 vi.mock('../src/ui/portrait_chip', () => ({
-  hydratePortraits: vi.fn(),
-  isComposedPortraitKey: vi.fn(() => false),
-  modularLookFor: vi.fn(),
-  onPortraitUpdate: vi.fn(),
-  portraitChipHtml: vi.fn(() => ''),
+  crestUrl: () => '',
+  hydrateComposedChips: () => undefined,
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
 }));
 
 import {
@@ -21,6 +31,8 @@ import {
 } from '../src/sim/content/world_quest_investigation';
 import { DELVES, ITEMS, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
+import { defaultRewardChoice } from '../src/sim/quests/quest_reward_choice';
+import { createReferralCard } from '../src/sim/referral_cards';
 import type { Entity } from '../src/sim/types';
 import { WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID } from '../src/sim/weekly_rewards';
 import { craftNameText } from '../src/ui/char_window';
@@ -71,6 +83,7 @@ function harness(
   const world = {
     entities,
     cfg: { playerClass: 'warrior' },
+    talents: { spec: null },
     player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
     questLog: new Map(),
     partyInfo: null,
@@ -206,6 +219,38 @@ function harness(
 }
 
 describe('QuestDialogController', () => {
+  it('marks only the next stamp quest on pickup and its detail', () => {
+    const card = createReferralCard(8, 10, 20);
+    card.status = 'active';
+    Object.assign(card.participants[0], { characterId: 100, credited: 1, redeemed: 1 });
+    const offered = npc(30, 'brother_aldric');
+    offered.questIds = ['q_hollow', 'q_bones'];
+    const test = harness(
+      offered,
+      'available',
+      {},
+      {
+        referralCardsSnapshot: () => ({
+          revision: 1,
+          accountId: 10,
+          characterId: 100,
+          links: [{ card, friendName: 'Briar' }],
+        }),
+      },
+    );
+    test.controller.open(30);
+    const row = test.element.querySelector<HTMLButtonElement>('[data-quest="q_hollow"]');
+    expect(row).not.toBeNull();
+    expect(row?.getAttribute('aria-label')).toContain('next stamp card reward');
+    expect(row?.querySelector('.referral-quest-indicator')).not.toBeNull();
+    expect(
+      test.element.querySelector('[data-quest="q_bones"] .referral-quest-indicator'),
+    ).toBeNull();
+    row?.click();
+    expect(test.element.querySelector('.referral-quest-indicator')?.textContent).toContain(
+      'next stamp card reward',
+    );
+  });
   beforeEach(() => {
     document.body.innerHTML = '';
   });
@@ -269,7 +314,9 @@ describe('QuestDialogController', () => {
     if (!doneRow) throw new Error('expected the gossip quest row');
     expect(doneRow.innerHTML).toContain('<span class="quest-repeat">!</span>');
     expect(doneRow.getAttribute('aria-label')).toBe(
-      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+      t('questUi.dialog.repeatableQuestAria', {
+        name: `quest:${workOrder.id}`,
+      }),
     );
 
     // Inside the cadence window the dialog lists NO row for the order (it is
@@ -280,7 +327,9 @@ describe('QuestDialogController', () => {
     const blocked = harness(giver3, 'unavailable');
     (blocked.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
     (
-      blocked.world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }
+      blocked.world.craftingIdentity as unknown as {
+        cadenceBlockedQuests: string[];
+      }
     ).cadenceBlockedQuests = [workOrder.id];
     blocked.controller.open(32);
     expect(blocked.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
@@ -314,7 +363,9 @@ describe('QuestDialogController', () => {
     if (!row) throw new Error('expected the lapsed work order row without close/reopen');
     expect(row.innerHTML).toContain('<span class="quest-repeat">!</span>');
     expect(row.getAttribute('aria-label')).toBe(
-      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+      t('questUi.dialog.repeatableQuestAria', {
+        name: `quest:${workOrder.id}`,
+      }),
     );
   });
 
@@ -324,6 +375,23 @@ describe('QuestDialogController', () => {
     expect(keeper.targetEntity).toHaveBeenCalledWith(WEEKLY_KEEPER_ENTITY_ID);
     expect(keeper.interact).toHaveBeenCalledTimes(1);
     expect(keeper.element.style.display).not.toBe('block');
+  });
+
+  it("routes Lantern Hall's working residents to their windows, the guildmaster to gossip", () => {
+    // The 2026-10-16 playtest bug: talking to Garrick Holt showed only his greeting, because the
+    // gossip menu never sent the interact that makes the sim emit guildHallOpen.
+    for (const [templateId, entityId] of Object.entries(HIGHWATCH_GUILD_ENTITY_IDS)) {
+      const resident = harness(npc(entityId, templateId));
+      resident.controller.open(entityId);
+      if (templateId === GUILDMASTER_NPC_ID) {
+        expect(resident.interact, templateId).not.toHaveBeenCalled();
+        expect(resident.element.style.display, templateId).toBe('block');
+      } else {
+        expect(resident.targetEntity, templateId).toHaveBeenCalledWith(entityId);
+        expect(resident.interact, templateId).toHaveBeenCalledTimes(1);
+        expect(resident.element.style.display, templateId).not.toBe('block');
+      }
+    }
   });
 
   it('a clue hand-over at an ordinary quest giver renders the row and the click sends the interact', () => {
@@ -458,7 +526,9 @@ describe('QuestDialogController', () => {
     offered.element.querySelector<HTMLButtonElement>('.btn')?.click();
 
     expect(offered.acceptQuest).toHaveBeenCalledWith('q_wolves');
-    expect(offered.reportTelemetry).toHaveBeenCalledWith('quest_accept', { timeMs: 0 });
+    expect(offered.reportTelemetry).toHaveBeenCalledWith('quest_accept', {
+      timeMs: 0,
+    });
 
     const readyNpc = npc(31, 'marshal_redbrook');
     readyNpc.questIds = ['q_wolves'];
@@ -468,8 +538,61 @@ describe('QuestDialogController', () => {
     expect(ready.element.innerHTML).toContain('completion:q_wolves');
     ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
 
-    expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves');
+    // The turn-in carries the preselected choose-one piece: the spec default.
+    expect(ready.turnInQuest).toHaveBeenCalledWith(
+      'q_wolves',
+      defaultRewardChoice(QUESTS.q_wolves, 'warrior', null),
+    );
     expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', { timeMs: 0 });
+  });
+
+  it('turns in the reward card the player checked, and only the class can wear', () => {
+    const readyNpc = npc(32, 'marshal_redbrook');
+    readyNpc.questIds = ['q_wolves'];
+    const ready = harness(readyNpc, 'ready');
+    ready.controller.open(readyNpc.id);
+    ready.element.querySelector<HTMLButtonElement>('[data-quest="q_wolves"]')?.click();
+    const cards = [
+      ...ready.element.querySelectorAll<HTMLButtonElement>('button[data-reward-choice]'),
+    ];
+    // A warrior wears all four armor weights, so all four cards are offered.
+    expect(cards.map((c) => c.dataset.rewardChoice)).toEqual(QUESTS.q_wolves.choiceRewards);
+    const defaultId = defaultRewardChoice(QUESTS.q_wolves, 'warrior', null);
+    expect(cards.find((c) => c.getAttribute('aria-checked') === 'true')?.dataset.rewardChoice).toBe(
+      defaultId,
+    );
+    const other = cards.find((c) => c.dataset.rewardChoice !== defaultId);
+    other?.click();
+    expect(other?.getAttribute('aria-checked')).toBe('true');
+    expect(cards.filter((c) => c.getAttribute('aria-checked') === 'true')).toHaveLength(1);
+    ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
+    expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves', other?.dataset.rewardChoice);
+  });
+
+  it('moves the reward check and the one tab stop with the arrow keys and Home/End', () => {
+    const readyNpc = npc(34, 'marshal_redbrook');
+    readyNpc.questIds = ['q_wolves'];
+    const ready = harness(readyNpc, 'ready');
+    ready.controller.open(readyNpc.id);
+    ready.element.querySelector<HTMLButtonElement>('[data-quest="q_wolves"]')?.click();
+    const cards = [
+      ...ready.element.querySelectorAll<HTMLButtonElement>('button[data-reward-choice]'),
+    ];
+    const checkedIndex = () => cards.findIndex((c) => c.getAttribute('aria-checked') === 'true');
+    const press = (key: string) =>
+      cards[checkedIndex()].dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    press('Home');
+    expect(checkedIndex()).toBe(0);
+    press('ArrowRight');
+    expect(checkedIndex()).toBe(1);
+    expect(document.activeElement).toBe(cards[1]);
+    press('End');
+    expect(checkedIndex()).toBe(cards.length - 1);
+    press('ArrowDown');
+    expect(checkedIndex()).toBe(0);
+    expect(cards.filter((c) => c.tabIndex === 0)).toEqual([cards[0]]);
+    ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
+    expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves', cards[0].dataset.rewardChoice);
   });
 
   it('the preview promises the REMEMBERED hobby when the identity carries one', () => {
@@ -570,7 +693,9 @@ describe('QuestDialogController', () => {
     if (!select) throw new Error('hobby profession selector missing');
     expect([...select.options].map((option) => option.value)).toEqual(['tailoring']);
     expect(preview?.textContent).toBe(
-      t('hudChrome.crafting.hobbyPreview', { hobby: craftNameText('tailoring') }),
+      t('hudChrome.crafting.hobbyPreview', {
+        hobby: craftNameText('tailoring'),
+      }),
     );
     expect(preview?.getAttribute('aria-live')).toBe('polite');
     expect(preview?.getAttribute('aria-atomic')).toBe('true');

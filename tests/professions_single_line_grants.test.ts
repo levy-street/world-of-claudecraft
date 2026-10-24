@@ -30,6 +30,14 @@
 // COMMAND. Its own describe block sits below the six.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { audio } from '../src/game/audio';
 import { ITEMS } from '../src/sim/data';
 import type { HarvestYield } from '../src/sim/professions/harvest_yields';
@@ -37,6 +45,7 @@ import type { SimEvent } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import { QUALITY_COLOR } from '../src/ui/icons';
+import { contactAtOnce } from './helpers/renderer_contact';
 
 const PLAYER_ID = 7;
 // Real content ids so the item links resolve through the same ITEMS table the
@@ -71,7 +80,11 @@ interface GrantLineHarness {
     craftSkills: Record<string, number>;
     gatheringProficiency: Record<string, number>;
   };
-  renderer: { handleEvent: ReturnType<typeof vi.fn> };
+  renderer: {
+    handleEvent: ReturnType<typeof vi.fn>;
+    // the event sound waits for a swing's blade contact (contact_queue.ts); none here
+    atContact: typeof contactAtOnce;
+  };
   playEventSfx: ReturnType<typeof vi.fn>;
   meters: { onEvent: ReturnType<typeof vi.fn> };
   isNythraxisEvent: ReturnType<typeof vi.fn>;
@@ -99,7 +112,7 @@ function makeHud(): GrantLineHarness {
     craftSkills: {},
     gatheringProficiency: {},
   };
-  hud.renderer = { handleEvent: vi.fn() };
+  hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };
   hud.isNythraxisEvent = vi.fn(() => false);

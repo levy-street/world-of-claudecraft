@@ -1,0 +1,154 @@
+{
+  "measuredAt": "2026-10-14T01:50:10.975Z",
+  "head": "6c727361910f65e10699dad6d53026bc83d26c93",
+  "workingTree": "Includes uncommitted membership refinement changes; head identifies starting revision only",
+  "runtime": "v26.7.0",
+  "host": {
+    "platform": "win32",
+    "release": "10.0.26200",
+    "cpuModel": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "logicalCpus": 20,
+    "totalMemoryBytes": 25480454144,
+    "freeMemoryBytes": 1124864000
+  },
+  "fixture": {
+    "residentPlayers": 1,
+    "inventoryStacks": 1000,
+    "bankStacks": 1000,
+    "bankerAnchors": 1,
+    "courierPathLength": 1000,
+    "finalReturnCargoStacks": 24,
+    "finalReturnStartingTick": 199,
+    "claimRewardIds": [
+      "membership_helmet",
+      "membership_shoulder",
+      "membership_chest",
+      "membership_waist",
+      "membership_legs",
+      "membership_gloves",
+      "membership_feet",
+      "membership_staff"
+    ],
+    "claimLocations": ["equipment", "inventory", "personal bank", "courier cargo"]
+  },
+  "method": "30 warmed batched samples per operation. Durations are per-call means within each sample; p50/p95 are quantiles of those sample means. Courier tick samples include resetting the scalar tick counter to remain mid-flight. Final-return samples prepare full 24-stack custody and 1000-slot bags outside timing, then time the complete return kernel including failed normal packing and overflow. Bank rebuild explicitly invalidates its revision. These are host measurements, not CI thresholds or whole-server throughput.",
+  "measurements": [
+    {
+      "name": "courier_outbound_tick_1000_bag_1000_bank",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 1000,
+      "measuredCalls": 30000,
+      "p50": 0.12139999999999418,
+      "p95": 0.4844999999999686,
+      "min": 0.09910000000002128,
+      "max": 1.2171999999999912
+    },
+    {
+      "name": "courier_pose_1000_bag_1000_bank",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 1000,
+      "measuredCalls": 30000,
+      "p50": 0.23390000000000555,
+      "p95": 3.0002000000000066,
+      "min": 0.08600000000001273,
+      "max": 8.497099999999989
+    },
+    {
+      "name": "courier_flight_cached_info_1000_bag_1000_bank",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 1000,
+      "measuredCalls": 30000,
+      "p50": 0.1793999999999869,
+      "p95": 0.4602999999999611,
+      "min": 0.1624999999999659,
+      "max": 0.573599999999999
+    },
+    {
+      "name": "courier_return_tick_1000_bag_1000_bank",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 1000,
+      "measuredCalls": 30000,
+      "p50": 0.08189999999996189,
+      "p95": 0.5552000000000135,
+      "min": 0.07040000000000646,
+      "max": 0.765700000000038
+    },
+    {
+      "name": "courier_final_return_tick_24_cargo_1000_bag_1000_bank",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 10,
+      "measuredCalls": 300,
+      "p50": 584.0900000000033,
+      "p95": 1295.2200000000062,
+      "min": 460.70000000000846,
+      "max": 4339.719999999999,
+      "setupTimed": false,
+      "includes": "The complete courier return update: arrival position, 24 capacity/merge attempts, overflow transfer, clearing custody, and one inventory-change notification. The notification is a counter callback; downstream quest processing and network snapshots are not included."
+    },
+    {
+      "name": "courier_ready_bank_projection_rebuild_1000_slots",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 100,
+      "measuredCalls": 3000,
+      "p50": 37.03000000000088,
+      "p95": 245.5460000000005,
+      "min": 23.83699999999976,
+      "max": 251.30999999999972
+    },
+    {
+      "name": "courier_ready_cached_projection_1000_slots",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 1000,
+      "measuredCalls": 30000,
+      "p50": 0.16210000000000946,
+      "p95": 0.6540999999999713,
+      "min": 0.10500000000001819,
+      "max": 1.1209999999998672
+    },
+    {
+      "name": "explicit_claim_ownership_lookup_1000_bag_1000_bank_all_rewards_owned",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 100,
+      "measuredCalls": 3000,
+      "p50": 67.6110000000017,
+      "p95": 442.0479999999997,
+      "min": 51.32500000000164,
+      "max": 688.2470000000013
+    },
+    {
+      "name": "recurring_active_membership_refresh_1000_bag_1000_bank",
+      "unit": "microseconds_per_call",
+      "sampleCount": 30,
+      "callsPerSample": 1000,
+      "measuredCalls": 30000,
+      "p50": 0.05329999999980828,
+      "p95": 0.19319999999993342,
+      "min": 0.038600000000087675,
+      "max": 0.25749999999993634
+    }
+  ],
+  "recurringRefreshProof": {
+    "calls": 10000,
+    "ownershipStorageReads": {
+      "inventory": 0,
+      "equipment": 0,
+      "bankInventory": 0,
+      "courierCargo": 0
+    },
+    "explicitClaimStorageReads": {
+      "inventory": 1,
+      "equipment": 1,
+      "bankInventory": 1,
+      "courierCargo": 1
+    }
+  },
+  "checksum": 59759940
+}

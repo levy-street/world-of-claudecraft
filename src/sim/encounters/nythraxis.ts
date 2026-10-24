@@ -29,7 +29,7 @@ import { isBlocked } from '../colliders';
 import { isUnbreakableControlAura } from '../combat/cc';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
-import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
+import { DUNGEONS, ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { dungeonInstanceAt } from '../dungeon_floor';
 import { createMob, createNpc } from '../entity';
@@ -38,6 +38,7 @@ import {
   claimedInstanceForMob,
   heroicLockoutId,
   instanceLockoutMetas,
+  recordClearedRaidParticipant,
 } from '../instances/dungeons';
 import {
   NYTHRAXIS_ASCENSION_AURA_ID,
@@ -101,7 +102,6 @@ import {
   NYTHRAXIS_BONE_STORM_AURA_ID,
   NYTHRAXIS_BONE_STORM_AURA_NAME,
   NYTHRAXIS_BONE_STORM_CAST_ID,
-  NYTHRAXIS_BONE_STORM_ENABLED,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
   NYTHRAXIS_BONE_STORM_SPEED_MULT,
@@ -176,7 +176,6 @@ import {
 } from '../nythraxis_kings_wrath';
 import {
   NYTHRAXIS_SOUL_REND_AURA_ID,
-  NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS,
   NYTHRAXIS_SOUL_REND_SETTLE_SECONDS,
   releaseNythraxisSoulRendMarks,
 } from '../nythraxis_soul_rend';
@@ -235,7 +234,6 @@ type NythraxisMechanicField =
   | 'sigilSide'
   | 'majorGapTimer'
   | 'soulRendSettleTimer'
-  | 'soulRendFireGapTimer'
   | 'enrageElapsed'
   | 'enrageStacks'
   | 'boneStormTimer'
@@ -274,7 +272,6 @@ export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicSta
   st.sigilSide ??= null;
   st.majorGapTimer ??= 0;
   st.soulRendSettleTimer ??= 0;
-  st.soulRendFireGapTimer ??= 0;
   st.enrageElapsed ??= 0;
   st.enrageStacks ??= 0;
   st.boneStormTimer ??= NYTHRAXIS_BONE_STORM_FIRST_SECONDS;
@@ -521,7 +518,6 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       sigilSide: null,
       majorGapTimer: 0,
       soulRendSettleTimer: 0,
-      soulRendFireGapTimer: 0,
       enrageElapsed: 0,
       enrageStacks: 0,
       boneStormTimer: NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
@@ -716,9 +712,7 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   updateNythraxisSigilCast(ctx, boss, st, room);
   // The guard waves ride the adds switch (owner playtest call, see types.ts).
   if (NYTHRAXIS_ADDS_ENABLED && st.phase === 1) updateNythraxisRaiseFallen(ctx, boss, st);
-  // Bone Storm is retired from play (nythraxis_bone_storm.ts).
-  if (NYTHRAXIS_BONE_STORM_ENABLED && st.phase === 3)
-    updateNythraxisBoneStormCast(ctx, boss, st, room);
+  if (st.phase === 3) updateNythraxisBoneStormCast(ctx, boss, st, room);
   // A storm that just started THIS tick owns the boss's body immediately: the
   // `storming` snapshot above predates this call, so without this check
   // Gravefire/Soul Rend/Deathless Rage admission below could still fire the
@@ -727,11 +721,7 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   if (st.phase === 2 || st.phase === 3) {
     st.soulRendTimer -= DT;
     if (st.soulRendTimer <= 0) {
-      // The marks also wait out a live eruption telegraph (one that began
-      // this tick included), so the curse and the circles of fire never
-      // start together; the eruption side waits out the marks plus a gap.
-      if (canCastNythraxisSoulRend(st) && nythraxisMechanicState(st).eruptionPoints.length === 0)
-        castNythraxisSoulRend(ctx, boss, st);
+      if (canCastNythraxisSoulRend(st)) castNythraxisSoulRend(ctx, boss, st);
       else st.soulRendTimer = 1;
     }
     st.deathlessTimer -= DT;
@@ -943,6 +933,11 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
     for (const meta of instanceLockoutMetas(ctx, inst)) lockoutMetas.set(meta.entityId, meta);
   }
   for (const meta of lockoutMetas.values()) {
+    // Before the stamp: a participant whose lock first lands with this kill
+    // earns the claim's cleared-run record, so they can walk back into this
+    // exact arena for a corpse run or loot (instances/raid_return.ts), and
+    // the cleared claim takes the longer empty-instance grace.
+    if (inst) recordClearedRaidParticipant(ctx, inst, meta, lockId);
     meta.raidLockouts.set(lockId, until);
   }
   // Raid deed credit stays scoped to the boss room roster.
@@ -1361,9 +1356,6 @@ export function updateNythraxisGraveEruptionCast(
   // A due eruption waits out the settle window after a spike wave, so the
   // freshly pinned never find a circle opening under their neighbours.
   if (ms.spikeSettleTimer > 0) return;
-  // It also waits out live Soul Rend marks and the gap after they clear, so
-  // the circles of fire never open on top of (or right behind) the marks.
-  if (st.soulRendMarks.length > 0 || ms.soulRendFireGapTimer > 0) return;
   startNythraxisGraveEruption(ctx, boss, st, room);
 }
 
@@ -1415,7 +1407,6 @@ export function startNythraxisGraveEruption(
     count,
     targets,
     impaled.map((p) => ({ x: p.pos.x, z: p.pos.z })),
-    nythraxisHallPillars(boss),
   );
   ms.eruptionImpactRemaining = NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS;
   ms.eruptionTimer = nythraxisWrathCadence(
@@ -1438,13 +1429,6 @@ export function startNythraxisGraveEruption(
       sourceId: boss.id,
     });
   });
-}
-
-/** World-space centres of the hall pillars in the boss's instance (none outside one). */
-function nythraxisHallPillars(boss: Entity): { x: number; z: number }[] {
-  const frame = dungeonInstanceAt(boss.spawnPos.x, boss.spawnPos.z);
-  if (!frame) return [];
-  return frame.layout.pillars.map((p) => ({ x: frame.ox + p.x, z: frame.oz + p.z }));
 }
 
 /** The armed eruption lands, then its circles keep burning as Grave Flame. */
@@ -2057,7 +2041,6 @@ export function startNythraxisBoneStorm(
   ms.boneStorm = beginNythraxisBoneStorm(castKey);
   // Soul Rend says stack, the storm says spread: any live marks are released
   // unresolved so the raid never has to answer both at once.
-  if (st.soulRendMarks.length > 0) ms.soulRendFireGapTimer = NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS;
   releaseNythraxisSoulRendMarks(ctx.entities, st.soulRendMarks);
   st.soulRendMarks = [];
   st.gravebreakerCharged = false;
@@ -2591,6 +2574,13 @@ export function updateNythraxisTransition(
   if (st.transitionTimer > 0) return;
   st.phase = 2;
   st.transitionReleased = true;
+  // Step aside by the entrance once the speech ends, leaving the wardstone clear.
+  // The NPC tick owns the walk so an early boss kill cannot strand him here.
+  const frame = dungeonInstanceAt(boss.spawnPos.x, boss.spawnPos.z);
+  if (aldric && frame) {
+    const arena = DUNGEONS.nythraxis_boss_arena;
+    aldric.wanderTarget = ctx.groundPos(frame.ox + arena.entry.x + 8, frame.oz + arena.entry.z + 4);
+  }
   st.gravebreakerTimer = 3;
   st.soulRendTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY;
   st.deathlessTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY + 15;
@@ -2688,11 +2678,6 @@ export function updateNythraxisSoulRend(
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
-  // The fire gap counts down here, ahead of any detonation this tick, so it
-  // runs every encounter tick and a gap armed below keeps its full length.
-  const ms = nythraxisMechanicState(st);
-  if (ms.soulRendFireGapTimer > 0)
-    ms.soulRendFireGapTimer = Math.max(0, ms.soulRendFireGapTimer - DT);
   if (st.soulRendMarks.length === 0) return;
   for (const mark of st.soulRendMarks) mark.remaining -= DT;
   if (st.soulRendMarks.some((m) => m.remaining > 0)) return;
@@ -2737,10 +2722,8 @@ export function updateNythraxisSoulRend(
   // A detonation leaves nothing behind (owner call, 2026-09-11: the Soulfire
   // pools it used to drop made the fight too hard and are retired from play).
   st.soulRendMarks = [];
-  // The raid is still huddled on the stack point: hold the storm off, and
-  // keep the next circles of fire back until the marks have been gone a beat.
-  ms.soulRendSettleTimer = NYTHRAXIS_SOUL_REND_SETTLE_SECONDS;
-  ms.soulRendFireGapTimer = NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS;
+  // The raid is still huddled on the stack point: hold the storm off.
+  nythraxisMechanicState(st).soulRendSettleTimer = NYTHRAXIS_SOUL_REND_SETTLE_SECONDS;
 }
 
 // ----- phase-two mechanics: Deathless Rage + wardstone channels --------------------

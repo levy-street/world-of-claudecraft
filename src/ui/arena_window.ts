@@ -46,13 +46,16 @@ import {
   buildBgWindowView,
 } from './hud/battleground';
 import {
+  bindWorldPvpRewardProgress,
   buildWorldPvpWindowView,
   updateWorldPvpRewardProgress,
   WORLD_PVP_ACTION_FOCUS_KEY,
+  type WorldPvpRewardProgressState,
   wireWorldPvpPanel,
   worldPvpBodyHtml,
 } from './hud/world_pvp';
 import { formatNumber, t } from './i18n';
+import type { PainterHostWriters } from './painter_host';
 import { formatPvpRecord } from './pvp_record_core';
 import { buildPvpTabs, type PvpTabId, type PvpTabsModel } from './pvp_tabs_view';
 import { svgIcon } from './ui_icons';
@@ -84,6 +87,7 @@ const num = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 })
 export interface ArenaWindowDeps {
   root(): HTMLElement;
   world(): IWorld;
+  writers: Pick<PainterHostWriters, 'setText'>;
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
@@ -115,6 +119,7 @@ export class ArenaWindow {
   // The World PvP tab's raise-confirm step (hud/world_pvp/): window state so
   // a tab switch or a close clears it; the view signature carries it.
   private worldConfirming = false;
+  private worldRewardProgress: WorldPvpRewardProgressState | null = null;
 
   constructor(private readonly deps: ArenaWindowDeps) {}
 
@@ -308,7 +313,7 @@ export class ArenaWindow {
     });
     const sig = `${view.sig}|${strip.tabs.map((s2) => (s2.locked ? 1 : 0)).join('')}`;
     if (sig === this.lastSig) {
-      updateWorldPvpRewardProgress(el, view);
+      updateWorldPvpRewardProgress(this.worldRewardProgress, view, this.deps.writers);
       return;
     }
     this.lastSig = sig;
@@ -317,6 +322,7 @@ export class ArenaWindow {
     // innerHTML swap, never on the body (the bags window precedent).
     const focusKey = captureFocusKey(el);
     el.innerHTML = this.worldTitleHtml() + this.stripHtml(strip) + worldPvpBodyHtml(view);
+    this.worldRewardProgress = bindWorldPvpRewardProgress(el, view);
     this.wireChrome(el);
     if (focusKey !== null) {
       restoreFirstEnabled([

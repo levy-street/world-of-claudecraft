@@ -129,7 +129,7 @@ describe('spec masteries', () => {
     });
     // Balance pass: Quickblood is the evasive-skirmisher mastery.
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'survival')?.mastery.effect).toEqual({
-      stats: { agiPct: 0.15, dodge: 0.04 },
+      stats: { agiPct: 0.2, dodge: 0.04 },
     });
     // Mage rework: the 'arcane' internal id is now the Chronomancy healer (Chronoweave
     // mastery), so its effect boosts healing/mana, not spell damage.
@@ -146,13 +146,14 @@ describe('spec masteries', () => {
         { ability: 'crippling_poison', dmgPct: 0.1 },
       ],
     });
-    // Balance pass: tuned down plus the Duskveil stealth-speed identity, now the
-    // full removal of the stealth slow (buffPct 1 doubles the 0.5 aura to 1.0).
+    // Balance pass: tuned down plus the Duskveil stealth-speed identity. Duskveil
+    // and Smokefade run at full speed for every rogue, so buffPct 0.15 lifts the
+    // 1.0 aura to 1.15.
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 1 },
-        { ability: 'vanish', buffPct: 1 },
+        { ability: 'stealth', buffPct: 0.15 },
+        { ability: 'vanish', buffPct: 0.15 },
       ],
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
@@ -495,7 +496,7 @@ describe('spec masteries', () => {
       hunter: {
         beast_mastery: { global: 'petDmgPct', value: 0.25 },
         marksmanship: { global: 'meleeDmgPct', value: 0.12 },
-        survival: { stat: 'agiPct', value: 0.15 },
+        survival: { stat: 'agiPct', value: 0.2 },
       },
       mage: {
         // Mage rework: arcane is the Chronomancy healer (healing axis), fire is Ignition.

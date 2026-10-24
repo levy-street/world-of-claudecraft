@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const vi_VN: Record<string, string> = {
+  'error.buddyGrantFailed': 'Không thể cấp bạn đồng hành.',
+  'error.characterAlreadyHasThat': 'Nhân vật đó đã có bạn đồng hành hoặc diện mạo này.',
+  'moderationHistory.actionGrantBuddy': 'Đã cấp bạn đồng hành',
+  'moderationHistory.actionAnnounce': 'Thông báo toàn cõi',
+  'moderationHistory.actionGmInvisible': 'Đã trở nên vô hình',
+  'moderationHistory.actionGmVisible': 'Đã hiện hình',
+  'moderationHistory.actionUnwatch': 'Đã xóa khỏi danh sách theo dõi',
+  'moderationHistory.actionWatch': 'Đã thêm vào danh sách theo dõi',
   'error.flagActiveExists': 'Tài khoản này đã có một đánh dấu đang mở thuộc loại đó.',
   'wealth.largeMovementsUnavailable':
     'Không thể tải các khoản chuyển ngân hàng lớn (việc đọc sổ cái đã hết thời gian chờ). Bảng chi tiết vàng ở trên vẫn đầy đủ.',
@@ -401,8 +409,6 @@ export const vi_VN: Record<string, string> = {
   'detail.accountActions': 'Hành động kiểm duyệt tài khoản',
   'detail.banReason': 'Lý do cấm:{value}',
   'detail.suspensionReason': 'Lý do đình chỉ:{value}',
-  'detail.deactivatedNotice': 'Người chơi đã vô hiệu hóa tài khoản này vào {value}.',
-  'detail.reactivate': 'Kích hoạt lại',
   'detail.notePlaceholder': 'Ghi chú / lý do của điều hành viên',
   'detail.suspend1h': 'Đình Chỉ 1 giờ',
   'detail.suspend24h': 'Đình Chỉ 24 giờ',
@@ -501,7 +507,6 @@ export const vi_VN: Record<string, string> = {
   'dialog.confirmBan': 'Xác nhận cấm',
   'dialog.confirmUnban': 'Xác nhận gỡ cấm',
   'dialog.confirmUnsuspension': 'Xác nhận việc hủy tạm ngưng',
-  'dialog.confirmReactivation': 'Xác nhận kích hoạt lại',
   'dialog.character': 'Nhân Vật',
   'dialog.account': 'Tài Khoản',
   'dialog.action': 'Hành Động',
@@ -514,8 +519,6 @@ export const vi_VN: Record<string, string> = {
   'dialog.actionUnban': 'Khôi phục quyền đăng nhập tài khoản',
   'dialog.actionUnsuspend':
     'Khôi phục quyền truy cập đăng nhập tài khoản trước khi hết hạn tạm dừng',
-  'dialog.actionReactivate':
-    'Hoàn tác việc người chơi tự vô hiệu hóa và khôi phục quyền đăng nhập tài khoản',
   'dialog.confirm': 'Xác Nhận',
   'dialog.cancel': 'Hủy',
   'dialog.warning': 'Cảnh báo',
@@ -1088,36 +1091,18 @@ export const vi_VN: Record<string, string> = {
     'Mọi nhân vật trong tài khoản đều mang nhãn công khai cho đến khi hết số giờ chơi này.',
   'detail.cheaterMarkRelengthHint':
     'Thay thế hoàn toàn hạn mức còn lại, không cộng thêm. Nhãn công khai vẫn được giữ nguyên.',
-  'detail.worldQuestBlockModeration': 'Nhiệm vụ thế giới',
-  'detail.worldQuestBlockActions': 'Thao tác kiểm duyệt nhiệm vụ thế giới',
-  'detail.worldQuestBlockApply': 'Chặn nhiệm vụ thế giới',
-  'detail.worldQuestBlockLift': 'Bỏ chặn nhiệm vụ thế giới',
-  'detail.worldQuestBlockReason': 'Lý do chặn: {value}',
-  'detail.worldQuestBlockedAt': 'Đã chặn: {value}',
-  'detail.worldQuestBlockHint':
-    'Dùng cho việc chạy bot nhiệm vụ thế giới thay vì cấm tài khoản: mọi nhân vật trên tài khoản sẽ không thể bắt đầu, tiến triển hay nhận phần thưởng từ nhiệm vụ thế giới nữa. Mọi nội dung khác vẫn chơi được.',
   'dialog.confirmCheaterMark': 'Xác nhận dấu gian lận',
   'dialog.confirmCheaterMarkRelength': 'Xác nhận thời hạn đánh dấu mới',
   'dialog.confirmCheaterMarkLift': 'Xác nhận gỡ dấu',
   'dialog.actionCheaterMark': 'Gắn nhãn công khai Kẻ Gian Lận cho mọi nhân vật trong tài khoản này',
   'dialog.actionCheaterMarkRelength': 'Thay thế hạn mức thời gian chơi còn lại của dấu này',
   'dialog.actionCheaterMarkLift': 'Gỡ dấu gian lận sớm',
-  'dialog.confirmWorldQuestBlock': 'Xác nhận chặn nhiệm vụ thế giới',
-  'dialog.confirmWorldQuestUnblock': 'Xác nhận bỏ chặn nhiệm vụ thế giới',
-  'dialog.actionWorldQuestBlock': 'Chặn nhiệm vụ thế giới cho mọi nhân vật trên tài khoản này',
-  'dialog.actionWorldQuestUnblock': 'Cho phép lại nhiệm vụ thế giới trên tài khoản này',
   'alert.cheaterMarkDurationInvalid': 'Nhập số nguyên từ 1 đến {max} giờ.',
   'error.cheaterMarkDurationInvalid': 'Hạn mức thời gian chơi phải từ 1 đến 100 giờ.',
   'error.cheaterMarkNotMarked': 'Tài khoản này không mang dấu gian lận.',
   'error.cheaterMarkAdminTarget': 'Không thể gắn dấu gian lận cho tài khoản quản trị viên.',
-  'error.worldQuestBlockAdminTarget':
-    'Không thể chặn nhiệm vụ thế giới đối với tài khoản quản trị.',
-  'error.worldQuestBlockAlreadyBlocked': 'Tài khoản này đã bị chặn nhiệm vụ thế giới.',
-  'error.worldQuestBlockNotBlocked': 'Tài khoản này không bị chặn nhiệm vụ thế giới.',
   'moderationHistory.actionCheaterMark': 'Đã gắn dấu gian lận',
   'moderationHistory.actionCheaterMarkLift': 'Đã gỡ dấu gian lận',
-  'moderationHistory.actionWorldQuestsBlock': 'Đã chặn nhiệm vụ thế giới',
-  'moderationHistory.actionWorldQuestsUnblock': 'Đã bỏ chặn nhiệm vụ thế giới',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Vàng',
   'error.flagInvalidStatus': 'trạng thái cờ không hợp lệ',

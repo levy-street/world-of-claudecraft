@@ -39,6 +39,19 @@ export function isDistanceCullExemptObject(entity: Entity): boolean {
   );
 }
 
+/**
+ * The telemetry label for a view that was just created.
+ *
+ * Lives here rather than on the coordinator because it is a pure classification of an
+ * entity, which is what this module is for, and because the length cap is a contract with
+ * the perf overlay that reads it: an unbounded templateId would let one exotic spawn widen
+ * every row of that table.
+ */
+export function createdViewType(e: Entity): string {
+  const id = e.templateId || e.kind;
+  return `${e.kind}:${id}`.slice(0, 64);
+}
+
 export function entityViewDistanceSq(a: Entity, b: Entity): number {
   const dx = a.pos.x - b.pos.x;
   const dz = a.pos.z - b.pos.z;
@@ -69,10 +82,14 @@ export function entityViewCandidatePriority(entity: Entity, player: Entity, d2: 
   // bg_flag/bg_rune are always lootable:false (bg_flag_interact.ts) but a
   // carried flag's position is actionable info that must never lag behind on
   // a saturated view pool (the graphics-fairness invariant), so they keep the
-  // same priority tier an ordinary lootable object gets.
+  // same priority tier an ordinary lootable object gets. The planted Dawn
+  // Battle Standard reuses the flag body and is never lootable either.
   if (
     entity.kind === 'object' &&
-    (entity.lootable || isPersistentPortalObject(entity) || entity.templateId?.startsWith('bg_'))
+    (entity.lootable ||
+      isPersistentPortalObject(entity) ||
+      entity.templateId?.startsWith('bg_') ||
+      entity.templateId === 'dawn_battle_standard')
   )
     return 2;
   if (entity.kind === 'player') return 3;

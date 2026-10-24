@@ -71,6 +71,10 @@ export const VAULT_MAX_RUNG: number;
 // of this list.
 export const BANK_SOCKET_PRICES: readonly number[];
 
+// Socket ladders live before a compiled retune; an unlock row charged at the
+// Nth price of any of them is honest too (a pre-retune purchase keeps its price).
+export const BANK_SOCKET_RETIRED_PRICES: readonly (readonly number[])[];
+
 // Every container the reconciliation passes actually replay, mirrored from the
 // BankLedgerRow.container union in server/db.ts (same dependency-free rule as
 // the ladder above); tests/bank_audit.test.ts pins the two in lockstep.
@@ -108,6 +112,9 @@ export function auditBank(input: {
   ledgerRows: BankLedgerAuditRow[];
   characters: BankAuditCharacter[];
   guildBanks?: BankAuditGuildBank[];
+  projectPersonalSlot?: (
+    slot: import('../src/sim/types').InvSlot,
+  ) => readonly import('../src/sim/types').InvSlot[];
 }): BankAuditFinding[];
 
 // A one-line-per-finding report grouped by container, plus per-container counts.

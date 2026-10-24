@@ -10,7 +10,7 @@
 // re-validated by the sim's own harvestNode gates.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
-import { GATHER_NODES } from '../sim/data';
+import { gatherNodesInActiveWorld } from '../sim/data';
 import { NODE_TYPE_BY_PROFESSION } from '../sim/professions/gathering';
 import { isGatherToolUse } from '../sim/professions/tools';
 import { type GatherNodeDef, INTERACT_RANGE, type ItemDef } from '../sim/types';
@@ -40,7 +40,7 @@ export function nearestGatherNodeForProfession(
   let best: GatherNodeDef | null = null;
   let bestDist = Infinity;
   let bestReady = false;
-  for (const node of GATHER_NODES) {
+  for (const node of gatherNodesInActiveWorld()) {
     if (node.type !== nodeType) continue;
     const dx = p.pos.x - node.pos.x;
     const dz = p.pos.z - node.pos.z;

@@ -26,10 +26,15 @@ describe('Ley effect lifecycle', () => {
     Object.defineProperty(Element.prototype, 'animate', {
       configurable: true,
       value: function (this: Element, _frames: Keyframe[], options: KeyframeAnimationOptions) {
+        let rejectFinished!: (reason: unknown) => void;
+        const finished = new Promise<void>((_, reject) => {
+          rejectFinished = reject;
+        });
         const animation = {
           element: this,
           options,
-          cancel: vi.fn(),
+          finished,
+          cancel: vi.fn(() => rejectFinished(new DOMException('Cancelled', 'AbortError'))),
           onfinish: null,
           oncancel: null,
         };

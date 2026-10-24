@@ -11,9 +11,12 @@
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { TRANSPORT_ROUTES } from '../src/sim/content/transport_ships';
 import { ZONES } from '../src/sim/data';
+import { emptyTransportFerryView } from '../src/sim/transport_schedule';
 import { ContinentMapPainter } from '../src/ui/continent_map_painter';
 import { zoneDisplayName } from '../src/ui/entity_i18n';
+import { FERRY_PORTS } from '../src/ui/ferry_port_map_core';
 import { t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
@@ -51,6 +54,8 @@ interface PaintTrace {
   arcFills: string[]; // fillStyle at each arc fill (the you-are-here dot)
   labels: Array<{ text: string; color: string }>; // fillText + the fillStyle it used
   styleReads: string[];
+  hullStarts: Array<[number, number]>;
+  pathFills: string[];
 }
 
 function newTrace(): PaintTrace {
@@ -61,10 +66,13 @@ function newTrace(): PaintTrace {
     labels: [],
     gradients: [],
     styleReads: [],
+    hullStarts: [],
+    pathFills: [],
   };
 }
 
 function fakeContinentContext(trace: PaintTrace): CanvasRenderingContext2D {
+  let pathIsBoat = false;
   const ctx = {
     fillStyle: '' as string | object,
     strokeStyle: '',
@@ -91,10 +99,21 @@ function fakeContinentContext(trace: PaintTrace): CanvasRenderingContext2D {
     strokeRect(): void {
       trace.strokeRects.push(String(ctx.strokeStyle));
     },
-    beginPath(): void {},
+    save(): void {},
+    restore(): void {},
+    beginPath(): void {
+      pathIsBoat = false;
+    },
+    moveTo(x: number, y: number): void {
+      pathIsBoat = true;
+      trace.hullStarts.push([x, y]);
+    },
+    lineTo(): void {},
+    closePath(): void {},
     arc(): void {},
     fill(): void {
-      trace.arcFills.push(String(ctx.fillStyle));
+      if (pathIsBoat) trace.pathFills.push(String(ctx.fillStyle));
+      else trace.arcFills.push(String(ctx.fillStyle));
     },
     stroke(): void {},
     fillText(text: string): void {
@@ -139,6 +158,7 @@ function continentWorld(): IWorld {
     cfg: { seed: 42, playerClass: 'warrior' },
     questState: () => 'unavailable',
     questLog: new Map(),
+    ferryView: () => null,
   } as unknown as IWorld;
 }
 
@@ -268,6 +288,48 @@ describe('continent_map_painter: token-driven draw behavior', () => {
       'paint:--color-map-continent-ocean',
       'paint:--color-map-region-hover-fill',
     ]);
+  });
+});
+
+describe('continent_map_painter: ferry markers', () => {
+  it('returns projected ports and paints a boat hull and sail at each landing', () => {
+    const trace = newTrace();
+    installStyleGlobals(trace);
+    const world = continentWorld();
+    world.ferryView = () => emptyTransportFerryView(TRANSPORT_ROUTES[0]);
+    const result = new ContinentMapPainter(classColor).paintContinent(
+      fakeContinentContext(trace),
+      world,
+      {
+        canvasSize: 560,
+        hoveredZoneId: null,
+      },
+    );
+    expect(result.ports).toHaveLength(FERRY_PORTS.length);
+    expect(trace.hullStarts).toHaveLength(result.ports.length * 2);
+    expect(trace.pathFills).toEqual(
+      result.ports.flatMap(() => ['paint:--color-map-player', 'paint:--color-map-player']),
+    );
+    for (const [index, port] of result.ports.entries()) {
+      expect(trace.hullStarts[index * 2]).toEqual([port.mx - 9, port.my + 2.25]);
+      expect(trace.hullStarts[index * 2 + 1]).toEqual([port.mx, port.my + 0.9]);
+    }
+  });
+
+  it('returns no ports and paints no boat when ferry service is absent', () => {
+    const trace = newTrace();
+    installStyleGlobals(trace);
+    const result = new ContinentMapPainter(classColor).paintContinent(
+      fakeContinentContext(trace),
+      continentWorld(),
+      {
+        canvasSize: 560,
+        hoveredZoneId: null,
+      },
+    );
+    expect(result.ports).toEqual([]);
+    expect(trace.pathFills).toEqual([]);
+    expect(trace.hullStarts).toEqual([]);
   });
 });
 

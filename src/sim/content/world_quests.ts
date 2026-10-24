@@ -121,7 +121,10 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
     ambushes: [
       { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 5, radius: 6 },
       { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 5, radius: 7 },
-      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 8 },
+      // radius 7, not 8: at 8 the fourth bandit lands against the painted
+      // smithy's north wall, 0.15 yd of clearance (spawns are not collision
+      // checked); at 7 every spawn has at least 0.95 yd
+      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 7 },
     ],
     creditRadius: 35,
     respawnSeconds: 30,
@@ -310,15 +313,16 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'eastbrook_freight_crate',
     name: 'Eastbrook Freight Crate',
-    // Six separate loads across the dry freight yard, off the road and within
+    // Six separate loads along the town side of the quay road (north-east of
+    // it, toward the quay cottage and the inn), clear of the road and within
     // the world-quest ring. Keep the first stable id for existing sessions.
     positions: [
-      { x: -63, z: -90 },
-      { x: -66, z: -94 },
-      { x: -70, z: -89 },
-      { x: -76, z: -95 },
-      { x: -86, z: -90 },
-      { x: -68, z: -78 },
+      { x: -55, z: -75 },
+      { x: -44, z: -79 },
+      { x: -58, z: -70 },
+      { x: -62, z: -65 },
+      { x: -50, z: -78 },
+      { x: -67, z: -62 },
     ],
     entityIds: [
       2_147_100_003, 2_147_100_005, 2_147_100_006, 2_147_100_007, 2_147_100_008, 2_147_100_009,
@@ -327,7 +331,7 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'eastbrook_freight_wagon',
     name: 'Eastbrook Freight Wagon',
-    positions: [{ x: -80, z: -82 }],
+    positions: [{ x: -78, z: -57 }],
     entityIds: [2_147_100_004],
   },
   {
@@ -469,14 +473,15 @@ const PALMREACH_MATCH3_LEVELS = [
 ] as const;
 
 /** One rotation candidate in every shipped overworld zone. Areas deliberately
- *  cover the authored targets, so the marker and credit describe the same
- *  physical space in every host. */
+ *  cover the authored targets (a kill quest's ring holds EVERY camp of its
+ *  target in the zone, plus wander), so the marker and credit describe the
+ *  same physical space in every host. */
 export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_eastbrook_bandits',
     zoneId: 'eastbrook_vale',
     minLevel: WORLD_QUEST_MIN_LEVEL,
-    area: { x: -74, z: -82, radius: 20 },
+    area: { x: -61, z: -68, radius: 26 },
     objective: {
       type: 'delivery',
       pickupObjectItemId: 'eastbrook_freight_crate',
@@ -498,7 +503,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_mirefen_gravecallers',
     zoneId: 'mirefen_marsh',
     minLevel: 6,
-    area: { x: 0, z: 485, radius: 46 },
+    area: { x: 0, z: 485, radius: 51 },
     objective: { type: 'kill', targetMobId: 'gravecaller_cultist' },
     count: 6,
   },
@@ -506,7 +511,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_thornpeak_stormcrag',
     zoneId: 'thornpeak_heights',
     minLevel: 13,
-    area: { x: 122, z: 778, radius: 46 },
+    area: { x: 122, z: 778, radius: 51 },
     objective: { type: 'kill', targetMobId: 'stormcrag_elemental' },
     count: 6,
   },
@@ -514,7 +519,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_hollow_sporelings',
     zoneId: 'veiled_hollow',
     minLevel: 15,
-    area: { x: -42, z: 1222, radius: 38 },
+    area: { x: -42, z: 1222, radius: 41 },
     objective: { type: 'kill', targetMobId: 'corrupted_sporeling' },
     count: 5,
   },
@@ -522,7 +527,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_drakelands_brood',
     zoneId: 'drakelands',
     minLevel: 16,
-    area: { x: 382, z: 2310, radius: 132 },
+    area: { x: 382, z: 2310, radius: 145 },
     objective: { type: 'kill', targetMobId: 'dragonkin_broodguard' },
     count: 5,
     // Rift-forge currency on top of the bundle, never equipment (the day's item slots own gear).
@@ -545,7 +550,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_amberfall_lurkers',
     zoneId: 'amberfall',
     minLevel: 18,
-    area: { x: -298, z: 2192, radius: 46 },
+    area: { x: -298, z: 2192, radius: 55 },
     objective: { type: 'kill', targetMobId: 'mere_lurker' },
     count: 3,
   },
@@ -554,6 +559,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     zoneId: 'willowfen',
     minLevel: 19,
     area: { x: -370, z: 355, radius: 108 },
+    // Clear of Bridgemere's painted building footprint.
+    championAt: { x: -362, z: 372 },
     objective: { type: 'gather', nodeType: 'ore' },
     count: 3,
   },
@@ -577,7 +584,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_nightbloom_barrow',
     zoneId: 'nightbloom',
     minLevel: 20,
-    area: { x: -354, z: 1648, radius: 48 },
+    area: { x: -354, z: 1648, radius: 49 },
     objective: { type: 'kill', targetMobId: 'barrow_wight' },
     count: 4,
   },
@@ -585,7 +592,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_wraithwood_restless',
     zoneId: 'wraithwood',
     minLevel: 20,
-    area: { x: 360, z: 1592, radius: 72 },
+    area: { x: 360, z: 1592, radius: 82 },
     objective: { type: 'kill', targetMobId: 'wood_wraith' },
     count: 4,
   },
@@ -607,7 +614,11 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_evergarden_watch',
     zoneId: 'evergarden',
     minLevel: 20,
-    area: { x: 410, z: 1110, radius: 42 },
+    // Centred between the knights' garden posts and their north camp so the
+    // ring holds every hedge knight in the zone. That centre sits in the Great
+    // Maze, so the champion keeps its open-lawn spot at the north watch.
+    area: { x: 358, z: 995, radius: 151 },
+    championAt: { x: 418, z: 1118 },
     objective: { type: 'kill', targetMobId: 'hedge_knight' },
     count: 3,
   },

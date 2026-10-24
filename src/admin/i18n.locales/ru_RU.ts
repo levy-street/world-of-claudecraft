@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ru_RU: Record<string, string> = {
+  'error.buddyGrantFailed': 'Не удалось выдать спутника.',
+  'error.characterAlreadyHasThat': 'У этого персонажа уже есть такой спутник или облик.',
+  'moderationHistory.actionGrantBuddy': 'Спутник выдан',
+  'moderationHistory.actionAnnounce': 'Объявление для мира',
+  'moderationHistory.actionGmInvisible': 'Стал невидимым',
+  'moderationHistory.actionGmVisible': 'Стал видимым',
+  'moderationHistory.actionUnwatch': 'Удалён из списка наблюдения',
+  'moderationHistory.actionWatch': 'Добавлен в список наблюдения',
   'error.flagActiveExists': 'у этого аккаунта уже есть открытый флаг такого типа',
   'wealth.largeMovementsUnavailable':
     'крупные банковские операции не удалось загрузить (истекло время ожидания при чтении бухгалтерской книги); разбивка по золоту выше приведена полностью',
@@ -415,8 +423,6 @@ export const ru_RU: Record<string, string> = {
   'detail.accountActions': 'Действия по модерации аккаунта',
   'detail.banReason': 'Причина бана:{value}',
   'detail.suspensionReason': 'Причина приостановки:{value}',
-  'detail.deactivatedNotice': 'Игрок деактивировал этот аккаунт {value}.',
-  'detail.reactivate': 'Активировать повторно',
   'detail.notePlaceholder': 'Заметка модератора / причина',
   'detail.suspend1h': 'Блок 1ч',
   'detail.suspend24h': 'Блок 24ч',
@@ -515,7 +521,6 @@ export const ru_RU: Record<string, string> = {
   'dialog.confirmBan': 'Подтвердить бан',
   'dialog.confirmUnban': 'Подтвердить разбан',
   'dialog.confirmUnsuspension': 'Подтвердите отмену блокировки',
-  'dialog.confirmReactivation': 'Подтвердите повторную активацию',
   'dialog.character': 'Персонаж',
   'dialog.account': 'Аккаунт',
   'dialog.action': 'Действие',
@@ -527,8 +532,6 @@ export const ru_RU: Record<string, string> = {
   'dialog.actionBan': 'Постоянная блокировка аккаунта',
   'dialog.actionUnban': 'Восстановить доступ к аккаунту',
   'dialog.actionUnsuspend': 'Восстановить доступ к учетной записи до истечения срока блокировки',
-  'dialog.actionReactivate':
-    'Отменить деактивацию, сделанную самим игроком, и восстановить доступ к аккаунту',
   'dialog.confirm': 'Подтвердить',
   'dialog.cancel': 'Отмена',
   'dialog.warning': 'Предупреждение',
@@ -1100,14 +1103,6 @@ export const ru_RU: Record<string, string> = {
     'Все персонажи учетной записи носят публичную метку, пока это игровое время не будет исчерпано.',
   'detail.cheaterMarkRelengthHint':
     'Полностью заменяет оставшийся лимит, а не прибавляет время к нему. Публичная метка сохраняется.',
-  'detail.worldQuestBlockModeration': 'Локальные задания',
-  'detail.worldQuestBlockActions': 'Действия модерации локальных заданий',
-  'detail.worldQuestBlockApply': 'Заблокировать локальные задания',
-  'detail.worldQuestBlockLift': 'Разблокировать локальные задания',
-  'detail.worldQuestBlockReason': 'Причина блокировки: {value}',
-  'detail.worldQuestBlockedAt': 'Заблокировано: {value}',
-  'detail.worldQuestBlockHint':
-    'Для ботоводства в локальных заданиях вместо бана: ни один персонаж учетной записи больше не может начинать локальные задания, продвигаться в них или получать за них награды. Все остальное остается доступным.',
   'dialog.confirmCheaterMark': 'Подтвердить метку читера',
   'dialog.confirmCheaterMarkRelength': 'Подтвердить новый срок метки',
   'dialog.confirmCheaterMarkLift': 'Подтвердить снятие метки',
@@ -1115,24 +1110,12 @@ export const ru_RU: Record<string, string> = {
     'Пометить всех персонажей этой учетной записи публичной меткой «Читер»',
   'dialog.actionCheaterMarkRelength': 'Заменить оставшийся лимит игрового времени этой метки',
   'dialog.actionCheaterMarkLift': 'Снять метку читера досрочно',
-  'dialog.confirmWorldQuestBlock': 'Подтвердить блокировку локальных заданий',
-  'dialog.confirmWorldQuestUnblock': 'Подтвердить разблокировку локальных заданий',
-  'dialog.actionWorldQuestBlock':
-    'Заблокировать локальные задания для всех персонажей этой учетной записи',
-  'dialog.actionWorldQuestUnblock': 'Снова разрешить локальные задания для этой учетной записи',
   'alert.cheaterMarkDurationInvalid': 'Введите целое число часов от 1 до {max}.',
   'error.cheaterMarkDurationInvalid': 'Лимит игрового времени должен составлять от 1 до 100 часов.',
   'error.cheaterMarkNotMarked': 'На этой учетной записи нет метки читера.',
   'error.cheaterMarkAdminTarget': 'Учетным записям администраторов нельзя назначать метку читера.',
-  'error.worldQuestBlockAdminTarget':
-    'Учетные записи администраторов нельзя лишить доступа к локальным заданиям.',
-  'error.worldQuestBlockAlreadyBlocked':
-    'Эта учетная запись уже лишена доступа к локальным заданиям.',
-  'error.worldQuestBlockNotBlocked': 'Эта учетная запись не лишена доступа к локальным заданиям.',
   'moderationHistory.actionCheaterMark': 'Метка читера установлена',
   'moderationHistory.actionCheaterMarkLift': 'Метка читера снята',
-  'moderationHistory.actionWorldQuestsBlock': 'Локальные задания заблокированы',
-  'moderationHistory.actionWorldQuestsUnblock': 'Локальные задания разблокированы',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Золото',
   'error.flagInvalidStatus': 'неверный статус флага',

@@ -14,6 +14,7 @@ import {
 } from '../src/ui/hud/cooldown_manager/cooldown_manager_config';
 import {
   type CooldownManagerTrackedSpell,
+  cooldownAuraReminder,
   cooldownCueFires,
   cooldownSlotReady,
   createCooldownManagerView,
@@ -248,10 +249,10 @@ describe('cooldown manager view over a live Sim (feral druid)', () => {
     expect(view.tick(worldOf(sim), OPEN).cues).toEqual([]);
   });
 
-  it('hides an only-when-ready spell until ready, but the placement preview shows it', () => {
+  it('hides a ready-only spell until ready, but the placement preview shows it', () => {
     const sim = feral();
     const view = viewOver(sim);
-    view.setTracked([spell('ferocious_bite', { onlyWhenReady: true })]);
+    view.setTracked([spell('ferocious_bite', { showNotReady: false })]);
     sim.player.resource = 0;
     expect(view.tick(worldOf(sim), OPEN).buttons[0].visible).toBe(false);
     expect(view.tick(worldOf(sim), { soundsAllowed: true, preview: true }).buttons[0].visible).toBe(
@@ -259,6 +260,50 @@ describe('cooldown manager view over a live Sim (feral druid)', () => {
     );
     sim.player.resource = sim.player.maxResource;
     expect(view.tick(worldOf(sim), OPEN).buttons[0].visible).toBe(true);
+  });
+
+  it('shows a not-ready-only spell while it cannot be cast, and hides it once ready', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([spell('ferocious_bite', { showReady: false })]);
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      ready: true,
+      visible: false,
+    });
+    sim.player.resource = 0;
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      ready: false,
+      unusable: true,
+      visible: true,
+    });
+    // Neither ticked: never on screen, but the cue still fires on the ready edge.
+    const silent = viewOver(sim);
+    silent.setTracked([spell('ferocious_bite', { showReady: false, showNotReady: false })]);
+    expect(silent.tick(worldOf(sim), OPEN).buttons[0].visible).toBe(false);
+    sim.player.resource = sim.player.maxResource;
+    const back = silent.tick(worldOf(sim), OPEN);
+    expect(back.buttons[0].visible).toBe(false);
+    expect(back.cues).toHaveLength(1);
+  });
+
+  it('mutes a muted entry: no cue and no hotbar glow, and no stale replay on unmuting', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([spell('ferocious_bite', { hotbarGlow: true }), spell('claw')]);
+    const muted = { ...OPEN, muted: [true, false] };
+    view.tick(worldOf(sim), muted);
+    sim.player.resource = 0;
+    view.tick(worldOf(sim), muted);
+    sim.player.resource = sim.player.maxResource;
+    const edge = view.tick(worldOf(sim), muted);
+    // Only the unmuted Rendclaw chimes; the muted Gorebite stays dark on the bar.
+    expect(edge.cues).toHaveLength(1);
+    expect(edge.buttons.map((b) => b.hotbarGlow)).toEqual([false, false]);
+    expect(edge.buttons[0].ready).toBe(true);
+    // Unmuting while still ready replays nothing: the edge was recorded while muted.
+    const open = view.tick(worldOf(sim), OPEN);
+    expect(open.cues).toEqual([]);
+    expect(open.buttons[0].hotbarGlow).toBe(true);
   });
 
   it('flags the hotbar glow only while ready and only when asked for', () => {
@@ -360,13 +405,13 @@ describe('cooldown manager view: aura entries (engines, procs, buffs)', () => {
     expect(up.cues).toHaveLength(1);
   });
 
-  it('hides an only-while-active aura until it is up, and never lights the hotbar', () => {
+  it('hides an active-only aura until it is up, and never lights the hotbar', () => {
     const sim = feral();
     const view = viewOver(sim);
     view.setTracked([
       {
         id: 'kind:old_blood',
-        config: { ...defaultCooldownSpellConfig(), onlyWhenReady: true, hotbarGlow: true },
+        config: { ...defaultCooldownSpellConfig(), showNotReady: false, hotbarGlow: true },
         cue: null,
         aura: OLD_BLOOD,
       },
@@ -377,6 +422,121 @@ describe('cooldown manager view: aura entries (engines, procs, buffs)', () => {
       visible: true,
       hotbarGlow: false,
     });
+  });
+});
+
+describe('cooldown manager view: the buff reminder (missing only)', () => {
+  const reminder = (patch: Partial<CooldownSpellConfig> = {}): CooldownManagerTrackedSpell => ({
+    id: 'kind:old_blood',
+    config: { ...defaultCooldownSpellConfig(), showReady: false, ...patch },
+    cue: CUE,
+    aura: { match: 'kind', value: 'old_blood', iconKey: 'aura:old_blood' },
+  });
+
+  it('is missing-only, never active-only, both, or neither', () => {
+    const base = defaultCooldownSpellConfig();
+    expect(cooldownAuraReminder({ ...base, showReady: false })).toBe(true);
+    expect(cooldownAuraReminder(base)).toBe(false);
+    expect(cooldownAuraReminder({ ...base, showNotReady: false })).toBe(false);
+    expect(cooldownAuraReminder({ ...base, showReady: false, showNotReady: false })).toBe(false);
+  });
+
+  it('lights, pulses and shows at full strength while the aura is missing, hides once up', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([reminder()]);
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      visible: true,
+      ready: true,
+      glow: true,
+      proc: true,
+      unusable: false,
+    });
+    sim.player.auras.push(oldBlood(sim, 1));
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      visible: false,
+      ready: false,
+      glow: false,
+      proc: false,
+    });
+    // The placement preview still shows it (dimmed) so it can be arranged.
+    expect(view.tick(worldOf(sim), { ...OPEN, preview: true }).buttons[0]).toMatchObject({
+      visible: true,
+      unusable: true,
+    });
+  });
+
+  it('keeps the outline and pulse off when the light-up switch is off', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([reminder({ glowWhenReady: false })]);
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      visible: true,
+      ready: true,
+      glow: false,
+      proc: false,
+    });
+  });
+
+  it('chimes when the aura drops off, never when it comes up or on first sight', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([reminder()]);
+    expect(view.tick(worldOf(sim), OPEN).cues).toEqual([]);
+    sim.player.auras.push(oldBlood(sim, 1));
+    expect(view.tick(worldOf(sim), OPEN).cues).toEqual([]);
+    sim.player.auras.length = 0;
+    expect(view.tick(worldOf(sim), OPEN).cues).toHaveLength(1);
+  });
+
+  it('counts an aura short of its stack goal as missing', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([reminder({ alertStacks: 3 })]);
+    sim.player.auras.push(oldBlood(sim, 2));
+    expect(view.tick(worldOf(sim), OPEN).buttons[0]).toMatchObject({
+      visible: true,
+      ready: true,
+      count: '2',
+    });
+    sim.player.auras[0] = oldBlood(sim, 3);
+    expect(view.tick(worldOf(sim), OPEN).buttons[0].visible).toBe(false);
+  });
+
+  it('chimes once on resurrecting without the aura, but never at login', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([reminder()]);
+    // Login (first sight) with the aura missing: lit, silent.
+    const login = view.tick(worldOf(sim), OPEN);
+    expect(login.buttons[0].visible).toBe(true);
+    expect(login.cues).toEqual([]);
+    const dead = worldOf(sim);
+    dead.player = { ...sim.player, dead: true } as ActionBarWorldInput['player'];
+    expect(view.tick(dead, OPEN).cues).toEqual([]);
+    expect(view.tick(dead, OPEN).cues).toEqual([]);
+    // Back on your feet with no buff: the reminder chimes, once.
+    expect(view.tick(worldOf(sim), OPEN).cues).toHaveLength(1);
+    expect(view.tick(worldOf(sim), OPEN).cues).toEqual([]);
+    // Resurrected WITH the aura (it survived death): nothing to remind.
+    view.tick(dead, OPEN);
+    sim.player.auras.push(oldBlood(sim, 1));
+    expect(view.tick(worldOf(sim), OPEN).cues).toEqual([]);
+    // An ordinary (non-reminder) aura entry still only records after a rez.
+    const plain = viewOver(sim);
+    plain.setTracked([{ ...reminder(), config: defaultCooldownSpellConfig() }]);
+    plain.tick(worldOf(sim), OPEN);
+    plain.tick(dead, OPEN);
+    expect(plain.tick(worldOf(sim), OPEN).cues).toEqual([]);
+  });
+
+  it('never reminds a dead player, who cannot rebuff', () => {
+    const sim = feral();
+    const view = viewOver(sim);
+    view.setTracked([reminder()]);
+    const world = worldOf(sim);
+    world.player = { ...sim.player, dead: true } as ActionBarWorldInput['player'];
+    expect(view.tick(world, OPEN).buttons[0]).toMatchObject({ visible: false, ready: false });
   });
 });
 
@@ -415,5 +575,57 @@ describe('cooldown manager view over a ClientWorld-shaped mirror', () => {
     expect(view.tick(world, OPEN).buttons[0]).toMatchObject({ ready: true, visible: true });
     world.player.dead = true;
     expect(view.tick(world, OPEN).buttons[0].ready).toBe(false);
+  });
+
+  it('runs the buff reminder and per-entry muting over the mirrored aura list', () => {
+    // The online mirror carries a plain aura array (id, kind, stacks, remaining)
+    // and a dead flag, nothing Sim-specific.
+    const auras: { id?: string; kind: string; stacks?: number; remaining?: number }[] = [];
+    const world = {
+      player: {
+        id: 1,
+        autoAttack: false,
+        dead: false,
+        resource: 100,
+        resourceType: 'mana',
+        savedMana: 0,
+        cooldowns: new Map<string, number>(),
+        gcdRemaining: 0,
+        potionCdRemaining: 0,
+        queuedOnSwing: null,
+        pos: { x: 0, y: 0, z: 0 },
+        auras,
+      },
+      target: null,
+      inventory: [],
+      stealthed: false,
+      entities: [],
+      activeAimSlot: null,
+    } as unknown as ActionBarWorldInput;
+    const view = createCooldownManagerView({ resolve: () => null, formatCount: String });
+    view.setTracked([
+      {
+        id: 'aura:arcane_intellect',
+        config: { ...defaultCooldownSpellConfig(), showReady: false },
+        cue: CUE,
+        aura: { match: 'id', value: 'arcane_intellect', iconKey: 'aura:arcane_intellect' },
+      },
+    ]);
+    expect(view.tick(world, OPEN).buttons[0]).toMatchObject({ visible: true, ready: true });
+    auras.push({ id: 'arcane_intellect', kind: 'buff_int', remaining: 1800 });
+    expect(view.tick(world, OPEN).buttons[0]).toMatchObject({ visible: false, ready: false });
+    // The buff drops while the entry is muted (its group is off here): no chime.
+    auras.length = 0;
+    const muted = view.tick(world, { ...OPEN, muted: [true] });
+    expect(muted.buttons[0].visible).toBe(true);
+    expect(muted.cues).toEqual([]);
+    // Unmuting while still missing replays nothing; the next drop chimes.
+    expect(view.tick(world, OPEN).cues).toEqual([]);
+    auras.push({ id: 'arcane_intellect', kind: 'buff_int', remaining: 1800 });
+    view.tick(world, OPEN);
+    auras.length = 0;
+    expect(view.tick(world, OPEN).cues).toHaveLength(1);
+    world.player.dead = true;
+    expect(view.tick(world, OPEN).buttons[0]).toMatchObject({ visible: false, ready: false });
   });
 });

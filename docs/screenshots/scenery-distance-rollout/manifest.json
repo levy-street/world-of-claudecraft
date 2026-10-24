@@ -1,0 +1,450 @@
+{
+  "purpose": "Matched fixed viewpoints. Animation phases differ. Higher presets use final candidate; Low pairs document recovery against selected prototype. Supplementary images are not paired comparisons. All phone captures retain native CSS and measured buffer settings.",
+  "pairs": [
+    {
+      "device": "mac",
+      "tier": "medium",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-medium-thornpeak-stock.webp",
+          "sha256": "d32d67701445bd4d70ca4de8811bd543382679bfe85eba3502a980d19662cb9d",
+          "bytes": 234352
+        },
+        {
+          "file": "higher-v6-medium-thornpeak-detail.webp",
+          "sha256": "84f686fece664fb9cd04ef196eae5657fd4097c1bc0ccff7551d465c7d565433",
+          "bytes": 233834
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "medium",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-medium-forward-stock-thornpeak.webp",
+          "sha256": "5a224cfc5abe6be30efb5f7253a207289a98333b0e1fa109e3ba2afe906a02ee",
+          "bytes": 198814
+        },
+        {
+          "file": "higher-phone-v6-medium-forward-detail-thornpeak.webp",
+          "sha256": "d66a764d56d0aebc0a9af82c2a66ef21cbb5542eaebef6bcc58dec8b96b512fc",
+          "bytes": 197662
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "medium",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-medium-beach-stock.webp",
+          "sha256": "68f73c218c33c1be68529fe86105c36b75ba3b28e1a282f951a5807cd1c7ebd5",
+          "bytes": 216966
+        },
+        {
+          "file": "higher-v6-medium-beach-detail.webp",
+          "sha256": "96e999ecfaf045ee13cc747faf3d4254ff4dfefb951458b8f90afca4b9d08a8b",
+          "bytes": 215398
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "medium",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-medium-forward-stock-beach.webp",
+          "sha256": "a62c9a489aff8236d3e73dd44f21da9bd6b829ec2743a1e5910139bfb65dfff3",
+          "bytes": 183206
+        },
+        {
+          "file": "higher-phone-v6-medium-forward-detail-beach.webp",
+          "sha256": "d19e3e9aeb382a8eebc041fb45010bb1887ab3439fad2f87581d67b7f10ab24d",
+          "bytes": 182940
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "high",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-high-thornpeak-stock.webp",
+          "sha256": "2a994b4dea871dc4dd50acebcdedfe38277eb2b703f72019d2953f290ea1b099",
+          "bytes": 275898
+        },
+        {
+          "file": "higher-v6-high-thornpeak-detail.webp",
+          "sha256": "c04671894acc51f60fcb4bb0a810869fe0699ca08505d80cbf7652c3f237bdfb",
+          "bytes": 273320
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "high",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-high-forward-stock-thornpeak.webp",
+          "sha256": "e40ea843514921237002be195fccd5b3f2ac7a9ce8069872df448c5182d2561b",
+          "bytes": 234066
+        },
+        {
+          "file": "higher-phone-v6-high-forward-detail-thornpeak.webp",
+          "sha256": "c43b618252834f3a49b59dbe4f901133113002f9681310cdc438cdfd156c4792",
+          "bytes": 233330
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "high",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-high-beach-stock.webp",
+          "sha256": "1b590562b15c78a06c6fe23905be941046609b640b6343640b2b6ee38785b7a7",
+          "bytes": 271722
+        },
+        {
+          "file": "higher-v6-high-beach-detail.webp",
+          "sha256": "3489845840728a9c3b9033475b8e3813297a448db738905644581f6645e970f3",
+          "bytes": 272926
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "high",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-high-forward-stock-beach.webp",
+          "sha256": "357e0707a0aaa5b64e6726198a50fba62a20cdb2b0a098e79bd7fe78d1e244e8",
+          "bytes": 228618
+        },
+        {
+          "file": "higher-phone-v6-high-forward-detail-beach.webp",
+          "sha256": "5712f2cacbb8c24f1579e15d50f91667b37c0ecef3bc5da430af7234e9ef47e6",
+          "bytes": 232318
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "ultra",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-ultra-thornpeak-stock.webp",
+          "sha256": "de87c6ac6c1ea7bef2e20fbd3a1aef834d20c933c1bfe25e3f1dab278b3044bb",
+          "bytes": 270758
+        },
+        {
+          "file": "higher-v6-ultra-thornpeak-detail.webp",
+          "sha256": "d644ac63653bbc94f8081acb2d7d701025e54b242b90c5220be645a7c796735a",
+          "bytes": 271758
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "ultra",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-ultra-forward-stock-thornpeak.webp",
+          "sha256": "103d8a7fd183ffd5223dc2a99bfa7532504fe913d6588b73c908b354a6d2258a",
+          "bytes": 224782
+        },
+        {
+          "file": "higher-phone-v6-ultra-forward-detail-thornpeak.webp",
+          "sha256": "53e84374aab36ec05341c319971e1cf689d11be65d567bf08b1d619268988920",
+          "bytes": 224414
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "ultra",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-ultra-beach-stock.webp",
+          "sha256": "b883f59d9019f5041f9bf6006e4b02d5d269128af5a3bff3c7e51c00e647ad84",
+          "bytes": 286802
+        },
+        {
+          "file": "higher-v6-ultra-beach-detail.webp",
+          "sha256": "111475daec42376733c948443c69c91a7b2edd4d0ae082ce92eabc29d9858094",
+          "bytes": 287668
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "ultra",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-ultra-forward-stock-beach.webp",
+          "sha256": "117a10e9f709bbea07d733efc9b50448a6c33353c8527127d712f5c801d3eedd",
+          "bytes": 233368
+        },
+        {
+          "file": "higher-phone-v6-ultra-forward-detail-beach.webp",
+          "sha256": "26e2172384ccb097f2102921ea95d088e17f3b5b4e8bd94c2aed1ec4176a4608",
+          "bytes": 233748
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "insane",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-insane-thornpeak-stock.webp",
+          "sha256": "861eda21c8aa1e09dd438d55fed98bdf5b909e29684620ec4d87a535c10b55b8",
+          "bytes": 270876
+        },
+        {
+          "file": "higher-v6-insane-thornpeak-detail.webp",
+          "sha256": "f8d255ef2fad6d0e610f6124c0597c3e053fa0668d47a6715a4537653ee82066",
+          "bytes": 272546
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "insane",
+      "scene": "thornpeak",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-insane-forward-stock-thornpeak.webp",
+          "sha256": "8f2b30bd77c89ca484d3f0742053a13cb91f3e3c39d50965aea9fc29d5bb3725",
+          "bytes": 225440
+        },
+        {
+          "file": "higher-phone-v6-insane-forward-detail-thornpeak.webp",
+          "sha256": "59934586dd692e8a304a549c36e4f44a5239e2402221d50a54c631ae125783a1",
+          "bytes": 223986
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "insane",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-v6-insane-beach-stock.webp",
+          "sha256": "ffdf33dc6d0e926096b290598a560fde97eb9157bb7872a8373d114aed096879",
+          "bytes": 284686
+        },
+        {
+          "file": "higher-v6-insane-beach-detail.webp",
+          "sha256": "80d0c3b03f4f8b1cffb3fc9b2929ce305c95e5ac99bd0b63dc078023848905f7",
+          "bytes": 287434
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "insane",
+      "scene": "beach",
+      "build": "handoff-v6",
+      "comparison": "existing scenery / updated scenery",
+      "files": [
+        {
+          "file": "higher-phone-v6-insane-forward-stock-beach.webp",
+          "sha256": "5058ecf11cd0a9ad93cc0281c692bb62415e74ff046714856cc015485ab6fa00",
+          "bytes": 235724
+        },
+        {
+          "file": "higher-phone-v6-insane-forward-detail-beach.webp",
+          "sha256": "3a37966cceb62c9bd6a81e39d68e784a52ccc006ce58df546a339e757d86524b",
+          "bytes": 237800
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "low",
+      "scene": "thornpeak",
+      "build": "v4 parity checkpoint",
+      "comparison": "selected prototype / corrected implementation",
+      "files": [
+        {
+          "file": "paired-mac-v4-forward-reference-thornpeak.webp",
+          "sha256": "a73c2f7c5eb4ea26b3651f373f984770df2940778ebaf3994fdc5633bd2014a6",
+          "bytes": 120358
+        },
+        {
+          "file": "paired-mac-v4-forward-port-thornpeak.webp",
+          "sha256": "9e673569393961b4bbbd1e4790f8e8966dc06e3a7abb6768d8f0110d6e658c08",
+          "bytes": 120554
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "low",
+      "scene": "thornpeak",
+      "build": "v4 parity checkpoint",
+      "comparison": "selected prototype / corrected implementation",
+      "files": [
+        {
+          "file": "paired-v4b-forward-reference-thornpeak.webp",
+          "sha256": "dbf0af67bf10b3f423377b4b472baacfd2218ed5c521b8785ec416a7d6f74dbe",
+          "bytes": 121374
+        },
+        {
+          "file": "paired-v4b-forward-port-thornpeak.webp",
+          "sha256": "9610271eccd30ed7bb7cf0d58c76ef66d19088f5788fd639c38ecb797a5a1296",
+          "bytes": 121524
+        }
+      ]
+    },
+    {
+      "device": "mac",
+      "tier": "low",
+      "scene": "beach",
+      "build": "v4 parity checkpoint",
+      "comparison": "selected prototype / corrected implementation",
+      "files": [
+        {
+          "file": "paired-mac-v4-forward-reference-beach.webp",
+          "sha256": "a80c3f0ef90e6491dc4fff0cf8516d697458fcc857258132aa911d88e497b568",
+          "bytes": 145544
+        },
+        {
+          "file": "paired-mac-v4-forward-port-beach.webp",
+          "sha256": "65f965d765e51253499308d45b237b6de4f6e29e2ec79df23db5939ec7a0a44d",
+          "bytes": 144988
+        }
+      ]
+    },
+    {
+      "device": "phone",
+      "tier": "low",
+      "scene": "beach",
+      "build": "v4 parity checkpoint",
+      "comparison": "selected prototype / corrected implementation",
+      "files": [
+        {
+          "file": "paired-v4b-forward-reference-beach.webp",
+          "sha256": "02bd57c37e63b4b1805b7cf17fdf41162002a34f1010054cd3bf121936dc7bc3",
+          "bytes": 147194
+        },
+        {
+          "file": "paired-v4b-forward-port-beach.webp",
+          "sha256": "157a313c355dcd1bef0922c75d2de0b8da89f3230886c17512441466d5861337",
+          "bytes": 147776
+        }
+      ]
+    }
+  ],
+  "supplementary": [
+    {
+      "file": "low-v6-final-thornpeak.webp",
+      "sha256": "c70d2a1f10fe70fc7100e36786b1a420f3da03df4548cf6b5786e1a4437e701b",
+      "bytes": 122500,
+      "purpose": "Final Low thornpeak absolute-FPS check; no paired reference",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "low-v6-final-beach.webp",
+      "sha256": "250e3f5acae0e9ce2d5e639f15b439645d38a32b0272953461dd84f9fbf62fe7",
+      "bytes": 147934,
+      "purpose": "Final Low beach absolute-FPS check; no paired reference",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "movement-phone-handoff-v6-end.webp",
+      "sha256": "a74490943e614e90683a487bfc210289d858e43cd6c0fa5f1dd5abea0d9bd8c2",
+      "bytes": 135406,
+      "purpose": "Final Low streamed-root route endpoint",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "movement-higher-v6-mac-14.webp",
+      "sha256": "4bb52f6b19f44447b2c1627528a0ea609edb39b7d848dae8330519dd63fa51d1",
+      "bytes": 266052,
+      "purpose": "Higher-setting mac loading route, step 14",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "movement-higher-v6-mac-44.webp",
+      "sha256": "af71687b45bc0ef80833bd982bd36351c62201cbf55edc607b1f2d19912be973",
+      "bytes": 287480,
+      "purpose": "Higher-setting mac loading route, step 44",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "movement-higher-v6-mac-89.webp",
+      "sha256": "057b4b3109a5b122313085d4ad1d0e8e6a16795bac65995d21822e369571c3f2",
+      "bytes": 188506,
+      "purpose": "Higher-setting mac loading route, step 89",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "movement-higher-v6-phone-14.webp",
+      "sha256": "516d85220bff7175076d90499f55268096373e29fa1fc60bc7fb5ce88d8c9aff",
+      "bytes": 182442,
+      "purpose": "Higher-setting phone loading route, step 14",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "movement-higher-v6-phone-44.webp",
+      "sha256": "06e2d2cc08a14faec0dafa3f6be65672a973f1815cd19ca40a787e780097af98",
+      "bytes": 218190,
+      "purpose": "Higher-setting phone loading route, step 44",
+      "build": "handoff-v6"
+    },
+    {
+      "file": "movement-higher-v6-phone-89.webp",
+      "sha256": "08d05f10e521faa3bf08e7147fb9f45e6ec6989685dc0bcfb9b0475519bcf5a0",
+      "bytes": 171804,
+      "purpose": "Higher-setting phone loading route, step 89",
+      "build": "handoff-v6"
+    }
+  ]
+}

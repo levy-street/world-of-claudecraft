@@ -39,22 +39,25 @@ export interface ArmorDyeSpec {
 
 const MAX_DYE_RULES = 5;
 
-/** Flatten a spec into the fixed-size uniform arrays the shader reads: per
- *  rule A=(ref, band, satLo0, satLo1), B=(satHi0, satHi1, valLo0, valLo1),
- *  C=(valHi0, valHi1, hueTarget, hueMode), D=(satMul, satAdd, valMul, valAdd).
- *  Unused slots get zero weight via an empty hue band. */
-function dyeUniforms(dye: ArmorDyeSpec): {
+/** The dye's uniform values: per rule A=(ref, band, satLo0, satLo1),
+ *  B=(satHi0, satHi1, valLo0, valLo1), C=(valHi0, valHi1, hueTarget, hueMode),
+ *  D=(satMul, satAdd, valMul, valAdd), flattened into the fixed-size arrays the
+ *  shader reads. Unused slots get zero weight via an empty hue band; a null
+ *  spec is the undyed layer, count 0. */
+export interface ArmorDyeUniformValues {
   a: number[];
   b: number[];
   c: number[];
   d: number[];
   n: number;
-} {
+}
+
+export function armorDyeUniformValues(dye: ArmorDyeSpec | null): ArmorDyeUniformValues {
   const a: number[] = [];
   const b: number[] = [];
   const c: number[] = [];
   const d: number[] = [];
-  const rules = dye.rules.slice(0, MAX_DYE_RULES);
+  const rules = dye ? dye.rules.slice(0, MAX_DYE_RULES) : [];
   for (let i = 0; i < MAX_DYE_RULES; i++) {
     const r = rules[i];
     if (!r) {
@@ -73,32 +76,9 @@ function dyeUniforms(dye: ArmorDyeSpec): {
   return { a, b, c, d, n: rules.length };
 }
 
-/** Attach the dye hook to a material IN PLACE, recording a JSON-safe spec in
- *  userData: Material.clone() copies userData but silently DROPS
- *  onBeforeCompile (the worn_stone precedent), and tintedMaterial() clones
- *  again downstream of recolored(), so every clone site re-attaches from the
- *  spec it finds. */
-export function attachArmorDye(mat: THREE.Material, dye: ArmorDyeSpec): void {
-  mat.userData.armorDye = {
-    rules: dye.rules.map((r) => ({ ...r, sat: [...r.sat], val: [...r.val] })),
-  };
-  // Compose with whatever hook the material may already carry (the
-  // surface-detail layer composes the same way from its side), and fold the
-  // previous program key in rather than clobbering it.
-  const prev = mat.onBeforeCompile;
-  const prevKey = typeof prev === 'function' ? prev.toString() : '';
-  const u = dyeUniforms(dye);
-  mat.onBeforeCompile = (shader, renderer) => {
-    prev?.call(mat, shader, renderer);
-    shader.uniforms.uDyeA = { value: u.a };
-    shader.uniforms.uDyeB = { value: u.b };
-    shader.uniforms.uDyeC = { value: u.c };
-    shader.uniforms.uDyeD = { value: u.d };
-    shader.uniforms.uDyeCount = { value: u.n };
-    shader.fragmentShader = shader.fragmentShader
-      .replace(
-        'void main() {',
-        `uniform vec4 uDyeA[${MAX_DYE_RULES}];
+/** The dye's declarations: its uniforms and the colour-space helpers, spliced
+ *  ahead of `void main()`. */
+export const ARMOR_DYE_GLSL_PARS = `uniform vec4 uDyeA[${MAX_DYE_RULES}];
 uniform vec4 uDyeB[${MAX_DYE_RULES}];
 uniform vec4 uDyeC[${MAX_DYE_RULES}];
 uniform vec4 uDyeD[${MAX_DYE_RULES}];
@@ -121,14 +101,12 @@ vec3 wocHsv2Rgb(vec3 c) {
 // gold that measures s=0.31 in sRGB reads s=0.57 in linear, selectors
 // written for one space silently miss in the other).
 vec3 wocLin2Srgb(vec3 c) { return pow(max(c, vec3(0.0)), vec3(1.0 / 2.2)); }
-vec3 wocSrgb2Lin(vec3 c) { return pow(max(c, vec3(0.0)), vec3(2.2)); }
-void main() {`,
-      )
-      .replace(
-        '#include <map_fragment>',
-        `#include <map_fragment>
-{
-  vec3 dyeSrgb = wocLin2Srgb(diffuseColor.rgb);
+vec3 wocSrgb2Lin(vec3 c) { return pow(max(c, vec3(0.0)), vec3(2.2)); }`;
+
+/** The dye remap, in place on the linear colour `target`. */
+export function armorDyeRemapGlsl(target: string): string {
+  return `{
+  vec3 dyeSrgb = wocLin2Srgb(${target});
   vec3 dyeHsv = wocRgb2Hsv(dyeSrgb);
   float dyeHueDeg = dyeHsv.x * 360.0;
   vec3 dyeOut = dyeSrgb;
@@ -148,8 +126,37 @@ void main() {`,
       dyeOut = mix(dyeOut, dyed, w);
     }
   }
-  diffuseColor.rgb = wocSrgb2Lin(dyeOut);
-}`,
+  ${target} = wocSrgb2Lin(dyeOut);
+}`;
+}
+
+/** Attach the dye hook to a material IN PLACE, recording a JSON-safe spec in
+ *  userData: Material.clone() copies userData but silently DROPS
+ *  onBeforeCompile (the worn_stone precedent), and tintedMaterial() clones
+ *  again downstream of recolored(), so every clone site re-attaches from the
+ *  spec it finds. */
+export function attachArmorDye(mat: THREE.Material, dye: ArmorDyeSpec): void {
+  mat.userData.armorDye = {
+    rules: dye.rules.map((r) => ({ ...r, sat: [...r.sat], val: [...r.val] })),
+  };
+  // Compose with whatever hook the material may already carry (the
+  // surface-detail layer composes the same way from its side), and fold the
+  // previous program key in rather than clobbering it.
+  const prev = mat.onBeforeCompile;
+  const prevKey = typeof prev === 'function' ? prev.toString() : '';
+  const u = armorDyeUniformValues(dye);
+  mat.onBeforeCompile = (shader, renderer) => {
+    prev?.call(mat, shader, renderer);
+    shader.uniforms.uDyeA = { value: u.a };
+    shader.uniforms.uDyeB = { value: u.b };
+    shader.uniforms.uDyeC = { value: u.c };
+    shader.uniforms.uDyeD = { value: u.d };
+    shader.uniforms.uDyeCount = { value: u.n };
+    shader.fragmentShader = shader.fragmentShader
+      .replace('void main() {', `${ARMOR_DYE_GLSL_PARS}\nvoid main() {`)
+      .replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>\n${armorDyeRemapGlsl('diffuseColor.rgb')}`,
       );
   };
   // One key for every colorway (the GLSL is identical; only uniforms differ),

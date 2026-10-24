@@ -23,9 +23,30 @@ export const NAMEPLATE_HERALDRY_TITLE_STEP = 11;
 export const NAMEPLATE_HERALDRY_TITLE_BASELINE = 9;
 export const NAMEPLATE_HERALDRY_NAME_BASELINE_FROM_CENTER = 5;
 
-/** Extra collision and anchor lift for a slug that can paint world heraldry. */
+/** Extra anchor lift for a slug that can paint world heraldry. */
 export function nameplateHeraldryLift(slug: string): number {
   return borderAccent(slug) ? NAMEPLATE_HERALDRY_EXTRA_LIFT : 0;
+}
+
+/** The `<guild>` / `<role>` row's step under the name row (taller on the current target's
+ *  larger type). */
+export const NAMEPLATE_GUILD_ROW_STEP = 12;
+export const NAMEPLATE_GUILD_ROW_STEP_TARGET = 14;
+
+/** The pixels a plate's under-name rows (the `<guild>` or `<role>` line and the deed title
+ *  line) push its name row up, so the declutter envelope counts them: two titled NPCs
+ *  standing close otherwise printed one's name across the other's role line. */
+export function nameplateSubRowsLift(
+  guild: boolean,
+  currentTarget: boolean,
+  title: boolean,
+): number {
+  const guildStep = guild
+    ? currentTarget
+      ? NAMEPLATE_GUILD_ROW_STEP_TARGET
+      : NAMEPLATE_GUILD_ROW_STEP
+    : 0;
+  return guildStep + (title ? NAMEPLATE_HERALDRY_TITLE_STEP : 0);
 }
 
 const NAMEPLATE_HERALDRY_JOINT_HEIGHT = 8;

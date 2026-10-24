@@ -1,8 +1,8 @@
 // King of the Hill: the system half, behind the SimContext seam.
 //
-// Once every HILL_WINDOW_SECONDS (two hours), at a moment drawn at random
+// Once every HILL_WINDOW_SECONDS (three hours), at a moment drawn at random
 // inside the window, the realm is warned that a hill will rise in one of the
-// northern zones (hill_zones.ts); HILL_WARNING_SECONDS later it rises,
+// free-for-all zones (world_pvp_zones.ts); HILL_WARNING_SECONDS later it rises,
 // a HILL_RADIUS circle on dry, open ground, clear of the water, the hub
 // settlement and every collider, wholly inside its zone, and it stands for
 // HILL_DURATION_SECONDS before it falls. Each phase change is announced to the
@@ -12,19 +12,24 @@
 // group that held it longest earns a point toward the Weekly Vault's PvP row,
 // through the credit the host injects (`HillVaultCredit`: the vault module
 // reaches entity.ts, which imports this barrel, so it is never imported here).
-// Entering the active circle raises the ordinary World PvP flag; outside the
-// circle, the surrounding zone remains opt-in.
+// Everyone standing in that zone is already hostile to every
+// stranger there (the free-for-all arm of world_pvp.ts), so the hill needs no
+// flag of its own.
 //
 // Once a second while the hill stands the presence pass counts the players
 // inside the circle by PARTY (an ungrouped player is a group of one; a raid
-// member does not count at all, hill_rules.ts hillStanding; level 10 or above); the largest party that beats the holder's
+// member does not count at all, hill_rules.ts hillStanding; any level does); the largest party that beats the holder's
 // present count by a strict majority is the challenger, and after
-// HILL_CAPTURE_SECONDS of unbroken majority it takes the hill (a tie never
-// moves it; a challenge that lapses starts over). Every holder standing inside
+// HILL_CAPTURE_SECONDS of majority it takes the hill. A tie never moves it,
+// and a rival walking in only PAUSES a group's clock (hillProgressStep): the
+// seconds are lost only when the group has nobody left alive inside (a death,
+// or walking away). The hold, and any clock, follows its members when their
+// group changes under them (a lone holder forms a party, a holding party
+// disbands around its last member: reconcileHolder, carryProgress), so
+// grouping up never costs the hill. Every holder standing inside
 // banks a second of presence per pass, and each HILL_ACCRUAL_SECONDS pays
-// hillHonorPerPayout Honor, which ramps with how long the holding party has
-// held (hill_rules.ts). A holder who steps out keeps what they banked; a
-// capture clears the books and restarts the ramp.
+// a flat HILL_HONOR_PER_PAYOUT Honor (hill_rules.ts). A holder who steps out
+// keeps what they banked; a capture clears the books.
 //
 // State lives on the Sim as ONE live view (`ctx.hillState`), never in this
 // module: the modules hold functions, the Sim holds state (src/sim/CLAUDE.md).
@@ -47,12 +52,6 @@ import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import type { ZoneDef } from '../types';
 import {
-  clearHillBounties,
-  type HillBountyBook,
-  hillCalloutFor,
-  syncHillBountyBadges,
-} from './hill_bounty';
-import {
   HILL_RANKING_SHOWN,
   type HillHoldRecord,
   hillRanking,
@@ -63,6 +62,7 @@ import {
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_EDGE_MARGIN,
+  HILL_HONOR_PER_PAYOUT,
   HILL_HUB_MARGIN,
   HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_NOTICE_SECONDS,
@@ -75,20 +75,19 @@ import {
   type HillTimes,
   hillChallengeStands,
   hillContains,
-  hillContestStep,
   hillGroupKey,
-  hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
+  hillProgressStep,
   hillSpotIsOpen,
   hillStanding,
+  hillSuccessorKey,
   hillTimes,
   hillTimesFrom,
   hillWindowAt,
 } from './hill_rules';
-import { hillZones } from './hill_zones';
 import { grantHonor } from './honor';
-import { worldPvpOnHillPresence } from './world_pvp';
+import { worldPvpFfaZones } from './world_pvp_zones';
 
 /** 'warning': announced, drawn on the ground, not yet contestable.
  *  'active': risen; the contest and the payouts run. */
@@ -105,17 +104,21 @@ export interface ActiveHill extends HillTimes {
   radius: number;
   /** The holding party's key (hillGroupKey), or null while unheld. */
   holder: string | null;
-  /** The leading challenger's key and its banked seconds of majority. */
+  /** The holding group's members, the capturers first: the players the hold
+   *  follows when the holder key stops naming any of them (reconcileHolder). */
+  holderRoster: Set<number>;
+  /** The group whose clock ran on the last pass (the leader that beats the
+   *  holder), or null when every clock was paused or none ran. */
   challenger: string | null;
-  contest: number;
+  /** Group key -> seconds of majority banked toward the capture. A paused
+   *  group keeps its row while it has a member counted inside
+   *  (hillProgressStep). */
+  progress: Map<string, number>;
   /** Last presence pass: group key -> counted members inside; pid -> key. */
   counts: Map<string, number>;
   insideKeys: Map<number, string>;
   /** pid -> seconds of paid presence banked toward the next payout. */
   accrual: Map<number, number>;
-  /** Seconds the current holder has held the hill: the ramp's clock. Reset to
-   *  zero whenever the hill changes hands. */
-  heldSeconds: number;
   /** Honor paid out by this hill so far (the readout and the tests). */
   honorPaid: number;
   /** group key -> that group's total hold this stand (hill_ranking.ts),
@@ -123,9 +126,6 @@ export interface ActiveHill extends HillTimes {
   holds: Map<string, HillHoldRecord>;
   /** When the next realm reminder and standings sound while risen. */
   nextNoticeAt: number;
-  /** Kill and death streaks, repeat counts and the latest callout
-   *  (hill_bounty.ts), created on the hill's first hill kill. */
-  bounty?: HillBountyBook;
 }
 
 /** The Weekly Vault's PvP credit for one player, injected by the host (the Sim
@@ -153,9 +153,6 @@ export interface HillState {
    *  modulo of the tick count, so a pass can never be skipped by a host that
    *  does not visit every tick. */
   passTick: number;
-  /** The realm's announcer call counter (hill_bounty.ts), so a callout id is
-   *  never reused within the realm's session. */
-  calloutSeq?: number;
 }
 
 export function newHillState(): HillState {
@@ -209,9 +206,9 @@ function hillRng(ctx: SimContext, ordinal: number, salt: number): Rng {
 }
 
 /** Window `ordinal`'s times: the warning's offset inside the window is the
- *  first draw of a seed-specific private rng, reused so rises are two hours apart. */
+ *  first draw of the window's own private rng. */
 export function hillPlanFor(ctx: SimContext, ordinal: number): HillTimes {
-  const offset = hillRng(ctx, 0, OFFSET_SALT).int(0, HILL_LATEST_WARN_OFFSET_SECONDS);
+  const offset = hillRng(ctx, ordinal, OFFSET_SALT).int(0, HILL_LATEST_WARN_OFFSET_SECONDS);
   return hillTimes(ordinal, offset);
 }
 
@@ -249,7 +246,7 @@ function notice(ctx: SimContext, pid: number, text: string, color = NOTICE_COLOR
 }
 
 function zoneName(zoneId: string): string {
-  return hillZones().find((z) => z.id === zoneId)?.name ?? zoneId;
+  return worldPvpFfaZones().find((z) => z.id === zoneId)?.name ?? zoneId;
 }
 
 /** Tell the realm what just happened to the hill: the warning (with the
@@ -267,10 +264,19 @@ function announcePhase(
   } else {
     announce(ctx, hillFallenLine(name), RISE_COLOR);
   }
+  // The server-only twin of the line above for the Discord PvP feed: no
+  // text, no pid, times relative to now (types.ts 'hillAnnounced').
+  ctx.emit({
+    type: 'hillAnnounced',
+    phase: what,
+    zoneId: hill.zoneId,
+    secondsUntilRise: Math.max(0, hill.risesAt - ctx.time),
+    secondsUntilFall: Math.max(0, hill.closesAt - ctx.time),
+  });
 }
 
 /**
- * Place window `ordinal`'s hill on `times` in a hill zone (a random
+ * Place window `ordinal`'s hill on `times` in a free-for-all zone (a random
  * one by the private rng, or `zoneId` when given: the /dev arm and the tests)
  * and announce it: the warning when it has not risen yet, else the rise.
  * `attempt` salts the spot rng so a retry searches new ground. Returns the
@@ -283,7 +289,7 @@ export function spawnHill(
   attempt = 0,
   zoneId?: string,
 ): ActiveHill | null {
-  const zones = hillZones();
+  const zones = worldPvpFfaZones();
   if (zones.length === 0) return null;
   const rng = hillRng(ctx, ordinal, SPOT_SALT ^ Math.imul(attempt, 0x27d4eb2f));
   const zone = zoneId ? zones.find((z) => z.id === zoneId) : zones[rng.int(0, zones.length - 1)];
@@ -300,17 +306,16 @@ export function spawnHill(
     z: spot.z,
     radius: HILL_RADIUS,
     holder: null,
+    holderRoster: new Set(),
     challenger: null,
-    contest: 0,
+    progress: new Map(),
     counts: new Map(),
     insideKeys: new Map(),
     accrual: new Map(),
-    heldSeconds: 0,
     honorPaid: 0,
     holds: new Map(),
     nextNoticeAt: times.risesAt + HILL_NOTICE_SECONDS,
   };
-  clearHillBounties(ctx, ctx.hillState.active);
   ctx.hillState.active = hill;
   announcePhase(ctx, hill, phase === 'warning' ? 'warning' : 'risen');
   return hill;
@@ -382,7 +387,6 @@ function announceRanking(ctx: SimContext, hill: ActiveHill): void {
  *  still in the realm and in that group now, or was its sole survivor when
  *  the party disbanded and has remained ungrouped. */
 function fallHill(ctx: SimContext, hill: ActiveHill, credit: HillVaultCredit): void {
-  clearHillBounties(ctx, hill);
   ctx.hillState.active = null;
   announcePhase(ctx, hill, 'fallen');
   announceRanking(ctx, hill);
@@ -505,25 +509,111 @@ function updateSchedule(ctx: SimContext, credit: HillVaultCredit): void {
 }
 
 /** The presence pass: who stands inside, by party. The dead and raid members
- *  are not counted. */
-function countInside(ctx: SimContext, hill: ActiveHill): void {
+ *  are not counted. Returns the previous pass's pid -> key map, which
+ *  carryProgress reads to follow a group whose key changed. */
+function countInside(ctx: SimContext, hill: ActiveHill): Map<number, string> {
+  const previous = hill.insideKeys;
   hill.counts.clear();
-  hill.insideKeys.clear();
+  hill.insideKeys = new Map();
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead || !hillContains(hill, e.pos.x, e.pos.z)) continue;
-    if (!worldPvpOnHillPresence(ctx, e)) continue;
     const party = ctx.partyOf(e.id);
-    if (hillStanding(party, e.level) !== 'counted') continue;
+    if (hillStanding(party) !== 'counted') continue;
     const key = hillGroupKey(e.id, party);
     if (key === null) continue;
     hill.insideKeys.set(e.id, key);
     hill.counts.set(key, (hill.counts.get(key) ?? 0) + 1);
   }
+  return previous;
 }
 
-/** The contest clock: the leader beats the holder for HILL_CAPTURE_SECONDS
- *  of unbroken majority and takes the hill. Tells everyone inside. */
+/** The key a player counts under right now (null in a raid). */
+function currentKey(ctx: SimContext, pid: number): string | null {
+  return hillGroupKey(pid, ctx.partyOf(pid));
+}
+
+/** The groups that already stood inside on the last pass. A hold or a clock
+ *  only follows its members into a group that was NOT one of these: joining a
+ *  rival party that is already contesting the circle must never hand that
+ *  party the hill (or a near-complete clock); it is simply leaving your own. */
+function standingGroups(previous: ReadonlyMap<number, string>): Set<string> {
+  return new Set(previous.values());
+}
+
+/** Keep the hold with its members when their group changes under them (owner
+ *  report 2026-10-12: a lone player who took the hill and then invited a
+ *  friend lost it to their own new party). While any roster member still
+ *  counts under the holder key nothing moves; once none does, the hold moves
+ *  to hillSuccessorKey's pick among the groups that did not already stand
+ *  inside (standingGroups), keeping every bank (the members now
+ *  match the holder key, so payHolders keeps their accrual). A holder who
+ *  joins a rival party inside leaves the hold behind, held by nobody present,
+ *  so any group beats it. Then the
+ *  roster is refreshed: the members still under the key, plus everyone seen
+ *  inside under it (a friend who joined the holding party). */
+function reconcileHolder(
+  ctx: SimContext,
+  hill: ActiveHill,
+  previous: ReadonlyMap<number, string>,
+): void {
+  if (hill.holder === null) return;
+  for (const pid of hill.holderRoster) {
+    if (!ctx.players.has(pid)) hill.holderRoster.delete(pid);
+  }
+  let stillNamed = false;
+  for (const pid of hill.holderRoster) {
+    if (currentKey(ctx, pid) === hill.holder) {
+      stillNamed = true;
+      break;
+    }
+  }
+  if (!stillNamed) {
+    const standing = standingGroups(previous);
+    const members = [...hill.holderRoster].map((pid) => {
+      const key = currentKey(ctx, pid);
+      return {
+        key: key !== null && standing.has(key) ? null : key,
+        inside: hill.insideKeys.has(pid),
+      };
+    });
+    const next = hillSuccessorKey(members);
+    if (next !== null) hill.holder = next;
+  }
+  const holder = hill.holder;
+  for (const pid of hill.holderRoster) {
+    if (currentKey(ctx, pid) !== holder) hill.holderRoster.delete(pid);
+  }
+  for (const [pid, key] of hill.insideKeys) {
+    if (key === holder) hill.holderRoster.add(pid);
+  }
+}
+
+/** Carry a contest clock across a key change the same way: a group whose key
+ *  names nobody inside this pass, but whose members from the last pass stand
+ *  inside under a new key, hands its seconds to that key (the larger clock
+ *  wins when two merge). A lone challenger who invites a friend mid-capture
+ *  keeps their progress; one who joins a group already standing inside
+ *  (standingGroups) brings nothing with them. */
+function carryProgress(hill: ActiveHill, previous: ReadonlyMap<number, string>): void {
+  const standing = standingGroups(previous);
+  for (const [key, seconds] of [...hill.progress]) {
+    if ((hill.counts.get(key) ?? 0) > 0) continue;
+    const members: { key: string; inside: boolean }[] = [];
+    for (const [pid, oldKey] of previous) {
+      if (oldKey !== key) continue;
+      const now = hill.insideKeys.get(pid);
+      if (now !== undefined && !standing.has(now)) members.push({ key: now, inside: true });
+    }
+    const next = hillSuccessorKey(members);
+    hill.progress.delete(key);
+    if (next !== null) hill.progress.set(next, Math.max(seconds, hill.progress.get(next) ?? 0));
+  }
+}
+
+/** The contest clock: the leader that beats the holder banks a pass, every
+ *  other group inside keeps its seconds paused (hillProgressStep), and the
+ *  first to HILL_CAPTURE_SECONDS takes the hill. Tells everyone inside. */
 function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
   const holderCount = hill.holder === null ? 0 : (hill.counts.get(hill.holder) ?? 0);
   const leader = hillLeader(hill.counts);
@@ -531,20 +621,18 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
     leader && leader.key !== hill.holder && hillChallengeStands(leader.count, holderCount)
       ? leader.key
       : null;
-  hill.contest = hillContestStep(
-    hill.contest,
-    challenger !== null,
-    challenger === hill.challenger,
-    dt,
-  );
+  hill.progress = hillProgressStep(hill.progress, hill.counts, challenger, hill.holder, dt);
   hill.challenger = challenger;
-  if (challenger === null || hill.contest < HILL_CAPTURE_SECONDS) return;
+  if (challenger === null || (hill.progress.get(challenger) ?? 0) < HILL_CAPTURE_SECONDS) return;
   const ousted = hill.holder;
   hill.holder = challenger;
   hill.challenger = null;
-  hill.contest = 0;
+  hill.progress.delete(challenger);
+  hill.holderRoster.clear();
+  for (const [pid, key] of hill.insideKeys) {
+    if (key === challenger) hill.holderRoster.add(pid);
+  }
   hill.accrual.clear();
-  hill.heldSeconds = 0;
   if (!hill.holds.has(challenger)) {
     hill.holds.set(challenger, {
       key: challenger,
@@ -560,17 +648,15 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
   }
 }
 
-/** The trickle: every holder inside banks this pass, and each compressed payout interval pays
- *  the current ramp amount. Only counted players are inside the books, so the raid rule
+/** The trickle: every holder inside banks this pass, and a full minute pays
+ *  HILL_HONOR_PER_PAYOUT. Only counted players are inside the books, so the raid rule
  *  holds here too, and a party's size is the payee cap. A
  *  holder who steps out keeps their bank; one who leaves the party, or the
  *  realm, loses it. */
 function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
   const holder = hill.holder;
   if (holder === null) return;
-  hill.heldSeconds += dt;
   recordHold(ctx, hill, holder, dt);
-  const amount = hillHonorPerPayout(hill.heldSeconds);
   for (const pid of hill.accrual.keys()) {
     if (!ctx.players.has(pid) || hillGroupKey(pid, ctx.partyOf(pid)) !== holder) {
       hill.accrual.delete(pid);
@@ -581,12 +667,12 @@ function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     const banked = (hill.accrual.get(pid) ?? 0) + dt;
-    if (banked + 1e-9 < HILL_ACCRUAL_SECONDS) {
+    if (banked < HILL_ACCRUAL_SECONDS) {
       hill.accrual.set(pid, banked);
       continue;
     }
-    hill.accrual.set(pid, Math.max(0, banked - HILL_ACCRUAL_SECONDS));
-    hill.honorPaid += grantHonor(ctx, meta, amount, 'hill_hold');
+    hill.accrual.set(pid, banked - HILL_ACCRUAL_SECONDS);
+    hill.honorPaid += grantHonor(ctx, meta, HILL_HONOR_PER_PAYOUT, 'hill_hold');
   }
 }
 
@@ -623,7 +709,6 @@ export function updateHill(ctx: SimContext, credit: HillVaultCredit = NO_HILL_VA
   if (ctx.tickCount - state.passTick < PASS_TICKS) return;
   state.passTick = ctx.tickCount;
   if (ctx.worldPvpDisabled) {
-    clearHillBounties(ctx, state.active);
     state.active = null;
     return;
   }
@@ -631,10 +716,11 @@ export function updateHill(ctx: SimContext, credit: HillVaultCredit = NO_HILL_VA
   const live = state.active;
   if (!live || live.phase !== 'active') return;
   const dt = PASS_TICKS * (1 / 20);
-  countInside(ctx, live);
+  const previous = countInside(ctx, live);
+  reconcileHolder(ctx, live, previous);
+  carryProgress(live, previous);
   updateContest(ctx, live, dt);
   payHolders(ctx, live, dt);
-  syncHillBountyBadges(ctx, live);
 }
 
 /** The IWorld readout for one viewer (src/world_api/world_pvp.ts HillInfo).
@@ -650,7 +736,7 @@ export function hillInfoFor(
   const e = ctx.entities.get(pid);
   if (!e || e.kind !== 'player') return null;
   const party = ctx.partyOf(pid);
-  const standing = hillStanding(party, e.level);
+  const standing = hillStanding(party);
   const key = standing === 'counted' ? hillGroupKey(pid, party) : null;
   const side = (group: string | null): 'none' | 'you' | 'other' =>
     group === null ? 'none' : group === key ? 'you' : 'other';
@@ -678,20 +764,46 @@ export function hillInfoFor(
       yourCount: 0,
       challenger: 'none',
       challengerCount: 0,
+      rivalCount: 0,
       contest: 0,
+      contestPaused: false,
     };
+  }
+  const shown = shownContest(hill, key);
+  let rivalCount = 0;
+  for (const [group, count] of hill.counts) {
+    if (group !== key && count > rivalCount) rivalCount = count;
   }
   return {
     ...base,
     inside: hillContains(hill, e.pos.x, e.pos.z),
     holderCount: hill.holder === null ? 0 : (hill.counts.get(hill.holder) ?? 0),
     yourCount: key === null ? 0 : (hill.counts.get(key) ?? 0),
-    challenger: side(hill.challenger),
-    challengerCount: hill.challenger === null ? 0 : (hill.counts.get(hill.challenger) ?? 0),
-    contest: Math.floor(hill.contest),
-    // The announcer (hill_bounty.ts): everyone in the zone sees the same call.
-    callout: hillCalloutFor(ctx, hill),
+    challenger: side(shown),
+    challengerCount: shown === null ? 0 : (hill.counts.get(shown) ?? 0),
+    rivalCount,
+    contest: shown === null ? 0 : Math.floor(hill.progress.get(shown) ?? 0),
+    contestPaused: shown !== null && shown !== hill.challenger,
   };
+}
+
+/** The clock one viewer's bar shows: their own group's (running or paused)
+ *  when it has one, else the running challenger's, else the largest paused
+ *  clock (a holder watching a rival's progress wait out a tie). Null when no
+ *  clock stands. The order of `progress` breaks a tie between paused clocks,
+ *  the same on every host. */
+function shownContest(hill: ActiveHill, viewerKey: string | null): string | null {
+  if (viewerKey !== null && hill.progress.has(viewerKey)) return viewerKey;
+  if (hill.challenger !== null) return hill.challenger;
+  let best: string | null = null;
+  let bestSeconds = 0;
+  for (const [group, seconds] of hill.progress) {
+    if (seconds > bestSeconds) {
+      best = group;
+      bestSeconds = seconds;
+    }
+  }
+  return best;
 }
 
 export const HILL_READOUT_NONE_LINE = 'No hill stands right now.';

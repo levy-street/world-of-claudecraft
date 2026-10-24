@@ -293,9 +293,10 @@ describe('talent production save migrations', () => {
     expect(first.copper).toBe(9876);
     // wolf_fang is a gathering material: the legacy `instance.signer` legacy
     // stack now loads as a `materialSources` composition, source-keyed on the
-    // same signer, rather than an `instance` payload.
+    // same signer, rather than an `instance` payload. Crafted food uses the
+    // same source custody, with an explicit unknown bucket for unsigned bread.
     expect(first.inventory).toEqual([
-      { itemId: 'baked_bread', count: 4 },
+      { itemId: 'baked_bread', count: 4, materialSources: [{ source: {}, count: 4 }] },
       {
         itemId: 'wolf_fang',
         count: 9,
@@ -344,5 +345,25 @@ describe('talent production save migrations', () => {
     expect(second.contentRevision).toBe(first.contentRevision);
     expect(second.inventory).toEqual(first.inventory);
     expect(second.bank).toEqual(first.bank);
+  });
+
+  it('preserves loadout gear sets during content revision migration', () => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 1;
+    legacy.loadouts = [
+      {
+        name: 'PvP Gear',
+        alloc: { spec: 'fury', rows: {} },
+        bar: ['bloodthirst'],
+        gear: {
+          waist: { itemId: 'molten_clinker_girdle', pin: 'test_pin' },
+        },
+      },
+    ];
+
+    const migrated = migrateCharacterTalentsV2('warrior', legacy);
+    expect(migrated.loadouts?.[0]?.gear).toEqual({
+      waist: { itemId: 'molten_clinker_girdle', pin: 'test_pin' },
+    });
   });
 });

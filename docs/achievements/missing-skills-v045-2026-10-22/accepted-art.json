@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "missing-skills-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "ability": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "assets": [
+    {
+      "kind": "ability",
+      "id": "courier",
+      "family": "warrior",
+      "batch": "missing-skills-v045-2026-10-22",
+      "runtimeUrl": "/ui/skills/warrior/courier.webp",
+      "canonicalDisplayName": "Courier",
+      "acceptedSha256": "64971feb2f6201f4cf07adf7da108d0eeaaf3f4ee3726b042ba18fbbc98add38",
+      "acceptedBytes": 7484,
+      "original": {
+        "path": "tmp/imagegen/v045-skills/originals/courier.png",
+        "sha256": "a07139491fa1eb94a916db8bbd10025bbafb922622013db0efe663c3eea2b693",
+        "bytes": 2848085,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-skills/masters/courier.png",
+        "sha256": "8926a3a2dc322b4341a39ad42cbcce7efe763f7f44b3548b01ee9c44cc684623",
+        "bytes": 738635,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one borderless square hand-painted fantasy MMORPG ability icon for World of ClaudeCraft, courier. Subject and mechanic: A friendly grey flying donkey with long ears, short dark mane, cream muzzle, broad feathered grey wings and worn brown leather mail saddlebags, banking upward diagonally. Keep the compact donkey and saddlebags clearly readable, exactly four legs and two wings. This is a bank delivery summon, no rider or weapon. Palette: sky blue, warm brown and ivory, dark blue atmospheric backdrop. Rich painterly fantasy illustration, dramatic lighting, one dominant bold action silhouette filling 80 percent of frame, crisp focal edges, quieter peripheral atmosphere. Entire subject inside frame with safe margin, legible at 22 and 32 pixels, opaque full-square background. Fresh original composition. No text, letters, numerals, watermark, logo, UI border, frame, rarity chrome, flat vector glyph, collage or sprite sheet. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/cat_form.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b44b297c23f8680adea35187964c8d4836f585d5cb16e75a6e69160ca17bb504"
+          },
+          {
+            "path": "public/ui/skills/druid/pounce.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "2786e05605f52987caf23a717a65eb7425abf86ae7f63981407f5a3402ac4c53"
+          },
+          {
+            "path": "public/ui/courier/donkey.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "e64a307fb593151bdebe77fb5010b13631d356e4cf6ac6c06cee82862a3097ce"
+          },
+          {
+            "path": "public/ui/items/clockwork_shock_bomb.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original to 512x512 opaque sRGB PNG master with Sharp",
+        "Convert master via scripts/convert_skill_icons_webp.mjs at quality 82, smartSubsample, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed canonical mechanic and identity, text-free artwork and action silhouette.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/missing-skills-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon on desktop action bar and mobile circular buttons. Test-only known-ability seeding exposes all four icons; gameplay eligibility is not changed. Takedown is visibly disabled outside Cat Form.",
+        "gameCaptures": [
+          "docs/screenshots/missing-skills-v045/action-bar-desktop.png",
+          "docs/screenshots/missing-skills-v045/action-bar-mobile.png"
+        ]
+      },
+      "class": "warrior"
+    },
+    {
+      "kind": "ability",
+      "id": "lunge",
+      "family": "druid",
+      "batch": "missing-skills-v045-2026-10-22",
+      "runtimeUrl": "/ui/skills/druid/lunge.webp",
+      "canonicalDisplayName": "Lunge",
+      "acceptedSha256": "d7dee00bc1cb6393b1d1ea94dbf39bb33a51d513c6797ef347c31b5303639b0b",
+      "acceptedBytes": 7482,
+      "original": {
+        "path": "tmp/imagegen/v045-skills/originals/lunge.png",
+        "sha256": "cd64fee35c01b2cd6d766fcd8f886921591e717ec3362afe0e0fed09629588b5",
+        "bytes": 2676012,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-skills/masters/lunge.png",
+        "sha256": "71ad206f87104a92444a3264ac9bee487b8f9ae6f231b9500eb0d6f8310265f7",
+        "bytes": 711536,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one borderless square hand-painted fantasy MMORPG ability icon for World of ClaudeCraft, lunge. Subject and mechanic: A powerful golden-brown lynx with black ear tufts and amber eyes launching forward in a long horizontal leap, forepaws reaching with claws, compressed hindquarters and a short tail. A bold green arc and speed streaks behind it communicate an immediate gap-closing pounce. One lynx, no humanoid and no other animal. Palette: golden fur, forest green motion and dark teal shadows. Rich painterly fantasy illustration, dramatic lighting, one dominant bold action silhouette filling 80 percent of frame, crisp focal edges, quieter peripheral atmosphere. Entire subject inside frame with safe margin, legible at 22 and 32 pixels, opaque full-square background. Fresh original composition. No text, letters, numerals, watermark, logo, UI border, frame, rarity chrome, flat vector glyph, collage or sprite sheet. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/cat_form.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b44b297c23f8680adea35187964c8d4836f585d5cb16e75a6e69160ca17bb504"
+          },
+          {
+            "path": "public/ui/skills/druid/pounce.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "2786e05605f52987caf23a717a65eb7425abf86ae7f63981407f5a3402ac4c53"
+          },
+          {
+            "path": "public/ui/courier/donkey.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "e64a307fb593151bdebe77fb5010b13631d356e4cf6ac6c06cee82862a3097ce"
+          },
+          {
+            "path": "public/ui/items/clockwork_shock_bomb.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original to 512x512 opaque sRGB PNG master with Sharp",
+        "Convert master via scripts/convert_skill_icons_webp.mjs at quality 82, smartSubsample, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed canonical mechanic and identity, text-free artwork and action silhouette.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/missing-skills-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon on desktop action bar and mobile circular buttons. Test-only known-ability seeding exposes all four icons; gameplay eligibility is not changed. Takedown is visibly disabled outside Cat Form.",
+        "gameCaptures": [
+          "docs/screenshots/missing-skills-v045/action-bar-desktop.png",
+          "docs/screenshots/missing-skills-v045/action-bar-mobile.png"
+        ]
+      },
+      "class": "druid"
+    },
+    {
+      "kind": "ability",
+      "id": "hamstring_bite",
+      "family": "druid",
+      "batch": "missing-skills-v045-2026-10-22",
+      "runtimeUrl": "/ui/skills/druid/hamstring_bite.webp",
+      "canonicalDisplayName": "Takedown",
+      "acceptedSha256": "66e0b0bba0694f6f01fff2de1b79797cb1b8d55c707abe32fa5686b0ff750207",
+      "acceptedBytes": 6064,
+      "original": {
+        "path": "tmp/imagegen/v045-skills/originals/hamstring_bite.png",
+        "sha256": "89bdce914ed91b66ab6e4e02cdb1dd00fbbeb8e7270a0b85290381ae6c08d33d",
+        "bytes": 2485172,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-skills/masters/hamstring_bite.png",
+        "sha256": "0ee702f4022a594b08863a51086a89d28318da1b94cc22dabfe6aa579400d0f2",
+        "bytes": 657295,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one borderless square hand-painted fantasy MMORPG ability icon for World of ClaudeCraft, hamstring_bite. Subject and mechanic: A close-up golden-brown lynx with black ear tufts driving one forceful clawed forepaw down onto an enemy's dark leather armored shoulder, with a single bright amber impact burst and small stylized stun sparks above the impact. Emphasize a stunning takedown, not eating or a bite. No visible enemy face, no blood or gore; one readable paw-strike action. Palette: golden fur, warm amber impact and deep burgundy shadows. Rich painterly fantasy illustration, dramatic lighting, one dominant bold action silhouette filling 80 percent of frame, crisp focal edges, quieter peripheral atmosphere. Entire subject inside frame with safe margin, legible at 22 and 32 pixels, opaque full-square background. Fresh original composition. No text, letters, numerals, watermark, logo, UI border, frame, rarity chrome, flat vector glyph, collage or sprite sheet. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/cat_form.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b44b297c23f8680adea35187964c8d4836f585d5cb16e75a6e69160ca17bb504"
+          },
+          {
+            "path": "public/ui/skills/druid/pounce.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "2786e05605f52987caf23a717a65eb7425abf86ae7f63981407f5a3402ac4c53"
+          },
+          {
+            "path": "public/ui/courier/donkey.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "e64a307fb593151bdebe77fb5010b13631d356e4cf6ac6c06cee82862a3097ce"
+          },
+          {
+            "path": "public/ui/items/clockwork_shock_bomb.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original to 512x512 opaque sRGB PNG master with Sharp",
+        "Convert master via scripts/convert_skill_icons_webp.mjs at quality 82, smartSubsample, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed canonical mechanic and identity, text-free artwork and action silhouette.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/missing-skills-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon on desktop action bar and mobile circular buttons. Test-only known-ability seeding exposes all four icons; gameplay eligibility is not changed. Takedown is visibly disabled outside Cat Form.",
+        "gameCaptures": [
+          "docs/screenshots/missing-skills-v045/action-bar-desktop.png",
+          "docs/screenshots/missing-skills-v045/action-bar-mobile.png"
+        ]
+      },
+      "class": "druid"
+    },
+    {
+      "kind": "ability",
+      "id": "clockwork_shock_bomb",
+      "family": "warrior",
+      "batch": "missing-skills-v045-2026-10-22",
+      "runtimeUrl": "/ui/skills/warrior/clockwork_shock_bomb.webp",
+      "canonicalDisplayName": "Clockwork Shock Bomb",
+      "acceptedSha256": "b74720b0b202271d45141630aa4fec829a8378ffe0188c75b3e536785ecb9fb4",
+      "acceptedBytes": 6730,
+      "original": {
+        "path": "tmp/imagegen/v045-skills/originals/clockwork_shock_bomb.png",
+        "sha256": "b14df164e65516ba8a1b9c95735dcb5db0b23be39539ec6747ba489b0d9bcf6c",
+        "bytes": 2454555,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-skills/masters/clockwork_shock_bomb.png",
+        "sha256": "065f1fd5d4c31c17c3840b0a064faa99da140c329512f104394ec460b82b2d53",
+        "bytes": 637300,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one borderless square hand-painted fantasy MMORPG ability icon for World of ClaudeCraft, clockwork_shock_bomb. Subject and mechanic: A compact spherical bronze clockwork shock bomb hurtling diagonally, with a prominent brass cog on its front, steel bands, a small pull-ring on top, and two cyan electrical contacts sparking a bold jagged blue arc. A short electric trail makes the thrown action clear. One bomb, no hands, no explosion cloud hiding the mechanism. Palette: brass bronze and saturated cyan lightning against deep navy shadows. Rich painterly fantasy illustration, dramatic lighting, one dominant bold action silhouette filling 80 percent of frame, crisp focal edges, quieter peripheral atmosphere. Entire subject inside frame with safe margin, legible at 22 and 32 pixels, opaque full-square background. Fresh original composition. No text, letters, numerals, watermark, logo, UI border, frame, rarity chrome, flat vector glyph, collage or sprite sheet. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/skills/druid/cat_form.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b44b297c23f8680adea35187964c8d4836f585d5cb16e75a6e69160ca17bb504"
+          },
+          {
+            "path": "public/ui/skills/druid/pounce.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "2786e05605f52987caf23a717a65eb7425abf86ae7f63981407f5a3402ac4c53"
+          },
+          {
+            "path": "public/ui/courier/donkey.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "e64a307fb593151bdebe77fb5010b13631d356e4cf6ac6c06cee82862a3097ce"
+          },
+          {
+            "path": "public/ui/items/clockwork_shock_bomb.webp",
+            "role": "Visual identity/style review anchor, not an image-edit input",
+            "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original to 512x512 opaque sRGB PNG master with Sharp",
+        "Convert master via scripts/convert_skill_icons_webp.mjs at quality 82, smartSubsample, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed canonical mechanic and identity, text-free artwork and action silhouette.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/missing-skills-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon on desktop action bar and mobile circular buttons. Test-only known-ability seeding exposes all four icons; gameplay eligibility is not changed. Takedown is visibly disabled outside Cat Form.",
+        "gameCaptures": [
+          "docs/screenshots/missing-skills-v045/action-bar-desktop.png",
+          "docs/screenshots/missing-skills-v045/action-bar-mobile.png"
+        ]
+      },
+      "class": "warrior"
+    }
+  ]
+}

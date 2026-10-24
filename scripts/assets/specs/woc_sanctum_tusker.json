@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/sanctum_tusker_woc.glb",
+      "out": "models/creatures/woc_sanctum_tusker.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Charge",
+        "Hit",
+        "Attack",
+        "TuskSweep",
+        "TrampleWindup",
+        "Roar",
+        "Unhitch",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

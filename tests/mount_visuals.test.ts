@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
+import { rideLegDirections } from '../src/render/characters/ride_pose';
 import { CharacterVisual } from '../src/render/characters/visual';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import {
@@ -17,7 +18,9 @@ import {
   type MountVisualSpec,
   mountBobY,
   mountLampFlicker,
+  mountLampSummonFlare,
   mountSeatLift,
+  mountSummonFx,
   mountVisualSpec,
   stepRocketSledJumpPitch,
 } from '../src/render/mount_visuals';
@@ -37,7 +40,12 @@ describe('mount visual specs cover the sim catalog', () => {
       expect(def.lazyPreload, `${spec.visualKey} must be lazyPreload (never boot-swept)`).toBe(
         true,
       );
-      expect(def.url).toBe(`models/mounts/${key}.glb`);
+      const placeholder = {
+        referral_raptor: 'drakemaw_raptor',
+        referral_tank: 'terrorspark_groundshaker',
+      };
+      const model = placeholder[key as keyof typeof placeholder] ?? key;
+      expect(def.url).toBe(`models/mounts/${model}.glb`);
       // The mount never swings: the rider's one-shots carry mounted combat.
       expect(def.clips.attack).toEqual([]);
     }
@@ -64,12 +72,15 @@ describe('mount visual specs cover the sim catalog', () => {
     const expected = {
       lanternback_troll: ['chair', 'lantern_l', 'lantern_r'],
       chimeglass_tortoise: ['lens', 'saddle'],
+      // the destrier rides its saddle bone through the gallop instead of a fixed lift
+      lantern_hall_destrier: ['lantern_l', 'lantern_r', 'saddle'],
+      nightwing_chimera: ['saddle'],
     } as const;
     for (const [key, expectedBones] of Object.entries(expected)) {
       const spec =
         key === 'chimeglass_tortoise'
           ? MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise
-          : MOUNT_VISUAL_SPECS.lanternback_troll;
+          : MOUNT_VISUAL_SPECS[key as keyof typeof MOUNT_VISUAL_SPECS];
       const requested = new Set([
         ...(spec.seatBone ? [spec.seatBone.bone] : []),
         ...spec.lamps.map((lamp) => lamp.bone),
@@ -85,6 +96,40 @@ describe('mount visual specs cover the sim catalog', () => {
       const shipped = new Set((json.nodes ?? []).map((node) => node.name).filter(Boolean));
       for (const bone of requested) expect(shipped.has(bone), `${key} missing ${bone}`).toBe(true);
     }
+  });
+
+  it('the destrier names its ember bones by the RUNTIME node name, all present in its GLB', () => {
+    // GLTFLoader strips '.' from node names (PropertyBinding.sanitizeNodeName), so the spec
+    // names `toes_01l_011` for the GLB's `toes_01.l_011`; a raw name would find no bone at
+    // runtime and the hoof would shed nothing, silently.
+    const spec = MOUNT_VISUAL_SPECS.lantern_hall_destrier;
+    expect(spec.fx).toBe('embers');
+    expect(spec.summonFx).toBe('lanternBurst');
+    const embers = spec.embers;
+    if (!embers) throw new Error('the destrier sheds embers');
+    expect(embers.hooves).toHaveLength(4);
+    const bytes = readFileSync(path.join(__dirname, '..', 'public', VISUALS[spec.visualKey].url));
+    const jsonLength = bytes.readUInt32LE(12);
+    const json = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString('utf8')) as {
+      nodes?: { name?: string }[];
+    };
+    const runtime = new Set(
+      (json.nodes ?? []).map((node) => (node.name ?? '').replace(/[.:/[\]]/g, '')),
+    );
+    for (const bone of [...embers.hooves, ...embers.lanterns.map((l) => l.bone)])
+      expect(runtime.has(bone), `destrier missing ${bone}`).toBe(true);
+    // the lanterns shed from the same glass the lamps burn in
+    expect(embers.lanterns).toEqual(spec.lamps.map((l) => ({ bone: l.bone, offset: l.offset })));
+    // every other mount keeps the shared shimmer and no embers
+    for (const key of MOUNT_KEYS) {
+      if (key === 'lantern_hall_destrier') continue;
+      expect(MOUNT_VISUAL_SPECS[key].embers, key).toBeNull();
+      expect(MOUNT_VISUAL_SPECS[key].summonFx, key).toBe('shimmer');
+    }
+    expect(mountSummonFx('lantern_hall_destrier')).toBe('lanternBurst');
+    expect(mountSummonFx('valorsteed')).toBe('shimmer');
+    expect(mountSummonFx('')).toBe('shimmer');
+    expect(mountSummonFx('mech_bird')).toBe('shimmer');
   });
 
   it('preserves authored vertex colors when Low converts mount materials to Lambert', () => {
@@ -115,11 +160,14 @@ describe('mount visual specs cover the sim catalog', () => {
       bobIdle: false,
       bobShape: 'hop',
       fx: null,
+      embers: null,
+      summonFx: 'shimmer',
       lamps: [],
       seatBone: null,
       glows: [],
       ride: null,
       jumpTips: false,
+      rear: false,
     });
     expect(VISUALS.mount_mech_bird).toMatchObject({
       url: 'models/mounts/mech_bird.glb',
@@ -165,6 +213,10 @@ function ridePoseHarness(): {
   const model = new THREE.Group();
   const bones = new Map<string, THREE.Object3D>();
   for (const name of [
+    'upperarml',
+    'upperarmr',
+    'lowerarml',
+    'lowerarmr',
     'upperlegl',
     'upperlegr',
     'lowerlegl',
@@ -185,6 +237,8 @@ function ridePoseHarness(): {
     rideBlend: 0,
     climbOn: false,
     climbBlend: 0,
+    climbArmBones: undefined,
+    climbForearmBones: undefined,
     climbLegBones: undefined,
     climbShinBones: undefined,
     rideFootBones: undefined,
@@ -218,30 +272,24 @@ describe('Chimeglass rider straddle', () => {
     visual.setRidePose(ride);
     visual.applyRidePose(0.125);
 
-    expectQuaternion(
-      boneNamed(bones, 'upperlegl').quaternion,
-      [0.8683345493323961, 0.30716195257435025, 0.12986599060280818, 0.3671259590537949],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'upperlegr').quaternion,
-      [0.8683345493323961, -0.30716195257435025, -0.12986599060280818, 0.3671259590537949],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'lowerlegl').quaternion,
-      [0.29552020666133955, 0, 0, 0.955336489125606],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'lowerlegr').quaternion,
-      [0.29552020666133955, 0, 0, 0.955336489125606],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'footl').quaternion,
-      [-0.22310636213174545, 0, 0, 0.9747941070689433],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'footr').quaternion,
-      [-0.22310636213174545, 0, 0, 0.9747941070689433],
-    );
+    // every bone is AIMED (characters/ride_pose.ts): the harness bones hang straight off the
+    // model, so each leg bone's +Y must land on the direction the spec asks of it
+    for (const [name, side] of [
+      ['l', 1],
+      ['r', -1],
+    ] as const) {
+      const thigh = new THREE.Vector3();
+      const shin = new THREE.Vector3();
+      const foot = new THREE.Vector3();
+      rideLegDirections(ride, side, thigh, shin, foot);
+      const t = boneNamed(bones, `upperleg${name}`).quaternion;
+      const s = boneNamed(bones, `lowerleg${name}`).quaternion;
+      const f = boneNamed(bones, `foot${name}`).quaternion;
+      const axis = (q: THREE.Quaternion) => new THREE.Vector3(0, 1, 0).applyQuaternion(q);
+      expect(axis(t).distanceTo(thigh)).toBeLessThan(1e-9);
+      expect(axis(t.clone().multiply(s)).distanceTo(shin)).toBeLessThan(1e-9);
+      expect(axis(t.clone().multiply(s).multiply(f)).distanceTo(foot)).toBeLessThan(1e-9);
+    }
     expect(boneNamed(bones, 'hips').rotation.x).toBeCloseTo(-0.18, 12);
   });
 
@@ -324,11 +372,12 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the goblin rocket sled, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the goblin rocket sled, the Lantern Hall Destrier, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
       'models/mounts/goblin_rocket_sled.glb',
+      'models/mounts/lantern_hall_destrier.glb',
       'models/mounts/rickshaw_mount.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
@@ -525,7 +574,7 @@ describe('procedural bob math', () => {
     expect(spec.seat).toBeLessThan(2.6);
   });
 
-  it('only the Lanternback and the Chimeglass carry lamps, on their own terms', () => {
+  it('only the Lanternback, the Chimeglass and the Lantern Hall Destrier carry lamps, on their own terms', () => {
     // Catalog mounts and mount SKINS alike: a skin is drawn by the same lamp
     // path, so a new skin shipping stray lamps fails here too.
     const specs: [string, MountVisualSpec][] = [
@@ -547,6 +596,19 @@ describe('procedural bob math', () => {
         for (const lamp of lamps) {
           expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
           expect(lamp.intensity ?? MOUNT_LAMP_INTENSITY).toBe(MOUNT_LAMP_INTENSITY);
+        }
+      } else if (key === 'lantern_hall_destrier') {
+        // Two storm lanterns on their own swinging bones, the glass 0.195 model units down
+        // each (measured by build_steed.py report_spec_offsets). The troll's warm flame,
+        // burning HOTTER (they are the horse's identity at night and hang low, at a rider's
+        // hip, so they must pool real light on the road) but reaching a little less far.
+        expect(lamps.map((l) => l.bone)).toEqual(['lantern_l', 'lantern_r']);
+        for (const lamp of lamps) {
+          expect(lamp.offset).toEqual([0, 0.195, 0]);
+          expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
+          expect(lamp.intensity).toBeGreaterThan(MOUNT_LAMP_INTENSITY);
+          expect(lamp.distance).toBeLessThan(MOUNT_LAMP_DISTANCE);
+          expect(lamp.flicker ?? 'flame').toBe('flame');
         }
       } else if (key === 'chimeglass_tortoise') {
         // ONE light for the pair of lenses, hung off the single spectacle bone
@@ -600,11 +662,98 @@ describe('procedural bob math', () => {
     expect(maxSplit).toBeGreaterThan(0.15);
   });
 
+  it('flares the lamps on a summon and settles them back to their plain flame', () => {
+    // the burst the destrier arrives in is light: its lanterns open past three times their level
+    expect(mountLampSummonFlare(0)).toBeCloseTo(3.4, 6);
+    // and fall away monotonically over about a second and a half
+    let prev = mountLampSummonFlare(0);
+    for (let t = 0.05; t < 2.5; t += 0.05) {
+      const v = mountLampSummonFlare(t);
+      expect(v).toBeLessThan(prev);
+      expect(v).toBeGreaterThan(1);
+      prev = v;
+    }
+    expect(mountLampSummonFlare(1.5)).toBeLessThan(1.1);
+    // a lamp never summoned (a rider already mounted when he came into view) burns plain
+    expect(mountLampSummonFlare(Number.POSITIVE_INFINITY)).toBe(1);
+    expect(mountLampSummonFlare(2.5)).toBe(1);
+    expect(mountLampSummonFlare(Number.NaN)).toBe(1);
+    expect(mountLampSummonFlare(-1)).toBe(1);
+  });
+
   it('pins the ambient particle effects: snail slime, hover-cycle exhaust', () => {
     expect(MOUNT_VISUAL_SPECS.stalkglider_snail.fx).toBe('slime');
     expect(MOUNT_VISUAL_SPECS.aether_hover_cycle.fx).toBe('exhaust');
     expect(MOUNT_VISUAL_SPECS.valorsteed.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.terrorspark_groundshaker.fx).toBeNull();
+    expect(MOUNT_VISUAL_SPECS.lantern_hall_destrier.fx).toBe('embers');
+    expect(MOUNT_VISUAL_SPECS.wobbles_slime.fx).toBeNull();
+  });
+
+  it('seats the Wobbles rider on the saddle bone at the offset measured in Blender', () => {
+    // The jelly squashes and leans under the rider in every clip, so the seat
+    // rides the `saddle` bone; a typo here floats or sinks the rider.
+    const spec = MOUNT_VISUAL_SPECS.wobbles_slime;
+    expect(spec.seat).toBe(3.35);
+    expect(spec.seatBone).toEqual({ bone: 'saddle', offset: [0, 0.22, 0] });
+  });
+
+  it('pins the Nightwing Chimaera saddle socket, straddle pose, and flight/perch clips', () => {
+    const spec = MOUNT_VISUAL_SPECS.nightwing_chimera;
+    const def = VISUALS.mount_nightwing_chimera;
+    expect(spec).toMatchObject({
+      visualKey: 'mount_nightwing_chimera',
+      seat: 3.61,
+      seatFwd: 0.4,
+      rigged: true,
+      bobAmp: 0,
+      fx: null,
+      seatBone: { bone: 'saddle', offset: [0, -0.022, 0.068] },
+      ride: {
+        spread: 3.11,
+        thigh: 2.062,
+        knee: -1.02,
+        ankle: 0.85,
+        hips: -0.04,
+        upperArm: [0.3201, 0.1239, -0.6185, 0.7069],
+        lowerArm: [0.3042, 0.4618, 0.0173, 0.833],
+      },
+    });
+    expect(def).toMatchObject({
+      url: 'models/mounts/nightwing_chimera.glb',
+      authoredAtlas: true,
+      height: 5.78,
+      walkRef: 5.6,
+      runRef: 12.6,
+      lazyPreload: true,
+      clips: {
+        idle: 'Idle',
+        idleVariants: ['Idle_Look'],
+        walk: 'Walk',
+        run: 'Run',
+        walkBack: 'WalkBackward',
+        jump: 'Jump',
+        attack: [],
+        death: 'Death',
+      },
+    });
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+
+    const { visual, bones } = ridePoseHarness();
+    visual.setRidePose(spec.ride);
+    visual.applyRidePose(0.125);
+    const ual = boneNamed(bones, 'upperarml').quaternion;
+    const uar = boneNamed(bones, 'upperarmr').quaternion;
+    expect(ual.x).toBeCloseTo(uar.x, 12);
+    expect(ual.y).toBeCloseTo(-uar.y, 12);
+    expect(ual.z).toBeCloseTo(-uar.z, 12);
+    expect(ual.w).toBeCloseTo(uar.w, 12);
+    const lal = boneNamed(bones, 'lowerarml').quaternion;
+    const lar = boneNamed(bones, 'lowerarmr').quaternion;
+    expect(lal.x).toBeCloseTo(lar.x, 12);
+    expect(lal.y).toBeCloseTo(-lar.y, 12);
+    expect(lal.z).toBeCloseTo(-lar.z, 12);
+    expect(lal.w).toBeCloseTo(lar.w, 12);
   });
 });

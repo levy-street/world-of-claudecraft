@@ -8,9 +8,12 @@ describe('owned-class level 20 balance harness (Groveheart)', () => {
   it('counts Groveheart heal-over-time ticks in the effective-healing profile', () => {
     const groveheart = runOwnedHealerProbe('groveheart', 3, 29_913);
 
-    expect(groveheart.healingBySource.Wildbloom).toBeGreaterThan(0);
+    expect(groveheart.healingBySource.Sporemending).toBeGreaterThan(0);
     expect(groveheart.hps).toBeGreaterThan(0);
-  });
+    // One 60 s probe runs about 13 s alone (17 s under vitest), too close to
+    // the 20 s default under a loaded full run: the long-sims budget, like
+    // its sibling below.
+  }, 120_000);
 
   it('holds the Groveheart interim healer contract on both profiles', () => {
     // Single target: inside the peer envelope at the shared seed.

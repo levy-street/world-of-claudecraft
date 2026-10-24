@@ -563,7 +563,7 @@ export class MobileControls {
     const musicBtn = document.getElementById('mobile-music');
     this.bindButton('mobile-music', () => {
       const on = this.callbacks.onMusic();
-      // mirror the desktop #mm-music control: a diagonal slash (.mm-muted) signals
+      // A diagonal slash (.mm-muted) signals
       // "off", rather than dimming the note
       musicBtn?.classList.toggle('mm-muted', !on);
     });

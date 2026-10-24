@@ -18,9 +18,10 @@
 // sites. Pure: no Three, no DOM, no i18n, no clock, no rng.
 
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
+import { isEntombed } from '../sim/encounters/hollow_crypt/ids';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import type { Entity, QuestProgress, WorldQuestProgress } from '../sim/types';
-import { vaultPortalVisible } from '../sim/vault_visibility';
+import { vaultPortalVisible } from '../sim/vault_portal_visibility';
 import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import {
   isWorldQuestSalvageObject,
@@ -40,6 +41,7 @@ export type QuestObjectGate = (entity: Entity, questLog: Map<string, QuestProgre
 export interface WorldQuestObjectReader {
   playerId?: number;
   partyInfo?: { members: readonly { pid: number }[] } | null;
+  characterId?: number;
   worldQuestCycle: string;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
 }
@@ -48,13 +50,21 @@ export function makeQuestObjectGate(
   options: QuestObjectGateOptions,
   worldQuests?: WorldQuestObjectReader,
 ): QuestObjectGate {
-  if (options.showAllQuestObjects === true) return () => false;
+  // An encounter-concealed mob (the Hollow Crypt's Morthen entombed under his
+  // ring, the Knellwyrm before it flies in) is withheld from every viewer:
+  // no body, no plate, nothing to click, until the encounter reveals it.
+  if (options.showAllQuestObjects === true) return (entity) => isEntombed(entity);
   const salvageQuest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
   if (worldQuests) {
     return (entity, questLog) => {
+      if (isEntombed(entity)) return true;
       if (
-        worldQuests.playerId !== undefined &&
-        !vaultPortalVisible(entity, worldQuests.playerId, worldQuests.partyInfo?.members ?? null)
+        !vaultPortalVisible(
+          entity,
+          worldQuests.playerId,
+          worldQuests.partyInfo,
+          worldQuests.characterId,
+        )
       )
         return true;
       if (investigationDisguiseHidden(entity, worldQuests)) return true;
@@ -70,5 +80,6 @@ export function makeQuestObjectGate(
       return isQuestGatedGroundObjectHidden(entity, questLog);
     };
   }
-  return isQuestGatedGroundObjectHidden;
+  return (entity, questLog) =>
+    isEntombed(entity) || isQuestGatedGroundObjectHidden(entity, questLog);
 }

@@ -18,12 +18,12 @@ import {
   type MoveInput,
   type WorldContent,
 } from '../src/sim/types';
+import { terrainWallStandoff } from '../src/sim/wall_standoff';
 import {
   groundHeight,
   terrainHeight,
   terrainSteepness,
   terrainSteepnessAt,
-  terrainWallStandoff,
   WATER_LEVEL,
 } from '../src/sim/world';
 import { wallFootFixture } from './helpers/wall_foot';

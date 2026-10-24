@@ -1,19 +1,20 @@
 // @vitest-environment happy-dom
 // The CharacterVisual wiring of the shapeshift form adornments: the renderer
-// already forwards the Moonwing (`setMoonkin`) and Gloamveil (`setShadowform`)
-// edges every frame, and the visual turns them into rig-parented pieces
-// (form_adornments.ts). Pins, on the REAL CharacterVisual over a mocked
-// loader (the character_halo.test.ts rig):
-//  - each edge mounts and unmounts its set, and dispose() takes it down;
+// already forwards the Moonwing (`setMoonkin`) edge every frame, and the visual
+// turns it into rig-parented pieces (form_adornments.ts). Pins, on the REAL
+// CharacterVisual over a mocked loader (the character_halo.test.ts rig):
+//  - the edge mounts and unmounts the set, and dispose() takes it down;
 //  - antlers only on a composed body (a fixed druid rig wears its own hood);
 //  - the pieces stay out of the body's overlay cycle: a ghost, stealth or Soul
 //    Rend swap, a weapon swap (rebuildCasters re-traverses the model) or the
 //    tint itself never mounts an effect clone on them, and they never cast
 //    shadows; under a ghost or stealth body they hide instead;
-//  - the veil stays off a Combat Mech body;
+//  - Gloamveil (`setShadowform`) mounts NO piece on a rig: its look rides the
+//    rig's own materials (tests/character_gloam_form.test.ts);
 //  - the first mount rides the visual's injected compile gate.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { failWocHeads, landWocBodies } from './helpers/woc_streamed';
 
 type Visual = import('../src/render/characters/visual').CharacterVisual;
 let CharacterVisual: typeof import('../src/render/characters/visual').CharacterVisual;
@@ -40,8 +41,13 @@ beforeAll(async () => {
     loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
     releaseGltf: vi.fn(),
   }));
-  const { charactersReady } = await import('../src/render/characters/assets');
-  await charactersReady();
+  const assets = await import('../src/render/characters/assets');
+  await assets.charactersReady();
+  // The druid is a WOC body: its base and clip library stream on demand, never in the boot
+  // preload, so land them through the stub loader; and the stub rig can hang no head, so end
+  // the head wait a WOC body otherwise holds its draw for.
+  failWocHeads(await import('../src/render/characters/woc_head_packs'));
+  await landWocBodies(assets, ['player_druid']);
   ({ CharacterVisual } = await import('../src/render/characters/visual'));
 });
 
@@ -54,7 +60,7 @@ function adornments(visual: Visual): THREE.Mesh[] {
   const out: THREE.Mesh[] = [];
   visual.root.traverse((object) => {
     const mesh = object as THREE.Mesh;
-    if (mesh.isMesh && /^(moonwing|gloamveil)_/.test(mesh.name)) out.push(mesh);
+    if (mesh.isMesh && /^moonwing_/.test(mesh.name)) out.push(mesh);
   });
   return out;
 }
@@ -102,28 +108,32 @@ describe('CharacterVisual form adornments', () => {
     visual.dispose();
   });
 
-  it('mounts the Gloamveil veil on the Shadowform edge and drops it on dispose', () => {
+  it('mounts no piece on a rig for Gloamveil: the form parents nothing to a bone', () => {
     const visual = new CharacterVisual('player_priest', 0xffffff, 0);
+    const meshes = (): string[] => {
+      const out: string[] = [];
+      visual.root.traverse((object) => {
+        if ((object as THREE.Mesh).isMesh) out.push(object.name);
+      });
+      return out.sort();
+    };
+    const head = visual.root.getObjectByName('head') as THREE.Object3D;
+    const before = meshes();
+    const onHead = [...head.children];
     visual.setShadowform(true);
-    expect(pieceNames(visual)).toEqual([
-      'gloamveil_eye_left',
-      'gloamveil_eye_right',
-      'gloamveil_shell',
-    ]);
+    // The whole mesh list, not a name filter: the retired face veil would show
+    // up here under any name, and so would a piece hung on any bone.
+    expect(meshes()).toEqual(before);
+    expect(head.children).toEqual(onHead);
     visual.dispose();
-    expect(pieceNames(visual)).toEqual([]);
   });
 
   it('keeps the pieces on their kit materials through every overlay and weapon swap', async () => {
     const { moonwingMaterials } = await import('../src/render/characters/moonwing_adornment');
-    const { gloamveilMaterials } = await import('../src/render/characters/gloamveil_veil');
-    const kit = new Set<THREE.Material>([...moonwingMaterials(), ...gloamveilMaterials()]);
-    for (const [key, shift] of [
-      ['player_druid', (v: Visual) => v.setMoonkin(true)],
-      ['player_priest', (v: Visual) => v.setShadowform(true)],
-    ] as const) {
-      const visual = new CharacterVisual(key, 0xffffff, 0);
-      shift(visual);
+    const kit = new Set<THREE.Material>(moonwingMaterials());
+    {
+      const visual = new CharacterVisual('player_druid', 0xffffff, 0);
+      visual.setMoonkin(true);
       const body = visual.root.getObjectByName('body') as THREE.Mesh;
       const bodyOriginal = body.material;
       // Pinned to the KIT instances, not a snapshot taken after the tint ran:
@@ -152,7 +162,7 @@ describe('CharacterVisual form adornments', () => {
       visual.setShadow(true);
       visual.setWeapon('bogoak_staff');
       onKit();
-      visual.setGhost(true, 'stealth');
+      visual.setGhost(true, 'stealth-rogue');
       onKit();
       visual.dispose();
     }
@@ -165,7 +175,7 @@ describe('CharacterVisual form adornments', () => {
       (name) => visual.root.getObjectByName(name) as THREE.Object3D,
     );
     expect(roots.every((root) => root.visible)).toBe(true);
-    for (const style of ['stealth', 'spirit'] as const) {
+    for (const style of ['stealth-rogue', 'stealth-other', 'spirit'] as const) {
       visual.setGhost(true, style);
       expect(roots.some((root) => root.visible)).toBe(false);
       visual.setGhost(false);
@@ -174,21 +184,11 @@ describe('CharacterVisual form adornments', () => {
     visual.dispose();
   });
 
-  it('leaves the veil off a Combat Mech body', async () => {
-    // The mech is fetched on demand, never at boot; ride its real preload.
-    const { preloadMechAssets } = await import('../src/render/characters/assets');
-    await preloadMechAssets();
-    const visual = new CharacterVisual('player_mech', 0xffffff, 0);
-    visual.setShadowform(true);
-    expect(pieceNames(visual)).toEqual([]);
-    visual.dispose();
-  });
-
   it('holds the first mount behind the injected compile gate', () => {
     const visual = new CharacterVisual('player_druid', 0xffffff, 0);
     const settles: (() => void)[] = [];
-    // The Moonwing tint stages its transparent clones through the same gate;
-    // count only what the adornments hand it.
+    // A Moonwing veil tuple the boot family has not linked stages through the
+    // same gate; count only what the adornments hand it.
     visual.setFarBakeGate((target, settle) => {
       if (target.name.startsWith('moonwing_')) settles.push(() => settle());
     });

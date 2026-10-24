@@ -272,18 +272,35 @@ async function callServiceDetailed<T>(req: ServiceRequest): Promise<ServiceCallO
   }
 }
 
-async function callService<T>(req: ServiceRequest): Promise<T | null> {
+export async function callService<T>(req: ServiceRequest): Promise<T | null> {
   return (await callServiceDetailed<T>(req)).data;
 }
 
-export async function claudiumStripeWebhook(
+export function claudiumStripeWebhook(
+  rawBody: Buffer,
+  signatureHeader: string,
+): Promise<ClaudiumStripeWebhookResult> {
+  return forwardStripeWebhook('stripe/webhook', rawBody, signatureHeader);
+}
+
+/** The membership billing webhook: the service verifies it against its own signing
+ *  secret, separate from the Claudium one. */
+export function membershipStripeWebhook(
+  rawBody: Buffer,
+  signatureHeader: string,
+): Promise<ClaudiumStripeWebhookResult> {
+  return forwardStripeWebhook('membership/stripe/webhook', rawBody, signatureHeader);
+}
+
+async function forwardStripeWebhook(
+  path: string,
   rawBody: Buffer,
   signatureHeader: string,
 ): Promise<ClaudiumStripeWebhookResult> {
   const base = serviceUrl();
   if (base === '') return { received: false };
   try {
-    const url = new URL('stripe/webhook', base.endsWith('/') ? base : `${base}/`);
+    const url = new URL(path, base.endsWith('/') ? base : `${base}/`);
     const body = new Uint8Array(rawBody);
     const res = await fetch(url, {
       method: 'POST',
@@ -294,7 +311,7 @@ export async function claudiumStripeWebhook(
       body,
       signal: AbortSignal.timeout(SERVICE_TIMEOUT_MS),
     });
-    if (!res.ok && res.status !== 400) throw new Error(`POST stripe/webhook -> ${res.status}`);
+    if (!res.ok && res.status !== 400) throw new Error(`POST ${path} -> ${res.status}`);
     const data = (await res.json()) as { received?: unknown };
     return { received: data.received === true };
   } catch (err) {

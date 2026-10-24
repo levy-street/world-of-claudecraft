@@ -392,6 +392,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // ladder twin: registry-only, so every arm is asserted here. price/:rail is a
     // public enum param (publicRead), not an account-owned resource.
     { method: 'POST', path: '/api/claudium/stripe/webhook' },
+    { method: 'POST', path: '/api/claudium/membership/stripe/webhook' },
     { method: 'GET', path: '/api/claudium/balance' },
     { method: 'GET', path: '/api/claudium/price/:rail' },
     { method: 'GET', path: '/api/claudium/skus' },
@@ -400,6 +401,13 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/claudium/native/balance/sol/:owner' },
     { method: 'GET', path: '/api/claudium/native/balance/usdc/:owner' },
     { method: 'GET', path: '/api/claudium/store' },
+    { method: 'GET', path: '/api/claudium/membership-token' },
+    { method: 'POST', path: '/api/claudium/membership-token/checkout' },
+    { method: 'POST', path: '/api/claudium/membership-token/claim' },
+    { method: 'GET', path: '/api/claudium/subscription' },
+    { method: 'POST', path: '/api/claudium/subscription/checkout' },
+    { method: 'POST', path: '/api/claudium/subscription/portal' },
+    { method: 'POST', path: '/api/claudium/subscription/annual/claim' },
     { method: 'GET', path: '/api/claudium/history' },
     // The $WOC Exchange family (server/woc_market_routes.ts): registry-only
     // like the Claudium family, config-gated dark until WOC_MARKET_ENABLED=1.

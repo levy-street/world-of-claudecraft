@@ -12,9 +12,11 @@
 
 import { AURA_CUE_NONE } from '../../../game/aura_cue_catalog';
 import { isDebuffDisplayAura } from '../../../sim/aura_classify';
+import { DUNGEON_X_THRESHOLD } from '../../../sim/data';
 import type { ResolvedAbility } from '../../../sim/sim';
 import type { AuraKind, PlayerClass } from '../../../sim/types';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from '../../aura_icon_runtime';
+import type { AuraInput } from '../../auras_view';
 import { formatNumber } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { actionBarIconBg } from '../action_bar/action_bar_icon_bg';
@@ -37,6 +39,7 @@ import {
   type CooldownSpellConfig,
   type CooldownSpellPatch,
   cooldownCell,
+  cooldownGroupActive,
   cooldownGroupShown,
   moveCooldownSpell,
   newCooldownGroup,
@@ -54,7 +57,15 @@ import {
 /** The world slice the manager reads: a structural subset of IWorld. */
 export interface CooldownManagerWorld {
   readonly cfg: { readonly playerClass: PlayerClass };
-  readonly player: { readonly name: string; readonly inCombat: boolean };
+  readonly player: {
+    readonly name: string;
+    readonly inCombat: boolean;
+    readonly auras?: readonly AuraInput[];
+    /** Past DUNGEON_X_THRESHOLD is the instance plane (dungeons, raids, delves,
+     *  rifts, battlegrounds, the arena): the same test the HUD's zone label and
+     *  music use. */
+    readonly pos: { readonly x: number };
+  };
   readonly known: readonly ResolvedAbility[];
   /** The entity roster (IWorld.entities). The manager takes its OWN iterator
    *  from it each frame; see paint(). */
@@ -74,6 +85,10 @@ export interface CooldownManagerControllerDeps {
   hotbarGlowAvailable?: () => boolean;
   /** The Auras panel's hotbar glow set, unioned with this manager's. */
   auraGlowIds?: () => ReadonlySet<string>;
+  /** Shared HUD tooltip, resolved from the tracked identity at hover time. */
+  attachTooltip?(element: HTMLElement, html: () => string): void;
+  tooltipHtml?(trackedId: string, auraEntry?: CooldownAuraEntry): string;
+  hideTooltip?(): void;
 }
 
 const NO_GLOW: ReadonlySet<string> = new Set();
@@ -97,6 +112,9 @@ export const COOLDOWN_WORLD_FIELDS = [
   // The worn trinket (PR 4173's trinket slot): its action-bar state is per
   // frame like the aim slot, so the manager's own view mirrors it too.
   'wornTrinketId',
+  // The commanded pet (pet-command slots): inert in the manager's own view,
+  // whose descriptors hold no pet slot, but mirrored so no field is frozen.
+  'pet',
 ] as const satisfies readonly Exclude<keyof ActionBarWorldInput, 'entities'>[];
 
 function copyWorldField<K extends keyof ActionBarWorldInput>(
@@ -123,7 +141,10 @@ const APPEARANCE_KEYS: ReadonlySet<string> = new Set([
   'scale',
   'padding',
   'opacity',
-  'visibility',
+  'showOutOfCombat',
+  'showInCombat',
+  'showInWorld',
+  'showInInstances',
   'showTimer',
 ]);
 const POSITION_STEP = 0.005;
@@ -139,8 +160,20 @@ export class CooldownManagerController {
   private layout: CooldownManagerLayout;
   private groupEls: HTMLElement[] = [];
   private readonly groupShown: boolean[] = [];
+  /** Per tracked entry (the view's order): the index of the group holding it. */
+  private entryGroup: number[] = [];
+  /** Per tracked entry: its group is off where the player stands. Reused. */
+  private readonly entryMuted: boolean[] = [];
+  /** The view's per-frame options, mutated in place so a frame allocates none. */
+  private readonly tickOpts: { soundsAllowed: boolean; preview: boolean; muted: boolean[] } = {
+    soundsAllowed: false,
+    preview: false,
+    muted: this.entryMuted,
+  };
   private buttons: CooldownButtonElements[] = [];
   private placement = false;
+  private hoveredIndex = -1;
+  private hoveredGroup = -1;
   // Helpful auras seen on the player (persisted), offered in the picker so
   // anything the static aura catalog misses (a trinket, a new passive) is still
   // trackable. The id set makes the per-frame check a lookup, no allocation.
@@ -188,17 +221,25 @@ export class CooldownManagerController {
   /** Per frame: derive, paint, sound, and refresh the hotbar glow set. */
   paint(world: ActionBarWorldInput): void {
     const { enabled, soundInCombatOnly } = this.layout;
-    const inCombat = this.deps.world.player.inCombat;
+    const { inCombat, pos } = this.deps.world.player;
+    const inInstance = pos.x > DUNGEON_X_THRESHOLD;
     const soundsAllowed = enabled && (!soundInCombatOnly || inCombat);
     const own = this.world ?? { ...world };
     this.world = own;
     for (const key of COOLDOWN_WORLD_FIELDS) copyWorldField(own, world, key);
     own.entities = this.deps.world.entities.values();
-    const state = this.view.tick(own, { soundsAllowed, preview: this.placement });
-    this.recordSeen(world.player.auras);
     for (let g = 0; g < this.groups.length; g++) {
-      this.groupShown[g] = cooldownGroupShown(this.groups[g].visibility, inCombat, this.placement);
+      const group = this.groups[g];
+      this.groupShown[g] = cooldownGroupShown(group, inCombat, inInstance, this.placement);
     }
+    for (let i = 0; i < this.entryGroup.length; i++) {
+      const group = this.groups[this.entryGroup[i]];
+      this.entryMuted[i] = group !== undefined && !cooldownGroupActive(group, inInstance);
+    }
+    this.tickOpts.soundsAllowed = soundsAllowed;
+    this.tickOpts.preview = this.placement;
+    const state = this.view.tick(own, this.tickOpts);
+    this.recordSeen(world.player.auras);
     this.painter.paint(
       this.layer,
       enabled || this.placement,
@@ -207,6 +248,13 @@ export class CooldownManagerController {
       this.buttons,
       state,
     );
+    if (
+      this.hoveredIndex >= 0 &&
+      (!(enabled || this.placement) ||
+        !this.groupShown[this.hoveredGroup] ||
+        !state.buttons[this.hoveredIndex]?.visible)
+    )
+      this.clearHover();
     this.glowIds.clear();
     this.glowOut = null;
     if (enabled) {
@@ -379,6 +427,7 @@ export class CooldownManagerController {
 
   /** Cold path: re-mint every group and button and re-arm the view. */
   private rebuild(): void {
+    this.clearHover();
     const doc = this.layer.ownerDocument;
     this.groupEls = [];
     this.buttons = [];
@@ -388,8 +437,23 @@ export class CooldownManagerController {
       root.className = `cdm-group cdm-group--${group.kind}`;
       root.dataset.group = group.id;
       this.applyGroup(root, group);
-      group.spells.forEach((_, index) => {
+      group.spells.forEach((id, index) => {
         const button = this.buildButton(doc);
+        const buttonIndex = this.buttons.length;
+        const groupIndex = this.groupEls.length;
+        button.btn.addEventListener('mouseenter', () => {
+          this.hoveredIndex = buttonIndex;
+          this.hoveredGroup = groupIndex;
+        });
+        button.btn.addEventListener('mouseleave', () => this.clearHover());
+        this.deps.attachTooltip?.(
+          button.btn,
+          () =>
+            this.deps.tooltipHtml?.(
+              id,
+              this.auraCatalog().find((entry) => entry.token === id),
+            ) ?? '',
+        );
         const cell = cooldownCell(group, index, group.spells.length);
         button.btn.style.gridColumn = String(cell.column);
         button.btn.style.gridRow = String(cell.row);
@@ -409,8 +473,10 @@ export class CooldownManagerController {
   private rearm(): void {
     const spells: CooldownManagerTrackedSpell[] = [];
     const catalog = this.auraCatalog();
-    for (const group of this.groups) {
-      for (const id of group.spells) {
+    this.entryGroup = [];
+    for (let g = 0; g < this.groups.length; g++) {
+      for (const id of this.groups[g].spells) {
+        this.entryGroup.push(g);
         const config = this.store.getSpell(id);
         const cue = config.soundId === AURA_CUE_NONE ? null : config.soundId;
         const rule = parseCooldownAuraToken(id);
@@ -430,6 +496,8 @@ export class CooldownManagerController {
         });
       }
     }
+    this.entryMuted.length = this.entryGroup.length;
+    this.entryMuted.fill(false);
     this.view.setTracked(spells);
   }
 
@@ -455,6 +523,12 @@ export class CooldownManagerController {
     count.className = 'ui-socket-count';
     btn.append(art, cd, cdText, count);
     return { btn, art, cd, cdText, count };
+  }
+
+  private clearHover(): void {
+    if (this.hoveredIndex >= 0) this.deps.hideTooltip?.();
+    this.hoveredIndex = -1;
+    this.hoveredGroup = -1;
   }
 
   private startDrag(event: PointerEvent, id: string, root: HTMLElement): void {

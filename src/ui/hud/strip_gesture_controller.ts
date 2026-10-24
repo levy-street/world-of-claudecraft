@@ -83,8 +83,8 @@ const ARIA_EXPANDED_ATTR = 'aria-expanded';
 const TABINDEX_ATTR = 'tabindex';
 
 /** The measured row metrics a direction rule is resolved against. Every distance
- *  here is in the overlay's padding-box frame (see measure()), which is the frame
- *  the painter's coordinates are resolved in. */
+ *  here is in the safe-area box the row is clamped into (see measure()), whose
+ *  origin sits the left inset in from the frame the painter writes in. */
 export interface StripMetrics {
   /** Centre of the anchoring control. */
   anchorX: number;
@@ -141,7 +141,9 @@ export interface StripGestureDeps {
   count(): number;
   /** Travel between adjacent items as the finger sees it. */
   pitch: number;
-  /** Which way the row grows, resolved against the measured metrics. */
+  /** Which way the row grows, resolved against the measured metrics. Those are
+   *  in the safe-area clamp frame (anchorX less the left inset), not the
+   *  viewport frame the open state reports, so compare them only to each other. */
   direction(metrics: StripMetrics): StripDirection;
   /** What a release means. */
   release(input: StripReleaseInput): StripGestureOutcome;
@@ -169,7 +171,11 @@ export interface StripGestureLayout {
   direction: StripDirection;
   anchorX: number;
   anchorY: number;
+  /** Width of the safe-area box the row was clamped against. */
   viewportWidth: number;
+  /** Where that box starts: the left safe-area inset. The caption clamp reads
+   *  both, so it keeps the caption inside the same box as the row. */
+  clampLeft: number;
   margin: number;
   count: number;
   itemSize: number;
@@ -206,11 +212,10 @@ function readPx(value: string): number {
  *  custom property comes back unresolved, see above), so the overlay carries the
  *  insets as padding, which is a real property and does resolve to px.
  *
- *  That padding is NOT inert: every row item is an absolutely positioned child of
- *  the overlay, so the left/top the painter writes resolves against the overlay's
- *  PADDING box. These four numbers are therefore the offset between the viewport
- *  and the frame the row is actually seated in, which is why measure() works in
- *  that frame rather than in viewport coordinates. */
+ *  That padding does NOT move the row: an absolutely positioned child's left/top
+ *  is measured from the overlay's padding EDGE, the outer edge of the padding, so
+ *  the painter's coordinates are viewport coordinates whatever the inset. These
+ *  four numbers only shrink the box the row is clamped into. */
 interface EdgeInsets {
   top: number;
   right: number;
@@ -451,16 +456,16 @@ export class StripGesture {
   /** Measure the anchor and lay the row out around it. The one place this module
    *  reads layout, gated to an opening gesture rather than per frame.
    *
-   *  WHY THE FRAME IS THE OVERLAY'S PADDING BOX, not the viewport: the row items
-   *  are absolutely positioned children of the overlay, so the coordinates the
-   *  painter writes are resolved against its padding box, and the safe-area inset
-   *  the overlay carries as padding is exactly the offset between the two.
-   *  Measuring in viewport coordinates displaced every item by that inset on a
-   *  notched device, and folding the same inset into the clamp margin counted it
-   *  twice. Shifting the anchor and shrinking the clamp box here counts it once,
-   *  and leaves the margin the stylesheet's own literal clearance INSIDE the safe
-   *  area. Everything downstream (the caption clamp, the dim band) then reads one
-   *  consistent frame. */
+   *  The row is CLAMPED in the safe-area box (the app box minus the insets the
+   *  overlay carries as padding), so the margin stays the stylesheet's own
+   *  literal clearance inside the safe area and the inset is counted once. It is
+   *  then translated back by the left inset, because the painter's coordinates
+   *  resolve from the overlay's padding EDGE, which is the viewport origin, not
+   *  from inside the padding. Leaving the row in the clamp frame displaced it a
+   *  whole inset toward the left edge: on an edge-to-edge Android phone in
+   *  landscape that slid the cancel X off the anchor and seated Mount under the
+   *  finger, so the tap that opened the row also mounted. The anchor Y needs no
+   *  shift: nothing clamps vertically. */
   private measure(): StripGestureLayout {
     const rect = this.deps.anchor.getBoundingClientRect();
     const style = getComputedStyle(this.deps.metricsHost);
@@ -475,14 +480,16 @@ export class StripGesture {
         readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth) - inset.left - inset.right,
       margin: readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
     };
-    const anchorY = rect.y + rect.height / 2 - inset.top;
+    const anchorY = rect.y + rect.height / 2;
     const direction = this.deps.direction(metrics);
+    const placement = placeConsumableStrip({ ...metrics, anchorY, direction });
     return {
-      placement: placeConsumableStrip({ ...metrics, anchorY, direction }),
+      placement: { ...placement, centers: placement.centers.map((c) => c + inset.left) },
       direction,
-      anchorX: metrics.anchorX,
+      anchorX: metrics.anchorX + inset.left,
       anchorY,
       viewportWidth: metrics.viewportWidth,
+      clampLeft: inset.left,
       margin: metrics.margin,
       count: metrics.count,
       itemSize,

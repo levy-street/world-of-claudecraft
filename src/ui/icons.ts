@@ -8,9 +8,11 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { BUDDY_ART_PENDING_ITEM_IDS } from '../sim/content/buddies';
+import { HOLLOW_CRYPT_ART_PENDING_ITEM_IDS } from '../sim/content/hollow_crypt_items';
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
-import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
+import { QUEST_SHIELD_ART_PENDING_ITEM_IDS } from '../sim/content/quest_shields';
 import {
   BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
@@ -20,6 +22,7 @@ import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { professionImageUrl } from './hud/professions/profession_art';
+import { ITEM_ART_PLACEHOLDERS } from './item_art_placeholders';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
 import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
@@ -2527,6 +2530,23 @@ function r(
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Not real abilities, so the
+  // ability FALLBACK would normally paint them, and it derived three visually identical
+  // tiles from ids that differ only in their last word: a bar whose entire job is "which
+  // of these three do I press" showed the same glyph three times. Authored here instead,
+  // in the frost/ice pair the Barrowglass's own teal reads as.
+  //
+  // The pike is `staff` (the closest primitive to a shaft) in all three, so the family
+  // reads as one item, and the SECOND mark is the verb: a hand gripping it to brace, the
+  // eye it goes through to thrust, a cancel cross to ground it.
+  //
+  // All three now also ship PAINTED art (ABILITY_IMAGE_IDS below), so `abilityImageUrl`
+  // wins and these are the fallback path only. They stay for the reason `intervene`'s does:
+  // every ability owes an explicit, distinct recipe (tests/ability_icons.test.ts), and a
+  // painted file failing to load must still land on three different tiles.
+  lance_brace: r('frost', 'ice', ['staff', { p: 'hand', ...BR }], ['glow']),
+  lance_thrust: r('frost', 'ice', ['staff', { p: 'eye', ...TL }], ['sparkle']),
+  lance_release: r('frost', 'ice', ['staff', { p: 'cross', ...BR }]),
   // Talents 2.0 ground-targeted spells (each aimed AoE gets a distinct recipe;
   // grouped here so the family reads together, order within the map is cosmetic).
   flamestrike: r('fire', 'ember', ['meteor', { p: 'sunburst', ...BIG }], ['glow']),
@@ -2659,6 +2679,250 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['helm', { p: 'shield', ...BR }],
     ['glow', 'arcs'],
   ),
+  // Gravewyrm Sanctum dungeon-journal icons (src/ui/boss_journal/dungeons/
+  // gravewyrm_sanctum.ts; same UI-owned convention as the raid rows above):
+  // ice and soulfire for the lake and the vault, steel and chain for Korgath.
+  dgn_sanctum_tusk_sweep: r('frost', 'bone', ['fang', { p: 'claw_slash', ...BR }], ['motion']),
+  dgn_sanctum_trample: r('earth', 'earthBrown', ['boot', { p: 'arrow', ...BR }], ['crack']),
+  dgn_sanctum_spilled_braziers: r(
+    'fire',
+    'shadowPurple',
+    ['flame', { p: 'crate', ...BR }],
+    ['drips'],
+  ),
+  dgn_sanctum_tusker_enrage: r('fury', 'blood', ['roar', { p: 'fang', ...BR }], ['glow']),
+  dgn_sanctum_lockbound: r('steel', 'silverWhite', ['shield', { p: 'tendrils', ...BR }], ['glow']),
+  dgn_sanctum_seal_shackles: r('steel', 'gold', ['sigil_rune', { p: 'tendrils', ...BR }], ['arcs']),
+  dgn_sanctum_strain: r('steel', 'ice', ['tendrils', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_sanctum_stomp: r('earth', 'earthBrown', ['boot', { p: 'sunburst', ...BIG }], ['crack']),
+  dgn_sanctum_rerivet: r('fire', 'ember', ['hand', { p: 'gear', ...BR }], ['sparkle']),
+  dgn_sanctum_last_link: r('steel', 'blood', ['tendrils', { p: 'hourglass', ...BR }], ['glow']),
+  dgn_sanctum_maul_arc: r('steel', 'steel', ['mace', { p: 'claw_slash', ...BR }], ['motion']),
+  dgn_sanctum_chain_flail: r(
+    'steel',
+    'silverWhite',
+    ['tendrils', { p: 'arrow', ...BR }],
+    ['motion'],
+  ),
+  dgn_sanctum_threshold_charge: r(
+    'fury',
+    'earthBrown',
+    ['fist', { p: 'arrow', ...BR }],
+    ['motion'],
+  ),
+  dgn_sanctum_bellow: r('storm', 'sky', ['roar', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_sanctum_korgath_enrage: r('fury', 'blood', ['fist', { p: 'flame', ...BR }], ['glow']),
+  dgn_sanctum_waking_thaw: r(
+    'shadow',
+    'ice',
+    ['skull', { p: 'droplet', ...BR, pal: 'ice' }],
+    ['drips'],
+  ),
+  dgn_sanctum_held: r('frost', 'ice', ['snowflake', { p: 'skull', ...BR }], ['sparkle']),
+  dgn_sanctum_grasp: r('shadow', 'ice', ['hand', { p: 'droplet', ...BR }], ['glow']),
+  dgn_sanctum_soulfire_trench: r(
+    'fire',
+    'shadowPurple',
+    ['flame', { p: 'arrow', ...BR }],
+    ['motion'],
+  ),
+  dgn_sanctum_shadow_volley: r('shadow', 'shadowPurple', ['bolt', { p: 'skull', ...BR }], ['arcs']),
+  dgn_sanctum_warm_hands: r('fire', 'ice', ['hand', { p: 'flame', ...BR }], ['drips']),
+  dgn_sanctum_twice_woken: r(
+    'shadow',
+    'blood',
+    ['skull', { p: 'ascension_seal', ...BR }],
+    ['glow'],
+  ),
+  dgn_sanctum_breaking_ice: r('frost', 'sky', ['snowflake', { p: 'droplet', ...BR }], ['crack']),
+  dgn_sanctum_open_water: r('frost', 'ice', ['droplet', { p: 'boot', ...BR }], ['drips']),
+  dgn_sanctum_grave_breath: r('fire', 'ember', ['flame', { p: 'wing', ...BR }], ['arcs']),
+  dgn_sanctum_tail_sweep: r('earth', 'bone', ['claw_slash', { p: 'bone', ...BR }], ['motion']),
+  dgn_sanctum_grave_inferno: r('fire', 'blood', ['sunburst', { p: 'flame', ...BIG }], ['glow']),
+  dgn_sanctum_wing_gale: r('storm', 'silverWhite', ['wing', { p: 'arrow', ...BR }], ['motion']),
+  dgn_sanctum_plunging_fire: r('fire', 'ember', ['eye', { p: 'meteor', ...BR }], ['glow']),
+  dgn_sanctum_brood: r('earth', 'ember', ['fang', { p: 'wing', ...BR }], ['crack']),
+  dgn_sanctum_crashing_descent: r(
+    'shadow',
+    'ember',
+    ['wing', { p: 'sunburst', ...BIG }],
+    ['crack'],
+  ),
+  dgn_sanctum_shard_flare: r('arcane', 'sky', ['gem', { p: 'flame', ...BR }], ['sparkle', 'glow']),
+  dgn_sanctum_korzul_enrage: r('fury', 'ember', ['roar', { p: 'flame', ...BR }], ['glow']),
+  dgn_sanctum_no_ice: r(
+    'blood',
+    'ember',
+    ['skull', { p: 'droplet', ...BR, pal: 'ice' }],
+    ['drips'],
+  ),
+  // Wildheart Basin dungeon-journal icons (src/ui/boss_journal/dungeons/wildheart_basin.ts).
+  dgn_wildheart_tail_swipe: r(
+    'earth',
+    'leafGreen',
+    ['claw_slash', { p: 'bone', ...BR }],
+    ['motion'],
+  ),
+  dgn_wildheart_stomp: r('earth', 'earthBrown', ['paw', { p: 'sunburst', ...BIG }], ['crack']),
+  dgn_wildheart_howdah_rider: r('nature', 'blood', ['helm', { p: 'staff', ...BR }], ['arcs']),
+  dgn_wildheart_ancestral_sap: r(
+    'nature',
+    'leafGreen',
+    ['droplet', { p: 'heart', ...BR }],
+    ['glow'],
+  ),
+  dgn_wildheart_saurian_enrage: r('fury', 'leafGreen', ['roar', { p: 'paw', ...BR }], ['glow']),
+  dgn_wildheart_pack_bond: r('nature', 'gold', ['paw', { p: 'shield', ...BR }], ['arcs']),
+  dgn_wildheart_shared_health: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow']),
+  dgn_wildheart_stalk: r('shadow', 'leafGreen', ['eye', { p: 'fang', ...BR }], ['motion']),
+  dgn_wildheart_wary: r('steel', 'sky', ['hourglass', { p: 'paw', ...BR }], ['arcs']),
+  dgn_wildheart_quake: r('earth', 'earthBrown', ['fist', { p: 'sunburst', ...BIG }], ['crack']),
+  dgn_wildheart_call_hunt: r('fury', 'gold', ['roar', { p: 'bolt', ...BR }], ['arcs']),
+  dgn_wildheart_thickhide: r('nature', 'earthBrown', ['pelt', { p: 'shield', ...BR }], ['glow']),
+  dgn_wildheart_heel: r('nature', 'gold', ['paw', { p: 'arrow', ...BR }], ['motion']),
+  dgn_wildheart_seed_rain: r('nature', 'leafGreen', ['leaf', { p: 'droplet', ...BR }], ['drips']),
+  dgn_wildheart_pollinate: r('holy', 'holyGold', ['leaf', { p: 'sunburst', ...BR }], ['sparkle']),
+  dgn_wildheart_thorn_sprout: r('nature', 'venom', ['leaf', { p: 'claw_slash', ...BR }], ['arcs']),
+  dgn_wildheart_vine_lash: r(
+    'nature',
+    'leafGreen',
+    ['tendrils', { p: 'arrow', ...BR }],
+    ['motion'],
+  ),
+  dgn_wildheart_gorge: r('blood', 'venom', ['fang', { p: 'droplet', ...BR }], ['drips']),
+  dgn_wildheart_spit: r('nature', 'venom', ['droplet', { p: 'arrow', ...BR }], ['motion']),
+  dgn_wildheart_pulse: r('nature', 'gold', ['heart', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_wildheart_roar: r('fury', 'earthBrown', ['roar', { p: 'arrow', ...BR }], ['motion']),
+  dgn_wildheart_spirit_hunt: r('arcane', 'leafGreen', ['paw', { p: 'eye', ...BR }], ['sparkle']),
+  dgn_wildheart_sun_glyph: r(
+    'holy',
+    'holyGold',
+    ['sigil_rune', { p: 'sunburst', ...BIG }],
+    ['glow'],
+  ),
+  dgn_wildheart_ambush: r('shadow', 'blood', ['claw_slash', { p: 'crosshair', ...BR }], ['motion']),
+  dgn_wildheart_zulgar_enrage: r('fury', 'blood', ['roar', { p: 'fang', ...BR }], ['glow', 'arcs']),
+  // Hollow Crypt dungeon-journal icons (src/ui/boss_journal/dungeons/hollow_crypt.ts).
+  dgn_crypt_barrowflame: r('fire', 'bone', ['flame', { p: 'skull', ...BR }], ['arcs']),
+  dgn_crypt_tail_lash: r('shadow', 'bone', ['bone', { p: 'claw_slash', ...BR }], ['motion']),
+  dgn_crypt_wing_gust: r('storm', 'bone', ['wing', { p: 'sunburst', ...BIG }], ['motion']),
+  dgn_crypt_embers: r('fire', 'ember', ['flame', { p: 'boot', ...BR }], ['drips']),
+  dgn_crypt_shovelful: r('earth', 'earthBrown', ['pickaxe', { p: 'eye', ...BR }], ['motion']),
+  dgn_crypt_measured: r('shadow', 'bone', ['crosshair', { p: 'skull', ...BR }], ['glow']),
+  dgn_crypt_blow: r('steel', 'blood', ['pickaxe', { p: 'shield', ...BR }], ['crack']),
+  dgn_crypt_grave_vigor: r('fury', 'bone', ['skull', { p: 'bolt', ...BR }], ['glow']),
+  dgn_crypt_unquiet_earth: r('earth', 'bone', ['hand', { p: 'bone', ...BR }], ['crack']),
+  dgn_crypt_burial_toll: r('shadow', 'gold', ['bell', { p: 'skull', ...BR }], ['arcs']),
+  dgn_crypt_lament: r('frost', 'silverWhite', ['moon', { p: 'heart', ...BR }], ['arcs']),
+  dgn_crypt_lantern: r('holy', 'holyGold', ['candle', { p: 'shield', ...BR }], ['glow']),
+  dgn_crypt_embrace: r('frost', 'ice', ['hand', { p: 'snowflake', ...BR }], ['sparkle']),
+  dgn_crypt_rime_path: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  dgn_crypt_bridal_freeze: r(
+    'frost',
+    'silverWhite',
+    ['snowflake', { p: 'sunburst', ...BIG }],
+    ['glow'],
+  ),
+  dgn_crypt_harmony: r('arcane', 'shadowPurple', ['bell', { p: 'shield', ...BR }], ['arcs']),
+  dgn_crypt_dirge: r('shadow', 'shadowPurple', ['skull', { p: 'bell', ...BR }], ['arcs']),
+  dgn_crypt_bone_organ: r('shadow', 'bone', ['bone', { p: 'bell', ...BR }], ['drips']),
+  dgn_crypt_encore: r('shadow', 'bone', ['skull', { p: 'ascension_seal', ...BR }], ['sparkle']),
+  dgn_crypt_unbroken_verse: r('blood', 'shadowPurple', ['bell', { p: 'cross', ...BR }], ['glow']),
+  dgn_crypt_crescendo: r('arcane', 'arcanePink', ['bell', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_crypt_shadow_pulse: r(
+    'shadow',
+    'shadowPurple',
+    ['sunburst', { p: 'skull', ...BR }],
+    ['arcs'],
+  ),
+  dgn_crypt_gravecall: r('shadow', 'sky', ['skull', { p: 'arrow', ...BR }], ['motion']),
+  dgn_crypt_grasp: r('earth', 'shadowPurple', ['hand', { p: 'crosshair', ...BR }], ['crack']),
+  dgn_crypt_rite: r('shadow', 'blood', ['sigil_rune', { p: 'candle', ...BR }], ['glow']),
+  dgn_crypt_candle: r('holy', 'ember', ['candle', { p: 'heart', ...BR }], ['sparkle']),
+  dgn_crypt_name_dead: r('holy', 'gold', ['scroll', { p: 'candle', ...BR }], ['glow']),
+  dgn_crypt_reap: r('shadow', 'silverWhite', ['claw_slash', { p: 'skull', ...BR }], ['motion']),
+  dgn_crypt_pyre_strafe: r('fire', 'ember', ['wing', { p: 'flame', ...BR }], ['motion']),
+  dgn_crypt_dread_bellow: r('shadow', 'bone', ['roar', { p: 'skull', ...BR }], ['arcs']),
+  dgn_crypt_burning_knell: r('fire', 'blood', ['bell', { p: 'flame', ...BR }], ['glow']),
+  // Sunken Bastion dungeon-journal icons (src/ui/boss_journal/dungeons/sunken_bastion.ts).
+  dgn_bastion_broadside: r('frost', 'sky', ['bolt', { p: 'arrow', ...BR }], ['motion']),
+  dgn_bastion_cursed_anchor: r('shadow', 'sky', ['gear', { p: 'tendrils', ...BR }], ['motion']),
+  dgn_bastion_boarding: r('frost', 'silverWhite', ['sword', { p: 'arrow', ...BR }], ['motion']),
+  dgn_bastion_sailors: r('shadow', 'sky', ['skull', { p: 'droplet', ...BR, pal: 'ice' }], ['arcs']),
+  dgn_bastion_brine: r('holy', 'sky', ['droplet', { p: 'shield', ...BR }], ['glow']),
+  dgn_bastion_bulwark: r('holy', 'holyGold', ['shield', { p: 'arrow', ...BR }], ['arcs']),
+  dgn_bastion_sentence: r('holy', 'sky', ['crosshair', { p: 'droplet', ...BR }], ['glow']),
+  dgn_bastion_reaping_arc: r(
+    'steel',
+    'silverWhite',
+    ['axe', { p: 'claw_slash', ...BR }],
+    ['motion'],
+  ),
+  dgn_bastion_oath: r('holy', 'gold', ['helm', { p: 'shield', ...BR }], ['glow']),
+  dgn_bastion_cage: r('steel', 'steel', ['crate', { p: 'hand', ...BR }], ['crack']),
+  dgn_bastion_prisoners: r('steel', 'bone', ['hand', { p: 'tendrils', ...BR }], ['arcs']),
+  dgn_bastion_anchor: r('frost', 'steel', ['gear', { p: 'droplet', ...BR, pal: 'ice' }], ['drips']),
+  dgn_bastion_shackle: r('steel', 'silverWhite', ['tendrils', { p: 'heart', ...BR }], ['arcs']),
+  dgn_bastion_cudgel: r('steel', 'earthBrown', ['mace', { p: 'boot', ...BR }], ['crack']),
+  dgn_bastion_mist_surge: r(
+    'frost',
+    'silverWhite',
+    ['sunburst', { p: 'droplet', ...BR }],
+    ['arcs'],
+  ),
+  dgn_bastion_shadow_crossing: r(
+    'shadow',
+    'shadowPurple',
+    ['eye', { p: 'claw_slash', ...BR }],
+    ['motion'],
+  ),
+  dgn_bastion_grave_shadow: r(
+    'shadow',
+    'shadowPurple',
+    ['skull', { p: 'flame', ...BR }],
+    ['drips'],
+  ),
+  dgn_bastion_fog_veil: r('frost', 'silverWhite', ['eye', { p: 'moon', ...BR }], ['sparkle']),
+  dgn_bastion_fogburst: r('frost', 'sky', ['sunburst', { p: 'cross', ...BR }], ['glow']),
+  // Drowned Temple dungeon-journal icons (src/ui/boss_journal/dungeons/drowned_temple.ts).
+  dgn_temple_chorus: r('frost', 'sky', ['bell', { p: 'heart', ...BR }], ['arcs']),
+  dgn_temple_solo: r('frost', 'silverWhite', ['bell', { p: 'crosshair', ...BR }], ['glow']),
+  dgn_temple_sea_song: r('frost', 'sky', ['droplet', { p: 'bell', ...BR }], ['arcs']),
+  dgn_temple_moonwater_bolt: r('frost', 'ice', ['bolt', { p: 'moon', ...BR }], ['motion']),
+  dgn_temple_aria: r('arcane', 'sky', ['bell', { p: 'bolt', ...BR }], ['glow']),
+  dgn_temple_mere_surge: r('frost', 'sky', ['droplet', { p: 'arrow', ...BR }], ['motion']),
+  dgn_temple_three_heads: r('nature', 'venom', ['fang', { p: 'eye', ...BR }], ['arcs']),
+  dgn_temple_freezing_breath: r('frost', 'ice', ['snowflake', { p: 'fang', ...BR }], ['arcs']),
+  dgn_temple_venom_spit: r('nature', 'venom', ['droplet', { p: 'fang', ...BR }], ['drips']),
+  dgn_temple_crushing_torrent: r(
+    'frost',
+    'sky',
+    ['droplet', { p: 'arrow', ...BR, pal: 'ice' }],
+    ['motion'],
+  ),
+  dgn_temple_tsunami: r('storm', 'sky', ['droplet', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_temple_frostlocked: r('frost', 'ice', ['snowflake', { p: 'shield', ...BR }], ['crack']),
+  dgn_temple_venom_current: r(
+    'nature',
+    'venom',
+    ['droplet', { p: 'arrow', ...BR, pal: 'venom' }],
+    ['motion'],
+  ),
+  dgn_temple_toxic_rime: r('frost', 'venom', ['gem', { p: 'snowflake', ...BR }], ['sparkle']),
+  dgn_temple_lance: r('arcane', 'silverWhite', ['moon', { p: 'arrow', ...BR }], ['motion']),
+  dgn_temple_slam: r('arcane', 'sky', ['fist', { p: 'sunburst', ...BIG }], ['crack']),
+  dgn_temple_fracture: r('arcane', 'arcanePink', ['gem', { p: 'sunburst', ...BIG }], ['crack']),
+  dgn_temple_prism_flare: r('arcane', 'sky', ['gem', { p: 'eye', ...BR }], ['sparkle']),
+  dgn_temple_prism_ward: r('arcane', 'silverWhite', ['gem', { p: 'shield', ...BR }], ['glow']),
+  dgn_temple_shattering: r('arcane', 'arcanePink', ['gem', { p: 'cross', ...BR }], ['crack']),
+  dgn_temple_swapped: r('arcane', 'sky', ['eye', { p: 'arrow', ...BR }], ['arcs']),
+  dgn_temple_lunar_tide: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BIG }], ['arcs']),
+  dgn_temple_undertow: r('frost', 'sky', ['hand', { p: 'droplet', ...BR }], ['motion']),
+  dgn_temple_tears: r('holy', 'silverWhite', ['moon', { p: 'droplet', ...BR }], ['drips']),
+  dgn_temple_rising_tide: r('frost', 'sky', ['droplet', { p: 'boot', ...BR }], ['drips']),
+  dgn_temple_moonspawn: r('shadow', 'sky', ['moon', { p: 'claw_slash', ...BR }], ['arcs']),
+  dgn_temple_wrath: r('fury', 'sky', ['roar', { p: 'moon', ...BR }], ['glow']),
+  dgn_temple_falling_moon: r('arcane', 'gold', ['moon', { p: 'meteor', ...BR }], ['glow']),
   // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
@@ -2911,7 +3175,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   trailbreak: r('storm', 'leafGreen', ['boot', { p: 'arrow', ...TR }], ['motion', 'arcs']),
   wildheart: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow', 'sparkle']),
   shellskin: r('earth', 'earthBrown', ['shield', { p: 'pelt', ...BR }], ['crack']),
+  tactical_camo: r('nature', 'leafGreen', ['eye', { p: 'pelt', ...BR }], ['glow']),
+  play_dead: r('shadow', 'bone', [{ p: 'skull', ...BIG }], ['glow']),
   frostjaw_trap: r('frost', 'ice', ['fang', { p: 'tendrils', ...BR }], ['arcs', 'glow']),
+  bear_trap: r('steel', 'blood', ['fang', { p: 'claw_slash', ...BR }], ['drips']),
+  scatterbolt: r('steel', 'ember', ['bow', { p: 'arrow', ...TR }], ['motion', 'sparkle']),
+  phosphor_flask: r('fire', 'ember', ['potion', { p: 'flame', ...BR }], ['glow', 'sparkle']),
   cold_focus: r('frost', 'steel', ['eye', { p: 'crosshair', ...BR }], ['sparkle']),
   bloodhook: r('blood', 'steel', ['fang', { p: 'tendrils', ...TR }], ['motion', 'drips']),
   hunting_momentum: r('fury', 'blood', ['boot', { p: 'fang', ...TR }], ['motion', 'glow']),
@@ -3252,6 +3521,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
   rake: r('nature', 'leafGreen', ['claw_slash'], ['drips']),
   claw: r('nature', 'leafGreen', ['claw_slash'], ['motion']),
+  scratch: r('nature', 'leafGreen', ['claw_slash', { p: 'paw', ...BR }], ['arcs']),
   ferocious_bite: r('blood', 'blood', ['fang'], ['drips']),
   swipe: r('earth', 'earthBrown', ['claw_slash'], ['arcs']),
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
@@ -3279,6 +3549,15 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
   conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
+  // Groveheart's Sporemender Form: the healer's cross inside the druid leaf
+  // (procedural fallback; owner-provided painted art ships beside it).
+  sporemender_form: r('nature', 'leafGreen', ['leaf', { p: 'cross', ...BR }], ['sparkle']),
+  // Spore Burst: a bursting sun of spores over the druid leaf (procedural
+  // fallback; the painted art ships beside it).
+  spore_burst: r('nature', 'leafGreen', ['sunburst', { p: 'leaf', ...BR }], ['sparkle', 'glow']),
+  // Nature's Boon passive: the druid leaf held in a warm glow (procedural
+  // fallback; the painted art ships beside it).
+  natures_boon: r('nature', 'leafGreen', ['leaf'], ['glow', 'sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
   swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
   // Groveheart resurrections: the in-combat single rez (a heart bursting back
@@ -3470,6 +3749,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast (the Automatons
   // quartermaster's engineering item): a clockwork gear crackling with shock.
   clockwork_shock_bomb: r('storm', 'sky', ['gear', { p: 'lightning', ...BR }], ['arcs', 'glow']),
+  // Membership Courier: the flying donkey that ferries bag stacks to the bank.
+  courier: r('nature', 'sky', ['sack', { p: 'wing', ...TR }], ['motion']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
@@ -3786,6 +4067,10 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Physical-only damage-reduction buffs (Raised Guard's cut), mirroring
   // aura_buff_dr on the steel palette
   aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // The slumbering world boss in bed (src/sim/mob/slumber.ts): keyed by the bare aura id,
+  // which is how a dedicated per-aura recipe is found (hasAuraRecipe), so the frame reads
+  // "asleep" under a moon rather than the generic shield its buff_dr kind falls back to.
+  slumber: r('shadow', 'shadowPurple', ['moon'], ['glow']),
   // Breachmaker's source-scoped vulnerability debuff (kind 'vuln_source'), shown
   // on the target's debuff frame: a cracked guard struck by a blade
   aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
@@ -4447,6 +4732,19 @@ const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
   'wlk_r20_curse_mastery',
 ]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
+  // Integration 45: final four procedural ability fallbacks receive painted art.
+  'courier',
+  'lunge',
+  'hamstring_bite',
+  'clockwork_shock_bomb',
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Painted rather than procedural
+  // because the player's entire job in this mechanic is choosing between these three under
+  // pressure, and three composited tiles built from the same primitives read as one tile at
+  // the 32px they are actually seen at. They are not class abilities, so `abilityImageUrl`
+  // maps them to their own folder below rather than deriving one from ABILITIES.
+  'lance_brace',
+  'lance_thrust',
+  'lance_release',
   // paladin (original project art for the overhaul and talent abilities, plus
   // the existing CraftPix premium "RPG Paladin skill icons" base set)
   'divine_ascension',
@@ -4523,7 +4821,12 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'trailbreak',
   'wildheart',
   'shellskin',
+  'play_dead',
+  'tactical_camo',
   'frostjaw_trap',
+  'bear_trap',
+  'scatterbolt',
+  'phosphor_flask',
   'cold_focus',
   'bloodhook',
   'hunting_momentum',
@@ -4890,6 +5193,9 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'typhoon',
   'wildwake',
   'grove_awakening',
+  'sporemender_form',
+  'spore_burst',
+  'natures_boon',
   // hunter
   'aspect_of_the_wild',
   'bestial_wrath',
@@ -4971,19 +5277,17 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 // abilities). The painted-census guards (tests/missing_painted_icons_wave,
 // tests/release_v039_icon_art) treat these as parked, never as painted, and
 // reject a stale entry once art lands.
-export const ABILITY_ART_PENDING = new Set<string>([
-  // Wildfang kit pass 2: the VFX and art retune owns the final paintings.
-  'lunge',
-  'hamstring_bite',
-  // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
-  // its skill painting ships (the item itself already ships painted art).
-  'clockwork_shock_bomb',
-]);
+export const ABILITY_ART_PENDING = new Set<string>(['scratch']);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
   if (ABILITY_ART_PENDING.has(id)) return null;
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
+  // The Shardpike verbs first: they are quest-tool actions with no ABILITIES row at all, so
+  // every arm below would fall through to a class that does not own them.
+  if (id === 'lance_brace' || id === 'lance_thrust' || id === 'lance_release') {
+    return `${SKILL_ICON_DIR}/shardpike/${id}.webp`;
+  }
   if (PET_ACTION_IMAGE_IDS.has(id)) return `${SKILL_ICON_DIR}/pet/${id}.webp`;
   const cls =
     ABILITIES[id]?.class ??
@@ -5498,6 +5802,8 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
   'reins_lanternback_troll',
+  'reins_wobbles_slime',
+  'reins_nightwing_chimera',
   // trinkets (src/sim/content/trinkets.ts; opaque woc-item-icon-v1 paintings from the
   // trinket-slot-icons-2026-09-23 batch in mapping.json)
   'bastion_sigil',
@@ -5536,22 +5842,27 @@ for (const item of Object.values(ITEMS)) {
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
 // Explicit development-only item-art debt ledger. The Masterwrought completion wave
-// cleared the Ignivar raid's 81 feature entries (content/ignivar_loot.ts), so that spread
-// is currently empty; it stays in the union below as the canonical seam for future parked
-// raid art. Tests reject both unenumerated debt and stale entries after art lands.
+// cleared the Ignivar raid's 81 feature entries (content/ignivar_loot.ts); that spread
+// now parks only the later Crucible hunter quiver, and stays in the union below as the
+// canonical seam for parked raid art. Tests reject both unenumerated debt and stale
+// entries after art lands.
 export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
-  // Warfare Season 2 armor: painted icons owned by a follow-up art pass; the
-  // procedural icon stands in until then. The season weapons never park here:
-  // an unpainted weapon already draws its procedural icon, and the season
-  // jewelry ships its own (vanguard-jewelry-icons-2026-10-03).
-  ...SEASON2_SETS.flatMap((set) => set.itemIds),
+  // All 135 Season 2 armor pieces now ship individual paintings.
+  // The Hollow Crypt rework's per-boss loot: EMPTY since its painted wave
+  // (hollow-crypt-icons-2026-10-03) landed; the seam stays for the next park.
+  ...HOLLOW_CRYPT_ART_PENDING_ITEM_IDS,
+  ...BUDDY_ART_PENDING_ITEM_IDS,
+  ...Object.keys(ITEM_ART_PLACEHOLDERS),
+  ...QUEST_SHIELD_ART_PENDING_ITEM_IDS,
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
+  const placeholder = ITEM_ART_PLACEHOLDERS[id];
+  if (typeof placeholder === 'string') return `${ITEM_ICON_DIR}/${placeholder}.webp`;
   if (ITEM_ART_PENDING.has(id)) return null;
   return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
 }
@@ -5565,56 +5876,29 @@ export function itemImageUrl(id: string): string | null {
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
-// Exhaustive live-deed art debt ledger. The Masterwrought completion wave clears its
-// eleven crests (including the commissioned Harvestmaster replacement). Inherited release
-// rows and the hidden hammer celebration retain their deliberate procedural category fallback.
+// Exhaustive live-deed art debt ledger. Accepted paintings are removed as each batch
+// lands; remaining rows retain their deliberate procedural category fallback.
 // Insertion order mirrors DEED_ORDER because the deed-art gate derives its exact debt in order.
+// Integration 45 completed all 57 formerly pending paintings. Lantern Hall's contract
+// milestones and the quartermaster's three titles came after it: the category crest until their
+// paintings are commissioned.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
-  'exp_the_last_keep',
-  'exp_dawnhold_castle',
-  'soc_strongbox_outfitter',
-  'soc_four_bags_deep',
-  'prog_ready_for_an_adventure',
-  'dgn_ignivar',
-  'dgn_ignivar_heroic',
-  'dgn_varkhul',
-  'dgn_varkhul_heroic',
-  'dgn_varkhul_flawless',
-  // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
-  'hid_forgebreaker',
-  // Arcane Calligraphy's completion and Gold-rating deeds are both
-  // 'exploration'. They use the category crest until their commissioned
-  // paintings land (docs/achievements/icon-brief.md).
-  'exp_arcane_calligraphy',
-  'exp_arcane_calligraphy_gold',
-  // World-quest completion deeds use the exploration category crest pending art.
-  'exp_forge_helper',
-  'exp_last_barricade',
-  'exp_borrowed_face',
-  'exp_windrider_slalom',
-  'exp_duskweave_dispatches',
-  'exp_wisp_maze',
-  // Faction standing deeds use the progression category crest pending art.
-  'prog_rift_watch_trusted',
-  'prog_church_order_trusted',
-  'prog_automatons_trusted',
-  'prog_rift_watch_champion',
-  'prog_church_order_champion',
-  'prog_automatons_champion',
-  'prog_faction_champion_all',
-  // Clue Scroll casket deeds use the exploration category crest pending art.
-  'exp_clue_first_casket',
-  'exp_clue_ten_caskets',
-  // The Buried Hoard goblin catch uses the combat category crest pending art.
-  'cmb_coinsack_caught',
-  // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
-  'exp_harbor_to_harbor',
-  // Opt-in played-time titles use the PvP category crest pending commissioned art.
+  // The sixth lifetime-XP rung (prog_titan): procedural progression crest until commissioned.
+  'prog_titan',
+  // World PvP streak titles use the PvP category crest until commissioned.
   'pvp_flag_1h',
   'pvp_flag_3h',
   'pvp_flag_6h',
   'pvp_flag_24h',
   'pvp_flag_168h',
+  // The Hard wisp maze clear: exploration category crest pending art.
+  'exp_wisp_maze_hard',
+  'dgn_guild_first_contract',
+  'dgn_guild_ten_contracts',
+  'dgn_guild_fifty_contracts',
+  'feat_guild_writ_runner',
+  'feat_guild_hallsworn',
+  'feat_guild_of_lantern_hall',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

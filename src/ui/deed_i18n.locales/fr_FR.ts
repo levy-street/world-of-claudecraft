@@ -395,6 +395,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Chronique du Val, chapitre II',
+    desc: 'Terminez le deuxième chapitre de la chronique de Saul : éliminez bandits, murlocs et vermine des mines, et affrontez le Reliquaire.',
   },
   chr_vale_chapter_iii: {
     name: 'Chronique du Val',
@@ -415,6 +416,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Prétendant au Seau de cuivre',
+    desc: 'Entrez sur le terrain et touchez le ballon dans un match de la Coupe du Val au Pré de la Truie. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   chr_vale_rares: {
     name: 'Les terreurs du Val',
@@ -614,53 +616,72 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Crampons sur le pré',
+    desc: 'Terminez un match complet de la Coupe du Val au Pré de la Truie, victoire ou défaite. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_first_win: {
     name: 'Premier trophée',
+    desc: 'Remportez un match coté de la Coupe du Val. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_wins_10: {
     name: 'Briscard de la balle au sanglier',
+    desc: 'Remportez 10 matchs cotés de la Coupe du Val. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_wins_25: {
     name: 'Légende de la balle au sanglier',
     title: 'Légende de la balle au sanglier',
+    desc: 'Remportez 25 matchs cotés de la Coupe du Val. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_first_goal: {
     name: 'Compteur débloqué',
+    desc: 'Marquez un but dans un match coté de la Coupe du Val. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_hat_trick: {
     name: 'Coup du chapeau',
+    desc: 'Marquez trois buts dans un seul match coté de la Coupe du Val, dans la catégorie 3c3 ou supérieure. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_golden_goal: {
     name: 'Instant en or',
+    desc: "Marquez le but en or qui décide d'un match coté de la Coupe du Val. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.",
   },
   pvp_vcup_first_save: {
     name: 'Des mains sûres',
+    desc: 'Effectuez un arrêt comme gardien dans un match coté de la Coupe du Val, dans la catégorie 3c3 ou supérieure. Seul un tir assez rapide pour éprouver votre prise compte : une réception facile ne compte pas. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Rien ne passe',
+    desc: 'Remportez un match coté de la Coupe du Val comme gardien sans encaisser de but, dans la catégorie 3c3 ou supérieure. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_vcup_guild_win: {
     name: 'Pour la bannière',
+    desc: 'Remportez un match coté de la Coupe du Val sous la bannière de votre guilde. Les matchs de la Coupe du Val ne sont plus jouables ; ce haut fait ne peut donc plus être obtenu.',
   },
   pvp_fiesta_first_bout: {
     name: "Taper l'incruste",
+    desc: "Disputez un combat Fiesta complet en 2c2, victoire ou défaite. Les combats Fiesta ne sont plus proposés dans la file d'arène ; ce haut fait ne peut plus être obtenu.",
   },
-  pvp_fiesta_first_win: { name: "L'âme de la Fiesta" },
+  pvp_fiesta_first_win: {
+    name: "L'âme de la Fiesta",
+    desc: "Remportez un combat Fiesta en 2c2. Les combats Fiesta ne sont plus proposés dans la file d'arène ; ce haut fait ne peut plus être obtenu.",
+  },
   pvp_fiesta_double: {
     name: 'Coup double',
+    desc: "Réussissez deux éliminations Fiesta en quatre secondes. Les combats Fiesta ne sont plus proposés dans la file d'arène ; ce haut fait ne peut plus être obtenu.",
   },
   pvp_fiesta_shutdown: {
     name: 'Trouble-fête',
+    desc: "Éliminez un adversaire Fiesta ayant une série d'au moins trois éliminations. Les combats Fiesta ne sont plus proposés dans la file d'arène ; ce haut fait ne peut plus être obtenu.",
   },
   pvp_fiesta_full_build: {
     name: 'Sur son trente-et-un',
+    desc: "Remportez un combat Fiesta avec une augmentation verrouillée pour chacune des trois vagues. Les combats Fiesta ne sont plus proposés dans la file d'arène ; ce haut fait ne peut plus être obtenu.",
   },
   pvp_fiesta_powerups: {
     name: 'Un de chaque',
+    desc: "Ramassez au moins une fois chacun des quatre bonus de l'arène : Démon de vitesse, Colosse, Bottes lunaires et Berserker. Les combats Fiesta ne sont plus proposés dans la file d'arène ; ce haut fait ne peut plus être obtenu.",
   },
   pvp_fiesta_five_kills: {
     name: 'Toute la fête sur le dos',
+    desc: "Réussissez cinq éliminations dans un seul combat Fiesta. Les combats Fiesta ne sont plus proposés dans la file d'arène ; ce haut fait ne peut plus être obtenu.",
   },
   soc_first_party: {
     name: "L'union fait la force",
@@ -1250,30 +1271,175 @@ export const table: DeedLocaleTable = {
     name: 'Pris en flagrant délit',
     desc: "Capturez un Escroc Sacpiéces dans un Trésor enterré avant qu'il ne s'échappe avec l'or.",
   },
+  exp_wisp_maze_hard: {
+    name: 'Plus brillante que les ombres',
+    desc: "Recupere les bourses de pieces volees et echappe-toi du labyrinthe d'Evergarden en difficulte Hard.",
+  },
+  prog_titan: {
+    name: 'Colosse',
+    desc: "Gagner 10 000 000 de points d'expérience au cours de votre vie.",
+    title: 'Colosse',
+  },
   pvp_flag_1h: {
     name: 'Audacieux',
-    desc: 'Gardez le JcJ mondial activé pendant 1 heure de temps de jeu dans le monde ouvert. La déconnexion, la mort et les instances suspendent la progression ; la désactivation la remet à zéro. Les titres obtenus sont permanents.',
+    desc: 'Gardez le JcJ mondial activé pendant 1 heure de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
     title: 'Audacieux',
   },
   pvp_flag_3h: {
     name: 'Insoumis',
-    desc: 'Gardez le JcJ mondial activé pendant 3 heures de temps de jeu dans le monde ouvert. La déconnexion, la mort et les instances suspendent la progression ; la désactivation la remet à zéro. Les titres obtenus sont permanents.',
+    desc: 'Gardez le JcJ mondial activé pendant 3 heures de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
     title: 'Insoumis',
   },
   pvp_flag_6h: {
     name: 'Intrépide',
-    desc: 'Gardez le JcJ mondial activé pendant 6 heures de temps de jeu dans le monde ouvert. La déconnexion, la mort et les instances suspendent la progression ; la désactivation la remet à zéro. Les titres obtenus sont permanents.',
+    desc: 'Gardez le JcJ mondial activé pendant 6 heures de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
     title: 'Intrépide',
   },
   pvp_flag_24h: {
     name: 'Inébranlable',
-    desc: 'Gardez le JcJ mondial activé pendant 24 heures de temps de jeu dans le monde ouvert. La déconnexion, la mort et les instances suspendent la progression ; la désactivation la remet à zéro. Les titres obtenus sont permanents.',
+    desc: 'Gardez le JcJ mondial activé pendant 24 heures de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
     title: 'Inébranlable',
   },
   pvp_flag_168h: {
     name: 'Indomptable',
-    desc: 'Gardez le JcJ mondial activé pendant 7 jours de temps de jeu dans le monde ouvert. La déconnexion, la mort et les instances suspendent la progression ; la désactivation la remet à zéro. Les titres obtenus sont permanents.',
+    desc: 'Gardez le JcJ mondial activé pendant 7 jours de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
     title: 'Indomptable',
+  },
+  cmb_balgath: {
+    name: 'Fin du contremaître',
+    desc: 'Renvoyez le Contremaître enseveli dans son tertre.',
+  },
+  cmb_balgath_ten: {
+    name: 'Le tertre ne garde rien',
+    desc: 'Terrassez le Contremaître enseveli dix fois.',
+  },
+  cmb_point_taken: {
+    name: 'Message bien pointé',
+    desc: "Éteignez la lanterne du Contremaître de paille sur le terrain d'exercice du rassemblement et faites compter ses planches.",
+  },
+  dgn_olen_buttress: {
+    name: 'Tenir le rempart',
+    desc: 'Vainquez le Chevalier-commandant Olen sans que son Rempart rebondissant touche un deuxième joueur.',
+  },
+  dgn_ossick_moored: {
+    name: 'Port sûr',
+    desc: 'Vainquez le Geôlier Ossick sans que personne soit entraîné dans la Fosse de noyade.',
+  },
+  dgn_vael_beacon: {
+    name: 'À la lumière de la balise',
+    desc: 'Vainquez Vael le Lie-brume sans faire exploser une seule Ombre de brume.',
+  },
+  dgn_turretback: {
+    name: "Avis d'expulsion",
+    desc: 'Vainquez le Capitaine naufragé sans que personne soit touché par Bordée spectrale.',
+  },
+  dgn_selthe_pitch: {
+    name: "Toutes les voix à l'unisson",
+    desc: "Vainquez la Mère du chœur Selthe en partageant chaque Chœur entre au moins deux personnes et sans qu'aucun Solo touche une autre personne.",
+  },
+  dgn_colossus_mirror: {
+    name: 'Briser le verre',
+    desc: 'Vainquez le Colosse du verre de marée en brisant chaque Reflet dans les 15 secondes suivant son apparition.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Bien au sec',
+    desc: 'Vainquez Ysolei, Avatar de la Lune noyée, sans que personne soit touché par son Fracas de marée.',
+  },
+  dgn_mere_hydra: {
+    name: 'Toutes les têtes à terre',
+    desc: "Tuez les trois têtes de l'Hydre du lac à moins de 10 secondes d'intervalle.",
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Pas un cheveu roussi',
+    desc: 'Vainquez le Knellwyrm sans que personne soit brûlé par son Mitraillage du bûcher.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Aucune cage ne nous retient',
+    desc: 'Vainquez le Porte-clefs de la prison sans que personne soit écrasé dans une Cage de fer.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Tenus à distance',
+    desc: 'Vainquez le Maître des bêtes seigneur des crocs et son Grand jaguar avec Lien de meute actif pendant moins de 10 secondes au total.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Désherbage',
+    desc: "Vainquez la Florengloutissante sans qu'une seule Pousse épineuse grandisse.",
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Jamais rattrapé',
+    desc: 'Vainquez Zulgar, Voix du Bassin, sans que personne soit Lacéré.',
+  },
+  dgn_great_saurian: {
+    name: 'Titan renversé',
+    desc: "Vainquez le Grand Saurien et son Lanceur de maléfices du howdah à moins de 20 secondes d'intervalle.",
+  },
+  dgn_korgath_all_chains: {
+    name: 'Une fin plus douce',
+    desc: "Vainquez Korgath l'Enchaîné avec ses quatre chaînes brisées.",
+  },
+  dgn_korgath_still_bound: {
+    name: 'Le verrou tient',
+    desc: "Vainquez Korgath l'Enchaîné en difficulté héroïque sans qu'au moins deux de ses chaînes soient jamais brisées.",
+  },
+  dgn_velkhar_cold: {
+    name: 'Maigre réconfort',
+    desc: "Vainquez le Grand Nécromancien Velkhar sans qu'un seul Marche-os ressuscité se relève une deuxième fois.",
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Sur une glace fragile',
+    desc: 'Vainquez Korzul le Gravewyrm en gardant au moins douze des dix-neuf plaques du lac intactes.',
+  },
+  dgn_sledge_tusker: {
+    name: 'Cargaison froide',
+    desc: 'Vainquez le Mastodonte au traîneau sans que personne soit touché par son Piétinement.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Le dernier couplet',
+    desc: 'Vainquez Ysolei, Avatar de la Lune noyée, avec le Dernier chantre du Chœur pâle à vos côtés.',
+    title: 'Témoin du Chœur',
+  },
+  dgn_marrow_tidy: {
+    name: 'Un cimetière bien rangé',
+    desc: 'Vainquez le Sacristain Marrow en plaçant chaque Tombe ouverte au bord de la Cour de la cloche.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Personne ne reste suspendu',
+    desc: "Vainquez la Dame du Froid d'Os sans qu'elle lâche personne de son Étreinte glacée.",
+  },
+  dgn_ilvane_hush: {
+    name: 'Silence, maintenant',
+    desc: 'Vainquez le Chantre Ilvane sans que sa Complainte du creux touche qui que ce soit.',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Toutes les bougies allumées',
+    desc: "Vainquez Morthen le Gravecaller après avoir rallumé les quatre Bougies du souvenir dans les 20 secondes suivant l'apparition de sa Protection des tourmentés.",
+  },
+  dgn_guild_first_contract: {
+    name: 'Contrat signé',
+    desc: "Terminez l'un des contrats de donjon hebdomadaires du Hall de la Lanterne.",
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Habitué du tableau',
+    desc: 'Terminez 10 contrats de donjon hebdomadaires du Hall de la Lanterne.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Vétéran des contrats',
+    desc: 'Terminez 50 contrats de donjon hebdomadaires du Hall de la Lanterne.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Porte-contrat',
+    desc: "Acheté auprès de Garrick Holt, l'intendant du Hall de la Lanterne, pour 6 Sceaux de lanterne.",
+    title: 'Porte-contrat',
+  },
+  feat_guild_hallsworn: {
+    name: 'Assermenté du Hall',
+    desc: "Acheté auprès de Garrick Holt, l'intendant du Hall de la Lanterne, pour 14 Sceaux de lanterne.",
+    title: 'Assermenté du Hall',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Du Hall de la Lanterne',
+    desc: "Acheté auprès de Garrick Holt, l'intendant du Hall de la Lanterne, pour 24 Sceaux de lanterne.",
+    title: 'du Hall de la Lanterne',
   },
 };
 

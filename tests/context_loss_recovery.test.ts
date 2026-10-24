@@ -516,9 +516,11 @@ describe('buildContextRecoveryCallbacks', () => {
     expect(checkpoints).toEqual([['webgl-context-lost', { phase: 'render', contextLost: 3 }]]);
   });
 
-  it('onRestored checkpoints webgl-context-restored', () => {
-    const { callbacks, checkpoints } = harness();
+  it('onRestored runs the ktx2 restore hook, then checkpoints webgl-context-restored', () => {
+    const ktx2MipsOnContextRestored = vi.fn();
+    const { callbacks, checkpoints } = harness({ ktx2MipsOnContextRestored });
     callbacks.onRestored();
+    expect(ktx2MipsOnContextRestored).toHaveBeenCalledTimes(1);
     expect(checkpoints).toEqual([['webgl-context-restored', undefined]]);
   });
 

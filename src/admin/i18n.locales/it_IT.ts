@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const it_IT: Record<string, string> = {
+  'error.buddyGrantFailed': 'Impossibile assegnare il compagno.',
+  'error.characterAlreadyHasThat': 'Quel personaggio possiede già quel compagno o aspetto.',
+  'moderationHistory.actionGrantBuddy': 'Compagno assegnato',
+  'moderationHistory.actionAnnounce': 'Annuncio del reame',
+  'moderationHistory.actionGmInvisible': 'Diventato invisibile',
+  'moderationHistory.actionGmVisible': 'Diventato visibile',
+  'moderationHistory.actionUnwatch': 'Rimosso dalla lista di sorveglianza',
+  'moderationHistory.actionWatch': 'Aggiunto alla lista di sorveglianza',
   'error.flagActiveExists': 'questo account ha già una segnalazione aperta di quel tipo',
   'wealth.largeMovementsUnavailable':
     "i movimenti bancari di grande entità non sono stati caricati (la lettura del registro è scaduta); la ripartizione dell'oro qui sopra è comunque completa",
@@ -360,8 +368,6 @@ export const it_IT: Record<string, string> = {
   'detail.accountActions': "Azioni di moderazione dell'account",
   'detail.banReason': 'Motivo del divieto:{value}',
   'detail.suspensionReason': 'Motivo della sospensione:{value}',
-  'detail.deactivatedNotice': 'Il giocatore ha disattivato questo account il {value}.',
-  'detail.reactivate': 'Riattiva',
   'detail.notePlaceholder': 'Nota moderatore / motivo',
   'detail.suspend1h': 'Sospendi 1h',
   'detail.suspend24h': 'Sospendi 24h',
@@ -460,7 +466,6 @@ export const it_IT: Record<string, string> = {
   'dialog.confirmBan': 'Conferma ban',
   'dialog.confirmUnban': 'Conferma rimozione ban',
   'dialog.confirmUnsuspension': 'Conferma la sospensione',
-  'dialog.confirmReactivation': 'Conferma la riattivazione',
   'dialog.character': 'Personaggio',
   'dialog.account': 'Account',
   'dialog.action': 'Azione',
@@ -474,8 +479,6 @@ export const it_IT: Record<string, string> = {
   'dialog.actionUnban': "Ripristina l'accesso all'account",
   'dialog.actionUnsuspend':
     "Ripristina l'accesso all'account prima della scadenza della sospensione",
-  'dialog.actionReactivate':
-    "Annulla la disattivazione fatta dal giocatore e ripristina l'accesso all'account",
   'dialog.confirm': 'Conferma',
   'dialog.cancel': 'Annulla',
   'dialog.warning': 'Avvertimento',
@@ -1103,14 +1106,6 @@ export const it_IT: Record<string, string> = {
     'Ogni personaggio dell’account mostra l’etichetta pubblica finché non si esaurisce questo tempo di gioco.',
   'detail.cheaterMarkRelengthHint':
     'Sostituisce completamente il tempo restante, senza aggiungervisi. L’etichetta pubblica rimane visibile.',
-  'detail.worldQuestBlockModeration': 'Missioni mondiali',
-  'detail.worldQuestBlockActions': 'Azioni di moderazione delle missioni mondiali',
-  'detail.worldQuestBlockApply': 'Blocca missioni mondiali',
-  'detail.worldQuestBlockLift': 'Sblocca missioni mondiali',
-  'detail.worldQuestBlockReason': 'Motivo del blocco: {value}',
-  'detail.worldQuestBlockedAt': 'Bloccato: {value}',
-  'detail.worldQuestBlockHint':
-    "Per il botting delle missioni mondiali invece di un ban: nessun personaggio dell'account può più iniziare, avanzare o ottenere ricompense dalle missioni mondiali. Tutto il resto resta giocabile.",
   'dialog.confirmCheaterMark': 'Conferma il marchio di baro',
   'dialog.confirmCheaterMarkRelength': 'Conferma la nuova durata del marchio',
   'dialog.confirmCheaterMarkLift': 'Conferma la rimozione del marchio',
@@ -1118,25 +1113,14 @@ export const it_IT: Record<string, string> = {
     'Mostra l’etichetta pubblica Baro su ogni personaggio di questo account',
   'dialog.actionCheaterMarkRelength': 'Sostituisci il tempo di gioco restante del marchio',
   'dialog.actionCheaterMarkLift': 'Rimuovi in anticipo il marchio di baro',
-  'dialog.confirmWorldQuestBlock': 'Conferma blocco missioni mondiali',
-  'dialog.confirmWorldQuestUnblock': 'Conferma sblocco missioni mondiali',
-  'dialog.actionWorldQuestBlock':
-    'Blocca le missioni mondiali per tutti i personaggi di questo account',
-  'dialog.actionWorldQuestUnblock': 'Consenti di nuovo le missioni mondiali su questo account',
   'alert.cheaterMarkDurationInvalid': 'Inserisci un numero intero da 1 a {max} ore.',
   'error.cheaterMarkDurationInvalid':
     'Il credito di tempo di gioco deve essere compreso tra 1 e 100 ore.',
   'error.cheaterMarkNotMarked': 'Questo account non porta il marchio di baro.',
   'error.cheaterMarkAdminTarget':
     'Gli account amministratore non possono ricevere il marchio di baro.',
-  'error.worldQuestBlockAdminTarget':
-    'Gli account amministratore non possono essere bloccati dalle missioni mondiali.',
-  'error.worldQuestBlockAlreadyBlocked': 'Questo account è già bloccato dalle missioni mondiali.',
-  'error.worldQuestBlockNotBlocked': 'Questo account non è bloccato dalle missioni mondiali.',
   'moderationHistory.actionCheaterMark': 'Marchio di baro applicato',
   'moderationHistory.actionCheaterMarkLift': 'Marchio di baro rimosso',
-  'moderationHistory.actionWorldQuestsBlock': 'Missioni mondiali bloccate',
-  'moderationHistory.actionWorldQuestsUnblock': 'Missioni mondiali sbloccate',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Oro',
   'error.flagInvalidStatus': 'stato di contrassegno non valido',

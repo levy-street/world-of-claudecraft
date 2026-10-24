@@ -41,7 +41,14 @@
 // the line clean: the old clip ran per FACE on a mesh whose lower half is a
 // handful of big triangles, and no amount of subdivision fixed the sawtooth.
 import * as THREE from 'three';
+import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
+import {
+  type DecalTextureSizes,
+  decalMapSide,
+  decalTextureSizesFor,
+  FULL_DECAL_TEXTURE_SIZES,
+} from './decal_texture_size_core';
 import {
   type BeardDecal,
   type Gender,
@@ -445,10 +452,32 @@ export function stipple(theta: number, az: number): number {
 // Texture
 // ---------------------------------------------------------------------------
 
-/** Side of the generated decal map. The whole head lands in the inscribed disc,
- *  so a degree of arc is `SIZE/360` texels across the face, fine enough for a
- *  hairline to be a line rather than a staircase. */
-export const DECAL_TEX_SIZE = 1024;
+/** The FULL side of the decal map, painted on every profile but the iOS memory
+ *  one; the side a page actually paints is `decalTextureSizes().stubble`. The
+ *  whole head lands in the inscribed disc, so a degree of arc is `SIZE/360`
+ *  texels across the face, fine enough for a hairline to be a line rather than
+ *  a staircase. The iOS memory profile trades that for memory: at 512 a degree
+ *  is 1.42 texels, the smallest dots are about one texel across and the
+ *  hairline is coarser in texels. The coverage is kept (the mean alpha of every
+ *  style matches the full map's first mip, tests/decal_texture_profile.test.ts),
+ *  and a phone never samples finer than 512 in the world. */
+export const DECAL_TEX_SIZE = FULL_DECAL_TEXTURE_SIZES.stubble;
+
+let pageDecalSizes: DecalTextureSizes | null = null;
+
+/** The decal map sides for this page, resolved from the memory profile at the
+ *  first paint and then held. The iOS memory profile is the platform, fixed for
+ *  the page, so the hold only makes explicit that every cached map has one
+ *  size. */
+export function decalTextureSizes(): DecalTextureSizes {
+  pageDecalSizes ??= decalTextureSizesFor(GFX);
+  return pageDecalSizes;
+}
+
+/** Forget the held sizes so a test can resolve them under another profile. */
+export function resetDecalTextureSizesForTest(): void {
+  pageDecalSizes = null;
+}
 
 export function decalKey(sel: StubbleSelection): string {
   return `${sel.scalp ?? '-'}|${sel.beard ?? '-'}`;
@@ -466,7 +495,7 @@ export function decalKey(sel: StubbleSelection): string {
  */
 export function decalTextureData(
   sel: StubbleSelection,
-  size = DECAL_TEX_SIZE,
+  size = decalTextureSizes().stubble,
 ): Uint8Array<ArrayBuffer> {
   const out = new Uint8Array(new ArrayBuffer(size * size * 4));
   decalTextureRows(sel, out, 0, size, size);
@@ -485,7 +514,7 @@ export function decalTextureRows(
   out: Uint8Array,
   rowStart: number,
   rowEnd: number,
-  size = DECAL_TEX_SIZE,
+  size = decalTextureSizes().stubble,
 ): void {
   // RGB is filled EVERYWHERE, alpha only where there is growth. three multiplies
   // the whole texel into the fragment, so a transparent texel left at black
@@ -569,13 +598,8 @@ export function decalTextureFromData(
   const key = decalKey(sel);
   const hit = textureCache.get(key);
   if (hit) return hit;
-  const tex = new THREE.DataTexture(
-    data,
-    DECAL_TEX_SIZE,
-    DECAL_TEX_SIZE,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType,
-  );
+  const side = decalMapSide(data.length);
+  const tex = new THREE.DataTexture(data, side, side, THREE.RGBAFormat, THREE.UnsignedByteType);
   tex.name = `stubble_${key}`;
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.ClampToEdgeWrapping;

@@ -75,6 +75,12 @@ export interface RevealGateCore {
    *  cover polls it to know whether anything the camera landed among is still
    *  held. */
   heldImminentKeys(): number;
+  /** The context every key was proved (or half proved) on is gone (a WebGL
+   *  context restore): forget every key, warm or still compiling, so the next
+   *  consult holds and compiles again on the restored context. The host stops
+   *  honouring the settles of requests made before this (reveal_gate.ts).
+   *  Returns how many keys were forgotten. */
+  reset(): number;
 }
 
 interface KeyEntry {
@@ -164,6 +170,11 @@ export function createRevealGateCore(
         held++;
       }
       return held;
+    },
+    reset(): number {
+      const forgotten = keys.size;
+      keys.clear();
+      return forgotten;
     },
     readiness(key: string, out: RevealGateReadiness): RevealGateReadiness {
       const entry = keys.get(key);

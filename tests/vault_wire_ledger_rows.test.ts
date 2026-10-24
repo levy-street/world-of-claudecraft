@@ -21,8 +21,10 @@ vi.mock('../server/db', () => ({
 }));
 
 import { bankLedgerIdle } from '../server/bank_ledger';
+import { saveCharacterAndMarketState, saveCharacterState } from '../server/db';
 import type { GameServer as GameServerType } from '../server/game';
 import { GameServer } from '../server/game';
+import { dispatchVaultCommand } from '../server/vault_wire';
 import { decodeVaultInfoWire } from '../src/net/vault_snapshot_wire';
 import { canonicalMaterialComposition, type MaterialSource } from '../src/sim/material_sources';
 import { vaultStoredCount } from '../src/sim/materials_vault';
@@ -98,7 +100,10 @@ function journalRows(session: Seated['session']): Record<string, unknown>[] {
 function kickFrames(fw: FakeClient): unknown[] {
   return fw.sent.filter((frame) => {
     try {
-      const parsed = JSON.parse(String(frame)) as { t?: string; error?: string };
+      const parsed = (typeof frame === 'string' ? JSON.parse(frame) : frame) as {
+        t?: string;
+        error?: string;
+      };
       return parsed.t === 'error' && parsed.error === KICK_TEXT;
     } catch {
       return false;
@@ -126,6 +131,50 @@ function carried(meta: PlayerMeta, itemId: string): number {
 
 beforeEach(async () => {
   await bankLedgerIdle();
+});
+
+describe('vault mutation facts projection failures', () => {
+  it('quarantines the actual session before disconnect and never saves an unpaired mutation', async () => {
+    const server = new GameServer();
+    const { session, sim, pid, meta, fw } = seat(server, 9001, 'Vaultfault', 10);
+    meta.inventory = [{ itemId: 'copper_ore', count: 2 }];
+    vi.mocked(saveCharacterState).mockClear();
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    const original = sim.vaultDeposit.bind(sim);
+    vi.spyOn(sim, 'vaultDeposit').mockImplementation((...args) => {
+      const facts = original(...args);
+      if (facts)
+        Object.defineProperty(facts, 'slots', {
+          get() {
+            throw new Error('receipt facts unavailable');
+          },
+        });
+      return facts;
+    });
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      expect(() =>
+        dispatchVaultCommand(
+          sim,
+          { characterId: session.characterId, accountId: session.accountId },
+          'vault_deposit',
+          { slot: 0 },
+          pid,
+          session.bankLedgerJournal.admission,
+        ),
+      ).toThrow('receipt facts unavailable');
+      expect(meta.inventory).toEqual([]);
+      expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(2);
+      expect(session.escrowQuarantined).toBe(true);
+      await settle();
+      expect(kickFrames(fw)).toHaveLength(1);
+      expect(session.left).toBe(true);
+      expect(vi.mocked(saveCharacterState)).not.toHaveBeenCalled();
+      expect(vi.mocked(saveCharacterAndMarketState)).not.toHaveBeenCalled();
+    } finally {
+      log.mockRestore();
+    }
+  });
 });
 
 describe('materials vault ledger rows for mixed-identity stacks', () => {
@@ -196,10 +245,10 @@ describe('materials vault ledger rows for mixed-identity stacks', () => {
     ]);
   });
 
-  it('a 120-ceiling vault stocked past 80 keeps taking mixed deposits and paying them back', async () => {
+  it('a 200-ceiling vault stocked past 100 keeps taking mixed deposits and paying them back', async () => {
     const server = new GameServer();
-    const { session, sim, pid, meta, fw } = seat(server, 3, 'Vaultwide', 3);
-    for (let i = 0; i < 5; i++) {
+    const { session, sim, pid, meta, fw } = seat(server, 3, 'Vaultwide', 2);
+    for (let i = 0; i < 6; i++) {
       sim.addItem('copper_ore', 20, pid, {
         materialSources: composition([
           { source: i % 2 ? signedAna : signedBob, count: 12 },
@@ -212,10 +261,10 @@ describe('materials vault ledger rows for mixed-identity stacks', () => {
 
     expect(session.escrowQuarantined).toBe(false);
     expect(kickFrames(fw)).toEqual([]);
-    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(100);
+    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(120);
     expect(carried(meta, 'copper_ore')).toBe(0);
     const info = sim.vaultInfoFor(pid);
-    expect(info?.perMaterialCap).toBe(120);
+    expect(info?.perMaterialCap).toBe(200);
     expect(decodeVaultInfoWire(JSON.parse(JSON.stringify(info)))).not.toBeNull();
 
     // Shift-click partial: 20 units (one bag stack) out of the three-identity row.
@@ -230,7 +279,7 @@ describe('materials vault ledger rows for mixed-identity stacks', () => {
     expect(session.escrowQuarantined).toBe(false);
     expect(session.left).toBe(false);
     expect(kickFrames(fw)).toEqual([]);
-    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(80);
+    expect(vaultStoredCount(meta.vault, 'copper_ore')).toBe(100);
     expect(carried(meta, 'copper_ore')).toBe(20);
   });
 

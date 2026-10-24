@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.44.7-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.45.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -208,7 +208,7 @@ Every class runs on classic-era MMO mechanics implemented from first principles,
 
 - **Warrior**: a rage engine that turns damage taken and dealt into ever bigger swings, bleeds, and shouts.
 - **Paladin**: a holy knight who brands foes with an oath, then spends it on verdicts, wards, and mending light.
-- **Hunter**: ranged auto-attacks with a classic-style dead zone, snares and traps of the wild, and a tameable pet at your side.
+- **Hunter**: ranged auto-attacks and shots that work even point blank, snares and traps of the wild, and a tameable pet at your side.
 - **Rogue**: energy and combo points, opened from stealth and cashed in on cold-blooded finishers.
 - **Priest**: psalms and litanies that shield allies, mend wounds, and rot an enemy's mind in equal measure.
 - **Shaman**: elemental jolts, mending waters, and weapon imbues that spark on every swing.

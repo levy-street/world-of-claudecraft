@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ja_JP: Record<string, string> = {
+  'error.buddyGrantFailed': '仲間を付与できませんでした。',
+  'error.characterAlreadyHasThat': 'そのキャラクターはすでにその仲間または外見を所持しています。',
+  'moderationHistory.actionGrantBuddy': '仲間を付与しました',
+  'moderationHistory.actionAnnounce': 'レルム全体への告知',
+  'moderationHistory.actionGmInvisible': '不可視状態になった',
+  'moderationHistory.actionGmVisible': '可視状態になった',
+  'moderationHistory.actionUnwatch': '監視リストから削除',
+  'moderationHistory.actionWatch': '監視リストに追加',
   'error.flagActiveExists': 'このアカウントには、その種類の未処理のフラグがすでにあります。',
   'wealth.largeMovementsUnavailable':
     '大規模な銀行の動きを読み込めませんでした（台帳の読み取りがタイムアウトしました）。上記の金の内訳は完全です。',
@@ -413,8 +421,6 @@ export const ja_JP: Record<string, string> = {
   'detail.accountActions': 'アカウントモデレーションアクション',
   'detail.banReason': '禁止理由:{value}',
   'detail.suspensionReason': '停止理由:{value}',
-  'detail.deactivatedNotice': 'プレイヤーが {value} にこのアカウントを無効化しました。',
-  'detail.reactivate': '再有効化',
   'detail.notePlaceholder': 'モデレーターメモ / 理由',
   'detail.suspend1h': '1時間停止',
   'detail.suspend24h': '24時間停止',
@@ -513,7 +519,6 @@ export const ja_JP: Record<string, string> = {
   'dialog.confirmBan': 'BANを確認',
   'dialog.confirmUnban': 'BAN解除を確認',
   'dialog.confirmUnsuspension': '停止解除の確認',
-  'dialog.confirmReactivation': '再有効化の確認',
   'dialog.character': 'キャラクター',
   'dialog.account': 'アカウント',
   'dialog.action': '操作',
@@ -526,8 +531,6 @@ export const ja_JP: Record<string, string> = {
   'dialog.actionBan': 'アカウントの永久ロック',
   'dialog.actionUnban': 'アカウントのログインアクセスを復旧',
   'dialog.actionUnsuspend': '一時停止の有効期限が切れる前にアカウントのログイン アクセスを復元する',
-  'dialog.actionReactivate':
-    'プレイヤー自身による無効化を取り消し、アカウントのログインアクセスを復旧',
   'dialog.confirm': '確認',
   'dialog.cancel': 'キャンセル',
   'dialog.warning': '警告',
@@ -1099,37 +1102,18 @@ export const ja_JP: Record<string, string> = {
     'このプレイ時間を使い切るまで、アカウント内の全キャラクターに公開タグが表示されます。',
   'detail.cheaterMarkRelengthHint':
     '残り時間を完全に置き換えます。加算はされません。公開タグは引き続き表示されます。',
-  'detail.worldQuestBlockModeration': 'ワールドクエスト',
-  'detail.worldQuestBlockActions': 'ワールドクエストのモデレーション操作',
-  'detail.worldQuestBlockApply': 'ワールドクエストをブロック',
-  'detail.worldQuestBlockLift': 'ワールドクエストのブロックを解除',
-  'detail.worldQuestBlockReason': 'ブロック理由：{value}',
-  'detail.worldQuestBlockedAt': 'ブロック日時：{value}',
-  'detail.worldQuestBlockHint':
-    'BAN の代わりにワールドクエストのボット行為に使用します。このアカウントのすべてのキャラクターは、ワールドクエストの開始、進行、報酬の獲得ができなくなります。それ以外はすべて引き続きプレイできます。',
   'dialog.confirmCheaterMark': 'チーターマークの適用を確認',
   'dialog.confirmCheaterMarkRelength': '新しいマーク期間を確認',
   'dialog.confirmCheaterMarkLift': 'チーターマークの解除を確認',
   'dialog.actionCheaterMark': 'このアカウントの全キャラクターに公開の「チーター」タグを付けます',
   'dialog.actionCheaterMarkRelength': 'このチーターマークの残りプレイ時間を置き換えます',
   'dialog.actionCheaterMarkLift': 'チーターマークを期限前に外します',
-  'dialog.confirmWorldQuestBlock': 'ワールドクエストのブロックを確認',
-  'dialog.confirmWorldQuestUnblock': 'ワールドクエストのブロック解除を確認',
-  'dialog.actionWorldQuestBlock':
-    'このアカウントのすべてのキャラクターのワールドクエストをブロックする',
-  'dialog.actionWorldQuestUnblock': 'このアカウントでワールドクエストを再び許可する',
   'alert.cheaterMarkDurationInvalid': '1から{max}までの整数の時間数を入力してください。',
   'error.cheaterMarkDurationInvalid': 'プレイ時間の上限は1時間から100時間までです。',
   'error.cheaterMarkNotMarked': 'このアカウントにはチーターマークが付いていません。',
   'error.cheaterMarkAdminTarget': '管理者アカウントにはチーターマークを付けられません。',
-  'error.worldQuestBlockAdminTarget': '管理者アカウントはワールドクエストからブロックできません。',
-  'error.worldQuestBlockAlreadyBlocked':
-    'このアカウントはすでにワールドクエストからブロックされています。',
-  'error.worldQuestBlockNotBlocked': 'このアカウントはワールドクエストからブロックされていません。',
   'moderationHistory.actionCheaterMark': 'チーターマークを適用',
   'moderationHistory.actionCheaterMarkLift': 'チーターマークを解除',
-  'moderationHistory.actionWorldQuestsBlock': 'ワールドクエストをブロック済み',
-  'moderationHistory.actionWorldQuestsUnblock': 'ワールドクエストのブロックを解除済み',
   // v0.40 release i18n fill.
   'accounts.colGold': '金',
   'error.flagInvalidStatus': '無効なフラグステータス',

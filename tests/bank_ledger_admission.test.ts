@@ -158,10 +158,10 @@ function vaultSim(initial: VaultInfo = vaultInfo()): VaultSim & {
       info = next;
     },
     ctx: {
-      resolve: () => ({ meta: { entityId: 88, inventory: [] } }),
+      resolve: () => ({ meta: { entityId: 88, inventory: [], vault: { special: info.special } } }),
       error: (_id, text) => void errors.push(text),
     },
-    vaultInfoFor: () => info,
+    vaultInfoWireRevFor: () => 0,
     vaultDeposit: vi.fn(),
     vaultWithdraw: vi.fn(),
     vaultDepositAll: vi.fn(),
@@ -455,6 +455,7 @@ describe('bank and vault synchronous ledger admission', () => {
     const vault = vaultSim();
     vi.mocked(vault.vaultBuyUpgrade).mockImplementation(() => {
       vault.setInfo(vaultInfo({ upgrades: 2, perMaterialCap: 80 }));
+      return { kind: 'upgrade', price: 50000, upgrades: 2 };
     });
     expect(() => dispatchVaultCommand(vault, WHO, 'vault_buy_upgrade', {}, 1, admission)).toThrow(
       commitFailure,
@@ -500,6 +501,14 @@ describe('bank and vault synchronous ledger admission', () => {
     const vault = vaultSim();
     vi.mocked(vault.vaultDepositAll).mockImplementation(() => {
       vault.setInfo(vaultInfo({ stock: { silverleaf: 3, peacebloom: 2 } }));
+      return {
+        kind: 'move',
+        slots: [
+          { itemId: 'silverleaf', count: 3 },
+          { itemId: 'peacebloom', count: 2 },
+        ],
+        upgrades: 1,
+      };
     });
     dispatchVaultCommand(vault, WHO, 'vault_deposit_all', {}, 1, sweepRig.admission);
 

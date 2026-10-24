@@ -149,7 +149,7 @@ export const PROVING_SHORE_ROADS: { x: number; z: number }[][] = [
 // (PROVING_SHORE_OBJECTS ps_ferry_bell, routed by
 // src/sim/interactions/ferry_bell.ts), so nobody is ever teleported by
 // wandering over a trigger. The island bell sets the player down in
-// Eastbrook TOWN (beside the spawn square); the vale-strand bell rings a
+// Eastbrook TOWN (on the quay, beside the town bell); the vale-strand bell rings a
 // returning player back to the island arrival for a refresher. The compulsory
 // tutorial greeting ferry (sim/tutorial/greeting.ts) lands at
 // PROVING_SHORE_ARRIVAL.
@@ -270,14 +270,14 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'wayfarer_bryn',
     name: 'Wayfarer Bryn',
     title: 'Harbor Guide',
-    pos: { x: 6, z: -7 },
-    // Facing the town square's middle from her spot southeast of it
-    // (forward = (-sin f, cos f), so 0.7 rad points toward (0, 0)).
+    // By the docks spawn every new arrival steps off at, the same spot and
+    // facing the Studio world map gives her (data/maps/world_of_claudecraft).
+    pos: { x: -79.2, z: -52.1 },
     facing: 0.7,
     color: 0x8a6a9a,
     questIds: [],
     greeting:
-      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home.',
+      'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell down on the quay rings you across any day of the year, and its twin on the island rings you home.',
   },
   instructor_maren: {
     id: 'instructor_maren',
@@ -824,11 +824,10 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
     itemId: 'ps_ferry_bell',
     name: 'Ferry Bell',
     // The clicked crossing (interactions/ferry_bell.ts): the Old Pier's bell
-    // rings a player to Eastbrook town, and its twin INSIDE town (beside the
-    // harbor's Ravenpost mailbox at (-10, -98), on its seaward side, clear of
-    // the posting spot at (-10, -96.9)) rings a returning player back to the
-    // island arrival. The twin moved with the mailbox when the New Eastbrook
-    // program rebuilt the town around the quay.
+    // rings a player to Eastbrook town, and its twin down on Eastbrook's quay
+    // (by the harbour, near the docks spawn) rings a returning player back to
+    // the island arrival. The island bell sets a graduate down beside this
+    // twin (FERRY_BELL_TOWN_LANDING).
     //
     // The island bell stands on the dry ground between the pier head and the
     // Gauntlet's mouth, a few steps from Ferryman Odo (his completion note
@@ -836,7 +835,7 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
     // of the arrival point at (-281, -18).
     positions: [
       { x: -279, z: -10 },
-      { x: -7.5, z: -100 },
+      { x: -95, z: -45 },
     ],
   },
 ];

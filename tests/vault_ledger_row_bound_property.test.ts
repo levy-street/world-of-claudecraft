@@ -342,10 +342,10 @@ describe('over-bound refusal happens before mutation', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const fake: VaultSim = {
       ctx: {
-        resolve: () => ({ meta: { entityId: 5, inventory } }),
+        resolve: () => ({ meta: { entityId: 5, inventory, vault: { special: [] } } }),
         error: (_id, text) => void errors.push(text),
       },
-      vaultInfoFor: () => null,
+      vaultInfoWireRevFor: () => null,
       vaultDeposit: vi.fn(),
       vaultWithdraw: vi.fn(),
       vaultDepositAll: depositAll,

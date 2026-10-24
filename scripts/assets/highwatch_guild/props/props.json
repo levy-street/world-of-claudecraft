@@ -1,0 +1,283 @@
+{
+  "about": "Lantern Hall's painted props (guild_props.py hangs and stands them, guild_furnish.py and guild_yard.py name where; build_atlas.mjs packs them). Each is a real model with its own painted map, packed into its own tile of the atlas ([left, top, side] in pixels): a 1024 tile for a big hero piece, a 512 for most, a 256 for the small ones. Every piece made for the guild was made the Mirefen tavern's way: its front, side and back views painted with ChatGPT's image generation in the tavern stag's style (tmp/guild_props_gen, not committed), then built from them in Tripo Studio (model P2, multi-view image to 3D, Smart Mesh, quad topology, its texture from the same views); the chandelier, sconces, lanterns, candles, candelabrum, jug, barrels, crates, sacks, firewood basket, bottles, weapon rack and bearskin are pieces the project made the same way for the Mirefen tavern's painted rebuild, reused here. dense is the Tripo model as exported; bake_low.py brings it down to its triangles (welded, decimated, unwrapped afresh and its paint baked onto the new surface at its tile's side) and writes source.",
+  "atlas": {
+    "width": 2048,
+    "height": 5120,
+    "pad": 8,
+    "out": "tex/GuildProps_Color.jpg",
+    "data": "props/props_data.json"
+  },
+  "props": [
+    {
+      "id": "trophy_gravewyrm",
+      "about": "the Gravewyrm Sanctum's trophy: an undead wyrm's skull over the trophy hall's hearth",
+      "source": "tmp/asset_src/highwatch_guild_props/low/trophy_gravewyrm.glb",
+      "triangles": 1400,
+      "tile": [0, 0, 1024],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/trophy_gravewyrm_tripo.glb"
+    },
+    {
+      "id": "notice_board",
+      "about": "the contracts board on the great hall's left wall",
+      "source": "tmp/asset_src/highwatch_guild_props/low/notice_board.glb",
+      "triangles": 700,
+      "tile": [1024, 0, 1024],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/notice_board_tripo.glb"
+    },
+    {
+      "id": "map_table",
+      "about": "the recruiter's map table",
+      "source": "tmp/asset_src/highwatch_guild_props/low/map_table.glb",
+      "triangles": 900,
+      "tile": [0, 1024, 1024],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/map_table_tripo.glb"
+    },
+    {
+      "id": "trophy_crypt",
+      "about": "the Hollow Crypt's trophy: a crypt lord's horned skull-mask and bell",
+      "source": "tmp/asset_src/highwatch_guild_props/low/trophy_crypt.glb",
+      "triangles": 800,
+      "tile": [1024, 1024, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/trophy_crypt_tripo.glb"
+    },
+    {
+      "id": "trophy_bastion",
+      "about": "the Sunken Bastion's trophy: a sea lantern, a cutlass and a barnacled chain",
+      "source": "tmp/asset_src/highwatch_guild_props/low/trophy_bastion.glb",
+      "triangles": 800,
+      "tile": [1536, 1024, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/trophy_bastion_tripo.glb"
+    },
+    {
+      "id": "trophy_temple",
+      "about": "the Drowned Temple's trophy: a bronze trident and a pearl crescent",
+      "source": "tmp/asset_src/highwatch_guild_props/low/trophy_temple.glb",
+      "triangles": 700,
+      "tile": [1024, 1536, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/trophy_temple_tripo.glb"
+    },
+    {
+      "id": "trophy_wildheart",
+      "about": "the Wildheart Basin's trophy: a tusked beast mask on a fan of feathers",
+      "source": "tmp/asset_src/highwatch_guild_props/low/trophy_wildheart.glb",
+      "triangles": 800,
+      "tile": [1536, 1536, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/trophy_wildheart_tripo.glb"
+    },
+    {
+      "id": "trophy_plaque",
+      "about": "the trophy plaques' shield-shaped oak boards",
+      "source": "tmp/asset_src/highwatch_guild_props/low/trophy_plaque.glb",
+      "triangles": 220,
+      "tile": [0, 2048, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/trophy_plaque_tripo.glb"
+    },
+    {
+      "id": "gilt_laurel",
+      "about": "a plaque's gilded laurels, shown for a Heroic clear",
+      "source": "tmp/asset_src/highwatch_guild_props/low/gilt_laurel.glb",
+      "triangles": 320,
+      "tile": [512, 2048, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/gilt_laurel_tripo.glb"
+    },
+    {
+      "id": "guild_banner",
+      "about": "the guild's blue lantern banner",
+      "source": "tmp/asset_src/highwatch_guild_props/low/guild_banner.glb",
+      "triangles": 220,
+      "tile": [1024, 2048, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/guild_banner_tripo.glb"
+    },
+    {
+      "id": "clerk_desk",
+      "about": "the contract clerk's desk",
+      "source": "tmp/asset_src/highwatch_guild_props/low/clerk_desk.glb",
+      "triangles": 700,
+      "tile": [1536, 2048, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/clerk_desk_tripo.glb"
+    },
+    {
+      "id": "cloth_shelf",
+      "about": "the quartermaster's shelves of folded cloth",
+      "source": "tmp/asset_src/highwatch_guild_props/low/cloth_shelf.glb",
+      "triangles": 520,
+      "tile": [0, 2560, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/cloth_shelf_tripo.glb"
+    },
+    {
+      "id": "armchair",
+      "about": "the fireside armchairs",
+      "source": "tmp/asset_src/highwatch_guild_props/low/armchair.glb",
+      "triangles": 380,
+      "tile": [512, 2560, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/armchair_tripo.glb"
+    },
+    {
+      "id": "long_table",
+      "about": "the adventurers' long tables",
+      "source": "tmp/asset_src/highwatch_guild_props/low/long_table.glb",
+      "triangles": 500,
+      "tile": [1024, 2560, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/long_table_tripo.glb"
+    },
+    {
+      "id": "tabard_stand",
+      "about": "the guild's tabard on its stand",
+      "source": "tmp/asset_src/highwatch_guild_props/low/tabard_stand.glb",
+      "triangles": 400,
+      "tile": [1536, 2560, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/tabard_stand_tripo.glb"
+    },
+    {
+      "id": "guild_crest",
+      "about": "the guild's crest",
+      "source": "tmp/asset_src/highwatch_guild_props/low/guild_crest.glb",
+      "triangles": 300,
+      "tile": [0, 3072, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/guild_crest_tripo.glb"
+    },
+    {
+      "id": "water_trough",
+      "about": "the stable yard's trough",
+      "source": "tmp/asset_src/highwatch_guild_props/low/water_trough.glb",
+      "triangles": 250,
+      "tile": [512, 3072, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/water_trough_tripo.glb"
+    },
+    {
+      "id": "hitching_rail",
+      "about": "the stable yard's hitching rail",
+      "source": "tmp/asset_src/highwatch_guild_props/low/hitching_rail.glb",
+      "triangles": 250,
+      "tile": [1024, 3072, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/hitching_rail_tripo.glb"
+    },
+    {
+      "id": "wheel_chandelier",
+      "about": "the great hall's wheel chandeliers (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/wheel_chandelier.glb",
+      "triangles": 700,
+      "tile": [1536, 3072, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/wheel_chandelier_tripo.glb"
+    },
+    {
+      "id": "weapon_rack",
+      "about": "the weapon racks (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/weapon_rack.glb",
+      "triangles": 320,
+      "tile": [0, 3584, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/weapon_rack_tripo.glb"
+    },
+    {
+      "id": "barrel_stack",
+      "about": "the stacked barrels (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/barrel_stack.glb",
+      "triangles": 500,
+      "tile": [1024, 3584, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/barrel_stack_tripo.glb"
+    },
+    {
+      "id": "crate_stack",
+      "about": "the stacked crates (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/crate_stack.glb",
+      "triangles": 600,
+      "tile": [1536, 3584, 512],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/crate_stack_tripo.glb"
+    },
+    {
+      "id": "counter_wares",
+      "about": "the quartermaster's strongbox, scales, ledger and coins",
+      "source": "tmp/asset_src/highwatch_guild_props/low/counter_wares.glb",
+      "triangles": 450,
+      "tile": [0, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/counter_wares_tripo.glb"
+    },
+    {
+      "id": "bench",
+      "about": "the adventurers' benches",
+      "source": "tmp/asset_src/highwatch_guild_props/low/bench.glb",
+      "triangles": 150,
+      "tile": [256, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/bench_tripo.glb"
+    },
+    {
+      "id": "wall_sconce",
+      "about": "the candle sconces (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/wall_sconce.glb",
+      "triangles": 240,
+      "tile": [512, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/wall_sconce_tripo.glb"
+    },
+    {
+      "id": "wall_lantern",
+      "about": "the lanterns on iron arms (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/wall_lantern.glb",
+      "triangles": 450,
+      "tile": [768, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/wall_lantern_tripo.glb"
+    },
+    {
+      "id": "table_candles",
+      "about": "the table candles (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/table_candles.glb",
+      "triangles": 200,
+      "tile": [1024, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/table_candles_tripo.glb"
+    },
+    {
+      "id": "candelabrum",
+      "about": "the standing candelabra (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/candelabrum.glb",
+      "triangles": 360,
+      "tile": [1280, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/candelabrum_tripo.glb"
+    },
+    {
+      "id": "ale_jug",
+      "about": "the ale jugs (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/ale_jug.glb",
+      "triangles": 260,
+      "tile": [1536, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/ale_jug_tripo.glb"
+    },
+    {
+      "id": "grain_sacks",
+      "about": "the sacks of meal (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/grain_sacks.glb",
+      "triangles": 450,
+      "tile": [1792, 4096, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/grain_sacks_tripo.glb"
+    },
+    {
+      "id": "firewood_basket",
+      "about": "the firewood baskets (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/firewood_basket.glb",
+      "triangles": 450,
+      "tile": [0, 4352, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/firewood_basket_tripo.glb"
+    },
+    {
+      "id": "bottle_trio",
+      "about": "the bottles (the tavern's)",
+      "source": "tmp/asset_src/highwatch_guild_props/low/bottle_trio.glb",
+      "triangles": 300,
+      "tile": [256, 4352, 256],
+      "dense": "tmp/asset_src/highwatch_guild_props/src/bottle_trio_tripo.glb"
+    },
+    {
+      "id": "shield_blue_iron",
+      "about": "the Crucible's blue iron epic shield on the board wall (the game's own epic shield model)",
+      "source": "public/models/weapons/shield_epic_crucible_heat_blue_iron.glb",
+      "triangles": 600,
+      "tile": [512, 3584, 512],
+      "turn": 180
+    },
+    {
+      "id": "shield_ember_warden",
+      "about": "the Votive ember warden epic shield on the board wall (the game's own epic shield model)",
+      "source": "public/models/weapons/shield_epic_votive_ember_warden.glb",
+      "triangles": 600,
+      "tile": [0, 4608, 512]
+    }
+  ]
+}

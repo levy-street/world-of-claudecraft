@@ -12,8 +12,13 @@ their own CLAUDE.md: `sim/` (+ `sim/content/`, `sim/professions/`, `sim/physics/
 `editor/` (below). Read the local one before working in an area.
 
 ## Entries (what loads what)
-- `index.html` AND `play.html` both load `src/main.ts`. Guard index-only DOM
-  lookups with `?.`: `/play` lacks the marketing shell, and an unguarded lookup
+- `play.html` loads `src/main.ts`; `index.html` loads `src/boot.ts`, which imports the
+  style barrel and then `src/main.ts` as a dynamic import. On a plain first visit
+  (`bootModeFor` in `src/ui/landing_first_core.ts`) the landing page paints without the
+  client and `src/main.ts` starts on the first interaction (`src/ui/landing_first.ts`
+  holds and replays a button click made before then); every other visit starts it at
+  once. Either way `src/main.ts` runs the same code on both entries. Guard index-only
+  DOM lookups with `?.`: `/play` lacks the marketing shell, and an unguarded lookup
   throws there (a bug class that has shipped before).
 - `guide.html` loads `src/guide/main.ts`; `editor.html` loads `src/editor/main.ts`;
   `admin.html` is the standalone Svelte admin SPA (`src/admin/`).

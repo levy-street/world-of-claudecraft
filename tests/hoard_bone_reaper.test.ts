@@ -279,7 +279,6 @@ describe('Wandering Scythe (authoritative)', () => {
   it('is avoided by position alone: beside the pivot, or outside its reach', () => {
     for (const where of ['pivot', 'outside'] as const) {
       const entry = encounter();
-      entry.inst.vault!.rarity = 'common'; // Isolate one scythe's geometry.
       const cue = startScythe(entry);
       const frame = decodeScytheFrame(cue.radius, cue.halfAngle ?? 0);
       const pattern = scythePatternOf(cue.cueId);
@@ -419,8 +418,8 @@ describe('Soul Harvest (authoritative)', () => {
     const entry = encounter();
     const souls = startHarvest(entry);
     // A lone player in a LEGENDARY hoard: the solo count plus the rarity's one.
-    expect(souls).toHaveLength(soulCountFor(5, HOARD_RARITY_PRESSURE.legendary.extra));
-    expect(souls).toHaveLength(8);
+    expect(souls).toHaveLength(soulCountFor(1, HOARD_RARITY_PRESSURE.legendary.extra));
+    expect(souls).toHaveLength(4);
     for (const soul of souls) {
       expect(soul.kind).toBe('mark');
       // Untargeted on purpose: a targeted mark is drawn ON its target.
@@ -511,7 +510,7 @@ describe('the price of a soul, and pressure by party and rarity', () => {
       entry.sim.player.pos = { ...entry.sim.player.pos, x: soul.x, z: soul.z };
       run(entry.sim, entry.boss, DT * 2);
       expect(burdenOf()).toMatchObject({ kind: 'vulnerability', stacks: taken });
-      expect(burdenOf()?.value).toBeCloseTo(taken * SOUL_HARVEST.burdenPerStack, 9);
+      expect(burdenOf()?.value).toBeCloseTo(taken * SOUL_HARVEST.soloBurdenPerStack, 9);
       expect(burdenOf()?.remaining).toBeGreaterThan(SOUL_HARVEST.burdenDurationSec - 1);
     }
     expect(entry.boss.auras.some((a) => a.id === HOARD_HARVESTED_SOUL_AURA_ID)).toBe(false);
@@ -536,7 +535,7 @@ describe('the price of a soul, and pressure by party and rarity', () => {
     const entry = encounter();
     const share = 0.2;
     expect(hoardMechanicDamage(entry.inst, share)).toBe(
-      Math.round(HOARD_REFERENCE_HEALTH * share * HOARD_RARITY_PRESSURE.legendary.damage * 0.7),
+      Math.round(HOARD_REFERENCE_HEALTH * share * HOARD_RARITY_PRESSURE.legendary.damage),
     );
     if (entry.inst.vault) entry.inst.vault.rarity = 'common';
     expect(hoardMechanicDamage(entry.inst, share)).toBe(
@@ -544,11 +543,11 @@ describe('the price of a soul, and pressure by party and rarity', () => {
     );
   });
 
-  it('sends a mirrored PAIR of scythes at fixed epic and legendary pressure regardless of entrants', () => {
+  it('sends a mirrored PAIR of scythes only at full pressure, never at a lone player', () => {
     const heads = (vaultRarity: 'common' | 'rare' | 'epic' | 'legendary', n: number) =>
       hoardIntensity({ rarity: vaultRarity, ownerPid: 1, headCount: n, level: 20 }, n);
-    expect(heads('legendary', 1)).toBeGreaterThanOrEqual(HOARD_DOUBLE_MECHANIC_INTENSITY);
-    expect(heads('legendary', 3)).toBeGreaterThanOrEqual(HOARD_DOUBLE_MECHANIC_INTENSITY);
+    expect(heads('legendary', 1)).toBeLessThan(HOARD_DOUBLE_MECHANIC_INTENSITY);
+    expect(heads('legendary', 3)).toBeLessThan(HOARD_DOUBLE_MECHANIC_INTENSITY);
     expect(heads('legendary', 4)).toBeGreaterThanOrEqual(HOARD_DOUBLE_MECHANIC_INTENSITY);
     expect(heads('epic', 5)).toBeGreaterThanOrEqual(HOARD_DOUBLE_MECHANIC_INTENSITY);
     expect(heads('rare', 5)).toBeLessThan(HOARD_DOUBLE_MECHANIC_INTENSITY);
@@ -597,9 +596,8 @@ describe('the price of a soul, and pressure by party and rarity', () => {
       () => {},
     );
     expect(corneredState.cues.filter((cue) => cue.variant === 'bone-scythe')).toHaveLength(1);
-    // A common map uses the solo budget.
+    // A lone player gets one.
     const solo = encounter();
-    solo.inst.vault!.rarity = 'common';
     expect(hoardBossCueViews(solo.inst).filter((c) => c.variant === 'bone-scythe')).toHaveLength(0);
     startScythe(solo);
     expect(hoardBossCueViews(solo.inst).filter((c) => c.variant === 'bone-scythe')).toHaveLength(1);

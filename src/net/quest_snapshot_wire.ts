@@ -7,6 +7,7 @@ import { sanitizeWeeklyQuestProgress } from '../sim/weekly_quests';
 import { decodeForgeState } from '../sim/world_quest_forge_wire';
 import { decodeGliderState } from '../sim/world_quest_glider_wire';
 import { decodeInvestigationState } from '../sim/world_quest_investigation_wire';
+import { sanitizeWorldQuestReplacements } from '../sim/world_quest_reroll';
 import { decodeShadowState } from '../sim/world_quest_shadow_wire';
 import { decodeWorldQuestProgressTrace } from '../sim/world_quest_trace_wire';
 import { decodeWispMazeState } from '../sim/world_quest_wisp_maze_wire';
@@ -51,6 +52,7 @@ export function applyQuestSelfWire(
     wkexp?: unknown;
     cluh?: unknown;
     tmap?: unknown;
+    ahs?: unknown;
   },
   simTime?: unknown,
 ): void {
@@ -84,8 +86,18 @@ export function applyQuestSelfWire(
   }
   if (Array.isArray(self.wqlog) && !malformedExplicitCycle) {
     const rawRows = self.wqlog;
+    // A rerolled quest is on this character's board but not the shared rotation:
+    // filter against the personal replacements too, as the save boundary does
+    // (src/sim/world_quest_state.ts). The same snapshot's `wqrep` wins; otherwise
+    // the retained mirror applies only while the cycle is unchanged.
+    const replacements =
+      self.wqrep !== undefined
+        ? sanitizeWorldQuestReplacements(self.wqrep, incomingCycle)
+        : incomingCycle === target.worldQuestCycle
+          ? { ...(target.worldQuestReplacements ?? {}) }
+          : undefined;
     target.worldQuestLog = new Map(
-      sanitizeWorldQuestProgress(rawRows, incomingCycle, true).map((progress) => {
+      sanitizeWorldQuestProgress(rawRows, incomingCycle, true, replacements).map((progress) => {
         const raw = rawRows.find(
           (row) =>
             row &&

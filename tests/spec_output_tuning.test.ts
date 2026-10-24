@@ -51,7 +51,10 @@ describe('offensiveAbilityBonus', () => {
 
   it('gives no bonus to a different rogue spec on the same physical ability', () => {
     expect(offensiveAbilityBonus(ability('rogue', 'physical'), mods('combat'))).toBe(0);
-    expect(offensiveAbilityBonus(ability('rogue', 'physical'), mods('subtlety'))).toBe(0);
+  });
+
+  it('gives Skulduggery (rogue/subtlety) its own offensive physical bonus', () => {
+    expect(offensiveAbilityBonus(ability('rogue', 'physical'), mods('subtlety'))).toBeCloseTo(0.1);
   });
 
   it('gives Fieldcraft (hunter/survival) the offensive bonus on a ranged ability regardless of school', () => {

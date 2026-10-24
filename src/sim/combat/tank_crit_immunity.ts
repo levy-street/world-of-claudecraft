@@ -13,6 +13,10 @@
 // does. The crit roll is still DRAWN for an immune tank so every downstream
 // rng draw keeps its stream position (the parity contract).
 //
+// The target-side half of the rule, isCommittedTank, is exported on its own:
+// raid encounters (encounters/ignivar.ts, encounters/varkhul.ts) use the same
+// form/posture-aware definition to keep tanks out of their non-tank mechanics.
+//
 // Pure leaf module: no Sim import, structural meta parameter, so a Vitest
 // imports it directly and the mobSwing shell stays a thin consumer.
 
@@ -23,20 +27,18 @@ const TANK_SPEC_BY_CLASS: Partial<Record<PlayerClass, string>> = {
   paladin: 'protection',
 };
 
-export interface TankCritImmunityMeta {
+export interface CommittedTankMeta {
   cls: PlayerClass;
   talentMods?: { spec: string | null } | null;
 }
 
-export function isCritImmuneTank(
-  attacker: Entity,
-  target: Entity,
-  meta: TankCritImmunityMeta | undefined,
-): boolean {
-  // Creature rule only: a friendly creature sharing the mobSwing path (a player
-  // pet, a delve companion) and any player attacker keep their crits against a
-  // committed tank; only a hostile mob's swing is suppressed.
-  if (!attacker.hostile) return false;
+export type TankCritImmunityMeta = CommittedTankMeta;
+
+/** True when `target` is a player committed to tanking right now: the
+ *  Protection spec for warriors and paladins, a Feral druid in Bruin Form,
+ *  or an Enhancement shaman holding the Stonebound posture. Pure: reads only
+ *  the target's kind and auras plus the structural meta. */
+export function isCommittedTank(target: Entity, meta: CommittedTankMeta | undefined): boolean {
   if (target.kind !== 'player' || !meta) return false;
   const spec = meta.talentMods?.spec ?? null;
   if (spec === null) return false;
@@ -53,4 +55,16 @@ export function isCritImmuneTank(
     return target.auras.some((a) => a.id === 'rockbiter_weapon');
   }
   return false;
+}
+
+export function isCritImmuneTank(
+  attacker: Entity,
+  target: Entity,
+  meta: TankCritImmunityMeta | undefined,
+): boolean {
+  // Creature rule only: a friendly creature sharing the mobSwing path (a player
+  // pet, a delve companion) and any player attacker keep their crits against a
+  // committed tank; only a hostile mob's swing is suppressed.
+  if (!attacker.hostile) return false;
+  return isCommittedTank(target, meta);
 }

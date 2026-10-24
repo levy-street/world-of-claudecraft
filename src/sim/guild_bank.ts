@@ -40,7 +40,7 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
-import { materialItemIds } from './material_ids';
+import { isItemLocked } from './item_lock_flag';
 import type { MaterialPayloadIdentity } from './material_payload_identity';
 import {
   normalizeLoadedMaterialSlot,
@@ -54,6 +54,7 @@ import {
 import type { MaterialComposition, MaterialSourceDelta } from './material_sources';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { stackProvenanceItemIds } from './stack_provenance_ids';
 import { cloneInvSlot, type InvSlot } from './types';
 
 /** One-time fee the founder pays when a guild is created (1 gold).
@@ -683,10 +684,10 @@ export function applyGuildBankDeltasTo(
     // are applied to the book's own normalized stock, so a mixed stack can never
     // be edited by a source-blind slot count and a count-0 re-attribution
     // replays as the move it really was.
-    const move = guildMaterialMoveFor(d, materialItemIds());
+    const move = guildMaterialMoveFor(d, stackProvenanceItemIds());
     if (!move.ok) return sourceUnreadable(d);
     if (move.value !== null) {
-      const applied = applyGuildMaterialMove(book.inventory, move.value, materialItemIds());
+      const applied = applyGuildMaterialMove(book.inventory, move.value, stackProvenanceItemIds());
       if (applied.ok) continue;
       if (applied.reason === 'unreadable') return sourceUnreadable(d);
       return {
@@ -766,9 +767,9 @@ export function revertGuildBankDeltasTo(
     // same way the legacy arm below does. A delta this arm cannot read is
     // SKIPPED rather than undone source-blind: the forward replay refused it
     // too, so there is nothing of its to undo.
-    const move = guildMaterialMoveFor(d, materialItemIds());
+    const move = guildMaterialMoveFor(d, stackProvenanceItemIds());
     if (move.ok && move.value !== null) {
-      revertGuildMaterialMove(book.inventory, move.value, materialItemIds());
+      revertGuildMaterialMove(book.inventory, move.value, stackProvenanceItemIds());
       continue;
     }
     if (!move.ok) continue;
@@ -859,7 +860,7 @@ export function netGuildBankOpLogForReplay(log: readonly GuildBankOpDelta[]): Gu
     // divergence the ordered replay exists to refuse.
     if (d.op !== 'deposit' && d.op !== 'withdraw' && d.op !== 'admin_purge') continue;
     if (typeof d.itemId !== 'string' || d.itemId === '') continue;
-    const move = guildMaterialMoveFor(d, materialItemIds());
+    const move = guildMaterialMoveFor(d, stackProvenanceItemIds());
     if (!move.ok) {
       // Unreadable provenance is carried through VERBATIM and unnetted, so the
       // netted rescue replay meets exactly the same refusal the ordered one
@@ -1156,6 +1157,14 @@ export function guildBankDeposit(
   const refusal = guildBankPipeRefusal(slot);
   if (refusal !== null) {
     ctx.error(meta.entityId, refusal);
+    return;
+  }
+  // The owner's own lock pins the copy to its bag cell (inventory_order.ts), the
+  // personal bank's rule. Checked here rather than in guildBankPipeRefusal: that
+  // predicate is direction-independent and also gates withdraw, and a locked copy
+  // can never reach the book to be withdrawn.
+  if (isItemLocked(slot.instance)) {
+    ctx.error(meta.entityId, 'That item is locked and cannot be stored in the guild bank.');
     return;
   }
   let selectedSources: MaterialComposition | undefined;

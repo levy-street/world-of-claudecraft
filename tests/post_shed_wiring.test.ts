@@ -76,7 +76,10 @@ describe('post shed renderer wiring', () => {
 describe('post shed pipeline wiring', () => {
   it('builds the twin from the same grade shape with the FXAA arm, disabled, beside the grade', () => {
     expect(postSource).toMatch(
-      /const gradeFxaaTwin = plan\.shed\.gradeFxaaTwin\s*\?\s*new OutputGradePass\([\s\S]*?\{ fxaa: true \},?\s*\)\s*:\s*null;/,
+      // `celInk` is the opt-in cel-shading ink arm (?cel=on), which the twin
+      // must carry too so the shed's FXAA rung keeps the look; `paletteGrade`
+      // is the palette lab's grade arm (?palette=on), carried for the same reason.
+      /const gradeFxaaTwin = plan\.shed\.gradeFxaaTwin\s*\?\s*new OutputGradePass\([\s\S]*?\{ fxaa: true(?:, celInk)?(?:, paletteGrade: paletteLabEnabled\(\))? \},?\s*\)\s*:\s*null;/,
     );
     expect(postSource).toContain('gradeFxaaTwin.enabled = false;');
     expect(postSource).toContain('composer.addPass(gradeFxaaTwin);');

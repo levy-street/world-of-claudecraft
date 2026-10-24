@@ -717,6 +717,10 @@ const ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS: readonly CaptureViewContract[] =
 // refinement round 4 (the armoury retired from placement and the matched view
 // aims at the barracks garrison on its lot); every other matched view still
 // shares its live framing with the frozen records.
+// Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced the
+// eleven kit shells and face local -Z. Its live re-aims (bank-and-chest,
+// smithy-and-forge, inn-and-kitchens, chapel-and-weaving, apothecary-lin) were
+// all members already, so the set and the frozen literals are unchanged.
 const HARBOR_MOVED_VIEW_NAMES: ReadonlySet<string> = new Set([
   'armoury-relation',
   'bank-and-chest',
@@ -1373,6 +1377,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
+  // down under promotedScenery.authoredTownDressing. No capture was retaken.
+  // Re-minted for the release/v0.44.0 merge into the WebGL context restore. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1394,8 +1401,42 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '132ec3c7aeae8fa5b488c727e54be36de0fdf7904c663670014f82a0ae548740';
+  // Courier integration reseals only renderer provenance, preserving captured measurements.
+  // Re-minted after composing buddy rendering into the v0.45.0 integration.
+  // Existing captures and measurements remain unchanged.
+  // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
+  // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
+  // on the merged tree, no capture was retaken).
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for the painted Tidehold buildings in the built-in town: the
+  // authoritative layout and the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
+  // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
+  // integration (town dressing + gameplay objects over #4507). No capture was retaken.
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
+  // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
+  // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '3df616db1e65ef5b7b5f19f569b8c71c0a672fea839b53cebd2dcdb2d393414a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
+  // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
+  // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1417,7 +1458,36 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '3a9e4f3fd27676cdbd4571f7e778f8167c799a65a2038309ebfd4df2c6ddc3aa';
+  // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
+  // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
+  // on the merged tree, no capture was retaken).
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for the painted Tidehold buildings in the built-in town: the
+  // authoritative layout and the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
+  // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
+  // integration (town dressing + gameplay objects over #4507). No capture was retaken.
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
+  // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
+  // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  'e4b0c082ee94a3313569494c41e5dfeff074aa80d341cd64fe4c34c79e21dfbf';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2800,7 +2870,29 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('9d6302e953bfbf67213b2fdb5a700f8eb55ee986d60eb4d902b2116afbd77542');
+      // v0.45.0 integration (membership integration + the Mirefen world-boss branch
+      // + the character pack + the five-dungeon rework): recomputed LAST again over the
+      // re-swept evidence. No
+      // capture was retaken.
+      // Merging #4466 and #4470 into the v0.45.0 integration: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+      // The painted Tidehold buildings in the built-in town: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+      // Merging #4507 into the v0.45.0 integration: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+      // The Studio movable-objects merge with the v0.45.0 integration:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // The walk-in Eastbrook buildings: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
+      // over the re-swept evidence, then again for the towns preview. No capture was retaken.
+      // The Mirefen mudfin huts: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+      // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
+      // One-colour market canopies on the current integration base: recomputed
+      // from the swept evidence. No capture was retaken.
+    ).toBe('ef2a6a89e9561c73e4989e6adf852cf6dbd7f43b42adff33ac8631c2101625a6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

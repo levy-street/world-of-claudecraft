@@ -90,13 +90,15 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     // -10%. apPct 0.12 -> 0 (no AP floor left), meleeDmgPct 0.08 -> 0.04,
     // ambush's own dmgPct 0.16 -> 0 (its true-stealth opener reward is a
     // separate gameplay-slice mechanic, out of this numeric package).
+    // Rogue tweak pass: Skulduggery +25% sustained. It had the lowest AP of the
+    // three specs (278 vs 377/424 on raid BiS) and is the most auto-attack
+    // heavy (54% of its damage), so the lift leans on apPct 0 -> 0.45 (autos
+    // and abilities) plus a 0.10 offensive physical bonus in
+    // spec_output_tuning.ts. Raid-BiS Monte Carlo: 137.3 -> 171.5 DPS.
     subtlety: {
-      stats: { agi: 7, crit: 0.1, dodge: 0.05 },
+      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.45 },
       global: { meleeDmgPct: 0.04 },
-      ability: [
-        { ability: 'stealth', cooldownPct: -0.7 },
-        { ability: 'backstab', dmgPct: 0.16 },
-      ],
+      ability: [{ ability: 'backstab', dmgPct: 0.16 }],
     },
   },
   priest: {
@@ -152,6 +154,10 @@ export const SPEC_BASELINES: SpecBaselineTable = {
         { ability: 'chain_lightning', castPct: LIGHTNING_MASTERY_CAST_PCT },
         { ability: 'earth_shock', dmgPct: 0.18, costPct: -0.15 },
         { ability: 'flame_shock', costPct: -0.2 },
+        // v0.45 rotation fix: Magma Burst takes Arc Bolt's discount. At full
+        // price the Cinder Jolt and Magma Burst loop ran out of Mana inside a
+        // 3 min fight and lost to Arc Bolt plus Earthen Jolt.
+        { ability: 'lava_burst', costPct: -0.35 },
       ],
     },
     enhancement: {
@@ -259,12 +265,14 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // feeds the autos in both forms; the paired offensive physical ability
       // bonus (+0.15, form attacks and bleeds) lives ONLY in
       // spec_output_tuning.ts, never CAT_FORM_DAMAGE_MULT/Wild Apex/armor/
-      // Marrowbreak's shield.
+      // Marrowbreak's heal.
       stats: { armorPct: 0.23, staPct: 0.25, apPct: 0.1 },
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'maul', dmgPct: 0.35 },
         { ability: 'claw', dmgPct: 0.15 },
+        // Scratch copies Rendclaw's damage profile, baseline row included.
+        { ability: 'scratch', dmgPct: 0.15 },
         { ability: 'swipe', dmgPct: 0.2 },
       ],
     },

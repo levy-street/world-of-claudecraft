@@ -46,6 +46,8 @@ export interface MenuStripOpenState {
   /** The app-viewport width the row was clamped against, reused to clamp the
    *  caption without a second measure. */
   viewportWidth: number;
+  /** Where that clamp box starts (the left safe-area inset). Omitted means 0. */
+  clampLeft?: number;
   /** The edge clearance the clamp keeps. */
   margin: number;
   /** Rendered size of one item, so the dim knows how far past the last item its
@@ -108,6 +110,7 @@ export class MenuStripPainter {
       centers: open.placement.centers,
       live: open.live,
       viewportWidth: open.viewportWidth,
+      clampLeft: open.clampLeft,
       margin: open.margin,
     });
     this.writers.setText(captionText, open.caption);

@@ -1,0 +1,1544 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "rewards-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 18,
+    "replacedSvgIcons": 18,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "allied_hearthstone",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/allied_hearthstone.webp",
+      "canonicalDisplayName": "Allied Hearthstone",
+      "acceptedSha256": "49569c4ee4a17c762cc30bd0a382d87d7df9c42d8b55c5949efde8ef363fac96",
+      "acceptedBytes": 4082,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/allied_hearthstone.png",
+        "sha256": "75aeaad778f669629ab918b6e24a633c315266ee965f589f68c8cf9448ee1d50",
+        "bytes": 2417304,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/allied_hearthstone.png",
+        "sha256": "e4d800c77b8afd4bcd30b6e51b63e0c150e74e0b0adeb12b1424bbfc0cd22374",
+        "bytes": 567960,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "ee27388a633a14f8613618f75ee0679977276dd7af714e403df51d7dfc043df7",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Allied Hearthstone (allied_hearthstone) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete smooth dark violet-grey river stone, a carved luminous warm white-gold swirling hearth center. Three clear inset faction marks: gold gem at top, cyan gem lower left, small copper cog lower right. Ancient tactile stone, contained magical glow; no floating extra pieces. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/allied_hearthstone.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ee27388a633a14f8613618f75ee0679977276dd7af714e403df51d7dfc043df7"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "allied_vanguard_duffel",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/allied_vanguard_duffel.webp",
+      "canonicalDisplayName": "Allied Vanguard Duffel",
+      "acceptedSha256": "775a4322c96aa00f9868ba04273fa94c6c01e8e00c39b5827e969132c02cd061",
+      "acceptedBytes": 3734,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/allied_vanguard_duffel.png",
+        "sha256": "991132579cd071020f731c0400d2aab991b203d4008990057b8a9a9ae60e096e",
+        "bytes": 2579291,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/allied_vanguard_duffel.png",
+        "sha256": "0d7d74b2a841475305a2dfe8795305c98dc9385282f982afd2a0786d3d51c3b6",
+        "bytes": 542898,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "74708ec226226b6f1713d01eaaca181e9a678f7da8e246ade6abd977c4f77a6c",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Allied Vanguard Duffel (allied_vanguard_duffel) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete stout military green canvas duffel bag with rolled top, brown leather straps, bronze buckles and a small centered cyan diamond insignia set in brass. Thick practical woven canvas, weathered leather and visible stitching. Clearly a soft duffel with full silhouette. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/allied_vanguard_duffel.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "74708ec226226b6f1713d01eaaca181e9a678f7da8e246ade6abd977c4f77a6c"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rift_feather_glider",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rift_feather_glider.webp",
+      "canonicalDisplayName": "Rift Feather Glider",
+      "acceptedSha256": "0a1ee8a7104e48d8f922ab0dad40ac707382fdade3fa3d5adadd28b5a1c4b1dd",
+      "acceptedBytes": 4310,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/rift_feather_glider.png",
+        "sha256": "3835c960db56fa66de6e9e6359dee22ce29dee56702f89bf3c16238a1ffccb15",
+        "bytes": 2334000,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/rift_feather_glider.png",
+        "sha256": "da622327744792e0f0b667a441ed2872e6fa208fe6c6911fe20373cbce1d249d",
+        "bytes": 552723,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "9171d1d26852cfd9f1976821acc40167a1a91550999819640cd0828bead6b3b2",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rift Feather Glider (rift_feather_glider) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete compact wearable glider with paired swept mechanical wings symmetrically spread around a dark central leather harness hub. Midnight-indigo metal wing struts hold layered luminous teal feather-like plumes, cyan diamond crystal at center. Mechanical fantasy flight device, no wearer or bird, both wingtips fully inside frame. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/rift_feather_glider.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "9171d1d26852cfd9f1976821acc40167a1a91550999819640cd0828bead6b3b2"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "formula_enchant_feet_shadowstride",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/formula_enchant_feet_shadowstride.webp",
+      "canonicalDisplayName": "Formula: Enchant Boots - Shadowstride",
+      "acceptedSha256": "ed6b88ed0dc25d684cb53fbe45640c4520b9115a900f15d487b88aee218ca41f",
+      "acceptedBytes": 3966,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/formula_enchant_feet_shadowstride.png",
+        "sha256": "b444f201b745b6f45967441015bbee3d7aeec6fdabf0cdc333e9ba499455f3d3",
+        "bytes": 2298801,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/formula_enchant_feet_shadowstride.png",
+        "sha256": "29b7fa8020d20dc3f1df29691d06948b7e509b0c367dcb8da369a842cb51fff1",
+        "bytes": 566305,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "15fa94bd39ac1cdcdbe2d47d85c37b1e8007e19178b1e60f94e3c5153ec5be1a",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Formula: Enchant Boots - Shadowstride (formula_enchant_feet_shadowstride) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete partially unrolled purple vellum scroll, tied at bottom with a teal ribbon. A single intentional dark boot silhouette emblem on the open purple page, edged with restrained cyan shadow glow. Blank page elsewhere; no writing or pseudo-script. Curling paper ends, magical textile ribbon. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/formula_enchant_feet_shadowstride.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "15fa94bd39ac1cdcdbe2d47d85c37b1e8007e19178b1e60f94e3c5153ec5be1a"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "recipe_potion_of_invisibility",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/recipe_potion_of_invisibility.webp",
+      "canonicalDisplayName": "Recipe: Potion of Invisibility",
+      "acceptedSha256": "139fd3c8b1e65515cacb389fae0d0cd3e2c4c0601d6d78b697128f6aa2f97716",
+      "acceptedBytes": 3998,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/recipe_potion_of_invisibility.png",
+        "sha256": "0b66e7767d757e41209e9594081b7d5c3891965d77479163a7d1b15d7e586a41",
+        "bytes": 2377875,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/recipe_potion_of_invisibility.png",
+        "sha256": "a15b4715b3c2d4e583aaa80394e0485f7694289882817444b60c7dba5cd9ea97",
+        "bytes": 638395,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "62f7b3f9b75890947fc9d9e8950158e97b9265b36d3f7de7783c80664854611e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Recipe: Potion of Invisibility (recipe_potion_of_invisibility) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One aged ivory alchemical recipe parchment partially unrolled, a single violet line illustration of a round potion flask dissolving into pale violet mist. This is an intentional pictorial flask diagram on paper. A muted purple ribbon at the bottom, blank elsewhere, no writing, labels, letters, numbers or pseudo-script. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/recipe_potion_of_invisibility.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "62f7b3f9b75890947fc9d9e8950158e97b9265b36d3f7de7783c80664854611e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "potion_of_invisibility",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/potion_of_invisibility.webp",
+      "canonicalDisplayName": "Potion of Invisibility",
+      "acceptedSha256": "0baa0fc035f31036f01984f70f8bd731c65528aa8cafff5d4c2bdb8df0265cd0",
+      "acceptedBytes": 3206,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/potion_of_invisibility.png",
+        "sha256": "2172b5e7eb098b4682f9d85ee23e97c92da063b6b2bf82bfc4329b257b3ed82b",
+        "bytes": 2214661,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/potion_of_invisibility.png",
+        "sha256": "3bf218bfb7dfd33e755592c834bef791701beba6cbca5e2462f8a742c44a53db",
+        "bytes": 589785,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "7f4a5c5b2322e22100bd78e2582e07757ee41a3596009eac0ee556f3242095f5",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Potion of Invisibility (potion_of_invisibility) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete round crystal potion flask with narrow neck, natural cork stopper, faint violet mist swirling through almost colorless liquid. Shimmering translucent glass with cool violet edge highlights and a subtle disappearing wisp contained around the bottle. Readable whole glass outline, no labels. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/potion_of_invisibility.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "7f4a5c5b2322e22100bd78e2582e07757ee41a3596009eac0ee556f3242095f5"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "pattern_reinforced_armor_kit",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/pattern_reinforced_armor_kit.webp",
+      "canonicalDisplayName": "Pattern: Reinforced Armor Kit",
+      "acceptedSha256": "ae24405ba1e355bde6ae62ffb1e456d35076db7c9f0427a135a752b2b2a83dac",
+      "acceptedBytes": 3354,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/pattern_reinforced_armor_kit.png",
+        "sha256": "3e2dfc3ca63c4f281cee21f532c4b135bb4f431706eefd391202e5aa3829e077",
+        "bytes": 2277855,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/pattern_reinforced_armor_kit.png",
+        "sha256": "b2fe5f002d75caecc6a261e84c679be032891fe5f3d45dd71ce04ab2bf51fa4d",
+        "bytes": 542457,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "f686e847c7c34e3dfe86e0b417d0f4eadb5d8bcc785772ddf9a241a133925b3a",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Pattern: Reinforced Armor Kit (pattern_reinforced_armor_kit) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete partially unrolled tawny leatherworking pattern parchment, simple dark pictorial diagram of a square leather reinforcement patch with four corner rivets and two crossed sewing needles beneath. Small leather tie, curled edges. Blank elsewhere, no writing, letters, numbers or pseudo-script. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/pattern_reinforced_armor_kit.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f686e847c7c34e3dfe86e0b417d0f4eadb5d8bcc785772ddf9a241a133925b3a"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "reinforced_armor_kit",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/reinforced_armor_kit.webp",
+      "canonicalDisplayName": "Reinforced Armor Kit",
+      "acceptedSha256": "334889f547cfefbaa45f27727f2aeca57908798bed553ec7807e170da0bbacac",
+      "acceptedBytes": 3328,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/reinforced_armor_kit.png",
+        "sha256": "a48733c63055809038bb9db59b434ceab051893df7c724f641eda8a24210257d",
+        "bytes": 2379909,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/reinforced_armor_kit.png",
+        "sha256": "95783c0df9cd8581320f4a2dbe38261e2487368cf079ad6fa4ad70acfc9dcc4e",
+        "bytes": 502871,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "190557ccde2b8ff99e8677d6f5e5ba7debbededf3f94f88b410d09d12eb7592d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Reinforced Armor Kit (reinforced_armor_kit) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete layered square dark brown leather armor reinforcement patch in three-quarter view. Thick stacked leather edges, tidy stitched border, four strong steel corner studs, smaller central round steel boss. Compact rugged leatherworking kit, no wearer or armor body. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/reinforced_armor_kit.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "190557ccde2b8ff99e8677d6f5e5ba7debbededf3f94f88b410d09d12eb7592d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "dawn_battle_standard",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/dawn_battle_standard.webp",
+      "canonicalDisplayName": "Dawn Battle Standard",
+      "acceptedSha256": "d900f93add6f90da2d6b1225b76bc6d4871d1123932615a812190652e8657ed3",
+      "acceptedBytes": 2838,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/dawn_battle_standard.png",
+        "sha256": "6038eadeb66c027ec4f923b9ebcd1618b969ba78f92cf68af54fe8dccbab0d2f",
+        "bytes": 1902487,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/dawn_battle_standard.png",
+        "sha256": "01d936155abbf0130214ce342e9b14b1f1d66da40beac9c03e03ffc3b7952740",
+        "bytes": 461390,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "d47be03fe4338e4cbd0ed929e060fef422cfaccaf68e167c186668d65f69aa88",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Dawn Battle Standard (dawn_battle_standard) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete ornate golden portable battle standard, full upright pole with small sunburst finial and horizontal crossbar supporting an deep crimson cloth banner. Large simple golden sun emblem in center, gold edging, two short trailing cloth points, warm amber sunstone in finial. Entire pole tip and foot inside square frame, no army, hands or scenery. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/dawn_battle_standard.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d47be03fe4338e4cbd0ed929e060fef422cfaccaf68e167c186668d65f69aa88"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "formula_enchant_offhand_spirit",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/formula_enchant_offhand_spirit.webp",
+      "canonicalDisplayName": "Formula: Enchant Off-Hand - Spirit",
+      "acceptedSha256": "2aa1c4746a69d0f6855ec0512947d77ceff987f8eaac722e1ae11d7b71a402f4",
+      "acceptedBytes": 3836,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/formula_enchant_offhand_spirit.png",
+        "sha256": "dd25fd65c36c6669c8fdbcf571af4787fba5399088124aab36311dfba5b54097",
+        "bytes": 2065434,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/formula_enchant_offhand_spirit.png",
+        "sha256": "26a0fc7842f5b1e0bc5535f67bc09cd7832f2b4f0a9a2339eaf51bacca6c0877",
+        "bytes": 547588,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "d5aa4f3c15f4d3997db08e01bbce6b093fd7fa176a519c275983902c1b4d0fc0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Formula: Enchant Off-Hand - Spirit (formula_enchant_offhand_spirit) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete consecrated ivory parchment scroll partly unrolled diagonally and bound with a gold silk ribbon. A single small luminous pearl-white spirit-flame emblem on the open page, graceful pale gold halo. Blank elsewhere, no writing or pseudo-script. Different from round sun-seal benediction: clearly open page with white spirit flame. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/formula_enchant_offhand_spirit.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d5aa4f3c15f4d3997db08e01bbce6b093fd7fa176a519c275983902c1b4d0fc0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "recipe_elixir_of_mana_regeneration",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/recipe_elixir_of_mana_regeneration.webp",
+      "canonicalDisplayName": "Recipe: Elixir of Mana Regeneration",
+      "acceptedSha256": "c1617d7933a191934847b2d3b8b3b45e94db35449a90c4e263b38351ca09fe99",
+      "acceptedBytes": 4274,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/recipe_elixir_of_mana_regeneration.png",
+        "sha256": "59dd39a3d79f770fad63315ec851c08c8ccf107c280d2e0b3acc354166450956",
+        "bytes": 2273101,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/recipe_elixir_of_mana_regeneration.png",
+        "sha256": "a2ce0d127839319dec8df76eb45d3482d894ed1d365763762c3ee0095ee1e460",
+        "bytes": 616782,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "b2d35d500e7ddf54f281f53d332c34a3e7d45861147196bc9bbeaf217443f656",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Recipe: Elixir of Mana Regeneration (recipe_elixir_of_mana_regeneration) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete cream alchemical recipe sheet with softly curled top and bottom. A single painted sapphire-blue water droplet symbol beside a small green herb sprig illustration. A narrow blue ribbon at lower corner. Blank elsewhere, no writing, lettering, numbers or pseudo-script. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/recipe_elixir_of_mana_regeneration.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "b2d35d500e7ddf54f281f53d332c34a3e7d45861147196bc9bbeaf217443f656"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "elixir_of_mana_regeneration",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/elixir_of_mana_regeneration.webp",
+      "canonicalDisplayName": "Elixir of Mana Regeneration",
+      "acceptedSha256": "7385e6df808d61406d233def8d53516f9b1ca8f38833fa67496af5a3dd38bb35",
+      "acceptedBytes": 2562,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/elixir_of_mana_regeneration.png",
+        "sha256": "3ebd23fc5d39209024107ed3ec6be49a7f513588629b199e002809599346e2ad",
+        "bytes": 1931381,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/elixir_of_mana_regeneration.png",
+        "sha256": "b3cfe2c72988daea5560888a1c87679dc963d9d4c17144ae4f82cc83d35fa16a",
+        "bytes": 470468,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "7599b90037dc1791678247ad76a7b86c0d8344c872ab204d8ad65f4ae31587f0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Elixir of Mana Regeneration (elixir_of_mana_regeneration) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete slender tall crystal vial filled with luminous cerulean-blue mana water, narrow neck with small gold band, natural cork stopper. Clear blue fluid meniscus and small bubbles, bright glass edge highlights. Upright elegant silhouette distinctly taller and narrower than a round violet potion, no labels. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/elixir_of_mana_regeneration.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "7599b90037dc1791678247ad76a7b86c0d8344c872ab204d8ad65f4ae31587f0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "clockwork_target_dummy",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/clockwork_target_dummy.webp",
+      "canonicalDisplayName": "Clockwork Target Dummy",
+      "acceptedSha256": "db0487c8ab7cd888d144930aec03e4ed1d5937e3d9270368f20830eb4b39b8b4",
+      "acceptedBytes": 2960,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/clockwork_target_dummy.png",
+        "sha256": "9a1e3e6720715f2a16f065bbc2911bc9c1372cfc08fbcf5d3fcc903ca8a4159e",
+        "bytes": 2031626,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/clockwork_target_dummy.png",
+        "sha256": "88da51a9e6a598e92f3ad2607369a53adb35b8cedf83cd4dfba66a44762b9c85",
+        "bytes": 486052,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "3646226e375fdc71a2d8e5445fd2976c21d989ac1d09bd17f9918d6615c21808",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Clockwork Target Dummy (clockwork_target_dummy) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete compact mechanical training dummy on a short sturdy wooden support and broad base. Small round brass cog sensor head above a spring neck, riveted gunmetal torso with a large red-and-ivory concentric bullseye target on chest, two short stubby articulated shoulder arms. Toy-like engineered training object, no living character. All base and head fully visible. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/clockwork_target_dummy.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "3646226e375fdc71a2d8e5445fd2976c21d989ac1d09bd17f9918d6615c21808"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "schematic_clockwork_shock_bomb",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/schematic_clockwork_shock_bomb.webp",
+      "canonicalDisplayName": "Schematic: Clockwork Shock Bomb",
+      "acceptedSha256": "4b67d0af2c8ffa7facc3f39f3ac99615417c05aec334de729383e259cf164346",
+      "acceptedBytes": 4400,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/schematic_clockwork_shock_bomb.png",
+        "sha256": "e02239cf20ba279661666de3dcd98a6233e95158c61bb86858db6e5d34f608e4",
+        "bytes": 2551648,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/schematic_clockwork_shock_bomb.png",
+        "sha256": "7d6877e4f16ef328e8a453ba78fe2272f919d2da768dd6c6f3fcc41037d12593",
+        "bytes": 561921,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "c93211cb341938913afd3c6f5478df99bdea04f26c139b5d9ea72d7ec65557a6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square hand-painted fantasy game inventory icon for the fictional recipe item Schematic: Clockwork Shock Bomb (schematic_clockwork_shock_bomb). Show a curled dark-blue parchment sheet with one decorative white drawing of a round brass clockwork magic orb, cog-shaped face and a winding key, plus a small stylized lightning emblem. This is a fictional magical toy pictogram on parchment, not a functional engineering design: no circuitry, internals, components list, assembly instructions, dimensions or technical details. Sparse pale blue decorative grid, small copper clip. Classic fantasy MMO brushwork, warm upper-left light, cool shadows, opaque dark charcoal-umber vignette. Complete parchment silhouette centered with generous padding, readable at 22 pixels, 1024x1024 square. No text, letters, numbers, labels, UI borders, watermark, collage, transparency, hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/schematic_clockwork_shock_bomb.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "c93211cb341938913afd3c6f5478df99bdea04f26c139b5d9ea72d7ec65557a6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 1,
+        "retryHistory": [
+          {
+            "initialPrompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Schematic: Clockwork Shock Bomb (schematic_clockwork_shock_bomb) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete rolled-edge dark blue engineering blueprint sheet, one simple crisp white pictorial schematic of a spherical cog bomb with winding key and tiny lightning-bolt symbol. Faint sparse blueprint grid, copper clip at bottom. No words, labels, dimensions, letters, numbers or pseudo-script; intentional pictorial bomb diagram only. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+            "reason": "Initial decorative game recipe generation rejected at output by tool safety system; clarified fictional nonfunctional pictogram.",
+            "record": "tmp/imagegen/v045-items-rewards/schematic-retry.json"
+          }
+        ]
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "clockwork_shock_bomb",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/clockwork_shock_bomb.webp",
+      "canonicalDisplayName": "Clockwork Shock Bomb",
+      "acceptedSha256": "d635b7d36b05db9c46438c92f5e0c01de1bf2fa9d21c4aec36f7267fa1f7c66c",
+      "acceptedBytes": 4410,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/clockwork_shock_bomb.png",
+        "sha256": "3a43ca12257c12c4aa98e1b3f8f5387a048c81cbfb5b55dce4de222b484427f0",
+        "bytes": 2405217,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/clockwork_shock_bomb.png",
+        "sha256": "601b08863303d0a901a13489b287e08d77b1553fe4426177b985271e4f5356e7",
+        "bytes": 568486,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Clockwork Shock Bomb (clockwork_shock_bomb) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete compact spherical bronze clockwork bomb, interlocking copper gears on its face, chunky dark winding key on top, reinforced gunmetal bands and tiny contained blue-white electric sparks between exposed contacts. Whole sphere and key inside frame. Inventory object pose, no explosion, hands or combat scene. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/clockwork_shock_bomb.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "public/ui/skills/warrior/clockwork_shock_bomb.webp",
+            "role": "Visual identity review against previously painted matching ability; separate inventory painting, not image-edit input",
+            "sha256": "b74720b0b202271d45141630aa4fec829a8378ffe0188c75b3e536785ecb9fb4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "plans_dense_sharpening_stone",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/plans_dense_sharpening_stone.webp",
+      "canonicalDisplayName": "Plans: Dense Sharpening Stone",
+      "acceptedSha256": "4c1d98b8d2ec610bee6b1c88e1efa3e49f6a6be129c0986ecc8ac8992078bdea",
+      "acceptedBytes": 3290,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/plans_dense_sharpening_stone.png",
+        "sha256": "e6ad94f9f3cee00d30e9f98f0a0d792269e858496bd30fdc47054330dc63a3f7",
+        "bytes": 2479703,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/plans_dense_sharpening_stone.png",
+        "sha256": "f806eb37e83d0f723fe7d0ad9cb3267c298c9e430fb825a42739621ef8856278",
+        "bytes": 593327,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "c808a61e138903edefbd8f4437a8ca0330d67d7a1348aad81cc4415201c3a3a0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Plans: Dense Sharpening Stone (plans_dense_sharpening_stone) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pale grey vellum blacksmithing plan sheet, softly rolled ends and one clear charcoal pictorial diagram of a beveled rectangular whetstone with a single honing-angle arc. Small brass clip at lower edge. Blank elsewhere, no writing, labels, measurements, letters, numbers or pseudo-script. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/plans_dense_sharpening_stone.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "c808a61e138903edefbd8f4437a8ca0330d67d7a1348aad81cc4415201c3a3a0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "dense_sharpening_stone",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/dense_sharpening_stone.webp",
+      "canonicalDisplayName": "Dense Sharpening Stone",
+      "acceptedSha256": "da41d58c5ce532df7c0ad3e713f1cbdbc92d643b0c49c03cb377e21ae8d1ffb0",
+      "acceptedBytes": 2274,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/dense_sharpening_stone.png",
+        "sha256": "05896c154d4c88a96849b6a8b269f486025cc81adf876d0815aa3e3d130ebed7",
+        "bytes": 2291662,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/dense_sharpening_stone.png",
+        "sha256": "2c46b5273d571dcb5d5e9854061963dad9f5a076a4abed1e5c1e7e88840f781a",
+        "bytes": 472993,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "d0378e038248e2342853df2cadf85a7f71ba68ec27a03c27a357c1862a642ea6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Dense Sharpening Stone (dense_sharpening_stone) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete heavy dark slate whetstone bar in isometric three-quarter view. Long rectangular compact stone with finely honed beveled edges, smooth flat top showing a narrow polish sheen, a single worn brass binding band around its center. Tactile dark mineral stone and restrained warm metal. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/dense_sharpening_stone.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d0378e038248e2342853df2cadf85a7f71ba68ec27a03c27a357c1862a642ea6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "formula_enchant_gloves_forged_might",
+      "family": "rewards",
+      "batch": "rewards-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/formula_enchant_gloves_forged_might.webp",
+      "canonicalDisplayName": "Formula: Enchant Gloves - Forged Might",
+      "acceptedSha256": "74018c9a98dbf25f30c45d3e2657aac54c9bd7f43107298f1e380b47f84b86bd",
+      "acceptedBytes": 4142,
+      "original": {
+        "path": "tmp/imagegen/v045-items-rewards/originals/formula_enchant_gloves_forged_might.png",
+        "sha256": "7beb4c6a45b8f0a4ed8397b9737a3f91c74bc0aadad2c36e0ae23b3ddd2c7d48",
+        "bytes": 2293169,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-rewards/masters/formula_enchant_gloves_forged_might.png",
+        "sha256": "8b1d9f9a569aded6afafd473c8647ed4759e6a103385aee09f760069aad936b7",
+        "bytes": 577067,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-rewards-icons-2026-09-17",
+        "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+        "sha256": "017cdaf1961a5ecb9b7c25f8cd2eaba359324ec909c64f6b1ae5693ae3c09daa",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Formula: Enchant Gloves - Forged Might (formula_enchant_gloves_forged_might) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete partially unrolled ivory enchantment scroll with bronze ribbon and small anvil-stamped copper wax seal at its base. One bold pictorial iron gauntlet fist emblem on the open page outlined in restrained fiery orange light. Blank elsewhere, no writing, letters, numbers or pseudo-script. Preserve established faction reward identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands, mannequin or cropped edges. Intentional pictorial item emblems specified above are permitted.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-rewards/superseded/formula_enchant_gloves_forged_might.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "017cdaf1961a5ecb9b7c25f8cd2eaba359324ec909c64f6b1ae5693ae3c09daa"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/rewards-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ],
+  "review": {
+    "perceptualCandidateDispositions": [
+      {
+        "ids": ["plans_dense_sharpening_stone", "recipe_elixir_of_mana_regeneration"],
+        "decision": "retain distinct independently generated paintings",
+        "reason": "Shared pale parchment silhouette explains similarity. Sharpening plans use a monochrome horizontal whetstone and angle arc with a brass clip; mana recipe uses a saturated blue droplet, green herb sprig and blue ribbon. Reviewed at 128, 40, 28, 22 pixels and grayscale; the page symbols and accent shapes remain distinguishable.",
+        "audit": "tmp/icon-audit/rewards-audit/icon-asset-audit.json",
+        "evidence": "docs/screenshots/rewards-icons-v045/small-size-review.png"
+      }
+    ]
+  }
+}

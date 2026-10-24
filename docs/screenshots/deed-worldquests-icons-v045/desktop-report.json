@@ -1,0 +1,66 @@
+[
+  {
+    "id": "exp_arcane_calligraphy",
+    "src": "http://localhost:5194/ui/deeds/exp_arcane_calligraphy.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_arcane_calligraphy_gold",
+    "src": "http://localhost:5194/ui/deeds/exp_arcane_calligraphy_gold.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_forge_helper",
+    "src": "http://localhost:5194/ui/deeds/exp_forge_helper.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_last_barricade",
+    "src": "http://localhost:5194/ui/deeds/exp_last_barricade.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_borrowed_face",
+    "src": "http://localhost:5194/ui/deeds/exp_borrowed_face.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_windrider_slalom",
+    "src": "http://localhost:5194/ui/deeds/exp_windrider_slalom.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_duskweave_dispatches",
+    "src": "http://localhost:5194/ui/deeds/exp_duskweave_dispatches.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_wisp_maze",
+    "src": "http://localhost:5194/ui/deeds/exp_wisp_maze.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

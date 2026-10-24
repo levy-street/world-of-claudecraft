@@ -693,3 +693,51 @@ describe('gpu prep budget: the overrun floor is a share of the frame', () => {
     expect(DEFAULT_GPU_PREP_BUDGET_CONFIG.overrunSliceShare).toBeLessThan(0.5);
   });
 });
+
+describe('gpu prep budget: the context restore hold paces the cover', () => {
+  it('still refuses what the cover refuses, but runs what it admits under the frame budget', () => {
+    // A frame spending 22 of its 24 ms leaves the 2 ms floor.
+    const budget = budgetAt(22);
+    const hold = { cover: true, coverPaced: true } as const;
+    // The debt lanes wait for the hold to end, exactly as under a curtain.
+    expect(
+      budget.admit({
+        kind: 'debt:1',
+        cls: 'approaching',
+        deferredFrames: 0,
+        priority: GPU_WORK_PRIORITY.BOOT_DEBT,
+        ...hold,
+      }),
+    ).toMatchObject({ admit: false, reason: 'cover-not-arrival' });
+    // An admitted candidate takes its turn in the frame instead of running
+    // on the cover reason: the HUD keeps painting under a restore hold.
+    const first = budget.admit({
+      kind: 'restore-link:1',
+      cls: 'approaching',
+      deferredFrames: 0,
+      priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      ...hold,
+    });
+    expect(first.admit).toBe(true);
+    expect(first.reason).not.toBe('cover');
+    budget.spend(20);
+    const second = budget.admit({
+      kind: 'restore-link:1',
+      cls: 'approaching',
+      deferredFrames: 0,
+      priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      ...hold,
+    });
+    expect(second).toMatchObject({ admit: false });
+    // A blocking arrival's curtain keeps the historical answer.
+    expect(
+      budget.admit({
+        kind: 'restore-link:1',
+        cls: 'approaching',
+        deferredFrames: 0,
+        priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        cover: true,
+      }),
+    ).toMatchObject({ admit: true, reason: 'cover' });
+  });
+});

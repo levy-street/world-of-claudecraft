@@ -209,9 +209,9 @@ function assertExactlyOnceBake(
 }
 
 describe('GroveOverbloom: Swiftmend -> Overbloom (druid Groveheart/restoration)', () => {
-  it('transforms at 5 Verdance, bakes talent mods exactly once, and carries the primary-healing factor', () => {
+  it('transforms at 3 Verdance, bakes talent mods exactly once, and carries the primary-healing factor', () => {
     const sim = makeSim('druid', 'restoration', 20, 307);
-    addAura(sim.player, 'verdance', 5);
+    addAura(sim.player, 'verdance', 3);
     // druidOverbloom is not a scalable damage/heal magnitude (scaleEffect's
     // default arm), so a second bake would coincidentally match; the
     // double-bake half of the proof lives on Redharvest/Venomrend below,
@@ -221,9 +221,9 @@ describe('GroveOverbloom: Swiftmend -> Overbloom (druid Groveheart/restoration)'
     assertMatchesSimResolve(sim, 'swiftmend');
   });
 
-  it('negative control: below 5 stacks Swiftmend stays byte-identical to `known`', () => {
+  it('negative control: below 3 stacks Swiftmend stays byte-identical to `known`', () => {
     const sim = makeSim('druid', 'restoration', 20, 308);
-    addAura(sim.player, 'verdance', 4);
+    addAura(sim.player, 'verdance', 2);
     const meta = metaFor(sim);
     const mods = sim.playerMods(meta);
     const known = knownEntry(sim, 'swiftmend');

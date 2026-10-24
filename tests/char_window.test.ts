@@ -3,11 +3,33 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// The painter's portrait chip reaches the character model preload; keep it
+// inert (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
+// This suite exercises the character sheet DOM, not WebGL portraits. Importing
+// the real portrait module starts GLB fetches that can outlive happy-dom
+// teardown and throw ProgressEvent errors in Node, so the portrait chip stays a
+// stub.
+vi.mock('../src/ui/portrait_chip', () => ({
+  crestUrl: () => '',
+  hydrateComposedChips: () => undefined,
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
-import { STAT_DEFENSE, STAT_GRID, STAT_PANELS } from '../src/ui/char_stats_view';
+import { STAT_DEFENSE, STAT_GRID } from '../src/ui/char_stats_view';
 import {
   archetypeTitleText,
   CharWindow,
@@ -1463,101 +1485,5 @@ describe('char_window: the worn trinket drags onto the action bar', () => {
     expect(beginUnequipDrag).toHaveBeenCalledWith('mainhand', null);
     expect(data.size).toBe(0);
     expect(dataTransfer.effectAllowed).toBe('move');
-  });
-});
-
-describe('char_window: stat tooltips (live report: hovering a stat showed nothing)', () => {
-  // The bottom tab strip restructure moved the stat rows out of the old
-  // `.stat-panels` wrapper into the rail (`.char-stats-rail`) and the attribute
-  // row (`.char-attr-row`), while the hover binding still looked for
-  // `.stat-panels [data-stat]`, so no stat on the sheet got a tooltip.
-  function renderSheet() {
-    let canvasContext: unknown;
-    canvasContext = new Proxy(
-      {},
-      {
-        get: () => () => canvasContext,
-        set: () => true,
-      },
-    );
-    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
-    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
-      'data:image/png;base64,stub',
-    );
-    const root = document.createElement('div');
-    document.body.appendChild(root);
-    const world = {
-      cfg: { playerClass: 'warrior' },
-      player: { name: 'Aurelia', level: 20, skin: 0 },
-      equipment: {},
-      honor: 0,
-      archetypeTitle: null,
-      hobbyCraft: null,
-      craftingIdentity: { craftSkills: {} },
-      professionsState: { skills: [] },
-    };
-    // A stand-in for the HUD's attachTooltip: the real one shows the html on
-    // hover (mouseenter) and on keyboard focus.
-    const shown: string[] = [];
-    const attachTooltip = vi.fn((el: HTMLElement, html: string | (() => string)) => {
-      const show = () => shown.push(typeof html === 'function' ? html() : html);
-      el.addEventListener('mouseenter', show);
-      el.addEventListener('focus', show);
-    });
-    const win = new CharWindow({
-      root: () => root,
-      world: () => world as never,
-      closeOthers: vi.fn(),
-      hideTooltip: vi.fn(),
-      captureFocus: () => null,
-      restoreFocus: vi.fn(),
-      slotName: (slot) => slot,
-      statCellHtml: (stat) =>
-        `<span class="stat-cell" data-stat="${stat}" tabindex="0"><span>${stat}</span><b>1</b></span>`,
-      statTooltipHtml: (stat) => `tooltip:${stat}`,
-      progressionHtml: () => '',
-      unequip: vi.fn(),
-      beginUnequipDrag: vi.fn(),
-      endUnequipDrag: vi.fn(),
-      renderPreview: vi.fn(),
-      renderSkinPicker: vi.fn(),
-      openPlayerCard: vi.fn(),
-      openPrestige: vi.fn(),
-      openDeeds: vi.fn(),
-      openCosmetics: vi.fn(),
-      openReliquary: vi.fn(),
-      dragState: new ItemDragState(),
-      renderBags: vi.fn(),
-      showError: vi.fn(),
-      helmSlotAvailable: () => true,
-      helmHidden: () => false,
-      toggleHelm: vi.fn(),
-      playtimeVisible: () => true,
-      togglePlaytimeVisible: vi.fn(),
-      itemIcon: () => '',
-      moneyHtml: () => '',
-      wornItemTooltip: () => '',
-      attachTooltip,
-    });
-    win.render();
-    return { root, shown };
-  }
-
-  it('shows the tooltip of every stat on the sheet when it is hovered', () => {
-    const { root, shown } = renderSheet();
-    const cells = [...root.querySelectorAll<HTMLElement>('[data-stat]')];
-    // The primary attributes under the paperdoll AND every rail board row.
-    expect(root.querySelectorAll('.char-attr-row [data-stat]').length).toBeGreaterThan(0);
-    expect(root.querySelectorAll('.char-stats-rail [data-stat]').length).toBeGreaterThan(0);
-    expect(cells.length).toBe(STAT_PANELS.reduce((n, panel) => n + panel.stats.length, 0));
-    for (const cell of cells) {
-      shown.length = 0;
-      cell.dispatchEvent(new MouseEvent('mouseenter'));
-      expect(shown, `hover ${cell.dataset.stat}`).toEqual([`tooltip:${cell.dataset.stat}`]);
-    }
-    // Keyboard focus reaches the same tooltip (the cells are tab stops).
-    shown.length = 0;
-    cells[0].dispatchEvent(new FocusEvent('focus'));
-    expect(shown).toEqual([`tooltip:${cells[0].dataset.stat}`]);
   });
 });

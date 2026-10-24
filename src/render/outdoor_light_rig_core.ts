@@ -3,7 +3,8 @@
 // rig. Pure: no Three, no DOM, no GFX read (the caller passes the profile).
 //
 // Two rigs light the overworld:
-// - The Lambert (low) rig: hemisphere 0.9, sun 2.65, no image-based fill, and
+// - The Lambert (low) rig: hemisphere 1.8, sun 2.25 with readability lighting
+//   (legacy 0.9/2.65 otherwise), no image-based fill, and
 //   the day/night grade is never applied to its lights (the renderer's outdoor
 //   branch returns before grading on the Lambert tier), so its terrain sits at
 //   a permanent full-day fill.
@@ -34,9 +35,19 @@ export const HEMI_INTENSITY_COMPOSER = 0.27;
 export const HEMI_INTENSITY_GRADE = 0.32;
 export const HEMI_INTENSITY_FLAT = 0.4;
 
-/** The Lambert rig's fixed daylight fill and key (never graded). */
+/** Legacy Lambert daylight values, retained for higher-tier terrain compensation. */
 export const LAMBERT_RIG_HEMI_INTENSITY = 0.9;
 export const LAMBERT_RIG_SUN_INTENSITY = 2.65;
+
+/** The Low preset's clearer fill uses the same light pair and shader programs.
+ * Keep the legacy constants above for higher-tier Lambert terrain compensation. */
+export function lowHemiIntensity(profile: { readonly lowReadabilityLighting: boolean }): number {
+  return profile.lowReadabilityLighting ? 1.8 : LAMBERT_RIG_HEMI_INTENSITY;
+}
+
+export function lowSunIntensity(profile: { readonly lowReadabilityLighting: boolean }): number {
+  return profile.lowReadabilityLighting ? 2.25 : LAMBERT_RIG_SUN_INTENSITY;
+}
 
 /** Hemisphere intensity the standard-materials rig runs at for `profile`. */
 export function hemiOutdoorIntensity(

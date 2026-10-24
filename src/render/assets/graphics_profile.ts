@@ -1,6 +1,8 @@
 import { resetBankerChestProfileCaches } from '../banker_chest';
 import { prepareCanopyDetailProfileAssets } from '../canopy_detail';
 import { prepareCharacterProfileAssets, resetCharacterProfileCaches } from '../characters/assets';
+import { resetSpiritVeilLedger } from '../characters/ghost_veil';
+import { prepareCityClutterProfileAssets, resetCityClutterProfileCaches } from '../city_clutter';
 import { prepareCliffScreeProfileAssets, resetCliffScreeProfileCaches } from '../cliff_scree';
 import { prepareStoneDetailProfileAssets } from '../detail_normals';
 import { resetDoorPortalProfileCaches } from '../door_portal';
@@ -13,6 +15,10 @@ import {
   prepareEastbrookTownProfileAssets,
   resetEastbrookTownProfileCaches,
 } from '../eastbrook_town';
+import {
+  prepareFenbridgeTownProfileAssets,
+  resetFenbridgeTownProfileCaches,
+} from '../fenbridge_town';
 import { resetFireballTravelProfileCaches } from '../fireball_travel_visual';
 import { prepareFoliageProfileAssets, resetFoliageProfileCaches } from '../foliage';
 import { resetFrostNovaRootProfileCaches } from '../frost_nova_root_visual';
@@ -24,13 +30,20 @@ import {
   prepareHarborRouteMarkerAssets,
   resetHarborRouteMarkerCaches,
 } from '../harbor_route_markers';
+import {
+  prepareHighwatchTownProfileAssets,
+  resetHighwatchTownProfileCaches,
+} from '../highwatch_town';
 import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
+import { prepareMirefenTavernAssets, resetMirefenTavernCaches } from '../mirefen_tavern';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
+import { preparePaintedTownProfileAssets, resetPaintedTownProfileCaches } from '../painted_towns';
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
+import { resetSanctumExitPortalProfileCaches } from '../sanctum_exit_portal';
 import { ensureSkyAssetsAt } from '../sky';
 import { resetStationProfileCaches } from '../stations';
 import { resetTemporalHourglassProfileCaches } from '../temporal_hourglass_visual';
@@ -39,7 +52,6 @@ import { prepareTransportShipAssets, resetTransportShipCaches } from '../transpo
 import { prepareWaterProfileAssets } from '../water';
 import { prepareWickharborHarborAssets, resetWickharborHarborCaches } from '../wickharbor_harbor';
 import { prepareWickharborWharfAssets, resetWickharborWharfCaches } from '../wickharbor_wharf';
-import { resetWildheartTerrainProfileCaches } from '../wildheart_terrain';
 import { prepareSurfaceDetailProfileAssets, resetSurfaceDetailProfileCaches } from '../worn_stone';
 import { prepareWyrmwatchHarborAssets, resetWyrmwatchHarborCaches } from '../wyrmwatch_harbor';
 
@@ -65,7 +77,11 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
   (target) =>
     Promise.all([
       prepareCliffScreeProfileAssets(target),
-      prepareEastbrookTownProfileAssets(),
+      prepareCityClutterProfileAssets(target),
+      prepareEastbrookTownProfileAssets(target),
+      prepareFenbridgeTownProfileAssets(target),
+      prepareHighwatchTownProfileAssets(target),
+      preparePaintedTownProfileAssets(target),
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),
@@ -74,6 +90,8 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareWyrmwatchHarborAssets(),
       prepareWickharborWharfAssets(),
       prepareWickharborHarborAssets(),
+      // the painted tavern follows the target profile's texture tier, like the towns
+      prepareMirefenTavernAssets(target),
     ]).then(() => undefined),
 ];
 
@@ -83,9 +101,14 @@ const RESETTERS = [
   ['foliage', resetFoliageProfileCaches],
   ['props', resetPropProfileCaches],
   ['characters', resetCharacterProfileCaches],
+  // The veil's linked-tuple ledger belongs to the retiring renderer's programs.
+  ['spirit_veil', resetSpiritVeilLedger],
   ['stations', resetStationProfileCaches],
   ['eastbrook_surface_atlas', resetEastbrookSurfaceProfileCaches],
   ['eastbrook_town', resetEastbrookTownProfileCaches],
+  ['fenbridge_town', resetFenbridgeTownProfileCaches],
+  ['highwatch_town', resetHighwatchTownProfileCaches],
+  ['painted_towns', resetPaintedTownProfileCaches],
   ['banker_chest', resetBankerChestProfileCaches],
   ['mailbox', resetMailboxProfileCaches],
   ['noticeboard', resetNoticeboardProfileCaches],
@@ -93,8 +116,9 @@ const RESETTERS = [
   ['quest_objects', resetQuestObjectProfileCaches],
   ['jail_scene', resetJailSceneProfileCaches],
   ['cliff_scree', resetCliffScreeProfileCaches],
+  ['city_clutter', resetCityClutterProfileCaches],
   ['door_portal', resetDoorPortalProfileCaches],
-  ['wildheart_terrain', resetWildheartTerrainProfileCaches],
+  ['sanctum_exit_portal', resetSanctumExitPortalProfileCaches],
   ['fireball_travel_visual', resetFireballTravelProfileCaches],
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],
@@ -104,6 +128,7 @@ const RESETTERS = [
   ['wyrmwatch_harbor', resetWyrmwatchHarborCaches],
   ['wickharbor_wharf', resetWickharborWharfCaches],
   ['wickharbor_harbor', resetWickharborHarborCaches],
+  ['mirefen_tavern', resetMirefenTavernCaches],
   ['paladin_ascension_visual', resetPaladinAscensionProfileCaches],
   // The shared plume pair bakes the composer's HDR colour gain at build.
   ['goblin_rocket_sled_fx', resetGoblinRocketSledProfileCaches],

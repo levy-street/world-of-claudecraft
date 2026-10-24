@@ -1,0 +1,634 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-adventures-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 7,
+    "removedCategoryFallbacks": [
+      "exp_clue_first_casket",
+      "exp_clue_ten_caskets",
+      "cmb_coinsack_caught",
+      "exp_harbor_to_harbor",
+      "cmb_balgath",
+      "cmb_balgath_ten",
+      "cmb_point_taken"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "exp_clue_first_casket",
+      "family": "deed-adventures",
+      "batchId": "deed-adventures-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_clue_first_casket.webp",
+      "canonicalDisplayName": "Treasure Found",
+      "acceptedSha256": "0d70c58d2b2f4678c7dd650da37ca02e2bc6bd5e6c39881bb81b3db84d66dbbb",
+      "acceptedBytes": 8076,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-adventures/originals/exp_clue_first_casket.png",
+        "sha256": "61029213da09a7ac343f0e7a07135cb3e5495e813ba30e223979ebe97683cd40",
+        "bytes": 1988514,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-adventures/masters/exp_clue_first_casket.png",
+        "sha256": "279945e04b4f6a78ebbd46f7ffafa033b0d0a430ebfa98641e0a119dea9c9cc3",
+        "bytes": 425132,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Treasure Found (exp_clue_first_casket). Subject: A small wooden treasure casket with a rounded lid, dark iron bands and a brass keyhole, freshly opened in a little mound of earth. One blue gemstone and a few gold coins shine inside. A short rolled blank parchment clue and a small digging spade lie beside it. Casket dominant, chestnut wood, warm gold and earthy brown, no map lettering. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/items/treasure_casket.webp",
+            "role": "Project-owned subject identity reviewed visually; not an image-edit input",
+            "sha256": "84a4ad79d82f96a2eac4018632e6039d94c07a0736f43144126beba115dbb2c1"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/content/mirefen_muster_quests.ts; src/sim/content/zone2.ts",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_clue_first_casket",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [95, 124, 1163, 1128],
+          "framedSubject": [434, 408],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-adventures-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-adventures-icons-v045/exp_clue_first_casket-desktop.png",
+          "docs/screenshots/deed-adventures-icons-v045/exp_clue_first_casket-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_clue_ten_caskets",
+      "family": "deed-adventures",
+      "batchId": "deed-adventures-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_clue_ten_caskets.webp",
+      "canonicalDisplayName": "Treasure Hunter",
+      "acceptedSha256": "bdd514c59516b9908240b217a5ddb93a7e30729cb51cf9f5b0086d6b6ed83444",
+      "acceptedBytes": 9544,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-adventures/originals/exp_clue_ten_caskets.png",
+        "sha256": "2b471e05f6206964ad4a2761fdf1f099099ac2c8ad2fc80fb71950a832185ae0",
+        "bytes": 2380609,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-adventures/masters/exp_clue_ten_caskets.png",
+        "sha256": "f580d8ba0ae73466b8710f5f2fc6699a4b51a2c49febba621f21743742371834",
+        "bytes": 435101,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Treasure Hunter (exp_clue_ten_caskets). Subject: A finely worn wooden treasure casket with rounded lid, dark iron bands and brass keyhole, overflowing with a blue gemstone and gold coins. A pair of rich golden laurel branches surround it, with a rolled blank parchment clue and small compass below. Veteran treasure-hunter achievement, casket dominant, bright gold and sapphire blue against deep brown wood, no numbers or writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/items/treasure_casket.webp",
+            "role": "Project-owned subject identity reviewed visually; not an image-edit input",
+            "sha256": "84a4ad79d82f96a2eac4018632e6039d94c07a0736f43144126beba115dbb2c1"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/content/mirefen_muster_quests.ts; src/sim/content/zone2.ts",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_clue_ten_caskets",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [22, 97, 1234, 1151],
+          "framedSubject": [448, 390],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-adventures-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-adventures-icons-v045/exp_clue_ten_caskets-desktop.png",
+          "docs/screenshots/deed-adventures-icons-v045/exp_clue_ten_caskets-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "cmb_coinsack_caught",
+      "family": "deed-adventures",
+      "batchId": "deed-adventures-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/cmb_coinsack_caught.webp",
+      "canonicalDisplayName": "Caught Red-Handed",
+      "acceptedSha256": "bc0f80c9f1a392cf0eb6715bc177ae472995f1e1c089154f863e3ec74c231576",
+      "acceptedBytes": 7418,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-adventures/originals/cmb_coinsack_caught.png",
+        "sha256": "90a87729c5b9c885e0abdfbf879a1e79f657422b2a795227054da2f9a3b09c04",
+        "bytes": 1846798,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-adventures/masters/cmb_coinsack_caught.png",
+        "sha256": "ec0ed461806fe5089945ac6fe4b102ffbdcbc6fb08bae09e5b752d103180b54b",
+        "bytes": 411283,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Caught Red-Handed (cmb_coinsack_caught). Subject: A bulging tan burlap sack of stolen gold caught by a steel gauntlet gripping its knotted neck. A small startled green goblin face with long pointed ear, orange nose and dark cap peeks from behind the sack. Several gold coins spill onto a small dark stone ledge. Sack and gripping gauntlet dominant, playful caught-thief mood, no gore, deep green and gold. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/hoard_coinsack_scurrier.webp",
+            "role": "Project-owned subject identity reviewed visually; not an image-edit input",
+            "sha256": "bea4a026cafd2e81387caae7057010f9fdaf296fa1e8ae44dbc5fc2392f3d5e4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/content/mirefen_muster_quests.ts; src/sim/content/zone2.ts",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "cmb_coinsack_caught",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [133, 91, 1225, 1163],
+          "framedSubject": [448, 440],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-adventures-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-adventures-icons-v045/cmb_coinsack_caught-desktop.png",
+          "docs/screenshots/deed-adventures-icons-v045/cmb_coinsack_caught-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_harbor_to_harbor",
+      "family": "deed-adventures",
+      "batchId": "deed-adventures-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_harbor_to_harbor.webp",
+      "canonicalDisplayName": "Harbor to Harbor",
+      "acceptedSha256": "a3e9dd8c2304c15e0d8803e71fe31d3e56d2faf79705de95cc51f14abad077ce",
+      "acceptedBytes": 9490,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-adventures/originals/exp_harbor_to_harbor.png",
+        "sha256": "41facbfad268b5a62ee7fe61f1c30ed72ee340fcb5dcf6837e1c74e12d38fbe9",
+        "bytes": 2140483,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-adventures/masters/exp_harbor_to_harbor.png",
+        "sha256": "303265a4587360a8496b639f85ab5198950206c77dcabf04b7ad24d58a2dd2ed",
+        "bytes": 418571,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Harbor to Harbor (exp_harbor_to_harbor). Subject: A compact wooden sailing ferry with cream canvas sail and warm deck lanterns travelling between two miniature stone-and-timber harbor piers. Two broad curling teal wakes form a round-trip loop below the boat, conveying travel there and back. Ferry dominant, warm oak and brass against sea teal, a small gold compass star above, no lettering or route labels. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "docs/screenshots/eastbrook-ferry/01-route-a-sailing.jpg",
+            "role": "Project-owned subject identity reviewed visually; not an image-edit input",
+            "sha256": "c5281e990c163c1d1e40d454a1a22376c156eb5f39b18370feb518ec13a1fac7"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/content/mirefen_muster_quests.ts; src/sim/content/zone2.ts",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_harbor_to_harbor",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [50, 99, 1217, 1169],
+          "framedSubject": [448, 411],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-adventures-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-adventures-icons-v045/exp_harbor_to_harbor-desktop.png",
+          "docs/screenshots/deed-adventures-icons-v045/exp_harbor_to_harbor-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "cmb_balgath",
+      "family": "deed-adventures",
+      "batchId": "deed-adventures-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/cmb_balgath.webp",
+      "canonicalDisplayName": "Foreman No More",
+      "acceptedSha256": "fa67af3207dc0a8a930a0f95d6d39a02e33223190966291ff2f2321c3b7c9332",
+      "acceptedBytes": 8478,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-adventures/originals/cmb_balgath.png",
+        "sha256": "1b71512f87914d58e3876ac26d42d8f1e74ed05556e1d5622f25a0973c1ddb36",
+        "bytes": 2243469,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-adventures/masters/cmb_balgath.png",
+        "sha256": "514f6680b285d599f4ca7c6e66b5b0a1518b6a6c9d78e1d7e302cb35cec4102d",
+        "bytes": 446691,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Foreman No More (cmb_balgath). Subject: The broken grey granite face of a defeated one-eyed stone cyclops foreman resting in a little reed-fringed barrow mound. One large central cyan glass eye is cracked and dim, chunky stone brow and broad stone jaw, a snapped iron shackle beside it. Head dominant, mossy granite, fen green and subdued cyan. No flesh, blood, second eye or skull. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/balgath_cyclops.webp",
+            "role": "Project-owned subject identity reviewed visually; not an image-edit input",
+            "sha256": "8557cc13e48a873d4e9412c67e5e6b5dfee5e961ff0cf94841a16a75a584cd9b"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/content/mirefen_muster_quests.ts; src/sim/content/zone2.ts",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "cmb_balgath",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [96, 124, 1179, 1147],
+          "framedSubject": [436, 412],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-adventures-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-adventures-icons-v045/cmb_balgath-desktop.png",
+          "docs/screenshots/deed-adventures-icons-v045/cmb_balgath-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "cmb_balgath_ten",
+      "family": "deed-adventures",
+      "batchId": "deed-adventures-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/cmb_balgath_ten.webp",
+      "canonicalDisplayName": "The Mound Keeps Nothing",
+      "acceptedSha256": "4341bebe8ca36ba7c9f28c4a9bba30e80a9d4d98a5859b8f8ffddc4e52c9b2c6",
+      "acceptedBytes": 9052,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-adventures/originals/cmb_balgath_ten.png",
+        "sha256": "abc1caf1599b3e57814cb9ba40acddd76bb4e2cbdf495b53de327e685c30dcc7",
+        "bytes": 2799897,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-adventures/masters/cmb_balgath_ten.png",
+        "sha256": "2243ce45ab2375020b19cdc8d34f5f670f1aff7aa0057a4f9e1709ff1e78207e",
+        "bytes": 448507,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for The Mound Keeps Nothing (cmb_balgath_ten). Subject: A broken grey granite cyclops foreman head with one cracked cyan glass eye, sinking into a split mossy barrow mound, framed by a strong golden laurel pair. A shattered heavy iron chain lies across the foreground and small reeds flank the mound. Veteran repeat-victory crest, cyclops face dominant, cold granite, fen green and warm gold. No second eye, flesh, blood, lettering or numbers. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/balgath_cyclops.webp",
+            "role": "Project-owned subject identity reviewed visually; not an image-edit input",
+            "sha256": "8557cc13e48a873d4e9412c67e5e6b5dfee5e961ff0cf94841a16a75a584cd9b"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/content/mirefen_muster_quests.ts; src/sim/content/zone2.ts",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "cmb_balgath_ten",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [21, 112, 1232, 1155],
+          "framedSubject": [444, 382],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-adventures-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-adventures-icons-v045/cmb_balgath_ten-desktop.png",
+          "docs/screenshots/deed-adventures-icons-v045/cmb_balgath_ten-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "cmb_point_taken",
+      "family": "deed-adventures",
+      "batchId": "deed-adventures-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/cmb_point_taken.webp",
+      "canonicalDisplayName": "Point Taken",
+      "acceptedSha256": "1d0884ee9cc424b201d64e0d0d623f0d6daef9a69f71a12032b0c60e226d2a50",
+      "acceptedBytes": 9966,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-adventures/originals/cmb_point_taken.png",
+        "sha256": "f3cb90a1fe81ff05a360f0b3b3a983c5c182c87eee5d0171c6661c63a534be51",
+        "bytes": 2004993,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-adventures/masters/cmb_point_taken.png",
+        "sha256": "8aff429a757fd7df5b67fcfae1c666c0196b6967d1b0643f59a20dcce3ca6290",
+        "bytes": 412543,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Point Taken (cmb_point_taken). Subject: A long braced steel shardpike thrust through the extinguished brass lantern eye of a wooden training effigy made of planks and straw. Compact upper torso and head only, one lantern socket at centre of the head, several loosened planks falling outward and golden straw visible. Pike tip and broken dark lantern are dominant, warm timber and cold steel, no person, gore or text. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/content/mirefen_muster_quests.ts; src/sim/content/zone2.ts",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "cmb_point_taken",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [124, 78, 1230, 1171],
+          "framedSubject": [448, 443],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-adventures-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-adventures-icons-v045/cmb_point_taken-desktop.png",
+          "docs/screenshots/deed-adventures-icons-v045/cmb_point_taken-mobile.png"
+        ]
+      }
+    }
+  ]
+}

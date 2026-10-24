@@ -9,7 +9,15 @@
 // aliased builder, a helper that composes the view), so this arm reads the
 // rendered HTML the player gets.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { ITEMS } from '../src/sim/data';
 import { Hud } from '../src/ui/hud';
 import { wellFedTooltipLines } from '../src/ui/hud/professions/wellfed_tooltip_view';

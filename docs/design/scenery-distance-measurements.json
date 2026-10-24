@@ -1,0 +1,5515 @@
+{
+  "status": "comparison matrices complete; consult report for remaining qualification",
+  "higherBuild": "handoff-v6",
+  "baselineCommit": "a0659eb667c46273836f3345e5dcdf7e098459c4",
+  "codeFingerprint": "451daf9b485b4d7cded70777c28e2658afb9ed9493d50a5b19667d4607f2e6c6",
+  "lowEvidence": "Earlier v4 matched comparison against the selected prototype; final v6 loading and absolute-FPS sanity checks are separate.",
+  "method": "Two 20-second windows per setting and scene in both orders. Mac uses two simultaneous uncapped Metal browsers at 1600x900. Redmi uses one Chrome page, 0.68 requested scale. Both use three-band cel, governor off and shader-cache warmup off. Preparation and changing shader counts are excluded. Compare within each order only; roughly 10% noise threshold must be exceeded in both orders.",
+  "limits": "Stationary controlled throughput, not normal adaptive-play or movement FPS. CPU submit phase includes driver blocking and does not isolate GPU time. No Windows or iPhone device tested.",
+  "finalLowSanity": {
+    "status": "complete",
+    "purpose": "Absolute final-build FPS check only, with no paired reference; not proof of a new gain.",
+    "error": null,
+    "rows": [
+      {
+        "scene": "thornpeak",
+        "fps": 38.73945654857051,
+        "windows": [
+          {
+            "submittedFrames": 771,
+            "elapsedMs": 20022.800000071526,
+            "buffer": {
+              "width": 899,
+              "height": 394,
+              "cssWidth": 894,
+              "cssHeight": 392,
+              "dynamicResolution": true
+            }
+          },
+          {
+            "submittedFrames": 780,
+            "elapsedMs": 20013.899999976158,
+            "buffer": {
+              "width": 899,
+              "height": 394,
+              "cssWidth": 894,
+              "cssHeight": 392,
+              "dynamicResolution": true
+            }
+          }
+        ],
+        "beforeActive": true,
+        "afterActive": true,
+        "afterPending": false
+      },
+      {
+        "scene": "beach",
+        "fps": 29.726144768805316,
+        "windows": [
+          {
+            "submittedFrames": 582,
+            "elapsedMs": 20027.100000023842,
+            "buffer": {
+              "width": 899,
+              "height": 394,
+              "cssWidth": 894,
+              "cssHeight": 392,
+              "dynamicResolution": true
+            }
+          },
+          {
+            "submittedFrames": 608,
+            "elapsedMs": 20005,
+            "buffer": {
+              "width": 899,
+              "height": 394,
+              "cssWidth": 894,
+              "cssHeight": 392,
+              "dynamicResolution": true
+            }
+          }
+        ],
+        "beforeActive": true,
+        "afterActive": true,
+        "afterPending": false
+      }
+    ]
+  },
+  "loadingChecks": [
+    {
+      "source": "movement-higher-v6-mac",
+      "tier": "high",
+      "status": "complete",
+      "error": null,
+      "travelYards": 176.37949769062055,
+      "observations": 90,
+      "activeChecks": null,
+      "nearOmissions": null,
+      "placementErrors": null,
+      "pageErrors": [],
+      "method": "2 yd teleport steps every 500 ms, then settle; loading/material smoke check, not movement FPS or a proof against all visible holes",
+      "checks": [
+        {
+          "index": 0,
+          "camera": [28.378006267671314, 15.20003117019267, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 1,
+          "camera": [30.394100544279024, 15.13456079846676, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 2,
+          "camera": [32.382516313664695, 14.873435664782152, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 3,
+          "camera": [34.309898975026464, 14.587589976016327, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 4,
+          "camera": [36.38848217753751, 14.374849707108556, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 5,
+          "camera": [38.36951133757031, 14.352915062921447, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 6,
+          "camera": [40.37730973955426, 14.405997946460715, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 7,
+          "camera": [42.38768306827485, 14.450603311911031, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 8,
+          "camera": [44.39978152615949, 14.386839323052843, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 9,
+          "camera": [46.40439982592154, 14.193351158751991, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 10,
+          "camera": [48.38673540672027, 13.922267800594186, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 11,
+          "camera": [50.37868277640521, 13.624728751452828, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 12,
+          "camera": [52.387176445982995, 13.299051956204913, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 13,
+          "camera": [54.387795957430974, 13.011464315673491, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 14,
+          "camera": [56.39697586536821, 12.80147645764081, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 15,
+          "camera": [58.319048853664086, 12.811627920040891, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 16,
+          "camera": [60.37048278910862, 13.293072616579117, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 17,
+          "camera": [62.384313356528864, 14.364668697490625, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 18,
+          "camera": [64.40607973307911, 17.36875356006015, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 19,
+          "camera": [66.41357821537687, 22.137511094572883, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 20,
+          "camera": [68.57226085572812, 24.389983330866073, 693.9909811612258],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 21,
+          "camera": [70.39960877291837, 26.866182600803004, 693.2800316623816],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 22,
+          "camera": [72.3827199702987, 27.131344672892148, 693.290658383132],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 23,
+          "camera": [74.3279322139711, 25.11931610469787, 693.2926016669352],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 24,
+          "camera": [76.32120880923686, 21.81949530324438, 693.2928707035747],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 25,
+          "camera": [78.3862461182458, 18.461084986571123, 693.2929022752995],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 26,
+          "camera": [80.40115839817832, 15.923743062573193, 693.292906042594],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 27,
+          "camera": [82.40076411116816, 14.391669165670503, 693.2929067778871],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 28,
+          "camera": [84.39727351438904, 13.362272912479249, 693.2929068373925],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 29,
+          "camera": [86.3318528935879, 13.367264941073548, 693.2929068499891],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 30,
+          "camera": [88.30983140453715, 13.455553288677683, 693.2929068510762],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 31,
+          "camera": [90.29703528240819, 13.515908209509634, 693.2929068512218],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 32,
+          "camera": [92.39628033580257, 13.509094197213173, 693.2929068512431],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 33,
+          "camera": [94.3259620874299, 13.597790444274953, 693.292906851246],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 34,
+          "camera": [96.38726062757387, 14.354065416068575, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 35,
+          "camera": [98.3900798793341, 15.35654281866613, 693.1446212550077],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 36,
+          "camera": [100.4472121635823, 14.038827821387203, 693.0517545277219],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 37,
+          "camera": [102.38365733899475, 13.293271929913667, 693.2966451875453],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 38,
+          "camera": [104.32358502817044, 12.563181436338382, 693.2943714493526],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 39,
+          "camera": [106.3974832648688, 12.151432478246742, 693.2930911636871],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 40,
+          "camera": [108.389964104161, 12.077308327965435, 693.2929247203018],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 41,
+          "camera": [110.38004928929075, 12.272254205209412, 693.2929100090171],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 42,
+          "camera": [112.38783594775704, 12.703333060496648, 693.2929072011373],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 43,
+          "camera": [114.3937854341932, 13.454987782794085, 693.2929068809485],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 44,
+          "camera": [116.38879744818091, 14.291068320388392, 693.2929068558389],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 45,
+          "camera": [118.38320965017722, 15.86883506294562, 693.2929068513638],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 46,
+          "camera": [120.39923535648887, 17.672816736555514, 693.2929068512685],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 47,
+          "camera": [122.33335979778339, 20.20406593785626, 693.2929068512481],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 48,
+          "camera": [124.3804112056313, 22.063045290133505, 693.2929068512466],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 49,
+          "camera": [126.39400441768422, 23.5410457211157, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 50,
+          "camera": [128.4071372466134, 24.80244035291861, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 51,
+          "camera": [130.33496876138923, 25.971648514084865, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 52,
+          "camera": [132.38790353750565, 26.92030204313822, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 53,
+          "camera": [134.33091224581756, 27.796577266223974, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 54,
+          "camera": [136.36102977733864, 28.97911584953731, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 55,
+          "camera": [138.3232219450415, 30.302396688125608, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 56,
+          "camera": [140.3180309352554, 31.720758841594638, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 57,
+          "camera": [142.36972382508773, 33.31036131305773, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 58,
+          "camera": [144.33091273395206, 35.03452019198118, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 59,
+          "camera": [146.39540904197128, 37.06695304357414, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 60,
+          "camera": [148.39103325315057, 39.56307870406331, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 61,
+          "camera": [148.74653971990642, 40.482459931377996, 693.8253919323414],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 62,
+          "camera": [148.57269244401886, 40.80093222169639, 694.4008137036949],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 63,
+          "camera": [150.0483134399866, 43.22398378737168, 694.4017652380685],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 64,
+          "camera": [150.82507479843414, 44.36059928062425, 694.5569458525375],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 65,
+          "camera": [152.5782733317412, 47.76667144560669, 694.3419281352467],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 66,
+          "camera": [155.1942153770217, 52.5887161635905, 693.9208351197861],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 67,
+          "camera": [157.26320797607784, 56.62824922333137, 693.6866997344657],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 68,
+          "camera": [159.44182185422952, 60.38005756138703, 693.4161897336727],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 69,
+          "camera": [166.17711728468154, 70.67679172434477, 693.3018343452206],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 70,
+          "camera": [168.36614127202517, 72.53930911798467, 693.2938324964432],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 71,
+          "camera": [170.37467944476438, 74.69765354654005, 693.2930704294204],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 72,
+          "camera": [172.3920208823875, 76.94575317688964, 693.29292073183],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 73,
+          "camera": [174.37797520667792, 78.53939759617234, 693.2929086090955],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 74,
+          "camera": [176.337676818134, 78.97904648572298, 693.2052332239274],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 75,
+          "camera": [177.14503328696424, 80.88450554172192, 691.5368607586126],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 76,
+          "camera": [177.51709755698735, 83.55598673230232, 690.3503646389498],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 77,
+          "camera": [178.83395723403723, 83.13784425454344, 690.4876425943155],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 78,
+          "camera": [180.38360208795757, 81.8281226326251, 690.8444675573793],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 79,
+          "camera": [181.89911346096653, 80.1659196017052, 691.2223801821474],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 80,
+          "camera": [187.14003083904328, 73.28723638599392, 692.1761735468293],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 81,
+          "camera": [186.88522713192418, 72.31317623437968, 692.2320767283582],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 82,
+          "camera": [188.15757791396558, 71.17147315370295, 692.2340524571911],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 83,
+          "camera": [193.96815604524193, 65.49516105402336, 692.5028524721055],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 84,
+          "camera": [197.7555045977121, 60.037153156668666, 692.7499702486228],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 85,
+          "camera": [199.8310393081392, 57.07682764532843, 692.6821010150154],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 86,
+          "camera": [201.13708883779304, 55.12608025664631, 693.1825546676745],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 87,
+          "camera": [201.88865152919178, 54.05790031722719, 692.5152885254244],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 88,
+          "camera": [202.46667091787347, 53.95810240540534, 690.8955223867907],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 89,
+          "camera": [203.1547220901107, 53.505985401783164, 690.2984236338696],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        }
+      ]
+    },
+    {
+      "source": "movement-higher-v6-phone",
+      "tier": "medium",
+      "status": "complete",
+      "error": null,
+      "travelYards": 175.3218891626289,
+      "observations": 90,
+      "activeChecks": null,
+      "nearOmissions": null,
+      "placementErrors": null,
+      "pageErrors": [],
+      "method": "2 yd teleport steps every 500 ms, then settle; loading/material smoke check, not movement FPS or a proof against all visible holes",
+      "checks": [
+        {
+          "index": 0,
+          "camera": [28.414505386853694, 15.189024312849442, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 1,
+          "camera": [30.37647245866229, 15.132611773237208, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 2,
+          "camera": [32.422852967684754, 14.879627658443754, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 3,
+          "camera": [34.41811374380701, 14.529583920520997, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 4,
+          "camera": [36.42565542477485, 14.392485260634642, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 5,
+          "camera": [38.37137175154011, 14.352538574072641, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 6,
+          "camera": [40.40287469296565, 14.410584651911229, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 7,
+          "camera": [42.40438693222228, 14.449636782135263, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 8,
+          "camera": [44.36925633224382, 14.390066463609628, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 9,
+          "camera": [46.40244612914668, 14.18441340995562, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 10,
+          "camera": [48.44391985189985, 13.943143106502296, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 11,
+          "camera": [50.41910348240093, 13.600026130361, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 12,
+          "camera": [52.426110826673046, 13.314814930961731, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 13,
+          "camera": [54.37857426967461, 13.006627218534573, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 14,
+          "camera": [56.42025399434813, 12.79819203096905, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 15,
+          "camera": [58.366115459305156, 12.816502062039055, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 16,
+          "camera": [60.415917909504884, 13.358407543314563, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 17,
+          "camera": [62.4257879465238, 14.470408670230722, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 18,
+          "camera": [64.37016686190756, 17.287008034424865, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 19,
+          "camera": [66.36429456993866, 22.02974533704914, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 20,
+          "camera": [68.56083060324255, 24.380636679588097, 693.9894193436439],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 21,
+          "camera": [70.32946639952891, 26.821823765729732, 693.3008788680106],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 22,
+          "camera": [72.32117101926274, 27.13015979353066, 693.2931260407671],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 23,
+          "camera": [74.38422000762613, 25.04168559470457, 693.2929314563903],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 24,
+          "camera": [76.38188106993401, 21.712763412731995, 693.292909388585],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 25,
+          "camera": [78.37806188076166, 18.472987192710576, 693.2929072689923],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 26,
+          "camera": [80.3659959542417, 15.958152514214897, 693.292906874847],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 27,
+          "camera": [82.41345368679107, 14.383906522353616, 693.2929068551397],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 28,
+          "camera": [84.34003596259079, 13.350046779052235, 693.2929068516219],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 29,
+          "camera": [86.40511714817625, 13.369730603397356, 693.292906851276],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 30,
+          "camera": [88.410553592533, 13.467768861578302, 693.2929068512487],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 31,
+          "camera": [90.41100052288648, 13.52527062674727, 693.2929068512466],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 32,
+          "camera": [92.4257308175504, 13.51163894007272, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 33,
+          "camera": [94.38170230650047, 13.600551507818269, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 34,
+          "camera": [96.36554704453245, 14.340902652226942, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 35,
+          "camera": [98.40532255501499, 15.480413727511095, 693.1429220813914],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 36,
+          "camera": [100.46562213354383, 14.062390778741747, 693.0509229127042],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 37,
+          "camera": [102.38406445130573, 13.177284311685431, 693.2976795344414],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 38,
+          "camera": [104.39919100338899, 12.493852408726138, 693.2935166000918],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 39,
+          "camera": [106.39824461954991, 12.132424346615037, 693.2929551869668],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 40,
+          "camera": [108.41507995351674, 12.077247883544763, 693.2929121794522],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 41,
+          "camera": [110.40391416899136, 12.308674021360998, 693.2929073319114],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 42,
+          "camera": [112.4176969844994, 12.74747245606117, 693.2929068975848],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 43,
+          "camera": [114.40449119716698, 13.420878160051618, 693.2929068554266],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 44,
+          "camera": [116.41468791893502, 14.355604818434339, 693.2929068516233],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 45,
+          "camera": [118.35924030147598, 15.729699846003054, 693.2929068512465],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 46,
+          "camera": [120.39929402178312, 17.969543958804874, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 47,
+          "camera": [122.40144883231964, 20.185554072968387, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 48,
+          "camera": [124.40059463449953, 22.123591500090264, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 49,
+          "camera": [126.42462905140357, 23.41365647557433, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 50,
+          "camera": [128.37208282006128, 24.806705369241783, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 51,
+          "camera": [130.40613348947088, 26.053160406427477, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 52,
+          "camera": [132.42471925441066, 26.850900074573353, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 53,
+          "camera": [134.38157285477, 27.807569430176947, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 54,
+          "camera": [136.40730154773814, 29.006414266858908, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 55,
+          "camera": [138.42487717987157, 30.213505587197044, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 56,
+          "camera": [140.37215895985037, 31.75471034838706, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 57,
+          "camera": [142.4061402654923, 33.388189972098345, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 58,
+          "camera": [144.42499341820442, 34.909258445010884, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 59,
+          "camera": [146.32913208150555, 37.06702630990177, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 60,
+          "camera": [148.40490790397513, 39.61385584213254, 693.2929068512464],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 61,
+          "camera": [148.80117044937296, 40.31286978592718, 693.8306291004267],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 62,
+          "camera": [148.64997484324456, 41.05766960849102, 694.3922387290752],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 63,
+          "camera": [150.50324376725288, 43.454590608797744, 694.2980554571129],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 64,
+          "camera": [151.11519687665216, 45.02957911478506, 694.4904544177435],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 65,
+          "camera": [150.68120535457672, 44.31051415417103, 694.8136053920815],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 66,
+          "camera": [154.21738049733202, 50.349162445756306, 694.1489889761078],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 67,
+          "camera": [155.96531330495367, 54.05792730548265, 693.8474266294584],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 68,
+          "camera": [159.44340630158345, 60.22279798855566, 693.43003358771],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 69,
+          "camera": [166.2090383125034, 70.67517529562834, 693.3036251325822],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 70,
+          "camera": [168.35926987436096, 72.35708518887948, 693.294257183694],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 71,
+          "camera": [170.32819864058422, 74.82849359185384, 693.2930065453065],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 72,
+          "camera": [172.43614691745856, 76.65881744777342, 693.2929232582139],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 73,
+          "camera": [174.33213350242178, 78.50717547662771, 693.2929080620764],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 74,
+          "camera": [176.36692335855898, 78.92768389352868, 693.2275001742148],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 75,
+          "camera": [176.71232507715095, 81.79334829397396, 690.9831086427956],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 76,
+          "camera": [177.03408017999405, 84.05929973439126, 690.3405311130085],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 77,
+          "camera": [178.6546230266846, 83.09140890778156, 690.7113702726954],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 78,
+          "camera": [180.18297019156725, 81.80252442617454, 691.1064777003344],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 79,
+          "camera": [181.72231805239878, 80.05102547181086, 691.524896738071],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 80,
+          "camera": [186.69851236150564, 74.09382639225652, 692.3908523569779],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 81,
+          "camera": [187.09694247323665, 72.23487036293467, 692.3688357356996],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 82,
+          "camera": [190.87315912685096, 68.63082162353227, 692.6674626336866],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 83,
+          "camera": [195.09979685974133, 63.70913745083006, 692.9887942511439],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 84,
+          "camera": [197.7525624053325, 59.707509090571094, 692.7592199709737],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 85,
+          "camera": [199.8476791550432, 56.92233433223747, 692.6975081152217],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 86,
+          "camera": [201.17526264132437, 55.04426042939476, 693.2085985281942],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 87,
+          "camera": [201.7890124601395, 54.134850503871185, 692.3400933767655],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 88,
+          "camera": [202.82975715964486, 54.153782685866325, 691.2460861664694],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        },
+        {
+          "index": 89,
+          "camera": [202.93006793483187, 53.43228267665005, 690.414568436358],
+          "active": null,
+          "pending": 0,
+          "identityFailures": 0,
+          "nearOmissions": null,
+          "placementErrors": null,
+          "emptyDrawGuard": true
+        }
+      ]
+    },
+    {
+      "source": "movement-phone-handoff-v6",
+      "tier": "low",
+      "status": "complete",
+      "error": null,
+      "travelYards": 176.05657439497665,
+      "observations": 90,
+      "activeChecks": 90,
+      "nearOmissions": 0,
+      "placementErrors": 0,
+      "pageErrors": [],
+      "method": "2 yd position steps every 500 ms after scenery is ready; native cosmetic work may remain, no steady FPS claim",
+      "checks": [
+        {
+          "index": 0,
+          "camera": [28.366185815906395, 15.207596698744464, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 1,
+          "camera": [30.329258227877038, 15.134653429731065, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 2,
+          "camera": [32.32540187068109, 14.857684430328295, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 3,
+          "camera": [34.325047957612725, 14.54740129424093, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 4,
+          "camera": [36.324973820789836, 14.379640981336456, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 5,
+          "camera": [38.32290995773945, 14.352692722671918, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 6,
+          "camera": [40.3250192531901, 14.407144065918331, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 7,
+          "camera": [42.326780978747195, 14.452782862997065, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 8,
+          "camera": [44.32290955530607, 14.390732466440458, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 9,
+          "camera": [46.32501930225774, 14.19534199817872, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 10,
+          "camera": [48.325005795850174, 13.928834429356634, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 11,
+          "camera": [50.32500314712474, 13.618819092404273, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 12,
+          "camera": [52.32194968953443, 13.298147835750774, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 13,
+          "camera": [54.32296589108313, 13.014680289167885, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 14,
+          "camera": [56.29268977883107, 12.825459168589296, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 15,
+          "camera": [58.4195434680217, 12.820488821079698, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 16,
+          "camera": [60.373289251125485, 13.337050862770088, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 17,
+          "camera": [62.32967902085994, 14.357520774154345, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 18,
+          "camera": [64.35094082703912, 17.243373924275843, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 19,
+          "camera": [66.36162920733736, 22.023877714509446, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 20,
+          "camera": [68.5028199833342, 24.29605673474288, 694.001573153199],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 21,
+          "camera": [70.3249708544857, 26.819479252868597, 693.3018208999298],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 22,
+          "camera": [72.32308144479458, 27.129878752169738, 693.29334384379],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 23,
+          "camera": [74.28435110584948, 25.17809880632572, 693.2929960614977],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 24,
+          "camera": [76.36900561388887, 21.735366428095162, 693.2929118931312],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 25,
+          "camera": [78.3274199895832, 18.546934618586153, 693.2929073375018],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 26,
+          "camera": [80.32544323319232, 15.998222392840944, 693.2929068981424],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 27,
+          "camera": [82.325050590012, 14.43828956865966, 693.2929068560796],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 28,
+          "camera": [84.3229278398478, 13.349293267020345, 693.2929068517789],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 29,
+          "camera": [86.3229559776264, 13.368175553449452, 693.292906851305],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 30,
+          "camera": [88.32293648843955, 13.462773286755137, 693.2929068512524],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 31,
+          "camera": [90.32504155112709, 13.523379069688184, 693.2929068512469],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 32,
+          "camera": [92.32292280838985, 13.509706617734206, 693.2929068512465],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 33,
+          "camera": [94.3229263322366, 13.600813693787552, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 34,
+          "camera": [96.32678085805988, 14.371087054836112, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 35,
+          "camera": [98.3250025032457, 15.440255792789, 693.1430098971106],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 36,
+          "camera": [100.38857613711596, 14.083121439371002, 693.0458113694835],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 37,
+          "camera": [102.3205642144574, 13.206053575043605, 693.2898153856122],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 38,
+          "camera": [104.35991629677181, 12.499786885035649, 693.2927795145749],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 39,
+          "camera": [106.32593823789813, 12.149303713690905, 693.2928916774705],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 40,
+          "camera": [108.31980912446316, 12.07934723699747, 693.2929050638345],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 41,
+          "camera": [110.3230173965429, 12.302580381753389, 693.2929066542229],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 42,
+          "camera": [112.3242062521271, 12.742690758100935, 693.2929068309402],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 43,
+          "camera": [114.32502309895123, 13.412894278431079, 693.2929068490081],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 44,
+          "camera": [116.32291984934079, 14.323275668181997, 693.2929068509997],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 45,
+          "camera": [118.3249946612757, 15.80487375389307, 693.2929068512241],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 46,
+          "camera": [120.32500588029949, 17.949897797099176, 693.2929068512441],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 47,
+          "camera": [122.32678340073807, 20.23663860482499, 693.2929068512461],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 48,
+          "camera": [124.31929710163323, 22.077536924190298, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 49,
+          "camera": [126.32296601128084, 23.51576683781841, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 50,
+          "camera": [128.314036419889, 24.753194945738134, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 51,
+          "camera": [130.3249599129573, 26.011777273930473, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 52,
+          "camera": [132.32414273695795, 26.927121796237916, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 53,
+          "camera": [134.3229461861133, 27.80793932839199, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 54,
+          "camera": [136.32293856638913, 28.941685526048946, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 55,
+          "camera": [138.32295727205047, 30.31541089480302, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 56,
+          "camera": [140.32197968689135, 31.763016759720927, 693.2929068512464],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 57,
+          "camera": [142.32502790858996, 33.327815318609325, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 58,
+          "camera": [144.3250056679225, 35.0293027409104, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 59,
+          "camera": [146.32500588276284, 37.13244503670855, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 60,
+          "camera": [148.32498312772782, 39.63021968339461, 693.2929068512464],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 61,
+          "camera": [148.69871128590864, 40.62157397008844, 693.8209317133288],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 62,
+          "camera": [148.64769305639533, 41.07660382003003, 694.3756854256648],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 63,
+          "camera": [149.30635191698775, 42.18457746500402, 694.605891850095],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 64,
+          "camera": [150.55438051126984, 44.31534125076509, 694.6242958127864],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 65,
+          "camera": [152.14638912289576, 47.044757438013384, 694.4419358784754],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 66,
+          "camera": [155.0739818253218, 52.5399570779257, 693.9447990084577],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 67,
+          "camera": [156.9695946755014, 56.03534448444514, 693.7270729396681],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 68,
+          "camera": [159.7648686527091, 61.20870446772149, 693.3883068080987],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 69,
+          "camera": [166.22168677787639, 70.68753483960701, 693.299406361606],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 70,
+          "camera": [168.31234626005875, 72.54197844079144, 693.2935767202148],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 71,
+          "camera": [170.32157515049218, 74.82794619635065, 693.2929857907769],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 72,
+          "camera": [172.32487603531396, 76.90923892985133, 693.2929149903669],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 73,
+          "camera": [174.31929608838163, 78.50357707004325, 693.2929078103867],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 74,
+          "camera": [176.07439465861862, 79.28315220335182, 692.8768610174966],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 75,
+          "camera": [176.2593706661464, 82.25201660509762, 690.759184684662],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 76,
+          "camera": [176.9090586710291, 84.06779581680237, 690.393487267213],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 77,
+          "camera": [178.4367146135599, 83.13272260689071, 690.7565973052174],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 78,
+          "camera": [179.97602093290195, 81.83213198674127, 691.1545642940167],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 79,
+          "camera": [181.5209456976973, 80.09150596726133, 691.5882905483187],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 80,
+          "camera": [186.60312730735058, 73.37184347698621, 692.5561778302346],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 81,
+          "camera": [188.0008219520066, 71.47155280716943, 692.4232843557742],
+          "active": true,
+          "pending": true,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 82,
+          "camera": [191.6689579767942, 67.98361994018971, 692.965704871246],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 83,
+          "camera": [195.0449619627271, 63.80710058042544, 692.9840268067595],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 84,
+          "camera": [197.70522276948543, 60.080698404095656, 692.7354988207326],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 85,
+          "camera": [199.80910096954116, 57.10596980026924, 692.6788559242387],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 86,
+          "camera": [201.1023938591375, 55.12262646346354, 693.1646560084548],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 87,
+          "camera": [202.01561056413428, 53.73601689639233, 692.7771730887894],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 88,
+          "camera": [202.20417672482833, 54.091784305591474, 690.7192979737384],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        },
+        {
+          "index": 89,
+          "camera": [202.71171506236024, 53.420115367740244, 690.6104407992763],
+          "active": true,
+          "pending": false,
+          "identityFailures": null,
+          "nearOmissions": 0,
+          "placementErrors": 0,
+          "emptyDrawGuard": null
+        }
+      ]
+    }
+  ],
+  "hardware": {
+    "desktop": {
+      "cpuGpu": "Apple M4 Pro",
+      "model": "Mac16,8",
+      "memoryBytes": 25769803776,
+      "renderer": "ANGLE Metal",
+      "viewport": [1600, 900],
+      "twoConcurrentTargets": true
+    },
+    "phone": {
+      "model": "Xiaomi Redmi 12 5G / 23076RN8DY",
+      "gpu": "Adreno 613",
+      "android": "15",
+      "cssViewport": [894, 392],
+      "requestedRenderScale": 0.68,
+      "measuredBufferLowMediumHigh": [899, 394]
+    }
+  },
+  "sources": [
+    {
+      "file": "tmp/scenery-recovery/higher-mac-v6.json",
+      "sha256": "bc40304ca941198d56256521e2f1bf0ce581de717adf90c38f349c03b6006fc3",
+      "complete": true,
+      "error": null,
+      "interruptions": [],
+      "excludedGroups": 0,
+      "uptimeChecks": [
+        {
+          "tier": "medium",
+          "order": "forward",
+          "uptime": " 1:19  up 9 days, 13:48, 2 users, load averages: 4.51 4.99 6.69\n"
+        },
+        {
+          "tier": "medium",
+          "order": "reverse",
+          "uptime": " 1:27  up 9 days, 13:57, 2 users, load averages: 5.44 5.79 6.36\n"
+        },
+        {
+          "tier": "high",
+          "order": "forward",
+          "uptime": " 1:37  up 9 days, 14:07, 2 users, load averages: 5.75 7.60 7.32\n"
+        },
+        {
+          "tier": "high",
+          "order": "reverse",
+          "uptime": " 1:47  up 9 days, 14:17, 2 users, load averages: 7.51 7.84 7.80\n"
+        },
+        {
+          "tier": "ultra",
+          "order": "forward",
+          "uptime": " 1:58  up 9 days, 14:28, 2 users, load averages: 10.07 8.50 8.15\n"
+        },
+        {
+          "tier": "ultra",
+          "order": "reverse",
+          "uptime": " 2:09  up 9 days, 14:38, 2 users, load averages: 8.91 8.65 8.29\n"
+        },
+        {
+          "tier": "insane",
+          "order": "forward",
+          "uptime": " 2:19  up 9 days, 14:48, 2 users, load averages: 9.22 9.14 8.75\n"
+        },
+        {
+          "tier": "insane",
+          "order": "reverse",
+          "uptime": " 2:30  up 9 days, 14:59, 2 users, load averages: 9.31 9.29 9.21\n"
+        }
+      ]
+    },
+    {
+      "file": "tmp/scenery-recovery/higher-phone-v6.json",
+      "sha256": "74f3fbe181f6f1db19f78fb10f9f0dc5dc918f695e6e2d852c0779b3a6760f7c",
+      "complete": true,
+      "error": null,
+      "interruptions": [
+        {
+          "at": "2026-10-14T14:02:11.750Z",
+          "error": "TargetCloseError: Protocol error (Runtime.callFunctionOn): Target closed",
+          "recovery": "USB debugging reconnected; existing game document and probe survived. No timing window was in flight. Resume missing High reverse reference before later tiers.",
+          "continuity": {
+            "timeOrigin": 1791985465435.2,
+            "url": "http://127.0.0.1:41321/?gfx=high&governor=off&shaderwarm=off&cel=on&celbands=3&celink=0.5&celinkwidth=0.65&celmid=0.65&celsat=1.05&shaderdebug=1&gfxo=sceneryDetail%3A0",
+            "hasProbe": true,
+            "hasGame": true,
+            "wake": true
+          },
+          "uptime": " 3:02  up 9 days, 15:31, 2 users, load averages: 2.94 2.94 4.07\n"
+        },
+        {
+          "at": "2026-10-14T14:07:01.992Z",
+          "error": "Error: net::ERR_SOCKET_NOT_CONNECTED at http://127.0.0.1:41321/?gfx=ultra&governor=off&shaderwarm=off&cel=on&celbands=3&celink=0.5&celinkwidth=0.65&celmid=0.65&celsat=1.05&shaderdebug=1&gfxo=sceneryDetail%3A0",
+          "recovery": "Local frozen-build preview stopped before Ultra navigation. Restored the identical build; Ultra and Insane each start fresh with their own paired orders. Completed Medium and High measurements retained.",
+          "continuity": {
+            "url": "http://127.0.0.1:41321/?gfx=ultra&governor=off&shaderwarm=off&cel=on&celbands=3&celink=0.5&celinkwidth=0.65&celmid=0.65&celsat=1.05&shaderdebug=1&gfxo=sceneryDetail%3A0"
+          },
+          "uptime": " 3:07  up 9 days, 15:36, 2 users, load averages: 2.84 3.25 3.91\n"
+        }
+      ],
+      "excludedGroups": 0,
+      "uptimeChecks": [
+        {
+          "tier": "medium",
+          "order": "forward",
+          "uptime": " 1:22  up 9 days, 13:51, 2 users, load averages: 5.69 5.33 6.51\n"
+        },
+        {
+          "tier": "medium",
+          "order": "reverse",
+          "uptime": " 1:47  up 9 days, 14:16, 2 users, load averages: 6.18 7.75 7.77\n"
+        },
+        {
+          "tier": "high",
+          "order": "forward",
+          "uptime": " 2:05  up 9 days, 14:35, 2 users, load averages: 8.43 7.97 8.03\n"
+        },
+        {
+          "tier": "high",
+          "order": "reverse",
+          "uptime": " 2:42  up 9 days, 15:11, 2 users, load averages: 4.88 7.46 8.56\n"
+        },
+        {
+          "tier": "ultra",
+          "order": "forward",
+          "uptime": " 3:04  up 9 days, 15:34, 2 users, load averages: 3.33 3.35 4.06\n"
+        },
+        {
+          "tier": "ultra",
+          "order": "reverse",
+          "uptime": " 3:50  up 9 days, 16:19, 2 users, load averages: 3.17 3.45 3.56\n"
+        },
+        {
+          "tier": "insane",
+          "order": "forward",
+          "uptime": " 4:16  up 9 days, 16:45, 2 users, load averages: 2.87 3.07 3.29\n"
+        },
+        {
+          "tier": "insane",
+          "order": "reverse",
+          "uptime": " 5:01  up 9 days, 17:30, 2 users, load averages: 2.35 2.94 3.20\n"
+        }
+      ]
+    },
+    {
+      "file": "tmp/scenery-recovery/paired-mac-v4.json",
+      "sha256": "e1624ae74df8bd59ddb718aa904c51b5ba581a4444440ff287e10813e4eecf92",
+      "complete": true,
+      "error": null,
+      "interruptions": [],
+      "excludedGroups": 0,
+      "uptimeChecks": [
+        {
+          "tier": "low",
+          "order": "forward",
+          "uptime": "22:00  up 9 days, 10:29, 1 user, load averages: 4.14 4.36 3.98\n"
+        },
+        {
+          "tier": "low",
+          "order": "reverse",
+          "uptime": "22:04  up 9 days, 10:34, 1 user, load averages: 6.41 5.27 4.46\n"
+        }
+      ]
+    },
+    {
+      "file": "tmp/scenery-recovery/paired-phone-v4b.json",
+      "sha256": "3f8d311775fccef90fedd888aa861abc9e1b56827bb0643439dab2d35fb7a574",
+      "complete": true,
+      "error": null,
+      "interruptions": [],
+      "excludedGroups": 0,
+      "uptimeChecks": []
+    },
+    {
+      "file": "tmp/scenery-recovery/low-v6-spot-check.json",
+      "sha256": "346be62e485b5eb584a002e0598b5f6ed500bb677685d276b2395c4df93d3f01",
+      "complete": true,
+      "error": null,
+      "interruptions": [],
+      "excludedGroups": 0,
+      "uptimeChecks": []
+    },
+    {
+      "file": "tmp/scenery-recovery/movement-higher-v6-mac.json",
+      "sha256": "9e2f9df79a82db83f407e608481de80a0b267ddb9245fa7e5f407bc3607cd137",
+      "complete": true,
+      "error": null,
+      "interruptions": [],
+      "excludedGroups": 0,
+      "uptimeChecks": []
+    },
+    {
+      "file": "tmp/scenery-recovery/movement-higher-v6-phone.json",
+      "sha256": "cc770cbb95bae4c731c8ec3fcf82c1288fc19f4edb9f22b67b38e789b482a5fb",
+      "complete": true,
+      "error": null,
+      "interruptions": [],
+      "excludedGroups": 0,
+      "uptimeChecks": []
+    },
+    {
+      "file": "tmp/scenery-recovery/movement-phone-handoff-v6.json",
+      "sha256": "ee14e27942a34e392daf517919d8fdcc52d9b73593c934bb45c2b2396341d7b9",
+      "complete": true,
+      "error": null,
+      "interruptions": [],
+      "excludedGroups": 0,
+      "uptimeChecks": []
+    }
+  ],
+  "measurements": [
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 63.83053168794931,
+      "windows": [
+        {
+          "submittedFrames": 1277,
+          "elapsedMs": 20003.799999952316,
+          "fps": 63.83787080469931
+        },
+        {
+          "submittedFrames": 1277,
+          "elapsedMs": 20008.399999976158,
+          "fps": 63.82319425848752
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [4233054, 4233143],
+      "drawCalls": [840, 842],
+      "worldCpuMs": [1.1, 1.1],
+      "submitCpuMs": [12.52, 12.51]
+    },
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 61.14106670808634,
+      "windows": [
+        {
+          "submittedFrames": 1224,
+          "elapsedMs": 20010.699999928474,
+          "fps": 61.16727550782207
+        },
+        {
+          "submittedFrames": 1223,
+          "elapsedMs": 20011.5,
+          "fps": 61.11485895610024
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [2244526, 2244526],
+      "drawCalls": [783, 783],
+      "worldCpuMs": [1.78, 1.79],
+      "submitCpuMs": [12.41, 12.45]
+    },
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 84.46642459627333,
+      "windows": [
+        {
+          "submittedFrames": 1803,
+          "elapsedMs": 20001.899999976158,
+          "fps": 90.14143656363392
+        },
+        {
+          "submittedFrames": 1577,
+          "elapsedMs": 20014,
+          "fps": 78.79484360947338
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [4712528, 4712528],
+      "drawCalls": [622, 622],
+      "worldCpuMs": [0.97, 1.25],
+      "submitCpuMs": [8.74, 10.58]
+    },
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 77.4965200290279,
+      "windows": [
+        {
+          "submittedFrames": 1660,
+          "elapsedMs": 20006.399999976158,
+          "fps": 82.97344849658
+        },
+        {
+          "submittedFrames": 1441,
+          "elapsedMs": 20008.299999952316,
+          "fps": 72.02011165383537
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [2785106, 2785106],
+      "drawCalls": [623, 623],
+      "worldCpuMs": [1.64, 2.03],
+      "submitCpuMs": [9, 11.31]
+    },
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 54.23283397171629,
+      "windows": [
+        {
+          "submittedFrames": 1204,
+          "elapsedMs": 20013.199999928474,
+          "fps": 60.16029420603916
+        },
+        {
+          "submittedFrames": 967,
+          "elapsedMs": 20017.899999976158,
+          "fps": 48.30676544498432
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [4233060, 4233149],
+      "drawCalls": [840, 842],
+      "worldCpuMs": [1.18, 1.59],
+      "submitCpuMs": [13.22, 16.97]
+    },
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 49.82683052377674,
+      "windows": [
+        {
+          "submittedFrames": 1103,
+          "elapsedMs": 20009.600000023842,
+          "fps": 55.123540700398095
+        },
+        {
+          "submittedFrames": 891,
+          "elapsedMs": 20009,
+          "fps": 44.529961517317204
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [2245496, 2245407],
+      "drawCalls": [785, 783],
+      "worldCpuMs": [2, 2.43],
+      "submitCpuMs": [13.77, 17.39]
+    },
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 85.85020687990732,
+      "windows": [
+        {
+          "submittedFrames": 1713,
+          "elapsedMs": 20012.600000023842,
+          "fps": 85.59607447297998
+        },
+        {
+          "submittedFrames": 1723,
+          "elapsedMs": 20010.600000023842,
+          "fps": 86.10436468661345
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [4712528, 4712528],
+      "drawCalls": [622, 622],
+      "worldCpuMs": [1.09, 1.05],
+      "submitCpuMs": [8.86, 8.95]
+    },
+    {
+      "device": "Mac",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 74.87285858876157,
+      "windows": [
+        {
+          "submittedFrames": 1494,
+          "elapsedMs": 20008,
+          "fps": 74.67013194722111
+        },
+        {
+          "submittedFrames": 1502,
+          "elapsedMs": 20006.5,
+          "fps": 75.0756004298603
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [2784149, 2784315],
+      "drawCalls": [622, 623],
+      "worldCpuMs": [1.74, 1.73],
+      "submitCpuMs": [9.83, 9.92]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 54.545000249862575,
+      "windows": [
+        {
+          "submittedFrames": 1105,
+          "elapsedMs": 20015.700000047684,
+          "fps": 55.206662769594246
+        },
+        {
+          "submittedFrames": 1078,
+          "elapsedMs": 20006.299999952316,
+          "fps": 53.88302684667177
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4930787, 4930787],
+      "drawCalls": [889, 889],
+      "worldCpuMs": [1.29, 1.34],
+      "submitCpuMs": [14.22, 14.8]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 51.11651868035577,
+      "windows": [
+        {
+          "submittedFrames": 1032,
+          "elapsedMs": 20019.100000023842,
+          "fps": 51.550769015528715
+        },
+        {
+          "submittedFrames": 1014,
+          "elapsedMs": 20007.099999904633,
+          "fps": 50.68200788744163
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3812539, 3812539],
+      "drawCalls": [827, 828],
+      "worldCpuMs": [1.92, 1.97],
+      "submitCpuMs": [14.95, 15.14]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 69.6891101082527,
+      "windows": [
+        {
+          "submittedFrames": 1435,
+          "elapsedMs": 20017.399999976158,
+          "fps": 71.68763176045387
+        },
+        {
+          "submittedFrames": 1354,
+          "elapsedMs": 20003.200000047684,
+          "fps": 67.68916973268139
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5380075, 5380075],
+      "drawCalls": [674, 674],
+      "worldCpuMs": [1.22, 1.35],
+      "submitCpuMs": [10.79, 12.28]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 63.39821425451525,
+      "windows": [
+        {
+          "submittedFrames": 1304,
+          "elapsedMs": 20010.699999928474,
+          "fps": 65.16513665212416
+        },
+        {
+          "submittedFrames": 1233,
+          "elapsedMs": 20006.200000047684,
+          "fps": 61.63089442258206
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4107546, 4107765],
+      "drawCalls": [658, 661],
+      "worldCpuMs": [1.82, 2.01],
+      "submitCpuMs": [11.6, 12.84]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 53.59043417002422,
+      "windows": [
+        {
+          "submittedFrames": 1065,
+          "elapsedMs": 20010.399999976158,
+          "fps": 53.22232439137993
+        },
+        {
+          "submittedFrames": 1080,
+          "elapsedMs": 20015.399999976158,
+          "fps": 53.95845199203046
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4930787, 4930787],
+      "drawCalls": [889, 888],
+      "worldCpuMs": [1.27, 1.27],
+      "submitCpuMs": [14.91, 14.84]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 50.707252461789494,
+      "windows": [
+        {
+          "submittedFrames": 1007,
+          "elapsedMs": 20002.799999952316,
+          "fps": 50.34295198684187
+        },
+        {
+          "submittedFrames": 1022,
+          "elapsedMs": 20011.199999928474,
+          "fps": 51.07140001617359
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3812834, 3812834],
+      "drawCalls": [828, 828],
+      "worldCpuMs": [1.97, 1.99],
+      "submitCpuMs": [15.11, 15.04]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 55.86452540165368,
+      "windows": [
+        {
+          "submittedFrames": 1167,
+          "elapsedMs": 20004.899999976158,
+          "fps": 58.335707751670384
+        },
+        {
+          "submittedFrames": 1068,
+          "elapsedMs": 20002.599999904633,
+          "fps": 53.39305890259726
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5379953, 5379823],
+      "drawCalls": [674, 673],
+      "worldCpuMs": [1.5, 1.5],
+      "submitCpuMs": [13.45, 14.85]
+    },
+    {
+      "device": "Mac",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 51.00000999507202,
+      "windows": [
+        {
+          "submittedFrames": 1061,
+          "elapsedMs": 20013.300000071526,
+          "fps": 53.01474519425622
+        },
+        {
+          "submittedFrames": 980,
+          "elapsedMs": 20006.299999952316,
+          "fps": 48.9845698606107
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4107881, 4107881],
+      "drawCalls": [661, 661],
+      "worldCpuMs": [2.17, 2.31],
+      "submitCpuMs": [14.32, 15.48]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 48.09446001791729,
+      "windows": [
+        {
+          "submittedFrames": 903,
+          "elapsedMs": 20015.600000023842,
+          "fps": 45.114810447796934
+        },
+        {
+          "submittedFrames": 1022,
+          "elapsedMs": 20009.799999952316,
+          "fps": 51.074973263222795
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5321764, 5321764],
+      "drawCalls": [912, 912],
+      "worldCpuMs": [1.48, 1.36],
+      "submitCpuMs": [17.7, 15.91]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 48.15437373077528,
+      "windows": [
+        {
+          "submittedFrames": 903,
+          "elapsedMs": 20009.800000071526,
+          "fps": 45.12788733504444
+        },
+        {
+          "submittedFrames": 1025,
+          "elapsedMs": 20028.100000023842,
+          "fps": 51.17809477677762
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4470063, 4470063],
+      "drawCalls": [830, 829],
+      "worldCpuMs": [2.16, 2.01],
+      "submitCpuMs": [17.1, 15.27]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 58.485376157618354,
+      "windows": [
+        {
+          "submittedFrames": 1172,
+          "elapsedMs": 20015.399999976158,
+          "fps": 58.554912717277496
+        },
+        {
+          "submittedFrames": 1169,
+          "elapsedMs": 20011.700000047684,
+          "fps": 58.41582674121712
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5636116, 5636116],
+      "drawCalls": [679, 679],
+      "worldCpuMs": [1.31, 1.33],
+      "submitCpuMs": [12.73, 13.47]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 58.44344054224653,
+      "windows": [
+        {
+          "submittedFrames": 1161,
+          "elapsedMs": 20009.299999952316,
+          "fps": 58.02301929616562
+        },
+        {
+          "submittedFrames": 1178,
+          "elapsedMs": 20012.299999952316,
+          "fps": 58.86379876390054
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4860829, 4860829],
+      "drawCalls": [645, 645],
+      "worldCpuMs": [1.9, 1.97],
+      "submitCpuMs": [12.26, 12.69]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 43.936226280229135,
+      "windows": [
+        {
+          "submittedFrames": 918,
+          "elapsedMs": 20026.200000047684,
+          "fps": 45.83994966582847
+        },
+        {
+          "submittedFrames": 841,
+          "elapsedMs": 20009.100000023842,
+          "fps": 42.03087595139201
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5321764, 5321764],
+      "drawCalls": [912, 912],
+      "worldCpuMs": [1.47, 1.59],
+      "submitCpuMs": [17.76, 18.8]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 43.307352254008116,
+      "windows": [
+        {
+          "submittedFrames": 905,
+          "elapsedMs": 20008.600000023842,
+          "fps": 45.23055086307496
+        },
+        {
+          "submittedFrames": 828,
+          "elapsedMs": 20007.699999928474,
+          "fps": 41.3840671343013
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4470063, 4470063],
+      "drawCalls": [830, 830],
+      "worldCpuMs": [2.3, 2.51],
+      "submitCpuMs": [17.19, 18.19]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 58.71619257093937,
+      "windows": [
+        {
+          "submittedFrames": 1185,
+          "elapsedMs": 20002.900000095367,
+          "fps": 59.2414099952682
+        },
+        {
+          "submittedFrames": 1164,
+          "elapsedMs": 20003.100000023842,
+          "fps": 58.19098039796894
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5635775, 5635864],
+      "drawCalls": [676, 678],
+      "worldCpuMs": [1.33, 1.28],
+      "submitCpuMs": [13.49, 13.44]
+    },
+    {
+      "device": "Mac",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 57.57250912685761,
+      "windows": [
+        {
+          "submittedFrames": 1161,
+          "elapsedMs": 20015.899999976158,
+          "fps": 58.00388690997571
+        },
+        {
+          "submittedFrames": 1143,
+          "elapsedMs": 20003.200000047684,
+          "fps": 57.140857462669736
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4861399, 4861399],
+      "drawCalls": [647, 646],
+      "worldCpuMs": [2.03, 1.98],
+      "submitCpuMs": [13.04, 13.04]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 42.116412161326444,
+      "windows": [
+        {
+          "submittedFrames": 780,
+          "elapsedMs": 20006,
+          "fps": 38.98830350894732
+        },
+        {
+          "submittedFrames": 906,
+          "elapsedMs": 20025.899999976158,
+          "fps": 45.24141237103344
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5465770, 5465770],
+      "drawCalls": [911, 911],
+      "worldCpuMs": [1.69, 1.46],
+      "submitCpuMs": [20.15, 17.48]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 41.00498398988615,
+      "windows": [
+        {
+          "submittedFrames": 763,
+          "elapsedMs": 20004.299999952316,
+          "fps": 38.1417995131956
+        },
+        {
+          "submittedFrames": 880,
+          "elapsedMs": 20064,
+          "fps": 43.85964912280702
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4914933, 4914933],
+      "drawCalls": [817, 817],
+      "worldCpuMs": [2.61, 2.24],
+      "submitCpuMs": [19.84, 17.22]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 57.40691682133815,
+      "windows": [
+        {
+          "submittedFrames": 1157,
+          "elapsedMs": 20008.199999928474,
+          "fps": 57.826291220806276
+        },
+        {
+          "submittedFrames": 1140,
+          "elapsedMs": 20004.399999976158,
+          "fps": 56.98746275826112
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5764116, 5764116],
+      "drawCalls": [679, 679],
+      "worldCpuMs": [1.35, 1.33],
+      "submitCpuMs": [13.8, 13.76]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 57.2496203340378,
+      "windows": [
+        {
+          "submittedFrames": 1153,
+          "elapsedMs": 20015.700000047684,
+          "fps": 57.604780247368474
+        },
+        {
+          "submittedFrames": 1139,
+          "elapsedMs": 20019.5,
+          "fps": 56.89452783536052
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5382452, 5382704],
+      "drawCalls": [634, 635],
+      "worldCpuMs": [2.01, 2.03],
+      "submitCpuMs": [13.01, 13.08]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 50.369652284468586,
+      "windows": [
+        {
+          "submittedFrames": 1000,
+          "elapsedMs": 20005.600000023842,
+          "fps": 49.98600391884314
+        },
+        {
+          "submittedFrames": 1016,
+          "elapsedMs": 20018.5,
+          "fps": 50.753053425581335
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5465770, 5465770],
+      "drawCalls": [911, 911],
+      "worldCpuMs": [1.47, 1.31],
+      "submitCpuMs": [15.94, 15.54]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 49.01433938112618,
+      "windows": [
+        {
+          "submittedFrames": 976,
+          "elapsedMs": 20005.300000071526,
+          "fps": 48.78707142589766
+        },
+        {
+          "submittedFrames": 985,
+          "elapsedMs": 20003.399999976158,
+          "fps": 49.24162892314177
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4914933, 4914933],
+      "drawCalls": [817, 817],
+      "worldCpuMs": [2.08, 2.1],
+      "submitCpuMs": [15.78, 15.5]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 57.60981715257042,
+      "windows": [
+        {
+          "submittedFrames": 1168,
+          "elapsedMs": 20010.299999952316,
+          "fps": 58.36993948130629
+        },
+        {
+          "submittedFrames": 1138,
+          "elapsedMs": 20017.600000023842,
+          "fps": 56.849972024550624
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5763864, 5764116],
+      "drawCalls": [678, 679],
+      "worldCpuMs": [1.38, 1.36],
+      "submitCpuMs": [13.18, 13.51]
+    },
+    {
+      "device": "Mac",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 55.35972579944791,
+      "windows": [
+        {
+          "submittedFrames": 1119,
+          "elapsedMs": 20010.100000023842,
+          "fps": 55.92175951138009
+        },
+        {
+          "submittedFrames": 1097,
+          "elapsedMs": 20019,
+          "fps": 54.79794195514261
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5381889, 5381889],
+      "drawCalls": [635, 635],
+      "worldCpuMs": [2.02, 2.02],
+      "submitCpuMs": [13.31, 13.44]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 5.884825556956704,
+      "windows": [
+        {
+          "submittedFrames": 119,
+          "elapsedMs": 20160,
+          "fps": 5.902777777777778
+        },
+        {
+          "submittedFrames": 119,
+          "elapsedMs": 20283,
+          "fps": 5.866982201843909
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [4706798, 4706798],
+      "drawCalls": [924, 924],
+      "worldCpuMs": [6.52, 6.4],
+      "submitCpuMs": [40.84, 40.68]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 6.98145318575386,
+      "windows": [
+        {
+          "submittedFrames": 141,
+          "elapsedMs": 20205.799999952316,
+          "fps": 6.978194379848001
+        },
+        {
+          "submittedFrames": 140,
+          "elapsedMs": 20043.700000047684,
+          "fps": 6.984738346695817
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [3383930, 3383930],
+      "drawCalls": [523, 523],
+      "worldCpuMs": [7.32, 7.31],
+      "submitCpuMs": [34.47, 30.96]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 8.81235427162547,
+      "windows": [
+        {
+          "submittedFrames": 176,
+          "elapsedMs": 20021.5,
+          "fps": 8.790550158579528
+        },
+        {
+          "submittedFrames": 177,
+          "elapsedMs": 20035.899999976158,
+          "fps": 8.83414271383919
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1712172, 1712083],
+      "drawCalls": [625, 622],
+      "worldCpuMs": [9.28, 9.21],
+      "submitCpuMs": [42.98, 43]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 9.413944592200648,
+      "windows": [
+        {
+          "submittedFrames": 189,
+          "elapsedMs": 20066.5,
+          "fps": 9.418682879425909
+        },
+        {
+          "submittedFrames": 189,
+          "elapsedMs": 20086.700000047684,
+          "fps": 9.409211069989164
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1395016, 1395016],
+      "drawCalls": [439, 439],
+      "worldCpuMs": [11.33, 11.31],
+      "submitCpuMs": [33.14, 28.47]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 8.750956746344634,
+      "windows": [
+        {
+          "submittedFrames": 176,
+          "elapsedMs": 20105,
+          "fps": 8.75404128326287
+        },
+        {
+          "submittedFrames": 175,
+          "elapsedMs": 20004.899999976158,
+          "fps": 8.747856775100528
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1730801, 1730801],
+      "drawCalls": [621, 621],
+      "worldCpuMs": [9.57, 9.6],
+      "submitCpuMs": [35.67, 40.17]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 9.502203914327922,
+      "windows": [
+        {
+          "submittedFrames": 191,
+          "elapsedMs": 20144.399999976158,
+          "fps": 9.481543257690776
+        },
+        {
+          "submittedFrames": 191,
+          "elapsedMs": 20056.799999952316,
+          "fps": 9.522954808366942
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1391768, 1391857],
+      "drawCalls": [437, 440],
+      "worldCpuMs": [9.37, 9.13],
+      "submitCpuMs": [33.86, 28.38]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 5.8410194326223435,
+      "windows": [
+        {
+          "submittedFrames": 118,
+          "elapsedMs": 20003.100000023842,
+          "fps": 5.899085641718502
+        },
+        {
+          "submittedFrames": 116,
+          "elapsedMs": 20058.399999976158,
+          "fps": 5.783113309144193
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [4706796, 4706885],
+      "drawCalls": [924, 925],
+      "worldCpuMs": [7.16, 7.26],
+      "submitCpuMs": [47.18, 47.88]
+    },
+    {
+      "device": "Redmi",
+      "tier": "medium",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 6.907462287500433,
+      "windows": [
+        {
+          "submittedFrames": 139,
+          "elapsedMs": 20160.899999976158,
+          "fps": 6.894533478176291
+        },
+        {
+          "submittedFrames": 140,
+          "elapsedMs": 20230.199999928474,
+          "fps": 6.920346808261657
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [3383930, 3383930],
+      "drawCalls": [523, 523],
+      "worldCpuMs": [8.03, 7.98],
+      "submitCpuMs": [35.07, 31.07]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 4.281201098354546,
+      "windows": [
+        {
+          "submittedFrames": 87,
+          "elapsedMs": 20283.399999976158,
+          "fps": 4.289221728117686
+        },
+        {
+          "submittedFrames": 87,
+          "elapsedMs": 20359.399999976158,
+          "fps": 4.273210408956152
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5358585, 5358674],
+      "drawCalls": [984, 985],
+      "worldCpuMs": [8.73, 8.88],
+      "submitCpuMs": [58.96, 59.69]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 4.681567191557869,
+      "windows": [
+        {
+          "submittedFrames": 95,
+          "elapsedMs": 20270.900000095367,
+          "fps": 4.686521072056646
+        },
+        {
+          "submittedFrames": 95,
+          "elapsedMs": 20313.800000071526,
+          "fps": 4.676623772985138
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4033877, 4034207],
+      "drawCalls": [576, 577],
+      "worldCpuMs": [14.21, 14.08],
+      "submitCpuMs": [51.33, 47.38]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 5.1880033598497945,
+      "windows": [
+        {
+          "submittedFrames": 105,
+          "elapsedMs": 20218.700000047684,
+          "fps": 5.1932122243147365
+        },
+        {
+          "submittedFrames": 105,
+          "elapsedMs": 20259.299999952316,
+          "fps": 5.182804934042496
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3221509, 3221509],
+      "drawCalls": [693, 693],
+      "worldCpuMs": [10.27, 10.28],
+      "submitCpuMs": [51, 51.02]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 5.659801261536563,
+      "windows": [
+        {
+          "submittedFrames": 111,
+          "elapsedMs": 20042.600000023842,
+          "fps": 5.538203626269444
+        },
+        {
+          "submittedFrames": 117,
+          "elapsedMs": 20241.5,
+          "fps": 5.780204036262135
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [2692513, 2692843],
+      "drawCalls": [481, 482],
+      "worldCpuMs": [19.35, 19.26],
+      "submitCpuMs": [45.21, 41.1]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 5.2027193543556685,
+      "windows": [
+        {
+          "submittedFrames": 105,
+          "elapsedMs": 20163.200000047684,
+          "fps": 5.207506744948802
+        },
+        {
+          "submittedFrames": 104,
+          "elapsedMs": 20008.100000023842,
+          "fps": 5.197894852578509
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3200488, 3206352],
+      "drawCalls": [684, 690],
+      "worldCpuMs": [25.38, 19.95],
+      "submitCpuMs": [43.84, 42.87]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 5.765122976974923,
+      "windows": [
+        {
+          "submittedFrames": 117,
+          "elapsedMs": 20310.100000023842,
+          "fps": 5.760680646568095
+        },
+        {
+          "submittedFrames": 117,
+          "elapsedMs": 20278.799999952316,
+          "fps": 5.7695721640469415
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [2692843, 2692843],
+      "drawCalls": [482, 482],
+      "worldCpuMs": [20.24, 19.94],
+      "submitCpuMs": [40.51, 40.55]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 4.317585725173408,
+      "windows": [
+        {
+          "submittedFrames": 87,
+          "elapsedMs": 20125,
+          "fps": 4.3229813664596275
+        },
+        {
+          "submittedFrames": 87,
+          "elapsedMs": 20175.299999952316,
+          "fps": 4.312203536017091
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5358585, 5358585],
+      "drawCalls": [982, 982],
+      "worldCpuMs": [6.63, 6.63],
+      "submitCpuMs": [47.96, 47.53]
+    },
+    {
+      "device": "Redmi",
+      "tier": "high",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 4.60646886917259,
+      "windows": [
+        {
+          "submittedFrames": 93,
+          "elapsedMs": 20294.900000095367,
+          "fps": 4.582432039554912
+        },
+        {
+          "submittedFrames": 93,
+          "elapsedMs": 20083.100000023842,
+          "fps": 4.630759195537023
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4034207, 4034207],
+      "drawCalls": [577, 577],
+      "worldCpuMs": [11.88, 11.89],
+      "submitCpuMs": [44.78, 42.6]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 3.4959181462811975,
+      "windows": [
+        {
+          "submittedFrames": 71,
+          "elapsedMs": 20299.399999976158,
+          "fps": 3.49764032434867
+        },
+        {
+          "submittedFrames": 71,
+          "elapsedMs": 20319.399999976158,
+          "fps": 3.49419766332093
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5546839, 5546839],
+      "drawCalls": [984, 984],
+      "worldCpuMs": [5.87, 5.84],
+      "submitCpuMs": [38.9, 38.5]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 3.5652452082777177,
+      "windows": [
+        {
+          "submittedFrames": 72,
+          "elapsedMs": 20490.300000071526,
+          "fps": 3.513857776594226
+        },
+        {
+          "submittedFrames": 74,
+          "elapsedMs": 20460.600000023842,
+          "fps": 3.616707232432762
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4293606, 4293606],
+      "drawCalls": [580, 580],
+      "worldCpuMs": [9.55, 9.5],
+      "submitCpuMs": [37.31, 36.08]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 3.9466749263698286,
+      "windows": [
+        {
+          "submittedFrames": 79,
+          "elapsedMs": 20026.100000023842,
+          "fps": 3.9448519681768266
+        },
+        {
+          "submittedFrames": 79,
+          "elapsedMs": 20007.600000023842,
+          "fps": 3.9484995701586327
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3921255, 3921255],
+      "drawCalls": [680, 680],
+      "worldCpuMs": [9.23, 9.16],
+      "submitCpuMs": [32.63, 32.29]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 4.021762481221794,
+      "windows": [
+        {
+          "submittedFrames": 81,
+          "elapsedMs": 20015.099999904633,
+          "fps": 4.046944556878854
+        },
+        {
+          "submittedFrames": 80,
+          "elapsedMs": 20017.099999904633,
+          "fps": 3.996582921621071
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3446931, 3446931],
+      "drawCalls": [465, 465],
+      "worldCpuMs": [13.51, 13.3],
+      "submitCpuMs": [28.74, 27.14]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 3.866701581182761,
+      "windows": [
+        {
+          "submittedFrames": 79,
+          "elapsedMs": 20433.5,
+          "fps": 3.8662001125602563
+        },
+        {
+          "submittedFrames": 79,
+          "elapsedMs": 20428.200000047684,
+          "fps": 3.8672031799089295
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3937822, 3937822],
+      "drawCalls": [681, 682],
+      "worldCpuMs": [19.96, 19.93],
+      "submitCpuMs": [29.68, 29.82]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 3.8643800766389735,
+      "windows": [
+        {
+          "submittedFrames": 77,
+          "elapsedMs": 20085.600000023842,
+          "fps": 3.833592225271269
+        },
+        {
+          "submittedFrames": 79,
+          "elapsedMs": 20283.100000023842,
+          "fps": 3.8948681414530886
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3447878, 3447748],
+      "drawCalls": [469, 468],
+      "worldCpuMs": [22.45, 20.05],
+      "submitCpuMs": [29.77, 30.09]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 3.512973261828701,
+      "windows": [
+        {
+          "submittedFrames": 71,
+          "elapsedMs": 20206.899999976158,
+          "fps": 3.5136512775380573
+        },
+        {
+          "submittedFrames": 71,
+          "elapsedMs": 20214.699999928474,
+          "fps": 3.5122955077370044
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5546839, 5546839],
+      "drawCalls": [983, 983],
+      "worldCpuMs": [7.62, 7.59],
+      "submitCpuMs": [41.6, 41.45]
+    },
+    {
+      "device": "Redmi",
+      "tier": "ultra",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 3.6591285299902623,
+      "windows": [
+        {
+          "submittedFrames": 74,
+          "elapsedMs": 20093.100000023842,
+          "fps": 3.6828563039009508
+        },
+        {
+          "submittedFrames": 73,
+          "elapsedMs": 20080.400000095367,
+          "fps": 3.6353857492705974
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4293606, 4293606],
+      "drawCalls": [580, 580],
+      "worldCpuMs": [11.16, 11.1],
+      "submitCpuMs": [39.31, 37.47]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 3.4809552525674006,
+      "windows": [
+        {
+          "submittedFrames": 71,
+          "elapsedMs": 20394.399999976158,
+          "fps": 3.4813478209745323
+        },
+        {
+          "submittedFrames": 71,
+          "elapsedMs": 20399,
+          "fps": 3.4805627726849355
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5546841, 5546841],
+      "drawCalls": [986, 986],
+      "worldCpuMs": [6.25, 6.25],
+      "submitCpuMs": [39.57, 39.51]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 3.427745363225174,
+      "windows": [
+        {
+          "submittedFrames": 68,
+          "elapsedMs": 20176.399999976158,
+          "fps": 3.3702741817212365
+        },
+        {
+          "submittedFrames": 70,
+          "elapsedMs": 20083.300000071526,
+          "fps": 3.4854829634447873
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4293166, 4293606],
+      "drawCalls": [579, 580],
+      "worldCpuMs": [10.67, 10.84],
+      "submitCpuMs": [40.36, 39.32]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 3.8110224604564453,
+      "windows": [
+        {
+          "submittedFrames": 77,
+          "elapsedMs": 20340.099999904633,
+          "fps": 3.785625439420702
+        },
+        {
+          "submittedFrames": 78,
+          "elapsedMs": 20331.399999976158,
+          "fps": 3.8364303491196607
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4376130, 4376130],
+      "drawCalls": [719, 718],
+      "worldCpuMs": [7.18, 7.18],
+      "submitCpuMs": [32.86, 32.85]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 3.5949373365233237,
+      "windows": [
+        {
+          "submittedFrames": 70,
+          "elapsedMs": 20145.299999952316,
+          "fps": 3.4747558984063622
+        },
+        {
+          "submittedFrames": 75,
+          "elapsedMs": 20189.200000047684,
+          "fps": 3.7148574485280674
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3836037, 3836477],
+      "drawCalls": [469, 470],
+      "worldCpuMs": [12.84, 13.87],
+      "submitCpuMs": [34.26, 34.95]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "updated",
+      "fps": 3.6962157200689476,
+      "windows": [
+        {
+          "submittedFrames": 74,
+          "elapsedMs": 20063.800000071526,
+          "fps": 3.6882345318302714
+        },
+        {
+          "submittedFrames": 75,
+          "elapsedMs": 20247.700000047684,
+          "fps": 3.704124419061097
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4380848, 4380848],
+      "drawCalls": [719, 720],
+      "worldCpuMs": [17.29, 17.4],
+      "submitCpuMs": [35.72, 36.07]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "updated",
+      "fps": 3.813160076455537,
+      "windows": [
+        {
+          "submittedFrames": 76,
+          "elapsedMs": 20234.299999952316,
+          "fps": 3.755998477841047
+        },
+        {
+          "submittedFrames": 79,
+          "elapsedMs": 20414.400000095367,
+          "fps": 3.8698173837894303
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [3835884, 3835884],
+      "drawCalls": [471, 471],
+      "worldCpuMs": [20.61, 17.43],
+      "submitCpuMs": [34.02, 32.15]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "existing",
+      "fps": 3.462850490818106,
+      "windows": [
+        {
+          "submittedFrames": 71,
+          "elapsedMs": 20328.899999976158,
+          "fps": 3.492564772323307
+        },
+        {
+          "submittedFrames": 70,
+          "elapsedMs": 20389,
+          "fps": 3.4332237971455197
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [5546930, 5546930],
+      "drawCalls": [987, 987],
+      "worldCpuMs": [7.38, 7.43],
+      "submitCpuMs": [38.31, 38.34]
+    },
+    {
+      "device": "Redmi",
+      "tier": "insane",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "existing",
+      "fps": 3.6187520758273877,
+      "windows": [
+        {
+          "submittedFrames": 73,
+          "elapsedMs": 20161.899999976158,
+          "fps": 3.6206905103232496
+        },
+        {
+          "submittedFrames": 73,
+          "elapsedMs": 20183.5,
+          "fps": 3.6168157158074665
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": false
+      },
+      "geometryTriangles": [4293606, 4293606],
+      "drawCalls": [580, 580],
+      "worldCpuMs": [11.2, 11.18],
+      "submitCpuMs": [34.65, 33.34]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "selected prototype",
+      "fps": 194.35167779831667,
+      "windows": [
+        {
+          "submittedFrames": 3713,
+          "elapsedMs": 20001,
+          "fps": 185.64071796410178
+        },
+        {
+          "submittedFrames": 4062,
+          "elapsedMs": 20003.800000071526,
+          "fps": 203.06141832979114
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1064131, 1064131],
+      "drawCalls": [177, 177],
+      "worldCpuMs": [0.81, 0.74],
+      "submitCpuMs": [3.25, 3.1]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "corrected Low",
+      "fps": 199.72902845236965,
+      "windows": [
+        {
+          "submittedFrames": 3836,
+          "elapsedMs": 20002,
+          "fps": 191.78082191780823
+        },
+        {
+          "submittedFrames": 4154,
+          "elapsedMs": 20002.199999928474,
+          "fps": 207.67715551363622
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1065148, 1065148],
+      "drawCalls": [166, 166],
+      "worldCpuMs": [0.74, 0.65],
+      "submitCpuMs": [3.22, 3.08]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "selected prototype",
+      "fps": 172.6417664597507,
+      "windows": [
+        {
+          "submittedFrames": 3447,
+          "elapsedMs": 20001.800000071526,
+          "fps": 172.3344898952931
+        },
+        {
+          "submittedFrames": 3460,
+          "elapsedMs": 20005.899999976158,
+          "fps": 172.9489800510911
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1418937, 1418937],
+      "drawCalls": [146, 146],
+      "worldCpuMs": [0.9, 0.94],
+      "submitCpuMs": [3.52, 3.67]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "corrected Low",
+      "fps": 181.9177096069785,
+      "windows": [
+        {
+          "submittedFrames": 3635,
+          "elapsedMs": 20002.199999928474,
+          "fps": 181.73000969958295
+        },
+        {
+          "submittedFrames": 3643,
+          "elapsedMs": 20004.899999976158,
+          "fps": 182.10538418109272
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1418479, 1418479],
+      "drawCalls": [138, 138],
+      "worldCpuMs": [0.78, 0.82],
+      "submitCpuMs": [3.4, 3.51]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "selected prototype",
+      "fps": 150.51651007659768,
+      "windows": [
+        {
+          "submittedFrames": 2927,
+          "elapsedMs": 20005.800000071526,
+          "fps": 146.30757080394363
+        },
+        {
+          "submittedFrames": 3095,
+          "elapsedMs": 20003.099999904633,
+          "fps": 154.72601746803025
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1064147, 1064147],
+      "drawCalls": [177, 177],
+      "worldCpuMs": [1.22, 1.01],
+      "submitCpuMs": [4.38, 3.83]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "corrected Low",
+      "fps": 153.04898167284193,
+      "windows": [
+        {
+          "submittedFrames": 2991,
+          "elapsedMs": 20002.399999976158,
+          "fps": 149.53205615343984
+        },
+        {
+          "submittedFrames": 3132,
+          "elapsedMs": 20004.400000095367,
+          "fps": 156.5655555770265
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1065152, 1065152],
+      "drawCalls": [166, 166],
+      "worldCpuMs": [1.05, 0.89],
+      "submitCpuMs": [4.4, 3.86]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "selected prototype",
+      "fps": 183.66602178607906,
+      "windows": [
+        {
+          "submittedFrames": 3663,
+          "elapsedMs": 20005.100000023842,
+          "fps": 183.10330865607443
+        },
+        {
+          "submittedFrames": 3685,
+          "elapsedMs": 20002.299999952316,
+          "fps": 184.22881368686524
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1418937, 1418937],
+      "drawCalls": [146, 146],
+      "worldCpuMs": [0.93, 0.82],
+      "submitCpuMs": [3.55, 3.34]
+    },
+    {
+      "device": "Mac",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "corrected Low",
+      "fps": 189.66172367900333,
+      "windows": [
+        {
+          "submittedFrames": 3789,
+          "elapsedMs": 20001.100000023842,
+          "fps": 189.4395808228289
+        },
+        {
+          "submittedFrames": 3798,
+          "elapsedMs": 20001.700000047684,
+          "fps": 189.8838598714582
+        }
+      ],
+      "buffer": {
+        "width": 1600,
+        "height": 900,
+        "cssWidth": 1600,
+        "cssHeight": 900,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1418105, 1418105],
+      "drawCalls": [138, 138],
+      "worldCpuMs": [0.83, 0.73],
+      "submitCpuMs": [3.49, 3.33]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "selected prototype",
+      "fps": 35.75709149021175,
+      "windows": [
+        {
+          "submittedFrames": 720,
+          "elapsedMs": 20020.799999952316,
+          "fps": 35.96259889723262
+        },
+        {
+          "submittedFrames": 712,
+          "elapsedMs": 20027.200000047684,
+          "fps": 35.55164975624674
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1071363, 1071363],
+      "drawCalls": [185, 185],
+      "worldCpuMs": [5.61, 5.69],
+      "submitCpuMs": [12.61, 12.7]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "selected prototype",
+      "fps": 29.856265193573236,
+      "windows": [
+        {
+          "submittedFrames": 597,
+          "elapsedMs": 20015,
+          "fps": 29.827629278041467
+        },
+        {
+          "submittedFrames": 598,
+          "elapsedMs": 20010.100000023842,
+          "fps": 29.884908121363086
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1427521, 1427521],
+      "drawCalls": [161, 161],
+      "worldCpuMs": [5.61, 5.49],
+      "submitCpuMs": [12.73, 12.7]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "forward",
+      "scene": "thornpeak",
+      "setting": "corrected Low",
+      "fps": 38.920219790691,
+      "windows": [
+        {
+          "submittedFrames": 778,
+          "elapsedMs": 20022,
+          "fps": 38.85725701728099
+        },
+        {
+          "submittedFrames": 781,
+          "elapsedMs": 20034.299999952316,
+          "fps": 38.983143908290224
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1072370, 1072370],
+      "drawCalls": [175, 175],
+      "worldCpuMs": [4.47, 4.4],
+      "submitCpuMs": [12.36, 12.28]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "forward",
+      "scene": "beach",
+      "setting": "corrected Low",
+      "fps": 30.046155690554976,
+      "windows": [
+        {
+          "submittedFrames": 604,
+          "elapsedMs": 20028.600000023842,
+          "fps": 30.156875667759156
+        },
+        {
+          "submittedFrames": 599,
+          "elapsedMs": 20009.799999952316,
+          "fps": 29.935331687544476
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1427521, 1427521],
+      "drawCalls": [153, 153],
+      "worldCpuMs": [4.38, 4.35],
+      "submitCpuMs": [12.28, 12.11]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "corrected Low",
+      "fps": 36.3935196056279,
+      "windows": [
+        {
+          "submittedFrames": 684,
+          "elapsedMs": 20022.699999928474,
+          "fps": 34.161227007468696
+        },
+        {
+          "submittedFrames": 773,
+          "elapsedMs": 20011.899999976158,
+          "fps": 38.627016924975685
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1072370, 1072370],
+      "drawCalls": [175, 175],
+      "worldCpuMs": [4.64, 4.04],
+      "submitCpuMs": [12.81, 11.89]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "corrected Low",
+      "fps": 30.12882757178216,
+      "windows": [
+        {
+          "submittedFrames": 602,
+          "elapsedMs": 20033.199999928474,
+          "fps": 30.05011680620916
+        },
+        {
+          "submittedFrames": 605,
+          "elapsedMs": 20028.100000023842,
+          "fps": 30.207558380439473
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1427521, 1427521],
+      "drawCalls": [153, 153],
+      "worldCpuMs": [4.23, 4.13],
+      "submitCpuMs": [12.07, 11.83]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "thornpeak",
+      "setting": "selected prototype",
+      "fps": 38.46470657251636,
+      "windows": [
+        {
+          "submittedFrames": 770,
+          "elapsedMs": 20035.899999976158,
+          "fps": 38.431016325741105
+        },
+        {
+          "submittedFrames": 771,
+          "elapsedMs": 20026.799999952316,
+          "fps": 38.49841212784048
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1071365, 1071365],
+      "drawCalls": [186, 186],
+      "worldCpuMs": [4.44, 4.34],
+      "submitCpuMs": [12.71, 12.7]
+    },
+    {
+      "device": "Redmi",
+      "tier": "low",
+      "order": "reverse",
+      "scene": "beach",
+      "setting": "selected prototype",
+      "fps": 29.776774116153902,
+      "windows": [
+        {
+          "submittedFrames": 599,
+          "elapsedMs": 20004.899999976158,
+          "fps": 29.942664047344095
+        },
+        {
+          "submittedFrames": 593,
+          "elapsedMs": 20026.300000071526,
+          "fps": 29.611061454081984
+        }
+      ],
+      "buffer": {
+        "width": 899,
+        "height": 394,
+        "cssWidth": 894,
+        "cssHeight": 392,
+        "dynamicResolution": true
+      },
+      "geometryTriangles": [1427521, 1427521],
+      "drawCalls": [161, 161],
+      "worldCpuMs": [4.49, 4.6],
+      "submitCpuMs": [12.74, 12.73]
+    }
+  ]
+}

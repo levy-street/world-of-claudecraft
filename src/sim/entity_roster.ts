@@ -20,6 +20,8 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { burstSporeBurst, type SporeBurstGroundState } from './combat/druid_spore_burst';
+import { pulseArmoredGroundAoE } from './combat/hunter_ground_zone';
 import { tickHunterTrap } from './combat/hunter_trap';
 import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { cleanupPaladinAegis } from './combat/paladin_aegis';
@@ -27,10 +29,12 @@ import { stripSunGodVerdicts } from './combat/paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './combat/paladin_support';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
-import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
+import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, getActiveWorldContent, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
 import { guardAndReportPose, isPosFinite } from './finite_pose_guard';
+import { dungeonDoorPos } from './moved_objects';
+import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelCorpseHarvestForCorpse } from './professions/corpse_harvest_session';
 import { aurasSurvivingDeath } from './resurrection';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
@@ -104,8 +108,12 @@ export type GroundAoE = {
     innerRadius: number;
     triggeredIds: Set<number>;
   };
-  // Hunter trap (combat/hunter_trap.ts): placed at the owner's feet, arms
-  // after armRemaining, freezes the first enemy contact, then is consumed.
+  // Physical ground zones (Volley) roll armor per struck target, the rule the
+  // old channel path applied; combat/hunter_ground_zone.ts owns that pulse.
+  armorMitigated?: boolean;
+  // Hunter trap (combat/hunter_trap.ts): placed at the owner's feet or aimed
+  // point, arms after armRemaining, springs on the first enemy contact, then is
+  // consumed. A concealed trap's cues reach only its owner and their group.
   hunterTrap?: {
     abilityId: string;
     armRemaining: number;
@@ -114,6 +122,10 @@ export type GroundAoE = {
     rootInstead?: boolean;
     slowMult?: number;
     slowDuration?: number;
+    concealed?: boolean;
+    // Bear Trap: the victim bleeds instead of being rooted. Total is resolved
+    // (Ranged AP included) when the trap is placed.
+    bleed?: { total: number; duration: number; interval: number };
   };
   temporalHourglass?: {
     id: string;
@@ -129,6 +141,9 @@ export type GroundAoE = {
     sourceOrigin: Vec3;
     sourceZoneId: string;
   };
+  // Spore Burst (combat/druid_spore_burst.ts): a growing mushroom whose fuse is
+  // `remaining`; it bursts once when the fuse runs out, then is removed.
+  sporeBurst?: SporeBurstGroundState;
 };
 
 // A SimEvent or deterministic simulation callback scheduled for a future sim time,
@@ -297,7 +312,8 @@ export function tickGroundAoEs(ctx: SimContext): void {
     );
     if (
       ((effect.frostRing || effect.hunterTrap) && !persistentSource) ||
-      (effect.temporalHourglass && (!persistentSource || persistentSource.dead)) ||
+      ((effect.temporalHourglass || effect.sporeBurst) &&
+        (!persistentSource || persistentSource.dead)) ||
       hourglassChangedRegion
     ) {
       ctx.groundAoEs.splice(i, 1);
@@ -324,10 +340,18 @@ export function tickGroundAoEs(ctx: SimContext): void {
       if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
       continue;
     }
+    if (effect.sporeBurst) {
+      if (effect.remaining <= CAST_COMPLETE_EPS) {
+        ctx.groundAoEs.splice(i, 1);
+        burstSporeBurst(ctx, effect);
+      }
+      continue;
+    }
     effect.tickTimer -= DT;
     while (effect.tickTimer <= CAST_COMPLETE_EPS && effect.remaining > CAST_COMPLETE_EPS) {
       effect.tickTimer += effect.interval;
-      ctx.pulseGroundAoE(effect, effect.threat);
+      if (effect.armorMitigated) pulseArmoredGroundAoE(ctx, effect, effect.threat);
+      else ctx.pulseGroundAoE(effect, effect.threat);
     }
     if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
   }
@@ -351,6 +375,9 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
   run.deathsThisRun[pid] = deaths;
   if (deaths >= 2) {
     r.e.dead = false;
+    // Hand back the pet this death took before the eject, which then carries it
+    // out to the door beside its owner (delves/delve_pet.ts bringPetToOwner).
+    restorePetOnOwnerRevive(ctx, r.e);
     ctx.failDelveRun(run);
     return true;
   }
@@ -403,6 +430,10 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
     if (run.companion) ctx.despawnDelveCompanion(run);
     ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId);
   }
+  // The delve respawn is a resurrection like any other (spirit.ts reviveAt), so the
+  // pet the death took comes back beside its owner: hunter and warlock pets fight in
+  // delves (delves/delve_pet.ts). A no-op when the death took no pet.
+  restorePetOnOwnerRevive(ctx, p);
   ctx.emit({ type: 'respawn', pid });
   return true;
 }
@@ -412,7 +443,8 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
 // guard does not see it as a literal emit.
 export function graveyardReadout(p: Entity): string {
   const dungeon = dungeonAt(p.pos.x);
-  const zone = zoneAt(dungeon ? dungeon.doorPos.x : p.pos.x, dungeon ? dungeon.doorPos.z : p.pos.z);
+  const door = dungeon ? dungeonDoorPos(getActiveWorldContent().objectMoves, dungeon) : p.pos;
+  const zone = zoneAt(door.x, door.z);
   const gy = zone.graveyard;
   return `If you fall here, your spirit returns to the ${zone.name} graveyard at (${Math.floor(gy.x)}, ${Math.floor(gy.z)}).`;
 }

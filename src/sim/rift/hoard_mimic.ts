@@ -41,7 +41,6 @@ import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
   hoardMechanicDamage,
-  hoardPlayerBudget,
 } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
@@ -204,7 +203,7 @@ export function tickHoardMimic(
     const points = mimicCoinPoints(
       boss.pos,
       boss.facing,
-      mimicCoinCount(hoardPlayerBudget(inst.vault, living.length)),
+      mimicCoinCount(living.length),
       held.casts,
     );
     held.casts++;

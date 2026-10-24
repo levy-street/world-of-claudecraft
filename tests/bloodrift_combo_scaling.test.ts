@@ -5,10 +5,11 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 
 // Classic Rip scaling for Bloodrift (owner ruling 2026-07-29, mirroring the
-// Bleed Out fix): a FIXED 24 sec duration whose total damage is 36 plus 24
-// per combo point spent, so points buy bigger ticks and a 5-point spend is
-// exactly the pre-change 156 total. Rounds out the six-spec tooltip-clarity
-// rule that every finisher visibly rewards the points it consumes.
+// Bleed Out fix): a FIXED 24 sec duration whose total damage scales per
+// combo point spent, so points buy bigger ticks. The values were doubled to
+// 72 plus 48 per point (312 at a 5-point spend) to make Bloodrift worth its
+// press. Rounds out the six-spec tooltip-clarity rule that every finisher
+// visibly rewards the points it consumes.
 
 function rig() {
   const sim = new Sim({ seed: 43, playerClass: 'druid', autoEquip: true });
@@ -49,9 +50,9 @@ function bleedOn(mob: Entity): Aura | undefined {
 }
 
 describe('Bloodrift (rip): damage scales with combo points at a fixed duration', () => {
-  it('always runs 24 sec, with 36 plus 24 per combo point of bleed', () => {
+  it('always runs 24 sec, with 72 plus 48 per combo point of bleed', () => {
     // Tick value = comboTotal / 12 ticks (+ a constant AP snapshot), so each
-    // combo point adds exactly 2 per tick: 24 extra damage over the bleed.
+    // combo point adds exactly 4 per tick: 48 extra damage over the bleed.
     const ticks: number[] = [];
     for (const combo of [1, 3, 5]) {
       const { sim } = rig();
@@ -66,9 +67,9 @@ describe('Bloodrift (rip): damage scales with combo points at a fixed duration',
     }
     const [v1, v3, v5] = ticks;
     expect(v1).toBeGreaterThan(0);
-    // (36 + 24 x 3)/12 - (36 + 24 x 1)/12 = 4, and again from 3 to 5 points.
-    expect(v3 - v1).toBe(4);
-    expect(v5 - v3).toBe(4);
+    // (72 + 48 x 3)/12 - (72 + 48 x 1)/12 = 8, and again from 3 to 5 points.
+    expect(v3 - v1).toBe(8);
+    expect(v5 - v3).toBe(8);
   });
 
   it('cannot be cast with no combo points', () => {

@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { bossRoomThemeFor } from '../src/render/hoard_room_themes_core';
 import { hoardValleyProfile } from '../src/render/hoard_valley_core';
 import { resolveHoardValleyEnvironment } from '../src/render/hoard_valley_environment';
-import { makeVaultSeed } from '../src/sim/rift/vault_seed';
+import { zoneAt } from '../src/sim/data';
+import { makeVaultSeed, VAULT_ZONE_IDS } from '../src/sim/rift/vault_seed';
 import type { RiftFloorView } from '../src/world_api';
 
 function floorView(seed: number): RiftFloorView {
@@ -24,6 +25,17 @@ function floorView(seed: number): RiftFloorView {
 }
 
 describe('hidden valley environment', () => {
+  it('provides a sky anchor inside every encoded dig zone', () => {
+    for (const zoneId of VAULT_ZONE_IDS) {
+      const env = resolveHoardValleyEnvironment(
+        floorView(makeVaultSeed(3, 1234, { open: true, zoneId })),
+      );
+      expect(env?.sky, zoneId).toBeDefined();
+      if (!env?.sky) throw new Error(`missing sky for ${zoneId}`);
+      expect(zoneAt(env.sky.x, env.sky.z).id, zoneId).toBe(zoneId);
+    }
+  });
+
   it('uses the encoded dig zone for sky and live-light biome, and the boss room for fog', () => {
     const seed = makeVaultSeed(3, 1234, { open: true, zoneId: 'frostveil' });
     const env = resolveHoardValleyEnvironment(floorView(seed));

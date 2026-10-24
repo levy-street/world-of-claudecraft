@@ -61,7 +61,6 @@ export class CensusExporter {
     if (this.running) return 0;
     this.running = true;
     try {
-      const startedMs = this.now().getTime();
       const day = snapshotDate ?? this.now().toISOString().slice(0, 10);
       const rows = await this.load(day);
       for (let i = 0; i < rows.length; i++) {
@@ -72,10 +71,7 @@ export class CensusExporter {
       }
       this.counters.censusRuns++;
       this.counters.censusRows += rows.length;
-      const elapsedMs = this.now().getTime() - startedMs;
-      console.log(
-        `[parse] census exported ${rows.length} characters for ${day} in ${elapsedMs} ms`,
-      );
+      console.log(`[parse] census exported ${rows.length} characters for ${day}`);
       return rows.length;
     } catch (e) {
       this.counters.censusFailures++;

@@ -21,9 +21,10 @@
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import {
+  BASE_WORLD,
   CAMPS,
   GATHER_NODE_TYPES,
   GATHER_NODES,
@@ -31,6 +32,7 @@ import {
   PROPS,
   STRIP_MAX_X,
   STRIP_MIN_X,
+  setActiveWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_X,
@@ -62,6 +64,10 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // The live shipped seed (src/sim/world_seed.ts, the one both hosts build
 // from), never a copy: every geometry assertion below is about THE world.
 //
+setActiveWorldContent(BASE_WORLD);
+beforeEach(() => setActiveWorldContent(BASE_WORLD));
+afterEach(() => setActiveWorldContent(null));
+
 // One literal pin, deliberately: every suite now derives from the shared
 // constant, so without this line a seed change would reshuffle the whole
 // persistent world with a fully green suite (the constant-self-comparison
@@ -372,11 +378,15 @@ const ON_A_DOCK_PLANK = { x: PROPS.docks[0].x, z: PROPS.docks[0].z };
 // ground a yard away, the same shallow shape the old fixture had.
 const INSIDE_A_TOWN_COLLIDER = { x: -7, z: -123 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
-// can hold is 4.5yd away, three times the widest clearance a node's own
+// can hold is 4yd away, nearly three times the widest clearance a node's own
 // body can account for, and still inside the harvest reach the sweep
 // searches so the fixture fails on distance rather than on running out of
 // room. This is the counter-example the buried-in-geometry arm needs.
-const DEEP_INSIDE_A_BUILDING = { x: 17, z: -6 };
+// Re-staged 2026-10 inside the sealed quay cottage
+// (EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage) when the genshin artstyle
+// merge (8bff2cec638) cleared the Wolf Run barracks the old (17, -6) fixture
+// sat inside.
+const DEEP_INSIDE_A_BUILDING = { x: -59, z: -55 };
 
 describe('gather node placement: every node sits on ground a player can work', () => {
   it('dry land: no node sits at or under a declared water surface', () => {

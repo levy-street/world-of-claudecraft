@@ -25,6 +25,7 @@ await writeFile(
   sourcePath,
   `
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUEST_ORDER, QUESTS, ZONES } from '../../src/sim/data';
+import { mediawikiAbilityDescription } from '../../scripts/mediawiki/ability_description';
 
 const css = ${JSON.stringify(css)};
 const pages = [];
@@ -277,7 +278,7 @@ for (const [id, item] of Object.entries(ITEMS)) {
 }
 
 for (const [id, ability] of visibleAbilities) {
-  add(titleBy.ability.get(id), section('Description', ability.description) + section('Facts', table([
+  add(titleBy.ability.get(id), section('Description', mediawikiAbilityDescription(ability)) + section('Facts', table([
     ['Class', link(titleBy.class.get(ability.class), CLASSES[ability.class]?.name ?? ability.class)], ['Learn level', String(ability.learnLevel)], ['Cost', String(ability.cost)], ['Cooldown', ability.cooldown + 's'], ['Range', ability.range ? ability.range + ' yd' : 'Melee/self'], ['School', ability.school],
   ])) + section('Base effects', bullets(ability.effects.map((effect) => effect.type))) + (ability.ranks?.length ? section('Ranks', table(ability.ranks.map((rank) => ['Rank ' + rank.rank, 'Level ' + rank.level + ', cost ' + rank.cost]))) : ''), ['Abilities', CLASSES[ability.class]?.name ?? ability.class]);
 }

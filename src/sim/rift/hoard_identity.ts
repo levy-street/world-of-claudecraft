@@ -2,6 +2,7 @@
 // rift roster keyed to current entities while remembering stable identities for
 // vault entrants, so reconnecting cannot create a phantom extra participant.
 
+import { VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../content/treasure_maps';
 import { mountOwned } from '../mounts';
 import type { SimContext } from '../sim_context';
 import { VAULT_MOUNT_KEY } from '../treasure_vault';
@@ -64,7 +65,9 @@ export function rememberVaultEntrant(ctx: SimContext, inst: RiftInstance, pid: n
         cls: meta.cls,
         level: player.level,
         mountOwned: mountOwned(meta, VAULT_MOUNT_KEY),
-        guestCapped: false,
+        guestCapped:
+          meta.vaultGuestCycle === meta.worldQuestCycle &&
+          (meta.vaultGuestPayouts ?? 0) >= VAULT_GUEST_PAYOUTS_PER_CYCLE,
         guestCycle: meta.worldQuestCycle,
       });
     };

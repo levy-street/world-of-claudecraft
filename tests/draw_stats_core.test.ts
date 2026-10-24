@@ -70,8 +70,14 @@ describe('draw_stats_core', () => {
     // session kept from before the loss would accumulate into a dead object,
     // zeroing the governor draw signal and the opaque-sort input for the rest
     // of the session.
+    // The restore host (src/render/context_restore.ts) calls this rebind first
+    // thing on every in-place restore.
     expect(source).toMatch(
-      /onWebGLContextRestored = \(\): void => \{[\s\S]{0,900}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);/,
+      /rebindContextReaders: \(\) => \{[\s\S]{0,300}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);/,
+    );
+    const host = readFileSync(new URL('../src/render/context_restore.ts', import.meta.url), 'utf8');
+    expect(host).toMatch(
+      /private contextRestored\(\): void \{[\s\S]{0,400}?this\.surface\.rebindContextReaders\(\);/,
     );
     expect(source.match(/this\.drawStats\.beginFrame\(\)/g)).toHaveLength(1);
     expect(source.match(/this\.drawStats\.currentFrame\(\)/g)).toHaveLength(2);
@@ -249,8 +255,10 @@ describe('draw_stats_core', () => {
 
   it('pins the config version that segments the expanded graphics profiles', () => {
     // v21 separates the staged per-system graphics controls and expanded
-    // profile bytes from v20 fleet comparisons.
-    expect(GFX_CONFIG_VERSION).toBe(21);
+    // profile bytes from v20 fleet comparisons. v22 (8ac3ed28f3d, merged with
+    // the genshin overhaul) segments Low's distant scenery index LOD and its
+    // clearer outdoor light pair from v21 Low frames.
+    expect(GFX_CONFIG_VERSION).toBe(22);
   });
 
   it('clamps a backward counter jump at zero, per field, and recovers', () => {

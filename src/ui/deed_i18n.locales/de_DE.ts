@@ -157,7 +157,7 @@ export const table: DeedLocaleTable = {
     title: 'Champion',
   },
   prog_paragon: {
-    name: 'Paragon',
+    name: 'Vorbild',
     desc: 'Sammle insgesamt 1.000.000 Erfahrung.',
     title: 'Paragon',
   },
@@ -378,6 +378,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Talchronik, Kapitel II',
+    desc: 'Schließe das zweite Kapitel von Sauls Chronik ab: Besiege Banditen, Murlocs und Minenungeziefer und stelle dich dem Reliquiar.',
   },
   chr_vale_chapter_iii: {
     name: 'Die Chronik des Tals',
@@ -398,6 +399,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Anwärter auf den Kupfereimer',
+    desc: 'Betritt das Spielfeld und berühre den Ball in einem Talpokalspiel auf dem Saatfeld. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   chr_vale_rares: {
     name: 'Die Schrecken des Tals',
@@ -594,51 +596,72 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Stiefel auf dem Rasen',
+    desc: 'Spiele ein ganzes Talpokalspiel auf dem Saatfeld zu Ende, ob Sieg oder Niederlage. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
-  pvp_vcup_first_win: { name: 'Der erste Pott' },
+  pvp_vcup_first_win: {
+    name: 'Der erste Pott',
+    desc: 'Gewinne ein gewertetes Talpokalspiel. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
+  },
   pvp_vcup_wins_10: {
     name: 'Keilerball-Routinier',
+    desc: 'Gewinne 10 gewertete Talpokalspiele. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_vcup_wins_25: {
     name: 'Keilerball-Legende',
     title: 'Keilerball-Legende',
+    desc: 'Gewinne 25 gewertete Talpokalspiele. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_vcup_first_goal: {
     name: 'Der Bann ist gebrochen',
+    desc: 'Erziele ein Tor in einem gewerteten Talpokalspiel. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_vcup_hat_trick: {
     name: 'Hattrick-Held',
+    desc: 'Erziele drei Tore in einem einzigen gewerteten Talpokalspiel im Format 3v3 oder größer. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_vcup_golden_goal: {
     name: 'Goldener Moment',
+    desc: 'Erziele das Golden Goal, das ein gewertetes Talpokalspiel entscheidet. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_vcup_first_save: {
     name: 'Sichere Hände',
+    desc: 'Pariere als Torwart einen Schuss in einem gewerteten Talpokalspiel im Format 3v3 oder größer. Nur ein Schuss, der schnell genug ist, um deinen Griff auf die Probe zu stellen, zählt; ein leichtes Fangen genügt nicht. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_vcup_clean_sheet: {
     name: 'An mir kommt keiner vorbei',
+    desc: 'Gewinne als Torwart ein gewertetes Talpokalspiel im Format 3v3 oder größer, ohne ein Tor zu kassieren. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_vcup_guild_win: {
     name: 'Für das Banner',
+    desc: 'Gewinne ein gewertetes Talpokalspiel, zu dem du unter dem Banner deiner Gilde angetreten bist. Talpokalspiele sind nicht mehr spielbar; diese Tat kann daher nicht mehr neu verdient werden.',
   },
   pvp_fiesta_first_bout: {
     name: 'Partycrasher',
+    desc: 'Bestreite einen ganzen 2v2-Fiesta-Kampf, ob Sieg oder Niederlage. Fiesta-Kämpfe werden in der Arenawarteschlange nicht mehr angeboten; diese Tat kann nicht mehr neu verdient werden.',
   },
-  pvp_fiesta_first_win: { name: 'Die Seele der Fiesta' },
+  pvp_fiesta_first_win: {
+    name: 'Die Seele der Fiesta',
+    desc: 'Gewinne einen 2v2-Fiesta-Kampf. Fiesta-Kämpfe werden in der Arenawarteschlange nicht mehr angeboten; diese Tat kann nicht mehr neu verdient werden.',
+  },
   pvp_fiesta_double: {
     name: 'Doppelter Ärger',
+    desc: 'Erziele zwei Fiesta-Abschüsse innerhalb von vier Sekunden. Fiesta-Kämpfe werden in der Arenawarteschlange nicht mehr angeboten; diese Tat kann nicht mehr neu verdient werden.',
   },
   pvp_fiesta_shutdown: {
     name: 'Spielverderber',
+    desc: 'Besiege einen Fiesta-Gegner mit einer Serie von mindestens drei Abschüssen. Fiesta-Kämpfe werden in der Arenawarteschlange nicht mehr angeboten; diese Tat kann nicht mehr neu verdient werden.',
   },
   pvp_fiesta_full_build: {
     name: 'Passend gekleidet',
+    desc: 'Gewinne einen Fiesta-Kampf mit je einer festgelegten Verstärkung aus allen drei Wellen. Fiesta-Kämpfe werden in der Arenawarteschlange nicht mehr angeboten; diese Tat kann nicht mehr neu verdient werden.',
   },
   pvp_fiesta_powerups: {
     name: 'Von jedem eins',
+    desc: 'Sammle jede der vier Ringverstärkungen mindestens einmal ein: Geschwindigkeitsdämon, Koloss, Mondstiefel und Berserker. Fiesta-Kämpfe werden in der Arenawarteschlange nicht mehr angeboten; diese Tat kann nicht mehr neu verdient werden.',
   },
   pvp_fiesta_five_kills: {
     name: 'Partyträger',
+    desc: 'Erziele fünf Abschüsse in einem einzigen Fiesta-Kampf. Fiesta-Kämpfe werden in der Arenawarteschlange nicht mehr angeboten; diese Tat kann nicht mehr neu verdient werden.',
   },
   soc_first_party: {
     name: 'Gemeinsam stärker',
@@ -1213,29 +1236,174 @@ export const table: DeedLocaleTable = {
     name: 'Auf frischer Tat ertappt',
     desc: 'Schnap dir einen Münzsakk-Ratte in einem Begrabenen Hort, bevor er mit dem Gold entwischt.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Heller als die Schatten',
+    desc: 'Hol die gestohlenen Geldborsen zuruck und entkomme dem Evergarden-Labyrinth auf Hard.',
+  },
+  prog_titan: {
+    name: 'Gigant',
+    desc: 'Verdiene insgesamt 10.000.000 Erfahrungspunkte.',
+    title: 'Gigant',
+  },
   pvp_flag_1h: {
     name: 'Kühn',
-    desc: 'Lasse Welt-PvP für 1 Stunde Spielzeit in der offenen Welt aktiv. Ausloggen, Tod und Instanzen pausieren den Fortschritt; Deaktivieren setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    desc: 'Lasse Welt-PvP für 1 Stunde Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
     title: 'Kühn',
   },
   pvp_flag_3h: {
-    name: 'Trotzig',
-    desc: 'Lasse Welt-PvP für 3 Stunden Spielzeit in der offenen Welt aktiv. Ausloggen, Tod und Instanzen pausieren den Fortschritt; Deaktivieren setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
-    title: 'Trotzig',
+    name: 'Aufbegehrend',
+    desc: 'Lasse Welt-PvP für 3 Stunden Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    title: 'Aufbegehrend',
   },
   pvp_flag_6h: {
     name: 'Furchtlos',
-    desc: 'Lasse Welt-PvP für 6 Stunden Spielzeit in der offenen Welt aktiv. Ausloggen, Tod und Instanzen pausieren den Fortschritt; Deaktivieren setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    desc: 'Lasse Welt-PvP für 6 Stunden Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
     title: 'Furchtlos',
   },
   pvp_flag_24h: {
-    name: 'Unnachgiebig',
-    desc: 'Lasse Welt-PvP für 24 Stunden Spielzeit in der offenen Welt aktiv. Ausloggen, Tod und Instanzen pausieren den Fortschritt; Deaktivieren setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
-    title: 'Unnachgiebig',
+    name: 'Unbeugsam',
+    desc: 'Lasse Welt-PvP für 24 Stunden Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    title: 'Unbeugsam',
   },
   pvp_flag_168h: {
     name: 'Unbezwingbar',
-    desc: 'Lasse Welt-PvP für 7 Tage Spielzeit in der offenen Welt aktiv. Ausloggen, Tod und Instanzen pausieren den Fortschritt; Deaktivieren setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    desc: 'Lasse Welt-PvP für 7 Tage Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
     title: 'Unbezwingbar',
+  },
+  cmb_balgath: {
+    name: 'Kein Vorarbeiter mehr',
+    desc: 'Schicke den Begrabenen Vorarbeiter zurück in seinen Grabhügel.',
+  },
+  cmb_balgath_ten: {
+    name: 'Der Hügel behält nichts',
+    desc: 'Besiege den Begrabenen Vorarbeiter zehnmal.',
+  },
+  cmb_point_taken: {
+    name: 'Spitze verstanden',
+    desc: 'Lösche die Laterne des Strohvorarbeiters auf dem Übungsplatz des Aufgebots und nutze seine abgefallenen Bretter.',
+  },
+  dgn_olen_buttress: {
+    name: 'Haltet die Mauer',
+    desc: 'Besiege Ritterkommandant Olen, ohne dass sein Abprallendes Bollwerk jemals einen zweiten Spieler trifft.',
+  },
+  dgn_ossick_moored: {
+    name: 'Sicherer Hafen',
+    desc: 'Besiege Kerkermeister Ossick, ohne dass jemand in die Grube des Ertrinkens gezogen wird.',
+  },
+  dgn_vael_beacon: {
+    name: 'Im Licht des Leuchtfeuers',
+    desc: 'Besiege Vael den Nebelbinder, ohne einen einzigen Nebelschatten zerplatzen zu lassen.',
+  },
+  dgn_turretback: {
+    name: 'Räumungsbescheid',
+    desc: 'Besiege den Schiffswrackkapitän, ohne dass jemand von der Geisterbreitseite getroffen wird.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Jede Stimme im Einklang',
+    desc: 'Besiege Chormutter Selthe, wobei jeder Chor von mindestens zwei Personen geteilt wird und kein Solo jemand anderen berührt.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Zerbrecht das Glas',
+    desc: 'Besiege den Gezeitenglaskoloss, wobei jedes Spiegelbild innerhalb von 15 Sekunden nach seinem Erscheinen zerbrochen wird.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Auf dem Trockenen',
+    desc: 'Besiege Ysolei, Avatar des Ertrunkenen Mondes, ohne dass jemand von ihrem Gezeiteneinschlag getroffen wird.',
+  },
+  dgn_mere_hydra: {
+    name: 'Alle Köpfe unten',
+    desc: 'Töte alle drei Köpfe der Seehydra innerhalb von 10 Sekunden voneinander.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Kein Haar versengt',
+    desc: 'Besiege den Totengeläutwyrm, ohne dass jemand von seinem Scheiterhaufen-Feuerflug verbrannt wird.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Kein Käfig hält uns',
+    desc: 'Besiege den Kerkerwärter, ohne dass jemand in einem Eisenkäfig zerquetscht wird.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Auf Abstand gehalten',
+    desc: 'Besiege den Fangfürsten-Bestienmeister und seinen Großen Jaguar, wobei Rudelband insgesamt weniger als 10 Sekunden aktiv ist.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Unkrautbekämpfung',
+    desc: 'Besiege die Schlingblüte, ohne dass ein einziger Dornenspross wächst.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Niemals erwischt',
+    desc: 'Besiege Zulgar, Stimme des Beckens, ohne dass jemand zerfleischt wird.',
+  },
+  dgn_great_saurian: {
+    name: 'Gestürzter Titan',
+    desc: 'Besiege den Großsaurier und seinen Sänftenfluchrufer innerhalb von 20 Sekunden voneinander.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Ein gnädigeres Ende',
+    desc: 'Besiege Korgath den Gebundenen, nachdem alle vier seiner Ketten zerbrochen wurden.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Das Schloss hält',
+    desc: 'Besiege Korgath den Gebundenen auf heroischem Schwierigkeitsgrad, wobei mindestens zwei seiner Ketten niemals zerbrochen werden.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Kalter Trost',
+    desc: 'Besiege Großnekromant Velkhar, ohne dass ein einziger erweckter Knochenwandler ein zweites Mal aufsteht.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Dünnes Eis',
+    desc: 'Besiege Korzul den Gravewyrm, wobei mindestens zwölf der neunzehn Eisplatten auf dem See unzerbrochen bleiben.',
+  },
+  dgn_sledge_tusker: {
+    name: 'Kalte Fracht',
+    desc: 'Besiege den Schlittenhauer, ohne dass jemand von seinem Trampeln getroffen wird.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Die letzte Strophe',
+    desc: 'Besiege Ysolei, Avatar des Ertrunkenen Mondes, mit dem Letzten Kantor des Bleichen Chors an deiner Seite.',
+    title: 'Zeuge des Chors',
+  },
+  dgn_marrow_tidy: {
+    name: 'Ein ordentlicher Kirchhof',
+    desc: 'Besiege Küster Marrow, wobei jedes Offene Grab am Rand des Glockenhofs angelegt wird.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Niemand bleibt hängen',
+    desc: 'Besiege die Lady des Knochenfrosts, ohne dass sie jemals jemanden aus ihrer Gefrorenen Umarmung fallen lässt.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Sei jetzt still',
+    desc: 'Besiege Kantor Ilvane, ohne dass ihr Klagelied der Hohlen jemals jemanden trifft.',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Jede Kerze brennt',
+    desc: 'Besiege Morthen den Gravecaller, nachdem alle vier Gedenkkerzen innerhalb von 20 Sekunden nach dem Erscheinen seines Schutzes der Ruhelosen wieder angezündet wurden.',
+  },
+  dgn_guild_first_contract: {
+    name: 'Auftrag unterzeichnet',
+    desc: 'Schließe einen wöchentlichen Dungeonauftrag der Laternenhalle ab.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Stammgast am Brett',
+    desc: 'Schließe 10 wöchentliche Dungeonaufträge der Laternenhalle ab.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Auftragsveteran',
+    desc: 'Schließe 50 wöchentliche Dungeonaufträge der Laternenhalle ab.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Auftragsbote',
+    desc: 'Bei Garrick Holt, dem Rüstmeister der Laternenhalle, für 6 Laternensiegel gekauft.',
+    title: 'Auftragsbote',
+  },
+  feat_guild_hallsworn: {
+    name: 'Hallengeschworen',
+    desc: 'Bei Garrick Holt, dem Rüstmeister der Laternenhalle, für 14 Laternensiegel gekauft.',
+    title: 'Hallengeschworen',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Von der Laternenhalle',
+    desc: 'Bei Garrick Holt, dem Rüstmeister der Laternenhalle, für 24 Laternensiegel gekauft.',
+    title: 'von der Laternenhalle',
   },
 };

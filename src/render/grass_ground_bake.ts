@@ -17,14 +17,22 @@
 
 import * as THREE from 'three';
 import { clusterGeometry, mulberry32 } from './blade_grass';
+import { rendererDisposed } from './context_generation';
+import { registerContextRestoreRebake } from './context_restore_registry';
 import {
   GRASS_BAKE_CLUSTER_JITTER,
   GRASS_BAKE_PATCH_YARDS,
   GRASS_BAKE_SOIL_SHADE,
   GRASS_BAKE_TEXTURE_SIZE,
+  meadowClusterHeight,
+  meadowClusterScale,
+  meadowCoverage,
 } from './meadow_tuning';
 
 export interface GrassGroundBake {
+  /** The WebGLRenderer whose context owns `texture`. A renderer may only
+   *  retire the bake it made itself, see clearGrassGroundBakeFor. */
+  owner: THREE.WebGLRenderer;
   /** Tileable linear-space albedo, RepeatWrapping, mipped, anisotropic. */
   texture: THREE.Texture;
   /** Per-channel mean of the baked patch (linear). This IS the blades'
@@ -38,12 +46,45 @@ export interface GrassGroundBake {
 // the same constructor). Null when baking was skipped (dev flag, headless).
 let activeBake: GrassGroundBake | null = null;
 
+/** What a bake needs to be drawn again into its own target. */
+interface GrassBakeSource {
+  renderer: THREE.WebGLRenderer;
+  seed: number;
+  target: THREE.WebGLRenderTarget;
+}
+
+// Keyed by the bake, so a source lives exactly as long as its bake.
+const bakeSources = new WeakMap<GrassGroundBake, GrassBakeSource>();
+
 export function setGrassGroundBake(bake: GrassGroundBake | null): void {
   activeBake = bake;
 }
 
 export function getGrassGroundBake(): GrassGroundBake | null {
   return activeBake;
+}
+
+/**
+ * Retire the bake IF it is still the one `owner` made.
+ *
+ * Renderer.shutdown() must clear this singleton, left set, the next
+ * renderer's terrain materials bind a texture from a dead GL context and the
+ * ground samples white. But `shutdownTask` is ASYNC, so an outgoing renderer's
+ * teardown can land AFTER the incoming one has already baked and built its
+ * materials; an unconditional dispose there kills the good bake instead, and
+ * the ground goes white a second time, worse, progressively, as terrain
+ * chunks re-mesh while the player walks and each new material binds the
+ * corpse. (Tried unconditionally on 2026-09-22, made it worse, and this is
+ * the guard that makes the clear safe.)
+ *
+ * Ownership settles it: a late teardown finds `activeBake.owner` is no longer
+ * its own renderer and leaves the live bake alone.
+ */
+export function clearGrassGroundBakeFor(owner: THREE.WebGLRenderer): boolean {
+  if (!activeBake || activeBake.owner !== owner) return false;
+  activeBake.texture.dispose();
+  activeBake = null;
+  return true;
 }
 
 // Same integer hash family the carpet uses for placement decisions.
@@ -54,15 +95,15 @@ function hash(i: number, j: number, k: number): number {
 }
 
 /**
- * Render the bake. `renderer` must be the live WebGLRenderer; state (render
- * target, tone mapping) is saved and restored around the offscreen pass.
+ * Draw the bake into `rt`. `renderer` must be the live WebGLRenderer; state
+ * (render target, tone mapping) is saved and restored around the pass.
  */
-export function bakeGrassGroundTexture(
+function drawGrassBake(
   renderer: THREE.WebGLRenderer,
   seed: number,
-): GrassGroundBake {
+  rt: THREE.WebGLRenderTarget,
+): void {
   const patch = GRASS_BAKE_PATCH_YARDS;
-  const size = GRASS_BAKE_TEXTURE_SIZE;
 
   // Cluster field over the patch at the CARPET's own density (0.46-yard
   // cells) and the carpet's own size formula, so the strokes are the real
@@ -84,18 +125,15 @@ export function bakeGrassGroundTexture(
       // neutral patch, and lushness structure comes from the per-vertex
       // tint, not the texture
       const lush = 0.55;
-      if (r1 >= (0.44 + 1.7 * lush * lush) * 1.05) continue;
+      if (r1 >= meadowCoverage(lush)) continue;
       const x = (ci + 0.5) * CELL + (r1 - 0.5) * CELL * 1.3;
       const z = (cj + 0.5) * CELL + (hash(ci, cj, 12) - 0.5) * CELL * 1.3;
-      const lushHere = 0.5 + lush * 0.6;
-      let s = (0.22 + hash(ci, cj, 13) * 0.34) * lushHere;
-      const rTuft = hash(ci, cj, 14);
-      if (rTuft < 0.1) s *= 1.5 + rTuft * 3.0;
+      const s = meadowClusterScale(lush, hash(ci, cj, 13), hash(ci, cj, 14));
       placements.push({
         x,
         z,
         s,
-        sy: s * (0.85 + lush * 0.5) * (0.82 + hash(ci, cj, 16) * 0.36),
+        sy: meadowClusterHeight(s, lush, hash(ci, cj, 16)),
         yaw: r1 * 12.9,
         grey: 1 + (hash(ci, cj, 15) - 0.5) * 2 * GRASS_BAKE_CLUSTER_JITTER,
       });
@@ -144,6 +182,28 @@ export function bakeGrassGroundTexture(
   cam.up.set(0, 0, -1);
   cam.lookAt(0, 0, 0);
 
+  const prevTarget = renderer.getRenderTarget();
+  const prevToneMapping = renderer.toneMapping;
+  // Albedo-space bake: tone mapping belongs to the lit frame, not the map.
+  renderer.toneMapping = THREE.NoToneMapping;
+  try {
+    renderer.setRenderTarget(rt);
+    renderer.render(scene, cam);
+  } finally {
+    renderer.setRenderTarget(prevTarget);
+    renderer.toneMapping = prevToneMapping;
+    geo.dispose();
+    mat.dispose();
+    im.dispose();
+  }
+}
+
+/** Render the bake into a fresh mipped target and measure its mean. */
+export function bakeGrassGroundTexture(
+  renderer: THREE.WebGLRenderer,
+  seed: number,
+): GrassGroundBake {
+  const size = GRASS_BAKE_TEXTURE_SIZE;
   const rt = new THREE.WebGLRenderTarget(size, size, {
     format: THREE.RGBAFormat,
     type: THREE.UnsignedByteType,
@@ -157,12 +217,7 @@ export function bakeGrassGroundTexture(
   });
   rt.texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
-  const prevTarget = renderer.getRenderTarget();
-  const prevToneMapping = renderer.toneMapping;
-  // Albedo-space bake: tone mapping belongs to the lit frame, not the map.
-  renderer.toneMapping = THREE.NoToneMapping;
-  renderer.setRenderTarget(rt);
-  renderer.render(scene, cam);
+  drawGrassBake(renderer, seed, rt);
 
   // Per-channel mean via one full readback (a few milliseconds, once per
   // session): the measured distant appearance the band blades sink toward.
@@ -179,11 +234,17 @@ export function bakeGrassGroundTexture(
   const inv = 1 / (size * size * 255);
   const mean: [number, number, number] = [r * inv, g * inv, b * inv];
 
-  renderer.setRenderTarget(prevTarget);
-  renderer.toneMapping = prevToneMapping;
-  geo.dispose();
-  mat.dispose();
-  im.dispose();
+  const bake: GrassGroundBake = { owner: renderer, texture: rt.texture, mean };
+  bakeSources.set(bake, { renderer, seed, target: rt });
+  registerContextRestoreRebake('grass-ground-bake', bake, rebakeGrassGround);
+  return bake;
+}
 
-  return { texture: rt.texture, mean };
+/** A WebGL context restore gives the target back empty: every terrain tile
+ *  sampling it would paint its grass black until the next session. The seed
+ *  is the same, so the strokes and their measured mean are too. */
+function rebakeGrassGround(bake: GrassGroundBake): void {
+  const source = bakeSources.get(bake);
+  if (!source || bake !== activeBake || rendererDisposed(source.renderer)) return;
+  drawGrassBake(source.renderer, source.seed, source.target);
 }

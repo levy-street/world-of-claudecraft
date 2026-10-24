@@ -470,6 +470,9 @@ export class WorldQuestConfectionFxController {
       element.remove();
       return;
     }
+    // Cancellation is normal when a board changes or closes. Some animation
+    // backends expose its rejected completion promise even with oncancel set.
+    void animation.finished.catch(() => {});
     this.effects.set(element, animation);
     const clean = () => {
       animation.onfinish = null;

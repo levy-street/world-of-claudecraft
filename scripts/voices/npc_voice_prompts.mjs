@@ -108,6 +108,17 @@ export const VOICE_PROMPTS = [
       "Hold at the gate. Past those reeds, the fen does the killing for us — and it's never short of work.",
   },
   {
+    npcId: 'socketwright_skerrit',
+    name: 'Maben Skerrit',
+    voiceDescription:
+      'Thin, reedy old craftsman\u2019s tenor \u2014 forty years of unpaid grievance worn smooth into ' +
+      'flat, matter-of-fact bitterness. Precise about his own work, dismissive of everything else. ' +
+      'Age 70s. Male.',
+    sampleText:
+      'I ground that lens myself. Seated it, wedged it true, and never saw a copper for it \u2014 so aim ' +
+      'for my work, and we are square.',
+  },
+  {
     npcId: 'provisioner_hale',
     name: 'Provisioner Hale',
     voiceDescription:
@@ -1103,6 +1114,9 @@ export const VOICE_ALIAS = {
   calligraphy_apprentice_2: 'trader_wilkes',
   // A working forgemistress.
   forge_instructor: 'forgemistress_darva',
+  // The Mirefen muster's leader (content/mirefen_muster.ts) gives clipped soldier's
+  // orders, so he borrows the Marshal's weathered parade register until he is designed.
+  muster_commander: 'marshal_redbrook',
   // Keep suspects vocally distinct without making any voice signal guilt.
   infiltrator_captain: 'warden_fenwick',
   infiltrator_nella: 'scout_maren',
@@ -1134,6 +1148,10 @@ export const VOICE_ALIAS = {
   // harbour road: the Gilded Strongbox bursar's discreet baritone is the
   // register, until a voice of his own is cast.
   eastbrook_vault_keeper: 'bursar_fernando',
+  // Laverock, the Drowned Temple's lore guide (src/sim/dungeon_guide), is the
+  // old last cantor of the Pale Choir: Brother Halven's hushed, unhurried
+  // monkish register is the closest cast, until a voice of his own is designed.
+  cantor_laverock: 'brother_halven',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',
@@ -1177,6 +1195,28 @@ export const VOICE_ALIAS = {
   // Promote her to her own VOICE_PROMPTS entry, warmer and more weathered than
   // Odile's, once an ElevenLabs key is available to design and render it.
   harbormaster_tamsin: 'harbormaster_odile',
+  // Maudie Tapwright, innkeeper of the Mirefen tavern (src/sim/content/mirefen_tavern.ts):
+  // the same trade and warmth as Hearthkeeper Maeve's lodge in the north, so she borrows
+  // Maeve's designed voice as a ROLE match. Promote her to her own VOICE_PROMPTS entry, a
+  // rounder, merrier marsh-country alto, once an ElevenLabs key is available.
+  innkeeper_maudie: 'hearthkeeper_maeve',
+  // The tavern's seated regulars (src/sim/content/mirefen_tavern_patrons.ts), ROLE matches
+  // until each gets a voice of their own: the old eel fisher borrows Fisherman Brandt's
+  // salt-cured rasp, the peat cutter Mother Sedge's marsh-country voice, the drover the
+  // Fenbridge provisioner's working baritone, and the mapmaker a chronicler's measured one.
+  patron_amos_eelby: 'fisherman_brandt',
+  patron_grissel_sedgeworth: 'mother_sedge',
+  patron_ned_oxley: 'provisioner_hale',
+  patron_hester_quillby: 'chronicler_edda_hartwell',
+  // The Highwatch guild's four residents (src/sim/content/highwatch_guild.ts), each a ROLE
+  // match until an ElevenLabs key is available to design their own: the guildmaster, a
+  // capable woman handing out work, borrows the Reeve's; the clerk at his ledger the bursar's;
+  // the quartermaster at his counter the Heroic Quartermaster's; the recruiter, wry and
+  // weather-hardened, the pass watcher's.
+  guildmaster_hesper_dunmore: 'reeve_ottoline',
+  contract_clerk_tobias_wren: 'bursar_fernando',
+  guild_quartermaster_garrick_holt: 'heroic_quartermaster',
+  guild_recruiter_mira_fairweather: 'watcher_maren',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

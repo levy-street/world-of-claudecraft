@@ -94,6 +94,15 @@ export const WARFARE_CAST_DODGE = 0.15;
 export const WARFARE_CAST_DODGE_DURATION = 6;
 export const WARFARE_CAST_DODGE_CHANCE = 0.15;
 export const WARFARE_CAST_DODGE_ICD = 20;
+// Every WARFARE family also makes the wearer immune to damage cast pushback at
+// two pieces: the caster families for their spells, and the Strength and
+// Agility families for the casts their classes carry too (Marksmanship shots,
+// hunter Volley, paladin and shaman self-heals, druid caster-form spells).
+// Unlike the rating tiers this is NOT PvP-gated: castPushbackReduction folds
+// into the wearer's stats in recalcPlayerStats like any stat-set knob. The
+// Season 2 sets carry the same rider (content/vanguard_set_bonuses.ts).
+export const PVP_SET_2PC_PUSHBACK_REDUCTION = 1;
+export const PVP_SET_2PC_PUSHBACK_TEXT = 'Damage taken no longer delays your spellcasting.';
 
 // Set ids. Tier-1 families drop from the Gravewyrm Sanctum; tier-2 from the
 // Nythraxis raid. The string is also the `set` tag on each member item.
@@ -342,8 +351,11 @@ function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[
   return [
     {
       pieces: 2,
-      effect: { pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING },
-      text: 'Increases Warfare Defense Rating by 40.',
+      effect: {
+        pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING,
+        castPushbackReduction: PVP_SET_2PC_PUSHBACK_REDUCTION,
+      },
+      text: `Increases Warfare Defense Rating by 40. ${PVP_SET_2PC_PUSHBACK_TEXT}`,
     },
     {
       pieces: 4,
@@ -523,7 +535,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: 'Iron Resolve converts rage at 5 absorb per point instead of 4.',
+        text: "Iron Resolve's shield absorbs 25% of your maximum health instead of 20%.",
       },
       {
         pieces: 4,
@@ -966,7 +978,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
         // "Fleetmend" is the ability's shipped display name (the Phase 03 naming
         // audit renamed swiftmend; docs/design/naming-audit.md, pinned by
         // tests/ip_scrub.test.ts): player copy names the ability as players see it.
-        text: 'Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
+        text: 'Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,

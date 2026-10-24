@@ -11,6 +11,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { findBrowserPath } from '../../browser_path_resolve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+/** Repo root, for the shipped KTX2 transcoder this module serves to the preview page. */
+const REPO_ROOT = resolve(__dirname, '..', '..', '..');
+/** Must match TRANSCODER_PATH in ../preview_entry.js. */
+const TRANSCODER_ORIGIN = 'https://asset-preview.invalid/basis/';
 
 let pagePromise = null;
 
@@ -38,6 +42,13 @@ async function launchPage() {
     format: 'iife',
     outfile: bundlePath,
     logLevel: 'silent',
+    // three's KTX2Loader resolves its default transcoder paths at MODULE SCOPE with
+    // `new URL('../libs/basis/...', import.meta.url)`. An IIFE bundle has no import.meta,
+    // so that becomes `new URL(relative, undefined)` and throws before the entry runs:
+    // the whole preview bundle dies with "Failed to construct 'URL': Invalid URL" and the
+    // page never signals ready. Pointing import.meta.url at the synthetic origin below
+    // makes those defaults resolve, and interception serves them.
+    define: { 'import.meta.url': JSON.stringify(`${TRANSCODER_ORIGIN}three/`) },
   });
 
   const browser = await puppeteer.launch({
@@ -52,7 +63,35 @@ async function launchPage() {
     ],
   });
   const page = await browser.newPage();
-  page.on('pageerror', (err) => console.error('[preview page error]', err.message));
+  // Serve the KTX2 transcoder to the origin-less preview document (see the
+  // TRANSCODER_PATH note in preview_entry.js). Interception is scoped to that one
+  // synthetic host; everything else continues untouched, and the page makes no other
+  // network requests because GLBs arrive as base64 through an evaluate call.
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    const url = req.url();
+    // Both the path this entry sets explicitly and three's own module-scope default
+    // (`<origin>three/../libs/basis/...`) land on the same two filenames.
+    const name = url.startsWith(TRANSCODER_ORIGIN) ? url.split('/').pop() : null;
+    if (name !== 'basis_transcoder.js' && name !== 'basis_transcoder.wasm') {
+      void req.continue();
+      return;
+    }
+    const hit = name;
+    try {
+      req.respond({
+        status: 200,
+        contentType: hit.endsWith('.wasm') ? 'application/wasm' : 'application/javascript',
+        body: readFileSync(join(REPO_ROOT, 'public', 'basis', hit)),
+      });
+    } catch (err) {
+      // Fail the one request rather than the launch: a missing transcoder must surface as
+      // an unrendered preview the QA step reports, never as a hung page.
+      console.error('[preview] transcoder unavailable', err.message);
+      void req.abort();
+    }
+  });
+  page.on('pageerror', (err) => console.error('[preview page error]', err.stack ?? err.message));
   page.on('console', (msg) => {
     if (msg.type() === 'error') console.error('[preview console]', msg.text());
   });

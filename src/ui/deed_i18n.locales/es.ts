@@ -1240,30 +1240,207 @@ export const table: DeedLocaleTable = {
     name: 'Atrapada con las manos en la masa',
     desc: 'Atrapa una Rata de Bolsa de Monedas en un Tesoro Enterrado antes de que escape con el oro.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Mas brillante que las sombras',
+    desc: 'Recupera las bolsas de monedas robadas y escapa del laberinto de Evergarden en dificultad Hard.',
+  },
+  prog_titan: {
+    name: 'Titán',
+    desc: 'Gana 10.000.000 de experiencia a lo largo de tu vida.',
+    title: 'Titán',
+  },
   pvp_flag_1h: {
     name: 'Audaz',
-    desc: 'Mantén el JcJ mundial activado durante 1 hora de tiempo jugado en el mundo abierto. Desconectarte, morir o entrar en instancias pausa el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    desc: 'Mantén JcJ del mundo activado durante 1 hora de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
     title: 'Audaz',
   },
   pvp_flag_3h: {
     name: 'Desafiante',
-    desc: 'Mantén el JcJ mundial activado durante 3 horas de tiempo jugado en el mundo abierto. Desconectarte, morir o entrar en instancias pausa el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    desc: 'Mantén JcJ del mundo activado durante 3 horas de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
     title: 'Desafiante',
   },
   pvp_flag_6h: {
     name: 'Intrépido',
-    desc: 'Mantén el JcJ mundial activado durante 6 horas de tiempo jugado en el mundo abierto. Desconectarte, morir o entrar en instancias pausa el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    desc: 'Mantén JcJ del mundo activado durante 6 horas de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
     title: 'Intrépido',
   },
   pvp_flag_24h: {
-    name: 'Inflexible',
-    desc: 'Mantén el JcJ mundial activado durante 24 horas de tiempo jugado en el mundo abierto. Desconectarte, morir o entrar en instancias pausa el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
-    title: 'Inflexible',
+    name: 'Inquebrantable',
+    desc: 'Mantén JcJ del mundo activado durante 24 horas de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    title: 'Inquebrantable',
   },
   pvp_flag_168h: {
     name: 'Indomable',
-    desc: 'Mantén el JcJ mundial activado durante 7 días de tiempo jugado en el mundo abierto. Desconectarte, morir o entrar en instancias pausa el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    desc: 'Mantén JcJ del mundo activado durante 7 días de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
     title: 'Indomable',
+  },
+  cmb_balgath: {
+    name: 'Capataz nunca más',
+    desc: 'Devuelve al Capataz Enterrado a su túmulo.',
+  },
+
+  cmb_balgath_ten: {
+    name: 'El túmulo no retiene nada',
+    desc: 'Derriba al Capataz Enterrado diez veces.',
+  },
+
+  cmb_point_taken: {
+    name: 'Punta certera',
+    desc: 'Apaga el farol del Capataz de Paja en el patio de instrucción de la leva y aprovecha que caen sus tablones.',
+  },
+
+  dgn_olen_buttress: {
+    name: 'Defender la muralla',
+    desc: 'Derrota al Caballero Comandante Olen sin que su Baluarte de rebote golpee nunca a un segundo jugador.',
+  },
+
+  dgn_ossick_moored: {
+    name: 'Puerto seguro',
+    desc: 'Derrota al Carcelero Ossick sin que nadie sea arrastrado a la Fosa de ahogamiento.',
+  },
+
+  dgn_vael_beacon: {
+    name: 'A la luz de la baliza',
+    desc: 'Derrota a Vael el Fogbinder sin hacer estallar una sola Sombra de Niebla.',
+  },
+
+  dgn_turretback: {
+    name: 'Aviso de desalojo',
+    desc: 'Derrota al Capitán del Naufragio sin que nadie reciba Andanada espectral.',
+  },
+
+  dgn_selthe_pitch: {
+    name: 'Todas las voces afinadas',
+    desc: 'Derrota a la Madre del Coro Selthe con cada Coro compartido por dos o más jugadores y sin que ningún Solo toque a otro jugador.',
+  },
+
+  dgn_colossus_mirror: {
+    name: 'Romper el cristal',
+    desc: 'Derrota al Coloso de Cristal de Marea rompiendo cada reflejo en los 15 segundos siguientes a su aparición.',
+  },
+
+  dgn_ysolei_high_and_dry: {
+    name: 'A salvo en tierra seca',
+    desc: 'Derrota a Ysolei, Avatar de la Luna Ahogada, sin que nadie reciba su Impacto de marea.',
+  },
+
+  dgn_mere_hydra: {
+    name: 'Todas las cabezas abatidas',
+    desc: 'Mata a las tres cabezas de la Hidra de la Laguna con una diferencia máxima de 10 segundos entre ellas.',
+  },
+
+  dgn_crypt_knellwyrm: {
+    name: 'Ni un pelo chamuscado',
+    desc: 'Derrota al Vermis del Doblar sin que nadie se queme con su Pasada de fuego de pira.',
+  },
+
+  dgn_turnkey_cage: {
+    name: 'Ninguna jaula nos retiene',
+    desc: 'Derrota al Alcaide de la Prisión sin que nadie sea aplastado en una Jaula de hierro.',
+  },
+
+  dgn_beastmaster_apart: {
+    name: 'A raya',
+    desc: 'Derrota al Maestro de Bestias Señor de los Colmillos y a su Gran Jaguar con Vínculo de la manada activo menos de 10 segundos en total.',
+  },
+
+  dgn_gorgebloom_clean: {
+    name: 'Control de maleza',
+    desc: 'Derrota a la Flor Devoradora sin que crezca un solo Brote Espinoso.',
+  },
+
+  dgn_zulgar_uncaught: {
+    name: 'Nunca atrapados',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, sin que nadie quede Magullado.',
+  },
+
+  dgn_great_saurian: {
+    name: 'Titán derribado',
+    desc: 'Derrota al Gran Saurio y a su Invocador de Maleficios de la Plataforma con una diferencia máxima de 20 segundos entre ellos.',
+  },
+
+  dgn_korgath_all_chains: {
+    name: 'Un final más piadoso',
+    desc: 'Derrota a Korgath el Encadenado con sus cuatro cadenas rotas.',
+  },
+
+  dgn_korgath_still_bound: {
+    name: 'El sello resiste',
+    desc: 'Derrota a Korgath el Encadenado en dificultad heroica sin haber roto nunca al menos dos de sus cadenas.',
+  },
+
+  dgn_velkhar_cold: {
+    name: 'Consuelo helado',
+    desc: 'Derrota al Gran Nigromante Velkhar sin que ningún Caminahuesos Resucitado se alce por segunda vez.',
+  },
+
+  dgn_korzul_thin_ice: {
+    name: 'Hielo fino',
+    desc: 'Derrota a Korzul el Gravewyrm con al menos doce de las diecinueve placas del lago intactas.',
+  },
+
+  dgn_sledge_tusker: {
+    name: 'Carga fría',
+    desc: 'Derrota al Colmilludo del Trineo sin que nadie reciba su Pisotear.',
+  },
+
+  dgn_drowned_temple_cantor: {
+    name: 'El último verso',
+    desc: 'Derrota a Ysolei, Avatar de la Luna Ahogada, con el Último Cantor del Coro Pálido a tu lado.',
+    title: 'Testigo del Coro',
+  },
+
+  dgn_marrow_tidy: {
+    name: 'Un camposanto ordenado',
+    desc: 'Derrota al Sacristán Marrow colocando cada Tumba abierta en el borde del Patio de la Campana.',
+  },
+
+  dgn_lady_nobody_hanging: {
+    name: 'Nadie queda colgando',
+    desc: 'Derrota a la Dama del Frío de Huesos sin que deje caer a nadie desde su Abrazo helado.',
+  },
+
+  dgn_ilvane_hush: {
+    name: 'Silencio ya',
+    desc: 'Derrota al Cantor Ilvane sin que su Canto fúnebre de la oquedad golpee a nadie.',
+  },
+
+  dgn_morthen_candlelight: {
+    name: 'Todas las velas encendidas',
+    desc: 'Derrota a Morthen el Gravecaller tras reencender las cuatro Velas del Recuerdo en los 20 segundos siguientes a la aparición de su Resguardo inquieto.',
+  },
+
+  dgn_guild_first_contract: {
+    name: 'Documento firmado',
+    desc: 'Completa uno de los contratos semanales de mazmorra del Salón del Farol.',
+  },
+
+  dgn_guild_ten_contracts: {
+    name: 'Asiduo del tablón',
+    desc: 'Completa 10 contratos semanales de mazmorra del Salón del Farol.',
+  },
+
+  dgn_guild_fifty_contracts: {
+    name: 'Veterano de los contratos',
+    desc: 'Completa 50 contratos semanales de mazmorra del Salón del Farol.',
+  },
+
+  feat_guild_writ_runner: {
+    name: 'Corredor de Contratos',
+    desc: 'Comprado a Garrick Holt, intendente del Salón del Farol, por 6 sellos del farol.',
+    title: 'Corredor de Contratos',
+  },
+
+  feat_guild_hallsworn: {
+    name: 'Juramentado del Salón',
+    desc: 'Comprado a Garrick Holt, intendente del Salón del Farol, por 14 sellos del farol.',
+    title: 'Juramentado del Salón',
+  },
+
+  feat_guild_of_lantern_hall: {
+    name: 'Del Salón del Farol',
+    desc: 'Comprado a Garrick Holt, intendente del Salón del Farol, por 24 sellos del farol.',
+    title: 'del Salón del Farol',
   },
 };
 

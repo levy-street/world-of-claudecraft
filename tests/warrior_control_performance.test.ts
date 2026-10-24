@@ -4,7 +4,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { expect, it } from 'vitest';
 import { createGlbIO, stripToAnimationsOnly } from '../scripts/anim/pose_blend.mjs';
-import { VISUALS } from '../src/render/characters/manifest';
+import { KAYKIT_KNIGHT_WARRIOR } from '../src/render/characters/manifest';
 import { prepareWarriorAbilityClips } from '../src/render/characters/warrior_ability_clips';
 import { prepareWarriorActionFallbacks } from '../src/render/characters/warrior_action_fallbacks';
 
@@ -34,7 +34,7 @@ it('keeps the native control poses and timing through actual clip preparation', 
       ) as ArrayBuffer,
       '',
     );
-  const map = VISUALS.player_warrior.clips;
+  const map = KAYKIT_KNIGHT_WARRIOR.clips;
   const clips = new Map(
     [...knight.animations, ...gltf.animations].map((clip) => [clip.name, clip]),
   );

@@ -3,7 +3,10 @@
 // roll the system actually drew, the effective chance, and the verdict, on
 // both arms, and nothing on a denial. The record must never move or add an
 // rng draw (the perfecting.ts and crafting.ts draw contracts), so each case
-// pins the draw count beside the event.
+// pins the draw count beside the event. A crafted EQUIPMENT copy also rolls
+// its permanent loot quality at grant (loot/fresh_quality_grant.ts), after
+// the proc draw: one draw when the forced value lands under the 9000 of
+// 10000 enhanced threshold, six (the tier draw plus five weights) at or above.
 
 import { describe, expect, it } from 'vitest';
 import { STATIONS } from '../src/sim/content/professions';
@@ -168,11 +171,11 @@ describe('masterwork proc draws emit one craftRoll audit record per eligible cra
     return { sim, pid, meta, recipe };
   };
 
-  it('a forced proc records success true against the effective chance, one draw', () => {
+  it('a forced proc records success true against the effective chance, one proc draw', () => {
     const { sim, pid, meta, recipe } = apexCrafter(7, 'jewelcrafting');
     const draws = forceRoll(sim, 0);
     runCraft(sim, recipe.id, false, pid);
-    expect(draws(), 'exactly the one proc draw').toBe(1);
+    expect(draws(), 'the one proc draw plus the one plain loot-quality draw').toBe(2);
     const rolls = craftRollsOf(sim);
     expect(rolls).toHaveLength(1);
     expect(rolls[0]).toMatchObject({
@@ -189,18 +192,27 @@ describe('masterwork proc draws emit one craftRoll audit record per eligible cra
     // The record and the piece agree (the apex proc is the head start).
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
+    expect(slot?.instance?.lootQuality, 'a forced 0 rolls no enhanced quality').toBeUndefined();
   });
 
   it('a forced miss records success false with the same chance', () => {
     expect(MASTERWORK_CHANCE_CAP).toBeLessThan(0.999);
-    const { sim, pid, recipe } = apexCrafter(8, 'jewelcrafting');
+    const { sim, pid, meta, recipe } = apexCrafter(8, 'jewelcrafting');
     const draws = forceRoll(sim, 0.999);
     runCraft(sim, recipe.id, false, pid);
-    expect(draws()).toBe(1);
+    // The proc draw, then an enhanced quality roll (9990 of 10000) that
+    // spends its tier draw plus five weight draws.
+    expect(draws()).toBe(7);
     const [ev] = craftRollsOf(sim);
     expect(ev).toMatchObject({ kind: 'masterwork', roll: 0.999, success: false });
     expect(ev.chance).toBeGreaterThan(0);
     expect(ev.success).toBe(ev.roll < ev.chance);
+    const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
+    expect(slot?.instance?.lootQuality).toEqual({
+      version: 1,
+      tier: 3,
+      weights: [1000, 1000, 1000, 1000, 1000],
+    });
   });
 
   it('a non-apex craft that bakes a bonus record (the quality-bump proc) records its roll too', () => {
@@ -216,7 +228,7 @@ describe('masterwork proc draws emit one craftRoll audit record per eligible cra
     sim.drainEvents();
     const draws = forceRoll(sim, 0);
     runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
-    expect(draws()).toBe(1);
+    expect(draws(), 'the proc draw plus the one plain loot-quality draw').toBe(2);
     const rolls = craftRollsOf(sim);
     expect(rolls).toHaveLength(1);
     expect(rolls[0]).toMatchObject({
@@ -230,6 +242,7 @@ describe('masterwork proc draws emit one craftRoll audit record per eligible cra
     expect(rolls[0].chance).toBeGreaterThan(0);
     const slot = meta.inventory.find((s) => s.itemId === 'eastbrook_ritual_vestments');
     expect(slot?.instance?.rolled?.masterwork, 'the record and the piece agree').toBe(true);
+    expect(slot?.instance?.lootQuality).toBeUndefined();
   });
 
   it('a craft whose output can never proc (a statless consumable) records nothing', () => {
@@ -243,7 +256,10 @@ describe('masterwork proc draws emit one craftRoll audit record per eligible cra
     const draws = forceRoll(sim, 0);
     runCraft(sim, 'recipe_minor_healing_potion', false, pid);
     expect(meta.lastCraftResult?.ok, 'the craft itself succeeded').toBe(true);
-    expect(draws(), 'the proc draw is unconditional on the success path').toBe(1);
+    expect(
+      draws(),
+      'the proc draw is unconditional on the success path; a consumable rolls no quality',
+    ).toBe(1);
     expect(craftRollsOf(sim)).toEqual([]);
   });
 
@@ -253,10 +269,11 @@ describe('masterwork proc draws emit one craftRoll audit record per eligible cra
     const { sim, pid, meta, recipe } = apexCrafter(9, null);
     const draws = forceRoll(sim, 0);
     runCraft(sim, recipe.id, false, pid);
-    expect(draws()).toBe(1);
+    expect(draws(), 'the gated proc draw plus the one plain loot-quality draw').toBe(2);
     const [ev] = craftRollsOf(sim);
     expect(ev).toMatchObject({ kind: 'masterwork', roll: 0, chance: 0, success: false });
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.perfecting).toBeUndefined();
+    expect(slot?.instance?.lootQuality).toBeUndefined();
   });
 });

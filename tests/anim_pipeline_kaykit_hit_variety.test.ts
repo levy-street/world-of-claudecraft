@@ -97,20 +97,30 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
     // unscoped count every time one of them lands.
     const donorPattern = new RegExp(DONOR_GLBS.map((p) => p.split('/').pop()).join('|'), 'g');
     const occurrences = [...MANIFEST_SRC.matchAll(donorPattern)].length;
-    // 37 since the composed-NPC defs landed: the `npc_modular_<propSet>` loop
-    // is one more kaykit() consumer, and it wires the rogue donor exactly as
-    // this test requires (its bodies would otherwise have no Hit_B_Stagger).
-    // One literal in the loop covers every derived def, so the count moved by
-    // one rather than by the number of prop sets.
-    expect(occurrences).toBe(37);
+    // 36 again since the composed-NPC defs left (every NPC rides a WOC class
+    // body now, npc_looks.ts): their `npc_modular_<propSet>` loop was one more
+    // kaykit() consumer and wired the rogue donor with one literal.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 45. The integration
+    // tree itself had already drifted to 43 when the skeleton minion was remade through
+    // the art guide, and that took three more off (skel_minion, delve_skel_wraith and
+    // crypt_skel_minion ride WOC_SKELETON_MINION's own clips now): 40. The Hollow Crypt's
+    // trash bodies were remade the same way, and five more left the donors (the ossuary
+    // warrior, cutthroat, adept, necromancer and chorister ride their own clips): 35.
+    expect(occurrences).toBe(35);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).
-    const hunterBlock = manifestBlock('player_hunter: swims({', 'player_rogue: swims({');
+    const hunterBlock = manifestBlock(
+      'export const KAYKIT_HUNTER: VisualDef = swims({',
+      'export const KAYKIT_ROGUE',
+    );
     expect(hunterBlock).toContain('bow_anims.glb');
     expect(hunterBlock).toContain('ranger_hit_variety_anims.glb');
 
-    const mageBlock = manifestBlock('player_mage: swims({', 'player_warlock: swims({');
+    const mageBlock = manifestBlock(
+      'export const KAYKIT_MAGE: VisualDef = swims({',
+      'export const KAYKIT_WARLOCK',
+    );
     expect(mageBlock).toContain('mage_ability_anims.glb');
     expect(mageBlock).toContain('mage_hit_variety_anims.glb');
 

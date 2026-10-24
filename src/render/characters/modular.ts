@@ -12,6 +12,18 @@
 // without a GL context (`tests/modular_character.test.ts`).
 
 import { UNDERHAIR } from './underhair.generated';
+import {
+  WOC_HEAD_MORPH_KEYS,
+  WOC_HEAD_MORPH_RANGE,
+  WOC_HEAD_TYPES,
+  WOC_PIERCING_IDS,
+  type WocHeadLook,
+  type WocHeadMorph,
+  type WocHeadSlot,
+  type WocHeadType,
+  wocHeadSlotIds,
+  wocHeadTypeForGender,
+} from './woc_head_catalog';
 
 /** Visual key of the modular warrior (manifest.ts VISUALS), the fallback for
  *  a claimed look whose class has no modular def of its own. Every real class
@@ -226,6 +238,53 @@ export const NEUTRAL_BODY: BodyShape = {
   knees: 0,
   feet: 0,
 };
+
+/** The WOC head builder's continuous face controls (WOC_HEAD_MORPHS in
+ *  woc_head_catalog.ts), each held inside its WOC_HEAD_MORPH_RANGE row: the
+ *  eye and brow controls -1..1 with 0 as sculpted, the chin 0..1. */
+export type WocHeadShape = Record<WocHeadMorph, number>;
+/** Every face control at its range's default: the authoring file's own face
+ *  (the chin opens at 0.65, not 0). */
+export const NEUTRAL_HEAD_SHAPE: WocHeadShape = Object.fromEntries(
+  WOC_HEAD_MORPH_KEYS.map((k) => [k, WOC_HEAD_MORPH_RANGE[k].def]),
+) as WocHeadShape;
+
+/** Every id any head type offers per slot, the set normalizeAppearance keeps.
+ *  Built once: normalizeAppearance runs on every look a consumer composes. */
+const WOC_HEAD_SLOT_IDS: Readonly<Record<WocHeadSlot, readonly string[]>> = {
+  hair: wocHeadSlotIds('hair'),
+  beard: wocHeadSlotIds('beard'),
+  nose: wocHeadSlotIds('nose'),
+  mouth: wocHeadSlotIds('mouth'),
+  brows: wocHeadSlotIds('brows'),
+  ears: wocHeadSlotIds('ears'),
+  eyes: wocHeadSlotIds('eyes'),
+};
+
+/** A WOC body's size (ModularAppearance.bodyScale): a uniform scale on the drawn
+ *  body, 5% either way of the authored size, which is the default (the owner's
+ *  call, 2026-09-30: the creator's slider reads -5 .. 0 .. +5 with 0 the normal
+ *  height; it had run 80..100%, then 90..100%). Presentation only: the sim's
+ *  collision radius, the pick capsule and the chase camera never read it
+ *  (CharacterVisual.setBodyScale). */
+export const WOC_BODY_SCALE_RANGE: {
+  readonly min: number;
+  readonly max: number;
+  readonly def: number;
+} = { min: 0.95, max: 1.05, def: 1 };
+
+/** A body size clamped into WOC_BODY_SCALE_RANGE (the authored size for junk). */
+export function clampWocBodyScale(v: unknown): number {
+  const { min, max, def } = WOC_BODY_SCALE_RANGE;
+  return typeof v === 'number' && Number.isFinite(v) ? Math.max(min, Math.min(max, v)) : def;
+}
+
+/** The body size a stored, wire or normalized look draws at, clamped into
+ *  WOC_BODY_SCALE_RANGE (the authored size for no look, a missing field, or
+ *  junk). Cheap enough for the per-frame diff: one read and a clamp. */
+export function wocBodyScaleOf(app: { readonly bodyScale?: unknown } | null | undefined): number {
+  return clampWocBodyScale(app?.bodyScale);
+}
 /** Jewellery: earrings, and on some sets a face piercing too. One slot, because
  *  a set is a LOOK, the elf's crescent comes with the brow bar that matches it
  * and because a second picker row for two pieces of metal is not a feature.
@@ -474,6 +533,38 @@ export interface ModularAppearance {
    *  authored. One choice re-dyes whatever set (or mix of sets) is worn, each
    *  material through its own set's band; see OUTFIT_COLORWAYS. */
   outfit: OutfitColorway;
+  /** The WOC head builder's picks (woc_head_catalog.ts): one variant id per
+   *  feature slot plus the piercing preset, stored as the bare catalog id.
+   *  normalizeAppearance keeps any id SOME head type offers; which type draws
+   *  it is decided at render time by resolveWocHeadLook, where another type's
+   *  id (Type A's `swept` on a Type B body, after a body-type switch) falls
+   *  back to the worn type's default. So the stored pick is never rewritten by
+   *  a switch, and switching back restores it. See wocHeadLookOf. A look
+   *  that never picked one (saved before the builder, or before the slot)
+   *  gets its OWN body type's default, so an old Type B look is not handed
+   *  Type A's beard. */
+  headHair: string;
+  /** Facial hair ('none' = clean shaven). Drawn in the HAIR colour: the beard
+   *  pieces are hair_ materials, so one Hair Color pick recolours both. */
+  headBeard: string;
+  headNose: string;
+  headMouth: string;
+  headBrows: string;
+  headEars: string;
+  headEyes: string;
+  headPiercing: string;
+  /** The WOC head's eyebrow colour (its `brow_` materials): hue 0..360,
+   *  saturation 0..1, lightness 0.02..0.95, the hair's ranges. A look stored
+   *  before it existed has no opinion, so its brows follow its own hair. */
+  browHue: number;
+  browSat: number;
+  browLight: number;
+  /** The WOC head's face controls, each inside its WOC_HEAD_MORPH_RANGE row
+   *  (NEUTRAL_HEAD_SHAPE is the authored face). */
+  headShape: WocHeadShape;
+  /** The WOC body's size, WOC_BODY_SCALE_RANGE (1 = as authored, 0.95 / 1.05 =
+   *  5% shorter / taller). Visual only, see WOC_BODY_SCALE_RANGE. */
+  bodyScale: number;
 }
 
 export const DEFAULT_APPEARANCE: ModularAppearance = {
@@ -510,6 +601,21 @@ export const DEFAULT_APPEARANCE: ModularAppearance = {
   blush: 'none',
   eyeshadow: 'none',
   outfit: 'classic',
+  // The default body is male, so the head builder starts on Type A's look.
+  headHair: WOC_HEAD_TYPES.a.defaults.hair,
+  headBeard: WOC_HEAD_TYPES.a.defaults.beard,
+  headNose: WOC_HEAD_TYPES.a.defaults.nose,
+  headMouth: WOC_HEAD_TYPES.a.defaults.mouth,
+  headBrows: WOC_HEAD_TYPES.a.defaults.brows,
+  headEars: WOC_HEAD_TYPES.a.defaults.ears,
+  headEyes: WOC_HEAD_TYPES.a.defaults.eyes,
+  headPiercing: WOC_HEAD_TYPES.a.defaults.piercing,
+  // on the hair's default, like the lashes: out of the box the brows match
+  browHue: 26,
+  browSat: 0.5,
+  browLight: 0.24,
+  headShape: NEUTRAL_HEAD_SHAPE,
+  bodyScale: WOC_BODY_SCALE_RANGE.def,
 };
 
 /** The seven KayKit class kits, all carved into the same slots and all fitted
@@ -2057,7 +2163,105 @@ export function randomizeAppearance(
     // gentler than the face: a randomised silhouette should read as a build,
     // not a caricature
     body: Object.fromEntries(BODY_SLIDERS.map((k) => [k, span(-0.35, 0.35)])) as BodyShape,
+    // last, so every draw above keeps its place in a seeded stream
+    ...rollWocHead(base.gender, rand, [hairHue, hairSat, hairLight]),
+    // ...and the body size after the head, for the same reason
+    bodyScale: rollWocBodyScale(rand),
   });
+}
+
+/** The body-size half of a roll: most characters keep the authored size and
+ *  about a quarter come out a little shorter or taller, anywhere along the
+ *  slider. Both draws
+ *  happen on every roll so the stream never depends on the outcome. Rounded
+ *  to the hundredth, the slider's own step. */
+function rollWocBodyScale(rand: () => number): number {
+  const roll = rand();
+  const { min, max, def } = WOC_BODY_SCALE_RANGE;
+  const size = Math.round((min + rand() * (max - min)) * 100) / 100;
+  return roll < 0.75 ? def : size;
+}
+
+/** The chance a roll wears facial hair, per head type, matching the face
+ *  builder's own Random (woc_head_builder_model randomizeFace) and the owner's
+ *  roll rule recorded on the KayKit beard above (Troy, 2026-08-07): facial hair
+ *  is rolled for the male fit only, so a Type A roll is bearded about two times
+ *  in three and a Type B roll is always clean shaven (the builder still offers
+ *  every beard to both). */
+const WOC_BEARD_ODDS: Readonly<Record<WocHeadType, number>> = { a: 2 / 3, b: 0 };
+
+/** The WOC head builder's half of a roll (randomizeAppearance), its draws in
+ *  a fixed order. The pieces come from the body's OWN head type: another
+ *  type's id would only resolve back to this type's default at render time,
+ *  so rolling from the union would quietly weight the dice toward it. */
+function rollWocHead(
+  gender: Gender,
+  rand: () => number,
+  [hairHue, hairSat, hairLight]: readonly [number, number, number],
+): Pick<
+  ModularAppearance,
+  | 'headHair'
+  | 'headBeard'
+  | 'headNose'
+  | 'headMouth'
+  | 'headBrows'
+  | 'headEars'
+  | 'headEyes'
+  | 'headPiercing'
+  | 'browHue'
+  | 'browSat'
+  | 'browLight'
+  | 'headShape'
+> {
+  const of = <T>(xs: readonly T[]): T =>
+    xs[Math.min(xs.length - 1, Math.floor(rand() * xs.length))];
+  const span = (lo: number, hi: number) => lo + rand() * (hi - lo);
+  const type = wocHeadTypeForGender(gender);
+  const head = WOC_HEAD_TYPES[type];
+  const pick = (slot: WocHeadSlot): string => of(head.slots[slot]).id;
+  const headHair = pick('hair');
+  const headNose = pick('nose');
+  const headMouth = pick('mouth');
+  const headBrows = pick('brows');
+  const headEars = pick('ears');
+  const headEyes = pick('eyes');
+  // like the jewellery material: a piercing should read as a deliberate touch
+  const headPiercing = rand() < 0.65 ? 'none' : of(WOC_PIERCING_IDS);
+  // the brows follow the hair the way the lash does, and more often
+  const matchBrow = rand() < 0.8;
+  const browHue = matchBrow ? hairHue : span(0, 360);
+  const browSat = matchBrow ? hairSat : span(0.05, 0.85);
+  const browLight = matchBrow ? hairLight : span(0.05, 0.8);
+  // off the rails, like the face: eye size and tilt at +-1 read as a mask.
+  // Each control rolls the middle 60% of its OWN range (-0.6..0.6 for the
+  // two-way eye and brow controls, 0.2..0.8 for the one-way chin).
+  const headShape = Object.fromEntries(
+    WOC_HEAD_MORPH_KEYS.map((k) => {
+      const { min, max } = WOC_HEAD_MORPH_RANGE[k];
+      const mid = (min + max) / 2;
+      const half = ((max - min) / 2) * 0.6;
+      return [k, span(mid - half, mid + half)];
+    }),
+  ) as WocHeadShape;
+  // facial hair, after the shape so every earlier draw keeps its place; both
+  // draws happen on every roll so the stream never depends on the body type
+  const beardRoll = rand();
+  const beardPick = of(head.slots.beard.filter((x) => x.id !== 'none')).id;
+  const headBeard = beardRoll < WOC_BEARD_ODDS[type] ? beardPick : 'none';
+  return {
+    headHair,
+    headBeard,
+    headNose,
+    headMouth,
+    headBrows,
+    headEars,
+    headEyes,
+    headPiercing,
+    browHue,
+    browSat,
+    browLight,
+    headShape,
+  };
 }
 
 /** Whether a body wears lashes unless told otherwise: the female standard, and
@@ -2073,6 +2277,17 @@ export function lashColor(app: ModularAppearance): number {
   return hslToHex(app.lashHue ?? 26, app.lashSat ?? 0.5, app.lashLight ?? 0.24);
 }
 
+/** The WOC head's eyebrow tint (its `brow_` materials). An un-normalized look
+ *  with no brow colour follows its hair, the same rule normalizeAppearance
+ *  applies. */
+export function browColor(app: ModularAppearance): number {
+  return hslToHex(
+    app.browHue ?? app.hairHue ?? 26,
+    app.browSat ?? app.hairSat ?? 0.5,
+    app.browLight ?? app.hairLight ?? 0.24,
+  );
+}
+
 /** Clamp a stored/deserialized appearance into range, filling gaps with the
  *  default. Anything off the known style lists falls back rather than throwing,
  *  so an old save (or a hand-edited one) can never blank a character. */
@@ -2084,8 +2299,20 @@ export function normalizeAppearance(
     typeof v === 'number' && Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : fallback;
   const pick = <T extends string>(v: unknown, allowed: readonly T[], fallback: T): T =>
     allowed.includes(v as T) ? (v as T) : fallback;
+  const gender: Gender = a?.gender === 'female' ? 'female' : 'male';
+  // The UNION of every head type's ids, never the worn type's alone: a pick
+  // another type offers is kept, and resolveWocHeadLook settles it per type
+  // at render time (see ModularAppearance.headHair). A MISSING pick falls back
+  // to the body's own type default, not Type A's: both types offer every
+  // beard, so an old Type B look would otherwise keep Type A's boxed beard.
+  const headDefaults = WOC_HEAD_TYPES[wocHeadTypeForGender(gender)].defaults;
+  const headPick = (v: unknown, slot: WocHeadSlot): string =>
+    pick(v as string, WOC_HEAD_SLOT_IDS[slot], headDefaults[slot]);
+  const hairHue = num(a?.hairHue, d.hairHue, 0, 360);
+  const hairSat = num(a?.hairSat, d.hairSat, 0, 1);
+  const hairLight = num(a?.hairLight, d.hairLight, 0.02, 0.95);
   return {
-    gender: a?.gender === 'female' ? 'female' : 'male',
+    gender,
     hair: pick(HAIR_LEGACY[a?.hair as string] ?? a?.hair, HAIR_STYLES, d.hair),
     beard: pick(BEARD_LEGACY[a?.beard as string] ?? a?.beard, BEARD_STYLES, d.beard),
     brows: pick(a?.brows, BROW_STYLES, d.brows),
@@ -2094,9 +2321,9 @@ export function normalizeAppearance(
     skinHue: num(a?.skinHue, d.skinHue, 0, 360),
     skinSat: num(a?.skinSat, d.skinSat, 0, 1),
     skinLight: num(a?.skinLight, d.skinLight, 0.12, 0.95),
-    hairHue: num(a?.hairHue, d.hairHue, 0, 360),
-    hairSat: num(a?.hairSat, d.hairSat, 0, 1),
-    hairLight: num(a?.hairLight, d.hairLight, 0.02, 0.95),
+    hairHue,
+    hairSat,
+    hairLight,
     eyeShape: pick(a?.eyeShape, EYE_STYLES, d.eyeShape),
     ears: pick(a?.ears, EAR_STYLES, d.ears),
     lipstick: pick(a?.lipstick, LIP_SHADES, d.lipstick),
@@ -2122,5 +2349,44 @@ export function normalizeAppearance(
     ) as BodyShape,
     mouth: pick(a?.mouth, MOUTH_STYLES, d.mouth),
     outfit: pick(a?.outfit, OUTFIT_COLORWAY_IDS, d.outfit),
+    headHair: headPick(a?.headHair, 'hair'),
+    headBeard: headPick(a?.headBeard, 'beard'),
+    headNose: headPick(a?.headNose, 'nose'),
+    headMouth: headPick(a?.headMouth, 'mouth'),
+    headBrows: headPick(a?.headBrows, 'brows'),
+    headEars: headPick(a?.headEars, 'ears'),
+    headEyes: headPick(a?.headEyes, 'eyes'),
+    headPiercing: pick(a?.headPiercing, WOC_PIERCING_IDS, headDefaults.piercing),
+    // a look saved before brow colour existed has no opinion, so its brows
+    // follow its own hair (the same channel, already clamped to the same
+    // range) rather than snapping to the default brown under red hair
+    browHue: num(a?.browHue, hairHue, 0, 360),
+    browSat: num(a?.browSat, hairSat, 0, 1),
+    browLight: num(a?.browLight, hairLight, 0.02, 0.95),
+    // each control clamps to its OWN range and defaults to its own rest value
+    // (the chin opens at 0.65), so the range table is the one authority
+    headShape: Object.fromEntries(
+      WOC_HEAD_MORPH_KEYS.map((k) => {
+        const r = WOC_HEAD_MORPH_RANGE[k];
+        return [k, num(a?.headShape?.[k], r.def, r.min, r.max)];
+      }),
+    ) as WocHeadShape,
+    bodyScale: wocBodyScaleOf(a),
+  };
+}
+
+/** A look's WOC head-builder picks as the catalog's WocHeadLook, the shape
+ *  resolveWocHeadLook and wocHeadVisibleNodes take. Unresolved on purpose:
+ *  the caller resolves it against the head type the body actually wears. */
+export function wocHeadLookOf(app: ModularAppearance): WocHeadLook {
+  return {
+    hair: app.headHair,
+    beard: app.headBeard,
+    nose: app.headNose,
+    mouth: app.headMouth,
+    brows: app.headBrows,
+    ears: app.headEars,
+    eyes: app.headEyes,
+    piercing: app.headPiercing,
   };
 }

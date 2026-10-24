@@ -1,0 +1,769 @@
+{
+  "generatedAt": "2026-10-22T23:29:54.067Z",
+  "sourceHashes": {
+    "duallam_c5427ab37cc": "167b46b95c8797bca65df100955d5b6a209263fae56c0bc264c794bafa242d51",
+    "mirefen_3aa88a5a077": "498fb76dd290c8ba7647f4f54573a2daaa91227159bf3d89885d0e1a593c25d7",
+    "firstCombined_f4b55b3db7a": "c32c25a76325ddcbce3c04ff41721536cb38e79e1f0c07ea84223853fad4c9d6",
+    "combined_20261020T0115Z": "0b753e684eee666c1bab9239970446521d0f10429409d7a1dda9052502bd382b",
+    "reconciledFinal_e16c7eb5de9e": "e16c7eb5de9ea6274fc7bbeb7de2ad3138632f93c8a6b8fb380ee6c18e3e12ee"
+  },
+  "canonicalBuildingsAndCivic": [
+    {
+      "code": "FB-001",
+      "canonicalId": "fenbridge_warden_gatehouse",
+      "role": "Warden Gatehouse (South Entrance)",
+      "assetId": "tidehold/fenrire/house_a",
+      "walkIn": false,
+      "footprint": {
+        "w": 11.2,
+        "d": 14.2
+      },
+      "associatedNpcs": [
+        "warden_fenwick"
+      ],
+      "targetBeforeNative": {
+        "x": 11.6,
+        "y": -1.45,
+        "z": 274.6,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 7.7827
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge warden gatehouse",
+        "x": 11.6,
+        "y": -1.45,
+        "z": 274.6,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 7.7827,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge warden gatehouse",
+        "x": 10.2731,
+        "y": -1.44,
+        "z": 265.9471,
+        "rotY": 1.9373,
+        "rotYDeg": 111,
+        "scale": 7.7827,
+        "detached": true,
+        "groundY": 1.0629
+      },
+      "combined_20261020T0115Z": {
+        "uid": "b29319e11ece",
+        "name": "Fenbridge warden gatehouse",
+        "x": 10.2731,
+        "y": -1.44,
+        "z": 265.9471,
+        "rotY": 1.9373,
+        "rotYDeg": 111,
+        "scale": 7.7827,
+        "detached": true,
+        "groundY": 1.0629
+      },
+      "deltaNativeToCombined": {
+        "dx": -1.3269,
+        "dy": 0.01,
+        "dz": -8.6529,
+        "dRotYDeg": 21,
+        "distanceMovedYd": 8.75
+      },
+      "action": "move_existing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "gatehouse-approach.png"
+      },
+      "targetActual": {
+        "x": 10.2731,
+        "y": -1.45,
+        "z": 265.9471,
+        "rotY": 1.9373,
+        "scale": 1.4,
+        "errorX": 0.000017,
+        "errorZ": 0.000036,
+        "errorRotRad": 0.000015
+      }
+    },
+    {
+      "code": "FB-002",
+      "canonicalId": "fenbridge_crooked_reed_inn",
+      "role": "The Crooked Reed Inn (West of Cistern)",
+      "assetId": "tidehold/fenrire/tavern",
+      "walkIn": true,
+      "footprint": {
+        "w": 17.6,
+        "d": 16.9
+      },
+      "associatedNpcs": [
+        "chronicler_osric_fenn",
+        "maudie",
+        "innkeeper"
+      ],
+      "targetBeforeNative": {
+        "x": 13.55,
+        "y": -1.25,
+        "z": 298,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 12.3536
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge crooked reed inn",
+        "x": 13.55,
+        "y": -1.25,
+        "z": 298,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 12.3536,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge crooked reed inn",
+        "x": 21.4035,
+        "y": -1.25,
+        "z": 297.9038,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 12.3536,
+        "detached": true,
+        "groundY": 1.2
+      },
+      "combined_20261020T0115Z": {
+        "uid": "f1db9a61dc08",
+        "name": "Fenbridge crooked reed inn",
+        "x": 21.4035,
+        "y": -1.25,
+        "z": 297.9038,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 12.3536,
+        "detached": true,
+        "groundY": 1.2
+      },
+      "deltaNativeToCombined": {
+        "dx": 7.8535,
+        "dy": 0,
+        "dz": -0.0962,
+        "dRotYDeg": 0,
+        "distanceMovedYd": 7.85
+      },
+      "action": "move_existing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "inn-entrance.png"
+      },
+      "targetActual": {
+        "x": 21.4035,
+        "y": -1.25,
+        "z": 297.9038,
+        "rotY": 1.5708,
+        "scale": 1.2,
+        "errorX": 0.000047,
+        "errorZ": 0.00002,
+        "errorRotRad": 0.000004
+      }
+    },
+    {
+      "code": "FB-003",
+      "canonicalId": "fenbridge_lantern_chapel",
+      "role": "Lantern Chapel (East of Cistern)",
+      "assetId": "tidehold/fenrire/hall",
+      "walkIn": true,
+      "footprint": {
+        "w": 22.9,
+        "d": 18.6
+      },
+      "associatedNpcs": [
+        "brother_aldric_fen"
+      ],
+      "targetBeforeNative": {
+        "x": -16.2,
+        "y": -1.05,
+        "z": 299.6,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 13.8635
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge lantern chapel",
+        "x": -16.2,
+        "y": -1.05,
+        "z": 299.6,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 13.8635,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge lantern chapel",
+        "x": -23.9464,
+        "y": -1.05,
+        "z": 300.279,
+        "rotY": 4.6775,
+        "rotYDeg": 268,
+        "scale": 13.8635,
+        "detached": true,
+        "groundY": 1.2
+      },
+      "combined_20261020T0115Z": {
+        "uid": "0352cb9645c1",
+        "name": "Fenbridge lantern chapel",
+        "x": -23.9464,
+        "y": -1.05,
+        "z": 300.279,
+        "rotY": 4.6775,
+        "rotYDeg": 268,
+        "scale": 13.8635,
+        "detached": true,
+        "groundY": 1.2
+      },
+      "deltaNativeToCombined": {
+        "dx": -7.7464,
+        "dy": 0,
+        "dz": 0.679,
+        "dRotYDeg": 358,
+        "distanceMovedYd": 7.78
+      },
+      "action": "move_existing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "chapel-entrance.png"
+      },
+      "targetActual": {
+        "x": -23.9464,
+        "y": -1.05,
+        "z": 300.279,
+        "rotY": -1.6057,
+        "scale": 1,
+        "errorX": 0.000049,
+        "errorZ": 0.000022,
+        "errorRotRad": 0.000018
+      }
+    },
+    {
+      "code": "FB-004",
+      "canonicalId": "fenbridge_moonwort_apothecary",
+      "role": "Moonwort Apothecary (North-West)",
+      "assetId": "tidehold/fenrire/shop_b",
+      "walkIn": true,
+      "footprint": {
+        "w": 16.5,
+        "d": 14.6
+      },
+      "associatedNpcs": [
+        "herbalist_yara",
+        "tanner_hesk"
+      ],
+      "targetBeforeNative": {
+        "x": 12.75,
+        "y": -1.55,
+        "z": 326.4,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 12.75
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge moonwort apothecary",
+        "x": 12.75,
+        "y": -1.55,
+        "z": 326.4,
+        "rotY": 1.5708,
+        "rotYDeg": 90,
+        "scale": 12.75,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge moonwort apothecary",
+        "x": 15.849,
+        "y": -1.55,
+        "z": 328.4295,
+        "rotY": 0.7679,
+        "rotYDeg": 44,
+        "scale": 12.75,
+        "detached": true,
+        "groundY": 1.0561
+      },
+      "combined_20261020T0115Z": {
+        "uid": "e8c21f319622",
+        "name": "Fenbridge moonwort apothecary",
+        "x": 15.9752,
+        "y": -1.55,
+        "z": 328.6336,
+        "rotY": 0.7679,
+        "rotYDeg": 44,
+        "scale": 12.75,
+        "detached": true,
+        "groundY": 1.0561
+      },
+      "deltaNativeToCombined": {
+        "dx": 3.2252,
+        "dy": 0,
+        "dz": 2.2336,
+        "dRotYDeg": -46,
+        "distanceMovedYd": 3.92
+      },
+      "action": "move_existing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "apothecary-entrance.png"
+      },
+      "targetActual": {
+        "x": 15.9752,
+        "y": -1.55,
+        "z": 328.6336,
+        "rotY": 0.7679,
+        "scale": 1.5,
+        "errorX": 0,
+        "errorZ": 0.000005,
+        "errorRotRad": 0.000045
+      }
+    },
+    {
+      "code": "FB-005",
+      "canonicalId": "fenbridge_gilded_strongbox",
+      "role": "The Gilded Strongbox / Bank (North-East)",
+      "assetId": "tidehold/fenrire/shop_a",
+      "walkIn": true,
+      "footprint": {
+        "w": 18.1,
+        "d": 15.8
+      },
+      "associatedNpcs": [
+        "bursar_petra_vell"
+      ],
+      "targetBeforeNative": {
+        "x": -12.3,
+        "y": -1.55,
+        "z": 325.3,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 11.0998
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge gilded strongbox",
+        "x": -12.3,
+        "y": -1.55,
+        "z": 325.3,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 11.0998,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge gilded strongbox",
+        "x": -46.5641,
+        "y": -1.55,
+        "z": 332.6957,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 11.0998,
+        "detached": true,
+        "groundY": 1.1169
+      },
+      "combined_20261020T0115Z": {
+        "uid": "3e8f0d5add69",
+        "name": "Fenbridge gilded strongbox",
+        "x": -47.2492,
+        "y": -2.55,
+        "z": 333.499,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 11.0998,
+        "detached": true,
+        "groundY": 1.1169
+      },
+      "deltaNativeToCombined": {
+        "dx": -34.9492,
+        "dy": -1,
+        "dz": 8.199,
+        "dRotYDeg": 0,
+        "distanceMovedYd": 35.9
+      },
+      "action": "move_existing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "strongbox-entrance.png"
+      },
+      "targetActual": {
+        "x": -47.2492,
+        "y": -1.55,
+        "z": 333.499,
+        "rotY": -1.5708,
+        "scale": 1.5,
+        "errorX": 0.000018,
+        "errorZ": 0.000039,
+        "errorRotRad": 0.000004
+      }
+    },
+    {
+      "code": "FB-C01",
+      "canonicalId": "well_fenbridge_cistern",
+      "role": "Mirelight Cistern (Town Square Center)",
+      "assetId": "props/fenbridge_mirelight_cistern",
+      "walkIn": false,
+      "footprint": {
+        "w": 3.6,
+        "d": 3.6
+      },
+      "associatedNpcs": [],
+      "targetBeforeNative": {
+        "x": 0,
+        "y": 0,
+        "z": 303,
+        "rotY": 0,
+        "rotYDeg": 0,
+        "scale": 1.6364
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge mirelight cistern",
+        "x": 0,
+        "y": 0,
+        "z": 303,
+        "rotY": 0,
+        "rotYDeg": 0,
+        "scale": 1.6364,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge mirelight cistern",
+        "x": 0.1235,
+        "y": 0,
+        "z": 300.5201,
+        "rotY": 0,
+        "rotYDeg": 0,
+        "scale": 1.6364,
+        "detached": false,
+        "groundY": null
+      },
+      "combined_20261020T0115Z": {
+        "uid": "556406a0dae5",
+        "name": "Fenbridge mirelight cistern",
+        "x": 0.1235,
+        "y": 0,
+        "z": 300.5201,
+        "rotY": 0,
+        "rotYDeg": 0,
+        "scale": 1.6364,
+        "detached": false,
+        "groundY": null
+      },
+      "deltaNativeToCombined": {
+        "dx": 0.1235,
+        "dy": 0,
+        "dz": -2.4799,
+        "dRotYDeg": 0,
+        "distanceMovedYd": 2.48
+      },
+      "action": "move_existing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "inn-entrance.png"
+      },
+      "targetActual": {
+        "x": 0.1235,
+        "y": 0,
+        "z": 300.5201,
+        "rotY": 0,
+        "scale": 1.6364,
+        "errorX": 0.000045,
+        "errorZ": 0.000013,
+        "errorRotRad": 0
+      }
+    },
+    {
+      "code": "FB-C02",
+      "canonicalId": "stall_fenbridge_provisions",
+      "role": "Fenbridge Provision Stall",
+      "assetId": "props/fenbridge_provision_stall",
+      "walkIn": false,
+      "footprint": {
+        "w": 3.2,
+        "d": 2.2
+      },
+      "associatedNpcs": [
+        "provisioner_hale"
+      ],
+      "targetBeforeNative": {
+        "x": 3,
+        "y": 0,
+        "z": 294.5,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 1.4545
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge provision stall",
+        "x": 3,
+        "y": 0,
+        "z": 294.5,
+        "rotY": -1.5708,
+        "rotYDeg": -90,
+        "scale": 1.4545,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge provision stall",
+        "x": -5.6126,
+        "y": 0,
+        "z": 287.8894,
+        "rotY": 3.4732,
+        "rotYDeg": 199,
+        "scale": 1.4545,
+        "detached": true,
+        "groundY": 1.2
+      },
+      "combined_20261020T0115Z": {
+        "uid": "aaebb3bd933c",
+        "name": "Fenbridge provision stall",
+        "x": -7.2105,
+        "y": 0,
+        "z": 287.6056,
+        "rotY": 3.8048,
+        "rotYDeg": 218,
+        "scale": 1.4545,
+        "detached": true,
+        "groundY": 1.2
+      },
+      "deltaNativeToCombined": {
+        "dx": -10.2105,
+        "dy": 0,
+        "dz": -6.8944,
+        "dRotYDeg": 308,
+        "distanceMovedYd": 12.32
+      },
+      "action": "move_existing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "inn-entrance.png"
+      },
+      "targetActual": {
+        "x": -7.2105,
+        "y": 0,
+        "z": 287.6056,
+        "rotY": -2.4784,
+        "scale": 1.4545,
+        "errorX": 0.000012,
+        "errorZ": 0.000004,
+        "errorRotRad": 0.000018
+      }
+    },
+    {
+      "code": "FB-C03",
+      "canonicalId": "fenbridge_muster_board",
+      "role": "Fenbridge Muster Board",
+      "assetId": "props/fenbridge_muster_board",
+      "walkIn": false,
+      "footprint": {
+        "w": 2.6,
+        "d": 0.9
+      },
+      "associatedNpcs": [],
+      "targetBeforeNative": {
+        "x": -6,
+        "y": 0,
+        "z": 278,
+        "rotY": 0.2355,
+        "rotYDeg": 13.49,
+        "scale": 1.1818
+      },
+      "duallam_c5427ab37cc": {
+        "uid": null,
+        "name": "Fenbridge muster board",
+        "x": -6,
+        "y": 0,
+        "z": 278,
+        "rotY": 0.2355,
+        "rotYDeg": 13.5,
+        "scale": 1.1818,
+        "detached": false,
+        "groundY": null
+      },
+      "mirefen_3aa88a5a077": {
+        "uid": null,
+        "name": "Fenbridge muster board",
+        "x": -6,
+        "y": 0,
+        "z": 278,
+        "rotY": 0.2355,
+        "rotYDeg": 13.5,
+        "scale": 1.1818,
+        "detached": false,
+        "groundY": null
+      },
+      "combined_20261020T0115Z": {
+        "uid": "123386dc919d",
+        "name": "Fenbridge muster board",
+        "x": -6,
+        "y": 0,
+        "z": 278,
+        "rotY": 0.2355,
+        "rotYDeg": 13.5,
+        "scale": 1.1818,
+        "detached": false,
+        "groundY": null
+      },
+      "deltaNativeToCombined": {
+        "dx": 0,
+        "dy": 0,
+        "dz": 0,
+        "dRotYDeg": 0,
+        "distanceMovedYd": 0
+      },
+      "action": "keep_current_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "beforeOverview": "target-before-overview-annotated.png",
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "gatehouse-approach.png"
+      },
+      "targetActual": {
+        "x": -6,
+        "y": 0,
+        "z": 278,
+        "rotY": 0.2355,
+        "scale": 1.1818,
+        "errorX": 0,
+        "errorZ": 0,
+        "errorRotRad": 0.000045
+      }
+    }
+  ],
+  "addedNorthHousesInCombined": [
+    {
+      "code": "FB-006",
+      "role": "Added House A (North-Center)",
+      "assetId": "tidehold/fenrire/house_a",
+      "walkIn": false,
+      "footprint": {
+        "w": 11.2,
+        "d": 14.2
+      },
+      "combinedUid": "b29319e11ece",
+      "reconciledUniqueUid": "d4a2522da25a",
+      "x": -10.5419,
+      "y": -1.44,
+      "z": 346.2181,
+      "rotY": 4.9742,
+      "rotYDeg": 285,
+      "scale": 7.7827,
+      "detached": true,
+      "groundY": 1.0629,
+      "presentInDuallam": false,
+      "presentInMirefenOriginal": false,
+      "presentInCombined20261020T0115Z": true,
+      "action": "add_missing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "added-houses-north.png"
+      }
+    },
+    {
+      "code": "FB-007",
+      "role": "Added House A (North-East)",
+      "assetId": "tidehold/fenrire/house_a",
+      "walkIn": false,
+      "footprint": {
+        "w": 11.2,
+        "d": 14.2
+      },
+      "combinedUid": "b29319e11ece",
+      "reconciledUniqueUid": "a1f743dc0b53",
+      "x": -47.0478,
+      "y": -1.44,
+      "z": 360.0211,
+      "rotY": 4.2935,
+      "rotYDeg": 246,
+      "scale": 7.7827,
+      "detached": true,
+      "groundY": 1.0629,
+      "presentInDuallam": false,
+      "presentInMirefenOriginal": false,
+      "presentInCombined20261020T0115Z": true,
+      "action": "add_missing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "added-houses-north.png"
+      }
+    },
+    {
+      "code": "FB-008",
+      "role": "Added House A (North-West)",
+      "assetId": "tidehold/fenrire/house_a",
+      "walkIn": false,
+      "footprint": {
+        "w": 11.2,
+        "d": 14.2
+      },
+      "combinedUid": "b29319e11ece",
+      "reconciledUniqueUid": "97310fe05757",
+      "x": 13.8094,
+      "y": -1.44,
+      "z": 351.7897,
+      "rotY": 1.7104,
+      "rotYDeg": 98,
+      "scale": 7.7827,
+      "detached": true,
+      "groundY": 1.0629,
+      "presentInDuallam": false,
+      "presentInMirefenOriginal": false,
+      "presentInCombined20261020T0115Z": true,
+      "action": "add_missing_building",
+      "confidence": "exact_record_match",
+      "evidence": {
+        "sourceOverview": "source-combined-20261020T0115Z-overview-annotated.png",
+        "afterOverview": "target-after-overview-annotated.png",
+        "groundCapture": "added-houses-north.png"
+      }
+    }
+  ],
+  "targetHeadCommit": "7fbd7532ab0aeb1793b663bfa59699554ab68837",
+  "authoritativeSourceChoice": "combined_20261020T0115Z"
+}

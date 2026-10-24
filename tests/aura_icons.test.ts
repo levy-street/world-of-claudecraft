@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, ITEMS } from '../src/sim/data';
+import { SLUMBER_AURA_ID } from '../src/sim/mob/slumber';
 import {
   NYTHRAXIS_ASCENSION_AURA_ID,
   NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
@@ -171,6 +172,16 @@ describe('aura icons reuse image-based ability art', () => {
     }
     expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_CROWN_ENDURES_AURA_ID))).not.toBe(
       JSON.stringify(auraIconRecipe(NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID)),
+    );
+  });
+
+  it('the world boss slumber aura carries its own moon recipe, not the shield of its kind', () => {
+    // Its kind is buff_dr (value 0) purely so every frame classifies it as a benign buff;
+    // keyed by the bare aura id (that is how a dedicated per-aura recipe is found), so a
+    // sleeping boss reads "asleep" rather than "damage reduction" on the target frame.
+    expect(hasAuraRecipe(SLUMBER_AURA_ID), 'the slumber aura needs its recipe').toBe(true);
+    expect(hasAuraRecipe('aura_slumber'), 'the aura_ prefix is the kind fallback, not an id').toBe(
+      false,
     );
   });
 

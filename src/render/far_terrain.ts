@@ -45,6 +45,8 @@ import { getGrassGroundBake } from './grass_ground_bake';
 import { type IdleSlotResult, idleSlot } from './idle_queue';
 import { GRASS_BAKE_PATCH_YARDS, GRASS_PAINT_GAIN } from './meadow_tuning';
 import { renderLayerDisabled } from './render_dev_flags';
+import { CHUNK_SIZE } from './terrain';
+import { activeTerrainGridBox, SHIPPED_GRID_BOX } from './terrain_grid_core';
 
 // One Uint16 index buffer per (tileSize, spacing): every tile of one
 // spacing has identical topology, so a dozen tiles share one buffer.
@@ -138,6 +140,10 @@ export function farVistaGate(
 // margin keeps a covered overlap band so the handoff never opens a seam:
 // near chunks stay visible out to detailFar itself.
 const FAR_DISCARD_MARGIN = 60;
+// How far an authored map's vista reaches past its chunk grid: past the
+// editor's default 900-yard visibility from anywhere on the map, so the
+// outskirts never end in mid-air (the shipped world keeps FAR_WORLD_MARGIN).
+const AUTHORED_FAR_MARGIN = 1500;
 
 interface BuiltFarTile {
   tile: FarTile;
@@ -294,7 +300,14 @@ export function buildFarTerrain(
     for (const waiter of initialBuildWaiters.splice(0)) waiter();
   };
 
-  const tiles = planFarTiles(WORLD_MIN_X, WORLD_MAX_X, WORLD_MIN_Z, WORLD_MAX_Z);
+  // An authored map's vista covers its own chunk-grid box and runs well past
+  // it, so its outskirts continue to the horizon instead of stopping where
+  // the grid does (terrain_grid_core.ts). The shipped world plans as before.
+  const gridBox = activeTerrainGridBox(CHUNK_SIZE);
+  const shippedGrid = gridBox === SHIPPED_GRID_BOX;
+  const tiles = shippedGrid
+    ? planFarTiles(WORLD_MIN_X, WORLD_MAX_X, WORLD_MIN_Z, WORLD_MAX_Z)
+    : planFarTiles(gridBox.minX, gridBox.maxX, gridBox.minZ, gridBox.maxZ, AUTHORED_FAR_MARGIN);
   // Standard, not Lambert: the detail terrain lights with the realm's IBL
   // irradiance (scene.environment), and without the same term the far
   // tiles' shaded faces crush toward black where the near terrain stays
@@ -311,6 +324,15 @@ export function buildFarTerrain(
   // clearance at build time), so the vertex stage reads nothing here and the
   // guarantee holds at every distance instead of across one tuned band.
   const farCut = { value: new THREE.Vector3(0, 0, 0) };
+  // ...but only over ground the chunk grid actually covers: past an authored
+  // map's grid no near chunk will ever draw, so discarding there opened a
+  // void right at the map's edge. The shipped world keeps its discard
+  // everywhere (an unbounded box), byte-identical.
+  const farGrid = {
+    value: shippedGrid
+      ? new THREE.Vector4(-1e9, -1e9, 1e9, 1e9)
+      : new THREE.Vector4(gridBox.minX, gridBox.minZ, gridBox.maxX, gridBox.maxZ),
+  };
   // Meadow-continuum ground paint: the far tiles multiply the SAME baked
   // blade texture the near splat terrain paints with, at the same true
   // world scale and the same constructed gain, gated by the per-vertex
@@ -337,8 +359,13 @@ export function buildFarTerrain(
   // Distant-zone atmosphere: whether the biome haze field exists is decided
   // once, before the material compiles, so a tier without one is byte-identical.
   const zoneHaze = hasBiomeHazeField();
+  // The grid discard is a compile-time variant: name it in the program key so
+  // a shipped-world and an authored-map far material never share a program.
+  material.customProgramCacheKey = () =>
+    `${material.onBeforeCompile.toString()}|far-grid:${shippedGrid ? 0 : 1}`;
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uFarCut = farCut;
+    if (!shippedGrid) shader.uniforms.uFarGrid = farGrid;
     shader.uniforms.uFarNightFloor = farNightFloor;
     shader.uniforms.uFarNightDim = farNightDim;
     if (detailArm) {
@@ -370,13 +397,19 @@ export function buildFarTerrain(
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        `#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;\nuniform vec3 uFarNightFloor;\nuniform float uFarNightDim;${
+        `#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;${
+          shippedGrid ? '' : '\nuniform vec4 uFarGrid;'
+        }\nuniform vec3 uFarNightFloor;\nuniform float uFarNightDim;${
           detailArm ? '\nuniform sampler2D uFarDetail;\nuniform float uFarDetailAmt;' : ''
         }${grassBake ? '\nvarying float vGrassW;\nuniform sampler2D uGrassBake;' : ''}`,
       )
       .replace(
         'void main() {',
-        'void main() {\n\tif (distance(vFarXZ, uFarCut.xy) < uFarCut.z) discard;',
+        // The shipped world compiles the discard it always had (its grid box
+        // is unbounded, so the grid test would be a no-op there anyway).
+        shippedGrid
+          ? 'void main() {\n\tif (distance(vFarXZ, uFarCut.xy) < uFarCut.z) discard;'
+          : 'void main() {\n\tif (distance(vFarXZ, uFarCut.xy) < uFarCut.z && all(greaterThanEqual(vFarXZ, uFarGrid.xy)) && all(lessThanEqual(vFarXZ, uFarGrid.zw))) discard;',
       )
       .replace(
         // Everything that shapes ALBEDO, in one patch and in this order: the

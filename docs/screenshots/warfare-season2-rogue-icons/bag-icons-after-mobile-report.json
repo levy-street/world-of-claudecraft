@@ -1,0 +1,25 @@
+{
+  "bagBar": [
+    "http://localhost:5173/ui/items/backpack.webp",
+    "http://localhost:5173/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5173/ui/items/baked_bread.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_assassination_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_assassination_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_assassination_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_assassination_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_assassination_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_combat_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_combat_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_combat_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_combat_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_combat_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_subtlety_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_subtlety_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_subtlety_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_subtlety_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_rogue_subtlety_gloves.webp"
+  ],
+  "allDecoded": true
+}

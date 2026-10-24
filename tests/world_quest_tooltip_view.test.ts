@@ -2,6 +2,12 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import type { ItemDef, WorldQuestDef } from '../src/sim/types';
 import {
+  WORLD_QUEST_HONOR_REWARD,
+  worldQuestHonorRewardForQuest,
+  worldQuestHonorZonesForCycle,
+} from '../src/sim/world_quest_honor_slots';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quest_rotation';
+import {
   withItemLevelLine,
   worldQuestTooltipHtml,
 } from '../src/ui/hud/map/world_quest_tooltip_html';
@@ -248,5 +254,41 @@ describe('world quest tooltip html', () => {
     expect(worldQuestFactionLine(quest)).toMatch(/^Facción: /);
     expect(worldQuestStandingRewardText(quest, 20)).toMatch(/^\+80 de reputación con /);
     expect(worldQuestStandingRewardText(quest, 20)).not.toContain('Standing');
+  });
+});
+
+describe("the day's Honor reward on the hover", () => {
+  const cycle = 'wq1_0';
+  const board = activeWorldQuestsForCycle(cycle);
+  const honorZones = worldQuestHonorZonesForCycle(cycle);
+  const onSlot = board.find((quest) => worldQuestHonorRewardForQuest(cycle, quest) > 0);
+  const offSlot = board.find(
+    (quest) =>
+      !honorZones.includes(quest.zoneId) && worldQuestHonorRewardForQuest(cycle, quest) === 0,
+  );
+
+  it('shows 150 Honor with the Honor art on an Honor quest, matching what the sim pays', () => {
+    if (!onSlot) throw new Error('no Honor quest on the board');
+    const rewards = tooltip(onSlot, { cycle }).rewards.filter(
+      (row) => row.kind === 'currency' && row.currencyId === 'honor',
+    );
+    expect(rewards).toEqual([
+      {
+        kind: 'currency',
+        currencyId: 'honor',
+        amount: WORLD_QUEST_HONOR_REWARD,
+        text: '150 Honor',
+        iconUrl: '/ui/currency/honor.webp',
+      },
+    ]);
+    expect(worldQuestTooltipHtml(tooltip(onSlot, { cycle }))).toContain('150 Honor');
+  });
+
+  it('shows no Honor on a quest off the day slots, or with no cycle', () => {
+    if (!offSlot || !onSlot) throw new Error('board lacks an on/off slot quest');
+    const honorRows = (model: WorldQuestTooltipModel) =>
+      model.rewards.filter((row) => row.kind === 'currency' && row.currencyId === 'honor');
+    expect(honorRows(tooltip(offSlot, { cycle }))).toEqual([]);
+    expect(honorRows(tooltip(onSlot))).toEqual([]);
   });
 });

@@ -24,7 +24,8 @@ const RIBBONS = [
 // Real aurora anatomy: a sharp bright LOWER border that fades upward into
 // long ray columns of varying width and strength (the canvas y axis maps to
 // curtain height; y=64 is the bottom edge).
-function auroraTexture(): THREE.CanvasTexture | null {
+/** The curtain texture, shared with the map-authored aurora (aurora_sky.ts). */
+export function auroraTexture(): THREE.CanvasTexture | null {
   if (typeof document === 'undefined') return null;
   const canvas = document.createElement('canvas');
   canvas.width = 512;

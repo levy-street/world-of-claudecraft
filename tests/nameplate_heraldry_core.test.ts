@@ -13,6 +13,7 @@ import {
   NAMEPLATE_HERALDRY_WELL_FILL,
   type NameplateHeraldryInput,
   nameplateHeraldryInto,
+  nameplateSubRowsLift,
 } from '../src/render/nameplate_heraldry_core';
 import {
   BORDER_ACCENT_SLUGS,
@@ -415,4 +416,11 @@ describe('E46 allocation, raster, and tier fairness guards', () => {
     }
     expect(source).not.toContain('nameplate_cartouche_core');
   });
+});
+
+it('reserves NPC role rows and player titles independently', () => {
+  expect(nameplateSubRowsLift(true, false, false)).toBe(12);
+  expect(nameplateSubRowsLift(true, true, false)).toBe(14);
+  expect(nameplateSubRowsLift(false, false, true)).toBe(11);
+  expect(nameplateSubRowsLift(false, false, false)).toBe(0);
 });

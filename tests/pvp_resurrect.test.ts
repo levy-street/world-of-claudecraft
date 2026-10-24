@@ -1,9 +1,9 @@
 // PvP Resurrect (src/sim/pvp/pvp_resurrect.ts, src/sim/spirit.ts pvpResurrect):
 // a death a hostile player had a hand in offers a raise at the graveyard Release
-// picks, at full health and mana with no Keeper's Toll. Pinned here end to end:
-// the pure rule, the offer stamped by a real world PvP death, the raise, every
-// refusal, the self-wire round trip to the ClientWorld mirror, and the death
-// screen's view core.
+// picks, at full health and mana with no Keeper's Toll, once the death's
+// PVP_RESURRECT_WAIT_SECONDS have run. Pinned here end to end: the pure rule, the
+// offer stamped by a real world PvP death, the wait, the raise, every refusal, the
+// self-wire round trip to the ClientWorld mirror, and the death screen's view core.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -20,12 +20,17 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD } from '../src/sim/data';
-import { PVP_RESURRECT_WINDOW_SECONDS, pvpResurrectEarned } from '../src/sim/pvp';
+import {
+  PVP_RESURRECT_WAIT_SECONDS,
+  PVP_RESURRECT_WINDOW_SECONDS,
+  pvpResurrectEarned,
+} from '../src/sim/pvp';
 import { WORLD_PVP_TOGGLE_COOLDOWN, worldPvpOnPlayerDeath } from '../src/sim/pvp/world_pvp';
 import { WORLD_PVP_ASSIST_WINDOW } from '../src/sim/pvp/world_pvp_rules';
 import { RESURRECTION_SICKNESS_ID } from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
-import type { Entity, WorldContent } from '../src/sim/types';
+import { DT, type Entity, type WorldContent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 import { createDeathPromptView, updateDeathPromptView } from '../src/ui/hud/death';
 import { bareClient } from './helpers/bare_client';
 
@@ -48,7 +53,9 @@ function duelists(sim: Sim): { killer: number; victim: number } {
     const e = ent(sim, pid);
     e.hp = e.maxHp;
     e.resource = e.maxResource;
-    e.pos = { ...ent(sim, killer).pos, x: ent(sim, killer).pos.x + (pid === victim ? 2 : 0) };
+    // Thornpeak Heights: contested ground (the start town is a sanctuary).
+    const x = 60 + (pid === victim ? 2 : 0);
+    e.pos = { x, y: groundHeight(x, 700, 7), z: 700 };
     e.prevPos = { ...e.pos };
   }
   (sim as unknown as { time: number }).time += WORLD_PVP_TOGGLE_COOLDOWN + 1;
@@ -56,6 +63,11 @@ function duelists(sim: Sim): { killer: number; victim: number } {
   sim.setWorldPvpFlag(true, victim);
   expect(sim.isHostileTo(ent(sim, killer), ent(sim, victim)), 'the pair is hostile').toBe(true);
   return { killer, victim };
+}
+
+/** Run the sim for `seconds` (the PvP Resurrect wait counts down on the tick). */
+function tickSeconds(sim: Sim, seconds: number): void {
+  for (let i = 0; i < Math.round(seconds / DT); i++) sim.tick();
 }
 
 function slay(sim: Sim, killerPid: number, victimPid: number): void {
@@ -105,6 +117,7 @@ describe('PvP Resurrect in the Sim', () => {
     twin.releaseSpirit(pair.victim);
     const graveyard = ent(twin, pair.victim).pos;
 
+    tickSeconds(sim, PVP_RESURRECT_WAIT_SECONDS);
     sim.pvpResurrect(victim);
     expect(v.dead).toBe(false);
     expect(v.ghost).toBe(false);
@@ -114,6 +127,47 @@ describe('PvP Resurrect in the Sim', () => {
     expect(v.resource).toBe(v.maxResource);
     expect(v.auras.some((a) => a.id === RESURRECTION_SICKNESS_ID)).toBe(false);
     expect(v.pvpResurrect, 'the offer belonged to that death').toBe(false);
+    expect(v.pvpResurrectWait ?? 0).toBe(0);
+  });
+
+  it('makes the corpse wait PVP_RESURRECT_WAIT_SECONDS before the raise is honored', () => {
+    expect(PVP_RESURRECT_WAIT_SECONDS).toBe(15);
+    const sim = world();
+    const { killer, victim } = duelists(sim);
+    slay(sim, killer, victim);
+    const v = ent(sim, victim);
+    expect(v.pvpResurrect).toBe(true);
+    expect(v.pvpResurrectWait).toBe(PVP_RESURRECT_WAIT_SECONDS);
+    // Pressed at once: refused, the body stays where it fell.
+    const fell = { ...v.pos };
+    sim.pvpResurrect(victim);
+    expect(v.dead).toBe(true);
+    expect(v.ghost).toBe(false);
+    expect(v.pos).toEqual(fell);
+    // A second before the end: still refused, and the offer still stands.
+    tickSeconds(sim, PVP_RESURRECT_WAIT_SECONDS - 1);
+    expect(v.pvpResurrectWait).toBeGreaterThan(0);
+    sim.pvpResurrect(victim);
+    expect(v.dead).toBe(true);
+    expect(v.pvpResurrect).toBe(true);
+    // The wait runs out: the raise lands at the graveyard.
+    tickSeconds(sim, 1);
+    expect(v.pvpResurrectWait).toBe(0);
+    sim.pvpResurrect(victim);
+    expect(v.dead).toBe(false);
+    expect(v.pos).not.toEqual(fell);
+  });
+
+  it('a second pass of the death hook on the corpse does not restart the wait', () => {
+    const sim = world();
+    const { killer, victim } = duelists(sim);
+    slay(sim, killer, victim);
+    const v = ent(sim, victim);
+    tickSeconds(sim, 5);
+    const left = v.pvpResurrectWait ?? 0;
+    expect(left).toBeLessThan(PVP_RESURRECT_WAIT_SECONDS);
+    worldPvpOnPlayerDeath(sim.ctx, v, ent(sim, killer));
+    expect(v.pvpResurrectWait).toBe(left);
   });
 
   it('a death with no hostile player in it offers nothing, and the raise is refused', () => {
@@ -220,14 +274,25 @@ describe('PvP Resurrect on the authoritative server', () => {
     e.hp = 0;
     e.dead = true;
     e.pvpResurrect = true;
+    e.pvpResurrectWait = 12.4;
     (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
     const self = lastSelf(fc.sent);
     expect(self?.pvr).toBe(1);
+    expect(self?.pvrw, 'whole seconds, rounded up').toBe(13);
     const client = bareClient(session.pid);
     (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(
       JSON.parse(fc.sent[fc.sent.length - 1]),
     );
     expect(client.player.pvpResurrect).toBe(true);
+    expect(client.player.pvpResurrectWait).toBe(13);
+
+    // The server refuses the raise while the wait runs.
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'pvp_resurrect' }));
+    expect(e.dead).toBe(true);
+    e.pvpResurrectWait = 0;
+    server.sim.tickCount++;
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    expect(lastSelf(fc.sent)?.pvrw).toBe(0);
 
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'pvp_resurrect' }));
     expect(e.dead).toBe(false);
@@ -242,17 +307,21 @@ describe('updateDeathPromptView', () => {
   const at = { x: 0, z: 0 };
   it('shows the PvP Resurrect button only on a fresh corpse that carries the offer', () => {
     const v = createDeathPromptView();
-    updateDeathPromptView(v, true, false, false, false, at, null, true);
+    updateDeathPromptView(v, true, false, false, false, at, null, true, 12.2);
     expect(v).toEqual({
       spiritMode: false,
       overlay: true,
       pvpResurrect: true,
+      pvpResurrectWait: 13,
       ghostHint: false,
       ghostPrompt: false,
     });
-    updateDeathPromptView(v, true, false, false, false, at, null, false);
+    updateDeathPromptView(v, true, false, false, false, at, null, true, 0);
+    expect(v.pvpResurrectWait, 'the wait is over').toBe(0);
+    updateDeathPromptView(v, true, false, false, false, at, null, false, 9);
     expect(v.overlay).toBe(true);
     expect(v.pvpResurrect).toBe(false);
+    expect(v.pvpResurrectWait, 'no button, no countdown').toBe(0);
     // An arena corpse gets no overlay at all, so no button either.
     updateDeathPromptView(v, true, false, true, false, at, null, true);
     expect(v.overlay).toBe(false);
@@ -267,6 +336,7 @@ describe('updateDeathPromptView', () => {
       spiritMode: true,
       overlay: false,
       pvpResurrect: false,
+      pvpResurrectWait: 0,
       ghostHint: true,
       ghostPrompt: true,
     });
@@ -276,7 +346,7 @@ describe('updateDeathPromptView', () => {
     expect(v.ghostHint, 'a battleground ghost waits for the wave').toBe(false);
     expect(v.ghostPrompt).toBe(false);
     updateDeathPromptView(v, false, false, false, false, at, null, false);
-    expect(Object.values(v).every((shown) => shown === false)).toBe(true);
+    expect(Object.values(v).every((shown) => shown === false || shown === 0)).toBe(true);
   });
 });
 

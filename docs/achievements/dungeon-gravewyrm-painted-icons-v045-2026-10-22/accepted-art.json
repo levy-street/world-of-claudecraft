@@ -1,0 +1,949 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 11,
+    "replacedSvgIcons": 11,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "foremans_grips",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/foremans_grips.webp",
+      "canonicalDisplayName": "Foreman's Grips",
+      "acceptedSha256": "1ce3cdb56cf92f93dd4ec08028b2998fca8405bf00b94b7fc74be1a2c18133bf",
+      "acceptedBytes": 4870,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/foremans_grips.png",
+        "sha256": "552ea1e5d86ae7047feba1e60fa404703e6969e82cf463e3e4c743157f38cc0b",
+        "bytes": 2566775,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/foremans_grips.png",
+        "sha256": "1b6f5b3ecd7ee9e196d210874c2a0ebca22167dc52fe0905290c4d8a4a59e64d",
+        "bytes": 554741,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "ddfc278058be6b66c3ca3e9ba0d629a1b3531cb45d92bdc58a5dae065b593ece",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Foreman's Grips (foremans_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of giant smith's MAIL work gauntlets, visible interlinked steel chain on fingers beneath iron knuckle reinforcement. Broad broken shackle cuffs with short snapped chain ends and a single glowing blue abstract seal emblem on one cuff. Heavy dark iron rimed in frost; empty gloves, five fingers each, no hands. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/foremans_grips.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ddfc278058be6b66c3ca3e9ba0d629a1b3531cb45d92bdc58a5dae065b593ece"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "serac_stride_boots",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/serac_stride_boots.webp",
+      "canonicalDisplayName": "Serac-Stride Boots",
+      "acceptedSha256": "82ac6a15bb3da9eef2f16259807fd1047b62aacddb0d351173fbe34f00be91c7",
+      "acceptedBytes": 4386,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/serac_stride_boots.png",
+        "sha256": "663bcec17c906e516e297bba5a35f5696d1e01ea9501258e492992291c212d7b",
+        "bytes": 2513753,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/serac_stride_boots.png",
+        "sha256": "780e41e4a70d15052900c58bfc4b83a00958ffd9c9b3d366d45a1f3ed3e1a38b",
+        "bytes": 557604,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "365528ec0205baf67779c7ba92e2e36a8423690aca1710d4dadb5ccbd22fbd9d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Serac-Stride Boots (serac_stride_boots) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of frost-laced dark brown LEATHER climbing boots on small iron crampons, stitched supple hide and thick practical soles. One small translucent glacier-blue serac ice shard beside the boots, rime on seams, whole pair visible, no feet. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/serac_stride_boots.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "365528ec0205baf67779c7ba92e2e36a8423690aca1710d4dadb5ccbd22fbd9d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "seal_rune_mantle",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/seal_rune_mantle.webp",
+      "canonicalDisplayName": "Seal-Rune Mantle",
+      "acceptedSha256": "4cd655c24d33f1f1fe68e5e1722243bd58d3ab305bb7c56b07978a756bc28abd",
+      "acceptedBytes": 4666,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/seal_rune_mantle.png",
+        "sha256": "0252d5609acb4034dc154d3427afae3aade765aa6b64b4bea1d67d7d07a127a8",
+        "bytes": 2599665,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/seal_rune_mantle.png",
+        "sha256": "a7a8e2108db7ca676a6698f212ce669a43df6194a8765a1fd20d5366b1b29050",
+        "bytes": 551866,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "f4b806f290cc46711f2e39986044a504e5131b8b873ea8a4fa660e4485cf60a9",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Seal-Rune Mantle (seal_rune_mantle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete deep indigo CLOTH shoulder mantle with a gold-edged hem, four small distinct abstract blue glowing circular seal-tool emblems stitched across it, no readable alphabet. White rime crust along upper edge. Soft thick woven fabric folds, no armor plate, no wearer. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/seal_rune_mantle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f4b806f290cc46711f2e39986044a504e5131b8b873ea8a4fa660e4485cf60a9"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "thawbound_legguards",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/thawbound_legguards.webp",
+      "canonicalDisplayName": "Thawbound Legguards",
+      "acceptedSha256": "80161dd516c0e0d31d14f286e085aecfd095beba579cd70109d9c12736444b97",
+      "acceptedBytes": 3804,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/thawbound_legguards.png",
+        "sha256": "ff6672c33fa205cd23aba3df4472f9ef4a2934f015c446896d1be2abd1b7f8f7",
+        "bytes": 2308003,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/thawbound_legguards.png",
+        "sha256": "2a68a90f8af37572d450f4fbcd0a088c8b2a7e3b11447ae0c6e5ece862b2133f",
+        "bytes": 516267,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "ed3854ea4ace4eb93c78f8d696cac6b5e56352670152c1fa64cd20258b4d8984",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Thawbound Legguards (thawbound_legguards) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of heavy MAIL legguards, dark interlinked chain with iron knee reinforcement, partially sheathed in cracked melting glacier-blue ice on one thigh and shin. A few clear water droplets and rime edges. Separate full legs and waistband visible, no wearer. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/thawbound_legguards.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ed3854ea4ace4eb93c78f8d696cac6b5e56352670152c1fa64cd20258b4d8984"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "pyre_tenders_hood",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/pyre_tenders_hood.webp",
+      "canonicalDisplayName": "Pyre-Tender's Hood",
+      "acceptedSha256": "378f45b01230c04589f7ab97e0b14fa18116099e68c86b67fb7dc40091d56c6f",
+      "acceptedBytes": 2902,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/pyre_tenders_hood.png",
+        "sha256": "f732fa6a594f9047bcb884417b77956ffba5b6f347e8132e0158a9874428414e",
+        "bytes": 2123550,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/pyre_tenders_hood.png",
+        "sha256": "36cd953fada5268a9d5929e33391e7b43423a07ecfc8d5a57bfaff99d531c32f",
+        "bytes": 501946,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "c67d0e3c8ec8b0a68f8862cbfe575225f82abc2e24df7075a2b022f4883ae03d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Pyre-Tender's Hood (pyre_tenders_hood) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty soot-black LEATHER hood with thick stitched seams and stiff folded leather rim, shadowed face opening containing a tiny violet-green soulfire ember. Subtle soot marks and restrained ember edge light. No face, eyes, person or mannequin. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/pyre_tenders_hood.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "c67d0e3c8ec8b0a68f8862cbfe575225f82abc2e24df7075a2b022f4883ae03d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "meltwater_cord",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/meltwater_cord.webp",
+      "canonicalDisplayName": "Meltwater Cord",
+      "acceptedSha256": "d4e6d38833e1f74c495e2e7829a8755d0b6e398b92cea774862c94c7fe8d7a2e",
+      "acceptedBytes": 3356,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/meltwater_cord.png",
+        "sha256": "fc1bef386615b45ea1de695c95b4fbbc6a2a2d5249cf3daec89b851faf402969",
+        "bytes": 2325376,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/meltwater_cord.png",
+        "sha256": "824adf6252a1fb9d35ed7635c80faac21a9b7a7bf711772b35838f263477ea49",
+        "bytes": 498218,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "3dfa2105cfac7db99323d050d86ac0de01ec3b1cb7c3ac4079b251daf068a8cf",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Meltwater Cord (meltwater_cord) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete braided CLOTH waist cord of dark blue-gray fibers looped horizontally with a substantial knot around a glossy glass bead containing dark meltwater. Two short tassels, icy blue highlight in bead, soft woven texture, no leather or metal belt, no wearer. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/meltwater_cord.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "3dfa2105cfac7db99323d050d86ac0de01ec3b1cb7c3ac4079b251daf068a8cf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "hammer_of_the_open_lock",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/hammer_of_the_open_lock.webp",
+      "canonicalDisplayName": "Hammer of the Open Lock",
+      "acceptedSha256": "44bfd13cc9647ef84c29a5f42e6ad2dc39640a9604a9872239de7018405c5ceb",
+      "acceptedBytes": 3070,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/hammer_of_the_open_lock.png",
+        "sha256": "022f698aa8002215eef49cee5ba5ba45e83083fc5399b165efcbe1da49341c4b",
+        "bytes": 2164856,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/hammer_of_the_open_lock.png",
+        "sha256": "061cf5d0bfc435121476e8af91d3f164597c294952f21b43c826380dced4d1aa",
+        "bytes": 469141,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "f689667a677f5a3c7865e8a0d3dc5dfa16b5afd713750a7702ba128ef8712eca",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Hammer of the Open Lock (hammer_of_the_open_lock) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete large two-handed smith's forge hammer diagonally posed, massive squared black iron head wound with a broken heavy chain. Clearly visible simple glowing icy-blue open-padlock emblem embossed on broad hammer face, no letters. Long dark wooden haft with iron bands and leather grip. Whole head and butt visible. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/hammer_of_the_open_lock.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f689667a677f5a3c7865e8a0d3dc5dfa16b5afd713750a7702ba128ef8712eca"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vestments_of_the_waking_rite",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/vestments_of_the_waking_rite.webp",
+      "canonicalDisplayName": "Vestments of the Waking Rite",
+      "acceptedSha256": "ed7ae1c55e3cc5bb5f80874ed1b46232e519a7451d321b523305a01844b592b8",
+      "acceptedBytes": 3608,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/vestments_of_the_waking_rite.png",
+        "sha256": "e494d7468ddfa38a2c1442ec4f3806387f0c803fef41e5401ad13e4cf8028521",
+        "bytes": 2246938,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/vestments_of_the_waking_rite.png",
+        "sha256": "4d4480b61c8abb6b333056771ca09731915fa0d75d4486b1548cec03d7dbb309",
+        "bytes": 506342,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "0a870886e4299fd0131f4a7e23517721b8bffd0981d1279d5f830dd73545f9f5",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Vestments of the Waking Rite (vestments_of_the_waking_rite) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty violet ritual CLOTH robe beneath a black fur shoulder mantle. White frost on the left shoulder, small ember-cracked iron ornament at right shoulder, dark violet flowing skirt and subtle green soulfire reflections. Main garment unmistakably soft cloth, no wearer or mannequin. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/vestments_of_the_waking_rite.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "0a870886e4299fd0131f4a7e23517721b8bffd0981d1279d5f830dd73545f9f5"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "foremans_last_link",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/foremans_last_link.webp",
+      "canonicalDisplayName": "Foreman's Last Link",
+      "acceptedSha256": "8904601afba39037bc6d2b11cb102fca60266eea36b5aa547c79c37c833598da",
+      "acceptedBytes": 4232,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/foremans_last_link.png",
+        "sha256": "544dde71735630b22bac19f1c32a8df93119f07c1d51a92ef09c58623f2b3dc6",
+        "bytes": 2452123,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/foremans_last_link.png",
+        "sha256": "d1a4f6b2cd037a6a81ad7b00adfe6c1757a4119bb00f527298b506fcfc838518",
+        "bytes": 528898,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "e3a49505537b22c00d9c2d841b1e9a86667d468a214f2512bc0113f60ea91059",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Foreman's Last Link (foremans_last_link) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One massive complete oval dark iron chain link with short broken chain stubs at either side, lightly rimed in white frost. A red-hot diagonal goad-brand rod crosses through its opening and partially obscures a small blue abstract seal medallion. Thick heavy iron loop is dominant, red and icy blue restrained accents. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/foremans_last_link.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "e3a49505537b22c00d9c2d841b1e9a86667d468a214f2512bc0113f60ea91059"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "phial_of_the_tithe",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/phial_of_the_tithe.webp",
+      "canonicalDisplayName": "Phial of the Tithe",
+      "acceptedSha256": "911b7c80afe1b9ff0095d4e4f8eb7ab753dfa231097d8cd29dd7f708ba106063",
+      "acceptedBytes": 3722,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/phial_of_the_tithe.png",
+        "sha256": "46d3ebfc848c2faa989a8aa2e4e3894d01fea8a8eaab988c1c0842fd01b59f1f",
+        "bytes": 2448960,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/phial_of_the_tithe.png",
+        "sha256": "8c0cdf62627f975836efe4939c0d2bc28db30c1bebb23fe56b018cc971e115a7",
+        "bytes": 561632,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "1bf954298ecc369aa64d346a2412942d96395cf87674c53ed55b262efc8f6fc2",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Phial of the Tithe (phial_of_the_tithe) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete caged glass phial containing swirling violet-green soulfire. Thin black iron cage around clear bulbous glass, narrow neck with cork and plain dark crimson wax seal on front. Magical light visible through glass, no lettering, complete bottle with generous padding. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/phial_of_the_tithe.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "1bf954298ecc369aa64d346a2412942d96395cf87674c53ed55b262efc8f6fc2"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "quenchwater_flask",
+      "family": "gravewyrm",
+      "batch": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/quenchwater_flask.webp",
+      "canonicalDisplayName": "Quenchwater Flask",
+      "acceptedSha256": "bf449d2c12ce1c5d2a662c73aca509f8e70506fa4ac266d6500f7737ab24a909",
+      "acceptedBytes": 2796,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/originals/quenchwater_flask.png",
+        "sha256": "b1310fc0b883e0b413214f8280bcb249499c70b75e37b419d98b72b1a47c87f9",
+        "bytes": 2216075,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-gravewyrm/masters/quenchwater_flask.png",
+        "sha256": "4cbe1cc35fd989db8cc305c2e4181f9583e4e8f7fcb803d9ca5acc623a46c59a",
+        "bytes": 486478,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+        "sha256": "40a8657762df46407ae9f11d16d9aceec730c0ff6e6386be0b007bb6d37f7254",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Edit this fantasy MMORPG Quenchwater Flask inventory icon (quenchwater_flask). Preserve the same hammered iron flask, dark glass window, black water, frost, painterly style and lighting. Fix framing: show a SHORT complete detached red-hot blade fragment resting in the neck, with its upper broken end fully visible and at least 12 percent empty dark background above it. Scale the complete flask and blade fragment composition down slightly so every solid edge stays inside a generous safe margin on all sides. Keep the blade fragment secondary to the flask. The steam may curl softly above the blade but must fade before the image edge. Opaque square dark charcoal-umber vignette, no text, letters, UI or border.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/superseded/quenchwater_flask.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "40a8657762df46407ae9f11d16d9aceec730c0ff6e6386be0b007bb6d37f7254"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "tmp/imagegen/v045-dungeon-gravewyrm/rejected/quenchwater_flask-cropped-blade.png",
+            "role": "image-edit input: initial painting rejected for cropped blade",
+            "sha256": "8aea47a386b735a3d593a2e22d50d321a038e19f4d005bdd58ee59cf2152705c"
+          }
+        ],
+        "retryCount": 1,
+        "initialPrompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Quenchwater Flask (quenchwater_flask) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete squat smith's flask of hammered black iron with a large round dark-glass viewing window full of almost-black quenchwater. Short red-hot blade tip rests in the open narrow neck, small white steam curls rising where it meets water. Frost specks on iron, cold blue liquid reflections, flask dominates the composition. Preserve established Gravewyrm Sanctum loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "retryHistory": [
+          "Initial source cropped the blade at the top edge; corrected with built-in image editing."
+        ]
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-gravewyrm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

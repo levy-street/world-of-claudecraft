@@ -5,6 +5,11 @@
 // around the roots of a great tree. Reached only by portal: the southern
 // border ridge is sealed (see sealedSouthBorder in world.ts).
 
+import {
+  ELDERSHINE_LAYOUT,
+  ELDERSHINE_NPC_PLACEMENTS_BY_ID,
+  paintedTownBuildingDefs,
+} from '../painted_towns';
 import type {
   CampDef,
   GroundObjectDef,
@@ -493,8 +498,9 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'loremother_bryn',
     name: 'Loremother Bryn',
     title: 'Voice of the Shrine',
-    pos: { x: -20, z: 1015 },
-    facing: -0.9,
+    // at the painted shrine's door (sim/painted_towns/eldershine.ts)
+    pos: { ...ELDERSHINE_NPC_PLACEMENTS_BY_ID.loremother_bryn.position },
+    facing: ELDERSHINE_NPC_PLACEMENTS_BY_ID.loremother_bryn.facing,
     color: 0xc4b08a,
     questIds: ['q_spore_hearts', 'q_wisp_lights', 'q_treant_accord', 'q_spore_tide'],
     greeting: 'Every light in this valley remembers something, $N. Help me listen.',
@@ -1168,21 +1174,11 @@ export const REALM_PROPS: ZonePropsDef = {
   // model spans 0.85 native at its base, 5.5yd at the 6.5x town scale), so
   // players collide with the visual bark instead of sinking into it.
   greatTrees: [{ x: -40, z: 1026, r: 5.5 }],
-  buildings: [
-    // The whole town is the KayKit medieval set in the Hollow's dusk palette
-    // (violet roofs, warm timber; render/props.ts maps each kind to its GLB).
-    // Layout is radial: everything rings the great tree at (-40,1026), placed
-    // in the quiet sectors BETWEEN the four spoke roads, doors facing the
-    // tree, well clear of the ring path (r 14) and every spoke corridor.
-    { kind: 'hollowInn', x: -59, z: 1033, w: 6, d: 7, rot: 1.92 }, // northwest sector
-    { kind: 'hollowHouse', x: -52, z: 1041, w: 7, d: 6, rot: 2.47 },
-    { kind: 'hollowHouse', x: -33, z: 1044, w: 7, d: 6, rot: 2.77 }, // northeast sector
-    { kind: 'hollowHouse', x: -24, z: 1038, w: 6, d: 6, rot: -2.21 },
-    { kind: 'hollowSmith', x: -21, z: 1023, w: 7, d: 6.5, rot: -1.41 }, // southeast sector
-    { kind: 'hollowChapel', x: -18, z: 1012, w: 5, d: 7, rot: -0.9 }, // the shrine
-    { kind: 'hollowHouse', x: -47, z: 1008, w: 7, d: 6, rot: 0.37 }, // southwest sector
-    { kind: 'hollowMarket', x: -54, z: 1010, w: 8, d: 6, rot: 0.72 }, // the Duskfall approach
-  ],
+  // The town is radial: the painted inn, shrine, market, smithy and wayhouse
+  // ring the great tree at (-40,1026) in the quiet sectors BETWEEN the four
+  // spoke roads, doors on the ring or on their spoke, clear of the ring path
+  // (r 14) and every spoke corridor (sim/painted_towns/eldershine.ts).
+  buildings: [...paintedTownBuildingDefs(ELDERSHINE_LAYOUT)],
   wells: [{ x: -40, z: 1035, r: 1.5 }], // inside the ring, north of the tree
   stalls: [
     // the market stalls nestle close under the tree, facing out at the ring

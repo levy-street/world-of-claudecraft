@@ -59,7 +59,18 @@ export function movementInputWouldMove(
   steepGround: boolean,
   mountLocked: boolean,
 ): boolean {
-  return hasMovementInput(inp) && !isRooted(p) && !steepGround && !mountLocked;
+  return (
+    hasMovementInput(inp) && !isRooted(p) && !steepGround && !mountLocked && !isFeigningDeath(p)
+  );
+}
+
+// A hunter lying in Play Dead never translates: held keys either end it on the
+// hunter tick (combat/hunter_play_dead.ts) or, inside the grace window after a
+// moving cast, are ignored, so the body never slides along the ground. Read off
+// the aura kind directly (not isPlayingDead) to keep this module import-free of
+// the Play Dead module, which imports hasMovementInput from here.
+export function isFeigningDeath(p: Entity): boolean {
+  return p.auras.some((aura) => aura.kind === 'feign_death');
 }
 
 export function heldMovementInputWouldMove(p: Entity, inp: MoveInput, seed: number): boolean {

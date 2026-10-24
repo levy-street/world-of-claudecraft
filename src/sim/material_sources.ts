@@ -275,6 +275,47 @@ function readHeld(value: unknown): MaterialSourceResult<HeldBuckets> {
   return succeed({ buckets, total });
 }
 
+/** Command-local validated composition. Private backing never leaves this value;
+ * materialization always returns a detached canonical composition. */
+export class PreparedMaterialComposition {
+  #buckets: BucketMap;
+  #total: number;
+
+  get total(): number {
+    return this.#total;
+  }
+
+  private constructor(held: HeldBuckets) {
+    this.#buckets = held.buckets;
+    this.#total = held.total;
+  }
+
+  static read(
+    value: unknown,
+    expectedTotal: number,
+  ): MaterialSourceResult<PreparedMaterialComposition> {
+    const held = readHeld(value);
+    if (!held.ok) return held;
+    if (!Number.isSafeInteger(expectedTotal) || expectedTotal < 0) return fail('invalid-count');
+    if (held.value.total !== expectedTotal) return fail('sum-mismatch');
+    return succeed(new PreparedMaterialComposition(held.value));
+  }
+
+  materialize(): MaterialComposition {
+    return finalize(this.#buckets);
+  }
+
+  merge(other: PreparedMaterialComposition): MaterialSourceResult<PreparedMaterialComposition> {
+    const merged = copyBuckets(this.#buckets);
+    for (const bucket of other.#buckets.values()) {
+      if (!addBucket(merged, bucket.source, bucket.count)) return fail('count-overflow');
+    }
+    const total = this.total + other.total;
+    if (!Number.isSafeInteger(total)) return fail('count-overflow');
+    return succeed(new PreparedMaterialComposition({ buckets: merged, total }));
+  }
+}
+
 /** Validates signed legs (nonzero safe integer counts) and coalesces them. */
 function readDeltas(value: unknown): MaterialSourceResult<BucketMap> {
   if (!Array.isArray(value)) return fail('invalid-source');

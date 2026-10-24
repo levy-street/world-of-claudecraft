@@ -28,6 +28,8 @@ const settings = {
   terrainRelief: 3,
   bladeCarpetRadius: 34,
   cliffScree: true,
+  cityClutter: true,
+  cityClutterRadius: 45,
   canopyDetail: true,
   canopyDetailTaps: 6,
   pixelRatioCap: 2.5,
@@ -36,6 +38,10 @@ const settings = {
   grassCardsPerTuft: 4,
   leanFoliage: false,
   standardMaterials: true,
+  sceneryGeometryLodDistance: 0,
+  sceneryDetail: false,
+  coconutCellSize: 0,
+  lowReadabilityLighting: false,
   terrainSplat: true,
   maxPointLights: 6,
   farCharacterAnimScale: 1.55,
@@ -65,6 +71,8 @@ describe('gfx override parsing', () => {
           'terrainRelief:2',
           'bladeCarpetRadius:24',
           'cliffScree:0',
+          'cityClutter:0',
+          'cityClutterRadius:30',
           'canopyDetail:0',
           'canopyDetailTaps:3',
           'pixelRatioCap:1.48',
@@ -73,6 +81,9 @@ describe('gfx override parsing', () => {
           'grassCardsPerTuft:3',
           'leanFoliage:1',
           'standardMaterials:0',
+          'sceneryGeometryLodDistance:180',
+          'coconutCellSize:128',
+          'lowReadabilityLighting:1',
           'terrainSplat:0',
           'maxPointLights:3',
           'farCharacterAnimScale:1',
@@ -98,6 +109,8 @@ describe('gfx override parsing', () => {
       terrainRelief: 2,
       bladeCarpetRadius: 24,
       cliffScree: false,
+      cityClutter: false,
+      cityClutterRadius: 30,
       canopyDetail: false,
       canopyDetailTaps: 3,
       pixelRatioCap: 1.48,
@@ -106,6 +119,9 @@ describe('gfx override parsing', () => {
       grassCardsPerTuft: 3,
       leanFoliage: true,
       standardMaterials: false,
+      sceneryGeometryLodDistance: 180,
+      coconutCellSize: 128,
+      lowReadabilityLighting: true,
       terrainSplat: false,
       maxPointLights: 3,
       farCharacterAnimScale: 1,
@@ -142,7 +158,7 @@ describe('gfx override parsing', () => {
 });
 
 describe('gfx override application', () => {
-  it('pins no-gfxo derived settings bytes for every preset profile', () => {
+  it('pins existing settings bytes and the new Low knobs for every preset profile', () => {
     const cases = {
       low: gfxInternalsForTest.settingsFor('low'),
       medium: gfxInternalsForTest.settingsFor('medium'),
@@ -152,10 +168,29 @@ describe('gfx override application', () => {
       advanced: gfxInternalsForTest.settingsFor('high', { graphicsPreset: 5 }),
     };
     const hashes = Object.fromEntries(
-      Object.entries(cases).map(([preset, derived]) => [
-        preset,
-        createHash('sha256').update(JSON.stringify(derived)).digest('hex'),
-      ]),
+      Object.entries(cases).map(([preset, derived]) => {
+        const {
+          sceneryGeometryLodDistance,
+          sceneryDetail,
+          coconutCellSize,
+          lowReadabilityLighting,
+          ...existing
+        } = derived;
+        expect(coconutCellSize).toBe(preset === 'low' ? 128 : 0);
+        expect(sceneryGeometryLodDistance).toBe(preset === 'low' ? 180 : 0);
+        expect(sceneryDetail).toBe(true);
+        expect(lowReadabilityLighting).toBe(preset === 'low');
+        // The cel branch bumped the config version for its Low settings.
+        // Normalize only that marker to the integration parent's v21 pins:
+        // every existing dial must still match, including Advanced's High base.
+        expect(existing.graphicsConfigVersion).toBe(22);
+        return [
+          preset,
+          createHash('sha256')
+            .update(JSON.stringify({ ...existing, graphicsConfigVersion: 21 }))
+            .digest('hex'),
+        ];
+      }),
     );
 
     // Regenerated for the GfxSettings.nativeIosMemoryProfile -> iosMemoryProfile rename (the
@@ -215,13 +250,31 @@ describe('gfx override application', () => {
     // style (occluder_dither_fade.ts). It moves a VALUE: true on low and medium,
     // false on high, ultra, insane and the Advanced default mix (no dial hint,
     // so it inherits the high base). Named pins: tests/graphics_rebuild_core.test.ts.
+    // The LOW and MEDIUM rows alone moved for the painted-clutter gate
+    // (gfx.ts cityClutter/cityClutterRadius, 2026-09-22). Medium moves by two
+    // VALUES: it now draws the layer (false -> true) in a tight 30yd ring
+    // (45 -> 30) because medium is the auto-default for Apple Silicon Macs and
+    // a High gate hid authored ground dressing from them. Low moves only by
+    // the inert radius falling through the same new branch (45 -> 30); its
+    // cityClutter stays false, so it still builds nothing. high/ultra/insane
+    // and the Advanced mix do NOT move, which is the check that the tighter
+    // ring is confined to the rungs below high.
+    // Regenerated across the board at the Studio merge (studio/main into
+    // release/v0.45.0): the two cityClutter keys are new to every release
+    // profile, so every row moves; measured on the merged gfx.ts.
+    // Regenerated across the board for `placedTextureTier`, the texture set a
+    // placed town building loads (placed_texture_tier_core.ts). The key is new
+    // to every profile; its VALUE is 'half' on low and 'full' on the other five
+    // (none of these desktop cases is a constrained-memory profile, which is
+    // the one that takes 'quarter'). Named pins:
+    // tests/placed_texture_tier_core.test.ts.
     expect(hashes).toEqual({
-      low: '0748e49e6ecb9bb2081cfa4ca45601ab831eb95a847c8c5c3034f311e8d20bab',
-      medium: '67edab8d72816c12af258dd60217db55751b57aa358a1a4c5df4fac1fb77d63d',
-      high: '0e135d2bc6a726fc190b0d52a8bb670369a7df5f142266c09150ce4a3d6ce1fd',
-      ultra: '72f80b79fdc37c36bd66133eafeb438f9fe091c3c4b16de256f74da1c1dfa857',
-      insane: '30ff1f03d0134187f92f3e71daeaf24d2fec937cba2a8b3630b228f81595825d',
-      advanced: '00214f627cbe2b5082c28d45e06911b445ef1ef3ca271a95d1998c3281fb0248',
+      low: '92f2725926f8d891875cbd97c9fd184b78848d2aaa062542fbda5ac599f259db',
+      medium: '89be3abe078ab01b9f66b77906f33c327011d6d03ec698ba666d9d1299628890',
+      high: '72b73c8b4551103c146cd3142a672e47f0ff0958d44125552ce26831bbd41799',
+      ultra: 'ec5adbfe8d406553307fe9a9b790bb260c73d1092d42e9200fa383833a6066ec',
+      insane: '6e4cda8517982d0159e1ebe49c0b82e14a42eec481c6f1224384e1165e7346da',
+      advanced: 'ea7e08b964e586c9084d0f8129e0fc5faf962e9e7028f5d1d235527dcd585f32',
     });
   });
 

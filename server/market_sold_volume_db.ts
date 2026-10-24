@@ -4,8 +4,8 @@
 // the book (server/admin_market_metrics.ts folds the live listing book), never
 // what had actually CHANGED HANDS, and the sim carries no durable sales record
 // to fold instead: `MarketCollection.sales` (src/sim/market_sale_log.ts) is a
-// PENDING ledger, itemised for the seller and cleared to empty the moment they
-// collect (src/sim/market.ts marketCollect). So sold volume is not a read that
+// per-seller rolling ledger, itemised for the seller's History tab and capped at
+// its most recent rows, so it is no realm-wide record. So sold volume is not a read that
 // was missing, it is a fact nothing was writing down. This table is the write.
 //
 // WHY A DAILY ROLL-UP AND NOT A SALE LOG. Nothing here needs an individual

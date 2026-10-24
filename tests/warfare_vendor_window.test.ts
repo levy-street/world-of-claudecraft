@@ -19,6 +19,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { talentsFor } from '../src/sim/content/talents';
+import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { FocusManager } from '../src/ui/focus_manager';
 import type {
@@ -29,7 +30,6 @@ import type {
 import {
   renderWarfareVendorWindow,
   type WarfareVendorWindowDeps,
-  warfarePurchaseConfirmBody,
 } from '../src/ui/hud/vendor/warfare_vendor_window';
 import { tTalent } from '../src/ui/talent_i18n';
 
@@ -65,7 +65,6 @@ function offer(
     itemId,
     item: item(itemId, slot),
     honor: 100,
-    copper: 0,
     affordable: true,
     owned: false,
     ...over,
@@ -90,12 +89,8 @@ function section(key: string, offers: WarfareShopOffer[]): WarfareShopSection {
   };
 }
 
-function view(
-  sections: WarfareShopSection[],
-  balance = 500,
-  goldBalance: number | null = null,
-): WarfareShopView {
-  return { sections, balance, goldBalance };
+function view(sections: WarfareShopSection[], balance = 500): WarfareShopView {
+  return { sections, balance };
 }
 
 function deps(over: Partial<WarfareVendorWindowDeps> = {}): WarfareVendorWindowDeps {
@@ -176,49 +171,6 @@ describe('renderWarfareVendorWindow: focus keys are namespaced per section', () 
   });
 });
 
-describe('renderWarfareVendorWindow: Season 1 rows sell for gold', () => {
-  it('paints the coin readout and names the gold price, never Honor', () => {
-    const el = mount();
-    renderWarfareVendorWindow(
-      el,
-      'Draven',
-      view([
-        section(SET_A, [
-          offer('gold_helm', 'helmet', { honor: 0, copper: 170_000 }),
-          offer('poor_chest', 'chest', { honor: 0, copper: 220_000, affordable: false }),
-        ]),
-      ]),
-      deps(),
-    );
-    const helm = tile(el, `buy:${SET_A}:gold_helm`);
-    expect(helm.querySelector('.vi-price')?.innerHTML).toBe('170000c');
-    expect(helm.querySelector('.warfare-price')).toBeNull();
-    expect(helm.getAttribute('aria-label')).toBe('Buy gold_helm for 17 gold 0 silver');
-    const chest = tile(el, `buy:${SET_A}:poor_chest`);
-    expect(chest.disabled).toBe(true);
-    expect(chest.querySelector('.vi-price')?.classList.contains('unaffordable')).toBe(true);
-  });
-
-  it('shows the coin purse beside the Honor balance only when a row sells for gold', () => {
-    const el = mount();
-    const rows = [offer('gold_helm', 'helmet', { honor: 0, copper: 170_000 })];
-    renderWarfareVendorWindow(el, 'Draven', view([section(SET_A, rows)], 500, 1_234_567), deps());
-    expect(el.querySelector('.warfare-balance .warfare-balance-gold')?.innerHTML).toBe('1234567c');
-    renderWarfareVendorWindow(el, 'Draven', view([section(SET_A, rows)], 500, null), deps());
-    expect(el.querySelector('.warfare-balance-gold')).toBeNull();
-  });
-
-  it('confirms a gold purchase in gold and an Honor purchase in Honor', () => {
-    const gold = { ...item('gold_helm', 'helmet'), priceHonor: undefined, buyValue: 170_000 };
-    expect(warfarePurchaseConfirmBody(gold as ItemDef)).toBe(
-      'Buy gold_helm for 17 gold 0 silver? This purchase cannot be refunded.',
-    );
-    expect(warfarePurchaseConfirmBody(item('honor_helm', 'helmet'))).toBe(
-      'Buy honor_helm for 100 Honor? Honor purchases cannot be refunded.',
-    );
-  });
-});
-
 describe('renderWarfareVendorWindow: painted Honor identity', () => {
   it('renders the Honor painting in both the live balance and each purchasable price', () => {
     const el = mount();
@@ -243,6 +195,73 @@ describe('renderWarfareVendorWindow: painted Honor identity', () => {
     ]);
     expect(icons[0].closest('.warfare-balance')).not.toBeNull();
     expect(icons[1].closest('.warfare-price')).not.toBeNull();
+  });
+});
+
+describe('renderWarfareVendorWindow: direct buddy purchases', () => {
+  function companionView(owned: boolean): WarfareShopView {
+    return view([
+      {
+        kind: 'companions',
+        group: 'entry',
+        key: 'companions',
+        offers: [
+          {
+            itemId: 'whistle_horse',
+            item: ITEMS.whistle_horse,
+            honor: 100_000,
+            affordable: true,
+            owned,
+          },
+        ],
+      },
+    ]);
+  }
+
+  it('offers Tug, the Warhorse by name and explains the immediate unlock without an inventory item', () => {
+    const el = mount();
+    const onBuy = vi.fn();
+    const itemTooltip = vi.fn();
+    let tooltip = '';
+    renderWarfareVendorWindow(
+      el,
+      'FURY',
+      companionView(false),
+      deps({
+        onBuy,
+        itemTooltip,
+        attachTooltip: (_el, build) => {
+          tooltip = build();
+        },
+      }),
+    );
+    const horse = tile(el, 'buy:companions:whistle_horse');
+    expect(horse.querySelector('.vi-name')?.textContent).toBe('Tug, the Warhorse');
+    expect(horse.getAttribute('aria-label')).toBe('Buy Tug, the Warhorse for 100,000 Honor');
+    expect(tooltip).toContain('Permanently unlocks this buddy and summons it immediately.');
+    expect(tooltip).toContain('No item is added to your bags.');
+    expect(itemTooltip).not.toHaveBeenCalled();
+    horse.click();
+    expect(onBuy).toHaveBeenCalledExactlyOnceWith('whistle_horse');
+  });
+
+  it('disables an acquired buddy while owned gear remains purchasable', () => {
+    const el = mount();
+    const onBuy = vi.fn();
+    const model = companionView(true);
+    model.sections.unshift(section(SET_A, [offer('a_one', 'helmet', { owned: true })]));
+    renderWarfareVendorWindow(el, 'FURY', model, deps({ onBuy }));
+    const horse = tile(el, 'buy:companions:whistle_horse');
+    expect(horse.disabled).toBe(true);
+    expect(horse.getAttribute('aria-label')).toBe(
+      'Tug, the Warhorse, already collected or awaiting reveal',
+    );
+    horse.click();
+    expect(onBuy).not.toHaveBeenCalled();
+    const gear = tile(el, `buy:${SET_A}:a_one`);
+    expect(gear.disabled).toBe(false);
+    gear.click();
+    expect(onBuy).toHaveBeenCalledExactlyOnceWith('a_one');
   });
 });
 

@@ -4,7 +4,7 @@
 // localized (the callers pass t() output).
 
 import { t } from '../ui/i18n';
-import { button, el } from './dom';
+import { button, checkbox, el } from './dom';
 
 const TOAST_LIFE_MS = 4200;
 const TOAST_CAP = 4;
@@ -53,13 +53,15 @@ export interface ConfirmOptions {
   danger?: boolean;
 }
 
-interface ModalHandles {
+export interface ModalHandles {
   overlay: HTMLElement;
   panel: HTMLElement;
   close(): void;
 }
 
-function buildModal(parent: HTMLElement, title: string, onClose: () => void): ModalHandles {
+/** Shared modal chrome (overlay, panel, title, Escape/backdrop dismissal);
+ *  richer dialogs (new-map size) compose it from their own modules. */
+export function buildModal(parent: HTMLElement, title: string, onClose: () => void): ModalHandles {
   const overlay = el('div', 'ed-modal-overlay');
   const panel = el('div', 'ed-modal');
   panel.setAttribute('role', 'dialog');
@@ -107,6 +109,52 @@ export function confirmDialog(parent: HTMLElement, opts: ConfirmOptions): Promis
       opts.confirmLabel ?? t('editor.confirm.ok'),
       () => {
         settle(true);
+        modal.close();
+      },
+      opts.danger ? 'danger' : 'primary',
+    );
+    row.append(cancel, ok);
+    modal.panel.appendChild(row);
+    ok.focus();
+  });
+}
+
+export interface OptOutConfirmOptions extends ConfirmOptions {
+  /** Label for the decline button (defaults to the localized Cancel). */
+  cancelLabel?: string;
+  /** Label for the "don't ask again" tick box. */
+  optOutLabel: string;
+}
+
+/** Confirm with a "don't ask again" tick box. Resolves the answer plus whether
+ *  the maker ticked the box; a dismissal (Escape / backdrop) counts as "no"
+ *  and never opts out. */
+export function optOutConfirmDialog(
+  parent: HTMLElement,
+  opts: OptOutConfirmOptions,
+): Promise<{ ok: boolean; optOut: boolean }> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const settle = (ok: boolean, optOut: boolean): void => {
+      if (!settled) {
+        settled = true;
+        resolve({ ok, optOut });
+      }
+    };
+    const modal = buildModal(parent, opts.title, () => settle(false, false));
+    modal.panel.appendChild(el('p', 'ed-modal-body', opts.body));
+    const tick = checkbox(opts.optOutLabel, false, () => {});
+    tick.root.classList.add('ed-modal-optout');
+    modal.panel.appendChild(tick.root);
+    const row = el('div', 'ed-modal-actions');
+    const cancel = button(opts.cancelLabel ?? t('editor.confirm.cancel'), () => {
+      settle(false, tick.input.checked);
+      modal.close();
+    });
+    const ok = button(
+      opts.confirmLabel ?? t('editor.confirm.ok'),
+      () => {
+        settle(true, tick.input.checked);
         modal.close();
       },
       opts.danger ? 'danger' : 'primary',

@@ -34,6 +34,7 @@ function collect(p: Partial<Entity>, meta: Partial<PlayerMeta>): Record<string, 
       ...p,
     } as Entity,
     'heroic',
+    'normal',
   );
   return out;
 }
@@ -61,6 +62,7 @@ describe('emitSelfScalarKeys', () => {
       hrat: 10,
       hirat: 11,
       ddiff: 'heroic',
+      adiff: 'normal',
     });
   });
 

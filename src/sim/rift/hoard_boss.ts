@@ -62,7 +62,7 @@ import {
   tickHoardPulsarCue,
   tickHoardPulsars,
 } from './hoard_pulsars';
-import { hoardMechanicDamage, hoardPlayerBudget, hoardPressure } from './hoard_scaling';
+import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
 import { isSilkCue, tickHoardSilkSnare } from './hoard_silk_snare';
 import {
   resolveHoardStormStaticTargets,
@@ -141,10 +141,9 @@ export function hoardMarkTargetCount(livingPlayers: number): number {
 export function hoardMarkTargets(
   sortedLivingIds: readonly number[],
   cursor: number,
-  playerBudget = sortedLivingIds.length,
 ): { ids: number[]; nextCursor: number } {
   if (sortedLivingIds.length === 0) return { ids: [], nextCursor: 0 };
-  const count = Math.min(sortedLivingIds.length, hoardMarkTargetCount(playerBudget));
+  const count = hoardMarkTargetCount(sortedLivingIds.length);
   const ids: number[] = [];
   for (let index = 0; index < count; index++) {
     ids.push(sortedLivingIds[(cursor + index) % sortedLivingIds.length]);
@@ -1062,7 +1061,6 @@ function startMarks(
   const selection = hoardMarkTargets(
     livingPlayers.map((player) => player.id),
     state.targetCursor,
-    hoardPlayerBudget(inst.vault, livingPlayers.length),
   );
   state.targetCursor = selection.nextCursor;
   const authored = hoardMarkSpec(variant);

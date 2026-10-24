@@ -69,6 +69,8 @@ export function weaponSkinCollectionLabel(collection: WeaponSkinCollection): str
       return t('hudChrome.wocStore.collections.hoarfrost');
     case 'fallen_star':
       return t('hudChrome.wocStore.collections.fallen_star');
+    case 'lantern_hall':
+      return t('hudChrome.wocStore.collections.lantern_hall');
   }
 }
 
@@ -114,6 +116,31 @@ const ARMORY_SKIN_KEYS = {
     name: 'hudChrome.wocStore.skins.fletcher_s_guild_bow.name',
     look: 'hudChrome.wocStore.skins.fletcher_s_guild_bow.look',
     lore: 'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore',
+  },
+  lantern_hall_sword: {
+    name: 'hudChrome.wocStore.skins.lantern_hall_sword.name',
+    look: 'hudChrome.wocStore.skins.lantern_hall_sword.look',
+    lore: 'hudChrome.wocStore.skins.lantern_hall_sword.lore',
+  },
+  hearthbrand_sword: {
+    name: 'hudChrome.wocStore.skins.hearthbrand_sword.name',
+    look: 'hudChrome.wocStore.skins.hearthbrand_sword.look',
+    lore: 'hudChrome.wocStore.skins.hearthbrand_sword.lore',
+  },
+  squallcrest_sword: {
+    name: 'hudChrome.wocStore.skins.squallcrest_sword.name',
+    look: 'hudChrome.wocStore.skins.squallcrest_sword.look',
+    lore: 'hudChrome.wocStore.skins.squallcrest_sword.lore',
+  },
+  rimelight_staff: {
+    name: 'hudChrome.wocStore.skins.rimelight_staff.name',
+    look: 'hudChrome.wocStore.skins.rimelight_staff.look',
+    lore: 'hudChrome.wocStore.skins.rimelight_staff.lore',
+  },
+  duskwick_staff: {
+    name: 'hudChrome.wocStore.skins.duskwick_staff.name',
+    look: 'hudChrome.wocStore.skins.duskwick_staff.look',
+    lore: 'hudChrome.wocStore.skins.duskwick_staff.lore',
   },
   cinderbrand_sword: {
     name: 'hudChrome.wocStore.skins.cinderbrand_sword.name',

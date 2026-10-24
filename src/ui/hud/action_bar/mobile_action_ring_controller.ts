@@ -38,7 +38,7 @@ import {
   ATTACK_ICON_KEY,
   createActionBarView,
 } from './action_bar_view';
-import { handleMobileAttackTap } from './hotbar';
+import { type HotbarAction, handleMobileAttackTap, hotbarPetCommand } from './hotbar';
 import { MOBILE_ACTION_BUTTONS } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import type { RadialDirection, RadialPlacement } from './radial_action_core';
@@ -82,7 +82,7 @@ export interface MobileActionRingDeps {
   aimOwnsButton(buttonIndex: number): boolean;
   /** Cancel the active ground aim owned by a ring button. */
   cancelAim(): void;
-  actionForSlot(slot: number): unknown;
+  actionForSlot(slot: number): HotbarAction;
   abilityForSlot(slot: number): ActionBarAbility | null;
   itemForSlot(slot: number): ItemDef | null;
   /** The empowered ability a slot holds, if any: an empowered hold owns the
@@ -237,6 +237,7 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
           hasAction: () => deps.actionForSlot(deps.sourceSlot(i, 'center')) !== null,
           ability: () => deps.abilityForSlot(deps.sourceSlot(i, 'center')),
           item: () => deps.itemForSlot(deps.sourceSlot(i, 'center')),
+          petCommand: () => hotbarPetCommand(deps.actionForSlot(deps.sourceSlot(i, 'center'))),
           keybindLabel: () => '',
           ownsAimSlot: () => deps.aimOwnsButton(i),
         })),
@@ -348,6 +349,10 @@ function buildRadialPetals(
         item: () => {
           const slot = petalSlot(deps, gesture, direction);
           return slot === null ? null : deps.itemForSlot(slot);
+        },
+        petCommand: () => {
+          const slot = petalSlot(deps, gesture, direction);
+          return slot === null ? null : hotbarPetCommand(deps.actionForSlot(slot));
         },
         keybindLabel: () => '',
       })),

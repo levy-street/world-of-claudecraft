@@ -1,0 +1,40 @@
+{
+  "bagBar": [
+    "http://localhost:5173/ui/items/backpack.webp",
+    "http://localhost:5173/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5173/ui/items/baked_bread.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_arms_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_arms_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_arms_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_arms_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_arms_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_fury_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_fury_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_fury_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_fury_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_fury_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_prot_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_prot_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_prot_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_prot_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_warrior_prot_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_holy_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_holy_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_holy_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_holy_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_holy_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_protection_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_protection_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_protection_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_protection_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_protection_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_retribution_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_retribution_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_retribution_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_retribution_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_paladin_retribution_gloves.webp"
+  ],
+  "allDecoded": true
+}

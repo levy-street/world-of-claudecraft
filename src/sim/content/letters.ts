@@ -25,6 +25,20 @@ export interface LetterDef {
   delaySeconds?: number;
 }
 
+export const MEMBERSHIP_TOKEN_LETTER: LetterDef = {
+  letterId: 'membership_token_delivery',
+  senderName: 'The Ravenpost',
+  subject: 'Your membership token',
+  body: 'Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer.',
+};
+
+export const MEMBERSHIP_ANNUAL_LETTER: LetterDef = {
+  letterId: 'membership_annual_reward',
+  senderName: 'The Ravenpost',
+  subject: 'Your annual membership mount',
+  body: 'Your annual membership payment is complete. Your mount reins are enclosed. Keep the reins in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required.',
+};
+
 // The one-time service letter. Sent to every character that has never been
 // welcomed (new characters right away, pre-mail characters on their next
 // login), so it doubles as the feature announcement.
@@ -182,6 +196,24 @@ export const HOARD_REWARD_LETTER: LetterDef = {
     'The vault was cleared, but your share was not collected from the ' +
     'chest. The ravens have brought it to you here, with the goods and coin ' +
     'you earned attached.\n\n' +
+    '- The Ravenpost',
+  delaySeconds: 0,
+};
+
+// World quest reward letter: a world quest reward item (the quest's fixed
+// extra, the day's item slot piece, the slate's treasure map, a treasure
+// hunt's casket, or the weekly charge's cache) that did not fit in the bags
+// when it was earned. The item rides as the attachment;
+// world_quest_reward_mail.ts fills `items` per grant, so this base carries
+// none. Body stays count-free so the letterId localizes cleanly.
+export const WORLD_QUEST_REWARD_LETTER: LetterDef = {
+  letterId: 'world_quest_reward',
+  senderName: 'The Ravenpost',
+  subject: 'Your world quest reward',
+  body:
+    'Your bags were full when you earned this world quest reward, so the ' +
+    'ravens have brought it to you here instead. Make some room and collect ' +
+    'it from any raven pillar.\n\n' +
     '- The Ravenpost',
   delaySeconds: 0,
 };
@@ -600,6 +632,9 @@ export function authoredLettersById(): Record<string, LetterDef> {
     [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
     [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
     [HOARD_REWARD_LETTER.letterId]: HOARD_REWARD_LETTER,
+    [MEMBERSHIP_TOKEN_LETTER.letterId]: MEMBERSHIP_TOKEN_LETTER,
+    [MEMBERSHIP_ANNUAL_LETTER.letterId]: MEMBERSHIP_ANNUAL_LETTER,
+    [WORLD_QUEST_REWARD_LETTER.letterId]: WORLD_QUEST_REWARD_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) byId[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) byId[letter.letterId] = letter;

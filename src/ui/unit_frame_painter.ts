@@ -101,6 +101,8 @@ export interface UnitFrameElements {
    *  elsewhere (the player name is set at login, not on the hot path). A frame
    *  whose name changes per unit (target/party) supplies it. */
   name?: HTMLElement;
+  /** Self risk surfaces, independent of the overhead nameplate. */
+  pvpRisk?: { badge: HTMLElement; minimap: HTMLElement };
   /** The title-decoration spans around the name (Book of Deeds display title),
    *  written from the view's pre-localized titlePre/titlePost strings; omitted
    *  by frames without a title surface (player, party), which then pay zero
@@ -191,6 +193,10 @@ export class UnitFramePainter {
     if (this.el.titlePre) this.writers.setText(this.el.titlePre, view.titlePre);
     if (this.el.titlePost) this.writers.setText(this.el.titlePost, view.titlePost);
     if (this.el.cheaterTag) this.writers.setText(this.el.cheaterTag, view.cheaterTag);
+    if (this.el.pvpRisk) {
+      this.writers.setDisplay(this.el.pvpRisk.badge, view.pvpRisk ? 'inline-flex' : 'none');
+      this.writers.toggleClass(this.el.pvpRisk.minimap, 'pvp-risk', view.pvpRisk === true);
+    }
     this.paintHeraldry(view);
     this.gatePortrait(view.portraitKey);
     this.writers.setText(this.el.level, view.levelText ?? '');

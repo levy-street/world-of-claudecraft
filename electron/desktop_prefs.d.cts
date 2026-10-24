@@ -20,8 +20,6 @@ export interface DesktopPrefs {
   gpuBackendProof?: GpuBackendProof;
   consecutiveGpuLaunchCrashes: number;
   launchesSinceBackendReprobe: number;
-  /** Hand-set off switch for the shader disk cache (electron/shader_disk_cache.cjs). */
-  shaderDiskCacheOptOut: boolean;
   windowBounds?: WindowRect;
   displayId?: number;
 }

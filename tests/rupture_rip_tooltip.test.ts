@@ -34,15 +34,15 @@ describe('Bleed Out and Bloodrift tooltips: $d shows the full five-point spend',
     expect(ABILITIES.rupture.description).toContain('2 sec per combo point');
   });
 
-  it('Bloodrift renders its 5-combo total (156), not the 36 base', () => {
+  it('Bloodrift renders its 5-combo total (312), not the 72 base', () => {
     const rip = abilitiesKnownAt('druid', 20, emptyModifiers()).find(
       (known) => known.def.id === 'rip',
     );
     if (!rip) throw new Error('missing rip');
 
-    expect(abilityEffectText(rip, NO_SCALING)).toBe('156');
-    expect(abilityEffectText(rip, NO_SCALING)).not.toBe('36');
-    expect(ABILITIES.rip.description).toContain('24 per combo point spent');
+    expect(abilityEffectText(rip, NO_SCALING)).toBe('312');
+    expect(abilityEffectText(rip, NO_SCALING)).not.toBe('72');
+    expect(ABILITIES.rip.description).toContain('48 per combo point spent');
   });
 
   it('both dots carry their scaling in data, so $d stays the full-spend number', () => {
@@ -58,9 +58,9 @@ describe('Bleed Out and Bloodrift tooltips: $d shows the full five-point spend',
 
     const bloodrift = ABILITIES.rip.effects[0];
     if (bloodrift?.type !== 'dot') throw new Error('rip is no longer a dot');
-    // Total scaling: 36 base plus 24 per point = the 156 `total` above.
-    expect(bloodrift.baseTotal).toBe(36);
-    expect(bloodrift.perComboTotal).toBe(24);
+    // Total scaling: 72 base plus 48 per point = the 312 `total` above.
+    expect(bloodrift.baseTotal).toBe(72);
+    expect(bloodrift.perComboTotal).toBe(48);
     expect((bloodrift.baseTotal ?? 0) + (bloodrift.perComboTotal ?? 0) * 5).toBe(bloodrift.total);
   });
 });

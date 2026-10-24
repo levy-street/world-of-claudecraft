@@ -56,6 +56,7 @@ describe('the wisp maze footprint', () => {
     // Nearest approach of each collider's real shape to the footprint rect.
     const reach = (c: Collider): number => {
       if (c.type === 'circle') return wispMazeFootprintDistance(c.x, c.z) - c.r;
+      if (c.type === 'prism') throw new Error('unexpected prism collider');
       let best = Number.POSITIVE_INFINITY;
       const cos = Math.cos(c.rot);
       const sin = Math.sin(c.rot);

@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pt_BR: Record<string, string> = {
+  'error.buddyGrantFailed': 'Não foi possível conceder o companheiro.',
+  'error.characterAlreadyHasThat': 'Esse personagem já tem esse companheiro ou visual.',
+  'moderationHistory.actionGrantBuddy': 'Companheiro concedido',
+  'moderationHistory.actionAnnounce': 'Anúncio do reino',
+  'moderationHistory.actionGmInvisible': 'Ficou invisível',
+  'moderationHistory.actionGmVisible': 'Ficou visível',
+  'moderationHistory.actionUnwatch': 'Removido da lista de vigilância',
+  'moderationHistory.actionWatch': 'Adicionado à lista de vigilância',
   'error.flagActiveExists': 'esta conta já possui uma sinalização em aberto desse tipo',
   'wealth.largeMovementsUnavailable':
     'não foi possível carregar as movimentações bancárias de grande valor (a leitura do registro expirou); o detalhamento de ouro acima está completo',
@@ -356,8 +364,6 @@ export const pt_BR: Record<string, string> = {
   'detail.accountActions': 'Ações de moderação de conta',
   'detail.banReason': 'Motivo do banimento:{value}',
   'detail.suspensionReason': 'Motivo da suspensão:{value}',
-  'detail.deactivatedNotice': 'O jogador desativou esta conta em {value}.',
-  'detail.reactivate': 'Reativar',
   'detail.notePlaceholder': 'Nota / motivo do moderador',
   'detail.suspend1h': 'Suspender 1h',
   'detail.suspend24h': 'Suspender 24h',
@@ -456,7 +462,6 @@ export const pt_BR: Record<string, string> = {
   'dialog.confirmBan': 'Confirmar banimento',
   'dialog.confirmUnban': 'Confirmar desbanimento',
   'dialog.confirmUnsuspension': 'Confirmar suspensão',
-  'dialog.confirmReactivation': 'Confirmar reativação',
   'dialog.character': 'Personagem',
   'dialog.account': 'Conta',
   'dialog.action': 'Ação',
@@ -469,8 +474,6 @@ export const pt_BR: Record<string, string> = {
   'dialog.actionBan': 'Bloqueio permanente da conta',
   'dialog.actionUnban': 'Restaurar acesso de login da conta',
   'dialog.actionUnsuspend': 'Restaurar o acesso de login da conta antes do término da suspensão',
-  'dialog.actionReactivate':
-    'Desfazer a desativação feita pelo próprio jogador e restaurar o acesso de login da conta',
   'dialog.confirm': 'Confirmar',
   'dialog.cancel': 'Cancelar',
   'dialog.warning': 'Aviso',
@@ -1084,14 +1087,6 @@ export const pt_BR: Record<string, string> = {
     'Todos os personagens da conta exibem a etiqueta pública até que esse tempo jogado se esgote.',
   'detail.cheaterMarkRelengthHint':
     'Substitui totalmente o crédito restante; não soma a ele. A etiqueta pública continua visível.',
-  'detail.worldQuestBlockModeration': 'Missões mundiais',
-  'detail.worldQuestBlockActions': 'Ações de moderação de missões mundiais',
-  'detail.worldQuestBlockApply': 'Bloquear missões mundiais',
-  'detail.worldQuestBlockLift': 'Desbloquear missões mundiais',
-  'detail.worldQuestBlockReason': 'Motivo do bloqueio: {value}',
-  'detail.worldQuestBlockedAt': 'Bloqueado em: {value}',
-  'detail.worldQuestBlockHint':
-    'Para uso de bots em missões mundiais em vez de banimento: nenhum personagem da conta pode mais iniciar, avançar ou ganhar recompensas de missões mundiais. Todo o resto continua jogável.',
   'dialog.confirmCheaterMark': 'Confirmar marca de trapaceiro',
   'dialog.confirmCheaterMarkRelength': 'Confirmar a nova duração da marca',
   'dialog.confirmCheaterMarkLift': 'Confirmar remoção da marca',
@@ -1099,24 +1094,13 @@ export const pt_BR: Record<string, string> = {
     'Exibir a etiqueta pública Trapaceiro em todos os personagens desta conta',
   'dialog.actionCheaterMarkRelength': 'Substituir o crédito de tempo jogado restante desta marca',
   'dialog.actionCheaterMarkLift': 'Remover a marca de trapaceiro antes do fim',
-  'dialog.confirmWorldQuestBlock': 'Confirmar bloqueio de missões mundiais',
-  'dialog.confirmWorldQuestUnblock': 'Confirmar desbloqueio de missões mundiais',
-  'dialog.actionWorldQuestBlock':
-    'Bloquear as missões mundiais para todos os personagens desta conta',
-  'dialog.actionWorldQuestUnblock': 'Permitir novamente as missões mundiais nesta conta',
   'alert.cheaterMarkDurationInvalid': 'Insira um número inteiro de 1 a {max} horas.',
   'error.cheaterMarkDurationInvalid': 'O crédito de tempo jogado deve ficar entre 1 e 100 horas.',
   'error.cheaterMarkNotMarked': 'Esta conta não está usando a marca de trapaceiro.',
   'error.cheaterMarkAdminTarget':
     'Contas de administrador não podem receber a marca de trapaceiro.',
-  'error.worldQuestBlockAdminTarget':
-    'Contas de administrador não podem ser bloqueadas das missões mundiais.',
-  'error.worldQuestBlockAlreadyBlocked': 'Esta conta já está bloqueada das missões mundiais.',
-  'error.worldQuestBlockNotBlocked': 'Esta conta não está bloqueada das missões mundiais.',
   'moderationHistory.actionCheaterMark': 'Marca de trapaceiro aplicada',
   'moderationHistory.actionCheaterMarkLift': 'Marca de trapaceiro removida',
-  'moderationHistory.actionWorldQuestsBlock': 'Missões mundiais bloqueadas',
-  'moderationHistory.actionWorldQuestsUnblock': 'Missões mundiais desbloqueadas',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Ouro',
   'error.flagInvalidStatus': 'status de sinalizador inválido',

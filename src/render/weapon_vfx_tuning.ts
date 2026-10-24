@@ -9,6 +9,29 @@ import { type WeaponVfxTierName, type WeaponVfxTuning, WORLD_TUNING } from './we
 
 export const WEAPON_VFX_TUNING: Record<string, Partial<WeaponVfxTuning>> = {
   // Populated by the inspector Save VFX button, keyed by weapon model basename.
+  // The elemental arms (reserved for a future raid): dialled hot on purpose (showpieces), the
+  // painted element at full glow, its particles and rim above the epic baseline, the cast light
+  // kept near it so a wearer lights the ground at their feet without washing out a crowd.
+  hearthbrand: { glow: 2, light: 0.6, core: 1.2, mist: 1.4, sparkle: 1.6, shell: 1.5 },
+  squallcrest: { glow: 2, light: 0.6, core: 1.2, aurora: 1.3, mist: 1.3, sparkle: 1.8, shell: 1.8 },
+  rimelight_staff: {
+    glow: 2,
+    light: 0.6,
+    core: 1.2,
+    motes: 1.2,
+    mist: 1.3,
+    sparkle: 1.6,
+    shell: 1.5,
+  },
+  duskwick_staff: {
+    glow: 2,
+    light: 0.6,
+    core: 1.2,
+    aurora: 1.3,
+    mist: 1.3,
+    sparkle: 1.5,
+    shell: 1.5,
+  },
   winterbite: {
     glow: 2,
     bloom: 0.3,

@@ -22,13 +22,13 @@ dependency set. The one sanctioned exception is the standalone admin dashboard
 | `src/render/` | Three.js renderer (procedural geometry/textures/VFX + curated GLBs). Reads the world; never mutates it. |
 | `src/game/` | Local input, camera, keybinds, gamepad, mobile controls, sampled WebAudio SFX, and procedural music. |
 | `src/ui/` | Classic HUD (frames, windows, tooltips, map, FCT), procedural icons, i18n. |
-| `src/styles/` | Extracted HUD CSS under one `@layer` order, imported once via `src/main.ts`. See `src/styles/CLAUDE.md`. |
+| `src/styles/` | Extracted HUD CSS under one `@layer` order, imported via `src/main.ts` (and `src/boot.ts`, index.html's entry). See `src/styles/CLAUDE.md`. |
 | `src/net/` | Online client: REST auth + WebSocket world mirror (`ClientWorld`), reconnect, native-app glue, wallet glue. |
 | `src/admin/` | Admin dashboard SPA (separate `admin.html` entry). |
 | `src/guide/` | Public guide/wiki SPA (separate `guide.html` entry, served at `/wiki`); spoiler-safe content generated from `src/sim/`. |
 | `src/editor/` | World editor SPA (separate root-level `editor.html` entry); its 3D viewport composes the real `Sim` + `Renderer`. |
 | `src/world_api.ts` + `src/world_api/` | `IWorld`, the seam render/ui depend on: one facet interface per domain file under `src/world_api/`, re-aggregated by the barrel (see Architecture). |
-| `src/main.ts` | Client entry; fixes the world seed. |
+| `src/main.ts` | Client entry (index.html reaches it through `src/boot.ts`); fixes the world seed. |
 | `server/` | Authoritative game server: HTTP+WS, world loop, Postgres, auth, social, moderation. |
 | `server/http/` | The REST request pipeline spine: table router, middleware onion, per-domain `RouteDef` tables, typed schemas, stable error codes. |
 | `server/epic/` · `server/steam/` · `server/parse/` · `server/email/` | Store/platform glue, combat-parse ingest, transactional email; each has its own `CLAUDE.md`. |

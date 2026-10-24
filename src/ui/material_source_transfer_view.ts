@@ -1,13 +1,13 @@
 // Pure UI bridge from a displayed stack snapshot to the compact transfer
 // intent accepted by the bank, guild bank, and vault IWorld commands.
 
-import { materialItemIds } from '../sim/material_ids';
 import type { MaterialSourceTransferSelection } from '../sim/material_source_transfer_selection';
 import { normalizeMaterialStack } from '../sim/material_stack';
 import {
   captureMaterialStackSelection,
   type MaterialStackSelection,
 } from '../sim/material_stack_selection';
+import { stackProvenanceItemIds } from '../sim/stack_provenance_ids';
 import type { InvSlot } from '../sim/types';
 import type { SelectedMaterialSources } from './material_sources_view';
 
@@ -27,7 +27,7 @@ export function captureMaterialSourceTransfer(
   const slot = slots[slotIndex];
   if (!slot || slot.itemId !== itemId) return null;
   const target = captureMaterialStackSelection(slots, itemId, slotIndex);
-  const normalized = normalizeMaterialStack(slot, materialItemIds());
+  const normalized = normalizeMaterialStack(slot, stackProvenanceItemIds());
   const sources = normalized.ok ? normalized.value.materialSources : undefined;
   return target && sources ? { itemId, target, sources } : null;
 }

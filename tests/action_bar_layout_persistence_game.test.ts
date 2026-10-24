@@ -483,6 +483,7 @@ describe('the auth handshake: a queued write that settles between the row reads 
       acquireCharacterLease: async () => true,
       releaseCharacterLease: async () => {},
       bankBonusForAccount: async () => ({ bonusSlots: 0, sources: [], characterCount: 1 }),
+      guestPayoutsForCycle: async () => 0,
     } as unknown as Parameters<typeof createWsAuth>[0];
   }
 

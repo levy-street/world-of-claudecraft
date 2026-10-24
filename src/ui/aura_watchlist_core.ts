@@ -99,7 +99,7 @@ export function abilitySelfAuraSignature(def: WatchableAbilityDef): AuraWatchSig
     if (effect.type === 'finisherHaste') {
       return { auraKind: 'buff_haste', auraId: def.id };
     }
-    // Iron Resolve: the spend-all shield, a second absorb path.
+    // A spend-all shield (absorbSpentResource): a second absorb path.
     if (effect.type === 'absorbSpentResource') {
       return { auraKind: 'absorb', auraId: def.id };
     }

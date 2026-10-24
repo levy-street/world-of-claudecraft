@@ -1,0 +1,34 @@
+[
+  {
+    "id": "dgn_beastmaster_apart",
+    "src": "http://localhost:5194/ui/deeds/dgn_beastmaster_apart.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_gorgebloom_clean",
+    "src": "http://localhost:5194/ui/deeds/dgn_gorgebloom_clean.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_zulgar_uncaught",
+    "src": "http://localhost:5194/ui/deeds/dgn_zulgar_uncaught.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_great_saurian",
+    "src": "http://localhost:5194/ui/deeds/dgn_great_saurian.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

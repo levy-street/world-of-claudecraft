@@ -467,7 +467,7 @@ describe('the World Market: the Merchant', () => {
   // The pending sale ledger: the itemized rows behind the one proceeds figure, so
   // a seller can tell WHICH listings sold rather than reading a bare copper total.
   // The leaf's own math is tests/market_sale_log.test.ts; these pin the wiring.
-  describe('the pending sale ledger', () => {
+  describe('the sale ledger (the History tab)', () => {
     // Sell `count` copies at `price` and return the seller's fresh market view.
     const sellOne = (
       sim: Sim,
@@ -552,7 +552,10 @@ describe('the World Market: the Merchant', () => {
       expect(info.collectionSales.reduce((n, s) => n + s.proceeds, 0)).toBe(info.collectionCopper);
     });
 
-    it('clears the ledger with the gold it explains', () => {
+    // Discord bug report "History tab on the world market doesnt work": the
+    // History tab reads this ledger, and Collect used to wipe it with the gold,
+    // so a seller who had claimed their proceeds saw "No sales yet" forever.
+    it('keeps a sale on the History ledger after its gold is collected', () => {
       const { sim, seller, buyer } = world();
       sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
 
@@ -560,12 +563,26 @@ describe('the World Market: the Merchant', () => {
 
       const after = marketInfo(sim, seller);
       expect(after.collectionCopper).toBe(0);
-      expect(after.collectionSales).toEqual([]);
+      expect(after.collectionSales).toEqual([
+        { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Buyer' },
+      ]);
       expect(after.collectionSalesOmitted).toBe(0);
       expect(copperOf(sim, seller)).toBe(950);
+      expect(sim.marketCollectPendingFor(seller)).toBe(false);
     });
 
-    it('does not re-pay or re-show a collected sale on the next collect', () => {
+    it('appends later sales after a collect, oldest first', () => {
+      const { sim, seller, buyer } = world();
+      sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
+      sim.marketCollect(seller);
+
+      const info = sellOne(sim, seller, buyer, 'bone_fragments', 1, 500);
+
+      expect(info.collectionSales.map((s) => s.itemId)).toEqual(['wolf_fang', 'bone_fragments']);
+      expect(info.collectionCopper).toBe(475);
+    });
+
+    it('does not re-pay a collected sale, and a ledger alone is nothing to collect', () => {
       const { sim, seller, buyer } = world();
       sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
       sim.marketCollect(seller);
@@ -574,7 +591,7 @@ describe('the World Market: the Merchant', () => {
       sim.marketCollect(seller);
 
       expect(copperOf(sim, seller)).toBe(950);
-      expect(marketInfo(sim, seller).collectionSales).toEqual([]);
+      expect(marketInfo(sim, seller).collectionSales).toHaveLength(1);
       expect(
         sim
           .drainEvents()
@@ -582,10 +599,40 @@ describe('the World Market: the Merchant', () => {
       ).toBe(true);
     });
 
-    // The trap this feature could most easily ship: the item arm returns EARLY when
-    // bags are full, but the gold is always taken. A ledger cleared at the end of
-    // the method would survive that return and be shown (and paid out) again.
-    it('a bags-full collect takes the gold AND the ledger, and leaves the goods', () => {
+    it('still drops a collected bucket that never sold anything', () => {
+      const { sim, seller } = world();
+      sim.addItem('bone_fragments', 1, seller);
+      sim.marketList('bone_fragments', 1, 50, seller);
+      listingBy(sim, (l) => l.itemId === 'bone_fragments', 'expiring listing').expiresAt =
+        sim.time - 1;
+      for (let i = 0; i < 20; i++) sim.tick(); // updateMarket runs once a second
+
+      sim.marketCollect(seller);
+
+      expect(sim.serializeMarket().collections).toEqual([]);
+    });
+
+    it('keeps the History ledger through a save/load after the gold is collected', () => {
+      const { sim, seller, buyer } = world();
+      sellOne(sim, seller, buyer, 'wolf_fang', 2, 1000);
+      sim.marketCollect(seller);
+
+      const sim2 = makeWorld();
+      sim2.loadMarket(sim.serializeMarket());
+      const reloaded = (
+        sim2.market as unknown as { marketCollections: Map<string, MarketCollection> }
+      ).marketCollections.get(marketSellerKey(seller));
+
+      expect(reloaded?.copper).toBe(0);
+      expect(reloaded?.items).toEqual([]);
+      expect(reloaded?.sales.entries).toEqual([
+        { itemId: 'wolf_fang', count: 2, price: 1000, proceeds: 950, buyerName: 'Buyer' },
+      ]);
+    });
+
+    // The item arm returns EARLY when bags are full, but the gold is always
+    // taken; the ledger is history, so it stays whichever way the collect ends.
+    it('a bags-full collect takes the gold, keeps the ledger, and leaves the goods', () => {
       const { sim, seller, buyer } = world();
       sellOne(sim, seller, buyer, 'wolf_fang', 1, 1000);
       // A second listing expires back into the same collection, so this collect has
@@ -608,16 +655,15 @@ describe('the World Market: the Merchant', () => {
       const after = marketInfo(sim, seller);
       expect(copperOf(sim, seller)).toBe(950); // gold always lands
       expect(after.collectionCopper).toBe(0);
-      expect(after.collectionSales).toEqual([]); // and its ledger left with it
+      expect(after.collectionSales.map((s) => s.itemId)).toEqual(['wolf_fang']);
       expect(after.collectionItems).toEqual([
         { itemId: 'bone_fragments', count: 1, materialSources: [{ source: {}, count: 1 }] },
       ]);
     });
 
     // A 1-copper listing nets floor(1 * 0.95) = 0, so the sale leaves a row and no
-    // coin. Nothing else in the collection would report it, and the old
-    // gold-or-goods emptiness test would have stranded it forever.
-    it('a sale whose proceeds floor to zero still shows, still pends, and still clears', () => {
+    // coin. The row is History, not a pickup: it shows, but nothing pends.
+    it('a sale whose proceeds floor to zero still shows, and pends nothing', () => {
       const { sim, seller, buyer } = world();
 
       const info = sellOne(sim, seller, buyer, 'wolf_fang', 1, 1);
@@ -626,11 +672,6 @@ describe('the World Market: the Merchant', () => {
       expect(info.collectionSales).toEqual([
         { itemId: 'wolf_fang', count: 1, price: 1, proceeds: 0, buyerName: 'Buyer' },
       ]);
-      expect(sim.marketCollectPendingFor(seller)).toBe(true);
-
-      sim.marketCollect(seller);
-
-      expect(marketInfo(sim, seller).collectionSales).toEqual([]);
       expect(sim.marketCollectPendingFor(seller)).toBe(false);
     });
 

@@ -13,7 +13,8 @@
 
 import { describe, expect, it } from 'vitest';
 import { FARM_PATCHES, type FarmPatchDef } from '../src/sim/content/farm_patches';
-import { CAMPS, NPCS, zoneAt } from '../src/sim/data';
+import { BUILTIN_WORLD, CAMPS, zoneAt } from '../src/sim/data';
+import { farmPatchesFor } from '../src/sim/moved_objects';
 import { FARMER_TRADE_RANGE } from '../src/sim/professions/farmer_npcs';
 import { Sim } from '../src/sim/sim';
 import type { Entity, NpcDef } from '../src/sim/types';
@@ -45,7 +46,7 @@ const FARMERS: readonly {
     id: 'farmer_teasel',
     patchId: 'patch_mirefen',
     zoneId: 'mirefen_marsh',
-    seat: { x: -21, z: 333.5 },
+    seat: { x: -27.243072340930894, z: 322.0520825402818 },
   },
   {
     id: 'farmer_hollis',
@@ -74,7 +75,7 @@ const ROAD_MARGIN = 5;
 const WATER_MARGIN = 1;
 
 function patchOf(id: string): FarmPatchDef {
-  const patch = FARM_PATCHES.find((p) => p.id === id);
+  const patch = farmPatchesFor(BUILTIN_WORLD.objectMoves, FARM_PATCHES).find((p) => p.id === id);
   if (!patch) throw new Error(`no such patch: ${id}`);
   return patch;
 }
@@ -94,13 +95,13 @@ function isDryLand(x: number, z: number): boolean {
 
 describe('the farmer NPCs: content shape', () => {
   it('exactly the four farmers carry the farmer flag, each a static vendor with a greeting', () => {
-    const flagged = Object.values(NPCS)
+    const flagged = Object.values(BUILTIN_WORLD.npcs)
       .filter((npc: NpcDef) => npc.farmer === true)
       .map((npc) => npc.id)
       .sort();
     expect(flagged).toEqual(FARMERS.map((f) => f.id).sort());
     for (const { id } of FARMERS) {
-      const def = NPCS[id];
+      const def = BUILTIN_WORLD.npcs[id];
       expect(def, id).toBeDefined();
       expect(def.dynamic, `${id} must be surface-placed by the ctor loop`).toBeUndefined();
       expect(def.greeting.length, `${id} greeting`).toBeGreaterThan(0);
@@ -109,27 +110,29 @@ describe('the farmer NPCs: content shape', () => {
   });
 
   it('pins the go-live names and titles as literals (D17: repo-clean, real plant words)', () => {
-    expect(FARMERS.map(({ id }) => [id, NPCS[id].name, NPCS[id].title])).toEqual([
+    expect(
+      FARMERS.map(({ id }) => [id, BUILTIN_WORLD.npcs[id].name, BUILTIN_WORLD.npcs[id].title]),
+    ).toEqual([
       ['farmer_jessica', 'Farmer Jessica', 'Allotment Keeper'],
       ['farmer_teasel', 'Farmer Teasel', 'Fen Paddy Farmer'],
       ['farmer_hollis', 'Farmer Hollis', 'Highwatch Terrace Farmer'],
       ['farmer_verbena', 'Farmer Verbena', 'Parterre Gardener'],
     ]);
     // Distinct signature tints: the shared villager body is told apart by them.
-    expect(new Set(FARMERS.map(({ id }) => NPCS[id].color)).size).toBe(4);
+    expect(new Set(FARMERS.map(({ id }) => BUILTIN_WORLD.npcs[id].color)).size).toBe(4);
   });
 
   it('Jessica teaches the two go-live sentences verbatim; every farmer greets', () => {
     // The anti-chore promise and the Harvest Journal pointer, the two lines
     // D20 requires the front door to say. Substring pins on the exact
     // literals: a reword that drops the keybind or softens the promise reds.
-    const greeting = NPCS.farmer_jessica.greeting;
+    const greeting = BUILTIN_WORLD.npcs.farmer_jessica.greeting;
     expect(greeting).toContain('It keeps growing while you are away, and it never spoils.');
     expect(greeting).toContain(
       'Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer.',
     );
     for (const { id } of FARMERS) {
-      expect(NPCS[id].greeting.trim().length, id).toBeGreaterThan(0);
+      expect(BUILTIN_WORLD.npcs[id].greeting.trim().length, id).toBeGreaterThan(0);
     }
     // No greeting over-promises the ready notice: a plot ripening during the
     // linkdead grace loses its transient banner (deviation (bb)), so no farmer
@@ -139,7 +142,7 @@ describe('the farmer NPCs: content shape', () => {
     // Positive control: the predicate trips on the wording it bans.
     expect(overPromises('You will always be told when a crop is ready.')).toBe(true);
     for (const { id } of FARMERS) {
-      expect(overPromises(NPCS[id].greeting), id).toBe(false);
+      expect(overPromises(BUILTIN_WORLD.npcs[id].greeting), id).toBe(false);
     }
   });
 });
@@ -149,7 +152,7 @@ describe('the farmer NPCs: seated beside their beds in the real world', () => {
 
   it('spawns at EXACTLY the authored pos (findSafePos nudged nothing) with the authored facing', () => {
     for (const { id, seat } of FARMERS) {
-      const def = NPCS[id];
+      const def = BUILTIN_WORLD.npcs[id];
       const entity = spawned(sim, id);
       expect({ x: entity.pos.x, z: entity.pos.z }, id).toEqual({ x: def.pos.x, z: def.pos.z });
       // The def itself against the literal seat, so a re-seat inside the

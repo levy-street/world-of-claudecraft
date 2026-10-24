@@ -195,28 +195,30 @@ describe('ConsumableStripGesture: the clamp box', () => {
     expect(open?.placement.centers[0]).toBe(114);
   });
 
-  // The overlay carries the device safe area as PADDING, and its items are
-  // absolutely positioned children, so what the painter writes is resolved
-  // against the PADDING box rather than the viewport. The gesture layer
-  // therefore measures in that frame. NOT coverable by the real-browser suite:
-  // env(safe-area-inset-*) resolves to 0 on a headless desktop viewport, so only
-  // a stubbed computed style can drive the nonzero arm at all.
-  it('seats the row in the overlay padding-box frame, counting the safe area once', () => {
+  // The overlay carries the device safe area as PADDING. That padding only
+  // shrinks the box the row is CLAMPED into: its items are absolutely
+  // positioned children, whose left/top resolve from the overlay's padding
+  // EDGE (the viewport origin), so the seated positions come back in viewport
+  // coordinates. Reading the padding as an offset slid the row a whole inset
+  // left, off the seat it belongs to on a notched or edge-to-edge phone
+  // (tests/browser/mobile_menu_control.browser.test.ts pins the real layout).
+  it('clamps the row inside the safe area, counting the inset once', () => {
     const rig = makeRig({ appVw: '380px', safeAreaPx: '30px' });
     rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
     rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
     const open = rig.gesture.openState();
-    // The seat's viewport centre is 80, so in the padding box it is 50, and the
-    // clamp box is the app box minus BOTH insets. The margin stays the
-    // stylesheet's own 6px literal rather than absorbing the inset a second time.
-    expect(open?.anchorX).toBe(50);
+    // The seat stays on its viewport centre, 80. The clamp box is the app box
+    // minus BOTH insets, starting 30px in, and the margin stays the stylesheet's
+    // own 6px literal rather than absorbing the inset a second time.
+    expect(open?.anchorX).toBe(80);
     expect(open?.viewportWidth).toBe(320);
+    expect(open?.clampLeft).toBe(30);
     expect(open?.margin).toBe(6);
-    // Unclamped the row runs 98..338, so its far edge (358) overruns 320 - 6 by
-    // 44 and the whole row shifts left by that. Rendered, the last item's right
-    // edge lands at 294 + 20 + 30 = 344, exactly 6px inside the safe area.
-    expect(open?.placement.centers[0]).toBe(54);
-    expect(open?.placement.centers[CONSUMABLE_BAR_SLOTS - 1]).toBe(294);
+    // Unclamped the row runs 128..368, so its far edge (388) overruns
+    // 380 - 30 - 6 by 44 and the whole row shifts left by that: the last item's
+    // right edge lands at 324 + 20 = 344, exactly 6px inside the safe area.
+    expect(open?.placement.centers[0]).toBe(84);
+    expect(open?.placement.centers[CONSUMABLE_BAR_SLOTS - 1]).toBe(324);
   });
 });
 

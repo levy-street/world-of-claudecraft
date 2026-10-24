@@ -1015,3 +1015,42 @@ describe('the feast arm (Phase 12)', () => {
     expect(r.calls).toEqual(['error:nothing']);
   });
 });
+
+// The trash engine's G3 use: a press near a living Soul Brazier targets it and
+// sends the ordinary interact (the sim starts the use), on keyboard, pad and
+// the mobile interact button alike (all three reach this press).
+describe('tryNearbyInteraction: the usable encounter body', () => {
+  it('targets the brazier, then interacts, ahead of a lootable corpse', () => {
+    const brazier = entity({
+      id: 70,
+      kind: 'mob',
+      templateId: 'soul_brazier',
+      hp: 120,
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    const corpse = entity({
+      id: 71,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const r = rig([corpse, brazier]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['target:70', 'interact']);
+  });
+
+  it('out of reach the press falls through to the next arm', () => {
+    const brazier = entity({
+      id: 70,
+      kind: 'mob',
+      templateId: 'soul_brazier',
+      hp: 120,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const r = rig([brazier]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+});

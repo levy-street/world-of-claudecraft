@@ -1,0 +1,25 @@
+{
+  "bagBar": [
+    "http://localhost:5173/ui/items/backpack.webp",
+    "http://localhost:5173/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5173/ui/items/baked_bread.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_elemental_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_elemental_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_elemental_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_elemental_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_elemental_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_enhancement_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_enhancement_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_enhancement_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_enhancement_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_enhancement_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_restoration_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_restoration_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_restoration_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_restoration_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_shaman_restoration_gloves.webp"
+  ],
+  "allDecoded": true
+}

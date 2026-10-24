@@ -1,4 +1,6 @@
 import { delveAt, dungeonAt, isBgPos, isDelvePos, type ZoneDef } from '../sim/data';
+import type { MapMusic } from '../sim/types';
+import { bossTrackFor } from './boss_music_loop';
 import { type CrucibleFloor, crucibleFloorForDungeon } from './crucible_music';
 import {
   type MusicZone,
@@ -6,6 +8,7 @@ import {
   riftMusicZoneForTheme,
   shouldResetMusicForDungeonEntry,
 } from './music';
+import { ALL_MUSIC_ZONES } from './music_zones';
 
 export interface InstanceMusicEntity {
   kind: string;
@@ -41,6 +44,13 @@ export interface InstanceMusicInput {
   // instance entry so the crawl cue re-phrases from the top even when two floors
   // roll the same theme.
   riftFloor: InstanceMusicRiftFloor | null;
+  // The active map's AUTHORED soundtrack (WorldContent.music: the Studio's
+  // "Map track" plus any rect areas), or null/absent for the shipped world.
+  // Resolved by resolveMapMusicZone below, and it outranks the location walk:
+  // an authored world's coordinates otherwise resolve through the OVERWORLD's
+  // zone table, so a player walking across one heard the score churn through
+  // whichever shipped zones its rect happened to overlap.
+  mapMusic?: MapMusic | null;
 }
 
 export interface InstanceMusicDecision {
@@ -48,6 +58,9 @@ export interface InstanceMusicDecision {
   inCombat: boolean;
   musicCombat: boolean;
   bossEngaged: boolean;
+  // The engaged boss's own fight track (BOSS_TRACK_URLS), or null for the
+  // shared default loop.
+  bossTrackUrl: string | null;
   instanceId: string | null;
   crucibleFloor: CrucibleFloor | null;
 }
@@ -57,7 +70,33 @@ export interface InstanceMusicPort {
   // floor's RiftTheme), so the resolved zone rides along explicitly.
   resetForDungeonEntry(dungeonId: string | null, zone?: MusicZone): void;
   update(zone: MusicZone, inCombat: boolean, crucibleFloor?: CrucibleFloor | null): void;
-  setBossCombat(active: boolean): void;
+  setBossCombat(active: boolean, url?: string): void;
+}
+
+const MUSIC_ZONE_SET: ReadonlySet<string> = new Set(ALL_MUSIC_ZONES);
+
+/**
+ * The track an authored map asks for at (x, z), or null when it asks for
+ * nothing there. The smallest containing area wins, then the map-wide track.
+ * Unknown ids are ignored (documents stay forward-compatible), so a stale or
+ * misspelt track simply falls back to the location walk.
+ */
+export function resolveMapMusicZone(
+  music: MapMusic | null | undefined,
+  x: number,
+  z: number,
+): MusicZone | null {
+  if (!music) return null;
+  let best: { track: string; size: number } | null = null;
+  for (const a of music.areas ?? []) {
+    if (x < a.minX || x > a.maxX || z < a.minZ || z > a.maxZ) continue;
+    if (!MUSIC_ZONE_SET.has(a.track)) continue;
+    const size = Math.max(0, a.maxX - a.minX) * Math.max(0, a.maxZ - a.minZ);
+    if (best === null || size < best.size) best = { track: a.track, size };
+  }
+  if (best) return best.track as MusicZone;
+  const track = music.zoneTrack;
+  return track && MUSIC_ZONE_SET.has(track) ? (track as MusicZone) : null;
 }
 
 const RAID_ARENA_ID = 'nythraxis_boss_arena';
@@ -69,10 +108,16 @@ const RECENT_BOSS_COMBAT_MS = 10000;
 export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicDecision {
   let aggroed = false;
   let bossEngaged = false;
+  let bossTrackUrl: string | null = null;
   for (const entity of input.entities) {
     if (entity.kind !== 'mob' || entity.dead) continue;
     if (entity.aggroTargetId === input.playerId) aggroed = true;
     if (entity.templateId === RAID_BOSS_ID && entity.aggroTargetId !== null) bossEngaged = true;
+    const track = bossTrackFor(entity.templateId);
+    if (track !== null && entity.aggroTargetId !== null) {
+      bossEngaged = true;
+      bossTrackUrl = track;
+    }
   }
 
   const dungeon = dungeonAt(input.playerPos.x);
@@ -98,16 +143,22 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   const scoredInstanceId =
     instanceId === 'ignivar_forge_lift' ? 'ignivar_forge_approach' : instanceId;
   const riftFloor = input.riftFloor;
+  // A rift floor scores by its theme; an authored map by what its maker asked
+  // for; the shipped world by where the player stands.
+  const mapZone = riftFloor
+    ? null
+    : resolveMapMusicZone(input.mapMusic, input.playerPos.x, input.playerPos.z);
   const crucibleFloor = input.inDungeon && !riftFloor ? crucibleFloorForDungeon(instanceId) : null;
   const zone = riftFloor
     ? riftMusicZoneForTheme(riftFloor.themeName)
-    : musicZoneForLocation(
+    : (mapZone ??
+      musicZoneForLocation(
         input.zone.id,
         input.zone.biome,
         inHub,
         input.inDungeon || inRaidArena,
         scoredInstanceId,
-      );
+      ));
   const musicInstanceId = riftFloor
     ? `rift:${riftFloor.instanceId}:${riftFloor.floorIndex}`
     : input.inDungeon || inRaidArena
@@ -120,6 +171,7 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
     // The complete room score owns the mix through pulls and boss fights.
     musicCombat: crucibleFloor === null && (inCombat || inRaidArena || inBattleground),
     bossEngaged: crucibleFloor === null && bossEngaged,
+    bossTrackUrl: crucibleFloor === null ? bossTrackUrl : null,
     crucibleFloor,
     instanceId: musicInstanceId,
   };
@@ -127,6 +179,9 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
 
 export class InstanceMusicController {
   private lastInstanceId: string | null = null;
+  // A boss with its own track keeps it through a short aggro gap (an immune
+  // phase, a scripted hover) instead of dropping back to the zone score.
+  private bossTrack: { url: string; seenAt: number } | null = null;
 
   constructor(private readonly music: InstanceMusicPort) {}
 
@@ -134,14 +189,22 @@ export class InstanceMusicController {
     const decision = instanceMusicDecision(input);
     if (shouldResetMusicForDungeonEntry(this.lastInstanceId, decision.instanceId)) {
       this.music.resetForDungeonEntry(decision.instanceId, decision.zone);
+      this.bossTrack = null;
     }
     this.lastInstanceId = decision.instanceId;
+    if (decision.bossTrackUrl !== null) {
+      this.bossTrack = { url: decision.bossTrackUrl, seenAt: input.now };
+    } else if (this.bossTrack && input.now - this.bossTrack.seenAt >= RECENT_BOSS_COMBAT_MS) {
+      this.bossTrack = null;
+    }
+    if (this.bossTrack) this.music.setBossCombat(true, this.bossTrack.url);
+    else this.music.setBossCombat(decision.bossEngaged);
+    // Give the boss cue ownership before the normal combat score can start.
     if (decision.crucibleFloor !== null) {
       this.music.update(decision.zone, decision.musicCombat, decision.crucibleFloor);
     } else {
       this.music.update(decision.zone, decision.musicCombat);
     }
-    this.music.setBossCombat(decision.bossEngaged);
     return decision;
   }
 }

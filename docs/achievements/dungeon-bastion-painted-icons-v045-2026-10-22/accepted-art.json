@@ -1,0 +1,943 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "dungeon-bastion-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 11,
+    "replacedSvgIcons": 11,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "knight_commanders_longsword",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/knight_commanders_longsword.webp",
+      "canonicalDisplayName": "Knight-Commander's Longsword",
+      "acceptedSha256": "bba3c5a817acba3f3df3e2990beebd9f83683e85e71b53ba36b8c85e5a5aee3e",
+      "acceptedBytes": 1766,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/knight_commanders_longsword.png",
+        "sha256": "01a91304de92c77fc676bb54fbac4e61ec2b7a22ff65c0656f4d0c8758c7b533",
+        "bytes": 2345821,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/knight_commanders_longsword.png",
+        "sha256": "c15c30cfea79d180ff67a56c50b855f260558b7d92e7d61effe997291f71a25d",
+        "bytes": 490675,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "3afa8c4402fdbcbb5e78f43c062de64124e2f3bd36e8124cca75fb0f380f9e30",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Knight-Commander's Longsword (knight_commanders_longsword) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete knightly one-handed longsword diagonally posed, long straight steel blade flecked with aged green verdigris near the fuller, gilt crossguard, sea-green leather grip and scallop-shell pommel. Entire blade point, guard and pommel visible. Drowned coastal fortress craftsmanship, restrained cold sea-green glint, no jagged fantasy spikes. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/knight_commanders_longsword.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "3afa8c4402fdbcbb5e78f43c062de64124e2f3bd36e8124cca75fb0f380f9e30"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gaolers_chain_girdle",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gaolers_chain_girdle.webp",
+      "canonicalDisplayName": "Gaoler's Chain Girdle",
+      "acceptedSha256": "3d5a29b54b01f2842037919a781c5e245c678901ce27b001afe87308120f5566",
+      "acceptedBytes": 3644,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/gaolers_chain_girdle.png",
+        "sha256": "56e7f7967aafebac033859cf24e6e697af7cd457e16fb1f30311f09d5d3f1776",
+        "bytes": 2257204,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/gaolers_chain_girdle.png",
+        "sha256": "43a0699cb9cefb50c892385d0752a37de2147861d60ecbb39d7dbb182e109c1f",
+        "bytes": 488131,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "f9a14c28cfd929d14fafd00c058fb8cec4e3484b9504d62fffafd91e9ad24060",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gaoler's Chain Girdle (gaolers_chain_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete MAIL waist girdle woven from heavy interlocking gaol-chain links, broad curved horizontal belt shape, square iron buckle and one small rusted key ring hanging beside it. Weathered dark iron and orange-brown rust, visible interlinked mail, no leather main band or wearer. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/gaolers_chain_girdle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f9a14c28cfd929d14fafd00c058fb8cec4e3484b9504d62fffafd91e9ad24060"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rusted_shackle_grips",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rusted_shackle_grips.webp",
+      "canonicalDisplayName": "Rusted Shackle Grips",
+      "acceptedSha256": "4da0527801fe31ae2aac0b90069ef422139b15f89c0dded7ee6d8df9320eb6ef",
+      "acceptedBytes": 3246,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/rusted_shackle_grips.png",
+        "sha256": "821ba091385966f25731fe95d6fbd500d7b4d55afb8e788db06c56369ca88a42",
+        "bytes": 2288802,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/rusted_shackle_grips.png",
+        "sha256": "8ff14a3a3f2a4b53e5315106f3136b20eafb475342292841731e7abfbd48a017",
+        "bytes": 501716,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "f082732a79ddf55ec8d3cc9d96ba8b1d7b5341ef5c15d446d689dbe119c2603e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rusted Shackle Grips (rusted_shackle_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact matching pair of worn brown LEATHER gloves, five fingers per glove, one slightly overlapping the other. One wrist still bears a rusted iron shackle cuff with a short snapped chain link hanging from it. Soft creased leather with stitched seams, restrained metal only at shackle, no living hands. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/rusted_shackle_grips.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f082732a79ddf55ec8d3cc9d96ba8b1d7b5341ef5c15d446d689dbe119c2603e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "drowned_wardens_mantle",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/drowned_wardens_mantle.webp",
+      "canonicalDisplayName": "Drowned Warden's Mantle",
+      "acceptedSha256": "c0d695359dd63610ca3ee591d657ace9f2eb6acd7c4fd2256e0336ec5f6f08d9",
+      "acceptedBytes": 3952,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/drowned_wardens_mantle.png",
+        "sha256": "2479b5c4f4dbb23985736d2b6f5cce8482bc2b452b1edd1aa36a30c92b8189c6",
+        "bytes": 2444588,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/drowned_wardens_mantle.png",
+        "sha256": "61e22a7bc80a36bf4d5ee476b48687a149892ede7588e1dd5e4d5800fb43d97d",
+        "bytes": 512898,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "4387fcbf14303ec2054b790f14469867cbe037bb524d58e7bc8a6dfdc131d632",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Drowned Warden's Mantle (drowned_wardens_mantle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-green CLOTH shoulder mantle, draped symmetrically around an empty neck opening, folded woven fabric, a ragged kelp-like trailing hem and one small pearl clasp at front center. Damp aged coastal cloth with subtle teal highlights, no hard armor plates, no head, body or mannequin. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/drowned_wardens_mantle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "4387fcbf14303ec2054b790f14469867cbe037bb524d58e7bc8a6dfdc131d632"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gaolyard_cudgel",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gaolyard_cudgel.webp",
+      "canonicalDisplayName": "Gaolyard Cudgel",
+      "acceptedSha256": "50088b3386c4e55bc466d51319c0653df691e3364272b6cc993a14293a8d2d9b",
+      "acceptedBytes": 2482,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/gaolyard_cudgel.png",
+        "sha256": "f5fd5ecd8e60d0facf38743b706bd33aa41e07bd979cd4b229c43dd8e19cf1fa",
+        "bytes": 2228518,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/gaolyard_cudgel.png",
+        "sha256": "d4ff17ac1d3fe94e648deeaac6b0e27d9f9da8d7ef19e9006f8376cd69271aaa",
+        "bytes": 470433,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "52eeb000c6e1b0f30655afa5a006eb74ba467984b1556cfcf19b755cf3973ea9",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gaolyard Cudgel (gaolyard_cudgel) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete stout one-handed oak cudgel diagonally posed. Thick knotted oak striking head bound in three heavily rusted iron bands with blunt iron studs, tapering worn wooden handle with dark leather grip. Entire rounded head and butt visible, gritty prison tool, no blade or spikes. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/gaolyard_cudgel.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "52eeb000c6e1b0f30655afa5a006eb74ba467984b1556cfcf19b755cf3973ea9"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "drowned_commanders_breastplate",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/drowned_commanders_breastplate.webp",
+      "canonicalDisplayName": "Drowned Commander's Breastplate",
+      "acceptedSha256": "0ba04b4998ff7daf95918dbd59e32041b1ba107a7d0656e26e41d20ac61923fe",
+      "acceptedBytes": 4844,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/drowned_commanders_breastplate.png",
+        "sha256": "8303fee307bf99d57da3622ad7d90cd8dd09ccdffee72dac8b6816880073eeb9",
+        "bytes": 2664870,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/drowned_commanders_breastplate.png",
+        "sha256": "5d85ef13c92af0a9d9fbc76634bbd98d871847d38a2076a418bbc05a032f3559",
+        "bytes": 569967,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "becf5c50507de72bc4be31e3863353333e65d759b2e0de087500ef43de1ed7d8",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Drowned Commander's Breastplate (drowned_commanders_breastplate) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty MAIL torso armor in three-quarter view: dark sea-stained steel breastplate reinforcement over clearly visible interlinked chain mail at sides, collar and lower hem. Aged gilt trim, central scallop-shell metal boss, small pale barnacle clusters on lower edge and shoulder rim. Strong sea-dark steel, verdigris and subdued gold, no wearer, arms, head or mannequin. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/drowned_commanders_breastplate.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "becf5c50507de72bc4be31e3863353333e65d759b2e0de087500ef43de1ed7d8"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gaolyard_striders",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gaolyard_striders.webp",
+      "canonicalDisplayName": "Gaolyard Striders",
+      "acceptedSha256": "929d3e1c86ba96807448404138730b0c0f46d034a469beca815544a8bca71a4b",
+      "acceptedBytes": 3302,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/gaolyard_striders.png",
+        "sha256": "09d5efb519e4c352cf3c3becd13332499c45088b8a1d8d449d4ab1365f39175b",
+        "bytes": 2242005,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/gaolyard_striders.png",
+        "sha256": "abe270e274f19d801cd7693a523030c5adba583f4d9fdfac912c48aff37ac3fe",
+        "bytes": 510280,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "e5f29b4edc382113ee7849f8ebb386eae06d7539ad91a097b341abb7a3f422e7",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gaolyard Striders (gaolyard_striders) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact matching pair of tall dark brown LEATHER boots, one forward and one behind, worn folded leather shafts with riveted iron ankle cuffs. Supple leather main body, stitched seams, low practical soles and muted rusty metal at ankles only. Whole boots visible, no feet or wearer. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/gaolyard_striders.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "e5f29b4edc382113ee7849f8ebb386eae06d7539ad91a097b341abb7a3f422e7"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gaolers_iron_key",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gaolers_iron_key.webp",
+      "canonicalDisplayName": "Gaoler's Iron Key",
+      "acceptedSha256": "9d739da1716f0078d642a14ad4801d341f5ecd9abd35c21c6c0ea8b4c9494d14",
+      "acceptedBytes": 2134,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/gaolers_iron_key.png",
+        "sha256": "bcaf4801e260da72541c885818060acd98668abe76993c8573f4b03167675620",
+        "bytes": 2169163,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/gaolers_iron_key.png",
+        "sha256": "0d2a73890599f2930ec3be3544f10fecaedcbdcb73ce0bcda034dc575e6d51f0",
+        "bytes": 463469,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "6c7ce363c7c5937f746caadf96ff223bb944638ecf837db4184b4a46892aca01",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gaoler's Iron Key (gaolers_iron_key) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete large ancient iron prison key on a plain heavy circular keyring. Long sturdy square shaft, broad simple warded rectangular bit, oval bow, weathered dark iron with small rust patches and one restrained cold sea-green glint. Diagonal key silhouette and whole ring visible. One key only, no writing or magical letters. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/gaolers_iron_key.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6c7ce363c7c5937f746caadf96ff223bb944638ecf837db4184b4a46892aca01"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "jailers_iron_gauntlets",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/jailers_iron_gauntlets.webp",
+      "canonicalDisplayName": "Jailer's Iron Gauntlets",
+      "acceptedSha256": "5cbfa8fee1067b1d2a149f9f995659d0cfcf179ee78b298d2bc7d69e17783e77",
+      "acceptedBytes": 4070,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/jailers_iron_gauntlets.png",
+        "sha256": "e1386a2fea5888c131d267dba736dcfdbdef8b5e6fcf919377e805c794a26a21",
+        "bytes": 2350823,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/jailers_iron_gauntlets.png",
+        "sha256": "c07d101bc3031c67ccbf3d888020af2454fb5e50f0e5f43fd21642f942bbd4df",
+        "bytes": 530055,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "1734b41c3537750e2f78341425e95fe621c1f927edbdeed45e79ce4763e4f2f8",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Jailer's Iron Gauntlets (jailers_iron_gauntlets) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact matching pair of iron MAIL gauntlets with clear interlinked chain mail on fingers and wrists, riveted steel reinforcement on knuckles and rusted broad cuffs. Short length of dark cell chain loops from one cuff. Distinct armored gloves, five fingers per glove, no living hands; more metal than the leather Shackle Grips. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/jailers_iron_gauntlets.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "1734b41c3537750e2f78341425e95fe621c1f927edbdeed45e79ce4763e4f2f8"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "turnkeys_keyring_belt",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/turnkeys_keyring_belt.webp",
+      "canonicalDisplayName": "Turnkey's Keyring Belt",
+      "acceptedSha256": "d3e7b93fc0a2535f13c19718370ffcce3a456935b6c2418068aa6a8c9feec270",
+      "acceptedBytes": 3312,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/turnkeys_keyring_belt.png",
+        "sha256": "6b1686442605b2ee98e2aab622b1b96a965bc24b9f68016c90285b8c6528ea87",
+        "bytes": 2161372,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/turnkeys_keyring_belt.png",
+        "sha256": "d98c304766f4354d8ac827aa88f8d55f1840637def9fb3749468325902c12ca0",
+        "bytes": 483410,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "492964ff481f09f5a4609ffdffc1750730c5775d436256a6651c151eedcf1e1a",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Turnkey's Keyring Belt (turnkeys_keyring_belt) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete broad brown LEATHER waist belt arranged in a gentle curve, worn leather strap with a rusted rectangular iron buckle and a large ring of three old warded cell keys hanging beside it. Dark aged leather, orange rust, heavy steel keys. Supple solid leather main band, not a chain girdle, no wearer. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/turnkeys_keyring_belt.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "492964ff481f09f5a4609ffdffc1750730c5775d436256a6651c151eedcf1e1a"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 1,
+        "retryHistory": [
+          "Initial tool result had no saved-file metadata during disk exhaustion; regenerated with the identical prompt after space became available."
+        ]
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "turnkeys_lantern_cowl",
+      "family": "bastion",
+      "batch": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/turnkeys_lantern_cowl.webp",
+      "canonicalDisplayName": "Turnkey's Lantern Cowl",
+      "acceptedSha256": "562e85f9a3edac2520854d9d721de8a567714919f49760c24356d2de6dd4b6f9",
+      "acceptedBytes": 3366,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/originals/turnkeys_lantern_cowl.png",
+        "sha256": "19a5e966a180c5d7b7552264f9fce1dd4fb2705adbbadd3b93f0be6970809c9a",
+        "bytes": 2288693,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-bastion/masters/turnkeys_lantern_cowl.png",
+        "sha256": "76e79f9b6acc0322e26a9aae034ca8221a24f1d721dc37031232cc7c0984cb21",
+        "bytes": 494150,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "sunken-bastion-icons-2026-09-29",
+        "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+        "sha256": "6bcf52aa21bb7689c8d0b58805db56e9b9c550a2bb4eedf43f99caef70d537a1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Turnkey's Lantern Cowl (turnkeys_lantern_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty sea-stained teal CLOTH hood and short cowl, deep shadow in the face opening, ragged salt-worn fabric edge, small iron storm lantern hanging from the side seam near the lower cheek. Lantern has a restrained warm amber light behind glass, clearly attached to the cowl. Soft woven cloth, no face, head or mannequin. Preserve the established Sunken Bastion loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-bastion/superseded/turnkeys_lantern_cowl.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6bcf52aa21bb7689c8d0b58805db56e9b9c550a2bb4eedf43f99caef70d537a1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-bastion-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

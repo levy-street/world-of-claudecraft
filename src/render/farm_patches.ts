@@ -232,9 +232,20 @@ export interface FarmBedSeat {
   readonly x: number;
   readonly y: number;
   readonly z: number;
+  /** Shared with the bed's drawn plot, which sways about it; only the map
+   *  editor's live bed drag turns it, in place. */
   readonly quat: THREE.Quaternion;
   readonly patchId: string;
   readonly zoneId: string;
+}
+
+/** The bed-seat map buildFarmPatchProps hangs on its group, for the map
+ *  editor's live bed drag (editor_api/moved_object_preview.ts). */
+export function farmBedSeatsOf(
+  group: THREE.Object3D | undefined,
+): Map<string, FarmBedSeat> | undefined {
+  const seats: unknown = group?.userData.farmBedSeats;
+  return seats instanceof Map ? (seats as Map<string, FarmBedSeat>) : undefined;
 }
 
 export interface FarmPatchPropsView {
@@ -256,12 +267,17 @@ export function buildFarmPatchProps(
   const group = new THREE.Group();
   group.name = 'farmPatches';
   const seats = new Map<string, FarmBedSeat>();
+  // The editor's live bed drag re-seats the crops through this same map
+  // (editor_api/moved_object_preview.ts), so a plot rebuilt later lands on it.
+  group.userData.farmBedSeats = seats;
   if (patches.length === 0) return { group, seats };
 
   const matrix = new THREE.Matrix4();
   const holder = new THREE.Matrix4();
   const pos = new THREE.Vector3();
   const one = new THREE.Vector3(1, 1, 1);
+  const bedScale = new THREE.Vector3();
+  const yawQuat = new THREE.Quaternion();
   const tint = new THREE.Color();
 
   for (const patch of patches) {
@@ -273,6 +289,9 @@ export function buildFarmPatchProps(
         WORLD_UP,
         groundNormal(bed.x, bed.z, seed),
       );
+      // A Studio map may turn a bed (sim/moved_objects.ts): the turn is about
+      // the bed's own up after the ground tilt, and its crops seat with it.
+      if (bed.rotY !== undefined) quat.multiply(yawQuat.setFromAxisAngle(WORLD_UP, bed.rotY));
       seats.set(bed.id, {
         x: bed.x,
         y,
@@ -282,7 +301,7 @@ export function buildFarmPatchProps(
         zoneId: patch.zoneId,
       });
       pos.set(bed.x, y, bed.z);
-      holder.compose(pos, quat, one);
+      holder.compose(pos, quat, bed.scale === undefined ? one : bedScale.setScalar(bed.scale));
       bedMatrices.push(holder.clone());
     }
     addInstancedParts(
@@ -293,6 +312,12 @@ export function buildFarmPatchProps(
       matrix,
       tint.setHex(palette.soil),
     );
+    // The editor's live preview addresses a bed's instance by its id: a map
+    // that deleted a bed builds fewer instances than the content table.
+    const bedIds = patch.beds.map((bed) => bed.id);
+    for (const child of group.children) {
+      if (child.name === `farmPatches:bed:${patch.id}`) child.userData.farmBedIds = bedIds;
+    }
 
     // One compost bin per patch, just outside the west edge of the grid.
     const bin = farmCompostBinPosition(patch);

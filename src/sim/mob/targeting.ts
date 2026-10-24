@@ -20,11 +20,13 @@
 // directly (already pure); only `entities` + the Nythraxis helpers route via the seam.
 
 import { MOBS } from '../data';
+import { isGmHidden } from '../gm_presence';
 import { combatProfileForMob } from '../mob_combat';
 import type { SimContext } from '../sim_context';
 import {
   addThreat,
   canDetectStealthedTarget,
+  isFeigningDeath,
   MELEE_SWITCH_MULT,
   RANGED_SWITCH_MULT,
 } from '../threat';
@@ -40,6 +42,8 @@ const VOSS_FRONTLINE_CLASSES = new Set(['warrior', 'rogue', 'hunter']);
 const MAX_AGGRO_RADIUS = 20;
 
 function mobCanSeeTarget(ctx: SimContext, mob: Entity, target: Entity): boolean {
+  // A hidden GM (or their pet) is never seen, so it is pruned from hate tables.
+  if (isGmHidden(ctx.entities, target)) return false;
   if (target.kind !== 'player') return true;
   const template = MOBS[mob.templateId];
   const baseRadius =
@@ -136,6 +140,9 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
   if (!cur || cur.dead || !mobCanSeeTarget(ctx, mob, cur)) {
     const next = highestThreatTarget(ctx, mob);
     if (next) mob.aggroTargetId = next.id;
+    // A hunter playing dead is let go even with no one else to turn to; the
+    // empty hate table then sends the mob home like any lost pull.
+    else if (cur && isFeigningDeath(cur)) mob.aggroTargetId = null;
     return;
   }
   const curThreat = mob.threat.get(cur.id) ?? 0;

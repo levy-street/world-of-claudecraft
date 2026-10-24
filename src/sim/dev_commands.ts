@@ -1,15 +1,39 @@
+import { AUTHORED_TOWN_BUILDINGS } from './authored_town_registry';
+import { attachPendingBuddy, grantBuddy } from './buddies';
 import { applyCourserDaze } from './combat/hunter_shared';
+import { BUDDY_KEYS } from './content/buddies';
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
+import { isBalgathDevLootCommand, runBalgathDevLoot } from './dev/balgath_dev_loot';
+import {
+  BALGATH_DEV_MECHANICS,
+  balgathDevHelp,
+  balgathDevSlumber,
+  forceBalgathDevMechanic,
+  parseBalgathDevCommand,
+} from './dev/balgath_dev_mechanics';
+import { parseBalgathQuestDevCommand, runBalgathQuestDev } from './dev/balgath_dev_quests';
 import { equipBestInSlotForDev } from './dev/bis_gear';
+import {
+  parseServerTimeCommand,
+  restoreServerTime,
+  setServerTimePhase,
+} from './dev/day_night_override';
 import { displacePlayerForDev } from './dev/dev_displace';
+import { handleDrownedTempleDevChat } from './dev/drowned_temple_dev';
 import { handleFerryDevChat } from './dev/ferry_dev';
+import { handleGravewyrmSanctumDevChat } from './dev/gravewyrm_sanctum_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
-import { devTownList, resolveDevTown } from './dev/town_teleport';
+import { handleHollowCryptDevChat } from './dev/hollow_crypt_dev';
+import { spawnDevPvpBot } from './dev/pvp_bot';
+import { handleSunkenBastionDevChat } from './dev/sunken_bastion_dev';
+import { devTownLanding, devTownList, resolveDevTown } from './dev/town_teleport';
+import { handleTrashEngineDevChat } from './dev/trash_engine_dev';
 import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
+import { handleWildheartBasinDevChat } from './dev/wildheart_basin_dev';
 import { handleDevClueCommand } from './dev_clue_scrolls';
 import { applyDevKit } from './dev_kit';
 import { handleDevTreasureMapCommand } from './dev_treasure_map';
@@ -24,7 +48,7 @@ import { armWorldQuestInvestigationForDev } from './dev_world_quest_investigatio
 import { armWorldQuestShadowForDev } from './dev_world_quest_shadow';
 import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
 import { armWorldQuestWispMazeForDev } from './dev_world_quest_wisp_maze';
-import { createGroundObject, createMob } from './entity';
+import { createGroundObject } from './entity';
 import { awardFactionReputation, FACTION_IDS } from './factions';
 import {
   ignivarDevRaidTravelRoster,
@@ -33,6 +57,7 @@ import {
 } from './ignivar_dev_raid';
 import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID } from './ignivar_raid_ids';
 import { enterDungeon, instanceInfoAt } from './instances/dungeons';
+import { spawnOpenWorldMob } from './mob/open_world_tuning';
 import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import {
@@ -59,6 +84,9 @@ import {
   worldQuestCycleOfferingQuest,
   worldQuestPuzzleVariantForCycle,
 } from './world_quest_rotation';
+
+/** /dev healing faces the middle of the healing dummy row from its teleport spot. */
+const HEALING_TRAINING_DEV_FACING = Math.atan2(-39 - -36, -76 - -82);
 
 const MAX_DEV_SPAWNS = 20;
 const DEV_SPAWN_RADIUS = 4;
@@ -94,7 +122,7 @@ export function spawnMobsForDev(
       player.pos.x + Math.sin(angle) * radius,
       player.pos.z + Math.cos(angle) * radius,
     );
-    const mob = createMob(ctx.nextId++, template, level, pos);
+    const mob = spawnOpenWorldMob(ctx.nextId++, template, level, pos);
     mob.devSpawnOwnerId = pid;
     ctx.addEntity(mob);
     ids.push(mob.id);
@@ -178,6 +206,12 @@ export function handleDevChat(
     return null;
   }
   if (handleFerryDevChat(ctx, raw, pid)) return null; // /dev ferry (dev/ferry_dev.ts)
+  if (handleHollowCryptDevChat(ctx, raw, pid)) return null; // /dev crypt (dev/hollow_crypt_dev.ts)
+  if (handleSunkenBastionDevChat(ctx, raw, pid)) return null; // /dev bastion (dev/sunken_bastion_dev.ts)
+  if (handleDrownedTempleDevChat(ctx, raw, pid)) return null; // /dev temple (dev/drowned_temple_dev.ts)
+  if (handleWildheartBasinDevChat(ctx, raw, pid)) return null; // /dev wildheart (dev/wildheart_basin_dev.ts)
+  if (handleGravewyrmSanctumDevChat(ctx, raw, pid)) return null; // /dev sanctum (dev/gravewyrm_sanctum_dev.ts)
+  if (handleTrashEngineDevChat(ctx, raw, pid)) return null; // /dev trashkit (dev/trash_engine_dev.ts)
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);
@@ -416,9 +450,11 @@ export function handleDevChat(
   if (/^\/(?:dev\s+healing|devhealing|healing)\s*$/i.test(raw)) {
     const entity = ctx.entities.get(pid);
     if (entity) {
-      displacePlayerForDev(ctx, entity, -82, -42);
-      entity.facing = 0;
-      entity.prevFacing = 0;
+      // Behind the dummy row (content/healing_training.ts), clear of the quay cottage, with
+      // sight of every healing dummy and of Drillmaster Hale's own dummies; facing the middle one.
+      displacePlayerForDev(ctx, entity, -82, -36);
+      entity.facing = HEALING_TRAINING_DEV_FACING;
+      entity.prevFacing = HEALING_TRAINING_DEV_FACING;
       if (entity.level < 20) {
         ctx.setPlayerLevel(20, pid);
       }
@@ -461,7 +497,13 @@ export function handleDevChat(
     }
     const entity = ctx.entities.get(pid);
     if (entity) {
-      const pos = displacePlayerForDev(ctx, entity, town.x, town.z);
+      // only the rebuilt towns' buildings this world actually stands
+      const standing = new Set(getActiveWorldContent().props.buildings.map((b) => b.id));
+      const landing = devTownLanding(
+        town,
+        AUTHORED_TOWN_BUILDINGS.filter((building) => standing.has(building.id)),
+      );
+      const pos = displacePlayerForDev(ctx, entity, landing.x, landing.z);
       emitDevLog(
         ctx,
         pid,
@@ -588,6 +630,37 @@ export function handleDevChat(
     return null;
   }
 
+  // /dev buddies: collect every companion outright.
+  if (/^\/(?:dev\s+buddi?es?|devbuddi?es?)\s*$/i.test(raw)) {
+    let granted = 0;
+    for (const key of BUDDY_KEYS) if (grantBuddy(ctx, pid, key)) granted += 1;
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Collected ${granted} buddies (${BUDDY_KEYS.length} in the catalog). Summon one from the Buddies tab in Cosmetics.`,
+    );
+    return null;
+  }
+  // /dev buddy <key>: stage ONE companion as a boss-roll win at your feet, so
+  // the presence line and the walk-away reveal can be watched end to end.
+  const buddyMatch = /^\/dev\s+buddy\s+([a-z_]+)\s*$/i.exec(raw);
+  if (buddyMatch) {
+    const e = ctx.entities.get(pid);
+    const key = buddyMatch[1].toLowerCase();
+    if (!e || !(BUDDY_KEYS as readonly string[]).includes(key)) {
+      emitDevLog(ctx, pid, `[dev] Unknown buddy key: ${key}`);
+      return null;
+    }
+    const staged = attachPendingBuddy(ctx, pid, key, 'world', { x: e.pos.x, z: e.pos.z });
+    emitDevLog(
+      ctx,
+      pid,
+      staged
+        ? `[dev] ${key} is watching you. Walk 80 yards away and it will reveal itself.`
+        : `[dev] ${key} is already collected or already pending.`,
+    );
+    return null;
+  }
   // Grant every catalog mount skin to the (offline, session-local) account
   // cosmetics so the Cosmetics window can be exercised without the store.
   // Server-side the session cosmetics are the authority, so this only ever
@@ -754,6 +827,20 @@ export function handleDevChat(
       pid,
       `[dev] Advanced ${advanced} farm plot${advanced === 1 ? '' : 's'} to ready (${meta.farmPlots.size} planted).`,
     );
+    return null;
+  }
+
+  const pvpBotMatch = /^\/(?:dev\s+pvpbot|devpvpbot)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (pvpBotMatch) {
+    const botName = pvpBotMatch[1] ?? 'Sparring';
+    const spawned = spawnDevPvpBot(ctx, pid, botName);
+    if ('error' in spawned) ctx.error(pid, spawned.error);
+    else
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Spawned ${botName}: flagged for World PvP, your level, 10g in its purse. Raise your own flag with /pvp on contested ground, then kill it and loot the body.`,
+      );
     return null;
   }
 
@@ -1292,6 +1379,73 @@ export function handleDevChat(
     return null;
   }
 
+  // [dev] Balgath's spoils in your bags (src/sim/dev/balgath_dev_loot.ts).
+  if (isBalgathDevLootCommand(raw)) {
+    const result = runBalgathDevLoot(ctx, pid);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    return null;
+  }
+
+  // [dev] The muster's quest chain, solo (src/sim/dev/balgath_dev_quests.ts).
+  const balgathQuests = parseBalgathQuestDevCommand(raw);
+  if (balgathQuests) {
+    const result = runBalgathQuestDev(ctx, pid, balgathQuests);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    return null;
+  }
+
+  // [dev] Force one of Balgath's mechanics on the nearest live Balgath, aimed at the
+  // caller (src/sim/dev/balgath_dev_mechanics.ts).
+  const balgath = parseBalgathDevCommand(raw);
+  if (balgath) {
+    if (balgath.kind === 'help') emitDevLog(ctx, pid, balgathDevHelp());
+    else if (balgath.kind === 'unknown') {
+      ctx.error(
+        pid,
+        `[dev] Unknown Balgath mechanic '${balgath.verb}'. Usage: /dev balgath <${BALGATH_DEV_MECHANICS.join('|')}|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>.`,
+      );
+    } else {
+      const result =
+        balgath.kind === 'slumber'
+          ? balgathDevSlumber(ctx, pid, balgath.action)
+          : forceBalgathDevMechanic(ctx, pid, balgath.mechanic);
+      if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+      else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    }
+    return null;
+  }
+
+  // [dev] Move the SERVER's day/night clock (src/sim/dev/day_night_override.ts).
+  const serverTime = parseServerTimeCommand(raw);
+  if (serverTime) {
+    if (serverTime === 'usage') {
+      ctx.error(pid, '[dev] Usage: /dev servertime day|night|dawn|dusk|<0..1>|auto.');
+    } else if (serverTime.kind === 'auto') {
+      const restored = restoreServerTime(ctx);
+      emitDevLog(
+        ctx,
+        pid,
+        restored
+          ? '[dev] Server day/night clock back on real time.'
+          : '[dev] The server day/night clock was already on real time.',
+      );
+    } else {
+      const mode = setServerTimePhase(ctx, serverTime.phase);
+      const flow =
+        mode === 'running'
+          ? 'it keeps running from there'
+          : 'this world had no clock, so it stays frozen there until the next /dev servertime';
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Server day/night clock set to ${serverTime.label} (phase ${serverTime.phase.toFixed(2)}); ${flow}. Your sky is drawn from your own clock: type /daynight ${serverTime.label} to match it. /dev servertime auto restores real time.`,
+      );
+    }
+    return null;
+  }
+
   const varkhulRaidMatch = raw.match(
     /^\/(?:dev\s+varkhulraid|devvarkhulraid)(?:\s+(normal|heroic))?\s*$/i,
   );
@@ -1385,7 +1539,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev pvpbot [name], /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev trashkit [demo|cast|wall|pool|split|freeze|brand|quench|clear], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

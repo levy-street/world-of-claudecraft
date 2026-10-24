@@ -21,6 +21,7 @@ import {
   treasureCasketCopper,
 } from '../src/sim/clue_casket';
 import {
+  advanceClueHunt,
   CLUE_HUNT_STANDING,
   CLUE_HUNT_TEST_POOL,
   clueHuntFaction,
@@ -37,11 +38,13 @@ import {
   type ClueHuntDef,
   TREASURE_CASKET_ITEM_ID,
 } from '../src/sim/content/clue_hunts';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
+import { WORLD_QUEST_REWARD_LETTER } from '../src/sim/content/letters';
 import { TREASURE_MAP_ITEM_IDS, TREASURE_MAP_RARITIES } from '../src/sim/content/treasure_maps';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { ITEMS } from '../src/sim/data';
 import { METER_DIRTY_KEYS } from '../src/sim/deeds';
+import { createLootQuality } from '../src/sim/loot_quality';
 import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -408,19 +411,40 @@ describe('the slate entitlement (creditWorldQuest completion arm)', () => {
     expect(meta.clueScrollCycle).toBe('');
   });
 
-  it('full bags lose the map for the day (the cycle is still marked)', () => {
+  it('full bags post the map to the Ravenpost (the cycle is still marked)', () => {
     const sim = slateSim(20);
     const meta = metaOf(sim);
     fillBags(sim);
+    const inventoryBefore = meta.inventory.length;
     sim.drainEvents();
     const evs = completeThornpeak(sim);
     expect(mapsHeld(sim)).toBe(0);
+    expect(meta.inventory.length).toBe(inventoryBefore);
     expect(meta.clueScrollCycle).toBe(meta.worldQuestCycle);
-    expect(ofType(evs, 'treasureMapLost')).toHaveLength(1);
-    expect(ofType(evs, 'treasureMapEarned')).toHaveLength(0);
-    // And the loss is final: nothing pays later in the same cycle.
+    expect(ofType(evs, 'treasureMapLost')).toHaveLength(0);
+    const earned = ofType(evs, 'treasureMapEarned');
+    expect(earned).toHaveLength(1);
+    const mapId = TREASURE_MAP_ITEM_IDS[earned[0].rarity];
+    // The quest's own bundle may mail its day piece first (the full bags meet
+    // it too); the map is always the LAST mailed grant, on its own notice.
+    const mailedEvs = ofType(evs, 'worldQuestRewardMailed');
+    expect(mailedEvs.at(-1)).toEqual({
+      type: 'worldQuestRewardMailed',
+      itemIds: [mapId],
+      pid: sim.playerId,
+    });
+    const rewardLetters = () =>
+      sim.postOffice.mail.filter((m) => m.letterId === WORLD_QUEST_REWARD_LETTER.letterId);
+    expect(rewardLetters()).toHaveLength(mailedEvs.length);
+    expect(
+      rewardLetters()
+        .at(-1)
+        ?.items.map((slot) => [slot.itemId, slot.count]),
+    ).toEqual([[mapId, 1]]);
+    // Once per cycle still holds: nothing pays (or mails) again the same day.
     maybeAwardClueScroll(sim.ctx, meta, sim.player);
-    expect(sim.drainEvents().filter((ev) => ev.type.startsWith('treasureMap'))).toHaveLength(0);
+    expect(sim.drainEvents()).toHaveLength(0);
+    expect(rewardLetters()).toHaveLength(mailedEvs.length);
   });
 });
 
@@ -649,6 +673,30 @@ describe('the deliver step (Sim.talkToNpc)', () => {
 });
 
 describe('the dig step (using the scroll on the spot)', () => {
+  it('posts the casket to the Ravenpost when the last step lands on full bags', () => {
+    const sim = huntSim();
+    const meta = metaOf(sim);
+    startHunt(sim);
+    advanceTo(sim, 4);
+    fillBags(sim);
+    const inventoryBefore = meta.inventory.length;
+    sim.drainEvents();
+    advanceClueHunt(sim.ctx, meta);
+    const evs = sim.drainEvents();
+    expect(meta.clueHunt).toBeNull();
+    expect(sim.countItem(TREASURE_CASKET_ITEM_ID)).toBe(0);
+    expect(meta.inventory.length).toBe(inventoryBefore);
+    expect(ofType(evs, 'worldQuestRewardMailed')).toEqual([
+      { type: 'worldQuestRewardMailed', itemIds: [TREASURE_CASKET_ITEM_ID], pid: sim.playerId },
+    ]);
+    expect(
+      sim.postOffice.mail
+        .filter((m) => m.letterId === WORLD_QUEST_REWARD_LETTER.letterId)
+        .map((m) => m.items.map((slot) => [slot.itemId, slot.count])),
+    ).toEqual([[[TREASURE_CASKET_ITEM_ID, 1]]]);
+    expect(ofType(evs, 'clueHuntDone')).toHaveLength(1);
+  });
+
   it('refuses off the spot, keeps the scroll on a dig, and the last step hands the casket', () => {
     const sim = huntSim();
     const meta = metaOf(sim);
@@ -774,10 +822,38 @@ describe('the Treasure Casket', () => {
   });
 
   // A fake ctx around a real Rng: the payout is a pure function of the rng,
-  // so the odds are pinned across seeds without a Sim per roll.
+  // so the odds are pinned across seeds without a Sim per roll. Every rng
+  // call is logged by method and arguments, so the draw ORDER is pinned, not
+  // just the outcomes. Each Rng method consumes exactly one next(), so the
+  // log length is also the stream position.
+  type CasketGrant = { itemId: string; count: number; lootQuality?: unknown };
   function openWithSeed(seed: number, ownedReins = false) {
-    const grants: { itemId: string; count: number }[] = [];
+    const grants: CasketGrant[] = [];
     const emits: SimEvent[] = [];
+    const draws: string[] = [];
+    const real = new Rng(seed);
+    const rng = {
+      int: (min: number, max: number) => {
+        draws.push(`int(${min},${max})`);
+        return real.int(min, max);
+      },
+      chance: (p: number) => {
+        draws.push(`chance(${p})`);
+        return real.chance(p);
+      },
+      next: () => {
+        draws.push('next()');
+        return real.next();
+      },
+      range: (min: number, max: number) => {
+        draws.push(`range(${min},${max})`);
+        return real.range(min, max);
+      },
+      pick: <T>(arr: T[]) => {
+        draws.push(`pick(${arr.length})`);
+        return real.pick(arr);
+      },
+    };
     const meta = {
       entityId: 1,
       cls: 'mage',
@@ -787,15 +863,26 @@ describe('the Treasure Casket', () => {
       bank: { inventory: [] },
     } as unknown as PlayerMeta;
     const ctx = {
-      rng: new Rng(seed),
+      rng,
       addItem: (itemId: string, count: number) => grants.push({ itemId, count }),
+      // grantFreshLoot mints an enhanced copy as an instance carrying its
+      // permanent loot quality; a plain copy goes through addItem.
+      addItemInstance: (
+        itemId: string,
+        payload: { lootQuality?: unknown },
+        _pid: number,
+        count = 1,
+      ) => grants.push({ itemId, count, lootQuality: payload.lootQuality }),
       emit: (ev: SimEvent) => emits.push(ev),
       markDeedsDirty: vi.fn(),
     } as unknown as SimContext;
     let spent = 0;
     openTreasureCasket(ctx, meta, { level: 17 } as Entity, () => spent++);
-    return { grants, emits, meta, ctx, spent };
+    return { grants, emits, meta, ctx, spent, draws };
   }
+
+  const isGear = (id: string) =>
+    id !== HEROIC_MARK_CURRENCY_ID && id !== CASKET_MOUNT_REINS_ITEM_ID;
 
   it('rolls gear, marks and the Lanternback at their pinned odds, in a fixed order', () => {
     expect(CASKET_GEAR_CHANCE).toBe(0.1);
@@ -803,25 +890,30 @@ describe('the Treasure Casket', () => {
     expect(CASKET_MOUNT_CHANCE).toBe(0.015);
     const TRIALS = 6000;
     let gear = 0;
+    let enhanced = 0;
     let marks = 0;
     let mount = 0;
     const materials = new Set<string>();
     for (let seed = 1; seed <= TRIALS; seed++) {
-      const { grants, emits, meta, ctx, spent } = openWithSeed(seed);
+      const { grants, emits, meta, ctx, spent, draws } = openWithSeed(seed);
       expect(spent).toBe(1);
       expect(meta.copper).toBe(CASKET_COPPER_BASE + CASKET_COPPER_PER_LEVEL * 17);
       expect(meta.clueCasketsOpened).toBe(5);
       expect(ctx.markDeedsDirty).toHaveBeenCalledWith(1);
       const opened = ofType(emits, 'clueCasketOpened')[0];
-      expect(opened.itemIds).toEqual(grants.map((g) => g.itemId));
       // Always first: the material stack.
       expect(CASKET_MATERIAL_POOL).toContain(grants[0].itemId);
       expect(grants[0].count).toBe(CASKET_MATERIAL_COUNT);
+      expect(opened.itemIds[0]).toBe(grants[0].itemId);
       materials.add(grants[0].itemId);
-      // Then the extras, each at most once and in gear, marks, mount order.
-      const rest = grants.slice(1).map((g) => g.itemId);
+      // The emitted ids keep the ROLL order: gear, marks, mount, each at most once.
+      const rest = opened.itemIds.slice(1);
       const kinds = rest.map((id) =>
-        id === HEROIC_MARK_ITEM_ID ? 'marks' : id === CASKET_MOUNT_REINS_ITEM_ID ? 'mount' : 'gear',
+        id === HEROIC_MARK_CURRENCY_ID
+          ? 'marks'
+          : id === CASKET_MOUNT_REINS_ITEM_ID
+            ? 'mount'
+            : 'gear',
       );
       expect(
         [...kinds].sort(
@@ -829,8 +921,16 @@ describe('the Treasure Casket', () => {
         ),
       ).toEqual(kinds);
       expect(new Set(kinds).size).toBe(kinds.length);
+      // ... but the gear piece is GRANTED last, after marks and mount, so its
+      // loot-quality draw is the final draw of the open.
+      expect(grants.map((g) => g.itemId)).toEqual([
+        opened.itemIds[0],
+        ...rest.filter((id) => !isGear(id)),
+        ...rest.filter(isGear),
+      ]);
+      const gearGrant = grants.slice(1).find((g) => isGear(g.itemId));
       for (const g of grants.slice(1)) {
-        if (g.itemId === HEROIC_MARK_ITEM_ID) {
+        if (g.itemId === HEROIC_MARK_CURRENCY_ID) {
           expect(g.count).toBe(CASKET_HEROIC_MARKS);
           marks++;
         } else if (g.itemId === CASKET_MOUNT_REINS_ITEM_ID) {
@@ -839,13 +939,37 @@ describe('the Treasure Casket', () => {
         } else {
           // A caster's lowest delve rung: one of the two reliquary pieces.
           expect(['reliquary_legs', 'reliquary_shoulder']).toContain(g.itemId);
+          expect(g.count).toBe(1);
           gear++;
+          if (g.lootQuality) enhanced++;
         }
+      }
+      // The exact draw sequence: material, gear chance, the piece's one coin
+      // flip, marks, mount (always drawn), then the piece's quality draw and,
+      // only when it enhanced, its five weight draws.
+      expect(draws).toEqual([
+        'int(0,2)',
+        'chance(0.1)',
+        ...(gearGrant ? ['chance(0.5)'] : []),
+        'chance(0.05)',
+        'chance(0.015)',
+        ...(gearGrant ? ['int(0,9999)'] : []),
+        ...(gearGrant?.lootQuality ? Array(5).fill('int(1,1000)') : []),
+      ]);
+      if (gearGrant) {
+        // Replayed from a bare Rng: skip the five draws before it and the
+        // quality the piece carries is exactly createLootQuality's next roll.
+        const replay = new Rng(seed);
+        for (let i = 0; i < 5; i++) replay.next();
+        expect(gearGrant.lootQuality).toEqual(createLootQuality(replay));
       }
     }
     expect([...materials].sort()).toEqual([...CASKET_MATERIAL_POOL].sort());
     expect(gear / TRIALS).toBeGreaterThan(CASKET_GEAR_CHANCE - 0.02);
     expect(gear / TRIALS).toBeLessThan(CASKET_GEAR_CHANCE + 0.02);
+    // Both quality arms are exercised: some pieces enhanced, most plain.
+    expect(enhanced).toBeGreaterThan(0);
+    expect(enhanced).toBeLessThan(gear);
     expect(marks / TRIALS).toBeGreaterThan(CASKET_HEROIC_MARK_CHANCE - 0.015);
     expect(marks / TRIALS).toBeLessThan(CASKET_HEROIC_MARK_CHANCE + 0.015);
     expect(mount / TRIALS).toBeGreaterThan(CASKET_MOUNT_CHANCE - 0.008);
@@ -854,16 +978,25 @@ describe('the Treasure Casket', () => {
 
   it('never hands the Lanternback to an owner, and draws the same rng sequence either way', () => {
     let rolledMount = 0;
+    let rolledGear = 0;
     for (let seed = 1; seed <= 3000; seed++) {
-      const fresh = openWithSeed(seed).grants.map((g) => g.itemId);
-      const owner = openWithSeed(seed, true).grants.map((g) => g.itemId);
-      expect(owner).not.toContain(CASKET_MOUNT_REINS_ITEM_ID);
-      // The owner's grants are the fresh grants minus the reins: the mount
-      // roll is always drawn, so every other outcome matches seed for seed.
-      expect(owner).toEqual(fresh.filter((id) => id !== CASKET_MOUNT_REINS_ITEM_ID));
-      if (fresh.includes(CASKET_MOUNT_REINS_ITEM_ID)) rolledMount++;
+      const fresh = openWithSeed(seed);
+      const owner = openWithSeed(seed, true);
+      const freshIds = fresh.grants.map((g) => g.itemId);
+      expect(owner.grants.map((g) => g.itemId)).not.toContain(CASKET_MOUNT_REINS_ITEM_ID);
+      // The mount roll is always drawn, so the owner's draws match the fresh
+      // character's draw for draw, including the gear quality draw after it.
+      expect(owner.draws).toEqual(fresh.draws);
+      // The owner's grants are the fresh grants minus the reins, quality and
+      // all: every other outcome matches seed for seed.
+      expect(owner.grants).toEqual(
+        fresh.grants.filter((g) => g.itemId !== CASKET_MOUNT_REINS_ITEM_ID),
+      );
+      if (freshIds.includes(CASKET_MOUNT_REINS_ITEM_ID)) rolledMount++;
+      if (freshIds.some(isGear)) rolledGear++;
     }
     expect(rolledMount).toBeGreaterThan(0);
+    expect(rolledGear).toBeGreaterThan(0);
   });
 });
 

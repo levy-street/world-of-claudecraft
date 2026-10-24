@@ -1,10 +1,10 @@
-// The World Market's per-seller SALE LEDGER: the itemized record behind the one
-// "Sale proceeds" line the Merchant's Collect tab shows. A completed sale used to
-// leave nothing but a copper total, so a seller returning to a full collection box
-// could see WHAT had come back (expired listings are already itemized) but never
-// WHICH listings had actually sold, or for how much. Each sale appends a row here,
-// and the whole log clears with the gold it explains (market.ts marketCollect):
-// this is a PENDING ledger, never a permanent sales history.
+// The World Market's per-seller SALE LEDGER: the itemized record the Merchant's
+// History tab lists. A completed sale used to leave nothing but a copper total, so
+// a seller could never see WHICH listings had actually sold, or for how much. Each
+// sale appends a row here. Collecting the gold does NOT clear it (market.ts
+// marketCollect): the History tab exists to show sales after their proceeds are
+// claimed, and clearing it left that tab empty. It is a rolling recent history,
+// bounded by the cap below, not a complete one.
 //
 // A pure leaf (the market_listing_ids.ts / market_query.ts pattern): no SimContext,
 // no rng, no clock. Ordering is insertion order, which is chronological within one
@@ -14,9 +14,9 @@
 // The log is CAPPED, because it persists in the market blob and a seller who stays
 // offline across hundreds of sales would otherwise grow one unbounded row. Past the
 // cap the OLDEST rows drop and `omitted` counts them, so the tab can say how many
-// earlier sales it is not listing instead of silently showing a short list that does
-// not add up to the proceeds. Dropping a row never drops its gold: the copper total
-// lives on MarketCollection and is unaffected by anything here.
+// earlier sales it is not listing instead of silently showing a short list. Dropping
+// a row never drops its gold: the copper total lives on MarketCollection and is
+// unaffected by anything here.
 
 export interface MarketSaleRecord {
   itemId: string;
@@ -44,7 +44,7 @@ export interface MarketSaleRecord {
 
 export interface MarketSaleLog {
   entries: MarketSaleRecord[];
-  /** Sales the cap dropped. Their gold is still in the collection's copper. */
+  /** Sales the cap dropped (their gold, if not yet collected, is in the copper). */
   omitted: number;
 }
 

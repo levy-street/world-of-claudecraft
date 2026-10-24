@@ -465,6 +465,14 @@ describe('a one-shot scene without carriers', () => {
 // sees constructors only: a glTF punctual light is built inside three's loader,
 // which tests/glb_punctual_lights.test.ts covers for every shipped GLB.
 const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
+  // Studio (map editor) producers, landed with the woc-studio merge. Each is
+  // routed into a carrier source list like the release producers below.
+  'editor/3d/viewport.ts':
+    'the editor map lights, handed to Renderer.setEditorMapLights, which swaps them into viewLights and marks them (swapBudgetedLights)',
+  'render/fluid_surfaces.ts':
+    'fluid pool lights, pushed into fireLights at boot and re-adopted through the fireLights adopter on an editor rebuild',
+  'render/placed_assets.ts':
+    'the placed fire-light pool, adoptDynamicBudgetLight into the PlacedLightRegistry (the renderer budgetLights)',
   'render/battleground.ts':
     'field lights, born hidden, handed to the fireLights registry through the battleground host',
   'render/battleground_props.ts':
@@ -487,6 +495,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/haunt_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/highwatch_guild_lights.ts':
+    'the Highwatch adventurers guild hearths, lamps and belfry lantern, pushed into the props fireLights budget beside the campfires',
   'render/ignivar_fire_vfx.ts':
     'Ignivar flame light on the model bone inside the entity view, a view light marked on reconcile',
   'render/ignivar_model_vfx.ts':
@@ -502,10 +512,30 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/night_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/point_light_carriers.ts': 'the carriers themselves, the only lights three gathers',
+  'render/hollow_crypt_entrance.ts':
+    'the Fallen Chapel soul light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/hollow_crypt/crypt_lights.ts':
+    'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
+  'render/drowned_temple/temple_lights.ts':
+    'the Drowned Temple braziers, moon orbs, tidepools, the conch, the prism and the altar, pushed through the fireLights adopter sink the interiors are handed',
+  'render/wildheart_basin/basin_lights.ts':
+    'the Wildheart Basin Sunbone braziers and the jaguar eyes, pushed through the fireLights adopter sink the interiors are handed',
+  'render/gravewyrm_sanctum/sanctum_lights.ts':
+    'the Gravewyrm Sanctum braziers, soul brazier, Thaw Works soul pyres and the vault thaw pyres, pushed through the fireLights adopter sink the interiors are handed',
+  'render/sunken_bastion/bastion_lights.ts':
+    'the Sunken Bastion lanterns, braziers, fog-fire and the Fogbeacon lamp, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
     'campfire and prop fire lights, the seed of the fireLights registry, mass hidden in the constructor',
   'render/quest_objects.ts':
     'the ground-object glow inside the entity view body, a view light marked on reconcile',
+  'render/sanctum_seal_gate.ts':
+    'the Seal Gate rune light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/sunken_bastion_entrance.ts':
+    'the Drowned Gate Tower pulse light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/drowned_temple_entrance.ts':
+    'the Moon Stair gate light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/wildheart_basin_entrance.ts':
+    'the Jaguar Maw breath light and its two fire bowls, static zone feature glowLights lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/realm_flora.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/soulwell.ts':
@@ -515,8 +545,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'fall and impact lights handed to registerBudgetPointLight, born hidden, marked on the rank rebuild',
   'render/weapon_vfx.ts':
     'weapon-skin light: in the world a hidden view light marked on reconcile; in a preview canvas the only point lights of that scene, all driven live together',
-  'render/wildheart_props.ts':
-    'the Wildheart fire light, pushed through the fireLights adopter sink the interiors are handed',
+  'render/mirefen_tavern.ts':
+    'the Mirefen tavern hearth, wall fire, chandelier and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/wyrmwatch_harbor_house.ts':
     'the Harbormaster House hearth and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/yumi_maze.ts': 'maze brazier lights pushed through the fireLights adopter sink',
@@ -597,9 +627,26 @@ describe('every point-light producer is a carrier source', () => {
       'render/ability_vfx/ground_auras.ts: slot.mesh',
       'render/ability_vfx/rings.ts: mesh',
       'render/ability_vfx/rings.ts: slot.mesh',
+      // The Drowned Temple's Hydra Pool water: a mesh hook reading the drain
+      // (the Prism Stair gate's openness), never a scene.
+      'render/drowned_temple/temple_landmarks.ts: water',
+      // The Moon Stair's mist: a mesh hook writing the time of day, the
+      // reduced-motion switch, the gate's ghost and the gate light's base,
+      // never a scene.
+      'render/drowned_temple_entrance.ts: mesh',
       'render/gather_nodes.ts: target',
+      // The Gloamveil form's ground pool (the Shadow priest's look, #4466): a
+      // mesh hook writing the stain's uniforms each draw, never a scene.
+      'render/gloam_pool.ts: mesh',
       'render/goblin_rocket_sled_fx.ts: inner',
       'render/goblin_rocket_sled_fx.ts: outer',
+      // The Gravewyrm Sanctum: mesh hooks, never a scene: the gates reading
+      // the gate memory (the ice walls shattering, the chain grates rising,
+      // the Chain Bridge falling taut, the wards failing) and the sky dome,
+      // the interior's frame driver (the Calving Face's story, the chains,
+      // the shard's light on the dome and the peaks).
+      'render/gravewyrm_sanctum/sanctum_gates.ts: m',
+      'render/gravewyrm_sanctum/sanctum_sky.ts: mesh',
       // Mesh hooks, never a scene (the 2026-09-28 release/v0.44.0 merge into
       // feature/buried-hoards): the hoard entrance's rim clock and light cards,
       // and the reward chest's cards, motes and pool clock.
@@ -608,9 +655,39 @@ describe('every point-light producer is a carrier source', () => {
       'render/hoard_reward_chest.ts: mesh',
       'render/hoard_reward_chest.ts: motes',
       'render/hoard_reward_chest.ts: pool.mesh',
+      // The Fallen Chapel's grave mist: a mesh hook writing the time of day
+      // and the reduced-motion switch into its own uniform, never a scene.
+      'render/hollow_crypt_entrance.ts: mesh',
       'render/jail_scene.ts: swirl',
+      // Studio mesh clocks, never a scene: the placed fire FX (lathe flame,
+      // smoke puffs, sparks, the shared clock mesh) and the waterfall spray.
+      'render/placed_assets.ts: clockMesh',
+      'render/placed_assets.ts: lathe',
+      'render/placed_assets.ts: puffs',
+      'render/placed_assets.ts: sparks',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
+      // The sprite buddy's flame meshes step and upload their own uniforms.
+      'render/sprites_buddy_flame.ts: mesh',
+      // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
+      // the idle sweep or to Vael's lamp yaw, never a scene.
+      'render/sunken_bastion/bastion_beacon.ts: mesh',
+      // The Drowned Gate Tower's marsh fog: a mesh hook writing the time of
+      // day, the reduced-motion switch and the pulse light's base, never a scene.
+      'render/sunken_bastion_entrance.ts: mesh',
+      // The FFT ocean (9d5385caac4): every water sheet and its from-below
+      // underside twin mark themselves drawn from a mesh hook, so the per-frame
+      // simulation idles while no water is on screen; never a scene.
+      'render/water.ts: mesh',
+      'render/water.ts: under',
+      'render/waterfall.ts: sp',
+      // The Wildheart Basin's gates: mesh hooks reading the gate memory (the
+      // vine bridges weaving, the thorn walls sinking, the wards failing),
+      // never a scene.
+      'render/wildheart_basin/basin_gates.ts: m',
+      // The Jaguar Maw's mist: a mesh hook writing the time of day, the
+      // reduced-motion switch and the breath light's base, never a scene.
+      'render/wildheart_basin_entrance.ts: mesh',
     ]);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');
@@ -630,11 +707,24 @@ describe('every point-light producer is a carrier source', () => {
     }
     expect(layerCalls).toEqual([]);
     expect(maskWrites.sort()).toEqual([
+      // a spirit veil's depth sibling copies its body mesh's mask
+      'render/characters/ghost_veil.ts',
       'render/characters/makeup.ts',
       'render/characters/rig_merge.ts',
       'render/characters/stubble.ts',
+      // a merged stand-in takes the pieces it folds out of the render lists (mask 0) and
+      // puts their own masks back: never a layer a camera does not already see
+      'render/characters/woc_armor_merge.ts',
+      'render/characters/woc_head_merge.ts',
       'render/gather_nodes.ts',
+      // Copies a source MESH's mask onto the fused mesh that replaces it.
+      'render/mesh_merge.ts',
       'render/point_light_carriers_core.ts',
+      // The scenery distance bands (a0659eb667c, c33418ac348): a detail-band
+      // colour twin, a per-level instanced batch and a fused cell batch each
+      // copy the mask of the source mesh they draw for, never a new layer.
+      'render/scenery_detail.ts',
+      'render/scenery_detail_batches.ts',
     ]);
   });
 });

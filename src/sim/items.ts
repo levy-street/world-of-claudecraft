@@ -1,4 +1,7 @@
+import { endPlayDead } from './combat/hunter_play_dead';
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { gliderActionsLocked } from './glider_action_lock';
+import { membershipWeaponShape } from './membership_weapon';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { useCartographersInk, useTreasureMap } from './treasure_vault';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
@@ -28,6 +31,7 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { useBuddyToken } from './buddies';
 import { openTreasureCasket } from './clue_casket';
 import { useClueScroll } from './clue_scrolls';
 import { isWornTrinket, onTrinketEquipped, useWornTrinket } from './combat/trinkets';
@@ -74,7 +78,7 @@ import {
 import { formatMoney } from './format_money';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
-import { moveStackToCell } from './inventory_order';
+import { freezeBagCells, moveStackToCell, pinStackToCurrentCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import {
@@ -85,8 +89,8 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { type ItemUseConsumption, planItemUseConsumption } from './item_use_consumption';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
-import { isMaterialItemId } from './material_ids';
 import {
   buybackCompositionAfter,
   commitMaterialUnitWithdrawal,
@@ -106,6 +110,7 @@ import { refreshModsForEquipmentChange } from './progression/talents';
 import { useForgebreakerEmber } from './quests/forgebreaker_ember';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { usePassingStone } from './tutorial/death_lesson';
 import {
   ALL_EQUIP_SLOTS,
@@ -121,6 +126,7 @@ import {
   isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
+import { buyBuddyOffer } from './vendor_buddy_purchase';
 import {
   bulkBuyQuantity,
   buyPurchaseTotals,
@@ -174,11 +180,40 @@ function payloadWithoutCraftedRecipeId(
   return Object.keys(instance).length > 0 ? instance : undefined;
 }
 
+/** The bag's CELL GRID extent: the one flat-total read in this module. Every
+ *  caller asks where an existing stack sits or may sit (a drag, the sort
+ *  restamp, the locked-cell pin and swap), never whether a new grant fits, so
+ *  the flat total is the right answer and the two-pool split is not
+ *  (bag_pools.ts; tests/pool_wiring_pins.test.ts pins this exemption). */
+function bagGridSize(meta: PlayerMeta): number {
+  return bagCapacity(meta.bags);
+}
+
+/** The index the id-only equip walk (item_copy_ref.ts consumeNewestInventoryUnit)
+ *  lifts from: the highest matching index, -1 when none. Gear is never a
+ *  material, so the walk's material arm does not apply to an equip. */
+function newestInventoryIndex(inventory: readonly InvSlot[], itemId: string): number {
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    if (inventory[i].itemId === itemId) return i;
+  }
+  return -1;
+}
+
+/** Returns the FRESH stack the piece landed in, or null when it topped up an
+ *  existing one (both arms append a new stack at the array's end, so the
+ *  length delta is the whole test). The locked-cell swap in equipItem stamps
+ *  the returned stack's cell through it.
+ *
+ *  A LOCKED piece coming off with nothing to swap into its place (a plain
+ *  unequip, a respec bench) lands in the first free cell like any other, and
+ *  is pinned there at once: a hint-less stack would otherwise slide whenever
+ *  an earlier hint-less stack leaves, which a locked one must not. */
 function returnEquippedItemToBags(
   meta: PlayerMeta,
   itemId: string,
   payload?: ItemInstancePayload,
-): void {
+): InvSlot | null {
+  const before = meta.inventory.length;
   const craftedRecipeId = payload?.craftedRecipeId;
   const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
   if (instance || craftedRecipeId !== undefined) {
@@ -188,9 +223,14 @@ function returnEquippedItemToBags(
       ...(instance ? { instance } : {}),
       ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
     });
-    return;
+  } else {
+    addItemSilent(itemId, 1, meta);
   }
-  addItemSilent(itemId, 1, meta);
+  const fresh = meta.inventory.length === before + 1 ? meta.inventory[before] : null;
+  if (fresh && isItemLocked(fresh.instance)) {
+    pinStackToCurrentCell(meta.inventory, bagGridSize(meta), fresh);
+  }
+  return fresh;
 }
 
 function canReturnEquippedItemToBags(
@@ -207,7 +247,8 @@ function canReturnEquippedItemToBags(
  *  routed between hands from the committed spec. Exported so auto_equip.ts
  *  compares a grant against the copy this resolver would actually displace. */
 export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
-  const def = ITEMS[itemId];
+  const base = ITEMS[itemId];
+  const def = base ? membershipWeaponShape(base, meta.cls, meta.talents.spec) : undefined;
   if (!def?.slot) return null;
   if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
 
@@ -216,7 +257,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (hand === 'mainhand') return 'mainhand';
   if (hand === 'twohand') {
     if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
-    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
     if (
       mainhand?.kind === 'weapon' &&
       weaponHand(mainhand) === 'twohand' &&
@@ -231,7 +273,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (!canDualWield(meta.cls, spec)) return 'mainhand';
   if (!canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return 'mainhand';
 
-  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
   if (
     !canDualWieldTwoHand(meta.cls, spec) &&
     mainhand?.kind === 'weapon' &&
@@ -279,7 +322,7 @@ export function removePreferFungible(
   // beside it. Absent, the walk is byte-identical to before.
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     const held = ctx.resolve(pid);
     if (!held) return [];
     const payloads = consumeMaterialUnitPayloads(held.meta.inventory, itemId, count, {
@@ -382,7 +425,7 @@ export function removeSellUnitsFromInventory(
   // predicates (read on each unit's effective payload), but the source rides
   // along on every unit, so a sale, a trade preview and the real swap move the
   // units they said they would. `skipPlainStacks` reads as payload-only here.
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return takeMaterialUnits(inventory, itemId, count, {
       skip,
       deprioritize,
@@ -523,18 +566,20 @@ export function moveInventoryItem(ctx: SimContext, from: number, to: number, pid
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
-  moveStackToCell(meta.inventory, from, to, bagCapacity(meta.bags));
+  moveStackToCell(meta.inventory, from, to, bagGridSize(meta));
 }
 
 // One-shot bag clean-up (the sort button). Consolidates partial stacks and
 // restamps every cell hint into the canonical ladder; the array order itself
 // is untouched, so removal walks and recency keep their meaning (the why
 // lives in inventory_sort.ts). No arguments to validate and no rng drawn;
-// an empty inventory is a no-op.
+// an empty inventory is a no-op. The bag capacity rides along so a locked
+// stack keeps its cell while the rest sort around it.
 export function sortInventory(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
-  sortInventoryStacks(r.meta.inventory, (id) => ITEMS[id], stackSizeOf);
+  const { meta } = r;
+  sortInventoryStacks(meta.inventory, (id) => ITEMS[id], stackSizeOf, bagGridSize(meta));
 }
 
 // `targetSlot` names the exact equipment key the player aimed at (the paperdoll
@@ -689,6 +734,24 @@ export function equipItem(
   // An invalid selection refuses rather than falling back, because equipping the
   // wrong copy is silent: the piece looks right in the paperdoll and simply
   // carries none of the stats the player expected.
+  //
+  // Locked-cell swap: a locked copy is pinned to its bag cell (inventory_order.ts),
+  // so when one side of this swap is locked the piece coming OFF takes the exact cell
+  // the incoming copy leaves, and a second gear set swaps in place instead of
+  // scattering into the first free cells. Either side counts, so the round trip
+  // (equip the locked set, then equip the other set back) lands the locked piece
+  // in its own cell again. Peeked before the consume below, against the same copy
+  // it lifts (the named slot, or the newest match the id-only walk takes); only a
+  // single-unit stack actually vacates its cell.
+  const sourceIndex = slotIndex ?? newestInventoryIndex(meta.inventory, itemId);
+  const source = sourceIndex >= 0 ? meta.inventory[sourceIndex] : undefined;
+  const lockedSwap =
+    (old !== undefined || displacedId !== undefined) &&
+    source?.count === 1 &&
+    (isItemLocked(source.instance) || isItemLocked(oldInstance) || isItemLocked(displacedInstance));
+  const vacatedCell = lockedSwap
+    ? (freezeBagCells(meta.inventory, bagGridSize(meta))[sourceIndex] ?? -1)
+    : -1;
   let consumed: InventoryUnit;
   if (slotIndex !== undefined) {
     const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
@@ -703,16 +766,25 @@ export function equipItem(
   } else {
     consumed = consumeNewestInventoryUnit(meta.inventory, itemId);
   }
+  // One vacated cell, so one piece takes it (the replaced piece first). It is
+  // claimed before the next piece returns, so a second, displaced hand falls
+  // into a cell that is really free (and pins there if it is locked itself).
+  let cellToClaim = vacatedCell;
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
     // its own instanced slot (never merged into a plain stack, which would
     // silently drop the enchant; worn kinds are 1-per-slot, so the
     // identical-payload merge arm of addItemInstance could
     // never apply here anyway).
-    returnEquippedItemToBags(meta, old, oldInstance);
+    const returned = returnEquippedItemToBags(meta, old, oldInstance);
+    if (returned && cellToClaim >= 0) {
+      returned.slot = cellToClaim;
+      cellToClaim = -1;
+    }
   }
   if (displacedId) {
-    returnEquippedItemToBags(meta, displacedId, displacedInstance);
+    const returned = returnEquippedItemToBags(meta, displacedId, displacedInstance);
+    if (returned && cellToClaim >= 0) returned.slot = cellToClaim;
   }
   meta.equipment[slot] = itemId;
   if (slot === 'trinket') onTrinketEquipped(p, itemId, old);
@@ -749,7 +821,18 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   if (!offhandId) return;
   const def = ITEMS[offhandId];
   if (!def) return;
-  if (canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
+  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const conflict =
+    mainhand &&
+    displacedSlotForEquip(
+      mainhand,
+      'mainhand',
+      meta.equipment,
+      (id) => ITEMS[id],
+      meta.cls,
+      meta.talents.spec,
+    );
+  if (!conflict && canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
 
   const instance = meta.equipmentInstance?.offhand;
   delete meta.equipment.offhand;
@@ -840,11 +923,16 @@ export function useItem(
   pid?: number,
   slotIndex?: number,
   aimPoint?: { x: number; z: number },
+  inkMapTarget?: unknown,
 ): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
+  // Using an item is acting: a hunter playing dead stands up first.
+  endPlayDead(ctx, r.e);
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  // Redemption is a durable account operation owned by the online host.
+  if (itemId === MEMBERSHIP_TOKEN_ID) return;
   if (
     meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||
@@ -860,7 +948,13 @@ export function useItem(
   // Consumables of one id are interchangeable in effect, so this matters less
   // than it does for gear; it is threaded anyway so the family has no id-only
   // holes left for a new command to copy.
+  let sourceUse: ItemUseConsumption | null | undefined;
   const consumeOneUnit = (): ItemInstancePayload | undefined => {
+    if (sourceUse) {
+      const payload = sourceUse.consume();
+      ctx.onInventoryChangedForQuests?.(meta);
+      return payload;
+    }
     if (slotIndex === undefined) {
       const [unit] = ctx.removeItem(itemId, 1, meta.entityId);
       return unit;
@@ -890,6 +984,13 @@ export function useItem(
   ) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
+  }
+  if (isStackProvenanceItemId(itemId)) {
+    sourceUse = planItemUseConsumption(meta.inventory, itemId, slotIndex);
+    if (!sourceUse) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
   }
   if (def.use?.type === 'fishing') {
     ctx.startFishing(p, meta);
@@ -1013,7 +1114,7 @@ export function useItem(
     return;
   }
   if (def.use?.type === 'cartographersInk') {
-    useCartographersInk(ctx, meta);
+    useCartographersInk(ctx, meta, inkMapTarget);
     return;
   }
   if (def.use?.type === 'treasureMap') {
@@ -1294,6 +1395,13 @@ export function useItem(
     // first. Reins are never consumed: mountOwned() derives ownership from holding
     // the item, so removing it here would delete the mount.
     summonMountItem(ctx, meta.entityId, def.mount);
+  } else if (def.kind === 'buddy') {
+    // A whistle is a grant TOKEN: using it attaches the companion to the
+    // character and consumes the token (a duplicate is refused unconsumed).
+    // Summoning an owned buddy is a Cosmetics-window command, not an item use.
+    useBuddyToken(ctx, meta.entityId, itemId);
+  } else if (def.kind === 'buddy_cosmetic') {
+    // Historical cosmetic tokens remain readable but are no longer usable.
   } else if (def.kind === 'recipe') {
     // A pattern teaches the recipe it names and is spent doing so.
     // useRecipePatternItem owns every gate and the consume; it sits here, below
@@ -1508,6 +1616,7 @@ export function buyItem(
     ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
+  if (buyBuddyOffer(ctx, meta.entityId, def, copperCost, honorCost)) return;
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
@@ -1531,6 +1640,26 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
   );
 }
 
+// Whether a sold unit stays out of the buyback list. Plain Poor-quality (gray)
+// junk is worthless fodder the player sells in bulk; recording it let one Sell
+// Junk sweep evict every real sale from the VENDOR_BUYBACK_LIMIT rows. A gray
+// unit that carries anything the row would preserve (an instance payload such
+// as a signature, a crafted recipe id, or a material composition) is not
+// fungible fodder, so it still gets a row and buys back intact.
+export function skipsVendorBuyback(
+  def: ItemDef | undefined,
+  instance: ItemInstancePayload | undefined,
+  craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
+): boolean {
+  return (
+    def?.quality === 'poor' &&
+    instance === undefined &&
+    craftedRecipeId === undefined &&
+    materialSources === undefined
+  );
+}
+
 // `instance` carries the payload of the sold copies (absent for a plain
 // fungible sale). A row is a merge target only when its stored payload
 // matches under canStackInstancePayloads, exactly the identical-payload
@@ -1546,6 +1675,9 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
 // descriptors gains one unit rather than being rewritten, and the recency and
 // limit rules are untouched: the merged row still moves to the front and the
 // list still pops past VENDOR_BUYBACK_LIMIT.
+//
+// Plain gray junk never takes a row (see skipsVendorBuyback), so a Sell Junk
+// sweep cannot push the player's real sales off the end of the list.
 function recordVendorBuyback(
   meta: PlayerMeta,
   itemId: string,
@@ -1554,6 +1686,7 @@ function recordVendorBuyback(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): void {
+  if (skipsVendorBuyback(ITEMS[itemId], instance, craftedRecipeId, materialSources)) return;
   const existingIndex = meta.vendorBuyback.findIndex(
     (s) =>
       s.itemId === itemId &&
@@ -1781,8 +1914,9 @@ export function junkSellableSlot(
 
 // Bulk-sell every gray (poor-quality) item in the bags in one action, applying the
 // same rules as the per-item sellItem path: quest items and noVendorSell items are
-// left untouched and each sold stack is recorded for buyback. One summary loot line
-// is emitted instead of one per stack.
+// left untouched, and only instanced copies are recorded for buyback (plain gray
+// junk never fills the list, see skipsVendorBuyback). One summary loot line is
+// emitted instead of one per stack.
 export function sellAllJunk(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -1911,7 +2045,7 @@ export function buyBackItem(
   // row that cannot give a unit reads as unavailable rather than half-spent.
   const rowIndex = meta.vendorBuyback.indexOf(slot);
   const withdrawal = planMaterialUnitWithdrawal(meta.vendorBuyback, itemId, rowIndex);
-  if (isMaterialItemId(itemId) && withdrawal === null) {
+  if (isStackProvenanceItemId(itemId) && withdrawal === null) {
     ctx.error(meta.entityId, 'That item is not available for buyback.');
     return;
   }

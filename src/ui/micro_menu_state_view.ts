@@ -16,8 +16,8 @@ export interface MicroMenuLauncherSpec {
 /**
  * Every micro-menu launcher that OPENS A WINDOW, paired with that window's element
  * id. The ring means exactly one thing, "this button's window is open", which is why
- * the rail's other buttons are deliberately absent: `#mm-music` toggles audio and
- * keeps its own `mm-on` gold, `#mm-emote` opens the emote wheel (not a `.window`),
+ * the rail's other buttons are deliberately absent: `#mm-emote` opens the emote
+ * wheel (not a `.window`),
  * and `#mm-wiki` / `#mm-discord` leave the game entirely.
  */
 export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
@@ -41,6 +41,7 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-crafting', windowId: 'crafting-window' },
   { selector: '#mm-arena', windowId: 'arena-window' },
   { selector: '#mm-dfinder', windowId: 'dungeon-finder-window' },
+  { selector: '#expedition-bell', windowId: 'dungeon-finder-window' },
   { selector: '#mm-cardduel', windowId: 'card-duel-window' },
   { selector: '#mm-leaderboard', windowId: 'leaderboard-window' },
   { selector: '#mm-wocmarket', windowId: 'woc-market-window' },

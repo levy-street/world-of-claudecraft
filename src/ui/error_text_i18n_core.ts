@@ -161,6 +161,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'That quest is not complete.': 'questUi.errors.incomplete',
     'That quest giver is not nearby.': 'questUi.errors.giverMissing',
     'That quest turn-in is not nearby.': 'questUi.errors.turnInMissing',
+    'That reward is not offered.': 'questUi.errors.rewardNotOffered',
     'Too far away.': 'questUi.errors.tooFar',
     "This quest can't be shared.": 'hudChrome.questShare.notShareable',
     'That item is not sold here.': 'itemUi.errors.notSoldHere',

@@ -1,3 +1,5 @@
+import type { MaterialComposition } from '../sim/material_sources';
+
 // IWorld facet: World PvP, the /pvp flag (src/sim/pvp/world_pvp.ts) and the
 // King of the Hill (src/sim/pvp/hill.ts). The self-scoped readouts the World
 // PvP tab and the hill bar paint plus the one command that raises or lowers
@@ -10,11 +12,8 @@
 // ClientWorld mirrors the server's `wpvp` and `hill` self keys (delta-omitted:
 // an absent key keeps the prior readout, null before the first snapshot).
 
-import type { HillCalloutKind } from '../sim/pvp/hill_bounty_rules';
-
 export type WorldPvpZone = 'sanctuary' | 'contested' | 'ffa';
 
-/** Why an armed World PvP streak is not ticking (src/sim/pvp/world_pvp_rewards.ts). */
 export type WorldPvpRewardPause = 'dead' | 'instance' | 'sanctuary';
 
 export interface WorldPvpInfo {
@@ -23,10 +22,7 @@ export interface WorldPvpInfo {
   flagged: boolean;
   /** Played seconds rounded down to whole minutes; absent on older servers. */
   rewardSeconds?: number;
-  /** Why the armed streak is paused right now: dead (a corpse or a ghost),
-   *  inside an instance, or on sanctuary ground (world_pvp_rewards.ts
-   *  worldPvpRewardPause). Null while it ticks or while no flag is armed, so
-   *  always null on a realm with the kill switch set. Absent on older servers. */
+  /** Why the armed streak is paused. Null while it ticks or no flag is armed. */
   rewardPause?: WorldPvpRewardPause | null;
   /** Seconds until the flag drops after /pvp off, or null when it is not
    *  switching off (armed for good, or not flagged). */
@@ -45,7 +41,28 @@ export interface WorldPvpInfo {
    *  no flag can be raised and no zone is free-for-all, so the client paints
    *  nobody hostile on the world arm. */
   enabled: boolean;
+  /** The Skull Bag sub-inventory (src/sim/pvp/skull_bag.ts), present only for
+   *  a player who carries one or keeps skulls in it. */
+  skullBag?: SkullBagInfo;
 }
+
+/** What the Skull Bag holds, from its owner's seat. */
+export interface SkullBagInfo {
+  /** A Skull Bag sits in the viewer's bags, so storing and taking are open.
+   *  False when the bag is banked or gone: the skulls wait for it. */
+  owned: boolean;
+  /** Every stored skull. */
+  total: number;
+  /** One bucket per victim, the provenance a carried skull stack keeps
+   *  (src/sim/pvp/world_pvp_trophy.ts); an empty source is an unrecorded skull. */
+  sources: MaterialComposition;
+}
+
+/** A Skull Bag command: store every plain skull carried in the bags, or take
+ *  exactly the selected buckets back out. */
+export type SkullBagAction =
+  | { readonly op: 'store' }
+  | { readonly op: 'take'; readonly sources: MaterialComposition };
 
 /** Who a side of the hill is, from the viewer's seat. */
 export type HillSide = 'none' | 'you' | 'other';
@@ -54,23 +71,9 @@ export type HillSide = 'none' | 'you' | 'other';
  *  'active': risen; the contest and the payouts run. */
 export type HillPhaseInfo = 'warning' | 'active';
 
-/** Whether the viewer counts on the hill: no raid members or players below
- *  the ordinary World PvP level requirement. */
-export type HillStandingInfo = 'counted' | 'raid' | 'level';
-
-/** The latest King of the Hill announcer call (src/sim/pvp/hill_bounty.ts),
- *  for everyone in the hill's zone while it is fresh. */
-export interface HillCalloutInfo {
-  /** Unique within the realm's session, so the HUD shows each call exactly once. */
-  id: string;
-  kind: HillCalloutKind;
-  /** The streaking killer, or the one who shut a streak down. */
-  killer: string;
-  /** The player shut down; '' for a streak call. */
-  victim: string;
-  /** The killer's new streak, or the streak that was shut down. */
-  streak: number;
-}
+/** Whether the viewer counts on the hill: parties only, so a raid member
+ *  does not. Any level counts. */
+export type HillStandingInfo = 'counted' | 'raid';
 
 /** The announced or standing hill (src/sim/pvp/hill.ts), from one viewer's
  *  seat. The geometry, the phase and the holder are realm facts; `inZone`,
@@ -97,16 +100,22 @@ export interface HillInfo {
   holderCount: number;
   /** The viewer's own group's members standing inside right now. */
   yourCount: number;
-  /** The leading challenger (the largest group inside that beats the
-   *  holder's present count), and its members inside. */
+  /** The group whose contest clock this viewer's bar shows: their own group's
+   *  when it has one (running or paused), else the running challenger's (the
+   *  largest group inside that beats the holder's present count), else the
+   *  largest paused clock; and its members inside. */
   challenger: HillSide;
   challengerCount: number;
-  /** Whole seconds of unbroken majority the challenger has banked, of
-   *  HILL_CAPTURE_SECONDS; 0 when nobody is challenging. */
+  /** The largest other group's members inside (any group but the viewer's,
+   *  the holder included): the number the viewer's group must beat. */
+  rivalCount: number;
+  /** Whole seconds of majority that clock has banked, of
+   *  HILL_CAPTURE_SECONDS; 0 when no clock stands. */
   contest: number;
-  /** The latest announcer call, for a viewer in the zone while it is risen;
-   *  absent or null when there is none fresh. */
-  callout?: HillCalloutInfo | null;
+  /** The shown clock is paused: its group is inside but not the leader (a
+   *  tie, or a bigger group walked in). It resumes, never restarts, once the
+   *  group leads again. */
+  contestPaused: boolean;
 }
 
 export interface IWorldWorldPvp {
@@ -115,6 +124,9 @@ export interface IWorldWorldPvp {
    *  countdown. The sim refuses and explains under level or when nothing
    *  changes; the bare /pvp chat command toggles through the same path. */
   setWorldPvpFlag(enabled: boolean): void;
+  /** Store skulls in, or take them out of, the carried Skull Bag. The sim
+   *  refuses and explains without the bag, and on full bags. */
+  skullBagAction(action: SkullBagAction): void;
   /** The announced or standing King of the Hill circle, or null while none
    *  is (between hills, or on a realm whose World PvP switch is set). */
   hillInfo: HillInfo | null;

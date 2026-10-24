@@ -31,6 +31,10 @@ const TEST_FENCE = {
   z2: TEST_FENCE_PLACEMENT.z2,
 } as const;
 
+// Highwatch's painted chapel stands just south of this fence, door to it, so
+// the crossings below start on the chapel's forecourt, a stride off the rails.
+const FENCE_CROSSING_DISTANCE = 2;
+
 function acrossFence(distance: number): {
   from: { x: number; z: number };
   to: { x: number; z: number };
@@ -67,29 +71,46 @@ describe('player pathfinding', () => {
 
   it('routes around static blockers instead of walking straight through them', () => {
     // Re-staged 2026-08-18 for the Eastbrook harbor move (d19aa33f76): the old
-    // blocker at (0,2) was a town building on the now-open vacated ground. The
-    // chapel at (2,-78) blocks the straight line across the chapel green, with
-    // walkable ground on both sides to detour over.
+    // blocker at (0,2) was a town building on the now-open vacated ground.
+    // Re-staged again for the painted Tidehold town, which took the chapel off
+    // the green at (2,-78): the apothecary's shop at (-7,-82) blocked the
+    // straight line along z -80. Re-staged for the World of ClaudeCraft Studio
+    // map's arrangement, which moved the shop to the strand: the smithy that
+    // took the old chapel rise blocks the straight line along z -73, with open
+    // ground at both ends to detour over.
     const seed = 20061;
-    const from = { x: -2, z: -78 };
-    const to = { x: 6, z: -78 };
+    const from = { x: -13, z: -73 };
+    const to = { x: 9, z: -73 };
     const path = findPlayerPath(seed, from, to);
 
-    expect(isBlocked(seed, 2, -78)).toBe(true);
+    expect(isBlocked(seed, -2, -73)).toBe(true);
+    expect(isBlocked(seed, from.x, from.z)).toBe(false);
+    expect(isBlocked(seed, to.x, to.z)).toBe(false);
     expect(path.length).toBeGreaterThan(1);
-    expect(path.some((p) => Math.abs(p.z + 78) > 0.5)).toBe(true);
+    expect(path.some((p) => Math.abs(p.z + 73) > 0.5)).toBe(true);
     expect(path[path.length - 1]).toEqual(to);
   });
 
   it('resolves click destinations inside buildings to the nearest walkable outside point', () => {
+    // Re-staged for the World of ClaudeCraft Studio map's arrangement: on the
+    // walk-in bank a click on the walls' middle now lands on the counting
+    // hall's own walkable floor, which is right for a building you can walk
+    // into. The sealed quay cottage is the case this pins: no floor inside,
+    // so the click comes out past the nearest wall face.
     const seed = 20061;
-    const center = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position;
+    const cottage = EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage;
+    expect('walkIn' in cottage && cottage.walkIn).toBe(false);
+    const center = cottage.position;
     const target = resolvePlayerDestination(seed, center);
 
     expect(isBlocked(seed, center.x, center.z)).toBe(true);
     expect(isBlocked(seed, target.x, target.z)).toBe(false);
-    expect(Math.hypot(target.x - center.x, target.z - center.z)).toBeGreaterThan(0.5);
-    expect(Math.hypot(target.x - center.x, target.z - center.z)).toBeLessThan(6);
+    // just outside the nearest wall face (the cottage is 11 yd deep, so the
+    // nearest outside point sits a body width past its half depth)
+    const nearestFace = Math.min(cottage.footprint.halfWidth, cottage.footprint.halfDepth);
+    const reached = Math.hypot(target.x - center.x, target.z - center.z);
+    expect(reached).toBeGreaterThan(nearestFace);
+    expect(reached).toBeLessThan(nearestFace + 1.5);
   });
 
   it('snaps a water click to shore for walkers but keeps it for swimmers', () => {
@@ -124,7 +145,7 @@ describe('player pathfinding', () => {
 
   it('treats fence runs as movement blockers', () => {
     const seed = 20061;
-    const { from, to } = acrossFence(6);
+    const { from, to } = acrossFence(FENCE_CROSSING_DISTANCE);
     const midpoint = { x: (from.x + to.x) / 2, z: (from.z + to.z) / 2 };
     expect(isBlocked(seed, midpoint.x, midpoint.z)).toBe(true);
 
@@ -136,7 +157,7 @@ describe('player pathfinding', () => {
 
   it('routes over a fence when the mover can jump it (click-to-move)', () => {
     const seed = 20061;
-    const { from, to } = acrossFence(6);
+    const { from, to } = acrossFence(FENCE_CROSSING_DISTANCE);
 
     const anySegmentCrossesFence = (path: { x: number; z: number }[]) => {
       let prev = from;

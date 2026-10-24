@@ -6,7 +6,8 @@
 // map's override when one is loaded, else the built-in constant) against the
 // same deterministic terrainHeight the sim uses. Registered in
 // RENDER_PURE_CORES (tests/architecture.test.ts).
-import { terrainHeight, waterLevel } from '../sim/world';
+import { isBuiltinWorldActive } from '../sim/data';
+import { terrainHeight, waterLevel, waterLevelAt } from '../sim/world';
 
 export interface WaterFieldPlan {
   /** Height-field texels per side (square). */
@@ -143,6 +144,60 @@ export function advanceWaterSchedule(
 // open water, negative on dry land.
 export function shoreDepthAt(x: number, z: number, seed: number): number {
   return waterLevel() - terrainHeight(x, z, seed);
+}
+
+/**
+ * The surface the CAMERA is under at (x, z), or -Infinity over dry ground.
+ * waterLevelAt is the sim's answer and deliberately ignores sculpt stamps, but
+ * the sheet is built from shoreDepthAt, stamps included: a basin an author
+ * carved below the waterline DRAWS water, and a camera inside it has to get
+ * the same wash and ceiling as one in the open sea (SPACEY, 2026-09-19: "the
+ * underwater shader only working on some parts of the map"). Free above the
+ * waterline, one terrain sample below it.
+ */
+export function drawnWaterLevelAt(x: number, y: number, z: number, seed: number): number {
+  const level = waterLevelAt(x, z, seed);
+  // The built-in world keeps the sim's answer it shipped with.
+  if (Number.isFinite(level) || isBuiltinWorldActive()) return level;
+  const global = waterLevel();
+  if (y >= global + 1.1) return Number.NEGATIVE_INFINITY;
+  return shoreDepthAt(x, z, seed) > 0 ? global : Number.NEGATIVE_INFINITY;
+}
+
+/**
+ * How far below the waterline a DRY vertex's shore-depth attribute may read.
+ *
+ * The sheet's alpha and shore film fade in over the first yard of depth,
+ * interpolated linearly across each cell. The raw depth of a vertex on top of
+ * a sheer cliff is the cliff's whole height (a fjord wall can put -30 to
+ * -85 next to +50 of open sea), so the zero crossing of that interpolation
+ * lands a third of the way across the cell, out over the water: a straight
+ * band of bare seabed between the sheet's edge and the cliff foot, ~1 yard on
+ * a fine zone plane, 4-5 on a coarse block and up to 20 on an apron cell
+ * ("the water doesn't fit the topo, there are gaps"). Clamping the dry side to
+ * this margin moves the crossing to within a couple of percent of the cliff
+ * vertex, so the sheet runs under the wall and the terrain hides the rest.
+ * Gentle beaches are untouched: a dry vertex a couple of yards inland on a
+ * 5 percent shelf reads about -0.1 and was never near the clamp.
+ * The raw depth still feeds everything that MEANS dry (the tile cull, the gap
+ * sheet decision, the slope finite difference): only the shaded attribute is
+ * clamped. Matches WATER_TILE_KEEP_ABOVE, so a vertex the cull keeps is
+ * exactly a vertex the shader still grades.
+ */
+export const WATER_DRY_DEPTH_CLAMP_YARDS = 0.75;
+
+/** Whether this thread's active world floors the dry shore depth: authored
+ *  maps only, the built-in world keeps the raw depth it shipped with. Resolve
+ *  it on the MAIN thread: a zone-build worker's module copy of the active
+ *  world is only as fresh as the last content message it was sent. */
+export function clampsDryShoreDepth(): boolean {
+  return !isBuiltinWorldActive();
+}
+
+/** A vertex's shore-depth ATTRIBUTE: the raw depth, floored on the dry side
+ *  (see WATER_DRY_DEPTH_CLAMP_YARDS) when `clampDry` is set. */
+export function shoreDepthAttribute(depth: number, clampDry: boolean): number {
+  return clampDry && depth < -WATER_DRY_DEPTH_CLAMP_YARDS ? -WATER_DRY_DEPTH_CLAMP_YARDS : depth;
 }
 
 /**
@@ -366,7 +421,7 @@ export const WATER_FOAM_WIDTH_YARDS = 4.5;
 // Half-width of the central difference used for the seabed gradient, in yards.
 // The zone plane bakes at ~2 yard vertex spacing, so sampling wider than that
 // would smear a cove's slope into its neighbour's. Exported so interior shore
-// bakes (wildheart_terrain.ts) sample with the same contract the shader
+// bakes sample with the same contract the shader
 // expects instead of mirroring the value.
 export const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
 // Below this the seabed is flat enough that depth carries no direction, and

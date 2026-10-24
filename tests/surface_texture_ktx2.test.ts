@@ -50,12 +50,23 @@ const readSource = (rel: string): string => fs.readFileSync(path.join(ROOT, rel)
 
 /** Splat layers terrain.ts asks for, read off its prepareTerrainTex calls,
  *  with the srgb flag: the srgb=true COLOUR layers are pack sources for
- *  buildSplatAlbedoArray's drawImage and must stay raw (see below). */
-function terrainReferencesWithFlags(): { logical: string; srgb: boolean }[] {
+ *  buildSplatAlbedoArray's drawImage and must stay raw (see below). One row
+ *  per FILE: a call whose file argument is a conditional (the snow layer picks
+ *  Snow010A for the built-in world and Snow004 for an authored map) yields a
+ *  row for every file literal it can resolve to, so neither arm escapes. */
+function terrainReferencesWithFlags(): { key: string; logical: string; srgb: boolean }[] {
   const src = readSource('src/render/terrain.ts');
   const calls = [
-    ...src.matchAll(/prepareTerrainTex\(\s*'[^']+',\s*'([^']+)',\s*(true|false)\s*\)/g),
-  ].map((m) => ({ logical: `${TERRAIN_DIR}/${m[1]}`, srgb: m[2] === 'true' }));
+    ...src.matchAll(/prepareTerrainTex\(\s*'([^']+)',([^;]*?),\s*(true|false),?\s*\)/g),
+  ].flatMap((m) => {
+    const files = [...m[2].matchAll(/'([A-Za-z0-9_]+\.(?:jpg|png))'/g)].map((f) => f[1]);
+    if (files.length === 0) throw new Error(`prepareTerrainTex('${m[1]}') names no file literal`);
+    return files.map((file) => ({
+      key: m[1],
+      logical: `${TERRAIN_DIR}/${file}`,
+      srgb: m[3] === 'true',
+    }));
+  });
   if (calls.length === 0) throw new Error('no prepareTerrainTex calls found in terrain.ts');
   return calls;
 }
@@ -188,7 +199,13 @@ describe('surface texture KTX2 compression (shipped assets)', () => {
     // is the resident form wherever the colours load, so compressing the
     // pack source bought nothing anyway.
     const colours = terrainColourReferences();
-    expect(colours.length).toBe(6);
+    // Six colour LAYERS over seven files: snowC resolves to Snow010A on the
+    // built-in world and Snow004 on an authored map, and both are pack sources.
+    const colourKeys = terrainReferencesWithFlags()
+      .filter((c) => c.srgb)
+      .map((c) => c.key);
+    expect(new Set(colourKeys).size).toBe(6);
+    expect(colours.length).toBe(7);
     for (const logical of colours) {
       expect(fs.existsSync(onDisk(logical)), `${logical} source missing`).toBe(true);
       expect(

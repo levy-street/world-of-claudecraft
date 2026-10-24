@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { QuestSelfMirrors } from '../src/net/quest_snapshot_wire';
 import { applyQuestSelfWire } from '../src/net/quest_snapshot_wire';
 import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quest_rotation';
 
 function mirrors(): QuestSelfMirrors {
   return {
@@ -156,5 +157,86 @@ describe('world quest snapshot wire', () => {
       state: 'active',
       puzzleVariant: 0,
     });
+  });
+
+  it('keeps the row of a replacement quest, which is not on the base board', () => {
+    // wq1_101 offers the stealth heist in Eastbrook; calligraphy is the reroll.
+    const cycle = 'wq1_101';
+    const row = { questId: 'wq_eastbrook_calligraphy', count: 1, state: 'active' as const };
+    const target = mirrors();
+    applyQuestSelfWire(target, {
+      wqday: cycle,
+      wqrep: { wq_eastbrook_shadow: row.questId },
+      wqlog: [row],
+    });
+    expect(target.worldQuestLog.get(row.questId)).toMatchObject(row);
+
+    // A later delta carries the row alone; the mirrored replacement still admits it.
+    const later = { ...row, count: 2 };
+    applyQuestSelfWire(target, { wqlog: [later] });
+    expect(target.worldQuestLog.get(row.questId)).toMatchObject(later);
+
+    // A rollover never carries yesterday's replacement onto the new board.
+    applyQuestSelfWire(target, { wqday: 'wq1_102', wqlog: [later] });
+    expect(target.worldQuestLog.has(row.questId)).toBe(false);
+  });
+
+  // Discord report: the rerolled "Load freight into the wagon" completed and paid out,
+  // but the map board kept it open (0/6) because the decode filtered its row against
+  // the shared rotation only, never the character's personal replacement.
+  it("keeps progress rows for a personal replacement quest on today's board", () => {
+    const replacementId = 'wq_eastbrook_bandits';
+    let cycle = '';
+    let replacedId = '';
+    for (let day = 1; day <= 64 && !cycle; day++) {
+      const ids = activeWorldQuestsForCycle(`wq1_${day}`).map((quest) => quest.id);
+      const replaced = ids.find((id) => id.startsWith('wq_eastbrook_') && id !== replacementId);
+      if (replaced && !ids.includes(replacementId)) {
+        cycle = `wq1_${day}`;
+        replacedId = replaced;
+      }
+    }
+    expect(cycle).not.toBe('');
+    const replacement = { questId: replacementId, count: 6, state: 'completed' };
+
+    // Both keys in one snapshot (login or resume).
+    const target = mirrors();
+    applyQuestSelfWire(target, {
+      wqday: cycle,
+      wqrr: cycle,
+      wqrep: { [replacedId]: replacementId },
+      wqlog: [replacement],
+    });
+    expect(target.worldQuestLog.get(replacementId)).toEqual(replacement);
+
+    // The delta gate sends the reroll first, then progress on a later tick.
+    const delta = mirrors();
+    applyQuestSelfWire(delta, {
+      wqday: cycle,
+      wqlog: [],
+      wqrr: cycle,
+      wqrep: { [replacedId]: replacementId },
+    });
+    applyQuestSelfWire(delta, { wqlog: [{ questId: replacementId, count: 3, state: 'active' }] });
+    expect(delta.worldQuestLog.get(replacementId)).toEqual({
+      questId: replacementId,
+      count: 3,
+      state: 'active',
+    });
+
+    // A rollover snapshot without `wqrep` never applies the old cycle's mapping.
+    let nextCycle = '';
+    for (let day = 1; day <= 64 && !nextCycle; day++) {
+      const ids = activeWorldQuestsForCycle(`wq1_${day}`).map((quest) => quest.id);
+      if (`wq1_${day}` !== cycle && !ids.includes(replacementId)) nextCycle = `wq1_${day}`;
+    }
+    applyQuestSelfWire(delta, { wqday: nextCycle, wqlog: [replacement] });
+    expect(delta.worldQuestCycle).toBe(nextCycle);
+    expect(delta.worldQuestLog.has(replacementId)).toBe(false);
+
+    // Without a replacement mapping the off-board row is still dropped.
+    const plain = mirrors();
+    applyQuestSelfWire(plain, { wqday: cycle, wqlog: [replacement] });
+    expect(plain.worldQuestLog.has(replacementId)).toBe(false);
   });
 });

@@ -1,9 +1,13 @@
 // Unreachable-target detection for engaged mobs: the classic evade trigger.
-// Mobs chase in a straight line with a slide fan and no pathfinding, so a mob
-// whose target stands past a wall or under an unclimbable ledge pins in place
-// forever, still in combat, while the target chips it down risk-free (the rift
-// ledge exploit). This module watches for that shape: engaged, out of reach,
-// committing zero movement, with the straight step toward the target refused
+// Mobs chase in a straight line with a slide fan, and inside an instance a
+// chase that stops dead on geometry first looks for a route round it
+// (mob/chase_route.ts: a wall with a doorway is walked round, never waited
+// out). What reaches this module's timeout is the mob NO route helps (or, in
+// the open world, a rift or a delve, the mob with no routes at all): its target stands
+// past a wall with no way round or under an unclimbable ledge, and it would pin
+// in place forever, still in combat, while the target chips it down risk-free
+// (the rift ledge exploit). This module watches for that shape: engaged, out
+// of reach, committing zero movement, with the straight step toward the target refused
 // by the same block modes moveToward enforces. After CHASE_STALL_TIMEOUT
 // seconds of that, the caller (combat_profile.ts) sends an open-world mob home
 // through the existing evade state (immune, heals to full on arrival), while an
@@ -33,6 +37,7 @@ import {
   terrainSteepnessAt,
   waterLevelAt,
 } from '../world';
+import { insideKeepOut } from './keep_out';
 
 // Longer than the evade arm's EVADE_STALL_TIMEOUT (3s, locomotion.ts): a false
 // positive there merely phases a mob home, while a false positive here full
@@ -99,14 +104,21 @@ export function chaseStalledUnreachable(
   target: Entity,
   reach: number,
   chaseSpeed: number,
+  inReach = dist2d(mob.pos, target.pos) <= reach,
 ): boolean {
   // A phasing mob walks through the geometry this probe models; its moveToward
-  // always commits the straight step, so it can never be terrain-pinned.
-  if (MOBS[mob.templateId]?.phasesThroughObstacles) return false;
+  // always commits the straight step, so it can never be terrain-pinned. The one
+  // thing that CAN hold it is its own keep-out circle (mob/keep_out.ts): a target
+  // standing inside one is chased only to the rim, which is exactly the
+  // unreachable perch this module denies, so that case stalls like a wall does.
+  const template = MOBS[mob.templateId];
+  const heldOut =
+    !!template?.keepOut && insideKeepOut(template.keepOut, target.pos.x, target.pos.z);
+  if (template?.phasesThroughObstacles && !heldOut) return false;
   // In reach is fighting fine: melee in swing range, casters standing at spell
   // range on purpose. Also covers a mob close enough to hit through thin walls
   // (mob melee has no line-of-sight check), which is a fight, not a stall.
-  if (dist2d(mob.pos, target.pos) <= reach) {
+  if (inReach) {
     mob.chaseStall = 0;
     return false;
   }
@@ -114,6 +126,10 @@ export function chaseStalledUnreachable(
   // reset) so root spam can neither trigger an evade nor re-arm a pinned
   // mob's clock.
   if (ctx.isRooted(mob)) return false;
+  // Held on a keep-out rim he may still edge round it after a target that moves
+  // inside, so neither "moved this tick" nor the collider probe applies: out of
+  // reach behind the circle is pinned.
+  if (heldOut) return tickStall(mob);
   // The slide fan only commits movement when it makes real progress, so a
   // circling or wall-sliding mob moves every tick and resets; a truly pinned
   // mob commits exactly zero.
@@ -123,10 +139,18 @@ export function chaseStalledUnreachable(
   }
   // Stationary with open ground ahead is a transient AI hiccup, not an
   // unreachable target.
-  if (!blockedTowardTarget(ctx, mob, target.pos, chaseSpeed)) {
+  if (
+    dist2d(mob.pos, target.pos) > reach &&
+    !blockedTowardTarget(ctx, mob, target.pos, chaseSpeed)
+  ) {
     mob.chaseStall = 0;
     return false;
   }
+  return tickStall(mob);
+}
+
+/** Accumulate one pinned tick; true exactly once per full stall window. */
+function tickStall(mob: Entity): boolean {
   mob.chaseStall += DT;
   if (mob.chaseStall < CHASE_STALL_TIMEOUT) return false;
   mob.chaseStall = 0;

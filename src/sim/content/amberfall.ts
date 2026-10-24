@@ -5,6 +5,7 @@
 // Frostveil's north benches over the Goldmelt pass, snow melting into
 // gold underfoot (southPassX). Terrain shape: AMBER_* tables in world.ts.
 
+import { LANTERNMERE_LAYOUT, paintedTownBuildingDefs } from '../painted_towns';
 import type {
   CampDef,
   GroundObjectDef,
@@ -20,6 +21,7 @@ import { emptyZoneProps } from '../types';
 
 export const AMBERFALL_ZONE: ZoneDef = {
   id: 'amberfall',
+  worldPvp: 'ffa',
   name: 'The Amberfall',
   riftPortalEligible: true,
   riftTierWeights: { B: 0.15, A: 0.55, S: 0.3 },
@@ -559,13 +561,10 @@ export const AMBERFALL_QUEST_CAMPS: CampDef[] = [
 
 export const AMBERFALL_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Lanternmere: an autumn market town on the Mere's north shore
-  buildings: [
-    { kind: 'inn', x: -372, z: 2066, w: 6, d: 7, rot: 0.6 },
-    { kind: 'house', x: -348, z: 2062, w: 6, d: 6, rot: -0.8 },
-    { kind: 'house', x: -374, z: 2084, w: 6, d: 6, rot: 2.0 },
-    { kind: 'chapel', x: -346, z: 2082, w: 5, d: 7, rot: -2.2 },
-  ],
+  // Lanternmere: an autumn market town on the Mere's north shore, its painted
+  // inn west of the square and its chapel and a house east, every door on the
+  // square or its roads (sim/painted_towns/lanternmere.ts)
+  buildings: [...paintedTownBuildingDefs(LANTERNMERE_LAYOUT)],
   wells: [{ x: -360, z: 2074, r: 1.5 }],
   stalls: [
     { x: -354, z: 2068, rot: 0.4, r: 1.6 },

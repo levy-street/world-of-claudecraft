@@ -90,15 +90,14 @@ const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), '
   /\r\n/g,
   '\n',
 );
-// The server's pretty-URL alias table (STATIC_PAGE_ALIASES), imported by server/main.ts.
-const serverAliases = readFileSync(
-  new URL('../server/static_fallback.ts', import.meta.url),
-  'utf8',
-);
 const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
 );
+const mobileZoomGuardTs = readFileSync(
+  new URL('../src/game/mobile_zoom_guard.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const padTargetPickTs = readFileSync(
   new URL('../src/game/pad_target_pick.ts', import.meta.url),
   'utf8',
@@ -362,8 +361,8 @@ describe('client HTML shell', () => {
   });
 
   it('carries the loading-screen element set, including #ls-slow-hint, in BOTH entries', () => {
-    // main.ts is shared by index.html and play.html (src/CLAUDE.md: "index.html
-    // AND play.html both load src/main.ts"). setSlowConnectionHintVisible is
+    // main.ts runs on both index.html and play.html (src/CLAUDE.md, Entries; index.html
+    // reaches it through src/boot.ts). setSlowConnectionHintVisible is
     // hit on every 1s tick of the slow-connection watch during the whole
     // loading screen, so a missing element on either entry throws (or, with
     // the null-guard, silently never shows) on that entry. #2106's review
@@ -1010,14 +1009,11 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("alternateName: 'World of Claudecraft'");
     expect(mainTs).toContain("'https://github.com/levy-street/world-of-claudecraft'");
     expect(robotsTxt.trim()).toBe(
-      'User-agent: *\nAllow: /\n\nSitemap: https://worldofclaudecraft.com/sitemap.xml\nSitemap: https://worldofclaudecraft.com/sitemap-characters.xml\nSitemap: https://worldofclaudecraft.com/sitemap-marketing.xml',
+      'User-agent: *\nAllow: /\n\nSitemap: https://worldofclaudecraft.com/sitemap.xml\nSitemap: https://worldofclaudecraft.com/sitemap-characters.xml',
     );
     expect(robotsTxt).toContain('Sitemap: https://worldofclaudecraft.com/sitemap.xml');
     // The dynamic per-character sitemap (served by the game server) is advertised too.
     expect(robotsTxt).toContain('Sitemap: https://worldofclaudecraft.com/sitemap-characters.xml');
-    // The player-guide pages are served by nginx beside the game (woc-marketing-website);
-    // their sitemap index is advertised here so crawlers find them from the game's robots.txt.
-    expect(robotsTxt).toContain('Sitemap: https://worldofclaudecraft.com/sitemap-marketing.xml');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/</loc>');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/links</loc>');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/play</loc>');
@@ -1060,28 +1056,23 @@ describe('client HTML shell', () => {
     expect(supportHtml).toContain('href="/data-deletion">Data Deletion page</a>');
     expect(supportHtml).toContain('"@type": "ContactPage"');
     expect(html).toContain(
-      'href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.whitepaper"',
+      'href="https://worldofclaudecraft.com/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.whitepaper"',
     );
     expect(html.indexOf('data-i18n="footer.whitepaper"')).toBeLessThan(
       html.indexOf('data-i18n="footer.terms"'),
     );
     expect(existsSync(whitepaperUrl)).toBe(true);
     expect(statSync(whitepaperUrl).size).toBeGreaterThan(0);
-    expect(html).toContain(
-      'href="/terms" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.terms"',
-    );
-    expect(html).toContain(
-      'href="/privacy" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.privacy"',
-    );
-    expect(mainTs).toContain('syncFooterLegalLinks();');
+    expect(html).toContain('href="/terms" class="footer-link" data-i18n="footer.terms"');
+    expect(html).toContain('href="/privacy" class="footer-link" data-i18n="footer.privacy"');
     expect(viteConfig).toContain("['/privacy', '/privacy.html']");
     expect(viteConfig).toContain("['/terms', '/terms.html']");
     expect(viteConfig).toContain("['/data-deletion', '/data-deletion.html']");
     expect(viteConfig).toContain("['/support', '/support.html']");
-    expect(serverAliases).toContain("['/privacy', '/privacy.html']");
-    expect(serverAliases).toContain("['/terms', '/terms.html']");
-    expect(serverAliases).toContain("['/data-deletion', '/data-deletion.html']");
-    expect(serverAliases).toContain("['/support', '/support.html']");
+    expect(serverMain).toContain("['/privacy', '/privacy.html']");
+    expect(serverMain).toContain("['/terms', '/terms.html']");
+    expect(serverMain).toContain("['/data-deletion', '/data-deletion.html']");
+    expect(serverMain).toContain("['/support', '/support.html']");
   });
 
   it('loads Meta Pixel outside local development and tracks level 5', () => {
@@ -1117,13 +1108,18 @@ describe('client HTML shell', () => {
     // tests/meta_pixel.test.ts. What main.ts owes now is only that it reaches the
     // shared sender rather than re-implementing it: while the duplicate stood, its
     // three events were guarded by nothing behavioral at all.
-    expect(mainTs).toContain("import { trackMetaPixel } from './game/meta_pixel';");
+    expect(mainTs).toContain(
+      "import { trackCommunityLinkClicks, trackMetaPixel } from './game/meta_pixel';",
+    );
     expect(mainTs).not.toContain("fbq('trackCustom'");
     expect(mainTs).toContain(
       'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );
-    expect(mainTs).toContain("'GitHubClick'");
-    expect(mainTs).toContain("'DiscordClick'");
+    // The GitHub/Discord click events moved with trackCommunityLinkClicks to the shared
+    // sender's module, which the landing-first boot also binds before the client loads.
+    expect(mainTs).toContain('trackCommunityLinkClicks();');
+    expect(metaPixelTs).toContain("'GitHubClick'");
+    expect(metaPixelTs).toContain("'DiscordClick'");
   });
 
   it('keeps the $WOC contract address box off the landing page', () => {
@@ -1259,10 +1255,17 @@ describe('client HTML shell', () => {
     // lives in the pure preview_framing.ts constants and is applied on construction;
     // the exact numbers are pinned decisively in tests/preview_framing.test.ts.
     expect(characterPreviewTs).toContain('this.applyFraming(PREVIEW_FRAMING.sheet);');
-    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, f.y, f.z);');
+    // A fixed framing always rides the centered x: applyFraming hands
+    // LIVE_PREVIEW_X to applyPose, which places the camera on that x and aims it
+    // along the same x, so the model is never slid or turned off the stage
+    // center. Only the face builder's close-up reaches applyPose with another x
+    // (creationFocusPose, pinned in tests/woc_head_builder_model.test.ts).
     expect(characterPreviewTs).toContain(
-      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, f.lookY, 0));',
+      'this.applyPose({ x: LIVE_PREVIEW_X, y: f.y, z: f.z, lookY: f.lookY });',
     );
+    expect(characterPreviewTs).toContain('this.camera.position.set(p.x, p.y, p.z);');
+    // (LOOK_AT is a module scratch vector, so a camera moved every frame allocates nothing)
+    expect(characterPreviewTs).toContain('this.camera.lookAt(LOOK_AT.set(p.x, p.lookY, 0));');
   });
 
   it('offers the quest log in the mobile controls drawer', () => {
@@ -2217,9 +2220,10 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'touch-action: manipulation;\n    -webkit-tap-highlight-color: transparent;',
     );
-    expect(mainTs).toContain(
+    expect(mobileZoomGuardTs).toContain(
       'target?.closest(\'button, a, input, textarea, select, [role="button"], [role="option"], [tabindex]\')',
     );
+    expect(mainTs).toContain('installMobileZoomGuard();');
     expect(mainTs).toContain(
       "document.addEventListener('pointerup', handleNativeMenuToggle, true);",
     );
@@ -2508,7 +2512,12 @@ describe('client HTML shell', () => {
 
   it('ships a looping cinematic backdrop with a poster fallback, lazy-loaded for perf', () => {
     expect(html).toContain('id="bg-home"');
-    expect(html).toContain('poster="/home-bg.png"');
+    // The poster only shows in the native and desktop shells (the website hides the
+    // video), so the markup carries it as data-poster and src/boot.ts applies it there.
+    expect(html).toContain('data-poster="/home-bg.webp"');
+    expect(html).not.toContain(' poster="');
+    const bootTs = readFileSync(new URL('../src/boot.ts', import.meta.url), 'utf8');
+    expect(bootTs).toContain('if (video?.dataset.poster) video.poster = video.dataset.poster;');
     // The 5.7MB mp4 is NOT eagerly fetched: no <source>/autoplay/preload in the
     // static markup. main.ts attaches data-trailer-src only on capable devices;
     // phones / Save-Data / reduced-motion / high-contrast keep the poster only.

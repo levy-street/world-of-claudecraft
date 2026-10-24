@@ -105,9 +105,9 @@
 | eviscerate | 1 | 1 | 35 | base 4, perCombo 7, var 4 |
 | | **2** | **12** | 35 | base **8**, perCombo **12**, var 6 (5cp ≈ 62–74) |
 | | **3** | **18** | 35 | base **14**, perCombo **18**, var 9 (5cp ≈ 95–113) |
-| backstab | 1 | 4 | 60 | weaponMult 1.5, +11 (behind, dagger) |
-| | **2** | **12** | 60 | weaponMult 1.5, **+20** |
-| | **3** | **18** | 60 | weaponMult 1.5, **+32** |
+| backstab | 1 | 4 | 50 | weaponMult 1.5, +11 (behind, dagger) |
+| | **2** | **12** | 50 | weaponMult 1.5, **+20** |
+| | **3** | **18** | 50 | weaponMult 1.5, **+32** |
 | gouge | 1 | 6 | 45 | 8–9 dmg + incapacitate 4s |
 | | **2** | **14** | 45 | **15–17** dmg + incapacitate 4s |
 | evasion / slice_and_dice / sprint | 1 | 8/10/10 | — | no further ranks (durations/multipliers stay) |
@@ -116,9 +116,9 @@
 
 | Ability | Learn | Cost | CD | Effects |
 |---|---|---|---|---|
-| `kidney_shot` | 14 | 25 | 20s | spendsCombo, **finisherStun { base 1, perCombo 1 }** (2–6s) — *the one new effect type* |
-| `ambush` | 16 | 60 | — | weaponStrike weaponMult 2.5, +28, requiresBehind, dagger, awardsCombo 1 |
-| `adrenaline_rush` | 20 | 0 | 180s, offGcd | gainResource 60 (energy) |
+| `kidney_shot` | 14 | 25 | 20s | spendsCombo, **finisherStun { base 2, perCombo 1 }** (3-7s) - *the one new effect type* |
+| `ambush` | 16 | 50 | - | weaponStrike weaponMult 2.5, +28, requiresBehind, dagger, awardsCombo 1 |
+| `adrenaline_rush` | 20 | 0 | 90s, offGcd | gainResource 60 (energy) |
 
 **Sanity** — L14: SS R3 special ≈ 40–45; 5 builders (~210) + Eviscerate R2 (~68) + white ≈ 292 hp in ~8 actions ✓. L20: SS R4 ≈ 55–60; 5 SS (~285) + Evisc R3 (~105) = 390 + white ≥ 400 ✓.
 
@@ -216,7 +216,7 @@ pinned by `tests/paladin_progression.test.ts`; the current design is
 | shadow_word_pain | 1 | 4 | 25 | inst | dot 30/18s (6×5) |
 | | **2** | **10** | 38 | inst | dot **54/18s** (6×9) |
 | | **3** | **16** | 55 | inst | dot **84/18s** (6×14) |
-| power_word_shield | 1 | 6 | 45 | inst, 6cd | absorb 48/30s |
+| power_word_shield | 1 | 6 | 45 | inst, 6cd | absorb 48/30s + 10% combined healing power (Spell Power + gear/set Healing Power, every rank) |
 | | **2** | **12** | 70 | inst, 6cd | absorb **90** |
 | | **3** | **18** | 100 | inst, 6cd | absorb **145** |
 | renew | 1 | 8 | 30 | inst | hot 45/15s (5×9) |

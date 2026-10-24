@@ -6,6 +6,7 @@ import {
 } from '../src/sim/professions/battlefield_xp';
 import { emptyCraftSkills } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
+import type { InvSlot } from '../src/sim/types';
 
 function makeSim(seed = 42) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -426,8 +427,8 @@ describe('Battlefield Experience wired into potion-drunk (#1149)', () => {
       { signer: meta.name, rolled: { quality: 'rare' } },
       pid,
     );
-    // Plain copies picked up afterward (later slot, own stack since instanced
-    // slots never merge with fungible stacks).
+    // Plain copies picked up afterward stay separate because their quality
+    // differs from the rare signed potion.
     sim.addItem('minor_healing_potion', 2, pid);
     const entity = (sim as any).entities.get(pid);
     entity.hp = 1;
@@ -439,7 +440,9 @@ describe('Battlefield Experience wired into potion-drunk (#1149)', () => {
     expect(meta.craftSkills.alchemy).toBe(0);
     expect(sim.countItem('minor_healing_potion', pid)).toBe(2); // 1 signed + 1 plain left
     const remainingSigned = meta.inventory.find(
-      (s: any) => s.itemId === 'minor_healing_potion' && s.instance?.signer === meta.name,
+      (s: InvSlot) =>
+        s.itemId === 'minor_healing_potion' &&
+        s.materialSources?.some((entry) => entry.source.signer === meta.name && entry.count === 1),
     );
     expect(remainingSigned).toBeDefined();
   });

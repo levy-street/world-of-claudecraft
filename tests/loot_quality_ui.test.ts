@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { craftResultViewFromEvent } from '../src/net/craft_result_mirror';
 import { ITEMS } from '../src/sim/data';
 import { emitInventoryReceipt } from '../src/sim/inventory_receipt';
 import { activeItemInstanceStats } from '../src/sim/item_instance_stats';
@@ -11,6 +12,7 @@ import { itemCombatTooltipLines } from '../src/ui/item_combat_tooltip_view';
 import { itemStatDeltas, sameItemCopy, shouldCompareCopies } from '../src/ui/item_compare';
 import { itemNumber, itemStatName, wornTooltipInstance } from '../src/ui/item_instance_tooltip';
 import {
+  craftedLineBody,
   lootQualityReceiptBody,
   lootQualityReceiptNodes,
   lootQualityReceiptText,
@@ -291,5 +293,52 @@ describe('permanent loot quality presentation', () => {
     }
     expect(html).toContain('Rift upgrade 5/5');
     expect(html).toContain('Rift gems 0/2');
+  });
+});
+
+describe('crafted line names the rolled quality', () => {
+  const doc = {
+    createElement: () => ({ append: () => {} }),
+    createTextNode: () => ({}),
+  } as unknown as Document;
+
+  it('links the exact crafted copy only when it rolled above Ordinary', () => {
+    const appended: Array<{ id: string; instance?: ItemInstancePayload }> = [];
+    const appendLink = (_parent: HTMLElement, id: string, instance?: ItemInstancePayload) => {
+      appended.push({ id, instance });
+    };
+    const text = 'Crafted: [[i:ring]]';
+    expect(craftedLineBody(doc, text, 'ring', undefined, appendLink)).toBe(text);
+    expect(appended).toHaveLength(0);
+    // A signed masterwork copy links with its whole payload, not just the tier.
+    const crafted: ItemInstancePayload = {
+      ...copy(1),
+      signer: 'Maker',
+      rolled: { masterwork: true, stats: { str: 2 } },
+    };
+    const body = craftedLineBody(doc, text, 'ring', crafted, appendLink);
+    expect(Array.isArray(body)).toBe(true);
+    expect(appended).toEqual([{ id: 'ring', instance: crafted }]);
+    // A copy with no valid descriptor stays on the plain string path.
+    expect(craftedLineBody(doc, text, 'ring', { signer: 'Maker' }, appendLink)).toBe(text);
+    expect(appended).toHaveLength(1);
+  });
+
+  it('mirrors the event quality into the online CraftResultView, validated', () => {
+    const base = {
+      type: 'craftResult' as const,
+      ok: true,
+      recipeId: 'r',
+      itemId: 'ring',
+      count: 1,
+      pid: 7,
+    };
+    const instance: ItemInstancePayload = { ...copy(3), signer: 'Maker' };
+    const view = craftResultViewFromEvent({ ...base, instance });
+    expect(view.instance).toEqual(instance);
+    expect(view.instance).not.toBe(instance);
+    expect('instance' in craftResultViewFromEvent(base)).toBe(false);
+    const bad = { signer: 'Maker', lootQuality: { ...copy(3).lootQuality!, tier: 9 } } as never;
+    expect('instance' in craftResultViewFromEvent({ ...base, instance: bad })).toBe(false);
   });
 });

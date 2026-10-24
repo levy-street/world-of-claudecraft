@@ -440,13 +440,16 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
   // an output can exceed that tier is the masterwork bump (def quality + 1 on
   // the ladder). The empowerment ceiling therefore binds craft outputs by
   // gating the masterwork EFFECT, never the proc draw itself: every successful
-  // craft below still draws exactly once.
+  // craft below still draws the proc exactly once, and its equipment output
+  // then takes one permanent loot-quality draw at grant (five more weight
+  // draws only on an enhanced roll, which no arm here hits), so two in all.
   //
   // PROC_SEED was HUNTED (loop seeds, build the scenario, craft once, keep the
   // first seed whose proc roll lands under MASTERWORK_BASE_CHANCE) and is
   // pinned as a literal; the hunt loop is not committed. At this seed the
   // craft's proc roll is the FIRST rng draw after Sim construction in every
-  // arm below (nothing else here draws), so the identical roll value reaches
+  // arm below (nothing else here draws before it; the loot-quality draw comes
+  // after, so it never moved this seed), so the identical roll value reaches
   // the proc comparison each time: only the archetype ceiling changes the
   // outcome, which is exactly what these cases pin. Re-hunted twice for the
   // same reason (content commits move the construction-time world-gen draws,
@@ -479,19 +482,17 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     return (sim as unknown as { ctx: Parameters<typeof resolveCraftForRecipe>[0] }).ctx;
   }
 
-  /** Run `fn` while observing rng draws: returns the draw count and the last
-   *  drawn value (the proc roll, since every arm draws exactly once). */
+  /** Run `fn` while observing rng draws: returns the draw count and the FIRST
+   *  drawn value (the proc roll, which always precedes the output grant). */
   function observeDraws<T>(sim: Sim, fn: () => T): { result: T; draws: number; roll: number } {
     const rng = ctxOf(sim).rng;
-    let draws = 0;
-    let roll = -1;
+    const values: number[] = [];
     rng.setObserver((value) => {
-      draws += 1;
-      roll = value;
+      values.push(value);
     });
     const result = fn();
     rng.setObserver(null);
-    return { result, draws, roll };
+    return { result, draws: values.length, roll: values[0] ?? -1 };
   }
 
   function syntheticRecipe(
@@ -523,7 +524,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     major.acceptArchetypeQuest('tailoring');
     for (const r of recipe.reagents) major.addItem(r.itemId, r.count, majorPid);
     const majorRun = observeDraws(major, () => runCraft(major, recipe.id, false, majorPid));
-    expect(majorRun.draws).toBe(1);
+    expect(majorRun.draws).toBe(2); // the proc draw, then the output's one loot-quality draw
     expect(majorRun.roll).toBeLessThan(MASTERWORK_BASE_CHANCE); // the hunted premise
     expect(major.lastCraftResult?.masterwork).toBe(true);
     expect(major.events.filter((e) => e.type === 'masterwork')).toEqual([
@@ -554,7 +555,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     expect(metaOf(dormant, pid).archetype.hobbyCraft).toBe(STATE_HOBBY); // not tailoring: dormant
     for (const r of recipe.reagents) dormant.addItem(r.itemId, r.count, pid);
     const run = observeDraws(dormant, () => runCraft(dormant, recipe.id, false, pid));
-    expect(run.draws).toBe(1); // the proc draw is unconditional on success
+    expect(run.draws).toBe(2); // the proc draw is unconditional on success, plus the quality draw
     expect(run.roll).toBe(majorRun.roll); // the very roll that procced under the major
     expect(dormant.lastCraftResult?.ok).toBe(true);
     expect(dormant.lastCraftResult?.masterwork).toBeUndefined();
@@ -577,7 +578,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     const { result, draws, roll } = observeDraws(sim, () =>
       resolveCraftForRecipe(ctxOf(sim), pid, recipe),
     );
-    expect(draws).toBe(1);
+    expect(draws).toBe(2);
     expect(roll).toBeLessThan(MASTERWORK_BASE_CHANCE);
     expect(result.ok).toBe(true);
     expect(result.masterwork).toBe(true);
@@ -596,7 +597,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     const { result, draws, roll } = observeDraws(sim, () =>
       resolveCraftForRecipe(ctxOf(sim), pid, recipe),
     );
-    expect(draws).toBe(1); // gating the EFFECT never suppresses the draw
+    expect(draws).toBe(2); // gating the EFFECT never suppresses the proc or quality draw
     expect(roll).toBeLessThan(MASTERWORK_BASE_CHANCE); // this roll DID land in the proc window
     expect(result.ok).toBe(true);
     expect(result.masterwork).toBeUndefined();
@@ -616,7 +617,7 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
     const { result, draws, roll } = observeDraws(sim, () =>
       resolveCraftForRecipe(ctxOf(sim), pid, recipe),
     );
-    expect(draws).toBe(1);
+    expect(draws).toBe(2);
     expect(roll).toBeLessThan(MASTERWORK_BASE_CHANCE);
     expect(result.ok).toBe(true);
     expect(result.masterwork).toBe(true);

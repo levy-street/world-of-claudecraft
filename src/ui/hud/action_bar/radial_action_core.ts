@@ -309,6 +309,10 @@ export interface StripCaptionInput {
   live: number;
   viewportWidth: number;
   margin: number;
+  /** Where the clamp box starts, in the same frame as `centers`: the left
+   *  safe-area inset, so the box is [clampLeft, clampLeft + viewportWidth].
+   *  Defaults to 0. */
+  clampLeft?: number;
   halfWidth?: number;
 }
 
@@ -323,10 +327,11 @@ export function stripCaptionCenterX(input: StripCaptionInput): number | null {
   const center = input.live >= 0 ? input.centers[input.live] : undefined;
   if (center === undefined || !Number.isFinite(center)) return null;
   const half = input.halfWidth ?? STRIP_CAPTION_HALF_PX;
-  const min = input.margin + half;
-  const max = input.viewportWidth - input.margin - half;
+  const left = input.clampLeft ?? 0;
+  const min = left + input.margin + half;
+  const max = left + input.viewportWidth - input.margin - half;
   // A viewport narrower than the caption itself cannot satisfy both bounds; the
   // centre is the least-bad answer and keeps the box symmetric.
-  if (max < min) return input.viewportWidth / 2;
+  if (max < min) return left + input.viewportWidth / 2;
   return Math.min(Math.max(center, min), max);
 }

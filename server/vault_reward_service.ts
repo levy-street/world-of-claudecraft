@@ -3,6 +3,8 @@
 import type { Pool, PoolClient } from 'pg';
 import { HOARD_REWARD_LETTER } from '../src/sim/content/letters';
 import { ITEMS } from '../src/sim/data';
+import { cloneLootQuality } from '../src/sim/loot_quality/types';
+import { applyDurableVaultGuestPayouts } from '../src/sim/rift/hoard_guest_cap';
 import {
   confirmHoardRewardChest,
   confirmHoardRewardClaim,
@@ -59,7 +61,7 @@ export function saveVaultOwner<Session extends { left: boolean }>(
 }
 
 export class VaultRewardService {
-  private readonly pending = new Map<string, VaultOutcomeInput & { bossKilledAtMs: number }>();
+  private readonly pending = new Map<string, VaultOutcomeInput>();
   private readonly committing = new Set<string>();
   private readonly outcomeRetryAt = new Map<string, number>();
   private readonly claiming = new Set<string>();
@@ -97,7 +99,6 @@ export class VaultRewardService {
           this.pending.set(event.attemptId, {
             attemptId: event.attemptId,
             ownerCharacterId: event.ownerCharacterId,
-            bossKilledAtMs: event.bossKilledAtMs ?? now,
             claims: event.claims.map((claim) => ({
               ...claim,
               mailDueAt: new Date(now + MAIL_DELAY_MS),
@@ -221,23 +222,13 @@ export class VaultRewardService {
       if (fresh?.characterId !== characterId || fresh.vaultAttempt?.id !== pending.attemptId)
         return;
       if (outcome) {
-        finishVaultAttempt(
-          this.host.sim.ctx,
-          characterId,
-          pending.attemptId,
-          outcome.bossKilledAtMs ?? outcome.completedAt.getTime(),
-        );
+        finishVaultAttempt(this.host.sim.ctx, characterId, pending.attemptId);
         void this.host
           .saveOwner(pending.pid)
           .catch((error) => this.host.onClaimFailure(characterId, error));
       } else {
-        if (!this.pending.has(pending.attemptId)) {
-          // A crash can save the kill marker before the immutable outcome commits.
-          // Restore the retry right, never extend the already-shortened deadline.
-          delete fresh.vaultAttempt.bossKilledAtMs;
-          fresh.wireRev++;
+        if (!this.pending.has(pending.attemptId))
           confirmVaultAttemptDurable(this.host.sim.ctx, pending.pid, pending.attemptId);
-        }
       }
     } catch (error) {
       this.host.onClaimFailure(characterId, error);
@@ -255,15 +246,28 @@ export class VaultRewardService {
     this.committing.add(attemptId);
     try {
       await this.host.withPermit(() => this.db.commitVaultOutcome(input));
+      // A mailed reward consumes the guest allowance at clear, even when nobody
+      // opens the chest. Keep online cap checks in step before opening it.
+      for (const claim of input.claims) {
+        if (claim.characterId === input.ownerCharacterId || !claim.guestCycle) continue;
+        const pid = this.host.characterPid(claim.characterId);
+        const meta = pid === null ? undefined : this.host.sim.meta(pid);
+        if (
+          !meta ||
+          meta.characterId !== claim.characterId ||
+          meta.worldQuestCycle !== claim.guestCycle
+        )
+          continue;
+        const used = await this.host.withPermit(() =>
+          this.db.guestPayoutsForCycle(claim.characterId, claim.guestCycle as string),
+        );
+        if (this.host.characterPid(claim.characterId) === pid)
+          applyDurableVaultGuestPayouts(meta, claim.guestCycle, used);
+      }
       this.pending.delete(attemptId);
       this.outcomeRetryAt.delete(attemptId);
       confirmHoardRewardChest(this.host.sim.ctx, attemptId);
-      const pid = finishVaultAttempt(
-        this.host.sim.ctx,
-        input.ownerCharacterId,
-        attemptId,
-        input.bossKilledAtMs,
-      );
+      const pid = finishVaultAttempt(this.host.sim.ctx, input.ownerCharacterId, attemptId);
       if (pid !== null)
         void this.host
           .saveOwner(pid)
@@ -418,7 +422,10 @@ export class VaultRewardService {
       custodyRef: `vault:${REALM}:${claim.attemptId}:${claim.characterId}`,
       recipient: { key: String(claim.characterId), name: claim.recipientName },
       letter: 'vault_reward',
-      items: claim.items.map((item) => ({ ...item })),
+      items: claim.items.map(({ itemId, count, lootQuality }) => {
+        const quality = cloneLootQuality(lootQuality);
+        return quality ? { itemId, count, instance: { lootQuality: quality } } : { itemId, count };
+      }),
       copper: claim.copper,
     };
     const priorPending = this.pendingLiveParcels.has(row.custodyRef);

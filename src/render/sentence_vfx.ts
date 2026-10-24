@@ -15,6 +15,8 @@ import {
   writeSentenceBurstPlan,
   writeSentenceInvocationPlan,
 } from './sentence_vfx_core';
+import { spellEffectsMuted } from './spell_effects_switch';
+import { VisibleChildrenGroup } from './visible_children_group';
 
 const POOL_SIZE = 8;
 const BASE_SPARK_COUNT = 42;
@@ -195,7 +197,8 @@ function starburstGeometry(rayCount = 30): THREE.BufferGeometry {
  * the authoritative Sentence impact event.
  */
 export class SentenceVfx {
-  readonly group = new THREE.Group();
+  // Parked slots (hidden) are skipped by the per-frame matrix walk.
+  readonly group = new VisibleChildrenGroup();
   private readonly slots: SentenceSlot[] = [];
   private readonly ribbons: AbilityVfxRibbons;
   private cursor = 0;
@@ -809,6 +812,7 @@ export class SentenceVfx {
   }
 
   trigger(sourceId: number, targetId: number, condemnation: number, threadCount = 0): boolean {
+    if (spellEffectsMuted(sourceId)) return false;
     if (!this.anchor(targetId, 0, this.anchorProbe)) return false;
     const slot = this.slots[this.cursor];
     this.cursor = (this.cursor + 1) % this.slots.length;
@@ -1174,4 +1178,29 @@ export class SentenceVfx {
       slot.group.visible = false;
     }
   }
+}
+
+/** The anchor writer the renderer hands the Sentence: the drawn view's body
+ *  (`heightFraction` of its height) when there is one, else the entity's own
+ *  position. Moved out of renderer.ts. */
+export function entitySentenceAnchor(
+  views: () => ReadonlyMap<number, { group: THREE.Object3D; height: number }>,
+  entity: (id: number) => { scale: number; pos: { x: number; y: number; z: number } } | undefined,
+): SentenceAnchorWriter {
+  return (id, heightFraction, out) => {
+    const view = views().get(id);
+    const e = entity(id);
+    if (view) {
+      const entityScale = e?.scale ?? 1;
+      out.set(
+        view.group.position.x,
+        view.group.position.y + view.height * entityScale * heightFraction,
+        view.group.position.z,
+      );
+      return true;
+    }
+    if (!e) return false;
+    out.set(e.pos.x, e.pos.y + heightFraction * 2 * e.scale, e.pos.z);
+    return true;
+  };
 }

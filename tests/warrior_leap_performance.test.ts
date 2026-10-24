@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { expect, it } from 'vitest';
-import { VISUALS } from '../src/render/characters/manifest';
+import { KAYKIT_KNIGHT_WARRIOR } from '../src/render/characters/manifest';
 import { prepareWarriorAbilityClips } from '../src/render/characters/warrior_ability_clips';
 
 it('preserves the delivered Leap landing and recovery through actual clip preparation', async () => {
@@ -12,7 +12,7 @@ it('preserves the delivered Leap landing and recovery through actual clip prepar
     bytes.byteOffset + bytes.byteLength,
   ) as ArrayBuffer;
   const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(buffer, '');
-  const rush = gltf.animations.find((clip) => clip.name === VISUALS.player_warrior.clips.rush);
+  const rush = gltf.animations.find((clip) => clip.name === KAYKIT_KNIGHT_WARRIOR.clips.rush);
   if (!rush) throw new Error('Delivered Warrior rush loop missing');
   expect(rush.duration).toBeCloseTo(0.6, 5);
   for (const track of rush.tracks) {
@@ -25,7 +25,7 @@ it('preserves the delivered Leap landing and recovery through actual clip prepar
   }
   const source = gltf.animations.find((clip) => clip.name === 'Warrior_Heroic_Leap');
   if (!source) throw new Error('Delivered Heroic Leap performance missing');
-  const map = VISUALS.player_warrior.clips;
+  const map = KAYKIT_KNIGHT_WARRIOR.clips;
   expect(map.attackByAbility?.heroic_leap).toBe(source.name);
   expect(map.attackTimeScaleByAbility?.heroic_leap).toBe(1);
   const clips = new Map([[source.name, source]]);

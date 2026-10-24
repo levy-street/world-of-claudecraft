@@ -11,6 +11,126 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const en_CA: EnTranslations = {
+  "referralCards": {
+    "title": "Refer a Friend",
+    "subtitle": "Adventure together. Earn your stamps.",
+    "close": "Close Refer a Friend",
+    "launcher": "Stamp cards",
+    "pages": "Stamp card pages",
+    "firstPage": "First page",
+    "nextPage": "More cards",
+    "trailmateTitle": "Trailmate",
+    "friendshipAura": "Friendship",
+    "protectiveCharm": "Protective Charm",
+    "bankBonus": "Completed stamp cards",
+    "bankBonusHelp": "Help two bound friends complete their stamp cards to unlock 20 permanent bank slots.",
+    "friendshipUse": "Increase your Strength, Agility, Stamina, Intellect, and Spirit by {stats} for {duration} seconds.",
+    "readyCount": "Stamp cards: {count} rewards ready to collect",
+    "loading": "Connecting to your referral cards...",
+    "empty": "Invite a new player to begin your first stamp card together.",
+    "inviteTitle": "Invite a friend",
+    "inviteHelp": "Share this link with a friend before they create their account. Only new accounts created through your link become bound friends.",
+    "inviteLabel": "Your invitation link",
+    "inviteUnavailable": "Your invitation link is not available yet.",
+    "membership": "When your bound friend buys their first membership, you receive a membership bond.",
+    "cardBetween": "{you} and {friend}",
+    "yourCard": "{name}'s stamp card",
+    "unassigned": "Character not selected",
+    "start": "Start a card",
+    "startPrompt": "Start stamp cards with {friend}? Both of you must accept. Each character must be below level 5 and must not have completed the final Tutorial Island quest.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "declinePrompt": "Are you sure you want to decline? You can start later from the stamp card menu while both characters still meet the requirements.",
+    "declineConfirmed": "The card was not started. You can start from the stamp card menu while both characters still meet the requirements.",
+    "waiting": "Waiting for your bound friend to accept.",
+    "cancel": "Cancel",
+    "okay": "OK",
+    "understand": "Yes, I understand",
+    "confirmLock": "Yes, lock this card",
+    "lockFirst": "Redeeming The Fogbinder stamp reward permanently locks this card to {name}. You will no longer be able to move this card or its rewards to another character. Do you understand?",
+    "lockSecond": "Are you sure? Redeem The Fogbinder reward and permanently lock this card to {name}.",
+    "locked": "This card is locked to {name}. It can no longer be moved.",
+    "unlocked": "This card can move to another eligible character until you redeem The Fogbinder stamp reward. Redeeming that reward permanently locks it to this character.",
+    "move": "Move card to this character",
+    "movePrompt": "Move your card from {oldName} to {newName}? Your progress and all rewards earned from this card will move. Those rewards will be removed from {oldName}.",
+    "confirmMove": "Yes, move my card",
+    "summon": "Summon bound friend",
+    "summonPrompt": "{friend} wants to summon you to their location. Accept the summon?",
+    "summonHelp": "Bring your bound friend to your location. You can summon once every 30 minutes.",
+    "summonCooldown": "Summon ready in {minutes} min {seconds} sec",
+    "reward": "Reward: {reward}",
+    "earned": "Earned",
+    "redeemed": "Redeemed",
+    "emptyStamp": "Not yet earned",
+    "stamping": "Stamping your card...",
+    "redeem": "Redeem reward",
+    "previous": "Redeem earlier stamps first.",
+    "playTogether": "Complete milestones in a party with the characters on this card.",
+    "fallback": "Already completed a milestone quest alone? Rejoin your friend in a party for the Tutorial Island stamp. For later quest stamps, clear the matching dungeon together.",
+    "questGroup": "Stamp card quests",
+    "questWithFriend": "{quest} with {friend}",
+    "browseCards": "Browse all stamp card pages",
+    "nextQuest": "Stamp card: {quest}",
+    "questIndicator": "This quest advances your next stamp card reward.",
+    "completion": "Congratulations! {friend} completed their stamp card with your help.",
+    "openInvites": "Open Refer a Friend",
+    "referrerTitle": "Friends you helped",
+    "referrerCount": "{count} friends completed",
+    "friendTier": "Friends helped: {count}",
+    "awarded": "Awarded",
+    "pending": "Not yet awarded",
+    "celebration": {
+      "earned": "Adventure rewarded",
+      "title": "Reward claimed!",
+      "titleReward": "Title unlocked: {title}",
+      "together": "Earned together with {friend}.",
+      "continue": "Keep adventuring"
+    },
+    "milestones": {
+      "tutorial": "Tutorial Island final quest",
+      "hollow": "Into the Hollow",
+      "fogbinder": "The Fogbinder",
+      "gravewyrm": "Korzul the Gravewyrm",
+      "raid": "Defeat your first raid boss"
+    },
+    "rewards": {
+      "tutorial": "A unique title and a maximum-tier bag, bound to your character.",
+      "hollow": "A trinket that grants Stamina and a passive shield when your health is low.",
+      "fogbinder": "Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.",
+      "gravewyrm": "Free mount training.",
+      "raid": "Wobbles the Slime mount."
+    },
+    "referrerRewards": {
+      "1": "The exclusive Friendship Raptor mount.",
+      "2": "20 bank slots and 5 character slots.",
+      "3": "1,000 Claudium.",
+      "4": "1,000 Claudium.",
+      "5": "Flicker and Glimmer buddy companions."
+    },
+    "reasons": {
+      "notParticipant": "This account is not part of this bound-friend link.",
+      "staleRevision": "Your card changed. Check its latest progress and try again.",
+      "invalidCharacters": "The party characters do not belong to this bound-friend link.",
+      "notTogether": "Both bound friends must be in the same party.",
+      "levelTooHigh": "New card characters must be below level 5.",
+      "tutorialCompleted": "A character has already completed the final Tutorial Island quest.",
+      "alreadyStarted": "This link already has a card. Each bound-friend link can have only one active card.",
+      "notPending": "There is no card invitation waiting for a response.",
+      "declinePending": "Your bound friend is deciding whether to decline the card.",
+      "declineNotConfirmed": "Confirm the decline before ending this invitation.",
+      "notActive": "Start a card together before collecting rewards.",
+      "wrongCharacter": "Use the characters named on the card, or move an unlocked card to an eligible character.",
+      "locked": "This card is locked to its character and cannot be moved.",
+      "sameCharacter": "This card is already on this character.",
+      "invalidMilestone": "That stamp does not belong to this card.",
+      "notEarned": "Complete this milestone together before redeeming it.",
+      "alreadyRedeemed": "This reward has already been redeemed.",
+      "previousRewardRequired": "Redeem the earlier stamp rewards first.",
+      "confirmationRequired": "Review the card lock warning before redeeming The Fogbinder reward.",
+      "newAccountsOnly": "Accounts can become bound friends only when a new account is created through a referral link. Existing accounts cannot be bound.",
+      "unavailable": "This action is not available right now. Please try again later."
+    }
+  },
   "meta": {
     "builtOn": "Built {date}"
   },
@@ -347,6 +467,192 @@ export const en_CA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "Courier",
+      "close": "Close courier",
+      "ready": "Ready for a delivery",
+      "outbound": "Flying to the bank",
+      "returning": "Bringing your items back",
+      "waiting": "Waiting to return your items",
+      "bags": "Send to bank",
+      "bank": "Bring from bank",
+      "inventory": "Inventory",
+      "bankTitle": "Bank",
+      "capacity": "{used} / {capacity} slots",
+      "cargo": "Courier inventory",
+      "empty": "No items",
+      "send": "Send courier",
+      "selected": "{count} / {limit} stacks selected",
+      "select": "Select {item}, {count}",
+      "selectedItem": "Deselect {item}, {count}",
+      "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
+      "membership": "Renew your membership to start another trip.",
+      "cargoSafe": "Returned items overflow full bags. The courier vanishes after delivery until summoned again.",
+      "unavailable": "Summon your courier to plan a delivery."
+    },
+    "adventureGuide": {
+      "title": "Adventure Guide",
+      "eyebrow": "The expedition ledger",
+      "intro": "Discover the world. Know your enemy. Choose your next adventure.",
+      "dungeons": "Dungeons",
+      "raids": "Raids",
+      "delves": "Delves",
+      "search": "Search adventures",
+      "eligible": "My level",
+      "catalogueCount": "{count} adventures",
+      "catalogueCountPlural": {
+        "one": "{count} adventure",
+        "other": "{count} adventures"
+      },
+      "empty": "No adventures match these filters.",
+      "reset": "Clear filters",
+      "delve": "Delve",
+      "delveTravel": "Enter at the delve entrance. Choose your tier at the local board; automatic matchmaking is not available.",
+      "dungeonTravel": "Explore the encounters below, then choose a group or travel to the entrance.",
+      "raidTravel": "Gather your raid, review the encounters and check your lockout before entering.",
+      "soloTravel": "A solo adventure. Travel to the entrance to begin.",
+      "browseOnly": "Travel to entrance",
+      "findGroup": "Find a group",
+      "inspectLoot": "Loot preview",
+      "lootClass": "Class",
+      "lootSpec": "Specialization",
+      "allSpecs": "All specializations",
+      "lootHint": "Usable gear with the selected specialization's stat affinity. General rewards remain visible. Drop chances use the full loot table.",
+      "lootEmpty": "No equipment matches this class and specialization.",
+      "fullTableRoll": "One item from the full loot table",
+      "encountersCount": "{count} encounters",
+      "tiers": "Available tiers: {tiers}"
+    },
+    "expeditions": {
+      "bell": "Open Groups: {count} notifications",
+      "bellCount": {
+        "one": "Open Groups: {count} notification",
+        "other": "Open Groups: {count} notifications"
+      },
+      "alerts": "Alerts",
+      "groups": "Groups",
+      "rewards": "Rewards",
+      "sections": "Expedition sections",
+      "noAlerts": "No expedition alerts need your attention.",
+      "findGroup": "Find a Group",
+      "recruitPlayers": "Recruit Players",
+      "recruitIntro": "Choose your dungeon and group goal. Review your listing, then publish it.",
+      "recruitDungeon": "Dungeon",
+      "recruitDifficulty": "Difficulty",
+      "recruitPreview": "Listing preview",
+      "recruitPublish": "Publish Group",
+      "recruitPublishing": "Publishing your group...",
+      "recruitBeforeEntry": "You can recruit before entering the dungeon. Publishing does not teleport your group.",
+      "recruitUnconfirmed": "Your listing has not been confirmed. Check your connection or chat messages, then try again.",
+      "recruitLoading": "Loading your recruitment options...",
+      "recruitAlreadyOpen": "Your recruitment is already open. Manage your group instead.",
+      "recruitExistingRun": "You already have an expedition. Manage its recruitment from Your Group.",
+      "recruitLeaveQueue": "Leave the matchmaking queue before publishing your own group.",
+      "recruitFinishProposal": "Respond to your matchmaking invitation before publishing a group.",
+      "recruitCancelRequests": "Withdraw your pending join requests before publishing your own group.",
+      "recruitNoActivities": "No dungeons have room for your group at its current levels.",
+      "recruitNoRoles": "No compatible roles are available for your character.",
+      "recruitInvalidNote": "Use up to 120 characters without control characters in your note.",
+      "manageRecruitment": "Manage Recruitment",
+      "formingGroup": "Forming Group",
+      "groupGathering": "Your group is forming. Gather at the dungeon entrance when ready.",
+      "groupChooseDungeon": "Choose a dungeon for your group, then recruit any missing players.",
+      "waitForLeader": "Your group leader can choose a dungeon and open recruitment.",
+      "recruitmentNext": "Recruitment is open. Gather your group at the dungeon entrance when ready.",
+      "findGroupNext": "You are not in a group. Find one to start an expedition.",
+      "awaitingReply": "Waiting for replies from {count} groups.",
+      "requestSent": "Request sent. Waiting for the group leader to respond.",
+      "readyToTravel": "Your group is ready. Travel to the dungeon when you are ready.",
+      "groupRecruiting": "Your expedition is in progress. Recruitment is open.",
+      "groupInProgress": "Your expedition is in progress.",
+      "title": "Open Expeditions",
+      "entryTitle": "Run solo or open your group?",
+      "entryBody": "Start now. You can open your group later at any time.",
+      "solo": "Run Solo",
+      "open": "Open Group",
+      "closeRecruitment": "Close Recruitment",
+      "travel": "Travel to Group",
+      "request": "{name} wants to join as {role}.",
+      "level": "Level {level}",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptPlayer": "Accept Player",
+      "declinePlayer": "Decline Player",
+      "chooseRole": "Your role",
+      "send": "Send Request",
+      "confirmRequest": "Confirm Request",
+      "chooseRoleAction": "Choose Role",
+      "cancel": "Cancel",
+      "pending": "Request pending",
+      "join": "Request to Join",
+      "leader": "Led by {name}",
+      "members": "{current}/{total} players",
+      "progress": "{defeated}/{total} bosses defeated",
+      "needed": "Suggested roles: {roles}",
+      "close": "Close",
+      "empty": "No open expeditions right now.",
+      "finder": "Open Dungeon Finder",
+      "groupsCount": "Open groups: {count}",
+      "requestsCount": "Join requests: {count}",
+      "yourGroup": "Your group",
+      "otherGroups": "Other groups",
+      "manageGroup": "Your expedition and join requests",
+      "browseGroups": "Choose a group to help",
+      "noCurrentGroup": "You are not in an expedition.",
+      "noCurrentGroupHint": "Enter a dungeon or request to join a group.",
+      "recruitmentOpen": "Recruitment open",
+      "recruitmentClosed": "Recruitment closed",
+      "groupRoster": "Group members",
+      "noRequests": "No pending join requests.",
+      "requestsCombat": "Requests are waiting. Review them after combat.",
+      "expires": "Expires in {time}",
+      "waiting": "Waiting for {name} to respond.",
+      "outcomeAccepted": "{name} accepted your request. Use Travel to Group when ready.",
+      "outcomeDeclined": "{name} declined your request.",
+      "outcomeExpired": "Your request expired. You can send a new request.",
+      "outcomeCancelled": "You cancelled your request.",
+      "outcomeClosed": "That group is no longer accepting your request.",
+      "editDetails": "Edit Group Details",
+      "purpose": "Group goal",
+      "purposeFirstTime": "First time",
+      "purposeRelaxed": "Relaxed run",
+      "purposeClear": "Complete the dungeon",
+      "purposeNeedsHelp": "Need help",
+      "note": "Short note (optional, up to 120 characters)",
+      "saveDetails": "Save Details",
+      "available": "Available to Help",
+      "stopHelping": "Stop Helper Alerts",
+      "helperRoles": "Roles you offer",
+      "helperOn": "Helper alerts are on. You still choose which group to join.",
+      "helperPaused": "Helper alerts pause while you are grouped, queued or have a pending request.",
+      "helperFound": "{count} compatible groups are looking for help.",
+      "viewGroups": "View Groups",
+      "sound": "Play a sound for new groups and applications",
+      "shop": "Queue Point Shop",
+      "backToGroups": "Back to Groups",
+      "shopIntro": "A reward for every helping hand",
+      "shopDescription": "Spend the points you earn helping other players complete their expeditions.",
+      "shopCollection": "Bell Collection",
+      "shopOwned": "In your collection",
+      "shopLocked": "Available to unlock",
+      "shopRules": "How to earn points",
+      "pendingRequests": "Your pending requests: {count}/5",
+      "multiApplyHint": "Request up to five groups. Joining one withdraws your other requests.",
+      "multiApplyLimit": "You already have five pending requests. Cancel one to request another group.",
+      "points": "Queue Points: {count}",
+      "dailyPoints": "Earned today: {earned}/{cap}",
+      "rewardRules": "Helpers earn 5 points per qualifying boss and 10 for completion, paid when they complete the dungeon. Deal, heal or take effective damage worth at least 1% of each boss health to qualify. Each boss and completion pays once per dungeon difficulty per day, up to 60 points per day. Joining or waiting at the entrance gives no points.",
+      "rewardScope": "Bell finishes are permanent cosmetics for this character. They do not change gameplay.",
+      "bronze": "Bronze bell",
+      "silver": "Silver bell",
+      "gold": "Gold bell",
+      "price": "{count} Queue Points",
+      "buy": "Buy and Equip",
+      "equip": "Equip",
+      "equipped": "Equipped",
+      "defaultBell": "Use Default Bell",
+      "dismiss": "Dismiss"
+    },
     "framePresets": {
       "apply": "Apply",
       "pickerLabel": "Frame Presets: {name}",
@@ -418,6 +724,13 @@ export const en_CA: EnTranslations = {
       "heroicClears": "{count} Heroic",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "View possible loot",
+      "lootFocus": "Loot focus",
+      "allClassGear": "All class gear",
+      "specRole": "{name} ({role})",
+      "mixedRole": "{first} / {second}",
+      "lootFocusHelp": "Applies to unopened vaults only.",
+      "noFocusedLoot": "No eligible loot. Choose another focus.",
+      "rolledFocus": "Rolled for: {focus}",
       "chooseTable": "Select which table to roll off",
       "selectAllTables": "Select all",
       "selectedTables": "{count} tables selected",
@@ -431,8 +744,8 @@ export const en_CA: EnTranslations = {
       "heroicUpgradeOne": "{count} more Heroic dungeon clear to upgrade",
       "heroicUpgradeMany": "{count} more Heroic dungeon clears to upgrade",
       "completedTask": {
-        "raidOne": "{count} Raid Clear",
-        "raidMany": "{count} Raid Clears",
+        "raidOne": "{count} Raid Encounter Cleared",
+        "raidMany": "{count} Raid Encounters Cleared",
         "dungeonOne": "{count} Dungeon Cleared",
         "dungeonMany": "{count} Dungeons Cleared",
         "worldOne": "{count} World Quest Completed",
@@ -443,8 +756,8 @@ export const en_CA: EnTranslations = {
         "pvpWinMany": "{count} PvP Wins"
       },
       "requiredTask": {
-        "raidOne": "Complete {count} Raid Clear",
-        "raidMany": "Complete {count} Raid Clears",
+        "raidOne": "Clear {count} Raid Encounter",
+        "raidMany": "Clear {count} Raid Encounters",
         "dungeonOne": "Clear {count} Dungeon",
         "dungeonMany": "Clear {count} Dungeons",
         "worldOne": "Complete {count} World Quest",
@@ -458,6 +771,7 @@ export const en_CA: EnTranslations = {
       "claimLastWeek": "Claim last week's reward",
       "readyTitle": "Your weekly rewards are ready",
       "readyDescription": "A completed week of rewards is waiting. Open your earned vaults, then choose one item to claim.",
+      "previewClaimNotice": "Rewards are waiting. Visit the Vault Keeper in Eastbrook to open your vaults and claim a reward.",
       "notNow": "Not now",
       "completedWeek": "Week ended {date}",
       "currentWeek": "Back to this week's progress",
@@ -484,6 +798,7 @@ export const en_CA: EnTranslations = {
       "worldPoolRule": "Normal Nythraxis equipment. No raid clears required.",
       "poolRule": "Every listed item has an equal chance. Items match your class restrictions. Defeated raids unlock their loot at that difficulty. Legendary items are excluded.",
       "selectionPoolRule": "For raids and dungeons, select one or more tables before opening. Dungeon tables combine bosses you have cleared at this difficulty. Rolls exclude duplicates, legendary items and equipment requiring more than {maxLevelOffset} levels above your level.",
+      "previewPoolRule": "All tables these vaults can roll from. Defeating a boss permanently unlocks its loot for future vaults. A dungeon table holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.",
       "rare": "Rare",
       "epic": "Epic",
       "unavailable": "Not yet available",
@@ -495,7 +810,7 @@ export const en_CA: EnTranslations = {
         "pvp": "PvP"
       },
       "task": {
-        "raid": "Every raid clear counts, including repeat encounters. Your best clears set each reward difficulty.",
+        "raid": "Defeat different raid encounters. Each encounter counts once; a Heroic clear upgrades its credit.",
         "dungeon": "Complete dungeons. Your best clears determine the reward difficulty at each milestone.",
         "world": "Complete rotating world quests. Story quests do not count.",
         "pvp": "Win ranked arena or rated battleground matches. Practice matches and forfeits do not count."
@@ -507,17 +822,160 @@ export const en_CA: EnTranslations = {
         "dungeon_heroic": "Heroic dungeon loot",
         "world": "World quest loot",
         "pvp": "WARFARE equipment"
+      }
+    },
+    "guildHall": {
+      "title": "Lantern Hall",
+      "signSubtitle": "Adventurers' Guild",
+      "close": "Close the guild window",
+      "tabsLabel": "Lantern Hall sections",
+      "tabs": {
+        "contracts": "Contracts",
+        "quartermaster": "Quartermaster"
       },
-      "previewClaimNotice": "Rewards are waiting. Visit the Vault Keeper in Eastbrook to open and claim."
+      "seals": "Lantern Seals: {count}",
+      "resetIn": "New contracts in {time}",
+      "resetSoon": "New contracts at the next weekly reset",
+      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "kinds": {
+        "boss": "Bounty",
+        "heroic": "Heroic Clear",
+        "task": "Execution"
+      },
+      "goals": {
+        "boss": "Defeat {boss} in {dungeon}, on either difficulty.",
+        "heroic": "Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.",
+        "task": "{task} ({dungeon})"
+      },
+      "contractLabel": "{kind}: {dungeon}",
+      "reward": {
+        "one": "{count} Lantern Seal",
+        "few": "{count} Lantern Seals",
+        "many": "{count} Lantern Seals",
+        "other": "{count} Lantern Seals"
+      },
+      "done": "Completed this week",
+      "open": "Open",
+      "lifetime": "Contracts completed: {count}",
+      "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
+      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds, the guild's sword appearance and its war horse. Nothing here makes you stronger in a fight.",
+      "titleOffer": "Title: {title}",
+      "titlePreview": "Shown as {preview}",
+      "mountOffer": "Mount: {mount}",
+      "mountPreview": "Ground mount: +{pct}% movement speed while riding. Requires riding training.",
+      "skinOffer": "Sword appearance: {skin}",
+      "skinPreview": "Changes how your equipped sword looks, on every character of your account. Appearance only: no stats.",
+      "buy": "Buy",
+      "owned": "Owned",
+      "needSeals": "Needs {count} more",
+      "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "boughtMount": "You bought the {mount}. Its reins are in your bags.",
+      "boughtSkin": "You bought the {skin} appearance. Apply it from the Cosmetics window.",
+      "refused": {
+        "owned": "You already own that.",
+        "seals": "You do not have enough Lantern Seals.",
+        "range": "Stand at the quartermaster to trade.",
+        "riding": "Learn to ride before you buy a mount.",
+        "bags": "Your bags are full."
+      },
+      "board": {
+        "noticesLabel": "This week's contracts",
+        "weekProgress": "This week: {done} of {total} contracts complete",
+        "weekProgressAria": "Contracts completed this week",
+        "cardProgress": "{done}/{total} this week",
+        "rewardLine": "Reward: {reward}",
+        "stamp": "Sealed",
+        "sealsTip": "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are bound to you."
+      },
+      "shop": {
+        "stockLabel": "Garrick Holt's stock",
+        "kindTitle": "Title",
+        "kindMount": "Mount",
+        "kindSword": "Sword appearance",
+        "plateHeading": "Your nameplate",
+        "mountHeading": "You, in the saddle",
+        "skinHeading": "In your hand",
+        "stageLabel": "3D preview of {name}",
+        "stageUnavailable": "3D preview unavailable on this device.",
+        "mountHowTo": "After you buy it, its reins go to your bags. Use them to ride; the horse is yours while you keep them.",
+        "mountOwned": "You own this mount. Its reins are in your bags.",
+        "skinHowTo": "After you buy it, apply it from the Cosmetics window. It works on every character of your account.",
+        "skinOwned": "You own this appearance. Apply it from the Cosmetics window.",
+        "howTo": "After you buy it, choose it in the Book of Deeds to show it with your name.",
+        "cosmetic": "Cosmetic only: it changes no stats.",
+        "price": "Price: {price}",
+        "have": "You have {count}",
+        "ownedLong": "You own this title. Choose it in the Book of Deeds.",
+        "short": {
+          "one": "You need {count} more Lantern Seal.",
+          "few": "You need {count} more Lantern Seals.",
+          "many": "You need {count} more Lantern Seals.",
+          "other": "You need {count} more Lantern Seals."
+        }
+      },
+      "contractDone": {
+        "one": "Contract complete: {contract}. You receive {count} Lantern Seal.",
+        "few": "Contract complete: {contract}. You receive {count} Lantern Seals.",
+        "many": "Contract complete: {contract}. You receive {count} Lantern Seals.",
+        "other": "Contract complete: {contract}. You receive {count} Lantern Seals."
+      }
     },
     "ferry": {
       "regionLabel": "Ferry timetable",
       "departsIn": "The ferry to {dest} departs in {time}",
       "castingOff": "The ferry to {dest} is casting off",
       "boardHint": "Stand on its deck when it sails. The crossing is free.",
-      "sailing": "Sailing to {dest}"
+      "sailing": "Sailing to {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "That material selection is no longer available.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "North Watch Cannon",
       "objective": "Defend the north watch",
@@ -575,6 +1033,15 @@ export const en_CA: EnTranslations = {
     "spectate": {
       "banner": "Spectating {name}"
     },
+    "realmMotd": {
+      "line": "Message of the day: {text}",
+      "updated": "Message of the day updated.",
+      "cleared": "Message of the day cleared.",
+      "none": "No message of the day is set.",
+      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
+      "tooLong": "The message of the day is limited to {max} characters.",
+      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+    },
     "readyCheck": {
       "title": "Ready Check",
       "close": "Close",
@@ -600,6 +1067,9 @@ export const en_CA: EnTranslations = {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "pvpResurrect": "PvP Resurrect",
       "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
+      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
+      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
+      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
       "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living.",
@@ -615,6 +1085,9 @@ export const en_CA: EnTranslations = {
       "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
       "healerConfirmAccept": "Revive Me",
       "healerConfirmCancel": "Cancel"
+    },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
     },
     "wiki": {
       "confirmTitle": "Open the Wiki?",
@@ -833,6 +1306,51 @@ export const en_CA: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "Game subscription",
+        "monthlyTitle": "Monthly membership",
+        "annualTitle": "12-month membership bundle",
+        "annualPrice": "{price} for 12 months, paid upfront",
+        "annualTerms": "Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.",
+        "annualMount": "After payment, collect the soulbound Nightwing Chimaera reins by mail on the character that purchased this bundle. The mount remains yours after membership expires.",
+        "trialTerms": "Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.",
+        "startTrial": "Start 7-day free trial",
+        "resumeCheckout": "Resume checkout",
+        "checkoutClosed": "This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.",
+        "annualClaim": "Collect bundle mount",
+        "annualPending": "Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.",
+        "annualDelivered": "Your bundle mount key has been delivered by mail.",
+        "tokenTitle": "Tradable membership token",
+        "benefitsTitle": "Active membership benefits",
+        "benefitBank": "Access your other characters' banks at any banker.",
+        "benefitSlots": "Unlock 10 additional character slots.",
+        "benefitArmour": "Claim Rare soulbound armour and the Staff of Changing. Their stats adapt to your class and specialisation, always 5 item levels above your character level. Wear all 7 armour pieces for 20% more XP.",
+        "benefitBag": "Equip an extra bag in your membership bag slot.",
+        "benefitTax": "Pay half the normal auction house tax.",
+        "benefitExpiry": "When membership ends, additional character slots, gear benefits and the extra bag slot lock until renewal. Your bag and items stay safe, with excess items kept as overflow. Your base character slots remain playable.",
+        "tokenTerms": "{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.",
+        "tokenBuy": "Buy membership token",
+        "tokenClaim": "Collect purchased token",
+        "tokenPending": "After payment, return to this character and collect your token. If payment is still processing, try again shortly.",
+        "tokenDelivered": "Your token has been delivered by mail.",
+        "price": "{price} per month",
+        "terms": "Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.",
+        "subscribe": "Subscribe",
+        "manage": "Manage subscription",
+        "ending": "Cancels at the end of the billing period",
+        "error": "Could not open billing. Allow popups and try again.",
+        "status": {
+          "none": "Not subscribed",
+          "incomplete": "Payment incomplete",
+          "incomplete_expired": "Checkout expired",
+          "trialing": "Trial",
+          "active": "Active",
+          "past_due": "Payment overdue",
+          "canceled": "Canceled",
+          "unpaid": "Unpaid",
+          "paused": "Paused"
+        }
+      },
       "title": "WOC Store",
       "close": "Close WOC Store",
       "tabsLabel": "WOC Store sections",
@@ -879,9 +1397,35 @@ export const en_CA: EnTranslations = {
         "guildmark": "Guildmark",
         "emberwrought": "Emberwrought",
         "hoarfrost": "Hoarfrost",
-        "fallen_star": "Fallen Star"
+        "fallen_star": "Fallen Star",
+        "lantern_hall": "Lantern Hall"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "Blade of Lantern Hall",
+          "look": "Broad steel blade with a fuller of banked lantern-fire, gilt cheeks, a caged lantern burning in the crossguard, blue leather grip.",
+          "lore": "Garrick Holt will not sell this blade to a stranger. It goes to members who have kept Lantern Hall's contracts week after week, and he hands it over with the same words every time: the lantern in the guard is lit from the hall's own hearth, so wherever you carry it, the hall goes with you. The fire in the fuller is only a look. The promise is the point."
+        },
+        "hearthbrand_sword": {
+          "name": "Hearthbrand",
+          "look": "Flame-waved blade of blackened steel with forge-hot edges, a molten seam branching up both faces, a guard of bronze flames around a burning stone, oxblood grip.",
+          "lore": "Lantern Hall keeps a hearth that has not gone out since the hall was raised, and Garrick Holt swears this blade was quenched in its coals. Members who carry it say the grip stays warm on the coldest watch. The fire along its edges is only a look."
+        },
+        "squallcrest_sword": {
+          "name": "Squallcrest",
+          "look": "Long sea-blue blade with edges bright as breaking surf, a storm channel holding a forked bolt, a gilt wave over the ricasso, a fin down one edge and a guard of gilt breakers around a storm pearl.",
+          "lore": "A captain who sailed for the guild brought this blade home from a squall that took her mast and left her ship ringing like a bell. Garrick sells it only for seals, and warns every buyer that it hums before a storm. The lightning and the sea light are only a look."
+        },
+        "rimelight_staff": {
+          "name": "Rimelight Staff",
+          "look": "Pale shaft bound in silver and wound with glowing rime, crowned by a silver claw holding a great crystal of cold light inside a crown of splintered ice, icicles hanging from its collar.",
+          "lore": "Lantern Hall's winter watch carried staves like this along the high road, their crowns lit for travellers lost in the snow. Garrick keeps one on the rack for members with seals to spare. The frost and its cold light are only a look."
+        },
+        "duskwick_staff": {
+          "name": "Duskwick Staff",
+          "look": "Two twisted strands of black wood bound in iron, crowned by an open iron lantern burning a violet dusk-flame between two curling horns, chains swinging from its floor.",
+          "lore": "Every lantern in the hall burns bright save one. The dusk-flame was lit to keep the hall by night, and it gives off shadow where the others give light; Garrick trims its wick himself. The smoke and the violet glow are only a look."
+        },
         "guildmark_arming_sword": {
           "name": "Guildmark Arming Sword",
           "look": "Blued steel blade, bronze fishtail crossguard, teal-dyed leather grip, small stamped guild sigil.",
@@ -1029,6 +1573,18 @@ export const en_CA: EnTranslations = {
         }
       },
       "seasonOne": "Season 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Uncommon",
         "rare": "Rare",
@@ -1212,7 +1768,8 @@ export const en_CA: EnTranslations = {
       "drowning": "Drowning!"
     },
     "rest": {
-      "resting": "Resting"
+      "resting": "Resting",
+      "restArea": "Resting: you are in a rest area and gain rested experience here."
     },
     "paladin": {
       "devotion": "Devotion",
@@ -1318,7 +1875,7 @@ export const en_CA: EnTranslations = {
       "guidanceOn": "Turn guidance on",
       "guidanceOff": "Turn guidance off",
       "guidanceSetting": "Eastbrook golden guidance",
-      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
+      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs right beside you on the quay: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
       "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him. When you would rather be off, ring the bell beside my pier and it will carry you across to the vale at any time.",
       "noteClose": "Understood"
     },
@@ -1669,6 +2226,10 @@ export const en_CA: EnTranslations = {
       "replayAction": "Practice again",
       "replayTarget": "Target it again"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Rift",
       "hoardTitle": "Buried Hoard",
@@ -1860,6 +2421,8 @@ export const en_CA: EnTranslations = {
       "reportSent": "Report copied and sent to chat",
       "reportNoData": "No data recorded.",
       "noDetailedData": "No detailed data",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "No events logged before death",
       "killedBy": "Killed by {killer} ({ability})",
       "lethalHit": "Lethal Hit",
@@ -1994,12 +2557,17 @@ export const en_CA: EnTranslations = {
       "name_goblin_rocket_sled": "Goblin Rocket Sled",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
+      "name_referral_tank": "Friendship Tank",
+      "name_referral_raptor": "Friendship Raptor",
       "name_drakemaw_raptor": "Drakemaw Raptor",
       "name_avian_strider": "Viridian Valestrider",
       "name_mech_bird": "Cluckwork Mech Bird",
       "name_lanternback_troll": "Grumbol the Lanternback",
+      "name_lantern_hall_destrier": "Lantern Hall Destrier",
       "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
@@ -2010,11 +2578,16 @@ export const en_CA: EnTranslations = {
       "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
       "desc_rallycart_rxt": "A pint-sized rally machine that provides enhanced travel speed.",
       "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
+      "desc_referral_tank": "Former referral stamp card reward.",
+      "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
       "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.",
       "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
       "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
       "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
+      "desc_lantern_hall_destrier": "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
     },
@@ -2087,6 +2660,10 @@ export const en_CA: EnTranslations = {
       "flagTakenLog": "{name} has taken the {team} flag!",
       "flagDroppedLog": "The {team} flag was dropped.",
       "flagReturnedLog": "The {team} flag was returned.",
+      "flagDroppedByLog": "{name} dropped the {team} flag.",
+      "flagReturnedByLog": "{name} returned the {team} flag.",
+      "flagNameCrimson": "Crimson Flag",
+      "flagNameAzure": "Azure Flag",
       "dropFlagConfirmTitle": "Drop the flag?",
       "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
       "dropFlagConfirmAccept": "Drop the flag",
@@ -2126,6 +2703,7 @@ export const en_CA: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Left Click",
       "clickMoveRight": "Right Click",
       "version": "v{version} ({build})",
@@ -2171,11 +2749,14 @@ export const en_CA: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
+      "ambienceVolume": "Ambience Volume",
       "footstepSounds": "Footstep Sounds",
       "interfaceSounds": "Interface and Feedback Sounds",
       "clickFeedback": "Click Marker",
       "lockCursorOnRotate": "Lock Cursor While Rotating",
       "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
+      "rawMouseInput": "Raw Mouse Input",
+      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
       "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
       "showWalletOnPlayerCard": "Show Wallet on Player Card",
       "showPlaytime": "Show Time Played on Character Screen",
@@ -2215,6 +2796,7 @@ export const en_CA: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "showOwnNameplate": "Show My Nameplate",
       "showPlayerNameplates": "Show Player Nameplates",
+      "showPetNames": "Show Pet Names",
       "uiScale": "UI Scale",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
@@ -2232,12 +2814,15 @@ export const en_CA: EnTranslations = {
       "groundReticle": "Ground-Targeting Reticle",
       "mouseoverCast": "Mouseover Cast on Unit Frames",
       "stickyTarget": "Keep Target on Ground Click",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Show Item Level",
       "showReliquaryTracker": "Show Reliquary Tracker",
       "confirmVendorSell": "Confirm Before Selling",
       "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "confirmVendorSellMinQuality": "Confirm Sales From Quality",
       "confirmVendorSellMinQualityNote": "Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.",
+      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
@@ -2247,9 +2832,22 @@ export const en_CA: EnTranslations = {
       "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
       "showTargetSwingTimer": "Show Target Swing Timer",
+      "enemyHighlightStyle": "Style of Enemy Highlight",
+      "enemyHighlightEdgeArrow": "Screen-Edge Arrow Off-Camera",
+      "enemyHighlightNameplate": "Big Framed Target Nameplate",
+      "enemyHighlightOverhead": "Floating Marker Overhead",
+      "enemyHighlightReticle": "Heavier Hostile Reticle",
+      "enemyHighlightDistance": "{yards} yd",
       "showPetFrame": "Show Your Pet",
+      "playerFrameResourceDetached": "Detach Resource Bar",
+      "playerFrameResourceWidth": "Resource Bar Width",
+      "playerFrameResourceHeight": "Resource Bar Height",
+      "hillBarOpacity": "King of the Hill Background Opacity",
+      "pixelsValue": "{value} px",
       "showNameplateDots": "Show My Dots on Nameplates",
       "nameplateDotScale": "Nameplate Dot Size",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Show Target Dots",
       "showDefensivesTrack": "Show Defensive Cooldowns",
       "showSelfBuffTrack": "Show My Buffs",
@@ -2258,7 +2856,9 @@ export const en_CA: EnTranslations = {
       "showUtilityModes": "Include Stealth and Travel Modes",
       "showFriendlyTrack": "Show My Buffs on Allies",
       "showShieldTrack": "Show My Shields",
+      "classicCombatText": "Classic Combat Text",
       "waterRipples": "Water Ripples (Wakes)",
+      "spellEffects": "Spell Effects",
       "actionCam": "Action Cam",
       "actionCamShoulder": "Action Cam Shoulder",
       "actionCamShoulderLeft": "Left {pct}",
@@ -2289,6 +2889,11 @@ export const en_CA: EnTranslations = {
       "complexityMedium": "Medium",
       "complexityHigh": "High",
       "exampleAbilities": "Example abilities",
+      "specBonus": "Specialization bonus",
+      "healing": "healing",
+      "absorption": "absorption",
+      "physicalAbilityDamage": "melee and ranged ability damage",
+      "primaryHealingBonus": "Increases primary healing by {pct} after other healing bonuses.",
       "viewTalents": "View talents",
       "selectSpec": "Select specialization",
       "specUnlockBanner": "Specialization Unlocked!",
@@ -2612,11 +3217,15 @@ export const en_CA: EnTranslations = {
       "iconSize": "Icon Size",
       "iconPadding": "Icon Padding",
       "opacity": "Opacity",
-      "visibility": "Visibility",
-      "visAlways": "Always Visible",
       "visCombat": "In Combat",
-      "visHidden": "Hidden",
       "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
+      "showWhile": "Show While",
+      "showOutOfCombat": "Out of Combat",
+      "showIn": "Show In",
+      "showInWorld": "Open World",
+      "showInInstances": "Instances",
+      "placeHint": "Instances are dungeons, raids, delves, rifts, battlegrounds, the arena and any other instanced area. Outside the places you tick, the group is hidden and silent.",
+      "groupOffHint": "With no place ticked, this group never shows and never plays its sounds.",
       "showTimer": "Show Timer",
       "positionX": "Horizontal Position",
       "positionY": "Vertical Position",
@@ -2634,7 +3243,6 @@ export const en_CA: EnTranslations = {
       "aurasTitle": "Procs, Engines and Buffs",
       "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
       "auraFallback": "Aura",
-      "onlyWhileActive": "Only Show While Active",
       "alertStacks": "Alert at Stacks",
       "alertStacksAny": "On gain",
       "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
@@ -2651,7 +3259,18 @@ export const en_CA: EnTranslations = {
       "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
       "hotbarGlow": "Hotbar Glow",
       "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
-      "onlyWhenReady": "Only Show When Ready",
+      "showButtonWhen": "Show Button When",
+      "showReady": "Ready",
+      "showNotReady": "Not Ready",
+      "notReadyHint": "Not ready means on cooldown, or not usable right now.",
+      "auraShowWhen": "Show Button While the Aura Is",
+      "auraActive": "Active",
+      "auraMissing": "Missing",
+      "neverShownHint": "With neither ticked, the button never shows, but its sound still plays.",
+      "reminderHint": "Buff reminder: the button lights up while this aura is missing and hides once you have it.",
+      "glowWhileMissing": "Light Up While Missing",
+      "reminderGlowHint": "Brightens, outlines and pulses the button while the aura is missing.",
+      "reminderSoundHint": "Plays when the aura drops off.",
       "sound": "Ready Sound",
       "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
     },
@@ -2781,7 +3400,8 @@ export const en_CA: EnTranslations = {
         "battlegroundAssist": "killing blow assisted",
         "worldKill": "world kill",
         "worldAssist": "world kill assisted",
-        "hillHold": "holding the hill"
+        "hillHold": "holding the hill",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Kill",
@@ -2791,11 +3411,10 @@ export const en_CA: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world. Logout, death, instances and the Proving Shore pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused on the Proving Shore)",
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
       "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside instances)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
       "rewardProgress": "Current PvP streak: {time} played",
       "tab": "World PvP",
       "title": "World PvP",
@@ -2808,20 +3427,22 @@ export const en_CA: EnTranslations = {
       "zoneContested": "Contested ground: only flagged players fight here.",
       "zoneFfa": "Free-for-all ground: everyone here is fair game.",
       "realmDisabled": "World PvP is disabled on this realm.",
-      "groundSanctuary": "The Proving Shore is the only sanctuary: you cannot enable World PvP or fight other players there.",
+      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
       "groundContested": "Everywhere else is contested: only two flagged players can fight.",
-      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall use normal PvP flags. Entering an active King of the Hill circle enables your flag.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
       "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
-      "markLine": "Entering an active hill circle enables World PvP. Leaving the circle keeps your flag up.",
+      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
       "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
       "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
-      "noStakeLine": "Unflagged players cannot be attacked in the open world.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
+      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
       "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
       "honorLine": "{honor} Honor per kill, split between everyone who helped.",
       "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
       "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
       "greyLine": "Players more than {levels} levels below you pay nothing.",
-      "disarmLine": "Switching off takes {minutes} minutes and waits until you leave the active hill and combat ends.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
       "record": "Record: {kills} kills, {deaths} deaths",
       "enable": "Enable World PvP",
       "disable": "Disable World PvP",
@@ -2844,42 +3465,53 @@ export const en_CA: EnTranslations = {
       "countsHolding": "Inside: you {yours}, rival {theirs}",
       "contestYou": "Taking the hill: {seconds} of {total}",
       "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestYouPaused": "Paused: {seconds} of {total}",
+      "contestOtherPaused": "Rival paused: {seconds} of {total}",
       "contestNone": "Hold a majority inside for {total} to take it",
       "inside": "You are inside the circle",
       "distance": "{yards} yd to the circle",
       "rises": "Rises in {minutes}",
       "falls": "Falls in {minutes}",
-      "pvpEntry": "Entering the active circle enables World PvP.",
-      "pvpBanner": "PvP",
-      "callout": {
-        "killingSpree": "{name} is on a Killing Spree!",
-        "rampage": "{name} is on a Rampage!",
-        "unstoppable": "{name} is Unstoppable!",
-        "dominating": "{name} is Dominating!",
-        "godlike": "{name} is Godlike!",
-        "legendary": "{name} is Legendary!",
-        "shutDown": "{killer} has shut down {victim}!"
-      },
       "standingRaid": "Raid members do not count: only parties can hold the hill"
+    },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
     },
     "warfareShop": {
       "gossipOption": "Browse Warfare Sets",
       "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
       "jewelry": "Jewelry",
       "weapons": "Weapons",
+      "goods": "Goods",
       "groupSeason2": "Warfare Season 2: Vanguard",
       "groupEntry": "Warfare Season 1",
+      "companions": "Companions",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "Owned",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "Buy {item} for {honor}, already owned",
-      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded.",
-      "buyConfirmBodyGold": "Buy {item} for {price}? This purchase cannot be refunded."
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Offense",
       "spell": "Spell",
       "defense": "Defense",
       "ratings": "Ratings",
+      "gearScore": "Gearscore",
       "playtimeLabel": "Time Played",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Less than a minute",
@@ -2908,6 +3540,12 @@ export const en_CA: EnTranslations = {
       "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
       "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
       "upgradeMaxed": "No cartographer could better this map.",
+      "inkPickerTitle": "Use Cartographer's Ink on which map?",
+      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
+      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
+      "inkPickerUnread": "Unread ({count} held)",
+      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
+      "inkPickerCancel": "Cancel",
       "rarity": {
         "common": "Common",
         "rare": "Rare",
@@ -2923,7 +3561,7 @@ export const en_CA: EnTranslations = {
       "delveMark": "Delve Mark",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
-      "honorNote": "Battlegrounds and the arena",
+      "honorNote": "Battlegrounds, the arena, and world quests",
       "delveMarkNote": "Delves completed",
       "wocTokenNote": "Linked wallet balance",
       "walletNotLinked": "No wallet linked",
@@ -3137,8 +3775,10 @@ export const en_CA: EnTranslations = {
         "storm": "Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one.",
         "heat": "Your melee and ranged weapon hits each add a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.",
         "ignite": "Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
-        "guardHeat": "Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack."
+        "guardHeat": "Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
         "anchor": "For {duration} sec, take {reduction}% less damage but move at {speed}% speed. Removes stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you, and you ignore new ones and knockbacks while it lasts.",
@@ -3157,7 +3797,17 @@ export const en_CA: EnTranslations = {
         "kindlingOrb": "Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.",
         "pierce": "For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.",
         "lantern": "Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.",
-        "heartNova": "Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack."
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
+        "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
+        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
+        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
+        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
+        "heartNova": "Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3606,6 +4256,14 @@ export const en_CA: EnTranslations = {
       "watchYouTube": "Watch on YouTube",
       "streamerBadgeTitle": "Verified streamer"
     },
+    "buddyMenu": {
+      "rename": "Rename Buddy",
+      "nameLabel": "Buddy name",
+      "autolootEnable": "Enable Autoloot",
+      "autolootDisable": "Disable Autoloot",
+      "autolootHint": "Your buddy fetches loot from your own corpses within 30 yards.",
+      "cancel": "Cancel"
+    },
     "lootSettings": {
       "title": "Loot Settings",
       "close": "Close loot settings",
@@ -3624,6 +4282,8 @@ export const en_CA: EnTranslations = {
       "resetDone": "All instances have been reset.",
       "resetNone": "You have no instances to reset.",
       "resetOccupied": "You cannot reset instances while someone is still inside.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.",
       "resetLoot": "You cannot reset instances while loot remains inside.",
       "resetConfirmTitle": "Reset All Instances?",
@@ -3635,11 +4295,15 @@ export const en_CA: EnTranslations = {
       "entryMismatchHeroic": "This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run."
     },
     "bags": {
+      "membershipSlot": "Membership bag slot",
+      "membershipSlotLocked": "Unlock this bag slot with a membership.",
+      "membershipSlotHint": "Equip one extra bag while your membership is active. Your bag and items stay safe when it expires.",
       "cannotDestroy": "This item cannot be destroyed.",
       "rightClickDestroy": "Right-click to destroy",
       "dragEquipHint": "Drag onto your character to equip",
       "dragDestroyHint": "Drag out into the world to destroy",
       "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
       "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
       "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
       "itemAriaBound": "{item}, quantity {count}, bound copy",
@@ -3758,6 +4422,24 @@ export const en_CA: EnTranslations = {
       "collapseAbility": "Collapse {ability}",
       "abilityControlLabel": "{action}. {details}",
       "tooltipMeta": "{phase} | {difficulty}",
+      "dungeonButton": "Boss Guide: {dungeon}",
+      "dungeonBossesLabel": "Dungeon bosses",
+      "dungeonSubtitle": "{dungeon} | {boss} | {difficulty}",
+      "rankMiniboss": "Miniboss",
+      "rankFinal": "Final boss",
+      "defeated": "Defeated",
+      "browseBossDefeated": "View {boss} (defeated)",
+      "heroicHeading": "What changes on Heroic",
+      "tipsHeading": "Role tips",
+      "choicesHeading": "Key choices",
+      "choiceGain": "You gain",
+      "choiceRisk": "You risk",
+      "markHeroicOnly": "Heroic only",
+      "markHeroicChanged": "Changed on Heroic",
+      "damageCompare": "Normal {normal} | Heroic {heroic}",
+      "damageRange": "{min} to {max}",
+      "finderOpen": "Boss Guide",
+      "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.",
         "phaseOpeningName": "The Herald Awakens",
@@ -3896,8 +4578,8 @@ export const en_CA: EnTranslations = {
         "boneSpikeHeroicSummary": "Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
         "boneSpikeResponse": "Whoever is nearest hits the Bone Spike: a few hits from anyone shatter it, whatever they deal. Healers keep the impaled alive while the spikes fall.",
         "graveEruptionName": "Grave Eruption",
-        "graveEruptionSummary": "Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it. It never begins while Soul Rend marks are live or within {gap} sec of them clearing.",
-        "graveEruptionHeroicSummary": "Every {everyHeroic} sec, skeletal hands mark {countHeroic} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstHeroic} of maximum health as Shadow damage, then burns as Grave Flame for {flameHeroic} sec, dealing {tickHeroic} of maximum health every second to anyone standing in it. It never begins while Soul Rend marks are live or within {gap} sec of them clearing.",
+        "graveEruptionSummary": "Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it.",
+        "graveEruptionHeroicSummary": "Every {everyHeroic} sec, skeletal hands mark {countHeroic} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstHeroic} of maximum health as Shadow damage, then burns as Grave Flame for {flameHeroic} sec, dealing {tickHeroic} of maximum health every second to anyone standing in it.",
         "graveEruptionResponse": "Step out of every warning circle before it erupts and stay off the burning ground. Tanks pull Nythraxis clear of the flames so melee keeps room to work.",
         "bindingSigilName": "Binding Sigil",
         "bindingSigilSummary": "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
@@ -3931,6 +4613,64 @@ export const en_CA: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
+        "packBondFury": "Deals {pct}% more damage while its partner stands close.",
+        "stalked": "The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.",
+        "waryStuns": "A stun has landed on it. Further stuns slide off until this ends.",
+        "waryRoots": "A root has landed on it. Further roots slide off until this ends.",
+        "warySlows": "A slow has landed on it. Further slows slide off until this ends.",
+        "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
+        "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
+        "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
+        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+      },
+      "bastion": {
+        "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
+        "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
+        "fogShroud": "Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.",
+        "carrionGlut": "Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.",
+        "snappedFetters": "Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.",
+        "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
+      },
+      "crypt": {
+        "carrionEye": "Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.",
+        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec.",
+        "measured": "When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.",
+        "graveDirt": "Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.",
+        "dirtInEyes": "Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.",
+        "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
+        "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
+        "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
+        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health ({shareHeroic}% on Heroic) she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+        "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
+        "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
+        "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
+        "harmony": "Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.",
+        "crescendo": "Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.",
+        "gorged": "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
+        "unquietWard": "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
+        "riteBroken": "Stunned: the shattered ward leaves him unable to act for {seconds} sec.",
+        "shatteredWard": "Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.",
+        "graveChill": "Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.",
+        "graspMark": "Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.",
+        "graspRoot": "Held by the grave's hands: unable to move for {seconds} sec.",
+        "knellAirborne": "On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands."
+      },
+      "sanctum": {
+        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
+        "enrage": "Deals {pct}% more damage.",
+        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
+        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
+        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
+        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
+        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
+        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
+        "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
+        "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
+        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
+      },
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
       "varkhulSharedPyre": "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
@@ -3975,6 +4715,8 @@ export const en_CA: EnTranslations = {
       "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
       "bruinRushWindow": "Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec",
       "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Leaden Hex cannot root this target again yet",
       "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
       "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
@@ -4025,14 +4767,14 @@ export const en_CA: EnTranslations = {
       "duskEconomy": "Abilities cost {pct}% less energy",
       "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
       "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form",
-      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
+      "verdance": "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Your next eligible execute ability costs nothing",
       "resourceSap": "Restores {value} of your current resource every {interval} sec",
       "nextAttackCrit": "Your next attack is guaranteed to critically strike",
       "healEcho": "Falling below {threshold}% health restores {value} health",
       "trinket": {
-        "lastStandCooldown": "Bastion Sigil's Last Bastion shield was used. Falling below {threshold}% health cannot raise it again until this expires.",
-        "lastBastion": "Absorbs {value} damage. Bastion Sigil raised it when you took damage below {threshold}% health.",
+        "lastStandCooldown": "Your protective shield was used. Taking damage below {threshold}% health cannot raise it again until this expires.",
+        "lastBastion": "Absorbs {value} damage. Your trinket raised it when you took damage below {threshold}% health.",
         "retaliate": "Enemies that hit you directly take Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
         "moored": "You take {reduction}% less damage but move at {speed}% speed. You ignore stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms, incapacitating effects and knockbacks.",
         "hourglassStored": "Holds {stored} healing stored from your overhealing. Use Mender's Hourglass to turn it into a shield on the party member within {range} yd with the lowest health percentage, you included.",
@@ -4053,6 +4795,16 @@ export const en_CA: EnTranslations = {
         "riftGuard": "You take {pct}% less damage.",
         "sprint": "Movement speed increased by {pct}%. Does not stack with other speed increases.",
         "brand": "Healing received is reduced by {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
+        "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
+        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
+        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
+        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenched": "Attack speed slowed by {pct}%.",
         "forgeHeat": "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
         "tempered": "Your melee and ranged weapon hits deal {damage} extra Fire damage ({pct}% more from the heat spent). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total.",
         "temperedOther": "Melee and ranged weapon hits deal extra Fire damage, {pct}% more from the heat spent. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
@@ -4061,6 +4813,10 @@ export const en_CA: EnTranslations = {
         "moltenIgnite": "Deals {damage} Fire damage every {every} sec. Another weapon critical hit refreshes it.",
         "pierce": "Your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {pct}% of the damage dealt.",
         "lantern": "A direct heal from anyone on you or a party member within {radius} yd of the lantern also heals the most wounded other party member in its light for {pct}% of the heal.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Heat: {stacks}/{max}. Use Heart of the Crucible to spend it all on a fire nova that deals {damage} Fire damage to each enemy within {radius} yd and taunts every creature it hits.",
         "crucibleHeatOther": "Heat: {stacks}/{max}. Heart of the Crucible spends it all on a fire nova within {radius} yd that deals more Fire damage for each stack and taunts every creature it hits."
       },
@@ -4096,6 +4852,7 @@ export const en_CA: EnTranslations = {
       "dodge": "Increases dodge chance by {pct}%",
       "dodgeReduce": "Reduces dodge chance by {pct}%",
       "damageReduction": "Reduces all damage taken by {pct}%",
+      "slumber": "Asleep until dawn. Cannot be attacked and will not wake for anyone.",
       "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Reduces armor by {value}",
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
@@ -4127,6 +4884,7 @@ export const en_CA: EnTranslations = {
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
       "resourceCount": "{value} of {max}",
       "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
@@ -4172,7 +4930,9 @@ export const en_CA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rises over Thornpeak Heights!"
+      "spawn": "{name} rises over {zone}!",
+      "wake": "{name} wakes over {zone}!",
+      "sleep": "{name} sleeps until dawn."
     },
     "auth": {
       "appleLoginCta": "Continue with Apple",
@@ -4212,8 +4972,8 @@ export const en_CA: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "bountyTag": "Bounty {honor}",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Cheater >",
       "pledgeTag": "Pledge of {guild}",
       "npcRoleTag": "<{role}>",
@@ -4237,7 +4997,8 @@ export const en_CA: EnTranslations = {
         "foodVendor": "Food & Drink Vendor",
         "potionVendor": "Potion Vendor",
         "stableMaster": "Stable Master",
-        "generalGoods": "General Goods"
+        "generalGoods": "General Goods",
+        "innkeeper": "Innkeeper"
       }
     },
     "mobTooltip": {
@@ -4317,10 +5078,12 @@ export const en_CA: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimap",
         "stanceBar": "Stance Bar",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "XP Bar",
         "chat": "Chat",
         "actionBarGroup": "Action Bars",
         "playerFrame": "Player",
+        "playerResource": "Resource Bar",
         "targetFrame": "Target",
         "partyFrames": "Party",
         "swingBar": "Auto Attack",
@@ -4334,6 +5097,7 @@ export const en_CA: EnTranslations = {
         "deedTracker": "Deed Tracker",
         "delveTracker": "Delve Tracker",
         "riftTracker": "Rift Tracker",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Off Hand",
         "unitTooltip": "Tooltip"
       },
@@ -4372,6 +5136,37 @@ export const en_CA: EnTranslations = {
       "apply": "Apply",
       "imported": "Hotkey setup imported.",
       "wrongKind": "That code is a settings export, not a hotkey setup."
+    },
+    "keybindLayout": {
+      "title": "Keyboard Layout",
+      "open": "Convert",
+      "from": "Hotkeys made for",
+      "to": "Convert to",
+      "keepMovement": "Keep movement keys in place",
+      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
+      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
+      "moves": "Hotkeys that will move: {count}",
+      "noChange": "No hotkeys change between these layouts.",
+      "apply": "Convert Hotkeys",
+      "converted": "Hotkeys converted from {from} to {to}.",
+      "layouts": {
+        "qwertyUs": "QWERTY (US)",
+        "qwertyUk": "QWERTY (UK)",
+        "qwertzDe": "QWERTZ (German)",
+        "qwertzCh": "QWERTZ (Swiss)",
+        "azertyFr": "AZERTY (French)",
+        "azertyBe": "AZERTY (Belgian)",
+        "qwertyEs": "QWERTY (Spanish)",
+        "qwertyIt": "QWERTY (Italian)",
+        "qwertyNordic": "QWERTY (Swedish, Finnish)",
+        "qwertyDa": "QWERTY (Danish)",
+        "qwertyNo": "QWERTY (Norwegian)",
+        "qwertyBr": "QWERTY (Brazilian ABNT2)",
+        "qwertyPt": "QWERTY (Portuguese)",
+        "qwertyTr": "QWERTY (Turkish)",
+        "dvorak": "Dvorak",
+        "colemak": "Colemak"
+      }
     },
     "keyboardMap": {
       "title": "Keyboard Overview",
@@ -4462,6 +5257,7 @@ export const en_CA: EnTranslations = {
       "perfectedBadge": "Perfected",
       "perfectingRank": "Perfecting: rank {rank} of {ranks}",
       "materialSourceGatherer": "{count} × Collected by {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × Collected by {name}, signed by {signer}",
       "materialSourceUnrecorded": "{count} × No gatherer recorded",
       "materialSourceUnrecordedSigned": "{count} × No gatherer recorded, signed by {name}",
@@ -4598,11 +5394,12 @@ export const en_CA: EnTranslations = {
       "memberSinceDays": "{days}d in the Discord",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "Admin",
         "coredevs": "Core Dev",
         "devs": "Dev",
-        "seniormods": "Sentinel",
+        "seniormods": "Senior Mod",
         "mods": "Mod",
-        "juniormods": "Observer",
+        "juniormods": "Junior Mod",
         "artists": "Artist",
         "contentcreator": "Content Creator",
         "legend": "LEGEND",
@@ -4905,6 +5702,32 @@ export const en_CA: EnTranslations = {
       "vaultCannotDeposit": "Cannot go in the vault",
       "tabsAria": "Bank tabs",
       "personalTab": "Personal",
+      "accountTab": "Other characters",
+      "accountArmour": "Claim membership gear",
+      "referralArmour": "Claim friendship armour",
+      "accountMembership": "An active membership lets you access your other characters' banks here.",
+      "accountCharacters": "Character banks",
+      "accountEmpty": "Create another character to use their bank here.",
+      "accountSelect": "Select a character to load their bank.",
+      "accountUnavailable": "This bank is unavailable. Select the character again to refresh.",
+      "accountLoading": "Loading your characters...",
+      "accountOpening": "Opening {name}'s bank...",
+      "accountOnline": "{name} is logged in. Log that character out to open their bank here.",
+      "accountBusy": "The bank is busy. Try again in a moment.",
+      "accountNoFit": "There is no room for that stack.",
+      "accountStale": "That stack changed before it could move. Try again.",
+      "accountTooLarge": "{name}'s bank is too large to open from here. Log in as {name} to use it.",
+      "accountRetry": "Try again",
+      "accountBankTitle": "{name}'s bank",
+      "accountBagsTitle": "Your bags",
+      "accountSlots": "{used} / {total} slots",
+      "accountWithdrawLead": "Click an item to move it into your bags.",
+      "accountDepositLead": "Click an item to send it to {name}'s bank.",
+      "accountBankEmpty": "This bank is empty.",
+      "accountBagsEmpty": "Your bags are empty.",
+      "accountDepositHint": "Click to deposit this stack into the selected character bank.",
+      "accountWithdrawHint": "Click to withdraw this stack into your bags.",
+      "accountBound": "Soulbound, locked and quest items cannot move between characters.",
       "guildTab": "Guild",
       "guildCapacityAria": "Guild bank slots used: {used} of {total}",
       "guildEmpty": "The guild bank is empty.",
@@ -4974,6 +5797,192 @@ export const en_CA: EnTranslations = {
       "logOpenBank": "{actor} opened the guild bank for {amount}",
       "logCharterFee": "{actor} paid the guild charter fee of {amount}",
       "logAdminPurge": "An administrator removed {count} {item}"
+    },
+    "collections": {
+      "title": "Hunting",
+      "close": "Close hunting",
+      "keybindLabel": "Hunting",
+      "launcherTitle": "Hunting: buddies, mounts and item sets",
+      "tabs": {
+        "buddies": "Buddies",
+        "mounts": "Mounts",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "Collected",
+        "notOwned": "Not collected",
+        "unavailable": "Not obtainable yet",
+        "pending": "A presence follows you"
+      },
+      "presenceDefault": "You feel a presence watching you.",
+      "revealed": "{name} has decided to follow you.",
+      "cosmeticUnlocked": "New look for {name}: {look}.",
+      "presence": {
+        "ember_fox": "Something small and warm is padding along behind you.",
+        "moss_hare": "A rustle in the peat keeps pace with your steps.",
+        "frog": "A wet croak answers every step you take.",
+        "crimson_claw_crab": "Something clicks and scuttles just out of sight.",
+        "golden_sentinel": "A faint gilded glint watches from the grass.",
+        "nightfang": "Silent paws follow where you cannot see.",
+        "tuskhorn_boar": "A snort and a stamp: something stubborn is trailing you.",
+        "emerald_wolf": "Green eyes blink in the undergrowth, then follow.",
+        "tiger": "Stripes shift at the edge of your vision.",
+        "cate_coin": "You hear the faint ring of a coin that is not yours.",
+        "alon": "You feel watched, and quietly approved of.",
+        "trollface": "Somewhere behind you, something is grinning.",
+        "ansem": "A whisper of doors and darkness follows you.",
+        "triple_t": "Three footsteps fall where there should be one.",
+        "kekius": "A stifled laugh trails you down the road.",
+        "solbot": "A soft ticking keeps time with your stride.",
+        "frostfire": "Steam and frost swirl in your wake.",
+        "rocky": "Pebbles shift behind you with no wind to move them.",
+        "proud_grunt": "A boot stamps to attention somewhere behind you.",
+        "loot_goblin": "Something is counting your coins under its breath.",
+        "penny_goldspark": "Tiny tools clink in a pocket that is not yours.",
+        "stag": "A shadow with antlers falls across your path.",
+        "alpaca": "Something woolly and unhurried has decided to come along.",
+        "horse": "Hooves keep an easy, patient beat somewhere behind you.",
+        "sapling": "Little roots patter behind you, stirring the fallen leaves.",
+        "bull": "A low huff of breath stirs the dust behind you.",
+        "spider": "A thread of silk brushes your shoulder.",
+        "raptor": "Quick claws tick over stone at your heels.",
+        "skeleton": "Dry bones rattle in step with yours.",
+        "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
+        "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "sprites": "Two small flames have caught on you, and they are not going out.",
+        "crystal_tide": "A drop of the sea refuses to fall from your line.",
+        "phantom": "The air behind you is a shade too still.",
+        "emberfall_phoenix": "A warmth like a banked fire settles at your back."
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "Frostbound",
+        "crystal_lich_voltaic": "Voltaic",
+        "forgemaw_ashen": "Ashen",
+        "forgemaw_whitehot": "White-Hot",
+        "stag_acorn": "Acorn Crown",
+        "stag_gilded": "Gilded",
+        "moss_hare_verdant": "Verdant",
+        "proud_grunt_warlord": "Warlord",
+        "frog_sapphire": "Sapphire Frog"
+      },
+      "actions": {
+        "summon": "Summon",
+        "dismiss": "Dismiss",
+        "wear": "Wear",
+        "remove": "Remove"
+      },
+      "looks": {
+        "title": "Looks",
+        "unlocked": "Unlocked",
+        "locked": "Locked",
+        "worn": "Worn",
+        "none": "No looks authored for this companion yet"
+      },
+      "source": {
+        "bossLabel": "Boss pet",
+        "bossDrop": "{mob} ({location}), {chance}% per player per kill",
+        "bossDropWithHeroic": "{mob} ({location}), {chance}% per player, {heroicChance}% on Heroic",
+        "bossDropHeroicOnly": "{mob} ({location}), Heroic only, {chance}% per player",
+        "rollNote": "Every player rolls separately; nobody loses a roll to a party member.",
+        "deedLabel": "Earned by",
+        "deed": "The deed {deed}",
+        "challengeLabel": "Challenge",
+        "challengeSpeed": "Defeat {mob} within {seconds} seconds of the pull",
+        "challengeDps": "Deal {dps} damage per second to {mob} across the fight",
+        "craftLabel": "Crafted",
+        "craft": "{item} ({profession} recipe)",
+        "grantLabel": "Awarded",
+        "grantOnly": "Seasonal award: the monthly ladder and top-parse rewards",
+        "tokenLabel": "Token",
+        "token": "{item}, used once to attach the companion"
+      },
+      "buddyLore": {
+        "ember_fox": "A vixen out of the Eastbrook Vale hedgerows, named for the coal-red coat that shows through winter scrub. The trappers there gave up on the kits generations ago and started leaving food out instead.",
+        "moss_hare": "The Willowfen hare, green-furred from a lifetime bedded down in wet peat. Fen herbalists count them lucky and will not have one chased off a doorstep.",
+        "frog": "Mirefen Marsh raises them fat and unbothered, singing all night from the reed beds. The marsh guides swear a boat carrying one never runs aground.",
+        "crimson_claw_crab": "A Farshore tidal crab whose claw stays red long after it leaves the water. Dock crews used to race them along the boards for coin.",
+        "golden_sentinel": "A watch-beetle of the Amberfall, gilded by the resin it grew up in. The name is older than the resin: sentinels of a kind kept those groves long before anyone thought to bottle the sap.",
+        "nightfang": "A young Nightbloom hunter, silent even by the standards of its kind. It follows for the company and hunts nothing larger than a moth.",
+        "tuskhorn_boar": "Thornpeak stock, bred short-legged by shepherds who wanted a boar that could not put a fence down. It kept the temper regardless.",
+        "emerald_wolf": "A Wraithwood pup, its coat green in the canopy light that never quite reaches the forest floor. The wardens raise whichever orphans the wood leaves behind.",
+        "tiger": "Palmreach stripes on an animal that has never seen the Palmreach: the line has been kept in captivity since the old menageries closed. It answers to a whistle and to nothing else.",
+        "cate_coin": "A cat that will not be parted from the coin it sits on, and that nobody has ever seen eat. Eastbrook merchants still argue over which of the two is the pet.",
+        "alon": "A traveller's mascot from a road no map will admit to, turning up wherever a plan is going badly. It watches, it approves, and it offers no help whatsoever.",
+        "trollface": "A grinning thing the Wraithwood put out and would not take back. Every attempt to describe it ends with the describer laughing and giving up.",
+        "ansem": "It speaks of doors and of darkness and will not be drawn further on either. The Nightbloom cultists claim it as theirs; it wanders off whenever they hold a rite.",
+        "triple_t": "Three of something, or one thing three times over. The accounts disagree, and the creature will not hold still long enough to be counted.",
+        "kekius": "A laughing companion of unclear origin, adopted by the Galecrest race yards as a charm. It has outlived four stables that swore by it.",
+        "solbot": "A small sun-fed automaton, dug half-buried out of the Drakelands ash and still ticking. Whatever workshop built it left no mark anywhere on the casing.",
+        "frostfire": "Born in the Frostveil Reach where a hot spring surfaces through the ice field, and it has never settled on which half it belongs to. It steams in cold air and shivers in warm.",
+        "rocky": "A stone-shelled crawler off the Thornpeak scree, slow and thoroughly unbothered. Miners keep them for the way they go still a moment before a collapse.",
+        "proud_grunt": "A veteran of the Warfare stores who kept the salute and lost the rank. Warmarshal Draven Kole hands one to any soldier with honor enough to know what that costs.",
+        "loot_goblin": "It follows anyone carrying Heroic Marks and has never once been caught stealing. Quartermaster Vex maintains that this proves nothing at all.",
+        "penny_goldspark": "A gnome tinker's apprentice who charges by the hour and is worth every copper of it. Armorer Hode took her on to settle a debt and now sells the arrangement to anyone holding a thousand gold.",
+        "stag": "Evergarden bloodline, bred down from the great stags the wardens once rode. It still lowers its head at a raised hand, from a habit older than the animal.",
+        "alpaca": "The Galecrest herds keep them for wool and for temper: nothing stays calmer in a storm. This one will spit at exactly one person per journey.",
+        "horse": "Vale pony stock, bred small for the orchard lanes and never told it is not a warhorse. It keeps pace at your shoulder and will follow anyone who once fed it an apple.",
+        "sapling": "A young tree with a smile in its bark and a curious purple gaze. Its roots carry it in a cheerful waddle wherever you wander.",
+        "bull": "A Vale bull the size of a dog, which is the only reason anyone agreed to keep one indoors. The temperament did not scale down with the rest.",
+        "spider": "A Wraithwood weaver, palm-sized, that redecorates any pack it is carried in. The webbing is stronger than the thread it replaces.",
+        "raptor": "Drakelands hatchling stock, sold on before it learns how fast it can run. Every new owner is told to keep it fed, and none of them need telling twice.",
+        "skeleton": "It came up out of the Wraithwood barrows, dusted itself off, and has followed people about ever since. Nobody has established whose bones these were.",
+        "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
+        "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
+        "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
+        "sprites": "Two small fire sprites, one gold and one teal, who never quite agree which of them is leading. Get close enough and they fold into one green flame, then spill apart again, laughing.",
+        "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.",
+        "emberfall_phoenix": "It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice."
+      },
+      "petKind": {
+        "beast": "Beasts",
+        "elemental": "Elementals",
+        "humanoid": "Humanoids",
+        "undead": "Undead",
+        "celebrity": "Celebrities"
+      },
+      "armor": {
+        "cloth": "Cloth",
+        "mail": "Mail",
+        "leather": "Leather"
+      },
+      "stat": {
+        "intellect": "Intellect",
+        "agility": "Agility",
+        "strength": "Strength",
+        "mixed": "Hybrid"
+      },
+      "set": {
+        "owned": "{owned} of {total} pieces",
+        "itemLevel": "ilvl {level}",
+        "bonusLabel": "{pieces} pieces"
+      },
+      "detail": {
+        "dropLabel": "Drops from",
+        "vendorLabel": "Sold by",
+        "bindLabel": "Binding",
+        "sellLabel": "Vendor pays",
+        "marketLabel": "World Market",
+        "exchangeLabel": "$WOC Exchange",
+        "setLabel": "Collected",
+        "drop": "{mob} ({location}), {chance}% per kill",
+        "heroicDrop": "{mob} ({location}), Heroic only, {chance}% per kill",
+        "dropWithHeroic": "{mob} ({location}), {chance}% per kill, {heroicChance}% on Heroic",
+        "globalDrop": "Any enemy, {chance}% per kill, one of {count} at this rarity",
+        "fishingDrop": "Fishing anywhere, {chance}% per catch",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "{amount} Honor",
+        "marksPrice": "{amount} Heroic Marks",
+        "noSource": "No source in the game yet",
+        "noItem": "No item grants this yet",
+        "tradeable": "Tradeable",
+        "soulbound": "Soulbound",
+        "noSell": "Cannot be sold",
+        "marketAtMerchant": "Shown at the Merchant",
+        "marketChecking": "Checking...",
+        "marketNone": "No listings",
+        "exchangeNone": "No listings",
+        "exchangeUnavailable": "Not available on this client"
+      }
     },
     "calendar": {
       "title": "Event Calendar",
@@ -5067,13 +6076,6 @@ export const en_CA: EnTranslations = {
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Hide offline",
       "hideOfflineTitle": "Hide offline guild members",
-      "presence": {
-        "label": "Show me online to",
-        "everyone": "Everyone",
-        "friends": "Friends only",
-        "none": "No one",
-        "title": "Who sees you online in friends lists and the guild roster, with your zone and map position. Your party always sees you."
-      },
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
@@ -5371,22 +6373,26 @@ export const en_CA: EnTranslations = {
       "enchant_weapon_piston_drive": "Weapon Etching: Piston Drive"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
-      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
+      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
       "enchant_weapon_dawnfire_etching": "Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.",
       "enchant_weapon_dawns_benediction": "Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.",
       "enchant_weapon_piston_drive": "Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Your Allied Hearthstone is not attuned. Speak with an allied quartermaster or use it in an allied hub.",
+      "hearthstoneBound": "Your Allied Hearthstone is now attuned to {hub}.",
+      "hearthstoneTransport": "The hearthstone transports you to {hub}.",
+      "itemCooldown": "That item is not ready yet ({minutes} min remaining).",
       "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
       "alliedHearthstoneAttuned": "Attuned to: {hub}",
       "hub_none": "None (Use near a faction hub to attune)",
       "hub_rift_watch": "Drifthaven (The Rift Watch)",
       "hub_church_order": "Eastbrook Vale (The Church Order)",
-      "hub_automatons": "South Reach (The Automaton Foundry)",
+      "hub_automatons": "Wyrmwatch (The Automatons)",
       "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
       "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
-      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
+      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 min. Players out of combat within 15 yards of it regenerate 10% more health, and mana users also restore mana equal to 5% of their Spirit, every 2 sec. Staying near it for 10 sec grants Blessing of the Dawn, increasing Strength, Agility, Stamina, Intellect, and Spirit by 5% for 30 min. (5 min cooldown)",
       "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
       "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
       "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
@@ -5746,7 +6752,9 @@ export const en_CA: EnTranslations = {
     },
     "pattern": {
       "teaches": "Use: Teaches you how to craft {item}.",
-      "teachesEnchant": "Use: Teaches you how to apply {enchant}."
+      "teachesEnchant": "Use: Teaches you how to apply {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Unbinding: {name}",
@@ -5899,6 +6907,12 @@ export const en_CA: EnTranslations = {
       "acceptedWait": "Waiting for the others..."
     },
     "finder": {
+      "groups": "Groups",
+      "dungeonGuide": "Dungeon Guide",
+      "backToGroups": "Back to Groups",
+      "createGroup": "Create Group",
+      "cancelCreate": "Cancel",
+      "activeQueue": "Your Queue",
       "title": "Dungeon Finder",
       "close": "Close",
       "back": "Back",
@@ -5940,6 +6954,9 @@ export const en_CA: EnTranslations = {
       "blockedLevel": "Levels {min} to {max} only",
       "blockedSpec": "Requires a specialization",
       "yourRoles": "Your roles",
+      "yourRole": "Your role",
+      "createQueueLocked": "Leave matchmaking before publishing.",
+      "noCreateActivities": "No eligible activities in this category.",
       "needsSpec": "Choose a specialization to use the Dungeon Finder.",
       "leaderNote": "Only your party leader can queue the group.",
       "chooseActivities": "Choose activities",
@@ -5979,20 +6996,98 @@ export const en_CA: EnTranslations = {
       "tagFullClear": "Full clear",
       "tagLearning": "Learning welcome",
       "tagFastRun": "Fast run",
+      "tagGuildOnly": "Guild Party",
+      "guildPartyToggle": "Guild Party",
+      "guildPartyHint": "Only members of {guild} can apply.",
+      "guildPartyNeedsGuild": "Join a guild to create a Guild Party.",
+      "guildPartyNote": "Guild Parties only accept members of the leader's guild.",
+      "guildPartyBadge": "{guild} only",
+      "guildPartyLocked": "Guild members only",
+      "filterContent": "Content",
+      "filterAll": "All content",
+      "filterDungeons": "Dungeons",
+      "filterRaids": "Raids",
+      "filterEmpty": "No listings match this filter.",
+      "postHeading": "Advertise your group",
+      "postGeneral": "Post in General",
+      "postDiscord": "Post in Discord",
+      "postReadyIn": "Ready in {minutes} min",
+      "postDiscordOffline": "Online play only",
+      "inspect": "Inspect",
+      "inspectApplicantAria": "Inspect {name}",
+      "partyHeading": "Bringing your party",
+      "partyNote": "Your party joins this group. Choose a role for each member, or let them keep their own.",
+      "partyRolesHeading": "Party roles",
+      "partyRolesNote": "Choose a role for each member, or let them keep their own.",
+      "partyRoleOwn": "Their choice",
+      "partyRoleAria": "Role for {name}",
+      "partyMemberMeta": "Level {level} {cls}",
+      "difficultyHeading": "Difficulty",
+      "showGuide": "Show Guide",
+      "hideGuide": "Hide Guide",
+      "levelUnavailable": "Outside your level range",
+      "guideUnavailable": "A detailed strategy for this encounter is not available yet.",
+      "guide": {
+        "pulse": "Periodically damages players near the boss. Ranged players and healers can reduce damage taken by keeping their distance. Healers should prepare to restore health to players fighting in melee.",
+        "cleave": "Melee swings also damage other players near the current target. Keep space around the tank; standing behind the boss alone does not prevent this splash damage.",
+        "adds": "Reinforcements arrive as the fight progresses. The tank should collect them before they reach the healer. Damage dealers should help clear them so the group does not face several waves at once.",
+        "enrage": "At low health, the boss attacks faster and deals more damage. Save defensive and healing cooldowns for this final stretch, and finish the fight without abandoning the other mechanics.",
+        "stomp": "A periodic slam damages and briefly stuns nearby players. Healers and ranged players should keep their distance. Keep the tank healthy before the slam, since nearby allies may be unable to act during the stun.",
+        "inferno": "The boss stops moving and attacking to channel increasingly strong fire pulses. Leave the area around the boss as soon as the channel begins, then return when it ends. Spreading out inside the fire does not protect you.",
+        "mending": "Periodically heals wounded nearby allies, including the caster. Focus damage on the healer and avoid bringing extra enemies into its healing range. This is an instant effect, not a cast to interrupt.",
+        "manaBurn": "Landed melee hits can drain mana from a mana-using target. Keep the boss off the healer and other vulnerable casters. Rage and energy users do not lose resources to this effect.",
+        "mortalWound": "Melee hits can reduce the healing received by the target. Use defensive cooldowns while the wound is active; the healer will need more healing to restore the same amount of health.",
+        "bleed": "Melee hits can leave a bleed that continues damaging the victim. Watch the wounded player even if the enemy changes targets, and restore their health while the bleed runs.",
+        "haste": "Periodically increases the attack speed of nearby allies. Avoid fighting additional packs beside the Beastmaster, and prepare defensive cooldowns when several enemies receive the effect.",
+        "ward": "Periodically gives nearby allies an absorb shield. Focus the same target together to break its shield and finish it before the next ward, rather than spreading damage across the pack.",
+        "knockback": "Melee hits can knock the target away. Leave safe space behind the tank, avoid positioning near unpulled enemies, and be ready to restore melee range after the knockback."
+      },
       "mech": {
         "shadow_pulse": "Shadow Pulse (pulsing area damage)",
-        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "crypt_shovelful": "Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)",
+        "crypt_measured_for_the_grave": "Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)",
+        "crypt_burial_toll": "Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)",
+        "crypt_marrow_heroic": "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
+        "crypt_brides_lament": "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
+        "crypt_frozen_embrace": "Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)",
+        "crypt_rime_path": "Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)",
+        "crypt_bridal_freeze": "Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)",
+        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players and lets go at 4.4 percent of her health",
+        "crypt_dirge_of_the_hollow": "Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)",
+        "crypt_harmony": "Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)",
+        "crypt_bone_organ": "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
+        "crypt_crescendo": "Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)",
+        "crypt_ilvane_heroic": "Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)",
+        "crypt_morthen_shadow_pulse": "Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)",
+        "crypt_gravecall": "Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)",
+        "crypt_rite_of_the_unquiet": "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
+        "crypt_reap_the_unquiet": "Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)",
+        "crypt_morthen_heroic": "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
+        "reaping_arc": "Reaping Arc (splash around the tank)",
+        "hallowed_brine": "Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)",
+        "rebounding_bulwark": "Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)",
+        "tide_sentence": "Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)",
+        "unbroken_oath": "Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)",
+        "fog_veil": "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
         "mist_surge": "Mist Surge (pulsing area damage)",
         "summons_adds": "Summons reinforcements",
         "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
+        "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
+        "hydra_three_elements": "Three Elements (the left head breathes an 18 yard cone of frost that slows you by 70 percent for 4 seconds, the centre head spits venom under up to 3 players that bursts after 1.5 seconds and burns for 6 seconds where it lands, and the right head fires a torrent down a 26 yard lane that throws you back 8 yards: step out of each one. When a head falls, the heads still standing take over its attack)",
+        "hydra_tsunami": "Tsunami (the heads sink for 4.5 seconds, taking 75 percent less damage, and a wave rolls over one half of the pool, the other half the next time: 160 to 190 frost damage on normal and a 10 yard shove. Cross to the other half or stand behind a rim column; on heroic the wave rolls back over the other half 3.5 seconds later. The first Tsunami comes 24 seconds into the fight, each later one 40 seconds after the last has passed)",
+        "hydra_combined_breath": "Combined Breath (between Tsunamis the heads fuse two of their attacks, always in the same order: Frostlocked Torrent freezes everyone in its lane for 2 seconds and leaves an Ice Wall that can shelter you from the next wave, Venom Current slides the venom pools outward, and Toxic Rime freezes the pools into crystals that burst after 4 seconds. Once between Tsunamis on normal, twice on heroic)",
+        "hydra_regrowth": "Regrowth (a fallen head grows back after 20 seconds at half health while another head still lives, and each fallen head makes the others deal 15 percent more damage: bring all three down close together)",
+        "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
+        "undertow": "Undertow (pulls everyone in, run out before the crash)",
         "enrage": "Enrages at low health",
         "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "grave_inferno": "Grave Inferno (channeled fire AoE, stay spread)",
-        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "grave_inferno": "Grave Inferno (leave the fire pulses)",
+        "grave_cleaver": "Grave-Cleaver (splash around the tank)",
         "shadow_nova": "Shadow Nova (area burst)",
         "profane_mending": "Profane Mending (heals its allies)",
         "mana_burn": "Withered Benediction (burns mana)",
-        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "deathstalker_cleave": "Deathstalker Cleave (splash around the tank)",
         "mortal_wound": "Forgotten Wound (reduces healing taken)",
         "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
         "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
@@ -6009,7 +7104,10 @@ export const en_CA: EnTranslations = {
         "crown_endures": "The Crown Endures (hard enrage at 6:00, heroic 5:00)",
         "deathless_court": "The Deathless Court (heroic only, the royal court rises after Deathless Rage)",
         "bloodmane_rend": "Bloodmane Rend (bleed, watch for target swaps)",
-        "tusk_sweep": "Tusk Sweep (frontal cleave)",
+        "tusk_sweep": "Tusk Sweep (splash around the tank)",
+        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
+        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
+        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
         "ancestral_sap": "Ancestral Sap (heals its allies)",
         "call_of_the_hunt": "Call of the Hunt (hastens nearby allies)",
         "thickhide_ward": "Thickhide Ward (shields nearby allies)",
@@ -6033,8 +7131,172 @@ export const en_CA: EnTranslations = {
         "forgestorm": "Forgestorm (falling meteor circles, move out)",
         "shared_pyre": "Shared Pyre (gathering circle, split the damage)",
         "anvils_decree": "Anvil's Decree (three raid-wide hammer strikes, heal through)",
-        "masters_assembly": "The Master's Assembly (block the forge beams, rotate blockers)"
+        "masters_assembly": "The Master's Assembly (block the forge beams, rotate blockers)",
+        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
+        "drowned_anchor": "Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)",
+        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
+        "reaper_behind": "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
+        "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
+        "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
+        "shared_health": "Shared Health (one pool: hit whichever is safest)",
+        "heel_frenzied_bond": "Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)",
+        "seed_rain": "Seed Rain (clean players stomp the seeds before they sprout)",
+        "pollinate": "Pollinate (golden players stay off the seeds, or they sprout at once)",
+        "vine_lash": "Vine Lash (step out of the thorny lane or be rooted)",
+        "gorge": "Gorge (a heavy bite and a poison on the tank)",
+        "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
+        "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
+        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
+        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
+        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
+        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
+        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
+        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
+        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
+        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
+        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
+        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
       }
+    },
+    "bastionCage": {
+      "title": "Locked in the Iron Cage!",
+      "promptKey": "Press {key} again and again to break free",
+      "promptNoKey": "Press your interact key again and again to break free",
+      "promptClick": "Click here again and again to break free",
+      "promptTap": "Tap here again and again to break free",
+      "buttonAria": "Break free from the Iron Cage",
+      "progressAria": "Escape progress: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "Chained to the Drowned Anchor!",
+      "anchoredLine": "Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit",
+      "allyTitle": "Break the chain!",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
+      "shackledTitle": "Shackled to {name}",
+      "shackledLine": "Stay within {range} yards to avoid chain damage to both of you ({dist} yards apart)",
+      "strainedLine": "Move within {range} yards of your partner to stop chain damage to both of you",
+      "brokenAria": "Chain broken: {pct}",
+      "reachAria": "Chain reach used: {pct}",
+      "linksLeft": "Chain links left: {count} of {total}",
+      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
+      "linksTarget": "{count} of {total} links",
+      "linkBroken": "Link broken!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "The Sentence falls on you!",
+      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
+      "brineTitle": "In the Hallowed Brine!",
+      "brineLine": "It burns you every second: step out of the pool",
+      "reapedTitle": "Death rises behind you!",
+      "reapedLine": "Move forward or sideways to avoid the scythe swinging behind you",
+      "veilTitle": "The Fog Veil",
+      "veilLine": "Find the Vael whose lantern flares in the beacon beam, then attack to break the veil",
+      "realTitle": "The beam found him!",
+      "realLine": "This is the real Vael: strike him to break the veil",
+      "shadeTitle": "A hollow shade",
+      "shadeLine": "Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil",
+      "timeAria": "{seconds} seconds left"
+    },
+    "wildheartAlert": {
+      "preyTitle": "You are the Prey!",
+      "preyLine": "Lure Zulgar through lit sun glyphs to slow him before he catches and mauls you",
+      "preyWaitLine": "Keep away from Zulgar: he will switch from the other marked player to chase you",
+      "stalkedTitle": "Stalked!",
+      "stalkedLine": "Run from the jaguar to avoid its bites. Lead it away from the Beastmaster to break Pack Bond",
+      "pollinatedTitle": "Pollinated!",
+      "pollinatedLine": "Avoid seedpods: touching them while Pollinated creates enemies. Unmarked allies can stomp them",
+      "bondTitle": "Pack Bond",
+      "bondLine": "Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus",
+      "timeAria": "{seconds} seconds left"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "In the quench-water!",
+      "quenchLine": "Swim onto ice or the shore to escape the water damage and slow",
+      "plungeTitle": "Plunging Fire!",
+      "plungeLine": "Leave this ice platform now: fire will hit everyone on it and damage the ice",
+      "descentTitle": "Crashing Descent!",
+      "descentLine": "Leave the landing shadow to avoid Korzul crashing down and knocking you back",
+      "eyeTitle": "Wyrm's Eye on you!",
+      "eyeLine": "Move onto uncracked ice away from allies: your mark calls fire onto that platform",
+      "eyeCrackedLine": "Move onto uncracked ice away from allies: your marked fire would break this cracked platform",
+      "flailTitle": "Chain Flail!",
+      "flailLine": "Step sideways out of the marked strip to avoid the chain strike",
+      "chargeTitle": "Threshold Charge!",
+      "chargeLine": "Step sideways out of the marked strip: Korgath charges through it and knocks you back",
+      "trenchTitle": "Soulfire Trench!",
+      "trenchLine": "Step sideways out of the marked strip to avoid the fire damage. The ice then becomes meltwater",
+      "strainTitle": "Strain!",
+      "strainLine": "Move away from pillars with intact chains to avoid the blast and knockback",
+      "infernoTitle": "Grave Inferno!",
+      "infernoLine": "Move away from Korzul: each nearby fire pulse deals more damage",
+      "stompTitle": "Shuddering Stomp!",
+      "stompLine": "Move away from Korgath before the cast ends to avoid the stomp damage",
+      "breathTitle": "Grave Breath!",
+      "breathLine": "Move sideways out of the marked cone to avoid Korzul's breath damage",
+      "maulTitle": "Maul Arc!",
+      "maulLine": "Move behind Korgath to avoid the weapon swing hitting everyone in front",
+      "tailTitle": "Tail Sweep!",
+      "tailLine": "Move to Korzul's side to avoid the tail damage and knockback behind him",
+      "meltwaterTitle": "Bonewalker in meltwater",
+      "meltwaterLine": "Lure the Bonewalker chasing you onto dry ice before killing it: dying in water revives it and heals Velkhar",
+      "meltwaterTargetLine": "Stop attacking until the Bonewalker leaves the water: killing it there revives it and heals Velkhar",
+      "crackedTitle": "Cracked ice",
+      "crackedLine": "Move onto uncracked ice before drawing fire here: another fire hit breaks this platform",
+      "flightTitle": "Korzul takes flight",
+      "flightLine": "Group on uncracked ice to lure Korzul's landing, then leave the shadow to avoid the crash",
+      "lockboundTitle": "Lockbound",
+      "lockboundLine": "Attack the Seal Shackles to remove Korgath's damage reduction: {chains} chains grant {pct}% less damage taken",
+      "timeAria": "{seconds} seconds left",
+      "brandedTitle": "Branded!",
+      "brandedLine": "Enter a meltwater pool to remove the brand and stop its damage",
+      "rimeTitle": "Creeping Rime!",
+      "rimeLine": "Leave the whelps' breath to avoid freezing solid at full stacks: Creeping Rime {stacks}/{max}",
+      "slabTitle": "Ice Slab",
+      "slabLine": "Put the ice slab between you and enemy casters to block their line of sight"
+    },
+    "cryptAlert": {
+      "measuredTitle": "Measured for the Grave!",
+      "measuredLine": "Move to the yard's edge before the mark ends to keep the damaging grave away from your group",
+      "embracedTitle": "Frozen Embrace!",
+      "embracedLine": "Your group must damage the Lady of the Bonechill to free you from her grip",
+      "lamentTitle": "Bride's Lament!",
+      "lamentShelteredLine": "Stay in this lit lantern's light to avoid the wail damage: you have a shelter spot",
+      "lamentOpenLine": "Move into a lit lantern's light to avoid the wail damage: only two players fit per lantern",
+      "graveTitle": "In an Open Grave!",
+      "graveLine": "The grave dirt burns and slows you: step out of it",
+      "tollTitle": "Burial Toll!",
+      "tollLine": "Prepare to fight the skeletons raised from open graves: Marrow is immune while ringing the bell",
+      "harmonyTitle": "Harmony",
+      "harmonyLine": "Kill the Choristers to remove Ilvane's {pct}% damage reduction",
+      "knellTitle": "Burning Knell!",
+      "knellLine": "Ghost fire pours over this half of the ring when the bar runs out: get to the other half",
+      "graspTitle": "Grasp of the Grave!",
+      "graspLine": "Leave the marked ring before the hands erupt to avoid damage and being rooted",
+      "reapTitle": "Reap the Unquiet!",
+      "reapLine": "Move behind Morthen to avoid the scythe striking everyone in front",
+      "riteTitle": "Rite of the Unquiet",
+      "riteLine": "Relight all Remembrance Candles to break Morthen's immunity: {lit} of {total} lit",
+      "riteNamedLine": "Relight candles in the Ledger's order to break Morthen's immunity: a wrong candle undoes progress ({lit}/{total})",
+      "soulTitle": "Bound Soul",
+      "soulLine": "Intercept the drifting soul to stop it healing Morthen and increasing his damage. Catching it hurts you",
+      "timeAria": "{seconds} seconds left"
+    },
+    "kitUse": {
+      "toppleLine": "Topple the brazier onto nearby enemies to burn them with the spill",
+      "toppleKey": "Topple the {name} onto them",
+      "toppleTap": "Tap here to topple the {name} onto them",
+      "toppleClick": "Click here to topple the {name} onto them",
+      "toppleFar": "Get within {range} yd to kick it over",
+      "toppleAria": "Topple the {name}",
+      "usingLine": "Hold still: a hit, a step or a stun breaks it",
+      "relightLine": "Relight the candles to break Morthen's immunity. Channeling drains your health; moving or a stun cancels it",
+      "relightKey": "Relight the {name}",
+      "relightTap": "Tap here to relight the {name}",
+      "relightClick": "Click here to relight the {name}",
+      "relightFar": "Get within {range} yd to relight it",
+      "relightAria": "Relight the {name}",
+      "relightUsingLine": "Keep channeling to light the candle: it drains health. Hits do not interrupt; moving or a stun does",
+      "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
       "title": "Cosmetics",
@@ -6043,6 +7305,8 @@ export const en_CA: EnTranslations = {
       "tabMounts": "Mounts",
       "tabSkins": "Skins",
       "tabMech": "Mech",
+      "buddyActive": "Summoned",
+      "buddyDrag": "Drag to action bar",
       "legend": "Account: shared by every character. Character: this character only.",
       "scopeAccount": "Account",
       "scopeCharacter": "Character",
@@ -6165,6 +7429,7 @@ export const en_CA: EnTranslations = {
       "sourceActivityMasterworkCraft": "Earned by crafting a masterwork",
       "sourceActivityRiftFirstClear": "Awarded to every member of the party that wins a ranked Rift's first clear",
       "sourceActivityBuriedHoard": "Found in the reward chest of a Buried Hoard, the vault a treasure map leads to",
+      "sourceActivityLanternHall": "Bought for Lantern Seals from Lantern Hall's quartermaster",
       "cellMissingSourceAria": "{name}, not yet found, {source}",
       "cellOwnedClearsAria": "{name}, catalogued, first found on clear {count}",
       "searchPlaceholder": "Search relics",
@@ -6263,6 +7528,14 @@ export const en_CA: EnTranslations = {
       "bordersSection": "Borders",
       "bordersNone": "No Border",
       "bordersEmpty": "Earn a border-bearing deed to unlock this shelf.",
+      "buddiesSection": "Buddies",
+      "buddiesNone": "No Buddy",
+      "buddiesEmpty": "Collect a companion to summon it from this shelf.",
+      "buddyDragHint": "Drag onto your action bar",
+      "looksSection": "Buddy Looks",
+      "looksNone": "Own Look",
+      "looksNoBuddy": "Summon a companion to choose its look here.",
+      "looksEmpty": "This companion has no looks unlocked yet.",
       "unlockedBanner": "Deed accomplished: {name}",
       "unlockedTitleHint": "New title earned: {title}. Choose it in the Book of Deeds.",
       "unlockedBorderHint": "New border earned: {name}. Wear it from the Book of Deeds.",
@@ -6348,7 +7621,9 @@ export const en_CA: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Collapse map sidebar",
-      "expandHint": "Expand map sidebar"
+      "expandHint": "Expand map sidebar",
+      "resizeRailAria": "Map sidebar width",
+      "resizeRailHint": "Drag to resize the map sidebar. Double-click to reset."
     },
     "arenaGate": {
       "minLevelNote": "Requires level {level}"
@@ -6633,6 +7908,8 @@ export const en_CA: EnTranslations = {
       "choose": "Choose quest",
       "inProgress": "In progress ({count}/{required})",
       "completed": "Completed this week",
+      "completedLastWeek": "Completed last week",
+      "claimFirst": "Claim first",
       "lockedThisWeek": "Locked this week",
       "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
       "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
@@ -6641,7 +7918,7 @@ export const en_CA: EnTranslations = {
       "rewards": "Rewards",
       "alsoReceive": "You will also receive:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
+      "cacheDesc": "Opens into one Normal raid piece for your class (never an Ignivar tier-set piece), plus {count} x {item}.",
       "dialogNote": "Only one weekly charge can be active. It {reset}",
       "accept": "Accept",
       "decline": "Decline",
@@ -6673,6 +7950,7 @@ export const en_CA: EnTranslations = {
       },
       "commendHeading": "Emissary's commendation",
       "commendNote": "{amount} standing to one faction of your choice, once a week.",
+      "commendCarriedNote": "{amount} standing from last week, still unclaimed. Claim it to choose a new charge.",
       "commendClaimed": "This week's commendation went to the {faction}.",
       "commendRewardLine": "{amount} standing with a faction of your choice",
       "chosen": "Weekly quest taken: {category}",
@@ -6743,6 +8021,8 @@ export const en_CA: EnTranslations = {
       "delete_confirm": "Type the character name to confirm deletion.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
       "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "referral_transfer_pending": "Move all unlocked stamp cards to another character before deleting this character.",
+      "referral_bond_pending": "A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.",
       "already_in_world": "Character is already in world.",
       "taken_over": "Your character was taken over by another session.",
       "rename_required": "This character must be renamed before entering the world.",
@@ -6838,12 +8118,6 @@ export const en_CA: EnTranslations = {
       "reason_required": "A reason is required.",
       "admin_target": "Operator accounts cannot be kicked.",
       "target_offline": "That player is no longer online on this realm."
-    },
-    "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
     },
     "woc_market": {
       "invalid_input": "Invalid input.",
@@ -6987,6 +8261,792 @@ export const en_CA: EnTranslations = {
       }
     }
   },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you.",
+        "2": "Every full moon I come to this gate, and every full moon my nerve fails me. Not tonight. The Choir is singing, and I am the one who ran. Take me down to her, and I will keep out of your way."
+      },
+      "row": {
+        "join": "Come with us.",
+        "decline": "We go alone."
+      },
+      "joined": "Lead on. I am right behind you.",
+      "singing": "Let me sing. Go, and go gently.",
+      "accept": {
+        "1": "Thank you. I will walk behind you, and keep out of your way.",
+        "2": "Then I go down at last. Walk on. I will keep up."
+      },
+      "decline": "I understand. I will listen from up here, as I always have.",
+      "heroicWater": "The water stands high tonight, higher than I have ever seen it. She is close to waking.",
+      "memory": {
+        "votaries": "The drowned ones on the shore walked in after the gate closed. The moon never took them, only the water.",
+        "rubbing": "The Tidewatcher read my words on the shore-rock. 'It only sleeps.' I carved them the morning after."
+      },
+      "area": {
+        "steps": "The Pilgrim Steps. I ran up these that night, three at a time, and never looked back.",
+        "causeway": {
+          "1": "On rite nights the moon lay on this causeway like a second road.",
+          "2": "Look at the water. It still remembers how to hold the moon."
+        },
+        "colonnade": "The Colonnade of Tides. We walked it two by two, singing the rising verse.",
+        "veil": "Past that veil is the Choir Court. I have not stood there since I was a boy.",
+        "terraces": "The tidepools. The novices kept them clean and fed the small bright things living in them.",
+        "falls": "Behind the falls the water drowns every voice. I hid here when I skipped practice.",
+        "pool": "The moon pool. They knelt round it and drank from their shells. I could not lift mine.",
+        "prismStair": "The Prism Stair. We climbed it at moonrise to wake the great glass.",
+        "moonbridge": {
+          "1": "A bridge of moonlight. The elders said only the faithful could cross it.",
+          "2": "I was never faithful. Well. We shall see if it holds me."
+        },
+        "altarLanding": "This is where I stood. Right here. This is where I turned and ran."
+      },
+      "sight": {
+        "pilgrim": "The pilgrims of the shore villages. They carried their shrine on their backs every spring. Now they carry it forever.",
+        "acolyte": "The novices. I learned my letters beside them. They sing in their sleep now, and never wake.",
+        "templeguard": "The stair guard. They swore to hold the temple until the moon set. It never set.",
+        "snapper": "We drank the moon-water from shells like those. Mine I dropped on the stair.",
+        "siren": "That voice. She sang beside me in the choir. She still comes in half a beat early.",
+        "lurker": "The children netted those in the shallows. They were small as a thumb, and they glowed.",
+        "tidewisp": "That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.",
+        "sentinel": "The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.",
+        "eel": "The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.",
+        "reflection": "It shows you what the water would make of you. Break it!",
+        "moonspawn": "Those were never my people. They are hers, made of nothing but moonlight."
+      },
+      "selthe": {
+        "pre": {
+          "1": "Mother Selthe. She taught me to breathe from the belly. She taught us all to drown without dying.",
+          "2": "Choirmother Selthe. Every note I know, she put in me. Forgive me, Mother."
+        },
+        "post": {
+          "1": "She is quiet. In all my years in the Choir, she was never once quiet.",
+          "2": "Rest now, Mother. You were right about me. I never could hold the long notes."
+        }
+      },
+      "hydra": {
+        "pre": "The pool serpent. When I was a boy it had one head, and it ate from our hands.",
+        "post": "Listen. Under the falls they are still singing. Closer now."
+      },
+      "colossus": {
+        "pre": "The great prism. We sang into it to catch the moon. I never knew it could stand.",
+        "post": "The glass is broken. Nothing is left to catch the moon now, but her."
+      },
+      "ysolei": {
+        "pre": "There she is. All my life I have asked if she was a goddess or a monster. Show me.",
+        "preHeroic": "On a night like this the whole Choir sings with her. Hold fast, all of you."
+      },
+      "farewell": {
+        "answer": "She was neither. She was the moon in the water, and we were the ones who knelt.",
+        "verse": "The rite had a last verse, the one that lets the singers sleep. I never sang it.",
+        "stay": "They have waited long enough. I will stay, and sing it for them now.",
+        "goodbye": {
+          "1": "Go up into the night. If you hear singing at the full moon, it is only me.",
+          "2": "Thank you for bringing an old coward to the end of his song. Go now."
+        },
+        "emote": "{name} lifts his voice over the altar, and the lagoon falls still."
+      },
+      "wipe": "Get up. Please. Do not leave me down here alone again.",
+      "catchUp": "My legs are old, but I know every one of these stairs. I am here."
+    }
+  },
+  "bossJournal": {
+    "common": {
+      "enrageName": "Enraged",
+      "phaseEnrageSummary": "Below {health} health the boss enrages for the rest of the fight.",
+      "enrageSummary": "Below {health} health its melee attacks deal {damage} more damage and come {haste} faster, for the rest of the fight.",
+      "enrageResponse": "Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast.",
+      "heroicHarder": "Every ability on this page hits {scale} times as hard as on Normal."
+    },
+    "wildheart": {
+      "saurian": {
+        "overview": "A house-sized war-beast carrying a howdah walks a loop across the river ford. Passing it is not optional: the vine bridges open only once it is dead. Two telegraphed strikes, a healer rider at half health, and an enrage at the end.",
+        "phaseFordName": "The River Ford",
+        "phaseFordSummary": "From the pull it alternates a tail sweep behind it and a stomp around it. Only one strike runs at a time.",
+        "phaseHowdahName": "The Howdah Breaks",
+        "phaseHowdahSummary": "At {health} health the howdah splinters and a Howdah Hexcaller leaps down to heal the Saurian.",
+        "phaseEnrageName": "Enraged",
+        "phaseEnrageSummary": "Below {health} health it enrages for the rest of the fight.",
+        "tailSummary": "Every {every} sec, a {cast} sec cast, then its tail sweeps a {arc} degree cone behind it, out to {range} yd from its centre: {min} to {max} damage and a {push} yd knockback.",
+        "tailResponse": "Never stand behind it. Attack from its sides.",
+        "stompSummary": "Every {every} sec, a {cast} sec cast, then everyone within {radius} yd of its centre takes {min} to {max} damage and is knocked down for {stun} sec.",
+        "stompResponse": "Everyone who can leaves the ring before the cast ends. The tank takes it; healers top the tank up after.",
+        "riderName": "Howdah Rider",
+        "riderSummary": "Once, at {health} health: a Howdah Hexcaller jumps down beside the Saurian and fights alongside it, healing it with Ancestral Sap.",
+        "riderResponse": "The tank picks up the rider. Damage dealers interrupt its heal or kill it first.",
+        "sapSummary": "The rider's heal: a {cast} sec cast every {every} sec that restores {heal} of the Saurian's maximum health.",
+        "sapResponse": "Interrupt it every time, or kill the rider.",
+        "enrageSummary": "Below {health} health everything it does deals {damage} more damage: melee, Tail Swipe and Earthshaking Stomp.",
+        "tipTank": "Keep it facing away from the group so nobody ends up behind its tail. Pick up the Howdah Hexcaller the moment it lands.",
+        "tipHealer": "Earthshaking Stomp knocks everyone near it down, so heal the tank after each one. Save a cooldown for the enrage.",
+        "tipDamage": "Stay at its sides, out of the tail cone and the stomp ring. At half health, interrupt Ancestral Sap or kill the rider.",
+        "choiceName": "Rider first, or Saurian first?",
+        "choiceGain": "Killing the rider ends its heals for good: each Ancestral Sap restores {heal} of the Saurian every {every} sec.",
+        "choiceRisk": "While you kill the rider the Saurian keeps sweeping and stomping. Leave the rider up and someone must interrupt every heal."
+      },
+      "beast": {
+        "overview": "The Fanglord Beastmaster and his Great Jaguar share one health bar and die together. Standing close they are far tougher and hit harder, so the tank drags the master away while the jaguar hunts a marked player.",
+        "phasePitsName": "The Beast Pits",
+        "phasePitsSummary": "One fight, two bodies. Their timers run the whole fight; there are no health phases.",
+        "bondName": "Pack Bond",
+        "bondSummary": "While the Beastmaster and the jaguar stand within {reach} yd of each other, both take {dr} less damage and deal {damage} more.",
+        "bondHeroicSummary": "Frenzied Bond: while the Beastmaster and the jaguar stand within {reach} yd of each other, both take {dr} less damage and deal {damage} more.",
+        "bondResponse": "The tank drags the Beastmaster more than {reach} yd away from the jaguar and keeps him there.",
+        "sharedName": "Shared Health",
+        "sharedSummary": "The two bodies share one health pool: damage on either counts the same, and when one dies the other dies too.",
+        "sharedResponse": "Hit whichever body is safest to reach. Nothing is lost by switching targets.",
+        "stalkName": "Stalk",
+        "stalkSummary": "The jaguar marks a player who is not the master's tank and hunts them for {seconds} sec, ignoring taunts. In reach it bites every {biteEvery} sec: {min} to {max} damage, then a bleed of {bleed} every {bleedEvery} sec for {bleedSeconds} sec. Then it picks new prey.",
+        "stalkResponse": "Marked: run, and lead the jaguar away from the Beastmaster. Others slow, root or stun it.",
+        "waryName": "Wary",
+        "warySummary": "Each kind of control (stun, root, slow) lands on the jaguar once, then that kind fails on it for {lockout} sec. Incapacitates, fears and polymorphs count as stuns.",
+        "waryResponse": "Take turns: one root, then one slow, then one stun, instead of three of the same.",
+        "quakeSummary": "Every {every} sec, a {cast} sec cast, then everyone within {radius} yd of the Beastmaster takes {min} to {max} damage.",
+        "quakeResponse": "Everyone but the tank steps away from the Beastmaster.",
+        "huntName": "Call of the Hunt",
+        "huntSummary": "Every {every} sec both beasts attack {haste} faster for {seconds} sec.",
+        "huntResponse": "Tank and healer use a cooldown through it; the jaguar bites faster too.",
+        "wardName": "Thickhide Ward",
+        "wardSummary": "Every {every} sec the jaguar gains a shield that absorbs {amount} damage for {seconds} sec.",
+        "wardResponse": "Hit the Beastmaster while the shield is up: the health pool is shared.",
+        "heelSummary": "Every {every} sec, a {cast} sec cast on the jaguar, then it leaps back to the Beastmaster and the bond returns.",
+        "heelResponse": "Stun, incapacitate or transform the jaguar during the cast to cancel it. It only works if the jaguar is not already Wary of stuns.",
+        "tipTank": "Pull the Beastmaster more than {normal} yd from the jaguar at once and hold him there, facing away from the group.",
+        "tipTankHeroic": "Pull the Beastmaster more than {heroic} yd from the jaguar at once and hold him there. After each Heel! drag him clear again.",
+        "tipHealer": "Watch the Stalk target: bites and bleeds land fast, faster during Call of the Hunt.",
+        "tipDamage": "Hit whichever body is safest. When stalked, run the jaguar away from the master; otherwise rotate slows, roots and stuns on it.",
+        "tipDamageHeroic": "Hit whichever body is safest. Keep a stun ready for every Heel! cast, and rotate slows and roots on the jaguar.",
+        "choiceName": "Control the jaguar now, or save it?",
+        "choiceGain": "Slows, roots and stuns keep the jaguar off its prey and away from the Beastmaster.",
+        "choiceRisk": "Each kind of control works once, then fails for {lockout} sec, so spending all three at once leaves nothing for the next hunt.",
+        "choiceRiskHeroic": "Each kind of control works once, then fails for {lockout} sec. Spend your stun early and nothing can cancel the next Heel!.",
+        "heroicBond": "Frenzied Bond: Pack Bond reaches {reach} yd.",
+        "heroicHeel": "Heel!: the jaguar leaps back to the Beastmaster unless a stun lands during its cast. Thickhide Ward absorbs {amount}."
+      },
+      "bloom": {
+        "overview": "A rooted man-eating flower rains seedpods on the loam beds around it. Players without pollen stamp the pods flat before they sprout; pollinated players must stay off them, or the pods sprout at once.",
+        "phaseTerraceName": "The Weeping Falls",
+        "phaseTerraceSummary": "It never moves. Its cast timers pause while another cast runs, so the listed cadences are the shortest gaps.",
+        "seedSummary": "Every {every} sec, a {cast} sec cast, then {count} seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. A pod left alone sprouts a Thorn Sprout after {sprout} sec.",
+        "seedHeroicSummary": "Every {every} sec, a {cast} sec cast, then {count} seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. Burrowing Seeds: a pod left alone burrows after {burrow} sec and a Thorn Sprout rises next to the nearest player.",
+        "seedResponse": "Players who are not Pollinated walk over every pod quickly. Pollinated players stay off them.",
+        "pollinateName": "Pollinate",
+        "pollinateSummary": "Every {every} sec, {count} players are Pollinated for {seconds} sec. A Pollinated player who touches a pod makes it sprout at once.",
+        "pollinateHeroicSummary": "Every {every} sec, {count} players are Pollinated for {seconds} sec. A Pollinated player who touches a pod makes it sprout at once. Pollen Cloud: standing within {cloudRadius} yd of a Pollinated player for {cloudSeconds} sec pollinates you too.",
+        "pollinateResponse": "Pollinated: keep off the pods until it wears off, and on Heroic away from allies.",
+        "sproutName": "Thorn Sprout",
+        "sproutSummary": "An elite add that grows from a sprouted pod and attacks the nearest player. Sprouts wither when the Gorgebloom dies.",
+        "sproutResponse": "The tank picks it up and damage dealers kill it.",
+        "lashSummary": "Every {every} sec, a {cast} sec cast aims a {length} yd lane, {width} yd wide, at a player (a non-tank when possible): {min} to {max} damage and a {root} sec root.",
+        "lashResponse": "Step sideways out of the lane before the cast ends.",
+        "gorgeSummary": "Every {every} sec, a {cast} sec cast on its target, then a bite for {mult} times its melee hit and Digesting: {perSecond} damage per second for {seconds} sec. It cannot be dodged by moving.",
+        "gorgeResponse": "Tank: use a defensive cooldown for it. Healers cover the Digesting damage.",
+        "spitName": "Bloom Spit",
+        "spitSummary": "If its target stays out of its reach for {delay} sec, it spits every {every} sec for {min} to {max} damage.",
+        "spitResponse": "The tank stays in melee range.",
+        "tipTank": "Stay in melee: walking away earns Bloom Spit. Use a cooldown for every Gorge and pick up each Thorn Sprout.",
+        "tipHealer": "Gorge is the big hit on the tank, followed by Digesting. Vine Lash roots and hurts whoever stands in its lane.",
+        "tipDamage": "If you are not Pollinated, stamp out pods between attacks. Step out of Vine Lash and kill any Thorn Sprout fast.",
+        "choiceName": "Who stamps the seeds?",
+        "choiceGain": "Every pod stamped out is one less elite Thorn Sprout, and the fight stays on the flower.",
+        "choiceRisk": "Running to the beds costs damage and melee time, and a Pollinated player who touches a pod sprouts it at once.",
+        "heroicBurrow": "Burrowing Seeds: an untouched pod burrows after {burrow} sec and its Sprout rises next to the nearest player.",
+        "heroicCloud": "Pollen Cloud: standing within {cloudRadius} yd of a Pollinated player for {cloudSeconds} sec pollinates you too."
+      },
+      "zulgar": {
+        "overview": "The high priest of the basin. A steady fight with a telegraphed ring, until he turns into a jaguar spirit and hunts one player. The hunted player kites him across lit sun glyphs, which slow him.",
+        "phaseShrineName": "The Shrine",
+        "phaseShrineSummary": "He fights in melee and pulses a ring around himself.",
+        "phaseHuntName": "Spirit of the Hunt",
+        "phaseHuntSummary": "At {first} and {second} health he becomes a jaguar spirit for {seconds} sec and chases a marked player.",
+        "phaseEnrageName": "Enraged",
+        "pulseSummary": "Every {every} sec, a {cast} sec cast, then one burst on everyone within {radius} yd of him: {min} to {max} damage.",
+        "pulseResponse": "Everyone but the tank leaves the ring before the cast ends.",
+        "roarName": "Jaguar Roar",
+        "roarSummary": "Each melee hit has a {chance} chance to knock the player he hits back {distance} yd.",
+        "roarResponse": "The tank keeps open ground behind them.",
+        "huntSummary": "At {first} and {second} health: a {cast} sec cast, then for {seconds} sec he hunts one marked player (the Prey, never the tank while others stand). He runs {speed} faster than a player, ignores taunts and does not attack. If he catches the Prey: {maul} damage and a {stun} sec stun, then he picks new prey. A mauled player is safe for {respite} sec.",
+        "huntHeroicSummary": "At {first} and {second} health: a {cast} sec cast, then for {seconds} sec he hunts the Prey. Twin Prey: two players are marked and he switches between them every {switchEvery} sec. He runs {speed} faster than a player, ignores taunts and does not attack. If he catches a Prey: {maul} damage and a {stun} sec stun.",
+        "huntResponse": "Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts.",
+        "glyphName": "Sun Glyphs",
+        "glyphSummary": "{count} glyphs ring the shrine. When the jaguar spirit crosses a lit glyph he is slowed by {slow} for {seconds} sec, and that glyph goes dark for {dark} sec. During the hunt slows and roots land on him, and stuns last half as long.",
+        "glyphResponse": "Spread the glyphs out: do not burn them all on the first hunt.",
+        "ambushName": "Hunter's Ambush",
+        "ambushSummary": "After each hunt he vanishes for {seconds} sec. A {radius} yd circle marks the farthest player, giving a {warn} sec warning, then he lands there: {min} to {max} damage to everyone inside.",
+        "ambushResponse": "Get out of the circle.",
+        "tipTank": "Keep open ground behind you for Jaguar Roar. When the hunt ends he comes back to you: be ready to take him.",
+        "tipHealer": "Wildheart Pulse hits anyone left in the ring. A Maul is a big single hit: top up the Prey.",
+        "tipDamage": "Leave the pulse ring. During the hunt, slow, root and stun him to protect the Prey, and run through lit glyphs if you are the Prey.",
+        "tipDamageHeroic": "Leave the pulse ring. During the hunt, slow, root and stun him to protect both Prey. After each hunt, get out of the Ambush circle.",
+        "choiceName": "Spend a glyph now, or save it?",
+        "choiceGain": "Each lit glyph you lead him through slows him hard and buys the Prey time.",
+        "choiceRisk": "A used glyph stays dark for {dark} sec, and each hunt lasts {seconds} sec: burn them all at the start and the end of the hunt has none.",
+        "heroicTwinPrey": "Twin Prey: two players are hunted; he switches every {switchEvery} sec.",
+        "heroicAmbush": "Ambush: after each hunt he pounces on a {radius} yd circle at the farthest player."
+      }
+    },
+    "crypt": {
+      "drake": {
+        "overview": "A skeletal drake flies a loop high over the Processional. Walk under it and it lands to fight: a fire breath in front, a tail lash behind and a wing gust around it.",
+        "phaseName": "The Processional",
+        "phaseSummary": "It lands where it is pulled and fights on the ground.",
+        "breathSummary": "Every {every} sec, a {cast} sec cast, then fire in a {arc} degree cone, {range} yd in front of it: {min} to {max} damage. Its facing locks for the cast.",
+        "breathResponse": "Only the tank stands in front. Everyone else stays at its sides.",
+        "tailSummary": "Every {every} sec when someone stands behind it: a {cast} sec cast, then a {arc} degree sweep {range} yd behind it for {min} to {max} damage.",
+        "tailResponse": "Never stand behind it.",
+        "gustSummary": "Every {every} sec when someone is close: a {cast} sec cast, then everyone within {radius} yd takes {min} to {max} damage and is knocked back {push} yd.",
+        "gustResponse": "Expect the knockback; keep your back away from edges.",
+        "embersName": "Barrow Embers",
+        "embersSummary": "The ground under each breath keeps burning for {seconds} sec: {min} to {max} damage per second to anyone on it.",
+        "embersResponse": "Move the drake off the burning ground and step out of it.",
+        "tipTank": "Turn it so the breath points away from the group, and move it off any burning ground on Heroic.",
+        "tipHealer": "The breath and the wing gust are the damage spikes. Stand at its side.",
+        "tipDamage": "Attack from its sides: never in front, never behind.",
+        "heroicEmbers": "Barrow Embers: each breath leaves the ground burning for {seconds} sec."
+      },
+      "marrow": {
+        "overview": "A raised gravedigger who measures players for graves. Every grave stays open, slowing and burning anyone in it, and each one raises a Restless Bones when he rings his Burial Bell. Dig the graves at the edge of the yard and keep their number down.",
+        "phaseYardName": "The Bell Yard",
+        "phaseYardSummary": "He digs graves under marked players and swings his shovel at the tank.",
+        "phaseTollName": "The Burial Toll",
+        "phaseTollSummary": "At {first} and {second} health he walks to the bell rope and rings the Burial Toll.",
+        "shovelSummary": "Every {every} sec, a {cast} sec cast, then a shovel swing in an {arc} degree cone {range} yd in front of him for {mult} times his melee hit. Everyone hit has Dirt in the Eyes: {slow} slower for {seconds} sec.",
+        "shovelResponse": "Only the tank stands in front. The tank can step out during the cast.",
+        "measureSummary": "Every {every} sec, a {cast} sec cast marks a player. {mark} sec later a grave caves in where they stand: {min} to {max} damage to everyone within {radius} yd. The grave stays open for the fight: inside it you are {slow} slower and take {dirt} damage per second. At most {cap} graves; a new one fills in the oldest.",
+        "measureResponse": "Marked: walk to the edge of the yard before the grave opens. Never stand in an open grave.",
+        "blowSummary": "Every {every} sec, a {cast} sec cast at the tank: a melee hit that adds a stack of {vuln} more damage taken, up to {stacks} stacks ({max}) for {seconds} sec.",
+        "blowResponse": "Tank: use cooldowns as the stacks rise. Healers watch the tank.",
+        "vigorName": "Grave Vigor",
+        "vigorSummary": "While he stands inside an open grave he attacks {haste} faster.",
+        "vigorResponse": "The tank keeps him out of the graves.",
+        "unquietName": "Unquiet Earth",
+        "unquietSummary": "A player who stays {linger} sec inside a grave raises a Restless Bones from it. That grave then rests for {rest} sec.",
+        "unquietResponse": "Leave graves at once.",
+        "tollSummary": "He walks to the rope and rings the bell for {ring} sec, immune to damage while he walks and rings. Then every player takes {min} to {max} damage, and every open grave raises a Restless Bones.",
+        "tollResponse": "Healers top everyone up before the last peal. The tank picks up the Restless Bones; damage dealers kill them.",
+        "tipTank": "Keep him facing away from the group. Pick up every Restless Bones after a Burial Toll.",
+        "tipTankHeroic": "Keep him facing away from the group and out of every grave. Gravedigger's Blow stacks: use cooldowns as they rise.",
+        "tipHealer": "Burial Toll hits the whole group. Graves slow and burn anyone in them, so help whoever is stuck in one.",
+        "tipDamage": "When marked, carry the grave to the yard's edge. After each Toll, kill the Restless Bones, then return to Marrow.",
+        "choiceName": "Where do the graves go?",
+        "choiceGain": "Graves dug at the edge of the yard leave the middle free to fight and dodge in.",
+        "choiceRisk": "Every open grave anywhere raises a Restless Bones at the next Toll, up to {cap} at once.",
+        "choiceRiskHeroic": "Every open grave anywhere raises a Restless Bones at the next Toll, up to {cap} at once. On Heroic a grave near the tank also speeds Marrow up.",
+        "heroicBlow": "Gravedigger's Blow: a tank hit that stacks {vuln} more damage taken.",
+        "heroicVigor": "Grave Vigor: inside a grave he attacks {haste} faster.",
+        "heroicUnquiet": "Unquiet Earth: {linger} sec in a grave raises a Restless Bones."
+      },
+      "lady": {
+        "overview": "A ghost bride whose wail hurts everyone who is not sheltered by a grave lantern. Each lantern shelters only two players and then goes dark, so the group has to take turns. She also lifts a player into the air until the group burns her enough to let go.",
+        "phaseRavineName": "The Frost Ravine",
+        "phaseRavineSummary": "Three grave lanterns stand around the ravine. Her path turns to slippery ice.",
+        "phaseFreezeName": "Bridal Freeze",
+        "phaseFreezeSummary": "At {health} health the whole ravine floor freezes for the rest of the fight.",
+        "lamentSummary": "Every {every} sec, a {cast} sec cast, then {min} to {max} damage to every player not sheltered by a lantern. Each hit adds a stack of Lingering Lament: {perStack} more Lament damage per stack, for {seconds} sec, up to {stacks} stacks.",
+        "lamentResponse": "Stand in a lit lantern's light before the cast ends.",
+        "lanternName": "Grave Lanterns",
+        "lanternSummary": "A lit lantern shelters up to {cap} players within {radius} yd from the Lament. A lantern that sheltered anyone goes dark for {dark} sec, so it is still dark at the next Lament.",
+        "lanternHeroicSummary": "A lit lantern shelters up to {cap} players within {radius} yd from the Lament. A lantern that sheltered anyone goes dark for {dark} sec. On Heroic a lit lantern also burns out on its own after {lit} sec and stays dark for {gutter} sec.",
+        "lanternResponse": "Plan who uses which lantern, and rotate to a lit one for each Lament.",
+        "embraceSummary": "Every {every} sec she seizes a player who is not the tank, lifts them into the air and holds them. Deal {share} of her health within {hold} sec to make her set them down gently. Otherwise she drops them: {min} to {max} damage.",
+        "embraceHeroicSummary": "Every {every} sec she seizes {victims} players who are not the tank, lifts them into the air and holds them. Deal {share} of her health within {hold} sec to make her set them down gently. Otherwise she drops them: {min} to {max} damage.",
+        "embraceResponse": "Everyone bursts her as soon as she grabs someone. Healers top up the held player.",
+        "rimeName": "Rime Path",
+        "rimeSummary": "She leaves slippery ice where she drifts; each patch lasts {seconds} sec. On ice you slide and turn slowly.",
+        "rimeResponse": "Avoid her trail when you need to move fast.",
+        "freezeSummary": "At {health} health, a {cast} sec cast, then the whole floor becomes slippery ice for the rest of the fight. It cancels a Lament already being cast.",
+        "freezeResponse": "Move earlier: on ice it takes longer to reach a lantern.",
+        "tipTank": "Keep her near the middle so every lantern stays in reach for the group.",
+        "tipHealer": "Unsheltered players take the Lament and gain stacks. The held player takes damage while she holds them.",
+        "tipDamage": "Burst her the moment she seizes someone. Rotate between lit lanterns for each Lament.",
+        "choiceName": "Who takes the Lament?",
+        "choiceGain": "Using all three lanterns shelters up to {cap} players each, so nobody takes this Lament.",
+        "choiceRisk": "Used lanterns are still dark at the next Lament, so someone takes it then, and each stack of Lingering Lament adds {perStack} damage.",
+        "heroicEmbrace": "Frozen Embrace seizes {victims} players at once.",
+        "heroicLanterns": "A lit lantern burns out on its own after {lit} sec and stays dark {gutter} sec."
+      },
+      "ilvane": {
+        "overview": "A choir mistress guarded by two Hollow Choristers who shield her while they live. Her Dirge hurts and silences everyone who can see her, so interrupt it or hide behind a pillar. She also plays the Bone Organ, sending lanes of notes down the loft.",
+        "phaseLoftName": "The Choir Loft",
+        "phaseLoftSummary": "She sings from the loft with two Hollow Choristers at her side.",
+        "phaseCrescendoName": "Crescendo",
+        "phaseCrescendoSummary": "At {health} health she sings faster and the organ plays a third wave.",
+        "harmonyName": "Harmony",
+        "harmonySummary": "Each living Chorister cuts the damage she takes by {per}: {both} while both stand.",
+        "harmonyResponse": "Kill the Choristers first.",
+        "dirgeSummary": "Every {every} sec, a {cast} sec cast. If it finishes, everyone who can see her takes {min} to {max} damage and is silenced for {silence} sec. After an interrupt she sings no Dirge for {quiet} sec.",
+        "dirgeResponse": "Interrupt it, or break line of sight behind a pillar before the cast ends.",
+        "organSummary": "Every {every} sec she walks to the organ and plays {waves} waves of note lanes down the loft. Each lane shows for {gather} sec, then bursts: {min} to {max} damage.",
+        "organResponse": "Stand between the first lanes, then step into a lane that has already burst.",
+        "encoreName": "Encore",
+        "encoreSummary": "A Chorister that stays dead {seconds} sec while its partner still stands rises again at full health.",
+        "encoreResponse": "Kill both Choristers within {seconds} sec of each other.",
+        "unbrokenSummary": "Every {nth} Dirge is an Unbroken Verse: it cannot be interrupted.",
+        "unbrokenResponse": "Hide behind a pillar for it.",
+        "crescendoName": "Crescendo",
+        "crescendoSummary": "Below {health} health the Dirge takes {cast} sec and comes every {every} sec, and the organ plays {waves} waves. The third wave reuses the first wave's lanes.",
+        "crescendoResponse": "Kick every Dirge, and step back out of the first lanes for the third wave.",
+        "tipTank": "Hold the Choristers together so they can be killed fast, then take Ilvane.",
+        "tipHealer": "A completed Dirge silences you too: hide behind a pillar if no one can kick it.",
+        "tipDamage": "Kill the Choristers first, interrupt the Dirge, and dodge the organ lanes.",
+        "tipDamageHeroic": "Kill both Choristers within {seconds} sec of each other, kick the Dirge, and hide from every Unbroken Verse.",
+        "choiceName": "Kick it or hide?",
+        "choiceGain": "An interrupt stops the Dirge and keeps her quiet for {quiet} sec.",
+        "choiceRisk": "Hiding behind a pillar costs uptime. A missed kick silences and hurts everyone in sight.",
+        "heroicEncore": "Encore: a Chorister dead {seconds} sec while its partner lives rises again.",
+        "heroicUnbroken": "Unbroken Verse: every {nth} Dirge cannot be interrupted."
+      },
+      "morthen": {
+        "overview": "A lich bishop running a three-act rite. First he calls souls to empower him; at {rite} health he hides behind a ward until the group relights four candles at a cost in health; at {last} health he sweeps a huge scythe.",
+        "phaseCallingName": "The Calling",
+        "phaseCallingSummary": "He pulses shadow around himself and calls souls to feed him.",
+        "phaseRiteName": "The Rite of the Unquiet",
+        "phaseRiteSummary": "At {health} health he returns to the altar and becomes immune until all four candles burn again.",
+        "phaseLastName": "Last Rites",
+        "phaseLastSummary": "At {health} health he takes up his scythe for the end of the fight.",
+        "pulseSummary": "Every {every} sec ({everyLast} sec in Last Rites), a {cast} sec cast, then {min} to {max} damage to everyone within {radius} yd.",
+        "pulseResponse": "Everyone, the tank included, steps out to {radius} yd before the cast ends.",
+        "gravecallName": "Gravecall",
+        "gravecallSummary": "Every {every} sec a Bound Soul drifts from an alcove toward him. If it reaches him he gains {per} more damage per stack (up to {stacks}) and heals {heal} of his health. The first player it touches absorbs it instead: {min} to {max} damage.",
+        "gravecallResponse": "A spare player steps into each soul's path.",
+        "graspName": "Grasp of the Grave",
+        "graspSummary": "Every {every} sec a {radius} yd ring appears under {count} players. {fuse} sec later hands erupt: everyone inside is rooted for {root} sec and takes {min} to {max} damage.",
+        "graspResponse": "Step out of the ring at once.",
+        "riteSummary": "He becomes immune and the {candles} candles go dark. {bones} Restless Bones climb out. Grave Chill hits everyone every second: {base} damage, rising by {step} every {chillEvery} sec, with no cap.",
+        "riteResponse": "Relight all four candles fast: the chill never stops rising.",
+        "relightName": "Relight the Candles",
+        "relightSummary": "Channel {channel} sec at a candle (within {range} yd) to relight it. It costs the lighter {drain} of their maximum health. When the fourth is lit he is stunned for {stun} sec and takes {vuln} more damage.",
+        "relightResponse": "Split the candles between players with health to spare, and burst him in the stun.",
+        "nameDeadName": "Name the Dead",
+        "nameDeadSummary": "The candles must be lit in an order shown by a gold beam from the ledger. A wrong candle snuffs the last one lit and burns the lighter for {min} to {max}.",
+        "nameDeadResponse": "Light only the candle the beam points at.",
+        "reapSummary": "Every {every} sec, a {cast} sec cast at the tank, then a {arc} degree scythe sweep {range} yd in front of him: {min} to {max} damage.",
+        "reapResponse": "Only the tank stands in front. The tank can sidestep during the cast.",
+        "tipTank": "Keep him facing away from the group, and step out of the Shadow Pulse with everyone else.",
+        "tipHealer": "Each candle costs the lighter a big share of their health and Grave Chill keeps rising: heal the lighters first.",
+        "tipDamage": "Body-block the Bound Souls, relight candles in the Rite, then burst him while he is stunned.",
+        "tipDamageHeroic": "Body-block the Bound Souls and dodge Grasp of the Grave. In the Rite, follow the gold beam to the right candle.",
+        "choiceCandleName": "How many lighters?",
+        "choiceCandleGain": "Several players relighting at once ends the Rite sooner, before Grave Chill climbs.",
+        "choiceCandleRisk": "Each lighter pays {normal} of their maximum health per candle while the chill keeps rising.",
+        "choiceSoulName": "Block the souls?",
+        "choiceSoulGain": "A blocked soul never reaches him: no damage stack and no heal.",
+        "choiceSoulRisk": "The blocker takes the soul's damage. Every soul that gets through adds {per} damage and heals him {heal}.",
+        "heroicNameDead": "Name the Dead: the candles must be lit in the order the ledger shows.",
+        "heroicGrasp": "Grasp of the Grave: rings that root and hurt, in every act.",
+        "heroicDrain": "Each candle costs the lighter {drain} of their maximum health."
+      },
+      "wyrm": {
+        "overview": "Morthen's dying rite lights a pyre, and a bone wyrm lands in it. It fights like the Ossuary Drake, plus burning strafe lanes and a roar that knocks players back but leaves it open to damage.",
+        "phaseName": "The Wyrmcall Pyre",
+        "phaseSummary": "It glides in out of reach and lands in the ring with a burst of fire.",
+        "strafeSummary": "Every {every} sec it marks a {width} yd lane through a player for {mark} sec, then flies it pouring fire: {min} to {max} damage to everyone in it. The lane keeps burning for {seconds} sec: {burn} damage per second.",
+        "strafeResponse": "Step sideways out of the marked lane and stay off the burning ground.",
+        "bellowSummary": "Every {every} sec, a {cast} sec cast, then {min} to {max} damage and a {push} yd knockback within {radius} yd. Afterwards it takes {vuln} more damage for {seconds} sec.",
+        "bellowResponse": "Do not get knocked into a burning lane. Spend cooldowns in the window after.",
+        "knellSummary": "Every {every} sec it flies up out of reach and breathes fire over half the ring {breaths} times. Each half is marked {mark} sec before the fire: {min} to {max} damage to everyone in it.",
+        "knellResponse": "Run to the unmarked half of the ring every time.",
+        "tipTank": "Keep it facing away from the group, and turn it out of burning lanes.",
+        "tipHealer": "Pyre Strafe and Dread Bellow are the spikes; heal anyone knocked into a burning lane.",
+        "tipDamage": "Step out of marked lanes and spend cooldowns after each Dread Bellow.",
+        "tipDamageHeroic": "Step out of marked lanes, and during Burning Knell run to the safe half every time.",
+        "heroicKnell": "Burning Knell: it takes flight and breathes over half the ring {breaths} times."
+      }
+    },
+    "bastion": {
+      "captain": {
+        "overview": "A hovering ghost captain patrols the Lower Bailey moat, and the drawbridge stays shut until he is dead. He cycles three lane attacks aimed at a player who is not the tank, each drawn on the floor before it fires.",
+        "phaseName": "The Moat",
+        "phaseSummary": "His first move comes {first} sec after the pull, then Spectral Broadside, Cursed Anchor and Phantom Boarding in turn, {recovery} sec apart. He stands still during each move.",
+        "broadsideSummary": "After a {warn} sec warning, {lanes} parallel lanes {length} yd long fire at once: {min} to {max} damage to anyone in a lane.",
+        "broadsideResponse": "Stand in a gap between the lanes.",
+        "anchorSummary": "After a {warn} sec warning, a cursed anchor is hauled {length} yd back along its lane over {seconds} sec, hitting everyone it passes: {min} to {max} damage.",
+        "anchorResponse": "Leave the lane before it fires.",
+        "boardingSummary": "After a {warn} sec warning, everyone in an {length} yd lane takes {min} to {max} damage and he dashes along it.",
+        "boardingResponse": "Step aside from the lane.",
+        "sailorsName": "Wreckbound Sailors",
+        "sailorsSummary": "At {first} and {second} health, {count} Wreckbound Sailors join the fight. A sailor bursts with soul energy shortly after it dies.",
+        "sailorsResponse": "The tank picks them up. Step away from a sailor that just died.",
+        "tipTank": "Keep him in place and pick up the Wreckbound Sailors. His lanes aim at the others, not at you.",
+        "tipHealer": "Spectral Broadside hits hardest: heal whoever stood in a lane.",
+        "tipDamage": "Watch the floor: every move is drawn before it fires. Stand in the Broadside gaps."
+      },
+      "olen": {
+        "overview": "A fallen paladin knight. His brine pools shield him, so the tank drags him out of them; the group stays spread so his rebounding shield and the Sentence column hit only one player. At half health he kneels, immune, until his Drowned Sergeants die.",
+        "phaseBreachName": "The Breach Bastion",
+        "phaseBreachSummary": "He casts one ability at a time; his timers pause during his casts.",
+        "phaseOathName": "Unbroken Oath",
+        "phaseOathSummary": "At {health} health he kneels, immune, while Drowned Sergeants fight for him.",
+        "brineSummary": "Every {every} sec, a {cast} sec cast, then a {radius} yd pool of holy brine under him for {seconds} sec: {perSecond} damage per second to anyone in it. While he stands in any pool he takes {shield} less damage.",
+        "brineResponse": "The tank drags him out of the pool. Everyone else steps out of it.",
+        "bulwarkSummary": "Every {every} sec, a {cast} sec cast at a player who is not the tank. The shield hits them for {min} to {max}, then rebounds to the nearest unhit player within {reach} yd, up to {hits} players.",
+        "bulwarkResponse": "Stay spread: more than {reach} yd from everyone else.",
+        "sentenceSummary": "Every {every} sec, a {cast} sec cast marks a player who is not the tank. {seconds} sec later a column lands on them wherever they are: {min} to {max} damage to everyone within {radius} yd.",
+        "sentenceResponse": "Marked: move away from the group before the column lands.",
+        "arcName": "Reaping Arc",
+        "arcSummary": "Each of his melee hits also strikes every other player within {radius} yd of the tank for {share} of the swing.",
+        "arcResponse": "Nobody but the tank stands within {radius} yd of the tank.",
+        "oathSummary": "Once, at {health} health: he kneels and channels for up to {max} sec, immune to damage, while {count} Drowned Sergeants rise and attack players who are not the tank. Kill them all and he is stunned for {stun} sec and takes {vuln} more damage for {vulnSeconds} sec.",
+        "oathResponse": "The tank gathers the Sergeants; everyone kills them, then bursts Olen while he is stunned.",
+        "tipTank": "Drag him out of every brine pool. Keep the group out of the {radius} yd around you, where his swings splash.",
+        "tipHealer": "Rebounding Bulwark and Sentence of the Tide hit hardest when players stand together. Sergeants enrage at low health.",
+        "tipDamage": "Stay spread, more than {reach} yd apart, and away from the tank. In the Oath, kill the Sergeants first.",
+        "choiceName": "Stack or spread?",
+        "choiceGain": "Spread out and Rebounding Bulwark, Sentence of the Tide and Reaping Arc each hit only one player.",
+        "choiceRisk": "Anyone within {reach} yd of a struck player takes the rebound, and anyone within {radius} yd of the tank takes the splash.",
+        "heroicChanges": "Brine pools are {radius} yd, the shield rebounds to {hits} players, the Sentence column is {sentence} yd, and {count} Sergeants rise."
+      },
+      "turnkey": {
+        "overview": "The gaol keeper locks players in Iron Cages. The prisoner breaks out by pressing the interact key again and again, and teammates speed it up by hitting the cage.",
+        "phaseName": "The Gaol Grate",
+        "phaseSummary": "He cages players on a steady timer and frees the prisoners at half health.",
+        "cageSummary": "Every {every} sec, a {cast} sec cast, then a cage drops on a player who is not the tank, stunning them. The cage has {hits} points: each press of the interact key by the prisoner breaks {press}, each hit from an ally breaks {helper}, and it slowly mends. After {max} sec the cage crushes the prisoner for {crush} of their maximum health.",
+        "cageHeroicSummary": "Every {every} sec, a {cast} sec cast, then cages drop on {cages} players who are not the tank. Each cage has {hits} points: each press of the interact key by the prisoner breaks {press}, each hit from an ally breaks {helper}. Inside, rising brine drains health every second. After {max} sec the cage crushes for {crush} of maximum health.",
+        "cageResponse": "Caged: press the interact key fast. Everyone else hits the cage to break it.",
+        "cellsName": "Open the Cells",
+        "cellsSummary": "At {health} health he lets {count} Shackled Prisoners out. At a quarter health their chains snap and they leave the fight.",
+        "cellsResponse": "Bring them to a quarter health; you do not need to kill them.",
+        "tipTank": "Hold him and the prisoners; the cages never target you.",
+        "tipHealer": "Top up caged players: the crush is a share of their health.",
+        "tipDamage": "Switch to every cage at once and hit it until it breaks.",
+        "heroicCages": "Iron Cage locks {cages} players at once.",
+        "heroicFlood": "Brine Flood: a caged player loses health every second until freed."
+      },
+      "ossick": {
+        "overview": "The gaoler hooks a player with his anchor and reels them toward the drowning pit. They run to a lit Mooring Post or the group breaks the chain. Meanwhile two other players are chained together and must stay close.",
+        "phaseName": "The Drowning Yard",
+        "phaseSummary": "At {first} and {second} health, {count} Shackled Prisoners come out of the cells each time.",
+        "anchorSummary": "Every {every} sec, a {cast} sec cast, then a player who is not the tank is hooked. After {settle} sec the chain reels them toward the pit. Escape: reach within {reach} yd of a lit Mooring Post at least {run} yd from where you were hooked (that post goes dark for {dark} sec), or the group lands {hits} hits on the anchor. Reaching the pit: {pit} of maximum health and a {stun} sec stun.",
+        "anchorHeroicSummary": "Every {every} sec, a {cast} sec cast, then a player who is not the tank is hooked; the anchor's landing hits everyone else within {crashRadius} yd for {min} to {max}. After {settle} sec the chain reels them toward the pit. Escape: a lit Mooring Post at least {run} yd away, or {hits} hits on the anchor. Reaching the pit: {pit} of maximum health and a {stun} sec stun.",
+        "anchorResponse": "Hooked: run to a lit post early. Everyone else hits the anchor.",
+        "shackleSummary": "Every {every} sec, a {cast} sec cast chains two players together for {seconds} sec. Every second they stand more than {range} yd apart, both take {min} to {max} damage.",
+        "shackleResponse": "Chained: stay within {range} yd of your partner.",
+        "cudgelSummary": "Every {every} sec, a {cast} sec cast at the tank: {mult} times his melee hit, ignoring armor, and {slow} slower movement for {seconds} sec.",
+        "cudgelResponse": "Tank: use a cooldown. Healers expect the hit.",
+        "tipTank": "Hold him near the middle and pick up the prisoners. Gaoler's Cudgel ignores your armor.",
+        "tipHealer": "Watch hooked and chained players; the pit takes a large share of health.",
+        "tipDamage": "Hit the anchor the moment someone is hooked. When chained, stay close to your partner.",
+        "choiceName": "Run to a post, or break the chain?",
+        "choiceGain": "A lit post frees the hooked player alone, so the group keeps attacking.",
+        "choiceRisk": "The post must be at least {run} yd away and goes dark for {dark} sec. Once the chain is short, no post is in reach and only breaking it works.",
+        "heroicCrash": "Anchor Crash: the anchor hits everyone within {crashRadius} yd of the hooked player.",
+        "heroicChanges": "The anchor needs {hits} hits and chained players must stay within {range} yd."
+      },
+      "vael": {
+        "overview": "A hooded reaper. Three times in a row he rises from a shadow pool behind a player and sweeps a scythe through their back. At {first} and {second} health he hides among identical copies while a hymn hurts everyone; the Fogbeacon's beam shows which figure is real.",
+        "phaseCrownName": "The Beacon Crown",
+        "phaseCrownSummary": "He rises from the crown when a player steps onto it. At {first} and {second} health, {count} Drowned Thralls join the fight.",
+        "phaseVeilName": "Fog Veil",
+        "phaseVeilSummary": "At {first} and {second} health he hides among identical copies.",
+        "surgeSummary": "A {cast} sec cast, then {min} to {max} damage to everyone within {radius} yd of him. Every {every} sec of open fight; every {lastEvery} sec below {below} health.",
+        "surgeResponse": "Ranged players stay beyond {radius} yd.",
+        "crossingSummary": "Every {every} sec he steps through the shadows up to {chain} times in a row, each behind a different player: a pool opens {behind} yd behind them, he rises, and sweeps a {arc} degree arc {range} yd toward them: {min} to {max} damage.",
+        "crossingResponse": "Marked by Death: move forward out of the sweep or behind the pool. Others never stand in front of the marked player.",
+        "graveName": "Grave Shadow",
+        "graveSummary": "Each shadow pool stays for {seconds} sec and burns anyone within {radius} yd for {perSecond} damage per second.",
+        "graveResponse": "Stay out of old pools.",
+        "veilSummary": "He hides, then four figures rise around the crown: Vael and three Fog Shades. All four sing the Drowning Hymn for {seconds} sec, hurting everyone more each second. The Fogbeacon's beam sweeps every {beam} sec: the real Vael lights up. Deal {share} of his health to him to break the veil: he is stunned for {stun} sec and takes {vuln} more damage for {vulnSeconds} sec.",
+        "veilHeroicSummary": "He hides, then four figures rise around the crown: Vael and three Fog Shades, drifting one place every {drift} sec. All four sing the Drowning Hymn for {seconds} sec. The Fogbeacon's beam shows the real Vael. Deal {share} of his health to him to break the veil: a {stun} sec stun and {vuln} more damage taken for {vulnSeconds} sec.",
+        "veilResponse": "Watch the beam, then everyone hits only the real Vael.",
+        "fogburstName": "Fogburst",
+        "fogburstSummary": "Any hit on a Fog Shade bursts it: {min} to {max} damage and a {stun} sec stun to players within {radius} yd of it.",
+        "fogburstHeroicSummary": "Any hit on a Fog Shade bursts it: {min} to {max} damage and a {stun} sec stun to players within {radius} yd, and a Drowned Thrall rises where it stood.",
+        "fogburstResponse": "Do not hit a copy: wait for the beam.",
+        "tipTank": "Pick up the Drowned Thralls. During the veil, help find the real Vael.",
+        "tipHealer": "The Drowning Hymn ramps on everyone until the veil breaks. Mist Surge hits everyone within {radius} yd of him.",
+        "tipDamage": "When Marked by Death, move forward or behind the pool. In the veil, hit only the figure the beam lights.",
+        "tipDamageHeroic": "When Marked by Death, move forward or behind the pool, and avoid old pools. In the veil, hit only the figure the beam lights.",
+        "choiceName": "Wait for the beam, or guess?",
+        "choiceGain": "Waiting for the beam puts every hit on the real Vael and breaks the veil sooner.",
+        "choiceRisk": "Every second of the veil the hymn hurts more. Guessing wrong bursts a copy: damage and a stun around it.",
+        "choiceRiskHeroic": "Every second of the veil the hymn hurts more. Guessing wrong bursts a copy, which stuns players near it and leaves a Drowned Thrall.",
+        "heroicGrave": "Grave Shadow: each shadow pool keeps burning for {seconds} sec.",
+        "heroicVeil": "In the veil the figures drift every {drift} sec, and a burst copy leaves a Drowned Thrall."
+      }
+    },
+    "temple": {
+      "selthe": {
+        "overview": "The Choirmother sings from her pool and never moves or melees. She marks players for a shared Chorus and a lonely Solo, beams a rising aria at one player, and sends a wave across the court. Her bolts and her aria can be interrupted.",
+        "phaseName": "The Choir Court",
+        "phaseSummary": "One phase on timers. A mechanic that comes due during a cast waits for it to end.",
+        "chorusName": "Chorus",
+        "chorusSummary": "Every {every} sec a player who is not the tank is marked for {mark} sec. When it ends, {total} damage is split evenly among everyone within {radius} yd of them.",
+        "chorusHeroicSummary": "Every {every} sec a player who is not the tank is marked for {mark} sec. When it ends, {total} damage is split evenly among everyone within {radius} yd of them. Echo: {echo} sec later the same spot bursts again for {echoDamage} to each player still there, not split.",
+        "chorusResponse": "Everyone stacks on the Chorus player, then leaves the spot before the Echo.",
+        "soloName": "Solo",
+        "soloSummary": "{offset} sec after each Chorus another player is marked for {mark} sec. When it ends, the marked player and everyone within {radius} yd take {damage} damage each.",
+        "soloHeroicSummary": "Duet: Solo lands together with the Chorus, on a different player. When it ends, the marked player and everyone within {radius} yd take {damage} each, and {echo} sec later the spot bursts again.",
+        "soloResponse": "Solo player: move away from everyone, then leave the spot.",
+        "songSummary": "Every {every} sec, a {cast} sec cast, then {min} to {max} frost damage to every player in the court.",
+        "songResponse": "It cannot be avoided: healers keep everyone topped up.",
+        "boltSummary": "Her filler: a {cast} sec cast at her target for {mult} times her melee hit, as frost. After any interrupt she casts no bolt or aria for {quiet} sec.",
+        "boltResponse": "Interrupt bolts when the aria is not coming.",
+        "ariaSummary": "Every {every} sec she channels a beam at a player who is not the tank for {channel} sec: {pulses} pulses that grow from {min} to {max} on the same body. A player who steps into the beam takes the pulse instead, and the ramp starts over.",
+        "ariaResponse": "Interrupt it, break her line of sight behind a lamp pillar, or step into the beam to share it.",
+        "surgeSummary": "Every {every} sec, a {cast} sec cast aimed at a player who is not the tank, then a {arc} degree wave {range} yd long: {min} to {max} damage and an {push} yd knockback.",
+        "surgeResponse": "Step sideways out of the wedge.",
+        "tipTank": "Stand where she can see you so her bolts go to you; nothing else needs a tank here.",
+        "tipHealer": "Sea-Song hits everyone every {every} sec. Watch the aria target and anyone a Chorus caught alone.",
+        "tipDamage": "Stack for Chorus, scatter from Solo, kick the aria and step out of Mere Surge.",
+        "tipDamageHeroic": "Stack for Chorus and scatter from Solo at the same time, then leave both spots before the Echo. Kick the aria.",
+        "choiceName": "Kick the aria, or soak it?",
+        "choiceGain": "An interrupt or a pillar ends the beam at once. Stepping into the beam restarts its ramp on you.",
+        "choiceRisk": "A kicked aria silences her bolts too for a moment, but if nobody acts the full ramp lands on one player.",
+        "heroicDuet": "Duet: Chorus and Solo land at the same time on two players.",
+        "heroicEcho": "Echo: each mark bursts again at the same spot {echo} sec later."
+      },
+      "hydra": {
+        "overview": "Three heads with three elements share one fight: ice, venom and water. A head that dies hands its attack to the next head and grows back {regrow} sec later while another lives. Waves wash over half the pool on a timer, and between waves two heads combine their breaths.",
+        "phaseName": "The Hydra Pool",
+        "phaseSummary": "The left head breathes ice, the centre spits venom, the right sends water.",
+        "phaseComboName": "Combined Breath",
+        "phaseComboSummary": "{after} sec after each wave two heads combine, always in the order Frostlocked Torrent, Venom Current, Toxic Rime.",
+        "phaseComboHeroicSummary": "{early} sec and {after} sec after each wave two heads combine, in the order Frostlocked Torrent, Venom Current, Toxic Rime.",
+        "headsName": "Three Heads",
+        "headsSummary": "A dead head passes its element to the next head, and every living head deals {enrage} more damage per dead head. A dead head grows back after {regrow} sec at {share} health while another head lives.",
+        "headsResponse": "Bring all three heads down together and finish them within {regrow} sec.",
+        "breathSummary": "Every {every} sec, a {cast} sec cast at a player who is not the tank, then a {arc} degree ice cone {range} yd long: {min} to {max} damage and {slow} slower for {seconds} sec.",
+        "breathResponse": "Step out of the cone.",
+        "spitName": "Venom Spit",
+        "spitSummary": "Every {every} sec, up to {count} pools of {radius} yd under different players burst after {warn} sec: {min} to {max} damage, then venom burns there for {seconds} sec at {perSecond} per second.",
+        "spitResponse": "Spread out, then step out of the pools.",
+        "torrentSummary": "Every {every} sec, a {cast} sec cast aims a {length} yd lane at a player who is not the tank: {min} to {max} damage and an {push} yd shove.",
+        "torrentResponse": "Step sideways out of the lane.",
+        "tsunamiSummary": "First at {first} sec, then {every} sec after the previous wave ends: a {cast} sec cast while the heads take {reduction} less damage, then a wave crashes over half the pool: {min} to {max} damage and a {push} yd shove.",
+        "tsunamiHeroicSummary": "First at {first} sec, then {every} sec after the previous wave ends: a {cast} sec cast while the heads take {reduction} less damage, then a wave crashes over half the pool: {min} to {max} damage and a shove. Backwash: {backwash} sec later it rolls over the other half.",
+        "tsunamiResponse": "Move to the other half, behind a rim column, or behind an Ice Wall. Do not burn the heads while they are submerged.",
+        "frostlockSummary": "A lane at a player: {min} to {max} damage and a {stun} sec freeze. It leaves an Ice Wall for {wall} sec: standing up to {lee} yd behind it shelters you from the next wave, which shatters it.",
+        "frostlockHeroicSummary": "A lane at a player: {min} to {max} damage and a {stun} sec freeze. It leaves an Ice Wall: standing behind it shelters you from the next wave. When it shatters, anyone within {reach} yd of the wall takes {shardMin} to {shardMax}.",
+        "frostlockResponse": "Dodge the lane, then use the wall as cover from the Tsunami.",
+        "currentSummary": "Venom pools swell to {radius} yd and slide {slide} yd outward from the pool centre, burning {perSecond} per second.",
+        "currentResponse": "Step aside from the slide path.",
+        "rimeSummary": "Venom pools freeze into crystals that burst after {seconds} sec: {min} to {max} damage within {radius} yd.",
+        "rimeResponse": "Move away from every crystal before it bursts.",
+        "tipTank": "Hold the heads you can reach; their attacks aim at the others.",
+        "tipHealer": "Tsunami and the combined breaths are the spikes. Every dead head makes the others hit harder.",
+        "tipDamage": "Spread damage evenly so all three heads fall within {regrow} sec of each other. Stop during each Tsunami.",
+        "choiceName": "Which head dies first?",
+        "choiceGain": "Killing all three together ends the fight; any order works if they die close together.",
+        "choiceRisk": "Each dead head makes the others deal {enrage} more damage and grows back after {regrow} sec, and the last head left carries every element.",
+        "heroicChanges": "A regrown head returns at {share} health, and each wave sends a backwash."
+      },
+      "colossus": {
+        "overview": "A walking glass giant. At three health marks every player gets a mirror copy that hunts them; you cannot damage your own copy, and each living copy shields the Colossus. In between, lanes, slams and a floor that shatters slice by slice.",
+        "phaseName": "The Prism Terrace",
+        "phaseSummary": "It plants its feet for every cast and never leaves the terrace.",
+        "phaseFlareName": "Prism Flare",
+        "phaseFlareSummary": "At {first}, {second} and {third} health it summons Tideglass Reflections.",
+        "lanceSummary": "Every {every} sec, a {cast} sec cast aims a {length} yd lane at a player who is not the tank: {min} to {max} damage.",
+        "lanceResponse": "Step sideways out of the lane.",
+        "slamSummary": "Every {every} sec, a {cast} sec cast, then {min} to {max} damage and an {push} yd knockback within {radius} yd.",
+        "slamResponse": "Melee can step out; healers cover the tank.",
+        "fractureSummary": "First at {first} sec, then every {every} sec: the floor splits into {slices} slices for {rounds} rounds. Each round some slices glow red and explode {warn} sec later: {min} to {max} damage. The centre explodes every round.",
+        "fractureResponse": "Move to a clear slice every round, and stay out of the centre.",
+        "flareSummary": "A {cast} sec channel, then every player gets a Tideglass Reflection with {share} of its health that hunts them. You cannot damage your own Reflection.",
+        "flareResponse": "Kill each other's Reflections: never your own.",
+        "wardName": "Prism Ward",
+        "wardSummary": "Each living Reflection cuts the damage the Colossus takes by {per}, up to {cap}.",
+        "wardResponse": "Clear the Reflections, then return to the Colossus.",
+        "shatterName": "Shattering Glass",
+        "shatterSummary": "When a Reflection breaks, everyone within {radius} yd of it takes {damage} damage.",
+        "shatterResponse": "Do not stand next to a Reflection that is about to die.",
+        "swapName": "Swapped Images",
+        "swapSummary": "Every {every} sec the Reflections swap owners, so who can hit which copy changes.",
+        "swapResponse": "Check again which copy you can hit after each swap.",
+        "tipTank": "Pick up the Colossus again after each flare; it walks its target down.",
+        "tipHealer": "Reflections hit their owners. Tideglass Fracture punishes anyone left on a red slice.",
+        "tipDamage": "At each flare kill a teammate's Reflection, then move slice by slice in the Fracture.",
+        "tipDamageHeroic": "At each flare kill a teammate's Reflection; after a swap, check again. Do not stand by a dying copy.",
+        "choiceName": "Kill the Reflections, or the Colossus?",
+        "choiceGain": "Killing the copies removes up to {cap} damage reduction and stops them hunting.",
+        "choiceRisk": "Time on copies is time off the Colossus, and on Heroic each copy bursts when it breaks.",
+        "heroicShatter": "Shattering Glass: a breaking Reflection hurts everyone within {radius} yd.",
+        "heroicSwap": "Swapped Images: Reflections swap owners every {every} sec."
+      },
+      "ysolei": {
+        "overview": "The Avatar of the Drowned Moon pulls everyone in and crashes, floods half her island, calls Moonspawn, and rolls Moonlight Tears at herself. At the end the moon falls unless the group breaks her ward in time.",
+        "phaseAltarName": "The Moon Altar",
+        "phaseAltarSummary": "She never moves. Her reach is long: melee stands far from her centre.",
+        "phaseTideName": "Rising Tide",
+        "phaseTideSummary": "At {health} health half of the island floods, and the flood switches sides.",
+        "phaseMoonName": "The Full Moon",
+        "phaseMoonSummary": "At {health} health she calls the moon down.",
+        "lunarSummary": "Every {every} sec, a {cast} sec cast, then {min} to {max} damage to everyone within {radius} yd of her centre.",
+        "lunarResponse": "Ranged players stay out; melee are always in range, so healers cover them.",
+        "undertowSummary": "Every {every} sec she channels for {seconds} sec, dragging everyone toward her at {pull} yd per second. Then Tidal Crash: {min} to {max} damage within {radius} yd.",
+        "undertowHeroicSummary": "Every {every} sec she channels for {seconds} sec, dragging everyone toward her. Then Tidal Crash: {min} to {max} damage within {radius} yd. Riptide: a pool opens where each player stood, burning {riptide} per second for {pool} sec.",
+        "undertowResponse": "Everyone, melee included, runs out toward dry ground during the channel; flood water slows you.",
+        "tearsSummary": "At {first} and {second} health she calls {count} Moonlight Tears that roll toward her. A tear that touches a player stops: {min} to {max} damage, plus {bonus} more for each Moonsear stack, which lasts {sear} sec. A tear that reaches her gives her {swell} more damage for the fight and heals her {heal}.",
+        "tearsHeroicSummary": "At {first} and {second} health she calls {count} Moonlight Tears that roll toward her. A tear that touches a player stops: {min} to {max} damage plus {bonus} more per Moonsear stack, and leaves Spilled Moonlight burning {glow} per second. A tear that reaches her gives her {swell} more damage and heals her {heal}.",
+        "tearsResponse": "Body-block every tear, taking turns so nobody stacks Moonsear.",
+        "tideName": "Rising Tide",
+        "tideSummary": "At {health} health half the island floods at once. Every {every} sec the flood switches sides, with a {warn} sec shimmer first. In the water: {perSecond} damage per second and {slow} slower.",
+        "tideHeroicSummary": "At {health} health half the island floods at once. Every {every} sec the flood switches sides. In the water: {perSecond} damage per second and {slow} slower. Drowned Moon: every {moonEvery} sec a Moonspawn climbs out of the flooded half.",
+        "tideResponse": "Stay on the dry half and move when the other half shimmers.",
+        "callSummary": "At {first} and {second} health she calls {count} Moonspawn.",
+        "callResponse": "The tank picks them up and damage dealers kill them.",
+        "moonSummary": "A {cast} sec cast behind a ward worth {ward} of her health. Break the ward in time: she is stunned for {stun} sec and takes {vuln} more damage. If the ward holds: {min} to {max} damage to everyone on the island, and she deals {might} more damage for the rest of the fight.",
+        "moonResponse": "Every damage dealer hits her ward; healers prepare for the impact.",
+        "tipTank": "Pick up every Moonspawn. Run out of the Undertow with everyone.",
+        "tipHealer": "Lunar Tide hits melee every cast. Tears add Moonsear stacks: heal whoever blocked one.",
+        "tipDamage": "Run from every Undertow, block tears in turns, kill Moonspawn, and burn the ward of the Falling Moon.",
+        "tipDamageHeroic": "Run from every Undertow and its Riptide pools, block tears in turns, kill Moonspawn, and burn the Falling Moon ward fast.",
+        "choiceName": "Block the tears, or let them through?",
+        "choiceGain": "A blocked tear never reaches her: no {swell} damage bonus for her and no {heal} heal.",
+        "choiceRisk": "The blocker takes the hit and a Moonsear stack: the next tear on them hits {bonus} harder. Take turns.",
+        "heroicRiptide": "Riptide: each Undertow leaves burning pools where players stood.",
+        "heroicDrownedMoon": "Drowned Moon: a Moonspawn climbs out of the flood every {moonEvery} sec.",
+        "heroicTears": "{count} tears per wave, and the Falling Moon cast lasts {cast} sec."
+      }
+    },
+    "sanctum": {
+      "tusker": {
+        "overview": "A house-sized tusker hauls a sledge of burning soul braziers up and down the Sledge Road. It walks the road in a loop and unhitches the sledge where you pull it. At half health the sledge tips over and spills fire behind it.",
+        "phaseRoadName": "On the Road",
+        "phaseRoadSummary": "Two telegraphed attacks from the start: a frontal sweep and a charge down a painted lane.",
+        "phaseSpillName": "The Sledge Tips",
+        "phaseSpillSummary": "At {health} health the sledge tips over and soulfire spills behind it.",
+        "phaseEnrageName": "Enraged",
+        "phaseEnrageSummary": "Below {health} health it enrages for the rest of the fight.",
+        "sweepSummary": "Every {every} sec, a {cast} sec cast, then its tusks sweep a {arc} degree cone in front of it, {range} yd past its body: {min} to {max} damage and a {push} yd knockback.",
+        "sweepResponse": "The tank holds it facing away from the group. Everyone else attacks from its sides or rear.",
+        "trampleSummary": "Every {every} sec, a {cast} sec cast paints a {length} yd lane toward the farthest player, then it charges down the lane: {min} to {max} damage and a {stun} sec knockdown to everyone in it.",
+        "trampleResponse": "Step sideways out of the painted lane before the cast ends. The farthest player is the target, so ranged players keep room to side-step.",
+        "spillName": "Spilled Braziers",
+        "spillSummary": "Once, at {health} health: the sledge tips and {count} soulfire patches ({radius} yd) burn behind it for {seconds} sec, {min} to {max} damage per second to anyone inside.",
+        "spillResponse": "Walk out of the fire at once and fight away from the patches.",
+        "enrageSummary": "Below {health} health it deals {damage} more damage for the rest of the fight.",
+        "enrageResponse": "Save healing and defensive cooldowns for the last stretch and finish it fast.",
+        "tipTank": "Hold it facing away from the group and keep still, so the sweep cone never swings into allies. Expect a knockback with every Tusk Sweep.",
+        "tipHealer": "Tusk Sweep and Trample are the damage spikes. Stand to its side, not at the far edge where Trample aims, and keep a cooldown for its enrage below {health}.",
+        "tipDamage": "Attack from the sides or rear. Watch the floor for the painted lane and step out of it. At half health, leave the fire behind it."
+      },
+      "korgath": {
+        "overview": "The Smith's foreman, chained to four seal pillars. Each chain still on him cuts the damage he takes by {perChain}, so breaking chains makes him easier to kill. But every chain you break frees one more of his attacks for the rest of the fight.",
+        "phaseLockName": "The Lock",
+        "phaseLockSummary": "He starts bound by {chains} chains, one to each pillar. A Seal Shackle at each pillar holds its chain.",
+        "phaseFreedName": "Broken Chains",
+        "phaseFreedSummary": "Each broken chain frees one attack for the rest of the pull, even if the chain is later re-riveted.",
+        "phaseEnrageName": "Enraged",
+        "lockboundName": "Lockbound",
+        "lockboundSummary": "Each intact chain cuts the damage he takes by {perChain}: {all} less damage while all four hold.",
+        "lockboundResponse": "Break chains to speed up the kill. Decide how many first: each one also frees an attack.",
+        "shacklesName": "Seal Shackles",
+        "shacklesSummary": "A Seal Shackle stands at each pillar's foot. Shackles can't be attacked until Korgath is pulled. Killing one breaks its chain. While the Anvil chain holds he can't leave {leash} yd of the terrace's middle.",
+        "shacklesResponse": "Damage dealers kill the Shackles of the chains you chose to break. The tank keeps Korgath in the middle meanwhile.",
+        "strainSummary": "While any chain holds: every {every} sec, a {cast} sec cast, then a blast in a {radius} yd ring around each pillar whose chain still holds: {min} to {max} damage and a knockback. It stops once all four chains are broken.",
+        "strainResponse": "Step away from every pillar with an intact chain before the cast ends.",
+        "stompSummary": "Every {every} sec, a {cast} sec cast, then a ring {radius} yd past his body: {min} to {max} damage to everyone inside.",
+        "stompResponse": "Ranged players stay outside the ring. Melee step out if they can; healers top up anyone it hits.",
+        "rerivetSummary": "{delay} sec after a chain breaks, a Broodsworn Goadsmith climbs over the rim behind its pillar, walks to the Shackle and channels Re-rivet for {channel} sec. If it finishes, the chain and a fresh Shackle return with their {perChain} damage cut, but the freed attack stays.",
+        "rerivetResponse": "Interrupt, stun or kill the Goadsmith before the channel ends.",
+        "lastLinkName": "Last Link",
+        "lastLinkSummary": "While exactly one chain is left, Strain comes every {every} sec instead of every {base} sec.",
+        "lastLinkResponse": "Break the last chain quickly, or stay ready to leave its pillar every {every} sec.",
+        "maulSummary": "Hammer chain broken: every {every} sec, a {cast} sec cast, then a {arc} degree cleave in front of him, {range} yd past his body, for {mult} times his melee hit.",
+        "maulResponse": "Only the tank stands in front. Everyone else moves behind him during the cast.",
+        "flailSummary": "Tongs chain broken: every {every} sec, a {cast} sec cast paints a {length} yd lane at the farthest player who is not the tank, then the whip hits everyone in it: {min} to {max} damage.",
+        "flailResponse": "Step sideways out of the lane before the cast ends.",
+        "chargeSummary": "Anvil chain broken: he can leave the middle of the terrace. Every {every} sec, a {cast} sec cast paints a {length} yd lane at the farthest player, then he charges down it: {min} to {max} damage and a knockback.",
+        "chargeResponse": "Step out of the lane. While the Anvil chain holds he stays within {leash} yd of the middle and never charges.",
+        "bellowSummary": "Bellows chain broken: every {every} sec, a {cast} sec cast, then {min} to {max} damage to everyone and a {push} yd shove away from him.",
+        "bellowResponse": "It hits the whole group and cannot be avoided: healers top everyone up before it lands.",
+        "tipTank": "Hold him in the middle, facing away from the group. Once the Hammer chain breaks, Maul Arc hits everything in front of him. Until the Anvil chain breaks he cannot leave {leash} yd of the middle.",
+        "tipHealer": "Strain, Shuddering Stomp and every freed attack land hard. Each chain left on makes the fight longer; each chain broken adds an attack to heal through.",
+        "tipDamage": "Kill Shackles to break the chains you chose, then burn Korgath. Step out of painted lanes and away from pillars that still hold a chain.",
+        "tipDamageHeroic": "Kill Shackles to break the chains you chose, then burn Korgath. Stop every Goadsmith before its Re-rivet ends. Step out of painted lanes and away from pillars that still hold a chain.",
+        "choiceName": "How many chains do you break?",
+        "choiceGain": "Each broken chain removes {perChain} of his damage cut: from {all} with all four chains, down to none. The fight gets much shorter.",
+        "choiceRisk": "Each broken chain frees one attack for the rest of the pull. Hammer: Maul Arc. Tongs: Chain Flail. Anvil: Threshold Charge, and he can leave the middle. Bellows: Foreman's Bellow.",
+        "choiceRiskHeroic": "Each broken chain frees one attack for the rest of the pull. Hammer: Maul Arc. Tongs: Chain Flail. Anvil: Threshold Charge, and he can leave the middle. Bellows: Foreman's Bellow. A Goadsmith also comes to re-rivet each broken chain.",
+        "heroicRerivet": "Re-rivet: {delay} sec after a chain breaks, a Goadsmith tries to restore it. Interrupt, stun or kill it.",
+        "heroicLastLink": "Last Link: with one chain left, Strain comes every {every} sec."
+      },
+      "velkhar": {
+        "overview": "Velkhar raises the thawed dead from three meltwater pools. Only the cold keeps them down: a Bonewalker killed on dry ice stays dead, but one killed in meltwater rises again and heals him.",
+        "phaseVaultName": "The Ritual Vault",
+        "phaseVaultSummary": "Bonewalkers keep climbing out of the pools. At {wave1} and {wave2} health an extra wave rises, one from each pool.",
+        "thawName": "Waking Thaw",
+        "thawSummary": "Every {every} sec one pool's pyre roars and {count} Raised Bonewalkers climb out {warn} sec later. The pools take turns. At {wave1} and {wave2} health, one more climbs out of each pool.",
+        "thawResponse": "The tank gathers them and drags them onto dry ice. Damage dealers kill them there.",
+        "heldName": "Held and Unquenched",
+        "heldSummary": "A Bonewalker killed on dry ice is Held: it freezes into a statue and stays dead. One killed in meltwater sinks, then rises again {delay} sec later at {share} health and heals Velkhar for {heal} of his health.",
+        "heldResponse": "Kill Bonewalkers only on dry ice: never in a pool or on a meltwater strip.",
+        "graspName": "Grasp of the Thawed",
+        "graspSummary": "A Bonewalker standing in meltwater deals {bonus} more damage.",
+        "graspResponse": "The tank keeps Bonewalkers out of the water.",
+        "trenchSummary": "Every {every} sec, a {cast} sec cast paints a {width} yd lane from him toward a player who is not the tank, out to the vault's rim. Then {min} to {max} damage to everyone in it, and the lane stays meltwater for {seconds} sec.",
+        "trenchResponse": "Step out of the lane. Do not kill Bonewalkers on the meltwater strip it leaves.",
+        "volleySummary": "Every {every} sec, a {cast} sec cast, then {min} to {max} shadow damage to everyone.",
+        "volleyResponse": "It cannot be avoided: healers keep the whole group topped up.",
+        "warmHandsName": "Warm Hands",
+        "warmHandsSummary": "A Bonewalker that stands still for {still} sec melts a {radius} yd meltwater puddle under itself for {seconds} sec.",
+        "warmHandsResponse": "Keep the Bonewalkers moving, and never finish one off on top of a puddle.",
+        "twiceWokenName": "Twice-Woken",
+        "twiceWokenSummary": "A Bonewalker that rises again comes back at full health and deals {bonus} more damage.",
+        "twiceWokenResponse": "Do not let any rise: kill them all on dry ice.",
+        "tipTank": "Pick up every Bonewalker and drag it onto dry ice, out of the pools and the meltwater strips. In meltwater they hit {bonus} harder.",
+        "tipTankHeroic": "Pick up every Bonewalker and drag it onto dry ice, out of the pools and the meltwater strips. Keep them moving: one that stands still melts a puddle under itself.",
+        "tipHealer": "Shadow Volley hits everyone every {every} sec. Bonewalkers in meltwater hit {bonus} harder, so watch the tank when they reach water.",
+        "tipDamage": "Kill Bonewalkers only on dry ice, then return to Velkhar. Step out of the Soulfire Trench lane.",
+        "choiceName": "Where do the dead fall?",
+        "choiceGain": "A Bonewalker killed on dry ice is gone for good: fewer adds and a cleaner fight.",
+        "choiceRisk": "Killed in meltwater, it rises again and heals Velkhar for {heal} of his health each time. Dragging them to dry ice costs time, so plan the kill spot before you burn them.",
+        "heroicWarmHands": "Warm Hands: a Bonewalker that stands still for {still} sec melts a meltwater puddle.",
+        "heroicTwiceWoken": "Twice-Woken: a Bonewalker that rises again returns at full health and deals {bonus} more damage."
+      },
+      "korzul": {
+        "overview": "A dragon fight on a frozen lake his fire keeps breaking. Every breath spends ice, and the group aims his fire, so the group decides which ice to lose. A wyrm with no ice left breathes without pause.",
+        "phaseLakeName": "The Frozen Lake",
+        "phaseLakeSummary": "He bursts out of the ice and lands in the middle of the lake. His fight starts when he touches down.",
+        "phaseFlightName": "Flights",
+        "phaseFlightSummary": "At {first} and {second} health he takes off and fights from the air until he crashes back down.",
+        "phaseLastName": "The Last Phase",
+        "phaseLastSummary": "After the second flight: Grave Breath every {breath} sec and Wing Gale every {gale} sec on the ground.",
+        "iceName": "Breaking Ice",
+        "iceSummary": "The lake is made of ice plates. His fire cracks an uncracked plate and breaks a cracked one. A cracked plate refreezes after {refreeze} sec. A broken plate is open water.",
+        "iceHeroicSummary": "The lake is made of ice plates. His fire cracks an uncracked plate and breaks a cracked one. Deep Quench: on Heroic a cracked plate never refreezes. A broken plate is open water.",
+        "iceResponse": "Spend ice on purpose: aim his fire at plates the group can afford to lose.",
+        "waterName": "Open Water",
+        "waterSummary": "Standing in open water slows you by {slow} and deals {perSecond} damage per second.",
+        "waterResponse": "Stay on the ice. Leave the water at once if a shove puts you in it.",
+        "breathSummary": "Every {every} sec, a {cast} sec cast along the tank's line, then a {arc} degree fire cone {range} yd past his body: {min} to {max} damage to everyone in it except the tank. Up to {plates} plates under the cone burn, nearest first.",
+        "breathResponse": "Only the tank stands in front. The tank turns the breath toward ice the group can spare.",
+        "tailSummary": "Every {every} sec, a {cast} sec cast, then his tail sweeps the {arc} degrees behind him, {range} yd past his body: {min} to {max} damage and a knockback.",
+        "tailResponse": "Never stand behind him. Attack from his sides.",
+        "infernoSummary": "Every {every} sec, and once at {health} health, he channels for {duration} sec: {pulses} fire pulses within {radius} yd, each stronger than the last (the last pulse deals {min} to {max}). Pulse {crack} cracks the plate under him and pulse {brk} breaks it: when it breaks he is Doused and the channel ends.",
+        "infernoResponse": "Get {radius} yd away from him. Start him on a cracked plate and the channel ends at pulse {crack}.",
+        "galeSummary": "A {cast} sec cast, then everyone is pushed {push} yd away from him.",
+        "galeResponse": "Keep open water behind you clear, so the push lands you on ice.",
+        "plungeSummary": "In the air he marks a player who is not the tank with Wyrm's Eye for {eye} sec. When it ends he pours Plunging Fire on that player's whole plate: a {warn} sec warning, then {min} to {max} damage to anyone on it, and the plate burns. {roundsFirst} rounds in the first flight, {roundsSecond} in the second.",
+        "plungeHeroicSummary": "In the air he marks two players who are not the tank with Wyrm's Eye for {eye} sec (Twin Eyes). When it ends he pours Plunging Fire on each marked player's whole plate: a {warn} sec warning, then {min} to {max} damage to anyone on it, and the plate burns. {roundsFirst} rounds in the first flight, {roundsSecond} in the second.",
+        "plungeResponse": "Marked: walk to an uncracked plate away from the group. Everyone else leaves that plate.",
+        "broodName": "Brood from Below",
+        "broodSummary": "When he takes off, a Scaleguard climbs out of each broken plate, up to {max}.",
+        "broodResponse": "The tank picks them up and the group kills them while he is in the air.",
+        "descentSummary": "He ends each flight by landing on the unbroken plate with the most players: a {warn} sec shadow, then {min} to {max} damage within {radius} yd and a knockback, and that plate burns.",
+        "descentResponse": "Gather on a plate you can afford to crack, then run out of the shadow before he lands.",
+        "flareName": "Shard Flare",
+        "flareSummary": "After the second flight the shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec, on the ground.",
+        "flareResponse": "Breaths come faster: plan which plates are left to spend.",
+        "noIceName": "No Ice Left",
+        "noIceSummary": "If every plate is broken, he hovers over the open water and breathes without pause.",
+        "noIceResponse": "Never run out of ice: it ends the fight in a wipe.",
+        "tipTank": "Turn Grave Breath onto ice the group can spare, never across the group. Move him onto a cracked plate before a Grave Inferno to cut it short.",
+        "tipHealer": "Grave Inferno pulses grow fast: make sure everyone leaves. Plunging Fire, Crashing Descent and every knockback into water hit hard.",
+        "tipDamage": "Never stand in front of him or behind him. With Wyrm's Eye, take it to an uncracked plate away from the group. Kill the Scaleguards during flights.",
+        "tipDamageHeroic": "Never stand in front of him or behind him. Two players get Wyrm's Eye at once: each takes it to a different uncracked plate away from the group. Kill the Scaleguards during flights.",
+        "choiceIceName": "Which ice do you spend?",
+        "choiceIceGain": "Aim his breath, his Plunging Fire and his landing at chosen plates and the rest of the lake stays safe to stand on.",
+        "choiceIceRisk": "Every broken plate is open water, and each one lets a Scaleguard climb out at his next flight (up to {max}). With no ice left he breathes without pause.",
+        "choiceDouseName": "Douse the Inferno?",
+        "choiceDouseGain": "With him on a cracked plate, pulse {crack} breaks it, he is Doused and Grave Inferno ends early, before the strongest pulses.",
+        "choiceDouseRisk": "That plate is gone for good. Left on uncracked ice, the channel runs to pulse {brk} and still breaks the plate.",
+        "heroicDeepQuench": "Deep Quench: a cracked plate never refreezes.",
+        "heroicTwinEyes": "Twin Eyes: Wyrm's Eye marks two players at once."
+      }
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -7067,14 +9127,7 @@ export const en_CA: EnTranslations = {
       "discord": "Join the Discord",
       "communityWiki": "Community Wiki",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Play and community links",
-      "guidesLabel": "Player guides",
-      "guideFree": "Free MMORPGs",
-      "guideGamesLikeWow": "Games like WoW",
-      "guideBest": "Best MMORPGs",
-      "guideNew": "New MMORPGs",
-      "guideBrowser": "Browser MMORPGs",
-      "guideGamesLikeDiablo": "Games like Diablo"
+      "linksLabel": "Play and community links"
     },
     "language": {
       "label": "Language",
@@ -7341,7 +9394,7 @@ export const en_CA: EnTranslations = {
       "mobileBody": "On a phone or tablet the game starts you on Low. Every touch device lands there on its first launch, on purpose, so you can get into the world and play; raise it yourself from the Graphics panel any time. On an Android browser the whole ladder is open to you and your choice sticks. On iPhone and iPad you can still pick the top presets and they take hold as soon as you press Apply, but the game sets you back to High the next time you launch, because iOS can end the tab while a scene that large is being built. The downloaded app is shorter still: its preset list stops at High and the per-system dials are hidden, because the app manages those itself.",
       "touchBody": "On a touchscreen the Graphics panel grows a Touch Controls card of its own: joystick size and deadzone, on-screen button size, control opacity, an optional camera stick, a left-handed mirrored layout, and inverted touch look, so the screen fits your hands rather than the other way around.",
       "audioTitle": "Sound and language",
-      "audioBody": "The options window is not all pixels. Audio holds three volume sliders, for sound effects, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
+      "audioBody": "The options window is not all pixels. Audio holds four volume sliders, for sound effects, ambience, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
       "autolootBody": "Prefer not to click every corpse? Walk-by Autoloot, on the Interface panel's Combat tab and off by default, scoops the loot from your own kills as you walk past them.",
       "panelsMoreBody": "The two panels this page does not table are worth a look anyway. Auras is where you shape the big on-screen alerts that fire when one of your class procs comes up: which ones show, their size, color, opacity, and where they sit on screen. Performance Overlay is the readout you turn on while you tune this page, then hide again.",
       "valueUltraOrInsane": "Ultra, or Insane if you want everything",
@@ -7358,6 +9411,7 @@ export const en_CA: EnTranslations = {
       "rowCameraSpeed": "How quickly the camera swings when you look around with the mouse.",
       "rowTouchLookSpeed": "The same thing for swipe-look, and it only appears when you are on a touchscreen.",
       "rowFullscreen": "Fills the whole screen with the game.",
+      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
       "rowWaterRipples": "Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.",
       "rowOverflowXp": "At maximum level, whether your bar keeps filling with overflow experience or shows the classic static max-level text instead.",
       "rowInterfaceMode": "Whether you get the desktop interface or the on-screen touch controls. Auto reads your device, and you can force either one: a tablet with a keyboard can take the desktop layout, and a touchscreen laptop can take the touch controls.",
@@ -7392,7 +9446,7 @@ export const en_CA: EnTranslations = {
       "ifPartyShowAuras": "Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.",
       "ifAurasOnPlayerFrame": "Puts your buffs and debuffs on your own unit frame as well as the aura bar.",
       "ifAuraBarBelowFrame": "Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.",
-      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame, under the target's name and health bar, instead of above it: the classic layout. On its stock seat the target frame (with your cast bar and swing timers) rises by one strip row so the strip's first row clears the action bar; a frame you have moved stays where you put it.",
       "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Shows who your target is targeting, the classic way to tell whether the tank still has it.",
@@ -7410,6 +9464,7 @@ export const en_CA: EnTranslations = {
       "ifMouseoverCast": "Lets a heal or a friendly spell land on the unit frame you are hovering, a party or raid row or the target-of-target frame, without changing your target.",
       "ifStickyTarget": "Keeps your current target when you click on empty ground, instead of clearing it.",
       "ifFctScale": "The size of the damage and healing numbers that float off your target.",
+      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
       "ifExtraBars": "Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.",
       "ifHideUnused": "Hides empty action slots so only the buttons you actually use are drawn.",
       "ifLockBars": "Locks your bars so you cannot drag an ability out of a slot by accident.",
@@ -7435,7 +9490,7 @@ export const en_CA: EnTranslations = {
       "queueTitle": "Your next move is already loaded",
       "queueBody": "You do not have to time your presses to the frame. Press your next ability in the closing moments of the current cast and it is queued, firing the instant the cast completes, so practiced play flows without gaps. A press too early is simply refused, so nothing is wasted. Some melee strikes work the same way, riding out on your next weapon swing.",
       "deathTitle": "When you fall",
-      "deathBody": "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
+      "deathBody": "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance or, in most dungeons, in the arena of the last boss your group has already beaten when the way there is safe. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
       "threatTitle": "Who the enemy hits",
       "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Cat Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
       "hazardsTitle": "The water can kill you",
@@ -7473,7 +9528,9 @@ export const en_CA: EnTranslations = {
       "framesGovernedAuraTracks": "Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
+      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
       "barsTitle": "Bars, timers, and combat text",
       "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
       "aurasTitle": "Buffs and debuffs",
@@ -7487,6 +9544,7 @@ export const en_CA: EnTranslations = {
       "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, recipes you pinned from crafting, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "gatheringGoalTrackerBody": "A gathering goal tracker joins the stack once you Track a recipe in the crafting window or a commission on the board: it names the recipe or commission you are tracking, how many you are collecting for, and how far your held and stored materials get you there. Track replaces your current goal, and Clear drops it explicitly; neither one ever changes your harvest preference.",
       "hubPracticeTrackerBody": "Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "The chat box",
       "chatBody": "Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.",
       "keyWindowsTitle": "Windows you open with a key",
@@ -7585,9 +9643,7 @@ export const en_CA: EnTranslations = {
       "session": "What you have done since you logged in: kills, deaths, damage and experience.",
       "arena": "Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and entering an active King of the Hill circle raises your flag; switching off takes 5 minutes.",
-      "presence": "Who sees you online in friends lists, your guild roster and /who: /presence everyone (the default), /presence friends (only players on your friends list), or /presence none. Hidden, they see no online dot, zone or map position for you, though whispers and invites still reach you; your party always sees you. A plain /presence tells you which is set.",
-      "flair": "Shows or hides your Discord role for other players, meaning your colored name, role tag and verified chat tag: /flair on shows it, /flair off hides it, and a plain /flair tells you which is set. Needs a linked Discord account.",
+      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
       "listings": "Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.",
       "buyback": "What you sold to a vendor recently and could still buy back.",
       "groupState": "How you are right now",
@@ -7727,7 +9783,7 @@ export const en_CA: EnTranslations = {
       "honorTerm": "Honor",
       "honorDef": "What fighting other players pays out: arena victories, Thornhollow Fields wins, and honorable kills all add to it. You spend it on the Warfare sets.",
       "warfareTerm": "Warfare",
-      "warfareDef": "The gear side of player-versus-player. The quartermasters sell sets of Warfare armor, the newest season for Honor and the last season for gold, and the Warfare rating they carry counts only in fights against other players.",
+      "warfareDef": "The gear side of player-versus-player. A quartermaster sells sets of Warfare armor for Honor, and the Warfare rating they carry counts only in fights against other players.",
       "fatigueTerm": "Fatigue",
       "fatigueDef": "Swim far enough out into open sea and the water begins to sap you: a warning comes first, then rising damage until you turn back toward land.",
       "unstuckTerm": "Unstuck Sickness",
@@ -7836,18 +9892,20 @@ export const en_CA: EnTranslations = {
       "formsHeading": "Shapeshifting",
       "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
       "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
-      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
+      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. Like the Groveheart Sporemender Form, it keeps your spells, and your wand works only in those two shapes or your normal caster form.",
       "formsWolfEngage": "A Cat opens a fight with Bruin Rush, shifts straight into Cat Form to Pin the target, closes the gap with Lunge when it is not stalking, and holds an enemy still with Takedown.",
       "formLine": {
         "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
         "form_cat": "The melee damage shape: energy and combo points, like a rogue, and much less threat.",
-        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out."
+        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
       "formName": {
         "form_bear": "Bruin Form",
         "form_cat": "Cat Form",
-        "form_travel": "Fleet Form"
+        "form_travel": "Fleet Form",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8231,8 +10289,8 @@ export const en_CA: EnTranslations = {
       "hollowBody": "A grave-robbed chapel crypt where the newly dead refuse to rest. The first real test of a new party.",
       "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
       "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
-      "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
-      "wildheartBody": "A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.",
+      "sanctumBody": "A hidden glacier high on Thornpeak, where a dragon lies frozen in the ice and the cult burns stolen souls to thaw it. Descend from the high pass past ice towers, the Smith's broken chains and the cult's fires to the frozen lake at the glacier's foot.",
+      "wildheartBody": "A hidden jungle caldera behind the Sunken Idol, ringed by cliffs and loud with waterfalls. Wade the river ford, hunt through the terraces and the falls, cross the ruined colony and climb the stepped shrine under a colossal stone jaguar.",
       "raidName": "The endgame raid",
       "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
       "heroicTitle": "Heroic mode",
@@ -8346,12 +10404,11 @@ export const en_CA: EnTranslations = {
       "honorFinalNoteSoldBack": "Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Warfare gear",
       "warfareBody": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit is worth nothing on a dungeon boss.",
-      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster. One exception works everywhere: two pieces of any of these sets also stop damage from delaying your spellcasting.",
       "warfareTradeBody": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.",
       "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.",
       "vanguardHeading": "Vanguard gear: Warfare Season 2",
-      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid.",
-      "vanguardStatsBody": "Unlike the original tier, Vanguard gear also carries combat ratings: each Vanguard armor piece, weapon and necklace has Crit Rating or Haste Rating, and the spellcaster and healer pieces add Spell Power or Healing Power. The Vanguard rings and necklaces are sold beside the weapons, and every class can wear them. Two of the Vanguard melee rings give exactly the Hit Rating that removes the base chance of your attacks missing a player of your own level, and two spellcasting rings do the same for your spells being resisted. Auto-attacks while dual-wielding keep their extra miss chance. The healer ring carries Haste Rating instead."
+      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
     },
     "worldPvpPage": {
       "heading": "World PvP",
@@ -8362,17 +10419,18 @@ export const en_CA: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Fair play rules",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. The Proving Shore is the only sanctuary, where no world fighting happens at all, and the three northernmost zones use the same opt-in flag rules as the rest of the world. Entering an active King of the Hill circle raises your flag automatically. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
+      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
       "zonesHeading": "Where world PvP happens",
-      "zonesBody": "The Proving Shore is the only sanctuary: no world PvP happens there, and you cannot raise your flag. An existing flag stays on, but its played-time title progress pauses until you leave. Everywhere else, including the Drakelands, the Frostveil Reach and the Amberfall, only flagged players can fight. Entering an active King of the Hill circle automatically raises your flag if you meet the normal level requirement. The warning circle does not flag you. Leaving the active circle keeps your flag up; use /pvp off to start the normal five-minute countdown, which cannot finish while you are inside an active hill or still in combat.",
+      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
       "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
       "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
-      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. An unflagged player cannot be attacked in the open world. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "hillHeading": "King of the Hill",
-      "hillBody": "Every two hours, a hill rises in the Drakelands, the Frostveil Reach or the Amberfall. The realm receives a fifteen-minute warning, and the circle is marked on open ground. The hill stays active for thirty minutes. Entering the active circle raises your World PvP flag under the normal level rules, including for raid members. The party with the most eligible players inside takes the hill after a minute of unbroken majority; a lone player counts as a party of one, but raid members and players below the PvP level requirement cannot capture or earn hill Honor. Each holder standing inside earns Honor at an increasing rate. Payouts and their ramp are faster, preserving the total Honor of the former forty-five-minute event. A change of holder restarts the ramp. Leaving the circle keeps your flag up; /pvp off uses the normal five-minute delay and cannot finish inside an active hill or during combat. The hill bar shows control, numbers and capture progress; /hill reports its location.",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Every two hours, a hill rises in the Drakelands, the Frostveil Reach or the Amberfall. The realm receives a fifteen-minute warning, and the circle is marked on open ground. The hill stays active for thirty minutes. Entering the active circle raises your World PvP flag under the normal level rules, including for raid members. The party with the most eligible players inside takes the hill after a minute of unbroken majority; a lone player counts as a party of one, but raid members and players below the PvP level requirement cannot capture or earn hill Honor. Each holder standing inside earns Honor at an increasing rate. Payouts and their ramp are faster, preserving the total Honor of the former forty-five-minute event. A change of holder restarts the ramp. Leaving the circle keeps your flag up; /pvp off uses the normal five-minute delay and cannot finish inside an active hill or during combat. The hill bar shows control, numbers and capture progress; /hill reports its location.",
-      "hillBodyRanked": "Every two hours, a hill rises in the Drakelands, the Frostveil Reach or the Amberfall. The realm receives a fifteen-minute warning, and the circle is marked on open ground. The hill stays active for thirty minutes. Entering the active circle raises your World PvP flag under the normal level rules, including for raid members. The party with the most eligible players inside takes the hill after a minute of unbroken majority; a lone player counts as a party of one, but raid members and players below the PvP level requirement cannot capture or earn hill Honor. Each holder standing inside earns Honor at an increasing rate. Payouts and their ramp are faster, preserving the total Honor of the former forty-five-minute event. A change of holder restarts the ramp. Every five minutes while the hill stands, the realm hears its location and the groups ranked by time held. When the hill falls, if the longest-holding group held it for at least ten minutes in total, each player who stood inside for at least a minute for that group, and is still in it, earns one win toward the Weekly Vault PvP row. Leaving the circle keeps your flag up; /pvp off uses the normal five-minute delay and cannot finish inside an active hill or during combat. The hill bar shows control, numbers and capture progress; /hill reports its location.",
+      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyFlat": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
     },
     "thornhollowPage": {
@@ -8550,6 +10608,7 @@ export const en_CA: EnTranslations = {
       "formBear": "Bruin Form",
       "formCat": "Cat Form",
       "formTravel": "Fleet Form",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Creatures",
       "groupPets": "Warlock Demons",
       "pickerLabel": "Choose a model to view",
@@ -8614,7 +10673,7 @@ export const en_CA: EnTranslations = {
       "offhandBody": "What the off hand takes depends on your class. A shield goes there, and so does a held focus such as an orb or a tome, or a quiver for a hunter. Classes that can dual wield put a second weapon in it instead, at a price worth knowing: fighting with a weapon in each hand makes your ordinary swings miss noticeably more often, though it leaves your abilities alone. A two-handed weapon normally needs both hands, so equipping one benches whatever the off hand was holding, unless your specialization is one of the rare ones that can carry two of them at once.",
       "bagsSort": "When the pack gets messy, the Sort button in the bags window tidies it in one press. Partial stacks of the same thing are merged together, and everything is laid back out in a readable order: weapons and armor first, then bags, consumables, tools, and mounts, then crafting materials with each fine grade sitting beside its plain version, then quest items, with grey junk last so you can see at a glance what to sell. Nothing is ever created or lost, only rearranged, so it is always safe to press.",
       "requiredLevelBody": "Some pieces also carry a required level, shown on the tooltip. You can loot, buy, or be handed such a piece at any level, but you cannot wear it until you get there. The requirement follows where the piece came from rather than its color alone, so a rare you win at your own level is usually wearable straight away, while a hand-me-down from far above you waits in your bags until you catch up.",
-      "sourcesHonor": "Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores: the newest season of armor and weapons, sold for Honor alone, beside the armor families, jewelry, and weapons of the last season, now sold for gold. The arena page covers how the Honor itself is earned.",
+      "sourcesHonor": "Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores that Honor alone buys: whole armor families, jewelry, and weapons no coin merchant carries. The arena page covers how the Honor itself is earned.",
       "sourcesRifts": "Rifts add one more source once you are at the level cap, and a rift is a race: the group that clears one first wins its rewards. That first clear pays gear on top of everything else the run leaves behind, including a Riftbound band cut to your class role, a ring you will not find anywhere else in the world. A group that finishes second still finishes its own run and keeps the credit for the clear; what it forfeits are the first-clear rewards. The rifts page covers the race itself.",
       "bindOnTradeBody": "A softer version of the same idea also exists: some things bind on trade, meaning they can change hands exactly once and then belong to whoever received them. A crafted piece made on commission binds when the crafter hands it over. A copy under that rule never rides the market or the post, which are anonymous; it passes face to face or not at all, and once it has passed, it is bound. The tooltip says which rule a piece follows, so check before you plan to resell it.",
       "cosmeticsWeapons": "Weapon skins are a third line, and they change what you carry rather than who carries it. A skin repaints a weapon type, so the look follows whichever sword, staff, or bow you have equipped, and it never touches the weapon's stats, reach, or speed. Skins unlock for your whole account rather than one character, and they come in collections with rarity tiers like everything else. They are offered in the Armory's seasonal collections rather than found out in the world, and the Armory is also where you set them, one per weapon type, rather than from the appearance row. Everyone standing near you sees the skin you are wearing.",
@@ -8983,8 +11042,8 @@ export const en_CA: EnTranslations = {
         "commissionsHeading": "Commissions and the Maker's Bond",
         "commissionsBody": "A commission is a craft made for someone. When crafting a weapon, armor piece, or held off-hand (a potion cannot carry a bond), the crafter can flag the craft as a commission: the finished piece behaves normally in the maker's own hands, but the moment it changes hands in a trade it binds to the person who received it. That is the Maker's Bond: the buyer gets their piece, and the piece cannot be passed on or resold.\n\nBonds are not forever, just expensive. Any station master will unbind a bound piece while you stand at their station (a mobile station never offers the service), for a fee set by the item's quality: 25 silver uncommon, 1 gold rare, 4 gold epic, with a legendary paying the epic rate and a commissioned common piece the uncommon one.\n\nThe fee buys a clean slate, not a cure: the piece is still a commission, so it binds again to whoever receives it in the next trade, and everything else about it, signature, masterwork, and enchants, survives untouched.",
         "provenanceHeading": "Signed work",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Collectors, trophies, and the price of a story",
         "collectorsBody": "Vendors are blind to provenance: a signed item sells to an NPC for exactly its plain price. The premium on a signature exists only between players, which is precisely what makes it interesting: a stack of windfall ore signed by a famous gatherer, a Prime Cut from a lucky harvest, a masterwork blade naming a crafter who has since retired, all cost whatever someone's memory says they are worth.\n\nThe Book of Deeds leans into the same instinct: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, and Glimmer of Hope are zero-Renown collector's marks that exist purely to prove a moment happened to you. Keep the item that earned the deed and you hold the receipt. None of this is power; provenance buys no stats and wins no fights, it is the game's paper trail of good days.",
         "castPaceHeading": "Cast time and the gold sink",
@@ -9033,7 +11092,7 @@ export const en_CA: EnTranslations = {
         "q3": "What is the difference between looting and harvesting a corpse?",
         "a3": "They are two separate actions on the same body. Everything a corpse holds, coin and drops plus any harvestable components, opens in the same loot window, but the interact key and Take Loot collect only the ordinary loot, which follows the normal loot rules. Harvesting is the professions side, stripping materials off the carcass itself: it needs a Field Kit in your bags, carried rather than spent, and its own Harvest command, a 1.5-second cast rather than an instant grant. What the cast extracts is your harvest preference, set from the kit, the Professions window, or the corpse's own Change option: it defaults to taking everything the body offers, and pressing Apply saves a choice to concentrate on one material instead, which can earn it a finer grade when doing so leaves the body's other workable materials ungathered. If the body does not carry your chosen material, the cast refuses rather than falling back to the rest, until you change your preference.\n\nHarvesting is single use: each corpse can be harvested exactly once, online included. Whoever earned the kill, and their party if grouped, hold first claim on it for ten seconds; after that it opens to whoever starts the cast first, and that reservation locks out everyone else until it finishes, is cancelled, or the body expires. Your Town Focus shapes what you get regardless of preference: while standing in a town hub you can spread 10 focus points across the component types you care about, and each focused component rolls a better tier (every 5 points bumps it a step, at most two steps) and yields more (10 percent per point). Unfocused components are never made worse.",
         "q4": "Why is my Ironbark Log signed?",
-        "a4": "You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: holding any signed copy of a needed reagent at the bench adds 2 percentage points to the masterwork chance. They can share a compatible stack with plain material or units from other collectors and signers without losing any mark; the stack keeps each source and count separately.",
+        "a4": "You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: holding any signed copy of a needed reagent, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points to the masterwork chance. They can share a compatible stack with plain material or units from other collectors and signers without losing any mark; the stack keeps each source and count separately.",
         "q5": "Which commissioned pieces can I unbind, and what does it cost?",
         "a5": "Walk to any crafting station with the piece in your bags and pay the master. The fee follows the item's quality: 25 silver for an uncommon piece, 1 gold for a rare, 4 gold for an epic; a legendary pays the epic rate, and a commissioned common piece pays the uncommon rate. It must be a real station: a mobile station never offers the service.\n\nA piece with any Perfecting rank or the Perfected stamp cannot be unbound. That includes a commissioned piece made with a masterwork head start. A failed first Perfecting attempt that leaves rank zero can still be unbound for the usual fee.\n\nThe piece remains a commission after unbinding, so it binds again to whoever receives it in the next trade. If several bound copies share a stack, one copy is peeled off and unbound per payment.",
         "q6": "Where do I learn recipes, and what do they cost?",
@@ -9069,6 +11128,7 @@ export const en_CA: EnTranslations = {
       "buyingBody": "Speak to a merchant and choose to browse their goods, and their shop opens as a single panel: everything they stock in one list, yours with a click if you can afford it. A quantity strip above the goods sets how many each click buys, one, five, or ten at a time, or a custom count, though a few special wares, mounts among them, only ever sell one at a time. Stackable coin-priced wares also carry a second offer beside the row that takes as many as your coin covers, up to a full stack, in one purchase. Selling is just as direct: while the shop is open, click an item in your bags to sell it on the spot, and what a merchant will not take, quest goods and soulbound pieces among them, simply stays put. If you part with something you regret, the shop keeps a Buyback list of your recent sales so you can buy them back for the coin you were paid.",
       "junkTitle": "Clearing out junk",
       "junkBody": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
+      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
       "tradeTitle": "Trading with other players",
       "tradeBody": "You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.",
       "mailTitle": "The Ravenpost",
@@ -9082,7 +11142,7 @@ export const en_CA: EnTranslations = {
       "marketPost": "Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind. Listing itself is free, so an optimistic price costs you nothing but time.",
       "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale. The Collect tab itemizes what is waiting, one line per completed sale with the goods, the buyer, and what you made, so you can see exactly what sold before you take the coin.",
       "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post.",
-      "honorBody": "Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the newest season of Warfare armor and weapons sells for Honor alone, while the armor families, jewelry, and weapons of the last season sell for gold. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.",
+      "honorBody": "Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the Warfare armor families, jewelry, and weapons that Honor alone buys. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.",
       "guildBankNote": "Your guild keeps a vault of its own alongside your personal one, opened at the same bursar and reached from a tab in the same window: a shared treasury of coin and a pooled store of goods. Every member can look at it, and officers are the ones who may move things in and out. The social page has the details."
     },
     "social": {
@@ -9232,12 +11292,156 @@ export const en_CA: EnTranslations = {
     }
   },
   "editor": {
-    "appTitle": "Map Editor",
-    "docTitle": "Map Editor - World of ClaudeCraft",
+    "picking": {
+      "target": "Target: {name}",
+      "choose": "Choose overlapping asset ({count})",
+      "chooser": "Choose an asset under the pointer",
+      "front": "Frontmost",
+      "behind": "Behind another asset",
+      "close": "Close",
+      "keyboard": "Use Previous/Next or arrow keys to compare. Enter selects; Escape closes.",
+      "hint": "Click again to cycle overlapping items, or choose from this list.",
+      "asset": "Asset {number}",
+      "overlapAt": "Overlaps at {name}",
+      "previous": "Previous",
+      "next": "Next",
+      "position": "{current} of {count}",
+      "details": "Item {number} · Floor {level} · Height {height}",
+      "ungroupedDetails": "Item {number} · Height {height}",
+      "hideAbove": "Hide floors above selected level",
+      "allFloors": "All floors visible",
+      "filteredFloors": "Floors above level {level} are hidden"
+    },
+    "quickActions": {
+      "title": "Selected asset",
+      "move": "Move",
+      "frame": "Frame",
+      "remove": "Remove",
+      "count": "{count} selected"
+    },
+    "buildMode": {
+      "materialNames": {
+        "WardenStone": "Smooth Stone",
+        "Cliff001": "Red Cliff",
+        "Cliff002": "Mossy Crag",
+        "Cliff003": "Craggy Rock",
+        "Cliff004": "Weathered Bluff",
+        "Rock052": "Rugged Stone",
+        "Rock053": "Ironrock",
+        "Rock054": "Sandstone Face",
+        "Rock055": "Rust Rock",
+        "Rock029": "Weathered Rock",
+        "Rock035": "Layered Stone",
+        "Rock051": "Granite",
+        "Rock056": "Meadow Stones",
+        "Rock057": "Veined Darkstone",
+        "Cliff005": "Strata Cliff",
+        "Cliff006": "Sunbaked Cliff",
+        "Concrete034": "Cast Concrete",
+        "Marble012": "Veined Marble",
+        "Bricks076C": "Mossy Brick",
+        "Gravel024": "Gravel",
+        "PavingStones046": "Paving Stones",
+        "Cobblestone001": "Cobbled Road",
+        "Cobblestone002": "Old Cobblestone",
+        "Tiles001": "Lichen Flagstones",
+        "Tiles002": "Slate Pavers",
+        "PavingStones131": "Mossy Setts",
+        "Metal032": "Brushed Steel",
+        "Metal034": "Painted Steel",
+        "Rust004": "Rusted Iron",
+        "Roots001": "Tangled Roots",
+        "Roots002": "Living Roots",
+        "Wood001": "Oak Planks",
+        "Wood002": "Pine Planks",
+        "Wood003": "Weathered Bark",
+        "Wood004": "Mossy Bark",
+        "Plaster001": "Lime Plaster"
+      },
+      "title": "Build a building",
+      "modeWall": "Walls",
+      "modeRoom": "Rooms",
+      "modeFloor": "Floors",
+      "modeObject": "Objects",
+      "modeFinish": "Wall finishes",
+      "building": "Building",
+      "buildingNumber": "Building {number}",
+      "noBuilding": "New building",
+      "newBuilding": "New building",
+      "levels": "Building floors",
+      "groundFloor": "Ground floor",
+      "floorNumber": "Floor {number}",
+      "addLevel": "Add floor",
+      "hideAbove": "Hide higher floors",
+      "settings": "Grid and foundation",
+      "gridSize": "Grid spacing",
+      "gridOff": "Off",
+      "gridCell": "{size} yards",
+      "floorHeight": "Floor height (yards)",
+      "baseY": "Foundation height (yards)",
+      "autoBase": "Set by first placement",
+      "foundationLocked": "Foundation settings are fixed after building starts.",
+      "wallSource": "Wall type",
+      "bareWall": "Bare wall",
+      "chosenAsset": "Chosen asset",
+      "thickness": "Wall thickness (yards)",
+      "pickAsset": "Choose asset",
+      "selectedAsset": "Asset: {name}",
+      "noAsset": "Choose an asset from the browser.",
+      "selectExisting": "Select an existing piece",
+      "wallHint": "Drag to draw a straight wall.",
+      "diagonal": "Diagonal walls",
+      "diagonalHint": "Drag between grid points to draw a wall at any angle.",
+      "roomHint": "Drag a rectangle to create a room with walls and a floor.",
+      "floorHint": "Drag a rectangle to add a floor on this level.",
+      "objectHint": "Place objects on the selected floor.",
+      "finishHint": "Choose a finish, then click a wall to paint it.",
+      "finishTexture": "Wall texture",
+      "bareFinish": "Original surface",
+      "importTexture": "Import texture",
+      "importingTexture": "Importing texture...",
+      "finishTile": "Texture repeat (yards)",
+      "finishSide": "Paint side",
+      "sideClicked": "Clicked side",
+      "sideFront": "Front",
+      "sideBack": "Back",
+      "sideBoth": "Both sides",
+      "finishRun": "Apply to connected walls",
+      "rotateLeft": "Rotate left",
+      "rotateRight": "Rotate right",
+      "smaller": "Smaller",
+      "larger": "Larger",
+      "fineRotation": "Fine rotation (15°)",
+      "transformReadout": "Rotation: {degrees}° | Size: {scale}x",
+      "transformEmpty": "Choose an asset to rotate or resize.",
+      "transformShortcuts": "Rotate: , and . | Resize: [ and ]",
+      "undo": "Undo",
+      "redo": "Redo",
+      "transformControls": "Asset controls",
+      "chooseWall": "Choose a wall asset and wait for its preview, or select Bare wall.",
+      "chooseAsset": "Choose an asset first.",
+      "choosePaintWall": "Click a building wall or a wall asset.",
+      "capacity": "This build is too large. Draw a smaller section or remove unused pieces.",
+      "invalid": "This wall or room could not fit. Adjust the grid or choose another piece.",
+      "importFailed": "Texture import failed. Use a PNG, JPG or WebP under 8 MB, up to 8192 pixels per side.",
+      "bare": "Original surface",
+      "importedTexture": "Imported texture {number}"
+    },
+    "appTitle": "ClaudeCraft Studio",
+    "docTitle": "ClaudeCraft Studio - World of ClaudeCraft",
     "untitledMap": "Untitled Map",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
+    "flatMapName": "Flat World",
     "playtestPlayerName": "Mapmaker",
+    "playtestBack": "Back to Editor",
+    "playtestBackTitle": "Return to the map editor (your map was saved when the playtest launched)",
     "topbar": {
       "label": "Editor actions",
+      "dungeon": "Dungeon",
+      "dungeonTitle": "Edit an authored dungeon interior layout",
       "mapNameLabel": "Map name",
       "dirty": "Unsaved changes",
       "dirtyDot": "This map has unsaved changes",
@@ -9247,7 +11451,9 @@ export const en_CA: EnTranslations = {
       "saving": "Saving...",
       "neverSaved": "Not saved yet",
       "new": "New",
-      "newTitle": "Start a new map from the built-in world",
+      "newTitle": "Start a new map from the standard built-in world",
+      "newFlat": "Blank Map",
+      "newFlatTitle": "Start a brand-new blank map with none of the base game content, at a size you choose",
       "open": "Open",
       "openTitle": "Open a saved map (browser or server)",
       "save": "Save",
@@ -9258,23 +11464,57 @@ export const en_CA: EnTranslations = {
       "forkTitle": "Create your own server-side copy of this map",
       "forkDisabledTitle": "Open a server map first to fork it",
       "import": "Import",
-      "importTitle": "Import a map from a JSON file",
+      "importTitle": "Import a map from a .wocmap.zip bundle (or a plain map .json)",
       "export": "Export",
-      "exportTitle": "Download this map as a JSON file",
+      "exportTitle": "Export this map and its models, textures, and skybox as a .wocmap.zip bundle",
       "uploadAsset": "Upload Asset",
       "uploadAssetTitle": "Upload a GLB model (up to 8 MiB) to place in your maps",
       "uploadAssetDisabledTitle": "Sign in from the game to upload assets",
+      "importModel": "Import Model",
+      "importModelTitle": "Load a .glb or .gltf model from this computer and place it, fully offline (kept for this session)",
       "playtest": "Playtest",
       "playtestTitle": "Boot the game on this map (offline, current edits included)",
       "viewLabel": "View mode",
+      "workspace": "View",
+      "workspaceTitle": "View, map, preview, and workspace modes",
       "view3d": "3D",
       "view3dTitle": "Edit in the rendered world",
       "view2d": "2D",
       "view2dTitle": "Edit on the symbolic overhead map",
+      "projectionPerspective": "Perspective",
+      "projectionOrthographic": "Orthographic",
+      "projectionTitle": "Toggle perspective/orthographic projection (Numpad 5)",
+      "axisGimbal": "Camera gimbal",
+      "axisGimbalTitle": "Show or hide the camera orientation gimbal",
+      "minimap": "Minimap",
+      "minimapTitle": "Toggle the corner minimap (top-down view that follows the camera)",
+      "music": "Music",
+      "musicTitle": "Play the soundtrack for the area under the camera (the music area's track, else the map track, else the zone's own cue). Fly around and it follows you.",
+      "mapWindow": "Map",
+      "mapWindowTitle": "Open the map of the current zone (with a button for the full world)",
+      "preview": "Preview",
+      "previewTitle": "See the map as it looks in-game: hides editor-only overlays (collider boxes, music areas, markers, rings, gizmos)",
+      "hitboxes": "Hitboxes",
+      "hitboxesTitle": "Show the collision shapes the game actually blocks with (blue = authored in Collision Master, red = auto-baked boxes)",
+      "zoneIsolateOff": "Full Build",
+      "zoneIsolateOn": "Zone: {zone}",
+      "zoneIsolateTitle": "Full Build ⇄ Zone: isolate the camera’s zone, everything outside it unloads until you switch back. View only; the map itself never changes.",
+      "fullBuildPreview": "Full Build Preview",
+      "fullBuildPreviewTitle": "Stream every zone of this map into the viewport (may take a while)",
+      "fullBuildProgress": "Building zones: {done}/{total}",
+      "fullBuildDone": "All {total} zones resident.",
+      "publishMap": "Publish to Game",
+      "pushMapChanges": "Push changes to repo map",
+      "pushMapChangesTitle": "Apply only what you changed since opening this repo map onto the repo file as it is now, keeping everyone else's pushes.",
+      "publishMapTitle": "Write this map into the local repo as real game content (data/maps + src/sim/maps); boot it with ?map=<slug>",
+      "unpublishMap": "Remove from Game",
+      "unpublishMapTitle": "Uninstall this map from the local game: deletes the files Publish wrote and restores the standard ClaudeCraft world",
       "undoCount": "Undo: {count}",
       "undoCountTitle": "{count} undoable steps (Ctrl+Z to undo, Ctrl+Y to redo)",
       "autosave": "Autosave",
       "autosaveTitle": "Automatically save the map while there are unsaved changes. Turns itself off if a save fails.",
+      "presetPrompt": "Ask about presets on Lock In",
+      "presetPromptTitle": "After a Collision Master Lock In, ask whether to also save the boxes as a hitbox preset on this device. Turn this back on if you ticked \"Don't ask again\".",
       "undo": "Undo",
       "undoTitle": "Undo the last change (Ctrl+Z)",
       "redo": "Redo",
@@ -9284,34 +11524,593 @@ export const en_CA: EnTranslations = {
       "signIn": "Sign in",
       "signInTitle": "Open the game login screen in a new tab",
       "help": "Help",
-      "helpTitle": "Editor guide: tools, shortcuts, and the tutorial"
+      "helpTitle": "Editor guide: tools, shortcuts, and the tutorial",
+      "more": "More",
+      "moreTitle": "More actions: Save As, autosave, fork, import/export, upload",
+      "primaryTools": "Primary transform tools",
+      "settings": "Settings",
+      "settingsTitle": "Graphics and sound settings (shared with playtest)",
+      "worldLink": "Link to World",
+      "worldLinkTitle": "Place this map inside the base game world: drag its outline onto the world map, and playtest embeds it there with the base game running around it",
+      "generateTerrain": "Generate Terrain",
+      "generateTerrainTitle": "Generate this map’s terrain from a region of the base game world: drag the outline over the world map to pick which part of the old layout to use",
+      "evenBuildings": "Even Out Buildings",
+      "evenBuildingsTitle": "Fix buildings that were stretched sideways to fill their plot: each one keeps its height and its footprint area, but its width and depth are made equal so it stops looking squashed",
+      "evenBuildingsDone": "Evened out {count} buildings.",
+      "evenBuildingsNone": "No squashed buildings found."
+    },
+    "genTerrain": {
+      "title": "Generate Terrain",
+      "hint": "Pick which part of the old world layout this map’s terrain generates from: drag the gold rectangle over the region you want. Its hills, lakes, and coastlines become your map’s base terrain, you can sculpt on top of it afterwards. Generating replaces your current sculpt edits, and your map stays its own separate space.",
+      "dragHint": "Drag the gold rectangle over the terrain to copy. The dot marks your spawn point.",
+      "status": "Sampling the world layout around ({x}, {z}).",
+      "save": "Generate",
+      "clear": "Flatten Map",
+      "generated": "Terrain generated from the world layout around ({x}, {z}).",
+      "cleared": "Terrain source cleared: the map is a flat slate again."
+    },
+    "worldLink": {
+      "title": "Link to World",
+      "hint": "Drag your map’s outline to where it should sit in the base game world. Playtest stamps your map’s terrain, placements, and spawns right there, with the world’s own mobs, NPCs, and quests running around it. You can also place it in the open sea beyond the old world’s edges: your map rises there as new land. Your editing space stays exactly as it is; only playtest uses the link.",
+      "statusLinked": "Linked: your map’s origin sits at ({x}, {z}) in the world.",
+      "statusUnlinked": "Standalone: this map playtests as its own separate space.",
+      "dragHint": "Drag the gold rectangle to position your map. The dot marks your spawn point.",
+      "save": "Save Link",
+      "unlink": "Unlink",
+      "cancel": "Cancel",
+      "linked": "Map linked to the world at ({x}, {z}).",
+      "unlinked": "Map unlinked: it playtests standalone again.",
+      "standaloneOnly": "Only standalone authored maps can link to the world (open a Blank Map or import one first)."
+    },
+    "settings": {
+      "title": "Settings",
+      "hint": "Graphics and sound for the editor and playtest. These are the same settings the game uses, saved in this browser.",
+      "graphicsTitle": "Graphics quality",
+      "graphicsLow": "Low",
+      "graphicsMedium": "Medium",
+      "graphicsHigh": "High",
+      "graphicsUltra": "Ultra",
+      "graphicsHint": "Applies to the next playtest, and to the editor after a reload.",
+      "applyGraphics": "Reload editor to apply",
+      "soundTitle": "Sound",
+      "sfxVolume": "Effects volume",
+      "musicVolume": "Music volume",
+      "music": "Play music",
+      "close": "Close"
+    },
+    "fluid": {
+      "title": "Fluid Pool",
+      "hint": "Pick a fluid and click the ground to place a pool. Use the transform tools to move it, stretch its footprint, and slide the surface down into a dip.",
+      "selHint": "The gizmo scales the pool footprint (X/Z) and the Y arrow slides the surface height. Damage ticks once per second on anyone in the fluid.",
+      "kind": {
+        "lava": "Lava",
+        "acid": "Acid",
+        "spectral": "Spectral Fluid",
+        "water": "Still Water"
+      },
+      "hue": "Hue",
+      "light": "Lightness",
+      "dps": "Damage per second",
+      "surfaceOffset": "Surface height",
+      "fxBubbles": "Bubbles",
+      "fxSmoke": "Smoke",
+      "fxHaze": "Haze",
+      "fxLight": "Glow light",
+      "resetPreset": "Reset to preset"
+    },
+    "tunnel": {
+      "needExit": "Entrance placed. Keep clicking to lay the path (the last point is the exit), then hit Generate.",
+      "generate": "Generate cave ({count} ready)",
+      "tooShort": "The rig points are too close together - spread them at least a few yards apart.",
+      "modeDig": "Dig cave",
+      "modeCarve": "Carve",
+      "modeHole": "Cut hole",
+      "modePatch": "Patch hole",
+      "modeRemesh": "Remesh",
+      "modeSculpt": "Dig brush",
+      "modeFill": "Fill brush",
+      "modeSmooth": "Smooth",
+      "smoothHint": "Drag along a dug edge to SMOOTH it: each pass raises the Blend of every cut and fill under the brush, so creases and lumps along a dig stroke melt into one rounded surface. One undo step per stroke.",
+      "ghostTitle": "Pending cut",
+      "ghostHint": "The blue ghost is the solid the cut will remove. Drag it into place (click or hold anywhere on the ground), tune its size, shape and depth below, then press \"Lock in cut\" (or Enter) to commit it - or Cancel / Escape to discard it. Nothing is removed until you commit.",
+      "ghostConfirm": "Lock in cut",
+      "ghostLockHint": "Enter locks the cut in, Escape discards it. Tools 2-4 move, turn and scale the ghost first.",
+      "ghostCancel": "Cancel",
+      "carveHint": "Click the ground to spawn a blue GHOST of the solid, drag it into place and tune it, then press \"Lock in cut\" (or Enter) to carve a REAL room or tunnel out of the rock: the solid has a walkable floor, rock walls and a ceiling, and it re-meshes the ground around it. A ball makes a chamber, a pitched capsule bored into a hillside a tunnel, a box a hall - and raise Blend so neighbouring carves melt together into one clean cave. Walk in through any face that breaks the surface.",
+      "carveList": "Carves",
+      "carveLabel": "Carve {n}",
+      "carveDelete": "Delete carve",
+      "cutDepth": "Depth",
+      "sculptHint": "Drag across a carve wall, floor or ceiling to DIG rock away, like a clay brush: each pass carves a blended channel at the stamp size (set by the brush radius). Drag on open ground to gouge into the surface. One undo step per stroke.",
+      "fillHint": "Click the ground to drop an ERASE BOX, size it with the sliders or the gizmo (any width, length and height), then press \"Erase caves\" (or Enter): every carve, hole and dug volume inside the box is removed, and a carve the box only partly covers is filled back to solid rock where it is covered. One undo step.",
+      "eraseTitle": "Erase box",
+      "eraseGhostHint": "The box stands where you clicked; click again to move it. Everything cave-like inside it goes when you confirm.",
+      "eraseHalf": "Half width (yd)",
+      "eraseConfirm": "Erase caves",
+      "eraseDone": "Erased {n} cave record(s) inside the box",
+      "eraseNothing": "No caves inside the box",
+      "remeshHint": "Click to paint a DETAIL region (brush radius wide): every carve it touches re-meshes at the chosen cell size - finer OR coarser than the default. Spend fine topology exactly where a cave needs to read clean; turn the cell up to thin out a carve that costs too much. Finer cells cost more triangles.",
+      "remeshCell": "Detail (cell yards)",
+      "remeshAllTitle": "Remesh all caves",
+      "remeshAllHint": "One cell size for every carve and dug volume on the map: larger cells mean far fewer triangles. Applies to the whole map at once and re-meshes it; the regions below can still refine or coarsen single spots on top of it.",
+      "remeshGlobal": "Cave mesh detail (cell yards)",
+      "remeshAll": "Remesh all caves",
+      "remeshRegionsTitle": "Detail regions (brush)",
+      "remeshList": "Detail regions",
+      "remeshLabel": "Region {n} ({r} yd, {cell} yd cells)",
+      "remeshDelete": "Delete region",
+      "holeHint": "Click the ground to spawn a blue GHOST of the cut, drag it into place, then press \"Cut into the ground\" to punch it straight through the terrain mesh. The ground stops existing there and the mesh grows a rock rim around the opening, so line a cave mouth up underneath and you can walk or drop in. Pick the shape first: a ball, an oriented box for a slot or a doorway, or a capsule for an arch. Resize or delete any committed cut below; undo removes the last one.",
+      "holeList": "Cuts",
+      "holeLabel": "Cut {n}",
+      "holeRadius": "Radius",
+      "holeDelete": "Delete cut",
+      "cutBrush": "Next cut",
+      "cutShape": {
+        "sphere": "Ball",
+        "box": "Box",
+        "capsule": "Capsule",
+        "voxel": "Dug rock",
+        "tube": "Cave mouth (from the bore)"
+      },
+      "cutLength": "Length",
+      "cutHeight": "Height",
+      "cutYaw": "Turn",
+      "cutPitch": "Tilt",
+      "cutBlend": "Blend",
+      "cutWarp": "Undulation",
+      "digAlphaLabel": "Brush alpha",
+      "digAlpha": {
+        "round": "Round",
+        "halfmoon": "Half moon",
+        "ragged": "Ragged",
+        "crescent": "Crescent"
+      },
+      "digNoise": "Edge noise",
+      "digCell": "Dig detail (cell yards)",
+      "digCellHint": "Strokes bake straight into the map as one rock volume at this cell size (finer costs more memory and triangles). The cell is fixed once the first stroke lands.",
+      "digClear": "Clear dug rock",
+      "digVolumeFull": "The dug rock volume is as large as a map can hold; clear it or dig closer to what is already dug.",
+      "digCellCoarsened": "Dig detail set to {cell} yd for this brush size (a finer cell would not fit the volume budget).",
+      "cutWarpScale": "Undulation size",
+      "cutTaper": "Taper",
+      "cutWobble": "Wobble",
+      "cutWobbleLen": "Wobble length",
+      "cutBend": "Bend",
+      "cutArch": "Arch",
+      "ghostGizmoHint": "Press 2, 3 or 4 (Move, Rotate, Scale) to drag the ghost with the gizmo, then come back to the Caves tool to cut.",
+      "autoMouth": "Carve its own mouth",
+      "autoMouthHint": "The tube cuts the ground wherever it breaches the surface, so you no longer line a hole up with the mouth by hand. Buried stretches cut nothing, and ground under a stretch standing above the surface is left alone.",
+      "mouthBlend": "Mouth blend",
+      "patchHint": "Click the ground to lay a patch (brush radius wide, same shapes as a cut) that FILLS the ground back in wherever cuts overlap it - use it to trim the blank parts around each cut. A patch always beats the cuts it touches. Resize or delete any patch below; undo removes the last one.",
+      "patchList": "Patches",
+      "patchLabel": "Patch {n}",
+      "patchDelete": "Delete patch",
+      "listTitle": "Caves",
+      "caveLabel": "Cave {n} ({nodes} points)",
+      "width": "Width",
+      "height": "Interior height",
+      "variance": "Variance",
+      "floorVariance": "Floor bumps",
+      "stalactites": "Stalactites",
+      "stalagmites": "Stalagmites",
+      "spikeSize": "Formation size",
+      "startOpen": "Entrance open",
+      "endOpen": "Exit open",
+      "selectCave": "Select whole cave",
+      "noRig": "This cave has no rig nodes to grab - lay a new cave instead.",
+      "reverse": "Swap entrance/exit",
+      "delete": "Delete cave",
+      "texture": "Interior texture",
+      "texDefault": "Granite (default)",
+      "guideHint": "Blue nodes joined by a dotted line are your cave model (visible in every tool). Move a node with the Move tool, raise or sink it with the Y arrow, and scale it to widen the cave there - the tube re-generates live and ALWAYS keeps exactly the size you set. Green ball = entrance, red arrow = exit.",
+      "hint": "Click the ground to drop the ENTRANCE node, keep clicking to lay blue waypoints (the last one is the exit), then press Generate. The cave is a standalone tube built only from your nodes - the surrounding terrain never squishes or reshapes it. Turn on \"Carve its own mouth\" and the tube opens the ground wherever it breaches the surface; otherwise use Cut hole mode and slide the tube into place with Select whole cave + the Move tool."
+    },
+    "foliage": {
+      "kind": "Plant",
+      "kinds": {
+        "tree": "Tree",
+        "bush": "Bush",
+        "grass": "Grass clump",
+        "fern": "Fern",
+        "vine": "Vine"
+      },
+      "preset": "Starting point",
+      "presets": {
+        "bushRound": "Round bush",
+        "bushBerry": "Berry bush",
+        "bushDry": "Dry scrub",
+        "grassTuft": "Tuft",
+        "grassMeadow": "Meadow clump",
+        "fernForest": "Forest fern",
+        "vineHanging": "Hanging vine"
+      },
+      "footprint": "Spread",
+      "plantHeight": "Height",
+      "splay": "Splay",
+      "clumps": "Blade clumps",
+      "strands": "Strands",
+      "hang": "Hang",
+      "bake": "Keep as an asset",
+      "bakeHint": "Writes the plant to public/models/generated as a GLB, so it stops being a recipe and becomes an ordinary catalogue asset: it batches with the others, takes a collision bake, and can be placed on any map. Its settings ride along inside the file, so you can re-open and re-bake it later. Needs the dev server.",
+      "bakePrompt": "Name this plant",
+      "baked": "Kept as {id}. Re-run the asset catalogue to see it in the browser.",
+      "bakeFailed": "Could not keep the plant: {reason}"
+    },
+    "tree": {
+      "title": "Tree Generator",
+      "hint": "Click the ground to grow a tree there. Everything below shapes the NEXT tree; select a placed tree with the Select tool to reshape it live.",
+      "preset": "Preset",
+      "presetHint": "A starting point for the biome. Every setting stays editable afterwards.",
+      "openStudio": "Edit in Tree Studio",
+      "openStudioHint": "Opens the tree on its own in an empty scene, so you can shape it without a village in the way. Keep it when you are done and it becomes the tool default.",
+      "studioMapName": "Tree Studio",
+      "studioBanner": "Tree Studio",
+      "studioHint": "Shape the tree here, then keep it as the tool default or discard it. The map you came from is waiting.",
+      "studioKeep": "Use this tree",
+      "studioDiscard": "Discard",
+      "studioKept": "Tree Studio settings are now the tool default.",
+      "randomize": "New seed",
+      "randomizeHint": "Rerolls the branch growth and leaf scatter without changing any setting.",
+      "copyToTool": "Use as tool default",
+      "trunkSection": "Trunk",
+      "trunk": "Foundation",
+      "girth": "Girth",
+      "heightScale": "Trunk height",
+      "bark": "Bark texture",
+      "barkTile": "Bark tile (yd)",
+      "branchSection": "Branches",
+      "branches": "Per limb",
+      "branchDepth": "Levels",
+      "branchLen": "Length",
+      "branchAngle": "Spread",
+      "branchDroop": "Droop",
+      "branchTwist": "Gnarl",
+      "branchTaper": "Taper",
+      "canopySection": "Canopy volumes",
+      "canopyHint": "The leaves only ever go inside these spheres. Pick a shape to lay them out, then tune the spread and size - or edit a single sphere below to sculpt the crown by hand.",
+      "shape": "Shape",
+      "volumeCount": "Spheres",
+      "volumeSpread": "Spread",
+      "volumeRise": "Height",
+      "volumeScale": "Sphere size",
+      "volumeJitter": "Jitter",
+      "showVolumes": "Show spheres",
+      "editVolumes": "Edit spheres",
+      "resetVolumes": "Back to preset shape",
+      "volumeLabel": "Sphere {n}",
+      "volumeX": "X",
+      "volumeY": "Y",
+      "volumeZ": "Z",
+      "volumeR": "Radius",
+      "volumeSy": "Stretch",
+      "addVolume": "Add sphere",
+      "removeVolume": "Remove",
+      "leafSection": "Leaves",
+      "leafSet": "Leaf art",
+      "leaves": "Count",
+      "leafSize": "Size",
+      "leafSizeVar": "Size variation",
+      "leafOrient": "Orientation",
+      "leafFill": "Fill",
+      "leafFillHint": "0 hangs the leaves on the shell of each sphere; 1 fills it solid.",
+      "leafDroop": "Droop",
+      "leafJitter": "Rotation jitter",
+      "leafClump": "Clumping",
+      "leafBranchBias": "Pull to branches",
+      "leafTint": "Tint",
+      "leafTintVar": "Colour variation",
+      "leafGlow": "Glow",
+      "leafCross": "Crossed cards",
+      "leafCrossHint": "Two quads per leaf instead of one: twice the cost, a canopy with real depth.",
+      "windSection": "Wind and collision",
+      "sway": "Sway",
+      "collide": "Trunk hitbox",
+      "collideHint": "Radius of the trunk collider, as a multiple of its own girth. 0 lets players walk through.",
+      "stats": "{leaves} leaves, {branches} branches, {height} yd tall",
+      "orient": {
+        "volume": "Follow canopy",
+        "up": "Upright",
+        "out": "Outward",
+        "droop": "Drooping",
+        "random": "Random",
+        "billboard": "Face camera"
+      },
+      "shapeName": {
+        "sockets": "On the limbs",
+        "sphere": "Ball",
+        "dome": "Dome",
+        "cone": "Cone",
+        "umbrella": "Umbrella",
+        "column": "Column",
+        "weeping": "Weeping"
+      }
+    },
+    "rock": {
+      "title": "Rock Generator",
+      "hint": "Click the ground to grow a procedural boulder there. The sliders below shape the NEXT rock; select a placed rock with the Select tool to reshape it live. Use the gizmo to stretch rocks into slabs and cliff plates.",
+      "chainMode": "Bridge / ridge mode",
+      "chainHint": "Click to lay blue points; Generate lofts ONE merged solid body through them (spanning dips in a straight line) plus walkable tops, so the chain works as a bridge or ridge. The points stay after Generate: move or scale one with the gizmos and the body follows.",
+      "chainCount": "{count} points laid",
+      "generateChain": "Generate rock ridge",
+      "clearChain": "Clear points",
+      "chainTooShort": "Lay at least two points first.",
+      "size": "Size",
+      "noise": "Noise amount",
+      "detail": "Feature detail",
+      "sharp": "Sharpness",
+      "height": "Height",
+      "depth": "Embed depth",
+      "jag": "Jaggedness",
+      "texture": "Texture",
+      "baseTex": "Base texture",
+      "texStone": "Stone",
+      "texSandstone": "Sandstone",
+      "texBare": "Bare (tintable)",
+      "reroll": "Re-roll shape",
+      "selTitle": "Generated Rock",
+      "walkable": "Walkable top"
     },
     "tool": {
+      "building": "Build mode",
       "listLabel": "Editor tools",
       "keyHint": "{name} ({key})",
       "select": "Select",
-      "raise": "Raise",
+      "move": "Move",
+      "rotate": "Rotate",
+      "scale": "Scale",
+      "raise": "Sculpt",
       "lower": "Lower",
       "smooth": "Smooth",
-      "flatten": "Flatten",
+      "flatten": "Flatten / Smooth",
+      "slope": "Slope",
+      "pond": "Pond",
+      "tunnel": "Caves",
+      "rock": "Rock Gen",
+      "build": "Build Model",
+      "fluid": "Fluid Pool",
       "paint": "Paint Biome",
+      "eyedropper": "Eyedropper",
+      "decal": "Decal",
       "water": "Water",
       "place": "Place Asset",
+      "foliage": "Paint Foliage",
+      "clutter": "Paint Clutter",
+      "meshFix": "Mesh Fix",
+      "tree": "Tree Generator",
+      "grassClear": "Remove Grass",
       "blocker": "Blocker Wall",
+      "collider": "Collider",
       "camp": "Camp",
-      "spawn": "Spawn Point",
+      "entity": "Move NPCs and Mobs",
+      "spawn": "Player Spawn",
+      "zone": "Zone",
+      "light": "Point Light",
+      "music": "Music",
+      "sound": "Point Sound",
       "region": "Region",
-      "erase": "Erase"
+      "erase": "Erase",
+      "city": "City Build"
+    },
+    "toolGroup": {
+      "terrain": "Terrain",
+      "assets": "Assets",
+      "world": "World",
+      "effects": "Effects"
+    },
+    "eyedropperTool": {
+      "empty": "Nothing painted here, click a painted texture to pick it."
+    },
+    "build": {
+      "entered": "Editing model, add shapes, apply a texture, toggle collision, then Done.",
+      "newHint": "Click the map to start a new model, or select one to edit it.",
+      "banner": "Building Model",
+      "bannerHint": "Add shapes and edit vertices/edges/faces with the modeling bar.",
+      "done": "Done",
+      "editModel": "Edit Model",
+      "panelTitle": "Built Model",
+      "shapes": "{n} shapes",
+      "texture": "Surface texture",
+      "material": "Material",
+      "materialMany": "Material controls apply to all {n} selected built models.",
+      "materialHint": "Library materials are projected onto the shape in the shader (no stretching on stairs, slopes or curves) and tint with hue, saturation and light.",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "light": "Light",
+      "resetLook": "Reset material tint",
+      "bare": "Plain (no texture)",
+      "tileSize": "Texture scale",
+      "tileSizeUnit": "yd / tile",
+      "collision": "Use mesh as collision",
+      "collisionHint": "The player is blocked where the model is solid. Walkable shapes (green) become ramps.",
+      "walkableTip": "Tip: use the modeling bar’s Walkable toggle to make a shape a ramp."
+    },
+    "city": {
+      "title": "City Build",
+      "tabKit": "Kit",
+      "tabWalls": "Walls",
+      "tabRoads": "Roads",
+      "tabPrefabs": "Prefabs",
+      "tabRoutes": "Routes",
+      "settings": "Build settings",
+      "gridSize": "Grid size",
+      "gridOff": "Off",
+      "rotSnap": "Rotation snap",
+      "snapHint": "Grid snapping applies to wall nodes, Kit placement, and prefab stamps.",
+      "kitPick": "Choose asset",
+      "kitChosen": "Placing: {name}",
+      "kitNone": "Pick an asset from the browser, then click the map to place it on the grid.",
+      "kitRotate": "Rotate (R)",
+      "kitScale": "Piece scale",
+      "kitTileSnap": "Connect tiles",
+      "kitTileHint": "Connect tiles snaps each piece to its own size and to the FIRST tile’s height, so floors join edge to edge and stay flat across bumpy ground. Esc or picking a new asset starts a fresh level; turn it off to use the world grid.",
+      "kitGhostBlocked": "Blocked: overlapping a placed asset.",
+      "wallStyle": "Wall style",
+      "wallDraw": "Draw wall",
+      "wallDrawing": "Click to add corners on the visible grid. Double-click a node or press Enter to finish. Backspace or Delete removes the last node; Esc cancels.",
+      "wallFinish": "Finish wall",
+      "wallCancel": "Cancel",
+      "wallUndoPoint": "Undo point",
+      "wallNodes": "{n} wall nodes placed.",
+      "wallPostEvery": "Post spacing",
+      "wallPostsOff": "No posts",
+      "wallScale": "Wall scale",
+      "wallHeight": "Height",
+      "wallThickness": "Thickness",
+      "wallClosed": "Close the loop",
+      "wallWalkTop": "Walkable top",
+      "wallStairs": "Stairs up",
+      "wallWalkHint": "Walkable top puts a patrol deck along the wall so players can walk it in playtest; Stairs up adds a staircase from the ground to the deck at each end (or beside a closed loop).",
+      "wallPlaced": "Wall run placed ({n} pieces).",
+      "wallBuildFailed": "The wall assets could not be generated. Your path is still available.",
+      "wallTooShort": "Draw at least two points to build a wall.",
+      "wallLiveEdit": "The controls above update your most recent wall live.",
+      "wallEditHint": "Select any wall piece to make that run active. Return to Walls to reshape it, or press Delete in Select to remove the whole run.",
+      "wallGateHint": "Gate segments are skipped so the wall leaves an opening.",
+      "styleStone": "Stone Wall",
+      "styleCastle": "Castle Wall",
+      "styleWoodFence": "Wood Fence",
+      "styleMetalFence": "Metal Fence",
+      "styleCastleFence": "Castle Fence",
+      "styleHexWall": "Hex Wall",
+      "roadType": "Road type",
+      "roadTypeRoad": "Road",
+      "roadTypePath": "Footpath",
+      "roadDraw": "Draw road",
+      "roadDrawing": "Click to add waypoints. Enter or double-click finishes, Esc cancels.",
+      "roadFinish": "Finish road",
+      "roadCancel": "Cancel",
+      "roadPlaced": "Road placed.",
+      "roadTooShort": "Draw at least two points to build a road.",
+      "roadLimit": "This map already has the maximum number of roads.",
+      "roadList": "Roads on this map",
+      "roadDelete": "Delete",
+      "roadLegacy": "Built-in road",
+      "roadAuthored": "Road {n}",
+      "roadHint": "Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.",
+      "roadMode": "Roads tool",
+      "roadModeDraw": "Draw a new road",
+      "roadModeEdit": "Edit roads",
+      "roadEditHint": "Click a road to select it. Drag a waypoint to move it, drag the road line to add a bend, and press Delete to remove the held waypoint.",
+      "roadEditNone": "No road selected. Click one in the view or pick it from a list below.",
+      "roadEditing": "Editing: {name}",
+      "roadWaypoints": "Waypoints: {n}",
+      "roadWaypointHeld": "Waypoint {n} selected.",
+      "roadDeletePoint": "Delete waypoint",
+      "roadRemove": "Remove road",
+      "roadReset": "Reset to default",
+      "roadRestore": "Restore",
+      "roadSelect": "Select",
+      "roadBuiltin": "World road {n}",
+      "roadBuiltinEdited": "{name} (changed)",
+      "roadBuiltinRemoved": "{name} (removed)",
+      "roadWorldList": "World roads ({n})",
+      "roadBuiltinNote": "World roads are the game's own roads. Changes apply to this map only, and Reset puts the road back.",
+      "roadPointTooShort": "A road needs at least two waypoints. Use Remove road instead.",
+      "roadPointLimit": "This road already has as many waypoints as it can hold.",
+      "roadRemoved": "Road removed. Undo brings it back.",
+      "prefabSave": "Save selection as prefab",
+      "prefabName": "Prefab name",
+      "prefabSaved": "Prefab saved: {name}",
+      "prefabNone": "No prefabs yet. Select some placed assets and save them as a prefab.",
+      "prefabStamp": "Stamp",
+      "prefabDelete": "Delete",
+      "prefabStamped": "Prefab stamped ({n} pieces).",
+      "prefabNeedSelection": "Select one or more placed assets first (Shift+click or marquee).",
+      "prefabCount": "{n} pieces",
+      "routePick": "Click an NPC to edit its route.",
+      "routeEditing": "Route for {name}: click the map to add waypoints.",
+      "routeAddHint": "Each click adds a waypoint. Enter finishes, Esc stops editing.",
+      "routeMode": "Traversal",
+      "routeModeLoop": "Loop",
+      "routeModePingPong": "Ping-pong",
+      "routeSpeed": "Walk speed",
+      "routeWait": "Wait at waypoints",
+      "routeWaitUnit": "seconds",
+      "routeFinish": "Save route",
+      "routeClear": "Clear route",
+      "routeSaved": "Route saved ({n} waypoints).",
+      "routeCleared": "Route cleared.",
+      "routeNoNpc": "No NPC selected. Click an NPC in the viewport first.",
+      "routeCount": "{n} waypoints"
     },
     "inspector": {
-      "label": "Tool options"
+      "label": "Tool options",
+      "toolTab": "Tools",
+      "cameraTab": "Camera",
+      "lightingTab": "Lighting",
+      "sceneTab": "Scene"
+    },
+    "scene": {
+      "title": "Scene Collection",
+      "hint": "Every placed object. Click to select, double-click a name to rename.",
+      "none": "No objects placed yet.",
+      "count": "{n} objects",
+      "pinTitle": "Focus the camera on this object and select it",
+      "hideTitle": "Hide this object in the editor (it still exists in the map)",
+      "showTitle": "Show this object again",
+      "hiddenBadge": "hidden",
+      "renameLabel": "Object name",
+      "residentBadge": "resident",
+      "isolateTitle": "Isolate {zone}: unload everything outside this zone (view only)",
+      "zoneStream": "Stream the zones near the camera",
+      "zoneStreamHint": "Keep the {count} zones nearest the camera loaded, and swap the whole set when you fly clear of them.",
+      "zoneStreamAt": "Streaming {zone} ({count} zones). Fly clear of them to load the next set.",
+      "zoneStreamLocked": "Locked on {zone}. Unlock to follow the camera again.",
+      "zoneStreamOn": "Streaming {zone} — {count} zones resident, everything else unloaded.",
+      "streamGuide": "Show the resident perimeter",
+      "streamGuideHint": "Draws light red walls where the loaded zones end, so the edge of what is streamed is visible instead of guessed.",
+      "zoneLockTitle": "Lock this zone loaded: stay here until you unlock, whatever the camera does",
+      "zoneUnlockTitle": "Unlock: follow the camera into the next zone again"
+    },
+    "push": {
+      "notLinked": "This map was not opened from a repo map, so there is nothing to push into. Open one from Open, Shipped maps first.",
+      "baseMissing": "The version you started from is no longer available. Reopen the repo map and redo your changes.",
+      "repoMissing": "The repo map this copy came from is gone.",
+      "missingIds": "Some items in the repo map have no id or share one, so your changes cannot be matched to it.",
+      "nothing": "Nothing to push: this copy has no changes since you opened it.",
+      "done": "Pushed {count} changes into {slug}. The editor now shows the merged map.",
+      "withUpgrades": "One of your edits was to an item the editor added when it opened the map, so its upgrades were saved too.",
+      "overwriteTitle": "Replace newer repo changes?",
+      "overwriteBody": "Someone pushed changes to this repo map after you opened it. Publish replaces the whole file and would drop them. Use Push changes to repo map to keep them.",
+      "conflictsTitle": "Push refused: conflicting changes",
+      "conflictsBody": "{count} of your changes clash with changes pushed since you opened this map. Nothing was written. Reopen the repo map from Open, then redo these:",
+      "conflictRow": "{kind} {id}: {reason}",
+      "conflictsMore": "And {count} more.",
+      "reasonBoth": "you and someone else both changed it",
+      "reasonDeleted": "one of you deleted it and the other changed it",
+      "reasonOverlap": "your terrain stroke overlaps a newer stroke",
+      "kindPlacement": "Asset",
+      "kindTerrain": "Terrain stroke",
+      "kindGrassClear": "Grass clearing",
+      "kindNpc": "NPC",
+      "kindObjectMove": "Gameplay object",
+      "kindPaint": "Painted cells",
+      "kindField": "Map setting",
+      "kindRoad": "Road",
+      "kindRoadEdit": "World road",
+      "close": "Close"
+    },
+    "publish": {
+      "failed": "Publish blocked: {error}",
+      "noDevServer": "Publishing writes into the project, so it needs the local dev server (npm run dev).",
+      "rejected": "Publish rejected: {error}",
+      "done": "Published. Boot it at /index.html?map={slug}, commit the generated files to ship.",
+      "removeTitle": "Remove this map from the game?",
+      "removeConfirm": "Deletes the published files for \"{slug}\" (data/maps + src/sim/maps) and restores the standard ClaudeCraft world. Your map in the editor is not touched, and you can publish it again at any time.",
+      "removed": "Removed \"{slug}\" from the game. The standard ClaudeCraft world is back.",
+      "removedNothing": "Nothing to remove: \"{slug}\" was not published to this repo."
     },
     "brush": {
       "title": "Brush",
+      "shape": "Brush shape",
+      "circle": "Circle",
+      "square": "Square",
       "size": "Brush size",
       "strength": "Strength",
       "sizeHint": "Keys: [ and ] resize the brush; Shift+[ and Shift+] change strength.",
-      "editCount": "Terrain edits: {count} / {max}"
+      "editCount": "Terrain edits: {count} / {max}",
+      "reapplyWater": "Re-apply water",
+      "reapplyWaterTitle": "Rebuild the water from the current terrain. Strokes already refresh the water they touch; use this for anything left over, like a basin dug where the map had no water at all."
     },
     "biome": {
       "title": "Biome",
@@ -9324,19 +12123,331 @@ export const en_CA: EnTranslations = {
       "volcano": "Volcano",
       "cave": "Cave",
       "erase": "Erase paint",
-      "hint": "Painted cells override the zone biome for terrain shape and color.",
+      "hint": "Paint changes the ground texture and color only; it never reshapes the terrain.",
+      "hue": "Hue",
+      "light": "Light/Dark",
+      "saveSwatch": "Save tint as swatch",
+      "saveSwatchTitle": "Keep this hue/light version as its own swatch, so the tint can be reused after the sliders move on",
+      "swatchSaved": "Saved swatch \"{name}\".",
+      "removeSwatch": "Remove swatch",
+      "removeSwatchTitle": "Delete this custom swatch from the map. Terrain painted with it reverts to the base biome look.",
+      "swatchRemoved": "Removed swatch \"{name}\".",
+      "customHint": "Custom swatches color the ground only (terrain shape keeps the zone biome) and save with the map.",
+      "customFull": "Swatch limit reached ({max}).",
+      "textureSlotsFull": "Only {max} textured swatches render per map; extra ones show their flat color. Retire an unused texture to free a slot.",
+      "textureSlots": "Texture slots: {used} / {max} used · {free} free",
+      "textureSlotsTitle": "Each distinct texture on this map uses one of {max} slots. Snow textures ride the terrain snow layer and use none. Removing a texture swatch frees its slot.",
+      "textureSlotsOver": "Over the limit by {over}: the most recently added textures paint as flat color. Remove a texture swatch to free a slot.",
+      "importTexture": "Import texture swatch",
+      "importTextureTitle": "Pick an image file: painting with the new swatch tiles it over the ground (stored in this browser; other machines see its average color)",
+      "builtinGroup": "Texture library",
+      "builtinTitle": "Built-in ground textures that ship with the editor: picking one adds it to this map as a swatch (available on every machine)",
+      "tileSize": "Texture tile size (yd)",
+      "depth": "Surface depth",
+      "variation": "Variation",
+      "variationHint": "Breaks up the repeating grid by sampling the texture a second time through a rotated frame. 0% is the plain tiling and costs nothing; higher values cost one extra texture read wherever this swatch is painted. Surface depth shades the texture's own crevices from its ambient-occlusion map, which stops painted ground reading flat; it is priced the same way.",
+      "importTextureFailed": "Could not read that image.",
+      "autoRetexture": "Auto-Retexture Map",
+      "autoRetextureHint": "One click: repaints the whole map with fitting builtin textures by elevation, slope, water, zone and paths, sand in deserts and on beaches, cliffs on steep faces, varied grass and dirt, cobble in towns and on roads. Fully editable after: repaint anything with the brush.",
+      "autoRetextureDone": "Retextured {count} cells. Repaint any of it with the brush.",
       "clear": "Clear all biome paint",
-      "clearConfirm": "Remove every painted biome cell from this map?"
+      "clearConfirm": "Remove every painted biome cell from this map?",
+      "hardness": "Brush hardness",
+      "edgeSoftness": "Edge softness",
+      "edgeDetail": "Edge detail",
+      "edgeHint": "How the boundary between two painted textures looks, across the whole map. A soft brush stores its rim as scattered single cells (one cell can only hold one texture), and the paint grid is a quarter of a yard, so with both of these at 0 a boundary is a hard line with speckle along it, whatever the hardness slider says. Edge softness widens the blend so that scatter reads as the gradual fade it stands for; Edge detail wanders the boundary with fine noise so it interlocks like real ground instead of following the grid. Both are free, no extra texture reads, but a wide softness blurs painted detail narrower than itself.",
+      "bucket": "Fill (replace texture)",
+      "bucketTitle": "Arm the bucket, then click the ground: every cell painted with the clicked texture switches to the selected swatch",
+      "bucketArmedHint": "Bucket armed: click the ground to replace the clicked texture map-wide.",
+      "bucketDone": "Replaced {count} painted cells.",
+      "pickTexture": "Pick the texture to paint",
+      "galleryTitle": "Choose a ground texture",
+      "galleryHint": "Browse every texture, then Lock In the one you want to paint with.",
+      "galleryLockIn": "Lock In",
+      "galleryCurrent": "Current",
+      "groupBiomes": "Biomes",
+      "groupSwatches": "Your swatches",
+      "galleryCount": "{n} textures",
+      "alphaTitle": "Brush alpha",
+      "alphaNone": "None",
+      "alphaImport": "Import alpha",
+      "alphaImportTitle": "Load a grayscale image as a brush mask: white paints, black masks out (kept in this browser)",
+      "alphaImportFailed": "Could not read that image as a brush alpha.",
+      "alphaRemove": "Remove this imported alpha",
+      "autoTitle": "Auto textures",
+      "autoSlopeRock": "Rock on steep slopes",
+      "autoScree": "Rock rubble on cliffs (high graphics)",
+      "autoSnowCaps": "Snow-capped peaks",
+      "autoRim": "Mountains at the map edge",
+      "autoShoreSand": "Sand near the water",
+      "autoAllOff": "Paint only (turn all off)",
+      "autoAllOffTitle": "Switch every automatic rule off so nothing re-textures the ground by slope, height or shoreline. Your paint is then the only thing on it.",
+      "autoHint": "Automatic texturing rules, applied UNDER your paint: while one is on it keeps re-tinting the ground it owns, so a cliff you have painted goes back to rock. Uncheck one to remove it map-wide. New maps start with all of these off."
+    },
+    "map": {
+      "zoneTitle": "Zone map",
+      "worldTitle": "World map",
+      "showWorld": "Show full world",
+      "showZone": "Show this zone",
+      "usePainted": "Use painted map",
+      "useLiveTerrain": "Use live terrain",
+      "pinHint": "Click the map to place a teleport pin.",
+      "teleportToPin": "Teleport to pin",
+      "close": "Close"
+    },
+    "zoneTool": {
+      "title": "Named Locations",
+      "hint": "Drag a box on the ground, then name it: standing inside shows that name as the location in playtest.",
+      "namePrompt": "Location name",
+      "none": "No named locations yet.",
+      "deleteTitle": "Remove this location",
+      "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "Gameplay Object",
+      "kindFarmBed": "Farm bed",
+      "kindPracticeDummy": "Practice dummy",
+      "kindGatherNode": "Gather node",
+      "kindDungeonDoor": "Dungeon door",
+      "position": "Position: {x}, {z}",
+      "moved": "Moved on this map.",
+      "original": "At its original spot.",
+      "hint": "Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.",
+      "reset": "Reset to original spot",
+      "edited": "Changed on this map.",
+      "rotation": "Rotation (degrees)",
+      "size": "Size",
+      "resetAll": "Reset to original",
+      "delete": "Delete from this map",
+      "deleteHint": "Deletes it from this map only. Restore it later from the deleted objects list.",
+      "doorDeleteHint": "Deleting a dungeon door removes its overworld entrance from this map.",
+      "dummyDeleteHint": "Hale's practice lessons use these dummies: deleting one leaves its lesson unfinishable on this map.",
+      "doorFixed": "Dungeon doors can be moved or deleted, but not turned or resized.",
+      "deletedTitle": "Deleted Gameplay Objects",
+      "deletedHint": "Deleted from this map. Restore one to bring it back where it stood.",
+      "deletedRow": "{kind}: {name}",
+      "restore": "Restore",
+      "restoredLater": "Restored. It appears in the view after the map reloads."
+    },
+    "lightTool": {
+      "title": "Point Lights",
+      "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
+      "none": "No lights yet.",
+      "color": "Color",
+      "intensity": "Intensity",
+      "range": "Range (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this light",
+      "capReached": "Light limit reached ({max}).",
+      "lightN": "Light {num}",
+      "selectTitle": "Select this light in the world (bulb badge enlarges; Delete removes it)"
+    },
+    "soundTool": {
+      "title": "Point Sounds",
+      "hint": "Click the ground to drop a looping sound emitter, then pick a clip and set its max volume and radius. The falloff sphere shows how far it carries; it plays spatially in playtest.",
+      "none": "No point sounds yet.",
+      "clip": "Sound effect",
+      "volume": "Max volume",
+      "radius": "Radius (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this sound",
+      "capReached": "Point sound limit reached ({max}).",
+      "soundN": "Sound {num}",
+      "selectTitle": "Select this sound in the world (badge enlarges; Delete removes it)"
+    },
+    "decalTool": {
+      "title": "Decals",
+      "hint": "Pick a decal, then click the ground to stamp it. Stamps drape over the terrain and only load when the camera is near, so a map can carry plenty. Click a stamp to select it; Delete removes it.",
+      "none": "No decals stamped yet.",
+      "library": "Decal library",
+      "libraryTitle": "Built-in decals that ship with the editor (original CC0 art). Pick one, then click the ground to stamp it.",
+      "importDecal": "Import decal image",
+      "importTitle": "Pick a PNG/WebP with transparency: it becomes a stampable decal (stored in this browser, and packed into map bundles)",
+      "imported": "Imported",
+      "importFailed": "Could not read that image.",
+      "importedDecal": "Imported \"{name}\".",
+      "size": "Size (yd)",
+      "rotation": "Rotation",
+      "aspect": "Stretch",
+      "opacity": "Opacity",
+      "glow": "Glow",
+      "tint": "Tint",
+      "sortOrder": "Draw over",
+      "randomRotate": "Random rotation per stamp",
+      "stamped": "Stamped \"{name}\".",
+      "removed": "Removed decal.",
+      "capReached": "Decal limit reached ({max}).",
+      "decalN": "Decal {num}",
+      "deleteTitle": "Remove this decal",
+      "selectTitle": "Select this decal in the world (Delete removes it)",
+      "pickFirst": "Pick a decal from the library first.",
+      "catArcane": "Arcane",
+      "catBurn": "Burns",
+      "catDamage": "Damage",
+      "catGore": "Gore",
+      "catNature": "Nature",
+      "catTracks": "Tracks",
+      "catMarker": "Markers"
+    },
+    "markerTool": {
+      "title": "AI Markers",
+      "hint": "Editor-only notes for AI quest/event generation (\"quest giver here\", \"chest here\"). Never shown in playtest.",
+      "place": "Place markers instead of moving the spawn",
+      "kind": "Marker type",
+      "npc": "NPC",
+      "object": "Interactable object",
+      "none": "No markers yet.",
+      "defaultName": "{kind} {num}",
+      "deleteTitle": "Remove this marker",
+      "capReached": "Marker limit reached ({max})."
+    },
+    "appearance": {
+      "title": "Appearance (shader)",
+      "tint": "Tint color",
+      "opacity": "Opacity",
+      "glow": "Glow color",
+      "glowStrength": "Glow strength",
+      "fire": "Fire effect (animated flame)",
+      "reset": "Reset appearance",
+      "hint": "Renders the same in playtest: tint recolors, opacity fades (ghosts), glow adds emissive light."
+    },
+    "fire": {
+      "title": "Asset fire effects",
+      "hint": "Add independent procedural fire sources, select one, then use the Move gizmo in the viewport to place it precisely on the model.",
+      "legacy": "Legacy single flame",
+      "customize": "Open full controls",
+      "add": "+ Add fire emitter",
+      "removeAll": "Remove all fire",
+      "emitter": "Fire {count}",
+      "preset": "Effect preset",
+      "enabled": "Emitter enabled",
+      "anchor": "Attach to",
+      "anchorBase": "Model base",
+      "anchorCenter": "Model center",
+      "anchorTop": "Model top",
+      "position": "Position",
+      "positionX": "Local X (yd)",
+      "positionY": "Local Y (yd)",
+      "positionZ": "Local Z (yd)",
+      "flameShape": "Flame shape",
+      "scale": "Overall scale",
+      "width": "Flame width",
+      "height": "Flame height",
+      "layers": "Flame layers",
+      "intensity": "Shader intensity",
+      "opacity": "Flame opacity",
+      "light": "Glow light",
+      "glow": "Glow intensity",
+      "glowRange": "Glow radius (yd)",
+      "smoke": "Smoke",
+      "smokeAmount": "Smoke amount",
+      "smokeScale": "Smoke scale",
+      "smokeRise": "Smoke rise",
+      "colorMotion": "Color & motion",
+      "hue": "Fire hue",
+      "saturation": "Saturation",
+      "speed": "Animation speed",
+      "turbulence": "Turbulence",
+      "flicker": "Flicker",
+      "embers": "Flying embers",
+      "blend": "Blend mode",
+      "blendAdditive": "Additive glow",
+      "blendAlpha": "Natural alpha",
+      "duplicate": "Duplicate emitter",
+      "remove": "Remove emitter",
+      "style": {
+        "torch": "Torch",
+        "bonfire": "Bonfire",
+        "wildfire": "Wildfire",
+        "soulfire": "Soul fire",
+        "embers": "Ember bed"
+      }
+    },
+    "sculpt": {
+      "hint": "Drag to raise the ground; tick the box to carve downward instead.",
+      "shapeTitle": "Brush Shape",
+      "hardness": "Brush hardness",
+      "alphaTitle": "Sculpt alpha",
+      "alphaNone": "Round",
+      "alphaHint": "Alphas shape the actual terrain surface and stay identical in editor and playtest.",
+      "lower": "Lower instead of raise",
+      "grab": "Grab / pull (snake hook)",
+      "grabHint": "Press to grab the ground under the brush, then drag and the terrain follows your cursor in any direction - up lifts it, down shoves it in, sideways slides it across the map, like pulling clay. One grab is one undo step. Brush size sets how wide a chunk you pull.",
+      "shiftHint": "Hold Shift while dragging to do the opposite (raise becomes lower, and back).",
+      "autoTex": "Auto texture by angle",
+      "autoTexHint": "Each stroke repaints the sculpted area by ground angle: one texture below the threshold, another above it (instant cliffs).",
+      "autoTexAngle": "Steep from (degrees)",
+      "autoTexFlat": "Flat ground texture",
+      "autoTexSteep": "Steep ground texture",
+      "autoTexNone": "Leave as is"
+    },
+    "materials": {
+      "title": "Materials",
+      "hint": "Pick a texture for each part of this model. Textures tile in world space, ignore the model UVs, and save with the map.",
+      "loading": "The model is still loading. Select it again in a moment to edit its materials.",
+      "original": "Original",
+      "texture": "Texture",
+      "tile": "Texture scale (yards per tile)",
+      "color": "Tint",
+      "reset": "Restore original"
     },
     "flatten": {
+      "style": {
+        "smooth": "Smooth",
+        "sharpen": "Sharpen",
+        "noise": "Noise",
+        "terrace": "Terrace"
+      },
+      "styleHint": {
+        "smooth": "Averages the ground under the brush - repeated passes melt bumps away.",
+        "sharpen": "The inverse of Smooth: ridges crest harder and gullies bite deeper with each pass.",
+        "noise": "Paints natural undulation across the whole brush: layered swells and dips with finer detail on top. One stroke keeps one pattern, so dragging builds rolling ground; stroke again to layer new detail.",
+        "terrace": "Pulls slopes into stepped ledges. Brush strength sets the step height."
+      },
+      "noiseSize": "Bump size (yards)",
+      "noiseRough": "Roughness",
+      "noiseHint": "Small bumps with high roughness read as rocky, broken ground; big bumps with low roughness roll like meadow hills. Brush strength sets how tall they stand.",
       "hint": "Flatten levels the ground to the height under the cursor when the drag starts.",
-      "hardEdge": "Hard edge"
+      "hardEdge": "Hard edge",
+      "smoothMode": "Smooth instead of flatten",
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "Level height (yards)",
+      "levelPlaceholder": "Drag start",
+      "levelClear": "Clear",
+      "levelHint": "Every drag levels the ground to this height. Right-click the ground to pick another.",
+      "levelHintNone": "Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.",
+      "levelPicked": "Level locked at {height} yards."
+    },
+    "slope": {
+      "hint": "Right-click the ground where the slope should start. Then press where it should end and drag along the path: the ground eases into a smooth ramp between the two heights.",
+      "start": "Start height: {height} yards",
+      "noStart": "No start set yet. Right-click the ground to set one.",
+      "clearStart": "Clear start",
+      "needStart": "Right-click the ground first to set where the slope starts.",
+      "startPicked": "Slope start set at {height} yards."
+    },
+    "pond": {
+      "title": "Create a pond",
+      "add": "Add pond",
+      "radius": "Pond radius",
+      "depth": "Pond depth",
+      "hint": "Click the ground to dig a round pond and fill it with water. The circle includes the softly sloping bank. Undo removes the water and basin together.",
+      "invalid": "Cannot dig a pond on this ground. Choose another spot."
     },
     "water": {
       "title": "Water Level",
       "level": "Water level",
       "hint": "Sets each declared lake's water surface height, from {min} to {max} yards.",
-      "reset": "Reset to the built-in level"
+      "reset": "Reset to the built-in level",
+      "tintTitle": "Water tint",
+      "hue": "Hue",
+      "light": "Lightness",
+      "tintReset": "Reset tint",
+      "waterfallTitle": "Waterfalls",
+      "placeWaterfall": "Place waterfall",
+      "placeWaterfallTitle": "Arm the Place tool with an animated waterfall (click a cliff to drop it)",
+      "waterfallLabel": "Waterfall",
+      "waterfallHint": "An animated falling-water sheet with a foam pool. Scale it up a cliff with S or the gizmo; stretch just the height with the Y scale handle."
     },
     "place": {
       "title": "Place Asset",
@@ -9347,6 +12458,102 @@ export const en_CA: EnTranslations = {
       "chosen": "Placing: {name}",
       "none": "Pick an asset from the browser below, then click the ground to place it."
     },
+    "collider": {
+      "title": "Collision Volumes",
+      "hint": "Pick a shape, then click the ground to drop it. Use Move, Rotate, and Scale (or the sliders below) to shape it.",
+      "shapeLabel": "Collider shape",
+      "box": "Box collider",
+      "sphere": "Sphere collider",
+      "plane": "Floor plane",
+      "wall": "Wall plane",
+      "width": "Width",
+      "height": "Height",
+      "depth": "Depth",
+      "diameter": "Diameter",
+      "floorOffset": "Floor height offset",
+      "sizeHint": "Dimensions are yards at scale 1; the Scale tool multiplies them.",
+      "playtestNote": "Volumes show green in the editor and are invisible in playtest: boxes and spheres block movement, floor planes raise the walkable ground.",
+      "hideVolumes": "Hide collision volumes",
+      "hideVolumesHint": "Hides the green volume overlays in the viewport (they still block in playtest)."
+    },
+    "foliageTool": {
+      "title": "Foliage Brush",
+      "hint": "Drag across the ground to scatter the enabled foliage inside the brush; each stroke is one undo step. Use Erase to remove pieces.",
+      "ambientTitle": "Existing map foliage",
+      "ambientHint": "Built-in trees and rocks are procedural and cannot be selected. Point the camera at an area, then convert this zone (recommended), the nearest batch, or the whole map.",
+      "makeZoneEditable": "Make THIS zone editable",
+      "makeZoneEditableHint": "Converts every tree and rock in the zone the camera is over into editable placements, the performance-safe way to edit a far area, one region at a time.",
+      "makeAmbientEditable": "Make nearby foliage editable",
+      "makeAllAmbientEditable": "Make ALL foliage editable",
+      "ambientAllHint": "Converting the whole map turns thousands of trees and rocks into individual placements, which uses more memory than the zone or batch options.",
+      "ambientEditableHint": "Ambient foliage is off. Every foliage piece painted with this brush can be selected, moved, rotated, scaled, or erased.",
+      "ambientConverted": "Made the {count} nearest foliage pieces editable.",
+      "ambientConvertedAll": "All ambient foliage ({count} pieces) is now editable.",
+      "ambientPartial": "Converted {count} pieces; raise the limit or convert again for the rest.",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "grass": "Grass (animated)",
+      "grassHue": "Grass hue",
+      "grassLight": "Grass lightness",
+      "grassClump": "Clump size (strands)",
+      "grassPreview": "The color new grass will paint with",
+      "ferns": "Ferns and mushrooms",
+      "bushes": "Bushes",
+      "trees": "Trees",
+      "rocks": "Rocks",
+      "collide": "New foliage blocks movement",
+      "noneSelected": "Enable at least one foliage group to paint.",
+      "customTitle": "Custom brush asset",
+      "customHint": "Scatter your own asset instead of the built-in sets. Pick any model from the browser below, then brush as usual.",
+      "customPick": "Pick from asset browser",
+      "customChosen": "Brushing: {name}",
+      "customClear": "Back to built-in foliage",
+      "customNeedsPick": "Open the asset browser and pick an asset for the custom brush first."
+    },
+    "meshFixTool": {
+      "title": "Mesh Fix",
+      "hint": "Wireframe is on while this tool is active. Drag over the stretched terrain polys draped across a cave mouth (from outside or from inside the cave) to REMOVE them; every poly centred under the brush stops drawing. Draw-only: the ground you walk on is unchanged. One undo step per stroke.",
+      "restore": "Restore mode (bring removed polys back under the brush)",
+      "nudgeHint": "To MOVE a stretched poly instead of removing it, use Raise or Lower with a very small brush on its vertices.",
+      "count": "{n} removed spots",
+      "clear": "Restore everything",
+      "capReached": "Mesh Fix is full ({max} spots). Restore some before removing more.",
+      "miss": "Aim at the terrain mesh: nothing was under the cursor.",
+      "vertexMode": "Vertices mode (select and move single vertices)",
+      "vertexHint": "Every terrain vertex near the cursor shows as a small square; selected ones turn yellow. Click one to select it, drag a box to take several, Shift+click or Shift+drag to add, Ctrl/Cmd+click to toggle, Alt+click to drop. Then DRAG a selected vertex to move it up or down. Draw-only: the ground you walk on is unchanged.",
+      "vertexCount": "{sel} selected, {n} vertices moved",
+      "vertexReset": "Reset selected vertices",
+      "vertexClearSel": "Clear selection",
+      "vertexClearAll": "Reset every moved vertex"
+    },
+    "clutterTool": {
+      "title": "Clutter Brush",
+      "hint": "Drag across the ground to scatter the enabled clutter inside the brush; each stroke is one undo step. Pieces never block movement.",
+      "tierNote": "Clutter shows in game on High graphics and up; lower tiers skip it at no cost.",
+      "erase": "Erase mode (lift painted clutter under the brush)",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "clumps": "Clumps (0 = even spread)",
+      "kindsTitle": "Clutter kinds",
+      "kinds": {
+        "tile_broken": "Cracked paving slabs",
+        "tile_shards": "Tile shards",
+        "pebbles": "Pebbles",
+        "stones": "Loose stones",
+        "letter": "Dropped letters",
+        "paper_scraps": "Crumpled paper",
+        "leaves": "Fallen leaves",
+        "straw": "Straw",
+        "splinters": "Wood splinters",
+        "pot_shards": "Broken pottery"
+      },
+      "noneSelected": "Enable at least one clutter kind to paint.",
+      "count": "{count} clutter stamps painted",
+      "clearAll": "Remove all painted clutter",
+      "capReached": "Clutter limit reached ({max} stamps); erase some to paint more."
+    },
     "blockerTool": {
       "title": "Blocker Wall",
       "hint": "Drag along the ground to draw an invisible wall players cannot walk or jump through. Release to place it; a wall shorter than half a yard is discarded.",
@@ -9354,21 +12561,150 @@ export const en_CA: EnTranslations = {
     },
     "camp": {
       "title": "Mob Camp",
+      "chooseMob": "Choose a mob model",
       "mob": "Mob",
       "count": "Count",
       "radius": "Radius",
       "delete": "Delete camp",
       "hint": "Click open ground to add a camp, or click an existing camp to edit it.",
-      "playtestNote": "Mobs spawn only in playtest, never in the editor view.",
+      "playtestNote": "Camp rules, level overrides, and VFX are applied in playtest.",
       "selected": "Camp: {mob}",
-      "none": "No camp selected."
+      "none": "No camp selected.",
+      "catalogMeta": "{family} | Level {min}-{max}",
+      "statFamily": "Family: {value}",
+      "statAggro": "Aggro: {value} yd",
+      "statScale": "Scale: {value}",
+      "overrideLevels": "Override template levels",
+      "levelMin": "Minimum level",
+      "levelMax": "Maximum level",
+      "aiNotesPlaceholder": "Describe behavior, patrol logic, encounter pacing, or dialogue cues for the AI.",
+      "questNotesPlaceholder": "Explain how this camp should support objectives, rewards, or quest progression.",
+      "tagElite": "Elite",
+      "tagRare": "Rare",
+      "tagBoss": "Boss",
+      "tagCaster": "Caster",
+      "tagSupport": "Support",
+      "tagSummoner": "Summoner",
+      "tagEnrage": "Berserk",
+      "tagSwimmer": "Swimmer",
+      "tagStationary": "Fixed"
+    },
+    "authoring": {
+      "browseAll": "Browse all",
+      "search": "Search all models...",
+      "searchLabel": "Search catalog",
+      "filterLabel": "Filter catalog group",
+      "allGroups": "All",
+      "defaults": "Defaults",
+      "noResults": "No matching entries.",
+      "showing": "Showing {shown} of {total}. Refine the search to see the rest.",
+      "resultCount": "{count} entries",
+      "aiBrief": "AI and Quest Brief",
+      "aiNotes": "AI direction",
+      "questNotes": "Quest-building notes",
+      "vfxTitle": "Ambient VFX",
+      "vfxPreset": "Preset",
+      "vfxNone": "None",
+      "vfxArcane": "Arcane motes",
+      "vfxFire": "Fire embers",
+      "vfxFrost": "Frost shimmer",
+      "vfxHoly": "Holy glow",
+      "vfxNature": "Nature wisps",
+      "vfxShadow": "Shadow motes",
+      "vfxIntensity": "VFX intensity",
+      "vfxHint": "Pooled particles keep the effect lightweight in the editor and playtest."
+    },
+    "entityTool": {
+      "title": "NPCs and Mobs",
+      "hint": "Select an NPC to configure its rig, role, VFX, and AI brief. Select a mob to set its type, levels, stat modifiers, patrol, and respawn.",
+      "selected": "Selected: {name}",
+      "none": "Click a mob or NPC in the map view to select it.",
+      "facing": "Facing",
+      "oneMob": "1 mob",
+      "manyMobs": "{count} mobs",
+      "name": "Display name",
+      "titleField": "Title",
+      "role": "Story role",
+      "rolePlaceholder": "Quest giver, merchant, guard, trainer...",
+      "characterModel": "Rigged character",
+      "placeNpc": "Place NPC",
+      "chooseNpcModel": "Choose a character model",
+      "placeNpcHint": "{name} is ready. Click the terrain to place this NPC.",
+      "cancelPlacement": "Cancel placement",
+      "automaticModel": "Automatic template rig",
+      "automaticModelHint": "Use the character assigned by this NPC template.",
+      "aiNotesPlaceholder": "Describe personality, dialogue tone, schedules, reactions, and interaction rules.",
+      "questNotesPlaceholder": "Leave instructions for future AI-authored quests, objectives, and story beats.",
+      "categoryNpc": "NPCs",
+      "categoryPlayer": "Player rigs",
+      "categoryHumanoid": "Humanoids",
+      "categoryCreature": "Creatures",
+      "categoryForm": "Forms"
+    },
+    "mobTool": {
+      "hint": "Click a mob in the map view to edit its type, levels, stats, patrol, and respawn.",
+      "typeHeader": "Mob: {name}",
+      "typeHeaderMany": "Mob: {name} ({count} selected)",
+      "type": "Mob type",
+      "mixedType": "Mixed types",
+      "statLevels": "Template levels {min}-{max}",
+      "mixedHint": "The selected mobs differ. Values shown are the first one; edits apply to all of them.",
+      "overrideLevels": "Override level range",
+      "levelDefaultHint": "Using the template level range for this mob.",
+      "statsTitle": "Stat modifiers",
+      "statsHint": "Multipliers on the level-derived stats. Above 1 is a bonus, below 1 a penalty. Click a value to type an exact number.",
+      "statHealth": "Health",
+      "statDamage": "Damage",
+      "statArmor": "Armor",
+      "statMoveSpeed": "Move speed",
+      "statAttackSpeed": "Swing time",
+      "statScale": "Size",
+      "statDefault": "{value}x default",
+      "statBonus": "{value}x (+{percent}%)",
+      "statPenalty": "{value}x (-{percent}%)",
+      "statsReset": "Reset modifiers",
+      "respawnTitle": "Respawn",
+      "respawnDefault": "Default respawn speed",
+      "respawnDefaultHint": "Using the realm default for this mob (rares and bosses take longer).",
+      "respawnSeconds": "Respawn after",
+      "seconds": "{value}s",
+      "patrolTitle": "Patrol",
+      "patrolNone": "This mob wanders near its spawn point. Set a patrol to walk it along a path.",
+      "patrolNoneNpc": "This character stands where you placed it. Set a patrol to walk it along a path.",
+      "patrolSet": "Set patrol route",
+      "patrolEdit": "Edit patrol route",
+      "patrolClear": "Clear patrol",
+      "patrolPickHint": "Click the map to drop each waypoint in order. Double-click the last one, or press Enter, to finish.",
+      "patrolDraftPoints": "Waypoints placed: {count}",
+      "patrolPoints": "Patrolling {count} waypoints",
+      "patrolMode": "At the end of the path",
+      "patrolLoop": "Loop back to the start",
+      "patrolPingpong": "Turn around and walk back",
+      "patrolSpeed": "Walk speed",
+      "patrolWait": "Pause at each waypoint",
+      "patrolWaitHint": "The pause is stamped on every waypoint you place from now on.",
+      "patrolFinish": "Finish route",
+      "patrolUndoPoint": "Remove last point",
+      "patrolCancel": "Cancel",
+      "patrolNeedPoints": "Place at least two waypoints before finishing the route.",
+      "patrolFull": "A patrol route holds at most {max} waypoints.",
+      "patrolSaved": "Patrol set: {count} waypoints.",
+      "patrolRemoved": "Patrol cleared.",
+      "yardsPerSecond": "{value} yd/s",
+      "delete": "Delete mob",
+      "deleteMany": "Delete {count} mobs",
+      "deleted": "Deleted {count} mobs.",
+      "deleteNpc": "Delete character",
+      "deleteManyNpcs": "Delete {count} characters",
+      "deletedNpcs": "Deleted {count} characters."
     },
     "spawn": {
-      "title": "Spawn Point",
-      "hint": "Click the ground to set where playtest drops the player.",
+      "title": "Player Spawn",
+      "hint": "Drag a large box to spread new players across it. Click without dragging to keep a single spawn point.",
       "position": "Spawn: {x}, {z}",
+      "area": "Spawn area: {width} x {height} yd",
       "unset": "Using the built-in start position.",
-      "clear": "Clear spawn point"
+      "clear": "Clear player spawn"
     },
     "region": {
       "title": "Region",
@@ -9383,15 +12719,34 @@ export const en_CA: EnTranslations = {
     },
     "eraseTool": {
       "title": "Erase",
-      "hint": "Click a placed asset to remove it, or click sculpted ground to remove the newest stamp under the cursor.",
+      "hint": "Click or drag across placed assets to remove them. Terrain sculpting is never affected - use Undo for sculpt mistakes.",
       "blockerHint": "Clicking near a blocker wall removes that wall instead."
+    },
+    "grassClearTool": {
+      "title": "Remove Grass",
+      "hint": "Click or drag to scrub away the procedural meadow grass, including the grass baked into the built-in world. Use a large brush to clear a wide area in one stroke.",
+      "restore": "Restore all grass"
     },
     "selection": {
       "title": "Selection",
+      "heightOffset": "Height offset (yards)",
+      "heightStep": "Step (yards)",
+      "raiseAsset": "Raise",
+      "lowerAsset": "Lower",
+      "heightHint": "Negative offsets sink assets below their base.",
       "none": "Nothing selected. Use Select and click a placed asset.",
+      "squareCollision": "Square collision (follows rotation)",
       "asset": "Asset: {name}",
       "x": "X",
+      "y": "Y",
       "z": "Z",
+      "multiCount": "{count} assets selected",
+      "selectAllOfAsset": "Select all of this asset ({count})",
+      "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
+      "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "Set to ground",
+      "setGroundTitle": "Seat the selected assets back on the terrain under them, removing any float or lift",
+      "snapGround": "Snap to ground when moving",
       "rotation": "Rotation",
       "scale": "Scale",
       "collide": "Blocks movement",
@@ -9399,12 +12754,73 @@ export const en_CA: EnTranslations = {
       "radiusAuto": "Auto",
       "radiusAutoTitle": "Reset the collision radius to follow the asset scale",
       "radiusHint": "Auto derives the collision radius from the asset scale; drag the slider to override it.",
+      "collisionBaked": "Blocking with the baked model shape ({count} boxes hugging the mesh). Drag the radius slider to override with a simple circle; Auto restores the baked shape.",
+      "collisionCustom": "Custom footprint (circle/square) - overrides the baked model shape. Press Auto to restore it.",
       "footprints": "Show collision footprints",
+      "sway": "Wind sway",
+      "swayHint": "Sways this asset in the wind. On by default for plants. Applies to EVERY placement of this asset on the map, not just the selected one.",
+      "collisionTitle": "Collision",
+      "collisionType": "Collision type",
+      "collisionTypeBaked": "Baked hitboxes",
+      "collisionTypeBasic": "Basic (radius)",
+      "collisionTypeMesh": "True collision (heavy)",
+      "collisionTypeNone": "No collision",
+      "collisionEdited": "Custom hitboxes ({count} boxes). The sim blocks with exactly these.",
+      "hitboxEdit": "Edit hitboxes",
+      "hitboxDone": "Done editing",
+      "hitboxAdd": "Add hitbox",
+      "hitboxDelete": "Delete selected",
+      "hitboxReset": "Reset to baked",
+      "hitboxSelected": "{count} hitboxes selected",
+      "hitboxHint": "Click a hitbox to select it; Ctrl/Shift+click selects several. Use the Move, Rotate, and Scale tools (or the gizmo) to shape them like any other object. Delete removes the selected boxes; Esc leaves edit mode.",
+      "hitboxCap": "Hitbox limit reached ({max} per asset).",
+      "hitboxSavePreset": "Save as preset",
+      "hitboxClearPreset": "Clear saved preset",
+      "hitboxPresetSaved": "Hitbox preset saved for {name}. New placements copy these boxes.",
+      "hitboxPresetCleared": "Hitbox preset cleared.",
+      "hitboxPresetHint": "Presets live on this device: every future placement of this asset spawns with the saved hitboxes.",
+      "meshBaking": "Baking true collision from the model mesh...",
+      "meshBakeDone": "True collision ready ({count} boxes).",
+      "meshBakeFailed": "Could not bake true collision for this asset.",
+      "meshReady": "True collision active: a dense box set hugging the real model mesh.",
+      "meshHint": "True collision rebuilds the hitboxes from the actual model mesh (many small boxes). Expensive - keep it for edge cases; it bakes once per asset when selected.",
+      "collisionCopyAll": "Copy collision to all {name} ({count})",
+      "collisionCopyAllHint": "Gives every other {name} on the map the same collision type and shape, sized to each copy so a small one never gets a giant footprint.",
+      "collisionCopyConfirmTitle": "Copy collision to all {name}?",
+      "collisionCopyConfirmBody": "All {count} other {name} on the map take this collision type and shape, each sized to its own scale (a small copy gets a small footprint, never this one), replacing their own. Ctrl+Z reverts the whole copy.",
+      "collisionCopyConfirm": "Copy to all",
+      "collisionCopied": "Copied collision to {count} {name}.",
+      "scaleAllTitle": "Scale all copies",
+      "scaleMin": "Scale min",
+      "scaleMax": "Scale max",
+      "scaleAllButton": "Scale all {name} ({count})",
+      "scaleAllHint": "Rolls a random scale between min and max onto every copy of this asset (set min and max equal for a uniform scale).",
+      "scaleAllConfirmTitle": "Scale all {name}?",
+      "scaleAllConfirmBody": "Every one of the {count} {name} on the map (this one included) gets a random scale between {min} and {max}, replacing its current scale. Ctrl+Z reverts it.",
+      "scaleAllConfirm": "Scale all",
+      "scaleAllDone": "Scaled {count} {name}.",
       "duplicate": "Duplicate",
       "delete": "Delete",
+      "pieces": "Edit pieces ({count})",
+      "piecesHint": "Splits this Blender-built building into its kit pieces and shell, each its own placement to move, rotate, scale or delete. Ctrl+Z puts the building back together.",
+      "piecesDone": "Split into {count} pieces.",
+      "piecesCap": "Not enough placement room to split this building.",
+      "combine": "Combine ({count})",
+      "combineHint": "Joins the selection into one object. The pieces of a split building become the building again; anything else is grouped, so it picks, drags and deletes as one.",
+      "combineRejoined": "Joined back into {name}.",
+      "combineGrouped": "Grouped {count} placements.",
+      "combineNeedsTwo": "Select at least two placements to combine.",
+      "ungroup": "Ungroup ({count})",
+      "ungroupDone": "Ungrouped {count} placements.",
       "deleteHint": "Delete removes the selection; Ctrl+Z restores it.",
       "moveHint": "Move: drag the asset along the ground in the 3D view, or nudge it with the arrow keys (0.5 yd, Shift for 2 yd).",
-      "wheelHint": "Shift+scroll rotates the asset, Alt+scroll scales it, Ctrl+D duplicates it."
+      "wheelHint": "Shift+scroll rotates the asset, Alt+scroll scales it, Ctrl+C copies, and Ctrl+V pastes. Ctrl+D duplicates it in place."
+    },
+    "transform": {
+      "moveHint": "Drag a gizmo arrow to move along that axis, or the yellow square to move freely. Arrow keys nudge.",
+      "rotateHint": "Drag a gizmo ring to rotate around that axis. Shift+scroll also rotates in 15 degree steps.",
+      "scaleHint": "Drag a gizmo axis handle to stretch that axis, or the yellow center cube to scale uniformly.",
+      "pickHint": "Click an asset to select it; the gizmo appears on the selection."
     },
     "marker": {
       "title": "Marker",
@@ -9442,13 +12858,47 @@ export const en_CA: EnTranslations = {
       "searchPlaceholder": "Search assets...",
       "empty": "No matching assets.",
       "uploadedTab": "Uploaded",
+      "importedTab": "Imported",
+      "importedEmpty": "No imported models this session. Use Import Model to load a .glb or .gltf from this computer.",
+      "removeImported": "Remove imported model (this session only)",
       "uploadedEmpty": "No uploaded assets yet. Use Upload Asset to add a GLB model (up to 8 MiB).",
       "uploadedSignIn": "Sign in from the game to upload and place your own GLB models.",
       "uploadedLoadFailed": "Could not load your uploaded assets.",
       "deleteAsset": "Delete uploaded asset",
       "deleteAssetConfirm": "Delete the uploaded asset \"{name}\"? Maps that use it lose the model.",
       "pick": "Place {name}",
+      "collisionMaster": "Collision Master: author this asset’s default collision",
       "categoryTab": "{category} ({count})",
+      "resizeHandle": "Drag to resize the asset browser",
+      "allTab": "All ({count})",
+      "favouritesTab": "Favourites ({count})",
+      "recentsTab": "Recent",
+      "favouritesEmpty": "No favourites yet. Click the star on any asset to keep it here.",
+      "recentsEmpty": "Nothing placed yet in this browser. Assets you place appear here.",
+      "favouriteAdd": "Add {name} to favourites",
+      "favouriteRemove": "Remove {name} from favourites",
+      "subcategoryAll": "All ({count})",
+      "subcategoryTab": "{name} ({count})",
+      "collision": {
+        "baked": "Collision: baked boxes (auto-generated shape)",
+        "authored": "Collision: authored in Collision Master",
+        "none": "Collision: none, placements block only by their soft circle, if any"
+      },
+      "subcategory": {
+        "buildings": "Buildings",
+        "props": "Props",
+        "nature": "Nature",
+        "environment": "Environment",
+        "structure": "Structure",
+        "furniture": "Furniture",
+        "containers": "Containers",
+        "lighting": "Lighting",
+        "decor": "Decor",
+        "other": "Other",
+        "enemies": "Enemies",
+        "players": "Players",
+        "modular": "Modular"
+      },
       "category": {
         "biome": "Biome",
         "chars": "Characters",
@@ -9462,6 +12912,113 @@ export const en_CA: EnTranslations = {
         "weapons": "Weapons"
       }
     },
+    "collisionMaster": {
+      "title": "Collision Master",
+      "mapName": "Collision Master: {name}",
+      "assetLabel": "Authoring default collision for {name}.",
+      "hint": "Build this asset’s collision with the Selection panel below: pick the collision type, edit boxes with the gizmo (move / rotate / scale), add or delete boxes. Lock In saves it to the project as the asset’s default everywhere.",
+      "fromBake": "From bake",
+      "fromBakeTitle": "Start from the asset’s auto-baked voxel boxes",
+      "fittedBox": "Fitted box",
+      "fittedBoxTitle": "Start from one box fitted around the whole asset",
+      "singleBox": "Single box",
+      "singleBoxTitle": "Start from one plain box at the asset’s base",
+      "fromCylinder": "Start from cylinder",
+      "fromCylinderTitle": "Start from one editable cylinder around the asset base",
+      "fromClear": "Start from clear",
+      "fromClearTitle": "Remove every collision shape and begin with an empty scene",
+      "polySnap": "Poly snap brush",
+      "polySnapHint": "Drag across the model’s surface to lay a collision plane that hugs the geometry: the drag start/end set its length and yaw, the sampled heights its vertical band. Great for walls, roofs, and ramps.",
+      "devOnly": "Lock In writes to the project files, so it needs the local dev server (npm run dev).",
+      "lockIn": "Lock In",
+      "lockInTitle": "Save as this asset’s default collision (writes to the project) and return to your map",
+      "cancel": "Back to map",
+      "catalogOnly": "Collision Master works on catalogue assets. Imported models keep their import bake.",
+      "adopted": "Updated {count} placement(s) already in this map to use the collision you just authored.",
+      "copyEmpty": "No collision volumes to copy.",
+      "copied": "Copied {n} collision volume(s), paste with Ctrl+V (works across assets).",
+      "pasted": "Pasted {n} collision volume(s).",
+      "saveFailed": "Could not save your map before opening Collision Master.",
+      "stashOnly": "Browser storage is blocked, so the map is held in memory: you will return to it from Collision Master, but export it if you want a durable copy.",
+      "noBoxes": "No collision boxes to lock in. Add at least one box, or pick Basic/None.",
+      "meshUnsupported": "True Mesh is a per-map bake and cannot be a project default. Pick Baked, Basic, or None.",
+      "saveEndpointFailed": "Saving the default failed: {error}",
+      "saveUnreachable": "Could not reach the save endpoint (is the dev server running?). Your collision was downloaded as a file so nothing is lost; start \"npm run dev\" and Lock In again, or merge the file into data/asset_collision_overrides.json.",
+      "locked": "Locked in: {name} now uses this collision everywhere.",
+      "presetPromptTitle": "Save as preset too?",
+      "presetPromptBody": "Lock In already made this the default collision for {name} across the whole project, and every copy in your map now uses it. A preset goes one step further on this device only: each NEW placement of {name} spawns carrying these boxes as its own editable hitboxes, so you can tweak them per copy with Edit Hitboxes. Not needed for the collision to work.",
+      "presetPromptYes": "Save preset",
+      "presetPromptNo": "No thanks",
+      "presetPromptDontAsk": "Don't ask again (turn it back on under More > \"Ask about presets on Lock In\")",
+      "barLabel": "Collision modeling tools",
+      "modeObject": "Object",
+      "modeObjectTitle": "Object mode (Tab): move / rotate / scale whole volumes with the gizmo",
+      "modeVertex": "Vertex",
+      "modeVertexTitle": "Vertex select (Z): click a vertex and the gizmo moves ONLY that vertex; Ctrl+drag lassos several",
+      "modeEdge": "Edge",
+      "modeEdgeTitle": "Edge select (V): click an edge and the gizmo moves / rotates / scales its two vertices",
+      "modeFace": "Face",
+      "modeFaceTitle": "Face select (C): click a face and the gizmo moves / rotates / scales that face locally",
+      "addMenu": "Add",
+      "addMenuTitle": "Add a collision primitive: real triangulated solids (a cylinder is a true cylinder mesh)",
+      "primBox": "Box",
+      "primPlane": "Plane",
+      "primCylinder": "Cylinder",
+      "primSphere": "Sphere",
+      "primWedge": "Ramp",
+      "primTitle": "Add a {name} primitive to the collision set",
+      "polySnapShort": "Poly Snap",
+      "polyBuildShort": "Poly Build",
+      "polyBuildHint": "Poly Build: click-drag a face of the model to extrude it outward and hand-build shapes. Toggle off to orbit/select again.",
+      "polyBuildFail": "This model is at its detail limit, cannot extrude any further.",
+      "sculptTitle": "Dynamic mesh sculpt brush",
+      "sculptSettings": "Sculpt settings",
+      "sculptOff": "Sculpt: Off",
+      "sculptGrab": "Sculpt: Grab",
+      "sculptInflate": "Sculpt: Inflate",
+      "sculptDeflate": "Sculpt: Deflate",
+      "sculptSmooth": "Sculpt: Smooth",
+      "sculptPinch": "Sculpt: Pinch",
+      "sculptCrease": "Sculpt: Crease",
+      "sculptRelax": "Sculpt: Relax",
+      "sculptRadius": "Radius",
+      "sculptStrength": "Strength",
+      "sculptDetail": "Detail",
+      "dyntopo": "Dyntopo",
+      "dyntopoTitle": "Dynamic topology locally splits long edges and safely collapses short edges around the sculpt brush.",
+      "symmetry": "Symmetry",
+      "symmetryHint": "Mirror each sculpt stroke across the selected local X, Y, and Z axes.",
+      "loopCut": "Loop Cut",
+      "loopCutTitle": "Insert an edge loop: in Edge mode, pick an edge, then Loop Cut adds a parallel ring of edges around the shape (drag the new loop to slide it).",
+      "loopCutFail": "Pick a box edge in Edge mode first, loop cut needs a quad edge (not a cap/sphere).",
+      "weld": "Weld",
+      "weldTitle": "Merge the selected vertices at their center.",
+      "subdivide": "Subdivide",
+      "subdivideTitle": "Split every triangle into four shared-edge triangles for more modeling detail.",
+      "inset": "Inset",
+      "insetTitle": "Inset the selected face and create a connected border ring.",
+      "fill": "Fill",
+      "fillTitle": "Fill three or more selected boundary vertices with a new face.",
+      "mirror": "Mirror X",
+      "mirrorTitle": "Append a mirrored copy of the selected volume across its local X axis.",
+      "topologyFail": "That topology operation cannot be applied to the current selection.",
+      "rampToggle": "Walkable",
+      "rampToggleTitle": "Walkable ramp: the selected volume raises the walkable ground along its slope (the player walks up it) instead of blocking. Ramp primitives start walkable.",
+      "duplicate": "Dup",
+      "duplicateTitle": "Duplicate the selected boxes",
+      "delete": "Del",
+      "deleteTitle": "Delete the selected boxes",
+      "openFromSelection": "Collision Master",
+      "openFromSelectionTitle": "Author this asset’s DEFAULT collision in the Collision Master scene (saves to the project; your map auto-saves and you return here)",
+      "heroTitle": "Collision Master",
+      "heroStatus": "Asset collision: {mode}"
+    },
+    "importModel": {
+      "notModel": "Pick a .glb or .gltf file.",
+      "tooLarge": "That file is over the 64 MiB import limit.",
+      "imported": "Imported \"{name}\". It is kept for this session; re-import it after a reload.",
+      "failed": "Could not read that model file."
+    },
     "upload": {
       "notGlb": "Pick a .glb file.",
       "tooLarge": "That file is over the 8 MiB limit.",
@@ -9473,15 +13030,21 @@ export const en_CA: EnTranslations = {
     "openDrawer": {
       "title": "Open Map",
       "close": "Close",
+      "tabShipped": "Shipped Maps",
       "tabLocal": "This Browser",
       "tabMine": "My Server Maps",
       "tabPublic": "Public Maps",
       "colName": "Name",
+      "colType": "Type",
       "colUpdated": "Updated",
       "colStatus": "Status",
       "statusPublic": "Public",
       "statusPrivate": "Private",
       "open": "Open",
+      "openCopy": "Open Copy",
+      "typePublished": "Published to Game ({slug})",
+      "typeShippedPublished": "{group} · your published version",
+      "publishedUnreadable": "Could not read the published map \"{slug}\" from the dev server.",
       "fork": "Fork",
       "publish": "Publish",
       "unpublish": "Unpublish",
@@ -9504,24 +13067,43 @@ export const en_CA: EnTranslations = {
       "savedServer": "Saved \"{name}\" to the server (v{version}).",
       "savedLocalOnly": "Saved \"{name}\" to this browser. Sign in to save online.",
       "saveFailedLocal": "Local save failed (storage blocked).",
+      "openFailedLocal": "That save could not be read (corrupt or truncated). Its file may still import via More > Import if you exported a copy.",
       "opened": "Opened \"{name}\".",
+      "waterReapplied": "Water rebuilt from the current terrain.",
+      "shippedMapOpened": "Opened an editable copy of \"{name}\".",
+      "publishedMapOpened": "Opened your published \"{name}\": this is the version the game ships for that map.",
       "imported": "Imported \"{name}\".",
-      "importFailed": "Import cancelled, or the file is not a valid map.",
+      "importFailed": "That file is not a valid map. If you exported a bundle, import the .wocmap.zip.",
+      "importMissingDeps": "{count} model/texture/skybox file(s) are missing, so parts of the map are blank. Re-import the .wocmap.zip bundle to include them.",
       "exported": "Downloaded \"{name}\".",
+      "bundleExported": "Exported \"{name}\" with its models, textures, and skybox. Import the .wocmap.zip (not a loose .json) on the other computer.",
+      "exportBlockedMissingDeps": "Export blocked: {count} referenced model, texture, or skybox file(s) are missing from this browser. Restore them before exporting so the engine receives a complete map.",
+      "exportBlockedInvalid": "Export blocked because the map did not pass the engine compatibility check. Save a copy and review the latest edits before trying again.",
       "newMap": "New map started from the built-in world.",
+      "newFlatMap": "Blank map started.",
       "forked": "Forked to \"{name}\". You are editing your own copy now.",
       "published": "Map published. Anyone can now find and fork it.",
       "unpublished": "Map unpublished.",
       "deleted": "Map deleted.",
       "assetPlacedFirst": "Pick an asset in the browser first.",
       "loading3d": "Loading the world...",
+      "loading3dAssets": "Loading assets...",
+      "loading3dEngine": "Starting the engine...",
+      "loading3dZone": "Building the world...",
       "playtestLaunch": "Launching playtest...",
       "playtestFailed": "Could not start the playtest (storage blocked).",
       "draftSaved": "Draft autosaved.",
       "draftRestored": "Restored the autosaved draft.",
       "autosaveFailed": "Autosave failed (browser storage is full or blocked). Export the map to keep a backup.",
       "terrainCapReached": "Terrain edit limit reached ({max}). Extra sculpt stamps were not added.",
+      "caveCapReached": "Cave limit reached ({max}). Delete or undo a cave first.",
+      "holeCapReached": "Hole limit reached ({max}). Delete or undo a hole first.",
       "placementCapReached": "Placement limit reached ({max}). Extra assets were not added.",
+      "entityCapReached": "The map entity limit was reached. Some copied NPCs or mobs were not pasted.",
+      "selectionCopied": "Copied {count} selected item(s).",
+      "selectionPasted": "Pasted {count} item(s).",
+      "selectionNothingToCopy": "Select an asset, NPC, or mob before copying.",
+      "selectionNothingToPaste": "Copy an asset, NPC, or mob before pasting.",
       "blockerCapReached": "Blocker wall limit reached ({max}). The new wall was not added.",
       "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Autosave turned off: {reason} Save manually, then turn it back on."
@@ -9539,6 +13121,17 @@ export const en_CA: EnTranslations = {
     "prompt": {
       "saveAsTitle": "Save As",
       "nameLabel": "New map name"
+    },
+    "newMap": {
+      "title": "New Map",
+      "hint": "Pick a preset or set the size in yards. The map is bounded: terrain rim walls and invisible perimeter blockers keep playtest inside it.",
+      "width": "Width (yards)",
+      "height": "Height (yards)",
+      "scale": "Scale multiplier",
+      "interior": "Interior (60 x 60)",
+      "zone": "Zone (240 x 360)",
+      "openWorld": "Open World (360 x 1080)",
+      "create": "Create"
     },
     "serverError": {
       "invalid_map_name": "That map name is not allowed. Use letters, numbers, spaces, apostrophes, or hyphens.",
@@ -9562,8 +13155,170 @@ export const en_CA: EnTranslations = {
       "timeout": "The server took too long to respond. Try again.",
       "unknown": "Something went wrong talking to the server."
     },
+    "lighting": {
+      "title": "Lighting",
+      "presetLabel": "Lighting preset",
+      "day": "Day",
+      "overcast": "Overcast",
+      "dusk": "Dusk",
+      "night": "Night",
+      "customHint": "Custom lighting (edited from a preset).",
+      "sun": "Sun intensity",
+      "ambient": "Ambient intensity",
+      "environment": "Sky ambience",
+      "azimuth": "Sun direction",
+      "elevation": "Sun height",
+      "nightFloor": "Night brightness",
+      "nightFloorHint": "How much daylight the deepest night keeps. 0 is the shipped night; around 0.35 stays readable and cool instead of murky.",
+      "caveLight": "Cave brightness",
+      "caveLightHint": "How dark carved cave walls go with depth. 0 is the shipped cave dark; around 0.4 keeps a big cavern readable by torchlight.",
+      "sunColor": "Sun color",
+      "skyColor": "Sky tint",
+      "hint": "Map lighting is saved and used by both the editor and playtest.",
+      "skyboxTitle": "Skybox",
+      "skyboxDefault": "Default sky",
+      "skybox_toon_day": "Toon Blue Sky",
+      "skybox_vale_day": "Vale Day HDR",
+      "skybox_marsh_overcast": "Marsh Overcast HDR",
+      "skybox_peaks_dawn": "Peaks Dawn HDR",
+      "skybox_hollow_dusk": "Hollow Dusk HDR",
+      "skybox_amber_sunset": "Amber Sunset HDR",
+      "skybox_ember_storm": "Ember Storm HDR",
+      "skybox_frost_twilight": "Frost Twilight HDR",
+      "skybox_fen_day": "Fen Day HDR",
+      "skybox_night": "Night HDR",
+      "skybox_nightbloom_dream": "Nightbloom Dream HDR",
+      "skybox_wraithwood_gloom": "Wraithwood Gloom HDR",
+      "skybox_vale_backdrop": "Vale Painted Backdrop",
+      "skybox_marsh_backdrop": "Marsh Painted Backdrop",
+      "skybox_peaks_backdrop": "Peaks Painted Backdrop",
+      "skybox_space_galaxy": "Space Galaxy",
+      "skyboxUpload": "Upload skybox...",
+      "skyboxCustomActive": "Custom skybox active.",
+      "skyboxHint": "Pick a bundled sky or upload a panoramic (equirectangular) image. Saved with the map - playtest shows it in-game.",
+      "skyboxImported": "Skybox imported.",
+      "skyboxImportFailed": "Could not import that image.",
+      "skyboxTooLarge": "Skybox image is too large (max 24 MB).",
+      "skyboxMissing": "That skybox is not stored in this browser anymore.",
+      "birdsTitle": "Birds",
+      "birds": "Birds in the sky",
+      "birdCount": "How many",
+      "birdFormation": "Fly in V formation",
+      "worldSpeedTitle": "World Speed",
+      "worldSpeed": "Animation speed",
+      "worldSpeedHint": "Speeds up or slows every ambient motion (water, fire, foliage sway, birds, weather). Cosmetic only; it never changes playtest gameplay or timing.",
+      "worldSpeedReset": "Reset to normal speed",
+      "zoneTitle": "Zone atmosphere",
+      "zoneHint": "Choose a zone, then give it its own lighting, skybox, and ambience speed.",
+      "zoneSelect": "Zone to edit",
+      "zoneReset": "Use map atmosphere"
+    },
+    "music": {
+      "title": "Music",
+      "hint": "Pick the soundtrack for the whole map, or drag boxes to give areas their own track. Playtest switches as you cross them.",
+      "zoneTrack": "Map track",
+      "default": "Auto (biome theme)",
+      "areasTitle": "Music areas",
+      "areaTrack": "Track for new areas",
+      "rowTrack": "Track for this area",
+      "dragHint": "Drag a box on the ground to add an area with the track above. Click an area to select it (Delete removes it). Smaller areas win where they overlap.",
+      "none": "No music areas yet.",
+      "areaN": "Area {num}",
+      "selectArea": "Select this area in the world (its box highlights; Delete removes it)",
+      "removeArea": "Remove this music area",
+      "areaCap": "Music area limit reached ({max}).",
+      "previewZone": "Now playing: {zone}",
+      "previewOff": "Area music stopped.",
+      "previewDisabled": "Music is switched off in Settings.",
+      "track": {
+        "town_eastbrook": "Town: Eastbrook (warm pastoral)",
+        "town_fenbridge": "Town: Fenbridge (old medieval)",
+        "town_highwatch": "Town: Highwatch (brisk march)",
+        "town_goldcrest": "Town: Goldcrest Harbor (trading port)",
+        "vale": "Vale (playful meadow)",
+        "vale_legacy": "Vale legacy (original theme)",
+        "marsh": "Marsh (croaky swamp)",
+        "peaks": "Peaks (heroic folk)",
+        "dungeon_hollow_crypt": "Dungeon: Hollow Crypt (skeletal dance)",
+        "dungeon_sunken_bastion": "Dungeon: Sunken Bastion (flooded fortress)",
+        "dungeon_gravewyrm_sanctum": "Dungeon: Gravewyrm Sanctum (boss route)"
+      }
+    },
+    "weather": {
+      "title": "Weather",
+      "showSnowfall": "Show snowfall",
+      "snowfallHint": "A Studio preview setting, remembered in this browser.",
+      "zoneTitle": "Weather in this zone",
+      "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
+      "auto": "Auto",
+      "clear": "Clear",
+      "rain": "Rain",
+      "snow": "Snow",
+      "blizzard": "Blizzard",
+      "sparkle": "Golden sparkles",
+      "intensity": "Intensity",
+      "cloudCover": "Cloud cover",
+      "cloudHeight": "Cloud height (yd)",
+      "cloudHint": "Low clouds hug the terrain and read as rolling ground fog.",
+      "aurora": "Aurora",
+      "auroraHint": "Curtains hang high over the camera wherever it goes: brightest at night, faint by day.",
+      "scheduleTitle": "Dynamic weather",
+      "scheduleWins": "A schedule is running: it overrides the fixed weather above.",
+      "stepMode": "Weather for this step",
+      "stepMinutes": "Minutes this step lasts",
+      "minutesShort": "min",
+      "removeStep": "Remove this step",
+      "addStep": "Add step",
+      "addStepTitle": "Cycle through the steps in order, each holding for its minutes, then repeat",
+      "scheduleHint": "Steps loop in order (Rain 5 min, then Clear 10 min, ...). Saves with the map and runs in playtest."
+    },
+    "camera": {
+      "title": "Camera",
+      "axisWidget": "Camera axis views",
+      "snapPositiveX": "View from positive X",
+      "snapNegativeX": "View from negative X",
+      "snapPositiveY": "View from above",
+      "snapNegativeY": "View from below",
+      "snapPositiveZ": "View from positive Z",
+      "snapNegativeZ": "View from negative Z",
+      "focus": "Focus selection (.)",
+      "focusTitle": "Move the orbit pivot onto the selected object so the camera revolves around it; with nothing selected, frame the whole map",
+      "freeFly": "Free-Fly (Shift+F)",
+      "freeFlyHint": "WASD moves, Q/E goes up and down, dragging looks around like first person, and the wheel sets the speed.",
+      "invertPan": "Invert camera",
+      "showBoundary": "Show map boundary walls",
+      "showPlayer": "Show playtest player",
+      "wireframe": "Wireframe mode",
+      "xray": "Transparent X-ray mode",
+      "speedTitle": "Movement speeds",
+      "moveSpeed": "WASD move speed",
+      "lookSpeed": "Mouse look speed",
+      "panSpeed": "Pan speed",
+      "speedHint": "How fast the viewport camera flies, looks, and pans. Editor only. In Free-Fly the mouse wheel is the throttle: it changes this move speed instead of zooming.",
+      "flySpeedSet": "Fly speed {value}x",
+      "resetSpeeds": "Reset speeds",
+      "perfTitle": "Performance overlay",
+      "perfShow": "Show overlay in the viewport",
+      "perfHint": "A live readout pinned to the viewport corner while you edit.",
+      "perfFps": "FPS",
+      "perfFrameMs": "Frame time (ms)",
+      "perfAssets": "Placed assets",
+      "perfTris": "Scene polygons",
+      "perfSelTris": "Selected polygons",
+      "perfTerrain": "Terrain edits",
+      "perfStreaming": "Terrain streaming",
+      "perfCoords": "World (x, z)",
+      "assetViewTitle": "Asset view distance",
+      "assetViewDistance": "Placed assets fade out at",
+      "assetViewMax": "As far as the fog",
+      "assetViewHint": "How far placed decor renders before it fades out and stops drawing, to save performance. Lower it to cull distant assets sooner; raise it to see farther. Saved with the map, so playtest matches.",
+      "visibilityTitle": "Terrain visibility",
+      "visibilityDistance": "Visible terrain distance",
+      "loadingHaze": "Loading haze",
+      "visibilityHint": "Original-detail terrain streams near the camera. Haze hides each zone until it is ready. Higher distances use more GPU and memory."
+    },
     "hints": {
-      "nav3d": "Drag to orbit, scroll to zoom. While dragging, WASD flies and Q/E changes height.",
+      "nav3d": "Middle-drag or Alt+drag orbits, Shift+drag pans, scroll zooms (Blender style, works with any tool). While dragging, WASD flies and Q/E changes height.",
       "nav2d": "Drag to pan, scroll to zoom."
     },
     "help": {
@@ -9575,35 +13330,46 @@ export const en_CA: EnTranslations = {
       "beginTutorial": "Begin tutorial",
       "close": "Close",
       "tool": {
-        "select": "Pick placed assets to move, rotate, and scale them; click a 2D marker to edit it.",
-        "raise": "Raise the terrain under the brush.",
+        "select": "Pick placed assets to inspect them; click a 2D marker to edit it.",
+        "move": "Move the selected asset with the 3-axis gizmo arrows.",
+        "rotate": "Rotate the selected asset with the gizmo rings.",
+        "scale": "Scale the selected asset with the gizmo handles, per axis or uniformly.",
+        "raise": "Raise or lower the terrain under the brush (checkbox flips the direction).",
         "lower": "Lower the terrain under the brush.",
         "smooth": "Smooth bumps toward the local average height.",
-        "flatten": "Level the ground to the height where the drag starts.",
+        "flatten": "Level the ground to the drag-start height, or smooth bumps (checkbox picks the mode).",
+        "slope": "Right-click to set the start height, then drag from another height to lay a smooth ramp.",
+        "pond": "Click to dig a local pond with its own water surface.",
         "paint": "Paint biome ground cover over the zone default.",
         "water": "Set a declared lake's water level.",
         "place": "Place catalog or uploaded assets on the ground.",
+        "foliage": "Brush-paint grass, bushes, trees, and rocks with size variation.",
+        "clutter": "Brush-paint ground clutter (broken tiles, pebbles, letters, leaves) that renders on High graphics and up.",
+        "meshfix": "Remove stretched leftover terrain polys around a cut or cave mouth, or restore them. Wireframe turns on while the tool is active.",
+        "tree": "Grow a fully customizable tree: trunk, branches, canopy volumes and leaves.",
         "blocker": "Drag invisible walls that block movement in playtest.",
+        "collider": "Drop box, sphere, or floor-plane collision volumes, invisible in playtest.",
         "camp": "Add and edit mob camps that spawn in playtest.",
         "spawn": "Set where playtest drops the player.",
         "region": "Box-select terrain and assets to copy and paste.",
-        "erase": "Remove placed assets or sculpt stamps under the cursor."
+        "erase": "Remove placed assets or blocker walls under the cursor."
       },
       "key": {
-        "tools": "Every tool has a single-letter shortcut, shown on its button in the tool rail.",
+        "tools": "Select, Move, Rotate and Scale use the number keys 1-4, shown in the top bar. X deletes selected assets; grouped authoring tools open from the left rail.",
         "brush": "[ and ] resize the brush; Shift+[ and Shift+] change its strength.",
         "undo": "Ctrl+Z undoes the last change; Ctrl+Y or Ctrl+Shift+Z redoes it.",
         "save": "Ctrl+S saves the map.",
-        "duplicate": "Ctrl+D duplicates the selected asset.",
+        "duplicate": "Ctrl+C copies selected assets, NPCs, or mobs; Ctrl+V pastes the group. Ctrl+D duplicates assets in place, and Shift+D duplicates them into a grab.",
+        "multiSelect": "Shift+click adds or removes assets. In the NPC and Mob tool, Ctrl+click selects multiple entities.",
         "nudge": "Arrow keys nudge the selected asset by 0.5 yards; hold Shift for 2 yards.",
         "wheel": "Shift+scroll rotates the selected asset; Alt+scroll scales it.",
         "delete": "Delete removes the selected asset or camp.",
         "escape": "Esc clears the selection first, then returns to the Select tool."
       },
       "mouse": {
-        "orbit3d": "3D view: drag to orbit and scroll to zoom; middle-drag or Shift+drag pans.",
+        "orbit3d": "3D view: middle-drag or Alt+drag orbits, Shift+drag pans, scroll zooms; navigation works with any tool active (Blender style; Invert pan flips the pan direction).",
         "fly3d": "While holding a drag in 3D, WASD flies the camera and Q/E changes height.",
-        "move": "With Select active, drag a placed asset to move it across the ground.",
+        "move": "With Move, Rotate, or Scale active, drag the gizmo handles to transform along an axis.",
         "pan2d": "2D view: drag to pan and scroll to zoom."
       },
       "flow": {
@@ -9621,12 +13387,12 @@ export const en_CA: EnTranslations = {
       "counter": "Step {current} of {total}",
       "steps": {
         "toolbar": {
-          "title": "The tool rail",
-          "body": "Every editing tool lives here: sculpting brushes, biome paint, water, asset placement, camps, and more. Each one has a single-key shortcut, shown in its corner."
+          "title": "Tool groups",
+          "body": "Terrain, asset, world, and effects tools are grouped here. Select, Move, Rotate, and Scale stay in the top bar with number shortcuts 1-4."
         },
         "stage": {
           "title": "The world",
-          "body": "This is your map, rendered with the real game engine. Drag to orbit, scroll to zoom, and middle-drag or Shift+drag to pan. Click the ground with a tool to edit."
+          "body": "This is your map, rendered with the real game engine. Middle-drag or Alt+drag orbits, Shift+drag pans, and scroll zooms, with any tool active. Click the ground with a tool to edit."
         },
         "inspector": {
           "title": "Tool options",
@@ -9654,6 +13420,54 @@ export const en_CA: EnTranslations = {
       "stage": "Map viewport",
       "toasts": "Editor notifications",
       "dialog": "Editor dialog"
+    },
+    "dungeon": {
+      "title": "Dungeon layout",
+      "collapse": "Fold",
+      "expand": "Expand",
+      "exit": "Back to map",
+      "hint": "Click selects (again cycles overlaps). Drag moves. Arrows nudge, Delete removes, Ctrl+Z undoes. Shift-drag pans, middle-drag orbits.",
+      "none": "Nothing selected. Click an outline on the floor plan.",
+      "addRoom": "Add room",
+      "addDoor": "Add door",
+      "addBarrier": "Add barrier",
+      "addOpening": "Add opening",
+      "addDecor": "Add decor",
+      "delete": "Delete",
+      "validate": "Validate",
+      "save": "Save to source",
+      "saved": "Layout written to src/sim/dungeon_layout.ts (dev server)",
+      "saveFailed": "Dev save endpoint unavailable; downloaded the layout instead",
+      "unsaved": "Unsaved layout changes",
+      "noIssues": "No issues found",
+      "kind": {
+        "room": "Room",
+        "door": "Door",
+        "barrier": "Barrier",
+        "opening": "Visual opening",
+        "decor": "Decor",
+        "dais": "Boss dais"
+      },
+      "field": {
+        "id": "Id",
+        "key": "Model",
+        "style": "Style",
+        "x0": "West edge (x0)",
+        "x1": "East edge (x1)",
+        "z0": "Near edge (z0)",
+        "z1": "Far edge (z1)",
+        "x": "X",
+        "z": "Z",
+        "y": "Height offset",
+        "yaw": "Yaw (radians)",
+        "hw": "Half width",
+        "hd": "Half depth",
+        "r": "Collision radius",
+        "scale": "Scale",
+        "scaleX": "Scale X",
+        "scaleZ": "Scale Z",
+        "innerScale": "Inner scale"
+      }
     }
   },
   "skinEvent": {
@@ -9717,14 +13531,7 @@ export const en_CA: EnTranslations = {
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "discordLabel": "Join the Discord",
-    "levyStreet": "Levy Street",
-    "guidesLabel": "Player guides",
-    "guideFree": "Free MMORPGs",
-    "guideGamesLikeWow": "Games like WoW",
-    "guideBest": "Best MMORPGs",
-    "guideNew": "New MMORPGs",
-    "guideBrowser": "Browser MMORPGs",
-    "guideGamesLikeDiablo": "Games like Diablo"
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Loading language...",
@@ -9777,6 +13584,8 @@ export const en_CA: EnTranslations = {
     "serverOffline": "Offline",
     "play": "Play",
     "playAria": "Play World of ClaudeCraft",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Choose your world",
     "serverAria": "Select world: Online or Offline",
     "serverOfflineSub": "Instant local world"
@@ -9804,10 +13613,174 @@ export const en_CA: EnTranslations = {
     "realm": "World",
     "newCharacter": "New Character",
     "appearance": "Appearance",
+    "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Customize",
     "body": "Body",
     "genderMale": "Male",
     "genderFemale": "Female",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "Swept",
+        "long": "Long",
+        "mohawk": "Mohawk",
+        "quiff": "Cropped Quiff",
+        "undercut": "Undercut",
+        "topknot": "Topknot",
+        "shoulder": "Shoulder Length",
+        "bald": "Bald",
+        "waves": "Waves",
+        "ponytail": "High Ponytail",
+        "braid": "Braid",
+        "bob": "Bob",
+        "crown": "Braided Crown",
+        "twins": "Twin Braids",
+        "curls": "Curly Updo"
+      },
+      "beard": {
+        "none": "Clean Shaven",
+        "moustache": "Moustache",
+        "handlebar": "Handlebar",
+        "goatee": "Goatee",
+        "chin": "Chin Beard",
+        "boxed": "Boxed Beard",
+        "long": "Long Beard",
+        "chops": "Mutton Chops",
+        "chinstrap": "Chinstrap"
+      },
+      "nose": {
+        "default": "Classic",
+        "broad": "Broad",
+        "aquiline": "Aquiline",
+        "button": "Button",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "Classic",
+        "full": "Full",
+        "smirk": "Smirk",
+        "relaxed": "Relaxed",
+        "cupids_bow": "Cupid's Bow",
+        "narrow": "Narrow",
+        "thin": "Thin",
+        "rounded": "Rounded"
+      },
+      "brows": {
+        "default": "Classic",
+        "slim": "Slim",
+        "arched": "Arched",
+        "soft": "Soft",
+        "straight": "Straight",
+        "relaxed": "Relaxed",
+        "soft_arch": "Soft Arch",
+        "rounded": "Rounded"
+      },
+      "ears": {
+        "default": "Classic",
+        "large": "Large",
+        "pointed": "Pointed",
+        "round": "Round"
+      },
+      "eyes": {
+        "default": "Classic",
+        "almond": "Almond",
+        "hooded": "Hooded"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "Eyes and Brows",
+        "eyeColor": "Eye Color",
+        "hairstyle": "Hairstyle",
+        "facialHair": "Facial Hair",
+        "hairColor": "Hair Color",
+        "browColor": "Eyebrow Color",
+        "piercings": "Piercings"
+      },
+      "section": {
+        "hair": "Hairstyle",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "Brow Shape",
+        "ears": "Ears",
+        "eyes": "Eye Shape"
+      },
+      "slider": {
+        "eyeSpacing": "Eye Spacing",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "Brow Height",
+        "chinWidth": "Chin Width",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "Lobes",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "Nostril",
+        "septum": "Septum",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "Porcelain",
+        "ivory": "Ivory",
+        "rose": "Rose",
+        "peach": "Peach",
+        "fair": "Fair",
+        "beige": "Beige",
+        "sand": "Sand",
+        "honey": "Honey",
+        "olive": "Olive",
+        "caramel": "Caramel",
+        "tan": "Tan",
+        "bronze": "Bronze",
+        "chestnut": "Chestnut",
+        "umber": "Umber",
+        "mahogany": "Mahogany",
+        "ebony": "Ebony"
+      },
+      "eye": {
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "hazel": "Hazel",
+        "amber": "Amber",
+        "green": "Green",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "Violet"
+      },
+      "hairColor": {
+        "platinum": "Platinum",
+        "blonde": "Blonde",
+        "golden": "Golden",
+        "copper": "Copper",
+        "red": "Red",
+        "auburn": "Auburn",
+        "lightBrown": "Light Brown",
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "black": "Black",
+        "silver": "Silver",
+        "white": "White"
+      },
+      "matchHair": "Match Hair",
+      "resetDefault": "Reset to Default",
+      "customColorAria": "Pick a custom color",
+      "customSkinAria": "Pick a custom skin tone"
+    },
     "hair": "Hair",
     "brows": "Eyebrows",
     "skinTone": "Skin Tone",
@@ -11165,6 +15138,10 @@ export const en_CA: EnTranslations = {
     "selectClass": "Please select a class.",
     "pickClass": "Pick a class.",
     "returnToLogin": "Return to Login",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Too many attempts. Wait a minute and try again.",
       "usernameShape": "Username must be 3-24 characters and use letters, digits, or underscore.",
@@ -11275,6 +15252,9 @@ export const en_CA: EnTranslations = {
   "character": {
     "loading": "Loading...",
     "noneYet": "No characters yet. Create one below.",
+    "membershipRequired": "Renew your membership to play this character.",
+    "membershipSlots": "Unlock slots with a membership",
+    "emptySlot": "Available character slot",
     "levelClass": "Level {level} {className}",
     "inWorld": "in world",
     "takeOver": "Take Over",
@@ -11284,6 +15264,7 @@ export const en_CA: EnTranslations = {
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "This will disconnect this character from another session and bring it here. Continue?",
     "renameRequired": "rename required",
     "delete": "Delete",
@@ -11392,6 +15373,17 @@ export const en_CA: EnTranslations = {
     "androidOpenStep": "Open World of ClaudeCraft from the new icon.",
     "otherStandaloneDetail": "Keep your device in landscape fullscreen.",
     "otherInstallDetail": "Install or add this page to your Home screen for the best fullscreen mobile experience."
+  },
+  "graphicsPrompt": {
+    "title": "Choose Your Graphics",
+    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
+    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
+    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
+    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
+    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
+    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
+    "changeLater": "You can change this any time in Options, under Graphics Quality.",
+    "confirm": "Continue"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - World Unavailable",
@@ -11868,6 +15860,7 @@ export const en_CA: EnTranslations = {
       "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "You feel rested and whole again.",
       "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
+      "moonbridgeBanner": "The Moonbridge Rises",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
       "playerNotNearby": "That player is not nearby.",
@@ -12039,6 +16032,7 @@ export const en_CA: EnTranslations = {
       "passive": "Passive",
       "defensive": "Defensive",
       "aggressive": "Aggressive",
+      "assist": "Assist",
       "petAttackTitle": "Pet Attack",
       "petAttackDesc": "Command your pet to attack your current hostile target.",
       "waterJetTitle": "Water Jet",
@@ -12052,10 +16046,11 @@ export const en_CA: EnTranslations = {
       "healDemonDesc": "Spend mana to channel healing into your demon over 5 seconds.",
       "healPetDesc": "Click, then click food in your bags to feed your pet, healing it over 5 seconds.",
       "stanceTitle": "Pet Stance",
-      "stanceDesc": "Click to choose Passive, Defensive, or Aggressive.",
+      "stanceDesc": "Click to choose Passive, Defensive, Aggressive, or Assist.",
       "passiveDesc": "Only attacks when you command it.",
       "defensiveDesc": "Attacks enemies that hurt you or your pet.",
       "aggressiveDesc": "Attacks nearby hostile enemies.",
+      "assistDesc": "Attacks only your current target, once you cast an ability on it. Ignores enemies that attack you.",
       "rename": "Rename Pet",
       "revive": "Patch Up",
       "abandon": "Abandon Pet",
@@ -12071,6 +16066,10 @@ export const en_CA: EnTranslations = {
     "social": {
       "title": "Social",
       "friendsTab": "Friends",
+      "friendFirstPage": "First page",
+      "friendNextPage": "Next page",
+      "boundFriend": "Bound friend",
+      "boundFriendLink": "Bound friends are linked by their referral invitation.",
       "guildTab": "Guild",
       "ignoreTab": "Ignore",
       "leaveParty": "Leave Party",
@@ -12181,7 +16180,6 @@ export const en_CA: EnTranslations = {
       "cooldownMinutes": "{minutes}m",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
       "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
-      "moveHint": "Shift-drag to move",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",
@@ -12299,7 +16297,161 @@ export const en_CA: EnTranslations = {
       "hoard_cast_screech": "Deafening Screech",
       "hoard_cast_mimic_bite": "Voracious Bite",
       "hoard_cast_mimic_leap": "Crushing Leap",
-      "hoard_cast_coin_spit": "Cursed Coins"
+      "hoard_cast_coin_spit": "Cursed Coins",
+      "crypt_grave_bolt": "Grave Bolt",
+      "crypt_raise_bones": "Raise Bones",
+      "crypt_murder_call": "Murder Call",
+      "crypt_stone_shriek": "Stone Shriek",
+      "crypt_grave_cleave": "Grave Cleave",
+      "crypt_barrowflame_breath": "Barrowflame Breath",
+      "crypt_tail_lash": "Tail Lash",
+      "crypt_wing_gust": "Wing Gust",
+      "crypt_grave_rupture": "Grave Rupture",
+      "crypt_carrion_eye": "Carrion Eye",
+      "crypt_marrow_crush": "Marrow Crush",
+      "crypt_rimesilk_spit": "Rimesilk Spit",
+      "crypt_gravespark_volley": "Gravespark Volley",
+      "crypt_morthen_rite_wakes": "The Rite Wakes",
+      "crypt_morthen_rise": "Rise of the Gravecaller",
+      "crypt_morthen_proclaim": "Grave Proclamation",
+      "crypt_morthen_descend": "Descent",
+      "crypt_knellwyrm_arrive": "Descending from the Sky",
+      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
+      "crypt_knellwyrm_strafe_run": "Strafing Run",
+      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
+      "crypt_marrow_shovelful": "Shovelful",
+      "crypt_marrow_measure": "Measured for the Grave",
+      "crypt_marrow_burial_toll": "Burial Toll",
+      "crypt_marrow_gravediggers_blow": "Gravedigger's Blow",
+      "crypt_lady_brides_lament": "Bride's Lament",
+      "crypt_lady_frozen_embrace": "Frozen Embrace",
+      "crypt_lady_embrace_hold": "Frozen Embrace",
+      "crypt_lady_bridal_freeze": "Bridal Freeze",
+      "crypt_ilvane_dirge": "Dirge of the Hollow",
+      "crypt_ilvane_unbroken_dirge": "Unbroken Verse",
+      "crypt_ilvane_bone_organ": "Bone Organ",
+      "crypt_morthen_shadow_pulse": "Shadow Pulse",
+      "crypt_morthen_rite_of_the_unquiet": "Rite of the Unquiet",
+      "crypt_morthen_reap_the_unquiet": "Reap the Unquiet",
+      "kituse_crypt_relight_candle": "Relight the Candle",
+      "crypt_knellwyrm_knell_rise": "Burning Knell",
+      "crypt_knellwyrm_knell_mark": "Burning Knell",
+      "crypt_knellwyrm_knell_breath": "Burning Knell",
+      "crypt_knellwyrm_knell_land": "Burning Knell",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "ghost_captain_broadside": "Spectral Broadside",
+      "ghost_captain_anchor": "Cursed Anchor",
+      "ghost_captain_boarding": "Phantom Boarding",
+      "bastion_boathook": "Boathook Drag",
+      "bastion_fog_bank": "Fog Bank",
+      "bastion_brine_column": "Brine Column",
+      "bastion_loose_on_my_mark": "Loose on My Mark",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn",
+      "bastion_iron_cage": "Iron Cage",
+      "bastion_drowned_anchor_cast": "Drowned Anchor",
+      "bastion_shackle_pair": "Shackle Pair",
+      "bastion_shadowstep": "Shadow Crossing",
+      "bastion_reaping_scythe": "Reaping Scythe",
+      "bastion_veil_rise": "Fog Veil",
+      "bastion_veil_gather": "Gathering Fog",
+      "bastion_vael_rise": "Death Rises",
+      "bastion_vael_sink": "Into the Fog",
+      "bastion_hallowed_brine": "Hallowed Brine",
+      "bastion_rebounding_bulwark": "Rebounding Bulwark",
+      "bastion_tide_sentence": "Sentence of the Tide",
+      "bastion_oath_kneel": "Unbroken Oath",
+      "bastion_oath_vigil": "Unbroken Oath",
+      "temple_lullaby": "Lullaby",
+      "cantor_last_verse": "The Last Verse",
+      "temple_call_the_tide": "Call the Tide",
+      "temple_static_coil": "Static Coil",
+      "temple_snapper_snap": "Snap",
+      "temple_trident_sweep": "Trident Sweep",
+      "temple_sea_song": "Sea-Song",
+      "temple_tidal_slap": "Tidal Slap",
+      "temple_tide_breath": "Freezing Breath",
+      "temple_moonlight_lance": "Moonlight Lance",
+      "temple_prism_flare": "Prism Flare",
+      "temple_resonant_slam": "Resonant Slam",
+      "temple_moonwater_bolt": "Moonwater Bolt",
+      "temple_drowning_aria": "Drowning Aria",
+      "temple_mere_surge": "Mere Surge",
+      "temple_tideglass_fracture": "Tideglass Fracture",
+      "temple_undertow": "Undertow",
+      "temple_lunar_tide": "Lunar Tide",
+      "temple_skewering_trident": "Skewering Trident",
+      "temple_pale_mending": "Pale Mending",
+      "temple_glimmer_venom": "Glimmer Venom",
+      "temple_pearl_slam": "Tidal Wingbeat",
+      "temple_lightning_spit": "Lightning Spit",
+      "temple_crushing_torrent": "Crushing Torrent",
+      "temple_hydra_tsunami": "Tsunami",
+      "temple_ysolei_call": "Moonspawn Call",
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "temple_frostlocked_torrent": "Frostlocked Torrent",
+      "temple_venom_current": "Venom Current",
+      "temple_toxic_rime": "Toxic Rime",
+      "temple_beckoning_moon": "Beckoning Moon",
+      "temple_falling_moon": "Falling Moon",
+      "temple_prism_glare": "Prism Glare",
+      "temple_arcing_spark": "Arcing Spark",
+      "temple_call_of_the_shallows": "Call of the Shallows",
+      "wildheart_ancestral_sap": "Ancestral Sap",
+      "wildheart_plant_totem": "Plant Totem",
+      "wildheart_entangling_lash": "Entangling Lash",
+      "wildheart_saurian_tail_swipe": "Tail Swipe",
+      "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_quarry_mark": "Quarry Mark",
+      "wildheart_war_roar": "War Roar",
+      "wildheart_toad_hex": "Toad Hex",
+      "wildheart_rattling_dread": "Rattling Dread",
+      "wildheart_snaring_tongue": "Snaring Tongue",
+      "wildheart_beast_pit_quake": "Beast Pit Quake",
+      "wildheart_jaguar_heel": "Heel!",
+      "wildheart_gorgebloom_seed_rain": "Seed Rain",
+      "wildheart_gorgebloom_vine_lash": "Vine Lash",
+      "wildheart_gorgebloom_gorge": "Gorge",
+      "wildheart_zulgar_pulse": "Wildheart Pulse",
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "Counterweight Lash",
+      "sanctum_branding_iron": "Branding Iron",
+      "sanctum_rime_breath": "Rime Breath",
+      "kituse_sanctum_topple_brazier": "Topple Brazier",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "Maul Arc",
+      "sanctum_korgath_chain_flail": "Chain Flail",
+      "sanctum_korgath_threshold_charge": "Threshold Charge",
+      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
+      "sanctum_korgath_strain": "Strain",
+      "sanctum_korgath_stomp": "Shuddering Stomp",
+      "sanctum_goadsmith_rerivet": "Re-rivet",
+      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
+      "sanctum_velkhar_shadow_volley": "Shadow Volley",
+      "sanctum_korzul_break_free": "Break Free",
+      "sanctum_korzul_grave_breath": "Grave Breath",
+      "sanctum_korzul_tail_sweep": "Tail Sweep",
+      "sanctum_korzul_grave_inferno": "Grave Inferno",
+      "sanctum_korzul_wing_gale": "Wing Gale",
+      "sanctum_korzul_plunging_fire": "Plunging Fire",
+      "sanctum_korzul_crashing_descent": "Crashing Descent"
     }
   },
   "questUi": {
@@ -12343,6 +16495,8 @@ export const en_CA: EnTranslations = {
       "clueTalkAria": "Ask about the clue: {name}",
       "clueDeliver": "Hand over {count} {item}.",
       "clueDeliverAria": "Hand over {count} {item} to {name}",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
+      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "See {name} for \"{quest}\".",
       "nythraxisDeathlessKingWarning": "The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and the abandoned crypt is the way down.",
       "browseGoods": "Let me browse your goods.",
@@ -12367,6 +16521,8 @@ export const en_CA: EnTranslations = {
       "rewards": "Rewards",
       "xpReward": "{xp} experience",
       "itemReward": "Item reward:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Requires Level {level}"
     },
@@ -12382,6 +16538,7 @@ export const en_CA: EnTranslations = {
       "activeStatus": "Active world quest",
       "expiresIn": "Expires in {time}",
       "mineOre": "Mine copper ore",
+      "mineMaterial": "Mine {name}",
       "recoverObject": "Recover {name}",
       "redirectLeyBeam": "Redirect the ley beam",
       "matchConfections": "Match enchanted confections",
@@ -12729,6 +16886,7 @@ export const en_CA: EnTranslations = {
       "clueCasketOpened": "The casket holds {money} and {items}.",
       "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
       "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
       "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
       "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
@@ -12744,6 +16902,7 @@ export const en_CA: EnTranslations = {
       "incomplete": "That quest is not complete.",
       "giverMissing": "That quest giver is not nearby.",
       "turnInMissing": "That quest turn-in is not nearby.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Too far away.",
       "escortAway": "Your escort is not at their post right now. They will return there shortly."
     }
@@ -12795,7 +16954,9 @@ export const en_CA: EnTranslations = {
       "flask": "Flask",
       "scroll": "Scroll",
       "bag": "Bag",
-      "mount": "Mount"
+      "mount": "Mount",
+      "buddy": "Buddy",
+      "buddyCosmetic": "Buddy cosmetic"
     },
     "stats": {
       "armor": "Armour",
@@ -12811,6 +16972,18 @@ export const en_CA: EnTranslations = {
       "parry": "Parry"
     },
     "tooltip": {
+      "referralFullSet": "Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.",
+      "referralInviter": "the member who invited you",
+      "referralRetained": "Armor stats keep scaling even when you are not in a party with your inviter.",
+      "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
+      "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
+      "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
+      "membershipWeaponAdaptive": "Changes its weapon type, appearance and stats to suit your class and specialization while equipped.",
+      "membershipScaling": "Item level {level}. Always 5 item levels above your character level.",
+      "membershipPerfected": "Perfected: item level {level}.",
+      "membershipFullSet": "Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.",
+      "membershipRequired": "Gear stats and set benefits stop when membership expires and return when you renew.",
+      "membershipDormant": "Inactive: renew your membership to restore gear stats and set benefits.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Currently equipped",
       "ifYouEquip": "If you equip this",
@@ -12818,7 +16991,6 @@ export const en_CA: EnTranslations = {
       "dps": "({dps} damage per second)",
       "armorStat": "{value} Armour",
       "stat": "+{value} {stat}",
-      "warfareMainHandOnly": "Warfare counts only in the main hand.",
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
@@ -12907,7 +17079,8 @@ export const en_CA: EnTranslations = {
       "sellQuantityCancel": "Cancel",
       "sellJunk": "Sell Junk",
       "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunkHint": "Sells every gray item in your bags except quest items.",
+      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
     },
     "market": {
       "title": "The World Market",
@@ -13020,7 +17193,7 @@ export const en_CA: EnTranslations = {
       "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
       "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Sold to {buyer}",
-      "saleOlder": "Plus {count} earlier sales, included in the total.",
+      "saleOlder": "Plus {count} earlier sales not listed.",
       "ordersTab": "Wanted",
       "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
       "ordersListAria": "Open buy orders",
@@ -13111,6 +17284,10 @@ export const en_CA: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "Courier",
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. Each journey takes up to 15 seconds to the bank and up to 15 seconds back, flying faster on longer routes. Choose up to 24 stacks per trip. Returned items overflow full bags, then the courier vanishes until summoned again. Return travel pauses while you are dead or inside an instance. Membership is required to start a new trip."
+      },
       "sport_kick": {
         "name": "Kick",
         "description": "Knock the ball along the ground toward the aim point."
@@ -13167,6 +17344,10 @@ export const en_CA: EnTranslations = {
         "name": "Volley",
         "description": "Rain arrows over an 8-yard area for 3 sec. Enemies in the area take {damage} Physical damage every 0.5 sec. Damage increases with Ranged Attack Power."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Pack Command",
         "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
@@ -13189,19 +17370,19 @@ export const en_CA: EnTranslations = {
       },
       "bloodhook": {
         "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. On arrival, slow the target by 30% for 3 sec. (Fieldcraft signature)"
       },
       "shrapnel_charge": {
         "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "description": "Blast a 10-yard cone in front of you. Your target, or the nearest enemy hit if your target is outside the cone, takes 24 to 30 Physical damage. Every other enemy in the cone takes 7 to 9 and bleeds for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Hitting an enemy grants 1 Hunting Momentum. Direct damage increases with Ranged Attack Power."
       },
       "bloodtrail_assault": {
         "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and triggers 50% more wound damage. While you have no living pet, your Focus also regenerates 100% faster."
       },
       "trailbreak": {
         "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "description": "Leap 25 yards backward and break free of roots and movement slows. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
       },
       "wildheart": {
         "name": "Wildheart",
@@ -13211,9 +17392,25 @@ export const en_CA: EnTranslations = {
         "name": "Shellskin",
         "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
       },
+      "play_dead": {
+        "name": "Play Dead",
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+      },
+      "tactical_camo": {
+        "name": "Tactical Camo",
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+      },
       "frostjaw_trap": {
         "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it bleeds for {damage} Physical damage over 15 sec and is slowed by 50% for 4 sec. Damage increases with Ranged Attack Power. Only one Bear Trap can be active at a time. Placing another replaces it. It can coexist with your Frostjaw Trap."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage."
       },
       "pack_rally": {
         "name": "Pack Rally",
@@ -13329,7 +17526,7 @@ export const en_CA: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Mass Barrier",
-        "description": "Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)"
+        "description": "Shields you and up to 4 nearby allies within 30 yd, each absorbing {damage} damage for 15 sec. (Mage talent)"
       },
       "overload": {
         "name": "Overload",
@@ -13466,7 +17663,7 @@ export const en_CA: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Low Blow",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Finishing move that stuns the target for 2 sec plus 1 sec per combo point (5 combo points: 7 sec)."
       },
       "ambush": {
         "name": "Lurker's Strike",
@@ -13475,7 +17672,7 @@ export const en_CA: EnTranslations = {
       },
       "stealth": {
         "name": "Duskveil",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
+        "description": "Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.",
         "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
@@ -13519,7 +17716,7 @@ export const en_CA: EnTranslations = {
       },
       "vanish": {
         "name": "Smokefade",
-        "description": "Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec."
+        "description": "Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec."
       },
       "instant_poison": {
         "name": "Adder's Bite",
@@ -13752,11 +17949,11 @@ export const en_CA: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "description": "Passive: Gutting Strike and a Shrapnel Charge that hits an enemy each grant 1 Hunting Momentum, up to 3. Momentum lasts until spent or until you leave combat, and each stack increases your movement speed by 15%. At 3 stacks, Woundrend deals 60% more strike damage and consumes the stacks. (Fieldcraft)"
       },
       "fieldcraft_reentry": {
         "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "description": "Passive: With Hunting Momentum, Trailbreak arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
       },
       "wing_clip": {
         "name": "Fettering Slash",
@@ -13768,7 +17965,7 @@ export const en_CA: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Courser's Guise",
-        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze)."
+        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze)."
       },
       "aimed_shot": {
         "name": "Long Draw",
@@ -13824,7 +18021,7 @@ export const en_CA: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)"
+        "description": "Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13832,7 +18029,7 @@ export const en_CA: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "description": "Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13856,7 +18053,7 @@ export const en_CA: EnTranslations = {
       },
       "flame_shock": {
         "name": "Cinder Jolt",
-        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power."
+        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over {duration} sec. The initial hit increases with Spell Power."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Weapon",
@@ -13989,7 +18186,8 @@ export const en_CA: EnTranslations = {
       },
       "healing_touch": {
         "name": "Wildmend",
-        "description": "Heals a friendly target for {damage}."
+        "description": "Heals a friendly target for {damage}.",
+        "specNote_restoration": "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3."
       },
       "mark_of_the_wild": {
         "name": "Wildward",
@@ -14005,9 +18203,9 @@ export const en_CA: EnTranslations = {
         "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
       },
       "rejuvenation": {
-        "name": "Wildbloom",
+        "name": "Sporemending",
         "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom."
+        "specNote_restoration": "Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom."
       },
       "thorns": {
         "name": "Briarguard",
@@ -14019,12 +18217,12 @@ export const en_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
         "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "Menace",
@@ -14043,6 +18241,11 @@ export const en_CA: EnTranslations = {
         "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Gorebite",
         "description": "Finishing move that causes {damage}. Cat Form only.",
@@ -14055,8 +18258,8 @@ export const en_CA: EnTranslations = {
       },
       "regrowth": {
         "name": "Second Bloom",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Heals a friendly target for {damage} and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.",
+        "specNote_restoration": "Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking."
       },
       "barkskin": {
         "name": "Oakhide",
@@ -14093,11 +18296,11 @@ export const en_CA: EnTranslations = {
       },
       "hibernate": {
         "name": "Slumber",
-        "description": "Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it."
+        "description": "Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "dash": {
         "name": "Dash",
-        "description": "Sprint forward, increasing movement speed by 50% for 15 sec. Cat Form only."
+        "description": "Shift into Cat Form if you are not already, then sprint, increasing movement speed by 50% for 15 sec. Usable in any form. Instant, and does not trigger the global cooldown."
       },
       "pounce": {
         "name": "Slinkstrike",
@@ -14121,7 +18324,7 @@ export const en_CA: EnTranslations = {
       },
       "rip": {
         "name": "Bloodrift",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Cat Form only.",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: {damage} total). Cat Form only.",
         "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
@@ -14282,11 +18485,11 @@ export const en_CA: EnTranslations = {
       },
       "cold_blood": {
         "name": "Killer's Calm",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "Mirrored Blades",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 30 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "Red Ribbon",
@@ -14326,7 +18529,8 @@ export const en_CA: EnTranslations = {
       },
       "swiftmend": {
         "name": "Fleetmend",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)",
+        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Moonsurge",
@@ -14342,7 +18546,7 @@ export const en_CA: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Marrowbreak",
-        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage."
       },
       "wildwake": {
         "name": "Wildwake",
@@ -14352,9 +18556,27 @@ export const en_CA: EnTranslations = {
         "name": "Grove Awakening",
         "description": "Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
+      "spore_burst": {
+        "name": "Spore Burst",
+        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
+        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
+        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+      },
+      "natures_boon": {
+        "name": "Nature's Boon",
+        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
+        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
+        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+      },
       "overbloom": {
         "name": "Overbloom",
-        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
+        "description": "Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.",
+        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Summon Emberkin",
@@ -14426,7 +18648,7 @@ export const en_CA: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Iron Resolve",
-        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb {absorbPerRage} damage per rage spent, lasting up to 10 sec. (Protection)"
+        "description": "Grit your teeth and ignore the pain: a shield absorbs damage equal to {damage}% of your maximum health when cast, lasting up to {duration} sec. (Protection)"
       },
       "faultline": {
         "name": "Faultline",
@@ -14698,7 +18920,7 @@ export const en_CA: EnTranslations = {
       },
       "multi_shot": {
         "name": "Splitshot",
-        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)"
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
         "name": "Choirmend",
@@ -14726,7 +18948,7 @@ export const en_CA: EnTranslations = {
       },
       "shadowstep": {
         "name": "Shadeslip",
-        "description": "Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)"
+        "description": "Steps through the shadows to your target, friend or foe, without breaking Duskveil. Stores up to 2 charges. (Rogue talent)"
       },
       "silence": {
         "name": "Hushword",
@@ -14787,7 +19009,7 @@ export const en_CA: EnTranslations = {
       },
       "typhoon": {
         "name": "Typhoon",
-        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
+        "description": "A blast of wind hurls all enemies within 8 yd 15 yd away from you and dazes them, slowing their movement by 50% for 4 sec. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill."
       },
       "voidfeast": {
         "name": "Voidfeast",
@@ -14835,12 +19057,12 @@ export const en_CA: EnTranslations = {
       },
       "rake": {
         "name": "Flense",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.",
+        "description": "Flense the enemy for weapon damage plus {damage} and cause {overTime} bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "Patch Up",
-        "description": "Patch up your companion, restoring {overTime} health over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health."
+        "description": "Restore 10% of your living companion's maximum health every sec for 8 sec. If your companion is dead, revive it with 50% health instead."
       }
     },
     "items": {
@@ -15888,6 +20110,30 @@ export const en_CA: EnTranslations = {
       "fenshadow_maul": {
         "name": "Fenshadow Maul"
       },
+      "foremans_barrowmaul": {
+        "name": "Foreman's Barrowmaul"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrit's Shardpike"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Barrowhide Pauldrons"
+      },
+      "mirestone_stride": {
+        "name": "Mirestone Stride"
+      },
+      "foremans_wage_band": {
+        "name": "Foreman's Wage Band"
+      },
+      "mirelight_locket": {
+        "name": "Mirelight Locket"
+      },
+      "fenwright_grips": {
+        "name": "Fenwright Grips"
+      },
       "wildgrove_cinch": {
         "name": "Wildgrove Cinch"
       },
@@ -16365,6 +20611,9 @@ export const en_CA: EnTranslations = {
       "reins_avian_strider": {
         "name": "Reins of the Viridian Valestrider"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Ignition Key: Goblin Rocket Sled"
       },
@@ -16376,6 +20625,9 @@ export const en_CA: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Roadwarden's Bellstrap: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Bound Reins: Bonebound Rickshaw"
@@ -16937,6 +21189,117 @@ export const en_CA: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Passing Stone"
+      },
+      "whistle_ember_fox": {
+        "name": "Ember Fox Whistle"
+      },
+      "whistle_moss_hare": {
+        "name": "Moss Hare Whistle"
+      },
+      "whistle_frog": {
+        "name": "Frog Whistle"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "Crimson Claw Crab Whistle"
+      },
+      "whistle_golden_sentinel": {
+        "name": "Golden Sentinel Whistle"
+      },
+      "whistle_nightfang": {
+        "name": "Nightfang Whistle"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "Tuskhorn Boar Whistle"
+      },
+      "whistle_emerald_wolf": {
+        "name": "Emerald Wolf Whistle"
+      },
+      "whistle_tiger": {
+        "name": "Tiger Whistle"
+      },
+      "whistle_cate_coin": {
+        "name": "Cate Coin Whistle"
+      },
+      "whistle_alon": {
+        "name": "Alon Whistle"
+      },
+      "whistle_trollface": {
+        "name": "Trollface Whistle"
+      },
+      "whistle_ansem": {
+        "name": "Ansem Whistle"
+      },
+      "whistle_triple_t": {
+        "name": "Triple T Whistle"
+      },
+      "whistle_kekius": {
+        "name": "Kekius Whistle"
+      },
+      "whistle_solbot": {
+        "name": "Solbot Whistle"
+      },
+      "whistle_frostfire": {
+        "name": "Frostfire Whistle"
+      },
+      "whistle_rocky": {
+        "name": "Rocky Whistle"
+      },
+      "whistle_proud_grunt": {
+        "name": "Proud Grunt Whistle"
+      },
+      "whistle_loot_goblin": {
+        "name": "Loot Goblin Whistle"
+      },
+      "whistle_penny_goldspark": {
+        "name": "Penny Goldspark Whistle"
+      },
+      "whistle_stag": {
+        "name": "Stag Whistle"
+      },
+      "whistle_alpaca": {
+        "name": "Alpaca Whistle"
+      },
+      "whistle_horse": {
+        "name": "Horse Whistle"
+      },
+      "whistle_sapling": {
+        "name": "Sapling Whistle"
+      },
+      "whistle_bull": {
+        "name": "Bull Whistle"
+      },
+      "whistle_spider": {
+        "name": "Spider Whistle"
+      },
+      "whistle_raptor": {
+        "name": "Raptor Whistle"
+      },
+      "whistle_skeleton": {
+        "name": "Skeleton Whistle"
+      },
+      "whistle_crystal_lich": {
+        "name": "Crystal Lich Whistle"
+      },
+      "whistle_forgemaw": {
+        "name": "Forgemaw The Molten Whistle"
+      },
+      "whistle_sprites": {
+        "name": "Flicker and Glimmer Whistle"
+      },
+      "whistle_crystal_tide": {
+        "name": "Crystal Tide Whistle"
+      },
+      "whistle_phantom": {
+        "name": "Phantom Whistle"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "Emberfall Phoenix Whistle"
+      },
+      "charm_stag_acorn": {
+        "name": "Acorn Crown Charm"
+      },
+      "charm_stag_gilded": {
+        "name": "Gilded Charm"
       },
       "lastflame_core": {
         "name": "Core of the Last Flame"
@@ -18510,32 +22873,1535 @@ export const en_CA: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Vanguard's Warstaff"
       },
-      "vanguard_feral_staff": {
-        "name": "Vanguard's Feral Staff"
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
       },
-      "vanguard_band_of_might": {
-        "name": "Vanguard's Band of Might"
+      "lychgate_buckler": {
+        "name": "Lychgate Buckler"
       },
-      "vanguard_band_of_precision": {
-        "name": "Vanguard's Band of Precision"
+      "bastion_kite_shield": {
+        "name": "Bastion Kite Shield"
       },
-      "vanguard_band_of_focus": {
-        "name": "Vanguard's Band of Focus"
+      "barrowfield_tower_shield": {
+        "name": "Barrowfield Tower Shield"
       },
-      "vanguard_band_of_mending": {
-        "name": "Vanguard's Band of Mending"
+      "brookwatch_robe": {
+        "name": "Brookwatch Robe"
       },
-      "vanguard_pendant_of_might": {
-        "name": "Vanguard's Pendant of Might"
+      "brookwatch_leggings": {
+        "name": "Brookwatch Leggings"
       },
-      "vanguard_pendant_of_precision": {
-        "name": "Vanguard's Pendant of Precision"
+      "brookwatch_slippers": {
+        "name": "Brookwatch Slippers"
       },
-      "vanguard_pendant_of_focus": {
-        "name": "Vanguard's Pendant of Focus"
+      "brookwatch_hood": {
+        "name": "Brookwatch Hood"
       },
-      "vanguard_pendant_of_mending": {
-        "name": "Vanguard's Pendant of Mending"
+      "brookwatch_gloves": {
+        "name": "Brookwatch Gloves"
+      },
+      "brookwatch_mantle": {
+        "name": "Brookwatch Mantle"
+      },
+      "brookwatch_sash": {
+        "name": "Brookwatch Sash"
+      },
+      "brookwatch_jerkin": {
+        "name": "Brookwatch Jerkin"
+      },
+      "brookwatch_breeches": {
+        "name": "Brookwatch Breeches"
+      },
+      "brookwatch_boots": {
+        "name": "Brookwatch Boots"
+      },
+      "brookwatch_cap": {
+        "name": "Brookwatch Cap"
+      },
+      "brookwatch_grips": {
+        "name": "Brookwatch Grips"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "Brookwatch Shoulderpads"
+      },
+      "brookwatch_belt": {
+        "name": "Brookwatch Belt"
+      },
+      "brookwatch_hauberk": {
+        "name": "Brookwatch Hauberk"
+      },
+      "brookwatch_legguards": {
+        "name": "Brookwatch Legguards"
+      },
+      "brookwatch_sabatons": {
+        "name": "Brookwatch Sabatons"
+      },
+      "brookwatch_helm": {
+        "name": "Brookwatch Helm"
+      },
+      "brookwatch_gauntlets": {
+        "name": "Brookwatch Gauntlets"
+      },
+      "brookwatch_pauldrons": {
+        "name": "Brookwatch Pauldrons"
+      },
+      "brookwatch_girdle": {
+        "name": "Brookwatch Girdle"
+      },
+      "brookwatch_chainmail": {
+        "name": "Brookwatch Chainmail"
+      },
+      "brookwatch_chausses": {
+        "name": "Brookwatch Chausses"
+      },
+      "brookwatch_greaves": {
+        "name": "Brookwatch Greaves"
+      },
+      "brookwatch_coif": {
+        "name": "Brookwatch Coif"
+      },
+      "brookwatch_handguards": {
+        "name": "Brookwatch Handguards"
+      },
+      "brookwatch_spaulders": {
+        "name": "Brookwatch Spaulders"
+      },
+      "brookwatch_cord": {
+        "name": "Brookwatch Cord"
+      },
+      "hedgerow_robe": {
+        "name": "Hedgerow Robe"
+      },
+      "hedgerow_leggings": {
+        "name": "Hedgerow Leggings"
+      },
+      "hedgerow_slippers": {
+        "name": "Hedgerow Slippers"
+      },
+      "hedgerow_hood": {
+        "name": "Hedgerow Hood"
+      },
+      "hedgerow_gloves": {
+        "name": "Hedgerow Gloves"
+      },
+      "hedgerow_mantle": {
+        "name": "Hedgerow Mantle"
+      },
+      "hedgerow_sash": {
+        "name": "Hedgerow Sash"
+      },
+      "hedgerow_jerkin": {
+        "name": "Hedgerow Jerkin"
+      },
+      "hedgerow_breeches": {
+        "name": "Hedgerow Breeches"
+      },
+      "hedgerow_boots": {
+        "name": "Hedgerow Boots"
+      },
+      "hedgerow_cap": {
+        "name": "Hedgerow Cap"
+      },
+      "hedgerow_grips": {
+        "name": "Hedgerow Grips"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "Hedgerow Shoulderpads"
+      },
+      "hedgerow_belt": {
+        "name": "Hedgerow Belt"
+      },
+      "hedgerow_hauberk": {
+        "name": "Hedgerow Hauberk"
+      },
+      "hedgerow_legguards": {
+        "name": "Hedgerow Legguards"
+      },
+      "hedgerow_sabatons": {
+        "name": "Hedgerow Sabatons"
+      },
+      "hedgerow_helm": {
+        "name": "Hedgerow Helm"
+      },
+      "hedgerow_gauntlets": {
+        "name": "Hedgerow Gauntlets"
+      },
+      "hedgerow_pauldrons": {
+        "name": "Hedgerow Pauldrons"
+      },
+      "hedgerow_girdle": {
+        "name": "Hedgerow Girdle"
+      },
+      "hedgerow_chainmail": {
+        "name": "Hedgerow Chainmail"
+      },
+      "hedgerow_chausses": {
+        "name": "Hedgerow Chausses"
+      },
+      "hedgerow_greaves": {
+        "name": "Hedgerow Greaves"
+      },
+      "hedgerow_coif": {
+        "name": "Hedgerow Coif"
+      },
+      "hedgerow_handguards": {
+        "name": "Hedgerow Handguards"
+      },
+      "hedgerow_spaulders": {
+        "name": "Hedgerow Spaulders"
+      },
+      "hedgerow_cord": {
+        "name": "Hedgerow Cord"
+      },
+      "bogwalker_robe": {
+        "name": "Bogwalker Robe"
+      },
+      "bogwalker_leggings": {
+        "name": "Bogwalker Leggings"
+      },
+      "bogwalker_slippers": {
+        "name": "Bogwalker Slippers"
+      },
+      "bogwalker_hood": {
+        "name": "Bogwalker Hood"
+      },
+      "bogwalker_gloves": {
+        "name": "Bogwalker Gloves"
+      },
+      "bogwalker_mantle": {
+        "name": "Bogwalker Mantle"
+      },
+      "bogwalker_sash": {
+        "name": "Bogwalker Sash"
+      },
+      "bogwalker_jerkin": {
+        "name": "Bogwalker Jerkin"
+      },
+      "bogwalker_breeches": {
+        "name": "Bogwalker Breeches"
+      },
+      "bogwalker_boots": {
+        "name": "Bogwalker Boots"
+      },
+      "bogwalker_cap": {
+        "name": "Bogwalker Cap"
+      },
+      "bogwalker_grips": {
+        "name": "Bogwalker Grips"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "Bogwalker Shoulderpads"
+      },
+      "bogwalker_belt": {
+        "name": "Bogwalker Belt"
+      },
+      "bogwalker_hauberk": {
+        "name": "Bogwalker Hauberk"
+      },
+      "bogwalker_legguards": {
+        "name": "Bogwalker Legguards"
+      },
+      "bogwalker_sabatons": {
+        "name": "Bogwalker Sabatons"
+      },
+      "bogwalker_helm": {
+        "name": "Bogwalker Helm"
+      },
+      "bogwalker_gauntlets": {
+        "name": "Bogwalker Gauntlets"
+      },
+      "bogwalker_pauldrons": {
+        "name": "Bogwalker Pauldrons"
+      },
+      "bogwalker_girdle": {
+        "name": "Bogwalker Girdle"
+      },
+      "bogwalker_chainmail": {
+        "name": "Bogwalker Chainmail"
+      },
+      "bogwalker_chausses": {
+        "name": "Bogwalker Chausses"
+      },
+      "bogwalker_greaves": {
+        "name": "Bogwalker Greaves"
+      },
+      "bogwalker_coif": {
+        "name": "Bogwalker Coif"
+      },
+      "bogwalker_handguards": {
+        "name": "Bogwalker Handguards"
+      },
+      "bogwalker_spaulders": {
+        "name": "Bogwalker Spaulders"
+      },
+      "bogwalker_cord": {
+        "name": "Bogwalker Cord"
+      },
+      "thornspire_robe": {
+        "name": "Thornspire Robe"
+      },
+      "thornspire_leggings": {
+        "name": "Thornspire Leggings"
+      },
+      "thornspire_slippers": {
+        "name": "Thornspire Slippers"
+      },
+      "thornspire_hood": {
+        "name": "Thornspire Hood"
+      },
+      "thornspire_gloves": {
+        "name": "Thornspire Gloves"
+      },
+      "thornspire_mantle": {
+        "name": "Thornspire Mantle"
+      },
+      "thornspire_sash": {
+        "name": "Thornspire Sash"
+      },
+      "thornspire_jerkin": {
+        "name": "Thornspire Jerkin"
+      },
+      "thornspire_breeches": {
+        "name": "Thornspire Breeches"
+      },
+      "thornspire_boots": {
+        "name": "Thornspire Boots"
+      },
+      "thornspire_cap": {
+        "name": "Thornspire Cap"
+      },
+      "thornspire_grips": {
+        "name": "Thornspire Grips"
+      },
+      "thornspire_shoulderpads": {
+        "name": "Thornspire Shoulderpads"
+      },
+      "thornspire_belt": {
+        "name": "Thornspire Belt"
+      },
+      "thornspire_hauberk": {
+        "name": "Thornspire Hauberk"
+      },
+      "thornspire_legguards": {
+        "name": "Thornspire Legguards"
+      },
+      "thornspire_sabatons": {
+        "name": "Thornspire Sabatons"
+      },
+      "thornspire_helm": {
+        "name": "Thornspire Helm"
+      },
+      "thornspire_gauntlets": {
+        "name": "Thornspire Gauntlets"
+      },
+      "thornspire_pauldrons": {
+        "name": "Thornspire Pauldrons"
+      },
+      "thornspire_girdle": {
+        "name": "Thornspire Girdle"
+      },
+      "thornspire_chainmail": {
+        "name": "Thornspire Chainmail"
+      },
+      "thornspire_chausses": {
+        "name": "Thornspire Chausses"
+      },
+      "thornspire_greaves": {
+        "name": "Thornspire Greaves"
+      },
+      "thornspire_coif": {
+        "name": "Thornspire Coif"
+      },
+      "thornspire_handguards": {
+        "name": "Thornspire Handguards"
+      },
+      "thornspire_spaulders": {
+        "name": "Thornspire Spaulders"
+      },
+      "thornspire_cord": {
+        "name": "Thornspire Cord"
+      },
+      "hollowveil_robe": {
+        "name": "Hollowveil Robe"
+      },
+      "hollowveil_leggings": {
+        "name": "Hollowveil Leggings"
+      },
+      "hollowveil_slippers": {
+        "name": "Hollowveil Slippers"
+      },
+      "hollowveil_hood": {
+        "name": "Hollowveil Hood"
+      },
+      "hollowveil_gloves": {
+        "name": "Hollowveil Gloves"
+      },
+      "hollowveil_mantle": {
+        "name": "Hollowveil Mantle"
+      },
+      "hollowveil_sash": {
+        "name": "Hollowveil Sash"
+      },
+      "hollowveil_jerkin": {
+        "name": "Hollowveil Jerkin"
+      },
+      "hollowveil_breeches": {
+        "name": "Hollowveil Breeches"
+      },
+      "hollowveil_boots": {
+        "name": "Hollowveil Boots"
+      },
+      "hollowveil_cap": {
+        "name": "Hollowveil Cap"
+      },
+      "hollowveil_grips": {
+        "name": "Hollowveil Grips"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "Hollowveil Shoulderpads"
+      },
+      "hollowveil_belt": {
+        "name": "Hollowveil Belt"
+      },
+      "hollowveil_hauberk": {
+        "name": "Hollowveil Hauberk"
+      },
+      "hollowveil_legguards": {
+        "name": "Hollowveil Legguards"
+      },
+      "hollowveil_sabatons": {
+        "name": "Hollowveil Sabatons"
+      },
+      "hollowveil_helm": {
+        "name": "Hollowveil Helm"
+      },
+      "hollowveil_gauntlets": {
+        "name": "Hollowveil Gauntlets"
+      },
+      "hollowveil_pauldrons": {
+        "name": "Hollowveil Pauldrons"
+      },
+      "hollowveil_girdle": {
+        "name": "Hollowveil Girdle"
+      },
+      "hollowveil_chainmail": {
+        "name": "Hollowveil Chainmail"
+      },
+      "hollowveil_chausses": {
+        "name": "Hollowveil Chausses"
+      },
+      "hollowveil_greaves": {
+        "name": "Hollowveil Greaves"
+      },
+      "hollowveil_coif": {
+        "name": "Hollowveil Coif"
+      },
+      "hollowveil_handguards": {
+        "name": "Hollowveil Handguards"
+      },
+      "hollowveil_spaulders": {
+        "name": "Hollowveil Spaulders"
+      },
+      "hollowveil_cord": {
+        "name": "Hollowveil Cord"
+      },
+      "trailwarden_robe": {
+        "name": "Trailwarden Robe"
+      },
+      "trailwarden_leggings": {
+        "name": "Trailwarden Leggings"
+      },
+      "trailwarden_slippers": {
+        "name": "Trailwarden Slippers"
+      },
+      "trailwarden_hood": {
+        "name": "Trailwarden Hood"
+      },
+      "trailwarden_gloves": {
+        "name": "Trailwarden Gloves"
+      },
+      "trailwarden_mantle": {
+        "name": "Trailwarden Mantle"
+      },
+      "trailwarden_sash": {
+        "name": "Trailwarden Sash"
+      },
+      "trailwarden_jerkin": {
+        "name": "Trailwarden Jerkin"
+      },
+      "trailwarden_breeches": {
+        "name": "Trailwarden Breeches"
+      },
+      "trailwarden_boots": {
+        "name": "Trailwarden Boots"
+      },
+      "trailwarden_cap": {
+        "name": "Trailwarden Cap"
+      },
+      "trailwarden_grips": {
+        "name": "Trailwarden Grips"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "Trailwarden Shoulderpads"
+      },
+      "trailwarden_belt": {
+        "name": "Trailwarden Belt"
+      },
+      "trailwarden_hauberk": {
+        "name": "Trailwarden Hauberk"
+      },
+      "trailwarden_legguards": {
+        "name": "Trailwarden Legguards"
+      },
+      "trailwarden_sabatons": {
+        "name": "Trailwarden Sabatons"
+      },
+      "trailwarden_helm": {
+        "name": "Trailwarden Helm"
+      },
+      "trailwarden_gauntlets": {
+        "name": "Trailwarden Gauntlets"
+      },
+      "trailwarden_pauldrons": {
+        "name": "Trailwarden Pauldrons"
+      },
+      "trailwarden_girdle": {
+        "name": "Trailwarden Girdle"
+      },
+      "trailwarden_chainmail": {
+        "name": "Trailwarden Chainmail"
+      },
+      "trailwarden_chausses": {
+        "name": "Trailwarden Chausses"
+      },
+      "trailwarden_greaves": {
+        "name": "Trailwarden Greaves"
+      },
+      "trailwarden_coif": {
+        "name": "Trailwarden Coif"
+      },
+      "trailwarden_handguards": {
+        "name": "Trailwarden Handguards"
+      },
+      "trailwarden_spaulders": {
+        "name": "Trailwarden Spaulders"
+      },
+      "trailwarden_cord": {
+        "name": "Trailwarden Cord"
+      },
+      "highgale_robe": {
+        "name": "Highgale Robe"
+      },
+      "highgale_leggings": {
+        "name": "Highgale Leggings"
+      },
+      "highgale_slippers": {
+        "name": "Highgale Slippers"
+      },
+      "highgale_hood": {
+        "name": "Highgale Hood"
+      },
+      "highgale_gloves": {
+        "name": "Highgale Gloves"
+      },
+      "highgale_mantle": {
+        "name": "Highgale Mantle"
+      },
+      "highgale_sash": {
+        "name": "Highgale Sash"
+      },
+      "highgale_jerkin": {
+        "name": "Highgale Jerkin"
+      },
+      "highgale_breeches": {
+        "name": "Highgale Breeches"
+      },
+      "highgale_boots": {
+        "name": "Highgale Boots"
+      },
+      "highgale_cap": {
+        "name": "Highgale Cap"
+      },
+      "highgale_grips": {
+        "name": "Highgale Grips"
+      },
+      "highgale_shoulderpads": {
+        "name": "Highgale Shoulderpads"
+      },
+      "highgale_belt": {
+        "name": "Highgale Belt"
+      },
+      "highgale_hauberk": {
+        "name": "Highgale Hauberk"
+      },
+      "highgale_legguards": {
+        "name": "Highgale Legguards"
+      },
+      "highgale_sabatons": {
+        "name": "Highgale Sabatons"
+      },
+      "highgale_helm": {
+        "name": "Highgale Helm"
+      },
+      "highgale_gauntlets": {
+        "name": "Highgale Gauntlets"
+      },
+      "highgale_pauldrons": {
+        "name": "Highgale Pauldrons"
+      },
+      "highgale_girdle": {
+        "name": "Highgale Girdle"
+      },
+      "highgale_chainmail": {
+        "name": "Highgale Chainmail"
+      },
+      "highgale_chausses": {
+        "name": "Highgale Chausses"
+      },
+      "highgale_greaves": {
+        "name": "Highgale Greaves"
+      },
+      "brookwatch_tunic": {
+        "name": "Brookwatch Tunic"
+      },
+      "brookwatch_legwraps": {
+        "name": "Brookwatch Legwraps"
+      },
+      "brookwatch_treads": {
+        "name": "Brookwatch Treads"
+      },
+      "brookwatch_headguard": {
+        "name": "Brookwatch Headguard"
+      },
+      "brookwatch_handwraps": {
+        "name": "Brookwatch Handwraps"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Brookwatch Shoulderguards"
+      },
+      "brookwatch_waistguard": {
+        "name": "Brookwatch Waistguard"
+      },
+      "hedgerow_tunic": {
+        "name": "Hedgerow Tunic"
+      },
+      "hedgerow_legwraps": {
+        "name": "Hedgerow Legwraps"
+      },
+      "hedgerow_treads": {
+        "name": "Hedgerow Treads"
+      },
+      "hedgerow_headguard": {
+        "name": "Hedgerow Headguard"
+      },
+      "hedgerow_handwraps": {
+        "name": "Hedgerow Handwraps"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Hedgerow Shoulderguards"
+      },
+      "hedgerow_waistguard": {
+        "name": "Hedgerow Waistguard"
+      },
+      "bogwalker_tunic": {
+        "name": "Bogwalker Tunic"
+      },
+      "bogwalker_legwraps": {
+        "name": "Bogwalker Legwraps"
+      },
+      "bogwalker_treads": {
+        "name": "Bogwalker Treads"
+      },
+      "bogwalker_headguard": {
+        "name": "Bogwalker Headguard"
+      },
+      "bogwalker_handwraps": {
+        "name": "Bogwalker Handwraps"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Bogwalker Shoulderguards"
+      },
+      "bogwalker_waistguard": {
+        "name": "Bogwalker Waistguard"
+      },
+      "thornspire_tunic": {
+        "name": "Thornspire Tunic"
+      },
+      "thornspire_legwraps": {
+        "name": "Thornspire Legwraps"
+      },
+      "thornspire_treads": {
+        "name": "Thornspire Treads"
+      },
+      "thornspire_headguard": {
+        "name": "Thornspire Headguard"
+      },
+      "thornspire_handwraps": {
+        "name": "Thornspire Handwraps"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Thornspire Shoulderguards"
+      },
+      "thornspire_waistguard": {
+        "name": "Thornspire Waistguard"
+      },
+      "hollowveil_tunic": {
+        "name": "Hollowveil Tunic"
+      },
+      "hollowveil_legwraps": {
+        "name": "Hollowveil Legwraps"
+      },
+      "hollowveil_treads": {
+        "name": "Hollowveil Treads"
+      },
+      "hollowveil_headguard": {
+        "name": "Hollowveil Headguard"
+      },
+      "hollowveil_handwraps": {
+        "name": "Hollowveil Handwraps"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Hollowveil Shoulderguards"
+      },
+      "hollowveil_waistguard": {
+        "name": "Hollowveil Waistguard"
+      },
+      "trailwarden_tunic": {
+        "name": "Trailwarden Tunic"
+      },
+      "trailwarden_legwraps": {
+        "name": "Trailwarden Legwraps"
+      },
+      "trailwarden_treads": {
+        "name": "Trailwarden Treads"
+      },
+      "trailwarden_headguard": {
+        "name": "Trailwarden Headguard"
+      },
+      "trailwarden_handwraps": {
+        "name": "Trailwarden Handwraps"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Trailwarden Shoulderguards"
+      },
+      "trailwarden_waistguard": {
+        "name": "Trailwarden Waistguard"
+      },
+      "highgale_tunic": {
+        "name": "Highgale Tunic"
+      },
+      "highgale_legwraps": {
+        "name": "Highgale Legwraps"
+      },
+      "highgale_treads": {
+        "name": "Highgale Treads"
+      },
+      "highgale_headguard": {
+        "name": "Highgale Headguard"
+      },
+      "highgale_handwraps": {
+        "name": "Highgale Handwraps"
+      },
+      "highgale_shoulderguards": {
+        "name": "Highgale Shoulderguards"
+      },
+      "highgale_waistguard": {
+        "name": "Highgale Waistguard"
+      },
+      "highgale_coif": {
+        "name": "Highgale Coif"
+      },
+      "highgale_handguards": {
+        "name": "Highgale Handguards"
+      },
+      "highgale_spaulders": {
+        "name": "Highgale Spaulders"
+      },
+      "highgale_cord": {
+        "name": "Highgale Cord"
+      },
+      "breakwater_mantle": {
+        "name": "Breakwater Mantle"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Breakwater Shoulderpads"
+      },
+      "breakwater_spaulders": {
+        "name": "Breakwater Spaulders"
+      },
+      "gravebell_treads": {
+        "name": "Gravebell Treads"
+      },
+      "gravebell_greaves": {
+        "name": "Gravebell Greaves"
+      },
+      "cryptbound_tunic": {
+        "name": "Cryptbound Tunic"
+      },
+      "cryptbound_chainmail": {
+        "name": "Cryptbound Chainmail"
+      },
+      "oathbroken_leggings": {
+        "name": "Oathbroken Leggings"
+      },
+      "oathbroken_breeches": {
+        "name": "Oathbroken Breeches"
+      },
+      "oathbroken_legwraps": {
+        "name": "Oathbroken Legwraps"
+      },
+      "oathbroken_legguards": {
+        "name": "Oathbroken Legguards"
+      },
+      "oathbroken_chausses": {
+        "name": "Oathbroken Chausses"
+      },
+      "seamist_legwraps": {
+        "name": "Seamist Legwraps"
+      },
+      "seamist_chausses": {
+        "name": "Seamist Chausses"
+      },
+      "warmonger_treads": {
+        "name": "Warmonger Treads"
+      },
+      "warmonger_greaves": {
+        "name": "Warmonger Greaves"
+      },
+      "sparkglass_leggings": {
+        "name": "Sparkglass Leggings"
+      },
+      "sparkglass_breeches": {
+        "name": "Sparkglass Breeches"
+      },
+      "sparkglass_legwraps": {
+        "name": "Sparkglass Legwraps"
+      },
+      "sparkglass_legguards": {
+        "name": "Sparkglass Legguards"
+      },
+      "sparkglass_chausses": {
+        "name": "Sparkglass Chausses"
+      },
+      "stillhymn_treads": {
+        "name": "Stillhymn Treads"
+      },
+      "stillhymn_greaves": {
+        "name": "Stillhymn Greaves"
+      },
+      "pearlglow_headguard": {
+        "name": "Pearlglow Headguard"
+      },
+      "pearlglow_coif": {
+        "name": "Pearlglow Coif"
+      },
+      "sealkeeper_gloves": {
+        "name": "Sealkeeper Gloves"
+      },
+      "sealkeeper_grips": {
+        "name": "Sealkeeper Grips"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Sealkeeper Handwraps"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Sealkeeper Gauntlets"
+      },
+      "sealkeeper_handguards": {
+        "name": "Sealkeeper Handguards"
+      },
+      "fetterbound_leggings": {
+        "name": "Fetterbound Leggings"
+      },
+      "fetterbound_breeches": {
+        "name": "Fetterbound Breeches"
+      },
+      "fetterbound_legwraps": {
+        "name": "Fetterbound Legwraps"
+      },
+      "fetterbound_legguards": {
+        "name": "Fetterbound Legguards"
+      },
+      "fetterbound_chausses": {
+        "name": "Fetterbound Chausses"
+      },
+      "shroudcaller_tunic": {
+        "name": "Shroudcaller Tunic"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Shroudcaller Chainmail"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Wyrmshadow Tunic"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Wyrmshadow Chainmail"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Cinderbrood Shoulderpads"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Cinderbrood Shoulderguards"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Cinderbrood Pauldrons"
+      },
+      "hoarfrost_mantle": {
+        "name": "Hoarfrost Mantle"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Hoarfrost Shoulderpads"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Hoarfrost Spaulders"
+      },
+      "blackmere_mantle": {
+        "name": "Blackmere Mantle"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Blackmere Shoulderpads"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Blackmere Shoulderguards"
+      },
+      "blackmere_pauldrons": {
+        "name": "Blackmere Pauldrons"
+      },
+      "blackmere_spaulders": {
+        "name": "Blackmere Spaulders"
+      },
+      "reedhush_mantle": {
+        "name": "Reedhush Mantle"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Reedhush Shoulderpads"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Reedhush Shoulderguards"
+      },
+      "reedhush_pauldrons": {
+        "name": "Reedhush Pauldrons"
+      },
+      "reedhush_spaulders": {
+        "name": "Reedhush Spaulders"
+      },
+      "cairnking_mantle": {
+        "name": "Cairnking Mantle"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Cairnking Shoulderpads"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Cairnking Shoulderguards"
+      },
+      "cairnking_pauldrons": {
+        "name": "Cairnking Pauldrons"
+      },
+      "cairnking_spaulders": {
+        "name": "Cairnking Spaulders"
+      },
+      "palehunt_mantle": {
+        "name": "Palehunt Mantle"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Palehunt Shoulderpads"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Palehunt Shoulderguards"
+      },
+      "palehunt_pauldrons": {
+        "name": "Palehunt Pauldrons"
+      },
+      "palehunt_spaulders": {
+        "name": "Palehunt Spaulders"
+      },
+      "jadeshrine_mantle": {
+        "name": "Jadeshrine Mantle"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Jadeshrine Shoulderpads"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Jadeshrine Shoulderguards"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Jadeshrine Pauldrons"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Jadeshrine Spaulders"
+      },
+      "gildhedge_mantle": {
+        "name": "Gildhedge Mantle"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Gildhedge Shoulderpads"
+      },
+      "gildhedge_spaulders": {
+        "name": "Gildhedge Spaulders"
+      },
+      "saltwrack_mantle": {
+        "name": "Saltwrack Mantle"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Saltwrack Shoulderpads"
+      },
+      "saltwrack_spaulders": {
+        "name": "Saltwrack Spaulders"
+      },
+      "brookwatch_vest": {
+        "name": "Brookwatch Vest"
+      },
+      "brookwatch_trousers": {
+        "name": "Brookwatch Trousers"
+      },
+      "brookwatch_moccasins": {
+        "name": "Brookwatch Moccasins"
+      },
+      "brookwatch_cowl": {
+        "name": "Brookwatch Cowl"
+      },
+      "brookwatch_mitts": {
+        "name": "Brookwatch Mitts"
+      },
+      "brookwatch_epaulets": {
+        "name": "Brookwatch Epaulets"
+      },
+      "brookwatch_cinch": {
+        "name": "Brookwatch Cinch"
+      },
+      "hedgerow_vest": {
+        "name": "Hedgerow Vest"
+      },
+      "hedgerow_trousers": {
+        "name": "Hedgerow Trousers"
+      },
+      "hedgerow_moccasins": {
+        "name": "Hedgerow Moccasins"
+      },
+      "hedgerow_cowl": {
+        "name": "Hedgerow Cowl"
+      },
+      "hedgerow_mitts": {
+        "name": "Hedgerow Mitts"
+      },
+      "hedgerow_epaulets": {
+        "name": "Hedgerow Epaulets"
+      },
+      "hedgerow_cinch": {
+        "name": "Hedgerow Cinch"
+      },
+      "bogwalker_vest": {
+        "name": "Bogwalker Vest"
+      },
+      "bogwalker_trousers": {
+        "name": "Bogwalker Trousers"
+      },
+      "bogwalker_moccasins": {
+        "name": "Bogwalker Moccasins"
+      },
+      "bogwalker_cowl": {
+        "name": "Bogwalker Cowl"
+      },
+      "bogwalker_mitts": {
+        "name": "Bogwalker Mitts"
+      },
+      "bogwalker_epaulets": {
+        "name": "Bogwalker Epaulets"
+      },
+      "bogwalker_cinch": {
+        "name": "Bogwalker Cinch"
+      },
+      "thornspire_vest": {
+        "name": "Thornspire Vest"
+      },
+      "thornspire_trousers": {
+        "name": "Thornspire Trousers"
+      },
+      "thornspire_moccasins": {
+        "name": "Thornspire Moccasins"
+      },
+      "thornspire_cowl": {
+        "name": "Thornspire Cowl"
+      },
+      "thornspire_mitts": {
+        "name": "Thornspire Mitts"
+      },
+      "thornspire_epaulets": {
+        "name": "Thornspire Epaulets"
+      },
+      "thornspire_cinch": {
+        "name": "Thornspire Cinch"
+      },
+      "hollowveil_vest": {
+        "name": "Hollowveil Vest"
+      },
+      "hollowveil_trousers": {
+        "name": "Hollowveil Trousers"
+      },
+      "hollowveil_moccasins": {
+        "name": "Hollowveil Moccasins"
+      },
+      "hollowveil_cowl": {
+        "name": "Hollowveil Cowl"
+      },
+      "hollowveil_mitts": {
+        "name": "Hollowveil Mitts"
+      },
+      "hollowveil_epaulets": {
+        "name": "Hollowveil Epaulets"
+      },
+      "hollowveil_cinch": {
+        "name": "Hollowveil Cinch"
+      },
+      "trailwarden_vest": {
+        "name": "Trailwarden Vest"
+      },
+      "trailwarden_trousers": {
+        "name": "Trailwarden Trousers"
+      },
+      "trailwarden_moccasins": {
+        "name": "Trailwarden Moccasins"
+      },
+      "trailwarden_cowl": {
+        "name": "Trailwarden Cowl"
+      },
+      "trailwarden_mitts": {
+        "name": "Trailwarden Mitts"
+      },
+      "trailwarden_epaulets": {
+        "name": "Trailwarden Epaulets"
+      },
+      "trailwarden_cinch": {
+        "name": "Trailwarden Cinch"
+      },
+      "highgale_vest": {
+        "name": "Highgale Vest"
+      },
+      "highgale_trousers": {
+        "name": "Highgale Trousers"
+      },
+      "highgale_moccasins": {
+        "name": "Highgale Moccasins"
+      },
+      "highgale_cowl": {
+        "name": "Highgale Cowl"
+      },
+      "highgale_mitts": {
+        "name": "Highgale Mitts"
+      },
+      "highgale_epaulets": {
+        "name": "Highgale Epaulets"
+      },
+      "highgale_cinch": {
+        "name": "Highgale Cinch"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Breakwater Shoulderguards"
+      },
+      "breakwater_pauldrons": {
+        "name": "Breakwater Pauldrons"
+      },
+      "breakwater_epaulets": {
+        "name": "Breakwater Epaulets"
+      },
+      "gravebell_moccasins": {
+        "name": "Gravebell Moccasins"
+      },
+      "oathbroken_trousers": {
+        "name": "Oathbroken Trousers"
+      },
+      "sparkglass_trousers": {
+        "name": "Sparkglass Trousers"
+      },
+      "stillhymn_moccasins": {
+        "name": "Stillhymn Moccasins"
+      },
+      "sealkeeper_mitts": {
+        "name": "Sealkeeper Mitts"
+      },
+      "fetterbound_trousers": {
+        "name": "Fetterbound Trousers"
+      },
+      "wyrmshadow_vest": {
+        "name": "Wyrmshadow Vest"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Cinderbrood Spaulders"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Cinderbrood Epaulets"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Hoarfrost Shoulderguards"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Hoarfrost Pauldrons"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Hoarfrost Epaulets"
+      },
+      "blackmere_epaulets": {
+        "name": "Blackmere Epaulets"
+      },
+      "reedhush_epaulets": {
+        "name": "Reedhush Epaulets"
+      },
+      "cairnking_epaulets": {
+        "name": "Cairnking Epaulets"
+      },
+      "palehunt_epaulets": {
+        "name": "Palehunt Epaulets"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Jadeshrine Epaulets"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Gildhedge Shoulderguards"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Gildhedge Pauldrons"
+      },
+      "gildhedge_epaulets": {
+        "name": "Gildhedge Epaulets"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Saltwrack Shoulderguards"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Saltwrack Pauldrons"
+      },
+      "saltwrack_epaulets": {
+        "name": "Saltwrack Epaulets"
+      },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
+      "gravedirt_treads": {
+        "name": "Gravedirt Treads"
+      },
+      "bellrope_girdle": {
+        "name": "Bellrope Girdle"
+      },
+      "sextons_spadehaft": {
+        "name": "Sexton's Spadehaft"
+      },
+      "rimesilk_mantle": {
+        "name": "Rimesilk Mantle"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Bonechill Hauberk"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Rime-Laced Leggings"
+      },
+      "rimeweb_fang": {
+        "name": "Bride's Icicle"
+      },
+      "cantors_cassock": {
+        "name": "Cantor's Cassock"
+      },
+      "choirward_leggings": {
+        "name": "Choirward Leggings"
+      },
+      "choristers_gloves": {
+        "name": "Chorister's Gloves"
+      },
+      "cantors_hymnal": {
+        "name": "Cantor's Hymnal"
+      },
+      "gravecallers_vestments": {
+        "name": "Gravecaller's Vestments"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Unquiet Stalker's Hood"
+      },
+      "sextons_burial_spade": {
+        "name": "Sexton's Burial Spade"
+      },
+      "rimesilk_hood": {
+        "name": "Rimesilk Hood"
+      },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "Jailer's Iron Gauntlets"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Turnkey's Keyring Belt"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Turnkey's Lantern Cowl"
+      },
+      "conchplate_girdle": {
+        "name": "Conchplate Girdle"
+      },
+      "pale_chorus_leggings": {
+        "name": "Pale Chorus Leggings"
+      },
+      "refrain_silk_gloves": {
+        "name": "Refrain Silk Gloves"
+      },
+      "chorus_conch": {
+        "name": "Chorus Conch"
+      },
+      "tideglass_pauldrons": {
+        "name": "Tideglass Pauldrons"
+      },
+      "moonburn_treads": {
+        "name": "Moonburn Treads"
+      },
+      "prism_etched_cowl": {
+        "name": "Prism-Etched Cowl"
+      },
+      "tideglass_shiv": {
+        "name": "Tideglass Shiv"
+      },
+      "pale_chorus_vestment": {
+        "name": "Pale Chorus Vestment"
+      },
+      "tideglass_warmaul": {
+        "name": "Tideglass Warmaul"
+      },
+      "beastpit_warbelt": {
+        "name": "Beastpit Warbelt"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "Jaguar-Hide Jerkin"
+      },
+      "hexbone_handwraps": {
+        "name": "Hexbone Handwraps"
+      },
+      "rootbound_sabatons": {
+        "name": "Rootbound Sabatons"
+      },
+      "pollen_dusted_leggings": {
+        "name": "Pollen-Dusted Leggings"
+      },
+      "bloomsilk_cowl": {
+        "name": "Bloomsilk Cowl"
+      },
+      "falls_blessed_staff": {
+        "name": "Falls-Blessed Staff"
+      },
+      "fanglords_hide_mantle": {
+        "name": "Fanglord's Hide Mantle"
+      },
+      "thornroot_greathelm": {
+        "name": "Thorncrowned Greathelm"
+      },
+      "foremans_grips": {
+        "name": "Foreman's Grips"
+      },
+      "serac_stride_boots": {
+        "name": "Serac-Stride Boots"
+      },
+      "seal_rune_mantle": {
+        "name": "Seal-Rune Mantle"
+      },
+      "thawbound_legguards": {
+        "name": "Thawbound Legguards"
+      },
+      "pyre_tenders_hood": {
+        "name": "Pyre-Tender's Hood"
+      },
+      "meltwater_cord": {
+        "name": "Meltwater Cord"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "Hammer of the Open Lock"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "Vestments of the Waking Rite"
+      },
+      "spadeworn_gauntlets": {
+        "name": "Spadeworn Gauntlets"
+      },
+      "gravedirt_grips": {
+        "name": "Gravedirt Grips"
+      },
+      "bellrope_mitts": {
+        "name": "Bellrope Mitts"
+      },
+      "rimewreath_coif": {
+        "name": "Rimewreath Coif"
+      },
+      "rime_laced_hood": {
+        "name": "Rime-Laced Hood"
+      },
+      "lamenting_veil": {
+        "name": "Lamenting Veil"
+      },
+      "choirward_pauldrons": {
+        "name": "Choirward Pauldrons"
+      },
+      "choristers_spaulders": {
+        "name": "Chorister's Spaulders"
+      },
+      "cantors_stole": {
+        "name": "Cantor's Stole"
+      },
+      "knellbound_hauberk": {
+        "name": "Knellbound Hauberk"
+      },
+      "candlewatch_jerkin": {
+        "name": "Candlewatch Jerkin"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "Robe of the Unquiet Rite"
+      },
+      "gravecallers_rod": {
+        "name": "Gravecaller's Rod"
+      },
+      "portcullis_girdle": {
+        "name": "Portcullis Girdle"
+      },
+      "cellwatch_belt": {
+        "name": "Cellwatch Belt"
+      },
+      "lanternwick_sash": {
+        "name": "Lanternwick Sash"
+      },
+      "turnkeys_shank": {
+        "name": "Turnkey's Shank"
+      },
+      "gaolyard_jerkin": {
+        "name": "Gaolyard Jerkin"
+      },
+      "brinewarden_robe": {
+        "name": "Brinewarden Robe"
+      },
+      "fogbinders_rod": {
+        "name": "Fogbinder's Rod"
+      },
+      "conchplate_sabatons": {
+        "name": "Conchplate Sabatons"
+      },
+      "pale_chorus_slippers": {
+        "name": "Pale Chorus Slippers"
+      },
+      "tideglass_gauntlets": {
+        "name": "Tideglass Gauntlets"
+      },
+      "moonburn_grips": {
+        "name": "Moonburn Grips"
+      },
+      "prism_etched_handwraps": {
+        "name": "Prism-Etched Handwraps"
+      },
+      "mere_crested_helm": {
+        "name": "Mere-Crested Helm"
+      },
+      "mereskin_hood": {
+        "name": "Mereskin Hood"
+      },
+      "merewater_cowl": {
+        "name": "Merewater Cowl"
+      },
+      "merecleaver": {
+        "name": "Merecleaver"
+      },
+      "moonwrack_stave": {
+        "name": "Moonwrack Stave"
+      },
+      "membership_staff": {
+        "name": "Staff of Changing"
+      },
+      "membership_token": {
+        "name": "Membership Token (30 Days)"
+      },
+      "referral_satchel": {
+        "name": "Friendship Satchel"
+      },
+      "referral_hollow_charm": {
+        "name": "Oathkeeper's Heart"
+      },
+      "referral_fog_charm": {
+        "name": "Awakened Oathkeeper's Heart"
+      },
+      "reins_referral_tank": {
+        "name": "Friendship Tank Reins"
+      },
+      "reins_referral_raptor": {
+        "name": "Friendship Raptor Reins"
+      },
+      "referral_helmet": {
+        "name": "Friendship Helm"
+      },
+      "referral_shoulder": {
+        "name": "Friendship Pauldrons"
+      },
+      "referral_chest": {
+        "name": "Friendship Cuirass"
+      },
+      "referral_waist": {
+        "name": "Friendship Girdle"
+      },
+      "referral_legs": {
+        "name": "Friendship Legguards"
+      },
+      "referral_gloves": {
+        "name": "Friendship Gauntlets"
+      },
+      "referral_feet": {
+        "name": "Friendship Boots"
+      },
+      "membership_helmet": {
+        "name": "Membership Helm"
+      },
+      "membership_shoulder": {
+        "name": "Membership Pauldrons"
+      },
+      "membership_chest": {
+        "name": "Membership Cuirass"
+      },
+      "membership_waist": {
+        "name": "Membership Girdle"
+      },
+      "membership_legs": {
+        "name": "Membership Legguards"
+      },
+      "membership_gloves": {
+        "name": "Membership Gauntlets"
+      },
+      "membership_feet": {
+        "name": "Membership Boots"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"
@@ -19020,6 +24886,12 @@ export const en_CA: EnTranslations = {
       "emissary_cache": {
         "name": "Emissary's Cache"
       },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
+      },
       "clue_scroll": {
         "name": "Clue Scroll"
       },
@@ -19028,6 +24900,12 @@ export const en_CA: EnTranslations = {
       },
       "heroic_mark": {
         "name": "Heroic Mark"
+      },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "Reins of the Lantern Hall Destrier"
       },
       "wyrmfall_core": {
         "name": "Wyrmfall Core"
@@ -19392,6 +25270,24 @@ export const en_CA: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Heart of the Crucible"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
+      "fanglords_whistle": {
+        "name": "Fanglord's Whistle"
+      },
+      "gorgebloom_seedpod": {
+        "name": "Gorgebloom Seedpod"
+      },
+      "foremans_last_link": {
+        "name": "Foreman's Last Link"
+      },
+      "phial_of_the_tithe": {
+        "name": "Phial of the Tithe"
+      },
+      "quenchwater_flask": {
+        "name": "Quenchwater Flask"
+      },
       "rift_watchers_band": {
         "name": "Rift Watcher's Band"
       },
@@ -19526,6 +25422,9 @@ export const en_CA: EnTranslations = {
       "restless_bones": {
         "name": "Restless Bones"
       },
+      "marrow_restless_bones": {
+        "name": "Restless Bones"
+      },
       "gorrak": {
         "name": "Gorrak the Ruthless"
       },
@@ -19643,6 +25542,75 @@ export const en_CA: EnTranslations = {
       "morthen": {
         "name": "Morthen the Gravecaller"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Lady of the Bonechill"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Ossuary Warrior"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Gravecaller Adept"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Ossuary Cutthroat"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Gravecaller Necromancer"
+      },
+      "crypt_bone_minion": {
+        "name": "Bone Minion"
+      },
+      "crypt_bone_brute": {
+        "name": "Bone Brute"
+      },
+      "crypt_bone_pile": {
+        "name": "Stirring Bones"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Chapel Gargoyle"
+      },
+      "crypt_crow_caller": {
+        "name": "Crow Caller"
+      },
+      "crypt_carrion_crow": {
+        "name": "Carrion Crow"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Ossuary Drake"
+      },
+      "crypt_knellwyrm": {
+        "name": "Knellwyrm"
+      },
+      "crypt_remembrance_candle": {
+        "name": "Remembrance Candle"
+      },
       "bastion_revenant": {
         "name": "Bastion Revenant"
       },
@@ -19657,6 +25625,102 @@ export const en_CA: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael the Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Wreckbound Sailor"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "Shipwreck Captain"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
+      },
+      "bastion_gaol_cage": {
+        "name": "Iron Cage"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Drowned Anchor"
+      },
+      "lagoon_snapper": {
+        "name": "Lagoon Snapper"
+      },
+      "ice_wraith": {
+        "name": "Ice Wraith"
+      },
+      "moonlit_siren": {
+        "name": "Moonlit Siren"
+      },
+      "tidewisp": {
+        "name": "Tidewisp"
+      },
+      "drowned_pilgrim": {
+        "name": "Drowned Pilgrim"
+      },
+      "mere_hydra_head_left": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_center": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_right": {
+        "name": "Mere Hydra"
+      },
+      "tideglass_colossus": {
+        "name": "Tideglass Colossus"
+      },
+      "tideglass_reflection": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Tideglass Reflection"
       },
       "sanctum_boneguard": {
         "name": "Sanctum Boneguard"
@@ -19811,8 +25875,26 @@ export const en_CA: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, the Waking Peak"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Roused Stormling"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Stable Horse"
@@ -20186,8 +26268,182 @@ export const en_CA: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "Fanglord Beastmaster"
       },
+      "sunbone_totem_binder": {
+        "name": "Sunbone Totem-Binder"
+      },
+      "sunbone_totem": {
+        "name": "Sunbone Totem"
+      },
+      "sunbone_dread_totem": {
+        "name": "Sunbone Dread Totem"
+      },
+      "basin_raptor": {
+        "name": "Basin Raptor"
+      },
+      "spore_toad": {
+        "name": "Spore Toad"
+      },
+      "vine_lasher": {
+        "name": "Snarlvine Lasher"
+      },
+      "great_saurian": {
+        "name": "Great Saurian"
+      },
+      "howdah_hexcaller": {
+        "name": "Howdah Hexcaller"
+      },
+      "fanglord_jaguar": {
+        "name": "Fanglord's Great Jaguar"
+      },
+      "the_gorgebloom": {
+        "name": "The Gorgebloom"
+      },
       "wildheart_high_priest": {
         "name": "Zulgar, Voice of the Basin"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "Hammer Shackle"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "Tongs Shackle"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "Anvil Shackle"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "Bellows Shackle"
+      },
+      "thorn_sprout": {
+        "name": "Thorn Sprout"
+      },
+      "buddy_ember_fox": {
+        "name": "Ember Fox"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "Emberfall Phoenix"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "Crimson Claw Crab"
+      },
+      "buddy_golden_sentinel": {
+        "name": "Golden Sentinel"
+      },
+      "buddy_nightfang": {
+        "name": "Nightfang"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "Tuskhorn Boar"
+      },
+      "buddy_emerald_wolf": {
+        "name": "Emerald Wolf"
+      },
+      "buddy_tiger": {
+        "name": "Tiger"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "Trollface"
+      },
+      "buddy_ansem": {
+        "name": "Ansem"
+      },
+      "buddy_triple_t": {
+        "name": "Triple T"
+      },
+      "buddy_kekius": {
+        "name": "Kekius"
+      },
+      "buddy_solbot": {
+        "name": "Solbot"
+      },
+      "buddy_frostfire": {
+        "name": "Frostfire"
+      },
+      "buddy_rocky": {
+        "name": "Rocky"
+      },
+      "buddy_proud_grunt": {
+        "name": "Proud Grunt"
+      },
+      "buddy_loot_goblin": {
+        "name": "Loot Goblin"
+      },
+      "buddy_penny_goldspark": {
+        "name": "Penny Goldspark"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "Alpaca"
+      },
+      "buddy_horse": {
+        "name": "Tug, the Warhorse"
+      },
+      "buddy_sapling": {
+        "name": "Sapling"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "Spider"
+      },
+      "buddy_raptor": {
+        "name": "Raptor"
+      },
+      "buddy_skeleton": {
+        "name": "Skeleton"
+      },
+      "buddy_crystal_lich": {
+        "name": "Crystal Lich"
+      },
+      "buddy_forgemaw": {
+        "name": "Forgemaw The Molten"
+      },
+      "buddy_sprites": {
+        "name": "Flicker and Glimmer"
+      },
+      "buddy_crystal_tide": {
+        "name": "Crystal Tide"
+      },
+      "buddy_phantom": {
+        "name": "Phantom"
       },
       "ironvein_foreman": {
         "name": "Ironvein Foreman"
@@ -20271,7 +26527,7 @@ export const en_CA: EnTranslations = {
         "name": "Pale Choir Acolyte"
       },
       "pearlguard_sentinel": {
-        "name": "Pearlguard Sentinel"
+        "name": "Moonmantle Ray"
       },
       "sethrael_palecoil": {
         "name": "Sethrael the Palecoil"
@@ -20461,6 +26717,16 @@ export const en_CA: EnTranslations = {
         "name": "Warden Fenwick",
         "title": "Warden of Fenbridge",
         "greeting": "Hold at the gate, {className}. Past those reeds, the fen does the killing for us."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Brother Aldric",
@@ -20681,6 +26947,31 @@ export const en_CA: EnTranslations = {
         "name": "Harbormaster Tamsin",
         "title": "Keeper of the Wyrmwatch Quays",
         "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+      },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
+      "patron_amos_eelby": {
+        "name": "Amos Eelby",
+        "title": "Eel Fisher",
+        "greeting": "Pull up a bench, {className}. Grissel here swears the big eel under Fenbridge is a myth. I've had my hand on him twice. Twice! Slippery as a tax collector, and near as long as this bench."
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "Grissel Sedgeworth",
+        "title": "Peat Cutter",
+        "greeting": "Don't mind Amos. Forty years cutting peat and I've pulled more strange things out of this bog than he's pulled eels: boots, bones, a helmet with the head still worried about it. Warm yourself, the fire's free."
+      },
+      "patron_ned_oxley": {
+        "name": "Ned Oxley",
+        "title": "Drover",
+        "greeting": "Drove forty head down the causeway and lost two to the mire before Fenbridge. Maudie's ale is the only thing on this road that never lets a man down. Buy your own, mind."
+      },
+      "patron_hester_quillby": {
+        "name": "Hester Quillby",
+        "title": "Mapmaker",
+        "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
       },
       "reeve_ottoline": {
         "name": "Reeve Ottoline",
@@ -20907,6 +27198,26 @@ export const en_CA: EnTranslations = {
         "title": "Master of the Apothecary",
         "greeting": "Measure twice and pour once, {className}. The apothecary has no patience for spilled reagents."
       },
+      "guildmaster_hesper_dunmore": {
+        "name": "Hesper Dunmore",
+        "title": "Guildmaster of Lantern Hall",
+        "greeting": "Welcome to Lantern Hall, {className}. Tobias keeps the week's contracts on the board, Garrick trades our seals for honors worth wearing, and Mira will find you a party for any door below the mountain. Bring back a trophy and it hangs in the hall behind me."
+      },
+      "contract_clerk_tobias_wren": {
+        "name": "Tobias Wren",
+        "title": "Contract Clerk",
+        "greeting": "Three contracts a week, posted every reset. No signing, no fees: see one through and the seals are yours."
+      },
+      "guild_quartermaster_garrick_holt": {
+        "name": "Garrick Holt",
+        "title": "Guild Quartermaster",
+        "greeting": "Seals for honors, friend. Nothing on my shelves will sharpen a blade, but every hall in Highwatch will know where you earned it."
+      },
+      "guild_recruiter_mira_fairweather": {
+        "name": "Mira Fairweather",
+        "title": "Guild Recruiter",
+        "greeting": "Looking for a party? Every crypt, bastion and temple on this map has a name on my list. Tell me where you are headed."
+      },
       "farmer_jessica": {
         "name": "Farmer Jessica",
         "title": "Allotment Keeper",
@@ -20930,7 +27241,7 @@ export const en_CA: EnTranslations = {
       "wayfarer_bryn": {
         "name": "Wayfarer Bryn",
         "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell down on the quay rings you across any day of the year, and its twin on the island rings you home."
       },
       "instructor_maren": {
         "name": "Instructor Maren",
@@ -20976,6 +27287,11 @@ export const en_CA: EnTranslations = {
         "name": "Drillmaster Hale",
         "title": "Quay Sparring Master",
         "greeting": "That dummy behind me never swings back and never goes down, {className}. What matters is the tally: your Damage Meters count every blow you land on it. Target it and open the meters, and I will walk you through the rest."
+      },
+      "cantor_laverock": {
+        "name": "Laverock",
+        "title": "Last Cantor of the Pale Choir",
+        "greeting": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -21200,6 +27516,52 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge Muster Order"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23384,6 +29746,12 @@ export const en_CA: EnTranslations = {
           },
           "7": {
             "label": "The Sunken Bastion"
+          },
+          "8": {
+            "label": "Barrowmound Reach"
+          },
+          "9": {
+            "label": "Starfall Crater"
           }
         }
       },
@@ -23741,6 +30109,39 @@ export const en_CA: EnTranslations = {
             "label": "The Gauntlet"
           }
         }
+      },
+      "goldcrest_harbor": {
+        "name": "Goldcrest Harbor",
+        "welcome": "Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.",
+        "pois": {
+          "0": {
+            "label": "The Grand Gate"
+          },
+          "1": {
+            "label": "Grand Plaza"
+          },
+          "2": {
+            "label": "The Goldcrest Exchange"
+          },
+          "3": {
+            "label": "Market Ward"
+          },
+          "4": {
+            "label": "Harbor Ward"
+          },
+          "5": {
+            "label": "Highcrown Citadel"
+          },
+          "6": {
+            "label": "The Lightspire"
+          },
+          "7": {
+            "label": "The Gold Light"
+          },
+          "8": {
+            "label": "The Golden Span"
+          }
+        }
       }
     },
     "dungeons": {
@@ -23796,7 +30197,7 @@ export const en_CA: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "The Wildheart Basin",
-        "enterText": "Warm rain hisses on old stone. The Wildheart Basin opens before you.",
+        "enterText": "You step through the idol maw onto a ledge high above the basin. Waterfalls thunder from the rim, and far below, something enormous wades the ford.",
         "leaveText": "You pass back beneath the stone fangs into the Palmreach sun."
       },
       "the_last_keep": {
@@ -24018,6 +30419,16 @@ export const en_CA: EnTranslations = {
         "subject": "Your Exchange purchase",
         "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
       },
+      "membership_token_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Your membership token",
+        "body": "Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer."
+      },
+      "membership_annual_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your annual membership mount",
+        "body": "Your annual membership payment is complete. Your mount reins are enclosed. Keep the reins in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
+      },
       "woc_market_return": {
         "sender": "The Exchange Broker",
         "subject": "Your Exchange listing has ended",
@@ -24032,6 +30443,11 @@ export const en_CA: EnTranslations = {
         "sender": "The Ravenpost",
         "subject": "Your vault reward",
         "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {
@@ -24148,7 +30564,7 @@ export const en_CA: EnTranslations = {
       },
       "forgewall": {
         "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
+        "bonus2": "Iron Resolve's shield absorbs 25% of your maximum health instead of 20%.",
         "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
       },
       "frostquench": {
@@ -24167,7 +30583,7 @@ export const en_CA: EnTranslations = {
       },
       "grovespring": {
         "name": "Grovespring Raiment",
-        "bonus2": "Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
       },
       "hexthread": {
@@ -24260,77 +30676,77 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
+        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",
-        "bonus2": "Reduces the cooldowns of Lunge and Bruin Rush by 3 sec.",
-        "bonus4": "Dash's cooldown is reduced by 15 sec."
+        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
       },
       "vanguard_druid_restoration": {
         "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
+        "bonus2": "Fleetmend's cooldown is reduced by 1 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Packwarden Harness",
-        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
+        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Farsight Harness",
-        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
+        "bonus2": "Trailbreak's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
       },
       "vanguard_hunter_survival": {
         "name": "Snaretooth Harness",
-        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
+        "bonus2": "Bloodhook's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Bloodhook grants 1 Hunting Momentum."
       },
       "vanguard_mage_arcane": {
         "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
+        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
       },
       "vanguard_mage_fire": {
         "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
+        "bonus2": "Cinderfall recharges 3 sec faster. Damage taken no longer delays your spellcasting.",
         "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
       },
       "vanguard_mage_frost": {
         "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
+        "bonus2": "Icebind's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
       },
       "vanguard_paladin_holy": {
         "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
+        "bonus2": "Life Covenant's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
       },
       "vanguard_paladin_protection": {
         "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
+        "bonus2": "Oath Chain's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
       },
       "vanguard_paladin_retribution": {
         "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
+        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
       },
       "vanguard_priest_discipline": {
         "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
+        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
       },
       "vanguard_priest_holy": {
         "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
+        "bonus2": "Veilstep's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
       },
       "vanguard_priest_shadow": {
         "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
+        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it. Damage taken no longer delays your spellcasting.",
         "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
       },
       "vanguard_rogue_assassination": {
@@ -24340,7 +30756,7 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
+        "bonus2": "Swift Heels' cooldown is reduced by 15 sec.",
         "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
       },
       "vanguard_rogue_subtlety": {
@@ -24350,32 +30766,32 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
+        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
       },
       "vanguard_shaman_enhancement": {
         "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
+        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
       },
       "vanguard_shaman_restoration": {
         "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
+        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health. Damage taken no longer delays your spellcasting.",
         "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
+        "bonus2": "Harrow's cast time is reduced by 0.3 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
       },
       "vanguard_warlock_demonology": {
         "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
+        "bonus2": "Bone Armor's cooldown is reduced by 10 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
       },
       "vanguard_warlock_destruction": {
         "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
+        "bonus2": "Cinderhide's cooldown is reduced by 30 sec. Damage taken no longer delays your spellcasting.",
         "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
       },
       "vanguard_warrior_arms": {
@@ -24400,31 +30816,31 @@ export const en_CA: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Ashstalker Kit",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
       },
       "warfare_cinderweave": {
         "name": "Cinderweave Regalia",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
       },
       "warfare_furyforged": {
         "name": "Furyforged Battlegear",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
       },
       "warfare_stormbound": {
         "name": "Stormbound Vestments",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
       },
       "warfare_thornhide": {
         "name": "Thornhide Garb",
-        "bonus2": "Increases Warfare Defense Rating by 40.",
+        "bonus2": "Increases Warfare Defense Rating by 40. Damage taken no longer delays your spellcasting.",
         "bonus4": "Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
         "bonus7": "Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
@@ -24467,6 +30883,7 @@ export const en_CA: EnTranslations = {
     "mailboxName": "Mailbox",
     "noticeboardName": "Notice Board",
     "farmPatchName": "Garden Beds",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Realm Builder Monument",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

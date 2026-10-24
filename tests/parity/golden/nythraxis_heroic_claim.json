@@ -10,13 +10,13 @@
     "awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants",
     "class:warrior"
   ],
-  "draws": 14,
-  "drawDigest": "31372acd",
+  "draws": 19,
+  "drawDigest": "b446fa79",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1010,
+      "nextId": 1011,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1020,
-      "state": "30ea90aa",
-      "events": "bc873d79",
+      "nextId": 1021,
+      "state": "42efef74",
+      "events": "ca8b4699",
       "rng": {
         "draws": 1,
         "digest": "84017fb6"
@@ -59,6 +59,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -79,7 +82,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -143,88 +146,9 @@
             ]
           },
           "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "partiesJoined": 1
-            },
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water"
-            ]
+          "buddies": {
+            "names": {}
           },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1011,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "factionCurrencies": {},
-          "factions": {},
-          "gatheringProficiency": {},
-          "gliderRecords": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "vaultAttemptDurable": true,
-          "worldQuestReplacements": {},
-          "wyrmfallDaily": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -307,6 +231,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -389,6 +316,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -409,6 +339,91 @@
           "delveClears": {},
           "delveDaily": {},
           "entityId": 1014,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
+          "gatheringProficiency": {},
+          "gliderRecords": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1015,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -464,7 +479,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -477,7 +492,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -526,7 +541,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1011,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -575,7 +590,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1012,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -624,7 +639,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1013,
+          "id": 1014,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -673,7 +688,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1014,
+          "id": 1015,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -723,7 +738,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 192000,
-          "id": 1015,
+          "id": 1016,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -759,12 +774,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1020,
-      "state": "16b6fb3a",
-      "events": "3b126ae3",
+      "nextId": 1021,
+      "state": "6e62dc20",
+      "events": "a82dd91b",
       "rng": {
-        "draws": 14,
-        "digest": "31372acd"
+        "draws": 19,
+        "digest": "b446fa79"
       },
       "label": "death",
       "players": [
@@ -788,6 +803,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -884,7 +902,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -904,14 +922,11 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -955,9 +970,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -968,10 +980,7 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1000,209 +1009,9 @@
             ]
           },
           "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {
-            "xpGained": 98
+          "buddies": {
+            "names": {}
           },
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "dungeonFinalBossKills": 1,
-              "kills": 1,
-              "partiesJoined": 1
-            },
-            "dungeonClears": {
-              "nythraxis_boss_arena:heroic": 1
-            },
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "heroic_mark",
-              "spring_water",
-              "wyrmfall_core"
-            ],
-            "visited": [
-              "quality:rare"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "cmb_first_blood",
-              ""
-            ],
-            [
-              "col_first_rare",
-              ""
-            ],
-            [
-              "dgn_nythraxis",
-              ""
-            ],
-            [
-              "dgn_nythraxis_deathless",
-              ""
-            ],
-            [
-              "dgn_nythraxis_gravebreaker",
-              ""
-            ],
-            [
-              "dgn_nythraxis_heroic",
-              ""
-            ],
-            [
-              "dgn_nythraxis_wardens",
-              ""
-            ],
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
-            [
-              "soc_first_party",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1011,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "factionCurrencies": {},
-          "factions": {},
-          "gatheringProficiency": {},
-          "gliderRecords": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {
-            "date": "reset:1",
-            "marked": [
-              "nythraxis_boss_arena"
-            ]
-          },
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
-            },
-            {
-              "count": 2,
-              "itemId": "wyrmfall_core",
-              "materialSources": [
-                {
-                  "count": 2,
-                  "source": {}
-                }
-              ]
-            }
-          ],
-          "lifetimeXp": 167298,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "raidLockouts": [
-            [
-              "nythraxis_boss_arena:heroic",
-              86400000
-            ]
-          ],
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 200,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "vaultAttemptDurable": true,
-          "weeklyRewards": {
-            "bossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            },
-            "raidClears": [
-              2
-            ],
-            "raidUnlocks": [
-              2,
-              0,
-              0
-            ],
-            "raids": [
-              2,
-              0,
-              0
-            ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
-          },
-          "worldQuestReplacements": {},
-          "wyrmfallDaily": {
-            "sources": [
-              "nythraxis_boss_arena:heroic"
-            ]
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1310,6 +1119,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1318,10 +1128,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1361,9 +1167,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -1374,10 +1177,7 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1406,6 +1206,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1513,6 +1316,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1521,10 +1325,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1564,9 +1364,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -1577,10 +1374,7 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1609,6 +1403,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1716,6 +1513,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1724,10 +1522,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1767,9 +1561,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -1780,10 +1571,204 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1015,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
+          "gatheringProficiency": {},
+          "gliderRecords": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "heroicMarks": 3,
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "vaultAttemptDurable": true,
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1805,7 +1790,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -1818,7 +1803,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1868,7 +1853,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1011,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1917,7 +1902,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1012,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1966,7 +1951,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1013,
+          "id": 1014,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2015,7 +2000,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1014,
+          "id": 1015,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2060,11 +2045,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1010",
               "entity:1011",
               "entity:1012",
               "entity:1013",
-              "entity:1014"
+              "entity:1014",
+              "entity:1015"
             ],
             "token": {}
           },
@@ -2076,7 +2061,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1015,
+          "id": 1016,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2093,26 +2078,17 @@
               },
               {
                 "count": 1,
-                "itemId": "hunters_tally"
+                "itemId": "stormcallers_focus"
               }
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
-            1010,
             1011,
             1012,
             1013,
-            1014
+            1014,
+            1015
           ],
           "lootable": true,
           "maxHp": 192000,
@@ -2136,7 +2112,7 @@
           "stats": {
             "armor": 1058
           },
-          "tappedById": 1010,
+          "tappedById": 1011,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
             "max": 573,
@@ -2149,12 +2125,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1020,
-      "state": "16b6fb3a",
+      "nextId": 1021,
+      "state": "6e62dc20",
       "events": "741638a5",
       "rng": {
-        "draws": 14,
-        "digest": "31372acd"
+        "draws": 19,
+        "digest": "b446fa79"
       },
       "label": "final",
       "players": [
@@ -2178,6 +2154,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -2274,7 +2253,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2294,14 +2273,11 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2345,9 +2321,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -2358,10 +2331,7 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2390,209 +2360,9 @@
             ]
           },
           "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {
-            "xpGained": 98
+          "buddies": {
+            "names": {}
           },
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {
-              "dungeonFinalBossKills": 1,
-              "kills": 1,
-              "partiesJoined": 1
-            },
-            "dungeonClears": {
-              "nythraxis_boss_arena:heroic": 1
-            },
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "heroic_mark",
-              "spring_water",
-              "wyrmfall_core"
-            ],
-            "visited": [
-              "quality:rare"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "cmb_first_blood",
-              ""
-            ],
-            [
-              "col_first_rare",
-              ""
-            ],
-            [
-              "dgn_nythraxis",
-              ""
-            ],
-            [
-              "dgn_nythraxis_deathless",
-              ""
-            ],
-            [
-              "dgn_nythraxis_gravebreaker",
-              ""
-            ],
-            [
-              "dgn_nythraxis_heroic",
-              ""
-            ],
-            [
-              "dgn_nythraxis_wardens",
-              ""
-            ],
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ],
-            [
-              "soc_first_party",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1011,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "factionCurrencies": {},
-          "factions": {},
-          "gatheringProficiency": {},
-          "gliderRecords": {},
-          "harvestPreference": {
-            "kind": "all"
-          },
-          "heroicDaily": {
-            "date": "reset:1",
-            "marked": [
-              "nythraxis_boss_arena"
-            ]
-          },
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
-            },
-            {
-              "count": 2,
-              "itemId": "wyrmfall_core",
-              "materialSources": [
-                {
-                  "count": 2,
-                  "source": {}
-                }
-              ]
-            }
-          ],
-          "lifetimeXp": 167298,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "raidLockouts": [
-            [
-              "nythraxis_boss_arena:heroic",
-              86400000
-            ]
-          ],
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 200,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "vaultAttemptDurable": true,
-          "weeklyRewards": {
-            "bossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            },
-            "raidClears": [
-              2
-            ],
-            "raidUnlocks": [
-              2,
-              0,
-              0
-            ],
-            "raids": [
-              2,
-              0,
-              0
-            ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
-          },
-          "worldQuestReplacements": {},
-          "wyrmfallDaily": {
-            "sources": [
-              "nythraxis_boss_arena:heroic"
-            ]
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2700,6 +2470,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2708,10 +2479,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2751,9 +2518,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -2764,10 +2528,7 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2796,6 +2557,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2903,6 +2667,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2911,10 +2676,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2954,9 +2715,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -2967,10 +2725,7 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
-            }
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2999,6 +2754,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -3106,6 +2864,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -3114,10 +2873,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -3157,9 +2912,6 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
-            "raidClears": [
-              2
-            ],
             "raidUnlocks": [
               2,
               0,
@@ -3170,10 +2922,204 @@
               0,
               0
             ],
-            "resetAtMs": 604800000,
-            "weeklyBossUnlocks": {
-              "nythraxis_scourge_of_thornpeak": 2
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1015,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
+          "gatheringProficiency": {},
+          "gliderRecords": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "heroicMarks": 3,
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "wyrmfall_core",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "vaultAttemptDurable": true,
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "nythraxis_scourge_of_thornpeak": 2
+            },
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -3195,7 +3141,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -3208,7 +3154,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -3258,7 +3204,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1011,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3307,7 +3253,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1012,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3356,7 +3302,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1013,
+          "id": 1014,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3405,7 +3351,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1014,
+          "id": 1015,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3450,11 +3396,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1010",
               "entity:1011",
               "entity:1012",
               "entity:1013",
-              "entity:1014"
+              "entity:1014",
+              "entity:1015"
             ],
             "token": {}
           },
@@ -3466,7 +3412,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1015,
+          "id": 1016,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3483,26 +3429,17 @@
               },
               {
                 "count": 1,
-                "itemId": "hunters_tally"
+                "itemId": "stormcallers_focus"
               }
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
-            1010,
             1011,
             1012,
             1013,
-            1014
+            1014,
+            1015
           ],
           "lootable": true,
           "maxHp": 192000,
@@ -3526,7 +3463,7 @@
           "stats": {
             "armor": 1058
           },
-          "tappedById": 1010,
+          "tappedById": 1011,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
             "max": 573,

@@ -155,15 +155,33 @@ describe('mob aura icon art', () => {
   it('keeps the closed live mob aura inventory in parity with painted identities', () => {
     const census = buildLiveMobAuraCensus();
 
+    // The two family counts are the CLOSED-inventory half and they do not move for a new
+    // carrier: a mob taking an existing trait adds no family and no painting. The two
+    // census counts below are facts about the live MOBS table, so content legitimately
+    // moves them, and moving one without adding the matching painted identity is exactly
+    // the drift the parity assertion two lines down catches.
+    // 108 -> 109 / 89 -> 90 (v0.44): Balgath, the One-Eyed Foreman took `stoneskin`
+    // (Barrowhide, src/sim/content/zone2.ts), the eighth carrier of that family.
     expect(LIVE_MOB_AURA_FAMILIES).toHaveLength(44);
     expect(census.populatedFamilyCount).toBe(44);
     // The Fenbridge infiltrator reuses the drowned dead's existing aura art.
     // 110 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards:
     // the Buried Hoard Marrow Golem (rift_marrow_golem) carries frenzyOnHit,
     // whose shared blood_frenzy runtime id already resolves to painted art, so
-    // the identity count holds.
-    expect(census.carrierCount).toBe(110);
-    expect(census.identities.size).toBe(90);
+    // the identity count holds. 111 carriers and 91 identities with Balgath's
+    // Barrowhide (the Mirefen world-boss branch, release/v0.45.0 merge).
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 112, 92.
+    // Re-counted 2026-10 off the merged MOBS at 106a086b617 (the 114 and 93
+    // first written here were never the merged tree's counts): the rework adds
+    // five carriers (crypt_carrion_crow blind, basin_raptor and
+    // bastion_warhound packFrenzy, rimeweb_spinner stackPoison,
+    // drowned_sergeant warcry) and retires four (charge on
+    // knight_commander_olen and sexton_marrow, warcry and wardAllies on
+    // wildheart_beastmaster), so 111 + 5 - 4. Identities: three new per-template
+    // runtime ids (blind_, stackpoison_, warcry_) minus the beastmaster's two;
+    // pack_frenzy and mob_charge_stun are shared ids that still have carriers.
+    expect(census.carrierCount).toBe(112);
+    expect(census.identities.size).toBe(92);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

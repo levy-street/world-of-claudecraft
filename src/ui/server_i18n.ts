@@ -16,6 +16,7 @@ import {
   getLanguage,
   type InterpolationValues,
   type SupportedLanguage,
+  t,
   tPlural,
 } from './i18n';
 import { SERVER_NEW } from './server_i18n.newlocales';
@@ -64,17 +65,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Your ignore list is empty.',
     'ignores.list': 'Ignored ({count}): {names}',
     'ignores.usage': 'Usage: /ignore <name>, /unignore <name>, /ignorelist.',
-    'flair.shown': 'Your Discord role is shown to other players. Type /flair off to hide it.',
-    'flair.hidden': 'Your Discord role is hidden from other players. Type /flair on to show it.',
-    'flair.notLinked': 'Link your Discord account to use /flair.',
-    'flair.usage': 'Usage: /flair, /flair on, or /flair off.',
-    'presence.everyone':
-      'Friends and guildmates can see you online. Type /presence friends or /presence none to hide.',
-    'presence.friends':
-      'Only your friends can see you online. Type /presence everyone or /presence none to change it.',
-    'presence.none':
-      'You appear offline to friends and guildmates. Type /presence everyone or /presence friends to change it.',
-    'presence.usage': 'Usage: /presence, /presence everyone, /presence friends, or /presence none.',
     'guild.nameRules': 'Guild names are 3-24 letters (spaces allowed).',
     'guild.nameNotAllowed': 'That guild name is not allowed.',
     'guild.exists': "A guild named '{name}' already exists.",
@@ -241,17 +231,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Your ignore list is empty.',
     'ignores.list': 'Ignored ({count}): {names}',
     'ignores.usage': 'Usage: /ignore <name>, /unignore <name>, /ignorelist.',
-    'flair.shown': 'Your Discord role is shown to other players. Type /flair off to hide it.',
-    'flair.hidden': 'Your Discord role is hidden from other players. Type /flair on to show it.',
-    'flair.notLinked': 'Link your Discord account to use /flair.',
-    'flair.usage': 'Usage: /flair, /flair on, or /flair off.',
-    'presence.everyone':
-      'Friends and guildmates can see you online. Type /presence friends or /presence none to hide.',
-    'presence.friends':
-      'Only your friends can see you online. Type /presence everyone or /presence none to change it.',
-    'presence.none':
-      'You appear offline to friends and guildmates. Type /presence everyone or /presence friends to change it.',
-    'presence.usage': 'Usage: /presence, /presence everyone, /presence friends, or /presence none.',
     'guild.nameRules': 'Guild names are 3-24 letters (spaces allowed).',
     'guild.nameNotAllowed': 'That guild name is not allowed.',
     'guild.exists': "A guild named '{name}' already exists.",
@@ -399,19 +378,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Tu lista de ignorados está vacía.',
     'ignores.list': 'Ignorados ({count}): {names}',
     'ignores.usage': 'Uso: /ignore <nombre>, /unignore <nombre>, /ignorelist.',
-    'flair.shown':
-      'Tu rol de Discord es visible para otros jugadores. Escribe /flair off para ocultarlo.',
-    'flair.hidden':
-      'Tu rol de Discord está oculto para otros jugadores. Escribe /flair on para mostrarlo.',
-    'flair.notLinked': 'Vincula tu cuenta de Discord para usar /flair.',
-    'flair.usage': 'Uso: /flair, /flair on o /flair off.',
-    'presence.everyone':
-      'Tus amigos y compañeros de hermandad pueden verte en línea. Escribe /presence friends o /presence none para ocultarte.',
-    'presence.friends':
-      'Solo tus amigos pueden verte en línea. Escribe /presence everyone o /presence none para cambiarlo.',
-    'presence.none':
-      'Apareces desconectado para tus amigos y compañeros de hermandad. Escribe /presence everyone o /presence friends para cambiarlo.',
-    'presence.usage': 'Uso: /presence, /presence everyone, /presence friends o /presence none.',
     'guild.nameRules':
       'Los nombres de hermandad tienen entre 3 y 24 letras (se permiten espacios).',
     'guild.nameNotAllowed': 'Ese nombre de hermandad no está permitido.',
@@ -568,19 +534,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Tu lista de ignorados está vacía.',
     'ignores.list': 'Ignorados ({count}): {names}',
     'ignores.usage': 'Uso: /ignore <nombre>, /unignore <nombre>, /ignorelist.',
-    'flair.shown':
-      'Tu rol de Discord es visible para otros jugadores. Escribe /flair off para ocultarlo.',
-    'flair.hidden':
-      'Tu rol de Discord está oculto para otros jugadores. Escribe /flair on para mostrarlo.',
-    'flair.notLinked': 'Vincula tu cuenta de Discord para usar /flair.',
-    'flair.usage': 'Uso: /flair, /flair on o /flair off.',
-    'presence.everyone':
-      'Tus amigos y compañeros de hermandad pueden verte en línea. Escribe /presence friends o /presence none para ocultarte.',
-    'presence.friends':
-      'Solo tus amigos pueden verte en línea. Escribe /presence everyone o /presence none para cambiarlo.',
-    'presence.none':
-      'Apareces desconectado para tus amigos y compañeros de hermandad. Escribe /presence everyone o /presence friends para cambiarlo.',
-    'presence.usage': 'Uso: /presence, /presence everyone, /presence friends o /presence none.',
     'guild.nameRules':
       'Los nombres de hermandad deben tener entre 3 y 24 letras (se permiten espacios).',
     'guild.nameNotAllowed': 'Ese nombre de hermandad no está permitido.',
@@ -755,20 +708,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Votre liste des joueurs ignorés est vide.',
     'ignores.list': 'Ignorés ({count}) : {names}',
     'ignores.usage': 'Utilisation : /ignore <nom>, /unignore <nom>, /ignorelist.',
-    'flair.shown':
-      'Votre rôle Discord est visible par les autres joueurs. Tapez /flair off pour le masquer.',
-    'flair.hidden':
-      'Votre rôle Discord est masqué pour les autres joueurs. Tapez /flair on pour l’afficher.',
-    'flair.notLinked': 'Liez votre compte Discord pour utiliser /flair.',
-    'flair.usage': 'Utilisation : /flair, /flair on ou /flair off.',
-    'presence.everyone':
-      'Vos amis et les membres de votre guilde peuvent vous voir en ligne. Tapez /presence friends ou /presence none pour vous masquer.',
-    'presence.friends':
-      'Seuls vos amis peuvent vous voir en ligne. Tapez /presence everyone ou /presence none pour modifier ce réglage.',
-    'presence.none':
-      'Vous apparaissez hors ligne pour vos amis et les membres de votre guilde. Tapez /presence everyone ou /presence friends pour modifier ce réglage.',
-    'presence.usage':
-      'Utilisation : /presence, /presence everyone, /presence friends ou /presence none.',
     'guild.nameRules': 'Les noms de guilde comportent 3 à 24 lettres (espaces autorisés).',
     'guild.nameNotAllowed': "Ce nom de guilde n'est pas autorisé.",
     'guild.exists': 'Une guilde nommée « {name} » existe déjà.',
@@ -925,20 +864,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Votre liste des joueurs ignorés est vide.',
     'ignores.list': 'Ignorés ({count}) : {names}',
     'ignores.usage': 'Utilisation : /ignore <nom>, /unignore <nom>, /ignorelist.',
-    'flair.shown':
-      'Votre rôle Discord est visible par les autres joueurs. Tapez /flair off pour le masquer.',
-    'flair.hidden':
-      'Votre rôle Discord est masqué pour les autres joueurs. Tapez /flair on pour l’afficher.',
-    'flair.notLinked': 'Liez votre compte Discord pour utiliser /flair.',
-    'flair.usage': 'Utilisation : /flair, /flair on ou /flair off.',
-    'presence.everyone':
-      'Vos amis et les membres de votre guilde peuvent vous voir en ligne. Tapez /presence friends ou /presence none pour vous masquer.',
-    'presence.friends':
-      'Seuls vos amis peuvent vous voir en ligne. Tapez /presence everyone ou /presence none pour modifier ce réglage.',
-    'presence.none':
-      'Vous apparaissez hors ligne pour vos amis et les membres de votre guilde. Tapez /presence everyone ou /presence friends pour modifier ce réglage.',
-    'presence.usage':
-      'Utilisation : /presence, /presence everyone, /presence friends ou /presence none.',
     'guild.nameRules': 'Les noms de guilde comptent de 3 à 24 lettres (espaces autorisés).',
     'guild.nameNotAllowed': "Ce nom de guilde n'est pas autorisé.",
     'guild.exists': 'Une guilde nommée « {name} » existe déjà.',
@@ -1075,19 +1000,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'La tua lista degli ignorati è vuota.',
     'ignores.list': 'Ignorati ({count}): {names}',
     'ignores.usage': 'Uso: /ignore <nome>, /unignore <nome>, /ignorelist.',
-    'flair.shown':
-      'Il tuo ruolo Discord è visibile agli altri giocatori. Scrivi /flair off per nasconderlo.',
-    'flair.hidden':
-      'Il tuo ruolo Discord è nascosto agli altri giocatori. Scrivi /flair on per mostrarlo.',
-    'flair.notLinked': 'Collega il tuo account Discord per usare /flair.',
-    'flair.usage': 'Uso: /flair, /flair on o /flair off.',
-    'presence.everyone':
-      'Amici e compagni di gilda possono vederti online. Scrivi /presence friends o /presence none per nasconderti.',
-    'presence.friends':
-      'Solo i tuoi amici possono vederti online. Scrivi /presence everyone o /presence none per cambiare.',
-    'presence.none':
-      'Appari offline ad amici e compagni di gilda. Scrivi /presence everyone o /presence friends per cambiare.',
-    'presence.usage': 'Uso: /presence, /presence everyone, /presence friends o /presence none.',
     'guild.nameRules': 'I nomi delle gilde devono avere 3-24 lettere (spazi consentiti).',
     'guild.nameNotAllowed': 'Questo nome di gilda non è consentito.',
     'guild.exists': "Esiste già una gilda chiamata '{name}'.",
@@ -1244,20 +1156,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Deine Ignorierliste ist leer.',
     'ignores.list': 'Ignoriert ({count}): {names}',
     'ignores.usage': 'Verwendung: /ignore <Name>, /unignore <Name>, /ignorelist.',
-    'flair.shown':
-      'Deine Discord-Rolle ist für andere Spieler sichtbar. Gib /flair off ein, um sie auszublenden.',
-    'flair.hidden':
-      'Deine Discord-Rolle ist für andere Spieler ausgeblendet. Gib /flair on ein, um sie anzuzeigen.',
-    'flair.notLinked': 'Verknüpfe dein Discord-Konto, um /flair zu verwenden.',
-    'flair.usage': 'Verwendung: /flair, /flair on oder /flair off.',
-    'presence.everyone':
-      'Freunde und Gildenmitglieder sehen dich online. Gib /presence friends oder /presence none ein, um dich zu verbergen.',
-    'presence.friends':
-      'Nur deine Freunde sehen dich online. Gib /presence everyone oder /presence none ein, um das zu ändern.',
-    'presence.none':
-      'Für Freunde und Gildenmitglieder erscheinst du offline. Gib /presence everyone oder /presence friends ein, um das zu ändern.',
-    'presence.usage':
-      'Verwendung: /presence, /presence everyone, /presence friends oder /presence none.',
     'guild.nameRules': 'Gildennamen bestehen aus 3-24 Buchstaben (Leerzeichen erlaubt).',
     'guild.nameNotAllowed': 'Dieser Gildenname ist nicht erlaubt.',
     'guild.exists': "Eine Gilde mit dem Namen '{name}' existiert bereits.",
@@ -1407,17 +1305,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': '你的忽略列表为空。',
     'ignores.list': '已忽略（{count}）：{names}',
     'ignores.usage': '用法：/ignore <名称>、/unignore <名称>、/ignorelist。',
-    'flair.shown': '你的 Discord 身份组对其他玩家可见。输入 /flair off 可隐藏。',
-    'flair.hidden': '你的 Discord 身份组已对其他玩家隐藏。输入 /flair on 可显示。',
-    'flair.notLinked': '请先关联你的 Discord 账号才能使用 /flair。',
-    'flair.usage': '用法：/flair、/flair on 或 /flair off。',
-    'presence.everyone':
-      '好友和公会成员可以看到你在线。输入 /presence friends 或 /presence none 即可隐藏。',
-    'presence.friends':
-      '只有你的好友可以看到你在线。输入 /presence everyone 或 /presence none 即可更改。',
-    'presence.none':
-      '你对好友和公会成员显示为离线。输入 /presence everyone 或 /presence friends 即可更改。',
-    'presence.usage': '用法：/presence、/presence everyone、/presence friends 或 /presence none。',
     'guild.nameRules': '公会名称需为3-24个字母（允许空格）。',
     'guild.nameNotAllowed': '该公会名称不可使用。',
     'guild.exists': '已存在名为“{name}”的公会。',
@@ -1561,17 +1448,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': '你的忽略清單是空的。',
     'ignores.list': '已忽略（{count}）：{names}',
     'ignores.usage': '用法：/ignore <名稱>、/unignore <名稱>、/ignorelist。',
-    'flair.shown': '你的 Discord 身分組對其他玩家可見。輸入 /flair off 即可隱藏。',
-    'flair.hidden': '你的 Discord 身分組已對其他玩家隱藏。輸入 /flair on 即可顯示。',
-    'flair.notLinked': '請先連結你的 Discord 帳號才能使用 /flair。',
-    'flair.usage': '用法：/flair、/flair on 或 /flair off。',
-    'presence.everyone':
-      '好友和公會成員可以看到你在線。輸入 /presence friends 或 /presence none 即可隱藏。',
-    'presence.friends':
-      '只有你的好友可以看到你在線。輸入 /presence everyone 或 /presence none 即可更改。',
-    'presence.none':
-      '你對好友和公會成員顯示為離線。輸入 /presence everyone 或 /presence friends 即可更改。',
-    'presence.usage': '用法：/presence、/presence everyone、/presence friends 或 /presence none。',
     'guild.nameRules': '公會名稱須為 3-24 個字母（可使用空格）。',
     'guild.nameNotAllowed': '此公會名稱不可使用。',
     'guild.exists': '已經有一個名為「{name}」的公會存在。',
@@ -1716,18 +1592,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': '무시 목록이 비어 있습니다.',
     'ignores.list': '무시됨 ({count}): {names}',
     'ignores.usage': '사용법: /ignore <이름>, /unignore <이름>, /ignorelist.',
-    'flair.shown': 'Discord 역할이 다른 플레이어에게 표시됩니다. 숨기려면 /flair off를 입력하세요.',
-    'flair.hidden':
-      'Discord 역할이 다른 플레이어에게 숨겨져 있습니다. 표시하려면 /flair on을 입력하세요.',
-    'flair.notLinked': '/flair를 사용하려면 Discord 계정을 연동하세요.',
-    'flair.usage': '사용법: /flair, /flair on, /flair off.',
-    'presence.everyone':
-      '친구와 길드원이 당신의 접속 상태를 볼 수 있습니다. 숨기려면 /presence friends 또는 /presence none을 입력하세요.',
-    'presence.friends':
-      '친구만 당신의 접속 상태를 볼 수 있습니다. 변경하려면 /presence everyone 또는 /presence none을 입력하세요.',
-    'presence.none':
-      '친구와 길드원에게 오프라인으로 표시됩니다. 변경하려면 /presence everyone 또는 /presence friends를 입력하세요.',
-    'presence.usage': '사용법: /presence, /presence everyone, /presence friends, /presence none',
     'guild.nameRules': '길드 이름은 3~24자여야 합니다(공백 허용).',
     'guild.nameNotAllowed': '사용할 수 없는 길드 이름입니다.',
     'guild.exists': "'{name}'(이)라는 이름의 길드가 이미 존재합니다.",
@@ -1874,19 +1738,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': '無視リストは空です。',
     'ignores.list': '無視中（{count}）：{names}',
     'ignores.usage': '使い方: /ignore <名前>、/unignore <名前>、/ignorelist。',
-    'flair.shown':
-      'あなたの Discord ロールは他のプレイヤーに表示されています。非表示にするには /flair off と入力してください。',
-    'flair.hidden':
-      'あなたの Discord ロールは他のプレイヤーに非表示になっています。表示するには /flair on と入力してください。',
-    'flair.notLinked': '/flair を使うには Discord アカウントを連携してください。',
-    'flair.usage': '使い方: /flair、/flair on、/flair off。',
-    'presence.everyone':
-      'フレンドとギルドメンバーにオンライン状態が表示されています。隠すには /presence friends または /presence none と入力してください。',
-    'presence.friends':
-      'フレンドだけにオンライン状態が表示されます。変更するには /presence everyone または /presence none と入力してください。',
-    'presence.none':
-      'フレンドとギルドメンバーにはオフラインと表示されます。変更するには /presence everyone または /presence friends と入力してください。',
-    'presence.usage': '使い方：/presence、/presence everyone、/presence friends、/presence none',
     'guild.nameRules': 'ギルド名は3～24文字です（スペース可）。',
     'guild.nameNotAllowed': 'そのギルド名は使用できません。',
     'guild.exists': '「{name}」という名前のギルドはすでに存在します。',
@@ -2040,19 +1891,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Sua lista de ignorados está vazia.',
     'ignores.list': 'Ignorados ({count}): {names}',
     'ignores.usage': 'Uso: /ignore <nome>, /unignore <nome>, /ignorelist.',
-    'flair.shown':
-      'Seu cargo do Discord está visível para outros jogadores. Digite /flair off para ocultá-lo.',
-    'flair.hidden':
-      'Seu cargo do Discord está oculto para outros jogadores. Digite /flair on para exibi-lo.',
-    'flair.notLinked': 'Vincule sua conta do Discord para usar /flair.',
-    'flair.usage': 'Uso: /flair, /flair on ou /flair off.',
-    'presence.everyone':
-      'Amigos e membros da guilda podem ver você online. Digite /presence friends ou /presence none para se ocultar.',
-    'presence.friends':
-      'Só seus amigos podem ver você online. Digite /presence everyone ou /presence none para mudar.',
-    'presence.none':
-      'Você aparece offline para amigos e membros da guilda. Digite /presence everyone ou /presence friends para mudar.',
-    'presence.usage': 'Uso: /presence, /presence everyone, /presence friends ou /presence none.',
     'guild.nameRules': 'Os nomes de guilda têm de 3 a 24 letras (espaços permitidos).',
     'guild.nameNotAllowed': 'Esse nome de guilda não é permitido.',
     'guild.exists': "Já existe uma guilda chamada '{name}'.",
@@ -2204,19 +2042,6 @@ export const DICT: Record<string, Record<string, string>> = {
     'ignores.empty': 'Ваш список игнорируемых пуст.',
     'ignores.list': 'Игнорируются ({count}): {names}',
     'ignores.usage': 'Использование: /ignore <имя>, /unignore <имя>, /ignorelist.',
-    'flair.shown': 'Ваша роль в Discord видна другим игрокам. Введите /flair off, чтобы скрыть её.',
-    'flair.hidden':
-      'Ваша роль в Discord скрыта от других игроков. Введите /flair on, чтобы показать её.',
-    'flair.notLinked': 'Привяжите аккаунт Discord, чтобы использовать /flair.',
-    'flair.usage': 'Использование: /flair, /flair on или /flair off.',
-    'presence.everyone':
-      'Друзья и члены гильдии видят, что вы в сети. Введите /presence friends или /presence none, чтобы скрыться.',
-    'presence.friends':
-      'Только друзья видят, что вы в сети. Введите /presence everyone или /presence none, чтобы изменить это.',
-    'presence.none':
-      'Для друзей и членов гильдии вы не в сети. Введите /presence everyone или /presence friends, чтобы изменить это.',
-    'presence.usage':
-      'Использование: /presence, /presence everyone, /presence friends или /presence none.',
     'guild.nameRules': 'Названия гильдий должны содержать от 3 до 24 букв (пробелы допускаются).',
     'guild.nameNotAllowed': 'Такое название гильдии недопустимо.',
     'guild.exists': 'Гильдия с названием «{name}» уже существует.',
@@ -2608,6 +2433,51 @@ for (const key of Object.keys(DICT.en)) {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // ---- GM tools (server/moderation_service.ts) ----
+  // FIRST on purpose: the announcement and watch lines carry staff-authored free
+  // text, which a later, broader rule (e.g. "(.+) is not jailed.") could
+  // otherwise claim and mistranslate. The text itself passes through verbatim.
+  {
+    re: /^\[Announcement\] ([^:]+): (.+)$/,
+    build: (m) => tServer('moderation.announcement', { name: m[1], text: m[2] }),
+  },
+  {
+    re: /^Watchlist: (.+) just logged in \(watched as (.+)\)\.$/,
+    build: (m) => tServer('moderation.watchLoginAs', { name: m[1], watched: m[2] }),
+  },
+  {
+    re: /^Watchlist: (.+) just logged in\.$/,
+    build: (m) => tServer('moderation.watchLogin', { name: m[1] }),
+  },
+  { re: /^Watch note: (.+)$/, build: (m) => tServer('moderation.watchNote', { note: m[1] }) },
+  {
+    re: /^Watched: ([^()]+) \((.+)\)$/,
+    build: (m) => tServer('moderation.watchlistEntryNote', { name: m[1], note: m[2] }),
+  },
+  { re: /^Watched: (.+)$/, build: (m) => tServer('moderation.watchlistEntry', { name: m[1] }) },
+  {
+    re: /^Watchlist \((\d+)\):$/,
+    build: (m) => tServer('moderation.watchlistHeader', { count: m[1] }),
+  },
+  {
+    re: /^Added (.+) to the watchlist\.$/,
+    build: (m) => tServer('moderation.watchAdded', { name: m[1] }),
+  },
+  {
+    re: /^Removed (.+) from the watchlist\.$/,
+    build: (m) => tServer('moderation.watchRemoved', { name: m[1] }),
+  },
+  {
+    re: /^(.+) is not on the watchlist\.$/,
+    build: (m) => tServer('moderation.notWatched', { name: m[1] }),
+  },
+  { re: /^Usage: \/visible on\|off$/, build: () => tServer('moderation.visibleUsage') },
+  {
+    re: /^Usage: \/watch \["<name>" \[note\]\]$/,
+    build: () => tServer('moderation.watchUsage'),
+  },
+  { re: /^Usage: \/unwatch "<name>"$/, build: () => tServer('moderation.unwatchUsage') },
+  { re: /^Usage: \/announce <message>$/, build: () => tServer('moderation.announceUsage') },
   // ---- guild pledges (docs/prd/guild-pledge-board.md) ----
   {
     re: /^You have pledged to (.+)\.$/,
@@ -3002,6 +2872,8 @@ const RULES: Rule[] = [
 
 // Returns the localized form of a server message, or null if it is not one of ours.
 export function localizeServerText(text: string): string | null {
+  if (text === 'Bound friends are linked by their referral invitation.')
+    return t('hud.social.boundFriendLink');
   const restart = RESTART_MESSAGES[text]?.[getLanguage()];
   if (restart) return restart;
   const exactKey = EXACT[text];

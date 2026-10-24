@@ -14,6 +14,10 @@ const FRAME_GEOMETRY_PROPERTIES: Record<string, readonly [string, string]> = {
   focusTarget2Height: ['--focus-target-2-height', 'px'],
   focusTarget3Width: ['--focus-target-3-width', 'px'],
   focusTarget3Height: ['--focus-target-3-height', 'px'],
+  playerFrameResourceWidth: ['--player-resource-width', 'px'],
+  playerFrameResourceHeight: ['--player-resource-height', 'px'],
+  // Frame appearance rides the same publication path: one root var per setting.
+  hillBarOpacity: ['--hill-bar-opacity', ''],
 };
 
 export function applyFrameGeometrySetting(

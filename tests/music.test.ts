@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { BossLoopTrack } from '../src/game/boss_music_loop';
 import {
   buildMusicThemes,
   dungeonMusicZoneForDungeon,
@@ -91,6 +92,7 @@ class FakeAudioContext {
 }
 
 interface FakeStream {
+  url: string;
   el: FakeAudio | null;
   gain: FakeGain;
   target: number;
@@ -102,6 +104,7 @@ interface DirectorInternals {
   timer: number;
   zoneStreams: Partial<Record<string, FakeStream>>;
   combatStreams: FakeStream[];
+  master: FakeGain;
   streamKeeper(): void;
 }
 
@@ -141,6 +144,56 @@ describe('MusicDirector streamed combat / background mix', () => {
     expect(vale?.el?.preload).toBe('auto');
     expect(vale?.el?.play).toHaveBeenCalled();
     for (const combat of internals(director).combatStreams) expect(combat.target).toBe(0);
+  });
+
+  // Goldcrest Harbor is the one zone shipping a PAIR of remasters: it rolls one
+  // per arrival, so the capital does not wear a single loop out over a session.
+  it('opens the capital on the rolled harbor cue', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.9); // second of the two
+    director.update('town_goldcrest', false);
+    const stream = internals(director).zoneStreams.town_goldcrest;
+    expect(stream?.el?.src).toBe('/audio/music/town_goldcrest_2.mp3?v=c616612609d6');
+    expect(stream?.target).toBe(1);
+  });
+
+  it('rolls a different harbor cue on the next visit and drops the old download', () => {
+    const rand = vi.spyOn(Math, 'random').mockReturnValue(0);
+    director.update('town_goldcrest', false);
+    const first = internals(director).zoneStreams.town_goldcrest;
+    // Held separately: releasing the stream nulls its own `el` reference.
+    const firstEl = first?.el;
+    expect(firstEl?.src).toBe('/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5');
+
+    director.update('vale', false);
+    rand.mockReturnValue(0.9);
+    director.update('town_goldcrest', false);
+
+    const second = internals(director).zoneStreams.town_goldcrest;
+    expect(second).not.toBe(first);
+    expect(second?.el?.src).toBe('/audio/music/town_goldcrest_2.mp3?v=c616612609d6');
+    // The swapped-out cue must stop buffering behind the one now playing.
+    expect(firstEl?.pause).toHaveBeenCalled();
+    expect(first?.el).toBeNull();
+  });
+
+  it('hands the capital back its own cue after a fight instead of re-rolling', () => {
+    const rand = vi.spyOn(Math, 'random').mockReturnValue(0);
+    director.update('town_goldcrest', false);
+    const before = internals(director).zoneStreams.town_goldcrest;
+    director.update('town_goldcrest', true);
+    rand.mockReturnValue(0.9); // would pick the other cue if this re-rolled
+    director.update('town_goldcrest', false);
+
+    expect(internals(director).zoneStreams.town_goldcrest).toBe(before);
+    expect(before?.target).toBe(1);
+  });
+
+  it('keeps a single-track zone on one stream across revisits', () => {
+    director.update('vale', false);
+    const first = internals(director).zoneStreams.vale;
+    director.update('peaks', false);
+    director.update('vale', false);
+    expect(internals(director).zoneStreams.vale).toBe(first);
   });
 
   it('silences the zone stream so ONLY combat music plays in combat (no layering)', () => {
@@ -198,6 +251,33 @@ describe('MusicDirector streamed combat / background mix', () => {
     director.update('vale', false);
     expect(el.currentTime).toBe(55);
     expect(el.play).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('MusicDirector close', () => {
+  beforeEach(() => {
+    vi.stubGlobal('AudioContext', FakeAudioContext);
+    vi.stubGlobal('Audio', FakeAudio);
+    vi.stubGlobal('window', { setInterval: vi.fn(() => 1) });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    FakeAudio.instances = [];
+  });
+
+  it('releases the zone streams and the context, so a later init() rebuilds', () => {
+    const director = makeDirector();
+    director.update('vale', false);
+    const el = internals(director).zoneStreams.vale?.el;
+    expect(el).toBeDefined();
+    (FakeAudioContext.prototype as unknown as { close: () => Promise<void> }).close =
+      async () => {};
+    director.close();
+    expect(el?.pause).toHaveBeenCalled();
+    expect(internals(director).zoneStreams).toEqual({});
+    expect((director as unknown as { ctx: unknown }).ctx).toBeNull();
   });
 });
 
@@ -343,6 +423,22 @@ describe('MusicDirector stream keeper', () => {
     expect(el.play).toHaveBeenCalledTimes(1);
   });
 
+  it('stops the default combat track immediately when a boss cue takes over', () => {
+    director.update('dungeon_hollow_crypt', true);
+    const inner = internals(director);
+    const combat = inner.combatStreams.find((stream) => stream.target === 1);
+    if (!combat?.el) throw new Error('combat stream element missing');
+    expect(combat.el.paused).toBe(false);
+
+    director.setBossCombat(true, '/audio/music/boss_sexton_marrow.mp3');
+
+    expect(combat.el.paused).toBe(true);
+    expect(FakeAudio.instances.at(-1)?.src).toBe('/audio/music/boss_sexton_marrow.mp3');
+    expect(FakeAudio.instances.at(-1)?.paused).toBe(false);
+    inner.streamKeeper();
+    expect(combat.el.paused).toBe(true);
+  });
+
   it('pauses streams at volume zero and revives when the slider comes back', () => {
     director.update('vale', false);
     const inner = internals(director);
@@ -433,8 +529,10 @@ describe('dungeon music entry reset', () => {
     const el = internals(director).zoneStreams.dungeon_hollow_crypt?.el;
     if (!el) throw new Error('dungeon stream element missing');
     el.currentTime = 19;
-    const bossElement = { currentTime: 19 };
-    (director as unknown as { bossElement: typeof bossElement }).bossElement = bossElement;
+    const bossLoop = (director as unknown as { bossLoop: BossLoopTrack }).bossLoop;
+    const bossElement = bossLoop.element();
+    if (!bossElement) throw new Error('boss loop element missing');
+    bossElement.currentTime = 19;
 
     director.resetForDungeonEntry('nythraxis_boss_arena');
 

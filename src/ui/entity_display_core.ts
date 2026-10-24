@@ -15,13 +15,15 @@
 // this module (the Phase 18 frontend review round), and were deleted with that
 // last import; every consumer names this path.
 import { isNecromancyUndead } from '../sim/combat/necromancy';
-import { DUNGEON_LIST, ITEMS, QUESTS } from '../sim/data';
+import { DUNGEON_LIST, ITEMS, MOBS, QUESTS } from '../sim/data';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import type { Entity, PlayerClass } from '../sim/types';
 import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, dungeonDisplayName, itemDisplayName, tEntity } from './entity_i18n';
 import { feastTitleFor } from './hud/professions/feast_title';
 import { mobileStationTitleFor } from './hud/professions/mobile_station_title';
 import { formatNumber, t } from './i18n';
+import { kitObjectDisplayName } from './kit_object_name';
 import { professionTrainerLabel } from './profession_trainer_label_core';
 import { localizeSimAuraName } from './sim_i18n';
 import { forgeObjectLabel } from './world_quest_forge_view';
@@ -40,6 +42,14 @@ export function itemStackDisplayName(item: string, stackSuffix?: string): string
 
 export function mobDisplayName(mobId: string): string {
   return tEntity({ kind: 'mob', id: mobId, field: 'name' });
+}
+
+/** Hover titles retain a buddy's nickname and identify its original companion type. */
+export function mobHoverIdentity(entity: Entity): { name: string; buddyType?: string } {
+  const typeName = mobDisplayName(entity.templateId);
+  if (!isBuddyMob(entity)) return { name: typeName };
+  const name = entityDisplayName(entity);
+  return { name, buddyType: name !== typeName ? typeName : undefined };
 }
 
 export function npcDisplayName(npcId: string): string {
@@ -132,6 +142,7 @@ export function delveDisplayName(delveId: string): string {
 //  - the placed harvest feast composes the localized "{name}'s Harvest
 //    Feast" title around the PLACER'S raw name (the wire carries the name as
 //    a value; sim and server stay language-agnostic);
+//  - a capture-the-flag flag object names its side (flagObjectDisplayName);
 //  - every other entity (players, plain objects) shows its wire name as is.
 // The world-quest cannon stations name themselves by the emplacement they man,
 // read by the vehicle bar and the world-quest view as well as the live name.
@@ -153,6 +164,18 @@ export function investigationObjectLabel(itemId: string | null | undefined): str
   return null;
 }
 
+// The capture-the-flag flag objects (templateId 'bg_flag'): the battleground
+// (src/sim/social/battleground.ts) and the authored-map rehearsal
+// (src/sim/social/map_objectives_run.ts) both name one "<Side> Flag" in
+// English. Null for anything else, including an unknown side, which then
+// shows its wire name as is.
+export function flagObjectDisplayName(templateId: string, name: string): string | null {
+  if (templateId !== 'bg_flag') return null;
+  if (name === 'Crimson Flag') return t('hudChrome.bg.flagNameCrimson');
+  if (name === 'Azure Flag') return t('hudChrome.bg.flagNameAzure');
+  return null;
+}
+
 export function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'object') {
     // World-quest objects first: an investigation clue, a forge station, and
@@ -164,8 +187,14 @@ export function entityDisplayName(entity: Entity): string {
     if (forgeLabel) return forgeLabel;
     if (entity.templateId === 'north_watch_cannon' || entity.templateId === 'last_keep_cannon')
       return vehicleStationDisplayName(entity.templateId);
+    const flagName = flagObjectDisplayName(entity.templateId, entity.name);
+    if (flagName !== null) return flagName;
   }
   if (entity.kind === 'mob') {
+    if (isBuddyMob(entity))
+      return entity.name === MOBS[entity.templateId]?.name
+        ? tEntity({ kind: 'mob', id: entity.templateId, field: 'name' })
+        : entity.name;
     return entity.ownerId !== null && !isNecromancyUndead(entity)
       ? (localizeSimAuraName(entity.name) ?? entity.name)
       : tEntity({ kind: 'mob', id: entity.templateId, field: 'name' });
@@ -180,6 +209,10 @@ export function entityDisplayName(entity: Entity): string {
     // A placed mobile crafting station, the same leaf rule (mobile_station_title.ts).
     const stationTitle = mobileStationTitleFor(entity.templateId, entity.name);
     if (stationTitle !== null) return stationTitle;
+    // A trash engine object (an Ice Slab, a soulfire pool): the sim's English
+    // mechanic name, re-localized (kit_object_name.ts).
+    const kitName = kitObjectDisplayName(entity.templateId, entity.name);
+    if (kitName !== null) return kitName;
   }
   return entity.name;
 }

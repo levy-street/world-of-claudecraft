@@ -54,6 +54,7 @@ import { primaryHealingMultiplier } from '../spec_output_tuning';
 import {
   abilityScalingPower,
   absorbBonus,
+  coefficientCastTime,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -131,8 +132,14 @@ import {
   druidMarrowbreakUsesGuard,
   resolveDruidOverbloom,
 } from './druid_engines';
+import { resolveWeaponSweep } from './druid_scratch';
+import {
+  plantSporeBurst,
+  SPORE_BURST_FULL_BANK_POWER,
+  sporeBurstFullBank,
+} from './druid_spore_burst';
 import { consumeNextAttackCrit } from './empower_next';
-import { runWeaponProcs } from './equip_procs';
+import { rollFeralStrikeEnchant, runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { fireGuaranteedCrit, personalBarrierIdForSpec } from './fire_mage';
 import { isFormAuraKind, isTravelFormAuraKind } from './forms';
@@ -157,6 +164,7 @@ import {
   startBloodhook,
   trailbreak,
 } from './hunter_fieldcraft';
+import { pulseArmoredGroundAoE } from './hunter_ground_zone';
 import {
   applyHowlingRage,
   runFrenzyFellShotCleave,
@@ -164,16 +172,20 @@ import {
   runStampede,
   runUnleashBeast,
 } from './hunter_packlord';
+import { startPlayDead } from './hunter_play_dead';
+import { runScatterbolt } from './hunter_scatterbolt';
 import {
   activateHunterMajorWindow,
   cripplingPursuit,
   grantHunterFocus,
   onHunterGuiseActivated,
   onHunterPrimaryDamage,
+  onHunterVenomBarbLanded,
   runHunterPackRally,
   runHunterWildheart,
 } from './hunter_shared';
-import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
+import { spawnBearTrap, spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
+import { applyLaunchKnockback } from './knockback_launch';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import {
   addSoulFragments,
@@ -260,8 +272,10 @@ import {
 } from './shaman_thundercall';
 import {
   applyStormbreakMana,
+  magmaBurstCritBonus,
   magmaBurstGuaranteedCrit,
   rollArcOverload,
+  thundercallOnMagmaBurstImpact,
 } from './shaman_thundercall_kit';
 import { runUnleashWeapon } from './shaman_unleash_weapon';
 import {
@@ -316,7 +330,7 @@ function dropsCombatOnStealth(ability: AbilityDef): boolean {
  * return the extra ids the live-target sweep must clear. Ordinary stealth uses
  * only that live-target sweep, so it never becomes a full threat dump.
  */
-function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
+export function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
@@ -390,7 +404,7 @@ function consumeMatchingAura(
 ): number {
   if (!target) return -1;
   // Grovespring 2pc: Swiftmend (the only hot-kind consumer) prefers the
-  // caster's OWN Wildbloom or Second Bloom, so a wearer stops eating another
+  // caster's OWN Sporemending or Second Bloom, so a wearer stops eating another
   // healer's HoT while their own is up. With none of their own present the
   // base pick below still applies (the set doc's explicit fallback: a paid
   // cast must never turn into a silent no-heal). Selection only; draws no
@@ -480,6 +494,9 @@ export function runEffects(
   const ability = res.def;
   const benisonChoirMult = consumeBenisonPrayers(ctx, p, ability.id);
   let benisonPrayerBuilt = false;
+  // The resolved (pre-critical) amount of this cast's direct heal, read by a
+  // later 'hot' effect that carries closingHealFromDirect (Second Bloom).
+  let directHealAmount: number | undefined;
   // The cast-scoped heal multiplier the heal and hot arms below apply to the
   // WHOLE resolved amount: the caller's mark times the Nature's Boon power the
   // resolved copy carries (combat/druid_natures_boon.ts, stamped in
@@ -654,7 +671,49 @@ export function runEffects(
         applyTemporalHourglass(ctx, p, p.castAim ?? p.pos, eff, ability.name);
         break;
       }
+      case 'sporeBurst': {
+        // Spore Burst (combat/druid_spore_burst.ts): plant the mushroom where
+        // the cast was aimed. Both riders take the area coefficient, like
+        // aoeDamage and aoeHeal, and everything is snapshotted here so the
+        // burst five seconds later only rolls.
+        // A full Verdance or Moontide bank adds its 25% on top of any armed
+        // Nature's Boon window; the bank itself is spent at cast completion
+        // (druid_engines.ts druidEngineOnCast), after this snapshot.
+        const bankPower = sporeBurstFullBank(p.auras, p.id) ? SPORE_BURST_FULL_BANK_POWER : 1;
+        const boonPower = (res.naturesBoonPower ?? 1) * bankPower;
+        plantSporeBurst(ctx, p, p.castAim ?? p.pos, eff, ability.name, {
+          spBonus: directHitBonus(
+            abilityScalingPower(p, ability),
+            ability,
+            res.castTime,
+            true,
+            talentDmgMult,
+          ),
+          healBonus: directHealBonus(p.healPower, res.castTime, true, talentHealMult),
+          healMult: castScopedHealMult * bankPower,
+          primaryHealMult,
+          damageMult: boonPower * primaryDamageMult,
+          plantsSporemending: meta.cls === 'druid' && mods.spec === 'restoration',
+          threat: threatOpts,
+        });
+        break;
+      }
       case 'weaponStrike': {
+        // Sweep variant (Scratch): every nearby hostile, combo per landed hit.
+        if (eff.sweepRadius !== undefined) {
+          const landed = resolveWeaponSweep(ctx, p, ability, eff.sweepRadius, eff.bonus, {
+            weaponMult: eff.weaponMult,
+            primaryDamageMult,
+            threatFlat: res.threatFlat,
+            threatMult: res.threatMult,
+            critBonus: mods.abilities[ability.id]?.critPct ?? 0,
+            comboPerHit: ability.awardsCombo ? ability.awardsCombo + setComboBonus : 0,
+            forceCrit: sureCrit,
+          });
+          if (landed > 0 && ability.awardsCombo) comboAwarded = true;
+          if (landed > 0 && sureCrit) sureCritRolled = true;
+          break;
+        }
         if (!target) break;
         const strikeTarget = target;
         let dawnEchoWeaponAmount = 0;
@@ -904,7 +963,12 @@ export function runEffects(
           // override against the caster's own Cinder Jolt; the roll is still drawn.
           magmaBurstGuaranteedCrit(ctx, p, ability.id, target);
         if (sureCrit) sureCritRolled = true;
-        if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
+        if (crit)
+          dmg *=
+            (isSpell ? 1.5 : 2) +
+            (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus) +
+            // Lava Flows (combat/shaman_thundercall_kit.ts): Magma Burst only.
+            magmaBurstCritBonus(ctx, p, ability.id);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
@@ -939,6 +1003,9 @@ export function runEffects(
         // The crit rolled above is plumbed through as one argument (Coldsight
         // 4pc observes it; no extra roll happens anywhere downstream).
         onHunterPrimaryDamage(ctx, p, target, res, finalDamage, crit);
+        // A landed feral form strike (Marrowbreak) rolls the mainhand's melee
+        // enchant; a no-op for every other ability (combat/equip_procs.ts).
+        rollFeralStrikeEnchant(ctx, p, ability);
         if (ability.id === 'arcane_shot') runFrenzyFellShotCleave(ctx, p, target);
         if (ability.id === 'lightning_bolt') {
           thundercallOnArcBoltImpact(ctx, p);
@@ -949,6 +1016,7 @@ export function runEffects(
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
           applyStoneboundJolt(ctx, p, target);
         }
+        if (ability.id === 'lava_burst') thundercallOnMagmaBurstImpact(ctx, p);
         if (ability.id === 'solar_invocation') {
           ctx.emit({
             type: 'spellfx',
@@ -1114,6 +1182,9 @@ export function runEffects(
           ability.id,
         );
         druidEngineOnLandedStrike(ctx, p, ability.id);
+        // A landed feral finisher is a melee strike: it rolls the mainhand's
+        // melee enchant like a weaponStrike would (combat/equip_procs.ts).
+        rollFeralStrikeEnchant(ctx, p, ability);
         // Second Shadow (rogue capstone, docs/design/rogue-v029-class-design.md):
         // a full 5-combo finisher strikes again as a shadow echo at a fraction of
         // the resolved damage. No extra rng (never crits); the amount is already
@@ -1371,7 +1442,8 @@ export function runEffects(
         const rolledAmount = ctx.rng.range(eff.min, eff.max);
         const baseHealAmount =
           eff.casterMaxHpPct === undefined
-            ? rolledAmount + directHealBonus(p.healPower, res.castTime, false, talentHealMult)
+            ? rolledAmount +
+              directHealBonus(p.healPower, coefficientCastTime(res), false, talentHealMult)
             : Math.round(p.maxHp * eff.casterMaxHpPct);
         // The cast-scoped multiplier (see the runEffects parameter note): the
         // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
@@ -1383,6 +1455,7 @@ export function runEffects(
           eff.casterMaxHpPct === undefined
             ? scalePrimaryHealing(castHealAmount, primaryHealMult)
             : castHealAmount;
+        directHealAmount = healAmount;
         if (eff.canCrit === false) ctx.rng.chance(0);
         // Only this direct-heal effect opts into Beacon transfer. Derived,
         // periodic, chained, area, and self-heal effects remain ineligible.
@@ -1565,9 +1638,6 @@ export function runEffects(
       }
       case 'hot': {
         const hotTarget = target ?? p;
-        const plantsHot = !hotTarget.auras.some(
-          (aura) => aura.kind === 'hot' && aura.id === ability.id && aura.sourceId === p.id,
-        );
         // A HoT that RIDES a direct heal (Regrowth-style) does NOT also scale here:
         // the direct component already took the cast-time coefficient, so scaling the
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
@@ -1604,8 +1674,12 @@ export function runEffects(
           tickTimer: eff.interval,
           sourceId: p.id,
           school: ability.school,
+          ...(eff.closingHealFromDirect === true && directHealAmount !== undefined
+            ? { closingHeal: directHealAmount }
+            : {}),
         });
-        if (plantsHot) druidEngineOnHotPlanted(ctx, p, ability.id);
+        // A refresh of the caster's own ticking bloom banks Verdance too.
+        druidEngineOnHotPlanted(ctx, p, ability.id);
         break;
       }
       case 'absorb': {
@@ -2130,6 +2204,7 @@ export function runEffects(
         }
         if (ability.id === 'rip') druidEngineOnLandedStrike(ctx, p, ability.id);
         ctx.enterCombat(p, target);
+        if (ability.id === 'serpent_sting') onHunterVenomBarbLanded(ctx, p, target);
         break;
       }
       case 'extendDot': {
@@ -2186,16 +2261,17 @@ export function runEffects(
       case 'druidMarrowbreakGuard': {
         if (!druidMarrowbreakUsesGuard(p, eff.belowFrac)) break;
         const mult = druidApexPayoffMult(ctx, p, ability.id);
-        ctx.applyAura(p, {
-          id: 'marrowbreak_guard',
-          name: ability.name,
-          kind: 'absorb',
-          remaining: 8,
-          duration: 8,
-          value: Math.round(p.maxHp * eff.absorbPctMaxHp * mult),
-          sourceId: p.id,
-          school: 'nature',
-        });
+        // An instant self-heal for a slice of maximum health (it used to be an
+        // 8 sec absorb). It cannot critically strike, so it draws no rng.
+        ctx.applyHeal(
+          p,
+          p,
+          Math.round(p.maxHp * eff.healPctMaxHp * mult),
+          ability.name,
+          ability.id,
+          false,
+          false,
+        );
         if (p.resourceType === 'rage') {
           p.resource = Math.min(p.maxResource, p.resource + eff.rage);
         }
@@ -2322,8 +2398,8 @@ export function runEffects(
       case 'incapacitate': {
         if (!target || target.dead) break;
         // Fear keeps its own ladder; every other incapacitate asks
-        // incapacitateDrCategory, which today diminishes Sap alone (and returns
-        // null, meaning "no ladder", for the rest). Deterministic either way:
+        // incapacitateDrCategory, which today diminishes Sap and Slumber (and
+        // returns null, meaning "no ladder", for the rest). Deterministic either way:
         // the resolver draws no rng.
         const incapDrCategory = ability.fearDr ? 'fear' : incapacitateDrCategory(ability.id);
         const remaining = incapDrCategory
@@ -2661,7 +2737,12 @@ export function runEffects(
           ctx.awardCombo(p, aoeTargets[0], ability.awardsCombo);
           comboAwarded = true;
         }
-        if (aoeTargets.length > 0) druidEngineOnLandedStrike(ctx, p, ability.id);
+        if (aoeTargets.length > 0) {
+          druidEngineOnLandedStrike(ctx, p, ability.id);
+          // Sweeping Claws: ONE melee-enchant roll per cast that struck
+          // anything, never one per target (combat/equip_procs.ts).
+          rollFeralStrikeEnchant(ctx, p, ability);
+        }
         break;
       }
       case 'chainDamage': {
@@ -2913,6 +2994,7 @@ export function runEffects(
           orbCdr: eff.orbCdr,
           threat: threatOpts,
           devotionOnFirstHit: eff.devotionOnFirstHit,
+          armorMitigated: ability.school === 'physical' || undefined,
           consecration:
             ability.id === 'consecration'
               ? {
@@ -3006,7 +3088,9 @@ export function runEffects(
         }
         // A delayed zone (Meteor's fall) skips the on-cast pulse: its first
         // hit lands one interval later, exactly the fall time.
-        if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
+        if (!eff.delayed && groundEffect.armorMitigated) {
+          pulseArmoredGroundAoE(ctx, groundEffect, threatOpts, true);
+        } else if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
         if (echoThunderVent) {
           // Faultwake's full vent is the whole zone, so mirror each pulse one
@@ -3314,6 +3398,16 @@ export function runEffects(
             : ability.id === 'mass_barrier' && spec === 'fire'
               ? 'fire'
               : ability.school;
+        // The healPower rider is computed once per cast from the CASTER, with the
+        // same talent heal and global absorb multipliers as the single-target
+        // 'absorb' arm, then added to every recipient's shield.
+        const shieldValue =
+          eff.amount +
+          absorbBonus(
+            p.healPower,
+            eff.spellPowerCoeff ?? 0,
+            talentHealMult * (1 + mods.global.absorbPct),
+          );
         for (const mE of recipients) {
           ctx.applyAura(mE, {
             id: ability.id,
@@ -3321,7 +3415,7 @@ export function runEffects(
             kind: 'absorb',
             remaining: eff.duration,
             duration: eff.duration,
-            value: eff.amount,
+            value: shieldValue,
             sourceId: p.id,
             school: barrierSchool,
           });
@@ -3423,7 +3517,9 @@ export function runEffects(
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
           if (!ctx.hasLineOfSight(p, hostile)) continue;
-          ctx.applyKnockback(p, hostile, eff.distance);
+          // Players are thrown into the air (a fall off a ledge credits the
+          // caster); mobs take the grounded shove (combat/knockback_launch.ts).
+          applyLaunchKnockback(ctx, p, hostile, eff.distance);
           ctx.applyAura(hostile, {
             id: `${ability.id}_daze`,
             name: ability.name,
@@ -3911,7 +4007,11 @@ export function runEffects(
         break;
       }
       case 'hunterShrapnel': {
-        runShrapnelCharge(ctx, p, target, eff, ability.name);
+        runShrapnelCharge(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterPlayDead': {
+        startPlayDead(ctx, p, ability.name, dropSelfFromHostileFocus(ctx, p), eff.movingGrace);
         break;
       }
       case 'hunterTrailbreak': {
@@ -3923,7 +4023,15 @@ export function runEffects(
         break;
       }
       case 'frostjawTrap': {
-        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id, ability.range);
+        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterBearTrap': {
+        spawnBearTrap(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterScatterbolt': {
+        runScatterbolt(ctx, p, eff, ability.id);
         break;
       }
       case 'aoeAllyMaxHp': {
@@ -4281,9 +4389,9 @@ export function runEffects(
         break;
       }
       case 'absorbSpentResource': {
-        // Forgewall 2pc lives UPSTREAM: a buffPct row rewrites the RESOLVED
-        // mult (applyTalentMods' scaleEffect extension), so eff.mult already
-        // carries the wearer's 5-per-rage and the tooltip reads the same.
+        // A buffPct upgrade lives UPSTREAM: the row rewrites the RESOLVED
+        // mult (applyTalentMods' buffPct arm), so eff.mult already carries
+        // the upgraded rate and the tooltip reads the same.
         const amount = Math.round(res.cost * eff.mult);
         if (amount <= 0) break;
         ctx.applyAura(p, {
@@ -4322,7 +4430,9 @@ export function runEffects(
         if (!pet) {
           ctx.error(
             p.id,
-            isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+            isDelvePos(p.pos.x) && ctx.delvePetStash.has(p.id)
+              ? 'Pets are not allowed inside the delves.'
+              : 'You have no pet.',
           );
           break;
         }

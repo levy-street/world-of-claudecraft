@@ -13,6 +13,10 @@
    practice. */
 
 @layer components {
+  .friendship-armour-claim {
+    min-height: 40px;
+  }
+
   /* ---------- delve board ---------- */
   #delve-board {
     width: 360px;
@@ -301,6 +305,71 @@
     font-size: 12px;
     text-align: center;
     opacity: 0.8;
+  }
+  /* The Cartographer's Ink map picker (ink_map_picker_controller.ts), a
+     #prompt-stack tenant: one row per map the ink could redraw. */
+  #prompt-stack .tmap-ink-prompt {
+    box-sizing: border-box;
+    width: min(420px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 18px;
+    pointer-events: auto;
+  }
+  .tmap-ink-prompt .prompt-text {
+    margin: 0 0 6px;
+  }
+  .tmap-ink-prompt .tmap-ink-held {
+    margin: 0 0 12px;
+    font-size: 12px;
+    opacity: 0.8;
+  }
+  .tmap-ink-prompt .tmap-ink-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tmap-ink-prompt .tmap-ink-choice {
+    --tmap-rarity: var(--color-quality-uncommon);
+    height: auto;
+    min-height: 44px;
+    padding: 6px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    text-align: left;
+    white-space: normal;
+    cursor: pointer;
+  }
+  .tmap-ink-prompt .tmap-ink-choice[data-rarity="rare"] {
+    --tmap-rarity: var(--color-quality-rare);
+  }
+  .tmap-ink-prompt .tmap-ink-choice[data-rarity="epic"] {
+    --tmap-rarity: var(--color-quality-epic);
+  }
+  .tmap-ink-prompt .tmap-ink-choice[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .tmap-ink-prompt .tmap-ink-name {
+    color: var(--tmap-rarity);
+    font-weight: 600;
+  }
+  .tmap-ink-prompt .tmap-ink-note,
+  .tmap-ink-prompt .tmap-ink-cost {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    letter-spacing: 0;
+    opacity: 0.85;
+  }
+  .tmap-ink-prompt .tmap-ink-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .tmap-ink-prompt .tmap-ink-cancel {
+    min-height: 40px;
   }
 
   /* ---------- lockpicking minigame ("Tumbler's Path") ---------- */
@@ -859,6 +928,52 @@
   }
   .qd-reward-name {
     font-size: 12px;
+  }
+  /* Choose-one quest rewards: one card per offered piece. In the turn-in
+     dialog each card is a radio button (the harvest-preference radio look);
+     in the quest log and on the accept step they are a static preview. */
+  .qd-reward-choice-heading {
+    display: block;
+    margin-top: var(--spacing-sm);
+  }
+  .qd-reward-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+  }
+  .qd-reward-choice {
+    margin-top: 0;
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    font: inherit;
+  }
+  /* Icon and name stay on one line (the name wraps within its column); beats
+     the generic reward-row wrap below on specificity. */
+  .qd-reward-row.qd-reward-choice {
+    flex-wrap: nowrap;
+  }
+  button.qd-reward-choice {
+    cursor: var(--cursor-point);
+  }
+  button.qd-reward-choice:hover {
+    border-color: var(--color-accent);
+  }
+  .qd-reward-choice:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .qd-reward-choice[aria-checked="true"] {
+    border-color: var(--color-accent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--panel-base));
+  }
+  @media (forced-colors: active) {
+    .qd-reward-choice[aria-checked="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
   }
   .qd-list-item {
     display: block;
@@ -1676,7 +1791,14 @@
     position: relative;
     z-index: 1;
   }
+  /* Out of flow, so the drawing buffer can never size the host. CharacterPreview
+     sizes the buffer FROM the host's client box on every resize; an in-flow
+     canvas lets that buffer feed back into the host's height wherever it is only
+     floored (the inspect stage), and Firefox under the #ui zoom then grows the
+     stage without bound. tests/browser/inspect_stage_size.browser.test.ts. */
   .char-model-preview canvas {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100% !important;
     height: 100% !important;
@@ -1684,10 +1806,12 @@
   /* Cold-open stand-in: the class crest (or a cached portrait) covers the still
      empty canvas while the preview's programs link, so the panel is never a
      blank box. Built and removed by src/ui/preview_stand_in.ts, never per
-     frame. */
+     frame. z-index keeps it over the (also positioned) canvas whatever the
+     mount order. */
   .char-model-preview .preview-stand-in {
     position: absolute;
     inset: 0;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1881,6 +2005,16 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+  }
+  /* Gearscore (average worn item level): a one-row card above Offense, the
+     value in gold so it reads as the rail's headline. */
+  #char-window .char-gearscore .ui-stat-row {
+    font-family: var(--title-font);
+  }
+  #char-window .char-gearscore b {
+    font-size: 15px;
+    font-weight: normal;
+    color: var(--gold);
   }
   #char-window .char-tab-panel {
     padding-right: var(--spacing-xs);
@@ -2745,6 +2879,10 @@
     min-height: 0;
     overflow-y: auto;
     padding-right: var(--spacing-xs);
+  }
+  .ql-detail-body:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   .ql-detail-actions {
     display: flex;
@@ -3827,6 +3965,10 @@
     border-color: #8d7138;
     box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
   }
+  .membership-token-card .ui-btn {
+    min-height: 40px;
+  }
+
   .woc-store-tabs {
     display: flex;
     gap: 2px;
@@ -3940,6 +4082,13 @@
     padding: 9px 12px;
     color: var(--color-accent);
     background: var(--color-primary-glow);
+  }
+  [data-subscription-section] .ui-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  [data-subscription-section] p {
+    margin-block: var(--spacing-sm);
   }
   .woc-store-balance {
     z-index: 1;
@@ -7973,9 +8122,6 @@
   .faction-currency-balance {
     color: var(--gold);
   }
-  .warfare-balance .warfare-balance-gold {
-    margin-left: 12px;
-  }
   .warfare-balance,
   .faction-currency-balance {
     margin: 6px 5px;
@@ -9144,6 +9290,32 @@
     overflow: hidden;
     flex-direction: column;
   }
+  /* Once the player has dragged the bags to a size (.window-sized, stamped by
+     src/ui/window_resize.ts), the inline height is the budget: the 560px
+     content cap above would otherwise stop the window growing taller. The
+     viewport clamp stays, matching the shell's own max-width clamp. */
+  #bags.window-sized {
+    max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 16px);
+  }
+  /* The NW resize grip (.window-resizable-nw, the bottom-anchored windows in
+     src/ui/window_resize.ts): the same diagonal grip as the SE corner, drawn on
+     the sticky title bar because its opaque background covers the window's own
+     top-left. The second layer restates the .ui-win-head gradient, and the
+     title padding grows so the window art clears the grip. Desktop only: on
+     touch the bags are a full-screen sheet with no NW grip. */
+  body:not(.mobile-touch) .window.window-resizable-nw > .ui-win-head {
+    background-image:
+      repeating-linear-gradient(135deg, transparent 0 3px, var(--gold-dim) 3px 4px),
+      linear-gradient(180deg, var(--color-panel-hi), var(--panel-base));
+    background-size:
+      12px 12px,
+      auto;
+    background-position:
+      left 5px top 5px,
+      0 0;
+    background-repeat: no-repeat;
+    padding-left: calc(var(--window-pad, 12px) + 8px);
+  }
   /* The window body is one flex column: title, bag sockets and the filter/search
      chrome hold their natural height, the grid takes every remaining pixel as the
      single scroller, and the money footer stays pinned to the bottom edge. */
@@ -9611,6 +9783,14 @@
     width: calc(100% - 4px);
     height: calc(100% - 4px);
   }
+  .membership-bag-slot > svg {
+    width: 22px;
+    height: 22px;
+  }
+  .membership-bag-slot.membership-locked {
+    color: var(--color-text-muted);
+    filter: grayscale(1);
+  }
   .bag-socket.backpack {
     cursor: default;
   }
@@ -9821,6 +10001,75 @@
     background:
       url("/ui/currency/coin_copper.webp") center / cover no-repeat,
       radial-gradient(circle at 35% 30%, #e8a87a, #8b4513);
+  }
+
+  /* ---------- skull bag pane ---------- */
+  /* The World PvP Skull Bag's sub-inventory (src/ui/hud/skull_bag/), docked inside
+     #bags between the grid and the money footer. It holds its natural height up to
+     a cap and scrolls its own rows, so the bag grid above keeps the window's space. */
+  #bags .skull-bag-pane {
+    /* Shrinks before the money footer is pushed out of a short (landscape
+       phone) window; the rows below are the part that scrolls. */
+    flex: 0 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    border-top: 1px solid var(--color-border-showcase);
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+  .skull-bag-head {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .skull-bag-title {
+    color: var(--color-gold);
+    font-weight: 700;
+  }
+  .skull-bag-total {
+    color: var(--color-text-muted);
+    margin-right: auto;
+  }
+  .skull-bag-note {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+  .skull-bag-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: min(132px, 22dvh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .skull-bag-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 2px 0;
+  }
+  .skull-bag-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .skull-bag-count {
+    color: var(--color-text-muted);
+  }
+  .skull-bag-store {
+    align-self: flex-start;
+  }
+  @media (pointer: coarse) {
+    .skull-bag-take,
+    .skull-bag-store {
+      min-height: 40px;
+    }
   }
 
   /* ---------- bank ---------- */
@@ -10340,6 +10589,78 @@
     gap: 4px;
     margin: 6px 0 2px;
     flex: none;
+  }
+  .account-bank-panel .bank-tabs {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .account-bank-panel .ui-btn {
+    min-height: 40px;
+  }
+  .account-bank-tab {
+    flex: none;
+    min-height: 40px;
+  }
+  /* The selected bank and the player's bags as two framed sections, each
+     titled with whose items they hold, so a click's direction is never a guess. */
+  .account-bank-section {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+  }
+  .account-bank-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .account-bank-section h3 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--gold-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .account-bank-count {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .account-bank-hint {
+    margin: 2px 0 var(--spacing-xs);
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .account-bank-panel .bank-item:disabled {
+    opacity: 0.5;
+  }
+  .account-bank-failure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .account-bank-failure .account-bank-notice {
+    color: var(--color-text-error);
+  }
+  .account-bank-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .account-bank-note {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-align: center;
   }
   .bank-tab {
     flex: 1;
@@ -11497,6 +11818,37 @@
     align-items: center;
     gap: 8px;
   }
+  /* The buddy shelf: the whistle still as the option's icon, the drag grip
+     for the action bar. */
+  .deeds-buddies .deed-title-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .deed-buddy-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid var(--color-deed-buddy-icon-border);
+    flex: 0 0 auto;
+  }
+  .deed-buddy-icon-empty {
+    background: linear-gradient(160deg, var(--color-card-hi), var(--color-card-lo));
+  }
+  .deed-buddy-drag {
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--color-text-muted);
+    border-radius: 4px;
+  }
+  .deed-buddy-drag:hover {
+    color: var(--color-deed-banner-text);
+  }
   .deed-border-swatch {
     flex: none;
     display: inline-flex;
@@ -11783,8 +12135,10 @@
   .cos-tabs {
     flex: none;
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     min-height: 48px;
+    height: auto;
     border-bottom: 1px solid var(--color-border-default);
     margin-bottom: var(--spacing-md);
   }
@@ -11879,6 +12233,16 @@
     align-items: center;
     gap: var(--spacing-xs);
     font-size: 12px;
+  }
+  .cos-buddy-icon {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    object-fit: contain;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    user-select: none;
   }
   .cos-scope {
     padding: 4px 8px;
@@ -14090,19 +14454,6 @@
   .soc-add input {
     flex: 1;
   }
-  /* The Friends footer's presence setting (src/ui/social_window.ts). */
-  .soc-presence {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 6px;
-    font-size: 11px;
-    color: var(--color-text-muted);
-  }
-  .soc-presence select {
-    flex: 1;
-    min-width: 0;
-  }
   .soc-add .btn {
     margin: 0;
     padding: 5px 12px;
@@ -14545,11 +14896,18 @@
   /* The atlas: a 300px plated rail beside the map stage. An absolutely
      positioned child resolves against the PADDING box, so inset: 0 would cover
      the --window-pad band, and that band is the only drag handle a headerless
-     map window has (Hud.isWindowDragHandle grabs #map-window itself). Both
-     panes therefore inset by --window-pad on every edge they touch, and the
-     stage's left edge is that pad plus the 300px rail plus the 12px gutter. */
+     map window has (src/ui/window_drag_handle.ts grabs #map-window itself).
+     Both panes therefore inset by --window-pad on every edge they touch, and
+     the stage's left edge is that pad plus the 300px rail plus the 12px
+     gutter. The resize corner overlaps that band; a press there resizes. */
+  /* --map-rail-width is the atlas rail's width: 300px shipped, and the player
+     sets it with the divider between the rail and the stage
+     (src/ui/hud/map/map_rail_resize_controller.ts writes it inline). The
+     window grows with the rail (624px is the shipped stage share plus the
+     pads and gutter), so the map keeps its size. */
   #map-window {
-    width: 924px;
+    --map-rail-width: 300px;
+    width: calc(624px + var(--map-rail-width));
     max-width: calc(100vw - 24px);
     --window-pad: 14px;
   }
@@ -14560,7 +14918,7 @@
     position: absolute;
     inset: var(--window-pad) auto var(--window-pad) var(--window-pad);
     box-sizing: border-box;
-    width: 300px;
+    width: var(--map-rail-width);
     padding: 14px 12px;
     display: flex;
     flex-direction: column;
@@ -14589,12 +14947,52 @@
   .map-atlas-stage {
     position: absolute;
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
-      calc(var(--window-pad) + 300px + 12px);
+      calc(var(--window-pad) + var(--map-rail-width) + 12px);
     min-width: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+  }
+  /* The divider between the rail and the stage: it fills the 12px gutter, and
+     dragging it (or its arrow keys, Home and End; a double-click resets)
+     widens the rail so long quest titles and the world-quest board stop
+     truncating. A thin rule marks it; hover, focus and a live drag brighten
+     it. It stands down wherever the rail is collapsed, empty, or hidden. */
+  .map-atlas-splitter {
+    position: absolute;
+    top: var(--window-pad);
+    bottom: var(--window-pad);
+    left: calc(var(--window-pad) + var(--map-rail-width));
+    width: 12px;
+    cursor: ew-resize;
+    touch-action: none;
+    z-index: 1;
+  }
+  .map-atlas-splitter::before {
+    content: "";
+    position: absolute;
+    top: 25%;
+    bottom: 25%;
+    left: 5px;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--gold-dim);
+    opacity: 0.45;
+  }
+  .map-atlas-splitter:hover::before,
+  .map-atlas-splitter.is-dragging::before,
+  .map-atlas-splitter:focus-visible::before {
+    opacity: 1;
+  }
+  .map-atlas-splitter:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  #map-window:has(> .map-atlas-sidebar:empty) .map-atlas-splitter,
+  #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-splitter,
+  body.mobile-touch .map-atlas-splitter {
+    display: none;
   }
   /* Until the rail is fed (Hud wiring), the empty plate collapses and the map
      keeps the whole window rather than shipping a blank column. */
@@ -14631,6 +15029,57 @@
   body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-stage {
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
       calc(var(--window-pad) + 44px + 12px);
+  }
+  /* A player-resized map (the shared corner grip, src/ui/window_resize.ts,
+     stamps .window-sized and writes an inline width and height). The stage
+     becomes a size container and the canvas grows into the largest square it
+     fits, while map_canvas_size_controller.ts resizes the backing store to
+     match so the map stays crisp. The overlay controls are pinned to that
+     square face rather than the stage corners, through the face offsets
+     below; the unregistered custom properties substitute their tokens at each
+     child, so the container units resolve against the stage. The minimum
+     sizes keep a roughly 300px face beside the rail in each rail state, but
+     never more than the viewport allows (the shell's own max-width cap). The
+     face sheds the canvas border (2px a side, the #map-canvas rule below) to
+     size its content box. Unsized, the shipped 560px layout above is
+     untouched. Desktop only: the touch sheet never takes the grip, and
+     map_canvas_size_controller.ts drops a desktop size left on the window
+     when the HUD switches to touch. */
+  body:not(.mobile-touch) #map-window.window-sized {
+    min-width: min(calc(340px + var(--map-rail-width)), calc(100vw - 24px));
+    min-height: 360px;
+  }
+  body:not(.mobile-touch) #map-window.window-sized:has(> .map-atlas-sidebar.is-collapsed) {
+    min-width: min(384px, calc(100vw - 24px));
+  }
+  body:not(.mobile-touch) #map-window.window-sized:has(> .map-atlas-sidebar:empty) {
+    min-width: min(328px, calc(100vw - 24px));
+  }
+  body:not(.mobile-touch) #map-window.window-sized .map-atlas-stage {
+    container-type: size;
+    --map-face: min(100cqw, 100cqh);
+    --map-face-x: calc((100cqw - var(--map-face)) / 2);
+    --map-face-y: calc((100cqh - var(--map-face)) / 2);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-canvas {
+    width: calc(var(--map-face) - 4px);
+    height: calc(var(--map-face) - 4px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-close {
+    top: calc(var(--map-face-y) + 8px);
+    right: calc(var(--map-face-x) + 8px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-level-toggle {
+    top: calc(var(--map-face-y) + 8px);
+    left: calc(var(--map-face-x) + 8px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-zoom {
+    right: calc(var(--map-face-x) + 22px);
+    bottom: calc(var(--map-face-y) + 22px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized .map-atlas-compass {
+    top: calc(var(--map-face-y) + 52px);
+    right: calc(var(--map-face-x) + 14px);
   }
   /* Touch keeps the shipped single-pane map: the rail and the map-face chrome
      the atlas adds have no room on a 330px sheet (W13 owns the touch rail). */
@@ -14986,33 +15435,366 @@
      sits on screen from boot (same reason #market-window declares it). The painter
      opens with inline `flex`, which is what the flex-column bounds below assume. */
   #dungeon-finder-window {
-    width: 640px;
+    width: 1120px;
     max-width: 96%;
-    --window-pad: 14px;
+    --window-pad: 18px;
+    --panel-bg: linear-gradient(
+      145deg,
+      var(--color-ranking-ground-top),
+      var(--color-ranking-ground-deep)
+    );
+    --panel-bg-soft: var(--color-ranking-well);
+    --panel-bg-strong: var(--color-ranking-ground);
+    --panel-base: var(--color-ranking-ground-deep);
+    --color-panel-hi: var(--color-ranking-ground-top);
+    --color-card-hi: var(--color-ranking-control-hover-deep);
+    --color-card-lo: var(--color-ranking-well);
+    --color-bg-input: var(--color-ranking-ground-deep);
+    --color-text-light: var(--color-ranking-text);
+    --color-text-secondary: var(--color-ranking-text-soft);
+    --color-text-muted: var(--color-ranking-text-muted);
+    --color-text-faint: var(--color-ranking-text-muted);
+    --gold: var(--color-wq-ranking-heading);
+    --gold-dim: var(--color-wq-ranking-edge);
+    --border: var(--color-wq-ranking-edge);
+    --df-border: var(--color-ranking-control-border);
+    --color-border-showcase: var(--color-wq-ranking-edge);
+    --btn-fill-selected: linear-gradient(
+      135deg,
+      var(--color-ranking-control),
+      var(--color-ranking-ground-top)
+    );
     display: none;
     flex-direction: column;
-    max-height: min(700px, 80vh);
+    height: 820px;
+    max-height: 88vh;
   }
+  /* Inside the zoomed #ui: viewport lengths divide by --window-scale (raw vh
+     re-multiplies by the zoom and runs the vault off the bottom). The top is
+     the shared .window 10vh restated in the same units, so the sheet ends at
+     98% of the screen at any UI scale. */
   #dungeon-finder-window.df-vault-mode {
-    width: min(980px, 96vw);
-    height: min(780px, 88vh);
-    max-height: min(780px, 88vh);
+    top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale));
+    width: min(980px, calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale)));
+    height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
+    max-height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
   }
-  .df-tabs {
+  .df-body-vault {
     display: flex;
-    gap: 6px;
-    margin: 6px 0 10px;
+    overflow: hidden;
   }
-  .df-tab {
+  .df-vault-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .df-vault-container .weekly-rewards {
     flex: 1;
-    display: inline-flex;
+    overflow-y: auto;
+    padding: 4px 12px 12px;
+  }
+  .weekly-preview-notice {
+    padding: 8px 14px;
+  }
+  #dungeon-finder-window:has(.df-body-catalogue) {
+    --color-text-light: var(--color-finder-text);
+    --color-text-secondary: var(--color-finder-muted);
+    --color-text-muted: var(--color-finder-muted);
+    --color-border-showcase: var(--color-finder-line);
+    --color-card-hi: var(--color-finder-surface);
+    --color-card-lo: var(--color-finder-ink);
+    --color-bg-input: var(--color-finder-ink);
+    --panel-bg-soft: var(--color-finder-ink);
+    --df-border: var(--color-finder-line);
+    --gold: var(--color-finder-gold);
+    --gold-dim: var(--color-finder-gold-deep);
+    --radius-card: 10px;
+    --input-h: 42px;
+    font: 400 16px / 1.45 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+
+  #dungeon-finder-window:has(.df-body-catalogue) .ui-win-title {
+    font-size: 22px;
+  }
+  .df-detail-hero-copy {
+    position: relative;
+    z-index: 1;
+  }
+  .df-guide-hero-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+  .df-guide-hero-portrait {
+    inset-inline-start: auto;
+    width: 60%;
+    object-position: center 25%;
+  }
+  .df-detail-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        var(--color-finder-ink),
+        color-mix(in srgb, var(--color-finder-ink) 82%, transparent) 48%,
+        color-mix(in srgb, var(--color-finder-ink) 28%, transparent)
+      ),
+      linear-gradient(0deg, var(--color-finder-ink), transparent);
+  }
+  .df-detail-hero::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0 12% auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-finder-gold), transparent);
+    pointer-events: none;
+  }
+  .df-body-catalogue .ui-btn {
+    min-height: 42px;
+    font: 600 15px / 1.25 var(--font-ui);
+  }
+  .df-body-catalogue .ui-input,
+  .df-search .ui-input {
+    font-size: 16px;
+  }
+  .df-body-catalogue .df-badge {
+    font: 600 12px / 1.6 var(--font-ui);
+    color: var(--color-finder-teal);
+  }
+  .df-body-catalogue .df-badge.heroic {
+    color: var(--color-finder-violet);
+  }
+  .df-body-catalogue .df-chip,
+  .df-body-catalogue .df-flag {
+    font: 600 13px / 1.5 var(--font-ui);
+    white-space: normal;
+  }
+  .df-body-catalogue .df-sub {
+    font: 600 19px / 1.4 var(--font-display);
+    margin: 18px 0 10px;
+  }
+  .df-body-catalogue [data-combat-role="tank"] {
+    color: var(--color-finder-tank);
+  }
+  .df-body-catalogue [data-combat-role="healer"] {
+    color: var(--color-finder-healer);
+  }
+  .df-body-catalogue [data-combat-role="dps"] {
+    color: var(--color-finder-dps);
+  }
+  .df-category[data-category="raids"] {
+    --gold: var(--color-finder-violet);
+  }
+  .df-category[data-category="delves"] {
+    --gold: var(--color-finder-teal);
+  }
+  .df-category .ui-icon {
+    color: var(--gold);
+  }
+  .df-category.is-on {
+    --btn-fill-selected: linear-gradient(
+      135deg,
+      var(--color-finder-surface-raised),
+      var(--color-finder-ink)
+    );
+    --color-control-border: var(--gold);
+    color: var(--color-finder-text);
+    box-shadow:
+      inset 0 -2px var(--gold),
+      0 0 calc(14px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+  @media (forced-colors: active) {
+    #dungeon-finder-window:has(.df-body-catalogue),
+    .df-board-shell {
+      background: Canvas;
+      color: CanvasText;
+    }
+    .df-category.is-on,
+    .df-row.active {
+      outline: 2px solid Highlight;
+      outline-offset: -4px;
+    }
+    .df-guide-hero-art,
+    .df-detail-hero::after,
+    .df-detail-hero::before {
+      display: none;
+    }
+  }
+  .df-guide-intro {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 4px 2px 8px;
+    flex: none;
+  }
+  .df-eyebrow {
+    color: var(--color-finder-gold);
+    font: 600 12px var(--font-display);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    flex: none;
+  }
+  .df-guide-intro p {
+    color: var(--color-finder-muted);
+    margin: 0;
+    font-size: 14px;
+  }
+  .df-categories {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    flex: none;
+  }
+  .df-category {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 6px 0;
-    border: 1px solid var(--panel-border);
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 58px;
+    padding: 12px 18px;
+    font: 600 17px var(--font-display);
+  }
+  .df-category .ui-icon {
+    width: 24px;
+    height: 24px;
+    flex: none;
+  }
+  .df-category-count {
+    margin-left: auto;
+    font: 700 19px var(--font-ui);
+    font-variant-numeric: tabular-nums;
+    color: var(--gold);
+  }
+  .df-filters {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 12px 0;
+    flex: none;
+  }
+  .df-search {
+    flex: 1;
+    min-width: 0;
+  }
+  .df-search input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .df-search > span {
+    display: block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .df-eligible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    font-size: 15px;
+    color: var(--color-finder-muted);
     cursor: var(--cursor-point);
   }
+  .df-rail {
+    padding: 10px;
+    scrollbar-gutter: stable;
+  }
+  .df-rail-count {
+    color: var(--color-finder-teal);
+    font: 600 12px var(--font-display);
+    letter-spacing: 1px;
+    padding: 6px 4px 14px;
+  }
+  .df-detail {
+    padding: 0 4px 18px;
+    scrollbar-gutter: stable;
+  }
+  .df-detail-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-finder-line);
+    border-radius: var(--radius-card);
+    background: var(--color-finder-ink);
+  }
+  .df-guide-description {
+    max-width: 52ch;
+    font-size: 16px;
+    color: var(--color-finder-muted);
+    line-height: 1.5;
+    margin: 16px 0 20px;
+  }
+  .df-group-btn {
+    --btn-fill-gold: linear-gradient(
+      var(--color-finder-gold),
+      color-mix(in srgb, var(--color-finder-gold) 74%, var(--color-finder-gold-deep))
+    );
+    --color-text-on-gold-btn: var(--color-finder-ink);
+    --gold-dim: var(--color-finder-gold-deep);
+    min-height: 44px;
+    padding-inline: 26px;
+  }
+  .df-glyph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+  }
+  .df-glyph .ui-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .df-loot-filter {
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--df-border);
+    margin: 18px 0;
+  }
+  .df-loot-selects {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .df-loot-selects label {
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--color-finder-muted);
+  }
+  .df-loot-selects select {
+    width: 100%;
+    min-width: 0;
+    color: var(--color-ranking-text);
+  }
+  .df-loot-selects option {
+    background: var(--color-ranking-ground);
+  }
+  .df-loot-hint {
+    color: var(--color-finder-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 0;
+  }
+  .df-empty {
+    margin: auto;
+    padding: 30px;
+    text-align: center;
+    color: var(--color-text-secondary);
+  }
+
   .df-body {
     flex: 1 1 auto;
     min-height: 0;
@@ -15022,27 +15804,14 @@
   .df-body-catalogue {
     display: flex;
     overflow: hidden;
-  }
-  .df-body-vault {
-    display: flex;
-    overflow-y: auto;
-  }
-  .df-vault-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  .df-vault-container .weekly-rewards {
-    flex: 1;
-    overflow-y: visible;
-    padding: 4px 12px 12px;
+    container: finder-catalogue / inline-size;
   }
   .df-cols {
     display: grid;
-    grid-template-columns: 236px 1fr;
-    gap: 10px;
+    grid-template-columns: minmax(290px, 0.95fr) minmax(0, 1.75fr);
+    gap: 20px;
     flex: 1 1 auto;
+    min-width: 0;
     min-height: 0;
   }
   .df-rail,
@@ -15054,29 +15823,29 @@
   .df-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 14px;
     width: 100%;
     text-align: left;
-    padding: 7px 8px;
-    margin: 0 0 4px;
-    border: 1px solid var(--panel-border);
+    padding: 14px 12px;
+    margin: 0 0 10px;
     cursor: var(--cursor-point);
   }
   .df-row.active {
-    border-color: var(--gold-dim);
-    color: var(--color-text-light);
-    background: var(--btn-fill-selected);
+    --color-border-showcase: var(--color-finder-teal);
+    --color-card-hi: var(--color-finder-surface-raised);
+    color: var(--color-finder-text);
+    box-shadow: inset 3px 0 var(--color-finder-teal);
   }
   .df-row.ineligible {
-    opacity: 0.55;
+    opacity: 1;
   }
   .df-row-icon {
-    width: 30px;
-    height: 30px;
-    flex: 0 0 30px;
+    width: 64px;
+    height: 80px;
+    flex: 0 0 64px;
     object-fit: cover;
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
+    border: 1px solid var(--df-border);
+    border-radius: 7px;
     background: var(--color-card-lo);
   }
   .df-row-text {
@@ -15086,15 +15855,17 @@
   }
   .df-row-name {
     display: block;
-    font-family: var(--title-font);
-    font-size: 13px;
+    font: 600 17px / 1.4 var(--font-display);
+    color: var(--color-finder-text);
   }
   .df-row-meta,
   .df-lock,
   .df-blocked {
     display: block;
-    font-size: 11px;
-    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1.45;
+    margin-top: 5px;
+    color: var(--color-finder-muted);
   }
   .df-lock {
     color: var(--color-text-error);
@@ -15102,7 +15873,7 @@
   .df-badge {
     padding: 1px 5px;
     margin-left: 4px;
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--df-border);
     vertical-align: 1px;
   }
   .df-badge.heroic {
@@ -15111,46 +15882,58 @@
   }
   .df-kind {
     margin-left: 6px;
-    font-size: 11px;
-    color: var(--color-text-muted);
+    font-size: 14px;
+    color: var(--color-finder-muted);
   }
   .df-detail-head {
     display: flex;
     align-items: center;
     gap: 6px;
     margin-bottom: 6px;
+    flex-wrap: wrap;
   }
   .df-detail-icon {
-    width: 40px;
-    height: 40px;
-    flex: 0 0 40px;
+    width: 56px;
+    height: 68px;
+    flex: 0 0 56px;
     object-fit: cover;
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
+    border: 1px solid var(--df-border);
+    border-radius: 7px;
     background: var(--color-card-lo);
   }
   .df-detail-name {
-    font-family: var(--title-font);
-    font-size: 16px;
-    color: var(--gold);
+    font: 600 27px / 1.25 var(--font-display);
+    flex: 1;
+    color: var(--color-finder-text);
   }
   .df-back {
     display: none;
   }
   .df-meta {
-    border: 1px solid var(--panel-border);
-    padding: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+    padding: 18px;
     margin-bottom: 8px;
   }
   .df-meta-row {
-    font-size: 12px;
-    margin: 2px 0;
-    color: var(--color-text-muted);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-finder-muted);
+    overflow-wrap: anywhere;
+  }
+  .df-entrance {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: 1px solid var(--df-border);
+    padding-top: 12px;
   }
   .df-entrance .df-map-btn {
-    margin-left: 6px;
-    padding: 2px 8px;
-    font-size: 11px;
+    margin-left: auto;
+    padding: 8px 14px;
   }
   .df-sub {
     font-family: var(--title-font);
@@ -15160,21 +15943,18 @@
   }
   .df-encounter {
     display: flex;
-    gap: 8px;
-    border: 1px solid var(--panel-border);
-    padding: 8px;
-    margin-bottom: 6px;
+    gap: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
   }
   .df-portrait {
-    width: 64px;
-    height: 64px;
-    flex: 0 0 64px;
+    width: 72px;
+    height: 88px;
+    flex: 0 0 72px;
     object-fit: cover;
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
+    border: 1px solid var(--df-border);
+    border-radius: 7px;
     background: var(--color-card-lo);
-    position: sticky;
-    top: 8px;
     align-self: flex-start;
   }
   .df-encounter-body {
@@ -15182,32 +15962,96 @@
     min-width: 0;
   }
   .df-encounter-name {
-    font-family: var(--title-font);
-    font-size: 13px;
-    color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font: 600 19px / 1.4 var(--font-display);
+    color: var(--color-finder-text);
   }
   .df-flag {
     margin-left: 6px;
     padding: 0 4px;
   }
-  .df-mechanics {
-    margin: 4px 0;
+  /* The encounter's boss guide page (src/ui/boss_journal/): opens the journal on it. */
+  .df-encounter-name .df-guide-btn {
+    margin-left: 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    vertical-align: middle;
+  }
+  .df-encounter-guide {
+    margin: 12px 0 16px;
+  }
+  .df-encounter-guide > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+    height: auto;
+    padding: 10px 16px;
+    list-style: none;
+    color: var(--color-finder-teal);
+  }
+  .df-encounter-guide > summary::-webkit-details-marker {
+    display: none;
+  }
+  .df-guide-hide,
+  .df-encounter-guide[open] .df-guide-show {
+    display: none;
+  }
+  .df-encounter-guide[open] .df-guide-hide {
+    display: inline;
+  }
+  .df-guide-content {
+    margin-top: 16px;
+    padding: 0 0 0 16px;
+    border-left: 2px solid var(--color-finder-line);
+    font: 400 16px / 1.55 var(--font-ui);
+    color: var(--color-finder-muted);
+    overflow-wrap: anywhere;
+  }
+  .df-guide-content p {
+    margin: 8px 0 14px;
+  }
+  .df-encounter-guide-phase + .df-encounter-guide-phase {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-finder-line);
+  }
+  .df-encounter-guide-phase h4 {
+    margin: 0 0 8px;
+    font: 600 19px / 1.4 var(--font-display);
+    color: var(--color-finder-gold);
+  }
+  .df-encounter-guide-mechanic h5 {
+    margin: 18px 0 6px;
+    font: 700 17px / 1.4 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  .df-encounter-guide-response strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--color-finder-teal);
   }
   .df-chip {
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--df-border);
     padding: 1px 8px;
     margin: 0 4px 4px 0;
   }
   .df-loot-sub {
-    font-size: 11px;
-    color: var(--color-text-muted);
-    margin: 6px 0 2px;
+    font-size: 14px;
+    color: var(--color-finder-muted);
+    margin: 14px 0 6px;
   }
   .df-loot-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 2px 2px;
+    gap: 10px;
+    min-height: 40px;
+    padding: 5px 2px;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-finder-line) 40%, transparent);
     border-radius: 3px;
   }
   .df-loot-row:focus-visible {
@@ -15215,23 +16059,64 @@
     outline-offset: 2px;
   }
   .df-loot-row img {
-    width: 22px;
-    height: 22px;
+    width: 32px;
+    height: 32px;
+    flex: none;
   }
   .df-loot-name {
     flex: 1;
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    min-width: 0;
+    font-size: 15px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .df-quality-poor {
+    color: var(--mkt-name-poor);
+  }
+  .df-quality-common {
+    color: var(--mkt-name-common);
+  }
+  .df-quality-uncommon {
+    color: var(--mkt-name-uncommon);
+  }
+  .df-quality-rare {
+    color: var(--mkt-name-rare);
+  }
+  .df-quality-epic {
+    color: var(--mkt-name-epic);
+  }
+  .df-quality-legendary {
+    color: var(--mkt-name-legendary);
   }
   .df-loot-chance {
-    font-size: 11px;
-    color: var(--color-text-muted);
+    flex: none;
+    font-size: 14px;
+    color: var(--color-finder-muted);
   }
   .df-loot-money {
     margin-top: 4px;
     font-size: 12px;
+  }
+  @container finder-catalogue (max-width: 700px) {
+    .df-cols {
+      display: block;
+    }
+    .df-rail,
+    .df-detail {
+      height: 100%;
+      box-sizing: border-box;
+    }
+    .df-pane-list .df-detail,
+    .df-pane-detail .df-rail {
+      display: none;
+    }
+    .df-back {
+      display: inline-block;
+      flex-basis: 100%;
+    }
+    .df-meta {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
   /* The "group found" popup: fixed top-center, outside the finder window. */
   #dfinder-proposal-popup {
@@ -15274,7 +16159,7 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--border);
     padding: 7px 10px;
   }
   .dfp-slot .ui-icon {
@@ -15414,10 +16299,7 @@
     gap: 3px;
     margin-right: 8px;
   }
-  #dungeon-finder-window .df-tab .ui-icon {
-    width: 14px;
-    height: 14px;
-  }
+
   #dungeon-finder-window .df-role-count .ui-icon,
   #dungeon-finder-window .df-role .ui-icon,
   #dungeon-finder-window .df-member .ui-icon,
@@ -15436,7 +16318,7 @@
     gap: 5px;
     padding: 6px 10px;
     font-size: 12px;
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--df-border);
     cursor: var(--cursor-point);
   }
   .df-opt.active {
@@ -15468,12 +16350,543 @@
   .df-warn {
     color: var(--color-text-error);
   }
-  .df-create,
-  .df-mine,
-  .df-listing {
-    border: 1px solid var(--panel-border);
+  .df-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 0 20px;
+    color: var(--color-finder-text);
+  }
+  .df-navigation-actions,
+  .df-group-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .df-navigation-actions {
+    margin-left: auto;
+  }
+  .df-navigation .ui-btn,
+  .df-group-toolbar .ui-btn,
+  .df-create-heading .ui-btn {
+    min-height: 44px;
+    height: auto;
+    padding: 10px 12px;
+    font: 600 16px / 1.3 var(--font-ui);
+    white-space: normal;
+  }
+  .df-navigation .ui-btn svg,
+  .df-group-toolbar .ui-btn svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .df-navigation-actions .ui-btn {
+    color: var(--color-finder-muted);
+  }
+  .df-create-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .df-create-heading .df-create-cancel {
+    font-size: 14px;
     padding: 8px;
-    margin-bottom: 6px;
+  }
+  .df-queue-shell {
+    --color-text-light: var(--color-finder-text);
+    --color-text-muted: var(--color-finder-muted);
+    --color-border-showcase: var(--color-finder-line);
+    --color-card-hi: var(--color-finder-surface);
+    --color-card-lo: var(--color-finder-ink);
+    --radius-card: 10px;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    align-items: start;
+    gap: 22px;
+    padding: 6px 0 16px;
+    font: 400 16px / 1.45 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  #dungeon-finder-window .df-body:has(.df-queue-shell) {
+    container: finder-queue / inline-size;
+  }
+
+  #dungeon-finder-window:has(.df-queue-shell) .ui-win-title {
+    font-size: 22px;
+  }
+  .df-queue-sidebar {
+    padding: 20px;
+    min-width: 0;
+  }
+  .df-queue-activities {
+    min-width: 0;
+  }
+  .df-queue-shell .df-sub {
+    font: 600 19px / 1.35 var(--font-display);
+    color: var(--color-finder-gold);
+    margin: 0 0 16px;
+    padding: 0;
+    border: 0;
+  }
+  .df-queue-shell .df-roles {
+    display: grid;
+    gap: 10px;
+  }
+  .df-queue-shell .df-role {
+    display: flex;
+    gap: 12px;
+    min-height: 62px;
+    padding: 12px;
+    font: 600 18px / 1.3 var(--font-ui);
+    color: var(--color-finder-dps);
+  }
+  .df-queue-shell .df-role[data-role="tank"] {
+    color: var(--color-finder-tank);
+  }
+  .df-queue-shell .df-role[data-role="healer"] {
+    color: var(--color-finder-healer);
+  }
+  .df-queue-shell .df-role svg {
+    width: 28px;
+    height: 28px;
+  }
+  .df-queue-shell .df-role::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    margin-left: auto;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+  .df-queue-shell .df-role.active {
+    border-color: currentColor;
+  }
+  .df-queue-shell .df-role.active::after {
+    background: currentColor;
+  }
+  .df-queue-shell .df-footer {
+    position: static;
+    margin-top: 20px;
+    background: transparent;
+  }
+  .df-queue-shell .df-footer .ui-btn {
+    min-height: 48px;
+    height: auto;
+    white-space: normal;
+    font-size: 17px;
+  }
+  .df-queue-shell .df-note,
+  .df-queue-shell .df-queue-status {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-finder-muted);
+  }
+  .df-queue-shell .df-warn {
+    color: var(--color-text-error);
+  }
+  .df-options.df-activity-options {
+    display: grid;
+    gap: 12px;
+  }
+  .df-activity-group {
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    min-width: 0;
+    padding: 0;
+  }
+  .df-activity-art {
+    width: 80px;
+    flex: 0 0 80px;
+  }
+  .df-activity-art img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 88px;
+    object-fit: cover;
+  }
+  .df-activity-copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+  .df-activity-name {
+    font: 600 18px / 1.35 var(--font-display);
+    color: var(--color-finder-text);
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+  .df-difficulties {
+    display: flex;
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  .df-activity-group .df-difficulty {
+    --btn-h: 44px;
+    min-height: 44px;
+    height: auto;
+    padding: 8px 12px;
+    font: 600 15px / 1.3 var(--font-ui);
+    color: var(--color-finder-teal);
+    border: 1px solid var(--color-finder-line);
+    border-radius: 6px;
+    white-space: normal;
+    background: var(--color-finder-ink);
+  }
+  .df-activity-group .df-difficulty[data-difficulty="heroic"] {
+    color: var(--color-finder-violet);
+  }
+  .df-activity-group .df-difficulty.active {
+    border-color: currentColor;
+    background: var(--color-finder-surface-raised);
+    box-shadow: inset 0 -3px currentColor;
+  }
+  .df-activity-group .df-difficulty:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  .df-board-sidebar .df-activity-art {
+    display: none;
+  }
+  .df-board-sidebar .df-activity-copy {
+    gap: 8px;
+    padding: 10px;
+  }
+  .df-board-sidebar .df-activity-name {
+    font-size: 14px;
+  }
+  .df-board-sidebar .df-activity-group .df-difficulty {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  @container finder-queue (max-width: 760px) {
+    .df-queue-shell {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .df-queue-shell .df-roles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .df-queue-shell .df-role {
+      flex-wrap: wrap;
+    }
+  }
+  @container finder-queue (max-width: 480px) {
+    .df-activity-copy {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+    }
+    .df-activity-name {
+      font-size: 16px;
+    }
+    .df-queue-sidebar {
+      padding: 14px;
+    }
+    .df-queue-shell .df-role {
+      font-size: 15px;
+      position: relative;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 76px;
+      padding: 10px 8px;
+      gap: 6px;
+    }
+    .df-queue-shell .df-role::after {
+      position: absolute;
+      right: 7px;
+      top: 7px;
+      width: 8px;
+      height: 8px;
+    }
+  }
+  @media (forced-colors: active) {
+    .df-difficulty.active,
+    .df-queue-shell .df-role.active {
+      outline: 2px solid Highlight;
+      outline-offset: -3px;
+    }
+  }
+  .df-board-shell {
+    --color-text-light: var(--color-finder-text);
+    --color-text-muted: var(--color-finder-muted);
+    --color-text-secondary: var(--color-finder-muted);
+    --color-border-showcase: var(--color-finder-line);
+    --color-card-hi: var(--color-finder-surface);
+    --color-card-lo: var(--color-finder-ink);
+    --radius-card: 10px;
+    display: grid;
+    grid-template-columns: minmax(270px, 320px) minmax(0, 1fr);
+    align-items: start;
+    gap: 22px;
+    padding: 6px 0 16px;
+    font: 400 16px / 1.45 var(--font-ui);
+    color: var(--color-finder-text);
+    container-type: inline-size;
+  }
+  .df-board-sidebar,
+  .df-board-listings,
+  .df-board-browser {
+    min-width: 0;
+  }
+  .df-board-own {
+    min-width: 0;
+  }
+  .df-browse-roles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+  }
+  .df-browse-roles .df-roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .df-browse-roles .df-role {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 16px;
+    font: 600 16px / 1.3 var(--font-ui);
+    color: var(--color-finder-muted);
+    cursor: pointer;
+  }
+  .df-browse-roles .df-role.active {
+    color: var(--color-finder-gold);
+    border-color: var(--color-finder-gold);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .df-current-group {
+    padding: 18px;
+    margin-bottom: 18px;
+    min-width: 0;
+    color: var(--color-finder-text);
+    font: 400 16px / 1.45 var(--font-ui);
+  }
+  .df-current-group h3 {
+    color: var(--color-finder-gold);
+    font: 600 21px / 1.3 var(--font-display);
+    margin: 0 0 10px;
+  }
+  .df-current-group .expedition-actions,
+  .df-group-tools .expedition-actions {
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .df-current-group .ui-btn,
+  .df-group-tools .ui-btn {
+    min-height: 42px;
+    height: auto;
+    white-space: normal;
+  }
+  .df-group-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 18px 0;
+    color: var(--color-finder-text);
+    font: 400 16px / 1.45 var(--font-ui);
+  }
+  .df-group-tools > p {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .df-board-shell--browse {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #dungeon-finder-window .df-body:has(.df-board-shell) {
+    container: finder-board / inline-size;
+  }
+
+  #dungeon-finder-window:has(.df-board-shell) .ui-win-title {
+    font-size: 22px;
+  }
+  .df-board-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .df-board-heading h2,
+  .df-board-heading h3,
+  .df-board-shell .df-sub {
+    font: 600 19px / 1.35 var(--font-display);
+    color: var(--color-finder-gold);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    letter-spacing: 0.02em;
+  }
+  .df-board-heading .ui-badge,
+  .df-board-heading .ui-chip,
+  .df-board-count {
+    font: 600 18px / 1 var(--font-ui);
+    min-width: 34px;
+    min-height: 30px;
+    display: inline-grid;
+    place-items: center;
+    color: var(--color-finder-teal);
+  }
+  .df-board-eyebrow {
+    font: 600 12px / 1.4 var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-finder-gold);
+  }
+  .df-board-shell .df-note {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-finder-muted);
+    margin: 12px 0;
+  }
+  .df-board-shell .ui-btn {
+    --btn-h: 42px;
+    min-height: 42px;
+    height: auto;
+    padding: 10px 14px;
+    font: 600 15px / 1.25 var(--font-ui);
+    letter-spacing: 0.02em;
+    white-space: normal;
+  }
+  .df-create,
+  .df-mine {
+    padding: 18px;
+    margin: 0;
+    min-width: 0;
+  }
+  .df-mine {
+    --color-border-showcase: var(--color-finder-gold-deep);
+    overflow: hidden;
+  }
+  .df-board-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 154px;
+    margin: -18px -18px 18px;
+    padding: 22px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+  }
+  .df-board-hero > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .df-board-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, var(--color-finder-ink));
+    z-index: -1;
+    pointer-events: none;
+  }
+  .df-board-hero h3 {
+    font: 600 23px / 1.3 var(--font-display);
+    color: var(--color-finder-text);
+    margin: 6px 0;
+    text-shadow: 0 2px 8px var(--color-finder-ink);
+  }
+  /* Compact listing rows: thumbnail, one-line head and meta, mini roster, action. */
+  .df-board-shell .df-listings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .df-board-shell .df-listing {
+    position: relative;
+    min-width: 0;
+    padding: 10px 12px;
+    margin: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    isolation: isolate;
+  }
+  .df-listing.is-guild {
+    border-left: 3px solid var(--color-finder-gold);
+  }
+  .df-listing::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-finder-teal), transparent);
+    opacity: 0.7;
+    transition: opacity 180ms ease;
+  }
+  .df-listing:focus-within::after,
+  .df-listing:hover::after {
+    opacity: 1;
+  }
+  .df-listing-thumb {
+    width: 52px;
+    height: 52px;
+    align-self: start;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--color-finder-gold-deep);
+  }
+  .df-listing-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+  }
+  .df-listing-leader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .df-listing-leader > .ui-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+  }
+  .df-needed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .df-needed:empty,
+  .df-listing-tags:empty,
+  .df-mine-tags:empty {
+    display: none;
+  }
+  .df-listing-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
   }
   .df-create-tags {
     margin-bottom: 6px;
@@ -15483,49 +16896,999 @@
   }
   .df-listing-head {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
   }
   .df-listing-name {
-    font-family: var(--title-font);
-    font-size: 13px;
-    color: var(--color-text-light);
+    font: 600 16px / 1.3 var(--font-display);
+    color: var(--color-finder-text);
+    overflow-wrap: anywhere;
+    margin: 0;
   }
-  .df-listing-size,
+  .df-listing-size {
+    margin-left: auto;
+    font: 600 15px / 1.2 var(--font-ui);
+    color: var(--color-finder-teal);
+    white-space: nowrap;
+  }
   .df-listing-meta,
   .df-needed {
-    font-size: 11px;
-    color: var(--color-text-muted);
+    font-size: 13px;
+    color: var(--color-finder-muted);
+  }
+  .df-listing-leader {
+    font-size: 14px;
+    color: var(--color-finder-gold);
+  }
+  .df-listing-members {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+  }
+  .df-listing .df-roster-seat {
+    width: 28px;
+    height: 30px;
+    border-radius: 5px;
+  }
+  .df-listing .df-roster-seat img {
+    width: 24px;
+    height: 24px;
+  }
+  .df-listing .df-roster-seat .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  .df-listing .df-roster-seat.is-empty .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  .df-listing .df-role-chip {
+    padding: 2px 7px;
+    font-size: 12px;
+  }
+  .df-listing .df-needed {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .df-listing .expedition-note,
+  .df-listing .ui-meta {
+    margin: 0;
+    font-size: 13px;
   }
   .df-member {
-    display: inline-block;
-    font-size: 11px;
-    color: var(--color-text-muted);
-    margin-right: 8px;
+    color: var(--color-finder-muted);
+    font-size: 14px;
+  }
+  .df-roster-seat {
+    --df-role-accent: var(--color-finder-gold);
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 48px;
+    border: 1px solid color-mix(in srgb, var(--df-role-accent) 50%, transparent);
+    border-radius: 7px;
+    background: var(--color-finder-ink);
+    overflow: hidden;
+  }
+  .df-roster-seat img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+  .df-member-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .df-member-portrait {
+    display: grid;
+    place-items: center;
+  }
+  .df-roster-seat .ui-icon {
+    position: absolute;
+    inset: auto 1px 1px auto;
+    color: var(--df-role-accent);
+    background: var(--color-finder-ink);
+    border-radius: 3px;
+  }
+  .df-roster-seat.is-empty {
+    border-style: dashed;
+    opacity: 0.65;
+  }
+  .df-roster-seat.is-empty .ui-icon {
+    position: static;
+    width: 20px;
+    height: 20px;
+  }
+  .df-role-chip,
+  .df-app-role {
+    --df-role-accent: var(--color-finder-gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 5px;
+    font: 600 14px / 1.3 var(--font-ui);
+    color: var(--df-role-accent);
+    background: color-mix(in srgb, var(--df-role-accent) 12%, transparent);
+  }
+  [data-combat-role="tank"],
+  [data-seat-role="tank"] {
+    --df-role-accent: var(--color-finder-tank);
+  }
+  [data-combat-role="healer"],
+  [data-seat-role="healer"] {
+    --df-role-accent: var(--color-finder-healer);
+  }
+  [data-combat-role="dps"],
+  [data-seat-role="dps"] {
+    --df-role-accent: var(--color-finder-dps);
+  }
+  .df-board-shell .df-badge {
+    display: inline-flex;
+    width: fit-content;
+    font: 600 12px / 1.2 var(--font-ui);
+    padding: 5px 9px;
+    margin-block: 5px;
+    color: var(--color-finder-teal);
+  }
+  .df-board-shell .df-badge.heroic {
+    color: var(--color-finder-violet);
+  }
+  .df-board-shell .df-chip {
+    font: 500 14px / 1.3 var(--font-ui);
+    padding: 5px 9px;
+    height: auto;
   }
   .df-listing-action {
-    margin-top: 6px;
+    align-self: center;
+  }
+  .df-board-shell .df-listing-action > .ui-btn {
+    --btn-h: 34px;
+    min-height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .df-board-shell .df-listing .df-chip,
+  .df-board-shell .df-listing .df-badge {
+    font-size: 12px;
+    padding: 2px 7px;
+    margin-block: 0;
+  }
+  .df-guild-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-finder-gold);
+  }
+  .df-guild-chip > .ui-icon,
+  .df-guild-note > .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  .df-guild-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 10px;
+    color: var(--color-finder-muted);
+  }
+  .df-board-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    font: 600 14px / 1.2 var(--font-ui);
+    color: var(--color-finder-muted);
+  }
+  .df-board-filter > select {
+    min-height: 34px;
+  }
+  .df-board-listings .df-board-heading h2 {
+    margin-right: 0;
+  }
+  .df-create-guild {
+    margin-top: 12px;
+  }
+  .df-guild-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font: 600 15px / 1.3 var(--font-ui);
+    color: var(--color-finder-gold);
+    cursor: var(--cursor-point);
+  }
+  .df-create-guild .df-note {
+    margin: 4px 0 0;
+  }
+  .df-party-roles {
+    margin-top: 12px;
+  }
+  .df-party-roles .df-note {
+    margin: 4px 0 8px;
+  }
+  .df-party-list {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .df-party-member {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(120px, auto);
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--color-finder-ink);
+  }
+  .df-party-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: 600 14px / 1.3 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  .df-difficulty-switch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .df-difficulty-switch .df-sub {
+    margin: 0;
+  }
+  .df-difficulty-options {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .df-difficulty-option.active {
+    border-color: var(--color-finder-gold);
+    color: var(--color-finder-gold);
+  }
+  .df-difficulty-option.active:disabled {
+    opacity: 1;
+  }
+  .df-advert {
+    display: grid;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .df-advert-preview {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: var(--color-finder-ink);
+    color: var(--color-finder-text);
+    overflow-wrap: anywhere;
+  }
+  .df-advert-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .df-advert-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .df-advert-hint {
+    font: 500 12px / 1.2 var(--font-ui);
+    color: var(--color-finder-muted);
+  }
+  .df-group-roster {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .df-group-member {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    min-width: 0;
+    border-left: 3px solid var(--class-color);
+  }
+  .df-group-member .df-app-portrait,
+  .df-group-member .df-app-portrait img {
+    width: 44px;
+    height: 44px;
+  }
+  .df-group-member .df-app-person {
+    gap: 2px;
+  }
+  .df-group-member .df-app-class {
+    font-size: 15px;
+    gap: 6px;
+  }
+  .df-group-member .df-app-meta {
+    font-size: 12px;
+  }
+  .df-group-member .df-app-spec {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+  .df-group-member .df-app-roles {
+    grid-column: auto;
+    justify-content: flex-end;
+  }
+  .df-group-member .df-app-roles .df-role-chip {
+    min-height: 34px;
+    padding: 6px 8px;
+    gap: 6px;
+    font-size: 14px;
+  }
+  .df-group-member .df-app-roles .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .df-group-member .df-app-name {
+    font-size: 17px;
+  }
+  @container finder-board (max-width: 600px) {
+    .df-current-group {
+      padding: 8px 0;
+    }
+    .df-group-roster {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .df-group-member {
+      grid-template-columns: 36px minmax(0, 1fr) auto;
+      padding: 10px 8px;
+      gap: 8px;
+    }
+    .df-group-member .df-app-portrait,
+    .df-group-member .df-app-portrait img {
+      width: 36px;
+      height: 36px;
+    }
+    .df-group-member .df-app-roles {
+      grid-column: auto;
+      flex-direction: column;
+    }
+    .df-group-member .df-role-chip {
+      flex-direction: column;
+    }
   }
   .df-applicant {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px 18px;
+    padding: 18px;
+    margin: 12px 0;
+    border-left: 4px solid var(--class-color);
+  }
+  .df-app-portrait {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(ellipse, var(--color-finder-surface-raised), transparent 70%);
+  }
+  .df-app-portrait img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+  }
+  .df-app-person,
+  .df-app-copy {
+    min-width: 0;
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .df-app-name {
+    font: 700 22px / 1.2 var(--font-ui);
+    color: var(--color-finder-text);
+    overflow-wrap: anywhere;
+  }
+  .df-app-meta {
+    font-size: 14px;
+    color: var(--color-finder-muted);
+  }
+  .df-app-class {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    font: 700 18px / 1.3 var(--font-ui);
+    color: color-mix(in srgb, var(--class-color) 75%, var(--color-finder-text));
+  }
+  .df-app-spec {
+    font: 600 17px / 1.3 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  .df-app-roles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .df-app-roles .df-role-chip {
+    min-height: 46px;
+    padding: 10px 14px;
+    gap: 10px;
+    font: 700 18px / 1.3 var(--font-ui);
+    border: 1px solid currentColor;
+    border-radius: 8px;
+  }
+  .df-app-roles .ui-icon {
+    width: 28px;
+    height: 28px;
+  }
+  @container finder-board (max-width: 600px) {
+    .df-applicant {
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 12px;
+      padding: 14px;
+    }
+    .df-app-roles {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
+  }
+  .df-app-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .df-app-actions .ui-icon {
+    width: 17px;
+    height: 17px;
+    margin-right: 6px;
+  }
+  .df-board-shell .df-app-accept,
+  .df-board-shell .df-accept {
+    --btn-fill-gold: linear-gradient(
+      180deg,
+      var(--color-finder-accept-hi),
+      var(--color-finder-accept-lo)
+    );
+    --gold-dim: var(--color-finder-healer);
+    --color-text-on-gold-btn: var(--color-finder-text);
+    --glow-gold-soft: 0 0 14px color-mix(in srgb, var(--color-finder-healer) 12%, transparent);
+  }
+  .df-board-shell .df-apply {
+    --gold-dim: var(--color-finder-gold-deep);
+    --btn-fill-gold: linear-gradient(
+      180deg,
+      var(--color-finder-gold),
+      color-mix(in srgb, var(--color-finder-gold) 70%, var(--color-finder-gold-deep))
+    );
+    --color-text-on-gold-btn: var(--color-finder-ink);
+    text-shadow: none;
+    font-weight: 700;
+  }
+  .df-mine [data-act="closelisting"] {
+    width: 100%;
+    margin-top: 20px;
+  }
+  .df-board-shell .df-create .df-sub {
+    margin: 12px 0;
+  }
+  .df-board-shell--create .df-create-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    flex-wrap: wrap;
+    padding: 12px 0;
+    background: var(--color-finder-ink);
+  }
+  .df-create-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .df-create-actions .btn {
+    margin: 0;
+  }
+  .df-board-shell--create .df-create-heading .df-sub {
+    margin: 0;
+  }
+  .df-board-shell--create .df-activity-options {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  }
+  .df-board-shell--create .df-activity-art {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    pointer-events: none;
+  }
+  .df-board-shell--create .df-activity-group {
+    position: relative;
+    isolation: isolate;
+    border-color: var(--color-finder-line);
+  }
+  .df-board-shell--create .df-activity-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-finder-ink) 85%, transparent),
+        color-mix(in srgb, var(--color-finder-ink) 15%, transparent)
+      ),
+      linear-gradient(0deg, var(--color-finder-ink), transparent 80%);
+  }
+  .df-board-shell--create .df-activity-art img {
+    object-fit: cover;
+    object-position: center 45%;
+  }
+  .df-board-shell--create .df-activity-copy {
+    position: relative;
+    z-index: 1;
+    min-height: 140px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 18px;
+  }
+  .df-board-shell--create .df-activity-group:has([aria-checked="true"]) {
+    border-color: var(--color-finder-gold);
+    box-shadow: inset 3px 0 var(--color-finder-gold);
+  }
+  .df-board-shell--create .df-activity-name {
+    font-size: 18px;
+    text-shadow: 0 2px 4px var(--color-finder-ink);
+  }
+  .df-create-filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 12px 0 20px;
+    color: var(--color-finder-gold);
+    font: 600 17px / 1.4 var(--font-display);
+  }
+  .df-board-shell--create .df-create-filter {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    gap: 6px;
+    margin: 0;
+    font-size: 15px;
+  }
+  .df-board-shell--create .df-create-actions {
+    align-self: end;
+  }
+  .df-create-filter .ui-input {
+    min-height: 48px;
+    width: min(100%, 320px);
+    padding: 10px 14px;
+    font: 600 18px / 1.4 var(--font-ui);
+    color: var(--color-finder-text);
+    background-color: var(--color-finder-surface);
+    border-color: var(--color-finder-line);
+    border-radius: 8px;
+    color-scheme: dark;
+  }
+  .df-create-role-section {
+    margin-bottom: 22px;
+  }
+  .df-create-roles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 600px;
+  }
+  .df-create-role {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 140px;
+    padding: 18px 10px 14px;
+    font: 600 18px / 1.3 var(--font-ui);
+    color: var(--color-finder-tank);
+    border: 1px solid var(--color-finder-line);
+    background:
+      radial-gradient(
+        ellipse at 50% 0%,
+        color-mix(in srgb, currentColor 18%, transparent),
+        transparent 75%
+      ),
+      linear-gradient(150deg, var(--color-finder-surface), var(--color-finder-ink));
+    overflow: hidden;
+  }
+  .df-create-role::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 7px;
+    pointer-events: none;
+  }
+  .df-create-role[data-create-role="healer"] {
+    color: var(--color-finder-healer);
+  }
+  .df-create-role[data-create-role="dps"] {
+    color: var(--color-finder-dps);
+  }
+  .df-create-role-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, currentColor 22%, var(--color-finder-ink)),
+      var(--color-finder-ink)
+    );
+    box-shadow:
+      0 0 0 4px var(--color-finder-ink),
+      0 0 0 5px color-mix(in srgb, currentColor 45%, transparent),
+      0 0 22px color-mix(in srgb, currentColor 18%, transparent),
+      inset 0 0 12px var(--color-finder-ink);
+  }
+  .df-create-role-icon .ui-icon {
+    width: 32px;
+    height: 32px;
+    fill: currentColor;
+  }
+  .df-create-role::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+  .df-create-role[aria-pressed="true"] {
+    border-color: currentColor;
+    box-shadow:
+      inset 0 -3px currentColor,
+      0 0 16px color-mix(in srgb, currentColor 14%, transparent);
+  }
+  .df-create-role[aria-pressed="true"]::after {
+    background: currentColor;
+  }
+  .df-create-role:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  @container finder-board (max-width: 480px) {
+    .df-board-shell--create .df-activity-copy {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+    }
+    .df-board-shell--create .df-create-actions {
+      gap: 6px;
+    }
+    .df-board-shell--create .df-create-actions .ui-btn {
+      padding: 8px;
+      font-size: 14px;
+    }
+    .df-board-shell--create .df-create-filter .ui-input {
+      padding: 8px;
+      font-size: 16px;
+    }
+  }
+  @media (forced-colors: active) {
+    .df-create-role[aria-pressed="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -3px;
+    }
+  }
+  .df-board-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 28px 14px;
+    grid-column: 1 / -1;
+  }
+  .df-board-empty > .ui-icon {
+    width: 38px;
+    height: 38px;
+    color: var(--color-finder-teal);
+  }
+  .df-board-shell .df-opt {
+    font-size: 15px;
+    min-height: 40px;
+  }
+  @media (max-width: 1080px) {
+    .df-board-shell:not(.df-board-shell--browse) {
+      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+      gap: 16px;
+    }
+    .df-board-shell .df-listings {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 650px) {
+    .df-board-shell {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    /* Narrow rows: the action drops under the content at full width. */
+    .df-board-shell .df-listing {
+      grid-template-columns: 44px minmax(0, 1fr);
+    }
+    .df-listing-thumb {
+      width: 44px;
+      height: 44px;
+    }
+    .df-listing-action {
+      grid-column: 1 / -1;
+    }
+    .df-board-shell .df-listing-action > .ui-btn {
+      width: 100%;
+    }
+    /* The role select drops under the member's name and level. */
+    .df-party-member {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .df-party-member select {
+      grid-column: 1 / -1;
+    }
+  }
+  @container finder-board (max-width: 900px) {
+    .df-board-shell .df-listings {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @container finder-board (max-width: 600px) {
+    .df-board-shell:not(.df-board-shell--browse) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (forced-colors: active) {
+    .df-board-hero > img,
+    .df-board-hero::after,
+    .df-listing::after {
+      display: none;
+    }
+    .df-board-shell {
+      color: CanvasText;
+    }
+    .df-board-hero,
+    .df-app-name,
+    .df-listing-name,
+    .df-role-chip,
+    .df-app-role,
+    .df-app-meta,
+    .df-listing-meta,
+    .df-needed,
+    .df-listing-size,
+    .df-listing-leader {
+      color: CanvasText;
+      background: Canvas;
+    }
+    .df-roster-seat {
+      border-color: CanvasText;
+    }
+  }
+
+  /* ---------- Collections (buddies, mounts, item sets) ---------- */
+  #collections-window {
+    width: 620px;
+    --window-pad: 14px;
+  }
+  .col-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0 10px;
+  }
+  .col-tab {
+    flex: 1;
+    font-family: var(--title-font);
+    font-size: 12px;
+    padding: 5px 4px;
+    color: var(--color-text-muted);
+    background: linear-gradient(var(--color-collections-tab-hi), var(--color-collections-tab-lo));
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .col-tab.active {
+    color: var(--gold);
+    background: linear-gradient(
+      var(--color-collections-tab-on-hi),
+      var(--color-collections-tab-on-lo)
+    );
+  }
+  /* Readability pass (owner request): every word in this window is white and
+     bold. The item-quality tints the rows carry (q-common through q-epic) read
+     too dark against the panel to scan a long catalog by, so inside this window
+     the quality classes lose the color argument and the text wins it. Scoped to
+     #collections-window, so the same q-* classes keep their tints everywhere
+     else in the HUD. */
+  #collections-window,
+  #collections-window .col-row-name,
+  #collections-window .col-row-state,
+  #collections-window .col-detail-name,
+  #collections-window .col-line-label,
+  #collections-window .col-line-value,
+  #collections-window .col-note,
+  #collections-window .col-tab {
+    color: var(--color-white);
+    font-weight: 700;
+  }
+  /* Two panes: the catalog list scrolls, the detail pane holds the preview. */
+  .col-body {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .col-list {
+    flex: 1 1 46%;
+    max-height: 620px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .col-detail {
+    flex: 1 1 54%;
+    max-height: 620px;
+    overflow-y: auto;
+  }
+  .col-row {
+    min-height: 32px;
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
-    border-top: 1px solid var(--panel-border);
-    padding: 6px 0;
+    width: 100%;
+    padding: 3px 5px;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
   }
-  .df-app-name {
-    font-size: 12px;
-    color: var(--color-text-light);
+  .col-row.active {
+    border-color: var(--color-border-showcase);
+    background: var(--color-collections-row-active);
   }
-  .df-app-meta {
+  /* An entry nothing in the game grants yet: still listed, visibly dimmed. */
+  .col-row.col-locked {
+    opacity: 0.55;
+  }
+  /* The buddy pane's summon/dismiss command: the shared
+     button chrome at the pane's own rhythm. */
+  .col-action {
+    margin: 6px 0 4px;
+    padding: 4px 12px;
+    min-height: 40px;
+  }
+  .col-row-name {
     flex: 1;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .col-row-state {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .col-group-head {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 11px;
+    margin: 10px 0 3px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    padding-bottom: 2px;
+  }
+  /* The shared turntable's canvas is appended here by Hud.mountSharedPreview. */
+  /* The idle turntable, at double the height it shipped at (owner request):
+     a buddy rig is small in frame, and the pane is the only place a player
+     ever sees one up close. */
+  .col-preview {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    margin-bottom: 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .col-detail-name {
+    font-family: var(--title-font);
+    font-size: 14px;
+    margin: 0 0 6px;
+  }
+  /* The companion blurb: flavour, so it reads quieter than the derived facts
+     under it and never competes with them for the eye. */
+  .col-lore {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--color-collections-lore);
+  }
+  .col-line {
+    display: flex;
+    gap: 8px;
+    margin: 2px 0;
+    font-size: 11px;
+  }
+  .col-line-label {
+    flex: 0 0 96px;
+    color: var(--color-text-muted);
+  }
+  .col-line-value {
+    flex: 1;
+  }
+  .col-note {
     font-size: 11px;
     color: var(--color-text-muted);
   }
-  .df-app-actions {
-    display: flex;
-    gap: 6px;
+  .col-pieces {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  /* A piece the player already owns: green tick beside the name and a green
+     ring on the icon, so a set can be read at a glance without counting. */
+  .col-piece.col-owned .item-icon {
+    outline: 2px solid var(--color-collections-owned);
+    outline-offset: -2px;
+    border-radius: 3px;
+  }
+  .col-tick {
+    color: var(--color-collections-owned);
+    margin-right: 4px;
+    font-weight: 700;
+  }
+  /* Item level rides the name line, dimmer than the name it qualifies. */
+  .col-ilvl {
+    color: var(--color-collections-ilvl);
+    font-size: 10px;
+    font-weight: 400;
+  }
+  /* A set bonus the player has the pieces for reads live, the rest sit muted,
+     matching how the item tooltip lights a met tier. */
+  .col-bonus .col-line-value {
+    opacity: 0.6;
+  }
+  .col-bonus-live .col-line-value {
+    opacity: 1;
+    color: var(--color-collections-owned);
+  }
+  .col-piece {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 8px;
+    padding: 6px 0;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .col-piece .col-line,
+  .col-piece .col-note {
+    grid-column: 2;
+  }
+  /* An entry with no committed item art: an empty cell at icon size, never a
+     broken image. */
+  .col-noart {
+    display: inline-block;
+    background: var(--color-collections-art-empty);
   }
 
   /* ---------- Ashen Coliseum (arena) ---------- */
@@ -16380,12 +18743,690 @@
     line-height: 1.35;
   }
 
+  /* ---------- Dungeon prompts' shared slot (the Iron Cage, the chains, the encounter alerts) ---------- */
+  /* The three encounter prompts share one slot, clear of the WHOLE bottom
+     stack: it sits a gap above the cast bar (which already rides above the
+     action rows, the player frame and the swing timers) and lifts with it
+     when a third action row shows. They used to sit at 190px, over the player
+     frame and the stacked action rows. On touch they float above the action
+     ring's arc instead. */
+  #bastion-cage-escape,
+  #bastion-chain-alert,
+  #bastion-alert,
+  #wildheart-alert,
+  #sanctum-alert,
+  #crypt-alert,
+  #kit-use-prompt {
+    bottom: calc(260px + var(--castbar-h) + 14px);
+  }
+  body.show-actionbar3 #bastion-cage-escape,
+  body.show-actionbar3 #bastion-chain-alert,
+  body.show-actionbar3 #bastion-alert,
+  body.show-actionbar3 #wildheart-alert,
+  body.show-actionbar3 #sanctum-alert,
+  body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #kit-use-prompt {
+    bottom: calc(312px + var(--castbar-h) + 14px);
+  }
+  body.mobile-touch #bastion-cage-escape,
+  body.mobile-touch #bastion-chain-alert,
+  body.mobile-touch #bastion-alert,
+  body.mobile-touch #wildheart-alert,
+  body.mobile-touch #sanctum-alert,
+  body.mobile-touch #crypt-alert,
+  body.mobile-touch #kit-use-prompt {
+    bottom: 56%;
+  }
+
+  /* ---------- Iron Cage escape (the Gaol Turnkey's button-mash prompt) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/cage_escape_painter.ts while the local
+     player is locked in the Iron Cage, centred low over the action bar. The
+     whole panel is a button (a tap or a click is an escape press, the same
+     command the interact key sends), composed from the library panel, keycap
+     and bar. The state is carried by text as well as the fill. */
+  #bastion-cage-escape {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-hostile);
+  }
+  #bastion-cage-escape .bce-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  #bastion-cage-escape .bce-key {
+    font-size: 16px;
+    font-weight: 700;
+    animation: bce-press 0.3s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-bar {
+    --bar-h: 16px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-cage-escape .bce-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-cage-escape.is-near .bce-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @keyframes bce-throb {
+    from {
+      box-shadow: 0 0 6px color-mix(in srgb, var(--color-hostile) 40%, transparent);
+    }
+    to {
+      box-shadow: 0 0 22px color-mix(in srgb, var(--color-hostile) 80%, transparent);
+    }
+  }
+  @keyframes bce-press {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(2px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-cage-escape,
+    #bastion-cage-escape .bce-key {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-cage-escape {
+    min-width: min(420px, calc(100vw - 32px));
+    padding: 16px 20px 18px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-title {
+    font-size: 22px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-bar {
+    --bar-h: 22px;
+  }
+
+  /* ---------- Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/gaol_chain_painter.ts in the Iron Cage
+     prompt's slot (the two never share a fight), shown while a chain asks
+     something of the local player. The kind classes come from the pure view;
+     the state is carried by the text too, so colour is never the only cue. */
+  #bastion-chain-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 6px 16px 8px;
+    pointer-events: none;
+    text-align: center;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-chain-alert .bca-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-chain-alert .bca-line {
+    font-size: 13px;
+  }
+  /* The Drowned Anchor's links left: the number the whole group plays to. */
+  #bastion-chain-alert .bca-count {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-light);
+  }
+  #bastion-chain-alert .bca-hint {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  #bastion-chain-alert .bca-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-chain-alert .bca-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-chain-alert.is-anchored,
+  #bastion-chain-alert.is-strained {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-chain-alert.is-anchored .bca-title,
+  #bastion-chain-alert.is-strained .bca-title {
+    color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-strained .bca-fill {
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-anchored .bca-fill,
+  #bastion-chain-alert.is-ally .bca-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-chain-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-chain-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Sunken Bastion's crown alert (Vael's scythe, the Fog Veil) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/bastion_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the
+     scythe behind you throbs in the hostile tone, the veil's rule sits in the
+     beacon's warm gold, a hollow shade in its fog green. Never tier-gated
+     (graphics fairness). */
+  #bastion-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-alert .fa-line {
+    font-size: 14px;
+  }
+  #bastion-alert .fa-hint {
+    display: none;
+  }
+  #bastion-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-alert.is-reaped,
+  #bastion-alert.is-sentenced,
+  #bastion-alert.is-brine {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-reaped .fa-title,
+  #bastion-alert.is-reaped .fa-fill,
+  #bastion-alert.is-sentenced .fa-title,
+  #bastion-alert.is-sentenced .fa-fill,
+  #bastion-alert.is-brine .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-alert.is-veil-real {
+    animation: bce-throb 0.6s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-veil-shade {
+    border-color: var(--color-debuff-nature);
+  }
+  #bastion-alert.is-veil-shade .fa-title {
+    color: var(--color-debuff-nature);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/wildheart_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too. */
+  #wildheart-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #wildheart-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #wildheart-alert .fa-line {
+    font-size: 14px;
+  }
+  #wildheart-alert .fa-hint {
+    display: none;
+  }
+  #wildheart-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #wildheart-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #wildheart-alert.is-prey,
+  #wildheart-alert.is-stalked {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #wildheart-alert.is-prey .fa-title,
+  #wildheart-alert.is-stalked .fa-title,
+  #wildheart-alert.is-prey .fa-fill,
+  #wildheart-alert.is-stalked .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #wildheart-alert.is-pollinated {
+    border-color: var(--color-energy);
+  }
+  #wildheart-alert.is-pollinated .fa-title,
+  #wildheart-alert.is-pollinated .fa-fill {
+    color: var(--color-energy);
+    --bar-color: var(--color-energy);
+  }
+  #wildheart-alert.is-bonded {
+    border-color: var(--color-debuff-nature);
+  }
+  #wildheart-alert.is-bonded .fa-title {
+    color: var(--color-debuff-nature);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #wildheart-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #wildheart-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/sanctum_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a strike
+     to dodge throbs in the hostile tone, a floor to read sits in frost, the
+     Lockbound readout in gold. Never tier-gated (graphics fairness). */
+  #sanctum-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #sanctum-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #sanctum-alert .fa-line {
+    font-size: 14px;
+  }
+  #sanctum-alert .fa-hint {
+    display: none;
+  }
+  #sanctum-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #sanctum-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #sanctum-alert.is-quench,
+  #sanctum-alert.is-plunge,
+  #sanctum-alert.is-descent,
+  #sanctum-alert.is-eye,
+  #sanctum-alert.is-eye-cracked,
+  #sanctum-alert.is-flail,
+  #sanctum-alert.is-charge,
+  #sanctum-alert.is-trench,
+  #sanctum-alert.is-strain,
+  #sanctum-alert.is-inferno,
+  #sanctum-alert.is-stomp,
+  #sanctum-alert.is-breath,
+  #sanctum-alert.is-maul,
+  #sanctum-alert.is-tail,
+  #sanctum-alert.is-branded {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-quench .fa-title,
+  #sanctum-alert.is-plunge .fa-title,
+  #sanctum-alert.is-descent .fa-title,
+  #sanctum-alert.is-eye .fa-title,
+  #sanctum-alert.is-eye-cracked .fa-title,
+  #sanctum-alert.is-flail .fa-title,
+  #sanctum-alert.is-charge .fa-title,
+  #sanctum-alert.is-trench .fa-title,
+  #sanctum-alert.is-strain .fa-title,
+  #sanctum-alert.is-inferno .fa-title,
+  #sanctum-alert.is-stomp .fa-title,
+  #sanctum-alert.is-breath .fa-title,
+  #sanctum-alert.is-maul .fa-title,
+  #sanctum-alert.is-tail .fa-title,
+  #sanctum-alert.is-branded .fa-title,
+  #sanctum-alert.is-quench .fa-fill,
+  #sanctum-alert.is-plunge .fa-fill,
+  #sanctum-alert.is-descent .fa-fill,
+  #sanctum-alert.is-eye .fa-fill,
+  #sanctum-alert.is-eye-cracked .fa-fill,
+  #sanctum-alert.is-flail .fa-fill,
+  #sanctum-alert.is-charge .fa-fill,
+  #sanctum-alert.is-trench .fa-fill,
+  #sanctum-alert.is-strain .fa-fill,
+  #sanctum-alert.is-inferno .fa-fill,
+  #sanctum-alert.is-stomp .fa-fill,
+  #sanctum-alert.is-breath .fa-fill,
+  #sanctum-alert.is-maul .fa-fill,
+  #sanctum-alert.is-tail .fa-fill,
+  #sanctum-alert.is-branded .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #sanctum-alert.is-meltwater,
+  #sanctum-alert.is-meltwater-target,
+  #sanctum-alert.is-cracked,
+  #sanctum-alert.is-flight,
+  #sanctum-alert.is-rime {
+    border-color: var(--color-debuff-frost);
+  }
+  #sanctum-alert.is-meltwater .fa-title,
+  #sanctum-alert.is-meltwater-target .fa-title,
+  #sanctum-alert.is-cracked .fa-title,
+  #sanctum-alert.is-flight .fa-title,
+  #sanctum-alert.is-rime .fa-title,
+  #sanctum-alert.is-meltwater .fa-fill,
+  #sanctum-alert.is-meltwater-target .fa-fill,
+  #sanctum-alert.is-cracked .fa-fill,
+  #sanctum-alert.is-flight .fa-fill,
+  #sanctum-alert.is-rime .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  /* The Ice Slab's cover hint: calm, never a warning (it is shelter). */
+  #sanctum-alert.is-slab {
+    border-color: var(--color-friendly);
+  }
+  #sanctum-alert.is-slab .fa-title,
+  #sanctum-alert.is-slab .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #sanctum-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #sanctum-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the Open Grave, Morthen's Rite Ring) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/crypt_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a mark
+     or a grave to leave throbs in the hostile tone, being held and the
+     Lament's call to the light sit in frost, a sheltered player stays calm in
+     the friendly tone, the target readouts in gold. Never tier-gated
+     (graphics fairness). */
+  #crypt-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #crypt-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #crypt-alert .fa-line {
+    font-size: 14px;
+  }
+  #crypt-alert .fa-hint {
+    display: none;
+  }
+  #crypt-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #crypt-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  /* Morthen's Rite Ring and the Burning Knell: the strikes to leave (the
+     marked half, a Grasp ring, the Reap's arc) throb in the hostile tone too;
+     the Rite's candle count and a Bound Soul on its way stay in gold. */
+  #crypt-alert.is-measured,
+  #crypt-alert.is-grave,
+  #crypt-alert.is-knell,
+  #crypt-alert.is-grasp,
+  #crypt-alert.is-reap {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-measured .fa-title,
+  #crypt-alert.is-measured .fa-fill,
+  #crypt-alert.is-knell .fa-title,
+  #crypt-alert.is-knell .fa-fill,
+  #crypt-alert.is-grasp .fa-title,
+  #crypt-alert.is-grasp .fa-fill,
+  #crypt-alert.is-reap .fa-title,
+  #crypt-alert.is-reap .fa-fill,
+  #crypt-alert.is-grave .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #crypt-alert.is-embraced,
+  #crypt-alert.is-lament-open {
+    border-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-open {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-embraced .fa-title,
+  #crypt-alert.is-embraced .fa-fill,
+  #crypt-alert.is-lament-open .fa-title,
+  #crypt-alert.is-lament-open .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-sheltered {
+    border-color: var(--color-friendly);
+  }
+  #crypt-alert.is-lament-sheltered .fa-title,
+  #crypt-alert.is-lament-sheltered .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #crypt-alert {
+      animation: none;
+    }
+    #crypt-alert .fa-fill {
+      transition: none;
+    }
+  }
+  body.mobile-touch #crypt-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The trash engine's use prompt (a Soul Brazier to topple) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/kit_use_prompt_view.ts, in the dungeon prompts' shared
+     slot (it yields the slot to every other prompt). In the use's reach the
+     whole panel is a button (a tap or a click targets the body and interacts,
+     like the interact key); a little farther out, or while the player's own
+     use runs, it ignores the pointer. The state is carried by the text too:
+     the keycap and the press line, the step-closer line, the use's own bar.
+     Never tier-gated (graphics fairness). */
+  #kit-use-prompt {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #kit-use-prompt.is-pressable {
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  #kit-use-prompt .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #kit-use-prompt .fa-line {
+    font-size: 14px;
+  }
+  #kit-use-prompt .fa-hint {
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  #kit-use-prompt .fa-key {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  #kit-use-prompt .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #kit-use-prompt .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #kit-use-prompt.is-use {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #kit-use-prompt.is-use-far {
+    border-color: var(--color-border-default);
+  }
+  #kit-use-prompt.is-using .fa-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #kit-use-prompt {
+      animation: none;
+    }
+    #kit-use-prompt .fa-fill {
+      transition: none;
+    }
+  }
+  body.mobile-touch #kit-use-prompt {
+    min-width: min(420px, calc(100vw - 32px));
+    padding: 16px 20px 18px;
+  }
+  body.mobile-touch #kit-use-prompt .fa-hint {
+    font-size: 17px;
+  }
+
   /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
-  /* Self-mounted by src/ui/hud/hill/hill_bar_painter.ts, top centre below the
-     Thornhollow Fields scoreboard's slot; shown only while the player stands in
-     the hill's zone. The tone classes are chosen by the painter from the
-     readout's union; the state is carried by text too, so colour is never the
-     only channel. */
+  /* Static #hill-bar in both entries (a governed frame: move, resize, hide,
+     backdrop opacity), painted by src/ui/hud/hill/hill_bar_painter.ts into its
+     #hill-body. Stock seat top centre below the Thornhollow Fields
+     scoreboard's slot; shown only while the player stands in the hill's
+     zone. The tone classes are chosen by the painter from the readout's
+     union; the state is carried by text too, so colour is never the only
+     channel. */
   #hill-bar {
     position: absolute;
     top: 8px;
@@ -16397,13 +19438,30 @@
     max-width: min(360px, calc(100vw - 24px));
     pointer-events: none;
     text-align: center;
-    background: var(--panel-bg-strong);
-    border: 1px solid var(--color-bg-field-edge);
+    /* The backdrop lives on ::before so King of the Hill Background
+       (hillBarOpacity, --hill-bar-opacity) can fade the panel without the
+       text; the transparent border keeps the stock box geometry. */
+    border: 1px solid transparent;
     border-radius: 9px;
     padding: 6px 14px 8px;
-    box-shadow: 0 2px 16px color-mix(in srgb, var(--color-keyline) 63%, transparent);
     font-size: 12px;
     color: var(--color-text);
+  }
+  /* The panel itself: fill, border and shadow fade together at the player's
+     chosen opacity, and the text above them never does. The root's own
+     z-index makes it a stacking context, so -1 still paints inside it. At the
+     stock 1 this is exactly the solid panel the bar always had. */
+  #hill-bar::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--panel-bg-strong);
+    border: 1px solid var(--color-bg-field-edge);
+    box-shadow: 0 2px 16px color-mix(in srgb, var(--color-keyline) 63%, transparent);
+    opacity: var(--hill-bar-opacity, 1);
+    pointer-events: none;
   }
   #hill-bar .hill-head {
     display: flex;
@@ -17943,6 +21001,16 @@
     padding-bottom: 4px;
     margin: 10px 0 6px;
   }
+  /* A checkbox option row (options_check_rows.ts, the Combat tab's Style of
+     Enemy Highlight group): the box leads, the name follows, and the whole
+     row is the click target. */
+  .set-check-row {
+    grid-template-columns: auto 1fr;
+    cursor: var(--cursor-point);
+  }
+  .set-check-row .ui-check {
+    margin: 0;
+  }
   .graphics-controls-disabled {
     opacity: 0.55;
   }
@@ -17962,6 +21030,11 @@
      binding columns and the Reset/Back buttons, with the same expando. */
   .kb-transfer {
     margin: 0 0 var(--spacing-sm);
+  }
+  /* The Key Bindings panel's keyboard-layout converter: the same expando, with
+     its picker rows and the movement switch spanning the pane. */
+  .kb-layout-pane > .set-row {
+    align-self: stretch;
   }
   /* The Import / Export sub-panel's body around the Full Settings row. */
   .transfer-body {
@@ -18860,17 +21933,46 @@
     margin: 0;
     align-self: center;
   }
-  /* Touch: the selects, the name boxes and the search box meet the 40px target floor. */
+  /* Checkmark rows (Show While, Show In, Show Button When): each box combines
+     with its neighbour, so a row is a fieldset of label chips, not a select. */
+  .cdm-check-row {
+    display: grid;
+    gap: 4px;
+    margin: 6px 0 2px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .cdm-check-legend {
+    padding: 0;
+  }
+  .cdm-check-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+  .cdm-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+  }
+  /* Touch: the selects, the name boxes, the search box and the checkmark chips
+     meet the 40px target floor. */
   @media (pointer: coarse) {
     .cdm-select,
     .cdm-name,
-    .cdm-search {
+    .cdm-search,
+    .cdm-check {
       min-height: 40px;
     }
   }
   body.mobile-touch .cdm-select,
   body.mobile-touch .cdm-name,
-  body.mobile-touch .cdm-search {
+  body.mobile-touch .cdm-search,
+  body.mobile-touch .cdm-check {
     min-height: 40px;
   }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
@@ -20085,6 +23187,693 @@
   }
   .mail-send-btn:hover {
     filter: brightness(1.08);
+  }
+
+  /* ---------- lantern hall guild window ---------- */
+  /* Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts): two tabs over the
+     Highwatch slate blue. Contracts: a wooden notice board of pinned parchment notices, each
+     with its boss's portrait, the guild's wax seal, the week's counter and the reward.
+     Quartermaster: a vendor counter, item cards on the left and the selected card's detail
+     (the crest, the nameplate the title draws, the price against the bags) on the right. A
+     flex column under the base window shell; both bodies restack on a narrow window (the
+     container queries below), which is what a landscape phone gets. */
+  #guild-hall-window {
+    width: min(1040px, calc(100vw - 32px));
+    max-height: calc(var(--app-vh, 100vh) * 0.9 - 16px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden auto;
+    min-height: 0;
+    container-type: inline-size;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, var(--gh-amber-glow), transparent 60%),
+      linear-gradient(180deg, var(--gh-sheet-top), var(--gh-sheet-bottom));
+    border-color: var(--gh-edge);
+    color: var(--gh-ink);
+    padding: clamp(10px, 1.6cqw, 22px) clamp(12px, 2cqw, 26px);
+  }
+  #guild-hall-window .gh-title span:first-child {
+    font-size: clamp(18px, 3cqw, 30px);
+    letter-spacing: 0.03em;
+    color: var(--gh-amber);
+    text-shadow: 0 1px 0 var(--gh-shadow);
+  }
+  #guild-hall-window .gh-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  #guild-hall-window .gh-tab {
+    flex: 1 1 0;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--gh-muted);
+    background: linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-tab[aria-selected="true"] {
+    color: var(--gh-amber);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-card));
+    box-shadow:
+      inset 0 -2px 0 var(--gh-amber),
+      0 0 14px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-tab:focus-visible,
+  #guild-hall-window .gh-btn:focus-visible,
+  #guild-hall-window .gh-item:focus-visible,
+  #guild-hall-window .gh-seals:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  #guild-hall-window .gh-sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 16px;
+    font-size: 14px;
+  }
+  #guild-hall-window .gh-seals {
+    min-height: 40px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: help;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px 3px 4px;
+    color: var(--gh-amber);
+    font-weight: 600;
+    background: var(--gh-chip-bg);
+    border: 1px solid var(--gh-edge);
+    border-radius: 999px;
+  }
+  #guild-hall-window .gh-seal-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+  #guild-hall-window .gh-reset,
+  #guild-hall-window .gh-intro,
+  #guild-hall-window .gh-empty {
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-intro {
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 8px 0 12px;
+  }
+  #guild-hall-window .gh-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* The notice board: dark oak boards behind the pinned notices. */
+  #guild-hall-window .gh-board {
+    padding: 14px clamp(10px, 1.8cqw, 22px) 12px;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, var(--gh-wood-glow), transparent 70%),
+      repeating-linear-gradient(
+        180deg,
+        var(--gh-wood-1) 0 46px,
+        var(--gh-wood-seam) 46px 48px,
+        var(--gh-wood-2) 48px 94px,
+        var(--gh-wood-seam) 94px 96px
+      );
+    border: 3px solid var(--gh-frame);
+    box-shadow:
+      inset 0 0 0 1px var(--gh-edge),
+      inset 0 0 40px var(--gh-shadow),
+      0 6px 16px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-tally {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 12px;
+    margin: 0 0 14px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--gh-gilt);
+    text-shadow: 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-pips {
+    display: inline-flex;
+    gap: 5px;
+  }
+  #guild-hall-window .gh-pip {
+    width: 26px;
+    height: 8px;
+    background: var(--gh-pip-empty);
+    border: 1px solid var(--gh-edge);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-pip-done {
+    background: linear-gradient(180deg, var(--gh-amber), var(--gh-edge));
+    box-shadow: 0 0 6px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  /* One notice: a sheet of aged parchment pinned at its head. */
+  #guild-hall-window .gh-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 24px 16px 18px;
+    color: var(--gh-paper-ink);
+    text-align: center;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 40%, var(--gh-paper-hi), transparent 75%),
+      radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, var(--gh-paper-burn) 100%),
+      linear-gradient(170deg, var(--gh-paper-1), var(--gh-paper-2));
+    border-radius: 3px 5px 4px 6px;
+    box-shadow:
+      inset 0 0 0 1px var(--gh-paper-edge),
+      0 10px 18px var(--gh-shadow),
+      0 2px 3px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-card:nth-child(3n + 1) {
+    transform: rotate(-0.6deg);
+  }
+  #guild-hall-window .gh-card:nth-child(3n + 3) {
+    transform: rotate(0.5deg);
+  }
+  #guild-hall-window .gh-pin {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--gh-pin-hi), var(--gh-pin) 60%);
+    box-shadow: 1px 2px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-ribbon {
+    padding: 2px 14px;
+    color: var(--gh-ribbon-text);
+    background: var(--gh-kind-boss);
+    clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%);
+  }
+  #guild-hall-window .gh-card-heroic .gh-ribbon {
+    background: var(--gh-kind-heroic);
+  }
+  #guild-hall-window .gh-card-task .gh-ribbon {
+    background: var(--gh-kind-task);
+  }
+  #guild-hall-window .gh-kind {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  #guild-hall-window .gh-portrait {
+    width: 92px;
+    height: 92px;
+    margin-top: 4px;
+    padding: 3px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--gh-gilt), var(--gh-edge) 55%, var(--gh-frame));
+    box-shadow: 0 3px 8px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--gh-sheet-bottom);
+    box-shadow: inset 0 0 8px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-boss {
+    margin: 2px 0 0;
+    font-family: var(--title-font);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--gh-paper-ink);
+  }
+  #guild-hall-window .gh-dungeon {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-rule {
+    width: 70%;
+    height: 1px;
+    margin: 2px 0;
+    background: linear-gradient(90deg, transparent, var(--gh-paper-rule), transparent);
+  }
+  #guild-hall-window .gh-goal,
+  #guild-hall-window .gh-detail {
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+  }
+  #guild-hall-window .gh-detail {
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-progress {
+    width: 100%;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+  #guild-hall-window .gh-progress-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-pips-card {
+    display: flex;
+    margin-top: 4px;
+  }
+  #guild-hall-window .gh-pips-card .gh-pip {
+    flex: 1 1 auto;
+    height: 9px;
+    background: var(--gh-paper-track);
+    border-color: var(--gh-paper-rule);
+  }
+  #guild-hall-window .gh-pips-card .gh-pip-done {
+    background: linear-gradient(180deg, var(--gh-done-bar), var(--gh-done-deep));
+    box-shadow: none;
+  }
+  #guild-hall-window .gh-card-done .gh-state {
+    color: var(--gh-done-deep);
+    font-weight: 700;
+  }
+  #guild-hall-window .gh-reward {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding-right: 36px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gh-paper-ink);
+  }
+  #guild-hall-window .gh-reward-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+  }
+  /* The guild's wax seal, pressed at the notice's foot: the crown while the contract is
+     open, a tick once it is done this week. */
+  #guild-hall-window .gh-wax {
+    position: absolute;
+    right: -10px;
+    bottom: -12px;
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    color: var(--gh-wax-deep);
+    border-radius: 47% 53% 50% 50% / 52% 48% 52% 48%;
+    background: radial-gradient(
+      circle at 38% 32%,
+      var(--gh-wax-hi),
+      var(--gh-wax) 55%,
+      var(--gh-wax-deep)
+    );
+    box-shadow:
+      inset 0 0 0 4px var(--gh-wax-rim),
+      1px 2px 3px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-wax .ui-icon {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 1px 0 var(--gh-wax-hi));
+  }
+  #guild-hall-window .gh-card-done .gh-wax {
+    color: var(--gh-wax-gilt);
+  }
+  /* The clerk's ink stamp across the notice's upper corner, clear of the boss's name. */
+  #guild-hall-window .gh-stamp {
+    position: absolute;
+    top: 50px;
+    right: 8px;
+    padding: 1px 8px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gh-stamp);
+    border: 3px double var(--gh-stamp);
+    border-radius: 4px;
+    transform: rotate(12deg);
+    pointer-events: none;
+  }
+  #guild-hall-window .gh-foot {
+    margin-top: 14px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--gh-gilt);
+    text-shadow: 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-empty {
+    text-align: center;
+    color: var(--gh-gilt);
+  }
+
+  /* The quartermaster's counter. */
+  #guild-hall-window .gh-shop {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 16px;
+    align-items: start;
+  }
+  #guild-hall-window .gh-stock {
+    display: grid;
+    gap: 10px;
+  }
+  #guild-hall-window .gh-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 72px;
+    padding: 8px 12px 8px 8px;
+    font-family: inherit;
+    color: var(--gh-ink);
+    text-align: start;
+    background: linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge-dim);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-item:hover {
+    border-color: var(--gh-edge);
+  }
+  #guild-hall-window .gh-item-selected {
+    border-color: var(--gh-amber);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-card));
+    box-shadow:
+      inset 0 0 0 1px var(--gh-amber),
+      0 0 16px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-slot {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    padding: 3px;
+    background: radial-gradient(circle at 50% 40%, var(--gh-card), var(--gh-sheet-bottom));
+    border: 2px solid var(--gh-edge);
+    border-radius: 6px;
+    box-shadow: inset 0 0 10px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #guild-hall-window .gh-item-owned .gh-slot {
+    border-color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-item-short .gh-slot img {
+    filter: saturate(0.55) brightness(0.8);
+  }
+  #guild-hall-window .gh-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  #guild-hall-window .gh-item-kind {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-item-name {
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--gh-title-ink);
+  }
+  #guild-hall-window .gh-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-tag-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+  #guild-hall-window .gh-chip {
+    padding: 3px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+  }
+  #guild-hall-window .gh-chip-owned {
+    color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-chip-ready {
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-chip-short {
+    color: var(--gh-short);
+  }
+  #guild-hall-window .gh-detail-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, var(--gh-amber-glow), transparent 70%),
+      linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge);
+    border-radius: 4px;
+    box-shadow: 0 8px 18px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  #guild-hall-window .gh-slot-large {
+    width: 84px;
+    height: 84px;
+  }
+  #guild-hall-window .gh-detail-name {
+    margin: 2px 0 0;
+    font-family: var(--title-font);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gh-title-ink);
+  }
+  /* The nameplate preview: the name over a dusk sky, the title beside it, the way the
+     title draws over the player in the world. */
+  #guild-hall-window .gh-plate-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 10px 18px;
+    background:
+      radial-gradient(ellipse 60% 70% at 50% 100%, var(--gh-plate-glow), transparent 70%),
+      linear-gradient(180deg, var(--gh-plate-sky-1), var(--gh-plate-sky-2));
+    border: 1px solid var(--gh-edge-dim);
+    border-radius: 4px;
+  }
+  #guild-hall-window .gh-plate-heading {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-plate {
+    font-family: var(--title-font);
+    font-size: 20px;
+    text-align: center;
+    text-shadow:
+      0 0 3px var(--gh-shadow),
+      0 1px 1px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-plate-name {
+    color: var(--gh-plate-name);
+  }
+  #guild-hall-window .gh-plate-title {
+    color: var(--gh-plate-title);
+    white-space: pre-wrap;
+  }
+  /* The live 3D stage of the horse or a weapon appearance (guild_offer_stage_controller.ts): the same
+     dusk frame as the nameplate, with the preview canvas filling it. */
+  #guild-hall-window .gh-model-stage {
+    align-items: stretch;
+    padding: 10px 10px 12px;
+  }
+  #guild-hall-window .gh-model-stage .gh-plate-heading {
+    text-align: center;
+  }
+  #guild-hall-window .gh-stage-slot,
+  #guild-hall-window .gh-stage {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #guild-hall-window .gh-stage-empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    margin: 0;
+    font-size: 13px;
+    text-align: center;
+    color: var(--gh-muted);
+  }
+  /* The reins and the Armory cards are paintings, not crests: they fill their slot. */
+  #guild-hall-window .gh-slot-item img,
+  #guild-hall-window .gh-slot-skin img {
+    object-fit: cover;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-detail-summary {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-detail-text,
+  #guild-hall-window .gh-detail-note {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  #guild-hall-window .gh-detail-note {
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-buybar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gh-edge-dim);
+  }
+  #guild-hall-window .gh-buy-price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #guild-hall-window .gh-tag-large {
+    font-size: 20px;
+  }
+  #guild-hall-window .gh-tag-large .gh-tag-icon {
+    width: 28px;
+    height: 28px;
+  }
+  #guild-hall-window .gh-have {
+    font-size: 12px;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-btn {
+    min-width: 120px;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--gh-ink);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-sheet-top));
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-buy:enabled {
+    color: var(--gh-btn-ink);
+    background: linear-gradient(180deg, var(--gh-amber), var(--gh-edge));
+    box-shadow: 0 0 12px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-btn:disabled {
+    color: var(--gh-muted);
+    cursor: default;
+  }
+  #guild-hall-window .gh-detail-owned .gh-btn {
+    color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-short {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gh-short);
+  }
+  @container (max-width: 560px) {
+    #guild-hall-window .gh-cards {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    /* a narrow notice runs sideways: the portrait at its left, the words beside it */
+    #guild-hall-window .gh-card {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      column-gap: 12px;
+      row-gap: 3px;
+      align-items: start;
+      padding: 18px 14px 14px;
+      text-align: start;
+      transform: none;
+    }
+    #guild-hall-window .gh-card > :not(.gh-portrait, .gh-pin, .gh-wax, .gh-stamp) {
+      grid-column: 2;
+    }
+    #guild-hall-window .gh-ribbon {
+      justify-self: start;
+    }
+    #guild-hall-window .gh-portrait {
+      grid-column: 1;
+      grid-row: 1 / span 4;
+      width: 72px;
+      height: 72px;
+    }
+    #guild-hall-window .gh-rule {
+      display: none;
+    }
+    #guild-hall-window .gh-wax {
+      width: 40px;
+      height: 40px;
+    }
+    #guild-hall-window .gh-shop {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* Forced colors drop the gradients and tints that carry the selected tab, the selected
+     card and the done pips, so each keeps a system-color edge instead. */
+  @media (forced-colors: active) {
+    #guild-hall-window .gh-tab[aria-selected="true"],
+    #guild-hall-window .gh-item-selected {
+      border: 2px solid Highlight;
+    }
+    #guild-hall-window .gh-pip-done,
+    #guild-hall-window .gh-pips-card .gh-pip-done {
+      background: Highlight;
+    }
   }
 
   /* ---------- event calendar ---------- */
@@ -22983,6 +26772,7 @@
   }
   .weekly-choice-status {
     font-size: 13px;
+    margin: 0;
   }
   .weekly-tracks {
     display: flex;
@@ -23207,7 +26997,35 @@
   }
   .weekly-vault-toolbar {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .weekly-vault-toolbar .weekly-choice-status {
+    flex: 999 1 260px;
+    min-width: min(100%, 220px);
+  }
+  .weekly-loot-focus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-width: 0;
+    flex: 1 1 280px;
+  }
+  .weekly-loot-focus .ui-input {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    flex: 1 1 180px;
+  }
+  .weekly-loot-focus-help {
+    flex-basis: 100%;
+    font-size: 12px;
+  }
+  .weekly-rolled-focus {
+    font-size: 12px;
   }
   .weekly-possible-loot-button {
     min-height: 44px;
@@ -24190,26 +28008,6 @@
     align-self: flex-start;
     padding: 10px 22px;
   }
-  .weekly-preview-notice {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: 8px 14px;
-    background: var(--color-ink-deep);
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
-    font-size: 13px;
-    border-radius: var(--radius-sm);
-  }
-  .weekly-preview-notice-icon {
-    display: inline-flex;
-    align-items: center;
-    color: var(--color-accent);
-  }
-  .weekly-preview-notice-icon .ui-icon {
-    width: 20px;
-    height: 20px;
-  }
   .weekly-claim-tracks {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -24418,11 +28216,19 @@
     justify-content: flex-end;
   }
   @media (min-width: 1100px) and (min-height: 700px) {
+    /* #bank-window lives inside the zoomed #ui (`zoom: var(--ui-scale)`), so
+       every viewport length divides by --window-scale, exactly as the base
+       rule above does: raw vw/vh here re-multiply by the zoom and push the
+       vault off-screen at any UI scale above 1. The 1080px cap is an author
+       length (already zoom space) and centres against the scaled viewport. */
     body.weekly-vault-open #bank-window {
-      left: 2vw;
-      top: max(2vh, calc((100vh - 1080px) / 2));
-      width: 96vw;
-      height: min(96vh, 1080px);
+      left: calc(var(--app-vw, 100vw) * 0.02 / var(--window-scale));
+      top: max(
+        calc(var(--app-vh, 100vh) * 0.02 / var(--window-scale)),
+        calc((var(--app-vh, 100vh) / var(--window-scale) - 1080px) / 2)
+      );
+      width: calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale));
+      height: min(calc(var(--app-vh, 100vh) * 0.96 / var(--window-scale)), 1080px);
     }
     #weekly-rewards-panel {
       flex: 1;
@@ -24454,11 +28260,28 @@
     .weekly-reset strong {
       font-size: 16px;
     }
+    /* The loot controls and status share one flex row, so the button scrolls
+       with the panel and follows a header that wraps taller at high UI scale.
+       Lifted above the status text so the row never swallows its clicks. */
     .weekly-vault-toolbar {
-      position: absolute;
-      right: 18px;
-      top: 118px;
+      position: relative;
       z-index: 2;
+      align-self: stretch;
+      justify-content: flex-end;
+    }
+    .weekly-vault-toolbar .weekly-choice-status {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      box-sizing: border-box;
+      padding-right: min(56%, 560px);
+      min-height: 48px;
+      pointer-events: none;
+    }
+    .weekly-vault-toolbar .weekly-loot-focus {
+      flex: 0 1 430px;
+      margin-left: auto;
     }
     .weekly-possible-loot-button {
       min-height: 30px;
@@ -24466,7 +28289,7 @@
       font-size: 12px;
     }
     .weekly-choice-status {
-      padding: 3px 165px 3px 0;
+      padding: 3px 0;
       font-size: 12px;
       min-height: 30px;
     }
@@ -24485,6 +28308,15 @@
       grid-template-rows: repeat(2, minmax(0, 1fr));
       gap: 12px;
       container-type: size;
+    }
+    /* A floor for the full-screen sheet's vault art: the illustration width
+       below derives from this container's height, so on a short scaled
+       viewport (this media gate reads the real, unzoomed viewport) the tracks
+       hold their size and the panel scrolls instead of collapsing every vault
+       to a sliver. Scoped to the bank sheet; the Dungeon Finder's read-only
+       vault keeps its fit-to-window sizing. */
+    body.weekly-vault-open #bank-window .weekly-tracks {
+      min-height: 480px;
     }
     .weekly-track,
     .weekly-track:last-child {
@@ -24548,6 +28380,25 @@
       height: auto;
       aspect-ratio: 1;
       place-self: start center;
+    }
+    /* The overview tiles fill the art row the tile grid actually leaves, so a
+       label that wraps (a narrow tile at a high UI scale, a long locale) takes
+       height from the art instead of the square art spilling under the
+       footer. The art image is object-fit: contain, so it stays square and
+       centred; the earned glow sizes from the cell's shorter side to match. */
+    .weekly-tracks .weekly-vault-illustration {
+      container-type: size;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+    .weekly-tracks .weekly-earned .weekly-vault-illustration::after {
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      width: calc(min(100cqw, 100cqh) * 0.72);
+      aspect-ratio: 1;
+      translate: -50% -50%;
     }
     .weekly-milestone-footer {
       padding: 2px;
@@ -26511,5 +30362,193 @@
   }
   .frame-preset-loadouts .tal-lo-item {
     min-height: 40px;
+  }
+  /* ---------- courier ---------- */
+  #courier-window {
+    width: min(960px, 100%);
+    max-height: calc(100dvh - 48px);
+  }
+  #courier-window .courier-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+  #courier-window .courier-storage {
+    min-width: 0;
+  }
+  #courier-window .courier-storage-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #courier-window .courier-storage-head h3 {
+    margin: 0;
+  }
+  #courier-window .courier-storage-hint {
+    margin: 8px 0;
+  }
+  #courier-window .courier-grid {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    max-height: 320px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+  }
+  #courier-window .courier-grid .bank-item {
+    width: 100%;
+    min-height: 44px;
+  }
+  #courier-window .courier-item .item-icon {
+    width: 100%;
+    height: 100%;
+  }
+  #courier-window .courier-item[aria-pressed="true"] {
+    outline: 2px solid var(--color-gold);
+    outline-offset: -2px;
+  }
+  #courier-window .courier-item:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  #courier-window .courier-selected {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--color-keyline) 65%, transparent);
+    color: var(--color-gold);
+    pointer-events: none;
+  }
+  #courier-window .courier-selected .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+  @media (forced-colors: active) {
+    #courier-window .ui-win-title,
+    #courier-window .ui-win-body,
+    #courier-window .ui-muted,
+    #courier-window .ui-win-foot {
+      color: CanvasText;
+    }
+    #courier-window button {
+      color: ButtonText;
+      background: ButtonFace;
+    }
+    #courier-window .courier-item[aria-pressed="true"] {
+      outline-color: Highlight;
+    }
+    #courier-window .courier-selected {
+      color: HighlightText;
+      background: Highlight;
+      forced-color-adjust: none;
+    }
+  }
+  #courier-window .courier-companion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    align-self: center;
+    gap: 8px;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  #courier-window .courier-companion p {
+    margin: 0;
+  }
+  #courier-window .courier-portrait {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--color-gold);
+    border-radius: 50%;
+    aspect-ratio: 1;
+  }
+  #courier-window .courier-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #courier-window .courier-emblem {
+    color: var(--color-gold);
+  }
+  #courier-window .courier-emblem .ui-icon {
+    width: 28px;
+    height: 28px;
+  }
+  #courier-window .courier-item-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  #courier-window .courier-item-label img {
+    width: 32px;
+    height: 32px;
+    flex: none;
+  }
+  #courier-window .courier-cargo-icon {
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+  #courier-window .courier-cargo {
+    padding: 0;
+    list-style: none;
+  }
+  #courier-window .courier-cargo li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #courier-window .ui-win-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  #courier-window .courier-send,
+  #courier-window .x-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  @media (max-height: 500px) and (min-width: 601px) {
+    #courier-window .courier-companion {
+      align-self: start;
+      gap: 4px;
+    }
+    #courier-window .courier-portrait {
+      width: 72px;
+    }
+    #courier-window .courier-emblem .ui-icon {
+      width: 20px;
+      height: 20px;
+    }
+    #courier-window .courier-grid {
+      max-height: 144px;
+    }
+  }
+  @media (max-width: 600px) {
+    #courier-window .courier-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    #courier-window .courier-companion {
+      display: grid;
+      grid-template-columns: 72px auto;
+      justify-items: center;
+      max-width: none;
+      column-gap: 16px;
+    }
+    #courier-window .courier-portrait {
+      grid-row: 1 / 4;
+      width: 72px;
+    }
+    #courier-window .courier-grid {
+      max-height: 160px;
+    }
   }
 }

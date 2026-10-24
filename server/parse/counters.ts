@@ -23,7 +23,6 @@ export interface ParseCounters {
   censusRuns: number;
   censusRows: number;
   censusFailures: number;
-  censusBatchRetries: number;
 }
 
 export function createParseCounters(): ParseCounters {
@@ -46,7 +45,6 @@ export function createParseCounters(): ParseCounters {
     censusRuns: 0,
     censusRows: 0,
     censusFailures: 0,
-    censusBatchRetries: 0,
   };
 }
 
@@ -133,10 +131,5 @@ export function registerParseMetrics(registry: Registry, counters: ParseCounters
     'woc_parse_census_failures_total',
     'Census export failures since boot',
     () => counters.censusFailures,
-  );
-  gauge(
-    'woc_parse_census_batch_retries_total',
-    'Census batches retried after a failure since boot',
-    () => counters.censusBatchRetries,
   );
 }

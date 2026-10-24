@@ -240,7 +240,7 @@ describe.each(CASES)('%s %s material source selection', (storage, direction) => 
         count: 20,
       }));
     } else {
-      meta.vault.stock[ORE] = 39;
+      meta.vault.stock[ORE] = 99;
     }
     const before = JSON.stringify({
       inventory: meta.inventory,

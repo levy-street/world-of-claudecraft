@@ -175,7 +175,7 @@ describe('renderer wiring', () => {
     // the plan reads the entity data the loop already has, never a raycast
     expect(source).toContain('blobBaseRadius(active.height, v.liveScale),');
     expect(source).toContain(
-      'const blobGroundY = onSurface ? smoothY : groundHeight(x, z, this.sim.cfg.seed);',
+      'const blobGroundY = onSurface ? smoothY : groundHeightAtBody(x, z, this.sim.cfg.seed, y);',
     );
   });
 

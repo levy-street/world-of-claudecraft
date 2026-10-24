@@ -108,14 +108,8 @@ function burnHut(
     ...burnedList(qp).filter((b) => b.key !== hutKey),
     { key: hutKey, at: ctx.time },
   ];
-  // Throw animation (windup) + the bottle arcing to the hut + the blaze itself.
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: player.id,
-    targetId: hut.id,
-    school: 'fire',
-    fx: 'windup',
-  });
+  // The bottle arcing to the hut + the blaze itself. No windup: the renderer
+  // answers one with the thrower's attack swing, and the torch plays no animation.
   ctx.emit({
     type: 'spellfx',
     sourceId: player.id,

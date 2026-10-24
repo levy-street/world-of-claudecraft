@@ -23,27 +23,43 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { rollBossBuddyDrops } from '../buddy_drops';
+import { MEMBERSHIP_XP_MULTIPLIER } from '../content/membership';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
+import { bastionWardHitPoints } from '../encounters/sunken_bastion/ward_hits';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
+import { recordExpeditionEncounterDeath } from '../instances/dungeon_expeditions';
 import {
   claimedInstanceForMob,
   lockNormalDungeonResetOnBossKill,
   spawnBossExitPortal,
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
+import { awardQueueEncounter, recordQueueDamage } from '../instances/queue_participation';
 import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
+import { membershipActive } from '../membership';
+import { wearsMembershipArmour } from '../membership_armour';
+import { perfectMembershipArmour } from '../membership_armour_progression';
+import { isMembershipWeapon, membershipWeaponShape } from '../membership_weapon';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import { kitUseHoldsThroughHits } from '../mob/trash_kit/encounter_use';
+import { oathShare } from '../mob/trash_kit/temple_choir';
+import { effigyHideBypassed, noteEffigyBlow } from '../muster_effigy';
+import { EFFIGY_WARD_AURA_ID } from '../muster_effigy_core';
+import { creditMusterTrophyKill } from '../muster_trophy';
 import {
   NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
   nythraxisBoneSpikeWardHit,
 } from '../nythraxis_bone_spike';
 import { grantAbilityDevotion } from '../paladin_devotion';
+import { isBuddyMob } from '../pet/buddy_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
   recordCorpseHarvestDeath,
@@ -55,7 +71,9 @@ import {
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
 } from '../pvp';
-import { worldPvpRewardAmount } from '../pvp/world_pvp_rewards_rules';
+import { worldPvpXpAmount } from '../pvp/world_pvp_rewards_rules';
+import { referralArmourXpActive } from '../referral_armour';
+import { emitReferralBossEvidence } from '../referral_evidence';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -94,6 +112,7 @@ import {
   mitigateVicariousSuffering,
   onAfflictionDamage,
 } from './affliction';
+import { barrowstoneSave } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
 import { stopChannelVisual } from './channel_visuals';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
@@ -111,13 +130,14 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { formAutoRageMult } from './form_swing';
 import { clearFieldcraftState } from './hunter_fieldcraft';
+import { lonelySoulDamageMult, lonelySoulPetFloor } from './hunter_lonely_soul';
 import { clearPacklordState } from './hunter_packlord';
 import {
   breakEnduringCourserBurst,
   clearHunterTalentState,
   courserGuiseDazeOnDamage,
-  hasHunterTalent,
 } from './hunter_shared';
 import {
   clearOssuaryMarks,
@@ -151,10 +171,12 @@ import {
 import { duskhymnChannelStopped, vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
+import { onHarvestDeath, tetherRedirect } from './sanctum_trinkets';
 import { applySetProcs } from './set_procs';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
+import { fallDamageKeepsStealth } from './stealth_fall';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { onTrinketDamage } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
@@ -235,6 +257,8 @@ export function dealDamage(
   const copiedResolvedHit = resolvedHpLoss;
   if (target.dead) return 0;
   if (target.damageImmune) return 0;
+  // A Tideglass Reflection never takes damage from the player it mirrors.
+  if (reflectionIgnoresHit(source, target)) return 0;
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source
@@ -244,6 +268,14 @@ export function dealDamage(
   // player's own hit.
   if (nythraxisBoneSpikeWardHit(source, target)) {
     amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
+  // The Sunken Bastion's Iron Cage and Drowned Anchor are wards the same way
+  // (encounters/sunken_bastion/ward_hits.ts): a fixed number of points a hit.
+  const bastionWard = bastionWardHitPoints(source, target);
+  if (bastionWard !== null) {
+    amount = bastionWard;
     resolvedHpLoss = true;
     alreadyFinal = true;
   }
@@ -346,10 +378,15 @@ export function dealDamage(
   if (!alreadyFinal && source?.kind === 'player' && source.id !== target.id && amount > 0) {
     const sourceMeta = ctx.players.get(source.id);
     const twoHandPct = sourceMeta ? ctx.playerMods(sourceMeta).global.masteryTwoHandDmgPct : 0;
-    const mainhandId = sourceMeta?.equipment.mainhand;
-    const mainhand = mainhandId ? ITEMS[mainhandId] : undefined;
-    if (twoHandPct > 0 && mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand') {
-      amount = Math.round(amount * (1 + twoHandPct));
+    if (twoHandPct > 0 && sourceMeta) {
+      const mainhandId = sourceMeta.equipment.mainhand;
+      const base = mainhandId ? ITEMS[mainhandId] : undefined;
+      const mainhand =
+        base && !(isMembershipWeapon(base.id) && !source.membershipActive)
+          ? membershipWeaponShape(base, sourceMeta.cls, sourceMeta.talents.spec)
+          : undefined;
+      if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand')
+        amount = Math.round(amount * (1 + twoHandPct));
     }
   }
 
@@ -468,6 +505,9 @@ export function dealDamage(
     let reduction = protectionConsecrationDamageReduction(ctx.groundAoEs, target);
     for (const aura of target.auras) {
       if (aura.kind === 'buff_dr') {
+        // The drill yard's plank hide lets through the blows of whoever put its lantern out
+        // (muster_effigy.ts): a per-player window on one shared effigy.
+        if (aura.id === EFFIGY_WARD_AURA_ID && effigyHideBypassed(ctx, source)) continue;
         reduction += masteredPaladinAuraValue(target, aura.id, aura.value);
       } else if (aura.kind === 'die_by_sword') reduction += aura.value;
     }
@@ -506,6 +546,13 @@ export function dealDamage(
   if (!alreadyFinal && source && school === 'shadow' && amount > 0) {
     const form = source.auras.find((a) => a.kind === 'form_shadow');
     if (form) amount = Math.round(amount * (1 + form.value / 100));
+  }
+
+  // Lonely Soul (hunter choice row): a petless hunter deals 10% more damage.
+  // Source-output, so the alreadyFinal guard keeps a redirect share clean.
+  if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
+    const lonely = lonelySoulDamageMult(ctx, source);
+    if (lonely !== 1) amount = Math.round(amount * lonely);
   }
 
   // Warded (mage choice row): the wearer takes barrierDrPct less damage while
@@ -677,12 +724,8 @@ export function dealDamage(
     }
     const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
     const pet = share > 0 ? ctx.petOf(target.id) : null;
-    const beastguard = !!meta && hasHunterTalent(meta, 'hun_r8_beastguard');
-    if (beastguard && (!pet || pet.dead) && target.hp < target.maxHp * 0.5) {
-      amount = Math.round(amount * 0.92);
-    }
     if (pet && !pet.dead) {
-      const petFloor = beastguard ? Math.ceil(pet.maxHp * 0.2) : 0;
+      const petFloor = lonelySoulPetFloor(ctx, target, pet);
       const redirected = Math.min(
         amount,
         Math.round(amount * share),
@@ -719,6 +762,12 @@ export function dealDamage(
   // sharing, so only damage that would reach health can be reduced/transferred.
   if (!resolvedHpLoss) {
     amount = mitigateVicariousSuffering(ctx, source, target, amount, abilityId);
+    // Foreman's Last Link moves its share of what is left to the tether's
+    // wearer (combat/sanctum_trinkets.ts).
+    amount = tetherRedirect(ctx, source, target, amount, school, abilityId);
+    // A heroic Drowned Temple singer under a guard's Moonset Oath passes a
+    // share of the hit onto the guard (mob/trash_kit/temple_choir.ts).
+    amount = oathShare(ctx, source, target, amount, school, ability, abilityId);
   }
 
   if (target.damageFloorHp !== undefined) {
@@ -971,6 +1020,15 @@ export function dealDamage(
     }
   }
 
+  // The Barrowstone Heart (combat/balgath_trinkets.ts): the last save asked, so every
+  // class and talent save above gets its turn first. A lethal hit turns the wearer to
+  // stone at 1 health instead. A guardian ward that already caught this blow has saved
+  // the wearer, so the Heart is not spent on it.
+  if (guardianWardRestore === 0) {
+    const stoned = barrowstoneSave(ctx, target, amount);
+    if (stoned !== null) amount = stoned;
+  }
+
   // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death
   // taken-multiplier, tiebreak bookkeeping, and win detection. Amps and
   // absorb shields already resolved above, so a shielded cat soaks first.
@@ -997,6 +1055,7 @@ export function dealDamage(
   target.hp = guardianWardRestore || Math.max(0, target.hp - amount);
   // Snapshot before reactive heals can restore health or nested damage can add loss.
   const craftedHpLoss = Math.max(0, preHp - target.hp);
+  recordQueueDamage(ctx, source, target, craftedHpLoss);
   if (resolution) resolution.landedHpLoss = Math.max(0, preHp - target.hp);
   // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
   // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.
@@ -1098,9 +1157,10 @@ export function dealDamage(
     }
   }
 
-  // taking or dealing real damage breaks stealth
+  // taking or dealing real damage breaks stealth (a fall leaves Stalk and the
+  // rogue stealths up: combat/stealth_fall.ts)
   if (amount > 0) {
-    ctx.breakStealth(target);
+    if (!fallDamageKeepsStealth(source, target, ability)) ctx.breakStealth(target);
     if (source && source.id !== target.id) {
       ctx.breakStealth(source);
     }
@@ -1175,6 +1235,9 @@ export function dealDamage(
   // The hub dummy lesson (tutorial/dummy_drill.ts): one credit per blow that
   // actually lands on a training dummy. Zero rng.
   if (source && amount > 0) creditDummyDrill(ctx, source, target);
+  // The muster's pike drill (muster_effigy.ts): a blow on the Straw Foreman while its
+  // lantern is out for this player. Zero rng.
+  noteEffigyBlow(ctx, source, target, amount, abilityId);
 
   // Thornhollow Fields assists: remember who softened a player before the blow
   // that finishes them. Only real damage on a live player counts, and the
@@ -1218,10 +1281,15 @@ export function dealDamage(
       // here, a hidden ~20% income buff that co-fed the fury overpower incident.
       const baseRage = rageFromDealing(amount, source.level);
       const talentMult = isWarrior ? 1 + ctx.playerMods(meta).global.autoRagePct : 1;
+      // Bruin Form white swings mint double rage (combat/form_swing.ts): the
+      // bear swings twice as fast for half the damage, so rage per second
+      // doubles while white damage does not.
       source.resource = Math.min(
         source.maxResource,
         source.resource +
-          baseRage * (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1),
+          baseRage *
+            (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1) *
+            formAutoRageMult(source),
       );
     }
   }
@@ -1265,9 +1333,12 @@ export function dealDamage(
       // arm at all). Spell pushback keeps the classic kind gate below: only
       // an unblocked, unabsorbed hit pushes a cast back, exactly as before
       // this arm widened. The Demon Heal channel is deliberately NOT folded
-      // in: it takes the normal channel pushback below, as today.
-      if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
-      else if (
+      // in: it takes the normal channel pushback below, as today. A G3 use
+      // that holds through hits (the Remembrance Candle's draining relight,
+      // mob/trash_kit/encounter_use.ts) is the one non-spell cast a hit spares.
+      if (isNonSpellCast(target.castingAbility)) {
+        if (!kitUseHoldsThroughHits(ctx, target)) ctx.cancelCast(target);
+      } else if (
         amount > 0 &&
         kind === 'hit' &&
         !ignoresDamagePushback(ctx, target, target.castingAbility)
@@ -1420,8 +1491,13 @@ export function handleDeath(
     // reviveAt left behind (battleground seating, the delve respawn). Only a
     // LIVING player's death resets it, so a second pass over the same corpse
     // keeps the offer this death earned.
-    if (!e.dead) e.pvpResurrect = false;
+    if (!e.dead) {
+      e.pvpResurrect = false;
+      e.pvpResurrectWait = 0;
+    }
   }
+  // A dead mob keeps no route and no plan throttle (mob/chase_route.ts).
+  if (e.chaseRoute !== undefined) e.chaseRoute = undefined;
   vespersOnEntityDeath(ctx, e);
   afflictionOnDeath(ctx, e);
   destructionOnDeath(ctx, e);
@@ -1432,6 +1508,9 @@ export function handleDeath(
   stripPaladinDevotionsFromSource(ctx, e.id);
   e.dead = true;
   e.hp = 0;
+  // A corpse is not mid-throw: no Typhoon fall credit or steering lock
+  // survives into the next life (combat/knockback_launch.ts).
+  if (e.launchedBy) e.launchedBy = undefined;
   ctx.clearNonPlayerStatAuras(e);
   // Death cannot shed persistent death penalties or encounter-owned unbreakable
   // control. The encounter script remains responsible for releasing its markers.
@@ -1506,6 +1585,9 @@ export function handleDeath(
   if (killer && killer.id !== e.id && !killer.dead) {
     applySetProcs(ctx, killer, e, 'kill');
   }
+  // The Phial of the Tithe pays every nearby wearer for an enemy's death
+  // (combat/sanctum_trinkets.ts). No rng.
+  if (e.kind === 'mob') onHarvestDeath(ctx, e);
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn
@@ -1591,8 +1673,8 @@ export function handleDeath(
     ctx.bgOnPlayerDeath(e, killer);
     // World PvP: a flagged player's death in the open world moves the gold
     // stake and pays the honor pool to everyone who worked for the kill. Pure
-    // ledger arithmetic on the sim clock, zero rng; a no-op for every death
-    // that was not a flagged player's at a flagged player's hands.
+    // ledger arithmetic on the sim clock, zero rng. Every other death only
+    // ends the victim's kill streak and any bounty it earned.
     worldPvpOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
@@ -1699,6 +1781,18 @@ export function handleDeath(
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
+      // A cosmetic buddy (src/sim/pet/buddy_ai.ts) has no revive command and
+      // no corpse mechanics of its own. isHostileTo/isEnemyTargetCandidate
+      // (sim.ts, targeting.ts) keep it out of ordinary hostile damage
+      // entirely, so this arm should be unreachable in practice, but a
+      // stray non-hostility-gated damage source (a hits-everyone AoE, a
+      // /dev command) must never leave it as a permanent stray corpse the
+      // way the Infinity corpseTimer below deliberately does for a real,
+      // revivable pet. Despawn outright instead; the owner can re-summon it.
+      if (isBuddyMob(e)) {
+        ctx.dropEntity(e.id);
+        return;
+      }
       const owner = ctx.entities.get(e.ownerId);
       const ownerMeta = owner ? ctx.players.get(owner.id) : null;
       if (owner && ownerMeta?.cls === 'hunter') clearPacklordState(ctx, owner);
@@ -1734,8 +1828,11 @@ export function handleDeath(
     // Resolve the owning claim once for corpse participation and both reward
     // awarders below; the slot remains stable throughout this death path.
     const claimedInst = claimedInstanceForMob(ctx, e.id);
+    awardQueueEncounter(ctx, claimedInst, e);
+    recordExpeditionEncounterDeath(claimedInst, e);
     let heroicRewardRecipients: PlayerMeta[] = [];
-    if (meta && creditEntity && !meta.leaving) {
+    // A regrown encounter part (the Mere Hydra's head) paid on its first death.
+    if (meta && creditEntity && !meta.leaving && !e.regrown) {
       const tmpl = MOBS[e.templateId];
       // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
       // in one hit by design, so it must not pay full kill XP.
@@ -1874,18 +1971,29 @@ export function handleDeath(
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
+      if (e.templateId !== 'nythraxis_scourge_of_thornpeak')
+        emitReferralBossEvidence(ctx, e, eligible);
     }
     // Settle the heroic reward and its realm-reset lockout together. This runs
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     recordWeeklyBossKill(ctx, e, heroicRewardRecipients, claimedInst);
+    // Boss pets and their challenge looks (content/buddy_sources.ts): one
+    // independent roll per credited player, never a corpse item, then the
+    // speed/dps looks for the same roster. World bosses roll on the
+    // never-pruned contributor roster below instead. Draws rng ONLY for a
+    // boss that carries a companion row.
+    if (!template?.worldBoss) {
+      rollBossBuddyDrops(ctx, e, heroicRewardRecipients, claimedInst);
+    }
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
     // Intentional Gathering PR3: the kill-credit priority snapshot for a
     // future corpse-harvest cast, taken from the exact same eligible list the
     // heroic-reward award above uses (empty means the corpse is public at
     // once). Owned pets return earlier in this function and never reach here.
-    recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
+    // A regrown encounter part (the Mere Hydra's head) was harvestable once.
+    if (!e.regrown) recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);
@@ -1897,9 +2005,12 @@ export function handleDeath(
     // damaged the boss, so it rolls outside the credited-player block above.
     if (worldBossContribs) {
       ctx.rollWorldBossLoot(e, worldBossContribs);
+      rollBossBuddyDrops(ctx, e, worldBossContribs, null);
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
       onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
+      // The muster's weekly counts his kill for every contributor carrying it.
+      creditMusterTrophyKill(ctx, e, worldBossContribs);
     }
     // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
     // check for the same participation snapshot. Deliberately BELOW every loot
@@ -1921,7 +2032,7 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
-  if (!ctx.worldPvpDisabled) amount = worldPvpRewardAmount(amount, meta.worldPvp);
+  if (!ctx.worldPvpDisabled) amount = worldPvpXpAmount(amount, meta.worldPvp);
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.
@@ -1930,6 +2041,12 @@ export function grantXp(
     restedBonus = Math.min(Math.floor(meta.restedXp), amount);
     meta.restedXp -= restedBonus;
     amount += restedBonus;
+  }
+  if (
+    (membershipActive(meta, ctx.time) && wearsMembershipArmour(meta.equipment)) ||
+    referralArmourXpActive(ctx, meta)
+  ) {
+    amount = Math.floor(amount * MEMBERSHIP_XP_MULTIPLIER);
   }
   // Lifetime XP accrues for EVERY award, including at the cap — this is what
   // makes post-cap progression work. It feeds the virtual level, the
@@ -1951,6 +2068,7 @@ export function grantXp(
   while (p.level < MAX_LEVEL && meta.xp >= xpForLevel(p.level)) {
     meta.xp -= xpForLevel(p.level);
     p.level++;
+    perfectMembershipArmour(meta, p.level);
     meta.counters.levelUps++;
     // Re-bake the flat talent mods at the new level BEFORE the stat pass: spec mastery
     // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must

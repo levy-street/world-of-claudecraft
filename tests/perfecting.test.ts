@@ -936,26 +936,28 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     return { sim, pid, meta, recipe };
   };
 
-  it('a forced proc on an apex recipe mints masterwork:true + perfecting 1, one draw', () => {
+  it('a forced proc on an apex recipe mints masterwork:true + perfecting 1, one proc draw', () => {
     const { sim, pid, meta, recipe } = apexCrafter(7, 'jewelcrafting');
-    // Force the single output-side proc draw to hit; the counter pins the
-    // one-draw contract on the apex path (the head start gates the EFFECT,
-    // never the draw).
+    // Force the single proc draw to hit; the counter pins the one-proc-draw
+    // contract on the apex path (the head start gates the EFFECT, never the
+    // draw), plus the equipment copy's one plain loot-quality draw at grant
+    // (a forced 0 lands under the enhanced threshold, so no weight draws).
     const draws = forceRoll(sim, 0);
     runCraft(sim, recipe.id, false, pid);
     const result = meta.lastCraftResult;
     expect(result?.ok).toBe(true);
     expect(result?.masterwork, 'the proc effect applied').toBe(true);
-    expect(draws(), 'exactly one draw on the apex craft').toBe(1);
+    expect(draws(), 'the proc draw plus one loot-quality draw on the apex craft').toBe(2);
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.signer).toBeTruthy();
     expect(slot?.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
     expect(slot?.instance?.rolled, 'no quality bump is baked').toBeUndefined();
     expect(slot?.instance?.perfected).toBeUndefined();
     expect(slot?.instance?.bindOnTrade, 'an uncommissioned craft arms no bond').toBeUndefined();
+    expect(slot?.instance?.lootQuality, 'a forced 0 rolls no enhanced quality').toBeUndefined();
   });
 
-  it('a forced MISS mints the plain signed copy: no rank, no masterwork flag, still one draw', () => {
+  it('a forced MISS mints the plain signed copy: no rank, no masterwork flag, still one proc draw', () => {
     const { sim, pid, meta, recipe } = apexCrafter(8, 'jewelcrafting');
     // 0.999 sits above MASTERWORK_CHANCE_CAP, so no composition of the
     // chance terms can turn it into a hit; the premise is checked, not
@@ -967,11 +969,18 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     const result = meta.lastCraftResult;
     expect(result?.ok).toBe(true);
     expect(result?.masterwork).toBeUndefined();
-    expect(draws(), 'the miss still spends the one draw').toBe(1);
+    // The miss still spends the one proc draw; the forced 0.999 then rolls
+    // an enhanced quality (9990 of 10000): its tier draw plus five weights.
+    expect(draws(), 'the miss still spends the proc draw, then six quality draws').toBe(7);
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.signer).toBeTruthy();
     expect(slot?.instance?.perfecting).toBeUndefined();
     expect(slot?.instance?.rolled).toBeUndefined();
+    expect(slot?.instance?.lootQuality).toEqual({
+      version: 1,
+      tier: 3,
+      weights: [1000, 1000, 1000, 1000, 1000],
+    });
   });
 
   it('the ceiling term holds: a forced hit on a craft under the rare ceiling grants no head start', () => {
@@ -984,9 +993,10 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     runCraft(sim, recipe.id, false, pid);
     expect(meta.lastCraftResult?.ok).toBe(true);
     expect(meta.lastCraftResult?.masterwork).toBeUndefined();
-    expect(draws()).toBe(1);
+    expect(draws(), 'the gated proc draw plus one loot-quality draw').toBe(2);
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.perfecting).toBeUndefined();
+    expect(slot?.instance?.lootQuality).toBeUndefined();
   });
 
   it("a commissioned head-start copy carries the Maker's Bond arm beside its rank", () => {
@@ -1001,8 +1011,9 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
   });
 
   /** Force a SEQUENCE of draws (call N answers values[N], the last value
-   *  repeating): the Jack arm draws twice per craft, so a single forced value
-   *  cannot stage a normal-variance proc hit. */
+   *  repeating): the Jack arm draws twice before the grant (variance, then
+   *  proc), so a single forced value cannot stage a normal-variance proc hit.
+   *  The equipment copy's loot-quality draw reads the repeated last value. */
   function forceRollSequence(sim: Sim, values: number[]): () => number {
     let draws = 0;
     (sim.rng as { next: () => number }).next = () => {
@@ -1013,10 +1024,11 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     return () => draws;
   }
 
-  it('a Jack of All Trades draws TWO on an apex craft; the ceiling denies the head start even on a hit', () => {
-    // The Jack arm is the one arm where draws-per-successful-craft is 2 (the
-    // variance roll, then the proc roll), so it is where a draw-order
-    // regression would hide. Stage variance 'normal' (0.5) then a proc HIT
+  it('a Jack of All Trades draws TWO before the grant on an apex craft; the ceiling denies the head start even on a hit', () => {
+    // The Jack arm is the one arm with two pre-grant draws per successful
+    // craft (the variance roll, then the proc roll), so it is where a
+    // draw-order regression would hide; the equipment copy's one plain
+    // loot-quality draw (the repeated 0) follows at grant. Stage variance 'normal' (0.5) then a proc HIT
     // (0): the head start is STILL denied, by the same ceiling term that
     // denies the no-archetype crafter above (a Jack's breadth ceiling is the
     // rare tier, under the apex def's legendary bumped tier).
@@ -1025,7 +1037,7 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     const draws = forceRollSequence(sim, [0.5, 0]);
     runCraft(sim, recipe.id, false, pid);
     expect(meta.lastCraftResult?.ok).toBe(true);
-    expect(draws(), 'exactly two draws for a Jack, in order').toBe(2);
+    expect(draws(), 'variance, proc, then one loot-quality draw for a Jack, in order').toBe(3);
     // The staging premise, checked: 0.5 really mapped to the 'normal' arm
     // (a variance-threshold retune that re-bins it would make this case
     // silently test a different arm).
@@ -1033,15 +1045,16 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     expect(meta.lastCraftResult?.masterwork).toBeUndefined();
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.perfecting).toBeUndefined();
+    expect(slot?.instance?.lootQuality).toBeUndefined();
   });
 
-  it("a Jack 'worse' variance also draws two and mints the plain signed copy", () => {
+  it("a Jack 'worse' variance also draws two before the grant and mints the plain signed copy", () => {
     const { sim, pid, meta, recipe } = apexCrafter(12, null);
     meta.archetype.isJackOfAllTrades = true;
     const draws = forceRollSequence(sim, [0, 0]); // variance 'worse', proc hit
     runCraft(sim, recipe.id, false, pid);
     expect(meta.lastCraftResult?.ok).toBe(true);
-    expect(draws()).toBe(2);
+    expect(draws(), 'variance, proc, then one loot-quality draw').toBe(3);
     // The staging premise, checked (the twin of the 'normal' case above):
     // 0 really mapped to 'worse'. With the head-start gate's dead Jack term
     // removed (phase 18), this case and the one above landing IDENTICALLY
@@ -1052,6 +1065,7 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     expect(slot?.instance?.signer).toBeTruthy();
     expect(slot?.instance?.perfecting).toBeUndefined();
     expect(slot?.instance?.rolled).toBeUndefined();
+    expect(slot?.instance?.lootQuality).toBeUndefined();
   });
 
   it('the dominance sweep: every apex def is epic and bumps past every non-major ceiling (phase 18)', () => {

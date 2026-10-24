@@ -93,6 +93,11 @@ export function isToggleAuraKind(id: string, kind: AuraKind): boolean {
  *  strip sorts by (`auraUrgencyBucket`). Keeping it one rule is what stops the
  *  strip from banding an aura as a mode while still printing a countdown. */
 function isToggleAura(a: AuraInput): boolean {
+  // A PERMANENT aura (a world boss's ward, his slumber) is a state, not a countdown: it
+  // has no duration to show, so it must band and render as a mode. The shared classifier
+  // sees only kind and id, so it cannot know that; this is the one caller that holds the
+  // aura itself and can.
+  if (a.permanent === true) return true;
   return isToggleAuraKind(a.id, a.kind);
 }
 
@@ -157,6 +162,10 @@ export interface AuraInput {
   // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
   // and unlike stacks it shows even at 1 so the player sees the shield about to drop.
   charges?: number;
+  // A permanent aura (a boss's standing ward, the slumber a sleeping boss wears): a STATE,
+  // not a timer. The sim backs it with a long finite duration purely so nothing expires
+  // it, and the wire mirrors the bit (`perm`), so both worlds can hide the countdown.
+  permanent?: boolean;
   // Full authored duration in seconds, for the expiring-blink threshold. Present on the
   // offline Sim aura and mirrored over the wire (terse `dur`); an old server omitting it
   // degrades to never-blink rather than misfiring.
@@ -435,6 +444,9 @@ export function createAurasView(
         // via echoVisibleTo, so re-filtering here would wrongly hide the viewer's OWN
         // marks too.
         if (ownFirst && a.kind === 'temporal_echo' && !deps.isOwn(a)) return;
+        // Play Dead (hunter feign death) must not give itself away: only the
+        // hunter sees the aura on their own target/focus strip.
+        if (ownFirst && a.kind === 'feign_death' && !deps.isOwn(a)) return;
         // Coldsight Read's internal bookkeeping markers (the Fevered Draw progress
         // counter, the two per-ability reserved-cast markers): kind 'internal_cd'
         // with an 86400s reservation-timeout duration purely so nothing but their

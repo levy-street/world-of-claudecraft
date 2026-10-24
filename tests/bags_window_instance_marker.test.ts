@@ -101,6 +101,15 @@ function windowFor(
 }
 
 describe('bag_instance_glyph_view: kind priority', () => {
+  it('source makers retain the signed priority below masterwork and enchantment', () => {
+    const sources = [{ source: { signer: 'Ana' }, count: 1 }];
+    expect(bagInstanceGlyphKind(undefined, sources)).toBe('signed');
+    expect(bagInstanceGlyphKind({ rolled: { masterwork: true } }, sources)).toBe('masterwork');
+    expect(bagInstanceGlyphKind({ enchant: 'enchant_chest_stamina' }, sources)).toBe('enchanted');
+    expect(bagInstanceGlyphKind({ boundTo: 7 }, sources)).toBe('signed');
+    expect(bagInstanceGlyphKind(undefined, [{ source: {}, count: 1 }])).toBeNull();
+  });
+
   it('resolves each single marker to its own kind', () => {
     expect(bagInstanceGlyphKind({ rolled: { masterwork: true, stats: { str: 1 } } })).toBe(
       'masterwork',
@@ -165,6 +174,22 @@ describe('bag_instance_glyph_view: kind priority', () => {
 });
 
 describe('bags grid instanced-slot marker', () => {
+  it('keeps a mixed potion maker mark and accessible name after source normalization', () => {
+    const root = windowFor([
+      {
+        itemId: 'minor_healing_potion',
+        count: 3,
+        materialSources: [
+          { source: { signer: 'Ana' }, count: 1 },
+          { source: { signer: 'Bru' }, count: 2 },
+        ],
+      },
+    ]);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.querySelector('.bi-glyph-signed')).not.toBeNull();
+    expect(cell?.getAttribute('aria-label')).toContain('maker-marked copy');
+  });
+
   it('a signed slot renders the maker glyph; a plain slot renders no marker', () => {
     const root = windowFor([
       { itemId: 'copper_ore', count: 1, instance: { signer: 'Anna' } },

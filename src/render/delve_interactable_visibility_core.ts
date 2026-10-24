@@ -10,12 +10,18 @@
  * position is actionable info that must stay visible on every tier
  * (battleground_props.ts). Without this arm, an always-non-lootable `bg_`
  * prop would read as invisible through this same `syncDelveInteractableVisibility`
- * gate, which every 'object'-kind entity view runs through, not just delves. */
+ * gate, which every 'object'-kind entity view runs through, not just delves.
+ *
+ * The planted Dawn Battle Standard (faction_rewards.ts useDawnBattleStandard)
+ * reuses that bg_flag body and is `lootable: false` for its whole 5 min life
+ * for the same reason (nobody picks it up); without its arm here the renderer
+ * built the flag and then hid it, offline and online alike. */
 export function delveInteractableVisible(templateId: string | null, lootable: boolean): boolean {
   return (
     lootable ||
     templateId?.startsWith('delve_') === true ||
     templateId?.startsWith('rift_') === true ||
-    templateId?.startsWith('bg_') === true
+    templateId?.startsWith('bg_') === true ||
+    templateId === 'dawn_battle_standard'
   );
 }

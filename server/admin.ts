@@ -83,6 +83,8 @@ import {
   newToken,
   verifyPassword,
 } from './auth';
+import { queueBuddyGrant } from './buddy_grants_db';
+import { type BuddyGrant, buddyGrantBodyError } from './buddy_wire';
 import {
   type BugReportResolution,
   getBugReportScreenshot,
@@ -209,12 +211,6 @@ import {
   UNSTUCK_REPORT_MAX_LIMIT,
 } from './unstuck_db';
 import { PgUserAssetsDb } from './user_assets_db';
-import {
-  rethrowWorldQuestBlockRefusal,
-  WORLD_QUEST_BLOCK_ADMIN_TARGET_CODE,
-  worldQuestBlockBodySchema,
-} from './world_quest_block_api';
-import { liftAccountWorldQuestBlock, setAccountWorldQuestBlock } from './world_quest_block_db';
 
 // Admin API: everything under /admin/api/*. Auth is an exact full-scope bearer
 // token whose account has at least one staff role (accounts.admin_roles;
@@ -2030,9 +2026,6 @@ export type AdminRuntime = Pick<
   // sanction applied to a logged-in player does nothing until their next login,
   // which is the session it is most needed in.
   | 'applyCheaterMarkLive'
-  // Push a world quest block change onto the account's live session, so a
-  // bot caught mid-circuit stops earning in that session, not at its next login.
-  | 'applyWorldQuestBlockLive'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -2052,6 +2045,7 @@ export type AdminRuntime = Pick<
   | 'adminCharacterOnline'
   | 'adminRestoreItem'
   | 'adminRestoreToolEffectSlot'
+  | 'adminGrantBuddy'
   | 'social'
 >;
 
@@ -2197,9 +2191,6 @@ function makeRealAdminDb() {
     // a stale budget onto the live session.
     setAccountCheaterMark,
     liftAccountCheaterMark,
-    // The world quest block: the two audited writes (server/world_quest_block_db.ts).
-    setAccountWorldQuestBlock,
-    liftAccountWorldQuestBlock,
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
@@ -3147,47 +3138,6 @@ async function liftCheaterMarkHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { ok: true });
 }
 
-/**
- * The operator-target guard for the world quest block pair, the Cheater mark's
- * rule on both arms: an operator cannot block another operator's account.
- */
-async function refuseAdminWorldQuestBlockTarget(targetAccountId: number): Promise<void> {
-  if (await adminDb().isAdminAccount(targetAccountId)) {
-    throw new HttpError(400, WORLD_QUEST_BLOCK_ADMIN_TARGET_CODE);
-  }
-}
-
-/**
- * POST /admin/api/moderation/accounts/:id/world-quests-block and
- * .../world-quests-unblock: block every character on an account from world
- * quests (the sanction for world quest botting, short of a ban), or lift it, then
- * push the change onto the live session. Registry-only like the Cheater mark
- * pair: a typed body (a shape failure is the pipeline's 422) and stable
- * `world_quest_block.*` codes. The audited write commits before the live push,
- * so a session is never blocked without its history row.
- */
-async function worldQuestBlockHandler(ctx: Ctx): Promise<void> {
-  const rt = useAdminRuntime();
-  const targetAccountId = adminTargetId(ctx);
-  const blocked = ctx.path.endsWith('/world-quests-block');
-  const decoded = worldQuestBlockBodySchema.decode(ctx.body ?? {});
-  if (!decoded.ok) throw decoded;
-  await refuseAdminWorldQuestBlockTarget(targetAccountId);
-  const input = {
-    accountId: targetAccountId,
-    adminAccountId: ctxAccountId(ctx),
-    reason: decoded.value.reason,
-  };
-  try {
-    if (blocked) await adminDb().setAccountWorldQuestBlock(input);
-    else await adminDb().liftAccountWorldQuestBlock(input);
-  } catch (err) {
-    rethrowWorldQuestBlockRefusal(err);
-  }
-  rt.applyWorldQuestBlockLive(targetAccountId, blocked);
-  ok(ctx.res, { ok: true });
-}
-
 /** POST /admin/api/moderation/accounts/:id/lift-mute: clear a chat mute + live push. */
 async function liftMuteHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
@@ -3336,6 +3286,42 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'item restore failed');
+  }
+}
+
+/** POST /admin/api/moderation/characters/:id/grant-buddy: attach a buddy
+ *  companion on a character (the channel the
+ *  monthly PvP ladder, top-parse and zodiac awards land through; owner plan
+ *  2026-09-09). Body: { buddyKey }, plus reason. Audit
+ *  first, then: ONLINE targets take the sim's grant path at once; OFFLINE
+ *  targets are queued (server/buddy_grants_db.ts queueBuddyGrant) and drained at the
+ *  character's next join, so an award never depends on the winner being
+ *  logged in. Idempotent on the sim side: an already-owned grant answers
+ *  409 rather than re-announcing. */
+async function grantBuddyHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = buddyGrantBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const grant: BuddyGrant = { buddyKey: String(body.buddyKey) };
+  try {
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'grant_buddy',
+      detail: grant.buddyKey ?? '',
+      reason: body.reason,
+    });
+    const result = rt.adminGrantBuddy(id, grant);
+    if (result === 'already_owned') return fail(ctx.res, 409, 'character already has that');
+    if (result === 'offline') {
+      await queueBuddyGrant(id, grant);
+      return ok(ctx.res, { ok: true, queued: true });
+    }
+    return ok(ctx.res, { ok: true, queued: false });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'buddy grant failed');
   }
 }
 
@@ -3954,6 +3940,14 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'POST',
+    path: '/admin/api/moderation/characters/:id/grant-buddy',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: grantBuddyHandler,
+  },
+  {
+    method: 'POST',
     path: '/admin/api/moderation/characters/:id/clear-item-name',
     surface: 'admin',
     middleware: [requireAdmin, requireAdminTarget('character')],
@@ -4161,25 +4155,6 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
     meta: adminTargetMeta('account'),
     handler: liftCheaterMarkHandler,
-  },
-  // The world quest block pair (server/world_quest_block_api.ts): registry-only
-  // like the Cheater mark pair, so the same withBody mount, operator gate pair,
-  // and envelope; the legacy rollback answers 404 for both by design.
-  {
-    method: 'POST',
-    path: '/admin/api/moderation/accounts/:id/world-quests-block',
-    surface: 'admin',
-    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
-    meta: adminTargetMeta('account'),
-    handler: worldQuestBlockHandler,
-  },
-  {
-    method: 'POST',
-    path: '/admin/api/moderation/accounts/:id/world-quests-unblock',
-    surface: 'admin',
-    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
-    meta: adminTargetMeta('account'),
-    handler: worldQuestBlockHandler,
   },
   // The admin-panel kick (server/admin_kick_api.ts): registry-only like the
   // Cheater mark pair, so the same withBody mount, operator gate pair, and

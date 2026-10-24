@@ -1,0 +1,25 @@
+{
+  "bagBar": [
+    "http://localhost:5173/ui/items/backpack.webp",
+    "http://localhost:5173/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5173/ui/items/baked_bread.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_arcane_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_arcane_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_arcane_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_arcane_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_arcane_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_fire_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_fire_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_fire_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_fire_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_fire_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_frost_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_frost_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_frost_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_frost_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_mage_frost_gloves.webp"
+  ],
+  "allDecoded": true
+}

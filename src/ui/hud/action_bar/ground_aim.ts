@@ -146,7 +146,10 @@ export function withinMinRange(
 export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): number {
   const effect = res.effects.find(
     (eff) =>
-      eff.type === 'aoeDamage' || eff.type === 'groundAoE' || eff.type === 'temporalHourglass',
+      eff.type === 'aoeDamage' ||
+      eff.type === 'groundAoE' ||
+      eff.type === 'temporalHourglass' ||
+      eff.type === 'sporeBurst',
   );
   if (effect?.type === 'temporalHourglass') return effect.captureRadius;
   return effect && 'radius' in effect ? effect.radius : DEFAULT_GROUND_AOE_RADIUS;

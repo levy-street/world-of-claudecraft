@@ -1,0 +1,25 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_balance_helmet.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_balance_shoulder.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_balance_chest.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_balance_legs.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_balance_gloves.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_feral_helmet.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_feral_shoulder.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_feral_chest.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_feral_legs.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_feral_gloves.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_restoration_helmet.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_restoration_shoulder.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_restoration_chest.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_restoration_legs.webp",
+    "http://localhost:5194/ui/items/vanguard_druid_restoration_gloves.webp"
+  ],
+  "allDecoded": true
+}

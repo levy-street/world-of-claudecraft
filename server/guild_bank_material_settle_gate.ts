@@ -4,7 +4,6 @@
 // signature projection, zero-count reattribution and the automatic spend order.
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import { guildMaterialMoveFor } from '../src/sim/guild_bank_material';
-import { materialItemIds } from '../src/sim/material_ids';
 import { materialPayloadKey } from '../src/sim/material_payload_identity';
 import {
   type MaterialSourceTransferSelection,
@@ -12,6 +11,7 @@ import {
 } from '../src/sim/material_source_transfer_selection';
 import { type MaterialComposition, materialSourceKey } from '../src/sim/material_sources';
 import { normalizeMaterialStack, takeMaterialStack } from '../src/sim/material_stack';
+import { stackProvenanceItemIds } from '../src/sim/stack_provenance_ids';
 import type { InvSlot } from '../src/sim/types';
 
 function sourceUnitKey(itemId: string, payloadKey: string, sourceKey: string): string {
@@ -26,7 +26,7 @@ export function guildBankMaterialSourceContribution(
 ): ReadonlyMap<string, number> {
   const own = new Map<string, number>();
   for (const delta of log) {
-    const read = guildMaterialMoveFor(delta, materialItemIds());
+    const read = guildMaterialMoveFor(delta, stackProvenanceItemIds());
     if (!read.ok || read.value === null) continue;
     const move = read.value;
     const legs = move.kind === 'exact' ? move.legs : move.signedCount > 0 ? move.composition : [];
@@ -65,14 +65,14 @@ export function guildBankMaterialWithdrawal(
     count = resolved.value.count;
     selected = resolved.value.sources;
   }
-  const take = takeMaterialStack(slot, count, materialItemIds(), selected);
+  const take = takeMaterialStack(slot, count, stackProvenanceItemIds(), selected);
   if (!take.ok) return null;
   const incoming = take.value.taken;
   const payloadKey = materialPayloadKey(incoming);
   const held = new Map<string, number>();
   for (const row of slots) {
     if (row.itemId !== slot.itemId) continue;
-    const normalized = normalizeMaterialStack(row, materialItemIds());
+    const normalized = normalizeMaterialStack(row, stackProvenanceItemIds());
     if (!normalized.ok || materialPayloadKey(normalized.value) !== payloadKey) continue;
     for (const bucket of normalized.value.materialSources ?? []) {
       const key = sourceUnitKey(slot.itemId, payloadKey, materialSourceKey(bucket.source));

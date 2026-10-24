@@ -42,6 +42,7 @@ import { iconDataUrl } from './icons';
 import { PlayerActivityTracker } from './meters_activity';
 import { AuraUptimeTracker } from './meters_auras';
 import {
+  abilityDetailStats,
   type BreakdownEntry,
   type BreakdownGroup,
   type BreakdownRow,
@@ -286,21 +287,13 @@ export function inferSpecFromAbility(cls: string | null, ability: string | null)
   return classSpecs[key] ?? null;
 }
 
-function addBreakdown(
+// The ability's breakdown entry, created empty on first use.
+function breakdownEntry(
   map: Map<string, BreakdownEntry>,
   petName: string | null,
   ability: string | null,
-  amount: number,
-  opts?: {
-    crit?: boolean;
-    absorbed?: number;
-    overheal?: number;
-    targetName?: string;
-    sourceName?: string;
-    abilityId?: string | null;
-    interruptedSpell?: string;
-  },
-): void {
+  abilityId: string | null | undefined,
+): BreakdownEntry {
   const key = breakdownKey(petName, ability);
   let entry = map.get(key);
   if (!entry) {
@@ -314,7 +307,7 @@ function addBreakdown(
     Object.defineProperty(entry, 'overheal', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(entry, 'absorbed', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(entry, 'abilityId', {
-      value: opts?.abilityId ?? null,
+      value: abilityId ?? null,
       writable: true,
       enumerable: false,
     });
@@ -335,7 +328,25 @@ function addBreakdown(
     });
     map.set(key, entry);
   }
+  return entry;
+}
 
+function addBreakdown(
+  map: Map<string, BreakdownEntry>,
+  petName: string | null,
+  ability: string | null,
+  amount: number,
+  opts?: {
+    crit?: boolean;
+    absorbed?: number;
+    overheal?: number;
+    targetName?: string;
+    sourceName?: string;
+    abilityId?: string | null;
+    interruptedSpell?: string;
+  },
+): void {
+  const entry = breakdownEntry(map, petName, ability, opts?.abilityId);
   entry.amount += amount;
   entry.hits = (entry.hits ?? 0) + 1;
   if (opts?.crit) {
@@ -828,7 +839,12 @@ export class MeterData {
       const targetEntity = world.entities.get(ev.targetId);
       const targetName = targetEntity?.name ?? `#${ev.targetId}`;
 
-      if (targetInParty) {
+      // A periodic tick that landed as pure overheal (a HoT on a full-health
+      // target) would only add a "+0" row that pushes real damage out of the
+      // short death recap, so it stays out.
+      const passiveOverhealTick =
+        ev.type === 'heal2' && ev.hot === true && ev.amount === 0 && !(ev.absorbed ?? 0);
+      if (targetInParty && !passiveOverhealTick) {
         const hpBefore = targetEntity?.hp;
         const maxHp = targetEntity?.maxHp;
         const hpAfter = Math.min(maxHp ?? (hpBefore ?? 0) + ev.amount, (hpBefore ?? 0) + ev.amount);
@@ -884,6 +900,21 @@ export class MeterData {
             overheal: 'overheal' in ev ? ev.overheal : undefined,
             targetName,
           });
+        }
+      } else if (
+        sourceInParty &&
+        ev.type === 'heal2' &&
+        ev.amount === 0 &&
+        (ev.overheal ?? 0) > 0
+      ) {
+        // A heal that landed entirely as overheal (a direct heal on a full-health
+        // target) healed nothing, so it adds no healing, hit, or crit; only its
+        // overheal counts toward the ability's overheal share.
+        const who = this.attribute(world, ev.sourceId, partyPids);
+        for (const enc of [this.current, this.allTime]) {
+          const t = this.tally(enc, who.pid, who.name, who.cls, partyPids, who.spec);
+          const entry = breakdownEntry(t.healByAbility, who.petName, ev.ability, ev.abilityId);
+          entry.overheal = (entry.overheal ?? 0) + (ev.overheal ?? 0);
         }
       }
     } else if (
@@ -2313,19 +2344,26 @@ export class MetersPanel {
       return;
     }
 
-    const hits = entry.hits ?? 1;
-    const crits = entry.crits ?? 0;
-    const critPct = hits > 0 ? Math.round((crits / hits) * 100) : 0;
-    const avg = hits > 0 ? Math.round(entry.amount / hits) : entry.amount;
-
-    if (this.tab === 'heal') {
-      const over = entry.overheal ?? 0;
-      const eff = Math.max(0, entry.amount - over);
-      const overPct = entry.amount > 0 ? Math.round((over / entry.amount) * 100) : 0;
-      this.subEl.textContent = `Efectiva: ${fmtNum(eff)} | Sobrecuración: ${fmtNum(over)} (${overPct}%) | Hits: ${hits} (${critPct}% crit)`;
-    } else {
-      this.subEl.textContent = `Hits: ${hits} | Crits: ${crits} (${critPct}%) | Media: ${fmtNum(avg)} | Mín/Máx: ${fmtNum(entry.minHit ?? avg)} / ${fmtNum(entry.maxHit ?? avg)}`;
-    }
+    const stats = abilityDetailStats(entry);
+    // Exact counts: fmtNum would compact an all-time hit count to "10.0k".
+    const count = (n: number) => formatNumber(n, { maximumFractionDigits: 0, useGrouping: false });
+    this.subEl.textContent =
+      this.tab === 'heal'
+        ? t('hudChrome.meters.detailHealSubtitle', {
+            effective: fmtNum(stats.effective),
+            overheal: fmtNum(stats.overheal),
+            overhealPercent: fmtPercent(stats.overhealShare),
+            hits: count(stats.hits),
+            critPercent: fmtPercent(stats.critShare),
+          })
+        : t('hudChrome.meters.detailHitSubtitle', {
+            hits: count(stats.hits),
+            crits: count(stats.crits),
+            critPercent: fmtPercent(stats.critShare),
+            average: fmtNum(stats.avg),
+            min: fmtNum(stats.minHit),
+            max: fmtNum(stats.maxHit),
+          });
 
     interface DetailRowItem {
       label: string;
@@ -2825,10 +2863,6 @@ export class MetersPanel {
       return `<div class="tt-title">${esc(row.petName ?? row.name)}</div>`;
     }
 
-    if (this.tab === 'deaths') {
-      return this.deathBreakdownHtml(row, enc, tally);
-    }
-
     if (this.selectedPlayer !== null) {
       const hex = getClassColor(this.selectedPlayer.cls ?? null);
       const title = `<div class="tt-title" style="color:${hex}">${esc(row.name)}</div>`;
@@ -2895,9 +2929,12 @@ export class MetersPanel {
     );
 
     // Threat rows are already per-contributor (one bar each), so their panel
-    // stays flat. Interrupts are simple counts without per-second rates.
-    if (isThreat || this.tab === 'interrupts') {
-      const model = buildMeterBreakdown(entries, this.tab === 'interrupts' ? 1 : enc.duration);
+    // stays flat. Interrupts and deaths are simple counts without per-second rates.
+    if (isThreat || this.tab === 'interrupts' || this.tab === 'deaths') {
+      const model = buildMeterBreakdown(
+        entries,
+        this.tab === 'interrupts' || this.tab === 'deaths' ? 1 : enc.duration,
+      );
       // Always the DAMAGE label here for threat: these entries are the damage that
       // generated the hate, not the hate value on the bar.
       const summary = t('hudChrome.meters.breakdownSummary', {
@@ -2906,7 +2943,7 @@ export class MetersPanel {
       });
       const body = model.rows.map((r) => this.breakdownRowHtml(r, false)).join('');
       const targetsHtml =
-        isThreat || this.tab === 'interrupts'
+        isThreat || this.tab === 'interrupts' || this.tab === 'deaths'
           ? ''
           : this.breakdownTargetsHtml(entries, enc.duration);
       return `${title}${summaryCard}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>${targetsHtml}`;
@@ -2928,103 +2965,6 @@ export class MetersPanel {
       .join('');
     const targetsHtml = this.breakdownTargetsHtml(entries, enc.duration);
     return `${title}${summaryCard}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>${targetsHtml}`;
-  }
-
-  /**
-   * Hover panel for a bar on the Deaths tab: presents the lethal sequence
-   * (killer, lethal ability, recent damage/healing taken leading to death)
-   * rather than the player's own dealt damage.
-   */
-  private deathBreakdownHtml(row: MeterRowNodes, enc: Encounter, tally: MemberTally): string {
-    const hex = getClassColor(tally.cls);
-    const title = `<div class="tt-title" style="color:${hex}">${esc(row.name)}</div>`;
-
-    const recaps = enc.deathRecaps.get(row.pid);
-    let record: DeathRecapRecord | undefined =
-      recaps && recaps.length > 0 ? recaps[recaps.length - 1] : undefined;
-    if (!record) {
-      const recent = this.host.data.deathRecapBuffer.getRecentEvents(row.pid);
-      if (recent.length > 0) {
-        record = {
-          pid: row.pid,
-          playerName: row.name,
-          deathTime: recent[recent.length - 1].timestamp,
-          events: recent,
-        };
-      }
-    }
-
-    const deathsCount = tally.deaths || 1;
-    let summaryStats = `<div class="mt-tt-stat"><span>${esc(t(TAB_LABEL_KEY.deaths))}:</span><span class="mt-tt-stat-val">${esc(row.num.textContent ?? String(deathsCount))}</span></div>`;
-    if (record?.killerName) {
-      const killerText = `${record.killerName}${record.killerAbility ? ` (${record.killerAbility})` : ''}`;
-      summaryStats += `<div class="mt-tt-stat"><span>${esc(t('hud.core.deathRecapLethal'))}:</span><span class="mt-tt-stat-val" style="color:#ff6b6b">${esc(killerText)}</span></div>`;
-    }
-    const summaryCard = `<div class="mt-tt-summary">${summaryStats}</div>`;
-
-    if (!record || record.events.length === 0) {
-      return `${title}${summaryCard}<div class="mt-tip-sub">${esc(t('hudChrome.meters.noDeathEvents'))}</div>`;
-    }
-
-    const rows = buildDeathRecapRows(record);
-    const displayRows = rows.slice(-8);
-    const subheader = record.killerName
-      ? t('hudChrome.meters.killedBy', {
-          killer: record.killerName,
-          ability: record.killerAbility ?? t('hudChrome.meters.lethalHit'),
-        })
-      : t('hudChrome.meters.recentCombatEvents', { count: displayRows.length });
-
-    const body = displayRows
-      .map((r) => {
-        let iconHtml = '';
-        try {
-          const rawKey =
-            r.abilityId || (r.ability ? r.ability.toLowerCase().replace(/\s+/g, '_') : 'attack');
-          const url = iconDataUrl('ability', rawKey, 16);
-          if (url) {
-            iconHtml = `<span class="mt-tip-icon" style="background-image:url('${url}')"></span>`;
-          }
-        } catch {
-          iconHtml = '';
-        }
-
-        let barStyle = '';
-        if (r.lethal) {
-          barStyle =
-            'width:100%; background: linear-gradient(90deg, rgba(192, 57, 43, 0.5) 0%, rgba(120, 30, 30, 0.25) 100%);';
-        } else if (r.type === 'heal') {
-          barStyle = `width:${Math.max(5, r.hpPercent)}%; background: rgba(39, 174, 96, 0.25);`;
-        } else if (r.type === 'absorb') {
-          barStyle = `width:${Math.max(5, r.hpPercent)}%; background: rgba(212, 172, 13, 0.25);`;
-        } else {
-          barStyle = `width:${Math.max(5, r.hpPercent)}%; background: rgba(180, 40, 40, 0.25);`;
-        }
-
-        let valColor = '#ff6b6b';
-        if (r.type === 'heal') valColor = '#2ecc71';
-        else if (r.type === 'absorb') valColor = '#f1c40f';
-
-        const label = `${r.sourceName}: ${r.ability}${r.crit ? ' *' : ''}`;
-        return (
-          `<div class="mt-tip-row${r.lethal ? ' mt-tip-lethal' : ''}">` +
-          `<span class="mt-tip-bar" style="${barStyle}"></span>` +
-          `<span class="mt-tip-time" style="font-size:10px; color:var(--color-text-muted); font-variant-numeric:tabular-nums; margin-right:4px;">${esc(r.timeRel)}</span>` +
-          iconHtml +
-          `<span class="mt-tip-name" style="${r.lethal ? 'font-weight:600; color:#ff7675;' : ''}">${esc(label)}</span>` +
-          `<span class="mt-tip-val" style="color:${valColor}">${esc(r.amountStr)} <span style="font-size:10px; color:var(--color-text-muted); margin-left:3px;">${esc(r.hpStr)}</span></span>` +
-          `</div>`
-        );
-      })
-      .join('');
-
-    let moreHtml = '';
-    if (rows.length > displayRows.length) {
-      const moreCount = rows.length - displayRows.length;
-      moreHtml = `<div style="font-size:10px; color:var(--color-text-muted); text-align:center; margin-top:4px; font-style:italic;">+${moreCount} ${esc(t('hudChrome.meters.recentCombatEvents', { count: rows.length }))}</div>`;
-    }
-
-    return `${title}${summaryCard}<div class="mt-tip-sub">${esc(subheader)}</div><div class="mt-tip-rows">${body}</div>${moreHtml}`;
   }
 
   /** A contributor's subtotal line: the member or one of their pets. */

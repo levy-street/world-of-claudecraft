@@ -5,11 +5,22 @@ import {
   HEMI_INTENSITY_GRADE,
   hemiOutdoorIntensity,
   LAMBERT_RIG_HEMI_INTENSITY,
+  LAMBERT_RIG_SUN_INTENSITY,
   lambertTerrainFillBoost,
+  lowHemiIntensity,
+  lowSunIntensity,
   terrainFillBoostTarget,
 } from '../src/render/outdoor_light_rig_core';
 
 describe('hemiOutdoorIntensity', () => {
+  it('lifts Low fill without altering the higher-tier Lambert terrain reference', () => {
+    expect(lowHemiIntensity({ lowReadabilityLighting: true })).toBe(1.8);
+    expect(lowSunIntensity({ lowReadabilityLighting: true })).toBe(2.25);
+    expect(lowHemiIntensity({ lowReadabilityLighting: false })).toBe(LAMBERT_RIG_HEMI_INTENSITY);
+    expect(lowSunIntensity({ lowReadabilityLighting: false })).toBe(LAMBERT_RIG_SUN_INTENSITY);
+    expect(LAMBERT_RIG_HEMI_INTENSITY).toBe(0.9);
+    expect(LAMBERT_RIG_SUN_INTENSITY).toBe(2.65);
+  });
   it('steps down as the post chain grows (composer < grade < flat)', () => {
     expect(hemiOutdoorIntensity({ composer: true, gradePass: true })).toBe(HEMI_INTENSITY_COMPOSER);
     expect(hemiOutdoorIntensity({ composer: false, gradePass: true })).toBe(HEMI_INTENSITY_GRADE);

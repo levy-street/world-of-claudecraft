@@ -1,29 +1,28 @@
-// King of the Hill: the pure rules. Once every two hours, at a random
+// King of the Hill: the pure rules. Once every three hours, at a random
 // moment inside the window, a hill is announced somewhere in one of the
-// northern zones; it rises HILL_WARNING_SECONDS later as a HILL_RADIUS
+// free-for-all zones; it rises HILL_WARNING_SECONDS later as a HILL_RADIUS
 // circle on dry, open ground and stands for HILL_DURATION_SECONDS. The PARTY
 // with the most members standing inside it contests it, holds it after
-// HILL_CAPTURE_SECONDS of unbroken majority, and every holder standing inside
-// earns a slow trickle of Honor for as long as they hold it. While it stands
-// the realm hears where it is every HILL_NOTICE_SECONDS, with the standings
-// (hill_ranking.ts): the group that held it longest earns a point toward the
-// Weekly Vault's PvP row when it falls. Raid members do
+// HILL_CAPTURE_SECONDS of majority (a rival walking in pauses the clock, it
+// never resets it while the group keeps a living member inside), and every
+// holder standing inside earns a slow trickle of Honor for as long as they hold
+// it. While it stands the realm hears where it is every HILL_NOTICE_SECONDS,
+// with the standings (hill_ranking.ts): the group that held it longest earns a
+// point toward the Weekly Vault's PvP row when it falls. Raid members do
 // not count; every level does. No SimContext, no rng, no clock: every function here is a plain function of its arguments so the
 // sim (hill.ts), the HUD bar and the tests read the same verdicts. The
 // ctx-bound system that owns the schedule, the presence pass, the contest
 // clock and the payouts is hill.ts.
 
-import { WORLD_PVP_MIN_LEVEL } from './world_pvp_rules';
-
 /** The circle's radius in yards (owner spec). */
 export const HILL_RADIUS = 50;
-/** One hill per window of this length (owner spec: "once every 2 hours"). */
-export const HILL_WINDOW_SECONDS = 2 * 60 * 60;
+/** One hill per window of this length (owner spec: "once every 3 hours"). */
+export const HILL_WINDOW_SECONDS = 3 * 60 * 60;
 /** The realm is told where the hill will rise this long before it does
  *  (owner spec: a 15 minute warning), so parties can form and travel. */
 export const HILL_WARNING_SECONDS = 15 * 60;
-/** A risen hill stands this long, then falls (owner spec: 30 minutes). */
-export const HILL_DURATION_SECONDS = 30 * 60;
+/** A risen hill stands this long, then falls (owner spec: 45 minutes). */
+export const HILL_DURATION_SECONDS = 45 * 60;
 /** While a hill stands the realm is reminded where it is, and told the
  *  standings, this often (owner spec 2026-09-29: every 5 minutes). */
 export const HILL_NOTICE_SECONDS = 5 * 60;
@@ -36,19 +35,20 @@ export const HILL_FIRST_WINDOW_AT_SECONDS = 120;
  *  overlap. The warning's offset is drawn uniformly from [0, this]. */
 export const HILL_LATEST_WARN_OFFSET_SECONDS =
   HILL_WINDOW_SECONDS - HILL_WARNING_SECONDS - HILL_DURATION_SECONDS;
-/** Unbroken majority for this long takes the hill (owner spec). */
-export const HILL_CAPTURE_SECONDS = 60;
-/** Presence seconds per payout. Payout amounts still ramp from 2 to 12;
- * both clocks are compressed to preserve 388 Honor per full uncontested stand. */
-// Compress the old 44 paid minutes into 29, keeping the one-minute capture.
-const HILL_REWARD_TIME_SCALE =
-  (HILL_DURATION_SECONDS - HILL_CAPTURE_SECONDS) / (45 * 60 - HILL_CAPTURE_SECONDS);
-export const HILL_ACCRUAL_SECONDS = 60 * HILL_REWARD_TIME_SCALE;
-/** Held seconds per step of the ramp, the Honor each step adds to a minute's
- *  payout, and the per-payout cap it climbs to. */
-export const HILL_RAMP_STEP_SECONDS = 300 * HILL_REWARD_TIME_SCALE;
-export const HILL_RAMP_STEP_HONOR = 2;
-export const HILL_RAMP_MAX_HONOR = 12;
+/** Majority for this long takes the hill (owner spec 2026-10-12: 30 seconds,
+ *  down from a minute). The seconds need not be unbroken: hillProgressStep
+ *  pauses a group's clock while it is not the leader. */
+export const HILL_CAPTURE_SECONDS = 30;
+/** Each holder standing inside accrues this many seconds of presence before a
+ *  payout of HILL_HONOR_PER_PAYOUT. The rate is FLAT: every paid minute is
+ *  worth the same, however long the holding party has held the hill (owner
+ *  tuning 2026-10-14, replacing the 2026-09-25 ramp of 2 a minute climbing to
+ *  12). A full uncontested stand still pays about 390 each, the ramp's total,
+ *  so King of the Hill stays a real road to Warfare gear. Only a party can
+ *  hold, so a party's size is the payee cap. */
+export const HILL_ACCRUAL_SECONDS = 60;
+/** The flat Honor paid for one held minute. */
+export const HILL_HONOR_PER_PAYOUT = 9;
 /** The Weekly Vault point for the longest hold (hill_ranking.ts) pays only a
  *  player who stood inside for at least this long while their group held the
  *  hill, and who is still in that group when it falls: a one-second visit, or
@@ -60,13 +60,6 @@ export const HILL_VAULT_MIN_INSIDE_SECONDS = 60;
  *  standings, but five such visits must not fill the PvP row. */
 export const HILL_VAULT_MIN_HOLD_SECONDS = 10 * 60;
 
-/** The Honor one payout is worth after the holding party has held the hill
- *  for `heldSeconds`: HILL_RAMP_STEP_HONOR, then that much more every
- *  HILL_RAMP_STEP_SECONDS, capped at HILL_RAMP_MAX_HONOR. */
-export function hillHonorPerPayout(heldSeconds: number): number {
-  const steps = Math.floor(Math.max(0, heldSeconds) / HILL_RAMP_STEP_SECONDS);
-  return Math.min(HILL_RAMP_MAX_HONOR, HILL_RAMP_STEP_HONOR * (1 + steps));
-}
 /** The circle keeps this much clear of the zone's edges beyond its own radius,
  *  and this much clear of the hub settlement's radius. */
 export const HILL_EDGE_MARGIN = 25;
@@ -80,20 +73,16 @@ export const HILL_RIM_SAMPLES = 16;
 export const HILL_INNER_SAMPLES = 8;
 /** Clearance the centre must have from any collider: a hill never rises on
  *  a building, a wall or a fence. The rings are not collider-checked: the
- *  northern zones are forests, a trunk on a sample point is not a
+ *  free-for-all zones are forests, a trunk on a sample point is not a
  *  structure, and the hub exclusion keeps the circle off every settlement. */
 export const HILL_CENTER_CLEARANCE = 6;
 
 /** Whether a player counts on the hill (owner spec: parties only): a raid
- *  member does not, so a raid cannot flood the circle. Players below the normal
- *  World PvP level cannot count or earn honor while immune to opponents. */
-export type HillStanding = 'counted' | 'raid' | 'level';
+ *  member does not, so a raid cannot flood the circle. Level does not matter:
+ *  anyone on free-for-all ground is fair game, so anyone there can hold. */
+export type HillStanding = 'counted' | 'raid';
 
-export function hillStanding(
-  party: { raid: boolean } | null,
-  level = WORLD_PVP_MIN_LEVEL,
-): HillStanding {
-  if (level < WORLD_PVP_MIN_LEVEL) return 'level';
+export function hillStanding(party: { raid: boolean } | null): HillStanding {
   return party?.raid ? 'raid' : 'counted';
 }
 
@@ -134,17 +123,70 @@ export function hillChallengeStands(challengerCount: number, holderCount: number
   return challengerCount > 0 && challengerCount > holderCount;
 }
 
-/** The contest clock after one pass. A lapsed challenge resets it (a group
- *  that thins out below the holder starts over), a new challenger starts it
- *  over from this pass, the same challenger keeps counting. */
-export function hillContestStep(
-  prev: number,
-  contested: boolean,
-  sameChallenger: boolean,
+/** Every group's contest clock after one pass (owner spec 2026-10-12: a rival
+ *  walking in only PAUSES a challenge). The challenger, the leader that beats
+ *  the holder, banks `dt`; every other group with a member still counted
+ *  inside keeps its seconds, paused (a tie, or a bigger group walked in); a
+ *  group with nobody counted inside loses them, which is how a death resets a
+ *  challenge (the dead are not counted) and how walking away does. The holder
+ *  never carries a clock. Returns a fresh map; the input is not touched. */
+export function hillProgressStep(
+  prev: ReadonlyMap<string, number>,
+  counts: ReadonlyMap<string, number>,
+  challenger: string | null,
+  holder: string | null,
   dt: number,
-): number {
-  if (!contested) return 0;
-  return sameChallenger ? prev + dt : dt;
+): Map<string, number> {
+  const next = new Map<string, number>();
+  for (const [key, seconds] of prev) {
+    if (key === holder || (counts.get(key) ?? 0) <= 0) continue;
+    next.set(key, seconds);
+  }
+  if (challenger !== null && challenger !== holder) {
+    next.set(challenger, (next.get(challenger) ?? 0) + dt);
+  }
+  return next;
+}
+
+/** One member of a group whose key just stopped naming anyone in it: the
+ *  key the member counts under now (null in a raid) and whether they stand
+ *  inside the circle. */
+export interface HillSuccessorMember {
+  key: string | null;
+  inside: boolean;
+}
+
+/** The group a hold or a contest clock follows when its key stops naming any
+ *  of its members: a lone holder formed or joined a party (`solo:` becomes
+ *  `party:`), or the holding party disbanded around its last member. The key
+ *  carrying the most of the old group's members inside the circle wins, then
+ *  the most members anywhere, then the earliest member's in the given order
+ *  (the caller lists the capturers first). Null when no member still counts
+ *  (they all left the realm or joined a raid). */
+export function hillSuccessorKey(members: Iterable<HillSuccessorMember>): string | null {
+  const tally = new Map<string, { inside: number; total: number; order: number }>();
+  let order = 0;
+  for (const m of members) {
+    if (m.key === null) continue;
+    const row = tally.get(m.key) ?? { inside: 0, total: 0, order: order++ };
+    row.total += 1;
+    if (m.inside) row.inside += 1;
+    tally.set(m.key, row);
+  }
+  let best: string | null = null;
+  let bestRow: { inside: number; total: number; order: number } | null = null;
+  for (const [key, row] of tally) {
+    if (
+      bestRow === null ||
+      row.inside > bestRow.inside ||
+      (row.inside === bestRow.inside && row.total > bestRow.total) ||
+      (row.inside === bestRow.inside && row.total === bestRow.total && row.order < bestRow.order)
+    ) {
+      best = key;
+      bestRow = row;
+    }
+  }
+  return best;
 }
 
 /** The world reads a spawn probe needs; the sim binds them to the terrain,

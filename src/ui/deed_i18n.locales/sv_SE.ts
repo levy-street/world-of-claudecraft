@@ -434,6 +434,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Dalskrönikan, kapitel II',
+    desc: 'Slutför andra kapitlet av Sauls krönika: besegra banditer, murlocker och gruvans ohyra, och våga dig in i Relikvariet.',
   },
   chr_vale_chapter_iii: {
     name: 'Dalens krönika',
@@ -1315,29 +1316,171 @@ export const table: DeedLocaleTable = {
     name: 'Fångad rödhänt',
     desc: 'Fånga en Myntpåseskinmare i ett begravt lagom innan det flyr med guldet.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Klarare an skuggorna',
+    desc: 'Ta tillbaka de stulna myntpungarna och fly fran Evergarden-labyrinten pa Hard.',
+  },
+  prog_titan: {
+    name: 'Jätte',
+    desc: 'Tjäna sammanlagt 10 000 000 erfarenhet under din livstid.',
+    title: 'Jätte',
+  },
   pvp_flag_1h: {
     name: 'Djärv',
-    desc: 'Ha världs-PvP aktiverat under 1 timme speltid i den öppna världen. Utloggning, död och instanser pausar framstegen; avstängning nollställer dem. Intjänade titlar är permanenta.',
+    desc: 'Ha Världs-PvP på under 1 timme speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
     title: 'Djärv',
   },
   pvp_flag_3h: {
     name: 'Trotsig',
-    desc: 'Ha världs-PvP aktiverat under 3 timmar speltid i den öppna världen. Utloggning, död och instanser pausar framstegen; avstängning nollställer dem. Intjänade titlar är permanenta.',
+    desc: 'Ha Världs-PvP på under 3 timmar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
     title: 'Trotsig',
   },
   pvp_flag_6h: {
     name: 'Orädd',
-    desc: 'Ha världs-PvP aktiverat under 6 timmar speltid i den öppna världen. Utloggning, död och instanser pausar framstegen; avstängning nollställer dem. Intjänade titlar är permanenta.',
+    desc: 'Ha Världs-PvP på under 6 timmar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
     title: 'Orädd',
   },
   pvp_flag_24h: {
     name: 'Orubblig',
-    desc: 'Ha världs-PvP aktiverat under 24 timmar speltid i den öppna världen. Utloggning, död och instanser pausar framstegen; avstängning nollställer dem. Intjänade titlar är permanenta.',
+    desc: 'Ha Världs-PvP på under 24 timmar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
     title: 'Orubblig',
   },
   pvp_flag_168h: {
     name: 'Okuvlig',
-    desc: 'Ha världs-PvP aktiverat under 7 dagar speltid i den öppna världen. Utloggning, död och instanser pausar framstegen; avstängning nollställer dem. Intjänade titlar är permanenta.',
+    desc: 'Ha Världs-PvP på under 7 dagar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
     title: 'Okuvlig',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Alla ljus tända',
+    desc: 'Besegra Morthen Gravkallaren efter att ha tänt alla fyra minnesljusen igen inom 20 sekunder efter att hans oroliga skydd uppstod.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Tyst nu',
+    desc: 'Besegra kantor Ilvane utan att hennes Klagosång från hålrummet någonsin träffar någon.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Ingen kvar i luften',
+    desc: 'Besegra Benkylans dam utan att hon någonsin släpper någon från sin Frusna omfamning.',
+  },
+  dgn_marrow_tidy: {
+    name: 'En prydlig kyrkogård',
+    desc: 'Besegra dödgrävaren Marrow med varje öppen grav placerad vid klockgårdens kant.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Sista versen',
+    desc: 'Besegra Ysolei, den dränkta månens avatar, med Bleka körens sista kantor vid din sida.',
+    title: 'Körens vittne',
+  },
+  dgn_sledge_tusker: {
+    name: 'Kall last',
+    desc: 'Besegra slädbetaren utan att någon träffas av dess nedtrampning.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Tunn is',
+    desc: 'Besegra Korzul Gravlindormen med minst tolv av sjöns nitton plattor obrutna.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Kall tröst',
+    desc: 'Besegra stornekromantikern Velkhar utan att en enda uppväckt benvandrare reser sig en andra gång.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Låset håller',
+    desc: 'Besegra Korgath den bundne på heroisk svårighetsgrad med minst två kedjor som aldrig brutits.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Ett mildare slut',
+    desc: 'Besegra Korgath den bundne med alla fyra kedjor brutna.',
+  },
+  dgn_great_saurian: {
+    name: 'Störtad titan',
+    desc: 'Besegra storödlan och dess bärstolsförbannelsekallare inom 20 sekunder från varandra.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Aldrig fångad',
+    desc: 'Besegra Zulgar, bassängens röst, utan att någon blir sargad.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Ogräsbekämpning',
+    desc: 'Besegra Frossblomman utan att ett enda taggskott växer upp.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Hållna på avstånd',
+    desc: 'Besegra Bettherren bestmästaren och hans stora jaguar med Flockband aktivt i mindre än 10 sekunder sammanlagt.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Ingen bur håller oss',
+    desc: 'Besegra fängelsevakten utan att någon krossas i en järnbur.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Inte ett svedt hårstrå',
+    desc: 'Besegra dödsklangslindormen utan att någon bränns av dess Bålsvep.',
+  },
+  dgn_mere_hydra: {
+    name: 'Alla huvuden ned',
+    desc: 'Dräp sjöhydrans alla tre huvuden inom 10 sekunder från varandra.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Högt och torrt',
+    desc: 'Besegra Ysolei, den dränkta månens avatar, utan att någon träffas av hennes Tidvattensnedslag.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Krossa glaset',
+    desc: 'Besegra tidvattensglaskolossen med varje spegelbild krossad inom 15 sekunder efter att den uppstått.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Varje röst i ton',
+    desc: 'Besegra körmodern Selthe med varje Kör delad av två eller fler och utan att något Solo berör någon annan.',
+  },
+  dgn_turretback: {
+    name: 'Vräkningsbesked',
+    desc: 'Besegra skeppsvrakskaptenen utan att någon träffas av Spöksalva.',
+  },
+  dgn_vael_beacon: {
+    name: 'I fyrens sken',
+    desc: 'Besegra Vael Dimbindaren utan att spränga en enda dimskugga.',
+  },
+  dgn_ossick_moored: {
+    name: 'Trygg hamn',
+    desc: 'Besegra fångvaktare Ossick utan att någon dras ned i Drunkningsgropen.',
+  },
+  dgn_olen_buttress: {
+    name: 'Håll muren',
+    desc: 'Besegra riddarbefälhavare Olen utan att hans Återstudsande bålverk någonsin träffar en andra spelare.',
+  },
+  cmb_point_taken: {
+    name: 'Poängen tagen',
+    desc: 'Släck halmförmannens lykta på uppbådets övningsgård och få plankorna att känna på slagen.',
+  },
+  cmb_balgath_ten: {
+    name: 'Högen behåller inget',
+    desc: 'Fäll den begravde förmannen tio gånger.',
+  },
+  cmb_balgath: { name: 'Förman inte mer', desc: 'Lägg den begravde förmannen i sin gravhög igen.' },
+  dgn_guild_first_contract: {
+    name: 'Uppdragsbrevet undertecknat',
+    desc: 'Slutför ett av Lykthallens veckovisa fängelsehålekontrakt.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Stammis vid tavlan',
+    desc: 'Slutför 10 av Lykthallens veckovisa fängelsehålekontrakt.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Kontraktsveteran',
+    desc: 'Slutför 50 av Lykthallens veckovisa fängelsehålekontrakt.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Uppdragsbud',
+    desc: 'Köps hos Garrick Holt, Lykthallens kvartermästare, för 6 lyktsigill.',
+    title: 'Uppdragsbud',
+  },
+  feat_guild_hallsworn: {
+    name: 'Hallsvuren',
+    desc: 'Köps hos Garrick Holt, Lykthallens kvartermästare, för 14 lyktsigill.',
+    title: 'Hallsvuren',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Från Lykthallen',
+    desc: 'Köps hos Garrick Holt, Lykthallens kvartermästare, för 24 lyktsigill.',
+    title: 'från Lykthallen',
   },
 };

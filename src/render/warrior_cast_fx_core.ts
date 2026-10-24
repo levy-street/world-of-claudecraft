@@ -38,7 +38,6 @@ export type WarriorCastVisualPlan =
       kind: 'shout';
       color: number;
       ringRadius: 8;
-      emote: 'cheer';
       repeats: 1;
     }
   | { kind: 'gesture'; abilityId: string };
@@ -52,7 +51,6 @@ export function warriorCastVisualPlan(
       kind: 'shout',
       color: WARRIOR_SHOUT_COLORS[abilityId as keyof typeof WARRIOR_SHOUT_COLORS] ?? 0xff3220,
       ringRadius: 8,
-      emote: 'cheer',
       repeats: 1,
     };
   }

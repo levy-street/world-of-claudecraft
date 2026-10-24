@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-foundations-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 5,
+    "removedCategoryFallbacks": [
+      "exp_the_last_keep",
+      "exp_dawnhold_castle",
+      "soc_strongbox_outfitter",
+      "soc_four_bags_deep",
+      "prog_ready_for_an_adventure"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "exp_the_last_keep",
+      "family": "deed-foundations",
+      "batchId": "deed-foundations-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_the_last_keep.webp",
+      "canonicalDisplayName": "The Quiet Halls",
+      "acceptedSha256": "264d47a44fa3cf507d6e99e9feaff924254ee69c8f172f24a69ab602b742e0ce",
+      "acceptedBytes": 6808,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-foundations/originals/exp_the_last_keep.png",
+        "sha256": "28955ba3c32addcf1a92c628ff1b7c0f6247afc1117ee5e898c0ea4ed38d07a7",
+        "bytes": 2000474,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-foundations/masters/exp_the_last_keep.png",
+        "sha256": "2b2787b09e94549efe72a4fab26145faed8a5a6e18547b9bf2d694dc62f5fa4e",
+        "bytes": 403772,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for The Quiet Halls (exp_the_last_keep). Subject: The Last Keep gatehouse arch half in shadow, one deep ember-red banner stirring in a cold draught, dusk grey stone and dark iron. A compact miniature gatehouse with a tall dark open arch, a short suggestion of silent halls within, only a few readable stone blocks. No figures. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_the_last_keep",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [78, 112, 1157, 1183],
+          "framedSubject": [423, 420],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-foundations-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-foundations-icons-v045/exp_the_last_keep-desktop.png",
+          "docs/screenshots/deed-foundations-icons-v045/exp_the_last_keep-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_dawnhold_castle",
+      "family": "deed-foundations",
+      "batchId": "deed-foundations-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_dawnhold_castle.webp",
+      "canonicalDisplayName": "An Open Door in the Garden",
+      "acceptedSha256": "42363661a20bd256defe792d2237573e22fca81f662533d9013121c77ef73ee7",
+      "acceptedBytes": 8448,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-foundations/originals/exp_dawnhold_castle.png",
+        "sha256": "94ec5b31709df302463dd3914f4df75e7b61a34727f8cd6b66af78fc0833aee0",
+        "bytes": 2090962,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-foundations/masters/exp_dawnhold_castle.png",
+        "sha256": "215f0fccf81af287be830a41f4de975e8ba6b12b931a9f7ef34a9849d36f8ff6",
+        "bytes": 450054,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for An Open Door in the Garden (exp_dawnhold_castle). Subject: Dawnhold Castle garden gate standing open, rose petals drifting across the threshold, warm morning gold on hedge green. A compact miniature sunlit stone arch, open wrought-gold gate and two small leafy hedges, a short pale path through it. No figures. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_dawnhold_castle",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [89, 59, 1162, 1172],
+          "framedSubject": [420, 435],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-foundations-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-foundations-icons-v045/exp_dawnhold_castle-desktop.png",
+          "docs/screenshots/deed-foundations-icons-v045/exp_dawnhold_castle-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "soc_strongbox_outfitter",
+      "family": "deed-foundations",
+      "batchId": "deed-foundations-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/soc_strongbox_outfitter.webp",
+      "canonicalDisplayName": "Strongbox Outfitter",
+      "acceptedSha256": "c807a4ef386b7aee3ce903ac007e14944f546d58d14bbeeb4b81b2c34ff92019",
+      "acceptedBytes": 7270,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-foundations/originals/soc_strongbox_outfitter.png",
+        "sha256": "47a6a1cfd532704f8d52d0cd2ad861b1b3ddffdddb910b73cf877196e338b0a4",
+        "bytes": 1973425,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-foundations/masters/soc_strongbox_outfitter.png",
+        "sha256": "05a42fe93b5febc1c587343d5f70b804a516305c9e2aaa284e6b7827f0784713",
+        "bytes": 386902,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Strongbox Outfitter (soc_strongbox_outfitter). Subject: One sturdy brown leather bag fitted into one brass-rimmed socket inside an open banker-green strongbox, exactly one gold coin on its front ledge. The bag and socket must be the clear focal point, hinged lid behind, polished brass and stitched leather. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "soc_strongbox_outfitter",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [95, 65, 1157, 1196],
+          "framedSubject": [390, 415],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-foundations-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-foundations-icons-v045/soc_strongbox_outfitter-desktop.png",
+          "docs/screenshots/deed-foundations-icons-v045/soc_strongbox_outfitter-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "soc_four_bags_deep",
+      "family": "deed-foundations",
+      "batchId": "deed-foundations-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/soc_four_bags_deep.webp",
+      "canonicalDisplayName": "Four Bags Deep",
+      "acceptedSha256": "01d8dc63d24ef37d93e91654b6137a083e0f891b0a4a7511c64e1873668420d2",
+      "acceptedBytes": 6962,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-foundations/originals/soc_four_bags_deep.png",
+        "sha256": "57a9aff3e5c6f012d6bf15ff6468abe6953de656c541f46c483e4d07567ea804",
+        "bytes": 2033026,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-foundations/masters/soc_four_bags_deep.png",
+        "sha256": "4b92ae3d3229f5eca9d2e3d6c6a15b3978e676627f3514200586cf113538a18f",
+        "bytes": 370424,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Four Bags Deep (soc_four_bags_deep). Subject: Exactly four matched small brown leather bags seated side by side in four brass sockets across a grand banker-green vault shelf, a small blank bill of sale with a red wax seal hanging below. Keep all four separate bag silhouettes easily countable, deep green and rich gilt, no writing on the bill. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "soc_four_bags_deep",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [32, 19, 1221, 1183],
+          "framedSubject": [448, 439],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-foundations-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-foundations-icons-v045/soc_four_bags_deep-desktop.png",
+          "docs/screenshots/deed-foundations-icons-v045/soc_four_bags_deep-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_ready_for_an_adventure",
+      "family": "deed-foundations",
+      "batchId": "deed-foundations-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_ready_for_an_adventure.webp",
+      "canonicalDisplayName": "Ready for an Adventure",
+      "acceptedSha256": "1de6dda404932aea7cfc22830341df27db098d383dcc19a5890d0663431ee698",
+      "acceptedBytes": 8028,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-foundations/originals/prog_ready_for_an_adventure.png",
+        "sha256": "0660e36d8437cb07db92ca438bf0fdb76964a23cbab378f6b21d287fe3258eb3",
+        "bytes": 2035193,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-foundations/masters/prog_ready_for_an_adventure.png",
+        "sha256": "e1122849f1f1d83dacb7fe0111523847fe139a1150d6846666fe6e054e8dfb13",
+        "bytes": 435753,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Ready for an Adventure (prog_ready_for_an_adventure). Subject: A large brass island ferry bell mid-swing on a short weathered wooden bracket, knotted rope trailing downward, a small suggestion of the Proving Shore island and dawn strait behind it inside the compact emblem. Sea teal and brass gold; bell clearly dominant, no person or hand. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_ready_for_an_adventure",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [100, 46, 1149, 1210],
+          "framedSubject": [404, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-foundations-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-foundations-icons-v045/prog_ready_for_an_adventure-desktop.png",
+          "docs/screenshots/deed-foundations-icons-v045/prog_ready_for_an_adventure-mobile.png"
+        ]
+      }
+    }
+  ]
+}

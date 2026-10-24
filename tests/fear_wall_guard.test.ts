@@ -28,7 +28,9 @@ const R = PLAYER_BODY_RADIUS;
 // Re-anchored for the New Eastbrook rebuild (the harbor-town move,
 // docs/design/eastbrook-revamp/site-plan.md): the old origin-side building is
 // gone, so the fixture sits against a dig-flank building in the new town.
-const START = { x: -100.0, z: -77.0 };
+// Re-anchored 4yd south for the grand painted towns (#4525), which stood Eastbrook's
+// buildings on Duallam's Studio layout: still 1yd short of a wall on heading 0.
+const START = { x: -101.0, z: -81.0 };
 const INTO_WALL = 0; // +z, into the building 1yd ahead
 const AWAY = Math.PI; // -z, open ground to the south
 

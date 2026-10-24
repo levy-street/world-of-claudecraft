@@ -28,7 +28,7 @@ import {
   type MaterialSourceTransferSelection,
   materialSourceTransferSelectionMatches,
 } from '../src/sim/material_source_transfer_selection';
-import type { BankInfo, VaultInfo } from '../src/world_api';
+import type { BankInfo } from '../src/world_api';
 
 const WHO = Object.freeze({ characterId: 101, accountId: 202 });
 const PID = 9;
@@ -65,16 +65,6 @@ function bankInfo(): BankInfo {
   };
 }
 
-function vaultInfo(): VaultInfo {
-  return {
-    stock: {},
-    special: [],
-    upgrades: 1,
-    perMaterialCap: 40,
-    nextUpgradeCost: 50_000,
-  };
-}
-
 function bankSim(): BankSim {
   return {
     ctx: {
@@ -94,10 +84,10 @@ function bankSim(): BankSim {
 function vaultSim(): VaultSim {
   return {
     ctx: {
-      resolve: () => ({ meta: { entityId: 88, inventory: [] } }),
+      resolve: () => ({ meta: { entityId: 88, inventory: [], vault: { special: [] } } }),
       error: vi.fn(),
     },
-    vaultInfoFor: () => vaultInfo(),
+    vaultInfoWireRevFor: () => 0,
     vaultDeposit: vi.fn(),
     vaultWithdraw: vi.fn(),
     vaultDepositAll: vi.fn(),

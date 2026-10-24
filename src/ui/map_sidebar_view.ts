@@ -3,12 +3,16 @@
 // gold objective badges painted on the map. DOM and localization stay in the
 // controller; this core only returns content identities, counts, and routes.
 
-import { NPCS, QUESTS, type ZoneDef } from '../sim/data';
+import { getActiveWorldContent, QUESTS, type ZoneDef } from '../sim/data';
 import { type QuestProgress, questObjectiveRequired } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { ownEntry } from './known_item';
 import { questNumbersByLog } from './map_quest_list_view';
-import { type QuestMapLocation, questMapLocation } from './quest_map_location_core';
+import {
+  liveNpcPosLookup,
+  type QuestMapLocation,
+  questMapLocation,
+} from './quest_map_location_core';
 
 export type MapAtlasFilterId = 'quests' | 'gather' | 'dungeons' | 'services' | 'players';
 
@@ -64,7 +68,7 @@ export interface MapSidebarView {
 }
 
 export interface MapSidebarViewInput {
-  world: Pick<IWorld, 'player' | 'questLog' | 'questState'>;
+  world: Pick<IWorld, 'player' | 'questLog' | 'questState' | 'entities'>;
   zone: ZoneDef;
   filters: Readonly<MapAtlasFilters>;
   selectedQuestId: string | null;
@@ -157,7 +161,8 @@ function nearbyQuests(input: MapSidebarViewInput): MapAtlasNearbyQuest[] {
   const zoneMaxX = zone.xMax ?? Number.POSITIVE_INFINITY;
   const seen = new Set<string>();
   const nearby: MapAtlasNearbyQuest[] = [];
-  for (const npc of Object.values(NPCS)) {
+  // The loaded world's NPCs: a Studio map may move or drop a quest giver.
+  for (const npc of Object.values(getActiveWorldContent().npcs)) {
     if (
       npc.pos.x < zoneMinX ||
       npc.pos.x >= zoneMaxX ||
@@ -217,6 +222,10 @@ export function buildMapSidebarView(input: MapSidebarViewInput): MapSidebarView 
     quests,
     nearby: nearbyQuests(input),
     selectedQuestId,
-    route: questMapLocation(selectedQuestId, input.world.questLog),
+    route: questMapLocation(
+      selectedQuestId,
+      input.world.questLog,
+      liveNpcPosLookup(input.world.entities),
+    ),
   };
 }

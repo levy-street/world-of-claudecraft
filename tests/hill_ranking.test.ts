@@ -350,19 +350,19 @@ describe('the hold ranking', () => {
     expect(party0.name).toBe('Bet');
     expect(party0.party).toBe(true);
     expect(solo0.party).toBe(false);
-    // Aleph's hold ran from the capture until the party's capture (about 3 minutes).
-    expect(solo0.seconds).toBeGreaterThanOrEqual(175);
-    expect(solo0.seconds).toBeLessThanOrEqual(185);
+    // Aleph's hold ran from the capture until the party's capture; the rival's
+    // own capture wind-up no longer counts as extra held time.
+    expect(solo0.seconds).toBeGreaterThanOrEqual(145);
+    expect(solo0.seconds).toBeLessThanOrEqual(155);
     expect([...party0.holders.keys()].sort()).toEqual([b, c].sort());
     expect([...solo0.holders.keys()]).toEqual([a]);
-    // The party has held about a minute of the five: Aleph ranks first.
-    expect(party0.seconds).toBeGreaterThanOrEqual(55);
-    expect(party0.seconds).toBeLessThanOrEqual(65);
+    // The party has held about two minutes of the five: Aleph ranks first.
+    expect(party0.seconds).toBeGreaterThanOrEqual(115);
+    expect(party0.seconds).toBeLessThanOrEqual(125);
     const ranking = logLines(seen).filter((l) => l.startsWith('Hill ranking'));
     expect(ranking).toEqual([
       'Hill ranking #1: Aleph, held 3 minutes.',
-      // The standings sound before the pass banks its second: a minute held.
-      "Hill ranking #2: Bet's group, held 1 minute.",
+      "Hill ranking #2: Bet's group, held 2 minutes.",
     ]);
   });
 
@@ -532,7 +532,7 @@ describe('the Weekly Vault point', () => {
     const ranking = realm.filter((l) => l.startsWith('Hill ranking'));
     expect(ranking).toEqual([
       "Hill ranking #1: Bet's group, held 10 minutes.",
-      'Hill ranking #2: Aleph, held 2 minutes.',
+      'Hill ranking #2: Aleph, held 1 minute.',
     ]);
     // The standings follow the fall line.
     expect(realm.indexOf(ranking[0])).toBeGreaterThan(

@@ -269,7 +269,7 @@
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's
      own `pan-y` could not re-enable it. `pan-x pan-y` still blocks pinch/
-     double-tap zoom (also guarded globally in preventMobileZoom). */
+     double-tap zoom (also guarded globally in installMobileZoomGuard, src/game/mobile_zoom_guard.ts). */
   body.mobile-touch #ui {
     touch-action: pan-x pan-y;
   }
@@ -768,7 +768,6 @@
      body.mobile-touch (hidden below); xpbar/player-frame/petbar keep rendering
      (their own mobile rules are untouched).
 
-
      GEOMETRY: the 5 paged buttons sit on one circular arc centred on the attack
      button's centre, a quarter sweep from due-left (180deg) to due-up (90deg) in
      22.5deg steps, so every adjacent pair has the same centre distance
@@ -1242,10 +1241,11 @@
      hands back an unresolved calc() for a custom property, and only a literal
      parses. The safe area cannot ride in that literal for the same reason, so
      the overlay carries the insets as PADDING, which is a real property and does
-     resolve. That padding is NOT inert: an absolutely positioned child resolves
-     against the PADDING box, so it shifts every petal by the inset. The gesture
-     layer seats the radial in that same padding-box frame (see its measure()),
-     which is what makes the inset count exactly once. */
+     resolve. That padding does NOT move the petals: an absolutely positioned
+     child's left/top is measured from the padding EDGE, so the petals sit in
+     viewport coordinates. The gesture layer reads the padding only to shrink the
+     box it clamps the radial into, then hands back viewport coordinates (see its
+     measure()), which is what makes the inset count exactly once. */
   body.mobile-touch #mobile-action-radial {
     --radial-radius-ratio: 1.35;
     --radial-margin: 6px;
@@ -2373,7 +2373,7 @@
   body.mobile-touch #mobile-extra-controls .mobile-btn.active .mobile-label {
     color: var(--gold);
   }
-  /* music toggle: a diagonal slash over the note signals "off" (mirrors #mm-music) */
+  /* music toggle: a diagonal slash over the note signals "off" */
   body.mobile-touch #mobile-music {
     position: relative;
   }
@@ -3844,6 +3844,41 @@
   body.mobile-touch #raid-boss-guide-window .rbg-ability-detail p {
     font-size: 10px;
   }
+  /* Dungeon pages: four or five bosses ride one horizontal strip instead of a
+     two-column grid, so the journal keeps its height on a landscape phone. */
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon .rbg-boss-tab {
+    flex: 0 0 auto;
+    width: 150px;
+    scroll-snap-align: start;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-tip-grid,
+  body.mobile-touch #raid-boss-guide-window .rbg-choice-sides {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-tip p,
+  body.mobile-touch #raid-boss-guide-window .rbg-choice p,
+  body.mobile-touch #raid-boss-guide-window .rbg-heroic ul,
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-summary {
+    font-size: 10px;
+  }
+  body.mobile-touch
+    #raid-boss-guide-window
+    .rbg-boss-nav-dungeon
+    ~ .rbg-journal
+    .rbg-ability-toggle {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon ~ .rbg-journal .rbg-badges {
+    grid-column: 2;
+    padding-bottom: 4px;
+  }
   /* One anchor for both strips: the column (hud.css #aura-stack) owns the
      buff-to-debuff clearance, so the two `top` offsets that used to set it are
      gone. The old pair put the debuff row 36px under the buff row while a buff
@@ -4001,6 +4036,18 @@
     width: 24px;
     height: 24px;
   }
+  body.mobile-touch #instance-difficulty {
+    left: 2px;
+    top: 26px;
+    width: var(--rim-satellite-size);
+    height: var(--rim-satellite-size);
+    border-width: 2px;
+    transform: scale(var(--rim-satellite-scale));
+  }
+  body.mobile-touch #instance-difficulty svg {
+    width: 24px;
+    height: 24px;
+  }
   body.mobile-touch #mail-indicator {
     right: var(--rim-satellite-inset);
     bottom: var(--rim-satellite-inset);
@@ -4118,6 +4165,16 @@
      quest grew it down into the action ring. Desktop keeps it untouched, and the
      other trackers in #right-tracker-stack are unaffected. */
   body.mobile-touch #quest-tracker {
+    display: none;
+  }
+  /* The dungeon objectives tracker follows it for the same reason, and harder:
+     its seat at the top of this stack sits directly on the action ring on a
+     landscape phone, and a plate there would cover buttons a player fights
+     with. On touch the run is a PAGE of #quest-strip instead (the dungeon as
+     the title, each boss a counted line: dungeonStripQuest in
+     src/ui/hud/dungeon/dungeon_tracker_view.ts), so nothing is lost and the
+     stack keeps its phone footprint. */
+  body.mobile-touch #dungeon-tracker {
     display: none;
   }
   body.mobile-touch #meters-window {
@@ -4367,10 +4424,6 @@
     text-align: center;
     white-space: normal;
     overflow-wrap: anywhere;
-  }
-  /* Keep the danger announcement below the hill status strip on short screens. */
-  body.mobile-touch #banner.banner-pvp {
-    top: max(38%, 132px);
   }
   body.mobile-touch #banner.banner-loot {
     top: 21%;
@@ -4751,6 +4804,7 @@
   body.mobile-touch #quest-dialog,
   body.mobile-touch #calendar-window,
   body.mobile-touch #weekly-quests-window,
+  body.mobile-touch #guild-hall-window,
   body.mobile-touch #crafting-window,
   body.mobile-touch #mailbox-window,
   body.mobile-touch #emote-editor,
@@ -4937,6 +4991,11 @@
      the picker's own radio rows already clear it unconditionally
      (components.css min-height:40px). */
   body.mobile-touch #harvest-preference-window .btn {
+    min-height: 40px;
+  }
+  /* The first-login graphics prompt's Continue rides the same 32px .ui-btn plate; its option
+     rows already clear the floor (shell.css, first-login graphics prompt). */
+  body.mobile-touch .graphics-prompt-confirm {
     min-height: 40px;
   }
   @media (orientation: landscape) {
@@ -5584,6 +5643,58 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     flex: 0 0 auto;
   }
+  /* Lantern Hall on a phone: a compact board (a smaller portrait, a tighter sheet). On a
+     landscape phone the notices stay side by side and the quartermaster's detail keeps
+     beside its stock; only a window under 560px restacks them (components.css container
+     query), so the whole board and counter show with a short scroll. */
+  body.mobile-touch #guild-hall-window .gh-intro {
+    margin: 4px 0 8px;
+  }
+  body.mobile-touch #guild-hall-window .gh-board {
+    padding: 10px 8px 8px;
+  }
+  body.mobile-touch #guild-hall-window .gh-tally {
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  body.mobile-touch #guild-hall-window .gh-cards {
+    gap: 10px;
+  }
+  body.mobile-touch #guild-hall-window .gh-card {
+    padding: 20px 10px 14px;
+    gap: 4px;
+  }
+  body.mobile-touch #guild-hall-window .gh-portrait {
+    width: 60px;
+    height: 60px;
+  }
+  body.mobile-touch #guild-hall-window .gh-boss {
+    font-size: 15px;
+  }
+  body.mobile-touch #guild-hall-window .gh-goal,
+  body.mobile-touch #guild-hall-window .gh-detail {
+    font-size: 12px;
+  }
+  body.mobile-touch #guild-hall-window .gh-wax {
+    width: 40px;
+    height: 40px;
+  }
+  body.mobile-touch #guild-hall-window .gh-slot-large {
+    width: 60px;
+    height: 60px;
+  }
+  body.mobile-touch #guild-hall-window .gh-detail-pane {
+    padding: 12px;
+    gap: 8px;
+  }
+  body.mobile-touch #guild-hall-window .gh-item {
+    min-height: 64px;
+  }
+  /* the phone's 3D stage: short enough that the buy bar stays in reach under it */
+  body.mobile-touch #guild-hall-window .gh-stage-slot,
+  body.mobile-touch #guild-hall-window .gh-stage {
+    height: 180px;
+  }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
   body.mobile-touch #leaderboard-window,
@@ -6048,7 +6159,6 @@
     display: none;
   }
   body.mobile-touch .soc-add input,
-  body.mobile-touch .soc-presence select,
   body.mobile-touch .soc-billboard-edit input,
   body.mobile-touch .soc-pledge-note-row input,
   body.mobile-touch .soc-pledge-minlvl input,
@@ -7475,6 +7585,25 @@
       min-height: 40px;
     }
   }
+  body.mobile-touch #collections-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    /* Both opposing edges are pinned, so the edge pin IS the height on touch:
+       a desktop height on this window would otherwise over-constrain the box
+       and the browser would drop `bottom`. */
+    height: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
   body.mobile-touch #reliquary-window {
     position: fixed;
     left: max(10px, env(safe-area-inset-left));
@@ -7819,6 +7948,14 @@
   body.mobile-touch .set-toggle {
     flex: 0 0 auto;
     min-height: 40px;
+  }
+  /* Checkbox rows keep the box and its name on one line; the whole label row
+     (44px floor above) is the tap target. */
+  body.mobile-touch .set-check-row {
+    flex-wrap: nowrap;
+  }
+  body.mobile-touch .set-check-row .set-name {
+    flex: 1 1 auto;
   }
   body.mobile-touch .graphics-apply {
     grid-template-columns: minmax(0, 1fr);
@@ -9849,6 +9986,141 @@
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
   }
+  /* Vivid combat text on touch: this layer outranks hud.css, so the vivid lane and
+     big-hit sizes are restated at the compact mobile scale (colours, keyline and crit
+     flare inherit untouched). An outgoing non-crit number fans out along a shorter arc
+     in its lane; a crit keeps the mobile crit pop above; a big hit sits between the two
+     sizes. */
+  @keyframes fct-out-l-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 20px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 30px) calc(-50% - 58px);
+    }
+  }
+  @keyframes fct-out-r-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 20px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 30px) calc(-50% - 58px);
+    }
+  }
+  @keyframes fct-out-ll-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 40px) calc(-50% - 12px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 56px) calc(-50% - 48px);
+    }
+  }
+  @keyframes fct-out-rr-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 40px) calc(-50% - 12px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 56px) calc(-50% - 48px);
+    }
+  }
+  body.mobile-touch .fct.fct-out-l:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-l-mobile;
+  }
+  body.mobile-touch .fct.fct-out-r:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-r-mobile;
+  }
+  body.mobile-touch .fct.fct-out-ll:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-ll-mobile;
+  }
+  body.mobile-touch .fct.fct-out-rr:not(.crit) {
+    font-size: calc(15px * var(--fct-scale, 1));
+    animation-name: fct-out-rr-mobile;
+  }
+  @keyframes fct-vivid-rise-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 58px);
+    }
+  }
+  @keyframes fct-vivid-crit-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 0.7;
+    }
+    14% {
+      scale: 1.5;
+    }
+    28% {
+      scale: 1;
+    }
+    65% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 62px);
+      scale: 1;
+    }
+  }
+  body.mobile-touch .fct.fct-vivid.fct-damage-taken:not(.crit),
+  body.mobile-touch .fct.fct-vivid.fct-damage-taken-block:not(.crit) {
+    animation-name: fct-vivid-rise-mobile;
+  }
+  body.mobile-touch .fct.fct-vivid.crit {
+    animation-name: fct-vivid-crit-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit {
+    animation-name: fct-vivid-rise-mobile;
+  }
+  body.mobile-touch .fct.fct-big:not(.crit) {
+    font-size: calc(18px * var(--fct-scale, 1));
+  }
+  body.mobile-touch .fct.fct-big.crit {
+    font-size: calc(23px * var(--fct-scale, 1));
+  }
   @keyframes fct-xp-pop-mobile {
     0% {
       opacity: 1;
@@ -9888,6 +10160,89 @@
      bounds while open. */
   body.mobile-touch #dungeon-finder-window {
     max-height: calc(100% - 20px);
+    height: auto;
+    overflow-y: auto;
+    --window-pad: 10px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-guide-intro {
+    padding-top: 6px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-guide-intro p {
+    font-size: 14px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-categories {
+    gap: 5px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-category {
+    padding: 8px 6px;
+    gap: 5px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-category .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-filters {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+  }
+  body.mobile-touch #dungeon-finder-window .df-search {
+    flex-basis: 100%;
+  }
+  @media (max-height: 480px) and (min-width: 650px) {
+    body.mobile-touch #dungeon-finder-window .df-guide-intro {
+      display: none;
+    }
+    body.mobile-touch #dungeon-finder-window .df-filters {
+      flex-wrap: nowrap;
+    }
+    body.mobile-touch #dungeon-finder-window .df-search {
+      flex-basis: auto;
+    }
+    body.mobile-touch #dungeon-finder-window .df-eligible {
+      white-space: nowrap;
+    }
+  }
+  body.mobile-touch #dungeon-finder-window .df-eligible {
+    min-height: 40px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-eligible input {
+    width: 24px;
+    height: 24px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-detail {
+    padding: 0;
+  }
+  body.mobile-touch #dungeon-finder-window .df-detail-hero {
+    padding: 18px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-detail-name {
+    font-size: 24px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-back {
+    flex-basis: 100%;
+  }
+  body.mobile-touch #dungeon-finder-window .df-loot-row {
+    min-height: 40px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-encounter {
+    padding: 10px;
+    gap: 10px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-portrait {
+    width: 44px;
+    height: 54px;
+    flex-basis: 44px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-loot-name {
+    white-space: normal;
+  }
+  body.mobile-touch #dungeon-finder-window .df-empty .ui-btn {
+    min-height: 40px;
   }
   body.mobile-touch #dungeon-finder-window .df-body {
     overflow: visible;
@@ -9921,7 +10276,82 @@
     padding: 4px 0;
   }
   /* 40x40 touch floor for every tappable finder control. */
-  body.mobile-touch #dungeon-finder-window .df-tab,
+  body.mobile-touch #dungeon-finder-window .df-board-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding-top: 10px;
+  }
+  body.mobile-touch #dungeon-finder-window .df-board-shell .df-listings {
+    grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+  }
+  body.mobile-touch #dungeon-finder-window .df-board-shell .ui-btn {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  @media (max-width: 650px) {
+    body.mobile-touch #dungeon-finder-window .df-category {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 4px;
+      height: auto;
+      min-height: 64px;
+      text-align: left;
+    }
+    body.mobile-touch #dungeon-finder-window .df-category > .ui-icon {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    body.mobile-touch #dungeon-finder-window .df-category-count {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    body.mobile-touch #dungeon-finder-window .df-category > span:not(.df-category-count) {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      font-size: 13px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    body.mobile-touch #dungeon-finder-window .df-meta {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    body.mobile-touch #dungeon-finder-window .df-encounter:has(.df-encounter-guide[open]) {
+      display: block;
+    }
+    body.mobile-touch
+      #dungeon-finder-window
+      .df-encounter:has(.df-encounter-guide[open])
+      .df-portrait {
+      float: left;
+      margin: 0 12px 12px 0;
+    }
+    body.mobile-touch #dungeon-finder-window .df-encounter-guide {
+      clear: both;
+    }
+    body.mobile-touch #dungeon-finder-window .df-guide-content {
+      padding-left: 10px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-detail-head {
+      gap: 10px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-detail-name {
+      flex-basis: calc(100% - 80px);
+    }
+  }
+  @media (min-width: 720px) {
+    body.mobile-touch #dungeon-finder-window .df-board-shell:not(.df-board-shell--browse) {
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 16px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-board-hero {
+      min-height: 112px;
+      padding-top: 12px;
+    }
+    body.mobile-touch #dungeon-finder-window .df-board-hero h3 {
+      font-size: 20px;
+    }
+  }
   body.mobile-touch #dungeon-finder-window .df-row,
   body.mobile-touch #dungeon-finder-window .df-role,
   body.mobile-touch #dungeon-finder-window .df-opt,
@@ -10248,5 +10678,19 @@
   }
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
     font-size: 16px;
+  }
+  body.mobile-touch #courier-window {
+    left: 8px;
+    right: 8px;
+    top: max(8px, env(safe-area-inset-top));
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    transform: none;
+  }
+  @media (max-width: 500px) {
+    body.mobile-touch #courier-window .courier-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 }

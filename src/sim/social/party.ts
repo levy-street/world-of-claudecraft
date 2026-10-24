@@ -16,16 +16,21 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { cancelPendingDifficultyChange } from '../instances/difficulty_selection';
+import { expeditionFamilyClaims } from '../instances/dungeon_expeditions';
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
-import type { Party } from '../sim';
+import { emitReferralPartyEvidence } from '../referral_evidence';
+import type { InstanceSlot, Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { rememberSoulwellPartyEligibility } from '../soulwell';
 import { type Aura, DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
 // from sim.ts with the code that reads them; do NOT inline new numbers.
-const PARTY_MAX = 5;
+// PARTY_MAX is also read by the render side to size the pools of telegraphs a
+// whole party can wear at once (wildheart_basin/basin_trash_fx_core.ts).
+export const PARTY_MAX = 5;
 const RAID_MIN = 5;
 // The largest roster any group can hold, enforced at every join site below
 // (partyInvite, partyAccept, and the Dungeon Finder formation seam). The one cap
@@ -199,6 +204,7 @@ export class PartyMachine {
         ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
       };
       this.parties.set(party.id, party);
+      cancelPendingDifficultyChange(this.ctx, invite.fromPid);
       this.partyByPid.set(invite.fromPid, party.id);
       this.ctx.hillPartyJoin(invite.fromPid);
     }
@@ -209,11 +215,15 @@ export class PartyMachine {
     const raidGroup = this.nextRaidGroupFor(party);
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
+    if (!created) cancelPendingDifficultyChange(this.ctx, party.leader);
+    cancelPendingDifficultyChange(this.ctx, r.meta.entityId);
     this.partyByPid.set(r.meta.entityId, party.id);
     this.ctx.hillPartyJoin(r.meta.entityId);
     rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
+    emitReferralPartyEvidence(this.ctx, party.members);
     this.syncPersistentPaladinPartyAuras(party);
+    for (const memberPid of party.members) this.ctx.onDungeonFinderPartyJoined(memberPid);
     // Forming the party is the inviter's join too; the accepter counts on
     // every successful join.
     if (created) this.ctx.bumpDeedStat(leaderMeta, 'partiesJoined', 1);
@@ -284,6 +294,7 @@ export class PartyMachine {
       party.leader,
       party.members,
     );
+    cancelPendingDifficultyChange(this.ctx, party.leader);
     party.leader = targetPid;
     const newLeader = this.ctx.players.get(targetPid);
     for (const mPid of party.members) {
@@ -427,7 +438,10 @@ export class PartyMachine {
   //    chat lines are deliberately skipped (the finder sends its own single
   //    formation notice); the group still gets the loot summary, and a raid
   //    conversion announces itself like the manual path.
-  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null {
+  formDungeonFinderGroup(
+    units: FinderFormationUnit[],
+    opts: { raid: boolean; expeditionClaim?: InstanceSlot },
+  ): Party | null {
     const seen = new Set<number>();
     let total = 0;
     for (const unit of units) {
@@ -454,6 +468,29 @@ export class PartyMachine {
     if (total < 2 || total > (opts.raid ? RAID_MAX : PARTY_MAX)) return null;
 
     const baseUnit = units.find((u) => u.partyId !== null) ?? units[0];
+    const expeditionClaim = opts.expeditionClaim;
+    const destinationId = baseUnit.partyId ?? this.nextPartyId;
+    const expeditionClaims = expeditionClaim
+      ? expeditionFamilyClaims(this.ctx, expeditionClaim)
+      : [];
+    if (expeditionClaim) {
+      if (
+        !this.ctx.instances.includes(expeditionClaim) ||
+        expeditionClaim.exitId === null ||
+        expeditionClaim.partyKey !== this.ctx.instanceKeyFor(baseUnit.leaderPid)
+      )
+        return null;
+      const destinationKey = `party:${destinationId}`;
+      if (
+        this.ctx.instances.some(
+          (claim) =>
+            !expeditionClaims.includes(claim) &&
+            expeditionClaims.some((promoted) => promoted.dungeonId === claim.dungeonId) &&
+            claim.partyKey === destinationKey,
+        )
+      )
+        return null;
+    }
     let party: Party | null =
       baseUnit.partyId !== null ? (this.parties.get(baseUnit.partyId) ?? null) : null;
     if (!party) {
@@ -471,12 +508,16 @@ export class PartyMachine {
         ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
       };
       this.parties.set(party.id, party);
+      cancelPendingDifficultyChange(this.ctx, baseUnit.leaderPid);
       this.partyByPid.set(baseUnit.leaderPid, party.id);
       this.ctx.hillPartyJoin(baseUnit.leaderPid);
       // Same deed credit the invite path grants (acceptInvite): a finder group is a
       // party the player joined, so it counts toward partiesJoined.
       this.ctx.bumpDeedStat(leaderMeta, 'partiesJoined', 1);
     }
+    // Promote the existing live claim BEFORE per-join reset-lock inheritance.
+    // No slot, exit, mobs, difficulty, progress or participation set is replaced.
+    for (const claim of expeditionClaims) claim.partyKey = `party:${party.id}`;
     const convertedToRaid = opts.raid && !party.raid;
     if (convertedToRaid) {
       party.raid = true;
@@ -502,6 +543,7 @@ export class PartyMachine {
         const raidGroup = this.nextRaidGroupFor(party);
         party.members.push(pid);
         party.raidGroups.set(pid, raidGroup);
+        cancelPendingDifficultyChange(this.ctx, pid);
         this.partyByPid.set(pid, party.id);
         this.ctx.hillPartyJoin(pid);
         rememberSoulwellPartyEligibility(this.ctx, party);
@@ -514,6 +556,7 @@ export class PartyMachine {
       }
     }
     this.syncPersistentPaladinPartyAuras(party);
+    for (const memberPid of party.members) this.ctx.onDungeonFinderPartyJoined(memberPid);
     if (convertedToRaid) {
       for (const mPid of party.members) {
         this.ctx.emit({
@@ -532,6 +575,7 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+    emitReferralPartyEvidence(this.ctx, party.members);
     return party;
   }
 
@@ -566,6 +610,7 @@ export class PartyMachine {
   }
 
   removeFromParty(pid: number, verb: string): void {
+    cancelPendingDifficultyChange(this.ctx, pid);
     const party = this.partyOf(pid);
     if (!party) return;
     // Revoke any pending master-loot curate-phase assign authority the departing
@@ -582,6 +627,8 @@ export class PartyMachine {
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);
+    if (party.members.length > 1 && party.leader !== pid)
+      cancelPendingDifficultyChange(this.ctx, party.leader);
     // Paladin auras are tied to the party relationship. Keep the caster's own
     // aura intact, but remove paladin auras across the broken relationship in
     // both directions.
@@ -608,6 +655,7 @@ export class PartyMachine {
         this.ctx.hillPartyDisband(party.id, party.members[0]);
       }
       for (const mPid of party.members) {
+        cancelPendingDifficultyChange(this.ctx, mPid);
         this.partyByPid.delete(mPid);
         // The members left behind lose their group too, so any curate-phase roll
         // they still master is orphaned: without this it would sit invisible to
@@ -636,5 +684,6 @@ export class PartyMachine {
       }
     }
     this.announceLooterShift(party, beforeLooter);
+    emitReferralPartyEvidence(this.ctx, [...party.members, pid]);
   }
 }

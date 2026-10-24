@@ -776,7 +776,7 @@ describe('auditBank (vault container)', () => {
     // outside it is caught AT the row, not only downstream where the final
     // state happens to disagree. State matches the tampered rung in each red
     // fixture so the tripwire, not purchased_mismatch, is what fires.
-    for (const rung of [6, 0, 2.5]) {
+    for (const rung of [11, 0, 2.5]) {
       const findings = auditBank({
         ledgerRows: [
           {
@@ -802,11 +802,11 @@ describe('auditBank (vault container)', () => {
             id: 1,
             character_id: 1,
             op: 'buy_slots',
-            copper_delta: -400000,
-            purchased_slots_after: 5,
+            copper_delta: -1600000,
+            purchased_slots_after: 10,
           },
         ].map(V),
-        characters: [{ id: 1, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: 5 } } }],
+        characters: [{ id: 1, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: 10 } } }],
       }),
     ).toEqual([]);
   });
@@ -1281,21 +1281,35 @@ describe('auditBank (vault container)', () => {
       ).toContain('unexpected_instance');
     }
 
-    const craft = auditBank({
-      ledgerRows: [
-        V({
-          id: 1,
-          character_id: 1,
-          op: 'craft_consume',
-          item_id: 'copper_ore',
-          count: 1,
-          purchased_slots_after: 1,
-          instance: identity,
-        }),
-      ],
-      characters: [],
-    });
-    expect(craft.map((f) => f.kind)).toContain('unexpected_instance');
+    const craftRow = (instance: unknown) =>
+      auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'craft_consume',
+            item_id: 'copper_ore',
+            count: 1,
+            purchased_slots_after: 1,
+            instance,
+          }),
+        ],
+        characters: [],
+      }).map((f) => f.kind);
+
+    // A craft may spend the crafter's OWN signed units, keyed signer-only.
+    expect(craftRow(identity)).not.toContain('unexpected_instance');
+    // Anything beyond a bare signer is still identity no craft can consume.
+    for (const instance of [
+      { ...identity, instance: { signer: 'Ada', ilvl: 5 } },
+      { ...identity, instance: { signer: '' } },
+      { ...identity, instance: null },
+      { ...identity, craftedRecipeId: 'recipe_copper_bar' },
+      { ...identity, vaultSpecial: 2 },
+      { signer: 'Ada' },
+    ]) {
+      expect(craftRow(instance), JSON.stringify(instance)).toContain('unexpected_instance');
+    }
   });
 
   it('a guild-only op wearing the vault container is flagged', () => {
@@ -2878,15 +2892,15 @@ describe('auditBank (bank socket store, Phase 07)', () => {
       ],
     });
     expect(findingKindsFor(wrongPrice, 1)).toEqual(['bad_socket_price']);
-    expect(wrongPrice[0].detail).toContain('expected -1000000');
+    expect(wrongPrice[0].detail).toContain('expected -750000');
 
     const pastLadder = auditBank({
       ledgerRows: [
-        L({ id: 1, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
-        L({ id: 2, op: 'unlock_socket', copper_delta: -2000000, purchased_slots_after: 0 }),
-        L({ id: 3, op: 'unlock_socket', copper_delta: -3500000, purchased_slots_after: 0 }),
-        L({ id: 4, op: 'unlock_socket', copper_delta: -5000000, purchased_slots_after: 0 }),
-        L({ id: 5, op: 'unlock_socket', copper_delta: -5000000, purchased_slots_after: 0 }),
+        L({ id: 1, op: 'unlock_socket', copper_delta: -750000, purchased_slots_after: 0 }),
+        L({ id: 2, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
+        L({ id: 3, op: 'unlock_socket', copper_delta: -1250000, purchased_slots_after: 0 }),
+        L({ id: 4, op: 'unlock_socket', copper_delta: -1500000, purchased_slots_after: 0 }),
+        L({ id: 5, op: 'unlock_socket', copper_delta: -1500000, purchased_slots_after: 0 }),
       ],
       characters: [
         {
@@ -2901,6 +2915,48 @@ describe('auditBank (bank socket store, Phase 07)', () => {
     expect(findingKindsFor(pastLadder, 1).sort()).toEqual(
       ['socket_unlock_mismatch', 'socket_unlock_past_ladder'].sort(),
     );
+  });
+
+  it('accepts unlocks charged at the retired launch ladder, alone or mixed with current prices', () => {
+    // Unlocks bought before the socket retune keep the price they were
+    // charged (100g/200g/350g/500g), so a history at the retired ladder, or
+    // one that crosses the retune mid-ladder, reconciles clean.
+    const state = { bank: { inventory: [], purchasedSlots: 0, unlockedSockets: 4 } };
+    const retired = auditBank({
+      ledgerRows: [
+        L({ id: 1, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
+        L({ id: 2, op: 'unlock_socket', copper_delta: -2000000, purchased_slots_after: 0 }),
+        L({ id: 3, op: 'unlock_socket', copper_delta: -3500000, purchased_slots_after: 0 }),
+        L({ id: 4, op: 'unlock_socket', copper_delta: -5000000, purchased_slots_after: 0 }),
+      ],
+      characters: [{ id: 1, realm: 'Claudemoon', state }],
+    });
+    expect(retired).toEqual([]);
+    const mixed = auditBank({
+      ledgerRows: [
+        L({ id: 1, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
+        L({ id: 2, op: 'unlock_socket', copper_delta: -2000000, purchased_slots_after: 0 }),
+        L({ id: 3, op: 'unlock_socket', copper_delta: -1250000, purchased_slots_after: 0 }),
+        L({ id: 4, op: 'unlock_socket', copper_delta: -1500000, purchased_slots_after: 0 }),
+      ],
+      characters: [{ id: 1, realm: 'Claudemoon', state }],
+    });
+    expect(mixed).toEqual([]);
+    // A retired price is honest only at ITS position: the retired unlock-3
+    // price charged for unlock 1 still reds.
+    const misplaced = auditBank({
+      ledgerRows: [
+        L({ id: 1, op: 'unlock_socket', copper_delta: -3500000, purchased_slots_after: 0 }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [], purchasedSlots: 0, unlockedSockets: 1 } },
+        },
+      ],
+    });
+    expect(findingKindsFor(misplaced, 1)).toEqual(['bad_socket_price']);
   });
 
   it('flags socket state no ledger row explains (the birth-complete direction)', () => {

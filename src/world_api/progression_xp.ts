@@ -95,6 +95,11 @@ export interface IWorldProgressionXp {
   unlockedMilestones: string[];
   // Classic Rested XP pool (inn-rested kill-XP bonus); 0 when not rested.
   restedXp: number;
+  // True while the player stands in a rest area (an inn, the Mirefen tavern, the
+  // harbormaster's house) out of combat: the classic "Resting" state that fills the
+  // rested pool (src/sim/progression/xp.ts isResting). Both worlds derive it from the
+  // player's own position and combat flag, so it needs no wire field.
+  readonly resting: boolean;
   // Lifetime played time in seconds for the SELF character (the same running
   // total the /playtime chat command reports and the save persists). The
   // offline Sim derives it live from the sim clock; the online ClientWorld

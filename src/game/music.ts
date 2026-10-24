@@ -1,6 +1,5 @@
 // The adventure soundtrack, in two halves. The composition half is unchanged:
-// every theme is still authored as note data (per-place leitmotifs, layered
-// ostinati, multi-section forms) played by the MusicSynth voices, and that
+// themes remain note data (leitmotifs, ostinati, forms) played by MusicSynth; that
 // machinery keeps powering the music editor (music_editor.html) and the
 // offline render pipeline (scripts/render_music.mjs). The runtime half no
 // longer synthesizes: the shipped game streams the remastered mp3 renders of
@@ -10,6 +9,8 @@
 // download. Each fight opens on one of the two battle themes at random.
 
 import { resumeWhenAllowed } from './audio_unlock';
+import { BossLoopTrack, DEFAULT_BOSS_TRACK_URL } from './boss_music_loop';
+import { bossPcmPrefetchAllowed } from './boss_music_residency';
 import { CRUCIBLE_STREAM_URLS, type CrucibleFloor } from './crucible_music';
 import { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
 import { minigameLayerFor } from './minigame_music_layer';
@@ -27,8 +28,10 @@ import {
   triad,
 } from './music_notes';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
+import { closeMusicDirector } from './music_teardown';
 import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
-import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
+import { COMBAT_STREAM_URLS, pickCombatTrackIndex } from './music_tracks';
+import { applyZoneStreamTargets } from './music_zone_streams';
 import type { MusicZone } from './music_zones';
 
 export type { NoteEvent, Phrase, Theme } from './music_notes';
@@ -39,6 +42,7 @@ import { buildIgnivarRaidThemes } from './raid_music_themes';
 export type { MusicZone } from './music_zones';
 export {
   dungeonMusicZoneForDungeon,
+  MUSIC_ZONES,
   musicZoneForLocation,
   riftMusicZoneForTheme,
   shouldResetMusicForDungeonEntry,
@@ -4291,10 +4295,7 @@ export class MusicDirector {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private bossGain: GainNode | null = null;
-  private bossBuffer: AudioBuffer | null = null;
-  private bossSource: AudioBufferSourceNode | null = null;
-  private bossElement: HTMLAudioElement | null = null;
-  private bossLoading = false;
+  private readonly bossLoop = new BossLoopTrack();
   private zoneStreams: Partial<Record<MusicZone, StreamTrack>> = {};
   private combatStreams: StreamTrack[] = [];
   private crucibleStreams: Partial<Record<CrucibleFloor, StreamTrack>> = {};
@@ -4316,6 +4317,8 @@ export class MusicDirector {
   // Boss-fight override: a looped file track routed through the same AudioContext
   // that user gestures already unlock for the procedural soundtrack.
   private bossActive = false;
+  /** The stream-keeper interval handle, so close() can clear it. */
+  private timer: number | undefined;
 
   get enabled(): boolean {
     return this._enabled;
@@ -4341,13 +4344,14 @@ export class MusicDirector {
 
   /** Engage/disengage the dedicated boss-fight loop. Idempotent; called every
    *  frame by the HUD. Ducks the procedural score while active. */
-  setBossCombat(on: boolean): void {
+  setBossCombat(on: boolean, url = DEFAULT_BOSS_TRACK_URL): void {
+    this.bossLoop.retarget(url, on && !this.bossActive ? this.allStreams() : null);
     if (on === this.bossActive) {
       if (on) this.applyBossPlayback();
       return;
     }
     this.bossActive = on;
-    if (on) this.ensureBossBuffer();
+    if (on && bossPcmPrefetchAllowed()) this.ensureBossBuffer();
     if (!on) this.stopBossSource();
     this.applyBossPlayback();
     if (this.ctx && this.master)
@@ -4372,15 +4376,8 @@ export class MusicDirector {
         /* browser may reject seeking before metadata */
       }
     }
-    if (this.bossElement) {
-      try {
-        this.bossElement.currentTime = 0;
-      } catch {
-        /* browser may reject seeking before metadata */
-      }
-    }
+    this.bossLoop.rewind();
     minigameLayerFor(this).rewind();
-    this.stopBossSource();
   }
 
   private applyBossPlayback(): void {
@@ -4389,7 +4386,7 @@ export class MusicDirector {
     this.bossGain.gain.setTargetAtTime(target, this.ctx.currentTime, target > 0 ? 0.25 : 0.12);
     if (target > 0) {
       resumeWhenAllowed(this.ctx);
-      const element = this.ensureBossElement();
+      const element = this.bossLoop.element();
       if (element) {
         element.volume = target;
         void element.play().catch(() => {
@@ -4402,58 +4399,21 @@ export class MusicDirector {
         this.startBossSource();
       }
     } else {
-      if (this.bossElement) this.bossElement.pause();
+      this.bossLoop.pause();
       this.stopBossSource();
     }
   }
 
-  private ensureBossElement(): HTMLAudioElement | null {
-    if (this.bossElement) return this.bossElement;
-    if (typeof Audio !== 'function') return null;
-    const el = new Audio('/audio/dungeon-boss-fight.mp3');
-    el.loop = true;
-    el.preload = 'auto';
-    this.bossElement = el;
-    return el;
-  }
-
   private ensureBossBuffer(): void {
-    const ctx = this.ctx;
-    if (!ctx || this.bossBuffer || this.bossLoading || typeof fetch !== 'function') return;
-    this.bossLoading = true;
-    void fetch('/audio/dungeon-boss-fight.mp3')
-      .then((res) => res.arrayBuffer())
-      .then((bytes) => ctx.decodeAudioData(bytes))
-      .then((buffer) => {
-        this.bossBuffer = buffer;
-        this.bossLoading = false;
-        this.applyBossPlayback();
-      })
-      .catch(() => {
-        this.bossLoading = false;
-      });
+    if (this.ctx) this.bossLoop.loadBuffer(this.ctx, () => this.applyBossPlayback());
   }
 
   private startBossSource(): void {
-    const ctx = this.ctx;
-    if (!ctx || !this.bossGain || !this.bossBuffer || this.bossSource) return;
-    const src = ctx.createBufferSource();
-    src.buffer = this.bossBuffer;
-    src.loop = true;
-    src.connect(this.bossGain);
-    src.start();
-    this.bossSource = src;
+    if (this.ctx && this.bossGain) this.bossLoop.startSource(this.ctx, this.bossGain);
   }
 
   private stopBossSource(): void {
-    if (!this.bossSource) return;
-    try {
-      this.bossSource.stop();
-    } catch {
-      /* already stopped */
-    }
-    this.bossSource.disconnect();
-    this.bossSource = null;
+    this.bossLoop.stopSource();
   }
 
   /** Set music volume (0..1). Safe before init(); applied to the master gain. */
@@ -4502,7 +4462,7 @@ export class MusicDirector {
       const stream = this.makeStream(url);
       if (stream) this.combatStreams.push(stream);
     }
-    window.setInterval(() => this.streamKeeper(), STREAM_KEEPER_MS);
+    this.timer = window.setInterval(() => this.streamKeeper(), STREAM_KEEPER_MS);
     this.streamKeeper();
   }
 
@@ -4532,14 +4492,6 @@ export class MusicDirector {
       el.muted = true;
     }
     stream.el = el;
-  }
-
-  private ensureZoneStream(zone: MusicZone): void {
-    if (this.zoneStreams[zone]) return;
-    const url = ZONE_STREAM_URLS[zone];
-    if (!url) return;
-    const stream = this.makeStream(url);
-    if (stream) this.zoneStreams[zone] = stream;
   }
 
   /** Each floor owns its whole soundtrack, including pulls and quiet gaps. */
@@ -4640,6 +4592,11 @@ export class MusicDirector {
     if (on) this.streamKeeper();
   }
 
+  /** Tear the director down for a page that is going away (music_teardown.ts). */
+  close(): void {
+    closeMusicDirector(this);
+  }
+
   /** Fade out while the game menu is open; does not change the music toggle. */
   pauseForMenu(): void {
     if (this._menuPaused) return;
@@ -4673,19 +4630,11 @@ export class MusicDirector {
     if (zone === this.zone && combat === this.combat && crucibleFloor === this.crucibleFloor)
       return;
     const combatStarting = combat && !this.combat;
+    const zoneChanging = zone !== this.zone;
     this.setCrucibleFloor(crucibleFloor);
     this.zone = zone;
     this.combat = combat;
     if (minigameLayerFor(this).active !== null) return;
-    // Combat music replaces the zone theme rather than layering over it: the
-    // zone is silenced for the duration of combat and fades back in when it
-    // ends. Fade out faster than fade in so instance music does not bleed
-    // into the world.
-    if (!combat && crucibleFloor === null) this.ensureZoneStream(zone);
-    for (const [name, stream] of Object.entries(this.zoneStreams) as [MusicZone, StreamTrack][]) {
-      const target = name === zone && !combat && crucibleFloor === null ? 1 : 0;
-      this.setStreamTarget(stream, target, target > 0 ? FADE_SECONDS / 3 : 0.35);
-    }
     // Each fight opens on one of the battle themes, chosen at random per
     // fight and restarted from the top so the opening hit lands; the pick
     // then holds for the whole fight, even across a zone border mid-chase.
@@ -4703,14 +4652,8 @@ export class MusicDirector {
         }
       }
     }
-    this.combatStreams.forEach((stream, idx) => {
-      const target = combat && idx === this.combatIdx ? 1 : 0;
-      this.setStreamTarget(
-        stream,
-        target,
-        target > 0 || crucibleFloor !== null ? 0.35 : FADE_SECONDS / 3,
-      );
-    });
+    // Combat replaces the zone theme (music_zone_streams.ts).
+    applyZoneStreamTargets(this, zoneChanging, FADE_SECONDS / 3);
   }
 }
 

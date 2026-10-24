@@ -98,6 +98,8 @@ function makeRig(): Rig {
   const style = stack.style;
   const rawSet = style.setProperty.bind(style);
   const rawRemove = style.removeProperty.bind(style);
+  // happy-dom's CSS declaration proxy routes style.top assignments through
+  // setProperty. Observe that public method without redefining CSS properties.
   style.setProperty = (name, value, priority) => {
     if (name === 'top') writes.push(String(value));
     rawSet(name, value, priority ?? undefined);
@@ -106,15 +108,6 @@ function makeRig(): Rig {
     if (name === 'top') writes.push('');
     return rawRemove(name);
   };
-  // happy-dom routes `style.top = x` through the property setter, not
-  // setProperty, so mirror the applier's writes by defining the property.
-  Object.defineProperty(style, 'top', {
-    get: () => style.getPropertyValue('top'),
-    set: (value: string) => {
-      writes.push(value);
-      rawSet('top', value);
-    },
-  });
   const anchor = new TrackerStackAnchor({
     stack: () => stack,
     minimapWrap: () => wrap,

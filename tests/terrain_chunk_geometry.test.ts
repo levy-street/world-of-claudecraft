@@ -403,7 +403,31 @@ describe('generated chunk geometry is stable', () => {
     // freight yard's five new crate spots each carry a ground-object calm pad.
     // Checked against the dense height atlas re-minted in the same commit: 9
     // points move, all within 5.4 yd of a new crate. Measured on the merged tree.
-    expect(digestOf(inRect)).toBe('d74e213f712eedd077e835eaf282b7bd');
+    // Re-minted for the painted Tidehold town (the Studio rebuild map's six
+    // buildings in the built-in world): six level pads under the buildings
+    // (zone1.ts EASTBROOK_BUILDING_PAD_TERRAIN_EDITS), the retired KayKit
+    // smithy's decor-prop calm pad leaving the civic green, and the moved town
+    // NPCs' calm pads. The quay and the coastline are pinned unchanged by
+    // tests/eastbrook_placed_buildings.test.ts (the quay to the bit, no ground
+    // crossing the sea surface). Computed twice in separate processes.
+    // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
+    // same town plus the Genshin Impact terrain palette, meadow splat, beach
+    // sand strand, road verge, non-directional cliff stone mottling, and Low-tier
+    // baked canopy and building contact shadows.
+    // Re-minted for Wayfarer Bryn standing by the docks spawn again: her calm
+    // pad reshapes the ground around (-79, -52), about twenty points of the
+    // dense height atlas (tests/terrain_height_parity.test.ts, re-minted with it).
+    // Re-minted after aligning BIOME_PALETTE.marsh with Eastbrook's vale meadow
+    // palette (which blends across the z = 150..215 northern border strip).
+    // Re-minted for the six Stolen Supply Crates moving off the eastern
+    // hillside into the bandit camps: their ground-object calm pads leave the
+    // slope. Checked against the dense height atlas re-minted in the same
+    // commit: 13 points move, all within 17 yd of an old crate spot, by at
+    // most 2.7 yd. Measured on the merged tree, twice in separate processes.
+    // Re-minted for the freight yard and ferry bell moving to the quay. The
+    // dense height atlas changes at 74 of 167,188 samples, all within 5.93 yd
+    // of an old or new object position (maximum height delta 2.84 yd).
+    expect(digestOf(inRect)).toBe('3d621f9335e944b43575c00e60652941');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

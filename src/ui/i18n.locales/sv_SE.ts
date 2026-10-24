@@ -2,58 +2,157 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
-  'footer.guideBest': 'Bästa MMORPG:er',
-  'footer.guideBrowser': 'Webbläsar-MMORPG:er',
-  'footer.guideFree': 'Gratis MMORPG:er',
-  'footer.guideGamesLikeDiablo': 'Spel som Diablo',
-  'footer.guideGamesLikeWow': 'Spel som WoW',
-  'footer.guideNew': 'Nya MMORPG:er',
-  'footer.guidesLabel': 'Spelarguider',
-  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} PvP-vinster',
-  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} PvP-vinst',
-  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Ta {count} PvP-vinster',
-  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Ta {count} PvP-vinst',
-  'guide.footer.guideBest': 'Bästa MMORPG:er',
-  'guide.footer.guideBrowser': 'Webbläsar-MMORPG:er',
-  'guide.footer.guideFree': 'Gratis MMORPG:er',
-  'guide.footer.guideGamesLikeDiablo': 'Spel som Diablo',
-  'guide.footer.guideGamesLikeWow': 'Spel som WoW',
-  'guide.footer.guideNew': 'Nya MMORPG:er',
-  'guide.footer.guidesLabel': 'Spelarguider',
-  'guide.worldPvpPage.hillBodyRanked':
-    'Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Var femte minut medan berget står hör riket dess plats och grupperna rangordnade efter hur länge de har hållit det. När berget faller, om gruppen som höll det längst höll det i minst tio minuter totalt, får varje spelare som stod innanför i minst en minut för den gruppen, och fortfarande är i den, en vinst till Det veckovisa valvets PvP-rad. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.',
-  'hudChrome.death.pvpResurrect': 'PvP Återupplivning',
-  'hudChrome.death.pvpResurrectTitle':
-    'Återuppstå vid närmaste kyrkogård med full hälsa, utan ny Väktartull.',
-  'hudChrome.hill.callout.dominating': '{name} dominerar!',
-  'hudChrome.hill.callout.godlike': '{name} är gudalik!',
-  'hudChrome.hill.callout.killingSpree': '{name} är på en mördarspree!',
-  'hudChrome.hill.callout.legendary': '{name} är legendarisk!',
-  'hudChrome.hill.callout.rampage': '{name} härjar!',
-  'hudChrome.hill.callout.shutDown': '{killer} har stoppat {victim}!',
-  'hudChrome.hill.callout.unstoppable': '{name} är omöjlig att stoppa!',
-  'hudChrome.nameplate.bountyTag': 'Belöning {honor}',
-  'hudChrome.social.presence.everyone': 'Alla',
-  'hudChrome.social.presence.friends': 'Endast vänner',
-  'hudChrome.social.presence.label': 'Visa mig online för',
-  'hudChrome.social.presence.none': 'Ingen',
-  'hudChrome.social.presence.title':
-    'Vem som ser dig online i vännernas listor och gildsamlandet, med din zon och kartposition. Ditt lag ser alltid dig.',
-  'hudChrome.warfareShop.buyConfirmBodyGold':
-    'Köp {item} för {price}? Detta köp kan inte återbetalas.',
-  'itemUi.tooltip.warfareMainHandOnly': 'Krigföring räknas endast i huvudhanden.',
-  'entities.items.vanguard_band_of_focus.name': 'Förtruppens ring av fokus',
-  'entities.items.vanguard_band_of_mending.name': 'Förtruppens ring av läkning',
-  'entities.items.vanguard_band_of_might.name': 'Förtruppens ring av kraft',
-  'entities.items.vanguard_band_of_precision.name': 'Förtruppens ring av precision',
-  'entities.items.vanguard_pendant_of_focus.name': 'Förtruppens hänge av fokus',
-  'entities.items.vanguard_pendant_of_mending.name': 'Förtruppens hänge av läkning',
-  'entities.items.vanguard_pendant_of_might.name': 'Förtruppens hänge av kraft',
-  'entities.items.vanguard_pendant_of_precision.name': 'Förtruppens hänge av precision',
-  'guide.arenaPage.vanguardStatsBody':
-    'Till skillnad från den ursprungliga nivån bär Förtruppsutrustning även stridsvärden: varje förtruppspans rustning, vapen och halsband har antingen Kritvärde eller Snabbhetsvärde, och spellcaster- och läkardelarna lägger till Besvärjelsekraft eller Läkningskraft. Förtruppens ringar och halsband säljs vid sidan av vapnen, och alla klasser kan bära dem. Två av Förtruppens närkampingsringar ger exakt det Träffvärde som tar bort baschansen för att dina attacker missar en spelare på din egen nivå, och två spellcaster-ringar gör samma för dina besvärjelser att bli motverkade. Autoattacker medan dual-wielding behåller sin extra misschans. Läkarringen bär Snabbhetsvärde istället.',
-  'guide.commandsPage.presence':
-    'Vem som ser dig online i vännernas listor, ditt gildsamlande och /who: /presence everyone (förval), /presence friends (endast spelare på din vännerlista) eller /presence none. Dold ser de ingen online-prick, zon eller kartposition för dig, dock når vissningar och inbjudningar dig ändå; ditt lag ser alltid dig. En enkel /presence talar om för dig vilken som är inställd.',
+  'auth.wocBuilder.cat.eyeColor': 'Ögonfärg',
+  'auth.wocBuilder.cat.hairColor': 'Hårfärg',
+  'auth.wocBuilder.cat.skinTone': 'Hudton',
+  'auth.wocBuilder.section.eyes': 'Ögonform',
+  'auth.wocBuilder.slider.eyeSize': 'Ögonstorlek',
+  'hud.social.friendNextPage': 'Nästa sida',
+  'hudChrome.adventureGuide.delves': 'Delver',
+  'hudChrome.adventureGuide.lootSpec': 'Specialisering',
+  'hudChrome.adventureGuide.raids': 'Räder',
+  'hudChrome.bank.accountBagsEmpty': 'Dina väskor är tomma.',
+  'hudChrome.bank.accountRetry': 'Försök igen',
+  'hudChrome.buddyMenu.cancel': 'Avbryt',
+  'hudChrome.collections.actions.remove': 'Ta bort',
+  'hudChrome.collections.actions.summon': 'Frammana',
+  'hudChrome.collections.actions.wear': 'Bär',
+  'hudChrome.collections.armor.cloth': 'Tyg',
+  'hudChrome.collections.armor.leather': 'Läder',
+  'hudChrome.collections.detail.honorPrice': '{amount} Heder',
+  'hudChrome.collections.petKind.beast': 'Bestar',
+  'hudChrome.collections.petKind.elemental': 'Elementarer',
+  'hudChrome.collections.petKind.humanoid': 'Humanoider',
+  'hudChrome.collections.petKind.undead': 'Odöda',
+  'hudChrome.collections.stat.agility': 'Smidighet',
+  'hudChrome.collections.stat.intellect': 'Intellekt',
+  'hudChrome.collections.tabs.mounts': 'Riddjur',
+  'hudChrome.courier.empty': 'Inga föremål',
+  'hudChrome.courier.inventory': 'Inventarium',
+  'hudChrome.expeditions.cancel': 'Avbryt',
+  'hudChrome.expeditions.close': 'Stäng',
+  'hudChrome.expeditions.equip': 'Utrusta',
+  'hudChrome.expeditions.equipped': 'Utrustad',
+  'hudChrome.expeditions.level': 'Nivå {level}',
+  'hudChrome.expeditions.rewards': 'Belöningar',
+  'hudChrome.finder.cancelCreate': 'Avbryt',
+  'hudChrome.finder.difficultyHeading': 'Svårighetsgrad',
+  'hudChrome.finder.filterRaids': 'Räder',
+  'hudChrome.finder.inspectApplicantAria': 'Inspektera {name}',
+  'hudChrome.guildHall.buy': 'Köp',
+  'hudChrome.raidBossGuide.damageRange': '{min} till {max}',
+  'hudChrome.raidBossGuide.finderOpen': 'Bossguide',
+  'hudChrome.raidBossGuide.rankFinal': 'Slutboss',
+  'hudChrome.trinkets.range': '{min} till {max}',
+  'editor.appearance.opacity': 'Opacitet',
+  'editor.assets.subcategory.players': 'Spelare',
+  'editor.assets.subcategory.props': 'Rekvisita',
+  'editor.biome.galleryLockIn': 'Lås in',
+  'editor.buildMode.redo': 'Gör om',
+  'editor.buildMode.undo': 'Ångra',
+  'editor.camera.title': 'Kamera',
+  'editor.camp.levelMin': 'Lägsta nivå',
+  'editor.city.roadCancel': 'Avbryt',
+  'editor.city.wallCancel': 'Avbryt',
+  'editor.collisionMaster.addMenu': 'Lägg till',
+  'editor.collisionMaster.lockIn': 'Lås in',
+  'editor.collisionMaster.sculptRadius': 'Radie',
+  'editor.decalTool.opacity': 'Opacitet',
+  'editor.dungeon.expand': 'Expandera',
+  'editor.dungeon.field.r': 'Kollisionsradie',
+  'editor.dungeon.field.scale': 'Skala',
+  'editor.entityTool.categoryCreature': 'Varelser',
+  'editor.entityTool.categoryHumanoid': 'Humanoider',
+  'editor.entityTool.categoryNpc': 'NPC:er',
+  'editor.fire.smoke': 'Rök',
+  'editor.fluid.dps': 'Skada per sekund',
+  'editor.fluid.fxSmoke': 'Rök',
+  'editor.inspector.cameraTab': 'Kamera',
+  'editor.inspector.toolTab': 'Verktyg',
+  'editor.lightTool.color': 'Färg',
+  'editor.map.close': 'Stäng',
+  'editor.map.worldTitle': 'Världskarta',
+  'editor.map.zoneTitle': 'Zonkarta',
+  'editor.materials.title': 'Material',
+  'editor.mobTool.patrolCancel': 'Avbryt',
+  'editor.mobTool.statArmor': 'Rustning',
+  'editor.mobTool.statHealth': 'Hälsa',
+  'editor.mobTool.statScale': 'Storlek',
+  'editor.music.title': 'Musik',
+  'editor.newMap.create': 'Skapa',
+  'editor.objectMove.size': 'Storlek',
+  'editor.picking.close': 'Stäng',
+  'editor.picking.next': 'Nästa',
+  'editor.picking.previous': 'Föregående',
+  'editor.push.close': 'Stäng',
+  'editor.quickActions.move': 'Rör dig',
+  'editor.quickActions.remove': 'Ta bort',
+  'editor.rock.size': 'Storlek',
+  'editor.settings.close': 'Stäng',
+  'editor.settings.title': 'Inställningar',
+  'editor.tool.move': 'Rör dig',
+  'editor.tool.music': 'Musik',
+  'editor.tool.scale': 'Skala',
+  'editor.tool.zone': 'Zon',
+  'editor.topbar.mapWindow': 'Karta',
+  'editor.topbar.minimap': 'Minikarta',
+  'editor.topbar.more': 'Mer',
+  'editor.topbar.music': 'Musik',
+  'editor.topbar.preview': 'Förhandsvisning',
+  'editor.topbar.settings': 'Inställningar',
+  'editor.tree.leafSize': 'Storlek',
+  'editor.tree.removeVolume': 'Ta bort',
+  'editor.tree.studioDiscard': 'Kasta',
+  'editor.tree.volumeR': 'Radie',
+  'editor.tunnel.ghostCancel': 'Avbryt',
+  'editor.tunnel.holeRadius': 'Radie',
+  'editor.worldLink.cancel': 'Avbryt',
+  'editor.worldLink.unlink': 'Avlänka',
+  'referralCards.cancel': 'Avbryt',
+  'referralCards.earned': 'Fullbordade',
+  'hudChrome.specPanel.specBonus': 'Specialiseringsbonus',
+  'hudChrome.specPanel.healing': 'läkning',
+  'hudChrome.specPanel.absorption': 'skadeabsorption',
+  'hudChrome.specPanel.physicalAbilityDamage': 'skada från närstrids- och avståndsförmågor',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Ökar den primära läkningen med {pct} efter övriga läkningsbonusar.',
+  'hud.pet.assist': 'Assistans',
+  'hud.pet.assistDesc':
+    'Angriper bara ditt nuvarande mål när du har använt en förmåga på det. Ignorerar fiender som angriper dig.',
+  'hudChrome.cooldownManager.auraActive': 'Aktiv',
+  'hudChrome.cooldownManager.auraMissing': 'Saknas',
+  'hudChrome.cooldownManager.auraShowWhen': 'Visa knappen när auran är',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Lys upp när auran saknas',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Om ingen plats är markerad visas gruppen aldrig och spelar inga ljud.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Om ingen av rutorna är markerad visas knappen aldrig, men dess ljud spelas ändå.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Inte redo betyder på nedkylning eller att förmågan inte kan användas just nu.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instanser omfattar fängelsehålor, räder, delves, revor, slagfält, arenan och alla andra instansindelade områden. Utanför de markerade platserna är gruppen dold och tyst.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Lyser upp knappen, framhäver dess kant och får den att pulsera medan auran saknas.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Förstärkningspåminnelse: knappen lyser när denna aura saknas och döljs så snart du har den.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Spelas när auran upphör.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Visa knappen när',
+  'hudChrome.cooldownManager.showIn': 'Visa i',
+  'hudChrome.cooldownManager.showInInstances': 'Instansområden',
+  'hudChrome.cooldownManager.showInWorld': 'Öppen värld',
+  'hudChrome.cooldownManager.showNotReady': 'Inte redo',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Utanför strid',
+  'hudChrome.cooldownManager.showReady': 'Redo',
+  'hudChrome.cooldownManager.showWhile': 'Visa under',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yard',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Pil vid skärmkanten utanför kameravyn',
+  'hudChrome.options.enemyHighlightNameplate': 'Stor inramad namnskylt för målet',
+  'hudChrome.options.enemyHighlightOverhead': 'Svävande markör ovanför huvudet',
+  'hudChrome.options.enemyHighlightReticle': 'Kraftigare fientligt hårkors',
+  'hudChrome.options.enemyHighlightStyle': 'Stil för fiendemarkering',
+  'hudChrome.options.nameplateCooldownScale': 'Storlek på offensiv/defensiv bevakning',
+  'hudChrome.options.showNameplateCooldowns': 'Offensiv/defensiv bevakning',
+  'hud.pet.stanceDesc': 'Klicka för att välja passiv, defensiv, aggressiv eller assistans.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Dykning',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Störtdykning',
@@ -101,8 +200,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Användning: Förstärker din bröstrustning, ökar rustning med 12 för 1 timme.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Användning: Plantera Vigda gryningens stridsfana för 5 minuter, ökar markant hälso- och manaregerering utanför strid för alla närliggande allierade. Att stanna nära den i 10 sekunder ger också Gryningens välsignelse (+5% till alla stats för 30 min). (5 min väntetid)',
-  'hudChrome.factionRewards.hub_automatons': 'Sydlig räckvidd (AutomatsmidjaN)',
+    'Användning: placerar Vigda gryningens stridsfana i 5 min. Spelare utanför strid inom 15 yards återhämtar 10% mer hälsa, och manaanvändare återfår dessutom mana motsvarande 5% av sin Ande varannan sek. Stanna nära i 10 sek. för att få Gryningens välsignelse, som ökar Styrka, Smidighet, Uthållighet, Intellekt och Ande med 5% i 30 min. (5 min. nedkylning)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automater)',
   'hudChrome.factionRewards.hub_church_order': 'Östbäcksdalen (Kyrkoorden)',
   'hudChrome.factionRewards.hub_none': 'Ingen (använd nära en fraktionsnav för att ställa in)',
   'hudChrome.factionRewards.hub_rift_watch': 'Driftvik (Riftvakten)',
@@ -449,6 +548,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Sök efter lagersmaterial efter namn',
   'hudChrome.bank.vaultSearchNoMatch': 'Inget material i ditt lager matchar din sökning.',
   'hudChrome.charSheet.ratings': 'Betyg',
+  'hudChrome.charSheet.gearScore': 'Utrustningspoäng',
   'hudChrome.charSheet.spell': 'Trollformel',
   'hudChrome.charSidebar.character': 'Karaktär',
   'hudChrome.charSidebar.currencies': 'Valutor',
@@ -509,8 +609,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Lägg denna trollformel i en grupp för att visa dess knapp.',
   'hudChrome.cooldownManager.notKnown': '{spell} (inte känd än)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Visa endast när klar',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Visa endast medan aktiv',
   'hudChrome.cooldownManager.opacity': 'Opacitet',
   'hudChrome.cooldownManager.orientation': 'Orientering',
   'hudChrome.cooldownManager.otherSpells': 'Andra trollformler',
@@ -534,12 +632,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Dra en trollformel på en grupp, eller välj den för att välja dess grupp och varningar. En knapp följer sin trollformel även om du byter specialisering eller nivå.',
   'hudChrome.cooldownManager.trackedTitle': 'Spårade trollformler',
   'hudChrome.cooldownManager.vertical': 'Vertikal',
-  'hudChrome.cooldownManager.visAlways': 'Alltid synlig',
   'hudChrome.cooldownManager.visCombat': 'I strid',
-  'hudChrome.cooldownManager.visHidden': 'Dold',
   'hudChrome.cooldownManager.visHiddenHint':
     'En dold grupp spelar fortfarande ljud och tänder upp på ditt handlingsfält.',
-  'hudChrome.cooldownManager.visibility': 'Synlighet',
   'hudChrome.crafting.mobileStationTitle': '{name}:s {station}',
   'hudChrome.currencies.activities': 'Aktiviteter',
   'hudChrome.currencies.delveMark': 'Delve-märke',
@@ -548,7 +643,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fraktioner',
   'hudChrome.currencies.heroicMarkNote': 'Heroiska dungeons . spenderas på heroisk kvartermästare',
   'hudChrome.currencies.honor': 'Heder',
-  'hudChrome.currencies.honorNote': 'Slagfält och arena',
+  'hudChrome.currencies.honorNote': 'Slagfält, arena och världsuppdrag',
   'hudChrome.currencies.intro':
     'Ingen av dessa tar upp väskeutrymme. Mynt stannar i din väska som vanligt.',
   'hudChrome.currencies.lifetime': 'Livstid {amount}',
@@ -577,7 +672,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Märker permanent ett tvåhandsvapen med 12 styrka och 25 kritiska slag. Kan inte tillämpas på ett enhandsväpen. En platt bonus; den skalas inte.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Dina landade närstridattacker kan ge 60 smidighet och 2% snabbare närstridattacker i 15 sekunder. Varje träff rullar 1% per 0,6 sekunder av vapnets basvapenhastighet. Ingen intern cooldown. Båda händerna delar en buff; vilken trigger som helst förnyar den, och den staplas aldrig. Distansattacker löser inte denna effekt. Kattform använder istället dess 1 sekunds basvapenhastighet.',
+    'Dina närstridsattacker som träffar kan ge 60 Smidighet och 2% snabbare närstridsattacker i 15 sek. Varje träff har 1% chans per 0,6 sek. av det träffande vapnets grundhastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den kan inte staplas. Avståndsattacker utlöser inte effekten. I Kattform använder automatiska attacker tassarnas hastighet på 1 sek. Slag och avslutare i Kattform och Bruinform använder vapnets egen hastighet; Svepande klor gör en chanskontroll per användning, inte per mål.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Vapen Etching: Gryningeld',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Vapen Etching: Gryningens välsignelse',
   'hudChrome.enchantName.enchant_weapon_piston_drive': 'Vapen Etching: Kolvdrift',
@@ -1132,7 +1227,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Du får också:',
   'hudChrome.weekly.anyDifficulty': 'Vilken svårighetsgrad som helst',
   'hudChrome.weekly.cacheDesc':
-    'Öppnas till en Normal raidkläder för din klass (aldrig en setkläder), plus {count} x {item}.',
+    'Öppnas till ett Normalt raidplagg för din klass (aldrig ett setplagg från Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Välj uppdrag',
   'hudChrome.weekly.chosen': 'Veckouppdrag taget: {category}',
   'hudChrome.weekly.close': 'Stäng veckoupdrag',
@@ -1251,6 +1346,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Sällsynt',
   'hudChrome.weeklyRewards.readyDescription':
     'En slutförd vecka av belöningar väntar. Öppna dina intjänade valv, välj sedan ett föremål att hävda.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Belöningar väntar. Besök Valvförvaltaren i Eastbrook för att öppna och hämta dem.',
   'hudChrome.weeklyRewards.readyTitle': 'Dina veckovisa belöningar är klara',
   'hudChrome.weeklyRewards.readyWeeks':
     'Oinsamlade veckor: {count}. Hävda den äldsta slutförda veckan först.',
@@ -1307,21 +1404,24 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.confirmCancel': 'Avbryt',
   'hudChrome.worldPvp.disable': 'Inaktivera världskamp',
   'hudChrome.worldPvp.disarmLine':
-    'Det tar {minutes} minuter att stänga av flaggan, och det väntar tills du lämnar den aktiva kullen och striden är över.',
+    'Att slå av tar {minutes} minuter och väntar på att kampen slutar.',
   'hudChrome.worldPvp.enable': 'Aktivera världskamp',
   'hudChrome.worldPvp.greyLine': 'Spelare mer än {levels} nivåer under dig betalar ingenting.',
   'hudChrome.worldPvp.groundContested':
     'Överallt annars är omstritt: endast två flaggade spelare kan slåss.',
   'hudChrome.worldPvp.groundFfa':
-    'Drakländerna, Frostslöjans vidder och Bärnstensfallet använder vanliga PvP-flaggor. Din flagga aktiveras när du går in i en aktiv cirkel i Kullens kung.',
+    'Draklandet, Frostslöjans räckvidd och Glödskogen är free-for-all: alla där kan slåss, flaggade eller inte.',
+  'hudChrome.worldPvp.groundSanctuary':
+    'Provstranden och Östbrooks dal är helgedomar: ingen världskamp alls.',
   'hudChrome.worldPvp.groupLine':
     'Grupp- och raidmedlemmar är aldrig fientliga mot varandra. Gildekamrater utanför din grupp kan slåss.',
   'hudChrome.worldPvp.honorLine': '{honor} Heder per seger, delad mellan alla som hjälpte.',
   'hudChrome.worldPvp.keepUp': 'Håll flaggan uppe',
   'hudChrome.worldPvp.levelReq': 'Kräver nivå {level}.',
   'hudChrome.worldPvp.markLine':
-    'Världs-PvP aktiveras när du går in i en aktiv kullcirkel. Din flagga förblir aktiv när du lämnar cirkeln.',
-  'hudChrome.worldPvp.noStakeLine': 'Oflaggade spelare kan inte angripas i den öppna världen.',
+    'Att attackera en ej flaggad spelare där höjer din egen flagga; att attackera en flaggad gör det aldrig.',
+  'hudChrome.worldPvp.noStakeLine':
+    'En ej flaggad spelare som dödas på free-for-all marken förlorar inget guld.',
   'hudChrome.worldPvp.noTakeLine':
     'En ej flaggad fighter tar inget guld heller: det flyttas bara mellan två flaggade spelare.',
   'hudChrome.worldPvp.pending': 'Väntar på din PvP-status från riket.',
@@ -1689,6 +1789,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Söt seger',
   'questUi.worldQuest.matchConfections': 'Matcha förtrollad godis',
   'questUi.worldQuest.mineOre': 'Bryta kopparmalm',
+  'questUi.worldQuest.mineMaterial': 'Bryt {name}',
   'questUi.worldQuest.practiceRewards':
     'Träning: spela igen utan att tjäna mer mynt, erfarenhet eller rykte.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristaller nådd: {count}',
@@ -1899,78 +2000,85 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tillkännage en kulle nu; den reser efter den fullständiga varningen.',
   'devCommand.actions.hillwarn.label': 'Kullnedräkning',
   'entities.abilities.lava_burst.description':
-    'Orsakar {damage} eldskada. Träffar alltid kritiskt ett mål som brinner av din Glödstöt. Magma Surge: varje Glödstöt-tick har 20% chans att återställa denna nedräkning och göra din nästa Magma Burst inom 10 sec omedelbar. Skada ökar med Spellkraft. (Thundercall)',
-  'entities.abilities.lava_burst.name': 'Magma Burst',
+    'Orsakar {damage} eldskada. En träff ger 1 Åska. Träffar alltid kritiskt ett mål som brinner av din Glödstöt. En kritisk träff gör ytterligare 24% av den normala skadan. Magma Surge: varje Glödstöt-tick har 20% chans att återställa denna nedräkning och göra din nästa Magmautbrott inom 10 sec omedelbar. Skada ökar med Spellkraft. (Thundercall)',
+  'entities.abilities.lava_burst.name': 'Magmautbrott',
   'entities.abilities.lightning_overload.description':
     'Passiv: Bågblixt och Gaffelblixt har 20% chans att överbelasta, träffa sitt första mål igen för 50% av skadan som orsakades och ge 1 Åska. (Thundercall)',
-  'entities.abilities.lightning_overload.name': 'Arc Overload',
+  'entities.abilities.lightning_overload.name': 'Bågöverbelastning',
   'entities.abilities.thunderstorm.description':
     'Kalla ned ett åskknall som orsakar {damage} naturskada till fiender inom 10 yards och saktar dem ned med 50% i 5 sec. Återställer 8% av din maximala mana. Skada ökar med Spellkraft. (Thundercall)',
-  'entities.abilities.thunderstorm.name': 'Stormbreak',
+  'entities.abilities.thunderstorm.name': 'Stormbrott',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Gripande rotters kastningstid minskas med 0,5 sec.',
+    'Gripande rotters kastningstid minskas med 0,5 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Att kasta Gripande rötter låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec.',
   'entities.itemSets.vanguard_druid_balance.name': 'Starwarden Raiment',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'Minskar nedkylningstiderna för Utfall och Bruinrusning med 3 sek.',
-  'entities.itemSets.vanguard_druid_feral.bonus4': 'Minskar nedkylningstiden för Rusa med 15 sek.',
+    'Bruinrusningens nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    'Bruinrusning skyddar dig för 6 procent av din maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_druid_feral.name': 'Bloodmane Hide',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': 'Fleetmends nedräkning minskas med 1 sec.',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    'Fleetmends nedräkning minskas med 1 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Fleetmend ökar också din rörelse med 30 procent i 3 sec.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Thistlebloom Vestment',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Skakande skotts nedräkning minskas med 4 sec.',
+    'Skakande skotts nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Skakande skott minskar Howling Rage återstående nedräkning med 1 sec.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Packwarden Harness',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'Trailbreaks nedräkning minskas med 4 sec.',
+    'Trailbreaks nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Trailbreak gör din nästa Långt drag inom 6 sec omedelbar. Kan inte inträffa mer än en gång var 15 sec.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Farsight Harness',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': 'Blodkroks nedräkning minskas med 3 sec.',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    'Blodkroks nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Blodkrok ger 1 Jaktfart.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Snaretooth Harness',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Temporal Barriers nedräkning minskas med 2 sec.',
+    'Temporal Barriers nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Temporal Barrier ökar också den skyddade målgruppen rörelse med 20 procent i 3 sec.',
   'entities.itemSets.vanguard_mage_arcane.name': "Hourbinder's Vestments",
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Cinderfall laddas om 3 sec snabbare.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Cinderfall laddas om 3 sec snabbare. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Att kasta Cinderfall minskar återstående nedräkning för Flammande barriär med 2 sec.',
   'entities.itemSets.vanguard_mage_fire.name': 'Emberlash Regalia',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Isbindningens nedräkning minskas med 2 sec.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Isbindningens nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Att kasta Isbindning minskar återstående nedräkning för Fladdersteg med 5 sec.',
   'entities.itemSets.vanguard_mage_frost.name': 'Rimewarden Garb',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Life Covenants nedräkning minskas med 30 sec.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Life Covenants nedräkning minskas med 30 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Life Covenant skyddar också alliansen för 8 procent av deras maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Sunvigil Regalia',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'Oath Chains nedräkning minskas med 2 sec.',
+    'Oath Chains nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Fiender dragna av Oath Chain kastar besvärjelser 30 procent långsammare i 4 sec, och Oath Chain ger dig Solar Reprisal när det binder en fiende som kan dras.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Shieldvow Bastion',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    "Valkyr's Callings nedräkning minskas med 15 sec.",
+    "Valkyr's Callings nedräkning minskas med 15 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     "Valkyr's Calling återställer Final Edicts nedräkning, och din nästa Final Edict inom 6 sec från träff orsakar 15 procent mer skada.",
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lightbrand Warplate',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Terror Canticles nedräkning minskas med 3 sec.',
+    'Terror Canticles nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'När din Psalm of Warding är fullt konsumerad, får den skyddade alliansen 20 procent rörelse i 3 sec. Kan inte inträffa mer än en gång var 8 sec.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Veilpsalm Raiment',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Veilsteps nedräkning minskas med 6 sec.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Veilsteps nedräkning minskas med 6 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Veilstep skyddar också dig för 8 procent av din maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_priest_holy.name': 'Gracewing Raiment',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Sorgens litania saktar också målsökningens rörelse ned med 30 procent medan du kanaliserar den.',
+    'Sorgens litania saktar också målsökningens rörelse ned med 30 procent medan du kanaliserar den. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Kalla Tithefiend skyddar också dig för 10 procent av din maximala hälsa i 8 sec.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Duskhymn Regalia',
@@ -1978,7 +2086,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Lågt slag gör också din nästa attack inom 6 sec en kritisk träff.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Nightcut Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Swift Heels nedräkning minskas med 60 sec.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Swift Heels nedräkning minskas med 15 sec.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Medan Swift Heels är aktiv, Wicked Slash och Haymaker ger 1 ytterligare combo-poäng.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Brawlmark Leathers',
@@ -1987,32 +2095,32 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Magslag ger 2 ytterligare combo-poäng när det används från Smokefade.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Shadewalk Leathers',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Unleash Weapons nedräkning minskas med 3 sec.',
+    'Unleash Weapons nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Unleash Weapon låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec.',
+    'Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
-    'Ancestral Strike minskar återstående nedräkning för Elemental Trance med 4 sec.',
+    'Ancestral Strike minskar återstående nedräkning för Elementartrans med 4 sec.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Lagande vatten kastar 0,5 sec snabbare på en allierad under 50 procent hälsa.',
+    'Lagande vatten kastar 0,5 sec snabbare på en allierad under 50 procent hälsa. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Tidecall skyddar också sitt mål för 5 procent av din maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Harrows kastningstid minskas med 0,3 sec.',
+    'Harrows kastningstid minskas med 0,3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Förtär läker dig för 30 procent mer och kan kanaliseras medan du rör dig.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Bone Armors nedräkning minskas med 10 sec.',
+    'Benrustningens nedräkning minskas med 10 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
-    'Reaping Command minskar återstående nedräkning för Bone Armor med 2 sec.',
+    'Skördande befallning minskar återstående nedräkning för Benrustning med 2 sec.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Cinderhides nedräkning minskas med 30 sec.',
+    'Glödhudens nedräkning minskas med 30 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Var andra Conflagrate gör din nästa Fördärvsbult inom 8 sec omedelbar.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagcrown Vestments',
@@ -2345,10 +2453,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.vanguardHeading': 'Vanguard-utrustning: Warfare säsong 2',
   'guide.combat.unstuckBodyWindow':
     'Om världen fångar dig någonstans du inte kan ta dig ut, skriv /unstuck. Du måste vara utanför strid och stå stille, inte hålld av en bedövning eller en rot, och inte i en tvekamp eller en arenomatch: en kort nedräkning körs, och att röra dig eller ta skada avbryter det. När det slutförs är du placerad vid närmaste kyrkogård. Det dödar aldrig dig och det lämnar ingen lik, och om du redan var nere höjer det upp dig där istället. Den första användningen på en timme kostar dig ingenting. Använd det igen inom en timme från senast och priset är Unstuck sjukdom, en tillfällig försvagning av allt du är som har slitit av innan du kunde använda kommandot igen, och som Vaktarens tull sparar helt nya karaktärer.',
-  'guide.commandsPage.flair':
-    'Visar eller döljer din Discord-roll för andra spelare, alltså ditt färgade namn, din rolltagg och din verifierade chattagg: /flair on visar den, /flair off döljer den och bara /flair berättar vad som är inställt. Kräver ett kopplat Discord-konto.',
   'guide.commandsPage.pvpZones':
-    'Flagga för världs-PvP: /pvp växlar den, /pvp on slår på den och /pvp off stänger av den. Flaggade spelare kan slåss mot varandra på omstridd mark, fristäder tillåter inga världsstrider alls och din flagga aktiveras när du går in i en aktiv cirkel i Kullens kung; det tar 5 minuter att stänga av den.',
+    'Världens PvP-flagga: /pvp växlar den, /pvp on och /pvp off ställer in den. Flaggade spelare kan slåss med varandra på omstridigt område, helgedomar tillåter ingen världsstrid alls, och fritt-för-allt-zonerna tillåter det med eller utan flagga; att stänga av tar 5 minuter.',
   'guide.commandsPage.unstuckWindow':
     'Vägen ut när världen har fångat dig. Stå stille genom en kort nedräkning och du flytas till närmaste kyrkogård, och höjd där om du redan hade fallit. Den första användningen på en timme är gratis. Använd det igen inom en timme från senast och det lämnar dig försvagad av Unstuck sjukdom ett tag efteråt, så det är en räddning snarare än en genväg.',
   'guide.factionsPage.automatonsBody':
@@ -2409,7 +2515,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     "Lägger till en Cast by-rad till varje buff/debuff-verktygstips, namngivning vem som tillämpade det. Praktiskt för att skilja flera trollformelskastarar av samma buff, som två paladiner's välsignelser.",
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Hänger målramens buff- och debuff-band under ramen istället för ovanför den, den klassiska layouten. Av som standard, eftersom standardtargetgramen sitter direkt ovanför handlingsfältet; slå på det när du har flyttat ramen någonstans med plats under den.',
+    'Placerar målets rad med förstärkningar och försvagningar under målramen, under namn och hälsomätare, i stället för ovanför: den klassiska placeringen. I standardläget flyttas målramen, tillsammans med din besvärjelsemätare och dina slagtimers, en rad uppåt så att första effektraden går fri från handlingsfältet; en ram du har flyttat stannar där du satte den.',
   'guide.settingsPage.rowFrameRateCap':
     'Ett tak på hur många bilder spelet drar varje sekund. En dator som inte kan hålla jämna steg med skärmen landet på en ojämn rytm; en stadig 30 ser mjukare ut än det, halverar arbetet, och håller datorn svalare. Visa betyder ingen gräns.',
   'guide.stats.warfareBodyPets':
@@ -2419,16 +2525,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.flagHeading': 'Att höja och sänka flaggan',
   'guide.worldPvpPage.heading': 'Världens PvP',
   'guide.worldPvpPage.hillBodyRamp':
-    'Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.',
+    'En gång var tredje timme, vid ett tillfälle ingen kan förutsäga, blir hela riket berättat att en kulle kommer att stiga i en av fritt-för-allt-zonerna om femton minuter, och cirkeln där det kommer att stå markeras på öppen mark. När den stiger står den i fyrtiofem minuter, sedan faller. Partiet med mest spelare som står innanför bestrid kullen, och efter en minut av obruten majoritet är kullen deras; en ensamspelare räknas som ett parti av en, men raid-medlemmar räknas inte alls. Medan ett parti håller kullen, tjänar var och en av dess medlemmar som står innanför Ära varje minut, och ju längre samma parti håller det, desto mer varje minut betalar: ett fullt parti som håller en omtvistet kulle för hela sin tid tjänar ungefär lika mycket som tre slagfält-segrar. När kullen byter händer startar de nya innehavarna räkningen från början. En stapel över fältet visar vem som håller det, dina nummer mot deras, och tävlingsklockan; /hill i chatten säger var den står.',
   'guide.worldPvpPage.hillHeading': 'Kullens kung',
+  'guide.worldPvpPage.introZones':
+    'Öppen världsspeler-mot-spelare är val-in, och marken du står på bestämmer vad det betyder. Höj din PvP-flagga och varje annan flaggad spelare som inte är i ditt parti eller raid blir en fiende på omstridigt område; sänk den och, efter en kort fördröjning, är du en åskådare igen. Två zoner är helgedomar där ingen världsstrid händer alls, och de tre nordligaste zonerna är fritt-för-allt-område där alla närvarande är rättvis spel, flagga eller ingen flagga. Parti- och raid-kamrater är aldrig dina fiender någonstans; skickekamrater utanför din grupp är rättvis spel som vilken som helst.',
   'guide.worldPvpPage.limitsBodyRaids':
     'Att besegra samma spelare igen och igen betalar mindre varje gång och snart ingenting, och din räkning mot den spelaren börjar bara igen ungefär en timme efter den första av dessa dödningar, så att läger en offer är aldrig värt väntan. Ett mål långt under din nivå betalar ingenting alls. Slagfält och Arenor kör sina egna regler medan du är inne i dem, och de betalar mer Ära än den öppna världen, så världens PvP är den långsammare vägen till samma leverantör. Raid tjänar ingenting från världsdödningar: en raid-medlem tar ingen Ära eller guld och krymper inte någon annans andel, så slå som ett parti för att bli betald.',
   'guide.worldPvpPage.limitsHeading': 'Fair play-regler',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'När en flaggad spelare besegras av en annan spelare betalar förloraren en liten del av guldet i sin börs, begränsad till ett blygsamt belopp, och vinnarna tjänar Ära till Kriget-utrustning. En oflaggad spelare kan inte angripas i den öppna världen. Alla som hjälpte till delar på både guld och Ära: spelaren som gav dödsstöten, alla som skadade målet strax före och helarna som höll dessa kämpar på benen. En ren en-mot-en-strid ger hela potten; en grupp delar på den.',
+    'När en flaggad spelare besegras av en annan spelare, betalar förloraren en liten andel av guldet i sin börs, begränsad till ett blygsamt belopp, och vinnarna tjänar Ära mot Kriget-utrustning. En spelare som inte var flaggad betalar inget guld alls, även när de faller i en fritt-för-allt-zon. Alla som hjälpte delar båda: slaggöringen, någon som skadade målet strax innan, och helarna som höll dessa brottare stående. En ren en-mot-en-betalar hela potten; en grupp delar det.',
   'guide.worldPvpPage.stakesHeading': 'Vad en dödning är värd',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'En oflaggrad kämpare får inte heller någon: guld byter endast ägare mellan två flaggade spelare, men alla som hjälpte tjänar fortfarande Heder.',
+  'guide.worldPvpPage.zonesBody':
+    'Världen är uppdelad i tre sorters mark. Prövostranden och Östbäcksdalen är fredade områden: ingen världs-PvP förekommer där överhuvudtaget, flaggad eller inte, så en ny karaktär kan aldrig anfallas innan de förstår vad flaggan betyder. Det mesta av världen är omstritt, där flaggreglerna ovan är hela berättelsen. Drakländerna, Frostslöjans vidder och Bärnstensfallet, de tre nordligaste zonerna, är fri-för-allmark: alla som står där kan anfalla alla andra som står där, med eller utan flagga, och du underrättas när du går in och igen när du går ut. Att anfalla en spelare som inte är flaggad där höjer din egen flagga, så en angripare slutar alltid med att bära risken. Att slå en spelare som redan är flaggad höjer aldrig den, vilket betyder att försvara dig själv eller försvara någon som inte är flaggad inte kostar dig något.',
   'guide.worldPvpPage.zonesHeading': 'Var världs-PvP förekommer',
   'landing.headline': 'Äventyr med vänner.',
   'landing.contribute': 'Bidra till spelet',
@@ -3485,9 +3595,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Fleetform',
   'guide.classPage.formsHeading': 'Formskiftning',
   'guide.classPage.formsMoonwing':
-    'En Månlund-druid får en form till, Månugglaform, besvärjarformen en Balans-druid strider i. Det är den enda djurformen som behåller dina besvärjelser, och din trollstav fungerar bara i den eller i din vanliga besvärjarform.',
+    'En Balans-druid får ytterligare en form, Månugglaform, besvärjarformen som denna specialisering strider i. Liksom Återställnings Sporläkarform behåller den dina besvärjelser, och din trollstav fungerar bara i dessa två former eller din vanliga besvärjarform.',
   'guide.classPage.formsWolfEngage':
-    'En varg öppnar striden med Bruinrusning, skiftar genast till Vargform för att hålla fast målet, sluter avståndet med Utfall när den inte smyger och håller en fiende stilla med Nedtagning.',
+    'En katt öppnar striden med Bruinrusning, skiftar genast till Kattform för att hålla fast målet, sluter avståndet med Utfall när den inte smyger och håller en fiende stilla med Nedtagning.',
   'guide.classPage.formsNote':
     'En druid slåss genom att byta form. De flesta av druidens förmågor hör till en enda form, så formen du befinner dig i avgör vad du kan kasta, och att skifta kostar lite mana. Du kan skifta in eller ut ur strid, så ofta du vill.',
   'guide.classPage.mageEleHeading': 'Vattenelementar',
@@ -4704,31 +4814,36 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'auth.shadeWarm': 'Varm',
   'auth.style': 'Stil',
   'editor.status.campCapReached': 'Lägergränsen nådd ({max}). Det nya lägret lades inte till.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Ökar Krigföringsförsvar med 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.',
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Askesteg, vilket ökar förflyttningshastigheten med 40% i 6 sek.',
   'entities.itemSets.warfare_ashstalker.name': 'Asksmygarens utrustning',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Ökar Krigföringsförsvar med 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.',
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Glödvakt, vilket absorberar 120 skada i 8 sek.',
   'entities.itemSets.warfare_cinderweave.name': 'Glödvävsregalier',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Ökar Krigföringsförsvar med 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.',
   'entities.itemSets.warfare_furyforged.bonus7':
     'Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Obruten ed, vilket absorberar 200 skada i 10 sek.',
   'entities.itemSets.warfare_furyforged.name': 'Raserismidd stridsutrustning',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Ökar Krigföringsförsvar med 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Glödvakt, vilket absorberar 120 skada i 8 sek.',
   'entities.itemSets.warfare_stormbound.name': 'Stormbunden skrud',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Ökar Krigföringsförsvar med 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -5042,7 +5157,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Ägd',
   'hudChrome.warfareShop.weapons': 'Vapen',
   'itemUi.market.saleBuyer': 'Sålt till {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} tidigare försäljningar, inräknade i totalen.',
+  'itemUi.market.saleOlder': 'Samt {count} tidigare försäljningar som inte visas.',
   'itemUi.tooltip.maxStack': 'Maxstapel: {count}',
   'hud.system.deathRecapAbility': 'Du har dött. Dräpt av {ability}.',
   'hud.system.deathRecapDrowned': 'Du har dött. Du drunknade.',
@@ -6006,6 +6121,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Kallblodiga jägare med ett eget väsande och ett snäppande bett, skilda från de varmblodiga djuren.',
   'guide.family.reptile.name': 'Reptiler',
   'hudChrome.auraEffect.damageReduction': 'Minskar all inkommande skada med {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Sover till gryningen. Kan inte anfallas och vaknar inte för någon.',
   'hudChrome.auraEffect.guardianWard':
     'Nästa dödliga fiendeträff återger dig {pct}% av dina livspunkter i stället',
   'hudChrome.bags.dragDestroyHint': 'Dra ut i världen för att förstöra',
@@ -6024,9 +6141,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.title': 'Välj din kamera',
   'hudChrome.discord.link.joinServer': 'Gå med i Discord-servern',
   'hudChrome.discord.roleTag.contentcreator': 'Innehållsskapare',
-  'hudChrome.discord.roleTag.juniormods': 'Observatör',
+  'hudChrome.discord.roleTag.juniormods': 'Junior-mod',
   'hudChrome.discord.roleTag.legend': 'LEGEND',
-  'hudChrome.discord.roleTag.seniormods': 'Väktare',
+  'hudChrome.discord.roleTag.seniormods': 'Senior-mod',
   'hudChrome.discord.roleTag.shill': 'MARKNADSFÖRARE',
   'hudChrome.finder.accept': 'Acceptera',
   'hudChrome.finder.acceptApplicantAria': 'Acceptera {name}',
@@ -6199,7 +6316,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett skräckinjagande rop som får upp till 5 fiender inom 8 m att fly i skräck i 4 sek. Skada kan bryta effekten.',
   'entities.abilities.intimidating_shout.name': 'Skräckinjagande rop',
   'entities.abilities.iron_resolve.description':
-    'Bit ihop och ignorera smärtan: förbrukar upp till 40 raseri (minst 20) för att absorbera {absorbPerRage} skada per förbrukad raseripoäng i upp till 10 sek. (Beskydd)',
+    'Bit ihop och ignorera smärtan: en sköld absorberar skada motsvarande {damage}% av din maximala hälsa vid användning, i upp till {duration} sek. (Beskydd)',
   'entities.abilities.iron_resolve.name': 'Järnvilja',
   'entities.abilities.measured_fury.description':
     'Ditt avmätta raseri skärper din hushållning: dina förmågor kostar 10 % mindre raseri. (Vapen)',
@@ -6318,7 +6435,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett vilt skott som desorienterar målet i {duration} sek. All skada bryter effekten.',
   'entities.abilities.typhoon.name': 'Tyfon',
   'entities.abilities.typhoon.description':
-    'En vindstöt slår tillbaka alla fiender inom 8 m och omtöcknar dem, vilket minskar deras rörelsehastighet med 50 % i 4 sek.',
+    'En vindstöt kastar alla fiender inom 8 meter 15 meter bort från dig och omtöcknar dem så att de rör sig 50% långsammare i 4 sek. Fiendespelare kastas i en rak linje genom luften: över en kant fortsätter de och tar fallskada; ett dödligt fall räknas som ditt dödande.',
   'entities.abilities.voidfeast.name': 'Tomhetsmåltid',
   'entities.abilities.voidfeast.description':
     'Slukar en magisk effekt (en gynnsam från en fiende eller en skadlig från en allierad) och helar dig med 6 % av din maximala hälsa.',
@@ -7100,6 +7217,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.resurrectAtHealer': 'Den bleka väktaren (Väktartullen)',
   'hudChrome.death.spiritHealerAlive':
     'Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande.',
+  'hudChrome.discord.roleTag.admin': 'Admin',
   'hudChrome.frameReset.label': 'Återställ ramarnas positioner',
   'hudChrome.mailbox.arrivedBanner': 'Korpen har landat: post från {name}.',
   'hudChrome.mailbox.arrivedLog': 'Du har ny post från {name}.',
@@ -7169,7 +7287,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 't',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} reser sig över Törntoppshöjderna!',
+  'hudChrome.worldBoss.spawn': '{name} reser sig över {zone}!',
+  'hudChrome.worldBoss.wake': '{name} vaknar över {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} sover till gryningen.',
   'itemUi.kind.bag': 'Väska',
   'itemUi.tooltip.bagSlots': 'Väska med {slots} platser',
   'itemUi.tooltip.bagSlotsMaterials': 'Materialväska med {slots} platser',
@@ -7672,7 +7792,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skjuter målet för {damage} Arkan skada. Skadan ökar med anfallskraft på avstånd.',
   'entities.abilities.arcane_shot.name': 'Ondskeskott',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 4 sek. (varje träff förnyar omtöckningen)',
+    'Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 2 sek. (varje träff förnyar omtöckningen)',
   'entities.abilities.aspect_of_the_cheetah.name': 'Springarens skepnad',
   'entities.abilities.aspect_of_the_hawk.description':
     'Anta kärrhökens skepnad och öka er anfallskraft med {buff} i 30 min.',
@@ -7690,10 +7810,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett rop som ökar attackkraften hos alla gruppmedlemmar med {buff}% i 30 min.',
   'entities.abilities.battle_shout.name': 'Järnvrål',
   'entities.abilities.bear_charge.description':
-    'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. I 3 sek därefter är Vargform gratis och håller fast målet, vilket saktar ner det med 50% i 4 sek. 8-25 m räckvidd. Endast i Bruinform.',
+    'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. I 3 sek därefter är Kattform gratis och håller fast målet, vilket saktar ner det med 50% i 4 sek. 8-25 m räckvidd. Endast i Bruinform.',
   'entities.abilities.bear_charge.name': 'Bruinrusning',
   'entities.abilities.bear_form.description':
-    'Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform.',
+    'Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Du slår dubbelt så snabbt för halva skadan per slag, och varje slag bygger dubbelt så mycket raseri. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.bear_form.name': 'Bruinform',
   'entities.abilities.berserker_rage.description':
     'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
@@ -7710,7 +7830,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Attackera omedelbart i ett blodsraseri för 60 % vapenskada plus {damage}. (Raserisignatur)',
   'entities.abilities.bloodthirst.name': 'Åderlåtning',
   'entities.abilities.cat_form.description':
-    'Förvandlar er till en varg: smidigheten stiger med er nivå, anfallskraft +8 plus 2 per nivå, era anfall använder energi och kombopoäng, och ni alstrar 29% mindre hot. Att skifta till vilken gestalt som helst ger Lunkande steg: 60% förflyttningshastighet i 3 sek, en gång var 20:e sek. Besvärj igen för att återgå till besvärjarskepnaden.',
+    'Förvandla dig till en katt: smidigheten stiger med nivån, anfallskraft +8 plus 2 per nivå, anfallen använder energi och kombopoäng, du rör dig 15% snabbare och alstrar 29% mindre hot. Varje formskifte ger Lunkande steg, en kort fartökning. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.cat_form.name': 'Kattform',
   'entities.abilities.charge.description':
     'Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd.',
@@ -7742,7 +7862,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbannar målet med plåga: {damage} skuggskada över 24 sek.',
   'entities.abilities.curse_of_agony.name': 'Våndans häxkonst',
   'entities.abilities.dash.description':
-    'Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i kattform.',
+    'Skifta till Kattform om du inte redan är i den och sprinta med 50% högre hastighet i 15 sek. Kan användas i alla former. Omedelbar och utlöser inte global återhämtning.',
   'entities.abilities.dash.name': 'Rusa',
   'entities.abilities.deadly_poison.description':
     'Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg lägger till en giftstapling på målet, upp till 5, och förnyar varaktigheten på 12 sekunder. Varje stapling vållar {damage} naturskada varannan sekund.',
@@ -7767,7 +7887,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En helig sköld absorberar {damage}% av din maximala hälsa i {duration} sek.',
   'entities.abilities.divine_protection.name': 'Trons värn',
   'entities.abilities.drain_life.description':
-    'Förtär målets livskraft, vållar {damage} Skuggskada varje sekund och överför 70% av den som hälsa till er. Vanmakt överför i stället alltihop. Kanaliserad på ert främsta Evil Eye förbrukar den alla Ödestrådar vid början, och varje Tråd alstrar 1 extra Fördömelse per tick.',
+    'Förtär målets livskraft, vållar {damage} Skuggskada varje sekund och överför 70% av den som hälsa till er. Vanmakt överför i stället alltihop. Kanaliserad på ert främsta onda öga förbrukar den alla Ödestrådar vid början, och varje Tråd alstrar 1 extra Fördömelse per tick.',
   'entities.abilities.drain_life.name': 'Förtär',
   'entities.abilities.earth_shock.description':
     'Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: vid 5 Åska vållas 125% mer skada, varefter all Åska förbrukas. Stenbunden: tvingar målet att anfalla er i 3 sek.',
@@ -7813,7 +7933,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Kallar ner en eldexplosion på målområdet som ger {damage} Eldskada till fiender som fångas i explosionen.',
   'entities.abilities.flame_shock.description':
-    'Vållar {damage} Eldskada, sedan {overTime} Eldskada under 12 sek. Den första träffen ökar med Besvärjelsekraft.',
+    'Vållar {damage} Eldskada, sedan {overTime} Eldskada under {duration} sek. Den första träffen ökar med Besvärjelsekraft.',
   'entities.abilities.flame_shock.name': 'Glödstöt',
   'entities.abilities.flametongue_weapon.description':
     'Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra Eldskada.',
@@ -7858,6 +7978,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.heal.name': 'Högtidlig bön',
   'entities.abilities.healing_touch.description': 'Läker ett vänligt mål för {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Varje fullbordad kastning ger 1 Grönska (max 3). Samlad Grönska förkortar denna kastning: 2,2 sek vid 1 Grönska, 1,9 sek vid 2 och 1,5 sek vid 3. Naturens gåva gör den omedelbar, gratis och 25 % starkare.',
   'entities.abilities.healing_touch.name': 'Vildläkning',
   'entities.abilities.healing_wave.description':
     'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft. Återställning: sparar 50% av den fulla läkningen före överläkning som Läkande ström i 12 sek, upp till 30% av målets maximala hälsa.',
@@ -7866,7 +7988,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg.',
   'entities.abilities.heroic_strike.name': 'Plundrarhugg',
   'entities.abilities.hibernate.description':
-    'Tvingar målet i en djup sömn i upp till 8 sek. All skada väcker det.',
+    'Tvingar målet till djup sömn i upp till 8 sek. All skada väcker det. Mot spelare varar varje upprepning inom 18 sek hälften så länge som den föregående och den fjärde misslyckas.',
   'entities.abilities.hibernate.name': 'Slummer',
   'entities.abilities.holy_light.description':
     'Läker snabbt ett vänligt mål för {damage}. Att återställa hälsa alstrar 1 Hängivenhet, även utan specialisering. Strålande resonans eller Solvedergällning gör den omedelbar.',
@@ -7925,13 +8047,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förvandlar fienden till en padda i upp till {duration} sek. Paddan vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider.',
   'entities.abilities.polymorph.name': 'Förhäxa',
   'entities.abilities.pounce.description':
-    'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i vargform. Utanför smyg är den här knappen Utfall.',
+    'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i kattform. Utanför smyg är den här knappen Utfall.',
   'entities.abilities.pounce.name': 'Smyghugg',
   'entities.abilities.lunge.description':
-    'Kasta dig mot en fiende upp till 12 m bort, tillfoga 60% vapenskada och ge 1 kombopoäng. Endast i vargform.',
+    'Kasta dig mot en fiende upp till 12 m bort, tillfoga 60% vapenskada och ge 1 kombopoäng. Endast i kattform.',
   'entities.abilities.lunge.name': 'Utfall',
   'entities.abilities.hamstring_bite.description':
-    'Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek). Endast i vargform.',
+    'Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek). Endast i kattform.',
   'entities.abilities.hamstring_bite.name': 'Nedtagning',
   'entities.abilities.power_word_fortitude.description':
     'Ökar varje gruppmedlems Uthållighet med {buff}% i 30 min.',
@@ -7940,7 +8062,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skyddar ett vänligt mål och absorberar {damage} skada i 30 sek. Disciplin länkar dessutom målet till er Heliga skada i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Värnpsalm',
   'entities.abilities.prowl.description':
-    'Gå i smyg medan du är i vargform. Kan inte användas i strid.',
+    'Gå i smyg medan du är i kattform. Kan inte användas i strid.',
   'entities.abilities.prowl.name': 'Smygjaga',
   'entities.abilities.pyroblast.description':
     'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid.',
@@ -7953,7 +8075,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slår för 10% vapenskada plus {damage}. En träff återställer 15 Fokus och ger 1 Jaktfart. Skadan ökar med anfallskraft via vapenskadan.',
   'entities.abilities.raptor_strike.name': 'Uppsprättande hugg',
   'entities.abilities.regrowth.name': 'Andra blomningen',
-  'entities.abilities.rejuvenation.name': 'Vildblomning',
   'entities.abilities.renew.description':
     'Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.renew.name': 'Dröjande nåd',
@@ -7961,7 +8082,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Omger dig och din grupp med helig energi till döden eller tills den ersätts. Fiender som träffar en påverkad allierad i närstrid tar {buff} helig skada, och påverkade allierade gör {buff} extra helig skada med automatiska attacker.',
   'entities.abilities.retribution_aura.name': 'Vedergällningsaura',
   'entities.abilities.revive_pet.description':
-    'Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa.',
+    'Återställer 10 % av din levande följeslagares maximala hälsa varje sekund i 8 sek. Om följeslagaren är död återupplivas den i stället med 50 % hälsa.',
   'entities.abilities.revive_pet.name': 'Lappa ihop',
   'entities.abilities.righteous_fury.description':
     'Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare.',
@@ -8054,7 +8175,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skiftar omedelbart till en snabb Fleetform, ökar förflyttningshastigheten med 40 % och tar bort brytbara rotbindningar och nedsaktningar. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet.',
   'entities.abilities.travel_form.name': 'Fleetform',
   'entities.abilities.vanish.description':
-    'Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig 50 % långsammare medan du är dold. Varar i upp till 10 sek.',
+    'Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig i full fart medan du är dold. Varar i upp till 10 sek.',
   'entities.abilities.whirlwind.description':
     'Snurra i en dödlig båge och hugg alla närliggande fiender för {damage}. (Raserital)',
   'entities.abilities.whirlwind.name': 'Klingvirvel',
@@ -8116,7 +8237,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)',
   'entities.abilities.metamorphosis.name': 'Lichskepnad',
   'entities.abilities.metamorphosis.description':
-    'Bli en lich i 20 sek, vilket skapar 3 Själfragment och ökar er besvärjelseskada och besvärjelsehastighet med 20%. Era odöda vållar 50% mer skada och agerar 20% snabbare, och Soul Lance tränger igenom sitt mål och träffar upp till 2 närliggande fiender för 50% av sin skada. (Signatur för Nekromanti)',
+    'Bli en lich i 20 sek, vilket skapar 3 Själfragment och ökar er besvärjelseskada och besvärjelsehastighet med 20%. Era odöda vållar 50% mer skada och agerar 20% snabbare, och Själslans tränger igenom sitt mål och träffar upp till 2 närliggande fiender för 50% av sin skada. (Signatur för Nekromanti)',
   'entities.delves.collapsed_reliquary.enterText': 'Du stiger ner i det rasade relikvariet.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Du klättrar tillbaka till broder Halven vid relikvarieruinen.',
@@ -8264,6 +8385,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenmist_robe.name': 'Kärrdimmsrock',
   'entities.items.fenreed_staff.name': 'Kärrvasstav',
   'entities.items.fenshadow_maul.name': 'Kärrskuggans stridsklubba',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Skärvpik',
+  'entities.items.foremans_barrowmaul.name': 'Förmannens Gravhögshammare',
+  'entities.items.barrowhide_pauldrons.name': 'Gravhögsaxelskydd',
+  'entities.items.mirestone_stride.name': 'Myrstenssteg',
+  'entities.items.foremans_wage_band.name': 'Förmannens Lönering',
+  'entities.items.mirelight_locket.name': 'Kärrljusmedaljong',
+  'entities.items.fenwright_grips.name': 'Kärrbyggarens Grepp',
   'entities.items.fenwarden_sabatons.name': 'Kärrväktarens sabatoner',
   'entities.items.fenwalker_boots.name': 'Kärrvandrarstövlar',
   'entities.items.footpad_jerkin.name': 'Ficktjuvsväst',
@@ -9261,6 +9389,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollhögarna',
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravkallarlägret',
   'entities.zones.mirefen_marsh.pois.7.label': 'Den sjunkna bastionen',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Gravhögsområdet',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Stjärnfallskratern',
   'entities.zones.mirefen_marsh.welcome': 'Anmäl dig hos väktare Fenwick vid Kärrbrons port.',
   'entities.zones.thornpeak_heights.name': 'Törntoppshöjderna',
   'entities.zones.thornpeak_heights.pois.0.label': 'Högvakten',
@@ -11127,7 +11257,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Byt namn',
   'hud.pet.renameLabel': 'Välj ett nytt namn på djuret.',
   'hud.pet.revive': 'Lappa ihop',
-  'hud.pet.stanceDesc': 'Klicka för att välja Passiv, Defensiv eller Aggressiv.',
   'hud.pet.stanceTitle': 'Djurets hållning',
   'hud.pet.taunt': 'Håna',
   'hud.prompts.acceptDuel': 'Anta duell',
@@ -14182,7 +14311,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Förmåga',
   'guide.search.typeDeed': 'Bedrift',
   'guide.settingsPage.audioBody':
-    'Alternativfönstret är inte bara pixlar. Ljud rymmer tre volymreglage, för ljudeffekter, musik och röst, plus en strömbrytare för musik och fyra brytare för de ljud som oftast tröttar ut: NPC-röster, fotsteg, gränssnittsljud och klickrespons. Fliken Allmänt i Gränssnittspanelen bär en språkväljare som lokaliserar om hela gränssnittet på fläcken, utan omladdning, och en temaväljare för fönstrens utstyrsel.',
+    'Alternativfönstret handlar också om ljud. Ljud har fyra volymreglage för effekter, omgivning, musik och röster, en musikströmbrytare och fyra brytare för ljud man ofta tröttnar på: NPC-röster, fotsteg, gränssnittsljud och klickrespons. Fliken Allmänt under Gränssnitt har ett språkval som omedelbart översätter hela gränssnittet utan omladdning och ett temaval för fönstren.',
   'guide.settingsPage.audioTitle': 'Ljud och språk',
   'guide.settingsPage.autolootBody':
     'Föredrar du att inte klicka på varje lik? Automatisk plundring i förbifarten, på fliken Strid i Gränssnittspanelen och avstängd som standard, skopar upp bytet från dina egna byten medan du går förbi dem.',
@@ -14684,7 +14813,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Kanaliserar i 3 sek och vållar {damage} Skuggskada varje sekund på fiender inom 8 m från målområdet. Skadan ökar med Besvärjelsekraft. (Prästtalang)',
   'entities.abilities.multi_shot.description':
-    'Avfyrar en salva mot målområdet och ger {damage} Fysisk skada till fiender inom 8 m. (jägartalang)',
+    'Avfyrar en salva mot målområdet och ger {damage} Fysisk skada till fiender inom 8 yards. (jägartalang)',
   'entities.abilities.prayer_of_healing.description':
     'Läker bundsförvanter inom 30 m för {damage}. Läkningen ökar med Besvärjelsekraft. (Helig)',
   'entities.abilities.preparation.description':
@@ -14694,7 +14823,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Skrämmer fiender inom 8 m i upp till 4 sek. Skada kan bryta effekten.',
   'entities.abilities.shadowstep.description':
-    'Kliver genom skuggorna till ditt mål, vän eller fiende, utan att bryta Duskveil. (skurktalang)',
+    'Kliver genom skuggorna till ditt mål, vän eller fiende, utan att bryta Duskveil. Lagrar upp till 2 laddningar. (skurktalang)',
   'entities.abilities.silence.description': 'Tystar målet i 4 sek. (prästtalang)',
   'entities.abilities.tranquility.description':
     'Kanaliserar återställande energi i 4 sek. och helar allierade inom 30 m för 42 till 52 varje sekund. (druidtalang)',
@@ -14719,7 +14848,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Passiv: kritiska träffar med dina besvärjelser bränner målet för 30% av den utdelade skadan under 6 sek. och kan staplas. (Eldmästerskap)',
   'entities.abilities.mass_barrier.name': 'Massbarriär',
   'entities.abilities.mass_barrier.description':
-    'Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar 130 skada i 60 sek. (magikertalang)',
+    'Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar {damage} skada i 15 sek. (magikertalang)',
   'entities.abilities.overload.name': 'Överbelastning',
   'entities.abilities.overload.description':
     'Din nästa besvärjelse förstärks med 40% men kostar 50% mer mana. Varar i 10 sek. (magikertalang)',
@@ -16016,17 +16145,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Släpp loss besten',
   'entities.abilities.wildheart.name': 'Vildhjärta',
   'entities.abilities.bloodhook.description':
-    'Storma mot en fiende och applicera Blodkrokssår som gör 34 fysisk grundskada plus 26% av din distansattackkraft över 12 sek i 4 pulser. (Fältkonstsignatur)',
+    'Rusa mot en fiende och lägg ett sår med Blodkrok, som ger 34 fysisk grundskada plus 26% av din avståndsanfallskraft i 4 tick under 12 sek. Vid ankomst sänks målets hastighet med 30% i 3 sek. (Överlevnad)',
   'entities.abilities.bloodtrail_assault.description':
-    'I 12 sek sprider Blodkroken ett sår med 60% styrka till upp till 2 närliggande fiender, Sårslitning befaller en husdjursattack på 18 skada, och Splitterladdningen får 2 meter, gör 25% mer grundskada på sitt huvudmål och utlöser 50% mer sårskada.',
+    'I 12 sek sprider Blodkrok ett sår med 60% styrka till högst 2 fiender inom 5 meter, Sårslitare beordrar ett husdjursanfall för 18 skada och Splitterladdning når 2 meter längre, ger 25% mer grundskada på huvudmålet och utlöser 50% mer sårskada. Utan levande husdjur återhämtas din Fokus också 100% snabbare.',
   'entities.abilities.cold_focus.description':
     'I 12 sek återställer Avvägt skott 50% mer fokus, och Långt drag kostar 25% mindre och kastas 30% snabbare. (Kallsiktsignatur)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Passiv: Spårbrott förnyar Jaktfarten och laddar ditt nästa Rensarslag eller Blodkrok i 12 sek. Rensarslaget gör 15% mer skada per stapel. Blodkroken gör 18 till 24 extra fysisk skada, ökad med 15% per stapel och av din distansattackkraft. Vid 3 staplar förbrukar endera attacken Jaktfarten. (Fältkonst)',
+    'Passivt: Med Jaktfart förbereder Spårbrott ditt nästa Uppsprättande hugg eller Blodkrok i 12 sek. Uppsprättande hugg ger 15% mer skada per laddning. Blodkrok ger 18 till 24 extra fysisk skada, ökad med 15% per laddning och av avståndsanfallskraft. Vid 3 laddningar förbrukar vilket som helst av anfallen Jaktfart. (Överlevnad)',
   'entities.abilities.frostjaw_trap.description':
-    'Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
+    'Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
-    'Passiv: Rensarslaget ger 1 Jaktfart i 8 sek, upp till 3. Vid 3 staplar gör Sårslitning 45% mer slagskada och förbrukar staplarna. (Fältkonst)',
+    'Passivt: Uppsprättande hugg och en Splitterladdning som träffar en fiende ger vardera 1 Jaktfart, upp till 3. Varar tills de används eller du lämnar strid, och varje laddning ökar rörelsehastigheten med 15%. Vid 3 laddningar ger Sårslitare 60% mer slagskada och förbrukar laddningarna. (Överlevnad)',
   'entities.abilities.measured_shot.description':
     'Skjut målet för {damage} fysisk skada. En träff återställer 20 fokus. Skadan ökar med distansattackkraft.',
   'entities.abilities.pack_command.description':
@@ -16036,11 +16165,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv.',
   'entities.abilities.shrapnel_charge.description':
-    'Träffar målet för 24 till 30 fysisk skada och upp till 4 andra fiender inom 6 meter för 13 till 17. De andra målen blöder också för 12 skada över 6 sek. Om huvudmålet bär ditt Blodkrokssår görs 1 sårpuls omedelbart. Direktskadan ökar med distansattackkraft.',
+    'Träffar en 10 meter lång kon framför dig. Ditt mål, eller den närmaste träffade fienden om målet är utanför konen, tar 24 till 30 fysisk skada. Alla andra fiender i konen tar 7 till 9 och blöder för 12 skada under 6 sek. Har huvudmålet ditt sår från Blodkrok, tar det genast 1 sårtick. En träff på en fiende ger 1 Jaktfart. Direkt skada ökar med avståndsanfallskraft.',
   'entities.abilities.stampede.description':
     'Frammanar 3 bestar i 12 sek. Var och en attackerar var 2:e sek för {damage} fysisk skada. Den visade skadan inkluderar 8% av din distansattackkraft före husdjursskadebonusar. Bestarna låser Flockvildheten när de frammanas och får 10% skada per stapel. Medan Vilt språng är på nedkylning har lyckade Flockbefallningar 20% chans att återställa det, garanterat efter 5 misslyckade chanser. Det kan inte återställas medan bestarna är aktiva. (Flockherre)',
   'entities.abilities.trailbreak.description':
-    'Hoppa 12 meter bakåt. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek.',
+    'Hoppa 25 meter bakåt och bryt dig fri från rotfästningar och förflyttningssänkningar. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek.',
   'entities.abilities.unleash_beast.description':
     'Förbrukar 3 Flockvildhet efter att ditt husdjur slagit för 83 till 105 fysisk skada och skakat varje fiende inom 6 meter för 26 till 34. Slaget och skakningen använder Flockvildhetens fulla husdjursskadebonus på 30% och ökar med husdjurets attackkraft. I 8 sek därefter gör husdjuret 25% mer skada, attackerar 35% snabbare och får Ondskeskott att träffa upp till 2 närliggande fiender.',
   'entities.abilities.wildheart.description': 'Återställer omedelbart 30% av din maximala hälsa.',
@@ -16067,7 +16196,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiv: medan Förfäderslaget är på nedkylning har förbrukandet av ett Stormtecken 25% chans att återställa det. Om de 3 första chanserna misslyckas återställer den 4:e det alltid. (Krigsande)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiv: Bågblixten och Gaffelblixten ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)',
+    'Passiv: Bågblixt, Gaffelblixt och Magmautbrott ger Åska, upp till 5. Jordstöt förbrukar all Åska och gör 25% mer skada per Åska (125% vid 5). Förkastningsvak förbrukar all Åska och gör 20% mer skada per Åska (100% vid 5). (Åskkallelse)',
   'entities.abilities.tidecall.description':
     'Läker ett vänligt mål för {damage}. Läkningen ökar med besvärjelsekraft. Lägger hela läkningen före överläkning till Lagningsströmmen, upp till 30% av målets maximala hälsa.',
   'entities.abilities.unleash_weapon.description':
@@ -16140,7 +16269,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Märgbräckare',
   'entities.abilities.marrowbreak.description':
-    'Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa i 8 sek och återbetalar 15 raseri.',
+    'Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri.',
   'entities.abilities.moonlash.name': 'Månsvall',
   'entities.abilities.moonlash.description':
     'Förbrukar dina 3 Månflod för ett tungt slag som ger {damage} arkan skada: skadevalet. Solspår förbrukar samma 3 Månflod, så välj ett.',
@@ -16149,7 +16278,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till {duration} sek per användning. Vid full Månflod blir Månfrö Månsvall.',
   'entities.abilities.overbloom.name': 'Överblomning',
   'entities.abilities.overbloom.description':
-    'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
+    'Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Sporemending på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
     'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng.',
@@ -16163,7 +16292,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross',
   'hudChrome.auraEffect.verdance':
-    'Grönska {stacks}/{max}. Varje NY Vildblomning eller Andra blomningen du planterar ger 1. Vid {max} blir Snabb läkning Överblomning',
+    'Grönska {stacks}/{max}. Varje Sporemending, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning',
   'hudChrome.continentMap.levels': 'Nivåer {min} till {max}',
   'hudChrome.continentMap.summary': 'Världskarta. Välj en zon för att öppna dess karta.',
   'hudChrome.continentMap.title': 'Världskarta',
@@ -16345,57 +16474,57 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.ruinCost': '{cost} Wrack',
   'entities.abilities.abyssal_rift.description':
     'River upp en reva på den valda platsen, drar fiender inom 8 meter till dess mitt, vållar {damage} skuggskada och bedövar dem i 2 sek. Bossar tar skada men motstår dragningen och bedövningen.',
-  'entities.abilities.abyssal_rift.name': 'Abyssal Rift',
+  'entities.abilities.abyssal_rift.name': 'Avgrundsspricka',
   'entities.abilities.ambush.description':
     'Slå till från skuggorna för 250% vapenskada plus {damage}. Du måste vara dold och bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.ambush.specNote_subtlety':
     'Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold och från valfri vinkel: den användningen kostar inget, förbrukar alla 3 Skymningsförråd, startar den 6 sekunder långa Skuggslöjan och slår dubbelt så hårt.',
   'entities.abilities.army_of_the_dead.description':
-    'River upp en gravportal för att väcka upp en tillfällig Skeletal Warrior, Bone Mage och Gravewing i 20 sek, vilket fyller de platser dina stående Herravälde-tjänare lämnar tomma.',
-  'entities.abilities.army_of_the_dead.name': 'Army of the Dead',
+    'River upp en gravportal för att väcka upp en tillfällig Skelettkrigare, Benmagiker och Gravvinge i 20 sek, vilket fyller de platser dina stående Herravälde-tjänare lämnar tomma.',
+  'entities.abilities.army_of_the_dead.name': 'De dödas armé',
   'entities.abilities.backstab.description':
     'Driv din dolk in i målets rygg för 150% vapenskada plus {damage}. Du måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.backstab.specNote_assassination':
     'Varje slag lägger till 1 Giftritual (max 6) och återställer 15 energi. Vid 6 Giftritual blir Sista vilan till Giftrivning (den detonerar dina blödningars återstående skada på en gång).',
   'entities.abilities.blade_flurry.description':
-    'Släpper lös en klingflod, vilket ökar attackhastigheten med 20% i 12 sek. (Thuggery-motorn)',
+    'Släpper lös en klingflod, vilket ökar attackhastigheten med 20% i 30 sek. (Thuggery-motorn)',
   'entities.abilities.bone_armor.description':
     'Sveper dig i ben och absorberar skada motsvarande 20% av din maximala hälsa.',
-  'entities.abilities.bone_armor.name': 'Bone Armor',
+  'entities.abilities.bone_armor.name': 'Benrustning',
   'entities.abilities.cheap_shot.description':
     'Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.',
   'entities.abilities.cheap_shot.specNote_subtlety':
     'Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan.',
   'entities.abilities.cinderhide.description':
     'Härdar din hud till svalnande slagg i 10 sek, vilket minskar all mottagen skada med 25%.',
-  'entities.abilities.cinderhide.name': 'Cinderhide',
+  'entities.abilities.cinderhide.name': 'Glödhud',
   'entities.abilities.claw.description':
     'Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.claw.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.cold_blood.description':
-    'Fokuserar ditt dödliga uppsåt så att din nästa attack blir en kritisk träff. (Knifework-motorn)',
+    'Fokuserar ditt dödliga uppsåt så att dina nästa 5 attacker blir kritiska träffar. (Knifework-motorn)',
   'entities.abilities.corpse_explosion.description':
-    'Offrar först en Bone Mage, sedan en Skeletal Warrior, och en Gravewing endast som sista utväg. Bland dubbletter väljs den med kortast återstående varaktighet, sedan den svagaste, för att vålla {damage} skuggskada på den valda platsen.',
-  'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
+    'Offrar först en Benmagiker, sedan en Skelettkrigare, och en Gravvinge endast som sista utväg. Bland dubbletter väljs den med kortast återstående varaktighet, sedan den svagaste, för att vålla {damage} skuggskada på den valda platsen.',
+  'entities.abilities.corpse_explosion.name': 'Likexplosion',
   'entities.abilities.coven.description':
-    'Skapar sekundära Evil Eyes på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Sentence ekar till dem för 35% skada.',
-  'entities.abilities.coven.name': 'Coven',
+    'Skapar sekundära onda ögon på upp till 4 närliggande fiender i 15 sek. De matar den delade Fördömelse-poolen med 50%, och Dom ekar till dem för 35% skada.',
+  'entities.abilities.coven.name': 'Häxring',
   'entities.abilities.cruel_pact.description':
     'Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa.',
-  'entities.abilities.cruel_pact.name': 'Cruel Pact',
+  'entities.abilities.cruel_pact.name': 'Grym pakt',
   'entities.abilities.cursed_accomplice.description':
-    'Länkar ditt Maledict Eye när ingen allierad är vald, vilket får dess Gaze att generera 2 Fördömelse. Att länka en vald gruppmedlem gör att bara deras skada mot ditt Evil Eye genererar 3 i stället. En ny länk ersätter den föregående och kan utlösas högst en gång var 2:e sek.',
-  'entities.abilities.cursed_accomplice.name': 'Cursed Accomplice',
+    'Länkar ditt förbannade öga när ingen allierad är vald, vilket får dess Förbannad blick att generera 2 Fördömelse. Att länka en vald gruppmedlem gör att bara deras skada mot ditt onda öga genererar 3 i stället. En ny länk ersätter den föregående och kan utlösas högst en gång var 2:e sek.',
+  'entities.abilities.cursed_accomplice.name': 'Förbannad medhjälpare',
   'entities.abilities.dark_pact.description':
     'Offrar 10% av din nuvarande hälsa för att absorbera skada motsvarande 30% av din maximala hälsa i 8 sek.',
-  'entities.abilities.dark_pact.name': 'Sanguine Covenant',
+  'entities.abilities.dark_pact.name': 'Blodsförbund',
   'entities.abilities.elemental_trance.description':
     'Gå in i en elementär trans i 15 sek, vilket minskar mottagen skada med 30% och omvandlar 20% av all skada du vållar till mana. (Warspirit-motorn)',
-  'entities.abilities.elemental_trance.name': 'Elemental Trance',
+  'entities.abilities.elemental_trance.name': 'Elementartrans',
   'entities.abilities.evil_eye.description':
-    'Märker en fiende som fokus för dina förbannelser. Att flytta Evil Eye bevarar Fördömelse men förnyar inte dess 20 sekunders utgång.',
-  'entities.abilities.evil_eye.name': 'Evil Eye',
+    'Märker en fiende som fokus för dina förbannelser. Att flytta Onda ögat bevarar Fördömelse men förnyar inte dess 20 sekunders utgång.',
+  'entities.abilities.evil_eye.name': 'Onda ögat',
   'entities.abilities.eviscerate.description': 'Avslutande drag som orsakar {damage}.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Vid 6 Giftritual blir denna knapp Giftrivning: ett slag som omedelbart ger all skada dina blödningar ännu skulle ha gett, planterar ett färskt Giftrivning-sår och återställer 20 energi.',
@@ -16410,7 +16539,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi.',
   'entities.abilities.funeral_harvest.description':
     'När en fiende som nyligen skadats av dig eller dina odöda dör får du 1 Själfragment. Detta kan inträffa högst en gång var 3:e sek.',
-  'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
+  'entities.abilities.funeral_harvest.name': 'Begravningsskörd',
   'entities.abilities.garrote.description':
     'Slinga en vajer runt fiendens strupe, vilket orsakar {damage} skada nu och blödning för {overTime} under 18 sek. Du måste vara dold. Ger 1 kombopoäng.',
   'entities.abilities.garrote.specNote_subtlety':
@@ -16421,78 +16550,78 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slår fienden för vapenskada plus {damage}, orsakar blödningsskada under 12 sek och ökar mottagen blödningsskada med 40%. Ger 1 kombopoäng. Var 2:a användning lägger till 1 Skymningsförråd (max 3). (Skulduggery-motorn)',
   'entities.abilities.hex_of_violence.description':
     'Förhäxar fienden i 8 sek, vållar skuggskada och genererar 2 Fördömelse var 2:e sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada.',
-  'entities.abilities.hex_of_violence.name': 'Hex of Violence',
+  'entities.abilities.hex_of_violence.name': 'Våldets förbannelse',
   'entities.abilities.hour_of_judgment.description':
-    'Kallar fram dom över ditt primära Evil Eye i 15 sek, vilket ger 40 Fördömelse och 3 Ödestrådar, aktiverar Possession, fördubblar Fördömelse genererad genom det primära Eye, och ökar Sentence-skada med 20%. Den första Sentence återbetalar 50 Fördömelse.',
-  'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
+    'Kallar fram dom över ditt primära onda öga i 15 sek, vilket ger 40 Fördömelse och 3 Ödestrådar, aktiverar Besättelse, fördubblar Fördömelse genererad genom det primära ögat, och ökar skadan från Dom med 20%. Den första Domen återbetalar 50 Fördömelse.',
+  'entities.abilities.hour_of_judgment.name': 'Domens timme',
   'entities.abilities.kidney_shot.description':
-    'Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek).',
+    'Avslutande drag som bedövar målet i 2 sek plus 1 sek per kombopoäng (5 kombopoäng: 7 sek).',
   'entities.abilities.litany_of_guilt.description':
-    'Förbannar ditt primära Evil Eye i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 meter, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender.',
-  'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
+    'Förbannar ditt primära onda öga i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 yards, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender.',
+  'entities.abilities.litany_of_guilt.name': 'Skuldens litania',
   'entities.abilities.maledict_gaze.description':
-    'Ditt Maledict Eye attackerar ditt valda primära Evil Eye var 2,5:e sek för skuggskada. Possess the Evil Eye fördubblar dess attackhastighet.',
-  'entities.abilities.maledict_gaze.name': 'Maledict Gaze',
+    'Ditt förbannade öga attackerar ditt valda primära onda öga var 2,5:e sek för skuggskada. Besätt det onda ögat fördubblar dess attackhastighet.',
+  'entities.abilities.maledict_gaze.name': 'Förbannad blick',
   'entities.abilities.maul.description':
     'En krossande attack som ökar närstridsskadan med {damage} och orsakar stort hot. Aktiveras vid ditt nästa slag. Endast i Bruinform.',
   'entities.abilities.maul.specNote_feral':
-    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa och återbetalar 15 raseri.',
+    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri.',
   'entities.abilities.moonfire.description':
     'Bränner fienden med Månstorm för {damage} arkan skada plus skada över tid.',
   'entities.abilities.moonfire.specNote_balance':
     'Håll den brinnande: Månfrö förlänger den med 6 sek.',
   'entities.abilities.needle_of_fate.description':
-    'Genomborrar fienden för {damage} skuggskada och genererar {needleDoom} Fördömelse om den bär ditt Evil Eye. Varje träff på ditt primära Evil Eye lägger till en Ödestråd i 12 sek, upp till 3. Om inget Evil Eye finns märker Needle först sitt mål.',
-  'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+    'Genomborrar fienden för {damage} skuggskada och genererar {needleDoom} Fördömelse om den bär ditt onda öga. Varje träff på ditt primära onda öga lägger till en Ödestråd i 12 sek, upp till 3. Om inget ont öga finns märker nålen först sitt mål.',
+  'entities.abilities.needle_of_fate.name': 'Ödets nål',
   'entities.abilities.ossuary_mark.description':
     'Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment.',
-  'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
+  'entities.abilities.ossuary_mark.name': 'Benhusmärke',
   'entities.abilities.possess_evil_eye.description':
-    'Maledictorn tar över ditt primära Evil Eye i 15 sek och genererar 35 Fördömelse. Needle of Fate kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Sentence gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20.',
-  'entities.abilities.possess_evil_eye.name': 'Possess the Evil Eye',
+    'Maledictorn tar över ditt primära onda öga i 15 sek och genererar 35 Fördömelse. Ödets nål kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Dom gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20.',
+  'entities.abilities.possess_evil_eye.name': 'Besätt det onda ögat',
   'entities.abilities.raise_bone_mage.description':
-    'Förbrukar 2 Själfragment för att lägga till en beständig Bone Mage på avstånd i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Dess attacker exponerar målet för 5% mer magisk skada i 6 sek, och Reaping Command höjer den svagheten till 8%.',
-  'entities.abilities.raise_bone_mage.name': 'Raise Bone Mage',
+    'Förbrukar 2 Själfragment för att lägga till en beständig Benmagiker på avstånd i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Dess attacker exponerar målet för 5% mer magisk skada i 6 sek, och Skördande befallning höjer den svagheten till 8%.',
+  'entities.abilities.raise_bone_mage.name': 'Väck benmagiker',
   'entities.abilities.raise_graveguard.description':
-    'Väcker upp en permanent defensiv följeslagare. Graveguard hånar automatiskt, avleder 20% av din skada genom Gravherravälde, och Reaping Command får den att håna och ta 30% mindre skada i 4 sek.',
-  'entities.abilities.raise_graveguard.name': 'Raise Graveguard',
+    'Väcker upp en permanent defensiv följeslagare. Gravvakt hånar automatiskt, avleder 20% av din skada genom Gravherravälde, och Skördande befallning får den att håna och ta 30% mindre skada i 4 sek.',
+  'entities.abilities.raise_graveguard.name': 'Väck gravvakt',
   'entities.abilities.raise_gravewing.description':
-    'Förbrukar 2 Själfragment för att lägga till en beständig Gravewing i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 65% skada var 5:e sek, och Reaping Command gör att varje träffad fiende tar 8% mer skada i 5 sek.',
-  'entities.abilities.raise_gravewing.name': 'Raise Gravewing',
+    'Förbrukar 2 Själfragment för att lägga till en beständig Gravvinge i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 65% skada var 5:e sek, och Skördande befallning gör att varje träffad fiende tar 8% mer skada i 5 sek.',
+  'entities.abilities.raise_gravewing.name': 'Väck gravvinge',
   'entities.abilities.raise_skeletal_warrior.description':
-    'Förbrukar 1 Själfragment för att lägga till en beständig Skeletal Warrior i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 45% skada var 6:e sek, och Reaping Command förlångsammar dess mål med 40% i 4 sek.',
-  'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
+    'Förbrukar 1 Själfragment för att lägga till en beständig Skelettkrigare i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 45% skada var 6:e sek, och Skördande befallning förlångsammar dess mål med 40% i 4 sek.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Väck skelettkrigare',
   'entities.abilities.rake.description':
-    'Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.',
+    'Flå fienden för vapenskada plus {damage} och orsaka {overTime} blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.rake.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.reaping_command.description':
-    'Förbrukar 2 Själfragment för att befalla varje odöd tjänare att slå i samklang. Graveguards hånar och spänner sig, Skeletal Warriors förlångsammar sina mål, Bone Mages exponerar magiska försvar, och Gravewing sliter i alla träffade fiender.',
-  'entities.abilities.reaping_command.name': 'Reaping Command',
+    'Förbrukar 2 Själfragment för att befalla varje odöd tjänare att slå i samklang. Graveguards hånar och spänner sig, Skeletal Warriors förlångsammar sina mål, Bone Mages exponerar magiska försvar, och Gravvinge sliter i alla träffade fiender.',
+  'entities.abilities.reaping_command.name': 'Skördande befallning',
   'entities.abilities.regrowth.description':
-    'Läker ett vänligt mål för {damage} och ytterligare en mängd under 21 sek.',
+    'Läker ett vänligt mål för {damage} och ytterligare en mängd under 15 sek. Om effekten varar hela sin tid läker den målet igen för samma mängd som den första läkningen.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Att plantera en NY blomning lägger till 1 Grönska (max 5).',
+    'Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar.',
   'entities.abilities.rejuvenation.description': 'Läker målet för {damage} under 12 sek.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Att plantera en NY blomning lägger till 1 Grönska (max 5). Vid 5 Grönska blir Snabb läkning Överblomning.',
+    'Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar. Vid 3 Grönska blir Snabb läkning Överblomning.',
   'entities.abilities.rip.description':
-    'Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Kattform.',
+    'Avslutande attack som får målet att blöda varannan sekund i 24 sek: 72 skada plus 48 per förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.',
   'entities.abilities.rip.specNote_feral': 'Det landade slaget lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.ruinous_brand.description':
     'Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål. Fördärvsbult-ekon räknas också som kritiska träffar, utan ytterligare multiplikator för kritisk skada.',
-  'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
+  'entities.abilities.ruinous_brand.name': 'Förödande brännmärke',
   'entities.abilities.rupture.description':
     'Avslutande drag som sårar målet: det blöder var 2:e sek, i 6 sek plus 2 sek per kombopoäng (5 kombopoäng: 16 sek och {damage} total skada).',
   'entities.abilities.sacrifice_undead.description':
     'Förstör en tjänare från ditt Herravälde för att återställa 25% av din maximala hälsa.',
-  'entities.abilities.sacrifice_undead.name': 'Sacrifice Undead',
+  'entities.abilities.sacrifice_undead.name': 'Offra odöd',
   'entities.abilities.sacrilegious_march.description':
     'Ökar förflyttningshastigheten med 35%, men offrar 2% av din maximala hälsa varje sekund. Kasta igen för att avbryta. Den stängs av vid 20% hälsa.',
-  'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
+  'entities.abilities.sacrilegious_march.name': 'Vanhelgande marsch',
   'entities.abilities.sentence.description':
     'Förbrukar all Fördömelse och alla Ödestrådar för att fälla dom över fienden. Varje Tråd ökar skadan med 6%. Extra effekter trappas upp vid 20, 50, 80 och 100 Fördömelse. Dess skalning av skada planar ut efter nivå 16.',
-  'entities.abilities.sentence.name': 'Sentence',
+  'entities.abilities.sentence.name': 'Dom',
   'entities.abilities.sinister_strike.description':
     'Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Lägger till 1 Giftritual (max 6).',
@@ -16502,38 +16631,38 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Avslutande drag som ökar närstridens attackhastighet med 30% i 12 sek plus 4 sek per kombopoäng (5 kombopoäng: 32 sek).',
   'entities.abilities.soul_harvest.description':
     'River i fiendens själ för {damage} skuggskada och skapar 1 Själfragment, upp till 5.',
-  'entities.abilities.soul_harvest.name': 'Essence Reap',
+  'entities.abilities.soul_harvest.name': 'Essensskörd',
   'entities.abilities.soul_lance.description':
-    'Kastar en spöklik lans för {damage} skuggskada. Mot ditt Ossuary Mark läggs 50% av dess skada till märket.',
-  'entities.abilities.soul_lance.name': 'Soul Lance',
+    'Kastar en spöklik lans för {damage} skuggskada. Mot ditt Benhusmärke läggs 50% av dess skada till märket.',
+  'entities.abilities.soul_lance.name': 'Själslans',
   'entities.abilities.soulwell.description':
-    'Frammanar en Soulwell i 3 min. Utanför strid kan gruppmedlemmar fylla på sina Själstenar upp till 3. En Själsten återställer 25% av maximal hälsa och delar nedkylning med drycker.',
-  'entities.abilities.soulwell.name': 'Soulwell',
+    'Frammanar en Själsbrunn i 3 min. Utanför strid kan gruppmedlemmar fylla på sina Själstenar upp till 3. En Själsten återställer 25% av maximal hälsa och delar nedkylning med drycker.',
+  'entities.abilities.soulwell.name': 'Själsbrunn',
   'entities.abilities.starfire.description':
     'Kallar ner en stråle av stjärneld, vilket orsakar {damage} arkan skada.',
   'entities.abilities.starfire.specNote_balance':
     'I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir denna knapp Solspår: ett omedelbart slag som ger 80 till 100 naturskada plus en brännskada på 45 under 9 sek, återställer 35 mana och förbrukar alla 3.',
   'entities.abilities.stealth.description':
-    'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50% långsammare. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva ut.',
+    'Döljer dig i skuggorna: fiender lägger knappt märke till dig, och du rör dig i full fart. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva ut.',
   'entities.abilities.stealth.specNote_subtlety':
     'Varje öppnare du använder från Skymningsslöja lägger till 1 Skymningsförråd (max 3).',
   'entities.abilities.swiftmend.description':
-    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Plantering av Vildblomning och Andra blomningen lägger till Grönska; vid 5 Grönska blir denna knapp Överblomning, som skördar varje läkning över tid du äger på alla allierade och omedelbart läker dem för 60% av dess återstående läkning. (Groveheart-motorn)',
+    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Varje kastning av Sporemending, Andra blomningen och Vildläkning ger 1 Grönska; vid 3 Grönska blir denna knapp Överblomning, som omedelbart läker varje allierad som bär dina läkning över tid-effekter för 60% av vad de effekterna hade kvar. (Återställning-motorn)',
   'entities.abilities.swipe.description':
     'Svep dina klor genom närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
   'entities.abilities.swipe.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.umbral_anchor.description':
     'Första kastningen: förankrar din skugga vid dina fötter i 5 min. Kasta igen inom 40 m för att återvända dit, vilket förbrukar ankaret och startar en 45 sekunders nedkylning.',
-  'entities.abilities.umbral_anchor.name': 'Umbral Anchor',
+  'entities.abilities.umbral_anchor.name': 'Skuggankare',
   'entities.abilities.unholy_command.description':
     'Förbrukar 3 Själfragment för att befalla alla dina odöda att vålla 25% mer skada och agera 20% snabbare i 12 sek.',
-  'entities.abilities.unholy_command.name': 'Unholy Command',
+  'entities.abilities.unholy_command.name': 'Ohelig befallning',
   'entities.abilities.venom_dart.specNote_assassination':
     'Lägger till 1 Giftritual och förlänger ditt Giftrivning-sår med 6 sek (såret går aldrig över 20 sek).',
   'entities.abilities.vicarious_suffering.description':
     'Länkar ditt lidande i 8 sek och genererar upp till 15 Fördömelse från fientliga träffar. På dig själv minskar den mottagen skada med 20%. På en allierad omdirigerar den upp till 20% till dig utan att ta dig under 15% hälsa.',
-  'entities.abilities.vicarious_suffering.name': 'Vicarious Suffering',
+  'entities.abilities.vicarious_suffering.name': 'Ställföreträdande lidande',
   'entities.abilities.wrath.description':
     'Slungar en stråle av naturenergi för {damage} naturskada.',
   'entities.abilities.wrath.specNote_balance':
@@ -16543,10 +16672,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.marrowpoint.name': 'Märgspets',
   'entities.items.rimefang.name': 'Rimtand',
   'entities.items.soul_stone.name': 'Själsten',
-  'entities.mobs.graveguard.name': 'Graveguard',
-  'entities.mobs.necromancy_bone_mage.name': 'Bone Mage',
-  'entities.mobs.necromancy_gravewing.name': 'Gravewing',
-  'entities.mobs.necromancy_skeletal_warrior.name': 'Skeletal Warrior',
+  'entities.mobs.graveguard.name': 'Gravvakt',
+  'entities.mobs.necromancy_bone_mage.name': 'Benmagiker',
+  'entities.mobs.necromancy_gravewing.name': 'Gravvinge',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Skelettkrigare',
   'guide.abilityHook.evil_eye': 'Namnger fienden vars handlingar och lidande föder din Fördömelse.',
   'hud.pet.abyssalChain': 'Abyssal Chain',
   'hud.pet.abyssalChainDesc':
@@ -16565,17 +16694,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Förtär förbrukar {stacks} Ödestrådar för {doom} extra Fördömelse per tillfälle',
   'hudChrome.auraEffect.afflictionEye':
-    'Maledict Gaze attackerar var {interval}:e sek; effekter vid detta Evil Eye genererar {pct}% Fördömelse',
+    'Förbannad blick attackerar var {interval}:e sek; effekter vid detta onda öga genererar {pct}% Fördömelse',
   'hudChrome.auraEffect.afflictionEyeSecondary':
-    'Effekter vid detta Evil Eye genererar {doomPct}% Fördömelse; Sentence ekar hit för {echoPct}% skada',
+    'Effekter vid detta onda öga genererar {doomPct}% Fördömelse; Dom ekar hit för {echoPct}% skada',
   'hudChrome.auraEffect.afflictionFateThreads':
-    '{stacks} Ödestrådar: Sentence gör {sentencePct}% mer skada, eller Förtär får {doom} extra Fördömelse per tillfälle',
+    '{stacks} Ödestrådar: Dom gör {sentencePct}% mer skada, eller Förtär får {doom} extra Fördömelse per tillfälle',
   'hudChrome.auraEffect.afflictionJudgment':
-    'Primära Evil Eye genererar {eyePct}% mer Fördömelse; Sentence gör {sentencePct}% mer skada och den första återbetalar {refund} Fördömelse',
+    'Det primära onda ögat genererar {eyePct}% mer Fördömelse; Dom gör {sentencePct}% mer skada och den första återbetalar {refund} Fördömelse',
   'hudChrome.auraEffect.afflictionLitany':
     'Fördömelse-vinster vållar {damage} skuggskada till upp till {targets} fiender inom {radius} m, en gång per sekund',
   'hudChrome.auraEffect.afflictionPossession':
-    'Förstärker Needle of Fate, Förtär, Maledict Gaze och Sentence',
+    'Förstärker Ödets nål, Förtär, Förbannad blick och Dom',
   'hudChrome.auraEffect.afflictionVicarious':
     'Omdirigerar eller minskar {pct}% av inkommande skada och kan generera upp till {max} Fördömelse',
   'hudChrome.auraEffect.afflictionViolence':
@@ -16592,7 +16721,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     '{used} av {cap} sek nedkylningsreduktion använd i detta fönster',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Vargform kostar ingen mana och håller fast målet för er Bruinrusning, vilket saktar ner det med {pct}% i {sec} sek',
+    'Kattform kostar ingen mana och håller fast målet för er Bruinrusning, vilket saktar ner det med {pct}% i {sec} sek',
   'hudChrome.auraEffect.desolation':
     '{charges} laddningar: din nästa Fördärvsbult kastas {castPct}% snabbare, eller din nästa Eldregn landar omedelbart',
   'hudChrome.auraEffect.duskfireClaim': 'Döden ger {value} Wrack',
@@ -16607,7 +16736,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.forbiddenReflectionReady':
     'Din nästa kvalificerade häxmästarförmåga kan kastas igen',
   'hudChrome.auraEffect.formLich':
-    'Soul Lance träffar även upp till {targets} närliggande fiender för {pct}% skada',
+    'Själslans träffar även upp till {targets} närliggande fiender för {pct}% skada',
   'hudChrome.auraEffect.formMetamorph':
     'Demonform: kroppsstorlek ökad med {pct}%; övriga bonusar hanteras av separata buffar',
   'hudChrome.auraEffect.formMoonkin':
@@ -16615,7 +16744,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formShadow': 'Dunkelslöja: skuggskada ökad med {pct}%',
   'hudChrome.auraEffect.freeExecute': 'Din nästa kvalificerade avrättningsförmåga kostar ingenting',
   'hudChrome.auraEffect.funeralHarvestLock':
-    'Funeral Harvest kan inte skapa ännu ett Själfragment än',
+    'Begravningsskörd kan inte skapa ännu ett Själfragment än',
   'hudChrome.auraEffect.galeheartWeapon':
     'Att fullborda {steps}-slags Krigsandens kadens ekar slaget {count} gånger för {pct}% av dess skada som naturskada',
   'hudChrome.auraEffect.healEcho': 'Att falla under {threshold}% hälsa återställer {value} hälsa',
@@ -16627,7 +16756,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Föråldrat Dödseko; ingen nuvarande förmåga förbrukar det',
   'hudChrome.auraEffect.necromancyHarvestMark': 'Döden kan skapa 1 Själfragment',
   'hudChrome.auraEffect.necromancyOssuaryMark':
-    'Lagrar {storedPct}% av din och dina odödas skada, plus {lancePct}% av Soul Lance-skada; kasta igen för att detonera. Döden exploderar inom {radius} m och skapar 1 Själfragment',
+    'Lagrar {storedPct}% av din och dina odödas skada, plus {lancePct}% av Själslans-skada; kasta igen för att detonera. Döden exploderar inom {radius} yards och skapar 1 Själfragment',
   'hudChrome.auraEffect.nextAttackCrit': 'Din nästa attack blir garanterat en kritisk träff',
   'hudChrome.auraEffect.overpowerCharge':
     '{stacks} laddningar: ditt nästa Stympande hugg vållar {pct}% mer skada',
@@ -16669,7 +16798,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tre Ödestrådar: Förtär kan väva in dem till ytterligare Fördömelse.',
   'hudChrome.warlock.fateThreadsLabel': 'Ödestrådar',
   'hudChrome.warlock.fateThreadsSentenceReady':
-    'Tre Ödestrådar: Sentence kan förbruka dem för 18% ökad skada.',
+    'Tre Ödestrådar: Dom kan förbruka dem för 18% ökad skada.',
   'hudChrome.warlock.fateThreadsStatus': '{value} av {max} Ödestrådar.',
   'itemUi.tooltip.useHealingPotionPct':
     'Använd: Återställer omedelbart {percent}% av maximal hälsa. Användbar i strid. 2 min nedkylning.',
@@ -16958,7 +17087,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Det är två skilda handlingar på samma kropp. Allt ett lik innehåller, mynt och fynd plus insamlingsbara komponenter, öppnas i samma fönster, men interagera-tangenten och Ta byte plockar bara det vanliga bytet, som följer normala bytesregler. Insamling är yrkessidan, som lossar material från kroppen själv, och sker först när du väljer Skörda i det fönstret.\n\nInsamling är först till kvarn, engångsbasis: varje kropp kan skördas exakt en gång, av vem som helst som gör anspråk på det först, inbegripet online-föregångare. Ditt Stadsfokus formar vad du får: när du står i ett stadscentrum kan du fördela 10 fokuspoäng över de komponenttyper du bryr dig om, och varje fokuserad komponent rullar en bättre nivå (var 5:e poäng ökar det ett steg, som mest två steg) och ger mer (10 procent per poäng). Ofokuserade komponenter försämras aldrig.',
   'guide.profPages.faq.a4':
-    'Du fick ett vindfall. Ungefär 1 skörd av 90 utlöser en sällsynt insamlingshändelse (urgammalt hjärtved på ett träd, en oskadd åder i malm, en månlyst blomma bland örter): den femdubblar utbytet, signerar varje enhet med ditt namn och kungör fyndet för hela zonen. Ett sällsynt eller bättre kvalitetsslag på en vanlig skörd signerar också utbytet.\n\nSignerade material är värda att spara eller sälja dyrt: att hålla vilken signerad kopia som helst av ett nödvändigt reagens vid bänken lägger till 2 procentenheter på mästerverkschansen. Kom bara ihåg att de bara staplas med identiskt signerade kopior, så de tar en egen väskplats.',
+    'Du har hittat en ovanligt rik skörd. Ungefär 1 av 90 skördar utlöser en sällsynt insamlingshändelse: uråldrig kärnved i träd, en orörd åder i malm eller en månlyst blomma bland örter. Utbytet femdubblas, varje enhet får ditt namn som signatur och fyndet annonseras i hela zonen. En vanlig skörd som får sällsynt eller bättre kvalitet signerar också utbytet.\n\nSignerade material är värda att behålla eller sälja dyrt: en signerad enhet av ett nödvändigt reagens i väskorna eller Materialvalvet, där tillverkningen kan hämta det, ger 2 procentenheter högre mästerverkschans. De kan dela en kompatibel stapel med osignerat material eller andra samlares och undertecknares enheter utan att tappa märken; varje källa och mängd sparas separat.',
   'guide.profPages.faq.a5':
     'Gå till valfri hantverksstation med pjäsen i din väska och betala mästaren. Avgiften följer föremålets kvalitet: 25 silver för ett ovanligt stycke, 1 guld för ett sällsynt, 4 guld för ett episkt; ett legendariskt betalar den episka taxan, och ett beställt vanligt stycke betalar den ovanliga. Det måste vara en riktig station: en mobil station erbjuder aldrig tjänsten.\n\nAvgiften köper en ren tavla, inte ett botemedel: pjäsen förblir en beställning, så det binds igen till vem som tar emot det i nästa handel. Om flera bundna kopior delar en stapel lossas en kopia av och löses upp per betalning.',
   'guide.profPages.faq.a8':
@@ -17631,7 +17760,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'När din skyddande psalm är helt förbrukad blir din nästa Skurgärningshymn inom 10 sek omedelbar. Kan inte inträffa mer än en gång var 15:e sek.',
   'entities.itemSets.emberscreed.name': 'Glödernas trosklädnad',
   'entities.itemSets.forgewall.bonus2':
-    'Järnvilja omvandlar vrede till 5 absorption per poäng i stället för 4.',
+    'Järnviljas sköld absorberar 25% av din maximala hälsa i stället för 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Att kasta Sköldspricka minskar Järnviljas återstående väntetid med 2 sek.',
   'entities.itemSets.forgewall.name': 'Smedjemurens aegis',
@@ -17645,8 +17774,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Skördekommandots samstämmiga slag orsakar 25 procent mer skada.',
   'entities.itemSets.gravebrand.name': 'Gravmärkt regalia',
-  'entities.itemSets.grovespring.bonus2':
-    'Snabbläkning förbrukar din egen Vildblomma eller Andra blomning först och helar 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.grovespring.bonus4':
     'Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska.',
   'entities.itemSets.grovespring.name': 'Lundkällans dräkt',
@@ -17943,11 +18070,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Operatörskonton kan inte sparkas.',
   'apiError.kick.reason_required': 'En anledning krävs.',
   'apiError.kick.target_offline': 'Den spelaren är inte längre online i denna värld.',
-  'apiError.world_quest_block.admin_target':
-    'Operatörskonton kan inte blockeras från världsuppdrag.',
-  'apiError.world_quest_block.reason_required': 'En anledning krävs.',
-  'apiError.world_quest_block.already_blocked': 'Det kontot är redan blockerat från världsuppdrag.',
-  'apiError.world_quest_block.not_blocked': 'Det kontot är inte blockerat från världsuppdrag.',
   'entities.abilities.melting_acid.description':
     'Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg stänker frätande syra på målet och minskar dess rustning med 5 % i 12 sekunder.',
   'entities.abilities.nightshade_coating.description':
@@ -18322,12 +18444,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.dreadCurseSummary':
     'Var {every} sek träffar Nythraxis sin nuvarande tank för {hitNormal} av maximal hälsa som Skuggskada och lägger till en stapel Skräckförbannelse. I {duration} sek ökar varje stapel skadan den tanken tar från Nythraxis med {perStackNormal}, upp till {max} staplar.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    'Var {everyHeroic} sek markerar skeletthänder {countHeroic} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstHeroic} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameHeroic} sek, vilket orsakar {tickHeroic} av maximal hälsa varje sekund för alla som står i den. Det sker aldrig medan Själsslitning-märken är aktiva, eller inom {gap} sek efter att de försvunnit.',
+    'Var {everyHeroic} sek markerar skeletthänder {countHeroic} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstHeroic} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameHeroic} sek, vilket orsakar {tickHeroic} av maximal hälsa varje sekund för alla som står i den.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': 'Gravutbrott',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     'Kliv ut ur varje varningscirkel innan den bryter ut och håll er borta från brinnande mark. Tankar drar Nythraxis bort från lågorna så att närstrid har plats att arbeta.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    'Var {everyNormal} sek markerar skeletthänder {countNormal} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstNormal} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameNormal} sek, vilket orsakar {tickNormal} av maximal hälsa varje sekund för alla som står i den. Det sker aldrig medan Själsslitning-märken är aktiva, eller inom {gap} sek efter att de försvunnit.',
+    'Var {everyNormal} sek markerar skeletthänder {countNormal} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstNormal} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameNormal} sek, vilket orsakar {tickNormal} av maximal hälsa varje sekund för alla som står i den.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': 'Gravbrytare',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerResponse':
     'Tankar håller Nythraxis vänd bort från raiden. Alla andra står bakom eller bredvid honom och korsar aldrig konen.',
@@ -18465,7 +18587,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Spåra {count} tillverkningar av {name} som ditt samlarmål',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Dina träffande närstridsattacker kan ge 50 Styrka i 15 sekunder och hela dig för 200 hälsa. Läkningsmodifierare gäller. Varje träff har 1 % chans per 0,6 sekunder av den anfallande vapnets bashastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den staplas aldrig. Distansattacker utlöser inte effekten. Vargform använder sin bashastighet på 1 sekund.',
+    'Dina närstridsattacker som träffar kan ge 50 Styrka i 15 sek. och hela dig för 200 hälsa. Modifieringar av helande gäller. Varje träff har 1% chans per 0,6 sek. av det träffande vapnets grundhastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den kan inte staplas. Avståndsattacker utlöser inte effekten. I Kattform använder automatiska attacker tassarnas hastighet på 1 sek. Slag och avslutare i Kattform och Bruinform använder vapnets egen hastighet; Svepande klor gör en chanskontroll per användning, inte per mål.',
   'hudChrome.enchantName.enchant_chest_armor': 'Bröstetsning: Förstärkning',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Bröstetsning: Större uthållighet',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Bröstetsning: Lysande uthållighet',
@@ -19358,7 +19480,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'En rankad vinst ger Heder, valutan för spelare mot spelare, och en förlust som du spelar till slutet ger fortfarande en mindre andel, liksom oavgjort, så rankning är det enda en förlust egentligen kostar dig. Heder ska belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag ger inget mer, och det gör inte heller att förlora mot dem igen. En lång vinstdag betalar fullt för sin första följd av segrar, halverar sedan vad en vinst ger, halverar det igen längre in och stannar där. En match som din motståndare lämnar påverkar fortfarande din rankning men ger ingen Heder alls. Dagen tillhör riket: den rullar över vid rikets nattliga återställningstid, samma gräns där alla dagliga låsningar nollställs.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster.',
+    'Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster. Ett undantag fungerar överallt: två delar av vilket som helst av dessa set gör också att skada du tar inte längre fördröjer dina besvärjelser.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Det är den avsiktliga avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålornas nivåer: ett krigföringsföremål har aldrig de stridsvärden som en episk fängelsehåleutrustning på samma plats har, och krigföringsvärdet och setbonusarna det får i stället används helt mot andra spelare. Vill du hävda dig på arenan, köp den. Vill du klara hjältemodiga fängelsehålor snabbare, förtjäna din utrustning där.',
   'guide.controls.harvestJournal': 'Skördedagbok',
@@ -19454,7 +19576,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Hur mynt rör sig genom yrkena: de exakta avgifterna och sänkorna, vad som faktiskt säljer, Världsmarknadens regler, arbetsordrar, beställningar och raidfinansierade samlingars plats vid sidan av vanlig tillverkning.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att hålla en signerad kopia av ett nödvändigt reagens vid bänken, vem som än signerade det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.',
+    'Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att ha en signerad enhet av ett nödvändigt reagens, vem som än signerade det, i väskorna eller Materialvalvet där tillverkningen kan hämta det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.',
   'guide.profPages.effectFeast':
     'Dukar upp en festmåltid som andra kan äta av, en portion var: {servings} portioner, varar i {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -19833,28 +19955,5665 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
-  'abilityUi.actionBar.moveHint': 'Håll Skift och dra för att flytta',
-  'entities.items.vanguard_feral_staff.name': 'Förtruppens vilda stav',
-  'hudChrome.weeklyRewards.previewClaimNotice':
-    'Belöningar väntar. Besök Valvförvaltaren i Eastbrook för att öppna och hämta dem.',
-  'hudChrome.worldPvp.groundSanctuary':
-    'Prövostranden är den enda fristaden: där kan du inte aktivera världs-PvP eller slåss mot andra spelare.',
-  'hudChrome.worldPvp.rewardBonus':
-    'Ha världs-PvP aktiverat för att få {percent} mer erfarenhet och fraktionsrykte. Bonusarna upphör när du begär att stänga av det.',
-  'hudChrome.worldPvp.rewardPaused': 'Nuvarande PvP-svit: {time} spelat (pausad på Prövostranden)',
+  'hudChrome.meters.detailHealSubtitle':
+    'Effektivt: {effective} | Överläkning: {overheal} ({overhealPercent}) | Träffar: {hits} ({critPercent} krit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Träffar: {hits} | Kritiska: {crits} ({critPercent}) | Snitt: {average} | Min/max: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Omgivningsvolym',
+  'hudChrome.mapAtlas.resizeRailAria': 'Kartans sidopanelsbredd',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Dra för att ändra storlek på kartans sidopanel. Dubbelklicka för att återställa.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'En gång var tredje timme får hela riket vid en oförutsägbar tidpunkt veta att en kulle dyker upp i en zon med fri strid om femton minuter. Dess cirkel markeras på öppen mark. Kullen står kvar i fyrtiofem minuter och försvinner sedan. Under tiden meddelas dess plats och grupperna med längst sammanlagd innehavstid var femte minut. Gruppen med flest spelare i cirkeln utmanar om kullen och tar den efter sammanlagt trettio sekunders numerärt övertag. En rivaliserande grupp pausar bara räknaren tills din grupp leder igen; den börjar om först när ingen levande medlem av din grupp finns kvar där inne. En ensam spelare räknas som en grupp på en person och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Varje medlem i gruppen som håller kullen och står i cirkeln får lika mycket Ära varje minut, oavsett hur länge gruppen hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar ungefär lika mycket som för tre segrar på slagfält. När kullen försvinner får alla som stått i cirkeln minst en minut under den ledande gruppens innehav och fortfarande tillhör gruppen en seger till PvP-raden i det veckovisa valvet, om gruppen med längst sammanlagd innehavstid hållit den i minst tio minuter. En stapel över fältet visar vem som håller den, antalet spelare på båda sidor och erövringsräknaren; /hill i chatten visar platsen.',
+  'questUi.dialog.attuneHearthstone': 'Bind min allierade hemsten här.',
+  'questUi.dialog.attuneHearthstoneAria': 'Bind din allierade hemsten till {hub} hos {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Din allierade hemsten är inte bunden. Tala med en allierad kvartermästare eller använd den vid en allierad knutpunkt.',
+  'hudChrome.factionRewards.hearthstoneBound': 'Din allierade hemsten är nu bunden till {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Hemstenen för dig till {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Föremålet är inte klart än ({minutes} min återstår).',
+  'errors.noUpdateFound': 'Ingen uppdatering hittades. Försök igen om en stund.',
+  'errors.searchUpdates': 'Sök efter uppdateringar',
+  'errors.updateSearchFailed': 'Det gick inte att söka efter uppdateringar. Försök igen.',
+  'errors.updateUnavailable': 'Uppdatera via din spelbutik eller hämta den senaste klienten.',
+  'hudChrome.auraEffect.formSporemender':
+    'Sporläkarform: utförd läkning ökar med {pct}%, rustningen ökar med {armorPct}% och rörelsehastigheten minskar med {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Låsta föremål stannar på sin plats i väskan. Lås upp föremålet för att flytta det.',
+  'hudChrome.death.pvpResurrect': 'PvP-återupplivning',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'PvP-återupplivning är redo: du återuppstår på närmaste kyrkogård.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Återuppstå på närmaste kyrkogård med full hälsa, utan en ny Väktartull.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP-återupplivning ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Du kan använda PvP-återupplivning om {seconds}: du återuppstår på närmaste kyrkogård.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Den köade svårighetsändringen avbröts eftersom gruppen eller ledaren ändrades.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Svårighetsändringen köades eftersom någon eller någons kropp fortfarande är kvar där inne. Den träder i kraft när instanserna är tomma.',
+  'hudChrome.ferry.arrivesIn': 'Färjan anländer om {time}',
+  'hudChrome.ferry.boardNow': 'Gå ombord nu',
+  'hudChrome.ferry.destination': 'Resmål: {dest}',
+  'hudChrome.ferry.portLabel': 'Färja från {port} till {dest}',
+  'hudChrome.ferry.portTitle': 'Färjeläget i {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Färjans tidtabell är inte tillgänglig.',
+  'hudChrome.graphicsRestore.note': 'Återställer grafik',
+  'hudChrome.hill.contestOtherPaused': 'Rivalens tid pausad: {seconds} av {total}',
+  'hudChrome.hill.contestYouPaused': 'Pausad: {seconds} av {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Tagen från {name}',
+  'hudChrome.keybindLayout.apply': 'Konvertera snabbtangenter',
+  'hudChrome.keybindLayout.converted': 'Snabbtangenter konverterades från {from} till {to}.',
+  'hudChrome.keybindLayout.from': 'Snabbtangenter avsedda för',
+  'hudChrome.keybindLayout.help':
+    'Varje snabbtangent flyttas till den tangent som skriver samma tecken i den nya layouten. Sifferraden stannar på samma plats. Tangentnamnen i listan anger QWERTY-positioner; tangentbordsöversikten visar din egen layout.',
+  'hudChrome.keybindLayout.keepMovement': 'Behåll rörelsetangenternas placering',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Rörelsetangenterna behöll sin placering förra gången och gör därför det igen. Återställ standardinställningarna för att börja om.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belgisk)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (fransk)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Colemak-layout',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Dvorak-layout',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasiliansk ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (dansk)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (spansk)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiensk)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norsk)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (svensk, finsk)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portugisisk)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turkisk)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (brittisk)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (amerikansk)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (schweizisk)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (tysk)',
+  'hudChrome.keybindLayout.moves': 'Snabbtangenter som flyttas: {count}',
+  'hudChrome.keybindLayout.noChange': 'Inga snabbtangenter ändras mellan dessa layouter.',
+  'hudChrome.keybindLayout.open': 'Konvertera',
+  'hudChrome.keybindLayout.title': 'Tangentbordslayout',
+  'hudChrome.keybindLayout.to': 'Konvertera till',
+  'hudChrome.nameplate.bountyTag': 'Skottpengar',
+  'hudChrome.options.classicCombatText': 'Klassisk stridstext',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Föremål under denna kvalitet säljs med ett enda klick. Ett föremål som säljs av misstag kan köpas tillbaka från handlaren, utom osignerade grå föremål.',
+  'hudChrome.options.spellEffects': 'Besvärjelseeffekter',
+  'hudChrome.options.spellTooltipOnHover': 'Besvärjelsers verktygstips vid hovring',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.realmMotd.cleared': 'Dagens meddelande har rensats.',
+  'hudChrome.realmMotd.line': 'Dagens meddelande: {text}',
+  'hudChrome.realmMotd.none': 'Inget meddelande för dagen har angetts.',
+  'hudChrome.realmMotd.saveFailed':
+    'Dagens meddelande kunde inte sparas och försvinner vid en omstart.',
+  'hudChrome.realmMotd.tooLong': 'Dagens meddelande får innehålla högst {max} tecken.',
+  'hudChrome.realmMotd.updated': 'Dagens meddelande har uppdaterats.',
+  'hudChrome.realmMotd.usage':
+    'Användning: /motd "<meddelande>" för att ange det, /motd clear för att ta bort det.',
+  'hudChrome.skullBag.clickOpen': 'Klicka för att öppna',
+  'hudChrome.skullBag.close': 'Stäng skallpåsen',
+  'hudChrome.skullBag.empty': 'Tom. När du bär påsen hamnar skallar som du plundrar direkt i den.',
+  'hudChrome.skullBag.notCarried':
+    'Bär skallpåsen i dina väskor för att lägga in eller ta ut skallar.',
+  'hudChrome.skullBag.store': 'Lägg in burna skallar ({count})',
+  'hudChrome.skullBag.storeNone': 'Inga skallar att lägga in',
+  'hudChrome.skullBag.takeAll': 'Ta alla',
+  'hudChrome.skullBag.takeAllAria': 'Ta alla: {item}',
+  'hudChrome.skullBag.takeOne': 'Ta 1',
+  'hudChrome.skullBag.takeOneAria': 'Ta 1: {item}',
+  'hudChrome.skullBag.title': 'Skallpåse',
+  'hudChrome.skullBag.tooltip':
+    'Rymmer obegränsat med troféskallar utan att ta upp väskutrymme. När du har den i dina väskor hamnar skallar som du plundrar direkt i den. Klicka på den i väskan för att lägga in eller ta ut skallar.',
+  'hudChrome.skullBag.total': 'Skallar: {count}',
+  'hudChrome.skullBag.unrecorded': 'Troféskalle',
+  'hudChrome.treasureMap.inkPickerCancel': 'Avbryt',
+  'hudChrome.treasureMap.inkPickerCost': 'Rita om till {rarity}: {inks} bläck',
+  'hudChrome.treasureMap.inkPickerHeld': 'Du har {held} Kartografens bläck.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Följs just nu: dess kryss finns i {zone}. Krysset stannar på samma plats.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Vilken karta vill du använda Kartografens bläck på?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Oläst ({count} i din ägo)',
+  'hudChrome.warfare.reasons.worldQuest': 'världsuppdrag',
+  'hudChrome.warfareShop.goods': 'Varor',
+  'hudChrome.weeklyRewards.allClassGear': 'Alla klassers utrustning',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} PvP-segrar',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} PvP-seger',
+  'hudChrome.weeklyRewards.lootFocus': 'Bytesinriktning',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Gäller endast oöppnade valv.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Inget lämpligt byte. Välj en annan inriktning.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Vinn {count} PvP-segrar',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Vinn {count} PvP-seger',
+  'hudChrome.weeklyRewards.rolledFocus': 'Slumpat för: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused': 'Nuvarande PvP-svit: {time} spelad tid (pausad i en fristad)',
   'hudChrome.worldPvp.rewardPausedDead':
-    'Nuvarande PvP-svit: {time} spelat (pausad medan du är död)',
+    'Nuvarande PvP-svit: {time} spelad tid (pausad medan du är död)',
   'hudChrome.worldPvp.rewardPausedInstance':
-    'Nuvarande PvP-svit: {time} spelat (pausad i instanser)',
-  'hudChrome.worldPvp.rewardProgress': 'Nuvarande PvP-svit: {time} spelat',
+    'Nuvarande PvP-svit: {time} spelad tid (pausad i PvE-instanser)',
+  'hudChrome.worldPvp.rewardProgress': 'Nuvarande PvP-svit: {time} spelad tid',
   'hudChrome.worldPvp.rewardTitles':
-    'Få permanenta titlar efter {thresholds} speltid i den öppna världen med världs-PvP aktiverat. Utloggning, död, instanser och Prövostranden pausar räknaren. Avstängning nollställer den.',
-  'guide.worldPvpPage.introZones':
-    'PvP i den öppna världen är frivilligt och beror på området. På omstridd mark gör din aktiva PvP-flagga alla flaggade spelare utanför din grupp eller raid till fiender; stänger du av den blir du åskådare igen efter en kort fördröjning. Prövostranden är den enda fristaden utan världsstrider, och de tre nordligaste områdena använder samma frivilliga flaggregler som resten av världen. Din flagga aktiveras automatiskt när du går in i en aktiv cirkel i Kullens kung. Grupp- och raidkamrater är aldrig dina fiender någonstans; guildmedlemmar utanför din grupp är mål som alla andra.',
-  'guide.worldPvpPage.zonesBody':
-    'Prövostranden är den enda fristaden: ingen världs-PvP sker där och du kan inte aktivera din flagga. En aktiv flagga förblir aktiv, men framsteg mot titlar baserade på speltid pausas tills du lämnar området. Överallt annars, även i Drakländerna, Frostslöjans vidder och Bärnstensfallet, kan bara flaggade spelare slåss. Din flagga aktiveras automatiskt när du går in i en aktiv cirkel i Kullens kung om du uppfyller det vanliga nivåkravet. Varningscirkeln aktiverar inte din flagga. Flaggan förblir aktiv när du lämnar den aktiva cirkeln; använd /pvp off för att starta den vanliga nedräkningen på fem minuter, som inte kan slutföras medan du är inne på en aktiv kulle eller fortfarande i strid.',
-  'guide.worldPvpPage.hillBody':
-    'Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.',
-  'hudChrome.hill.pvpEntry': 'Världs-PvP aktiveras när du går in i den aktiva cirkeln.',
-  'hudChrome.hill.pvpBanner': 'PvP',
+    'Få permanenta titlar efter {thresholds} spelad tid med världs-PvP påslaget i den öppna världen eller i PvP-instanser. Utloggning, död, PvE-instanser och fristäder pausar tiden. Stänger du av det nollställs tiden.',
+  'hudChrome.worldPvp.skullName': '{name}s skalle',
+  'hudChrome.worldPvp.spoilsLine':
+    'När ni båda har PvP-flaggan påslagen hamnar guldet från den dödande träffen på kroppen tillsammans med förlorarens skalle.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Osignerade grå föremål hamnar inte i återköpslistan, så försäljningen kan inte ångras.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Dina väskor är fulla. Din belöning skickades till brevlådan: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Dina besvärjelser kan aktivera Naturens gåva i 10 sek: den angivna besvärjelsen blir gratis, 25% starkare och kan kastas i alla former. En ny aktivering förnyar varaktigheten.',
+  'entities.abilities.natures_boon.name': 'Naturens gåva',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Varje Vildbult eller Himlafall du kastar har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Varje närstridsautoträff som träffar har 1 chans på 15 att aktivera den för Sporläkning, eller för Ekhud när du är i Bruinform.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Varje tick från dina läkningseffekter över tid har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Förbrukar dina 5 Grönska: varje allierad med dina läkningseffekter över tid läks omedelbart med {buff}% av den läkning som återstod i effekterna, effekterna tas bort och målet får en ny Sporläkning.',
+  'entities.abilities.play_dead.description':
+    'Fall till marken och se död ut: din hälsa och ditt fokus visas som tomma för alla. Fiender glömmer dig, och fientliga spelare som har dig som mål tappar sitt mål. Att röra dig, attackera eller använda en annan förmåga avslutar den. Kastas den medan du rör dig har du 1 sek på dig att stanna innan rörelsen avslutar den. Kasta igen för att resa dig.',
+  'entities.abilities.play_dead.name': 'Spela död',
+  'entities.abilities.rejuvenation.name': 'Sporläkning',
+  'entities.abilities.scratch.description':
+    'Klös igenom närliggande mål inom 6 yards och ge vapenskada plus {damage}. Ger 1 kombopoäng per träffat mål. Avslöjar smygande fiender inom svepet. Endast i Kattform.',
+  'entities.abilities.scratch.name': 'Klös',
+  'entities.abilities.scratch.specNote_feral': 'Varje träff ger 1 Gammalt Blod (högst 3).',
+  'entities.abilities.spore_burst.description':
+    'Frammanar en sporfylld svamp i målområdet. Efter {duration} sek brister den och läker allierade för {healing} samt ger fiender inom 8 yards {damage} naturskada.',
+  'entities.abilities.spore_burst.name': 'Sporutbrott',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Vid 3 Månflod blir det 25% starkare och förbrukar din Månflod.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Ger också Sporläkning till varje allierad som läks. Vid full Grönska blir det 25% starkare och förbrukar din Grönska.',
+  'entities.abilities.sporemender_form.description':
+    'Byt skepnad till en sporläkare: din utförda läkning ökar med 20% och din rustning med 40%, men din rörelsehastighet minskar med 20%. Alla besvärjelser från din kastarform kan fortfarande användas. Varar tills du byter skepnad igen. Varje skepnadsbyte ger Lunkande steg, en kort ökning av rörelsehastigheten. Använd igen för att återgå till kastarformen. (signatur för Återställning)',
+  'entities.abilities.sporemender_form.name': 'Sporläkarform',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Förbrukar en läkningseffekt över tid på ett vänligt mål för att läka det för {damage}. Planteringar av Sporläkning och Andra blomningen ger Grönska; vid 5 Grönska blir knappen Överblomning, som omedelbart läker varje allierad med dina läkningseffekter över tid för 60% av deras återstående läkning. (signatur för Återställning)',
+  'entities.abilities.tactical_camo.description':
+    'Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Attacker eller skada avslutar Taktiskt kamouflage. Använd igen för att träda fram. (Fältkunskap)',
+  'entities.abilities.tactical_camo.name': 'Taktiskt kamouflage',
+  'entities.itemSets.grovespring.bonus2':
+    'Snabb läkning förbrukar din egen Sporläkning eller Andra blomningen först och läker 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.',
+  'entities.items.pvp_skull_bag.name': 'Skallpåse',
+  'entities.items.pvp_trophy_skull.name': 'Troféskalle',
+  'entities.letters.world_quest_reward.body':
+    'Dina väskor var fulla när du fick denna belöning för ett världsuppdrag, så korparna har fört hit den åt dig i stället. Gör plats och hämta den vid valfri korppelare.\n\n- Korpposten',
+  'entities.letters.world_quest_reward.sender': 'Korpposten',
+  'entities.letters.world_quest_reward.subject': 'Din belöning för världsuppdraget',
+  'guide.classPage.formLine.form_sporemender':
+    'Återställnings läkningsskepnad: tåligare hud och starkare läkning med långsammare steg, samtidigt som du behåller alla besvärjelser och din mana.',
+  'guide.classPage.formName.form_sporemender': 'Sporläkarform',
+  'guide.economy.junkBodyFinal':
+    'Byte som du inte behöver kan fortfarande säljas till alla handlare som har en egen butik, så töm väskorna när du passerar en stad i stället för att låta dem bli fulla. I handlarens fönster finns till och med knappen Sälj skräp, som säljer alla föremål av usel kvalitet med ett klick. Helt värdelösa småsaker kan också kastas bort direkt för att skapa plats. Osignerade grå föremål som säljs på detta sätt hamnar inte i återköpslistan, så kontrollera att inget du vill behålla följer med innan du trycker.',
+  'guide.models.formSporemender': 'Sporläkarform',
+  'guide.settingsPage.ifClassicCombatText':
+    'Återställer de enkla vita och blekgula skadesiffrorna som stiger rakt uppåt. Låt inställningen vara avstängd (standard) för tydligare siffror som sprids åt sidorna och blossar upp vid kritiska och ovanligt stora träffar.',
+  'guide.settingsPage.rowSpellEffects':
+    'Glöd, gnistor, projektiler och träffexplosioner från besvärjelser som spelare och deras husdjur kastar, inklusive dina egna. Stäng av för en lugnare skärm eller några extra bildrutor i stora gruppstrider. Allt som fiender kastar syns fortfarande, liksom ringarna som visar områden du bör lämna, markörerna ovanför bedövade, skrämda eller rotade mål och alla kaststaplar.',
+  'hudChrome.weekly.completedLastWeek': 'Slutfört förra veckan',
+  'hudChrome.weekly.claimFirst': 'Hämta först',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} anseende från förra veckan är ännu inte hämtat. Hämta det för att välja en ny laddning.',
+  'hudChrome.options.rawMouseInput': 'Obehandlad musinmatning',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Läser musrörelser direkt från enheten när du drar för att vrida kameran, utan systemets pekarhastighet och acceleration, för jämnare rotation. Stäng av för att använda systemets musinställningar. Fungerar bara när Lås pekare under rotation är på och stöds inte av alla webbläsare eller system.',
+  'entities.items.infernal_quiver.name': 'Helveteskoger',
+  'graphicsPrompt.title': 'Välj dina grafikinställningar',
+  'graphicsPrompt.intro':
+    'Välj en grafikförinställning för den här enheten. Lägre förinställningar ger bättre flyt, högre ger rikare grafik.',
+  'graphicsPrompt.autoDesc':
+    'Väljer en förinställning som passar den här enheten. Identifierad: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Bäst flyt. Passar bäst för telefoner, surfplattor och äldre eller integrerade grafikkretsar.',
+  'graphicsPrompt.mediumDesc':
+    'En balans mellan grafik och prestanda. Passar de flesta bärbara datorer.',
+  'graphicsPrompt.highDesc':
+    'Fler detaljer och fylligare landskap. Passar ett dedikerat grafikkort.',
+  'graphicsPrompt.ultraDesc':
+    'Den visuellt rikaste fasta förinställningen. Passar ett avancerat grafikkort.',
+  'graphicsPrompt.changeLater':
+    'Du kan ändra detta när som helst i Alternativ, under Grafikkvalitet.',
+  'graphicsPrompt.confirm': 'Fortsätt',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Björnfälla',
+  'entities.abilities.bear_trap.description':
+    'Placera en fälla på den valda platsen. Den armeras efter 0,75 sek. och varar i 1 min.; bara du och din grupp kan se den. Den första fienden som utlöser den blöder för {damage} fysisk skada under 15 sek. och saktas ned med 50% i 4 sek. Skadan ökar med distansattackkraft. Endast en Björnfälla kan vara aktiv åt gången. Den kan vara aktiv samtidigt som din Frostkäftsfälla. Om du placerar en ny Björnfälla ersätter den den gamla.',
+  'entities.abilities.scatterbolt.name': 'Spridbult',
+  'entities.abilities.scatterbolt.description':
+    'Avfyra en skur av armborstpilar i en 90 graders kon som når 8 yards framför dig och knuffar tillbaka fiender till högst 20 yards från dig. Fiender som är immuna mot tillbakaknuffning påverkas inte. Orsakar ingen skada.',
+  'entities.abilities.phosphor_flask.name': 'Fosforflaska',
+  'entities.abilities.phosphor_flask.description':
+    'Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft.',
+  'entities.items.lychgate_buckler.name': 'Kyrkogårdsportens bucklare',
+  'entities.items.bastion_kite_shield.name': 'Bastionens droppsköld',
+  'entities.items.barrowfield_tower_shield.name': 'Gravhögsfältets tornsköld',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Resursfält',
+  'hudChrome.options.hillBarOpacity': 'Bakgrundens opacitet för Kungens på kullen',
+  'hudChrome.options.playerFrameResourceDetached': 'Koppla loss resursfältet',
+  'hudChrome.options.playerFrameResourceHeight': 'Resursfältets höjd',
+  'hudChrome.options.playerFrameResourceWidth': 'Resursfältets bredd',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktivera Koppla loss resursfältet på fliken Ramar så låser Redigera ramar även upp ditt resursfält. Då kan du placera mana, energi eller vrede separat var du vill. Resursfältets bredd och Resursfältets höjd på samma flik ändrar storleken. Redigera ramar låser även upp fältet för Kungens på kullen. Bakgrundens opacitet för Kungens på kullen på samma flik tonar ned panelen medan texten förblir tydlig.',
+  'hudChrome.options.pixelsValue': '{value} px',
+  'abilityUi.cast.bastion_boathook': 'Båtshakedrag',
+  'abilityUi.cast.bastion_brine_column': 'Saltvattenpelare',
+  'abilityUi.cast.bastion_brine_mend': 'Saltvattenläkning',
+  'abilityUi.cast.bastion_claw_sweep': 'Klosvep',
+  'abilityUi.cast.bastion_drowned_anchor_cast': 'Dränkt ankare',
+  'abilityUi.cast.bastion_drowning_hymn': 'Drunknandets hymn',
+  'abilityUi.cast.bastion_fog_bank': 'Dimbank',
+  'abilityUi.cast.bastion_fog_ward': 'Dimskydd',
+  'abilityUi.cast.bastion_gaolers_cudgel': 'Fångvaktarens påk',
+  'abilityUi.cast.bastion_halberd_sweep': 'Hillebardsvep',
+  'abilityUi.cast.bastion_hallowed_brine': 'Helgat saltvatten',
+  'abilityUi.cast.bastion_iron_cage': 'Järnbur',
+  'abilityUi.cast.bastion_loose_on_my_mark': 'Skjut på mitt tecken',
+  'abilityUi.cast.bastion_mist_surge': 'Dimsvall',
+  'abilityUi.cast.bastion_oath_kneel': 'Obruten ed',
+  'abilityUi.cast.bastion_oath_vigil': 'Obruten ed',
+  'abilityUi.cast.bastion_oathbound_charge': 'Edsbunden anstormning',
+  'abilityUi.cast.bastion_piercing_bolt': 'Genomborrande skäkta',
+  'abilityUi.cast.bastion_reaping_scythe': 'Skördande lie',
+  'abilityUi.cast.bastion_rebounding_bulwark': 'Återstudsande bålverk',
+  'abilityUi.cast.bastion_shackle_pair': 'Fängsla par',
+  'abilityUi.cast.bastion_shadowstep': 'Skuggövergång',
+  'abilityUi.cast.bastion_shell_slam': 'Skalsmäll',
+  'abilityUi.cast.bastion_tide_sentence': 'Tidvattnets dom',
+  'abilityUi.cast.bastion_vael_rise': 'Döden reser sig',
+  'abilityUi.cast.bastion_vael_sink': 'In i dimman',
+  'abilityUi.cast.bastion_veil_gather': 'Samlande dimma',
+  'abilityUi.cast.bastion_veil_rise': 'Dimslöja',
+  'abilityUi.cast.cantor_last_verse': 'Sista versen',
+  'abilityUi.cast.crypt_barrowflame_breath': 'Gravflammans andedräkt',
+  'abilityUi.cast.crypt_carrion_eye': 'Asöga',
+  'abilityUi.cast.crypt_grave_bolt': 'Gravprojektil',
+  'abilityUi.cast.crypt_grave_cleave': 'Gravklyvning',
+  'abilityUi.cast.crypt_grave_rupture': 'Gravbristning',
+  'abilityUi.cast.crypt_gravespark_volley': 'Gravgnistsalva',
+  'abilityUi.cast.crypt_ilvane_bone_organ': 'Benorgel',
+  'abilityUi.cast.crypt_ilvane_dirge': 'Klagosång från hålrummet',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': 'Obruten vers',
+  'abilityUi.cast.crypt_knellwyrm_arrive': 'Nedstigning från himlen',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': 'Skräckvrål',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': 'Brinnande dödsklang',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': 'Brinnande dödsklang',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': 'Brinnande dödsklang',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': 'Brinnande dödsklang',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': 'Bålsvep',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': 'Svepande anfall',
+  'abilityUi.cast.crypt_lady_bridal_freeze': 'Brudfrysning',
+  'abilityUi.cast.crypt_lady_brides_lament': 'Brudens klagan',
+  'abilityUi.cast.crypt_lady_embrace_hold': 'Frusen omfamning',
+  'abilityUi.cast.crypt_lady_frozen_embrace': 'Frusen omfamning',
+  'abilityUi.cast.crypt_marrow_burial_toll': 'Begravningsklang',
+  'abilityUi.cast.crypt_marrow_crush': 'Märgkross',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': 'Dödgrävarens slag',
+  'abilityUi.cast.crypt_marrow_measure': 'Mätt för graven',
+  'abilityUi.cast.crypt_marrow_shovelful': 'En skyffel jord',
+  'abilityUi.cast.crypt_morthen_descend': 'Nedstigning',
+  'abilityUi.cast.crypt_morthen_proclaim': 'Gravförkunnelse',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': 'Skörda de oroliga',
+  'abilityUi.cast.crypt_morthen_rise': 'Gravkallarens uppstigande',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': 'De oroligas rit',
+  'abilityUi.cast.crypt_morthen_rite_wakes': 'Riten vaknar',
+  'abilityUi.cast.crypt_morthen_shadow_pulse': 'Skuggpuls',
+  'abilityUi.cast.crypt_murder_call': 'Kråkflockens rop',
+  'abilityUi.cast.crypt_raise_bones': 'Väck benen',
+  'abilityUi.cast.crypt_rimesilk_spit': 'Rimsilkesspott',
+  'abilityUi.cast.crypt_stone_shriek': 'Stenskrik',
+  'abilityUi.cast.crypt_tail_lash': 'Svanspiska',
+  'abilityUi.cast.crypt_wing_gust': 'Vingkast',
+  'abilityUi.cast.ghost_captain_anchor': 'Förbannat ankare',
+  'abilityUi.cast.ghost_captain_boarding': 'Spöklig äntring',
+  'abilityUi.cast.ghost_captain_broadside': 'Spöksalva',
+  'abilityUi.cast.kituse_crypt_relight_candle': 'Tänd ljuset igen',
+  'abilityUi.cast.kituse_sanctum_topple_brazier': 'Vält fyrfatet',
+  'abilityUi.cast.sanctum_branding_iron': 'Brännjärn',
+  'abilityUi.cast.sanctum_cinder_breath': 'Glödandedräkt',
+  'abilityUi.cast.sanctum_counterweight_lash': 'Motviktspiska',
+  'abilityUi.cast.sanctum_goad': 'Spora',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': 'Nita om',
+  'abilityUi.cast.sanctum_ice_block_toss': 'Isblockskast',
+  'abilityUi.cast.sanctum_korgath_chain_flail': 'Kedjegissel',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': 'Förmannens vrål',
+  'abilityUi.cast.sanctum_korgath_maul_arc': 'Släggbåge',
+  'abilityUi.cast.sanctum_korgath_stomp': 'Skälvande stamp',
+  'abilityUi.cast.sanctum_korgath_strain': 'Ansträngning',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': 'Tröskelanstormning',
+  'abilityUi.cast.sanctum_korzul_break_free': 'Bryt dig fri',
+  'abilityUi.cast.sanctum_korzul_crashing_descent': 'Krossande nedslag',
+  'abilityUi.cast.sanctum_korzul_grave_breath': 'Gravandedräkt',
+  'abilityUi.cast.sanctum_korzul_grave_inferno': 'Gravinferno',
+  'abilityUi.cast.sanctum_korzul_plunging_fire': 'Störtande eld',
+  'abilityUi.cast.sanctum_korzul_tail_sweep': 'Svanssvep',
+  'abilityUi.cast.sanctum_korzul_wing_gale': 'Vingstorm',
+  'abilityUi.cast.sanctum_plant_brazier': 'Placera själsfyrfat',
+  'abilityUi.cast.sanctum_rime_breath': 'Rimfrostsandedräkt',
+  'abilityUi.cast.sanctum_thaw_the_held': 'Tina de fångna',
+  'abilityUi.cast.sanctum_tusker_trample': 'Trampa ned',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': 'Betessvep',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': 'Skuggsalva',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': 'Själseldsdike',
+  'abilityUi.cast.sanctum_warming_rite': 'Värmande rit',
+  'abilityUi.cast.temple_arcing_spark': 'Bågande gnista',
+  'abilityUi.cast.temple_beckoning_moon': 'Lockande måne',
+  'abilityUi.cast.temple_call_of_the_shallows': 'Grundvattnets kall',
+  'abilityUi.cast.temple_call_the_tide': 'Kalla på tidvattnet',
+  'abilityUi.cast.temple_crushing_torrent': 'Krossande fors',
+  'abilityUi.cast.temple_drowning_aria': 'Drunknandets aria',
+  'abilityUi.cast.temple_falling_moon': 'Fallande måne',
+  'abilityUi.cast.temple_frostlocked_torrent': 'Frostlåst fors',
+  'abilityUi.cast.temple_glimmer_venom': 'Glimmergift',
+  'abilityUi.cast.temple_hydra_tsunami': 'Flodvåg',
+  'abilityUi.cast.temple_lightning_spit': 'Blixtspott',
+  'abilityUi.cast.temple_lullaby': 'Vaggvisa',
+  'abilityUi.cast.temple_lunar_tide': 'Måntidvatten',
+  'abilityUi.cast.temple_mere_surge': 'Insjösvall',
+  'abilityUi.cast.temple_moonlight_lance': 'Månljuslans',
+  'abilityUi.cast.temple_moonwater_bolt': 'Månvattensprojektil',
+  'abilityUi.cast.temple_pale_mending': 'Blek läkning',
+  'abilityUi.cast.temple_pearl_slam': 'Tidvattnets vingslag',
+  'abilityUi.cast.temple_prism_flare': 'Prismaflamma',
+  'abilityUi.cast.temple_prism_glare': 'Prismabländning',
+  'abilityUi.cast.temple_resonant_slam': 'Resonanssmäll',
+  'abilityUi.cast.temple_sea_song': 'Havssång',
+  'abilityUi.cast.temple_skewering_trident': 'Spetsande treudd',
+  'abilityUi.cast.temple_snapper_snap': 'Bett',
+  'abilityUi.cast.temple_static_coil': 'Statisk spole',
+  'abilityUi.cast.temple_tidal_slap': 'Tidvattensslag',
+  'abilityUi.cast.temple_tide_breath': 'Frysande andedräkt',
+  'abilityUi.cast.temple_tideglass_fracture': 'Tidvattensglasets bristning',
+  'abilityUi.cast.temple_toxic_rime': 'Giftig rimfrost',
+  'abilityUi.cast.temple_trident_sweep': 'Treuddssvep',
+  'abilityUi.cast.temple_undertow': 'Underström',
+  'abilityUi.cast.temple_venom_current': 'Giftström',
+  'abilityUi.cast.temple_ysolei_call': 'Månavfödingens kall',
+  'abilityUi.cast.temple_ysolei_wrath': 'Dränkt vrede',
+  'abilityUi.cast.trash_demo_nova': 'Testexplosion',
+  'abilityUi.cast.trash_demo_nova_unstoppable': 'Testexplosion',
+  'abilityUi.cast.trash_demo_walker': 'Testklot',
+  'abilityUi.cast.wildheart_ancestral_sap': 'Förfädernas sav',
+  'abilityUi.cast.wildheart_beast_pit_quake': 'Odjursgropens skalv',
+  'abilityUi.cast.wildheart_entangling_lash': 'Snärjande piska',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': 'Frossa',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': 'Fröregn',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': 'Vinrankepiskslag',
+  'abilityUi.cast.wildheart_jaguar_heel': 'Fot!',
+  'abilityUi.cast.wildheart_plant_totem': 'Placera totem',
+  'abilityUi.cast.wildheart_quarry_mark': 'Bytesmärke',
+  'abilityUi.cast.wildheart_rattling_dread': 'Skramlande skräck',
+  'abilityUi.cast.wildheart_saurian_stomp': 'Jordskakande stamp',
+  'abilityUi.cast.wildheart_saurian_tail_swipe': 'Svansslag',
+  'abilityUi.cast.wildheart_snaring_tongue': 'Snärjande tunga',
+  'abilityUi.cast.wildheart_toad_hex': 'Paddförhäxning',
+  'abilityUi.cast.wildheart_war_roar': 'Krigsvrål',
+  'abilityUi.cast.wildheart_zulgar_pulse': 'Vildhjärtats puls',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': 'Jaktens ande',
+  'auth.bodyTypeA': 'Typ A',
+  'auth.bodyTypeB': 'Typ B',
+  'auth.modelLoading': 'Laddar karaktär...',
+  'auth.previewPinchHint': 'Nyp för att zooma',
+  'auth.wocBuilder.cat.bodyType': 'Kroppstyp',
+  'auth.wocBuilder.cat.browColor': 'Ögonbrynsfärg',
+  'auth.wocBuilder.cat.eyesBrows': 'Ögon och ögonbryn',
+  'auth.wocBuilder.cat.face': 'Ansikte',
+  'auth.wocBuilder.cat.facialHair': 'Ansiktsbehåring',
+  'auth.wocBuilder.cat.hairstyle': 'Frisyr',
+  'auth.wocBuilder.cat.piercings': 'Piercingar',
+  'auth.wocBuilder.customColorAria': 'Välj en egen färg',
+  'auth.wocBuilder.customSkinAria': 'Välj en egen hudton',
+  'auth.wocBuilder.eye.amber': 'Bärnsten',
+  'auth.wocBuilder.eye.blue': 'Blå',
+  'auth.wocBuilder.eye.brown': 'Brun',
+  'auth.wocBuilder.eye.darkBrown': 'Mörkbrun',
+  'auth.wocBuilder.eye.green': 'Grön',
+  'auth.wocBuilder.eye.grey': 'Grå',
+  'auth.wocBuilder.eye.hazel': 'Hasselnöt',
+  'auth.wocBuilder.eye.paleBlue': 'Ljusblå',
+  'auth.wocBuilder.eye.teal': 'Blågrön',
+  'auth.wocBuilder.eye.violet': 'Violett',
+  'auth.wocBuilder.hairColor.auburn': 'Rödbrun',
+  'auth.wocBuilder.hairColor.black': 'Svart',
+  'auth.wocBuilder.hairColor.blonde': 'Blond',
+  'auth.wocBuilder.hairColor.brown': 'Brun',
+  'auth.wocBuilder.hairColor.copper': 'Koppar',
+  'auth.wocBuilder.hairColor.darkBrown': 'Mörkbrun',
+  'auth.wocBuilder.hairColor.golden': 'Gyllene',
+  'auth.wocBuilder.hairColor.lightBrown': 'Ljusbrun',
+  'auth.wocBuilder.hairColor.platinum': 'Platina',
+  'auth.wocBuilder.hairColor.red': 'Röd',
+  'auth.wocBuilder.hairColor.silver': 'Silverfärgad',
+  'auth.wocBuilder.hairColor.white': 'Vit',
+  'auth.wocBuilder.matchHair': 'Matcha håret',
+  'auth.wocBuilder.piercing.brow': 'Ögonbryn',
+  'auth.wocBuilder.piercing.ears': 'Hela öronen',
+  'auth.wocBuilder.piercing.full': 'Full uppsättning',
+  'auth.wocBuilder.piercing.lip': 'Läpp',
+  'auth.wocBuilder.piercing.lobes': 'Örsnibbar',
+  'auth.wocBuilder.piercing.none': 'Inga',
+  'auth.wocBuilder.piercing.nose': 'Näsvinge',
+  'auth.wocBuilder.piercing.septum': 'Nässkiljevägg',
+  'auth.wocBuilder.resetDefault': 'Återställ standard',
+  'auth.wocBuilder.section.brows': 'Ögonbrynsform',
+  'auth.wocBuilder.section.ears': 'Öron',
+  'auth.wocBuilder.section.hair': 'Frisyr',
+  'auth.wocBuilder.section.mouth': 'Läppar',
+  'auth.wocBuilder.section.nose': 'Näsa',
+  'auth.wocBuilder.skin.beige': 'Beige',
+  'auth.wocBuilder.skin.bronze': 'Brons',
+  'auth.wocBuilder.skin.caramel': 'Karamell',
+  'auth.wocBuilder.skin.chestnut': 'Kastanj',
+  'auth.wocBuilder.skin.ebony': 'Ebenholts',
+  'auth.wocBuilder.skin.fair': 'Ljus',
+  'auth.wocBuilder.skin.honey': 'Honung',
+  'auth.wocBuilder.skin.ivory': 'Elfenben',
+  'auth.wocBuilder.skin.mahogany': 'Mahogny',
+  'auth.wocBuilder.skin.olive': 'Oliv',
+  'auth.wocBuilder.skin.peach': 'Persika',
+  'auth.wocBuilder.skin.porcelain': 'Porslin',
+  'auth.wocBuilder.skin.rose': 'Ros',
+  'auth.wocBuilder.skin.sand': 'Sandfärgad',
+  'auth.wocBuilder.skin.tan': 'Solbrun',
+  'auth.wocBuilder.skin.umber': 'Umbra',
+  'auth.wocBuilder.slider.bodyScale': 'Kroppsstorlek',
+  'auth.wocBuilder.slider.browHeight': 'Ögonbrynshöjd',
+  'auth.wocBuilder.slider.chinWidth': 'Hakbredd',
+  'auth.wocBuilder.slider.eyeSpacing': 'Ögonavstånd',
+  'auth.wocBuilder.slider.eyeTilt': 'Ögonlutning',
+  'auth.wocHead.beard.boxed': 'Format helskägg',
+  'auth.wocHead.beard.chin': 'Hakskägg',
+  'auth.wocHead.beard.chinstrap': 'Hakremsa',
+  'auth.wocHead.beard.chops': 'Polisonger',
+  'auth.wocHead.beard.goatee': 'Bockskägg',
+  'auth.wocHead.beard.handlebar': 'Knävelborrar',
+  'auth.wocHead.beard.long': 'Långt skägg',
+  'auth.wocHead.beard.moustache': 'Mustasch',
+  'auth.wocHead.beard.none': 'Slätrakad',
+  'auth.wocHead.brows.arched': 'Välvda',
+  'auth.wocHead.brows.default': 'Klassiska',
+  'auth.wocHead.brows.relaxed': 'Avslappnade',
+  'auth.wocHead.brows.rounded': 'Rundade',
+  'auth.wocHead.brows.slim': 'Smala',
+  'auth.wocHead.brows.soft': 'Mjuka',
+  'auth.wocHead.brows.soft_arch': 'Mjuk båge',
+  'auth.wocHead.brows.straight': 'Raka',
+  'auth.wocHead.ears.default': 'Klassiska',
+  'auth.wocHead.ears.large': 'Stora',
+  'auth.wocHead.ears.pointed': 'Spetsiga',
+  'auth.wocHead.ears.round': 'Runda',
+  'auth.wocHead.eyes.almond': 'Mandelformade',
+  'auth.wocHead.eyes.default': 'Klassiska',
+  'auth.wocHead.eyes.hooded': 'Tunga ögonlock',
+  'auth.wocHead.hair.bald': 'Skallig',
+  'auth.wocHead.hair.bob': 'Page',
+  'auth.wocHead.hair.braid': 'Fläta',
+  'auth.wocHead.hair.crown': 'Flätad krona',
+  'auth.wocHead.hair.curls': 'Lockig uppsättning',
+  'auth.wocHead.hair.long': 'Långt',
+  'auth.wocHead.hair.mohawk': 'Tuppkam',
+  'auth.wocHead.hair.ponytail': 'Hög hästsvans',
+  'auth.wocHead.hair.quiff': 'Kort luggsvall',
+  'auth.wocHead.hair.shoulder': 'Axellångt',
+  'auth.wocHead.hair.swept': 'Sidokammat',
+  'auth.wocHead.hair.topknot': 'Hårknut',
+  'auth.wocHead.hair.twins': 'Två flätor',
+  'auth.wocHead.hair.undercut': 'Kortklippta sidor',
+  'auth.wocHead.hair.waves': 'Vågor',
+  'auth.wocHead.mouth.cupids_bow': 'Amorbåge',
+  'auth.wocHead.mouth.default': 'Klassisk',
+  'auth.wocHead.mouth.full': 'Fyllig',
+  'auth.wocHead.mouth.narrow': 'Smal',
+  'auth.wocHead.mouth.relaxed': 'Avslappnad',
+  'auth.wocHead.mouth.rounded': 'Rundad',
+  'auth.wocHead.mouth.smirk': 'Snedleende',
+  'auth.wocHead.mouth.thin': 'Tunn',
+  'auth.wocHead.nose.aquiline': 'Örnnäsa',
+  'auth.wocHead.nose.broad': 'Bred',
+  'auth.wocHead.nose.button': 'Uppnäsa',
+  'auth.wocHead.nose.default': 'Klassisk',
+  'auth.wocHead.nose.soft': 'Mjuk',
+  'character.emptySlot': 'Ledig karaktärsplats',
+  'character.lockoutWeeklyQuests': 'Veckouppdrag',
+  'character.membershipRequired': 'Förnya ditt medlemskap för att spela denna karaktär.',
+  'character.membershipSlots': 'Lås upp platser med ett medlemskap',
+  'hud.social.boundFriend': 'Bunden vän',
+  'hud.social.boundFriendLink': 'Bundna vänner är kopplade genom sin värvningsinbjudan.',
+  'hud.social.friendFirstPage': 'Första sidan',
+  'hud.system.moonbridgeBanner': 'Månbron reser sig',
+  'hudChrome.adventureGuide.allSpecs': 'Alla specialiseringar',
+  'hudChrome.adventureGuide.browseOnly': 'Res till ingången',
+  'hudChrome.adventureGuide.catalogueCountPlural.one': '{count} äventyr',
+  'hudChrome.adventureGuide.catalogueCountPlural.other': '{count} äventyr',
+  'hudChrome.adventureGuide.delve': 'Delv',
+  'hudChrome.adventureGuide.delveTravel':
+    'Gå in vid delvens ingång. Välj nivå vid den lokala tavlan; automatisk gruppsökning är inte tillgänglig.',
+  'hudChrome.adventureGuide.dungeonTravel':
+    'Läs om striderna nedan och välj sedan en grupp eller res till ingången.',
+  'hudChrome.adventureGuide.dungeons': 'Fängelsehålor',
+  'hudChrome.adventureGuide.eligible': 'Min nivå',
+  'hudChrome.adventureGuide.empty': 'Inga äventyr matchar dessa filter.',
+  'hudChrome.adventureGuide.encountersCount': '{count} strider',
+  'hudChrome.adventureGuide.eyebrow': 'Expeditionsliggaren',
+  'hudChrome.adventureGuide.findGroup': 'Hitta en grupp',
+  'hudChrome.adventureGuide.fullTableRoll': 'Ett föremål från hela bytestabellen',
+  'hudChrome.adventureGuide.inspectLoot': 'Förhandsvisning av byte',
+  'hudChrome.adventureGuide.intro':
+    'Upptäck världen. Lär känna din fiende. Välj ditt nästa äventyr.',
+  'hudChrome.adventureGuide.lootClass': 'Klass',
+  'hudChrome.adventureGuide.lootEmpty': 'Ingen utrustning matchar denna klass och specialisering.',
+  'hudChrome.adventureGuide.lootHint':
+    'Användbar utrustning med egenskaper som passar den valda specialiseringen. Allmänna belöningar visas också. Chansen att få ett föremål utgår från hela bytestabellen.',
+  'hudChrome.adventureGuide.raidTravel':
+    'Samla din raidgrupp, läs om striderna och kontrollera din spärr innan ni går in.',
+  'hudChrome.adventureGuide.reset': 'Rensa filter',
+  'hudChrome.adventureGuide.search': 'Sök äventyr',
+  'hudChrome.adventureGuide.soloTravel': 'Ett soloäventyr. Res till ingången för att börja.',
+  'hudChrome.adventureGuide.tiers': 'Tillgängliga nivåer: {tiers}',
+  'hudChrome.adventureGuide.title': 'Äventyrsguide',
+  'hudChrome.auraEffect.bastion.anchored':
+    'Fastkedjad vid det dränkta ankaret: du kan röra dig, men aldrig längre från vinschen, som drar dig mot Drunkningsgropen. Kom inom {reach} yard från en tänd förtöjningsstolpe minst {run} yard från platsen där du hakades fast för att förtöja kedjan (stolpen slocknar i {dark} sek), eller låt gruppen bryta den med {links} träffar ({linksHeroic} i heroiskt läge). Gropen tar {pit}% av din maximala hälsa ({pitHeroic}% i heroiskt läge).',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    'Rotad i en havsvattenpelare: du tar {min} till {max} naturskada var {tick}:e sek i upp till {seconds} sek. Avbryt eller bedöva den tidvattensbundna akolyten för att bryta effekten.',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    'Mätt på de döda ({stacks} av {max}): varje laddning gör dess Själsfrigörelse {radius} yard bredare och {pct}% starkare.',
+  'hudChrome.auraEffect.bastion.fogShroud':
+    'Tar {pct}% mindre skada medan den står i Dimbanken. Dra ut den ur dimman.',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    'Tar {pct}% mindre skada medan en annan dränkt väktare står inom {radius} yard. Dra isär dem.',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    'Dess kedjor är brutna. Den slåss inte längre, kan inte skadas och lämnar snart platsen.',
+  'hudChrome.auraEffect.crypt.blow':
+    'Ökar skadan du tar med {pct}%: {per}% per laddning, nu {stacks} av {max}. Varje Dödgrävarens slag lägger till en laddning och återställer varaktigheten till {seconds} sek.',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    'Varje kråka i striden jagar dig i {seconds} sek. Spring till din tank så att flocken kan huggas ned tillsammans.',
+  'hudChrome.auraEffect.crypt.crescendo':
+    'Sjunger snabbare: Klagosång från hålrummet tar {cast} sek i stället för {castNormal} sek och kommer var {every}:e sek i stället för var {everyNormal}:e sek, och Benorgel spelar {waves} vågor av toner i stället för {wavesNormal}.',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    'Minskar rörelsehastigheten med {pct}%. En skyffel jord träffar alla framför dödgrävaren Marrow: stå bakom honom.',
+  'hudChrome.auraEffect.crypt.embraced':
+    'Hålls uppe i damens armar: kan inte agera och tar {tick} frostskada varje sekund ({tickHeroic} i heroiskt läge). Om gruppen gör skada motsvarande {share}% av hennes maximala hälsa ({shareHeroic}% i heroiskt läge) sätter hon varsamt ned dig; om hon håller dig högst upp i {hold} sek släpper hon dig på isen för {min} till {max} skada ({heroicMin} till {heroicMax} i heroiskt läge).',
+  'hudChrome.auraEffect.crypt.gorged':
+    'Gör {pct}% mer skada: {per}% för varje bunden själ som nått honom, nu {stacks} av {max}, under resten av striden. Varje själ som når honom läker honom också med {heal}% av hans maximala hälsa. Ställ dig i själens väg för att ta den i stället.',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    'Tar {pct}% mindre skada, och stenen tjocknar var {every}:e sek, upp till {max} lager. En bedövning krossar den och gör att den tar {cracked}% mer skada i {seconds} sek.',
+  'hudChrome.auraEffect.crypt.graspMark':
+    'Händer bryter fram ur ringen under dig om {fuse} sek: alla inom {radius} yard från platsen där den lades rotas i {root} sek och tar {min} till {max} skuggskada. Gå ut ur ringen.',
+  'hudChrome.auraEffect.crypt.graspRoot':
+    'Fasthållen av gravens händer: kan inte röra dig i {seconds} sek.',
+  'hudChrome.auraEffect.crypt.graveChill':
+    'Tar {bite} skuggskada varje sekund ({biteHeroic} i heroiskt läge) medan De oroligas rit pågår, med en ökning på {step} ({stepHeroic} i heroiskt läge) var {every}:e sek. Tänd minnesljusen igen för att avsluta den.',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    'Står i en öppen grav: rörelsehastigheten minskar med {slow}% och du tar {damage} skuggskada varje sekund ({heroic} i heroiskt läge). Om du stannar i en grav i {linger} sek i heroiskt läge väcks ett rastlöst skelett. Gå ut ur graven.',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    'Attackerar {pct}% snabbare medan han står i en öppen grav. Håll honom borta från gravarna.',
+  'hudChrome.auraEffect.crypt.harmony':
+    'Tar {pct}% mindre skada: {per}% för varje levande korist. Döda koristerna först.',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    'Flyger ovanför ritringen, utom räckhåll. Den markerar halva ringen i {mark} sek och öser sedan spökeld över den halvan: {min} till {max} eldskada på alla där. Den bränner {breaths} halvor under varje flygning och landar sedan.',
+  'hudChrome.auraEffect.crypt.lament':
+    'När Brudens klagan tar slut gör den {min} till {max} frostskada ({heroicMin} till {heroicMax} i heroiskt läge) på alla som inte står inom {radius} yard från en tänd gravlykta. En lykta skyddar de {cap} närmaste spelarna, slocknar sedan och är släckt under nästa klagan.',
+  'hudChrome.auraEffect.crypt.lingering':
+    'Nästa Brudens klagan gör {pct}% mer skada på dig: {per}% per laddning, upp till {max} laddningar. Ta nästa i skenet från en lykta.',
+  'hudChrome.auraEffect.crypt.measured':
+    'När effekten tar slut rasar en öppen grav in där du står: {min} till {max} skada ({heroicMin} till {heroicMax} i heroiskt läge) på alla inom {radius} yard. Graven blir kvar under resten av striden, så bär markeringen till gårdens kant, bort från gruppen.',
+  'hudChrome.auraEffect.crypt.riteBroken':
+    'Bedövad: det krossade skyddet hindrar honom från att agera i {seconds} sek.',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    'Tar {pct}% mer skada i {seconds} sek: de återtända ljusen bröt hans skydd. Använd dina starkaste attacker nu.',
+  'hudChrome.auraEffect.crypt.slippery':
+    'På hal is: din hastighet ändras med högst {grip} yard/sek varje sekund, så du kommer långsamt i gång, glider vidare när du stannar och gör vida svängar. Gå av isen för att få fäste igen.',
+  'hudChrome.auraEffect.crypt.tolling':
+    'Immun mot skada medan han går till klockrepet och ringer i begravningsklockan. När ringningen slutar gör klangen {min} till {max} skuggskada ({heroicMin} till {heroicMax} i heroiskt läge) på alla, och varje öppen grav släpper fram ett rastlöst skelett.',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    'Immun mot skada medan han kanaliserar De oroligas rit vid altaret: {lit} av {total} minnesljus återtända. Att tända ett ljus är en kanalisering på {channel} sek som dränerar {drain}% av tändarens maximala hälsa varje sekund ({drainHeroic}% i heroiskt läge); träffar bryter inte kanaliseringen, men ett steg eller en bedövning gör det. Det sista ljuset krossar skyddet. Tänd dem i liggarens ordning i heroiskt läge: fel ljus släcker det senast tända och gör {wrongMin} till {wrongMax} skuggskada på tändaren.',
+  'hudChrome.auraEffect.effigyLanternOut':
+    'Halmförmannens lykta är släckt för dig: dina och ditt husdjurs slag ignorerar dess plankhud och gör full skada',
+  'hudChrome.auraEffect.effigyPlankHide':
+    'Avvärjer {pct}% av varje slag tills en stöt med Skärvpiken släcker lyktan i dess öga',
+  'hudChrome.auraEffect.sanctum.airborne':
+    'Är i luften och kan inte attackeras. Han landar med Krossande nedslag på plattan med flest spelare och gör {min} till {max} skada ({heroicMin} till {heroicMax} i heroiskt läge) på alla inom {radius} yard.',
+  'hudChrome.auraEffect.sanctum.branded':
+    'Gör {value} {school}-skada var {interval}:e sek i {seconds} sek. Gå ned i en smältvattenpöl för att släcka den direkt.',
+  'hudChrome.auraEffect.sanctum.creepingRime':
+    'Minskar rörelsehastigheten med {pct}%, {per}% per laddning. Varje Rimfrostsandedräkt lägger till en laddning och återställer varaktigheten till {seconds} sek. Vid {max} laddningar fryser du fast helt (Isbelagd) i {freeze} sek och laddningarna tas bort.',
+  'hudChrome.auraEffect.sanctum.doused':
+    'Plattan brast under honom och kylvattnet släckte hans Gravinferno.',
+  'hudChrome.auraEffect.sanctum.enrage': 'Gör {pct}% mer skada.',
+  'hudChrome.auraEffect.sanctum.grasp':
+    'Står i smältvatten och gör {pct}% mer skada. Om den dör i smältvatten sjunker den och reser sig igen {seconds} sek senare; döda den på kall is för att hålla den nere.',
+  'hudChrome.auraEffect.sanctum.icedOver':
+    'Helt fastfrusen av Krypande rimfrost: kan varken röra sig eller agera.',
+  'hudChrome.auraEffect.sanctum.lockbound':
+    'Tar {pct}% mindre skada: {per}% för varje kedja som fortfarande håller honom. Bryt en sigillboja för att släppa dess kedja.',
+  'hudChrome.auraEffect.sanctum.quenchWater':
+    'I öppet kylvatten: saktad med {slow}% och bränd för {damage} skada varje sekund ({heroic} i heroiskt läge). Simma till valfri platta eller stranden.',
+  'hudChrome.auraEffect.sanctum.shardFlare':
+    'Hjärtskärvan flammar upp: Gravandedräkt var {breath}:e sek och Vingstorm var {gale}:e sek.',
+  'hudChrome.auraEffect.sanctum.twiceWoken':
+    'Har rest sig ur smältvattnet igen och gör {pct}% mer skada.',
+  'hudChrome.auraEffect.sanctum.wyrmsEye':
+    'När effekten tar slut öser Korzul Störtande eld över hela plattan du står på: {min} till {max} skada ({heroicMin} till {heroicMax} i heroiskt läge) på alla på den, och plattan spricker, eller brister om den redan var sprucken. Stå på hel is, bort från gruppen.',
+  'hudChrome.auraEffect.trinket.foremanShape':
+    'Du är förmannen: {armorPct}% mer rustning och immun mot tillbakaknuffningar.',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    'Strålen gör {tick} arkanskada var {every}:e sek på fiender i dess väg. Den upphör om du rör dig eller kastar en besvärjelse.',
+  'hudChrome.auraEffect.trinket.harvest':
+    'Varje fientlig varelse som dör inom {radius} yard från dig återställer {pct}% av din maximala hälsa och mana.',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    'Ditt samlingsstandar är rest. Dess soldater marscherar med dig och bekämpar ditt mål.',
+  'hudChrome.auraEffect.trinket.quench':
+    'Dina nästa {stacks} vapenträffar gör {damage} extra frostskada. Den sista saktar målets attacker med {slow}%.',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    'De nästa {stacks} vapenträffarna gör extra frostskada. Den sista saktar målets attacker med {slow}%.',
+  'hudChrome.auraEffect.trinket.quenched': 'Attackhastigheten är sänkt med {pct}%.',
+  'hudChrome.auraEffect.trinket.seedburst':
+    'Ett Frossblomsfrö. När effekten tar slut brister det för {damage} naturskada på varje fiende inom {radius} yard, eller {bonus}% mer ({empowered}) om denna fiende dör dessförinnan.',
+  'hudChrome.auraEffect.trinket.shackle': 'Fastkedjad på plats: kan inte röra sig.',
+  'hudChrome.auraEffect.trinket.shackleSlow': 'Fastkedjad: rörelsehastigheten är sänkt med {pct}%.',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    'En andejaguar slåss vid din sida och biter ditt mål för {min} till {max} fysisk skada var {every}:e sek.',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    'Förvandlad till sten: immun mot skada och kan inte agera. Du återvänder med {pct}% av din maximala hälsa.',
+  'hudChrome.auraEffect.trinket.tether':
+    'Fastkedjad av Förmannens sista länk: {pct}% av skadan som annars skulle drabba din hälsa tillfogas den som kedjade fast dig i stället.',
+  'hudChrome.auraEffect.trinket.tetherLink':
+    'Du tar {pct}% av skadan som din fastkedjade bundsförvant skulle ta.',
+  'hudChrome.auraEffect.wildheart.avatar':
+    'Rör sig {pct}% snabbare och jagar sitt byte. Saktningar och rotningar fungerar, och bedövningar varar hälften så länge.',
+  'hudChrome.auraEffect.wildheart.packBond':
+    'Tar {pct}% mindre skada medan dess partner står nära. Dra isär bestmästaren och hans jaguar för att bryta effekten.',
+  'hudChrome.auraEffect.wildheart.packBondFury':
+    'Gör {pct}% mer skada medan dess partner står nära.',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    'Om du rör en frökapsel växer genast ett taggskott ur den. Håll dig borta från fröna och låt en opåverkad spelare trampa sönder dem; en orörd kapsel gror efter {seconds} sek (i heroiskt läge gräver den ned sig efter {heroic} sek och kommer upp bredvid närmaste spelare).',
+  'hudChrome.auraEffect.wildheart.prey':
+    'Zulgar jagar dig. Led honom över en tänd solglyf för att sakta honom med {slow}%. Om han hinner ikapp blir du sargad för {damage} skada ({heroic} i heroiskt läge) och nedslagen i {stun} sek.',
+  'hudChrome.auraEffect.wildheart.stalked':
+    'Den stora jaguaren jagar dig och ignorerar hån. Varje bett gör {min} till {max} fysisk skada ({heroicMin} till {heroicMax} i heroiskt läge) och orsakar en blödning. Håll den på avstånd från sin mästare.',
+  'hudChrome.auraEffect.wildheart.vanished':
+    'Dold och immun mot skada. Han är på väg att kasta sig över den spelare som är längst bort.',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    'En rotning har träffat den. Ytterligare rotningar glider av tills effekten tar slut.',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    'En saktning har träffat den. Ytterligare saktningar glider av tills effekten tar slut.',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    'En bedövning har träffat den. Ytterligare bedövningar glider av tills effekten tar slut.',
+  'hudChrome.bags.membershipSlot': 'Väskplats för medlemmar',
+  'hudChrome.bags.membershipSlotHint':
+    'Utrusta en extra väska medan ditt medlemskap är aktivt. Väskan och föremålen är trygga när det går ut.',
+  'hudChrome.bags.membershipSlotLocked': 'Lås upp denna väskplats med ett medlemskap.',
+  'hudChrome.bank.accountArmour': 'Hämta medlemsutrustning',
+  'hudChrome.bank.accountBagsTitle': 'Dina väskor',
+  'hudChrome.bank.accountBankEmpty': 'Denna bank är tom.',
+  'hudChrome.bank.accountBankTitle': '{name}s bank',
+  'hudChrome.bank.accountBound':
+    'Själsbundna, låsta och uppdragsföremål kan inte flyttas mellan karaktärer.',
+  'hudChrome.bank.accountBusy': 'Banken är upptagen. Försök igen om en stund.',
+  'hudChrome.bank.accountCharacters': 'Karaktärsbanker',
+  'hudChrome.bank.accountDepositHint':
+    'Klicka för att sätta in denna stapel i den valda karaktärens bank.',
+  'hudChrome.bank.accountDepositLead':
+    'Klicka på ett föremål för att skicka det till {name}s bank.',
+  'hudChrome.bank.accountEmpty': 'Skapa en till karaktär för att använda dess bank här.',
+  'hudChrome.bank.accountLoading': 'Laddar dina karaktärer...',
+  'hudChrome.bank.accountMembership':
+    'Ett aktivt medlemskap låter dig komma åt dina andra karaktärers banker här.',
+  'hudChrome.bank.accountNoFit': 'Det finns inte plats för den stapeln.',
+  'hudChrome.bank.accountOnline':
+    '{name} är inloggad. Logga ut karaktären för att öppna dess bank här.',
+  'hudChrome.bank.accountOpening': 'Öppnar {name}s bank...',
+  'hudChrome.bank.accountSelect': 'Välj en karaktär för att ladda dess bank.',
+  'hudChrome.bank.accountSlots': '{used} / {total} platser',
+  'hudChrome.bank.accountStale': 'Stapeln ändrades innan den kunde flyttas. Försök igen.',
+  'hudChrome.bank.accountTab': 'Andra karaktärer',
+  'hudChrome.bank.accountTooLarge':
+    '{name}s bank är för stor för att öppnas härifrån. Logga in som {name} för att använda den.',
+  'hudChrome.bank.accountUnavailable':
+    'Denna bank är inte tillgänglig. Välj karaktären igen för att uppdatera.',
+  'hudChrome.bank.accountWithdrawHint': 'Klicka för att ta ut denna stapel till dina väskor.',
+  'hudChrome.bank.accountWithdrawLead':
+    'Klicka på ett föremål för att flytta det till dina väskor.',
+  'hudChrome.bank.referralArmour': 'Hämta vänskapsrustning',
+  'hudChrome.bastionAlert.brineLine': 'Det bränner dig varje sekund: kliv ur pölen',
+  'hudChrome.bastionAlert.brineTitle': 'I det helgade saltvattnet!',
+  'hudChrome.bastionAlert.realLine': 'Detta är den riktiga Vael: slå honom för att bryta slöjan',
+  'hudChrome.bastionAlert.realTitle': 'Strålen hittade honom!',
+  'hudChrome.bastionAlert.reapedLine':
+    'Rör dig framåt eller åt sidan för att undvika lien som svingas bakom dig',
+  'hudChrome.bastionAlert.reapedTitle': 'Döden reser sig bakom dig!',
+  'hudChrome.bastionAlert.sentencedLine':
+    'En ljuspelare träffar alla nära dig: gå bort från gruppen',
+  'hudChrome.bastionAlert.sentencedTitle': 'Domen faller över dig!',
+  'hudChrome.bastionAlert.shadeLine':
+    'Lämna denna skenbild. Attackera den Vael vars lykta flammar i strålen för att bryta slöjan',
+  'hudChrome.bastionAlert.shadeTitle': 'En ihålig skugga',
+  'hudChrome.bastionAlert.timeAria': '{seconds} sekunder kvar',
+  'hudChrome.bastionAlert.veilLine':
+    'Hitta den Vael vars lykta flammar i fyrstrålen och attackera sedan för att bryta slöjan',
+  'hudChrome.bastionAlert.veilTitle': 'Dimslöjan',
+  'hudChrome.bastionCage.buttonAria': 'Bryt dig fri ur järnburen',
+  'hudChrome.bastionCage.progressAria': 'Flyktförlopp: {pct}',
+  'hudChrome.bastionCage.promptClick': 'Klicka här gång på gång för att bryta dig fri',
+  'hudChrome.bastionCage.promptKey': 'Tryck på {key} gång på gång för att bryta dig fri',
+  'hudChrome.bastionCage.promptNoKey':
+    'Tryck på din interaktionstangent gång på gång för att bryta dig fri',
+  'hudChrome.bastionCage.promptTap': 'Tryck här gång på gång för att bryta dig fri',
+  'hudChrome.bastionCage.title': 'Inlåst i järnburen!',
+  'hudChrome.bastionChain.allyLine':
+    '{name} dras mot gropen: slå det dränkta ankaret eller hjälp spelaren att nå en tänd stolpe',
+  'hudChrome.bastionChain.allyTitle': 'Bryt kedjan!',
+  'hudChrome.bastionChain.anchoredLine':
+    'Spring till en tänd förtöjningsstolpe för att förtöja kedjan, eller låt gruppen bryta den innan vinschen drar dig ned i gropen',
+  'hudChrome.bastionChain.anchoredTitle': 'Fastkedjad vid det dränkta ankaret!',
+  'hudChrome.bastionChain.brokenAria': 'Kedjan bruten: {pct}',
+  'hudChrome.bastionChain.linkBroken': 'Länk bruten!',
+  'hudChrome.bastionChain.linkRule':
+    'Varje träff på ankaret bryter en länk, oavsett hur hårt den träffar',
+  'hudChrome.bastionChain.linksLeft': 'Kedjelänkar kvar: {count} av {total}',
+  'hudChrome.bastionChain.linksTarget': '{count} av {total} länkar',
+  'hudChrome.bastionChain.reachAria': 'Använd kedjelängd: {pct}',
+  'hudChrome.bastionChain.shackledLine':
+    'Håll er inom {range} yard för att undvika kedjeskada på er båda ({dist} yard mellan er)',
+  'hudChrome.bastionChain.shackledTitle': 'Fastkedjad vid {name}',
+  'hudChrome.bastionChain.strainedLine':
+    'Gå inom {range} yard från din partner för att stoppa kedjeskadan på er båda',
+  'hudChrome.bg.flagDroppedByLog': '{name} tappade {team}-flaggan.',
+  'hudChrome.bg.flagNameAzure': 'Azurflagga',
+  'hudChrome.bg.flagNameCrimson': 'Karmosinflagga',
+  'hudChrome.bg.flagReturnedByLog': '{name} återförde {team}-flaggan.',
+  'hudChrome.buddyMenu.autolootDisable': 'Stäng av automatisk byteshämtning',
+  'hudChrome.buddyMenu.autolootEnable': 'Slå på automatisk byteshämtning',
+  'hudChrome.buddyMenu.autolootHint':
+    'Din följeslagare hämtar byte från dina egna lik inom 30 yard.',
+  'hudChrome.buddyMenu.nameLabel': 'Följeslagarens namn',
+  'hudChrome.buddyMenu.rename': 'Byt namn på följeslagaren',
+  'hudChrome.collections.actions.dismiss': 'Avvisa',
+  'hudChrome.collections.armor.mail': 'Ringbrynja',
+  'hudChrome.collections.buddyLore.alon':
+    'En resenärs maskot från en väg som ingen karta vill kännas vid, som dyker upp så fort en plan går snett. Den iakttar, den godkänner och den erbjuder ingen som helst hjälp.',
+  'hudChrome.collections.buddyLore.alpaca':
+    'Hjordarna i Stormkammen håller dem för ullens och humörets skull: inget förblir lugnare i en storm. Den här spottar på exakt en person per resa.',
+  'hudChrome.collections.buddyLore.ansem':
+    'Den talar om dörrar och mörker och låter sig inte dras in på något av ämnena. Nattblomstrets kultister hävdar att den tillhör dem; den vandrar iväg så fort de håller en rit.',
+  'hudChrome.collections.buddyLore.bull':
+    'En tjur från Dalen, stor som en hund, vilket är det enda skälet till att någon gick med på att ha en inomhus. Humöret krympte inte med resten.',
+  'hudChrome.collections.buddyLore.cate_coin':
+    'En katt som vägrar skiljas från myntet den sitter på, och som ingen någonsin sett äta. Köpmännen i Östbäck grälar fortfarande om vilken av de två som är husdjuret.',
+  'hudChrome.collections.buddyLore.crimson_claw_crab':
+    'En tidvattenskrabba från Fjärrkusten vars klo förblir röd långt efter att den lämnat vattnet. Hamnarbetarna brukade låta dem tävla längs plankorna om pengar.',
+  'hudChrome.collections.buddyLore.crystal_lich':
+    'En skärva av självaste Nythraxis, fortfarande surrande av kylan som formade den. Den lyder den som drog fram den ur raidens spillror, och har inte förlåtit personen för det.',
+  'hudChrome.collections.buddyLore.crystal_tide':
+    'Ett tidvattensväsen som rider på sin egen droppe havsglas, uppfiskat ur stilla vatten av fiskare från Dalen till Fjärrkusten som ville fånga middag. Det behåller vattnet det kom upp i och vägrar låta sig övertalas att återvända.',
+  'hudChrome.collections.buddyLore.ember_fox':
+    'En rävhona från häckarna i Östbäcksdalen, döpt efter den kolröda pälsen som syns genom vinterns snår. Fångstmännen där gav upp om ungarna för generationer sedan och började ställa ut mat i stället.',
+  'hudChrome.collections.buddyLore.emberfall_phoenix':
+    'Den brinner ned till en glöd varje höst och reser sig ur sin egen aska till våren, vilket är allt någon kan berätta om den. Ingen har någonsin hittat ett bo, och ingen har någonsin fångat en två gånger.',
+  'hudChrome.collections.buddyLore.emerald_wolf':
+    'En valp från Vålnadsskogen, vars päls är grön i trädkronornas ljus som aldrig riktigt når skogsmarken. Väktarna föder upp de föräldralösa ungar som skogen lämnar efter sig.',
+  'hudChrome.collections.buddyLore.forgemaw':
+    'Smidd i Den sista källans Smältdegel och aldrig riktigt färdig gick den ut ur Ignivars gjuteri medan hamrarna ännu slog. Bara den heroiska nedstigningen finner den: det smälta väsendet återvänder ständigt till smedjan som skapade det och följer med hem med den som överlever elden två gånger.',
+  'hudChrome.collections.buddyLore.frog':
+    'Dykärrsträsket föder upp dem tjocka och obekymrade, kväkande hela natten i vassen. Träskguiderna svär på att en båt med en sådan ombord aldrig går på grund.',
+  'hudChrome.collections.buddyLore.frostfire':
+    'Född i Frostslöjans vidder där en het källa bryter fram genom isfältet, och den har aldrig bestämt sig för vilken hälft den tillhör. Den ångar i kall luft och huttrar i varm.',
+  'hudChrome.collections.buddyLore.golden_sentinel':
+    'En vaktbagge från Bärnstensfallet, förgylld av kådan den växte upp i. Namnet är äldre än kådan: väktare av något slag vaktade lundarna långt innan någon kom på att tappa saven på flaska.',
+  'hudChrome.collections.buddyLore.horse':
+    'En dalponny, framavlad liten för fruktträdgårdarnas stigar och aldrig upplyst om att den inte är en stridshäst. Den håller jämna steg vid din sida och följer vem som helst som en gång gett den ett äpple.',
+  'hudChrome.collections.buddyLore.kekius':
+    'En skrattande följeslagare av oklart ursprung, anammad som lyckobringare av kapplöpningsstallarna i Stormkammen. Den har överlevt fyra stall som svor vid den.',
+  'hudChrome.collections.buddyLore.loot_goblin':
+    'Den följer alla som bär heroiska märken och har aldrig en enda gång ertappats med att stjäla. Kvartermästare Vex vidhåller att det inte bevisar någonting alls.',
+  'hudChrome.collections.buddyLore.moss_hare':
+    'En hare från Pilkärret, grönpälsad efter ett liv med sovplats i våt torv. Träskets örtkännare ser dem som lyckobringare och tillåter inte att någon jagar bort dem från en trappa.',
+  'hudChrome.collections.buddyLore.nightfang':
+    'En ung jägare från Nattblomstret, tyst även med sitt släktes mått mätt. Den följer med för sällskapets skull och jagar inget större än en nattfjäril.',
+  'hudChrome.collections.buddyLore.penny_goldspark':
+    'En gnomisk uppfinnarlärling som tar betalt per timme och är värd varenda kopparslant. Rustmästare Hode tog sig an henne för att reglera en skuld och säljer nu arrangemanget till alla med tusen guld.',
+  'hudChrome.collections.buddyLore.phantom':
+    'En handflatestor vålnad från Vålnadsskogens gravhögar, bara lakan och inga ben, som dyker upp i en stängd packning och stannar för sällskapets skull. Ingen har kommit på vad den vill, och den har aldrig ens försökt skrämma någon.',
+  'hudChrome.collections.buddyLore.proud_grunt':
+    'En veteran från krigsförråden som behöll honnören och förlorade graden. Krigsmarskalk Draven Kole ger en till varje soldat med nog mycket ära för att veta vad det kostar.',
+  'hudChrome.collections.buddyLore.raptor':
+    'En unge från Drakländerna, såld vidare innan den lär sig hur fort den kan springa. Varje ny ägare får höra att den måste hållas mätt, och ingen behöver höra det två gånger.',
+  'hudChrome.collections.buddyLore.rocky':
+    'En stenskalskrypare från Törntoppshöjdernas rasbranter, långsam och fullständigt obekymrad. Gruvarbetare håller dem för deras förmåga att stanna upp strax före ett ras.',
+  'hudChrome.collections.buddyLore.sapling':
+    'Ett ungt träd med ett leende i barken och en nyfiken lila blick. Dess rötter bär det med glatt vaggande steg vart du än vandrar.',
+  'hudChrome.collections.buddyLore.skeleton':
+    'Det kom upp ur Vålnadsskogens gravhögar, borstade av sig och har följt efter folk sedan dess. Ingen har fastställt vems ben det var.',
+  'hudChrome.collections.buddyLore.solbot':
+    'En liten soldriven automat, uppgrävd halvt begravd i Drakländernas aska och fortfarande tickande. Verkstaden som byggde den lämnade inget märke någonstans på höljet.',
+  'hudChrome.collections.buddyLore.spider':
+    'En handflatestor vävare från Vålnadsskogen som möblerar om varje packning den bärs i. Spindelväven är starkare än tråden den ersätter.',
+  'hudChrome.collections.buddyLore.sprites':
+    'Två små eldväsen, ett gyllene och ett blågrönt, som aldrig riktigt enas om vem som leder. Kom nära nog så förenas de till en grön låga, för att sedan skratta och glida isär igen.',
+  'hudChrome.collections.buddyLore.stag':
+    'En blodslinje från Evighetsträdgården, framavlad ur de stora hjortar väktarna en gång red. Den sänker fortfarande huvudet när en hand höjs, av en vana äldre än djuret självt.',
+  'hudChrome.collections.buddyLore.tiger':
+    'Palmviddens ränder på ett djur som aldrig sett Palmvidden: blodslinjen har hållits i fångenskap sedan de gamla menagerierna stängde. Den lyder en vissling och ingenting annat.',
+  'hudChrome.collections.buddyLore.triple_t':
+    'Tre av någonting, eller en sak tre gånger om. Uppgifterna går isär, och varelsen står inte still tillräckligt länge för att bli räknad.',
+  'hudChrome.collections.buddyLore.trollface':
+    'En grinande sak som Vålnadsskogen släppte ut och vägrade ta tillbaka. Varje försök att beskriva den slutar med att berättaren skrattar och ger upp.',
+  'hudChrome.collections.buddyLore.tuskhorn_boar':
+    'Ett djur från Törntoppshöjderna, framavlat kortbent av herdar som ville ha ett vildsvin som inte kunde riva ett staket. Humöret behöll det ändå.',
+  'hudChrome.collections.close': 'Stäng jakten',
+  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Frostbunden',
+  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Elektrisk',
+  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Askgrå',
+  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Vitglödande',
+  'hudChrome.collections.cosmetic.frog_sapphire': 'Safirgroda',
+  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Grönskande',
+  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Krigsherre',
+  'hudChrome.collections.cosmetic.stag_acorn': 'Ekollonkrona',
+  'hudChrome.collections.cosmetic.stag_gilded': 'Förgylld',
+  'hudChrome.collections.cosmeticUnlocked': 'Nytt utseende för {name}: {look}.',
+  'hudChrome.collections.detail.bindLabel': 'Bindning',
+  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% per dödande',
+  'hudChrome.collections.detail.dropLabel': 'Tappas av',
+  'hudChrome.collections.detail.dropWithHeroic':
+    '{mob} ({location}), {chance}% per dödande, {heroicChance}% i heroiskt läge',
+  'hudChrome.collections.detail.exchangeLabel': '$WOC-börsen',
+  'hudChrome.collections.detail.exchangeNone': 'Inga annonser',
+  'hudChrome.collections.detail.exchangeUnavailable': 'Inte tillgängligt i denna klient',
+  'hudChrome.collections.detail.fishingDrop': 'Fiske var som helst, {chance}% per fångst',
+  'hudChrome.collections.detail.globalDrop':
+    'Valfri fiende, {chance}% per dödande, en av {count} med denna sällsynthet',
+  'hudChrome.collections.detail.heroicDrop':
+    '{mob} ({location}), endast heroiskt läge, {chance}% per dödande',
+  'hudChrome.collections.detail.marketAtMerchant': 'Visas hos köpmannen',
+  'hudChrome.collections.detail.marketChecking': 'Kontrollerar...',
+  'hudChrome.collections.detail.marketLabel': 'Världsmarknaden',
+  'hudChrome.collections.detail.marketNone': 'Inga annonser',
+  'hudChrome.collections.detail.marksPrice': '{amount} heroiska märken',
+  'hudChrome.collections.detail.noItem': 'Inget föremål ger detta ännu',
+  'hudChrome.collections.detail.noSell': 'Kan inte säljas',
+  'hudChrome.collections.detail.noSource': 'Ingen källa i spelet ännu',
+  'hudChrome.collections.detail.sellLabel': 'Handlaren betalar',
+  'hudChrome.collections.detail.setLabel': 'Insamlat',
+  'hudChrome.collections.detail.soulbound': 'Själsbundet',
+  'hudChrome.collections.detail.tradeable': 'Kan handlas',
+  'hudChrome.collections.detail.vendor': '{npc} ({location}) för {price}',
+  'hudChrome.collections.detail.vendorLabel': 'Säljs av',
+  'hudChrome.collections.keybindLabel': 'Jakt',
+  'hudChrome.collections.launcherTitle': 'Jakt: följeslagare, riddjur och föremålsset',
+  'hudChrome.collections.looks.locked': 'Låst',
+  'hudChrome.collections.looks.none': 'Inga utseenden har skapats för denna följeslagare ännu',
+  'hudChrome.collections.looks.title': 'Utseenden',
+  'hudChrome.collections.looks.unlocked': 'Upplåst',
+  'hudChrome.collections.looks.worn': 'Använt',
+  'hudChrome.collections.petKind.celebrity': 'Kändisar',
+  'hudChrome.collections.presence.alon': 'Du känner dig iakttagen och stillsamt godkänd.',
+  'hudChrome.collections.presence.alpaca':
+    'Något ulligt och makligt har bestämt sig för att följa med.',
+  'hudChrome.collections.presence.ansem': 'En viskning om dörrar och mörker följer dig.',
+  'hudChrome.collections.presence.bull': 'En låg utandning virvlar upp dammet bakom dig.',
+  'hudChrome.collections.presence.cate_coin':
+    'Du hör det svaga klingandet av ett mynt som inte är ditt.',
+  'hudChrome.collections.presence.crimson_claw_crab':
+    'Något klickar och skuttar precis utom synhåll.',
+  'hudChrome.collections.presence.crystal_lich':
+    'Ett kallt surr stiger ur spillrorna, och det iakttar dig.',
+  'hudChrome.collections.presence.crystal_tide': 'En droppe av havet vägrar släppa från din lina.',
+  'hudChrome.collections.presence.ember_fox': 'Något litet och varmt tassar efter dig.',
+  'hudChrome.collections.presence.emberfall_phoenix':
+    'En värme som från en pyrande eld slår sig ned bakom dig.',
+  'hudChrome.collections.presence.emerald_wolf':
+    'Gröna ögon blinkar i undervegetationen och följer sedan efter.',
+  'hudChrome.collections.presence.forgemaw':
+    'Smedjans hetta har inte lämnat dig. Något gick ut med den.',
+  'hudChrome.collections.presence.frog': 'Ett vått kväk svarar på varje steg du tar.',
+  'hudChrome.collections.presence.frostfire': 'Ånga och frost virvlar i ditt kölvatten.',
+  'hudChrome.collections.presence.golden_sentinel': 'Ett svagt förgyllt skimmer vakar från gräset.',
+  'hudChrome.collections.presence.horse':
+    'Hovar håller en lugn, tålmodig takt någonstans bakom dig.',
+  'hudChrome.collections.presence.kekius': 'Ett kvävt skratt följer dig längs vägen.',
+  'hudChrome.collections.presence.loot_goblin': 'Något räknar dina mynt för sig självt.',
+  'hudChrome.collections.presence.moss_hare': 'Ett prasslande i torven håller jämna steg med dig.',
+  'hudChrome.collections.presence.nightfang': 'Tysta tassar följer dig där du inte kan se.',
+  'hudChrome.collections.presence.penny_goldspark':
+    'Små verktyg klirrar i en ficka som inte är din.',
+  'hudChrome.collections.presence.phantom': 'Luften bakom dig är aningen för stilla.',
+  'hudChrome.collections.presence.proud_grunt': 'En stövel stampar i givakt någonstans bakom dig.',
+  'hudChrome.collections.presence.raptor': 'Snabba klor klickar mot sten vid dina hälar.',
+  'hudChrome.collections.presence.rocky':
+    'Småsten rör sig bakom dig utan att någon vind driver den.',
+  'hudChrome.collections.presence.sapling':
+    'Små rötter trippar bakom dig och rör upp de fallna löven.',
+  'hudChrome.collections.presence.skeleton': 'Torra ben skallrar i takt med dina steg.',
+  'hudChrome.collections.presence.solbot': 'Ett mjukt tickande håller takten med dina steg.',
+  'hudChrome.collections.presence.spider': 'En silkestråd stryker över din axel.',
+  'hudChrome.collections.presence.sprites':
+    'Två små lågor har fastnat på dig, och de slocknar inte.',
+  'hudChrome.collections.presence.stag': 'En skugga med horn faller över din stig.',
+  'hudChrome.collections.presence.tiger': 'Ränder skiftar i utkanten av ditt synfält.',
+  'hudChrome.collections.presence.triple_t': 'Tre fotsteg hörs där det borde vara ett.',
+  'hudChrome.collections.presence.trollface': 'Någonstans bakom dig står något och flinar.',
+  'hudChrome.collections.presence.tuskhorn_boar':
+    'En grymtning och en stampning: något envist följer dig.',
+  'hudChrome.collections.presenceDefault': 'Du känner en närvaro som iakttar dig.',
+  'hudChrome.collections.revealed': '{name} har bestämt sig för att följa dig.',
+  'hudChrome.collections.set.bonusLabel': '{pieces} delar',
+  'hudChrome.collections.set.itemLevel': 'föremålsnivå {level}',
+  'hudChrome.collections.set.owned': '{owned} av {total} delar',
+  'hudChrome.collections.source.bossDrop': '{mob} ({location}), {chance}% per spelare och dödande',
+  'hudChrome.collections.source.bossDropHeroicOnly':
+    '{mob} ({location}), endast heroiskt läge, {chance}% per spelare',
+  'hudChrome.collections.source.bossDropWithHeroic':
+    '{mob} ({location}), {chance}% per spelare, {heroicChance}% i heroiskt läge',
+  'hudChrome.collections.source.bossLabel': 'Bossföljeslagare',
+  'hudChrome.collections.source.challengeDps':
+    'Gör {dps} skada per sekund på {mob} under hela striden',
+  'hudChrome.collections.source.challengeLabel': 'Utmaning',
+  'hudChrome.collections.source.challengeSpeed':
+    'Besegra {mob} inom {seconds} sekunder från stridens början',
+  'hudChrome.collections.source.craft': '{item} (recept för {profession})',
+  'hudChrome.collections.source.craftLabel': 'Tillverkat',
+  'hudChrome.collections.source.deed': 'Bedriften {deed}',
+  'hudChrome.collections.source.deedLabel': 'Förtjänas genom',
+  'hudChrome.collections.source.grantLabel': 'Tilldelat',
+  'hudChrome.collections.source.grantOnly':
+    'Säsongsbelöning: den månatliga rankningen och belöningarna för bästa stridsloggar',
+  'hudChrome.collections.source.rollNote':
+    'Varje spelare slår separat; ingen förlorar sitt slag till en gruppmedlem.',
+  'hudChrome.collections.source.token':
+    '{item}, används en gång för att knyta följeslagaren till dig',
+  'hudChrome.collections.source.tokenLabel': 'Pollett',
+  'hudChrome.collections.stat.mixed': 'Blandad',
+  'hudChrome.collections.stat.strength': 'Styrka',
+  'hudChrome.collections.state.notOwned': 'Inte insamlat',
+  'hudChrome.collections.state.owned': 'Insamlat',
+  'hudChrome.collections.state.pending': 'En närvaro följer dig',
+  'hudChrome.collections.state.unavailable': 'Kan inte fås ännu',
+  'hudChrome.collections.tabs.buddies': 'Följeslagare',
+  'hudChrome.collections.tabs.sets': 'Föremålsset',
+  'hudChrome.collections.title': 'Jakt',
+  'hudChrome.cosmetics.buddyActive': 'Frammanad',
+  'hudChrome.cosmetics.buddyDrag': 'Dra till handlingsfältet',
+  'hudChrome.courier.bags': 'Skicka till banken',
+  'hudChrome.courier.bank': 'Hämta från banken',
+  'hudChrome.courier.bankTitle': 'Banken',
+  'hudChrome.courier.capacity': '{used} / {capacity} platser',
+  'hudChrome.courier.cargo': 'Kurirens packning',
+  'hudChrome.courier.cargoSafe':
+    'Återlämnade föremål får plats även om väskorna är fulla. Kuriren försvinner efter leveransen tills den frammanas igen.',
+  'hudChrome.courier.close': 'Stäng kuriren',
+  'hudChrome.courier.instructions':
+    'Välj hela staplar. Kuriren sätter in dem först och hämtar sedan de föremål du begärt. Uppdragsföremål kan inte skickas.',
+  'hudChrome.courier.membership': 'Förnya ditt medlemskap för att påbörja en till resa.',
+  'hudChrome.courier.outbound': 'Flyger till banken',
+  'hudChrome.courier.ready': 'Redo för en leverans',
+  'hudChrome.courier.returning': 'Tar med dina föremål tillbaka',
+  'hudChrome.courier.select': 'Välj {item}, {count}',
+  'hudChrome.courier.selected': '{count} / {limit} staplar valda',
+  'hudChrome.courier.selectedItem': 'Avmarkera {item}, {count}',
+  'hudChrome.courier.send': 'Skicka kuriren',
+  'hudChrome.courier.title': 'Kurir',
+  'hudChrome.courier.unavailable': 'Frammana din kurir för att planera en leverans.',
+  'hudChrome.courier.waiting': 'Väntar på att lämna tillbaka dina föremål',
+  'hudChrome.cryptAlert.embracedLine':
+    'Din grupp måste skada Benkylans dam för att befria dig ur hennes grepp',
+  'hudChrome.cryptAlert.embracedTitle': 'Frusen omfamning!',
+  'hudChrome.cryptAlert.graspLine':
+    'Lämna den markerade ringen innan händerna bryter fram för att undvika skada och rotning',
+  'hudChrome.cryptAlert.graspTitle': 'Gravens grepp!',
+  'hudChrome.cryptAlert.graveLine': 'Gravjorden bränner och saktar dig: gå ur den',
+  'hudChrome.cryptAlert.graveTitle': 'I en öppen grav!',
+  'hudChrome.cryptAlert.harmonyLine':
+    'Döda koristerna för att ta bort Ilvanes skademinskning på {pct}%',
+  'hudChrome.cryptAlert.harmonyTitle': 'Harmoni',
+  'hudChrome.cryptAlert.knellLine':
+    'Spökeld öser över denna halva av ringen när fältet tömts: ta dig till den andra halvan',
+  'hudChrome.cryptAlert.knellTitle': 'Brinnande dödsklang!',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    'Gå in i skenet från en tänd lykta för att undvika klagans skada: bara två spelare får plats vid varje lykta',
+  'hudChrome.cryptAlert.lamentShelteredLine':
+    'Stanna i skenet från denna tända lykta för att undvika klagans skada: du har en skyddad plats',
+  'hudChrome.cryptAlert.lamentTitle': 'Brudens klagan!',
+  'hudChrome.cryptAlert.measuredLine':
+    'Gå till gårdens kant innan markeringen tar slut för att hålla den skadande graven borta från gruppen',
+  'hudChrome.cryptAlert.measuredTitle': 'Mätt för graven!',
+  'hudChrome.cryptAlert.reapLine':
+    'Gå bakom Morthen för att undvika lien som träffar alla framför honom',
+  'hudChrome.cryptAlert.reapTitle': 'Skörda de oroliga!',
+  'hudChrome.cryptAlert.riteLine':
+    'Tänd alla minnesljus igen för att bryta Morthens immunitet: {lit} av {total} tända',
+  'hudChrome.cryptAlert.riteNamedLine':
+    'Tänd ljusen i liggarens ordning för att bryta Morthens immunitet: fel ljus återställer framsteg ({lit}/{total})',
+  'hudChrome.cryptAlert.riteTitle': 'De oroligas rit',
+  'hudChrome.cryptAlert.soulLine':
+    'Fånga upp den drivande själen för att hindra den från att läka Morthen och öka hans skada. Att fånga den skadar dig',
+  'hudChrome.cryptAlert.soulTitle': 'Bunden själ',
+  'hudChrome.cryptAlert.timeAria': '{seconds} sekunder kvar',
+  'hudChrome.cryptAlert.tollLine':
+    'Förbered dig på att slåss mot skeletten som väcks ur öppna gravar: Marrow är immun medan han ringer i klockan',
+  'hudChrome.cryptAlert.tollTitle': 'Begravningsklang!',
+  'hudChrome.deeds.buddiesEmpty': 'Samla en följeslagare för att frammana den från denna hylla.',
+  'hudChrome.deeds.buddiesNone': 'Ingen följeslagare',
+  'hudChrome.deeds.buddiesSection': 'Följeslagare',
+  'hudChrome.deeds.buddyDragHint': 'Dra till ditt handlingsfält',
+  'hudChrome.deeds.looksEmpty': 'Denna följeslagare har inga upplåsta utseenden ännu.',
+  'hudChrome.deeds.looksNoBuddy': 'Frammana en följeslagare för att välja dess utseende här.',
+  'hudChrome.deeds.looksNone': 'Eget utseende',
+  'hudChrome.deeds.looksSection': 'Följeslagarutseenden',
+  'hudChrome.dungeonTracker.complete': 'Slutförd',
+  'hudChrome.expeditions.accept': 'Acceptera',
+  'hudChrome.expeditions.alerts': 'Aviseringar',
+  'hudChrome.expeditions.available': 'Tillgänglig för att hjälpa',
+  'hudChrome.expeditions.bellCount.one': 'Öppna grupper: {count} avisering',
+  'hudChrome.expeditions.bellCount.other': 'Öppna grupper: {count} aviseringar',
+  'hudChrome.expeditions.buy': 'Köp och utrusta',
+  'hudChrome.expeditions.closeRecruitment': 'Stäng rekrytering',
+  'hudChrome.expeditions.decline': 'Avböj',
+  'hudChrome.expeditions.dismiss': 'Avfärda',
+  'hudChrome.expeditions.editDetails': 'Redigera gruppdetaljer',
+  'hudChrome.expeditions.empty': 'Inga öppna expeditioner just nu.',
+  'hudChrome.expeditions.findGroup': 'Hitta en grupp',
+  'hudChrome.expeditions.finder': 'Öppna gruppsökaren för fängelsehålor',
+  'hudChrome.expeditions.gold': 'Guldklocka',
+  'hudChrome.expeditions.groupRoster': 'Gruppmedlemmar',
+  'hudChrome.expeditions.groups': 'Grupper',
+  'hudChrome.expeditions.helperPaused':
+    'Hjälparaviseringar pausas medan du är i en grupp, står i kö eller har en väntande förfrågan.',
+  'hudChrome.expeditions.join': 'Begär att få gå med',
+  'hudChrome.expeditions.leader': 'Leds av {name}',
+  'hudChrome.expeditions.members': '{current}/{total} spelare',
+  'hudChrome.expeditions.needed': 'Föreslagna roller: {roles}',
+  'hudChrome.expeditions.note': 'Kort anteckning (valfri, högst 120 tecken)',
+  'hudChrome.expeditions.open': 'Öppna grupp',
+  'hudChrome.expeditions.otherGroups': 'Andra grupper',
+  'hudChrome.expeditions.outcomeAccepted':
+    '{name} accepterade din förfrågan. Använd Res till gruppen när du är redo.',
+  'hudChrome.expeditions.outcomeCancelled': 'Du avbröt din förfrågan.',
+  'hudChrome.expeditions.outcomeClosed': 'Den gruppen tar inte längre emot din förfrågan.',
+  'hudChrome.expeditions.outcomeDeclined': '{name} avböjde din förfrågan.',
+  'hudChrome.expeditions.outcomeExpired': 'Din förfrågan gick ut. Du kan skicka en ny förfrågan.',
+  'hudChrome.expeditions.pending': 'Förfrågan väntar',
+  'hudChrome.expeditions.points': 'Köpoäng: {count}',
+  'hudChrome.expeditions.price': '{count} köpoäng',
+  'hudChrome.expeditions.progress': '{defeated}/{total} bossar besegrade',
+  'hudChrome.expeditions.purpose': 'Gruppens mål',
+  'hudChrome.expeditions.purposeClear': 'Slutför fängelsehålan',
+  'hudChrome.expeditions.purposeFirstTime': 'Första gången',
+  'hudChrome.expeditions.purposeNeedsHelp': 'Behöver hjälp',
+  'hudChrome.expeditions.purposeRelaxed': 'Avslappnad runda',
+  'hudChrome.expeditions.recruitmentClosed': 'Rekrytering stängd',
+  'hudChrome.expeditions.recruitmentOpen': 'Rekrytering öppen',
+  'hudChrome.expeditions.request': '{name} vill gå med som {role}.',
+  'hudChrome.expeditions.saveDetails': 'Spara detaljer',
+  'hudChrome.expeditions.send': 'Skicka förfrågan',
+  'hudChrome.expeditions.shop': 'Köpoängsbutik',
+  'hudChrome.expeditions.solo': 'Spela ensam',
+  'hudChrome.expeditions.sound': 'Spela ett ljud för nya grupper och ansökningar',
+  'hudChrome.expeditions.title': 'Öppna expeditioner',
+  'hudChrome.expeditions.travel': 'Res till gruppen',
+  'hudChrome.expeditions.waiting': 'Väntar på att {name} ska svara.',
+  'hudChrome.expeditions.yourGroup': 'Din grupp',
+  'hudChrome.finder.activeQueue': 'Din kö',
+  'hudChrome.finder.backToGroups': 'Tillbaka till grupper',
+  'hudChrome.finder.createGroup': 'Skapa grupp',
+  'hudChrome.finder.createQueueLocked': 'Lämna gruppsökningen innan du publicerar.',
+  'hudChrome.finder.dungeonGuide': 'Guide till fängelsehålor',
+  'hudChrome.finder.filterAll': 'Allt innehåll',
+  'hudChrome.finder.filterContent': 'Innehåll',
+  'hudChrome.finder.filterDungeons': 'Fängelsehålor',
+  'hudChrome.finder.filterEmpty': 'Inga annonser matchar detta filter.',
+  'hudChrome.finder.groups': 'Grupper',
+  'hudChrome.finder.guide.adds':
+    'Förstärkningar anländer under stridens gång. Tanken bör samla upp dem innan de når helaren. Skadegörare bör hjälpa till att döda dem så att gruppen inte möter flera vågor samtidigt.',
+  'hudChrome.finder.guide.bleed':
+    'Närstridsträffar kan orsaka en blödning som fortsätter skada offret. Håll koll på den skadade spelaren även om fienden byter mål, och återställ hälsan medan blödningen pågår.',
+  'hudChrome.finder.guide.cleave':
+    'Närstridsslag skadar även andra spelare nära det aktuella målet. Håll avstånd runt tanken; det räcker inte att stå bakom bossen för att undvika denna områdesskada.',
+  'hudChrome.finder.guide.enrage':
+    'Vid låg hälsa attackerar bossen snabbare och gör mer skada. Spara försvars- och läkningsförmågor med nedkylning till denna sista fas och avsluta striden utan att strunta i övriga mekaniker.',
+  'hudChrome.finder.guide.haste':
+    'Ökar regelbundet attackhastigheten för närliggande bundsförvanter. Undvik att slåss mot extra grupper bredvid bestmästaren och förbered försvarsförmågor när flera fiender får effekten.',
+  'hudChrome.finder.guide.inferno':
+    'Bossen slutar röra sig och attackera för att kanalisera allt starkare eldpulser. Lämna området runt bossen så fort kanaliseringen börjar och återvänd när den tar slut. Att sprida ut sig inne i elden skyddar dig inte.',
+  'hudChrome.finder.guide.knockback':
+    'Närstridsträffar kan knuffa bort målet. Lämna säkert utrymme bakom tanken, undvik positioner nära fiender som ännu inte dragits in i strid och var beredd att återgå till närstridsavstånd efter knuffen.',
+  'hudChrome.finder.guide.manaBurn':
+    'Närstridsträffar kan dränera mana från ett mål som använder mana. Håll bossen borta från helaren och andra sårbara besvärjare. Spelare som använder vrede eller energi förlorar inga resurser av denna effekt.',
+  'hudChrome.finder.guide.mending':
+    'Läker regelbundet skadade bundsförvanter i närheten, inklusive besvärjaren själv. Fokusera skadan på helaren och undvik att dra in extra fiender i dess läkningsräckvidd. Detta är en omedelbar effekt, ingen besvärjelse som kan avbrytas.',
+  'hudChrome.finder.guide.mortalWound':
+    'Närstridsträffar kan minska läkningen målet tar emot. Använd försvarsförmågor med nedkylning medan såret är aktivt; helaren behöver mer läkning för att återställa samma mängd hälsa.',
+  'hudChrome.finder.guide.pulse':
+    'Skadar regelbundet spelare nära bossen. Avståndsspelare och helare kan minska skadan de tar genom att hålla avstånd. Helare bör vara beredda att återställa hälsan hos spelare i närstrid.',
+  'hudChrome.finder.guide.stomp':
+    'En återkommande smäll skadar och bedövar kortvarigt närliggande spelare. Helare och avståndsspelare bör hålla avstånd. Håll tankens hälsa hög före smällen eftersom närliggande bundsförvanter kan vara oförmögna att agera under bedövningen.',
+  'hudChrome.finder.guide.ward':
+    'Ger regelbundet närliggande bundsförvanter en absorberande sköld. Fokusera gemensamt på samma mål för att bryta skölden och döda det före nästa skydd, i stället för att sprida skadan över gruppen.',
+  'hudChrome.finder.guideUnavailable':
+    'En detaljerad strategi för denna strid är inte tillgänglig ännu.',
+  'hudChrome.finder.guildPartyBadge': 'Endast {guild}',
+  'hudChrome.finder.guildPartyHint': 'Endast medlemmar i {guild} kan ansöka.',
+  'hudChrome.finder.guildPartyLocked': 'Endast gillesmedlemmar',
+  'hudChrome.finder.guildPartyNeedsGuild': 'Gå med i ett gille för att skapa en gillesgrupp.',
+  'hudChrome.finder.guildPartyNote': 'Gillesgrupper tar bara emot medlemmar i ledarens gille.',
+  'hudChrome.finder.guildPartyToggle': 'Gillesgrupp',
+  'hudChrome.finder.hideGuide': 'Dölj guiden',
+  'hudChrome.finder.inspect': 'Inspektera',
+  'hudChrome.finder.levelUnavailable': 'Utanför ditt nivåintervall',
+  'hudChrome.finder.mech.burrowing_seeds':
+    'Grävande frön och Pollenmoln (fröna kommer upp vid en spelare efter 6 sekunder, gyllene spelare sprider ut sig)',
+  'hudChrome.finder.mech.chain_strain':
+    'Ansträngning (gå bort från varje pelare vars kedja fortfarande håller)',
+  'hudChrome.finder.mech.chorus_and_solo':
+    'Kör och Solo (samlas på den ena markeringen, sprid ut er från den andra)',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    'Benorgel (var 26:e sekund spelar hon Benorgel: två vågor av skuggtoner brister fram längs läktarens banor, 100 till 115 skada i normalt läge i en bana, och den andra vågen fyller luckorna i den första)',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    'Brudfrysning (vid halv hälsa fryser hela ravinens golv till: hal is under resten av striden)',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    'Brudens klagan (var 22:a sekund en klagan på 3 sekunder: 60 till 75 frostskada i normalt läge på alla utanför skenet från en tänd gravlykta, hälften så mycket till för varje laddning av Kvardröjande klagan från de klagor du redan tagit. En lykta skyddar högst två spelare och slocknar i 28 sekunder efter att ha skyddat någon, så dela upp er och turas om)',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    'Begravningsklang (vid 66 och 33 procent hälsa går han till klockrepet, immun mot skada, och ringer i 3 sekunder: 30 till 38 skuggskada på alla i normalt läge, och varje öppen grav väcker ett rastlöst skelett)',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'Stegring (under 30 procent hälsa tar hennes klagosång 1,8 sekunder och kommer var 11:e sekund, och orgeln spelar en tredje våg)',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    'Klagosång från hålrummet (var 16:e sekund en sång på 2,5 sekunder som kan avbrytas: om hon slutför den gör den 105 till 125 skuggskada i normalt läge och tystar i 4 sekunder alla inom 45 yard som kan se henne, så avbryt den eller göm dig bakom en körpelare)',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    'Frusen omfamning (var 30:e sekund griper hon en annan spelare än tanken och stiger 5 yard upp i luften med spelaren, 6 frostskada per sekund: gör skada motsvarande 6 procent av hennes hälsa inom 8 sekunder så sätter hon ned spelaren, annars släpper hon ned spelaren för 150 till 180 skada i normalt läge)',
+  'hudChrome.finder.mech.crypt_gravecall':
+    'Gravkall (var 15:e sekund driver en bunden själ från nästa sarkofagnisch mot honom; när den når honom blir han Mätt på de döda, 10 procent mer skada per själ upp till 10 laddningar, och läker 3 procent av sin hälsa. En spelare i dess väg tar den i stället: 12 till 16 skuggskada i normalt läge)',
+  'hudChrome.finder.mech.crypt_harmony':
+    'Harmoni (varje levande korist får henne att ta 30 procent mindre skada: döda koristerna först)',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'Heroiskt: Extranummer (en korist som legat död i 10 sekunder medan den andra fortfarande står reser sig igen, så döda dem samtidigt) och Obruten vers (var tredje klagosång kan inte avbrytas: göm dig från den)',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'Heroiskt: varje tänd lykta slocknar även av sig själv efter 30 sekunder och förblir släckt i 10, och Frusen omfamning tar två spelare och släpper vid 4,4 procent av hennes hälsa',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'Heroiskt: Dödgrävarens slag var 9:e sekund på tanken (varje laddning får tanken att ta 6 procent mer skada i 20 sekunder, upp till 6 laddningar), Gravkraft (han slår 30 procent snabbare medan han står i en grav) och Orolig jord (den som stannar i en grav i 2 sekunder väcker ett rastlöst skelett där)',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    'Mätt för graven (var 15:e sekund markerar han en annan spelare än tanken; 4 sekunder senare rasar en öppen grav in under spelaren, 42 till 52 skada inom 3 yard i normalt läge, och gropen stannar under striden: 9 skada per sekund och 40 procent långsammare rörelse därinne, så placera gravarna vid gårdens kant)',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    'Heroiskt: Namnge de döda (liggaren anger ljusens ordning: fel ljus släcker det senast tända och gör 252 till 288 skuggskada på tändaren, och varje återtändning dränerar 8 procent per sekund), Gravens grepp (var 16:e sekund får 2 spelare en ring på 4 yard; 1,5 sekunder senare bryter händer fram i den: en rotning på 3 sekunder och 162 till 198 skuggskada) och Dödsklangslindormens Brinnande dödsklang (den lyfter och markerar halva ringen i 4,5 sekunder och öser sedan spökeld över den halvan för 1 000 till 1 120 eldskada, 3 halvor per flygning)',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    'Skuggpuls (var 12:e sekund en besvärjelse på 2 sekunder, sedan 24 till 30 skuggskada i normalt läge på alla inom 12 yard från honom, så gå undan; var 9:e sekund under hans Sista smörjelse)',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    'Skörda de oroliga (under 35 procent hälsa upphör själarna; var 14:e sekund sveper han med lien efter en besvärjelse på 2 sekunder: 55 till 65 skuggskada i normalt läge på alla i en båge på 120 grader 14 yard framför honom. Skuggpuls kommer då var 9:e sekund)',
+  'hudChrome.finder.mech.crypt_rime_path':
+    'Rimfroststig (hon lämnar hal rimfrost där hon svävar i 25 sekunder: på den ökar du farten långsamt och glider vidare när du stannar eller svänger)',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    'De oroligas rit (vid 65 procent hälsa återvänder han till altaret, immun inuti De oroligas skydd, medan Gravkyla gör 3 skuggskada per sekund på alla, med en ökning på 1 var 5:e sekund, och 2 rastlösa skelett klättrar upp ur nischerna. Tänd de 4 minnesljusen igen: varje ljus kräver en kanalisering på 4 sekunder som dränerar 6 procent av tändarens maximala hälsa varje sekund; träffar bryter inte den men ett steg eller en bedövning gör det. Det sista ljuset bryter riten: han bedövas i 8 sekunder och tar 25 procent mer skada)',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'En skyffel jord (var 11:e sekund slungar han gravjord över en kon på 8 yard framför sig: en och en halv gånger hans vanliga slag och 50 procent långsammare rörelse i 6 sekunder, så stå bakom honom)',
+  'hudChrome.finder.mech.drowned_anchor':
+    'Dränkt ankare (offret vinschas mot gropen: spring inom 3 yard från en tänd förtöjningsstolpe för att förtöja kedjan, varefter stolpen slocknar i 30 sekunder, eller bryt kedjan med 12 träffar, 16 i heroiskt läge)',
+  'hudChrome.finder.mech.fog_veil':
+    'Dimslöja (fyra gestalter, en verklig: fyrens stråle får den riktiga Vaels lykta att flamma upp)',
+  'hudChrome.finder.mech.gorge': 'Frossa (ett tungt bett och ett gift på tanken)',
+  'hudChrome.finder.mech.grave_breath':
+    'Gravandedräkt (en eldkon framåt, den spräcker isen den täcker)',
+  'hudChrome.finder.mech.hallowed_brine':
+    'Helgat saltvatten (en pöl av mörkt heligt vatten på 9 yard, 10 i heroiskt läge: 18 skada per sekund på alla i den, 26 i heroiskt läge, och han tar 40 procent mindre skada medan han står i den, så dra ut honom)',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    'Fot! och Rasande band (jaguaren hoppar hem, bandet når 20 yard)',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    'Kombinerad andedräkt (mellan flodvågorna förenar huvudena två av sina attacker, alltid i samma ordning: Frostlåst fors fryser alla i sin bana i 2 sekunder och lämnar en isvägg som kan skydda dig från nästa våg, Giftström flyttar giftpölarna utåt och Giftig rimfrost fryser pölarna till kristaller som brister efter 4 sekunder. En gång mellan flodvågorna i normalt läge, två gånger i heroiskt läge)',
+  'hudChrome.finder.mech.hydra_regrowth':
+    'Återväxt (ett fallet huvud växer tillbaka efter 20 sekunder med halv hälsa medan ett annat huvud lever, och varje fallet huvud får de andra att göra 15 procent mer skada: få ned alla tre ungefär samtidigt)',
+  'hudChrome.finder.mech.hydra_three_elements':
+    'Tre element (vänsterhuvudet andas en frostkon på 18 yard som saktar dig med 70 procent i 4 sekunder, mittenhuvudet spottar gift under upp till 3 spelare som brister efter 1,5 sekunder och bränner där det landar i 6 sekunder, och högerhuvudet skjuter en fors längs en bana på 26 yard som kastar dig 8 yard bakåt: gå ur var och en. När ett huvud faller tar de kvarvarande huvudena över dess attack)',
+  'hudChrome.finder.mech.hydra_tsunami':
+    'Flodvåg (huvudena sjunker i 4,5 sekunder och tar 75 procent mindre skada, och en våg rullar över ena halvan av bassängen, den andra halvan nästa gång: 160 till 190 frostskada i normalt läge och en knuff på 10 yard. Ta dig till andra halvan eller stå bakom en kantpelare; i heroiskt läge rullar vågen tillbaka över andra halvan 3,5 sekunder senare. Första flodvågen kommer 24 sekunder in i striden, varje senare våg 40 sekunder efter att den föregående passerat)',
+  'hudChrome.finder.mech.iron_cage':
+    'Järnbur (tryck upprepade gånger på din interaktionstangent för att bryta dig ut, bundsförvanter kan slå sönder gallret)',
+  'hudChrome.finder.mech.korgath_stomp': 'Skälvande stamp (gå ur ringen runt honom)',
+  'hudChrome.finder.mech.pack_bond':
+    'Flockband (tillsammans tar de halv skada: dra dem 15 yard från varandra)',
+  'hudChrome.finder.mech.plate_floor':
+    'Bräckande is (hans eld spräcker och sänker sjöns plattor, håll dig borta från öppet vatten)',
+  'hudChrome.finder.mech.pollinate':
+    'Pollinera (gyllene spelare håller sig borta från fröna, annars gror de genast)',
+  'hudChrome.finder.mech.reaper_behind':
+    'Skuggövergång (tre gånger i rad reser han sig bakom en spelare, olika varje gång så länge tillräckligt många står: gå ur liens båge)',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    'Återstudsande bålverk (hans sköld studsar till närmaste spelare inom 10 yard från den senast träffade, upp till 3 spelare, 4 i heroiskt läge: sprid ut er)',
+  'hudChrome.finder.mech.rerivet_last_link':
+    'Nita om och Sista länken (avbryt sporsmeden som fäster en kedja igen; med en kedja kvar kommer Ansträngning var 10:e sekund)',
+  'hudChrome.finder.mech.rising_tide':
+    'Stigande tidvatten (halva ön översvämmas, gå till den torra halvan)',
+  'hudChrome.finder.mech.seal_shackles':
+    'Sigillbojor (varje kedja du bryter får honom att ta 20 procent mer skada och frigör en av hans attacker)',
+  'hudChrome.finder.mech.seed_rain':
+    'Fröregn (opåverkade spelare trampar sönder fröna innan de gror)',
+  'hudChrome.finder.mech.shackle_pair':
+    'Fängsla par (två fastkedjade spelare måste hålla sig nära varandra)',
+  'hudChrome.finder.mech.shadow_volley': 'Skuggsalva (skuggskada på alla)',
+  'hudChrome.finder.mech.shared_health': 'Delad hälsa (en hälsopool: slå det säkraste målet)',
+  'hudChrome.finder.mech.soulfire_trench':
+    'Själseldsdike (en rad själseld, sedan en remsa smältvatten)',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    'Jaktens ande (bytet håller avataren på avstånd genom tända solglyfer; en sargad spelare får ett försprång)',
+  'hudChrome.finder.mech.stalk':
+    'Smygjakt (jaguaren jagar en markerad spelare, aldrig tanken; ensam jagar den dig: håll avstånd, sakta, rota och bedöva den)',
+  'hudChrome.finder.mech.tide_sentence':
+    'Tidvattnets dom (5 sekunder efter markeringen träffar en ljuspelare alla inom 6 yard från den markerade spelaren, 8 i heroiskt läge: ta den bort från gruppen)',
+  'hudChrome.finder.mech.tideglass_reflections':
+    'Tidvattensglasets spegelbilder (döda varandras spegelbilder)',
+  'hudChrome.finder.mech.twin_prey_ambush':
+    'Tvillingbyte och Bakhåll (två byten, sedan ett språng mot spelaren längst bort)',
+  'hudChrome.finder.mech.unbroken_oath':
+    'Obruten ed (en gång vid halv hälsa knäböjer han immun i en bubbla i upp till 60 sekunder: döda hans soldater för att bryta den, sedan bedövas han i 4 sekunder och tar 20 procent mer skada i 10)',
+  'hudChrome.finder.mech.undertow': 'Underström (drar in alla, spring ut före nedslaget)',
+  'hudChrome.finder.mech.unquenched_held':
+    'Fasthållen eller Osläckt (döda de döda på kall is, aldrig i smältvatten)',
+  'hudChrome.finder.mech.vine_lash': 'Vinrankepiskslag (gå ur den taggiga banan eller bli rotad)',
+  'hudChrome.finder.mech.waking_thaw': 'Väckande tö (de döda klättrar upp ur töpölarna)',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    'Varma händer och Två gånger väckt (endast heroiskt, håll de döda i rörelse; en återuppstånden kommer tillbaka starkare)',
+  'hudChrome.finder.mech.wyrm_flights':
+    'Flygningar (vid 70% och 40%: för Lindormens öga till hel is, samlas där han ska landa)',
+  'hudChrome.finder.noCreateActivities':
+    'Inga aktiviteter som du kan delta i finns i denna kategori.',
+  'hudChrome.finder.partyHeading': 'Ta med din grupp',
+  'hudChrome.finder.partyMemberMeta': 'Nivå {level} {cls}',
+  'hudChrome.finder.partyNote':
+    'Din grupp går med i denna grupp. Välj en roll för varje medlem eller låt dem behålla sin egen.',
+  'hudChrome.finder.partyRoleAria': 'Roll för {name}',
+  'hudChrome.finder.partyRoleOwn': 'Eget val',
+  'hudChrome.finder.partyRolesHeading': 'Grupproller',
+  'hudChrome.finder.partyRolesNote':
+    'Välj en roll för varje medlem eller låt dem behålla sin egen.',
+  'hudChrome.finder.postDiscord': 'Publicera i Discord',
+  'hudChrome.finder.postDiscordOffline': 'Endast onlinespel',
+  'hudChrome.finder.postGeneral': 'Publicera i Allmänt',
+  'hudChrome.finder.postHeading': 'Annonsera din grupp',
+  'hudChrome.finder.postReadyIn': 'Redo om {minutes} min',
+  'hudChrome.finder.showGuide': 'Visa guiden',
+  'hudChrome.finder.tagGuildOnly': 'Gillesgrupp',
+  'hudChrome.finder.yourRole': 'Din roll',
+  'hudChrome.guildHall.board.cardProgress': '{done}/{total} denna vecka',
+  'hudChrome.guildHall.board.noticesLabel': 'Veckans kontrakt',
+  'hudChrome.guildHall.board.rewardLine': 'Belöning: {reward}',
+  'hudChrome.guildHall.board.sealsTip':
+    'Lyktsigill betalas för Lykthallens veckokontrakt och kan bara användas hos kvartermästaren Garrick Holt. De är bundna till dig.',
+  'hudChrome.guildHall.board.stamp': 'Förseglat',
+  'hudChrome.guildHall.board.weekProgress': 'Denna vecka: {done} av {total} kontrakt slutförda',
+  'hudChrome.guildHall.board.weekProgressAria': 'Kontrakt slutförda denna vecka',
+  'hudChrome.guildHall.bought': 'Du köpte titeln {title}. Välj den i Bedrifternas bok.',
+  'hudChrome.guildHall.boughtMount': 'Du köpte {mount}. Dess tyglar finns i dina väskor.',
+  'hudChrome.guildHall.boughtSkin': 'Du köpte utseendet {skin}. Använd det från kosmetikfönstret.',
+  'hudChrome.guildHall.close': 'Stäng gillesfönstret',
+  'hudChrome.guildHall.contractDone.few':
+    'Kontrakt slutfört: {contract}. Du får {count} lyktsigill.',
+  'hudChrome.guildHall.contractDone.many':
+    'Kontrakt slutfört: {contract}. Du får {count} lyktsigill.',
+  'hudChrome.guildHall.contractDone.one':
+    'Kontrakt slutfört: {contract}. Du får {count} lyktsigill.',
+  'hudChrome.guildHall.contractDone.other':
+    'Kontrakt slutfört: {contract}. Du får {count} lyktsigill.',
+  'hudChrome.guildHall.contractsIntro':
+    'Tre kontrakt i veckan, samma för varje äventyrare i riket. Du behöver inte skriva under: slutför ett så hamnar dess sigill direkt i dina väskor, en gång varje vecka.',
+  'hudChrome.guildHall.done': 'Slutfört denna vecka',
+  'hudChrome.guildHall.emptyBoard': 'Tavlan skrivs om. Kom tillbaka efter veckoåterställningen.',
+  'hudChrome.guildHall.goals.boss': 'Besegra {boss} i {dungeon}, på valfri svårighetsgrad.',
+  'hudChrome.guildHall.goals.heroic':
+    'Klara {dungeon} i heroiskt läge: besegra {boss} på heroisk svårighetsgrad.',
+  'hudChrome.guildHall.kinds.boss': 'Belöningsjakt',
+  'hudChrome.guildHall.kinds.heroic': 'Heroisk rensning',
+  'hudChrome.guildHall.kinds.task': 'Utförande',
+  'hudChrome.guildHall.lifetime': 'Slutförda kontrakt: {count}',
+  'hudChrome.guildHall.mountOffer': 'Riddjur: {mount}',
+  'hudChrome.guildHall.mountPreview':
+    'Markriddjur: +{pct}% rörelsehastighet under ridning. Kräver ridträning.',
+  'hudChrome.guildHall.needSeals': 'Behöver {count} till',
+  'hudChrome.guildHall.open': 'Öppna',
+  'hudChrome.guildHall.owned': 'Ägd',
+  'hudChrome.guildHall.quartermasterIntro':
+    'Garrick byter lyktsigill enbart mot hedersbetygelser: titlar att bära i Bedrifternas bok, gillets svärdsutseende och dess stridshäst. Inget här gör dig starkare i strid.',
+  'hudChrome.guildHall.refused.bags': 'Dina väskor är fulla.',
+  'hudChrome.guildHall.refused.owned': 'Du äger redan det.',
+  'hudChrome.guildHall.refused.range': 'Stå vid kvartermästaren för att handla.',
+  'hudChrome.guildHall.refused.riding': 'Lär dig rida innan du köper ett riddjur.',
+  'hudChrome.guildHall.refused.seals': 'Du har inte tillräckligt med lyktsigill.',
+  'hudChrome.guildHall.resetIn': 'Nya kontrakt om {time}',
+  'hudChrome.guildHall.resetSoon': 'Nya kontrakt vid nästa veckoåterställning',
+  'hudChrome.guildHall.reward.few': '{count} lyktsigill',
+  'hudChrome.guildHall.reward.many': '{count} lyktsigill',
+  'hudChrome.guildHall.reward.one': '{count} lyktsigill',
+  'hudChrome.guildHall.reward.other': '{count} lyktsigill',
+  'hudChrome.guildHall.seals': 'Lyktsigill: {count}',
+  'hudChrome.guildHall.shop.cosmetic': 'Endast kosmetiskt: ändrar inga egenskaper.',
+  'hudChrome.guildHall.shop.have': 'Du har {count}',
+  'hudChrome.guildHall.shop.howTo':
+    'Efter köpet väljer du den i Bedrifternas bok för att visa den med ditt namn.',
+  'hudChrome.guildHall.shop.kindMount': 'Riddjur',
+  'hudChrome.guildHall.shop.kindSword': 'Svärdsutseende',
+  'hudChrome.guildHall.shop.kindTitle': 'Titel',
+  'hudChrome.guildHall.shop.mountHeading': 'Du, i sadeln',
+  'hudChrome.guildHall.shop.mountHowTo':
+    'Efter köpet hamnar dess tyglar i dina väskor. Använd dem för att rida; hästen är din så länge du behåller dem.',
+  'hudChrome.guildHall.shop.mountOwned': 'Du äger detta riddjur. Dess tyglar finns i dina väskor.',
+  'hudChrome.guildHall.shop.ownedLong': 'Du äger denna titel. Välj den i Bedrifternas bok.',
+  'hudChrome.guildHall.shop.plateHeading': 'Din namnskylt',
+  'hudChrome.guildHall.shop.price': 'Pris: {price}',
+  'hudChrome.guildHall.shop.short.few': 'Du behöver {count} lyktsigill till.',
+  'hudChrome.guildHall.shop.short.many': 'Du behöver {count} lyktsigill till.',
+  'hudChrome.guildHall.shop.short.one': 'Du behöver {count} lyktsigill till.',
+  'hudChrome.guildHall.shop.short.other': 'Du behöver {count} lyktsigill till.',
+  'hudChrome.guildHall.shop.skinHeading': 'I din hand',
+  'hudChrome.guildHall.shop.skinHowTo':
+    'Efter köpet använder du det från kosmetikfönstret. Det fungerar på alla karaktärer på ditt konto.',
+  'hudChrome.guildHall.shop.skinOwned': 'Du äger detta utseende. Använd det från kosmetikfönstret.',
+  'hudChrome.guildHall.shop.stageLabel': '3D-förhandsvisning av {name}',
+  'hudChrome.guildHall.shop.stageUnavailable':
+    '3D-förhandsvisning är inte tillgänglig på denna enhet.',
+  'hudChrome.guildHall.shop.stockLabel': 'Garrick Holts sortiment',
+  'hudChrome.guildHall.signSubtitle': 'Äventyrarnas gille',
+  'hudChrome.guildHall.skinOffer': 'Svärdsutseende: {skin}',
+  'hudChrome.guildHall.skinPreview':
+    'Ändrar ditt utrustade svärds utseende på alla karaktärer på ditt konto. Endast utseende: inga egenskaper.',
+  'hudChrome.guildHall.tabs.contracts': 'Kontrakt',
+  'hudChrome.guildHall.tabs.quartermaster': 'Kvartermästare',
+  'hudChrome.guildHall.tabsLabel': 'Lykthallens avdelningar',
+  'hudChrome.guildHall.title': 'Lykthallen',
+  'hudChrome.guildHall.titleOffer': 'Titel: {title}',
+  'hudChrome.guildHall.titlePreview': 'Visas som {preview}',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': 'Fängelsehålsspårare',
+  'hudChrome.interfaceUnlock.frameNames.shardpikeBar': 'Skärvpiksfält',
+  'hudChrome.kitUse.relightAria': 'Tänd {name} igen',
+  'hudChrome.kitUse.relightClick': 'Klicka här för att tända {name} igen',
+  'hudChrome.kitUse.relightFar': 'Kom inom {range} yard för att tända igen',
+  'hudChrome.kitUse.relightKey': 'Tänd {name} igen',
+  'hudChrome.kitUse.relightLine':
+    'Tänd ljusen igen för att bryta Morthens immunitet. Kanaliseringen dränerar din hälsa; rörelse eller en bedövning avbryter den',
+  'hudChrome.kitUse.relightTap': 'Tryck här för att tända {name} igen',
+  'hudChrome.kitUse.relightUsingLine':
+    'Fortsätt kanalisera för att tända ljuset: det dränerar hälsa. Träffar avbryter inte; rörelse eller en bedövning gör det',
+  'hudChrome.kitUse.timeAria': '{seconds} sekunder kvar',
+  'hudChrome.kitUse.toppleAria': 'Vält {name}',
+  'hudChrome.kitUse.toppleClick': 'Klicka här för att välta {name} över dem',
+  'hudChrome.kitUse.toppleFar': 'Kom inom {range} yard för att sparka omkull det',
+  'hudChrome.kitUse.toppleKey': 'Vält {name} över dem',
+  'hudChrome.kitUse.toppleLine':
+    'Vält fyrfatet över närliggande fiender för att bränna dem med spillet',
+  'hudChrome.kitUse.toppleTap': 'Tryck här för att välta {name} över dem',
+  'hudChrome.kitUse.usingLine': 'Stå still: en träff, ett steg eller en bedövning bryter det',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    'Lykthallens stridshäst, med ek- och järnbardering under gillets blå färg, och två stormlyktor som svänger från sadeln för att lysa upp vägen hem.',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    'En tvåhövdad skymningswyvern från de uråldriga grenarna, vilande på klobeklädda bakben och glidande över marken på vingar ristade med arkana tecken.',
+  'hudChrome.mounts.desc_referral_raptor':
+    'Förtjänas genom att hjälpa din första bundna vän att slutföra ett stämpelkort.',
+  'hudChrome.mounts.desc_referral_tank': 'Tidigare belöning från värvningens stämpelkort.',
+  'hudChrome.mounts.desc_wobbles_slime':
+    'Ett stort blått slem tämjt för sadeln. Det hoppar i stället för att gå, vickar under ryttaren och bär bubblor som svävar upp genom gelén.',
+  'hudChrome.mounts.name_lantern_hall_destrier': 'Lykthallens stridshäst',
+  'hudChrome.mounts.name_nightwing_chimera': 'Nattvingad chimära',
+  'hudChrome.mounts.name_referral_raptor': 'Vänskapsraptor',
+  'hudChrome.mounts.name_referral_tank': 'Vänskapsstridsvagn',
+  'hudChrome.mounts.name_wobbles_slime': 'Slemmet Vickis',
+  'hudChrome.nameplate.npcRole.innkeeper': 'Värdshusvärd',
+  'hudChrome.options.showDungeonHints': 'Tips för fängelsehålors mekaniker',
+  'hudChrome.options.showDungeonHintsNote':
+    'Visar tipspanelen som förklarar en fängelsehålas mekanik och vad du ska göra åt den. Stänger du av detta döljs bara tipsen: markvarningar, besvärjelsefält och negativa effekter finns kvar. Uppmaningar som kräver handling visas alltid: en bur att bryta sig ur, en kedja att bryta, ett föremål att använda.',
+  'hudChrome.options.showPetNames': 'Visa husdjursnamn',
+  'hudChrome.raidBossGuide.browseBossDefeated': 'Visa {boss} (besegrad)',
+  'hudChrome.raidBossGuide.choiceGain': 'Du vinner',
+  'hudChrome.raidBossGuide.choiceRisk': 'Du riskerar',
+  'hudChrome.raidBossGuide.choicesHeading': 'Viktiga val',
+  'hudChrome.raidBossGuide.damageCompare': 'Normalt {normal} | Heroiskt {heroic}',
+  'hudChrome.raidBossGuide.defeated': 'Besegrad',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': 'Fängelsehålans bossar',
+  'hudChrome.raidBossGuide.dungeonButton': 'Bossguide: {dungeon}',
+  'hudChrome.raidBossGuide.finderOpenLabel': 'Öppna bossguiden för {boss}',
+  'hudChrome.raidBossGuide.heroicHeading': 'Vad som ändras i heroiskt läge',
+  'hudChrome.raidBossGuide.markHeroicChanged': 'Ändrat i heroiskt läge',
+  'hudChrome.raidBossGuide.markHeroicOnly': 'Endast heroiskt läge',
+  'hudChrome.raidBossGuide.rankMiniboss': 'Mindre boss',
+  'hudChrome.raidBossGuide.tipsHeading': 'Rolltips',
+  'hudChrome.reliquary.sourceActivityLanternHall':
+    'Köps för lyktsigill hos Lykthallens kvartermästare',
+  'hudChrome.rest.restArea': 'Vilar: du är i ett rastområde och får utvilad erfarenhet här.',
+  'hudChrome.sanctumAlert.brandedLine':
+    'Gå ned i en smältvattenpöl för att ta bort brännmärket och stoppa dess skada',
+  'hudChrome.sanctumAlert.brandedTitle': 'Brännmärkt!',
+  'hudChrome.sanctumAlert.breathLine':
+    'Gå åt sidan ur den markerade konen för att undvika skadan från Korzuls andedräkt',
+  'hudChrome.sanctumAlert.breathTitle': 'Gravandedräkt!',
+  'hudChrome.sanctumAlert.chargeLine':
+    'Gå åt sidan ur den markerade remsan: Korgath rusar genom den och knuffar dig bakåt',
+  'hudChrome.sanctumAlert.chargeTitle': 'Tröskelanstormning!',
+  'hudChrome.sanctumAlert.crackedLine':
+    'Gå till osprucken is innan du drar elden hit: en till eldträff förstör denna plattform',
+  'hudChrome.sanctumAlert.crackedTitle': 'Sprucken is',
+  'hudChrome.sanctumAlert.descentLine':
+    'Lämna landningsskuggan för att undvika Korzuls nedslag och tillbakaknuffning',
+  'hudChrome.sanctumAlert.descentTitle': 'Krossande nedslag!',
+  'hudChrome.sanctumAlert.eyeCrackedLine':
+    'Gå till osprucken is bort från bundsförvanter: din markerade eld skulle förstöra denna spruckna plattform',
+  'hudChrome.sanctumAlert.eyeLine':
+    'Gå till osprucken is bort från bundsförvanter: din markering kallar ned eld på den plattformen',
+  'hudChrome.sanctumAlert.eyeTitle': 'Lindormens öga på dig!',
+  'hudChrome.sanctumAlert.flailLine':
+    'Gå åt sidan ur den markerade remsan för att undvika kedjeslaget',
+  'hudChrome.sanctumAlert.flailTitle': 'Kedjegissel!',
+  'hudChrome.sanctumAlert.flightLine':
+    'Samlas på osprucken is för att locka Korzuls landning och lämna sedan skuggan för att undvika nedslaget',
+  'hudChrome.sanctumAlert.flightTitle': 'Korzul lyfter',
+  'hudChrome.sanctumAlert.infernoLine':
+    'Gå bort från Korzul: varje närliggande eldpuls gör mer skada',
+  'hudChrome.sanctumAlert.infernoTitle': 'Gravinferno!',
+  'hudChrome.sanctumAlert.lockboundLine':
+    'Attackera sigillbojorna för att ta bort Korgaths skademinskning: {chains} kedjor ger {pct}% mindre skada tagen',
+  'hudChrome.sanctumAlert.lockboundTitle': 'Låsbunden',
+  'hudChrome.sanctumAlert.maulLine':
+    'Gå bakom Korgath för att undvika vapensvepet som träffar alla framför honom',
+  'hudChrome.sanctumAlert.maulTitle': 'Släggbåge!',
+  'hudChrome.sanctumAlert.meltwaterLine':
+    'Locka benvandraren som jagar dig till torr is innan du dödar den: dör den i vatten återuppstår den och läker Velkhar',
+  'hudChrome.sanctumAlert.meltwaterTargetLine':
+    'Sluta attackera tills benvandraren lämnat vattnet: dödar du den där återuppstår den och läker Velkhar',
+  'hudChrome.sanctumAlert.meltwaterTitle': 'Benvandrare i smältvatten',
+  'hudChrome.sanctumAlert.plungeLine':
+    'Lämna denna isplattform nu: eld träffar alla på den och skadar isen',
+  'hudChrome.sanctumAlert.plungeTitle': 'Störtande eld!',
+  'hudChrome.sanctumAlert.quenchLine':
+    'Simma upp på is eller stranden för att undvika vattnets skada och saktning',
+  'hudChrome.sanctumAlert.quenchTitle': 'I kylvattnet!',
+  'hudChrome.sanctumAlert.rimeLine':
+    'Lämna ungarnas andedräkt för att undvika att frysa fast vid fulla laddningar: Krypande rimfrost {stacks}/{max}',
+  'hudChrome.sanctumAlert.rimeTitle': 'Krypande rimfrost!',
+  'hudChrome.sanctumAlert.slabLine':
+    'Placera isblocket mellan dig och fiendens besvärjare för att blockera deras siktlinje',
+  'hudChrome.sanctumAlert.slabTitle': 'Isblock',
+  'hudChrome.sanctumAlert.stompLine':
+    'Gå bort från Korgath innan besvärjelsen tar slut för att undvika stampskadan',
+  'hudChrome.sanctumAlert.stompTitle': 'Skälvande stamp!',
+  'hudChrome.sanctumAlert.strainLine':
+    'Gå bort från pelare med hela kedjor för att undvika explosionen och tillbakaknuffningen',
+  'hudChrome.sanctumAlert.strainTitle': 'Ansträngning!',
+  'hudChrome.sanctumAlert.tailLine':
+    'Gå till Korzuls sida för att undvika svansskadan och tillbakaknuffningen bakom honom',
+  'hudChrome.sanctumAlert.tailTitle': 'Svanssvep!',
+  'hudChrome.sanctumAlert.timeAria': '{seconds} sekunder kvar',
+  'hudChrome.sanctumAlert.trenchLine':
+    'Gå åt sidan ur den markerade remsan för att undvika eldskadan. Isen blir sedan smältvatten',
+  'hudChrome.sanctumAlert.trenchTitle': 'Själseldsdike!',
+  'hudChrome.shardpike.beamDanger': 'Pikbalans {balance}, på väg att tappa greppet.',
+  'hudChrome.shardpike.beamLabel': 'Skärvpikens balans',
+  'hudChrome.shardpike.beamStatus': 'Pikbalans {balance}, redo till {set} procent.',
+  'hudChrome.shardpike.blindBanner': 'GRAVHUDEN BRUTEN',
+  'hudChrome.shardpike.braceLabel': 'Sätt Skärvpiken i stöd',
+  'hudChrome.shardpike.braceTooltip':
+    'Sätt ned skaftänden och håll spetsen uppe. Dina sidostegstangenter styr balansen: mätaren driver av sig själv, och varje smäll han träffar med ger den en knuff. Håll den borta från kanterna i {set} sekunder för att göra piken redo. Kräver fast mark och fungerar inte från sadeln.',
+  'hudChrome.shardpike.braceTooltipLean':
+    'Sätt ned skaftänden och håll spetsen uppe. Luta med dina sidostegs- eller svängtangenter, eller håll ned de två tangenterna ovanför mätaren: var och en för markören mot sin sida. Mätaren driver av sig själv, och varje smäll han träffar med ger den en knuff. Håll den borta från kanterna i {set} sekunder för att göra piken redo. Kräver fast mark och fungerar inte från sadeln.',
+  'hudChrome.shardpike.effigyBanner': 'BLÄNDAD! NU SLÅR HELA RAIDEN HÅRT',
+  'hudChrome.shardpike.leanLeft': 'Luta åt vänster',
+  'hudChrome.shardpike.leanLeftKey': 'Luta åt vänster ({key})',
+  'hudChrome.shardpike.leanRight': 'Luta åt höger',
+  'hudChrome.shardpike.leanRightKey': 'Luta åt höger ({key})',
+  'hudChrome.shardpike.promptBrace': 'Sätt Skärvpiken i stöd och håll den sedan stadig',
+  'hudChrome.shardpike.promptCatchIt': 'Fånga den, piken håller på att tippa',
+  'hudChrome.shardpike.promptCloser': 'Kom inom räckhåll för förmannen, {yards} yard bort',
+  'hudChrome.shardpike.promptCloserEffigy':
+    'Kom inom räckhåll för halmförmannen, {yards} yard bort',
+  'hudChrome.shardpike.promptEyeOut': 'Ögat är utslaget, {seconds}s: slå honom med allt du har',
+  'hudChrome.shardpike.promptFindBoss': 'Skerrits Skärvpik: slå ut förmannens öga med den',
+  'hudChrome.shardpike.promptFindBossMuster': 'Uppbådets Skärvpik: slå ut förmannens öga med den',
+  'hudChrome.shardpike.promptHoldSteady': 'Håll piken stadig med dina sidostegstangenter',
+  'hudChrome.shardpike.promptHoldSteadyLean': 'Håll piken stadig: luta med {left} och {right}',
+  'hudChrome.shardpike.promptLabel': 'Instruktion för Skärvpiken',
+  'hudChrome.shardpike.promptLanternOut':
+    'Lyktan är släckt, {seconds}s: slå den med ditt eget vapen',
+  'hudChrome.shardpike.promptPikeLevelCap':
+    'Uppbådet lånar bara ut sina pikar till nivå {level} eller lägre',
+  'hudChrome.shardpike.promptResetting': 'Gör piken redo igen, {seconds}s',
+  'hudChrome.shardpike.promptSealed': 'Hans öga är stängt. Det öppnas igen om {seconds}s',
+  'hudChrome.shardpike.promptStrike': 'STÖT MOT ÖGAT nu, {seconds}s',
+  'hudChrome.shardpike.promptStrikeLantern': 'STÖT MOT LYKTAN nu, {seconds}s',
+  'hudChrome.shardpike.promptTakePike':
+    'Tryck på {key} eller klicka på stället för att ta en Skärvpik',
+  'hudChrome.shardpike.promptTakePikeClick': 'Klicka på stället för att ta en Skärvpik',
+  'hudChrome.shardpike.promptTakePikeTap': 'Tryck på stället för att ta en Skärvpik',
+  'hudChrome.shardpike.promptTally': '{count} utslagna',
+  'hudChrome.shardpike.releaseLabel': 'Sänk Skärvpiken',
+  'hudChrome.shardpike.releaseTooltip':
+    'Sänk piken och lämna stödställningen, precis som när du hoppar. Du förlorar beredskapen men får inget straff: du kan sätta den i stöd igen direkt. Bara en stöt, en fumling, en bruten ställning eller ett missat tillfälle låter piken vila, i {rest} sekunder.',
+  'hudChrome.shardpike.thrustLabel': 'Gravglasstöt',
+  'hudChrome.shardpike.thrustTooltip':
+    'Driv den redo piken genom ögat för {damage} skada. Inget skalar den: varken din nivå, din attackstyrka eller piken. Bländar förmannen och tar bort Gravhud så att alla andra vapen i träsket äntligen biter. Bara en redo pik kan utföra stöten, inom {reach} yard, och tillfället varar i {seconds} sekunder.',
+  'hudChrome.shardpike.whyAlreadyCouched':
+    'Piken är redan i stöd. Sänk den innan du gör den redo igen.',
+  'hudChrome.shardpike.whyNotSet': 'Piken är inte redo. Sätt den i stöd och håll den stadig först.',
+  'hudChrome.shardpike.whyNothingCouched': 'Inget att sänka: piken är inte i stöd.',
+  'hudChrome.shardpike.whyResting':
+    'Piken görs redo igen efter en stöt, en fumling, en bruten ställning eller ett missat tillfälle. Vänta ut timern på ikonen.',
+  'hudChrome.trinkets.equip.stoneHeart':
+    'När en träff skulle döda dig förvandlas du i stället till sten i {statue} sek: du tar ingen skada och kan varken röra dig eller agera, och återvänder sedan med {restore} hälsa ({restorePct}% av din maximala hälsa). Kan inträffa en gång var {icd}. Aldrig i dueller eller arenamatcher, som slutar vid det dödande slaget.',
+  'hudChrome.trinkets.use.foremanShape':
+    'Anta förmannens skepnad i {duration} sek: du blir den enögda cyklopen och slåss med nävarna, med alla förmågor och deras skada kvar. Du får {armorPct}% rustning och kan inte knuffas bakåt. Du sitter av.',
+  'hudChrome.trinkets.use.grapnel':
+    'Haka fast en grupp- eller raidmedlem inom {range} yard som du kan se och dra personen genom luften till din sida, med {heal} läkning vid landningen. Den kan inte dra fiender eller bundsförvanter i ett fordon, på ett skepp, förvandlade till sten eller fasthållna av en effekt som inte kan brytas. Läkningen ökar med läkningskraft.',
+  'hudChrome.trinkets.use.gutteredGlare':
+    'Kanalisera i {duration} sek: en {length} yard lång stråle bryter fram åt det håll du är vänd och gör {tick} arkanskada var {every}:e sek på upp till {max} fiender i dess väg ({total} på var och en under hela kanaliseringen). Vrid dig för att svepa med den; rörelse eller besvärjelsekastning avslutar den. Skadan ökar med besvärjelsekraft.',
+  'hudChrome.trinkets.use.harvest':
+    'I {duration} sek återställer varje fientlig varelse som dör inom {radius} yard från dig {pct}% av din maximala hälsa ({health}) och {pct}% av din maximala mana.',
+  'hudChrome.trinkets.use.musterStandard':
+    'Res ett samlingsstandar vid dina fötter. I {duration} sek marscherar {soldiers} uppbådssoldater vid din sida och bekämpar ditt mål i närstrid, med varsin träff var {every}:e sek för {damage} fysisk skada. De attackerar bara ditt mål, och först när det redan är i strid. Var och en har {hpPct}% av din maximala hälsa. Hamnar de mer än {leash} yard efter kommer de genast tillbaka till dig. De lämnar när standaret faller eller när du dör. Skadan ökar med attackstyrka eller avståndsattackstyrka, beroende på vilken som är högst, fastställd när du reser det.',
+  'hudChrome.trinkets.use.quench':
+    'Dina nästa {hits} närstrids- eller avståndsvapenträffar inom {duration} sek gör {damage} extra frostskada. Den sista kyler även målet och saktar dess attacker med {slow}% i {slowDuration} sek. Oanvända träffar försvinner när effekten tar slut. Skadan ökar med attackstyrka eller avståndsattackstyrka, beroende på vilken som är högst.',
+  'hudChrome.trinkets.use.seedburst':
+    'Plantera ett frö på ditt mål inom {range} yard. Efter {delay} sek brister det där målet står eller där det dog och gör {damage} naturskada på varje fiende inom {radius} yard, eller {bonus}% mer ({empowered}) om målet dog först. Skadan ökar med besvärjelsekraft, fastställd vid planteringen. Fröet vissnar om du dör innan det brister.',
+  'hudChrome.trinkets.use.shackle':
+    'Kedja fast ditt mål inom {range} yard på plats i {duration} sek. En varelse som är immun mot kontroll, till exempel en boss, saktas i stället med {slow}%, om den inte också är immun mot saktningar.',
+  'hudChrome.trinkets.use.spiritPack':
+    'Kalla en andejaguar att slåss vid din sida i {duration} sek. Den springer till ditt mål och biter det för {min} till {max} fysisk skada var {every}:e sek och byter till varje annan fiende du väljer som mål. Utan fiendemål attackerar den fienden närmast dig inom {range} yard. Skadan ökar med attackstyrka eller avståndsattackstyrka, beroende på vilken som är högst, fastställd när den kallas. Kräver ett fiendemål inom {range} yard.',
+  'hudChrome.trinkets.use.tether':
+    'Kedja ihop dig med en vänlig spelare inom {range} yard i {duration} sek. {share}% av skadan som annars skulle drabba spelarens hälsa tillfogas dig i stället. Avslutas i förtid om du dör. Kräver en annan vänlig spelare som mål.',
+  'hudChrome.warfareShop.companionOwnedAria': '{item}, redan insamlad eller väntar på att visa sig',
+  'hudChrome.warfareShop.companionPurchase':
+    'Låser upp denna följeslagare permanent och frammanar den direkt. Inget föremål läggs i dina väskor.',
+  'hudChrome.warfareShop.companions': 'Följeslagare',
+  'hudChrome.wildheartAlert.bondLine':
+    'Skilj bestmästaren och jaguaren åt för att ta bort deras skademinskning och skadebonus',
+  'hudChrome.wildheartAlert.bondTitle': 'Flockband',
+  'hudChrome.wildheartAlert.pollinatedLine':
+    'Undvik frökapslar: rör du dem medan du är pollinerad skapas fiender. Omarkerade bundsförvanter kan trampa sönder dem',
+  'hudChrome.wildheartAlert.pollinatedTitle': 'Pollinerad!',
+  'hudChrome.wildheartAlert.preyLine':
+    'Locka Zulgar genom tända solglyfer för att sakta honom innan han fångar och sargar dig',
+  'hudChrome.wildheartAlert.preyTitle': 'Du är bytet!',
+  'hudChrome.wildheartAlert.preyWaitLine':
+    'Håll dig borta från Zulgar: han byter från den andra markerade spelaren till att jaga dig',
+  'hudChrome.wildheartAlert.stalkedLine':
+    'Spring från jaguaren för att undvika dess bett. Led den bort från bestmästaren för att bryta Flockband',
+  'hudChrome.wildheartAlert.stalkedTitle': 'Förföljd!',
+  'hudChrome.wildheartAlert.timeAria': '{seconds} sekunder kvar',
+  'hudChrome.wocStore.collections.lantern_hall': 'Lykthallen',
+  'hudChrome.wocStore.membershipPromo.close': 'Stäng medlemskampanjen',
+  'hudChrome.wocStore.membershipPromo.cta': 'Bli medlem nu',
+  'hudChrome.wocStore.membershipPromo.eyebrow': 'Kontoförmåner',
+  'hudChrome.wocStore.membershipPromo.open': 'Medlemskap i WOC-butiken',
+  'hudChrome.wocStore.membershipPromo.title': 'Medlemskap',
+  'hudChrome.wocStore.referralPromo.close': 'Stäng kampanjen Värva en vän',
+  'hudChrome.wocStore.referralPromo.cta': 'Bjud in vänner',
+  'hudChrome.wocStore.referralPromo.eyebrow': 'Äventyra tillsammans',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    'Två tvinnade strängar av svart trä bundna i järn, krönta av en öppen järnlykta där en violett skymningslåga brinner mellan två böjda horn, med kedjor svängande från bottnen.',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    'Varje lykta i hallen brinner klart utom en. Skymningslågan tändes för att vakta hallen om natten och avger skugga där de andra ger ljus; Garrick ansar själv dess veke. Röken och det violetta skenet är bara ett utseende.',
+  'hudChrome.wocStore.skins.duskwick_staff.name': 'Skymningsvekens stav',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    'Flamvågig klinga av svärtat stål med smidesheta eggar, en smält söm som förgrenar sig över båda sidorna, ett parerskydd av bronslågor runt en brinnande sten och ett oxblodsrött grepp.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    'Lykthallen håller en härd som inte slocknat sedan hallen restes, och Garrick Holt svär på att denna klinga härdades i dess kol. Medlemmar som bär den säger att greppet förblir varmt under den kallaste vakt. Elden längs eggarna är bara ett utseende.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Härdbrand',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    'Bred stålklinga med en blodränna av pyrande lykteld, förgyllda sidor, en burlykta brinnande i parerstången och ett blått lädergrepp.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'Garrick Holt säljer inte denna klinga till en främling. Den går till medlemmar som fullgjort Lykthallens kontrakt vecka efter vecka, och han överlämnar den med samma ord varje gång: lyktan i parerskyddet är tänd från hallens egen härd, så vart du än bär den följer hallen med. Elden i blodrännan är bara ett utseende. Löftet är det viktiga.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lykthallens klinga',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    'Ljust skaft bundet i silver och omvirat av glödande rimfrost, krönt av en silverklo som håller en stor kristall av kallt ljus i en krona av splittrad is, med istappar hängande från kragen.',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    'Lykthallens vintervakt bar stavar som denna längs landsvägen, med kronorna tända för resenärer vilse i snön. Garrick håller en på stället åt medlemmar med sigill över. Frosten och dess kalla ljus är bara ett utseende.',
+  'hudChrome.wocStore.skins.rimelight_staff.name': 'Rimljusets stav',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    'Lång havsblå klinga med eggar ljusa som brytande bränningar, en stormränna med en kluven blixt, en förgylld våg över klingbasen, en fena längs ena eggen och ett parerskydd av förgyllda bränningar runt en stormpärla.',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    'En kapten som seglade för gillet tog hem denna klinga från en stormby som tog hennes mast och lämnade skeppet klingande som en klocka. Garrick säljer den bara för sigill och varnar varje köpare för att den surrar före en storm. Blixten och havsljuset är bara ett utseende.',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': 'Stormkrön',
+  'hudChrome.wocStore.subscription.annualClaim': 'Hämta paketets riddjur',
+  'hudChrome.wocStore.subscription.annualDelivered':
+    'Nyckeln till ditt paketriddjur har levererats med posten.',
+  'hudChrome.wocStore.subscription.annualMount':
+    'Hämta de själsbundna tyglarna till den nattvingade chimäran med posten efter betalning på den karaktär som köpte paketet. Riddjuret förblir ditt när medlemskapet går ut.',
+  'hudChrome.wocStore.subscription.annualPending':
+    'Återvänd till den karaktär som gjorde köpet efter betalning för att hämta paketets riddjur. Om betalningen behandlas eller provperioden är aktiv, försök igen efter den betalda debiteringen.',
+  'hudChrome.wocStore.subscription.annualPrice': '{price} för 12 månader, betalas i förskott',
+  'hudChrome.wocStore.subscription.annualTerms':
+    'Förnyas årligen till samma pris. Betala med vanlig valuta via Stripe. Avsluta i faktureringsinställningarna.',
+  'hudChrome.wocStore.subscription.annualTitle': 'Medlemspaket för 12 månader',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'Hämta sällsynt själsbunden rustning och Förändringens stav. Deras egenskaper anpassas till din klass och specialisering, alltid 5 föremålsnivåer över din karaktärsnivå. Bär alla 7 rustningsdelarna för 20% mer erfarenhet.',
+  'hudChrome.wocStore.subscription.benefitBag':
+    'Utrusta en extra väska på din väskplats för medlemmar.',
+  'hudChrome.wocStore.subscription.benefitBank':
+    'Kom åt dina andra karaktärers banker hos valfri bankir.',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'När medlemskapet tar slut låses extra karaktärsplatser, utrustningsförmåner och den extra väskplatsen tills du förnyar. Din väska och dina föremål förvaras tryggt, och överflödiga föremål behålls som överskott. Dina grundläggande karaktärsplatser förblir spelbara.',
+  'hudChrome.wocStore.subscription.benefitSlots': 'Lås upp 10 extra karaktärsplatser.',
+  'hudChrome.wocStore.subscription.benefitTax': 'Betala halva den vanliga auktionshusskatten.',
+  'hudChrome.wocStore.subscription.benefitsTitle': 'Förmåner med aktivt medlemskap',
+  'hudChrome.wocStore.subscription.checkoutClosed':
+    'Denna kassa har stängts utan någon utestående belöning. Välj en medlemsplan igen för att öppna en ny kassa.',
+  'hudChrome.wocStore.subscription.ending': 'Avslutas vid faktureringsperiodens slut',
+  'hudChrome.wocStore.subscription.error':
+    'Kunde inte öppna faktureringen. Tillåt popupfönster och försök igen.',
+  'hudChrome.wocStore.subscription.manage': 'Hantera prenumeration',
+  'hudChrome.wocStore.subscription.monthlyTitle': 'Månadsmedlemskap',
+  'hudChrome.wocStore.subscription.price': '{price} per månad',
+  'hudChrome.wocStore.subscription.resumeCheckout': 'Återuppta betalning',
+  'hudChrome.wocStore.subscription.startTrial': 'Starta 7 dagars gratis provperiod',
+  'hudChrome.wocStore.subscription.status.active': 'Aktiv',
+  'hudChrome.wocStore.subscription.status.canceled': 'Avslutad',
+  'hudChrome.wocStore.subscription.status.incomplete': 'Betalning ofullständig',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': 'Kassan har gått ut',
+  'hudChrome.wocStore.subscription.status.none': 'Ingen prenumeration',
+  'hudChrome.wocStore.subscription.status.past_due': 'Förfallen betalning',
+  'hudChrome.wocStore.subscription.status.paused': 'Pausad',
+  'hudChrome.wocStore.subscription.status.trialing': 'Provperiod',
+  'hudChrome.wocStore.subscription.status.unpaid': 'Obetald',
+  'hudChrome.wocStore.subscription.subscribe': 'Prenumerera',
+  'hudChrome.wocStore.subscription.terms':
+    'Förnyas månadsvis. Betala med vanlig valuta via Stripe. Avsluta i faktureringsinställningarna.',
+  'hudChrome.wocStore.subscription.title': 'Spelprenumeration',
+  'hudChrome.wocStore.subscription.tokenBuy': 'Köp medlemspollett',
+  'hudChrome.wocStore.subscription.tokenClaim': 'Hämta köpt pollett',
+  'hudChrome.wocStore.subscription.tokenDelivered': 'Din pollett har levererats med posten.',
+  'hudChrome.wocStore.subscription.tokenPending':
+    'Återvänd till denna karaktär efter betalning och hämta din pollett. Om betalningen fortfarande behandlas, försök igen om en liten stund.',
+  'hudChrome.wocStore.subscription.tokenTerms':
+    '{price} en gång för 30 dagar. Levereras med posten till denna karaktär. Lös in den för att lägga till medlemstid eller sälj den på auktionshuset.',
+  'hudChrome.wocStore.subscription.tokenTitle': 'Överlåtbar medlemspollett',
+  'hudChrome.wocStore.subscription.trialTerms':
+    'Prova medlemskapet gratis i {days} dagar, en gång per konto. Ett betalningssätt krävs. Du debiteras {price} när provperioden tar slut om du inte avslutar.',
+  'itemUi.kind.buddy': 'Följeslagare',
+  'itemUi.kind.buddyCosmetic': 'Följeslagarkosmetik',
+  'itemUi.tooltip.membershipAdaptive':
+    'Egenskaper och rustning anpassas till din klass och specialisering.',
+  'itemUi.tooltip.membershipDormant':
+    'Inaktiv: förnya ditt medlemskap för att återställa utrustningsegenskaper och setförmåner.',
+  'itemUi.tooltip.membershipFullSet':
+    'Utrusta alla {pieces} medlemsrustningsdelar för att få {percent}% mer erfarenhet. Kräver ett aktivt medlemskap.',
+  'itemUi.tooltip.membershipPerfected': 'Fulländad: föremålsnivå {level}.',
+  'itemUi.tooltip.membershipRequired':
+    'Utrustningsegenskaper och setförmåner upphör när medlemskapet går ut och återkommer när du förnyar.',
+  'itemUi.tooltip.membershipScaling':
+    'Föremålsnivå {level}. Alltid 5 föremålsnivåer över din karaktärsnivå.',
+  'itemUi.tooltip.membershipToken':
+    'Använd: förbruka denna pollett för att lägga till {days} dagars medlemskap på ditt konto. Återstående medlemstid behålls. Polletten kan handlas eller säljas på auktionshuset innan den löses in.',
+  'itemUi.tooltip.membershipWeaponAdaptive':
+    'Ändrar vapentyp, utseende och egenskaper efter din klass och specialisering medan det är utrustat.',
+  'itemUi.tooltip.referralDormant':
+    'Inaktiv: detta konto har inte fått vänskapsrustning genom en medlemsvärvning.',
+  'itemUi.tooltip.referralFullSet':
+    'Utrusta alla {pieces} vänskapsrustningsdelar för att få {percent}% mer erfarenhet medan du är i grupp med {member}. Personens medlemskap måste vara aktivt.',
+  'itemUi.tooltip.referralInviter': 'medlemmen som bjöd in dig',
+  'itemUi.tooltip.referralRetained':
+    'Rustningens egenskaper fortsätter skala även när du inte är i grupp med den som bjöd in dig.',
+  'mode.playLoading': 'Laddar',
+  'mode.playStarting': 'Startar',
+  'questUi.detail.chooseReward': 'Välj din belöning:',
+  'questUi.detail.rewardChoices': 'Du kommer att kunna välja en av dessa belöningar:',
+  'questUi.errors.rewardNotOffered': 'Den belöningen erbjuds inte.',
+  'apiError.character.referral_bond_pending':
+    'Ett värvat medlemsband levereras till denna karaktär. Försök ta bort karaktären igen när leveransen är klar.',
+  'apiError.character.referral_transfer_pending':
+    'Flytta alla upplåsta stämpelkort till en annan karaktär innan du tar bort denna karaktär.',
+  'bossJournal.bastion.captain.anchorResponse': 'Lämna banan innan den avfyras.',
+  'bossJournal.bastion.captain.anchorSummary':
+    'Efter en varning på {warn} sek dras ett förbannat ankare {length} yard tillbaka längs sin bana under {seconds} sek och träffar alla det passerar: {min} till {max} skada.',
+  'bossJournal.bastion.captain.boardingResponse': 'Kliv åt sidan från banan.',
+  'bossJournal.bastion.captain.boardingSummary':
+    'Efter en varning på {warn} sek tar alla i en bana på {length} yard {min} till {max} skada och han rusar längs den.',
+  'bossJournal.bastion.captain.broadsideResponse': 'Stå i en lucka mellan banorna.',
+  'bossJournal.bastion.captain.broadsideSummary':
+    'Efter en varning på {warn} sek avfyras {lanes} parallella banor som är {length} yard långa samtidigt: {min} till {max} skada på alla i en bana.',
+  'bossJournal.bastion.captain.overview':
+    'En svävande spökkapten patrullerar den nedre borggårdens vallgrav, och vindbryggan förblir stängd tills han är död. Han växlar mellan tre banattacker riktade mot en annan spelare än tanken, var och en ritad på marken innan den avfyras.',
+  'bossJournal.bastion.captain.phaseName': 'Vallgraven',
+  'bossJournal.bastion.captain.phaseSummary':
+    'Hans första drag kommer {first} sek efter stridsstarten, sedan Spöksalva, Förbannat ankare och Spöklig äntring i turordning med {recovery} sek mellan. Han står still under varje drag.',
+  'bossJournal.bastion.captain.sailorsName': 'Vrakbundna sjömän',
+  'bossJournal.bastion.captain.sailorsResponse':
+    'Tanken fångar upp dem. Gå bort från en sjöman som just dött.',
+  'bossJournal.bastion.captain.sailorsSummary':
+    'Vid {first} och {second} hälsa ansluter {count} vrakbundna sjömän till striden. En sjöman brister av själsenergi strax efter döden.',
+  'bossJournal.bastion.captain.tipDamage':
+    'Håll koll på marken: varje drag ritas innan det avfyras. Stå i Spöksalvans luckor.',
+  'bossJournal.bastion.captain.tipHealer': 'Spöksalva slår hårdast: läk dem som stod i en bana.',
+  'bossJournal.bastion.captain.tipTank':
+    'Håll honom på plats och fånga upp de vrakbundna sjömännen. Hans banor siktar på de andra, inte dig.',
+  'bossJournal.bastion.olen.arcName': 'Skördande båge',
+  'bossJournal.bastion.olen.arcResponse': 'Ingen utom tanken står inom {radius} yard från tanken.',
+  'bossJournal.bastion.olen.arcSummary':
+    'Varje närstridsträff träffar även alla andra spelare inom {radius} yard från tanken för {share} av slaget.',
+  'bossJournal.bastion.olen.brineResponse': 'Tanken drar honom ur pölen. Alla andra kliver ur den.',
+  'bossJournal.bastion.olen.brineSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan en pöl av heligt saltvatten på {radius} yard under honom i {seconds} sek: {perSecond} skada per sekund på alla i den. Medan han står i en pöl tar han {shield} mindre skada.',
+  'bossJournal.bastion.olen.bulwarkResponse':
+    'Håll er utspridda: mer än {reach} yard från alla andra.',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek mot en annan spelare än tanken. Skölden träffar för {min} till {max} och studsar sedan till den närmaste ännu inte träffade spelaren inom {reach} yard, upp till {hits} spelare.',
+  'bossJournal.bastion.olen.choiceGain':
+    'Sprid ut er så träffar Återstudsande bålverk, Tidvattnets dom och Skördande båge bara en spelare var.',
+  'bossJournal.bastion.olen.choiceName': 'Samlas eller sprida ut sig?',
+  'bossJournal.bastion.olen.choiceRisk':
+    'Alla inom {reach} yard från en träffad spelare tar studsen, och alla inom {radius} yard från tanken tar områdesskadan.',
+  'bossJournal.bastion.olen.heroicChanges':
+    'Saltvattenpölar är {radius} yard, skölden studsar till {hits} spelare, dompelaren är {sentence} yard och {count} sergeanter reser sig.',
+  'bossJournal.bastion.olen.oathResponse':
+    'Tanken samlar sergeanterna; alla dödar dem och gör sedan så mycket skada som möjligt på Olen medan han är bedövad.',
+  'bossJournal.bastion.olen.oathSummary':
+    'En gång, vid {health} hälsa: han knäböjer och kanaliserar i upp till {max} sek, immun mot skada, medan {count} dränkta sergeanter reser sig och attackerar andra spelare än tanken. Döda alla så bedövas han i {stun} sek och tar {vuln} mer skada i {vulnSeconds} sek.',
+  'bossJournal.bastion.olen.overview':
+    'En fallen paladinriddare. Hans saltvattenpölar skyddar honom, så tanken drar ut honom ur dem; gruppen håller sig utspridd så att hans studsande sköld och dompelaren bara träffar en spelare. Vid halv hälsa knäböjer han, immun, tills hans dränkta sergeanter dör.',
+  'bossJournal.bastion.olen.phaseBreachName': 'Bräschbastionen',
+  'bossJournal.bastion.olen.phaseBreachSummary':
+    'Han kastar en förmåga i taget; hans tidsräknare pausas under besvärjelserna.',
+  'bossJournal.bastion.olen.phaseOathName': 'Obruten ed',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    'Vid {health} hälsa knäböjer han, immun, medan dränkta sergeanter slåss för honom.',
+  'bossJournal.bastion.olen.sentenceResponse':
+    'Markerad: gå bort från gruppen innan pelaren slår ned.',
+  'bossJournal.bastion.olen.sentenceSummary':
+    'Var {every}:e sek markerar en besvärjelse på {cast} sek en annan spelare än tanken. {seconds} sek senare landar en pelare på spelaren oavsett plats: {min} till {max} skada på alla inom {radius} yard.',
+  'bossJournal.bastion.olen.tipDamage':
+    'Håll er utspridda, mer än {reach} yard från varandra och bort från tanken. Döda sergeanterna först under eden.',
+  'bossJournal.bastion.olen.tipHealer':
+    'Återstudsande bålverk och Tidvattnets dom slår hårdast när spelare står tillsammans. Sergeanterna blir rasande vid låg hälsa.',
+  'bossJournal.bastion.olen.tipTank':
+    'Dra ut honom ur varje saltvattenpöl. Håll gruppen utanför de {radius} yard runt dig där hans slag ger områdesskada.',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan hakas en annan spelare än tanken fast; ankarets landning träffar alla andra inom {crashRadius} yard för {min} till {max}. Efter {settle} sek drar kedjan spelaren mot gropen. Flykt: en tänd förtöjningsstolpe minst {run} yard bort eller {hits} träffar på ankaret. Att nå gropen: {pit} av maximal hälsa och en bedövning på {stun} sek.',
+  'bossJournal.bastion.ossick.anchorResponse':
+    'Fasthakad: spring tidigt till en tänd stolpe. Alla andra slår ankaret.',
+  'bossJournal.bastion.ossick.anchorSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan hakas en annan spelare än tanken fast. Efter {settle} sek drar kedjan spelaren mot gropen. Flykt: kom inom {reach} yard från en tänd förtöjningsstolpe minst {run} yard från platsen där du hakades fast (stolpen slocknar i {dark} sek), eller låt gruppen landa {hits} träffar på ankaret. Att nå gropen: {pit} av maximal hälsa och en bedövning på {stun} sek.',
+  'bossJournal.bastion.ossick.choiceGain':
+    'En tänd stolpe befriar den fasthakade spelaren på egen hand så att gruppen kan fortsätta attackera.',
+  'bossJournal.bastion.ossick.choiceName': 'Springa till en stolpe eller bryta kedjan?',
+  'bossJournal.bastion.ossick.choiceRisk':
+    'Stolpen måste vara minst {run} yard bort och slocknar i {dark} sek. När kedjan väl är kort finns ingen stolpe inom räckhåll och enda lösningen är att bryta den.',
+  'bossJournal.bastion.ossick.cudgelResponse':
+    'Tank: använd en förmåga med nedkylning. Helare förbereder sig på träffen.',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek mot tanken: {mult} gånger hans närstridsträff, ignorerar rustning, och {slow} långsammare rörelse i {seconds} sek.',
+  'bossJournal.bastion.ossick.heroicChanges':
+    'Ankaret kräver {hits} träffar och fastkedjade spelare måste hålla sig inom {range} yard.',
+  'bossJournal.bastion.ossick.heroicCrash':
+    'Ankarnedslag: ankaret träffar alla inom {crashRadius} yard från den fasthakade spelaren.',
+  'bossJournal.bastion.ossick.overview':
+    'Fångvaktaren hakar fast en spelare med sitt ankare och vinschar spelaren mot drunkningsgropen. Spelaren springer till en tänd förtöjningsstolpe eller gruppen bryter kedjan. Samtidigt kedjas två andra spelare ihop och måste hålla sig nära varandra.',
+  'bossJournal.bastion.ossick.phaseName': 'Drunkningsgården',
+  'bossJournal.bastion.ossick.phaseSummary':
+    'Vid {first} och {second} hälsa kommer {count} fjättrade fångar ut ur cellerna varje gång.',
+  'bossJournal.bastion.ossick.shackleResponse':
+    'Fastkedjad: håll dig inom {range} yard från din partner.',
+  'bossJournal.bastion.ossick.shackleSummary':
+    'Var {every}:e sek kedjar en besvärjelse på {cast} sek ihop två spelare i {seconds} sek. Varje sekund de står mer än {range} yard från varandra tar båda {min} till {max} skada.',
+  'bossJournal.bastion.ossick.tipDamage':
+    'Slå ankaret så fort någon hakas fast. Håll dig nära din partner när ni är fastkedjade.',
+  'bossJournal.bastion.ossick.tipHealer':
+    'Håll koll på fasthakade och fastkedjade spelare; gropen tar en stor andel hälsa.',
+  'bossJournal.bastion.ossick.tipTank':
+    'Håll honom nära mitten och fånga upp fångarna. Fångvaktarens påk ignorerar din rustning.',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan faller burar över {cages} andra spelare än tanken. Varje bur har {hits} poäng: varje tryck på interaktionstangenten av fången bryter {press}, varje träff från en bundsförvant bryter {helper}. Inuti dränerar stigande saltvatten hälsa varje sekund. Efter {max} sek krossar buren för {crush} av maximal hälsa.',
+  'bossJournal.bastion.turnkey.cageResponse':
+    'I bur: tryck snabbt på interaktionstangenten. Alla andra slår buren för att bryta den.',
+  'bossJournal.bastion.turnkey.cageSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan faller en bur över en annan spelare än tanken och bedövar spelaren. Buren har {hits} poäng: varje tryck på interaktionstangenten av fången bryter {press}, varje träff från en bundsförvant bryter {helper}, och den reparerar sig långsamt. Efter {max} sek krossar buren fången för {crush} av spelarens maximala hälsa.',
+  'bossJournal.bastion.turnkey.cellsName': 'Öppna cellerna',
+  'bossJournal.bastion.turnkey.cellsResponse':
+    'Få ned dem till en fjärdedels hälsa; ni behöver inte döda dem.',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    'Vid {health} hälsa släpper han ut {count} fjättrade fångar. Vid en fjärdedels hälsa brister deras kedjor och de lämnar striden.',
+  'bossJournal.bastion.turnkey.heroicCages': 'Järnbur låser in {cages} spelare samtidigt.',
+  'bossJournal.bastion.turnkey.heroicFlood':
+    'Saltvattenflod: en spelare i bur förlorar hälsa varje sekund tills spelaren befrias.',
+  'bossJournal.bastion.turnkey.overview':
+    'Fängelsevakten låser in spelare i järnburar. Fången bryter sig ut genom att trycka på interaktionstangenten gång på gång, och lagkamrater skyndar på genom att slå buren.',
+  'bossJournal.bastion.turnkey.phaseName': 'Fängelsegallret',
+  'bossJournal.bastion.turnkey.phaseSummary':
+    'Han sätter spelare i bur med fasta mellanrum och släpper fångarna fria vid halv hälsa.',
+  'bossJournal.bastion.turnkey.tipDamage':
+    'Byt genast till varje bur och slå den tills den går sönder.',
+  'bossJournal.bastion.turnkey.tipHealer':
+    'Fyll på hälsan hos spelare i bur: krossningen är en andel av deras hälsa.',
+  'bossJournal.bastion.turnkey.tipTank':
+    'Håll honom och fångarna; burarna väljer aldrig dig som mål.',
+  'bossJournal.bastion.vael.choiceGain':
+    'Väntar ni på strålen hamnar varje träff på den riktiga Vael och slöjan bryts snabbare.',
+  'bossJournal.bastion.vael.choiceName': 'Vänta på strålen eller gissa?',
+  'bossJournal.bastion.vael.choiceRisk':
+    'Varje sekund under slöjan gör hymnen mer ont. En felgissning spränger en kopia: skada och en bedövning runt den.',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    'Varje sekund under slöjan gör hymnen mer ont. En felgissning spränger en kopia som bedövar närliggande spelare och lämnar en dränkt träl.',
+  'bossJournal.bastion.vael.crossingResponse':
+    'Dödsmärkt: gå framåt ur svepet eller bakom pölen. Andra står aldrig framför den markerade spelaren.',
+  'bossJournal.bastion.vael.crossingSummary':
+    'Var {every}:e sek kliver han genom skuggorna upp till {chain} gånger i rad, varje gång bakom en annan spelare: en pöl öppnas {behind} yard bakom spelaren, han reser sig och sveper en båge på {arc} grader {range} yard mot spelaren: {min} till {max} skada.',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    'Varje träff på en dimskugga spränger den: {min} till {max} skada och en bedövning på {stun} sek på spelare inom {radius} yard, och en dränkt träl reser sig där den stod.',
+  'bossJournal.bastion.vael.fogburstName': 'Dimbristning',
+  'bossJournal.bastion.vael.fogburstResponse': 'Slå inte en kopia: vänta på strålen.',
+  'bossJournal.bastion.vael.fogburstSummary':
+    'Varje träff på en dimskugga spränger den: {min} till {max} skada och en bedövning på {stun} sek på spelare inom {radius} yard från den.',
+  'bossJournal.bastion.vael.graveName': 'Gravskugga',
+  'bossJournal.bastion.vael.graveResponse': 'Håll dig borta från gamla pölar.',
+  'bossJournal.bastion.vael.graveSummary':
+    'Varje skuggpöl stannar i {seconds} sek och bränner alla inom {radius} yard för {perSecond} skada per sekund.',
+  'bossJournal.bastion.vael.heroicGrave':
+    'Gravskugga: varje skuggpöl fortsätter brinna i {seconds} sek.',
+  'bossJournal.bastion.vael.heroicVeil':
+    'Under slöjan driver gestalterna var {drift}:e sek, och en sprängd kopia lämnar en dränkt träl.',
+  'bossJournal.bastion.vael.overview':
+    'En huvklädd lieman. Tre gånger i rad reser han sig ur en skuggpöl bakom en spelare och sveper lien genom spelarens rygg. Vid {first} och {second} hälsa gömmer han sig bland identiska kopior medan en hymn skadar alla; dimfyrens stråle visar vilken gestalt som är verklig.',
+  'bossJournal.bastion.vael.phaseCrownName': 'Fyrkrönet',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    'Han reser sig ur krönet när en spelare kliver upp på det. Vid {first} och {second} hälsa ansluter {count} dränkta trälar till striden.',
+  'bossJournal.bastion.vael.phaseVeilName': 'Dimslöja',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    'Vid {first} och {second} hälsa gömmer han sig bland identiska kopior.',
+  'bossJournal.bastion.vael.surgeResponse': 'Avståndsspelare håller sig bortom {radius} yard.',
+  'bossJournal.bastion.vael.surgeSummary':
+    'En besvärjelse på {cast} sek, sedan {min} till {max} skada på alla inom {radius} yard från honom. Var {every}:e sek under öppen strid; var {lastEvery}:e sek under {below} hälsa.',
+  'bossJournal.bastion.vael.tipDamage':
+    'När du är dödsmärkt, gå framåt eller bakom pölen. Slå bara gestalten som strålen lyser upp under slöjan.',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    'När du är dödsmärkt, gå framåt eller bakom pölen och undvik gamla pölar. Slå bara gestalten som strålen lyser upp under slöjan.',
+  'bossJournal.bastion.vael.tipHealer':
+    'Drunknandets hymn stegrar skadan på alla tills slöjan bryts. Dimsvall träffar alla inom {radius} yard från honom.',
+  'bossJournal.bastion.vael.tipTank':
+    'Fånga upp de dränkta trälarna. Hjälp till att hitta den riktiga Vael under slöjan.',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    'Han gömmer sig, sedan reser sig fyra gestalter runt krönet: Vael och tre dimskuggor som driver en plats var {drift}:e sek. Alla fyra sjunger Drunknandets hymn i {seconds} sek. Dimfyrens stråle visar den riktiga Vael. Gör skada motsvarande {share} av hans hälsa på honom för att bryta slöjan: en bedövning på {stun} sek och {vuln} mer skada tagen i {vulnSeconds} sek.',
+  'bossJournal.bastion.vael.veilResponse': 'Se på strålen, sedan slår alla bara den riktiga Vael.',
+  'bossJournal.bastion.vael.veilSummary':
+    'Han gömmer sig, sedan reser sig fyra gestalter runt krönet: Vael och tre dimskuggor. Alla fyra sjunger Drunknandets hymn i {seconds} sek och skadar alla mer för varje sekund. Dimfyrens stråle sveper var {beam}:e sek: den riktiga Vael lyser upp. Gör skada motsvarande {share} av hans hälsa på honom för att bryta slöjan: han bedövas i {stun} sek och tar {vuln} mer skada i {vulnSeconds} sek.',
+  'editor.appearance.fire': 'Eldeffekt (animerad låga)',
+  'editor.appearance.glow': 'Glödfärg',
+  'editor.appearance.glowStrength': 'Glödstyrka',
+  'editor.appearance.hint':
+    'Återges likadant i speltest: toning färgar om, opacitet tonar bort (spöken), glöd ger självlysande ljus.',
+  'editor.appearance.reset': 'Återställ utseende',
+  'editor.appearance.tint': 'Toningsfärg',
+  'editor.appearance.title': 'Utseende (shader)',
+  'editor.assets.allTab': 'Alla ({count})',
+  'editor.assets.collision.authored': 'Kollision: skapad i kollisionsverktyget',
+  'editor.assets.collision.baked': 'Kollision: förberäknade lådor (automatiskt genererad form)',
+  'editor.assets.collision.none':
+    'Kollision: ingen, placeringar blockerar bara med sin mjuka cirkel, om sådan finns',
+  'editor.assets.collisionMaster': 'Kollisionsverktyg: skapa denna resurs standardkollision',
+  'editor.assets.favouriteAdd': 'Lägg till {name} som favorit',
+  'editor.assets.favouriteRemove': 'Ta bort {name} från favoriter',
+  'editor.assets.favouritesEmpty':
+    'Inga favoriter ännu. Klicka på stjärnan på valfri resurs för att behålla den här.',
+  'editor.assets.favouritesTab': 'Favoriter ({count})',
+  'editor.assets.importedEmpty':
+    'Inga importerade modeller denna session. Använd Importera modell för att läsa in en .glb eller .gltf från datorn.',
+  'editor.assets.importedTab': 'Importerade',
+  'editor.assets.recentsEmpty':
+    'Inget har placerats i denna webbläsare ännu. Resurser du placerar visas här.',
+  'editor.assets.recentsTab': 'Senaste',
+  'editor.assets.removeImported': 'Ta bort importerad modell (bara denna session)',
+  'editor.assets.resizeHandle': 'Dra för att ändra storlek på resursbläddraren',
+  'editor.assets.subcategory.buildings': 'Byggnader',
+  'editor.assets.subcategory.containers': 'Behållare',
+  'editor.assets.subcategory.decor': 'Dekor',
+  'editor.assets.subcategory.enemies': 'Fiender',
+  'editor.assets.subcategory.environment': 'Miljö',
+  'editor.assets.subcategory.furniture': 'Möbler',
+  'editor.assets.subcategory.lighting': 'Belysning',
+  'editor.assets.subcategory.modular': 'Modulärt',
+  'editor.assets.subcategory.nature': 'Natur',
+  'editor.assets.subcategory.other': 'Övrigt',
+  'editor.assets.subcategory.structure': 'Konstruktion',
+  'editor.assets.subcategoryAll': 'Alla ({count})',
+  'editor.authoring.aiBrief': 'AI- och uppdragsbeskrivning',
+  'editor.authoring.aiNotes': 'AI-inriktning',
+  'editor.authoring.allGroups': 'Alla',
+  'editor.authoring.browseAll': 'Bläddra bland alla',
+  'editor.authoring.defaults': 'Standardvärden',
+  'editor.authoring.filterLabel': 'Filtrera kataloggrupp',
+  'editor.authoring.noResults': 'Inga matchande poster.',
+  'editor.authoring.questNotes': 'Anteckningar för uppdragsbygge',
+  'editor.authoring.resultCount': '{count} poster',
+  'editor.authoring.search': 'Sök alla modeller...',
+  'editor.authoring.searchLabel': 'Sök i katalogen',
+  'editor.authoring.showing': 'Visar {shown} av {total}. Förfina sökningen för att se resten.',
+  'editor.authoring.vfxArcane': 'Arkana partiklar',
+  'editor.authoring.vfxFire': 'Eldglöd',
+  'editor.authoring.vfxFrost': 'Frostskimmer',
+  'editor.authoring.vfxHint':
+    'Återanvända partiklar håller effekten lätt i redigeraren och speltestet.',
+  'editor.authoring.vfxHoly': 'Heligt sken',
+  'editor.authoring.vfxIntensity': 'Effektintensitet',
+  'editor.authoring.vfxNature': 'Naturstråk',
+  'editor.authoring.vfxNone': 'Ingen',
+  'editor.authoring.vfxPreset': 'Förinställning',
+  'editor.authoring.vfxShadow': 'Skuggpartiklar',
+  'editor.authoring.vfxTitle': 'Omgivningseffekter',
+  'editor.biome.alphaImport': 'Importera alfamask',
+  'editor.biome.alphaImportFailed': 'Kunde inte läsa bilden som en alfamask för penseln.',
+  'editor.biome.alphaImportTitle':
+    'Läs in en gråskalebild som penselmask: vitt målar, svart maskerar bort (sparas i denna webbläsare)',
+  'editor.biome.alphaNone': 'Ingen',
+  'editor.biome.alphaRemove': 'Ta bort denna importerade alfamask',
+  'editor.biome.alphaTitle': 'Penselns alfamask',
+  'editor.biome.autoAllOff': 'Bara målning (stäng av alla)',
+  'editor.biome.autoAllOffTitle':
+    'Stäng av alla automatiska regler så att inget ändrar markens textur utifrån lutning, höjd eller strandlinje. Då är din målning det enda som ligger på den.',
+  'editor.biome.autoHint':
+    'Automatiska texturregler, tillämpade UNDER din målning: medan en regel är på fortsätter den färga om den mark den styr, så en klippa du målat blir sten igen. Avmarkera en för att ta bort den på hela kartan. Nya kartor börjar med alla avstängda.',
+  'editor.biome.autoRetexture': 'Texturera om kartan automatiskt',
+  'editor.biome.autoRetextureDone':
+    'Texturerade om {count} celler. Måla om valfri del med penseln.',
+  'editor.biome.autoRetextureHint':
+    'Ett klick: målar om hela kartan med passande inbyggda texturer efter höjd, lutning, vatten, zon och stigar, sand i öknar och på stränder, klippor på branta sidor, varierat gräs och jord, kullersten i städer och på vägar. Fullt redigerbart efteråt: måla om vad som helst med penseln.',
+  'editor.biome.autoRim': 'Berg vid kartans kant',
+  'editor.biome.autoScree': 'Stenras på klippor (hög grafik)',
+  'editor.biome.autoShoreSand': 'Sand nära vattnet',
+  'editor.biome.autoSlopeRock': 'Sten på branta sluttningar',
+  'editor.biome.autoSnowCaps': 'Snötäckta toppar',
+  'editor.biome.autoTitle': 'Automatiska texturer',
+  'editor.biome.bucket': 'Fyll (ersätt textur)',
+  'editor.biome.bucketArmedHint':
+    'Hinken är aktiverad: klicka på marken för att ersätta den klickade texturen på hela kartan.',
+  'editor.biome.bucketDone': 'Ersatte {count} målade celler.',
+  'editor.biome.bucketTitle':
+    'Aktivera hinken och klicka sedan på marken: varje cell målad med den klickade texturen byter till det valda provet',
+  'editor.biome.builtinGroup': 'Texturbibliotek',
+  'editor.biome.builtinTitle':
+    'Inbyggda marktexturer som följer med redigeraren: välj en för att lägga till den som prov på kartan (tillgänglig på alla datorer)',
+  'editor.biome.customFull': 'Gränsen för prover har nåtts ({max}).',
+  'editor.biome.customHint':
+    'Egna prover färgar bara marken (terrängformen behåller zonens biom) och sparas med kartan.',
+  'editor.biome.depth': 'Ytdjup',
+  'editor.biome.edgeDetail': 'Kantdetalj',
+  'editor.biome.edgeHint':
+    'Hur gränsen mellan två målade texturer ser ut på hela kartan. En mjuk pensel lagrar kanten som spridda enskilda celler (en cell kan bara innehålla en textur), och målningsrutnätet är en kvarts yard, så med båda dessa på 0 blir gränsen en hård linje med prickar längs den, oavsett hårdhetsreglaget. Kantmjukhet breddar övergången så att spridningen ser ut som den gradvisa uttoning den representerar; Kantdetalj varierar gränsen med fint brus så att den hakar i som riktig mark i stället för att följa rutnätet. Båda är gratis utan extra texturläsningar, men stor mjukhet suddar ut målad detalj som är smalare än den själv.',
+  'editor.biome.edgeSoftness': 'Kantmjukhet',
+  'editor.biome.galleryCount': '{n} texturer',
+  'editor.biome.galleryCurrent': 'Aktuell',
+  'editor.biome.galleryHint':
+    'Bläddra bland alla texturer och bekräfta sedan den du vill måla med.',
+  'editor.biome.galleryTitle': 'Välj en marktextur',
+  'editor.biome.groupBiomes': 'Biomer',
+  'editor.biome.groupSwatches': 'Dina prover',
+  'editor.biome.hardness': 'Penselhårdhet',
+  'editor.biome.hue': 'Nyans',
+  'editor.biome.importTexture': 'Importera texturprov',
+  'editor.biome.importTextureFailed': 'Kunde inte läsa bilden.',
+  'editor.biome.importTextureTitle':
+    'Välj en bildfil: målning med det nya provet upprepar den över marken (sparas i denna webbläsare; andra datorer ser dess medelfärg)',
+  'editor.biome.light': 'Ljus/mörk',
+  'editor.biome.pickTexture': 'Välj texturen att måla med',
+  'editor.biome.removeSwatch': 'Ta bort prov',
+  'editor.biome.removeSwatchTitle':
+    'Ta bort detta egna prov från kartan. Terräng målad med det återgår till grundbiomens utseende.',
+  'editor.biome.saveSwatch': 'Spara toning som prov',
+  'editor.biome.saveSwatchTitle':
+    'Behåll denna nyans- och ljusversion som ett eget prov så att toningen kan återanvändas efter att reglagen flyttats',
+  'editor.biome.swatchRemoved': 'Tog bort provet "{name}".',
+  'editor.biome.swatchSaved': 'Sparade provet "{name}".',
+  'editor.biome.textureSlots': 'Texturplatser: {used} / {max} använda · {free} lediga',
+  'editor.biome.textureSlotsFull':
+    'Bara {max} texturprover återges per karta; extra prover visar sin enfärgade yta. Ta bort en oanvänd textur för att frigöra en plats.',
+  'editor.biome.textureSlotsOver':
+    'Gränsen överskrids med {over}: de senast tillagda texturerna målar med enfärgad yta. Ta bort ett texturprov för att frigöra en plats.',
+  'editor.biome.textureSlotsTitle':
+    'Varje unik textur på denna karta använder en av {max} platser. Snötexturer använder terrängens snölager och tar ingen plats. Att ta bort ett texturprov frigör dess plats.',
+  'editor.biome.tileSize': 'Texturrutans storlek (yd)',
+  'editor.biome.variation': 'Variation',
+  'editor.biome.variationHint':
+    'Bryter upp det upprepade rutnätet genom att sampla texturen en andra gång i en roterad ram. 0% är vanlig upprepning och kostar inget; högre värden kostar en extra texturläsning där detta prov målas. Ytdjup skuggar texturens egna sprickor från dess omgivningsocklusionskarta, vilket hindrar målad mark från att se platt ut; kostnaden beräknas på samma sätt.',
+  'editor.brush.circle': 'Cirkel',
+  'editor.brush.reapplyWater': 'Tillämpa vatten igen',
+  'editor.brush.reapplyWaterTitle':
+    'Bygg om vattnet utifrån aktuell terräng. Penseldrag uppdaterar redan vattnet de berör; använd detta för det som återstår, som en bassäng grävd där kartan inte hade något vatten alls.',
+  'editor.brush.shape': 'Penselform',
+  'editor.brush.square': 'Kvadrat',
+  'editor.build.banner': 'Bygger modell',
+  'editor.build.bannerHint':
+    'Lägg till former och redigera hörn, kanter och ytor med modelleringsfältet.',
+  'editor.build.bare': 'Enkel (utan textur)',
+  'editor.build.collision': 'Använd nätet som kollision',
+  'editor.build.collisionHint':
+    'Spelaren blockeras där modellen är solid. Gångbara former (gröna) blir ramper.',
+  'editor.build.done': 'Klar',
+  'editor.build.editModel': 'Redigera modell',
+  'editor.build.entered':
+    'Redigerar modell: lägg till former, använd en textur, växla kollision och välj sedan Klar.',
+  'editor.build.hue': 'Nyans',
+  'editor.build.light': 'Ljus',
+  'editor.build.material': 'Material',
+  'editor.build.materialHint':
+    'Biblioteksmaterial projiceras på formen i shadern (ingen utdragning på trappor, sluttningar eller kurvor) och färgas med nyans, mättnad och ljus.',
+  'editor.build.materialMany': 'Materialreglagen gäller alla {n} valda byggda modeller.',
+  'editor.build.newHint':
+    'Klicka på kartan för att börja med en ny modell eller välj en att redigera.',
+  'editor.build.panelTitle': 'Byggd modell',
+  'editor.build.resetLook': 'Återställ materialtoning',
+  'editor.build.saturation': 'Mättnad',
+  'editor.build.shapes': '{n} former',
+  'editor.build.texture': 'Yttextur',
+  'editor.build.tileSize': 'Texturskala',
+  'editor.build.tileSizeUnit': 'yd / ruta',
+  'editor.build.walkableTip':
+    'Tips: använd modelleringsfältets Gångbar-växel för att göra en form till en ramp.',
+  'editor.buildMode.addLevel': 'Lägg till våning',
+  'editor.buildMode.autoBase': 'Anges av första placeringen',
+  'editor.buildMode.bare': 'Ursprunglig yta',
+  'editor.buildMode.bareFinish': 'Ursprunglig yta',
+  'editor.buildMode.bareWall': 'Bar vägg',
+  'editor.buildMode.baseY': 'Grundhöjd (yards)',
+  'editor.buildMode.building': 'Byggnad',
+  'editor.buildMode.buildingNumber': 'Byggnad {number}',
+  'editor.buildMode.capacity':
+    'Detta bygge är för stort. Rita en mindre del eller ta bort oanvända delar.',
+  'editor.buildMode.chooseAsset': 'Välj en resurs först.',
+  'editor.buildMode.choosePaintWall': 'Klicka på en byggnadsvägg eller en väggresurs.',
+  'editor.buildMode.chooseWall':
+    'Välj en väggresurs och vänta på förhandsvisningen eller välj Bar vägg.',
+  'editor.buildMode.chosenAsset': 'Vald resurs',
+  'editor.buildMode.diagonal': 'Diagonala väggar',
+  'editor.buildMode.diagonalHint':
+    'Dra mellan rutnätspunkter för att rita en vägg i valfri vinkel.',
+  'editor.buildMode.fineRotation': 'Finrotation (15°)',
+  'editor.buildMode.finishHint':
+    'Välj en ytbehandling och klicka sedan på en vägg för att måla den.',
+  'editor.buildMode.finishRun': 'Tillämpa på sammanhängande väggar',
+  'editor.buildMode.finishSide': 'Måla sida',
+  'editor.buildMode.finishTexture': 'Väggtextur',
+  'editor.buildMode.finishTile': 'Texturupprepning (yards)',
+  'editor.buildMode.floorHeight': 'Våningshöjd (yards)',
+  'editor.buildMode.floorHint': 'Dra en rektangel för att lägga till ett golv på denna våning.',
+  'editor.buildMode.floorNumber': 'Våning {number}',
+  'editor.buildMode.foundationLocked': 'Grundinställningarna låses när byggandet börjar.',
+  'editor.buildMode.gridCell': '{size} yard',
+  'editor.buildMode.gridOff': 'Av',
+  'editor.buildMode.gridSize': 'Rutnätsavstånd',
+  'editor.buildMode.groundFloor': 'Bottenvåning',
+  'editor.buildMode.hideAbove': 'Dölj högre våningar',
+  'editor.buildMode.importFailed':
+    'Texturimporten misslyckades. Använd en PNG, JPG eller WebP under 8 MB, högst 8192 pixlar per sida.',
+  'editor.buildMode.importTexture': 'Importera textur',
+  'editor.buildMode.importedTexture': 'Importerad textur {number}',
+  'editor.buildMode.importingTexture': 'Importerar textur...',
+  'editor.buildMode.invalid':
+    'Denna vägg eller detta rum fick inte plats. Justera rutnätet eller välj en annan del.',
+  'editor.buildMode.larger': 'Större',
+  'editor.buildMode.levels': 'Byggnadsvåningar',
+  'editor.buildMode.materialNames.Bricks076C': 'Mossigt tegel',
+  'editor.buildMode.materialNames.Cliff001': 'Röd klippa',
+  'editor.buildMode.materialNames.Cliff002': 'Mossig klippbrant',
+  'editor.buildMode.materialNames.Cliff003': 'Skrovlig klippa',
+  'editor.buildMode.materialNames.Cliff004': 'Vittrad bergsbrant',
+  'editor.buildMode.materialNames.Cliff005': 'Skiktad klippa',
+  'editor.buildMode.materialNames.Cliff006': 'Solstekt klippa',
+  'editor.buildMode.materialNames.Cobblestone001': 'Kullerstensväg',
+  'editor.buildMode.materialNames.Cobblestone002': 'Gammal kullersten',
+  'editor.buildMode.materialNames.Concrete034': 'Gjuten betong',
+  'editor.buildMode.materialNames.Gravel024': 'Grus',
+  'editor.buildMode.materialNames.Marble012': 'Ådrad marmor',
+  'editor.buildMode.materialNames.Metal032': 'Borstat stål',
+  'editor.buildMode.materialNames.Metal034': 'Målat stål',
+  'editor.buildMode.materialNames.PavingStones046': 'Marksten',
+  'editor.buildMode.materialNames.PavingStones131': 'Mossig gatsten',
+  'editor.buildMode.materialNames.Plaster001': 'Kalkputs',
+  'editor.buildMode.materialNames.Rock029': 'Vittrat berg',
+  'editor.buildMode.materialNames.Rock035': 'Skiktad sten',
+  'editor.buildMode.materialNames.Rock051': 'Granit',
+  'editor.buildMode.materialNames.Rock052': 'Grov sten',
+  'editor.buildMode.materialNames.Rock053': 'Järnsten',
+  'editor.buildMode.materialNames.Rock054': 'Sandstensyta',
+  'editor.buildMode.materialNames.Rock055': 'Roststen',
+  'editor.buildMode.materialNames.Rock056': 'Ängsstenar',
+  'editor.buildMode.materialNames.Rock057': 'Ådrad mörksten',
+  'editor.buildMode.materialNames.Roots001': 'Trassliga rötter',
+  'editor.buildMode.materialNames.Roots002': 'Levande rötter',
+  'editor.buildMode.materialNames.Rust004': 'Rostigt järn',
+  'editor.buildMode.materialNames.Tiles001': 'Lavtäckta hällar',
+  'editor.buildMode.materialNames.Tiles002': 'Skifferplattor',
+  'editor.buildMode.materialNames.WardenStone': 'Slät sten',
+  'editor.buildMode.materialNames.Wood001': 'Ekplankor',
+  'editor.buildMode.materialNames.Wood002': 'Tallplankor',
+  'editor.buildMode.materialNames.Wood003': 'Vittrad bark',
+  'editor.buildMode.materialNames.Wood004': 'Mossig bark',
+  'editor.buildMode.modeFinish': 'Väggytor',
+  'editor.buildMode.modeFloor': 'Golv',
+  'editor.buildMode.modeObject': 'Objekt',
+  'editor.buildMode.modeRoom': 'Rum',
+  'editor.buildMode.modeWall': 'Väggar',
+  'editor.buildMode.newBuilding': 'Ny byggnad',
+  'editor.buildMode.noAsset': 'Välj en resurs i bläddraren.',
+  'editor.buildMode.noBuilding': 'Ny byggnad',
+  'editor.buildMode.objectHint': 'Placera objekt på den valda våningen.',
+  'editor.buildMode.pickAsset': 'Välj resurs',
+  'editor.buildMode.roomHint': 'Dra en rektangel för att skapa ett rum med väggar och golv.',
+  'editor.buildMode.rotateLeft': 'Rotera åt vänster',
+  'editor.buildMode.rotateRight': 'Rotera åt höger',
+  'editor.buildMode.selectExisting': 'Välj en befintlig del',
+  'editor.buildMode.selectedAsset': 'Resurs: {name}',
+  'editor.buildMode.settings': 'Rutnät och grund',
+  'editor.buildMode.sideBack': 'Baksida',
+  'editor.buildMode.sideBoth': 'Båda sidor',
+  'editor.buildMode.sideClicked': 'Klickad sida',
+  'editor.buildMode.sideFront': 'Framsida',
+  'editor.buildMode.smaller': 'Mindre',
+  'editor.buildMode.thickness': 'Väggtjocklek (yards)',
+  'editor.buildMode.title': 'Bygg en byggnad',
+  'editor.buildMode.transformControls': 'Resursreglage',
+  'editor.buildMode.transformEmpty': 'Välj en resurs för att rotera eller ändra storlek.',
+  'editor.buildMode.transformReadout': 'Rotation: {degrees}° | Storlek: {scale}x',
+  'editor.buildMode.transformShortcuts': 'Rotera: , och . | Ändra storlek: [ och ]',
+  'editor.buildMode.wallHint': 'Dra för att rita en rak vägg.',
+  'editor.buildMode.wallSource': 'Väggtyp',
+  'editor.camera.assetViewDistance': 'Placerade resurser tonas bort vid',
+  'editor.camera.assetViewHint':
+    'Hur långt bort placerad dekor återges innan den tonas bort och slutar ritas för att spara prestanda. Sänk för att dölja avlägsna resurser tidigare; höj för att se längre. Sparas med kartan så att speltestet stämmer.',
+  'editor.camera.assetViewMax': 'Lika långt som dimman',
+  'editor.camera.assetViewTitle': 'Resursers visningsavstånd',
+  'editor.camera.axisWidget': 'Kamerans axelvyer',
+  'editor.camera.flySpeedSet': 'Flyghastighet {value}x',
+  'editor.camera.focus': 'Fokusera markering (.)',
+  'editor.camera.focusTitle':
+    'Flytta rotationspunkten till det valda objektet så att kameran kretsar runt det; utan markering ramas hela kartan in',
+  'editor.camera.freeFly': 'Fri flygning (Shift+F)',
+  'editor.camera.freeFlyHint':
+    'WASD förflyttar, Q/E går upp och ned, dragning låter dig se dig omkring som i förstaperson och hjulet ställer in hastigheten.',
+  'editor.camera.invertPan': 'Invertera kameran',
+  'editor.camera.loadingHaze': 'Inläsningsdis',
+  'editor.camera.lookSpeed': 'Musens blickhastighet',
+  'editor.camera.moveSpeed': 'WASD-förflyttningshastighet',
+  'editor.camera.panSpeed': 'Panoreringshastighet',
+  'editor.camera.perfAssets': 'Placerade resurser',
+  'editor.camera.perfCoords': 'Värld (x, z)',
+  'editor.camera.perfFrameMs': 'Bildrutetid (ms)',
+  'editor.camera.perfHint': 'En direktavläsning fäst i vyfönstrets hörn medan du redigerar.',
+  'editor.camera.perfSelTris': 'Valda polygoner',
+  'editor.camera.perfShow': 'Visa överlägget i vyfönstret',
+  'editor.camera.perfStreaming': 'Terrängströmning',
+  'editor.camera.perfTerrain': 'Terrängändringar',
+  'editor.camera.perfTitle': 'Prestandaöverlägg',
+  'editor.camera.perfTris': 'Scenpolygoner',
+  'editor.camera.resetSpeeds': 'Återställ hastigheter',
+  'editor.camera.showBoundary': 'Visa kartans gränsväggar',
+  'editor.camera.showPlayer': 'Visa speltestspelaren',
+  'editor.camera.snapNegativeX': 'Vy från negativ X',
+  'editor.camera.snapNegativeY': 'Vy underifrån',
+  'editor.camera.snapNegativeZ': 'Vy från negativ Z',
+  'editor.camera.snapPositiveX': 'Vy från positiv X',
+  'editor.camera.snapPositiveY': 'Vy ovanifrån',
+  'editor.camera.snapPositiveZ': 'Vy från positiv Z',
+  'editor.camera.speedHint':
+    'Hur fort vyfönstrets kamera flyger, tittar och panorerar. Bara i redigeraren. Vid fri flygning är mushjulet gasreglage: det ändrar denna förflyttningshastighet i stället för att zooma.',
+  'editor.camera.speedTitle': 'Förflyttningshastigheter',
+  'editor.camera.visibilityDistance': 'Synligt terrängavstånd',
+  'editor.camera.visibilityHint':
+    'Terräng med ursprunglig detaljgrad strömmas nära kameran. Dis döljer varje zon tills den är redo. Längre avstånd använder mer grafikprocessor och minne.',
+  'editor.camera.visibilityTitle': 'Terrängsynlighet',
+  'editor.camera.wireframe': 'Trådmodellsläge',
+  'editor.camera.xray': 'Genomskinligt röntgenläge',
+  'editor.camp.aiNotesPlaceholder':
+    'Beskriv beteende, patrullogik, stridstempo eller dialogledtrådar för AI:n.',
+  'editor.camp.catalogMeta': '{family} | Nivå {min}-{max}',
+  'editor.camp.chooseMob': 'Välj en fiendemodell',
+  'editor.camp.levelMax': 'Högsta nivå',
+  'editor.camp.overrideLevels': 'Åsidosätt mallens nivåer',
+  'editor.camp.questNotesPlaceholder':
+    'Förklara hur detta läger ska stödja mål, belöningar eller uppdragsframsteg.',
+  'editor.camp.statAggro': 'Aggro: {value} yard',
+  'editor.camp.statFamily': 'Familj: {value}',
+  'editor.camp.statScale': 'Skala: {value}',
+  'editor.camp.tagBoss': 'Huvudfiende',
+  'editor.camp.tagCaster': 'Besvärjare',
+  'editor.camp.tagElite': 'Elit',
+  'editor.camp.tagEnrage': 'Raseri',
+  'editor.camp.tagRare': 'Sällsynt',
+  'editor.camp.tagStationary': 'Fast',
+  'editor.camp.tagSummoner': 'Åkallare',
+  'editor.camp.tagSupport': 'Understöd',
+  'editor.camp.tagSwimmer': 'Simmare',
+  'editor.city.gridOff': 'Av',
+  'editor.city.gridSize': 'Rutnätsstorlek',
+  'editor.city.kitChosen': 'Placerar: {name}',
+  'editor.city.kitGhostBlocked': 'Blockerad: överlappar en placerad resurs.',
+  'editor.city.kitNone':
+    'Välj en resurs i bläddraren och klicka sedan på kartan för att placera den på rutnätet.',
+  'editor.city.kitPick': 'Välj resurs',
+  'editor.city.kitRotate': 'Rotera (R)',
+  'editor.city.kitScale': 'Delskala',
+  'editor.city.kitTileHint':
+    'Anslut plattor fäster varje del efter dess egen storlek och den FÖRSTA plattans höjd, så att golv möts kant mot kant och förblir plana över ojämn mark. Esc eller val av en ny resurs påbörjar en ny nivå; stäng av för att använda världsrutnätet.',
+  'editor.city.kitTileSnap': 'Anslut plattor',
+  'editor.city.prefabCount': '{n} delar',
+  'editor.city.prefabDelete': 'Ta bort',
+  'editor.city.prefabName': 'Byggmallens namn',
+  'editor.city.prefabNeedSelection':
+    'Välj först en eller flera placerade resurser (Shift+klick eller markeringsruta).',
+  'editor.city.prefabNone':
+    'Inga byggmallar ännu. Välj några placerade resurser och spara dem som en byggmall.',
+  'editor.city.prefabSave': 'Spara markering som byggmall',
+  'editor.city.prefabSaved': 'Byggmall sparad: {name}',
+  'editor.city.prefabStamp': 'Stämpla',
+  'editor.city.prefabStamped': 'Byggmall stämplad ({n} delar).',
+  'editor.city.roadAuthored': 'Väg {n}',
+  'editor.city.roadBuiltin': 'Världsväg {n}',
+  'editor.city.roadBuiltinEdited': '{name} (ändrad)',
+  'editor.city.roadBuiltinNote':
+    'Världsvägar är spelets egna vägar. Ändringar gäller bara denna karta och Återställ sätter tillbaka vägen.',
+  'editor.city.roadBuiltinRemoved': '{name} (borttagen)',
+  'editor.city.roadDelete': 'Ta bort',
+  'editor.city.roadDeletePoint': 'Ta bort vägpunkt',
+  'editor.city.roadDraw': 'Rita väg',
+  'editor.city.roadDrawing':
+    'Klicka för att lägga till vägpunkter. Enter eller dubbelklick avslutar, Esc avbryter.',
+  'editor.city.roadEditHint':
+    'Klicka på en väg för att välja den. Dra en vägpunkt för att flytta den, dra väglinjen för att lägga till en kurva och tryck på Delete för att ta bort den hållna vägpunkten.',
+  'editor.city.roadEditNone':
+    'Ingen väg vald. Klicka på en i vyn eller välj den från en lista nedan.',
+  'editor.city.roadEditing': 'Redigerar: {name}',
+  'editor.city.roadFinish': 'Slutför väg',
+  'editor.city.roadHint':
+    'Vägar smälter in i terrängen som de inbyggda världsvägarna och plattar till ojämnheter under sig.',
+  'editor.city.roadLegacy': 'Inbyggd väg',
+  'editor.city.roadLimit': 'Kartan har redan det högsta tillåtna antalet vägar.',
+  'editor.city.roadList': 'Vägar på denna karta',
+  'editor.city.roadMode': 'Vägverktyg',
+  'editor.city.roadModeDraw': 'Rita en ny väg',
+  'editor.city.roadModeEdit': 'Redigera vägar',
+  'editor.city.roadPlaced': 'Väg placerad.',
+  'editor.city.roadPointLimit': 'Denna väg har redan så många vägpunkter som den kan ha.',
+  'editor.city.roadPointTooShort':
+    'En väg behöver minst två vägpunkter. Använd Ta bort väg i stället.',
+  'editor.city.roadRemove': 'Ta bort väg',
+  'editor.city.roadRemoved': 'Väg borttagen. Ångra tar tillbaka den.',
+  'editor.city.roadReset': 'Återställ standard',
+  'editor.city.roadRestore': 'Återställ',
+  'editor.city.roadSelect': 'Välj',
+  'editor.city.roadTooShort': 'Rita minst två punkter för att bygga en väg.',
+  'editor.city.roadType': 'Vägtyp',
+  'editor.city.roadTypePath': 'Gångstig',
+  'editor.city.roadTypeRoad': 'Väg',
+  'editor.city.roadWaypointHeld': 'Vägpunkt {n} vald.',
+  'editor.city.roadWaypoints': 'Vägpunkter: {n}',
+  'editor.city.roadWorldList': 'Världsvägar ({n})',
+  'editor.city.rotSnap': 'Rotationsfästning',
+  'editor.city.routeAddHint':
+    'Varje klick lägger till en vägpunkt. Enter avslutar, Esc stoppar redigeringen.',
+  'editor.city.routeClear': 'Rensa rutt',
+  'editor.city.routeCleared': 'Rutt rensad.',
+  'editor.city.routeCount': '{n} vägpunkter',
+  'editor.city.routeEditing': 'Rutt för {name}: klicka på kartan för att lägga till vägpunkter.',
+  'editor.city.routeFinish': 'Spara rutt',
+  'editor.city.routeMode': 'Förflyttning',
+  'editor.city.routeModeLoop': 'Slinga',
+  'editor.city.routeModePingPong': 'Fram och tillbaka',
+  'editor.city.routeNoNpc': 'Ingen NPC vald. Klicka först på en NPC i vyfönstret.',
+  'editor.city.routePick': 'Klicka på en NPC för att redigera dess rutt.',
+  'editor.city.routeSaved': 'Rutt sparad ({n} vägpunkter).',
+  'editor.city.routeSpeed': 'Gånghastighet',
+  'editor.city.routeWait': 'Vänta vid vägpunkter',
+  'editor.city.routeWaitUnit': 'sekunder',
+  'editor.city.settings': 'Bygginställningar',
+  'editor.city.snapHint': 'Rutnätsfästning gäller väggnoder, satsplacering och byggmallsstämplar.',
+  'editor.city.styleCastle': 'Slottsmur',
+  'editor.city.styleCastleFence': 'Slottsstaket',
+  'editor.city.styleHexWall': 'Hexagonmur',
+  'editor.city.styleMetalFence': 'Metallstaket',
+  'editor.city.styleStone': 'Stenmur',
+  'editor.city.styleWoodFence': 'Trästaket',
+  'editor.city.tabKit': 'Sats',
+  'editor.city.tabPrefabs': 'Byggmallar',
+  'editor.city.tabRoads': 'Vägar',
+  'editor.city.tabRoutes': 'Rutter',
+  'editor.city.tabWalls': 'Väggar',
+  'editor.city.title': 'Stadsbygge',
+  'editor.city.wallBuildFailed': 'Väggresurserna kunde inte genereras. Din bana finns kvar.',
+  'editor.city.wallClosed': 'Slut slingan',
+  'editor.city.wallDraw': 'Rita vägg',
+  'editor.city.wallDrawing':
+    'Klicka för att lägga till hörn på det synliga rutnätet. Dubbelklicka på en nod eller tryck på Enter för att avsluta. Backsteg eller Delete tar bort den sista noden; Esc avbryter.',
+  'editor.city.wallEditHint':
+    'Välj valfri väggdel för att aktivera den sträckan. Gå tillbaka till Väggar för att forma om den eller tryck på Delete i markeringsläget för att ta bort hela sträckan.',
+  'editor.city.wallFinish': 'Slutför vägg',
+  'editor.city.wallGateHint': 'Portsegment hoppas över så att väggen lämnar en öppning.',
+  'editor.city.wallHeight': 'Höjd',
+  'editor.city.wallLiveEdit': 'Reglagen ovan uppdaterar din senaste vägg direkt.',
+  'editor.city.wallNodes': '{n} väggnoder placerade.',
+  'editor.city.wallPlaced': 'Väggsträcka placerad ({n} delar).',
+  'editor.city.wallPostEvery': 'Stolpavstånd',
+  'editor.city.wallPostsOff': 'Inga stolpar',
+  'editor.city.wallScale': 'Väggskala',
+  'editor.city.wallStairs': 'Trappor upp',
+  'editor.city.wallStyle': 'Väggstil',
+  'editor.city.wallThickness': 'Tjocklek',
+  'editor.city.wallTooShort': 'Rita minst två punkter för att bygga en vägg.',
+  'editor.city.wallUndoPoint': 'Ångra punkt',
+  'editor.city.wallWalkHint':
+    'Gångbar ovansida lägger ett patrulldäck längs väggen så att spelare kan gå på den i speltest; Trappor upp lägger till en trappa från marken till däcket i varje ände (eller bredvid en sluten slinga).',
+  'editor.city.wallWalkTop': 'Gångbar ovansida',
+  'editor.clutterTool.capReached':
+    'Gränsen för småföremål har nåtts ({max} stämplar); sudda bort några för att måla fler.',
+  'editor.clutterTool.clearAll': 'Ta bort alla målade småföremål',
+  'editor.clutterTool.clumps': 'Klungor (0 = jämn spridning)',
+  'editor.clutterTool.count': '{count} småföremålsstämplar målade',
+  'editor.clutterTool.density': 'Täthet',
+  'editor.clutterTool.erase': 'Suddningsläge (ta bort målade småföremål under penseln)',
+  'editor.clutterTool.hint':
+    'Dra över marken för att sprida aktiverade småföremål inom penseln; varje drag är ett ångrasteg. Delarna blockerar aldrig rörelse.',
+  'editor.clutterTool.kinds.leaves': 'Fallna löv',
+  'editor.clutterTool.kinds.letter': 'Tappade brev',
+  'editor.clutterTool.kinds.paper_scraps': 'Skrynkligt papper',
+  'editor.clutterTool.kinds.pebbles': 'Småsten',
+  'editor.clutterTool.kinds.pot_shards': 'Trasigt lergods',
+  'editor.clutterTool.kinds.splinters': 'Träflisor',
+  'editor.clutterTool.kinds.stones': 'Lösa stenar',
+  'editor.clutterTool.kinds.straw': 'Halm',
+  'editor.clutterTool.kinds.tile_broken': 'Spruckna markplattor',
+  'editor.clutterTool.kinds.tile_shards': 'Kakelskärvor',
+  'editor.clutterTool.kindsTitle': 'Typer av småföremål',
+  'editor.clutterTool.maxScale': 'Största storlek',
+  'editor.clutterTool.minScale': 'Minsta storlek',
+  'editor.clutterTool.noneSelected': 'Aktivera minst en typ av småföremål för att måla.',
+  'editor.clutterTool.tierNote':
+    'Småföremål visas i spelet på hög grafik och högre; lägre nivåer hoppar över dem utan kostnad.',
+  'editor.clutterTool.title': 'Småföremålspensel',
+  'editor.collider.box': 'Lådkollisionsform',
+  'editor.collider.depth': 'Djup',
+  'editor.collider.diameter': 'Diameter',
+  'editor.collider.floorOffset': 'Golvhöjdsförskjutning',
+  'editor.collider.height': 'Höjd',
+  'editor.collider.hideVolumes': 'Dölj kollisionsvolymer',
+  'editor.collider.hideVolumesHint':
+    'Döljer de gröna volymöverläggen i vyfönstret (de blockerar fortfarande i speltest).',
+  'editor.collider.hint':
+    'Välj en form och klicka sedan på marken för att placera den. Använd Flytta, Rotera och Skala (eller reglagen nedan) för att forma den.',
+  'editor.collider.plane': 'Golvplan',
+  'editor.collider.playtestNote':
+    'Volymer visas gröna i redigeraren och är osynliga i speltest: lådor och klot blockerar rörelse, golvplan höjer den gångbara marken.',
+  'editor.collider.shapeLabel': 'Kollisionsform',
+  'editor.collider.sizeHint': 'Måtten är yard vid skala 1; skalverktyget multiplicerar dem.',
+  'editor.collider.sphere': 'Klotkollisionsform',
+  'editor.collider.title': 'Kollisionsvolymer',
+  'editor.collider.wall': 'Väggplan',
+  'editor.collider.width': 'Bredd',
+  'editor.collisionMaster.addMenuTitle':
+    'Lägg till en kollisionsgrundform: riktiga triangulerade solider (en cylinder är ett riktigt cylindernät)',
+  'editor.collisionMaster.adopted':
+    'Uppdaterade {count} befintliga placeringar på kartan till att använda kollisionen du just skapade.',
+  'editor.collisionMaster.assetLabel': 'Skapar standardkollision för {name}.',
+  'editor.collisionMaster.barLabel': 'Verktyg för kollisionsmodellering',
+  'editor.collisionMaster.cancel': 'Tillbaka till kartan',
+  'editor.collisionMaster.catalogOnly':
+    'Kollisionsverktyget fungerar med katalogresurser. Importerade modeller behåller sin förberäknade importkollision.',
+  'editor.collisionMaster.copied':
+    'Kopierade {n} kollisionsvolymer, klistra in med Ctrl+V (fungerar mellan resurser).',
+  'editor.collisionMaster.copyEmpty': 'Inga kollisionsvolymer att kopiera.',
+  'editor.collisionMaster.delete': 'Ta bort',
+  'editor.collisionMaster.deleteTitle': 'Ta bort de valda lådorna',
+  'editor.collisionMaster.devOnly':
+    'Bekräfta skriver till projektfilerna och behöver därför den lokala utvecklingsservern (npm run dev).',
+  'editor.collisionMaster.duplicate': 'Duplicera',
+  'editor.collisionMaster.duplicateTitle': 'Duplicera de valda lådorna',
+  'editor.collisionMaster.dyntopo': 'Dynamisk topologi',
+  'editor.collisionMaster.dyntopoTitle':
+    'Dynamisk topologi delar långa kanter lokalt och slår säkert ihop korta kanter runt skulpteringspenseln.',
+  'editor.collisionMaster.fill': 'Fyll',
+  'editor.collisionMaster.fillTitle': 'Fyll tre eller fler valda randhörn med en ny yta.',
+  'editor.collisionMaster.fittedBox': 'Anpassad låda',
+  'editor.collisionMaster.fittedBoxTitle': 'Börja med en låda anpassad runt hela resursen',
+  'editor.collisionMaster.fromBake': 'Från förberäkning',
+  'editor.collisionMaster.fromBakeTitle': 'Börja med resursens automatiskt förberäknade voxellådor',
+  'editor.collisionMaster.fromClear': 'Börja tomt',
+  'editor.collisionMaster.fromClearTitle': 'Ta bort varje kollisionsform och börja med en tom scen',
+  'editor.collisionMaster.fromCylinder': 'Börja med cylinder',
+  'editor.collisionMaster.fromCylinderTitle': 'Börja med en redigerbar cylinder runt resursens bas',
+  'editor.collisionMaster.heroStatus': 'Resurskollision: {mode}',
+  'editor.collisionMaster.heroTitle': 'Kollisionsverktyg',
+  'editor.collisionMaster.hint':
+    'Bygg denna resurs kollision med markeringspanelen nedan: välj kollisionstyp, redigera lådor med manipulatorn (flytta / rotera / skala), lägg till eller ta bort lådor. Bekräfta sparar den i projektet som resursens standard överallt.',
+  'editor.collisionMaster.inset': 'Infällning',
+  'editor.collisionMaster.insetTitle': 'Fäll in den valda ytan och skapa en ansluten kantring.',
+  'editor.collisionMaster.lockInTitle':
+    'Spara som denna resurs standardkollision (skriver till projektet) och återvänd till kartan',
+  'editor.collisionMaster.locked': 'Bekräftat: {name} använder nu denna kollision överallt.',
+  'editor.collisionMaster.loopCut': 'Ringsnitt',
+  'editor.collisionMaster.loopCutFail':
+    'Välj först en lådkant i kantläge, ringsnitt kräver en fyrkantskant (inte en ändyta eller ett klot).',
+  'editor.collisionMaster.loopCutTitle':
+    'Infoga en kantring: välj en kant i kantläge så lägger Ringsnitt till en parallell ring av kanter runt formen (dra den nya ringen för att förskjuta den).',
+  'editor.collisionMaster.mapName': 'Kollisionsverktyg: {name}',
+  'editor.collisionMaster.meshUnsupported':
+    'Äkta nät är en förberäkning per karta och kan inte vara projektstandard. Välj Förberäknad, Grundläggande eller Ingen.',
+  'editor.collisionMaster.mirror': 'Spegla X',
+  'editor.collisionMaster.mirrorTitle':
+    'Lägg till en speglad kopia av den valda volymen över dess lokala X-axel.',
+  'editor.collisionMaster.modeEdge': 'Kant',
+  'editor.collisionMaster.modeEdgeTitle':
+    'Kantval (V): klicka på en kant så flyttar / roterar / skalar manipulatorn dess två hörn',
+  'editor.collisionMaster.modeFace': 'Yta',
+  'editor.collisionMaster.modeFaceTitle':
+    'Ytval (C): klicka på en yta så flyttar / roterar / skalar manipulatorn den ytan lokalt',
+  'editor.collisionMaster.modeObject': 'Objekt',
+  'editor.collisionMaster.modeObjectTitle':
+    'Objektläge (Tab): flytta / rotera / skala hela volymer med manipulatorn',
+  'editor.collisionMaster.modeVertex': 'Hörn',
+  'editor.collisionMaster.modeVertexTitle':
+    'Hörnval (Z): klicka på ett hörn så flyttar manipulatorn BARA det hörnet; Ctrl+dra gör ett lassoval av flera',
+  'editor.collisionMaster.noBoxes':
+    'Inga kollisionslådor att bekräfta. Lägg till minst en låda eller välj Grundläggande/Ingen.',
+  'editor.collisionMaster.openFromSelection': 'Kollisionsverktyg',
+  'editor.collisionMaster.openFromSelectionTitle':
+    'Skapa denna resurs STANDARDKOLLISION i kollisionsverktygets scen (sparas i projektet; kartan sparas automatiskt och du återvänder hit)',
+  'editor.collisionMaster.pasted': 'Klistrade in {n} kollisionsvolymer.',
+  'editor.collisionMaster.polyBuildFail':
+    'Modellen har nått sin detaljgräns och kan inte extruderas mer.',
+  'editor.collisionMaster.polyBuildHint':
+    'Polygonbygge: klicka och dra en yta på modellen för att extrudera den utåt och bygga former för hand. Stäng av för att kretsa och välja igen.',
+  'editor.collisionMaster.polyBuildShort': 'Polygonbygge',
+  'editor.collisionMaster.polySnap': 'Polygonfästningspensel',
+  'editor.collisionMaster.polySnapHint':
+    'Dra över modellens yta för att lägga ett kollisionsplan som följer geometrin: dragets början och slut anger längd och vridning, de samplade höjderna dess vertikala band. Passar bra för väggar, tak och ramper.',
+  'editor.collisionMaster.polySnapShort': 'Polygonfästning',
+  'editor.collisionMaster.presetPromptBody':
+    'Bekräfta gjorde redan detta till standardkollision för {name} i hela projektet, och varje kopia på din karta använder den nu. En förinställning går ett steg längre enbart på denna enhet: varje NY placering av {name} skapas med dessa lådor som egna redigerbara träffvolymer, så du kan justera dem per kopia med Redigera träffvolymer. Krävs inte för att kollisionen ska fungera.',
+  'editor.collisionMaster.presetPromptDontAsk':
+    'Fråga inte igen (slå på igen under Mer > "Fråga om förinställningar vid bekräftelse")',
+  'editor.collisionMaster.presetPromptNo': 'Nej tack',
+  'editor.collisionMaster.presetPromptTitle': 'Spara som förinställning också?',
+  'editor.collisionMaster.presetPromptYes': 'Spara förinställning',
+  'editor.collisionMaster.primBox': 'Låda',
+  'editor.collisionMaster.primCylinder': 'Cylinder',
+  'editor.collisionMaster.primPlane': 'Plan',
+  'editor.collisionMaster.primSphere': 'Klot',
+  'editor.collisionMaster.primTitle': 'Lägg till grundformen {name} i kollisionsuppsättningen',
+  'editor.collisionMaster.primWedge': 'Ramp',
+  'editor.collisionMaster.rampToggle': 'Gångbar',
+  'editor.collisionMaster.rampToggleTitle':
+    'Gångbar ramp: den valda volymen höjer den gångbara marken längs sin lutning (spelaren går uppför den) i stället för att blockera. Rampgrundformer börjar som gångbara.',
+  'editor.collisionMaster.saveEndpointFailed': 'Det gick inte att spara standarden: {error}',
+  'editor.collisionMaster.saveFailed':
+    'Kunde inte spara kartan innan kollisionsverktyget öppnades.',
+  'editor.collisionMaster.saveUnreachable':
+    'Kunde inte nå sparslutpunkten (körs utvecklingsservern?). Din kollision laddades ned som en fil så att inget går förlorat; starta "npm run dev" och bekräfta igen, eller slå ihop filen med data/asset_collision_overrides.json.',
+  'editor.collisionMaster.sculptCrease': 'Skulptera: veck',
+  'editor.collisionMaster.sculptDeflate': 'Skulptera: sänk',
+  'editor.collisionMaster.sculptDetail': 'Detalj',
+  'editor.collisionMaster.sculptGrab': 'Skulptera: greppa',
+  'editor.collisionMaster.sculptInflate': 'Skulptera: blås upp',
+  'editor.collisionMaster.sculptOff': 'Skulptera: av',
+  'editor.collisionMaster.sculptPinch': 'Skulptera: nyp',
+  'editor.collisionMaster.sculptRelax': 'Skulptera: slappna av',
+  'editor.collisionMaster.sculptSettings': 'Skulpteringsinställningar',
+  'editor.collisionMaster.sculptSmooth': 'Skulptera: jämna ut',
+  'editor.collisionMaster.sculptStrength': 'Styrka',
+  'editor.collisionMaster.sculptTitle': 'Dynamisk nätskulpteringspensel',
+  'editor.collisionMaster.singleBox': 'Enkel låda',
+  'editor.collisionMaster.singleBoxTitle': 'Börja med en vanlig låda vid resursens bas',
+  'editor.collisionMaster.stashOnly':
+    'Webbläsarlagring är blockerad, så kartan hålls i minnet: du återvänder till den från kollisionsverktyget, men exportera den om du vill ha en beständig kopia.',
+  'editor.collisionMaster.subdivide': 'Dela upp',
+  'editor.collisionMaster.subdivideTitle':
+    'Dela varje triangel i fyra trianglar med gemensamma kanter för fler modelleringsdetaljer.',
+  'editor.collisionMaster.symmetry': 'Symmetri',
+  'editor.collisionMaster.symmetryHint':
+    'Spegla varje skulpteringsdrag över de valda lokala X-, Y- och Z-axlarna.',
+  'editor.collisionMaster.title': 'Kollisionsverktyg',
+  'editor.collisionMaster.topologyFail':
+    'Den topologiåtgärden kan inte användas på den aktuella markeringen.',
+  'editor.collisionMaster.weld': 'Sammanfoga',
+  'editor.collisionMaster.weldTitle': 'Slå ihop de valda hörnen i deras mittpunkt.',
+  'editor.decalTool.aspect': 'Sträckning',
+  'editor.decalTool.capReached': 'Dekalgränsen har nåtts ({max}).',
+  'editor.decalTool.catArcane': 'Arkan',
+  'editor.decalTool.catBurn': 'Brännmärken',
+  'editor.decalTool.catDamage': 'Skador',
+  'editor.decalTool.catGore': 'Blodspill',
+  'editor.decalTool.catMarker': 'Markörer',
+  'editor.decalTool.catNature': 'Natur',
+  'editor.decalTool.catTracks': 'Spår',
+  'editor.decalTool.decalN': 'Dekal {num}',
+  'editor.decalTool.deleteTitle': 'Ta bort denna dekal',
+  'editor.decalTool.glow': 'Glöd',
+  'editor.decalTool.hint':
+    'Välj en dekal och klicka sedan på marken för att stämpla den. Stämplar följer terrängen och läses bara in när kameran är nära, så en karta kan ha många. Klicka på en stämpel för att välja den; Delete tar bort den.',
+  'editor.decalTool.importDecal': 'Importera dekalbild',
+  'editor.decalTool.importFailed': 'Kunde inte läsa bilden.',
+  'editor.decalTool.importTitle':
+    'Välj en PNG/WebP med genomskinlighet: den blir en stämplingsbar dekal (sparas i denna webbläsare och packas i kartpaket)',
+  'editor.decalTool.imported': 'Importerade',
+  'editor.decalTool.importedDecal': 'Importerade "{name}".',
+  'editor.decalTool.library': 'Dekalbibliotek',
+  'editor.decalTool.libraryTitle':
+    'Inbyggda dekaler som följer med redigeraren (ursprunglig CC0-grafik). Välj en och klicka sedan på marken för att stämpla den.',
+  'editor.decalTool.none': 'Inga dekaler stämplade ännu.',
+  'editor.decalTool.pickFirst': 'Välj först en dekal ur biblioteket.',
+  'editor.decalTool.randomRotate': 'Slumpmässig rotation per stämpel',
+  'editor.decalTool.removed': 'Tog bort dekal.',
+  'editor.decalTool.rotation': 'Rotation',
+  'editor.decalTool.selectTitle': 'Välj denna dekal i världen (Delete tar bort den)',
+  'editor.decalTool.size': 'Storlek (yd)',
+  'editor.decalTool.sortOrder': 'Rita ovanpå',
+  'editor.decalTool.stamped': 'Stämplade "{name}".',
+  'editor.decalTool.tint': 'Toning',
+  'editor.decalTool.title': 'Dekaler',
+  'editor.dungeon.addBarrier': 'Lägg till barriär',
+  'editor.dungeon.addDecor': 'Lägg till dekor',
+  'editor.dungeon.addDoor': 'Lägg till dörr',
+  'editor.dungeon.addOpening': 'Lägg till öppning',
+  'editor.dungeon.addRoom': 'Lägg till rum',
+  'editor.dungeon.collapse': 'Fäll ihop',
+  'editor.dungeon.delete': 'Ta bort',
+  'editor.dungeon.exit': 'Tillbaka till kartan',
+  'editor.dungeon.field.hd': 'Halvt djup',
+  'editor.dungeon.field.hw': 'Halv bredd',
+  'editor.dungeon.field.id': 'ID',
+  'editor.dungeon.field.innerScale': 'Inre skala',
+  'editor.dungeon.field.key': 'Modell',
+  'editor.dungeon.field.scaleX': 'Skala X',
+  'editor.dungeon.field.scaleZ': 'Skala Z',
+  'editor.dungeon.field.style': 'Stil',
+  'editor.dungeon.field.x0': 'Västra kanten (x0)',
+  'editor.dungeon.field.x1': 'Östra kanten (x1)',
+  'editor.dungeon.field.y': 'Höjdförskjutning',
+  'editor.dungeon.field.yaw': 'Vridning (radianer)',
+  'editor.dungeon.field.z0': 'Nära kanten (z0)',
+  'editor.dungeon.field.z1': 'Bortre kanten (z1)',
+  'editor.dungeon.hint':
+    'Klick väljer (upprepade klick växlar överlappningar). Dra flyttar. Pilar finjusterar, Delete tar bort, Ctrl+Z ångrar. Shift+dra panorerar, mittknapp+dra kretsar.',
+  'editor.dungeon.kind.barrier': 'Barriär',
+  'editor.dungeon.kind.dais': 'Bosspodium',
+  'editor.dungeon.kind.decor': 'Dekor',
+  'editor.dungeon.kind.door': 'Dörr',
+  'editor.dungeon.kind.opening': 'Visuell öppning',
+  'editor.dungeon.kind.room': 'Rum',
+  'editor.dungeon.noIssues': 'Inga problem hittades',
+  'editor.dungeon.none': 'Inget valt. Klicka på en kontur på planritningen.',
+  'editor.dungeon.save': 'Spara till källan',
+  'editor.dungeon.saveFailed':
+    'Utvecklingsserverns sparslutpunkt är inte tillgänglig; layouten laddades ned i stället',
+  'editor.dungeon.saved': 'Layouten skrevs till src/sim/dungeon_layout.ts (utvecklingsserver)',
+  'editor.dungeon.title': 'Fängelsehålans layout',
+  'editor.dungeon.unsaved': 'Osparade layoutändringar',
+  'editor.dungeon.validate': 'Validera',
+  'editor.entityTool.aiNotesPlaceholder':
+    'Beskriv personlighet, dialogton, scheman, reaktioner och interaktionsregler.',
+  'editor.entityTool.automaticModel': 'Automatisk mallrigg',
+  'editor.entityTool.automaticModelHint': 'Använd karaktären som tilldelats denna NPC-mall.',
+  'editor.entityTool.cancelPlacement': 'Avbryt placering',
+  'editor.entityTool.categoryForm': 'Former',
+  'editor.entityTool.categoryPlayer': 'Spelarriggar',
+  'editor.entityTool.characterModel': 'Riggad karaktär',
+  'editor.entityTool.chooseNpcModel': 'Välj en karaktärsmodell',
+  'editor.entityTool.facing': 'Riktning',
+  'editor.entityTool.hint':
+    'Välj en NPC för att ställa in dess rigg, roll, visuella effekter och AI-beskrivning. Välj en fiende för att ange typ, nivåer, egenskapsmodifierare, patrull och återkomst.',
+  'editor.entityTool.manyMobs': '{count} fiender',
+  'editor.entityTool.name': 'Visningsnamn',
+  'editor.entityTool.none': 'Klicka på en fiende eller NPC i kartvyn för att välja den.',
+  'editor.entityTool.oneMob': '1 fiende',
+  'editor.entityTool.placeNpc': 'Placera NPC',
+  'editor.entityTool.placeNpcHint':
+    '{name} är redo. Klicka på terrängen för att placera denna NPC.',
+  'editor.entityTool.questNotesPlaceholder':
+    'Lämna instruktioner för framtida AI-skapade uppdrag, mål och berättelsehändelser.',
+  'editor.entityTool.role': 'Berättelseroll',
+  'editor.entityTool.rolePlaceholder': 'Uppdragsgivare, köpman, vakt, tränare...',
+  'editor.entityTool.selected': 'Vald: {name}',
+  'editor.entityTool.title': 'NPC:er och fiender',
+  'editor.entityTool.titleField': 'Titel',
+  'editor.eyedropperTool.empty': 'Inget målat här, klicka på en målad textur för att välja den.',
+  'editor.fire.add': '+ Lägg till eldkälla',
+  'editor.fire.anchor': 'Fäst vid',
+  'editor.fire.anchorBase': 'Modellens bas',
+  'editor.fire.anchorCenter': 'Modellens mitt',
+  'editor.fire.anchorTop': 'Modellens topp',
+  'editor.fire.blend': 'Blandningsläge',
+  'editor.fire.blendAdditive': 'Additiv glöd',
+  'editor.fire.blendAlpha': 'Naturlig alfa',
+  'editor.fire.colorMotion': 'Färg och rörelse',
+  'editor.fire.customize': 'Öppna alla reglage',
+  'editor.fire.duplicate': 'Duplicera källa',
+  'editor.fire.embers': 'Flygande glöd',
+  'editor.fire.emitter': 'Eld {count}',
+  'editor.fire.enabled': 'Källa aktiverad',
+  'editor.fire.flameShape': 'Lågform',
+  'editor.fire.flicker': 'Flimmer',
+  'editor.fire.glow': 'Glödintensitet',
+  'editor.fire.glowRange': 'Glödradie (yard)',
+  'editor.fire.height': 'Låghöjd',
+  'editor.fire.hint':
+    'Lägg till oberoende procedurella eldkällor, välj en och använd sedan flyttmanipulatorn i vyfönstret för att placera den exakt på modellen.',
+  'editor.fire.hue': 'Eldnyans',
+  'editor.fire.intensity': 'Shaderintensitet',
+  'editor.fire.layers': 'Låglager',
+  'editor.fire.legacy': 'Äldre enkel låga',
+  'editor.fire.light': 'Glödljus',
+  'editor.fire.opacity': 'Lågans opacitet',
+  'editor.fire.position': 'Position',
+  'editor.fire.positionX': 'Lokal X (yard)',
+  'editor.fire.positionY': 'Lokal Y (yard)',
+  'editor.fire.positionZ': 'Lokal Z (yard)',
+  'editor.fire.preset': 'Effektförinställning',
+  'editor.fire.remove': 'Ta bort källa',
+  'editor.fire.removeAll': 'Ta bort all eld',
+  'editor.fire.saturation': 'Mättnad',
+  'editor.fire.scale': 'Övergripande skala',
+  'editor.fire.smokeAmount': 'Rökmängd',
+  'editor.fire.smokeRise': 'Rökstigning',
+  'editor.fire.smokeScale': 'Rökskala',
+  'editor.fire.speed': 'Animationshastighet',
+  'editor.fire.style.bonfire': 'Bål',
+  'editor.fire.style.embers': 'Glödbädd',
+  'editor.fire.style.soulfire': 'Själseld',
+  'editor.fire.style.torch': 'Fackla',
+  'editor.fire.style.wildfire': 'Löpeld',
+  'editor.fire.title': 'Resursens eldeffekter',
+  'editor.fire.turbulence': 'Turbulens',
+  'editor.fire.width': 'Lågbredd',
+  'editor.flatMapName': 'Platt värld',
+  'editor.flatten.levelClear': 'Rensa',
+  'editor.flatten.levelHint':
+    'Varje drag jämnar ut marken till denna höjd. Högerklicka på marken för att välja en annan.',
+  'editor.flatten.levelHintNone':
+    'Högerklicka på marken för att låsa dess höjd och dra sedan var som helst för att jämna ut till den. Tomt: varje drag jämnar ut till starthöjden.',
+  'editor.flatten.levelPicked': 'Nivån låst på {height} yard.',
+  'editor.flatten.levelPlaceholder': 'Dragets början',
+  'editor.flatten.levelTitle': 'Nivåhöjd (yards)',
+  'editor.flatten.noiseHint':
+    'Små ojämnheter med hög grovhet ser ut som stenig, sönderbruten mark; stora ojämnheter med låg grovhet böljar som ängskullar. Penselstyrkan anger hur höga de blir.',
+  'editor.flatten.noiseRough': 'Grovhet',
+  'editor.flatten.noiseSize': 'Ojämnheternas storlek (yards)',
+  'editor.flatten.shiftHint':
+    'Håll Shift medan du drar för att växla mellan platta till och jämna ut för det draget.',
+  'editor.flatten.smoothMode': 'Jämna ut i stället för att platta till',
+  'editor.flatten.style.noise': 'Brus',
+  'editor.flatten.style.sharpen': 'Skärp',
+  'editor.flatten.style.smooth': 'Jämna ut',
+  'editor.flatten.style.terrace': 'Terrassera',
+  'editor.flatten.styleHint.noise':
+    'Målar naturliga vågformer över hela penseln: lagrade höjningar och sänkor med finare detalj ovanpå. Ett drag behåller ett mönster, så dragning bygger böljande mark; dra igen för att lägga till nya detaljer.',
+  'editor.flatten.styleHint.sharpen':
+    'Motsatsen till Jämna ut: åsar får skarpare krön och raviner blir djupare för varje drag.',
+  'editor.flatten.styleHint.smooth':
+    'Beräknar markens medelhöjd under penseln; upprepade drag smälter bort ojämnheter.',
+  'editor.flatten.styleHint.terrace':
+    'Drar sluttningar till trappstegsformade avsatser. Penselstyrkan anger steghöjden.',
+  'editor.fluid.fxBubbles': 'Bubblor',
+  'editor.fluid.fxHaze': 'Dis',
+  'editor.fluid.fxLight': 'Glödljus',
+  'editor.fluid.hint':
+    'Välj en vätska och klicka på marken för att placera en pöl. Använd transformeringsverktygen för att flytta den, sträcka dess markyta och sänka ytan i en grop.',
+  'editor.fluid.hue': 'Nyans',
+  'editor.fluid.kind.acid': 'Syra',
+  'editor.fluid.kind.lava': 'Smält lava',
+  'editor.fluid.kind.spectral': 'Spökvätska',
+  'editor.fluid.kind.water': 'Stillastående vatten',
+  'editor.fluid.light': 'Ljushet',
+  'editor.fluid.resetPreset': 'Återställ förinställning',
+  'editor.fluid.selHint':
+    'Manipulatorn skalar pölens markyta (X/Z) och Y-pilen förskjuter ythöjden. Skada tillfogas en gång per sekund på alla i vätskan.',
+  'editor.fluid.surfaceOffset': 'Ythöjd',
+  'editor.fluid.title': 'Vätskepöl',
+  'editor.foliage.bake': 'Behåll som resurs',
+  'editor.foliage.bakeFailed': 'Kunde inte behålla växten: {reason}',
+  'editor.foliage.bakeHint':
+    'Skriver växten till public/models/generated som en GLB så att den slutar vara ett recept och blir en vanlig katalogresurs: den grupperas med de andra, får förberäknad kollision och kan placeras på valfri karta. Inställningarna följer med i filen så att du kan öppna och förberäkna den igen senare. Kräver utvecklingsservern.',
+  'editor.foliage.bakePrompt': 'Namnge växten',
+  'editor.foliage.baked': 'Behöll som {id}. Kör resurskatalogen igen för att se den i bläddraren.',
+  'editor.foliage.clumps': 'Stråklungor',
+  'editor.foliage.footprint': 'Utbredning',
+  'editor.foliage.hang': 'Häng',
+  'editor.foliage.kind': 'Växt',
+  'editor.foliage.kinds.bush': 'Buske',
+  'editor.foliage.kinds.fern': 'Ormbunke',
+  'editor.foliage.kinds.grass': 'Grästuva',
+  'editor.foliage.kinds.tree': 'Träd',
+  'editor.foliage.kinds.vine': 'Klätterväxt',
+  'editor.foliage.plantHeight': 'Höjd',
+  'editor.foliage.preset': 'Utgångspunkt',
+  'editor.foliage.presets.bushBerry': 'Bärbuske',
+  'editor.foliage.presets.bushDry': 'Torrt buskage',
+  'editor.foliage.presets.bushRound': 'Rund buske',
+  'editor.foliage.presets.fernForest': 'Skogsormbunke',
+  'editor.foliage.presets.grassMeadow': 'Ängstuva',
+  'editor.foliage.presets.grassTuft': 'Tuva',
+  'editor.foliage.presets.vineHanging': 'Hängande klätterväxt',
+  'editor.foliage.splay': 'Spärrning',
+  'editor.foliage.strands': 'Strån',
+  'editor.foliageTool.ambientAllHint':
+    'Att omvandla hela kartan gör tusentals träd och stenar till enskilda placeringar, vilket använder mer minne än zon- eller gruppalternativen.',
+  'editor.foliageTool.ambientConverted': 'Gjorde de {count} närmaste växtdelarna redigerbara.',
+  'editor.foliageTool.ambientConvertedAll':
+    'All omgivningsväxtlighet ({count} delar) är nu redigerbar.',
+  'editor.foliageTool.ambientEditableHint':
+    'Omgivningsväxtlighet är avstängd. Varje växtdel målad med denna pensel kan väljas, flyttas, roteras, skalas eller suddas bort.',
+  'editor.foliageTool.ambientHint':
+    'Inbyggda träd och stenar är procedurella och kan inte väljas. Rikta kameran mot ett område och omvandla sedan denna zon (rekommenderas), den närmaste gruppen eller hela kartan.',
+  'editor.foliageTool.ambientPartial':
+    'Omvandlade {count} delar; höj gränsen eller omvandla igen för resten.',
+  'editor.foliageTool.ambientTitle': 'Befintlig kartväxtlighet',
+  'editor.foliageTool.bushes': 'Buskar',
+  'editor.foliageTool.collide': 'Ny växtlighet blockerar rörelse',
+  'editor.foliageTool.customChosen': 'Målar: {name}',
+  'editor.foliageTool.customClear': 'Tillbaka till inbyggd växtlighet',
+  'editor.foliageTool.customHint':
+    'Sprid din egen resurs i stället för de inbyggda uppsättningarna. Välj valfri modell i bläddraren nedan och måla sedan som vanligt.',
+  'editor.foliageTool.customNeedsPick':
+    'Öppna resursbläddraren och välj först en resurs till den egna penseln.',
+  'editor.foliageTool.customPick': 'Välj från resursbläddraren',
+  'editor.foliageTool.customTitle': 'Egen penselresurs',
+  'editor.foliageTool.density': 'Täthet',
+  'editor.foliageTool.ferns': 'Ormbunkar och svampar',
+  'editor.foliageTool.grass': 'Gräs (animerat)',
+  'editor.foliageTool.grassClump': 'Tuvstorlek (strån)',
+  'editor.foliageTool.grassHue': 'Gräsnyans',
+  'editor.foliageTool.grassLight': 'Gräsets ljushet',
+  'editor.foliageTool.grassPreview': 'Färgen som nytt gräs målas med',
+  'editor.foliageTool.hint':
+    'Dra över marken för att sprida aktiverad växtlighet inom penseln; varje drag är ett ångrasteg. Använd Sudda för att ta bort delar.',
+  'editor.foliageTool.makeAllAmbientEditable': 'Gör ALL växtlighet redigerbar',
+  'editor.foliageTool.makeAmbientEditable': 'Gör närliggande växtlighet redigerbar',
+  'editor.foliageTool.makeZoneEditable': 'Gör DENNA zon redigerbar',
+  'editor.foliageTool.makeZoneEditableHint':
+    'Omvandlar varje träd och sten i zonen under kameran till redigerbara placeringar, det prestandasäkra sättet att redigera ett avlägset område en region i taget.',
+  'editor.foliageTool.maxScale': 'Största storlek',
+  'editor.foliageTool.minScale': 'Minsta storlek',
+  'editor.foliageTool.noneSelected': 'Aktivera minst en växtlighetsgrupp för att måla.',
+  'editor.foliageTool.rocks': 'Stenar',
+  'editor.foliageTool.title': 'Växtlighetspensel',
+  'editor.foliageTool.trees': 'Träd',
+  'editor.genTerrain.clear': 'Platta till kartan',
+  'editor.genTerrain.cleared': 'Terrängkällan rensad: kartan är en plan yta igen.',
+  'editor.genTerrain.dragHint':
+    'Dra den gyllene rektangeln över terrängen som ska kopieras. Punkten markerar din startpunkt.',
+  'editor.genTerrain.generated': 'Terräng genererad från världslayouten runt ({x}, {z}).',
+  'editor.genTerrain.hint':
+    'Välj vilken del av den gamla världslayouten denna kartas terräng genereras från: dra den gyllene rektangeln över önskat område. Dess kullar, sjöar och kustlinjer blir kartans grundterräng som du kan skulptera ovanpå efteråt. Generering ersätter dina aktuella skulpteringsändringar och kartan förblir en egen separat plats.',
+  'editor.genTerrain.save': 'Generera',
+  'editor.genTerrain.status': 'Samplar världslayouten runt ({x}, {z}).',
+  'editor.genTerrain.title': 'Generera terräng',
+  'editor.grassClearTool.hint':
+    'Klicka eller dra för att sudda bort det procedurella ängsgräset, inklusive gräset som är inbakat i den inbyggda världen. Använd en stor pensel för att rensa ett stort område i ett drag.',
+  'editor.grassClearTool.restore': 'Återställ allt gräs',
+  'editor.grassClearTool.title': 'Ta bort gräs',
+  'editor.help.key.multiSelect':
+    'Shift+klick lägger till eller tar bort resurser. I NPC- och fiendeverktyget väljer Ctrl+klick flera varelser.',
+  'editor.help.tool.clutter':
+    'Måla småföremål på marken (trasiga plattor, småsten, brev, löv) som återges på hög grafik och högre.',
+  'editor.help.tool.collider':
+    'Placera kollisionsvolymer i form av lådor, klot eller golvplan som är osynliga i speltest.',
+  'editor.help.tool.foliage': 'Måla gräs, buskar, träd och stenar med storleksvariation.',
+  'editor.help.tool.meshfix':
+    'Ta bort utdragna kvarvarande terrängpolygoner runt ett snitt eller en grottmynning, eller återställ dem. Trådmodellen slås på medan verktyget är aktivt.',
+  'editor.help.tool.move': 'Flytta den valda resursen med manipulatorns pilar för tre axlar.',
+  'editor.help.tool.pond': 'Klicka för att gräva en lokal damm med egen vattenyta.',
+  'editor.help.tool.rotate': 'Rotera den valda resursen med manipulatorns ringar.',
+  'editor.help.tool.scale':
+    'Skala den valda resursen med manipulatorns handtag, per axel eller likformigt.',
+  'editor.help.tool.slope':
+    'Högerklicka för att ange starthöjden och dra sedan från en annan höjd för att lägga en jämn ramp.',
+  'editor.help.tool.tree': 'Odla ett helt anpassningsbart träd: stam, grenar, kronvolymer och löv.',
+  'editor.importModel.failed': 'Kunde inte läsa modellfilen.',
+  'editor.importModel.imported':
+    'Importerade "{name}". Den behålls under denna session; importera den igen efter omladdning.',
+  'editor.importModel.notModel': 'Välj en .glb- eller .gltf-fil.',
+  'editor.importModel.tooLarge': 'Filen överskrider importgränsen på 64 MiB.',
+  'editor.inspector.lightingTab': 'Belysning',
+  'editor.inspector.sceneTab': 'Scen',
+  'editor.lightTool.capReached': 'Ljusgränsen har nåtts ({max}).',
+  'editor.lightTool.deleteTitle': 'Ta bort detta ljus',
+  'editor.lightTool.height': 'Höjd (yard)',
+  'editor.lightTool.hint':
+    'Klicka på marken för att placera ett ljus. Ljus återges i redigeraren och i speltest (högst {max}; bara de närmaste lyser samtidigt).',
+  'editor.lightTool.intensity': 'Intensitet',
+  'editor.lightTool.lightN': 'Ljus {num}',
+  'editor.lightTool.none': 'Inga ljus ännu.',
+  'editor.lightTool.range': 'Räckvidd (yard)',
+  'editor.lightTool.selectTitle':
+    'Välj detta ljus i världen (lampmärket förstoras; Delete tar bort det)',
+  'editor.lightTool.title': 'Punktljus',
+  'editor.lighting.ambient': 'Omgivningsintensitet',
+  'editor.lighting.azimuth': 'Solriktning',
+  'editor.lighting.birdCount': 'Hur många',
+  'editor.lighting.birdFormation': 'Flyg i V-formation',
+  'editor.lighting.birds': 'Fåglar på himlen',
+  'editor.lighting.birdsTitle': 'Fåglar',
+  'editor.lighting.caveLight': 'Grottans ljusstyrka',
+  'editor.lighting.caveLightHint':
+    'Hur mörka uthuggna grottväggar blir med djupet. 0 är det ordinarie grottmörkret; omkring 0,4 håller en stor grotta tydlig i fackelsken.',
+  'editor.lighting.customHint': 'Egen belysning (ändrad från en förinställning).',
+  'editor.lighting.day': 'Dag',
+  'editor.lighting.dusk': 'Skymning',
+  'editor.lighting.elevation': 'Solhöjd',
+  'editor.lighting.environment': 'Himmelsstämning',
+  'editor.lighting.hint': 'Kartbelysningen sparas och används av både redigeraren och speltestet.',
+  'editor.lighting.night': 'Natt',
+  'editor.lighting.nightFloor': 'Nattljusstyrka',
+  'editor.lighting.nightFloorHint':
+    'Hur mycket dagsljus den djupaste natten behåller. 0 är den ordinarie natten; omkring 0,35 förblir tydligt och svalt i stället för dunkelt.',
+  'editor.lighting.overcast': 'Mulet',
+  'editor.lighting.presetLabel': 'Belysningsförinställning',
+  'editor.lighting.skyColor': 'Himmelstoning',
+  'editor.lighting.skyboxCustomActive': 'Egen himmelsbakgrund aktiv.',
+  'editor.lighting.skyboxDefault': 'Standardhimmel',
+  'editor.lighting.skyboxHint':
+    'Välj en medföljande himmel eller ladda upp en panoramabild (ekvirektangulär). Sparas med kartan och visas i spelet under speltest.',
+  'editor.lighting.skyboxImportFailed': 'Kunde inte importera bilden.',
+  'editor.lighting.skyboxImported': 'Himmelsbakgrund importerad.',
+  'editor.lighting.skyboxMissing': 'Den himmelsbakgrunden finns inte längre i denna webbläsare.',
+  'editor.lighting.skyboxTitle': 'Himmelsbakgrund',
+  'editor.lighting.skyboxTooLarge': 'Himmelsbilden är för stor (högst 24 MB).',
+  'editor.lighting.skyboxUpload': 'Ladda upp himmelsbakgrund...',
+  'editor.lighting.skybox_amber_sunset': 'Bärnstenssolnedgång HDR',
+  'editor.lighting.skybox_ember_storm': 'Glödstorm HDR',
+  'editor.lighting.skybox_fen_day': 'Kärrdag HDR',
+  'editor.lighting.skybox_frost_twilight': 'Frostskymning HDR',
+  'editor.lighting.skybox_hollow_dusk': 'Hålans skymning HDR',
+  'editor.lighting.skybox_marsh_backdrop': 'Målad träskbakgrund',
+  'editor.lighting.skybox_marsh_overcast': 'Mulet träsk HDR',
+  'editor.lighting.skybox_night': 'Natt HDR',
+  'editor.lighting.skybox_nightbloom_dream': 'Nattblomstrets dröm HDR',
+  'editor.lighting.skybox_peaks_backdrop': 'Målad bergsbakgrund',
+  'editor.lighting.skybox_peaks_dawn': 'Bergsgryning HDR',
+  'editor.lighting.skybox_space_galaxy': 'Rymdgalax',
+  'editor.lighting.skybox_toon_day': 'Tecknad blå himmel',
+  'editor.lighting.skybox_vale_backdrop': 'Målad dalbakgrund',
+  'editor.lighting.skybox_vale_day': 'Daldag HDR',
+  'editor.lighting.skybox_wraithwood_gloom': 'Vålnadsskogens dunkel HDR',
+  'editor.lighting.sun': 'Solintensitet',
+  'editor.lighting.sunColor': 'Solfärg',
+  'editor.lighting.title': 'Belysning',
+  'editor.lighting.worldSpeed': 'Animationshastighet',
+  'editor.lighting.worldSpeedHint':
+    'Snabbar upp eller saktar ned all omgivningsrörelse (vatten, eld, växtsvaj, fåglar, väder). Bara kosmetiskt; ändrar aldrig speltestets spelmekanik eller tidsförlopp.',
+  'editor.lighting.worldSpeedReset': 'Återställ normal hastighet',
+  'editor.lighting.worldSpeedTitle': 'Världshastighet',
+  'editor.lighting.zoneHint':
+    'Välj en zon och ge den sedan egen belysning, himmelsbakgrund och omgivningshastighet.',
+  'editor.lighting.zoneReset': 'Använd kartans atmosfär',
+  'editor.lighting.zoneSelect': 'Zon att redigera',
+  'editor.lighting.zoneTitle': 'Zonatmosfär',
+  'editor.liveWorld.name': 'Justeringar av den aktuella världen',
+  'editor.liveWorld.scope':
+    'Aktuell värld: redigera terränghöjd och målning, vägar, spelobjektens positioner och tillagd rekvisita. Befintliga byggnader förblir fasta. Använd Exportera för att spara justeringar för granskning.',
+  'editor.map.pinHint': 'Klicka på kartan för att placera en teleportmarkör.',
+  'editor.map.showWorld': 'Visa hela världen',
+  'editor.map.showZone': 'Visa denna zon',
+  'editor.map.teleportToPin': 'Teleportera till markören',
+  'editor.map.useLiveTerrain': 'Använd aktuell terräng',
+  'editor.map.usePainted': 'Använd målad karta',
+  'editor.markerTool.capReached': 'Markörgränsen har nåtts ({max}).',
+  'editor.markerTool.deleteTitle': 'Ta bort denna markör',
+  'editor.markerTool.hint':
+    'Anteckningar bara för redigeraren för AI-generering av uppdrag och händelser ("uppdragsgivare här", "kista här"). Visas aldrig i speltest.',
+  'editor.markerTool.kind': 'Markörtyp',
+  'editor.markerTool.none': 'Inga markörer ännu.',
+  'editor.markerTool.object': 'Interaktivt objekt',
+  'editor.markerTool.place': 'Placera markörer i stället för att flytta startpunkten',
+  'editor.markerTool.title': 'AI-markörer',
+  'editor.materials.color': 'Toning',
+  'editor.materials.hint':
+    'Välj en textur för varje del av modellen. Texturer upprepas i världskoordinater, ignorerar modellens UV-koordinater och sparas med kartan.',
+  'editor.materials.loading':
+    'Modellen läses fortfarande in. Välj den igen om en stund för att redigera materialen.',
+  'editor.materials.original': 'Ursprunglig',
+  'editor.materials.reset': 'Återställ ursprunglig',
+  'editor.materials.texture': 'Textur',
+  'editor.materials.tile': 'Texturskala (yard per ruta)',
+  'editor.meshFixTool.capReached':
+    'Nätreparation är full ({max} platser). Återställ några innan du tar bort fler.',
+  'editor.meshFixTool.clear': 'Återställ allt',
+  'editor.meshFixTool.count': '{n} borttagna platser',
+  'editor.meshFixTool.hint':
+    'Trådmodellen är på medan detta verktyg är aktivt. Dra över de utdragna terrängpolygonerna över en grottmynning (utifrån eller inifrån grottan) för att TA BORT dem; varje polygon med mittpunkt under penseln slutar ritas. Bara återgivning: marken du går på ändras inte. Ett ångrasteg per drag.',
+  'editor.meshFixTool.miss': 'Sikta på terrängnätet: inget låg under markören.',
+  'editor.meshFixTool.nudgeHint':
+    'För att FLYTTA en utdragen polygon i stället för att ta bort den, använd Höj eller Sänk med en mycket liten pensel på dess hörn.',
+  'editor.meshFixTool.restore':
+    'Återställningsläge (ta tillbaka borttagna polygoner under penseln)',
+  'editor.meshFixTool.title': 'Nätreparation',
+  'editor.meshFixTool.vertexClearAll': 'Återställ varje flyttat hörn',
+  'editor.meshFixTool.vertexClearSel': 'Rensa markering',
+  'editor.meshFixTool.vertexCount': '{sel} valda, {n} hörn flyttade',
+  'editor.meshFixTool.vertexHint':
+    'Varje terränghörn nära markören visas som en liten ruta; valda hörn blir gula. Klicka på ett för att välja, dra en ruta för flera, Shift+klick eller Shift+dra för att lägga till, Ctrl/Cmd+klick för att växla, Alt+klick för att ta bort ur markeringen. DRA sedan ett valt hörn för att flytta det upp eller ned. Bara återgivning: marken du går på ändras inte.',
+  'editor.meshFixTool.vertexMode': 'Hörnläge (välj och flytta enskilda hörn)',
+  'editor.meshFixTool.vertexReset': 'Återställ valda hörn',
+  'editor.mobTool.delete': 'Ta bort fiende',
+  'editor.mobTool.deleteMany': 'Ta bort {count} fiender',
+  'editor.mobTool.deleteManyNpcs': 'Ta bort {count} karaktärer',
+  'editor.mobTool.deleteNpc': 'Ta bort karaktär',
+  'editor.mobTool.deleted': 'Tog bort {count} fiender.',
+  'editor.mobTool.deletedNpcs': 'Tog bort {count} karaktärer.',
+  'editor.mobTool.hint':
+    'Klicka på en fiende i kartvyn för att redigera dess typ, nivåer, egenskaper, patrull och återkomst.',
+  'editor.mobTool.levelDefaultHint': 'Använder mallens nivåintervall för denna fiende.',
+  'editor.mobTool.mixedHint':
+    'De valda fienderna skiljer sig åt. Värdena som visas gäller den första; ändringar tillämpas på alla.',
+  'editor.mobTool.mixedType': 'Blandade typer',
+  'editor.mobTool.overrideLevels': 'Åsidosätt nivåintervall',
+  'editor.mobTool.patrolClear': 'Rensa patrull',
+  'editor.mobTool.patrolDraftPoints': 'Placerade vägpunkter: {count}',
+  'editor.mobTool.patrolEdit': 'Redigera patrullrutt',
+  'editor.mobTool.patrolFinish': 'Slutför rutt',
+  'editor.mobTool.patrolFull': 'En patrullrutt rymmer högst {max} vägpunkter.',
+  'editor.mobTool.patrolLoop': 'Gå i slinga till starten',
+  'editor.mobTool.patrolMode': 'Vid banans slut',
+  'editor.mobTool.patrolNeedPoints': 'Placera minst två vägpunkter innan rutten slutförs.',
+  'editor.mobTool.patrolNone':
+    'Denna fiende vandrar nära sin startpunkt. Ange en patrull för att låta den gå längs en bana.',
+  'editor.mobTool.patrolNoneNpc':
+    'Denna karaktär står där du placerade den. Ange en patrull för att låta den gå längs en bana.',
+  'editor.mobTool.patrolPickHint':
+    'Klicka på kartan för att placera varje vägpunkt i ordning. Dubbelklicka på den sista eller tryck på Enter för att avsluta.',
+  'editor.mobTool.patrolPingpong': 'Vänd och gå tillbaka',
+  'editor.mobTool.patrolPoints': 'Patrullerar {count} vägpunkter',
+  'editor.mobTool.patrolRemoved': 'Patrull rensad.',
+  'editor.mobTool.patrolSaved': 'Patrull angiven: {count} vägpunkter.',
+  'editor.mobTool.patrolSet': 'Ange patrullrutt',
+  'editor.mobTool.patrolSpeed': 'Gånghastighet',
+  'editor.mobTool.patrolTitle': 'Patrull',
+  'editor.mobTool.patrolUndoPoint': 'Ta bort sista punkten',
+  'editor.mobTool.patrolWait': 'Pausa vid varje vägpunkt',
+  'editor.mobTool.patrolWaitHint': 'Pausen anges på varje vägpunkt du placerar hädanefter.',
+  'editor.mobTool.respawnDefault': 'Standardhastighet för återkomst',
+  'editor.mobTool.respawnDefaultHint':
+    'Använder rikets standard för denna fiende (sällsynta och bossar tar längre tid).',
+  'editor.mobTool.respawnSeconds': 'Återkommer efter',
+  'editor.mobTool.respawnTitle': 'Återkomst',
+  'editor.mobTool.statAttackSpeed': 'Slagtid',
+  'editor.mobTool.statDamage': 'Skada',
+  'editor.mobTool.statDefault': '{value}x standard',
+  'editor.mobTool.statLevels': 'Mallnivåer {min}-{max}',
+  'editor.mobTool.statMoveSpeed': 'Rörelsehastighet',
+  'editor.mobTool.statsHint':
+    'Multiplikatorer på de nivåbaserade egenskaperna. Över 1 är en bonus, under 1 ett avdrag. Klicka på ett värde för att skriva ett exakt tal.',
+  'editor.mobTool.statsReset': 'Återställ modifierare',
+  'editor.mobTool.statsTitle': 'Egenskapsmodifierare',
+  'editor.mobTool.type': 'Fiendetyp',
+  'editor.mobTool.typeHeader': 'Fiende: {name}',
+  'editor.mobTool.typeHeaderMany': 'Fiende: {name} ({count} valda)',
+  'editor.mobTool.yardsPerSecond': '{value} yard/s',
+  'editor.music.areaCap': 'Gränsen för musikområden har nåtts ({max}).',
+  'editor.music.areaN': 'Område {num}',
+  'editor.music.areaTrack': 'Spår för nya områden',
+  'editor.music.areasTitle': 'Musikområden',
+  'editor.music.default': 'Automatiskt (biomtema)',
+  'editor.music.dragHint':
+    'Dra en ruta på marken för att lägga till ett område med spåret ovan. Klicka på ett område för att välja det (Delete tar bort det). Mindre områden har företräde vid överlappning.',
+  'editor.music.hint':
+    'Välj musik för hela kartan eller dra rutor för att ge områden egna spår. Speltestet växlar när du passerar dem.',
+  'editor.music.none': 'Inga musikområden ännu.',
+  'editor.music.previewDisabled': 'Musiken är avstängd i Inställningar.',
+  'editor.music.previewOff': 'Områdesmusik stoppad.',
+  'editor.music.previewZone': 'Spelas nu: {zone}',
+  'editor.music.removeArea': 'Ta bort detta musikområde',
+  'editor.music.rowTrack': 'Spår för detta område',
+  'editor.music.selectArea': 'Välj detta område i världen (rutan markeras; Delete tar bort det)',
+  'editor.music.track.dungeon_gravewyrm_sanctum':
+    'Fängelsehåla: Gravlindormens helgedom (bossrutt)',
+  'editor.music.track.dungeon_hollow_crypt': 'Fängelsehåla: Den ihåliga kryptan (skelettdans)',
+  'editor.music.track.dungeon_sunken_bastion':
+    'Fängelsehåla: Den sjunkna bastionen (översvämmad fästning)',
+  'editor.music.track.marsh': 'Träsk (kväkande kärr)',
+  'editor.music.track.peaks': 'Bergstoppar (heroisk folkmusik)',
+  'editor.music.track.town_eastbrook': 'Stad: Östbäck (varm pastoral)',
+  'editor.music.track.town_fenbridge': 'Stad: Kärrbron (gammal medeltid)',
+  'editor.music.track.town_goldcrest': 'Stad: Goldcrest Harbor (handelshamn)',
+  'editor.music.track.town_highwatch': 'Stad: Högvakten (rask marsch)',
+  'editor.music.track.vale': 'Dalen (lekfull äng)',
+  'editor.music.track.vale_legacy': 'Äldre dalmusik (ursprungligt tema)',
+  'editor.music.zoneTrack': 'Kartspår',
+  'editor.newMap.height': 'Höjd (yard)',
+  'editor.newMap.hint':
+    'Välj en förinställning eller ange storleken i yard. Kartan är avgränsad: terrängkanternas väggar och osynliga omkretsblockerare håller speltestet inom den.',
+  'editor.newMap.interior': 'Interiör (60 x 60)',
+  'editor.newMap.openWorld': 'Öppen värld (360 x 1080)',
+  'editor.newMap.scale': 'Skalmultiplikator',
+  'editor.newMap.title': 'Ny karta',
+  'editor.newMap.width': 'Bredd (yard)',
+  'editor.newMap.zone': 'Zon (240 x 360)',
+  'editor.objectMove.delete': 'Ta bort från denna karta',
+  'editor.objectMove.deleteHint':
+    'Tar bara bort det från denna karta. Återställ det senare från listan över borttagna objekt.',
+  'editor.objectMove.deletedHint':
+    'Borttaget från denna karta. Återställ ett för att ta tillbaka det till platsen där det stod.',
+  'editor.objectMove.deletedTitle': 'Borttagna spelobjekt',
+  'editor.objectMove.doorDeleteHint':
+    'Att ta bort en dörr till en fängelsehåla tar bort dess ingång i världen från denna karta.',
+  'editor.objectMove.doorFixed':
+    'Dörrar till fängelsehålor kan flyttas eller tas bort men inte vridas eller skalas om.',
+  'editor.objectMove.dummyDeleteHint':
+    'Hales övningslektioner använder dessa dockor: tar du bort en kan dess lektion inte slutföras på denna karta.',
+  'editor.objectMove.edited': 'Ändrad på denna karta.',
+  'editor.objectMove.hint':
+    'Dra den eller finjustera med piltangenterna. Flytten gäller bara denna karta och objektet behåller sin identitet så att sparade framsteg fortfarande hittar det.',
+  'editor.objectMove.kindDungeonDoor': 'Dörr till fängelsehåla',
+  'editor.objectMove.kindFarmBed': 'Odlingsbädd',
+  'editor.objectMove.kindGatherNode': 'Insamlingsnod',
+  'editor.objectMove.kindPracticeDummy': 'Övningsdocka',
+  'editor.objectMove.moved': 'Flyttad på denna karta.',
+  'editor.objectMove.original': 'På sin ursprungliga plats.',
+  'editor.objectMove.position': 'Position: {x}, {z}',
+  'editor.objectMove.reset': 'Återställ till ursprungsplats',
+  'editor.objectMove.resetAll': 'Återställ ursprungligt',
+  'editor.objectMove.restore': 'Återställ',
+  'editor.objectMove.restoredLater': 'Återställd. Den visas i vyn efter att kartan laddats om.',
+  'editor.objectMove.rotation': 'Rotation (grader)',
+  'editor.objectMove.title': 'Spelobjekt',
+  'editor.openDrawer.colType': 'Typ',
+  'editor.openDrawer.openCopy': 'Öppna kopia',
+  'editor.openDrawer.publishedUnreadable':
+    'Kunde inte läsa den publicerade kartan "{slug}" från utvecklingsservern.',
+  'editor.openDrawer.tabShipped': 'Medföljande kartor',
+  'editor.openDrawer.typePublished': 'Publicerad i spelet ({slug})',
+  'editor.openDrawer.typeShippedPublished': '{group} · din publicerade version',
+  'editor.picking.allFloors': 'Alla våningar synliga',
+  'editor.picking.asset': 'Resurs {number}',
+  'editor.picking.behind': 'Bakom en annan resurs',
+  'editor.picking.choose': 'Välj överlappande resurs ({count})',
+  'editor.picking.chooser': 'Välj en resurs under pekaren',
+  'editor.picking.details': 'Objekt {number} · Våning {level} · Höjd {height}',
+  'editor.picking.filteredFloors': 'Våningar över nivå {level} är dolda',
+  'editor.picking.front': 'Främst',
+  'editor.picking.hideAbove': 'Dölj våningar ovanför vald nivå',
+  'editor.picking.hint': 'Klicka igen för att växla överlappande objekt eller välj från listan.',
+  'editor.picking.keyboard':
+    'Använd Föregående/Nästa eller piltangenter för att jämföra. Enter väljer; Escape stänger.',
+  'editor.picking.overlapAt': 'Överlappningar vid {name}',
+  'editor.picking.position': '{current} av {count}',
+  'editor.picking.target': 'Mål: {name}',
+  'editor.picking.ungroupedDetails': 'Objekt {number} · Höjd {height}',
+  'editor.playtestBack': 'Tillbaka till redigeraren',
+  'editor.playtestBackTitle':
+    'Återvänd till kartredigeraren (kartan sparades när speltestet startade)',
+  'editor.pond.add': 'Lägg till damm',
+  'editor.pond.depth': 'Dammdjup',
+  'editor.pond.hint':
+    'Klicka på marken för att gräva en rund damm och fylla den med vatten. Cirkeln omfattar den mjukt sluttande stranden. Ångra tar bort vattnet och bassängen tillsammans.',
+  'editor.pond.invalid': 'Kan inte gräva en damm på denna mark. Välj en annan plats.',
+  'editor.pond.radius': 'Dammradie',
+  'editor.pond.title': 'Skapa en damm',
+  'editor.publish.done':
+    'Publicerad. Starta den på /index.html?map={slug}, checka in de genererade filerna för att leverera.',
+  'editor.publish.failed': 'Publicering blockerad: {error}',
+  'editor.publish.noDevServer':
+    'Publicering skriver till projektet och behöver därför den lokala utvecklingsservern (npm run dev).',
+  'editor.publish.rejected': 'Publicering nekad: {error}',
+  'editor.publish.removeConfirm':
+    'Tar bort de publicerade filerna för "{slug}" (data/maps + src/sim/maps) och återställer den vanliga ClaudeCraft-världen. Kartan i redigeraren påverkas inte och du kan publicera den igen när som helst.',
+  'editor.publish.removeTitle': 'Ta bort denna karta från spelet?',
+  'editor.publish.removed':
+    'Tog bort "{slug}" från spelet. Den vanliga ClaudeCraft-världen är tillbaka.',
+  'editor.publish.removedNothing':
+    'Inget att ta bort: "{slug}" publicerades inte till detta kodförråd.',
+  'editor.push.baseMissing':
+    'Versionen du började med är inte längre tillgänglig. Öppna kodförrådets karta igen och gör om ändringarna.',
+  'editor.push.conflictsBody':
+    '{count} av dina ändringar krockar med ändringar som skickats in sedan du öppnade kartan. Inget skrevs. Öppna kodförrådets karta igen från Öppna och gör sedan om dessa:',
+  'editor.push.conflictsMore': 'Och {count} till.',
+  'editor.push.conflictsTitle': 'Inskickning nekad: motstridiga ändringar',
+  'editor.push.done':
+    'Skickade in {count} ändringar i {slug}. Redigeraren visar nu den sammanslagna kartan.',
+  'editor.push.kindField': 'Kartinställning',
+  'editor.push.kindGrassClear': 'Gräsrensning',
+  'editor.push.kindObjectMove': 'Spelobjekt',
+  'editor.push.kindPaint': 'Målade celler',
+  'editor.push.kindPlacement': 'Resurs',
+  'editor.push.kindRoad': 'Väg',
+  'editor.push.kindRoadEdit': 'Världsväg',
+  'editor.push.kindTerrain': 'Terrängdrag',
+  'editor.push.missingIds':
+    'Vissa objekt i kodförrådets karta saknar id eller delar ett, så dina ändringar kan inte matchas mot den.',
+  'editor.push.notLinked':
+    'Denna karta öppnades inte från en karta i kodförrådet, så det finns inget att skicka ändringar till. Öppna först en från Öppna, Medföljande kartor.',
+  'editor.push.nothing':
+    'Inget att skicka in: denna kopia har inga ändringar sedan du öppnade den.',
+  'editor.push.overwriteBody':
+    'Någon skickade in ändringar till denna karta i kodförrådet efter att du öppnade den. Publicera ersätter hela filen och skulle ta bort dem. Använd Skicka ändringar till kodförrådets karta för att behålla dem.',
+  'editor.push.overwriteTitle': 'Ersätta nyare ändringar i kodförrådet?',
+  'editor.push.reasonBoth': 'både du och någon annan ändrade det',
+  'editor.push.reasonDeleted': 'den ena av er tog bort det och den andra ändrade det',
+  'editor.push.reasonOverlap': 'förändringen av din terräng överlappar ett nyare drag',
+  'editor.push.repoMissing': 'Kartan i kodförrådet som denna kopia kom från är borta.',
+  'editor.push.withUpgrades':
+    'En av dina ändringar gällde ett objekt som redigeraren lade till när kartan öppnades, så dess uppgraderingar sparades också.',
+  'editor.quickActions.count': '{count} valda',
+  'editor.quickActions.frame': 'Rama in',
+  'editor.quickActions.title': 'Vald resurs',
+  'editor.rock.baseTex': 'Grundtextur',
+  'editor.rock.chainCount': '{count} punkter lagda',
+  'editor.rock.chainHint':
+    'Klicka för att lägga blå punkter; Generera drar EN sammanslagen solid kropp genom dem (överbryggar sänkor i en rak linje) plus gångbara ovansidor, så att kedjan fungerar som bro eller ås. Punkterna finns kvar efter Generera: flytta eller skala en med manipulatorerna så följer kroppen med.',
+  'editor.rock.chainMode': 'Bro-/åsläge',
+  'editor.rock.chainTooShort': 'Lägg minst två punkter först.',
+  'editor.rock.clearChain': 'Rensa punkter',
+  'editor.rock.depth': 'Nedsänkningsdjup',
+  'editor.rock.detail': 'Formdetalj',
+  'editor.rock.generateChain': 'Generera klippås',
+  'editor.rock.height': 'Höjd',
+  'editor.rock.hint':
+    'Klicka på marken för att odla ett procedurellt stenblock där. Reglagen nedan formar NÄSTA sten; välj en placerad sten med markeringsverktyget för att forma om den direkt. Använd manipulatorn för att sträcka stenar till block och klipplattor.',
+  'editor.rock.jag': 'Kantighet',
+  'editor.rock.noise': 'Brusmängd',
+  'editor.rock.reroll': 'Slumpa om formen',
+  'editor.rock.selTitle': 'Genererad sten',
+  'editor.rock.sharp': 'Skärpa',
+  'editor.rock.texBare': 'Bar (kan tonas)',
+  'editor.rock.texSandstone': 'Sandsten',
+  'editor.rock.texStone': 'Sten',
+  'editor.rock.texture': 'Textur',
+  'editor.rock.title': 'Stengenerator',
+  'editor.rock.walkable': 'Gångbar ovansida',
+  'editor.scene.count': '{n} objekt',
+  'editor.scene.hiddenBadge': 'dold',
+  'editor.scene.hideTitle': 'Dölj detta objekt i redigeraren (det finns fortfarande på kartan)',
+  'editor.scene.hint':
+    'Alla placerade objekt. Klicka för att välja, dubbelklicka på ett namn för att byta namn.',
+  'editor.scene.isolateTitle': 'Isolera {zone}: avlasta allt utanför denna zon (bara vy)',
+  'editor.scene.none': 'Inga objekt placerade ännu.',
+  'editor.scene.pinTitle': 'Fokusera kameran på detta objekt och välj det',
+  'editor.scene.renameLabel': 'Objektnamn',
+  'editor.scene.residentBadge': 'inläst',
+  'editor.scene.showTitle': 'Visa detta objekt igen',
+  'editor.scene.streamGuide': 'Visa den inlästa områdesgränsen',
+  'editor.scene.streamGuideHint':
+    'Ritar ljusröda väggar där de inlästa zonerna slutar så att kanten på det strömmade området syns i stället för att behöva gissas.',
+  'editor.scene.title': 'Scensamling',
+  'editor.scene.zoneLockTitle':
+    'Lås denna zon som inläst: stanna här tills du låser upp, oavsett vad kameran gör',
+  'editor.scene.zoneStream': 'Strömma zonerna nära kameran',
+  'editor.scene.zoneStreamAt':
+    'Strömmar {zone} ({count} zoner). Flyg bort från dem för att läsa in nästa uppsättning.',
+  'editor.scene.zoneStreamHint':
+    'Behåll de {count} zonerna närmast kameran inlästa och byt hela uppsättningen när du flyger bort från dem.',
+  'editor.scene.zoneStreamLocked': 'Låst på {zone}. Lås upp för att följa kameran igen.',
+  'editor.scene.zoneStreamOn': 'Strömmar {zone}: {count} zoner inlästa, allt annat avlastat.',
+  'editor.scene.zoneUnlockTitle': 'Lås upp: följ kameran in i nästa zon igen',
+  'editor.sculpt.alphaHint':
+    'Alfamasker formar den faktiska terrängytan och förblir identiska i redigeraren och speltestet.',
+  'editor.sculpt.alphaNone': 'Rund',
+  'editor.sculpt.alphaTitle': 'Skulpteringsmask',
+  'editor.sculpt.autoTex': 'Automatisk textur efter vinkel',
+  'editor.sculpt.autoTexAngle': 'Brant från (grader)',
+  'editor.sculpt.autoTexFlat': 'Textur för plan mark',
+  'editor.sculpt.autoTexHint':
+    'Varje drag målar om det skulpterade området efter markvinkel: en textur under tröskeln och en annan över den (omedelbara klippor).',
+  'editor.sculpt.autoTexNone': 'Lämna som det är',
+  'editor.sculpt.autoTexSteep': 'Textur för brant mark',
+  'editor.sculpt.grab': 'Greppa / dra (ormkrok)',
+  'editor.sculpt.grabHint':
+    'Tryck för att greppa marken under penseln och dra sedan så följer terrängen markören i valfri riktning: upp lyfter den, ned trycker in den och i sidled skjuter den över kartan, som att dra i lera. Ett grepp är ett ångrasteg. Penselstorleken anger hur stor bit du drar.',
+  'editor.sculpt.hardness': 'Penselhårdhet',
+  'editor.sculpt.hint': 'Dra för att höja marken; kryssa i rutan för att skära nedåt i stället.',
+  'editor.sculpt.lower': 'Sänk i stället för att höja',
+  'editor.sculpt.shapeTitle': 'Penselform',
+  'editor.sculpt.shiftHint':
+    'Håll Shift medan du drar för att göra motsatsen (höj blir sänk och tvärtom).',
+  'editor.selection.collisionBaked':
+    'Blockerar med den förberäknade modellformen ({count} lådor som följer nätet). Dra radiereglaget för att åsidosätta med en enkel cirkel; Automatiskt återställer den förberäknade formen.',
+  'editor.selection.collisionCopied': 'Kopierade kollision till {count} {name}.',
+  'editor.selection.collisionCopyAll': 'Kopiera kollision till alla {name} ({count})',
+  'editor.selection.collisionCopyAllHint':
+    'Ger alla andra {name} på kartan samma kollisionstyp och form, anpassad till varje kopia så att en liten aldrig får en jättestor markyta.',
+  'editor.selection.collisionCopyConfirm': 'Kopiera till alla',
+  'editor.selection.collisionCopyConfirmBody':
+    'Alla {count} andra {name} på kartan får denna kollisionstyp och form, anpassad till respektive skala (en liten kopia får en liten markyta, aldrig denna), som ersätter deras egen. Ctrl+Z ångrar hela kopieringen.',
+  'editor.selection.collisionCopyConfirmTitle': 'Kopiera kollision till alla {name}?',
+  'editor.selection.collisionCustom':
+    'Egen markyta (cirkel/kvadrat), åsidosätter den förberäknade modellformen. Tryck på Automatiskt för att återställa den.',
+  'editor.selection.collisionEdited':
+    'Egna träffvolymer ({count} lådor). Simuleringen blockerar med exakt dessa.',
+  'editor.selection.collisionTitle': 'Kollision',
+  'editor.selection.collisionType': 'Kollisionstyp',
+  'editor.selection.collisionTypeBaked': 'Förberäknade träffvolymer',
+  'editor.selection.collisionTypeBasic': 'Grundläggande (radie)',
+  'editor.selection.collisionTypeMesh': 'Äkta kollision (tung)',
+  'editor.selection.collisionTypeNone': 'Ingen kollision',
+  'editor.selection.combine': 'Kombinera ({count})',
+  'editor.selection.combineGrouped': 'Grupperade {count} placeringar.',
+  'editor.selection.combineHint':
+    'Sammanfogar markeringen till ett objekt. Delarna i en uppdelad byggnad blir byggnaden igen; allt annat grupperas så att det väljs, dras och tas bort som en enhet.',
+  'editor.selection.combineNeedsTwo': 'Välj minst två placeringar att kombinera.',
+  'editor.selection.combineRejoined': 'Sammanfogade till {name} igen.',
+  'editor.selection.heightHint': 'Negativa förskjutningar sänker resurser under deras bas.',
+  'editor.selection.heightOffset': 'Höjdförskjutning (yard)',
+  'editor.selection.heightStep': 'Steg (yard)',
+  'editor.selection.hitboxAdd': 'Lägg till träffvolym',
+  'editor.selection.hitboxCap': 'Gränsen för träffvolymer har nåtts ({max} per resurs).',
+  'editor.selection.hitboxClearPreset': 'Rensa sparad förinställning',
+  'editor.selection.hitboxDelete': 'Ta bort valda',
+  'editor.selection.hitboxDone': 'Avsluta redigering',
+  'editor.selection.hitboxEdit': 'Redigera träffvolymer',
+  'editor.selection.hitboxHint':
+    'Klicka på en träffvolym för att välja den; Ctrl/Shift+klick väljer flera. Använd Flytta, Rotera och Skala (eller manipulatorn) för att forma dem som andra objekt. Delete tar bort valda lådor; Esc lämnar redigeringsläget.',
+  'editor.selection.hitboxPresetCleared': 'Förinställning för träffvolymer rensad.',
+  'editor.selection.hitboxPresetHint':
+    'Förinställningar finns på denna enhet: varje framtida placering av resursen skapas med de sparade träffvolymerna.',
+  'editor.selection.hitboxPresetSaved':
+    'Förinställning för träffvolymer sparad för {name}. Nya placeringar kopierar dessa lådor.',
+  'editor.selection.hitboxReset': 'Återställ till förberäknad',
+  'editor.selection.hitboxSavePreset': 'Spara som förinställning',
+  'editor.selection.hitboxSelected': '{count} träffvolymer valda',
+  'editor.selection.lowerAsset': 'Sänk',
+  'editor.selection.meshBakeDone': 'Äkta kollision redo ({count} lådor).',
+  'editor.selection.meshBakeFailed': 'Kunde inte förberäkna äkta kollision för denna resurs.',
+  'editor.selection.meshBaking': 'Förberäknar äkta kollision från modellnätet...',
+  'editor.selection.meshHint':
+    'Äkta kollision bygger om träffvolymerna från det faktiska modellnätet (många små lådor). Dyrt, spara det till undantagsfall; förberäknas en gång per resurs när den väljs.',
+  'editor.selection.meshReady':
+    'Äkta kollision aktiv: en tät låduppsättning som följer det riktiga modellnätet.',
+  'editor.selection.multiCount': '{count} resurser valda',
+  'editor.selection.multiHint':
+    'Flyttning, duplicering med Shift+D och Delete gäller hela markeringen; Shift+klick lägger till eller tar bort resurser.',
+  'editor.selection.pieces': 'Redigera delar ({count})',
+  'editor.selection.piecesCap':
+    'Inte tillräckligt med placeringsutrymme för att dela upp byggnaden.',
+  'editor.selection.piecesDone': 'Uppdelad i {count} delar.',
+  'editor.selection.piecesHint':
+    'Delar upp denna Blender-byggda byggnad i sina satsdelar och sitt skal, var och en en egen placering att flytta, rotera, skala eller ta bort. Ctrl+Z sätter ihop byggnaden igen.',
+  'editor.selection.raiseAsset': 'Höj',
+  'editor.selection.scaleAllButton': 'Skala alla {name} ({count})',
+  'editor.selection.scaleAllConfirm': 'Skala alla',
+  'editor.selection.scaleAllConfirmBody':
+    'Var och en av de {count} {name} på kartan (inklusive denna) får en slumpmässig skala mellan {min} och {max} som ersätter den nuvarande. Ctrl+Z ångrar det.',
+  'editor.selection.scaleAllConfirmTitle': 'Skala alla {name}?',
+  'editor.selection.scaleAllDone': 'Skalade {count} {name}.',
+  'editor.selection.scaleAllHint':
+    'Slumpar en skala mellan min och max för varje kopia av denna resurs (ange samma min och max för en enhetlig skala).',
+  'editor.selection.scaleAllTitle': 'Skala alla kopior',
+  'editor.selection.scaleMax': 'Högsta skala',
+  'editor.selection.scaleMin': 'Lägsta skala',
+  'editor.selection.selectAllOfAsset': 'Välj alla av denna resurs ({count})',
+  'editor.selection.selectAllOfAssetTitle':
+    'Välj varje placering av denna resurs på kartan så att en flytt, borttagning eller egenskapsändring gäller alla.',
+  'editor.selection.setGround': 'Placera på marken',
+  'editor.selection.setGroundTitle':
+    'Sätt tillbaka de valda resurserna på terrängen under dem och ta bort eventuell svävning eller höjning',
+  'editor.selection.snapGround': 'Fäst vid marken under förflyttning',
+  'editor.selection.squareCollision': 'Kvadratisk kollision (följer rotation)',
+  'editor.selection.sway': 'Vindsvaj',
+  'editor.selection.swayHint':
+    'Låter resursen svaja i vinden. På som standard för växter. Gäller VARJE placering av denna resurs på kartan, inte bara den valda.',
+  'editor.selection.ungroup': 'Avgruppera ({count})',
+  'editor.selection.ungroupDone': 'Avgrupperade {count} placeringar.',
+  'editor.settings.applyGraphics': 'Ladda om redigeraren för att tillämpa',
+  'editor.settings.graphicsHigh': 'Hög',
+  'editor.settings.graphicsHint': 'Gäller nästa speltest och redigeraren efter omladdning.',
+  'editor.settings.graphicsLow': 'Låg',
+  'editor.settings.graphicsMedium': 'Medel',
+  'editor.settings.graphicsTitle': 'Grafikkvalitet',
+  'editor.settings.graphicsUltra': 'Ultrahög',
+  'editor.settings.hint':
+    'Grafik och ljud för redigeraren och speltestet. Samma inställningar som spelet använder, sparade i denna webbläsare.',
+  'editor.settings.music': 'Spela musik',
+  'editor.settings.musicVolume': 'Musikvolym',
+  'editor.settings.sfxVolume': 'Effektvolym',
+  'editor.settings.soundTitle': 'Ljud',
+  'editor.slope.clearStart': 'Rensa start',
+  'editor.slope.hint':
+    'Högerklicka på marken där sluttningen ska börja. Tryck sedan där den ska sluta och dra längs banan: marken övergår mjukt till en jämn ramp mellan de två höjderna.',
+  'editor.slope.needStart': 'Högerklicka först på marken för att ange var sluttningen börjar.',
+  'editor.slope.noStart': 'Ingen start angiven ännu. Högerklicka på marken för att ange en.',
+  'editor.slope.start': 'Starthöjd: {height} yard',
+  'editor.slope.startPicked': 'Sluttningens start angiven på {height} yard.',
+  'editor.soundTool.capReached': 'Gränsen för punktljud har nåtts ({max}).',
+  'editor.soundTool.clip': 'Ljudeffekt',
+  'editor.soundTool.deleteTitle': 'Ta bort detta ljud',
+  'editor.soundTool.height': 'Höjd (yard)',
+  'editor.soundTool.hint':
+    'Klicka på marken för att placera en upprepad ljudkälla, välj sedan ett klipp och ange dess högsta volym och radie. Avtoningsklotet visar hur långt det hörs; det spelas rumsligt i speltest.',
+  'editor.soundTool.none': 'Inga punktljud ännu.',
+  'editor.soundTool.radius': 'Radie (yard)',
+  'editor.soundTool.selectTitle':
+    'Välj detta ljud i världen (märket förstoras; Delete tar bort det)',
+  'editor.soundTool.soundN': 'Ljud {num}',
+  'editor.soundTool.title': 'Punktljud',
+  'editor.soundTool.volume': 'Högsta volym',
+  'editor.spawn.area': 'Startområde: {width} x {height} yard',
+  'editor.status.bundleExported':
+    'Exporterade "{name}" med modeller, texturer och himmelsbakgrund. Importera .wocmap.zip (inte en lös .json) på den andra datorn.',
+  'editor.status.caveCapReached':
+    'Grottgränsen har nåtts ({max}). Ta bort eller ångra en grotta först.',
+  'editor.status.entityCapReached':
+    'Kartans gräns för varelser nåddes. Vissa kopierade NPC:er eller fiender klistrades inte in.',
+  'editor.status.exportBlockedInvalid':
+    'Export blockerad eftersom kartan inte klarade motorns kompatibilitetskontroll. Spara en kopia och granska de senaste ändringarna innan du försöker igen.',
+  'editor.status.exportBlockedMissingDeps':
+    'Export blockerad: {count} refererade modell-, textur- eller himmelsfiler saknas i denna webbläsare. Återställ dem före export så att motorn får en komplett karta.',
+  'editor.status.holeCapReached':
+    'Hålgränsen har nåtts ({max}). Ta bort eller ångra ett hål först.',
+  'editor.status.importMissingDeps':
+    '{count} modell-/textur-/himmelsfiler saknas, så delar av kartan är tomma. Importera .wocmap.zip-paketet igen för att få med dem.',
+  'editor.status.loading3dAssets': 'Läser in resurser...',
+  'editor.status.loading3dEngine': 'Startar motorn...',
+  'editor.status.loading3dZone': 'Bygger världen...',
+  'editor.status.newFlatMap': 'Tom karta påbörjad.',
+  'editor.status.openFailedLocal':
+    'Den sparningen kunde inte läsas (skadad eller avklippt). Filen kan fortfarande gå att importera via Mer > Importera om du exporterade en kopia.',
+  'editor.status.publishedMapOpened':
+    'Öppnade din publicerade "{name}": detta är versionen som spelet levererar för den kartan.',
+  'editor.status.selectionCopied': 'Kopierade {count} valda objekt.',
+  'editor.status.selectionNothingToCopy': 'Välj en resurs, NPC eller fiende innan du kopierar.',
+  'editor.status.selectionNothingToPaste':
+    'Kopiera en resurs, NPC eller fiende innan du klistrar in.',
+  'editor.status.selectionPasted': 'Klistrade in {count} objekt.',
+  'editor.status.shippedMapOpened': 'Öppnade en redigerbar kopia av "{name}".',
+  'editor.status.waterReapplied': 'Vattnet byggdes om från aktuell terräng.',
+  'editor.tool.build': 'Bygg modell',
+  'editor.tool.building': 'Byggläge',
+  'editor.tool.city': 'Stadsbygge',
+  'editor.tool.clutter': 'Måla småföremål',
+  'editor.tool.collider': 'Kollisionsform',
+  'editor.tool.decal': 'Dekal',
+  'editor.tool.entity': 'Flytta NPC:er och fiender',
+  'editor.tool.eyedropper': 'Pipett',
+  'editor.tool.fluid': 'Vätskepöl',
+  'editor.tool.foliage': 'Måla växtlighet',
+  'editor.tool.grassClear': 'Ta bort gräs',
+  'editor.tool.light': 'Punktljus',
+  'editor.tool.meshFix': 'Nätreparation',
+  'editor.tool.pond': 'Damm',
+  'editor.tool.rock': 'Stengenerator',
+  'editor.tool.rotate': 'Rotera',
+  'editor.tool.slope': 'Sluttning',
+  'editor.tool.sound': 'Punktljud',
+  'editor.tool.tree': 'Trädgenerator',
+  'editor.tool.tunnel': 'Grottor',
+  'editor.toolGroup.assets': 'Resurser',
+  'editor.toolGroup.effects': 'Effekter',
+  'editor.toolGroup.terrain': 'Terräng',
+  'editor.toolGroup.world': 'Värld',
+  'editor.topbar.axisGimbal': 'Kameraorientering',
+  'editor.topbar.axisGimbalTitle': 'Visa eller dölj kamerans orienteringsindikator',
+  'editor.topbar.dungeon': 'Fängelsehåla',
+  'editor.topbar.dungeonTitle': 'Redigera en skapad interiörlayout för en fängelsehåla',
+  'editor.topbar.evenBuildings': 'Jämna ut byggnader',
+  'editor.topbar.evenBuildingsDone': 'Jämnade ut {count} byggnader.',
+  'editor.topbar.evenBuildingsNone': 'Inga tillplattade byggnader hittades.',
+  'editor.topbar.evenBuildingsTitle':
+    'Rätta byggnader som sträckts i sidled för att fylla sin tomt: var och en behåller höjd och markyta men bredd och djup görs lika så att den slutar se tillplattad ut',
+  'editor.topbar.fullBuildDone': 'Alla {total} zoner inlästa.',
+  'editor.topbar.fullBuildPreview': 'Förhandsvisa hela bygget',
+  'editor.topbar.fullBuildPreviewTitle':
+    'Strömma varje zon på kartan till vyfönstret (kan ta en stund)',
+  'editor.topbar.fullBuildProgress': 'Bygger zoner: {done}/{total}',
+  'editor.topbar.generateTerrain': 'Generera terräng',
+  'editor.topbar.generateTerrainTitle':
+    'Generera kartans terräng från ett område i grundspelets värld: dra konturen över världskartan för att välja vilken del av den gamla layouten som ska användas',
+  'editor.topbar.hitboxes': 'Träffvolymer',
+  'editor.topbar.hitboxesTitle':
+    'Visa kollisionsformerna som spelet faktiskt blockerar med (blått = skapat i kollisionsverktyget, rött = automatiskt förberäknade lådor)',
+  'editor.topbar.importModel': 'Importera modell',
+  'editor.topbar.importModelTitle':
+    'Läs in en .glb- eller .gltf-modell från datorn och placera den, helt utan uppkoppling (behålls under denna session)',
+  'editor.topbar.mapWindowTitle': 'Öppna kartan över aktuell zon (med en knapp för hela världen)',
+  'editor.topbar.minimapTitle': 'Växla hörnets minikarta (vy ovanifrån som följer kameran)',
+  'editor.topbar.moreTitle':
+    'Fler åtgärder: Spara som, autospara, förgrena, importera/exportera, ladda upp',
+  'editor.topbar.musicTitle':
+    'Spela musiken för området under kameran (musikområdets spår, annars kartspåret, annars zonens eget tema). Flyg omkring så följer den dig.',
+  'editor.topbar.newFlat': 'Tom karta',
+  'editor.topbar.newFlatTitle':
+    'Börja med en helt ny tom karta utan något av grundspelets innehåll, med en storlek du väljer',
+  'editor.topbar.presetPrompt': 'Fråga om förinställningar vid bekräftelse',
+  'editor.topbar.presetPromptTitle':
+    'Efter en bekräftelse i kollisionsverktyget, fråga om lådorna också ska sparas som en förinställning för träffvolymer på denna enhet. Slå på igen om du kryssade i "Fråga inte igen".',
+  'editor.topbar.previewTitle':
+    'Se kartan som den ser ut i spelet: döljer överlägg bara för redigeraren (kollisionslådor, musikområden, markörer, ringar, manipulatorer)',
+  'editor.topbar.primaryTools': 'Huvudsakliga transformeringsverktyg',
+  'editor.topbar.projectionOrthographic': 'Ortografisk',
+  'editor.topbar.projectionPerspective': 'Perspektiv',
+  'editor.topbar.projectionTitle': 'Växla perspektiv/ortografisk projektion (Numpad 5)',
+  'editor.topbar.publishMap': 'Publicera i spelet',
+  'editor.topbar.publishMapTitle':
+    'Skriv kartan till det lokala kodförrådet som riktigt spelinnehåll (data/maps + src/sim/maps); starta den med ?map=<slug>',
+  'editor.topbar.pushMapChanges': 'Skicka ändringar till kodförrådets karta',
+  'editor.topbar.pushMapChangesTitle':
+    'Tillämpa bara det du ändrat sedan du öppnade kodförrådets karta på filen som den är nu och behåll alla andras inskickade ändringar.',
+  'editor.topbar.settingsTitle': 'Grafik- och ljudinställningar (delas med speltestet)',
+  'editor.topbar.unpublishMap': 'Ta bort från spelet',
+  'editor.topbar.unpublishMapTitle':
+    'Avinstallera kartan från det lokala spelet: tar bort filerna som Publicera skrev och återställer den vanliga ClaudeCraft-världen',
+  'editor.topbar.workspace': 'Vy',
+  'editor.topbar.workspaceTitle': 'Vy, karta, förhandsvisning och arbetslägen',
+  'editor.topbar.worldLink': 'Länka till världen',
+  'editor.topbar.worldLinkTitle':
+    'Placera kartan inne i grundspelets värld: dra dess kontur till världskartan så bäddar speltestet in den där med grundspelet igång runtomkring',
+  'editor.topbar.zoneIsolateOff': 'Hela bygget',
+  'editor.topbar.zoneIsolateOn': 'Zon: {zone}',
+  'editor.topbar.zoneIsolateTitle':
+    'Hela bygget ⇄ Zon: isolera kamerans zon, allt utanför avlastas tills du växlar tillbaka. Bara vy; kartan ändras aldrig.',
+  'editor.transform.moveHint':
+    'Dra en manipulatorpil för att flytta längs axeln eller den gula rutan för att flytta fritt. Piltangenter finjusterar.',
+  'editor.transform.pickHint':
+    'Klicka på en resurs för att välja den; manipulatorn visas på markeringen.',
+  'editor.transform.rotateHint':
+    'Dra en manipulatorring för att rotera runt axeln. Shift+rullning roterar också i steg om 15 grader.',
+  'editor.transform.scaleHint':
+    'Dra ett axelhandtag för att sträcka den axeln eller den gula mittkuben för att skala likformigt.',
+  'editor.tree.addVolume': 'Lägg till klot',
+  'editor.tree.bark': 'Barktextur',
+  'editor.tree.barkTile': 'Barkruta (yard)',
+  'editor.tree.branchAngle': 'Spridning',
+  'editor.tree.branchDepth': 'Nivåer',
+  'editor.tree.branchDroop': 'Nedhängning',
+  'editor.tree.branchLen': 'Längd',
+  'editor.tree.branchSection': 'Grenar',
+  'editor.tree.branchTaper': 'Avsmalning',
+  'editor.tree.branchTwist': 'Vresighet',
+  'editor.tree.branches': 'Per huvudgren',
+  'editor.tree.canopyHint':
+    'Löven hamnar bara inuti dessa klot. Välj en form för att placera ut dem och justera sedan spridning och storlek, eller redigera ett klot nedan för att skulptera kronan för hand.',
+  'editor.tree.canopySection': 'Kronvolymer',
+  'editor.tree.collide': 'Stammens träffvolym',
+  'editor.tree.collideHint':
+    'Stammens kollisionsradie som multipel av dess egen tjocklek. 0 låter spelare gå igenom.',
+  'editor.tree.copyToTool': 'Använd som verktygsstandard',
+  'editor.tree.editVolumes': 'Redigera klot',
+  'editor.tree.girth': 'Tjocklek',
+  'editor.tree.heightScale': 'Stamhöjd',
+  'editor.tree.hint':
+    'Klicka på marken för att odla ett träd där. Allt nedan formar NÄSTA träd; välj ett placerat träd med markeringsverktyget för att forma om det direkt.',
+  'editor.tree.leafBranchBias': 'Dra mot grenar',
+  'editor.tree.leafClump': 'Klungbildning',
+  'editor.tree.leafCross': 'Korsade bladplan',
+  'editor.tree.leafCrossHint':
+    'Två fyrkanter per löv i stället för en: dubbel kostnad, en krona med verkligt djup.',
+  'editor.tree.leafDroop': 'Nedhängning',
+  'editor.tree.leafFill': 'Fyllning',
+  'editor.tree.leafFillHint': '0 hänger löven på varje klots skal; 1 fyller det helt.',
+  'editor.tree.leafGlow': 'Glöd',
+  'editor.tree.leafJitter': 'Rotationsvariation',
+  'editor.tree.leafOrient': 'Orientering',
+  'editor.tree.leafSection': 'Löv',
+  'editor.tree.leafSet': 'Lövgrafik',
+  'editor.tree.leafSizeVar': 'Storleksvariation',
+  'editor.tree.leafTint': 'Toning',
+  'editor.tree.leafTintVar': 'Färgvariation',
+  'editor.tree.leaves': 'Antal',
+  'editor.tree.openStudio': 'Redigera i trädstudion',
+  'editor.tree.openStudioHint':
+    'Öppnar trädet ensamt i en tom scen så att du kan forma det utan en by i vägen. Behåll det när du är klar så blir det verktygets standard.',
+  'editor.tree.orient.billboard': 'Vänd mot kameran',
+  'editor.tree.orient.droop': 'Hängande',
+  'editor.tree.orient.out': 'Utåt',
+  'editor.tree.orient.random': 'Slumpmässig',
+  'editor.tree.orient.up': 'Upprätt',
+  'editor.tree.orient.volume': 'Följ kronan',
+  'editor.tree.preset': 'Förinställning',
+  'editor.tree.presetHint':
+    'En utgångspunkt för biomen. Alla inställningar förblir redigerbara efteråt.',
+  'editor.tree.randomize': 'Nytt slumpfrö',
+  'editor.tree.randomizeHint':
+    'Slumpar om grentillväxt och lövspridning utan att ändra någon inställning.',
+  'editor.tree.resetVolumes': 'Tillbaka till förinställd form',
+  'editor.tree.shape': 'Form',
+  'editor.tree.shapeName.column': 'Pelare',
+  'editor.tree.shapeName.cone': 'Kon',
+  'editor.tree.shapeName.dome': 'Kupol',
+  'editor.tree.shapeName.sockets': 'På huvudgrenarna',
+  'editor.tree.shapeName.sphere': 'Boll',
+  'editor.tree.shapeName.umbrella': 'Paraply',
+  'editor.tree.shapeName.weeping': 'Hängande',
+  'editor.tree.showVolumes': 'Visa klot',
+  'editor.tree.stats': '{leaves} löv, {branches} grenar, {height} yard högt',
+  'editor.tree.studioBanner': 'Trädstudio',
+  'editor.tree.studioHint':
+    'Forma trädet här och behåll det sedan som verktygsstandard eller kasta bort det. Kartan du kom från väntar.',
+  'editor.tree.studioKeep': 'Använd detta träd',
+  'editor.tree.studioKept': 'Trädstudions inställningar är nu verktygets standard.',
+  'editor.tree.studioMapName': 'Trädstudio',
+  'editor.tree.sway': 'Svaj',
+  'editor.tree.title': 'Trädgenerator',
+  'editor.tree.trunk': 'Grund',
+  'editor.tree.trunkSection': 'Stam',
+  'editor.tree.volumeCount': 'Klot',
+  'editor.tree.volumeJitter': 'Lägesvariation',
+  'editor.tree.volumeLabel': 'Klot {n}',
+  'editor.tree.volumeRise': 'Höjd',
+  'editor.tree.volumeScale': 'Klotstorlek',
+  'editor.tree.volumeSpread': 'Spridning',
+  'editor.tree.volumeSy': 'Sträckning',
+  'editor.tree.windSection': 'Vind och kollision',
+  'editor.tunnel.autoMouth': 'Skär sin egen mynning',
+  'editor.tunnel.autoMouthHint':
+    'Röret skär marken där det bryter igenom ytan så att du inte längre behöver passa in ett hål mot mynningen för hand. Begravda sträckor skär inget, och mark under en sträcka ovanför ytan lämnas orörd.',
+  'editor.tunnel.carveDelete': 'Ta bort urholkning',
+  'editor.tunnel.carveHint':
+    'Klicka på marken för att skapa en blå SKENBILD av kroppen, dra den på plats och justera den, tryck sedan på "Bekräfta snitt" (eller Enter) för att skära ut ett RIKTIGT rum eller en tunnel ur berget: kroppen har ett gångbart golv, bergväggar och tak, och bygger om marknätet runt sig. Ett klot skapar en kammare, en lutad kapsel borrad in i en sluttning skapar en tunnel, en låda en sal; höj Blandning så smälter närliggande urholkningar ihop till en ren grotta. Gå in genom valfri sida som bryter ytan.',
+  'editor.tunnel.carveLabel': 'Urholkning {n}',
+  'editor.tunnel.carveList': 'Urholkningar',
+  'editor.tunnel.caveLabel': 'Grotta {n} ({nodes} punkter)',
+  'editor.tunnel.cutArch': 'Valv',
+  'editor.tunnel.cutBend': 'Böjning',
+  'editor.tunnel.cutBlend': 'Blandning',
+  'editor.tunnel.cutBrush': 'Nästa snitt',
+  'editor.tunnel.cutDepth': 'Djup',
+  'editor.tunnel.cutHeight': 'Höjd',
+  'editor.tunnel.cutLength': 'Längd',
+  'editor.tunnel.cutPitch': 'Lutning',
+  'editor.tunnel.cutShape.box': 'Låda',
+  'editor.tunnel.cutShape.capsule': 'Kapsel',
+  'editor.tunnel.cutShape.sphere': 'Boll',
+  'editor.tunnel.cutShape.tube': 'Grottmynning (från borrhålet)',
+  'editor.tunnel.cutShape.voxel': 'Urgrävt berg',
+  'editor.tunnel.cutTaper': 'Avsmalning',
+  'editor.tunnel.cutWarp': 'Vågighet',
+  'editor.tunnel.cutWarpScale': 'Vågstorlek',
+  'editor.tunnel.cutWobble': 'Vickning',
+  'editor.tunnel.cutWobbleLen': 'Vickningslängd',
+  'editor.tunnel.cutYaw': 'Vridning',
+  'editor.tunnel.delete': 'Ta bort grotta',
+  'editor.tunnel.digAlpha.crescent': 'Månskära',
+  'editor.tunnel.digAlpha.halfmoon': 'Halvmåne',
+  'editor.tunnel.digAlpha.ragged': 'Ojämn',
+  'editor.tunnel.digAlpha.round': 'Rund',
+  'editor.tunnel.digAlphaLabel': 'Penselns alfamask',
+  'editor.tunnel.digCell': 'Grävdetalj (cellstorlek i yard)',
+  'editor.tunnel.digCellCoarsened':
+    'Grävdetaljen angiven till {cell} yard för denna penselstorlek (en finare cell skulle inte rymmas inom volymbudgeten).',
+  'editor.tunnel.digCellHint':
+    'Drag förberäknas direkt i kartan som en bergvolym med denna cellstorlek (finare kostar mer minne och fler trianglar). Cellen låses när det första draget läggs.',
+  'editor.tunnel.digClear': 'Rensa urgrävt berg',
+  'editor.tunnel.digNoise': 'Kantbrus',
+  'editor.tunnel.digVolumeFull':
+    'Den urgrävda bergvolymen är så stor som en karta kan rymma; rensa den eller gräv närmare det som redan är urgrävt.',
+  'editor.tunnel.endOpen': 'Utgång öppen',
+  'editor.tunnel.eraseConfirm': 'Sudda bort grottor',
+  'editor.tunnel.eraseDone': 'Suddade bort {n} grottposter inuti lådan',
+  'editor.tunnel.eraseGhostHint':
+    'Lådan står där du klickade; klicka igen för att flytta den. Allt grottliknande inuti försvinner när du bekräftar.',
+  'editor.tunnel.eraseHalf': 'Halv bredd (yard)',
+  'editor.tunnel.eraseNothing': 'Inga grottor inuti lådan',
+  'editor.tunnel.eraseTitle': 'Suddningslåda',
+  'editor.tunnel.fillHint':
+    'Klicka på marken för att placera en SUDDNINGSLÅDA, ändra storlek med reglagen eller manipulatorn (valfri bredd, längd och höjd), tryck sedan på "Sudda bort grottor" (eller Enter): varje urholkning, hål och grävd volym inuti lådan tas bort, och en urholkning som bara delvis täcks fylls tillbaka till fast berg där den täcks. Ett ångrasteg.',
+  'editor.tunnel.floorVariance': 'Golvojämnheter',
+  'editor.tunnel.generate': 'Generera grotta ({count} redo)',
+  'editor.tunnel.ghostConfirm': 'Bekräfta snitt',
+  'editor.tunnel.ghostGizmoHint':
+    'Tryck på 2, 3 eller 4 (Flytta, Rotera, Skala) för att dra skenbilden med manipulatorn och återvänd sedan till grottverktyget för att skära.',
+  'editor.tunnel.ghostHint':
+    'Den blå skenbilden är kroppen som snittet tar bort. Dra den på plats (klicka eller håll var som helst på marken), justera storlek, form och djup nedan och tryck sedan på "Bekräfta snitt" (eller Enter) för att utföra det, eller Avbryt / Escape för att kasta bort det. Inget tas bort förrän du bekräftar.',
+  'editor.tunnel.ghostLockHint':
+    'Enter bekräftar snittet, Escape kastar bort det. Verktyg 2-4 flyttar, vrider och skalar skenbilden först.',
+  'editor.tunnel.ghostTitle': 'Väntande snitt',
+  'editor.tunnel.guideHint':
+    'Blå noder förenade av en prickad linje är din grottmodell (synlig i varje verktyg). Flytta en nod med flyttverktyget, höj eller sänk den med Y-pilen och skala den för att bredda grottan där; röret genereras om direkt och behåller ALLTID exakt storleken du angav. Grön boll = ingång, röd pil = utgång.',
+  'editor.tunnel.height': 'Invändig höjd',
+  'editor.tunnel.hint':
+    'Klicka på marken för att placera INGÅNGSNODEN, fortsätt klicka för att lägga blå vägpunkter (den sista är utgången) och tryck sedan på Generera. Grottan är ett fristående rör byggt bara av dina noder; den omgivande terrängen klämmer aldrig ihop eller formar om det. Slå på "Skär sin egen mynning" så öppnar röret marken där det bryter ytan; annars använd läget Skär hål och flytta röret på plats med Välj hela grottan + flyttverktyget.',
+  'editor.tunnel.holeDelete': 'Ta bort snitt',
+  'editor.tunnel.holeHint':
+    'Klicka på marken för att skapa en blå SKENBILD av snittet, dra den på plats och tryck sedan på "Skär ned i marken" för att slå det rakt genom terrängnätet. Marken upphör att finnas där och nätet bygger en bergkant runt öppningen, så passa in en grottmynning undertill för att kunna gå eller falla in. Välj form först: ett klot, en riktad låda för en springa eller dörröppning, eller en kapsel för ett valv. Ändra storlek på eller ta bort valfritt bekräftat snitt nedan; ångra tar bort det senaste.',
+  'editor.tunnel.holeLabel': 'Snitt {n}',
+  'editor.tunnel.holeList': 'Snitt',
+  'editor.tunnel.listTitle': 'Grottor',
+  'editor.tunnel.modeCarve': 'Urholka',
+  'editor.tunnel.modeDig': 'Gräv grotta',
+  'editor.tunnel.modeFill': 'Fyllpensel',
+  'editor.tunnel.modeHole': 'Skär hål',
+  'editor.tunnel.modePatch': 'Laga hål',
+  'editor.tunnel.modeRemesh': 'Bygg om nät',
+  'editor.tunnel.modeSculpt': 'Grävpensel',
+  'editor.tunnel.modeSmooth': 'Jämna ut',
+  'editor.tunnel.mouthBlend': 'Mynningsblandning',
+  'editor.tunnel.needExit':
+    'Ingång placerad. Fortsätt klicka för att lägga banan (sista punkten är utgången) och tryck sedan på Generera.',
+  'editor.tunnel.noRig': 'Grottan har inga riggnoder att greppa; lägg en ny grotta i stället.',
+  'editor.tunnel.patchDelete': 'Ta bort lagning',
+  'editor.tunnel.patchHint':
+    'Klicka på marken för att lägga en lagning (lika bred som penselradien, samma former som ett snitt) som FYLLER tillbaka marken där snitt överlappar den; använd den för att trimma tomma delar runt varje snitt. En lagning har alltid företräde framför snitten den berör. Ändra storlek på eller ta bort valfri lagning nedan; ångra tar bort den senaste.',
+  'editor.tunnel.patchLabel': 'Lagning {n}',
+  'editor.tunnel.patchList': 'Lagningar',
+  'editor.tunnel.remeshAll': 'Bygg om alla grottnät',
+  'editor.tunnel.remeshAllHint':
+    'En cellstorlek för varje urholkning och grävd volym på kartan: större celler ger mycket färre trianglar. Gäller hela kartan samtidigt och bygger om nätet; regionerna nedan kan fortfarande förfina eller grova till enskilda platser ovanpå detta.',
+  'editor.tunnel.remeshAllTitle': 'Bygg om alla grottnät',
+  'editor.tunnel.remeshCell': 'Detalj (cellstorlek i yard)',
+  'editor.tunnel.remeshDelete': 'Ta bort region',
+  'editor.tunnel.remeshGlobal': 'Grottnätets detalj (cellstorlek i yard)',
+  'editor.tunnel.remeshHint':
+    'Klicka för att måla en DETALJREGION (lika bred som penselradien): varje urholkning den berör får nätet ombyggt med vald cellstorlek, finare ELLER grövre än standarden. Använd fin topologi precis där en grotta behöver se ren ut; öka cellstorleken för att glesa ut en för dyr urholkning. Finare celler kostar fler trianglar.',
+  'editor.tunnel.remeshLabel': 'Region {n} ({r} yard, celler på {cell} yard)',
+  'editor.tunnel.remeshList': 'Detaljregioner',
+  'editor.tunnel.remeshRegionsTitle': 'Detaljregioner (pensel)',
+  'editor.tunnel.reverse': 'Byt ingång/utgång',
+  'editor.tunnel.sculptHint':
+    'Dra över en urholkad vägg, golv eller tak för att GRÄVA bort berg, som med en lerpensel: varje drag skär en mjukt blandad kanal med stämpelstorleken (anges av penselradien). Dra på öppen mark för att gröpa ur ytan. Ett ångrasteg per drag.',
+  'editor.tunnel.selectCave': 'Välj hela grottan',
+  'editor.tunnel.smoothHint':
+    'Dra längs en grävd kant för att JÄMNA UT den: varje drag höjer Blandning för varje snitt och fyllning under penseln så att veck och klumpar längs ett grävdrag smälter till en rundad yta. Ett ångrasteg per drag.',
+  'editor.tunnel.spikeSize': 'Formationsstorlek',
+  'editor.tunnel.stalactites': 'Takdroppstenar',
+  'editor.tunnel.stalagmites': 'Golvdroppstenar',
+  'editor.tunnel.startOpen': 'Ingång öppen',
+  'editor.tunnel.texDefault': 'Granit (standard)',
+  'editor.tunnel.texture': 'Invändig textur',
+  'editor.tunnel.tooShort':
+    'Riggpunkterna ligger för nära varandra; sprid dem minst några yard från varandra.',
+  'editor.tunnel.variance': 'Varians',
+  'editor.tunnel.width': 'Bredd',
+  'editor.water.hue': 'Nyans',
+  'editor.water.light': 'Ljushet',
+  'editor.water.placeWaterfall': 'Placera vattenfall',
+  'editor.water.placeWaterfallTitle':
+    'Förbered placeringsverktyget med ett animerat vattenfall (klicka på en klippa för att placera det)',
+  'editor.water.tintReset': 'Återställ toning',
+  'editor.water.tintTitle': 'Vattentoning',
+  'editor.water.waterfallHint':
+    'En animerad fallande vattenyta med en skumpöl. Skala upp den längs en klippa med S eller manipulatorn; sträck bara höjden med Y-skalhandtaget.',
+  'editor.water.waterfallLabel': 'Vattenfall',
+  'editor.water.waterfallTitle': 'Vattenfall',
+  'editor.weather.addStep': 'Lägg till steg',
+  'editor.weather.addStepTitle':
+    'Växla genom stegen i ordning, låt varje steg vara sina minuter och upprepa sedan',
+  'editor.weather.aurora': 'Norrsken',
+  'editor.weather.auroraHint':
+    'Ridåer hänger högt ovanför kameran vart den än går: starkast på natten, svaga på dagen.',
+  'editor.weather.auto': 'Automatiskt',
+  'editor.weather.blizzard': 'Snöstorm',
+  'editor.weather.clear': 'Klart',
+  'editor.weather.cloudCover': 'Molntäcke',
+  'editor.weather.cloudHeight': 'Molnhöjd (yard)',
+  'editor.weather.cloudHint': 'Låga moln följer terrängen och ser ut som rullande markdimma.',
+  'editor.weather.intensity': 'Intensitet',
+  'editor.weather.rain': 'Regn',
+  'editor.weather.removeStep': 'Ta bort detta steg',
+  'editor.weather.scheduleHint':
+    'Stegen upprepas i ordning (Regn 5 min, sedan Klart 10 min, ...). Sparas med kartan och körs i speltest.',
+  'editor.weather.scheduleTitle': 'Dynamiskt väder',
+  'editor.weather.scheduleWins': 'Ett schema körs: det åsidosätter det fasta vädret ovan.',
+  'editor.weather.showSnowfall': 'Visa snöfall',
+  'editor.weather.snow': 'Snö',
+  'editor.weather.snowfallHint':
+    'En förhandsvisningsinställning för studion, ihågkommen i denna webbläsare.',
+  'editor.weather.sparkle': 'Gyllene gnistor',
+  'editor.weather.stepMinutes': 'Minuter som steget varar',
+  'editor.weather.stepMode': 'Väder för detta steg',
+  'editor.weather.title': 'Väder',
+  'editor.weather.zoneHint':
+    'Denna zons väder åsidosätter hela kartans himmel medan spelaren är i den så att ett rike kan ha egna stormar.',
+  'editor.weather.zoneTitle': 'Väder i denna zon',
+  'editor.worldLink.dragHint':
+    'Dra den gyllene rektangeln för att placera kartan. Punkten markerar din startpunkt.',
+  'editor.worldLink.hint':
+    'Dra kartans kontur till platsen där den ska ligga i grundspelets värld. Speltestet stämplar kartans terräng, placeringar och startpunkter just där, med världens egna fiender, NPC:er och uppdrag igång runtomkring. Du kan också placera den i öppna havet bortom den gamla världens kanter: kartan reser sig där som nytt land. Ditt redigeringsutrymme förblir exakt som det är; bara speltestet använder länken.',
+  'editor.worldLink.linked': 'Kartan länkad till världen vid ({x}, {z}).',
+  'editor.worldLink.save': 'Spara länk',
+  'editor.worldLink.standaloneOnly':
+    'Bara fristående skapade kartor kan länkas till världen (öppna en tom karta eller importera en först).',
+  'editor.worldLink.statusLinked': 'Länkad: kartans origo ligger vid ({x}, {z}) i världen.',
+  'editor.worldLink.statusUnlinked': 'Fristående: kartan speltestas som en egen separat plats.',
+  'editor.worldLink.title': 'Länka till världen',
+  'editor.worldLink.unlinked': 'Kartlänken borttagen: den speltestas fristående igen.',
+  'editor.zoneTool.deleteTitle': 'Ta bort denna plats',
+  'editor.zoneTool.hideBoxes': 'Dölj områdesrutor',
+  'editor.zoneTool.hint':
+    'Dra en ruta på marken och namnge den: när du står inuti visas namnet som plats i speltest.',
+  'editor.zoneTool.namePrompt': 'Platsnamn',
+  'editor.zoneTool.none': 'Inga namngivna platser ännu.',
+  'editor.zoneTool.title': 'Namngivna platser',
+  'referralCards.accept': 'Acceptera',
+  'referralCards.awarded': 'Tilldelad',
+  'referralCards.bankBonus': 'Slutförda stämpelkort',
+  'referralCards.bankBonusHelp':
+    'Hjälp två bundna vänner att slutföra sina stämpelkort för att låsa upp 20 permanenta bankplatser.',
+  'referralCards.browseCards': 'Bläddra bland alla stämpelkortssidor',
+  'referralCards.cardBetween': '{you} och {friend}',
+  'referralCards.celebration.continue': 'Fortsätt äventyra',
+  'referralCards.celebration.earned': 'Äventyr belönat',
+  'referralCards.celebration.title': 'Belöning hämtad!',
+  'referralCards.celebration.titleReward': 'Titel upplåst: {title}',
+  'referralCards.celebration.together': 'Förtjänad tillsammans med {friend}.',
+  'referralCards.close': 'Stäng Värva en vän',
+  'referralCards.completion': 'Grattis! {friend} slutförde sitt stämpelkort med din hjälp.',
+  'referralCards.confirmLock': 'Ja, lås detta kort',
+  'referralCards.confirmMove': 'Ja, flytta mitt kort',
+  'referralCards.decline': 'Avböj',
+  'referralCards.declineConfirmed':
+    'Kortet startades inte. Du kan börja från stämpelkortsmenyn medan båda karaktärerna fortfarande uppfyller kraven.',
+  'referralCards.declinePrompt':
+    'Är du säker på att du vill avböja? Du kan börja senare från stämpelkortsmenyn medan båda karaktärerna fortfarande uppfyller kraven.',
+  'referralCards.empty':
+    'Bjud in en ny spelare för att påbörja ert första stämpelkort tillsammans.',
+  'referralCards.emptyStamp': 'Inte förtjänad ännu',
+  'referralCards.fallback':
+    'Har du redan slutfört ett milstolpeuppdrag ensam? Gå med din vän i en grupp igen för stämpeln från Introduktionsön. För senare uppdragsstämplar, klara motsvarande fängelsehåla tillsammans.',
+  'referralCards.firstPage': 'Första sidan',
+  'referralCards.friendTier': 'Hjälpta vänner: {count}',
+  'referralCards.friendshipAura': 'Vänskap',
+  'referralCards.friendshipUse':
+    'Öka din styrka, smidighet, uthållighet, intelligens och ande med {stats} i {duration} sekunder.',
+  'referralCards.inviteHelp':
+    'Dela länken med en vän innan personen skapar sitt konto. Bara nya konton skapade genom din länk blir bundna vänner.',
+  'referralCards.inviteLabel': 'Din inbjudningslänk',
+  'referralCards.inviteTitle': 'Bjud in en vän',
+  'referralCards.inviteUnavailable': 'Din inbjudningslänk är inte tillgänglig ännu.',
+  'referralCards.launcher': 'Stämpelkort',
+  'referralCards.loading': 'Ansluter till dina värvningskort...',
+  'referralCards.lockFirst':
+    'Om du löser in stämpelbelöningen för Dimbindaren låses kortet permanent till {name}. Du kommer inte längre att kunna flytta kortet eller dess belöningar till en annan karaktär. Förstår du?',
+  'referralCards.lockSecond':
+    'Är du säker? Lös in belöningen för Dimbindaren och lås kortet permanent till {name}.',
+  'referralCards.locked': 'Kortet är låst till {name}. Det kan inte längre flyttas.',
+  'referralCards.membership':
+    'När din bundna vän köper sitt första medlemskap får du ett medlemsbevis.',
+  'referralCards.milestones.fogbinder': 'Dimbindaren',
+  'referralCards.milestones.gravewyrm': 'Korzul Gravlindormen',
+  'referralCards.milestones.hollow': 'In i hålan',
+  'referralCards.milestones.raid': 'Besegra din första raidboss',
+  'referralCards.milestones.tutorial': 'Introduktionsöns sista uppdrag',
+  'referralCards.move': 'Flytta kortet till denna karaktär',
+  'referralCards.movePrompt':
+    'Flytta ditt kort från {oldName} till {newName}? Dina framsteg och alla belöningar från kortet flyttas. Belöningarna tas bort från {oldName}.',
+  'referralCards.nextPage': 'Fler kort',
+  'referralCards.nextQuest': 'Stämpelkort: {quest}',
+  'referralCards.openInvites': 'Öppna Värva en vän',
+  'referralCards.pages': 'Stämpelkortssidor',
+  'referralCards.pending': 'Inte tilldelad ännu',
+  'referralCards.playTogether': 'Slutför milstolpar i en grupp med karaktärerna på kortet.',
+  'referralCards.previous': 'Lös in tidigare stämplar först.',
+  'referralCards.protectiveCharm': 'Skyddsamulett',
+  'referralCards.questGroup': 'Stämpelkortsuppdrag',
+  'referralCards.questIndicator': 'Detta uppdrag för dig närmare nästa stämpelkortsbelöning.',
+  'referralCards.questWithFriend': '{quest} med {friend}',
+  'referralCards.readyCount': 'Stämpelkort: {count} belöningar redo att hämtas',
+  'referralCards.reasons.alreadyRedeemed': 'Denna belöning har redan lösts in.',
+  'referralCards.reasons.alreadyStarted':
+    'Denna förbindelse har redan ett kort. Varje förbindelse mellan bundna vänner kan bara ha ett aktivt kort.',
+  'referralCards.reasons.confirmationRequired':
+    'Läs varningen om kortlåsning innan du löser in belöningen för Dimbindaren.',
+  'referralCards.reasons.declineNotConfirmed': 'Bekräfta att du avböjer innan inbjudan avslutas.',
+  'referralCards.reasons.declinePending': 'Din bundna vän bestämmer sig för om kortet ska avböjas.',
+  'referralCards.reasons.invalidCharacters':
+    'Gruppens karaktärer tillhör inte denna förbindelse mellan bundna vänner.',
+  'referralCards.reasons.invalidMilestone': 'Den stämpeln tillhör inte detta kort.',
+  'referralCards.reasons.levelTooHigh': 'Karaktärer på nya kort måste vara under nivå 5.',
+  'referralCards.reasons.locked': 'Kortet är låst till sin karaktär och kan inte flyttas.',
+  'referralCards.reasons.newAccountsOnly':
+    'Konton kan bara bli bundna vänner när ett nytt konto skapas genom en värvningslänk. Befintliga konton kan inte bindas.',
+  'referralCards.reasons.notActive': 'Starta ett kort tillsammans innan ni hämtar belöningar.',
+  'referralCards.reasons.notEarned': 'Slutför milstolpen tillsammans innan den löses in.',
+  'referralCards.reasons.notParticipant':
+    'Kontot ingår inte i denna förbindelse mellan bundna vänner.',
+  'referralCards.reasons.notPending': 'Ingen kortinbjudan väntar på svar.',
+  'referralCards.reasons.notTogether': 'Båda bundna vännerna måste vara i samma grupp.',
+  'referralCards.reasons.previousRewardRequired': 'Lös in de tidigare stämpelbelöningarna först.',
+  'referralCards.reasons.sameCharacter': 'Kortet finns redan på denna karaktär.',
+  'referralCards.reasons.staleRevision':
+    'Ditt kort ändrades. Kontrollera de senaste framstegen och försök igen.',
+  'referralCards.reasons.tutorialCompleted':
+    'En karaktär har redan slutfört Introduktionsöns sista uppdrag.',
+  'referralCards.reasons.unavailable':
+    'Denna åtgärd är inte tillgänglig just nu. Försök igen senare.',
+  'referralCards.reasons.wrongCharacter':
+    'Använd karaktärerna som anges på kortet eller flytta ett olåst kort till en behörig karaktär.',
+  'referralCards.redeem': 'Lös in belöning',
+  'referralCards.redeemed': 'Inlöst',
+  'referralCards.referrerCount': '{count} vänner klara',
+  'referralCards.referrerRewards.1': 'Det exklusiva riddjuret Vänskapsraptor.',
+  'referralCards.referrerRewards.2': '20 bankplatser och 5 karaktärsplatser.',
+  'referralCards.referrerRewards.3': '1 000 Claudium.',
+  'referralCards.referrerRewards.4': '1 000 Claudium.',
+  'referralCards.referrerRewards.5': 'Följeslagarna Flimmer och Glimmer.',
+  'referralCards.referrerTitle': 'Vänner du hjälpte',
+  'referralCards.reward': 'Belöning: {reward}',
+  'referralCards.rewards.fogbinder':
+    'Ditt smycke utvecklas och får mer uthållighet och en aktiv effekt: +5 till alla egenskaper i 15 sekunder, med 2 minuters nedkylning.',
+  'referralCards.rewards.gravewyrm': 'Gratis ridträning.',
+  'referralCards.rewards.hollow':
+    'Ett smycke som ger uthållighet och en passiv sköld när din hälsa är låg.',
+  'referralCards.rewards.raid': 'Riddjuret Slemmet Vickis.',
+  'referralCards.rewards.tutorial':
+    'En unik titel och en väska av högsta rang, bundna till din karaktär.',
+  'referralCards.stamping': 'Stämplar ditt kort...',
+  'referralCards.start': 'Starta ett kort',
+  'referralCards.startPrompt':
+    'Starta stämpelkort med {friend}? Ni måste båda acceptera. Varje karaktär måste vara under nivå 5 och får inte ha slutfört Introduktionsöns sista uppdrag.',
+  'referralCards.subtitle': 'Äventyra tillsammans. Förtjäna era stämplar.',
+  'referralCards.summon': 'Frammana bunden vän',
+  'referralCards.summonCooldown': 'Frammaning redo om {minutes} min {seconds} sek',
+  'referralCards.summonHelp':
+    'Ta din bundna vän till din plats. Du kan frammana en gång var 30:e minut.',
+  'referralCards.summonPrompt':
+    '{friend} vill frammana dig till sin plats. Acceptera frammaningen?',
+  'referralCards.title': 'Värva en vän',
+  'referralCards.trailmateTitle': 'Färdkamrat',
+  'referralCards.unassigned': 'Ingen karaktär vald',
+  'referralCards.understand': 'Ja, jag förstår',
+  'referralCards.unlocked':
+    'Kortet kan flyttas till en annan behörig karaktär tills du löser in stämpelbelöningen för Dimbindaren. När belöningen löses in låses kortet permanent till denna karaktär.',
+  'referralCards.waiting': 'Väntar på att din bundna vän ska acceptera.',
+  'referralCards.yourCard': '{name}s stämpelkort',
+  'bossJournal.crypt.drake.breathResponse':
+    'Bara tanken står framför. Alla andra stannar vid sidorna.',
+  'bossJournal.crypt.drake.breathSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan eld i en kon på {arc} grader, {range} yard framför den: {min} till {max} skada. Riktningen låses under besvärjelsen.',
+  'bossJournal.crypt.drake.embersName': 'Gravglöd',
+  'bossJournal.crypt.drake.embersResponse':
+    'Flytta draken från den brinnande marken och kliv ur den.',
+  'bossJournal.crypt.drake.embersSummary':
+    'Marken under varje andedräkt fortsätter brinna i {seconds} sek: {min} till {max} skada per sekund på alla där.',
+  'bossJournal.crypt.drake.gustResponse':
+    'Räkna med tillbakaknuffningen; håll ryggen borta från kanter.',
+  'bossJournal.crypt.drake.gustSummary':
+    'Var {every}:e sek när någon är nära: en besvärjelse på {cast} sek, sedan tar alla inom {radius} yard {min} till {max} skada och knuffas {push} yard bakåt.',
+  'bossJournal.crypt.drake.heroicEmbers':
+    'Gravglöd: varje andedräkt lämnar marken brinnande i {seconds} sek.',
+  'bossJournal.crypt.drake.overview':
+    'En skelettdrake flyger i en slinga högt över processionsvägen. Gå under den så landar den för att slåss: en eldandedräkt framför, en svanspiska bakom och ett vingkast runt sig.',
+  'bossJournal.crypt.drake.phaseName': 'Processionsvägen',
+  'bossJournal.crypt.drake.phaseSummary': 'Den landar där den dras in i strid och slåss på marken.',
+  'bossJournal.crypt.drake.tailResponse': 'Stå aldrig bakom den.',
+  'bossJournal.crypt.drake.tailSummary':
+    'Var {every}:e sek när någon står bakom den: en besvärjelse på {cast} sek, sedan ett svep på {arc} grader {range} yard bakom den för {min} till {max} skada.',
+  'bossJournal.crypt.drake.tipDamage': 'Attackera från sidorna: aldrig framför, aldrig bakom.',
+  'bossJournal.crypt.drake.tipHealer':
+    'Andedräkten och vingkastet ger skadetopparna. Stå vid sidan.',
+  'bossJournal.crypt.drake.tipTank':
+    'Vänd den så att andedräkten riktas bort från gruppen och flytta den från brinnande mark i heroiskt läge.',
+  'bossJournal.crypt.ilvane.choiceGain':
+    'Ett avbrott stoppar klagosången och håller henne tyst i {quiet} sek.',
+  'bossJournal.crypt.ilvane.choiceName': 'Avbryta eller gömma sig?',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    'Att gömma sig bakom en pelare kostar attacktid. Ett missat avbrott tystar och skadar alla inom synhåll.',
+  'bossJournal.crypt.ilvane.crescendoName': 'Stegring',
+  'bossJournal.crypt.ilvane.crescendoResponse':
+    'Avbryt varje klagosång och kliv tillbaka ur de första banorna inför tredje vågen.',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    'Under {health} hälsa tar klagosången {cast} sek och kommer var {every}:e sek, och orgeln spelar {waves} vågor. Tredje vågen återanvänder första vågens banor.',
+  'bossJournal.crypt.ilvane.dirgeResponse':
+    'Avbryt den eller bryt siktlinjen bakom en pelare innan besvärjelsen tar slut.',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek. Om den slutförs tar alla som kan se henne {min} till {max} skada och tystas i {silence} sek. Efter ett avbrott sjunger hon ingen klagosång i {quiet} sek.',
+  'bossJournal.crypt.ilvane.encoreName': 'Extranummer',
+  'bossJournal.crypt.ilvane.encoreResponse':
+    'Döda båda koristerna inom {seconds} sek från varandra.',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    'En korist som förblir död i {seconds} sek medan dess partner står kvar reser sig igen med full hälsa.',
+  'bossJournal.crypt.ilvane.harmonyName': 'Harmoni',
+  'bossJournal.crypt.ilvane.harmonyResponse': 'Döda koristerna först.',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    'Varje levande korist minskar skadan hon tar med {per}: {both} medan båda står.',
+  'bossJournal.crypt.ilvane.heroicEncore':
+    'Extranummer: en korist som varit död i {seconds} sek medan dess partner lever reser sig igen.',
+  'bossJournal.crypt.ilvane.heroicUnbroken':
+    'Obruten vers: var {nth}:e klagosång kan inte avbrytas.',
+  'bossJournal.crypt.ilvane.organResponse':
+    'Stå mellan de första banorna och kliv sedan in i en bana som redan brustit.',
+  'bossJournal.crypt.ilvane.organSummary':
+    'Var {every}:e sek går hon till orgeln och spelar {waves} vågor av tonbanor längs läktaren. Varje bana visas i {gather} sek och brister sedan: {min} till {max} skada.',
+  'bossJournal.crypt.ilvane.overview':
+    'En körledare bevakad av två ihåliga korister som skyddar henne medan de lever. Hennes klagosång skadar och tystar alla som kan se henne, så avbryt den eller göm dig bakom en pelare. Hon spelar också Benorgel som skickar tonbanor längs läktaren.',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': 'Stegring',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    'Vid {health} hälsa sjunger hon snabbare och orgeln spelar en tredje våg.',
+  'bossJournal.crypt.ilvane.phaseLoftName': 'Körläktaren',
+  'bossJournal.crypt.ilvane.phaseLoftSummary':
+    'Hon sjunger från läktaren med två ihåliga korister vid sin sida.',
+  'bossJournal.crypt.ilvane.tipDamage':
+    'Döda koristerna först, avbryt klagosången och undvik orgelbanorna.',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    'Döda båda koristerna inom {seconds} sek från varandra, avbryt klagosången och göm dig från varje Obruten vers.',
+  'bossJournal.crypt.ilvane.tipHealer':
+    'En slutförd klagosång tystar även dig: göm dig bakom en pelare om ingen kan avbryta den.',
+  'bossJournal.crypt.ilvane.tipTank':
+    'Håll ihop koristerna så att de kan dödas snabbt och ta sedan Ilvane.',
+  'bossJournal.crypt.ilvane.unbrokenResponse': 'Göm dig bakom en pelare under den.',
+  'bossJournal.crypt.ilvane.unbrokenSummary':
+    'Var {nth}:e klagosång är en Obruten vers: den kan inte avbrytas.',
+  'bossJournal.crypt.lady.choiceGain':
+    'Att använda alla tre lyktorna skyddar upp till {cap} spelare var, så att ingen drabbas av denna klagan.',
+  'bossJournal.crypt.lady.choiceName': 'Vem tar klagan?',
+  'bossJournal.crypt.lady.choiceRisk':
+    'Använda lyktor är fortfarande släckta vid nästa klagan, så någon får ta den då, och varje laddning av Kvardröjande klagan lägger till {perStack} skada.',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    'Var {every}:e sek griper hon {victims} andra spelare än tanken, lyfter upp dem i luften och håller dem där. Gör skada motsvarande {share} av hennes hälsa inom {hold} sek så sätter hon varsamt ned dem. Annars släpper hon dem: {min} till {max} skada.',
+  'bossJournal.crypt.lady.embraceResponse':
+    'Alla gör så mycket skada som möjligt på henne så fort hon griper någon. Helare fyller på den fasthållna spelarens hälsa.',
+  'bossJournal.crypt.lady.embraceSummary':
+    'Var {every}:e sek griper hon en annan spelare än tanken, lyfter upp spelaren i luften och håller kvar. Gör skada motsvarande {share} av hennes hälsa inom {hold} sek så sätter hon varsamt ned spelaren. Annars släpper hon spelaren: {min} till {max} skada.',
+  'bossJournal.crypt.lady.freezeResponse':
+    'Rör dig tidigare: på is tar det längre tid att nå en lykta.',
+  'bossJournal.crypt.lady.freezeSummary':
+    'Vid {health} hälsa en besvärjelse på {cast} sek, sedan blir hela golvet hal is under resten av striden. Det avbryter en klagan som redan kastas.',
+  'bossJournal.crypt.lady.heroicEmbrace': 'Frusen omfamning griper {victims} spelare samtidigt.',
+  'bossJournal.crypt.lady.heroicLanterns':
+    'En tänd lykta slocknar av sig själv efter {lit} sek och förblir släckt i {gutter} sek.',
+  'bossJournal.crypt.lady.lamentResponse':
+    'Stå i skenet från en tänd lykta innan besvärjelsen tar slut.',
+  'bossJournal.crypt.lady.lamentSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan {min} till {max} skada på varje spelare som inte skyddas av en lykta. Varje träff ger en laddning av Kvardröjande klagan: {perStack} mer klagoskada per laddning i {seconds} sek, upp till {stacks} laddningar.',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    'En tänd lykta skyddar upp till {cap} spelare inom {radius} yard från klagan. En lykta som skyddade någon slocknar i {dark} sek. I heroiskt läge slocknar en tänd lykta även av sig själv efter {lit} sek och förblir släckt i {gutter} sek.',
+  'bossJournal.crypt.lady.lanternName': 'Gravlyktor',
+  'bossJournal.crypt.lady.lanternResponse':
+    'Planera vem som använder vilken lykta och byt till en tänd inför varje klagan.',
+  'bossJournal.crypt.lady.lanternSummary':
+    'En tänd lykta skyddar upp till {cap} spelare inom {radius} yard från klagan. En lykta som skyddade någon slocknar i {dark} sek och är därför fortfarande släckt vid nästa klagan.',
+  'bossJournal.crypt.lady.overview':
+    'En spökbrud vars klagan skadar alla som inte skyddas av en gravlykta. Varje lykta skyddar bara två spelare och slocknar sedan, så gruppen måste turas om. Hon lyfter även en spelare i luften tills gruppen skadar henne nog för att hon ska släppa.',
+  'bossJournal.crypt.lady.phaseFreezeName': 'Brudfrysning',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    'Vid {health} hälsa fryser hela ravinens golv under resten av striden.',
+  'bossJournal.crypt.lady.phaseRavineName': 'Frostravinen',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    'Tre gravlyktor står runt ravinen. Hennes väg blir hal is.',
+  'bossJournal.crypt.lady.rimeName': 'Rimfroststig',
+  'bossJournal.crypt.lady.rimeResponse': 'Undvik hennes spår när du behöver röra dig snabbt.',
+  'bossJournal.crypt.lady.rimeSummary':
+    'Hon lämnar hal is där hon svävar; varje fläck varar i {seconds} sek. På is glider du och svänger långsamt.',
+  'bossJournal.crypt.lady.tipDamage':
+    'Gör så mycket skada som möjligt på henne så fort hon griper någon. Byt mellan tända lyktor inför varje klagan.',
+  'bossJournal.crypt.lady.tipHealer':
+    'Oskyddade spelare tar klagan och får laddningar. Den fasthållna spelaren tar skada medan hon håller kvar.',
+  'bossJournal.crypt.lady.tipTank':
+    'Håll henne nära mitten så att alla lyktor förblir inom räckhåll för gruppen.',
+  'bossJournal.crypt.marrow.blowResponse':
+    'Tank: använd förmågor med nedkylning när laddningarna ökar. Helare håller koll på tanken.',
+  'bossJournal.crypt.marrow.blowSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek mot tanken: en närstridsträff som ger en laddning med {vuln} mer skada tagen, upp till {stacks} laddningar ({max}) i {seconds} sek.',
+  'bossJournal.crypt.marrow.choiceGain':
+    'Gravar grävda vid gårdens kant lämnar mitten fri för strid och undanmanövrer.',
+  'bossJournal.crypt.marrow.choiceName': 'Var ska gravarna placeras?',
+  'bossJournal.crypt.marrow.choiceRisk':
+    'Varje öppen grav, oavsett plats, väcker ett rastlöst skelett vid nästa klang, upp till {cap} samtidigt.',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    'Varje öppen grav, oavsett plats, väcker ett rastlöst skelett vid nästa klang, upp till {cap} samtidigt. I heroiskt läge gör en grav nära tanken även Marrow snabbare.',
+  'bossJournal.crypt.marrow.heroicBlow':
+    'Dödgrävarens slag: en träff på tanken som bygger laddningar med {vuln} mer skada tagen.',
+  'bossJournal.crypt.marrow.heroicUnquiet':
+    'Orolig jord: {linger} sek i en grav väcker ett rastlöst skelett.',
+  'bossJournal.crypt.marrow.heroicVigor':
+    'Gravkraft: inuti en grav attackerar han {haste} snabbare.',
+  'bossJournal.crypt.marrow.measureResponse':
+    'Markerad: gå till gårdens kant innan graven öppnas. Stå aldrig i en öppen grav.',
+  'bossJournal.crypt.marrow.measureSummary':
+    'Var {every}:e sek markerar en besvärjelse på {cast} sek en spelare. {mark} sek senare rasar en grav in där spelaren står: {min} till {max} skada på alla inom {radius} yard. Graven förblir öppen under striden: inuti är du {slow} långsammare och tar {dirt} skada per sekund. Högst {cap} gravar; en ny fyller igen den äldsta.',
+  'bossJournal.crypt.marrow.overview':
+    'En uppväckt dödgrävare som mäter spelare för gravar. Varje grav förblir öppen och saktar och bränner alla i den, och var och en väcker ett rastlöst skelett när han ringer i begravningsklockan. Gräv gravarna vid gårdens kant och håll deras antal nere.',
+  'bossJournal.crypt.marrow.phaseTollName': 'Begravningsklangen',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    'Vid {first} och {second} hälsa går han till klockrepet och ringer Begravningsklang.',
+  'bossJournal.crypt.marrow.phaseYardName': 'Klockgården',
+  'bossJournal.crypt.marrow.phaseYardSummary':
+    'Han gräver gravar under markerade spelare och svingar skyffeln mot tanken.',
+  'bossJournal.crypt.marrow.shovelResponse':
+    'Bara tanken står framför. Tanken kan gå undan under besvärjelsen.',
+  'bossJournal.crypt.marrow.shovelSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan ett skyffelslag i en kon på {arc} grader {range} yard framför honom för {mult} gånger hans närstridsträff. Alla träffade får Jord i ögonen: {slow} långsammare i {seconds} sek.',
+  'bossJournal.crypt.marrow.tipDamage':
+    'När du markeras, bär graven till gårdens kant. Döda de rastlösa skeletten efter varje klang och återgå sedan till Marrow.',
+  'bossJournal.crypt.marrow.tipHealer':
+    'Begravningsklang träffar hela gruppen. Gravar saktar och bränner alla i dem, så hjälp den som fastnat i en.',
+  'bossJournal.crypt.marrow.tipTank':
+    'Håll honom vänd bort från gruppen. Fånga upp varje rastlöst skelett efter en Begravningsklang.',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    'Håll honom vänd bort från gruppen och utanför varje grav. Dödgrävarens slag bygger laddningar: använd förmågor med nedkylning när de ökar.',
+  'bossJournal.crypt.marrow.tollResponse':
+    'Helare fyller på allas hälsa före sista klangen. Tanken fångar upp de rastlösa skeletten; skadegörare dödar dem.',
+  'bossJournal.crypt.marrow.tollSummary':
+    'Han går till repet och ringer i klockan i {ring} sek, immun mot skada medan han går och ringer. Sedan tar varje spelare {min} till {max} skada och varje öppen grav väcker ett rastlöst skelett.',
+  'bossJournal.crypt.marrow.unquietName': 'Orolig jord',
+  'bossJournal.crypt.marrow.unquietResponse': 'Lämna gravar direkt.',
+  'bossJournal.crypt.marrow.unquietSummary':
+    'En spelare som stannar i {linger} sek inuti en grav väcker ett rastlöst skelett ur den. Graven vilar sedan i {rest} sek.',
+  'bossJournal.crypt.marrow.vigorName': 'Gravkraft',
+  'bossJournal.crypt.marrow.vigorResponse': 'Tanken håller honom utanför gravarna.',
+  'bossJournal.crypt.marrow.vigorSummary':
+    'Medan han står i en öppen grav attackerar han {haste} snabbare.',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    'Om flera spelare tänder samtidigt avslutas riten tidigare, innan Gravkyla stiger.',
+  'bossJournal.crypt.morthen.choiceCandleName': 'Hur många tändare?',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    'Varje tändare betalar {normal} av sin maximala hälsa per ljus medan kylan fortsätter stiga.',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    'En blockerad själ når honom aldrig: ingen skadeladdning och ingen läkning.',
+  'bossJournal.crypt.morthen.choiceSoulName': 'Blockera själarna?',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    'Blockeraren tar själens skada. Varje själ som kommer fram lägger till {per} skada och läker honom med {heal}.',
+  'bossJournal.crypt.morthen.graspName': 'Gravens grepp',
+  'bossJournal.crypt.morthen.graspResponse': 'Kliv ur ringen direkt.',
+  'bossJournal.crypt.morthen.graspSummary':
+    'Var {every}:e sek dyker en ring på {radius} yard upp under {count} spelare. {fuse} sek senare bryter händer fram: alla inuti rotas i {root} sek och tar {min} till {max} skada.',
+  'bossJournal.crypt.morthen.gravecallName': 'Gravkall',
+  'bossJournal.crypt.morthen.gravecallResponse': 'En ledig spelare kliver i varje själs väg.',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    'Var {every}:e sek driver en bunden själ från en nisch mot honom. Når den fram får han {per} mer skada per laddning (upp till {stacks}) och läker {heal} av sin hälsa. Den första spelare den rör absorberar den i stället: {min} till {max} skada.',
+  'bossJournal.crypt.morthen.heroicDrain':
+    'Varje ljus kostar tändaren {drain} av sin maximala hälsa.',
+  'bossJournal.crypt.morthen.heroicGrasp':
+    'Gravens grepp: ringar som rotar och skadar, i varje akt.',
+  'bossJournal.crypt.morthen.heroicNameDead':
+    'Namnge de döda: ljusen måste tändas i ordningen som liggaren visar.',
+  'bossJournal.crypt.morthen.nameDeadName': 'Namnge de döda',
+  'bossJournal.crypt.morthen.nameDeadResponse': 'Tänd bara det ljus som strålen pekar på.',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    'Ljusen måste tändas i en ordning som visas av en gyllene stråle från liggaren. Fel ljus släcker det senast tända och bränner tändaren för {min} till {max}.',
+  'bossJournal.crypt.morthen.overview':
+    'En lichbiskop som utför en rit i tre akter. Först kallar han själar för att stärka sig; vid {rite} hälsa gömmer han sig bakom ett skydd tills gruppen tänder fyra ljus igen till en hälsokostnad; vid {last} hälsa sveper han med en enorm lie.',
+  'bossJournal.crypt.morthen.phaseCallingName': 'Kallet',
+  'bossJournal.crypt.morthen.phaseCallingSummary':
+    'Han pulserar skugga runt sig och kallar själar för att livnära sig på dem.',
+  'bossJournal.crypt.morthen.phaseLastName': 'Sista smörjelsen',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    'Vid {health} hälsa tar han upp lien inför stridens slut.',
+  'bossJournal.crypt.morthen.phaseRiteName': 'De oroligas rit',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    'Vid {health} hälsa återvänder han till altaret och blir immun tills alla fyra ljusen brinner igen.',
+  'bossJournal.crypt.morthen.pulseResponse':
+    'Alla, även tanken, går ut till {radius} yard innan besvärjelsen tar slut.',
+  'bossJournal.crypt.morthen.pulseSummary':
+    'Var {every}:e sek ({everyLast} sek under Sista smörjelsen) en besvärjelse på {cast} sek, sedan {min} till {max} skada på alla inom {radius} yard.',
+  'bossJournal.crypt.morthen.reapResponse':
+    'Bara tanken står framför. Tanken kan kliva åt sidan under besvärjelsen.',
+  'bossJournal.crypt.morthen.reapSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek mot tanken, sedan ett liesvep på {arc} grader {range} yard framför honom: {min} till {max} skada.',
+  'bossJournal.crypt.morthen.relightName': 'Tänd ljusen igen',
+  'bossJournal.crypt.morthen.relightResponse':
+    'Fördela ljusen mellan spelare med hälsa att avvara och gör så mycket skada som möjligt på honom under bedövningen.',
+  'bossJournal.crypt.morthen.relightSummary':
+    'Kanalisera i {channel} sek vid ett ljus (inom {range} yard) för att tända det igen. Det kostar tändaren {drain} av sin maximala hälsa. När det fjärde tänds bedövas han i {stun} sek och tar {vuln} mer skada.',
+  'bossJournal.crypt.morthen.riteResponse':
+    'Tänd alla fyra ljusen snabbt: kylan slutar aldrig stiga.',
+  'bossJournal.crypt.morthen.riteSummary':
+    'Han blir immun och de {candles} ljusen slocknar. {bones} rastlösa skelett klättrar upp. Gravkyla träffar alla varje sekund: {base} skada, med en ökning på {step} var {chillEvery}:e sek utan tak.',
+  'bossJournal.crypt.morthen.tipDamage':
+    'Blockera de bundna själarna med kroppen, tänd ljus under riten och gör sedan så mycket skada som möjligt på honom medan han är bedövad.',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    'Blockera de bundna själarna med kroppen och undvik Gravens grepp. Följ den gyllene strålen till rätt ljus under riten.',
+  'bossJournal.crypt.morthen.tipHealer':
+    'Varje ljus kostar tändaren en stor andel hälsa och Gravkyla fortsätter stiga: läk tändarna först.',
+  'bossJournal.crypt.morthen.tipTank':
+    'Håll honom vänd bort från gruppen och gå ur Skuggpuls med alla andra.',
+  'bossJournal.crypt.wyrm.bellowResponse':
+    'Låt dig inte knuffas in i en brinnande bana. Använd förmågor med nedkylning under tillfället efteråt.',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan {min} till {max} skada och en tillbakaknuffning på {push} yard inom {radius} yard. Efteråt tar den {vuln} mer skada i {seconds} sek.',
+  'bossJournal.crypt.wyrm.heroicKnell':
+    'Brinnande dödsklang: den lyfter och andas över halva ringen {breaths} gånger.',
+  'bossJournal.crypt.wyrm.knellResponse': 'Spring till den omarkerade halvan av ringen varje gång.',
+  'bossJournal.crypt.wyrm.knellSummary':
+    'Var {every}:e sek flyger den upp utom räckhåll och andas eld över halva ringen {breaths} gånger. Varje halva markeras {mark} sek före elden: {min} till {max} skada på alla i den.',
+  'bossJournal.crypt.wyrm.overview':
+    'Morthens döende rit tänder ett bål och en benlindorm landar i det. Den slåss som benhusdraken, med tillägg av brinnande svepbanor och ett vrål som knuffar spelare bakåt men lämnar den öppen för skada.',
+  'bossJournal.crypt.wyrm.phaseName': 'Lindormskallets bål',
+  'bossJournal.crypt.wyrm.phaseSummary':
+    'Den glider in utom räckhåll och landar i ringen med en eldexplosion.',
+  'bossJournal.crypt.wyrm.strafeResponse':
+    'Kliv åt sidan ur den markerade banan och håll dig borta från den brinnande marken.',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    'Var {every}:e sek markerar den en {width} yard bred bana genom en spelare i {mark} sek och flyger sedan längs den och öser eld: {min} till {max} skada på alla i den. Banan fortsätter brinna i {seconds} sek: {burn} skada per sekund.',
+  'bossJournal.crypt.wyrm.tipDamage':
+    'Kliv ur markerade banor och använd förmågor med nedkylning efter varje Skräckvrål.',
+  'bossJournal.crypt.wyrm.tipDamageHeroic':
+    'Kliv ur markerade banor och spring till den säkra halvan varje gång under Brinnande dödsklang.',
+  'bossJournal.crypt.wyrm.tipHealer':
+    'Bålsvep och Skräckvrål ger skadetopparna; läk dem som knuffats in i en brinnande bana.',
+  'bossJournal.crypt.wyrm.tipTank':
+    'Håll den vänd bort från gruppen och vänd ut den ur brinnande banor.',
+  'entities.items.bellrope_girdle.name': 'Klockrepets gördel',
+  'entities.items.bellrope_mitts.name': 'Klockrepets vantar',
+  'entities.items.blackmere_epaulets.name': 'Svartsjöns epåletter',
+  'entities.items.blackmere_mantle.name': 'Svartsjöns mantel',
+  'entities.items.blackmere_pauldrons.name': 'Svartsjöns pansaraxlar',
+  'entities.items.blackmere_shoulderguards.name': 'Svartsjöns axelskydd',
+  'entities.items.blackmere_shoulderpads.name': 'Svartsjöns axelvaddar',
+  'entities.items.blackmere_spaulders.name': 'Svartsjöns axelskenor',
+  'entities.items.bogwalker_belt.name': 'Kärrvandrarens bälte',
+  'entities.items.bogwalker_boots.name': 'Kärrvandrarens stövlar',
+  'entities.items.bogwalker_breeches.name': 'Kärrvandrarens knäbyxor',
+  'entities.items.bogwalker_cap.name': 'Kärrvandrarens mössa',
+  'entities.items.bogwalker_chainmail.name': 'Kärrvandrarens ringbrynja',
+  'entities.items.bogwalker_chausses.name': 'Kärrvandrarens brynjehosor',
+  'entities.items.bogwalker_cinch.name': 'Kärrvandrarens gördelrem',
+  'entities.items.bogwalker_coif.name': 'Kärrvandrarens brynjehuva',
+  'entities.items.bogwalker_cord.name': 'Kärrvandrarens midjesnöre',
+  'entities.items.bogwalker_cowl.name': 'Kärrvandrarens kåphuva',
+  'entities.items.bogwalker_epaulets.name': 'Kärrvandrarens epåletter',
+  'entities.items.bogwalker_gauntlets.name': 'Kärrvandrarens pansarhandskar',
+  'entities.items.bogwalker_girdle.name': 'Kärrvandrarens gördel',
+  'entities.items.bogwalker_gloves.name': 'Kärrvandrarens handskar',
+  'entities.items.bogwalker_greaves.name': 'Kärrvandrarens benskenor',
+  'entities.items.bogwalker_grips.name': 'Kärrvandrarens grepphandskar',
+  'entities.items.bogwalker_handguards.name': 'Kärrvandrarens handskydd',
+  'entities.items.bogwalker_handwraps.name': 'Kärrvandrarens handlindor',
+  'entities.items.bogwalker_hauberk.name': 'Kärrvandrarens brynjeskjorta',
+  'entities.items.bogwalker_headguard.name': 'Kärrvandrarens huvudskydd',
+  'entities.items.bogwalker_helm.name': 'Kärrvandrarens hjälm',
+  'entities.items.bogwalker_hood.name': 'Kärrvandrarens huva',
+  'entities.items.bogwalker_jerkin.name': 'Kärrvandrarens skinnjacka',
+  'entities.items.bogwalker_leggings.name': 'Kärrvandrarens benkläder',
+  'entities.items.bogwalker_legguards.name': 'Kärrvandrarens benskydd',
+  'entities.items.bogwalker_legwraps.name': 'Kärrvandrarens benlindor',
+  'entities.items.bogwalker_mantle.name': 'Kärrvandrarens mantel',
+  'entities.items.bogwalker_mitts.name': 'Kärrvandrarens vantar',
+  'entities.items.bogwalker_moccasins.name': 'Kärrvandrarens mockasiner',
+  'entities.items.bogwalker_pauldrons.name': 'Kärrvandrarens pansaraxlar',
+  'entities.items.bogwalker_robe.name': 'Kärrvandrarens kåpa',
+  'entities.items.bogwalker_sabatons.name': 'Kärrvandrarens pansarskor',
+  'entities.items.bogwalker_sash.name': 'Kärrvandrarens midjeband',
+  'entities.items.bogwalker_shoulderguards.name': 'Kärrvandrarens axelskydd',
+  'entities.items.bogwalker_shoulderpads.name': 'Kärrvandrarens axelvaddar',
+  'entities.items.bogwalker_slippers.name': 'Kärrvandrarens tofflor',
+  'entities.items.bogwalker_spaulders.name': 'Kärrvandrarens axelskenor',
+  'entities.items.bogwalker_treads.name': 'Kärrvandrarens kängor',
+  'entities.items.bogwalker_trousers.name': 'Kärrvandrarens byxor',
+  'entities.items.bogwalker_tunic.name': 'Kärrvandrarens tunika',
+  'entities.items.bogwalker_vest.name': 'Kärrvandrarens väst',
+  'entities.items.bogwalker_waistguard.name': 'Kärrvandrarens midjeskydd',
+  'entities.items.breakwater_epaulets.name': 'Vågbrytarens epåletter',
+  'entities.items.breakwater_mantle.name': 'Vågbrytarens mantel',
+  'entities.items.breakwater_pauldrons.name': 'Vågbrytarens pansaraxlar',
+  'entities.items.breakwater_shoulderguards.name': 'Vågbrytarens axelskydd',
+  'entities.items.breakwater_shoulderpads.name': 'Vågbrytarens axelvaddar',
+  'entities.items.breakwater_spaulders.name': 'Vågbrytarens axelskenor',
+  'entities.items.brookwatch_belt.name': 'Bäckvaktens bälte',
+  'entities.items.brookwatch_boots.name': 'Bäckvaktens stövlar',
+  'entities.items.brookwatch_breeches.name': 'Bäckvaktens knäbyxor',
+  'entities.items.brookwatch_cap.name': 'Bäckvaktens mössa',
+  'entities.items.brookwatch_chainmail.name': 'Bäckvaktens ringbrynja',
+  'entities.items.brookwatch_chausses.name': 'Bäckvaktens brynjehosor',
+  'entities.items.brookwatch_cinch.name': 'Bäckvaktens gördelrem',
+  'entities.items.brookwatch_coif.name': 'Bäckvaktens brynjehuva',
+  'entities.items.brookwatch_cord.name': 'Bäckvaktens midjesnöre',
+  'entities.items.brookwatch_cowl.name': 'Bäckvaktens kåphuva',
+  'entities.items.brookwatch_epaulets.name': 'Bäckvaktens epåletter',
+  'entities.items.brookwatch_gauntlets.name': 'Bäckvaktens pansarhandskar',
+  'entities.items.brookwatch_girdle.name': 'Bäckvaktens gördel',
+  'entities.items.brookwatch_gloves.name': 'Bäckvaktens handskar',
+  'entities.items.brookwatch_greaves.name': 'Bäckvaktens benskenor',
+  'entities.items.brookwatch_grips.name': 'Bäckvaktens grepphandskar',
+  'entities.items.brookwatch_handguards.name': 'Bäckvaktens handskydd',
+  'entities.items.brookwatch_handwraps.name': 'Bäckvaktens handlindor',
+  'entities.items.brookwatch_hauberk.name': 'Bäckvaktens brynjeskjorta',
+  'entities.items.brookwatch_headguard.name': 'Bäckvaktens huvudskydd',
+  'entities.items.brookwatch_helm.name': 'Bäckvaktens hjälm',
+  'entities.items.brookwatch_hood.name': 'Bäckvaktens huva',
+  'entities.items.brookwatch_jerkin.name': 'Bäckvaktens skinnjacka',
+  'entities.items.brookwatch_leggings.name': 'Bäckvaktens benkläder',
+  'entities.items.brookwatch_legguards.name': 'Bäckvaktens benskydd',
+  'entities.items.brookwatch_legwraps.name': 'Bäckvaktens benlindor',
+  'entities.items.brookwatch_mantle.name': 'Bäckvaktens mantel',
+  'entities.items.brookwatch_mitts.name': 'Bäckvaktens vantar',
+  'entities.items.brookwatch_moccasins.name': 'Bäckvaktens mockasiner',
+  'entities.items.brookwatch_pauldrons.name': 'Bäckvaktens pansaraxlar',
+  'entities.items.brookwatch_robe.name': 'Bäckvaktens kåpa',
+  'entities.items.brookwatch_sabatons.name': 'Bäckvaktens pansarskor',
+  'entities.items.brookwatch_sash.name': 'Bäckvaktens midjeband',
+  'entities.items.brookwatch_shoulderguards.name': 'Bäckvaktens axelskydd',
+  'entities.items.brookwatch_shoulderpads.name': 'Bäckvaktens axelvaddar',
+  'entities.items.brookwatch_slippers.name': 'Bäckvaktens tofflor',
+  'entities.items.brookwatch_spaulders.name': 'Bäckvaktens axelskenor',
+  'entities.items.brookwatch_treads.name': 'Bäckvaktens kängor',
+  'entities.items.brookwatch_trousers.name': 'Bäckvaktens byxor',
+  'entities.items.brookwatch_tunic.name': 'Bäckvaktens tunika',
+  'entities.items.brookwatch_vest.name': 'Bäckvaktens väst',
+  'entities.items.brookwatch_waistguard.name': 'Bäckvaktens midjeskydd',
+  'entities.items.cairnking_epaulets.name': 'Rösekungens epåletter',
+  'entities.items.cairnking_mantle.name': 'Rösekungens mantel',
+  'entities.items.cairnking_pauldrons.name': 'Rösekungens pansaraxlar',
+  'entities.items.cairnking_shoulderguards.name': 'Rösekungens axelskydd',
+  'entities.items.cairnking_shoulderpads.name': 'Rösekungens axelvaddar',
+  'entities.items.cairnking_spaulders.name': 'Rösekungens axelskenor',
+  'entities.items.choirward_leggings.name': 'Körskyddets benkläder',
+  'entities.items.choirward_pauldrons.name': 'Körskyddets pansaraxlar',
+  'entities.items.cinderbrood_epaulets.name': 'Glödkullens epåletter',
+  'entities.items.cinderbrood_pauldrons.name': 'Glödkullens pansaraxlar',
+  'entities.items.cinderbrood_shoulderguards.name': 'Glödkullens axelskydd',
+  'entities.items.cinderbrood_shoulderpads.name': 'Glödkullens axelvaddar',
+  'entities.items.cinderbrood_spaulders.name': 'Glödkullens axelskenor',
+  'entities.items.conchplate_girdle.name': 'Snäckpansarets gördel',
+  'entities.items.conchplate_sabatons.name': 'Snäckpansarets pansarskor',
+  'entities.items.cryptbound_chainmail.name': 'Kryptbundnas ringbrynja',
+  'entities.items.cryptbound_tunic.name': 'Kryptbundnas tunika',
+  'entities.items.fetterbound_breeches.name': 'Bojfångens knäbyxor',
+  'entities.items.fetterbound_chausses.name': 'Bojfångens brynjehosor',
+  'entities.items.fetterbound_leggings.name': 'Bojfångens benkläder',
+  'entities.items.fetterbound_legguards.name': 'Bojfångens benskydd',
+  'entities.items.fetterbound_legwraps.name': 'Bojfångens benlindor',
+  'entities.items.fetterbound_trousers.name': 'Bojfångens byxor',
+  'entities.items.gildhedge_epaulets.name': 'Guldhäckens epåletter',
+  'entities.items.gildhedge_mantle.name': 'Guldhäckens mantel',
+  'entities.items.gildhedge_pauldrons.name': 'Guldhäckens pansaraxlar',
+  'entities.items.gildhedge_shoulderguards.name': 'Guldhäckens axelskydd',
+  'entities.items.gildhedge_shoulderpads.name': 'Guldhäckens axelvaddar',
+  'entities.items.gildhedge_spaulders.name': 'Guldhäckens axelskenor',
+  'entities.items.gravebell_greaves.name': 'Gravklockans benskenor',
+  'entities.items.gravebell_moccasins.name': 'Gravklockans mockasiner',
+  'entities.items.gravebell_treads.name': 'Gravklockans kängor',
+  'entities.items.gravedirt_grips.name': 'Gravjordens grepphandskar',
+  'entities.items.gravedirt_treads.name': 'Gravjordens kängor',
+  'entities.items.hedgerow_belt.name': 'Häckradens bälte',
+  'entities.items.hedgerow_boots.name': 'Häckradens stövlar',
+  'entities.items.hedgerow_breeches.name': 'Häckradens knäbyxor',
+  'entities.items.hedgerow_cap.name': 'Häckradens mössa',
+  'entities.items.hedgerow_chainmail.name': 'Häckradens ringbrynja',
+  'entities.items.hedgerow_chausses.name': 'Häckradens brynjehosor',
+  'entities.items.hedgerow_cinch.name': 'Häckradens gördelrem',
+  'entities.items.hedgerow_coif.name': 'Häckradens brynjehuva',
+  'entities.items.hedgerow_cord.name': 'Häckradens midjesnöre',
+  'entities.items.hedgerow_cowl.name': 'Häckradens kåphuva',
+  'entities.items.hedgerow_epaulets.name': 'Häckradens epåletter',
+  'entities.items.hedgerow_gauntlets.name': 'Häckradens pansarhandskar',
+  'entities.items.hedgerow_girdle.name': 'Häckradens gördel',
+  'entities.items.hedgerow_gloves.name': 'Häckradens handskar',
+  'entities.items.hedgerow_greaves.name': 'Häckradens benskenor',
+  'entities.items.hedgerow_grips.name': 'Häckradens grepphandskar',
+  'entities.items.hedgerow_handguards.name': 'Häckradens handskydd',
+  'entities.items.hedgerow_handwraps.name': 'Häckradens handlindor',
+  'entities.items.hedgerow_hauberk.name': 'Häckradens brynjeskjorta',
+  'entities.items.hedgerow_headguard.name': 'Häckradens huvudskydd',
+  'entities.items.hedgerow_helm.name': 'Häckradens hjälm',
+  'entities.items.hedgerow_hood.name': 'Häckradens huva',
+  'entities.items.hedgerow_jerkin.name': 'Häckradens skinnjacka',
+  'entities.items.hedgerow_leggings.name': 'Häckradens benkläder',
+  'entities.items.hedgerow_legguards.name': 'Häckradens benskydd',
+  'entities.items.hedgerow_legwraps.name': 'Häckradens benlindor',
+  'entities.items.hedgerow_mantle.name': 'Häckradens mantel',
+  'entities.items.hedgerow_mitts.name': 'Häckradens vantar',
+  'entities.items.hedgerow_moccasins.name': 'Häckradens mockasiner',
+  'entities.items.hedgerow_pauldrons.name': 'Häckradens pansaraxlar',
+  'entities.items.hedgerow_robe.name': 'Häckradens kåpa',
+  'entities.items.hedgerow_sabatons.name': 'Häckradens pansarskor',
+  'entities.items.hedgerow_sash.name': 'Häckradens midjeband',
+  'entities.items.hedgerow_shoulderguards.name': 'Häckradens axelskydd',
+  'entities.items.hedgerow_shoulderpads.name': 'Häckradens axelvaddar',
+  'entities.items.hedgerow_slippers.name': 'Häckradens tofflor',
+  'entities.items.hedgerow_spaulders.name': 'Häckradens axelskenor',
+  'entities.items.hedgerow_treads.name': 'Häckradens kängor',
+  'entities.items.hedgerow_trousers.name': 'Häckradens byxor',
+  'entities.items.hedgerow_tunic.name': 'Häckradens tunika',
+  'entities.items.hedgerow_vest.name': 'Häckradens väst',
+  'entities.items.hedgerow_waistguard.name': 'Häckradens midjeskydd',
+  'entities.items.highgale_belt.name': 'Högstormens bälte',
+  'entities.items.highgale_boots.name': 'Högstormens stövlar',
+  'entities.items.highgale_breeches.name': 'Högstormens knäbyxor',
+  'entities.items.highgale_cap.name': 'Högstormens mössa',
+  'entities.items.highgale_chainmail.name': 'Högstormens ringbrynja',
+  'entities.items.highgale_chausses.name': 'Högstormens brynjehosor',
+  'entities.items.highgale_cinch.name': 'Högstormens gördelrem',
+  'entities.items.highgale_coif.name': 'Högstormens brynjehuva',
+  'entities.items.highgale_cord.name': 'Högstormens midjesnöre',
+  'entities.items.highgale_cowl.name': 'Högstormens kåphuva',
+  'entities.items.highgale_epaulets.name': 'Högstormens epåletter',
+  'entities.items.highgale_gauntlets.name': 'Högstormens pansarhandskar',
+  'entities.items.highgale_girdle.name': 'Högstormens gördel',
+  'entities.items.highgale_gloves.name': 'Högstormens handskar',
+  'entities.items.highgale_greaves.name': 'Högstormens benskenor',
+  'entities.items.highgale_grips.name': 'Högstormens grepphandskar',
+  'entities.items.highgale_handguards.name': 'Högstormens handskydd',
+  'entities.items.highgale_handwraps.name': 'Högstormens handlindor',
+  'entities.items.highgale_hauberk.name': 'Högstormens brynjeskjorta',
+  'entities.items.highgale_headguard.name': 'Högstormens huvudskydd',
+  'entities.items.highgale_helm.name': 'Högstormens hjälm',
+  'entities.items.highgale_hood.name': 'Högstormens huva',
+  'entities.items.highgale_jerkin.name': 'Högstormens skinnjacka',
+  'entities.items.highgale_leggings.name': 'Högstormens benkläder',
+  'entities.items.highgale_legguards.name': 'Högstormens benskydd',
+  'entities.items.highgale_legwraps.name': 'Högstormens benlindor',
+  'entities.items.highgale_mantle.name': 'Högstormens mantel',
+  'entities.items.highgale_mitts.name': 'Högstormens vantar',
+  'entities.items.highgale_moccasins.name': 'Högstormens mockasiner',
+  'entities.items.highgale_pauldrons.name': 'Högstormens pansaraxlar',
+  'entities.items.highgale_robe.name': 'Högstormens kåpa',
+  'entities.items.highgale_sabatons.name': 'Högstormens pansarskor',
+  'entities.items.highgale_sash.name': 'Högstormens midjeband',
+  'entities.items.highgale_shoulderguards.name': 'Högstormens axelskydd',
+  'entities.items.highgale_shoulderpads.name': 'Högstormens axelvaddar',
+  'entities.items.highgale_slippers.name': 'Högstormens tofflor',
+  'entities.items.highgale_spaulders.name': 'Högstormens axelskenor',
+  'entities.items.highgale_treads.name': 'Högstormens kängor',
+  'entities.items.highgale_trousers.name': 'Högstormens byxor',
+  'entities.items.highgale_tunic.name': 'Högstormens tunika',
+  'entities.items.highgale_vest.name': 'Högstormens väst',
+  'entities.items.highgale_waistguard.name': 'Högstormens midjeskydd',
+  'entities.items.hoarfrost_epaulets.name': 'Rimfrostens epåletter',
+  'entities.items.hoarfrost_mantle.name': 'Rimfrostens mantel',
+  'entities.items.hoarfrost_pauldrons.name': 'Rimfrostens pansaraxlar',
+  'entities.items.hoarfrost_shoulderguards.name': 'Rimfrostens axelskydd',
+  'entities.items.hoarfrost_shoulderpads.name': 'Rimfrostens axelvaddar',
+  'entities.items.hoarfrost_spaulders.name': 'Rimfrostens axelskenor',
+  'entities.items.hollowveil_belt.name': 'Hålslöjans bälte',
+  'entities.items.hollowveil_boots.name': 'Hålslöjans stövlar',
+  'entities.items.hollowveil_breeches.name': 'Hålslöjans knäbyxor',
+  'entities.items.hollowveil_cap.name': 'Hålslöjans mössa',
+  'entities.items.hollowveil_chainmail.name': 'Hålslöjans ringbrynja',
+  'entities.items.hollowveil_chausses.name': 'Hålslöjans brynjehosor',
+  'entities.items.hollowveil_cinch.name': 'Hålslöjans gördelrem',
+  'entities.items.hollowveil_coif.name': 'Hålslöjans brynjehuva',
+  'entities.items.hollowveil_cord.name': 'Hålslöjans midjesnöre',
+  'entities.items.hollowveil_cowl.name': 'Hålslöjans kåphuva',
+  'entities.items.hollowveil_epaulets.name': 'Hålslöjans epåletter',
+  'entities.items.hollowveil_gauntlets.name': 'Hålslöjans pansarhandskar',
+  'entities.items.hollowveil_girdle.name': 'Hålslöjans gördel',
+  'entities.items.hollowveil_gloves.name': 'Hålslöjans handskar',
+  'entities.items.hollowveil_greaves.name': 'Hålslöjans benskenor',
+  'entities.items.hollowveil_grips.name': 'Hålslöjans grepphandskar',
+  'entities.items.hollowveil_handguards.name': 'Hålslöjans handskydd',
+  'entities.items.hollowveil_handwraps.name': 'Hålslöjans handlindor',
+  'entities.items.hollowveil_hauberk.name': 'Hålslöjans brynjeskjorta',
+  'entities.items.hollowveil_headguard.name': 'Hålslöjans huvudskydd',
+  'entities.items.hollowveil_helm.name': 'Hålslöjans hjälm',
+  'entities.items.hollowveil_hood.name': 'Hålslöjans huva',
+  'entities.items.hollowveil_jerkin.name': 'Hålslöjans skinnjacka',
+  'entities.items.hollowveil_leggings.name': 'Hålslöjans benkläder',
+  'entities.items.hollowveil_legguards.name': 'Hålslöjans benskydd',
+  'entities.items.hollowveil_legwraps.name': 'Hålslöjans benlindor',
+  'entities.items.hollowveil_mantle.name': 'Hålslöjans mantel',
+  'entities.items.hollowveil_mitts.name': 'Hålslöjans vantar',
+  'entities.items.hollowveil_moccasins.name': 'Hålslöjans mockasiner',
+  'entities.items.hollowveil_pauldrons.name': 'Hålslöjans pansaraxlar',
+  'entities.items.hollowveil_robe.name': 'Hålslöjans kåpa',
+  'entities.items.hollowveil_sabatons.name': 'Hålslöjans pansarskor',
+  'entities.items.hollowveil_sash.name': 'Hålslöjans midjeband',
+  'entities.items.hollowveil_shoulderguards.name': 'Hålslöjans axelskydd',
+  'entities.items.hollowveil_shoulderpads.name': 'Hålslöjans axelvaddar',
+  'entities.items.hollowveil_slippers.name': 'Hålslöjans tofflor',
+  'entities.items.hollowveil_spaulders.name': 'Hålslöjans axelskenor',
+  'entities.items.hollowveil_treads.name': 'Hålslöjans kängor',
+  'entities.items.hollowveil_trousers.name': 'Hålslöjans byxor',
+  'entities.items.hollowveil_tunic.name': 'Hålslöjans tunika',
+  'entities.items.hollowveil_vest.name': 'Hålslöjans väst',
+  'entities.items.hollowveil_waistguard.name': 'Hålslöjans midjeskydd',
+  'entities.items.jadeshrine_epaulets.name': 'Jadehelgedomens epåletter',
+  'entities.items.jadeshrine_mantle.name': 'Jadehelgedomens mantel',
+  'entities.items.jadeshrine_pauldrons.name': 'Jadehelgedomens pansaraxlar',
+  'entities.items.jadeshrine_shoulderguards.name': 'Jadehelgedomens axelskydd',
+  'entities.items.jadeshrine_shoulderpads.name': 'Jadehelgedomens axelvaddar',
+  'entities.items.jadeshrine_spaulders.name': 'Jadehelgedomens axelskenor',
+  'entities.items.membership_feet.name': 'Medlemskapets stövlar',
+  'entities.items.membership_gloves.name': 'Medlemskapets pansarhandskar',
+  'entities.items.membership_helmet.name': 'Medlemskapets hjälm',
+  'entities.items.membership_legs.name': 'Medlemskapets benskydd',
+  'entities.items.membership_shoulder.name': 'Medlemskapets pansaraxlar',
+  'entities.items.membership_waist.name': 'Medlemskapets gördel',
+  'entities.items.moonburn_grips.name': 'Månbrandens grepphandskar',
+  'entities.items.moonburn_treads.name': 'Månbrandens kängor',
+  'entities.items.oathbroken_breeches.name': 'Edsbrytarens knäbyxor',
+  'entities.items.oathbroken_chausses.name': 'Edsbrytarens brynjehosor',
+  'entities.items.oathbroken_leggings.name': 'Edsbrytarens benkläder',
+  'entities.items.oathbroken_legguards.name': 'Edsbrytarens benskydd',
+  'entities.items.oathbroken_legwraps.name': 'Edsbrytarens benlindor',
+  'entities.items.oathbroken_trousers.name': 'Edsbrytarens byxor',
+  'entities.items.pale_chorus_leggings.name': 'Bleka körens benkläder',
+  'entities.items.pale_chorus_slippers.name': 'Bleka körens tofflor',
+  'entities.items.palehunt_epaulets.name': 'Blekjaktens epåletter',
+  'entities.items.palehunt_mantle.name': 'Blekjaktens mantel',
+  'entities.items.palehunt_pauldrons.name': 'Blekjaktens pansaraxlar',
+  'entities.items.palehunt_shoulderguards.name': 'Blekjaktens axelskydd',
+  'entities.items.palehunt_shoulderpads.name': 'Blekjaktens axelvaddar',
+  'entities.items.palehunt_spaulders.name': 'Blekjaktens axelskenor',
+  'entities.items.pearlglow_coif.name': 'Pärlglödens brynjehuva',
+  'entities.items.pearlglow_headguard.name': 'Pärlglödens huvudskydd',
+  'entities.items.reedhush_epaulets.name': 'Vassusets epåletter',
+  'entities.items.reedhush_mantle.name': 'Vassusets mantel',
+  'entities.items.reedhush_pauldrons.name': 'Vassusets pansaraxlar',
+  'entities.items.reedhush_shoulderguards.name': 'Vassusets axelskydd',
+  'entities.items.reedhush_shoulderpads.name': 'Vassusets axelvaddar',
+  'entities.items.reedhush_spaulders.name': 'Vassusets axelskenor',
+  'entities.items.referral_feet.name': 'Vänskapens stövlar',
+  'entities.items.referral_gloves.name': 'Vänskapens pansarhandskar',
+  'entities.items.referral_helmet.name': 'Vänskapens hjälm',
+  'entities.items.referral_legs.name': 'Vänskapens benskydd',
+  'entities.items.referral_shoulder.name': 'Vänskapens pansaraxlar',
+  'entities.items.referral_waist.name': 'Vänskapens gördel',
+  'entities.items.rimesilk_hood.name': 'Rimsilkets huva',
+  'entities.items.rimesilk_mantle.name': 'Rimsilkets mantel',
+  'entities.items.saltwrack_epaulets.name': 'Saltvrakets epåletter',
+  'entities.items.saltwrack_mantle.name': 'Saltvrakets mantel',
+  'entities.items.saltwrack_pauldrons.name': 'Saltvrakets pansaraxlar',
+  'entities.items.saltwrack_shoulderguards.name': 'Saltvrakets axelskydd',
+  'entities.items.saltwrack_shoulderpads.name': 'Saltvrakets axelvaddar',
+  'entities.items.saltwrack_spaulders.name': 'Saltvrakets axelskenor',
+  'entities.items.sealkeeper_gauntlets.name': 'Sigillväktarens pansarhandskar',
+  'entities.items.sealkeeper_gloves.name': 'Sigillväktarens handskar',
+  'entities.items.sealkeeper_grips.name': 'Sigillväktarens grepphandskar',
+  'entities.items.sealkeeper_handguards.name': 'Sigillväktarens handskydd',
+  'entities.items.sealkeeper_handwraps.name': 'Sigillväktarens handlindor',
+  'entities.items.sealkeeper_mitts.name': 'Sigillväktarens vantar',
+  'entities.items.seamist_chausses.name': 'Havsdimmans brynjehosor',
+  'entities.items.seamist_legwraps.name': 'Havsdimmans benlindor',
+  'entities.items.shroudcaller_chainmail.name': 'Svepningskallarens ringbrynja',
+  'entities.items.shroudcaller_tunic.name': 'Svepningskallarens tunika',
+  'entities.items.sparkglass_breeches.name': 'Gnistglasets knäbyxor',
+  'entities.items.sparkglass_chausses.name': 'Gnistglasets brynjehosor',
+  'entities.items.sparkglass_leggings.name': 'Gnistglasets benkläder',
+  'entities.items.sparkglass_legguards.name': 'Gnistglasets benskydd',
+  'entities.items.sparkglass_legwraps.name': 'Gnistglasets benlindor',
+  'entities.items.sparkglass_trousers.name': 'Gnistglasets byxor',
+  'entities.items.stillhymn_greaves.name': 'Stillhymnens benskenor',
+  'entities.items.stillhymn_moccasins.name': 'Stillhymnens mockasiner',
+  'entities.items.stillhymn_treads.name': 'Stillhymnens kängor',
+  'entities.items.thornspire_belt.name': 'Törnspirans bälte',
+  'entities.items.thornspire_boots.name': 'Törnspirans stövlar',
+  'entities.items.thornspire_breeches.name': 'Törnspirans knäbyxor',
+  'entities.items.thornspire_cap.name': 'Törnspirans mössa',
+  'entities.items.thornspire_chainmail.name': 'Törnspirans ringbrynja',
+  'entities.items.thornspire_chausses.name': 'Törnspirans brynjehosor',
+  'entities.items.thornspire_cinch.name': 'Törnspirans gördelrem',
+  'entities.items.thornspire_coif.name': 'Törnspirans brynjehuva',
+  'entities.items.thornspire_cord.name': 'Törnspirans midjesnöre',
+  'entities.items.thornspire_cowl.name': 'Törnspirans kåphuva',
+  'entities.items.thornspire_epaulets.name': 'Törnspirans epåletter',
+  'entities.items.thornspire_gauntlets.name': 'Törnspirans pansarhandskar',
+  'entities.items.thornspire_girdle.name': 'Törnspirans gördel',
+  'entities.items.thornspire_gloves.name': 'Törnspirans handskar',
+  'entities.items.thornspire_greaves.name': 'Törnspirans benskenor',
+  'entities.items.thornspire_grips.name': 'Törnspirans grepphandskar',
+  'entities.items.thornspire_handguards.name': 'Törnspirans handskydd',
+  'entities.items.thornspire_handwraps.name': 'Törnspirans handlindor',
+  'entities.items.thornspire_hauberk.name': 'Törnspirans brynjeskjorta',
+  'entities.items.thornspire_headguard.name': 'Törnspirans huvudskydd',
+  'entities.items.thornspire_helm.name': 'Törnspirans hjälm',
+  'entities.items.thornspire_hood.name': 'Törnspirans huva',
+  'entities.items.thornspire_jerkin.name': 'Törnspirans skinnjacka',
+  'entities.items.thornspire_leggings.name': 'Törnspirans benkläder',
+  'entities.items.thornspire_legguards.name': 'Törnspirans benskydd',
+  'entities.items.thornspire_legwraps.name': 'Törnspirans benlindor',
+  'entities.items.thornspire_mantle.name': 'Törnspirans mantel',
+  'entities.items.thornspire_mitts.name': 'Törnspirans vantar',
+  'entities.items.thornspire_moccasins.name': 'Törnspirans mockasiner',
+  'entities.items.thornspire_pauldrons.name': 'Törnspirans pansaraxlar',
+  'entities.items.thornspire_robe.name': 'Törnspirans kåpa',
+  'entities.items.thornspire_sabatons.name': 'Törnspirans pansarskor',
+  'entities.items.thornspire_sash.name': 'Törnspirans midjeband',
+  'entities.items.thornspire_shoulderguards.name': 'Törnspirans axelskydd',
+  'entities.items.thornspire_shoulderpads.name': 'Törnspirans axelvaddar',
+  'entities.items.thornspire_slippers.name': 'Törnspirans tofflor',
+  'entities.items.thornspire_spaulders.name': 'Törnspirans axelskenor',
+  'entities.items.thornspire_treads.name': 'Törnspirans kängor',
+  'entities.items.thornspire_trousers.name': 'Törnspirans byxor',
+  'entities.items.thornspire_tunic.name': 'Törnspirans tunika',
+  'entities.items.thornspire_vest.name': 'Törnspirans väst',
+  'entities.items.thornspire_waistguard.name': 'Törnspirans midjeskydd',
+  'entities.items.tideglass_gauntlets.name': 'Tidvattensglasets pansarhandskar',
+  'entities.items.tideglass_pauldrons.name': 'Tidvattensglasets pansaraxlar',
+  'entities.items.trailwarden_belt.name': 'Stigväktarens bälte',
+  'entities.items.trailwarden_boots.name': 'Stigväktarens stövlar',
+  'entities.items.trailwarden_breeches.name': 'Stigväktarens knäbyxor',
+  'entities.items.trailwarden_cap.name': 'Stigväktarens mössa',
+  'entities.items.trailwarden_chainmail.name': 'Stigväktarens ringbrynja',
+  'entities.items.trailwarden_chausses.name': 'Stigväktarens brynjehosor',
+  'entities.items.trailwarden_cinch.name': 'Stigväktarens gördelrem',
+  'entities.items.trailwarden_coif.name': 'Stigväktarens brynjehuva',
+  'entities.items.trailwarden_cord.name': 'Stigväktarens midjesnöre',
+  'entities.items.trailwarden_cowl.name': 'Stigväktarens kåphuva',
+  'entities.items.trailwarden_epaulets.name': 'Stigväktarens epåletter',
+  'entities.items.trailwarden_gauntlets.name': 'Stigväktarens pansarhandskar',
+  'entities.items.trailwarden_girdle.name': 'Stigväktarens gördel',
+  'entities.items.trailwarden_gloves.name': 'Stigväktarens handskar',
+  'entities.items.trailwarden_greaves.name': 'Stigväktarens benskenor',
+  'entities.items.trailwarden_grips.name': 'Stigväktarens grepphandskar',
+  'entities.items.trailwarden_handguards.name': 'Stigväktarens handskydd',
+  'entities.items.trailwarden_handwraps.name': 'Stigväktarens handlindor',
+  'entities.items.trailwarden_hauberk.name': 'Stigväktarens brynjeskjorta',
+  'entities.items.trailwarden_headguard.name': 'Stigväktarens huvudskydd',
+  'entities.items.trailwarden_helm.name': 'Stigväktarens hjälm',
+  'entities.items.trailwarden_hood.name': 'Stigväktarens huva',
+  'entities.items.trailwarden_jerkin.name': 'Stigväktarens skinnjacka',
+  'entities.items.trailwarden_leggings.name': 'Stigväktarens benkläder',
+  'entities.items.trailwarden_legguards.name': 'Stigväktarens benskydd',
+  'entities.items.trailwarden_legwraps.name': 'Stigväktarens benlindor',
+  'entities.items.trailwarden_mantle.name': 'Stigväktarens mantel',
+  'entities.items.trailwarden_mitts.name': 'Stigväktarens vantar',
+  'entities.items.trailwarden_moccasins.name': 'Stigväktarens mockasiner',
+  'entities.items.trailwarden_pauldrons.name': 'Stigväktarens pansaraxlar',
+  'entities.items.trailwarden_robe.name': 'Stigväktarens kåpa',
+  'entities.items.trailwarden_sabatons.name': 'Stigväktarens pansarskor',
+  'entities.items.trailwarden_sash.name': 'Stigväktarens midjeband',
+  'entities.items.trailwarden_shoulderguards.name': 'Stigväktarens axelskydd',
+  'entities.items.trailwarden_shoulderpads.name': 'Stigväktarens axelvaddar',
+  'entities.items.trailwarden_slippers.name': 'Stigväktarens tofflor',
+  'entities.items.trailwarden_spaulders.name': 'Stigväktarens axelskenor',
+  'entities.items.trailwarden_treads.name': 'Stigväktarens kängor',
+  'entities.items.trailwarden_trousers.name': 'Stigväktarens byxor',
+  'entities.items.trailwarden_tunic.name': 'Stigväktarens tunika',
+  'entities.items.trailwarden_vest.name': 'Stigväktarens väst',
+  'entities.items.trailwarden_waistguard.name': 'Stigväktarens midjeskydd',
+  'entities.items.warmonger_greaves.name': 'Krigshetsarens benskenor',
+  'entities.items.warmonger_treads.name': 'Krigshetsarens kängor',
+  'entities.items.wyrmshadow_chainmail.name': 'Lindormsskuggans ringbrynja',
+  'entities.items.wyrmshadow_tunic.name': 'Lindormsskuggans tunika',
+  'entities.items.wyrmshadow_vest.name': 'Lindormsskuggans väst',
+  'entities.items.barrowstone_heart.name': 'Gravstenens hjärta',
+  'entities.items.beastpit_warbelt.name': 'Odjursgropens krigsbälte',
+  'entities.items.bloomsilk_cowl.name': 'Blomsilkets kåphuva',
+  'entities.items.bonechill_carapace_vest.name': 'Benkylans brynjeskjorta',
+  'entities.items.brinewarden_robe.name': 'Saltvattenväktarens kåpa',
+  'entities.items.candlewatch_jerkin.name': 'Ljusvaktens skinnjacka',
+  'entities.items.cantors_cassock.name': 'Kantorns kaftan',
+  'entities.items.cantors_hymnal.name': 'Kantorns psalmbok',
+  'entities.items.cantors_stole.name': 'Kantorns stola',
+  'entities.items.cellwatch_belt.name': 'Cellvaktens bälte',
+  'entities.items.charm_stag_acorn.name': 'Ekollonkronans amulett',
+  'entities.items.charm_stag_gilded.name': 'Förgylld amulett',
+  'entities.items.choristers_gloves.name': 'Koristens handskar',
+  'entities.items.choristers_spaulders.name': 'Koristens axelskenor',
+  'entities.items.chorus_conch.name': 'Körsnäcka',
+  'entities.items.craterglass_stave.name': 'Kraterglasstav',
+  'entities.items.drowned_commanders_breastplate.name': 'Den dränkte befälhavarens bröstplåt',
+  'entities.items.drowned_wardens_mantle.name': 'Den dränkte väktarens mantel',
+  'entities.items.falls_blessed_staff.name': 'Vattenfallsvälsignad stav',
+  'entities.items.fanglords_hide_mantle.name': 'Bettherrens skinnmantel',
+  'entities.items.fanglords_whistle.name': 'Bettherrens visselpipa',
+  'entities.items.fogbinders_rod.name': 'Dimbindarens stav',
+  'entities.items.foremans_grips.name': 'Förmannens grepphandskar',
+  'entities.items.foremans_last_link.name': 'Förmannens sista länk',
+  'entities.items.gaolers_chain_girdle.name': 'Fångvaktarens kedjegördel',
+  'entities.items.gaolers_iron_key.name': 'Fångvaktarens järnnyckel',
+  'entities.items.gaolyard_cudgel.name': 'Fängelsegårdens påk',
+  'entities.items.gaolyard_jerkin.name': 'Fängelsegårdens skinnjacka',
+  'entities.items.gaolyard_striders.name': 'Fängelsegårdens vandrarkängor',
+  'entities.items.gorgebloom_seedpod.name': 'Frossblommans frökapsel',
+  'entities.items.gravecallers_rod.name': 'Gravkallarens stav',
+  'entities.items.gravecallers_vestments.name': 'Gravkallarens skrud',
+  'entities.items.guttered_eye.name': 'Det slocknade ögat',
+  'entities.items.hammer_of_the_open_lock.name': 'Det öppna låsets hammare',
+  'entities.items.hexbone_handwraps.name': 'Förhäxade benlindor för händerna',
+  'entities.items.jaguar_hide_jerkin.name': 'Jaguarskinnsjacka',
+  'entities.items.jailers_iron_gauntlets.name': 'Fångvaktarens järnhandskar',
+  'entities.items.knellbound_hauberk.name': 'Dödsklangsbunden brynjeskjorta',
+  'entities.items.knight_commanders_longsword.name': 'Riddarbefälhavarens långsvärd',
+  'entities.items.knucklebone_of_balgath.name': 'Balgaths knogben',
+  'entities.items.lamenting_veil.name': 'Klagande slöja',
+  'entities.items.lantern_seal.name': 'Lyktsigill',
+  'entities.items.lanternwick_sash.name': 'Lyktvekens midjeband',
+  'entities.items.loomshard_eye.name': 'Gravglasögat',
+  'entities.items.meltwater_cord.name': 'Smältvattnets midjesnöre',
+  'entities.items.membership_chest.name': 'Medlemskapets kyrass',
+  'entities.items.membership_staff.name': 'Förändringens stav',
+  'entities.items.membership_token.name': 'Medlemspollett (30 dagar)',
+  'entities.items.mere_crested_helm.name': 'Sjökrönt hjälm',
+  'entities.items.merecleaver.name': 'Sjöklyvaren',
+  'entities.items.mereskin_hood.name': 'Sjöhudshuva',
+  'entities.items.merewater_cowl.name': 'Sjövattnets kåphuva',
+  'entities.items.moonwrack_stave.name': 'Månvrakets stav',
+  'entities.items.muster_grapnel.name': 'Uppbådets änterhake',
+  'entities.items.muster_shardpike.name': 'Uppbådets Skärvpik',
+  'entities.items.muster_standard.name': 'Samlingsstandar',
+  'entities.items.pale_chorus_vestment.name': 'Bleka körens skrud',
+  'entities.items.phial_of_the_tithe.name': 'Tiondets flaska',
+  'entities.items.pollen_dusted_leggings.name': 'Pollendammiga benkläder',
+  'entities.items.portcullis_girdle.name': 'Fällgallrets gördel',
+  'entities.items.prism_etched_cowl.name': 'Prismaristad kåphuva',
+  'entities.items.prism_etched_handwraps.name': 'Prismaristade handlindor',
+  'entities.items.pyre_tenders_hood.name': 'Bålvårdarens huva',
+  'entities.items.quenchwater_flask.name': 'Kylvattenflaska',
+  'entities.items.referral_chest.name': 'Vänskapens kyrass',
+  'entities.items.referral_fog_charm.name': 'Edsväktarens uppvaknade hjärta',
+  'entities.items.referral_hollow_charm.name': 'Edsväktarens hjärta',
+  'entities.items.referral_satchel.name': 'Vänskapens axelväska',
+  'entities.items.refrain_silk_gloves.name': 'Refrängsilkeshandskar',
+  'entities.items.reins_lantern_hall_destrier.name': 'Lykthallens stridshästtyglar',
+  'entities.items.reins_nightwing_chimera.name': 'Nattvingad chimäras tyglar',
+  'entities.items.reins_referral_raptor.name': 'Vänskapsraptorns tyglar',
+  'entities.items.reins_referral_tank.name': 'Vänskapsstridsvagnens tyglar',
+  'entities.items.reins_wobbles_slime.name': 'Gelésadel: Vickis',
+  'entities.items.rime_laced_hood.name': 'Rimfrostkantad huva',
+  'entities.items.rimeweb_fang.name': 'Brudens istapp',
+  'entities.items.rimeweb_hunters_leggings.name': 'Rimfrostkantade benkläder',
+  'entities.items.rimewreath_coif.name': 'Rimfrostkransens brynjehuva',
+  'entities.items.robe_of_the_unquiet_rite.name': 'De oroligas rits kåpa',
+  'entities.items.rootbound_sabatons.name': 'Rotbundna pansarskor',
+  'entities.items.rusted_shackle_grips.name': 'Rostiga bojors grepphandskar',
+  'entities.items.seal_rune_mantle.name': 'Sigillrunans mantel',
+  'entities.items.serac_stride_boots.name': 'Isblocksvandrarens stövlar',
+  'entities.items.sextons_burial_spade.name': 'Dödgrävarens gravspade',
+  'entities.items.sextons_spadehaft.name': 'Dödgrävarens spadskaft',
+  'entities.items.spadeworn_gauntlets.name': 'Spadslitna pansarhandskar',
+  'entities.items.thawbound_legguards.name': 'Töbundna benskydd',
+  'entities.items.thornroot_greathelm.name': 'Törnkrönt storhjälm',
+  'entities.items.tideglass_shiv.name': 'Tidvattensglasets stickkniv',
+  'entities.items.tideglass_warmaul.name': 'Tidvattensglasets krigsslägga',
+  'entities.items.turnkeys_keyring_belt.name': 'Fängelsevaktens nyckelringsbälte',
+  'entities.items.turnkeys_lantern_cowl.name': 'Fängelsevaktens lyktkåphuva',
+  'entities.items.turnkeys_shank.name': 'Fängelsevaktens stickkniv',
+  'entities.items.unquiet_stalkers_hood.name': 'Den orolige smygarens huva',
+  'entities.items.vestments_of_the_waking_rite.name': 'Uppvaknandets rits skrud',
+  'entities.items.whistle_alon.name': 'Visselpipa för Alon',
+  'entities.items.whistle_alpaca.name': 'Alpackavisselpipa',
+  'entities.items.whistle_ansem.name': 'Visselpipa för Ansem',
+  'entities.items.whistle_bull.name': 'Tjurvisselpipa',
+  'entities.items.whistle_cate_coin.name': 'Myntkattens visselpipa',
+  'entities.items.whistle_crimson_claw_crab.name': 'Karmosinkrabbans visselpipa',
+  'entities.items.whistle_crystal_lich.name': 'Kristalllichens visselpipa',
+  'entities.items.whistle_crystal_tide.name': 'Kristalltidvattnets visselpipa',
+  'entities.items.whistle_ember_fox.name': 'Glödrävens visselpipa',
+  'entities.items.whistle_emberfall_phoenix.name': 'Glödfallsfenixens visselpipa',
+  'entities.items.whistle_emerald_wolf.name': 'Smaragdvargens visselpipa',
+  'entities.items.whistle_forgemaw.name': 'Visselpipa för Smältkäften',
+  'entities.items.whistle_frog.name': 'Grodvisselpipa',
+  'entities.items.whistle_frostfire.name': 'Frosteldens visselpipa',
+  'entities.items.whistle_golden_sentinel.name': 'Gyllene väktarens visselpipa',
+  'entities.items.whistle_horse.name': 'Hästvisselpipa',
+  'entities.items.whistle_kekius.name': 'Visselpipa för Kekius',
+  'entities.items.whistle_loot_goblin.name': 'Bytesgoblinens visselpipa',
+  'entities.items.whistle_moss_hare.name': 'Mossharens visselpipa',
+  'entities.items.whistle_nightfang.name': 'Nattandens visselpipa',
+  'entities.items.whistle_penny_goldspark.name': 'Penny Guldgnistas visselpipa',
+  'entities.items.whistle_phantom.name': 'Vålnadsvisselpipa',
+  'entities.items.whistle_proud_grunt.name': 'Stolte soldatens visselpipa',
+  'entities.items.whistle_raptor.name': 'Raptorvisselpipa',
+  'entities.items.whistle_rocky.name': 'Stenis visselpipa',
+  'entities.items.whistle_sapling.name': 'Plantans visselpipa',
+  'entities.items.whistle_skeleton.name': 'Skelettvisselpipa',
+  'entities.items.whistle_solbot.name': 'Solbotens visselpipa',
+  'entities.items.whistle_spider.name': 'Spindelvisselpipa',
+  'entities.items.whistle_sprites.name': 'Flimmer och Glimmers visselpipa',
+  'entities.items.whistle_stag.name': 'Hjortvisselpipa',
+  'entities.items.whistle_tiger.name': 'Tigervisselpipa',
+  'entities.items.whistle_triple_t.name': 'Trippel-T:s visselpipa',
+  'entities.items.whistle_trollface.name': 'Trollansiktets visselpipa',
+  'entities.items.whistle_tuskhorn_boar.name': 'Beteshornsgaltens visselpipa',
+  'entities.mobs.balgath_cyclops.name': 'Balgath, den enögde förmannen',
+  'entities.mobs.barnacle_crawler.name': 'Vrakbunden sjöman',
+  'entities.mobs.basin_raptor.name': 'Bassängraptor',
+  'entities.mobs.bastion_drowned_anchor.name': 'Dränkt ankare',
+  'entities.mobs.bastion_gaol_cage.name': 'Järnbur',
+  'entities.mobs.bastion_warhound.name': 'Bastionens krigshund',
+  'entities.mobs.bound_soul.name': 'Bunden själ',
+  'entities.mobs.broodsworn_goadsmith.name': 'Kullsvuren sporsmed',
+  'entities.mobs.broodsworn_pyre_tender.name': 'Kullsvuren bålvårdare',
+  'entities.mobs.broodsworn_thawcaller.name': 'Kullsvuren tökallare',
+  'entities.mobs.buddy_alpaca.name': 'Alpacka',
+  'entities.mobs.buddy_bull.name': 'Tjur',
+  'entities.mobs.buddy_cate_coin.name': 'Myntkatten',
+  'entities.mobs.buddy_crimson_claw_crab.name': 'Karmosinkrabba',
+  'entities.mobs.buddy_crystal_lich.name': 'Kristalllich',
+  'entities.mobs.buddy_crystal_tide.name': 'Kristalltidvatten',
+  'entities.mobs.buddy_ember_fox.name': 'Glödräv',
+  'entities.mobs.buddy_emberfall_phoenix.name': 'Glödfallsfenix',
+  'entities.mobs.buddy_emerald_wolf.name': 'Smaragdvarg',
+  'entities.mobs.buddy_forgemaw.name': 'Smältkäften',
+  'entities.mobs.buddy_frog.name': 'Groda',
+  'entities.mobs.buddy_frostfire.name': 'Frosteld',
+  'entities.mobs.buddy_golden_sentinel.name': 'Gyllene väktare',
+  'entities.mobs.buddy_horse.name': 'Drag, stridshästen',
+  'entities.mobs.buddy_loot_goblin.name': 'Bytesgoblin',
+  'entities.mobs.buddy_moss_hare.name': 'Mosshare',
+  'entities.mobs.buddy_nightfang.name': 'Nattand',
+  'entities.mobs.buddy_penny_goldspark.name': 'Penny Guldgnista',
+  'entities.mobs.buddy_phantom.name': 'Vålnad',
+  'entities.mobs.buddy_proud_grunt.name': 'Stolt soldat',
+  'entities.mobs.buddy_rocky.name': 'Stenis',
+  'entities.mobs.buddy_sapling.name': 'Planta',
+  'entities.mobs.buddy_skeleton.name': 'Skelett',
+  'entities.mobs.buddy_solbot.name': 'Solboten',
+  'entities.mobs.buddy_spider.name': 'Spindel',
+  'entities.mobs.buddy_sprites.name': 'Flimmer och Glimmer',
+  'entities.mobs.buddy_stag.name': 'Hjort',
+  'entities.mobs.buddy_tiger.name': 'Tiger',
+  'entities.mobs.buddy_triple_t.name': 'Trippel-T',
+  'entities.mobs.buddy_trollface.name': 'Trollansiktet',
+  'entities.mobs.buddy_tuskhorn_boar.name': 'Beteshornsgalt',
+  'entities.mobs.candlewright_acolyte.name': 'Ljusmakarakolyt',
+  'entities.mobs.cantor_ilvane.name': 'Kantor Ilvane',
+  'entities.mobs.crypt_bone_brute.name': 'Benbest',
+  'entities.mobs.crypt_bone_minion.name': 'Bentjänare',
+  'entities.mobs.crypt_bone_pile.name': 'Rörliga ben',
+  'entities.mobs.crypt_carrion_crow.name': 'Askråka',
+  'entities.mobs.crypt_chapel_gargoyle.name': 'Kapellgargoyl',
+  'entities.mobs.crypt_crow_caller.name': 'Kråkkallare',
+  'entities.mobs.crypt_gravecaller_adept.name': 'Gravkallaradept',
+  'entities.mobs.crypt_gravecaller_necromancer.name': 'Gravkallarnekromantiker',
+  'entities.mobs.crypt_knellwyrm.name': 'Dödsklangslindorm',
+  'entities.mobs.crypt_ossuary_cutthroat.name': 'Benhusets strupskärare',
+  'entities.mobs.crypt_ossuary_drake.name': 'Benhusdrake',
+  'entities.mobs.crypt_ossuary_warrior.name': 'Benhuskrigare',
+  'entities.mobs.crypt_remembrance_candle.name': 'Minnesljus',
+  'entities.mobs.drowned_pilgrim.name': 'Dränkt pilgrim',
+  'entities.mobs.drowned_sergeant.name': 'Dränkt sergeant',
+  'entities.mobs.drowned_watchman.name': 'Dränkt väktare',
+  'entities.mobs.fanglord_jaguar.name': 'Bettherrens stora jaguar',
+  'entities.mobs.fogbound_arbalest.name': 'Dimbunden armborstskytt',
+  'entities.mobs.gaol_turnkey.name': 'Fängelsevakt',
+  'entities.mobs.gaoler_ossick.name': 'Fångvaktare Ossick',
+  'entities.mobs.glacier_splinter.name': 'Glaciärskärva',
+  'entities.mobs.great_saurian.name': 'Storödla',
+  'entities.mobs.hollow_chorister.name': 'Ihålig korist',
+  'entities.mobs.hollow_gravedigger.name': 'Ihålig dödgrävare',
+  'entities.mobs.howdah_hexcaller.name': 'Bärstolens förbannelsekallare',
+  'entities.mobs.ice_wraith.name': 'Isvålnad',
+  'entities.mobs.lagoon_snapper.name': 'Lagunsnappare',
+  'entities.mobs.marrow_restless_bones.name': 'Rastlöst skelett',
+  'entities.mobs.mere_hydra_head_center.name': 'Sjöhydra',
+  'entities.mobs.mere_hydra_head_left.name': 'Sjöhydra',
+  'entities.mobs.mere_hydra_head_right.name': 'Sjöhydra',
+  'entities.mobs.mistweaver.name': 'Dimkantor',
+  'entities.mobs.moonlit_siren.name': 'Månbelyst siren',
+  'entities.mobs.muster_chaplain.name': 'Uppbådets fältpräst',
+  'entities.mobs.muster_drillmaster.name': 'Uppbådets exercismästare',
+  'entities.mobs.muster_effigy.name': 'Halmförman',
+  'entities.mobs.muster_footman.name': 'Uppbådets fotsoldat',
+  'entities.mobs.muster_sergeant.name': 'Uppbådets sergeant',
+  'entities.mobs.ogre_sledge_hauler.name': 'Ogrisk släddragare',
+  'entities.mobs.ossuary_sentinel.name': 'Benhusväktare',
+  'entities.mobs.rime_egg_sac.name': 'Rimfrostsäggsäck',
+  'entities.mobs.rime_whelp.name': 'Rimfrostsunge',
+  'entities.mobs.rimeweb.name': 'Benkylans dam',
+  'entities.mobs.rimeweb_hatchling.name': 'Rimnätsunge',
+  'entities.mobs.rimeweb_spinner.name': 'Rimnätsspinnare',
+  'entities.mobs.sanctum_shackle_anvil.name': 'Städboja',
+  'entities.mobs.sanctum_shackle_bellows.name': 'Bälgboja',
+  'entities.mobs.sanctum_shackle_hammer.name': 'Hammarboja',
+  'entities.mobs.sanctum_shackle_tongs.name': 'Tångboja',
+  'entities.mobs.shackled_prisoner.name': 'Fjättrad fånge',
+  'entities.mobs.sledge_tusker.name': 'Slädbetare',
+  'entities.mobs.soul_brazier.name': 'Själsfyrfat',
+  'entities.mobs.spore_toad.name': 'Sporpadda',
+  'entities.mobs.sunbone_dread_totem.name': 'Solbenens skräcktotem',
+  'entities.mobs.sunbone_totem.name': 'Solbenens totem',
+  'entities.mobs.sunbone_totem_binder.name': 'Solbenens totembindare',
+  'entities.mobs.the_gorgebloom.name': 'Frossblomman',
+  'entities.mobs.thorn_sprout.name': 'Taggskott',
+  'entities.mobs.tideglass_colossus.name': 'Tidvattensglaskoloss',
+  'entities.mobs.tideglass_reflection.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tidewisp.name': 'Tidvattensirrbloss',
+  'entities.mobs.turretback_hermit.name': 'Skeppsvrakskapten',
+  'entities.mobs.vael_fog_shade.name': 'Vael Dimbindaren',
+  'entities.mobs.vine_lasher.name': 'Snärrankepiskare',
+  'entities.mobs.tideglass_reflection_druid.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_hunter.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_mage.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_paladin.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_priest.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_rogue.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_shaman.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_warlock.name': 'Tidvattensglasets spegelbild',
+  'entities.mobs.tideglass_reflection_warrior.name': 'Tidvattensglasets spegelbild',
+  'entities.npcs.cantor_laverock.greeting':
+    'Jag var Bleka körens yngsta röst. På ritens natt drack jag inte, och jag flydde. Varje fullmåne sedan dess hör jag dem sjunga under vattnet. Jag måste träffa henne innan jag dör. Låt mig gå bakom er. Jag kommer inte slåss och jag kommer inte sakta ned er.',
+  'entities.npcs.cantor_laverock.title': 'Bleka körens sista kantor',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    'Tre kontrakt i veckan, uppsatta vid varje återställning. Ingen underskrift, inga avgifter: fullfölj ett så är sigillen dina.',
+  'entities.npcs.contract_clerk_tobias_wren.title': 'Kontraktsskrivare',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    'Sigill mot hedersbetygelser, vän. Inget på mina hyllor vässar en klinga, men varje hall i Högvakten kommer veta var du förtjänade det.',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'Gillets kvartermästare',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    'Letar du efter en grupp? Varje krypta, bastion och tempel på kartan har ett namn på min lista. Säg vart du är på väg.',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'Gillesrekryterare',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    'Välkommen till Lykthallen, {className}. Tobias har veckans kontrakt på tavlan, Garrick byter våra sigill mot hedersbetygelser värda att bära och Mira hittar en grupp åt dig för varje port under berget. Ta med en trofé tillbaka så hänger den i hallen bakom mig.',
+  'entities.npcs.guildmaster_hesper_dunmore.title': 'Lykthallens gillesmästare',
+  'entities.npcs.innkeeper_maudie.greeting':
+    'Kom in från fukten, vän, och se upp för steget ned till elden. Kitteln står på, bänkarna är varma och rummen ovanpå är torra. Resenärer från Kärrbron svär på att träskvägen är lugn om dagen, men ingen går där efter mörkrets inbrott. Sitt en stund och vila fötterna.',
+  'entities.npcs.innkeeper_maudie.title': 'Värdshusvärd',
+  'entities.npcs.muster_commander.greeting':
+    'Pikarna först, {className}, sedan alla andra. Det är allt, och det har hållit detta läger vid liv.',
+  'entities.npcs.muster_commander.name': 'Uppbådets befälhavare',
+  'entities.npcs.muster_commander.title': 'Kärrbrons uppbåd',
+  'entities.npcs.patron_amos_eelby.greeting':
+    'Dra fram en bänk, {className}. Grissel här svär på att storålen under Kärrbron är en myt. Jag har haft handen på honom två gånger. Två gånger! Hal som en skatteindrivare och nästan lika lång som den här bänken.',
+  'entities.npcs.patron_amos_eelby.title': 'Ålfiskare',
+  'entities.npcs.patron_grissel_sedgeworth.greeting':
+    'Bry dig inte om Amos. Fyrtio år av torvskärning och jag har dragit fler konstiga saker ur kärret än han fångat ålar: stövlar, ben, en hjälm med huvudet fortfarande bekymrat över den. Värm dig, elden är gratis.',
+  'entities.npcs.patron_grissel_sedgeworth.title': 'Torvskärare',
+  'entities.npcs.patron_hester_quillby.greeting':
+    'Varje karta över detta träsk jag köpt har blivit fel inom en säsong. Vattnet flyttar stigarna och stigarna flyttar vattnet. Så jag ritar egna och sitter här där det är torrt medan bläcket torkar.',
+  'entities.npcs.patron_hester_quillby.title': 'Kartograf',
+  'entities.npcs.patron_ned_oxley.greeting':
+    'Drev fyrtio djur nedför vallen och förlorade två i dyn före Kärrbron. Maudies öl är det enda längs denna väg som aldrig sviker en man. Köp din egen, bara.',
+  'entities.npcs.patron_ned_oxley.title': 'Boskapsskötare',
+  'entities.npcs.socketwright_skerrit.greeting':
+    'Fyrtio år sedan jag slipade det ögat och satte det i hans håla, och inte en dagslön har jag fått. Vill du skada förmannen, {className}? Sikta på mitt verk.',
+  'entities.npcs.socketwright_skerrit.title': 'ögonhålsmakaren',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    'Alla tabeller dessa valv kan dra från. Att besegra en boss låser permanent upp dess byte för framtida valv. En fängelsehåletabell innehåller bara bossarna du besegrat, och ett heroiskt dödande låser även upp normalt läge. Slagen utesluter föremål som redan dragits. Utrustning som kräver mer än {maxLevelOffset} nivåer över din nivå visas inte.',
+  'entities.abilities.courier.description':
+    'Frammana en flygande åsna som bär föremål mellan dina väskor och närmaste bank. Varje resa tar upp till 15 sekunder till banken och upp till 15 sekunder tillbaka, med snabbare flygning på längre sträckor. Välj upp till 24 staplar per resa. Återlämnade föremål får plats även i fulla väskor, sedan försvinner kuriren tills den frammanas igen. Återresan pausas medan du är död eller inne i en instans. Medlemskap krävs för att påbörja en ny resa.',
+  'entities.abilities.courier.name': 'Kurir',
+  'entities.letters.membership_annual_reward.body':
+    'Din betalning för årsmedlemskapet är klar. Riddjurets tyglar är bifogade. Behåll tyglarna i dina väskor eller på banken för att äga detta riddjur. Det förblir ditt när medlemskapet går ut. Ridkunskap krävs.',
+  'entities.letters.membership_annual_reward.sender': 'Korpposten',
+  'entities.letters.membership_annual_reward.subject': 'Ditt riddjur från årsmedlemskapet',
+  'entities.letters.membership_token_delivery.body':
+    'Din köpta pollett är bifogad. Lös in den för att lägga till 30 dagars medlemskap på ditt konto eller handla den med en annan äventyrare.',
+  'entities.letters.membership_token_delivery.sender': 'Korpposten',
+  'entities.letters.membership_token_delivery.subject': 'Din medlemspollett',
+  'entities.quests.q_muster_pike_drill.completion':
+    'Du kände hur den bet, va? På den riktiga ger det fjorton andetag med hela raiden svingande innan huden sluter sig igen. Kom ihåg lärdomen. Förmannen kommer att pröva den.',
+  'entities.quests.q_muster_pike_drill.objectives.0.label': 'Skärvpik tagen från uppbådets ställ',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': 'Halmförmannens lykta släckt',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': 'Slag träffade medan plankorna är nere',
+  'entities.quests.q_muster_pike_drill.text':
+    'Prat är billigt och pikar är det inte, och stället lånar bara ut dem till rekryter på nivå 19 eller lägre. Ta en Skärvpik från stället bredvid mig och gå sedan till halmförmannen i lägrets västra ände: pojkarna byggde honom av plankor och halm, hälften så stor som den riktiga, med en lykta där ögat ska sitta. Sätt piken i stöd och håll spetsen stadig medan exercismästaren slår i marken, för den riktiga skakar hårdare. När dina armar är säkra, för spetsen genom lyktan. Hans plankor faller av: slå honom då med ditt eget vapen, {playerName}, och känn skillnaden.',
+  'entities.quests.q_muster_pike_drill.title': 'Pikarna först',
+  'entities.quests.q_muster_summons.completion':
+    'Fenwicks budbärare, är det så? Bra. Lyssna, för jag säger detta en gång och han säger det aldrig alls. Balgath går förbi våra förposter: kraterkanten, slätterna i väster, sydsluttningen, gapet i sydvästkanten och sedan runt igen, och varje post han stannar vid plattar han till. Stål biter inte på honom. Hans hud avvärjer det, och en raid som hugger på honom dör bara trött. Den enda svagheten är ögat. En stödd pik genom Gravglaset bländar honom, och medan han är blind faller huden av: då slår hela raiden honom, och slår hårt. Sedan sluter den sig och vi väntar på nästa chans. Stället lånar ut sina pikar till rekryter på nivå 19 eller lägre: de unga slår ut ögat, veteranerna utnyttjar tillfället. Pikarna först, {playerName}, sedan alla andra.',
+  'entities.quests.q_muster_summons.objectives.0.label': 'Rapportera till uppbådets befälhavare',
+  'entities.quests.q_muster_summons.text':
+    'Varje spjut jag kunde avvara är nedgrävt runt Stjärnfallskratern, {playerName}, i en ring runt det som vandrar ut ur den. Uppbådets befälhavare håller lägret på den södra höjden ovanför kratern, sydost om här. Rapportera till befälhavaren. Du får höra hur vi bekämpar honom, och du kommer att lyssna, för de som inte gjorde det ligger i vassen.',
+  'entities.quests.q_muster_summons.title': 'Uppbådets kallelse',
+  'entities.quests.q_muster_trophy.completion':
+    'Nere igen, och du var med i striden som gjorde det. Kärrbron får min rapport i kväll. Börsen är tunn så här långt ut, men den är din. Kom tillbaka när han är uppe igen.',
+  'entities.quests.q_muster_trophy.objectives.0.label': 'Balgath dräpt',
+  'entities.quests.q_muster_trophy.text':
+    'Varje vecka reser han sig igen och varje vecka slår vi ned honom igen. Det kräver en raid, och uppbådet kan inte samla en på egen hand. Hitta nästa raid som ger sig på Balgath och hjälp till att fälla honom, {playerName}. Slå honom, skydda dem som gör det eller läk dem: varje hand som bekämpar honom räknas. Kom tillbaka och rapportera till mig när han faller. Uppbådet betalar för varje dödande.',
+  'entities.quests.q_muster_trophy.title': 'En flisa av förmannen',
+  'entities.quests.q_socketwrights_due.completion':
+    'Du kände hur det gav vika, va? Fyrtio års ränta, betald genom ögonhålan. Piken är din, vän. Han läker, det gör han alltid, så gå och driv in mer när lusten faller på.',
+  'entities.quests.q_socketwrights_due.objectives.0.label': 'Förmannens öga utslaget',
+  'entities.quests.q_socketwrights_due.text':
+    'Jag satte Gravglaset i den ögonhålan själv: slipade linsen, satte den på plats och kilade fast den rakt. Gravmästarna betalade mig aldrig en kopparslant, och nu går mitt verk omkring och plattar till kärret. Ta min Skärvpik. Sätt ned skaftänden, håll spetsen stadig hur lång tid det än tar och för den genom ögat när dina armar är säkra. Huden han bär är bunden till den skärvan, {playerName}: blända honom så kommer varje klinga i träsket äntligen att bita.',
+  'entities.quests.q_socketwrights_due.title': 'Ögonhålsmakarens fordran',
+  'entities.zones.goldcrest_harbor.pois.0.label': 'Stora porten',
+  'entities.zones.goldcrest_harbor.pois.1.label': 'Stora torget',
+  'entities.zones.goldcrest_harbor.pois.2.label': 'Goldcrestbörsen',
+  'entities.zones.goldcrest_harbor.pois.3.label': 'Marknadskvarteret',
+  'entities.zones.goldcrest_harbor.pois.4.label': 'Hamnkvarteret',
+  'entities.zones.goldcrest_harbor.pois.5.label': 'Högkronans citadell',
+  'entities.zones.goldcrest_harbor.pois.6.label': 'Ljusspiran',
+  'entities.zones.goldcrest_harbor.pois.7.label': 'Guldljuset',
+  'entities.zones.goldcrest_harbor.pois.8.label': 'Gyllene spannet',
+  'entities.zones.goldcrest_harbor.welcome':
+    'Goldcrest Harbor, världsmarknadens säte. Varje väg, tidvatten och liggare i riket möts här.',
+  'guide.interfacePage.dungeonTrackerBody':
+    'Inne i en gruppfängelsehåla hamnar en fängelsehålsspårare högst i stapeln: en platta med fängelsehålans namn, märkt Heroisk på en heroisk runda, med ett fält som fylls under rundans gång, och under det alla bossar i den ordning vägen möter dem, var och en räknad 0 / 1 tills den faller. En boss vars strid har en andra akt förblir öppen tills hela striden är över, så listan visas som klar först när rundan är det. Spåraren försvinner när du lämnar, och Redigera ramar låser upp den som de andra spårarna, under en egen namnbricka.',
+  'guide.interfacePage.framesGovernedShardpike':
+    'Redigera ramar låser även upp Skärvpiksfältet, den korta raden med uppdragsverktygshandlingar som visas bredvid dina handlingsfält bara medan du bär själva Skärvpiken; den har sin namnbricka medan den är upplåst så att du kan placera den före striden i stället för under den.',
+  'worldContent.musterRackName': 'Uppbådets vapenställ',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    'Den träffar hela gruppen och kan inte undvikas: helare fyller på allas hälsa innan den landar.',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    'Bälgkedjan bruten: var {every}:e sek en besvärjelse på {cast} sek, sedan {min} till {max} skada på alla och en knuff {push} yard bort från honom.',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    'Kliv ur banan. Medan städkedjan håller stannar han inom {leash} yard från mitten och rusar aldrig.',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    'Städkedjan bruten: han kan lämna terrassens mitt. Var {every}:e sek markerar en besvärjelse på {cast} sek en bana på {length} yard mot spelaren längst bort, sedan rusar han längs den: {min} till {max} skada och en tillbakaknuffning.',
+  'bossJournal.sanctum.korgath.choiceGain':
+    'Varje bruten kedja tar bort {perChain} av hans skademinskning: från {all} med alla fyra kedjor till ingen. Striden blir mycket kortare.',
+  'bossJournal.sanctum.korgath.choiceName': 'Hur många kedjor bryter ni?',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    'Varje bruten kedja frigör en attack under resten av striden. Hammare: Släggbåge. Tång: Kedjegissel. Städ: Tröskelanstormning, och han kan lämna mitten. Bälg: Förmannens vrål.',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    'Varje bruten kedja frigör en attack under resten av striden. Hammare: Släggbåge. Tång: Kedjegissel. Städ: Tröskelanstormning, och han kan lämna mitten. Bälg: Förmannens vrål. En sporsmed kommer även för att nita om varje bruten kedja.',
+  'bossJournal.sanctum.korgath.flailResponse':
+    'Kliv åt sidan ur banan innan besvärjelsen tar slut.',
+  'bossJournal.sanctum.korgath.flailSummary':
+    'Tångkedjan bruten: var {every}:e sek markerar en besvärjelse på {cast} sek en bana på {length} yard mot den andra spelare än tanken som är längst bort, sedan träffar piskan alla i den: {min} till {max} skada.',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    'Sista länken: med en kedja kvar kommer Ansträngning var {every}:e sek.',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    'Nita om: {delay} sek efter att en kedja bryts försöker en sporsmed återställa den. Avbryt, bedöva eller döda den.',
+  'bossJournal.sanctum.korgath.lastLinkName': 'Sista länken',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    'Bryt den sista kedjan snabbt eller var redo att lämna dess pelare var {every}:e sek.',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    'Medan exakt en kedja återstår kommer Ansträngning var {every}:e sek i stället för var {base}:e sek.',
+  'bossJournal.sanctum.korgath.lockboundName': 'Låsbunden',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    'Bryt kedjor för att döda snabbare. Bestäm hur många först: varje kedja frigör också en attack.',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    'Varje hel kedja minskar skadan han tar med {perChain}: {all} mindre skada medan alla fyra håller.',
+  'bossJournal.sanctum.korgath.maulResponse':
+    'Bara tanken står framför. Alla andra går bakom honom under besvärjelsen.',
+  'bossJournal.sanctum.korgath.maulSummary':
+    'Hammarkedjan bruten: var {every}:e sek en besvärjelse på {cast} sek, sedan en klyvning på {arc} grader framför honom, {range} yard förbi hans kropp, för {mult} gånger hans närstridsträff.',
+  'bossJournal.sanctum.korgath.overview':
+    'Smedens förman, fastkedjad vid fyra sigillpelare. Varje kedja som sitter kvar minskar skadan han tar med {perChain}, så att bryta kedjor gör honom lättare att döda. Men varje kedja ni bryter frigör ytterligare en av hans attacker under resten av striden.',
+  'bossJournal.sanctum.korgath.phaseEnrageName': 'Rasande',
+  'bossJournal.sanctum.korgath.phaseFreedName': 'Brutna kedjor',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    'Varje bruten kedja frigör en attack under resten av striden, även om kedjan nitas fast igen senare.',
+  'bossJournal.sanctum.korgath.phaseLockName': 'Låset',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    'Han börjar bunden av {chains} kedjor, en till varje pelare. En sigillboja vid varje pelare håller dess kedja.',
+  'bossJournal.sanctum.korgath.rerivetResponse':
+    'Avbryt, bedöva eller döda sporsmeden innan kanaliseringen tar slut.',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    '{delay} sek efter att en kedja bryts klättrar en kullsvuren sporsmed över kanten bakom dess pelare, går till bojan och kanaliserar Nita om i {channel} sek. Om den slutförs återkommer kedjan och en ny boja med sin skademinskning på {perChain}, men den frigjorda attacken finns kvar.',
+  'bossJournal.sanctum.korgath.shacklesName': 'Sigillbojor',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    'Skadegörare dödar bojorna till de kedjor ni valt att bryta. Tanken håller Korgath i mitten under tiden.',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    'En sigillboja står vid varje pelares fot. Bojor kan inte attackeras förrän Korgath dras in i strid. Att döda en bryter dess kedja. Medan städkedjan håller kan han inte lämna {leash} yard från terrassens mitt.',
+  'bossJournal.sanctum.korgath.stompResponse':
+    'Avståndsspelare stannar utanför ringen. Närstridsspelare går ut om de kan; helare fyller på dem som träffas.',
+  'bossJournal.sanctum.korgath.stompSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan en ring {radius} yard förbi hans kropp: {min} till {max} skada på alla inuti.',
+  'bossJournal.sanctum.korgath.strainResponse':
+    'Gå bort från varje pelare med en hel kedja innan besvärjelsen tar slut.',
+  'bossJournal.sanctum.korgath.strainSummary':
+    'Medan någon kedja håller: var {every}:e sek en besvärjelse på {cast} sek, sedan en explosion i en ring på {radius} yard runt varje pelare vars kedja håller: {min} till {max} skada och en tillbakaknuffning. Den upphör när alla fyra kedjor är brutna.',
+  'bossJournal.sanctum.korgath.tipDamage':
+    'Döda bojor för att bryta de valda kedjorna och gör sedan full skada på Korgath. Gå ur markerade banor och bort från pelare som fortfarande håller en kedja.',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    'Döda bojor för att bryta de valda kedjorna och gör sedan full skada på Korgath. Stoppa varje sporsmed innan Nita om slutförs. Gå ur markerade banor och bort från pelare som fortfarande håller en kedja.',
+  'bossJournal.sanctum.korgath.tipHealer':
+    'Ansträngning, Skälvande stamp och varje frigjord attack slår hårt. Varje kvarvarande kedja gör striden längre; varje bruten kedja lägger till en attack att läka igenom.',
+  'bossJournal.sanctum.korgath.tipTank':
+    'Håll honom i mitten, vänd bort från gruppen. När hammarkedjan bryts träffar Släggbåge allt framför honom. Tills städkedjan bryts kan han inte lämna {leash} yard från mitten.',
+  'bossJournal.sanctum.korzul.breathResponse':
+    'Bara tanken står framför. Tanken riktar andedräkten mot is som gruppen kan avvara.',
+  'bossJournal.sanctum.korzul.breathSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek längs tankens linje, sedan en eldkon på {arc} grader {range} yard förbi hans kropp: {min} till {max} skada på alla i den utom tanken. Upp till {plates} plattor under konen brinner, de närmaste först.',
+  'bossJournal.sanctum.korzul.broodName': 'Kullen underifrån',
+  'bossJournal.sanctum.korzul.broodResponse':
+    'Tanken fångar upp dem och gruppen dödar dem medan han är i luften.',
+  'bossJournal.sanctum.korzul.broodSummary':
+    'När han lyfter klättrar en fjällvakt upp ur varje bruten platta, upp till {max}.',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    'Med honom på en sprucken platta bryter puls {crack} den, han släcks och Gravinferno slutar tidigt, före de starkaste pulserna.',
+  'bossJournal.sanctum.korzul.choiceDouseName': 'Släcka infernot?',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    'Den plattan är borta för gott. Lämnas han på osprucken is fortsätter kanaliseringen till puls {brk} och bryter ändå plattan.',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    'Rikta hans andedräkt, hans Störtande eld och hans landning mot valda plattor så förblir resten av sjön säker att stå på.',
+  'bossJournal.sanctum.korzul.choiceIceName': 'Vilken is förbrukar ni?',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    'Varje bruten platta är öppet vatten, och varje sådan låter en fjällvakt klättra upp vid nästa flygning (upp till {max}). Utan is kvar andas han utan paus.',
+  'bossJournal.sanctum.korzul.descentResponse':
+    'Samlas på en platta ni kan låta spricka och spring sedan ur skuggan innan han landar.',
+  'bossJournal.sanctum.korzul.descentSummary':
+    'Han avslutar varje flygning med att landa på den obrutna plattan med flest spelare: en skugga i {warn} sek, sedan {min} till {max} skada inom {radius} yard och en tillbakaknuffning, och plattan brinner.',
+  'bossJournal.sanctum.korzul.flareName': 'Skärvflamma',
+  'bossJournal.sanctum.korzul.flareResponse':
+    'Andedräkterna kommer snabbare: planera vilka plattor som återstår att förbruka.',
+  'bossJournal.sanctum.korzul.flareSummary':
+    'Efter andra flygningen flammar skärvan upp: Gravandedräkt var {breath}:e sek och Vingstorm var {gale}:e sek på marken.',
+  'bossJournal.sanctum.korzul.galeResponse':
+    'Håll öppet vatten borta bakom dig så att knuffen landar dig på is.',
+  'bossJournal.sanctum.korzul.galeSummary':
+    'En besvärjelse på {cast} sek, sedan knuffas alla {push} yard bort från honom.',
+  'bossJournal.sanctum.korzul.heroicDeepQuench':
+    'Djupkylning: en sprucken platta fryser aldrig igen.',
+  'bossJournal.sanctum.korzul.heroicTwinEyes':
+    'Tvillingögon: Lindormens öga markerar två spelare samtidigt.',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    'Sjön består av isplattor. Hans eld spräcker en osprucken platta och bryter en sprucken. Djupkylning: i heroiskt läge fryser en sprucken platta aldrig igen. En bruten platta är öppet vatten.',
+  'bossJournal.sanctum.korzul.iceName': 'Bräckande is',
+  'bossJournal.sanctum.korzul.iceResponse':
+    'Förbruka is med avsikt: rikta hans eld mot plattor gruppen har råd att förlora.',
+  'bossJournal.sanctum.korzul.iceSummary':
+    'Sjön består av isplattor. Hans eld spräcker en osprucken platta och bryter en sprucken. En sprucken platta fryser igen efter {refreeze} sek. En bruten platta är öppet vatten.',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    'Kom {radius} yard från honom. Börja med honom på en sprucken platta så slutar kanaliseringen vid puls {crack}.',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    'Var {every}:e sek och en gång vid {health} hälsa kanaliserar han i {duration} sek: {pulses} eldpulser inom {radius} yard, var och en starkare än den förra (sista pulsen gör {min} till {max}). Puls {crack} spräcker plattan under honom och puls {brk} bryter den: när den bryts släcks han och kanaliseringen tar slut.',
+  'bossJournal.sanctum.korzul.noIceName': 'Ingen is kvar',
+  'bossJournal.sanctum.korzul.noIceResponse':
+    'Låt aldrig isen ta slut: det slutar med att hela gruppen dör.',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    'Om alla plattor är brutna svävar han över det öppna vattnet och andas utan paus.',
+  'bossJournal.sanctum.korzul.overview':
+    'En drakstrid på en frusen sjö som hans eld fortsätter bryta sönder. Varje andedräkt förbrukar is och gruppen riktar hans eld, så gruppen bestämmer vilken is som ska förloras. En lindorm utan is kvar andas utan paus.',
+  'bossJournal.sanctum.korzul.phaseFlightName': 'Flygningar',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    'Vid {first} och {second} hälsa lyfter han och slåss från luften tills han störtar ned igen.',
+  'bossJournal.sanctum.korzul.phaseLakeName': 'Den frusna sjön',
+  'bossJournal.sanctum.korzul.phaseLakeSummary':
+    'Han bryter upp ur isen och landar mitt i sjön. Striden börjar när han tar mark.',
+  'bossJournal.sanctum.korzul.phaseLastName': 'Sista fasen',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    'Efter andra flygningen: Gravandedräkt var {breath}:e sek och Vingstorm var {gale}:e sek på marken.',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    'I luften markerar han två andra spelare än tanken med Lindormens öga i {eye} sek (Tvillingögon). När effekten tar slut öser han Störtande eld över varje markerad spelares hela platta: en varning på {warn} sek, sedan {min} till {max} skada på alla på den, och plattan brinner. {roundsFirst} omgångar under första flygningen, {roundsSecond} under den andra.',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    'Markerad: gå till en osprucken platta bort från gruppen. Alla andra lämnar den plattan.',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    'I luften markerar han en annan spelare än tanken med Lindormens öga i {eye} sek. När effekten tar slut öser han Störtande eld över spelarens hela platta: en varning på {warn} sek, sedan {min} till {max} skada på alla på den, och plattan brinner. {roundsFirst} omgångar under första flygningen, {roundsSecond} under den andra.',
+  'bossJournal.sanctum.korzul.tailResponse': 'Stå aldrig bakom honom. Attackera från sidorna.',
+  'bossJournal.sanctum.korzul.tailSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan sveper svansen de {arc} graderna bakom honom, {range} yard förbi kroppen: {min} till {max} skada och en tillbakaknuffning.',
+  'bossJournal.sanctum.korzul.tipDamage':
+    'Stå aldrig framför eller bakom honom. Ta Lindormens öga till en osprucken platta bort från gruppen. Döda fjällvakterna under flygningarna.',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    'Stå aldrig framför eller bakom honom. Två spelare får Lindormens öga samtidigt: var och en tar det till olika ospruckna plattor bort från gruppen. Döda fjällvakterna under flygningarna.',
+  'bossJournal.sanctum.korzul.tipHealer':
+    'Gravinfernots pulser växer snabbt: se till att alla lämnar. Störtande eld, Krossande nedslag och varje tillbakaknuffning i vatten slår hårt.',
+  'bossJournal.sanctum.korzul.tipTank':
+    'Rikta Gravandedräkt mot is som gruppen kan avvara, aldrig över gruppen. Flytta honom till en sprucken platta före ett Gravinferno för att korta det.',
+  'bossJournal.sanctum.korzul.waterName': 'Öppet vatten',
+  'bossJournal.sanctum.korzul.waterResponse':
+    'Stanna på isen. Lämna vattnet direkt om en knuff skickar ned dig.',
+  'bossJournal.sanctum.korzul.waterSummary':
+    'Att stå i öppet vatten saktar dig med {slow} och gör {perSecond} skada per sekund.',
+  'bossJournal.sanctum.tusker.enrageResponse':
+    'Spara läknings- och försvarsförmågor med nedkylning till sista delen och avsluta snabbt.',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    'Under {health} hälsa gör den {damage} mer skada under resten av striden.',
+  'bossJournal.sanctum.tusker.overview':
+    'En husstor betare drar en släde med brinnande själsfyrfat upp och ned längs Slädvägen. Den går vägen i en slinga och kopplar loss släden där ni drar in den i strid. Vid halv hälsa välter släden och spiller eld bakom den.',
+  'bossJournal.sanctum.tusker.phaseEnrageName': 'Rasande',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    'Under {health} hälsa blir den rasande under resten av striden.',
+  'bossJournal.sanctum.tusker.phaseRoadName': 'På vägen',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    'Två förvarnade attacker från början: ett svep framåt och en anstormning längs en markerad bana.',
+  'bossJournal.sanctum.tusker.phaseSpillName': 'Släden välter',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    'Vid {health} hälsa välter släden och själseld spills bakom den.',
+  'bossJournal.sanctum.tusker.spillName': 'Utspillda fyrfat',
+  'bossJournal.sanctum.tusker.spillResponse': 'Gå ur elden direkt och slåss bort från fläckarna.',
+  'bossJournal.sanctum.tusker.spillSummary':
+    'En gång, vid {health} hälsa: släden välter och {count} själseldsfläckar ({radius} yard) brinner bakom den i {seconds} sek, {min} till {max} skada per sekund på alla inuti.',
+  'bossJournal.sanctum.tusker.sweepResponse':
+    'Tanken håller den vänd bort från gruppen. Alla andra attackerar från sidorna eller bakifrån.',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan sveper betarna en kon på {arc} grader framför den, {range} yard förbi kroppen: {min} till {max} skada och en tillbakaknuffning på {push} yard.',
+  'bossJournal.sanctum.tusker.tipDamage':
+    'Attackera från sidorna eller bakifrån. Se efter den markerade banan på marken och gå ur den. Lämna elden bakom den vid halv hälsa.',
+  'bossJournal.sanctum.tusker.tipHealer':
+    'Betessvep och Trampa ned ger skadetopparna. Stå vid sidan, inte längst bort där Trampa ned siktar, och spara en förmåga med nedkylning till raseriet under {health}.',
+  'bossJournal.sanctum.tusker.tipTank':
+    'Håll den vänd bort från gruppen och stå still så att svepkonen aldrig svänger in i bundsförvanter. Räkna med en tillbakaknuffning vid varje Betessvep.',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    'Gå åt sidan ur den markerade banan innan besvärjelsen tar slut. Spelaren längst bort är målet, så avståndsspelare behöver utrymme att kliva åt sidan.',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    'Var {every}:e sek markerar en besvärjelse på {cast} sek en bana på {length} yard mot spelaren längst bort, sedan rusar den längs banan: {min} till {max} skada och en nedslagning på {stun} sek på alla i den.',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    'En benvandrare dödad på torr is är borta för gott: färre förstärkningar och en renare strid.',
+  'bossJournal.sanctum.velkhar.choiceName': 'Var faller de döda?',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    'Dör den i smältvatten reser den sig igen och läker Velkhar med {heal} av hans hälsa varje gång. Att dra dem till torr is kostar tid, så planera dödsplatsen innan ni gör full skada.',
+  'bossJournal.sanctum.velkhar.graspName': 'De upptinades grepp',
+  'bossJournal.sanctum.velkhar.graspResponse': 'Tanken håller benvandrare borta från vattnet.',
+  'bossJournal.sanctum.velkhar.graspSummary':
+    'En benvandrare som står i smältvatten gör {bonus} mer skada.',
+  'bossJournal.sanctum.velkhar.heldName': 'Fasthållen och Osläckt',
+  'bossJournal.sanctum.velkhar.heldResponse':
+    'Döda benvandrare bara på torr is: aldrig i en pöl eller på en smältvattenremsa.',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    'En benvandrare dödad på torr is blir Fasthållen: den fryser till en staty och förblir död. En som dödas i smältvatten sjunker och reser sig sedan igen {delay} sek senare med {share} hälsa och läker Velkhar med {heal} av hans hälsa.',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    'Två gånger väckt: en benvandrare som reser sig igen återkommer med full hälsa och gör {bonus} mer skada.',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    'Varma händer: en benvandrare som står still i {still} sek smälter en smältvattenpöl.',
+  'bossJournal.sanctum.velkhar.overview':
+    'Velkhar väcker de upptinade döda ur tre smältvattenpölar. Bara kylan håller dem nere: en benvandrare dödad på torr is förblir död, men en som dödas i smältvatten reser sig igen och läker honom.',
+  'bossJournal.sanctum.velkhar.phaseVaultName': 'Ritvalvet',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    'Benvandrare fortsätter klättra upp ur pölarna. Vid {wave1} och {wave2} hälsa reser sig en extra våg, en från varje pöl.',
+  'bossJournal.sanctum.velkhar.thawName': 'Väckande tö',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    'Tanken samlar dem och drar dem till torr is. Skadegörare dödar dem där.',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    'Var {every}:e sek vrålar en pöls bål och {count} uppväckta benvandrare klättrar upp {warn} sek senare. Pölarna turas om. Vid {wave1} och {wave2} hälsa klättrar en till upp ur varje pöl.',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    'Döda benvandrare bara på torr is och återgå sedan till Velkhar. Gå ur Själseldsdikets bana.',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    'Skuggsalva träffar alla var {every}:e sek. Benvandrare i smältvatten slår {bonus} hårdare, så håll koll på tanken när de når vattnet.',
+  'bossJournal.sanctum.velkhar.tipTank':
+    'Fånga upp varje benvandrare och dra den till torr is, bort från pölarna och smältvattenremsorna. I smältvatten slår de {bonus} hårdare.',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    'Fånga upp varje benvandrare och dra den till torr is, bort från pölarna och smältvattenremsorna. Håll dem i rörelse: en som står still smälter en pöl under sig.',
+  'bossJournal.sanctum.velkhar.trenchResponse':
+    'Gå ur banan. Döda inte benvandrare på smältvattenremsan den lämnar.',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    'Var {every}:e sek markerar en besvärjelse på {cast} sek en bana på {width} yard från honom mot en annan spelare än tanken, ut till valvets kant. Sedan {min} till {max} skada på alla i den och banan förblir smältvatten i {seconds} sek.',
+  'bossJournal.sanctum.velkhar.twiceWokenName': 'Två gånger väckt',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse': 'Låt ingen resa sig: döda alla på torr is.',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    'En benvandrare som reser sig igen återkommer med full hälsa och gör {bonus} mer skada.',
+  'bossJournal.sanctum.velkhar.volleyResponse':
+    'Den kan inte undvikas: helare håller hela gruppens hälsa hög.',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan {min} till {max} skuggskada på alla.',
+  'bossJournal.sanctum.velkhar.warmHandsName': 'Varma händer',
+  'bossJournal.sanctum.velkhar.warmHandsResponse':
+    'Håll benvandrarna i rörelse och döda aldrig en ovanpå en pöl.',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    'En benvandrare som står still i {still} sek smälter en smältvattenpöl på {radius} yard under sig i {seconds} sek.',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    'Rasande band: medan bestmästaren och jaguaren står inom {reach} yard från varandra tar båda {dr} mindre skada och gör {damage} mer.',
+  'bossJournal.wildheart.beast.bondName': 'Flockband',
+  'bossJournal.wildheart.beast.bondResponse':
+    'Tanken drar bestmästaren mer än {reach} yard från jaguaren och håller honom där.',
+  'bossJournal.wildheart.beast.bondSummary':
+    'Medan bestmästaren och jaguaren står inom {reach} yard från varandra tar båda {dr} mindre skada och gör {damage} mer.',
+  'bossJournal.wildheart.beast.choiceGain':
+    'Saktningar, rotningar och bedövningar håller jaguaren borta från sitt byte och från bestmästaren.',
+  'bossJournal.wildheart.beast.choiceName': 'Kontrollera jaguaren nu eller spara effekten?',
+  'bossJournal.wildheart.beast.choiceRisk':
+    'Varje kontrolltyp fungerar en gång och misslyckas sedan i {lockout} sek, så om alla tre används samtidigt finns inget kvar till nästa jakt.',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    'Varje kontrolltyp fungerar en gång och misslyckas sedan i {lockout} sek. Använd bedövningen tidigt så kan inget stoppa nästa Fot!.',
+  'bossJournal.wildheart.beast.heelResponse':
+    'Bedöva, oskadliggör eller förvandla jaguaren under besvärjelsen för att avbryta den. Det fungerar bara om jaguaren inte redan är vaksam mot bedövningar.',
+  'bossJournal.wildheart.beast.heelSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek på jaguaren, sedan hoppar den tillbaka till bestmästaren och bandet återkommer.',
+  'bossJournal.wildheart.beast.heroicBond': 'Rasande band: Flockband når {reach} yard.',
+  'bossJournal.wildheart.beast.heroicHeel':
+    'Fot!: jaguaren hoppar tillbaka till bestmästaren om inte en bedövning träffar under besvärjelsen. Tjockhudsskydd absorberar {amount}.',
+  'bossJournal.wildheart.beast.huntName': 'Jaktens kall',
+  'bossJournal.wildheart.beast.huntResponse':
+    'Tank och helare använder en förmåga med nedkylning under den; jaguaren biter också snabbare.',
+  'bossJournal.wildheart.beast.huntSummary':
+    'Var {every}:e sek attackerar båda odjuren {haste} snabbare i {seconds} sek.',
+  'bossJournal.wildheart.beast.overview':
+    'Bettherren bestmästaren och hans stora jaguar delar ett hälsofält och dör tillsammans. Nära varandra är de mycket tåligare och slår hårdare, så tanken drar bort mästaren medan jaguaren jagar en markerad spelare.',
+  'bossJournal.wildheart.beast.phasePitsName': 'Odjursgroparna',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    'En strid, två kroppar. Deras tidsräknare löper under hela striden; det finns inga hälsofaser.',
+  'bossJournal.wildheart.beast.quakeResponse': 'Alla utom tanken går bort från bestmästaren.',
+  'bossJournal.wildheart.beast.quakeSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan tar alla inom {radius} yard från bestmästaren {min} till {max} skada.',
+  'bossJournal.wildheart.beast.sharedName': 'Delad hälsa',
+  'bossJournal.wildheart.beast.sharedResponse':
+    'Slå den kropp som är säkrast att nå. Inget går förlorat av att byta mål.',
+  'bossJournal.wildheart.beast.sharedSummary':
+    'De två kropparna delar en hälsopool: skada på endera räknas lika och när den ena dör dör även den andra.',
+  'bossJournal.wildheart.beast.stalkName': 'Smygjakt',
+  'bossJournal.wildheart.beast.stalkResponse':
+    'Markerad: spring och led jaguaren bort från bestmästaren. Andra saktar, rotar eller bedövar den.',
+  'bossJournal.wildheart.beast.stalkSummary':
+    'Jaguaren markerar en annan spelare än mästarens tank och jagar spelaren i {seconds} sek, med hån ignorerade. Inom räckhåll biter den var {biteEvery}:e sek: {min} till {max} skada, sedan en blödning på {bleed} var {bleedEvery}:e sek i {bleedSeconds} sek. Sedan väljer den nytt byte.',
+  'bossJournal.wildheart.beast.tipDamage':
+    'Slå den kropp som är säkrast. När du förföljs, spring bort med jaguaren från mästaren; annars turas ni om med saktningar, rotningar och bedövningar.',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    'Slå den kropp som är säkrast. Håll en bedövning redo för varje Fot! och turas om med saktningar och rotningar på jaguaren.',
+  'bossJournal.wildheart.beast.tipHealer':
+    'Håll koll på Smygjaktens mål: bett och blödningar kommer snabbt, ännu snabbare under Jaktens kall.',
+  'bossJournal.wildheart.beast.tipTank':
+    'Dra genast bestmästaren mer än {normal} yard från jaguaren och håll honom där, vänd bort från gruppen.',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    'Dra genast bestmästaren mer än {heroic} yard från jaguaren och håll honom där. Dra bort honom igen efter varje Fot!.',
+  'bossJournal.wildheart.beast.wardName': 'Tjockhudsskydd',
+  'bossJournal.wildheart.beast.wardResponse':
+    'Slå bestmästaren medan skölden är uppe: hälsopoolen är delad.',
+  'bossJournal.wildheart.beast.wardSummary':
+    'Var {every}:e sek får jaguaren en sköld som absorberar {amount} skada i {seconds} sek.',
+  'bossJournal.wildheart.beast.waryName': 'Vaksam',
+  'bossJournal.wildheart.beast.waryResponse':
+    'Turas om: en rotning, sedan en saktning, sedan en bedövning i stället för tre av samma sort.',
+  'bossJournal.wildheart.beast.warySummary':
+    'Varje kontrolltyp (bedövning, rotning, saktning) träffar jaguaren en gång, sedan misslyckas den typen på den i {lockout} sek. Oskadliggörande, fruktan och förvandlingar räknas som bedövningar.',
+  'bossJournal.wildheart.bloom.choiceGain':
+    'Varje nedtrampad kapsel är ett elittaggskott mindre och striden förblir på blomman.',
+  'bossJournal.wildheart.bloom.choiceName': 'Vem trampar fröna?',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    'Att springa till bäddarna kostar skada och närstridstid, och en pollinerad spelare som rör en kapsel får den att gro direkt.',
+  'bossJournal.wildheart.bloom.gorgeResponse':
+    'Tank: använd en försvarsförmåga med nedkylning. Helare täcker matsmältningsskadan.',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek på målet, sedan ett bett för {mult} gånger dess närstridsträff och Matsmältning: {perSecond} skada per sekund i {seconds} sek. Det kan inte undvikas genom rörelse.',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    'Grävande frön: en orörd kapsel gräver ned sig efter {burrow} sek och dess skott kommer upp bredvid närmaste spelare.',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    'Pollenmoln: om du står inom {cloudRadius} yard från en pollinerad spelare i {cloudSeconds} sek pollineras du också.',
+  'bossJournal.wildheart.bloom.lashResponse': 'Gå åt sidan ur banan innan besvärjelsen tar slut.',
+  'bossJournal.wildheart.bloom.lashSummary':
+    'Var {every}:e sek riktar en besvärjelse på {cast} sek en bana som är {length} yard lång och {width} yard bred mot en spelare (annan än tanken om möjligt): {min} till {max} skada och en rotning på {root} sek.',
+  'bossJournal.wildheart.bloom.overview':
+    'En rotad människoätande blomma låter frökapslar regna över jordbäddarna runt sig. Spelare utan pollen trampar kapslarna platta innan de gror; pollinerade spelare måste hålla sig borta, annars gror kapslarna direkt.',
+  'bossJournal.wildheart.bloom.phaseTerraceName': 'De gråtande fallen',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    'Den rör sig aldrig. Dess besvärjelsetidsräknare pausas medan en annan besvärjelse pågår, så de angivna intervallen är de kortaste pauserna.',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    'Var {every}:e sek pollineras {count} spelare i {seconds} sek. En pollinerad spelare som rör en kapsel får den att gro direkt. Pollenmoln: om du står inom {cloudRadius} yard från en pollinerad spelare i {cloudSeconds} sek pollineras du också.',
+  'bossJournal.wildheart.bloom.pollinateName': 'Pollinera',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    'Pollinerad: håll dig borta från kapslarna tills effekten tar slut, och från bundsförvanter i heroiskt läge.',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    'Var {every}:e sek pollineras {count} spelare i {seconds} sek. En pollinerad spelare som rör en kapsel får den att gro direkt.',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan landar {count} frökapslar, en på varje jordbädd. En spelare utan pollinering som går på en kapsel trampar sönder den. Grävande frön: en orörd kapsel gräver ned sig efter {burrow} sek och ett taggskott kommer upp bredvid närmaste spelare.',
+  'bossJournal.wildheart.bloom.seedResponse':
+    'Spelare utan pollinering går snabbt över varje kapsel. Pollinerade spelare håller sig borta från dem.',
+  'bossJournal.wildheart.bloom.seedSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan landar {count} frökapslar, en på varje jordbädd. En spelare utan pollinering som går på en kapsel trampar sönder den. En orörd kapsel gror till ett taggskott efter {sprout} sek.',
+  'bossJournal.wildheart.bloom.spitName': 'Blomspott',
+  'bossJournal.wildheart.bloom.spitResponse': 'Tanken stannar inom närstridsräckvidd.',
+  'bossJournal.wildheart.bloom.spitSummary':
+    'Om målet stannar utom räckhåll i {delay} sek spottar den var {every}:e sek för {min} till {max} skada.',
+  'bossJournal.wildheart.bloom.sproutName': 'Taggskott',
+  'bossJournal.wildheart.bloom.sproutResponse': 'Tanken fångar upp det och skadegörare dödar det.',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    'En elitförstärkning som växer ur en grodd kapsel och attackerar närmaste spelare. Skotten vissnar när Frossblomman dör.',
+  'bossJournal.wildheart.bloom.tipDamage':
+    'Om du inte är pollinerad, trampa sönder kapslar mellan attackerna. Gå ur Vinrankepiskslag och döda varje taggskott snabbt.',
+  'bossJournal.wildheart.bloom.tipHealer':
+    'Frossa är den stora träffen på tanken, följd av Matsmältning. Vinrankepiskslag rotar och skadar dem som står i banan.',
+  'bossJournal.wildheart.bloom.tipTank':
+    'Stanna i närstrid: att gå bort ger Blomspott. Använd en förmåga med nedkylning vid varje Frossa och fånga upp varje taggskott.',
+  'bossJournal.wildheart.saurian.choiceGain':
+    'Att döda ryttaren stoppar läkningen för gott: varje Förfädernas sav återställer {heal} av storödlan var {every}:e sek.',
+  'bossJournal.wildheart.saurian.choiceName': 'Ryttaren först eller storödlan först?',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    'Medan ni dödar ryttaren fortsätter storödlan svepa och stampa. Lämnar ni ryttaren vid liv måste någon avbryta varje läkning.',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    'Under {health} hälsa gör allt den utför {damage} mer skada: närstrid, Svansslag och Jordskakande stamp.',
+  'bossJournal.wildheart.saurian.overview':
+    'Ett husstort stridsdjur med en bärstol går i en slinga över flodvadet. Att passera är inte valfritt: vinrankebroarna öppnas först när det är dött. Två förvarnade slag, en helarryttare vid halv hälsa och ett raseri i slutet.',
+  'bossJournal.wildheart.saurian.phaseEnrageName': 'Rasande',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    'Under {health} hälsa blir den rasande under resten av striden.',
+  'bossJournal.wildheart.saurian.phaseFordName': 'Flodvadet',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    'Från stridsstart växlar den mellan ett svanssvep bakom sig och ett stamp runt sig. Bara ett slag pågår i taget.',
+  'bossJournal.wildheart.saurian.phaseHowdahName': 'Bärstolen brister',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    'Vid {health} hälsa splittras bärstolen och en bärstolsförbannelsekallare hoppar ned för att läka storödlan.',
+  'bossJournal.wildheart.saurian.riderName': 'Bärstolsryttare',
+  'bossJournal.wildheart.saurian.riderResponse':
+    'Tanken fångar upp ryttaren. Skadegörare avbryter dess läkning eller dödar den först.',
+  'bossJournal.wildheart.saurian.riderSummary':
+    'En gång, vid {health} hälsa: en bärstolsförbannelsekallare hoppar ned bredvid storödlan och slåss vid dess sida medan den läker den med Förfädernas sav.',
+  'bossJournal.wildheart.saurian.sapResponse': 'Avbryt varje gång eller döda ryttaren.',
+  'bossJournal.wildheart.saurian.sapSummary':
+    'Ryttarens läkning: en besvärjelse på {cast} sek var {every}:e sek som återställer {heal} av storödlans maximala hälsa.',
+  'bossJournal.wildheart.saurian.stompResponse':
+    'Alla som kan lämnar ringen innan besvärjelsen tar slut. Tanken tar den; helare fyller på tankens hälsa efteråt.',
+  'bossJournal.wildheart.saurian.stompSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan tar alla inom {radius} yard från dess mitt {min} till {max} skada och slås ned i {stun} sek.',
+  'bossJournal.wildheart.saurian.tailResponse': 'Stå aldrig bakom den. Attackera från sidorna.',
+  'bossJournal.wildheart.saurian.tailSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan sveper svansen en kon på {arc} grader bakom den, ut till {range} yard från dess mitt: {min} till {max} skada och en tillbakaknuffning på {push} yard.',
+  'bossJournal.wildheart.saurian.tipDamage':
+    'Stanna vid sidorna, utanför svanskonen och stampringen. Avbryt Förfädernas sav eller döda ryttaren vid halv hälsa.',
+  'bossJournal.wildheart.saurian.tipHealer':
+    'Jordskakande stamp slår ned alla i närheten, så läk tanken efter varje. Spara en förmåga med nedkylning till raseriet.',
+  'bossJournal.wildheart.saurian.tipTank':
+    'Håll den vänd bort från gruppen så att ingen hamnar bakom svansen. Fånga upp bärstolsförbannelsekallaren så fort den landar.',
+  'bossJournal.wildheart.zulgar.ambushName': 'Jägarens bakhåll',
+  'bossJournal.wildheart.zulgar.ambushResponse': 'Gå ut ur cirkeln.',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    'Efter varje jakt försvinner han i {seconds} sek. En cirkel på {radius} yard markerar spelaren längst bort, med en varning på {warn} sek, sedan landar han där: {min} till {max} skada på alla inuti.',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    'Varje tänd glyf du leder honom genom saktar honom kraftigt och köper tid åt bytet.',
+  'bossJournal.wildheart.zulgar.choiceName': 'Förbruka en glyf nu eller spara den?',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    'En använd glyf förblir släckt i {dark} sek och varje jakt varar i {seconds} sek: förbrukar ni alla i början finns inga kvar i slutet.',
+  'bossJournal.wildheart.zulgar.glyphName': 'Solglyfer',
+  'bossJournal.wildheart.zulgar.glyphResponse':
+    'Fördela glyferna: förbruka inte alla på första jakten.',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    '{count} glyfer omger helgedomen. När jaguaranden korsar en tänd glyf saktas han med {slow} i {seconds} sek och glyfen slocknar i {dark} sek. Under jakten fungerar saktningar och rotningar på honom, och bedövningar varar hälften så länge.',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    'Bakhåll: efter varje jakt kastar han sig mot en cirkel på {radius} yard vid spelaren längst bort.',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    'Tvillingbyte: två spelare jagas; han byter var {switchEvery}:e sek.',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    'Vid {first} och {second} hälsa: en besvärjelse på {cast} sek, sedan jagar han bytet i {seconds} sek. Tvillingbyte: två spelare markeras och han växlar mellan dem var {switchEvery}:e sek. Han springer {speed} snabbare än en spelare, ignorerar hån och attackerar inte. Om han fångar ett byte: {maul} skada och en bedövning på {stun} sek.',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    'Byte: spring genom tända solglyfer för att sakta honom. Alla andra saktar, rotar och bedövar honom medan han jagar.',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    'Vid {first} och {second} hälsa: en besvärjelse på {cast} sek, sedan jagar han en markerad spelare i {seconds} sek (bytet, aldrig tanken medan andra står kvar). Han springer {speed} snabbare än en spelare, ignorerar hån och attackerar inte. Fångar han bytet: {maul} skada och en bedövning på {stun} sek, sedan väljer han nytt byte. En sargad spelare är säker i {respite} sek.',
+  'bossJournal.wildheart.zulgar.overview':
+    'Bassängens överstepräst. En jämn strid med en förvarnad ring tills han blir en jaguarande och jagar en spelare. Den jagade spelaren håller honom på avstånd över tända solglyfer som saktar honom.',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': 'Rasande',
+  'bossJournal.wildheart.zulgar.phaseHuntName': 'Jaktens ande',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    'Vid {first} och {second} hälsa blir han en jaguarande i {seconds} sek och jagar en markerad spelare.',
+  'bossJournal.wildheart.zulgar.phaseShrineName': 'Helgedomen',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary':
+    'Han slåss i närstrid och pulserar en ring runt sig.',
+  'bossJournal.wildheart.zulgar.pulseResponse':
+    'Alla utom tanken lämnar ringen innan besvärjelsen tar slut.',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan en explosion på alla inom {radius} yard från honom: {min} till {max} skada.',
+  'bossJournal.wildheart.zulgar.roarName': 'Jaguarvrål',
+  'bossJournal.wildheart.zulgar.roarResponse': 'Tanken håller öppen mark bakom sig.',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    'Varje närstridsträff har {chance} chans att knuffa den träffade spelaren {distance} yard bakåt.',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    'Lämna pulsringen. Sakta, rota och bedöva honom under jakten för att skydda bytet, och spring genom tända glyfer om du är bytet.',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    'Lämna pulsringen. Sakta, rota och bedöva honom under jakten för att skydda båda bytena. Gå ur bakhållscirkeln efter varje jakt.',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    'Vildhjärtats puls träffar alla som är kvar i ringen. Sargning är en stor enskild träff: fyll på bytets hälsa.',
+  'bossJournal.wildheart.zulgar.tipTank':
+    'Håll öppen mark bakom dig för Jaguarvrål. När jakten tar slut kommer han tillbaka till dig: var redo att ta honom.',
+  'bossJournal.temple.colossus.choiceGain':
+    'Att döda kopiorna tar bort upp till {cap} skademinskning och stoppar deras jakt.',
+  'bossJournal.temple.colossus.choiceName': 'Döda spegelbilderna eller kolossen?',
+  'bossJournal.temple.colossus.choiceRisk':
+    'Tid på kopior är tid borta från kolossen, och i heroiskt läge brister varje kopia när den krossas.',
+  'bossJournal.temple.colossus.flareResponse': 'Döda varandras spegelbilder: aldrig din egen.',
+  'bossJournal.temple.colossus.flareSummary':
+    'En kanalisering på {cast} sek, sedan får varje spelare en spegelbild av tidvattensglas med {share} av sin hälsa som jagar spelaren. Du kan inte skada din egen spegelbild.',
+  'bossJournal.temple.colossus.fractureResponse':
+    'Gå till en fri sektor varje omgång och håll dig borta från mitten.',
+  'bossJournal.temple.colossus.fractureSummary':
+    'Först vid {first} sek, sedan var {every}:e sek: golvet delas i {slices} sektorer under {rounds} omgångar. Varje omgång lyser vissa sektorer röda och exploderar {warn} sek senare: {min} till {max} skada. Mitten exploderar varje omgång.',
+  'bossJournal.temple.colossus.heroicShatter':
+    'Krossande glas: en spegelbild som bryts skadar alla inom {radius} yard.',
+  'bossJournal.temple.colossus.heroicSwap':
+    'Utbytta bilder: spegelbilder byter ägare var {every}:e sek.',
+  'bossJournal.temple.colossus.lanceResponse': 'Gå åt sidan ur banan.',
+  'bossJournal.temple.colossus.lanceSummary':
+    'Var {every}:e sek riktar en besvärjelse på {cast} sek en bana på {length} yard mot en annan spelare än tanken: {min} till {max} skada.',
+  'bossJournal.temple.colossus.overview':
+    'En vandrande glasjätte. Vid tre hälsogränser får varje spelare en spegelkopia som jagar spelaren; du kan inte skada din egen kopia, och varje levande kopia skyddar kolossen. Däremellan finns banor, smällar och ett golv som krossas sektor för sektor.',
+  'bossJournal.temple.colossus.phaseFlareName': 'Prismaflamma',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    'Vid {first}, {second} och {third} hälsa kallar den spegelbilder av tidvattensglas.',
+  'bossJournal.temple.colossus.phaseName': 'Prismaterrassen',
+  'bossJournal.temple.colossus.phaseSummary':
+    'Den står stadigt under varje besvärjelse och lämnar aldrig terrassen.',
+  'bossJournal.temple.colossus.shatterName': 'Krossande glas',
+  'bossJournal.temple.colossus.shatterResponse':
+    'Stå inte bredvid en spegelbild som håller på att dö.',
+  'bossJournal.temple.colossus.shatterSummary':
+    'När en spegelbild krossas tar alla inom {radius} yard från den {damage} skada.',
+  'bossJournal.temple.colossus.slamResponse': 'Närstridsspelare kan gå ut; helare täcker tanken.',
+  'bossJournal.temple.colossus.slamSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan {min} till {max} skada och en tillbakaknuffning på {push} yard inom {radius} yard.',
+  'bossJournal.temple.colossus.swapName': 'Utbytta bilder',
+  'bossJournal.temple.colossus.swapResponse':
+    'Kontrollera igen vilken kopia du kan slå efter varje byte.',
+  'bossJournal.temple.colossus.swapSummary':
+    'Var {every}:e sek byter spegelbilderna ägare så att det ändras vem som kan slå vilken kopia.',
+  'bossJournal.temple.colossus.tipDamage':
+    'Döda en lagkamrats spegelbild vid varje flamma och flytta sedan sektor för sektor under bristningen.',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    'Döda en lagkamrats spegelbild vid varje flamma; kontrollera igen efter ett byte. Stå inte vid en döende kopia.',
+  'bossJournal.temple.colossus.tipHealer':
+    'Spegelbilder slår sina ägare. Tidvattensglasets bristning straffar dem som står kvar i en röd sektor.',
+  'bossJournal.temple.colossus.tipTank':
+    'Fånga upp kolossen igen efter varje flamma; den går efter sitt mål.',
+  'bossJournal.temple.colossus.wardName': 'Prismaskydd',
+  'bossJournal.temple.colossus.wardResponse': 'Döda spegelbilderna och återgå sedan till kolossen.',
+  'bossJournal.temple.colossus.wardSummary':
+    'Varje levande spegelbild minskar skadan kolossen tar med {per}, upp till {cap}.',
+  'bossJournal.temple.hydra.breathResponse': 'Gå ur konen.',
+  'bossJournal.temple.hydra.breathSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek mot en annan spelare än tanken, sedan en iskon på {arc} grader som är {range} yard lång: {min} till {max} skada och {slow} långsammare i {seconds} sek.',
+  'bossJournal.temple.hydra.choiceGain':
+    'Att döda alla tre tillsammans avslutar striden; valfri ordning fungerar om de dör tätt inpå varandra.',
+  'bossJournal.temple.hydra.choiceName': 'Vilket huvud dör först?',
+  'bossJournal.temple.hydra.choiceRisk':
+    'Varje dött huvud får de andra att göra {enrage} mer skada och växer tillbaka efter {regrow} sek, och sista huvudet bär varje element.',
+  'bossJournal.temple.hydra.currentResponse': 'Kliv åt sidan från glidbanan.',
+  'bossJournal.temple.hydra.currentSummary':
+    'Giftpölar sväller till {radius} yard och glider {slide} yard utåt från bassängens mitt, med {perSecond} brännskada per sekund.',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    'En bana mot en spelare: {min} till {max} skada och en frysning på {stun} sek. Den lämnar en isvägg: står du bakom skyddas du från nästa våg. När den krossas tar alla inom {reach} yard från väggen {shardMin} till {shardMax}.',
+  'bossJournal.temple.hydra.frostlockResponse':
+    'Undvik banan och använd sedan väggen som skydd mot flodvågen.',
+  'bossJournal.temple.hydra.frostlockSummary':
+    'En bana mot en spelare: {min} till {max} skada och en frysning på {stun} sek. Den lämnar en isvägg i {wall} sek: står du upp till {lee} yard bakom skyddas du från nästa våg, som krossar den.',
+  'bossJournal.temple.hydra.headsName': 'Tre huvuden',
+  'bossJournal.temple.hydra.headsResponse':
+    'Få ned alla tre huvudena tillsammans och döda dem inom {regrow} sek.',
+  'bossJournal.temple.hydra.headsSummary':
+    'Ett dött huvud överlämnar sitt element till nästa huvud, och varje levande huvud gör {enrage} mer skada per dött huvud. Ett dött huvud växer tillbaka efter {regrow} sek med {share} hälsa medan ett annat lever.',
+  'bossJournal.temple.hydra.heroicChanges':
+    'Ett återväxt huvud återkommer med {share} hälsa och varje våg skickar en returvåg.',
+  'bossJournal.temple.hydra.overview':
+    'Tre huvuden med tre element delar en strid: is, gift och vatten. Ett huvud som dör lämnar sin attack till nästa huvud och växer tillbaka {regrow} sek senare medan ett annat lever. Vågor sköljer över halva bassängen med fasta intervall, och mellan vågorna förenar två huvuden sina andedräkter.',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    '{early} sek och {after} sek efter varje våg förenas två huvuden i ordningen Frostlåst fors, Giftström, Giftig rimfrost.',
+  'bossJournal.temple.hydra.phaseComboName': 'Kombinerad andedräkt',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    '{after} sek efter varje våg förenas två huvuden, alltid i ordningen Frostlåst fors, Giftström, Giftig rimfrost.',
+  'bossJournal.temple.hydra.phaseName': 'Hydrabassängen',
+  'bossJournal.temple.hydra.phaseSummary':
+    'Vänsterhuvudet andas is, mittenhuvudet spottar gift och högerhuvudet skickar vatten.',
+  'bossJournal.temple.hydra.rimeResponse': 'Gå bort från varje kristall innan den brister.',
+  'bossJournal.temple.hydra.rimeSummary':
+    'Giftpölar fryser till kristaller som brister efter {seconds} sek: {min} till {max} skada inom {radius} yard.',
+  'bossJournal.temple.hydra.spitName': 'Giftspott',
+  'bossJournal.temple.hydra.spitResponse': 'Sprid ut er och gå sedan ur pölarna.',
+  'bossJournal.temple.hydra.spitSummary':
+    'Var {every}:e sek brister upp till {count} pölar på {radius} yard under olika spelare efter {warn} sek: {min} till {max} skada, sedan bränner gift där i {seconds} sek med {perSecond} per sekund.',
+  'bossJournal.temple.hydra.tipDamage':
+    'Fördela skadan jämnt så att alla tre huvuden faller inom {regrow} sek från varandra. Sluta attackera under varje flodvåg.',
+  'bossJournal.temple.hydra.tipHealer':
+    'Flodvåg och de kombinerade andedräkterna ger skadetopparna. Varje dött huvud får de andra att slå hårdare.',
+  'bossJournal.temple.hydra.tipTank':
+    'Håll de huvuden du kan nå; deras attacker siktar på de andra.',
+  'bossJournal.temple.hydra.torrentResponse': 'Gå åt sidan ur banan.',
+  'bossJournal.temple.hydra.torrentSummary':
+    'Var {every}:e sek riktar en besvärjelse på {cast} sek en bana på {length} yard mot en annan spelare än tanken: {min} till {max} skada och en knuff på {push} yard.',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    'Först vid {first} sek, sedan {every} sek efter föregående vågs slut: en besvärjelse på {cast} sek medan huvudena tar {reduction} mindre skada, sedan slår en våg över halva bassängen: {min} till {max} skada och en knuff. Returvåg: {backwash} sek senare rullar den över andra halvan.',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    'Gå till andra halvan, bakom en kantpelare eller bakom en isvägg. Gör inte full skada på huvudena medan de är nedsänkta.',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    'Först vid {first} sek, sedan {every} sek efter föregående vågs slut: en besvärjelse på {cast} sek medan huvudena tar {reduction} mindre skada, sedan slår en våg över halva bassängen: {min} till {max} skada och en knuff på {push} yard.',
+  'bossJournal.temple.selthe.ariaResponse':
+    'Avbryt den, bryt hennes siktlinje bakom en lyktpelare eller kliv in i strålen för att dela den.',
+  'bossJournal.temple.selthe.ariaSummary':
+    'Var {every}:e sek kanaliserar hon en stråle mot en annan spelare än tanken i {channel} sek: {pulses} pulser som växer från {min} till {max} på samma kropp. En spelare som kliver in i strålen tar pulsen i stället och stegringen börjar om.',
+  'bossJournal.temple.selthe.boltResponse': 'Avbryt projektiler när arian inte är på väg.',
+  'bossJournal.temple.selthe.boltSummary':
+    'Hennes utfyllnadsattack: en besvärjelse på {cast} sek mot hennes mål för {mult} gånger hennes närstridsträff som frost. Efter varje avbrott kastar hon varken projektil eller aria i {quiet} sek.',
+  'bossJournal.temple.selthe.choiceGain':
+    'Ett avbrott eller en pelare avslutar strålen direkt. Att kliva in i strålen startar om stegringen på dig.',
+  'bossJournal.temple.selthe.choiceName': 'Avbryta arian eller ta den?',
+  'bossJournal.temple.selthe.choiceRisk':
+    'En avbruten aria tystar även projektilerna en stund, men om ingen agerar landar hela stegringen på en spelare.',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    'Var {every}:e sek markeras en annan spelare än tanken i {mark} sek. När effekten tar slut delas {total} skada jämnt mellan alla inom {radius} yard från spelaren. Eko: {echo} sek senare brister samma plats igen för {echoDamage} på varje spelare som står kvar, utan delning.',
+  'bossJournal.temple.selthe.chorusName': 'Kör',
+  'bossJournal.temple.selthe.chorusResponse':
+    'Alla samlas på körspelaren och lämnar sedan platsen före ekot.',
+  'bossJournal.temple.selthe.chorusSummary':
+    'Var {every}:e sek markeras en annan spelare än tanken i {mark} sek. När effekten tar slut delas {total} skada jämnt mellan alla inom {radius} yard från spelaren.',
+  'bossJournal.temple.selthe.heroicDuet': 'Duett: Kör och Solo landar samtidigt på två spelare.',
+  'bossJournal.temple.selthe.heroicEcho':
+    'Eko: varje markering brister igen på samma plats {echo} sek senare.',
+  'bossJournal.temple.selthe.overview':
+    'Körmodern sjunger från sin bassäng och varken rör sig eller slåss i närstrid. Hon markerar spelare för en delad Kör och ett ensamt Solo, riktar en stegrande aria mot en spelare och skickar en våg över gården. Hennes projektiler och aria kan avbrytas.',
+  'bossJournal.temple.selthe.phaseName': 'Körgården',
+  'bossJournal.temple.selthe.phaseSummary':
+    'En fas med tidsräknare. En mekanik som blir redo under en besvärjelse väntar tills den tar slut.',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    'Duett: Solo landar tillsammans med Kör på en annan spelare. När effekten tar slut tar den markerade spelaren och alla inom {radius} yard {damage} var, och {echo} sek senare brister platsen igen.',
+  'bossJournal.temple.selthe.soloName': 'Solosång',
+  'bossJournal.temple.selthe.soloResponse':
+    'Solospelare: gå bort från alla och lämna sedan platsen.',
+  'bossJournal.temple.selthe.soloSummary':
+    '{offset} sek efter varje Kör markeras en annan spelare i {mark} sek. När effekten tar slut tar den markerade spelaren och alla inom {radius} yard {damage} skada var.',
+  'bossJournal.temple.selthe.songResponse': 'Den kan inte undvikas: helare håller allas hälsa hög.',
+  'bossJournal.temple.selthe.songSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan {min} till {max} frostskada på varje spelare på gården.',
+  'bossJournal.temple.selthe.surgeResponse': 'Gå åt sidan ur kilen.',
+  'bossJournal.temple.selthe.surgeSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek riktad mot en annan spelare än tanken, sedan en våg på {arc} grader som är {range} yard lång: {min} till {max} skada och en tillbakaknuffning på {push} yard.',
+  'bossJournal.temple.selthe.tipDamage':
+    'Samlas för Kör, sprid ut er från Solo, avbryt arian och gå ur Insjösvall.',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    'Samlas för Kör och sprid ut er från Solo samtidigt, lämna sedan båda platserna före ekot. Avbryt arian.',
+  'bossJournal.temple.selthe.tipHealer':
+    'Havssång träffar alla var {every}:e sek. Håll koll på arians mål och dem som Kör träffat ensamma.',
+  'bossJournal.temple.selthe.tipTank':
+    'Stå där hon kan se dig så att projektilerna går till dig; inget annat behöver en tank här.',
+  'bossJournal.temple.ysolei.callResponse': 'Tanken fångar upp dem och skadegörare dödar dem.',
+  'bossJournal.temple.ysolei.callSummary':
+    'Vid {first} och {second} hälsa kallar hon {count} månavfödingar.',
+  'bossJournal.temple.ysolei.choiceGain':
+    'En blockerad tår når henne aldrig: ingen skadebonus på {swell} och ingen läkning på {heal} åt henne.',
+  'bossJournal.temple.ysolei.choiceName': 'Blockera tårarna eller släppa igenom dem?',
+  'bossJournal.temple.ysolei.choiceRisk':
+    'Blockeraren tar träffen och en laddning av Månbränna: nästa tår träffar spelaren {bonus} hårdare. Turas om.',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    'Dränkt måne: en månavföding klättrar upp ur översvämningen var {moonEvery}:e sek.',
+  'bossJournal.temple.ysolei.heroicRiptide':
+    'Rivström: varje Underström lämnar brinnande pölar där spelare stod.',
+  'bossJournal.temple.ysolei.heroicTears':
+    '{count} tårar per våg och besvärjelsen Fallande måne varar i {cast} sek.',
+  'bossJournal.temple.ysolei.lunarResponse':
+    'Avståndsspelare håller sig utanför; närstridsspelare är alltid inom räckhåll så helare täcker dem.',
+  'bossJournal.temple.ysolei.lunarSummary':
+    'Var {every}:e sek en besvärjelse på {cast} sek, sedan {min} till {max} skada på alla inom {radius} yard från hennes mitt.',
+  'bossJournal.temple.ysolei.moonResponse':
+    'Varje skadegörare slår hennes skydd; helare förbereder sig på nedslaget.',
+  'bossJournal.temple.ysolei.moonSummary':
+    'En besvärjelse på {cast} sek bakom ett skydd värt {ward} av hennes hälsa. Bryt skyddet i tid: hon bedövas i {stun} sek och tar {vuln} mer skada. Om skyddet håller: {min} till {max} skada på alla på ön och hon gör {might} mer skada under resten av striden.',
+  'bossJournal.temple.ysolei.overview':
+    'Den dränkta månens avatar drar in alla och slår ned, översvämmar halva ön, kallar månavfödingar och rullar månljusets tårar mot sig själv. I slutet faller månen om inte gruppen bryter hennes skydd i tid.',
+  'bossJournal.temple.ysolei.phaseAltarName': 'Månaltaret',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    'Hon rör sig aldrig. Hennes räckvidd är lång: närstridsspelare står långt från mitten.',
+  'bossJournal.temple.ysolei.phaseMoonName': 'Fullmånen',
+  'bossJournal.temple.ysolei.phaseMoonSummary': 'Vid {health} hälsa kallar hon ned månen.',
+  'bossJournal.temple.ysolei.phaseTideName': 'Stigande tidvatten',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    'Vid {health} hälsa översvämmas halva ön och översvämningen byter sida.',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    'Vid {first} och {second} hälsa kallar hon {count} månljusets tårar som rullar mot henne. En tår som rör en spelare stannar: {min} till {max} skada plus {bonus} mer per laddning av Månbränna, och lämnar Utspillt månljus som bränner för {glow} per sekund. En tår som når henne ger henne {swell} mer skada och läker henne med {heal}.',
+  'bossJournal.temple.ysolei.tearsResponse':
+    'Blockera varje tår med kroppen och turas om så att ingen samlar laddningar av Månbränna.',
+  'bossJournal.temple.ysolei.tearsSummary':
+    'Vid {first} och {second} hälsa kallar hon {count} månljusets tårar som rullar mot henne. En tår som rör en spelare stannar: {min} till {max} skada plus {bonus} mer för varje laddning av Månbränna, som varar i {sear} sek. En tår som når henne ger henne {swell} mer skada under striden och läker henne med {heal}.',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    'Vid {health} hälsa översvämmas halva ön direkt. Var {every}:e sek byter översvämningen sida. I vattnet: {perSecond} skada per sekund och {slow} långsammare. Dränkt måne: var {moonEvery}:e sek klättrar en månavföding upp ur den översvämmade halvan.',
+  'bossJournal.temple.ysolei.tideName': 'Stigande tidvatten',
+  'bossJournal.temple.ysolei.tideResponse':
+    'Stanna på den torra halvan och flytta när den andra halvan skimrar.',
+  'bossJournal.temple.ysolei.tideSummary':
+    'Vid {health} hälsa översvämmas halva ön direkt. Var {every}:e sek byter översvämningen sida, med ett skimmer i {warn} sek först. I vattnet: {perSecond} skada per sekund och {slow} långsammare.',
+  'bossJournal.temple.ysolei.tipDamage':
+    'Spring från varje Underström, blockera tårar i turordning, döda månavfödingar och gör full skada på Fallande månens skydd.',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    'Spring från varje Underström och dess rivströmspölar, blockera tårar i turordning, döda månavfödingar och bryt snabbt Fallande månens skydd.',
+  'bossJournal.temple.ysolei.tipHealer':
+    'Måntidvatten träffar närstridsspelare vid varje besvärjelse. Tårar lägger till laddningar av Månbränna: läk den som blockerade en.',
+  'bossJournal.temple.ysolei.tipTank':
+    'Fånga upp varje månavföding. Spring ut ur Underströmmen med alla andra.',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    'Var {every}:e sek kanaliserar hon i {seconds} sek och drar alla mot sig. Sedan Tidvattensnedslag: {min} till {max} skada inom {radius} yard. Rivström: en pöl öppnas där varje spelare stod och bränner för {riptide} per sekund i {pool} sek.',
+  'bossJournal.temple.ysolei.undertowResponse':
+    'Alla, även närstridsspelare, springer ut mot torr mark under kanaliseringen; översvämningsvattnet saktar dig.',
+  'bossJournal.temple.ysolei.undertowSummary':
+    'Var {every}:e sek kanaliserar hon i {seconds} sek och drar alla mot sig med {pull} yard per sekund. Sedan Tidvattensnedslag: {min} till {max} skada inom {radius} yard.',
+  'bossJournal.common.enrageName': 'Rasande',
+  'bossJournal.common.enrageResponse':
+    'Tank och helare sparar sina försvars- och läkningsförmågor med nedkylning till denna fas. Alla andra ökar skadan för att avsluta snabbt.',
+  'bossJournal.common.enrageSummary':
+    'Under {health} hälsa gör dess närstridsattacker {damage} mer skada och kommer {haste} snabbare under resten av striden.',
+  'bossJournal.common.heroicHarder':
+    'Varje förmåga på denna sida slår {scale} gånger så hårt som i normalt läge.',
+  'bossJournal.common.phaseEnrageSummary':
+    'Under {health} hälsa blir bossen rasande under resten av striden.',
+  'dungeonGuide.drownedTemple.accept.1': 'Tack. Jag går bakom er och håller mig ur vägen.',
+  'dungeonGuide.drownedTemple.accept.2': 'Då går jag äntligen ned. Gå ni. Jag hänger med.',
+  'dungeonGuide.drownedTemple.area.altarLanding':
+    'Det var här jag stod. Precis här. Det var här jag vände och sprang.',
+  'dungeonGuide.drownedTemple.area.causeway.1':
+    'På ritnätterna låg månen på denna vägbank som en andra väg.',
+  'dungeonGuide.drownedTemple.area.causeway.2':
+    'Se på vattnet. Det minns fortfarande hur man håller månen.',
+  'dungeonGuide.drownedTemple.area.colonnade':
+    'Tidvattnets kolonnad. Vi gick den två och två och sjöng den stigande versen.',
+  'dungeonGuide.drownedTemple.area.falls':
+    'Bakom fallen dränker vattnet varje röst. Jag gömde mig här när jag skolkade från övningen.',
+  'dungeonGuide.drownedTemple.area.moonbridge.1':
+    'En bro av månljus. De äldre sade att bara de trogna kunde korsa den.',
+  'dungeonGuide.drownedTemple.area.moonbridge.2':
+    'Jag var aldrig trogen. Nåväl. Vi får se om den bär mig.',
+  'dungeonGuide.drownedTemple.area.pool':
+    'Månbassängen. De knäböjde runt den och drack ur sina snäckskal. Jag kunde inte lyfta mitt.',
+  'dungeonGuide.drownedTemple.area.prismStair':
+    'Prismatrappan. Vi besteg den vid månuppgången för att väcka det stora glaset.',
+  'dungeonGuide.drownedTemple.area.steps':
+    'Pilgrimstrappan. Jag sprang uppför den den natten, tre steg i taget, och såg aldrig tillbaka.',
+  'dungeonGuide.drownedTemple.area.terraces':
+    'Tidvattenpölarna. Noviserna höll dem rena och matade de små ljusa ting som levde i dem.',
+  'dungeonGuide.drownedTemple.area.veil':
+    'Bortom den slöjan ligger Körgården. Jag har inte stått där sedan jag var pojke.',
+  'dungeonGuide.drownedTemple.catchUp':
+    'Mina ben är gamla men jag känner varje trappa här. Jag är med.',
+  'dungeonGuide.drownedTemple.colossus.post':
+    'Glaset är krossat. Nu finns inget kvar som kan fånga månen utom hon.',
+  'dungeonGuide.drownedTemple.colossus.pre':
+    'Det stora prismat. Vi sjöng in i det för att fånga månen. Jag visste aldrig att det kunde stå.',
+  'dungeonGuide.drownedTemple.decline':
+    'Jag förstår. Jag lyssnar här uppifrån, som jag alltid har gjort.',
+  'dungeonGuide.drownedTemple.farewell.answer':
+    'Hon var varken det ena eller det andra. Hon var månen i vattnet, och vi var de som knäböjde.',
+  'dungeonGuide.drownedTemple.farewell.emote':
+    '{name} höjer sin röst över altaret och lagunen blir stilla.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.1':
+    'Gå upp i natten. Om ni hör sång vid fullmånen är det bara jag.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.2':
+    'Tack för att ni förde en gammal fegis till slutet av hans sång. Gå nu.',
+  'dungeonGuide.drownedTemple.farewell.stay':
+    'De har väntat länge nog. Jag stannar och sjunger den för dem nu.',
+  'dungeonGuide.drownedTemple.farewell.verse':
+    'Riten hade en sista vers, den som låter sångarna sova. Jag sjöng den aldrig.',
+  'dungeonGuide.drownedTemple.greet.1':
+    'Jag var Bleka körens yngsta röst. På ritens natt drack jag inte, och jag flydde. Varje fullmåne sedan dess hör jag dem sjunga under vattnet. Jag måste träffa henne innan jag dör. Låt mig gå bakom er. Jag kommer inte slåss och jag kommer inte sakta ned er.',
+  'dungeonGuide.drownedTemple.greet.2':
+    'Varje fullmåne kommer jag till denna port, och varje fullmåne sviker modet mig. Inte i natt. Kören sjunger och jag är den som flydde. Ta mig ned till henne så håller jag mig ur vägen.',
+  'dungeonGuide.drownedTemple.heroicWater':
+    'Vattnet står högt i natt, högre än jag någonsin sett det. Hon är nära att vakna.',
+  'dungeonGuide.drownedTemple.hydra.post':
+    'Lyssna. Under fallen sjunger de fortfarande. Närmare nu.',
+  'dungeonGuide.drownedTemple.hydra.pre':
+    'Bassängormen. När jag var pojke hade den ett huvud och åt ur våra händer.',
+  'dungeonGuide.drownedTemple.joined': 'Led vägen. Jag är precis bakom er.',
+  'dungeonGuide.drownedTemple.memory.rubbing':
+    'Tidvattensväktaren läste mina ord på strandklippan. "Den bara sover." Jag ristade dem morgonen efter.',
+  'dungeonGuide.drownedTemple.memory.votaries':
+    'De dränkta på stranden gick ned efter att porten stängts. Månen tog dem aldrig, bara vattnet.',
+  'dungeonGuide.drownedTemple.row.decline': 'Vi går ensamma.',
+  'dungeonGuide.drownedTemple.row.join': 'Kom med oss.',
+  'dungeonGuide.drownedTemple.selthe.post.1':
+    'Hon är tyst. Under alla mina år i kören var hon aldrig tyst en enda gång.',
+  'dungeonGuide.drownedTemple.selthe.post.2':
+    'Vila nu, moder. Du hade rätt om mig. Jag kunde aldrig hålla de långa tonerna.',
+  'dungeonGuide.drownedTemple.selthe.pre.1':
+    'Moder Selthe. Hon lärde mig andas från magen. Hon lärde oss alla att drunkna utan att dö.',
+  'dungeonGuide.drownedTemple.selthe.pre.2':
+    'Körmodern Selthe. Varje ton jag kan lade hon i mig. Förlåt mig, moder.',
+  'dungeonGuide.drownedTemple.sight.acolyte':
+    'Noviserna. Jag lärde mig bokstäverna bredvid dem. Nu sjunger de i sömnen och vaknar aldrig.',
+  'dungeonGuide.drownedTemple.sight.eel':
+    'Lagunålarna. Noviserna matade dem med bröd i skymningen. De blev feta på våra hymner.',
+  'dungeonGuide.drownedTemple.sight.lurker':
+    'Barnen fångade dem med nät på grunt vatten. De var små som en tumme och lyste.',
+  'dungeonGuide.drownedTemple.sight.moonspawn':
+    'De var aldrig mitt folk. De är hennes, gjorda av inget annat än månljus.',
+  'dungeonGuide.drownedTemple.sight.pilgrim':
+    'Pilgrimerna från strandbyarna. De bar sin helgedom på ryggen varje vår. Nu bär de den för evigt.',
+  'dungeonGuide.drownedTemple.sight.reflection':
+    'Den visar dig vad vattnet skulle göra av dig. Krossa den!',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    'Portbassängernas månrockor. Som noviser matade vi dem med pärlor vid månuppgången. Nu vaktar de dörrarna och bär våra pärlor som hjärtan.',
+  'dungeonGuide.drownedTemple.sight.siren':
+    'Den rösten. Hon sjöng bredvid mig i kören. Hon kommer fortfarande in ett halvt slag för tidigt.',
+  'dungeonGuide.drownedTemple.sight.snapper':
+    'Vi drack månvattnet ur snäckskal som de där. Mitt tappade jag på trappan.',
+  'dungeonGuide.drownedTemple.sight.templeguard':
+    'Trappvakten. De svor att hålla templet tills månen gick ned. Den gick aldrig ned.',
+  'dungeonGuide.drownedTemple.sight.tidewisp':
+    'Det är själva månvattnet, drycken vi skulle dricka. Låt det inte röra er.',
+  'dungeonGuide.drownedTemple.singing': 'Låt mig sjunga. Gå och gå varsamt.',
+  'dungeonGuide.drownedTemple.wipe': 'Res er. Snälla. Lämna mig inte ensam här nere igen.',
+  'dungeonGuide.drownedTemple.ysolei.pre':
+    'Där är hon. Hela livet har jag frågat om hon var en gudinna eller ett monster. Visa mig.',
+  'dungeonGuide.drownedTemple.ysolei.preHeroic':
+    'En natt som denna sjunger hela kören med henne. Håll stånd, allihop.',
+  'auth.wocBuilder.bodyGlyph.a': 'A',
+  'auth.wocBuilder.bodyGlyph.b': 'B',
+  'hudChrome.dungeonTracker.heroicTitle': '{name} ({difficulty})',
+  'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
+  'hudChrome.guildHall.goals.task': '{task} ({dungeon})',
+  'hudChrome.raidBossGuide.dungeonSubtitle': '{dungeon} | {boss} | {difficulty}',
+  'editor.assets.subcategoryTab': '{name} ({count})',
+  'editor.camera.perfFps': 'FPS',
+  'editor.dungeon.field.x': 'X',
+  'editor.dungeon.field.z': 'Z',
+  'editor.markerTool.defaultName': '{kind} {num}',
+  'editor.markerTool.npc': 'NPC',
+  'editor.mobTool.seconds': '{value}s',
+  'editor.mobTool.statBonus': '{value}x (+{percent}%)',
+  'editor.mobTool.statPenalty': '{value}x (-{percent}%)',
+  'editor.objectMove.deletedRow': '{kind}: {name}',
+  'editor.push.conflictRow': '{kind} {id}: {reason}',
+  'editor.push.kindNpc': 'NPC',
+  'editor.selection.y': 'Y',
+  'editor.tree.volumeX': 'X',
+  'editor.tree.volumeY': 'Y',
+  'editor.tree.volumeZ': 'Z',
+  'editor.weather.minutesShort': 'min',
+  'entities.mobs.buddy_alon.name': 'Alon',
+  'entities.mobs.buddy_ansem.name': 'Ansem',
+  'entities.mobs.buddy_kekius.name': 'Kekius',
+  'entities.mobs.buddy_raptor.name': 'Raptor',
+  'entities.npcs.cantor_laverock.name': 'Laverock',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'Tobias Wren',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'Garrick Holt',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'Mira Fairweather',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'Hesper Dunmore',
+  'entities.npcs.innkeeper_maudie.name': 'Maudie Tapwright',
+  'entities.npcs.patron_amos_eelby.name': 'Amos Eelby',
+  'entities.npcs.patron_grissel_sedgeworth.name': 'Grissel Sedgeworth',
+  'entities.npcs.patron_hester_quillby.name': 'Hester Quillby',
+  'entities.npcs.patron_ned_oxley.name': 'Ned Oxley',
+  'entities.npcs.socketwright_skerrit.name': 'Maben Skerrit',
+  'entities.zones.goldcrest_harbor.name': 'Goldcrest Harbor',
+  'referralCards.okay': 'OK',
 };

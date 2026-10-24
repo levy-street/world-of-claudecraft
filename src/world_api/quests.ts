@@ -1,5 +1,6 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
+import type { GuildContractsView } from '../sim/guild_contracts';
 import type {
   QuestProgress,
   QuestState,
@@ -70,11 +71,18 @@ export interface IWorldQuests {
    * null when none.
    */
   readonly treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null;
+  /** The faction hub the Allied Hearthstone is bound to (persisted), or null while unbound. */
+  readonly alliedHearthstoneAttunement: FactionId | null;
+  /** Bind the Allied Hearthstone at a faction quartermaster (server-validated: in range, holding it). */
+  attuneAlliedHearthstone(npcId: number): void;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;
   acceptQuest(questId: string, selection?: string): void;
-  turnInQuest(questId: string): void;
+  /** `rewardChoice` is the picked choose-one reward (QuestDef.choiceRewards). The
+   *  server grants the spec default when it is left out and refuses a piece the
+   *  class is not offered. */
+  turnInQuest(questId: string, rewardChoice?: string): void;
   abandonQuest(questId: string): void;
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number): void;
   swapWorldQuestMatch3Tiles(questId: string, fromIndex: number, toIndex: number): void;
@@ -90,6 +98,12 @@ export interface IWorldQuests {
   chooseWeeklyQuest(questId: string): void;
   /** Claim the finished weekly charge's commendation for one faction. */
   commendWeeklyQuest(factionId: FactionId): void;
+  /** Lantern Hall's weekly dungeon contracts (src/sim/guild_contracts.ts): the week, its
+   *  three contracts, the ones this character has done and the lifetime count. */
+  readonly guildContracts: GuildContractsView;
+  /** Buy one of the guild quartermaster's cosmetics (server-validated: beside him, enough
+   *  Lantern Seals, not owned); the answer arrives as a guildCosmetic* event. */
+  buyGuildCosmetic(offerId: string): void;
   /** One page of a medal world quest's public ladder (best row per character;
    *  the offline world has no ladder and resolves an empty page). `viewer` is a
    *  character name: the page's `self` carries that character's standing. */

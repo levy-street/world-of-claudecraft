@@ -40,7 +40,7 @@ export function decodeWispMazeState(
     ) ||
     new Set(row.collected).size !== row.collected.length ||
     !Array.isArray(row.enemies) ||
-    row.enemies.length > WISP_MAZE_PROFILES.hard.enemyCount
+    row.enemies.length > 4
   )
     return;
   for (const field of [

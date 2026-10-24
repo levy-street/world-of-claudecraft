@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rare_bone_studded_pauldrons.webp",
+    "http://localhost:5194/ui/items/rare_legguards_of_the_ossuary.webp",
+    "http://localhost:5194/ui/items/rare_seal_of_the_cryptwalker.webp",
+    "http://localhost:5194/ui/items/rare_ossuary_bone_crown.webp",
+    "http://localhost:5194/ui/items/bone_studded_pauldrons.webp",
+    "http://localhost:5194/ui/items/legguards_of_the_ossuary.webp",
+    "http://localhost:5194/ui/items/seal_of_the_cryptwalker.webp",
+    "http://localhost:5194/ui/items/ossuary_bone_crown.webp",
+    "http://localhost:5194/ui/items/legendary_bone_studded_pauldrons.webp",
+    "http://localhost:5194/ui/items/legendary_legguards_of_the_ossuary.webp",
+    "http://localhost:5194/ui/items/legendary_seal_of_the_cryptwalker.webp",
+    "http://localhost:5194/ui/items/legendary_ossuary_bone_crown.webp"
+  ],
+  "allDecoded": true
+}

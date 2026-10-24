@@ -38,7 +38,7 @@ import { WYRMWATCH_RAIL_HEIGHT } from '../src/sim/content/wyrmwatch_harbor';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WICKHARBOR_WHARF_ASSET.target);
-const SHIPPED_SHA256 = '655410d0d1042dc1b63a8558d84c0457428650c98b97d9fbbe2bacf1181b1e72';
+const SHIPPED_SHA256 = '68fa502e2ac7411ae7a2c14cd21c83b4a86e930c6a0423aad4718995f4747b8e';
 const SHIPPED_BYTES = 168588;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {

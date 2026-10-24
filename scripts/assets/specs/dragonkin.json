@@ -36,13 +36,6 @@
       "out": "models/creatures/dragon_egg.glb",
       "type": "static",
       "maxTex": 512
-    },
-    {
-      "src": "tmp/asset_src/Dragonkin_Mobs/built/drakemaw_raptor.glb",
-      "out": "models/mounts/drakemaw_raptor.glb",
-      "type": "character",
-      "keepClips": ["Idle", "Walk", "Run", "Death"],
-      "keepExtras": true
     }
   ]
 }

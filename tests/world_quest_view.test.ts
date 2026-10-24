@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { createGroundObject } from '../src/sim/entity';
+import { worldQuestHonorRewardForQuest } from '../src/sim/world_quest_honor_slots';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quest_rotation';
 import { entityDisplayName } from '../src/ui/entity_display_core';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import {
   worldQuestDisplayName,
+  worldQuestHonorRewardText,
   worldQuestObjectiveLabel,
   worldQuestRewardLine,
   worldQuestRewardText,
@@ -12,6 +16,21 @@ import {
 } from '../src/ui/world_quest_view';
 
 describe('world quest view', () => {
+  it('names the ore actually harvested in Willowfen', () => {
+    expect(worldQuestObjectiveLabel('wq_willowfen_ore')).toBe('Mine Osmium Ore');
+    expect(worldQuestDisplayName('wq_willowfen_ore')).toBe('The Willowfen: Mine Osmium Ore');
+  });
+
+  it('uses the translated ore name in the Spanish Willowfen objective', async () => {
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    try {
+      expect(worldQuestObjectiveLabel('wq_willowfen_ore')).toBe('Extrae Mineral de Osmio');
+    } finally {
+      setLanguage('en');
+    }
+  });
+
   it('distinguishes the Last Keep defense from the existing cannon quest', () => {
     expect(worldQuestDisplayName('wq_last_keep_cannon')).toBe('The Last Keep Cannon');
     expect(worldQuestObjectiveLabel('wq_last_keep_cannon')).toBe(
@@ -79,6 +98,30 @@ describe('world quest view', () => {
     );
     expect(worldQuestObjectiveLabel('wq_frostveil_caravan')).toBe(
       'Escort the caravan: The Frostveil Reach',
+    );
+  });
+});
+
+describe("the day's Honor reward line", () => {
+  const cycle = 'wq1_0';
+  const board = activeWorldQuestsForCycle(cycle);
+  const onSlot = board.find((quest) => worldQuestHonorRewardForQuest(cycle, quest) > 0);
+  const offSlot = board.find((quest) => worldQuestHonorRewardForQuest(cycle, quest) === 0);
+
+  it('reads +150 Honor on an Honor quest and joins the reward line', () => {
+    if (!onSlot) throw new Error('no Honor quest on the board');
+    expect(worldQuestHonorRewardText(onSlot, cycle)).toBe('+150 Honor');
+    expect(worldQuestRewardLine(onSlot, { level: 20, cls: 'warrior', cycle })).toContain(
+      '+150 Honor',
+    );
+  });
+
+  it('is null off the day slots and with no cycle', () => {
+    if (!offSlot || !onSlot) throw new Error('board lacks an on/off slot quest');
+    expect(worldQuestHonorRewardText(offSlot, cycle)).toBeNull();
+    expect(worldQuestHonorRewardText(onSlot, '')).toBeNull();
+    expect(worldQuestRewardLine(offSlot, { level: 20, cls: 'warrior', cycle })).not.toContain(
+      'Honor',
     );
   });
 });

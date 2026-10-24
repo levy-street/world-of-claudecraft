@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-wildheart-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 4,
+    "removedCategoryFallbacks": [
+      "dgn_beastmaster_apart",
+      "dgn_gorgebloom_clean",
+      "dgn_zulgar_uncaught",
+      "dgn_great_saurian"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "dgn_beastmaster_apart",
+      "family": "deed-wildheart",
+      "batchId": "deed-wildheart-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_beastmaster_apart.webp",
+      "canonicalDisplayName": "Kept at Bay",
+      "acceptedSha256": "93ab1b2e4eef2000243ecf565c2fa2707c37e8c4c1e59912d3ef848f08ab91e6",
+      "acceptedBytes": 8936,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/originals/dgn_beastmaster_apart.png",
+        "sha256": "dfd26401a447bb1431420c8701e4678b4258e62486b957ba4a5ee59c0fd56632",
+        "bytes": 1940367,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/masters/dgn_beastmaster_apart.png",
+        "sha256": "51b30051c71a0cd3c0b1dcb113e8c782723b4c9123689e005a1f6acc399f5f55",
+        "bytes": 367301,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Kept at Bay (dgn_beastmaster_apart). Subject: A compact emblem with a tall tribal bone-tipped spear on the left and a proud spotted golden jaguar head on the right, clearly separated by an open gap. A broken emerald magical tether between them has two ends curling away, symbolizing the severed Pack Bond. Weathered bone, warm spotted fur, dark emerald leaves only at base. Jaguar has short rounded feline ears and a dark crest of mane, no tiger stripes. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/wildheart_beastmaster.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "dc5d57951865dff4166381796252650fe21fb5acd13807e8ee06bfc918c17059"
+          },
+          {
+            "path": "public/ui/mobs/fanglord_jaguar.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "acc93730e97d135757992e5660244647a53e6191088348cdf033690ff0bea186"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_beastmaster_apart",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [88, 44, 1201, 1212],
+          "framedSubject": [427, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_beastmaster_apart-desktop.png",
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_beastmaster_apart-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_gorgebloom_clean",
+      "family": "deed-wildheart",
+      "batchId": "deed-wildheart-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_gorgebloom_clean.webp",
+      "canonicalDisplayName": "Weed Control",
+      "acceptedSha256": "78f56124be7e1e6f9983ab0d37063c93559f73b9e4d602d0ce016dcd7efaf383",
+      "acceptedBytes": 9076,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/originals/dgn_gorgebloom_clean.png",
+        "sha256": "cf1cd6d5edd9d33ec045dbcf92edd3ae84995fc5f3392a17c27ed23bf7f956b8",
+        "bytes": 1774630,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/masters/dgn_gorgebloom_clean.png",
+        "sha256": "2dd8e70b167b97899afb210468beb169b8725970c6df536e68d68f7e0c0fa069",
+        "bytes": 385350,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Weed Control (dgn_gorgebloom_clean). Subject: A strong bronze-armored boot pressing down on a tiny thorn sprout before it can grow. Three fresh green thorny leaves and its roots curl from a small mound of soil; one orange carnivorous flower bud stays tightly shut. Boot and flattened sprout dominate a compact emblem, warm brown leather, bronze toe, vivid green foliage and orange bud, no blood, writing or garden scene. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/the_gorgebloom.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "110b7fdf04900c520ede84944cc0eed85b2a44091f99b055b225c0092357745d"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_gorgebloom_clean",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [66, 92, 1182, 1150],
+          "framedSubject": [448, 425],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_gorgebloom_clean-desktop.png",
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_gorgebloom_clean-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_zulgar_uncaught",
+      "family": "deed-wildheart",
+      "batchId": "deed-wildheart-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_zulgar_uncaught.webp",
+      "canonicalDisplayName": "Never Caught",
+      "acceptedSha256": "20050f9b9c0d9faaf292f3328ed4660dc3340b330cd52fdcc3ac3a5d0067162f",
+      "acceptedBytes": 10694,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/originals/dgn_zulgar_uncaught.png",
+        "sha256": "7cbed7b7e1003ce98c4bb3d55cc6b944f37a1604fe4a3385bf49a6fa2f464c55",
+        "bytes": 1928744,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/masters/dgn_zulgar_uncaught.png",
+        "sha256": "a62c49d2ed062581df819b5d3dfde69bc0157b1abea39b4fe43824bcecd29a8f",
+        "bytes": 412905,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Never Caught (dgn_zulgar_uncaught). Subject: A quick silver-edged brown adventurer boot leaping safely beyond the reach of a golden spectral jaguar paw. The large four-clawed paw sweeps behind the heel with a clear dark gap, no contact. Two short golden motion arcs emphasize escape, small deep-green jungle leaves anchor the base. Boot and reaching paw only, no full person or cat, no blood or text. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/wildheart_high_priest.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "4f6e217ed8057b465ffb66de357627cc74dbab8e5ce454b49c4687ba5003050d"
+          },
+          {
+            "path": "public/ui/mobs/fanglord_jaguar.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "acc93730e97d135757992e5660244647a53e6191088348cdf033690ff0bea186"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_zulgar_uncaught",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [73, 135, 1184, 1170],
+          "framedSubject": [448, 417],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_zulgar_uncaught-desktop.png",
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_zulgar_uncaught-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_great_saurian",
+      "family": "deed-wildheart",
+      "batchId": "deed-wildheart-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_great_saurian.webp",
+      "canonicalDisplayName": "Toppled Titan",
+      "acceptedSha256": "7a3ebddafec7eba4cc8e17af82b91bb1e2a0503e79d48173ea04b631b8d9e5f1",
+      "acceptedBytes": 8824,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/originals/dgn_great_saurian.png",
+        "sha256": "6cb625c629fda657858565d2a52bc1f819a1c829289510b71b28bc4b072bbb8e",
+        "bytes": 2350841,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-wildheart/masters/dgn_great_saurian.png",
+        "sha256": "7934255fb9e5dffa841bfb940ed486aff6ca77066264d91f858424bc1064c335",
+        "bytes": 445359,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Toppled Titan (dgn_great_saurian). Subject: A defeated moss-green long-necked sauropod war-beast resting with its head down, its tall wooden wicker howdah tilted and broken beside its back. A small fallen bone-topped hexcaller staff rests beside the howdah, symbolizing both beast and rider defeated together. Dinosaur has a long graceful neck, small rounded head, broad bulky body and short stout legs; not a tyrannosaur or crocodile. Compact triangular emblem, moss scales, warm wicker, ochre cloth, no wounds or visible rider. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/great_saurian.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "88d5196e6ff266a76dabfc981dbd458a9e588527c9860eb7f9be2c037945edad"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_great_saurian",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [52, 65, 1208, 1192],
+          "framedSubject": [448, 437],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_great_saurian-desktop.png",
+          "docs/screenshots/deed-wildheart-icons-v045/dgn_great_saurian-mobile.png"
+        ]
+      }
+    }
+  ]
+}

@@ -4,7 +4,9 @@
 // leave the slot (the exit portal, a room crossing, or any teleport out), die,
 // or escape through stealth. Neither the soft leash nor the hard tether ever
 // sends the mob home, so dragging a pull around the slot resets nothing. A mob
-// that cannot get to its target (pinned by geometry, the unreachable stall)
+// whose straight chase is stopped by geometry first walks a route round it
+// (mob/chase_route.ts); only a mob NO route brings to its target (the
+// unreachable stall: a perch, a sealed room, a way round too far to search)
 // holds in place in an evade stance: immune to damage while it is stuck
 // (combat/damage.ts), no swings, casts, or mechanics (mob/locomotion.ts), aggro
 // intact; it resumes the moment the target is back in reach or the way is open,
@@ -16,6 +18,16 @@
 // wall, not an unkillable one. So kiting the instance around can neither reset
 // the pull nor chip a pinned mob down for free, and a perch only buys a few
 // seconds, which is what a kited chain pull was being farmed for.
+//
+// CASTERS TOO, by decision. A petSpell caster that obeys the sight rule
+// (mob/cast_sight.ts) is "in reach" at spell range only while it SEES its
+// target. In spell range of a target behind a sealed gate it used to stand and
+// cast through the wall; now it closes, finds no route, stalls and is held
+// here exactly like a melee mob, then comes through and casts from the far
+// side. It is the same anti-exploit fallback melee has always had in a slot,
+// and it happens only when no route exists. Bosses are not swept in: they
+// obey neither the sight rule nor the route planner (mob/encounter_body.ts).
+// Pinned by tests/mob_cast_line_of_sight.test.ts.
 //
 // Scope: the dungeon and raid slots in ctx.instances. Rifts and delves keep
 // their own instance records and the open-world rules (the hate-table reach in
@@ -60,6 +72,9 @@ export function attackerLeftInstance(slot: InstanceSlot, attacker: Entity): bool
 export function pinInPlace(mob: Entity): void {
   if (mob.evadeInPlace === undefined) mob.evadeInPlace = 0;
   mob.autoAttack = false;
+  // Whatever route it was on did not get it there (mob/chase_route.ts): once
+  // it has phased through to its target the old waypoints lie behind a wall.
+  if (mob.chaseRoute !== undefined && mob.chaseRoute.path.length > 0) mob.chaseRoute.path = [];
 }
 
 export function releasePin(mob: Entity): void {

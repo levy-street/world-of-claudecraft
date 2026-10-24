@@ -115,7 +115,7 @@ describe('classic formulas', () => {
     expect(lb20.effects).toEqual([{ type: 'directDamage', min: 75, max: 85 }]);
     // rogue: kidney shot is the finisherStun new ability
     const ks = abilitiesKnownAt('rogue', 14).find((k) => k.def.id === 'kidney_shot')!;
-    expect(ks.effects).toEqual([{ type: 'finisherStun', base: 1, perCombo: 1 }]);
+    expect(ks.effects).toEqual([{ type: 'finisherStun', base: 2, perCombo: 1 }]);
   });
 });
 
@@ -658,18 +658,15 @@ describe('rogue', () => {
     expect(sim.player.comboPoints).toBe(0);
   });
 
-  it('toggling stealth off does not re-arm its cooldown', () => {
+  it('Duskveil has no cooldown: stepping out and back in is immediate', () => {
     const sim = makeScopedSim(WOLF_TEST_WORLD, 'rogue');
     (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10); // reach level 3, learns stealth (lvl 2)
     expect(sim.known.map((k) => k.def.id)).toContain('stealth');
-    // Stealth on: arms the 10s re-entry cooldown.
+    // Stealth on arms no re-entry cooldown (like the druid's Stalk).
     sim.castAbility('stealth');
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
-    expect(sim.player.cooldowns.has('stealth')).toBe(true);
-    // Wait out the cooldown (10s @ 20 ticks/s = 200 ticks).
-    for (let i = 0; i < 220; i++) sim.tick();
     expect(sim.player.cooldowns.has('stealth')).toBe(false);
-    // Toggling stealth off is free and must not re-arm the cooldown.
+    // Toggling stealth off is free and arms nothing either.
     sim.castAbility('stealth');
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);
     expect(sim.player.cooldowns.has('stealth')).toBe(false);
@@ -678,16 +675,16 @@ describe('rogue', () => {
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
   });
 
-  it('rogue Stealth moves at 50% speed', () => {
+  it('rogue Stealth moves at full speed', () => {
     const sim = makeScopedSim(WOLF_TEST_WORLD, 'rogue');
     (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10); // reach level 3, learns stealth (lvl 2)
     expect((sim as any).moveSpeedMult(sim.player)).toBe(1);
     sim.castAbility('stealth');
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
-    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(1, 5);
   });
 
-  it('rogue Stealth actually covers half normal ground', () => {
+  it('rogue Stealth actually covers normal ground', () => {
     const normal = makeScopedSim(WOLF_TEST_WORLD, 'rogue');
     despawnMobs(normal);
     (normal as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10);
@@ -701,18 +698,18 @@ describe('rogue', () => {
     const base = forwardDistance(normal);
     const stealth = forwardDistance(stealthed);
     expect(base).toBeGreaterThan(0);
-    expect(stealth / base).toBeCloseTo(0.5, 1);
+    expect(stealth / base).toBeCloseTo(1, 1);
   });
 
-  it('rogue Vanish moves at 50% speed', () => {
+  it('rogue Vanish moves at full speed', () => {
     const sim = makeScopedSim(WOLF_TEST_WORLD, 'rogue');
     sim.setPlayerLevel(20); // Vanish learns at level 18
     sim.castAbility('vanish');
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
-    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(1, 5);
   });
 
-  it('rogue Vanish actually covers half normal ground', () => {
+  it('rogue Vanish actually covers normal ground', () => {
     const normal = makeScopedSim(WOLF_TEST_WORLD, 'rogue');
     despawnMobs(normal);
     normal.setPlayerLevel(20);
@@ -726,7 +723,7 @@ describe('rogue', () => {
     const base = forwardDistance(normal);
     const vanish = forwardDistance(vanished);
     expect(base).toBeGreaterThan(0);
-    expect(vanish / base).toBeCloseTo(0.5, 1);
+    expect(vanish / base).toBeCloseTo(1, 1);
   });
 
   it('Sap does not break the caster stealth (issue #1890)', () => {

@@ -17,7 +17,14 @@ vi.mock('../server/db', () => ({
 
 import { wireEntity } from '../server/game';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
-import { MOUNT_SUMMON_SECONDS, summonMountItem, toggleMount } from '../src/sim/mounts';
+import { updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
+import { TRAINING_MOUNT_KEY } from '../src/sim/content/mounts';
+import {
+  forceTrainingMount,
+  MOUNT_SUMMON_SECONDS,
+  summonMountItem,
+  toggleMount,
+} from '../src/sim/mounts';
 import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import {
   isSwimming,
@@ -463,5 +470,89 @@ describe('attack auto-dismount', () => {
 
     // Assert: player is dismounted immediately
     expect(e.mountKey).toBe('');
+  });
+});
+
+describe('summon completion vs a still-armed auto-attack', () => {
+  // Regression: a summon whose bar filled left the rider on foot. Auto-attack
+  // stays armed out of combat while its target lives (a pull that never landed,
+  // a mob that reset), and the swing loop force-dismounts a mounted player with
+  // an armed swing BEFORE any range check, so the next tick undid the summon.
+  // Arms auto-attack on the nearest hostile well outside melee and aggro reach.
+  function armOnDistantHostile(sim: Sim, e: Entity): void {
+    let target: Entity | null = null;
+    let best = Infinity;
+    for (const m of sim.entities.values()) {
+      if (m.kind !== 'mob' || m.dead || !sim.ctx.isHostileTo(e, m)) continue;
+      const d = Math.hypot(m.pos.x - e.pos.x, m.pos.z - e.pos.z);
+      if (d > 40 && d < best) {
+        best = d;
+        target = m;
+      }
+    }
+    const t = expectDefined(target);
+    e.targetId = t.id;
+    e.facing = Math.atan2(t.pos.x - e.pos.x, t.pos.z - e.pos.z);
+    e.autoAttack = true;
+    e.swingTimer = 0;
+    expect(e.inCombat).toBe(false);
+  }
+
+  it('lands the mount and keeps it when auto-attack is armed on a distant hostile', () => {
+    const sim = makeSim();
+    const pid = joinRider(sim);
+    const e = expectDefined(sim.entities.get(pid));
+    armOnDistantHostile(sim, e);
+
+    expect(summonMountItem(sim.ctx, pid, 'grag_bear')).toBe(true);
+    for (let i = 0; i < channelTicks(MOUNT_SUMMON_SECONDS) - 1; i++) sim.tick();
+    // The bug's precondition holds right up to the landing tick: still armed.
+    expect(e.mountKey).toBe('');
+    expect(e.autoAttack).toBe(true);
+    sim.tick();
+    expect(e.mountKey).toBe('grag_bear');
+    // A further second of ticks: the armed swing must not knock the rider off.
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(e.mountKey).toBe('grag_bear');
+    // Riding off puts the weapon away, exactly like stopAutoAttack.
+    expect(e.autoAttack).toBe(false);
+  });
+
+  it('keeps the instantly lent lesson steed when auto-attack is armed', () => {
+    const sim = makeSim();
+    const pid = joinRider(sim);
+    const e = expectDefined(sim.entities.get(pid));
+    const meta = expectDefined(sim.players.get(pid));
+    meta.mountTraining = {
+      sessionId: 'armed-swing',
+      ownerId: pid,
+      anchor: { x: e.pos.x, z: e.pos.z },
+      state: 'IN_PROGRESS',
+      phase: 'mount',
+    };
+    armOnDistantHostile(sim, e);
+
+    expect(forceTrainingMount(sim.ctx, e)).toBe(true);
+    expect(e.mountKey).toBe(TRAINING_MOUNT_KEY);
+    expect(e.autoAttack).toBe(false);
+    // The swing pass alone (a full tick would also run the lesson's paddock
+    // bound, which this rider far from the yard trips by design).
+    updatePlayerAutoAttack(sim.ctx, e, meta);
+    expect(e.mountKey).toBe(TRAINING_MOUNT_KEY);
+  });
+
+  it('keeps the new mount on an instant mount-to-mount swap with auto-attack armed', () => {
+    const sim = makeSim();
+    const pid = joinRider(sim);
+    const e = expectDefined(sim.entities.get(pid));
+    sim.addItem('reins_valorsteed', 1, pid);
+    e.mountKey = 'grag_bear';
+    armOnDistantHostile(sim, e);
+
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(true);
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.autoAttack).toBe(false);
+    sim.tick();
+    expect(e.mountKey).toBe('valorsteed');
   });
 });

@@ -44,11 +44,13 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Il Bacino di Wildheart',
-    desc: 'Armi distintive di Zulgar e del Domabestie Signore delle Zanne.',
+
+    desc: 'Armi distintive del Signore delle Bestie Signore delle Zanne, del Fiore Vorace e di Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Eroico: Il Bacino di Wildheart',
-    desc: 'Epici esclusivi della modalità eroica di Zulgar, Voce del Bacino.',
+
+    desc: 'Oggetti epici e monili esclusivi della modalità Eroica del Signore delle Bestie Signore delle Zanne, del Fiore Vorace e di Zulgar, Voce del Bacino.',
   },
   conquerors_nythraxis: {
     name: 'Raid di Nythraxis',
@@ -61,6 +63,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, il Picco Risvegliato',
     desc: 'Bottini epici personali del boss mondiale del Picco Risvegliato.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, il Caposquadra Sepolto',
+    desc: 'Bottino trascinato fuori dai tumuli di Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Il Reliquiario Crollato',
@@ -140,11 +146,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galleria di Guerra',
-    desc: 'I cinque kit da battaglia di Guerra della prima stagione, ora venduti pezzo per pezzo per oro.',
+    desc: "I cinque completi da battaglia di Guerra, ottenuti pezzo per pezzo con l'onore.",
   },
   conquerors_warfare_armory: {
     name: 'Armeria di Guerra',
-    desc: 'Gioielli e armi di Guerra, la prima stagione per oro e i due ninnoli per onore.',
+    desc: 'Gioielli, armi e merci di Guerra acquistati con onore sudato.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galleria dell’Avanguardia',

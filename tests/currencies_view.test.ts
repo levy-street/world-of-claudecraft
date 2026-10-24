@@ -1,24 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { FACTION_IDS } from '../src/sim/factions';
-import { buildCurrenciesView, heroicMarkCount } from '../src/ui/hud/currencies/currencies_view';
+import { buildCurrenciesView } from '../src/ui/hud/currencies/currencies_view';
 
 const woc = { enabled: true, balance: 12, verified: true };
 
 describe('currencies view', () => {
-  it('counts Heroic Marks across every stack in the bags', () => {
-    expect(
-      heroicMarkCount([
-        { itemId: 'heroic_mark', count: 5 },
-        { itemId: 'copper_ore', count: 3 },
-        { itemId: 'heroic_mark', count: 7.9 },
-      ]),
-    ).toBe(12);
-    expect(heroicMarkCount([])).toBe(0);
+  it('shows the Heroic Marks currency balance as a whole number, never a bag count', () => {
+    const view = (heroicMarks: number) =>
+      buildCurrenciesView({ heroicMarks, honor: 0, lifetimeHonor: 0, delveMarks: 0, woc });
+    expect(view(12.9).activities[0]).toMatchObject({ id: 'heroic_mark', amount: 12 });
+    expect(view(-4).activities[0].amount).toBe(0);
+    expect(view(Number.NaN).activities[0].amount).toBe(0);
   });
 
   it('lists the four activity balances in a fixed order with Honor carrying its lifetime total', () => {
     const view = buildCurrenciesView({
-      inventory: [{ itemId: 'heroic_mark', count: 3 }],
+      heroicMarks: 3,
       honor: 340,
       lifetimeHonor: 1_200,
       delveMarks: 5,
@@ -38,7 +35,7 @@ describe('currencies view', () => {
 
   it('omits the token when the wallet UI is off and reports null when no wallet is linked', () => {
     const off = buildCurrenciesView({
-      inventory: [],
+      heroicMarks: 0,
       honor: 0,
       lifetimeHonor: 0,
       delveMarks: 0,
@@ -46,7 +43,7 @@ describe('currencies view', () => {
     });
     expect(off.activities.map((row) => row.id)).not.toContain('woc_token');
     const unlinked = buildCurrenciesView({
-      inventory: [],
+      heroicMarks: 0,
       honor: 0,
       lifetimeHonor: 0,
       delveMarks: 0,
@@ -57,7 +54,7 @@ describe('currencies view', () => {
 
   it('clamps corrupt balances to zero instead of painting a negative', () => {
     const view = buildCurrenciesView({
-      inventory: [],
+      heroicMarks: 0,
       honor: -5,
       lifetimeHonor: Number.NaN,
       delveMarks: -1,
@@ -69,7 +66,7 @@ describe('currencies view', () => {
 
   it('prepares one row per allied faction with real balance', () => {
     const view = buildCurrenciesView({
-      inventory: [],
+      heroicMarks: 0,
       honor: 0,
       lifetimeHonor: 0,
       delveMarks: 0,

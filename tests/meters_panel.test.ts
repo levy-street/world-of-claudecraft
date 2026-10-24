@@ -7,6 +7,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
+import { t } from '../src/ui/i18n';
 import { Meters } from '../src/ui/meters';
 import type { IWorld } from '../src/world_api';
 
@@ -17,7 +18,6 @@ const MARKUP = `
         <button type="button" class="mt-tab on" data-tab="dmg"></button>
         <button type="button" class="mt-tab" data-tab="heal"></button>
         <button type="button" class="mt-tab" data-tab="threat"></button>
-        <button type="button" class="mt-tab" data-tab="deaths"></button>
       </span>
       <button type="button" class="mt-prev"></button>
       <button type="button" class="mt-next"></button>
@@ -82,6 +82,15 @@ function fakeWorld(): IWorld {
     },
   } as unknown as IWorld;
 }
+
+const heal = (
+  sourceId: number,
+  targetId: number,
+  amount: number,
+  overheal: number,
+  ability: string,
+  crit = false,
+): SimEvent => ({ type: 'heal2', sourceId, targetId, amount, overheal, crit, ability }) as SimEvent;
 
 const dmg = (
   sourceId: number,
@@ -370,79 +379,42 @@ describe('meters panel', () => {
     expect(visibleRows()[0].tabIndex).toBe(0);
   });
 
-  it('shows death recap and killer sequence in the deaths tab hover tooltip rather than dealt damage', () => {
-    const { meters, world, visibleRows, tooltipFor } = setup();
-
-    const hero = world.entities.get(1);
-    if (!hero) throw new Error('Hero entity missing');
-    hero.hp = 1000;
-    hero.maxHp = 1000;
-
-    // Hero deals some damage
-    meters.onEvent(dmg(1, 51, 5000, 'Pyrelance'));
-    meters.onEvent(dmg(1, 51, 3000, 'Scald'));
-
-    // Hero takes incoming damage from Gorrak (-400 HP)
-    hero.hp = 600;
-    meters.onEvent({
-      type: 'damage',
-      kind: 'hit',
-      sourceId: 51,
-      sourceName: 'Gorrak',
-      targetId: 1,
-      targetName: 'Hero',
-      amount: 400,
-      ability: 'Cleave',
-      abilityId: 'cleave',
-      crit: false,
-      school: 'physical',
-    } as SimEvent);
-
-    // Hero takes a lethal hit from Gorrak (-600 HP)
-    hero.hp = 0;
-    meters.onEvent({
-      type: 'damage',
-      kind: 'hit',
-      sourceId: 51,
-      sourceName: 'Gorrak',
-      targetId: 1,
-      targetName: 'Hero',
-      amount: 600,
-      ability: 'Execute',
-      abilityId: 'execute',
-      crit: true,
-      lethal: true,
-      school: 'physical',
-    } as SimEvent);
-
-    // Trigger playerDeath sim event
-    meters.onEvent({
-      type: 'playerDeath',
-      pid: 1,
-      killerId: 51,
-      killerAbility: 'Execute',
-    } as SimEvent);
-
+  // The ability drill-down subtitle: a heal2 amount is already effective, so the
+  // subtitle shows it as-is and the overheal share is of total output.
+  it('drills into a heal ability with effective healing and the overheal share of output', () => {
+    const { meters, visibleRows } = setup();
+    meters.onEvent(heal(2, 1, 600, 200, 'Flash Heal', true));
+    meters.onEvent(heal(2, 1, 600, 0, 'Flash Heal'));
     meters.update();
-    (document.querySelector('.mt-tab[data-tab="deaths"]') as HTMLElement).click();
+    meters.render(true);
+    (document.querySelector('.mt-tab[data-tab="heal"]') as HTMLElement).click();
+    visibleRows()[0].click(); // the priest's bar opens the per-ability breakdown
+    visibleRows()[0].click(); // the Flash Heal row opens its detail
+    // 1200 effective, 200 of 1400 total output overhealed (14%), 1 crit in 2.
+    expect(document.querySelector('.mt-sub')?.textContent).toBe(
+      t('hudChrome.meters.detailHealSubtitle', {
+        effective: '1200',
+        overheal: '200',
+        overhealPercent: '14%',
+        hits: '2',
+        critPercent: '50%',
+      }),
+    );
+    expect(document.querySelector('.mt-sub')?.textContent).toBe(
+      'Effective: 1200 | Overheal: 200 (14%) | Hits: 2 (50% crit)',
+    );
+  });
 
-    const rows = visibleRows();
-    expect(rows).toHaveLength(1);
-    expect(rows[0].querySelector('.mt-label')?.textContent).toBe('Hero');
-
-    const tip = tooltipFor(rows[0]);
-
-    // Must NOT contain the player's own dealt damage or abilities
-    expect(tip).not.toContain('Pyrelance');
-    expect(tip).not.toContain('Scald');
-    expect(tip).not.toContain('Hits:');
-
-    // MUST contain the killer and the lethal sequence
-    expect(tip).toContain('Gorrak (Execute)');
-    expect(tip).toContain('Gorrak: Cleave');
-    expect(tip).toContain('Gorrak: Execute');
-    expect(tip).toContain('-400');
-    expect(tip).toContain('-600');
-    expect(tip).toContain('600 -&gt; 0 HP');
+  it('drills into a damage ability with hits, crits, average and range', () => {
+    const { meters, visibleRows } = setup();
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.onEvent(dmg(1, 51, 100, 'Aimed Shot'));
+    meters.update();
+    meters.render(true);
+    visibleRows()[0].click();
+    visibleRows()[0].click();
+    expect(document.querySelector('.mt-sub')?.textContent).toBe(
+      'Hits: 2 | Crits: 0 (0%) | Average: 200 | Min/Max: 100 / 300',
+    );
   });
 });

@@ -2,7 +2,6 @@
 
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { nameplateDotRowHeight } from '../src/render/nameplate_dots_core';
 import { NameplatePainter } from '../src/render/nameplate_painter';
 import {
   type NameplatePickCandidate,
@@ -100,7 +99,12 @@ function healthPoint(anchor: NameplatePickCandidate): [number, number] {
   return [anchor.sx, nameplateHealthBarTop(anchor.sy, anchor.castVisible) + 2];
 }
 
-function harness(targets: Entity[], dotScale = 0) {
+function harness(
+  targets: Entity[],
+  dotScale = 0,
+  markerFor: () => number | null = () => null,
+  questState = 'available',
+) {
   const player = entity(1, 'player');
   player.pos = { x: 0, y: 0, z: 3 } as Entity['pos'];
   const views = new Map<number, EntityView>();
@@ -117,8 +121,9 @@ function harness(targets: Entity[], dotScale = 0) {
   const world = {
     player,
     entities,
-    markerFor: () => null,
-    questState: () => 'available',
+    markerFor,
+    questState: () => questState,
+    questsDone: new Set<string>(),
   } as unknown as IWorld;
   const painter = new NameplatePainter({
     views,
@@ -130,24 +135,79 @@ function harness(targets: Entity[], dotScale = 0) {
     showNameplates: () => showNameplates,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
+    // Buddy nameplates are off by default (the "Show Pet Names" option), and
+    // this integration drives players and mobs, so the default answers here.
+    showPetNames: () => false,
     showPlayerNameplates: () => true,
     nameplateDotScale: () => dotScale,
     isHostilePlayer: () => false,
   });
-  return { painter, setShowNameplates: (value: boolean) => (showNameplates = value) };
+  return { painter, player, setShowNameplates: (value: boolean) => (showNameplates = value) };
 }
 
 describe('production nameplate picking path', () => {
-  it('returns each exact add from the post-declutter coordinates used for drawing', () => {
+  it('draws overlapping plates at their own anchors, never stacked apart', () => {
     const { painter } = harness([entity(7), entity(8)]);
     painter.update(true);
     const anchors = liveAnchors(painter);
 
     expect(anchors).toHaveLength(2);
-    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBe(20);
-    for (const anchor of anchors) {
-      expect(painter.pickEntityAt(...healthPoint(anchor))).toBe(anchor.id);
-    }
+    expect(anchors[0].sx).toBe(anchors[1].sx);
+    expect(anchors[0].sy).toBe(anchors[1].sy);
+    // the later plate draws on top, so it owns the shared spot
+    expect(painter.pickEntityAt(...healthPoint(anchors[0]))).toBe(8);
+  });
+
+  it('draws the current target on top of a plate it overlaps, so a click picks it', () => {
+    const { painter, player } = harness([entity(7), entity(8)]);
+    player.targetId = 7;
+    painter.update(true);
+    const anchors = liveAnchors(painter);
+
+    expect(anchors.map((a) => a.id)).toEqual([8, 7]);
+    expect(painter.pickEntityAt(...healthPoint(anchors[0]))).toBe(7);
+  });
+
+  it('paints the current target last, matching the pick order', () => {
+    const { painter, player } = harness([entity(7), entity(8)]);
+    const access = painter as unknown as {
+      surface: { drawBase: (state: unknown) => void };
+      states: Map<number, unknown>;
+    };
+    const drawn: unknown[] = [];
+    vi.spyOn(access.surface, 'drawBase').mockImplementation((state) => {
+      drawn.push(state);
+    });
+    player.targetId = 7;
+    painter.update(true);
+    expect(drawn).toEqual([access.states.get(8), access.states.get(7)]);
+  });
+
+  it('keeps a plate at its projected anchor when a dot row lifts it', () => {
+    const plain = harness([entity(7), entity(8)]);
+    plain.painter.update(true);
+    const dotted = entity(7);
+    dotted.auras = [
+      {
+        id: 'corruption',
+        name: 'Blackrot',
+        kind: 'dot',
+        value: 6,
+        remaining: 12,
+        duration: 18,
+        school: 'shadow',
+        sourceId: 1,
+      },
+    ] as Entity['auras'];
+    const lifted = harness([dotted, entity(8)], 3);
+    lifted.painter.update(true);
+    const dottedState = (
+      lifted.painter as unknown as { states: Map<number, { dots: { count: number } }> }
+    ).states.get(7);
+    expect(dottedState?.dots.count).toBeGreaterThan(0);
+    expect(liveAnchors(lifted.painter).map((a) => a.sy)).toEqual(
+      liveAnchors(plain.painter).map((a) => a.sy),
+    );
   });
 
   it('uses the production boss width and cast-bar lift for Ignivar', () => {
@@ -197,86 +257,53 @@ describe('production nameplate picking path', () => {
   });
 });
 
-describe('the dot row in the declutter anchor', () => {
-  // Every other harness in this file injects a scale of 0, so resolveDots and the
-  // extraLift row-height term are dead in them. This is the one case that turns
-  // the row on: without the term, two dotted plates in a crowd take the
-  // bare-label envelope and overlap without being nudged apart, and deleting it
-  // from the painter leaves the rest of the suite green.
-  const OWNER = 1;
-
-  function dotted(id: number): Entity {
-    const e = entity(id);
-    e.auras = [
-      {
-        id: 'corruption',
-        name: 'Blackrot',
-        kind: 'dot',
-        value: 6,
-        remaining: 12,
-        duration: 18,
-        school: 'shadow',
-        sourceId: OWNER,
-      },
-    ] as Entity['auras'];
+describe('NPC plates', () => {
+  function npc(id: number): Entity {
+    const e = entity(id, 'npc');
+    e.templateId = 'smith_haldren';
+    e.hostile = false;
+    e.castingAbility = 'fireball';
+    e.castTotal = 2;
+    e.castRemaining = 1;
     return e;
   }
 
-  it('adds the row height to extraLift, on top of any heraldry lift', () => {
-    const withoutRow = harness([dotted(7)], 0);
-    withoutRow.painter.update(true);
-    const bare = liveAnchors(withoutRow.painter)[0] as { extraLift?: number };
+  it('draws only the name line: no health bar, cast bar or raid mark', () => {
+    const { painter } = harness([npc(7)], 1, () => 4);
+    painter.update(true);
+    const [anchor] = liveAnchors(painter);
+    const state = (
+      painter as unknown as {
+        states: Map<number, { hpVisible: boolean; castVisible: boolean; raidMarkerUrl: string }>;
+      }
+    ).states.get(7);
 
-    const withRow = harness([dotted(7)], 1);
-    withRow.painter.update(true);
-    const lifted = liveAnchors(withRow.painter)[0] as { extraLift?: number };
-
-    expect(lifted.extraLift ?? 0).toBeCloseTo(
-      (bare.extraLift ?? 0) + nameplateDotRowHeight(1, 1),
-      5,
-    );
-    expect(lifted.extraLift ?? 0).toBeGreaterThan(0);
+    expect(anchor.hpVisible).toBe(false);
+    expect(anchor.castVisible).toBe(false);
+    expect(state?.raidMarkerUrl).toBe('');
   });
 
-  it('grows that term with the size slider', () => {
-    const one = harness([dotted(7)], 1);
-    one.painter.update(true);
-    const atOne = (liveAnchors(one.painter)[0] as { extraLift?: number }).extraLift ?? 0;
-    const three = harness([dotted(7)], 3);
-    three.painter.update(true);
-    const atThree = (liveAnchors(three.painter)[0] as { extraLift?: number }).extraLift ?? 0;
-    expect(atThree).toBeCloseTo(atOne * 3, 5);
+  it('keeps the quest marker on an NPC plate', () => {
+    const giver = npc(7);
+    giver.questIds = ['q_prof_hobby_switch'];
+    const { painter } = harness([giver], 0, () => null, 'ready');
+    painter.update(true);
+    const state = (
+      painter as unknown as { states: Map<number, { marker: string; castVisible: boolean }> }
+    ).states.get(7);
+    expect(state?.marker).toBe('?');
+    expect(state?.castVisible).toBe(false);
   });
 
-  it.each([
-    ['the 150% default', 1.5, 34.5],
-    ['the 300% maximum', 3, 69],
-  ])('declutters two dotted plates at one anchor by the whole row at %s', (_label, scale, lift) => {
-    // Both enemies stand on the same spot, so they project to one anchor. The
-    // painter hands the row height to the declutter pass through extraLift;
-    // this pins that the pass actually SPENDS it: the pair's pitch is the bare
-    // 20px plus the row, not the 28px heraldry pitch (PR 3853 review).
-    const bare = harness([entity(7), entity(8)]);
-    bare.painter.update(true);
-    const [bareA, bareB] = liveAnchors(bare.painter);
-    expect(Math.abs(bareA.sy - bareB.sy)).toBe(20);
-
-    const dots = harness([dotted(7), dotted(8)], scale);
-    dots.painter.update(true);
-    const anchors = liveAnchors(dots.painter);
-
-    expect(anchors).toHaveLength(2);
-    expect(nameplateDotRowHeight(1, scale)).toBe(lift);
-    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeCloseTo(20 + lift, 5);
-    // and picking still resolves at the post-declutter coordinates it draws at
-    for (const anchor of anchors) {
-      expect(dots.painter.pickEntityAt(...healthPoint(anchor))).toBe(anchor.id);
-    }
-  });
-
-  it('leaves the anchor unlifted for a plate with no dots of YOURS on it', () => {
-    const foreign = entity(7);
-    foreign.auras = [
+  it('strips a friendly quest-giver mob the same way', () => {
+    const giver = entity(7);
+    giver.hostile = false;
+    giver.questIds = ['q_prof_hobby_switch'];
+    giver.castingAbility = 'fireball';
+    giver.castTotal = 2;
+    giver.castRemaining = 1;
+    // one of the viewer's own debuffs, with the dot row switched on
+    giver.auras = [
       {
         id: 'corruption',
         name: 'Blackrot',
@@ -285,11 +312,41 @@ describe('the dot row in the declutter anchor', () => {
         remaining: 12,
         duration: 18,
         school: 'shadow',
-        sourceId: 99,
+        sourceId: 1,
       },
     ] as Entity['auras'];
-    const h = harness([foreign], 1);
-    h.painter.update(true);
-    expect((liveAnchors(h.painter)[0] as { extraLift?: number }).extraLift ?? 0).toBe(0);
+    const { painter } = harness([giver], 1, () => 4);
+    painter.update(true);
+    const state = (
+      painter as unknown as {
+        states: Map<
+          number,
+          {
+            hpVisible: boolean;
+            castVisible: boolean;
+            raidMarkerUrl: string;
+            dots: { count: number };
+          }
+        >;
+      }
+    ).states.get(7);
+    expect(state?.hpVisible).toBe(false);
+    expect(state?.castVisible).toBe(false);
+    expect(state?.raidMarkerUrl).toBe('');
+    expect(state?.dots.count).toBe(0);
+  });
+
+  it('still draws a cast bar and raid mark on a mob in the same spot', () => {
+    const mob = entity(7);
+    mob.castingAbility = 'fireball';
+    mob.castTotal = 2;
+    mob.castRemaining = 1;
+    const { painter } = harness([mob], 0, () => 4);
+    painter.update(true);
+    const state = (
+      painter as unknown as { states: Map<number, { castVisible: boolean; raidMarkerUrl: string }> }
+    ).states.get(7);
+    expect(state?.castVisible).toBe(true);
+    expect(state?.raidMarkerUrl).not.toBe('');
   });
 });

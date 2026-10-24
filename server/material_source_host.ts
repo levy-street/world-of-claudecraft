@@ -37,6 +37,7 @@ import {
 } from './material_source_journal_db';
 import {
   MATERIAL_SOURCE_WRITER_CAPABILITY,
+  MATERIAL_SOURCE_WRITER_FUNCTION_SQL,
   MATERIAL_SOURCE_WRITER_GUARD_SQL,
   MATERIAL_SOURCE_WRITER_VERSION,
 } from './material_source_writer';
@@ -106,6 +107,21 @@ export async function assertMaterialSourceWriterCapability(
         'the server; check the connection string for its own options parameter.',
     );
   }
+}
+
+/** Refresh the existing fence before schema backfills write guarded tables.
+ * Runs inside the caller's advisory-locked boot transaction, before core DDL.
+ * Fresh databases need no tables yet; existing triggers use this same function.
+ * A failed migration rolls back the replacement with the rest of boot. */
+export async function prepareMaterialSourceWriterUpgrade(
+  boot: MaterialSourceBootClient,
+  pool: MaterialSourceBootClient,
+): Promise<void> {
+  await assertMaterialSourceWriterCapability([
+    { label: 'schema boot client', client: boot },
+    { label: 'pool', client: pool },
+  ]);
+  await boot.query(MATERIAL_SOURCE_WRITER_FUNCTION_SQL);
 }
 
 /**

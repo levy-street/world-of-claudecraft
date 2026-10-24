@@ -1,4 +1,8 @@
-import { additionalUnitDimensions, migratePetFrameSize } from './frame_dimensions';
+import {
+  additionalUnitDimensions,
+  migratePetFrameSize,
+  resourceBarFirstSeat,
+} from './frame_dimensions';
 import type { HudFrameGroups } from './hud_frame_groups';
 import { frameGroupFor } from './hud_frame_groups';
 import type { TranslationKey } from './i18n.catalog';
@@ -6,6 +10,7 @@ import { type InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
 import { frameRowSettingKey, HUD_FRAME_SPECS, type HudFrameSpec } from './interface_unlock_core';
 import type { FramesMenuSettingsHooks } from './interface_unlock_menu_core';
 import { MovableFrame } from './movable_frame';
+import { getUiScale } from './ui_scale';
 
 /** The table-driven mover wiring; Hud supplies only its private state readers. */
 export function registerHudFrames(deps: {
@@ -20,10 +25,12 @@ export function registerHudFrames(deps: {
   options(): FramesMenuSettingsHooks | null;
 }): (force?: boolean) => void {
   const independentTarget = () => !!deps.options()?.settings.get('moveTargetOfTargetIndependently');
+  const detachedResource = () => !!deps.options()?.settings.get('playerFrameResourceDetached');
   let petMover: MovableFrame | undefined;
   let petStorageKey: string | undefined;
   let petMigrated = false;
   let targetMover: MovableFrame | undefined;
+  let resourceMover: MovableFrame | undefined;
   for (const spec of HUD_FRAME_SPECS) {
     const frame = deps.document.getElementById(spec.elementId);
     if (!frame) continue;
@@ -47,8 +54,11 @@ export function registerHudFrames(deps: {
       moveHandle: spec.id === 'damageMeter' ? '#meters-window' : undefined,
       resizeWhileLocked: spec.id === 'damageMeter',
       globalLockOnly: true,
-      observeSizeChanges: spec.id === 'menu',
+      // The hill bar is shrink-to-fit and grows with its phase rows, so a seat
+      // clamped while it was hidden re-clamps once it shows.
+      observeSizeChanges: spec.id === 'menu' || spec.id === 'hillBar',
       preserveSavedSize: spec.id === 'petFrame',
+      userHiddenOnlyWhenPositioned: spec.id === 'playerResource',
       maxScale: spec.maxScale,
       buttonOnlyWhenUnlocked: true,
       onPositioned: (active) => {
@@ -61,6 +71,7 @@ export function registerHudFrames(deps: {
       petStorageKey = spec.storageKey;
     }
     if (spec.id === 'targetOfTarget') targetMover = mover;
+    if (spec.id === 'playerResource') resourceMover = mover;
     const setting = frameRowSettingKey(spec.id);
     deps.registry.register({
       id: spec.id,
@@ -68,13 +79,15 @@ export function registerHudFrames(deps: {
       geometryActive: () =>
         deps.groups.isActive(spec.id) &&
         (spec.id !== 'targetOfTarget' || independentTarget()) &&
+        (spec.id !== 'playerResource' || detachedResource()) &&
         (spec.id !== 'actionBarGroup' || deps.isActive('actionBarGroup')) &&
         (!['actionBar1', 'actionBar2', 'actionBar3'].includes(spec.id) ||
           !deps.isActive('actionBarGroup')),
       isActive: () =>
         deps.groups.isActive(spec.id) &&
         deps.isActive(spec.id) &&
-        (spec.id !== 'targetOfTarget' || independentTarget()),
+        (spec.id !== 'targetOfTarget' || independentTarget()) &&
+        (spec.id !== 'playerResource' || detachedResource()),
       ...(setting
         ? {
             rowOverride: {
@@ -99,6 +112,7 @@ export function registerHudFrames(deps: {
     });
   }
   let independent: boolean | undefined;
+  let resourceDetached: boolean | undefined;
   return (force = false) => {
     if (!deps.options()) return;
     if ((!petMigrated || force) && petMover && petStorageKey) {
@@ -114,6 +128,11 @@ export function registerHudFrames(deps: {
         /* Storage unavailable. */
       }
     }
+    const resource = detachedResource();
+    if (resource !== resourceDetached || force) {
+      resourceDetached = resource;
+      syncResourceDetach(deps, resource, resourceMover, force);
+    }
     const next = independentTarget();
     if (next === independent && !force) return;
     independent = next;
@@ -126,6 +145,56 @@ export function registerHudFrames(deps: {
       });
     } else deps.registry.clearAppliedGeometry('targetOfTarget');
   };
+}
+
+/**
+ * Detach Resource Bar: on, the bar adopts its saved spot, or (the first time)
+ * a seat just below the player frame at the size it had there, so the flip
+ * neither covers the frame's hp bar nor changes the bar's size; off, its
+ * applied geometry drops (the saved spot stays for the next flip) and it rides
+ * the player frame again. A hide from the frames menu belongs to the DETACHED
+ * frame only, so re-docking shows the bar again. The touch HUD owns its own
+ * layout (the mover never applies a seat there), so nothing is measured or
+ * stored from it.
+ */
+function syncResourceDetach(
+  deps: {
+    registry: InterfaceUnlock;
+    document: Document;
+    isMobileLayout(): boolean;
+    options(): FramesMenuSettingsHooks | null;
+  },
+  detached: boolean,
+  mover: MovableFrame | undefined,
+  boot: boolean,
+): void {
+  if (!mover) return;
+  if (detached) {
+    deps.registry.restoreSavedPosition('playerResource');
+    const wrap = deps.document.getElementById('pf-resource-frame');
+    if (wrap && !wrap.classList.contains('hud-frame-detached') && !deps.isMobileLayout()) {
+      const frame = deps.document.getElementById('player-frame')?.getBoundingClientRect();
+      const first = resourceBarFirstSeat(wrap.getBoundingClientRect(), frame ?? null, getUiScale());
+      const hooks = deps.options();
+      // A live flip seeds the size from the docked bar; a boot with the option
+      // already on keeps whatever size the player has stored.
+      if (hooks && !boot) {
+        hooks.onSettingChange(
+          'playerFrameResourceWidth',
+          hooks.settings.set('playerFrameResourceWidth', first.width),
+        );
+        hooks.onSettingChange(
+          'playerFrameResourceHeight',
+          hooks.settings.set('playerFrameResourceHeight', first.height),
+        );
+      }
+      mover.detachAtPosition(first.seat);
+    }
+  } else {
+    deps.registry.clearAppliedGeometry('playerResource');
+    if (mover.isUserHidden) mover.setUserHidden(false);
+  }
+  deps.registry.refresh();
 }
 
 /** The edit preview replaces the live party rows while arranging frames. */

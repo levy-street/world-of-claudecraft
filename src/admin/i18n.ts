@@ -210,6 +210,8 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'windowminutes must be an integer from 1 to 1440': 'error.generalChatRateLimitWindowMinutes',
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
+  'character already has that': 'error.characterAlreadyHasThat',
+  'buddy grant failed': 'error.buddyGrantFailed',
   'guild not found': 'error.guildNotFound',
   'guild name is already taken': 'error.guildNameTaken',
   'guild name must change': 'error.guildNameUnchanged',
@@ -304,12 +306,6 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'cheater_mark.invalid_duration': 'error.cheaterMarkDurationInvalid',
   'cheater_mark.not_marked': 'error.cheaterMarkNotMarked',
   'cheater_mark.admin_target': 'error.cheaterMarkAdminTarget',
-  // The world quest block routes emit stable codes the same way
-  // (server/world_quest_block_api.ts).
-  'world_quest_block.reason_required': 'error.moderationReasonRequired',
-  'world_quest_block.already_blocked': 'error.worldQuestBlockAlreadyBlocked',
-  'world_quest_block.not_blocked': 'error.worldQuestBlockNotBlocked',
-  'world_quest_block.admin_target': 'error.worldQuestBlockAdminTarget',
   // The admin-panel kick emits stable codes the same way (server/admin_kick_api.ts).
   'kick.reason_required': 'error.moderationReasonRequired',
   'kick.target_offline': 'error.kickTargetOffline',

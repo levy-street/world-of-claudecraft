@@ -3,6 +3,7 @@
 // would permit a replayed attempt id to pay twice after a restored character
 // backup. Healthy claims leave the due-mail index when paid or mailed.
 
+import { cloneLootQuality, type LootQualityDescriptor } from '../src/sim/loot_quality/types';
 import type { CustodyParcelRow } from './mail_custody_overlay';
 import { REALM } from './realm';
 
@@ -33,7 +34,9 @@ CREATE TABLE IF NOT EXISTS vault_reward_claims (
     REFERENCES vault_reward_outcomes (realm, attempt_id),
   CHECK (direct_claimed_at IS NULL OR mail_booked_at IS NULL)
 );
--- Legacy guest quota baselines stay in place for existing installations.
+-- Keep forever: one row per participating guest/cycle; removing a baseline could let
+-- a restored older character exceed the three-payout cycle cap. At 5,000
+-- paid guest/cycles daily this is about 1.8 million small rows per year.
 CREATE TABLE IF NOT EXISTS vault_guest_cycle_baselines (
   realm TEXT NOT NULL,
   character_id BIGINT NOT NULL,
@@ -59,6 +62,8 @@ CREATE INDEX IF NOT EXISTS vault_reward_claims_guest_cycle
 export interface VaultRewardItem {
   itemId: string;
   count: number;
+  /** Permanent quality of a one-copy gear line, frozen with the parcel. */
+  lootQuality?: LootQualityDescriptor;
 }
 
 export interface VaultRewardClaimInput {
@@ -73,7 +78,6 @@ export interface VaultRewardClaimInput {
 export interface VaultOutcomeInput {
   attemptId: string;
   ownerCharacterId: number;
-  bossKilledAtMs?: number;
   claims: VaultRewardClaimInput[];
 }
 
@@ -89,7 +93,6 @@ export interface VaultRewardClaim {
 export interface VaultOutcome {
   attemptId: string;
   ownerCharacterId: number;
-  bossKilledAtMs?: number;
   claims: VaultRewardClaim[];
   completedAt: Date;
 }
@@ -178,11 +181,6 @@ function positiveId(value: number, label: string): void {
 function normalizeOutcome(input: VaultOutcomeInput): Omit<VaultOutcome, 'completedAt'> {
   if (!/^[A-Za-z0-9:_-]{1,128}$/.test(input.attemptId)) throw new Error('invalid attempt id');
   positiveId(input.ownerCharacterId, 'owner character id');
-  if (
-    input.bossKilledAtMs !== undefined &&
-    (!Number.isSafeInteger(input.bossKilledAtMs) || input.bossKilledAtMs < 0)
-  )
-    throw new Error('invalid vault kill time');
   if (input.claims.length < 1 || input.claims.length > 5) {
     throw new Error('vault outcome requires 1 to 5 claims');
   }
@@ -207,12 +205,15 @@ function normalizeOutcome(input: VaultOutcomeInput): Omit<VaultOutcome, 'complet
     ) {
       throw new Error('invalid guest cycle');
     }
-    const items = claim.items.map(({ itemId, count }) => {
+    const items = claim.items.map(({ itemId, count, lootQuality }): VaultRewardItem => {
       if (!/^[a-z0-9_:-]{1,128}$/.test(itemId)) throw new Error('invalid reward item id');
       if (!Number.isSafeInteger(count) || count <= 0 || count > 9999) {
         throw new Error('invalid reward item count');
       }
-      return { itemId, count };
+      if (lootQuality === undefined) return { itemId, count };
+      const quality = cloneLootQuality(lootQuality);
+      if (!quality || count !== 1) throw new Error('invalid reward item quality');
+      return { itemId, count, lootQuality: quality };
     });
     return {
       characterId: claim.characterId,
@@ -225,12 +226,7 @@ function normalizeOutcome(input: VaultOutcomeInput): Omit<VaultOutcome, 'complet
   });
   if (!seen.has(input.ownerCharacterId)) throw new Error('owner must have a reward claim');
   claims.sort((a, b) => a.characterId - b.characterId);
-  return {
-    attemptId: input.attemptId,
-    ownerCharacterId: input.ownerCharacterId,
-    claims,
-    ...(input.bossKilledAtMs === undefined ? {} : { bossKilledAtMs: input.bossKilledAtMs }),
-  };
+  return { attemptId: input.attemptId, ownerCharacterId: input.ownerCharacterId, claims };
 }
 
 function numericId(value: unknown): number {
@@ -262,6 +258,25 @@ export async function markVaultRewardClaimBooked(
 
 export function createVaultRewardsDb(pool: VaultRewardPool, realm = REALM) {
   return {
+    async guestPayoutsForCycle(characterId: number, cycle: string): Promise<number> {
+      positiveId(characterId, 'guest character id');
+      if (typeof cycle !== 'string' || cycle.length > 64) throw new Error('invalid guest cycle');
+      const result = await pool.query(
+        `SELECT LEAST(3,
+           COALESCE((SELECT existing_payouts FROM vault_guest_cycle_baselines
+             WHERE realm = $1 AND character_id = $2 AND guest_cycle = $3), 0)
+           + (SELECT count(*)::int FROM (
+             SELECT 1 FROM vault_reward_claims
+             WHERE realm = $1 AND character_id = $2 AND guest_cycle = $3
+               AND (copper > 0 OR items <> '[]'::jsonb)
+             LIMIT 3
+           ) paid)
+         ) AS payouts`,
+        [realm, characterId, cycle],
+      );
+      return Number(result.rows[0]?.payouts ?? 0);
+    },
+
     async commitVaultOutcome(input: VaultOutcomeInput): Promise<'created' | 'already_committed'> {
       const outcome = normalizeOutcome(input);
       const sourcePayload = JSON.stringify(outcome);
@@ -294,7 +309,55 @@ export function createVaultRewardsDb(pool: VaultRewardPool, realm = REALM) {
           committed = true;
           return 'already_committed';
         }
-        for (const claim of outcome.claims) {
+        const awarded = outcome.claims.map((claim) => ({ ...claim }));
+        for (const claim of awarded) {
+          if (claim.characterId === outcome.ownerCharacterId) continue;
+          // Reserve guest cycle allowance at CLEAR, not at chest/mail take.
+          // The transaction-scoped character lock serializes simultaneous
+          // clears even across different server processes and attempt ids.
+          await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [
+            `${realm}:vault-guest:${claim.characterId}:${claim.guestCycle ?? ''}`,
+          ]);
+          await client.query(
+            `INSERT INTO vault_guest_cycle_baselines
+               (realm, character_id, guest_cycle, existing_payouts)
+             VALUES ($1, $2, $3,
+               COALESCE((SELECT CASE
+                 WHEN state #>> '{worldQuests,vaultGuestCycle}' = $3
+                 THEN CASE
+                   WHEN jsonb_typeof(state #> '{worldQuests,vaultGuestPayouts}') = 'number'
+                   THEN LEAST(3, GREATEST(0,
+                     FLOOR((state #>> '{worldQuests,vaultGuestPayouts}')::numeric)))::int
+                   ELSE 0 END
+                 ELSE 0 END
+               FROM characters WHERE id = $2 AND realm = $1), 0))
+             ON CONFLICT DO NOTHING`,
+            [realm, claim.characterId, claim.guestCycle ?? ''],
+          );
+          const used = await client.query(
+            `SELECT existing_payouts FROM vault_guest_cycle_baselines
+             WHERE realm = $1 AND character_id = $2 AND guest_cycle = $3`,
+            [realm, claim.characterId, claim.guestCycle ?? ''],
+          );
+          const awarded = await client.query(
+            `SELECT 1 FROM vault_reward_claims
+             WHERE realm = $1 AND character_id = $2 AND guest_cycle = $3
+               AND (copper > 0 OR items <> '[]'::jsonb)
+             LIMIT 3`,
+            [realm, claim.characterId, claim.guestCycle ?? ''],
+          );
+          if (Number(used.rows[0]?.existing_payouts) + awarded.rows.length >= 3) {
+            claim.items = [];
+            claim.copper = 0;
+          }
+        }
+        const awardedPayload = JSON.stringify({ ...outcome, claims: awarded });
+        await client.query(
+          `UPDATE vault_reward_outcomes SET payload = $3::jsonb
+           WHERE realm = $1 AND attempt_id = $2`,
+          [realm, outcome.attemptId, awardedPayload],
+        );
+        for (const claim of awarded) {
           await client.query(
             `INSERT INTO vault_reward_claims
                (realm, attempt_id, character_id, recipient_name, items, copper, mail_due_at, guest_cycle)

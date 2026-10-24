@@ -9,6 +9,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { VISUALS } from '../src/render/characters/manifest';
 
 const SOURCE_ID = 3;
 const TARGET_ID = 9;
@@ -57,33 +58,39 @@ function makePainter(hasGestureClip: (id: number, ability: string) => boolean, i
 }
 
 describe('player gesture release on cast fx (review #2961)', () => {
-  it.each([true, false])('plays only an authored pure-DoT completion gesture: %s', (authored) => {
-    const { painter, triggerAttack } = makePainter((_id, ability) => authored && ability === 'rip');
-    expect(
+  it.each([
+    ['rip', true],
+    ['rip', false],
+    ['rupture', true],
+    ['rupture', false],
+  ] as const)(
+    'plays a pure-DoT melee finisher only with a bound clip: %s/%s',
+    (ability, authored) => {
+      const { painter, triggerAttack } = makePainter((_id, id) => authored && id === ability);
+      expect(
+        painter.handleSpellfx({
+          sourceId: SOURCE_ID,
+          targetId: TARGET_ID,
+          school: 'physical',
+          fx: 'selfCast',
+          ability,
+        }),
+      ).toBe(false);
+      if (authored) expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(SOURCE_ID, ability);
+      else expect(triggerAttack).not.toHaveBeenCalled();
+      // Periodic DoT ticks carry no ability completion; they must never restart the finisher.
       painter.handleSpellfx({
         sourceId: SOURCE_ID,
         targetId: TARGET_ID,
         school: 'physical',
-        fx: 'selfCast',
-        ability: 'rip',
-      }),
-    ).toBe(false);
-    if (authored) expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(SOURCE_ID, 'rip');
-    else expect(triggerAttack).not.toHaveBeenCalled();
-    // Periodic DoT ticks carry no ability completion; they must never restart the finisher.
-    painter.handleSpellfx({
-      sourceId: SOURCE_ID,
-      targetId: TARGET_ID,
-      school: 'physical',
-      fx: 'tick',
-    });
-    expect(triggerAttack).toHaveBeenCalledTimes(authored ? 1 : 0);
-  });
+        fx: 'tick',
+      });
+      expect(triggerAttack).toHaveBeenCalledTimes(authored ? 1 : 0);
+    },
+  );
   it('keeps every other pure-DoT completion gesture-free even when the rig authors one', () => {
-    // The humanoid rigs carry attackByAbility rows for corruption, rupture and
-    // serpent_sting; those completions have never played a swing, and the cat
-    // finisher allowlist (ownsDotCompletionGesture) must not widen that.
-    for (const ability of ['corruption', 'rupture', 'serpent_sting']) {
+    // Caster and shot DoTs release on their projectile cue, not selfCast.
+    for (const ability of ['corruption', 'serpent_sting']) {
       const { painter, triggerAttack } = makePainter(() => true);
       expect(
         painter.handleSpellfx({
@@ -96,6 +103,88 @@ describe('player gesture release on cast fx (review #2961)', () => {
       ).toBe(false);
       expect(triggerAttack, ability).not.toHaveBeenCalled();
     }
+  });
+
+  it.each(['selfCast', 'projectile', 'heavyBolt'] as const)(
+    'releases an authored %s completion even without gallery VFX',
+    (fx) => {
+      const { painter, triggerAttack } = makePainter((_id, ability) => ability === 'bloodhook');
+      expect(
+        painter.handleSpellfx({
+          sourceId: SOURCE_ID,
+          targetId: TARGET_ID,
+          school: 'physical',
+          fx,
+          ability: 'bloodhook',
+        }),
+      ).toBe(false);
+      expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(SOURCE_ID, 'bloodhook');
+    },
+  );
+
+  it.each(['selfCast', 'projectile', 'heavyBolt', 'tick'] as const)(
+    'keeps an unbound no-gallery %s cue from inventing a swing',
+    (fx) => {
+      const { painter, triggerAttack } = makePainter(() => false);
+      expect(
+        painter.handleSpellfx({
+          sourceId: SOURCE_ID,
+          targetId: TARGET_ID,
+          school: 'physical',
+          fx,
+          ability: 'bloodhook',
+        }),
+      ).toBe(false);
+      expect(triggerAttack).not.toHaveBeenCalled();
+    },
+  );
+
+  it('does not release a no-gallery periodic tick even when a body gesture is bound', () => {
+    const { painter, triggerAttack } = makePainter(() => true);
+    expect(
+      painter.handleSpellfx({
+        sourceId: SOURCE_ID,
+        targetId: TARGET_ID,
+        school: 'physical',
+        fx: 'tick',
+        ability: 'bloodhook',
+      }),
+    ).toBe(false);
+    expect(triggerAttack).not.toHaveBeenCalled();
+  });
+
+  it('leaves a Measured Shot launch to the generic ranged handler when there is no gallery entry', () => {
+    const { painter, triggerAttack } = makePainter(() => true);
+    expect(
+      painter.handleSpellfx({
+        sourceId: SOURCE_ID,
+        targetId: TARGET_ID,
+        school: 'physical',
+        fx: 'projectile',
+        ability: 'measured_shot',
+        attackAnimation: 'ranged-shot',
+      }),
+    ).toBe(false);
+    expect(triggerAttack).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['rogue', 'venom_dart', 'projectile'],
+    ['rogue', 'crippling_poison', 'projectile'],
+    ['hunter', 'counter_shot', 'selfCast'],
+    ['hunter', 'startle_shot', 'selfCast'],
+  ] as const)('links the WOC %s %s completion to its authored attack', (cls, ability, fx) => {
+    const { painter, triggerAttack } = makePainter(
+      (_id, id) => !!VISUALS[`player_${cls}`].clips.attackByAbility?.[id],
+    );
+    painter.handleSpellfx({
+      sourceId: SOURCE_ID,
+      targetId: TARGET_ID,
+      school: 'nature',
+      fx,
+      ability,
+    });
+    expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(SOURCE_ID, ability);
   });
 
   it('plays the authored clip for a player projectile cast whose ability has a gesture (earth_shock)', () => {

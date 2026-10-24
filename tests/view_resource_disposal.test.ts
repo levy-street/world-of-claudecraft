@@ -160,7 +160,11 @@ describe('door body teardown', () => {
       expect(plainCensus.disposed.has(m), 'shared door stone must survive churn').toBe(false);
     }
 
-    const wildheart = buildDoorBody(true, 'wildheart_basin', false);
+    // The Basin's ENTRY door is a built set piece now (the Jaguar Maw,
+    // doorArchAuthoredElsewhere): it draws a click box and no arch. The EXIT
+    // door inside the instance still draws the recoloured arch, so the clone
+    // is watched there.
+    const wildheart = buildDoorBody(false, 'wildheart_basin', false);
     const census = watchMaterials(wildheart.body);
     // The wildheart recolor is a per-view CLONE of the shared stone; it must
     // carry no inherited shared tag and must be freed with the view.

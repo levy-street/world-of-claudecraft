@@ -10,8 +10,15 @@ import {
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
 import {
+  NAMEPLATE_COOLDOWN_SIZE,
+  nameplateCooldownRowHeight,
+  nameplateCooldownsInto,
+  newNameplateCooldownsPlan,
+} from '../src/render/nameplate_cooldowns_core';
+import {
   NAMEPLATE_DOT_SIZE,
   nameplateDotRowHeight,
+  nameplateDotsInto,
   newNameplateDotsPlan,
 } from '../src/render/nameplate_dots_core';
 import {
@@ -24,6 +31,7 @@ import {
   NAMEPLATE_IMAGE_CACHE_LIMIT,
   NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
 } from '../src/render/nameplate_image_cache';
+import * as targetCues from '../src/render/nameplate_target_highlight';
 import {
   BORDER_ACCENT_SLUGS,
   type BorderMotifKind,
@@ -71,6 +79,8 @@ function context(trace: ContextTrace): CanvasRenderingContext2D {
   const noop = vi.fn();
   const ctx = {
     setTransform: trace.setTransform,
+    scale: noop,
+    translate: noop,
     clearRect: trace.clearRect,
     save: noop,
     restore: noop,
@@ -1472,9 +1482,9 @@ describe('nameplate canvas surface', () => {
 
 describe('the player dot row on a plate', () => {
   // The plate half of the dot surfaces had NO pin at all: every nameplate
-  // harness injects nameplateDotScale: () => 0, so resolveDots, the extraLift
-  // row-height term and both draw walks were dead in test and deleting any of
-  // them stayed green. These drive the surface directly, at a filled plan.
+  // harness injects nameplateDotScale: () => 0, so resolveDots and both draw
+  // walks were dead in test and deleting any of them stayed green. These drive
+  // the surface directly, at a filled plan.
 
   function planWith(count: number, scale: number, fraction = 0.25) {
     const plan = newNameplateDotsPlan();
@@ -1595,5 +1605,207 @@ describe('the player dot row on a plate', () => {
     state.dots = planWith(0, 3);
     expect(nameBaselineOf(surface, state)).toBe(empty);
     expect(nameplateDotRowHeight(0, 3)).toBe(0);
+  });
+});
+
+describe('the enemy cooldown row on a plate', () => {
+  // The row sits ABOVE the name: unlike the dot row it must not move the name
+  // row at all, while drawEmote (which stacks above everything) and the drawn
+  // countdown must account for it.
+
+  function cooldownPlanWith(keys: string[], scale = 1) {
+    const plan = newNameplateCooldownsPlan();
+    nameplateCooldownsInto(plan, new Map(keys.map((k) => [k, 30])), []);
+    plan.scale = scale;
+    for (let i = 0; i < plan.count; i++) plan.slots[i].timeText = '30';
+    return plan;
+  }
+
+  const plateState = () => {
+    const state = createNameplateCanvasState();
+    Object.assign(state, { initialized: true, name: 'Gilded One', level: '20', hpVisible: true });
+    return state;
+  };
+
+  function textYs(surface: NameplateCanvasSurface, state: ReturnType<typeof plateState>) {
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 260);
+    const calls = drawSpy.mock.calls.map((call) => ({ text: call[1], y: call[3] as number }));
+    drawSpy.mockRestore();
+    return calls;
+  }
+
+  it('leaves the name row where it was and draws active buff countdowns above it', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    const nameY = (calls: { text: unknown; y: number }[]) =>
+      calls.find((c) => c.text === 'Gilded One')?.y as number;
+
+    const without = nameY(textYs(surface, state));
+    const plan = newNameplateCooldownsPlan();
+    nameplateCooldownsInto(plan, new Map(), [
+      { id: 'barkskin', remaining: 11 },
+      { id: 'recklessness', remaining: 8 },
+    ]);
+    for (let i = 0; i < plan.count; i++) plan.slots[i].timeText = '11';
+    state.cooldowns = plan;
+    const calls = textYs(surface, state);
+    expect(nameY(calls)).toBe(without);
+    const countdowns = calls.filter((c) => c.text === '11');
+    expect(countdowns).toHaveLength(2);
+    for (const c of countdowns) expect(c.y).toBeLessThan(without);
+  });
+
+  it('never draws a number on a recharging cooldown, even if one was left on the slot', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    state.cooldowns = cooldownPlanWith(['barkskin', 'recklessness']); // recharging, text '30'
+    expect(textYs(surface, state).filter((c) => c.text === '30')).toHaveLength(0);
+  });
+
+  it('lifts the emote bubble by exactly the row height the core reserves', () => {
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(32);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    Object.assign(state, { emoteIconUrl: 'data:image/svg+xml,emote', emoteLabel: 'Cheers' });
+    const emoteY = (): number => {
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 260);
+      surface.drawEmote(state, 320, 260);
+      const blits = traces[0].drawImage.mock.calls.filter(
+        ([source]) => source instanceof HTMLImageElement,
+      );
+      return blits.at(-1)?.[2] as number;
+    };
+    const without = emoteY();
+    state.cooldowns = cooldownPlanWith(['barkskin', 'avatar', 'trinket:medallion_of_defiance'], 2);
+    const withRow = emoteY();
+    expect(without - withRow).toBeCloseTo(nameplateCooldownRowHeight(state.cooldowns), 5);
+  });
+
+  it('preserves bounty, dots and framed-target anchors while lifting chevron and emote together', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    Object.assign(state, {
+      bounty: true,
+      currentTarget: true,
+      emphasis: true,
+      overheadMarker: true,
+      castVisible: true,
+      guild: 'Guild',
+      guildLabel: '<Guild>',
+      title: 'Veteran',
+      comboPips: 2,
+      raidMarkerUrl: 'raid',
+      emoteIconUrl: 'emote',
+      emoteLabel: 'Cheers',
+    });
+    nameplateDotsInto(
+      state.dots,
+      [
+        {
+          id: 'rend',
+          kind: 'dot',
+          value: 1,
+          school: 'physical',
+          remaining: 12,
+          duration: 18,
+          sourceId: 1,
+        },
+      ],
+      () => true,
+    );
+    const frame = vi.spyOn(targetCues, 'drawTargetPlateFrame');
+    const chevron = vi.spyOn(targetCues, 'drawOverheadChevron');
+    const text = vi.spyOn(textOf(surface), 'draw');
+    const images = vi
+      .spyOn(
+        surface as unknown as {
+          drawImage(url: string, x: number, y: number, size: number, circular: boolean): void;
+        },
+        'drawImage',
+      )
+      .mockImplementation(() => {});
+    const draw = () => {
+      text.mockClear();
+      images.mockClear();
+      frame.mockClear();
+      chevron.mockClear();
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 260);
+      surface.drawEmote(state, 320, 260);
+      const name = text.mock.calls.find((call) => call[1] === 'Gilded One');
+      expect(name?.[4]).toMatchObject({ fill: '#c41e1e' });
+      return {
+        nameY: name?.[3],
+        frame: frame.mock.calls.at(-1)?.slice(1),
+        chevronY: chevron.mock.calls.at(-1)?.[2] ?? 0,
+        emoteY: images.mock.calls.find((call) => call[0] === 'emote')?.[2] ?? 0,
+      };
+    };
+    const before = draw();
+    state.cooldowns = cooldownPlanWith(['barkskin', 'recklessness'], 2);
+    const after = draw();
+    const lift = nameplateCooldownRowHeight(state.cooldowns);
+    expect(after.nameY).toBe(before.nameY);
+    expect(after.frame).toEqual(before.frame); // Frame still encloses name and bars.
+    expect(before.chevronY - after.chevronY).toBe(lift);
+    expect(before.emoteY - after.emoteY).toBe(lift);
+  });
+
+  it('dims a spent cooldown evenly, with no recharge swipe at any scale', () => {
+    // A swipe would show how much of the cooldown is left: the plate never does.
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    for (const scale of [1, 3]) {
+      traces[0].arc.mockClear();
+      traces[0].fillStyles.length = 0;
+      state.cooldowns = cooldownPlanWith(['recklessness'], scale);
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 260);
+      // The only arcs are the small group badge; nothing the size of the icon.
+      const radii = traces[0].arc.mock.calls.map((call) => call[2] as number);
+      for (const r of radii) expect(r).toBeLessThan(NAMEPLATE_COOLDOWN_SIZE * scale * 0.5);
+      expect(traces[0].fillStyles).toContain('rgba(4, 6, 10, 0.55)');
+    }
+  });
+
+  it('veils a spent cooldown under forced colors, so spent never reads as active', () => {
+    const previousMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn(() => ({ matches: true })),
+    });
+    try {
+      const surface = new NameplateCanvasSurface(document.createElement('div'));
+      const state = plateState();
+      const veils = (active: boolean): number => {
+        traces[0].globalAlphas.length = 0;
+        const plan = cooldownPlanWith(['recklessness']);
+        plan.slots[0].active = active;
+        state.cooldowns = plan;
+        surface.beginFrame(640, 360, 1);
+        surface.drawBase(state, 320, 260);
+        return traces[0].globalAlphas.filter((a) => a === 0.6).length;
+      };
+      expect(veils(false)).toBe(veils(true) + 1);
+    } finally {
+      if (previousMatchMedia) {
+        Object.defineProperty(window, 'matchMedia', previousMatchMedia);
+      } else {
+        Reflect.deleteProperty(window, 'matchMedia');
+      }
+    }
+  });
+
+  it('draws nothing and reserves nothing for an empty plan', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    const before = textYs(surface, state);
+    state.cooldowns = cooldownPlanWith([]);
+    expect(textYs(surface, state)).toEqual(before);
+    expect(nameplateCooldownRowHeight(state.cooldowns)).toBe(0);
   });
 });

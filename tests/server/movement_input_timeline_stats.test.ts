@@ -32,6 +32,8 @@ describe('movement input timeline tick stats', () => {
     secondTimeline.rejectedAnchoredWindow = 3;
     secondTimeline.rejectedSanityBound = 4;
     secondTimeline.resyncs = 1;
+    secondTimeline.playoutGrowths = 2;
+    firstTimeline.playoutShrinks = 1;
 
     stats.fold([first, second], true);
 
@@ -44,6 +46,8 @@ describe('movement input timeline tick stats', () => {
       rejectedAnchoredWindow: stats.lastRejectedAnchoredWindow,
       rejectedSanityBound: stats.lastRejectedSanityBound,
       resyncs: stats.lastResyncs,
+      playoutGrowths: stats.lastPlayoutGrowths,
+      playoutShrinks: stats.lastPlayoutShrinks,
     }).toEqual({
       consumed: 5,
       starved: 1,
@@ -53,10 +57,13 @@ describe('movement input timeline tick stats', () => {
       rejectedAnchoredWindow: 3,
       rejectedSanityBound: 4,
       resyncs: 1,
+      playoutGrowths: 2,
+      playoutShrinks: 1,
     });
 
     firstTimeline.consumed++;
     secondTimeline.starved += 2;
+    secondTimeline.playoutGrowths++;
     stats.fold([first, second], true);
     expect(stats.captureTotals()).toEqual({
       movementConsumedTotal: 6,
@@ -67,6 +74,8 @@ describe('movement input timeline tick stats', () => {
       movementRejectedAnchoredWindowTotal: 3,
       movementRejectedSanityBoundTotal: 4,
       movementResyncsTotal: 1,
+      movementPlayoutGrowthsTotal: 3,
+      movementPlayoutShrinksTotal: 1,
     });
   });
 
@@ -82,6 +91,8 @@ describe('movement input timeline tick stats', () => {
     timeline.rejectedAnchoredWindow = 3;
     timeline.rejectedSanityBound = 4;
     timeline.resyncs = 6;
+    timeline.playoutGrowths = 7;
+    timeline.playoutShrinks = 8;
     stats.fold([active], true);
     stats.fold([active], true);
     expect(stats.lastConsumed).toBe(0);
@@ -94,6 +105,8 @@ describe('movement input timeline tick stats', () => {
       movementRejectedAnchoredWindowTotal: 3,
       movementRejectedSanityBoundTotal: 4,
       movementResyncsTotal: 6,
+      movementPlayoutGrowthsTotal: 7,
+      movementPlayoutShrinksTotal: 8,
     });
 
     stats.resetCapture();
@@ -106,6 +119,8 @@ describe('movement input timeline tick stats', () => {
       movementRejectedAnchoredWindowTotal: 0,
       movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
+      movementPlayoutGrowthsTotal: 0,
+      movementPlayoutShrinksTotal: 0,
     });
     expect(stats.lastConsumed).toBe(0);
   });

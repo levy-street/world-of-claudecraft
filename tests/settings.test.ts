@@ -83,6 +83,15 @@ describe('Settings', () => {
     expect(new Settings().get('cameraZoom')).toBe(8);
   });
 
+  it('defaults Spell Effects on and remembers turning it off', () => {
+    // On out of the box: the option only ever removes presentation, and a
+    // player opts into the calmer screen.
+    expect(new Settings().get('spellEffects')).toBe(true);
+    expect(new Settings().set('spellEffects', false)).toBe(false);
+    expect(new Settings().get('spellEffects')).toBe(false);
+    expect(JSON.parse(localStorage.getItem('woc_settings') ?? '{}').spellEffects).toBe(false);
+  });
+
   it('persists the controller glyph family with Auto as the default', () => {
     const settings = new Settings();
 
@@ -91,6 +100,14 @@ describe('Settings', () => {
     expect(settings.set('gamepadGlyphStyle', 1)).toBe(1);
     expect(new Settings().get('gamepadGlyphStyle')).toBe(1);
     expect(settings.set('gamepadGlyphStyle', 99)).toBe(3);
+  });
+
+  it('defaults Raw Mouse Input on and persists turning it off', () => {
+    const settings = new Settings();
+
+    expect(settings.get('rawMouseInput')).toBe(true);
+    expect(settings.set('rawMouseInput', false)).toBe(false);
+    expect(new Settings().get('rawMouseInput')).toBe(false);
   });
 
   it('defaults and clamps controller reticle speed to its slider range', () => {
@@ -155,6 +172,27 @@ describe('Settings', () => {
     expect(s.get('graphicsDefaultApplied')).toBe(false);
   });
 
+  it('asks the first-login graphics prompt on a fresh store only, never for a returning player', () => {
+    // A brand new browser: nothing stored, so the prompt is unanswered.
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(false);
+    // A store written by THIS build before the prompt is answered (the landing contrast
+    // toggle, say) def-fills the key as an explicit false, so the prompt still asks.
+    new Settings().set('showFps', true);
+    expect(JSON.parse(localStorage.getItem('woc_settings') ?? '{}').graphicsPromptAnswered).toBe(
+      false,
+    );
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(false);
+    // A store persisted before the key existed is a player who has already played: answered.
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 3, showFps: true }));
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(true);
+    // Answering persists; reset() returns it to false so Reset to Defaults asks again.
+    const s = new Settings();
+    s.set('graphicsPromptAnswered', true);
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(true);
+    s.reset();
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(false);
+  });
+
   it('starts at the documented defaults (camera calmer than the old 1.0)', () => {
     const s = new Settings();
     expect(s.get('cameraSpeed')).toBe(SETTING_RANGES.cameraSpeed.def);
@@ -205,6 +243,23 @@ describe('Settings', () => {
     expect(s.set('cameraFov', 999)).toBe(SETTING_RANGES.cameraFov.max);
     expect(s.set('cameraFov', 0)).toBe(SETTING_RANGES.cameraFov.min);
     expect(s.set('cameraFov', 75)).toBe(75);
+  });
+
+  it('starts Ambience at the stored Sound Effects level for a profile saved before the split', () => {
+    // A fresh profile gets the documented default.
+    expect(new Settings().get('ambientVolume')).toBe(SETTING_RANGES.ambientVolume.def);
+    // A pre-split profile only has sfxVolume (which used to drive ambience too):
+    // the new slider starts there, so a player who had muted SFX stays muted.
+    localStorage.setItem('woc_settings', JSON.stringify({ sfxVolume: 0 }));
+    expect(new Settings().get('ambientVolume')).toBe(0);
+    localStorage.setItem('woc_settings', JSON.stringify({ sfxVolume: 0.35 }));
+    expect(new Settings().get('ambientVolume')).toBe(0.35);
+    // Once the player has set Ambience it is independent of Sound Effects.
+    localStorage.setItem('woc_settings', JSON.stringify({ sfxVolume: 0.35, ambientVolume: 1 }));
+    const s = new Settings();
+    expect(s.get('ambientVolume')).toBe(1);
+    s.set('sfxVolume', 0.1);
+    expect(new Settings().get('ambientVolume')).toBe(1);
   });
 
   it('clamps a stored historical Insane shadow dial (2) down to High on load', () => {
@@ -283,6 +338,24 @@ describe('Settings', () => {
     a.set('mouseCamera', true);
     const b = new Settings();
     expect(b.get('mouseCamera')).toBe(true);
+  });
+
+  it('defaults spell hover tooltips on and persists disabling them across reloads', () => {
+    const s = new Settings();
+    expect(s.get('spellTooltipOnHover')).toBe(true);
+    s.set('spellTooltipOnHover', false);
+    expect(new Settings().get('spellTooltipOnHover')).toBe(false);
+  });
+
+  it('enables spell hover tooltips for older settings and restores their default on reset', () => {
+    localStorage.setItem('woc_settings', JSON.stringify({ cameraSpeed: 0.5 }));
+    const s = new Settings();
+    expect(s.get('spellTooltipOnHover')).toBe(true);
+    s.set('spellTooltipOnHover', false);
+    s.reset(['spellTooltipOnHover']);
+    expect(s.get('spellTooltipOnHover')).toBe(true);
+    expect(new Settings().get('spellTooltipOnHover')).toBe(true);
+    expect(s.get('cameraSpeed')).toBe(0.5);
   });
 
   it('defaults left-handed touch off and persists it across instances', () => {

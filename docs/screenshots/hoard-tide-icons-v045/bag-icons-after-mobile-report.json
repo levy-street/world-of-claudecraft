@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rare_chalice_of_living_tides.webp",
+    "http://localhost:5194/ui/items/rare_pendant_continuous_flow.webp",
+    "http://localhost:5194/ui/items/rare_coral_encrusted_girdle.webp",
+    "http://localhost:5194/ui/items/rare_riptide_handwraps.webp",
+    "http://localhost:5194/ui/items/chalice_of_living_tides.webp",
+    "http://localhost:5194/ui/items/pendant_continuous_flow.webp",
+    "http://localhost:5194/ui/items/coral_encrusted_girdle.webp",
+    "http://localhost:5194/ui/items/riptide_handwraps.webp",
+    "http://localhost:5194/ui/items/legendary_chalice_of_living_tides.webp",
+    "http://localhost:5194/ui/items/legendary_pendant_continuous_flow.webp",
+    "http://localhost:5194/ui/items/legendary_coral_encrusted_girdle.webp",
+    "http://localhost:5194/ui/items/legendary_riptide_handwraps.webp"
+  ],
+  "allDecoded": true
+}

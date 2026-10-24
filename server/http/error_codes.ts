@@ -107,6 +107,8 @@ export const ERROR_CODES = deepFreeze({
   'character.storage_purchase_open': { params: [] },
   // identity: the realm background gate refused the delete; retry in a moment
   'character.delete_busy': { params: [] },
+  'character.referral_transfer_pending': { params: [] },
+  'character.referral_bond_pending': { params: [] },
   // identity: "character already in world"
   'character.already_in_world': { params: [] },
   // identity: "character taken over"
@@ -261,19 +263,6 @@ export const ERROR_CODES = deepFreeze({
   'cheater_mark.invalid_duration': { params: [] },
   // A lift was asked for on an account that is not wearing the tag (409).
   'cheater_mark.not_marked': { params: [] },
-
-  // --- world_quest_block: the operator world quest block (src/sim/world_quest_block.ts,
-  // server/world_quest_block_api.ts), the sanction for world quest botting short
-  // of a ban. ---
-
-  // The target account is an operator, and an operator cannot be blocked (400).
-  'world_quest_block.admin_target': { params: [] },
-  // The audited reason was absent or blank on either arm (400).
-  'world_quest_block.reason_required': { params: [] },
-  // A block was asked for on an account that is already blocked (409).
-  'world_quest_block.already_blocked': { params: [] },
-  // A lift was asked for on an account that is not blocked (409).
-  'world_quest_block.not_blocked': { params: [] },
 
   // --- kick: the admin-panel kick of a live player (server/admin_kick_api.ts),
   // the dashboard twin of the in-game /kick. A live-session effect only, so

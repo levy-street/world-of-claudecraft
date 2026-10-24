@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   HEROIC_DUNGEON_TUNING,
-  HEROIC_MARK_ITEM_ID,
+  HEROIC_MARK_CURRENCY_ID,
   NYTHRAXIS_HEROIC_COPPER,
 } from '../../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
@@ -20,7 +20,6 @@ import { heroicVariantId } from '../../src/sim/content/heroic_variants';
 import { ITEMS, MOBS } from '../../src/sim/data';
 import { countRawInSlots, countUnlockedInSlots } from '../../src/sim/item_lock';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
-import { NYTHRAXIS_BONE_STORM_ENABLED } from '../../src/sim/nythraxis_bone_storm';
 import {
   FARM_GOLDEN_BONUS_PATTERN_IDS,
   FARM_SEED_BACK_TWO_CHANCE,
@@ -331,11 +330,10 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // Soul Rend marks pick (the rng.int callout) + Deathless Rage interrupt self-stun.
     expect(chats.some((e) => e.text === 'Your spirit belongs to me')).toBe(true);
     expect(auras.some((e) => e.name === 'Deathless Rage Interrupted')).toBe(true);
-    // Phase 3: The King's Wrath and The Crown Endures enrage. Bone Storm (its
-    // whirl and a Bone Slam) fires only while NYTHRAXIS_BONE_STORM_ENABLED;
-    // it is retired from play, so the trace must carry none of it.
+    // Phase 3: The King's Wrath, a Bone Storm (its whirl and a Bone Slam; no
+    // spike lands while he storms), and The Crown Endures enrage.
     expect(auras.some((e) => e.name === "King's Wrath")).toBe(true);
-    expect(auras.some((e) => e.name === 'Bone Storm')).toBe(NYTHRAXIS_BONE_STORM_ENABLED);
+    expect(auras.some((e) => e.name === 'Bone Storm')).toBe(true);
     expect(auras.some((e) => e.name === 'The Crown Endures')).toBe(true);
     // The mechanics redo: Dread Curse landed on the tank, two raiders were
     // impaled and freed when their spikes died, and the eruption burst then burned.
@@ -361,12 +359,12 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(callouts.some((e) => e.call === 'sigilAppears')).toBe(true);
     expect(callouts.some((e) => e.call === 'sigilBound')).toBe(true);
     expect(callouts.some((e) => e.call === 'kingsWrath')).toBe(true);
-    expect(callouts.some((e) => e.call === 'boneStormBegins')).toBe(NYTHRAXIS_BONE_STORM_ENABLED);
-    expect(callouts.some((e) => e.call === 'boneStormCharge')).toBe(NYTHRAXIS_BONE_STORM_ENABLED);
-    expect(callouts.some((e) => e.call === 'boneStormEnds')).toBe(NYTHRAXIS_BONE_STORM_ENABLED);
+    expect(callouts.some((e) => e.call === 'boneStormBegins')).toBe(true);
+    expect(callouts.some((e) => e.call === 'boneStormCharge')).toBe(true);
+    expect(callouts.some((e) => e.call === 'boneStormEnds')).toBe(true);
     expect(callouts.some((e) => e.call === 'crownEndures')).toBe(true);
-    expect(damage.some((e) => e.ability === 'Bone Storm')).toBe(NYTHRAXIS_BONE_STORM_ENABLED);
-    expect(damage.some((e) => e.ability === 'Bone Slam')).toBe(NYTHRAXIS_BONE_STORM_ENABLED);
+    expect(damage.some((e) => e.ability === 'Bone Storm')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Bone Slam')).toBe(true);
     expect(auras.some((e) => e.name === 'Deathless Ascension')).toBe(true);
     expect(auras.some((e) => e.name === 'Bound')).toBe(true);
     // Kill: raid lockout granted to the tank + the death-dialogue first line emitted.
@@ -443,7 +441,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const raid = [...sim.players.values()] as any[];
     expect(raid.length).toBe(5);
     for (const meta of raid) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, meta.entityId), `${meta.name} heroic marks`).toBe(
+      expect(sim.meta(meta.entityId)!.heroicMarks, `${meta.name} heroic marks`).toBe(
         tuning.marksPerParticipant,
       );
     }
@@ -477,7 +475,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(ev.some((e) => e.type === 'damage' && e.ability === 'Bladestorm')).toBe(true);
   });
 
-  it('professions_craft: denial draws nothing, each craft draws once, and the vestments proc mints + surfaces a masterwork', () => {
+  it('professions_craft: denial draws nothing, each craft draws once plus one quality draw per equipment copy, and the vestments proc mints + surfaces a masterwork', () => {
     const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_craft')!);
     const ev = rec.allEvents as Ev[];
     const pid = rec.notes.pid as number;
@@ -517,8 +515,10 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // The phase 07 daily-gate arm (step 4b): the catalyst success stamps
     // craftDaily with real content and draws once like every success; the
     // daily_limit re-attempt returns BEFORE any draw and leaves the stamp
-    // unmutated, so the scenario's total stays at exactly four draws (three
-    // pre-existing crafts + the catalyst; the two denials contribute zero).
+    // unmutated, so the scenario's total is five draws: three pre-existing
+    // crafts + the catalyst (one proc draw each), plus one permanent
+    // loot-quality draw for the one eligible equipment output (the
+    // vestments, loot/fresh_quality_grant.ts); the two denials contribute zero.
     expect(
       crafts.some(
         (e) => e.ok === true && e.itemId === 'quickening_catalyst' && e.masterwork === undefined,
@@ -529,7 +529,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       date: '2099-06-25',
       crafted: new Set(['recipe_quickening_catalyst']),
     });
-    expect(trace.draws).toBe(4);
+    expect(trace.draws).toBe(5);
   });
 
   it('professions_gather: two draws per harvest, zero-draw denial, zone materials, and the hunted rare event fires', () => {
@@ -1236,7 +1236,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // broken recipe (a moved banker failing the proximity gate, every vault op
     // refusing) would mint a no-op arm with nothing red. Pin the final state
     // both stores must reach; the numbers are the scenario's own arithmetic
-    // (71000 - 20000 - 50000 = 1000 copper; 10 ore deposited 6 then 2 back,
+    // (61000 - 20000 - 40000 = 1000 copper; 10 ore deposited 6 then 2 back,
     // then the step-12 sweep re-stocks the carried 6; the whole 4-stack of
     // logs; the bank ladder's first 500-copper rung; and the sweep takes the
     // 5 wolf_fang the bank arm returned to the bags, wolf_fang being a recipe
@@ -1893,15 +1893,13 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const tuning = HEROIC_DUNGEON_TUNING[HEROIC_FIVE_MAN_DUNGEON_ID];
     expect(tuning.marksPerParticipant).toBe(1);
     for (const pid of partyPids) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid), `marks pid ${pid}`).toBe(
-        tuning.marksPerParticipant,
-      );
+      expect(sim.meta(pid)!.heroicMarks, `marks pid ${pid}`).toBe(tuning.marksPerParticipant);
       const lockouts = sim.players.get(pid).raidLockouts;
       expect(lockouts.has(`${HEROIC_FIVE_MAN_DUNGEON_ID}:heroic`), `lock pid ${pid}`).toBe(true);
       expect(lockouts.has(HEROIC_FIVE_MAN_DUNGEON_ID), `plain key pid ${pid}`).toBe(false);
     }
     // Marks are paid into the bags, never onto the corpse.
-    expect(droppedIds).not.toContain(HEROIC_MARK_ITEM_ID);
+    expect(droppedIds).not.toContain(HEROIC_MARK_CURRENCY_ID);
   });
 
   it('flask_consumables: one flask ever rides, upward replaces, downward refuses, and the whole path draws nothing', () => {
@@ -1960,5 +1958,77 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const alice = [...rec.sim.ctx.players.values()].find((meta) => meta.name === 'AliceParity');
     const awarded = alice?.inventory.find((slot) => slot.itemId === 'sigil_anvil_helmet');
     expect(awarded?.instance?.partyTrade?.eligibleIds).toEqual([101, 102]);
+  });
+
+  it('mob_cast_sight_route: a caster with no line of sight plans a way round, walks it and casts, twice; a windup and a bar whose target hides both fail', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'mob_cast_sight_route')!);
+    type Leg = { plans: number; sparks: number; blind: number; sees: boolean };
+    const first = rec.notes.first as Leg;
+    const second = rec.notes.second as Leg;
+    // Both legs really begin with the monument between the pair, so the
+    // route below is a route round something and not a straight walk.
+    expect(rec.notes.hiddenAtStart).toBe(true);
+    expect(rec.notes.hiddenAgain).toBe(true);
+    for (const leg of [first, second]) {
+      // The search ran, the caster ended in sight of its target, and its
+      // Spark landed from there.
+      expect(leg.plans).toBeGreaterThan(0);
+      expect(leg.sees).toBe(true);
+      expect(leg.sparks).toBeGreaterThan(0);
+      // THE RULE: no Spark landed on a tick that began with the target hidden.
+      expect(leg.blind).toBe(0);
+    }
+    // The route record the golden samples is the Adept's own.
+    const adept = rec.sim.entities.get(rec.notes.adeptId as number);
+    expect(adept?.chaseRoute?.targetId).toBe(rec.notes.pid);
+
+    // THE WINDUP THAT FAILS: committed, its target hidden before the release
+    // tick, run out, nothing landed, and the committed state cleared.
+    expect(rec.notes.windup).toEqual({
+      committed: true,
+      hidden: true,
+      ranOut: true,
+      landed: 0,
+      // No projectile left its hand. That cue is the first thing a resolving
+      // cast does, before its resist roll and its damage roll, so "none
+      // thrown" is "nothing drawn by the cast". (A raw draw count across these
+      // ticks cannot say it here: the world's idle mobs draw their wander
+      // every tick. The unit suite, tests/mob_cast_line_of_sight.test.ts,
+      // observes the stream itself at zero draws, and this scenario's golden
+      // pins the whole draw order, so a failed cast that began to roll turns
+      // the gate red.)
+      thrown: 0,
+      cleared: true,
+    });
+    // The window really crossed the release tick, and the frames either side
+    // of it are in the golden.
+    const frame = (label: string) => {
+      const f = trace.frames.find((fr) => fr.label === label);
+      if (!f) throw new Error(`no frame ${label}`);
+      return f;
+    };
+    expect(frame('windup-fizzled').tick).toBeGreaterThan(frame('windup-target-hides').tick);
+    expect(frame('bar-fizzled').tick).toBeGreaterThan(frame('bar-target-hides').tick);
+
+    // THE BAR THAT FAILS: a Grave Bolt begun at the player, who hid while it
+    // ran; it ran its length, nothing landed, and it was handed back to be
+    // begun again within the sight retry (never put on its nine second cooldown).
+    const bar = rec.notes.bar as {
+      begun: boolean;
+      victim: number | null;
+      hidden: boolean;
+      ended: boolean;
+      ranItsLength: number;
+      landed: number;
+      timer: number | null;
+    };
+    expect(bar.begun).toBe(true);
+    expect(bar.victim).toBe(rec.notes.pid);
+    expect(bar.hidden).toBe(true);
+    expect(bar.ended).toBe(true);
+    expect(bar.ranItsLength).toBeGreaterThan(20);
+    expect(bar.landed).toBe(0);
+    expect(bar.timer).not.toBeNull();
+    expect(bar.timer as number).toBeLessThanOrEqual(1);
   });
 });

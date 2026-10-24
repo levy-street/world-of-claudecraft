@@ -24,6 +24,12 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.landmarks',
   'views.persistent-portals',
   'views.nearby',
+  // Every translucent character look draws the veil: a character saved dead
+  // (it enters as a released spirit), every death, the Pale Keeper and the
+  // quest visions, Ghost Wolf, the Veilbound March, stealth, Moonkin and Soul
+  // Rend. Skipped, each would wait behind the effect gate, and Soul Rend,
+  // never deferred, would link live in the raid frame.
+  'entities.spirit-veil-family',
   'world.settle-state',
   'post.initial-frame',
   'textures.scene',

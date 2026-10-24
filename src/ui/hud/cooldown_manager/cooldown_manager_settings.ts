@@ -6,7 +6,8 @@
 // Three parts, top to bottom:
 //   - General: the switches every group shares.
 //   - Groups: one card per group with its layout (orientation, size, padding,
-//     opacity, visibility, timer, position), plus the three Add buttons.
+//     opacity, when and where it shows, timer, position), plus the three Add
+//     buttons.
 //   - Tracked Spells: every castable spell the player knows, sorted into one
 //     section per group and a Not Displayed section, searchable by name. A spell
 //     moves by drag and drop, or by selecting it and picking its group in the
@@ -45,7 +46,6 @@ import {
   COOLDOWN_PADDING_MAX,
   COOLDOWN_SCALE_MAX,
   COOLDOWN_SCALE_MIN,
-  COOLDOWN_VISIBILITIES,
   COOLDOWN_VOLUME_MAX,
   COOLDOWN_VOLUME_MIN,
   type CooldownGroup,
@@ -55,13 +55,13 @@ import {
   type CooldownManagerLayoutPatch,
   type CooldownSpellConfig,
   type CooldownSpellPatch,
-  type CooldownVisibility,
   cooldownGroupCapacity,
   cooldownGroupOf,
   cooldownSpellMatches,
   minGridLines,
   minGridPerLine,
 } from './cooldown_manager_config';
+import { cooldownAuraReminder } from './cooldown_manager_view';
 
 export interface CooldownManagerHooks {
   playerClass(): PlayerClass;
@@ -111,11 +111,16 @@ const ADD_GROUP_KEYS: Readonly<Record<CooldownGroupKind, TranslationKey>> = {
   grid: 'hudChrome.cooldownManager.addGrid',
   line: 'hudChrome.cooldownManager.addLine',
 };
-const VISIBILITY_KEYS: Readonly<Record<CooldownVisibility, TranslationKey>> = {
-  always: 'hudChrome.cooldownManager.visAlways',
-  combat: 'hudChrome.cooldownManager.visCombat',
-  hidden: 'hudChrome.cooldownManager.visHidden',
-};
+type CooldownGroupWhenKey = 'showOutOfCombat' | 'showInCombat' | 'showInWorld' | 'showInInstances';
+
+/** One checkmark in a row: its label, its state, what ticking it does, and the
+ *  focus key that brings focus back to it after the panel rebuilds. */
+interface CooldownCheck {
+  label: string;
+  checked: boolean;
+  focusKey: string;
+  onChange(checked: boolean): void;
+}
 const NOT_DISPLAYED = '';
 /** The section of class spells the current build does not know. Not a group:
  *  dropping a spell here takes it out of every group, like Not Displayed. */
@@ -137,7 +142,7 @@ function spellName(abilityId: string): string {
 
 /** A catalog aura's player-facing name, through the localized path its label
  *  names (the buff bar's own sim aura-name matcher for engines and seen auras). */
-function auraEntryName(entry: CooldownAuraEntry): string {
+export function auraEntryName(entry: CooldownAuraEntry): string {
   const label = entry.label;
   switch (label.type) {
     case 'ability':
@@ -318,6 +323,37 @@ export class CooldownManagerSettingsPanel {
     row.appendChild(select);
     parent.appendChild(row);
     return select;
+  }
+
+  /** A row of checkmarks that combine (a fieldset named by its legend), the
+   *  multi-choice twin of select(). */
+  private checks(parent: HTMLElement, legend: string, boxes: readonly CooldownCheck[]): void {
+    const set = document.createElement('fieldset');
+    set.className = 'cdm-check-row';
+    const title = document.createElement('legend');
+    title.className = 'set-name cdm-check-legend';
+    title.textContent = legend;
+    const list = document.createElement('div');
+    list.className = 'cdm-check-list';
+    for (const box of boxes) {
+      const label = document.createElement('label');
+      label.className = 'cdm-check';
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.className = 'ui-check';
+      input.checked = box.checked;
+      input.dataset.focusKey = box.focusKey;
+      input.addEventListener('change', () => {
+        this.host.click();
+        box.onChange(input.checked);
+      });
+      const text = document.createElement('span');
+      text.textContent = box.label;
+      label.append(input, text);
+      list.appendChild(label);
+    }
+    set.append(title, list);
+    parent.appendChild(set);
   }
 
   private button(
@@ -566,19 +602,7 @@ export class CooldownManagerSettingsPanel {
       step: 0.05,
       format: percent,
     });
-    this.select(
-      card,
-      t('hudChrome.cooldownManager.visibility'),
-      COOLDOWN_VISIBILITIES.map((value) => ({ value, label: t(VISIBILITY_KEYS[value]) })),
-      group.visibility,
-      (value) => {
-        const visibility = COOLDOWN_VISIBILITIES.find((entry) => entry === value) ?? 'always';
-        patch({ visibility }, true, [`cdm-visibility:${group.id}`]);
-      },
-      `cdm-visibility:${group.id}`,
-    );
-    if (group.visibility === 'hidden')
-      this.note(card, t('hudChrome.cooldownManager.visHiddenHint'));
+    this.buildGroupWhen(card, group, patch);
     this.toggle(
       card,
       t('hudChrome.cooldownManager.showTimer'),
@@ -790,6 +814,90 @@ export class CooldownManagerSettingsPanel {
     filter();
   }
 
+  /** When and where a group shows: the combat row and the place row, each a
+   *  pair of checkmarks that combine. */
+  private buildGroupWhen(
+    card: HTMLElement,
+    group: CooldownGroup,
+    patch: (value: CooldownGroupPatch, rebuild: boolean, keys?: string[]) => void,
+  ): void {
+    const box = (key: CooldownGroupWhenKey, label: string): CooldownCheck => {
+      const focusKey = `cdm-${key}:${group.id}`;
+      return {
+        label,
+        checked: group[key],
+        focusKey,
+        onChange: (checked) => patch({ [key]: checked }, true, [focusKey]),
+      };
+    };
+    this.checks(card, t('hudChrome.cooldownManager.showWhile'), [
+      box('showOutOfCombat', t('hudChrome.cooldownManager.showOutOfCombat')),
+      box('showInCombat', t('hudChrome.cooldownManager.visCombat')),
+    ]);
+    if (!group.showOutOfCombat && !group.showInCombat)
+      this.note(card, t('hudChrome.cooldownManager.visHiddenHint'));
+    this.checks(card, t('hudChrome.cooldownManager.showIn'), [
+      box('showInWorld', t('hudChrome.cooldownManager.showInWorld')),
+      box('showInInstances', t('hudChrome.cooldownManager.showInInstances')),
+    ]);
+    this.note(
+      card,
+      t(
+        !group.showInWorld && !group.showInInstances
+          ? 'hudChrome.cooldownManager.groupOffHint'
+          : 'hudChrome.cooldownManager.placeHint',
+      ),
+    );
+  }
+
+  /** When a tracked entry's button shows: ready (an aura: active), not ready
+   *  (an aura: missing), or both. Missing alone is the buff reminder. */
+  private buildEntryWhen(
+    card: HTMLElement,
+    id: string,
+    isAura: boolean,
+    refresh: (keys?: readonly string[]) => void,
+  ): void {
+    const { hooks } = this.host;
+    const config = hooks.getSpell(id);
+    const box = (key: 'showReady' | 'showNotReady', label: string): CooldownCheck => {
+      const focusKey = `cdm-detail-${key}`;
+      return {
+        label,
+        checked: config[key],
+        focusKey,
+        onChange: (checked) => {
+          hooks.patchSpell(id, { [key]: checked });
+          refresh([focusKey]);
+        },
+      };
+    };
+    this.checks(
+      card,
+      t(
+        isAura
+          ? 'hudChrome.cooldownManager.auraShowWhen'
+          : 'hudChrome.cooldownManager.showButtonWhen',
+      ),
+      isAura
+        ? [
+            box('showReady', t('hudChrome.cooldownManager.auraActive')),
+            box('showNotReady', t('hudChrome.cooldownManager.auraMissing')),
+          ]
+        : [
+            box('showReady', t('hudChrome.cooldownManager.showReady')),
+            box('showNotReady', t('hudChrome.cooldownManager.showNotReady')),
+          ],
+    );
+    if (!config.showReady && !config.showNotReady) {
+      this.note(card, t('hudChrome.cooldownManager.neverShownHint'));
+    } else if (isAura && cooldownAuraReminder(config)) {
+      this.note(card, t('hudChrome.cooldownManager.reminderHint'));
+    } else if (!isAura) {
+      this.note(card, t('hudChrome.cooldownManager.notReadyHint'));
+    }
+  }
+
   /** The selected spell's card: its group, its order, and its alerts. */
   private buildDetail(
     parent: HTMLElement,
@@ -864,13 +972,26 @@ export class CooldownManagerSettingsPanel {
     later.disabled = group === undefined || index >= group.spells.length - 1;
     card.appendChild(order);
 
+    const reminder = isAura && cooldownAuraReminder(hooks.getSpell(id));
+    this.buildEntryWhen(card, id, isAura, refresh);
     this.toggle(
       card,
-      t('hudChrome.cooldownManager.glowWhenReady'),
+      t(
+        reminder
+          ? 'hudChrome.cooldownManager.glowWhileMissing'
+          : 'hudChrome.cooldownManager.glowWhenReady',
+      ),
       () => hooks.getSpell(id).glowWhenReady,
       (glowWhenReady) => hooks.patchSpell(id, { glowWhenReady }),
     );
-    this.note(card, t('hudChrome.cooldownManager.glowWhenReadyHint'));
+    this.note(
+      card,
+      t(
+        reminder
+          ? 'hudChrome.cooldownManager.reminderGlowHint'
+          : 'hudChrome.cooldownManager.glowWhenReadyHint',
+      ),
+    );
     // An aura has no action-bar button of its own to light.
     if (!isAura && hooks.hotbarGlowAvailable()) {
       this.toggle(
@@ -881,16 +1002,6 @@ export class CooldownManagerSettingsPanel {
       );
       this.note(card, t('hudChrome.cooldownManager.hotbarGlowHint'));
     }
-    this.toggle(
-      card,
-      t(
-        isAura
-          ? 'hudChrome.cooldownManager.onlyWhileActive'
-          : 'hudChrome.cooldownManager.onlyWhenReady',
-      ),
-      () => hooks.getSpell(id).onlyWhenReady,
-      (onlyWhenReady) => hooks.patchSpell(id, { onlyWhenReady }),
-    );
     if (isAura) {
       sliderControl({
         parent: card,
@@ -905,7 +1016,7 @@ export class CooldownManagerSettingsPanel {
       });
       this.note(card, t('hudChrome.cooldownManager.alertStacksHint'));
     }
-    this.buildSound(card, id, isAura, refresh);
+    this.buildSound(card, id, isAura, reminder, refresh);
   }
 
   /** The ready sound: the Auras cue palette, a preview and a volume slider. The
@@ -914,6 +1025,7 @@ export class CooldownManagerSettingsPanel {
     card: HTMLElement,
     id: string,
     isAura: boolean,
+    reminder: boolean,
     refresh: (keys?: readonly string[]) => void,
   ): void {
     const { hooks } = this.host;
@@ -935,7 +1047,13 @@ export class CooldownManagerSettingsPanel {
     );
     this.note(
       card,
-      t(isAura ? 'hudChrome.cooldownManager.auraSoundHint' : 'hudChrome.cooldownManager.soundHint'),
+      t(
+        reminder
+          ? 'hudChrome.cooldownManager.reminderSoundHint'
+          : isAura
+            ? 'hudChrome.cooldownManager.auraSoundHint'
+            : 'hudChrome.cooldownManager.soundHint',
+      ),
     );
     if (current.soundId === AURA_CUE_NONE) return;
     const volume = sliderControl({

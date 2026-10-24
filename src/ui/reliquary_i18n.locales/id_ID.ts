@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Cekungan Hati Liar',
-    desc: 'Senjata khas dari Zulgar dan Fanglord, Penakluk Binatang.',
+    desc: 'Senjata khas dari Penguasa Taring Sang Penguasa Binatang, Bunga Pelahap, dan Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroik: Cekungan Hati Liar',
-    desc: 'Barang epik khusus mode heroik dari Zulgar, Suara Cekungan.',
+    desc: 'Item epik dan pernak-pernik khusus Heroik dari Penguasa Taring Sang Penguasa Binatang, Bunga Pelahap, dan Zulgar, Suara Cekungan.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, Puncak yang Terjaga',
     desc: 'Rampasan epik pribadi dari bos dunia Puncak yang Terjaga.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Mandor yang Terkubur',
+    desc: 'Rampasan yang diseret keluar dari gundukan kubur Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Reliquary yang Runtuh',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galeri Peperangan',
-    desc: 'Lima set tempur Peperangan musim pertama, kini dijual sepotong demi sepotong seharga emas.',
+    desc: 'Kelima set tempur Peperangan, diraih sepotong demi sepotong dengan kehormatan.',
   },
   conquerors_warfare_armory: {
     name: 'Gudang Senjata Peperangan',
-    desc: 'Perhiasan dan senjata Peperangan, musim pertama seharga emas dan dua perhiasan seharga kehormatan.',
+    desc: 'Perhiasan, senjata, dan barang Peperangan yang dibeli dengan kehormatan hasil jerih payah.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galeri Garda Depan',

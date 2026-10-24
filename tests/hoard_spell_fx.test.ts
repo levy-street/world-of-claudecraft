@@ -244,6 +244,36 @@ describe('Buried Hoard spell effects adapter', () => {
     fx.dispose();
   });
 
+  it('keeps every idle ribbon hidden, so an empty pool issues no draw call', async () => {
+    const scene = new THREE.Scene();
+    const fx = new HoardSpellFx(scene, () => 0, undefined, CALM_OFF, 'high');
+    await fx.readyForEntry;
+    const ribbons: THREE.Mesh[] = [];
+    scene.getObjectByName(ROOT)?.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      const position = mesh.isMesh
+        ? (mesh.geometry.getAttribute('position') as THREE.BufferAttribute)
+        : null;
+      if (position?.usage === THREE.DynamicDrawUsage) ribbons.push(mesh);
+    });
+    expect(ribbons.length).toBeGreaterThan(0);
+    const shown = () => ribbons.filter((mesh) => mesh.visible).length;
+    fx.update(0.05);
+    expect(shown()).toBe(0);
+
+    fx.sync([cue({ remaining: 0.5 })]);
+    fx.update(0.05);
+    expect(shown()).toBeGreaterThan(0);
+    for (const mesh of ribbons) {
+      if (mesh.visible) expect(mesh.geometry.drawRange.count).toBeGreaterThan(0);
+    }
+
+    fx.sync([]);
+    for (let frame = 0; frame < 40; frame++) fx.update(0.05);
+    expect(shown()).toBe(0);
+    fx.dispose();
+  });
+
   it('draws no bolt for a strike that was interrupted or reset', async () => {
     const scene = new THREE.Scene();
     const fx = new HoardSpellFx(scene, () => 0, undefined, CALM_OFF, 'high');

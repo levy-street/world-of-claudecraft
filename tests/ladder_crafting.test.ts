@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
 import { LADDER_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS, STATIONS } from '../src/sim/data';
+import { ITEMS } from '../src/sim/data';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
@@ -60,7 +60,11 @@ describe('ladder recipe execution sweep (all 54)', () => {
           sim.addItem(reagent.itemId, reagent.count, pid);
         }
       }
-      placeAt(sim, pid, stationsOfType(STATIONS, expectDefined(recipe.stationType))[0].pos);
+      placeAt(
+        sim,
+        pid,
+        stationsOfType(sim.stationPlacements, expectDefined(recipe.stationType))[0].pos,
+      );
       runCraft(sim, recipe.id, false, pid);
       expect(meta.lastCraftResult?.ok, `${recipe.id}: ${meta.lastCraftResult?.reason}`).toBe(true);
       expect(sim.countItem(recipe.resultItemId, pid), `${recipe.id} output`).toBe(
@@ -111,7 +115,11 @@ describe('Sim.trainRecipe on real ladder rungs', () => {
     const rung0 = expectDefined(
       LADDER_RECIPES.find((r) => r.professionId === 'weaponcrafting' && r.skillReq === 0),
     );
-    placeAt(sim, pid, stationsOfType(STATIONS, expectDefined(rung0.stationType))[0].pos);
+    placeAt(
+      sim,
+      pid,
+      stationsOfType(sim.stationPlacements, expectDefined(rung0.stationType))[0].pos,
+    );
     const copperBefore = meta.copper;
     sim.trainRecipe(rung0.id, pid);
     expect(meta.lastTrainResult?.ok).toBe(true);
@@ -129,7 +137,11 @@ describe('Sim.trainRecipe on real ladder rungs', () => {
     );
     meta.craftSkills.weaponcrafting = 50;
     meta.copper = 10_005;
-    placeAt(sim, pid, stationsOfType(STATIONS, expectDefined(rung50.stationType))[0].pos);
+    placeAt(
+      sim,
+      pid,
+      stationsOfType(sim.stationPlacements, expectDefined(rung50.stationType))[0].pos,
+    );
     sim.trainRecipe(rung50.id, pid);
     expect(meta.lastTrainResult?.ok).toBe(true);
     expect(meta.lastTrainResult?.fee).toBe(10_000);
@@ -203,7 +215,7 @@ describe('crafted potions and elixirs stack', () => {
     if (!recipe) throw new Error(`expected ${recipeId} on the ladder`);
     meta.craftSkills[recipe.professionId] = recipe.skillReq;
     meta.knownRecipes.add(recipe.id);
-    placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
+    placeAt(sim, pid, stationsOfType(sim.stationPlacements, recipe.stationType!)[0].pos);
     for (let craft = 0; craft < 2; craft++) {
       meta.craftThrottle.count = 0;
       for (const reagent of recipe.reagents) sim.addItem(reagent.itemId, reagent.count, pid);
@@ -259,7 +271,7 @@ describe('crafted potions and elixirs stack', () => {
     if (!recipe) throw new Error('expected recipe_silverleaf_healing_draught on the ladder');
     meta.craftSkills[recipe.professionId] = recipe.skillReq;
     meta.knownRecipes.add(recipe.id);
-    placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
+    placeAt(sim, pid, stationsOfType(sim.stationPlacements, recipe.stationType!)[0].pos);
     sim.addItem(recipe.resultItemId, 1, pid);
     meta.craftThrottle.count = 0;
     for (const reagent of recipe.reagents) sim.addItem(reagent.itemId, reagent.count, pid);
@@ -275,13 +287,16 @@ describe('crafted potions and elixirs stack', () => {
     expect(ITEMS[recipe.resultItemId].quality).toBe('rare');
     expect(sim.countItem(recipe.resultItemId, pid)).toBe(2 * recipe.resultCount);
     const slots = meta.inventory.filter((s: InvSlot) => s.itemId === recipe.resultItemId);
-    // Both crafts mint the same {signer} payload, so the second one must top
-    // up the first craft's instanced slot, never sit beside it. The literal
-    // name pin keeps the signer compare from being production-vs-production.
+    // Both crafts mint units from the same maker, so the second one must top
+    // up the first craft's source-counted slot, never sit beside it. Exact
+    // attribution now lives on each source bucket, not the shared payload.
     expect(meta.name).toBe('Adventurer');
     expect(slots.length).toBe(1);
     expect(slots[0].count).toBe(2 * recipe.resultCount);
-    expect(slots[0].instance?.signer).toBe(meta.name);
+    expect(slots[0].materialSources).toEqual([
+      { source: { signer: 'Adventurer' }, count: 2 * recipe.resultCount },
+    ]);
+    expect(slots[0].instance?.signer).toBeUndefined();
   });
 });
 

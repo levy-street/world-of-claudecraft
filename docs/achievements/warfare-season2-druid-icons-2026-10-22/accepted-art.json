@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-druid-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 0,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_druid_balance_helmet",
+      "family": "balance",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_balance_helmet.webp",
+      "canonicalDisplayName": "Starwarden Headdress",
+      "acceptedSha256": "aea4fae80ce8507fedc8ba58661dfedfe74435d8dde6b7a350f3d5928ab37d04",
+      "acceptedBytes": 3448,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_balance_helmet.png",
+        "sha256": "f09721ec53c1498e0e6a60b34287cf1c5df51da63a97ce7770947c3e28639064",
+        "bytes": 2185795,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_balance_helmet.png",
+        "sha256": "43698d554813eef5a48d1683b3059d102b93af81c73b194d5d268db7f0ff3e41",
+        "bytes": 478782,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Starwarden Headdress, Druid balance Season 2 LEATHER armor. Subject: a leather headdress with short feather fans framing a crescent forehead clasp. Coordinated set materials and palette: supple indigo and navy leather, silver crescent and star shaped fasteners, short ivory feather accents, pale blue stones. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_balance_shoulder",
+      "family": "balance",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_balance_shoulder.webp",
+      "canonicalDisplayName": "Starwarden Spaulders",
+      "acceptedSha256": "42678b5d8db0dd8087bd6365b84a597fc28b1601e15a3c22062bbec384e1ceb2",
+      "acceptedBytes": 3348,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_balance_shoulder.png",
+        "sha256": "0e75919cfd445a41124882daa731e21495b08334f4dcbce1bc1a1b06125e55a2",
+        "bytes": 2278702,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_balance_shoulder.png",
+        "sha256": "a11fd7f9b215510acbe810128a54a0965dd6ecb09a33f1cf3e1250074a9e6fb9",
+        "bytes": 454718,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Starwarden Spaulders, Druid balance Season 2 LEATHER armor. Subject: a paired set of broad leather shoulder guards, no torso or arms. Coordinated set materials and palette: supple indigo and navy leather, silver crescent and star shaped fasteners, short ivory feather accents, pale blue stones. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_balance_chest",
+      "family": "balance",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_balance_chest.webp",
+      "canonicalDisplayName": "Starwarden Vest",
+      "acceptedSha256": "6b78250935ad64ccfdc18c8c78303dab6ddbee6a3fbb5b3024a07e703e6f3505",
+      "acceptedBytes": 3668,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_balance_chest.png",
+        "sha256": "e25844023a436f9db9942971366ab145e211dd19e23f53e59a9b15e4501348cc",
+        "bytes": 2370527,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_balance_chest.png",
+        "sha256": "15afd6514c182b7bb07148719955562f35844109acf08d0bc3de7713c2538286",
+        "bytes": 487741,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Starwarden Vest, Druid balance Season 2 LEATHER armor. Subject: a complete sleeveless leather chest garment, clearly structured hide panels, no body inside. Coordinated set materials and palette: supple indigo and navy leather, silver crescent and star shaped fasteners, short ivory feather accents, pale blue stones. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_balance_legs",
+      "family": "balance",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_balance_legs.webp",
+      "canonicalDisplayName": "Starwarden Breeches",
+      "acceptedSha256": "8248cbf4099d399fcb79b0943fcbefc60527a28ee865190c89734ade51e04245",
+      "acceptedBytes": 2590,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_balance_legs.png",
+        "sha256": "fefa56e7c1979e516e05cf0cf1677d15577291651bfb986d3576a84198b85aa8",
+        "bytes": 2157871,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_balance_legs.png",
+        "sha256": "a478876f0f3fc1eecb178b8efb7006d071896ea7ec21a29590884aab6cc6cecc",
+        "bytes": 424268,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Starwarden Breeches, Druid balance Season 2 LEATHER armor. Subject: one complete matched pair of leather leggings from waist to ankles, no torso or boots. Coordinated set materials and palette: supple indigo and navy leather, silver crescent and star shaped fasteners, short ivory feather accents, pale blue stones. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_balance_gloves",
+      "family": "balance",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_balance_gloves.webp",
+      "canonicalDisplayName": "Starwarden Gloves",
+      "acceptedSha256": "913ae27ad70652e5eda574b7cfb17c309bb8bbbf542187de30aa225bb7892af1",
+      "acceptedBytes": 3348,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_balance_gloves.png",
+        "sha256": "1ccfb0d995ce5e8f6d37a98d284432850ce7cd0631e1c81615c98ff3b4607c79",
+        "bytes": 2233628,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_balance_gloves.png",
+        "sha256": "50bd650a46dac164419d24d6cc1e4e018fd7cb041be73fa4510e77f95c1ed1e2",
+        "bytes": 491268,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Starwarden Gloves, Druid balance Season 2 LEATHER armor. Subject: a matched pair of five-finger leather gloves with sturdy cuffs, hands empty. Coordinated set materials and palette: supple indigo and navy leather, silver crescent and star shaped fasteners, short ivory feather accents, pale blue stones. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_feral_helmet",
+      "family": "feral",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_feral_helmet.webp",
+      "canonicalDisplayName": "Bloodmane Helm",
+      "acceptedSha256": "3c825f18fd8fd01e49e8eab876196d2e45aea59663949efafe49e81b7751afc3",
+      "acceptedBytes": 3654,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_feral_helmet.png",
+        "sha256": "ed7d98b595bc66d3a45134024105418c1a03a70ef3af4a04462ae6dd334b269f",
+        "bytes": 2358844,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_feral_helmet.png",
+        "sha256": "431d5f304788ce4a84ad895843944e8c368b1d5a47c62feff921a87a731eba8b",
+        "bytes": 496717,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Bloodmane Helm, Druid feral Season 2 LEATHER armor. Subject: a thick leather open-face helm with a russet fur mane along its crown and two small ivory fang ornaments. Coordinated set materials and palette: rugged russet and brown leather, warm rust fur trim, ivory fang toggles and bronze fasteners, strong organic layered hide shapes. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_feral_shoulder",
+      "family": "feral",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_feral_shoulder.webp",
+      "canonicalDisplayName": "Bloodmane Shoulderpads",
+      "acceptedSha256": "19c2c0eb21c15937cdd74d1336e9663c4e872510de76909f27e9f89ee7811ba6",
+      "acceptedBytes": 3458,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_feral_shoulder.png",
+        "sha256": "7b5d10e0d3d7c93e2e95483eaf56ae0b126098b8c20b1399cc8b98941fa4707f",
+        "bytes": 2240018,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_feral_shoulder.png",
+        "sha256": "fac45425111e8b97fe6c973774cd0aa55049b02d76bd94514e327d414a8fadb7",
+        "bytes": 464267,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Bloodmane Shoulderpads, Druid feral Season 2 LEATHER armor. Subject: a paired set of broad leather shoulder guards, no torso or arms. Coordinated set materials and palette: rugged russet and brown leather, warm rust fur trim, ivory fang toggles and bronze fasteners, strong organic layered hide shapes. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_feral_chest",
+      "family": "feral",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_feral_chest.webp",
+      "canonicalDisplayName": "Bloodmane Tunic",
+      "acceptedSha256": "09e1b77274c89975140599fcd37c1cf25662efd6f25c4e85a151b10dc71fec58",
+      "acceptedBytes": 4098,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_feral_chest.png",
+        "sha256": "635f2feab657b976f1bd65905bac4aba7e998334e7ddeb16db193c240bbfc25a",
+        "bytes": 2285098,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_feral_chest.png",
+        "sha256": "2522292bc7bff05bca0290cb9362d1a05a2b8b002171d747b53f7cc9659fa1c8",
+        "bytes": 508764,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Bloodmane Tunic, Druid feral Season 2 LEATHER armor. Subject: a complete sleeveless leather chest garment, clearly structured hide panels, no body inside. Coordinated set materials and palette: rugged russet and brown leather, warm rust fur trim, ivory fang toggles and bronze fasteners, strong organic layered hide shapes. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_feral_legs",
+      "family": "feral",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_feral_legs.webp",
+      "canonicalDisplayName": "Bloodmane Legguards",
+      "acceptedSha256": "d9c321069ccbbedf377f0bb983be3ee9da68f096ed6daad4334a7d9f49a8f616",
+      "acceptedBytes": 3478,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_feral_legs.png",
+        "sha256": "f5fcac663a3ea84afbcfee05f03b52aa32ab04c7774cc22460c47f0120db5fb8",
+        "bytes": 2142230,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_feral_legs.png",
+        "sha256": "531c1cfed3e16eb80e96e9cc7387c6dc8f93d6373900194cfa9a50c43dbcdf5c",
+        "bytes": 467564,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Bloodmane Legguards, Druid feral Season 2 LEATHER armor. Subject: one complete matched pair of leather leggings from waist to ankles, no torso or boots. Coordinated set materials and palette: rugged russet and brown leather, warm rust fur trim, ivory fang toggles and bronze fasteners, strong organic layered hide shapes. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_feral_gloves",
+      "family": "feral",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_feral_gloves.webp",
+      "canonicalDisplayName": "Bloodmane Grips",
+      "acceptedSha256": "667ccfaac0b10f6880da3bf802a81bebb680ce6de819b496237e1f4eb22bddf2",
+      "acceptedBytes": 3736,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_feral_gloves.png",
+        "sha256": "3bcd0a910ef02b46bfb1aeb542d8717ea656ebb9a22f9cc97482c64f37e2a72d",
+        "bytes": 2399110,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_feral_gloves.png",
+        "sha256": "f89f4fb071de3d4acc4468330a4e4b9421d0bd0855be1db6ca7e49ece6370d95",
+        "bytes": 483689,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Bloodmane Grips, Druid feral Season 2 LEATHER armor. Subject: a matched pair of five-finger leather gloves with sturdy cuffs, hands empty. Coordinated set materials and palette: rugged russet and brown leather, warm rust fur trim, ivory fang toggles and bronze fasteners, strong organic layered hide shapes. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_restoration_helmet",
+      "family": "restoration",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_restoration_helmet.webp",
+      "canonicalDisplayName": "Thistlebloom Crown",
+      "acceptedSha256": "cdc202d6b6251e1e2fe593ccdf694e709bdcfa532431258bfbc1422810543684",
+      "acceptedBytes": 3170,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_restoration_helmet.png",
+        "sha256": "3d9e8e9b371ff41aa75eec4c661aa0e3dc3b037b0436f9a61a59c5513d8e908f",
+        "bytes": 2024516,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_restoration_helmet.png",
+        "sha256": "a054890de761dc07bf417eb1f2737eab1af70e849f2007c93c0fd5217e286d3e",
+        "bytes": 425182,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Thistlebloom Crown, Druid restoration Season 2 LEATHER armor. Subject: an open circlet crown of woven roots and leather, broad leaf-shaped panels and a few small lavender thistle blooms. Coordinated set materials and palette: sage green and tan leather, leaf shaped hide panels, restrained small lavender thistle blossoms and woven vine fasteners. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_restoration_shoulder",
+      "family": "restoration",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_restoration_shoulder.webp",
+      "canonicalDisplayName": "Thistlebloom Mantle",
+      "acceptedSha256": "1736566615a0782c2c0190342dd46722e69dd9f527adb497777d10f1e5f6b9ab",
+      "acceptedBytes": 3338,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_restoration_shoulder.png",
+        "sha256": "eef60a3710e162e34cfd89c7c2abf2d4bf94fcc2d45d8c1267b75b582539d12e",
+        "bytes": 2266651,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_restoration_shoulder.png",
+        "sha256": "bf24b8a858d7295c1206bdc9630390c4cc7254ae023faa8411219f024a503c12",
+        "bytes": 455599,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Thistlebloom Mantle, Druid restoration Season 2 LEATHER armor. Subject: a paired set of broad leather shoulder guards, no torso or arms. Coordinated set materials and palette: sage green and tan leather, leaf shaped hide panels, restrained small lavender thistle blossoms and woven vine fasteners. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_restoration_chest",
+      "family": "restoration",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_restoration_chest.webp",
+      "canonicalDisplayName": "Thistlebloom Vest",
+      "acceptedSha256": "20bdcc27d349c1fb095b84f0b0ee38b07fe26f4b17e8f4b5008aa48c9249920d",
+      "acceptedBytes": 3734,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_restoration_chest.png",
+        "sha256": "11f5ab7d124f06827daf3a4fff8e26c5a074fd7255d228783a4f8250fa69aa95",
+        "bytes": 2371025,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_restoration_chest.png",
+        "sha256": "ea069cce3b1ec70e257806c7e5fa23218d18613bc7d292fffd4cea5887ef4f3f",
+        "bytes": 499641,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Thistlebloom Vest, Druid restoration Season 2 LEATHER armor. Subject: a complete sleeveless leather chest garment, clearly structured hide panels, no body inside. Coordinated set materials and palette: sage green and tan leather, leaf shaped hide panels, restrained small lavender thistle blossoms and woven vine fasteners. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_restoration_legs",
+      "family": "restoration",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_restoration_legs.webp",
+      "canonicalDisplayName": "Thistlebloom Leggings",
+      "acceptedSha256": "45ee35cd27dc58aadbe203a1a085fbd78132600096689ca9aecd41525f59a625",
+      "acceptedBytes": 2684,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_restoration_legs.png",
+        "sha256": "67caa85a4b208b10503268b6cf76f7357cc2f1e04861c0084d5fb2cac78145a4",
+        "bytes": 2052510,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_restoration_legs.png",
+        "sha256": "5a2712524bbb24a514a192108422f8c891b663f483c03cdec58ab49d55ffae51",
+        "bytes": 422260,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Thistlebloom Leggings, Druid restoration Season 2 LEATHER armor. Subject: one complete matched pair of leather leggings from waist to ankles, no torso or boots. Coordinated set materials and palette: sage green and tan leather, leaf shaped hide panels, restrained small lavender thistle blossoms and woven vine fasteners. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_druid_restoration_gloves",
+      "family": "restoration",
+      "batch": "warfare-season2-druid-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_druid_restoration_gloves.webp",
+      "canonicalDisplayName": "Thistlebloom Gloves",
+      "acceptedSha256": "16af2b91ced6397622dfd4771beb35c17ec1b865b551c1c4202b4e890ce6f071",
+      "acceptedBytes": 3472,
+      "original": {
+        "path": "tmp/imagegen/v045-druid/originals/vanguard_druid_restoration_gloves.png",
+        "sha256": "24582c51ffe378b762bf7c83a1e2c1a85711df8c4de988205f59995e60e4fcb6",
+        "bytes": 2349005,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-druid/masters/vanguard_druid_restoration_gloves.png",
+        "sha256": "0b3ff419e5b785387f3e91927ec053b905d7341531e5fe17846829fe86298253",
+        "bytes": 479512,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create one square painted fantasy RPG inventory item icon for World of ClaudeCraft: Thistlebloom Gloves, Druid restoration Season 2 LEATHER armor. Subject: a matched pair of five-finger leather gloves with sturdy cuffs, hands empty. Coordinated set materials and palette: sage green and tan leather, leaf shaped hide panels, restrained small lavender thistle blossoms and woven vine fasteners. Hand-painted realistic fantasy item art with chunky readable silhouette, upper-left warm directional light, rich material texture, restrained edge highlights. Entire isolated item centered and filling about 80 percent of a square opaque dark umber-black softly vignetted background, ample margin on every edge. Three-quarter inventory product view; iconic shape must read at 22 pixels. No person, skin, mannequin, face, arms or body, no scenery, no extra equipment, no weapon, no text, letters, numerals, logo, watermark, UI border, frame, particles, magical glow, metallic plate armor or cloth robes. Exactly one item painting, no sheet or collage. For paired gear show both pieces together as one inventory icon. Output square 1024x1024.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-druid-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-druid-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

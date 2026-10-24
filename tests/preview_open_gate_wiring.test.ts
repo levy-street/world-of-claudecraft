@@ -21,6 +21,7 @@ import {
 import { PREVIEW_LINKED_PROGRAM_TOUCH_LABEL } from '../src/render/linked_program_touch_lane';
 
 vi.mock('../src/render/characters/assets', () => ({
+  directBuildAssetsResident: () => true,
   mechAssetsReady: () => true,
   preloadMechAssets: () => Promise.resolve(),
 }));
@@ -29,6 +30,7 @@ vi.mock('../src/render/characters/visual', () => ({
   CharacterVisual: class {
     root = {};
     setWeaponSkin = vi.fn();
+    setFarBakeGate = vi.fn();
     setSkin = vi.fn();
     update = vi.fn();
     dispose = vi.fn();
@@ -127,6 +129,9 @@ function harness(opts: { programs?: number; textures?: number } = {}): Harness {
   state.camera = { aspect: 1, updateProjectionMatrix: () => {} };
   state.characterGroup = characterGroup;
   state.container = { clientWidth: 300, clientHeight: 400 };
+  // the constructor's default: a mouse turntable, not a phone's touch stage
+  state.touchStage = () => false;
+  state.touchWasActive = false;
   state.touchQueue = {
     run: async <T>(work: () => T | Promise<T>, priority: number, label: string): Promise<T> => {
       touched.push({ priority, label });

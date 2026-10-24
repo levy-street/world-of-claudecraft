@@ -1,0 +1,274 @@
+{
+  "about": "The tavern's textured props (inn_props.py hangs and stands them, inn_lights.py hangs the light fittings among them and inn_furnish.py sets the table, rack and stage pieces; build_atlas.mjs packs them). Each is a real model with its own painted map, packed into one 512 tile of the 2048 by 5120 atlas ([left, top, side] in pixels). stag_head: the stag's head trophy over the front door, a mesh the art lead made in Tripo Studio (model P2, multi-view image to 3D from painted front, back and side views, Smart Mesh) and exported as GLB with its 512 texture. Every other piece but the shields was made the same way by the project: its front, side and back views painted with ChatGPT's image generation in the stag's style (tmp/inn_props_gen3, not committed), then built from them in Tripo Studio (model P2, multi-view image to 3D, Smart Mesh, about two thousand quads, the same three views its texture reference). dense is that model, as Tripo exported it; bake_low.py brings it down to its triangles (welded, decimated, unwrapped afresh and its paint baked onto the new surface) and writes source. The shields are the game's own shield models from public/models/weapons, unchanged but for their triangle budget: a piece with no dense model is simplified to its triangles here, its UV seams kept. turn (degrees about +y) brings a source whose face looks elsewhere round to +z.",
+  "atlas": {
+    "width": 2048,
+    "height": 5120,
+    "pad": 8,
+    "out": "tex/TavernProps_Color.jpg",
+    "data": "props/props_data.json"
+  },
+  "props": [
+    {
+      "id": "stag_head",
+      "source": "tmp/asset_src/mirefen_tavern_props/src/stag_head_tripo.glb",
+      "triangles": 1100,
+      "tile": [0, 0, 512]
+    },
+    {
+      "id": "pike_trophy",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/pike_trophy.glb",
+      "triangles": 800,
+      "tile": [512, 0, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/pike_trophy_tripo.glb"
+    },
+    {
+      "id": "ale_cask",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/ale_cask.glb",
+      "triangles": 520,
+      "tile": [1024, 0, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/ale_cask_tripo.glb"
+    },
+    {
+      "id": "wheel_chandelier",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/wheel_chandelier.glb",
+      "triangles": 1100,
+      "tile": [1536, 0, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/wheel_chandelier_tripo.glb"
+    },
+    {
+      "id": "wall_sconce",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/wall_sconce.glb",
+      "triangles": 400,
+      "tile": [0, 512, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/wall_sconce_tripo.glb"
+    },
+    {
+      "id": "wall_lantern",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/wall_lantern.glb",
+      "triangles": 450,
+      "tile": [512, 512, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/wall_lantern_tripo.glb"
+    },
+    {
+      "id": "table_candles",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/table_candles.glb",
+      "triangles": 300,
+      "tile": [1024, 512, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/table_candles_tripo.glb"
+    },
+    {
+      "id": "tankard",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/tankard.glb",
+      "triangles": 240,
+      "tile": [1536, 512, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/tankard_tripo.glb"
+    },
+    {
+      "id": "bottle_trio",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/bottle_trio.glb",
+      "triangles": 300,
+      "tile": [0, 1024, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/bottle_trio_tripo.glb"
+    },
+    {
+      "id": "bread_board",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/bread_board.glb",
+      "triangles": 300,
+      "tile": [512, 1024, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/bread_board_tripo.glb"
+    },
+    {
+      "id": "net_decor",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/net_decor.glb",
+      "triangles": 700,
+      "tile": [1024, 1024, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/net_decor_tripo.glb"
+    },
+    {
+      "id": "copper_pans",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/copper_pans.glb",
+      "triangles": 550,
+      "tile": [1536, 1024, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/copper_pans_tripo.glb"
+    },
+    {
+      "id": "eel_trap",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/eel_trap.glb",
+      "triangles": 550,
+      "tile": [0, 1536, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/eel_trap_tripo.glb"
+    },
+    {
+      "id": "shield_round_wood",
+      "source": "public/models/weapons/shield_starter.glb",
+      "triangles": 520,
+      "tile": [512, 1536, 512]
+    },
+    {
+      "id": "shield_kite_steel",
+      "source": "public/models/weapons/shield_field_steel.glb",
+      "triangles": 520,
+      "tile": [1024, 1536, 512]
+    },
+    {
+      "id": "shield_kite_crucible",
+      "source": "public/models/weapons/shield_rare_a_crucible.glb",
+      "triangles": 520,
+      "tile": [1536, 1536, 512]
+    },
+    {
+      "id": "wall_shelf",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/wall_shelf.glb",
+      "triangles": 700,
+      "tile": [0, 2048, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/wall_shelf_tripo.glb"
+    },
+    {
+      "id": "dresser",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/dresser.glb",
+      "triangles": 600,
+      "tile": [512, 2048, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/dresser_tripo.glb"
+    },
+    {
+      "id": "barrel_stack",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/barrel_stack.glb",
+      "triangles": 500,
+      "tile": [1024, 2048, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/barrel_stack_tripo.glb"
+    },
+    {
+      "id": "grain_sacks",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/grain_sacks.glb",
+      "triangles": 450,
+      "tile": [1536, 2048, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/grain_sacks_tripo.glb"
+    },
+    {
+      "id": "crate_stack",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/crate_stack.glb",
+      "triangles": 600,
+      "tile": [0, 2560, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/crate_stack_tripo.glb"
+    },
+    {
+      "id": "weapon_rack",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/weapon_rack.glb",
+      "triangles": 500,
+      "tile": [512, 2560, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/weapon_rack_tripo.glb"
+    },
+    {
+      "id": "boar_head",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/boar_head.glb",
+      "triangles": 800,
+      "tile": [1024, 2560, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/boar_head_tripo.glb"
+    },
+    {
+      "id": "hanging_meats",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/hanging_meats.glb",
+      "triangles": 700,
+      "tile": [1536, 2560, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/hanging_meats_tripo.glb"
+    },
+    {
+      "id": "dried_fish",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/dried_fish.glb",
+      "triangles": 600,
+      "tile": [0, 3072, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/dried_fish_tripo.glb"
+    },
+    {
+      "id": "bard_instruments",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/bard_instruments.glb",
+      "triangles": 600,
+      "tile": [512, 3072, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/bard_instruments_tripo.glb"
+    },
+    {
+      "id": "wine_rack",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/wine_rack.glb",
+      "triangles": 600,
+      "tile": [1024, 3072, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/wine_rack_tripo.glb"
+    },
+    {
+      "id": "rack_barrel",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/rack_barrel.glb",
+      "triangles": 260,
+      "tile": [1536, 3072, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/rack_barrel_tripo.glb"
+    },
+    {
+      "id": "firewood_basket",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/firewood_basket.glb",
+      "triangles": 450,
+      "tile": [0, 3584, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/firewood_basket_tripo.glb"
+    },
+    {
+      "id": "ale_jug",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/ale_jug.glb",
+      "triangles": 260,
+      "tile": [512, 3584, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/ale_jug_tripo.glb"
+    },
+    {
+      "id": "hanging_tankards",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/hanging_tankards.glb",
+      "triangles": 700,
+      "tile": [1024, 3584, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/hanging_tankards_tripo.glb"
+    },
+    {
+      "id": "bearskin_rug",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/bearskin_rug.glb",
+      "triangles": 600,
+      "tile": [1536, 3584, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/bearskin_rug_tripo.glb"
+    },
+    {
+      "id": "hearth_cauldron",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/hearth_cauldron.glb",
+      "triangles": 600,
+      "tile": [0, 4096, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/hearth_cauldron_tripo.glb"
+    },
+    {
+      "id": "candelabrum",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/candelabrum.glb",
+      "triangles": 600,
+      "tile": [512, 4096, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/candelabrum_tripo.glb"
+    },
+    {
+      "id": "banner_red",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/banner_red.glb",
+      "triangles": 300,
+      "tile": [1024, 4096, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/banner_red_tripo.glb"
+    },
+    {
+      "id": "banner_green",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/banner_green.glb",
+      "triangles": 300,
+      "tile": [1536, 4096, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/banner_green_tripo.glb"
+    },
+    {
+      "id": "copper_hood",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/copper_hood.glb",
+      "triangles": 700,
+      "tile": [0, 4608, 512],
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/copper_hood_tripo.glb"
+    },
+    {
+      "id": "sign_tankard",
+      "source": "tmp/asset_src/mirefen_tavern_props/low/sign_tankard.glb",
+      "dense": "tmp/asset_src/mirefen_tavern_props/src/sign_tankard_tripo.glb",
+      "triangles": 900,
+      "tile": [512, 4608, 512]
+    }
+  ]
+}

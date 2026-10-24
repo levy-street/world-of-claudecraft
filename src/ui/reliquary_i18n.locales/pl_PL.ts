@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Kotlina Dzikiego Serca',
-    desc: 'Charakterystyczne bronie od Zulgara oraz Kłolorda, Pogromcy Bestii.',
+    desc: 'Charakterystyczna broń od Kłolorda, Pogromcy Bestii, Żarłokwiatu i Zulgara.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroiczna: Kotlina Dzikiego Serca',
-    desc: 'Epiki dostępne wyłącznie heroicznie od Zulgara, Głosu Kotliny.',
+    desc: 'Epickie przedmioty i błyskotki dostępne tylko na heroicznym poziomie od Kłolorda, Pogromcy Bestii, Żarłokwiatu i Zulgara, Głosu Kotliny.',
   },
   conquerors_nythraxis: {
     name: 'Rajd Nythraxis',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, Budzący się Szczyt',
     desc: 'Osobiste epickie łupy od światowego bossa Budzącego się Szczytu.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Pogrzebany Sztygar',
+    desc: 'Łupy wywleczone z kurhanów Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Zawalony Relikwiarz',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galeria Wojny',
-    desc: 'Pięć bojowych zestawów Wojen pierwszego sezonu, teraz sprzedawanych kawałek po kawałku za złoto.',
+    desc: 'Pięć bojowych zestawów Wojny, zdobywanych sztuka po sztuce za honor.',
   },
   conquerors_warfare_armory: {
     name: 'Zbrojownia Wojny',
-    desc: 'Biżuteria i broń Wojny, pierwszy sezon za złoto i dwa talizmany za honor.',
+    desc: 'Biżuteria, bronie i towary Wojny kupione za ciężko wywalczony honor.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galeria Awangardy',

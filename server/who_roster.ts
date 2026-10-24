@@ -14,7 +14,6 @@
 // report the TRUE total so the player knows when a filter would help.
 
 import type { PresenceStatus } from '../src/world_api/social_graph';
-import { type PresenceMode, presenceHiddenFrom } from './presence_privacy';
 
 /** One visible player on the realm, as the Who tab and the chat list see it. */
 export interface WhoRosterRow {
@@ -47,11 +46,10 @@ export interface WhoFrame {
 /** The minimal session view the visibility rule needs. */
 export interface WhoVisibilitySession {
   characterId: number;
+  accountId?: number;
+  blockedAccountIds?: ReadonlySet<number>;
   blockListLoaded: boolean;
   blockedIds: ReadonlySet<number>;
-  /** Presence privacy (server/presence_privacy.ts); absent reads as 'everyone'. */
-  presenceMode?: PresenceMode;
-  friendIds?: ReadonlySet<number>;
 }
 
 /** May `viewer` see `candidate` in /who? Fail closed while the candidate's block
@@ -62,12 +60,15 @@ export function canShowInWho(
   viewer: WhoVisibilitySession,
   candidate: WhoVisibilitySession,
 ): boolean {
-  if (!candidate.blockListLoaded) return false;
+  if (!candidate.blockListLoaded || !viewer.blockListLoaded) return false;
+  if (candidate.accountId !== undefined && viewer.blockedAccountIds?.has(candidate.accountId))
+    return false;
+  if (viewer.accountId !== undefined && candidate.blockedAccountIds?.has(viewer.accountId))
+    return false;
   if (viewer.blockedIds.has(candidate.characterId)) return false;
   if (candidate.characterId !== viewer.characterId && candidate.blockedIds.has(viewer.characterId))
     return false;
-  // The candidate's presence setting hides them like a block would.
-  return !presenceHiddenFrom(candidate, viewer.characterId);
+  return true;
 }
 
 /** Sanitize a player-typed filter: strip control chars and double quotes (the

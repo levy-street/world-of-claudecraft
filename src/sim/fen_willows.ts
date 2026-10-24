@@ -4,11 +4,14 @@
 // the SAME list: the trunk you see is exactly the trunk that blocks you
 // (the reachPalmSpots idiom). Shoreline rings around every pool plus a
 // loose inland scatter; a willow only roots on LEVEL dry ground, clear of
-// roads, props, and the terrain's own scatter rocks. Pure leaf:
+// roads, props, and the terrain's own scatter rocks, with its canopy clear of
+// every painted town building (sim/painted_towns/: a building record's centre
+// says too little about a painted building's reach). Pure leaf:
 // deterministic, memoized, no SimContext.
 
 import { REALM_PROPS, REALM_ZONE } from './content/realm';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from './content/willowfen';
+import { PAINTED_TOWN_SCATTER_PAD, paintedTownReachCovers } from './decoration_exclusions';
 import { hash2 } from './rng';
 import { generateDecorationsInBounds, roadDistance, terrainHeight, WATER_LEVEL } from './world';
 
@@ -61,6 +64,7 @@ export function hollowWillowSpots(seed: number): FenWillow[] {
     if (Math.hypot(x + 60, z - 1004) < 14) return false; // the graveyard
     if (roadDistance(x, z) < 5) return false;
     for (const b of buildings) if (Math.hypot(x - b.x, z - b.z) < 9) return false;
+    if (paintedTownReachCovers(x, z, PAINTED_TOWN_SCATTER_PAD + s * 0.5)) return false;
     for (const d of decor) if (Math.hypot(x - d.x, z - d.z) < d.r + 4) return false;
     for (const r of rocks) if (Math.hypot(x - r.x, z - r.z) < 2.2 * r.scale + 1) return false;
     spots.push({ x, z, y: y - 0.15, s, rot, r: Math.max(0.85, s * 0.14) });
@@ -151,6 +155,7 @@ export function fenWillowSpots(seed: number): FenWillow[] {
     if (Math.hypot(x - hub.x, z - hub.z) < 15) return false;
     if (roadDistance(x, z) < 5) return false;
     if (!clearOfProps(x, z, 2)) return false;
+    if (paintedTownReachCovers(x, z, PAINTED_TOWN_SCATTER_PAD + s * 0.5)) return false;
     if (!clearOfRocks(x, z, 1)) return false;
     spots.push({ x, z, y: y - 0.15, s, rot, r: Math.max(0.85, s * 0.14) });
     return true;

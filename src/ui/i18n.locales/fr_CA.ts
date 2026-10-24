@@ -150,7 +150,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
     'Passif : les coups critiques de tes sorts enflamment la cible et lui infligent 40% des dégâts causés sur 6 s; cet effet se cumule. (Maîtrise du Feu)',
   'entities.abilities.mass_barrier.name': 'Bouclier collectif',
   'entities.abilities.mass_barrier.description':
-    'Pose un bouclier sur toi et sur un maximum de 4 alliés proches dans un rayon de 30 m; chacun absorbe 130 points de dégâts pendant 60 s. (Talent de mage)',
+    'Pose un bouclier sur toi et sur un maximum de 4 alliés proches dans un rayon de 30 m; chacun absorbe {damage} points de dégâts pendant 15 s. (Talent de mage)',
   'entities.abilities.overload.name': 'Surpuissance',
   'entities.abilities.overload.description':
     'Ton prochain sort gagne 40% de puissance, mais coûte 50% de mana de plus. Dure 10 s. (Talent de mage)',

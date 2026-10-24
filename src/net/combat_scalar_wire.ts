@@ -50,6 +50,8 @@ export function applySelfCombatScalars(e: Entity, s: any): void {
   // PvP Resurrect button. Both delta-guarded: an omitted key is unchanged.
   if (s.corpse !== undefined) e.corpsePos = s.corpse ?? null;
   if (s.pvr !== undefined) e.pvpResurrect = s.pvr === 1;
+  // The wait before that offer may be taken, whole seconds (`pvrw`).
+  if (s.pvrw !== undefined) e.pvpResurrectWait = s.pvrw;
   e.weapon = s.weapon ?? e.weapon;
   // offhandWeapon can legitimately BE null (unequipped), so it needs the
   // explicit presence check the other fields above don't: `?? e.X` would keep

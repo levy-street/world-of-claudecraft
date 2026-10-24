@@ -167,7 +167,6 @@ describe('live graphics profile architecture', () => {
 
     const directDeferredProfiles = [
       ['terrain.ts', 'prepareTerrainProfileAssets'],
-      ['water.ts', 'prepareWaterProfileAssets'],
       ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
       ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
       ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
@@ -209,11 +208,20 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/hud/referral_cards/referral_reward_core.ts',
+  'src/ui/hud/courier/courier_core.ts',
+  'src/ui/hud/referral_cards/referral_cards_view.ts',
+  // Whether the "restoring graphics" note shows over the held 3D view.
+  'src/ui/graphics_restore_note_view.ts',
+  'src/ui/ferry_port_map_core.ts',
   'src/ui/frame_presets_core.ts',
+  // The landing select's and first-login prompt's shared graphics-choice policy.
+  'src/ui/graphics_choice_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
+  // A copy's own display name (the World PvP trophy skull's "<name>'s Skull").
+  'src/ui/item_copy_name_core.ts',
   'src/ui/item_combat_tooltip_view.ts',
-  'src/ui/treasure_map_tooltip_view.ts',
   'src/ui/trinket_tooltip_view.ts',
   // The trinket auras' tooltip descriptor and their item-icon art map.
   'src/ui/trinket_aura_effect.ts',
@@ -240,10 +248,12 @@ const UI_PURE_CORES = [
   // bar's own pure view, the transform and glow flags, and the cue edges.
   'src/ui/hud/cooldown_manager/cooldown_manager_view.ts',
   'src/ui/collection_actions_core.ts',
+  'src/ui/hud/cosmetics/buddy_cosmetics_view.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
   'src/ui/hud/faction_reward_tooltip_view.ts',
   'src/ui/hud/treasure/treasure_map_view.ts',
+  'src/ui/hud/treasure/ink_map_picker_view.ts',
   'src/ui/hud/vehicle/vehicle_aim_core.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_view.ts',
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
@@ -257,6 +267,8 @@ const UI_PURE_CORES = [
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',
   'src/ui/map_pan_core.ts',
+  // Which per-zone map backgrounds the HUD keeps (map_bg.ts is its DOM half).
+  'src/ui/map_bg_residency_core.ts',
   'src/ui/mouseover_cast_core.ts',
   'src/ui/world_quest_view.ts',
   'src/ui/world_quest_trace_view.ts',
@@ -275,12 +287,21 @@ const UI_PURE_CORES = [
   // Which zone the overworld map frames (dungeon door, frozen last zone,
   // committed zone, override), lifted out of Hud.updateMapWindow.
   'src/ui/hud/map/map_zone_focus_core.ts',
+  // The resizable map's canvas backing side (map_canvas_size_controller.ts
+  // feeds it the ResizeObserver content box).
+  'src/ui/hud/map/map_canvas_size_core.ts',
+  // The atlas rail width: clamp, drag and key steps (map_rail_resize_controller.ts
+  // applies it as --map-rail-width).
+  'src/ui/hud/map/map_rail_width_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
   'src/ui/leaderboard_podium_html.ts',
   'src/ui/leaderboard_board_html.ts',
   'src/ui/weekly_quests_view.ts',
+  'src/ui/hud/guild_hall/guild_hall_view.ts',
+  'src/ui/hud/guild_hall/guild_quartermaster_view.ts',
+  'src/ui/hud/quest/weekly_quest_tracker_view.ts',
   'src/ui/world_quest_wisp_maze_view.ts',
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
@@ -315,6 +336,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/death_recap_view.ts',
+  'src/ui/death_screen_view.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
@@ -333,6 +355,9 @@ const UI_PURE_CORES = [
   // Which body a player entity's frame shows (mech, composed, stock) and the
   // matching rule for a landed portrait; unit_portrait_painter.ts draws it.
   'src/ui/player_portrait_core.ts',
+  // Its sibling for everyone else a frame can hold: an authored face, committed
+  // mob art or the crest, and the matching rule for a landed face.
+  'src/ui/nonplayer_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
@@ -351,18 +376,26 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_strip_core.ts',
   'src/ui/hud/action_bar/item_bags_line_core.ts',
   'src/ui/hud/quest/clue_talk_row_core.ts',
+  'src/ui/hud/quest/dungeon_guide_dialog_core.ts',
+  'src/ui/hud/dungeon/dungeon_guide_speech_view.ts',
   'src/ui/hud/action_bar/trinket_slot_core.ts',
-  'src/ui/hud/action_bar/slot_edit_hints_core.ts',
+  'src/ui/hud/action_bar/action_bar_item_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
   'src/ui/hud/pet_bar_core.ts',
+  'src/ui/hud/shardpike/shardpike_bar_view.ts',
+  'src/ui/hud/shardpike/shardpike_prompt_view.ts',
+  'src/ui/hud/shardpike/shardpike_lean_view.ts',
+  'src/ui/hud/action_bar/pet_slot_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
   'src/ui/hud/aura_tracks/aura_track_view.ts',
   'src/ui/hud/quest/master_craft_core.ts',
+  'src/ui/hud/quest/hearthstone_attune_row_core.ts',
   // The world quest entry banner model (the #banner 'worldQuest' plate).
   'src/ui/hud/quest/world_quest_banner_view.ts',
+  'src/ui/hud/quest/quest_reward_choice_view.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/rift/rift_map_core.ts',
@@ -370,6 +403,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_boss_guide_view.ts',
+  'src/ui/boss_journal/journal_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',
@@ -389,6 +423,7 @@ const UI_PURE_CORES = [
   'src/ui/keybind_action_names_core.ts',
   'src/ui/keybind_device_notes_core.ts',
   'src/ui/keyboard_layout_pref_core.ts',
+  'src/ui/keyboard_layout_convert_core.ts',
   'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
@@ -399,8 +434,12 @@ const UI_PURE_CORES = [
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/preview_prewarm_core.ts',
+  // The phone creator's one-time pinch hint: its phases and its stored flag.
+  'src/ui/preview_touch_hint_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
+  // Which player menu a Social row right-click opens (self / unit frame / by name).
+  'src/ui/social_row_menu_core.ts',
   'src/ui/guild_ranks_view.ts',
   'src/ui/who_tab_view.ts',
   'src/ui/tab_strip_view.ts',
@@ -453,6 +492,8 @@ const UI_PURE_CORES = [
   'src/ui/vault_view.ts',
   'src/ui/weekly_rewards_view.ts',
   'src/ui/bank_tabs_view.ts',
+  'src/ui/character_membership_view.ts',
+  'src/ui/account_bank_view.ts',
   'src/ui/vault_search.ts',
   'src/ui/guild_bank_log_view.ts',
   'src/ui/guild_bank_view.ts',
@@ -566,10 +607,12 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/professions_view.ts',
   'src/ui/tutorial_greeting_view.ts',
   'src/ui/bootcamp_view.ts',
+  'src/ui/zone_announcement_core.ts',
   'src/ui/coach_prompt_view.ts',
   'src/ui/objective_glow_view.ts',
   'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
+  'src/ui/market_consumable_sources_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
@@ -603,14 +646,18 @@ const UI_PURE_CORES = [
   'src/ui/mail_parcel_sources_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
+  // Gearscore: the average worn item level (character sheet + inspect).
+  'src/ui/gear_score_view.ts',
   'src/ui/masterwrought_cap_view.ts',
   'src/ui/char_stats_view.ts',
   // The live world -> stat-sheet model bridge (extracted from Hud.statModel).
   'src/ui/char_stat_model_core.ts',
+  'src/ui/worn_item_definition_core.ts',
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
   'src/ui/dungeon_map_view.ts',
+  'src/ui/field_map_view.ts',
   'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
@@ -626,15 +673,54 @@ const UI_PURE_CORES = [
   'src/ui/quest_tracking_core.ts',
   'src/ui/quest_map_location_core.ts',
   'src/ui/arena_window_view.ts',
+  'src/ui/collections/collections_view.ts',
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/pvp_hostile_core.ts',
+  'src/ui/pvp_risk_core.ts',
   'src/ui/dungeon_finder_view.ts',
+  'src/ui/dungeon_catalogue_view.ts',
+  'src/ui/dungeon_loot_preview_view.ts',
+  'src/ui/hud/expeditions/expedition_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/world_pvp/world_pvp_window_view.ts',
+  // The World PvP Skull Bag pane's rows and signature, and the bag's tooltip line.
+  'src/ui/hud/skull_bag/skull_bag_view.ts',
+  'src/ui/hud/skull_bag/skull_bag_tooltip_view.ts',
+  // The potion Use lines of the item tooltip, moved out of Hud.itemTooltip.
+  'src/ui/potion_tooltip_view.ts',
   'src/ui/hud/hill/hill_bar_view.ts',
+  // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
+  'src/ui/hud/dungeon/cage_escape_view.ts',
+  // Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair).
+  'src/ui/hud/dungeon/gaol_chain_view.ts',
+  // The shared encounter alert family's view contract, and the floating
+  // combat text's avoidance word.
+  'src/ui/hud/dungeon/encounter_alert_view.ts',
+  'src/ui/hud/dungeon/fct_avoidance_core.ts',
+  // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
+  'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
+  'src/ui/hud/dungeon/bastion_alert_view.ts',
+  // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
+  // scene scan.
+  'src/ui/hud/dungeon/sanctum_alert_view.ts',
+  'src/ui/hud/dungeon/sanctum_alert_scene_core.ts',
+  // The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the
+  // Open Grave, Morthen's Rite Ring, the Knell's half, the Toll and Harmony
+  // readouts) and its scene scan.
+  'src/ui/hud/dungeon/crypt_alert_view.ts',
+  'src/ui/hud/dungeon/crypt_alert_scene_core.ts',
+  // The trash engine's use prompt (a Soul Brazier to topple) and its scene scan.
+  'src/ui/hud/dungeon/kit_use_prompt_view.ts',
+  // Which dungeon prompt the "Dungeon mechanic hints" setting governs, and who
+  // holds the prompts' shared slot.
+  'src/ui/hud/dungeon/dungeon_prompt_policy_core.ts',
+  // The dungeon objectives tracker (the plate and its boss rows): what it
+  // shows, and which rows a kill just lit.
+  'src/ui/hud/dungeon/dungeon_tracker_view.ts',
   // The death screens: which of the Release overlay, PvP Resurrect button and
   // ghost surfaces show (src/ui/hud/death).
   'src/ui/hud/death/death_prompt_view.ts',
@@ -704,6 +790,7 @@ const UI_PURE_CORES = [
   // class div, nothing else.
   'src/ui/tooltip_line_core.ts',
   'src/ui/fct_core.ts',
+  'src/ui/fct_emphasis_core.ts',
   'src/ui/fct_event.ts',
   // Which authored contact beat a damage floater rides, and how long it waits. The
   // beat table is INJECTED by the painter (it lives in src/game, a layer a pure core
@@ -712,6 +799,9 @@ const UI_PURE_CORES = [
   'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
+  'src/ui/boot_splash_core.ts',
+  // Which boot a home page load takes, and the landing's touch-interface answer.
+  'src/ui/landing_first_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_reflow_core.ts',
   'src/ui/window_resize_core.ts',
@@ -797,7 +887,175 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/courier_visual_core.ts',
+  // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
+  'src/render/mount_embers_core.ts',
+  // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
+  'src/render/mount_rear_core.ts',
+  // the per-skin swing trail lookup (renderer.ts triggerAttack)
+  'src/render/weapon_skin_trail_core.ts',
+  // the ambient motes' fade around the local player (motes.ts)
+  'src/render/motes_keepout_core.ts',
+  // Was a click aimed at a body: the pick ray against its visible core.
+  'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
+  // the indoor chase-camera clamp's walk through a building's air (interior_camera.ts)
+  'src/render/interior_camera_core.ts',
+  // the chase camera's floor (ground, rift tier, maze hedges), out of renderer.ts
+  'src/render/chase_camera_floor_core.ts',
+  // the air of a walk-in placed town building (its rooms and doors) for the indoor camera
+  'src/render/placed_town_interior_core.ts',
+  'src/render/highwatch_guild_trophies_core.ts',
+  // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
+  'src/render/body_emote_core.ts',
+  // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
+  'src/render/far_lod_latch_core.ts',
+  // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).
+  'src/render/hollow_crypt/crypt_boss_fx_core.ts',
+  // Cantor Ilvane's Dirge plan (swell, voices, the shock of sound, the marks).
+  'src/render/hollow_crypt/ilvane_dirge_fx_core.ts',
+  'src/render/hollow_crypt/crypt_finale_fx_core.ts',
+  // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
+  'src/render/hollow_crypt/morthen_fx_core.ts',
+  // Morthen's Rite and the Knellwyrm's Burning Knell: telegraph shapes, candle
+  // looks, the ward's cracks, the Grasp's hands.
+  'src/render/hollow_crypt/morthen_rite_fx_core.ts',
+  // The Gravewyrm Sanctum bosses' Blender bodies, measured, and their gestures.
+  'src/render/gravewyrm_sanctum_bosses/boss_model_core.ts',
+  'src/render/gravewyrm_sanctum_bosses/boss_fx_core.ts',
+  // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
+  // set-dressing and gate-memory cores (docs/design/dungeon-rework).
+  'src/render/authored_field/field_mesh_core.ts',
+  'src/render/authored_field/field_clip_core.ts',
+  'src/render/authored_field/field_skirt_core.ts',
+  'src/render/hollow_crypt/crypt_plan_core.ts',
+  'src/render/hollow_crypt/crypt_kit_plan_core.ts',
+  'src/render/hollow_crypt/crypt_trash_fx_core.ts',
+  // The crypt trash mechanics pass's hero effects (bone pile, rupture, granite, marks).
+  'src/render/hollow_crypt/crypt_trash_kit_fx_core.ts',
+  'src/render/hollow_crypt/crypt_creature_fx_core.ts',
+  'src/render/hollow_crypt/crypt_set_dressing_core.ts',
+  'src/render/hollow_crypt/crypt_gate_state_core.ts',
+  // The Sunken Bastion's dressing, kit placement and headland rock cores.
+  'src/render/sunken_bastion/bastion_plan_core.ts',
+  'src/render/sunken_bastion/bastion_kit_plan_core.ts',
+  'src/render/sunken_bastion/bastion_headland_core.ts',
+  'src/render/sunken_bastion/bastion_fx_core.ts',
+  'src/render/sunken_bastion/bastion_boss_fx_core.ts',
+  'src/render/sunken_bastion/bastion_rain_core.ts',
+  'src/render/sunken_bastion/bastion_creature_fx_core.ts',
+  // The drowned garrison's drips, sprays and death gush.
+  'src/render/sunken_bastion/bastion_drowned_fx_core.ts',
+  // The fifth pass's cage, anchor, shackle and reaper visual plan.
+  'src/render/sunken_bastion/bastion_gaol_reaper_core.ts',
+  // Vael's staging (entrance eruptions, the gathering fog, the scythe flash)
+  // and the hollow shade's ghost predicate renderer.ts asks.
+  'src/render/sunken_bastion/bastion_vael_stage_core.ts',
+  'src/render/sunken_bastion/bastion_shade_ghost_core.ts',
+  'src/render/sunken_bastion/bastion_trash_fx_core.ts',
+  'src/render/sunken_bastion/bastion_order_fx_core.ts',
+  // Olen the fallen paladin's visuals: the brine, the shield, the Sentence, the Oath.
+  'src/render/sunken_bastion/bastion_olen_fx_core.ts',
+  'src/render/sunken_bastion/bastion_ghost_fx_core.ts',
+  // The Drowning Yard's Mooring Post lamps: lit, dark, kindling, the flare, the ring.
+  'src/render/sunken_bastion/bastion_mooring_core.ts',
+  'src/render/authored_field/field_edge_plan_core.ts',
+  'src/render/drowned_temple/temple_plan_core.ts',
+  'src/render/drowned_temple/temple_kit_plan_core.ts',
+  // The Wildheart Basin kit's placement plan (props, lips, caldera, gorge, pyramid).
+  'src/render/wildheart_basin/basin_kit_plan_core.ts',
+  // The Wildheart Basin's plan (sun, falls, rainbows, river, lights, life, gate curves)
+  // and its telegraph and creature-effect specs.
+  'src/render/wildheart_basin/basin_plan_core.ts',
+  'src/render/wildheart_basin/basin_fx_core.ts',
+  // The basin's three boss encounters: cast specs from the sim tuning, aura
+  // dressing, the spirit cord, the pods' swell and the seeds' arc.
+  'src/render/wildheart_basin/basin_boss_fx_core.ts',
+  // The Great Saurian's Blender body (its measured model facts and clip beats)
+  // and its body effects' plan (the beats, the tail sweep, the splash curves).
+  'src/render/wildheart_basin/saurian_model_core.ts',
+  'src/render/wildheart_basin/saurian_fx_core.ts',
+  // The Fanglord's Great Jaguar's Blender body (its measured facts and beats), and
+  // the dazed loop a stunned body holds (ClipMap.stunned).
+  'src/render/wildheart_basin/jaguar_model_core.ts',
+  'src/render/wildheart_basin/zulgar_avatar_core.ts',
+  'src/render/wildheart_basin/bond_cord_core.ts',
+  'src/render/wildheart_basin/basin_fire_core.ts',
+  'src/render/characters/stun_idle_core.ts',
+  // The Gorgebloom's Blender body (its measured anchors and beats) and its body
+  // effects' plan (beats, clip rates, the lash's thorn wave, the glow pulses),
+  // the rooted turn in place (ClipMap.turn) and the gesture-flared glow map.
+  'src/render/wildheart_basin/gorgebloom_model_core.ts',
+  'src/render/wildheart_basin/gorgebloom_fx_core.ts',
+  // The Snarlvine Lasher's and the Thorn Sprout's bodies and the Lasher's lash
+  // lane, and the thorn waves both lashes tear down their lanes.
+  'src/render/wildheart_basin/lasher_model_core.ts',
+  'src/render/wildheart_basin/lasher_fx_core.ts',
+  'src/render/wildheart_basin/basin_thorns_core.ts',
+  // The trash hunt (the trash mechanics pass): its telegraphs, shocks, marks,
+  // tongue and clip rates, all read off the sim's templates.
+  'src/render/wildheart_basin/basin_trash_fx_core.ts',
+  'src/render/wildheart_basin/basin_trash_model_core.ts',
+  'src/render/wildheart_basin/maw_glow_core.ts',
+  // The Gravewyrm Sanctum's Sledge Tusker body and sledge (measured facts,
+  // clip beats, the sledge's trailer drag and the bowls onto their patches)
+  // and its creature effects' plan (telegraph specs, the Trample lane's
+  // length, the object looks, the palette and the timelines).
+  'src/render/gravewyrm_sanctum_fx/tusker_model_core.ts',
+  'src/render/gravewyrm_sanctum_fx/sanctum_fx_core.ts',
+  // The trash engine's visuals: the catalog swept from the kits, the hazard
+  // looks, the wall box, the nova's sight reach and wave, the use hint, the
+  // freeze and encase timelines, the quench pools' placement.
+  'src/render/trash_engine_fx/trash_engine_fx_core.ts',
+  // The line-of-sight field's dense draped layout (shared by the nova and the Dirge).
+  'src/render/trash_engine_fx/sight_field_core.ts',
+  'src/render/characters/turn_in_place_core.ts',
+  'src/render/characters/glow_pulse_core.ts',
+  // Creased smooth normals for a faceted rig (VisualDef.smoothNormals).
+  'src/render/characters/smooth_normals_core.ts',
+  'src/render/drowned_temple/temple_shore_core.ts',
+  'src/render/drowned_temple/temple_fx_core.ts',
+  // Laverock's finale on the Moon Altar (the fallen rising as moonlight).
+  'src/render/drowned_temple/temple_cantor_finale_core.ts',
+  // The trash kit's death-burst rings: their look and their fuse.
+  'src/render/death_burst_fx_core.ts',
+  // The Gravewyrm Sanctum (render/gravewyrm_sanctum): the palette, fires and
+  // air spots; the Calving Face's frame, swap seam and stage curves; the
+  // story-step memory; the Smith's chains; the kit placement plan; the gates'
+  // motion; the lake's plate cells; the fires' counts; the Thaw Works' marks.
+  'src/render/gravewyrm_sanctum/sanctum_plan_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_face_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_story_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_chains_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_kit_plan_core.ts',
+  // The interior AAA pass's placement plan (the second kit, zone by zone).
+  'src/render/gravewyrm_sanctum/sanctum_interior_plan_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_gates_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_works_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_surface_wear_core.ts',
+  'src/render/drowned_temple/temple_rising_stair_core.ts',
+  // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
+  'src/render/drowned_temple/temple_tsunami_core.ts',
+  // The Mere Hydra's neck fold, regrowth rise and orphaned breath pours.
+  'src/render/drowned_temple/temple_hydra_neck_core.ts',
+  // The Temple encounter pass: the Combined Breath's floor marks, wall and
+  // crystals, Ysolei's moon (its swell, eclipse and ward cracks), the
+  // Moonmantle Ray's glide and wingbeat, and the Moonbridge's beam timeline.
+  'src/render/drowned_temple/temple_hydra_combo_core.ts',
+  'src/render/drowned_temple/temple_moon_core.ts',
+  'src/render/drowned_temple/temple_manta_core.ts',
+  'src/render/drowned_temple/temple_moonbridge_core.ts',
+  // The Temple trash mechanics pass: the vigil bubble, the oath, the echo,
+  // the gaze eye and veil, the whirlpool, the spark's arcs and the swell.
+  'src/render/drowned_temple/temple_trash_fx_core.ts',
+  'src/render/drowned_temple/temple_lure_fx_core.ts',
+  // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
+  'src/render/floor_telegraph/telegraph_look_core.ts',
+  // where a body sitting on a seat is drawn, and which seat a screen ray points at
+  'src/render/seated_pose_core.ts',
+  'src/render/seat_pick_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
@@ -831,6 +1089,23 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_room_themes_core.ts',
   'src/render/hoard_tide_wave_fx_core.ts',
   'src/render/hoard_entrance_core.ts',
+  // The Gravewyrm Sanctum Seal Gate's cosmetic plan (mist flow, rime fan).
+  'src/render/sanctum_seal_gate_core.ts',
+  // The Sunken Bastion's Drowned Gate Tower: the Fogbeacon's turn, the flooded
+  // passage's trace, the marsh fog's puffs and the gate sprites.
+  'src/render/sunken_bastion_entrance_core.ts',
+  // What a built set piece puts between the chase camera and the character:
+  // one occluder box per collider row, tested with the fade family's own test.
+  'src/render/set_piece_occluders_core.ts',
+  // The Hollow Crypt's Fallen Chapel: the virtual stair trace, the grave
+  // mist's puffs and the spirit sprites (flames, motes, wisps, rose glow).
+  'src/render/hollow_crypt_entrance_core.ts',
+  // The Drowned Temple's Moon Stair: the moonrise's clock, the pool's moon and
+  // its parallax, the mirror's sight of the gate, the mist and the sprites.
+  'src/render/drowned_temple_entrance_core.ts',
+  // The Wildheart Basin's Jaguar Maw: the idol's breath, the flooded throat's
+  // trace, the mist's puffs and the maw's sprites.
+  'src/render/wildheart_basin_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',
@@ -842,9 +1117,18 @@ const RENDER_PURE_CORES = [
   'src/render/wickharbor_wharf_core.ts',
   'src/render/wickharbor_harbor_core.ts',
   'src/render/wyrmwatch_harbor_house_core.ts',
+  'src/render/mirefen_tavern_core.ts',
+  // the tavern's air for the indoor chase camera (interior_camera_core.ts is registered above)
+  'src/render/mirefen_tavern_interior_core.ts',
+  // the tavern's dog breathing on its porch and its chimney smoke
+  'src/render/mirefen_tavern_dog_core.ts',
+  'src/render/mirefen_tavern_smoke_core.ts',
+  // the tavern's wall fire laid out in its fireplace's mouth
+  'src/render/mirefen_tavern_wall_fire_core.ts',
   'src/render/ship_wake_core.ts',
   'src/render/water_approach_core.ts',
   'src/render/view_candidate_scan_core.ts',
+  'src/render/required_views_core.ts',
   'src/render/wisp_maze_core.ts',
   // the maze kit's dressing plan (hedge piece per wall cell, gates, lanterns)
   'src/render/wisp_maze_kit_core.ts',
@@ -853,12 +1137,18 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_detection_core.ts',
   'src/render/world_quest_public_trace_core.ts',
   'src/render/world_quest_trace_core.ts',
+  'src/render/assets/load_priority_core.ts',
+  'src/render/voxel_identity_core.ts',
+  'src/render/cut_cavity_tile_core.ts',
+  'src/render/rail_tracks_core.ts',
+  'src/render/terrain_paint_interior_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',
   'src/render/wall_backface_cull_core.ts',
   'src/render/dais_blocks_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
+  'src/render/open_air_field_visibility_core.ts',
   'src/render/rift_platform_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/nythraxis_bound_cage_core.ts',
@@ -873,6 +1163,21 @@ const RENDER_PURE_CORES = [
   'src/render/delve_interior_cache_core.ts',
   'src/render/entity_gate_stand_in_core.ts',
   'src/render/entity_ground_sample_core.ts',
+  'src/render/balgath_aura_core.ts',
+  'src/render/balgath_death_fx_core.ts',
+  'src/render/balgath_debris_core.ts',
+  'src/render/characters/charge_glow_core.ts',
+  'src/render/characters/eye_glow_core.ts',
+  'src/render/characters/aura_idle_core.ts',
+  'src/render/characters/effigy_rig_core.ts',
+  'src/render/balgath_fx_core.ts',
+  'src/render/balgath_loot_relics_core.ts',
+  'src/render/balgath_ranged_fx_core.ts',
+  'src/render/balgath_starwake_fx_core.ts',
+  'src/render/shardpike_throw_core.ts',
+  'src/render/boss_impostor_core.ts',
+  'src/render/eye_ward_marker_core.ts',
+  'src/render/ground_puff_color_core.ts',
   'src/render/entity_view_policy_core.ts',
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
@@ -885,22 +1190,42 @@ const RENDER_PURE_CORES = [
   'src/render/initial_frame_core.ts',
   'src/render/character_cull_core.ts',
   'src/render/characters/anim_state_entity_core.ts',
+  'src/render/characters/combat_brace_core.ts',
+  'src/render/characters/weapon_loadout_core.ts',
+  'src/render/characters/held_item_size_core.ts',
+  'src/render/characters/attack_swing_core.ts',
+  'src/render/characters/woc_autoattack_core.ts',
+  'src/render/characters/woc_armor_core.ts',
+  'src/render/characters/woc_armor_merge_core.ts',
   'src/render/characters/death_grounding_core.ts',
   'src/render/characters/stonebound_shell_core.ts',
   'src/render/characters/form_adornment_core.ts',
+  // Gloamveil (the Shadow priest's form): the climbing dark on the body (the
+  // tongue tables, the cast surge and entry, the shader text and its CPU twin),
+  // then the floor and smoke layer around it (what each tier keeps, where a
+  // stain lies and when it is laid, the smoke pool and its eviction).
+  'src/render/characters/gloam_climb_core.ts',
+  'src/render/gloam_field_core.ts',
+  'src/render/gloam_pool_core.ts',
+  'src/render/gloam_smoke_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',
+  'src/render/scenery_geometry_lod_core.ts',
+  'src/render/scenery_detail_core.ts',
+  'src/render/scenery_bands/policy_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/quest_beacon_core.ts',
   'src/render/coach_trail_core.ts',
   'src/render/eastbrook_wolves_guidance_core.ts',
+  'src/render/wolf_hunt_area_core.ts',
   'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
-  'src/render/characters/soul_rend_prewarm_core.ts',
+  'src/render/characters/preview_armor_detail_core.ts',
+  'src/render/characters/preview_touch_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/view_vfx_pose_core.ts',
   'src/render/live_program_watch_core.ts',
@@ -918,18 +1243,45 @@ const RENDER_PURE_CORES = [
   'src/render/shader_warmup_gl_core.ts',
   'src/render/realm_builder_monument_fx_core.ts',
   'src/render/reveal_gate_core.ts',
+  // The WebGL context-restore registry and pass sequencing (context_restore.ts
+  // is its host).
+  'src/render/context_restore_core.ts',
   'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
   'src/render/foliage_prewarm_twins_core.ts',
-  'src/render/character_effect_prewarm_core.ts',
   'src/render/frame_ms_stats_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',
   'src/render/characters/far_lod_reveal_core.ts',
+  'src/render/characters/woc_parts_core.ts',
+  'src/render/characters/woc_entry_core.ts',
+  'src/render/characters/woc_crowd_prefetch_core.ts',
+  'src/render/characters/woc_idle_cache_core.ts',
+  'src/render/characters/woc_head_look_core.ts',
+  'src/render/characters/woc_head_stream_core.ts',
+  'src/render/characters/woc_head_merge_core.ts',
+  'src/render/characters/woc_head_merge_proof_core.ts',
+  'src/render/characters/woc_far_head_core.ts',
+  'src/render/characters/woc_shadow_stand_in_core.ts',
+  'src/render/characters/woc_skin_tint_core.ts',
+  'src/render/characters/woc_tint_hsv_core.ts',
+  'src/render/characters/woc_lod_core.ts',
+  'src/render/assets/load_queue_core.ts',
+  'src/render/assets/geometry_lod_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
+  // Palette lab (?palette=on dev tool): per-zone ground overrides the terrain
+  // caches re-read, and the zone-look model, display solver and export.
+  'src/render/ground_palette_override_core.ts',
+  'src/render/meadow_fullness_core.ts',
+  'src/render/palette_lab/zone_look_core.ts',
+  'src/render/spell_lab/spell_lab_catalog_core.ts',
+  'src/render/ocean/ocean_spectrum_core.ts',
+  'src/render/ocean/ocean_foam_core.ts',
+  'src/render/ocean/water_character_core.ts',
+  'src/render/ocean/water_liveness_core.ts',
   'src/render/battleground_core.ts',
   'src/render/battleground_fx_core.ts',
   'src/render/battleground_lantern_fx_core.ts',
@@ -1000,6 +1352,11 @@ const RENDER_PURE_CORES = [
   'src/render/ignivar_encounter_core.ts',
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',
+  // A torched mudfin hut's fire: the ten-second flame and smoke timeline and
+  // the particle sampler over the hut (randomness passed in).
+  'src/render/hut_fire_core.ts',
+  // ...and its lit smoke plume: how much smoke, where each puff is (hashed, no rng).
+  'src/render/hut_smoke_core.ts',
   'src/render/stations_core.ts',
   'src/render/mobile_stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
@@ -1012,11 +1369,15 @@ const RENDER_PURE_CORES = [
   'src/render/grass_tuft_cards_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/eastbrook_stall_canopy_core.ts',
   'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
   'src/render/point_light_carriers_core.ts',
   'src/render/final_color_nan_guard_core.ts',
+  // The opt-in cel-shading R&D look (`?cel=on`): URL parse + the toon ramp
+  // patch over three's directional light loop.
+  'src/render/cel_shading_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
@@ -1029,7 +1390,9 @@ const RENDER_PURE_CORES = [
   'src/render/spirit_grade_core.ts',
   'src/render/nameplate_cadence_core.ts',
   'src/render/nameplate_heraldry_core.ts',
+  'src/render/nameplate_tag_fill_core.ts',
   'src/render/nameplate_dots_core.ts',
+  'src/render/nameplate_cooldowns_core.ts',
   'src/render/nameplate_friendly_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
@@ -1066,7 +1429,11 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/static_merge_shadow_core.ts',
+  'src/render/target_highlight_core.ts',
   'src/render/terrain_region_core.ts',
+  // The chunk grid's world box (shipped box, or an authored map's own rect
+  // plus outskirts): pure arithmetic over the active zones and stamps.
+  'src/render/terrain_grid_core.ts',
   'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
   'src/render/vehicle_exhaust_core.ts',
@@ -1076,7 +1443,6 @@ const RENDER_PURE_CORES = [
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
   'src/render/water_coverage_core.ts',
-  'src/render/water_wave_core.ts',
   'src/render/weather_field_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',
@@ -1098,6 +1464,7 @@ const RENDER_PURE_CORES = [
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
+  'src/render/characters/form_visual_slots_core.ts',
   'src/render/characters/metamorph_wing_motion_core.ts',
   'src/render/warlock_meteor_fx_core.ts',
   'src/render/weapon_vfx_apply_queue_core.ts',
@@ -1105,15 +1472,43 @@ const RENDER_PURE_CORES = [
   'src/render/zone_dressing_lod_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/zone_eviction_core.ts',
+  'src/render/drakelands_kit_lane_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
   'src/render/cast_vfx_readiness_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/material_program_shape_core.ts',
   'src/render/characters/far_bake_groups_core.ts',
+  'src/render/characters/spirit_veil_family_core.ts',
+  'src/render/characters/spirit_veil_palette_core.ts',
+  'src/render/ghost_style_core.ts',
   'src/render/characters/modular_name_facts_core.ts',
   'src/render/characters/morph_union_core.ts',
+  'src/render/characters/rift_body_stream_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
+  'src/render/characters/composed_variant_residency_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
+  // FORK (Studio) pure cores.
+  'src/render/foliage_far_placements_core.ts',
+  'src/render/decal_stream_core.ts',
+  // renderer.ts extractions: the authored-map layer.
+  'src/render/authored_map/chase_boom_core.ts',
+  'src/render/authored_map/gameplay_fog_core.ts',
+  'src/render/authored_map/lighting_rig_core.ts',
+  'src/render/authored_map/shadow_cache_core.ts',
+  'src/render/authored_map/underworld_core.ts',
+  'src/render/authored_map/zone_atmosphere_core.ts',
+  'src/render/authored_map/zone_residency_core.ts',
+  'src/render/placed_batch_core.ts',
+  'src/render/placed_sprite_pick_core.ts',
+  'src/render/placed_texture_tier_core.ts',
+  'src/render/city_clutter_core.ts',
+  'src/render/terrain_cut_clip_core.ts',
+  'src/render/terrain_cut_rim_core.ts',
+  'src/render/cut_cavity_core.ts',
+  'src/render/grass_edge_taper_core.ts',
+  'src/render/grass_interaction_core.ts',
+  'src/render/sprites_buddy_flame_core.ts',
+  'src/render/characters/decal_texture_size_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -2652,7 +3047,26 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/hud/referral_cards/referral_reward_celebration_window.ts',
+  'src/ui/hud/referral_cards/referral_cards_controller.ts',
+  'src/ui/hud/referral_cards/referral_cards_hud_controller.ts',
+  'src/ui/hud/expeditions/finder_surfaces.ts',
+  'src/ui/hud/expeditions/expedition_controller.ts',
+  'src/ui/hud/expeditions/notification_sound.ts',
+  // Mints the "restoring graphics" status line and toggles it on the context
+  // restore hold's edges.
+  'src/ui/graphics_restore_note_controller.ts',
+  'src/ui/tooltip_binding.ts',
+  // The Skull Bag sub-inventory pane the bags window docks (createElement only).
+  'src/ui/hud/skull_bag/skull_bag_pane_controller.ts',
   'src/ui/error_toast_controller.ts',
+  'src/ui/boot_splash.ts',
+  // The first-login graphics prompt: a top-level pre-game modal reading the URL and navigator.
+  'src/ui/graphics_choice_prompt.ts',
+  // The landing-first boot (body classes, splash lift, prefetch, held clicks) and the
+  // characters-created counter it shares with main.ts.
+  'src/ui/landing_first.ts',
+  'src/ui/project_stats.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
   'src/ui/frame_presets_controls.ts',
@@ -2662,14 +3076,24 @@ const UI_DOM_MODULES = [
   // Mints the shared unit and bag-stack step buttons around a number input and
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
+  'src/ui/canvas_dpr.ts', // Reads the display's device pixel ratio.
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',
+  // Owns a ResizeObserver over the map canvas and writes its backing store.
+  'src/ui/hud/map/map_canvas_size_controller.ts',
+  // Hud's map-window sizing wiring: a ResizeObserver over #map-window that
+  // re-reads the stored rail width once settings exist.
+  'src/ui/hud/map/map_window_sizing_wiring.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
+  // Mounts the Cartographer's Ink map picker into #prompt-stack.
+  'src/ui/hud/treasure/ink_map_picker_controller.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
+  // The WOC face builder's painter (its rules are woc_head_builder_model.ts).
+  'src/ui/woc_head_builder.ts',
   // Owns browser state on purpose: it mints the reticle tick ring's root and
   // mounts it, which is exactly the work it exists to keep out of hud.ts. The
   // RULES it wires up are all in the pure cores (reticle_ticks_core,
@@ -2689,20 +3113,29 @@ const UI_DOM_MODULES = [
   'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/membership_bag_socket.ts',
   'src/ui/bank_buy_prompt.ts',
   'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_status_line.ts',
   'src/ui/bank_window.ts',
+  'src/ui/bank_window_lifecycle.ts',
+  'src/ui/account_bank_window.ts',
+  'src/ui/friendship_armour_claim.ts',
   'src/ui/bank_window_focus.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
   'src/ui/hud/action_bar/action_bar_bind_banner.ts',
   'src/ui/weekly_quests_window.ts',
+  'src/ui/hud/guild_hall/guild_hall_window.ts',
+  'src/ui/hud/guild_hall/guild_offer_stage_controller.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
   'src/ui/hud/action_bar/radial_gesture_controller.ts',
   'src/ui/hud/menu/menu_control_controller.ts',
+  // The pet-bar button builder (Hud.renderPetBar's sockets, their touch hold
+  // and the drag that copies a pet command onto the action bar).
+  'src/ui/hud/pet_bar_button.ts',
   'src/ui/hud/stance/stance_bar_controller.ts',
   'src/ui/hud/stance/stance_control_controller.ts',
   'src/ui/hud/tap_menu.ts',
@@ -2712,6 +3145,11 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  // Key Bindings > Keyboard Layout: mints its own nodes; the conversion lives in
+  // the registered pure core src/ui/keyboard_layout_convert_core.ts.
+  'src/ui/keybind_layout_convert_rows.ts',
+  // Interface > Combat: the subhead and checkbox row shapes (createElement).
+  'src/ui/options_check_rows.ts',
   // Options > Performance > System Report: mints its own nodes (createElement)
   // and reads the desktop bridge for its availability gate. Decisions live in
   // the registered pure core src/ui/host_diag_view.ts; this half is nodes, one
@@ -2719,6 +3157,10 @@ const UI_DOM_MODULES = [
   'src/ui/host_diag_section_controller.ts',
   'src/ui/options_main_menu_controller.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
+  // Composes the dungeon prompt painters (they mount the DOM) and reads the UI
+  // clock once a frame for the Sanctum's Ice Slab cover hint; the decisions
+  // stay in the registered pure cores (sanctum_alert_view, its scene scan).
+  'src/ui/hud/dungeon/dungeon_prompts.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',
@@ -2738,6 +3180,10 @@ const UI_DOM_MODULES = [
   // carries or the by-name sweep that would drop this very row. The double
   // coverage is the deliberate one this file's own header describes.
   'src/ui/daily_rewards_spin_controller.ts',
+  'src/ui/store_subscription.ts',
+  // The rotating promo card above chat: it owns its DOM, a rotation interval,
+  // a retire-guard clock read and the prefers-reduced-motion query.
+  'src/ui/store_promo_card.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',
@@ -2791,6 +3237,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/crucible_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
+  'src/ui/hud/buddy_menu.ts',
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/hud/vendor/warfare_vendor_window.ts',
   'src/ui/hud/woc_trade/woc_trade_controller.ts',
@@ -2843,6 +3290,7 @@ const UI_DOM_MODULES = [
   'src/ui/realm_builder_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
+  'src/ui/fatal_overlay_controller.ts',
   'src/ui/perf_metrics_sampler.ts',
   'src/ui/perf_nudge_toast.ts',
   'src/ui/perf_ornament_svg.ts',
@@ -2855,6 +3303,12 @@ const UI_DOM_MODULES = [
   'src/ui/hud/professions/profession_identity_card.ts',
   'src/ui/hud/professions/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
+  // The launcher turntable's loading silhouette: mints its own layer and SVG
+  // art (the `= document` default) and moves it between stage containers.
+  'src/ui/preview_loading_silhouette.ts',
+  // The phone creator's one-time pinch hint: mints its own tab and glyph (the
+  // `= document` default), remembers the first gesture in localStorage, and times its exit.
+  'src/ui/preview_touch_hint.ts',
   'src/ui/prompt_dialog.ts',
   // The report window body moved whole out of hud.ts (the Phase 9b headroom
   // extraction); it paints #report-window and owns its listeners. Renamed to
@@ -2932,6 +3386,7 @@ const UI_DOM_MODULES = [
   'src/ui/weekly_reward_claim_controller.ts',
   'src/ui/weekly_reward_table_picker_controller.ts',
   'src/ui/weekly_reward_loot_catalog_controller.ts',
+  'src/ui/weekly_reward_loot_focus_controller.ts',
   'src/ui/weekly_rewards_ready_prompt.ts',
   'src/ui/weekly_vault_reveal_controller.ts',
   'src/ui/wiki_link.ts',

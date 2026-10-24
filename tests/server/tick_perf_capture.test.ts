@@ -57,7 +57,9 @@ type MovementTimelineCaptureFields =
   | 'movementDroppedOldestTotal'
   | 'movementRejectedAnchoredWindowTotal'
   | 'movementRejectedSanityBoundTotal'
-  | 'movementResyncsTotal';
+  | 'movementResyncsTotal'
+  | 'movementPlayoutGrowthsTotal'
+  | 'movementPlayoutShrinksTotal';
 type _AdminMirrorCarriesMobScanFields = AssertTrue<
   Pick<ServerPerfCaptureResult, MobScanCaptureFields> extends Pick<
     AdminPerfCaptureResult,
@@ -164,6 +166,8 @@ describe('tick perf capture lifecycle', () => {
       movementRejectedAnchoredWindowTotal: 0,
       movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
+      movementPlayoutGrowthsTotal: 0,
+      movementPlayoutShrinksTotal: 0,
     });
     // The frozen profile reflects the window's samples (7 ms every tick -> mean 7).
     expect(status.last!.profile.phases.total.mean).toBe(7);
@@ -295,10 +299,11 @@ describe('tick perf capture lifecycle', () => {
     }
   });
 
-  it('registers the 35 base lap names first, then the 13 mob-family buckets', () => {
+  it('registers the 36 base lap names first, then the 13 mob-family buckets', () => {
     // Literal pins: the registry is built by mapping the base names plus the buckets
     // through `sim.${n}`, so comparing these literals against the derived array proves
-    // the mapping, not a constant against itself.
+    // the mapping, not a constant against itself. 35 -> 36: the membership bank
+    // courier (5769f2a2596, PR 4281) laps its per-player step as p.courier.
     const base = [
       'sim.respawns',
       'sim.worldBosses',
@@ -312,6 +317,7 @@ describe('tick perf capture lifecycle', () => {
       'sim.p.autoAtk',
       'sim.p.regen',
       'sim.p.auras',
+      'sim.p.courier',
       'sim.mob.update',
       'sim.mob.auras',
       'sim.ent.misc',
@@ -351,12 +357,12 @@ describe('tick perf capture lifecycle', () => {
       'sim.mob.update|reptile',
       'sim.mob.update|other',
     ];
-    expect(base).toHaveLength(35);
+    expect(base).toHaveLength(36);
     expect(buckets).toHaveLength(13);
     // Base names are byte-identical and first; the buckets are appended after and
     // nothing else, so every registered name still reaches the TickProfiler ctor.
-    expect(SIM_LAP_PHASES.slice(0, 35)).toEqual(base);
-    expect(SIM_LAP_PHASES.slice(35)).toEqual(buckets);
+    expect(SIM_LAP_PHASES.slice(0, 36)).toEqual(base);
+    expect(SIM_LAP_PHASES.slice(36)).toEqual(buckets);
     // Each bucket is registered (present in the set the ctor pre-registers).
     const registered = new Set(SIM_LAP_PHASES);
     for (const name of buckets) {
@@ -638,6 +644,8 @@ describe('tick perf capture lifecycle', () => {
       movementRejectedAnchoredWindowTotal: 0,
       movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
+      movementPlayoutGrowthsTotal: 0,
+      movementPlayoutShrinksTotal: 0,
     });
   });
 
@@ -667,6 +675,8 @@ describe('tick perf capture lifecycle', () => {
             lastRejectedAnchoredWindow: number;
             lastRejectedSanityBound: number;
             lastResyncs: number;
+            lastPlayoutGrowths: number;
+            lastPlayoutShrinks: number;
           };
         }
       ).movementTimelineTickStats;
@@ -678,6 +688,8 @@ describe('tick perf capture lifecycle', () => {
       movementStats.lastRejectedAnchoredWindow = 6;
       movementStats.lastRejectedSanityBound = 7;
       movementStats.lastResyncs = 8;
+      movementStats.lastPlayoutGrowths = 9;
+      movementStats.lastPlayoutShrinks = 10;
       // Force the heartbeat branch (tickCount 0 minus -100 clears the 100-tick gap).
       (server as unknown as { lastPerfLogTick: number }).lastPerfLogTick = -100;
       (server as unknown as { maybeLogTickPerf: (ms: number) => void }).maybeLogTickPerf(5);
@@ -693,6 +705,8 @@ describe('tick perf capture lifecycle', () => {
       expect(perfLine).toContain('moveRejectWindow=6');
       expect(perfLine).toContain('moveRejectSanity=7');
       expect(perfLine).toContain('moveResyncs=8');
+      expect(perfLine).toContain('moveGrow=9');
+      expect(perfLine).toContain('moveShrink=10');
     } finally {
       log.mockRestore();
       vi.unstubAllEnvs();

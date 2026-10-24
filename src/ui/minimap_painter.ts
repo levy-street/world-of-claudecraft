@@ -25,18 +25,10 @@
 // named constant.
 
 import { BG_HALF_X, BG_HALF_Z, bgFieldPlanWalls } from '../sim/battleground_layout';
-import {
-  bgOriginAt,
-  isBgPos,
-  WORLD_MAX_X,
-  WORLD_MAX_Z,
-  WORLD_MIN_X,
-  yumiMazeOriginAt,
-} from '../sim/data';
+import { activeWorldStripRegion, bgOriginAt, isBgPos, yumiMazeOriginAt } from '../sim/data';
 import { yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
 import { paintBgFieldAtlas } from './bg_field_relief_core';
-import { drawHillMapMarker } from './hill_map_marker_painter';
 import { drawBgAtlasMarks } from './hud/battleground';
 import {
   EMPTY_MAP_MARKER_ART,
@@ -65,7 +57,10 @@ import type { PainterHostWriters } from './painter_host';
 export const MINIMAP_SIZE = 162;
 // Historical base world scale (px per yard at zoom 1); the zoom multiplier shrinks the
 // world radius shown so markers spread out as you zoom in.
-const MINIMAP_BASE_SCALE = 1.7;
+// Exported alongside MINIMAP_SIZE: the capture-geometry tests project world
+// points through the same px-per-yard the painter draws markers with, so the
+// two have to read one constant rather than each carry a copy.
+export const MINIMAP_BASE_SCALE = 1.7;
 // The circular clip radius is (size / 2 - CLIP_INSET).
 
 // Marker draw dimensions. The tiny procedural family uses silhouette plus color:
@@ -1188,10 +1183,13 @@ export class MinimapPainter {
     // Coarse fallback: the sub-rect of the whole-world background under the
     // player (Hud-owned, +X-left). Covers the border case where the player's
     // view spills into a neighbouring zone the overlay does not.
-    const bgPxPerYard = bg.width / (WORLD_MAX_X - WORLD_MIN_X);
+    // Same rect Hud rendered the plate over (an authored map declares its own
+    // coordinates; the shipped fold addresses ground it does not contain).
+    const strip = activeWorldStripRegion();
+    const bgPxPerYard = bg.width / (strip.maxX - strip.minX);
     const sw = S / (pxPerYard / bgPxPerYard);
-    const sx = (WORLD_MAX_X - p.pos.x) * bgPxPerYard - sw / 2;
-    const sy = (WORLD_MAX_Z - p.pos.z) * bgPxPerYard - sw / 2;
+    const sx = (strip.maxX - p.pos.x) * bgPxPerYard - sw / 2;
+    const sy = (strip.maxZ - p.pos.z) * bgPxPerYard - sw / 2;
     ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
 
     // Sharp overlay: the current zone's own high-res background, placed by its
@@ -1438,24 +1436,6 @@ export class MinimapPainter {
             ctx.lineTo(m.mx + radius * 0.55, m.my);
           }
           ctx.stroke();
-          break;
-        }
-        case 'hill': {
-          ctx.save();
-          ctx.strokeStyle = colors.worldQuestAvailable;
-          ctx.lineWidth = 2;
-          if (m.phase === 'warning') ctx.setLineDash([4, 3]);
-          ctx.beginPath();
-          ctx.arc(m.mx, m.my, m.radius, 0, FULL_CIRCLE);
-          ctx.stroke();
-          ctx.restore();
-          drawHillMapMarker(
-            ctx,
-            m.skull ? { ...m.skull, phase: m.phase } : m,
-            profile === 'compact' ? 6 : 8,
-            colors.worldQuestAvailable,
-            colors.outline,
-          );
           break;
         }
         case 'world-boss': {

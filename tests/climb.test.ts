@@ -438,7 +438,11 @@ describe('the climb against real world geometry', () => {
     // re-laid ground falls northward, and from the south the floor sits
     // inside the silent-vault band (top minus floor 1.963 vs
     // CLIMB_MIN_OVERHEAD 2.025), so the pull-up correctly refuses there.
-    const gy = { x: -2, z: -70 };
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // cemetery moved with the chapel to (37.5, -99.3). Its ground still falls
+    // northward under stone 1, so the approach stays from the north (from the
+    // south, top minus floor is 1.838, a vault again).
+    const gy = { x: 37.5, z: -99.3 };
     const off = graveOffset(1);
     const sx = gy.x + off.x;
     const sz = gy.z + off.z;

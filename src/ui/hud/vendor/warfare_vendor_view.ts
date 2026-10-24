@@ -52,12 +52,16 @@ export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
   'warfare_cinderweave', // cloth, caster
 ];
 
-/** Section keys for the two non-set sections. Set sections key on their set id,
+/** Section keys for the non-set sections. Set sections key on their set id,
  *  so every key in one view is unique and safe to build a focus key from. */
 export const WARFARE_SHOP_JEWELRY_KEY = 'jewelry';
 export const WARFARE_SHOP_WEAPONS_KEY = 'weapons';
+export const WARFARE_SHOP_GOODS_KEY = 'goods';
 export const WARFARE_SHOP_SEASON2_WEAPONS_KEY = 'season2_weapons';
-export const WARFARE_SHOP_SEASON2_JEWELRY_KEY = 'season2_jewelry';
+/** Direct buddy unlocks (kind 'buddy'), currently Horse at both honor vendors. Its own section rather than the jewelry
+ *  fallback: a companion is not gear, carries no slot and no stats, and must
+ *  never read as a piece a set-completion count is waiting on. */
+export const WARFARE_SHOP_COMPANIONS_KEY = 'companions';
 
 /** The NpcDef shape this window gates on. A FLAG, never a hard-coded npc id:
  *  the Heroic Quartermaster is keyed to a single id and a second one would have
@@ -78,17 +82,12 @@ export function isWarfareVendorNpc(def: WarfareVendorNpcFlags | undefined): bool
 export interface WarfareShopOffer {
   itemId: string;
   item: ItemDef;
-  /** Price in Honor for one purchase (Honor is never stack-multiplied); 0 on a
-   *  gold row. */
+  /** Price in Honor for one purchase (Honor is never stack-multiplied). */
   honor: number;
-  /** Price in copper for one purchase: the Season 1 rows sell for gold
-   *  (WARFARE_SEASON1_PRICE_COPPER); 0 on an honor row. */
-  copper: number;
   /** Advisory only: the purchase resolves server-side against the server's own
    *  stock and balance, and this window decides nothing. */
   affordable: boolean;
-  /** True when the viewer already wears this piece or carries it in a bag, so
-   *  the tile can mark it and a mis-tap re-buy is at least visible first. */
+  /** Gear is worn or carried; buddies are permanently collected or pending reveal. */
   owned: boolean;
 }
 
@@ -132,7 +131,7 @@ export interface WarfareShopSetSection {
 }
 
 export interface WarfareShopPlainSection {
-  kind: 'jewelry' | 'weapons';
+  kind: 'jewelry' | 'weapons' | 'companions' | 'goods';
   group: WarfareShopGroup;
   key: string;
   offers: WarfareShopOffer[];
@@ -144,20 +143,17 @@ export interface WarfareShopView {
   sections: WarfareShopSection[];
   /** The viewer's current Honor balance. */
   balance: number;
-  /** The viewer's gold, in copper, when any row sells for gold (so the window
-   *  shows the balance those rows are judged against); null otherwise. */
-  goldBalance: number | null;
 }
 
 export interface WarfareShopViewer {
   honor: number;
-  /** The viewer's gold, in copper: what a Season 1 row's affordability reads. */
-  copper: number;
   /** Item ids the viewer wears OR carries in a bag. See warfareShopViewer below
    *  for what "owns" deliberately does NOT cover (the bank). */
   ownedItemIds: ReadonlySet<string>;
   /** Item ids the viewer currently wears. */
   equippedItemIds: ReadonlySet<string>;
+  /** Collected or pending buddies cannot be bought again. */
+  acquiredBuddyKeys: ReadonlySet<string>;
   /** Distinct-slot member count per set id (itemSetMemberCounts). A set with no
    *  row here falls back to the distinct slots this shop actually sells, so the
    *  denominator is never zero and never invented. */
@@ -172,7 +168,10 @@ export interface WarfareShopViewer {
  *  whole seam: the derivation stays drivable from a Sim-shaped and a
  *  ClientWorld-mirror-shaped stub alike, which is the exact place those two
  *  could quietly diverge. */
-export type WarfareShopWorld = Pick<IWorld, 'honor' | 'copper' | 'inventory' | 'equipment' | 'cfg'>;
+export type WarfareShopWorld = Pick<
+  IWorld,
+  'honor' | 'inventory' | 'equipment' | 'cfg' | 'ownedBuddies' | 'pendingBuddies'
+>;
 
 /**
  * Derive the shop viewer from the world seam: the honor balance, the item ids
@@ -193,31 +192,33 @@ export function warfareShopViewer(
   world: WarfareShopWorld,
 ): Pick<
   WarfareShopViewer,
-  'honor' | 'copper' | 'ownedItemIds' | 'equippedItemIds' | 'viewerClass'
+  'honor' | 'ownedItemIds' | 'equippedItemIds' | 'acquiredBuddyKeys' | 'viewerClass'
 > {
   const equippedItemIds = new Set(
     Object.values(world.equipment).filter((id): id is string => !!id),
   );
   const ownedItemIds = new Set([...equippedItemIds, ...world.inventory.map((slot) => slot.itemId)]);
+  const acquiredBuddyKeys = new Set([...world.ownedBuddies(), ...world.pendingBuddies()]);
   return {
     honor: world.honor,
-    copper: world.copper,
     ownedItemIds,
     equippedItemIds,
+    acquiredBuddyKeys,
     viewerClass: world.cfg.playerClass,
   };
 }
 
 function offerFor(itemId: string, item: ItemDef, viewer: WarfareShopViewer): WarfareShopOffer {
   const honor = Math.max(0, Math.floor(item.priceHonor ?? 0));
-  const copper = Math.max(0, Math.floor(item.buyValue ?? 0));
   return {
     itemId,
     item,
     honor,
-    copper,
-    affordable: viewer.honor >= honor && viewer.copper >= copper,
-    owned: viewer.ownedItemIds.has(itemId),
+    affordable: viewer.honor >= honor,
+    owned:
+      item.kind === 'buddy'
+        ? viewer.acquiredBuddyKeys.has(item.buddy)
+        : viewer.ownedItemIds.has(itemId),
   };
 }
 
@@ -254,26 +255,31 @@ export function buildWarfareVendorView(
   const jewelry: WarfareShopOffer[] = [];
   const weapons: WarfareShopOffer[] = [];
   const seasonWeapons: WarfareShopOffer[] = [];
-  const seasonJewelry: WarfareShopOffer[] = [];
+  const goods: WarfareShopOffer[] = [];
+  const companions: WarfareShopOffer[] = [];
   for (const itemId of stock) {
     const item = items[itemId];
     if (!item) continue;
     const offer = offerFor(itemId, item, viewer);
-    if (offer.honor <= 0 && offer.copper <= 0) continue;
+    if (offer.honor <= 0) continue;
     // Season 2 is class-locked: list only what this viewer can wear.
     if (SEASON2_IDS.has(itemId) && !wearableBy(item, viewer.viewerClass)) continue;
     if (SEASON2_IDS.has(itemId) && item.kind === 'weapon') {
       seasonWeapons.push(offer);
-    } else if (SEASON2_IDS.has(itemId) && !item.set) {
-      // Season 2 neck and rings: their own section in the Season 2 group, so
-      // they never mix into the entry tier's jewelry.
-      seasonJewelry.push(offer);
+    } else if (item.kind === 'buddy') {
+      // Checked before the set arm on purpose: a whistle carries no set tag
+      // today, and if one ever did it would still not be a gear piece.
+      companions.push(offer);
     } else if (item.set) {
       const existing = bySet.get(item.set);
       if (existing) existing.push(offer);
       else bySet.set(item.set, [offer]);
     } else if (item.kind === 'weapon') {
       weapons.push(offer);
+    } else if (!item.slot) {
+      // Nothing to wear (the World PvP Skull Bag): its own Goods section, so
+      // it never reads as jewelry.
+      goods.push(offer);
     } else {
       // Neck and rings: shared across role profiles, so they carry no set tag
       // and the only coherent grouping left is "jewelry".
@@ -295,25 +301,16 @@ export function buildWarfareVendorView(
   ];
 
   const sections: WarfareShopSection[] = [];
-  const pushSeasonWeaponsAndJewelry = () => {
-    if (seasonWeapons.length > 0) {
-      sections.push({
-        kind: 'weapons',
-        group: 'season2',
-        key: WARFARE_SHOP_SEASON2_WEAPONS_KEY,
-        offers: seasonWeapons,
-      });
-    }
-    if (seasonJewelry.length > 0) {
-      sections.push({
-        kind: 'jewelry',
-        group: 'season2',
-        key: WARFARE_SHOP_SEASON2_JEWELRY_KEY,
-        offers: seasonJewelry,
-      });
-    }
+  const pushSeasonWeapons = () => {
+    if (seasonWeapons.length === 0) return;
+    sections.push({
+      kind: 'weapons',
+      group: 'season2',
+      key: WARFARE_SHOP_SEASON2_WEAPONS_KEY,
+      offers: seasonWeapons,
+    });
   };
-  if (seasonSetIds.length === 0) pushSeasonWeaponsAndJewelry();
+  if (seasonSetIds.length === 0) pushSeasonWeapons();
   for (const setId of orderedSetIds) {
     const offers = bySet.get(setId) as WarfareShopOffer[];
     const ownedPieces = distinctSlots(offers, viewer.ownedItemIds);
@@ -344,9 +341,8 @@ export function buildWarfareVendorView(
         ? { pieces: pending.pieces, remaining: pending.pieces - ownedPieces }
         : null,
     });
-    // Season 2 weapons and jewelry close the Season 2 group, before the entry
-    // tier starts.
-    if (setId === seasonSetIds[seasonSetIds.length - 1]) pushSeasonWeaponsAndJewelry();
+    // Season 2 weapons close the Season 2 group, before the entry tier starts.
+    if (setId === seasonSetIds[seasonSetIds.length - 1]) pushSeasonWeapons();
   }
   if (jewelry.length > 0) {
     sections.push({
@@ -364,10 +360,17 @@ export function buildWarfareVendorView(
       offers: weapons,
     });
   }
-  const sellsForGold = sections.some((section) => section.offers.some((o) => o.copper > 0));
-  return {
-    sections,
-    balance: Math.max(0, Math.floor(viewer.honor)),
-    goldBalance: sellsForGold ? Math.max(0, Math.floor(viewer.copper)) : null,
-  };
+  if (goods.length > 0) {
+    sections.push({ kind: 'goods', group: 'entry', key: WARFARE_SHOP_GOODS_KEY, offers: goods });
+  }
+  // Last: the cosmetic row never pushes a gear section down the window.
+  if (companions.length > 0) {
+    sections.push({
+      kind: 'companions',
+      group: 'entry',
+      key: WARFARE_SHOP_COMPANIONS_KEY,
+      offers: companions,
+    });
+  }
+  return { sections, balance: Math.max(0, Math.floor(viewer.honor)) };
 }

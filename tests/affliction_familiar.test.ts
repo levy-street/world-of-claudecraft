@@ -107,10 +107,15 @@ describe('Affliction Maledict Eye familiar', () => {
     expect(familiarSource).toContain('loadGltf(MODEL_URL)');
     // Deferred, never eager: the launch-burst OOM lane (defer_launcher_preloads).
     expect(familiarSource).toContain('registerDeferredPreload(');
-    expect(rendererSource).toContain('new AfflictionFamiliar(() => this.worldCompileGate())');
-    expect(rendererSource).toContain(
-      'this.afflictionFamiliar.update(this.sim, this.views, this.reducedMotion(), this.time)',
+    const localSource = readFileSync(
+      path.join(REPO_ROOT, 'src/render/local_player_visuals.ts'),
+      'utf8',
     );
+    expect(rendererSource).toContain('new LocalPlayerVisuals(');
+    expect(rendererSource).toMatch(/\(\) =>\s*this\.worldCompileGate\(\)/);
+    expect(rendererSource).toContain('this.localVisuals.update(');
+    expect(localSource).toContain('new AfflictionFamiliar(compileGate)');
+    expect(localSource).toContain('this.familiar.update(world, views, reducedMotion, time)');
   });
 
   it('renders Maledict Gaze as an Eye-origin ray instead of a generic projectile', () => {

@@ -1,0 +1,133 @@
+[
+  {
+    "profile": "desktop",
+    "held": [
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 12,
+        "materialSources": [
+          {
+            "source": {
+              "signer": "Ana"
+            },
+            "count": 7
+          },
+          {
+            "source": {
+              "signer": "Bru"
+            },
+            "count": 5
+          }
+        ],
+        "slot": 0
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 10,
+        "materialSources": [
+          {
+            "source": {
+              "signer": "Ana"
+            },
+            "count": 4
+          },
+          {
+            "source": {
+              "signer": "Bru"
+            },
+            "count": 6
+          }
+        ],
+        "slot": 1
+      }
+    ],
+    "picker": "keyboard focus contained; Cancel returns focus to bags; confirm stages selected source"
+  },
+  {
+    "profile": "landscape",
+    "held": [
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 12,
+        "materialSources": [
+          {
+            "source": {
+              "signer": "Ana"
+            },
+            "count": 7
+          },
+          {
+            "source": {
+              "signer": "Bru"
+            },
+            "count": 5
+          }
+        ],
+        "slot": 0
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 10,
+        "materialSources": [
+          {
+            "source": {
+              "signer": "Ana"
+            },
+            "count": 4
+          },
+          {
+            "source": {
+              "signer": "Bru"
+            },
+            "count": 6
+          }
+        ],
+        "slot": 1
+      }
+    ],
+    "picker": "keyboard focus contained; Cancel returns focus to bags; confirm stages selected source"
+  },
+  {
+    "profile": "portrait",
+    "held": [
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 12,
+        "materialSources": [
+          {
+            "source": {
+              "signer": "Ana"
+            },
+            "count": 7
+          },
+          {
+            "source": {
+              "signer": "Bru"
+            },
+            "count": 5
+          }
+        ],
+        "slot": 0
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 10,
+        "materialSources": [
+          {
+            "source": {
+              "signer": "Ana"
+            },
+            "count": 4
+          },
+          {
+            "source": {
+              "signer": "Bru"
+            },
+            "count": 6
+          }
+        ],
+        "slot": 1
+      }
+    ]
+  }
+]

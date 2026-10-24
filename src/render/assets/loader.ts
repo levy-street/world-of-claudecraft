@@ -11,23 +11,51 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
+import { applyVertexColourScale } from '../vertex_colour_glb_parts';
+import { applyFoliageEdgeFade } from './foliage_edge_fade';
+import {
+  BITMAP_DECODE_OPTIONS,
+  browserDecodesImageBitmap,
+  fetchImageBlob,
+} from './image_bitmap_decode';
+import {
+  capCompressedMips,
+  capGltfKtx2Mips,
+  isIosPhoneUserAgent,
+  type Ktx2MipCapProfile,
+  ktx2MipCapFor,
+} from './ktx2_mip_cap';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
+import { type AssetLoadPriority, minimumLoadPriority } from './load_priority_core';
+import { type LoadPriority, LoadQueue } from './load_queue_core';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
+import { shareKitTextures } from './shared_kit_textures';
 import { assetLoadStarted, recordAssetLoad } from './stats';
+import { applyTownSmartToScene } from './town_smart_material';
 import { neutralizeGltfTransmission } from './transmission_neutralize';
+import { wocLodPlugin } from './woc_lod_plugin';
+
+/** A parsed GLB as every consumer receives it: the GLTF minus its parser,
+ *  which loadGltf drops once the post-parse hooks have run (dropGltfParser). */
+export type LoadedGltf = Omit<GLTF, 'parser'>;
 
 let gltfLoader: GLTFLoader | null = null;
-const gltfCache = new Map<string, Promise<GLTF>>();
+const gltfCache = new Map<string, Promise<LoadedGltf>>();
+// A shared file may serve several placements or fragments. The nearest caller
+// wins until its fetch starts; then its priority callbacks are released.
+const gltfPendingPriorities = new Map<string, Set<AssetLoadPriority>>();
+const DEFAULT_LOAD_PRIORITY: AssetLoadPriority = () => 0;
 const texCache = new Map<string, Promise<THREE.Texture>>();
+// Reference-counted holds layered over texCache (see acquireTexture). A plain
+// loadTexture caller pins its key for the session, that is the shipped game's
+// behaviour and the base splat depends on it, so an evictable hold may only
+// dispose a texture nobody pinned.
+const texPinned = new Set<string>();
+const texRefs = new Map<string, number>();
+const bitmapTexCache = new Map<string, Promise<THREE.Texture>>();
 const ktx2TexCache = new Map<string, Promise<THREE.CompressedTexture>>();
-
-interface AssetQueue {
-  active: number;
-  limit: number;
-  pending: (() => void)[];
-}
 
 function constrainedBrowser(): boolean {
   if (typeof navigator === 'undefined') return false;
@@ -37,36 +65,49 @@ function constrainedBrowser(): boolean {
   return (coarse && narrow) || (nav.deviceMemory !== undefined && nav.deviceMemory <= 4);
 }
 
+// Keep large loader callback chains from running in one import-time burst.
+const launchLoad = (start: () => void): void => {
+  globalThis.setTimeout(start, 0);
+};
+
 const constrained = constrainedBrowser();
-const gltfQueue: AssetQueue = { active: 0, limit: constrained ? 2 : 4, pending: [] };
-const textureQueue: AssetQueue = { active: 0, limit: constrained ? 3 : 6, pending: [] };
+// The iPhone mip cap's gate (ktx2_mip_cap.ts), settled once at load from the
+// same user agent GFX.iosMemoryProfile reads, so a graphics rebuild cannot flip
+// it between two parses of the same texture family.
+const ktx2MipCapProfile: Ktx2MipCapProfile = {
+  iosMemoryProfile: GFX.iosMemoryProfile,
+  iosPhone: isIosPhoneUserAgent(typeof navigator !== 'undefined' ? navigator.userAgent : undefined),
+};
+// Which waiting load starts next is load_queue_core.ts: a file somebody needs now ahead of
+// the bulk stream. The GLB queue carries background loads (the post-entry creature stream,
+// the crowd prefetch), and so does the texture queue for a KTX2 atlas fetched ahead of need.
+const gltfQueue = new LoadQueue(constrained ? 2 : 4, launchLoad);
+const textureQueue = new LoadQueue(constrained ? 3 : 6, launchLoad);
 // Single-slot lane for the few very large textures (the biome sky domes, about
 // 1.6 MB compressed at 2k), inherited from the Radiance path this replaced.
 // Their fetch lands on the hitch-sensitive biome-crossing path, and letting two
 // of them race the model and atlas traffic on the shared texture queue is what
 // that serialization was there to prevent.
-const largeTextureQueue: AssetQueue = { active: 0, limit: 1, pending: [] };
+const largeTextureQueue = new LoadQueue(1, launchLoad);
 
-function pumpQueue(q: AssetQueue): void {
-  while (q.active < q.limit && q.pending.length > 0) {
-    const start = q.pending.shift()!;
-    q.active++;
-    // Keep large loader callback chains from running in one import-time burst.
-    globalThis.setTimeout(start, 0);
-  }
-}
-
-function scheduleLoad<T>(q: AssetQueue, run: () => Promise<T>): Promise<T> {
+function scheduleLoad<T>(
+  q: LoadQueue,
+  run: () => Promise<T>,
+  priority?: LoadPriority,
+  key?: string,
+  rank?: AssetLoadPriority,
+): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    q.pending.push(() => {
-      run()
-        .then(resolve, reject)
-        .finally(() => {
-          q.active = Math.max(0, q.active - 1);
-          pumpQueue(q);
-        });
-    });
-    pumpQueue(q);
+    q.push(
+      (background) => {
+        run()
+          .then(resolve, reject)
+          .finally(() => q.release(background));
+      },
+      priority,
+      key,
+      rank,
+    );
   });
 }
 
@@ -97,6 +138,8 @@ function loader(): GLTFLoader {
     // Model textures ship as KTX2 (KHR_texture_basisu): without the transcoder
     // attached, parsing any public/models GLB rejects outright.
     assembled.setKTX2Loader(ktx2Loader());
+    // The WOC character files' coarser levels of detail (woc_lod_plugin.ts).
+    assembled.register(wocLodPlugin);
     gltfLoader = assembled;
   }
   return gltfLoader;
@@ -132,6 +175,19 @@ function polishGltfTextures(gltf: GLTF): void {
   });
 }
 
+// The parser is the only path from a cached GLTF to a copy of the whole binary
+// chunk, the bufferView promise cache (embedded image slices included) and the
+// parsed JSON. Nothing drawn needs it after parse: vertex, index and animation
+// arrays view their own decoded bufferViews, and a texture re-uploads (context
+// restore included) from its image, its mip chain, or the KTX2 restore source
+// that ktx2_mip_release keeps as its own copy. Every consumer shares this one
+// object, so deleting in place frees it for all of them. Pinned, with a ban on
+// src/ readers, by tests/gltf_parser_release.test.ts.
+function dropGltfParser(gltf: GLTF): LoadedGltf {
+  delete (gltf as { parser?: unknown }).parser;
+  return gltf;
+}
+
 // asset fetch start/settle so a device console shows exactly how far through the
 // preload set a WebContent kill lands and which asset preceded it (the iPhone 17
 // Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
@@ -165,44 +221,100 @@ function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): v
   console.info(`[load-diag] ${seq} ${kind} ${ok ? 'done' : 'FAIL'} ${resolved}`);
 }
 
+/** How one GLB request is scheduled. Never part of the cache key: a url is one parse
+ *  however it was asked for. */
+export interface GltfLoadOptions {
+  /** `background`: speculative bulk (the post-entry creature stream, a prefetch), which
+   *  starts only while no file somebody needs now is waiting (load_queue_core.ts).
+   *  Omitted: `demand`. */
+  priority?: LoadPriority;
+  /** Rank INSIDE that class, sampled when a slot frees (load_priority_core.ts): lower
+   *  starts first, equal ranks stay first come first served. The Studio placed-asset
+   *  stream passes its nearest waiting placement's distance, so a moving camera promotes
+   *  the models it is about to reach. Omitted: 0, which is plain arrival order. */
+  rank?: AssetLoadPriority;
+}
+
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
- *  Consumers must treat the result as immutable — clone before mutating. */
-export function loadGltf(url: string): Promise<GLTF> {
+ *  Consumers must treat the result as immutable: clone before mutating.
+ *  A demand for a file whose load still waits as background work promotes it: the
+ *  same promise comes back, and its start joins the demand line. `opts` may also be
+ *  a bare rank callback (the Studio placed-asset stream's form), read as `{ rank }`. */
+export function loadGltf(
+  url: string,
+  opts: GltfLoadOptions | AssetLoadPriority = {},
+): Promise<LoadedGltf> {
+  const { priority, rank } =
+    typeof opts === 'function' ? { priority: undefined, rank: opts } : opts;
+  // "<file>.glb#node:<name>" / "<file>.glb#group:<prefix>" addresses part of a
+  // GLB (a Blender-built building's parts twin, see data/prefab_pieces): the
+  // base file parses once, and the fragment is carved out of it as its own
+  // scene, cached under the full url like any other model.
+  const hash = url.indexOf('#');
+  if (hash > 0) {
+    return loadGltfFragment(url.slice(0, hash), url.slice(hash + 1), url, { priority, rank });
+  }
   const resolved = assetUrl(url);
   let p = gltfCache.get(resolved);
+  gltfPendingPriorities.get(resolved)?.add(rank ?? DEFAULT_LOAD_PRIORITY);
   if (!p) {
+    const priorities = new Set([rank ?? DEFAULT_LOAD_PRIORITY]);
+    gltfPendingPriorities.set(resolved, priorities);
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(gltfQueue, () => {
-      const seq = diagStart('gltf', resolved);
-      return withRetry(
-        () =>
-          new Promise<GLTF>((resolve, reject) => {
-            loader().load(resolved, resolve, undefined, () =>
-              reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
-            );
-          }),
-      ).then(
-        (gltf) => {
-          diagSettle(seq, 'gltf', resolved, true);
-          return gltf;
-        },
-        (err: unknown) => {
-          diagSettle(seq, 'gltf', resolved, false);
-          throw err;
-        },
-      );
-    }).then(
+    p = scheduleLoad(
+      gltfQueue,
+      () => {
+        if (gltfPendingPriorities.get(resolved) === priorities)
+          gltfPendingPriorities.delete(resolved);
+        const seq = diagStart('gltf', resolved);
+        return withRetry(
+          () =>
+            new Promise<GLTF>((resolve, reject) => {
+              loader().load(resolved, resolve, undefined, () =>
+                reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
+              );
+            }),
+        ).then(
+          (gltf) => {
+            diagSettle(seq, 'gltf', resolved, true);
+            return gltf;
+          },
+          (err: unknown) => {
+            diagSettle(seq, 'gltf', resolved, false);
+            throw err;
+          },
+        );
+      },
+      priority,
+      resolved,
+      () => minimumLoadPriority(priorities),
+    ).then(
       (gltf) => {
+        // The Tidehold kit's GLBs share one set of tiling maps: keep one copy
+        // of each on the GPU (shared_kit_textures.ts). Before classification, so
+        // the mip-release registry only ever sees the survivors.
+        shareKitTextures(gltf.scene, resolved);
         polishGltfTextures(gltf);
+        // A painted, vertex-coloured model's colours back above the headroom they are
+        // stored under (vertex_colour_glb_parts.ts), before anything clones its materials.
+        applyVertexColourScale(gltf.scene);
+        // The Tidehold town kit's per-building weathering masks (town_smart_material.ts).
+        applyTownSmartToScene(gltf.scene);
         // Transmissive materials become translucent (transmission_neutralize.ts).
         neutralizeGltfTransmission(gltf);
+        // Kit foliage cards fade out as they turn edge-on (foliage_edge_fade.ts).
+        applyFoliageEdgeFade(gltf.scene);
+        // iPhone only: character-side roots keep their mips at or under 512.
+        // Before classification and before any consumer, so before any upload.
+        const mipCap = ktx2MipCapFor(resolved, ktx2MipCapProfile);
+        if (mipCap !== null) capGltfKtx2Mips(gltf, mipCap);
         // Classify every KTX2 texture for post-upload mip release (world-only
         // categories) or source dismissal (everything a preview/portrait/armory
         // renderer can also upload). Runs here, in the parse's own resolve
         // chain, so classification always precedes the first GPU upload.
         classifyGltfKtx2Textures(gltf, resolved);
         recordAssetLoad('gltf', resolved, startedAt);
-        return gltf;
+        return dropGltfParser(gltf);
       },
       (err: unknown) => {
         recordAssetLoad('gltf', resolved, startedAt, true);
@@ -214,6 +326,8 @@ export function loadGltf(url: string): Promise<GLTF> {
       },
     );
     gltfCache.set(resolved, p);
+  } else if (priority !== 'background') {
+    gltfQueue.promote(resolved);
   }
   return p;
 }
@@ -222,6 +336,74 @@ export function loadGltf(url: string): Promise<GLTF> {
  *  module-owned structures — lets the parsed scene, original geometry and any
  *  duplicate decoded textures be garbage-collected. A later loadGltf for the
  *  same url would simply re-fetch. */
+
+const fragmentCache = new Map<string, Promise<LoadedGltf>>();
+
+/** Carve one node (or every mesh node with a name prefix) out of a parsed GLB.
+ *  `node:` drops the node's own placement so the piece sits in its local
+ *  frame (the prefab-pieces manifest carries where it goes); `group:` keeps
+ *  each matching node's composed transform (the joined shell stays put).
+ *  Geometry and materials are shared with the base parse. */
+function loadGltfFragment(
+  base: string,
+  fragment: string,
+  fullUrl: string,
+  opts: GltfLoadOptions,
+): Promise<LoadedGltf> {
+  const resolvedBase = assetUrl(base);
+  const key = `${resolvedBase}#${fragment}`;
+  let p = fragmentCache.get(key);
+  gltfPendingPriorities.get(resolvedBase)?.add(opts.rank ?? DEFAULT_LOAD_PRIORITY);
+  if (!p) {
+    p = loadGltf(base, opts).then((gltf) => {
+      const scene = new THREE.Group();
+      scene.name = fragment;
+      const colon = fragment.indexOf(':');
+      const kind = colon > 0 ? fragment.slice(0, colon) : 'node';
+      const name = colon > 0 ? fragment.slice(colon + 1) : fragment;
+      gltf.scene.updateMatrixWorld(true);
+      if (kind === 'group') {
+        gltf.scene.traverse((o) => {
+          if (!(o as THREE.Mesh).isMesh || !o.name.startsWith(name)) return;
+          const copy = o.clone(true);
+          copy.matrixAutoUpdate = true;
+          copy.position.set(0, 0, 0);
+          copy.quaternion.identity();
+          copy.scale.set(1, 1, 1);
+          copy.applyMatrix4(o.matrixWorld);
+          scene.add(copy);
+        });
+      } else {
+        const found = gltf.scene.getObjectByName(name);
+        if (found) {
+          const copy = found.clone(true);
+          copy.position.set(0, 0, 0);
+          copy.quaternion.identity();
+          copy.scale.set(1, 1, 1);
+          copy.updateMatrix();
+          scene.add(copy);
+        }
+      }
+      if (scene.children.length === 0) {
+        throw new Error(`asset fragment not found: ${fullUrl}`);
+      }
+      return { ...gltf, scene, scenes: [scene] } as LoadedGltf;
+    });
+    p.catch(() => fragmentCache.delete(key));
+    fragmentCache.set(key, p);
+  } else if (opts.priority !== 'background') {
+    // a demand for a piece is a demand for its file, as loadGltf promotes a whole one
+    gltfQueue.promote(resolvedBase);
+  }
+  return p;
+}
+
+/** Whether a GLB is already parsed or in flight in the shared cache (a borrower
+ *  such as the encounter journal releases on close only what it brought in). */
+export function isGltfCached(url: string): boolean {
+  return gltfCache.has(assetUrl(url));
+}
+
 export function releaseGltf(url: string): void {
   gltfCache.delete(assetUrl(url));
 }
@@ -242,6 +424,7 @@ export function loadTexture(
 ): Promise<THREE.Texture> {
   const resolved = assetUrl(url);
   const key = `${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}`;
+  texPinned.add(key);
   let p = texCache.get(key);
   if (!p) {
     const startedAt = assetLoadStarted();
@@ -291,6 +474,91 @@ export function loadTexture(
   return p;
 }
 
+/**
+ * A REFERENCE-COUNTED texture hold for callers that manage lifetime (rock/cave
+ * ground-texture sets, authored decals). The texture disposes (freeing its
+ * VRAM) once every acquire is released AND nothing pinned it via loadTexture.
+ * `release` is idempotent.
+ */
+export function acquireTexture(
+  url: string,
+  opts: { srgb?: boolean; repeat?: boolean } = {},
+): { texture: Promise<THREE.Texture>; release: () => void } {
+  const resolved = assetUrl(url);
+  const key = `${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}`;
+  // Route the fetch through the shared cache without pinning it: acquire and
+  // release are the only lifetime owners of a texture nobody else loaded.
+  const wasPinned = texPinned.has(key);
+  const texture = loadTexture(url, opts);
+  if (!wasPinned) texPinned.delete(key);
+  texRefs.set(key, (texRefs.get(key) ?? 0) + 1);
+  let released = false;
+  const release = (): void => {
+    if (released) return;
+    released = true;
+    const next = Math.max(0, (texRefs.get(key) ?? 0) - 1);
+    texRefs.set(key, next);
+    if (next > 0 || texPinned.has(key)) return;
+    const cached = texCache.get(key);
+    texRefs.delete(key);
+    texCache.delete(key);
+    void cached?.then((tex) => tex.dispose()).catch(() => {});
+  };
+  return { texture, release };
+}
+
+/** A plain image texture decoded off the main thread (image_bitmap_decode.ts),
+ *  for large sheets whose upload would otherwise pay the decode in a live
+ *  frame. Uploads the same texels as loadTexture, whose path it falls back to
+ *  outside Chromium or when the decode is refused. Each call past a settled
+ *  one fetches and decodes again. An ImageBitmap pins its decoded RGBA until
+ *  closed, so a caller that keeps the texture past its upload releases it
+ *  (bitmap_sheet_release.ts). */
+export function loadBitmapTexture(
+  url: string,
+  opts: { srgb?: boolean } = {},
+): Promise<THREE.Texture> {
+  if (!browserDecodesImageBitmap()) return loadTexture(url, opts);
+  const resolved = assetUrl(url);
+  const key = `${resolved}|${opts.srgb ? 's' : 'l'}`;
+  let p = bitmapTexCache.get(key);
+  if (!p) {
+    const startedAt = assetLoadStarted();
+    p = scheduleLoad(textureQueue, () => {
+      const seq = diagStart('bitmap', resolved);
+      return withRetry(() => fetchImageBlob(resolved))
+        .then((blob) => createImageBitmap(blob, BITMAP_DECODE_OPTIONS))
+        .then(
+          (bitmap) => {
+            diagSettle(seq, 'bitmap', resolved, true);
+            const texture = new THREE.Texture(bitmap);
+            texture.flipY = false;
+            if (opts.srgb) texture.colorSpace = THREE.SRGBColorSpace;
+            texture.needsUpdate = true;
+            recordAssetLoad('texture', resolved, startedAt);
+            return texture;
+          },
+          (err: unknown) => {
+            diagSettle(seq, 'bitmap', resolved, false);
+            throw err;
+          },
+        );
+    }).catch(() => {
+      if (loadDiagEnabled()) console.info(`[load-diag] bitmap decode declined: ${resolved}`);
+      return loadTexture(url, opts);
+    });
+    // Joins a load in flight only: a settled texture may have released its
+    // bitmap (bitmap_sheet_release.ts), so a later request decodes afresh.
+    const pending = p;
+    const settle = () => {
+      if (bitmapTexCache.get(key) === pending) bitmapTexCache.delete(key);
+    };
+    p.then(settle, settle);
+    bitmapTexCache.set(key, p);
+  }
+  return p;
+}
+
 /** One normalization for a KTX2 request's cache key, shared by
  *  loadKtx2Texture and releaseKtx2Texture so the pair can never disagree on
  *  which entry a release drops. */
@@ -310,38 +578,51 @@ function ktx2CacheKey(resolved: string, opts: { repeat?: boolean }): string {
  *  `repeat` remains a runtime choice, and it discriminates the cache key
  *  exactly as it does in loadTexture. `large` picks the single-slot fetch lane
  *  and is NOT part of the cache key: it is a scheduling choice about one
- *  request, not a property of the texture two callers would disagree on. */
+ *  request, not a property of the texture two callers would disagree on.
+ *  `priority` is a scheduling choice too (load_queue_core.ts): `background` is
+ *  a fetch ahead of need, which starts only while no texture somebody needs now
+ *  is waiting, and a later demand for the same texture promotes it, as loadGltf
+ *  does for a model. */
 export function loadKtx2Texture(
   url: string,
-  opts: { repeat?: boolean; large?: boolean } = {},
+  opts: { repeat?: boolean; large?: boolean; priority?: LoadPriority } = {},
 ): Promise<THREE.CompressedTexture> {
   const resolved = assetUrl(url);
   const cacheKey = ktx2CacheKey(resolved, opts);
+  const queue = opts.large ? largeTextureQueue : textureQueue;
   let p = ktx2TexCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(opts.large ? largeTextureQueue : textureQueue, () => {
-      const seq = diagStart('ktx2tex', resolved);
-      return withRetry(
-        () =>
-          new Promise<THREE.CompressedTexture>((resolve, reject) => {
-            ktx2Loader().load(resolved, resolve, undefined, () =>
-              reject(new Error(`ktx2 texture load failed: ${url}`)),
-            );
-          }),
-      ).then(
-        (tex) => {
-          diagSettle(seq, 'ktx2tex', resolved, true);
-          return tex;
-        },
-        (err: unknown) => {
-          diagSettle(seq, 'ktx2tex', resolved, false);
-          throw err;
-        },
-      );
-    }).then(
+    p = scheduleLoad(
+      queue,
+      () => {
+        const seq = diagStart('ktx2tex', resolved);
+        return withRetry(
+          () =>
+            new Promise<THREE.CompressedTexture>((resolve, reject) => {
+              ktx2Loader().load(resolved, resolve, undefined, () =>
+                reject(new Error(`ktx2 texture load failed: ${url}`)),
+              );
+            }),
+        ).then(
+          (tex) => {
+            diagSettle(seq, 'ktx2tex', resolved, true);
+            return tex;
+          },
+          (err: unknown) => {
+            diagSettle(seq, 'ktx2tex', resolved, false);
+            throw err;
+          },
+        );
+      },
+      opts.priority,
+      cacheKey,
+    ).then(
       (tex) => {
         if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        // iPhone only: the skin atlases keep their mips at or under 512.
+        const mipCap = ktx2MipCapFor(resolved, ktx2MipCapProfile);
+        if (mipCap !== null) capCompressedMips(tex, mipCap);
         // Standalone KTX2 atlases (character skins) draw in the character
         // preview, portrait and armory renderers too, so their CPU mip chains
         // must stay resident: dismiss the stashed restore source, never arm.
@@ -367,6 +648,10 @@ export function loadKtx2Texture(
       },
     );
     ktx2TexCache.set(cacheKey, p);
+  } else if (opts.priority !== 'background') {
+    // wherever it waits: the lane is the first asker's, and this one may name the other
+    textureQueue.promote(cacheKey);
+    largeTextureQueue.promote(cacheKey);
   }
   return p;
 }

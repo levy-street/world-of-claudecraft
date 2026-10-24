@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { attachBiomeHaze } from '../src/render/biome_haze_field';
 import { type ArmorDyeSpec, attachArmorDye } from '../src/render/characters/armor_dye';
+import { attachGloamClimb, hasGloamClimb } from '../src/render/characters/gloam_climb';
 import { addRimGlow, gfxInternalsForTest, hasRimGlow } from '../src/render/gfx';
 import {
   cloneMaterialWithHooks,
@@ -23,11 +24,13 @@ import {
 import { applySurfaceDetail } from '../src/render/worn_stone';
 
 // A rig material as characters/assets.ts tintedMaterial builds it on the
-// standard tier: rim glow first, then the low-strength object-space worn layer.
+// standard tier: rim glow first, then the dormant Gloamveil climb, then the
+// low-strength object-space worn layer.
 function riggedBodyMaterial(): THREE.MeshStandardMaterial {
   const mat = new THREE.MeshStandardMaterial({ color: 0x808080 });
   mat.name = 'knight_cloth';
   addRimGlow(mat);
+  attachGloamClimb(mat);
   applySurfaceDetail(mat, 'fabric', { strength: 0.2, objectSpace: true });
   return mat;
 }
@@ -79,6 +82,12 @@ describe('reattachClonedMaterialHooks', () => {
     // key, which is why the two must be re-attached in the source's order).
     expect(clone.customProgramCacheKey()).toContain('surface-detail|');
     expect(clone.customProgramCacheKey()).toContain('patchPbrRimGlowFragmentShader');
+    // And the layer the factory puts between them: a clone that lost the climb
+    // (or took it in another order) would link a second program per material.
+    expect(hasGloamClimb(clone)).toBe(true);
+    expect(clone.customProgramCacheKey()).toContain('gloam-climb|');
+    const key = clone.customProgramCacheKey();
+    expect(key.indexOf('surface-detail|')).toBeLessThan(key.indexOf('gloam-climb|'));
   });
 
   it('restores the shader patch itself, not just the key', () => {
@@ -96,6 +105,7 @@ describe('reattachClonedMaterialHooks', () => {
     const clone = plain.clone();
     reattachClonedMaterialHooks(plain, clone);
     expect(hasRimGlow(clone)).toBe(false);
+    expect(hasGloamClimb(clone)).toBe(false);
     expect(clone.customProgramCacheKey()).toBe(plain.customProgramCacheKey());
     expect(clone.onBeforeCompile).toBe(THREE.Material.prototype.onBeforeCompile);
   });
@@ -486,30 +496,21 @@ describe('the character overlay caches and the arena walls clone through the hoo
       );
       expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
     }
-    // The overlays that flip `transparent` mint through a shared factory
-    // module instead, so the boot prewarm twin and the live clone cannot drift
-    // into different program keys (character_effect_prewarm.ts). Each factory
-    // owes the same hook-preserving clone.
-    for (const [name, factory] of [
-      ['ghostMaterial', 'createGhostEffectMaterial'],
-      ['shadowformMaterial', 'createShadowformEffectMaterial'],
-      ['moonkinMaterial', 'createMoonkinEffectMaterial'],
-      ['soulRendMaterial', 'applySoulRendOverlay'],
-    ] as const) {
-      const body = methodSource(visual, `  private ${name}(`);
-      expect(body, `${name} lost its shared factory`).toContain(`${factory}(material`);
-      expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
-    }
-    for (const module of ['effect_materials', 'soul_rend_overlay']) {
-      const factory = readFileSync(
-        new URL(`../src/render/characters/${module}.ts`, import.meta.url),
-        'utf8',
-      );
-      expect(factory, `${module} lost its hook-preserving clone`).toMatch(
-        /cloneMaterialWithHooks\((?:source|material)\)/,
-      );
-      expect(factory, `${module} went back to a bare clone`).not.toContain('.clone(');
-    }
+    // Gloamveil's transparent body and immediate opaque stand-in both preserve
+    // the live hooks through their shared factory module.
+    const shadowform = methodSource(visual, '  private shadowformMaterial(');
+    expect(shadowform, 'shadowformMaterial lost its factory').toContain(
+      'createShadowformEffectMaterial(material',
+    );
+    expect(shadowform, 'shadowformMaterial went back to a bare clone').not.toContain('.clone(');
+    const factory = readFileSync(
+      new URL('../src/render/characters/effect_materials.ts', import.meta.url),
+      'utf8',
+    );
+    expect(factory, 'Gloamveil lost its hook-preserving clone').toMatch(
+      /cloneMaterialWithHooks\(source\)/,
+    );
+    expect(factory, 'Gloamveil went back to a bare clone').not.toContain('.clone(');
   });
 
   it('clones the hideable arena wall material through cloneMaterialWithHooks', () => {

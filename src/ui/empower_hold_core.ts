@@ -3,7 +3,6 @@
 // so every input family drives the ONE charge through identical rules.
 
 type CrossHotbarAction = { type: 'ability' | 'item'; id: string };
-type HotbarAction = CrossHotbarAction | null;
 
 export interface EmpowerHoldWorld {
   castAbility(abilityId: string): void;
@@ -22,7 +21,8 @@ interface EmpowerCharge {
 export function crossHotbarActionSlot(
   action: CrossHotbarAction,
   actionCount: number,
-  actionForSlot: (slot: number) => HotbarAction,
+  // The main bar's slots may also hold a pet command, which never matches.
+  actionForSlot: (slot: number) => { type: string; id: string } | null,
 ): number {
   for (let slot = 0; slot <= actionCount; slot++) {
     const onBar = actionForSlot(slot);

@@ -1,16 +1,25 @@
+import { DELVE_COMPANIONS } from '../content/delves/companions';
 import { isTemporaryNecromancyUndeadTemplateId } from '../content/necromancy';
 import type { Entity } from '../types';
+import { isBuddyMob } from './buddy_ai';
+
+/** Delve companion templates: owned by the player like a pet, but never the pet. */
+const DELVE_COMPANION_TEMPLATES: ReadonlySet<string> = new Set(
+  Object.values(DELVE_COMPANIONS).map((c) => c.mobTemplateId),
+);
 
 /**
  * Pure owner/pet identity shared by the authoritative command path and its
- * offline/online HUD mirrors. Delve companions require a host lookup and remain
- * an additional authoritative exclusion in petOf().
+ * offline/online HUD mirrors. Delve companions and cosmetic buddies are
+ * excluded here so every caller agrees they are never the commandable pet.
  */
 export function isPrimaryOwnedPetEntity(entity: Entity, ownerId: number): boolean {
   return (
     entity.kind === 'mob' &&
     entity.ownerId === ownerId &&
+    !DELVE_COMPANION_TEMPLATES.has(entity.templateId) &&
     !isTemporaryNecromancyUndeadTemplateId(entity.templateId) &&
+    !isBuddyMob(entity) &&
     !entity.auras.some((aura) => aura.id === 'pyre_guardian')
   );
 }

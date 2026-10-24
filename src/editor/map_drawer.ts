@@ -9,12 +9,26 @@ import { button, el } from './dom';
 import * as net from './net';
 import { EditorApiError, type MapSummaryWire } from './net';
 import { editorErrorKey } from './server_errors_core';
+import { SHIPPED_MAPS, type ShippedMapId } from './shipped_maps';
 
-type Tab = 'local' | 'mine' | 'public';
+type Tab = 'shipped' | 'local' | 'mine' | 'public';
+
+export interface PublishedMapMeta {
+  slug: string;
+  name: string;
+  seed: number;
+  bytes: number;
+  updatedAt: string;
+}
 
 export interface MapDrawerDeps {
   listLocal(): CustomMapMeta[];
   hasDraft(): boolean;
+  onOpenShipped(id: ShippedMapId): void;
+  /** Maps published to the game from this Studio (data/maps/*.map.json on
+   *  the dev server); empty when there is no dev server. */
+  listPublished(): Promise<PublishedMapMeta[]>;
+  onOpenPublished(slug: string): void;
   onOpenLocal(id: string): void;
   onOpenDraft(): void;
   onDeleteLocal(id: string): Promise<void>;
@@ -89,7 +103,8 @@ export class MapDrawer {
 
   private render(): void {
     this.renderTabs();
-    if (this.tab === 'local') this.renderLocal();
+    if (this.tab === 'shipped') this.renderShipped();
+    else if (this.tab === 'local') this.renderLocal();
     else if (this.tab === 'mine') void this.renderMine();
     else void this.renderPublic();
   }
@@ -97,6 +112,7 @@ export class MapDrawer {
   private renderTabs(): void {
     this.tabsEl.innerHTML = '';
     const tabs: { id: Tab; label: string }[] = [
+      { id: 'shipped', label: t('editor.openDrawer.tabShipped') },
       { id: 'local', label: t('editor.openDrawer.tabLocal') },
       { id: 'mine', label: t('editor.openDrawer.tabMine') },
       { id: 'public', label: t('editor.openDrawer.tabPublic') },
@@ -115,6 +131,63 @@ export class MapDrawer {
       });
       this.tabsEl.appendChild(b);
     }
+  }
+
+  private renderShipped(): void {
+    const { rows } = this.table([t('editor.openDrawer.colName'), t('editor.openDrawer.colType')]);
+    const typeCells = new Map<string, HTMLElement>();
+    for (const map of SHIPPED_MAPS) {
+      const row = el('div', 'ed-map-row');
+      row.appendChild(el('span', 'ed-map-cell', map.name));
+      const typeCell = el('span', 'ed-map-cell ed-map-muted', map.group);
+      typeCells.set(map.id, typeCell);
+      row.appendChild(typeCell);
+      const actions = el('span', 'ed-map-cell ed-map-actions');
+      actions.appendChild(
+        button(t('editor.openDrawer.openCopy'), () => {
+          this.deps.onOpenShipped(map.id);
+          this.close();
+        }),
+      );
+      row.appendChild(actions);
+      rows.appendChild(row);
+    }
+    // Published to Game: the maps this Studio has written into the repo. They
+    // are what the game boots for their slug (a publish under a shipped map's
+    // slug replaces that built-in map), so they belong beside the shipped list.
+    void this.deps.listPublished().then((published) => {
+      if (this.tab !== 'shipped' || published.length === 0) return;
+      for (const map of published) {
+        // A publish under a shipped map's own slug REPLACES that map: its row
+        // opens the published version (see onOpenShipped), so mark it rather
+        // than listing the same map twice.
+        const shippedCell = typeCells.get(map.slug);
+        if (shippedCell) {
+          shippedCell.textContent = t('editor.openDrawer.typeShippedPublished', {
+            group: shippedCell.textContent ?? '',
+          });
+          continue;
+        }
+        const row = el('div', 'ed-map-row');
+        row.appendChild(el('span', 'ed-map-cell', map.name));
+        row.appendChild(
+          el(
+            'span',
+            'ed-map-cell ed-map-muted',
+            t('editor.openDrawer.typePublished', { slug: map.slug }),
+          ),
+        );
+        const actions = el('span', 'ed-map-cell ed-map-actions');
+        actions.appendChild(
+          button(t('editor.openDrawer.openCopy'), () => {
+            this.deps.onOpenPublished(map.slug);
+            this.close();
+          }),
+        );
+        row.appendChild(actions);
+        rows.appendChild(row);
+      }
+    });
   }
 
   private note(text: string): void {
@@ -170,7 +243,10 @@ export class MapDrawer {
           'span',
           'ed-map-cell ed-map-muted',
           m.updatedAt
-            ? formatDateTime(m.updatedAt, { dateStyle: 'medium', timeStyle: 'short' })
+            ? formatDateTime(m.updatedAt, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              })
             : '',
         ),
       );

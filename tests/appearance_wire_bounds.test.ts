@@ -24,13 +24,24 @@ import {
   SHADOW_SHADES,
 } from '../src/render/characters/modular';
 import {
+  WOC_HEAD_MORPH_KEYS,
+  WOC_HEAD_SLOTS,
+  WOC_PIERCING_IDS,
+  wocHeadSlotIds,
+} from '../src/render/characters/woc_head_catalog';
+import {
   APPEARANCE_BODY_SLIDER_KEYS,
   APPEARANCE_FACE_SLIDER_KEYS,
+  APPEARANCE_HEAD_SHAPE_KEYS,
   APPEARANCE_MAX_WIRE_BYTES,
+  APPEARANCE_NESTED_SLIDER_KEYS,
   APPEARANCE_WIRE_KEYS,
   sameAppearance,
   sanitizeAppearance,
 } from '../src/world_api/appearance';
+
+/** The keys whose value is a slider map, not a scalar. */
+const isNested = (key: string): boolean => key in APPEARANCE_NESTED_SLIDER_KEYS;
 
 describe('appearance wire key set', () => {
   it('covers every field of the renderer model (drift guard)', () => {
@@ -63,6 +74,84 @@ describe('appearance wire key set', () => {
     // would silently strip it from every save.
     expect([...APPEARANCE_FACE_SLIDER_KEYS].sort()).toEqual([...FACE_SLIDERS].sort());
     expect([...APPEARANCE_BODY_SLIDER_KEYS].sort()).toEqual([...BODY_SLIDERS].sort());
+    expect([...APPEARANCE_HEAD_SHAPE_KEYS].sort()).toEqual([...WOC_HEAD_MORPH_KEYS].sort());
+  });
+
+  it('knows every nested map of the renderer model, and only those', () => {
+    // A nested field missing from the table would validate as a scalar and be
+    // dropped on every save; the ceiling test below would under-count it too.
+    const nestedInModel = Object.entries(DEFAULT_APPEARANCE)
+      .filter(([, v]) => typeof v === 'object' && v !== null)
+      .map(([k]) => k)
+      .sort();
+    expect(Object.keys(APPEARANCE_NESTED_SLIDER_KEYS).sort()).toEqual(nestedInModel);
+    expect(nestedInModel).toEqual(['body', 'face', 'headShape']);
+  });
+});
+
+describe('the WOC head builder fields', () => {
+  it('survive the bounds check, head shape included', () => {
+    const look = {
+      headHair: 'ponytail',
+      headNose: 'aquiline',
+      headMouth: 'smirk',
+      headBrows: 'arched',
+      headEars: 'pointed',
+      headEyes: 'hooded',
+      headPiercing: 'full',
+      browHue: 210,
+      browSat: 0.3,
+      browLight: 0.6,
+      headShape: {
+        eyeSpacing: -0.4,
+        eyeSize: 0.2,
+        eyeTilt: 0.9,
+        browHeight: -1,
+        chinWidth: 0.15,
+      },
+      headBeard: 'handlebar',
+      bodyScale: 0.85,
+    };
+    expect(sanitizeAppearance(look)).toEqual(look);
+  });
+
+  it('keeps the beard, the chin and the body size (a relog must not drop them)', () => {
+    // each on its own, so a key missing from either allowlist fails its own row
+    expect(sanitizeAppearance({ headBeard: 'chinstrap' })).toEqual({ headBeard: 'chinstrap' });
+    expect(sanitizeAppearance({ bodyScale: 0.8 })).toEqual({ bodyScale: 0.8 });
+    expect(sanitizeAppearance({ headShape: { chinWidth: 0 } })).toEqual({
+      headShape: { chinWidth: 0 },
+    });
+    // the ranges are the renderer's (normalizeAppearance clamps); the bounds
+    // check only keeps the value finite and numeric
+    expect(sanitizeAppearance({ bodyScale: 7 })).toEqual({ bodyScale: 7 });
+    expect(sanitizeAppearance({ bodyScale: Number.NaN, gender: 'male' })).toEqual({
+      gender: 'male',
+    });
+    expect(sanitizeAppearance({ headBeard: 'full beard', gender: 'male' })).toEqual({
+      gender: 'male',
+    });
+  });
+
+  it('validates headShape against ITS OWN allowlist, not the face one', () => {
+    // a face slider name is junk inside headShape and the other way round
+    expect(sanitizeAppearance({ headShape: { jaw: 0.5 } })).toBeNull();
+    expect(sanitizeAppearance({ face: { eyeTilt: 0.5 } })).toBeNull();
+    expect(sanitizeAppearance({ headShape: {} })).toBeNull();
+    expect(
+      sanitizeAppearance({ headShape: { eyeTilt: 0.5, evil: 'x', jaw: 1, eyeSize: 'big' } }),
+    ).toEqual({ headShape: { eyeTilt: 0.5 } });
+    // a scalar is not a map: dropped, not coerced
+    expect(sanitizeAppearance({ headShape: 'eyeTilt', gender: 'male' })).toEqual({
+      gender: 'male',
+    });
+  });
+
+  it('keeps an old stored look (no head fields) exactly as it was', () => {
+    // every character row saved before the head builder: nothing is invented
+    // server-side, the renderer's normalizeAppearance fills the defaults
+    const old = { gender: 'female', hair: 'pixie', hairHue: 5, face: { jaw: 0.25 } };
+    expect(sanitizeAppearance(old)).toEqual(old);
   });
 });
 
@@ -169,6 +258,9 @@ describe('appearance value charset', () => {
       ...SHADOW_SHADES,
       ...MOUTH_STYLES,
       ...OUTFIT_COLORWAY_IDS,
+      // the WOC head builder's catalog, every type's pieces and the piercings
+      ...WOC_HEAD_SLOTS.flatMap((slot) => wocHeadSlotIds(slot)),
+      ...WOC_PIERCING_IDS,
       'male',
       'female',
       // retired ids an old row may still carry (HAIR_LEGACY / BEARD_LEGACY);
@@ -208,7 +300,7 @@ describe('appearance value charset', () => {
     const evil = 'BUY GOLD';
     const doc: Record<string, unknown> = { gender: 'male' };
     for (const key of APPEARANCE_WIRE_KEYS) {
-      if (key === 'face' || key === 'body' || key === 'gender') continue;
+      if (isNested(key) || key === 'gender') continue;
       doc[key] = evil;
     }
     expect(sanitizeAppearance(doc)).toEqual({ gender: 'male' });
@@ -226,18 +318,17 @@ describe('the wire ceiling', () => {
 
   /** The biggest thing sanitizeAppearance can return: every scalar key carrying
    *  the longest legal value (a 24-character id costs 26 bytes with its
-   *  quotes), and both slider maps full of WORST_NUMBER, the longest legal
-   *  JSON number at 25 characters. */
+   *  quotes), and every slider map (face, body, headShape) full of
+   *  WORST_NUMBER, the longest legal JSON number at 25 characters. Built from
+   *  the sanitizer's own nested table, so a map added there is measured here
+   *  rather than filled as a scalar, dropped, and under-counted. */
   function maximalDocument(): Record<string, unknown> {
     const doc: Record<string, unknown> = {};
     for (const key of APPEARANCE_WIRE_KEYS) {
-      if (key === 'face') {
-        doc.face = Object.fromEntries(APPEARANCE_FACE_SLIDER_KEYS.map((k) => [k, WORST_NUMBER]));
-      } else if (key === 'body') {
-        doc.body = Object.fromEntries(APPEARANCE_BODY_SLIDER_KEYS.map((k) => [k, WORST_NUMBER]));
-      } else {
-        doc[key] = 'a'.repeat(24);
-      }
+      const sliders = APPEARANCE_NESTED_SLIDER_KEYS[key];
+      doc[key] = sliders
+        ? Object.fromEntries(sliders.map((k) => [k, WORST_NUMBER]))
+        : 'a'.repeat(24);
     }
     return doc;
   }
@@ -248,6 +339,8 @@ describe('the wire ceiling', () => {
     // stored per character and re-broadcast to everyone in view.
     const out = sanitizeAppearance(maximalDocument());
     expect(out).not.toBeNull();
+    // every key survived, so this really is the maximal document
+    expect(Object.keys(out ?? {})).toEqual([...APPEARANCE_WIRE_KEYS]);
     const bytes = Buffer.byteLength(JSON.stringify(out), 'utf8');
     expect(bytes).toBe(APPEARANCE_MAX_WIRE_BYTES);
   });
@@ -277,7 +370,7 @@ describe('the wire ceiling', () => {
     function withScalarsReplaced(value: unknown): Record<string, unknown> {
       const doc = maximalDocument();
       for (const key of APPEARANCE_WIRE_KEYS) {
-        if (key === 'face' || key === 'body') continue;
+        if (isNested(key)) continue;
         doc[key] = value;
       }
       return doc;
@@ -286,8 +379,9 @@ describe('the wire ceiling', () => {
     function withJunkSliderKeys(): Record<string, unknown> {
       const doc = maximalDocument();
       const junk = Object.fromEntries(Array.from({ length: 500 }, (_, i) => [`junk${i}`, 1]));
-      doc.face = { ...(doc.face as Record<string, number>), ...junk };
-      doc.body = { ...(doc.body as Record<string, number>), ...junk };
+      for (const key of Object.keys(APPEARANCE_NESTED_SLIDER_KEYS)) {
+        doc[key] = { ...(doc[key] as Record<string, number>), ...junk };
+      }
       return doc;
     }
 
@@ -299,24 +393,22 @@ describe('the wire ceiling', () => {
 
     function withExtremeSliderValues(): Record<string, unknown> {
       const doc = maximalDocument();
-      doc.face = Object.fromEntries(
-        APPEARANCE_FACE_SLIDER_KEYS.map((k, i) => [k, extremeNumbers[i % extremeNumbers.length]]),
-      );
-      doc.body = Object.fromEntries(
-        APPEARANCE_BODY_SLIDER_KEYS.map((k, i) => [
-          k,
-          extremeNumbers[(i + 3) % extremeNumbers.length],
-        ]),
-      );
+      let offset = 0;
+      for (const [key, sliders] of Object.entries(APPEARANCE_NESTED_SLIDER_KEYS)) {
+        doc[key] = Object.fromEntries(
+          sliders.map((k, i) => [k, extremeNumbers[(i + offset) % extremeNumbers.length]]),
+        );
+        offset += 3;
+      }
       return doc;
     }
 
     function withNonFiniteSliderValues(): Record<string, unknown> {
       const doc = maximalDocument();
-      doc.face = Object.fromEntries(
-        APPEARANCE_FACE_SLIDER_KEYS.map((k) => [k, Number.POSITIVE_INFINITY]),
-      );
-      doc.body = Object.fromEntries(APPEARANCE_BODY_SLIDER_KEYS.map((k) => [k, Number.NaN]));
+      const junk = [Number.POSITIVE_INFINITY, Number.NaN, Number.NEGATIVE_INFINITY];
+      Object.entries(APPEARANCE_NESTED_SLIDER_KEYS).forEach(([key, sliders], i) => {
+        doc[key] = Object.fromEntries(sliders.map((k) => [k, junk[i % junk.length]]));
+      });
       return doc;
     }
 
@@ -351,7 +443,9 @@ describe('the wire ceiling', () => {
 
   it('leaves a real authored look far under it', () => {
     const bytes = Buffer.byteLength(JSON.stringify(DEFAULT_APPEARANCE), 'utf8');
-    expect(bytes).toBeLessThan(700); // the ~0.6 KB the wire reasoning quotes
+    // the ~0.9 KB the wire reasoning quotes (server/game.ts appearanceWireJson)
+    expect(bytes).toBeLessThan(1000);
+    expect(bytes).toBeLessThan(APPEARANCE_MAX_WIRE_BYTES / 2);
   });
 });
 

@@ -160,6 +160,7 @@ describe('FRAME_SIZE_RESET_KEYS', () => {
       'playerFrame',
       'targetFrame',
       'partyFrames',
+      'playerResource',
       'petFrame',
       'focusTarget1',
       'focusTarget2',
@@ -169,6 +170,11 @@ describe('FRAME_SIZE_RESET_KEYS', () => {
       'playerFrameScale',
       'playerFrameWidth',
       'playerFrameHeight',
+    ]);
+    // The detached resource bar's size lives in its two dimension settings.
+    expect(FRAME_SIZE_RESET_KEYS.playerResource).toEqual([
+      'playerFrameResourceWidth',
+      'playerFrameResourceHeight',
     ]);
     expect(FRAME_SIZE_RESET_KEYS.targetFrame).toEqual([
       'targetFrameScale',

@@ -22,14 +22,19 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
-import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
+import {
+  consumeMovementFramesV2,
+  MAX_PLAYOUT_GROWTH_TICKS,
+  PLAYOUT_GROWTH_LATE_FRAMES,
+  PLAYOUT_SHRINK_SPARE_TICKS,
+} from '../server/movement_input_timeline_v2';
 import { negotiateMovementWireVersion } from '../server/movement_wire_version';
 import { type MovementWireClient, MovementWireGlue } from '../src/game/movement_wire_glue';
 import { emptyMoveInput } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
 import type { LatencyLinkConfig } from './helpers/latency_link';
 import { joinGroundTruthCharacter } from './helpers/movement_ground_truth';
-import { createOnlineHarness } from './helpers/online_harness';
+import { createOnlineHarness, SERVER_TICK_MS } from './helpers/online_harness';
 import { stripComments } from './helpers/strip_comments';
 
 function link(rttMs: number, jitterMs: number): LatencyLinkConfig {
@@ -279,6 +284,87 @@ describe('movement wire v2', () => {
       const recovered = run.frames.filter((frame) => frame.tMs > 900);
       expect(recovered.length).toBeGreaterThan(0);
       expect(recovered.every((frame) => frame.predictionEnabled)).toBe(true);
+    } finally {
+      harness.dispose();
+    }
+  });
+
+  it('stops guessing the inputs of a 30 fps client whose ticks alternate late and on time', () => {
+    const inputFlow = (fps: number) => {
+      const harness = createOnlineHarness({
+        latency: link(60, 10),
+        frameMs: 1000 / fps,
+        movementWire: 2,
+        warmupMs: 300,
+      });
+      try {
+        const timeline = harness.session.movementTimeline;
+        if (!timeline) throw new Error('movement v2 did not create an input timeline');
+        const before = {
+          extrapolated: timeline.extrapolated,
+          discardedLate: timeline.discardedLate,
+          playoutGrowths: timeline.playoutGrowths,
+        };
+        const script = Array.from({ length: 20 }, (_, index) => ({
+          atMs: index * 400,
+          mi: { forward: index % 2 === 0 },
+          facing: 0,
+        }));
+        const run = harness.runScript({ durationMs: 8000, script });
+        return {
+          extrapolated: timeline.extrapolated - before.extrapolated,
+          discardedLate: timeline.discardedLate - before.discardedLate,
+          playoutGrowths: timeline.playoutGrowths - before.playoutGrowths,
+          replays: run.frames.filter((frame) => frame.reconcileMode === 'replayed').length,
+        };
+      } finally {
+        harness.dispose();
+      }
+    };
+
+    const slow = inputFlow(30);
+    expect(slow.playoutGrowths).toBeGreaterThan(0);
+    expect(slow.playoutGrowths).toBeLessThanOrEqual(MAX_PLAYOUT_GROWTH_TICKS);
+    expect(slow.extrapolated).toBeLessThan(PLAYOUT_GROWTH_LATE_FRAMES * slow.playoutGrowths);
+    expect(slow.discardedLate).toBeLessThan(PLAYOUT_GROWTH_LATE_FRAMES * slow.playoutGrowths);
+    expect(slow.replays).toBeLessThanOrEqual(slow.discardedLate + slow.playoutGrowths);
+    for (const fps of [60, 144]) {
+      expect(inputFlow(fps)).toEqual({
+        extrapolated: 0,
+        discardedLate: 0,
+        playoutGrowths: 0,
+        replays: 0,
+      });
+    }
+  });
+
+  it('hands a grown playout tick back while the player stands still, with no correction', () => {
+    const harness = createOnlineHarness({ latency: link(60, 0), movementWire: 2 });
+    try {
+      const timeline = harness.session.movementTimeline;
+      if (!timeline) throw new Error('movement v2 did not create an input timeline');
+      const stopAtMs = 2000;
+      const lateFrameStalls = Array.from({ length: PLAYOUT_GROWTH_LATE_FRAMES }, (_, index) => ({
+        atMs: 600 + index * 300,
+        run: () => harness.link.stall('toServer', harness.clock.now() + 70),
+      }));
+      const run = harness.runScript({
+        durationMs: stopAtMs + 2 * PLAYOUT_SHRINK_SPARE_TICKS * SERVER_TICK_MS,
+        script: [
+          { atMs: 0, mi: { forward: true }, facing: 0 },
+          { atMs: stopAtMs, mi: { forward: false } },
+        ],
+        actions: lateFrameStalls,
+      });
+
+      expect(timeline.playoutGrowths).toBe(1);
+      expect(timeline.playoutShrinks).toBe(1);
+      const replayedAt = run.frames
+        .filter((frame) => frame.reconcileMode === 'replayed')
+        .map((frame) => frame.tMs);
+      expect(replayedAt.length).toBeLessThanOrEqual(1);
+      expect(replayedAt.every((tMs) => tMs < stopAtMs)).toBe(true);
+      expect(run.frames.at(-1)?.z).toBe(run.ticks.at(-1)?.z);
     } finally {
       harness.dispose();
     }

@@ -13,6 +13,7 @@ import { deriveMaterialItemIds } from './material_derivation';
 import { NODE_MATERIAL_TABLE } from './professions/gathering_materials';
 import { MATERIAL_GRADES } from './professions/material_grades';
 import { SALVAGE_MATERIAL_BY_QUALITY } from './professions/salvage_materials';
+import { WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS } from './pvp/world_pvp_trophy';
 
 export const MATERIAL_ITEM_IDS: ReadonlySet<string> = deriveMaterialItemIds({
   nodeMaterialTable: NODE_MATERIAL_TABLE,
@@ -24,6 +25,7 @@ export const MATERIAL_ITEM_IDS: ReadonlySet<string> = deriveMaterialItemIds({
   recipes: ALL_RECIPES,
   enchants: ENCHANTS,
   recipePendingMaterialItemIds: CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
+  trophyMaterialItemIds: WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS,
   items: ITEMS,
 });
 

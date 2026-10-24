@@ -124,7 +124,7 @@ const LIVE_OFF_SWEEP_KEYS: string[] = [
   'guide.abilityHook.thorns',
 ];
 
-/** Flatten the catalog to the dotted guide.* leaf paths a reader could be shown. */
+/** Flatten a catalog domain to its dotted leaf paths. */
 function flattenCatalog(obj: unknown, prefix: string, out: string[]): void {
   if (typeof obj === 'string') {
     out.push(prefix);
@@ -208,6 +208,7 @@ function liveReferences(key: string, files: string[]): string[] {
  */
 describe('Guide key coverage', () => {
   const catalogKeys: string[] = [];
+  const allCatalogKeys: string[] = [];
   let files: string[] = [];
 
   beforeAll(async () => {
@@ -225,6 +226,7 @@ describe('Guide key coverage', () => {
     const { breadcrumbHtml, mountToc, sequenceHtml } = await import('../src/guide/nav_aids');
     const { GUIDE_CLASSES, GUIDE_PROF_PAGES } = await import('../src/guide/content.generated');
     const { guideStrings } = await import('../src/ui/i18n.catalog/guide');
+    const { en } = await import('../src/ui/i18n.catalog');
 
     setLanguage('en');
 
@@ -282,6 +284,7 @@ describe('Guide key coverage', () => {
     );
 
     flattenCatalog(guideStrings, 'guide', catalogKeys);
+    flattenCatalog(en, '', allCatalogKeys);
     files = sourceFiles();
   }, 30000);
 
@@ -330,7 +333,8 @@ describe('Guide key coverage', () => {
   });
 
   it('keeps both allowlists disjoint and free of keys the catalog dropped', () => {
-    const inCatalog = new Set(catalogKeys);
+    // Retirement is shared across UI domains; guide rendering remains scoped above.
+    const inCatalog = new Set(allCatalogKeys);
     const overlap = RETIRED_KEYS.filter((k) => LIVE_OFF_SWEEP_KEYS.includes(k));
     expect(overlap, 'a key is listed as both retired and off-sweep').toEqual([]);
 

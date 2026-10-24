@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-14T22:55:33.014Z",
+  "source": "windows-2026-10-14T20-00-14.839Z/results.json",
+  "complete": true,
+  "rows": 40,
+  "windows": 80,
+  "submittedFrames": 127521,
+  "multiple": 0,
+  "skips": 0,
+  "excludedBlocks": 4,
+  "pageErrors": [],
+  "consoleErrors": 341,
+  "missing": [],
+  "issues": [],
+  "pass": true
+}

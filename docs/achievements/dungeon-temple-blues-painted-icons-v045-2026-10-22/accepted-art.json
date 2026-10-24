@@ -1,0 +1,1539 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 18,
+    "replacedSvgIcons": 18,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "conchplate_sabatons",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/conchplate_sabatons.webp",
+      "canonicalDisplayName": "Conchplate Sabatons",
+      "acceptedSha256": "74a3e2130a4478e78b7f412bc94078773fcf7d2d88170937d7124bd28db83acd",
+      "acceptedBytes": 5234,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/conchplate_sabatons.png",
+        "sha256": "04de625073a8b137b3b8b46512c80b20feafbf3c24d5969c37b71058b8be04b0",
+        "bytes": 2751680,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/conchplate_sabatons.png",
+        "sha256": "bac7e814673ba75ba96405c344ca1d4d4813e0417fceef05015faaf84591e16c",
+        "bytes": 656260,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "fc3e745771357679069b25808fac7b391868b1c47c419c0aa8e2974bd7130237",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Conchplate Sabatons (conchplate_sabatons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of MAIL sabatons, interlinked silver chain ankles, conch-shell shaped plate toes and golden spiral bosses, pearly sea-worn steel. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/conchplate_sabatons.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "fc3e745771357679069b25808fac7b391868b1c47c419c0aa8e2974bd7130237"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_conchplate_sabatons",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_conchplate_sabatons.webp",
+      "canonicalDisplayName": "Heroic Conchplate Sabatons",
+      "acceptedSha256": "5ed08795eb0ab7cfd5525fbff2cb0561b82b751a641cc5deafc85957c5366091",
+      "acceptedBytes": 5498,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_conchplate_sabatons.png",
+        "sha256": "5b4cecbc0b1fc8c4ef2baa90be14e6a2a2bdfef632c63dda192fad138f32c0fc",
+        "bytes": 2857802,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_conchplate_sabatons.png",
+        "sha256": "fca030f6ce65cfa802b24334349cee3311a073e03fcec899fcbceb828c264832",
+        "bytes": 660635,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "6e4215b7942b9edd7a2db3d3dc2a16cdb0c0978d987785a9ed62c1eb358e8c14",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Conchplate Sabatons (heroic_conchplate_sabatons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of MAIL sabatons, interlinked silver chain ankles, conch-shell shaped plate toes and golden spiral bosses, pearly sea-worn steel. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong silver-violet moonlight halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_conchplate_sabatons.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6e4215b7942b9edd7a2db3d3dc2a16cdb0c0978d987785a9ed62c1eb358e8c14"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "pale_chorus_slippers",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/pale_chorus_slippers.webp",
+      "canonicalDisplayName": "Pale Chorus Slippers",
+      "acceptedSha256": "ed346e3f755c0b915fa9ece2f1e8b773000e03bfb8bd93bd58d1f91c79678dcc",
+      "acceptedBytes": 3880,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/pale_chorus_slippers.png",
+        "sha256": "249e600e9ebe31652844593a2d330cb4897f80df7d5174b70b4b9d35bff5b9f8",
+        "bytes": 2437605,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/pale_chorus_slippers.png",
+        "sha256": "79e0947e3c661c528e1a77d9033751a2af6155e08de7838a17c0eff470fddca4",
+        "bytes": 616863,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "41c96a46c341cbba7ea5c93d635e0348db2e47a7f7fc86dddb7c7c9e39cd4d71",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Pale Chorus Slippers (pale_chorus_slippers) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of pale moon-silk CLOTH slippers, soft folded fabric, ornamental hymn-like stitching without readable notation, luminous pearl toe ornaments. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/pale_chorus_slippers.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "41c96a46c341cbba7ea5c93d635e0348db2e47a7f7fc86dddb7c7c9e39cd4d71"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_pale_chorus_slippers",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_pale_chorus_slippers.webp",
+      "canonicalDisplayName": "Heroic Pale Chorus Slippers",
+      "acceptedSha256": "d4ba5013be2390c409dc3ba06c1dadc74bc2630420869825bf07d7f6d71ed506",
+      "acceptedBytes": 4240,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_pale_chorus_slippers.png",
+        "sha256": "e6cf8971620f45f2134dcf02e3340680915f6fdc2f3b85cf0e42fbf6589dcb73",
+        "bytes": 2442472,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_pale_chorus_slippers.png",
+        "sha256": "35508f7dd2b90bcc57215f88267d61957e027283aa5a9765b2721ee14f5a0a7c",
+        "bytes": 624225,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "ba256ff6598427bb2286532f9844953979e383c2a30f080e719d41449594d390",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Pale Chorus Slippers (heroic_pale_chorus_slippers) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of pale moon-silk CLOTH slippers, soft folded fabric, ornamental hymn-like stitching without readable notation, luminous pearl toe ornaments. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong silver-violet moonlight halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_pale_chorus_slippers.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ba256ff6598427bb2286532f9844953979e383c2a30f080e719d41449594d390"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "tideglass_gauntlets",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/tideglass_gauntlets.webp",
+      "canonicalDisplayName": "Tideglass Gauntlets",
+      "acceptedSha256": "e85e78e0e0582a36ee06aee236d48ccc4f7608baa6cd2f62b8d26a44311d0e02",
+      "acceptedBytes": 4756,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/tideglass_gauntlets.png",
+        "sha256": "3f958fee7d931a313fdaf82a58c73efa195008b1ac2da30c886abd63e4a68067",
+        "bytes": 2600234,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/tideglass_gauntlets.png",
+        "sha256": "357ec1e62d90912fce7335ab2890e140bdfef491b28d989ee59c813c1e108fdf",
+        "bytes": 574472,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "1051fae94f1e746f6b9b51bc1ea469c70622ee1c0434e329526b66d0d28bbc1f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tideglass Gauntlets (tideglass_gauntlets) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of MAIL steel gauntlets, articulated iron fingers over interlinked chain, bright translucent blue tideglass shards set across knuckles. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/tideglass_gauntlets.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "1051fae94f1e746f6b9b51bc1ea469c70622ee1c0434e329526b66d0d28bbc1f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_tideglass_gauntlets",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_tideglass_gauntlets.webp",
+      "canonicalDisplayName": "Heroic Tideglass Gauntlets",
+      "acceptedSha256": "3b03c9e4f6f468aa2decc6b008ecc59ef4820f29185cb445f5b2eb6e4d2e4f79",
+      "acceptedBytes": 5788,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_tideglass_gauntlets.png",
+        "sha256": "44690075875e5382edeee905b523a64b15dd877db047b69341060719d9cedd0a",
+        "bytes": 2652329,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_tideglass_gauntlets.png",
+        "sha256": "41cc7a4056571763d6e1af9d8848244248defe5aa3e7f98c5a8f6817a2ef9260",
+        "bytes": 627765,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "a3766356ddda390af58da55599767ac244a6d64a364eae09b5df8c9bb6c2bd9d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Tideglass Gauntlets (heroic_tideglass_gauntlets) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of MAIL steel gauntlets, articulated iron fingers over interlinked chain, bright translucent blue tideglass shards set across knuckles. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong turquoise sea-light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_tideglass_gauntlets.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "a3766356ddda390af58da55599767ac244a6d64a364eae09b5df8c9bb6c2bd9d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "moonburn_grips",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/moonburn_grips.webp",
+      "canonicalDisplayName": "Moonburn Grips",
+      "acceptedSha256": "310d2562d67bc8e1516f37561b7791052087e8e49dc23376ff73841bb76ece75",
+      "acceptedBytes": 3678,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/moonburn_grips.png",
+        "sha256": "76771346764fa2ac350ac7619dd26b6676eecbcdf6424317209b45bc68e73cc5",
+        "bytes": 2514980,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/moonburn_grips.png",
+        "sha256": "b138ca38ed4f6e9b443648a4357d1e34cd4cac2f9a63e86332455ae4ed49fe68",
+        "bytes": 564433,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "d231761a1dd37ad8f0ca93efeb10118844f85d3c1ee8576a37291aa9c6f62ad6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Moonburn Grips (moonburn_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of russet LEATHER gloves, supple stitched hide, one dark burned crescent moon emblem on each back, warm amber seams. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/moonburn_grips.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d231761a1dd37ad8f0ca93efeb10118844f85d3c1ee8576a37291aa9c6f62ad6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_moonburn_grips",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_moonburn_grips.webp",
+      "canonicalDisplayName": "Heroic Moonburn Grips",
+      "acceptedSha256": "3eb66591bef9f00bcb90ae499b95b2b180f15569769a71f987f8c38a517e0893",
+      "acceptedBytes": 5012,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_moonburn_grips.png",
+        "sha256": "b4d283f54cf6f11f9ede8343242bcc539327355a0d0148fc038a898f7a95312c",
+        "bytes": 2659101,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_moonburn_grips.png",
+        "sha256": "06e718c6aa591a9df960157e56dbc8ecc22fc59704d776201a669a0d97d460e7",
+        "bytes": 618024,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "ee31fe043b41bf6685fa285e44d2c4b69580b54d04385e948cf33c14aacd3c81",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Moonburn Grips (heroic_moonburn_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of russet LEATHER gloves, supple stitched hide, one dark burned crescent moon emblem on each back, warm amber seams. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong silver-violet moonlight halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_moonburn_grips.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ee31fe043b41bf6685fa285e44d2c4b69580b54d04385e948cf33c14aacd3c81"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "prism_etched_handwraps",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/prism_etched_handwraps.webp",
+      "canonicalDisplayName": "Prism-Etched Handwraps",
+      "acceptedSha256": "e58b940f2ecad1a9e1e7e0cfd61c70c76c46ce926263478dd4bb2db57a7b5902",
+      "acceptedBytes": 3698,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/prism_etched_handwraps.png",
+        "sha256": "eadd4e1a11d3bee80913942baff3623173e3a30de8e5b66c5ce20a7ea26f0f05",
+        "bytes": 2442247,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/prism_etched_handwraps.png",
+        "sha256": "7ac86f0a1bd618535e1b12f4fbe26eda53c8de89a54f4be0cec4f684a3fc48af",
+        "bytes": 553310,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "a0a1e3b9a6d031256c91a6e74a5fa32116115146ef580b2afa087085a833a1a6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Prism-Etched Handwraps (prism_etched_handwraps) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of violet silk CLOTH handwraps, empty wrapped-glove shapes, subtle rainbow spectrum embroidery, a small faceted crystal prism secured at each wrist. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/prism_etched_handwraps.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "a0a1e3b9a6d031256c91a6e74a5fa32116115146ef580b2afa087085a833a1a6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_prism_etched_handwraps",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_prism_etched_handwraps.webp",
+      "canonicalDisplayName": "Heroic Prism-Etched Handwraps",
+      "acceptedSha256": "fa63ebb2c4204a12bbb58d40ae0f7094b9fd97419f6543fc1f15ff0a59167e8c",
+      "acceptedBytes": 4526,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_prism_etched_handwraps.png",
+        "sha256": "9d2e54c4ee3398c5d6b48eb1600bf8150d51259c90d73d3eb403d00c680f944c",
+        "bytes": 2639662,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_prism_etched_handwraps.png",
+        "sha256": "947d56849613c26174b86ea9e94994c18856661cb7f40de128334bb8aa4e88d7",
+        "bytes": 612969,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "ea4c0ecb046dca6e4974edf830ceaa77f6240278e6fe2f422bd546174ee1e337",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Prism-Etched Handwraps (heroic_prism_etched_handwraps) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of violet silk CLOTH handwraps, empty wrapped-glove shapes, subtle rainbow spectrum embroidery, a small faceted crystal prism secured at each wrist. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong silver-violet moonlight halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_prism_etched_handwraps.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ea4c0ecb046dca6e4974edf830ceaa77f6240278e6fe2f422bd546174ee1e337"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "mere_crested_helm",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/mere_crested_helm.webp",
+      "canonicalDisplayName": "Mere-Crested Helm",
+      "acceptedSha256": "ee3d25851039426aec4399fe393f617242ff5cb73407c56fbb1acd417e9ee9cd",
+      "acceptedBytes": 4226,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/mere_crested_helm.png",
+        "sha256": "fcbf2ff25224dcfd6eec9faa8889ca83c6b734f2849ed6c3392ba66c62527f53",
+        "bytes": 2637198,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/mere_crested_helm.png",
+        "sha256": "1dea62a786fbc34cf73740223787c973bd1323971d3220458d4e3995f1ad3fbb",
+        "bytes": 552303,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "f5d99744cbecb68b04c13635c4946345b641ca8d0ee6da1bbf2bef9d15e52a4d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Mere-Crested Helm (mere_crested_helm) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty MAIL steel helm with interlinked chain neck guard, three distinctive hydra fin crests sweeping back from crown, sea-aged silver metal and blue-green patina. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/mere_crested_helm.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f5d99744cbecb68b04c13635c4946345b641ca8d0ee6da1bbf2bef9d15e52a4d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_mere_crested_helm",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_mere_crested_helm.webp",
+      "canonicalDisplayName": "Heroic Mere-Crested Helm",
+      "acceptedSha256": "df083d2c0ce09a54553da1103f4151d16b77134b5f2680410e385d41702ecc6b",
+      "acceptedBytes": 4852,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_mere_crested_helm.png",
+        "sha256": "d9b73b22533da4f77a40ce3e2a5beae91be6701213a98516082ae17364369668",
+        "bytes": 2799069,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_mere_crested_helm.png",
+        "sha256": "f0a1cd71ba87d0ed2958e4cc98af111ba5a71a9e8353e470df4eb2150c7d085d",
+        "bytes": 603293,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "6eae8ae92cde77e078eac386157fdf696a32bdb27894906f9bc9da887312bed1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Mere-Crested Helm (heroic_mere_crested_helm) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty MAIL steel helm with interlinked chain neck guard, three distinctive hydra fin crests sweeping back from crown, sea-aged silver metal and blue-green patina. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong turquoise sea-light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_mere_crested_helm.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6eae8ae92cde77e078eac386157fdf696a32bdb27894906f9bc9da887312bed1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "mereskin_hood",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/mereskin_hood.webp",
+      "canonicalDisplayName": "Mereskin Hood",
+      "acceptedSha256": "2639f70fd6e7072cc6905ba9cf2be8411458259f5217ebba22e2d0e9c010c92d",
+      "acceptedBytes": 4320,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/mereskin_hood.png",
+        "sha256": "9c0e8ddfa2a4725b5d51aa17ed832cc8c30b3e6110c9c73276d02ac72df91ada",
+        "bytes": 2363527,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/mereskin_hood.png",
+        "sha256": "5298acc69f17b3649ffe6e389c8a91ce50fd790ee7a9419e9283b11885b0e286",
+        "bytes": 544285,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "638bacd4471bcdbc89835748f68a483b4b5bccd6efbc12083b1b5ef0d8974cd9",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Mereskin Hood (mereskin_hood) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty LEATHER hood made of teal hydra hide, large supple overlapping scales, a prominent finned ridge down crown, stitched leather edges, dark empty face opening. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/mereskin_hood.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "638bacd4471bcdbc89835748f68a483b4b5bccd6efbc12083b1b5ef0d8974cd9"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_mereskin_hood",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_mereskin_hood.webp",
+      "canonicalDisplayName": "Heroic Mereskin Hood",
+      "acceptedSha256": "dba8d68f3186a26eebf3f7bc05e78c1d71b9727e7b4ed8d801287f7239fbebd4",
+      "acceptedBytes": 4414,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_mereskin_hood.png",
+        "sha256": "3db2e469013dfa42a2f0582b8a21383578b1900f7bd835b503d1b10f15c39721",
+        "bytes": 2370141,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_mereskin_hood.png",
+        "sha256": "0854798d0e9391201d816cc2e29b343d2afc0180e2e56c17b8a577d18606f720",
+        "bytes": 565292,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "1633727a71cf895a4237fc9d06a38352288cf096bd9a5a96ee511d05a6b643b3",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Mereskin Hood (heroic_mereskin_hood) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty LEATHER hood made of teal hydra hide, large supple overlapping scales, a prominent finned ridge down crown, stitched leather edges, dark empty face opening. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong turquoise sea-light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_mereskin_hood.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "1633727a71cf895a4237fc9d06a38352288cf096bd9a5a96ee511d05a6b643b3"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "merewater_cowl",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/merewater_cowl.webp",
+      "canonicalDisplayName": "Merewater Cowl",
+      "acceptedSha256": "e6a4230850d16860d70a38a989b447765f9400911cc23d39eb097ebd28f8d136",
+      "acceptedBytes": 3852,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/merewater_cowl.png",
+        "sha256": "421f3781e26c6ec440c22b486ba541987f56c4a4658aa9e58fbd8f36d8bdf241",
+        "bytes": 2237464,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/merewater_cowl.png",
+        "sha256": "6a95021174a2e57d373ddea47ea309112a808d110b027256e98275fde9375fa7",
+        "bytes": 529772,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "dd3bc8fca867d3495951bc01ef46669155aaed4b465d616679d2b339603db43c",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Merewater Cowl (merewater_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty sea-green CLOTH cowl with deep rippled fabric folds, bright pearl at brow and a few suspended falling water drops below the hem, dark empty face opening. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/merewater_cowl.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "dd3bc8fca867d3495951bc01ef46669155aaed4b465d616679d2b339603db43c"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_merewater_cowl",
+      "family": "temple-blues",
+      "tier": "heroic",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_merewater_cowl.webp",
+      "canonicalDisplayName": "Heroic Merewater Cowl",
+      "acceptedSha256": "ebf239c04be71980b1a3434bcfbec732b7ece4b525450cc464e6d5f71c0a7bcb",
+      "acceptedBytes": 4706,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/heroic_merewater_cowl.png",
+        "sha256": "f4e08bbb389c499435613eb818ef97e8a6162d4fa82c385b000c5898456baa61",
+        "bytes": 2249971,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/heroic_merewater_cowl.png",
+        "sha256": "f3d121b6e827855ccd71f48198ebe0e46b5129f96e7b4f9505007da630b088c8",
+        "bytes": 562326,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "4c6c66511598fd36898812c4dbf2b539ddb53f4a1bbca451932eb8f99ad5f6f9",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Merewater Cowl (heroic_merewater_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty sea-green CLOTH cowl with deep rippled fabric folds, bright pearl at brow and a few suspended falling water drops below the hem, dark empty face opening. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong turquoise sea-light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/heroic_merewater_cowl.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "4c6c66511598fd36898812c4dbf2b539ddb53f4a1bbca451932eb8f99ad5f6f9"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "merecleaver",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/merecleaver.webp",
+      "canonicalDisplayName": "Merecleaver",
+      "acceptedSha256": "23ca9adc04f2fe8cab1110a0683a5d5f2a7bb56a979ea52fee666e14fe9e2d8b",
+      "acceptedBytes": 2272,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/merecleaver.png",
+        "sha256": "11bc6cf2646f5cd6773fbee351b1dd70f3fa2339533d5f8dec3d44ce061b57ff",
+        "bytes": 1959712,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/merecleaver.png",
+        "sha256": "2d2cf0ef58c4d5460cb843f155b62a8d9982cc5c03e8dd40e583c3bde5dac8b8",
+        "bytes": 416893,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "00219e8bc8b7f4bd12ceabb051f2d20d5a440fc196eb293fb5cae640a3c0a964",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Merecleaver (merecleaver) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete two-handed fantasy axe diagonally posed, long wrapped haft, a broad sea-steel fin-shaped blade with exactly three large teeth, whole axe head and butt visible. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/merecleaver.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "00219e8bc8b7f4bd12ceabb051f2d20d5a440fc196eb293fb5cae640a3c0a964"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "moonwrack_stave",
+      "family": "temple-blues",
+      "tier": "normal",
+      "batch": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/moonwrack_stave.webp",
+      "canonicalDisplayName": "Moonwrack Stave",
+      "acceptedSha256": "b5d5495829d8c6c383d664d879abc4d55ed006fa01cdc451b93c63b89dcc1dcc",
+      "acceptedBytes": 2114,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/originals/moonwrack_stave.png",
+        "sha256": "0fb119313f1f468d9a10a94c715410fe887e176ccd19755eab26da5b0a8120c1",
+        "bytes": 1997022,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple-blues/masters/moonwrack_stave.png",
+        "sha256": "0846b79d757fbd621a20ce878fad08f0a604b4d7be64a923d6074bc263603142",
+        "bytes": 450354,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "99ec51320fa41e302984b4196b387a23b2548c49a8874f29a82db0eb58fb0400",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Moonwrack Stave (moonwrack_stave) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pale driftwood magic staff diagonally posed, gnarled wood crowned by a pearly nacre crescent cradling a luminous round pearl, whole crescent and butt visible. No wearer or mannequin. Preserve canonical Drowned Temple rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper moonlit or sea ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple-blues/superseded/moonwrack_stave.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "99ec51320fa41e302984b4196b387a23b2548c49a8874f29a82db0eb58fb0400"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

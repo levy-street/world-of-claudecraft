@@ -1,0 +1,51 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = 'tmp/scenery-review';
+const dirs = [process.argv[2] ?? 'windows-2026-10-14T20-00-14.839Z'];
+const files = dirs.map(x => path.join(root, x, 'results.json')).filter(fs.existsSync);
+const quantile = (xs, p) => {
+  const a = xs.filter(Number.isFinite).sort((a,b) => a-b);
+  return a.length ? a[Math.min(a.length-1, Math.ceil(a.length*p)-1)] : null;
+};
+const rounds = files.map(file => {
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  return {file, data};
+});
+const rows = rounds.flatMap(({file,data}) => data.rows.map(row => {
+  const samples = row.samples;
+  const points = samples.flatMap(s => [s.start,...s.points,s.end]);
+  const frames = samples.flatMap(s=>s.frames);
+  return {
+    file, tier:row.tier, order:row.order, mode:row.mode, scene:row.scene,
+    windows:samples.length,
+    fps:1000*samples.reduce((n,s)=>n+s.submitted,0)/samples.reduce((n,s)=>n+s.elapsedMs,0),
+    p95ms:quantile(frames,.95),p99ms:quantile(frames,.99),maxMs:Math.max(...frames),
+    over50ms:frames.filter(x=>x>50).length,over100ms:frames.filter(x=>x>100).length,
+    longTasks:samples.reduce((n,s)=>n+s.longTasks.length,0),
+    medianCalls:quantile(points.map(x=>x.calls),.5),
+    medianTriangles:quantile(points.map(x=>x.triangles),.5),
+    medianWorldMs:quantile(points.map(x=>x.phaseMs?.world?.avg),.5),
+    medianFoliageLastFrameMs:quantile(points.map(x=>x.lastFrame?.worldPhaseMs?.foliage),.5),
+    medianSubmitMs:quantile(points.map(x=>x.phaseMs?.submit?.avg),.5),
+    renderer:row.before.snapshot.glRenderer,
+    screenshot:path.join(path.dirname(file),`${row.tier}-${row.order}-${row.mode}-${row.scene}.webp`),
+  };
+}));
+const pairs=[];
+for(const tier of ['low','medium','high','ultra','insane']) {
+  for(const scene of ['thornpeak','beach']) {
+    for(const order of ['forward','reverse']) {
+      const arms=rows.filter(x=>x.tier===tier&&x.scene===scene&&x.order===order);
+      const existing=arms.findLast(x=>x.mode==='existing');
+      const updated=arms.findLast(x=>x.mode==='updated');
+      if(existing&&updated) pairs.push({tier,scene,order,existing,updated,changePct:100*(updated.fps/existing.fps-1)});
+    }
+  }
+}
+const summary={
+  runs:rounds.map(({file,data})=>({file,complete:data.complete,error:data.error,rows:data.rows.length,excluded:data.excluded.length,pageErrors:data.errors,consoleErrors:data.consoleErrors.length})),
+  rows,pairs,
+};
+fs.writeFileSync(path.join(root,'summary.json'),JSON.stringify(summary,null,2));
+console.log(JSON.stringify({runs:summary.runs,pairs:pairs.map(p=>({tier:p.tier,scene:p.scene,order:p.order,existing:+p.existing.fps.toFixed(2),updated:+p.updated.fps.toFixed(2),changePct:+p.changePct.toFixed(1),p99:[p.existing.p99ms,p.updated.p99ms].map(x=>+x.toFixed(1))}))},null,2));

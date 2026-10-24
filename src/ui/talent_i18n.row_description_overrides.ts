@@ -105,8 +105,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Cada tercera habilidad que utilizas genera un 20 % más de ira.',
     war_row_colossal_might:
       'Cada punto de ira que gastas reduce en 0,1 s el tiempo de reutilización de tus grandes habilidades ofensivas, hasta 10 s cada 30 s.',
-    dru_r14_empowered_touch:
-      'Sobrefloración vuelve a plantar una Floración Silvestre nueva en cada aliado cuya sanación cosechó.',
     dru_r14_moonfury:
       'La Oleada Lunar y la Estela Solar también restauran cada una un 15% de tu maná máximo.',
     dru_r14_savage_fury:
@@ -118,7 +116,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Paso ligero dura 5 s y su tiempo de reutilización es de 12 s.',
     dru_r5_improved_wrath: 'Cambiar de forma elimina las raíces rompibles y las ralentizaciones.',
     hun_r11_binding_payload:
-      'La Trampa Fauces de Escarcha inmoviliza a todos los enemigos en su área de activación durante 3 s, y luego los ralentiza un 40% durante 4 s.',
+      'Tus trampas inmovilizan a todos los enemigos en su área de activación durante 3 s, y luego los ralentizan un 40% durante 4 s.',
     hun_r11_crippling_pursuit:
       'El Disparo Aturdidor o el Tajo Aprisionante inmoviliza a un objetivo ya ralentizado durante 2 s. Tiempo de reutilización de 12 s por objetivo.',
     hun_r14_efficient_rhythm:
@@ -132,7 +130,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'La Piel de Caparazón permite atacar y dar órdenes a la mascota, pero su reducción de daño baja al 40%.',
     hun_r20_chain_reaction:
-      'La Trampa Fauces de Escarcha marca a los enemigos en un radio de 4 metros durante 8 s. Tus próximas 3 habilidades que gastan concentración hacen eco de un 40% de daño entre los enemigos marcados.',
+      'Tus trampas marcan a los enemigos en un radio de 4 metros durante 8 s al activarse. Tus próximas 3 habilidades que gastan concentración hacen eco de un 40% de daño entre los enemigos marcados.',
     hun_r20_fang_chorus:
       'Cada habilidad que gasta concentración ordena un eco de mascota al 50% de potencia. Cada 3.er eco se convierte en un golpe de área de 4 metros.',
     hun_r20_overdraw:
@@ -204,6 +202,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La represalia de la Égida de Truenos otorga un 10% de reducción de daño durante 3 s.',
     wlk_r11_demon_armor:
       'La primera vez que cada miembro del grupo toca tu Pozo de Almas, los protege con un escudo equivalente al 15% de su salud máxima durante 30 s. Cada jugador puede obtener este escudo una vez por Pozo de Almas.',
+    dru_r14_empowered_touch:
+      'Sobrefloración aplica un nuevo Remiendo de Esporas a cada aliado cuyos efectos de sanación haya consumido.',
   },
   es_ES: {
     wlk_r17_death_coil:
@@ -230,8 +230,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Cada tercera habilidad que utilizas genera un 20 % más de ira.',
     war_row_colossal_might:
       'Cada punto de ira que gastas reduce en 0,1 s el tiempo de reutilización de tus grandes habilidades ofensivas, hasta 10 s cada 30 s.',
-    dru_r14_empowered_touch:
-      'Sobrefloración replanta una Floración Silvestre nueva en cada aliado cuya sanación cosechó.',
     dru_r14_moonfury:
       'Oleada Lunar y Estela Solar también restauran cada una un 15% de tu maná máximo.',
     dru_r14_savage_fury:
@@ -243,7 +241,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Paso ligero dura 5 s y su tiempo de reutilización es de 12 s.',
     dru_r5_improved_wrath: 'Cambiar de forma elimina raíces y ralentizaciones rompibles.',
     hun_r11_binding_payload:
-      'La Trampa Fauces de Escarcha inmoviliza a todos los enemigos en su área de activación durante 3 s, y luego los ralentiza un 40% durante 4 s.',
+      'Tus trampas inmovilizan a todos los enemigos en su área de activación durante 3 s, y luego los ralentizan un 40% durante 4 s.',
     hun_r11_crippling_pursuit:
       'Disparo Aturdidor o Tajo Aprisionante inmoviliza durante 2 s a un objetivo ya ralentizado. Tiempo de reutilización de 12 s por objetivo.',
     hun_r14_efficient_rhythm:
@@ -257,7 +255,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Piel de Caparazón permite atacar y ordenar a tu mascota, pero su reducción de daño baja al 40%.',
     hun_r20_chain_reaction:
-      'La Trampa Fauces de Escarcha marca a los enemigos en 4 m durante 8 s. Tus próximos 3 usos de habilidades que consumen Concentración hacen eco de un 40% de daño entre los enemigos marcados.',
+      'Tus trampas marcan a los enemigos en 4 m durante 8 s al activarse. Tus próximos 3 usos de habilidades que consumen Concentración hacen eco de un 40% de daño entre los enemigos marcados.',
     hun_r20_fang_chorus:
       'Cada habilidad que consume Concentración ordena un eco de tu mascota al 50% de fuerza. Cada 3.er eco se convierte en una sacudida de 4 m.',
     hun_r20_overdraw:
@@ -330,6 +328,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La represalia de la Égida de Truenos otorga una reducción del daño recibido del 10% durante 3 s.',
     wlk_r11_demon_armor:
       'La primera vez que cada miembro del grupo toca tu Soulwell, los escuda por un 15% de su salud máxima durante 30 s. Cada jugador puede obtener este escudo una vez por Soulwell.',
+    dru_r14_empowered_touch:
+      'Sobrefloración aplica un nuevo Remiendo de Esporas a cada aliado cuyos efectos de sanación haya consumido.',
   },
   fr_FR: {
     mag_r5_blink_cast:
@@ -351,8 +351,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Chaque troisième technique utilisée génère 20 % de rage en plus.',
     war_row_colossal_might:
       "Chaque point de rage dépensé réduit de 0,1 s le temps de recharge de vos grandes capacités offensives, jusqu'à 10 s toutes les 30 s.",
-    dru_r14_empowered_touch:
-      'Surfloraison replante une Floraison sauvage fraîche sur chaque allié dont elle a récolté le soin.',
     dru_r14_moonfury:
       'Déferlante lunaire et Sillage solaire restaurent chacun aussi 15% de votre mana maximum.',
     dru_r14_savage_fury:
@@ -365,7 +363,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_improved_wrath:
       'Changer de forme retire les immobilisations et ralentissements brisables.',
     hun_r11_binding_payload:
-      'Le Piège Mâchegivre immobilise tous les ennemis dans sa zone de déclenchement pendant 3 s, puis les ralentit de 40% pendant 4 s.',
+      'Vos pièges immobilisent tous les ennemis dans leur zone de déclenchement pendant 3 s, puis les ralentissent de 40% pendant 4 s.',
     hun_r11_crippling_pursuit:
       'Tir déstabilisant ou Taillade entravante immobilise une cible déjà ralentie pendant 2 s. Recharge de 12 s par cible.',
     hun_r14_efficient_rhythm:
@@ -379,7 +377,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Peau de carapace autorise les attaques et les ordres au familier, mais sa réduction des dégâts est ramenée à 40%.',
     hun_r20_chain_reaction:
-      'Le Piège Mâchegivre marque les ennemis dans un rayon de 4 m pendant 8 s. Vos 3 prochaines dépenses de concentration répercutent 40% de dégâts entre les ennemis marqués.',
+      "Vos pièges marquent les ennemis dans un rayon de 4 m pendant 8 s lorsqu'ils se déclenchent. Vos 3 prochaines dépenses de concentration répercutent 40% de dégâts entre les ennemis marqués.",
     hun_r20_fang_chorus:
       'Chaque dépense de concentration commande un écho de familier à 50% de puissance. Un écho sur trois devient une secousse de 4 m.',
     hun_r20_overdraw:
@@ -452,6 +450,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Les représailles de la Garde de tonnerre octroient 10% de réduction des dégâts pendant 3 s.',
     wlk_r11_demon_armor:
       "La première fois que chaque membre du groupe touche votre Puits d'âmes, il le protège d'un bouclier égal à 15% de ses points de vie maximum pendant 30 s. Chaque joueur ne peut obtenir ce bouclier qu'une fois par Puits d'âmes.",
+    dru_r14_empowered_touch:
+      'Surfloraison applique un nouveau Soin de spores à chaque allié dont elle a récolté les soins.',
   },
   fr_CA: {
     mag_r5_blink_cast:
@@ -473,8 +473,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Chaque troisième technique utilisée génère 20 % de rage en plus.',
     war_row_colossal_might:
       "Chaque point de rage dépensé réduit de 0,1 s le temps de recharge de vos grandes capacités offensives, jusqu'à 10 s toutes les 30 s.",
-    dru_r14_empowered_touch:
-      'Surfloraison replante une Floraison sauvage fraîche sur chaque allié dont elle a récolté les soins.',
     dru_r14_moonfury:
       'Déferlante lunaire et Sillage solaire restaurent chacun aussi 15% de votre mana maximum.',
     dru_r14_savage_fury:
@@ -486,7 +484,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Foulée bondissante dure 5 s et son temps de recharge est de 12 s.',
     dru_r5_improved_wrath: 'Changer de forme retire les racines et ralentissements dissipables.',
     hun_r11_binding_payload:
-      'Piège Mâchegivre enracine tous les ennemis dans sa zone de déclenchement pendant 3 s, puis les ralentit de 40% pendant 4 s.',
+      'Vos pièges enracinent tous les ennemis dans leur zone de déclenchement pendant 3 s, puis les ralentissent de 40% pendant 4 s.',
     hun_r11_crippling_pursuit:
       'Tir déstabilisant ou Taillade entravante enracine une cible déjà ralentie pendant 2 s. Recharge de 12 s par cible.',
     hun_r14_efficient_rhythm:
@@ -500,7 +498,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Peau de carapace autorise les attaques et les ordres au familier, mais sa réduction des dégâts tombe à 40%.',
     hun_r20_chain_reaction:
-      'Piège Mâchegivre marque les ennemis dans un rayon de 4 m pendant 8 s. Vos 3 prochaines techniques consommant de la Concentration font écho pour 40% de dégâts entre les ennemis marqués.',
+      "Vos pièges marquent les ennemis dans un rayon de 4 m pendant 8 s lorsqu'ils se déclenchent. Vos 3 prochaines techniques consommant de la Concentration font écho pour 40% de dégâts entre les ennemis marqués.",
     hun_r20_fang_chorus:
       'Chaque technique consommant de la Concentration commande un écho de familier à 50% de puissance. Tous les 3 échos deviennent un coup en zone de 4 m.',
     hun_r20_overdraw:
@@ -574,6 +572,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Les représailles de Garde de tonnerre confèrent 10% de réduction des dégâts pendant 3 s.',
     wlk_r11_demon_armor:
       "La première fois que chaque membre du groupe touche votre Puits d'âmes, il le protège d'un bouclier égal à 15% de ses points de vie maximum pendant 30 s. Chaque joueur ne peut gagner ce bouclier qu'une fois par Puits d'âmes.",
+    dru_r14_empowered_touch:
+      'Surfloraison applique un nouveau Soin de spores à chaque allié dont elle a récolté les soins.',
   },
   it_IT: {
     mag_r5_blink_cast: 'Puoi usare Passo Baleno nel mezzo di un incantesimo senza interromperlo.',
@@ -593,8 +593,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Ogni terza abilità usata genera il 20% di rabbia in più.',
     war_row_colossal_might:
       'Ogni punto di rabbia speso riduce di 0,1 secondi il tempo di recupero delle tue grandi abilità offensive, fino a 10 secondi ogni 30 secondi.',
-    dru_r14_empowered_touch:
-      'Sovrafioritura ripianta una Fioritura Selvaggia fresca su ogni alleato la cui cura ha raccolto.',
     dru_r14_moonfury:
       'Ondata Lunare e Scia Solare ripristinano ciascuna anche il 15% del tuo mana massimo.',
     dru_r14_savage_fury:
@@ -606,7 +604,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Passo leggero dura 5 sec e il suo tempo di recupero è di 12 sec.',
     dru_r5_improved_wrath: 'Cambiare forma rimuove i radicamenti frangibili e i rallentamenti.',
     hun_r11_binding_payload:
-      'Trappola Fauci di Gelo radica ogni nemico nella sua area di attivazione per 3 sec, poi li rallenta del 40% per 4 sec.',
+      'Le tue trappole radicano ogni nemico nella loro area di attivazione per 3 sec, poi li rallentano del 40% per 4 sec.',
     hun_r11_crippling_pursuit:
       'Tiro Scuotente o Fendente Immobilizzante radica per 2 sec un bersaglio già rallentato. Tempo di recupero di 12 sec per bersaglio.',
     hun_r14_efficient_rhythm:
@@ -620,7 +618,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Pelle di Corazza consente di attaccare e impartire comandi al famiglio, ma la sua riduzione danni scende al 40%.',
     hun_r20_chain_reaction:
-      'Trappola Fauci di Gelo marchia i nemici entro 4 metri per 8 sec. Le tue prossime 3 abilità che consumano Concentrazione fanno risuonare il 40% dei danni tra i nemici marchiati.',
+      'Le tue trappole, quando vengono attivate, marchiano i nemici entro 4 metri per 8 sec. Le tue prossime 3 abilità che consumano Concentrazione fanno risuonare il 40% dei danni tra i nemici marchiati.',
     hun_r20_fang_chorus:
       "Ogni abilità che consuma Concentrazione comanda un'eco del famiglio al 50% di potenza. Ogni 3° eco diventa un colpo ad area di 4 metri.",
     hun_r20_overdraw:
@@ -693,6 +691,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La rappresaglia di Barriera di Tuono concede il 10% di riduzione danni per 3 sec.',
     wlk_r11_demon_armor:
       'La prima volta che ogni membro del gruppo tocca il tuo Soulwell, li protegge con uno scudo pari al 15% della loro salute massima per 30 sec. Ogni giocatore può ottenere questo scudo una sola volta per Soulwell.',
+    dru_r14_empowered_touch:
+      'Sovrafioritura applica una nuova Cura delle Spore a ogni alleato di cui ha raccolto le cure.',
   },
   de_DE: {
     mag_r5_blink_cast:
@@ -714,8 +714,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Jede dritte eingesetzte Fähigkeit erzeugt 20 % mehr Wut.',
     war_row_colossal_might:
       'Jeder verbrauchte Wutpunkt verkürzt die Abklingzeit deiner wichtigsten Angriffsfähigkeiten um 0,1 Sek., maximal 10 Sek. alle 30 Sek.',
-    dru_r14_empowered_touch:
-      'Überblüte pflanzt auf jedem Verbündeten, dessen Heilung sie geerntet hat, eine frische Wildblüte.',
     dru_r14_moonfury:
       'Mondwoge und Sonnenspur stellen jeweils außerdem 15% Eures maximalen Manas wieder her.',
     dru_r14_savage_fury:
@@ -727,7 +725,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Weiter Schritt hält 5 Sek. an und seine Abklingzeit beträgt 12 Sek.',
     dru_r5_improved_wrath: 'Gestaltwandel entfernt brechbare Wurzeleffekte und Verlangsamungen.',
     hun_r11_binding_payload:
-      'Frostkieferfalle verwurzelt jeden Gegner in ihrem Auslösebereich 3 Sek. lang und verlangsamt sie anschließend 4 Sek. lang um 40%.',
+      'Eure Fallen verwurzeln jeden Gegner in ihrem Auslösebereich 3 Sek. lang und verlangsamen sie anschließend 4 Sek. lang um 40%.',
     hun_r11_crippling_pursuit:
       'Rasselnder Schuss oder Fesselnder Hieb verwurzelt ein bereits verlangsamtes Ziel 2 Sek. lang. 12 Sek. Abklingzeit pro Ziel.',
     hun_r14_efficient_rhythm:
@@ -741,7 +739,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Panzerhaut erlaubt Angriffe und Begleiterbefehle, doch ihre Schadensreduzierung sinkt auf 40%.',
     hun_r20_chain_reaction:
-      'Frostkieferfalle markiert Gegner im Umkreis von 4 Metern 8 Sek. lang. Eure nächsten 3 Fokusverbraucher lassen 40% Schaden zwischen markierten Gegnern widerhallen.',
+      'Eure Fallen markieren beim Auslösen Gegner im Umkreis von 4 Metern 8 Sek. lang. Eure nächsten 3 Fokusverbraucher lassen 40% Schaden zwischen markierten Gegnern widerhallen.',
     hun_r20_fang_chorus:
       'Jeder Fokusverbraucher befiehlt ein Begleiterecho mit 50% Stärke. Jedes 3. Echo wird zu einem Schlag im Umkreis von 4 Metern.',
     hun_r20_overdraw:
@@ -814,6 +812,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Eine Vergeltung des Donnerschilds gewährt 3 Sek. lang 10% Schadensreduzierung.',
     wlk_r11_demon_armor:
       'Beim ersten Berühren Eures Soulwell schützt es jedes Gruppenmitglied 30 Sek. lang mit einem Schild von 15% seiner maximalen Gesundheit. Jeder Spieler kann diesen Schild einmal pro Soulwell erhalten.',
+    dru_r14_empowered_touch:
+      'Überblüte belegt jeden Verbündeten, dessen Heilung sie geerntet hat, mit einer neuen Sporenheilung.',
   },
   pt_BR: {
     mag_r5_blink_cast: 'Você pode usar Passo Cintilante durante uma conjuração sem interrompê-la.',
@@ -833,8 +833,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Cada terceira habilidade usada gera 20% mais raiva.',
     war_row_colossal_might:
       'Cada ponto de raiva gasto reduz em 0,1 s a recarga das suas principais habilidades ofensivas, até 10 s a cada 30 s.',
-    dru_r14_empowered_touch:
-      'Superflorescência replanta um novo Florescer Selvagem em cada aliado cuja cura ela colheu.',
     dru_r14_moonfury: 'Onda Lunar e Despertar Solar também restauram 15% da sua mana máxima cada.',
     dru_r14_savage_fury:
       'Cada tique dos seus sangramentos de Esfolar e Rasgar também adiciona 1 de Sangue Antigo.',
@@ -846,7 +844,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_improved_wrath:
       'Mudar de forma remove enraizamentos e reduções de velocidade removíveis.',
     hun_r11_binding_payload:
-      'A Armadilha Presa Gélida enraíza todo inimigo na sua área de ativação por 3 s, depois os lentifica em 40% por 4 s.',
+      'Suas armadilhas enraízam todo inimigo na sua área de ativação por 3 s, depois os lentificam em 40% por 4 s.',
     hun_r11_crippling_pursuit:
       'Tiro Desnorteante ou Talho Aprisionador enraízam um alvo já lentificado por 2 s. Recarga de 12 s por alvo.',
     hun_r14_efficient_rhythm:
@@ -860,7 +858,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Pele de Casco permite ataques e comandos ao mascote, mas sua redução de dano cai para 40%.',
     hun_r20_chain_reaction:
-      'A Armadilha Presa Gélida marca inimigos num raio de 4 m por 8 s. Suas próximas 3 habilidades que gastam Foco ecoam 40% de dano entre os inimigos marcados.',
+      'Suas armadilhas, ao serem acionadas, marcam inimigos num raio de 4 m por 8 s. Suas próximas 3 habilidades que gastam Foco ecoam 40% de dano entre os inimigos marcados.',
     hun_r20_fang_chorus:
       'Cada habilidade que gasta Foco comanda um eco do mascote com 50% de força. A cada 3º eco, ele se torna um golpe em área de 4 m.',
     hun_r20_overdraw:
@@ -932,6 +930,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'A retaliação da Salvaguarda do Trovão concede 10% de redução de dano por 3 s.',
     wlk_r11_demon_armor:
       'Na primeira vez que cada membro do grupo toca seu Soulwell, ele os escuda em 15% da vida máxima deles por 30 s. Cada jogador pode obter esse escudo uma vez por Soulwell.',
+    dru_r14_empowered_touch:
+      'Superflorescência aplica uma nova Cura de Esporos a cada aliado cuja cura ela colheu.',
   },
   ru_RU: {
     mag_r5_blink_cast:
@@ -955,7 +955,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_colossal_might:
       'Каждая единица ярости, которую вы тратите, сокращает время восстановления ваших основных атакующих способностей на 0,1 сек., не более 10 сек. каждые 30 сек.',
     dru_r14_empowered_touch:
-      '«Сверхцветение» заново высаживает свежий «Дикий расцвет» на каждом союзнике, чье исцеление оно собрало.',
+      'Сверхцветение накладывает новое Спороисцеление на каждого союзника, чьи эффекты лечения оно собрало.',
     dru_r14_moonfury:
       '«Лунный всплеск» и «Пробуждение солнца» также восстанавливают по 15% вашей максимальной маны.',
     dru_r14_savage_fury:
@@ -968,7 +968,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_improved_wrath:
       'Смена облика снимает разрушаемые обездвиживающие и замедляющие эффекты.',
     hun_r11_binding_payload:
-      '«Капкан ледяной пасти» обездвиживает всех врагов в зоне срабатывания на 3 сек., а затем замедляет их на 40% на 4 сек.',
+      'Ваши ловушки обездвиживают всех врагов в зоне срабатывания на 3 сек., а затем замедляют их на 40% на 4 сек.',
     hun_r11_crippling_pursuit:
       '«Сотрясающий выстрел» или «Сковывающий разрез» обездвиживают уже замедленную цель на 2 сек. Время восстановления для каждой цели: 12 сек.',
     hun_r14_efficient_rhythm:
@@ -982,7 +982,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       '«Панцирная кожа» позволяет атаковать и отдавать команды питомцу, но ее снижение урона уменьшается до 40%.',
     hun_r20_chain_reaction:
-      '«Капкан ледяной пасти» помечает врагов в пределах 4 ярда на 8 сек. Следующие 3 траты концентрации распространяют эхом 40% урона между помеченными врагами.',
+      'При срабатывании ваши ловушки помечают врагов в пределах 4 ярдов на 8 сек. Следующие 3 траты концентрации распространяют эхом 40% урона между помеченными врагами.',
     hun_r20_fang_chorus:
       'Каждая трата концентрации вызывает эхо-атаку питомца силой 50%. Каждое 3-е эхо становится хлопком радиусом 4 ярда.',
     hun_r20_overdraw:
@@ -1074,8 +1074,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Každá třetí použitá schopnost generuje o 20 % více zuřivosti.',
     war_row_colossal_might:
       'Každý bod zuřivosti, který utratíš, zkracuje cooldown tvých hlavních útočných schopností o 0,1 s, nejvýše 10 s každých 30 s.',
-    dru_r14_empowered_touch:
-      'Překvět znovu zasadí čerstvý Divoký květ na každého spojence, jehož léčení sklidil.',
     dru_r14_moonfury: 'Měsíční vzedmutí i Sluneční vzedmutí navíc obnoví 15 % tvé maximální many.',
     dru_r14_savage_fury:
       'Každý tik tvého krvácení ze Stažení z kůže a Roztržení navíc přidá 1 Starou krev.',
@@ -1086,7 +1084,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Dlouhý krok trvá 5 s a jeho doba přebití je 12 s.',
     dru_r5_improved_wrath: 'Změna podoby odstraní zrušitelná zakořenění a zpomalení.',
     hun_r11_binding_payload:
-      'Past mrazivé čelisti zakoření každého nepřítele ve své spouštěcí oblasti na 3 s, poté je zpomalí o 40 % na 4 s.',
+      'Tvé pasti zakoření každého nepřítele ve své spouštěcí oblasti na 3 s, poté je zpomalí o 40 % na 4 s.',
     hun_r11_crippling_pursuit:
       'Otřásající výstřel nebo Spoutávající sek zakoření již zpomalený cíl na 2 s. Doba obnovy na cíl 12 s.',
     hun_r14_efficient_rhythm:
@@ -1100,7 +1098,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Krunýřová kůže umožňuje útoky a příkazy mazlíčkovi, ale její snížení poškození klesá na 40 %.',
     hun_r20_chain_reaction:
-      'Past mrazivé čelisti označí nepřátele do 4 yardů na 8 s. Tvé další 3 schopnosti spotřebovávající Soustředění ozvěnou přenesou 40 % poškození mezi označenými nepřáteli.',
+      'Tvé pasti při spuštění označí nepřátele do 4 yardů na 8 s. Tvé další 3 schopnosti spotřebovávající Soustředění ozvěnou přenesou 40 % poškození mezi označenými nepřáteli.',
     hun_r20_fang_chorus:
       'Každá schopnost spotřebovávající Soustředění přikáže tvému mazlíčkovi ozvěnu o poloviční síle. Každá 3. ozvěna se promění v úder v okruhu 4 yardů.',
     hun_r20_overdraw:
@@ -1169,6 +1167,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Odveta Hromové ochrany udělí 10 % snížení poškození na 3 s.',
     wlk_r11_demon_armor:
       'Poprvé, co se člen skupiny dotkne tvého Soulwellu, získá štít za 15 % svého maximálního zdraví na 30 s. Každý hráč může tento štít získat jednou za Soulwell.',
+    dru_r14_empowered_touch:
+      'Překvět znovu zasadí čerstvé Výtrusové hojení na každého spojence, jehož léčení sklidil.',
   },
   nl_NL: {
     mag_r5_blink_cast:
@@ -1189,8 +1189,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Elke derde gebruikte vaardigheid genereert 20% meer woede.',
     war_row_colossal_might:
       'Elk punt woede dat je uitgeeft verkort de herlaaditijd van je grote aanvalsvaardigheden met 0,1 sec, tot maximaal 10 sec elke 30 sec.',
-    dru_r14_empowered_touch:
-      'Overbloei herplant een verse Wildbloei op elke bondgenoot van wie het genezing heeft geoogst.',
     dru_r14_moonfury: 'Maangolf en Zonnespoor herstellen elk ook 15% van je maximale mana.',
     dru_r14_savage_fury:
       'Elke tik van je Villen- en Verscheuren-bloedingen voegt ook 1 Oud Bloed toe.',
@@ -1200,7 +1198,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Hobbelende pas duurt 5 sec en de afkoeltijd ervan is 12 sec.',
     dru_r5_improved_wrath: 'Van gedaante wisselen verwijdert breekbare wortels en vertragingen.',
     hun_r11_binding_payload:
-      'Vorstkaakval wortelt elke vijand in zijn triggergebied gedurende 3 sec, en vertraagt hen daarna 4 sec lang met 40%.',
+      'Je vallen wortelen elke vijand in hun triggergebied gedurende 3 sec, en vertragen hen daarna 4 sec lang met 40%.',
     hun_r11_crippling_pursuit:
       'Ratelend Schot of Kluisterende Houw wortelt een reeds vertraagd doelwit gedurende 2 sec. Afkoeltijd van 12 sec per doelwit.',
     hun_r14_efficient_rhythm:
@@ -1214,7 +1212,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Schildhuid staat aanvallen en huisdierbevelen toe, maar de schadevermindering ervan wordt verlaagd naar 40%.',
     hun_r20_chain_reaction:
-      'Vorstkaakval markeert vijanden binnen 4 m gedurende 8 sec. Je volgende 3 vaardigheden die focus verbruiken laten 40% schade weerklinken tussen gemarkeerde vijanden.',
+      'Je vallen markeren bij activering vijanden binnen 4 m gedurende 8 sec. Je volgende 3 vaardigheden die focus verbruiken laten 40% schade weerklinken tussen gemarkeerde vijanden.',
     hun_r20_fang_chorus:
       'Elke vaardigheid die focus verbruikt beveelt een huisdier-echo op 50% sterkte. Elke 3e echo wordt een klap van 4 m.',
     hun_r20_overdraw:
@@ -1286,6 +1284,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'De vergelding van Donderwering verleent 3 sec lang 10% schadevermindering.',
     wlk_r11_demon_armor:
       'De eerste keer dat een groepslid je Soulwell aanraakt, beschermt het hen 30 sec lang met een schild van 15% van hun maximale gezondheid. Elke speler kan dit schild eenmaal per Soulwell krijgen.',
+    dru_r14_empowered_touch:
+      'Overbloei brengt een nieuwe Sporenheling aan op elke bondgenoot van wie de genezing werd geoogst.',
   },
   pl_PL: {
     mag_r5_blink_cast:
@@ -1306,8 +1306,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Co trzecia użyta umiejętność generuje o 20% więcej szału.',
     war_row_colossal_might:
       'Każdy wydany punkt szału skraca czas odnowienia twoich głównych umiejętności ofensywnych o 0,1 sek., maksymalnie 10 sek. co 30 sek.',
-    dru_r14_empowered_touch:
-      'Nadrozkwit ponownie sadzi świeży Dziki rozkwit na każdym sojuszniku, którego leczenie zebrał.',
     dru_r14_moonfury:
       'Księżycowy przybór i Słoneczny ślad dodatkowo przywracają po 15% twojej maksymalnej many.',
     dru_r14_savage_fury:
@@ -1319,7 +1317,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Długi krok trwa 5 sekund, a jego czas odnowienia wynosi 12 sekund.',
     dru_r5_improved_wrath: 'Zmiana postaci usuwa przełamywalne unieruchomienia i spowolnienia.',
     hun_r11_binding_payload:
-      'Pułapka Mroźnej Paszczy unieruchamia każdego wroga w swoim obszarze wyzwolenia na 3 sekundy, a następnie spowalnia go o 40% na 4 sekundy.',
+      'Twoje pułapki unieruchamiają każdego wroga w swoim obszarze wyzwolenia na 3 sekundy, a następnie spowalniają go o 40% na 4 sekundy.',
     hun_r11_crippling_pursuit:
       'Wstrząsający strzał lub Pętające cięcie unieruchamia już spowolniony cel na 2 sekundy. Czas odnowienia na cel: 12 sekund.',
     hun_r14_efficient_rhythm:
@@ -1333,7 +1331,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Pancerna Skóra pozwala na ataki i rozkazywanie zwierzęciu, ale jej redukcja obrażeń zostaje zmniejszona do 40%.',
     hun_r20_chain_reaction:
-      'Pułapka Mroźnej Paszczy oznacza wrogów w promieniu 4 m na 8 sekund. Twoje następne 3 umiejętności zużywające skupienie odbijają 40% obrażeń między oznaczonymi wrogami.',
+      'Twoje pułapki po wyzwoleniu oznaczają wrogów w promieniu 4 m na 8 sekund. Twoje następne 3 umiejętności zużywające skupienie odbijają 40% obrażeń między oznaczonymi wrogami.',
     hun_r20_fang_chorus:
       'Każda umiejętność zużywająca skupienie rozkazuje echu zwierzęcia o sile 50%. Co 3. echo zamienia się w uderzenie obszarowe w promieniu 4 m.',
     hun_r20_overdraw:
@@ -1405,6 +1403,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Odwet Osłony gromu przyznaje 10% redukcji obrażeń na 3 sekundy.',
     wlk_r11_demon_armor:
       'Za pierwszym razem, gdy członek grupy skorzysta z twojego Soulwell, osłania go tarczą równą 15% jego maksymalnego zdrowia na 30 sekund. Każdy gracz może zyskać tę tarczę raz na Soulwell.',
+    dru_r14_empowered_touch:
+      'Nadrozkwit ponownie nakłada świeże Zarodnikowe gojenie na każdego sojusznika, którego leczenie zebrał.',
   },
   id_ID: {
     mag_r5_blink_cast:
@@ -1426,8 +1426,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Setiap kemampuan ketiga yang kamu gunakan menghasilkan 20% lebih banyak amarah.',
     war_row_colossal_might:
       'Setiap poin amarah yang kamu habiskan mempersingkat waktu pemulihan kemampuan ofensif utamamu sebesar 0,1 dtk, hingga 10 dtk setiap 30 dtk.',
-    dru_r14_empowered_touch:
-      'Mekar Raya menanam kembali Mekar Liar segar pada setiap sekutu yang penyembuhannya dipanen.',
     dru_r14_moonfury:
       'Gelombang Rembulan dan Jejak Surya masing-masing juga memulihkan 15% dari mana maksimummu.',
     dru_r14_savage_fury:
@@ -1439,7 +1437,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Langkah Berderap Lambat berlangsung 5 dtk dan waktu tunggunya 12 dtk.',
     dru_r5_improved_wrath: 'Berubah wujud menghapus akar dan pelambatan yang bisa diputus.',
     hun_r11_binding_payload:
-      'Jerat Rahang Beku mengakar setiap musuh di area pemicunya selama 3 dtk, lalu memperlambat mereka sebesar 40% selama 4 dtk.',
+      'Jeratmu mengakar setiap musuh di area pemicunya selama 3 dtk, lalu memperlambat mereka sebesar 40% selama 4 dtk.',
     hun_r11_crippling_pursuit:
       'Tembakan Pengguncang atau Tebasan Pembelenggu mengakar target yang sudah diperlambat selama 2 dtk. Jeda per target 12 dtk.',
     hun_r14_efficient_rhythm:
@@ -1453,7 +1451,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Kulit Cangkang mengizinkan serangan dan perintah peliharaan, tetapi pengurangan kerusakannya berkurang menjadi 40%.',
     hun_r20_chain_reaction:
-      'Jerat Rahang Beku menandai musuh dalam radius 4 m selama 8 dtk. 3 kemampuan penghabis fokus berikutnya menggemakan 40% kerusakan di antara musuh yang ditandai.',
+      'Saat terpicu, jeratmu menandai musuh dalam radius 4 m selama 8 dtk. 3 kemampuan penghabis fokus berikutnya menggemakan 40% kerusakan di antara musuh yang ditandai.',
     hun_r20_fang_chorus:
       'Setiap kemampuan penghabis fokus memerintahkan gema peliharaan berkekuatan 50%. Setiap gema ke-3 menjadi ledakan dengan radius 4 m.',
     hun_r20_overdraw:
@@ -1523,6 +1521,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Balasan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk.',
     wlk_r11_demon_armor:
       'Saat setiap anggota grup pertama kali menyentuh Soulwell-mu, mereka mendapat perisai sebesar 15% dari nyawa maksimum selama 30 dtk. Setiap pemain hanya dapat memperoleh perisai ini sekali per Soulwell.',
+    dru_r14_empowered_touch:
+      'Mekar Raya menerapkan Pemulihan Spora baru pada setiap sekutu yang penyembuhannya dipanen.',
   },
   tr_TR: {
     mag_r5_blink_cast:
@@ -1541,8 +1541,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Kullandığın her üçüncü yetenek %20 daha fazla öfke üretir.',
     war_row_colossal_might:
       'Harcadığın her öfke puanı, büyük saldırı yeteneklerinin bekleme süresini 0,1 saniye kısaltır; 30 saniyede en fazla 10 saniye.',
-    dru_r14_empowered_touch:
-      'Taşkın Çiçeklenme, iyileştirmesini hasat ettiği her müttefike taze bir Yaban Çiçeği yeniden diker.',
     dru_r14_moonfury: "Ay Kabarışı ve Güneş İzi ayrıca azami mananın %15'ini geri kazandırır.",
     dru_r14_savage_fury: 'Deri Yüzme ve Parçalama kanamalarının her turu da 1 Kadim Kan ekler.',
     dru_r20_berserk:
@@ -1552,7 +1550,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Ağır Aksak Adım 5 sn sürer ve bekleme süresi 12 sn olur.',
     dru_r5_improved_wrath: 'Şekil değiştirmek kırılabilir kökleri ve yavaşlatmaları kaldırır.',
     hun_r11_binding_payload:
-      'Buzçene Tuzağı, tetiklendiği alandaki her düşmanı 3 sn kökler, ardından 4 sn boyunca %40 yavaşlatır.',
+      'Tuzakların, tetiklendikleri alandaki her düşmanı 3 sn kökler, ardından 4 sn boyunca %40 yavaşlatır.',
     hun_r11_crippling_pursuit:
       "Sarsıcı Atış veya Prangalayan Kesik, zaten yavaşlamış bir hedefi 2 sn kökler. Hedef başına 12 sn'lik bekleme süresi.",
     hun_r14_efficient_rhythm:
@@ -1566,7 +1564,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       "Kabuk Deri saldırılara ve evcil hayvan komutlarına izin verir, ama hasar azaltımı %40'a düşer.",
     hun_r20_chain_reaction:
-      'Buzçene Tuzağı, 4 yarda içindeki düşmanları 8 sn boyunca işaretler. Sonraki 3 Odak harcayan yeteneğin, işaretli düşmanlar arasında %40 hasar yankılar.',
+      'Tuzakların tetiklendiğinde 4 yarda içindeki düşmanları 8 sn boyunca işaretler. Sonraki 3 Odak harcayan yeteneğin, işaretli düşmanlar arasında %40 hasar yankılar.',
     hun_r20_fang_chorus:
       'Her Odak harcayan yetenek, %50 güçte bir evcil hayvan yankısı emreder. Her 3. yankı 4 yardalık bir sarsmaya dönüşür.',
     hun_r20_overdraw:
@@ -1637,6 +1635,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Gök Gürültüsü Siperinin misillemesi 3 sn boyunca %10 hasar azaltımı kazandırır.',
     wlk_r11_demon_armor:
       "Her grup üyesi Ruh Kuyuna ilk kez dokunduğunda, 30 sn boyunca azami canının %15'i kadar onu kalkanlar. Her oyuncu bu kalkanı Ruh Kuyusu başına yalnızca bir kez kazanabilir.",
+    dru_r14_empowered_touch:
+      'Taşkın Çiçeklenme, iyileştirmesini topladığı her müttefike yeni bir Spor Şifası uygular.',
   },
   sv_SE: {
     mag_r5_blink_cast: 'Du kan använda Flimmersteg mitt i en besvärjelse utan att avbryta den.',
@@ -1655,8 +1655,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Var tredje förmåga du använder genererar 20 % mer raseri.',
     war_row_colossal_might:
       'Varje raserienhet du förbrukar kortar ned nedkylningen på dina stora anfallsförmågor med 0,1 sek, högst 10 sek var 30:e sek.',
-    dru_r14_empowered_touch:
-      'Överblomning planterar en färsk Vildblomning på varje allierad vars läkning den skördade.',
     dru_r14_moonfury: 'Månsvall och Solspår återställer även 15% av din maximala mana vardera.',
     dru_r14_savage_fury:
       'Varje tick av dina blödningar från Flå och Riv upp lägger också till 1 Gammalt Blod.',
@@ -1666,7 +1664,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Lunkande steg varar i 5 sek och dess nedkylningstid är 12 sek.',
     dru_r5_improved_wrath: 'Att skifta gestalt tar bort brytbara rötter och nedsaktningar.',
     hun_r11_binding_payload:
-      'Frostkäftsfälla rotar fast varje fiende i sitt utlösningsområde i 3 sek, och saktar sedan ner dem med 40% i 4 sek.',
+      'Dina fällor rotar fast varje fiende i sitt utlösningsområde i 3 sek, och saktar sedan ner dem med 40% i 4 sek.',
     hun_r11_crippling_pursuit:
       'Skakande skott eller Fjättrande hugg rotar fast ett redan nedsaktat mål i 2 sek. 12 sekunders nedkylning per mål.',
     hun_r14_efficient_rhythm:
@@ -1680,7 +1678,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Skalhud tillåter attacker och husdjursbefallningar, men dess skadereducering minskas till 40%.',
     hun_r20_chain_reaction:
-      'Frostkäftsfälla märker fiender inom 4 meter i 8 sek. Dina nästa 3 fokusförbrukande förmågor ekar 40% skada mellan märkta fiender.',
+      'Dina fällor märker fiender inom 4 meter i 8 sek när de utlöses. Dina nästa 3 fokusförbrukande förmågor ekar 40% skada mellan märkta fiender.',
     hun_r20_fang_chorus:
       'Varje fokusförbrukande förmåga befaller ett husdjurseko med 50% styrka. Var 3:e eko blir en smäll på 4 meter.',
     hun_r20_overdraw:
@@ -1749,6 +1747,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Åskvärns vedergällning ger 10% minskad mottagen skada i 3 sek.',
     wlk_r11_demon_armor:
       'Första gången varje gruppmedlem rör din Soulwell skyddar den dem med en sköld på 15% av deras maximala hälsa i 30 sek. Varje spelare kan få denna sköld en gång per Soulwell.',
+    dru_r14_empowered_touch:
+      'Överblomning lägger en ny Sporläkning på varje allierad vars läkning den skördade.',
   },
   vi_VN: {
     mag_r5_blink_cast:
@@ -1768,8 +1768,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Mỗi kỹ năng thứ ba bạn sử dụng tạo thêm 20% nộ.',
     war_row_colossal_might:
       'Mỗi điểm nộ bạn tiêu tốn rút ngắn 0,1 giây thời gian hồi chiêu của các kỹ năng tấn công chủ lực, tối đa 10 giây mỗi 30 giây.',
-    dru_r14_empowered_touch:
-      'Mãn Khai trồng lại một Hoa Nở Hoang Dã mới lên mọi đồng minh mà nó đã thu hoạch lượng hồi máu.',
     dru_r14_moonfury: 'Nguyệt Trào và Vệt Dương mỗi cái cũng hồi thêm 15% mana tối đa của bạn.',
     dru_r14_savage_fury: 'Mỗi nhịp chảy máu của Lóc Xé và Xé Rách cũng thêm 1 Huyết Cổ.',
     dru_r20_berserk: 'Nguyệt Trào, Vệt Dương, Thu Hoạch Đỏ, Đoạn Tủy, và Mãn Khai mạnh hơn 25%.',
@@ -1778,7 +1776,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Sải bước kéo dài 5 giây và thời gian hồi của nó là 12 giây.',
     dru_r5_improved_wrath: 'Biến hình sẽ gỡ bỏ các hiệu ứng trói chân và làm chậm có thể phá vỡ.',
     hun_r11_binding_payload:
-      'Bẫy Hàm Băng trói chân mọi kẻ địch trong khu vực kích hoạt của nó trong 3 giây, sau đó làm chậm chúng 40% trong 4 giây.',
+      'Bẫy của bạn trói chân mọi kẻ địch trong khu vực kích hoạt của bẫy trong 3 giây, sau đó làm chậm chúng 40% trong 4 giây.',
     hun_r11_crippling_pursuit:
       'Bắn Rúng Động hoặc Nhát Chém Xiềng Xích trói chân một mục tiêu đã bị làm chậm trong 2 giây. Hồi chiêu riêng cho từng mục tiêu 12 giây.',
     hun_r14_efficient_rhythm:
@@ -1792,7 +1790,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Da Mai cho phép tấn công và ra lệnh cho thú nuôi, nhưng lượng giảm sát thương của nó giảm còn 40%.',
     hun_r20_chain_reaction:
-      'Bẫy Hàm Băng đánh dấu kẻ địch trong bán kính 4 thước trong 8 giây. 3 kỹ năng tiêu Tập Trung tiếp theo của bạn vọng 40% sát thương giữa các kẻ địch bị đánh dấu.',
+      'Khi bị kích hoạt, bẫy của bạn đánh dấu kẻ địch trong bán kính 4 thước trong 8 giây. 3 kỹ năng tiêu Tập Trung tiếp theo của bạn vọng 40% sát thương giữa các kẻ địch bị đánh dấu.',
     hun_r20_fang_chorus:
       'Mỗi kỹ năng tiêu Tập Trung ra lệnh cho thú nuôi vọng lại một đòn ở 50% sức mạnh. Cứ tiếng vọng thứ 3 sẽ trở thành một cú vỗ trong bán kính 4 thước.',
     hun_r20_overdraw:
@@ -1863,6 +1861,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Đòn phản công của Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây.',
     wlk_r11_demon_armor:
       'Lần đầu tiên mỗi thành viên nhóm chạm vào Giếng Linh Hồn của bạn, nó sẽ tạo khiên cho họ bằng 15% máu tối đa trong 30 giây. Mỗi người chơi chỉ có thể nhận khiên này một lần cho mỗi Giếng Linh Hồn.',
+    dru_r14_empowered_touch:
+      'Mãn Khai áp dụng Chữa Lành Bào Tử mới lên mỗi đồng minh có hiệu ứng hồi máu bị thu hoạch.',
   },
   da_DK: {
     mag_r5_blink_cast: 'Du kan bruge Flimmertrin midt i en besværgelse uden at afbryde den.',
@@ -1882,8 +1882,6 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: 'Hver tredje evne, du bruger, genererer 20 % mere raseri.',
     war_row_colossal_might:
       'Hvert raserispunkt du bruger, reducerer afkølingen på dine store angrebsevner med 0,1 sek., op til 10 sek. hvert 30. sek.',
-    dru_r14_empowered_touch:
-      'Overblomstring genplanter en frisk Vildblomst på hver allieret, hvis helbredelse den høstede.',
     dru_r14_moonfury: 'Månebølge og Solspor genopretter hver også 15% af din maksimale mana.',
     dru_r14_savage_fury:
       'Hver tik af dine Flæns- og Sønderriv-blødninger tilføjer også 1 Gammelt Blod.',
@@ -1893,7 +1891,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: 'Langstrakt gang varer 5 sek., og dens nedkølingstid er 12 sek.',
     dru_r5_improved_wrath: 'Formskifte fjerner brydbare rødder og nedsættelser.',
     hun_r11_binding_payload:
-      'Frostkæbefælde rodfæster hver fjende i sit udløsningsområde i 3 sek. og sænker dem derefter med 40% i 4 sek.',
+      'Dine fælder rodfæster hver fjende i deres udløsningsområde i 3 sek. og sænker dem derefter med 40% i 4 sek.',
     hun_r11_crippling_pursuit:
       'Rystende Skud eller Lænkende Hug rodfæster et allerede nedsat mål i 2 sek. 12 sek. nedkøling pr. mål.',
     hun_r14_efficient_rhythm:
@@ -1907,7 +1905,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       'Skalhud tillader angreb og kæledyrsbefalinger, men dens skadereduktion reduceres til 40%.',
     hun_r20_chain_reaction:
-      'Frostkæbefælde mærker fjender inden for 4 m i 8 sek. Dine næste 3 fokusforbrugere genlyder 40% skade mellem mærkede fjender.',
+      'Dine fælder mærker fjender inden for 4 m i 8 sek., når de udløses. Dine næste 3 fokusforbrugere genlyder 40% skade mellem mærkede fjender.',
     hun_r20_fang_chorus:
       'Hver fokusforbruger befaler et kæledyrsekko med 50% styrke. Hvert 3. ekko bliver til et klap på 4 m.',
     hun_r20_overdraw:
@@ -1976,6 +1974,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Tordenværns gengældelse giver 10% reduceret skade i 3 sek.',
     wlk_r11_demon_armor:
       'Første gang hvert gruppemedlem rører ved din Soulwell, skjoldes de for 15% af deres maksimale helbred i 30 sek. Hver spiller kan få dette skjold én gang pr. Soulwell.',
+    dru_r14_empowered_touch:
+      'Overblomstring påfører en ny Sporeheling på hver allieret, hvis heling den høstede.',
   },
   zh_CN: {
     mag_r5_blink_cast: '你可以在施法过程中使用闪烁步，而不会打断当前施法。',
@@ -1992,7 +1992,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: '你每使用第三个技能时，该技能产生的怒气提高20%。',
     war_row_colossal_might:
       '你每消耗1点怒气，主要进攻技能的冷却时间缩短0.1秒，每30秒最多减少10秒。',
-    dru_r14_empowered_touch: '盛放会为每个被其吸收治疗效果的盟友重新种下一株崭新的野性绽放。',
+    dru_r14_empowered_touch: '盛放会为每个被其收取持续治疗效果的盟友重新施加一次孢愈术。',
     dru_r14_moonfury: '月涌和日醒还会各自恢复你最大法力值的 15%。',
     dru_r14_savage_fury: '你的剐削与割裂流血效果的每次跳动都会额外产生 1 点古血。',
     dru_r20_berserk: '月涌、日醒、血收、碎髓和盛放的效果强度提高 25%。',
@@ -2001,7 +2001,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: '疾跃步伐持续 5 秒，其冷却时间为 12 秒。',
     dru_r5_improved_wrath: '变形会解除可被打破的定身和减速效果。',
     hun_r11_binding_payload:
-      '霜颚陷阱定身触发区域内的所有敌人，持续 3 秒，随后使其减速 40%，持续 4 秒。',
+      '你的陷阱会定身触发区域内的所有敌人，持续 3 秒，随后使其减速 40%，持续 4 秒。',
     hun_r11_crippling_pursuit:
       '震颤射击或束缚斩会定身已处于减速状态的目标，持续 2 秒。对同一目标每 12 秒最多触发一次。',
     hun_r14_efficient_rhythm:
@@ -2014,7 +2014,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       '骏马之姿可以触发兽群集结：你、你的伙伴，以及 30 码内的小队或团队盟友获得 30% 移动速度加成，攻击、施法和引导速度提高 10%，持续 10 秒。冷却时间 90 秒。',
     hun_r17_shell_and_fang: '甲壳之肤生效期间允许攻击和宠物指令，但其伤害降低效果减少至 40%。',
     hun_r20_chain_reaction:
-      '霜颚陷阱标记 4 码内的敌人，持续 8 秒。你接下来 3 次消耗集中值的技能会在被标记的敌人之间回响 40% 的伤害。',
+      '你的陷阱被触发时会标记 4 码内的敌人，持续 8 秒。你接下来 3 次消耗集中值的技能会在被标记的敌人之间回响 40% 的伤害。',
     hun_r20_fang_chorus:
       '每次消耗集中值的技能都会指挥宠物以 50% 强度回响攻击。每第 3 次回响会变为一次 4 码范围的振击。',
     hun_r20_overdraw:
@@ -2094,7 +2094,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: '你每使用第三個技能時，該技能產生的怒氣提高20%。',
     war_row_colossal_might:
       '你每消耗1點怒氣，主要進攻技能的冷卻時間縮短0.1秒，每30秒最多縮短10秒。',
-    dru_r14_empowered_touch: '盛放會在每位被收割治療效果的盟友身上，重新種下一株新的野性綻放。',
+    dru_r14_empowered_touch: '盛放會為每位被其收取持續治療效果的盟友重新施加一次孢癒術。',
     dru_r14_moonfury: '月湧與日醒都會額外恢復你最大法力值的 15%。',
     dru_r14_savage_fury: '你的剮擊與割裂流血效果每次造成傷害時，都會額外增加 1 層古血。',
     dru_r20_berserk: '月湧、日醒、血收、碎髓與盛放的效果提高 25%。',
@@ -2103,7 +2103,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: '疾躍步伐持續 5 秒，其冷卻時間為 12 秒。',
     dru_r5_improved_wrath: '變形會解除可被打破的定身與減速效果。',
     hun_r11_binding_payload:
-      '霜顎陷阱會使觸發範圍內的所有敵人定身 3 秒，接著使其移動速度降低 40%，持續 4 秒。',
+      '你的陷阱會使觸發範圍內的所有敵人定身 3 秒，接著使其移動速度降低 40%，持續 4 秒。',
     hun_r11_crippling_pursuit:
       '對已處於減速狀態的目標使用震顫射擊或桎梏斬，會使其定身 2 秒。每個目標的冷卻時間為 12 秒。',
     hun_r14_efficient_rhythm:
@@ -2116,7 +2116,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       '駿馬之姿可以觸發獸群集結：你、你的寵物，以及 30 碼內的隊伍或團隊盟友都會獲得 30% 移動速度，以及 10% 的攻擊、施法與引導速度，持續 10 秒。冷卻時間 90 秒。',
     hun_r17_shell_and_fang: '甲殼之膚生效時可以攻擊並下達寵物指令，但其傷害降低效果會減少為 40%。',
     hun_r20_chain_reaction:
-      '霜顎陷阱會標記 4 碼內的敵人，持續 8 秒。你接下來 3 次消耗集中值的技能，會在被標記的敵人之間造成 40% 的迴響傷害。',
+      '你的陷阱被觸發時會標記 4 碼內的敵人，持續 8 秒。你接下來 3 次消耗集中值的技能，會在被標記的敵人之間造成 40% 的迴響傷害。',
     hun_r20_fang_chorus:
       '每次消耗集中值的技能都會命令寵物以 50% 強度發動迴響攻擊。每第 3 次迴響會變為 4 碼範圍的拍擊。',
     hun_r20_overdraw:
@@ -2196,7 +2196,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_colossal_might:
       '消費した怒気1ポイントごとに、主要な攻撃アビリティのクールダウンが0.1秒短縮されます。30秒ごとに最大10秒まで。',
     dru_r14_empowered_touch:
-      '満開は、その回復効果を刈り取ったすべての味方に、新しい野生の芽吹きを植え直す。',
+      '満開が回復効果を刈り取った味方全員に、新たなスポアメンディングを付与します。',
     dru_r14_moonfury: 'ムーンサージと陽醒は、それぞれ使用時に最大マナの15%も回復する。',
     dru_r14_savage_fury: '皮剥ぎと血の亀裂の出血ダメージが発生するたびに、古き血を1蓄える。',
     dru_r20_berserk: 'ムーンサージ、陽醒、血の収穫、骨髄砕き、満開の効果が25%強化される。',
@@ -2205,7 +2205,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: '疾駆の歩みの持続時間が5秒、クールダウンが12秒になる。',
     dru_r5_improved_wrath: '変身すると、解除可能な足止めと減速効果を除去する。',
     hun_r11_binding_payload:
-      '霜顎の罠は起動範囲内のすべての敵を3秒間足止めし、その後4秒間、移動速度を40%低下させる。',
+      'あなたの罠は起動範囲内のすべての敵を3秒間足止めし、その後4秒間、移動速度を40%低下させる。',
     hun_r11_crippling_pursuit:
       '動揺の射撃または足枷斬りは、すでに減速している対象を2秒間足止めする。同一対象への発動は12秒に1回まで。',
     hun_r14_efficient_rhythm:
@@ -2219,7 +2219,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       '甲殻の皮膚の効果中も攻撃とペットへの指令が行えるようになるが、ダメージ軽減率は40%に低下する。',
     hun_r20_chain_reaction:
-      '霜顎の罠は4ヤード以内の敵に8秒間の印を刻む。以後、集中値を消費するアビリティを3回使用するまで、それらのダメージの40%が印のついた敵の間で反響する。',
+      'あなたの罠は作動時に4ヤード以内の敵に8秒間の印を刻む。以後、集中値を消費するアビリティを3回使用するまで、それらのダメージの40%が印のついた敵の間で反響する。',
     hun_r20_fang_chorus:
       '集中値を消費するアビリティを使用するたびに、ペットが50%の威力で反響攻撃を行う。3回目の反響ごとに、4ヤード範囲を叩く一撃になる。',
     hun_r20_overdraw:
@@ -2304,8 +2304,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: '세 번째로 사용하는 능력은 분노 생성량이 20% 증가합니다.',
     war_row_colossal_might:
       '소비한 분노 1포인트마다 주요 공격 기술의 재사용 대기시간이 0.1초 단축됩니다. 30초마다 최대 10초까지 줄어듭니다.',
-    dru_r14_empowered_touch:
-      '만개는 치유 효과를 거둬들인 모든 아군에게 새로운 야생 개화를 다시 심어 줍니다.',
+    dru_r14_empowered_touch: '만개가 치유 효과를 거둔 모든 아군에게 새로운 포자치유를 적용합니다.',
     dru_r14_moonfury: '달의 격동과 해돋움은 사용할 때마다 최대 마나의 15%도 함께 회복시켜 줍니다.',
     dru_r14_savage_fury: '저미기와 찢기의 출혈 효과가 틱마다 오랜 피를 1단계 추가로 쌓습니다.',
     dru_r20_berserk: '달의 격동, 해돋움, 피의 수확, 골수분쇄, 만개의 효과가 25% 강력해집니다.',
@@ -2314,7 +2313,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r5_ferocity: '질주 보폭의 지속 시간이 5초가 되고 재사용 대기시간이 12초가 됩니다.',
     dru_r5_improved_wrath: '변신하면 해제 가능한 속박과 감속 효과가 사라집니다.',
     hun_r11_binding_payload:
-      '서리턱 덫이 발동 범위 안의 모든 적을 3초 동안 이동 불가로 만들고, 이어서 4초 동안 이동 속도를 40% 감소시킵니다.',
+      '자신이 설치한 덫이 발동 범위 안의 모든 적을 3초 동안 이동 불가로 만들고, 이어서 4초 동안 이동 속도를 40% 감소시킵니다.',
     hun_r11_crippling_pursuit:
       '이미 감속된 대상에게 뒤흔드는 사격이나 족쇄 베기를 사용하면 대상을 2초 동안 이동 불가로 만듭니다. 대상별 재사용 대기시간 12초.',
     hun_r14_efficient_rhythm:
@@ -2328,7 +2327,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     hun_r17_shell_and_fang:
       '갑각 피부 사용 중에도 공격과 소환수 명령이 가능해지지만, 받는 피해 감소 효과가 40%로 줄어듭니다.',
     hun_r20_chain_reaction:
-      '서리턱 덫이 4야드 이내의 적에게 8초 동안 표식을 남깁니다. 이후 사용하는 집중 소모 기술 3회는 표식이 남은 적들 사이에 피해의 40%를 반향시킵니다.',
+      '자신이 설치한 덫이 발동하면 4야드 이내의 적에게 8초 동안 표식을 남깁니다. 이후 사용하는 집중 소모 기술 3회는 표식이 남은 적들 사이에 피해의 40%를 반향시킵니다.',
     hun_r20_fang_chorus:
       '집중 소모 기술을 사용할 때마다 소환수가 50% 위력의 메아리 공격을 가합니다. 3번째 메아리마다 4미터 범위의 휩쓸기로 변합니다.',
     hun_r20_overdraw:

@@ -561,9 +561,6 @@ export interface AccountDetail {
   online: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
-  // Set when the player deactivated the account themselves; the moderation
-  // actions offer the audited reactivate while it is non-null.
-  deactivatedAt: string | null;
   moderationReason: string;
   chatMutedUntil: string | null;
   chatMuteReason: string;
@@ -574,9 +571,6 @@ export interface AccountDetail {
   // The operator-applied Cheater mark: remaining played-second budget, audited
   // reason, and when it was applied. Null when the account is not marked.
   cheaterMark?: { secondsRemaining: number; reason: string; setAt: string | null } | null;
-  // The operator world quest block: audited reason and when it was applied. Null
-  // when the account is not blocked.
-  worldQuestBlock?: { reason: string; blockedAt: string } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -918,6 +912,16 @@ export interface PerfCaptureResult {
   aggroVisitsMaxPerTick: number;
   threatVisitsTotal: number;
   threatVisitsMaxPerTick: number;
+  routePlansTotal: number;
+  routePlansMaxPerTick: number;
+  routeNodesTotal: number;
+  routeNodesMaxPerTick: number;
+  routeFailedTotal: number;
+  routeFailedMaxPerTick: number;
+  routeDeferredTotal: number;
+  routeDeferredMaxPerTick: number;
+  sightQueriesTotal: number;
+  sightQueriesMaxPerTick: number;
   movementConsumedTotal: number;
   movementStarvedTotal: number;
   movementExtrapolatedTotal: number;
@@ -926,6 +930,8 @@ export interface PerfCaptureResult {
   movementRejectedAnchoredWindowTotal: number;
   movementRejectedSanityBoundTotal: number;
   movementResyncsTotal: number;
+  movementPlayoutGrowthsTotal: number;
+  movementPlayoutShrinksTotal: number;
   profile: {
     samples: number;
     windowTicks: number;

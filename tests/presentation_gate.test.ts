@@ -110,6 +110,28 @@ describe('presentationGate', () => {
     expect(presentationGate(input).drawWorld).toBe(true);
   });
 
+  it('a context restore holds the world draw as a second owner the arrival cannot release', () => {
+    let restoreHeld = false;
+    const input = newPresentationGateInput(false, () => restoreHeld);
+    restoreHeld = true;
+    expect(input.worldDrawHeld).toBe(true);
+    expect(presentationGate(input)).toMatchObject({
+      render: true,
+      drawWorld: false,
+      paint: true,
+      tick: true,
+    });
+    // An arrival that lands and lifts during the restore hold does not end it.
+    input.holdWorldDraw(true);
+    input.holdWorldDraw(false);
+    expect(presentationGate(input).drawWorld).toBe(false);
+    restoreHeld = false;
+    expect(presentationGate(input).drawWorld).toBe(true);
+    // ...nor does the restore's end release an arrival still holding.
+    input.holdWorldDraw(true);
+    expect(presentationGate(input).drawWorld).toBe(false);
+  });
+
   it('leaves the web build untouched, including a hidden tab', () => {
     expect(
       presentationGate({

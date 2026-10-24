@@ -7,6 +7,7 @@ import {
   NAMEPLATE_HEALTH_PICK_PADDING_Y,
   type NameplatePickCandidate,
   pickNameplateHealthBarAt,
+  raiseNameplateCandidate,
 } from '../src/render/nameplate_pick_core';
 
 function plate(
@@ -65,24 +66,38 @@ describe('nameplate health-bar picking', () => {
 
   it('wires nameplates ahead of the direct 3D raycast without enabling overlay pointer events', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    // Picking moved out of renderer.ts into world_picking.ts (renderer.picking).
+    const renderer = readFileSync(
+      new URL('../src/render/world_picking.ts', import.meta.url),
+      'utf8',
+    );
+    const rendererHost = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    expect(rendererHost).toContain(
+      'nameplatePick: (x, y) => this.nameplatePainter.pickEntityAt(x, y),',
+    );
     const canvas = readFileSync(
       new URL('../src/render/nameplate_canvas.ts', import.meta.url),
       'utf8',
     );
 
     const handlePick = main.indexOf('function handlePick(x: number, y: number, button: number)');
-    const directEntityPick = main.indexOf('let id = renderer.pickDirect(x, y);', handlePick);
-    const gatherNodePick = main.indexOf('renderer.pickGatherNode(x, y);', directEntityPick);
-    const sloppyEntityPick = main.indexOf('renderer.pickSloppy(x, y);', gatherNodePick);
+    const directEntityPick = main.indexOf(
+      'let id = renderer.picking.pickDirect(x, y);',
+      handlePick,
+    );
+    const gatherNodePick = main.indexOf('renderer.picking.pickGatherNode(x, y);', directEntityPick);
+    const sloppyEntityPick = main.indexOf('renderer.picking.pickSloppy(x, y);', gatherNodePick);
     expect(handlePick).toBeGreaterThanOrEqual(0);
     expect(directEntityPick).toBeGreaterThan(handlePick);
     expect(gatherNodePick).toBeGreaterThan(directEntityPick);
     expect(sloppyEntityPick).toBeGreaterThan(gatherNodePick);
     const directPick = renderer.indexOf(
-      'pickDirect(clientX: number, clientY: number): number | null',
+      'pickDirect(clientX: number, clientY: number, attackIntent = false): number | null',
     );
-    const nameplatePick = renderer.indexOf('this.nameplatePainter.pickEntityAt(', directPick);
+    const nameplatePick = renderer.indexOf('this.host.nameplatePick(', directPick);
     const nameplateWins = renderer.indexOf(
       'if (nameplate !== null) return nameplate;',
       nameplatePick,
@@ -93,5 +108,25 @@ describe('nameplate health-bar picking', () => {
     expect(nameplateWins).toBeGreaterThan(nameplatePick);
     expect(raycast).toBeGreaterThan(nameplateWins);
     expect(canvas).toContain("canvas.style.pointerEvents = 'none';");
+  });
+});
+
+describe('raising a plate to the top', () => {
+  it('moves the raised id to the end and keeps the others in order', () => {
+    const plates = [plate(1), plate(2), plate(3), plate(4)];
+    raiseNameplateCandidate(plates, 4, 2);
+    expect(plates.map((p) => p.id)).toEqual([1, 3, 4, 2]);
+    expect(pickNameplateHealthBarAt(plates, 4, 200, 100)).toBe(2);
+  });
+
+  it('ignores slots past the live count, an absent id, and a null id', () => {
+    const plates = [plate(1), plate(2), plate(3)];
+    raiseNameplateCandidate(plates, 2, 3);
+    expect(plates.map((p) => p.id)).toEqual([1, 2, 3]);
+    raiseNameplateCandidate(plates, 3, 9);
+    raiseNameplateCandidate(plates, 3, null);
+    expect(plates.map((p) => p.id)).toEqual([1, 2, 3]);
+    raiseNameplateCandidate(plates, 3, 1);
+    expect(plates.map((p) => p.id)).toEqual([2, 3, 1]);
   });
 });

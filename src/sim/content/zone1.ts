@@ -127,6 +127,21 @@ export const SOWFIELD_SEABED_TERRAIN_EDITS: HeightStamp[] = [
   { x: 10, z: -140, radius: 12, delta: -5.2, falloff: 'smooth', mode: 'level' },
   { x: 20, z: -146, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
 ];
+
+// The Tidehold rebuild's building pads (sim/eastbrook_layout.ts pads): a grid
+// of level stamps under each placed building, its solid cores covering the
+// model's whole reach, each shelf eased into the streets by its own taper,
+// the vault on the bank's shelf. Applied LAST (array order is application
+// order), after the plat, the quay and the strand; the Studio rebuild map
+// carries the same list. None reaches the quay's working pad or the player
+// start, and none lifts a cell of sea out of the water. A grid, not one disc
+// per building: a disc whose core covers a whole reach spills well past its
+// long sides, and on the World of ClaudeCraft Studio map's sites those discs
+// (the bank's above all) lifted the harbour seabed out of the sea.
+// Copied: the layout's records are frozen, and edit lists are plain data.
+export const EASTBROOK_BUILDING_PAD_TERRAIN_EDITS: HeightStamp[] = EASTBROOK_LAYOUT.pads.map(
+  (pad) => ({ ...pad }),
+);
 // Flower drifts beside the lamplit town streets (owner refinement round 3).
 // The renderer's grass ring treats these circles as guaranteed bloom cells
 // (the REALM_FLOWER_MEADOWS mechanism); placement inside them still skips
@@ -138,7 +153,10 @@ export const ZONE1_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: 52, z: -62, r: 9 },
   { x: 66, z: -79, r: 8 },
   { x: 47, z: -80, r: 7 },
-  { x: -4, z: -73, r: 8 }, // the chapel rise, blooms among the headstones
+  // the churchyard, blooms among the headstones (it moved beside the chapel
+  // with the World of ClaudeCraft Studio map's arrangement; the smithy
+  // stands on the old chapel rise)
+  { x: 36, z: -101, r: 8 },
   { x: -36, z: -103, r: 6 }, // the main-street verge by the market home
   { x: -6, z: -116, r: 6 }, // the beach promenade's east verge
   // Owner refinement round 4: the Wolf Run reads green meadow, not strand.
@@ -153,6 +171,7 @@ export const LAKE = { x: -92, z: 88, radius: 30 };
 
 export const ZONE1_ZONE: ZoneDef = {
   id: 'eastbrook_vale',
+  worldPvp: 'sanctuary',
   name: 'Eastbrook Vale',
   zMin: -180,
   zMax: 180,
@@ -993,6 +1012,10 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'farmer_jessica',
     name: 'Farmer Jessica',
     title: 'Allotment Keeper',
+    // (the Tidehold rebuild's smithy stands a few strides west of her and
+    // the inn up the slope north of the beds; she keeps her spot: at the old
+    // Studio rebuild map's (-17, -82) she would stand inside the 3 yd the beds
+    // keep clear, and a customer beside her inside a bed's working reach)
     pos: { x: -15.5, z: -81.5 },
     facing: -Math.PI / 2,
     color: 0xa8843a,
@@ -1217,7 +1240,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     ],
     xpReward: 700,
     copperReward: 260,
-    itemRewards: {},
+    itemRewards: { warrior: 'lychgate_buckler' },
     minLevel: 5,
   },
   q_supplies: {
@@ -1936,12 +1959,12 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
     itemId: 'supply_crate',
     name: 'Stolen Supply Crate',
     positions: [
-      { x: 58, z: -58 },
-      { x: 73, z: -70 },
-      { x: 86, z: -82 },
-      { x: 95, z: -97 },
-      { x: 64, z: -76 },
-      { x: 81, z: -94 },
+      { x: 65, z: 23 },
+      { x: 72, z: 15 },
+      { x: 82, z: 22 },
+      { x: 106, z: 40 },
+      { x: 110, z: 48 },
+      { x: 116, z: 37 },
     ],
   },
   {
@@ -1990,16 +2013,16 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
     // the map painted the meadow road cut by the sea. This arc hugs the dry
     // sand instead: every sample along it, across a 2.5yd half-width, holds at
     // least 1.2yd of freeboard over WATER_LEVEL (probed against live terrain).
-    { x: -24, z: -128.5 },
+    { x: -18, z: -128 },
     { x: -16, z: -130 },
     { x: -10, z: -126.5 },
     { x: -4, z: -123.5 },
-    { x: 4, z: -123 },
-    { x: 12, z: -126 },
-    // Keep the coast track clear of the vault hall and its western entrance.
-    { x: 10, z: -122 },
-    { x: 11, z: -113 },
-    { x: 14, z: -108 },
+    // Up off the strand past the chapel's door, clear of its bell tower, and
+    // north across the square's west corner.
+    { x: 2, z: -119 },
+    { x: 6, z: -113 },
+    { x: 9, z: -106 },
+    { x: 14, z: -99 },
     { x: 30, z: -30 },
     { x: 50, z: -50 },
     { x: 65, z: -65 },
@@ -2013,6 +2036,11 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
 // ---------------------------------------------------------------------------
 // Static props (rendering + collision share this placement data)
 // ---------------------------------------------------------------------------
+
+// The churchyard rails' turns: the end rails run along the yard's north side,
+// the side rails down its east and west sides, square to the chapel.
+const CHURCHYARD_END_RAIL = (35 * Math.PI) / 180;
+const CHURCHYARD_SIDE_RAIL = (125 * Math.PI) / 180;
 
 export const ZONE1_PROPS: ZonePropsDef = {
   buildings: [
@@ -2090,11 +2118,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // the two dinghies pulled off the pad and into real water beside the piers
     { key: 'hexBoat', x: -107.5, z: -47, rot: 0.7, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: -107, z: -61, rot: -1.9, scale: 6, float: 0.1 },
-    // Round 6 (owner): rowboats hauled up the strand south of the quay, the
+    // Round 6 (owner): a rowboat hauled up the strand north of the quay, the
     // beached pose the Palmreach shore uses (a hull with no float rides the
-    // ground it stands on).
-    { key: 'rowboat', x: -98.5, z: -74.5, rot: 1.2, scale: 1, r: 1.4, h: 1.2 },
-    { key: 'rowboat', x: -95, z: -78, rot: -0.5, scale: 1, r: 1.4, h: 1.2 },
+    // ground it stands on). The two south of the quay left with the shore
+    // camp's move down the strand (the World of ClaudeCraft Studio map).
     { key: 'rowboat', x: -100, z: -33, rot: 2.4, scale: 1, r: 1.4, h: 1.2 },
     // the small watch tower on the quay's north shoulder, eyes on the fairway
     { key: 'hexWatchtower', x: -89, z: -41, rot: -2.3, scale: 6.5, r: 2.4, h: 12 },
@@ -2110,10 +2137,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // Flower plantings along the lamplit streets (owner refinement round 3):
     // walk-through dressing (no r/h), every cluster a hand-checked 2.2yd plus
     // off its street's centerline so nothing sits on the track.
-    { key: 'shrubFlowering', x: -19, z: -95.5, rot: 1.8, scale: 1.0 },
-    { key: 'shrubFlowering', x: 8.6, z: -82.6, rot: -1.2, scale: 0.95 },
-    { key: 'shrubFlowering', x: -30, z: -96.4, rot: 0.2, scale: 1.05 },
-    { key: 'shrubFlowering', x: -7.2, z: -124, rot: 2.7, scale: 0.95 },
+    // (the World of ClaudeCraft Studio map's planting: two of the square's
+    // four are gone, one moved into the churchyard below and one to the
+    // crafts lane's bend)
+    { key: 'shrubFlowering', x: -15.7, z: -118.82, rot: 2.7, scale: 0.95 },
     // fairway buoys marking the channel to the ferry berth (both moved clear
     // of the Eastbrook ferry's hull when it took the berth: they stood at
     // (-126, -46) and (-124, -62), inside its footprint; then out to the
@@ -2122,90 +2149,43 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // (-134, -64): tests/transport_lanes.test.ts keeps them clear)
     { key: 'seaBuoy', x: -160, z: -58, rot: 0.4, scale: 3, float: 0.15 },
     { key: 'seaBuoyFlag', x: -160, z: -90, rot: -0.8, scale: 3, float: 0.15 },
-    // round 4: the KayKit barracks takes the armoury's lot as the Wolf Run
-    // garrison. r 5.2 stays the clearance radius scatter and keep-outs read
-    // (the dawnhold_layout.ts pattern); hw/hd collide the model's real wall
-    // box instead of that circle (the ZonePropsDef box rule): hw matches the
-    // measured local-x wall half (4.68), hd is trimmed to the lot's authored
-    // half-depth 4.5 so the barracks-approach route front at (12, -5.5)
-    // keeps its route-body (0.8) clearance off the facade.
-    {
-      key: 'hexBarracks',
-      x: 17.5,
-      z: -5.5,
-      rot: -1.5707963267948966,
-      scale: 6.5,
-      r: 5.2,
-      h: 11,
-      hw: 4.7,
-      hd: 4.5,
-    },
-    // eyes over the runs
-    { key: 'hexWatchtower', x: 27, z: -13, rot: 2.2, scale: 6.5, r: 2.4, h: 12 },
-    // Round 5 (owner): Smith Haldren gets his own KayKit blacksmith on the
-    // green between the civic square and the crafts lane, facing west toward
-    // the lane. The kmed hollow variant is the BLUE-awning colourway the owner
-    // asked for; it shares the hex blacksmith mesh byte for byte, so the
-    // measured wall box (1.2876 x 1.2452 at scale 6.5) and the r clearance
-    // radius carry over unchanged.
-    {
-      key: 'kmedBlacksmith',
-      x: 2,
-      z: -112,
-      rot: -1.5707963267948966,
-      scale: 6.5,
-      r: 4.5,
-      h: 9,
-      hw: 4.2,
-      hd: 4.05,
-    },
-    // Round 6 (owner): the Pale Keeper's yard rebuilt on the Evergarden
-    // churchyard idiom (content/evergarden.ts): a wrought-iron enclosure of
-    // corner pillars and 4yd rails at a 3.5yd pitch, walk-through dressing with
-    // no colliders, wrapping the graves with ONE side left gateless. The open
-    // side is the EAST, because that is where the chapel, Brother Aldric, the
-    // north road and the graveyard approach route all arrive; a closed box
-    // there would fence the road out of its own churchyard. The town chapel at
-    // (2,-78) sits a stride south of the south run, so church and yard read as
-    // one place, and the lot the removed rise house left is the west half.
-    { key: 'gardenIronPillar', x: -13, z: -73.5 },
-    { key: 'gardenIronPillar', x: 3.2, z: -73.5 },
-    { key: 'gardenIronPillar', x: -13, z: -66 },
-    { key: 'gardenIronPillar', x: 3.2, z: -66 },
-    { key: 'gardenIronFence', x: -11, z: -73.5 },
-    { key: 'gardenIronFence', x: -7.5, z: -73.5 },
-    { key: 'gardenIronFence', x: -4, z: -73.5 },
-    { key: 'gardenIronFence', x: -0.5, z: -73.5 },
-    { key: 'gardenIronFence', x: 2.2, z: -73.5 },
-    { key: 'gardenIronFence', x: -11, z: -66 },
-    { key: 'gardenIronFence', x: -7.5, z: -66 },
-    { key: 'gardenIronFence', x: -4, z: -66 },
-    { key: 'gardenIronFence', x: -0.5, z: -66 },
-    { key: 'gardenIronFence', x: 2.2, z: -66 },
-    { key: 'gardenIronFence', x: -13, z: -71.5, rot: Math.PI / 2 },
-    { key: 'gardenIronFence', x: -13, z: -68, rot: Math.PI / 2 },
-    // two yews for churchyard shade, clear of both grave plots
-    { key: 'oakTree', x: -11.5, z: -71.8, rot: 0.6, scale: 1.3, r: 0.8, h: 9 },
-    { key: 'oakTree', x: -11.5, z: -67.6, rot: -1.1, scale: 1.2, r: 0.8, h: 9 },
-    // Round 6 (owner): kitchen gardens behind the harbour quarter's houses and
-    // a bench at each door. Walk-through dressing like the churchyard rails, so
-    // a garden never becomes an invisible wall across the seaward approach.
-    // Every spot was probed clear of the roads and of its own house footprint.
-    { key: 'fence', x: -77.1, z: -98.5, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -75, z: -96.9, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -78.7, z: -96.4, rot: -0.63, scale: 3 },
-    { key: 'fence', x: -45.1, z: -108.5, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -43, z: -106.9, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -46.7, z: -106.4, rot: -0.63, scale: 3 },
-    { key: 'shrubFlowering', x: -76.2, z: -97.6, rot: 0.3, scale: 0.9 },
-    { key: 'shrubFlowering', x: -44.2, z: -107.6, rot: -0.8, scale: 0.95 },
+    // The Tidehold rebuild retired Smith Haldren's KayKit blacksmith from the
+    // green at (2, -112): he keeps the painted smithy on the square now, and
+    // the Weekly Vault stands on the lot.
+    // The Pale Keeper's churchyard moved with the chapel (the World of
+    // ClaudeCraft Studio map's arrangement, carried the same 5 yd west and
+    // 10.2 yd north the chapel went): iron rails on three sides at a
+    // 3.4 yd pitch, walk-through dressing with no colliders, round the graves
+    // beside the chapel's north wall, the open side toward the square. The
+    // smithy stands on the old yard's rise.
+    { key: 'gardenIronFence', x: 38.11, z: -89.76, rot: CHURCHYARD_END_RAIL },
+    { key: 'gardenIronFence', x: 40.9, z: -91.68, rot: CHURCHYARD_END_RAIL },
+    { key: 'gardenIronFence', x: 43.66, z: -93.58, rot: CHURCHYARD_END_RAIL },
+    { key: 'gardenIronFence', x: 46.45, z: -95.49, rot: CHURCHYARD_END_RAIL },
+    { key: 'gardenIronFence', x: 49.25, z: -97.4, rot: CHURCHYARD_END_RAIL },
+    { key: 'gardenIronFence', x: 49.67, z: -99.77, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 47.72, z: -102.56, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 45.79, z: -105.31, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 43.87, z: -108.1, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 41.93, z: -110.88, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 40, z: -113.65, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 29.45, z: -94.16, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 27.46, z: -96.91, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 25.52, z: -99.66, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'gardenIronFence', x: 23.67, z: -102.49, rot: CHURCHYARD_SIDE_RAIL },
+    // a bloom against the west rails
+    { key: 'shrubFlowering', x: 47.97, z: -96.06, rot: 0.39, scale: 0.95 },
+    // the two yews that shaded the old churchyard, set out where that map
+    // moved them: one north of the smithy, one above the inn
+    { key: 'oakTree', x: -9.39, z: -57.36, rot: -0.366, scale: 1.3, r: 0.8, h: 9 },
+    { key: 'oakTree', x: -41.59, z: -43.6, rot: -1.1, scale: 1.2, r: 0.8, h: 9 },
+    // The round 6 kitchen gardens and door benches of the harbour quarter's
+    // kit houses left with those houses in the Tidehold rebuild: the painted
+    // smithy and chapel stand on that ground.
     // Round 6c (owner): blooms where the west road ends in the boar meadow,
     // walk-through like every flower, set off the painted track
     { key: 'shrubFlowering', x: 55, z: -66, rot: -1.2, scale: 0.95 },
     { key: 'shrubFlowering', x: 50, z: -76, rot: 0.3, scale: 0.9 },
-    { key: 'kcasBench', x: -86.4, z: -105.2, rot: -2.2, scale: 1.6 },
-    { key: 'kcasBench', x: -72.4, z: -111.2, rot: -2.2, scale: 1.6 },
-    { key: 'kcasBench', x: -54.4, z: -115.2, rot: -2.2, scale: 1.6 },
   ],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   // The first two tents, the first two crates and the first campfire are the
@@ -2217,8 +2197,9 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { x: 113, z: 47, rot: 1.2, scale: 1.3 },
     { x: 119, z: 39, rot: -0.6, scale: 1 },
     // Round 6 (owner): a fisherman's camp on the strand south of the quay,
-    // sharing its fire with the rowboats hauled up beside it
-    { x: -90.5, z: -78.5, rot: -0.9, scale: 1 },
+    // set out down the strand by the water where the World of ClaudeCraft
+    // Studio map moved it
+    { x: -104.5, z: -81.9, rot: -1.658, scale: 1 },
   ],
   crates: [
     [56, 22],
@@ -2232,8 +2213,8 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // camp whose centre is blocked cannot seat its spawns
     [59, 17],
     [111, 46],
-    // the shore camp's fire, beside the beached rowboats (round 6)
-    [-93.5, -76.5],
+    // the shore camp's fire (round 6), beside its tent on the strand
+    [-101.52, -78.71],
     [-30, 146],
     [-61, 56],
   ],
@@ -2244,8 +2225,16 @@ export const ZONE1_PROPS: ZonePropsDef = {
   ],
   marshReeds: [],
   ruinRings: [
-    { x: 80, z: 78, ringR: 7, columns: 7 },
-    { x: -5, z: -60, ringR: 8, columns: 6 },
+    // The Fallen Chapel stands on this ring's site (the Hollow Crypt's world
+    // entrance, src/sim/hollow_crypt_entrance.ts) and brings its own nave piers,
+    // so the ring is bare: it keeps only its terrain pad and clearings.
+    { x: 80, z: 78, ringR: 7, columns: 7, bare: true },
+    // The chapel-rise ruin (-5, -60) is gone: the smithy's eaves reach over
+    // its south column. The World of ClaudeCraft Studio map takes down the
+    // same five columns, the statue and the fallen column, and keeps one
+    // broken stump, carried off to (-14.1, -66.9); a ring here draws its
+    // relics with any column it keeps, so the built-in town lets the stump
+    // go with the rest.
   ],
   fences: EASTBROOK_LAYOUT.fences.map((fence) => ({
     id: fence.id,
@@ -2287,11 +2276,11 @@ export const ZONE1_PROPS: ZonePropsDef = {
   graveyards: [
     { ...EASTBROOK_LAYOUT.services.graveyard.position },
     { x: -22, z: 118 },
-    // Round 6 (owner): a second plot filling the west half of the churchyard
-    // enclosure. Anchors here render six more standable headstones; only the
-    // OVERWORLD_GRAVEYARDS rows spawn a Pale Keeper, so this plot adds graves
-    // without a second angel hovering ten yards from the first.
-    { x: -9, z: -70 },
+    // Round 6 (owner): a second plot, now the south end of the churchyard by
+    // the chapel's north wall. Anchors here render six more standable
+    // headstones; only the OVERWORLD_GRAVEYARDS rows spawn a Pale Keeper, so
+    // this plot adds graves without a second angel hovering beside the first.
+    { x: 28.5, z: -107.8 },
   ],
   // Round 6b (owner): the Collapsed Reliquary moved off the town's chapel rise
   // to the Mirror Lake shore. The lake's own margin is marsh and the north

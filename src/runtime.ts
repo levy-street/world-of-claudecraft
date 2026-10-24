@@ -236,6 +236,7 @@ export interface DesktopBridge {
   reportRendererError?(report: DesktopRendererErrorReport): void;
   onUpdateEvent?(callback: (event: DesktopUpdateEvent) => void): () => void;
   installUpdate?(): Promise<null>;
+  checkForUpdates?(): Promise<'checking' | 'ready' | 'unavailable'>;
   // A Steam link ticket (hex) for POST /api/steam/link, or null when Steam is
   // unavailable (website build, Steam not running, ticket failure). Feature-
   // check before use like the other post-trio methods.

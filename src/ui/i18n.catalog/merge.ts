@@ -149,6 +149,7 @@ const mergePetHud = {
     passive: 'Passive',
     defensive: 'Defensive',
     aggressive: 'Aggressive',
+    assist: 'Assist',
     petAttackTitle: 'Pet Attack',
     petAttackDesc: 'Command your pet to attack your current hostile target.',
     waterJetTitle: 'Water Jet',
@@ -166,10 +167,12 @@ const mergePetHud = {
     healDemonDesc: 'Spend mana to channel healing into your demon over 5 seconds.',
     healPetDesc: 'Click, then click food in your bags to feed your pet, healing it over 5 seconds.',
     stanceTitle: 'Pet Stance',
-    stanceDesc: 'Click to choose Passive, Defensive, or Aggressive.',
+    stanceDesc: 'Click to choose Passive, Defensive, Aggressive, or Assist.',
     passiveDesc: 'Only attacks when you command it.',
     defensiveDesc: 'Attacks enemies that hurt you or your pet.',
     aggressiveDesc: 'Attacks nearby hostile enemies.',
+    assistDesc:
+      'Attacks only your current target, once you cast an ability on it. Ignores enemies that attack you.',
     rename: 'Rename Pet',
     revive: 'Patch Up',
     abandon: 'Abandon Pet',
@@ -197,6 +200,7 @@ const mergePetHud = {
     passive: 'Pasivo',
     defensive: 'Defensivo',
     aggressive: 'Agresivo',
+    assist: 'Asistir',
     petAttackTitle: 'Ataque de mascota',
     petAttackDesc: 'Ordena a tu mascota atacar a tu objetivo hostil actual.',
     waterJetTitle: 'Chorro de agua',
@@ -215,10 +219,12 @@ const mergePetHud = {
     healPetDesc:
       'Haz clic y luego haz clic en comida de tus bolsas para alimentar y sanar a tu mascota durante 5 segundos.',
     stanceTitle: 'Actitud de mascota',
-    stanceDesc: 'Haz clic para elegir Pasivo, Defensivo o Agresivo.',
+    stanceDesc: 'Haz clic para elegir Pasivo, Defensivo, Agresivo o Asistir.',
     passiveDesc: 'Solo ataca cuando se lo ordenas.',
     defensiveDesc: 'Ataca a enemigos que te dañen a ti o a tu mascota.',
     aggressiveDesc: 'Ataca a enemigos hostiles cercanos.',
+    assistDesc:
+      'Solo ataca a tu objetivo actual después de que uses una habilidad sobre él. Ignora a los enemigos que te atacan.',
     rename: 'Renombrar mascota',
     revive: 'Remendar',
     abandon: 'Abandonar mascota',
@@ -239,6 +245,7 @@ const mergePetHud = {
     passive: 'Passif',
     defensive: 'Défensif',
     aggressive: 'Agressif',
+    assist: 'Assistance',
     petAttackTitle: 'Attaque du familier',
     petAttackDesc: "Ordonne à votre familier d'attaquer votre cible hostile actuelle.",
     petTauntTitle: 'Provocation du familier',
@@ -248,10 +255,12 @@ const mergePetHud = {
     healPetDesc:
       'Cliquez, puis cliquez sur de la nourriture dans vos sacs pour nourrir et soigner votre familier pendant 5 secondes.',
     stanceTitle: 'Posture du familier',
-    stanceDesc: 'Cliquez pour choisir Passif, Défensif ou Agressif.',
+    stanceDesc: 'Cliquez pour choisir Passif, Défensif, Agressif ou Assistance.',
     passiveDesc: "N'attaque que lorsque vous lui en donnez l'ordre.",
     defensiveDesc: 'Attaque les ennemis qui vous blessent, vous ou votre familier.',
     aggressiveDesc: 'Attaque les ennemis hostiles proches.',
+    assistDesc:
+      "N'attaque que votre cible actuelle, une fois que vous avez utilisé une technique sur elle. Ignore les ennemis qui vous attaquent.",
     rename: 'Renommer le familier',
     revive: 'Rafistoler',
     abandon: 'Abandonner le familier',
@@ -272,6 +281,7 @@ const mergePetHud = {
     passive: 'Passiva',
     defensive: 'Difensiva',
     aggressive: 'Aggressiva',
+    assist: 'Assistenza',
     petAttackTitle: 'Attacco mascotte',
     petAttackDesc: 'Ordina alla tua mascotte di attaccare il tuo attuale bersaglio ostile.',
     petTauntTitle: 'Provocazione mascotte',
@@ -281,10 +291,12 @@ const mergePetHud = {
     healPetDesc:
       'Clicca, poi clicca del cibo nelle borse per nutrire e curare la mascotte per 5 secondi.',
     stanceTitle: 'Posizione mascotte',
-    stanceDesc: 'Clicca per scegliere Passiva, Difensiva o Aggressiva.',
+    stanceDesc: 'Clicca per scegliere Passiva, Difensiva, Aggressiva o Assistenza.',
     passiveDesc: 'Attacca solo quando glielo ordini.',
     defensiveDesc: 'Attacca i nemici che feriscono te o la tua mascotte.',
     aggressiveDesc: 'Attacca i nemici ostili vicini.',
+    assistDesc:
+      "Attacca solo il tuo bersaglio attuale, dopo che hai usato un'abilità su di esso. Ignora i nemici che ti attaccano.",
     rename: 'Rinomina mascotte',
     revive: 'Rattoppare',
     abandon: 'Abbandona mascotte',
@@ -303,6 +315,7 @@ const mergePetHud = {
     passive: 'Passiv',
     defensive: 'Defensiv',
     aggressive: 'Aggressiv',
+    assist: 'Unterstützen',
     petAttackTitle: 'Begleiterangriff',
     petAttackDesc: 'Befiehlt deinem Begleiter, dein aktuelles feindliches Ziel anzugreifen.',
     petTauntTitle: 'Begleiterspott',
@@ -312,10 +325,12 @@ const mergePetHud = {
     healPetDesc:
       'Klicke hier und dann auf Nahrung in deinen Taschen, um deinen Begleiter 5 Sekunden lang zu füttern und zu heilen.',
     stanceTitle: 'Begleiterhaltung',
-    stanceDesc: 'Klicken, um Passiv, Defensiv oder Aggressiv zu wählen.',
+    stanceDesc: 'Klicken, um Passiv, Defensiv, Aggressiv oder Unterstützen zu wählen.',
     passiveDesc: 'Greift nur an, wenn du es befiehlst.',
     defensiveDesc: 'Greift Gegner an, die dich oder deinen Begleiter verletzen.',
     aggressiveDesc: 'Greift nahe feindliche Gegner an.',
+    assistDesc:
+      'Greift nur dein aktuelles Ziel an, sobald du eine Fähigkeit darauf wirkst. Ignoriert Gegner, die dich angreifen.',
     rename: 'Begleiter umbenennen',
     revive: 'Zusammenflicken',
     abandon: 'Begleiter aufgeben',
@@ -334,6 +349,7 @@ const mergePetHud = {
     passive: '被动',
     defensive: '防御',
     aggressive: '攻击',
+    assist: '协助',
     petAttackTitle: '宠物攻击',
     petAttackDesc: '命令你的宠物攻击当前敌对目标。',
     petTauntTitle: '宠物嘲讽',
@@ -341,10 +357,11 @@ const mergePetHud = {
     healDemonDesc: '消耗法力，在 5 秒内向你的恶魔引导治疗。',
     healPetDesc: '点击后，再点击背包中的食物，在 5 秒内喂养并治疗你的宠物。',
     stanceTitle: '宠物姿态',
-    stanceDesc: '点击选择被动、防御或攻击。',
+    stanceDesc: '点击选择被动、防御、攻击或协助。',
     passiveDesc: '只在你命令时攻击。',
     defensiveDesc: '攻击伤害你或你宠物的敌人。',
     aggressiveDesc: '攻击附近的敌对敌人。',
+    assistDesc: '只在你对当前目标施放技能后攻击该目标。不理会攻击你的敌人。',
     rename: '重命名宠物',
     revive: '修补',
     abandon: '放弃宠物',
@@ -363,6 +380,7 @@ const mergePetHud = {
     passive: '被動',
     defensive: '防禦',
     aggressive: '攻擊',
+    assist: '協助',
     petAttackTitle: '寵物攻擊',
     petAttackDesc: '命令你的寵物攻擊目前敵對目標。',
     petTauntTitle: '寵物嘲諷',
@@ -370,10 +388,11 @@ const mergePetHud = {
     healDemonDesc: '消耗法力，在 5 秒內向你的惡魔引導治療。',
     healPetDesc: '點擊後，再點擊背包中的食物，在 5 秒內餵養並治療你的寵物。',
     stanceTitle: '寵物姿態',
-    stanceDesc: '點擊選擇被動、防禦或攻擊。',
+    stanceDesc: '點擊選擇被動、防禦、攻擊或協助。',
     passiveDesc: '只在你命令時攻擊。',
     defensiveDesc: '攻擊傷害你或你寵物的敵人。',
     aggressiveDesc: '攻擊附近的敵對敵人。',
+    assistDesc: '只在你對當前目標施放技能後攻擊該目標。不理會攻擊你的敵人。',
     rename: '重新命名寵物',
     revive: '修補',
     abandon: '放棄寵物',
@@ -392,6 +411,7 @@ const mergePetHud = {
     passive: '수동',
     defensive: '방어',
     aggressive: '공격',
+    assist: '지원',
     petAttackTitle: '소환수 공격',
     petAttackDesc: '현재 적대적인 대상에게 소환수가 공격하도록 명령합니다.',
     petTauntTitle: '소환수 도발',
@@ -400,10 +420,12 @@ const mergePetHud = {
     healDemonDesc: '마나를 소비해 5초 동안 악마에게 치유를 집중합니다.',
     healPetDesc: '클릭한 뒤 가방의 음식을 클릭해 5초 동안 소환수에게 먹이를 주고 치유합니다.',
     stanceTitle: '소환수 태세',
-    stanceDesc: '클릭해 수동, 방어 또는 공격을 선택하세요.',
+    stanceDesc: '클릭해 수동, 방어, 공격 또는 지원을 선택하세요.',
     passiveDesc: '명령할 때만 공격합니다.',
     defensiveDesc: '당신이나 소환수를 해치는 적을 공격합니다.',
     aggressiveDesc: '근처의 적대적인 적을 공격합니다.',
+    assistDesc:
+      '현재 대상에게 기술을 사용한 후에만 그 대상을 공격합니다. 당신을 공격하는 적은 무시합니다.',
     rename: '소환수 이름 변경',
     revive: '응급 처치',
     abandon: '소환수 포기',
@@ -422,6 +444,7 @@ const mergePetHud = {
     passive: '受動',
     defensive: '防御',
     aggressive: '攻撃',
+    assist: 'アシスト',
     petAttackTitle: 'ペット攻撃',
     petAttackDesc: '現在の敵対対象を攻撃するようペットに命令します。',
     petTauntTitle: 'ペット挑発',
@@ -430,10 +453,12 @@ const mergePetHud = {
     healPetDesc:
       'クリックしてからバッグ内の食べ物をクリックし、5秒かけてペットに餌を与えて治癒します。',
     stanceTitle: 'ペットスタンス',
-    stanceDesc: 'クリックして受動、防御、攻撃を選びます。',
+    stanceDesc: 'クリックして受動、防御、攻撃、アシストを選びます。',
     passiveDesc: '命令した時だけ攻撃します。',
     defensiveDesc: 'あなたまたはペットを傷つけた敵を攻撃します。',
     aggressiveDesc: '近くの敵対的な敵を攻撃します。',
+    assistDesc:
+      '現在のターゲットにアビリティを使った後、そのターゲットだけを攻撃します。あなたを攻撃する敵は無視します。',
     rename: 'ペット名変更',
     revive: '応急処置',
     abandon: 'ペット放棄',
@@ -452,6 +477,7 @@ const mergePetHud = {
     passive: 'Passivo',
     defensive: 'Defensivo',
     aggressive: 'Agressivo',
+    assist: 'Assistir',
     petAttackTitle: 'Ataque do mascote',
     petAttackDesc: 'Comande seu mascote a atacar seu alvo hostil atual.',
     petTauntTitle: 'Provocação do mascote',
@@ -461,10 +487,12 @@ const mergePetHud = {
     healPetDesc:
       'Clique e depois clique em comida nas bolsas para alimentar e curar seu mascote por 5 segundos.',
     stanceTitle: 'Postura do mascote',
-    stanceDesc: 'Clique para escolher Passivo, Defensivo ou Agressivo.',
+    stanceDesc: 'Clique para escolher Passivo, Defensivo, Agressivo ou Assistir.',
     passiveDesc: 'Só ataca quando você comanda.',
     defensiveDesc: 'Ataca inimigos que ferem você ou seu mascote.',
     aggressiveDesc: 'Ataca inimigos hostis próximos.',
+    assistDesc:
+      'Só ataca seu alvo atual depois que você usa uma habilidade nele. Ignora inimigos que atacam você.',
     rename: 'Renomear mascote',
     revive: 'Remendar',
     abandon: 'Abandonar mascote',
@@ -483,6 +511,7 @@ const mergePetHud = {
     passive: 'Пассивный',
     defensive: 'Защитный',
     aggressive: 'Агрессивный',
+    assist: 'Помощь',
     petAttackTitle: 'Атака питомца',
     petAttackDesc: 'Прикажите питомцу атаковать вашу текущую враждебную цель.',
     petTauntTitle: 'Провокация питомца',
@@ -492,10 +521,12 @@ const mergePetHud = {
     healPetDesc:
       'Нажмите, затем выберите пищу в сумках, чтобы кормить и исцелять питомца 5 секунд.',
     stanceTitle: 'Стойка питомца',
-    stanceDesc: 'Нажмите, чтобы выбрать Пассивный, Защитный или Агрессивный.',
+    stanceDesc: 'Нажмите, чтобы выбрать Пассивный, Защитный, Агрессивный или Помощь.',
     passiveDesc: 'Атакует только по вашей команде.',
     defensiveDesc: 'Атакует врагов, которые ранят вас или питомца.',
     aggressiveDesc: 'Атакует ближайших враждебных врагов.',
+    assistDesc:
+      'Атакует только вашу текущую цель после того, как вы применили к ней способность. Игнорирует врагов, которые атакуют вас.',
     rename: 'Переименовать питомца',
     revive: 'Подлатать',
     abandon: 'Оставить питомца',
@@ -576,6 +607,216 @@ const mergeStringsEn = {
       hoard_cast_mimic_bite: 'Voracious Bite',
       hoard_cast_mimic_leap: 'Crushing Leap',
       hoard_cast_coin_spit: 'Cursed Coins',
+      // The Hollow Crypt trash kit (src/sim/mob/trash_kit/cast_ids.ts). The bolt,
+      // the raise, the call and the shriek can be kicked; the rest are dodged.
+      crypt_grave_bolt: 'Grave Bolt',
+      crypt_raise_bones: 'Raise Bones',
+      crypt_murder_call: 'Murder Call',
+      crypt_stone_shriek: 'Stone Shriek',
+      crypt_grave_cleave: 'Grave Cleave',
+      crypt_barrowflame_breath: 'Barrowflame Breath',
+      crypt_tail_lash: 'Tail Lash',
+      crypt_wing_gust: 'Wing Gust',
+      // The crypt trash mechanics pass (trash_kit/crypt_kit.ts): the rupture and
+      // the eye can be kicked; the crush and the web are dodged.
+      crypt_grave_rupture: 'Grave Rupture',
+      crypt_carrion_eye: 'Carrion Eye',
+      crypt_marrow_crush: 'Marrow Crush',
+      crypt_rimesilk_spit: 'Rimesilk Spit',
+      // The trash pass's second wave: the adept's volley can be kicked.
+      crypt_gravespark_volley: 'Gravespark Volley',
+      // The Hollow Crypt finale (encounters/hollow_crypt/ids.ts): Morthen's
+      // entrance at the Rite Ring and the Knellwyrm. None can be kicked.
+      crypt_morthen_rite_wakes: 'The Rite Wakes',
+      crypt_morthen_rise: 'Rise of the Gravecaller',
+      crypt_morthen_proclaim: 'Grave Proclamation',
+      crypt_morthen_descend: 'Descent',
+      crypt_knellwyrm_arrive: 'Descending from the Sky',
+      crypt_knellwyrm_pyre_strafe: 'Pyre Strafe',
+      crypt_knellwyrm_strafe_run: 'Strafing Run',
+      crypt_knellwyrm_dread_bellow: 'Dread Bellow',
+      // The Hollow Crypt's wing bosses (encounters/hollow_crypt). The Dirge can
+      // be kicked; the Unbroken Verse (heroic) and the rest cannot.
+      crypt_marrow_shovelful: 'Shovelful',
+      crypt_marrow_measure: 'Measured for the Grave',
+      crypt_marrow_burial_toll: 'Burial Toll',
+      crypt_marrow_gravediggers_blow: "Gravedigger's Blow",
+      crypt_lady_brides_lament: "Bride's Lament",
+      crypt_lady_frozen_embrace: 'Frozen Embrace',
+      crypt_lady_embrace_hold: 'Frozen Embrace',
+      crypt_lady_bridal_freeze: 'Bridal Freeze',
+      crypt_ilvane_dirge: 'Dirge of the Hollow',
+      crypt_ilvane_unbroken_dirge: 'Unbroken Verse',
+      crypt_ilvane_bone_organ: 'Bone Organ',
+      // Morthen the Gravecaller's bars (encounters/hollow_crypt/morthen_ids.ts),
+      // the players' own relight bar on a Remembrance Candle, and the
+      // Knellwyrm's heroic Burning Knell flight (every phase reads as the
+      // mechanic). None can be kicked.
+      crypt_morthen_shadow_pulse: 'Shadow Pulse',
+      crypt_morthen_rite_of_the_unquiet: 'Rite of the Unquiet',
+      crypt_morthen_reap_the_unquiet: 'Reap the Unquiet',
+      kituse_crypt_relight_candle: 'Relight the Candle',
+      crypt_knellwyrm_knell_rise: 'Burning Knell',
+      crypt_knellwyrm_knell_mark: 'Burning Knell',
+      crypt_knellwyrm_knell_breath: 'Burning Knell',
+      crypt_knellwyrm_knell_land: 'Burning Knell',
+      // The Sunken Bastion trash kit and boss casts (trash_kit/bastion_cast_ids.ts,
+      // encounters/sunken_bastion/ids.ts). The Mend and the Ward can be kicked.
+      bastion_brine_mend: 'Brine Mend',
+      bastion_fog_ward: 'Fog Ward',
+      bastion_halberd_sweep: 'Halberd Sweep',
+      bastion_piercing_bolt: 'Piercing Bolt',
+      bastion_claw_sweep: 'Claw Sweep',
+      bastion_shell_slam: 'Shell Slam',
+      ghost_captain_broadside: 'Spectral Broadside',
+      ghost_captain_anchor: 'Cursed Anchor',
+      ghost_captain_boarding: 'Phantom Boarding',
+      // The Bastion trash mechanics pass (trash_kit/bastion_kit.ts): the fog and
+      // the column can be kicked; the hook is dodged.
+      bastion_boathook: 'Boathook Drag',
+      bastion_fog_bank: 'Fog Bank',
+      bastion_brine_column: 'Brine Column',
+      // The trash pass's second wave: the sergeant's shout can be kicked.
+      bastion_loose_on_my_mark: 'Loose on My Mark',
+      bastion_oathbound_charge: 'Oathbound Charge',
+      bastion_gaolers_cudgel: "Gaoler's Cudgel",
+      bastion_mist_surge: 'Mist Surge',
+      bastion_drowning_hymn: 'Drowning Hymn',
+      // The Bastion's fifth pass: the Gaol Turnkey's cage, Ossick's anchor and
+      // shackles, and Vael the reaper's crossing and scythe. None can be kicked.
+      bastion_iron_cage: 'Iron Cage',
+      bastion_drowned_anchor_cast: 'Drowned Anchor',
+      bastion_shackle_pair: 'Shackle Pair',
+      bastion_shadowstep: 'Shadow Crossing',
+      bastion_reaping_scythe: 'Reaping Scythe',
+      // The Fog Veil's figures rising out of the roof (Wordy, M16: fills).
+      bastion_veil_rise: 'Fog Veil',
+      // Vael's entrance and the fog gathering before each veil.
+      bastion_veil_gather: 'Gathering Fog',
+      bastion_vael_rise: 'Death Rises',
+      bastion_vael_sink: 'Into the Fog',
+      // Olen the fallen paladin's casts (encounters/sunken_bastion/olen.ts).
+      bastion_hallowed_brine: 'Hallowed Brine',
+      bastion_rebounding_bulwark: 'Rebounding Bulwark',
+      bastion_tide_sentence: 'Sentence of the Tide',
+      bastion_oath_kneel: 'Unbroken Oath',
+      bastion_oath_vigil: 'Unbroken Oath',
+      // The Drowned Temple trash kit and boss casts (trash_kit/temple_cast_ids.ts,
+      // encounters/drowned_temple/ids.ts). The Lullaby, the Call and the Coil
+      // can be kicked.
+      temple_lullaby: 'Lullaby',
+      // Laverock's song at the Moon Altar (the dungeon guide's finale channel).
+      cantor_last_verse: 'The Last Verse',
+      temple_call_the_tide: 'Call the Tide',
+      temple_static_coil: 'Static Coil',
+      temple_snapper_snap: 'Snap',
+      temple_trident_sweep: 'Trident Sweep',
+      temple_sea_song: 'Sea-Song',
+      temple_tidal_slap: 'Tidal Slap',
+      temple_tide_breath: 'Freezing Breath',
+      temple_moonlight_lance: 'Moonlight Lance',
+      temple_prism_flare: 'Prism Flare',
+      temple_resonant_slam: 'Resonant Slam',
+      // The caster pass: Selthe's bolt and aria can be kicked, her surge and
+      // the Colossus's fracture cannot.
+      temple_moonwater_bolt: 'Moonwater Bolt',
+      temple_drowning_aria: 'Drowning Aria',
+      temple_mere_surge: 'Mere Surge',
+      temple_tideglass_fracture: 'Tideglass Fracture',
+      temple_undertow: 'Undertow',
+      temple_lunar_tide: 'Lunar Tide',
+      // The Temple's sixth pass: the trash's second jobs (the Mending and the
+      // Venom can be kicked) and the Mere Hydra's water and wave.
+      temple_skewering_trident: 'Skewering Trident',
+      temple_pale_mending: 'Pale Mending',
+      temple_glimmer_venom: 'Glimmer Venom',
+      // The Moonmantle Ray's wingbeat (the cast id kept from the Pearl Slam).
+      temple_pearl_slam: 'Tidal Wingbeat',
+      temple_lightning_spit: 'Lightning Spit',
+      temple_crushing_torrent: 'Crushing Torrent',
+      temple_hydra_tsunami: 'Tsunami',
+      temple_ysolei_call: 'Moonspawn Call',
+      temple_ysolei_wrath: 'Drowned Wrath',
+      // The Temple encounter pass: the Mere Hydra's Combined Breath and Ysolei
+      // calling the moon. None of them can be kicked.
+      temple_frostlocked_torrent: 'Frostlocked Torrent',
+      temple_venom_current: 'Venom Current',
+      temple_toxic_rime: 'Toxic Rime',
+      temple_beckoning_moon: 'Beckoning Moon',
+      temple_falling_moon: 'Falling Moon',
+      // The Temple trash mechanics pass (trash_kit/temple_cast_ids.ts). The
+      // Arcing Spark can be kicked; the Prism Glare cannot (turn your back).
+      temple_prism_glare: 'Prism Glare',
+      temple_arcing_spark: 'Arcing Spark',
+      // The trash pass's second wave: the siren's song can be kicked.
+      temple_call_of_the_shallows: 'Call of the Shallows',
+      // The Wildheart Basin rework (trash_kit/wildheart_cast_ids.ts,
+      // encounters/wildheart_basin/ids.ts). Only Ancestral Sap can be kicked.
+      wildheart_ancestral_sap: 'Ancestral Sap',
+      wildheart_plant_totem: 'Plant Totem',
+      wildheart_entangling_lash: 'Entangling Lash',
+      wildheart_saurian_tail_swipe: 'Tail Swipe',
+      wildheart_saurian_stomp: 'Earthshaking Stomp',
+      // The Wildheart trash mechanics pass (trash_kit/wildheart_cast_ids.ts).
+      // The War Roar and the Toad Hex can be kicked; the rest cannot.
+      wildheart_quarry_mark: 'Quarry Mark',
+      wildheart_war_roar: 'War Roar',
+      wildheart_toad_hex: 'Toad Hex',
+      wildheart_rattling_dread: 'Rattling Dread',
+      wildheart_snaring_tongue: 'Snaring Tongue',
+      // The Wildheart Basin's three bosses (encounters/wildheart_basin). None
+      // of these bars can be kicked.
+      wildheart_beast_pit_quake: 'Beast Pit Quake',
+      wildheart_jaguar_heel: 'Heel!',
+      wildheart_gorgebloom_seed_rain: 'Seed Rain',
+      wildheart_gorgebloom_vine_lash: 'Vine Lash',
+      wildheart_gorgebloom_gorge: 'Gorge',
+      wildheart_zulgar_pulse: 'Wildheart Pulse',
+      wildheart_zulgar_spirit_hunt: 'Spirit of the Hunt',
+      // The Gravewyrm Sanctum rework (trash_kit/sanctum_cast_ids.ts,
+      // encounters/gravewyrm_sanctum/ids.ts). Warming Rite and Goad can be kicked.
+      sanctum_cinder_breath: 'Cinder Breath',
+      sanctum_warming_rite: 'Warming Rite',
+      sanctum_goad: 'Goad',
+      sanctum_plant_brazier: 'Plant Soul Brazier',
+      sanctum_ice_block_toss: 'Ice Block Toss',
+      sanctum_tusker_tusk_sweep: 'Tusk Sweep',
+      sanctum_tusker_trample: 'Trample',
+      // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts). Thaw
+      // the Held and Branding Iron can be kicked.
+      sanctum_thaw_the_held: 'Thaw the Held',
+      sanctum_counterweight_lash: 'Counterweight Lash',
+      sanctum_branding_iron: 'Branding Iron',
+      sanctum_rime_breath: 'Rime Breath',
+      // The player's own bar while kicking a Soul Brazier over (the trash
+      // engine's G3 use, trash_kit/encounter_use.ts).
+      kituse_sanctum_topple_brazier: 'Topple Brazier',
+      // The trash engine's dev-only demonstration kit (trash_kit/engine_demo.ts):
+      // the nova (kickable), its every-third unstoppable twin, and the orb launch.
+      trash_demo_nova: 'Test Nova',
+      trash_demo_nova_unstoppable: 'Test Nova',
+      trash_demo_walker: 'Test Orb',
+      // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts). Only the
+      // Goadsmith's heroic Re-rivet can be kicked.
+      sanctum_korgath_maul_arc: 'Maul Arc',
+      sanctum_korgath_chain_flail: 'Chain Flail',
+      sanctum_korgath_threshold_charge: 'Threshold Charge',
+      sanctum_korgath_foremans_bellow: "Foreman's Bellow",
+      sanctum_korgath_strain: 'Strain',
+      sanctum_korgath_stomp: 'Shuddering Stomp',
+      sanctum_goadsmith_rerivet: 'Re-rivet',
+      // Grand Necromancer Velkhar (encounters/gravewyrm_sanctum/velkhar.ts).
+      sanctum_velkhar_soulfire_trench: 'Soulfire Trench',
+      sanctum_velkhar_shadow_volley: 'Shadow Volley',
+      // Korzul the Gravewyrm (encounters/gravewyrm_sanctum/korzul.ts). None of
+      // his bars can be kicked.
+      sanctum_korzul_break_free: 'Break Free',
+      sanctum_korzul_grave_breath: 'Grave Breath',
+      sanctum_korzul_tail_sweep: 'Tail Sweep',
+      sanctum_korzul_grave_inferno: 'Grave Inferno',
+      sanctum_korzul_wing_gale: 'Wing Gale',
+      sanctum_korzul_plunging_fire: 'Plunging Fire',
+      sanctum_korzul_crashing_descent: 'Crashing Descent',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
@@ -595,6 +836,8 @@ const mergeStringsEn = {
       scroll: 'Scroll',
       bag: 'Bag',
       mount: 'Mount',
+      buddy: 'Buddy',
+      buddyCosmetic: 'Buddy cosmetic',
     },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
@@ -635,6 +878,10 @@ const mergeStringsEn = {
       sellJunk: 'Sell Junk',
       sellJunkAria: 'Sell all junk for {price}',
       sellJunkHint: 'Sells every gray item in your bags except quest items.',
+      // The sim keeps plain gray junk out of the buyback list (items.ts
+      // skipsVendorBuyback), so the sweep is final: say so before the click.
+      sellJunkNoBuyback:
+        'Unsigned gray items skip the buyback list, so selling them cannot be undone.',
     },
     logs: {
       ...itemNames.en.itemUi.logs,
@@ -669,6 +916,10 @@ const mergeStringsEn = {
     social: {
       title: 'Social',
       friendsTab: 'Friends',
+      friendFirstPage: 'First page',
+      friendNextPage: 'Next page',
+      boundFriend: 'Bound friend',
+      boundFriendLink: 'Bound friends are linked by their referral invitation.',
       guildTab: 'Guild',
       ignoreTab: 'Ignore',
       leaveParty: 'Leave Party',
@@ -1542,6 +1793,10 @@ export const mergeStrings = {
       social: {
         title: '社交',
         friendsTab: '好友',
+        friendFirstPage: '首页',
+        friendNextPage: '下一页',
+        boundFriend: '绑定好友',
+        boundFriendLink: '绑定好友通过邀请链接建立关系。',
         guildTab: '公会',
         ignoreTab: '忽略',
         leaveParty: '离开队伍',
@@ -1720,6 +1975,10 @@ export const mergeStrings = {
       social: {
         title: '社交',
         friendsTab: '好友',
+        friendFirstPage: '首頁',
+        friendNextPage: '下一頁',
+        boundFriend: '綁定好友',
+        boundFriendLink: '綁定好友透過邀請連結建立關係。',
         guildTab: '公會',
         ignoreTab: '忽略',
         leaveParty: '離開隊伍',
@@ -1900,6 +2159,10 @@ export const mergeStrings = {
       social: {
         title: '소셜',
         friendsTab: '친구',
+        friendFirstPage: '첫 페이지',
+        friendNextPage: '다음 페이지',
+        boundFriend: '연결된 친구',
+        boundFriendLink: '연결된 친구는 초대 링크를 통해 연결됩니다.',
         guildTab: '길드',
         ignoreTab: '차단',
         leaveParty: '파티 떠나기',
@@ -2080,6 +2343,10 @@ export const mergeStrings = {
       social: {
         title: 'ソーシャル',
         friendsTab: 'フレンド',
+        friendFirstPage: '最初のページ',
+        friendNextPage: '次のページ',
+        boundFriend: '絆のフレンド',
+        boundFriendLink: '絆のフレンドは招待リンクで結ばれています。',
         guildTab: 'ギルド',
         ignoreTab: '無視',
         leaveParty: 'パーティを抜ける',
@@ -2435,6 +2702,10 @@ export const mergeStrings = {
       social: {
         title: 'Общение',
         friendsTab: 'Друзья',
+        friendFirstPage: 'Первая страница',
+        friendNextPage: 'Следующая страница',
+        boundFriend: 'Связанный друг',
+        boundFriendLink: 'Связанные друзья объединены приглашением по реферальной ссылке.',
         guildTab: 'Гильдия',
         ignoreTab: 'Игнор',
         leaveParty: 'Покинуть группу',
@@ -3979,13 +4250,13 @@ const mergeExtraEn = {
     [
       'rake',
       'Flense',
-      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
+      'Flense the enemy for weapon damage plus {damage} and cause {overTime} bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
       { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
     ],
     [
       'revive_pet',
       'Patch Up',
-      'Patch up your companion, restoring {overTime} health over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health.',
+      "Restore 10% of your living companion's maximum health every sec for 8 sec. If your companion is dead, revive it with 50% health instead.",
     ],
   ]),
   items: {
@@ -4038,7 +4309,7 @@ const mergeExtraEn = {
       'Glimmerscale Lurker',
       'Moonspawn',
       'Pale Choir Acolyte',
-      'Pearlguard Sentinel',
+      'Moonmantle Ray',
       'Sethrael the Palecoil',
       'Fire Demon',
       'Void Demon',
@@ -4138,7 +4409,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Remendar',
-        'Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud.',
+        'Restaura el 10% de la salud máxima de tu compañero vivo cada segundo durante 8 s. Si tu compañero está muerto, lo revive con un 50% de salud.',
       ],
     ]),
     items: {
@@ -4294,7 +4565,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Rafistoler',
-        "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
+        "Rend 10 % des points de vie maximum de votre compagnon vivant chaque seconde pendant 8 s. S'il est mort, le ranime avec 50 % de ses points de vie.",
       ],
     ]),
     items: {
@@ -4446,7 +4717,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Rattoppare',
-        'Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute.',
+        'Ripristina il 10% della salute massima del tuo compagno vivo ogni secondo per 8 sec. Se è morto, lo rianima con il 50% della salute.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4585,7 +4856,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Zusammenflicken',
-        'Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt.',
+        'Stellt deinem lebenden Begleiter 8 Sek. lang jede Sekunde 10 % seiner maximalen Gesundheit wieder her. Ist er tot, wird er stattdessen mit 50 % Gesundheit wiederbelebt.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4720,7 +4991,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '修补',
-        '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
+        '在8秒内每秒为存活的宠物恢复其最大生命值的10%。若宠物已死亡，则改为以50%生命值将其复活。',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4852,7 +5123,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '修補',
-        '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
+        '在 8 秒內每秒為存活的寵物恢復其最大生命值的 10%。若寵物已死亡，則改為以 50% 生命值將其復活。',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4984,7 +5255,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '응급 처치',
-        '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
+        '8초 동안 매초 살아 있는 소환수의 최대 생명력의 10%를 회복합니다. 소환수가 죽어 있으면 대신 50%의 생명력으로 되살립니다.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -5117,7 +5388,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         '応急処置',
-        'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
+        '生存しているペットの最大体力の10%を8秒間、毎秒回復する。ペットが死亡している場合は、代わりに体力50%で蘇生する。',
       ],
     ]),
     items: mergeNameTranslations(
@@ -5254,7 +5525,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Remendar',
-        'Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida.',
+        'Restaura 10% da vida máxima do seu companheiro vivo a cada segundo durante 8 s. Se ele estiver morto, revive-o com 50% da vida.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -5391,7 +5662,7 @@ export const mergeExtra = {
       [
         'revive_pet',
         'Подлатать',
-        'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
+        'Каждую секунду в течение 8 сек. восстанавливает живому питомцу 10% максимального запаса здоровья. Если питомец мёртв, вместо этого воскрешает его с 50% здоровья.',
       ],
     ]),
     items: mergeNameTranslations(

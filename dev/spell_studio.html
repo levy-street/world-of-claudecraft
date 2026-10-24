@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spell &amp; VFX Studio - World of ClaudeCraft</title>
+  <style>
+    :root {
+      --bg-0: #0b0e16;
+      --bg-1: #111622;
+      --bg-2: #171e2e;
+      --bg-3: #1f2940;
+      --border: rgba(212, 175, 55, 0.24);
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --gold: #f3c969;
+      --gold-dim: #b8923a;
+      --text: #e6ecff;
+      --text-dim: #9aa7c2;
+      --text-muted: #687591;
+      --accent: #c69b6d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-0);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      user-select: none;
+    }
+
+    #studio-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr 430px;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Left Column: Classes & Specializations */
+    #left-panel {
+      background: linear-gradient(180deg, #111623 0%, #0c101a 100%);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 14px;
+      gap: 16px;
+    }
+
+    .brand-header {
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-subtitle {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #class-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .class-btn {
+      background: var(--bg-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 7px;
+      padding: 8px 6px;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.14s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .class-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--cls-color, var(--gold));
+      opacity: 0.65;
+    }
+
+    .class-btn:hover {
+      background: var(--bg-3);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .class-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--cls-color, var(--gold));
+      box-shadow: 0 0 0 1px var(--cls-color, var(--gold)) inset;
+    }
+
+    .class-btn.active::before {
+      opacity: 1;
+    }
+
+    .class-btn-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .class-btn-count {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    #spec-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .spec-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 11px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text);
+      transition: all 0.14s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .spec-card:hover {
+      background: var(--bg-3);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .spec-card.active {
+      background: rgba(243, 201, 105, 0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent) inset;
+    }
+
+    .spec-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .spec-card-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .spec-role-badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .role-tank {
+      background: rgba(56, 189, 248, 0.16);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .role-healer {
+      background: rgba(74, 222, 128, 0.16);
+      color: #86efac;
+      border: 1px solid rgba(74, 222, 128, 0.35);
+    }
+
+    .role-dps {
+      background: rgba(248, 113, 113, 0.16);
+      color: #fca5a5;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+    }
+
+    .spec-card-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.38;
+      user-select: text;
+    }
+
+    .spec-card-sig {
+      font-size: 10.5px;
+      color: var(--gold);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    #category-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .cat-btn {
+      background: var(--bg-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 7px 9px;
+      color: var(--text-dim);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.14s ease;
+    }
+
+    .cat-btn:hover {
+      background: var(--bg-3);
+      color: #fff;
+    }
+
+    .cat-btn.active {
+      background: rgba(243, 201, 105, 0.12);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* Center Column: 3D Stage & Controls */
+    #stage-panel {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at 50% 42%, #1d273b 0%, #090d15 100%);
+      overflow: hidden;
+    }
+
+    #stage-toolbar {
+      z-index: 10;
+      background: rgba(13, 18, 29, 0.88);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 9px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-right: 2px;
+    }
+
+    .ctrl-btn, .ctrl-select {
+      background: var(--bg-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 9px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .ctrl-btn:hover, .ctrl-select:hover {
+      background: var(--bg-3);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .ctrl-btn.active {
+      background: rgba(243, 201, 105, 0.16);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .ctrl-btn.primary {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #bae6fd;
+    }
+
+    .ctrl-btn.primary.playing {
+      background: rgba(248, 113, 113, 0.22);
+      border-color: rgba(248, 113, 113, 0.55);
+      color: #fecaca;
+    }
+
+    .loadout-badge {
+      font-size: 10.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--gold);
+      background: rgba(243, 201, 105, 0.1);
+      border: 1px solid rgba(243, 201, 105, 0.25);
+      padding: 3px 7px;
+      border-radius: 4px;
+    }
+
+    #canvas-wrap {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #studio-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    #studio-canvas:active {
+      cursor: grabbing;
+    }
+
+    #stage-loading {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(11, 14, 22, 0.88);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      pointer-events: none;
+      display: none;
+    }
+
+    #stage-help {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(11, 14, 22, 0.72);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    #active-spell-hud {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      background: rgba(12, 16, 26, 0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+    }
+
+    .hud-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .hud-spell-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-spell-id {
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .hud-phase-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--gold);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .hud-progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .hud-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+      transition: width 0.04s linear;
+    }
+
+    .hud-spell-desc {
+      font-size: 12px;
+      color: #d2dcf2;
+      line-height: 1.42;
+      user-select: text;
+    }
+
+    .hud-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Right Column: Spell Browser & Inspector */
+    #right-panel {
+      background: linear-gradient(180deg, #111623 0%, #0c101a 100%);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #right-header {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .right-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #right-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    #right-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(243, 201, 105, 0.12);
+      border: 1px solid rgba(243, 201, 105, 0.28);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    #spell-search {
+      width: 100%;
+      background: var(--bg-0);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 7px 10px;
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+    }
+
+    #spell-search:focus {
+      border-color: var(--gold);
+    }
+
+    #spell-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .spell-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.12s ease;
+      text-align: left;
+    }
+
+    .spell-card:hover {
+      background: var(--bg-3);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .spell-card.active {
+      background: rgba(243, 201, 105, 0.11);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px var(--gold) inset;
+    }
+
+    .spell-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .spell-card-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .spell-card-id {
+      font-size: 10.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--text-muted);
+      margin-left: 5px;
+      font-weight: 500;
+    }
+
+    .origin-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .origin-sig {
+      background: rgba(243, 201, 105, 0.18);
+      color: var(--gold);
+      border: 1px solid rgba(243, 201, 105, 0.42);
+    }
+
+    .origin-spec {
+      background: rgba(167, 139, 250, 0.16);
+      color: #c4b5fd;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+    }
+
+    .origin-talent {
+      background: rgba(52, 211, 153, 0.15);
+      color: #6ee7b7;
+      border: 1px solid rgba(52, 211, 153, 0.35);
+    }
+
+    .origin-base {
+      background: rgba(148, 163, 184, 0.14);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.26);
+    }
+
+    .spell-timing-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .spell-desc {
+      font-size: 11.5px;
+      color: #cbd5e8;
+      line-height: 1.4;
+      user-select: text;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 2px;
+    }
+
+    .meta-pill {
+      font-size: 10.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+    }
+
+    .meta-pill.clip {
+      color: #93c5fd;
+      border-color: rgba(96, 165, 250, 0.3);
+    }
+
+    .meta-pill.loop {
+      color: #c4b5fd;
+      border-color: rgba(167, 139, 250, 0.3);
+    }
+
+    .meta-pill.vfx {
+      color: #fcd34d;
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .meta-pill.req {
+      color: #fda4af;
+      border-color: rgba(251, 113, 133, 0.32);
+    }
+  </style>
+</head>
+<body>
+  <div id="studio-layout">
+    <!-- Left Sidebar: Classes, Specializations, and Category Filters -->
+    <aside id="left-panel">
+      <div class="brand-header">
+        <div class="brand-eyebrow">World of ClaudeCraft</div>
+        <div class="brand-title">Spell &amp; VFX Studio</div>
+        <div class="brand-subtitle">
+          Select any of the 9 classes and 27 specializations to inspect and play their abilities, WOC animations, and VFX.
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">
+          <span>1. Class (9)</span>
+          <span id="active-class-label">Warrior</span>
+        </div>
+        <div id="class-grid"></div>
+      </div>
+
+      <div>
+        <div class="section-label">
+          <span>2. Specialization (3)</span>
+          <span id="active-spec-label">All Specs</span>
+        </div>
+        <div id="spec-list"></div>
+      </div>
+
+      <div>
+        <div class="section-label">
+          <span>3. Kit Category Filter</span>
+        </div>
+        <div id="category-list"></div>
+      </div>
+    </aside>
+
+    <!-- Center 3D Stage & Playback Controls -->
+    <main id="stage-panel">
+      <div id="stage-toolbar">
+        <div class="toolbar-group">
+          <span class="toolbar-label">Fit</span>
+          <button type="button" class="ctrl-btn active" id="fit-male-btn">Male</button>
+          <button type="button" class="ctrl-btn" id="fit-female-btn">Female</button>
+
+          <span class="toolbar-label" style="margin-left: 8px;">Weapons</span>
+          <select id="loadout-select" class="ctrl-select"></select>
+          <span id="resolved-loadout-badge" class="loadout-badge">loadout: default</span>
+        </div>
+
+        <div class="toolbar-group">
+          <span class="toolbar-label">Speed</span>
+          <button type="button" class="ctrl-btn active" data-speed="1">1x</button>
+          <button type="button" class="ctrl-btn" data-speed="0.5">0.5x</button>
+          <button type="button" class="ctrl-btn" data-speed="0.25">0.25x</button>
+          <button type="button" class="ctrl-btn active" id="fast-casts-btn" title="Cap long cast loops at 0.55s for rapid review">Fast Casts: ON</button>
+        </div>
+
+        <div class="toolbar-group">
+          <span class="toolbar-label">Camera</span>
+          <button type="button" class="ctrl-btn" data-cam="studio">3/4 Studio</button>
+          <button type="button" class="ctrl-btn" data-cam="side">Side Profile</button>
+          <button type="button" class="ctrl-btn" data-cam="caster">Close Caster</button>
+          <button type="button" class="ctrl-btn" data-cam="overhead">Overhead</button>
+          <button type="button" class="ctrl-btn" id="replay-btn" title="Shortcut: Spacebar">Replay (Space)</button>
+          <button type="button" class="ctrl-btn primary" id="sequence-btn">Play Spec Sequence</button>
+        </div>
+      </div>
+
+      <div id="canvas-wrap">
+        <canvas id="studio-canvas"></canvas>
+        <div id="stage-loading">Loading WOC character rig and armor kit...</div>
+        <div id="stage-help">Left-drag: Orbit | Right-drag: Pan | Scroll: Zoom | Space: Replay | Up/Down: Prev/Next Spell</div>
+
+        <div id="active-spell-hud">
+          <div class="hud-top-row">
+            <div class="hud-spell-title">
+              <span id="hud-spell-name">Select a spell to preview</span>
+              <span id="hud-spell-id" class="hud-spell-id"></span>
+            </div>
+            <div id="hud-phase-label" class="hud-phase-label">Ready</div>
+          </div>
+          <div class="hud-progress-track">
+            <div id="hud-progress-fill" class="hud-progress-fill"></div>
+          </div>
+          <div id="hud-spell-desc" class="hud-spell-desc">
+            Click any spell card on the right (or press Play Spec Sequence) to watch the caster perform the ability against the target dummy.
+          </div>
+          <div id="hud-meta-row" class="hud-meta-row"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar: Spell Cards for Selected Class / Spec -->
+    <aside id="right-panel">
+      <div id="right-header">
+        <div class="right-title-row">
+          <div id="right-title">Warrior - All Specializations</div>
+          <div id="right-count">0 spells</div>
+        </div>
+        <input
+          type="search"
+          id="spell-search"
+          placeholder="Search spells by name, id, WOC clip, or VFX..."
+          autocomplete="off"
+        />
+      </div>
+      <div id="spell-list"></div>
+    </aside>
+  </div>
+
+  <script type="module" src="./spell_studio.ts"></script>
+</body>
+</html>

@@ -1267,29 +1267,174 @@ export const table: DeedLocaleTable = {
     name: 'Colto con le mani nel sacco',
     desc: "Cattura uno Scansafatiche Coinsack in un Tesoro Sepolto prima che scappi con l'oro.",
   },
+  exp_wisp_maze_hard: {
+    name: 'Piu luminosa delle ombre',
+    desc: 'Recupera i borselli rubati e fuggi dal labirinto di Evergarden in modalita Hard.',
+  },
+  prog_titan: {
+    name: 'Titano',
+    desc: 'Ottieni 10.000.000 di esperienza complessiva nella tua vita.',
+    title: 'Titano',
+  },
   pvp_flag_1h: {
     name: 'Audace',
-    desc: 'Mantieni attivo il PvP mondiale per 1 ora di tempo giocato nel mondo aperto. La disconnessione, la morte e le istanze sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    desc: 'Mantieni il PvP mondiale attivo per 1 ora di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
     title: 'Audace',
   },
   pvp_flag_3h: {
     name: 'Ribelle',
-    desc: 'Mantieni attivo il PvP mondiale per 3 ore di tempo giocato nel mondo aperto. La disconnessione, la morte e le istanze sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    desc: 'Mantieni il PvP mondiale attivo per 3 ore di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
     title: 'Ribelle',
   },
   pvp_flag_6h: {
     name: 'Impavido',
-    desc: 'Mantieni attivo il PvP mondiale per 6 ore di tempo giocato nel mondo aperto. La disconnessione, la morte e le istanze sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    desc: 'Mantieni il PvP mondiale attivo per 6 ore di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
     title: 'Impavido',
   },
   pvp_flag_24h: {
     name: 'Inflessibile',
-    desc: 'Mantieni attivo il PvP mondiale per 24 ore di tempo giocato nel mondo aperto. La disconnessione, la morte e le istanze sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    desc: 'Mantieni il PvP mondiale attivo per 24 ore di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
     title: 'Inflessibile',
   },
   pvp_flag_168h: {
     name: 'Indomabile',
-    desc: 'Mantieni attivo il PvP mondiale per 7 giorni di tempo giocato nel mondo aperto. La disconnessione, la morte e le istanze sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    desc: 'Mantieni il PvP mondiale attivo per 7 giorni di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
     title: 'Indomabile',
+  },
+  cmb_balgath: {
+    name: 'Mai più caposquadra',
+    desc: 'Rimanda il Caposquadra Sepolto nel suo tumulo.',
+  },
+  cmb_balgath_ten: {
+    name: 'Il tumulo non trattiene nulla',
+    desc: 'Abbatti il Caposquadra Sepolto dieci volte.',
+  },
+  cmb_point_taken: {
+    name: 'Messaggio appuntito',
+    desc: "Spegni la lanterna del Caposquadra di paglia nel campo di addestramento dell'adunata e sfrutta le sue assi.",
+  },
+  dgn_olen_buttress: {
+    name: 'Tenete il muro',
+    desc: 'Sconfiggi il Cavaliere Comandante Olen senza che il suo Baluardo Rimbalzante colpisca mai un secondo giocatore.',
+  },
+  dgn_ossick_moored: {
+    name: 'Porto sicuro',
+    desc: "Sconfiggi il Carceriere Ossick senza che nessuno venga trascinato nella Fossa dell'Annegamento.",
+  },
+  dgn_vael_beacon: {
+    name: 'Alla luce del faro',
+    desc: "Sconfiggi Vael il Vincolanebbia senza far esplodere nemmeno un'Ombra di Nebbia.",
+  },
+  dgn_turretback: {
+    name: 'Avviso di sfratto',
+    desc: 'Sconfiggi il Capitano del Relitto senza che nessuno venga colpito da Bordata Spettrale.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Ogni voce intonata',
+    desc: 'Sconfiggi la Madre del Coro Selthe condividendo ogni Coro tra almeno due giocatori e senza che alcun Assolo tocchi qualcun altro.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Rompi il vetro',
+    desc: 'Sconfiggi il Colosso di Vetro delle Maree distruggendo ogni Riflesso entro 15 secondi dalla comparsa.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: "All'asciutto",
+    desc: 'Sconfiggi Ysolei, Avatar della Luna Annegata, senza che nessuno venga colpito dal suo Schianto della Marea.',
+  },
+  dgn_mere_hydra: {
+    name: 'Tutte le teste a terra',
+    desc: "Uccidi tutte e tre le teste dell'Idra dello Stagno entro 10 secondi l'una dall'altra.",
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Neanche un capello bruciato',
+    desc: 'Sconfiggi il Drago del Rintocco Funebre senza che nessuno venga bruciato dal suo Passaggio della Pira.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Nessuna gabbia può trattenerci',
+    desc: 'Sconfiggi il Secondino della Prigione senza che nessuno venga schiacciato in una Gabbia di Ferro.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Tenuti a distanza',
+    desc: 'Sconfiggi il Signore delle Bestie Signore delle Zanne e il suo Grande Giaguaro con Legame del Branco attivo per meno di 10 secondi complessivi.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Controllo delle erbacce',
+    desc: 'Sconfiggi il Fiore Vorace senza che cresca nemmeno un Germoglio spinoso.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Mai catturati',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, senza che nessuno venga Sbranato.',
+  },
+  dgn_great_saurian: {
+    name: 'Titano abbattuto',
+    desc: "Sconfiggi il Grande Sauro e il suo Invocatore di Maledizioni della Portantina entro 20 secondi l'uno dall'altro.",
+  },
+  dgn_korgath_all_chains: {
+    name: 'Una fine più gentile',
+    desc: 'Sconfiggi Korgath il Vincolato con tutte e quattro le sue catene spezzate.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'La serratura regge',
+    desc: 'Sconfiggi Korgath il Vincolato a difficoltà Eroica senza aver mai spezzato almeno due delle sue catene.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Freddo conforto',
+    desc: "Sconfiggi il Gran Negromante Velkhar senza che alcun Camminatore d'Ossa Rianimato risorga una seconda volta.",
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Ghiaccio sottile',
+    desc: 'Sconfiggi Korzul il Dragone Sepolcrale con almeno dodici delle diciannove lastre del lago intatte.',
+  },
+  dgn_sledge_tusker: {
+    name: 'Carico freddo',
+    desc: 'Sconfiggi lo Zannuto da Slitta senza che nessuno venga colpito dal suo Calpestamento.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: "L'ultima strofa",
+    desc: "Sconfiggi Ysolei, Avatar della Luna Annegata, con l'Ultimo Cantore del Coro Pallido al tuo fianco.",
+    title: 'Testimone del Coro',
+  },
+  dgn_marrow_tidy: {
+    name: 'Un cimitero ordinato',
+    desc: 'Sconfiggi il Sagrestano Marrow collocando ogni Tomba Aperta al bordo del Cortile della Campana.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Nessuno lasciato sospeso',
+    desc: "Sconfiggi la Dama del Gelo d'Ossa senza che lasci mai cadere qualcuno dal suo Abbraccio Gelido.",
+  },
+  dgn_ilvane_hush: {
+    name: 'Silenzio, ora',
+    desc: 'Sconfiggi la Cantora Ilvane senza che il suo Lamento del Vuoto colpisca mai qualcuno.',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Ogni candela accesa',
+    desc: "Sconfiggi Morthen l'Evocatombe dopo aver riacceso tutte e quattro le Candele della Rimembranza entro 20 secondi dalla comparsa della sua Protezione Inquieta.",
+  },
+  dgn_guild_first_contract: {
+    name: 'Mandato firmato',
+    desc: 'Completa uno dei contratti settimanali dei sotterranei della Sala della Lanterna.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Assiduo alla bacheca',
+    desc: 'Completa 10 contratti settimanali dei sotterranei della Sala della Lanterna.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Veterano dei contratti',
+    desc: 'Completa 50 contratti settimanali dei sotterranei della Sala della Lanterna.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Corriere dei Mandati',
+    desc: 'Acquistato da Garrick Holt, quartiermastro della Sala della Lanterna, per 6 Sigilli della Lanterna.',
+    title: 'Corriere dei Mandati',
+  },
+  feat_guild_hallsworn: {
+    name: 'Giurato della Sala',
+    desc: 'Acquistato da Garrick Holt, quartiermastro della Sala della Lanterna, per 14 Sigilli della Lanterna.',
+    title: 'Giurato della Sala',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Della Sala della Lanterna',
+    desc: 'Acquistato da Garrick Holt, quartiermastro della Sala della Lanterna, per 24 Sigilli della Lanterna.',
+    title: 'della Sala della Lanterna',
   },
 };

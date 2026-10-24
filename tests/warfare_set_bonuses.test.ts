@@ -201,6 +201,7 @@ describe('the crowd-control duration hook', () => {
   const CATEGORIES: CrowdControlDrCategory[] = [
     'root',
     'incapacitate',
+    'sleep',
     'polymorph',
     'fear',
     'lockout',
@@ -237,6 +238,7 @@ describe('the crowd-control duration hook', () => {
     const declared: Record<CrowdControlDrCategory, true> = {
       root: true,
       incapacitate: true,
+      sleep: true,
       polymorph: true,
       fear: true,
       lockout: true,

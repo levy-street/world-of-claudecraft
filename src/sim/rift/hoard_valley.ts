@@ -2,14 +2,14 @@
 // open through a broad reveal, and finish in a clear boss basin. The shell is
 // both the collision boundary and the renderer's natural-dressing guide.
 
-import type { Collider } from '../colliders';
+import type { LayoutCollider } from '../colliders';
 import { type DungeonLayout, layoutColliders } from '../dungeon_layout';
 import type { Rng } from '../rng';
 import type { VaultSizeTier } from './vault_seed';
 
 export interface HoardValleyGeometry {
   layout: DungeonLayout;
-  colliders: Collider[];
+  colliders: LayoutCollider[];
   halfWidthAt: (z: number) => number;
   archetype: 'hoard_valley';
   spawnStartZ: number;

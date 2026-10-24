@@ -1,0 +1,58 @@
+[
+  {
+    "id": "exp_clue_first_casket",
+    "src": "http://localhost:5194/ui/deeds/exp_clue_first_casket.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_clue_ten_caskets",
+    "src": "http://localhost:5194/ui/deeds/exp_clue_ten_caskets.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "cmb_coinsack_caught",
+    "src": "http://localhost:5194/ui/deeds/cmb_coinsack_caught.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_harbor_to_harbor",
+    "src": "http://localhost:5194/ui/deeds/exp_harbor_to_harbor.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "cmb_balgath",
+    "src": "http://localhost:5194/ui/deeds/cmb_balgath.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "cmb_balgath_ten",
+    "src": "http://localhost:5194/ui/deeds/cmb_balgath_ten.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "cmb_point_taken",
+    "src": "http://localhost:5194/ui/deeds/cmb_point_taken.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

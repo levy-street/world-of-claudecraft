@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/bastion_turnkey_woc.glb",
+      "out": "models/creatures/woc_bastion_turnkey.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Hit",
+        "KeySwing",
+        "ChainLash",
+        "LanternRaise",
+        "Cast",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

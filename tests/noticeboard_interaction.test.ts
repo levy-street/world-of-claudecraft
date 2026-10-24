@@ -2,6 +2,14 @@
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { objectDisplayName } from '../src/render/entity_labels';
 import { colliderInternalsForTest } from '../src/sim/colliders';
 import { noticeboardDefByEntityId } from '../src/sim/content/noticeboards';
@@ -23,6 +31,7 @@ import {
 } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { contactAtOnce } from './helpers/renderer_contact';
 
 const SEED = 20_061;
 const EMPTY_NOTICEBOARD_EVENT = {
@@ -100,8 +109,22 @@ describe('active-world noticeboard service', () => {
       noPlayer: true,
       world: worldWithoutBoard,
     });
+    // The board is the ONLY difference between the two worlds: both are plain
+    // copies of the built-in content. (The built-in world itself also carries
+    // the Weekly Vault's identity-gated terrain pad, sim/eastbrook_vault_terrain.ts,
+    // which since the Tidehold rebuild stands at the square's south edge and
+    // shifts the ground under the mailbox, the ferry bell and two NPCs by
+    // millimetres. Comparing a copy against the original would measure that
+    // pad, not the board.)
+    const worldWithBoard: WorldContent = { ...BUILTIN_WORLD };
+    setActiveWorldContent(worldWithBoard);
+    const withBoard = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: worldWithBoard,
+    });
     setActiveWorldContent(null);
-    const withBoard = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
     const board = noticeboard(withBoard);
 
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,
@@ -246,7 +269,11 @@ describe('active-world noticeboard service', () => {
         craftSkills: Record<string, number>;
         gatheringProficiency: Record<string, number>;
       };
-      renderer: { handleEvent: ReturnType<typeof vi.fn> };
+      renderer: {
+        handleEvent: ReturnType<typeof vi.fn>;
+        // the event sound waits for a swing's blade contact (contact_queue.ts); none here
+        atContact: typeof contactAtOnce;
+      };
       playEventSfx: ReturnType<typeof vi.fn>;
       meters: { onEvent: ReturnType<typeof vi.fn> };
       isNythraxisEvent: ReturnType<typeof vi.fn>;
@@ -264,7 +291,7 @@ describe('active-world noticeboard service', () => {
       craftSkills: {},
       gatheringProficiency: {},
     };
-    hud.renderer = { handleEvent: vi.fn() };
+    hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
     hud.playEventSfx = vi.fn();
     hud.meters = { onEvent: vi.fn() };
     hud.isNythraxisEvent = vi.fn(() => false);

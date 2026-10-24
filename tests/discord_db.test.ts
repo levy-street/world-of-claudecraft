@@ -904,7 +904,7 @@ describe('discordFlexRowsForDiscordIds', () => {
     ]);
   });
 
-  it('orders top-character identically to highestCharacterForAccount in server/db.ts', async () => {
+  it('orders top-character identically to highestCharacterForAccount in server/character_roster_db.ts', async () => {
     // A ONE-SIDED pin would be near worthless here. Asserting only that this
     // module still carries the clause leaves an edit on the db.ts side green while
     // the two live endpoints silently disagree about which character is "top", and
@@ -936,7 +936,10 @@ describe('discordFlexRowsForDiscordIds', () => {
     // silently disagreeing. Slicing to the function body is what makes the
     // assertion answer "is the SHIPPING statement still in step", not "does this
     // text appear somewhere in the file".
-    const dbSource = readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8');
+    const dbSource = readFileSync(
+      new URL('../server/character_roster_db.ts', import.meta.url),
+      'utf8',
+    );
     // Anchored on the bare name, NOT the full one-line signature: that declaration
     // is 99 characters against biome's lineWidth of 100, so a two-character rename
     // would wrap the parameter list and turn this pin red with no defect behind it.

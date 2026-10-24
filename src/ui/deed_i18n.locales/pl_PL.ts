@@ -1221,29 +1221,174 @@ export const table: DeedLocaleTable = {
     name: 'Przyłapany na Gorącym Uczynku',
     desc: 'Złap Scenusza Moneciaka w Zakopanych Skarbnicy zanim ucieka ze złotem.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Jasniej niz cienie',
+    desc: 'Odzyskaj skradzione sakiewki z monetami i ucieknij z labiryntu Evergarden na poziomie Hard.',
+  },
+  prog_titan: {
+    name: 'Tytan',
+    desc: 'Zdobądź łącznie 10 000 000 punktów doświadczenia w ciągu życia.',
+    title: 'Tytan',
+  },
   pvp_flag_1h: {
     name: 'Śmiały',
-    desc: 'Pozostaw światowe PvP włączone przez 1 godzinę czasu gry w otwartym świecie. Wylogowanie, śmierć i instancje wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są stałe.',
+    desc: 'Utrzymuj światowe PvP włączone przez 1 godzinę czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
     title: 'Śmiały',
   },
   pvp_flag_3h: {
-    name: 'Niepokorny',
-    desc: 'Pozostaw światowe PvP włączone przez 3 godziny czasu gry w otwartym świecie. Wylogowanie, śmierć i instancje wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są stałe.',
-    title: 'Niepokorny',
+    name: 'Buntowniczy',
+    desc: 'Utrzymuj światowe PvP włączone przez 3 godziny czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Buntowniczy',
   },
   pvp_flag_6h: {
     name: 'Nieustraszony',
-    desc: 'Pozostaw światowe PvP włączone przez 6 godzin czasu gry w otwartym świecie. Wylogowanie, śmierć i instancje wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są stałe.',
+    desc: 'Utrzymuj światowe PvP włączone przez 6 godzin czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
     title: 'Nieustraszony',
   },
   pvp_flag_24h: {
-    name: 'Nieugięty',
-    desc: 'Pozostaw światowe PvP włączone przez 24 godziny czasu gry w otwartym świecie. Wylogowanie, śmierć i instancje wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są stałe.',
-    title: 'Nieugięty',
+    name: 'Niezłomny',
+    desc: 'Utrzymuj światowe PvP włączone przez 24 godziny czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Niezłomny',
   },
   pvp_flag_168h: {
-    name: 'Niezłomny',
-    desc: 'Pozostaw światowe PvP włączone przez 7 dni czasu gry w otwartym świecie. Wylogowanie, śmierć i instancje wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są stałe.',
-    title: 'Niezłomny',
+    name: 'Nieposkromiony',
+    desc: 'Utrzymuj światowe PvP włączone przez 7 dni czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Nieposkromiony',
+  },
+  cmb_balgath: {
+    name: 'Już nie nadzorca',
+    desc: 'Odeślij Pogrzebanego Nadzorcę z powrotem do jego kurhanu.',
+  },
+  cmb_balgath_ten: {
+    name: 'Kurhan niczego nie zatrzyma',
+    desc: 'Pokonaj Pogrzebanego Nadzorcę dziesięć razy.',
+  },
+  cmb_point_taken: {
+    name: 'Celna uwaga',
+    desc: 'Zgaś latarnię Słomianego Nadzorcy na placu ćwiczeń zaciągu i rozpraw się z jego deskami.',
+  },
+  dgn_olen_buttress: {
+    name: 'Utrzymać mur',
+    desc: 'Pokonaj Komandora Rycerzy Olena, nie dopuszczając, by jego Odbijająca tarcza trafiła drugiego gracza.',
+  },
+  dgn_ossick_moored: {
+    name: 'Bezpieczna przystań',
+    desc: 'Pokonaj Dozorcę Ossicka, nie dopuszczając do wciągnięcia nikogo do Topielnej jamy.',
+  },
+  dgn_vael_beacon: {
+    name: 'W świetle latarni',
+    desc: 'Pokonaj Vaela Fogbindera, nie rozbijając ani jednego Mglistego Cienia.',
+  },
+  dgn_turretback: {
+    name: 'Nakaz eksmisji',
+    desc: 'Pokonaj Kapitana Wraku, nie dopuszczając, by Widmowa salwa burtowa kogokolwiek trafiła.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Każdy głos brzmi czysto',
+    desc: 'Pokonaj Chórmatkę Selthe, dzieląc każdy Chór między co najmniej dwie osoby i nie pozwalając, by jakakolwiek Partia solowa dotknęła kogokolwiek innego.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Rozbij szkło',
+    desc: 'Pokonaj Kolosa Pływowego Szkła, rozbijając każde Odbicie w ciągu 15 sekund od jego pojawienia się.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Suchą stopą',
+    desc: 'Pokonaj Ysolei, Awatar Utopionego Księżyca, nie dopuszczając, by jej Pływowe uderzenie kogokolwiek trafiło.',
+  },
+  dgn_mere_hydra: {
+    name: 'Wszystkie głowy w dół',
+    desc: 'Zabij wszystkie trzy głowy Jeziornej Hydry w odstępie najwyżej 10 sekund.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Ani włos nie osmalony',
+    desc: 'Pokonaj Dzwonnego Żmija, nie dopuszczając, by jego Ognisty przelot kogokolwiek poparzył.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Żadna klatka nas nie zatrzyma',
+    desc: 'Pokonaj Klucznika Więzienia, nie dopuszczając do zmiażdżenia nikogo w Żelaznej klatce.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Trzymani na dystans',
+    desc: 'Pokonaj Kłolorda, Pogromcę Bestii, i jego Wielkiego Jaguara, utrzymując Więź stada aktywną łącznie przez mniej niż 10 sekund.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Walka z chwastami',
+    desc: 'Pokonaj Żarłokwiat, nie dopuszczając do wyrośnięcia ani jednego Ciernistego Pędu.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Nieuchwytni',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, nie dopuszczając, by ktokolwiek został Poszarpany.',
+  },
+  dgn_great_saurian: {
+    name: 'Obalony tytan',
+    desc: 'Pokonaj Wielkiego Jaszczura i jego Zaklinacza Howdahu w odstępie najwyżej 20 sekund.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Łagodniejszy koniec',
+    desc: 'Pokonaj Korgatha Spętanego po zerwaniu wszystkich czterech jego łańcuchów.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Zamek trzyma',
+    desc: 'Pokonaj Korgatha Spętanego na heroicznym poziomie trudności, nigdy nie zrywając co najmniej dwóch jego łańcuchów.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Zimne pocieszenie',
+    desc: 'Pokonaj Wielkiego Nekromantę Velkhara, nie dopuszczając do ponownego powstania ani jednego Wskrzeszonego Kościanego Wędrowca.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Cienki lód',
+    desc: 'Pokonaj Korzula Grobowego Żmija, pozostawiając nienaruszone co najmniej dwanaście z dziewiętnastu płyt lodu na jeziorze.',
+  },
+  dgn_sledge_tusker: {
+    name: 'Zimny ładunek',
+    desc: 'Pokonaj Kłacza Sań, nie dopuszczając, by jego Tratowanie kogokolwiek trafiło.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Ostatnia zwrotka',
+    desc: 'Pokonaj Ysolei, Awatar Utopionego Księżyca, z Ostatnim Kantorem Bladego Chóru u boku.',
+    title: 'Świadek Chóru',
+  },
+  dgn_marrow_tidy: {
+    name: 'Zadbany cmentarz',
+    desc: 'Pokonaj Grabarza Marrowa, umieszczając każdy Otwarty grób na skraju Dziedzińca Dzwonu.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Nikt nie zostaje w powietrzu',
+    desc: 'Pokonaj Panią Przeszywającego Chłodu, nie dopuszczając, by upuściła kogokolwiek ze swojego Lodowego objęcia.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Teraz cisza',
+    desc: 'Pokonaj Kantorkę Ilvane, nie dopuszczając, by jej Tren Pustki kogokolwiek trafił.',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Każda świeca płonie',
+    desc: 'Pokonaj Morthena Grobowego Wołacza po ponownym zapaleniu wszystkich czterech Świec pamięci w ciągu 20 sekund od pojawienia się jego Osłony niespokojnych.',
+  },
+  dgn_guild_first_contract: {
+    name: 'Zlecenie podpisane',
+    desc: 'Ukończ jeden z tygodniowych kontraktów na lochy Sali Latarni.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Stały bywalec tablicy',
+    desc: 'Ukończ 10 tygodniowych kontraktów na lochy Sali Latarni.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Weteran kontraktów',
+    desc: 'Ukończ 50 tygodniowych kontraktów na lochy Sali Latarni.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Goniec zleceń',
+    desc: 'Kupiono od Garricka Holta, kwatermistrza Sali Latarni, za 6 Pieczęci Latarni.',
+    title: 'Goniec zleceń',
+  },
+  feat_guild_hallsworn: {
+    name: 'Zaprzysiężony Sali',
+    desc: 'Kupiono od Garricka Holta, kwatermistrza Sali Latarni, za 14 Pieczęci Latarni.',
+    title: 'Zaprzysiężony Sali',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Z Sali Latarni',
+    desc: 'Kupiono od Garricka Holta, kwatermistrza Sali Latarni, za 24 Pieczęci Latarni.',
+    title: 'z Sali Latarni',
   },
 };

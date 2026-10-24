@@ -19,8 +19,9 @@
 import type { GatheringProfessionId } from '../sim/content/professions';
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
-  DUNGEON_LIST,
-  GATHER_NODES,
+  activeOverworldDungeons,
+  gatherNodesInActiveWorld,
+  getActiveWorldContent,
   isBgPos,
   isDelvePos,
   STRIP_MAX_X,
@@ -45,11 +46,11 @@ import type {
 } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
-import { worldQuestCompletedForBoard } from '../sim/world_quest_practice';
 import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { dungeonMapActive } from './dungeon_map_view';
+import { FERRY_PORTS, type FerryPortMapMarker } from './ferry_port_map_core';
 import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
@@ -69,6 +70,7 @@ import {
   type MapAtlasFilters,
   type MapAtlasRoute,
 } from './map_sidebar_view';
+import { worldQuestReadsActive, worldQuestReadsCompleted } from './world_quest_progress_state';
 
 // World-map zoom band. zoom 1 = the whole current zone framed square;
 // MAP_MAX_ZOOM is a close local view. The view scales uniformly between the two,
@@ -90,6 +92,10 @@ const DETAIL_VIEW_MARGIN = 6;
 // Markers (POIs / portals / NPCs / allies) within this many world units of the
 // visible region still draw, so a label anchored just off the edge is not clipped.
 const MARKER_VIEW_MARGIN = 24;
+// Weight a zone POI point carries into the label declutter: its enter
+// diameter (subzone.ts SUBZONE_RADIUS * 2), so a point ranks alongside the
+// mid-sized authored districts rather than above or below all of them.
+const POI_POINT_WEIGHT = 64;
 // Marker radii in the detail overlay: a px floor plus a per-pixel-per-yard scale,
 // so dots stay visible when zoomed out yet grow with the map (matches the inline
 // site verbatim). ppu = pixels per world unit.
@@ -124,7 +130,10 @@ export interface MapViewRect {
   maxZ: number;
 }
 
-/** A zone POI label: canvas position + the identity the painter localizes. */
+/** A zone POI label: canvas position + the identity the painter localizes.
+ *  An AUTHORED named area (a map's `locations` rect) carries its name inline
+ *  instead: the maker typed it, so there is no catalog key to localize and
+ *  `poiIndex` is -1. */
 export interface MapPoiMarker {
   mx: number;
   /** The authored projection: hit-testing and the screen-reader summary read it. */
@@ -134,6 +143,12 @@ export interface MapPoiMarker {
   labelMy: number;
   zoneId: string;
   poiIndex: number;
+  label?: string;
+  /** Drawing priority for the painter's declutter pass, in yards: the longer
+   *  side of an authored area's rect, so a district outranks the tavern inside
+   *  it when their names would collide. Zone POIs carry the subzone enter
+   *  diameter, which puts them among the mid-sized landmarks. */
+  weight: number;
 }
 
 /** A dungeon entrance portal: canvas position + the dungeon id to localize. */
@@ -328,6 +343,7 @@ export interface MapServiceMarker {
  * identities come from authored content; Rift name/rank come only from a live
  * entity inside the host-fair disclosure range. */
 export type MapNavigationMarker =
+  | FerryPortMapMarker
   | { kind: 'hoard-entrance'; mx: number; my: number }
   | {
       kind: 'delve-entrance';
@@ -843,7 +859,6 @@ export interface OverworldMapModel {
   questAreas: MapQuestAreaMarker[];
   worldQuests: MapWorldQuestMarker[];
   worldBosses: MapWorldBossMarker[];
-  hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
   /** Gather nodes in the committed zone (all zoom levels). Empty only when
    *  the zone has no authored nodes in view. */
   gatherNodes: MapGatherNodeMarker[];
@@ -930,7 +945,6 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const filters = input.filters ?? DEFAULT_MAP_ATLAS_FILTERS;
   const landmarkPlacement = MAP_LANDMARK_PLACEMENT_BY_PROFILE[input.markerProfile ?? 'standard'];
   const p = world.player;
-  const hill = world.hillInfo;
 
   // Inside a rift the overworld zone (the current-zone frame below still keys
   // off `zone`, which the player's far-off rift x displaces past any real
@@ -1032,8 +1046,26 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       if (poi.hideOnMap) continue;
       if (!inView(poi.x, poi.z)) continue;
       const { mx, my } = toMap(poi.x, poi.z);
-      pois.push({ mx, my, zoneId: zone.id, poiIndex });
+      pois.push({ mx, my, zoneId: zone.id, poiIndex, weight: POI_POINT_WEIGHT });
     }
+    // Authored named areas (MapDoc `locations`) label their rect's centre.
+    // These are what a city map is actually made of - the zone POI list holds
+    // a handful of shipped points, while a Studio map names every square,
+    // dock and terrace with a dragged rect.
+    for (const area of getActiveWorldContent().locations ?? []) {
+      const cx = (area.minX + area.maxX) / 2;
+      const cz = (area.minZ + area.maxZ) / 2;
+      if (!inZone(cx, cz)) continue;
+      if (!inView(cx, cz)) continue;
+      const { mx, my } = toMap(cx, cz);
+      const weight = Math.max(area.maxX - area.minX, area.maxZ - area.minZ);
+      pois.push({ mx, my, zoneId: zone.id, poiIndex: -1, label: area.name, weight });
+    }
+    // Biggest landmark first: the painter draws greedily and drops a label
+    // whose box collides with one already down, so this ordering decides who
+    // survives a crowded plate. Sort is stable, so equal weights keep content
+    // order (every shipped zone's POIs are equal-weight, so nothing moves).
+    pois.sort((a, b) => b.weight - a.weight);
   }
 
   // Active-quest objective areas (the classic "your targets live here" blobs),
@@ -1078,7 +1110,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   })) {
     if (quest.zoneId !== zone.id || playerLevel < quest.minLevel) continue;
     const progress = world.worldQuestLog?.get(quest.id);
-    if (worldQuestCompletedForBoard(progress)) continue;
+    if (worldQuestReadsCompleted(progress)) continue;
     const isGlider = quest.objective.type === 'glider';
     const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
     if (!inView(position.x, position.z)) continue;
@@ -1088,7 +1120,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       mx,
       my,
       radius: isGlider ? 0 : (quest.area.radius / spanX) * S,
-      state: progress?.state === 'active' ? 'active' : 'available',
+      state: worldQuestReadsActive(progress) ? 'active' : 'available',
       areaVisible: !isGlider && input.selectedWorldQuestId === quest.id,
     });
   }
@@ -1112,7 +1144,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // Dungeon portals owned by the current zone (shown at every zoom).
   const portals: MapPortalMarker[] = [];
   for (const portal of filters.dungeons
-    ? overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax)
+    ? overworldDungeonPortals(activeOverworldDungeons(), zone.zMin, zone.zMax)
     : []) {
     if (!inZone(portal.x, portal.z) || !inView(portal.x, portal.z)) continue;
     const { mx, my } = toMap(portal.x, portal.z);
@@ -1130,7 +1162,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const gatherNodes: MapGatherNodeMarker[] = [];
   let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
   let proficiency: Readonly<Record<string, number>> | undefined;
-  for (const node of filters.gather ? GATHER_NODES : []) {
+  for (const node of filters.gather ? gatherNodesInActiveWorld() : []) {
     if (node.zoneId !== zone.id) continue;
     if (!inView(node.pos.x, node.pos.z)) continue;
     bestToolTiers ??= new Map();
@@ -1215,6 +1247,13 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
         portalId: site.id,
         destinationZoneId: site.destinationZoneId,
       });
+    }
+  }
+  if (world.ferryView?.()) {
+    for (const port of FERRY_PORTS) {
+      if (port.zoneId !== zone.id) continue;
+      const placed = placeNavigation(port.x, port.z);
+      if (placed) navigation.push({ ...port, ...placed });
     }
   }
   for (const entity of world.entities.values()) {
@@ -1407,10 +1446,6 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     questAreas,
     worldQuests,
     worldBosses,
-    hill:
-      hill && hill.zoneId === zone.id && inView(hill.x, hill.z)
-        ? { ...toMap(hill.x, hill.z), phase: hill.phase }
-        : null,
     gatherNodes,
     stations,
     services,

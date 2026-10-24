@@ -57,17 +57,23 @@ describe('shaman ability-specific spellcasts (issue #2889)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_shaman: swims({', 'player_mage: swims({');
+    const block = manifestBlock(
+      'export const KAYKIT_SHAMAN: VisualDef = swims({',
+      'export const KAYKIT_MAGE',
+    );
     expect(block).toContain('shaman_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of SHAMAN_CAST_CLIPS) expect(block).toContain(`'${clip}'`);
   });
 
   it('every mapped ability id is a real shaman ability, and every referenced bespoke clip is shipped', () => {
-    const shamanBlock = manifestBlock('player_shaman: swims({', 'player_mage: swims({');
+    const shamanBlock = manifestBlock(
+      'export const KAYKIT_SHAMAN: VisualDef = swims({',
+      'export const KAYKIT_MAGE',
+    );
     const abilityStart = shamanBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
-    const abilityEnd = shamanBlock.indexOf('\n      },', abilityStart);
+    const abilityEnd = shamanBlock.indexOf('\n    },', abilityStart);
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = shamanBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_]+)',$/gm)];

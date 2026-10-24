@@ -70,11 +70,6 @@ services:
       # realm. Forwarded so the switch actually reaches the server: a variable
       # set only in the host .env never does unless it is listed here.
       RIFT_FORGE_ENABLED: ${RIFT_FORGE_ENABLED:-}
-      # Runtime: the WebSocket compression kill switch (server/ws_compression.ts).
-      # permessage-deflate is on by default; 0 (or false) turns it off for this
-      # realm, and any other set value fails fast at boot (server/http/config.ts).
-      # Forwarded for the same reason as the forge switch above.
-      WS_PERMESSAGE_DEFLATE: ${WS_PERMESSAGE_DEFLATE:-}
       # Runtime: storage price override (server/storage_prices.ts), one JSON object
       # of copper price lists, e.g. {"bankSockets":[4 ints]} (bankExpansions and
       # vaultUpgrades too), kept on ONE line in a .env file. Empty (unset) keeps the
@@ -184,6 +179,9 @@ services:
       WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
       WOC_ECONOMY_SERVICE_URL: ${WOC_ECONOMY_SERVICE_URL:-}
       WOC_ECONOMY_INTERNAL_SECRET: ${WOC_ECONOMY_INTERNAL_SECRET:-}
+      # Game memberships: exactly 1 offers them in the store (server/subscription_proxy.ts);
+      # unset keeps them off.
+      WOC_SUBSCRIPTIONS_ENABLED: ${WOC_SUBSCRIPTIONS_ENABLED:-}
       # The $WOC Exchange. Ships disabled: unset leaves every path answering
       # woc_market.disabled and the sweep never starts. WOC_MARKET_SERVICE_URL
       # points at the economy service's /v1/market/ prefix, authenticated with
@@ -324,6 +322,7 @@ services:
       DISCORD_RELAY_CHANNEL_ID: ${DISCORD_RELAY_CHANNEL_ID:-}
       DISCORD_ACTIVITY_CHANNEL_ID: ${DISCORD_ACTIVITY_CHANNEL_ID:-}
       DISCORD_DAILY_REWARDS_CHANNEL_ID: ${DISCORD_DAILY_REWARDS_CHANNEL_ID:-}
+      DISCORD_PVP_FEED_CHANNEL_ID: ${DISCORD_PVP_FEED_CHANNEL_ID:-}
       DISCORD_SYNC_NICKNAMES: ${DISCORD_SYNC_NICKNAMES:-1}
       # Runtime: every tuning knob the bot reads, so an operator can turn the
       # incident levers DEPLOY.md documents (the request ceiling, the ban pause,

@@ -6,7 +6,15 @@
 // texts are pinned as EXACT strings (not per-name toContain), so the view
 // cannot silently reorder or re-sort what the sim derived in ring order.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
 import { craftIdsForMaterialItem } from '../src/sim/material_profession_affinity';
@@ -167,6 +175,9 @@ describe('materialProfessionHintText', () => {
     // sentence, which names no craft) and exactly one consumer. This is the
     // counterpart pin for the === 'enchanting' comparison in
     // hasSupersedingPurposeHint: dropping it would silently blank this line.
+    // (The buddy charm recipe that briefly made Leatherworking a second
+    // consumer left with the account-wide buddy rework: BUDDY_CHARM_RECIPES
+    // in content/recipes.ts is empty since 1896839827c.)
     expect(materialProfessionHintText('fine_ironbark_log')).toBe('Used by Weaponcrafting.');
   });
 

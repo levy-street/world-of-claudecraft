@@ -55,11 +55,10 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     // buff must scale a rate-shaped value as a fraction, not round it like a flat
     // magnitude (stealth is deliberately absent from INTEGRAL_BUFF_KINDS).
     // Subtlety is the live buffPct-on-a-rate pair in the content, so it pins the
-    // shipped tuning. It can no longer carry the ROUNDING half of the claim on its
-    // own: its mastery now doubles the rate outright (buffPct 1, the full-speed
-    // Duskveil pass), and 0.5 * 2 = 1 is exactly where rounding would land too. The
-    // second assertion therefore drives the same applyTalentMods path with a
-    // FRACTIONAL product, which only a scaling implementation can produce.
+    // shipped tuning: Duskveil runs at full speed (1.0) and the mastery adds 15%,
+    // a fractional 1.15 that Math.round would flatten back to 1. The second
+    // assertion drives the same applyTalentMods path with a larger fractional
+    // product as a second witness.
     const stealthValue = (mods: ReturnType<typeof computeTalentModifiers> | undefined): number => {
       const ability = abilitiesKnownAt('rogue', 20, mods).find((a) => a.def.id === 'stealth');
       const buff = ability?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'stealth');
@@ -67,15 +66,15 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
       return buff.value;
     };
 
-    expect(stealthValue(undefined)).toBeCloseTo(0.5, 6);
+    expect(stealthValue(undefined)).toBeCloseTo(1, 6);
 
     const subtlety = computeTalentModifiers(
       'rogue',
       { spec: 'subtlety', ranks: {}, choices: {} },
       20,
     );
-    // 0.5 * 2 (subtlety buffPct 1) = 1.0: the mastery removes the Duskveil slow.
-    expect(stealthValue(subtlety)).toBeCloseTo(1, 6);
+    // 1.0 * 1.15 (subtlety buffPct 0.15): Skulduggery moves 15% faster in Duskveil.
+    expect(stealthValue(subtlety)).toBeCloseTo(1.15, 6);
 
     // The rounding half of the claim, driven through the same resolver: a
     // fractional buffPct must land on a fractional value. Math.round would give
@@ -87,7 +86,7 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
         stealth: { ...subtlety.abilities.stealth, buffPct: 0.5 },
       },
     } as typeof subtlety;
-    expect(stealthValue(fractional)).toBeCloseTo(0.75, 6);
+    expect(stealthValue(fractional)).toBeCloseTo(1.5, 6);
   });
 });
 

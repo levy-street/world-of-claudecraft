@@ -51,9 +51,6 @@
   })();
 </script>
 
-<!-- Cloudflare Turnstile (bot gate on login/registration). Rendered explicitly
-     by src/main.ts only when VITE_TURNSTILE_SITEKEY is configured. -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://worldofclaudecraft.com/" />
@@ -162,11 +159,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="preload" as="image" href="/worldofclaudecraft-logo.webp" imagesrcset="/worldofclaudecraft-logo-540.webp 540w, /worldofclaudecraft-logo.webp 978w" imagesizes="min(540px, 72vw)" fetchpriority="high" />
 <link rel="preload" as="image" href="./ui/cursors/gauntlet.png" />
 <link rel="preload" as="image" href="./ui/cursors/arrow.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/cinzel-400-700-latin.woff2" crossorigin />
+<link rel="preload" as="font" type="font/woff2" href="/fonts/alegreya-sans-400-latin.woff2" crossorigin />
 <!-- Google tag (gtag.js) - skipped on localhost so dev sessions don't pollute analytics -->
 <script>
   if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
@@ -180,26 +177,171 @@
     gtag('config', 'G-BR5Z7GT7C2');
   }
 </script>
-<!-- Meta Pixel Code - skipped on localhost so dev sessions don't pollute analytics -->
+<!-- Meta Pixel Code - skipped on localhost so dev sessions don't pollute analytics.
+     The fbq queue and the PageView are set up now; the library itself loads on the
+     visitor's first interaction, so its script and third-party cookie stay off the
+     first paint, and the queued calls replay when it arrives. A visitor who leaves
+     without interacting sends no PageView. -->
 <script>
   if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
-    !((f,b,e,v,n,t,s)=> {if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    !((f,b,e,v,n,t,s)=> {if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];const load=()=>{if(t)return;t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)};['pointerdown','keydown','touchstart'].forEach((ev)=>f.addEventListener(ev,load,{capture:true,once:true,passive:true}))})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1692101265042180');
     fbq('track', 'PageView');
   }
 </script>
 <!-- End Meta Pixel Code -->
+<link rel="stylesheet" href="/src/styles/fonts.css" />
 <link rel="stylesheet" href="/src/styles/index.extra.css" />
 <style>
-  /* Game CSS now lives in src/styles/* (the CSS extraction). The shared
-     layers (tokens, base, layout, components, hud, shell, hud-mobile) load via the
-     src/main.ts barrel; this entry's per-entry layer (the #rotate-device
-     orientation gate) loads from index.extra.css linked above. Layer
-     names are flat (hud-mobile, not hud.mobile): a dot is a sublayer separator. This
-     inline block is intentionally empty. */
+  /* The boot splash paints from this block alone: the game stylesheets load behind it
+     (moved to the end of <body> by the woc-boot-splash-stylesheets Vite plugin) and
+     src/ui/boot_splash.ts lifts it once the start screen is presentable. Every rule
+     here is scoped to the splash or to body.boot-pending, so none outlives the boot.
+     Colors mirror --website-ink-deep, --website-gold and --website-gold-bright. */
+  body.boot-pending {
+    margin: 0;
+    overflow: hidden;
+  }
+  /* Clipped to the screen as well as hidden: unstyled media under the splash (the
+     1536px video poster, the 978px logos) would otherwise widen the layout viewport,
+     and a phone then zooms out and centers the splash off screen. */
+  body.boot-pending > :not(#boot-splash) {
+    visibility: hidden;
+    max-width: 100vw;
+    overflow: hidden;
+    overflow: clip;
+  }
+  #boot-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 5vh, 44px);
+    gap: clamp(18px, 5dvh, 44px);
+    background: #0a120f;
+    transition: opacity 350ms ease;
+  }
+  #boot-splash.boot-splash-leaving {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .boot-splash-logo {
+    width: min(540px, 72vw);
+    height: auto;
+    max-height: 52vh;
+    max-height: 52dvh;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 500ms ease;
+  }
+  .boot-splash-logo.is-loaded {
+    opacity: 1;
+  }
+  .boot-splash-bar {
+    position: relative;
+    overflow: hidden;
+    width: min(280px, 46vw);
+    height: 2px;
+    border-radius: 1px;
+    background: rgb(200 175 122 / 0.22);
+  }
+  .boot-splash-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, #efd594, transparent);
+    transform: translateX(-100%);
+    animation: boot-splash-sweep 1.6s ease-in-out infinite;
+  }
+  @keyframes boot-splash-sweep {
+    to {
+      transform: translateX(250%);
+    }
+  }
+  #boot-splash.boot-splash-still,
+  .boot-splash-still .boot-splash-logo {
+    transition: none;
+  }
+  .boot-splash-still .boot-splash-bar::after {
+    width: 100%;
+    opacity: 0.5;
+    transform: none;
+    animation: none;
+  }
 </style>
+<noscript>
+  <style>
+    body.boot-pending > :not(#boot-splash) {
+      visibility: visible;
+    }
+    #boot-splash {
+      display: none;
+    }
+  </style>
+</noscript>
 </head>
-<body class="steam-wishlist-pending start-screen-open" data-start-panel="mode-select" data-website-redesign>
+<body class="boot-pending steam-wishlist-pending start-screen-open" data-start-panel="mode-select" data-website-redesign>
+  <div id="boot-splash" aria-hidden="true">
+    <img class="boot-splash-logo" src="/worldofclaudecraft-logo.webp" srcset="/worldofclaudecraft-logo-540.webp 540w, /worldofclaudecraft-logo.webp 978w" sizes="min(540px, 72vw)" width="978" height="654" alt="" fetchpriority="high" />
+    <div class="boot-splash-bar"></div>
+  </div>
+  <script>
+    (() => {
+      const splash = document.getElementById('boot-splash');
+      const logo = splash?.querySelector('.boot-splash-logo');
+      if (!splash || !logo) return;
+      let reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try {
+        reduceMotion ||= JSON.parse(localStorage.getItem('woc_settings') ?? '{}')?.reduceMotion === true;
+      } catch {}
+      if (reduceMotion) splash.classList.add('boot-splash-still');
+      const showLogo = () => logo.classList.add('is-loaded');
+      if (logo.complete && logo.naturalWidth > 0) showLogo();
+      else logo.addEventListener('load', showLogo, { once: true });
+      // A failed stylesheet keeps a null sheet in some engines, so this mark is what
+      // tells a settled link from one still loading.
+      const markSettled = (event) => {
+        if (event.target instanceof HTMLLinkElement) event.target.dataset.bootSettled = '';
+      };
+      document.addEventListener('load', markSettled, true);
+      document.addEventListener('error', markSettled, true);
+      // Fail-safe: a game module that fails to load or a boot that throws shows the page
+      // at once, and a boot still held after the cap shows it once its own stylesheets
+      // settled. src/ui/boot_splash.ts takes over the error arm when it owns the splash.
+      const release = () => {
+        document.body.classList.remove('boot-pending');
+        splash.remove();
+      };
+      const onBootError = (event) => {
+        const target = event.target;
+        const moduleFailed = target instanceof HTMLScriptElement && target.type === 'module';
+        const bootThrew =
+          event instanceof ErrorEvent && String(event.filename).startsWith(location.origin);
+        if (moduleFailed || bootThrew) release();
+      };
+      addEventListener('error', onBootError, true);
+      document.addEventListener(
+        'woc:boot-splash-owned',
+        () => removeEventListener('error', onBootError, true),
+        { once: true },
+      );
+      const ownStylesSettled = () =>
+        [...document.querySelectorAll('link[rel~="stylesheet"]')].every((link) => {
+          const url = new URL(link.href, location.href);
+          const own = url.protocol === location.protocol && url.host === location.host;
+          return !own || link.sheet || 'bootSettled' in link.dataset;
+        });
+      const releaseOnceStyled = () => {
+        if (ownStylesSettled()) release();
+        else setTimeout(releaseOnceStyled, 1000);
+      };
+      setTimeout(releaseOnceStyled, 60000);
+    })();
+  </script>
   <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
        infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
   <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>
@@ -209,7 +351,9 @@
   <div id="nameplates" aria-hidden="true"></div>
   <img
     id="intro-logo"
-    src="/worldofclaudecraft-logo.png"
+    src="/worldofclaudecraft-logo.webp"
+    srcset="/worldofclaudecraft-logo-540.webp 540w, /worldofclaudecraft-logo.webp 978w"
+    sizes="min(540px, 72vw)"
     data-i18n-alt="serverUnavailable.logoAlt"
     alt="World of ClaudeCraft"
     aria-hidden="true"
@@ -240,6 +384,7 @@
       <span class="ctm-arrow ctm-s"></span>
       <span class="ctm-arrow ctm-w"></span>
     </div>
+    <div id="hill-bar" role="status" aria-live="polite"><div id="hill-body"></div></div>
     <div id="talking-head" class="talking-head ui-panel-strong" hidden role="status" data-i18n-aria="hudChrome.talkingHead.label" aria-label="Dialogue">
       <div class="portrait-wrap ui-portrait-wrap th-portrait-wrap"><div class="portrait ui-portrait"><canvas class="th-portrait" width="54" height="54"></canvas></div></div>
       <div class="th-body"><div class="th-name ui-h"></div><div class="th-text"></div></div>
@@ -328,6 +473,7 @@
 
     <div id="minimap-wrap">
       <div id="zone-label" class="ui-cin ui-outline" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
+      <button id="instance-difficulty" class="ui-disc" type="button" hidden data-i18n-title="hudChrome.raidBossGuide.difficultyLabel" data-i18n-aria="hudChrome.raidBossGuide.difficultyLabel" title="Difficulty" aria-label="Difficulty"></button>
       <div id="minimap-disc">
         <!-- Decorative canvas: the minimap pixels are not screen-readable, so the
              canvas is aria-hidden, like #nameplates/#swingbar and the FCT nodes. Its textual
@@ -377,6 +523,7 @@
     </nav>
 
     <div id="right-tracker-stack" class="ui-outline">
+      <div id="dungeon-tracker" role="group"></div>
       <div id="quest-tracker"><div id="qt-body"></div></div>
       <div id="deed-tracker"></div>
       <div id="reliquary-tracker"></div>
@@ -428,20 +575,26 @@
               <div class="combat-flash ui-combat-badge" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
-            <div class="uf-bars">
+            <div class="uf-bars" id="pf-bars">
               <div class="uf-name-header deed-heraldry-plaque ui-ribbon" id="pf-name-header">
                 <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                   <path id="pf-heraldry-pattern-motif"></path>
                 </svg>
                 <div class="uf-name" id="pf-name"></div>
+                <span class="ui-badge" id="pf-pvp" style="display: none" data-i18n="hudChrome.pvp.mobileLabel">PvP</span>
               </div>
               <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp ui-bevel"><div class="bar-fill ui-bevel-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-hp-text"></div></div>
-              <div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+              <div id="pf-resource-frame" class="pf-resource-frame"><div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div></div>
             </div>
           </div>
           <div id="stancebar"></div>
             <div id="petbar" class="panel"></div>
+            <!-- The Shardpike bar: a second action bar that appears only while the quest
+                 pike is in hand (src/ui/hud/shardpike/). Empty here; the painter builds
+                 its buttons on the first visible frame, so a session that never takes the
+                 quest carries no extra chrome. -->
+            <div id="shardpike-bar" class="panel" style="display: none"></div>
           <div id="actionbar-group">
             <div id="actionbar3" class="panel"></div>
             <div id="actionbar2" class="panel"></div>
@@ -581,6 +734,7 @@
     <div id="crafting-window" class="window panel ui-window"></div>
     <div id="map-window" class="window panel ui-window">
       <aside id="map-sidebar" class="map-atlas-sidebar ui-panel-strong"></aside>
+      <div class="map-atlas-splitter" role="separator" aria-orientation="vertical" tabindex="0" aria-controls="map-sidebar" data-i18n-aria="hudChrome.mapAtlas.resizeRailAria" data-i18n-title="hudChrome.mapAtlas.resizeRailHint" aria-label="Map sidebar width" title="Drag to resize the map sidebar. Double-click to reset."></div>
       <div class="map-atlas-stage">
         <button type="button" class="x-btn ui-x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
         <button type="button" class="ui-btn" id="map-level-toggle" data-i18n="hudChrome.continentMap.toWorld" data-i18n-title="hudChrome.continentMap.toggleAria" data-i18n-aria="hudChrome.continentMap.toggleAria" title="Switch between the world map and the zone map" aria-label="Switch between the world map and the zone map">World map</button>
@@ -605,11 +759,13 @@
     <div id="rift-forge-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel ui-window"></div>
     <div id="weekly-quests-window" class="window panel"></div>
+    <div id="guild-hall-window" class="window panel"></div>
     <div id="claudium-window" class="window panel ui-window"></div>
     <div id="market-window" class="window panel ui-window"></div>
     <div id="woc-market-window" class="window panel ui-window"></div>
     <div id="mailbox-window" class="window panel ui-window"></div>
     <div id="bank-window" class="window panel ui-window"></div>
+    <div id="courier-window" class="window panel ui-window"></div>
     <div id="deeds-window" class="window panel ui-window"></div>
     <div id="reliquary-window" class="window panel ui-window"></div>
     <div id="loot-explorer-window" class="window panel"></div>
@@ -650,7 +806,7 @@
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind ui-keycap">k</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind ui-keycap">x</span></button>
-        <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
+        <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="expedition-bell" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Groups" aria-label="Groups" aria-controls="dungeon-finder-window" aria-haspopup="dialog" data-icon="bell"></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind ui-keycap">o</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind ui-keycap">u</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-wiki" data-i18n-title="nav.wiki" data-i18n-aria="nav.wiki" title="Wiki" aria-label="Wiki" data-icon="wiki"></button>
@@ -674,6 +830,7 @@
     </div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner" class="ui-cin"></div>
+    <div id="shardpike-prompt"></div>
 
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <div class="death-panel ui-panel-strong">
@@ -684,6 +841,8 @@
           <button type="button" class="btn ui-btn ui-btn--lg" id="pvp-resurrect-btn" style="display: none" data-i18n="hudChrome.death.pvpResurrect" data-i18n-title="hudChrome.death.pvpResurrectTitle" title="Revive at the nearest graveyard at full health, without a new Keeper's Toll.">PvP Resurrect</button>
           <button type="button" class="btn ui-btn ui-btn--lg" id="death-recap-btn" data-i18n="hud.core.deathRecap">Recap</button>
         </div>
+        <!-- The PvP Resurrect wait and where the raise lands (src/ui/hud/death/pvp_resurrect_painter.ts). -->
+        <p id="pvp-resurrect-note" class="death-note" style="display: none"></p>
       </div>
     </div>
     <div id="death-recap-dialog" class="window panel" role="dialog" aria-modal="true" aria-labelledby="death-recap-title" style="display: none"></div>
@@ -778,7 +937,7 @@
     </div>
   </div>
 
-  <main id="start-screen">
+  <main id="start-screen" class="art-deferred">
     <!-- World-entry crash recovery notice (src/game/entry_crash_guard.ts): shown by main.ts
          when the previous entry attempt killed the WebView process and the graphics preset
          was stepped down. Lives inside #start-screen, the screen the recovery guarantees the
@@ -791,7 +950,7 @@
       <button type="button" class="entry-guard-dismiss" data-i18n="entryGuard.dismiss">Dismiss</button>
     </div>
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
-    <div id="start-screen-backdrop" aria-hidden="true">
+    <div id="start-screen-backdrop" class="scenes-deferred" aria-hidden="true">
       <!-- Cinematic website slideshow. The original trailer is reserved for native shells. -->
       <div class="website-cinematic-art">
         <div class="website-scene website-scene-eastbrook"></div>
@@ -804,7 +963,7 @@
            is NOT eagerly fetched: no autoplay/preload/source here — main.ts attaches
            the source and plays only on capable devices (see applyLandingBackdrop).
            Phones / Save-Data / reduced-motion / high-contrast keep the poster only. -->
-      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg.png" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
+      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" data-poster="/home-bg.webp" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
       <div class="website-cinematic-atmosphere"></div>
       <div class="bg-trailer-scrim"></div>
       <div class="portal-ring"></div>
@@ -897,7 +1056,7 @@
       <section id="hero-view" class="view-section" aria-hidden="false">
         <h1 class="visually-hidden" data-i18n="guide.brand">World of ClaudeCraft</h1>
         <div class="website-story">
-          <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+          <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.webp" srcset="/worldofclaudecraft-logo-540.webp 540w, /worldofclaudecraft-logo.webp 978w" sizes="min(540px, 72vw)" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
           <p class="website-genre">
             <span data-i18n="guide.home.eyebrow">Classic-style browser MMO</span>
           </p>
@@ -968,10 +1127,15 @@
             <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
               <span class="btn-play-sheen" aria-hidden="true"></span>
               <span class="btn-play-label" data-i18n="mode.play">Play</span>
+              <!-- Shown only while a first visit's game client loads (src/ui/landing_first.ts). -->
+              <span class="btn-play-status btn-play-status-loading" data-i18n="mode.playLoading">Loading</span>
+              <span class="btn-play-status btn-play-status-starting" data-i18n="mode.playStarting">Starting</span>
               <span class="website-play-arrow" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
               </span>
+              <span class="btn-play-progress" aria-hidden="true"></span>
             </button>
+            <span id="play-status" class="visually-hidden" role="status" aria-live="polite"></span>
           </div>
 
           <!-- Hidden, non-focusable compatibility triggers. Stable hooks the automated
@@ -1504,19 +1668,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.44.7-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.45.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.44.7-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.45.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.44.7-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.45.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1752,22 +1916,14 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.44.7</div>
+      <div id="game-version">v0.45.0</div>
       </div>
       <div class="footer-legal-row">
-        <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.whitepaper">Whitepaper</a>
-        <a href="/terms" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.terms">Terms of Service</a>
-        <a href="/privacy" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.privacy">Privacy Policy</a>
+        <a href="https://worldofclaudecraft.com/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.whitepaper">Whitepaper</a>
+        <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
+        <a href="/privacy" class="footer-link" data-i18n="footer.privacy">Privacy Policy</a>
         <a href="https://levystreet.com" class="footer-link" target="_blank" rel="noopener" data-i18n="footer.levyStreet">Levy Street</a>
       </div>
-      <nav class="footer-guides-row" aria-label="Player guides" data-i18n-aria="footer.guidesLabel">
-        <a href="/mmorpgs/free" class="footer-link" data-i18n="footer.guideFree">Free MMORPGs</a>
-        <a href="/games-like/world-of-warcraft" class="footer-link" data-i18n="footer.guideGamesLikeWow">Games like WoW</a>
-        <a href="/mmorpgs/best" class="footer-link" data-i18n="footer.guideBest">Best MMORPGs</a>
-        <a href="/mmorpgs/new" class="footer-link" data-i18n="footer.guideNew">New MMORPGs</a>
-        <a href="/mmorpgs/browser" class="footer-link" data-i18n="footer.guideBrowser">Browser MMORPGs</a>
-        <a href="/games-like/diablo" class="footer-link" data-i18n="footer.guideGamesLikeDiablo">Games like Diablo</a>
-      </nav>
       <div class="footer-lang-row">
         <div class="language-selector">
           <label for="lang-select" class="visually-hidden" data-i18n="a11y.languageSelection">Language selection</label>
@@ -2003,7 +2159,7 @@
   </div>
 
   <div id="loading-screen">
-    <img class="ls-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+    <img class="ls-logo" src="/worldofclaudecraft-logo.webp" srcset="/worldofclaudecraft-logo-540.webp 540w, /worldofclaudecraft-logo.webp 978w" sizes="min(540px, 72vw)" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
     <div class="ls-progress">
       <div class="ls-bar"><div id="ls-fill"></div></div>
       <div id="ls-status" data-i18n="loading.enteringWorld">Entering the world...</div>
@@ -2012,6 +2168,19 @@
     </div>
   </div>
 
-  <script type="module" src="/src/main.ts"></script>
+  <!-- Dev-only offscreen frame pump, opt-in with ?headless=1. An agent-driven
+       browser pane renders the page hidden, and Chrome then throttles rAF and
+       never fires requestIdleCallback, so the shader prewarm never finishes and
+       world entry hangs. This must install BEFORE any game module runs, hence a
+       separate module script above the entry: module scripts execute in
+       document order, and the top-level await here holds main.ts until the
+       pump is in place. No-ops in production (see headless_pump.ts). -->
+  <script type="module">
+    if (new URLSearchParams(location.search).has('headless')) {
+      const m = await import('/src/dev/headless_pump.ts');
+      m.installHeadlessPump();
+    }
+  </script>
+  <script type="module" src="/src/boot.ts"></script>
 </body>
 </html>

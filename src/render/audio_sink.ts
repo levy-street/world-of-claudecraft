@@ -16,14 +16,27 @@ export interface MountEnginePhase {
   elapsed: number;
 }
 
+/** The avatar's eye, where the player stands: what a room bed (the tavern's) is decided
+ *  from. Not the camera, which trails the player and can sit in the doorway or over the
+ *  roof while the player stands in the hall. */
+export interface AmbienceEye {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
 export interface AmbientPointSource {
   readonly id: string;
   // 'rift_portal'/'rift_roller'/'rift_ice_glide' are dynamic (spawn/move/
   // despawn during play, or track a gliding player), as is 'hoard_entrance', unlike the static
-  // world-built campfire/forge set; see src/render/rift_ambience.ts.
+  // world-built campfire/forge set; see src/render/rift_ambience.ts. 'tavern' is the
+  // Mirefen tavern's room bed (src/game/tavern_ambience_core.ts decides its level and tone
+  // from where the player stands, the ambience eye below; it plays non-positional, the point
+  // only anchors it).
   readonly kind:
     | 'campfire'
     | 'forge'
+    | 'tavern'
     | 'rift_portal'
     | 'rift_roller'
     | 'rift_ice_glide'
@@ -31,6 +44,22 @@ export interface AmbientPointSource {
   readonly x: number;
   readonly y: number;
   readonly z: number;
+}
+
+/** A map-authored looping emitter (the editor's 'sound' tool): any SFX clip
+ *  parked at a world point with its own gain and falloff radius. Distinct from
+ *  AmbientPointSource, whose kind picks a fixed built-in bed. */
+export interface PointSoundSource {
+  readonly id: string;
+  /** SFX clip id to loop (SFX_CLIPS); an unknown id stays silent. */
+  readonly key: string;
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  /** Peak gain 0..1 at the emitter, before distance falloff. */
+  readonly volume: number;
+  /** Falloff radius in yards: full at the centre, silent at/beyond it. */
+  readonly radius: number;
 }
 
 /** Per-ability audio moments fired by the ability-VFX engine: windup (the
@@ -122,6 +151,9 @@ export interface SpatialAudioSink {
     self: boolean,
     entityId: number,
   ): void;
+  /** The call a mount gives as it rears up (mount_rear_core.ts): `mount_neigh_<look>`, silent
+   *  for a mount with no take. Optional, so a host without one simply stays quiet. */
+  mountNeigh?(x: number, y: number, z: number, look: string, self: boolean): void;
   /** Warm a mount's summon take on the channel's START edge. */
   preloadMountSummon(mountKey: string): void;
   /** The standstill powered-on hum for a mount with a dedicated idle take
@@ -196,7 +228,8 @@ export interface SpatialAudioSink {
    *  `biome` is the full `BiomeId` union (covers both the grid-world biomes and
    *  the beach/desert/volcano/cave set). `crowd` is the Sowfield crowd-murmur
    *  level (0 away from the stadium, about 0.4 on the grounds, 1 while a Vale
-   *  Cup match is live). */
+   *  Cup match is live). `eye` is the avatar's eye the biome was sampled at, which the
+   *  room beds follow too (the camera listener when omitted). */
   ambience(
     biome: BiomeId,
     inDungeon: boolean,
@@ -204,7 +237,13 @@ export interface SpatialAudioSink {
     nearWater: boolean,
     crowd: number,
     points?: readonly AmbientPointSource[],
+    eye?: AmbienceEye,
   ): void;
+  /** Per-frame state of the map-authored point sounds (the editor's Sound
+   *  tool). Static for a session, so the renderer passes the same resolved
+   *  array every frame; the engine starts the ones in range and stops the ones
+   *  out of it. Optional: an engine without the layer stays silent. */
+  pointSounds?(sources: readonly PointSoundSource[]): void;
   /** One per-ability procedural audio moment at a world position (the 12
    *  palette identities live in src/game/sfx.ts). Optional: an engine without
    *  the synth layer simply stays silent for ability moments. */

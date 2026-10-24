@@ -27,7 +27,12 @@ describe('Eastbrook independent stone vault', () => {
       halfDepth: hall.d / 2,
       rotation: hall.rot,
     };
-    expect({ x: hall.x, z: hall.z }).toEqual({ x: 21, z: -119 });
+    // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings replaced
+    // the eleven kit shells, and the Weekly Vault moved off the bank's new
+    // ground at (21, -119) onto the green south of the civic square. Re-pinned
+    // again for the World of ClaudeCraft Studio map's arrangement: it stands
+    // against the bank's harbour-side flank, half a yard off its wall.
+    expect({ x: hall.x, z: hall.z }).toEqual({ x: -73.73, z: -103.4 });
     expect(ZONE1_PROPS.buildings.at(-1)?.id).toBe(hall.id);
     expect(ZONE1_NPCS.eastbrook_vault_keeper.banker).toBeUndefined();
     expect(ZONE1_NPCS.eastbrook_vault_keeper.pos).toEqual(hall.keeper);
@@ -43,6 +48,9 @@ describe('Eastbrook independent stone vault', () => {
         }),
         b.id,
       ).toBe(false);
+      // A placed building is solid past its wall box too (a bell tower, a
+      // strongroom, a forge shelter): the hall shares ground with none of them.
+      for (const annex of b.annexes) expect(obbsOverlap(obb, annex), annex.id).toBe(false);
     }
     const colliders = colliderInternalsForTest.staticWorldColliders(1337);
     expect(

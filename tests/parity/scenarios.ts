@@ -27,7 +27,9 @@ import {
   arenaOrigin,
   DELVES,
   DUNGEON_X_THRESHOLD,
+  DUNGEONS,
   GATHER_NODES,
+  instanceOrigin,
   LAKE,
   MOBS,
   PROPS,
@@ -2793,7 +2795,7 @@ function mobLocomotion(): Scenario {
     name: 'mob_locomotion',
     coverage: [
       'attack arm aoePulse rng.range(pulse.min,pulse.max) + spellfx (mogger Ground Pound)',
-      'attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (korgath)',
+      'attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (ossuary_sentinel: the Korgath Stomp moved into his encounter)',
       'attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura on the non-tank bystander; the aggro target is exempt (sister_nhalia)',
       'idle arm wander draws (range(0,2PI) heading + range(2,9) radius -> groundPos wanderTarget)',
       'evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)',
@@ -2849,8 +2851,8 @@ function mobLocomotion(): Scenario {
       rec.notes.pulserId = pulser.id;
       rec.snapshot('aoe-pulse');
 
-      // War Stomp: draws rng.range(20,30) + lands a stomp_stun aura on the player.
-      const stomper = fireMechanic('korgath_the_bound', 20, (m) => {
+      // War Stomp: draws rng.range(8,12) + lands a stomp_stun aura on the player.
+      const stomper = fireMechanic('ossuary_sentinel', 8, (m) => {
         m.stompTimer = 0.001;
       });
       rec.notes.stomperId = stomper.id;
@@ -3498,14 +3500,14 @@ function nythraxisFullPull(): Scenario {
       rec.snapshot('kings-wrath');
       parkRedoCadences();
 
-      // Bone Storm is retired from play (NYTHRAXIS_BONE_STORM_ENABLED): the due
-      // timer starts nothing, and this window records phase 3 running on
-      // without a storm (the coverage test asserts none of it fires).
+      // Bone Storm: hash-ranked charges (no shared rng), the whirl tick, a slam
+      // on arrival with its Gravefire line (no spike lands while he storms), then
+      // the top-threat pickup when it ends.
       nyx().boneStormTimer = DT;
-      step(1);
-      step(20 * 8);
-      rec.snapshot('phase-three-no-storm');
-      step(20 * 5);
+      step(1); // startNythraxisBoneStorm -> boneStormBegins + boneStormCharge callouts
+      step(20 * 8); // charges and slams, past the retired 6 s spike mark
+      rec.snapshot('bone-storm');
+      step(20 * 5); // the storm ends: pickup, Gravebreaker re-arm, the major gap
       parkRedoCadences();
       nyx().boneStormTimer = 999;
 
@@ -4352,10 +4354,10 @@ function c5AutoAttack(): Scenario {
       'player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)',
       'meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation',
       'queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)',
-      'instant raptor_strike weaponStrike mixed into the hunter melee lane',
+      'instant raptor_strike weaponStrike mixed into the point-blank hunter lane',
       'overpowerUntil window set on a melee dodge',
       'spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)',
-      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)',
+      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, no dead zone since v0.45)',
       'rangedSwing Wand (mage, arcane, no armor, no dead zone)',
       'stopAutoAttack public entry',
     ],
@@ -4395,7 +4397,8 @@ function c5AutoAttack(): Scenario {
         rec.track(m.id);
         return m;
       };
-      // dz 1.5 = melee; dz 20 = hunter Auto Shot band (> 8yd dead zone, <= 35);
+      // dz 1.5 = melee (Auto Shot for the hunter, which has no dead zone since v0.45);
+      // dz 20 = hunter Auto Shot band (<= 35);
       // dz 15 = wand band (no dead zone). wild_boar carries the spiked-hide thorns.
       const mobWarrior = spawnTarget(eWarrior, 'wild_boar', 1.5, 3);
       const mobRogue = spawnTarget(eRogue, 'forest_wolf', 1.5, 6);
@@ -4416,8 +4419,8 @@ function c5AutoAttack(): Scenario {
       for (const pid of ids) sim.startAutoAttack(pid);
 
       for (let round = 0; round < 12; round++) {
-        // Re-pin each target to its lane distance + re-face so the ranged dead-zone
-        // (Auto Shot) vs no-dead-zone (Wand) branches stay deterministically exercised.
+        // Re-pin each target to its lane distance + re-face so the melee and ranged
+        // (Auto Shot, Wand) branches stay deterministically exercised.
         for (const [, e, m, dz] of pairs) {
           teleport(sim, m, e.pos.x, e.pos.z + dz);
           face(e, m);
@@ -4559,7 +4562,7 @@ function marketRoundTrip(): Scenario {
 // that returns the old piece to the bags via addItemSilent + recalcPlayerStats),
 // unequipItem (piece back to bags + recalc), useItem (food/drink sit, potion heal +
 // cooldown, elixir aura), discardItem, sellItem (vendorInRange gate + recordVendorBuyback
-// + meta.copper payout), sellAllJunk (bulk gray sweep + per-stack buyback record), and
+// + meta.copper payout), sellAllJunk (bulk gray sweep; plain grays record no buyback), and
 // buyBackItem (meta.copper spend + addItemSilent + onInventoryChangedForQuests). Pins
 // copper / inventory / equipment / vendorBuyback in samplePlayerMeta so the W2 move stays
 // byte-identical. None of these commands draw rng, so the draw-order log must be UNCHANGED
@@ -4575,7 +4578,7 @@ function inventoryVendor(): Scenario {
       'useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)',
       'discardItem: removeItem the discarded count',
       'sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout',
-      'sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line',
+      'sellAllJunk: bulk gray sweep, plain grays skip buyback, one summary line',
       'buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests',
     ],
     build: () => new Sim({ seed: 5150, playerClass: 'warrior', noPlayer: true }),
@@ -4638,7 +4641,7 @@ function inventoryVendor(): Scenario {
       sim.sellItem('wolf_fang', 1, buyer);
       rec.snapshot('sold');
 
-      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line + per-stack buyback).
+      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line; plain grays skip buyback).
       // bandit_bandana was the fodder here until phase 11l promoted it to a
       // common trophy reagent; soggy_moccasin keeps the junk-sold beat live.
       sim.addItem('soggy_moccasin', 1, buyer);
@@ -4735,7 +4738,7 @@ function bankRoundTrip(): Scenario {
       // The Materials Vault arm, at the same bursar (nearBanker is already
       // satisfied). Count-only storage: PlayerMeta.vault holds one number per
       // material id plus the rung ladder, both already sampled by samplePlayerMeta.
-      // 6) stock the purse and the bags for the vault ladder: 20000 + 50000 for
+      // 6) stock the purse and the bags for the vault ladder: 20000 + 40000 for
       //    the two rungs, plus a 1000 REMAINDER on purpose. An exact 0 balance
       //    is inert to the canonicalizer (trace.ts drops inert keys), so the
       //    copper key would VANISH from the last snapshots and the second
@@ -4744,7 +4747,7 @@ function bankRoundTrip(): Scenario {
       //    TWO material ids, not one: a single-key stock cannot show two counts
       //    reconciling independently (the deposit of one leaving the other
       //    untouched, and the later withdraw moving only its own).
-      meta.copper = 71000;
+      meta.copper = 61000;
       sim.addItem('copper_ore', 10, pid);
       sim.addItem('ashwood_log', 4, pid);
       rec.snapshot('vault-setup');
@@ -4774,7 +4777,7 @@ function bankRoundTrip(): Scenario {
       sim.vaultWithdraw('copper_ore', 2, pid);
       rec.snapshot('vault-withdrew-partial');
 
-      // 11) the second rung: copper - 50000, upgrades 1 -> 2.
+      // 11) the second rung: copper - 40000, upgrades 1 -> 2.
       sim.vaultBuyUpgrade(pid);
       rec.snapshot('vault-bought-rung');
 
@@ -6494,16 +6497,16 @@ function bankSocketRoundTrip(): Scenario {
       const pid = sim.addPlayer('warrior', 'Socketwright');
       const meta = sim.players.get(pid) as PlayerMeta;
       // Stand at a bursar so the nearBanker gate passes (the bank_round_trip
-      // idiom); fund exactly two unlocks (1000000 + 2000000) plus 500000 over.
+      // idiom); fund exactly two unlocks (750000 + 1000000) plus 500000 over.
       const banker = sim.entities.get(sim.bankerIds[0]) as AnyEntity;
       teleport(sim, sim.entities.get(pid) as AnyEntity, banker.pos.x, banker.pos.z);
       rec.notes.pid = pid;
-      meta.copper = 3500000;
+      meta.copper = 2250000;
       sim.addItem('linen_pouch', 1, pid);
       sim.addItem('burlap_reagent_pouch', 1, pid);
 
-      // 1) two unlocks, cheapest first: the ladder charges 1000000 then
-      //    2000000, leaving 500000, with all sockets still empty.
+      // 1) two unlocks, cheapest first: the ladder charges 750000 then
+      //    1000000, leaving 500000, with all sockets still empty.
       sim.bankUnlockSocket(pid);
       sim.bankUnlockSocket(pid);
       rec.snapshot('two-sockets-unlocked');
@@ -6524,7 +6527,7 @@ function bankSocketRoundTrip(): Scenario {
       sim.bankUnsocketBag(0, pid);
       rec.snapshot('satchel-unsocketed');
 
-      // 5) the refusal arm: the third socket costs 3500000 and the purse
+      // 5) the refusal arm: the third socket costs 1250000 and the purse
       //    holds 500000, so nothing moves and nothing is charged.
       sim.bankUnlockSocket(pid);
       rec.snapshot('third-unlock-refused');
@@ -6759,17 +6762,18 @@ function grixRespawnWindow(): Scenario {
 
 // Cat Form AUTO attacks, the arm druid_engines deliberately does not drive
 // (it scripts specials only): the fixed 1.0s cat cadence swings against a
-// bear-form control on the same staff swinging at the weapon speed. The cat
-// lane lands ~1.8x the swings (and rng draws) of the bear lane over the same
-// window, so a regression in the cat swing timer or the normalized mainhand
-// roll moves this golden's draw digest, not just its state hashes.
+// bear-form control on the same staff swinging at HALF the weapon speed (the
+// Groveheart rework pass 2 Bruin cadence, half damage per swing). The two
+// lanes swing at different fixed cadences, so a regression in either swing
+// timer or in the normalized mainhand roll moves this golden's draw digest,
+// not just its state hashes.
 function catFormAutoSwing(): Scenario {
   return {
     name: 'cat_form_auto_swing',
     coverage: [
       'class:druid (Wildfang cat + Bruin control)',
       'Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
-      'bear-form control swinging at the equipped weapon speed on the same loadout',
+      'bear-form control swinging at half the equipped weapon speed on the same loadout',
     ],
     sampleEvery: 5,
     build: () => new Sim({ seed: 2931, playerClass: 'druid', noPlayer: true, autoEquip: true }),
@@ -7811,6 +7815,206 @@ function bopPartyTradeEligibility(): Scenario {
   };
 }
 
+// Mob casts and line of sight, with the walk round a wall (mob/cast_sight.ts,
+// mob/chase_route.ts, mob/route_search.ts). A Gravecaller Adept in a claimed
+// Hollow Crypt whose target stands dead behind the Ossuary Monument: its Grave
+// Spark may not begin, so on its plan slot it searches a way round (the
+// bounded search), walks the route and casts from where it sees. The target
+// then steps to the far side of the monument and the caster goes round again.
+// Everything the route keeps is on the sampled Adept (Entity.chaseRoute: the
+// waypoints, the plan clock, the tries), so a reordered search, a moved plan
+// slot or a changed budget turns this golden red.
+//
+// Two more legs pin the cast that FAILS. The target hides while a Grave Spark
+// windup is committed: the windup runs out, nothing lands and nothing is drawn
+// from the rng across its release tick. Then the Adept is lent its own Grave
+// Bolt (a kit cast bar; heroic-only on its template, and this claim is
+// normal) and its victim hides while the bar runs: the bar ends, nothing
+// lands, and the cast is handed back.
+const SIGHT_ROUTE_SPELL = 'Grave Spark';
+const SIGHT_ROUTE_BAR = 'Grave Bolt';
+function mobCastSightRoute(): Scenario {
+  return {
+    name: 'mob_cast_sight_route',
+    coverage: [
+      'a petSpell caster in spell range with no line of sight begins no cast (mob/cast_sight.ts casterSightBlocked on its staggered recheck)',
+      'followChaseRoute for a caster with no sight line: the plan slot, searchRoute round a collider and the waypoint walk (mob/chase_route.ts, mob/route_search.ts)',
+      'the cast resumes from the spot that sees the target, and a target that hides again is walked round again',
+      'petSpellSightVerdict at the release tick: a committed windup whose target hid fails with no damage and no rng draw (mob/cast_sight.ts)',
+      'the trash kit driver at the end of a bar: a Grave Bolt whose victim hid is dropped for sight and handed back (mob/trash_kit/driver.ts, kit_cast_sight.ts)',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 4471, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.addPlayer('warrior', 'Bonewall') as number;
+      sim.setPlayerLevel(20, pid);
+      const p = requireEntity(sim, pid, 'parity scenario sight-route player');
+      sim.enterDungeon('hollow_crypt', pid);
+      const inst = requireValue(
+        sim.instances.find((i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null),
+        'parity scenario sight-route instance',
+      );
+      // The placed crypt is cleared so the one engaged mob is the Adept and
+      // every gate stands open. Morthen stays entombed: with him dead the
+      // claim would raise his Knellwyrm into the scene.
+      for (const id of inst.mobIds) {
+        const e = sim.entities.get(id);
+        if (e && !e.dead && e.templateId !== 'morthen') sim.ctx.handleDeath(e, p);
+      }
+      const o = instanceOrigin(DUNGEONS.hollow_crypt.index, inst.slot);
+      // The Ossuary Monument (instance-local): a 5 yd pillar of bone.
+      const monument = { x: o.x, z: o.z - 30 };
+      const stand = (x: number, z: number) => {
+        p.pos = sim.ctx.groundPos(x, z);
+        p.prevPos = { ...p.pos };
+        sim.rebucket(p);
+      };
+      const topUp = () => {
+        p.maxHp = 1_000_000;
+        p.hp = 1_000_000;
+      };
+      // North of the monument, dead behind it from the caster's spot.
+      stand(monument.x, monument.z + 12);
+      topUp();
+      // One tick so the cleared claim's gates stand open to collision before
+      // anything plans a way past them.
+      rec.tick(1);
+      const adept = createMob(
+        sim.nextId++,
+        MOBS.crypt_gravecaller_adept,
+        MOBS.crypt_gravecaller_adept.minLevel,
+        sim.ctx.groundPos(monument.x, monument.z - 14),
+      ) as AnyEntity;
+      adept.maxHp = 1_000_000;
+      adept.hp = 1_000_000;
+      sim.addEntity(adept);
+      inst.mobIds.push(adept.id);
+      adept.aggroTargetId = pid;
+      adept.inCombat = true;
+      adept.aiState = 'chase';
+      adept.leashAnchor = { ...adept.pos };
+      addThreat(adept, pid, 100);
+      rec.track(adept.id);
+      rec.notes.adeptId = adept.id;
+      rec.notes.pid = pid;
+
+      // Run one leg: count the route searches, the Sparks that landed, and any
+      // Spark that landed on a tick that began with the target out of sight.
+      const leg = (ticks: number) => {
+        let plans = 0;
+        let sparks = 0;
+        let blind = 0;
+        for (let i = 0; i < ticks; i++) {
+          topUp();
+          const hidden = !sim.ctx.hasLineOfSight(adept, p);
+          const landed = rec
+            .tick(1)
+            .filter(
+              (ev) =>
+                ev.type === 'damage' && ev.targetId === pid && ev.ability === SIGHT_ROUTE_SPELL,
+            ).length;
+          plans += sim.mobScanCounters.routePlans;
+          sparks += landed;
+          if (hidden) blind += landed;
+        }
+        return { plans, sparks, blind, sees: sim.ctx.hasLineOfSight(adept, p) };
+      };
+
+      rec.notes.hiddenAtStart = !sim.ctx.hasLineOfSight(adept, p);
+      rec.snapshot('target-hidden');
+      rec.notes.first = leg(240);
+      rec.snapshot('walked-into-sight');
+
+      // The target steps to the far side of the monument from where the
+      // caster now stands: out of sight again, the other way round.
+      const hide = (): boolean => {
+        const dx = monument.x - adept.pos.x;
+        const dz = monument.z - adept.pos.z;
+        const d = Math.hypot(dx, dz);
+        stand(monument.x + (dx / d) * 12, monument.z + (dz / d) * 12);
+        return !sim.ctx.hasLineOfSight(adept, p);
+      };
+      rec.notes.hiddenAgain = hide();
+      rec.snapshot('target-hides-again');
+      rec.notes.second = leg(240);
+      rec.snapshot('walked-into-sight-again');
+
+      // Ticks until `done`, at most `cap`; the damage events of `ability`
+      // that landed on the player meanwhile. `each` runs before every tick
+      // (the fizzle legs keep the player behind the monument with it, wherever
+      // the caster walks).
+      const until = (done: () => boolean, cap: number, ability: string, each?: () => void) => {
+        let landed = 0;
+        let thrown = 0;
+        let ticks = 0;
+        while (!done() && ticks < cap) {
+          topUp();
+          each?.();
+          for (const ev of rec.tick(1)) {
+            if (ev.type === 'damage' && ev.targetId === pid && ev.ability === ability) landed++;
+            // The projectile cue is the first thing a cast that RESOLVES does,
+            // before its resist roll: none thrown, nothing rolled.
+            if (ev.type === 'spellfx' && ev.sourceId === adept.id && ev.fx === 'projectile')
+              thrown++;
+          }
+          ticks++;
+        }
+        return { landed, thrown, ticks, done: done() };
+      };
+
+      // THE WINDUP THAT FAILS. No kit bars for this leg (an empty lent kit), so
+      // the only cast in the room is the Spark and the only rng it could draw
+      // is the Spark's own.
+      adept.devTrashKit = {};
+      const windup = until(() => adept.rangedWindupReleaseTick != null, 200, SIGHT_ROUTE_SPELL);
+      const release = adept.rangedWindupReleaseTick ?? -1;
+      const windupHidden = hide();
+      rec.snapshot('windup-target-hides');
+      const fizzle = until(() => sim.tickCount > release, 60, SIGHT_ROUTE_SPELL, hide);
+      rec.notes.windup = {
+        committed: windup.done,
+        hidden: windupHidden,
+        ranOut: fizzle.done,
+        landed: fizzle.landed,
+        thrown: fizzle.thrown,
+        cleared: adept.rangedWindupReleaseTick == null,
+      };
+      rec.snapshot('windup-fizzled');
+
+      // THE BAR THAT FAILS. The Adept's own Grave Bolt, lent without its
+      // heroic-only mark; the caster walks round to see its target, begins the
+      // bar, and the victim hides while it runs.
+      const bolt = requireValue(
+        MOBS.crypt_gravecaller_adept.trashKit?.bolt,
+        'parity scenario sight-route Grave Bolt',
+      );
+      adept.devTrashKit = { bolt: { ...bolt, heroicOnly: false } };
+      const casting = () => adept.castingAbility === bolt.castId;
+      const bar = until(casting, 600, SIGHT_ROUTE_BAR);
+      const barVictim = adept.castTargetId;
+      const barHidden = hide();
+      rec.snapshot('bar-target-hides');
+      const ended = until(
+        () => !casting(),
+        Math.round(bolt.castTime / DT) + 20,
+        SIGHT_ROUTE_BAR,
+        hide,
+      );
+      rec.notes.bar = {
+        begun: bar.done,
+        victim: barVictim,
+        hidden: barHidden,
+        ended: ended.done,
+        ranItsLength: ended.ticks,
+        landed: ended.landed,
+        timer: adept.trashKit?.timers.bolt ?? null,
+      };
+      rec.snapshot('bar-fizzled');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -7919,4 +8123,6 @@ export const SCENARIOS: Scenario[] = [
   flaskConsumables(),
   worldQuestLifecycle(),
   bopPartyTradeEligibility(),
+  // Appended on the same tiling rule: it lands in the final shard.
+  mobCastSightRoute(),
 ];

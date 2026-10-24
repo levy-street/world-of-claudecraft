@@ -23,6 +23,9 @@ import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS } from '../mob/aggro_ranges';
 //   MAX_WANDER_RADIUS an idle mob drifts this far off its spawn point, so clearing only
 //                     the aggro radius would hold at the instant of arrival and then
 //                     decay as the front pack wandered toward the entry.
+// Also the clearance a dungeon death checkpoint keeps from the spawn point of every
+// wandering mob that could pull the arrival (instances/dungeon_checkpoints.ts), through
+// isClearOfRiftEntry.
 export const RIFT_ENTRY_CLEAR_RADIUS = MAX_AGGRO_RADIUS + MAX_WANDER_RADIUS;
 
 /**

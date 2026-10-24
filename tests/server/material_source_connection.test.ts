@@ -29,7 +29,7 @@ describe('materialSourceConnection: a string with no options parameter', () => {
       expect(resolved.options).toBe(MATERIAL_SOURCE_WRITER_STARTUP_OPTION);
       // Written out once, so this file pins the real startup value rather than
       // comparing the constant with itself.
-      expect(resolved.options).toBe('-c woc.material_source_writer=1');
+      expect(resolved.options).toBe('-c woc.material_source_writer=2');
     }
   });
 
@@ -46,7 +46,7 @@ describe('materialSourceConnection: a string that carries its own options', () =
     const resolved = materialSourceConnection(`${BASE}?options=-c%20search_path%3Dwoc`);
     // The LITERAL startup packet value, operator options first and the
     // code-owned capability appended last, so it wins a repeated GUC.
-    expect(resolved.options).toBe('-c search_path=woc -c woc.material_source_writer=1');
+    expect(resolved.options).toBe('-c search_path=woc -c woc.material_source_writer=2');
     expect(resolved.options).toBe(withMaterialSourceWriterOption('-c search_path=woc'));
     // The pair is gone, so the driver's own parse cannot put it back and win.
     expect(resolved.connectionString).toBe(BASE);

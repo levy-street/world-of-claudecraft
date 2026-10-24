@@ -73,7 +73,7 @@ function factionRow(row: FactionCurrencyRow): string {
 /** The whole sidebar body for the Currencies tab. */
 export function currenciesTabHtml(world: IWorld): string {
   const view = buildCurrenciesView({
-    inventory: world.inventory,
+    heroicMarks: world.heroicMarks,
     honor: world.honor,
     lifetimeHonor: world.lifetimeHonor,
     delveMarks: world.delveMarks,

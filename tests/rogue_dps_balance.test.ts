@@ -95,7 +95,7 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     }
   });
 
-  it('holds Combat at the 200-DPS top band and pins the merged-tree sibling ordering', () => {
+  it('pins the rogue DPS bands and the merged-tree sibling ordering', () => {
     const first = measuredDps();
     const repeat = measuredDps();
     expect(repeat).toEqual(first);
@@ -119,13 +119,23 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     // merged tree with the same three seeds: approximately 212.8 Combat, 191.1
     // Assassination, and 156.6 Subtlety; the bands below re-center at 8 either
     // side of those, and the sibling ordering holds.
-    expect(first.combat).toBeGreaterThanOrEqual(205);
-    expect(first.combat).toBeLessThanOrEqual(221);
-    expect(first.assassination).toBeGreaterThanOrEqual(183);
-    expect(first.assassination).toBeLessThanOrEqual(199);
-    expect(first.subtlety).toBeGreaterThanOrEqual(149);
-    expect(first.subtlety).toBeLessThanOrEqual(165);
-    expect(first.combat).toBeGreaterThan(first.assassination);
-    expect(first.assassination).toBeGreaterThan(first.subtlety);
+    // The rogue tweak pass (cheaper Craven Thrust, Gut Punch and Lurker's
+    // Strike, free off-GCD Cutthroat Tempo, 90 sec Quickened Blood, 30 sec
+    // Mirrored Blades, five-attack Killer's Calm) then lifts all three.
+    // MEASURED with the same three seeds: approximately 220.1 Combat, 232.1
+    // Assassination, and 169.5 Subtlety (from 212.8, 191.1 and 156.6). The
+    // bands re-center at 8 either side, and on this 60 sec fixture
+    // Assassination now leads Combat (the 180 sec raid-BiS Monte Carlo still
+    // has Combat ahead, 218 to 207). Skulduggery then takes a +25% sustained
+    // buff (apPct 0 -> 0.45 plus a 0.10 offensive physical bonus): MEASURED
+    // here at approximately 214.5, still third.
+    expect(first.combat).toBeGreaterThanOrEqual(212);
+    expect(first.combat).toBeLessThanOrEqual(228);
+    expect(first.assassination).toBeGreaterThanOrEqual(224);
+    expect(first.assassination).toBeLessThanOrEqual(240);
+    expect(first.subtlety).toBeGreaterThanOrEqual(207);
+    expect(first.subtlety).toBeLessThanOrEqual(222);
+    expect(first.assassination).toBeGreaterThan(first.combat);
+    expect(first.combat).toBeGreaterThan(first.subtlety);
   }, 30_000);
 });

@@ -8,16 +8,16 @@
 import { canStackInstancePayloads } from './item_instance_merge';
 import { cloneMaterialPayload } from './material_payload_identity';
 import {
-  canonicalMaterialComposition,
   legacyMaterialComposition,
   type MaterialComposition,
   type MaterialSourceCount,
   type MaterialSourceError,
+  PreparedMaterialComposition,
   takeMaterialCount,
   takeSelectedMaterialSources,
   totalMaterialCount,
 } from './material_sources';
-import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from './types';
+import type { InvSlot, ItemInstancePayload } from './types';
 
 /**
  * An inventory slot as the material model sees it. Both added fields are
@@ -85,7 +85,7 @@ function ownerSlot(
   composition: MaterialComposition,
   instance: ItemInstancePayload | undefined,
 ): MaterialStackSlot {
-  const next = cloneInvSlot(slot);
+  const next = { ...slot };
   next.count = count;
   next.materialSources = composition;
   // Overwritten unconditionally: cloneInvSlot's payload copy is deep only over
@@ -116,22 +116,78 @@ export function normalizeMaterialStack(
   slot: MaterialStackSlot,
   materialIds: ReadonlySet<string>,
 ): MaterialStackResult<MaterialStackSlot> {
-  if (!materialIds.has(slot.itemId)) return fail('not-material');
-  if (!Number.isSafeInteger(slot.count) || slot.count <= 0) return fail('invalid-count');
+  const prepared = PreparedMaterialStack.read(slot, materialIds);
+  return prepared.ok ? succeed(prepared.value.materialize()) : prepared;
+}
 
-  const signer = slot.instance?.signer;
-  if (slot.materialSources === undefined) {
-    const projected = legacyMaterialComposition(slot.count, signer);
-    if (!projected.ok) return fail(projected.error);
-    const instance = canonicalPayload(slot.instance, true);
-    return succeed(ownerSlot(slot, slot.count, projected.value, instance));
+/** A detached, command-local reading. No mutable payload, bucket, map or
+ * normalized slot escapes; callers receive fresh snapshots only. */
+export class PreparedMaterialStack {
+  #slot: MaterialStackSlot;
+  #composition: PreparedMaterialComposition;
+
+  private constructor(slot: MaterialStackSlot, composition: PreparedMaterialComposition) {
+    this.#slot = slot;
+    this.#composition = composition;
   }
 
-  if (signer !== undefined) return fail('ambiguous-signer');
-  const canonical = canonicalMaterialComposition(slot.materialSources, slot.count);
-  if (!canonical.ok) return fail(canonical.error);
-  const instance = canonicalPayload(slot.instance, false);
-  return succeed(ownerSlot(slot, slot.count, canonical.value, instance));
+  static read(
+    slot: MaterialStackSlot,
+    materialIds: ReadonlySet<string>,
+  ): MaterialStackResult<PreparedMaterialStack> {
+    if (!materialIds.has(slot.itemId)) return fail('not-material');
+    if (!Number.isSafeInteger(slot.count) || slot.count <= 0) return fail('invalid-count');
+    const signer = slot.instance?.signer;
+    let raw = slot.materialSources;
+    if (raw === undefined) {
+      const projected = legacyMaterialComposition(slot.count, signer);
+      if (!projected.ok) return projected;
+      raw = projected.value;
+    } else if (signer !== undefined) return fail('ambiguous-signer');
+    const composition = PreparedMaterialComposition.read(raw, slot.count);
+    if (!composition.ok) return composition;
+    const instance = canonicalPayload(slot.instance, slot.materialSources === undefined);
+    const metadata = { ...slot };
+    delete metadata.materialSources;
+    if (instance === undefined) delete metadata.instance;
+    else metadata.instance = instance;
+    if (metadata.materialSeparated !== true) delete metadata.materialSeparated;
+    return succeed(new PreparedMaterialStack(metadata, composition.value));
+  }
+
+  get count(): number {
+    return this.#slot.count;
+  }
+
+  /** Identity-only snapshot for routing, independent even of another snapshot. */
+  identity(): MaterialStackSlot {
+    return ownerSlot(this.#slot, this.count, [], this.#slot.instance);
+  }
+
+  materialize(): MaterialStackSlot {
+    return ownerSlot(this.#slot, this.count, this.#composition.materialize(), this.#slot.instance);
+  }
+
+  compatible(other: PreparedMaterialStack): boolean {
+    const a = this.#slot;
+    const b = other.#slot;
+    return (
+      a.itemId === b.itemId &&
+      a.craftedRecipeId === b.craftedRecipeId &&
+      a.materialSeparated !== true &&
+      b.materialSeparated !== true &&
+      canStackInstancePayloads(a.instance, b.instance)
+    );
+  }
+
+  merge(other: PreparedMaterialStack): MaterialStackResult<PreparedMaterialStack> {
+    const merged = this.#composition.merge(other.#composition);
+    if (!merged.ok) return merged;
+    const metadata = this.identity();
+    delete metadata.materialSources;
+    metadata.count = merged.value.total;
+    return succeed(new PreparedMaterialStack(metadata, merged.value));
+  }
 }
 
 /**

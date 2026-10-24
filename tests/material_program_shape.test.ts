@@ -445,6 +445,7 @@ describe('attachSharedDepthMaterials resets on a shape that stops being shareabl
       farMesh: null,
       farMaterials: null,
       effectMaterial: () => overlay,
+      syncSpiritVeil: () => {},
     };
     (
       CharacterVisual.prototype as unknown as {

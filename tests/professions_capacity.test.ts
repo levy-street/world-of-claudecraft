@@ -26,7 +26,7 @@ import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
-import type { ItemDef } from '../src/sim/types';
+import type { InvSlot, ItemDef } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const FILLER = 'simple_fishing_pole'; // tool: one per slot, merges with nothing
@@ -641,34 +641,21 @@ describe('unbind split capacity gate (#2350)', () => {
   });
 });
 
-// #2446 review coverage gap: the #1149 signing rule's capacity-gate shape
-// (the `shapes` array in resolveCraftForRecipe) has to model the SAME signed
-// instance the grant arm below it mints, or a stale plain shape passes the
-// gate for an output the grant then cannot fit (addItemInstance applies no
-// cap of its own). A signed instance never tops up a plain stack of the same
-// item (different payload), so a bag whose only free room is a plain stack
-// of the output must deny, exactly the case a regression to the old plain
-// shape would silently pass.
+// Signed food now shares physical stacks with unsigned units and other makers.
+// The capacity scratch still must reject truly incompatible copies before
+// spending reagents, money, skill or XP, and admit compatible source merges
+// without dropping any original or newly crafted units.
 describe('rare-quality signing composes with the capacity gate (#2446 review coverage)', () => {
-  it('denies a rare-quality resultCount>1 craft when the only room is a same-item PLAIN stack', () => {
+  function fullBagsWithOutput(output: InvSlot) {
     const sim = makeSim();
     const pid = sim.playerId;
-    // 11 filler slots + 1 plain output stack + 4 reagent slots = 16 (full).
+    // 11 filler slots + 1 output stack + 4 partially consumed reagent slots.
     const m = setBags(sim, pid, 11);
-    // The plain (unsigned) stack of the craft's own output. The OLD
-    // `recipe.resultCount === 1` gated shape modeled a plain grant here and
-    // found this slot a valid top-up target, so it fit. The signed shape
-    // this PR ships needs its own slot and must deny.
-    m.inventory.push({ itemId: 'anglers_feast_platter', count: 1 });
+    m.inventory.push(output);
     m.copper = 100000;
     m.knownRecipes.add('recipe_anglers_feast_platter');
     m.craftSkills.cooking = 50;
     standAtStationType(sim, pid, 'kitchens');
-    // One extra of each reagent beyond what the recipe consumes, so
-    // consuming the required amount leaves each stack non-empty and the
-    // reagent slots do NOT free up. Otherwise the freed reagent slots would
-    // give the output room regardless of shape, and the test would not
-    // distinguish the old plain shape from the new signed one.
     for (const [itemId, count] of [
       ['raw_frostgill_trout', 3],
       ['raw_bog_eel', 3],
@@ -678,16 +665,115 @@ describe('rare-quality signing composes with the capacity gate (#2446 review cov
       m.inventory.push({ itemId, count });
     }
     expect(bagCapacity(m.bags)).toBe(16);
-    expect(m.inventory.length).toBe(16);
+    expect(m.inventory).toHaveLength(16);
+    expect(m.name).toBe('Adventurer');
+    expect(stackSizeOf(ITEMS.anglers_feast_platter)).toBe(20);
+    return { sim, pid, m };
+  }
 
-    const result = resolveCraft(sim.ctx, pid, 'recipe_anglers_feast_platter');
+  it.each([
+    { label: 'bound', count: 1, instance: { boundTo: 999 } },
+    { label: 'locked', count: 1, instance: { locked: true } },
+    { label: 'different recipe', count: 1, craftedRecipeId: 'other_recipe' },
+    { label: 'compatible with room for only two units', count: 18 },
+  ])(
+    'denies a multi-copy signed craft when its only room is a $label stack',
+    ({ label: _label, ...identity }) => {
+      const { sim, pid, m } = fullBagsWithOutput({
+        itemId: 'anglers_feast_platter',
+        ...identity,
+      });
+      const before = sim.serializeCharacter(pid);
+      const inventoryBefore = structuredClone(m.inventory);
+      const skillsBefore = structuredClone(m.craftSkills);
+      const xpBefore = m.lifetimeXp;
+      sim.drainEvents();
 
-    expect(result.ok).toBe(false);
-    expect(result.reason).toBe('no_bag_space');
-    // No side effects: the reagents and the pre-existing plain stack survive
-    // untouched, and no output was minted.
-    expect(sim.countItem('anglers_feast_platter', pid)).toBe(1);
-    expect(sim.countItem('raw_frostgill_trout', pid)).toBe(3);
-    expect(m.copper).toBe(100000);
-  });
+      const { result, draws } = countDraws(sim, () =>
+        resolveCraft(sim.ctx, pid, 'recipe_anglers_feast_platter'),
+      );
+
+      expect(result).toEqual({
+        ok: false,
+        recipeId: 'recipe_anglers_feast_platter',
+        reason: 'no_bag_space',
+      });
+      expect(draws).toBe(0);
+      expect(sim.serializeCharacter(pid)).toEqual(before);
+      expect(m.inventory).toEqual(inventoryBefore);
+      expect(m.craftSkills).toEqual(skillsBefore);
+      expect(m.lifetimeXp).toBe(xpBefore);
+      expect(sim.drainEvents()).toEqual([]);
+      expect(sim.countItem('anglers_feast_platter', pid)).toBe(identity.count);
+      expect(sim.countItem('raw_frostgill_trout', pid)).toBe(3);
+      expect(m.copper).toBe(100000);
+    },
+  );
+
+  it.each([
+    {
+      label: 'plain',
+      count: 1,
+      instance: undefined,
+      expected: [
+        { source: {}, count: 1 },
+        { source: { signer: 'Adventurer' }, count: 3 },
+      ],
+    },
+    {
+      label: 'another maker',
+      count: 1,
+      instance: { signer: 'OtherMaker' },
+      expected: [
+        { source: { signer: 'Adventurer' }, count: 3 },
+        { source: { signer: 'OtherMaker' }, count: 1 },
+      ],
+    },
+    {
+      label: 'plain at the stack boundary',
+      count: 17,
+      instance: undefined,
+      expected: [
+        { source: {}, count: 17 },
+        { source: { signer: 'Adventurer' }, count: 3 },
+      ],
+    },
+  ])(
+    'merges all three signed outputs into a compatible $label stack at full bags',
+    ({ count, instance, expected }) => {
+      const { sim, pid, m } = fullBagsWithOutput({
+        itemId: 'anglers_feast_platter',
+        count,
+        ...(instance ? { instance } : {}),
+      });
+      const xpBefore = m.lifetimeXp;
+      const { result, draws } = countDraws(sim, () =>
+        resolveCraft(sim.ctx, pid, 'recipe_anglers_feast_platter'),
+      );
+      expect(result).toEqual({
+        ok: true,
+        recipeId: 'recipe_anglers_feast_platter',
+        itemId: 'anglers_feast_platter',
+        count: 3,
+        quality: 'rare',
+        selfSignedBonusApplied: false,
+      });
+      expect(draws).toBe(1);
+      expect(m.inventory).toHaveLength(16);
+      expect(m.inventory.filter((slot) => slot.itemId === 'anglers_feast_platter')).toEqual([
+        { itemId: 'anglers_feast_platter', count: count + 3, materialSources: expected },
+      ]);
+      for (const itemId of [
+        'raw_frostgill_trout',
+        'raw_bog_eel',
+        'sunpetal_herb',
+        'cooking_salt',
+      ]) {
+        expect(sim.countItem(itemId, pid), itemId).toBe(1);
+      }
+      expect(m.copper).toBe(99960);
+      expect(m.craftSkills.cooking).toBe(51);
+      expect(m.lifetimeXp - xpBefore).toBe(120);
+    },
+  );
 });

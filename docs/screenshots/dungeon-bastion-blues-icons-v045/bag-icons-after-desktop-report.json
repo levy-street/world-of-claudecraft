@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/portcullis_girdle.webp",
+    "http://localhost:5194/ui/items/heroic_portcullis_girdle.webp",
+    "http://localhost:5194/ui/items/cellwatch_belt.webp",
+    "http://localhost:5194/ui/items/heroic_cellwatch_belt.webp",
+    "http://localhost:5194/ui/items/lanternwick_sash.webp",
+    "http://localhost:5194/ui/items/heroic_lanternwick_sash.webp",
+    "http://localhost:5194/ui/items/turnkeys_shank.webp",
+    "http://localhost:5194/ui/items/gaolyard_jerkin.webp",
+    "http://localhost:5194/ui/items/heroic_gaolyard_jerkin.webp",
+    "http://localhost:5194/ui/items/brinewarden_robe.webp",
+    "http://localhost:5194/ui/items/heroic_brinewarden_robe.webp",
+    "http://localhost:5194/ui/items/fogbinders_rod.webp"
+  ],
+  "allDecoded": true
+}

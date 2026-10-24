@@ -75,6 +75,86 @@ of them is reviewed.
 
 ## Accepted exceptions
 
+### GHSA-hqr4-qq8f-hg3x: stream-json JSONC comment parsing can take quadratic time
+
+**Reviewed 2026-10-24. Severity** moderate. **Path**
+`@reown/appkit-adapter-solana > @solana/web3.js > jayson > stream-json@1.9.1`.
+The [advisory](https://github.com/advisories/GHSA-hqr4-qq8f-hg3x) is fixed in
+3.6.0, whose module layout is incompatible with jayson's 1.x imports.
+
+**Not reachable here.** The browser Solana bundle imports
+`jayson/lib/client/browser`, which loads only `uuid` and `generateRequest`.
+It never loads the stream-json-backed server utilities, including the JSONC
+parser/verifier. This is the same browser boundary recorded for
+GHSA-528h-pc64-c93x, independently checked against the installed packages.
+
+**Retire this entry when** jayson adopts stream-json >=3.6.0, removes it, or
+WoC starts using jayson's server/stream APIs. Recheck reachability on wallet upgrades.
+
+### GHSA-mjw6-4jj6-33hc: stream-json Assembler prototype pollution
+
+**Reviewed 2026-10-24. Severity** moderate. **Path**
+`@reown/appkit-adapter-solana > @solana/web3.js > jayson > stream-json@1.9.1`.
+The [advisory](https://github.com/advisories/GHSA-mjw6-4jj6-33hc) is fixed in
+3.6.0. Do not force that incompatible major into jayson's 1.x imports.
+
+**Not reachable here.** The installed Solana browser bundle uses jayson's
+browser client, not its server utilities or stream-json Assembler. The
+browser-client dependency closure is checked by
+`tests/dependency_exception_reachability.test.ts`.
+
+**Retire this entry when** a compatible patched consumer ships or a new
+application path imports stream-json; the latter requires fresh security review.
+
+### GHSA-ch52-4w7c-c8xp: http-cache-semantics accepts private cookies through max-stale
+
+**Reviewed 2026-10-24. Severity** high. **Path**
+`electron-builder > app-builder-lib > @electron/get > got > cacheable-request > http-cache-semantics`.
+The [advisory](https://github.com/advisories/GHSA-ch52-4w7c-c8xp) has no declared
+patched version. Version 4.3.0 retains the affected max-stale and Set-Cookie
+logic; being outside the advisory's affected range is not evidence of a fix.
+
+**Not reachable here.** This is development packaging code. The installed
+`@electron/get@3.1.0` downloader uses `got.stream`; Got 11.8.6 defaults its
+HTTP `cache` option to `undefined`. WoC does not configure an HTTP cache for
+this downloader, and it is not a shared multi-user response cache. Electron's
+artifact cache on disk is a different mechanism. The installed default and
+downloader are pinned by `tests/dependency_exception_reachability.test.ts`.
+
+**Retire this entry when** a verified upstream fix ships. Reassess before enabling
+Got HTTP caching or introducing a runtime consumer of this package.
+
+### GHSA-mrhx-c7xc-m3w5: Zod parses oversized constrained collections
+
+**Reviewed 2026-10-24. Severity** high. **Paths**
+`@reown/appkit-wallet > zod@3.22.4` and `chromium-bidi > zod@3.25.76`.
+The [upstream fix](https://github.com/colinhacks/zod/pull/6652) ships in Zod
+4.6.6. Neither consumer has a compatible patched Zod 3 release; forcing a
+major upgrade would change their validation API.
+
+**Locally patched.** The version-scoped pnpm patches backport early rejection
+for oversized Array `.max()`/`.length()` and Set `.max()`/`.size()` constraints
+to both installed versions. Zod 3 Map has no corresponding size constraint.
+CommonJS and ESM implementations are patched, including the 3.22.4 UMD
+bundle and 3.25.76 TypeScript source.
+`tests/zod_collection_limits.test.ts` loads each consumer's actual dependency
+and verifies zero element/refinement visits on oversize, sync/async error paths,
+valid transforms, and preserved undersize behavior. The unpatched versions
+fail the oversized-input tests. The audit exception is necessary because the
+registry sees version numbers, not pnpm patch contents.
+
+**Scope limit.** Like upstream, this fix does not bound unconstrained collections
+or all incoming wallet messages. Local email/social settings do not prove the
+wallet frame unreachable because AppKit can replace them with remote project
+configuration. No general wallet-message resource-exhaustion protection is claimed.
+Zod 3.25.76 also ships unpatched `v4`/`v4-mini` exports; no current application
+or installed consumer imports them. Introducing those imports invalidates this
+exception until those paths are patched or upgraded.
+
+**Retire this entry and both patches when** both consumers adopt an upstream
+patched compatible release. Recheck all executable entry points when changing
+versions or adding consumers.
+
 ### GHSA-3gc7-fjrx-p6mg: bigint-buffer buffer overflow in `toBigIntLE()`
 
 **Severity** high (CVSS 7.5). **Path**

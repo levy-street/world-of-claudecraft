@@ -19,7 +19,12 @@
 // would double-count completion.
 
 import { HOARD_BASE_ITEM_IDS } from './hoard_loot';
-import { FURY_STOCK, WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from './pvp_honor';
+import {
+  FURY_STOCK,
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
+} from './pvp_honor';
 import { SEASON2_STOCK } from './pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -27,6 +32,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from './rift/items';
+import { VAULT_MATERIAL_POOL } from './treasure_maps';
 
 /** Top-level shelf ids (Overview is virtual UI, not a catalog shelf row). */
 export type ReliquaryShelfId = 'conquerors' | 'professions' | 'horizons';
@@ -113,13 +119,20 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  * - buried_hoard: src/sim/treasure_vault.ts payOne rolls one piece off the fallen
  *   keeper's table (content/hoard_loot.ts rollHoardBossDrop) when an entrant
  *   opens the hoard's reward chest. The piece is never on the keeper's own mob
- *   loot, so a boss hint would name a door that does not hold it.
+ *   loot, so a boss hint would name a door that does not hold it. The same
+ *   chest always pays a stack of one corpse-harvest specimen (VAULT_MATERIAL_POOL,
+ *   content/treasure_maps.ts, rolled by src/sim/rift/hoard_reward_roll.ts).
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
   'masterwork_craft',
   'rift_first_clear',
   'buried_hoard',
+  // src/sim/referral_rewards.ts grants the completed-card and inviter reins.
+  'referral_cards',
+  // Lantern Hall's quartermaster (src/sim/guild_quartermaster.ts) sells the guild's horse and
+  // sword for Lantern Seals: a seal counter, not a vendorItems shop, so not a vendor hint.
+  'lantern_hall_quartermaster',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -274,8 +287,13 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'thunderstrut_gobbler',
   'drakemaw_raptor',
   'avian_strider',
+  'lantern_hall_destrier',
   'lanternback_troll',
+  'wobbles_slime',
   'terrorspark_groundshaker',
+  'nightwing_chimera',
+  'referral_raptor',
+  'referral_tank',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -291,10 +309,20 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// Drakemaw Raptor, Lanternback Troll and Dreadspark Groundshaker have no
-// player acquisition path. The Viridian Valestrider is the Rift Watch
-// quartermaster's Champion row (content/faction_vendors.ts). Paid mount skins
-// are deliberately absent here.
+// drakemaw_raptor is the Mirefen world boss's mount: the reins ride Balgath's
+// table as an ungrouped 1% personal drop (content/zone2.ts), the "dedicated
+// world boss" the 2026-08-04 owner call held them back for.
+//
+// Nightwing Chimaera is the annual membership bundle's paid mount reward.
+//
+// The Viridian Valestrider is the Rift Watch quartermaster's Champion row
+// (content/faction_vendors.ts).
+//
+// The Lantern Hall Destrier is Garrick Holt's 40-seal row (content/guild_contracts.ts), an
+// activity door because the guild's counter is not a vendorItems shop.
+//
+// The retired tank placeholders have no new acquisition path. Saved reins
+// remain usable. Paid mount skins are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -307,6 +335,10 @@ const MOUNT_SOURCES: Readonly<
   // never encodes meaning in the shape).
   valorsteed: fromVendor('stablemaster_marla'),
   avian_strider: fromVendor('npc_rift_watch_quartermaster'),
+  lantern_hall_destrier: fromActivity('lantern_hall_quartermaster'),
+  nightwing_chimera: fromStore(),
+  referral_raptor: fromActivity('referral_cards'),
+  wobbles_slime: fromActivity('referral_cards'),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),
@@ -331,6 +363,7 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  drakemaw_raptor: fromBoss('balgath_cyclops'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
@@ -374,7 +407,29 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'emberwish_wand',
   'encore_bow',
   'meteorlatch_crossbow',
+  'lantern_hall_sword',
+  // The four elemental arms (hearthbrand_sword, squallcrest_sword, rimelight_staff,
+  // duskwick_staff) are reserved for a future raid and obtainable nowhere yet, so they get no
+  // Reliquary row until that raid ships them.
 ] as const;
+
+// The skins NOT sold by the store (WeaponSkinDef.earnedFrom), each naming where it is earned.
+// With them the page has two doors, so every row names its own (the store's rows the store),
+// never leaning on the page default for a door it does not have.
+const WEAPON_SKIN_SOURCES: Readonly<
+  Partial<Record<(typeof RELIQUARY_HORIZON_WEAPON_SKINS)[number], ReliquarySourceHints>>
+> = {
+  lantern_hall_sword: fromActivity('lantern_hall_quartermaster'),
+};
+
+function weaponSkinEntries(
+  ids: readonly (typeof RELIQUARY_HORIZON_WEAPON_SKINS)[number][],
+): RelicEntry[] {
+  return ids.map((id) => {
+    const earned = Object.hasOwn(WEAPON_SKIN_SOURCES, id) ? WEAPON_SKIN_SOURCES[id] : undefined;
+    return [id, earned ?? fromStore()] as const;
+  });
+}
 
 // Hidden deeds NEVER enter the Reliquary, not even as a masked or locked slot:
 // a hidden deed's existence is itself the secret, so a placeholder row would
@@ -457,6 +512,17 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The Clue Scroll tenth-casket title (world quests, Stage 3): Treasure
   // Hunter pages here per the locked titles-page rule.
   'exp_clue_ten_caskets',
+  // The Drowned Temple lore guide's The Last Verse: Witness of the Choir.
+  'dgn_drowned_temple_cantor',
+  // Lantern Hall's quartermaster (guild_contracts.ts): the three titles bought with
+  // Lantern Seals from the guild's weekly dungeon contracts.
+  'feat_guild_writ_runner',
+  'feat_guild_hallsworn',
+  'feat_guild_of_lantern_hall',
+  // The sixth lifetime-XP rung (10,000,000 lifetime experience): Titan
+  // pages here per the locked titles-page rule.
+  'prog_titan',
+  // World PvP streak titles page here per the locked titles-page rule.
   'pvp_flag_1h',
   'pvp_flag_3h',
   'pvp_flag_6h',
@@ -604,13 +670,22 @@ function withProfessions(
   ids: readonly string[],
   professionById: Readonly<Record<string, string>>,
   fallback: ReliquarySourceHint,
-): RelicEntry[] {
+): (readonly [string, ReliquarySourceHint])[] {
   return ids.map((id) => {
     // Own-property read, same reasoning as setMembers below.
     const professionId = Object.hasOwn(professionById, id) ? professionById[id] : undefined;
     if (professionId) return [id, fromProfession(professionId)] as const;
     return [id, fallback] as const;
   });
+}
+
+/** Adds the Buried Hoard door to a specimen the hoard chest also pays. */
+function withHoardMaterialHint(
+  entry: readonly [string, ReliquarySourceHint],
+): readonly [string, ReliquarySourceHints] {
+  const [id, hint] = entry;
+  if (!VAULT_MATERIAL_POOL.includes(id)) return entry;
+  return [id, [hint, fromActivity('buried_hoard')]] as const;
 }
 
 // Epic set members, pinned to the same id lists as col_set_* deeds in
@@ -726,13 +801,13 @@ const SET_MEMBER_SOURCES: Readonly<
   stormcallers_waistguard: fromBoss('thunzharr_waking_peak'),
   stormcallers_crown: fromBoss('nythraxis_scourge_of_thornpeak'),
   stormcallers_spaulders: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_crown: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_mantle: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_harness: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_cinch: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_legguards: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_grips: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_treads: fromBoss('nythraxis_scourge_of_thornpeak'),
+  bramblehide_crown: fromBoss('the_gorgebloom'),
+  bramblehide_mantle: fromBoss('the_gorgebloom'),
+  bramblehide_harness: fromBoss('wildheart_high_priest'),
+  bramblehide_cinch: fromBoss('the_gorgebloom'),
+  bramblehide_legguards: fromBoss('wildheart_high_priest'),
+  bramblehide_grips: fromBoss('wildheart_beastmaster'),
+  bramblehide_treads: fromBoss('wildheart_beastmaster'),
 };
 
 /** Set-page members carrying their SET_MEMBER_SOURCES hint. A member with no
@@ -752,66 +827,110 @@ function setMembers(
 // HEROIC_BOSS_LOOT gear only (mount reins excluded; Horizons owns mounts).
 // Tests pin these lists against the live table so a new heroic gear row fails
 // until it is deliberately added here.
+/** New heroic epics whose Reliquary slot waits for their painted icon art
+ *  (a relic cell needs committed dark-card art; weapons cannot park on the
+ *  art-pending list). Each joins its heroic page in the art pass. */
+export const RELIQUARY_ART_PENDING_HEROIC: readonly string[] = [
+  'sextons_burial_spade',
+  'rimesilk_hood',
+];
+
 export const RELIQUARY_HEROIC_GEAR = {
-  morthen: [
-    'morthens_cryptforged_hauberk',
-    'shadowpulse_handwraps',
-    'bonechill_striders',
-    'lunarward_cinch',
-    'cryptplate_helm',
-    'shadowpulse_slippers',
-    'bonechill_cord',
-    'bastion_sigil',
-  ],
-  vael_the_mistcaller: [
-    'mistcallers_fang',
-    'tidebound_spaulders',
-    'sash_of_the_sunken_court',
+  // The Hollow Crypt rework spread Morthen's heroic epics over the four bosses
+  // (hollow_crypt.md 8.2); they share the one shipped heroic page.
+  sexton_marrow: ['cryptplate_helm'],
+  rimeweb: ['bonechill_striders', 'bonechill_cord'],
+  // The Slippers moved here off Morthen to join their Handwraps (2026-10-08).
+  cantor_ilvane: ['shadowpulse_handwraps', 'shadowpulse_slippers'],
+  morthen: ['morthens_cryptforged_hauberk', 'lunarward_cinch', 'bastion_sigil'],
+  // The Sunken Bastion rework moved three of Vael's heroic epics onto Olen and
+  // the new Gaoler Ossick (sunken_bastion.md 8.2); they share the one heroic page.
+  knight_commander_olen: [
+    'drowned_commanders_breastplate',
     'mistforged_pauldrons',
     'tideguard_faceguard',
-    'sunken_court_mantle',
-    'dreamroot_boots',
-    'stormjar',
   ],
-  ysolei: [
-    'lunar_tide_greatstaff',
+  // The Mooring Stone came off the heroic Nythraxis raid (2026-10-08).
+  gaoler_ossick: [
+    'gaolyard_striders',
+    'sash_of_the_sunken_court',
+    'gaolers_iron_key',
+    'mooring_stone',
+  ],
+  // The Gaol Turnkey takes two of Vael's heroic epics (2026-10-08).
+  gaol_turnkey: ['sunken_court_mantle', 'dreamroot_boots'],
+  vael_the_mistcaller: ['mistcallers_fang', 'tidebound_spaulders', 'stormjar'],
+  // The Drowned Temple rework moved four of Ysolei's heroic pieces onto
+  // Choirmother Selthe and the new Tideglass Colossus (drowned_temple.md 8.2)
+  // and gave each a new heroic epic; they share the one heroic page.
+  choirmother_selthe: ['choirmothers_casque', 'pale_chorus_vestment'],
+  tideglass_colossus: [
     'tidewoven_trousers',
-    'choirmothers_casque',
-    'stormbark_mantle',
     'lunar_choir_leggings',
-    'choir_blessed_spaulders',
     'tideworn_warboots',
-    'menders_hourglass',
+    'tideglass_warmaul',
+    // The Echoing Lens came off the heroic Nythraxis raid (2026-10-08).
+    'echoing_lens',
   ],
+  // The Mere Hydra takes two of Ysolei's heroic epics (2026-10-08).
+  mere_hydra_head_center: ['stormbark_mantle', 'choir_blessed_spaulders'],
+  ysolei: ['lunar_tide_greatstaff', 'menders_hourglass'],
   korzul_the_gravewyrm: [
     'gravewyrm_cleaver',
     'shroud_of_the_gravewyrm',
-    'sanctum_prowlers_grips',
+    'wildsoul_maul',
+    // The Gravewyrm Sanctum rework's Quenchwater Flask (gravewyrm_sanctum.md 9.2).
+    'quenchwater_flask',
+  ],
+  // The Gravewyrm Sanctum rework (gravewyrm_sanctum.md 9.2): Korgath and
+  // Velkhar each pay a new epic and a trinket, Korzul a trinket; all three
+  // share the one heroic page.
+  // Korzul's heroic epics spread over the Sanctum (2026-10-08): two each to
+  // Korgath and Velkhar.
+  korgath_the_bound: [
+    'foremans_last_link',
+    'hammer_of_the_open_lock',
     'gravewyrm_claws',
     'gravescale_girdle',
+  ],
+  grand_necromancer_velkhar: [
+    'phial_of_the_tithe',
+    'vestments_of_the_waking_rite',
+    'sanctum_prowlers_grips',
     'wyrmchoir_handwraps',
-    'wildsoul_maul',
+  ],
+  // The Wildheart Basin rework moved two of Zulgar's heroic epics onto the
+  // promoted Fanglord Beastmaster and the Gorgebloom (wildheart_basin.md 8.2)
+  // and gave each a new epic and a trinket; they share the one heroic page.
+  // The Hunter's Tally and the Wellspring Seed came off the heroic Nythraxis
+  // raid (2026-10-08).
+  wildheart_beastmaster: [
+    'bloodmane_war_legguards',
+    'fanglords_whistle',
+    'fanglords_hide_mantle',
+    'hunters_tally',
+  ],
+  the_gorgebloom: [
+    'sunbone_oracles_crown',
+    'gorgebloom_seedpod',
+    'thornroot_greathelm',
+    'wellspring_seed',
   ],
   wildheart_high_priest: [
     'basin_stalkers_tunic',
     'verdant_heart_vestment',
     'sunbone_ritual_hauberk',
     'greatfang_of_the_basin',
-    'sunbone_oracles_crown',
-    'bloodmane_war_legguards',
     'paired_talons',
   ],
+  // The four raid trinkets moved to heroic five-man bosses (2026-10-08).
   nythraxis_scourge_of_thornpeak: [
     'deathless_greatblade',
     'scepter_of_the_deathless_court',
     'stormcallers_focus',
-    'mooring_stone',
-    'wellspring_seed',
-    'hunters_tally',
-    'echoing_lens',
   ],
-  // Crucible of the Last Spring: the heroic-only weapon, shield and trinket
-  // appends.
+  // Crucible of the Last Spring: the heroic-only weapon, shield, offhand,
+  // quiver and trinket appends.
   // The sigil redemption tokens that share both bosses' heroic tables are
   // NOT catalogued (kind 'tool'): they are per-slot redemption currency the
   // Crucible Quartermaster consumes, not unique spoils, the same carve-out
@@ -836,6 +955,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'staff_of_the_last_spring',
     'orb_of_the_last_spring',
     'cinder_of_the_first_design',
+    'infernal_quiver',
     // The raid trinkets (content/trinkets.ts), heroic exclusives here and
     // Normal off-set drops too, so also on the Normal page.
     'forgefathers_temper',
@@ -963,14 +1083,15 @@ const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_
 // the partition and both floors are pinned in tests/reliquary_content.test.ts.
 // The two honor trinkets (WARFARE_TRINKET_STOCK) are set-less honor purchases
 // from the same two counters, so they close the armory after the kit's
-// jewelry and weapons.
+// jewelry and weapons, followed by the World PvP goods (the Skull Bag).
 const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
 const WARFARE_ARMORY_ITEM_IDS = [
   ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
   ...WARFARE_TRINKET_STOCK,
+  ...WORLD_PVP_GOODS_STOCK,
 ];
 // Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
-// two quartermasters: its spec sets and weapons fill one page, in stock
+// two quartermasters: its 27 spec sets and four weapons fill one page, in stock
 // order (class, then spec, each helmet to gloves, then the weapons).
 const VANGUARD_GALLERY_ITEM_IDS = [...SEASON2_STOCK];
 
@@ -1005,10 +1126,10 @@ function freezePageTable(pages: ReliquaryPageDef[]): readonly ReliquaryPageDef[]
 
 export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
   // ---- Five-man dungeons: normal chase uniques ----
-  // Clear meters on these pages read BOTH difficulties ('any'): every relic
-  // below also drops on the Heroic claim (HEROIC_BOSS_LOOT pays the base id or
-  // a heroic_<base> variant that folds back to it), so a Heroic run is a run
-  // at the page's spoils and counts. The heroic-only epic pages keep their
+  // Clear meters on these pages read BOTH difficulties ('any') unless noted:
+  // every relic below also drops on the Heroic claim (HEROIC_BOSS_LOOT pays the
+  // base id or a heroic_<base> variant that folds back to it), so a Heroic run
+  // is a run at the page's spoils and counts. The heroic-only epic pages keep their
   // 'heroic' filter, and the Crucible raid pages keep 'normal' because their
   // Normal tables hold normalOnly rows Heroic never pays. Derived and pinned by
   // tests/reliquary_content.test.ts ("count every difficulty that pays").
@@ -1017,15 +1138,35 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
-    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
-    // Morthen is the only Crypt mob that drops any of these five.
-    sourceDefault: fromBoss('morthen'),
+    // Normal clears only (2026-10-09): Morthen's four uncommon brand pieces
+    // drop on Normal alone (a Heroic kill pays no uncommon gear), so Heroic
+    // cannot pay the whole page; Heroic runs count on the Heroic page below.
+    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'normal' },
+    // Four bosses pay the page since every boss's blue roll joined it
+    // (2026-10-08), so every row names its own; the first five are Morthen's.
+    // The rework's three rare chase rows (Spadehaft, Fang, Hymnal) join this
+    // page with their painted art (the dark-card rule), not before.
     relics: items(
-      'cryptbone_greaves',
-      'cryptbone_helm',
-      'cryptbone_pauldrons',
-      'greyjaw_hide_boots',
-      'gravewoven_bag',
+      ['cryptbone_greaves', fromBoss('morthen')],
+      ['cryptbone_helm', fromBoss('morthen')],
+      ['cryptbone_pauldrons', fromBoss('morthen')],
+      ['greyjaw_hide_boots', fromBoss('morthen')],
+      ['gravewoven_bag', fromBoss('morthen')],
+      // Every boss's Normal blue roll (2026-10-08): a cloth, leather and mail
+      // piece of one slot plus a weapon, each paid on Heroic by its rare copy.
+      ['spadeworn_gauntlets', fromBoss('sexton_marrow')],
+      ['gravedirt_grips', fromBoss('sexton_marrow')],
+      ['bellrope_mitts', fromBoss('sexton_marrow')],
+      ['rimewreath_coif', fromBoss('rimeweb')],
+      ['rime_laced_hood', fromBoss('rimeweb')],
+      ['lamenting_veil', fromBoss('rimeweb')],
+      ['choirward_pauldrons', fromBoss('cantor_ilvane')],
+      ['choristers_spaulders', fromBoss('cantor_ilvane')],
+      ['cantors_stole', fromBoss('cantor_ilvane')],
+      ['knellbound_hauberk', fromBoss('morthen')],
+      ['candlewatch_jerkin', fromBoss('morthen')],
+      ['robe_of_the_unquiet_rite', fromBoss('morthen')],
+      ['gravecallers_rod', fromBoss('morthen')],
     ),
   },
   {
@@ -1034,61 +1175,126 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Heroic Hollow Crypt',
     desc: 'Heroic-only epics from Morthen the Gravecaller.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'heroic' },
-    sourceDefault: fromBoss('morthen'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.morthen),
+    // The shipped eight keep their slots and order; the rework moved four of
+    // them to the new bosses (hinted per boss). Its two new epics join with
+    // their painted art (RELIQUARY_ART_PENDING_HEROIC).
+    relics: items(
+      ['morthens_cryptforged_hauberk', fromBoss('morthen')],
+      ['shadowpulse_handwraps', fromBoss('cantor_ilvane')],
+      ['bonechill_striders', fromBoss('rimeweb')],
+      ['lunarward_cinch', fromBoss('morthen')],
+      ['cryptplate_helm', fromBoss('sexton_marrow')],
+      ['shadowpulse_slippers', fromBoss('cantor_ilvane')],
+      ['bonechill_cord', fromBoss('rimeweb')],
+      ['bastion_sigil', fromBoss('morthen')],
+    ),
   },
   {
     id: 'conquerors_sunken_bastion',
     shelf: 'conquerors',
     name: 'The Sunken Bastion',
-    desc: 'Rare and epic spoils from Olen and Vael the Fogbinder.',
+    desc: 'Rare and epic spoils from Olen, Gaoler Ossick and Vael the Fogbinder.',
     clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'any' },
-    // Two bosses, and every relic drops from exactly one of them, so the page
-    // takes no default: each row names its own.
+    // Three bosses, and every relic drops from exactly one of them, so the page
+    // takes no default: each row names its own. The rework's two rare chase
+    // weapons append after the shipped slots.
     relics: items(
       ['tideguard_greaves', fromBoss('knight_commander_olen')],
-      ['tideguard_sabatons', fromBoss('knight_commander_olen')],
+      ['tideguard_sabatons', fromBoss('vael_the_mistcaller')],
       ['eelscale_leggings', fromBoss('knight_commander_olen')],
-      ['tidescale_vest', fromBoss('vael_the_mistcaller')],
-      ['drowned_prayer_leggings', fromBoss('vael_the_mistcaller')],
+      ['tidescale_vest', fromBoss('gaoler_ossick')],
+      ['drowned_prayer_leggings', fromBoss('knight_commander_olen')],
       ['drowned_prayer_sandals', fromBoss('vael_the_mistcaller')],
       ['eelscale_treads', fromBoss('vael_the_mistcaller')],
       ['mistcallers_duffel', fromBoss('vael_the_mistcaller')],
+      ['knight_commanders_longsword', fromBoss('knight_commander_olen')],
+      ['gaolyard_cudgel', fromBoss('gaoler_ossick')],
+      // Every boss's Normal blue roll (2026-10-08): a cloth, leather and mail
+      // piece of one slot plus a weapon, each paid on Heroic by its rare copy.
+      ['portcullis_girdle', fromBoss('gaol_turnkey')],
+      ['cellwatch_belt', fromBoss('gaol_turnkey')],
+      ['lanternwick_sash', fromBoss('gaol_turnkey')],
+      ['turnkeys_shank', fromBoss('gaol_turnkey')],
+      ['gaolyard_jerkin', fromBoss('gaoler_ossick')],
+      ['brinewarden_robe', fromBoss('gaoler_ossick')],
+      ['fogbinders_rod', fromBoss('vael_the_mistcaller')],
     ),
   },
   {
     id: 'conquerors_sunken_bastion_heroic',
     shelf: 'conquerors',
     name: 'Heroic Sunken Bastion',
-    desc: 'Heroic-only epics from Vael the Fogbinder.',
+    desc: 'Heroic-only epics from Olen, Gaoler Ossick and Vael the Fogbinder.',
     clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'heroic' },
-    // Every heroic page defaults to the boss its RELIQUARY_HEROIC_GEAR list is
-    // keyed by: that key IS the HEROIC_BOSS_LOOT mob id awarding the gear.
-    sourceDefault: fromBoss('vael_the_mistcaller'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.vael_the_mistcaller),
+    // The shipped eight keep their slots and order; the rework moved three of
+    // them to Olen and Ossick and appends its new epics. Three bosses pay the
+    // page, so every row names its own.
+    relics: items(
+      ['mistcallers_fang', fromBoss('vael_the_mistcaller')],
+      ['tidebound_spaulders', fromBoss('vael_the_mistcaller')],
+      ['sash_of_the_sunken_court', fromBoss('gaoler_ossick')],
+      ['mistforged_pauldrons', fromBoss('knight_commander_olen')],
+      ['tideguard_faceguard', fromBoss('knight_commander_olen')],
+      ['sunken_court_mantle', fromBoss('gaol_turnkey')],
+      ['dreamroot_boots', fromBoss('gaol_turnkey')],
+      ['stormjar', fromBoss('vael_the_mistcaller')],
+      ['drowned_commanders_breastplate', fromBoss('knight_commander_olen')],
+      ['gaolyard_striders', fromBoss('gaoler_ossick')],
+      ['gaolers_iron_key', fromBoss('gaoler_ossick')],
+      ['mooring_stone', fromBoss('gaoler_ossick')],
+    ),
   },
   {
     id: 'conquerors_drowned_temple',
     shelf: 'conquerors',
     name: 'The Drowned Temple',
-    desc: 'Rare spoils from Choirmother Selthe and Ysolei, Avatar of the Drowned Moon.',
+    desc: 'Rare spoils from Choirmother Selthe, the Tideglass Colossus and Ysolei, Avatar of the Drowned Moon.',
     clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'any' },
+    // Three bosses pay the page, so every row names its own. The rework's two
+    // rare chase rows append after the shipped slots.
     relics: items(
       ['ysols_pearl_greaves', fromBoss('ysolei')],
       ['moonshroud_breastplate', fromBoss('ysolei')],
       ['moonshroud_robe', fromBoss('ysolei')],
       ['moonshroud_tunic', fromBoss('ysolei')],
       ['selthes_seastriders', fromBoss('choirmother_selthe')],
+      ['chorus_conch', fromBoss('choirmother_selthe')],
+      ['tideglass_shiv', fromBoss('tideglass_colossus')],
+      // Every boss's Normal blue roll (2026-10-08): a cloth, leather and mail
+      // piece of one slot plus a weapon, each paid on Heroic by its rare copy.
+      ['conchplate_sabatons', fromBoss('choirmother_selthe')],
+      ['pale_chorus_slippers', fromBoss('choirmother_selthe')],
+      ['tideglass_gauntlets', fromBoss('tideglass_colossus')],
+      ['moonburn_grips', fromBoss('tideglass_colossus')],
+      ['prism_etched_handwraps', fromBoss('tideglass_colossus')],
+      ['mere_crested_helm', fromBoss('mere_hydra_head_center')],
+      ['mereskin_hood', fromBoss('mere_hydra_head_center')],
+      ['merewater_cowl', fromBoss('mere_hydra_head_center')],
+      ['merecleaver', fromBoss('mere_hydra_head_center')],
+      ['moonwrack_stave', fromBoss('ysolei')],
     ),
   },
   {
     id: 'conquerors_drowned_temple_heroic',
     shelf: 'conquerors',
     name: 'Heroic Drowned Temple',
-    desc: 'Heroic-only epics from Ysolei.',
+    desc: 'Heroic-only epics from Choirmother Selthe, the Tideglass Colossus and Ysolei.',
     clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'heroic' },
-    sourceDefault: fromBoss('ysolei'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.ysolei),
+    // The shipped eight keep their slots and order; the rework moved four of
+    // them to Selthe and the Colossus and appends its two new epics.
+    relics: items(
+      ['lunar_tide_greatstaff', fromBoss('ysolei')],
+      ['tidewoven_trousers', fromBoss('tideglass_colossus')],
+      ['choirmothers_casque', fromBoss('choirmother_selthe')],
+      ['stormbark_mantle', fromBoss('mere_hydra_head_center')],
+      ['lunar_choir_leggings', fromBoss('tideglass_colossus')],
+      ['choir_blessed_spaulders', fromBoss('mere_hydra_head_center')],
+      ['tideworn_warboots', fromBoss('tideglass_colossus')],
+      ['menders_hourglass', fromBoss('ysolei')],
+      ['pale_chorus_vestment', fromBoss('choirmother_selthe')],
+      ['tideglass_warmaul', fromBoss('tideglass_colossus')],
+      ['echoing_lens', fromBoss('tideglass_colossus')],
+    ),
   },
   {
     id: 'conquerors_gravewyrm_sanctum',
@@ -1180,39 +1386,101 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         'gravewyrm_bone_quiver',
         [fromBoss('korzul_the_gravewyrm'), fromProfession('leatherworking')],
       ],
+      // The raid pieces relocated off Nythraxis (content/nythraxis_loot.ts),
+      // each on its home boss: Normal from its bonus roll, Heroic as its
+      // raid-tier copy from the same boss (content/heroic_loot.ts).
+      ['bonewrought_greatsword', fromBoss('korgath_the_bound')],
+      ['bonewrought_bulwark', fromBoss('korgath_the_bound')],
+      ['thornpeak_wardblade', fromBoss('korgath_the_bound')],
+      ['votive_ward_of_the_deathless_court', fromBoss('grand_necromancer_velkhar')],
+      ['wraithfire_orb', fromBoss('grand_necromancer_velkhar')],
+      ['courtiers_bonefang', fromBoss('grand_necromancer_velkhar')],
+      ['gravecourt_hewer', fromBoss('korzul_the_gravewyrm')],
+      ['stormhymn_chain_grips', fromBoss('korzul_the_gravewyrm')],
+      ['stormhymn_chain_treads', fromBoss('korzul_the_gravewyrm')],
     ),
   },
   {
     id: 'conquerors_gravewyrm_sanctum_heroic',
     shelf: 'conquerors',
     name: 'Heroic Gravewyrm Sanctum',
-    desc: 'Heroic-only epics from Korzul the Gravewyrm.',
+    desc: 'Heroic-only epics and trinkets from Korgath the Bound, Grand Necromancer Velkhar and Korzul the Gravewyrm.',
     clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'heroic' },
-    sourceDefault: fromBoss('korzul_the_gravewyrm'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.korzul_the_gravewyrm),
+    // The shipped seven keep their slots and order; the rework (gravewyrm_
+    // sanctum.md section 10) appends Korzul's Quenchwater Flask, then Korgath's
+    // and Velkhar's new epics and trinkets, each hinted to its boss.
+    relics: items(
+      // The shipped slots keep their order; four of Korzul's epics now name
+      // Korgath and Velkhar (2026-10-08).
+      ['gravewyrm_cleaver', fromBoss('korzul_the_gravewyrm')],
+      ['shroud_of_the_gravewyrm', fromBoss('korzul_the_gravewyrm')],
+      ['sanctum_prowlers_grips', fromBoss('grand_necromancer_velkhar')],
+      ['gravewyrm_claws', fromBoss('korgath_the_bound')],
+      ['gravescale_girdle', fromBoss('korgath_the_bound')],
+      ['wyrmchoir_handwraps', fromBoss('grand_necromancer_velkhar')],
+      ['wildsoul_maul', fromBoss('korzul_the_gravewyrm')],
+      ['quenchwater_flask', fromBoss('korzul_the_gravewyrm')],
+      ['hammer_of_the_open_lock', fromBoss('korgath_the_bound')],
+      ['vestments_of_the_waking_rite', fromBoss('grand_necromancer_velkhar')],
+      ['foremans_last_link', fromBoss('korgath_the_bound')],
+      ['phial_of_the_tithe', fromBoss('grand_necromancer_velkhar')],
+    ),
   },
   {
     id: 'conquerors_wildheart_basin',
     shelf: 'conquerors',
     name: 'The Wildheart Basin',
-    desc: 'Signature weapons from Zulgar and the Fanglord.',
+    desc: 'Signature weapons from the Fanglord Beastmaster, the Gorgebloom and Zulgar.',
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'any' },
+    // The rework (wildheart_basin.md section 9) appends the Gorgebloom's rare
+    // chase row; Duskwhisper and the Beastspear name the promoted Fanglord
+    // Beastmaster, a real boss now.
     relics: items(
       ['fanglords_beastspear', fromBoss('wildheart_beastmaster')],
       ['duskwhisper', fromBoss('wildheart_beastmaster')],
       ['wildheart_tuskblade', fromBoss('wildheart_high_priest')],
       ['wildheart_hexwood_staff', fromBoss('wildheart_high_priest')],
       ['wildheart_fangknife', fromBoss('wildheart_high_priest')],
+      ['falls_blessed_staff', fromBoss('the_gorgebloom')],
+      // The raid pieces relocated off Nythraxis (content/nythraxis_loot.ts),
+      // each on its home boss: Normal from its bonus roll, Heroic as its
+      // raid-tier copy from the same boss (content/heroic_loot.ts).
+      ['direfang_greatblade', fromBoss('wildheart_beastmaster')],
+      ['direfang_quiver', fromBoss('wildheart_beastmaster')],
+      ['bramblehide_grips', fromBoss('wildheart_beastmaster')],
+      ['bramblehide_treads', fromBoss('wildheart_beastmaster')],
+      ['bramblehide_crown', fromBoss('the_gorgebloom')],
+      ['bramblehide_mantle', fromBoss('the_gorgebloom')],
+      ['bramblehide_cinch', fromBoss('the_gorgebloom')],
+      ['bramblehide_harness', fromBoss('wildheart_high_priest')],
+      ['bramblehide_legguards', fromBoss('wildheart_high_priest')],
+      ['thornpeak_moonhide_cowl', fromBoss('wildheart_high_priest')],
     ),
   },
   {
     id: 'conquerors_wildheart_basin_heroic',
     shelf: 'conquerors',
     name: 'Heroic Wildheart Basin',
-    desc: 'Heroic-only epics from Zulgar, Voice of the Basin.',
+    desc: 'Heroic-only epics and trinkets from the Fanglord Beastmaster, the Gorgebloom and Zulgar, Voice of the Basin.',
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'heroic' },
-    sourceDefault: fromBoss('wildheart_high_priest'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.wildheart_high_priest),
+    // The shipped seven keep their slots and order; the rework moved two of
+    // them to the Beastmaster and the Gorgebloom and appends their new epics
+    // and trinkets.
+    relics: items(
+      ['basin_stalkers_tunic', fromBoss('wildheart_high_priest')],
+      ['verdant_heart_vestment', fromBoss('wildheart_high_priest')],
+      ['sunbone_ritual_hauberk', fromBoss('wildheart_high_priest')],
+      ['greatfang_of_the_basin', fromBoss('wildheart_high_priest')],
+      ['sunbone_oracles_crown', fromBoss('the_gorgebloom')],
+      ['bloodmane_war_legguards', fromBoss('wildheart_beastmaster')],
+      ['paired_talons', fromBoss('wildheart_high_priest')],
+      ['fanglords_whistle', fromBoss('wildheart_beastmaster')],
+      ['fanglords_hide_mantle', fromBoss('wildheart_beastmaster')],
+      ['gorgebloom_seedpod', fromBoss('the_gorgebloom')],
+      ['thornroot_greathelm', fromBoss('the_gorgebloom')],
+      ['hunters_tally', fromBoss('wildheart_beastmaster')],
+      ['wellspring_seed', fromBoss('the_gorgebloom')],
+    ),
   },
   // ---- Raid ----
   {
@@ -1230,10 +1498,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     relics: items(
       'deathless_heartwood',
       'kingsbane_last_oath',
-      'bonewrought_greatsword',
-      'bonewrought_bulwark',
-      'direfang_greatblade',
-      'wraithfire_orb',
       'maul_of_the_scourged_wilds',
       'crownforged_dreadhelm',
       'crownforged_warspaulders',
@@ -1243,21 +1507,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'soulflame_mantle',
       'stormcallers_crown',
       'stormcallers_spaulders',
-      'direfang_quiver',
-      'bramblehide_crown',
-      'bramblehide_mantle',
-      'bramblehide_harness',
-      'bramblehide_cinch',
-      'bramblehide_legguards',
-      'bramblehide_grips',
-      'bramblehide_treads',
-      'courtiers_bonefang',
-      'thornpeak_wardblade',
-      'gravecourt_hewer',
-      'votive_ward_of_the_deathless_court',
-      'thornpeak_moonhide_cowl',
-      'stormhymn_chain_grips',
-      'stormhymn_chain_treads',
     ),
   },
   {
@@ -1288,6 +1537,38 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'soulflame_cord',
       'stormcallers_waistguard',
       'vestments_of_the_waking_grove',
+    ),
+  },
+  {
+    id: 'conquerors_balgath',
+    shelf: 'conquerors',
+    name: 'Balgath, the Buried Foreman',
+    desc: 'Spoils dragged back out of the Mirefen barrow-mounds.',
+    clearSource: { kind: 'deed_stat', stat: 'balgathKills' },
+    // Every relic here comes off the boss himself and nowhere else, which is what a world
+    // boss page is supposed to mean: no shared tier, no second door, no page you can
+    // complete without meeting him. The three Foreman's Wage rares are his too, but they
+    // only ever fall to a contributor at or below level 13 (LootEntry.maxPlayerLevel), so
+    // a page completed at twenty was either started as a local or finished across a trade:
+    // the wage pieces are unbound, and discovery counts on the first copy a character
+    // ever holds, however it arrived. His reins are on the Horizons mounts page, never
+    // here (the curation rule above).
+    sourceDefault: fromBoss('balgath_cyclops'),
+    relics: items(
+      'foremans_barrowmaul',
+      'barrowhide_pauldrons',
+      'mirestone_stride',
+      'loomshard_eye',
+      'foremans_wage_band',
+      'mirelight_locket',
+      'fenwright_grips',
+      // His caster's staff and his five trinkets, his own and nowhere else's.
+      'craterglass_stave',
+      'knucklebone_of_balgath',
+      'muster_standard',
+      'guttered_eye',
+      'barrowstone_heart',
+      'muster_grapnel',
     ),
   },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----
@@ -1454,8 +1735,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // SPECIMEN_PROFESSIONS). The five pristine specimens come from corpse
     // harvest, which no gathering profession owns, so they name the
     // corpse_harvest activity, the same answer gather_event:perfect_specimen
-    // gives (one write site, src/sim/interaction.ts, awards the mark and these
-    // five items together). The CRAFTED FISHING ROD LADDER closes the angler's
+    // gives (src/sim/interaction.ts awards the mark and these five items
+    // together). All five are also the Buried Hoard chest's material stack
+    // (VAULT_MATERIAL_POOL), so they name buried_hoard as a second door. The
+    // CRAFTED FISHING ROD LADDER closes the angler's
     // chase, and since masterwrought Phase 11i that ladder is three rungs, not
     // two. Engineering crafts all three at the toolworks (ROD_RECIPES in
     // content/recipes.ts), so every one of them names the craft. What differs
@@ -1482,7 +1765,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
         SPECIMEN_PROFESSIONS,
         fromActivity('corpse_harvest'),
-      ),
+      ).map(withHoardMaterialHint),
       [
         'stormreel_fishing_rod',
         [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
@@ -1537,9 +1820,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // That is an account-level storefront rather than a boss, zone, profession,
     // deed, or in-world vendor NPC, and the 'store' kind now names it. One
     // storefront awards every skin on the page, which is exactly the condition
-    // a page default is for, so the default carries all 29 rows.
-    sourceDefault: fromStore(),
-    relics: weaponSkins(...RELIQUARY_HORIZON_WEAPON_SKINS),
+    // a page default was for. Lantern Hall's earned blade gave the page a second door, so every
+    // row now names its own (weaponSkinEntries): the store rows the store, the guild's blade the
+    // guild's quartermaster.
+    relics: weaponSkins(...weaponSkinEntries(RELIQUARY_HORIZON_WEAPON_SKINS)),
   },
   {
     id: 'horizons_titles',
@@ -1719,7 +2003,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_warfare_gallery',
     shelf: 'conquerors',
     name: 'Warfare Gallery',
-    desc: 'The five Warfare battle kits of the first season, now sold piece by piece for gold.',
+    desc: 'The five Warfare battle kits, earned piece by piece with honor.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
@@ -1727,7 +2011,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_warfare_armory',
     shelf: 'conquerors',
     name: 'Warfare Armory',
-    desc: 'Warfare jewelry and weapons, the first season for gold and the two trinkets for honor.',
+    desc: 'Warfare jewelry, weapons and goods purchased with hard-won honor.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_ARMORY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },

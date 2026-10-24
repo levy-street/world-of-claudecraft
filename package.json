@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.44.7",
+  "version": "0.45.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -136,10 +136,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.4",
-    "@capacitor/android": "^8.4.0",
-    "@capacitor/cli": "^8.4.0",
-    "@capacitor/core": "^8.4.0",
-    "@capacitor/ios": "^8.4.0",
+    "@capacitor/android": "8.4.3",
+    "@capacitor/cli": "8.4.3",
+    "@capacitor/core": "8.4.3",
+    "@capacitor/ios": "8.4.3",
     "@gltf-transform/cli": "^4.4.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@testing-library/jest-dom": "^6.9.1",
@@ -149,27 +149,27 @@
     "@types/three": "^0.185.4",
     "@types/ws": "^8.18.1",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "@vitest/browser": "4.1.11",
-    "@vitest/browser-playwright": "4.1.11",
+    "@vitest/browser": "4.1.12",
+    "@vitest/browser-playwright": "4.1.12",
     "axe-core": "4.12.1",
-    "electron": "^43.5.0",
+    "electron": "43.8.1",
     "electron-builder": "^26.15.7",
     "esbuild": "^0.28.1",
     "ffmpeg-static": "^5.3.0",
     "ffprobe-static": "^3.1.0",
-    "happy-dom": "^20.11.1",
+    "happy-dom": "21.0.4",
     "jsdom": "^29.1.1",
     "lightningcss": "1.32.0",
     "playwright": "1.61.1",
     "puppeteer-core": "^25.1.0",
-    "sharp": "^0.35.4",
+    "sharp": "0.35.5",
     "svelte": "^5.56.3",
     "svelte-check": "^4.6.0",
     "tsx": "^4.22.4",
     "turbo": "2.10.8",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
-    "vite": "^8.0.16",
-    "vitest": "4.1.11"
+    "vite": "8.1.6",
+    "vitest": "4.1.12"
   },
   "optionalDependencies": {
     "steamworks.js": "^0.4.0"
@@ -313,21 +313,27 @@
       "devalue@5": "^5.9.2",
       "@xmldom/xmldom@0.8": "^0.8.15",
       "@xmldom/xmldom@0.9": "^0.9.12",
-      "fast-uri@3": "^3.1.8",
+      "fast-uri@3": "^3.1.9",
       "js-yaml@4": "^4.3.2",
       "nanoid@3": "^3.3.17",
       "postcss@8": "^8.5.25",
-      "sharp@0.34": "^0.35.4",
+      "sharp@0.34": "^0.35.5",
       "stream-json@1": "^1.9.1",
       "tar@7": "^7.5.22",
-      "undici@6": "6.28.1",
-      "undici@7": "7.29.1"
+      "undici@6": "^6.29.1",
+      "undici@7": "^7.30.1",
+      "source-map-js@1": "^1.2.2",
+      "follow-redirects@1": "^1.16.1"
     },
     "auditConfig": {
       "ignoreGhsas": [
         "GHSA-3gc7-fjrx-p6mg",
         "GHSA-w5hq-g745-h8pq",
-        "GHSA-528h-pc64-c93x"
+        "GHSA-528h-pc64-c93x",
+        "GHSA-hqr4-qq8f-hg3x",
+        "GHSA-mjw6-4jj6-33hc",
+        "GHSA-ch52-4w7c-c8xp",
+        "GHSA-mrhx-c7xc-m3w5"
       ]
     },
     "onlyBuiltDependencies": [
@@ -343,7 +349,9 @@
       "@reown/appkit"
     ],
     "patchedDependencies": {
-      "three@0.185.1": "patches/three@0.185.1.patch"
+      "three@0.185.1": "patches/three@0.185.1.patch",
+      "zod@3.22.4": "patches/zod@3.22.4.patch",
+      "zod@3.25.76": "patches/zod@3.25.76.patch"
     }
   }
 }

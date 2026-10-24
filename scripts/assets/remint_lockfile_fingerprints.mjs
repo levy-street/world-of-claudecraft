@@ -14,6 +14,9 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { balgathBoulderSourceFingerprint } from './balgath_boulder/source_fingerprint.mjs';
+import { balgathStarwakeSourceFingerprint } from './balgath_starwake/source_fingerprint.mjs';
+import { craterglassStaveSourceFingerprint } from './craterglass_stave/source_fingerprint.mjs';
 import { eastbrookGrandArmourySourceFingerprint } from './eastbrook_grand_armoury/source_fingerprint.mjs';
 import { eastbrookMailboxSourceFingerprint } from './eastbrook_mailbox/source_fingerprint.mjs';
 import { eastbrookNoticeboardSourceFingerprint } from './eastbrook_noticeboard/source_fingerprint.mjs';
@@ -23,8 +26,14 @@ import { FARM_PROP_CONTRACTS, FARM_PROP_IDS } from './farm_props/model.js';
 import { farmPropsSourceFingerprint } from './farm_props/source_fingerprint.mjs';
 import { FENBRIDGE_TOWN_ASSET_IDS, FENBRIDGE_TOWN_CONTRACTS } from './fenbridge_town/model.js';
 import { fenbridgeTownSourceFingerprint } from './fenbridge_town/source_fingerprint.mjs';
+import { gutteredEyeSourceFingerprint } from './guttered_eye/source_fingerprint.mjs';
 import { hoardEntranceSourceFingerprint } from './hoard_entrance/source_fingerprint.mjs';
 import { inscriptionTomesSourceFingerprint } from './inscription_tomes/source_fingerprint.mjs';
+import { MUSTER_CAMP_PIECES } from './muster_camp/contract.mjs';
+import { musterCampSourceFingerprint } from './muster_camp/source_fingerprint.mjs';
+import { musterEffigySourceFingerprint } from './muster_effigy/source_fingerprint.mjs';
+import { musterGrapnelSourceFingerprint } from './muster_grapnel/source_fingerprint.mjs';
+import { musterStandardSourceFingerprint } from './muster_standard/source_fingerprint.mjs';
 import { tankSourceFingerprint } from './terrorspark_groundshaker/source_fingerprint.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -51,6 +60,13 @@ const FARM_PROPS_ASSETS = FARM_PROP_IDS.map((id) => ({
   kind: 'farm',
 }));
 
+// The Mirefen muster camp ships one stamped prop GLB per contract piece, so its
+// rows derive from the contract for the same reason as Fenbridge and the farm.
+const MUSTER_CAMP_ASSETS = MUSTER_CAMP_PIECES.map((piece) => ({
+  rel: path.posix.join('public', 'models', 'props', `${piece.file}.glb`),
+  kind: 'musterCamp',
+}));
+
 const ASSETS = [
   { rel: 'public/models/props/hoard_entrance.glb', kind: 'hoard' },
   { rel: 'public/models/props/eastbrook_bank.glb', kind: 'town' },
@@ -70,8 +86,17 @@ const ASSETS = [
   { rel: 'public/models/weapons/tome_goldleaf.glb', kind: 'tomes' },
   { rel: 'public/models/weapons/tome_sunpetal.glb', kind: 'tomes' },
   { rel: 'public/models/weapons/tome_voidbound.glb', kind: 'tomes' },
+  { rel: 'public/models/vfx/balgath_boulder.glb', kind: 'balgathBoulder' },
+  { rel: 'public/models/vfx/balgath_starwake.glb', kind: 'balgathStarwake' },
+  { rel: 'public/models/weapons/craterglass_stave.glb', kind: 'craterglassStave' },
+  { rel: 'public/models/vfx/guttered_eye.glb', kind: 'gutteredEye' },
+  { rel: 'public/models/creatures/muster_effigy.glb', kind: 'musterEffigy' },
+  { rel: 'public/models/weapons/muster_mallet.glb', kind: 'musterEffigy' },
+  { rel: 'public/models/vfx/muster_grapnel.glb', kind: 'musterGrapnel' },
+  { rel: 'public/models/vfx/muster_standard.glb', kind: 'musterStandard' },
   ...FENBRIDGE_ASSETS,
   ...FARM_PROPS_ASSETS,
+  ...MUSTER_CAMP_ASSETS,
 ];
 
 const requestedAssets = new Set(
@@ -124,10 +149,18 @@ const fps = {
   atlas: eastbrookSurfaceAtlasFingerprint(ROOT),
   fenbridge: fenbridgeTownSourceFingerprint(ROOT),
   farm: farmPropsSourceFingerprint(ROOT),
+  balgathBoulder: balgathBoulderSourceFingerprint(ROOT),
+  balgathStarwake: balgathStarwakeSourceFingerprint(ROOT),
+  craterglassStave: craterglassStaveSourceFingerprint(ROOT),
+  gutteredEye: gutteredEyeSourceFingerprint(ROOT),
+  musterCamp: musterCampSourceFingerprint(ROOT),
+  musterEffigy: musterEffigySourceFingerprint(ROOT),
+  musterGrapnel: musterGrapnelSourceFingerprint(ROOT),
+  musterStandard: musterStandardSourceFingerprint(ROOT),
 };
 
 console.log('live source fingerprints:');
-for (const [k, v] of Object.entries(fps)) console.log(`  ${k.padEnd(8)} ${v}`);
+for (const [k, v] of Object.entries(fps)) console.log(`  ${k.padEnd(16)} ${v}`);
 
 const results = [];
 for (const asset of selectedAssets) {

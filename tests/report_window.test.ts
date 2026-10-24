@@ -116,9 +116,36 @@ describe('report window: open', () => {
 });
 
 describe('report window: submit routing', () => {
-  it('routes a pid target through hooks.submit with the picked reason and details', async () => {
+  it.each([true, false])(
+    'reports a world target by its captured name when online=%s',
+    async (online) => {
+      let targetOnline = true;
+      const submit = vi.fn(() =>
+        targetOnline
+          ? Promise.resolve()
+          : Promise.reject(new Error('that player is no longer online')),
+      );
+      const submitByName = vi.fn().mockResolvedValue(undefined);
+      openReportWindow(
+        makeDeps(() => ({ submit, submitByName })),
+        { pid: 7, name: 'Rega' },
+      );
+      (el.querySelector('[data-value]') as HTMLElement).dataset.value = 'cheating';
+      (el.querySelector('#report-details') as HTMLTextAreaElement).value = 'speed hacking';
+      targetOnline = online;
+      el.querySelector<HTMLElement>('#report-submit')?.click();
+      await flush();
+      expect(submitByName).toHaveBeenCalledExactlyOnceWith('Rega', 'cheating', 'speed hacking');
+      expect(submit).not.toHaveBeenCalled();
+      expect(el.querySelector('#report-error')?.textContent).toBe('');
+      expect(el.style.display).toBe('none');
+      expect(log).toHaveBeenCalledWith('Report submitted for Rega.', 'var(--gold)');
+    },
+  );
+
+  it('keeps pid submission for hooks without name reporting', async () => {
     const submit = vi.fn().mockResolvedValue(undefined);
-    const hooks: Hooks = { submit, submitByName: vi.fn() };
+    const hooks: Hooks = { submit };
     openReportWindow(
       makeDeps(() => hooks),
       { pid: 7, name: 'Rega' },
@@ -128,7 +155,6 @@ describe('report window: submit routing', () => {
     await flush();
     expect(submit).toHaveBeenCalledTimes(1);
     expect(submit).toHaveBeenCalledWith(7, 'harassment', 'kited the boss');
-    expect(hooks.submitByName).not.toHaveBeenCalled();
     // Success closes and logs the submitted line in the theme gold token
     // (never a raw hex in a painter, src/styles/CLAUDE.md).
     expect(el.style.display).toBe('none');

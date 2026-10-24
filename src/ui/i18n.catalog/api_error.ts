@@ -116,6 +116,10 @@ export const apiErrorStrings = {
       'A storage purchase must finish or be resolved before this character can be deleted.',
     // the background-gate saturation refusal on the delete cascade (retryable)
     delete_busy: 'The realm is busy. Try deleting this character again in a moment.',
+    referral_transfer_pending:
+      'Move all unlocked stamp cards to another character before deleting this character.',
+    referral_bond_pending:
+      'A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.',
     // reuses errors.api.alreadyInWorld
     already_in_world: 'Character is already in world.',
     // reuses errors.api.takenOver
@@ -252,14 +256,6 @@ export const apiErrorStrings = {
     reason_required: 'A reason is required.',
     admin_target: 'Operator accounts cannot be kicked.',
     target_offline: 'That player is no longer online on this realm.',
-  },
-  // world_quest_block: the operator world quest block (server/world_quest_block_api.ts).
-  // Operator-facing copy: only the admin dashboard ever receives these codes.
-  world_quest_block: {
-    admin_target: 'Operator accounts cannot be blocked from world quests.',
-    reason_required: 'A reason is required.',
-    already_blocked: 'That account is already blocked from world quests.',
-    not_blocked: 'That account is not blocked from world quests.',
   },
   // woc_market: the config-gated $WOC Exchange family
   // (server/woc_market_routes.ts). USD-denominated auctions settled in $WOC;

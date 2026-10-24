@@ -218,6 +218,11 @@ async function shootSpecific(targets) {
               (variant.landing ? 'domcontentloaded' : 'networkidle0'),
             timeout: NAV_TIMEOUT,
           });
+          await page
+            .waitForFunction(() => !document.getElementById('boot-splash'), {
+              timeout: NAV_TIMEOUT,
+            })
+            .catch(() => errors.push(`BOOT SPLASH(${t.key}-${variant.key}): never lifted`));
           if (variant.mobile)
             await page.evaluate(() => document.body.classList.add('mobile-touch'));
           // A `landing: true` variant shoots the pre-game marketing shell (the home

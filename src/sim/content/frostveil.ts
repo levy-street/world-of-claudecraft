@@ -5,6 +5,11 @@
 // (southPassX). Terrain shape: the FROST_* tables in world.ts (coast lobes,
 // the bench terracing).
 
+import {
+  ICEMANTLE_LAYOUT,
+  ICEMANTLE_NPC_PLACEMENTS_BY_ID,
+  paintedTownBuildingDefs,
+} from '../painted_towns';
 import type {
   CampDef,
   EscortDef,
@@ -21,6 +26,7 @@ import { emptyZoneProps } from '../types';
 
 export const FROSTVEIL_ZONE: ZoneDef = {
   id: 'frostveil',
+  worldPvp: 'ffa',
   name: 'The Frostveil Reach',
   riftPortalEligible: true,
   riftTierWeights: { B: 0.45, A: 0.4, S: 0.15 },
@@ -281,8 +287,9 @@ export const FROSTVEIL_NPCS: Record<string, NpcDef> = {
     id: 'hearthkeeper_maeve',
     name: 'Hearthkeeper Maeve',
     title: 'Keeper of the Hearth-Lodge',
-    pos: { x: -40, z: 1557 },
-    facing: 0.8,
+    // at the painted Hearth-Lodge's door (sim/painted_towns/icemantle.ts)
+    pos: { ...ICEMANTLE_NPC_PLACEMENTS_BY_ID.hearthkeeper_maeve.position },
+    facing: ICEMANTLE_NPC_PLACEMENTS_BY_ID.hearthkeeper_maeve.facing,
     color: 0xd9a066,
     questIds: ['q_fv_winter_pelts', 'q_fv_ember_caches', 'q_fv_silent_trapline'],
     greeting: 'Come in off the cold. The lodge fire never goes out, so long as I draw breath.',
@@ -705,18 +712,11 @@ export const FROSTVEIL_ESCORTS: Record<string, EscortDef> = {
 
 export const FROSTVEIL_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Icemantle: a snug village ringing its firelit market plaza (the well
-  // and the great fire at the centre, stalls and crates crowding in, homes
-  // and the lodge shouldering close against the cold)
-  buildings: [
-    { kind: 'inn', x: -42, z: 1554, w: 6, d: 7, rot: 0.9 }, // the Hearth-Lodge
-    { kind: 'house', x: -20, z: 1550, w: 6, d: 6, rot: -0.5 },
-    { kind: 'house', x: -40, z: 1572, w: 6, d: 6, rot: 2.2 },
-    { kind: 'chapel', x: -18, z: 1570, w: 5, d: 7, rot: -2.0 },
-    { kind: 'house', x: -30, z: 1544, w: 5, d: 5, rot: 0.1 }, // the fisher's hut
-    { kind: 'house', x: -44, z: 1563, w: 5, d: 5, rot: 1.4 },
-    { kind: 'inn', x: -22, z: 1578, w: 5, d: 6, rot: -2.6 }, // the trade hall
-  ],
+  // Icemantle: a village ringing its firelit market plaza (the well and the
+  // great fire at the centre, stalls and crates crowding in), its painted
+  // Hearth-Lodge, trade hall, chapel and shelf house standing round it
+  // (sim/painted_towns/icemantle.ts)
+  buildings: [...paintedTownBuildingDefs(ICEMANTLE_LAYOUT)],
   wells: [{ x: -30, z: 1562, r: 1.5 }],
   stalls: [
     { x: -24, z: 1556, rot: 0.6, r: 1.6 },
@@ -731,8 +731,11 @@ export const FROSTVEIL_PROPS: ZonePropsDef = {
     [-38, 1558],
   ],
   fences: [
-    { x1: -46, z1: 1546, x2: -38, z2: 1542 },
-    { x1: -16, z1: 1558, x2: -14, z2: 1566 },
+    // the rail on the sea-cliff rim east of the plaza (it ran along the front
+    // of the painted lodge's site)
+    { x1: -57, z1: 1547, x2: -59, z2: 1557 },
+    // the trade hall's yard rail (it stood where the hall's front is)
+    { x1: -10, z1: 1540, x2: -2, z2: 1542 },
     { x1: -44, z1: 1578, x2: -36, z2: 1580 },
   ],
   tents: [

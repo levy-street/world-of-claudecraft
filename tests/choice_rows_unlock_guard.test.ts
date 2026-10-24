@@ -13,6 +13,10 @@ const FUTURE_ABILITY_EXCEPTIONS = new Set<string>([
   'dru_r5_natures_bounty:starfire',
   'dru_r5_natures_bounty:regrowth',
   'dru_r8_typhoon:barkskin',
+  // Binding Payload and Trapcraft cover "your traps": the level 16 Bear Trap
+  // joins them once learned, while Frostjaw carries the row from its unlock.
+  'hun_r11_binding_payload:bear_trap',
+  'hun_r14_trapcraft:bear_trap',
 ]);
 
 describe('choice row unlock ability guards', () => {

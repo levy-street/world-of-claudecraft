@@ -15,6 +15,11 @@
 // already made it through. Terrain: the ISLE_* tables in world.ts (biome
 // 'vale': the island shares the vale's sky, palette, and song).
 
+import {
+  GULLHAVEN_LAYOUT,
+  GULLHAVEN_NPC_PLACEMENTS_BY_ID,
+  paintedTownBuildingDefs,
+} from '../painted_towns';
 import type {
   CampDef,
   EscortDef,
@@ -278,8 +283,9 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'mender_saul',
     name: 'Mender Saul',
     title: 'Field Surgeon',
-    pos: { x: 312, z: 78 },
-    facing: -Math.PI / 2,
+    // at the menders' hall door, inside the hub circle (sim/painted_towns/gullhaven.ts)
+    pos: { ...GULLHAVEN_NPC_PLACEMENTS_BY_ID.mender_saul.position },
+    facing: GULLHAVEN_NPC_PLACEMENTS_BY_ID.mender_saul.facing,
     color: 0x9a3b3b,
     questIds: ['q_fs_moss_and_mending'],
     greeting:
@@ -588,9 +594,11 @@ export const FARSHORE_OBJECTS: GroundObjectDef[] = [
     name: 'Coastal Watchbell',
     // Bellkeeper Tam's three coastal watchbells (q_fs_the_three_bells): the
     // Landing point, the south strand below Gullhaven, the Riftfields shore.
+    // The south-strand bell stood at (318, 94) until the painted muster inn
+    // took that ground; it hangs on the strand behind the inn now.
     positions: [
       { x: 256, z: 0 },
-      { x: 318, z: 94 },
+      { x: 320, z: 106 },
       { x: 442, z: 64 },
     ],
   },
@@ -638,14 +646,10 @@ export const FARSHORE_ESCORTS: Record<string, EscortDef> = {
 export const FARSHORE_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Gullhaven, the redoubt: a fishing town turned to holding a line. The
-  // homes still stand, but a war camp crowds the market and the fences have
-  // become a barricade ring.
-  buildings: [
-    { kind: 'inn', x: 298, z: 64, w: 6, d: 7, rot: 0.5 }, // the muster hall
-    { kind: 'house', x: 312, z: 78, w: 5, d: 5, rot: -1.1 },
-    { kind: 'house', x: 296, z: 78, w: 5, d: 5, rot: 2.1 },
-    { kind: 'chapel', x: 316, z: 62, w: 5, d: 7, rot: -2.4 }, // the menders' hall
-  ],
+  // muster inn, the menders' hall and the watch house stand round the square
+  // (the painted rebuild, sim/painted_towns/gullhaven.ts), a war camp crowds
+  // the market and the fences have become a barricade ring.
+  buildings: [...paintedTownBuildingDefs(GULLHAVEN_LAYOUT)],
   wells: [{ x: 305, z: 71, r: 1.5 }],
   stalls: [
     { x: 310, z: 68, rot: 0.6, r: 1.6 }, // the quartermaster's arming table
@@ -664,10 +668,13 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   ],
   // the barricade ring: the town's old windward fences, doubled and closed
   // into a defensive line around the muster
+  // (the south-west run is cut short of the menders' hall's bell tower, and
+  // the north run, where the muster inn stands now, closes the gap north of
+  // Gullhaven Rest between the inn's end and the coastal bank)
   fences: [
     { x1: 288, z1: 56, x2: 308, z2: 54 },
-    { x1: 314, z1: 56, x2: 322, z2: 64 },
-    { x1: 292, z1: 86, x2: 312, z2: 88 },
+    { x1: 314, z1: 56, x2: 318.6, z2: 60.6 },
+    { x1: 285.5, z1: 92, x2: 295.5, z2: 92.5 },
     { x1: 284, z1: 66, x2: 286, z2: 78 },
   ],
   // the war camp: tents crowd the market where the fish stalls used to stand

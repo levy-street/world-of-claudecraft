@@ -526,6 +526,44 @@ describe('map semantic accessibility core', () => {
     expect(core().updateOverworld(withoutPatch, 'Eastbrook Vale', 560)).not.toContain('Garden');
   });
 
+  it('reads an authored named area by its maker-typed label, a zone POI by its catalog key', () => {
+    const model = {
+      view: {},
+      cursor: 'default',
+      questAreas: [],
+      npcs: [],
+      gatherNodes: [],
+      stations: [],
+      services: [],
+      farmPatches: [],
+      navigation: [],
+      player: { mx: 280, my: 280, angle: 0 },
+      allies: [],
+      party: [],
+      portals: [],
+      pois: [
+        // An authored `locations` rect (map_window_view.ts): poiIndex -1, its
+        // name inline. The positional resolver would read "harbor_city/-1".
+        {
+          mx: 280,
+          my: 200,
+          labelMy: 200,
+          zoneId: 'harbor_city',
+          poiIndex: -1,
+          label: 'Lantern Square',
+          weight: 80,
+        },
+        // A shipped zone POI still resolves through names.poi.
+        { mx: 360, my: 280, labelMy: 280, zoneId: 'eastbrook_vale', poiIndex: 2, weight: 64 },
+      ],
+    } as unknown as MapPaintResult;
+
+    const prose = core().updateOverworld(model, 'Harbor City', 560);
+    expect(prose).toContain('Lantern Square');
+    expect(prose).not.toContain('harbor_city/-1');
+    expect(prose).toContain('POI eastbrook_vale/2');
+  });
+
   it('rebuilds cached prose when only the loaded language changes', () => {
     const view = core();
     const model = crowdedOverworldModel();

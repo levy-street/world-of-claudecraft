@@ -22,6 +22,7 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   town_eastbrook: '/audio/music/town_eastbrook.mp3?v=251c46caf6ce',
   town_fenbridge: '/audio/music/town_fenbridge.mp3?v=1a94215a28f8',
   town_highwatch: '/audio/music/town_highwatch.mp3?v=8daa06e91073',
+  town_goldcrest: '/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5',
   vale: '/audio/music/vale.mp3?v=d40a82892e1e',
   // The legacy vale cue has no dedicated remaster and is not routed by
   // musicZoneForLocation; the vale remaster stands in for completeness.
@@ -67,11 +68,40 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   rift_tide: '/audio/music/dungeon_sunken_bastion.mp3?v=db67d7df0f4b',
 };
 
+/** Zones that ship MORE than one remaster. Goldcrest Harbor has two harbor
+ *  cues, so the capital picks one each time you walk in rather than wearing a
+ *  single loop out over a long session. A zone absent here plays its single
+ *  ZONE_STREAM_URLS entry, which stays the common case. */
+export const ZONE_STREAM_POOLS: Partial<Record<MusicZone, readonly string[]>> = {
+  town_goldcrest: [
+    '/audio/music/town_goldcrest_1.mp3?v=0cf44456d0f5',
+    '/audio/music/town_goldcrest_2.mp3?v=c616612609d6',
+  ],
+};
+
+/** Every remaster a zone can play, in pick order: its pool when it has one,
+ *  else its single stream, else empty (a streamless zone like vale_cup). */
+export function zoneStreamUrls(zone: MusicZone): readonly string[] {
+  const pool = ZONE_STREAM_POOLS[zone];
+  if (pool) return pool;
+  const url = ZONE_STREAM_URLS[zone];
+  return url ? [url] : [];
+}
+
 /** The remastered battle themes; each fight opens on one chosen at random. */
 export const COMBAT_STREAM_URLS: string[] = [
   '/audio/music/combat_1.mp3?v=c2587cdfa73a',
   '/audio/music/combat_2.mp3?v=36f7fc946e3a',
 ];
+
+/** Pick which track opens the next fight, or which cue a multi-track zone
+ *  greets you with: uniform over the pool. The two uses want identical
+ *  behaviour, so `pickCombatTrackIndex` is retained as the combat-side name. */
+export function pickStreamTrackIndex(trackCount: number, rand: () => number): number {
+  if (trackCount <= 0) return 0;
+  const idx = Math.floor(rand() * trackCount);
+  return Math.min(trackCount - 1, Math.max(0, idx));
+}
 
 /** Pick which battle theme opens the next fight: uniform over the catalog.
  *  rand is injected (Math.random at the call site) so tests can drive it;

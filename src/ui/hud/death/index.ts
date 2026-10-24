@@ -4,3 +4,4 @@ export {
   type DeathPromptView,
   updateDeathPromptView,
 } from './death_prompt_view';
+export { PvpResurrectPrompt } from './pvp_resurrect_painter';

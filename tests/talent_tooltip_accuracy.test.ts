@@ -17,7 +17,7 @@ import {
   STANCE_MASTERY_GUARDED_HP_PCT,
 } from '../src/sim/types';
 import { tEntity } from '../src/ui/entity_i18n';
-import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
+import { ensureLocaleLoaded, formatNumber, setLanguage, supportedLanguages } from '../src/ui/i18n';
 import { grantAbilityValues, tTalent } from '../src/ui/talent_i18n';
 
 // English row prose is authored alongside the canonical effect; localized tooltips are
@@ -163,6 +163,55 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     expect(mastery).toContain('auto-attacks are 5% faster');
     expect(mastery).toContain('at least 20%');
   });
+
+  it.each(supportedLanguages)(
+    'renders Mass Barrier base absorb in the real talent description (%s)',
+    async (lang) => {
+      const choice = CHOICE_ROWS.mage.rows
+        .flatMap((row) => [...row.options])
+        .find((option) => option.id === 'mag_r17_mass_barrier');
+      if (!choice) throw new Error('missing mag_r17_mass_barrier');
+
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      try {
+        const rendered = tTalent({ kind: 'talentChoice', choice, field: 'description' });
+        // Talent planning previews use the authored base, not a character's gear or mastery.
+        expect(rendered).toContain(formatNumber(250));
+        expect(rendered).toContain(formatNumber(15));
+        expect(rendered).not.toMatch(/\$[A-Za-z0-9_]+|\{[A-Za-z0-9_]+\}/);
+        if (lang === 'en') expect(rendered).toContain('each absorbing 250 damage for 15 sec');
+      } finally {
+        setLanguage('en');
+      }
+    },
+  );
+
+  it.each(supportedLanguages)(
+    'preserves single-target shield description amounts (%s)',
+    async (lang) => {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      try {
+        for (const [id, amount] of [
+          ['power_word_shield', 48],
+          ['ice_barrier', 50],
+          ['temporal_barrier', 55],
+        ] as const) {
+          const rendered = tEntity({
+            kind: 'ability',
+            id,
+            field: 'description',
+            values: grantAbilityValues(id),
+          });
+          expect(rendered, id).toContain(formatNumber(amount));
+          expect(rendered, id).not.toMatch(/\$[A-Za-z0-9_]+|\{[A-Za-z0-9_]+\}/);
+        }
+      } finally {
+        setLanguage('en');
+      }
+    },
+  );
 
   it('renders Warded source-health scaling in non-English tooltips', async () => {
     const warded = CHOICE_ROWS.mage.rows
@@ -313,6 +362,7 @@ const PCT_FIELDS = new Set([
   'focusGenerationPct',
   'damageReductionPct',
   'fallbackDamageReductionPct',
+  'noPetDamagePct',
   'petHealPct',
   'cooldownRefundPct',
   'petHealthFloorPct',
@@ -814,7 +864,7 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(render('warrior', 'war_row_bloodbath')).toContain('25%');
     const survival = render('hunter', 'survival.mastery');
     expect(survival).toContain('Agility');
-    expect(survival).toContain('15%');
+    expect(survival).toContain('20%');
     // Balance pass: Quickblood is the evasive-skirmisher mastery now.
     expect(survival).toContain('dodge chance by 4%');
   });

@@ -405,6 +405,7 @@ function measure(
           extrapolated: timeline.extrapolated,
           discardedLate: timeline.discardedLate,
           resyncs: timeline.resyncs,
+          playoutGrowths: timeline.playoutGrowths,
         }
       : null;
     const run = harness.runScript(resolved);
@@ -498,6 +499,7 @@ function measureBackpressureRecovery(): BackpressureRecoveryCell {
       extrapolated: timeline.extrapolated,
       discardedLate: timeline.discardedLate,
       resyncs: timeline.resyncs,
+      playoutGrowths: timeline.playoutGrowths,
     };
     const slowDrainActions = Array.from(
       { length: BACKPRESSURE_LATENCY_RAMP_END_MS / BACKPRESSURE_LATENCY_STEP_INTERVAL_MS },
@@ -1470,6 +1472,7 @@ describe('movement latency baseline', () => {
     expect(after.extrapolated - before.extrapolated).toBeGreaterThan(0);
     expect(after.discardedLate - before.discardedLate).toBeGreaterThan(0);
     expect(after.resyncs - before.resyncs).toBe(0);
+    expect(after.playoutGrowths - before.playoutGrowths).toBe(0);
   });
 
   it('sheds a slow uplink, resyncs, and returns to strict movement feel', () => {

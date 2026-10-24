@@ -3,6 +3,7 @@
 // the wall against ogres, waking elementals, and the open chanting of the
 // Broodsworn at the Gravewyrm Sanctum gates.
 
+import { HIGHWATCH_LAYOUT, HIGHWATCH_NPC_PLACEMENTS_BY_ID } from '../highwatch_layout';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
@@ -17,7 +18,7 @@ import type {
 import { FERAL, HUNTER_ONLY } from './items';
 import { MOUNT_RACE_COURSE, STABLE_HORSE_TEMPLATE_ID, STABLE_PADDOCK } from './mounts';
 import { PRACTICE_ROW_CAMPFIRE } from './practice_dummies';
-import { HONOR_QUARTERMASTER_STOCK } from './pvp_honor';
+import { HONOR_VENDOR_STOCK } from './pvp_honor';
 
 export const ZONE3_ZONE: ZoneDef = {
   id: 'thornpeak_heights',
@@ -59,11 +60,9 @@ export const ZONE3_ROADS: { x: number; z: number }[][] = [
     { x: -60, z: 700 },
     { x: -110, z: 735 },
   ], // -> ogre war-camp
-  [
-    { x: 6, z: 668 },
-    { x: 70, z: 720 },
-    { x: 110, z: 760 },
-  ], // -> Stormcrag
+  // -> Stormcrag: leaves the square's north-west corner and runs between the
+  // inn and the smithy's terrace (sim/highwatch_layout.ts roads.stormcrag)
+  HIGHWATCH_LAYOUT.roads.stormcrag.map((point) => ({ ...point })),
   [
     { x: 0, z: 676 },
     { x: 0, z: 780 },
@@ -1184,8 +1183,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'brother_aldric_highwatch',
     name: 'Brother Aldric',
     title: 'Priest of the Vale',
-    pos: { x: -10, z: 656 },
-    facing: 0.8,
+    // at the gate chapel's door (sim/highwatch_layout.ts)
+    pos: { ...HIGHWATCH_NPC_PLACEMENTS_BY_ID.brother_aldric_highwatch.position },
+    facing: HIGHWATCH_NPC_PLACEMENTS_BY_ID.brother_aldric_highwatch.facing,
     color: 0xf7f9f9,
     questIds: [
       'q_zealots',
@@ -1354,7 +1354,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: 2.26, // atan2(dx, dz) toward the square at (0, 660)
     color: 0x7d2f3f, // deep war-crimson steel, off every tint the visual manifest reserves
     questIds: [],
-    vendorItems: [...HONOR_QUARTERMASTER_STOCK],
+    vendorItems: [...HONOR_VENDOR_STOCK],
     dynamic: true,
     warfareVendor: true,
     greeting:
@@ -1364,8 +1364,8 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'loremaster_caddis',
     name: 'Loremaster Caddis',
     title: 'Loremaster',
-    pos: { x: 12, z: 655 },
-    facing: -1.2,
+    pos: { ...HIGHWATCH_NPC_PLACEMENTS_BY_ID.loremaster_caddis.position },
+    facing: HIGHWATCH_NPC_PLACEMENTS_BY_ID.loremaster_caddis.facing,
     color: 0x3b6ea5,
     questIds: ['q_kobold_tunnels', 'q_elementals', 'q_shard_cores', 'q_kazzix'],
     greeting:
@@ -1378,8 +1378,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'auctioneer_voss',
     name: 'Auctioneer Voss',
     title: 'Keeper of the World Market',
-    pos: { x: 16, z: 666 },
-    facing: -2.2,
+    // at the counting house's market counter
+    pos: { ...HIGHWATCH_NPC_PLACEMENTS_BY_ID.auctioneer_voss.position },
+    facing: HIGHWATCH_NPC_PLACEMENTS_BY_ID.auctioneer_voss.facing,
     color: 0x8e5ad6,
     questIds: [],
     market: true,
@@ -1390,8 +1391,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     id: 'bursar_aldous_crane',
     name: 'Bursar Aldous Crane',
     title: 'The Gilded Strongbox',
-    pos: { x: -12, z: 663 },
-    facing: Math.PI / 2,
+    // at the counting house's door
+    pos: { ...HIGHWATCH_NPC_PLACEMENTS_BY_ID.bursar_aldous_crane.position },
+    facing: HIGHWATCH_NPC_PLACEMENTS_BY_ID.bursar_aldous_crane.facing,
     color: 0xc9a227,
     questIds: [],
     banker: true,
@@ -1413,7 +1415,10 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     // Marla sells Riding Training (the 80g skill purchase, a service entry that
     // delegates to learnRiding) and the Valorsteed reins for riders who have
     // learned. The riding-skill gate (ridingTrained) is enforced in buyItem
-    // (items.ts).
+    // (items.ts). She sells NO buddy whistle (2026-09-04 owner call): the
+    // stables are a mount counter, and every common companion is a drop now
+    // (loot/global_drops.ts rolls the whole common tier at 1.5% a kill). The
+    // three currency companions still have their own vendors in Highwatch.
     vendorItems: ['riding_training', 'reins_valorsteed'],
     greeting:
       'Every rider walks in on two legs, $C. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and the Galecrest wind shows no mercy to a bad seat.',
@@ -1848,7 +1853,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     ],
     xpReward: 4300,
     copperReward: 2200,
-    itemRewards: {},
+    itemRewards: { warrior: 'barrowfield_tower_shield' },
     minLevel: 18,
   },
   q_revenant_vanguard: {
@@ -2336,21 +2341,27 @@ export const ZONE3_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'gravewyrm_sigil',
     name: 'Gravewyrm Sigil',
+    // Laid around the Smith's Seal Gate (src/sim/sanctum_seal_gate.ts): three
+    // moved into the gate plaza when the gate's pylons and tunnel were built
+    // over their old spots (-3, 857), (3, 861) and (8, 866).
     positions: [
       { x: -8, z: 852 },
-      { x: -3, z: 857 },
-      { x: 3, z: 861 },
-      { x: 8, z: 866 },
+      { x: -4.5, z: 855 },
+      { x: 3, z: 854 },
+      { x: 8.8, z: 846 },
     ],
   },
   {
     itemId: 'sanctum_key_shard',
     name: 'Sanctum Key Shard',
+    // "Scattered in the gate plaza": the forecourt in front of the Seal Gate,
+    // moved there from (-6, 872), (-2, 876), (2, 873) and (6, 878), which now
+    // lie inside the gate tunnel (src/sim/sanctum_seal_gate.ts).
     positions: [
-      { x: -6, z: 872 },
-      { x: -2, z: 876 },
-      { x: 2, z: 873 },
-      { x: 6, z: 878 },
+      { x: -6.5, z: 846.5 },
+      { x: -2.8, z: 849 },
+      { x: 2.8, z: 843.5 },
+      { x: 6.8, z: 851.5 },
     ],
   },
   {
@@ -4414,11 +4425,18 @@ export const NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS: readonly string[] = [];
 
 export const ZONE3_PROPS: ZonePropsDef = {
   buildings: [
-    { kind: 'house', x: 14, z: 671, w: 7, d: 6, rot: -0.5 },
-    { kind: 'house', x: 8, z: 650, w: 6, d: 5, rot: 0.4 },
-    { kind: 'house', x: 18, z: 660, w: 6, d: 5, rot: 1.2 },
-    { kind: 'inn', x: -15, z: 666, w: 6, d: 7, rot: 0.6 },
-    { kind: 'chapel', x: -16, z: 650, w: 5, d: 7, rot: 0.9 },
+    // Highwatch's painted rebuild (sim/highwatch_layout.ts)
+    ...HIGHWATCH_LAYOUT.buildings.map((building) => ({
+      id: building.id,
+      assetId: building.assetId,
+      kind: building.kind,
+      x: building.position.x,
+      z: building.position.z,
+      w: building.nativeDimensions.width,
+      d: building.nativeDimensions.depth,
+      rot: building.rotation,
+      height: building.nativeDimensions.height,
+    })),
     // The Galecrest Stables barn (Stablemaster Marla): in the open notch
     // beside the narrower north pasture. 'inn' kind for a barn footprint.
     { kind: 'inn', x: 352, z: 598, w: 10, d: 8, rot: 2.7 },

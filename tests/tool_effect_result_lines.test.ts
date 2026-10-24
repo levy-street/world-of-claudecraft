@@ -13,8 +13,17 @@
 // plus the professionsWindow stub the repaint hook needs.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import type { SimEvent } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
+import { contactAtOnce } from './helpers/renderer_contact';
 
 const PLAYER_ID = 7;
 
@@ -25,7 +34,11 @@ interface ToolEffectLineHarness {
     craftSkills: Record<string, number>;
     gatheringProficiency: Record<string, number>;
   };
-  renderer: { handleEvent: ReturnType<typeof vi.fn> };
+  renderer: {
+    handleEvent: ReturnType<typeof vi.fn>;
+    // the event sound waits for a swing's blade contact (contact_queue.ts); none here
+    atContact: typeof contactAtOnce;
+  };
   playEventSfx: ReturnType<typeof vi.fn>;
   meters: { onEvent: ReturnType<typeof vi.fn> };
   isNythraxisEvent: ReturnType<typeof vi.fn>;
@@ -54,7 +67,7 @@ function makeHud(): ToolEffectLineHarness {
     craftSkills: {},
     gatheringProficiency: {},
   };
-  hud.renderer = { handleEvent: vi.fn() };
+  hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };
   hud.isNythraxisEvent = vi.fn(() => false);

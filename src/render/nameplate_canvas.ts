@@ -1,5 +1,6 @@
 import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
+import * as cooldownRow from './nameplate_cooldown_row';
 import {
   drawNameplateDotRow,
   NAMEPLATE_DOT_TIME_STYLE,
@@ -18,6 +19,7 @@ import {
   type NameplateHeraldryInput,
   nameplateHeraldryInto,
   nameplateHeraldryLift,
+  nameplateSubRowsLift,
 } from './nameplate_heraldry_core';
 import {
   NAMEPLATE_IMAGE_CACHE_LIMIT,
@@ -38,10 +40,35 @@ import {
   roundedRect,
 } from './nameplate_paint_primitives';
 import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
+import { bountyFill, nameplateGuildFill, nameplateNameFill } from './nameplate_tag_fill_core';
+import {
+  drawOverheadChevron,
+  drawTargetEdgeArrow,
+  drawTargetPlateFrame,
+  scalePlateAboutAnchor,
+  TARGET_OVERLAY_ARROW,
+  TARGET_OVERLAY_CHEVRON,
+  type TargetOverlay,
+} from './nameplate_target_highlight';
+import {
+  AI_STYLE,
+  CAST_STYLE,
+  CHEATER_STYLE,
+  configureNameplateTextStyle,
+  EMOTE_STYLE,
+  GUILD_STYLE,
+  LEVEL_STYLE,
+  MARKER_STYLE,
+  NAME_STYLE,
+  TARGET_GUILD_STYLE,
+  TARGET_NAME_STYLE,
+  TITLE_STYLE,
+} from './nameplate_text_styles';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
 export type { NameplateMarkerTone } from './nameplate_markers';
 export type { NameplateBadge } from './nameplate_paint_primitives';
+export { GUILD_TIER_FILLS } from './nameplate_tag_fill_core'; // with the other tag fills
 
 export interface NameplateCanvasState {
   initialized: boolean;
@@ -76,19 +103,26 @@ export interface NameplateCanvasState {
   myPet: boolean;
   friendlyPet: boolean;
   threat: boolean;
+  /** Style of Enemy Highlight cues on this (hostile, targeted) plate: drawn 1.25x
+   *  inside a gold frame, and with a chevron above it (target_highlight_core.ts). */
+  emphasis: boolean;
+  overheadMarker: boolean;
   opacity: number;
   frame: NameplateFrame;
   comboPips: number;
-  /** The local player's OWN debuffs on this entity (nameplateDotsInto), an icon
-   *  row between the name row and the health bar while showNameplateDots is on.
-   *  One plan PER PLATE, never a shared scratch: a recycled slot's artwork is
-   *  invalidated here, which only works when the plan belongs to one entity; the
-   *  slots keep their high-water capacity. Actionable timers: no tier sheds them. */
+  /** The local player's OWN debuffs on this entity (nameplateDotsInto), an icon row between
+   *  the name row and the health bar while showNameplateDots is on. One plan PER PLATE, never
+   *  a shared scratch: a recycled slot's artwork is invalidated here, which only works when the
+   *  plan belongs to one entity. Actionable timers: no tier sheds them. */
   dots: NameplateDotsPlan;
+  /** A hostile player's tracked cooldowns (nameplate_cooldowns_core), the row ABOVE the name. */
+  cooldowns: cooldownRow.NameplateCooldownsPlan;
   aiLabel: string;
   /** The /pvp flag the name row was built with: the painter re-resolves the row
    *  the frame the live flag differs, so the `<PvP>` tag never waits on the tier cadence. */
   pvpFlag: boolean;
+  /** World PvP bounty: the whole tag paints blood red. Read every pass, like `hostile`. */
+  bounty: boolean;
   /** The operator-applied Cheater tag, already localized AND already wrapped in
    *  its `< >` form by the painter's resolveContent (its only writer, the
    *  guildLabel precedent), '' for everyone else. An inline chip in the name row
@@ -129,12 +163,16 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     myPet: false,
     friendlyPet: false,
     threat: false,
+    emphasis: false,
+    overheadMarker: false,
     opacity: 1,
     frame: '',
     comboPips: 0,
     dots: newNameplateDotsPlan(),
+    cooldowns: cooldownRow.newNameplateCooldownsPlan(),
     aiLabel: '',
     pvpFlag: false,
+    bounty: false,
     cheaterLabel: '',
     devOutline: null,
     badges: [],
@@ -145,104 +183,19 @@ export function createNameplateCanvasState(): NameplateCanvasState {
 }
 
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
-// The surface's own defensive clamp on the backing-store ratio it is handed. The
-// POLICY lives in the pure knob module under src/game (nameplatePixelRatio) and
-// is applied by nameplate_painter.ts; this file imports nothing from there, as
-// the deed-accent fairness guard (tests/deed_border_accent.test.ts) requires every
-// plate-drawing module to be free of knob and governor reads. Bounds pinned equal
-// in tests/nameplate_paint_gate.test.ts.
+// The surface's own defensive clamp on the backing-store ratio it is handed. The POLICY
+// lives in the pure knob module under src/game (nameplatePixelRatio) and is applied by
+// nameplate_painter.ts; this file imports nothing from there, as the deed-accent fairness
+// guard (tests/deed_border_accent.test.ts) requires every plate-drawing module to be free
+// of knob and governor reads. Bounds pinned equal in tests/nameplate_paint_gate.test.ts.
 export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
 export const NAMEPLATE_MIN_PIXEL_RATIO = 1;
-// Nameplate labels scale their backing stores with DPR. The count remains a
-// secondary guard, while the 16 MiB RGBA budget is the hard memory ceiling.
-// At DPR 2 a representative 126x43 logical label retains about 85 KiB, so the
-// byte budget holds roughly 190 such labels rather than the old 129 MiB worst
-// case from a 1536-entry count alone.
+// Nameplate labels scale their backing stores with DPR. The count remains a secondary
+// guard, while the 16 MiB RGBA budget is the hard memory ceiling. At DPR 2 a representative
+// 126x43 logical label retains about 85 KiB, so the byte budget holds roughly 190 such
+// labels rather than the old 129 MiB worst case from a 1536-entry count alone.
 export const NAMEPLATE_TEXT_SPRITE_LIMIT = 512;
 export const NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES = 16 * 1024 * 1024;
-
-const TITLE_FONT = 'Cinzel, Georgia, serif';
-const NAME_STYLE: TextSpriteStyle = {
-  font: `700 12px ${TITLE_FONT}`,
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 3,
-};
-const TARGET_NAME_STYLE: TextSpriteStyle = {
-  font: `700 14px ${TITLE_FONT}`,
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 3,
-};
-const LEVEL_STYLE: TextSpriteStyle = {
-  font: `700 19px ${TITLE_FONT}`,
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 3,
-};
-const AI_STYLE: TextSpriteStyle = {
-  font: `700 11px ${TITLE_FONT}`,
-  fill: '#7de9c3',
-  stroke: '#000',
-  lineWidth: 2,
-};
-// The operator-applied Cheater tag. Same weight and size as the AI chip it sits
-// beside so the row's metrics do not change shape, but a hot red rather than the
-// AI mint: the two are both operator-set flair and must never read as the same
-// thing. Deliberately NOT the hostile-name red (#ff5555), which the same row
-// already spends on "this unit will attack you"; the sanction is louder.
-const CHEATER_STYLE: TextSpriteStyle = {
-  font: `700 11px ${TITLE_FONT}`,
-  fill: '#ff6b6b',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const TITLE_STYLE: TextSpriteStyle = {
-  font: `italic 10px ${TITLE_FONT}`,
-  fill: '#ffe9a0',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const GUILD_STYLE: TextSpriteStyle = {
-  font: `700 11px ${TITLE_FONT}`,
-  fill: '#c9dcfb',
-  stroke: '#000',
-  lineWidth: 2,
-};
-/** Guild colour tiers (sim/guild_tier.ts): the guild line's fill by the
- *  guild's collective lifetime XP. Index IS the tier; 0 keeps the classic
- *  fill every fresh guild has always had. Cosmetic only. */
-export const GUILD_TIER_FILLS: readonly string[] = [
-  '#c9dcfb', // 0: the classic guild blue
-  '#9fe8a8', // 1: spring green, a few actives
-  '#5fd3e8', // 2: cyan, an established roster
-  '#e8b45f', // 3: amber, a serious guild
-  '#ffcf40', // 4: gold, the realm's elite
-];
-const TARGET_GUILD_STYLE: TextSpriteStyle = {
-  font: `700 13px ${TITLE_FONT}`,
-  fill: '#c9dcfb',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const MARKER_STYLE: TextSpriteStyle = {
-  font: `700 24px ${TITLE_FONT}`,
-  fill: '#f2c84b',
-  stroke: '#000',
-  lineWidth: 2,
-};
-const CAST_STYLE: TextSpriteStyle = {
-  font: '700 9px Arial, sans-serif',
-  fill: '#fff',
-  stroke: '#000',
-  lineWidth: 1,
-};
-const EMOTE_STYLE: TextSpriteStyle = {
-  font: `800 11px ${TITLE_FONT}`,
-  fill: '#ffe9a3',
-  stroke: '#000',
-  lineWidth: 1,
-};
 
 // Pen sizes for the world-scale forged seal; geometry lives in the pure heraldry core.
 const HERALDRY_EDGE_WIDTH = 2;
@@ -287,10 +240,9 @@ export class NameplateCanvasSurface {
   private width = 0;
   private height = 0;
   private layerHidden = false;
-  // Bumped by anything that changes how an UNCHANGED plate would be drawn: a
-  // late web-font load (which clears the sprite cache) and a forced-colors flip
-  // (which repaints every fill and stroke through the system palette). The
-  // repaint gate folds it in, so those two never leave a stale surface up.
+  // Bumped by anything that changes how an UNCHANGED plate would be drawn: a late web-font
+  // load (which clears the sprite cache) and a forced-colors flip (which repaints every fill and
+  // stroke through the system palette). The repaint gate folds it in, so neither goes stale.
   private styleRev = 0;
   private readonly heraldry = createNameplateHeraldry();
   private readonly heraldryInput: NameplateHeraldryInput = {
@@ -391,6 +343,7 @@ export class NameplateCanvasSurface {
     const ctx = this.ctx;
     ctx.save();
     ctx.globalAlpha = state.opacity;
+    if (state.emphasis) scalePlateAboutAnchor(ctx, screenX, screenY);
     let y = screenY;
 
     if (state.castVisible) {
@@ -401,16 +354,16 @@ export class NameplateCanvasSurface {
       y -= 7;
       this.drawHealth(state, screenX, y);
     }
-    // Your own dots sit BETWEEN the health bar and the name row (the classic
-    // nameplate-tracker placement): the health bar stays the lowest thing the eye
-    // tracks and the cast bar keeps its anchor, while the plate grows upward.
-    // drawEmote below mirrors this exact step, or the emote bubble drifts.
+    // Your own dots sit BETWEEN the health bar and the name row (the classic nameplate-tracker
+    // placement): the health bar stays the lowest thing the eye tracks and the cast bar keeps
+    // its anchor, while the plate grows upward. drawEmote mirrors this step (and the enemy
+    // cooldown row above the name), or the emote bubble drifts.
     if (state.dots.count > 0) {
       y -= nameplateDotRowHeight(state.dots.count, state.dots.scale);
       this.drawDots(state, screenX, y);
     }
     if (state.guild) {
-      y -= state.currentTarget ? 14 : 12;
+      y -= nameplateSubRowsLift(true, state.currentTarget, false);
       const guildStyle = state.currentTarget ? this.targetGuildStyle : this.guildStyle;
       // The `<guild>` wrapper is prebuilt by resolveContent (guild's only
       // writer): this runs per plate per frame, and an unconditional template
@@ -421,7 +374,7 @@ export class NameplateCanvasSurface {
         state.guildLabel,
         screenX,
         y + (state.currentTarget ? 11 : 10),
-        this.configureTextStyle(guildStyle, GUILD_TIER_FILLS[state.guildTier] ?? GUILD_STYLE.fill),
+        this.configureTextStyle(guildStyle, nameplateGuildFill(state.bounty, state.guildTier)),
       );
     }
     if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
@@ -429,6 +382,10 @@ export class NameplateCanvasSurface {
 
     const rowHeight = this.drawNameRow(state, screenX, y);
     y -= rowHeight;
+    const frameWidth = Math.max(NAMEPLATE_BASE_WIDTH, this.heraldryInput.nameRowWidth);
+    if (state.emphasis)
+      drawTargetPlateFrame(ctx, screenX, y, screenY, frameWidth, this.forcedColorsActive());
+    y -= cooldownRow.drawNameplateCooldownRow(ctx, state.cooldowns, screenX, y, this.dotRowHost);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.marker) {
       if (state.markerTone === 'loot' || state.markerTone === 'harvest') {
@@ -450,11 +407,10 @@ export class NameplateCanvasSurface {
         const dimmed = state.markerTone === 'cooldown';
         if (dimmed) ctx.globalAlpha = state.opacity * 0.55;
         this.text.draw(ctx, state.marker, screenX, y + 21, style);
-        // Forced colors collapses gold and blue to one CanvasText, so the two
-        // offers would read identically (the failure class the DOM plates'
-        // forced-colors rule closed). Underline the repeat mark as the
-        // redundant non-color cue, dotted for the cooldown mark so the dimmed
-        // not-yet state stays distinguishable too.
+        // Forced colors collapses gold and blue to one CanvasText, so the two offers would
+        // read identically (the failure class the DOM plates' forced-colors rule closed).
+        // Underline the repeat mark as the redundant non-color cue, dotted for the cooldown
+        // mark so the dimmed not-yet state stays distinguishable too.
         if (
           this.forcedColorsActive() &&
           (state.markerTone === 'repeat' || state.markerTone === 'cooldown')
@@ -480,7 +436,21 @@ export class NameplateCanvasSurface {
       y -= 31;
       this.drawImage(state.raidMarkerUrl, screenX - 15, y, 30, false);
     }
+    // Sits in the empty marker row unless something already fills the stack top.
+    const stackTop = state.marker || state.comboPips > 0 || state.raidMarkerUrl;
+    if (state.overheadMarker)
+      drawOverheadChevron(ctx, screenX, stackTop ? y - 3 : y + 20, this.forcedColorsActive());
     ctx.restore();
+  }
+
+  /** The target cue drawn outside any plate: the lone overhead chevron or the
+   *  screen-edge arrow (nameplate_target_highlight.ts). */
+  drawTargetOverlay(overlay: TargetOverlay): void {
+    if (overlay.kind === TARGET_OVERLAY_CHEVRON) {
+      drawOverheadChevron(this.ctx, overlay.x, overlay.y, this.forcedColorsActive());
+    } else if (overlay.kind === TARGET_OVERLAY_ARROW) {
+      drawTargetEdgeArrow(this.ctx, overlay, this.forcedColorsActive());
+    }
   }
 
   drawEmote(state: NameplateCanvasState, screenX: number, screenY: number): void {
@@ -490,10 +460,10 @@ export class NameplateCanvasSurface {
     if (state.hpVisible) y -= 7;
     // Mirrors drawBase's dot row exactly (same core, same count).
     if (state.dots.count > 0) y -= nameplateDotRowHeight(state.dots.count, state.dots.scale);
-    if (state.guild) y -= state.currentTarget ? 14 : 12;
-    if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
+    y -= nameplateSubRowsLift(!!state.guild, state.currentTarget, !!state.title);
     y -= this.heraldryLift(state);
     y -= this.nameRowHeight(state);
+    y -= cooldownRow.nameplateCooldownRowHeight(state.cooldowns);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.comboPips > 0) y -= 9;
     if (state.raidMarkerUrl) y -= 31;
@@ -506,6 +476,7 @@ export class NameplateCanvasSurface {
     const ctx = this.ctx;
     ctx.save();
     ctx.globalAlpha = state.opacity;
+    if (state.emphasis) scalePlateAboutAnchor(ctx, screenX, screenY);
     ctx.shadowColor = this.forcedColorsActive() ? 'transparent' : '#ffd65a66';
     ctx.shadowBlur = this.forcedColorsActive() ? 0 : 12;
     roundedRect(ctx, x, y, width, 42, 21);
@@ -551,12 +522,14 @@ export class NameplateCanvasSurface {
   private drawNameRow(state: NameplateCanvasState, screenX: number, bottomY: number): number {
     const rowHeight = this.nameRowHeight(state);
     const nameStyle = state.currentTarget ? this.targetNameStyle : this.nameStyle;
-    const nameColor = state.deadEnemy ? '#bbb' : state.hostile ? '#ff5555' : state.nameColor;
-    this.configureTextStyle(nameStyle, nameColor);
-    this.configureTextStyle(this.levelStyle, state.levelColor);
+    this.configureTextStyle(nameStyle, nameplateNameFill(state));
+    this.configureTextStyle(this.levelStyle, bountyFill(state.bounty, state.levelColor));
     this.configureTextStyle(this.aiStyle, AI_STYLE.fill);
     this.configureTextStyle(this.cheaterStyle, CHEATER_STYLE.fill);
-    const titleStyle = this.configureTextStyle(this.titleStyle, TITLE_STYLE.fill);
+    const titleStyle = this.configureTextStyle(
+      this.titleStyle,
+      bountyFill(state.bounty, TITLE_STYLE.fill),
+    );
     const nameWidth = this.text.measureAdvance(state.name, nameStyle);
     const levelWidth = state.level ? this.text.measureAdvance(state.level, this.levelStyle) + 6 : 0;
     const aiWidth = state.aiLabel ? this.text.measureAdvance(state.aiLabel, this.aiStyle) + 3 : 0;
@@ -815,9 +788,7 @@ export class NameplateCanvasSurface {
   }
 
   private configureTextStyle(style: TextSpriteStyle, fill: string): TextSpriteStyle {
-    style.fill = this.forcedColorsActive() ? 'CanvasText' : fill;
-    style.stroke = this.forcedColorsActive() ? 'Canvas' : '#000';
-    return style;
+    return configureNameplateTextStyle(style, fill, this.forcedColorsActive());
   }
 
   private forcedColorsActive(): boolean {

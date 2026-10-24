@@ -7,6 +7,7 @@ import {
   type SavedLoadout,
   type TalentAllocation,
 } from './content/talents';
+import { cloneGearSet } from './loadout_gear';
 import type { CharacterState } from './sim';
 import { repairTalentLoadouts } from './talent_loadouts';
 import { MAX_LEVEL, type PlayerClass } from './types';
@@ -124,6 +125,7 @@ function migrateLoadouts(
         name: loadout.name,
         alloc,
         bar: migrateLoadoutBar(cls, level, alloc, loadout.bar),
+        ...(loadout.gear ? { gear: cloneGearSet(loadout.gear) } : {}),
       };
     }),
   };

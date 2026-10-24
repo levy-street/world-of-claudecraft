@@ -7,16 +7,18 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
+  activeGatherNodes,
   CAMPS,
   ESCORTS,
   GATHER_NODE_TYPES,
-  GATHER_NODES,
   GROUND_OBJECTS,
+  getActiveWorldContent,
   MOBS,
   NPCS,
   QUESTS,
   zoneAt,
 } from '../src/sim/data';
+import { farmPatchesFor } from '../src/sim/moved_objects';
 import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { fineMaterialFor } from '../src/sim/professions/material_grades';
 import {
@@ -179,7 +181,9 @@ describe('questObjectiveAreas', () => {
     // patches, which no mob drops and no ground object carries, so the map
     // drew NOTHING for them. Derived over the live tables with non-vacuity:
     // at least one shipped quest must be in this class.
-    const yields = new Set(GATHER_NODES.map((n) => nodeMaterialFor(n.type, n.zoneId).itemId));
+    const yields = new Set(
+      activeGatherNodes().map((n) => nodeMaterialFor(n.type, n.zoneId).itemId),
+    );
     let found: { quest: QuestDef; itemId: string; objIndex: number } | null = null;
     for (const q of Object.values(QUESTS)) {
       for (const [i, objective] of q.objectives.entries()) {
@@ -211,7 +215,7 @@ describe('questObjectiveAreas', () => {
     // a node whose zone-and-type yield is a different material.
     for (const group of nodeYieldClusters(found.itemId)) {
       for (const point of group) {
-        const node = GATHER_NODES.find((n) => n.pos.x === point.x && n.pos.z === point.z);
+        const node = activeGatherNodes().find((n) => n.pos.x === point.x && n.pos.z === point.z);
         expect(node).toBeTruthy();
         if (node) {
           const base = nodeMaterialFor(node.type, node.zoneId).itemId;
@@ -287,35 +291,33 @@ describe('questObjectiveAreas', () => {
     // gatherNodeClusters is exported ONLY for this pin. The grouping is derived
     // from coordinates rather than authored, so without a stability assertion a
     // content nudge silently merges two blobs into one and nothing reds. The
-    // tightest real margins: the widest pair inside one cluster is 49.98 yards
-    // (chained, single linkage is transitive) and the nearest pair in two
-    // different clusters is 32.98 yards (the v0.32.0 expansion zones author
-    // their per-type hub-outskirt pairs exactly (32,8) apart), so the
-    // identical-partition band is 27 to 32: the shipped 30 sits 2.98 yards
-    // under its upper edge and 3.07 above its lower one.
+    // current shared plateau is 26 to 32 yards. Fenbridge's relocated wood
+    // nodes no longer set its lower edge: ore splits below 26, while the
+    // expansion herb pairs (32,8) apart merge above 32. The shipped 30-yard
+    // threshold keeps the same grouping throughout that measured interval.
     const key = (groups: { x: number; z: number }[][]) =>
       groups.map((g) => g.map((p) => `${p.x},${p.z}`).join(' ')).join(' | ');
     for (const type of GATHER_NODE_TYPES) {
       const at30 = key(gatherNodeClusters(type));
-      // Both edges, so a future bump in either direction reds. 26 and 33 are
+      // Both edges, so a future bump in either direction reds. 25 and 33 are
       // outside the band for at least one type, which is what makes this decisive
       // rather than a restatement of the default.
-      expect(key(gatherNodeClusters(type, 27)), `${type} at 27yd`).toBe(at30);
+      expect(key(gatherNodeClusters(type, 26)), `${type} at 26yd`).toBe(at30);
       expect(key(gatherNodeClusters(type, 32)), `${type} at 32yd`).toBe(at30);
       // Every node lands in exactly one group, and groups come back ordered by
       // their first member so the badge numbering a player sees is stable.
       const groups = gatherNodeClusters(type);
       const total = groups.reduce((s, g) => s + g.length, 0);
       expect(total, `${type} clusters must cover every node exactly once`).toBe(
-        GATHER_NODES.filter((n) => n.type === type).length,
+        activeGatherNodes().filter((n) => n.type === type).length,
       );
       expect(gatherNodeClusters(type), `${type} must be call-stable`).toEqual(groups);
     }
     // The band is not open-ended in either direction: 60 yards merges groups
-    // that 30 keeps apart, and 26 splits a wood cluster that 30 chains, so
+    // that 30 keeps apart, and 25 splits an ore cluster that 30 chains, so
     // moving the constant past either edge cannot pass unnoticed.
     expect(key(gatherNodeClusters('wood', 60))).not.toBe(key(gatherNodeClusters('wood')));
-    expect(key(gatherNodeClusters('wood', 26))).not.toBe(key(gatherNodeClusters('wood')));
+    expect(key(gatherNodeClusters('ore', 25))).not.toBe(key(gatherNodeClusters('ore')));
     // The UPPER edge belongs to HERB (the expansion's (32,8) pairs merge at
     // 33); wood does not flip again until 60, so without this arm the band's
     // stated ceiling was unpinned.
@@ -397,7 +399,7 @@ describe('questObjectiveAreas', () => {
 
     for (const { type, quest, objectiveIndex } of typed) {
       const areas = questObjectiveAreas(activeLog(quest));
-      const nodes = GATHER_NODES.filter((node) => node.type === type);
+      const nodes = activeGatherNodes().filter((node) => node.type === type);
       expect(nodes.length).toBeGreaterThan(0);
 
       // 1. Every node still sits inside an area, and that area carries the ref.
@@ -472,7 +474,7 @@ describe('questObjectiveAreas', () => {
         const zones = new Set(
           group.map(
             (p) =>
-              GATHER_NODES.find((n) => n.type === type && n.pos.x === p.x && n.pos.z === p.z)
+              activeGatherNodes().find((n) => n.type === type && n.pos.x === p.x && n.pos.z === p.z)
                 ?.zoneId,
           ),
         );
@@ -585,7 +587,7 @@ describe('questObjectiveAreas', () => {
       // therefore pin the same nodes the nodeType arm above would, found by
       // walking GATHER_NODES through nodeMaterialFor rather than mob camps or
       // ground-object clusters, which never grant this objective's credit.
-      const targetNode = GATHER_NODES.find((n) => nodeMaterialFor(n.type, n.zoneId).itemId);
+      const targetNode = activeGatherNodes().find((n) => nodeMaterialFor(n.type, n.zoneId).itemId);
       expect(targetNode).toBeTruthy();
       if (!targetNode) return;
       const itemId = nodeMaterialFor(targetNode.type, targetNode.zoneId).itemId;
@@ -606,7 +608,7 @@ describe('questObjectiveAreas', () => {
       QUESTS[TEST_QUEST_ID] = quest;
 
       const areas = questObjectiveAreas(activeLog(quest));
-      const nodesYieldingItem = GATHER_NODES.filter(
+      const nodesYieldingItem = activeGatherNodes().filter(
         (n) => nodeMaterialFor(n.type, n.zoneId).itemId === itemId,
       );
       expect(nodesYieldingItem.length).toBeGreaterThan(0);
@@ -690,7 +692,9 @@ describe('questObjectiveAreas', () => {
     }
 
     it("encloses the named patch's beds in one circle centred on their centroid", () => {
-      const patch = FARM_PATCHES.find((p) => p.id === 'patch_eastbrook');
+      const patch = farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES).find(
+        (p) => p.id === 'patch_eastbrook',
+      );
       expect(patch).toBeTruthy();
       if (!patch) return;
       const areas = questObjectiveAreas(activeLog(install(patch.id)));
@@ -702,7 +706,7 @@ describe('questObjectiveAreas', () => {
       }
       expect(areas[0].objectives).toEqual([{ questId: TEST_QUEST_ID, objectiveIndex: 0 }]);
       // No other patch is circled: the marker follows the objective's patchId.
-      for (const other of FARM_PATCHES) {
+      for (const other of farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES)) {
         if (other.id === patch.id) continue;
         const oc = centroid(other.beds);
         expect(areas.some((a) => a.center.x === oc.x && a.center.z === oc.z)).toBe(false);
@@ -711,9 +715,10 @@ describe('questObjectiveAreas', () => {
 
     it('draws every farming patch when the objective names none', () => {
       const areas = questObjectiveAreas(activeLog(install(undefined)));
-      expect(FARM_PATCHES.length).toBeGreaterThan(1);
-      expect(areas).toHaveLength(FARM_PATCHES.length);
-      for (const patch of FARM_PATCHES) {
+      const patches = farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES);
+      expect(patches.length).toBeGreaterThan(1);
+      expect(areas).toHaveLength(patches.length);
+      for (const patch of patches) {
         const c = centroid(patch.beds);
         const area = areas.find((a) => a.center.x === c.x && a.center.z === c.z);
         expect(area, `expected an area centred on ${patch.id}`).toBeTruthy();
@@ -914,7 +919,10 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
 
   it('skips a dynamic NPC (spawned on demand by its owning system) even when it lists a matching turn-in quest', () => {
     const dynamicNpc = Object.values(NPCS).find(
-      (n) => n.dynamic && n.questIds.some((q) => QUESTS[q] && isQuestTurnInNpc(QUESTS[q], n.id)),
+      (n) =>
+        n.dynamic &&
+        !n.fixedPost &&
+        n.questIds.some((q) => QUESTS[q] && isQuestTurnInNpc(QUESTS[q], n.id)),
     );
     if (!dynamicNpc) throw new Error('expected a dynamic NPC carrying a turn-in quest');
     const questId = dynamicNpc.questIds.find((q) => isQuestTurnInNpc(QUESTS[q], dynamicNpc.id));
@@ -925,6 +933,18 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
     );
     expect(markers.some((m) => m.pos.x === dynamicNpc.pos.x && m.pos.z === dynamicNpc.pos.z)).toBe(
       false,
+    );
+  });
+
+  it('marks a fixed-post dynamic NPC (the Muster Commander, always raised at his post)', () => {
+    const commander = NPCS.muster_commander;
+    expect(commander?.dynamic && commander.fixedPost).toBe(true);
+    const markers = questGiverNpcMarkers(
+      (q) => (q === 'q_muster_summons' ? 'ready' : 'unavailable'),
+      NO_HISTORY,
+    );
+    expect(markers.some((m) => m.pos.x === commander.pos.x && m.pos.z === commander.pos.z)).toBe(
+      true,
     );
   });
 });

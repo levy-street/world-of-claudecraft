@@ -157,6 +157,9 @@ class RibbonPool {
       const mesh = new THREE.Mesh(geometry, material);
       mesh.frustumCulled = false;
       mesh.renderOrder = order;
+      // An empty draw range still issues a draw call (twice for a double-sided transparent
+      // material), so an idle ribbon stays hidden until a frame writes into it.
+      mesh.visible = false;
       return mesh;
     };
     this.halo = build(COLORS[palette].halo, 0.42, floorVfxRenderOrder('encounter', 23));
@@ -214,6 +217,8 @@ class RibbonPool {
     if (this.cursor === 0 && this.last === 0) return;
     this.core.geometry.setDrawRange(0, this.cursor * 6);
     this.halo.geometry.setDrawRange(0, this.cursor * 6);
+    this.core.visible = this.cursor > 0;
+    this.halo.visible = this.cursor > 0;
     if (this.cursor > 0) {
       this.corePosition.needsUpdate = true;
       this.haloPosition.needsUpdate = true;

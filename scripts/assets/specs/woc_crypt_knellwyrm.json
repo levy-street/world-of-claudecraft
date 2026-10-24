@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_knellwyrm_woc.glb",
+      "out": "models/creatures/woc_crypt_knellwyrm.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Fly",
+        "Glide",
+        "Land",
+        "SkyRoar",
+        "Roar",
+        "Bite",
+        "Bite2",
+        "Breath",
+        "TailSweep",
+        "WingBuffet",
+        "Hit",
+        "Death",
+        "TakeWing",
+        "Strafe",
+        "Bellow"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

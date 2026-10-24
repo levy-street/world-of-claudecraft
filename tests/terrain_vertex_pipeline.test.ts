@@ -72,8 +72,18 @@ describe('terrain vertex pipeline', () => {
     // splits follow the moved heights (the 4 yd lattice probe puts every moved
     // height inside x 0..64, z -148..-20). Measured on the merged tree; CI
     // shard 3 read the same fingerprint.
+    // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
+    // town: the north road swings round the smithy that took the chapel rise,
+    // and the road's eased curve and calm band reach the probe chunk's south
+    // edge, so a few splits flip. Computed twice in separate processes.
+    // Re-minted for the genshin artstyle merge (8bff2cec638, e10ecc2aef8): it
+    // takes the Wolf Run garrison's barracks and watchtower props out of
+    // zone1.ts, and every structural prop owns a calm pad
+    // (terrain_calm_anchors.ts), so the probe chunk's heights move and a few
+    // splits flip; the chunk builder's split rule is unchanged. Computed twice
+    // in separate processes.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      'b98465349b97538018dd906b2b456b705d9e16ec252a77b8964b5a90634906f8',
+      'cc9e73ca2615d13c7b1cafc1aade6a0f4d0c78f8ff3f403349c64f972688dd74',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

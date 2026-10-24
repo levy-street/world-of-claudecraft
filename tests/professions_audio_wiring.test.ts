@@ -259,12 +259,21 @@ describe('sunder completion audio wiring (Masterwrought phase 14)', () => {
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-  it("the case 'log' arm routes the sunder line to audio.sunderComplete()", () => {
+  it("the case 'log' arm routes the sunder line to audio.sunderComplete()", async () => {
+    // The log cues live in src/ui/log_event_route.ts (logEventCue, moved out
+    // of hud.ts when the Moonbridge banner joined them): hud.ts plays the cue's
+    // sound off the RAW English, and the router maps the sunder line to it.
     const start = hud.indexOf("case 'log': {");
     expect(start).toBeGreaterThan(-1);
     const end = hud.indexOf("case 'playerDeath'", start);
     const body = hud.slice(start, end);
-    expect(body).toContain('if (isSunderCompletionLog(ev.text)) audio.sunderComplete();');
+    expect(body).toContain('const cue = logEventCue(ev.text);');
+    expect(body).toContain('if (cue.sound) audio[cue.sound]();');
+    const { logEventCue } = await import('../src/ui/log_event_route');
+    expect(logEventCue('You sunder Gravewyrm Bone Quiver into Sundered Essence.').sound).toBe(
+      'sunderComplete',
+    );
+    expect(logEventCue('You sunder it.').sound).toBeNull();
   });
 
   it('the predicate spells both halves of the emit, and the sim emit still matches them', () => {

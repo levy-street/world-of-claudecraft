@@ -42,7 +42,23 @@ const FROZEN_CLASS_DIRS = [
 ] as const;
 
 // Directories under public/ui/skills that are deliberately OUTSIDE the freeze.
-const EXEMPT_DIRS = new Set(['pet']);
+// Each is an asset family the 2026-08-19 ruling does not reach, named with the
+// reason it does not, never a directory parked here to quiet the arm above.
+//
+//   pet/       pet command art, exempt by the ruling itself: those icons replaced
+//              procedural placeholders and carry no accumulated muscle memory.
+//   shardpike/ the Balgath quest tool's three verbs (lance_brace, lance_thrust,
+//              lance_release). NOT a class: they have no ABILITIES row at all, which
+//              is why `abilityImageUrl` routes them to this folder ahead of every
+//              class arm (src/ui/icons.ts). The freeze is scoped to the nine playable
+//              classes' live ability icons (docs/design/spell-icon-freeze.md, "What is
+//              frozen"), and a quest tool held only while one quest is in hand builds
+//              none of the cross-character, cross-spec recognition the ruling protects.
+//              Adding it to FROZEN_CLASS_DIRS would assert a tenth class that does not
+//              exist and would pin art the ruling deliberately leaves open to art passes.
+//              If the Shardpike ever accumulates live hand-recognized identity, promoting
+//              it is a follow-up ruling, exactly as that doc's "What is NOT frozen" says.
+const EXEMPT_DIRS = new Set(['pet', 'shardpike']);
 
 // Vacuity floor near the real count (471 at minting time): a manifest that
 // quietly shrank below this is a scan that stopped seeing icons, not a game

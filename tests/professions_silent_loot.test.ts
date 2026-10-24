@@ -461,10 +461,15 @@ describe('every professions grant site is accounted for (#2430)', () => {
   // already (it has to set its flags); bump its number here in the same change.
   //
   // What this map does NOT claim: the scan matches `ctx.addItem`/
-  // `ctx.addItemInstance` call TEXT, so a grant routed through a destructured
-  // `const { addItem } = ctx` or a module-local helper contributes no row and
-  // no count drift. Nothing in src/sim/professions does that today. Recursion
-  // widens which FILES are read, not which call shapes are recognized.
+  // `ctx.addItemInstance`/`grantFreshLoot` call TEXT, so a grant routed
+  // through a destructured `const { addItem } = ctx` or some other
+  // module-local helper contributes no row and no count drift. Nothing in
+  // src/sim/professions does that today. grantFreshLoot
+  // (src/sim/loot/fresh_quality_grant.ts) is recognized because it is the
+  // shared fresh-loot grant seam: it forwards its opts unchanged to
+  // ctx.addItem / ctx.addItemInstance, so the flags on its call ARE the flags
+  // on the grant. Recursion widens which FILES are read, not which call
+  // shapes are recognized.
   const EXPECTED_GRANT_SITES: Record<string, number> = {
     'commission.ts': 1,
     'commission_order.ts': 1,
@@ -472,6 +477,9 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // (resolveCraftForRecipe) grants through the same silent + callerLogs
     // discipline as the masterwork arm it sits beside: the head-started
     // instance, its commissioned remainder copies, and the plain remainder.
+    // All nine are grantFreshLoot calls since every earned reward source
+    // rolls permanent loot quality; the count is unchanged because the
+    // scanner recognizes that call shape too (pinned below).
     'crafting.ts': 9,
     'enchanting.ts': 4,
     // Farming's eight grants: base produce, its fine twin, the withered-husk
@@ -567,11 +575,12 @@ describe('every professions grant site is accounted for (#2430)', () => {
   const codeOnly = (source: string): string =>
     source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-  /** Every ctx.addItem / ctx.addItemInstance call in `source`, each as the full
-   *  call text (paren-balanced, so a multi-line opts object is included). */
+  /** Every ctx.addItem / ctx.addItemInstance / grantFreshLoot call in `source`,
+   *  each as the full call text (paren-balanced, so a multi-line opts object is
+   *  included). A `function grantFreshLoot(` declaration is not a call. */
   const grantCalls = (source: string): string[] => {
     const calls: string[] = [];
-    const re = /\bctx\.addItem(?:Instance)?\(/g;
+    const re = /(?<!function\s+)\b(?:ctx\.addItem(?:Instance)?|grantFreshLoot)\(/g;
     let m = re.exec(source);
     while (m) {
       let depth = 0;
@@ -695,6 +704,15 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // or every site would read as unflagged and the exclusion list would have
     // to grow to hide it.
     expect(sites.find((s) => s.file === 'salvage.ts')?.call).toContain('callerLogs: true');
+    // Crafting outputs grant through grantFreshLoot (the loot-quality roll), so
+    // its nine sites are only in the sweep because the scanner recognizes that
+    // call shape. Bound to the call text, so a regex that dropped the
+    // grantFreshLoot arm reads as a missing crafting.ts row, not a quiet pass.
+    const craftSites = sites.filter((s) => s.file === 'crafting.ts');
+    expect(craftSites).toHaveLength(9);
+    for (const site of craftSites) {
+      expect(site.call, site.call).toMatch(/^grantFreshLoot\( ?ctx, recipe\.resultItemId,/);
+    }
   });
 
   it('the grantCorpseHarvest slice is the whole function and nothing but the function', () => {
@@ -780,6 +798,14 @@ describe('every professions grant site is accounted for (#2430)', () => {
         path.join(fixture, 'nested', 'bare.ts'),
         'ctx.addItemInstance(itemId, payload, pid);\n',
       );
+      // The fresh-loot grant seam faces the same two sweeps: a bare call keeps
+      // the hub LINE, and its declaration (and an import of it) is not a site.
+      writeFileSync(
+        path.join(fixture, 'nested', 'fresh_bare.ts'),
+        "import { grantFreshLoot } from '../loot/fresh_quality_grant';\n" +
+          'export function grantFreshLoot(ctx, itemId) {}\n' +
+          'grantFreshLoot(ctx, itemId, 1, pid);\n',
+      );
       // Split between the key and its value, which is what makes `flatten`
       // load-bearing: on raw text this call does not contain the literal
       // `callerLogs: true`, so a regression that stopped normalizing would
@@ -826,6 +852,7 @@ describe('every professions grant site is accounted for (#2430)', () => {
         'nested/commented_out.ts',
         'nested/deeper/deepest/line_only.ts',
         'nested/documented.ts',
+        'nested/fresh_bare.ts',
         'top.ts',
       ]);
       // ... and both sweeps really do fire on them. documented.ts is absent
@@ -835,7 +862,11 @@ describe('every professions grant site is accounted for (#2430)', () => {
       expect(unaccountedLineGrants(found).map((s) => s.file)).toEqual([
         'nested/bare.ts',
         'nested/commented_out.ts',
+        'nested/fresh_bare.ts',
       ]);
+      expect(found.find((s) => s.file === 'nested/fresh_bare.ts')?.call).toBe(
+        'grantFreshLoot(ctx, itemId, 1, pid)',
+      );
       expect(unaccountedCueGrants(found).map((s) => s.file)).toEqual([
         'nested/deeper/deepest/line_only.ts',
       ]);

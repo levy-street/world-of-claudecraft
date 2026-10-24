@@ -142,6 +142,8 @@ const TOKEN_HOME = 'tokens.css';
 // sheet with no row fails until it gets one.
 const CEILINGS: Record<string, number> = {
   'base.css': 23,
+  // The self-hosted webfonts (@font-face only): no colors.
+  'fonts.css': 0,
   // W19: 454, not 453, since the counter learned to read named colors and found a
   // pre-existing `white` inside a color-mix in the item-quality section.
   // 453 -> 463 at the release/v0.42.0 merge: the release arm's own sections
@@ -162,6 +164,7 @@ const CEILINGS: Record<string, number> = {
   'layout.css': 0,
   'library.css': 0,
   'play.extra.css': 1,
+  'referral_cards.css': 0,
   'shell.css': 719,
   'shell.website.css': 0,
   'shell.website-pages.css': 0,
@@ -174,12 +177,27 @@ const MAX_SLACK = 12;
 // Sections that compose tokens only. Every name must exist in the corpus (a
 // renamed banner fails here, not silently) and must count zero. The integrator
 // appends a section here when its migration lands.
-const ZERO_LITERAL_SECTIONS = ['ui library (shared primitives)', 'window shell'];
+const ZERO_LITERAL_SECTIONS = [
+  'ui library (shared primitives)',
+  'window shell',
+  // tokenized as authored (swatch fills arrive from the painter as --whb-sw)
+  'woc face builder',
+  // tokenized as authored (the plate composes ui-panel-soft, ui-chip, ui-bar)
+  'dungeon objectives tracker',
+  // tokenized as authored (the outline reads --gold, the sheen --color-gold-300)
+  'character preview loading silhouette',
+  // tokenized as authored (the tab reads --gold, --color-gold-300 and --color-bg-dark)
+  'character preview touch hint',
+  // migrated on the v0.45.0 integration: its tab, row, lore, item-level and
+  // owned-piece colors moved to --color-collections-* in tokens.css
+  'Collections (buddies, mounts, item sets)',
+];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin
-// alone would bless a deleted or relocated section. These floors sit well under the
-// live bodies (the smallest today is `window shell`: 42 declarations, 13 token reads),
-// so ordinary editing never trips them but an emptied section does.
+// alone would bless a deleted or relocated section. These floors sit under the live
+// bodies (the smallest today is `character preview loading silhouette`: 39
+// declarations, 6 token reads), so ordinary editing never trips them but an emptied
+// section does.
 const MIN_ZERO_SECTION_DECLARATIONS = 20;
 const MIN_ZERO_SECTION_TOKEN_READS = 4;
 

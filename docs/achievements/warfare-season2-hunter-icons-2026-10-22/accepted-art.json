@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-hunter-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 90,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_beast_mastery_helmet",
+      "family": "beast_mastery",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_beast_mastery_helmet.webp",
+      "canonicalDisplayName": "Packwarden Coif",
+      "acceptedSha256": "afbb94990f22ac6df5b48dee630a4384ae12a12277877eeb176ab5de608b1d6a",
+      "acceptedBytes": 3312,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_beast_mastery_helmet.png",
+        "sha256": "3e56d8b6918b32424e86876343ad9b10b06cbe2626c200c0f2f654ab1e5047f1",
+        "bytes": 2336238,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_beast_mastery_helmet.png",
+        "sha256": "e20058f28fb7e16fbff49e1f87e6b7501190b5b22c88ae3afd888b1a7073d691",
+        "bytes": 533726,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Packwarden Coif: one complete empty fitted leather hood with short tawny fur edging around the face opening, ear-covering side flaps and laced crown panels; no face or body. Coordinated beast mastery hunter LEATHER armor, not metal plate or mail. Thick worn chestnut leather with broad dark brown stitched seams, restrained tawny wolf-fur edging and small ivory tooth toggles. Rugged rounded hide panels, warm natural palette. Tiny brass buckles only; no animal heads or living creature. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_beast_mastery_shoulder",
+      "family": "beast_mastery",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_beast_mastery_shoulder.webp",
+      "canonicalDisplayName": "Packwarden Spaulders",
+      "acceptedSha256": "cdf0edb15c33dea8f3e114448124bb900f95eed2a739be9602882eeb7189f2a5",
+      "acceptedBytes": 3592,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_beast_mastery_shoulder.png",
+        "sha256": "f418cee290c76134227b71b05a7d5e7ab067cf932c18a11858e9af0da7cc509c",
+        "bytes": 2321895,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_beast_mastery_shoulder.png",
+        "sha256": "1e7edfa53e4c5c87a4dd907477b7b7a0df114c795b5d8da071a101ca0084caa3",
+        "bytes": 522761,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Packwarden Spaulders: compact pair of layered curved hide shoulder guards with tawny fur outer rims and one ivory tooth toggle on each, no torso. Coordinated beast mastery hunter LEATHER armor, not metal plate or mail. Thick worn chestnut leather with broad dark brown stitched seams, restrained tawny wolf-fur edging and small ivory tooth toggles. Rugged rounded hide panels, warm natural palette. Tiny brass buckles only; no animal heads or living creature. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_beast_mastery_chest",
+      "family": "beast_mastery",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_beast_mastery_chest.webp",
+      "canonicalDisplayName": "Packwarden Jerkin",
+      "acceptedSha256": "85f9ff846642ab538eb5cbb5bfe3314e5c85970fdd0cbdf4181dfe83429bdd19",
+      "acceptedBytes": 4246,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_beast_mastery_chest.png",
+        "sha256": "fa3a462b5ad54e38d46c476168329aeacb71b0467f2d83445f5e9aeb881e2c26",
+        "bytes": 2570106,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_beast_mastery_chest.png",
+        "sha256": "949928db2a726d76888896d7e11f6be32a0d1c95ecc6cb893977213705c08965",
+        "bytes": 583055,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Packwarden Jerkin: one complete empty front-facing leather vest with reinforced chest panels, fur collar, leather side ties and a short split hem; no legs. Coordinated beast mastery hunter LEATHER armor, not metal plate or mail. Thick worn chestnut leather with broad dark brown stitched seams, restrained tawny wolf-fur edging and small ivory tooth toggles. Rugged rounded hide panels, warm natural palette. Tiny brass buckles only; no animal heads or living creature. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_beast_mastery_legs",
+      "family": "beast_mastery",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_beast_mastery_legs.webp",
+      "canonicalDisplayName": "Packwarden Legguards",
+      "acceptedSha256": "58cef130da313de3cd08ca064df152d6798852d5cae0d4d89f0c5d0bb2555b3e",
+      "acceptedBytes": 3134,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_beast_mastery_legs.png",
+        "sha256": "58bcba85a459bdc791de68d3c4ff53a4dd828eb6cb7edbe6940e423c963a064f",
+        "bytes": 2155332,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_beast_mastery_legs.png",
+        "sha256": "58e7be5a31f3950767a421ce5a9cabdbfc1d26e38254ea8be28b50761fd85564",
+        "bytes": 519502,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Packwarden Legguards: complete joined pair of brown leather trousers with stitched padded knees, tawny fur hip edging and restrained tooth fasteners at belt; no boots. Coordinated beast mastery hunter LEATHER armor, not metal plate or mail. Thick worn chestnut leather with broad dark brown stitched seams, restrained tawny wolf-fur edging and small ivory tooth toggles. Rugged rounded hide panels, warm natural palette. Tiny brass buckles only; no animal heads or living creature. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_beast_mastery_gloves",
+      "family": "beast_mastery",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_beast_mastery_gloves.webp",
+      "canonicalDisplayName": "Packwarden Gauntlets",
+      "acceptedSha256": "979c8f9db5ed311426fa5ae86dc47b57f571677726d9fcac0f292f3538bef92c",
+      "acceptedBytes": 4144,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_beast_mastery_gloves.png",
+        "sha256": "9271fa456e129206069408da824d766b9958668f92bf6723960b17d2b9c8227a",
+        "bytes": 2480609,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_beast_mastery_gloves.png",
+        "sha256": "9511431f1b031ac1bb285c1907d688158a6f4d5d5c319fac69516201d6f9f437",
+        "bytes": 563729,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Packwarden Gauntlets: compact matched pair of empty brown leather gloves with broad stitched knuckle pads, tawny fur wrist cuffs and ivory tooth toggles, all fingers enclosed. Coordinated beast mastery hunter LEATHER armor, not metal plate or mail. Thick worn chestnut leather with broad dark brown stitched seams, restrained tawny wolf-fur edging and small ivory tooth toggles. Rugged rounded hide panels, warm natural palette. Tiny brass buckles only; no animal heads or living creature. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_marksmanship_helmet",
+      "family": "marksmanship",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_marksmanship_helmet.webp",
+      "canonicalDisplayName": "Farsight Coif",
+      "acceptedSha256": "306bfdd03a5ebb6499811f3d52e2f3f7dba1d008abc94daa9b606139884906d2",
+      "acceptedBytes": 2952,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_marksmanship_helmet.png",
+        "sha256": "2d7ddd14b952fafe61738a7f62b120bf64d3d060473a3a8a1499a37002fa893b",
+        "bytes": 2179551,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_marksmanship_helmet.png",
+        "sha256": "7636fecb9c4e6c5891aed700380a3aa563746eefa103327d120729fa01a74f79",
+        "bytes": 501932,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Farsight Coif: one complete empty low-profile leather hood with short pointed forward brow, navy cloth inset, fitted cheek flaps and leather crown seams; no face or body. Coordinated marksmanship hunter LEATHER armor, not metal plate or mail. Supple desaturated teal and slate leather, dark navy cloth lining, pale tan stitching, small brushed silver buckles. Lean tapered panels and subtle arrow-feather shapes worked into leather construction, a precise ranger's practical kit. No actual arrows or quiver. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_marksmanship_shoulder",
+      "family": "marksmanship",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_marksmanship_shoulder.webp",
+      "canonicalDisplayName": "Farsight Spaulders",
+      "acceptedSha256": "c9b8ef4fcfb3746f070cb2d47fd0ed6bb26b44c6521dd7e0e3da38c761d3d6c1",
+      "acceptedBytes": 3584,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_marksmanship_shoulder.png",
+        "sha256": "ec47a0f31f765b1c57eada3af9715d83ddd34764cebb602bf9ddd9aff8e5726c",
+        "bytes": 2465430,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_marksmanship_shoulder.png",
+        "sha256": "77fe88a429bd43f788d96a0af3362fce95b598422d212f98d0ae680e99a905f0",
+        "bytes": 539412,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Farsight Spaulders: compact matched pair of tapered overlapping teal leather shoulder guards, slim pale stitched feather-shaped panels, restrained silver fasteners; no torso. Coordinated marksmanship hunter LEATHER armor, not metal plate or mail. Supple desaturated teal and slate leather, dark navy cloth lining, pale tan stitching, small brushed silver buckles. Lean tapered panels and subtle arrow-feather shapes worked into leather construction, a precise ranger's practical kit. No actual arrows or quiver. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_marksmanship_chest",
+      "family": "marksmanship",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_marksmanship_chest.webp",
+      "canonicalDisplayName": "Farsight Jerkin",
+      "acceptedSha256": "6d875696eda773bf25b7d8a25bde45a0c1ce6a0fee6777a2b001a908d3b4435a",
+      "acceptedBytes": 3232,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_marksmanship_chest.png",
+        "sha256": "afbdc9b33c282fa229605412e20a61a133b2d17c120c344645aa01db932728fe",
+        "bytes": 2404196,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_marksmanship_chest.png",
+        "sha256": "7bdee1ad1c4f071de701e45135707b94612d358fd987e684dca27b1ece713ef7",
+        "bytes": 533340,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Farsight Jerkin: one complete empty front-facing fitted teal leather sleeveless torso garment with diagonal laced closure, slim overlapping side panels and navy lining. Coordinated marksmanship hunter LEATHER armor, not metal plate or mail. Supple desaturated teal and slate leather, dark navy cloth lining, pale tan stitching, small brushed silver buckles. Lean tapered panels and subtle arrow-feather shapes worked into leather construction, a precise ranger's practical kit. No actual arrows or quiver. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_marksmanship_legs",
+      "family": "marksmanship",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_marksmanship_legs.webp",
+      "canonicalDisplayName": "Farsight Legguards",
+      "acceptedSha256": "ec7bf798d21071a5c820e5509f6d112272cc847560b115e915af43a6d94de45c",
+      "acceptedBytes": 2366,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_marksmanship_legs.png",
+        "sha256": "5db3a58752d3a982f359e68e9028153788768d426812fe1339de8246ff13e3bd",
+        "bytes": 2154351,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_marksmanship_legs.png",
+        "sha256": "f78ef52f507f355b3051d4464562c659da3c25e0e1e0d7c72a8ec0af3dcd852e",
+        "bytes": 481505,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Farsight Legguards: complete joined pair of fitted teal leather trousers with long tapered padded thighs, narrow stitched kneepads and short silver-buckled calf straps; no boots. Coordinated marksmanship hunter LEATHER armor, not metal plate or mail. Supple desaturated teal and slate leather, dark navy cloth lining, pale tan stitching, small brushed silver buckles. Lean tapered panels and subtle arrow-feather shapes worked into leather construction, a precise ranger's practical kit. No actual arrows or quiver. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_marksmanship_gloves",
+      "family": "marksmanship",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_marksmanship_gloves.webp",
+      "canonicalDisplayName": "Farsight Gauntlets",
+      "acceptedSha256": "be01bb04c60e3fc561335bfab9896d61dcaca30e80562b5a9e2cbfc660e7a1c4",
+      "acceptedBytes": 3178,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_marksmanship_gloves.png",
+        "sha256": "160ac239566f6b35a29923ec90ae67f4cc09cfaabfbc0146a314aff4dcad07c0",
+        "bytes": 2456432,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_marksmanship_gloves.png",
+        "sha256": "ffee8e91a33b050a4bbb817fedc3c93c92eea9c9a8fb9d248b187e380e4acd8b",
+        "bytes": 550037,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Farsight Gauntlets: compact matched pair of empty slim teal leather archer gloves, smooth leather finger sections, long fitted cuffs, pale stitching and small silver wrist buckles. Coordinated marksmanship hunter LEATHER armor, not metal plate or mail. Supple desaturated teal and slate leather, dark navy cloth lining, pale tan stitching, small brushed silver buckles. Lean tapered panels and subtle arrow-feather shapes worked into leather construction, a precise ranger's practical kit. No actual arrows or quiver. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_survival_helmet",
+      "family": "survival",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_survival_helmet.webp",
+      "canonicalDisplayName": "Snaretooth Coif",
+      "acceptedSha256": "e5b290f3914a064cdc235eb4282d5616d7e419155e825ae0b855715ad830cd94",
+      "acceptedBytes": 3162,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_survival_helmet.png",
+        "sha256": "6e4cfa20235365823c4bd0860c65ceca5197d9913e5ce7be478b804caf40e8c2",
+        "bytes": 2212331,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_survival_helmet.png",
+        "sha256": "5323a5580ddd9be9a01d235db719f9a10c1fcb1e723d4607e866191e5e278657",
+        "bytes": 504384,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Snaretooth Coif: one complete empty rough olive leather hood, russet overlapping brow guard, short tooth toggles along the side straps and a low angular crown, no face or body. Coordinated survival hunter LEATHER armor, not metal plate or mail. Weathered olive green and russet leather, rugged dark straps, short jagged ivory tooth fasteners and small dark iron buckles. Uneven overlapping angular hide flaps and rough reinforced seams evoke a practical close-combat trapper. No weapons, traps or scattered objects. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_survival_shoulder",
+      "family": "survival",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_survival_shoulder.webp",
+      "canonicalDisplayName": "Snaretooth Spaulders",
+      "acceptedSha256": "cd0cef0292ce953225eb3ea2a64836515899deba103d1d27eee96ad36ab3aa88",
+      "acceptedBytes": 3560,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_survival_shoulder.png",
+        "sha256": "abbd544768ddb75ad15d13660d06527cc4a14550dd5c35a899d09f0564f949d3",
+        "bytes": 2202357,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_survival_shoulder.png",
+        "sha256": "6eff4a83ace5c88223fd074352e9303ff7d2c41e45a691c83c19a5d2c19855bc",
+        "bytes": 482086,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Snaretooth Spaulders: compact pair of angular overlapping russet and olive hide shoulder guards with jagged leather edges and small tooth fasteners; no torso. Coordinated survival hunter LEATHER armor, not metal plate or mail. Weathered olive green and russet leather, rugged dark straps, short jagged ivory tooth fasteners and small dark iron buckles. Uneven overlapping angular hide flaps and rough reinforced seams evoke a practical close-combat trapper. No weapons, traps or scattered objects. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_survival_chest",
+      "family": "survival",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_survival_chest.webp",
+      "canonicalDisplayName": "Snaretooth Jerkin",
+      "acceptedSha256": "6d4c2d4cbf674e385b3f6710b44cb35ae92199df9f7587e1fb32e654f8736409",
+      "acceptedBytes": 3920,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_survival_chest.png",
+        "sha256": "b4f21703b66dffc7f47d40326040a6c0337694a17d416242a54a860dd22dd371",
+        "bytes": 2457346,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_survival_chest.png",
+        "sha256": "87bab90535c71c1a62940092598301405ac8432bab2125e629716a4615fbb8ee",
+        "bytes": 539238,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Snaretooth Jerkin: one complete empty front-facing olive leather vest with cross-strapped russet reinforced chest, rough stitched seams, tooth toggles and overlapping leather waist flaps. Coordinated survival hunter LEATHER armor, not metal plate or mail. Weathered olive green and russet leather, rugged dark straps, short jagged ivory tooth fasteners and small dark iron buckles. Uneven overlapping angular hide flaps and rough reinforced seams evoke a practical close-combat trapper. No weapons, traps or scattered objects. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_survival_legs",
+      "family": "survival",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_survival_legs.webp",
+      "canonicalDisplayName": "Snaretooth Legguards",
+      "acceptedSha256": "3f91ed6bceb26b50ad9a0e675acb686f5e7eaeeadaff7dff4cb938094e552701",
+      "acceptedBytes": 3036,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_survival_legs.png",
+        "sha256": "f86d9dbb4b19b9e5552405f0f6a9bd9e6bbd08b153b631d047b2ab28c33878b4",
+        "bytes": 2363535,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_survival_legs.png",
+        "sha256": "84a537ca5464d061ff6468637fdddde757b36c46fe0b34f866a35dfec52621e4",
+        "bytes": 530910,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Snaretooth Legguards: complete joined pair of rugged olive leather trousers with angular russet thigh patches, layered reinforced knees, small iron buckles and tooth belt toggles; no boots. Coordinated survival hunter LEATHER armor, not metal plate or mail. Weathered olive green and russet leather, rugged dark straps, short jagged ivory tooth fasteners and small dark iron buckles. Uneven overlapping angular hide flaps and rough reinforced seams evoke a practical close-combat trapper. No weapons, traps or scattered objects. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_hunter_survival_gloves",
+      "family": "survival",
+      "batch": "warfare-season2-hunter-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_hunter_survival_gloves.webp",
+      "canonicalDisplayName": "Snaretooth Gauntlets",
+      "acceptedSha256": "7c0001d788b017dc32088fe87368904ae734fd2094ee774bbda5759e7f74f2ae",
+      "acceptedBytes": 3872,
+      "original": {
+        "path": "tmp/imagegen/v045-hunter/originals/vanguard_hunter_survival_gloves.png",
+        "sha256": "f5a7079c1f0decb43c72eecd4c01bcacd6f750a099e845be0b13b0582952a049",
+        "bytes": 2471415,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hunter/masters/vanguard_hunter_survival_gloves.png",
+        "sha256": "0ea4a9bd4e4b8ef1c2660d923c1ade80272b1f148c2cd012e9cf2e345d4dab4c",
+        "bytes": 552273,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Snaretooth Gauntlets: compact matched pair of empty rough olive leather gloves with russet stitched knuckle guards and angular reinforced wrist cuffs, small tooth toggles along outer cuffs. Coordinated survival hunter LEATHER armor, not metal plate or mail. Weathered olive green and russet leather, rugged dark straps, short jagged ivory tooth fasteners and small dark iron buckles. Uneven overlapping angular hide flaps and rough reinforced seams evoke a practical close-combat trapper. No weapons, traps or scattered objects. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-hunter-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-hunter-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

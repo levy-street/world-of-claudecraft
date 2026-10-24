@@ -25,8 +25,8 @@
 // count path, and bulkEligible (items.ts buyItem AND vendor_view.ts's own
 // preview predicate) excludes it from the bulk path the same way it already
 // excludes honor-priced rows and mounts, so a future soulbound stackable (no
-// such row exists today; the soulbound rows with a buyValue are the mounts and
-// the Warfare Season 1 gear, all unstackable and force-1 on both paths regardless) can never bulk-multiply while the count
+// such row exists today; the only soulbound row with a buyValue is a mount,
+// force-1 on both paths regardless) can never bulk-multiply while the count
 // path pins it to 1.
 //
 // DOM-free and deterministic so tests/vendor_buy_stack.test.ts drives it directly.

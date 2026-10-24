@@ -17,8 +17,7 @@
 // simply keeps the cylinder; nothing waits on them.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { markSharedGeometry } from './shared_resource';
 
@@ -48,7 +47,7 @@ function grainAt(x: number, y: number, z: number): number {
   return n - Math.floor(n);
 }
 
-function bake(gltf: GLTF): THREE.BufferGeometry | null {
+function bake(gltf: LoadedGltf): THREE.BufferGeometry | null {
   gltf.scene.updateMatrixWorld(true);
   let source: THREE.Mesh | null = null;
   gltf.scene.traverse((node) => {

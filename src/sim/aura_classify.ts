@@ -143,6 +143,7 @@ export const TOGGLE_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_bear',
   'form_cat',
   'form_moonkin',
+  'form_sporemender',
   'form_shadow',
   'form_travel',
   'form_fireball',

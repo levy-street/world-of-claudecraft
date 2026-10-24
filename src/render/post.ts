@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { celShadingSettings } from './cel_shading';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
 import {
@@ -10,10 +11,15 @@ import {
   GPU_TIMER_SCENE_BRACKET,
   labelGpuTimerPass,
 } from './gpu_timer_probe_core';
+import { setOceanShedRung } from './ocean/ocean_shed';
+import { paletteLabEnabled, setPaletteAoPass, setPaletteBloomPass } from './palette_lab';
+// The lab's runtime boots with the game composer only (never the guide/editor).
+import './palette_lab/palette_lab_boot';
+import './spell_lab/spell_lab_boot';
 import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
-import { OutputGradePass } from './post_output_grade';
+import { type GradeCelInk, OutputGradePass } from './post_output_grade';
 import { resolveAoFullRes } from './post_pixel_budget_core';
 import { postPipelinePlan } from './post_plan_core';
 import { PostShed } from './post_shed';
@@ -66,9 +72,9 @@ import { OpaqueSceneCapture } from './scene_sampling';
 // brightest lit diffuse or the whole sunlit world glows. Sunlit high-albedo
 // plaster/snow peaks near 1.02 luma at the current rig; 1.32 leaves it dark
 // and reserves bloom for emissives, which gfx.ts EMISSIVE_* push above it.
-const BLOOM_STRENGTH = 0.4; // subtle: fires/lamps/windows glow, sky must not blow out
+export const BLOOM_STRENGTH = 0.4; // subtle: fires/lamps/windows glow, sky must not blow out
 const BLOOM_RADIUS = 0.6;
-const BLOOM_THRESHOLD = 1.32;
+export const BLOOM_THRESHOLD = 1.32;
 
 // Ability-VFX screen feedback (ported from the gallery DistortShader, ripple
 // and flash arms only): up to 4 world-anchored radial distortion ripples,
@@ -228,14 +234,22 @@ export function buildComposer(
     isWebGL2: webgl.capabilities.isWebGL2,
     msaaSamples: GFX.msaaSamples,
   });
+  // The cel-shading R&D look (`?cel=on`): its ink rides the output grade and
+  // reads scene depth. N8AO chains already hold it; every RenderPass chain
+  // keeps composer depth as a texture instead of a renderbuffer (resolved
+  // when multisampled), including High and up with AO switched off.
+  const celLook = celShadingSettings();
+  const celDepthOnComposer = celLook !== null && plan.scene.pass === 'render';
   // HalfFloat keeps >1 colors for bloom. N8AO owns beauty depth, so its
   // composer target is color-only. RenderPass keeps depth only on the one
   // target that rasterizes geometry.
   const target = new THREE.WebGLRenderTarget(size.x, size.y, {
     depthBuffer: plan.scene.pass === 'render',
-    resolveDepthBuffer: !gradeOnly,
+    resolveDepthBuffer: !gradeOnly || celDepthOnComposer,
     samples: plan.composerSamples,
     type: THREE.HalfFloatType,
+    // Only when needed: an explicit undefined would override three's null default.
+    ...(celDepthOnComposer ? { depthTexture: new THREE.DepthTexture(size.x, size.y) } : {}),
   });
   const composer = new PostEffectComposer(webgl, target, width, height, plan.singleComposerBuffer);
 
@@ -291,6 +305,29 @@ export function buildComposer(
     labelGpuTimerPass(bloom, 'bloom');
     composer.addPass(bloom);
   }
+  setPaletteBloomPass(bloom);
+  setPaletteAoPass(ao);
+  // RenderPass writes readBuffer, and bloom does not swap it before the grade.
+  // Read it at grade draw time: the swapping tail can alternate the scene's
+  // target each frame. Capturing `target` would sample stale depth (or the
+  // grade's own write attachment) on the AO-off composer chain.
+  const celDepthTarget: (() => THREE.WebGLRenderTarget) | null = !celLook
+    ? null
+    : ao
+      ? () => n8aoSceneTarget(ao as StaticOpaqueN8AOPass)
+      : celDepthOnComposer
+        ? () => composer.readBuffer
+        : null;
+  const celInk: GradeCelInk | undefined =
+    celLook && celDepthTarget
+      ? {
+          depthTarget: celDepthTarget,
+          camera,
+          ink: celLook.ink,
+          saturation: celLook.saturation,
+          inkWidth: celLook.inkWidth,
+        }
+      : undefined;
   // Edge AA for the grade-only tiers lives INSIDE this pass. A tail pass would
   // be full-frame and cost the chain its dynamic-resolution region (see the AA
   // note above); the fused arm rides the grade's own uInputUvRect remap, so it
@@ -300,7 +337,7 @@ export function buildComposer(
   const grade = new OutputGradePass(
     sharedUniforms.uTime,
     bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
-    { fxaa: plan.gradeFxaa },
+    { fxaa: plan.gradeFxaa, celInk, paletteGrade: paletteLabEnabled() },
   );
   labelGpuTimerPass(grade, 'grade');
   composer.addPass(grade);
@@ -311,7 +348,7 @@ export function buildComposer(
     ? new OutputGradePass(
         sharedUniforms.uTime,
         bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
-        { fxaa: true },
+        { fxaa: true, celInk, paletteGrade: paletteLabEnabled() },
       )
     : null;
   if (gradeFxaaTwin) {
@@ -424,6 +461,12 @@ export function buildComposer(
     },
     setShedLevel(level: number): void {
       shed.apply(level);
+      // The water's per-frame extras answer to the same rungs: its simulation
+      // steps slower once bloom is shed, and with AO shed the opaque-scene copy
+      // stops, so the sea (and the ability VFX) take their unsampled arms.
+      const rung = shed.rung();
+      setOceanShedRung(rung);
+      sceneCapture?.setSuppressed(rung === 'ao-off');
     },
     shedRung(): PostShedRung | 'full' {
       return shed.rung();

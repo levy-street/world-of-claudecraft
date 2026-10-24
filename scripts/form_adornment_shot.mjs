@@ -1,5 +1,6 @@
-// Before/after capture for the shapeshift form adornments (Moonwing Form's
-// antlers, crescent and wings; Gloamveil's shadow veil). Needs a Vite dev
+// Before/after capture for the shapeshift forms that keep their body
+// (Moonwing Form's antlers, crescent and wings; Gloamveil's look on the body
+// and the floor, whose fuller rig is scripts/gloamveil_look_shot.mjs). Needs a Vite dev
 // client (offline world only, no server):
 //
 //   GAME_URL=http://127.0.0.1:5173 SHOTS_DIR=tmp/form-adornments \
@@ -24,7 +25,7 @@ const out = path.resolve(process.env.SHOTS_DIR ?? 'tmp/form-adornments');
 const prefix = process.argv[2] ?? 'shot';
 fs.mkdirSync(out, { recursive: true });
 
-// The veil is a face piece, so Gloamveil is shot from the front only.
+// Gloamveil is shot from the front only: its look does not differ behind.
 const SCENARIOS = [
   {
     name: 'moonwing',

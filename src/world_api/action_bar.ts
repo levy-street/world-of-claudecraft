@@ -72,10 +72,13 @@ export const ACTION_BAR_LAYOUT_MAX_SPEC_KEYS = 8;
 // such as __proto__ from ever being assigned onto the clean specs object.
 export const ACTION_BAR_LAYOUT_SPEC_KEY_RE = /^[a-z][a-z0-9_]{0,31}$/;
 
-export type ActionBarSlotAction = { type: 'ability' | 'item'; id: string };
+// 'pet' is a pet-bar command (attack, taunt, stop, defensive, aggressive). This
+// shape check keeps the id unchecked like every other type; the client re-checks
+// it against its closed command set on load.
+export type ActionBarSlotAction = { type: 'ability' | 'item' | 'pet'; id: string };
 
 export interface ActionBarFormLayout {
-  // The configurable slots (index 0 is bar slot 1). Entries are an ability/item
+  // The configurable slots (index 0 is bar slot 1). Entries are an ability/item/pet
   // binding or null for an empty slot. Up to ACTION_BAR_LAYOUT_MAX_SLOTS long.
   bar: (ActionBarSlotAction | null)[];
   // The player-assignable Attack control binding (bar slot 0), or null/absent.
@@ -156,7 +159,7 @@ function sanitizeSlotAction(value: unknown): ActionBarSlotAction | null {
   if (!isPlainObject(value)) return null;
   const type = value.type;
   const id = value.id;
-  if (type !== 'ability' && type !== 'item') return null;
+  if (type !== 'ability' && type !== 'item' && type !== 'pet') return null;
   if (typeof id !== 'string') return null;
   if (id.length === 0 || id.length > ACTION_BAR_LAYOUT_MAX_ID_LEN) return null;
   return { type, id };

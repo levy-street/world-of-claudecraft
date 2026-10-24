@@ -201,7 +201,7 @@ None. `origin/release/v0.40.0@b39b16022e` is integrated by merge commit
   geometry. The Phase 4 cartouche core is deleted.
 - `src/render/nameplate_canvas.ts`: thin world consumer.
 - `src/render/nameplate_painter.ts`: border slug resolution.
-- `src/render/nameplate_declutter.ts`: remeasure after new world extents.
+- `src/render/nameplate_declutter.ts`: removed (plates are no longer stacked apart).
 - `src/ui/unit_frame.ts` + `src/ui/unit_frame_painter.ts`: player/target reveal
   seam with optional heraldry hosts and elided token writes.
 - `src/ui/hud.ts`, `index.html`, `play.html`, `src/styles/hud.css`: player and

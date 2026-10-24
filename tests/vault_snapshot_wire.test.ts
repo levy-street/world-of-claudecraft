@@ -10,9 +10,10 @@ import {
   VAULT_UPGRADE_STEP,
 } from '../src/sim/materials_vault';
 
-// Literal fixture on purpose: perMaterialCap 80 is the ladder position the
-// decoder must recompute from the sim constants (40 + 40 * (2 - 1)), so this
-// arm fails if either the decoder formula or the sim ladder drifts.
+// Literal fixture on purpose: perMaterialCap 200 is the ladder position the
+// decoder must recompute from the sim constants (100 + 100 * (2 - 1)), so this
+// arm fails if either the decoder formula or the sim ladder drifts. The next
+// cost is the third rung's price (4g at rung 2 bought, 7g next).
 const VALID = {
   stock: { copper_ore: 3 },
   special: [
@@ -24,8 +25,8 @@ const VALID = {
     { itemId: 'future_material', count: 2, craftedRecipeId: 'future_recipe' },
   ],
   upgrades: 2,
-  perMaterialCap: 80,
-  nextUpgradeCost: 100_000,
+  perMaterialCap: 200,
+  nextUpgradeCost: 70_000,
 };
 
 describe('Materials Vault snapshot wire decoder', () => {
@@ -35,11 +36,11 @@ describe('Materials Vault snapshot wire decoder', () => {
   });
 
   it('pins the sim ladder the decoder validates against (change-detector)', () => {
-    // The decoder imports these instead of restating 40/5; a DELIBERATE ladder
+    // The decoder imports these instead of restating 100/10; a DELIBERATE ladder
     // change must update this pin alongside the wire-epoch story.
-    expect(VAULT_BASE_CAP).toBe(40);
-    expect(VAULT_UPGRADE_STEP).toBe(40);
-    expect(VAULT_UPGRADE_PRICES).toHaveLength(5);
+    expect(VAULT_BASE_CAP).toBe(100);
+    expect(VAULT_UPGRADE_STEP).toBe(100);
+    expect(VAULT_UPGRADE_PRICES).toHaveLength(10);
   });
 
   it('accepts the locked and fully upgraded ladder ends exactly as the sim emits them', () => {
@@ -75,9 +76,9 @@ describe('Materials Vault snapshot wire decoder', () => {
     { ...VALID, stock: { copper_ore: 1.5 } },
     { ...VALID, stock: { copper_ore: { polluted: true } } },
     { ...VALID, upgrades: 1.5 },
-    { ...VALID, upgrades: 6, perMaterialCap: 240, nextUpgradeCost: null },
+    { ...VALID, upgrades: 11, perMaterialCap: 1100, nextUpgradeCost: null },
     // One past the top of the ladder, derived from the same constant the
-    // decoder caps against (a sixth sim rung moves this case with it).
+    // decoder caps against (an eleventh sim rung moves this case with it).
     {
       ...VALID,
       upgrades: VAULT_UPGRADE_PRICES.length + 1,
@@ -87,9 +88,9 @@ describe('Materials Vault snapshot wire decoder', () => {
     // A locked vault must report cap 0 (the sim formula's locked arm), never a
     // paid ceiling.
     { ...VALID, upgrades: 0, perMaterialCap: VAULT_BASE_CAP, nextUpgradeCost: 20000 },
-    { ...VALID, perMaterialCap: 81 },
+    { ...VALID, perMaterialCap: 201 },
     { ...VALID, nextUpgradeCost: null },
-    { ...VALID, upgrades: 5, perMaterialCap: 200, nextUpgradeCost: 1 },
+    { ...VALID, upgrades: 10, perMaterialCap: 1000, nextUpgradeCost: 1 },
     {
       ...VALID,
       special: [{ itemId: 'copper_ore', count: 1, instance: { signer: 'x'.repeat(65) } }],

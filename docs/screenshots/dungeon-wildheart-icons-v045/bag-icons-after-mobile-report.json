@@ -1,0 +1,21 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/beastpit_warbelt.webp",
+    "http://localhost:5194/ui/items/jaguar_hide_jerkin.webp",
+    "http://localhost:5194/ui/items/hexbone_handwraps.webp",
+    "http://localhost:5194/ui/items/rootbound_sabatons.webp",
+    "http://localhost:5194/ui/items/pollen_dusted_leggings.webp",
+    "http://localhost:5194/ui/items/bloomsilk_cowl.webp",
+    "http://localhost:5194/ui/items/falls_blessed_staff.webp",
+    "http://localhost:5194/ui/items/fanglords_hide_mantle.webp",
+    "http://localhost:5194/ui/items/thornroot_greathelm.webp",
+    "http://localhost:5194/ui/items/fanglords_whistle.webp",
+    "http://localhost:5194/ui/items/gorgebloom_seedpod.webp"
+  ],
+  "allDecoded": true
+}

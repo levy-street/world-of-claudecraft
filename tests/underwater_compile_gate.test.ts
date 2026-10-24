@@ -62,7 +62,9 @@ async function load(tier: Tier) {
   const { buildWater, hasWaterShaderAssets } = await import('../src/render/water');
   const { UnderwaterView: View } = await import('../src/render/underwater');
   await Promise.resolve();
-  expect(hasWaterShaderAssets()).toBe(tier !== 'low');
+  // The shader water reads no image asset; GFX.standardMaterials alone picks
+  // it (the low tier draws the Phong plane, which has no underside).
+  expect(hasWaterShaderAssets()).toBe(true);
   return { water: buildWater(SEED), view: new View(tier === 'low') };
 }
 
@@ -436,7 +438,7 @@ describe('renderer wiring', () => {
 
   it('drives the view from the player position on both frame paths', () => {
     const calls = source.match(
-      /this\.underwaterView\.frame\(this\.camera, this\.scene, p\.pos, this\.sim\.cfg\.seed, dt\)/g,
+      /this\.underwaterView\.frame\(\s*this\.camera,\s*this\.scene,\s*p\.pos,\s*this\.sim\.cfg\.seed,\s*dt,?\s*\)/g,
     );
     expect(calls).toHaveLength(2);
   });

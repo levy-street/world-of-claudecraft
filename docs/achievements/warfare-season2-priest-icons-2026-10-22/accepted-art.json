@@ -1,0 +1,1033 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-priest-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 60,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_priest_discipline_helmet",
+      "family": "discipline",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_discipline_helmet.webp",
+      "canonicalDisplayName": "Veilpsalm Cowl",
+      "acceptedSha256": "d770919bcd32ea26159a874cca88e426dda41efbd37981088778d6751767af2c",
+      "acceptedBytes": 3300,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_discipline_helmet.png",
+        "sha256": "1ec13ef728262d988f6bfca2ae761d2a9b3a065db5947e455622d2a687d0a76f",
+        "bytes": 2480676,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_discipline_helmet.png",
+        "sha256": "573ef7907dd81d8968f5d994d3157e7e5993a2bc8df861835e9e1fe3729c9742",
+        "bytes": 544285,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Veilpsalm Cowl: one complete empty draped ivory cloth hood with claret folded rim, charcoal interior and small brass clasp at base, no head or shoulders. Discipline priest CLOTH set: heavy ivory and muted claret woven fabric, deep charcoal lining, restrained antique brass clasps and narrow gold-thread geometric trim. Structured pleats and layered protective-looking fabric folds, no leather or metal armor, no religious writing or real-world symbols. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_discipline_shoulder",
+      "family": "discipline",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_discipline_shoulder.webp",
+      "canonicalDisplayName": "Veilpsalm Mantle",
+      "acceptedSha256": "088da3cd5f7efc1c612bb959369ef05b32ec9cc022d8b022fd96503206327783",
+      "acceptedBytes": 3874,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_discipline_shoulder.png",
+        "sha256": "429d67cd95c75a581b4f5f0d2871e0498bec8560104d5ca5634446c12d4c7296",
+        "bytes": 2506588,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_discipline_shoulder.png",
+        "sha256": "02ef01e8b5a2745ea61102764954ddb4c907ae543494d300648b277fd7b62519",
+        "bytes": 567145,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Veilpsalm Mantle: one compact cloth shoulder mantle with ivory folded shoulder panels, claret hem and a small central brass clasp; no body or full robe. Discipline priest CLOTH set: heavy ivory and muted claret woven fabric, deep charcoal lining, restrained antique brass clasps and narrow gold-thread geometric trim. Structured pleats and layered protective-looking fabric folds, no leather or metal armor, no religious writing or real-world symbols. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_discipline_chest",
+      "family": "discipline",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_discipline_chest.webp",
+      "canonicalDisplayName": "Veilpsalm Robe",
+      "acceptedSha256": "8d436a22af8464c4181958a1a5103cd925e62e2448c0a869b50786c17f90a4ab",
+      "acceptedBytes": 3696,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_discipline_chest.png",
+        "sha256": "ac133930c71780ae74db9b774a578f4eaf08bb8f52f5f98599cae3e89fa18196",
+        "bytes": 2540194,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_discipline_chest.png",
+        "sha256": "00c1d5917e72ae8fd207f4bd0a91de27957139230934f431956c8697f6ed5a23",
+        "bytes": 579554,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Veilpsalm Robe: one complete empty front-facing floor-length ivory cloth robe, short broad sleeves, claret central stole-like panels, gold-thread hem and narrow woven waist sash; whole hem visible. Discipline priest CLOTH set: heavy ivory and muted claret woven fabric, deep charcoal lining, restrained antique brass clasps and narrow gold-thread geometric trim. Structured pleats and layered protective-looking fabric folds, no leather or metal armor, no religious writing or real-world symbols. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_discipline_legs",
+      "family": "discipline",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_discipline_legs.webp",
+      "canonicalDisplayName": "Veilpsalm Leggings",
+      "acceptedSha256": "ac1e2622f90245497a958782ecaf3e0fa172d09d18ac5c4019361bc4439a5b07",
+      "acceptedBytes": 3178,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_discipline_legs.png",
+        "sha256": "771836f10fc80e7fb086d49d5442c78691101cef7952730d881b4f06a7b7935c",
+        "bytes": 2263331,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_discipline_legs.png",
+        "sha256": "20a74e00a8b5d4690ff26de42960649a4874b0e7b658b94b6851fa0a0859063d",
+        "bytes": 534386,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Veilpsalm Leggings: complete joined pair of ivory woven cloth trousers with claret outer panels, soft pleated knees, narrow embroidered cuffs and cloth waist tie; no boots. Discipline priest CLOTH set: heavy ivory and muted claret woven fabric, deep charcoal lining, restrained antique brass clasps and narrow gold-thread geometric trim. Structured pleats and layered protective-looking fabric folds, no leather or metal armor, no religious writing or real-world symbols. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_discipline_gloves",
+      "family": "discipline",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_discipline_gloves.webp",
+      "canonicalDisplayName": "Veilpsalm Handwraps",
+      "acceptedSha256": "69ebd75b7338c031f2e91c1dc7d55fadccbd7b06cbc05fab6943c5f1dcc0b458",
+      "acceptedBytes": 3650,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_discipline_gloves.png",
+        "sha256": "98866979814224913d1cdc723bdffb1454f779915df5f861b5de6524ec3d362e",
+        "bytes": 2521709,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_discipline_gloves.png",
+        "sha256": "edcf2724113095c0e4a91e020b47d8daba659526a8c3afabc150fdca387a1e4f",
+        "bytes": 581654,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Veilpsalm Handwraps: compact matched pair of empty ivory fabric hand-shaped wraps, fully wrapped fingers, claret wrist bindings and simple brass clasps, no skin or hands inside. Discipline priest CLOTH set: heavy ivory and muted claret woven fabric, deep charcoal lining, restrained antique brass clasps and narrow gold-thread geometric trim. Structured pleats and layered protective-looking fabric folds, no leather or metal armor, no religious writing or real-world symbols. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_holy_helmet",
+      "family": "holy",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_holy_helmet.webp",
+      "canonicalDisplayName": "Gracewing Cowl",
+      "acceptedSha256": "0a5d99a67ab33f3e6a510333bf671a755fc3fa3f78b0f56b8128b05de8e9d11d",
+      "acceptedBytes": 3940,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_holy_helmet.png",
+        "sha256": "273acd4b683131cfc127676b74d3661767f0282ce821473d2f23ad3b57ce5da4",
+        "bytes": 2429934,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_holy_helmet.png",
+        "sha256": "8ef00e14ccbc2b050daf565835554854b332fd133db265a6518fba7563656b48",
+        "bytes": 592671,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Gracewing Cowl: one complete empty flowing cream cloth hood, softly swept mist-blue lining and pearl-set gold clasp at throat, no head or shoulders. Holy priest CLOTH set: soft pale cream and mist-blue silk-linen fabric, modest brushed gold clasps and warm pearl accents. Graceful feather-like overlapping fabric pleats, airy curved hems and gentle reflected light, no actual wings, no armor, no luminous haze or writing. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_holy_shoulder",
+      "family": "holy",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_holy_shoulder.webp",
+      "canonicalDisplayName": "Gracewing Mantle",
+      "acceptedSha256": "fb2b326919331f8b2703b888a4f60d4420c6fe3f18a28d190ef37cbd2076ef94",
+      "acceptedBytes": 3858,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_holy_shoulder.png",
+        "sha256": "dc608d9bb44be223b76ad7f6650d0139b3f060c8f7ced7d76fdf806e01cccb27",
+        "bytes": 2424089,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_holy_shoulder.png",
+        "sha256": "2fcd31a9db0c98a26b8c73fca7f207eb63b5615b23cf845502326264019edcb8",
+        "bytes": 586283,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Gracewing Mantle: compact matched shoulder-length cream fabric mantle, feather-like layered pleats draping both sides, mist-blue undersides and one pearl clasp; no torso. Holy priest CLOTH set: soft pale cream and mist-blue silk-linen fabric, modest brushed gold clasps and warm pearl accents. Graceful feather-like overlapping fabric pleats, airy curved hems and gentle reflected light, no actual wings, no armor, no luminous haze or writing. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_holy_chest",
+      "family": "holy",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_holy_chest.webp",
+      "canonicalDisplayName": "Gracewing Robe",
+      "acceptedSha256": "4a7872b2a9bf0198eb8869e9045f9433433e0ae778058289ea4e81d8618e97f4",
+      "acceptedBytes": 3708,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_holy_chest.png",
+        "sha256": "654a7da2e3771f947de5476505221023fcea75ed3246ac60d640289c29e55b83",
+        "bytes": 2335333,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_holy_chest.png",
+        "sha256": "fff9e46ad38665601ccf17efd0c81bc5e655cfadf6ebd6f54421bc985ee3f3df",
+        "bytes": 578544,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Gracewing Robe: one complete empty front-facing floor-length cream silk-linen robe with gentle flowing mist-blue side folds, graceful wide short sleeves and small pearl-set waist clasp; full hem visible. Holy priest CLOTH set: soft pale cream and mist-blue silk-linen fabric, modest brushed gold clasps and warm pearl accents. Graceful feather-like overlapping fabric pleats, airy curved hems and gentle reflected light, no actual wings, no armor, no luminous haze or writing. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_holy_legs",
+      "family": "holy",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_holy_legs.webp",
+      "canonicalDisplayName": "Gracewing Leggings",
+      "acceptedSha256": "428a36bfcd5cbb56c5ebfef056721ce4f0923d57195b1868c284fe797b327710",
+      "acceptedBytes": 3652,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_holy_legs.png",
+        "sha256": "cf9470bc7412d510458c2735abf41edf55b14d37da342743cc5af5695ba3cc5c",
+        "bytes": 2255824,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_holy_legs.png",
+        "sha256": "2b2a61db06c36fc41f6e6bd443e7e692bf550832608d5e35a7e778d1dd191b6f",
+        "bytes": 582879,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Gracewing Leggings: complete joined pair of flowing cream woven cloth trousers with mist-blue outer pleats, fine gold-thread cuff edging and soft cloth waistband; no boots. Holy priest CLOTH set: soft pale cream and mist-blue silk-linen fabric, modest brushed gold clasps and warm pearl accents. Graceful feather-like overlapping fabric pleats, airy curved hems and gentle reflected light, no actual wings, no armor, no luminous haze or writing. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_holy_gloves",
+      "family": "holy",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_holy_gloves.webp",
+      "canonicalDisplayName": "Gracewing Handwraps",
+      "acceptedSha256": "12976186dec3b22bbb9198a0e4a5c6e94e703b18c1629793d59c824cfa967f15",
+      "acceptedBytes": 3956,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_holy_gloves.png",
+        "sha256": "3493aaa6f5095dc214fe98c4f07396340b9045a63d7c17167859b0e95bd3a258",
+        "bytes": 2677525,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_holy_gloves.png",
+        "sha256": "4d235e79335a217d20189fb1bb761af63ac5c86f6f3385edb438d2e242e681da",
+        "bytes": 606748,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Gracewing Handwraps: compact matched pair of empty soft cream cloth wraps shaped like gloves with fully wrapped fingers, mist-blue wrist folds and small pearl clasps, no skin. Holy priest CLOTH set: soft pale cream and mist-blue silk-linen fabric, modest brushed gold clasps and warm pearl accents. Graceful feather-like overlapping fabric pleats, airy curved hems and gentle reflected light, no actual wings, no armor, no luminous haze or writing. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_shadow_helmet",
+      "family": "shadow",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_shadow_helmet.webp",
+      "canonicalDisplayName": "Duskhymn Cowl",
+      "acceptedSha256": "2c8c2070fca79b7b69d45fb9484ada9e5f911c0fbd9fd90d936936e89ad85d5f",
+      "acceptedBytes": 2500,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_shadow_helmet.png",
+        "sha256": "18c9742d4de9c08bead811a387a9dce937e259c6e9c947c4b4435a6c466dca9c",
+        "bytes": 2341778,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_shadow_helmet.png",
+        "sha256": "52dd946b64ddb26d579852c692e5c2d5918b9f84e2b67882f657f823432f48eb",
+        "bytes": 498159,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Duskhymn Cowl: one complete empty tall folded aubergine cloth hood with pointed smoky plum rim and a dark amethyst clasp at the base, deep empty opening, no head or shoulders. Shadow priest CLOTH set: deep aubergine and smoky plum woven fabric over charcoal lining, narrow tarnished silver trim and small dark amethyst clasps. Tall folded collars, pointed layered cloth hems and restrained cool purple edge reflections keep the silhouette readable. No leather, plate armor, skulls, faces, writing or obscuring magic fog. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 1,
+        "retryReason": "Original generation returned empty disk files during disk exhaustion; regenerated after space was freed"
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_shadow_shoulder",
+      "family": "shadow",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_shadow_shoulder.webp",
+      "canonicalDisplayName": "Duskhymn Mantle",
+      "acceptedSha256": "c169a95c7b291a8e2c59fc87982ee36d9a55f8cdbf33f506661be3eee43dfdb2",
+      "acceptedBytes": 3180,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_shadow_shoulder.png",
+        "sha256": "554660a4ca3772d56231d449e25e3b230233355f5dd7bd478054a1c22cdd42be",
+        "bytes": 2517851,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_shadow_shoulder.png",
+        "sha256": "ddaab3928d226d43994e0247f50b0b1ff3377d8b5394fe91086dbaa39aab8080",
+        "bytes": 511108,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Duskhymn Mantle: one compact pair-like shoulder mantle of layered pointed aubergine fabric folds with smoky plum undersides, silver-thread edges and an amethyst central clasp; no body. Shadow priest CLOTH set: deep aubergine and smoky plum woven fabric over charcoal lining, narrow tarnished silver trim and small dark amethyst clasps. Tall folded collars, pointed layered cloth hems and restrained cool purple edge reflections keep the silhouette readable. No leather, plate armor, skulls, faces, writing or obscuring magic fog. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 1,
+        "retryReason": "Original generation returned empty disk files during disk exhaustion; regenerated after space was freed"
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_shadow_chest",
+      "family": "shadow",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_shadow_chest.webp",
+      "canonicalDisplayName": "Duskhymn Robe",
+      "acceptedSha256": "ecde95601ba559078899388f742805da8217399ed8195c4d47bdbce51c5ab430",
+      "acceptedBytes": 2784,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_shadow_chest.png",
+        "sha256": "531f50aaf67fc052345eeccd63776e52c94b68aecf338656811b7d34ca2e7821",
+        "bytes": 2229078,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_shadow_chest.png",
+        "sha256": "341ab4fa899c36189737d253980ae92de897621d2c8b23a4983bb5aa908cb2ca",
+        "bytes": 495766,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Duskhymn Robe: one complete empty front-facing floor-length aubergine woven robe with pointed smoky plum panels, broad short sleeves, narrow silver trim and amethyst waist clasp; full hem visible. Shadow priest CLOTH set: deep aubergine and smoky plum woven fabric over charcoal lining, narrow tarnished silver trim and small dark amethyst clasps. Tall folded collars, pointed layered cloth hems and restrained cool purple edge reflections keep the silhouette readable. No leather, plate armor, skulls, faces, writing or obscuring magic fog. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_shadow_legs",
+      "family": "shadow",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_shadow_legs.webp",
+      "canonicalDisplayName": "Duskhymn Leggings",
+      "acceptedSha256": "d44e4441211604bb4d8d64ee8a5cd40d5362b3c5ceb8030ec7e5285abd350ea8",
+      "acceptedBytes": 2598,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_shadow_legs.png",
+        "sha256": "aa420b5464959b68a8d732bcb767c2e3ef54684e5c8a27c75fc7b195c0d5b178",
+        "bytes": 2135968,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_shadow_legs.png",
+        "sha256": "ae36807f2abb8dc3dd3fb78b5e7d43bcd21f26bb5ba693a102c84a3df61197f6",
+        "bytes": 502700,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Duskhymn Leggings: complete joined pair of deep plum cloth trousers with aubergine layered side folds, restrained silver-thread cuffs and soft fabric waist sash; no boots. Shadow priest CLOTH set: deep aubergine and smoky plum woven fabric over charcoal lining, narrow tarnished silver trim and small dark amethyst clasps. Tall folded collars, pointed layered cloth hems and restrained cool purple edge reflections keep the silhouette readable. No leather, plate armor, skulls, faces, writing or obscuring magic fog. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_priest_shadow_gloves",
+      "family": "shadow",
+      "batch": "warfare-season2-priest-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_priest_shadow_gloves.webp",
+      "canonicalDisplayName": "Duskhymn Handwraps",
+      "acceptedSha256": "6511a84a4ec477f926a3f45ac6b5c571a91ed794fb67aebf283fd5d1467019e1",
+      "acceptedBytes": 3018,
+      "original": {
+        "path": "tmp/imagegen/v045-priest/originals/vanguard_priest_shadow_gloves.png",
+        "sha256": "2d2b1a5accdf9f49c751cebf46e756bada7b0c5067783460e63eed8202ff161d",
+        "bytes": 2432570,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-priest/masters/vanguard_priest_shadow_gloves.png",
+        "sha256": "8688424871cd45c58b45b226e4982babb002abede07b92db2a35ae7eeb1a3d81",
+        "bytes": 530289,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Duskhymn Handwraps: compact matched pair of empty aubergine cloth wraps shaped like gloves with fully wrapped fingers, smoky plum wrist bands and small amethyst clasps, no skin. Shadow priest CLOTH set: deep aubergine and smoky plum woven fabric over charcoal lining, narrow tarnished silver trim and small dark amethyst clasps. Tall folded collars, pointed layered cloth hems and restrained cool purple edge reflections keep the silhouette readable. No leather, plate armor, skulls, faces, writing or obscuring magic fog. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile woven cloth, flowing folds and soft fabric sheen, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette with subtle contact shadow. Complete centered subject occupies about 72 percent square with generous padding; readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numerals, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0,
+        "retryReason": null
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-priest-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-priest-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

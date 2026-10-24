@@ -94,6 +94,38 @@ describe('hoverCursorKind', () => {
     expect(hoverCursorKind(npc, 1, new Set())).toBe('friendly');
   });
 
+  it("returns friendly (the gauntlet) for the muster's weapon rack, and only while it lends", () => {
+    const rack = stubEntity({ id: 9, kind: 'object', templateId: 'muster_weapon_rack' });
+    rack.lootable = true;
+    expect(hoverCursorKind(rack, 1, new Set())).toBe('friendly');
+    rack.lootable = false;
+    expect(hoverCursorKind(rack, 1, new Set())).toBe('default');
+    // Any other ground object keeps the plain arrow it always had.
+    const crate = stubEntity({ id: 10, kind: 'object', templateId: 'supply_crate' });
+    crate.lootable = true;
+    expect(hoverCursorKind(crate, 1, new Set())).toBe('default');
+  });
+
+  it('returns friendly (the gauntlet) for a usable encounter body the player cannot attack', () => {
+    // A Remembrance Candle's body in Morthen's Rite: held, never hostile, and
+    // the thing to click. The direct pick now resolves a hover over it to the
+    // candle, and the plain arrow gave no cue that it does something.
+    const candle = stubEntity({ id: 20, kind: 'mob', templateId: 'crypt_remembrance_candle' });
+    expect(hoverCursorKind(candle, 1, new Set())).toBe('friendly');
+    // Only while it can be used: a spent or dead body is scenery again.
+    candle.hp = 0;
+    expect(hoverCursorKind(candle, 1, new Set())).toBe('default');
+    candle.hp = 100;
+    candle.dead = true;
+    expect(hoverCursorKind(candle, 1, new Set())).toBe('default');
+    // A usable body the player CAN attack (the Soul Brazier) keeps the attack cursor.
+    const brazier = stubEntity({ id: 21, kind: 'mob', templateId: 'soul_brazier', hostile: true });
+    expect(hoverCursorKind(brazier, 1, new Set())).toBe('attack');
+    // A non-hostile mob with nothing to use keeps the plain arrow.
+    const critter = stubEntity({ id: 22, kind: 'mob', templateId: 'marrow_restless_bones' });
+    expect(hoverCursorKind(critter, 1, new Set())).toBe('default');
+  });
+
   it('returns friendly for other players', () => {
     const ally = stubEntity({ id: 4, kind: 'player' });
     const stranger = stubEntity({ id: 5, kind: 'player' });
@@ -473,6 +505,72 @@ describe('handlePickedEntity', () => {
 
     expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(true);
     expect(hud.openLoot).toHaveBeenCalledWith(2, 10, 20);
+  });
+
+  // A dead PLAYER's body carries loot only while it holds World PvP spoils
+  // (src/sim/pvp/world_pvp_spoils.ts); the killer opens it like a corpse, and a
+  // plain dead player (no spoils) still only targets.
+  it.each([0, 2])("opens a World PvP body's spoils with button %i", (button) => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const body = stubEntity({
+      id: 2,
+      kind: 'player',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      loot: {
+        copper: 2_000,
+        items: [
+          {
+            itemId: 'pvp_trophy_skull',
+            count: 1,
+            personalFor: [1],
+            materialSources: [
+              { source: { gatherer: { kind: 'character', id: 2, name: 'Bet' } }, count: 1 },
+            ],
+          },
+        ],
+      },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const plain = stubEntity({ id: 3, kind: 'player', dead: true, pos: { x: 1, y: 0, z: 0 } });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, body],
+        [3, plain],
+      ]),
+      targetEntity: vi.fn(),
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      openLoot: vi.fn(),
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(true);
+    expect(hud.openLoot).toHaveBeenCalledWith(2, 10, 20);
+    expect(handlePickedEntity(world, hud, 3, button, 10, 20)).toBe(false);
+    expect(hud.openLoot).toHaveBeenCalledTimes(1);
+    expect(world.targetEntity).toHaveBeenCalledWith(3);
+  });
+
+  it('walks toward an out-of-range World PvP body with spoils, never toward a bare dead player', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const far = { x: 30, y: 0, z: 0 };
+    const body = stubEntity({
+      id: 2,
+      kind: 'player',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      loot: { copper: 500, items: [] },
+      pos: far,
+    });
+    const plain = stubEntity({ id: 3, kind: 'player', dead: true, pos: far });
+    expect(shouldApproachPickedEntity(player, body, false)).toBe(true);
+    expect(shouldApproachPickedEntity(player, plain, false)).toBe(false);
   });
 
   it.each([0, 2])('preserves movement when button %i finds no visible corpse loot', (button) => {

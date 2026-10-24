@@ -1,0 +1,42 @@
+[
+  {
+    "id": "dgn_olen_buttress",
+    "src": "http://localhost:5194/ui/deeds/dgn_olen_buttress.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_ossick_moored",
+    "src": "http://localhost:5194/ui/deeds/dgn_ossick_moored.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_vael_beacon",
+    "src": "http://localhost:5194/ui/deeds/dgn_vael_beacon.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_turretback",
+    "src": "http://localhost:5194/ui/deeds/dgn_turretback.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_turnkey_cage",
+    "src": "http://localhost:5194/ui/deeds/dgn_turnkey_cage.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

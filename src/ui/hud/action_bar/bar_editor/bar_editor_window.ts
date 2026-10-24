@@ -33,6 +33,7 @@ import { iconDataUrl } from '../../../icons';
 import { svgIcon } from '../../../ui_icons';
 import type { HotbarAction } from '../hotbar';
 import { MOBILE_ACTION_BUTTONS } from '../mobile_action_page_view';
+import { petSlotIconId, petSlotText } from '../pet_slot_core';
 import {
   armBarEditorAbility,
   BAR_EDITOR_DIRECTION_KEYS,
@@ -376,12 +377,14 @@ export class BarEditorWindow {
       const item = ITEMS[action.id];
       return item ? itemDisplayName(item) : null;
     }
+    if (action.type === 'pet') return t(petSlotText(action.id).name);
     const def = ABILITIES[action.id];
     return def ? abilityDisplayName(def) : null;
   }
 
   private iconBackground(action: HotbarAction): string {
     if (action === null) return '';
+    if (action.type === 'pet') return `url(${iconDataUrl('ability', petSlotIconId(action.id))})`;
     return `url(${iconDataUrl(action.type === 'item' ? 'item' : 'ability', action.id)})`;
   }
 }

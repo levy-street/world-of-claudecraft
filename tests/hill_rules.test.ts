@@ -1,19 +1,18 @@
 // Pins for the King of the Hill pure rules (src/sim/pvp/hill_rules.ts): the
 // standing (parties only, any level), the group key, the strict-maximum
-// leader, the majority verdict, the contest clock, the spot probe, the
-// two-hour schedule and the circle test.
+// leader, the majority verdict, the contest clocks (paused, never reset, by a
+// rival), the successor a hold follows across a group change, the spot probe, the
+// three-hour schedule and the circle test.
 import { describe, expect, it } from 'vitest';
 import {
   HILL_ACCRUAL_SECONDS,
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_FIRST_WINDOW_AT_SECONDS,
+  HILL_HONOR_PER_PAYOUT,
   HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_NOTICE_SECONDS,
   HILL_RADIUS,
-  HILL_RAMP_MAX_HONOR,
-  HILL_RAMP_STEP_HONOR,
-  HILL_RAMP_STEP_SECONDS,
   HILL_VAULT_MIN_HOLD_SECONDS,
   HILL_VAULT_MIN_INSIDE_SECONDS,
   HILL_WARNING_SECONDS,
@@ -21,13 +20,13 @@ import {
   type HillSpotProbe,
   hillChallengeStands,
   hillContains,
-  hillContestStep,
   hillGroupKey,
-  hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
+  hillProgressStep,
   hillSpotIsOpen,
   hillStanding,
+  hillSuccessorKey,
   hillTimes,
   hillTimesFrom,
   hillWindowAt,
@@ -36,16 +35,14 @@ import {
 describe('the tuning literals the copy and the docs quote', () => {
   it('pins the radius, the window, the warning, the stand, the capture length and the trickle', () => {
     expect(HILL_RADIUS).toBe(50);
-    expect(HILL_WINDOW_SECONDS).toBe(2 * 3_600);
+    expect(HILL_WINDOW_SECONDS).toBe(3 * 3_600);
     expect(HILL_WARNING_SECONDS).toBe(15 * 60);
-    expect(HILL_DURATION_SECONDS).toBe(30 * 60);
+    expect(HILL_DURATION_SECONDS).toBe(45 * 60);
     expect(HILL_FIRST_WINDOW_AT_SECONDS).toBe(120);
-    expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(75 * 60);
-    expect(HILL_CAPTURE_SECONDS).toBe(60);
-    expect(HILL_ACCRUAL_SECONDS).toBeCloseTo((60 * 29) / 44);
-    expect(HILL_RAMP_STEP_SECONDS).toBeCloseTo((300 * 29) / 44);
-    expect(HILL_RAMP_STEP_HONOR).toBe(2);
-    expect(HILL_RAMP_MAX_HONOR).toBe(12);
+    expect(HILL_LATEST_WARN_OFFSET_SECONDS).toBe(2 * 3_600);
+    expect(HILL_CAPTURE_SECONDS).toBe(30);
+    expect(HILL_ACCRUAL_SECONDS).toBe(60);
+    expect(HILL_HONOR_PER_PAYOUT).toBe(9);
     // Owner spec 2026-09-29: the realm is reminded every five minutes, and the
     // Weekly Vault point needs a full minute inside.
     expect(HILL_NOTICE_SECONDS).toBe(5 * 60);
@@ -125,12 +122,89 @@ describe('hillChallengeStands', () => {
   });
 });
 
-describe('hillContestStep', () => {
-  it('counts on for the same challenger, restarts for a new one, resets when the challenge lapses', () => {
-    expect(hillContestStep(10, true, true, 1)).toBe(11);
-    expect(hillContestStep(10, true, false, 1)).toBe(1);
-    expect(hillContestStep(10, false, true, 1)).toBe(0);
-    expect(hillContestStep(0, true, false, 1)).toBe(1);
+describe('hillProgressStep', () => {
+  const step = (
+    prev: [string, number][],
+    counts: [string, number][],
+    challenger: string | null,
+    holder: string | null = null,
+  ) => [...hillProgressStep(new Map(prev), new Map(counts), challenger, holder, 1)];
+
+  it('banks a pass for the challenger, starting a fresh clock at one pass', () => {
+    expect(step([['a', 10]], [['a', 2]], 'a')).toEqual([['a', 11]]);
+    expect(step([], [['a', 1]], 'a')).toEqual([['a', 1]]);
+  });
+
+  it('pauses, never resets, a group still inside that is not the leader', () => {
+    // A tie: nobody leads, both clocks hold still.
+    expect(
+      step(
+        [['a', 10]],
+        [
+          ['a', 1],
+          ['b', 1],
+        ],
+        null,
+      ),
+    ).toEqual([['a', 10]]);
+    // A bigger group walked in: it counts, the old challenger waits.
+    expect(
+      step(
+        [['a', 10]],
+        [
+          ['a', 1],
+          ['b', 2],
+        ],
+        'b',
+      ),
+    ).toEqual([
+      ['a', 10],
+      ['b', 1],
+    ]);
+  });
+
+  it('drops the clock of a group with nobody counted inside (dead or gone)', () => {
+    expect(step([['a', 25]], [['b', 1]], 'b')).toEqual([['b', 1]]);
+    expect(step([['a', 25]], [['a', 0]], null)).toEqual([]);
+  });
+
+  it('never carries a clock for the holder, and leaves its input untouched', () => {
+    const prev = new Map([['h', 5]]);
+    expect([...hillProgressStep(prev, new Map([['h', 3]]), null, 'h', 1)]).toEqual([]);
+    expect([...prev]).toEqual([['h', 5]]);
+  });
+});
+
+describe('hillSuccessorKey', () => {
+  it('follows a lone holder into the party they formed', () => {
+    expect(hillSuccessorKey([{ key: 'party:7', inside: true }])).toBe('party:7');
+  });
+
+  it('prefers the key with most members inside, then most members, then the earliest', () => {
+    expect(
+      hillSuccessorKey([
+        { key: 'solo:1', inside: false },
+        { key: 'solo:2', inside: true },
+      ]),
+    ).toBe('solo:2');
+    expect(
+      hillSuccessorKey([
+        { key: 'solo:1', inside: false },
+        { key: 'party:3', inside: false },
+        { key: 'party:3', inside: false },
+      ]),
+    ).toBe('party:3');
+    expect(
+      hillSuccessorKey([
+        { key: 'solo:1', inside: true },
+        { key: 'solo:2', inside: true },
+      ]),
+    ).toBe('solo:1');
+  });
+
+  it('is null when no member still counts', () => {
+    expect(hillSuccessorKey([])).toBeNull();
+    expect(hillSuccessorKey([{ key: null, inside: true }])).toBeNull();
   });
 });
 
@@ -180,24 +254,24 @@ describe('hillSpotIsOpen', () => {
     expect(hillSpotIsOpen(open({ blocked: (x) => x > 45 }), 'zone', 0, 0, 50)).toBe(true);
   });
 });
-describe('the two-hour schedule', () => {
-  it('opens the first window two minutes in and one every two hours after', () => {
+describe('the three-hour schedule', () => {
+  it('opens the first window two minutes in and one every three hours after', () => {
     expect(hillWindowAt(0)).toBe(-1);
     expect(hillWindowAt(119)).toBe(-1);
     expect(hillWindowAt(120)).toBe(0);
-    expect(hillWindowAt(120 + 7_199)).toBe(0);
-    expect(hillWindowAt(120 + 7_200)).toBe(1);
+    expect(hillWindowAt(120 + 10_799)).toBe(0);
+    expect(hillWindowAt(120 + 10_800)).toBe(1);
   });
 
-  it('warns at the offset, rises 15 minutes on, falls 30 after, always inside the window', () => {
-    expect(hillTimes(0, 0)).toEqual({ warnAt: 120, risesAt: 120 + 900, closesAt: 120 + 2_700 });
+  it('warns at the offset, rises 15 minutes on, falls 45 after, always inside the window', () => {
+    expect(hillTimes(0, 0)).toEqual({ warnAt: 120, risesAt: 120 + 900, closesAt: 120 + 3_600 });
     expect(hillTimes(2, 600)).toEqual({
-      warnAt: 120 + 14_400 + 600,
-      risesAt: 120 + 14_400 + 1_500,
-      closesAt: 120 + 14_400 + 3_300,
+      warnAt: 120 + 21_600 + 600,
+      risesAt: 120 + 21_600 + 1_500,
+      closesAt: 120 + 21_600 + 4_200,
     });
     // The latest offset ends exactly at the window's close; past it clamps.
-    expect(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS).closesAt).toBe(120 + 7_200);
+    expect(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS).closesAt).toBe(120 + 10_800);
     expect(hillTimes(0, 99_999)).toEqual(hillTimes(0, HILL_LATEST_WARN_OFFSET_SECONDS));
     expect(hillTimes(0, -5)).toEqual(hillTimes(0, 0));
     expect(hillWindowAt(hillTimes(4, 1234).closesAt - 1)).toBe(4);
@@ -234,24 +308,26 @@ describe('hillContains', () => {
   });
 });
 
-describe('hillHonorPerPayout: the compressed hold ramp', () => {
-  it('keeps the reward steps while compressing their timing', () => {
-    expect(hillHonorPerPayout(0)).toBe(2);
-    expect(hillHonorPerPayout(HILL_RAMP_STEP_SECONDS - 0.01)).toBe(2);
-    expect(hillHonorPerPayout(HILL_RAMP_STEP_SECONDS)).toBe(4);
-    expect(hillHonorPerPayout(5 * HILL_RAMP_STEP_SECONDS)).toBe(12);
-    expect(hillHonorPerPayout(-5)).toBe(2);
-  });
+/** The 2026-09-25 hold ramp the flat rate replaced (2 a minute, 2 more each
+ *  five minutes held, capped at 12), kept here only to pin that the flat rate
+ *  pays a full stand the same total. */
+function rampTotal(paidMinutes: number): number {
+  let total = 0;
+  for (let minute = 1; minute <= paidMinutes; minute++) {
+    total += Math.min(12, 2 * (1 + Math.floor(minute / 5)));
+  }
+  return total;
+}
 
-  it('preserves all 388 honor from the old 45-minute stand after the same capture', () => {
-    let oldTotal = 0;
-    let newTotal = 0;
-    for (let payout = 1; payout <= 44; payout++) {
-      oldTotal += Math.min(12, 2 * (1 + Math.floor(payout / 5)));
-      newTotal += hillHonorPerPayout(payout * HILL_ACCRUAL_SECONDS + 1e-9);
-    }
-    expect(oldTotal).toBe(388);
-    expect(newTotal).toBe(oldTotal);
-    expect(44 * HILL_ACCRUAL_SECONDS + HILL_CAPTURE_SECONDS).toBeCloseTo(1800);
+describe('HILL_HONOR_PER_PAYOUT: the flat rate', () => {
+  it("is the ramp's average minute over a full stand, to the nearest whole Honor", () => {
+    // Only complete held minutes pay after the inherited 30-second capture.
+    const paidMinutes = Math.floor(
+      (HILL_DURATION_SECONDS - HILL_CAPTURE_SECONDS) / HILL_ACCRUAL_SECONDS,
+    );
+    expect(paidMinutes).toBe(44);
+    expect(rampTotal(paidMinutes)).toBe(388);
+    expect(HILL_HONOR_PER_PAYOUT).toBe(Math.round(rampTotal(paidMinutes) / paidMinutes));
+    expect(paidMinutes * HILL_HONOR_PER_PAYOUT).toBe(396);
   });
 });

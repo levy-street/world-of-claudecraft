@@ -1,5 +1,6 @@
 import { authoredLettersById } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
+import { STUDIO_CONTENT } from '../sim/studio_content';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
 //
@@ -17,6 +18,42 @@ import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 // declared-base merge in the build resolver (scripts/i18n_build.mjs). Only `.en` is
 // consumed, so this object carries only `en`.
 
+// Historical name keys remain for maintained locale overlays. They do not
+// register active mobs, rewards or Hunting entries.
+const RETIRED_BUDDY_NAMES = {
+  buddy_sapling: { name: 'Sapling' },
+  buddy_ember_fox: { name: 'Ember Fox' },
+  buddy_moss_hare: { name: 'Moss Hare' },
+  buddy_frog: { name: 'Frog' },
+  buddy_crimson_claw_crab: { name: 'Crimson Claw Crab' },
+  buddy_golden_sentinel: { name: 'Golden Sentinel' },
+  buddy_nightfang: { name: 'Nightfang' },
+  buddy_tuskhorn_boar: { name: 'Tuskhorn Boar' },
+  buddy_emerald_wolf: { name: 'Emerald Wolf' },
+  buddy_tiger: { name: 'Tiger' },
+  buddy_cate_coin: { name: 'Cate Coin' },
+  buddy_alon: { name: 'Alon' },
+  buddy_trollface: { name: 'Trollface' },
+  buddy_ansem: { name: 'Ansem' },
+  buddy_triple_t: { name: 'Triple T' },
+  buddy_kekius: { name: 'Kekius' },
+  buddy_solbot: { name: 'Solbot' },
+  buddy_frostfire: { name: 'Frostfire' },
+  buddy_rocky: { name: 'Rocky' },
+  buddy_proud_grunt: { name: 'Proud Grunt' },
+  buddy_loot_goblin: { name: 'Loot Goblin' },
+  buddy_penny_goldspark: { name: 'Penny Goldspark' },
+  buddy_stag: { name: 'Stag' },
+  buddy_alpaca: { name: 'Alpaca' },
+  buddy_bull: { name: 'Bull' },
+  buddy_spider: { name: 'Spider' },
+  buddy_raptor: { name: 'Raptor' },
+  buddy_skeleton: { name: 'Skeleton' },
+  buddy_crystal_tide: { name: 'Crystal Tide' },
+  buddy_phantom: { name: 'Phantom' },
+  buddy_emberfall_phoenix: { name: 'Emberfall Phoenix' },
+} as const;
+
 const MOB_IDS = [
   'yumi_cat',
   'forest_wolf',
@@ -30,6 +67,7 @@ const MOB_IDS = [
   'willowfen_remedy_caravan',
   'frostveil_supply_caravan',
   'restless_bones',
+  'marrow_restless_bones',
   'gorrak',
   'mire_prowler',
   'deepfen_murloc',
@@ -72,11 +110,75 @@ const MOB_IDS = [
   'bonechill_widow',
   'sexton_marrow',
   'morthen',
+  // The Hollow Crypt rework (sim/content/hollow_crypt.ts).
+  'ossuary_sentinel',
+  'hollow_gravedigger',
+  'rime_egg_sac',
+  'rimeweb_hatchling',
+  'rimeweb_spinner',
+  'candlewright_acolyte',
+  'hollow_chorister',
+  'bound_soul',
+  'rimeweb',
+  'cantor_ilvane',
+  // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
+  'crypt_ossuary_warrior',
+  'crypt_gravecaller_adept',
+  'crypt_ossuary_cutthroat',
+  'crypt_gravecaller_necromancer',
+  'crypt_bone_minion',
+  'crypt_bone_brute',
+  // Reassemble's bones (the crypt trash mechanics pass, trash_kit/crypt_kit.ts).
+  'crypt_bone_pile',
+  'crypt_chapel_gargoyle',
+  'crypt_crow_caller',
+  'crypt_carrion_crow',
+  'crypt_ossuary_drake',
+  // The Hollow Crypt finale (sim/content/hollow_crypt.ts).
+  'crypt_knellwyrm',
+  // Morthen's Rite: the usable body at each candle's foot (the relight).
+  'crypt_remembrance_candle',
   'bastion_revenant',
   'tidebound_acolyte',
   'drowned_thrall',
   'knight_commander_olen',
   'vael_the_mistcaller',
+  // The Sunken Bastion rework (sim/content/sunken_bastion.ts).
+  'drowned_watchman',
+  'fogbound_arbalest',
+  'barnacle_crawler',
+  'bastion_warhound',
+  'mistweaver',
+  'drowned_sergeant',
+  'shackled_prisoner',
+  'gaol_turnkey',
+  'turretback_hermit',
+  'vael_fog_shade',
+  'gaoler_ossick',
+  // The Bastion's fifth pass: the Turnkey's Iron Cage and Ossick's anchor.
+  'bastion_gaol_cage',
+  'bastion_drowned_anchor',
+  // The Drowned Temple rework (sim/content/drowned_temple.ts); the per-class
+  // Reflections all wear the one name.
+  'lagoon_snapper',
+  'ice_wraith',
+  'moonlit_siren',
+  'tidewisp',
+  'drowned_pilgrim',
+  'mere_hydra_head_left',
+  'mere_hydra_head_center',
+  'mere_hydra_head_right',
+  'tideglass_colossus',
+  'tideglass_reflection',
+  'tideglass_reflection_warrior',
+  'tideglass_reflection_paladin',
+  'tideglass_reflection_hunter',
+  'tideglass_reflection_rogue',
+  'tideglass_reflection_priest',
+  'tideglass_reflection_shaman',
+  'tideglass_reflection_mage',
+  'tideglass_reflection_warlock',
+  'tideglass_reflection_druid',
   'sanctum_boneguard',
   'sanctum_drakonid',
   'raised_bonewalker',
@@ -133,7 +235,15 @@ const MOB_IDS = [
   'tolling_bell',
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
+  'balgath_cyclops',
   'thunzharr_stormling',
+  // The Mirefen muster around Balgath's crater (src/sim/content/mirefen_muster.ts).
+  'muster_footman',
+  'muster_chaplain',
+  'muster_sergeant',
+  // The command camp's drill yard: the mallet man and the training effigy.
+  'muster_drillmaster',
+  'muster_effigy',
   // Ambient Highwatch Stables horse (zone 3)
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
@@ -265,7 +375,74 @@ const MOB_IDS = [
   'wildheart_ravager',
   'wildheart_hexcaller',
   'wildheart_beastmaster',
+  // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md).
+  'sunbone_totem_binder',
+  'sunbone_totem',
+  // The Wildheart trash mechanics pass: the Totem-Binder's fear totem.
+  'sunbone_dread_totem',
+  'basin_raptor',
+  'spore_toad',
+  'vine_lasher',
+  'great_saurian',
+  'howdah_hexcaller',
+  'fanglord_jaguar',
+  'the_gorgebloom',
   'wildheart_high_priest',
+  // The Gravewyrm Sanctum rework (docs/design/dungeon-rework/gravewyrm_sanctum.md).
+  'broodsworn_thawcaller',
+  'broodsworn_goadsmith',
+  'broodsworn_pyre_tender',
+  'soul_brazier',
+  'rime_whelp',
+  'ogre_sledge_hauler',
+  'glacier_splinter',
+  'sledge_tusker',
+  // Korgath's Seal Shackles (encounters/gravewyrm_sanctum/korgath.ts).
+  'sanctum_shackle_hammer',
+  'sanctum_shackle_tongs',
+  'sanctum_shackle_anvil',
+  'sanctum_shackle_bellows',
+  // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
+  'thorn_sprout',
+  // Cosmetic buddy followers (src/sim/content/buddy_mobs.ts). Their nameplate
+  // is off by default (the dedicated "Show Pet Names" option), but the
+  // canonical-fallback name still has to resolve in every locale the moment
+  // a player turns it on.
+  'buddy_ember_fox',
+  'buddy_emberfall_phoenix',
+  'buddy_moss_hare',
+  'buddy_frog',
+  'buddy_crimson_claw_crab',
+  'buddy_golden_sentinel',
+  'buddy_nightfang',
+  'buddy_tuskhorn_boar',
+  'buddy_emerald_wolf',
+  'buddy_tiger',
+  'buddy_cate_coin',
+  'buddy_alon',
+  'buddy_trollface',
+  'buddy_ansem',
+  'buddy_triple_t',
+  'buddy_kekius',
+  'buddy_solbot',
+  'buddy_frostfire',
+  'buddy_rocky',
+  'buddy_proud_grunt',
+  'buddy_loot_goblin',
+  'buddy_penny_goldspark',
+  'buddy_stag',
+  'buddy_alpaca',
+  'buddy_horse',
+  'buddy_sapling',
+  'buddy_bull',
+  'buddy_spider',
+  'buddy_raptor',
+  'buddy_skeleton',
+  'buddy_crystal_lich',
+  'buddy_forgemaw',
+  'buddy_sprites',
+  'buddy_crystal_tide',
+  'buddy_phantom',
 ] as const;
 
 const NPC_IDS = [
@@ -301,6 +478,10 @@ const NPC_IDS = [
   'foreman_odell',
   'stablemaster_marla', // the stablemaster: teaches riding lessons (Highwatch, zone 3)
   'warden_fenwick',
+  // The Mirefen world boss's level-spread mechanic: he lends the Shardpike.
+  'socketwright_skerrit',
+  // The muster's leader at the command camp (raised with the army; the muster quests).
+  'muster_commander',
   'brother_aldric_fen',
   'provisioner_hale',
   'herbalist_yara',
@@ -348,6 +529,12 @@ const NPC_IDS = [
   'quartermaster_sela',
   'scout_yerrin',
   'harbormaster_tamsin', // the Harbormaster's House at the Wyrmwatch cliff harbor
+  'innkeeper_maudie', // the Mirefen tavern on the Fenbridge road
+  // ...and its seated regulars (src/sim/content/mirefen_tavern_patrons.ts)
+  'patron_amos_eelby',
+  'patron_grissel_sedgeworth',
+  'patron_ned_oxley',
+  'patron_hester_quillby',
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',
@@ -403,6 +590,10 @@ const NPC_IDS = [
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  'guildmaster_hesper_dunmore', // the Highwatch guild's guildmaster (zone 3)
+  'contract_clerk_tobias_wren', // the Highwatch guild's contract clerk (zone 3)
+  'guild_quartermaster_garrick_holt', // the Highwatch guild's quartermaster (zone 3)
+  'guild_recruiter_mira_fairweather', // the Highwatch guild's recruiter (zone 3)
   // The farmer NPCs (the farming go-live), one per farming hub, in the same
   // tier order as the corresponding FARM_PATCHES rows.
   'farmer_jessica', // Eastbrook allotments (zone 1, tier 1)
@@ -421,6 +612,8 @@ const NPC_IDS = [
   'tidewarden_nel',
   // the Eastbrook quay's sparring master (content/practice_dummies.ts)
   'drillmaster_hale',
+  // the Drowned Temple's lore guide (content/drowned_temple_cantor.ts)
+  'cantor_laverock',
 ] as const;
 
 const QUEST_IDS = [
@@ -445,6 +638,11 @@ const QUEST_IDS = [
   'q_bandits',
   'q_ringleader',
   'q_fenbridge_muster',
+  // The Mirefen muster's chain (src/sim/content/mirefen_muster_quests.ts).
+  'q_muster_summons',
+  'q_muster_pike_drill',
+  'q_muster_trophy',
+  'q_socketwrights_due',
   'q_prowlers',
   'q_prowler_pelts',
   'q_fen_supplies',
@@ -672,6 +870,8 @@ const ZONE_IDS = [
   'evergarden',
   'galecrest',
   'farshore_isle',
+  // Appended last, matching the ZONES order in sim/data.ts.
+  'goldcrest_harbor',
   'proving_shore',
 ] as const;
 const DUNGEON_IDS = [
@@ -741,9 +941,14 @@ const LETTER_IDS = [
   // $WOC Exchange custody letters (the server-side marketplace,
   // WOC_MARKET_*_LETTER in src/sim/content/letters.ts).
   'woc_market_delivery',
+  'membership_token_delivery',
+  'membership_annual_reward',
   'woc_market_return',
   'woc_market_sold',
   'hoard_vault_reward',
+  // The full-bags world quest reward delivery (WORLD_QUEST_REWARD_LETTER in
+  // src/sim/content/letters.ts).
+  'world_quest_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -797,6 +1002,7 @@ type WorldEntityTranslations = {
     noticeboardName: string;
     farmPatchName: string;
     realmBuilderMonumentName: string;
+    musterRackName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -824,14 +1030,30 @@ function orderedValues<T>(ids: readonly string[], source: Record<string, T>): T[
   });
 }
 
+// Studio-authored rows (src/sim/studio_content.ts) join the live registries only
+// while an authored map is active, but their names are translated like every
+// other row, so the English source reads the base tables plus that overlay.
+const MOB_SOURCE = { ...STUDIO_CONTENT.mobs, ...MOBS };
+const NPC_SOURCE = { ...STUDIO_CONTENT.npcs, ...NPCS };
+const QUEST_SOURCE = { ...STUDIO_CONTENT.quests, ...QUESTS };
+const DUNGEON_SOURCE = { ...STUDIO_CONTENT.dungeons, ...DUNGEONS };
+const ZONE_SOURCE = [
+  ...ZONES,
+  ...STUDIO_CONTENT.zones.filter((zone) => !ZONES.some((base) => base.id === zone.id)),
+];
+
 function makeEnglishWorldEntities(): WorldEntityTranslations {
   const mobs = {} as MobTranslations;
-  orderedValues(MOB_IDS, MOBS).forEach((mob) => {
-    mobs[mob.id as MobId] = { name: mob.name };
+  MOB_IDS.forEach((id) => {
+    // The Studio overlay rides MOB_SOURCE; the retired buddy keys stay for the
+    // maintained locale overlays (see RETIRED_BUDDY_NAMES).
+    const mob = MOB_SOURCE[id] ?? RETIRED_BUDDY_NAMES[id as keyof typeof RETIRED_BUDDY_NAMES];
+    if (!mob) throw new Error(`Missing world entity source entry for ${id}`);
+    mobs[id] = { name: mob.name };
   });
 
   const npcs = {} as NpcTranslations;
-  orderedValues(NPC_IDS, NPCS).forEach((npc) => {
+  orderedValues(NPC_IDS, NPC_SOURCE).forEach((npc) => {
     npcs[npc.id as NpcId] = {
       name: npc.name,
       title: npc.title,
@@ -840,7 +1062,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const quests = {} as QuestTranslations;
-  orderedValues(QUEST_IDS, QUESTS).forEach((quest) => {
+  orderedValues(QUEST_IDS, QUEST_SOURCE).forEach((quest) => {
     const objectiveRecord = {} as Record<number, { label: string }>;
     quest.objectives.forEach((objective, objectiveIndex) => {
       objectiveRecord[objectiveIndex] = { label: objective.label };
@@ -854,7 +1076,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const zones = {} as ZoneTranslations;
-  ZONES.forEach((zone) => {
+  ZONE_SOURCE.forEach((zone) => {
     const poiRecord = {} as Record<number, { label: string }>;
     zone.pois.forEach((poi, index) => {
       poiRecord[index] = { label: poi.label };
@@ -870,7 +1092,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const dungeons = {} as DungeonTranslations;
-  orderedValues(DUNGEON_IDS, DUNGEONS).forEach((dungeon) => {
+  orderedValues(DUNGEON_IDS, DUNGEON_SOURCE).forEach((dungeon) => {
     dungeons[dungeon.id as DungeonId] = {
       name: dungeon.name,
       enterText: normalizeSourceText(dungeon.enterText),
@@ -918,6 +1140,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       noticeboardName: 'Notice Board',
       farmPatchName: 'Garden Beds',
       realmBuilderMonumentName: 'Realm Builder Monument',
+      musterRackName: 'Muster Weapon Rack',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

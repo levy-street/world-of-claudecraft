@@ -79,7 +79,7 @@ design targets for the tuning pass.
 | Emberfury Gauntlets (`emberfury_gloves`) | gloves | 270 | Str 11, Sta 6 | none | haste 60, crit 25 |
 | Emberfury Legguards (`emberfury_legs`) | legs | 345 | Str 15, Sta 7 | none | haste 60, crit 25 |
 
-**Forgewall Aegis** (`forgewall`), prot (Ironguard), mail. 2 pieces: Iron Resolve converts rage at 5 absorb per point instead of 4. 4 pieces: Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec.
+**Forgewall Aegis** (`forgewall`), prot (Ironguard), mail. 2 pieces: Iron Resolve's shield absorbs 25% of your maximum health instead of 20%. 4 pieces: Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -394,6 +394,11 @@ holder's class at the Crucible Quartermaster.
 Waist budget 17, feet 16. The Hit-flavored waists are the deliberate Hit
 electives; healer waists take haste instead.
 
+The healer rows in these tables are the original design and are superseded:
+the live records in src/sim/content/ignivar_loot.ts are authoritative, and
+the healer waists, ring, and weapons follow the 2026-10-12 healer Crit
+amendment in docs/prd/ignivar-raid-loot.md.
+
 | Variant | Piece | Slot | Armor | Stats | Affix | Ratings | Classes |
 |---|---|---|---|---|---|---|---|
 | Cloth spell damage | Cord of the Last Flame | waist | 75 | Int 11, Spi 6 | Spell Damage 4 | hit 60, crit 25 | mage, priest, warlock |
@@ -432,9 +437,10 @@ Class-open (no armor type). Neck budget 16, ring 15, one rating each.
 | Circle of Cinders | ring | spell damage | Int 10, Spi 5 | Spell Damage 4 | hit 25 |
 | Loop of Quiet Springs | ring | healing | Int 8, Spi 7 | Healing Power 14 | haste 25 |
 
-## Shields and held offhands
+## Shields, held offhands, and the hunter quiver
 
-Held-slot budget 18 (offhand mult 0.75).
+Held-slot budget 18 (offhand mult 0.75); the worn quiver takes the worn line
+of 11 (offhand mult 0.45).
 
 | Piece | Kind | Stats | Affix | Ratings | Extra | Classes |
 |---|---|---|---|---|---|---|
@@ -442,6 +448,7 @@ Held-slot budget 18 (offhand mult 0.75).
 | Ember Warden's Barrier | shield | Int 9, Spi 9 | Healing Power 18 | haste 25 | armor 760, block 22 | paladin, shaman |
 | Orb of the Last Spring | held offhand | Int 9, Spi 9 | Healing Power 18 | haste 25 | | priest, mage, druid, paladin, shaman |
 | Cinder of the First Design | held offhand | Int 12, Spi 6 | Spell Damage 14 | crit 25 | | mage, priest, warlock, druid |
+| Infernal Quiver | worn offhand (quiver) | Agi 7, Sta 4 | none | crit 25, hit 50 | worn line 11 (offhand mult 0.45) | hunter |
 
 ## Weapons (9 items)
 
@@ -523,9 +530,10 @@ power.
 
 ## Counts and gates
 
-201 new item ids: 145 set pieces, 15 sigils, 20 waist/feet, 8 jewelry, 4
-shields/held offhands, 9 weapons. 192 icons through the assets:items
-pipeline (weapons register through the variant tables). Acceptance gates:
+202 new item ids: 145 set pieces, 15 sigils, 20 waist/feet, 8 jewelry, 5
+shields/held offhands/quiver, 9 weapons (the quiver was added after launch).
+193 icons through the assets:items pipeline, the quiver's still pending
+(weapons register through the variant tables). Acceptance gates:
 the item_level.test.ts budget sweep over every piece above, the
 old-versus-new balance harness (full six-piece lineage versus full new
 kit per archetype, plus the blend paths), and the drop tables in the plan

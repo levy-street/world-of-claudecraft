@@ -7,6 +7,15 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const sv_SE: Record<string, string> = {
+  'error.buddyGrantFailed': 'Det gick inte att tilldela följeslagaren.',
+  'error.characterAlreadyHasThat':
+    'Den karaktären har redan den följeslagaren eller det utseendet.',
+  'moderationHistory.actionGrantBuddy': 'Följeslagare tilldelad',
+  'moderationHistory.actionAnnounce': 'Rikesmeddelande',
+  'moderationHistory.actionGmInvisible': 'Blev osynlig',
+  'moderationHistory.actionGmVisible': 'Blev synlig',
+  'moderationHistory.actionUnwatch': 'Borttagen från bevakningslistan',
+  'moderationHistory.actionWatch': 'Tillagd på bevakningslistan',
   'error.flagActiveExists': 'det här kontot har redan en öppen flagga av den typen',
   'wealth.largeMovementsUnavailable':
     'stora bankrörelser kunde inte laddas (inläsningen av liggaren tog för lång tid), guldsammanställningen ovan är fullständig',
@@ -355,8 +364,6 @@ export const sv_SE: Record<string, string> = {
   'detail.accountActions': 'Åtgärder för kontomoderering',
   'detail.banReason': 'Anledning till förbud:{value}',
   'detail.suspensionReason': 'Orsak till avstängning:{value}',
-  'detail.deactivatedNotice': 'Spelaren inaktiverade det här kontot den {value}.',
-  'detail.reactivate': 'Återaktivera',
   'detail.notePlaceholder': 'Moderatoranteckning / orsak',
   'detail.suspend1h': 'Stäng av 1 tim',
   'detail.suspend24h': 'Stäng av 24 tim',
@@ -455,7 +462,6 @@ export const sv_SE: Record<string, string> = {
   'dialog.confirmBan': 'Bekräfta bannlysning',
   'dialog.confirmUnban': 'Bekräfta hävd bannlysning',
   'dialog.confirmUnsuspension': 'Bekräfta avstängning',
-  'dialog.confirmReactivation': 'Bekräfta återaktivering',
   'dialog.character': 'Karaktär',
   'dialog.account': 'Konto',
   'dialog.action': 'Åtgärd',
@@ -468,8 +474,6 @@ export const sv_SE: Record<string, string> = {
   'dialog.actionBan': 'Permanent kontoutestängning',
   'dialog.actionUnban': 'Återställ kontots inloggningsåtkomst',
   'dialog.actionUnsuspend': 'Återställ kontoinloggningsåtkomst innan avstängningen löper ut',
-  'dialog.actionReactivate':
-    'Ångra spelarens egen inaktivering och återställ kontots inloggningsåtkomst',
   'dialog.confirm': 'Bekräfta',
   'dialog.cancel': 'Avbryt',
   'dialog.warning': 'Varning',
@@ -1081,14 +1085,6 @@ export const sv_SE: Record<string, string> = {
     'Alla figurer på kontot bär den offentliga etiketten tills den här speltiden har förbrukats.',
   'detail.cheaterMarkRelengthHint':
     'Ersätter hela den återstående budgeten och lägger inte till något. Den offentliga etiketten förblir synlig.',
-  'detail.worldQuestBlockModeration': 'Världsuppdrag',
-  'detail.worldQuestBlockActions': 'Modereringsåtgärder för världsuppdrag',
-  'detail.worldQuestBlockApply': 'Blockera världsuppdrag',
-  'detail.worldQuestBlockLift': 'Avblockera världsuppdrag',
-  'detail.worldQuestBlockReason': 'Orsak till blockering: {value}',
-  'detail.worldQuestBlockedAt': 'Blockerades: {value}',
-  'detail.worldQuestBlockHint':
-    'Vid bottning av världsuppdrag i stället för en avstängning: ingen karaktär på kontot kan längre starta, göra framsteg i eller få belöningar från världsuppdrag. Allt annat går fortfarande att spela.',
   'dialog.confirmCheaterMark': 'Bekräfta fuskarstämpel',
   'dialog.confirmCheaterMarkRelength': 'Bekräfta stämpelns nya längd',
   'dialog.confirmCheaterMarkLift': 'Bekräfta att stämpeln tas bort',
@@ -1096,21 +1092,12 @@ export const sv_SE: Record<string, string> = {
     'Märk alla figurer på det här kontot med den offentliga etiketten Fuskare',
   'dialog.actionCheaterMarkRelength': 'Ersätt fuskarstämpelns återstående speltidsbudget',
   'dialog.actionCheaterMarkLift': 'Ta bort fuskarstämpeln i förtid',
-  'dialog.confirmWorldQuestBlock': 'Bekräfta blockering av världsuppdrag',
-  'dialog.confirmWorldQuestUnblock': 'Bekräfta avblockering av världsuppdrag',
-  'dialog.actionWorldQuestBlock': 'Blockera alla karaktärer på det här kontot från världsuppdrag',
-  'dialog.actionWorldQuestUnblock': 'Tillåt världsuppdrag på det här kontot igen',
   'alert.cheaterMarkDurationInvalid': 'Ange ett heltal från 1 till {max} timmar.',
   'error.cheaterMarkDurationInvalid': 'Speltidsbudgeten måste vara mellan 1 och 100 timmar.',
   'error.cheaterMarkNotMarked': 'Det här kontot bär inte fuskarstämpeln.',
   'error.cheaterMarkAdminTarget': 'Administratörskonton kan inte få fuskarstämpeln.',
-  'error.worldQuestBlockAdminTarget': 'Administratörskonton kan inte blockeras från världsuppdrag.',
-  'error.worldQuestBlockAlreadyBlocked': 'Det här kontot är redan blockerat från världsuppdrag.',
-  'error.worldQuestBlockNotBlocked': 'Det här kontot är inte blockerat från världsuppdrag.',
   'moderationHistory.actionCheaterMark': 'Fuskarstämpel satt',
   'moderationHistory.actionCheaterMarkLift': 'Fuskarstämpel borttagen',
-  'moderationHistory.actionWorldQuestsBlock': 'Världsuppdrag blockerade',
-  'moderationHistory.actionWorldQuestsUnblock': 'Världsuppdrag avblockerade',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Guld',
   'error.flagInvalidStatus': 'ogiltig flaggstatus',

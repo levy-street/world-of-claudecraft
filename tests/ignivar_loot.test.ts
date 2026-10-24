@@ -74,17 +74,26 @@ const PROFESSION_SCROLL_IDS = [
   'formula_lastflame_zeal',
 ];
 
+// The three healer waists whose cut Crit was reallocated into Int/Spi, and by
+// how many points each line sits over its ilvl-35 budget on purpose.
+const HEALER_WAIST_OVER_BUDGET: Record<string, number> = {
+  springbinder_sash: 10,
+  grovetender_belt: 10,
+  tidebinder_links: 10,
+};
+
 const gearItems = (): ItemDef[] =>
   Object.values(IGNIVAR_LOOT_ITEMS).filter((item) => item.kind !== 'tool');
 
 describe('ignivar loot: catalog shape', () => {
   it('carries the exact authored counts', () => {
-    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(201);
+    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(202);
     expect(Object.keys(IGNIVAR_SET_ITEMS).length).toBe(29 * 5);
     expect(Object.keys(IGNIVAR_SIGIL_ITEMS).length).toBe(15);
     expect(Object.keys(IGNIVAR_OFFSET_ITEMS).length).toBe(20);
     expect(Object.keys(IGNIVAR_JEWELRY_ITEMS).length).toBe(8);
-    expect(Object.keys(IGNIVAR_HELD_ITEMS).length).toBe(4);
+    // Two shields, two caster held offhands, and the hunter quiver.
+    expect(Object.keys(IGNIVAR_HELD_ITEMS).length).toBe(5);
     // 9, not 10: the Emberflight Longbow was pulled from the tier (bows wait
     // for the hunter ranged-slot rework; maintainer decision 2026-08-28).
     expect(Object.keys(IGNIVAR_WEAPON_ITEMS).length).toBe(9);
@@ -99,9 +108,9 @@ describe('ignivar loot: catalog shape', () => {
 });
 
 describe('ignivar loot: every gear piece is item level 35 and budget-exact', () => {
-  it('derives ilvl 35 from source 26 + epic + raid for all 186 gear pieces', () => {
+  it('derives ilvl 35 from source 26 + epic + raid for all 187 gear pieces', () => {
     const gear = gearItems();
-    expect(gear.length).toBe(186);
+    expect(gear.length).toBe(187);
     for (const item of gear) {
       expect(itemSourceLevel(item.id), `${item.id} source`).toBe(IGNIVAR_RAID_LOOT_SOURCE_LEVEL);
       expect(itemFromRaid(item.id), `${item.id} raid flag`).toBe(true);
@@ -134,14 +143,37 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
       // adds the free caster baseline on top of that line, so the line is
       // priced here and the total is checked against expectedStatBudget,
       // an independent formula derived from the item's own level and slot.
+      // The hunter quiver is WORN (occupiesHand false), so it prices on the
+      // worn-offhand line: 35 x 0.45 x 0.7 = 11, never the held 18.
+      const isWornOffhand = item.kind === 'held_offhand' && item.occupiesHand === false;
       const line =
         // Two-handers carry the TWOHAND_STAT_MULT premium over the mainhand line.
-        isTwoHand ? 33 : SLOT_BUDGET[item.slot as string];
+        isTwoHand ? 33 : isWornOffhand ? 11 : SLOT_BUDGET[item.slot as string];
       const want = expectedStatBudget(item);
       expect(want, `${item.id} has a derivable budget`).toBe(
         expectedStatTotal(line, statIdentity(item.stats)),
       );
-      expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe(want);
+      const over = HEALER_WAIST_OVER_BUDGET[item.id] ?? 0;
+      expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe((want ?? 0) + over);
+    }
+  });
+
+  it('the healer waists carry their reallocated Crit as Int/Spi, deliberately over the line', () => {
+    // 60 Crit became 30 Crit plus +6 Int / +4 Spi: the cut 30 rating priced at
+    // the dev-kit healer weights (rating 0.3, Int 1, Spi 0.7), so the line
+    // stays 10 over the ilvl-35 waist budget by design. Asserted against the
+    // live budget so a well-meaning re-budget reads as the nerf it would be.
+    for (const id of Object.keys(HEALER_WAIST_OVER_BUDGET)) {
+      const item = ITEMS[id];
+      expect(item.stats?.int, id).toBe(15);
+      expect(item.stats?.spi, id).toBe(12);
+      expect(item.stats?.sta, id).toBe(6);
+      expect(item.critRating, id).toBe(30);
+      expect(item.hasteRating, id).toBe(25);
+      expect(item.hitRating ?? 0, id).toBe(0);
+      expect(primaryStatSum(item), `${id} over the live budget`).toBe(
+        (expectedStatBudget(item) ?? Number.NaN) + 10,
+      );
     }
   });
 });
@@ -166,7 +198,7 @@ describe('ignivar loot: binding policy (sigils and tier pieces bind, drops trade
       ...Object.values(IGNIVAR_HELD_ITEMS),
       ...Object.values(IGNIVAR_WEAPON_ITEMS),
     ];
-    expect(droppedGear.length).toBe(41);
+    expect(droppedGear.length).toBe(42);
     for (const item of droppedGear) {
       expect(item.soulbound, item.id).toBeFalsy();
     }
@@ -377,6 +409,10 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
     // rating), plus the choker's original 25. Set pieces still carry none
     // (the Hit-scarcity policy holds: hit lives on the elective lanes), and
     // the cap-coverage describe below proves the lanes reach the heroic caps.
+    // Healer pieces (Healing Power) swap their lane's Hit for Crit: heals
+    // are not resisted (halved on the waists, whose other 30 moved into Int/Spi).
+    // The one offhand exception is the hunter's Infernal Quiver at 50 (the
+    // operator's call, 2026-10-21), a Heroic-only lane beside the weapons.
     for (const item of Object.values(IGNIVAR_LOOT_ITEMS)) {
       const want =
         item.slot === 'waist'
@@ -385,9 +421,42 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
             ? 25
             : item.kind === 'weapon'
               ? 30
-              : 0;
+              : item.id === 'infernal_quiver'
+                ? 50
+                : 0;
+      if ((item.healPower ?? 0) > 0) {
+        expect(item.hitRating ?? 0, item.id).toBe(0);
+        // The healer waists halved theirs (60 to 30) into Int/Spi.
+        const crit = item.slot === 'waist' ? 30 : want;
+        if (want > 0) expect(item.critRating, `${item.id} lane Crit`).toBe(crit);
+        continue;
+      }
       expect(item.hitRating ?? 0, item.id).toBe(want);
     }
+  });
+
+  it('healer pieces carry Crit in place of Hit, and no healer gear anywhere carries Hit', () => {
+    // Named, so a field-predicate drift cannot silently drop a piece: the six
+    // Crucible healer electives took their old Hit amount as Crit, the waists
+    // then halving theirs into Int/Spi.
+    const healerElectives: Array<[string, number]> = [
+      ['springbinder_sash', 30],
+      ['grovetender_belt', 30],
+      ['tidebinder_links', 30],
+      ['loop_of_quiet_springs', 25],
+      ['staff_of_the_last_spring', 30],
+      ['springtouched_crozier', 30],
+    ];
+    for (const [id, crit] of healerElectives) {
+      expect(ITEMS[id].healPower ?? 0, `${id} is healer gear`).toBeGreaterThan(0);
+      expect(ITEMS[id].hitRating ?? 0, id).toBe(0);
+      expect(ITEMS[id].critRating, id).toBe(crit);
+    }
+    // Catalog-wide: every shipped item with Healing Power carries no Hit.
+    const healerHit = Object.values(ITEMS)
+      .filter((item) => (item.healPower ?? 0) > 0 && (item.hitRating ?? 0) > 0)
+      .map((item) => item.id);
+    expect(healerHit).toEqual([]);
   });
 
   it('healer pieces carry Healing Power, damage pieces Spell Damage, never both', () => {
@@ -655,13 +724,16 @@ describe('ignivar loot: the boss drop tables (one item per five raiders, plus th
       'forgefire_spire',
       'staff_of_the_last_spring',
     ];
-    const varkhulHeld = ['orb_of_the_last_spring', 'cinder_of_the_first_design'];
+    const varkhulCasterHeld = ['orb_of_the_last_spring', 'cinder_of_the_first_design'];
+    const varkhulHeld = [...varkhulCasterHeld, 'infernal_quiver'];
     const varkhulTrinkets = ['forgefathers_temper', 'heart_of_the_crucible'];
+    // The hunter quiver APPENDS at the group's tail (append-only partition).
     expect(varkhulGroups.get('varkhul_h_exclusive')?.ids).toEqual([
       ...shields,
       ...varkhulWeapons,
-      ...varkhulHeld,
+      ...varkhulCasterHeld,
       ...varkhulTrinkets,
+      'infernal_quiver',
     ]);
     expect(varkhulGroups.get('varkhul_h_robe')?.ids).toEqual(robes);
     // The Robe has its own group; #3923 keeps held offhands in the exclusive
@@ -669,7 +741,9 @@ describe('ignivar loot: the boss drop tables (one item per five raiders, plus th
     // trinkets take 0.24 with every other non-legendary row scaled together.
     expect(shareOf(varkhul, shields)).toBeCloseTo(0.384, 6); // 0.177 x 2 + Emberward 0.03
     expect(shareOf(varkhul, varkhulWeapons)).toBeCloseTo(0.301, 6);
+    // The quiver takes an equal third of the unchanged 0.075 held share.
     expect(shareOf(varkhul, varkhulHeld)).toBeCloseTo(0.075, 6);
+    for (const id of varkhulHeld) expect(shareOf(varkhul, [id]), id).toBeCloseTo(0.025, 6);
     expect(shareOf(varkhul, varkhulTrinkets)).toBeCloseTo(0.24, 6);
     for (const id of [...ignivarTrinkets, ...varkhulTrinkets]) {
       expect(ITEMS[id].slot, id).toBe('trinket');
@@ -802,10 +876,11 @@ describe('ignivar loot: the boss drop tables (one item per five raiders, plus th
       ['heart_of_the_end_greatblade', 0.1045],
       ['forgefire_spire', 0.098],
       ['staff_of_the_last_spring', 0.0985],
-      ['orb_of_the_last_spring', 0.0375],
-      ['cinder_of_the_first_design', 0.0375],
+      ['orb_of_the_last_spring', 0.025],
+      ['cinder_of_the_first_design', 0.025],
       ['forgefathers_temper', 0.12],
       ['heart_of_the_crucible', 0.12],
+      ['infernal_quiver', 0.025],
     ]);
     expect(rowsOf(varkhulHeroic, 'varkhul_h_robe')).toEqual([
       ['sigil_anvil_chest', 0.34],
@@ -977,6 +1052,9 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
   const heroicIds = (bossId: string) =>
     (HEROIC_BOSS_LOOT[bossId] ?? []).flatMap((e) => (e.itemId ? [e.itemId] : []));
   const crucible = Object.values(IGNIVAR_LOOT_ITEMS);
+  // The hit floor counts only pieces a hit-capped role wears: healer pieces
+  // (Healing Power) carry Crit in that lane, since heals are not resisted.
+  const hitLanes = crucible.filter((i) => (i.healPower ?? 0) === 0);
   const heroic = new Set([...heroicIds(IGNIVAR_BOSS_ID), ...heroicIds(VARKHUL_BOSS_ID)]);
   const normal = new Set([...normalIds(IGNIVAR_BOSS_ID), ...normalIds(VARKHUL_BOSS_ID)]);
   const heroicOnly = (ids: readonly string[]) => {
@@ -989,7 +1067,11 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
 
   it('every held offhand of the tier is Heroic-only', () => {
     const held = crucible.filter((i) => i.kind === 'held_offhand').map((i) => i.id);
-    expect(held.sort()).toEqual(['cinder_of_the_first_design', 'orb_of_the_last_spring']);
+    expect(held.sort()).toEqual([
+      'cinder_of_the_first_design',
+      'infernal_quiver',
+      'orb_of_the_last_spring',
+    ]);
     heroicOnly(held);
   });
 
@@ -1035,10 +1117,14 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
     // Normal floor without a weapon (min waist + two lowest rings) reaches the
     // spell cap but NOT the melee cap, which is why the wand could move and
     // the Kris and Cleaver could not.
+    // Count controls: Math.min over an empty lane is Infinity, which would pass
+    // every floor check below vacuously.
+    expect(hitLanes.filter((i) => i.slot === 'waist').length).toBeGreaterThan(0);
+    expect(hitLanes.filter((i) => i.kind === 'weapon').length).toBeGreaterThan(0);
     const minWaist = Math.min(
-      ...crucible.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
+      ...hitLanes.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
     );
-    const rings = crucible
+    const rings = hitLanes
       .filter((i) => i.slot === 'ring')
       .map((i) => i.hitRating ?? 0)
       .sort((a, b) => a - b);
@@ -1077,17 +1163,24 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
   const meleeCap = Math.round(HEROIC_LEVEL_GAP_MELEE_MISS * HIT_RATING_PER_PCT * 100);
   const spellCap = Math.round(HEROIC_LEVEL_GAP_SPELL_MISS * HIT_RATING_PER_PCT * 100);
   const crucible = Object.values(IGNIVAR_LOOT_ITEMS);
+  // The hit floor counts only pieces a hit-capped role wears: healer pieces
+  // (Healing Power) carry Crit in that lane, since heals are not resisted.
+  const hitLanes = crucible.filter((i) => (i.healPower ?? 0) === 0);
 
   it('the guaranteed elective floor (any waist + two rings + any weapon) covers both caps', () => {
+    // Count controls: Math.min over an empty lane is Infinity, which would pass
+    // every floor check below vacuously.
+    expect(hitLanes.filter((i) => i.slot === 'waist').length).toBeGreaterThan(0);
+    expect(hitLanes.filter((i) => i.kind === 'weapon').length).toBeGreaterThan(0);
     const minWaist = Math.min(
-      ...crucible.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
+      ...hitLanes.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
     );
-    const rings = crucible
+    const rings = hitLanes
       .filter((i) => i.slot === 'ring')
       .map((i) => i.hitRating ?? 0)
       .sort((a, b) => a - b);
     const minWeapon = Math.min(
-      ...crucible.filter((i) => i.kind === 'weapon').map((i) => i.hitRating ?? 0),
+      ...hitLanes.filter((i) => i.kind === 'weapon').map((i) => i.hitRating ?? 0),
     );
     const floor = minWaist + rings[0] + rings[1] + minWeapon;
     expect(minWaist).toBeGreaterThanOrEqual(60);
@@ -1132,10 +1225,13 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
         .reduce((acc, entry) => acc + entry.chance, 0);
       expect(sum, group).toBe(1);
     }
-    // The Heroic-exclusive hit carriers are the six marquee weapons plus the
-    // redistributed Wand of Quenched Sparks, all at 30, so a Heroic-only kit
+    // The Heroic-exclusive hit carriers are the physical marquee weapons, the
+    // damage staff, and the redistributed Wand of Quenched Sparks, all at 30
+    // (the two healer weapons carry that 30 as Crit), so a Heroic-only kit
     // tops out at 60 (both hands) against both caps: the Normal lock is
-    // load-bearing for hit, by design.
+    // load-bearing for hit, by design. The hunter's Infernal Quiver (Hit 50) is
+    // the one offhand carrier: a hunter cannot dual wield, so its Heroic-only
+    // ceiling is one weapon plus the quiver, 80, still short of the melee cap.
     const heroicIds = [
       ...(HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? []),
       ...(HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? []),
@@ -1146,12 +1242,14 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
       'forgefathers_warhammer',
       'forgefire_spire',
       'heart_of_the_end_greatblade',
-      'springtouched_crozier',
-      'staff_of_the_last_spring',
+      'infernal_quiver',
       'wand_of_quenched_sparks',
     ]);
-    for (const id of heroicHitCarriers) expect(ITEMS[id].hitRating, id).toBe(30);
+    for (const id of heroicHitCarriers) {
+      expect(ITEMS[id].hitRating, id).toBe(id === 'infernal_quiver' ? 50 : 30);
+    }
     expect(2 * 30).toBeLessThan(Math.min(meleeCap, spellCap));
+    expect(30 + 50, 'Heroic-only hunter: one weapon plus the quiver').toBeLessThan(meleeCap);
   });
 
   it('every class can wear a hit waist and a hit weapon from the tier', () => {

@@ -4,6 +4,7 @@ import { dealDamage } from '../src/sim/combat/damage';
 import { SHADOW_GUARDS } from '../src/sim/content/world_quest_shadow';
 import {
   BUILTIN_WORLD,
+  CAMPS,
   ESCORTS,
   GATHER_NODES,
   ITEMS,
@@ -240,6 +241,28 @@ describe('world quest content', () => {
           return entity.templateId === targetMobId && dx * dx + dz * dz <= quest.area.radius ** 2;
         }).length;
         expect(population, quest.id).toBeGreaterThanOrEqual(quest.count);
+        // Every spawn of the target in the zone counts, not just `count` of
+        // them: a camp (centre, spawn radius and idle wander) or a live spawn
+        // left outside the ring is a pull that dies without credit.
+        for (const camp of CAMPS) {
+          if (camp.mobId !== targetMobId) continue;
+          if (zoneAt(camp.center.x, camp.center.z).id !== quest.zoneId) continue;
+          expect(
+            Math.hypot(camp.center.x - quest.area.x, camp.center.z - quest.area.z) +
+              camp.radius +
+              MAX_WANDER_RADIUS,
+            `${quest.id}: camp at ${camp.center.x},${camp.center.z}`,
+          ).toBeLessThanOrEqual(quest.area.radius);
+        }
+        for (const entity of sim.entities.values()) {
+          if (entity.templateId !== targetMobId) continue;
+          if (zoneAt(entity.pos.x, entity.pos.z).id !== quest.zoneId) continue;
+          expect(
+            Math.hypot(entity.pos.x - quest.area.x, entity.pos.z - quest.area.z) +
+              MAX_WANDER_RADIUS,
+            `${quest.id}: ${targetMobId} spawned at ${entity.pos.x},${entity.pos.z}`,
+          ).toBeLessThanOrEqual(quest.area.radius);
+        }
       } else if (quest.objective.type === 'gather') {
         const nodeType = quest.objective.nodeType;
         const nodes = GATHER_NODES.filter((node) => {
@@ -494,12 +517,12 @@ describe('world quest content', () => {
       noPlayer: true,
     });
     const pickupPositions = [
-      { x: -63, z: -90 },
-      { x: -66, z: -94 },
-      { x: -70, z: -89 },
-      { x: -76, z: -95 },
-      { x: -86, z: -90 },
-      { x: -68, z: -78 },
+      { x: -55, z: -75 },
+      { x: -44, z: -79 },
+      { x: -58, z: -70 },
+      { x: -62, z: -65 },
+      { x: -50, z: -78 },
+      { x: -67, z: -62 },
     ];
     const pickups = [...sim.entities.values()].filter(
       (entity) => entity.objectItemId === objective.pickupObjectItemId,
@@ -510,7 +533,7 @@ describe('world quest content', () => {
     expect(pickups.map((pickup) => ({ x: pickup.pos.x, z: pickup.pos.z }))).toEqual(
       pickupPositions,
     );
-    expect(destination?.pos).toMatchObject({ x: -80, z: -82 });
+    expect(destination?.pos).toMatchObject({ x: -78, z: -57 });
     if (!destination) throw new Error('Missing freight wagon');
 
     for (const object of [...pickups, destination]) {

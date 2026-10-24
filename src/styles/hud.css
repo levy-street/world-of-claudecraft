@@ -1764,7 +1764,9 @@
     zoom: var(--target-frame-scale, 1);
   }
   /* Every extra action row lifts the docked player frame by one socket row, so
-     the mirrored target seat lifts by the same step and the pair stays level. */
+     the mirrored target seat lifts by the same step and the pair stays level
+     (except with targetAurasBelowFrame, where the target seat sits one aura
+     strip row higher; see the bottom-anchored seat below). */
   body.show-actionbar2 #target-frame,
   body.show-actionbar3 #target-frame {
     top: calc(
@@ -1784,6 +1786,54 @@
       (var(--socket-size) + var(--socket-row-gap)) -
       var(--stance-row-lift, 0px) -
       var(--pet-row-lift, 0px)
+    );
+  }
+  /* Target Auras Below the Frame (targetAurasBelowFrame) on the stock seat.
+     The seat sits directly over the action bar, so a strip hung below it
+     would paint across the hotbar. With the setting on (desktop only; the
+     touch sheet pins its own seat), the seat rises by exactly one strip row
+     (the 8px hang, an own-aura icon and its 13px timer, all under the
+     children zoom), so the strip's first row lands where the frame's bottom
+     edge used to be and keeps the full bar gap above the hotbar. The seat is
+     anchored by its BOTTOM edge here, so the target's own cast bar and swing
+     timer (in-flow .uf-bars children) grow the frame upward instead of
+     pushing the strip down onto the hotbar. A moved frame is untouched: its
+     inline top (and MovableFrame's inline bottom: auto) outranks this seat.
+     The lift is body-wide because the player's cast bar and swing timers
+     rise by the same step below, keeping the lifted frame clear of them. */
+  body.target-auras-below-frame:not(.mobile-touch) {
+    --target-aura-band-lift: calc(
+      (8px + var(--aura-size-own) + 13px) *
+      var(--target-frame-scale, 1)
+    );
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #target-frame {
+    top: auto;
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
+    );
+  }
+  body.target-auras-below-frame.show-actionbar2:not(.mobile-touch) #target-frame {
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      var(--socket-size) +
+      var(--socket-row-gap) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
+    );
+  }
+  body.target-auras-below-frame.show-actionbar2.show-actionbar3:not(.mobile-touch) #target-frame {
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      2 *
+      (var(--socket-size) + var(--socket-row-gap)) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
     );
   }
   /* The target's debuff strip hangs off the frame instead of living inside the
@@ -2200,6 +2250,7 @@
   #reliquary-tracker.tf-unlocked,
   #delve-tracker.tf-unlocked,
   #rift-tracker.tf-unlocked,
+  #dungeon-tracker.tf-unlocked,
   #practice-tracker.tf-unlocked,
   .gathering-goal-panel.tf-unlocked,
   #swingbar-offhand.tf-unlocked,
@@ -2207,6 +2258,8 @@
   #proc-overlay.tf-unlocked,
   #talking-head.tf-unlocked,
   #unit-tooltip-anchor.tf-unlocked,
+  #pf-resource-frame.tf-unlocked,
+  #hill-bar.tf-unlocked,
   #meters-window.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
@@ -2222,9 +2275,11 @@
   #reliquary-tracker.tf-unlocked,
   #delve-tracker.tf-unlocked,
   #rift-tracker.tf-unlocked,
+  #dungeon-tracker.tf-unlocked,
   #practice-tracker.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
+  #hill-bar.tf-unlocked,
   #talking-head.tf-unlocked {
     pointer-events: auto;
   }
@@ -2290,6 +2345,7 @@
   #reliquary-tracker.hud-frame-detached,
   #delve-tracker.hud-frame-detached,
   #rift-tracker.hud-frame-detached,
+  #dungeon-tracker.hud-frame-detached,
   #practice-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
     position: absolute;
@@ -2304,9 +2360,33 @@
   #reliquary-tracker.hud-frame-detached,
   #delve-tracker.hud-frame-detached,
   #rift-tracker.hud-frame-detached,
+  #dungeon-tracker.hud-frame-detached,
   #practice-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
     width: var(--tracker-w);
+  }
+  /* The player's resource bar, detached (Detach Resource Bar: the
+     playerResource frame row). Docked, the wrapper is a plain block in the
+     player frame's bars column and the bar keeps every .unitframe rule. Once
+     re-homed onto #ui those ancestor rules no longer reach it, so the frame
+     takes its own size from playerFrameResourceWidth / Height (the editor
+     drags and the frame-option sliders), and the bar text tracks the
+     thickness through --uf-bar-height exactly as on the frame. */
+  #pf-resource-frame.hud-frame-detached {
+    position: absolute;
+    margin: 0;
+    z-index: 20;
+    width: var(--player-resource-width, 232px);
+  }
+  /* A readout, not a control: once it is off the player frame (whose body
+     click targets yourself) a locked bar is click-through, so it never eats a
+     click meant for the world under it. Arranging hands events back. */
+  #pf-resource-frame.hud-frame-detached:not(.tf-unlocked) {
+    pointer-events: none;
+  }
+  #pf-resource-frame.hud-frame-detached > .bar {
+    --uf-bar-height: var(--player-resource-height, 11px);
+    height: var(--player-resource-height, 11px);
   }
   #actionbar .tf-move-btn,
   #actionbar2 .tf-move-btn,
@@ -2325,6 +2405,7 @@
   #reliquary-tracker .tf-move-btn,
   #delve-tracker .tf-move-btn,
   #rift-tracker .tf-move-btn,
+  #dungeon-tracker .tf-move-btn,
   .gathering-goal-panel .tf-move-btn,
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
@@ -2362,6 +2443,7 @@
   #reliquary-tracker .tf-move-btn:focus-visible,
   #delve-tracker .tf-move-btn:focus-visible,
   #rift-tracker .tf-move-btn:focus-visible,
+  #dungeon-tracker .tf-move-btn:focus-visible,
   .gathering-goal-panel .tf-move-btn:focus-visible,
   #swingbar-offhand .tf-move-btn:focus-visible,
   #paladin-devotion-frame .tf-move-btn:focus-visible,
@@ -2501,9 +2583,21 @@
      this, so it never suppresses live cast information. */
   body.interface-unlocked #castbar,
   body.interface-unlocked #swingbar,
-  body.interface-unlocked #swingbar-offhand.tf-unlocked {
+  body.interface-unlocked #swingbar-offhand.tf-unlocked,
+  body.interface-unlocked #hill-bar.tf-unlocked {
     display: block !important;
     opacity: 0.55;
+  }
+  /* An empty King of the Hill placeholder (the player is outside the hill's
+     zone, so the painter never built its skeleton) keeps a graspable box.
+     Its stock seat is the top centre, which the Edit Frames toolbar
+     (#interface-edit-controls, z 40) covers, so while arranging an unmoved
+     bar steps down below the toolbar; a moved bar keeps its own spot. */
+  body.interface-unlocked #hill-bar.tf-unlocked {
+    min-height: 48px;
+  }
+  body.interface-unlocked #hill-bar.tf-unlocked:not(.hud-frame-detached) {
+    top: 64px;
   }
   /* Unlocking shows the frames the class could have that are merely EMPTY
      right now (a target frame with nothing selected, a pet frame with no pet
@@ -2535,6 +2629,7 @@
   body.interface-unlocked #reliquary-tracker.tf-unlocked,
   body.interface-unlocked #delve-tracker.tf-unlocked,
   body.interface-unlocked #rift-tracker.tf-unlocked,
+  body.interface-unlocked #dungeon-tracker.tf-unlocked,
   body.interface-unlocked #practice-tracker.tf-unlocked,
   body.interface-unlocked .gathering-goal-panel.tf-unlocked {
     display: block !important;
@@ -3226,6 +3321,22 @@
     position: relative;
     min-width: 0;
     overflow: hidden;
+  }
+  #pf-name-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  #pf-name {
+    flex: 1;
+    min-width: 0;
+  }
+  #pf-pvp {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    --color-danger: var(--color-hostile-rim);
+    white-space: nowrap;
   }
   /* The bordered plaque keeps the .ui-ribbon inset on the PORTRAIT side (30px:
      the medallion overlaps the bar stack by 18px and its joint seal reaches
@@ -4615,6 +4726,338 @@
     display: flex;
     gap: var(--socket-gap);
   }
+  /* The Shardpike PROMPT (src/ui/hud/shardpike/shardpike_prompt_view.ts): the one loud
+     instruction, parked where the eyes already are during a fight rather than down with the
+     bars where the hands are. Above the subzone banner's 35% so the two never collide.
+
+     Tone drives colour and weight and nothing else moves: the line must not jump position
+     between states, or the player re-reads it from scratch every time it changes.
+
+     Seated ABOVE #banner (28%) rather than below it, and this is measured, not guessed: the
+     success banner and the success prompt fire on the same frame by design, and at 24% the
+     38px "BARROWHIDE BROKEN" landed straight through the prompt and its tally. The two now
+     stack, banner under line, which is also the reading order. */
+  #shardpike-prompt {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 16%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+    text-align: center;
+    font-family: var(--title-font);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    z-index: 6;
+  }
+  .pike-prompt-body {
+    font-size: 21px;
+    font-weight: bold;
+    color: var(--color-pike-prompt-text);
+    text-shadow:
+      0 0 16px var(--color-pike-prompt-halo),
+      1px 1px 4px var(--color-keyline);
+  }
+  .pike-prompt-tally {
+    display: none;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--color-pike-tally-text);
+    text-shadow: 1px 1px 3px var(--color-keyline);
+  }
+  /* Urgent is the set window and a fumbling beam: the two moments where a second of
+     hesitation loses the attempt, so this is the only tone that moves. */
+  #shardpike-prompt.tone-urgent .pike-prompt-body {
+    color: var(--color-pike-urgent-text);
+    font-size: 25px;
+    text-shadow:
+      0 0 22px var(--color-pike-urgent-glow),
+      1px 1px 4px var(--color-keyline);
+    animation: pike-prompt-pulse 0.7s ease-in-out infinite;
+  }
+  #shardpike-prompt.tone-active .pike-prompt-body {
+    color: var(--color-pike-active-text);
+  }
+  #shardpike-prompt.tone-directive .pike-prompt-body {
+    color: var(--color-pike-prompt-text);
+  }
+  /* The eye is out: the fight's payoff line, and the one the whole raid is acting on. */
+  #shardpike-prompt.tone-success .pike-prompt-body {
+    color: var(--color-pike-success-text);
+    text-shadow:
+      0 0 20px var(--color-pike-success-glow),
+      1px 1px 4px var(--color-keyline);
+  }
+  /* Sealed or re-setting: a reason to wait, deliberately quiet so it does not read as an
+     instruction the player is failing to follow. */
+  #shardpike-prompt.tone-idle .pike-prompt-body {
+    color: var(--color-pike-idle-text);
+    font-size: 17px;
+    font-weight: normal;
+  }
+  @keyframes pike-prompt-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #shardpike-prompt.tone-urgent .pike-prompt-body {
+      animation: none;
+    }
+  }
+  /* The Shardpike bar (src/ui/hud/shardpike/): a second action bar that only exists while
+     the quest pike is in hand. Seated above the pet bar's row rather than beside it: the
+     two are never both up in practice (the pike is a two-hander and the trial is a world
+     boss fight), but a stacked seat keeps the main hotbar from ever shifting under the
+     player's cursor if they are. */
+  #shardpike-bar {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: -104px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+  .pike-group {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border: 2px solid var(--color-keyline);
+    outline: 1px solid var(--color-pike-rim);
+    border-radius: 6px;
+    background: linear-gradient(170deg, var(--color-pike-group-hi), var(--color-pike-group-lo));
+    box-shadow: 0 2px 8px var(--color-pike-group-shadow);
+  }
+  /* The balance beam. Hidden until the pike is actually couched: a track showing a
+     centred pip while nothing is happening reads as a meter that is broken. */
+  .pike-beam {
+    height: 0;
+    opacity: 0;
+    transition: opacity 120ms linear;
+  }
+  .pike-beam.active {
+    height: 10px;
+    opacity: 1;
+  }
+  .pike-beam-track {
+    position: relative;
+    height: 100%;
+    border: 2px solid var(--color-keyline);
+    outline: 1px solid var(--color-pike-rim);
+    border-radius: 5px;
+    background: linear-gradient(
+      90deg,
+      var(--color-pike-beam-danger),
+      var(--color-pike-beam-track) 28%,
+      var(--color-pike-beam-track) 72%,
+      var(--color-pike-beam-danger)
+    );
+    overflow: hidden;
+  }
+  /* Set progress fills from the centre out, so "nearly set" reads as the safe band
+     widening rather than as a bar racing toward a rail. */
+  .pike-beam-set {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(var(--pike-set, 0));
+    transform-origin: center;
+    background: linear-gradient(
+      90deg,
+      var(--color-pike-set-edge),
+      var(--color-pike-primed),
+      var(--color-pike-set-edge)
+    );
+    opacity: 0.55;
+  }
+  .pike-beam-pip {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    margin-left: -3px;
+    left: calc(var(--pike-balance, 0.5) * 100%);
+    border-radius: 3px;
+    background: var(--color-pike-pip);
+    box-shadow: 0 0 6px var(--color-pike-pip-glow);
+  }
+  .pike-beam.danger .pike-beam-pip {
+    background: var(--color-pike-pip-danger);
+    box-shadow: 0 0 8px var(--color-pike-pip-danger-glow);
+  }
+  /* The lean keycaps (shardpike_lean_view.ts): the player's ACTUAL lean keys, drawn right
+     above the beam they steer, and press-and-hold buttons in their own right (mouse or
+     finger), so the stick exists whatever the bindings and on a touch screen. Hidden with
+     the beam until the pike is couched. Geometry only on the shared ui-keycap primitive. */
+  .pike-lean {
+    display: flex;
+    justify-content: space-between;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 120ms linear;
+  }
+  .pike-lean.active {
+    height: 30px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .pike-lean-key {
+    gap: 5px;
+    min-width: 58px;
+    height: 30px;
+    padding: 0 9px;
+    border-color: var(--color-pike-btn-rim);
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-pike-btn-hi),
+      var(--color-pike-btn-lo)
+    );
+    color: var(--color-pike-btn-text);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: var(--cursor-point);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .pike-lean-arrow {
+    color: var(--color-pike-primed);
+    font-size: 16px;
+  }
+  .pike-lean-key.unbound .pike-lean-cap {
+    display: none;
+  }
+  .pike-lean-key.held {
+    border-color: var(--color-pike-primed);
+    box-shadow: 0 0 9px var(--color-pike-primed-glow);
+  }
+  .pike-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 2px solid var(--color-pike-btn-rim);
+    border-radius: 6px;
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-pike-btn-hi),
+      var(--color-pike-btn-lo)
+    );
+    color: var(--color-pike-btn-text);
+    cursor: var(--cursor-point);
+    position: relative;
+    touch-action: manipulation;
+    user-select: none;
+  }
+  .pike-btn-icon {
+    position: absolute;
+    inset: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  /* Primed is the whole point of the bar: it names the one verb the fight wants next. */
+  .pike-btn.primed {
+    border-color: var(--color-pike-primed);
+    box-shadow: 0 0 9px var(--color-pike-primed-glow);
+  }
+  /* Dimmed, not extinguished. grayscale(0.75) + brightness(0.55) on painted art left three
+     near-black tiles, and since only ONE verb of the three is ever available at a time, the
+     bar read as mostly broken rather than mostly not-yet. A player has to be able to see
+     what the pike CAN do while it is not doing it, because that is how they learn the
+     sequence. Desaturated and darkened enough to be clearly out of reach, bright enough to
+     still be a picture. */
+  .pike-btn.disabled {
+    filter: grayscale(0.45) brightness(0.78);
+    opacity: 0.86;
+    border-color: var(--color-pike-btn-rim-disabled);
+    /* --cursor-arrow is what the family spells for the global default arrow
+       (base.css sets it on body), the same way it spells --cursor-point for the
+       interactive one. */
+    cursor: var(--cursor-arrow);
+  }
+  /* An AVAILABILITY WINDOW, which is the opposite of a cooldown and must never look like
+     one: the action is live and this is how long that lasts. So the ring is bright, sits on
+     the border, and DRAINS (conic-gradient sweep driven by --pike-window, 1 down to 0),
+     rather than a dark overlay filling up. The League-of-Legends reading: the glow running
+     out is your remaining time, and the button underneath stays lit the whole way. */
+  /* The border stays DIM here on purpose. A solid gold border plus the sweep on top means the
+     draining arc has nothing to drain against: the button reads as fully ringed at 10 percent
+     remaining exactly as it does at 90. The glow says "live", and the arc alone carries the
+     time. */
+  .pike-btn.windowed {
+    border-color: var(--color-pike-window-rim);
+    box-shadow:
+      0 0 12px var(--color-pike-window-glow),
+      inset 0 0 8px var(--color-pike-window-inset);
+  }
+  .pike-btn-window {
+    position: absolute;
+    inset: -3px;
+    display: none;
+    border-radius: 8px;
+    pointer-events: none;
+    /* The sweep itself: an opaque arc over a transparent remainder, masked to a thin ring so
+       it reads as a draining border and never as a pie chart over the art. */
+    background: conic-gradient(
+      from -90deg,
+      var(--color-pike-window-arc) 0turn,
+      var(--color-pike-window-arc) calc(var(--pike-window, 1) * 1turn),
+      var(--color-pike-window-arc-off) calc(var(--pike-window, 1) * 1turn),
+      var(--color-pike-window-arc-off) 1turn
+    );
+    -webkit-mask:
+      linear-gradient(var(--color-keyline) 0 0) content-box,
+      linear-gradient(var(--color-keyline) 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(var(--color-keyline) 0 0) content-box,
+      linear-gradient(var(--color-keyline) 0 0);
+    mask-composite: exclude;
+    padding: 3px;
+  }
+  .pike-btn.windowed .pike-btn-window {
+    display: block;
+  }
+  /* The seconds share the centred slot a cooldown uses, deliberately: same position, and the
+     dark backdrop that would make it read as a cooldown comes from `.cooldown`, which a
+     windowed button never carries. Bright digits over live art, not white-on-black. */
+  .pike-btn.windowed .pike-btn-cd {
+    color: var(--color-pike-window-text);
+    text-shadow:
+      0 0 8px var(--color-pike-window-text-glow),
+      0 1px 3px var(--color-keyline);
+  }
+  .pike-btn-cd {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--color-pike-cd-text);
+    text-shadow: 0 1px 2px var(--color-keyline);
+    pointer-events: none;
+  }
+  .pike-btn.cooldown .pike-btn-cd {
+    background: var(--color-pike-cd-scrim);
+    border-radius: 4px;
+  }
   .pet-btn {
     --ui-socket-size: var(--socket-size-pet);
     flex: none;
@@ -4720,6 +5163,29 @@
   }
   body.show-actionbar3 #swingbar-offhand {
     bottom: 272px;
+  }
+  /* Target Auras Below the Frame lifts the stock target seat by one strip
+     row (--target-aura-band-lift, set above with the seat), which would park
+     the frame on these centred timers. They rise by the same step so every
+     stock layout keeps the clearance it had. A moved bar keeps its inline
+     position; the var is unset (0) with the setting off and on touch. */
+  body.target-auras-below-frame:not(.mobile-touch) #castbar {
+    bottom: calc(260px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #swingbar {
+    bottom: calc(234px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #swingbar-offhand {
+    bottom: calc(220px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #castbar {
+    bottom: calc(312px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #swingbar {
+    bottom: calc(286px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #swingbar-offhand {
+    bottom: calc(272px + var(--target-aura-band-lift));
   }
 
   #actionbar,
@@ -5218,8 +5684,6 @@
     gap: 0;
   }
   .micro-btn {
-    width: 34px;
-    height: 30px;
     cursor: var(--cursor-point);
     font-weight: bold;
     position: relative;
@@ -5317,29 +5781,6 @@
   /* Zero is empty text, not a rendered 0: one elided write per badge hides it. */
   .micro-btn .mm-badge:empty {
     display: none;
-  }
-  /* music button: a bigger note with a small diagonal slash when audio is off */
-  #mm-music .ui-icon {
-    width: 22px;
-    height: 22px;
-  }
-  /* Music on is the note's own gold, not the launcher's open-window ring: the
-     ring stays reserved for "this button's window is open". */
-  #mm-music.mm-on {
-    color: var(--gold);
-  }
-  .micro-btn.mm-muted::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 17px;
-    height: 2px;
-    border-radius: var(--radius-2xs);
-    background: var(--color-text-light);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-keyline) 70%, transparent);
-    transform: translate(-50%, -50%) rotate(-45deg);
-    pointer-events: none;
   }
   @media (prefers-reduced-motion: reduce) {
     .micro-btn.has-points,
@@ -5585,12 +6026,65 @@
     cursor: var(--cursor-point);
     overflow: hidden;
   }
+  /* Each advert is a full-card layer; only the active one shows, crossfading on rotation. */
+  .store-promo-card-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.45s ease,
+      visibility 0s linear 0.45s;
+  }
+  .store-promo-card-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease;
+  }
   .store-promo-card-open img {
     width: 100%;
     height: 100%;
     display: block;
     object-fit: cover;
     transition: filter 0.12s ease;
+  }
+  .store-promo-card-dots {
+    position: absolute;
+    left: 4%;
+    bottom: 7%;
+    z-index: 1;
+    display: flex;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .store-promo-card-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-text-light);
+    opacity: 0.4;
+    box-shadow: 0 0 2px var(--color-store-promo-dot-shadow);
+  }
+  .store-promo-card-dot.is-active {
+    opacity: 1;
+  }
+  .store-promo-card-dot.is-retired {
+    display: none;
+  }
+  @media (forced-colors: active) {
+    .store-promo-card-dot {
+      background: CanvasText;
+      forced-color-adjust: none;
+    }
+    .store-promo-card-dot.is-active {
+      background: Highlight;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .store-promo-card-slide,
+    .store-promo-card-slide.is-active {
+      transition: none;
+    }
   }
   .store-promo-card-copy {
     /* The copy sits inside the card's own <button>, which carries no colour, so
@@ -6432,6 +6926,242 @@
   #rift-tracker .rt-obj {
     margin-left: 8px;
     margin-top: 4px;
+  }
+
+  /* ---------- dungeon objectives tracker ---------- */
+  /* The group dungeon a player stands in (src/ui/hud/dungeon/dungeon_tracker_*):
+     a plate naming the dungeon, with a rail that fills as its bosses fall, and
+     under it one row per boss counted 0 of 1. It sits at the TOP of the stack,
+     above the quest tracker, because inside a dungeon it is the business at
+     hand. Actionable progress, so nothing here rides a graphics tier
+     (docs/design/graphics-settings-fairness.md); the two short glows are
+     decoration over counts already on screen and stand down under reduced
+     motion.
+
+     Visibility is one class the painter owns: without .is-live the tracker
+     leaves the stack entirely, so it never spends a gap outside a dungeon.
+     The frame editor force-shows a hidden tracker as a placeholder (display
+     !important, above), and the second rule keeps the empty plate out of it. */
+  #dungeon-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    pointer-events: none;
+  }
+  #dungeon-tracker:not(.is-live) {
+    display: none;
+  }
+  #dungeon-tracker:not(.is-live) > .dgt-plate,
+  #dungeon-tracker:not(.is-live) > .dgt-list {
+    display: none;
+  }
+  /* The plate composes ui-panel-soft (the objective tracker surface, DESIGN.md
+     4.4); only its geometry is set here. The stack outlines its text for the
+     open world behind it, which a plated line does not need.
+
+     The plate is the one OPAQUE box in the stack, and the stack paints above
+     the button rail (z-index 20 over 19): wherever the two meet it would cover
+     buttons. Whether they meet depends on the viewport, the UI scale, a
+     horizontal or moved rail and a moved tracker, so no breakpoint can say;
+     the painter measures it and writes the share of the column the plate may
+     fill (--dgt-plate-w, a percentage, so it holds at every scale). Rows are
+     text and stay full width: text over a rail icon is harmless, which is why
+     every row in the stack hugs the left of the column. */
+  #dungeon-tracker .dgt-plate {
+    position: relative;
+    box-sizing: border-box;
+    width: var(--dgt-plate-w, 100%);
+    padding: 6px 10px 8px;
+    text-shadow: none;
+  }
+  /* The completed edge and its one-time glow live on an overlay, so the
+     primitive's own border and shadow are never re-declared. */
+  #dungeon-tracker .dgt-plate::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--gold-dim);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-plate.is-complete::after {
+    opacity: 1;
+  }
+  #dungeon-tracker .dgt-plate.is-complete-flash::after {
+    animation: dungeon-tracker-complete 1.4s ease-out;
+  }
+  @keyframes dungeon-tracker-complete {
+    from {
+      box-shadow:
+        0 0 calc(14px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 42%, transparent),
+        inset 0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 25%, transparent);
+    }
+    to {
+      box-shadow:
+        0 0 0 transparent,
+        inset 0 0 0 transparent;
+    }
+  }
+  /* A long localized name wraps inside the plate rather than clipping: it is
+     the one thing the plate is for. */
+  #dungeon-tracker .dgt-name {
+    color: var(--color-accent);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    overflow-wrap: anywhere;
+  }
+  /* Beside the rail (the painter's .is-narrow) the name sets a size down and
+     the plate gives it a pixel more room, so a name that fit one line still
+     does. The line height holds: narrowing never makes the plate shorter, so
+     the painter's measure cannot flip-flop. */
+  #dungeon-tracker.is-narrow .dgt-plate {
+    padding-inline: 9px;
+  }
+  #dungeon-tracker.is-narrow .dgt-name {
+    font-size: 13px;
+  }
+  /* Chip, rail, tally. On a narrowed plate with a long chip and a long tally
+     (a finished heroic run in German or Russian) the three no longer fit one
+     line: the row wraps and the tally drops under, right aligned, instead of
+     squeezing the rail to nothing. */
+  #dungeon-tracker .dgt-progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    margin-top: 5px;
+  }
+  #dungeon-tracker .dgt-diff {
+    flex: none;
+    height: 16px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  #dungeon-tracker .dgt-plate:not(.is-heroic) .dgt-diff {
+    display: none;
+  }
+  #dungeon-tracker .dgt-bar {
+    --bar-color: var(--gold);
+    --bar-h: 5px;
+
+    flex: 1 1 28px;
+    min-width: 28px;
+  }
+  #dungeon-tracker .dgt-bar-fill {
+    display: block;
+    transition:
+      width 0.5s ease-out,
+      background-color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-plate.is-complete .dgt-bar {
+    --bar-color: var(--color-text-success);
+  }
+  #dungeon-tracker .dgt-tally {
+    flex: none;
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 14px;
+    color: var(--color-text-secondary);
+    transition: color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-plate.is-complete .dgt-tally {
+    color: var(--color-text-success);
+  }
+  #dungeon-tracker .dgt-list {
+    margin: 7px 0 0 10px;
+  }
+  /* Rows are text on the world, like every other line in the stack: no plate,
+     the stack's outline, and click-through. Count first, so the counts form
+     one column and a long boss name wraps under itself. */
+  #dungeon-tracker .dgt-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-top: 3px;
+    line-height: 16px;
+    transition: color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-row:first-child {
+    margin-top: 0;
+  }
+  #dungeon-tracker .dgt-count {
+    flex: none;
+    color: var(--color-text-light);
+    transition: color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-boss {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  /* The check is decoration (aria-hidden; the count carries the state) and
+     arrives with the done color. */
+  #dungeon-tracker .dgt-mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 11px;
+    height: 16px;
+    opacity: 0;
+    transition: opacity var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-mark .ui-icon {
+    width: 11px;
+    height: 11px;
+    filter: drop-shadow(0 1px 1px var(--color-keyline));
+  }
+  #dungeon-tracker .dgt-row.is-done {
+    color: var(--color-text-success);
+  }
+  #dungeon-tracker .dgt-row.is-done .dgt-count {
+    color: inherit;
+  }
+  #dungeon-tracker .dgt-row.is-done .dgt-mark {
+    opacity: 1;
+  }
+  /* A boss that fell in front of the player: its row arrives lit and settles
+     into the done green (the Reliquary tracker's fill flash, same idiom). */
+  #dungeon-tracker .dgt-row.is-flash {
+    animation: dungeon-tracker-kill 1.2s ease-out;
+  }
+  @keyframes dungeon-tracker-kill {
+    from {
+      color: var(--color-text-light);
+      text-shadow:
+        0 0 8px var(--color-text-success),
+        var(--outline-shadow);
+    }
+    to {
+      color: var(--color-text-success);
+      text-shadow: var(--outline-shadow);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #dungeon-tracker .dgt-row.is-flash,
+    #dungeon-tracker .dgt-plate.is-complete-flash::after {
+      animation: none;
+    }
+    #dungeon-tracker .dgt-bar-fill {
+      transition: none;
+    }
+  }
+  body.reduce-motion #dungeon-tracker .dgt-row.is-flash,
+  body.reduce-motion #dungeon-tracker .dgt-plate.is-complete-flash::after {
+    animation: none;
+  }
+  body.reduce-motion #dungeon-tracker .dgt-bar-fill {
+    transition: none;
+  }
+  /* Forced colors drops the green: keep the done state readable as a system
+     color (the count text already says it). */
+  @media (forced-colors: active) {
+    #dungeon-tracker .dgt-row.is-done {
+      color: Highlight;
+    }
   }
 
   /* ---------- practice DPS tracker ---------- */
@@ -8160,13 +8890,6 @@
     padding: 1px 4px;
     line-height: 1.5;
   }
-  #tooltip .mt-tip-time {
-    position: relative;
-    font-size: 10px;
-    color: var(--color-text-muted);
-    font-variant-numeric: tabular-nums;
-    flex-shrink: 0;
-  }
   #tooltip .mt-tip-icon {
     position: relative;
     width: 16px;
@@ -8467,6 +9190,39 @@
     display: inline-block;
     line-height: 0;
   }
+  #minimap-disc.pvp-risk::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border: 3px solid var(--color-hostile);
+    border-radius: 50%;
+    box-shadow: 0 0 12px 3px var(--color-hostile-rim);
+    pointer-events: none;
+    animation: minimap-pvp-risk 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes minimap-pvp-risk {
+    from {
+      opacity: 0.6;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #minimap-disc.pvp-risk::after {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    #minimap-disc.pvp-risk::after {
+      border-color: Highlight;
+      animation: none;
+    }
+    #pf-pvp {
+      color: CanvasText;
+      border-color: CanvasText;
+    }
+  }
   /* The board's conic-bronze bezel, painted BEHIND the canvas and outside the
      disc's own layout box (inset -6px, z-index -1), so the canvas covers the
      centre and only the outer band reads as a ring: the four guarded rim seats
@@ -8540,6 +9296,60 @@
     color: var(--gold);
     border-color: var(--gold-dim);
     box-shadow: var(--glow-gold-soft), var(--edge-glint);
+  }
+  /* instance-difficulty badge: satellite indicator on the minimap cluster
+     (top-left rim, classic WoW instance difficulty indicator placement). Visible
+     only while inside a dungeon or raid instance. Normal shows the dungeon
+     arch gate; Heroic lights up as a golden skull with gold border and glow. */
+  #instance-difficulty {
+    position: absolute;
+    left: 8px;
+    top: 35px;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: default;
+    color: var(--color-text-muted);
+    border-color: var(--color-control-border);
+    background: radial-gradient(
+      circle at 45% 35%,
+      var(--color-socket-hi) 0%,
+      var(--color-instance-difficulty-mid) 70%,
+      var(--color-ink-deep) 100%
+    );
+    background-color: var(--color-instance-difficulty-bg);
+    box-shadow: var(--shadow-instance-difficulty), var(--edge-glint);
+  }
+  #instance-difficulty[hidden] {
+    display: none;
+  }
+  #instance-difficulty svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  #instance-difficulty.heroic {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    box-shadow: var(--glow-gold-soft), var(--shadow-instance-difficulty), var(--edge-glint);
+  }
+  #instance-difficulty.normal {
+    color: var(--color-text-light);
+    border-color: var(--color-control-border);
+    box-shadow: var(--shadow-instance-difficulty), var(--edge-glint);
+  }
+  #instance-difficulty:hover,
+  #instance-difficulty:focus-visible {
+    border-color: var(--gold);
+  }
+  #instance-difficulty:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   /* The store chest occupies a normal menu slot, including compact mode. */
   #daily-rewards-button {
@@ -8663,8 +9473,6 @@
   /* The tray plate stays fixed dark on every preset: it floats over the world,
      not over a themed panel, so its ink is fixed too (see the chip below). */
   .community-link {
-    width: 34px;
-    height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -9138,8 +9946,10 @@
     padding-top: 5px;
     border-top: 1px solid #3a3526;
   }
-  /* item comparison block (hover an equippable item to see the worn one + deltas) */
-  #tooltip .tt-cmp {
+  /* item comparison block (hover an equippable item to see the worn one + deltas),
+     and the crafted product card a recipe pattern embeds under its teaches line */
+  #tooltip .tt-cmp,
+  #tooltip .tt-recipe-product {
     margin-top: 6px;
     padding-top: 5px;
     border-top: 1px solid #3a3526;
@@ -9299,6 +10109,198 @@
   }
   .fct-self-note {
     color: var(--color-fct-self-note);
+  }
+  /* Vivid combat text, the default look (Interface > Combat > Classic Combat Text turns
+     it off: the painter then adds none of these classes, so every rule above renders
+     byte-identical to the shipped floater). What it borrows, and why:
+       - ability damage in a saturated gold beside the white auto-attacks, so the two
+         separate at a glance (the shipped pale parchment read as grey);
+       - a heavier keyline, so a number holds its colour on a grey scene;
+       - a hold-then-fade that keeps the number fully opaque for over half its life
+         (the plain rise fades from the first frame, which is what read as grey);
+       - outgoing numbers dealt into four lanes (near / far, alternating sides) that
+         arc out and up, so a burst fans out instead of stacking in one column;
+       - a louder crit that pops in the free centre column as the headline number
+         (overshoot pop, a small twist, a glow in the hit's own colour);
+       - a big-hit flag for a hit well above your own running average (fct_emphasis_core).
+     Presentation only: every number still shows on every tier; the low tier sheds only
+     the crit pop (a vivid crit falls back to the hold-then-fade rise, never the plain
+     fade-from-frame-one rise) and fits the animations to its shorter floater life. */
+  .fct.fct-vivid {
+    text-shadow: var(--fct-vivid-outline);
+  }
+  .fct.fct-vivid.fct-damage-done-ability {
+    color: var(--color-fct-vivid-ability);
+  }
+  .fct.fct-out-l,
+  .fct.fct-out-r,
+  .fct.fct-out-ll,
+  .fct.fct-out-rr {
+    font-size: calc(19px * var(--fct-scale, 1));
+    animation-duration: 1.25s;
+  }
+  .fct.fct-out-l {
+    animation-name: fct-out-l;
+  }
+  .fct.fct-out-r {
+    animation-name: fct-out-r;
+  }
+  .fct.fct-out-ll {
+    animation-name: fct-out-ll;
+  }
+  .fct.fct-out-rr {
+    animation-name: fct-out-rr;
+  }
+  /* A crit (in any lane, or incoming) pops in place. Declared after the lanes so the
+     equal-specificity lane rules above never pull a crit off centre stage. */
+  .fct.fct-vivid.crit {
+    font-size: calc(30px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-crit);
+    animation-name: fct-vivid-crit;
+    animation-duration: 1.25s;
+  }
+  .fct.fct-big {
+    font-size: calc(23px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-big);
+  }
+  .fct.fct-big.crit {
+    font-size: calc(35px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-big-crit);
+  }
+  /* Incoming damage keeps its straight rise over the player, but with the same
+     hold-then-fade, so the hit you just took does not wash out before you read it. */
+  .fct.fct-vivid.fct-damage-taken:not(.crit),
+  .fct.fct-vivid.fct-damage-taken-block:not(.crit) {
+    animation-name: fct-vivid-rise;
+    animation-duration: 1.25s;
+  }
+  /* Low tier: shed the pop (and the twist) exactly as the classic crit does, but keep
+     the hold-then-fade, so a low-tier crit is not the one number that goes grey. This
+     outranks both the vivid crit above and the shipped low-tier crit shed. */
+  :root[data-fx-level="low"] .fct.fct-vivid.crit {
+    animation-name: fct-vivid-rise;
+  }
+  /* The low tier also recycles every floater sooner (FCT_TTL_MS x FCT_TTL_SCALE_LOW =
+     0.75s, src/game/ui_tier_knobs.ts). A vivid animation holds full opacity until 60%, so
+     at its 1.25s length the node would be removed at full opacity the instant its fade
+     began; compressing the vivid animations to the low TTL keeps the fade on screen. XP,
+     heals and every classic floater keep their own durations. */
+  :root[data-fx-level="low"]
+    .fct.fct-vivid:is(
+      .fct-out-l,
+      .fct-out-r,
+      .fct-out-ll,
+      .fct-out-rr,
+      .crit,
+      .fct-damage-taken,
+      .fct-damage-taken-block
+    ) {
+    animation-duration: 0.75s;
+  }
+  /* Static keyframes per lane (never a var() inside keyframes, so the rise stays on the
+     compositor). Each number bows out sideways first and then climbs, an arc rather
+     than a straight diagonal, and holds full opacity until 60% before fading. */
+  @keyframes fct-out-l {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 30px) calc(-50% - 24px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 46px) calc(-50% - 84px);
+    }
+  }
+  @keyframes fct-out-r {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 30px) calc(-50% - 24px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 46px) calc(-50% - 84px);
+    }
+  }
+  @keyframes fct-out-ll {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 62px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 88px) calc(-50% - 70px);
+    }
+  }
+  @keyframes fct-out-rr {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 62px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 88px) calc(-50% - 70px);
+    }
+  }
+  @keyframes fct-vivid-rise {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 80px);
+    }
+  }
+  @keyframes fct-vivid-crit {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 0.6;
+      rotate: -8deg;
+    }
+    12% {
+      scale: 1.7;
+      rotate: 4deg;
+    }
+    26% {
+      scale: 1;
+      rotate: 0deg;
+    }
+    65% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 86px);
+      scale: 1;
+      rotate: 0deg;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .fct {
@@ -10512,10 +11514,6 @@
   #banner.banner-no-motion {
     transition: none;
   }
-  #banner.banner-pvp {
-    --color-text-light: var(--color-danger);
-    text-transform: uppercase;
-  }
   /* The quest-progress flash (quest_progress_banner.ts): small yellow lines
      stacked at the top-center, above the zone banner's slot, the classic
      "Forest Wolf slain: 3/8" cue. Lines are appended by the banner module and
@@ -10650,6 +11648,14 @@
     gap: 12px 16px;
     align-items: center;
     justify-content: center;
+  }
+  /* The PvP Resurrect wait and where the raise lands (src/ui/hud/death). */
+  #death-overlay .death-note {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--color-text-muted);
   }
 
   /* ---------- death recap dialog (WoW-style) ---------- */
@@ -11671,6 +12677,241 @@
   #raid-boss-guide-window .rbg-ability-detail p + p {
     margin-top: 7px;
     color: var(--color-text-light);
+  }
+  /* The five-player dungeon pages (src/ui/boss_journal/): rank and defeated
+     marks on the boss tabs, the Heroic callout, role tips, trade-off cards,
+     the always-visible ability summary and the two-tier damage line. Every
+     text block wraps; nothing in the journal truncates. */
+  /* The dungeon pages carry tips, choices and summaries: a wider sheet. */
+  #raid-boss-guide-window:has(.rbg-boss-nav-dungeon) {
+    width: min(980px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));
+  }
+  #raid-boss-guide-window .rbg-boss-nav-dungeon {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  #raid-boss-guide-window .rbg-boss-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overflow-wrap: anywhere;
+  }
+  #raid-boss-guide-window .rbg-boss-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+    color: var(--color-rbg-kicker);
+    font-family: var(--body-font);
+    font-size: 9px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  #raid-boss-guide-window .rbg-defeated {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--color-rbg-gain-text);
+  }
+  #raid-boss-guide-window .rbg-defeated .ui-icon {
+    width: 10px;
+    height: 10px;
+  }
+  #raid-boss-guide-window .rbg-boss-tab.defeated:not(.active) img {
+    filter: grayscale(1) brightness(0.55);
+  }
+  #raid-boss-guide-window .rbg-rank {
+    display: inline-block;
+    margin: -6px 0 10px;
+    padding: 2px 8px;
+    border: 1px solid var(--color-rbg-important-border);
+    border-radius: 999px;
+    color: var(--color-rbg-important-text);
+    font-family: var(--title-font);
+    font-size: 9px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  #raid-boss-guide-window .rbg-rank-final {
+    border-color: var(--color-rbg-deadly-border);
+    color: var(--color-rbg-deadly-text);
+  }
+  #raid-boss-guide-window .rbg-heroic {
+    margin: 0 0 14px;
+    padding: 9px 12px 10px;
+    border: 1px solid var(--color-rbg-deadly-border);
+    border-left-width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--color-rbg-heroic-bg), var(--color-rbg-detail-bg));
+  }
+  #raid-boss-guide-window .rbg-heroic-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-rbg-deadly-text);
+    font-family: var(--title-font);
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  #raid-boss-guide-window .rbg-heroic-head .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  #raid-boss-guide-window .rbg-heroic ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: var(--color-text-light);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  #raid-boss-guide-window .rbg-heroic li + li {
+    margin-top: 3px;
+  }
+  #raid-boss-guide-window .rbg-tips,
+  #raid-boss-guide-window .rbg-choices {
+    margin: 0 0 14px;
+  }
+  #raid-boss-guide-window .rbg-tip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 5px;
+  }
+  #raid-boss-guide-window .rbg-tip {
+    padding: 8px 9px 9px;
+    border: 1px solid var(--color-rbg-ability-border);
+    border-top-width: 2px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--color-rbg-ability-start), var(--color-rbg-tab-end));
+  }
+  #raid-boss-guide-window .rbg-tip-tank {
+    border-top-color: var(--color-rbg-role-tank-bg);
+  }
+  #raid-boss-guide-window .rbg-tip-healer {
+    border-top-color: var(--color-rbg-role-healer-bg);
+  }
+  #raid-boss-guide-window .rbg-tip-damage {
+    border-top-color: var(--color-rbg-role-damage-bg);
+  }
+  #raid-boss-guide-window .rbg-tip header,
+  #raid-boss-guide-window .rbg-choice header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  #raid-boss-guide-window .rbg-tip h3,
+  #raid-boss-guide-window .rbg-choice h3 {
+    margin: 0;
+    color: var(--color-rbg-phase-title);
+    font-family: var(--title-font);
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  #raid-boss-guide-window .rbg-tip p,
+  #raid-boss-guide-window .rbg-choice p {
+    margin: 6px 0 0;
+    color: var(--color-text-light);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  #raid-boss-guide-window .rbg-choice {
+    margin-top: 5px;
+    padding: 8px 9px 9px;
+    border: 1px solid var(--color-rbg-important-border);
+    border-radius: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--color-rbg-ability-expanded-start),
+      var(--color-rbg-tab-end)
+    );
+  }
+  #raid-boss-guide-window .rbg-choice header img {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--color-rbg-icon-border);
+    border-radius: 3px;
+  }
+  #raid-boss-guide-window .rbg-choice-sides {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 7px;
+  }
+  #raid-boss-guide-window .rbg-choice-gain,
+  #raid-boss-guide-window .rbg-choice-risk {
+    padding: 6px 8px 7px;
+    border-left: 2px solid var(--color-rbg-gain-border);
+    background: var(--color-rbg-detail-bg);
+  }
+  #raid-boss-guide-window .rbg-choice-risk {
+    border-left-color: var(--color-rbg-deadly-border);
+  }
+  #raid-boss-guide-window .rbg-choice-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-rbg-gain-text);
+    font-family: var(--title-font);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  #raid-boss-guide-window .rbg-choice-risk .rbg-choice-label {
+    color: var(--color-rbg-deadly-text);
+  }
+  #raid-boss-guide-window .rbg-choice-label .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #raid-boss-guide-window .rbg-choice-sides p {
+    margin-top: 4px;
+  }
+  #raid-boss-guide-window .rbg-ability-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 4px 0;
+  }
+  #raid-boss-guide-window .rbg-ability-text .rbg-ability-name {
+    overflow-wrap: anywhere;
+  }
+  #raid-boss-guide-window .rbg-ability-summary {
+    color: var(--color-rbg-summary-text);
+    font-family: var(--body-font);
+    font-size: 11px;
+    line-height: 1.42;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #raid-boss-guide-window .rbg-marks {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  #raid-boss-guide-window .rbg-mark {
+    padding: 1px 6px;
+    border: 1px solid var(--color-rbg-important-border);
+    border-radius: 999px;
+    color: var(--color-rbg-important-text);
+    font-family: var(--title-font);
+    font-size: 9px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  #raid-boss-guide-window .rbg-mark-heroicOnly {
+    border-color: var(--color-rbg-deadly-border);
+    color: var(--color-rbg-deadly-text);
+  }
+  #raid-boss-guide-window .rbg-boss-nav-dungeon ~ .rbg-journal .rbg-ability-detail p:first-child {
+    color: var(--color-text-light);
+  }
+  #raid-boss-guide-window .rbg-ability-detail .rbg-compare {
+    color: var(--color-rbg-kicker);
+    font-family: var(--title-font);
+    font-size: 10px;
   }
   @media (forced-colors: active) {
     #raid-boss-guide-window .rbg-boss-tab.active,
@@ -13488,12 +14729,17 @@
   }
   .cdm-btn {
     flex: none;
+    pointer-events: auto;
     opacity: var(--cdm-idle-opacity, 0.55);
     transition: opacity 0.16s ease;
   }
   .cdm-btn.is-ready,
   .cdm-btn.is-proc {
     opacity: 1;
+  }
+  /* Touch camera gestures pass through readouts outside placement mode. */
+  body.mobile-touch #cooldown-manager:not(.placement) .cdm-btn {
+    pointer-events: none;
   }
   /* A transformed button (Gorebite armed as Redharvest) or a class proc pulses
      with the action bar's own proc rim. Actionable: never tier-gated; only the
@@ -15276,6 +16522,44 @@
     font-size: 12px;
     color: var(--color-text-secondary);
   }
+  /* ---------- graphics restore note ---------- */
+  /* The status line over the 3D view while a WebGL context restore holds the
+     world draw (src/ui/graphics_restore_note_controller.ts). Composes
+     .ui-pill; this section sets geometry only. Centred: the view under it is
+     blank for the whole hold, so it hides nothing. The fade waits a beat, so
+     a hold of a few frames does not flash it. */
+  .graphics-restore-note {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 30;
+    white-space: nowrap;
+    animation: graphics-restore-note-in 200ms ease-out 250ms both;
+  }
+  .graphics-restore-note[hidden] {
+    display: none;
+  }
+  @keyframes graphics-restore-note-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  /* Reduced motion drops the fade, never the delay: a hold of a few frames
+     still must not flash the note. Hide Interface (Alt+Z) hides it with the
+     rest of #ui on purpose: the player asked for no chrome. */
+  @media (prefers-reduced-motion: reduce) {
+    .graphics-restore-note {
+      animation-duration: 0s;
+    }
+  }
+  body.reduce-motion .graphics-restore-note {
+    animation-duration: 0s;
+  }
   /* ---------- Hide Interface (Alt+Z, interface_visibility_core.ts) ---------- */
   /* One body class hides every HUD surface for a clean screenshot or video:
      each #ui child except the visually-hidden a11y live regions (screen readers
@@ -15306,5 +16590,86 @@
 @layer components {
   #chatlog-wrap.frame-user-hidden {
     display: none !important;
+  }
+}
+
+@layer components {
+  /* ---------- open expeditions ---------- */
+
+  .expedition-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #expedition-bell {
+    position: relative;
+  }
+  #expedition-bell .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  #expedition-bell.expedition-bell-alert {
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  #expedition-bell[data-finish="bronze"] {
+    color: var(--color-queue-bell-bronze);
+  }
+  #expedition-bell[data-finish="silver"] {
+    color: var(--color-queue-bell-silver);
+  }
+  #expedition-bell[data-finish="gold"] {
+    color: var(--color-queue-bell-gold);
+  }
+
+  .expedition-details {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .expedition-details label {
+    display: grid;
+    gap: 4px;
+  }
+  .expedition-details .ui-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .expedition-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+  .expedition-check input {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .expedition-note {
+    overflow-wrap: anywhere;
+  }
+
+  .expedition-progress {
+    width: 100%;
+    height: 8px;
+    accent-color: var(--color-primary);
+  }
+
+  @media (forced-colors: active) {
+    .expedition-progress {
+      accent-color: Highlight;
+    }
+  }
+
+  .expedition-actions {
+    flex-wrap: wrap;
+  }
+
+  .expedition-actions .ui-btn {
+    min-height: 40px;
   }
 }

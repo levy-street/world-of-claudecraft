@@ -215,14 +215,14 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     const at1 = bleedAt(1);
     const at5 = bleedAt(5);
 
-    // Bloodrift's record is { total: 156, duration: 24, interval: 2,
-    // baseTotal: 36, perComboTotal: 24 }: a fixed 24 sec / 12 tick window whose
-    // total is 36 + 24 x points, so dotBase(1) = round(60/12) = 5 and
-    // dotBase(5) = round(156/12) = 13, an exact +8 delta (attack-power scaling
+    // Bloodrift's record is { total: 312, duration: 24, interval: 2,
+    // baseTotal: 72, perComboTotal: 48 }: a fixed 24 sec / 12 tick window whose
+    // total is 72 + 48 x points, so dotBase(1) = round(120/12) = 10 and
+    // dotBase(5) = round(312/12) = 26, an exact +16 delta (attack-power scaling
     // is identical at both spends and cancels out of the delta).
     expect(at1.duration).toBe(24);
     expect(at5.duration).toBe(24);
-    expect(at5.value - at1.value).toBe(8);
+    expect(at5.value - at1.value).toBe(16);
   });
 
   it('rupture and rip: the five-point payload matches the authored content totals', () => {
@@ -241,12 +241,12 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
       perTick: Math.round(rupture.total / (rupture.duration / rupture.interval)),
     }).toEqual({ window: 16, total: 96, perTick: 12 });
 
-    // Bloodrift: 36 + 24 x 5 = 156 over a fixed 24 sec window (12 ticks of 13).
+    // Bloodrift: 72 + 48 x 5 = 312 over a fixed 24 sec window (12 ticks of 26).
     expect({
       window: rip.duration,
       total: (rip.baseTotal ?? 0) + (rip.perComboTotal ?? 0) * 5,
       perTick: Math.round(rip.total / (rip.duration / rip.interval)),
-    }).toEqual({ window: 24, total: 156, perTick: 13 });
+    }).toEqual({ window: 24, total: 312, perTick: 26 });
   });
 
   it('a melee damage-percent modifier scales the WHOLE bleed payload, not just `total`', () => {

@@ -1,0 +1,919 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-venom-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_silkstalker_woven_vest",
+      "family": "hoard-venom",
+      "tier": "Tarnished",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_silkstalker_woven_vest.webp",
+      "canonicalDisplayName": "Tarnished Woven Vest of the Silkstalker",
+      "acceptedSha256": "a8d702318184f356691f4d7c4558b1408b8147804f2f9054b329877bdfada894",
+      "acceptedBytes": 3578,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/rare_silkstalker_woven_vest.png",
+        "sha256": "cf1225a7d6bd6ceb510232a465c633ac39bb6c2fb3891231b413d0e6b6c74f6d",
+        "bytes": 2505357,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/rare_silkstalker_woven_vest.png",
+        "sha256": "7f959bece2a0d7a57474a8db02dd8485914154e0a3b90e7cf213ff6d944f10f0",
+        "bytes": 529460,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "d71b4909ee8ef9fc2548dd981a6dfb909b59be69ae57caf2881cdc5256b06e4d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Woven Vest of the Silkstalker (rare_silkstalker_woven_vest) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty forest-green LEATHER vest, fitted sleeveless torso of supple overlapping hide panels woven and stitched together with pale spider silk, slightly flared waist, two slender luminous yellow-green fang marks on a small central clasp. Clearly leather with woven silk reinforcement, not cloth robes or metal armor, no wearer. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with subtle green patina, faded forest-green leather or silk, frayed small thread ends, restrained poison-green enchantment. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/rare_silkstalker_woven_vest.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "d71b4909ee8ef9fc2548dd981a6dfb909b59be69ae57caf2881cdc5256b06e4d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_spun_venom_spaulders",
+      "family": "hoard-venom",
+      "tier": "Tarnished",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_spun_venom_spaulders.webp",
+      "canonicalDisplayName": "Tarnished Spun-Venom Spaulders",
+      "acceptedSha256": "d270b5a7660ac763cab8d5039aa82c83fcfa3ef9d14b336b8100b4fdc6483643",
+      "acceptedBytes": 3644,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/rare_spun_venom_spaulders.png",
+        "sha256": "1692a9c3a193b0a56346c20ebf0951d41aaab413e6bd717bbd15f181d1068345",
+        "bytes": 2312119,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/rare_spun_venom_spaulders.png",
+        "sha256": "2472f26896bda6c12d7dd1379ce64577f2b1cd5040cb79761f95dafea7edc91b",
+        "bytes": 504914,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "eb9d7e59417e644ca7bdb9f6887083f7b809f463c22cb984cf6ba5c294f35c48",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Spun-Venom Spaulders (rare_spun_venom_spaulders) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of forest-green LEATHER shoulder guards, curved layered hide panels wrapped with fine pale spun-silk cords, chitin-like ridges, two slender luminous yellow-green fang marks on the foremost panel. One shoulder guard forward and the matching partner behind. Visible leather grain and stitching, not metal plate. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with subtle green patina, faded forest-green leather or silk, frayed small thread ends, restrained poison-green enchantment. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/rare_spun_venom_spaulders.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "eb9d7e59417e644ca7bdb9f6887083f7b809f463c22cb984cf6ba5c294f35c48"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_broodmother_chitin_cowl",
+      "family": "hoard-venom",
+      "tier": "Tarnished",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_broodmother_chitin_cowl.webp",
+      "canonicalDisplayName": "Tarnished Chitin Cowl of the Broodmother",
+      "acceptedSha256": "aa1b48f12c6aaac91f0391f74f3b7c16578cdeee4a2f39260bc8f52b01406767",
+      "acceptedBytes": 3328,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/rare_broodmother_chitin_cowl.png",
+        "sha256": "314952f28e757ca858a9f5ece54fe6402ea90b870fabd4e52be8fa8f1a348be0",
+        "bytes": 2262285,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/rare_broodmother_chitin_cowl.png",
+        "sha256": "245dab33d2a47bbbcf969713af064432efc878e11b5c9b4e31d5c47494f7e2d8",
+        "bytes": 481030,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "b0c85ce3c8535be895f4fc787ff7886534922b235a7c868ede9298f2fef3a87b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Chitin Cowl of the Broodmother (rare_broodmother_chitin_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty deep forest-green LEATHER hood and cowl with layered green chitin-like ridges on the crown, supple stitched hide around a deep shadowed face opening. Two tiny lime magical eye lights in the empty hood as the established enchantment; no face, skin, head or wearer. Two slender fang-like green markings above the brow. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with subtle green patina, faded forest-green leather or silk, frayed small thread ends, restrained poison-green enchantment. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/rare_broodmother_chitin_cowl.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "b0c85ce3c8535be895f4fc787ff7886534922b235a7c868ede9298f2fef3a87b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_venom_etched_waistcord",
+      "family": "hoard-venom",
+      "tier": "Tarnished",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_venom_etched_waistcord.webp",
+      "canonicalDisplayName": "Tarnished Venom-Etched Waistcord",
+      "acceptedSha256": "a151df36bbbe7841ff1890d024ab3a0ba96fe3368711b7155901a9b34f9f1423",
+      "acceptedBytes": 3558,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/rare_venom_etched_waistcord.png",
+        "sha256": "32cfafbb1d54cd8f2955f59a2cf4677420d590ad12bf5f57652acbd71b997665",
+        "bytes": 2478772,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/rare_venom_etched_waistcord.png",
+        "sha256": "eae047321a4c3c164c865891efc89558741f181d9ae8885539f3b42e340d56cc",
+        "bytes": 485425,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "647d2c212292505908f45c37e0b8c99a41d4260010b3fc9ed96add1c7a37f8d4",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Venom-Etched Waistcord (rare_venom_etched_waistcord) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete forest-green CLOTH waistcord in a broad curved belt silhouette, twisted silk cords and woven green fabric bands, a central square metal clasp carrying two slender luminous yellow-green fang marks, small etched-looking silk embroidery. Clearly a soft cord and cloth accessory, no leather girdle or metal armor belt. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with subtle green patina, faded forest-green leather or silk, frayed small thread ends, restrained poison-green enchantment. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/rare_venom_etched_waistcord.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "647d2c212292505908f45c37e0b8c99a41d4260010b3fc9ed96add1c7a37f8d4"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "silkstalker_woven_vest",
+      "family": "hoard-venom",
+      "tier": "Epic",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/silkstalker_woven_vest.webp",
+      "canonicalDisplayName": "Woven Vest of the Silkstalker",
+      "acceptedSha256": "368117033466cd2e3f48de789c6687f4cc2500e70ccb2458a9c813a474d36e9c",
+      "acceptedBytes": 3464,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/silkstalker_woven_vest.png",
+        "sha256": "4ab2dd598a06dbd475f9006c34f7e94036ab42eac0199648456186c64bd8bfe2",
+        "bytes": 2453152,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/silkstalker_woven_vest.png",
+        "sha256": "37851ef654c7960b566e4b3a381aaf16d773f5873b61dbb408a6f162cbc797be",
+        "bytes": 506924,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "63af1315e64be2eb4a4bc42455254ca6f4db9aabf2e10c0cda000f64a57f429f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Woven Vest of the Silkstalker (silkstalker_woven_vest) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty forest-green LEATHER vest, fitted sleeveless torso of supple overlapping hide panels woven and stitched together with pale spider silk, slightly flared waist, two slender luminous yellow-green fang marks on a small central clasp. Clearly leather with woven silk reinforcement, not cloth robes or metal armor, no wearer. Tier finish: Well-kept masterwork: polished silver fittings, rich forest-green leather or silk, crisp pale woven reinforcement and clearly defined poison-green fang accents. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/silkstalker_woven_vest.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "63af1315e64be2eb4a4bc42455254ca6f4db9aabf2e10c0cda000f64a57f429f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "spun_venom_spaulders",
+      "family": "hoard-venom",
+      "tier": "Epic",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/spun_venom_spaulders.webp",
+      "canonicalDisplayName": "Spun-Venom Spaulders",
+      "acceptedSha256": "1824c196b5744071ddaaa8349c6e9c34fdd50bef6340f53572975b6ea5121a6e",
+      "acceptedBytes": 4298,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/spun_venom_spaulders.png",
+        "sha256": "89bf3a87d987fc9b4ad5426bd686c82da0306e4224dba4bf916bd41cd0e3400b",
+        "bytes": 2392391,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/spun_venom_spaulders.png",
+        "sha256": "c243315f8b64ca3fbabeb4eb56c46c9b6c79b86ca4cc25907485019c64feb58b",
+        "bytes": 539857,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "dba5e9b1bbb82cb7c0ba2c68f9cc12532b9365b7d3a54cd022ed3616f1b0f6ef",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Spun-Venom Spaulders (spun_venom_spaulders) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of forest-green LEATHER shoulder guards, curved layered hide panels wrapped with fine pale spun-silk cords, chitin-like ridges, two slender luminous yellow-green fang marks on the foremost panel. One shoulder guard forward and the matching partner behind. Visible leather grain and stitching, not metal plate. Tier finish: Well-kept masterwork: polished silver fittings, rich forest-green leather or silk, crisp pale woven reinforcement and clearly defined poison-green fang accents. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/spun_venom_spaulders.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "dba5e9b1bbb82cb7c0ba2c68f9cc12532b9365b7d3a54cd022ed3616f1b0f6ef"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "broodmother_chitin_cowl",
+      "family": "hoard-venom",
+      "tier": "Epic",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/broodmother_chitin_cowl.webp",
+      "canonicalDisplayName": "Chitin Cowl of the Broodmother",
+      "acceptedSha256": "0c4b3cb6b22b43ca856a1f13037934c52a93853348d1fd06f9bbcb93c56b6823",
+      "acceptedBytes": 3426,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/broodmother_chitin_cowl.png",
+        "sha256": "841842829fb8fad51849a1e17a028decdd35d5b9fd30955f5f6b37808ffe7e9d",
+        "bytes": 2286545,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/broodmother_chitin_cowl.png",
+        "sha256": "a15da075c931c5b2b2096bc6cff4ab754bb9f93c103208d852a137c96e633140",
+        "bytes": 496448,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "2dd07dfbb9fe272fa7162e7a745f9f10c80fdea98a5d1bd6ae72ee74589c25c0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Chitin Cowl of the Broodmother (broodmother_chitin_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty deep forest-green LEATHER hood and cowl with layered green chitin-like ridges on the crown, supple stitched hide around a deep shadowed face opening. Two tiny lime magical eye lights in the empty hood as the established enchantment; no face, skin, head or wearer. Two slender fang-like green markings above the brow. Tier finish: Well-kept masterwork: polished silver fittings, rich forest-green leather or silk, crisp pale woven reinforcement and clearly defined poison-green fang accents. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/broodmother_chitin_cowl.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "2dd07dfbb9fe272fa7162e7a745f9f10c80fdea98a5d1bd6ae72ee74589c25c0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "venom_etched_waistcord",
+      "family": "hoard-venom",
+      "tier": "Epic",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/venom_etched_waistcord.webp",
+      "canonicalDisplayName": "Venom-Etched Waistcord",
+      "acceptedSha256": "34d824d97e089bf9412f47ca31095bdddefabc178d9e959c412ac8d8129fd450",
+      "acceptedBytes": 3510,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/venom_etched_waistcord.png",
+        "sha256": "7a495be3937c67767978a3830a608413c8f1b911842c2f863bef7a472ac34192",
+        "bytes": 2240404,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/venom_etched_waistcord.png",
+        "sha256": "b31747c69b42e24eaea42a40eea6859fa38341eccbd74f6e865d362bf116ca30",
+        "bytes": 467583,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ed71e0ca024f31c9632c0cae3585a459efffa207a0b1d94572fd8973c256a834",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Venom-Etched Waistcord (venom_etched_waistcord) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete forest-green CLOTH waistcord in a broad curved belt silhouette, twisted silk cords and woven green fabric bands, a central square metal clasp carrying two slender luminous yellow-green fang marks, small etched-looking silk embroidery. Clearly a soft cord and cloth accessory, no leather girdle or metal armor belt. Tier finish: Well-kept masterwork: polished silver fittings, rich forest-green leather or silk, crisp pale woven reinforcement and clearly defined poison-green fang accents. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/venom_etched_waistcord.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ed71e0ca024f31c9632c0cae3585a459efffa207a0b1d94572fd8973c256a834"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_silkstalker_woven_vest",
+      "family": "hoard-venom",
+      "tier": "Sovereign",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_silkstalker_woven_vest.webp",
+      "canonicalDisplayName": "Sovereign Woven Vest of the Silkstalker",
+      "acceptedSha256": "1c07c625c1781957e2308e7bcdb0488f089c480ef12e58e442304393be75c6a9",
+      "acceptedBytes": 3894,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/legendary_silkstalker_woven_vest.png",
+        "sha256": "8fa52ccb1087868c4d0d98c4d685dd1cf67079a53fb0556d88d9a5d2a9664b5d",
+        "bytes": 2403688,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/legendary_silkstalker_woven_vest.png",
+        "sha256": "f286c22fbf6ac103d096b3b6bc7200993f9661bc4daf6661fd3956682b92b699",
+        "bytes": 511725,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "3398b43dd6673203e69a2dae33172d13936357b4092c2d81b681ece21520cdd1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Woven Vest of the Silkstalker (legendary_silkstalker_woven_vest) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty forest-green LEATHER vest, fitted sleeveless torso of supple overlapping hide panels woven and stitched together with pale spider silk, slightly flared waist, two slender luminous yellow-green fang marks on a small central clasp. Clearly leather with woven silk reinforcement, not cloth robes or metal armor, no wearer. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep emerald leather or silk, additional angular gold fang ornament and bright lime-green venom accents. Gold belongs to the object, never a surrounding frame. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/legendary_silkstalker_woven_vest.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "3398b43dd6673203e69a2dae33172d13936357b4092c2d81b681ece21520cdd1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_spun_venom_spaulders",
+      "family": "hoard-venom",
+      "tier": "Sovereign",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_spun_venom_spaulders.webp",
+      "canonicalDisplayName": "Sovereign Spun-Venom Spaulders",
+      "acceptedSha256": "611c4c060e62e962e38e32e615ca0c44b31e77fddbcee4f02360f80a2080ee82",
+      "acceptedBytes": 4566,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/legendary_spun_venom_spaulders.png",
+        "sha256": "ffe387640a128fb0495dd4ad7fc60994f2d476f5b00b47fa886f72bed23c964a",
+        "bytes": 2368131,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/legendary_spun_venom_spaulders.png",
+        "sha256": "69c22cded697be9309fe9ece87df8ec551611df830a48d2c7a90a7e962a162ba",
+        "bytes": 503355,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "c9649ed761f5899ec8063c675d7db51d3d1ecbb49d5b0bf143bd8383a2a3942f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Spun-Venom Spaulders (legendary_spun_venom_spaulders) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of forest-green LEATHER shoulder guards, curved layered hide panels wrapped with fine pale spun-silk cords, chitin-like ridges, two slender luminous yellow-green fang marks on the foremost panel. One shoulder guard forward and the matching partner behind. Visible leather grain and stitching, not metal plate. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep emerald leather or silk, additional angular gold fang ornament and bright lime-green venom accents. Gold belongs to the object, never a surrounding frame. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/legendary_spun_venom_spaulders.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "c9649ed761f5899ec8063c675d7db51d3d1ecbb49d5b0bf143bd8383a2a3942f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_broodmother_chitin_cowl",
+      "family": "hoard-venom",
+      "tier": "Sovereign",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_broodmother_chitin_cowl.webp",
+      "canonicalDisplayName": "Sovereign Chitin Cowl of the Broodmother",
+      "acceptedSha256": "ddd52a1bfcfb65d297113f9d6e65e9487fff8832190f35760ff88e5567c2313d",
+      "acceptedBytes": 3772,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/legendary_broodmother_chitin_cowl.png",
+        "sha256": "33e0b49d2b0f8f147adb56ad1216a533f4b3f3f8b0621e5495b98e13168cc9c1",
+        "bytes": 2215106,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/legendary_broodmother_chitin_cowl.png",
+        "sha256": "7e5b5560aac08600fd759fed318a4420ee9cfdff0f48c16cdf2b695f71e4dd25",
+        "bytes": 498984,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "479e93983ea7f39d95e215869f1c17b3e8fc6d0c6bde20a5baf5e5fcbf8f4d2e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Chitin Cowl of the Broodmother (legendary_broodmother_chitin_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty deep forest-green LEATHER hood and cowl with layered green chitin-like ridges on the crown, supple stitched hide around a deep shadowed face opening. Two tiny lime magical eye lights in the empty hood as the established enchantment; no face, skin, head or wearer. Two slender fang-like green markings above the brow. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep emerald leather or silk, additional angular gold fang ornament and bright lime-green venom accents. Gold belongs to the object, never a surrounding frame. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/legendary_broodmother_chitin_cowl.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "479e93983ea7f39d95e215869f1c17b3e8fc6d0c6bde20a5baf5e5fcbf8f4d2e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_venom_etched_waistcord",
+      "family": "hoard-venom",
+      "tier": "Sovereign",
+      "batch": "hoard-venom-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_venom_etched_waistcord.webp",
+      "canonicalDisplayName": "Sovereign Venom-Etched Waistcord",
+      "acceptedSha256": "2f8ea6c80efa26005ce4efe72fe54b46e328f0038e0494da414d3626d156c90d",
+      "acceptedBytes": 4424,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-venom/originals/legendary_venom_etched_waistcord.png",
+        "sha256": "62a598d0bc91b998d2336a6123aaf5f476405961c31bc3915bec597e9b0344bd",
+        "bytes": 2463228,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-venom/masters/legendary_venom_etched_waistcord.png",
+        "sha256": "607ac36617f588c4a6a2a7ae71431316a3446076cf78da884d40a88106795deb",
+        "bytes": 526505,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "3378f96e79f0ecf951db93c9ec61a5642aaccf321a539dfc2474a96673f037a6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Venom-Etched Waistcord (legendary_venom_etched_waistcord) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete forest-green CLOTH waistcord in a broad curved belt silhouette, twisted silk cords and woven green fabric bands, a central square metal clasp carrying two slender luminous yellow-green fang marks, small etched-looking silk embroidery. Clearly a soft cord and cloth accessory, no leather girdle or metal armor belt. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep emerald leather or silk, additional angular gold fang ornament and bright lime-green venom accents. Gold belongs to the object, never a surrounding frame. Broodmother Vysska family: deep forest green, chitin and silk, luminous acid-green paired fang motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-green painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-venom/superseded/legendary_venom_etched_waistcord.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "3378f96e79f0ecf951db93c9ec61a5642aaccf321a539dfc2474a96673f037a6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-venom-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-venom-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ],
+  "perceptualReview": {
+    "candidateCount": 1,
+    "disposition": "Reviewed Epic and Sovereign Silkstalker vest pair at source and small sizes. The shared sleeveless leather cut preserves identity; silver silk lacing versus broad gold fang fittings and different seam ornament clearly distinguish tiers. Separate authored paintings retained."
+  }
+}

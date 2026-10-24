@@ -617,6 +617,38 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     expect(writes).toBe(3);
   });
 
+  it('reads subscription status on foreground refreshes but never on background polls', async () => {
+    const snapshot = vi.fn(async () => ({
+      available: false,
+      status: 'none' as const,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: null,
+      canCheckout: false,
+      canManage: false,
+    }));
+    const hooks = { snapshot, link: vi.fn() };
+    const root = rootStub({ innerHTML: '', querySelector: () => null, querySelectorAll: () => [] });
+    const store = new DailyRewardsWindow({
+      root: () => root,
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+      storeEnabled: () => true,
+      subscriptionHooks: () => hooks,
+      storeSnapshot: async () => ({ available: false, balance: null, items: [] }),
+    });
+    const runner = store as unknown as {
+      renderStore(focus: null, opts?: { background: boolean }): Promise<void>;
+    };
+    await runner.renderStore(null);
+    expect(snapshot).toHaveBeenCalledTimes(1);
+    for (let i = 0; i < 4; i++) await runner.renderStore(null, { background: true });
+    expect(snapshot).toHaveBeenCalledTimes(1);
+    await runner.renderStore(null);
+    expect(snapshot).toHaveBeenCalledTimes(2);
+  });
+
   it('preserves the last successful store state when a background snapshot is unavailable', async () => {
     const body = {
       innerHTML: 'existing store',

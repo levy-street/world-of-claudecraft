@@ -1,3 +1,4 @@
+import type * as THREE from 'three';
 import {
   claimFuryAudio,
   clearFuryAudioClaim,
@@ -62,6 +63,7 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { CAST_VFX_ENGINE } from '../cast_vfx_family';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
+import { spellEffectsMuted, spellEffectsMutedBy } from '../spell_effects_switch';
 import { trinketCueReadsAsSelfCast } from '../trinket_vfx_specs';
 import { CastAdmission } from './cast_admission_core';
 import { castVfxRequirement, WARRIOR_KIT_REQUIREMENT } from './cast_requirements';
@@ -112,6 +114,10 @@ export interface AbilityVfxDeps {
   vfx: AbilityVfxPrimitives;
   // The gallery-ported primitive engine (rings, ribbons, decals, overlays).
   fx: AbilityVfxFx;
+  // The Shardpike throw's own presentation (it lives on the engine for update and
+  // dispose, but is asked here as a dep so a spellfx cue never touches the engine
+  // before the cast gate has had its say). Optional for tests.
+  shardpikeThrow?: { handleEvent(ev: AbilityVfxSpellfxEvent): boolean };
   // The renderer's entity anchor (same closure Vfx homes on): world position at
   // a height fraction, or null when the entity has no view yet.
   anchor: (id: number, heightFrac: number) => VfxPoint | null;
@@ -210,6 +216,7 @@ export interface TrinketRelicsHook {
   handleSpellfx(ev: AbilityVfxSpellfxEvent, admitted: boolean): boolean;
   update(dt: number, reducedMotion: boolean): void;
   setQuality(q: number): void;
+  lanternLightDrawable(): THREE.Object3D;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -585,6 +592,14 @@ export class AbilityVfx {
     );
   }
 
+  /** The reads a player acts on that this painter draws past a closed gate
+   *  (the hard-CC band, the Last Flame Lantern's light): the roots the
+   *  vfx.cast-first-reads entry links before the curtain (cast_vfx_prewarm.ts). */
+  firstReadDrawables(): THREE.Object3D[] {
+    const lantern = this.deps.trinketRelics?.lanternLightDrawable();
+    return lantern ? [this.deps.fx.ccBandDrawable(), lantern] : [this.deps.fx.ccBandDrawable()];
+  }
+
   setQuality(q: number): void {
     this.quality = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
     this.deps.fx.setQuality(this.quality);
@@ -648,6 +663,9 @@ export class AbilityVfx {
   // A spellfx cue's verdict: a cast-moment cue releases a cast (its cast
   // bar's, or a new one), a channel tick and any other cue follow one.
   private spellfxAdmitted(ev: AbilityVfxSpellfxEvent, abilityId: string): boolean {
+    // A caster the Spell Effects option mutes takes the refused arm, like a
+    // cast whose programs are still linking (spell_effects_switch.ts).
+    if (spellEffectsMuted(ev.sourceId)) return false;
     const nowSec = this.now();
     const appearance = this.deps.visualVariantOf?.(abilityId, ev.sourceId) ?? abilityId;
     const mask = this.requirementOf(abilityId, appearance);
@@ -677,6 +695,7 @@ export class AbilityVfx {
   // A cue that names no caster cannot be matched to its cast: decided on its
   // own, with no latch to share across casters.
   private followAdmitted(casterId: number | undefined, abilityId: string, mask: number): boolean {
+    if (spellEffectsMuted(casterId)) return false;
     if (casterId === undefined) return this.admission.once(mask);
     return this.admission.follow(casterId, abilityId, mask, this.now());
   }
@@ -711,10 +730,13 @@ export class AbilityVfx {
   }
 
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
+    if (this.deps.shardpikeThrow?.handleEvent(ev)) return true;
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
     if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {
-      const at = this.deps.anchor(ev.targetId, 0.63);
+      // Claimed ahead of the cast gate (no ability id to admit on), so the
+      // Spell Effects switch is read here directly.
+      const at = spellEffectsMuted(ev.sourceId) ? null : this.deps.anchor(ev.targetId, 0.63);
       if (at && this.budget.admitAccent(this.now()))
         this.deps.fx.burstAt(at.x, at.y, at.z, 0xa9152d, 9, 0.65, 'blood', 0.23);
       return true;
@@ -777,7 +799,16 @@ export class AbilityVfx {
       else return false;
     }
     const spec = abilityVfxSpecFor(appearance);
-    if (!spec) return false;
+    if (!spec) {
+      // A newly linked class ability may have no gallery entry yet. Its
+      // authored completion still owns the rig; ordinary tick cues do not.
+      if (
+        ev.attackAnimation !== 'ranged-shot' &&
+        (ev.fx === 'selfCast' || ev.fx === 'projectile' || ev.fx === 'heavyBolt')
+      )
+        this.releaseGesture(ev.sourceId, ability);
+      return false;
+    }
     // Claimed and drawn as nothing: the generic arm would link cold too. Two
     // reads survive the refusal, for the same reason the point-anchored ring
     // survives it in handleSpellfxAt below, and neither costs a cast program.
@@ -811,7 +842,7 @@ export class AbilityVfx {
       if (!full?.physical && !claimsSelfCastVfx(arch, targeted, !!full, !!full?.spirit)) {
         // A listed pure-DoT completion (Rip on the cat rig) still owns its
         // authored finisher; every other DoT keeps its no-gesture completion.
-        if (ownsDotCompletionGesture(arch, ability)) {
+        if (ownsDotCompletionGesture(arch, ability) || ability === 'startle_shot') {
           this.releaseGesture(ev.sourceId, ability);
         }
         return false;
@@ -1225,7 +1256,10 @@ export class AbilityVfx {
       // AREA the player steps out of): its pool is linked at boot and never
       // waits on the cast programs, so it draws even while the rest is held.
       // With the plan's colour, or the same cast would read one colour on a
-      // held gate and another on an open one.
+      // held gate and another on an open one. A zone pulse from a caster the
+      // Spell Effects option mutes keeps its ring too: with the pulse
+      // particles gone, the ring is the zone's footprint (a friendly heal
+      // circle is somewhere a player chooses to stand).
       this.areaTelegraph(ev, planCast(spec, this.quality, REFUSED_CAST_TIER).color);
       return true;
     }
@@ -1438,6 +1472,7 @@ export class AbilityVfx {
       if (drawnId && drawnId !== castId) mask |= castVfxRequirement(drawnId);
       if (!this.followAdmitted(ev.sourceId, castId, mask)) return;
     } else if (
+      spellEffectsMuted(ev.sourceId) ||
       !this.admission.hold(
         this.deps.isWarrior?.(ev.sourceId) ? WARRIOR_KIT_REQUIREMENT : CAST_VFX_ENGINE,
       )
@@ -1813,6 +1848,11 @@ export class AbilityVfx {
     // read the painter draws needs the engine, so while it is not ready the
     // entity sleeps whole; past it, each cast and hold waits on its own mask.
     const gateHeld = renderEffects && !this.admission.hold(CAST_VFX_ENGINE);
+    // The Spell Effects option (spell_effects_switch.ts) is judged per hold,
+    // by who caused it: a player body's own windup, queued glint and
+    // self-cast auras go, while an enemy's debuff on that body still draws
+    // and the hard-CC band is held whoever wears it.
+    const bodyMuted = spellEffectsMutedBy(e.id);
     const fx = this.deps.fx;
     if (e.kind === 'player' && e.templateId === 'warrior' && !this.kitsRequested.has('warrior')) {
       this.kitsRequested.add('warrior');
@@ -1854,7 +1894,9 @@ export class AbilityVfx {
     // never moves elapsed back; the tolerance of one sim tick absorbs the
     // wire's rounding of both fields.
     const castSpec =
-      renderEffects && e.castingAbility ? abilityVfxSpecFor(e.castingAbility) : undefined;
+      renderEffects && e.castingAbility && !bodyMuted
+        ? abilityVfxSpecFor(e.castingAbility)
+        : undefined;
     const castDrawn =
       castSpec !== undefined &&
       this.admission.windup(
@@ -1920,9 +1962,9 @@ export class AbilityVfx {
         const full = abilityVfxFullSpecFor(e.castingAbility);
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
-        // Preserve armour and skin detail throughout the cast. Physical
-        // channels carry weapon motion, never an emissive whole-body wash.
-        glowStrength = full?.physical ? 0 : 1.2 * (full?.power ?? 1);
+        // Preserve armour and skin detail throughout casts. Only morph form
+        // transitions tint the character body; offensive and normal spells do not.
+        glowStrength = full?.buff?.style === 'morph' ? 1.2 * (full?.power ?? 1) : 0;
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
         const windupStarted = fx.windup(
@@ -1963,6 +2005,9 @@ export class AbilityVfx {
     let orbitTier = -1;
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
+      // Caused by a muted caster (a player's buff on themselves, a player's
+      // DoT on a mob). An aura that names no caster falls to its wearer.
+      if (spellEffectsMutedBy(aura.sourceId ?? e.id)) continue;
       const auraWasHeld = held.auraStamps.has(aura.id);
       const readiness = this.deps.isLivingWarrior?.(e.id) ? warriorReadinessBit(aura) : 0;
       if (readiness) {
@@ -2178,7 +2223,11 @@ export class AbilityVfx {
     this.holdWornCcBand(e, fx);
     // Physical queues keep a real-weapon glint even when their buff orbit is
     // deliberately silent. Existing frame stamps remove it on release/cancel.
-    if (e.queuedOnSwing && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
+    if (
+      e.queuedOnSwing &&
+      !bodyMuted &&
+      !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })
+    ) {
       const qspec = abilityVfxSpecFor(e.queuedOnSwing);
       const qfull = abilityVfxFullSpecFor(e.queuedOnSwing);
       const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;

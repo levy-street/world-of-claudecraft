@@ -20,12 +20,12 @@
 // `TrailbreakSweepDeps`, so a Vitest can drive it over a synthetic hillside,
 // and `trailbreakArcFor` binds the live Sim's own resolvers. Draws no rng.
 
-import { MANTLE_REACH } from '../colliders';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../pathfind';
 import { floorHeightAt } from '../physics';
 import { GRAVITY, JUMP_VELOCITY } from '../player_motion';
 import { walkedSteepnessAt } from '../ride_height';
 import type { SimContext } from '../sim_context';
+import { traversalBand } from '../traversal_band';
 import { DT, type Entity, type Vec3 } from '../types';
 import { groundHeight } from '../world';
 
@@ -142,7 +142,7 @@ export function planTrailbreakArc(
       nextGround > previousGround &&
       ((nextGround - previousGround) / step > PLAYER_MAX_CLIMB_SLOPE ||
         deps.steepnessAt(nextX, nextZ, nextGround) > PLAYER_MAX_CLIMB_SLOPE);
-    if (unclimbable && nextGround > Math.max(from.y, walkableFloor) + MANTLE_REACH) break;
+    if (unclimbable && nextGround > Math.max(from.y, walkableFloor) + traversalBand()) break;
     const resolved = deps.resolve(safeX, safeZ, nextX, nextZ);
     if (Math.hypot(resolved.x - nextX, resolved.z - nextZ) > DIVERT_EPSILON) break;
     safeX = resolved.x;
@@ -151,7 +151,7 @@ export function planTrailbreakArc(
     // A prop top within mantle reach of the last floor is footing the arc can
     // carry onto (the kernel's airborne support query reaches the same
     // MANTLE_REACH above the feet); anything taller was a wall to the resolve.
-    safeFloor = deps.floorAt(safeX, safeZ, safeFloor + MANTLE_REACH);
+    safeFloor = deps.floorAt(safeX, safeZ, safeFloor + traversalBand());
     if (!unclimbable) walkableFloor = safeFloor;
     samples.push({ d: Math.hypot(safeX - from.x, safeZ - from.z), floor: safeFloor });
     reachedFull = index === steps;
@@ -236,7 +236,15 @@ export function planTrailbreakArc(
  *  lift the kernel grants mid-flight; the resolve judges every sample at the
  *  launch feet height, which is conservative (a low prop far up a hill may
  *  read as a wall and shorten the leap) and never lets the body clip. */
-export function trailbreakArcFor(ctx: SimContext, hunter: Entity, distance: number): TrailbreakArc {
+export function trailbreakArcFor(
+  ctx: SimContext,
+  hunter: Entity,
+  distance: number,
+  // The heading whose BACK the leap runs along. Trailbreak leaps behind the
+  // hunter's own facing; an airborne knockback (combat/knockback_launch.ts)
+  // throws its victim along a heading of its own without turning them.
+  facing: number = hunter.facing,
+): TrailbreakArc {
   const seed = ctx.cfg.seed;
   return planTrailbreakArc(
     {
@@ -247,7 +255,7 @@ export function trailbreakArcFor(ctx: SimContext, hunter: Entity, distance: numb
         ctx.resolveMove(fromX, fromZ, toX, toZ, PLAYER_BODY_RADIUS, hunter, true),
     },
     hunter.pos,
-    hunter.facing,
+    facing,
     distance,
   );
 }

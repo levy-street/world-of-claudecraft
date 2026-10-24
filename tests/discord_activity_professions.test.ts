@@ -709,7 +709,7 @@ describe('detectActivity: professions arms (GameServer)', () => {
     expect((cards[0] as { deedTitle?: string }).deedTitle).toBeUndefined();
     expect((cards[0] as { itemName?: string }).itemName).toBeUndefined();
     expect(marqueeSpy).toHaveBeenCalledWith(
-      { characterId: 114, name: 'Gilded' },
+      { characterId: 114, accountId: 114, name: 'Gilded' },
       'col_reliquary_rank_5',
     );
     expect(optOutReads()).toBe(1);

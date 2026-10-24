@@ -18,7 +18,7 @@ const URLS = {
   ice_spire: PINE_1,
   windswept_grass: OAK_1,
   moon_bloom: OAK_1,
-  palm: '/models/biome/beach_palm_1.glb',
+  palm: '/models/biome/beach_palm_1_lod.glb',
   reeds: '/models/props/willow_tree.glb',
   dead_tree: '/models/foliage/dead_1.glb',
 } as const;

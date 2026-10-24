@@ -1,3 +1,8 @@
+import type { LocoState, LocoStrafe } from '../locomotion';
+import type { SeatAnimInfo } from '../seated_pose_core';
+import type { AuraIdFact } from './aura_idle_core';
+import type { StunAuraFact } from './stun_idle_core';
+
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
 export interface AnimState {
   /** horizontal speed, world units/sec */
@@ -19,6 +24,10 @@ export interface AnimState {
   backwards: boolean;
   /** use reversed forward locomotion instead of an authored walkBack clip */
   reverseBackpedal?: boolean;
+  /** Moving sideways across facing (a Q/E strafe): which way, or null. Only a
+   *  rig that ships both strafe clips plays it (desiredBaseState); optional so
+   *  the fixed scratches that never strafe (previews, portraits) stay valid. */
+  strafe?: LocoStrafe;
   dead: boolean;
   casting: boolean;
   /** The ability id driving `casting`, or null. Presentation that must tell a
@@ -38,21 +47,94 @@ export interface AnimState {
    *  from the local camera so peers pitch too, and so the pose can never
    *  disagree with the travel it is drawn against. */
   swimPitch: number;
+  /** Radians the body BANKS into its turn, written straight onto the pose
+   *  wrap's roll axis (positive = the body's left side drops, which is the way
+   *  a left-hand turn leans). Derived in the renderer from how fast the DRAWN
+   *  facing is sweeping, so peers bank with no wire traffic and the lean can
+   *  never disagree with the turn it is drawn against. Absent/0 = the old
+   *  bolt-upright turn. */
+  bankRoll?: number;
   /** Feet under water but the ground still under them, the band between a dry
    *  stride and a swim. Walking here plays the wade cycle and the sim slows the
    *  body down (player_motion.wadeSpeedMult). */
   wading: boolean;
   sitting: boolean;
+  /** Sitting on a seat (render/seated_pose.ts): the seat's clip family, its idle and
+   *  whether the body is getting up. Absent or null: a plain floor sit. */
+  seat?: SeatAnimInfo | null;
   /** Concealed by an existing stealth aura. Only rigs with prowl clips use it. */
   stealthed?: boolean;
+  /** A flying rig that is currently ON THE GROUND (the dragon world boss's
+   *  Groundfall). Drops its hover gap to nothing and lets the visual swap to a
+   *  landed, wings-still clip set. Absent/false for everything that flies for a
+   *  living and everything that never flies at all. */
+  grounded?: boolean;
   /** Engaged with someone right now: a standing body holds its rig's braced
    *  battle stance instead of the relaxed idle (see desiredBaseState). Derived
    *  from a mob's live aggro target or a player's targeted auto-attack, so peers brace
    *  identically with no new wire traffic. Display-only; never gates gameplay. */
   combat?: boolean;
+  /** A mob that keeps hours is in bed (Entity.asleep, mob/slumber.ts): the sleep
+   *  loop outranks every locomotion and posture state below it. */
+  asleep?: boolean;
+  /** The body's live aura list, by reference (never copied): a rig whose ClipMap
+   *  names `idleByAura` (aura_idle_core.ts) or `stunned` (stun_idle_core.ts) holds
+   *  that loop in place of its idle while one rides. */
+  auras?: readonly (AuraIdFact & StunAuraFact)[];
+  /** Seconds the body's cast bar has run (castTotal - castRemaining), or
+   *  undefined with no bar: a rig with VisualDef.castClipSync locks its
+   *  per-ability cast clip to it (castClipSyncTime). */
+  castElapsed?: number;
+}
+
+/** A cast clip may drift this far (clip seconds) from the bar before it is
+ *  pulled back onto it. */
+export const CAST_CLIP_SYNC_SLACK = 0.12;
+
+/**
+ * Where a bar-locked cast clip should be (VisualDef.castClipSync): the bar's
+ * elapsed time at the clip's rate, when the clip has drifted more than the
+ * slack from it (it entered late behind a swing or a flinch), else null (leave
+ * it). Clamped inside the clip so it never wraps.
+ */
+/**
+ * Whether the cast clip for `ability` is bar-locked (VisualDef.castClipSync):
+ * `true` locks every per-ability cast clip of the rig; a list locks only those
+ * abilities, so a rig can lock a one-off rise to its bar while its channel
+ * loops (Vael's Emerge off the floor beside his looping Hymn).
+ */
+export function castClipSyncs(
+  sync: boolean | readonly string[] | undefined,
+  ability: string | null | undefined,
+): boolean {
+  if (sync === true) return true;
+  if (!sync || !ability) return false;
+  return sync.includes(ability);
+}
+
+/**
+ * Whether a clip takes the rig at full weight at once instead of crossfading
+ * out of the pose before it (ClipMap.castSnapIn): a body whose clip starts out
+ * of sight (under the floor) must never blend its standing pose into the first
+ * frames, or it reads as popping in standing and then dropping.
+ */
+export function clipSnapsIn(snapIn: readonly string[] | undefined, clip: string): boolean {
+  return snapIn?.includes(clip) === true;
+}
+
+export function castClipSyncTime(
+  clipTime: number,
+  castElapsed: number | undefined,
+  rate: number,
+  duration: number,
+): number | null {
+  if (castElapsed === undefined || !Number.isFinite(castElapsed) || duration <= 0) return null;
+  const want = Math.min(duration - 1e-3, Math.max(0, castElapsed * rate));
+  return Math.abs(clipTime - want) > CAST_CLIP_SYNC_SLACK ? want : null;
 }
 
 export type BaseState =
+  | 'sleep'
   | 'idle'
   /** Standing, but engaged: the braced guard loop, not the relaxed idle. */
   | 'combatIdle'
@@ -61,6 +143,10 @@ export type BaseState =
   | 'walk'
   | 'walkBack'
   | 'run'
+  /** Running sideways across facing (a Q/E strafe): the rig's authored side
+   *  runs instead of the forward Run sliding across the ground. */
+  | 'strafeLeft'
+  | 'strafeRight'
   | 'cast'
   | 'spin'
   | 'swim'
@@ -68,6 +154,8 @@ export type BaseState =
   | 'swimIdle'
   | 'wade'
   | 'sit'
+  /** Getting up out of a seat: the seat's stand-up clip, held on its last frame. */
+  | 'sitUp'
   | 'jump'
   | 'fall';
 
@@ -151,19 +239,25 @@ export function isSwimmingAtDepth(
   dead: boolean,
   feetDepth: number,
   floorDepth: number,
+  wadeDepth?: number,
 ): boolean {
   if (dead || !Number.isFinite(feetDepth) || !Number.isFinite(floorDepth)) return false;
   const minFeetDepth = previous ? SWIM_EXIT_FEET_DEPTH : SWIM_ENTER_FEET_DEPTH;
-  const minFloorDepth = previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
+  // A body that WADES (MobTemplate.wadeDepth, the sim keeps its feet on the bed through
+  // this much water) swims only past that depth, whatever a human-sized swimmer would do.
+  // Without it a thirteen-yard giant in two yards of fen would latch the swim pose the
+  // moment his boots went under and be pitched prone across the surface of a puddle.
+  const minFloorDepth =
+    wadeDepth !== undefined ? wadeDepth : previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
   return feetDepth >= minFeetDepth && floorDepth >= minFloorDepth;
 }
 
 /**
  * Should the rig show its weapon sheathed this frame? An OVERLAY on the sim's
- * cosmetic `weaponStowed` bit, not a write to it: swimming and riding both
- * force the sheathed pose (nobody swims or rides with a sword in hand)
- * without touching the player's own sheathe choice, so surfacing or
- * dismounting restores exactly what they had drawn. The caller MUST diff the
+ * cosmetic `weaponStowed` bit, not a write to it: swimming, riding, and sitting
+ * force the sheathed pose (nobody swims, rides, or sits with a sword in hand)
+ * without touching the player's own sheathe choice, so surfacing, dismounting,
+ * or standing up restores exactly what they had drawn. The caller MUST diff the
  * result into a single write site (renderer.ts): a second write against the
  * bare `weaponStowed` bit disagrees with this overlay on every frame the two
  * differ, which replays the sheathe gesture forever and never lands it.
@@ -172,8 +266,9 @@ export function weaponStowedOverlay(
   weaponStowed: boolean,
   swimming: boolean,
   mounted: boolean,
+  sitting = false,
 ): boolean {
-  return weaponStowed || swimming || mounted;
+  return weaponStowed || swimming || mounted || sitting;
 }
 
 /**
@@ -239,6 +334,74 @@ export function advanceSwimPitch(
   return target + (safeCurrent - target) * Math.exp(-SWIM_PITCH_RESPONSE * Math.max(0, dt));
 }
 
+// ---------------------------------------------------------------------------
+// Banking
+//
+// A body that changes heading by rotating on the spot, bolt upright, reads as a
+// turret rather than a swimmer: the turn has no weight to it. Every drawn body
+// now LEANS into its turn, off the rate the DRAWN facing is sweeping at (the
+// same displayed-motion discipline as swimPitch, so peers bank identically with
+// no wire traffic, and a lean can never contradict the turn under it).
+//
+// Two gains, because the same lean means different things in the two media. On
+// land it is a runner's inside lean, small, and only while actually running.
+// In water it is a full bank: the body rolls onto its side to carve.
+// ---------------------------------------------------------------------------
+
+/** Land lean at a full-rate turn, radians. Deliberately small, a runner tips
+ *  in, they do not bank. */
+export const TURN_LEAN_MAX = 0.17;
+/** Swim bank at a full-rate turn, radians (~46 degrees). */
+export const BANK_ROLL_MAX = 0.8;
+/** Yaw rate (rad/s) that earns the full lean. A hard mouse flick beats this many
+ *  times over, which is exactly why the result is clamped. */
+export const BANK_FULL_YAW_RATE = 2.4;
+/** Speed (yd/s) at which the bank reaches full authority. Banking is a function
+ *  of TRAVEL as well as turning: spinning on the spot must not roll the body
+ *  over, or an idle player twirling the camera lies on their side. */
+export const BANK_FULL_SPEED = 7;
+/** Exponential response of the bank follow, per second. Slow enough that mouse
+ *  jitter cannot flutter the body, fast enough to answer a real flick. */
+const BANK_RESPONSE = 5.5;
+
+/**
+ * Ease the drawn body roll toward the bank its turn implies.
+ *
+ * `yawRate` is radians/second of DRAWN heading change, positive = turning left
+ * (the sim's facing grows counter-clockwise: forward is `(sin f, cos f)`, so
+ * increasing `f` sweeps toward +X, which is the body's left). The result is the
+ * radians written straight onto the pose wrap's Z, where positive raises the
+ * body's left side, hence the negation: leaning INTO a left turn drops the
+ * left side. Eases out to level whenever there is no turn to lean into, so
+ * letting go of the stick unwinds instead of snapping.
+ */
+export function advanceBankRoll(
+  current: number,
+  yawRate: number,
+  speed: number,
+  dt: number,
+  maxRoll = BANK_ROLL_MAX,
+): number {
+  const safeRate = Number.isFinite(yawRate) ? yawRate : 0;
+  const safeSpeed = Number.isFinite(speed) ? Math.max(0, speed) : 0;
+  const turn = clamp(safeRate / BANK_FULL_YAW_RATE, -1, 1);
+  const travel = Math.min(1, safeSpeed / BANK_FULL_SPEED);
+  const target = -turn * travel * maxRoll;
+  const safeCurrent = Number.isFinite(current) ? current : 0;
+  return target + (safeCurrent - target) * Math.exp(-BANK_RESPONSE * Math.max(0, dt));
+}
+
+/** Shortest signed yaw delta per second between two DRAWN facings. Wrapping is
+ *  the whole point: without it the +/-PI seam reads as a 360 deg/frame flick and
+ *  slams the body onto its side for a frame. */
+export function yawRateBetween(previous: number, current: number, dt: number): number {
+  if (!(dt > 0) || !Number.isFinite(previous) || !Number.isFinite(current)) return 0;
+  let d = current - previous;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  return d / dt;
+}
+
 /** One impact for a fresh contact, a landing, or the wade-to-swim transition. */
 export function shouldTriggerWaterImpact(
   contactActive: boolean,
@@ -264,6 +427,24 @@ export function waterContactFrameMode(
 ): WaterContactFrameMode {
   if (editorCamera || !visible) return 'forget';
   return contactSeen ? 'track' : 'seed';
+}
+
+// ---------------------------------------------------------------------------
+// Held guard
+//
+// A rig whose battle stance is a RAISE that ends on the held guard (ClipMap
+// combatIdleHold: the KayKit `Block`) must not loop it, or the shield drops and
+// comes back up once a second for as long as the body is braced. The base
+// action plays once and clamps on its last frame instead, the same held-base
+// treatment a sit-down or a held jump gets.
+
+/** True when this base state's clip should play ONCE and clamp (the held guard)
+ *  rather than loop. Pure: visual.ts isOnce() asks it for the combatIdle action. */
+export function combatIdleClamps(
+  baseState: BaseState,
+  combatIdleHold: boolean | undefined,
+): boolean {
+  return baseState === 'combatIdle' && combatIdleHold === true;
 }
 
 // ---------------------------------------------------------------------------
@@ -411,6 +592,43 @@ export function shouldInterruptLanding(
   return s.moving || s.airborne || s.swimming;
 }
 
+/** Width (seconds) of the window either side of a looping idle's wrap in which
+ *  a seam-held fidget may fire (ClipMap.idleVariantsOnLoopSeam). Wider than a
+ *  frame so a low frame rate cannot step over it. */
+export const IDLE_LOOP_SEAM_WINDOW = 0.12;
+
+/** True when a looping idle at `time` into a `duration`-second clip sits on its
+ *  loop seam, where its pose is its first frame. */
+export function onIdleLoopSeam(time: number, duration: number): boolean {
+  if (!(duration > 0)) return true;
+  const t = ((time % duration) + duration) % duration;
+  return t <= IDLE_LOOP_SEAM_WINDOW || duration - t <= IDLE_LOOP_SEAM_WINDOW;
+}
+
+/** The next fidget from a shuffle bag (ClipMap.idleVariantsShuffled): every
+ *  variant plays once, in a fresh random order, before any repeats, and a new
+ *  round never opens on the one that just played, so no fidget ever plays
+ *  twice in a row. `bag` is the caller's remaining round, consumed in place. */
+export function drawIdleVariant(
+  variants: readonly string[],
+  bag: string[],
+  last: string | null,
+  random: () => number = Math.random,
+): string {
+  if (bag.length === 0) {
+    bag.push(...variants);
+    for (let i = bag.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    if (bag.length > 1 && bag[0] === last) {
+      const j = 1 + Math.floor(random() * (bag.length - 1));
+      [bag[0], bag[j]] = [bag[j], bag[0]];
+    }
+  }
+  return bag.shift() as string;
+}
+
 /**
  * `hasWadeClip` defaults TRUE so the state machine's own rule (wading beats the
  * dry gait) is what a caller gets by default. A rig with no wade cycle passes
@@ -427,7 +645,19 @@ export function desiredBaseState(
   hasCombatIdleClip = false,
   hasProwlIdleClip = false,
   hasProwlWalkClip = false,
+  /** The rig fought moments ago (combat_brace_core.ts): brace as if engaged. */
+  braced = false,
+  /** The LOADED rig plays BOTH strafe clips: the walkBack rule, the machine
+   *  never enters a state nothing is playing. */
+  hasStrafeClips = false,
+  /** Defaults TRUE (the wade rule's shape): a rig with no sleep clip passes false. Last,
+   *  so the brace and strafe callers keep their positions. */
+  hasSleepClip = true,
 ): BaseState {
+  // In bed. Same rule as wade: a rig with no sleep clip must not enter the state at
+  // all, or it would hold its idle at a tempo nothing authored (baseAction falls back
+  // to idle, but the machine would still believe it was asleep).
+  if (s.asleep && hasSleepClip) return 'sleep';
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
     // swimmer who moves picks the stroke for their depth: surface crawl above
@@ -439,13 +669,20 @@ export function desiredBaseState(
   if (s.airborne) return s.falling ? 'fall' : 'jump';
   if (s.spinning) return 'spin';
   if (s.casting) return 'cast';
-  if (s.sitting) return 'sit';
+  if (s.sitting) return s.seat?.rising ? 'sitUp' : 'sit';
   if (s.moving) {
     // Shallow water is still walking, just against resistance: one cycle covers
     // both gaits, because nobody sprints through knee-deep water.
     if (s.wading && hasWadeClip) return 'wade';
     if (s.stealthed && hasProwlWalkClip) return 'prowlWalk';
     if (s.backwards && hasWalkBackClip && !s.reverseBackpedal) return 'walkBack';
+    // Sideways at the run gait plays the side run instead of sliding the
+    // forward cycle across the ground. A slow sideways walk keeps the walk, and
+    // a backpedal never strafes (a rig that covers it with its forward cycle,
+    // no walkBack clip or a reversed one, keeps doing so).
+    if (s.strafe && s.running && !s.backwards && hasStrafeClips) {
+      return s.strafe === 'left' ? 'strafeLeft' : 'strafeRight';
+    }
     return s.running ? 'run' : 'walk';
   }
   // Standing still. A body that is currently fighting someone holds its braced
@@ -455,7 +692,7 @@ export function desiredBaseState(
   // wade follow: baseAction() falls back to idle for a rig without one, and the
   // machine must not sit in a state nothing is playing.
   if (s.stealthed && hasProwlIdleClip) return 'prowlIdle';
-  if (s.combat && hasCombatIdleClip) return 'combatIdle';
+  if ((s.combat || braced) && hasCombatIdleClip) return 'combatIdle';
   return 'idle';
 }
 
@@ -497,6 +734,11 @@ export function gaitWindDownTimeScale(from: number, elapsed: number, fade: numbe
   return from * (1 - clamp(elapsed / brake, 0, 1));
 }
 
+/** A side run (the strafe states): they blend in and out on a short crossfade (visual.ts). */
+export function isStrafeState(state: BaseState): boolean {
+  return state === 'strafeLeft' || state === 'strafeRight';
+}
+
 export function locomotionTimeScale(
   baseState: BaseState,
   s: Pick<AnimState, 'speed' | 'backwards' | 'reverseBackpedal'>,
@@ -507,6 +749,8 @@ export function locomotionTimeScale(
   runTimeScaleMin = 0.6,
   walkMax = DEFAULT_WALK_TIME_SCALE_MAX,
   runMax = DEFAULT_RUN_TIME_SCALE_MAX,
+  /** the speed the side runs were authored at (VisualDef.strafeRef) */
+  strafeRef = runRef,
 ): number | null {
   if (baseState === 'swim' || baseState === 'swimSurface') {
     // Stroke rate follows swim speed: the slow opening strokes of a dive read as
@@ -522,6 +766,11 @@ export function locomotionTimeScale(
     const stalkScale = clamp(s.speed / prowlRef, 0.6, 1.8);
     return s.backwards ? -stalkScale : stalkScale;
   }
+  // A side run is a run turned sideways: matched and clamped like the run, and
+  // never reversed (each side has its own clip, and a backpedal never strafes).
+  if (baseState === 'strafeLeft' || baseState === 'strafeRight') {
+    return clamp(s.speed / strafeRef, runTimeScaleMin, runMax);
+  }
   if (baseState === 'walk' || baseState === 'walkBack') {
     timeScale = clamp(s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef), 0.6, walkMax);
   } else if (baseState === 'wade') {
@@ -536,6 +785,22 @@ export function locomotionTimeScale(
     return null;
   }
   return s.reverseBackpedal && s.backwards && baseState !== 'walkBack' ? -timeScale : timeScale;
+}
+
+/**
+ * Feed one displayed frame's travel direction into the pose inputs: the
+ * backpedal, how this rig plays it (`reverseBackpedal`: its forward cycle run
+ * in reverse, the ghost wolf), and the strafe. One call so the renderer's sync
+ * loop sets every direction fact the machine reads in one place.
+ */
+export function applyLocoDirection(
+  s: AnimState,
+  loco: Pick<LocoState, 'backwards' | 'strafe'>,
+  reverseBackpedal: boolean,
+): void {
+  s.backwards = loco.backwards;
+  s.reverseBackpedal = reverseBackpedal;
+  s.strafe = loco.strafe;
 }
 
 function clamp(v: number, lo: number, hi: number): number {

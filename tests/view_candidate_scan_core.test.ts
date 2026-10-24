@@ -152,11 +152,18 @@ describe('liveViewCandidate', () => {
     expect(candidates.slice(0, candidates.indexOf('\n  }\n'))).toContain(
       'liveViewCandidate(candidate.id, this.sim, this.views, this.questObjectHidden)',
     );
-    const required = renderer.slice(renderer.indexOf('private createRequiredView('));
-    expect(required.slice(0, required.indexOf('\n  }\n'))).toContain(
-      'liveViewCandidate(id, this.sim, this.views, this.questObjectHidden)',
+    // The required pair (the player, its target) is built by required_views_core.ts over
+    // the renderer's own members, handed in as the host.
+    const delegate = renderer.slice(renderer.indexOf('private createRequiredViews('));
+    expect(delegate.slice(0, delegate.indexOf('\n  }\n'))).toContain(
+      'createRequiredViews(this, player, createdViewTypes, performance.now())',
     );
+    const required = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/required_views_core.ts', import.meta.url), 'utf8'),
+    );
+    expect(required).toContain('liveViewCandidate(id, h.sim, h.views, h.questObjectHidden)');
     expect(renderer).not.toContain('entityViewIsAdmitted(');
+    expect(required).not.toContain('entityViewIsAdmitted(');
   });
 });
 

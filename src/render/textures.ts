@@ -27,25 +27,36 @@ function rnd(): number {
 // Mottled detail texture multiplied over terrain vertex colors.
 export function groundDetailTexture(): THREE.CanvasTexture {
   return makeCanvas(256, (ctx, s) => {
-    ctx.fillStyle = '#b8b8b8';
+    ctx.fillStyle = '#f2f5ea';
     ctx.fillRect(0, 0, s, s);
-    for (let i = 0; i < 5000; i++) {
-      const v = 150 + Math.floor(rnd() * 105);
-      ctx.fillStyle = `rgba(${v},${v},${v},0.35)`;
+    for (let i = 0; i < 900; i++) {
+      const warm = rnd() > 0.45;
+      const v = 228 + Math.floor(rnd() * 27);
+      const r = warm ? v : v - 12;
+      const g = v;
+      const b = warm ? v - 18 : v - 8;
       const x = rnd() * s,
         y = rnd() * s;
-      const r = 1 + rnd() * 2.5;
-      ctx.fillRect(x, y, r, r);
+      const rx = 4 + rnd() * 10,
+        ry = 2.5 + rnd() * 6,
+        ang = (rnd() - 0.5) * 0.9;
+      drawWrapped(ctx, s, (ox, oy) => {
+        ctx.fillStyle = `rgba(${r},${g},${b},0.22)`;
+        ctx.beginPath();
+        ctx.ellipse(x + ox, y + oy, rx, ry, ang, 0, Math.PI * 2);
+        ctx.fill();
+      });
     }
-    // blades
-    for (let i = 0; i < 1400; i++) {
-      const v = 120 + Math.floor(rnd() * 100);
-      ctx.strokeStyle = `rgba(${v},${v},${v},0.30)`;
+    // soft painterly grass strokes
+    for (let i = 0; i < 1600; i++) {
+      const v = 216 + Math.floor(rnd() * 38);
+      ctx.strokeStyle = `rgba(${v - 14},${v},${v - 26},0.26)`;
+      ctx.lineWidth = 1.2 + rnd() * 0.9;
       const x = rnd() * s,
         y = rnd() * s;
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.lineTo(x + (rnd() - 0.5) * 3, y - 2 - rnd() * 4);
+      ctx.lineTo(x + (rnd() - 0.5) * 4, y - 3 - rnd() * 5);
       ctx.stroke();
     }
   });
@@ -149,22 +160,27 @@ export function castleAshlarTexture(): THREE.CanvasTexture {
 
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
-    ctx.fillStyle = '#7f7fff';
+    ctx.fillStyle = '#dcf8fc';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 300; i++) {
       const x = rnd() * s,
         y = rnd() * s,
-        r = 6 + rnd() * 22;
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(${100 + rnd() * 80},${100 + rnd() * 80},255,0.25)`);
-      g.addColorStop(1, 'rgba(127,127,255,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
+        r = 8 + rnd() * 24;
+      const bright = rnd() > 0.42;
+      const cr = bright ? 242 : 176;
+      const cg = bright ? 254 : 236;
+      const cb = 255;
+      drawWrapped(ctx, s, (ox, oy) => {
+        const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
+        g.addColorStop(0, `rgba(${cr},${cg},${cb},0.32)`);
+        g.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x + ox, y + oy, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
     }
   });
-  tex.colorSpace = THREE.NoColorSpace;
   return tex;
 }
 
@@ -201,11 +217,11 @@ export function skyTexture(): THREE.CanvasTexture {
   c.height = 256;
   const ctx = c.getContext('2d')!;
   const g = ctx.createLinearGradient(0, 0, 0, 256);
-  g.addColorStop(0.0, '#4f86c6');
-  g.addColorStop(0.45, '#7eb2e4');
-  g.addColorStop(0.62, '#aacdec');
-  g.addColorStop(0.75, '#cfe4f2');
-  g.addColorStop(1.0, '#dcecf4');
+  g.addColorStop(0.0, '#2478d8');
+  g.addColorStop(0.45, '#52a4f0');
+  g.addColorStop(0.62, '#88ccf8');
+  g.addColorStop(0.75, '#bce6fc');
+  g.addColorStop(1.0, '#daf2fe');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 4, 256);
   const tex = new THREE.CanvasTexture(c);
@@ -219,9 +235,9 @@ export interface FlowerKind {
 }
 
 const DEFAULT_FLOWER_KINDS: FlowerKind[] = [
-  { p: [246, 246, 250], c: [244, 200, 70] }, // daisy
-  { p: [238, 150, 190], c: [180, 90, 40] }, // cosmos pink
-  { p: [245, 195, 60], c: [150, 90, 20] }, // buttercup
+  { p: [252, 252, 255], c: [250, 210, 64] }, // daisy
+  { p: [252, 218, 68], c: [215, 128, 24] }, // golden blossom
+  { p: [250, 250, 255], c: [248, 204, 58] }, // daisy
 ];
 
 export function flowerTuftTexture(
@@ -248,31 +264,31 @@ export function flowerTuftTexture(
     if (palOverride) rnd();
     for (let i = 0; i < petals; i++) {
       const a = (i / petals) * Math.PI * 2 + rnd() * 0.25;
-      const px = x + Math.cos(a) * rad * 0.62;
-      const py = y + Math.sin(a) * rad * 0.62;
-      const jr = 0.85 + rnd() * 0.3;
-      const g = ctx.createRadialGradient(px, py, 0, px, py, rad * 0.62 * jr);
-      g.addColorStop(0, `rgba(${pal.p[0]},${pal.p[1]},${pal.p[2]},0.98)`);
+      const px = x + Math.cos(a) * rad * 0.64;
+      const py = y + Math.sin(a) * rad * 0.64;
+      const jr = 0.88 + rnd() * 0.28;
+      const g = ctx.createRadialGradient(px, py, 0, px, py, rad * 0.66 * jr);
+      g.addColorStop(0, `rgba(${pal.p[0]},${pal.p[1]},${pal.p[2]},0.99)`);
       g.addColorStop(
         1,
-        `rgba(${Math.floor(pal.p[0] * 0.78)},${Math.floor(pal.p[1] * 0.72)},${Math.floor(
-          pal.p[2] * 0.8,
-        )},0.95)`,
+        `rgba(${Math.floor(pal.p[0] * 0.88)},${Math.floor(pal.p[1] * 0.85)},${Math.floor(
+          pal.p[2] * 0.9,
+        )},0.96)`,
       );
       ctx.fillStyle = g;
       ctx.beginPath();
-      ctx.ellipse(px, py, rad * 0.52 * jr, rad * 0.3 * jr, a, 0, Math.PI * 2);
+      ctx.ellipse(px, py, rad * 0.58 * jr, rad * 0.36 * jr, a, 0, Math.PI * 2);
       ctx.fill();
     }
-    const cg = ctx.createRadialGradient(x, y, 0, x, y, rad * 0.34);
+    const cg = ctx.createRadialGradient(x, y, 0, x, y, rad * 0.36);
     cg.addColorStop(0, `rgba(${pal.c[0]},${pal.c[1]},${pal.c[2]},1)`);
     cg.addColorStop(
       1,
-      `rgba(${Math.floor(pal.c[0] * 0.7)},${Math.floor(pal.c[1] * 0.7)},${Math.floor(pal.c[2] * 0.7)},1)`,
+      `rgba(${Math.floor(pal.c[0] * 0.78)},${Math.floor(pal.c[1] * 0.76)},${Math.floor(pal.c[2] * 0.74)},1)`,
     );
     ctx.fillStyle = cg;
     ctx.beginPath();
-    ctx.arc(x, y, rad * 0.3, 0, Math.PI * 2);
+    ctx.arc(x, y, rad * 0.32, 0, Math.PI * 2);
     ctx.fill();
   };
 
@@ -286,8 +302,8 @@ export function flowerTuftTexture(
     const topY = S - h;
     // stem
     const sg = ctx.createLinearGradient(x, S, topX, topY);
-    sg.addColorStop(0, 'rgba(52,88,40,0.95)');
-    sg.addColorStop(1, 'rgba(92,138,62,0.95)');
+    sg.addColorStop(0, 'rgba(54,124,48,0.95)');
+    sg.addColorStop(1, 'rgba(116,186,68,0.95)');
     ctx.strokeStyle = sg;
     ctx.lineWidth = 1.6 + rnd() * 0.8;
     ctx.beginPath();
@@ -297,19 +313,19 @@ export function flowerTuftTexture(
     // leaf pair partway up
     const ly = S - h * (0.35 + rnd() * 0.2);
     const lx = x + sway * 0.25;
-    ctx.fillStyle = 'rgba(74,118,52,0.92)';
+    ctx.fillStyle = 'rgba(84,158,56,0.94)';
     for (const dir of [-1, 1]) {
       ctx.beginPath();
       ctx.ellipse(lx + dir * 4.5, ly, 5.5, 2.1, dir * 0.5, 0, Math.PI * 2);
       ctx.fill();
     }
     // flower head or bud
-    if (rnd() < 0.82) {
-      head(topX, topY, 7 + rnd() * 4.5, balanced ? kinds[headIdx++ % kinds.length] : undefined);
+    if (rnd() < 0.88) {
+      head(topX, topY, 8.2 + rnd() * 4.8, balanced ? kinds[headIdx++ % kinds.length] : undefined);
     } else {
-      ctx.fillStyle = 'rgba(150,190,90,0.95)';
+      ctx.fillStyle = 'rgba(168,216,84,0.95)';
       ctx.beginPath();
-      ctx.ellipse(topX, topY, 2.4, 3.6, sway * 0.02, 0, Math.PI * 2);
+      ctx.ellipse(topX, topY, 2.6, 3.8, sway * 0.02, 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -380,14 +396,14 @@ export function grassTuftTexture(blades = 18): THREE.Texture {
     const tipY = S - h;
     const midX = x + sway * 0.35;
     const midY = S - h * 0.55;
-    // olive base -> brighter yellow-green tip; light scales the whole blade
-    const g0 = Math.floor((74 + rnd() * 18) * light);
-    const g1 = Math.floor((138 + rnd() * 48) * light);
+    // Meadow-matched base -> sunlit golden-chartreuse tip; light scales the blade
+    const g0 = Math.floor((154 + rnd() * 24) * light);
+    const g1 = Math.min(255, Math.floor((212 + rnd() * 38) * light));
     const grad = ctx.createLinearGradient(x, S, tipX, tipY);
-    grad.addColorStop(0, `rgba(${Math.floor(g0 * 0.62)},${g0},${Math.floor(g0 * 0.44)},0.95)`);
+    grad.addColorStop(0, `rgba(${Math.floor(g0 * 0.62)},${g0},${Math.floor(g0 * 0.42)},0.95)`);
     grad.addColorStop(
       1,
-      `rgba(${Math.floor(g1 * 0.62 + rnd() * 18)},${g1},${Math.floor(g1 * 0.4)},0.95)`,
+      `rgba(${Math.min(255, Math.floor(g1 * 0.68 + rnd() * 18))},${g1},${Math.floor(g1 * 0.36)},0.95)`,
     );
     ctx.fillStyle = grad;
     ctx.beginPath();
@@ -779,6 +795,86 @@ export function radialGlowTexture(): THREE.CanvasTexture {
 
 // Two differently-scaled blobby normal maps for the water shader (scrolled
 // against each other). Real normal-encoded, replaces waterNormalish.
+// ---- FORK DECLARATION (Studio) ---------------------------------------------
+// stoneMaps() is the Rock Generator's masonry surface (src/render/rock_gen.ts,
+// a fork-only file). Upstream deleted it when the shipped world stopped using
+// it, so an upstream-wins merge of this file drops it and rock_gen fails to
+// resolve, restore this block, do not re-invent it. Like every generator in
+// this file it draws from the shared LCG, so keep it a lazily-called function:
+// generating at module scope would shift the look of everything drawn after.
+export function stoneMaps(): SurfaceMaps {
+  const S = 256;
+  interface Block {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    v: number;
+    warm: number;
+  }
+  const blocks: Block[] = [];
+  let y = 0;
+  let row = 0;
+  while (y < S) {
+    // last course stretches to close the tile exactly
+    let h = 16 + Math.floor(rnd() * 16);
+    if (y + h > S - 12) h = S - y;
+    let x = -Math.floor(rnd() * 30) - row * 17;
+    while (x < S) {
+      const w = 22 + Math.floor(rnd() * 34);
+      blocks.push({ x, y, w, h, v: 90 + rnd() * 80, warm: rnd() * 14 - 4 });
+      x += w;
+    }
+    y += h;
+    row++;
+  }
+  const map = makeCanvas(S, (ctx, s) => {
+    ctx.fillStyle = '#6f6f67';
+    ctx.fillRect(0, 0, s, s);
+    for (const b of blocks) {
+      for (const ox of [0, s]) {
+        // blocks only overhang in x; rows tile exactly
+        const v = b.v;
+        ctx.fillStyle = `rgb(${v + b.warm},${v},${v - 8})`;
+        ctx.fillRect(b.x + ox, b.y + 1, b.w - 2, b.h - 2);
+        // weathered face: speckle + a lighter catch along the top edge
+        ctx.fillStyle = 'rgba(255,255,250,0.10)';
+        ctx.fillRect(b.x + ox + 1, b.y + 1, b.w - 4, 2);
+        ctx.fillStyle = 'rgba(20,20,18,0.32)';
+        ctx.fillRect(b.x + ox + 1, b.y + b.h - 5, b.w - 4, 4);
+        for (let i = 0; i < b.w * b.h * 0.02; i++) {
+          const sv = 60 + rnd() * 140;
+          ctx.fillStyle = `rgba(${sv},${sv},${sv - 6},0.18)`;
+          ctx.fillRect(b.x + ox + 1 + rnd() * (b.w - 4), b.y + 2 + rnd() * (b.h - 5), 1.5, 1.5);
+        }
+        ctx.strokeStyle = 'rgba(32,32,30,0.85)';
+        ctx.strokeRect(b.x + ox + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+      }
+    }
+  });
+  const height = makeRawCanvas(S, (ctx, s) => {
+    ctx.fillStyle = '#383838'; // mortar sits low
+    ctx.fillRect(0, 0, s, s);
+    for (const b of blocks) {
+      for (const ox of [0, s]) {
+        const v = 130 + (b.v - 100) * 1.5;
+        const g = ctx.createLinearGradient(0, b.y, 0, b.y + b.h);
+        g.addColorStop(
+          0,
+          `rgb(${Math.min(255, v + 24)},${Math.min(255, v + 24)},${Math.min(255, v + 24)})`,
+        );
+        g.addColorStop(
+          1,
+          `rgb(${Math.max(0, v - 22)},${Math.max(0, v - 22)},${Math.max(0, v - 22)})`,
+        );
+        ctx.fillStyle = g;
+        ctx.fillRect(b.x + ox + 2, b.y + 2, b.w - 5, b.h - 4);
+      }
+    }
+  });
+  return { map, normalMap: heightToNormal(height, 2.4) };
+}
+
 export function waterNormalMaps(): [THREE.CanvasTexture, THREE.CanvasTexture] {
   const blobby = (count: number, rMin: number, rMax: number): HTMLCanvasElement =>
     makeRawCanvas(256, (ctx, s) => {

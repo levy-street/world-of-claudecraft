@@ -1,15 +1,5 @@
 import type { WorldQuestDef, WorldQuestProgress } from './types';
 
-/** A practice run is active only for the minigame; its daily reward is already claimed. */
-export function worldQuestCompletedForBoard(progress: WorldQuestProgress | undefined): boolean {
-  return (
-    !!progress &&
-    (progress.state === 'completed' ||
-      progress.practiceOnly === true ||
-      progress.glider?.practiceOnly === true)
-  );
-}
-
 export function isReplayableWorldQuest(quest: WorldQuestDef): boolean {
   return [
     'glider',

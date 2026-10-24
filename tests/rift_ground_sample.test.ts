@@ -48,6 +48,46 @@ describe('Rift aware render ground sampling', () => {
     expect(sample(bossX, bossZ)).toBe(groundHeight(bossX, bossZ, worldSeed));
   });
 
+  it('moves its epoch exactly when the same spot may read another height', () => {
+    let worldSeed = 4242;
+    const view = (floorIndex: number): RiftFloorView => ({
+      eventId: null,
+      instanceId: 1,
+      seed: 77,
+      baseLevel: 20,
+      floorIndex,
+      floorCount: 3,
+      origin: { x: 5200, z: -900 },
+      contentId: 'epoch-test',
+      contentHash: 'epoch-test',
+      upgrade: null,
+      name: 'Epoch',
+      themeName: 'Epoch',
+      tier: 'C',
+    });
+    let current: RiftFloorView | null = null;
+    const sample = createRiftAwareGroundSampler(
+      () => worldSeed,
+      () => current,
+    );
+    const open = sample.epoch();
+    expect(sample.epoch()).toBe(open);
+    current = view(0);
+    const entered = sample.epoch();
+    expect(entered).not.toBe(open);
+    // A fresh view object of the same floor is the same ground.
+    current = view(0);
+    expect(sample.epoch()).toBe(entered);
+    current = view(1);
+    const next = sample.epoch();
+    expect(next).not.toBe(entered);
+    current = null;
+    const left = sample.epoch();
+    expect(left).not.toBe(next);
+    worldSeed = 4243;
+    expect(sample.epoch()).not.toBe(left);
+  });
+
   it('keeps effects on the flat ground of an outdoor valley with a raised-theme kit', () => {
     const worldSeed = 4242;
     let seed = 0;

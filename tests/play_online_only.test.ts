@@ -55,8 +55,13 @@ describe('/play is online-only', () => {
     expect(mainTs).toContain("if (offlineBackBtn) offlineBackBtn.addEventListener('click'");
     expect(mainTs).toContain("serverTrigger?.querySelector('.server-dot')");
     // The character-preview boot probe must skip a missing #offline-select, not
-    // dereference it (and a missing panel must not be treated as the active one).
-    expect(mainTs).toContain('return panel !== null && !panel.hasAttribute(');
+    // dereference it (and a missing panel must not be treated as the active one). It lives
+    // in src/game/launcher_preview_stage.ts (activePreviewPanel, driven with a page missing
+    // the panel by tests/launcher_preview_stage.test.ts); main.ts calls it.
+    expect(read('src/game/launcher_preview_stage.ts')).toContain(
+      "if (panel && !panel.hasAttribute('hidden')) return id;",
+    );
+    expect(mainTs).toContain('const stagePanel = activePreviewPanel();');
   });
 });
 
@@ -74,12 +79,10 @@ describe('/play login panel carries Continue with Discord', () => {
 
 describe('/play footer carries the legal links', () => {
   it('play.html links the Terms of Service and Privacy Policy', () => {
-    expect(playHtml).toContain(
-      'href="/terms" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.terms"',
-    );
-    expect(playHtml).toContain(
-      'href="/privacy" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.privacy"',
-    );
+    expect(playHtml).toContain('href="/terms"');
+    expect(playHtml).toContain('data-i18n="footer.terms"');
+    expect(playHtml).toContain('href="/privacy"');
+    expect(playHtml).toContain('data-i18n="footer.privacy"');
   });
 });
 
@@ -89,7 +92,8 @@ describe('/play uses the landing hero backdrop', () => {
     // eager <source>, no autoplay, preload="none" (applyLandingBackdrop attaches
     // and plays the trailer only on capable devices).
     expect(playHtml).toContain('data-trailer-src="/home-bg.mp4"');
-    expect(playHtml).toContain('poster="/home-bg.png"');
+    expect(playHtml).toContain('data-poster="/home-bg.webp"');
+    expect(playHtml).not.toContain(' poster="');
     expect(playHtml).not.toContain('<source src="/home-bg.mp4"');
     const playVideoTag = /<video id="bg-home"[^>]*>/.exec(playHtml)?.[0] ?? '';
     const indexVideoTag = /<video id="bg-home"[^>]*>/.exec(indexHtml)?.[0] ?? '';

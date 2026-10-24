@@ -7,7 +7,7 @@
 // and their healers; the grey rule; the persisted per-victim diminishing
 // returns; the paid-death guard), the healer auto-flag, the books sweep, the
 // persistence round trip, and the determinism guarantees.
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { applyHeal } from '../src/sim/combat/heal';
 import { BUILTIN_WORLD, PLAYER_START, ZONES } from '../src/sim/data';
 import {
@@ -67,7 +67,7 @@ const SEED = 7;
 /** Contested ground (the mutual-flag rule), a free-for-all zone, and the two
  *  sanctuaries, by zone id; placeIn stands a player on the zone's graveyard
  *  (open ground, no hub colliders). Every fighter starts on contested ground:
- *  the default spawn is Eastbrook Vale; Thornpeak keeps the fixture explicit. */
+ *  the default spawn is Eastbrook Vale, a sanctuary, where nobody is hostile. */
 const CONTESTED_ZONE = 'thornpeak_heights';
 const FFA_ZONE = 'drakelands';
 const STARTER_ZONE = 'eastbrook_vale';
@@ -175,8 +175,20 @@ function flag(sim: Sim, pid: number, on = true): void {
   sim.setWorldPvpFlag(on, pid);
 }
 
-/** A lethal hit through the real damage hub (the same path every cast ends in). */
+/** A lethal hit through the real damage hub (the same path every cast ends in),
+ *  then the killing blow claims whatever dropped on the body (the World PvP
+ *  spoils, src/sim/pvp/world_pvp_spoils.ts) through the real corpse loot path,
+ *  so the purse assertions read the whole kill. `slayOnly` leaves the drop on
+ *  the body for the spoils block below, which reads it directly. */
 function slay(sim: Sim, killerPid: number, victimPid: number): void {
+  const killer = ent(sim, killerPid);
+  const victim = ent(sim, victimPid);
+  sim.ctx.dealDamage(killer, victim, victim.hp + 1_000, false, 'physical', 'Mortal Strike', 'hit');
+  if (victim.lootable) sim.lootCorpse(victimPid, killerPid);
+}
+
+/** The lethal hit alone: the spoils stay on the body. */
+function slayOnly(sim: Sim, killerPid: number, victimPid: number): void {
   const killer = ent(sim, killerPid);
   const victim = ent(sim, victimPid);
   sim.ctx.dealDamage(killer, victim, victim.hp + 1_000, false, 'physical', 'Mortal Strike', 'hit');
@@ -222,10 +234,10 @@ describe('the /pvp flag lifecycle', () => {
     const sim = world();
     const a = addFighter(sim, 'Aleph');
     expect(sim.worldPvpInfoFor(a)).toEqual({
-      rewardSeconds: 0,
-      rewardPause: null,
       flagged: false,
       disarmRemaining: null,
+      rewardSeconds: 0,
+      rewardPause: null,
       kills: 0,
       deaths: 0,
       levelLocked: false,
@@ -505,7 +517,11 @@ describe('kill resolution: the stake and the honor pool', () => {
     expect(honorEvents(sim, a)).toEqual([
       { type: 'honor', pid: a, amount: 10, reason: 'world_kill' },
     ]);
-    expect(logLines(sim, a)).toContain('You defeat Bet and take 20s from their purse.');
+    // Both flagged: the blow's share dropped on the body and was looted there.
+    expect(logLines(sim, a)).toEqual(['You defeat Bet.', "Loot Bet's body to claim your spoils."]);
+    expect(
+      sim.events.some((ev) => ev.type === 'loot' && ev.pid === a && ev.text === 'You loot 20s.'),
+    ).toBe(true);
     expect(logLines(sim, b)).toContain('Aleph defeats you and takes 20s from your purse.');
     expect(sim.worldPvpInfoFor(a)).toMatchObject({ kills: 1, deaths: 0 });
     expect(sim.worldPvpInfoFor(b)).toMatchObject({ kills: 0, deaths: 1 });
@@ -517,7 +533,9 @@ describe('kill resolution: the stake and the honor pool', () => {
     slay(sim, a, b);
     expect(sim.meta(b)!.copper).toBe(950_000);
     expect(sim.meta(a)!.copper).toBe(50_000);
-    expect(logLines(sim, a)).toContain('You defeat Bet and take 5g from their purse.');
+    expect(
+      sim.events.some((ev) => ev.type === 'loot' && ev.pid === a && ev.text === 'You loot 5g.'),
+    ).toBe(true);
   });
 
   it('a broke victim pays nothing but the honor still flows', () => {
@@ -747,6 +765,177 @@ describe('kill resolution: the stake and the honor pool', () => {
   });
 });
 
+describe('the Discord kill feed record (the server-only worldPvpKill event)', () => {
+  function kills(sim: Sim) {
+    return sim.events.filter(
+      (ev): ev is Extract<SimEvent, { type: 'worldPvpKill' }> => ev.type === 'worldPvpKill',
+    );
+  }
+
+  it('a clean 1v1 fires exactly one record: names, levels, zone, the stake TAKEN, no pid', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1001);
+    const b = addFighter(sim, 'Bet', 18, 1002);
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    sim.meta(b)!.copper = 20_000;
+    sim.events = [];
+    slay(sim, a, b);
+    expect(kills(sim)).toEqual([
+      {
+        type: 'worldPvpKill',
+        killerName: 'Aleph',
+        victimName: 'Bet',
+        killerLevel: 20,
+        victimLevel: 18,
+        zoneId: CONTESTED_ZONE,
+        assists: 0,
+        copper: 2_000,
+      },
+    ]);
+  });
+
+  it('counts every credited contributor but the blow as an assist, and reports the whole take', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    const healer = addFighter(sim, 'Heal', 20, 3);
+    const victim = addFighter(sim, 'Victim', 20, 4);
+    standTogether(sim, [victim, a, b, healer]);
+    for (const pid of [a, b, healer, victim]) flag(sim, pid);
+    sim.meta(victim)!.copper = 10_000;
+    sim.events = [];
+    hit(sim, b, victim);
+    heal(sim, healer, b);
+    slay(sim, a, victim);
+    expect(kills(sim).map((k) => [k.killerName, k.assists, k.copper])).toEqual([
+      ['Aleph', 2, 1_000],
+    ]);
+  });
+
+  it('a grey killing blow still names the killer; only the peer who earned counts as an assist', () => {
+    const sim = world();
+    const high = addFighter(sim, 'Cap', 20, 1);
+    const peer = addFighter(sim, 'Peer', 14, 2);
+    const low = addFighter(sim, 'Low', 14, 3);
+    standTogether(sim, [low, high, peer]);
+    for (const pid of [high, peer, low]) flag(sim, pid);
+    sim.meta(low)!.copper = 10_000;
+    hit(sim, peer, low);
+    sim.events = [];
+    slay(sim, high, low);
+    expect(kills(sim).map((k) => [k.killerName, k.victimName, k.assists, k.copper])).toEqual([
+      ['Cap', 'Low', 1, 1_000],
+    ]);
+  });
+
+  it('a kill nobody earned from (a grey solo gank) still fires, with no assists and no stake', () => {
+    const sim = world();
+    const high = addFighter(sim, 'Cap', 20, 1);
+    const low = addFighter(sim, 'Low', 14, 2);
+    standTogether(sim, [low, high]);
+    flag(sim, high);
+    flag(sim, low);
+    sim.meta(low)!.copper = 10_000;
+    sim.events = [];
+    slay(sim, high, low);
+    expect(kills(sim).map((k) => [k.killerName, k.assists, k.copper])).toEqual([['Cap', 0, 0]]);
+    expect(sim.meta(low)!.copper).toBe(10_000);
+  });
+
+  it('fires once per death even if the death hub is re-entered on the corpse', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    sim.events = [];
+    slay(sim, a, b);
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, b), ent(sim, a));
+    expect(kills(sim)).toHaveLength(1);
+  });
+
+  it('never fires for a death that was not a world PvP kill', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    standTogether(sim, [a, b]);
+    // Unflagged pair on contested ground: not world-hostile, so no kill record.
+    sim.events = [];
+    slay(sim, a, b);
+    expect(ent(sim, b).dead).toBe(true);
+    expect(kills(sim)).toEqual([]);
+    // A flagged player dying to no player at all (falling, a mob).
+    const lone = addFighter(sim, 'Wanderer', 20, 3);
+    flag(sim, lone);
+    sim.events = [];
+    sim.ctx.dealDamage(null, ent(sim, lone), 100_000, false, 'physical', 'Falling', 'hit');
+    expect(ent(sim, lone).dead).toBe(true);
+    expect(kills(sim)).toEqual([]);
+  });
+
+  it("reads the victim's zone, not the killer's", () => {
+    // Different zones on purpose: a record read off the killer's position
+    // would say CONTESTED_ZONE here. Both flagged, so the pair is hostile.
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    flag(sim, a);
+    flag(sim, b);
+    placeIn(sim, a, CONTESTED_ZONE);
+    placeIn(sim, b, FFA_ZONE);
+    sim.events = [];
+    slay(sim, a, b);
+    expect(kills(sim).map((k) => k.zoneId)).toEqual([FFA_ZONE]);
+  });
+
+  it('an UNFLAGGED kill on free-for-all ground still fires (world PvP, not only /pvp)', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    placeIn(sim, a, FFA_ZONE);
+    placeIn(sim, b, FFA_ZONE, 2);
+    sim.events = [];
+    slay(sim, a, b);
+    expect(kills(sim).map((k) => [k.killerName, k.victimName, k.zoneId])).toEqual([
+      ['Aleph', 'Bet', FFA_ZONE],
+    ]);
+  });
+
+  it("a pet's killing blow names its OWNER as the killer", () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const victim = addFighter(sim, 'Victim', 18, 2);
+    standTogether(sim, [a, victim]);
+    flag(sim, a);
+    flag(sim, victim);
+    const pet = { kind: 'mob', id: 999_999, ownerId: a, name: 'Wolf', level: 60 } as Entity;
+    sim.events = [];
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, victim), pet);
+    expect(kills(sim).map((k) => [k.killerName, k.killerLevel, k.victimName])).toEqual([
+      ['Aleph', 20, 'Victim'],
+    ]);
+  });
+
+  it("two flagged players mid-duel with each other are the duel's business: no record", () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    // The state the duel arm of isWorldPvpHostile reads (inActiveDuelTogether).
+    const duel = { a, b, state: 'active' } as never;
+    sim.ctx.duels.set(a, duel);
+    sim.ctx.duels.set(b, duel);
+    sim.events = [];
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, b), ent(sim, a));
+    expect(kills(sim)).toEqual([]);
+  });
+});
+
 describe('the healer rule: aiding a flagged fighter raises your own flag', () => {
   it('an unflagged healer who heals a flagged player mid-fight is flagged and then credited', () => {
     const sim = world();
@@ -930,7 +1119,7 @@ describe('the ground: sanctuaries', () => {
     flag(sim, a);
     flag(sim, b);
     expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
-    for (const zone of [TUTORIAL_ZONE]) {
+    for (const zone of [STARTER_ZONE, TUTORIAL_ZONE]) {
       placeIn(sim, a, zone);
       placeIn(sim, b, zone, 2);
       expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
@@ -950,8 +1139,8 @@ describe('the ground: sanctuaries', () => {
     const c = addFighter(sim, 'Gimel');
     flag(sim, a);
     tickSeconds(sim, 1);
-    placeIn(sim, a, TUTORIAL_ZONE);
-    placeIn(sim, c, TUTORIAL_ZONE, 2);
+    placeIn(sim, a, STARTER_ZONE);
+    placeIn(sim, c, STARTER_ZONE, 2);
     expect(tickCollecting(sim, 1, a)).toContain(WORLD_PVP_SANCTUARY_LINE);
     placeIn(sim, c, CONTESTED_ZONE);
     expect(tickCollecting(sim, 1, c)).toEqual([]);
@@ -977,9 +1166,9 @@ describe('the ground: sanctuaries', () => {
 
   it('aid given AND received inside a sanctuary never marks the helper (the real cast)', () => {
     const { sim, a, priest } = sanctuaryAid();
-    // The fighter is kited to the tutorial island with the priest inside it.
-    placeIn(sim, priest, TUTORIAL_ZONE);
-    placeIn(sim, a, TUTORIAL_ZONE, 2);
+    // The fighter is kited to the starter zone's edge with the priest inside it.
+    placeIn(sim, priest, STARTER_ZONE);
+    placeIn(sim, a, STARTER_ZONE, 2);
     sim.castAbilityOn('power_word_shield', a, priest);
     sim.tick();
     expect(ent(sim, a).auras.some((aura) => aura.kind === 'absorb')).toBe(true);
@@ -989,7 +1178,7 @@ describe('the ground: sanctuaries', () => {
 
   it('aid GIVEN from inside a sanctuary marks nobody, the fighter still on contested ground', () => {
     const { sim, a, priest } = sanctuaryAid();
-    placeIn(sim, priest, TUTORIAL_ZONE);
+    placeIn(sim, priest, STARTER_ZONE);
     worldPvpOnPlayerAided(sim.ctx, ent(sim, a), ent(sim, priest));
     expect(ent(sim, priest).pvpFlag).toBeUndefined();
     expect(sim.worldPvpBooks.recentSupport.has(a)).toBe(false);
@@ -997,7 +1186,7 @@ describe('the ground: sanctuaries', () => {
 
   it('aid RECEIVED inside a sanctuary marks nobody, the helper still on contested ground', () => {
     const { sim, a, priest } = sanctuaryAid();
-    placeIn(sim, a, TUTORIAL_ZONE);
+    placeIn(sim, a, STARTER_ZONE);
     worldPvpOnPlayerAided(sim.ctx, ent(sim, a), ent(sim, priest));
     expect(ent(sim, priest).pvpFlag).toBeUndefined();
     expect(sim.worldPvpBooks.recentSupport.has(a)).toBe(false);
@@ -1012,13 +1201,6 @@ describe('the ground: sanctuaries', () => {
 });
 
 describe('the ground: free-for-all zones', () => {
-  // Synthetic FFA ground preserves generic rule coverage; no shipped zone is FFA.
-  beforeEach(() => {
-    ZONES.find((z) => z.id === FFA_ZONE)!.worldPvp = 'ffa';
-  });
-  afterEach(() => {
-    delete ZONES.find((z) => z.id === FFA_ZONE)!.worldPvp;
-  });
   function brawl(): { sim: Sim; a: number; b: number } {
     const sim = world();
     const a = addFighter(sim, 'Aleph', 20, 1001);
@@ -1248,13 +1430,6 @@ describe('the ground: free-for-all zones', () => {
 });
 
 describe('aid: shields and buffs count like heals', () => {
-  // Synthetic FFA ground preserves generic rule coverage; no shipped zone is FFA.
-  beforeEach(() => {
-    ZONES.find((z) => z.id === FFA_ZONE)!.worldPvp = 'ffa';
-  });
-  afterEach(() => {
-    delete ZONES.find((z) => z.id === FFA_ZONE)!.worldPvp;
-  });
   function fight(): { sim: Sim; a: number; victim: number; priest: number } {
     const sim = world();
     const a = addFighter(sim, 'Aleph', 20, 1);
@@ -1318,7 +1493,7 @@ describe('aid: shields and buffs count like heals', () => {
     expect(ent(sim, a).auras.some((aura) => aura.kind === 'buff_sta_pct')).toBe(true);
   });
 
-  it('a heal with no target at all still self-casts', () => {
+  it('a heal with no target at all still self-casts: only a World PvP enemy on the target refuses', () => {
     const { sim, priest } = fight();
     ent(sim, priest).targetId = null;
     ent(sim, priest).hp = 1;
@@ -1353,90 +1528,7 @@ describe('aid: shields and buffs count like heals', () => {
   });
 });
 
-describe('a friendly cast with a World PvP enemy targeted lands on the caster', () => {
-  // The classic self-cast a duel, arena or battleground healer already gets: a
-  // flagged priest fighting a flagged enemy presses a heal with that enemy still
-  // selected, and the heal lands on the priest instead of being refused with the
-  // aid line.
-  function engaged(): { sim: Sim; priest: number; enemy: number } {
-    const sim = world();
-    const priest = addFighter(sim, 'Priest', 20, 1, 'priest');
-    const enemy = addFighter(sim, 'Enemy', 20, 2);
-    standTogether(sim, [priest, enemy]);
-    flag(sim, priest);
-    flag(sim, enemy);
-    expect(sim.isHostileTo(ent(sim, priest), ent(sim, enemy))).toBe(true);
-    hit(sim, enemy, priest, 150);
-    ent(sim, priest).targetId = enemy;
-    sim.events = [];
-    return { sim, priest, enemy };
-  }
-
-  it('an instant shield lands on the caster and keeps the enemy selected', () => {
-    const { sim, priest, enemy } = engaged();
-    sim.castAbility('power_word_shield', priest);
-    const errors = errorLines(sim, priest);
-    sim.tick();
-    expect(errors).not.toContain(WORLD_PVP_AID_REFUSED_LINE);
-    expect(ent(sim, priest).auras.some((aura) => aura.kind === 'absorb')).toBe(true);
-    expect(ent(sim, enemy).auras.some((aura) => aura.kind === 'absorb')).toBe(false);
-    expect(ent(sim, priest).targetId).toBe(enemy);
-  });
-
-  it('a timed heal starts and finishes on the caster', () => {
-    const { sim, priest, enemy } = engaged();
-    const before = ent(sim, priest).hp;
-    sim.castAbility('lesser_heal', priest);
-    const errors = errorLines(sim, priest);
-    expect(ent(sim, priest).castingAbility).toBe('lesser_heal');
-    for (let i = 0; i < Math.round(2.5 / DT); i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'error' && ev.pid === priest) errors.push(ev.text);
-      }
-    }
-    expect(errors).not.toContain(WORLD_PVP_AID_REFUSED_LINE);
-    expect(ent(sim, priest).castingAbility).toBeNull();
-    // Rank 1 heals at least 47: in-combat regeneration cannot account for that.
-    expect(ent(sim, priest).hp).toBeGreaterThanOrEqual(before + 47);
-    expect(ent(sim, enemy).hp).toBe(ent(sim, enemy).maxHp);
-  });
-
-  it('a heal whose locked target turns into an enemy mid-cast still fails the finish', () => {
-    const sim = world();
-    const priest = addFighter(sim, 'Priest', 20, 1, 'priest');
-    const stranger = addFighter(sim, 'Stranger', 20, 2);
-    standTogether(sim, [priest, stranger]);
-    flag(sim, stranger);
-    ent(sim, stranger).hp -= 100;
-    const strangerHp = ent(sim, stranger).hp;
-    const priestHp = ent(sim, priest).hp;
-    ent(sim, priest).targetId = stranger;
-    sim.castAbility('lesser_heal', priest);
-    expect(ent(sim, priest).castingAbility).toBe('lesser_heal');
-    // Raising the priest's own flag mid-cast makes the two flagged strangers.
-    sim.setWorldPvpFlag(true, priest);
-    expect(sim.isHostileTo(ent(sim, priest), ent(sim, stranger))).toBe(true);
-    const errors: string[] = [];
-    for (let i = 0; i < Math.round(2.5 / DT); i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'error' && ev.pid === priest) errors.push(ev.text);
-      }
-    }
-    expect(errors).toContain(WORLD_PVP_AID_REFUSED_LINE);
-    // Out-of-combat regeneration ticks; a heal (at least 47) never landed.
-    expect(ent(sim, stranger).hp).toBeLessThan(strangerHp + 47);
-    expect(ent(sim, priest).hp).toBe(priestHp);
-  });
-});
-
 describe('periodic harm follows the live verdict (src/sim/combat/periodic_harm.ts)', () => {
-  // Synthetic FFA ground preserves generic rule coverage; no shipped zone is FFA.
-  beforeEach(() => {
-    ZONES.find((z) => z.id === FFA_ZONE)!.worldPvp = 'ffa';
-  });
-  afterEach(() => {
-    delete ZONES.find((z) => z.id === FFA_ZONE)!.worldPvp;
-  });
   /** An unflagged priest opens on an unflagged stranger in a free-for-all
    *  zone with a pure damage-over-time spell. The bolt lands a tick later and
    *  the first damaging tick is still three seconds out, so at return nobody
@@ -1488,7 +1580,7 @@ describe('periodic harm follows the live verdict (src/sim/combat/periodic_harm.t
     const shed = dotted();
     flag(shed.sim, shed.priest);
     flag(shed.sim, shed.b);
-    placeIn(shed.sim, shed.b, TUTORIAL_ZONE);
+    placeIn(shed.sim, shed.b, STARTER_ZONE);
     tickSeconds(shed.sim, 7);
     expect(ent(shed.sim, shed.b).hp).toBe(ent(shed.sim, shed.b).maxHp);
     expect(hasDot(shed.sim, shed.b)).toBe(false);

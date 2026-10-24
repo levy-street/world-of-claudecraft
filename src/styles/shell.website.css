@@ -59,8 +59,7 @@
       inset: -3%;
       display: block;
       pointer-events: none;
-      background-image:
-        url("/website-hero-eastbrook-v1.webp"), url("/textures/loading/eastbrook-square.webp");
+      background-image: url("/website-hero-eastbrook-v1.webp");
       background-position: center 48%;
       background-size: cover;
       transform: scale(1.035);
@@ -88,6 +87,36 @@
     & .website-scene-thornpeak {
       background-image: url("/website-hero-thornpeak-v1.webp");
       animation-delay: -10s;
+    }
+    /* index.html paints the landing's text and panels before its artwork (src/ui/
+       landing_first.ts releases #start-screen.art-deferred once the art has decoded):
+       the art is decorative, and fetching it first held the headline back on slow
+       phones. The art layer (the scenes sit inside it) and the panel logo fade in. */
+    & #start-screen.art-deferred :is(.website-cinematic-art, .website-scene) {
+      background-image: none;
+    }
+    & #start-screen.art-deferred .website-cinematic-art {
+      opacity: 0;
+    }
+    &
+      #start-screen.art-deferred
+      :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::before {
+      border-image-source: none;
+    }
+    &
+      #start-screen.art-deferred
+      :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::after {
+      background-image: none;
+      opacity: 0;
+    }
+    & .website-cinematic-art,
+    & :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::after {
+      transition: opacity 600ms ease;
+    }
+    /* index.html holds the other scenes back until the page has settled (src/boot.ts):
+       only the first is on screen at load, and the crossfade reaches the next at 8 s. */
+    & #start-screen-backdrop.scenes-deferred .website-scene:not(.website-scene-eastbrook) {
+      background-image: none;
     }
     & .website-cinematic-art::after {
       content: "";
@@ -571,7 +600,7 @@
       max-width: 360px;
       aspect-ratio: 978 / 654;
       transform: translateX(-50%);
-      background: url("/worldofclaudecraft-logo.png") center / contain no-repeat;
+      background: url("/worldofclaudecraft-logo.webp") center / contain no-repeat;
       pointer-events: none;
     }
     & :is(#mode-select, #login-panel, #forgot-panel, #reset-panel) > :not(.play-compat-trigger) {
@@ -1223,17 +1252,6 @@
       padding-top: 22px;
       border-top: 1px solid color-mix(in srgb, var(--website-gold) 25%, transparent);
     }
-    /* Player-guide links: a second full-width row under the legal row, same link style. */
-    & .footer-guides-row {
-      grid-column: 1 / -1;
-      grid-row: 3;
-      display: flex;
-      flex-wrap: wrap;
-      width: 100%;
-      justify-content: flex-start;
-      gap: 0 24px;
-      margin-top: -20px;
-    }
     & .footer-link {
       display: inline-flex;
       align-items: center;
@@ -1527,9 +1545,6 @@
       & .footer-legal-row {
         grid-row: 3;
       }
-      & .footer-guides-row {
-        grid-row: 4;
-      }
       & #homepage-views-container {
         padding-left: max(32px, env(safe-area-inset-left));
         padding-right: max(32px, env(safe-area-inset-right));
@@ -1739,11 +1754,6 @@
         gap: 8px 16px;
         justify-content: flex-start;
       }
-      & .footer-guides-row {
-        grid-row: 5;
-        gap: 0 16px;
-        margin-top: -16px;
-      }
       & .footer-lang-row {
         justify-content: flex-start;
       }
@@ -1883,6 +1893,115 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  /* Landing-first boot (src/ui/landing_first.ts): a control used before the game client
+     has started says it is working (aria-busy), and its action replays once the client
+     is ready. Play sweeps a gold light and nudges its arrow; any other control pulses a
+     text glow (never its opacity, which would dim its focus ring). */
+  body.landing-booting,
+  [data-landing-booting] {
+    cursor: progress;
+  }
+  [data-landing-booting]:not(#btn-play) {
+    animation: landing-booting-glow 1.1s ease-in-out infinite;
+  }
+  #btn-play[data-landing-booting] .website-play-arrow {
+    animation: landing-booting-nudge 0.9s ease-in-out infinite;
+  }
+  /* Both effects stay inside Play's gold frame: the website button does not clip
+     (overflow: visible, for its drop shadow), so each takes the inner panel's shape.
+     The sweep moves its gradient, not the layer, so the clip holds still. The sheen
+     layer is hidden on the website by default; the id outranks that rule. */
+  body #btn-play[data-landing-booting] .btn-play-sheen {
+    display: block;
+    z-index: 0;
+    inset: 3px;
+    transform: none;
+    clip-path: polygon(
+      10px 0,
+      calc(100% - 10px) 0,
+      100% 10px,
+      100% calc(100% - 10px),
+      calc(100% - 10px) 100%,
+      10px 100%,
+      0 calc(100% - 10px),
+      0 10px
+    );
+    background:
+      linear-gradient(
+        105deg,
+        transparent 42%,
+        color-mix(in srgb, var(--website-gold-bright) 50%, transparent) 50%,
+        transparent 58%
+      )
+      0 0 / 300% 100% no-repeat;
+    animation: landing-booting-sheen 1.3s ease-in-out infinite;
+  }
+  /* Play's loading state: its label gives way to Loading, then Starting, over a bar
+     inside the frame's bottom edge that fills with the client's download. Hidden
+     everywhere else, including the native and desktop shells, which share index.html. */
+  .btn-play-status,
+  .btn-play-progress {
+    display: none;
+  }
+  #btn-play[data-landing-phase] .btn-play-label {
+    display: none;
+  }
+  #btn-play[data-landing-phase="loading"] .btn-play-status-loading,
+  #btn-play[data-landing-phase="starting"] .btn-play-status-starting {
+    display: inline;
+  }
+  #btn-play[data-landing-phase] .btn-play-progress {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    inset: auto 16px 7px;
+    height: 2px;
+    border-radius: 1px;
+    background:
+      linear-gradient(to right, var(--website-gold-bright), var(--website-gold-bright)) 0 0 /
+      calc(var(--landing-progress, 0) * 100%) 100% no-repeat,
+      color-mix(in srgb, var(--website-gold) 22%, transparent);
+    transition: background-size 240ms ease-out;
+  }
+  #btn-play[data-landing-phase="starting"] .btn-play-progress {
+    animation: landing-booting-pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes landing-booting-pulse {
+    50% {
+      opacity: 0.45;
+    }
+  }
+  @keyframes landing-booting-glow {
+    50% {
+      text-shadow: 0 0 12px color-mix(in srgb, var(--website-gold-bright) 70%, transparent);
+    }
+  }
+  @keyframes landing-booting-nudge {
+    50% {
+      transform: translateX(5px);
+    }
+  }
+  @keyframes landing-booting-sheen {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-landing-booting]:not(#btn-play),
+    #btn-play[data-landing-booting] .website-play-arrow,
+    body #btn-play[data-landing-booting] .btn-play-sheen,
+    #btn-play[data-landing-phase] .btn-play-progress {
+      animation: none;
+      transition: none;
+    }
+    body #start-screen .website-cinematic-art,
+    body #start-screen :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::after {
+      transition: none;
     }
   }
 }

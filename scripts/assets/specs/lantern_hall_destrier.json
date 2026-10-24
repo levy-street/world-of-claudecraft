@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/lantern_hall_destrier/destrier_source.glb",
+      "out": "models/mounts/lantern_hall_destrier.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Death", "Rear", "WalkBack"]
+    }
+  ]
+}

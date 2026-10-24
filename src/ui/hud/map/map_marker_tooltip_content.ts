@@ -7,14 +7,17 @@ import { QUESTS } from '../../../sim/data';
 import type { QuestObjectiveRef } from '../../../sim/quest_targets';
 import { type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
-import { tEntity } from '../../entity_i18n';
+import type { ContinentZoneRegion } from '../../continent_map_view';
+import { tEntity, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import { ferryPortSummary, ferryPortTooltipHtml } from '../../ferry_port_map_core';
 import { gatherNodeTooltipHtml } from '../../gather_node_tooltip_controller';
 import { formatNumber, t } from '../../i18n';
 import { type MapGatherTipMemo, resolveGatherTipMemo } from '../../map_gather_tip_memo';
 import type {
   MapFarmPatchMarker,
   MapGatherNodeMarker,
+  MapNavigationMarker,
   MapNpcMarker,
   MapServiceMarker,
   MapStationMarker,
@@ -112,7 +115,34 @@ export class MapMarkerTooltipContent {
     return `<div class="tt-title">${esc(t('worldContent.farmPatchName'))}</div>`;
   }
 
-  navigation(text: string): string {
+  // Tooltip body for a hovered zone region on the continent overview: the zone's
+  // localized name plus its suggested level band (from the region's levelRange).
+  continentZone(zoneId: string, regions: readonly ContinentZoneRegion[]): string {
+    const region = regions.find((r) => r.zoneId === zoneId);
+    let html = `<div class="tt-title">${esc(zoneDisplayName(zoneId))}</div>`;
+    if (region) {
+      html += `<div class="tt-quest-req">${esc(
+        t('hudChrome.continentMap.levels', {
+          min: questNumber(region.levelMin),
+          max: questNumber(region.levelMax),
+        }),
+      )}</div>`;
+    }
+    return html;
+  }
+
+  ferryPortSemantic(routeId: string, berthId: string): string {
+    return ferryPortSummary(routeId, berthId, this.world.ferryView()?.clock ?? null);
+  }
+
+  navigation(text: string, marker?: MapNavigationMarker): string {
+    if (marker?.kind === 'ferry-port') {
+      return ferryPortTooltipHtml(
+        marker.routeId,
+        marker.berthId,
+        this.world.ferryView()?.clock ?? null,
+      );
+    }
     return `<div class="tt-title">${esc(text)}</div>`;
   }
 

@@ -1,0 +1,28 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/allied_hearthstone.webp",
+    "http://localhost:5194/ui/items/allied_vanguard_duffel.webp",
+    "http://localhost:5194/ui/items/rift_feather_glider.webp",
+    "http://localhost:5194/ui/items/formula_enchant_feet_shadowstride.webp",
+    "http://localhost:5194/ui/items/recipe_potion_of_invisibility.webp",
+    "http://localhost:5194/ui/items/potion_of_invisibility.webp",
+    "http://localhost:5194/ui/items/pattern_reinforced_armor_kit.webp",
+    "http://localhost:5194/ui/items/reinforced_armor_kit.webp",
+    "http://localhost:5194/ui/items/dawn_battle_standard.webp",
+    "http://localhost:5194/ui/items/formula_enchant_offhand_spirit.webp",
+    "http://localhost:5194/ui/items/recipe_elixir_of_mana_regeneration.webp",
+    "http://localhost:5194/ui/items/elixir_of_mana_regeneration.webp",
+    "http://localhost:5194/ui/items/clockwork_target_dummy.webp",
+    "http://localhost:5194/ui/items/schematic_clockwork_shock_bomb.webp",
+    "http://localhost:5194/ui/items/clockwork_shock_bomb.webp",
+    "http://localhost:5194/ui/items/plans_dense_sharpening_stone.webp",
+    "http://localhost:5194/ui/items/dense_sharpening_stone.webp",
+    "http://localhost:5194/ui/items/formula_enchant_gloves_forged_might.webp"
+  ],
+  "allDecoded": true
+}

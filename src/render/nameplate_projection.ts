@@ -2,7 +2,7 @@ import type * as THREE from 'three';
 
 // Wide labels and emote bubbles may still intersect the viewport while their
 // projected anchor is just outside it. Keep one bounded gutter, then reject the
-// rest before the declutter sort and canvas pass.
+// rest before the canvas pass.
 export const NAMEPLATE_VIEWPORT_GUTTER_PX = 120;
 
 export function isProjectedNameplateAnchorVisible(

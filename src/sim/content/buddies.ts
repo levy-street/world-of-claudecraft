@@ -1,0 +1,102 @@
+// ---------------------------------------------------------------------------
+// Buddies: cosmetic followers, the declarative catalog.
+//
+// A buddy has zero GAMEPLAY effect: no stats, no abilities, no combat, no
+// riding-skill gate, no summon channel, no stat recompute. It IS a real
+// server-simulated owned mob entity (src/sim/content/buddy_mobs.ts's
+// MobTemplate per key, spawned/despawned by src/sim/buddies.ts and heeled by
+// src/sim/pet/buddy_ai.ts using the same A*-pathed locomotion as a hunter
+// pet), which is the "AI" this catalog has: purely locomotion, never combat.
+// Ownership is a per-character collection flag. Soulbound whistle tokens
+// grant the companion once and are consumed on use. Summoning pairs the
+// Entity.buddyKey identity with a real follower entity spawn or despawn.
+//
+// Used by the authoritative Sim (ownership + the active-buddy flip + the
+// entity itself), the renderer (key -> body via the normal per-mob path,
+// MOB_KEYS in src/render/characters/manifest.ts keyed on buddyTemplateId),
+// and any future HUD picker. Lives in sim/ so it carries no DOM/render
+// imports and runs unchanged on the server, offline, and headless.
+// ---------------------------------------------------------------------------
+
+export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling' | 'sprites';
+
+// Historical whistle identities remain readable in existing bags and bank saves.
+// This type is only for item definitions; active ownership uses BuddyKey.
+export type BuddyTokenKey =
+  | BuddyKey
+  | 'sapling'
+  | 'ember_fox'
+  | 'moss_hare'
+  | 'frog'
+  | 'crimson_claw_crab'
+  | 'golden_sentinel'
+  | 'nightfang'
+  | 'tuskhorn_boar'
+  | 'emerald_wolf'
+  | 'tiger'
+  | 'cate_coin'
+  | 'alon'
+  | 'trollface'
+  | 'ansem'
+  | 'triple_t'
+  | 'kekius'
+  | 'solbot'
+  | 'frostfire'
+  | 'rocky'
+  | 'proud_grunt'
+  | 'loot_goblin'
+  | 'penny_goldspark'
+  | 'stag'
+  | 'alpaca'
+  | 'bull'
+  | 'spider'
+  | 'raptor'
+  | 'skeleton'
+  | 'crystal_tide'
+  | 'phantom'
+  | 'emberfall_phoenix';
+
+export interface BuddyDef {
+  key: BuddyKey;
+  /** Canonical English display name (the HUD localizes via entities.mobs.buddy_<key>.name, src/ui/world_entity_i18n.ts). */
+  name: string;
+}
+
+export const BUDDIES: Record<BuddyKey, BuddyDef> = {
+  horse: {
+    key: 'horse',
+    name: 'Tug, the Warhorse',
+  },
+  crystal_lich: {
+    key: 'crystal_lich',
+    name: 'Crystal Lich',
+  },
+  forgemaw: {
+    key: 'forgemaw',
+    name: 'Forgemaw The Molten',
+  },
+  sapling: { key: 'sapling', name: 'Sapling' },
+  sprites: {
+    key: 'sprites',
+    name: 'Flicker and Glimmer',
+  },
+};
+
+// Retired Emberfall Phoenix tokens remain readable in old saves and retain their
+// procedural icon. The companion has no live model or acquisition source; see
+// docs/achievements/icon-backlog-v045/retired-phoenix-disposition.md.
+export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = ['whistle_emberfall_phoenix'];
+
+/** Catalog order: declaration order. */
+export const BUDDY_KEYS = Object.keys(BUDDIES) as readonly BuddyKey[];
+
+export function buddyDef(key: string): BuddyDef | null {
+  return (BUDDIES as Record<string, BuddyDef | undefined>)[key] ?? null;
+}
+
+/** Coerce a persisted/wire string back to a valid catalog key ('' when
+ *  unknown, so a save/wire value from a build that removed a buddy loads
+ *  cleanly with none out), mirroring normalizeMountKey. */
+export function normalizeBuddyKey(key: string | undefined | null): BuddyKey | '' {
+  return key && buddyDef(key) ? (key as BuddyKey) : '';
+}

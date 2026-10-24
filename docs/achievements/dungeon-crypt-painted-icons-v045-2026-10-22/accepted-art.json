@@ -1,0 +1,1518 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "dungeon-crypt-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 16,
+    "replacedSvgIcons": 16,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "gravedirt_treads",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gravedirt_treads.webp",
+      "canonicalDisplayName": "Gravedirt Treads",
+      "acceptedSha256": "dc6b18dcefbd1f43bd235713f644b543d9cc6b9c1ff851b1eb7cb77eb1a5c458",
+      "acceptedBytes": 4058,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/gravedirt_treads.png",
+        "sha256": "5764f52e8279e3b20c777dda0a22dac9c7472084e0bff8dc922093aa46a6e87b",
+        "bytes": 2455139,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/gravedirt_treads.png",
+        "sha256": "7678c07cff63de7382899304aeea316e7d289b17fe6e9106c178359461a13a15",
+        "bytes": 533492,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "59a92a93840a7582b3b399688e29f02cee26a7977bb5a195ff2ac4a30189012b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gravedirt Treads (gravedirt_treads) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of MAIL boots with visible interlinked iron chain, folded brown leather cuffs, buckled ankle straps and iron toe caps caked in dark grave dirt. Complete boots, no feet or wearer. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/gravedirt_treads.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "59a92a93840a7582b3b399688e29f02cee26a7977bb5a195ff2ac4a30189012b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "bellrope_girdle",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/bellrope_girdle.webp",
+      "canonicalDisplayName": "Bellrope Girdle",
+      "acceptedSha256": "f49e406a13ce902064355bfc672a594b001327e889480ea07b1ad56cadfec6f4",
+      "acceptedBytes": 2938,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/bellrope_girdle.png",
+        "sha256": "1941e68f91a462bb70a1840f88a4fa4bb76fb544e9f40fba8088c516fa2adadf",
+        "bytes": 2384078,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/bellrope_girdle.png",
+        "sha256": "caf6efdc842e9c0d106027d4630443c9125606ba8e038a9a14e0ef0d0b273cb6",
+        "bytes": 478918,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "990696959f8f2ebc366ded52c807a6938b36ebdab1265c166ef43dc70e7bfc15",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Bellrope Girdle (bellrope_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete faded violet CLOTH waist sash bound with old tan bell rope, tied at one side with a small bronze hand-bell hanging from one frayed tail. Soft woven fabric, whole curved sash and bell visible, no wearer. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/bellrope_girdle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "990696959f8f2ebc366ded52c807a6938b36ebdab1265c166ef43dc70e7bfc15"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "sextons_spadehaft",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/sextons_spadehaft.webp",
+      "canonicalDisplayName": "Sexton's Spadehaft",
+      "acceptedSha256": "39c7b6ea5e332a4141b00daf897283e46cfbc98e4f666293f138e004f11f0dec",
+      "acceptedBytes": 2096,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/sextons_spadehaft.png",
+        "sha256": "50b7092760c9f21e5ad3257f2ae2bf4193ecb89c26a1eb3f8d3075611efe0e7c",
+        "bytes": 2258482,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/sextons_spadehaft.png",
+        "sha256": "9be4f3a813458b67dcf1fc09383265094f9349c223347da4561ce3bbf21dd406",
+        "bytes": 469776,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "5c2b3ff8fa4c673e63342816a8ed1af4a4b9385f530c77c2d1d0e250cb909976",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sexton's Spadehaft (sextons_spadehaft) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete long-hafted round-point digging spade diagonally posed. Dirt-crusted dark iron blade, worn brown wooden haft wrapped in coarse rope, solid wooden D-grip. Full shovel from rounded blade tip to D-grip inside generous padding. No wielder. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/sextons_spadehaft.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "5c2b3ff8fa4c673e63342816a8ed1af4a4b9385f530c77c2d1d0e250cb909976"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rimesilk_mantle",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rimesilk_mantle.webp",
+      "canonicalDisplayName": "Rimesilk Mantle",
+      "acceptedSha256": "2953737844d78e530491fcbfc6f5da49bd07b6a66944b7dac18b08f4f24a6490",
+      "acceptedBytes": 4470,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/rimesilk_mantle.png",
+        "sha256": "04f651517f086527c2cefc6d77f81eece48399247ec8cae0ced200ee3e19a30f",
+        "bytes": 2537657,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/rimesilk_mantle.png",
+        "sha256": "17a0b5563f5146523da447044ec9ab95c45620ef2fdae8da5afdbbb70e9829de",
+        "bytes": 597108,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "f59aed2817a12bb5469422b068a21147fae0d18af19739294fb1246b0c6d49ba",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rimesilk Mantle (rimesilk_mantle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pale blue-white SILK CLOTH capelet with delicate bridal lace filigree, icy beaded collar, icicle hem and small silver snowflake clasp. Rime-encrusted ghostly bridal fabric, soft folds, no spider or chitin, no wearer. Current Lady of the Bonechill bridal-frost identity. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/rimesilk_mantle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f59aed2817a12bb5469422b068a21147fae0d18af19739294fb1246b0c6d49ba"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "bonechill_carapace_vest",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/bonechill_carapace_vest.webp",
+      "canonicalDisplayName": "Bonechill Hauberk",
+      "acceptedSha256": "a42d5c91806120641b1726728028ee0929b302a986648e4436e0ac2c2f5c1e3b",
+      "acceptedBytes": 5390,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/bonechill_carapace_vest.png",
+        "sha256": "f16ccd7b49506db8bea75a3f574b32a92c5fc2cd44135445b265814ed1b47e3c",
+        "bytes": 2949376,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/bonechill_carapace_vest.png",
+        "sha256": "81f7d04c16dd988e06e27fa6015a1962628a0dfac6506311aa84d4a75b4c516e",
+        "bytes": 594759,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "ddbec16db24bfe8d2455c83402ce46fb94c174073105a6fa78335c256d6861c9",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Bonechill Hauberk (bonechill_carapace_vest) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty MAIL hauberk with visibly interlinked cold steel chain, small frost-encrusted silver reinforcement plates at collar and chest, delicate icy snowflake ornament and long icicles at hem. Pale blue frost and iron, current Lady of the Bonechill identity, no spider limbs or chitin. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/bonechill_carapace_vest.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ddbec16db24bfe8d2455c83402ce46fb94c174073105a6fa78335c256d6861c9"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rimeweb_hunters_leggings",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rimeweb_hunters_leggings.webp",
+      "canonicalDisplayName": "Rime-Laced Leggings",
+      "acceptedSha256": "5311d5dc097b81ada7541052feed03992b015e1434e5359461ff9e84596bb413",
+      "acceptedBytes": 3432,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/rimeweb_hunters_leggings.png",
+        "sha256": "a632e11caeca77991893e87ca17a0b103fea2d69dd2ba0f1b6af9f8c3dad460a",
+        "bytes": 2226046,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/rimeweb_hunters_leggings.png",
+        "sha256": "83c3c1275261e07da65665124552c954618c898b676d1822a9d44766000656df",
+        "bytes": 504546,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "97ff9b21e2eea6956580d39d8bf83b358e4310f6a53827a21cdc8eb535773c0c",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rime-Laced Leggings (rimeweb_hunters_leggings) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of slate-gray LEATHER leggings laced criss-cross with pale icy silk cord, frosted stitched leather knee guards and rime crystals at seams. Separate legs and waistband visible, no spider anatomy, no wearer. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/rimeweb_hunters_leggings.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "97ff9b21e2eea6956580d39d8bf83b358e4310f6a53827a21cdc8eb535773c0c"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rimeweb_fang",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rimeweb_fang.webp",
+      "canonicalDisplayName": "Bride's Icicle",
+      "acceptedSha256": "e32020a967bf19f03fbfc881ef57c90dcd19516a1145d064ed8b6651a97e2668",
+      "acceptedBytes": 2520,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/rimeweb_fang.png",
+        "sha256": "60e7a66fd8417b5366d978cb19b67fddddfe2fa69fbc04594d406a2e0398bb07",
+        "bytes": 2424826,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/rimeweb_fang.png",
+        "sha256": "b6a8f05cde81764065f82e78066034f0402f2a4a44fe89ddbcc1a04c5e9c11bc",
+        "bytes": 517942,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "85228486ea26d9627e6d3e34440abd62aa1a6d4a1d52be47a9f9aef4d4b4275b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Bride's Icicle (rimeweb_fang) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete graceful dagger diagonally posed, long slightly curved translucent glacier-blue icicle blade, small silver snowflake-shaped guard, pale silk-wrapped grip with a pearl teardrop pommel. Delicate bridal frost theme, no spider parts or animal fang, whole tip and pommel visible. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/rimeweb_fang.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "85228486ea26d9627e6d3e34440abd62aa1a6d4a1d52be47a9f9aef4d4b4275b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "cantors_cassock",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/cantors_cassock.webp",
+      "canonicalDisplayName": "Cantor's Cassock",
+      "acceptedSha256": "867683b21dcb2ba8e7ce3d0f4e4fbd67ae28148b6fbdb690ec129f18b76cf19d",
+      "acceptedBytes": 3208,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/cantors_cassock.png",
+        "sha256": "44f389c321184ef93bbf84d02f26103f8bd6a162529ae79014960d65598ca887",
+        "bytes": 2298616,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/cantors_cassock.png",
+        "sha256": "4ab7b6096c193c0ef7ee3d4cd05ac2ddfbac0d2ce3b88d1462f955ec4ced322d",
+        "bytes": 533412,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "ed9a0ec64ee9908dee0b8c18dbad61300105809353fb2f49d716cb67b2ba1267",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Cantor's Cassock (cantors_cassock) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty ankle-length black-violet CLOTH cassock with broad bell sleeves, narrow clerical collar band, silver front buttons and a gold choir stole embroidered with tiny bell motifs. Soft thick fabric, no wearer or mannequin. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/cantors_cassock.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ed9a0ec64ee9908dee0b8c18dbad61300105809353fb2f49d716cb67b2ba1267"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "choirward_leggings",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/choirward_leggings.webp",
+      "canonicalDisplayName": "Choirward Leggings",
+      "acceptedSha256": "6b812ebf337e375e11acf58126852d2db64d01bfed90254812e6aad54aa0569a",
+      "acceptedBytes": 2986,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/choirward_leggings.png",
+        "sha256": "38e68c55f080220ea07ce507d1d42a12e5cb68bb796dac3a1a54644dc9260b10",
+        "bytes": 2199095,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/choirward_leggings.png",
+        "sha256": "74ebfab0a4c301c2db19a80c16698bba6f381b4a7ac0b32a5c91089e49263a51",
+        "bytes": 485943,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "12129c6325180996ccdd14f1b945d22547a56b1a833279bde70f83033959ccbf",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Choirward Leggings (choirward_leggings) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of MAIL leggings with visible interlinked steel chain and rounded steel knee cops, short violet cloth tabard hanging over the upper thighs embroidered with one silver bell. Whole separate legs visible, no wearer. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/choirward_leggings.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "12129c6325180996ccdd14f1b945d22547a56b1a833279bde70f83033959ccbf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "choristers_gloves",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/choristers_gloves.webp",
+      "canonicalDisplayName": "Chorister's Gloves",
+      "acceptedSha256": "0327d291486961da39624bb64fd955db34f0ca414ff4422fdfbec2e72bc0e48e",
+      "acceptedBytes": 3608,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/choristers_gloves.png",
+        "sha256": "8341172420c3c6a223b7d059a9180605e18b4fc9799ce1dd081eaa94614d66ab",
+        "bytes": 2499926,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/choristers_gloves.png",
+        "sha256": "b1c34742e365b645ffaf6e85cc9cd7d1e800c19ebc732927e7900ac42a503975",
+        "bytes": 536600,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "6128d9591049d5cf94c398b00a1ed797a09b2e5ae0be50100da0e865c63232ff",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Chorister's Gloves (choristers_gloves) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of dark brown LEATHER gloves with violet cuffs stitched with small decorative musical-note motifs and a small silver chime tied by ribbon to one wrist. Supple leather, five fingers per glove, no living hands. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/choristers_gloves.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6128d9591049d5cf94c398b00a1ed797a09b2e5ae0be50100da0e865c63232ff"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "cantors_hymnal",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/cantors_hymnal.webp",
+      "canonicalDisplayName": "Cantor's Hymnal",
+      "acceptedSha256": "515ff55865a98fb7ff524b16b6f2bc015756af46484359bc9d207776e0072924",
+      "acceptedBytes": 4074,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/cantors_hymnal.png",
+        "sha256": "8d5fbb4d138d53354f40f8781a44ec8c41fed3b515582207f968f1683591086d",
+        "bytes": 2362950,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/cantors_hymnal.png",
+        "sha256": "84fb21c4277ba92d03532664d621e2534a2dbebf706a068bfa2b9ab54cc55368",
+        "bytes": 551783,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "04a07126b0ca8c10971b3961a7e64f59c7ef8209451953f03a3741658922ba99",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Cantor's Hymnal (cantors_hymnal) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete CLOSED thick crimson leather-bound hymnal in three-quarter view, brass corners, ivory bone clasp, large embossed gold bell on front cover and two ribbon page markers. Aged cream page edges visible. No book title or writing, strong solid book silhouette. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/cantors_hymnal.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "04a07126b0ca8c10971b3961a7e64f59c7ef8209451953f03a3741658922ba99"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_cantors_hymnal",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_cantors_hymnal.webp",
+      "canonicalDisplayName": "Heroic Cantor's Hymnal",
+      "acceptedSha256": "ee9518c2ef4085a5b166e8453dfc73dcb05e97e97413a246120ac7f4f673c297",
+      "acceptedBytes": 3694,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/heroic_cantors_hymnal.png",
+        "sha256": "c870fb50a2bdd535b44b058f2fec818e330295fa7275cdd2cb7e0dee769d229f",
+        "bytes": 2264232,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/heroic_cantors_hymnal.png",
+        "sha256": "db3e7a908c8b6f306416104addbd56eaf6413d8789c362d1969bba538520d11c",
+        "bytes": 541674,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "dc56cf244b3694f2ec50738c0373d19806761952d63eae7b1a9138b68d6aa1a6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Cantor's Hymnal (heroic_cantors_hymnal) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete OPEN thick crimson leather-bound hymnal in three-quarter view, brass corners, ivory bone clasp and two ribbon markers. A few luminous violet musical notes rise in a compact arc from pale cream pages. No readable words or letters on pages, a distinctly open book silhouette versus the closed normal hymnal. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/heroic_cantors_hymnal.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "dc56cf244b3694f2ec50738c0373d19806761952d63eae7b1a9138b68d6aa1a6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gravecallers_vestments",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gravecallers_vestments.webp",
+      "canonicalDisplayName": "Gravecaller's Vestments",
+      "acceptedSha256": "7bd60bc71cb99340ab20941c335540a193be21fb2564246df1a198e366f489fb",
+      "acceptedBytes": 3840,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/gravecallers_vestments.png",
+        "sha256": "8074e4bc9c14e59094fb3763e61cb449435a7f470991202147f1d77482e028d4",
+        "bytes": 2339618,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/gravecallers_vestments.png",
+        "sha256": "d16c0f2138b73119e0c10b009bec384dc18fe8dc540db50df61cfc83a9eee2a7",
+        "bytes": 542287,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "6eac58ab99dc948adaa0b90badfa3bdbbfe1cea542fdb1abf2fbfcc17efead58",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gravecaller's Vestments (gravecallers_vestments) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty grave-black CLOTH robe with ragged sleeves, tall spiked violet collar, decorative ivory bone ribcage sewn across chest, small skull clasp and restrained soul-green glow at ragged hem. Flowing soft fabric, whole robe, no body or wearer. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/gravecallers_vestments.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6eac58ab99dc948adaa0b90badfa3bdbbfe1cea542fdb1abf2fbfcc17efead58"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "unquiet_stalkers_hood",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/unquiet_stalkers_hood.webp",
+      "canonicalDisplayName": "Unquiet Stalker's Hood",
+      "acceptedSha256": "29950cc8a01866c1a5be6ad9b4da9addeb9e885b87ffd3eca0429911d224b45c",
+      "acceptedBytes": 3724,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/unquiet_stalkers_hood.png",
+        "sha256": "cf1aedf4fd6085f525a6602f90e1d550834ae0a39fd3aca95992edab36117728",
+        "bytes": 2260373,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/unquiet_stalkers_hood.png",
+        "sha256": "b05c68a764c6c8a1953873b04492e266a49f01e47316d66aa9d5a972f97e3264",
+        "bytes": 506828,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "b002b39dd45799f60e63c1cac55eb954aa8999c221d7005d1a0c8e6d4a6d1c55",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Unquiet Stalker's Hood (unquiet_stalkers_hood) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty ragged dark brown LEATHER hood, prominent ivory bone jaw guard and small finger-bone tokens at brow. Two tiny soul-green magical eye-like lights in otherwise empty dark opening, no face or person. Thick stitched leather distinct from cloth. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/unquiet_stalkers_hood.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "b002b39dd45799f60e63c1cac55eb954aa8999c221d7005d1a0c8e6d4a6d1c55"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "sextons_burial_spade",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/sextons_burial_spade.webp",
+      "canonicalDisplayName": "Sexton's Burial Spade",
+      "acceptedSha256": "af93604e5d540862c8c827c9dafbe5af73d4ea6ebe3e79b89624749117cbf8e0",
+      "acceptedBytes": 2328,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/sextons_burial_spade.png",
+        "sha256": "39d08288accc0a4d8be99838f78046927b493daefdb917f3c6d9539522ab18a7",
+        "bytes": 2216419,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/sextons_burial_spade.png",
+        "sha256": "a99498da2b4b5c19584e9338b6fff665596ff155dbd250fb267a9900c1823ff6",
+        "bytes": 452719,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "f064328743c28a6008644a5cbecdbcccf86ed40ce3d2a53c640aef4c08f705cf",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sexton's Burial Spade (sextons_burial_spade) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete long two-handed burial spade diagonally posed. Squared grave-steel shovel blade pierced by a simple coffin-cross opening glowing violet, bone-wrapped wooden haft, ivory bone T-grip and small bronze funeral bell tied below grip. Entire blade and T-grip visible with generous margins, no wielder. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/sextons_burial_spade.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f064328743c28a6008644a5cbecdbcccf86ed40ce3d2a53c640aef4c08f705cf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rimesilk_hood",
+      "family": "crypt",
+      "batch": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rimesilk_hood.webp",
+      "canonicalDisplayName": "Rimesilk Hood",
+      "acceptedSha256": "42702017bcbed2c41d3f95a06af967ee39f5962169c9ec2fd3f46d4fd0f285d4",
+      "acceptedBytes": 3936,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/originals/rimesilk_hood.png",
+        "sha256": "bb3e6a91c43d8580f8eb38c566d9f15ce46780c1647623135a927d542e5fd1aa",
+        "bytes": 2433127,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt/masters/rimesilk_hood.png",
+        "sha256": "4b11705b5c0eaff07497083b2fe70f248d884e9aa180ccf34c8ebf77488864b9",
+        "bytes": 566055,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hollow-crypt-icons-2026-10-03",
+        "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+        "sha256": "de20e94c1bb4f11a707cdb1b3f7c4de4fe2a51a81b7dcc7faba5c0b313a3d9ce",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rimesilk Hood (rimesilk_hood) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty peaked pale blue-white SILK CLOTH hood with delicate frost-lace filigree, faceted ice-crystal circlet at brow, cold blue magical light low inside the dark cowl. Soft fine silk folds, bridal frost identity, no spider, face or mannequin. Follow current Hollow Crypt item names and canonical armor materials; the Lady of the Bonechill replaces the historical spider boss, so her renamed items use bridal frost details. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt/superseded/rimesilk_hood.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "de20e94c1bb4f11a707cdb1b3f7c4de4fe2a51a81b7dcc7faba5c0b313a3d9ce"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          },
+          {
+            "path": "src/sim/content/hollow_crypt_items.ts",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "71dc2bab2be739e63ec5ed1db63a2e8ac44f9af0bfa9c86e9dc05d55ffca4f90"
+          },
+          {
+            "path": "docs/design/dungeon-rework/hollow_crypt.md",
+            "role": "canonical live item and boss identity; textual reference, not image-edit input",
+            "sha256": "abade131454fdb949936ba5740f77f61678cdbb13e131e33992e71cbeab96802"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ],
+  "review": {
+    "identityUpdate": "Current hollow_crypt_items.ts and dungeon design replace the Rimeweb spider boss with the Lady of the Bonechill. The renamed hauberk, leggings and icicle dagger use their live names and bridal frost materials; related Rimesilk pieces use frost lace. Frozen runtime IDs are retained."
+  }
+}

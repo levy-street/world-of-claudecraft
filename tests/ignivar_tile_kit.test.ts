@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
+  ensureIgnivarTileAssets,
   IGNIVAR_TILE_KINDS,
   IGNIVAR_TILE_PREFIX,
   ignivarTileKind,
@@ -9,6 +10,17 @@ import {
 } from '../src/render/ignivar_tile_kit';
 
 describe('Ignivar raid-only tile kit', () => {
+  it('retries a failed lazy tile load and caches the successful retry', async () => {
+    const load = vi.fn().mockRejectedValue(new Error('Temporary tile failure'));
+    await expect(ensureIgnivarTileAssets('ignivar', load)).rejects.toThrow(
+      'Temporary tile failure',
+    );
+    load.mockResolvedValue(undefined);
+    await expect(ensureIgnivarTileAssets('ignivar', load)).resolves.toBeUndefined();
+    const calls = load.mock.calls.length;
+    await ensureIgnivarTileAssets('ignivar_depths', load);
+    expect(load).toHaveBeenCalledTimes(calls);
+  });
   it('remaps exactly the structural kinds, only for the ignivar variant', () => {
     for (const kind of IGNIVAR_TILE_KINDS) {
       expect(ignivarTileKind('ignivar', kind)).toBe(`${IGNIVAR_TILE_PREFIX}${kind}`);

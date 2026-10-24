@@ -25,6 +25,8 @@ import { terrainHeight } from '../src/sim/world';
 import { completeCorpseHarvest } from './helpers/complete_corpse_harvest';
 import { runCraft } from './helpers/enchant_family_cast';
 
+// Re-hunted sequentially at the v0.45 release merge: authored world and wander
+// changes compose with permanent craft-quality RNG draws. All grants remain live.
 const PLAYTHROUGH_SEED = 4242;
 const PAIR = 'weaponcrafting+armorcrafting';
 const SMITH_MASTER = 'forgemistress_darva';
@@ -170,8 +172,12 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, this exact beat order, re-recorded after the
     // craft-cast system landed: craft start/complete split shifts shared-stream
-    // draws vs the instant-craft era): the proc lands on attempt index 7.
-    expect(procAt).toBe(7);
+    // draws vs the instant-craft era). Re-hunted for the permanent loot
+    // quality roll on crafted outputs (src/sim/loot/fresh_quality_grant.ts):
+    // each vestments copy now takes one quality draw (plus five weight draws
+    // when it enhances), from beat 1's craft on, so the proc lands on
+    // attempt index 5.
+    expect(procAt).toBe(4);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -261,10 +267,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 9 in the shared
+  // 90s budget: the merged re-hunted koi session sits at index 9 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (19 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (10 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -332,8 +338,22 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // feature/world-quests: the playtest move of one Evergarden hedge_knight camp
     // out of the wisp maze (c43178a68c) forks the shared stream, and moving that
     // camp back restores every release literal in this file (verified); the koi
-    // now lands on session index 17.
-    expect(koiSession).toBe(17);
+    // now lands on session index 17. Re-hunted for the four built dungeon
+    // entrances (src/sim/*_entrance.ts): their colliders push the spawn point of
+    // three neighbouring world mobs, the Wildheart Basin door moved and the Idol
+    // Guardian's camp with it, and every world mob's idle wander draws from the
+    // shared stream, so it forks again; the koi now lands on session index 3.
+    // Re-hunted for the Fenbridge rebuild (painted buildings, the open ring,
+    // walk-in floors, re-threaded streets and lamps): colliders, roads and
+    // walkable ground near the town are world-gen inputs, so the shared stream
+    // forks again; the koi now lands on session index 14. Re-hunted for the
+    // Mirefen mudfin huts becoming solid walls (src/sim/mudfin_huts.ts): the
+    // camp murlocs' idle wander now settles on other ticks, so the shared
+    // stream forks again; the koi now lands on session index 18. Re-hunted for
+    // the wander fix around those huts (an idle pick inside a hut wall is
+    // skipped for one more pause, mob/locomotion.ts): the murlocs' wander draws
+    // move, so the shared stream forks again; the koi now lands on session index 3.
+    expect(koiSession).toBe(30);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -387,19 +407,30 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // reshaped world moves every shared-stream index downstream. Re-recorded in
     // order once more for the release/v0.43.0 merge into feature/world-quests,
     // for the moved Evergarden hedge_knight camp (c43178a68c) named above.
+    // Re-recorded in order, one at a time, for the four built dungeon entrances
+    // named at the koi hunt above (195, 61, 132 to 45, 0, 14). The heartwood's
+    // 0 was a real first-harvest hit of the 1-in-90 event, not a skipped hunt.
+    // Re-recorded in order, one at a time, for the Fenbridge rebuild named at
+    // the koi hunt above (45, 0, 14 to 26, 44, 67). Re-recorded in order for
+    // the solid Mirefen mudfin huts named at the koi hunt above (26, 44, 67 to
+    // 17, 38, 48). Re-recorded in order for the wander fix around those huts
+    // named at the koi hunt above (17, 38, 48 to 25, 59, 7).
+    // Re-recorded in order after composing the permanent loot-quality craft
+    // draws with the current release world/combat stream. The real gather
+    // events land at 114, 169 and 20, after the merged koi session at 9.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 195 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 69 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 61,
+        hitAt: 157,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 132,
+        hitAt: 21,
       },
     ];
     for (const hunt of hunts) {
@@ -407,6 +438,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (!node) throw new Error(`missing node ${hunt.nodeId}`);
       teleportTo(node.pos.x, node.pos.z);
       expect(meta.deedsEarned.has(hunt.deedId)).toBe(false);
+      // The visit mark is absent going in (a read, zero draws), so this hunt
+      // observes its own gather-cast event, never a mark from an earlier beat.
+      expect(meta.deedStats.visited.has(`gather_event:${hunt.deedId.slice(4)}`)).toBe(false);
       let hitAt = -1;
       for (let i = 0; i < 2000 && hitAt < 0; i++) {
         // Session-only cooldown and bag state reset per iteration, so every
@@ -469,8 +503,14 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // against the merged tree: combining the real HARVEST_CAST_SECONDS cast
     // (Intentional Gathering PR3) with the release's Eastbrook/Drakelands
     // world-layout re-hunt yields 2; the release/v0.43.0 merge into
-    // feature/world-quests yields 9 (the moved hedge_knight camp, c43178a68c).
-    expect(hitAt).toBe(9);
+    // feature/world-quests yields 9 (the moved hedge_knight camp, c43178a68c);
+    // the four built dungeon entrances (named at the koi hunt above) yield 1;
+    // the Fenbridge rebuild (named at the koi hunt above) yields 3; the grand
+    // painted towns and the Mirefen tavern (#4525) yield 5; the solid Mirefen
+    // mudfin huts (named at the koi hunt above) yield 7; the wander fix around
+    // those huts (named at the koi hunt above) yields 0, a real first-harvest
+    // hit (hitAt starts at -1), not a skipped hunt.
+    expect(hitAt).toBe(1);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     // The signature rides materialSources, not instance.signer (the two are
     // mutually exclusive; corpse_harvest_grant.test.ts / corpse_harvest_sim.test.ts

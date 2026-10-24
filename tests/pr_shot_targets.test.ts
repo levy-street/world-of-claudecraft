@@ -203,6 +203,48 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps the dungeon prompt modules to the hints target: the row, and a fight with the hints on and off, on both hosts', () => {
+    // Keyed on the prompts' own modules (the composer and its policy core), so
+    // the options_view order above is untouched.
+    for (const file of [
+      'src/ui/hud/dungeon/dungeon_prompts.ts',
+      'src/ui/hud/dungeon/dungeon_prompt_policy_core.ts',
+    ]) {
+      const plan = classifyDiff([file]);
+      expect(plan.isVisual, file).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        file,
+      ).toEqual(['dungeon-hints']);
+      expect(plan.generic).toHaveLength(0);
+    }
+    const [target] = classifyDiff(['src/ui/hud/dungeon/dungeon_prompts.ts']).specific;
+    const variants = target.variants as {
+      key: string;
+      mobile?: boolean;
+      fight?: boolean;
+      hints?: boolean;
+      beforeLoad?: unknown;
+    }[];
+    expect(variants.map((v) => v.key)).toEqual([
+      'options-desktop',
+      'options-mobile',
+      'fight-shown-desktop',
+      'fight-hidden-desktop',
+      'fight-shown-mobile',
+      'fight-hidden-mobile',
+    ]);
+    // Every arm seeds its own start state (the lowest preset, the hints ON):
+    // the harness profile's storage outlives a page, so an unseeded arm would
+    // inherit the hidden arm's off.
+    for (const v of variants) expect(typeof v.beforeLoad, v.key).toBe('function');
+    // Each host fights the same fight twice, once per setting.
+    for (const mobile of [false, true]) {
+      const fights = variants.filter((v) => v.fight && !!v.mobile === mobile);
+      expect(fights.map((v) => v.hints)).toEqual([true, false]);
+    }
+  });
+
   it('maps controller option changes to remapped desktop and mobile evidence', () => {
     const plan = classifyDiff(['src/game/gamepad_bindings.ts']);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
@@ -432,6 +474,30 @@ describe('classifyDiff', () => {
     // shared #tooltip actually painted rather than shooting the row alone.
     expect(target?.capture.toString()).toContain('#tooltip');
     expect(target?.capture.toString()).toContain('mouseenter');
+  });
+
+  it('maps the dungeon tracker pair and its sim read to the dungeon objectives target', () => {
+    for (const path of [
+      'src/ui/hud/dungeon/dungeon_tracker_painter.ts',
+      'src/ui/hud/dungeon/dungeon_tracker_view.ts',
+      'src/sim/instances/dungeon_run.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toEqual(['dungeon-objectives-tracker']);
+    }
+    const target = resolveTargets(['src/ui/hud/dungeon/dungeon_tracker_painter.ts'])[0];
+    // Desktop on entry, with a boss down and finished on heroic, plus the touch strip page.
+    expect(target.variants.map((v: { key: string }) => v.key)).toEqual([
+      'entry',
+      'boss-down',
+      'heroic-complete',
+      'mobile',
+    ]);
+    expect(target.variants.filter((v: { mobile?: boolean }) => v.mobile === true)).toHaveLength(1);
   });
 
   it('maps a zone/terrain change to the world-map target', () => {
@@ -1158,5 +1224,44 @@ describe('the Materials Vault evidence target', () => {
     expect(target.capture.toString()).toContain("matchMedia('(forced-colors: active)').matches");
     expect(target.capture.toString()).toContain("getElementById('tutorial-greeting')");
     expect(target.capture.toString()).toContain('signedSpecial');
+  });
+});
+
+describe('the Drowned Gate Tower night target', () => {
+  it('routes both entrance halves and seeds the medium preset, the lowest that draws the whole gate layer', async () => {
+    for (const path of [
+      'src/render/sunken_bastion_entrance.ts',
+      'src/render/sunken_bastion_entrance_core.ts',
+    ]) {
+      expect(
+        classifyDiff([path]).specific.map((target: { key: string }) => target.key),
+        path,
+      ).toEqual(['sunken-bastion-entrance-night']);
+    }
+    const target = classifyDiff(['src/render/sunken_bastion_entrance_core.ts']).specific[0];
+    expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+      'gate-at-the-crest',
+      'from-the-east-ridge',
+    ]);
+    // the gate leg at the beacon's crest, the ridge leg where the beam rose
+    expect(target.variants.map((variant: { spot: { turn: number } }) => variant.spot.turn)).toEqual(
+      [0, 255],
+    );
+    for (const variant of target.variants) {
+      const storageSeeds: string[] = [];
+      await variant.beforeLoad({
+        async evaluateOnNewDocument(script: string) {
+          storageSeeds.push(script);
+        },
+      });
+      expect(storageSeeds.join('\n').match(/graphicsPreset = \d/g), variant.key).toEqual([
+        'graphicsPreset = 2',
+      ]);
+    }
+    // night, after the zone-entry vista, held at one turn of the beacon
+    const capture = target.capture.toString();
+    expect(capture).toContain('setDayNightPhaseOverride(0)');
+    expect(capture).toContain('camDirector?.kind == null');
+    expect(capture).toContain('BASTION_BEACON.period');
   });
 });

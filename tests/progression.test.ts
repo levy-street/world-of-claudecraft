@@ -32,6 +32,7 @@ import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/profess
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
@@ -285,6 +286,10 @@ describe('content referential integrity', () => {
     const spawning = new Set<string>();
     for (const c of CAMPS) spawning.add(c.mobId);
     for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
+    // World bosses have no camp: the world-boss scheduler spawns each on its own cadence
+    // (src/sim/world_boss.ts WORLD_BOSSES), so a kill quest on one (the Mirefen muster's
+    // weekly on Balgath) is finishable whenever he is up.
+    for (const b of WORLD_BOSSES) spawning.add(b.templateId);
     const problems: string[] = [];
     for (const q of Object.values(QUESTS)) {
       for (const obj of q.objectives) {

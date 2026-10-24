@@ -1,7 +1,7 @@
 import { supportHeightAt } from '../sim/colliders';
-import { isRiftPos } from '../sim/data';
+import { isBuiltinWorldActive, isRiftPos } from '../sim/data';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
-import { groundHeight } from '../sim/world';
+import { groundHeight, groundHeightNear } from '../sim/world';
 import type { RiftFloorView } from '../world_api/dungeons';
 import { drawnDeckSupportAt } from './deck_frame';
 import {
@@ -77,7 +77,10 @@ export interface StandingSurfaceWorld {
 
 /**
  * The standing surface under a body's feet at the displayed (x, y, z): the
- * terrain (`groundHeight`, the sim's own sampler), plus the raised-tier lift
+ * ground reference (on an authored map `groundHeightNear`, not `groundHeight`: a body on a cave
+ * tube's or carve cavity's floor stands on solid ground BELOW the bare
+ * heightfield, and the surface reference would read it as permanently falling
+ * through a tunnel), plus the raised-tier lift
  * of the active rift floor (the flat dungeon floor would otherwise read a
  * standing player as airborne on a platform), OR a standable prop top under
  * the feet (parkour: crates and rocks are walkable, else a body perched on a
@@ -91,7 +94,9 @@ export function standingSurfaceAt(
   y: number,
   z: number,
 ): number {
-  let ground = groundHeight(x, z, seed);
+  // Authored maps only (their cave tubes and carve cavities): the built-in
+  // world keeps the surface reference it shipped with.
+  let ground = isBuiltinWorldActive() ? groundHeight(x, z, seed) : groundHeightNear(x, z, seed, y);
   if (riftFloor && isRiftPos(x)) {
     const floor = generateRiftFloor(
       riftFloor.seed,

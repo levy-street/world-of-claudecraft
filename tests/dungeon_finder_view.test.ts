@@ -15,7 +15,7 @@ import {
   FINDER_PORTRAIT_DIR,
   finderLootItemIds,
 } from '../src/ui/dungeon_finder_view';
-import type { DungeonFinderInfo } from '../src/world_api';
+import type { DungeonFinderInfo, DungeonFinderListingView } from '../src/world_api';
 
 function makeInfo(
   shape: 'sim' | 'client',
@@ -89,6 +89,30 @@ describe('dungeon finder view core', () => {
     expect(b.sig).toBe(a.sig);
   });
 
+  it('invalidates listing chrome for updated raid notes and expedition progress', () => {
+    const board: DungeonFinderListingView[] = [
+      {
+        id: 20,
+        activityId: 'nythraxis_boss_arena_normal',
+        leaderName: 'Leader',
+        tags: [],
+        size: 1,
+        capacity: 10,
+        members: [],
+        needed: null,
+        details: { purpose: 'clear', note: 'First note' },
+      },
+    ];
+    const snapshot = input({ board, playerLevel: 20, tab: 'board' });
+    const first = live(buildDungeonFinderView(snapshot));
+    expect(first.board.listings).toHaveLength(1);
+    board[0].details = { purpose: 'clear', note: 'Changed note' };
+    const note = live(buildDungeonFinderView(snapshot)).sig;
+    expect(note).not.toBe(first.sig);
+    board[0].expedition = { bossesDefeated: 1, bossesTotal: 3 };
+    expect(live(buildDungeonFinderView(snapshot)).sig).not.toBe(note);
+  });
+
   it('lists every catalogued activity with strict level eligibility', () => {
     const view = live(buildDungeonFinderView(input({ playerLevel: 8, specRole: 'tank' })));
     expect(view.rows.map((r) => r.id)).toEqual(FINDER_ACTIVITIES.map((a) => a.id));
@@ -98,15 +122,32 @@ describe('dungeon finder view core', () => {
     expect(byId.get('nythraxis_boss_arena_normal')?.blocked).toBe('level');
   });
 
-  it('flags the missing-spec gate at level 5+ and closes Quick Match', () => {
-    const view = live(buildDungeonFinderView(input({ playerLevel: 20, specRole: null })));
-    expect(view.queue.needsSpec).toBe(true);
-    expect(view.rows.find((r) => r.id === 'hollow_crypt_heroic')?.blocked).toBe('spec');
-    // The gate starts exactly at the spec unlock (level 5); level 4 is free of it.
-    const atFive = live(buildDungeonFinderView(input({ playerLevel: 5, specRole: null })));
-    expect(atFive.queue.needsSpec).toBe(true);
-    const atFour = live(buildDungeonFinderView(input({ playerLevel: 4, specRole: null })));
-    expect(atFour.queue.needsSpec).toBe(false);
+  it('offers class-capable roles without requiring or changing specialization', () => {
+    for (const specRole of [null, 'dps', 'tank'] as const) {
+      const view = live(
+        buildDungeonFinderView(
+          input({
+            playerLevel: 20,
+            specRole,
+            stagedActivityIds: ['hollow_crypt_heroic'],
+            info: makeInfo('sim', { roles: ['tank'] }),
+          }),
+        ),
+      );
+      expect(view.rows.find((r) => r.id === 'hollow_crypt_heroic')?.blocked).toBeNull();
+      expect(view.queue.roles.filter((role) => role.eligible).map((role) => role.role)).toEqual([
+        'tank',
+        'dps',
+      ]);
+      expect(view.queue.roles.find((role) => role.role === 'healer')?.eligible).toBe(false);
+      expect(view.queue.canQueue).toBe(true);
+    }
+    const lowLevel = live(buildDungeonFinderView(input({ playerLevel: 4, specRole: null })));
+    expect(lowLevel.queue.roles.filter((role) => role.eligible).map((role) => role.role)).toEqual([
+      'tank',
+      'dps',
+    ]);
+    expect(lowLevel.rows.find((row) => row.id === 'hollow_crypt_normal')?.blocked).toBe('level');
   });
 
   it('selects the first activity by default and honors an explicit selection', () => {
@@ -126,7 +167,12 @@ describe('dungeon finder view core', () => {
     const boss = view.detail?.encounters.find((e) => e.final);
     expect(boss?.mobId).toBe('morthen');
     expect(boss?.portraitUrl).toBe('/ui/dungeons/morthen.webp');
-    expect(boss?.mechanics).toEqual(['shadow_pulse']);
+    expect(boss?.mechanics).toEqual([
+      'crypt_morthen_shadow_pulse',
+      'crypt_gravecall',
+      'crypt_rite_of_the_unquiet',
+      'crypt_reap_the_unquiet',
+    ]);
     expect(boss?.groups.length).toBeGreaterThan(0);
     // morthen_guaranteed_uncommon partitions a full draw; morthen_bonus sums
     // below 1 and must NOT claim a guaranteed drop.
@@ -155,6 +201,69 @@ describe('dungeon finder view core', () => {
     }
   });
 
+  it('previews the Mere Hydra as one encounter that pays all three of its heads', () => {
+    const normal = live(
+      buildDungeonFinderView(
+        input({ playerLevel: 17, selectedActivityId: 'drowned_temple_normal' }),
+      ),
+    );
+    expect(normal.detail?.encounters.map((e) => e.mobId)).toEqual([
+      'choirmother_selthe',
+      'mere_hydra_head_center',
+      'tideglass_colossus',
+      'ysolei',
+    ]);
+    const hydra = normal.detail?.encounters[1];
+    expect(hydra?.final).toBe(false);
+    expect(hydra?.summoned).toBe(false);
+    expect(hydra?.portraitUrl).toBe('/ui/dungeons/mere_hydra_head_center.webp');
+    expect(hydra?.mechanics).toEqual([
+      'hydra_three_elements',
+      'hydra_tsunami',
+      'hydra_combined_breath',
+      'hydra_regrowth',
+    ]);
+    // Each head pays its own copper once per kill, and all three die for one:
+    // the preview is the sum, not the centre head's share alone.
+    const headCopper = (id: string) =>
+      (MOBS[id].loot ?? []).reduce((sum, e) => sum + (e.copper ?? 0), 0);
+    expect(headCopper('mere_hydra_head_left')).toBe(400);
+    expect(hydra?.copper).toBe(
+      headCopper('mere_hydra_head_left') +
+        headCopper('mere_hydra_head_center') +
+        headCopper('mere_hydra_head_right'),
+    );
+    expect(hydra?.copper).toBe(1200);
+    // The fight's one normal blue roll rides the centre head: four pieces, a
+    // chance and never a guarantee.
+    expect(hydra?.groups).toHaveLength(1);
+    expect(hydra?.groups[0].guaranteed).toBe(false);
+    expect(hydra?.groups[0].items.map((i) => i.itemId)).toEqual([
+      'mere_crested_helm',
+      'mereskin_hood',
+      'merewater_cowl',
+      'merecleaver',
+    ]);
+    expect(hydra?.singles).toEqual([]);
+    expect(hydra?.heroicGroups).toEqual([]);
+
+    const heroic = live(
+      buildDungeonFinderView(
+        input({ playerLevel: 20, specRole: 'tank', selectedActivityId: 'drowned_temple_heroic' }),
+      ),
+    ).detail?.encounters[1];
+    expect(heroic?.mobId).toBe('mere_hydra_head_center');
+    // Heroic never rolls the Normal-only blues; it pays the centre head's own
+    // heroic table, one piece a kill.
+    expect(heroic?.groups).toEqual([]);
+    expect(heroic?.heroicGroups).toHaveLength(1);
+    expect(heroic?.heroicGroups[0].guaranteed).toBe(true);
+    expect(heroic?.heroicGroups[0].items.map((i) => i.itemId)).toEqual(
+      (HEROIC_BOSS_LOOT.mere_hydra_head_center ?? []).map((e) => e.itemId),
+    );
+    expect(heroic?.copper).toBe(1200);
+  });
+
   it('appends heroic-only loot groups on heroic difficulty', () => {
     const view = live(
       buildDungeonFinderView(
@@ -176,7 +285,8 @@ describe('dungeon finder view core', () => {
     // kill actually pays; a non-finale encounter keeps its normal copper.
     expect(boss?.copper).toBe(100000);
     const sexton = view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
-    expect(sexton?.copper).toBe(400);
+    // The rework raised Marrow's purse with his level (hollow_crypt.md 8.1).
+    expect(sexton?.copper).toBe(800);
     expect(sexton?.heroicGroups).toHaveLength(1);
     expect(sexton?.heroicGroups[0].guaranteed).toBe(true);
 
@@ -193,7 +303,11 @@ describe('dungeon finder view core', () => {
       (e) => e.mobId === 'wildheart_beastmaster',
     );
     expect(beastmaster?.final).toBe(false);
-    expect(beastmaster?.heroicSingles.map((i) => i.itemId)).toContain('heroic_duskwhisper');
+    // The promoted Beastmaster pays one equipment item per heroic kill: Heroic
+    // Duskwhisper rides his weighted heroic partition (design section 8.2).
+    expect(beastmaster?.heroicGroups.flatMap((g) => g.items.map((i) => i.itemId))).toContain(
+      'heroic_duskwhisper',
+    );
   });
 
   it('previews the live non-finale equipment budget on Heroic only', () => {
@@ -212,9 +326,18 @@ describe('dungeon finder view core', () => {
     expect(heroic?.heroicGroups).toMatchObject([
       {
         guaranteed: true,
+        // The relocated Nythraxis piece (0.1) and the blue roll's three rare
+        // copies (0.04 each, 2026-10-08) come first; the shipped rows keep their
+        // ratios in the remaining 0.78. The two uncommon rows left on 2026-10-09
+        // (Heroic pays no uncommon gear), so 0.7 of weight shares the 0.78.
         items: [
-          { itemId: 'quilted_trousers', chance: 0.5 },
-          { itemId: 'oiled_boots', chance: 0.5 },
+          { itemId: 'heroic_bonewrought_greatsword', chance: expect.closeTo(0.1, 9) },
+          { itemId: 'heroic_spadeworn_gauntlets', chance: expect.closeTo(0.04, 9) },
+          { itemId: 'heroic_gravedirt_grips', chance: expect.closeTo(0.04, 9) },
+          { itemId: 'heroic_bellrope_mitts', chance: expect.closeTo(0.04, 9) },
+          { itemId: 'sextons_burial_spade', chance: expect.closeTo((0.3 / 0.7) * 0.78, 9) },
+          { itemId: 'cryptplate_helm', chance: expect.closeTo((0.3 / 0.7) * 0.78, 9) },
+          { itemId: 'heroic_sextons_spadehaft', chance: expect.closeTo((0.1 / 0.7) * 0.78, 9) },
         ],
       },
     ]);
@@ -375,6 +498,18 @@ describe('dungeon finder view core', () => {
       buildDungeonFinderView(input({ tab: 'board', specRole: 'tank', board: [listing] })),
     );
     expect(tankView.board.listings[0].canApply).toBe(false);
+    const armsTank = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          playerClass: 'warrior',
+          specRole: 'dps',
+          info: makeInfo('sim', { roles: ['tank'], eligibleRoles: ['tank', 'dps'] }),
+          board: [{ ...listing, needed: { tank: 1, healer: 0, dps: 0 } }],
+        }),
+      ),
+    );
+    expect(armsTank.board.listings[0].canApply).toBe(true);
     // A dps-capable viewer can.
     const dpsView = live(
       buildDungeonFinderView(
@@ -643,6 +778,39 @@ describe('dungeon finder view core', () => {
     expect(normalDifficultyUnaffected.board.listings.map((l) => l.id)).toEqual([9]);
   });
 
+  it('redraws applicant specializations while keeping expiry ticks out of the signature', () => {
+    const view = (spec: string | null | undefined, remaining: number) =>
+      live(
+        buildDungeonFinderView(
+          input({
+            tab: 'board',
+            info: makeInfo('sim', {
+              myListing: {
+                id: 7,
+                activityId: 'hollow_crypt_normal',
+                tags: [],
+                applicants: [
+                  {
+                    pid: 2,
+                    name: 'Priest',
+                    cls: 'priest',
+                    level: 8,
+                    roles: ['dps'],
+                    spec,
+                    remaining,
+                  },
+                ],
+              },
+            }),
+          }),
+        ),
+      );
+    expect(view('shadow', 59).sig).toBe(view('shadow', 60).sig);
+    expect(view('discipline', 60).sig).not.toBe(view('shadow', 60).sig);
+    expect(view(null, 60).sig).not.toBe(view('shadow', 60).sig);
+    expect(view(undefined, 60).board.myListing?.applicants[0].spec).toBeUndefined();
+  });
+
   it('keeps the 1 Hz clock numbers OUT of the render-skip signature', () => {
     const base = input({
       info: makeInfo('sim', {
@@ -742,6 +910,94 @@ describe('proposal popup view', () => {
 // A catalogued encounter with no committed portrait ships a silent 404 in the rail and
 // the detail header (the view builds the URL blindly from the mob id), so pin every
 // encounter, on both difficulties, against the real files under public/.
+describe('group board expedition applications', () => {
+  function listing(id: number, expedition = true): DungeonFinderListingView {
+    return {
+      id,
+      activityId: 'hollow_crypt_normal',
+      leaderName: `Leader${id}`,
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [],
+      ...(expedition ? { expedition: { bossesDefeated: 1, bossesTotal: 2 } } : {}),
+    };
+  }
+  function boardView(
+    info: Partial<DungeonFinderInfo>,
+    specRole: DungeonFinderViewInput['specRole'] = 'tank',
+  ) {
+    return live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          specRole,
+          board: [listing(1), listing(2), listing(3), listing(4, false)],
+          info: makeInfo('sim', info),
+        }),
+      ),
+    );
+  }
+  it('marks both pending expeditions and leaves a third available without allowing a manual request', () => {
+    const applications = [
+      { listingId: 1, remaining: 60 },
+      { listingId: 2, remaining: 50 },
+    ];
+    const result = boardView({
+      myApplication: applications[0],
+      myApplications: applications,
+      roles: [],
+    });
+    expect(result.board.listings.map((row) => [row.applied, row.canApply])).toEqual([
+      [true, false],
+      [true, false],
+      [false, true],
+      [false, false],
+    ]);
+    // Open expeditions use compatible roles, not the manual board's remaining composition slots.
+    expect(result.board.listings[2].applicationRole).toBe('tank');
+    const ticking = boardView({
+      myApplication: { ...applications[0], remaining: 59 },
+      myApplications: applications.map((app) => ({ ...app, remaining: app.remaining - 1 })),
+      roles: [],
+    });
+    expect(ticking.sig).toBe(result.sig);
+  });
+  it('enforces the five-request cap and the manual one-request compatibility rule', () => {
+    const capped = boardView({
+      myApplications: Array.from({ length: 5 }, (_, i) => ({ listingId: i + 10, remaining: 60 })),
+    });
+    expect(capped.board.listings.every((row) => !row.canApply)).toBe(true);
+    const legacy = boardView({ myApplication: { listingId: 1 } });
+    expect(legacy.board.listings[0].applied).toBe(true);
+    expect(legacy.board.listings.every((row) => !row.canApply)).toBe(true);
+    const pluralManual = boardView({ myApplications: [{ listingId: 4 }] });
+    expect(pluralManual.board.listings[3].applied).toBe(true);
+    expect(pluralManual.board.listings.every((row) => !row.canApply)).toBe(true);
+    const clear = boardView(
+      {
+        roles: ['dps'],
+        myApplications: [],
+        myApplication: { listingId: 99 },
+      },
+      'dps',
+    );
+    expect(clear.board.listings.every((row) => row.canApply)).toBe(true);
+  });
+  it('refuses expedition admission while queued but allows class roles without specialization', () => {
+    const queued = boardView({ queue: { activities: ['hollow_crypt_normal'], waited: 5 } });
+    expect(
+      queued.board.listings.filter((row) => row.expedition).every((row) => !row.canApply),
+    ).toBe(true);
+    const uncommitted = boardView({}, null);
+    expect(
+      uncommitted.board.listings.filter((row) => row.expedition).every((row) => row.canApply),
+    ).toBe(true);
+    expect(uncommitted.board.listings.every((row) => row.blocked === null)).toBe(true);
+  });
+});
+
 describe('every catalogued encounter has a committed portrait', () => {
   it('resolves a webp under public/ui/dungeons for every encounter mob id', () => {
     const missing: string[] = [];

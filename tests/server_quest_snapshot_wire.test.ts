@@ -5,8 +5,10 @@ import {
   PUBLIC_WORLD_QUEST_TRACE_RADIUS,
   type PublicTraceCandidate,
 } from '../server/quest_snapshot_wire';
+import { guildContractsForWeek } from '../src/sim/guild_contracts';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { weeklyQuestWeekForResetDay } from '../src/sim/weekly_quests';
 
 describe('quest snapshot wire', () => {
   it('emits the ordinary and rotating quest owner fields together', () => {
@@ -24,11 +26,15 @@ describe('quest snapshot wire', () => {
       worldQuestReplacements: { wq_test: 'wq_other' },
       weeklyQuest: null,
       clueHunt: { huntId: 'hunt_test', step: 2 },
+      guildContracts: { week: 'wk_9', done: ['phantom_old'], lifetime: 4 },
+      alliedHearthstoneAttunement: 'rift_watch',
     } as unknown as PlayerMeta;
     const sim = {
       worldQuestExpiresAtMs: 1_893_542_400_000,
       weeklyQuestResetAtMs: 1_893_628_800_000,
+      resetDay: '2026-10-12',
     } as Sim;
+    const week = weeklyQuestWeekForResetDay('2026-10-12');
 
     emitQuestSelfKeys(emit, sim, meta);
 
@@ -43,11 +49,26 @@ describe('quest snapshot wire', () => {
       ['cluh', { huntId: 'hunt_test', step: 2 }],
       // The Buried Hoard treasure map (null until one is read).
       ['tmap', null],
+      // The Allied Hearthstone's bound hub (null while unbound).
+      ['ahs', 'rift_watch'],
       ['wqrr', meta.worldQuestRerollCycle],
       ['wqrep', { wq_test: 'wq_other' }],
       ['wkq', null],
       ['wkexp', 1_893_628_800_000],
+      // Lantern Hall's board: the week's three contracts; a past week's done list does not
+      // carry over, the lifetime count does.
+      [
+        'gcon',
+        {
+          week,
+          offered: guildContractsForWeek(week).map((c) => c.id),
+          done: [],
+          lifetime: 4,
+        },
+      ],
     ]);
+    expect(week).not.toBe('wk_9');
+    expect(guildContractsForWeek(week)).toHaveLength(3);
   });
 });
 

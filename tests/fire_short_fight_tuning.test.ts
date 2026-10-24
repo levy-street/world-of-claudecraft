@@ -156,7 +156,10 @@ function addBossDummy(sim: Sim, dist = 6): Entity {
 }
 
 function free(p: Entity): boolean {
-  const q = p as unknown as { castingAbility: string | null; gcdRemaining: number };
+  const q = p as unknown as {
+    castingAbility: string | null;
+    gcdRemaining: number;
+  };
   return q.castingAbility == null && q.gcdRemaining <= 1e-6;
 }
 
@@ -453,6 +456,10 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
   });
 
   it('the talented build still out-bursts the naked spec (over-nerf guard)', () => {
+    // Mean versus mean over the SAME seed panel: a single-seed naked run can
+    // high-roll past the talented mean on pure crit luck whenever the shared
+    // rng stream shifts (any world-content change forks it), which is seed
+    // noise, not an over-nerf.
     // PAIRED comparison: the naked comparator runs the SAME seed ladder as the
     // talented sample, mean against mean. It used to be a 5-seed talented mean
     // against ONE naked run on the default seed, which is a population claim

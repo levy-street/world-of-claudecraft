@@ -26,6 +26,7 @@ import type {
 } from '../sim/types';
 import { buildPaperdollView, type PaperdollView } from './char_view';
 import { borderAccent, deedBorderSlug } from './deed_border_view';
+import { gearScore } from './gear_score_view';
 
 /** Class color as a CSS hex string (mirrors hud.ts classCss): the inspect stage
  *  border / glow / haze take the inspected player's class color. */
@@ -59,6 +60,8 @@ export interface InspectHeaderModel {
   deedTitle: string | null;
   level: number;
   cls: PlayerClass;
+  /** Talent specialization id (the painter localizes it); null = no spec chosen. */
+  specId: string | null;
   classColor: string;
   border: InspectBorderModel | null;
 }
@@ -131,6 +134,9 @@ export interface InspectViewModel {
   /** The Reliquary standing line, or null when there is none to show. */
   curator: InspectCuratorModel | null;
   gear: PaperdollView;
+  /** The average worn item level (gear_score_view.ts), or null when nothing
+   *  worn has one. */
+  gearScore: number | null;
   skin: number;
   skinCatalog: SkinCatalog;
 }
@@ -141,6 +147,8 @@ export interface InspectInput {
   name: string;
   level: number;
   cls: PlayerClass;
+  /** The mirrored specialization id (null = none chosen). */
+  specId?: string | null;
   skin: number;
   /** Which catalog `skin` indexes into ('class' or 'mech'), from the entity mirror. */
   skinCatalog: SkinCatalog;
@@ -224,6 +232,7 @@ export function buildInspectView(
     deedTitle: input.deedTitleText !== '' ? input.deedTitleText : null,
     level: input.level,
     cls: input.cls,
+    specId: input.specId ?? null,
     classColor: classColorCss(input.cls),
     border: accent
       ? {
@@ -288,39 +297,52 @@ export function buildInspectView(
   const curatorBadge: InspectCuratorBadgeModel | null =
     rank >= CURATOR_SIGIL_MIN_RANK ? { rank } : null;
 
+  const gear = buildPaperdollView(input.equippedItems, items, input.equippedInstances);
   return {
     header,
     badges: { holder, discord, dev, curator: curatorBadge },
     curator,
-    gear: buildPaperdollView(input.equippedItems, items, input.equippedInstances),
+    gear,
+    gearScore: gearScore(gear),
     skin: input.skin,
     skinCatalog: input.skinCatalog,
   };
 }
 
 /** The out-of-range remote-profile model: the thinner card shown when the named
- *  player is not inside interest scope. No worn gear, no identity flair, no live
- *  turntable, matching the public character sheet the crawlable page already
- *  serves. */
+ *  player is not inside interest scope. No identity flair and no live turntable,
+ *  matching the public character sheet the crawlable page already serves. Worn
+ *  gear appears only when the caller holds it from a consented source (a group
+ *  applicant's finder snapshot, seen by that listing's leader); a chat-name
+ *  lookup has none, so its `gear` is null. */
 export interface InspectRemoteModel {
   name: string;
   level: number;
   cls: PlayerClass;
+  specId: string | null;
   classColor: string;
   guild: string | null;
+  gear: PaperdollView | null;
 }
 
-export function buildInspectRemoteView(input: {
-  name: string;
-  level: number;
-  cls: PlayerClass;
-  guild: string | null;
-}): InspectRemoteModel {
+export function buildInspectRemoteView(
+  input: {
+    name: string;
+    level: number;
+    cls: PlayerClass;
+    guild: string | null;
+    specId?: string | null;
+    gear?: Partial<Record<EquipSlot, string>>;
+  },
+  items: Record<string, ItemDef> = {},
+): InspectRemoteModel {
   return {
     name: input.name,
     level: input.level,
     cls: input.cls,
+    specId: input.specId ?? null,
     classColor: classColorCss(input.cls),
     guild: input.guild,
+    gear: input.gear ? buildPaperdollView(input.gear, items) : null,
   };
 }

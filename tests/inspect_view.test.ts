@@ -425,7 +425,7 @@ describe('buildInspectView: gear reuses the char_view paperdoll (no forked slot 
 });
 
 describe('buildInspectRemoteView: the thin out-of-range card carries no gear', () => {
-  it('carries only name, level, class, class color, and guild', () => {
+  it('carries only name, level, class, spec, class color, and guild', () => {
     const m = buildInspectRemoteView({
       name: 'Elowen',
       level: 45,
@@ -436,16 +436,33 @@ describe('buildInspectRemoteView: the thin out-of-range card carries no gear', (
       name: 'Elowen',
       level: 45,
       cls: 'mage',
+      specId: null,
       classColor: '#33c1f1',
       guild: 'Nightwatch',
+      gear: null,
     });
-    expect('gear' in m).toBe(false);
     expect('badges' in m).toBe(false);
     // The out-of-range card stays FLAIRLESS: the Curator standing rides the
     // per-entity wire and is proximity-gated like the three older badges, so
     // looking a name up from chat must not leak it.
     expect('curator' in m).toBe(false);
     expect('border' in m).toBe(false);
+  });
+
+  it('paints worn gear only when a consented source (a group applicant) supplies it', () => {
+    const m = buildInspectRemoteView(
+      {
+        name: 'X',
+        level: 8,
+        cls: 'warrior',
+        guild: null,
+        specId: 'arms',
+        gear: { chest: 'gear_chest' },
+      },
+      { gear_chest: { id: 'gear_chest', name: 'Chest', slot: 'chest' } as never },
+    );
+    expect(m.specId).toBe('arms');
+    expect(m.gear?.left.find((cell) => cell.slot === 'chest')?.item?.id).toBe('gear_chest');
   });
 
   it('allows a null guild', () => {

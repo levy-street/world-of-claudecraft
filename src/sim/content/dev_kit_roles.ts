@@ -14,6 +14,10 @@
 // drift away from the talent tree. Two of those declared roles are worth noting
 // because they are not the genre default: mage/arcane is a HEALER in this game, and
 // druid/feral is a TANK.
+//
+// Each spec's leading primary stat is SPEC_PRIMARY_STAT's (content/spec_primary_stat.ts,
+// pinned by tests/spec_primary_stat.test.ts). Enhancement and Feral are Strength specs
+// here, not the genre's Agility: shaman and druid attack power never reads Agility.
 
 import type { PlayerClass } from '../types';
 
@@ -43,7 +47,6 @@ const PHYS_STR = { str: 1, agi: 0.5, sta: 0.6 } as const;
 const PHYS_AGI = { agi: 1, str: 0.4, sta: 0.6 } as const;
 // Tanks: survivability first. Stamina leads outright.
 const TANK_STR = { sta: 1, str: 0.7, agi: 0.4 } as const;
-const TANK_AGI = { sta: 1, agi: 0.8, str: 0.3 } as const;
 // Casters: intellect leads; a little spirit for regen, a little stamina to live.
 const CASTER = { int: 1, spi: 0.35, sta: 0.4 } as const;
 // Healers: intellect still leads but spirit matters far more than for a nuker.
@@ -79,9 +82,9 @@ export const DEV_KIT_ROLES: Readonly<Record<PlayerClass, readonly DevKitRole[]>>
   ],
   shaman: [
     { spec: 'elemental', weights: CASTER, melee: false },
-    // Enhancement is the agility-led melee shaman and its shared cadence advances
+    // Enhancement is the Strength-led melee shaman and its shared cadence advances
     // from both hands, so the test kit must exercise its real dual-wield rotation.
-    { spec: 'enhancement', weights: PHYS_AGI, melee: true, hands: 'dualWield' },
+    { spec: 'enhancement', weights: PHYS_STR, melee: true, hands: 'dualWield' },
     { spec: 'restoration', weights: HEALER, melee: false, healer: true, hands: 'shield' },
   ],
   mage: [
@@ -98,9 +101,9 @@ export const DEV_KIT_ROLES: Readonly<Record<PlayerClass, readonly DevKitRole[]>>
   ],
   druid: [
     { spec: 'balance', weights: CASTER, melee: false },
-    // Declared TANK in talents.ts. Agility-led rather than strength-led, and no
-    // shield: druids cannot hold one.
-    { spec: 'feral', weights: TANK_AGI, melee: true, tank: true },
+    // Declared TANK in talents.ts. Strength-led like the other tanks (Agility still
+    // counts, for the bear's dodge), and no shield: druids cannot hold one.
+    { spec: 'feral', weights: TANK_STR, melee: true, tank: true },
     { spec: 'restoration', weights: HEALER, melee: false, healer: true },
   ],
 });

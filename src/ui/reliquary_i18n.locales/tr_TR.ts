@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Yaban Yürek Çukuru',
-    desc: "Zulgar'dan ve Diş Lordu Canavar Efendisi'nden çıkan simge silahlar.",
+    desc: "Diş Lordu Canavar Efendisi, Obur Çiçek ve Zulgar'dan kendilerine özgü silahlar.",
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Kahramanca: Yaban Yürek Çukuru',
-    desc: "Zulgar, Çukurun Sesi'nden yalnızca kahramanca modda düşen epikler.",
+    desc: "Diş Lordu Canavar Efendisi, Obur Çiçek ve Çukurun Sesi Zulgar'dan yalnızca Kahramanca zorlukta düşen destansı eşyalar ve biblolar.",
   },
   conquerors_nythraxis: {
     name: 'Nythraxis Baskını',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, Uyanan Zirve',
     desc: "Uyanan Zirve'nin dünya patronundan çıkan kişisel epik ganimetler.",
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Gömülü Ustabaşı',
+    desc: 'Mirefen höyüklerinden çıkarılan ganimet.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Çökmüş Emanetlik',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Savaş Galerisi',
-    desc: 'Birinci sezonun beş Savaş muharebe takımı, şimdi altın karşılığında parça parça satılmaktadır.',
+    desc: 'Beş Savaş muharebe takımı, şerefle parça parça kazanılır.',
   },
   conquerors_warfare_armory: {
     name: 'Savaş Cephaneliği',
-    desc: 'Savaş takıları ve silahları, birinci sezon altın karşılığında ve iki harika eşya onur karşılığında.',
+    desc: 'Zorlukla kazanılmış şerefle satın alınan Savaş takıları, silahları ve eşyaları.',
   },
   conquerors_vanguard_gallery: {
     name: 'Öncü Galerisi',

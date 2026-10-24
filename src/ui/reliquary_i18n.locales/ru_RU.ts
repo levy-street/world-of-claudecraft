@@ -49,12 +49,12 @@ export const table: ReliquaryLocaleTable = {
     desc: 'Эпические предметы, которые падают только в героическом режиме с Корзула Могильного Вирма.',
   },
   conquerors_wildheart_basin: {
+    desc: 'Знаковое оружие Повелителя клыков, Цветожора и Зулгара.',
     name: 'Котловина Дикого Сердца',
-    desc: 'Знаковое оружие Зулгара и Повелителя клыков.',
   },
   conquerors_wildheart_basin_heroic: {
+    desc: 'Эпические предметы и аксессуары, доступные только на героической сложности, от Повелителя клыков, Цветожора и Зулгара, Голоса Котловины.',
     name: 'Героизм: Котловина Дикого Сердца',
-    desc: 'Эпические предметы, которые падают только в героическом режиме с Зулгара, Голоса Котловины.',
   },
   // The arena entity reads Рейдовая арена Нитраксиса; the page collects the
   // raid's spoils rather than naming the room, so the arena noun is dropped and
@@ -70,6 +70,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Тунзарр, Пробуждающийся пик',
     desc: 'Личная эпическая добыча с мирового босса Пробуждающегося пика.',
+  },
+  conquerors_balgath: {
+    name: 'Балгат, Погребённый Десятник',
+    desc: 'Добыча, вытащенная из курганов Мирфена.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Обрушившийся Реликварий',
@@ -163,11 +167,11 @@ export const table: ReliquaryLocaleTable = {
   // shipped armory noun (wocStore.armoryTitle Арсенал).
   conquerors_warfare_gallery: {
     name: 'Галерея Боевой мощи',
-    desc: 'Пять боевых комплектов Войны первого сезона, теперь продаются предмет за предметом за золото.',
+    desc: 'Пять боевых комплектов Войны, добываемых предмет за предметом за честь.',
   },
   conquerors_warfare_armory: {
     name: 'Арсенал Боевой мощи',
-    desc: 'Украшения и оружие Войны первого сезона, продаются за золото, и два аксессуара за честь.',
+    desc: 'Украшения, оружие и товары Войны, купленные за тяжело добытую честь.',
   },
   conquerors_vanguard_gallery: {
     name: 'Галерея Авангарда',

@@ -97,6 +97,7 @@ import { onCropHarvestedForDeeds } from '../deeds';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { gatheredMaterialSources } from '../material_gatherer';
 import { forceDismount } from '../mounts';
+import { farmBedFor } from '../moved_objects';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, INTERACT_RANGE, isConsuming } from '../types';
@@ -577,7 +578,7 @@ export function plantCrop(
   //    so validating here is what stops a live writer bug (or a forged
   //    command) minting a plot on a bed that is not a bed. Sits above the
   //    range check because the range check needs the bed's position.
-  const bed = farmBedById(bedId);
+  const bed = farmBedFor(ctx.objectMoves, farmBedById(bedId));
   if (!bed || !FARM_BED_IDS.has(bedId)) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'bad_bed', bedId, cropId });
     return;
@@ -817,7 +818,7 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     ctx.error(meta.entityId, "You can't do that while dead.");
     return;
   }
-  const bed = farmBedById(bedId);
+  const bed = farmBedFor(ctx.objectMoves, farmBedById(bedId));
   if (!bed || !FARM_BED_IDS.has(bedId)) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'bad_bed', bedId });
     return;

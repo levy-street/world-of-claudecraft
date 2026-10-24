@@ -547,10 +547,16 @@ describe('Broodmother egg aggro gate over a live tick loop (issue: eggs attack n
     }
     if (!widow) throw new Error('no mire_widow found near a spider_egg camp');
     sim.grid.refresh(sim.entities.values());
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    // The widow can kill the level-1 test player inside the window, which drops
+    // its target, so the claim is that it aggroed at all, not that it still is.
+    let widowAggroed = false;
+    for (let i = 0; i < 20 * 5; i++) {
+      sim.tick();
+      if (widow.aggroTargetId === sim.playerId) widowAggroed = true;
+    }
     expect(egg.aiState).toBe('idle');
     expect(egg.aggroTargetId).toBeNull();
-    expect(widow.aggroTargetId).toBe(sim.playerId);
+    expect(widowAggroed).toBe(true);
   });
 });
 

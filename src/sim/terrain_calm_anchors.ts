@@ -23,6 +23,8 @@
 import { FARSHORE_HULL_FRAGMENT_PLACEMENT } from './content/farshore_shipwreck_layout';
 import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
+import { TAVERN_KEEPER_NPC_ID } from './content/mirefen_tavern';
+import { TAVERN_PATRON_NPC_IDS } from './content/mirefen_tavern_patrons';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import { TRANSPORT_ROUTES } from './content/transport_ships';
 import { TUNNELS } from './content/tunnels';
@@ -43,6 +45,7 @@ import {
 import { GALE_HARBOR_DECKS } from './gale_harbor';
 import { GLIDER_WHARF_DECKS } from './glider_wharf_layout';
 import { REACH_DECKS } from './reach_decks';
+import { isStudioOverlayRow } from './studio_content';
 import { WORLD_BOSSES } from './world_boss';
 
 // The skirt's own contribution to radial slope is bounded by
@@ -166,7 +169,17 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   for (const node of GATHER_NODES) pad('gatherNode', node.pos.x, node.pos.z, 5, 12, false);
   for (const id in NPCS) {
     if (Object.hasOwn(WORLD_QUEST_CALLIGRAPHY_NPCS, id)) continue;
+    // Studio rows (studio_content.ts) never shape terrain: the calm tables are
+    // cached per seed, not per content, and must stay the release's.
+    if (isStudioOverlayRow('npc', id)) continue;
+    // the Mirefen tavern's innkeeper and patrons stand on the tavern's own floor, never the
+    // terrain: their pads would only reshape the ground under the building (no terrain edit)
+    if (id === TAVERN_KEEPER_NPC_ID || TAVERN_PATRON_NPC_IDS.includes(id)) continue;
     const npc = NPCS[id];
+    // A fixed-post NPC (the Muster Commander) is raised by its owning system on ground
+    // that system measured as it stands; calming it would re-grade a camp already fitted
+    // to the hillside (src/sim/muster_camp_layout.ts), so it adds no pad.
+    if (npc.fixedPost) continue;
     pad('npc', npc.pos.x, npc.pos.z, 6, 14, false);
   }
   // Precision-graded landforms outside the content tables: the Glacier Tarn
@@ -189,6 +202,7 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     // both seeds), so this changes no terrain; it stops them silently
     // activating if the character layers near the origin ever diverge.
     if (DUNGEONS[id].overworldDoor === false) continue;
+    if (isStudioOverlayRow('dungeon', id)) continue;
     const door = DUNGEONS[id].doorPos;
     pad('dungeonDoor', door.x, door.z, 7, 15);
   }
@@ -224,8 +238,12 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     pad('tunnelMouth', mouthA.x, mouthA.z, mouthA.radius + 2, mouthA.radius + 9);
     pad('tunnelMouth', mouthB.x, mouthB.z, mouthB.radius + 2, mouthB.radius + 9);
   }
-  // World-boss stands: the fight needs a workable raid floor.
-  for (const boss of WORLD_BOSSES) pad('worldBoss', boss.pos.x, boss.pos.z, 10, 18);
+  // World-boss stands: the fight needs a workable raid floor, unless the boss sleeps in
+  // an authored landform that already is one (WorldBossDef.raidFloorPad).
+  for (const boss of WORLD_BOSSES) {
+    if (boss.raidFloorPad === false) continue;
+    pad('worldBoss', boss.pos.x, boss.pos.z, 10, 18);
+  }
   // Escort runs: the escortee walks the authored polyline, so the whole
   // lane keeps workable ground (pads at every authored point plus samples
   // every 8yd along each leg).

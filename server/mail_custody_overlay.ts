@@ -34,6 +34,8 @@
 import {
   HOARD_REWARD_LETTER,
   type LetterDef,
+  MEMBERSHIP_ANNUAL_LETTER,
+  MEMBERSHIP_TOKEN_LETTER,
   WOC_MARKET_DELIVERY_LETTER,
   WOC_MARKET_RETURN_LETTER,
   WOC_MARKET_SOLD_LETTER,
@@ -66,7 +68,13 @@ CREATE TABLE IF NOT EXISTS mail_custody_watermark (
 );
 `;
 
-export type CustodyParcelLetter = 'delivery' | 'return' | 'sold_notice' | 'vault_reward';
+export type CustodyParcelLetter =
+  | 'delivery'
+  | 'return'
+  | 'sold_notice'
+  | 'vault_reward'
+  | 'membership_token'
+  | 'membership_annual';
 
 /** The letter templates by overlay kind. A replayed parcel uses the same
  *  static letter and its own stored coin and item payload. */
@@ -75,6 +83,8 @@ export const CUSTODY_PARCEL_LETTERS: Record<CustodyParcelLetter, LetterDef> = {
   return: WOC_MARKET_RETURN_LETTER,
   sold_notice: WOC_MARKET_SOLD_LETTER,
   vault_reward: HOARD_REWARD_LETTER,
+  membership_token: MEMBERSHIP_TOKEN_LETTER,
+  membership_annual: MEMBERSHIP_ANNUAL_LETTER,
 };
 
 export interface CustodyParcelRow {
@@ -297,7 +307,7 @@ export async function pruneMailCustodyParcelsBatch(batchSize: number): Promise<n
       WHERE ctid IN (
         SELECT ctid FROM mail_custody_parcels
          WHERE created_at < now() - ($1 || ' days')::interval
-           AND letter <> 'vault_reward'
+           AND letter NOT IN ('vault_reward', 'membership_token', 'membership_annual')
          LIMIT $2)`,
     [String(MAIL_CUSTODY_RESIDUE_RETENTION_DAYS), Math.max(1, Math.floor(batchSize))],
   );
@@ -309,7 +319,9 @@ function isCustodyParcelLetter(value: unknown): value is CustodyParcelLetter {
     value === 'delivery' ||
     value === 'return' ||
     value === 'sold_notice' ||
-    value === 'vault_reward'
+    value === 'vault_reward' ||
+    value === 'membership_token' ||
+    value === 'membership_annual'
   );
 }
 

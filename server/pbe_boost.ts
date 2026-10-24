@@ -595,8 +595,37 @@ function fillHands(
       return;
     }
   }
-  const mainhand = weapons[0];
+  // The offhand a one-hander pairs with: the best of a shield / held offhand,
+  // or, for a dual-wielder (rogue at spawn: no spec is chosen yet), the
+  // second-best one-hand weapon. The second weapon must be offhand-legal
+  // (canEquipItemInSlot excludes two-handers and mainhand-only weapons for a
+  // spec-less dual-wielder); anything else would displace the mainhand pick
+  // on equip.
+  const offhandFor = (main: ScoredWeapon): ScoredItem | undefined => {
+    const second = reads.canDualWieldSpecless(cls)
+      ? weapons.find((w) => w.id !== main.id && reads.canEquipInSlot(cls, w.id, 'offhand', null))
+      : undefined;
+    return [held, second]
+      .filter((c): c is ScoredItem => c !== undefined)
+      .sort((a, b) => b.score - a.score)[0];
+  };
+  let mainhand = weapons[0];
   if (!mainhand) return;
+  // A caster's top weapon can be a two-hander that alone outscores the best
+  // one-hander but not the one-hander plus its held offhand or shield (the
+  // healer staff against a one-hander and orb), so casters compare the two
+  // loadouts. Melee roles keep the top weapon: a two-hander is their identity
+  // and a shield's armor must not talk them into sword and board.
+  if (mainhand.twoHand && !role.melee) {
+    const oneHand = weapons.find((w) => !w.twoHand);
+    const twoHandOff = held && !reads.occupiesHand(held.id) ? held.score : 0;
+    if (
+      oneHand &&
+      oneHand.score + (offhandFor(oneHand)?.score ?? 0) > mainhand.score + twoHandOff
+    ) {
+      mainhand = oneHand;
+    }
+  }
   kit.mainhand = mainhand.id;
   if (mainhand.twoHand) {
     // A two-handed mainhand occupies both hands, so the sim's displacement
@@ -611,18 +640,7 @@ function fillHands(
     if (held && !reads.occupiesHand(held.id)) kit.offhand = held.id;
     return;
   }
-  // Otherwise the offhand takes the best of a shield / held offhand, or, for a
-  // dual-wielder (rogue at spawn: no spec is chosen yet), the second-best
-  // one-hand weapon. The second weapon must be offhand-legal
-  // (canEquipItemInSlot excludes two-handers and mainhand-only weapons for a
-  // spec-less dual-wielder); anything else would displace the mainhand pick
-  // on equip.
-  const second = reads.canDualWieldSpecless(cls)
-    ? weapons.find((w) => w.id !== mainhand.id && reads.canEquipInSlot(cls, w.id, 'offhand', null))
-    : undefined;
-  const off = [held, second]
-    .filter((c): c is ScoredItem => c !== undefined)
-    .sort((a, b) => b.score - a.score)[0];
+  const off = offhandFor(mainhand);
   if (off) kit.offhand = off.id;
 }
 
@@ -646,7 +664,7 @@ export function bestBoostBag(): string {
     // boosted character 4 sockets of materials capacity and a bare 16-slot
     // backpack for their gear, which is the opposite of what the boost is for.
     if (isMaterialsOnlyBag(item)) continue;
-    if (item.unique) continue;
+    if (item.unique || item.noDiscard) continue;
     const slots = item.bagSlots ?? 0;
     const bestSlots = best ? (best.bagSlots ?? 0) : Number.NEGATIVE_INFINITY;
     if (slots > bestSlots || (slots === bestSlots && best !== null && item.id < best.id)) {
@@ -693,7 +711,11 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
 // them nothing): enhancement and feral role weights flip str-first and the
 // four agi-lined Crucible sets re-stat to str-primary, moving several
 // enhancement and feral kit picks; the bump re-kits the fleet.
-export const BOOST_KIT_VERSION = 6;
+// v7: the Crucible healer electives trade Hit for Crit, which the kit scores
+// (Loop of Quiet Springs joins the holy priest and holy paladin rings), and
+// casters now weigh a two-hander against a one-hander plus its offhand so the
+// healer staff's new Crit cannot strip the holy kits' orb and shield.
+export const BOOST_KIT_VERSION = 7;
 
 /**
  * Bring one live player up to the current boost kit: level 20, the best

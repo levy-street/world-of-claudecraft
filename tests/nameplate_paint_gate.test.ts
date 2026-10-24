@@ -61,13 +61,17 @@ function fields(overrides: Partial<NameplatePaintFields> = {}): NameplatePaintFi
     currentTarget: false,
     hostile: true,
     deadEnemy: false,
+    bounty: false,
     myPet: false,
     friendlyPet: false,
     threat: false,
+    emphasis: false,
+    overheadMarker: false,
     opacity: 1,
     frame: '',
     comboPips: 0,
     dots: { slots: [], count: 0, scale: 1 },
+    cooldowns: { slots: [], count: 0, scale: 1 },
     aiLabel: '',
     cheaterLabel: '',
     devOutline: null,
@@ -133,6 +137,7 @@ describe('nameplate paint gate core', () => {
     ['guild line', fields({ guild: 'Vale', guildLabel: '<Vale>' })],
     ['deed title', fields({ title: 'the Bold' })],
     ['deed border', fields({ border: 'ember' })],
+    ['bounty', fields({ bounty: true })],
     ['elite frame', fields({ frame: 'elite' })],
     ['combo pips', fields({ comboPips: 3 })],
     [
@@ -154,6 +159,24 @@ describe('nameplate paint gate core', () => {
         },
       }),
     ],
+    [
+      'enemy cooldown row',
+      fields({
+        cooldowns: {
+          count: 1,
+          scale: 1,
+          slots: [
+            {
+              iconUrl: '/ui/skills/druid/barkskin.webp',
+              group: 'defensive',
+              active: true,
+              unit: 'seconds',
+              timeText: '11',
+            },
+          ],
+        },
+      }),
+    ],
     ['raid marker', fields({ raidMarkerUrl: 'data:image/png;base64,skull' })],
     ['overhead emote', fields({ emoteIconUrl: '/ui/emotes/emote-wave.png', emoteLabel: 'Wave' })],
     ['badge set', fields({ badges: [{ url: '/badge.webp', size: 15 }] })],
@@ -170,6 +193,41 @@ describe('nameplate paint gate core', () => {
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
     badge.size = 24;
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+  });
+
+  it('repaints when a cooldown slot flips from active to recharging in place', () => {
+    const gate = new NameplatePaintGate();
+    const slot = {
+      iconUrl: '/ui/skills/druid/barkskin.webp',
+      group: 'defensive',
+      active: true,
+      unit: 'seconds',
+      timeText: '2',
+    };
+    const f = fields({ cooldowns: { count: 1, scale: 1, slots: [slot] } });
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
+    slot.active = false;
+    slot.timeText = '';
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+  });
+
+  it('repaints on the active flag alone, with every other field unchanged', () => {
+    // A spent slot and a buff whose text has not been resolved yet can share
+    // icon, group, unit and (empty) text: only `active` tells them apart.
+    const gate = new NameplatePaintGate();
+    const slot = {
+      iconUrl: '/ui/skills/druid/barkskin.webp',
+      group: 'defensive',
+      active: false,
+      unit: 'seconds',
+      timeText: '',
+    };
+    const f = fields({ cooldowns: { count: 1, scale: 1, slots: [slot] } });
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
+    slot.active = true;
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
   });
 
@@ -437,6 +495,7 @@ function harness(options: { devicePixelRatio?: number; renderPixelRatio?: number
     showOwnNameplate: () => false,
     showPlayerNameplates: () => true,
     isHostilePlayer: () => false,
+    showPetNames: () => true,
   });
   const canvas = (painter as unknown as { surface: { canvas: HTMLCanvasElement } }).surface.canvas;
   return {

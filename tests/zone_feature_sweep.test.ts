@@ -131,6 +131,27 @@ describe('zone feature sweep', () => {
     expect(noExtent.visible).toBe(false);
   });
 
+  it('combines per-group scenery horizons with Studio zone isolation', () => {
+    const inside = group('inside');
+    const outside = group('outside');
+    const shortHorizon = group('short-horizon');
+    const entries = [entryFor(inside, 100), entryFor(outside, 300), entryFor(shortHorizon, 150)];
+    const cullFar = (g: ZoneFeatureEntry['group']) => (g.name === 'short-horizon' ? 50 : 850);
+    sweepZoneFeatures(entries, 0, 0, cullFar, 105, {
+      minX: 0,
+      maxX: 200,
+      minZ: -20,
+      maxZ: 20,
+    });
+    expect(inside.visible).toBe(true);
+    expect(outside.visible).toBe(false);
+    expect(shortHorizon.visible).toBe(false);
+
+    sweepZoneFeatures(entries, 0, 0, cullFar, 105);
+    expect(outside.visible).toBe(true);
+    expect(shortHorizon.visible).toBe(false);
+  });
+
   it('keeps the reach state per entry across frames (hysteresis)', () => {
     // Two entries with opposite histories in one sweep list, the camera the
     // only thing that moves between frames: the shown one rides the band,

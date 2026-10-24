@@ -5,8 +5,15 @@ import {
 } from '../../../sim/content/talents';
 import { abilitiesKnownAt } from '../../../sim/data';
 import type { AbilityDef, PlayerClass } from '../../../sim/types';
+import type { PetCommand } from '../../../world_api/pet';
+import { isPetSlotCommand } from './pet_slot_core';
 
-export type HotbarAction = { type: 'ability'; id: string } | { type: 'item'; id: string } | null;
+// A 'pet' slot runs one of the pet-bar commands (pet_slot_core.ts).
+export type HotbarAction =
+  | { type: 'ability'; id: string }
+  | { type: 'item'; id: string }
+  | { type: 'pet'; id: PetCommand }
+  | null;
 
 export interface HotbarStorage {
   getItem(key: string): string | null;
@@ -104,6 +111,7 @@ export function parseHotbarAction(
   if (action.type === 'ability' && abilityExists(action.id))
     return { type: 'ability', id: action.id };
   if (action.type === 'item' && itemExists(action.id)) return { type: 'item', id: action.id };
+  if (action.type === 'pet' && isPetSlotCommand(action.id)) return { type: 'pet', id: action.id };
   return null;
 }
 
@@ -284,6 +292,24 @@ export function placeItemOnSlot(
   return next;
 }
 
+/** The pet command a slot holds, or null: every action-bar view's petCommand(). */
+export function hotbarPetCommand(action: HotbarAction): PetCommand | null {
+  return action?.type === 'pet' ? action.id : null;
+}
+
+// A pet command copies onto the slot like an item does: the pet bar keeps its own
+// button, and the same command may sit on more than one slot.
+export function placePetOnSlot(
+  actions: readonly HotbarAction[],
+  command: PetCommand,
+  targetIndex: number,
+): HotbarAction[] {
+  const next = actions.slice();
+  if (targetIndex < 0 || targetIndex >= next.length) return next;
+  next[targetIndex] = { type: 'pet', id: command };
+  return next;
+}
+
 export function swapHotbarSlots(
   actions: readonly HotbarAction[],
   sourceIndex: number,
@@ -308,8 +334,11 @@ export function swapHotbarSlots(
 export function buildDefaultFormBar(
   kitAbilityIds: readonly string[],
   slots: number,
-): HotbarAction[] {
-  const next: HotbarAction[] = Array.from({ length: slots }, () => null);
+): ({ type: 'ability'; id: string } | null)[] {
+  const next: ({ type: 'ability'; id: string } | null)[] = Array.from(
+    { length: slots },
+    () => null,
+  );
   const seen = new Set<string>();
   let i = 0;
   for (const id of kitAbilityIds) {
@@ -380,22 +409,6 @@ export function loadoutKnownAbilityIds(
   );
 }
 
-// The ability ids an allocation itself GRANTS (its spec signature and every
-// choice-row spell), narrowed to the bar-eligible known set above. These are
-// the spells a spec defines, so a bar that lacks one of them (a per-spec bar
-// seeded from the pre-spec key, a build saved while that was the live bar) is
-// treated as a stale capture and gets them auto-placed: ActionBarController's
-// legacy-seed heal and applyLoadout both use exactly this set, nothing wider.
-export function loadoutGrantedAbilityIds(
-  cls: PlayerClass,
-  alloc: TalentAllocation,
-  level: number,
-): Set<string> {
-  const known = loadoutKnownAbilityIds(cls, alloc, level);
-  const mods = computeTalentModifiers(cls, alloc, level);
-  return new Set(mods.grants.map((grant) => grant.ability).filter((id) => known.has(id)));
-}
-
 function normalizeLoadoutBarSlots(
   bar: readonly (string | null)[],
   slots: number,
@@ -434,8 +447,9 @@ export function applyLoadoutBar(
     if (i >= normalizedBar.length) return current[i] ?? null;
     const v = normalizedBar[i];
     if (typeof v === 'string' && abilityExists(v)) return { type: 'ability' as const, id: v };
+    // A pet command is not an ability either, so it survives the switch the same way.
     const existing = current[i];
-    return existing?.type === 'item' ? existing : null;
+    return existing?.type === 'item' || existing?.type === 'pet' ? existing : null;
   });
 }
 

@@ -115,7 +115,9 @@ export class EditorTutorial {
         el(
           'span',
           'ed-help-term',
-          t('editor.tool.keyHint', { name: t(def.labelKey), key: def.key.toUpperCase() }),
+          def.key
+            ? t('editor.tool.keyHint', { name: t(def.labelKey), key: def.key.toUpperCase() })
+            : t(def.labelKey),
         ),
       );
       li.appendChild(el('span', undefined, t(`editor.help.tool.${def.tool}` as TKey)));
@@ -135,6 +137,7 @@ export class EditorTutorial {
       'editor.help.key.undo',
       'editor.help.key.save',
       'editor.help.key.duplicate',
+      'editor.help.key.multiSelect',
       'editor.help.key.nudge',
       'editor.help.key.wheel',
       'editor.help.key.delete',

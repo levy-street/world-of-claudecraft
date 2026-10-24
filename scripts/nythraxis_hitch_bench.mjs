@@ -13,7 +13,7 @@
 // Both legs are parked in an Aldric-free start zone first (ALDRIC_FREE_PARK_POS):
 // world entry prewarms the spawn zone's static NPC models, and the zones a leg
 // would otherwise start in (Eastbrook fresh, the crypt door after a disconnect)
-// all place a brother_aldric on the same npc_aldric key, which would leave the
+// all place a brother_aldric on the same priest-body key, which would leave the
 // aldric row comparing a model both legs already had.
 //
 //   npm run db:up
@@ -167,7 +167,7 @@ async function createObserverCharacter(fixture) {
 
 // Parks the observer in an Aldric-free zone between legs, over the game's own
 // dev command rather than a DB write, so the leg that follows enters the world
-// with npc_aldric genuinely cold. Resuming a linkdead session works the same
+// with Aldric's body key genuinely cold. Resuming a linkdead session works the same
 // way: being inside an instance is positional (dungeonAt reads pos.x), so the
 // teleport really leaves the arena, and the next leg opens with /dev raid reset.
 async function parkObserver(fixture, pos) {
@@ -561,7 +561,7 @@ async function runLeg({ origin, fixture, roster, prewarm, name }) {
     await sleep(200);
 
     // World entry prewarms every static NPC model of the spawn zone, and the
-    // Eastbrook brother_aldric shares npc_aldric with the raid Aldric. When
+    // Eastbrook brother_aldric shares his body key with the raid Aldric. When
     // that is already true here, the catalog's Aldric arm is a no-op and the
     // aldric row below says nothing about the prewarm either way.
     const aldricVisualWarmAtEntry = await page.evaluate(

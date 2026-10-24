@@ -131,8 +131,8 @@ describe('ground-targeted casting (Flamestrike)', () => {
   });
 });
 
-// The thematic per-class ground-targeted spells. Volley (hunter) and Hurricane
-// (druid) are channeled. Reworked Rain of Fire and Earthquake are instant
+// The thematic per-class ground-targeted spells. Hurricane (druid) is channeled.
+// Reworked Rain of Fire, Earthquake and Volley (hunter, PR 4488) are instant
 // lingering ground zones.
 describe('ground-targeted casting (thematic per-class spells)', () => {
   function castGroundSpell(cls: PlayerClass, spell: string, aim: { x: number; z: number }): Sim {
@@ -162,10 +162,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     return sim;
   }
 
-  const channeled = [
-    { cls: 'hunter', spell: 'volley' },
-    { cls: 'druid', spell: 'hurricane' },
-  ] as const;
+  const channeled = [{ cls: 'druid', spell: 'hurricane' }] as const;
 
   for (const c of channeled) {
     it(`${c.spell} (${c.cls}) begins a channel aimed at the (clamped) point`, () => {
@@ -282,6 +279,23 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     for (let i = 0; i < 120 && me?.castingAbility; i++) sim.tick();
     expect(me?.castingAbility).toBeNull();
     expect(me?.castAim).toBeNull();
+  });
+
+  it('volley (hunter) is instant and leaves a 3 sec armored arrow zone at the clamped point', () => {
+    const sim = castGroundSpell('hunter', 'volley', { x: 100, z: 0 }); // far beyond range
+    const me = sim.entities.get(sim.playerId);
+    expect(me?.channeling).toBe(false);
+    expect(me?.castingAbility).toBeNull();
+    const zone = (sim as unknown as { groundAoEs: GroundAoE[] }).groundAoEs.find(
+      (z) => z.abilityId === 'volley',
+    );
+    expect(zone).toBeDefined();
+    expect(zone?.pos.x).toBeCloseTo(35, 0);
+    expect(zone?.radius).toBe(8);
+    expect(zone?.remaining).toBeCloseTo(3, 5);
+    expect(zone?.interval).toBe(0.5);
+    expect(zone?.armorMitigated).toBe(true);
+    expect(sim.resolvedAbility('volley')?.cooldown).toBe(10);
   });
 
   it('earthquake (shaman) drops a lingering nature zone at the aimed point', () => {

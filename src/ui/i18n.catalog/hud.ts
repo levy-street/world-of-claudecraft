@@ -492,6 +492,9 @@ const hudStringsEn = {
       // non-Latin overlays carry real fills.
       respawnKeeperToll:
         "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
+      // The Drowned Temple's Moonbridge forming (the Tideglass Colossus falls):
+      // the centre-screen banner beside its chat line (log_event_cues.ts).
+      moonbridgeBanner: 'The Moonbridge Rises',
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',
       playerNotNearby: 'That player is not nearby.',

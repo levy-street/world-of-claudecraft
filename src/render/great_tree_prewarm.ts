@@ -27,7 +27,7 @@ import { GFX, type GfxSettings } from './gfx';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 /** Same asset the four zone-feature modules clone their giants from. */
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 
 let greatTreeScene: THREE.Group | null = null;
 let greatTreeTask: Promise<void> | null = null;

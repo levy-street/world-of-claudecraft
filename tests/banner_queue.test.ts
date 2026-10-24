@@ -5,22 +5,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import {
-  BANNER_QUEUE_LIMIT,
-  BannerQueue,
-  bannerSubtextLines,
-  isBannerStale,
-} from '../src/ui/banner_queue';
-
-describe('banner expiry', () => {
-  it('expires ambient state only after four seconds, but preserves celebrations', () => {
-    expect(isBannerStale({ bannerClass: 'ambient', enqueuedAt: 100 }, 4100)).toBe(false);
-    expect(isBannerStale({ bannerClass: 'ambient', enqueuedAt: 100 }, 4101)).toBe(true);
-    for (const bannerClass of ['levelup', 'deed', 'loot'] as const) {
-      expect(isBannerStale({ bannerClass, enqueuedAt: 100 }, 100000)).toBe(false);
-    }
-  });
-});
+import { BANNER_QUEUE_LIMIT, BannerQueue, bannerSubtextLines } from '../src/ui/banner_queue';
 
 describe('BannerQueue', () => {
   it('keeps successive loot wins and prevents a zone message from replacing a win', () => {

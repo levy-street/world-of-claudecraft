@@ -68,6 +68,15 @@ describe('MediaWiki ability visibility', () => {
     expect(xml).not.toContain('[[undefined]]');
   });
 
+  it('publishes a usable static Bear Trap reference without a live tooltip token', () => {
+    const article = xml.split('<title>Bear Trap (Ability)</title>')[1]?.split('</page>')[0];
+    expect(article).toBeDefined();
+    expect(article).toContain('85 Physical damage at zero Ranged Attack Power over 15 sec');
+    expect(article).toContain('5 times, once every 3 sec');
+    expect(article).toContain('each tick is rounded to a whole number');
+    expect(article).not.toMatch(/\$d|\{damage\}/);
+  });
+
   it('publishes the reworked Retribution defensive under its current name only', () => {
     expect(xml).toContain('<title>Debt of Light (Ability)</title>');
     expect(xml).not.toContain('Faithforged Guard (Ability)');

@@ -10,7 +10,9 @@
 // authoring data the game's creator cannot change, so a code neither carries
 // nor overwrites them. The importer therefore keeps the body it found, which
 // is what randomize does too; reset is the one whole-look action that returns
-// the proportions to neutral along with everything else.
+// the proportions to neutral along with everything else. The body SIZE is the
+// exception that proves the rule: the creator's slider changes it, so it rides
+// the code (`size`, in percent).
 //
 // Pure core (RENDER_PURE_CORES): no DOM, no Three, no i18n, no clock, no
 // randomness. Decode failures are stable discriminators the UI localizes.
@@ -23,7 +25,6 @@ import {
   EARRING_STYLES,
   EYE_STYLES,
   FACE_SLIDERS,
-  type FaceSlider,
   HAIR_STYLES,
   LIP_SHADES,
   MOUTH_STYLES,
@@ -32,6 +33,12 @@ import {
   OUTFIT_COLORWAY_IDS,
   SHADOW_SHADES,
 } from './modular';
+import {
+  WOC_HEAD_MORPH_KEYS,
+  WOC_HEAD_MORPH_RANGE,
+  WOC_PIERCING_IDS,
+  wocHeadSlotIds,
+} from './woc_head_catalog';
 
 /** The versioned header every code starts with. Bump the digit only for a
  *  change old importers cannot survive; additive fields do not need one. */
@@ -66,7 +73,15 @@ type StylePick =
   | 'lipstick'
   | 'blush'
   | 'eyeshadow'
-  | 'outfit';
+  | 'outfit'
+  | 'headHair'
+  | 'headBeard'
+  | 'headNose'
+  | 'headMouth'
+  | 'headBrows'
+  | 'headEars'
+  | 'headEyes'
+  | 'headPiercing';
 
 type ColorTriple = readonly [
   hue: keyof ModularAppearance,
@@ -154,36 +169,70 @@ const lashesField: DesignField = {
   kept: (draft, normalized) => draft.lashes === normalized.lashes,
 };
 
-const faceField: DesignField = {
-  id: 'face',
-  // Only the moved sliders are written (`nose:-40,jaw:20`); a sculpted-default
-  // face encodes as the empty value, so the field is still visibly present.
-  encode: (a) =>
-    FACE_SLIDERS.filter((k) => Math.round((a.face?.[k] ?? 0) * 100) !== 0)
-      .map((k) => `${k}:${Math.round((a.face?.[k] ?? 0) * 100)}`)
-      .join(','),
-  apply: (draft, raw, warn) => {
-    const face: Partial<Record<FaceSlider, number>> = {};
-    const body = raw.trim();
-    if (body !== '') {
-      for (const part of body.split(',')) {
-        const m = part.trim().match(/^([a-z]+)\s*:\s*(-?\d+(?:\.\d+)?)$/i);
-        if (!m) return false;
-        const key = m[1].toLowerCase() as FaceSlider;
-        if (!FACE_SLIDERS.includes(key)) {
-          warn(`face.${m[1]}`);
-          continue;
+/** A morph-slider map (the KayKit face, the WOC head's shape): only the
+ *  MOVED sliders are written (`nose:-40,jaw:20`), in whole percent, so a
+ *  sculpted-default map encodes as the empty value and the field is still
+ *  visibly present. "Moved" is measured from each slider's own rest value
+ *  (`rest`, 0 unless named: the WOC chin rests at 0.65), and a slider a code
+ *  leaves out imports AT that rest value, so a code minted before a slider
+ *  existed never reads as having moved it. Slider names match
+ *  case-insensitively on import, so the camelCase WOC names (`eyeSpacing`)
+ *  survive a paste that lowercased them. */
+function sliderMapField(
+  id: string,
+  key: 'face' | 'headShape',
+  sliders: readonly string[],
+  rest: (slider: string) => number = () => 0,
+): DesignField {
+  const byLower = new Map(sliders.map((k) => [k.toLowerCase(), k]));
+  const read = (a: Partial<ModularAppearance>, k: string): number =>
+    (a[key] as Record<string, number> | undefined)?.[k] ?? rest(k);
+  return {
+    id,
+    encode: (a) =>
+      sliders
+        .filter((k) => Math.round(read(a, k) * 100) !== Math.round(rest(k) * 100))
+        .map((k) => `${k}:${Math.round(read(a, k) * 100)}`)
+        .join(','),
+    apply: (draft, raw, warn) => {
+      const map: Record<string, number> = {};
+      const body = raw.trim();
+      if (body !== '') {
+        for (const part of body.split(',')) {
+          const m = part.trim().match(/^([a-z]+)\s*:\s*(-?\d+(?:\.\d+)?)$/i);
+          if (!m) return false;
+          const slider = byLower.get(m[1].toLowerCase());
+          if (!slider) {
+            warn(`${id}.${m[1]}`);
+            continue;
+          }
+          map[slider] = Number(m[2]) / 100;
         }
-        face[key] = Number(m[2]) / 100;
       }
-    }
-    draft.face = face as ModularAppearance['face'];
+      (draft as Record<string, unknown>)[key] = map;
+      return true;
+    },
+    kept: (draft, normalized) =>
+      sliders.every((k) => Math.abs(read(draft, k) - read(normalized, k)) <= UNIT_EPS * 10),
+  };
+}
+
+/** The WOC body size as a whole-or-one-decimal percent of the authored size
+ *  (`size=95`; the creator's slider shows the same value as its offset, -5). An
+ *  empty or non-numeric value is damage, not a
+ *  default: `Number('')` is 0, which would clamp to the smallest body and hide
+ *  the truncation. */
+const sizeField: DesignField = {
+  id: 'size',
+  encode: (a) => fmt(a.bodyScale * 100),
+  apply: (draft, raw) => {
+    const text = raw.trim();
+    if (!/^\d+(?:\.\d+)?$/.test(text)) return false;
+    draft.bodyScale = Number(text) / 100;
     return true;
   },
   kept: (draft, normalized) =>
-    FACE_SLIDERS.every(
-      (k) => Math.abs((draft.face?.[k] ?? 0) - (normalized.face[k] ?? 0)) <= UNIT_EPS * 10,
-    ),
+    Math.abs((draft.bodyScale as number) - normalized.bodyScale) <= UNIT_EPS,
 };
 
 /** The registry: every changeable creator feature, its stable wire id, and
@@ -203,7 +252,7 @@ export const DESIGN_FIELDS: readonly DesignField[] = [
   pickField('ears', 'ears', EAR_STYLES),
   lashesField,
   colorField('lashcol', ['lashHue', 'lashSat', 'lashLight']),
-  faceField,
+  sliderMapField('face', 'face', FACE_SLIDERS),
   pickField('hair', 'hair', HAIR_STYLES),
   colorField('haircol', ['hairHue', 'hairSat', 'hairLight']),
   pickField('beard', 'beard', BEARD_STYLES),
@@ -213,14 +262,102 @@ export const DESIGN_FIELDS: readonly DesignField[] = [
   pickField('shadow', 'eyeshadow', SHADOW_SHADES),
   pickField('earrings', 'earrings', EARRING_STYLES),
   pickField('jewel', 'earringMaterial', EARRING_MATERIAL_IDS),
+  // The WOC head builder. Additive ids, so no header bump: a code minted
+  // before them imports with the default head (and brows that follow its
+  // hair), and an older build imports these around, into `ignored`. A pick is
+  // kept whatever the body: which head type draws it is a render-time call
+  // (resolveWocHeadLook), exactly as for a stored look.
+  pickField('headhair', 'headHair', wocHeadSlotIds('hair')),
+  pickField('headnose', 'headNose', wocHeadSlotIds('nose')),
+  pickField('headmouth', 'headMouth', wocHeadSlotIds('mouth')),
+  pickField('headbrows', 'headBrows', wocHeadSlotIds('brows')),
+  pickField('headears', 'headEars', wocHeadSlotIds('ears')),
+  pickField('headeyes', 'headEyes', wocHeadSlotIds('eyes')),
+  pickField('headpiercing', 'headPiercing', WOC_PIERCING_IDS),
+  colorField('browcol', ['browHue', 'browSat', 'browLight']),
+  // each control's rest value is its range default, so the chin (resting at
+  // 0.65) is written only once it moves, and a code minted before the chin
+  // existed imports on the authored chin
+  sliderMapField(
+    'headshape',
+    'headShape',
+    WOC_HEAD_MORPH_KEYS,
+    (k) => WOC_HEAD_MORPH_RANGE[k as keyof typeof WOC_HEAD_MORPH_RANGE]?.def ?? 0,
+  ),
+  // Additive, like the head builder's: a code minted before the beard or the
+  // body size imports on the body type's own beard default and the authored
+  // size (normalizeAppearance), and an older build imports these around.
+  pickField('headbeard', 'headBeard', wocHeadSlotIds('beard')),
+  sizeField,
 ];
+
+const FIELD_BY_ID: ReadonlyMap<string, DesignField> = new Map(DESIGN_FIELDS.map((f) => [f.id, f]));
+
+/** The face code: the fields the WOC face builder edits, in the order its code
+ *  lists them (the body pick and size, the four colours, every head piece, the
+ *  face controls), and nothing the builder cannot show. It is the SAME wire
+ *  format with fewer fields (same header, ids and value spellings), so the one
+ *  decoder reads it and a full design code still imports into the builder.
+ *  tests/design_code.test.ts pins the list. */
+export const WOC_FACE_CODE_FIELDS: readonly string[] = [
+  'body',
+  'size',
+  'skin',
+  'eyecol',
+  'haircol',
+  'browcol',
+  'headhair',
+  'headbeard',
+  'headnose',
+  'headmouth',
+  'headbrows',
+  'headears',
+  'headeyes',
+  'headpiercing',
+  'headshape',
+];
+
+/** The face code's fields, resolved once: an id that is not a design code
+ *  field fails at load, never as a code missing a field. */
+const WOC_FACE_FIELDS: readonly DesignField[] = WOC_FACE_CODE_FIELDS.map((id) => {
+  const field = FIELD_BY_ID.get(id);
+  if (!field) throw new Error(`face code field "${id}" is not a design code field`);
+  return field;
+});
+
+function encodeFields(
+  appearance: Partial<ModularAppearance> | null,
+  fields: readonly DesignField[],
+): string {
+  const a = normalizeAppearance(appearance);
+  return `${DESIGN_CODE_HEADER}; ${fields.map((f) => `${f.id}=${f.encode(a)}`).join('; ')}`;
+}
 
 /** Serialize a look as a shareable one-line code. The input is normalized
  *  first, so the emitted values are always in range and re-importable
  *  verbatim. */
 export function encodeDesignCode(appearance: Partial<ModularAppearance> | null): string {
-  const a = normalizeAppearance(appearance);
-  return `${DESIGN_CODE_HEADER}; ${DESIGN_FIELDS.map((f) => `${f.id}=${f.encode(a)}`).join('; ')}`;
+  return encodeFields(appearance, DESIGN_FIELDS);
+}
+
+/** Serialize a look's FACE as a shareable one-line code (WOC_FACE_CODE_FIELDS):
+ *  what the WOC face builder's Share page shows and copies. */
+export function encodeWocFaceCode(appearance: Partial<ModularAppearance> | null): string {
+  return encodeFields(appearance, WOC_FACE_FIELDS);
+}
+
+/** Lift a code out of what a chat message wraps it in. A code shared on
+ *  Discord comes back with backticks or a code fence round it, in quotes, or
+ *  behind a label ("My ranger: WOC1; ..."): everything before the header token
+ *  goes, and so does a closing fence, backtick, quote mark (straight, or any
+ *  curly or angled quote, opening or closing type, since some languages close
+ *  on an opening-type mark) or full stop after the last field (no field value
+ *  can end in one). A paste with no header token at all comes back untouched,
+ *  so it still fails as 'header'. */
+function unwrapPastedCode(raw: string): string {
+  const m = /(^|[^a-z0-9_])woc\d+(?![a-z0-9_])/i.exec(raw);
+  if (!m) return raw;
+  return raw.slice(m.index + m[1].length).replace(/[\s`"'.\p{Pi}\p{Pf}]+$/u, '');
 }
 
 export type DesignCodeError = 'empty' | 'header' | 'version' | 'malformed';
@@ -244,14 +381,15 @@ export interface DesignCodeFailure {
 }
 
 /** Parse a pasted code. Tolerant where sharing mangles things (case, extra
- *  whitespace, line breaks between fields, a trailing separator); strict where
- *  damage means data loss (a token with no `=`, an unreadable value, a header
- *  from a future format). Missing fields take the default look's value, so a
- *  short code is a valid design, not an error. */
+ *  whitespace, line breaks between fields, a trailing separator, the backticks,
+ *  quotes or label a chat message wraps it in); strict where damage means data
+ *  loss (a token with no `=`, an unreadable value, a header from a future
+ *  format). Missing fields take the default look's value, so a short code is a
+ *  valid design, not an error. */
 export function decodeDesignCode(raw: string): DecodedDesignCode | DesignCodeFailure {
   if (typeof raw !== 'string') return { ok: false, reason: 'empty' };
   if (raw.length > DESIGN_CODE_MAX_LENGTH) return { ok: false, reason: 'malformed' };
-  const tokens = raw
+  const tokens = unwrapPastedCode(raw)
     .split(/[;\n\r]+/)
     .map((t) => t.trim())
     .filter((t) => t !== '');
@@ -261,7 +399,7 @@ export function decodeDesignCode(raw: string): DecodedDesignCode | DesignCodeFai
   if (!header) return { ok: false, reason: 'header' };
   if (Number(header[1]) !== 1) return { ok: false, reason: 'version' };
 
-  const byId = new Map(DESIGN_FIELDS.map((f) => [f.id, f]));
+  const byId = FIELD_BY_ID;
   const draft: Partial<ModularAppearance> = {};
   const applied: DesignField[] = [];
   const ignored: string[] = [];

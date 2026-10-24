@@ -32,6 +32,8 @@ const EXPECTED_CODES = [
   'body.unsupported_media_type',
   'character.already_in_world',
   'character.delete_busy',
+  'character.referral_transfer_pending',
+  'character.referral_bond_pending',
   'character.delete_confirm',
   'character.storage_purchase_open',
   'character.invalid_class',
@@ -158,10 +160,6 @@ const EXPECTED_CODES = [
   'kick.reason_required',
   'kick.admin_target',
   'kick.target_offline',
-  'world_quest_block.admin_target',
-  'world_quest_block.reason_required',
-  'world_quest_block.already_blocked',
-  'world_quest_block.not_blocked',
 ];
 
 describe('ERROR_CODES catalog', () => {

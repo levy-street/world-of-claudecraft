@@ -1,0 +1,21 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/knight_commanders_longsword.webp",
+    "http://localhost:5194/ui/items/gaolers_chain_girdle.webp",
+    "http://localhost:5194/ui/items/rusted_shackle_grips.webp",
+    "http://localhost:5194/ui/items/drowned_wardens_mantle.webp",
+    "http://localhost:5194/ui/items/gaolyard_cudgel.webp",
+    "http://localhost:5194/ui/items/drowned_commanders_breastplate.webp",
+    "http://localhost:5194/ui/items/gaolyard_striders.webp",
+    "http://localhost:5194/ui/items/gaolers_iron_key.webp",
+    "http://localhost:5194/ui/items/jailers_iron_gauntlets.webp",
+    "http://localhost:5194/ui/items/turnkeys_keyring_belt.webp",
+    "http://localhost:5194/ui/items/turnkeys_lantern_cowl.webp"
+  ],
+  "allDecoded": true
+}

@@ -84,7 +84,13 @@ describe('Confection Cascade presentation', () => {
     Object.defineProperty(Element.prototype, 'animate', {
       configurable: true,
       value: vi.fn((_frames: Keyframe[], options?: KeyframeAnimationOptions | number) => {
-        const animation = { cancel: vi.fn(), onfinish: null, oncancel: null, options };
+        const animation = {
+          cancel: vi.fn(),
+          finished: Promise.resolve(),
+          onfinish: null,
+          oncancel: null,
+          options,
+        };
         animations.push(animation);
         return animation as unknown as Animation;
       }),

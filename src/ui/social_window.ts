@@ -32,7 +32,6 @@ import {
 import { GUILD_ROSTER_PAGE_SEATS } from '../sim/guild_roster';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld, WhoRosterInfo } from '../world_api';
-import { PRESENCE_MODES, type PresenceMode } from '../world_api/social_graph';
 import { formatCount } from './count_format';
 import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
@@ -53,8 +52,15 @@ import {
 } from './guild_ranks_view';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { classColorCss } from './inspect_view';
+import { bindMobileFrameLongPress } from './mobile_frame_long_press';
 import { moneyHtml } from './money_html';
 import { localizeZone } from './server_i18n';
+import {
+  type SocialRowPlayer,
+  socialRowMenuPoint,
+  socialRowMenuTarget,
+  socialRowPlayer,
+} from './social_row_menu_core';
 import {
   blockRows,
   friendRows,
@@ -70,6 +76,7 @@ import {
   pledgePanelView,
   raidView,
   type SocialTab,
+  socialPageControls,
   socialStructSig,
   tenureTier,
 } from './social_view';
@@ -93,6 +100,14 @@ import {
 // mousedown on a suggestion can still fire first.
 const SUGGEST_DEBOUNCE_MS = 160;
 const SUGGEST_BLUR_CLEAR_MS = 150;
+
+export function socialPagerHtml(
+  kind: 'friend' | 'block',
+  controls: ReturnType<typeof socialPageControls>,
+): string {
+  if (!controls.first && controls.next === null) return '';
+  return `<div class="soc-actions">${controls.first ? `<button type="button" class="ui-btn" data-act="${kind}-page" data-cursor="0">${esc(t('hud.social.friendFirstPage'))}</button>` : ''}${controls.next !== null ? `<button type="button" class="ui-btn" data-act="${kind}-page" data-cursor="${controls.next}">${esc(t('hud.social.friendNextPage'))}</button>` : ''}</div>`;
+}
 
 // Founding a guild rides the metered name_screen WS lane (refill 2/s, burst 5,
 // shared with pet_rename and the named perfect_item promotion): a lane DROP
@@ -143,6 +158,15 @@ export interface SocialWindowDeps {
   showPrompt(text: string, acceptLabel: string, onAccept: () => void, onDecline: () => void): void;
   /** Open the chat bar pre-filled with a whisper to this player. */
   startWhisper(name: string): void;
+  openReferralCards?(): void;
+  // The player menus a row right-click (or a touch long-press) can open; which one
+  // is social_row_menu_core's call: your own unit frame's menu, another player's
+  // unit-frame menu (pid-keyed), or the by-name menu a chat name opens.
+  openSelfMenu(x: number, y: number): void;
+  openUnitMenu(pid: number, name: string, x: number, y: number): void;
+  openNameMenu(name: string, x: number, y: number): void;
+  /** The touch layout, which gates the long-press path exactly as the unit frames do. */
+  isMobileLayout(): boolean;
 }
 
 function cap(s: string): string {
@@ -399,28 +423,12 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
     actions += `<button type="button" class="soc-x ui-disc" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
   const tip = esc(dotTitle(m.online, m.status, m.zone));
   return (
-    `<div class="soc-row${m.online ? '' : ' is-offline'}">` +
+    `<div class="soc-row${m.online ? '' : ' is-offline'}" data-player="${esc(m.name)}">` +
     `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
     `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
     `<span class="soc-meta" title="${tip}">${meta}</span>` +
     (actions ? `<span class="soc-actions">${actions}</span>` : '') +
     `</div>`
-  );
-}
-
-/** The Friends footer's presence setting (server/presence_privacy.ts): a native
- *  select, rebuilt only with the footer so an open dropdown survives the list's
- *  slow-HUD refreshes. Choosing a value sends the same /presence command a
- *  player can type. */
-export function presenceSettingHtml(mode: PresenceMode): string {
-  const options = PRESENCE_MODES.map(
-    (m) =>
-      `<option value="${m}"${m === mode ? ' selected' : ''}>${esc(t(`hudChrome.social.presence.${m}`))}</option>`,
-  ).join('');
-  return (
-    `<div class="soc-presence" title="${esc(t('hudChrome.social.presence.title'))}">` +
-    `<label for="soc-presence-select">${esc(t('hudChrome.social.presence.label'))}</label>` +
-    `<select id="soc-presence-select" class="ui-input" data-field="presence">${options}</select></div>`
   );
 }
 
@@ -449,6 +457,9 @@ export class SocialWindow {
   // every structural repaint; applyGuildCreateLock re-stamps the fresh button.
   private guildCreateLocked = false;
   private guildCreateTimer: number | undefined;
+  // The player row under the last pointerdown in the body, read by the touch
+  // long-press (its callback carries only the press point).
+  private pressedRow: HTMLElement | null = null;
   // Who tab: the local sort / class chip plus the last server-side search
   // (who_tab_view.ts owns the decisions). Window-local like the tab itself.
   private who: WhoTabState = { ...DEFAULT_WHO_TAB_STATE };
@@ -719,6 +730,9 @@ export class SocialWindow {
           selected: tab,
         }),
       ) +
+      (online && this.deps.openReferralCards
+        ? `<div class="soc-referral-entry"><button type="button" class="ui-btn" data-open-referral-cards>${svgIcon('cards')}${esc(t('referralCards.title'))}</button></div>`
+        : '') +
       `<div class="soc-body" id="soc-body-panel" role="tabpanel"></div>` +
       `<div class="soc-notice"></div>` +
       // The raid tab has no footer; the pledges and ranks tabs' actions all
@@ -731,6 +745,22 @@ export class SocialWindow {
     const body = el.querySelector('.soc-body') as HTMLElement | null;
     if (body) {
       body.addEventListener('click', (e) => this.onBodyClick(e));
+      // Right-click on a player row opens that player's menu, delegated the same
+      // way so it survives every refreshList swap. Touch has no right-click (iOS
+      // never fires contextmenu), so a long-press opens it too, as on the frames.
+      body.addEventListener('contextmenu', (e) => this.onBodyContextMenu(e as MouseEvent));
+      body.addEventListener('pointerdown', (e) => {
+        this.pressedRow = (e.target as HTMLElement).closest<HTMLElement>('[data-player]');
+      });
+      bindMobileFrameLongPress(
+        body,
+        (x, y) => {
+          const player = this.pressedRow ? socialRowPlayer(this.pressedRow.dataset) : null;
+          if (player) this.openPlayerMenu(player, x, y);
+        },
+        () => this.deps.isMobileLayout(),
+        { ignoreSelector: 'input, select, textarea' },
+      );
       // Enter in the billboard edit input saves. Delegated on the persistent
       // body like the click handler, so it survives every refreshList swap.
       body.addEventListener('keydown', (e) => {
@@ -916,7 +946,9 @@ export class SocialWindow {
     const w = this.deps.world();
     const act = node.dataset.act;
     const name = node.dataset.name ?? '';
-    if (act === 'unfriend') w.friendRemove(name);
+    if (act === 'friend-page') w.socialFriendsPage(Number(node.dataset.cursor ?? 0));
+    else if (act === 'block-page') w.socialBlocksPage(Number(node.dataset.cursor ?? 0));
+    else if (act === 'unfriend') w.friendRemove(name);
     else if (act === 'unblock') w.blockRemove(name);
     else if (act === 'unignore') w.ignoreRemove(name);
     else if (act === 'gkick') w.guildKick(name);
@@ -947,6 +979,25 @@ export class SocialWindow {
       this.tab = 'raid';
       this.render();
     }
+  }
+
+  // The delegated row right-click. Only a row that names a player (data-player)
+  // claims the event; anywhere else in the body keeps the native menu.
+  private onBodyContextMenu(e: MouseEvent): void {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-player]');
+    const player = row ? socialRowPlayer(row.dataset) : null;
+    if (!row || !player) return;
+    e.preventDefault();
+    const { x, y } = socialRowMenuPoint(e, () => row.getBoundingClientRect());
+    this.openPlayerMenu(player, x, y);
+  }
+
+  private openPlayerMenu(player: SocialRowPlayer, x: number, y: number): void {
+    this.deps.hideTooltip();
+    const to = socialRowMenuTarget(player, this.deps.world());
+    if (to.kind === 'self') this.deps.openSelfMenu(x, y);
+    else if (to.kind === 'unit') this.deps.openUnitMenu(to.pid, to.name, x, y);
+    else this.deps.openNameMenu(to.name, x, y);
   }
 
   // The Ranks tab body: null (hidden tab) falls back to the empty state.
@@ -1070,37 +1121,46 @@ export class SocialWindow {
   }
 
   private friendsHtml(): string {
-    const rows = friendRows(this.deps.world().socialInfo);
+    const social = this.deps.world().socialInfo;
+    const rows = friendRows(social);
+    const pager = socialPagerHtml('friend', socialPageControls(social, 'friend'));
     if (rows.length === 0)
-      return `<div class="soc-empty">${esc(t('hud.social.friendsEmpty'))}</div>`;
-    return rows
-      .map((f) => {
-        const meta = f.online
-          ? `<span class="zone">${esc(f.zone ? localizeZone(f.zone) : '')}</span><br>${esc(statusLabel(f.status))}`
-          : esc(t('hud.social.status.offline'));
-        // The friend's Book of Deeds title (a deed id, localized here; '' for
-        // untitled/stale hides the span entirely). It rides INSIDE the
-        // ellipsized .soc-name cell, so a long combo trims the title tail and
-        // never pushes the meta column or action buttons.
-        const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';
-        const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : '';
-        const name = f.online
-          ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(f.cls)}" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}</button>`
-          : `<span class="soc-name" style="--class-color:${classColorCss(f.cls)}">${esc(f.name)}${titleSpan}</span>`;
-        const whisper = f.online
-          ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
-          : '';
-        const tip = esc(dotTitle(f.online, f.status, f.zone));
-        return (
-          `<div class="soc-row${f.online ? '' : ' is-offline'}">` +
-          `<span class="soc-dot ${f.dot === 'off' ? '' : f.dot}" title="${tip}"></span>` +
-          `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
-          `<span class="soc-meta" title="${tip}">${meta}</span>` +
-          `<span class="soc-actions">${whisper}<button type="button" class="soc-x ui-disc" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button></span>` +
-          `</div>`
-        );
-      })
-      .join('');
+      return pager + `<div class="soc-empty">${esc(t('hud.social.friendsEmpty'))}</div>`;
+    return (
+      pager +
+      rows
+        .map((f) => {
+          const meta = f.online
+            ? `<span class="zone">${esc(f.zone ? localizeZone(f.zone) : '')}</span><br>${esc(statusLabel(f.status))}`
+            : esc(t('hud.social.status.offline'));
+          // The friend's Book of Deeds title (a deed id, localized here; '' for
+          // untitled/stale hides the span entirely). It rides INSIDE the
+          // ellipsized .soc-name cell, so a long combo trims the title tail and
+          // never pushes the meta column or action buttons.
+          const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';
+          const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : '';
+          const boundSpan =
+            f.tier === 'bound'
+              ? `<span class="soc-title">${esc(t('hud.social.boundFriend'))}</span>`
+              : '';
+          const name = f.online
+            ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(f.cls)}" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}${boundSpan}</button>`
+            : `<span class="soc-name" style="--class-color:${classColorCss(f.cls)}">${esc(f.name)}${titleSpan}${boundSpan}</span>`;
+          const whisper = f.online
+            ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
+            : '';
+          const tip = esc(dotTitle(f.online, f.status, f.zone));
+          return (
+            `<div class="soc-row${f.online ? '' : ' is-offline'}" data-player="${esc(f.name)}">` +
+            `<span class="soc-dot ${f.dot === 'off' ? '' : f.dot}" title="${tip}"></span>` +
+            `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
+            `<span class="soc-meta" title="${tip}">${meta}</span>` +
+            `<span class="soc-actions">${whisper}${f.tier === 'bound' ? '' : `<button type="button" class="soc-x ui-disc" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button>`}</span>` +
+            `</div>`
+          );
+        })
+        .join('')
+    );
   }
 
   // The two PLAYER tiers get a tab each, so a row can never be mistaken for the
@@ -1116,7 +1176,7 @@ export class SocialWindow {
     return rows
       .map(
         (r) =>
-          `<div class="soc-row">` +
+          `<div class="soc-row" data-player="${esc(r.name)}">` +
           `<span class="soc-name">${esc(r.name)}</span>` +
           `<span class="soc-actions soc-actions-end"><button type="button" class="soc-x ui-disc" data-act="${act}" data-name="${esc(r.name)}" title="${esc(title(r.name))}">${svgIcon('close')}</button></span>` +
           `</div>`,
@@ -1134,11 +1194,16 @@ export class SocialWindow {
   }
 
   private blockHtml(): string {
-    return this.listHtml(
-      blockRows(this.deps.world().socialInfo),
-      'hudChrome.social.blockedEmpty',
-      'unblock',
-      (name) => t('hudChrome.social.stopBlockingTitle', { name }),
+    const social = this.deps.world().socialInfo;
+    const unavailable = social?.blocksUnavailable
+      ? `<div class="soc-empty" role="status">${esc(t('abilityUi.tooltip.unavailable'))}</div>`
+      : '';
+    return (
+      unavailable +
+      socialPagerHtml('block', socialPageControls(social, 'block')) +
+      this.listHtml(blockRows(social), 'hudChrome.social.blockedEmpty', 'unblock', (name) =>
+        t('hudChrome.social.stopBlockingTitle', { name }),
+      )
     );
   }
 
@@ -1267,7 +1332,7 @@ export class SocialWindow {
       .map((p) => {
         const since = formatDateTime(new Date(p.sinceMs), { dateStyle: 'medium' });
         return (
-          `<div class="soc-row">` +
+          `<div class="soc-row" data-player="${esc(p.name)}">` +
           `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(p.cls)}">${esc(p.name)}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(p.cls) }))}</span></span>` +
           `<span class="soc-meta">${esc(t('hudChrome.pledge.since', { date: since }))}</span>` +
           `<span class="soc-actions">` +
@@ -1295,7 +1360,7 @@ export class SocialWindow {
                 ? `<button type="button" class="soc-x ui-disc" data-act="raid-move" data-pid="${m.pid}" data-group="${m.moveTo}" title="${esc(t('hud.social.raidMoveToGroup', { group: formatNumber(m.moveTo, { maximumFractionDigits: 0 }) }))}">${esc(formatNumber(m.moveTo, { maximumFractionDigits: 0 }))}</button>`
                 : '';
             return (
-              `<div class="soc-row raid-row">` +
+              `<div class="soc-row raid-row" data-player="${esc(m.name)}" data-pid="${m.pid}">` +
               `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(m.cls)}">${esc(m.name)}${m.isLead ? `<span class="rank">${esc(t('hud.social.raidLeader'))}</span>` : ''}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
               `<span class="soc-meta">${esc(formatNumber(m.hpPct, { maximumFractionDigits: 0 }))}%</span>` +
               (move ? `<span class="soc-actions">${move}</span>` : '') +
@@ -1374,7 +1439,7 @@ export class SocialWindow {
           ? `<span class="soc-name" style="--class-color:${classColorCss(r.cls)}">${esc(r.name)}</span>`
           : `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(r.cls)}" data-whisper="${esc(r.name)}" title="${esc(t('hud.social.whisperTitle', { name: r.name }))}">${esc(r.name)}</button>`;
         return (
-          `<div class="soc-row soc-who-row" role="row">` +
+          `<div class="soc-row soc-who-row" role="row" data-player="${esc(r.name)}">` +
           `<span class="soc-who-cell who-dot" role="cell"><span class="soc-dot ${r.dot}" title="${tip}"></span></span>` +
           `<span class="soc-who-cell who-name" role="cell">${name}</span>` +
           `<span class="soc-who-cell who-level" role="cell">${n(r.level)}</span>` +
@@ -1398,19 +1463,15 @@ export class SocialWindow {
         `<input class="ui-input" maxlength="${WHO_SEARCH_MAX}" aria-label="${esc(t('hudChrome.social.who.searchPlaceholder'))}" placeholder="${esc(t('hudChrome.social.who.searchPlaceholder'))}" data-field="who" value="${esc(this.who.search)}" autocomplete="off" spellcheck="false"/>` +
         `<button class="btn ui-btn" data-act="who-search">${esc(t('hudChrome.social.who.search'))}</button></div>`
       );
-    if (this.tab === 'friends') {
-      const mode = this.deps.world().socialInfo?.presenceMode;
-      return (
-        this.addRow(
-          'friend',
-          'friend-add',
-          t('hud.social.friendSearchPlaceholder'),
-          t('hud.social.add'),
-          16,
-          true,
-        ) + (mode ? presenceSettingHtml(mode) : '')
+    if (this.tab === 'friends')
+      return this.addRow(
+        'friend',
+        'friend-add',
+        t('hud.social.friendSearchPlaceholder'),
+        t('hud.social.add'),
+        16,
+        true,
       );
-    }
     if (this.tab === 'ignore')
       return this.addRow(
         'ignore',
@@ -1503,6 +1564,9 @@ export class SocialWindow {
 
   // Wire the parts that survive a content refresh: close, tabs, footer + search.
   private wireChrome(el: HTMLElement): void {
+    el.querySelector('[data-open-referral-cards]')?.addEventListener('click', () =>
+      this.deps.openReferralCards?.(),
+    );
     el.querySelector('[data-close]')?.addEventListener('click', () => this.toggle());
     // WAI-ARIA tabs: click OR roving Arrow/Home/End select a tab, wired through the
     // shared tab_strip_painter core. render() rebuilds the strip, so a keyboard move
@@ -1569,10 +1633,6 @@ export class SocialWindow {
     };
     el.querySelectorAll('.soc-add .btn').forEach((b) => {
       b.addEventListener('click', () => submit((b as HTMLElement).dataset.act));
-    });
-    el.querySelector('select[data-field="presence"]')?.addEventListener('change', (e) => {
-      const mode = PRESENCE_MODES.find((m) => m === (e.target as HTMLSelectElement).value);
-      if (mode) w.chat(`/presence ${mode}`);
     });
     // Enter-to-submit only for plain inputs (the guild name). Search inputs get
     // richer keyboard handling (arrows + Enter to pick a suggestion) below.

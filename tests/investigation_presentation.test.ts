@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { visualKeyFor } from '../src/render/characters/manifest';
+import { npcLookFor } from '../src/render/characters/npc_looks';
 import { objectDisplayName } from '../src/render/entity_labels';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { INVESTIGATION_NPCS } from '../src/sim/content/world_quest_investigation';
@@ -9,8 +10,21 @@ import { t } from '../src/ui/i18n';
 
 describe('investigation reused presentation', () => {
   it('uses existing soldier and undead looks', () => {
-    for (const npc of INVESTIGATION_NPCS)
-      expect(visualKeyFor({ kind: 'npc', templateId: npc.id } as Entity)).toBe('npc_knight');
+    // the Fenbridge watch: every one a warrior in plate (an authored look on the class body)
+    const watch: Record<string, string> = {
+      infiltrator_captain: 'player_warrior',
+      infiltrator_nella: 'player_warrior_female',
+      infiltrator_orin: 'player_warrior',
+      infiltrator_bram: 'player_warrior',
+      infiltrator_tessa: 'player_warrior_female',
+    };
+    expect(INVESTIGATION_NPCS.map((npc) => npc.id).sort()).toEqual(Object.keys(watch).sort());
+    for (const npc of INVESTIGATION_NPCS) {
+      expect(npcLookFor(npc.id)?.cls, npc.id).toBe('warrior');
+      expect(visualKeyFor({ kind: 'npc', templateId: npc.id } as Entity), npc.id).toBe(
+        watch[npc.id],
+      );
+    }
     expect(visualKeyFor({ kind: 'mob', templateId: 'fenbridge_infiltrator' } as Entity)).toBe(
       visualKeyFor({ kind: 'mob', templateId: 'drowned_dead' } as Entity),
     );

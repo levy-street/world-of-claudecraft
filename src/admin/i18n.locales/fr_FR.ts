@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const fr_FR: Record<string, string> = {
+  'error.buddyGrantFailed': 'L’attribution du compagnon a échoué.',
+  'error.characterAlreadyHasThat': 'Ce personnage possède déjà ce compagnon ou cette apparence.',
+  'moderationHistory.actionGrantBuddy': 'Compagnon attribué',
+  'moderationHistory.actionAnnounce': 'Annonce du royaume',
+  'moderationHistory.actionGmInvisible': 'Est devenu invisible',
+  'moderationHistory.actionGmVisible': 'Est devenu visible',
+  'moderationHistory.actionUnwatch': 'Retiré de la liste de surveillance',
+  'moderationHistory.actionWatch': 'Ajouté à la liste de surveillance',
   'error.flagActiveExists': 'ce compte a déjà un drapeau ouvert de ce type',
   'wealth.largeMovementsUnavailable':
     "les grands mouvements bancaires n'ont pas pu être chargés (la lecture du grand livre a expiré), le détail de l'or ci-dessus est complet",
@@ -403,8 +411,6 @@ export const fr_FR: Record<string, string> = {
   'detail.accountActions': 'Actions de modération du compte',
   'detail.banReason': "Raison de l'interdiction :{value}",
   'detail.suspensionReason': 'Motif de la suspension :{value}',
-  'detail.deactivatedNotice': 'Le joueur a désactivé ce compte le {value}.',
-  'detail.reactivate': 'Réactiver',
   'detail.notePlaceholder': 'Note du modérateur / motif',
   'detail.suspend1h': 'Suspendre 1 h',
   'detail.suspend24h': 'Suspendre 24 h',
@@ -503,7 +509,6 @@ export const fr_FR: Record<string, string> = {
   'dialog.confirmBan': 'Confirmer le bannissement',
   'dialog.confirmUnban': 'Confirmer le débannissement',
   'dialog.confirmUnsuspension': 'Confirmer la levée de la suspension',
-  'dialog.confirmReactivation': 'Confirmer la réactivation',
   'dialog.character': 'Personnage',
   'dialog.account': 'Compte',
   'dialog.action': 'Action',
@@ -517,8 +522,6 @@ export const fr_FR: Record<string, string> = {
   'dialog.actionUnban': "Rétablir l'accès au compte",
   'dialog.actionUnsuspend':
     "Restaurer l'accès à la connexion au compte avant l'expiration de la suspension",
-  'dialog.actionReactivate':
-    "Annuler la désactivation faite par le joueur et rétablir l'accès au compte",
   'dialog.confirm': 'Confirmer',
   'dialog.cancel': 'Annuler',
   'dialog.warning': 'Avertissement',
@@ -1109,14 +1112,6 @@ export const fr_FR: Record<string, string> = {
     "Tous les personnages du compte portent l'étiquette publique jusqu'à épuisement de ce temps de jeu.",
   'detail.cheaterMarkRelengthHint':
     "Remplace entièrement le temps restant, sans s'y ajouter. L'étiquette publique reste affichée.",
-  'detail.worldQuestBlockModeration': 'Quêtes mondiales',
-  'detail.worldQuestBlockActions': 'Actions de modération des quêtes mondiales',
-  'detail.worldQuestBlockApply': 'Bloquer les quêtes mondiales',
-  'detail.worldQuestBlockLift': 'Débloquer les quêtes mondiales',
-  'detail.worldQuestBlockReason': 'Motif du blocage : {value}',
-  'detail.worldQuestBlockedAt': 'Bloqué : {value}',
-  'detail.worldQuestBlockHint':
-    "Contre le bot sur les quêtes mondiales, plutôt qu'un bannissement : aucun personnage du compte ne peut plus commencer, faire progresser ni obtenir de récompenses des quêtes mondiales. Le reste du jeu reste jouable.",
   'dialog.confirmCheaterMark': 'Confirmer la marque de tricheur',
   'dialog.confirmCheaterMarkRelength': 'Confirmer la nouvelle durée de la marque',
   'dialog.confirmCheaterMarkLift': 'Confirmer le retrait de la marque',
@@ -1124,25 +1119,14 @@ export const fr_FR: Record<string, string> = {
     "Afficher l'étiquette publique Tricheur sur tous les personnages de ce compte",
   'dialog.actionCheaterMarkRelength': 'Remplacer le temps de jeu restant de cette marque',
   'dialog.actionCheaterMarkLift': 'Retirer la marque de tricheur avant son terme',
-  'dialog.confirmWorldQuestBlock': 'Confirmer le blocage des quêtes mondiales',
-  'dialog.confirmWorldQuestUnblock': 'Confirmer le déblocage des quêtes mondiales',
-  'dialog.actionWorldQuestBlock':
-    'Bloquer les quêtes mondiales pour tous les personnages de ce compte',
-  'dialog.actionWorldQuestUnblock': 'Autoriser de nouveau les quêtes mondiales sur ce compte',
   'alert.cheaterMarkDurationInvalid': 'Saisissez un nombre entier entre 1 et {max} heures.',
   'error.cheaterMarkDurationInvalid':
     'Le crédit de temps de jeu doit être compris entre 1 et 100 heures.',
   'error.cheaterMarkNotMarked': 'Ce compte ne porte pas la marque de tricheur.',
   'error.cheaterMarkAdminTarget':
     'Les comptes administrateur ne peuvent pas recevoir la marque de tricheur.',
-  'error.worldQuestBlockAdminTarget':
-    'Les comptes administrateurs ne peuvent pas être bloqués des quêtes mondiales.',
-  'error.worldQuestBlockAlreadyBlocked': 'Ce compte est déjà bloqué des quêtes mondiales.',
-  'error.worldQuestBlockNotBlocked': "Ce compte n'est pas bloqué des quêtes mondiales.",
   'moderationHistory.actionCheaterMark': 'Marque de tricheur appliquée',
   'moderationHistory.actionCheaterMarkLift': 'Marque de tricheur retirée',
-  'moderationHistory.actionWorldQuestsBlock': 'Quêtes mondiales bloquées',
-  'moderationHistory.actionWorldQuestsUnblock': 'Quêtes mondiales débloquées',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Or',
   'error.flagInvalidStatus': 'statut de drapeau invalide',

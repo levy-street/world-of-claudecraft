@@ -11,7 +11,7 @@
 // self scalar lands here, not as another inline `maybe(...)` in game.ts. The
 // registry of delta keys is pinned by ALL_DELTA_KEYS in tests/snapshots.test.ts,
 // whose scrape reads this file like every other server emitter.
-import { pvpResurrectBarred } from '../src/sim/pvp/pvp_resurrect';
+import { pvpResurrectBarred, pvpResurrectWaitSeconds } from '../src/sim/pvp/pvp_resurrect';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -35,9 +35,12 @@ export const SELF_SCALAR_KEYS = [
   'hrat',
   'hirat',
   'ddiff',
+  'adiff',
   'cbt',
+  'mbr',
   'corpse',
   'pvr',
+  'pvrw',
 ] as const;
 
 export type SelfScalarKey = (typeof SELF_SCALAR_KEYS)[number];
@@ -47,6 +50,7 @@ export function emitSelfScalarKeys(
   meta: PlayerMeta,
   p: Entity,
   dungeonDifficulty: string,
+  activeDungeonDifficulty: string | null = null,
 ): void {
   emit('xp', meta.xp);
   emit('lxp', meta.lifetimeXp);
@@ -70,6 +74,7 @@ export function emitSelfScalarKeys(
   emit('hrat', p.hasteRating);
   emit('hirat', p.hitRating);
   emit('ddiff', dungeonDifficulty);
+  emit('adiff', activeDungeonDifficulty);
   // The sim's authoritative in-combat flag (the engaged pass in sim.ts: held on
   // a live mob's hate table, or the player's own 5 s linger). Without it the
   // online SELF mirror stayed at blankEntity's false forever, so the player
@@ -78,6 +83,7 @@ export function emitSelfScalarKeys(
   // traded a blow. A 0/1 bit rather than a boolean: it flips at most a few
   // times per fight, so the delta elision keeps it off the wire between flips.
   emit('cbt', p.inCombat ? 1 : 0);
+  emit('mbr', p.membershipActive === true);
   // Where the player's corpse lies while their spirit is a ghost (null otherwise).
   // Delta-guarded: ships on death-release and clears on resurrect. The client
   // draws the corpse marker and gates the resurrect-at-corpse button on it.
@@ -87,5 +93,10 @@ export function emitSelfScalarKeys(
   // jail (the button would show and do nothing). A released ghost keeps the
   // bit; the death screen hides the button for a ghost and the server re-checks
   // everything at the raise. Flips once per PvP death and once at the revive.
-  emit('pvr', p.dead && p.pvpResurrect === true && !pvpResurrectBarred(p) ? 1 : 0);
+  const pvr = p.dead && p.pvpResurrect === true && !pvpResurrectBarred(p);
+  emit('pvr', pvr ? 1 : 0);
+  // Whole seconds left on that offer's wait (PVP_RESURRECT_WAIT_SECONDS at the
+  // death), 0 once it may be taken or when there is no offer: the death screen's
+  // countdown. Changes once a second for the wait only, then sits at 0.
+  emit('pvrw', pvr ? pvpResurrectWaitSeconds(p) : 0);
 }

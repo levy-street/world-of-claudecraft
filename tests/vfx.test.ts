@@ -12,6 +12,7 @@ vi.mock('../src/render/assets/preload', () => ({
   registerDeferredPreload: vi.fn(),
 }));
 
+import { GLOAM_CUE_PRESENT } from '../src/render/characters/gloam_climb_core';
 import { Vfx } from '../src/render/vfx';
 
 interface VfxProbe {
@@ -489,6 +490,88 @@ describe('pooled VFX cloud', () => {
     expect(probe.points.visible).toBe(false);
   });
 
+  it('builds the Gloamveil field behind the compile gate and forwards a context restore', () => {
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const gated: THREE.Object3D[] = [];
+    const sampled: [number, number][] = [];
+    const vfx = new Vfx(
+      scene,
+      (_id, _frac, out) => (out ?? new THREE.Vector3()).set(7, 3, -2),
+      undefined,
+      (x, z) => {
+        sampled.push([x, z]);
+        return 0;
+      },
+      (target) => {
+        gated.push(target);
+        return new Promise(() => undefined);
+      },
+    );
+    const root = scene.getObjectByName('gloam_field');
+    // The renderer's gate holds the field from construction...
+    expect(root).toBeDefined();
+    expect(gated).toEqual([root]);
+    expect(root?.visible).toBe(false);
+    // ...its ground sampler is the one the pool is draped with...
+    vfx.gloam.wearer(1, GLOAM_CUE_PRESENT, true, 0, 0);
+    vfx.gloam.update(1 / 60, false);
+    expect(sampled.length).toBeGreaterThan(1);
+    expect(sampled[0]).toEqual([7, -2]);
+    expect(vfx.gloam.stats().wearers).toBe(1);
+    // ...and a restored context sends it back through the gate.
+    if (root) root.visible = true;
+    vfx.onContextRestored();
+    expect(gated).toEqual([root, root]);
+    expect(root?.visible).toBe(false);
+    // clear and dispose reach it too.
+    vfx.clear();
+    expect(vfx.gloam.stats().wearers).toBe(0);
+    vfx.dispose();
+    expect(scene.getObjectByName('gloam_field')).toBeUndefined();
+  });
+
+  it('is driven by the renderer with its own ground sampler, gate and reduced-motion setting', () => {
+    const source = readFileSync(
+      fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
+      'utf8',
+    );
+    // The field is draped with the renderer's seed-bound sampler and held by
+    // its compile gate: both are handed to Vfx at construction.
+    expect(source).toContain(
+      'this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);',
+    );
+    // One report per presented body in the form, never for the dead, with the
+    // rig's own cue, whether it stands on something, its distance and where
+    // its feet (or its mount's) touch the floor.
+    const report = 'this.vfx.gloam.wearer(e.id, active.gloamCue(), settled, d2, ay);';
+    const at = source.indexOf(report);
+    expect(at).toBeGreaterThan(0);
+    expect(source.indexOf(report, at + 1)).toBe(-1);
+    const block = source.slice(source.lastIndexOf('if (!e.dead) {', at), at + report.length);
+    expect(block.split('\n').length).toBeLessThan(8);
+    expect(block).toContain('else if (hasShadowform) this.vfx.gloam.wearer(');
+    // Inside the presented arm: a body out of view reports nothing.
+    const presented = source.lastIndexOf('if (runCharacterPresentation) {', at);
+    expect(presented).toBeGreaterThan(0);
+    expect(at - presented).toBeLessThan(4000);
+    expect(source).toContain('const settled = !airborne && !swimming && !visuallyDead;');
+    // The frame is closed once, after the entity loop, with the viewer's
+    // setting, right before the cloud it emits its glints into is advanced.
+    const close = [
+      ...source.matchAll(
+        /this\.vfx\.gloam\.update\(dt, this\.reducedMotion\(\)\);\n\s*this\.vfx\.update\(dt\);/g,
+      ),
+    ];
+    expect(close).toHaveLength(1);
+    expect(close[0].index).toBeGreaterThan(at);
+    // The form edge is forwarded every frame, and a body that is not
+    // presented takes the off-screen tick, which is what calls an unseen
+    // entry off (characters/gloam_climb.ts GloamPresence.idle).
+    expect(source).toContain('active.setShadowform(hasShadowform);');
+    expect(source).toContain('else active.advanceOffscreen(dt);');
+  });
+
   it('packs particles against the final camera pose for every out-of-band render', () => {
     const source = readFileSync(
       fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
@@ -518,12 +601,17 @@ describe('pooled VFX cloud', () => {
     // camera-shake updateMatrixWorld.
     // The call consumes its boolean return into the presented-frames counter
     // (phase 4 QA F4), so the pattern anchors the whole consuming statement.
+    // Since the ClaudeCraft Studio import the call sits inside the authored-map
+    // underworld mask's try/finally, so the result lands in `presented` first
+    // and that flag feeds the counter straight after the unmask.
     const presentSites = [
-      ...source.matchAll(
-        /\n\s*if \(presentFrame\(host, dt, present\)\) this\.presentedFrameCount\+\+;/g,
-      ),
+      ...source.matchAll(/\n\s*presented = presentFrame\(host, dt, present\);/g),
     ];
     expect(presentSites).toHaveLength(1);
+    expect(source.match(/presentFrame\(host, dt, present\)/g)).toHaveLength(1);
+    expect(source).toMatch(
+      /presented = presentFrame\(host, dt, present\);\n\s*\} finally \{\n\s*if \(underworld\) this\.underworld\.unmask\(\);\n\s*\}\n\s*if \(presented\) this\.presentedFrameCount\+\+;/,
+    );
     for (const site of presentSites) {
       const before = source.slice(0, site.index).trimEnd();
       // The camera-shake refresh spells refreshFrozenWorldMatrix since the
@@ -540,11 +628,25 @@ describe('pooled VFX cloud', () => {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);`);
-    // The restore handler re-captures identity, rebinds the draw-stats
-    // session (three replaces webgl.info on restore; see
-    // tests/draw_stats_core.test.ts), then notifies vfx, in that order.
+    // A restore re-captures identity and rebinds the draw-stats session
+    // (three replaces webgl.info on restore; see tests/draw_stats_core.test.ts)
+    // BEFORE the reset registry notifies the vfx cloud, in that order.
     expect(source).toMatch(
-      /this\.captureGlIdentity\(\);[\s\S]{0,700}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);\s+this\.vfx\?\.onContextRestored\(\);/,
+      /rebindContextReaders: \(\) => \{\s+this\.captureGlIdentity\(\);\s+if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);/,
+    );
+    const restore = readFileSync(
+      fileURLToPath(new URL('../src/render/context_restore.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(restore).toMatch(
+      /this\.surface\.rebindContextReaders\(\);[\s\S]{0,900}?runContextRestoreResets\(\);/,
+    );
+    const vfxSource = readFileSync(
+      fileURLToPath(new URL('../src/render/vfx.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(vfxSource).toContain(
+      "registerContextRestoreReset('vfx-cloud', this, (owner) => owner.onContextRestored());",
     );
   });
 });

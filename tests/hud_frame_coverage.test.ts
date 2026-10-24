@@ -146,6 +146,8 @@ const FRAME_EXEMPT: Record<string, string> = {
   banner: 'transient level-up and zone banner (banner_queue.ts)',
   'low-health-vignette': 'decorative full-screen veil, pointer-inert',
   'subzone-banner': 'transient subzone name fade',
+  'shardpike-prompt':
+    'transient centre-screen cue for the Balgath balance trial (src/ui/hud/shardpike/shardpike_prompt_painter.ts): one line, shown only while the quest pike is couched and swapped as the trial changes phase, sited mid-screen where the eyes already are during the fight. It is the prompt-stack / ghost-prompt family, not chrome: it has no controls, takes no pointer, and its whole value is being in the one place a player is already looking, so a saved corner would defeat it. Its BAR half is the movable frame (shardpikeBar in HUD_FRAME_SPECS), which is where the buttons and the persisted geometry live.',
   'death-overlay': 'death veil with the Release Spirit prompt, modal by design',
   'ghost-prompt': 'transient ghost-state prompt',
   'ghost-hint': 'ghost-state top-of-screen line naming both ways back, pointer-inert',
@@ -173,7 +175,10 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/frame_context_menu.ts': 'transient right-click menu for the frame editor',
   'src/ui/focus_targets_controller.ts':
     'mounts the focusTargets frame registered with the shared editor',
-  'src/main.ts': 'mounts the breath bar (transient survival meter, exempt for now) into #ui',
+  'src/main.ts':
+    'mounts the breath bar (transient survival meter, exempt for now) and the graphics restore note (a pointer-inert status line shown only while a WebGL context restore holds the world draw) into #ui',
+  'src/ui/hud/referral_cards/referral_cards_hud_controller.ts':
+    'mounts the referral card window and launcher; the shared window focus and close bridge owns its lifecycle',
   'src/ui/hud.ts': 'the HUD coordinator: mounts the proc overlay, FCT pool, match strips',
   'src/ui/interface_unlock.ts': 'the unlock coordinator: its own edit chrome + the detacher',
   'src/ui/meters_frame.ts': 're-homes framed meter panels onto #ui',
@@ -215,8 +220,10 @@ const RUNTIME_MOUNTED_FRAME_IDS = [
   'tracker-group',
   'aura-track-group',
 ];
-// The compact target frame starts nested inside #target-frame and detaches on drag.
-const NESTED_FRAME_IDS = ['totarget-frame'];
+// The compact target frame starts nested inside #target-frame and detaches on drag;
+// the player's resource bar wrapper starts inside #player-frame and detaches
+// while the Detach Resource Bar option is on.
+const NESTED_FRAME_IDS = ['totarget-frame', 'pf-resource-frame'];
 
 interface Harvest {
   ids: string[];
@@ -268,7 +275,10 @@ describe('hud_frame_coverage (standing HUD surfaces are movable frames)', () => 
   // test rather than as a describe-scope collection error.
   let built: Array<{ entry: string; harvest: Harvest }> | null = null;
   const entries = () =>
-    (built ??= HTML_ENTRIES.map((entry) => ({ entry, harvest: harvestEntry(read(entry)) })));
+    (built ??= HTML_ENTRIES.map((entry) => ({
+      entry,
+      harvest: harvestEntry(read(entry)),
+    })));
   const frameIds = new Set(HUD_FRAME_SPECS.map((s) => s.elementId));
 
   it('every element in the harvest carries an id', () => {

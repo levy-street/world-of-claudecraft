@@ -4,8 +4,8 @@
 // Consolidating four bot polls into one means one response now carries what four
 // used to, and every stream feeding it is bounded for exactly that reason. This
 // file drives the endpoint at the worst case those bounds admit (relay 50,
-// activity 100, link changes OUTBOX_LINK_CHANGE_PAGE, one reward day with a full
-// ten-payout table) and asserts the serialized payload stays under a stated byte
+// activity 100, link changes OUTBOX_LINK_CHANGE_PAGE, PvP kills 100, one reward
+// day with a full ten-payout table) and asserts the serialized payload stays under a stated byte
 // bound. A page or cap raised without checking what it does to the response size
 // fails here. Note the link-change bound is the PAGE, not the feed's cap: what a
 // backlog past the page costs is another poll, not a bigger response, which is
@@ -70,10 +70,20 @@ import { ACTIVITY_MAX_QUEUE, drainActivity } from '../../server/discord_activity
 import type { DiscordOutboxLinkRow } from '../../server/discord_db';
 import { discordLinksForAccounts } from '../../server/discord_db';
 import {
+  drainHillAnnouncements,
+  enqueueHillAnnouncement,
+  HILL_ANNOUNCEMENT_MAX_QUEUE,
+} from '../../server/discord_hill_feed';
+import {
   drainLinkChanges,
   enqueueLinkChange,
   LINK_CHANGE_MAX_QUEUE,
 } from '../../server/discord_link_changes';
+import {
+  drainPvpKills,
+  enqueuePvpKill,
+  PVP_KILL_FEED_MAX_QUEUE,
+} from '../../server/discord_pvp_feed';
 import type { QueuedRelay } from '../../server/discord_relay';
 import { drainRelay, RELAY_MAX_QUEUE } from '../../server/discord_relay';
 import { compose } from '../../server/http/compose';
@@ -95,13 +105,17 @@ const RELAY_CAP = RELAY_MAX_QUEUE;
 const ACTIVITY_CAP = ACTIVITY_MAX_QUEUE;
 
 /**
- * The bound on the serialized `data` payload, in bytes. The worst-case fixture
- * below measured 287,100 bytes (0.2 ms of JSON.stringify; 290,671 before the
- * #2791 narrowing dropped the unused winner-row fields, 279,891 before the
- * activity fixture moved to the wider deed item shape) when the drain moved to
- * a 1000-item link-change page and a one-day winners ask; the bound is roughly
- * 1.5x that, rounded to a clean number, so ordinary drift in the fixtures does
- * not red it while a page raise or a new per-item field does. The test logs its
+ * The bound on the serialized `data` payload, in bytes. The bound was set at
+ * roughly 1.5x the 287,100 bytes the worst-case fixture below measured (0.2 ms
+ * of JSON.stringify; 290,671 before the #2791 narrowing dropped the unused
+ * winner-row fields, 279,891 before the activity fixture moved to the wider
+ * deed item shape) when the drain moved to a 1000-item link-change page and a
+ * one-day winners ask, rounded to a clean number, so ordinary drift in the
+ * fixtures does not red it while a page raise or a new per-item field does.
+ * The PvP kill feed joining at its 100-item cap raised the measurement to
+ * 306,445 bytes, and the King of the Hill calls at their 10-item cap to
+ * 307,727, leaving about 1.36x headroom: the next stream should re-derive the
+ * bound rather than assume the old slack. The test logs its
  * own measurement, so re-deriving the headroom never means guessing at the size.
  *
  * The earlier figure was 979,051 bytes, at a whole-cap 5,000-item drain and five
@@ -209,6 +223,8 @@ const ORIGINAL_DISCORD_SECRET = process.env.DISCORD_BOT_SECRET;
 beforeEach(() => {
   vi.resetAllMocks();
   drainLinkChanges();
+  drainPvpKills();
+  drainHillAnnouncements();
   process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
 });
 
@@ -216,6 +232,8 @@ afterEach(() => {
   if (ORIGINAL_DISCORD_SECRET === undefined) delete process.env.DISCORD_BOT_SECRET;
   else process.env.DISCORD_BOT_SECRET = ORIGINAL_DISCORD_SECRET;
   drainLinkChanges();
+  drainPvpKills();
+  drainHillAnnouncements();
   vi.restoreAllMocks();
 });
 
@@ -236,6 +254,32 @@ describe('discord/outbox payload size at the full-cap drain', () => {
     // the rest stays queued and pages out on the next poll (pinned below).
     for (let i = 1; i <= LINK_CHANGE_MAX_QUEUE; i++) {
       enqueueLinkChange({ accountId: i, kinds: ['flex', 'points'] }, 1000);
+    }
+
+    // The PvP kill feed at its cap (the REAL queue), every field at a wide but
+    // legal width: long names, a zone name, a large stake.
+    for (let i = 0; i < PVP_KILL_FEED_MAX_QUEUE; i++) {
+      enqueuePvpKill({
+        killerName: `Adventurer${i}Longname`,
+        victimName: `Wanderer${i}Longername`,
+        killerLevel: 60,
+        victimLevel: 60,
+        zoneName: 'The Frostveil Reach',
+        assists: 24,
+        copper: 99_999_999,
+        realm: 'Claudemoon',
+      });
+    }
+
+    // The hill calls at their cap too (the REAL queue), with a wide zone name.
+    for (let i = 0; i < HILL_ANNOUNCEMENT_MAX_QUEUE; i++) {
+      enqueueHillAnnouncement({
+        phase: i % 2 === 0 ? 'warning' : 'risen',
+        zoneName: 'The Frostveil Reach',
+        risesAtMs: 1_790_000_000_000 + i,
+        fallsAtMs: 1_790_002_700_000 + i,
+        realm: 'Claudemoon',
+      });
     }
 
     // Every account any stream mentions resolves to a link row, so every item is
@@ -272,8 +316,12 @@ describe('discord/outbox payload size at the full-cap drain', () => {
       activity: { items: unknown[] };
       winners: { days: unknown[] };
       linkChanges: { items: unknown[] };
+      pvpKills: { items: unknown[] };
+      hillAnnouncements: { items: unknown[] };
     };
     expect(payload.relay.items).toHaveLength(RELAY_CAP);
+    expect(payload.pvpKills.items).toHaveLength(PVP_KILL_FEED_MAX_QUEUE);
+    expect(payload.hillAnnouncements.items).toHaveLength(HILL_ANNOUNCEMENT_MAX_QUEUE);
     expect(payload.activity.items).toHaveLength(ACTIVITY_CAP);
     expect(payload.linkChanges.items).toHaveLength(OUTBOX_LINK_CHANGE_PAGE);
     expect(payload.winners.days).toHaveLength(1);
@@ -351,5 +399,7 @@ describe('outbox contract literals', () => {
     expect(OUTBOX_LINK_CHANGE_PAGE).toBe(1000);
     expect(RELAY_MAX_QUEUE).toBe(50);
     expect(ACTIVITY_MAX_QUEUE).toBe(100);
+    expect(PVP_KILL_FEED_MAX_QUEUE).toBe(100);
+    expect(HILL_ANNOUNCEMENT_MAX_QUEUE).toBe(10);
   });
 });

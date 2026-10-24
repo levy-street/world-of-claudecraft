@@ -244,12 +244,52 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     detachToUiRoot: true,
     stockHome: { parentId: 'target-frame', slot: 'last' },
   },
+  // The player's resource bar (mana / energy / rage), live only while the
+  // Detach Resource Bar option is on (hud_frame_registry.ts gates it, the
+  // independent target-of-target's shape). The frame is a wrapper around the
+  // bar rather than the bar itself: the bar clips its own box (the bevel's
+  // clip-path, overflow hidden), which would swallow the mover chrome. It sits
+  // inside the player frame, so it re-homes onto #ui while positioned and
+  // returns to the end of the bars column. Its size lives in real settings
+  // (frame_dimensions.ts), so the editor drags and the frame-option sliders
+  // are one state.
+  {
+    id: 'playerResource',
+    elementId: 'pf-resource-frame',
+    storageKey: 'woc_hud_frame_player_resource',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.playerResource',
+    fallbackSize: { w: 232, h: 11 },
+    detachToUiRoot: true,
+    stockHome: { parentId: 'pf-bars', slot: 'last' },
+  },
   {
     id: 'stanceBar',
     elementId: 'stancebar',
     storageKey: 'woc_hud_frame_stancebar',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.stanceBar',
     fallbackSize: { w: 180, h: 44 },
+    detachToUiRoot: true,
+  },
+  // The Shardpike bar (src/ui/hud/shardpike/): the Balgath quest tool's three verbs,
+  // standing in the transformed #actionbar-stack beside the stance and pet bars, so it
+  // detaches exactly as they do. It is a REGISTERED row rather than an exemption because it
+  // is an action bar the player presses under boss pressure: leaving it the one immovable
+  // bar in the stack would drop it on top of whatever a player with a rearranged HUD has
+  // already docked there, and the stock slot is chosen for a stock layout only.
+  //
+  // Content-scoped, not class-scoped, so it needs no classGatedFrameActive arm: any class
+  // can carry the pike. It falls through to isHudFrameActive's default (true), which is the
+  // posture the cast bar, both swing timers and the Delve / Rift trackers already take:
+  // hidden in play until its content exists, shown as a dimmed placeholder while editing so
+  // the frame can be placed before the fight rather than during it.
+  {
+    id: 'shardpikeBar',
+    elementId: 'shardpike-bar',
+    storageKey: 'woc_hud_frame_shardpike_bar',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.shardpikeBar',
+    // Three 40px verbs in a 4px-gapped, 4px-padded, 2px-bordered group (140 x 52), plus the
+    // 10px balance beam and its 4px gap once the pike is couched.
+    fallbackSize: { w: 140, h: 66 },
     detachToUiRoot: true,
   },
   {
@@ -446,6 +486,18 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 240, h: 140 },
     detachToUiRoot: true,
   },
+  // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*): the
+  // plate and boss rows at the top of the same #right-tracker-stack column.
+  // Its painter builds the skeleton once and never rebuilds it, so the root is
+  // safe as the frame, the deed tracker's posture.
+  {
+    id: 'dungeonTracker',
+    elementId: 'dungeon-tracker',
+    storageKey: 'woc_hud_frame_dungeon_tracker',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.dungeonTracker',
+    fallbackSize: { w: 240, h: 130 },
+    detachToUiRoot: true,
+  },
   // The off-hand swing timer, the main-hand row's dual-wield sibling: same
   // placeholder posture as the cast and swing bars (hidden outside combat,
   // force-shown dimmed while editing).
@@ -476,6 +528,19 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
       resizeMode: 'box',
     }),
   ),
+  // The King of the Hill bar (src/ui/hud/hill/), top centre while the player
+  // stands in the hill's zone. A #ui child, so no re-home; hidden outside the
+  // zone, so editing shows it as a dimmed placeholder like the cast bar. Its
+  // painter rebuilds an inner #hill-body, so the mover chrome on the root
+  // survives every skeleton rebuild.
+  {
+    id: 'hillBar',
+    elementId: 'hill-bar',
+    storageKey: 'woc_hud_frame_hill_bar',
+    labelKey: 'hudChrome.hill.title',
+    fallbackSize: { w: 300, h: 92 },
+    detachToUiRoot: false,
+  },
   // The mouseover unit tooltip (the mob and player hover card). The card itself
   // is the shared transient #tooltip box, so the frame is its SEAT: an
   // invisible anchor whose stock spot is the classic bottom-right slot, which

@@ -4,7 +4,7 @@
 // legacy meaning, and an ability the painter declines (no spec, or an
 // archetype it does not claim) must draw NOTHING. Without the guard the event
 // walks the whole generic chain in handleEvent and lands on the terminal
-// `this.vfx.nova(...)`, popping a school-colored burst on a cast that drew
+// `this.vfx.spellNova(...)`, popping a school-colored burst on a cast that drew
 // nothing before this subsystem existed (sport_second_wind is the reachable
 // case: requiresTarget false, a lone selfBuff effect, no castFx, no spec).
 import { describe, expect, it, vi } from 'vitest';
@@ -17,7 +17,7 @@ interface EventHarness {
 }
 
 type SpellfxCalls = {
-  nova: ReturnType<typeof vi.fn>;
+  spellNova: ReturnType<typeof vi.fn>;
   tick: ReturnType<typeof vi.fn>;
   lightningProjectile: ReturnType<typeof vi.fn>;
 };
@@ -29,7 +29,7 @@ function spellfxHarness(painterClaims: boolean): {
   showChatBubble: ReturnType<typeof vi.fn>;
 } {
   const calls: SpellfxCalls = {
-    nova: vi.fn(),
+    spellNova: vi.fn(),
     tick: vi.fn(),
     lightningProjectile: vi.fn(),
   };
@@ -60,7 +60,7 @@ describe('unclaimed selfCast cues draw nothing', () => {
 
     harness.handleEvent(selfCast('sport_second_wind'));
 
-    expect(calls.nova).not.toHaveBeenCalled();
+    expect(calls.spellNova).not.toHaveBeenCalled();
     expect(calls.tick).not.toHaveBeenCalled();
     expect(calls.lightningProjectile).not.toHaveBeenCalled();
   });
@@ -70,7 +70,7 @@ describe('unclaimed selfCast cues draw nothing', () => {
 
     harness.handleEvent(selfCast('sport_second_wind'));
 
-    expect(calls.nova).not.toHaveBeenCalled();
+    expect(calls.spellNova).not.toHaveBeenCalled();
   });
 
   it('still barks the Goad grawlix, which is emitted before the claim', () => {

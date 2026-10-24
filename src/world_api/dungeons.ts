@@ -68,15 +68,55 @@ export interface HoardBossCueView {
   targetId?: number;
 }
 
+/** One boss row of the dungeon run the local player stands in. */
+export interface DungeonRunBossView {
+  /** The boss's mob template id: the row's stable identity and its name key. */
+  mobId: string;
+  /** True while this encounter is over in this run. Dead bosses stay dead
+   *  until the claim is freed, so in play a finished row stays finished. A
+   *  boss of several bodies (the Mere Hydra's three heads) is over only while
+   *  ALL of them lie dead: one or two fallen heads leave the row open. */
+  defeated: boolean;
+}
+
+/**
+ * The group dungeon run the local player is physically inside, or null
+ * anywhere else (the open world, a delve, a rift, an arena, a raid room, or a
+ * dungeon that authors no boss list). The rows are the dungeon's own boss
+ * list in route order, decided by the sim (src/sim/instances/dungeon_run.ts),
+ * so both hosts and every surface agree on what counts as a boss.
+ *
+ * Reference-stable: a world hands back the SAME object until the run changes
+ * (a boss falls, the difficulty or the dungeon differs, the player leaves),
+ * so a consumer may diff by identity.
+ */
+export interface DungeonRunView {
+  dungeonId: string;
+  /** The difficulty the CLAIM runs on, which is what the mobs were spawned
+   *  at. Not the selector read by dungeonDifficulty(), which a leader can
+   *  flip for the next run while standing inside this one. */
+  difficulty: DungeonDifficulty;
+  bosses: readonly DungeonRunBossView[];
+}
+
 export interface IWorldDungeons {
   enterDungeon(dungeonId: string): WorldInteractionOutcome;
   leaveDungeon(): WorldInteractionOutcome;
+  // The group dungeon run the local player stands in, with each boss's
+  // defeated state, driving the HUD's dungeon objectives tracker. Null outside
+  // a tracked dungeon. Online it mirrors the self record's `dgrun` key.
+  dungeonRun: DungeonRunView | null;
   // Still-locked raids for the local player (unlock countdown in ms), driving the
   // minimap raid-lockout badge + panel. Empty when nothing is locked.
   raidLockouts(): RaidLockout[];
   // Whether this fixed-position world boss is spawned and alive right now. Reward
   // eligibility remains a separate per-player raid-lockout read.
   worldBossActive(bossId: string): boolean;
+  // Answer a dungeon guide's offer for the whole group ("Come with us" when
+  // `accept`, "We go alone" otherwise). The sim validates everything (same
+  // claim, in reach, offer still open); the guide's state rides his entity
+  // (`guideState`), so this is a send with no return.
+  answerDungeonGuide(npcId: number, accept: boolean): void;
   // The active procedural Rift floor for the local player (null outside a rift).
   riftFloor: RiftFloorView | null;
   // Key into the per-Sim rift collision registry (sim/colliders.ts). Per world
@@ -116,9 +156,13 @@ export interface IWorldDungeons {
   // without a snapshot round trip.
   riftEventMsRemaining(): number | null;
   dungeonDifficulty(): DungeonDifficulty;
+  activeDungeonDifficulty(): DungeonDifficulty | null;
   setDungeonDifficulty(difficulty: DungeonDifficulty): void;
+  // The viewer's Heroic Marks balance: a currency counter, never a bag stack
+  // (src/sim/heroic_marks.ts). Online it mirrors the `hmarks` self key.
+  readonly heroicMarks: number;
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),
-  // paying its Heroic Marks price from the buyer's bags. Server-validated.
+  // paying its Heroic Marks price from the buyer's balance. Server-validated.
   buyHeroicVendorItem(itemId: string): void;
   // Redeem one Crucible Quartermaster set piece (src/sim/content/ignivar_loot.ts),
   // paying its matching-slot sigil from the buyer's bags. Server-validated,

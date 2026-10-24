@@ -18,10 +18,9 @@ export type CooldownOrientation = 'horizontal' | 'vertical';
 /** Which way buttons grow: `forward` is right (horizontal) or down (vertical),
  *  `reverse` is left or up. */
 export type CooldownDirection = 'forward' | 'reverse';
-/** When a group paints. A hidden group still plays its sounds and lights the
- *  hotbar, so a player can route a spell to sound alone. */
-export type CooldownVisibility = 'always' | 'combat' | 'hidden';
-export const COOLDOWN_VISIBILITIES: readonly CooldownVisibility[] = ['always', 'combat', 'hidden'];
+/** The legacy single-choice visibility a save made before the checkmark rows may
+ *  still carry; sanitizeCooldownGroup reads it into the combat row. */
+type LegacyCooldownVisibility = 'always' | 'combat' | 'hidden';
 
 /** The most groups one character keeps. */
 export const COOLDOWN_MAX_GROUPS = 12;
@@ -65,7 +64,16 @@ export interface CooldownGroup {
   perLine: number;
   /** Grid only: how many runs. Always enough to hold the group's spells. */
   lines: number;
-  visibility: CooldownVisibility;
+  /** The combat row: the group shows out of combat, in combat, or both. Both
+   *  unticked hides it on screen, but it still plays its sounds and lights the
+   *  hotbar, so a player can route a spell to sound alone. */
+  showOutOfCombat: boolean;
+  showInCombat: boolean;
+  /** The place row: the open world, instances (dungeons, raids, delves, rifts,
+   *  battlegrounds, the arena), or both. Outside a ticked place the group is fully off: hidden,
+   *  silent, and no hotbar glow. */
+  showInWorld: boolean;
+  showInInstances: boolean;
   /** Print the remaining cooldown seconds on each button. */
   showTimer: boolean;
 }
@@ -81,8 +89,12 @@ export interface CooldownSpellConfig {
   soundVolume: number;
   /** Brighten and outline the button while the spell is ready to press. */
   glowWhenReady: boolean;
-  /** Keep the button's slot empty until the spell is ready. */
-  onlyWhenReady: boolean;
+  /** Show the button while the spell is ready (an aura: while it is up). */
+  showReady: boolean;
+  /** Show the button while the spell is NOT ready (on cooldown, unaffordable; an
+   *  aura: while it is missing or short of its stack goal). An aura with only
+   *  this ticked is a buff reminder: see cooldownAuraReminder (the view). */
+  showNotReady: boolean;
   /** Also light this spell's action-bar button with the proc glow while it is
    *  ready. Additive only, like the Auras panel's Hotbar Glow: it can never
    *  suppress an authored class proc glow. */
@@ -118,7 +130,8 @@ export function defaultCooldownSpellConfig(): CooldownSpellConfig {
     soundId: AURA_CUE_NONE,
     soundVolume: 0.7,
     glowWhenReady: true,
-    onlyWhenReady: false,
+    showReady: true,
+    showNotReady: true,
     hotbarGlow: false,
     alertStacks: 0,
   };
@@ -178,16 +191,32 @@ export function cooldownCell(
     : { column: run + 1, row: along + 1 };
 }
 
-/** Whether a group paints this frame (the placement preview shows every group
- *  so a hidden one can still be arranged). */
+/** The group fields that decide when it shows and when it is active. */
+export type CooldownGroupWhen = Pick<
+  CooldownGroup,
+  'showOutOfCombat' | 'showInCombat' | 'showInWorld' | 'showInInstances'
+>;
+
+/** Whether a group is ACTIVE where the player stands: outside its ticked places
+ *  it is fully off, so its buttons hide, its sounds mute and its hotbar glow
+ *  goes dark. The combat row never mutes (the shared Sounds Only in Combat
+ *  switch owns that), which keeps a both-unticked group a sound-only route. */
+export function cooldownGroupActive(group: CooldownGroupWhen, inInstance: boolean): boolean {
+  return inInstance ? group.showInInstances : group.showInWorld;
+}
+
+/** Whether a group paints this frame: active here, and the current combat state
+ *  ticked. The placement preview shows every group so a hidden one can still be
+ *  arranged. */
 export function cooldownGroupShown(
-  visibility: CooldownVisibility,
+  group: CooldownGroupWhen,
   inCombat: boolean,
+  inInstance: boolean,
   preview: boolean,
 ): boolean {
   if (preview) return true;
-  if (visibility === 'hidden') return false;
-  return visibility === 'always' || inCombat;
+  if (!cooldownGroupActive(group, inInstance)) return false;
+  return inCombat ? group.showInCombat : group.showOutOfCombat;
 }
 
 /** Case- and accent-insensitive "name contains query" for the spell search. An
@@ -258,9 +287,21 @@ export function newCooldownGroup(
     direction: 'forward',
     perLine: 3,
     lines: 3,
-    visibility: 'always',
+    showOutOfCombat: true,
+    showInCombat: true,
+    showInWorld: true,
+    showInInstances: true,
     showTimer: true,
   };
+}
+
+const LEGACY_VISIBILITIES: readonly LegacyCooldownVisibility[] = ['always', 'combat', 'hidden'];
+
+/** The combat row a pre-checkmark save meant by its single visibility choice. */
+function legacyCombatRow(raw: unknown): { showOutOfCombat: boolean; showInCombat: boolean } | null {
+  const value = LEGACY_VISIBILITIES.find((entry) => entry === raw);
+  if (!value) return null;
+  return { showOutOfCombat: value === 'always', showInCombat: value !== 'hidden' };
 }
 
 export function sanitizeCooldownGroup(raw: unknown): CooldownGroup | null {
@@ -291,6 +332,7 @@ export function sanitizeCooldownGroup(raw: unknown): CooldownGroup | null {
     intIn(value.lines, 1, COOLDOWN_GRID_MAX_SIDE, base.lines),
     kind === 'grid' ? minGridLines(spells.length, perLine) : 1,
   );
+  const legacy = legacyCombatRow(value.visibility);
   return {
     id: value.id,
     kind,
@@ -305,7 +347,10 @@ export function sanitizeCooldownGroup(raw: unknown): CooldownGroup | null {
     direction: oneOf(value.direction, ['forward', 'reverse'], base.direction),
     perLine,
     lines,
-    visibility: oneOf(value.visibility, COOLDOWN_VISIBILITIES, base.visibility),
+    showOutOfCombat: boolOr(value.showOutOfCombat, legacy?.showOutOfCombat ?? base.showOutOfCombat),
+    showInCombat: boolOr(value.showInCombat, legacy?.showInCombat ?? base.showInCombat),
+    showInWorld: boolOr(value.showInWorld, base.showInWorld),
+    showInInstances: boolOr(value.showInInstances, base.showInInstances),
     showTimer: boolOr(value.showTimer, base.showTimer),
   };
 }
@@ -339,7 +384,12 @@ export function sanitizeCooldownSpellConfig(raw: unknown): CooldownSpellConfig {
       fallback.soundVolume,
     ),
     glowWhenReady: boolOr(value.glowWhenReady, fallback.glowWhenReady),
-    onlyWhenReady: boolOr(value.onlyWhenReady, fallback.onlyWhenReady),
+    showReady: boolOr(value.showReady, fallback.showReady),
+    // A pre-checkmark save's "Only Show When Ready" is the ready box alone.
+    showNotReady: boolOr(
+      value.showNotReady,
+      value.onlyWhenReady === true ? false : fallback.showNotReady,
+    ),
     hotbarGlow: boolOr(value.hotbarGlow, fallback.hotbarGlow),
     alertStacks: intIn(value.alertStacks, 0, COOLDOWN_ALERT_STACKS_MAX, fallback.alertStacks),
   };

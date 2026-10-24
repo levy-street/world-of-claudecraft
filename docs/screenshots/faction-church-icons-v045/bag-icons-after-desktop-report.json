@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/order_prayer_beads.webp",
+    "http://localhost:5194/ui/items/vestments_of_the_acolyte.webp",
+    "http://localhost:5194/ui/items/templar_dawn_shield.webp",
+    "http://localhost:5194/ui/items/dawnkeeper_consecrated_mace.webp",
+    "http://localhost:5194/ui/items/champion_dawn_medallion.webp",
+    "http://localhost:5194/ui/items/acolytes_signet.webp",
+    "http://localhost:5194/ui/items/cord_of_the_dawn.webp",
+    "http://localhost:5194/ui/items/dawnlit_slippers.webp",
+    "http://localhost:5194/ui/items/formula_dawnfire_etching.webp",
+    "http://localhost:5194/ui/items/formula_dawns_benediction.webp",
+    "http://localhost:5194/ui/items/champions_dawn_loop.webp",
+    "http://localhost:5194/ui/items/dawnkeepers_circle.webp"
+  ],
+  "allDecoded": true
+}

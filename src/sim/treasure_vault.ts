@@ -6,17 +6,17 @@
 //   - using it again on the X spends it and opens a private vault portal, an
 //     event-less Rift portal (src/sim/rift/) stamped with its owner, so only
 //     the owner and their party may enter and the run pays no Rift ladder;
-//   - the vault applies fixed solo or five-player tuning based on rarity
+//   - the vault scales the Rift rank tuning to the head count its owner brought
 //     and, when the boss falls, pays every entrant the rarity's table;
 //   - a read map can be redrawn one rarity finer with Cartographer's Ink, which
 //     the faction quartermasters sell for their currency.
 //
-// State lives on PlayerMeta (treasureMap) behind the world-quest save.
-// Legacy guest counters remain readable. Every roll draws from ctx.rng in a fixed order.
+// State lives on PlayerMeta (treasureMap, vaultGuestCycle, vaultGuestPayouts)
+// behind the world-quest save. Every roll draws from ctx.rng in a fixed order.
 
 import {
   CARTOGRAPHERS_INK_ITEM_ID,
-  HOARD_SUGGESTED_PLAYERS,
+  type InkMapTarget,
   isTreasureMapRarity,
   nextTreasureMapRarity,
   TREASURE_DIG_RADIUS,
@@ -29,13 +29,14 @@ import {
   TREASURE_SITES_BY_ID,
   type TreasureMapProgress,
   type TreasureMapRarity,
+  VAULT_GUEST_PAYOUTS_PER_CYCLE,
+  VAULT_PORTAL_LIFETIME,
   vaultDamageFactor,
   vaultHealthFactor,
 } from './content/treasure_maps';
 import { zoneAt } from './data';
 import { createGroundObject } from './entity';
 import { mountOwned } from './mounts';
-import { hoardOwnerPid, mayRecoverHoardCorpse } from './rift/hoard_party';
 import { grantHoardReward } from './rift/hoard_reward_grant';
 import { rollHoardReward } from './rift/hoard_reward_roll';
 import { RIFT_RANK_BASE_LEVEL, type RiftRankTuning } from './rift/ranks';
@@ -52,12 +53,6 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { findHoardEntrancePosition } from './treasure_vault_placement';
 import type { Entity } from './types';
-import {
-  completeVaultAttempt,
-  expireVaultAttempt,
-  VAULT_LIFETIME_MS,
-  vaultDeadline,
-} from './vault_lifecycle';
 import { waterLevelAt } from './world';
 
 export const VAULT_MOUNT_KEY = 'lanternback_troll';
@@ -67,8 +62,6 @@ export const VAULT_MOUNT_KEY = 'lanternback_troll';
  * save, so a later map cannot reuse a completed attempt's reward claim. */
 export interface VaultAttempt extends TreasureMapProgress {
   id: string;
-  expiresAtMs?: number;
-  bossKilledAtMs?: number;
 }
 // ---------------------------------------------------------------------------
 // Save boundary
@@ -94,15 +87,7 @@ export function sanitizeVaultAttempt(raw: unknown, characterId?: number): VaultA
     (characterId !== undefined && owner !== characterId)
   )
     return null;
-  const { expiresAtMs, bossKilledAtMs } = raw as Record<string, unknown>;
-  const timestamp = (value: unknown): value is number =>
-    typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
-  return {
-    ...map,
-    id,
-    ...(timestamp(expiresAtMs) ? { expiresAtMs } : {}),
-    ...(timestamp(bossKilledAtMs) ? { bossKilledAtMs } : {}),
-  };
+  return { ...map, id };
 }
 
 export function sanitizeVaultGuestPayouts(raw: unknown): number {
@@ -160,7 +145,6 @@ export function useTreasureMap(
   consumeOneUnit: () => void,
 ): void {
   const pid = meta.entityId;
-  expireVaultAttempt(meta, ctx.lockoutNowMs());
   const active = meta.treasureMap;
   if (meta.vaultAttempt) {
     ctx.error(pid, 'You are already following another treasure map.');
@@ -183,11 +167,7 @@ export function useTreasureMap(
   }
   const nextSeq = meta.vaultAttemptSeq + 1;
   if (!Number.isSafeInteger(nextSeq)) return;
-  const attempt: VaultAttempt = {
-    ...active,
-    id: `${meta.characterId ?? 0}:${nextSeq}`,
-    expiresAtMs: ctx.lockoutNowMs() + VAULT_LIFETIME_MS,
-  };
+  const attempt: VaultAttempt = { ...active, id: `${meta.characterId ?? 0}:${nextSeq}` };
   if (!spawnVaultPortal(ctx, player, pid, attempt, meta.characterId, ctx.cfg.vaultOpenNeedsSave)) {
     ctx.emit({ type: 'treasureMapRead', rarity, siteId: active.siteId, fresh: false, pid });
     return;
@@ -238,14 +218,12 @@ function spawnVaultPortal(
       guestCapped: false,
       guestCycle: ownerMeta.worldQuestCycle,
     };
-    // Retained as descriptive portal metadata; never grants entry authority.
     portal.vaultInitialPartyCharacterIds = (ctx.partyOf(ownerPid)?.members ?? [ownerPid])
       .map((memberPid) => ctx.players.get(memberPid)?.characterId)
       .filter((id): id is number => id !== undefined);
   }
   portal.vaultRarity = map.rarity;
-  portal.vaultExpiresAt =
-    'id' in map ? vaultDeadline(map as VaultAttempt) : ctx.lockoutNowMs() + VAULT_LIFETIME_MS;
+  portal.vaultExpiresAt = ctx.time + VAULT_PORTAL_LIFETIME;
   portal.facing = Math.atan2(player.pos.x - position.x, player.pos.z - position.z);
   ctx.addEntity(portal);
   ctx.emit({
@@ -274,44 +252,49 @@ export function confirmVaultAttemptDurable(
   return true;
 }
 
-/** A committed outcome ends retries, but keeps the owner lock until its deadline. */
+/** A committed outcome, not the boss's in-memory death, ends the retry right. */
 export function finishVaultAttempt(
   ctx: SimContext,
   ownerCharacterId: number,
   attemptId: string,
-  killedAtMs: number,
 ): number | null {
   const owner = [...ctx.players.values()].find((meta) => meta.characterId === ownerCharacterId);
+  return clearVaultAttempt(owner, attemptId);
+}
+
+/** Local vaults have no outcome commit to wait for once the clear is decided. */
+export function finishLocalVaultAttempt(
+  ctx: SimContext,
+  ownerPid: number,
+  attemptId: string,
+): void {
+  clearVaultAttempt(ctx.players.get(ownerPid), attemptId);
+}
+
+function clearVaultAttempt(owner: PlayerMeta | undefined, attemptId: string): number | null {
   if (owner?.vaultAttempt?.id !== attemptId) return null;
-  completeVaultAttempt(owner.vaultAttempt, killedAtMs);
-  expireVaultAttempt(owner, ctx.lockoutNowMs());
+  owner.vaultAttempt = null;
   owner.vaultAttemptDurable = true;
   owner.wireRev++;
   return owner.entityId;
 }
 
-/** Once a second: expire owner locks and entrances at their absolute deadline.
- * Instance cleanup uses the same deadline; occupancy never extends it. */
+/** Once a second: an unentered vault portal past its lifetime closes. A portal
+ *  a run is bound to is left to the Rift's own cleanup. Reads the Rift portal
+ *  registry (entity_roster keeps it), so vaults add no list of their own. */
 export function updateVaultPortals(ctx: SimContext): void {
-  if (ctx.tickCount % 20 !== 5) return;
-  const now = ctx.lockoutNowMs();
-  for (const meta of ctx.players.values()) expireVaultAttempt(meta, now);
-  if (!ctx.riftPortalIds) return;
+  if (ctx.tickCount % 20 !== 5 || !ctx.riftPortalIds) return;
   for (const id of [...ctx.riftPortalIds]) {
     const portal = ctx.entities.get(id);
-    if (!portal || portal.vaultExpiresAt === undefined || now < portal.vaultExpiresAt) continue;
+    if (!portal || portal.vaultExpiresAt === undefined || ctx.time < portal.vaultExpiresAt)
+      continue;
+    if (ctx.riftInstances.some((inst) => inst.partyKey !== null && inst.portalId === id)) continue;
     ctx.dropEntity(id);
   }
   for (const meta of ctx.players.values()) {
     const attempt = meta.vaultAttempt;
     const player = ctx.entities.get(meta.entityId);
-    if (
-      !attempt ||
-      attempt.bossKilledAtMs !== undefined ||
-      !meta.vaultAttemptDurable ||
-      !player ||
-      !atTreasureSite(player, attempt)
-    )
+    if (!attempt || !meta.vaultAttemptDurable || !player || !atTreasureSite(player, attempt))
       continue;
     if (
       ctx.riftInstances.some(
@@ -332,29 +315,53 @@ export function updateVaultPortals(ctx: SimContext): void {
 // The Rift hooks (src/sim/rift/runs.ts)
 
 /** Whether `pid` may walk through `portal`: always for an ordinary rift; for a
- *  vault, the owner's current party or a bound dead member recovering a corpse. */
-export function mayEnterVaultPortal(ctx: SimContext, portal: Entity, pid: number): boolean {
-  if (portal.vaultExpiresAt !== undefined && ctx.lockoutNowMs() >= portal.vaultExpiresAt)
-    return false;
-  if (portal.vaultOwnerPid === undefined) return true;
-  if (mayRecoverHoardCorpse(ctx, portal, pid)) return true;
-  const owner = hoardOwnerPid(ctx, portal.vaultOwnerPid, portal.vaultOwnerCharacterId);
+ *  vault, the map's owner and whoever shares the owner's party. */
+function currentVaultOwnerPid(ctx: SimContext, portal: Entity): number | undefined {
+  const ownerCharacterId = portal.vaultOwnerCharacterId;
+  if (ownerCharacterId === undefined) return portal.vaultOwnerPid;
   return (
-    owner !== undefined && (owner === pid || ctx.partyOf(owner)?.members.includes(pid) === true)
+    [...ctx.players.values()].find((meta) => meta.characterId === ownerCharacterId)?.entityId ??
+    portal.vaultOwnerPid
+  );
+}
+
+export function mayEnterVaultPortal(ctx: SimContext, portal: Entity, pid: number): boolean {
+  const owner = portal.vaultOwnerPid;
+  if (owner === undefined || owner === pid) return true;
+  const entrantCharacterId = ctx.players.get(pid)?.characterId;
+  const ownerCharacterId = portal.vaultOwnerCharacterId;
+  if (ownerCharacterId !== undefined && entrantCharacterId === ownerCharacterId) return true;
+  if (
+    entrantCharacterId !== undefined &&
+    portal.vaultInitialPartyCharacterIds?.includes(entrantCharacterId)
+  )
+    return true;
+  const currentOwnerPid = currentVaultOwnerPid(ctx, portal) ?? owner;
+  if (ctx.partyOf(currentOwnerPid)?.members.includes(pid)) return true;
+  // An entrant already bound to this run keeps access even when the owner's
+  // disconnect removes them from the current party.
+  return (
+    entrantCharacterId !== undefined &&
+    ctx.riftInstances.some(
+      (inst) =>
+        inst.vault?.ownerCharacterId === ownerCharacterId &&
+        inst.portalId === portal.id &&
+        inst.seed === portal.riftSeed &&
+        [...(inst.vault?.memberCharacterIds?.values() ?? [])].includes(entrantCharacterId),
+    )
   );
 }
 
 /** The vault record for a fresh run entered through `portal` (null for an
- *  ordinary rift). Difficulty uses the rarity's fixed suggested party size. */
+ *  ordinary rift). The head count is the owner's party size at that moment. */
 export function vaultForPortal(ctx: SimContext, portal: Entity | null): RiftInstance['vault'] {
   if (portal?.vaultOwnerPid === undefined || !portal.vaultRarity) return null;
-  const ownerPid =
-    hoardOwnerPid(ctx, portal.vaultOwnerPid, portal.vaultOwnerCharacterId) ?? portal.vaultOwnerPid;
+  const ownerPid = currentVaultOwnerPid(ctx, portal) ?? portal.vaultOwnerPid;
+  const party = ctx.partyOf(ownerPid);
   const ownerCharacterId =
     portal.vaultOwnerCharacterId ?? ctx.players.get(portal.vaultOwnerPid)?.characterId;
   return {
     rarity: portal.vaultRarity,
-    expiresAtMs: portal.vaultExpiresAt ?? ctx.lockoutNowMs() + VAULT_LIFETIME_MS,
     ...(portal.vaultAttemptId ? { attemptId: portal.vaultAttemptId } : {}),
     ownerPid,
     ...(ownerCharacterId === undefined
@@ -366,40 +373,40 @@ export function vaultForPortal(ctx: SimContext, portal: Entity | null): RiftInst
             ? { entrantSnapshots: new Map([[ownerCharacterId, portal.vaultOwnerRewardSnapshot]]) }
             : {}),
         }),
-    // Keep the existing run-record shape; this is an authored size, not attendance.
-    headCount: HOARD_SUGGESTED_PLAYERS[portal.vaultRarity],
+    headCount: Math.max(1, Math.min(5, party?.members.length ?? 1)),
     level: ctx.entities.get(ownerPid)?.level ?? RIFT_RANK_BASE_LEVEL.C,
     ...(portal.devForceHoardGoblin ? { forceGoblin: true } : {}),
   };
 }
 
-/** The rank tuning adjusted for a vault's fixed rarity budget; unchanged for a rift. */
+/** The rank tuning scaled to a vault's head count; unchanged for a rift. */
 export function vaultScaledTuning(
   tuning: RiftRankTuning,
   vault: RiftInstance['vault'],
 ): RiftRankTuning {
   if (!vault) return tuning;
-  const health = vaultHealthFactor(vault.rarity);
-  const bossDamage = vaultDamageFactor(vault.rarity, 'boss');
-  const addDamage = vaultDamageFactor(vault.rarity, 'add');
+  const health = vaultHealthFactor(vault.headCount);
+  const damage = vaultDamageFactor(vault.headCount);
   return {
     ...tuning,
     healthMultiplier: tuning.healthMultiplier * health,
     bossHealthMultiplier: tuning.bossHealthMultiplier * health,
-    damageMultiplier: tuning.damageMultiplier * addDamage,
-    bossDamageMultiplier: tuning.bossDamageMultiplier * bossDamage,
-    addDamageMultiplier: tuning.addDamageMultiplier * addDamage,
+    damageMultiplier: tuning.damageMultiplier * damage,
+    bossDamageMultiplier: tuning.bossDamageMultiplier * damage,
+    addDamageMultiplier: tuning.addDamageMultiplier * damage,
   };
 }
 
 /** The boss fell: pay every entrant the rarity's table, the gear off the fallen
- *  boss's own loot (`bossTemplateId`, content/hoard_loot.ts). */
+ *  boss's own loot (`bossTemplateId`, content/hoard_loot.ts). A guest past the
+ *  per-cycle cap is told so and paid nothing; the owner is never capped. */
 export function payTreasureVault(
   ctx: SimContext,
   vault: NonNullable<RiftInstance['vault']>,
   participants: readonly number[],
   bossTemplateId: string | undefined,
-): void {
+): boolean {
+  let paid = false;
   for (const pid of participants) {
     const meta = ctx.players.get(pid);
     const player = ctx.entities.get(pid);
@@ -413,47 +420,71 @@ export function payTreasureVault(
       cls: meta.cls,
       level: player.level,
       owner,
-      guestCapped: false,
+      guestCapped:
+        !owner &&
+        meta.vaultGuestCycle === meta.worldQuestCycle &&
+        (meta.vaultGuestPayouts ?? 0) >= VAULT_GUEST_PAYOUTS_PER_CYCLE,
       mountOwned: mountOwned(meta, VAULT_MOUNT_KEY),
     });
-    grantHoardReward(ctx, pid, vault.rarity, reward);
+    paid = grantHoardReward(ctx, pid, vault.rarity, reward, owner) || paid;
   }
+  return paid;
 }
 
 // ---------------------------------------------------------------------------
-// Cartographer's Ink (the `cartographersInk` item-use arm): redraws the read
+// Cartographer's Ink (the `cartographersInk` item-use arm): redraws a treasure
 // map one rarity finer. The ink is bought from a faction quartermaster.
 
-export function useCartographersInk(ctx: SimContext, meta: PlayerMeta): void {
+export function sanitizeInkMapTarget(raw: unknown): InkMapTarget | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const obj = raw as Record<string, unknown>;
+  if (!isTreasureMapRarity(obj.rarity) || typeof obj.read !== 'boolean') return null;
+  return { rarity: obj.rarity, read: obj.read };
+}
+
+/** `rawTarget` is the chosen map off the wire, re-validated here. Absent (an
+ *  older client, the RL env) it means the read map, the rule before the picker. */
+export function useCartographersInk(ctx: SimContext, meta: PlayerMeta, rawTarget?: unknown): void {
   const pid = meta.entityId;
-  const map = meta.treasureMap;
-  if (!map) {
+  const read = meta.treasureMap;
+  const target = rawTarget === undefined ? undefined : sanitizeInkMapTarget(rawTarget);
+  if (target === null || (target?.read && read?.rarity !== target.rarity)) {
+    ctx.error(pid, 'You no longer hold that treasure map.');
+    return;
+  }
+  const rarity = target ? target.rarity : read?.rarity;
+  if (!rarity) {
     ctx.error(pid, 'Read the treasure map you want to redraw first.');
     return;
   }
-  const next = nextTreasureMapRarity(map.rarity);
+  const next = nextTreasureMapRarity(rarity);
   if (!next) {
     ctx.error(pid, 'This map cannot be improved any further.');
     return;
   }
-  const inks = TREASURE_MAP_UPGRADE_INKS[map.rarity];
+  const inks = TREASURE_MAP_UPGRADE_INKS[rarity];
   if (ctx.countItem(CARTOGRAPHERS_INK_ITEM_ID, pid) < inks) {
     ctx.error(pid, `Redrawing this map takes ${inks} Cartographer's Ink.`);
     return;
   }
-  if (ctx.countItem(TREASURE_MAP_ITEM_IDS[map.rarity], pid) < 1) {
+  // An unread copy of the read map's rarity must be a copy beyond the read one.
+  const redrawsRead = !target || target.read;
+  const spare = !redrawsRead && read?.rarity === rarity ? 1 : 0;
+  if (ctx.countItem(TREASURE_MAP_ITEM_IDS[rarity], pid) < 1 + spare) {
     ctx.error(pid, 'You no longer hold that treasure map.');
     return;
   }
   ctx.removeItem(CARTOGRAPHERS_INK_ITEM_ID, inks, pid);
-  ctx.removeItem(TREASURE_MAP_ITEM_IDS[map.rarity], 1, pid);
+  ctx.removeItem(TREASURE_MAP_ITEM_IDS[rarity], 1, pid);
   ctx.addItem(TREASURE_MAP_ITEM_IDS[next], 1, pid);
-  const site = TREASURE_SITES_BY_ID[map.siteId];
-  meta.treasureMap = {
-    rarity: next,
-    siteId: map.siteId,
-    seed: pickVaultSeed(ctx, next, site.zoneId),
-  };
-  meta.wireRev++;
+  if (redrawsRead && read) {
+    const site = TREASURE_SITES_BY_ID[read.siteId];
+    meta.treasureMap = {
+      rarity: next,
+      siteId: read.siteId,
+      seed: pickVaultSeed(ctx, next, site.zoneId),
+    };
+    meta.wireRev++;
+  }
   ctx.emit({ type: 'treasureMapUpgraded', rarity: next, inks, pid });
 }

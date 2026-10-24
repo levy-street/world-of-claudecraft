@@ -56,7 +56,6 @@ describe('desktop prefs schema', () => {
       gpuBackend: 'auto',
       consecutiveGpuLaunchCrashes: 0,
       launchesSinceBackendReprobe: 0,
-      shaderDiskCacheOptOut: false,
     });
   });
 
@@ -78,7 +77,6 @@ describe('desktop prefs schema', () => {
       },
       consecutiveGpuLaunchCrashes: 2,
       launchesSinceBackendReprobe: 7,
-      shaderDiskCacheOptOut: true,
       // Junk a hand-edited file could carry; none of it may survive.
       apiOrigin: 'https://evil.example',
       extra: 'nope',
@@ -100,7 +98,6 @@ describe('desktop prefs schema', () => {
       },
       consecutiveGpuLaunchCrashes: 2,
       launchesSinceBackendReprobe: 7,
-      shaderDiskCacheOptOut: true,
     });
     expect(Object.keys(prefs).sort()).toEqual([
       'consecutiveGpuLaunchCrashes',
@@ -113,7 +110,6 @@ describe('desktop prefs schema', () => {
       'gpuForceOptOut',
       'launchesSinceBackendReprobe',
       'maximized',
-      'shaderDiskCacheOptOut',
       'version',
       'windowBounds',
     ]);
@@ -388,7 +384,6 @@ describe('loadDesktopPrefs', () => {
       displayMode: 'windowed',
       discordPresenceEnabled: false,
       gpuBackend: 'vulkan',
-      shaderDiskCacheOptOut: true,
     };
     expect(saveDesktopPrefs(filePath, saved)).toBe(true);
     // mkdir recursive: the userData subdirectory may not exist on a first run.
@@ -409,9 +404,6 @@ describe('loadDesktopPrefs', () => {
       gpuBackend: 'vulkan',
       consecutiveGpuLaunchCrashes: 0,
       launchesSinceBackendReprobe: 0,
-      // Non-default: a hand-set off switch that failed to persist would switch the
-      // shader disk cache back on at the next launch.
-      shaderDiskCacheOptOut: true,
     });
   });
 
@@ -572,7 +564,6 @@ describe('loadDesktopPrefs', () => {
       gpuBackend: 'auto',
       consecutiveGpuLaunchCrashes: 0,
       launchesSinceBackendReprobe: 0,
-      shaderDiskCacheOptOut: false,
     });
     expect(Object.prototype).not.toHaveProperty('polluted');
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
@@ -615,7 +606,7 @@ describe('saveDesktopPrefs', () => {
     expect(calls).toEqual([
       'mkdir:/userdata:true',
       'open:<staged>:wx',
-      'write:41:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true,"gpuBackend":"auto","consecutiveGpuLaunchCrashes":0,"launchesSinceBackendReprobe":0,"shaderDiskCacheOptOut":false}:utf8',
+      'write:41:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true,"gpuBackend":"auto","consecutiveGpuLaunchCrashes":0,"launchesSinceBackendReprobe":0}:utf8',
       'fsync:41',
       'close:41',
       'rename:<staged>:/userdata/desktop-prefs.json',
@@ -752,7 +743,6 @@ describe('saveDesktopPrefs', () => {
       gpuBackend: 'auto',
       consecutiveGpuLaunchCrashes: 0,
       launchesSinceBackendReprobe: 0,
-      shaderDiskCacheOptOut: false,
     });
   });
 

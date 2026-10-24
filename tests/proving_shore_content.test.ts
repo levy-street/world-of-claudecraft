@@ -45,8 +45,21 @@ describe('proving shore placement', () => {
   it('pins the town landing literally beside the return ferry bell', () => {
     // The home ride's destination as a bare literal (the ferry_prewarm suite
     // compares constant to constant, which a bad edit moves in lockstep).
-    // The revised handoff keeps the landing here and guides into the square.
-    expect(FERRY_BELL_TOWN_LANDING).toEqual({ x: -4.5, z: -101.5, facing: -0.87 });
+    // Re-pinned 2026-10 when the town bell moved down to the quay at
+    // (-95, -45): the graduate lands a stride from it, facing the chapel.
+    expect(FERRY_BELL_TOWN_LANDING).toEqual({ x: -92.5, z: -46.5, facing: 2.12 });
+    expect(Math.hypot(FERRY_BELL_TOWN_LANDING.x + 95, FERRY_BELL_TOWN_LANDING.z + 45)).toBeLessThan(
+      4,
+    );
+    const bells = PROVING_SHORE_OBJECTS.find((o) => o.itemId === 'ps_ferry_bell')?.positions;
+    expect(bells).toContainEqual({ x: -95, z: -45 });
+    // Facing the Eastbrook chapel (eastbrook_layout.ts anchor), within a degree.
+    const chapel = { x: 28.2, z: -119.62 };
+    const toward = Math.atan2(
+      chapel.x - FERRY_BELL_TOWN_LANDING.x,
+      chapel.z - FERRY_BELL_TOWN_LANDING.z,
+    );
+    expect(Math.abs(toward - FERRY_BELL_TOWN_LANDING.facing)).toBeLessThan(Math.PI / 180);
   });
 
   it('hub, graveyard, pois, arrival, npcs, camps, and crates sit on dry walkable ground', () => {

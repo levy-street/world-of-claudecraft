@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/bastion_captain_woc.glb",
+      "out": "models/creatures/woc_bastion_captain.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Hit",
+        "Attack",
+        "Attack2",
+        "Cast",
+        "Broadside",
+        "Anchor",
+        "Boarding",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

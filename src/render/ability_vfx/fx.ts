@@ -14,6 +14,7 @@ import {
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { CAST_VFX_ENGINE, type CastVfxSpawnGate } from '../cast_vfx_family';
+import type { ShardpikeThrowFx } from '../shardpike_throw_fx';
 import { tanHalfVerticalFov } from '../vfx_screen_bounds_core';
 import type { WarriorFuryStateAura, WarriorFuryStateKind } from '../warrior_fury_state_core';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
@@ -459,6 +460,7 @@ const PROJ_STYLE_BY_PALETTE: Record<string, BoltTrailStyle> = {
 };
 
 export class AbilityVfxFx implements SequencerHost {
+  shardpikeThrow?: ShardpikeThrowFx;
   private ribbons: AbilityVfxRibbons;
   private worldLightCb:
     | ((
@@ -1390,7 +1392,6 @@ export class AbilityVfxFx implements SequencerHost {
 
     this.crests.update(0.05, false);
     this.bakedAt('smoke', x, y, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
-    this.bakedAt('shockwave', x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     for (const kind of ['shout_dust', 'warrior_power'] as const)
       this.bakedAt(kind, x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     this.baked.update(0.1, this.camera.quaternion, false);
@@ -2473,6 +2474,7 @@ export class AbilityVfxFx implements SequencerHost {
     // the archetype sequences advance here so their transient draws (release
     // flash, gavel descent, stun stars) land inside this frame's overlay batch
     this.contactBursts.update(this, dt);
+    this.shardpikeThrow?.update(dt, reducedMotion);
     this.sequencer.update(this, dt);
     this.furyAudio.update(this, dt);
     // Pack after the sequence emits this frame's contacts, so the visible
@@ -2537,6 +2539,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   clear(): void {
+    this.shardpikeThrow?.dispose();
     this.guards.clear();
     this.powerForms.clear();
     this.spiritHammers.clear();

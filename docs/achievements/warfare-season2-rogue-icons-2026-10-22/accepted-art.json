@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-rogue-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 75,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_assassination_helmet",
+      "family": "assassination",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_assassination_helmet.webp",
+      "canonicalDisplayName": "Nightcut Hood",
+      "acceptedSha256": "18e90290d34291b0bdafb9ea22477197c8663e2e3866436bd821e77cbf1fb2e1",
+      "acceptedBytes": 2302,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_assassination_helmet.png",
+        "sha256": "424fde4ad7ebde40faf959e230deba4c4166e37c21e30c454efb86cb1291ba05",
+        "bytes": 2261418,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_assassination_helmet.png",
+        "sha256": "96a279f3dc58d22abc9db60a15408b66d459a5c5454b3b7e852c000e14a79aef",
+        "bytes": 469446,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Nightcut Hood: one complete empty fitted leather hood with a deep face opening, pointed brow and short green inset cheek panels, no face. Assassination rogue leather set: near-black charcoal leather with muted poison-green inset panels, dull steel fasteners and narrow pale stitching. Sharp fitted triangular overlapping leather panels; edge highlights keep dark silhouettes readable. No luminous fog, skulls or weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_assassination_shoulder",
+      "family": "assassination",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_assassination_shoulder.webp",
+      "canonicalDisplayName": "Nightcut Shoulderpads",
+      "acceptedSha256": "6ccec16816759e7b18bb310ecdbfebf2d52d6f81a544369fffcafa792d599cb2",
+      "acceptedBytes": 2658,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_assassination_shoulder.png",
+        "sha256": "b763bc11bbaa3aabf2e2e1fa9a1b1128d3a128642f7f7d7542d9efecbefccf0c",
+        "bytes": 2267983,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_assassination_shoulder.png",
+        "sha256": "949046b2c841851fcc8d244dd63013c7b2c5c207c12036cc323edf9bb116f26c",
+        "bytes": 468787,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Nightcut Shoulderpads: a compact pair of narrow angular layered leather shoulder guards with triangular green inset panels and dull steel rivets, no torso. Assassination rogue leather set: near-black charcoal leather with muted poison-green inset panels, dull steel fasteners and narrow pale stitching. Sharp fitted triangular overlapping leather panels; edge highlights keep dark silhouettes readable. No luminous fog, skulls or weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_assassination_chest",
+      "family": "assassination",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_assassination_chest.webp",
+      "canonicalDisplayName": "Nightcut Tunic",
+      "acceptedSha256": "3d95277f03464bcf7446589de3f70f0f86ea416f65be359e9c5a141d13576edd",
+      "acceptedBytes": 2360,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_assassination_chest.png",
+        "sha256": "83366a59d5c4b5e0ee9d06a70d4ae7ce208704cf6a0033ae1e0fe056cb0323fd",
+        "bytes": 2342354,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_assassination_chest.png",
+        "sha256": "827fb5acfb3029662b8e97c0cdfbe79708ecc64b24453398a2a2930b2105485b",
+        "bytes": 474669,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Nightcut Tunic: one empty front-facing fitted leather torso garment, high collar, angular green side panels and diagonal hidden-buckle closure, no arms or legs. Assassination rogue leather set: near-black charcoal leather with muted poison-green inset panels, dull steel fasteners and narrow pale stitching. Sharp fitted triangular overlapping leather panels; edge highlights keep dark silhouettes readable. No luminous fog, skulls or weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_assassination_legs",
+      "family": "assassination",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_assassination_legs.webp",
+      "canonicalDisplayName": "Nightcut Breeches",
+      "acceptedSha256": "e4bf80e61e00f9d00b5dc85d677c9902a2d73a7603e612e0833ac3abd48170f2",
+      "acceptedBytes": 2328,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_assassination_legs.png",
+        "sha256": "04966c472022f8b5179b439a5b03f3387f59f19860d7334a1c945d1e3c564719",
+        "bytes": 2228121,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_assassination_legs.png",
+        "sha256": "640322f835d709ccb218a6896b4deaa15a1990b244f6b7629d295df7ccab4d95",
+        "bytes": 493133,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Nightcut Breeches: one complete joined pair of fitted dark leather trousers with green narrow thigh panels, angular stitched kneepads and restrained straps, no boots. Assassination rogue leather set: near-black charcoal leather with muted poison-green inset panels, dull steel fasteners and narrow pale stitching. Sharp fitted triangular overlapping leather panels; edge highlights keep dark silhouettes readable. No luminous fog, skulls or weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_assassination_gloves",
+      "family": "assassination",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_assassination_gloves.webp",
+      "canonicalDisplayName": "Nightcut Gloves",
+      "acceptedSha256": "6d167a1917a9dc8d32113560ae611a8ae6f4a76fac0f76445120aa3d2af5bba4",
+      "acceptedBytes": 2548,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_assassination_gloves.png",
+        "sha256": "881e5c71d52d0a6df23ff3af157a4dc43ec6f3401031a3e246b6e8c4675e1fed",
+        "bytes": 2359546,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_assassination_gloves.png",
+        "sha256": "b9d7d01708dba39f3fec5bca891197a82b794faafa3ae08e0e7d56701266f045",
+        "bytes": 498700,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Nightcut Gloves: compact matched pair of empty close-fitting black leather gloves with green wrist panels and small dull steel rivets, all fingers enclosed. Assassination rogue leather set: near-black charcoal leather with muted poison-green inset panels, dull steel fasteners and narrow pale stitching. Sharp fitted triangular overlapping leather panels; edge highlights keep dark silhouettes readable. No luminous fog, skulls or weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_combat_helmet",
+      "family": "combat",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_combat_helmet.webp",
+      "canonicalDisplayName": "Brawlmark Hood",
+      "acceptedSha256": "1244c2f11f5f46c4641f05a6d9f02140da784ecfa5472550e7fd6d1a323e0251",
+      "acceptedBytes": 2776,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_combat_helmet.png",
+        "sha256": "2a58d9f4cbd46d5874b3f1ad33af061dfc2dc7e60d2113927c1d965d00ca77f7",
+        "bytes": 2409058,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_combat_helmet.png",
+        "sha256": "1db247755e5f5ea346cbca6fbd61acc09fa9f7bfe32fb6310589be6d72bdf698",
+        "bytes": 501980,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Brawlmark Hood: one complete empty low-profile oxblood leather hood, blunt reinforced brow, brown padded side panels and short buckled cheek flaps, no face. Combat rogue leather set: scarred dark oxblood and warm brown leather, battered brass buckles, thick tan stitching and broad layered knuckle-style reinforcement panels. Robust street-fighter construction with rounded padded sections; metal only small rivets and fasteners, no plate armor, no weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_combat_shoulder",
+      "family": "combat",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_combat_shoulder.webp",
+      "canonicalDisplayName": "Brawlmark Shoulderpads",
+      "acceptedSha256": "c7ba169e3163ada507d1eaf8c2f5ae56f72c58dcf33d35e527eacd1acddc2aa0",
+      "acceptedBytes": 3866,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_combat_shoulder.png",
+        "sha256": "2eae91cdce42f1ee2359bea03611528c82f2a98c6bdb0bdb6c05ddc8613727d4",
+        "bytes": 2454284,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_combat_shoulder.png",
+        "sha256": "0a673ae66a8f22e2a4766eb16c48968e5fae334111a8b4ff46f1589a679850f9",
+        "bytes": 542947,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Brawlmark Shoulderpads: compact pair of broad rounded leather shoulder pads with stacked oxblood panels, brown padded rims, brass rivets and visible scuffing, no torso. Combat rogue leather set: scarred dark oxblood and warm brown leather, battered brass buckles, thick tan stitching and broad layered knuckle-style reinforcement panels. Robust street-fighter construction with rounded padded sections; metal only small rivets and fasteners, no plate armor, no weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_combat_chest",
+      "family": "combat",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_combat_chest.webp",
+      "canonicalDisplayName": "Brawlmark Tunic",
+      "acceptedSha256": "449ebf9abc04b8c78cc7254e75ea57ec605561a67b283e3c28b2abe84e039e7a",
+      "acceptedBytes": 3652,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_combat_chest.png",
+        "sha256": "b82f9ac2d353b54bdfadc6b2360d72441639e82949cb1dc157137ac2ead58261",
+        "bytes": 2388667,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_combat_chest.png",
+        "sha256": "bed0a37db676ea8992e74e488fdfd111b715d430896286c0654a51d42eb3f6db",
+        "bytes": 527349,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Brawlmark Tunic: one complete empty front-facing oxblood leather vest with broad brown chest reinforcement, thick stitched seams, stout brass front buckles and short hem. Combat rogue leather set: scarred dark oxblood and warm brown leather, battered brass buckles, thick tan stitching and broad layered knuckle-style reinforcement panels. Robust street-fighter construction with rounded padded sections; metal only small rivets and fasteners, no plate armor, no weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_combat_legs",
+      "family": "combat",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_combat_legs.webp",
+      "canonicalDisplayName": "Brawlmark Breeches",
+      "acceptedSha256": "dfe27eab1998195cbcbeef099d375809cda5358985ea8f205f4dd162c91988af",
+      "acceptedBytes": 3032,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_combat_legs.png",
+        "sha256": "73b7b7f373db1f81da23efe852b4607fd6faa429e4ac930c6865dfb75779c75c",
+        "bytes": 2335758,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_combat_legs.png",
+        "sha256": "fa260a9ac1cd3cadcd345ead77b0cabda505404e9a2ec5474076480b67379cb3",
+        "bytes": 514716,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Brawlmark Breeches: complete joined pair of rugged oxblood leather trousers with broad brown padded knees, brass-buckled thigh straps and heavy seams, no boots. Combat rogue leather set: scarred dark oxblood and warm brown leather, battered brass buckles, thick tan stitching and broad layered knuckle-style reinforcement panels. Robust street-fighter construction with rounded padded sections; metal only small rivets and fasteners, no plate armor, no weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_combat_gloves",
+      "family": "combat",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_combat_gloves.webp",
+      "canonicalDisplayName": "Brawlmark Gloves",
+      "acceptedSha256": "530c5f960ca4fa2db3c422d5931ef3eee4dc5c19140130f36de3e2e5b7357ecc",
+      "acceptedBytes": 3712,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_combat_gloves.png",
+        "sha256": "d1688a0f0f16302b64e51b6d8d30c2fdc047f2518fdf2eff6e29cb053fdad55f",
+        "bytes": 2403410,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_combat_gloves.png",
+        "sha256": "10bb3e87555fcdc9301b84a5f73afbc74b00abf4a93b58b77b4725921284a54b",
+        "bytes": 535439,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Brawlmark Gloves: compact matched pair of empty heavy leather brawling gloves, broad brown padded knuckles, oxblood cuffs, brass rivets and thick stitching, all fingers enclosed. Combat rogue leather set: scarred dark oxblood and warm brown leather, battered brass buckles, thick tan stitching and broad layered knuckle-style reinforcement panels. Robust street-fighter construction with rounded padded sections; metal only small rivets and fasteners, no plate armor, no weapons. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_subtlety_helmet",
+      "family": "subtlety",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_subtlety_helmet.webp",
+      "canonicalDisplayName": "Shadewalk Hood",
+      "acceptedSha256": "f3245afe10fe18c4a799d18b56cd0d335ffa5aecd185df106bf16f0eeba01d8e",
+      "acceptedBytes": 2530,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_subtlety_helmet.png",
+        "sha256": "b4fba0f3672101a5170d1be145444ba212512f60e2c112c4ced15a5dc8f1f65b",
+        "bytes": 2223361,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_subtlety_helmet.png",
+        "sha256": "cd1d519b63d7d85b21bd3ed93798ea3dbbb283cc9a6200d9ef2d23610a3f32c0",
+        "bytes": 492791,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Shadewalk Hood: one complete empty soft leather hood with a long gently swept brow, violet outer panels and indigo cloth lining, deep empty face opening, no face. Subtlety rogue leather set: supple dusk-violet leather over midnight indigo soft cloth, slender pewter clasps, subtle silver-grey seams. Graceful swept overlapping panels and folded cloth edges, quiet stealth silhouette with cool readable highlights. No smoke that obscures the object, no weapons or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_subtlety_shoulder",
+      "family": "subtlety",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_subtlety_shoulder.webp",
+      "canonicalDisplayName": "Shadewalk Shoulderpads",
+      "acceptedSha256": "e237208ed12fbaeb423e66a9e8fe99b27b5dcdc46c9c951f8c3b4c189ecc2e59",
+      "acceptedBytes": 2620,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_subtlety_shoulder.png",
+        "sha256": "4b382f70ec0ef70b13e3e45e7b46d3c13ebc2a3ef548685545879143ff887bad",
+        "bytes": 2202206,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_subtlety_shoulder.png",
+        "sha256": "814f85d6639adfcf2b9333adc6322a0ea7883fa05ab749cc3f5ebd8428ebc760",
+        "bytes": 480881,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Shadewalk Shoulderpads: compact pair of slim swept dusk-violet leather shoulder guards layered over short indigo cloth folds, single pewter clasp each, no torso. Subtlety rogue leather set: supple dusk-violet leather over midnight indigo soft cloth, slender pewter clasps, subtle silver-grey seams. Graceful swept overlapping panels and folded cloth edges, quiet stealth silhouette with cool readable highlights. No smoke that obscures the object, no weapons or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_subtlety_chest",
+      "family": "subtlety",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_subtlety_chest.webp",
+      "canonicalDisplayName": "Shadewalk Tunic",
+      "acceptedSha256": "83359bcbd7f12ba5d08c35f05922c2a62ae3dce57fe1650a0ba0bd0c007c2c83",
+      "acceptedBytes": 2984,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_subtlety_chest.png",
+        "sha256": "d936a82ded622ba031b10c3cbbbc1eabdde1549d68784817e22dab5e9a24525e",
+        "bytes": 2312561,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_subtlety_chest.png",
+        "sha256": "75aea6a3b8cfdbb37a2bfe402a01f624da28bf641ab7e344f283dbe9a3ce6e94",
+        "bytes": 526679,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Shadewalk Tunic: one complete empty front-facing fitted dusk-violet leather torso garment, swept asymmetrical overlap, indigo cloth side insets and small pewter closure. Subtlety rogue leather set: supple dusk-violet leather over midnight indigo soft cloth, slender pewter clasps, subtle silver-grey seams. Graceful swept overlapping panels and folded cloth edges, quiet stealth silhouette with cool readable highlights. No smoke that obscures the object, no weapons or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_subtlety_legs",
+      "family": "subtlety",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_subtlety_legs.webp",
+      "canonicalDisplayName": "Shadewalk Breeches",
+      "acceptedSha256": "6fb4e9cbdf19e7655f328b55412513fe92c1fae6a8cf353c8a1bfeb5ab4cc5f9",
+      "acceptedBytes": 2384,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_subtlety_legs.png",
+        "sha256": "db4b32cc58e9c097ef0555f60730ed80cea2e28047f489b50c94c37ea5888998",
+        "bytes": 2096413,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_subtlety_legs.png",
+        "sha256": "e26d6ca0e6ab8e14ada95c224fceb121b26ce6a097bef9112083380a7fa619b2",
+        "bytes": 469250,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Shadewalk Breeches: complete joined pair of supple violet leather trousers with indigo inner panels, narrow sweeping stitched knees and small pewter side clasps, no boots. Subtlety rogue leather set: supple dusk-violet leather over midnight indigo soft cloth, slender pewter clasps, subtle silver-grey seams. Graceful swept overlapping panels and folded cloth edges, quiet stealth silhouette with cool readable highlights. No smoke that obscures the object, no weapons or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_rogue_subtlety_gloves",
+      "family": "subtlety",
+      "batch": "warfare-season2-rogue-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_rogue_subtlety_gloves.webp",
+      "canonicalDisplayName": "Shadewalk Gloves",
+      "acceptedSha256": "d7655abc28112eea4877bafaedd80d22f5adf407b340330a839a118f44c933f1",
+      "acceptedBytes": 2816,
+      "original": {
+        "path": "tmp/imagegen/v045-rogue/originals/vanguard_rogue_subtlety_gloves.png",
+        "sha256": "8ab9f346effed673c68fcfe3ae6b3ad9c8afdd9bb612a24a003148c4ee922121",
+        "bytes": 2470469,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-rogue/masters/vanguard_rogue_subtlety_gloves.png",
+        "sha256": "af1434cfb1cccd2dc2502ce2bd91bde3dc760dd0a76a8a22cf598d620d1371a8",
+        "bytes": 530701,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory icon. Paint Shadewalk Gloves: compact matched pair of empty thin dusk-violet leather gloves with folded indigo cuffs, slender pewter closures and silver-grey seams, all fingers enclosed. Subtlety rogue leather set: supple dusk-violet leather over midnight indigo soft cloth, slender pewter clasps, subtle silver-grey seams. Graceful swept overlapping panels and folded cloth edges, quiet stealth silhouette with cool readable highlights. No smoke that obscures the object, no weapons or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art, tactile leather grain and cloth, crisp focal edges with softer peripheral brushwork. Warm top-left key light, cool deep shadow, opaque charcoal/umber painted vignette and subtle contact shadow. Center the complete subject with generous padding, around 72 percent square fill; readable at 22px and in a circular crop. No wearer, mannequin, skin, held presentation, text, letters, numbers, pseudo-writing, border, frame, labels, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square 1024x1024 icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-rogue-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-rogue-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

@@ -26,13 +26,18 @@ import {
   type Collider,
   colliderTopAt,
   interiorColliderFrame,
+  prismBox,
   queryOpenWorldColliders,
   supportHeightAt,
 } from '../colliders';
 import { isArenaPos, isDelvePos, isYumiMazePos } from '../data';
+import { traversalBand } from '../traversal_band';
 import { groundHeight, terrainSteepnessAt } from '../world';
 
-/** A ledge must be at least this far above the feet, or it is a step. */
+/** A ledge must be at least this far above the feet, or it is a step.
+ *  Held equal to MAX_STEP_HEIGHT and MANTLE_REACH so no top is too tall to
+ *  stride and too short to grab. The built-in world's value; the grab reads
+ *  the active content's band (traversal_band.ts). */
 export const LEDGE_GRAB_MIN = 0.9;
 /**
  * Arms-extended reach above the feet (yards). At the player's 2 yd stature a
@@ -83,11 +88,14 @@ function fitsOn(x: number, z: number, feetY: number, radius: number): boolean {
       const reach = c.r + radius;
       if (dx * dx + dz * dz < reach * reach) return false;
     } else {
-      const cos = Math.cos(-c.rot);
-      const sin = Math.sin(-c.rot);
-      const lx = (x - c.x) * cos + (z - c.z) * sin;
-      const lz = -(x - c.x) * sin + (z - c.z) * cos;
-      if (Math.abs(lx) < c.hw + radius && Math.abs(lz) < c.hd + radius) return false;
+      // Coarse clearance query: a prism answers with its bounding box, which
+      // only ever refuses a grab the exact outline would have allowed.
+      const b = c.type === 'prism' ? prismBox(c) : c;
+      const cos = Math.cos(-b.rot);
+      const sin = Math.sin(-b.rot);
+      const lx = (x - b.x) * cos + (z - b.z) * sin;
+      const lz = -(x - b.x) * sin + (z - b.z) * cos;
+      if (Math.abs(lx) < b.hw + radius && Math.abs(lz) < b.hd + radius) return false;
     }
   }
   return true;
@@ -118,7 +126,7 @@ export function findLedgeGrab(q: LedgeQuery, x: number, y: number, z: number): L
   const reach = q.radius + LEDGE_GRAB_FORWARD;
   const px = x + dirX * reach;
   const pz = z + dirZ * reach;
-  const minY = y + LEDGE_GRAB_MIN;
+  const minY = y + traversalBand();
   const maxY = y + LEDGE_GRAB_MAX;
 
   // Fit/headroom candidates: the open-world grid, or the dungeon interior's

@@ -151,7 +151,9 @@ describe('druid cat production animation runtime', () => {
     ).toEqual([...CAT_CLIPS].sort());
     const wolf = create(entity(true), 'form_cat');
     expect(wolf && peek(wolf).key).toBe('form_ghost_wolf');
-    expect(wolf?.swimHeadHeight).toBe(1.6 * 0.42);
+    // the default head fraction of the wolf's own drawn height (the rebuilt rig's
+    // 1.47, the same on-screen size the old rig drew at 1.6)
+    expect(wolf?.swimHeadHeight).toBe(1.47 * 0.42);
     expect(wolf?.gait).toBeUndefined();
     wolf?.dispose();
   });
@@ -317,6 +319,7 @@ describe('druid cat production animation runtime', () => {
 
   it.each([
     ['claw', 'Attack_Left'],
+    ['scratch', 'Attack_Left'],
     ['rake', 'Attack_Right'],
     ['ferocious_bite', 'Bite'],
     ['rip', 'Finisher'],

@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
 import { buildMapSidebarView, DEFAULT_MAP_ATLAS_FILTERS } from '../src/ui/map_sidebar_view';
-import { questMapLocation } from '../src/ui/quest_map_location_core';
+import { liveNpcPosLookup, questMapLocation } from '../src/ui/quest_map_location_core';
 import type { IWorld } from '../src/world_api';
 
 function log(...entries: QuestProgress[]): Map<string, QuestProgress> {
@@ -56,6 +56,34 @@ describe('questMapLocation', () => {
     const location = questMapLocation('q_wolves', log(ready('q_wolves')));
     const npc = NPCS[QUESTS.q_wolves.turnInNpcId];
     expect(location).toEqual({ questId: 'q_wolves', x: npc.pos.x, z: npc.pos.z });
+  });
+
+  it('points at where the turn-in NPC actually stands in the loaded map', () => {
+    // A map can move the NPC (a Studio map stands Marshal Redbrook on the
+    // quay): the map control must lead to the NPC the player can see.
+    const moved = { x: -86.2, z: -44.4 };
+    const turnIn = QUESTS.q_wolves.turnInNpcId;
+    const entities = new Map([
+      [3, { kind: 'mob', templateId: turnIn, pos: { x: 0, y: 0, z: 0 } }],
+      [4, { kind: 'npc', templateId: turnIn, pos: { x: moved.x, y: 0, z: moved.z } }],
+    ]);
+    const livePos = liveNpcPosLookup(entities);
+    expect(questMapLocation('q_wolves', log(ready('q_wolves')), livePos)).toEqual({
+      questId: 'q_wolves',
+      ...moved,
+    });
+    // No live NPC (out of range, despawned): the content position still answers.
+    const npc = NPCS[turnIn];
+    expect(
+      questMapLocation('q_wolves', log(ready('q_wolves')), liveNpcPosLookup(new Map())),
+    ).toEqual({ questId: 'q_wolves', x: npc.pos.x, z: npc.pos.z });
+    // A dead copy never answers for the living NPC.
+    const dead = new Map([
+      [5, { kind: 'npc', templateId: turnIn, dead: true, pos: { x: 1, y: 0, z: 1 } }],
+    ]);
+    expect(questMapLocation('q_wolves', log(ready('q_wolves')), liveNpcPosLookup(dead))?.x).toBe(
+      npc.pos.x,
+    );
   });
 
   it('agrees with the atlas rail route for the same quest (one rule, two controls)', () => {

@@ -1,5 +1,10 @@
+import { MEMBERSHIP_ITEMS } from './content/membership';
+import { REFERRAL_ITEMS } from './content/referral';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
+import { bindFenbridgeActiveWorldGetter } from './fenbridge_touchup';
+import { applyWorldTouchup } from './world_touchup';
+import { WORLD_TOUCHUP } from './world_touchup.generated';
 // Content merge layer. Actual game content lives in sim/content/* — one
 // module per zone plus classes (abilities), shared items, and dungeons —
 // so content can grow without everything colliding in one file. This module
@@ -7,6 +12,11 @@ import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
 // and owns the world-layout constants.
 
 import { BASE_ITEMS } from './content/items';
+import {
+  isAuthoredMapPresentation,
+  usesOverworldSiteDressing,
+  usesOverworldTerrainPads,
+} from './map_presentation';
 import type {
   CampDef,
   DelveDef,
@@ -52,6 +62,7 @@ import {
   AMBERFALL_ROADS,
   AMBERFALL_ZONE,
 } from './content/amberfall';
+import { BUDDY_MOBS } from './content/buddy_mobs';
 import {
   BROTHER_HALVEN,
   BROTHER_HALVEN_MARSH,
@@ -75,6 +86,9 @@ import {
   DRAKELANDS_ROADS,
   DRAKELANDS_ZONE,
 } from './content/drakelands';
+import { DROWNED_TEMPLE_MOBS } from './content/drowned_temple';
+import { CANTOR_NPCS } from './content/drowned_temple_cantor';
+import { DROWNED_TEMPLE_ITEMS } from './content/drowned_temple_items';
 import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import { FORGEFATHER_ISLE_TERRAIN_EDITS } from './content/ember_coast';
 import {
@@ -92,6 +106,7 @@ import {
   EVERGARDEN_ZONE,
 } from './content/evergarden';
 import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
+import { FARM_PATCHES, type FarmPatchDef } from './content/farm_patches';
 import {
   FARSHORE_CAMPS,
   FARSHORE_ESCORTS,
@@ -136,6 +151,8 @@ import {
   GALECREST_ZONE,
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
+import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
   type GraveyardDef,
   LAST_KEEP_GRAVEYARD_ID,
@@ -147,6 +164,9 @@ import {
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { HEALING_TRAINING_MOBS } from './content/healing_training';
 import { HOARD_ITEMS } from './content/hoard_loot';
+import { HOLLOW_CRYPT_MOBS } from './content/hollow_crypt';
+import { HOLLOW_CRYPT_ITEMS } from './content/hollow_crypt_items';
+import { HOLLOW_CRYPT_TRASH_MOBS } from './content/hollow_crypt_trash';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -154,6 +174,7 @@ import {
 } from './content/ignivar_raid_lore';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { MUSTER_COMMANDER_NPC, MUSTER_MOBS } from './content/mirefen_muster';
 import { NECROMANCY_MOBS } from './content/necromancy';
 import {
   NIGHTBLOOM_CAMPS,
@@ -205,6 +226,8 @@ import {
   PROVING_SHORE_ROADS,
   PROVING_SHORE_ZONE,
 } from './content/proving_shore';
+import { QUEST_CHOICE_REWARDS } from './content/quest_choice_rewards';
+import { QUEST_LEVELING_GEAR_ITEMS } from './content/quest_leveling_gear';
 import {
   REALM_CAMPS,
   REALM_ITEMS,
@@ -225,6 +248,8 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
+import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
+import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -240,6 +265,7 @@ import {
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import { WEEKLY_EMISSARY_NPC_DEF } from './content/weekly_quests';
 import { WILDHEART_DUNGEON_DEFS, WILDHEART_ITEMS, WILDHEART_MOBS } from './content/wildheart';
+import { WILDHEART_BASIN_ITEMS } from './content/wildheart_items';
 import {
   WILLOWFEN_CAMPS,
   WILLOWFEN_ITEMS,
@@ -281,6 +307,7 @@ import {
 import { YUMI_MOBS } from './content/yumi';
 import {
   COPPER_DIG_TERRAIN_EDITS,
+  EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
   EASTBROOK_QUAY_TERRAIN_EDITS,
   GRAVEYARD_POS,
   HARBOR_SAND_TERRAIN_EDITS,
@@ -327,7 +354,11 @@ import {
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { HIGHWATCH_LAYOUT } from './highwatch_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
+import { PAINTED_TOWNS } from './painted_towns';
+import { setStudioOverlay, studioOverlayInstalled } from './studio_content';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
 // Delve affix/companion catalogs are consumed by the Sim delve engine; re-export
@@ -345,17 +376,24 @@ import { APEX_PATTERN_ITEMS } from './content/apex_patterns';
 import { CRUCIBLE_PROFESSION_ITEMS } from './content/crucible_professions';
 import { DELVE_ITEMS } from './content/delves/items';
 import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
+import { GUILD_CONTRACT_ITEMS } from './content/guild_contracts';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { HIGHWATCH_GUILD_NPCS } from './content/highwatch_guild';
 import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
+import { MIREFEN_TAVERN_NPCS } from './content/mirefen_tavern';
+import { MIREFEN_TAVERN_PATRON_NPCS } from './content/mirefen_tavern_patrons';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
+import { QUEST_SHIELD_ITEMS } from './content/quest_shields';
+import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
+import { dungeonDoorPos, farmPatchesFor, freezeObjectMoves, gatherNodesFor } from './moved_objects';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -392,6 +430,8 @@ export { STATIONS };
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
+  MEMBERSHIP_ITEMS,
+  REFERRAL_ITEMS,
   PROFESSION_ITEMS,
   APEX_PATTERN_ITEMS,
   FARM_PATTERN_ITEMS,
@@ -401,6 +441,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
   TRINKET_ITEMS,
+  REFERRAL_STAMP_ITEMS,
   HEROIC_ITEMS,
   RETIRED_HEROIC_ITEMS,
   IGNIVAR_LOOT_ITEMS,
@@ -419,6 +460,11 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  HOLLOW_CRYPT_ITEMS,
+  SUNKEN_BASTION_ITEMS,
+  DROWNED_TEMPLE_ITEMS,
+  WILDHEART_BASIN_ITEMS,
+  GRAVEWYRM_SANCTUM_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,
@@ -426,14 +472,19 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WORLD_QUEST_ITEMS,
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
+  QUEST_LEVELING_GEAR_ITEMS,
+  GUILD_CONTRACT_ITEMS,
+  QUEST_SHIELD_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
 export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 
 export const MOBS: Record<string, MobTemplate> = {
+  ...BUDDY_MOBS,
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
+  ...MUSTER_MOBS,
   [INVESTIGATION_MOB.id]: INVESTIGATION_MOB,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
@@ -451,6 +502,11 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...WILDHEART_MOBS,
+  ...HOLLOW_CRYPT_MOBS,
+  ...HOLLOW_CRYPT_TRASH_MOBS,
+  ...SUNKEN_BASTION_MOBS,
+  ...DROWNED_TEMPLE_MOBS,
+  ...GRAVEWYRM_SANCTUM_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,
@@ -474,6 +530,7 @@ Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
 export const NPCS: Record<string, NpcDef> = {
   ...ZONE1_NPCS,
   ...ZONE2_NPCS,
+  [MUSTER_COMMANDER_NPC.id]: MUSTER_COMMANDER_NPC,
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   [FURY_NPC.id]: FURY_NPC,
@@ -519,6 +576,16 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  // ...and the Highwatch guild's four residents (content/highwatch_guild.ts), dynamic too
+  ...HIGHWATCH_GUILD_NPCS,
+  // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
+  // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
+  ...CANTOR_NPCS,
+  // The Mirefen tavern's innkeeper (content/mirefen_tavern.ts), a dynamic singleton under a
+  // reserved id, appended last for the same reason.
+  ...MIREFEN_TAVERN_NPCS,
+  // Its seated patrons (content/mirefen_tavern_patrons.ts), dynamic singletons too.
+  ...MIREFEN_TAVERN_PATRON_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -552,6 +619,13 @@ export const QUESTS: Record<string, QuestDef> = {
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
 };
+
+// The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),
+// so the resolver, the turn-in, item levels and the dialogs all read one field.
+for (const [questId, itemIds] of Object.entries(QUEST_CHOICE_REWARDS)) {
+  const quest = QUESTS[questId];
+  if (quest && !quest.choiceRewards) quest.choiceRewards = [...itemIds];
+}
 
 export const QUEST_ORDER: string[] = [
   ...ZONE1_QUEST_ORDER,
@@ -637,6 +711,14 @@ export const CAMPS: CampDef[] = [
   // The Eastbrook hub dummy is NOT a camp: it spawns with its sparring master
   // after the player (sim/hub_practice.ts), so it consumes only trailing ids.
 ];
+// NOTE: FROSTVEIL_CAMPS_EXTRA (the Reach rebuild's 41 extra camps) is
+// deliberately NOT registered here. Camps draw from the SHARED world-gen Rng,
+// so adding any camp anywhere advances the stream that every seeded combat
+// test then rolls against, appending them here moves ~9 pinned combat
+// outcomes across the suite. The rebuild ships them on the map document
+// instead (the authored Frostveil .wocmap carries the full roster in
+// content.camps, which replaces this list at playtest). Add the spread here
+// only together with a deliberate re-pin of those seeded goldens.
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
 // like QUESTS.
@@ -668,7 +750,148 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...WORLD_QUEST_OBJECTS,
 ];
 
-export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
+// The content table itself (deep-frozen there), so every reader resolves a
+// map's moved nodes against ONE memo key (moved_objects.ts gatherNodesFor).
+export const GATHER_NODES: GatherNodeDef[] = GATHER_NODES_CONTENT;
+
+/**
+ * The gathering veins that exist in the world the player is actually standing
+ * in, `GATHER_NODES` on the shipped overworld, nothing on an authored map.
+ *
+ * Read this, never the raw table, from anything that DRAWS, LISTS or LETS THE
+ * PLAYER TOUCH a vein. The table is pinned to overworld coordinates, so on an
+ * authored map it puts ore and herbs wherever the built-in world happens to
+ * keep them; the minimap had already worked that out on its own while the
+ * renderer went on drawing them, spending a third of an arena map's triangles
+ * on ore inside its stadium.
+ */
+export function activeGatherNodes(): GatherNodeDef[] {
+  return usesOverworldSiteDressing(getActiveWorldContent().presentationMode)
+    ? gatherNodesInActiveWorld()
+    : [];
+}
+
+/**
+ * GATHER_NODES as the active world places them: any node a Studio map moved
+ * (moved_objects.ts) at its new spot, the shipped table itself otherwise.
+ * UNGATED, unlike activeGatherNodes: this is the table the by-id lookups and
+ * the collider build read, which never filtered by presentation.
+ */
+export function gatherNodesInActiveWorld(): GatherNodeDef[] {
+  return gatherNodesFor(getActiveWorldContent().objectMoves, GATHER_NODES);
+}
+
+/**
+ * The garden beds as the active world places them: any bed a Studio map moved
+ * (moved_objects.ts) at its new spot, the shipped table itself otherwise. The
+ * online client's IWorld.farmPatches, so its crops sit on the same beds the
+ * server's Sim plants and harvests at (the Sim reads its own world the same way).
+ */
+export function farmPatchesInActiveWorld(): readonly FarmPatchDef[] {
+  return farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES);
+}
+
+/** One node of gatherNodesInActiveWorld by id (a click pick), or undefined. */
+export function activeGatherNodeById(id: string): GatherNodeDef | undefined {
+  return gatherNodesInActiveWorld().find((node) => node.id === id);
+}
+
+/** The dungeons the WORLD MAP may draw an overworld portal for.
+ *
+ *  Same rule, same reason as activeGatherNodes above: DUNGEON_LIST holds the
+ *  shipped world's doors at fixed overworld coordinates, and the map's portal
+ *  pass admits any door whose z falls inside the drawn zone's band. An
+ *  authored map declares its own zone bands, and a big one swallows them
+ *  whole - a map whose single zone spans the world came up stamped with six
+ *  built-in crypt and temple labels over ground that has no door on it at
+ *  all.
+ *  The minimap was already right by construction: it reads the live ground
+ *  objects, not this table. */
+/** The active map's authored named areas (its `locations` rects), the list the
+ *  subzone banner and the world map's landmark labels read. Shared empty
+ *  array on the common path: most worlds author none, and the subzone probe
+ *  runs on the medium-HUD tick. */
+const NO_NAMED_AREAS: NonNullable<WorldContent['locations']> = [];
+export function activeNamedAreas(): NonNullable<WorldContent['locations']> {
+  return getActiveWorldContent().locations ?? NO_NAMED_AREAS;
+}
+
+/** A dungeon's overworld door as the active world stands it: a Studio map may
+ *  move a door (moved_objects.ts), and its entrance set piece, map portal and
+ *  finder pin follow. The shipped doorPos otherwise. */
+export function activeDungeonDoorPos(dungeon: Pick<DungeonDef, 'id' | 'doorPos'>): {
+  readonly x: number;
+  readonly z: number;
+} {
+  return dungeonDoorPos(getActiveWorldContent().objectMoves, dungeon);
+}
+
+export function activeOverworldDungeons(): readonly DungeonDef[] {
+  return usesOverworldSiteDressing(getActiveWorldContent().presentationMode) ? DUNGEON_LIST : [];
+}
+
+// The whole-world rect the minimap's coarse background plate covers, memoized
+// per content swap.
+let stripRegionGeneration = -1;
+let stripRegionCache: MapStripRegion | null = null;
+
+export interface MapStripRegion {
+  readonly minX: number;
+  readonly maxX: number;
+  readonly minZ: number;
+  readonly maxZ: number;
+}
+
+// Built on first call, never at module load: the WORLD_* folds are declared
+// further down this file, so a const here would read them in the TDZ.
+let shippedStripRegion: MapStripRegion | null = null;
+function shippedStrip(): MapStripRegion {
+  if (!shippedStripRegion) {
+    shippedStripRegion = Object.freeze({
+      minX: WORLD_MIN_X,
+      maxX: WORLD_MAX_X,
+      minZ: WORLD_MIN_Z,
+      maxZ: WORLD_MAX_Z,
+    });
+  }
+  return shippedStripRegion;
+}
+
+/** The rect the minimap's coarse whole-world plate spans.
+ *
+ *  WORLD_MIN_X..WORLD_MAX_Z are folded from the SHIPPED zone list at module
+ *  load, so on an authored map both the render AND the blit that samples it
+ *  were addressing the wrong thousands of yards: an authored minimap came up
+ *  as a grey wash of upscaled fallback pixels because the player's position
+ *  was being mapped into a strip covering ground the map does not contain.
+ *  Renderer and sampler must agree, so both go through here. */
+export function activeWorldStripRegion(): MapStripRegion {
+  const generation = getContentGeneration();
+  if (stripRegionCache && stripRegionGeneration === generation) return stripRegionCache;
+  const zones = activeZoneList();
+  let region = shippedStrip();
+  if (zones !== ZONES && zones.length > 0) {
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minZ = Number.POSITIVE_INFINITY;
+    let maxZ = Number.NEGATIVE_INFINITY;
+    for (const zone of zones) {
+      const [x0, x1] = zoneXBounds(zone);
+      minX = Math.min(minX, x0);
+      maxX = Math.max(maxX, x1);
+      minZ = Math.min(minZ, zone.zMin);
+      maxZ = Math.max(maxZ, zone.zMax);
+    }
+    // A hand-rolled world with a degenerate band keeps the shipped rect rather
+    // than handing the painter a zero or infinite span to divide by.
+    if (maxX > minX && maxZ > minZ && Number.isFinite(minX) && Number.isFinite(minZ)) {
+      region = Object.freeze({ minX, maxX, minZ, maxZ });
+    }
+  }
+  stripRegionCache = region;
+  stripRegionGeneration = generation;
+  return region;
+}
 
 export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT, ...TOOL_RECIPES_CONTENT];
 
@@ -841,7 +1064,7 @@ export const PLAYER_START = { ...EASTBROOK_LAYOUT.services.playerStart.position 
 // the Sim+renderer; the default game never touches it.
 // ---------------------------------------------------------------------------
 
-export const BUILTIN_WORLD: WorldContent = {
+export const BASE_WORLD: WorldContent = {
   zones: ZONES,
   camps: CAMPS,
   npcs: NPCS,
@@ -860,6 +1083,12 @@ export const BUILTIN_WORLD: WorldContent = {
   blockers: [...JAIL_BLOCKERS],
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
+    // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
+    // each stands on a level pad at the plateau's height, eased out by a soft
+    // apron (sim/fenbridge_layout.ts pads). No other stamp reaches that
+    // ground, so their place in this list moves no height. Copied, as
+    // Highwatch's are.
+    ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
     ...COPPER_DIG_TERRAIN_EDITS,
     ...TOWN_PLAT_TERRAIN_EDITS,
     ...SOWFIELD_BEACH_TERRAIN_EDITS,
@@ -867,8 +1096,21 @@ export const BUILTIN_WORLD: WorldContent = {
     ...HARBOR_SAND_TERRAIN_EDITS,
     ...SOWFIELD_SEABED_TERRAIN_EDITS,
     ...FORGEFATHER_ISLE_TERRAIN_EDITS,
+    // last, as the Studio rebuild map applies them: over the plat and the strand
+    ...EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
+    // Highwatch's painted buildings stand on level pads cut into the shelf's
+    // rim, eased out by wide aprons (sim/highwatch_layout.ts pads); no other
+    // stamp touches that ground. The calm skirts round nearby anchors are sized
+    // from the finished ground, so heights move a little further out too.
+    // Copied: the layout's records are frozen, and edit lists are plain data.
+    ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
+    // ...and every painted town after it (sim/painted_towns/), town by town in
+    // the list's order, each on its own ground far from every other stamp.
+    ...PAINTED_TOWNS.flatMap((town) => town.pads.map((pad) => ({ ...pad }))),
   ],
 };
+
+export const BUILTIN_WORLD = applyWorldTouchup(BASE_WORLD, WORLD_TOUCHUP);
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
 // Bumped on every content swap so content-derived caches (the terrain
@@ -881,8 +1123,16 @@ export function getActiveWorldContent(): WorldContent {
   return activeWorld;
 }
 
+bindFenbridgeActiveWorldGetter(getActiveWorldContent);
+
 export function getContentGeneration(): number {
   return contentGeneration;
+}
+
+/** Whether the shipped world's level pads and walkable lifts apply to the
+ *  active content (map_presentation.ts usesOverworldTerrainPads). */
+export function overworldTerrainPadsActive(): boolean {
+  return usesOverworldTerrainPads(activeWorld.presentationMode);
 }
 
 // Whether the active content is the built-in world. Consumers whose derived
@@ -890,7 +1140,11 @@ export function getContentGeneration(): number {
 // in-thread paths for a custom world: a worker samples its own module copy of
 // the content, which is always the built-in one.
 export function isBuiltinWorldActive(): boolean {
-  return activeWorld === BUILTIN_WORLD;
+  return isBuiltinWorldContent(activeWorld);
+}
+
+export function isBuiltinWorldContent(world: WorldContent): boolean {
+  return world === BUILTIN_WORLD || world === BASE_WORLD || world.liveWorldPreview === true;
 }
 
 // Swap in a custom world (editor play-test) or restore the built-in (pass nothing).
@@ -898,6 +1152,80 @@ export function isBuiltinWorldActive(): boolean {
 // through getActiveWorldContent. Spawns come from SimConfig.world too (sim.ts ctor).
 export function setActiveWorldContent(world: WorldContent | null): void {
   activeWorld = world ?? BUILTIN_WORLD;
+  // A world that arrived as JSON (a playtest handoff, a published map) carries
+  // a plain moves record: freeze it once here so every moved-object resolver
+  // (moved_objects.ts) memoizes on it instead of rebuilding per read.
+  if (activeWorld.objectMoves) {
+    const frozen = freezeObjectMoves(activeWorld.objectMoves);
+    if (frozen) activeWorld.objectMoves = frozen;
+    else delete activeWorld.objectMoves;
+  }
+  refreshAuthoredMapGate();
+  contentGeneration++;
+}
+
+// Re-derive the authored-map gate (and with it the Studio content overlay,
+// studio_content.ts) from the active content. The built-in world keeps the
+// release tables exactly.
+function refreshAuthoredMapGate(): void {
+  authoredMapWorld = !isBuiltinWorldActive() && isAuthoredMapContent(activeWorld);
+  setStudioOverlay(
+    {
+      items: ITEMS,
+      mobs: MOBS,
+      npcs: NPCS,
+      quests: QUESTS,
+      questOrder: QUEST_ORDER,
+      dungeons: DUNGEONS,
+      dungeonList: DUNGEON_LIST,
+      dungeonByIndex: DUNGEON_BY_INDEX,
+    },
+    authoredMapWorld,
+  );
+}
+
+/** Whether the Studio content overlay (studio_content.ts) is merged in: true
+ *  exactly while an authored map is the active content. */
+export function studioContentActive(): boolean {
+  return studioOverlayInstalled();
+}
+
+// See authoredMapActive.
+let authoredMapWorld = false;
+
+/** Whether the active content is an AUTHORED map: a Studio map document (it
+ *  carries a placements list, even an empty one), an authored presentation
+ *  slate (a blank or interior map), or content using the Studio
+ *  map runtime (collider volumes, caves, terrain holes). False for the
+ *  built-in world AND for a plain variant of it (a `{ ...BUILTIN_WORLD, ... }`
+ *  test or playtest fixture), which keep the release's behaviour. The gate for
+ *  every Studio change to built-in-world behaviour: the content overlay, the
+ *  traversal band (traversal_band.ts), the Studio-only spawns and movement. */
+export function authoredMapActive(): boolean {
+  return authoredMapWorld;
+}
+
+function isAuthoredMapContent(world: WorldContent): boolean {
+  return (
+    world.presentationMode !== undefined ||
+    (world.placements !== undefined && world.placements !== BUILTIN_WORLD.placements) ||
+    (world.colliderVolumes?.length ?? 0) > 0 ||
+    (world.caves?.length ?? 0) > 0 ||
+    (world.holes?.length ?? 0) > 0
+  );
+}
+
+// The active content was mutated IN PLACE (the editor sculpts into the shared
+// terrainEdits array, paints into the shared biomePaint grid). Nothing on this
+// thread needs telling, it reads the live objects, but every consumer that
+// keys a derived copy on the generation does: the zone-build workers mesh from
+// a structured clone shipped on generation change (render/zone_build_pool.ts),
+// so without this bump a camera-LOD re-mesh after a sculpt stroke rebuilt the
+// chunk from the STALE clone and the old terrain came back as the camera moved.
+export function touchActiveWorldContent(): void {
+  // An in-place edit can add the first Studio runtime record (a collider
+  // volume, a cave) to the active content.
+  refreshAuthoredMapGate();
   contentGeneration++;
 }
 
@@ -906,6 +1234,51 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 // as always) and x picks the column within it. Every zone without an
 // explicit x-range spans the original full-width strip, so a one-column
 // world behaves exactly as before.
+// The world's northmost zone, for clamping beyond the north end (append
+// order stopped meaning stack order when the first column landed).
+const NORTHMOST_ZONE: ZoneDef = ZONES.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+
+/** The zone list the MAP UI resolves against: the ACTIVE world's zones on an
+ *  authored map (blank/imported/Collision Master scratch, those worlds are
+ *  standalone spaces, never the shipped grid), the shipped ZONES otherwise.
+ *  Authored docs always project at least one zone (custom_map.ts), but guard
+ *  the empty list so a hand-rolled test world cannot strand the fallbacks.
+ *
+ *  IMPORTANT: engine internals (zone streaming, palettes, sky, rosters) keep
+ *  resolving through the plain builtin `zoneAt` below, the terrain streamer
+ *  can only build SHIPPED zones, and feeding it an authored zone leaves the
+ *  map with no ground at all. Only the map window / minimap / zone-label
+ *  surfaces opt into the active list via `activeZoneAt`. */
+export function activeZoneList(): readonly ZoneDef[] {
+  const w = activeWorld;
+  // ANY custom world's own zones win (an authored slate, or a standard-world
+  // doc whose maker re-zoned bands, e.g. the Scorching Wastes desert): its
+  // biomes must drive terrain texturing and the map UI. The shipped world
+  // (identity check) keeps the static list.
+  if (w !== BUILTIN_WORLD && w.zones.length > 0) {
+    return w.zones;
+  }
+  return ZONES;
+}
+
+/** A zone's x-bounds. Zones without an explicit x-range span the whole world:
+ *  the shipped strip for shipped zones, the map rect (±worldHalfX) for a zone
+ *  OF the active authored world (membership-checked so a builtin ZoneDef never
+ *  picks up a custom map's rect while an authored world is active). */
+export function zoneXBounds(zone: ZoneDef): [number, number] {
+  const w = activeWorld;
+  const halfX =
+    isAuthoredMapPresentation(w.presentationMode) &&
+    w.worldHalfX !== undefined &&
+    w.zones.includes(zone)
+      ? w.worldHalfX
+      : undefined;
+  return [
+    zone.xMin ?? (halfX !== undefined ? -halfX : STRIP_MIN_X),
+    zone.xMax ?? halfX ?? STRIP_MAX_X,
+  ];
+}
+
 // Walks the ACTIVE content's zones, not the builtin const, so every
 // consumer (the fishing rod gate, catch tables, deed credit, chat
 // readouts) resolves the same world the water and terrain reads resolve.
@@ -929,6 +1302,24 @@ export function zoneAt(x: number, z: number): ZoneDef {
     if (z >= zone.zMin && x >= x0 && x < x1) return zone;
   }
   return fallback ?? zones.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+}
+
+/** The map-UI zone lookup: same walk as zoneAt but over the ACTIVE zone list,
+ *  so an authored map's own zones name the label/banner and frame the map
+ *  window. Identical to zoneAt on the shipped world. */
+export function activeZoneAt(x: number, z: number): ZoneDef {
+  const zones = activeZoneList();
+  if (zones === ZONES) return zoneAt(x, z);
+  let fallback: ZoneDef | null = null;
+  let northmost: ZoneDef | null = null;
+  for (const zone of zones) {
+    if (northmost === null || zone.zMax > northmost.zMax) northmost = zone;
+    if (z >= zone.zMax) continue;
+    if (fallback === null || zone.zMax < fallback.zMax) fallback = zone; // southmost band containing z
+    const [x0, x1] = zoneXBounds(zone);
+    if (z >= zone.zMin && x >= x0 && x < x1) return zone;
+  }
+  return fallback ?? northmost ?? NORTHMOST_ZONE;
 }
 
 // Strict rect containment: the zone whose rectangle literally contains (x, z),
@@ -1018,7 +1409,14 @@ function computeWorldXBounds(z: number): Readonly<{ min: number; max: number }> 
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
     }
   }
-  return Object.freeze({ min, max });
+  // Seed double-valued fields before freezing: integer rows and the infinite
+  // fallback otherwise share a changing numeric representation that can make
+  // V8 repeatedly deoptimize terrainHeightUnpadded at its bounds.max read.
+  // Assign the original results unchanged (including non-finite values).
+  const bounds = { min: Number.NaN, max: Number.NaN };
+  bounds.min = min;
+  bounds.max = max;
+  return Object.freeze(bounds);
 }
 
 interface WorldXBoundsIndex {
@@ -1163,18 +1561,20 @@ export function isDungeonEntryTransition(fromX: number, toX: number): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// The Ashen Coliseum — 1v1 ranked arena. Its match instances live in their own
-// far-off flat-ground x-band, well past the dungeon bands (index 0/1/2 sit at
-// x 900/1500/2100). Like dungeons, x beyond DUNGEON_X_THRESHOLD means flat
-// ground (world.groundHeight) and instance-local collision (sim/colliders.ts);
-// the band split below keeps arena positions from being read as a dungeon.
+// The Ashen Coliseum, 1v1 ranked arena. Its match instances live in their own
+// far-off flat-ground x-band, well past the dungeon bands. Like dungeons, x
+// beyond DUNGEON_X_THRESHOLD means flat ground (world.groundHeight) and
+// instance-local collision (sim/colliders.ts); the band split below keeps
+// arena positions from being read as a dungeon.
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
 // Include the complete west wall plus one yard of routing headroom. Collision,
 // line of sight, camera sweeps, and dungeon lookup all select their instance
 // geometry through this boundary, so using the centreline would leave the
-// arena's entire west half attached to the neighboring dungeon band.
+// arena's entire west half attached to the neighboring dungeon band. Keep the
+// local instance-plane offset (INSTANCE_X_BASE) while taking the full-pit
+// collision bound.
 export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_X_MAX = ARENA_X + 150; // x at/after this = past the arena band
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
@@ -1235,7 +1635,7 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 // ---------------------------------------------------------------------------
 
 // 4800 sits clear of the v0.10.0 layout: the widest dungeon ends west of
-// the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
+// the arena pit centred at ARENA_X (4200, about 22u half-width). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = INSTANCE_X_BASE + 4800;
 // Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider

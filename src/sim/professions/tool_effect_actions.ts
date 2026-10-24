@@ -174,7 +174,8 @@ function applyMintedSlot(
   // gatherCastNodeId or these captures today); if fishing ever adopts the
   // capture fields, key this scope off the profession instead.
   // Draw-free field writes; '' / false are the inert values.
-  const castNode = r.e.gatherCastNodeId !== '' ? gatherNodeById(r.e.gatherCastNodeId) : undefined;
+  const castNode =
+    r.e.gatherCastNodeId !== '' ? gatherNodeById(r.e.gatherCastNodeId, ctx.objectMoves) : undefined;
   const castProfession = castNode ? NODE_HARVEST_TABLE[castNode.type].professionId : undefined;
   if (castProfession === undefined || castProfession === professionId) {
     r.e.gatherCastToolRarity = '';

@@ -309,8 +309,8 @@ describe('quest direction words match the world (the compass-truth guard)', () =
 
 describe('the world direction convention this table reads by', () => {
   // Build two structurally distinct IWorld stubs the same way
-  // tests/continent_map_view.test.ts does: the core reads only the player
-  // position off the seam.
+  // tests/continent_map_view.test.ts does, with ferries unavailable so this
+  // projection test isolates player positions.
   function worldAt(x: number, z: number): IWorld {
     return {
       player: { id: 1, kind: 'player', name: 'Me', pos: { x, z }, facing: 0 },
@@ -321,6 +321,7 @@ describe('the world direction convention this table reads by', () => {
       playerId: 1,
       questState: () => 'unavailable',
       questLog: new Map(),
+      ferryView: () => null,
     } as unknown as IWorld;
   }
 

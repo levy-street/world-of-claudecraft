@@ -2,7 +2,6 @@
 // allied faction identity, zone attribution, standing tiers, and reputation
 // awards. Pure functions; zero RNG, no wall clock, no DOM/Three.js imports.
 
-import { worldPvpRewardAmount } from './pvp/world_pvp_rewards_rules';
 import type { PlayerMeta } from './sim';
 import type { WorldQuestDef } from './types';
 
@@ -311,7 +310,7 @@ export function awardFactionReputation(
   }
   const current = meta.factions[factionId] ?? 0;
   const cap = maxStandingForLevel(playerLevel);
-  const add = Math.max(0, Math.floor(worldPvpRewardAmount(amount, meta.worldPvp)));
+  const add = Math.max(0, Math.floor(amount));
   const newTotal = Math.min(cap, current + add);
   const gained = newTotal - current;
   meta.factions[factionId] = newTotal;
@@ -347,6 +346,11 @@ export function sanitizeFactionCurrencies(raw: unknown): Record<FactionId, numbe
     }
   }
   return result;
+}
+
+/** The Allied Hearthstone's saved or wired hub: a known faction id, else unbound. */
+export function sanitizeAlliedHearthstoneAttunement(raw: unknown): FactionId | undefined {
+  return (FACTION_IDS as readonly unknown[]).includes(raw) ? (raw as FactionId) : undefined;
 }
 
 /** Reward in faction currency for completing a World Quest in that faction's zone. */

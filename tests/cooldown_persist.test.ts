@@ -188,6 +188,39 @@ describe('Sim cooldown persistence round-trip (anti-relog-reset)', () => {
     expect(sim2.serializeCharacter(pid2)?.cooldowns).toEqual({ abilities: { sprint: 25 } });
   });
 
+  it('drops legacy out-of-combat resurrection timers while retaining combat resurrection', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('mage', 'Returning Healer');
+    const state = sim.serializeCharacter(pid)!;
+    state.cooldowns = {
+      abilities: {
+        recall_the_fallen: 300,
+        ancestor_return: 300,
+        prayer_of_returning: 300,
+        grove_awakening: 300,
+        collective_reversal: 300,
+        wildwake: 300,
+        temporal_reversal: 600,
+        sprint: 25,
+      },
+      potion: 30,
+    };
+    const loaded = makeWorld();
+    const loadedPid = loaded.addPlayer('mage', 'Returning Healer', { state });
+    const player = loaded.entities.get(loadedPid)!;
+    expect(Object.fromEntries(player.cooldowns)).toEqual({
+      wildwake: 300,
+      temporal_reversal: 600,
+      sprint: 25,
+    });
+    expect(player.potionCooldownUntil).toBe(loaded.time + 30);
+    expect(loaded.serializeCharacter(loadedPid)?.cooldowns?.abilities).toEqual({
+      wildwake: 300,
+      temporal_reversal: 600,
+      sprint: 25,
+    });
+  });
+
   it('re-anchors the derived potion display copy (potionCdRemaining) on load', () => {
     // Regression: load restored the authoritative potionCooldownUntil but left the
     // derived display copy at 0, so after a relog inside the shared potion cooldown the

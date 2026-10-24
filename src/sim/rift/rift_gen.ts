@@ -9,7 +9,7 @@
 // descriptor (NOT the live sim rng), so generation never perturbs the sim's
 // global draw order and is reproducible anywhere.
 
-import type { Collider } from '../colliders';
+import type { LayoutCollider } from '../colliders';
 import { CAVE_THEMES } from '../content/rift/cave_themes';
 import {
   buildInfernalCitadelFloor,
@@ -134,7 +134,7 @@ function themeForFloor(seed: number, floorIndex: number): RiftTheme {
 /** Whether (x,z) clears every obstacle by the body radius (walkable). Handles
  * rotated OBBs (polygon-shell wall segments carry a non-zero rot) by testing the
  * point in each box's local frame, matching colliders.ts pushOut. */
-function isClear(colliders: readonly Collider[], x: number, z: number, r = BODY_R): boolean {
+function isClear(colliders: readonly LayoutCollider[], x: number, z: number, r = BODY_R): boolean {
   for (const c of colliders) {
     if (c.type === 'circle') {
       const dx = x - c.x;
@@ -163,7 +163,12 @@ function isClear(colliders: readonly Collider[], x: number, z: number, r = BODY_
  * terminate because |x| <= AISLE_HALF is kept obstacle-free by construction. `r`
  * lets a bulky prop (pylon, rune monolith) demand extra wall clearance so it never
  * renders embedded in a wall. */
-function toClear(colliders: readonly Collider[], x: number, z: number, r = BODY_R): GridPoint {
+function toClear(
+  colliders: readonly LayoutCollider[],
+  x: number,
+  z: number,
+  r = BODY_R,
+): GridPoint {
   if (isClear(colliders, x, z, r)) return { x, z };
   const step = x >= 0 ? -1 : 1;
   let cx = x;
@@ -178,7 +183,7 @@ function toClear(colliders: readonly Collider[], x: number, z: number, r = BODY_
 
 interface GeneratedGeometry {
   layout: DungeonLayout;
-  colliders: Collider[];
+  colliders: LayoutCollider[];
   /** Room half-width at instance-local z (the walkable envelope; obstacles + spawns
    * are kept inside it). For a rectangle this is a constant. */
   halfWidthAt: (z: number) => number;
@@ -993,6 +998,6 @@ export function riftFloorColliders(
   baseLevel: number,
   floorIndex: number,
   upgrade?: RiftUpgradeManifest | null,
-): Collider[] {
+): LayoutCollider[] {
   return layoutColliders(generateRiftFloor(seed, baseLevel, floorIndex, upgrade).layout);
 }

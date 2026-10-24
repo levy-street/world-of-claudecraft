@@ -4,7 +4,7 @@ import { shadowActionsLocked } from './shadow_action_lock';
 // system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
 //
 // Collection model: EVERY catalog mount is owned while its reins item (ItemDef
-// kind 'mount') sits in the player's bags or bank. Player reins are NOT
+// kind 'mount') sits in the player's bags, bank or personal courier cargo. Player reins are NOT
 // soulbound: ownership travels with the item, so a reins can be traded,
 // mailed, or listed away (and the mount with it). The horse (DEFAULT_MOUNT)
 // is no longer free: it has its own reins item too, sold by the stablemaster,
@@ -28,6 +28,7 @@ import { shadowActionsLocked } from './shadow_action_lock';
 //
 // `src/sim`-pure and rng-free.
 
+import { isMountSafeFormAuraKind } from './combat/forms';
 import { normalizeMountSkinId } from './content/mount_skins';
 import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
@@ -72,7 +73,7 @@ export function mountItemId(key: string): string | null {
 }
 
 /** Whether the player owns the mount: any catalog mount (the horse included)
- *  while its reins item sits in bags or bank. Reins are not soulbound, so
+ *  while its reins item sits in bags, bank or personal courier cargo. Reins are not soulbound, so
  *  ownership travels with the item (a traded-away reins is a lost mount, and
  *  a summon channel re-validates ownership at completion). Unknown keys are
  *  never owned. A fresh player owns nothing. */
@@ -82,12 +83,13 @@ export function mountOwned(meta: PlayerMeta, key: string): boolean {
   if (!itemId) return false;
   return (
     meta.inventory.some((s) => s.itemId === itemId) ||
+    !!meta.courier?.cargo.some((s) => s.itemId === itemId) ||
     meta.bank.inventory.some((s) => s.itemId === itemId)
   );
 }
 
 /** The catalog subset present in `slots`, in catalog order. Shared by
- *  `ownedMounts` (bags + bank) and `bagOwnedMounts` (bags only, #2739
+ *  `ownedMounts` (bags + bank + courier) and `bagOwnedMounts` (bags only, #2739
  *  followup): a single pass collecting reins itemIds into mount keys. */
 function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
   const owned = new Set<string>();
@@ -99,10 +101,14 @@ function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
 }
 
 /** The owned subset of the catalog, in catalog order. Empty for a fresh player.
- *  Single pass over bags + bank: the server rebuilds this per snapshot, so it
+ *  Single pass over bags + bank + bounded courier cargo: the server rebuilds this per snapshot, so it
  *  never scans the containers once per catalog mount. */
 export function ownedMounts(meta: PlayerMeta): MountKey[] {
-  return collectMountKeys([...meta.inventory, ...meta.bank.inventory]);
+  return collectMountKeys([
+    ...meta.inventory,
+    ...meta.bank.inventory,
+    ...(meta.courier?.cargo ?? []),
+  ]);
 }
 
 /** The owned subset of the catalog whose reins are in BAGS right now (never
@@ -163,8 +169,19 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   e.mountKey = TRAINING_MOUNT_KEY;
   e.mountCastRemaining = 0;
   e.mountCastKey = '';
+  stopArmedSwing(e);
   recalcFor(ctx, e, meta);
   return true;
+}
+
+/** Climbing into the saddle puts the weapon away (the same flag stopAutoAttack
+ *  clears). Auto-attack stays armed out of combat while its target lives (a pull
+ *  that never landed, a mob that reset), and the swing loop force-dismounts a
+ *  rider whose swing is armed BEFORE any range check (combat/auto_attack.ts
+ *  tryPlayerSwing), so a summon that landed with it still on was undone the next
+ *  tick: the bar filled and the player stayed on foot. */
+function stopArmedSwing(e: Entity): void {
+  e.autoAttack = false;
 }
 
 // Thornhollow Fields is fought on foot, start to finish. This replaced the
@@ -182,7 +199,9 @@ const CARRYING_FREIGHT_MSG = "You can't ride while carrying freight.";
 /** Strip all active form auras (FORM_AURA_KINDS), ghost_wolf, and stealth from the
  *  entity, emitting aura-removal events for each one removed. Called before a mount
  *  summon starts so the player is never simultaneously shapeshifted/stealthed and
- *  mounting. Stealth is routed through the single `ctx.breakStealth` funnel (not
+ *  mounting. The mount-safe forms (combat/forms.ts: Moonwing, Gloamveil) stay on:
+ *  they only adorn the rider, who may shift into and out of them in the saddle
+ *  anyway (the cast path's dismount skips their toggle). Stealth is routed through the single `ctx.breakStealth` funnel (not
  *  spliced inline like the forms) until no stealth aura remains, so each aura's
  *  linger/aftereffect side effects fire exactly as they do for every other way
  *  stealth ends. Without this, a stealthed rider keeps the aura's shrunk detection
@@ -193,7 +212,10 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
   let stripped = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const aura = e.auras[i];
-    if (FORM_AURA_KINDS.has(aura.kind) || aura.id === 'ghost_wolf') {
+    if (
+      (FORM_AURA_KINDS.has(aura.kind) && !isMountSafeFormAuraKind(aura.kind)) ||
+      aura.id === 'ghost_wolf'
+    ) {
       e.auras.splice(i, 1);
       ctx.emit({
         type: 'aura',
@@ -305,6 +327,7 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
     e.mountKey = def.key;
     e.mountCastRemaining = 0;
     e.mountCastKey = '';
+    stopArmedSwing(e);
     recalcFor(ctx, e, meta);
     return true;
   }
@@ -451,9 +474,11 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
       ) {
         // Strip any form that slipped through during the channel (e.g. instant
         // shapeshifts cast while channeling), so the player is never
-        // simultaneously mounted and shapeshifted at completion.
+        // simultaneously mounted and shapeshifted at completion. A mount-safe
+        // form toggled during the channel is the exception and rides along.
         cancelFormsAndGhostWolf(ctx, e);
         e.mountKey = target;
+        stopArmedSwing(e);
       }
       // A summon whose reins vanished mid-channel leaves the player unmounted.
       e.mountCastRemaining = 0;

@@ -1,5 +1,26 @@
+import { parseRealmMotdArguments, type RealmMotdCommand } from './realm_motd';
+
 export const MODERATION_COMMAND_REASON_MAX = 500;
 export const MODERATION_COMMAND_MINUTES_MAX = 10 * 365 * 24 * 60;
+// A realm announcement is one chat line, so it shares the chat line cap
+// (src/sim/sim.ts MAX_CHAT_MESSAGE_LEN; not imported to keep this parser
+// free of the sim graph).
+export const ANNOUNCE_TEXT_MAX = 255;
+export const WATCH_NOTE_MAX = 200;
+
+/** Commands that can leave custody or start another confined activity. */
+export const JAILED_BLOCKED_COMMANDS: ReadonlySet<string> = new Set([
+  'arena_queue',
+  'bg_queue',
+  'enter_dungeon',
+  'df_expedition_travel',
+  'enter_crypt',
+  'enter_delve',
+  'duel_req',
+  'duel_accept',
+  'unstuck',
+  'card_queue_join',
+]);
 
 const DEFAULT_REASON = 'No reason specified';
 
@@ -19,7 +40,16 @@ export type ModerationChatCommand =
       reason: string | null;
       malformed: boolean;
     }
-  | { kind: 'unjail'; name: string | null; malformed: boolean };
+  | { kind: 'unjail'; name: string | null; malformed: boolean }
+  | { kind: 'motd'; command: RealmMotdCommand }
+  // GM presence: on = seen by everyone (the default), off = invisible and
+  // untargetable. null is a malformed argument (the usage notice).
+  | { kind: 'visible'; on: boolean | null }
+  // Staff watchlist. A bare /watch lists the entries; a malformed name is
+  // kept as name null so the service answers with the usage notice.
+  | { kind: 'watch'; name: string | null; note: string | null; list: boolean }
+  | { kind: 'unwatch'; name: string | null }
+  | { kind: 'announce'; text: string | null };
 
 function cleanReason(raw: string): string {
   const reason = raw.trim().slice(0, MODERATION_COMMAND_REASON_MAX);
@@ -114,6 +144,38 @@ function parseJailArguments(rest: string): {
   };
 }
 
+function parseVisibleArgument(rest: string): boolean | null {
+  const arg = rest.trim().toLowerCase();
+  if (arg === 'on') return true;
+  if (arg === 'off') return false;
+  return null;
+}
+
+// /watch "<name>" [note]: the note is free text (quoted or bare) shown to the
+// GMs pinged on login. A bare /watch is the list form.
+function parseWatchArguments(rest: string): {
+  name: string | null;
+  note: string | null;
+  list: boolean;
+} {
+  const trimmed = rest.trim();
+  if (!trimmed) return { name: null, note: null, list: true };
+  const parsed = parseQuotedName(trimmed);
+  if (!parsed) return { name: null, note: null, list: false };
+  let noteRaw = parsed.rest;
+  const quoted = /^"([^"]*)"$/.exec(noteRaw);
+  if (quoted) noteRaw = quoted[1];
+  const note = noteRaw.replace(/\s+/g, ' ').trim().slice(0, WATCH_NOTE_MAX);
+  return { name: parsed.name, note: note || null, list: false };
+}
+
+// One line of free text: newlines and runs of whitespace fold to one space so
+// a broadcast cannot forge extra chat-log lines.
+function parseAnnounceText(rest: string): string | null {
+  const text = rest.replace(/\s+/g, ' ').trim().slice(0, ANNOUNCE_TEXT_MAX);
+  return text || null;
+}
+
 // Invalid arguments remain parsed commands so they are intercepted instead of
 // leaking into ordinary chat. The policy service returns the usage notice.
 export function parseModerationChatCommand(text: string): ModerationChatCommand | null {
@@ -154,6 +216,25 @@ export function parseModerationChatCommand(text: string): ModerationChatCommand 
   const unjail = /^\/unjail(?:\s+([\s\S]*))?$/i.exec(trimmed);
   if (unjail) {
     return { kind: 'unjail', ...parseOptionalQuotedName(unjail[1] ?? '') };
+  }
+  const motd = /^\/motd(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (motd) return { kind: 'motd', command: parseRealmMotdArguments(motd[1] ?? '') };
+  const visible = /^\/visible(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (visible) {
+    return { kind: 'visible', on: parseVisibleArgument(visible[1] ?? '') };
+  }
+  const watch = /^\/watch(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (watch) {
+    return { kind: 'watch', ...parseWatchArguments(watch[1] ?? '') };
+  }
+  const unwatch = /^\/unwatch(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (unwatch) {
+    const parsed = parseOptionalQuotedName(unwatch[1] ?? '');
+    return { kind: 'unwatch', name: parsed.malformed ? null : parsed.name };
+  }
+  const announce = /^\/announce(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (announce) {
+    return { kind: 'announce', text: parseAnnounceText(announce[1] ?? '') };
   }
   return null;
 }

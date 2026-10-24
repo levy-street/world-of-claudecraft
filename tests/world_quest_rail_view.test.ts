@@ -35,23 +35,6 @@ describe('world quest rail view', () => {
     expect(view.rows.every((row) => typeof row.factionId === 'string')).toBe(true);
   });
 
-  it('keeps a rewarded quest completed on the board while its minigame is replayed', () => {
-    const quest = board[0];
-    const view = buildWorldQuestRailView({
-      worldQuestCycle: cycle,
-      worldQuestLog: new Map([
-        [quest.id, { questId: quest.id, count: 0, state: 'active', practiceOnly: true }],
-      ]),
-      worldQuestExpiresAtMs: 10_000,
-      playerLevel: 20,
-      selectedWorldQuestId: quest.id,
-      canReroll: () => ({ canReroll: false, reason: 'Completed world quests cannot be rerolled.' }),
-    });
-    expect(view.completed).toBe(1);
-    expect(view.rows[0].state).toBe('completed');
-    expect(view.reroll.reason).toBe('completed');
-  });
-
   it('shows a rerolled replacement in the old slot and flags it', () => {
     const [old, ...rest] = board;
     const replacement = rest.find((quest) => quest.zoneId === old.zoneId) ?? rest[0];
@@ -153,5 +136,34 @@ describe('world quest rail view', () => {
     });
     expect(view.rows.length).toBe(board.length);
     expect(view.rows.some((row) => row.belowLevel)).toBe(board.some((q) => q.minLevel > 5));
+  });
+
+  it('reads reward-free practice replays as completed instead of active', () => {
+    const target = board[0];
+    const view = buildWorldQuestRailView({
+      worldQuestCycle: cycle,
+      worldQuestLog: new Map([
+        [
+          target.id,
+          {
+            questId: target.id,
+            count: 0,
+            state: 'active',
+            practiceOnly: true,
+          } as WorldQuestProgress,
+        ],
+      ]),
+      worldQuestExpiresAtMs: 0,
+      playerLevel: 20,
+      selectedWorldQuestId: target.id,
+      canReroll: () => ({
+        canReroll: false,
+        reason: 'Completed world quests cannot be rerolled.',
+      }),
+    });
+
+    expect(view.rows.find((row) => row.questId === target.id)?.state).toBe('completed');
+    expect(view.completed).toBe(1);
+    expect(view.reroll.reason).toBe('completed');
   });
 });

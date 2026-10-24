@@ -1,0 +1,459 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-crypt-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 5,
+    "removedCategoryFallbacks": [
+      "dgn_crypt_knellwyrm",
+      "dgn_marrow_tidy",
+      "dgn_lady_nobody_hanging",
+      "dgn_ilvane_hush",
+      "dgn_morthen_candlelight"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "dgn_crypt_knellwyrm",
+      "family": "deed-crypt",
+      "batchId": "deed-crypt-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_crypt_knellwyrm.webp",
+      "canonicalDisplayName": "Not a Hair Singed",
+      "acceptedSha256": "dcfd05247fcd4499197f841bc843bd9579a8866e84aed7874647495cb096f2aa",
+      "acceptedBytes": 9110,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crypt/originals/dgn_crypt_knellwyrm.png",
+        "sha256": "3ab7a0daaf64af8ef40d977a7fbcc3aea4fb936e3437747b13b86c5a7ac01ce9",
+        "bytes": 2476878,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crypt/masters/dgn_crypt_knellwyrm.png",
+        "sha256": "e42f87bbd22cb81fea19410c320e8925f0372535b4b4d32ada3c99511ea42b06",
+        "bytes": 448632,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Not a Hair Singed (dgn_crypt_knellwyrm). Subject: A weathered ivory dragon skull in three-quarter view breathing a curling arc of spectral green barrowfire around a clean untouched silver helmet. The flame clearly passes around the helmet with dark clear space between, no flame touching it. Dark iron horn accents, bone and emerald fire, compact dragon-skull-and-helm emblem. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/crypt_knellwyrm.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "ab3a6923cc51c427896d73fe43fede7671e2b8ebe2516be227850ffc77db3219"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_crypt_knellwyrm",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [100, 23, 1175, 1201],
+          "framedSubject": [407, 446],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crypt-icons-v045/dgn_crypt_knellwyrm-desktop.png",
+          "docs/screenshots/deed-crypt-icons-v045/dgn_crypt_knellwyrm-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_marrow_tidy",
+      "family": "deed-crypt",
+      "batchId": "deed-crypt-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_marrow_tidy.webp",
+      "canonicalDisplayName": "A Tidy Churchyard",
+      "acceptedSha256": "d75a32847e16b8e7c5b0caf39ed093cba421193a54678edf79bbc526e8e5c3cf",
+      "acceptedBytes": 7866,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crypt/originals/dgn_marrow_tidy.png",
+        "sha256": "7773564ab654547b1e5a9e3264eab2acbace9942c7f2732d3f9e30e372bb4d54",
+        "bytes": 2323821,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crypt/masters/dgn_marrow_tidy.png",
+        "sha256": "d110192effe4061e405d28aa59e41d083753862d5e6652e10dbb2ce709d85c7d",
+        "bytes": 441049,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for A Tidy Churchyard (dgn_marrow_tidy). Subject: A small circular mossy churchyard seen from a high angle, its clean flagstone center empty and orderly, three open rectangular graves neatly aligned along the outer edge beneath an old bronze church bell. The grave openings are dark, with tidy soil and small worn headstones. A small gravedigger spade rests at the rim, slate grey and muted moss with warm bell highlights. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/sexton_marrow.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "1af7d4577502ba239d35c475f05c260eb6240724eba24c225dc9701ea20a0b51"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_marrow_tidy",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [83, 44, 1171, 1185],
+          "framedSubject": [424, 445],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crypt-icons-v045/dgn_marrow_tidy-desktop.png",
+          "docs/screenshots/deed-crypt-icons-v045/dgn_marrow_tidy-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_lady_nobody_hanging",
+      "family": "deed-crypt",
+      "batchId": "deed-crypt-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_lady_nobody_hanging.webp",
+      "canonicalDisplayName": "Nobody Left Hanging",
+      "acceptedSha256": "9133e389a3842ecc98355c951f13a5df31ddb242797c42c948cfd6baa7dfedde",
+      "acceptedBytes": 9402,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crypt/originals/dgn_lady_nobody_hanging.png",
+        "sha256": "b9cd9319a412e39b6e164ea4f133a1ab8e9bbe8d951bf0049bd4a95bb009bc8e",
+        "bytes": 1982914,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crypt/masters/dgn_lady_nobody_hanging.png",
+        "sha256": "d54a0a8c0da50b5764ded9ba083f802477ef478c55793f508b9f549c689713f4",
+        "bytes": 440485,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Nobody Left Hanging (dgn_lady_nobody_hanging). Subject: A strong warm bronze armored gauntlet gently supporting a smaller adventurer gauntlet above a broken translucent ice shackle. A pale blue spectral ribbon curls behind them like a ghostly bridal veil. Rescuing hands dominate the composition, clear grip, shattered frost falling below, warm bronze against icy silver-blue. No spider, webs, corpse, blood or hanging body. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0,
+        "identityNote": "Current hollow_crypt.ts and encounters/hollow_crypt/lady.ts identify a ghostly bride and Frozen Embrace rescue. The reviewed old bonechill_widow portrait is a spider and was deliberately not used as the current subject."
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_lady_nobody_hanging",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [87, 78, 1196, 1162],
+          "framedSubject": [448, 438],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crypt-icons-v045/dgn_lady_nobody_hanging-desktop.png",
+          "docs/screenshots/deed-crypt-icons-v045/dgn_lady_nobody_hanging-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_ilvane_hush",
+      "family": "deed-crypt",
+      "batchId": "deed-crypt-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_ilvane_hush.webp",
+      "canonicalDisplayName": "Hush Now",
+      "acceptedSha256": "17f35a87665c934ec746f87987e8cbd7dadd1e6ce753a556c4dcc62285e2f523",
+      "acceptedBytes": 7616,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crypt/originals/dgn_ilvane_hush.png",
+        "sha256": "764ae738ad2f39bc80c300c190fa8392fc122fde8effee07eb6569c3c368a953",
+        "bytes": 2092547,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crypt/masters/dgn_ilvane_hush.png",
+        "sha256": "87865190176b0c872314f6df7434661a2b3bfae7d44493131b73aeac28dbf290",
+        "bytes": 417593,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Hush Now (dgn_ilvane_hush). Subject: A weathered silver choir handbell with a thick dark violet velvet ribbon wrapped around its clapper to silence it, beside a closed midnight-blue hymnal. A faint spectral teal sound arc dissipates harmlessly at the bell edge. One small ivory feather rests across the blank book cover. Bell dominates, quiet restrained blue-violet and old silver, no musical notation or writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/cantor_ilvane.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "0b85513d6050e7f8cab37eb9af35d42cd3010e718ad442d324300d7bb4cddf34"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_ilvane_hush",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [64, 63, 1202, 1191],
+          "framedSubject": [448, 444],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crypt-icons-v045/dgn_ilvane_hush-desktop.png",
+          "docs/screenshots/deed-crypt-icons-v045/dgn_ilvane_hush-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_morthen_candlelight",
+      "family": "deed-crypt",
+      "batchId": "deed-crypt-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_morthen_candlelight.webp",
+      "canonicalDisplayName": "Every Candle Lit",
+      "acceptedSha256": "83a01618d1144c195489bd86785476b13cb5cb1d0bba1d1be179adde5ca5173f",
+      "acceptedBytes": 7340,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crypt/originals/dgn_morthen_candlelight.png",
+        "sha256": "efd9ae45adf1867b4c45b7f2e06f53170dc5de2d07a33ffab865641124589d50",
+        "bytes": 1613640,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crypt/masters/dgn_morthen_candlelight.png",
+        "sha256": "7ac5351c1ca48a5b06dbfd83fc95a20b46728e435fed769a26468451ced92789",
+        "bytes": 365746,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Every Candle Lit (dgn_morthen_candlelight). Subject: Exactly FOUR tall ivory remembrance candles, all FOUR visibly lit with warm gold flames, arranged in a compact diamond on a dark weathered grave-stone altar. Each candle has its own clearly separated body and flame: one at back, one left, one right, one front. A thin broken violet ward ring surrounds the stone base. Candles dominate the image, warm light against cool purple grave stone. Exactly four candles, exactly four flames, no other candles, no writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/morthen.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "c479c46eac8fb57e7041f93069075442963452f9c87eda272f7cf6c7fb1df0a5"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_morthen_candlelight",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [74, 67, 1177, 1162],
+          "framedSubject": [448, 445],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crypt-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crypt-icons-v045/dgn_morthen_candlelight-desktop.png",
+          "docs/screenshots/deed-crypt-icons-v045/dgn_morthen_candlelight-mobile.png"
+        ]
+      }
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import {
+  bodyPoolSharedWithParty,
   corpseHarvestClaimOpen,
   corpseHasOrdinaryLootFor,
   corpseSharedLootRightsFor,
@@ -72,7 +73,7 @@ export function corpseLootAvailability(
   const sharedRights = corpseSharedLootRightsFor(
     playerId,
     tappedById,
-    tapperPartyFromViewerParty(tappedById, partyMemberIds),
+    bodyPoolSharedWithParty(mob) ? tapperPartyFromViewerParty(tappedById, partyMemberIds) : null,
     mob.lootFfaTimer,
     true,
   );

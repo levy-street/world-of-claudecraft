@@ -45,7 +45,9 @@ describe('the generic basic stand-ins', () => {
       'cast-vfx-basic:corpse-beacon',
       'cast-vfx-basic:weapon-imbue',
       'cast-vfx-basic:weapon-imbue-tip',
+      'cast-vfx-basic:weapon-imbue-rgba',
       'cast-vfx-basic:weapon-stonebound-shell',
+      'cast-vfx-basic:weapon-stonebound-shell-rgba',
       'cast-vfx-basic:weapon-stonebound-shard',
     ]);
     for (const mesh of meshes) {
@@ -72,13 +74,17 @@ describe('the generic basic stand-ins', () => {
     const scene = new THREE.Scene();
     scene.add(buildCastVfxBasicStandIns());
     const targets = collectAbilityVfxCompileTargets(scene);
-    // Six stand-ins, five programs: the full-blade weapon imbue shares the
+    // Eight stand-ins, seven targets: the full-blade weapon imbue shares the
     // beacon's (colour and opacity are uniforms), so it is not a unit of its own.
+    // The RGBA-geometry twins (a held model with its own RGBA vertex colour) are
+    // a geometry shape of their own, so each is collected.
     expect(targets.map((target) => target.object.name)).toEqual([
       'cast-vfx-basic:bubble-beam',
       'cast-vfx-basic:corpse-beacon',
       'cast-vfx-basic:weapon-imbue-tip',
+      'cast-vfx-basic:weapon-imbue-rgba',
       'cast-vfx-basic:weapon-stonebound-shell',
+      'cast-vfx-basic:weapon-stonebound-shell-rgba',
       'cast-vfx-basic:weapon-stonebound-shard',
     ]);
     const compiled: string[] = [];

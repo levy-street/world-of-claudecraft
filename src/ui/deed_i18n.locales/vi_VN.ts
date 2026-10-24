@@ -376,6 +376,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Biên Niên Sử Thung Lũng, Chương II',
+    desc: 'Hoàn thành chương hai trong biên niên sử của Saul: hạ bọn cướp, murloc và sâu bọ hầm mỏ, rồi dũng cảm bước vào Kỳ Trân Các.',
   },
   chr_vale_chapter_iii: {
     name: 'Trọn Bộ Biên Niên Sử Thung Lũng',
@@ -1252,29 +1253,174 @@ export const table: DeedLocaleTable = {
     name: 'Bắt Quả Tang',
     desc: 'Bắt được một Chuột Chạy Túi Tiền trong một Kho Báu Bị Chôn trước khi nó trốn thoát với vàng.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Sang hon bong toi',
+    desc: 'Thu hoi cac tui tien bi danh cap va thoat khoi me cung Evergarden o do kho Hard.',
+  },
+  prog_titan: {
+    name: 'Cự Nhân',
+    desc: 'Tích lũy tổng cộng 10.000.000 kinh nghiệm trọn đời.',
+    title: 'Cự Nhân',
+  },
   pvp_flag_1h: {
-    name: 'Gan Dạ',
-    desc: 'Giữ PvP Thế Giới bật trong 1 giờ thời gian chơi ở thế giới mở. Đăng xuất, tử trận và ở trong phụ bản sẽ tạm dừng tiến độ; tắt PvP đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
-    title: 'Gan Dạ',
+    name: 'Táo Bạo',
+    desc: 'Duy trì PvP Thế Giới trong 1 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Táo Bạo',
   },
   pvp_flag_3h: {
-    name: 'Thách Thức',
-    desc: 'Giữ PvP Thế Giới bật trong 3 giờ thời gian chơi ở thế giới mở. Đăng xuất, tử trận và ở trong phụ bản sẽ tạm dừng tiến độ; tắt PvP đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
-    title: 'Thách Thức',
+    name: 'Bất Phục',
+    desc: 'Duy trì PvP Thế Giới trong 3 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Bất Phục',
   },
   pvp_flag_6h: {
-    name: 'Không Sợ Hãi',
-    desc: 'Giữ PvP Thế Giới bật trong 6 giờ thời gian chơi ở thế giới mở. Đăng xuất, tử trận và ở trong phụ bản sẽ tạm dừng tiến độ; tắt PvP đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
-    title: 'Không Sợ Hãi',
+    name: 'Vô Úy',
+    desc: 'Duy trì PvP Thế Giới trong 6 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Vô Úy',
   },
   pvp_flag_24h: {
     name: 'Bất Khuất',
-    desc: 'Giữ PvP Thế Giới bật trong 24 giờ thời gian chơi ở thế giới mở. Đăng xuất, tử trận và ở trong phụ bản sẽ tạm dừng tiến độ; tắt PvP đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    desc: 'Duy trì PvP Thế Giới trong 24 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
     title: 'Bất Khuất',
   },
   pvp_flag_168h: {
-    name: 'Bất Khả Khuất Phục',
-    desc: 'Giữ PvP Thế Giới bật trong 7 ngày thời gian chơi ở thế giới mở. Đăng xuất, tử trận và ở trong phụ bản sẽ tạm dừng tiến độ; tắt PvP đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
-    title: 'Bất Khả Khuất Phục',
+    name: 'Bất Bại',
+    desc: 'Duy trì PvP Thế Giới trong 7 ngày thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Bất Bại',
+  },
+  cmb_balgath: {
+    name: 'Không Còn Là Đốc Công',
+    desc: 'Đưa Đốc Công Bị Chôn về lại mộ của hắn.',
+  },
+  cmb_balgath_ten: {
+    name: 'Gò Mộ Chẳng Giữ Được Gì',
+    desc: 'Hạ Đốc Công Bị Chôn mười lần.',
+  },
+  cmb_point_taken: {
+    name: 'Đã Hiểu Mũi Nhọn',
+    desc: 'Dập đèn của Đốc Công Rơm ở sân tập của trại tập kết và đánh vào những tấm ván của nó bằng đòn đủ sức.',
+  },
+  dgn_olen_buttress: {
+    name: 'Giữ Vững Tường Thành',
+    desc: 'Hạ Hiệp Sĩ Chỉ Huy Olen mà không để Thành Lũy Bật Lại của hắn trúng người chơi thứ hai lần nào.',
+  },
+  dgn_ossick_moored: {
+    name: 'Bến Cảng An Toàn',
+    desc: 'Hạ Cai Ngục Ossick mà không ai bị kéo xuống Hố Chết Đuối.',
+  },
+  dgn_vael_beacon: {
+    name: 'Dưới Ánh Hải Đăng',
+    desc: 'Hạ Vael Kẻ Trói Sương mà không làm nổ bất kỳ Bóng Sương nào.',
+  },
+  dgn_turretback: {
+    name: 'Lệnh Trục Xuất',
+    desc: 'Hạ Thuyền Trưởng Tàu Đắm mà không ai trúng Loạt Pháo Ma.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Mọi Giọng Đều Hòa Điệu',
+    desc: 'Hạ Mẫu Ca Selthe khi mọi Đồng Ca đều được ít nhất hai người chia sẻ và không Đơn Ca nào chạm người khác.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Đập Vỡ Kính',
+    desc: 'Hạ Cự Tượng Kính Triều khi mọi Ảnh Phản Chiếu đều bị phá trong vòng 15 giây sau khi xuất hiện.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Cao Và Khô Ráo',
+    desc: 'Hạ Ysolei, Hóa Thân Nguyệt Chết Chìm, mà không ai trúng Triều Va Đập của cô ta.',
+  },
+  dgn_mere_hydra: {
+    name: 'Mọi Đầu Đều Gục',
+    desc: 'Giết cả ba đầu của Hydra Hồ trong vòng 10 giây tính từ đầu tiên đến đầu cuối.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Không Cháy Một Sợi Tóc',
+    desc: 'Hạ Rồng Chuông Tử mà không ai bị đốt bởi Lướt Phun Lửa Thiêu của nó.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Không Lồng Nào Giam Được Ta',
+    desc: 'Hạ Kẻ Giữ Chìa Nhà Lao mà không ai bị nghiền trong Lồng Sắt.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Giữ Ngoài Tầm',
+    desc: 'Hạ Thuần Thú Sư Lãnh Chúa Nanh cùng Báo Đốm Lớn của hắn với tổng thời gian Liên Kết Bầy Đàn tồn tại dưới 10 giây.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Diệt Cỏ Dại',
+    desc: 'Hạ Hoa Hẻm Núi mà không để bất kỳ Chồi Gai nào mọc lên.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Chưa Từng Bị Bắt',
+    desc: 'Hạ Zulgar, Tiếng Nói Của Vùng Trũng, mà không ai bị Vồ Xé.',
+  },
+  dgn_great_saurian: {
+    name: 'Người Khổng Lồ Gục Ngã',
+    desc: 'Hạ Đại Thằn Lằn và Kẻ Gọi Bùa Trên Bành của nó cách nhau không quá 20 giây.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Kết Thúc Nhân Từ Hơn',
+    desc: 'Hạ Korgath Bị Trói khi cả bốn sợi xích của hắn đều đã đứt.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Khóa Vẫn Giữ Vững',
+    desc: 'Hạ Korgath Bị Trói ở độ khó Anh Hùng với ít nhất hai sợi xích của hắn chưa từng bị phá.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Niềm An Ủi Lạnh Lẽo',
+    desc: 'Hạ Đại Tử Linh Sư Velkhar mà không để bất kỳ Kẻ Bước Xương Được Hồi Sinh nào trỗi dậy lần hai.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Băng Mỏng',
+    desc: 'Hạ Korzul Mộ Long khi ít nhất mười hai trong số mười chín mảng băng trên hồ vẫn nguyên vẹn.',
+  },
+  dgn_sledge_tusker: {
+    name: 'Hàng Hóa Lạnh',
+    desc: 'Hạ Thú Nanh Kéo Xe mà không ai trúng Giẫm Đạp của nó.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Khổ Ca Cuối',
+    desc: 'Hạ Ysolei, Hóa Thân Nguyệt Chết Chìm, với Người Lĩnh Xướng Cuối của Ca Đoàn Nhợt Nhạt bên cạnh.',
+    title: 'Nhân Chứng Ca Đoàn',
+  },
+  dgn_marrow_tidy: {
+    name: 'Nghĩa Địa Gọn Gàng',
+    desc: 'Hạ Quản Mộ Marrow với mọi Mộ Mở đều được đặt ở rìa Sân Chuông.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Không Ai Bị Bỏ Treo',
+    desc: 'Hạ Phu Nhân Lạnh Xương mà không để cô ta làm rơi ai khỏi Vòng Ôm Băng Giá.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Im Nào',
+    desc: 'Hạ Người Lĩnh Xướng Ilvane mà không để Khúc Tang Rỗng của cô ta trúng bất kỳ ai.',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Mọi Ngọn Nến Đều Sáng',
+    desc: 'Hạ Morthen Kẻ Gọi Mộ sau khi thắp lại cả bốn Nến Tưởng Niệm trong vòng 20 giây kể từ khi Kết Giới Bất An của hắn xuất hiện.',
+  },
+  dgn_guild_first_contract: {
+    name: 'Khế Ước Đã Ký',
+    desc: 'Hoàn thành một hợp đồng hầm ngục hằng tuần của Sảnh Đèn Lồng.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Khách Quen Bảng Tin',
+    desc: 'Hoàn thành 10 hợp đồng hầm ngục hằng tuần của Sảnh Đèn Lồng.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Cựu Binh Hợp Đồng',
+    desc: 'Hoàn thành 50 hợp đồng hầm ngục hằng tuần của Sảnh Đèn Lồng.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Người Chạy Khế Ước',
+    desc: 'Mua từ Garrick Holt, quân nhu của Sảnh Đèn Lồng, với 6 Ấn Đèn Lồng.',
+    title: 'Người Chạy Khế Ước',
+  },
+  feat_guild_hallsworn: {
+    name: 'Người Thề Với Sảnh',
+    desc: 'Mua từ Garrick Holt, quân nhu của Sảnh Đèn Lồng, với 14 Ấn Đèn Lồng.',
+    title: 'Người Thề Với Sảnh',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Người Của Sảnh Đèn Lồng',
+    desc: 'Mua từ Garrick Holt, quân nhu của Sảnh Đèn Lồng, với 24 Ấn Đèn Lồng.',
+    title: 'Người Của Sảnh Đèn Lồng',
   },
 };

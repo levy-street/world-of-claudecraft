@@ -19,7 +19,6 @@ function detail(
       online: false,
       bannedAt: null,
       suspendedUntil: null,
-      deactivatedAt: null,
       moderationReason: '',
       chatMutedUntil: null,
       chatMuteReason: '',

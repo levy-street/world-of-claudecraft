@@ -11,11 +11,13 @@ import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface HauntFeaturesView {
   group: THREE.Group;
   glowLights: THREE.PointLight[];
+  animated: THREE.Object3D[];
   update(time: number): void;
 }
 
@@ -25,7 +27,7 @@ const WOOD_ZMAX = 1820;
 // The giant trees are the Eldershine's twisted-elder model (realm_flora
 // already preloads the same URL, so the loader cache makes this free),
 // cloned per greatTrees record and darkened into haunted silhouettes.
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 let greatTreeScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
@@ -82,7 +84,11 @@ function glowTexture(): THREE.CanvasTexture | null {
   return new THREE.CanvasTexture(canvas);
 }
 
-export function buildHauntFeatures(seed: number): HauntFeaturesView {
+export function buildHauntFeatures(
+  seed: number,
+  // The document may own the giants as placements (jungle_features doctrine).
+  renderGreatTrees = !activeWorldPromoted('greatTrees'),
+): HauntFeaturesView {
   const group = new THREE.Group();
   group.name = 'haunt-features';
   const glowLights: THREE.PointLight[] = [];
@@ -109,7 +115,7 @@ export function buildHauntFeatures(seed: number): HauntFeaturesView {
       }
       return m;
     };
-    if (greatTreeScene) {
+    if (greatTreeScene && renderGreatTrees) {
       for (const t of WRAITHWOOD_PROPS.greatTrees ?? []) {
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;
@@ -193,6 +199,7 @@ export function buildHauntFeatures(seed: number): HauntFeaturesView {
   return {
     group,
     glowLights,
+    animated: [...mists.map((m) => m.mesh), ...wisps.map((w) => w.sprite)],
     update(time: number): void {
       // the mist breathes and slowly slides; the ghost-lights wander their
       // little circuits like someone pacing a grave row

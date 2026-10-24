@@ -23,13 +23,16 @@ import type { Entity } from '../types';
 
 export const FERRY_BELL_OBJECT_ID = 'ps_ferry_bell';
 
-/** Where the island bell sets a graduate down: the harbor town's dock road,
- *  beside the return bell at (-7.5, -100), facing up the crafts lane toward
- *  the Ravenpost mailbox so the first thing a graduate sees is the town, not
- *  the sea. Well clear of the authored spawn at (-94, -58), so an arrival
- *  never stacks on a fresh spawn. The optional golden guidance leads from
- *  here to Marshal on the civic square. */
-export const FERRY_BELL_TOWN_LANDING = { x: -4.5, z: -101.5, facing: -0.87 } as const;
+/** Where the island bell sets a graduate down: on Eastbrook's quay, a
+ *  stride from the return bell at (-95, -45), facing up into town toward the
+ *  Eastbrook chapel (anchor (28.2, -119.6), eastbrook_layout.ts), so the first
+ *  thing a graduate sees is the town, not the sea. Clear of the bell's own
+ *  footprint and of the quay's crates. The optional golden guidance leads
+ *  from here to Marshal Redbrook wherever he stands
+ *  (render/eastbrook_wolves_guidance_core.ts). Facing follows the player
+ *  convention: f points along (sin f, cos f), as eastbrook_layout.ts
+ *  facingToward computes it. */
+export const FERRY_BELL_TOWN_LANDING = { x: -92.5, z: -46.5, facing: 2.12 } as const;
 
 /** Whether this character has never worked the shore: no Proving Shore quest
  *  in the log and none turned in. The arrival note is a TEACHING moment (it

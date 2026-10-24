@@ -1,6 +1,5 @@
 // Source-aware adapters for the existing inventory count/removal hub.
 
-import { materialItemIds } from './material_ids';
 import {
   applyMaterialInventoryTake,
   type MaterialTakePlan,
@@ -8,6 +7,7 @@ import {
 } from './material_inventory_take';
 import { materialSourceUnitPayload } from './material_inventory_units';
 import { normalizeMaterialStack } from './material_stack';
+import { stackProvenanceItemIds } from './stack_provenance_ids';
 import type { InvSlot, ItemInstancePayload } from './types';
 
 export type MaterialUnitEligibility = (payload: ItemInstancePayload | undefined) => boolean;
@@ -21,7 +21,7 @@ export function countMaterialInventoryForHub(
   let count = 0;
   for (const raw of inventory) {
     if (raw.itemId !== itemId) continue;
-    const read = normalizeMaterialStack(raw, materialItemIds());
+    const read = normalizeMaterialStack(raw, stackProvenanceItemIds());
     if (!read.ok) throw new Error(REFUSED);
     const slot = read.value;
     if (slot.instance?.locked === true) continue;
@@ -45,7 +45,7 @@ export function takeMaterialInventoryForHub(
     inventory,
     itemId,
     count,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     allowPartial: true,
     ...(eligible
       ? { eligibleSource: (source, slot) => eligible(materialSourceUnitPayload(slot, source)) }

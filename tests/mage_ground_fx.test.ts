@@ -848,6 +848,50 @@ describe('Mage meteor visual', () => {
     expect((secondOuterRing.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.75, 5);
   });
 
+  it('washes the WHOLE blast disc of a rift boss windup, leaving no safe-looking gap', () => {
+    // A rift mob stomp or pulse windup (no ability id) damages every player
+    // within its radius (fireWarStomp / fireAoePulse, a full disc). The rune
+    // inscription alone draws an inner ring, then an unlit band, then the outer
+    // ring, and players read that band as a safe gap (Warlord Grask player
+    // report): the danger fill must cover the disc from the center to the edge.
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 12, duration: 1.2, school: 'physical' });
+
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    const fill = rune.getObjectByName('mage-rune-power-danger-fill') as THREE.Mesh;
+    expect(fill).toBeInstanceOf(THREE.Mesh);
+    const positions = fill.geometry.getAttribute('position') as THREE.BufferAttribute;
+    let nearest = Number.POSITIVE_INFINITY;
+    let farthest = 0;
+    for (let i = 0; i < positions.count; i++) {
+      const r = Math.hypot(positions.getX(i) - 10, positions.getZ(i) - 20);
+      nearest = Math.min(nearest, r);
+      farthest = Math.max(farthest, r);
+    }
+    expect(nearest).toBeCloseTo(0, 5);
+    expect(farthest).toBeCloseTo(12, 4);
+    // Every ring of the disc is sampled, so no band between center and edge is bare.
+    const radii = new Set<number>();
+    for (let i = 0; i < positions.count; i++) {
+      radii.add(Math.round(Math.hypot(positions.getX(i) - 10, positions.getZ(i) - 20) * 100));
+    }
+    const sorted = [...radii].sort((a, b) => a - b).map((r) => r / 100);
+    for (let i = 1; i < sorted.length; i++) expect(sorted[i] - sorted[i - 1]).toBeLessThan(2);
+    expect((fill.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThan(0);
+  });
+
+  it('keeps the player-cast Rune of Power an inscription with no danger fill', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 12, ability: 'rune_of_power' });
+
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    expect(rune.getObjectByName('mage-rune-power-danger-fill')).toBeUndefined();
+  });
+
   it('keeps the mage-cast Rune of Power arcane when no mechanic school is given', () => {
     const scene = new THREE.Scene();
     const fx = new MageGroundFx(scene, () => 3, vi.fn());

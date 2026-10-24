@@ -7,7 +7,7 @@ import { shadowActionsLocked } from '../shadow_action_lock';
 //   - updatePlayerAutoAttack: the per-tick driver (swing-timer decay, facing/range
 //     gates, the ranged-vs-melee branch, and queuedOnSwing consumption that feeds
 //     on-next-swing abilities like Heroic Strike / Raptor Strike into the swing).
-//   - rangedSwing: Auto Shot (hunters, 8yd dead zone) and Wand (casters, no dead
+//   - rangedSwing: Auto Shot (hunters, no dead zone since v0.45) and Wand (casters, no dead
 //     zone); miss roll, crit, and armor mitigation for physical shots only.
 //   - meleeSwing: the white-hit table (single rng.next() miss -> dodge -> hit, crit,
 //     weapon imbue bonus, armor mitigation, and the thorns / spiked-hide reflect
@@ -69,6 +69,7 @@ import {
   baseSwingSpeed,
   catAutoWeaponRollMult,
   catFormDamageMult,
+  isBearForm,
   normalizedInstantSpeed,
   rangedAutoProfile,
 } from './form_swing';
@@ -171,15 +172,19 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // immediately. Ranged auto-attack (wand / auto shot, up to 30-35yd) must NOT pre-aggro
   // at engage: its threat comes from the shot LANDING (rangedSwing schedules a projectile
   // whose impact aggros, like the spell it accompanies). Otherwise the "Attack on Ability
-  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a distant
-  // mob the instant the cast starts, before anything lands.
+  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a mob the
+  // instant the cast starts, before anything lands.
   const d = dist2d(p.pos, t.pos);
+  const ranged = rangedAutoProfile(p, r.meta.cls);
+  const rangedAutoWouldFire =
+    ranged !== undefined && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange);
   // The melee seed is additionally gated on no cast in progress: the swing loop is
   // paused while casting (updatePlayerAutoAttack bails on castingAbility), so a
   // mid-cast Attack press must not aggro an untouched mob (the aggro-before-damage
   // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
   // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
+    !rangedAutoWouldFire &&
     d <= effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p)) &&
     !p.castingAbility &&
     t.kind === 'mob' &&
@@ -257,7 +262,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
   const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
   if (facingDiff > MELEE_ARC) return;
 
-  // ranged auto-attack: hunters (auto shot, dead zone inside minRange) and
+  // ranged auto-attack: hunters (auto shot, no dead zone since v0.45) and
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
@@ -300,7 +305,16 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
     // Raptor Strike style on-next-swing hit too (issue #1803).
     let weaponMult = 1;
     if (p.queuedOnSwing) {
-      const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
+      const queuedId = p.queuedOnSwing;
+      let queued = ctx.resolvedAbility(queuedId, p.id);
+      // The parked swing is the button that was PRESSED. An action-slot
+      // replacement that armed after the press (Bonecrush becomes Marrowbreak
+      // the moment Old Blood fills) resolves to a def that cannot ride a
+      // swing; fall back to the learned base so the queued strike still lands
+      // instead of silently turning into a white hit.
+      if (queued && !queued.effects.some((e) => e.type === 'weaponDamage')) {
+        queued = meta.known.find((known) => known.def.id === queuedId) ?? queued;
+      }
       if (queued) {
         const eff = queued.effects.find((e) => e.type === 'weaponDamage');
         const queuedCost =
@@ -628,14 +642,22 @@ export function meleeSwing(
   // roll is rescaled to that cadence (catAutoWeaponRollMult, the same shape as
   // the instant rescale above) and white DPS equals the weapon's authored dps
   // whatever its speed. Every other auto keeps the raw per-swing contract.
+  const bearStrike = isBearForm(attacker) && !(opts.autoAttack === true && !opts.abilityId);
   const weaponRollMult =
     opts.autoAttackHand === undefined
       ? normSpeed !== undefined
         ? normSpeed / Math.max(0.1, weapon.speed)
         : 1
       : autoAttackWeaponDamageMult(opts.autoAttackHand) *
-        (opts.autoAttackHand === 'mainhand' ? catAutoWeaponRollMult(attacker, weapon) : 1);
-  const apSwingSpeed = opts.apSwingSpeed ?? normSpeed ?? baseSwingSpeed(attacker);
+        (opts.autoAttackHand === 'mainhand' && !bearStrike
+          ? catAutoWeaponRollMult(attacker, weapon)
+          : 1);
+  // Bruin Form halves only its WHITE swings (form_swing.ts): a strike riding
+  // the swing (Bonecrush) or a bear weapon special keeps the full weapon roll
+  // and the Attack Power term at the weapon's own speed, as before the faster
+  // bear cadence.
+  const apSwingSpeed =
+    opts.apSwingSpeed ?? normSpeed ?? (bearStrike ? weapon.speed : baseSwingSpeed(attacker));
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
@@ -744,13 +766,15 @@ export function meleeSwing(
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
     applyThornsReaction(ctx, target, attacker);
-    // innate "spiked hide" mobs (e.g. bristleback boars) reflect on every hit
+    // innate "spiked hide" mobs (e.g. bristleback boars) reflect on every hit;
+    // a tuned dungeon spawn scales its spikes by its mechanic factor (the
+    // Snarlvine Lasher's Snarlbark on heroic). Untuned mobs keep the value.
     const spikes = MOBS[target.templateId]?.thorns;
     if (spikes && !attacker.dead) {
       ctx.dealDamage(
         target,
         attacker,
-        spikes.value,
+        Math.max(1, Math.round(spikes.value * (target.mechanicDamageMult ?? 1))),
         false,
         spikes.school ?? 'physical',
         spikes.name ?? 'Spiked Hide',
@@ -774,6 +798,7 @@ export function meleeSwing(
     'weaponHit',
     procWeaponId,
     opts.autoAttackHand === 'offhand' ? 'offhand' : 'mainhand',
+    opts.autoAttack === true,
   );
   return true;
 }

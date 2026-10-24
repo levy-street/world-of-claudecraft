@@ -1229,29 +1229,174 @@ export const table: DeedLocaleTable = {
     name: 'Betrapt op Heterdaad',
     desc: 'Vang een Muntzak Haastige in een Begraven Hoard voordat het met het goud vandoor gaat.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Helderder dan de schaduwen',
+    desc: 'Haal de gestolen muntenbuidels terug en ontsnap uit het Evergarden-doolhof op Hard.',
+  },
+  prog_titan: {
+    name: 'Titaan',
+    desc: 'Verdien in totaal 10.000.000 ervaringspunten.',
+    title: 'Titaan',
+  },
   pvp_flag_1h: {
     name: 'Stoutmoedig',
-    desc: 'Houd wereld-PvP ingeschakeld gedurende 1 uur speeltijd in de open wereld. Uitloggen, dood zijn en instanties pauzeren de voortgang; uitschakelen zet deze terug op nul. Verdiende titels zijn permanent.',
+    desc: 'Houd Wereld-PvP gedurende 1 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
     title: 'Stoutmoedig',
   },
   pvp_flag_3h: {
     name: 'Opstandig',
-    desc: 'Houd wereld-PvP ingeschakeld gedurende 3 uur speeltijd in de open wereld. Uitloggen, dood zijn en instanties pauzeren de voortgang; uitschakelen zet deze terug op nul. Verdiende titels zijn permanent.',
+    desc: 'Houd Wereld-PvP gedurende 3 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
     title: 'Opstandig',
   },
   pvp_flag_6h: {
-    name: 'Onbevreesd',
-    desc: 'Houd wereld-PvP ingeschakeld gedurende 6 uur speeltijd in de open wereld. Uitloggen, dood zijn en instanties pauzeren de voortgang; uitschakelen zet deze terug op nul. Verdiende titels zijn permanent.',
-    title: 'Onbevreesd',
+    name: 'Onverschrokken',
+    desc: 'Houd Wereld-PvP gedurende 6 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
+    title: 'Onverschrokken',
   },
   pvp_flag_24h: {
-    name: 'Onwrikbaar',
-    desc: 'Houd wereld-PvP ingeschakeld gedurende 24 uur speeltijd in de open wereld. Uitloggen, dood zijn en instanties pauzeren de voortgang; uitschakelen zet deze terug op nul. Verdiende titels zijn permanent.',
-    title: 'Onwrikbaar',
+    name: 'Onverzettelijk',
+    desc: 'Houd Wereld-PvP gedurende 24 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
+    title: 'Onverzettelijk',
   },
   pvp_flag_168h: {
     name: 'Ontembaar',
-    desc: 'Houd wereld-PvP ingeschakeld gedurende 7 dagen speeltijd in de open wereld. Uitloggen, dood zijn en instanties pauzeren de voortgang; uitschakelen zet deze terug op nul. Verdiende titels zijn permanent.',
+    desc: 'Houd Wereld-PvP gedurende 7 dagen speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
     title: 'Ontembaar',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Van Lantaarnhal',
+    desc: 'Gekocht van Garrick Holt, kwartiermeester van Lantaarnhal, voor 24 Lantaarnzegels.',
+    title: 'van Lantaarnhal',
+  },
+  feat_guild_hallsworn: {
+    name: 'Halgezworene',
+    desc: 'Gekocht van Garrick Holt, kwartiermeester van Lantaarnhal, voor 14 Lantaarnzegels.',
+    title: 'Halgezworene',
+  },
+  feat_guild_writ_runner: {
+    name: 'Opdrachtenloper',
+    desc: 'Gekocht van Garrick Holt, kwartiermeester van Lantaarnhal, voor 6 Lantaarnzegels.',
+    title: 'Opdrachtenloper',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Contractveteraan',
+    desc: 'Voltooi 50 van de wekelijkse kerkercontracten van Lantaarnhal.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Vaste klant bij het bord',
+    desc: 'Voltooi 10 van de wekelijkse kerkercontracten van Lantaarnhal.',
+  },
+  dgn_guild_first_contract: {
+    name: 'Opdracht ondertekend',
+    desc: 'Voltooi één van de wekelijkse kerkercontracten van Lantaarnhal.',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Elke kaars brandt',
+    desc: 'Versla Morthen de Grafroeper nadat je alle vier Herdenkingskaarsen opnieuw hebt aangestoken binnen 20 seconden na het verschijnen van zijn Rusteloze bescherming.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Nu stil',
+    desc: 'Versla Voorzanger Ilvane zonder dat haar Klaagzang van de holte ooit iemand raakt.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Niemand laten hangen',
+    desc: 'Versla de Vrouwe van de Bottenkou zonder dat ze ooit iemand uit haar Bevroren omhelzing laat vallen.',
+  },
+  dgn_marrow_tidy: {
+    name: 'Een keurig kerkhof',
+    desc: 'Versla Koster Marrow met elk Open graf aan de rand van het Klokkerf.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Het laatste vers',
+    desc: 'Versla Ysolei, Avatar van de Verdronken Maan, met de Laatste Voorzanger van het Bleke Koor naast je.',
+    title: 'Getuige van het Koor',
+  },
+  dgn_sledge_tusker: {
+    name: 'Koude lading',
+    desc: 'Versla het Sleeslagtandbeest zonder dat iemand door zijn Vertrappelen wordt geraakt.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Dun ijs',
+    desc: 'Versla Korzul de Grafwurm met minstens twaalf van de negentien meerplaten ongebroken.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Schrale troost',
+    desc: 'Versla Grootdodenbezweerder Velkhar zonder dat één herrezen bottenloper een tweede keer herrijst.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Het slot houdt',
+    desc: 'Versla Korgath de Geketende op heroïsche moeilijkheid waarbij minstens twee van zijn kettingen nooit zijn gebroken.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Een vriendelijker einde',
+    desc: 'Versla Korgath de Geketende met alle vier zijn kettingen gebroken.',
+  },
+  dgn_great_saurian: {
+    name: 'Gevallen titaan',
+    desc: 'Versla de Grote Sauriër en zijn draagkoetsvloekroeper binnen 20 seconden van elkaar.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Nooit gevangen',
+    desc: 'Versla Zulgar, Stem van het Bekken, zonder dat iemand wordt Toegetakeld.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Onkruidbestrijding',
+    desc: 'Versla de Vreetbloem zonder dat er één doornspruit groeit.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Op afstand gehouden',
+    desc: 'Versla de Hoektandheer Beestenmeester en zijn Grote Jaguar terwijl Roedelband in totaal minder dan 10 seconden actief is.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Geen kooi houdt ons vast',
+    desc: 'Versla de Gevangenisbewaarder zonder dat iemand in een IJzeren kooi wordt verpletterd.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Geen haar verschroeid',
+    desc: 'Versla de Doodsklokdraak zonder dat iemand door zijn Brandstapelbeschieting wordt verbrand.',
+  },
+  dgn_mere_hydra: {
+    name: 'Alle koppen neer',
+    desc: 'Dood alle drie de koppen van de Meerhydra binnen 10 seconden van elkaar.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Hoog en droog',
+    desc: 'Versla Ysolei, Avatar van de Verdronken Maan, zonder dat iemand door haar Getijdeninslag wordt geraakt.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Breek het glas',
+    desc: 'Versla de Getijdenglaskolos waarbij elke weerspiegeling binnen 15 seconden na verschijning wordt gebroken.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Elke stem zuiver',
+    desc: 'Versla Koormoeder Selthe waarbij elke Koorzang door twee of meer spelers wordt gedeeld en geen Eenstemmige zang iemand anders raakt.',
+  },
+  dgn_turretback: {
+    name: 'Ontruimingsbevel',
+    desc: 'Versla de Schipbreukkapitein zonder dat iemand door Geestensalvo wordt geraakt.',
+  },
+  dgn_vael_beacon: {
+    name: 'Bij het licht van het baken',
+    desc: 'Versla Vael de Mistbinder zonder één mistschim te laten ontploffen.',
+  },
+  dgn_ossick_moored: {
+    name: 'Veilige haven',
+    desc: 'Versla Cipier Ossick zonder dat iemand de Verdrinkingsput in wordt getrokken.',
+  },
+  dgn_olen_buttress: {
+    name: 'Houd de muur',
+    desc: 'Versla Riddercommandant Olen zonder dat zijn Terugkaatsend bolwerk ooit een tweede speler raakt.',
+  },
+  cmb_point_taken: {
+    name: 'Punt gemaakt',
+    desc: 'Doof de lantaarn van de Strovoorman op het oefenerf van de monstering en benut zijn losse planken.',
+  },
+  cmb_balgath_ten: {
+    name: 'De heuvel bewaart niets',
+    desc: 'Haal de Begraven Voorman tien keer neer.',
+  },
+  cmb_balgath: {
+    name: 'Geen voorman meer',
+    desc: 'Stop de Begraven Voorman terug in zijn grafheuvel.',
   },
 };

@@ -309,7 +309,7 @@ describe('the gates that run the lane (source pins)', () => {
     // The lane rides the one arbiter and reads the one in-flight map, or the
     // renderer's chunked sky uploads and these pieces race on a texture.
     expect(gate).toContain('runTexturePrepLane(this.backgroundGpuWork, properties, this.webgl,');
-    expect(gate).toContain('inFlight: this.textureUploadTasks,');
+    expect(gate).toContain('inFlight: this.textureResidency.inFlight,');
   });
 
   it('the reveal compile host calls deps.upload between deps.gate and deps.touch', () => {

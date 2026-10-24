@@ -149,9 +149,12 @@ describe('at cap, actions still work: only skill gain stops', () => {
     // Seed 1, hunted (bounded scan from seed 1; re-recorded whenever a
     // content commit shifts the construction-time world-gen draw sequence:
     // 40 after the procedural-dungeons merge, then 40 -> 1 after the v0.35.0
-    // release content commits): the proc lands before the unstackable
-    // vestments outputs fill the bags and deny a craft.
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', autoEquip: false });
+    // release content commits, then 1 -> 2 once every crafted equipment copy
+    // took a permanent loot-quality draw after the proc, shifting the stream
+    // for every later craft): the proc lands before the unstackable
+    // vestments outputs fill the bags and deny a craft. Spares on record: 3,
+    // 4, 5, 6, and 7.
+    const sim = new Sim({ seed: 2, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     const meta = mustMeta(sim, pid);
     meta.craftSkills.tailoring = 125;

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "dgn_crypt_knellwyrm",
+    "src": "http://localhost:5194/ui/deeds/dgn_crypt_knellwyrm.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_marrow_tidy",
+    "src": "http://localhost:5194/ui/deeds/dgn_marrow_tidy.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_lady_nobody_hanging",
+    "src": "http://localhost:5194/ui/deeds/dgn_lady_nobody_hanging.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_ilvane_hush",
+    "src": "http://localhost:5194/ui/deeds/dgn_ilvane_hush.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_morthen_candlelight",
+    "src": "http://localhost:5194/ui/deeds/dgn_morthen_candlelight.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

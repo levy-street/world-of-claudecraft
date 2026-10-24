@@ -1,13 +1,9 @@
 import type * as THREE from 'three';
 import type { Entity } from '../sim/types';
-import type { CharacterVisual } from './characters';
-import type { LiveSoulRendLook } from './interior_encounter_prewarm';
 
 export interface InteriorEncounterPrewarmHost {
   shutdownStarted: boolean;
-  views: Map<number, LiveSoulRendLook & { visual: CharacterVisual | null }>;
   sim: {
-    entities: { get(id: number): { kind?: string } | undefined };
     // Read to PLACE the hidden groups where the camera is: a bounded prewarm
     // render only draws what the frustum contains.
     player: { pos: { x: number; y: number; z: number } };

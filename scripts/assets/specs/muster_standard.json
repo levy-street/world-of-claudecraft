@@ -1,0 +1,11 @@
+{
+  "note": "The Fenbridge muster standard (Balgath loot): ONE GLB, root Muster_Standard with Standard_Pole, the Standard_Banner pivot (cloth child Standard_Banner_Cloth) and Standard_Finial. The raw GLB comes from the deterministic Blender factory scripts/assets/muster_standard/model.py, driven by export_muster_standard.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/muster_standard/muster_standard.glb",
+      "out": "models/vfx/muster_standard.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

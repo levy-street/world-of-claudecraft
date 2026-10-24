@@ -439,16 +439,15 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
 
   it('the escrow blob carries the session save fixups, not the raw live state', async () => {
     const rig = makeRig();
-    // A spectating seller: the ordinary save persists the SAVED position and
-    // the stowed pet, never the spectator body. The escrow write must apply
-    // the same fixups or a listing while spectating corrupts the blob.
+    // A jail-visiting seller: the ordinary save persists the SAVED position
+    // and the stowed pet, never the visitor body. The escrow write must apply
+    // the same fixups or a listing during the visit corrupts the blob.
     const stowedPet = { name: 'Stowed', kind: 'wolf' } as unknown as NonNullable<
-      ClientSession['spectating']
+      ClientSession['jailVisit']
     >['stowedPet'];
-    rig.session.spectating = {
-      characterId: 999,
-      name: 'Watched',
+    rig.session.jailVisit = {
       savedPos: { x: 111, y: 0, z: 222 },
+      savedFacing: 0,
       priorGm: false,
       stowedPet,
     };
@@ -493,12 +492,11 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
   it('grant and snapshot blobs carry the fixups too', () => {
     const rig = makeRig();
     const stowedPet = { name: 'Stowed', kind: 'wolf' } as unknown as NonNullable<
-      ClientSession['spectating']
+      ClientSession['jailVisit']
     >['stowedPet'];
-    rig.session.spectating = {
-      characterId: 999,
-      name: 'Watched',
+    rig.session.jailVisit = {
       savedPos: { x: 31, y: 0, z: 64 },
+      savedFacing: 0,
       priorGm: false,
       stowedPet,
     };

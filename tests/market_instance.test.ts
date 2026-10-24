@@ -99,9 +99,9 @@ function signerCounts(row: SourceCarrier | undefined): Record<string, number> {
   return out;
 }
 
-// Non-material controls: a stackable food and an unstackable weapon, so the
+// Non-material controls: stackable non-reagent junk and an unstackable weapon, so the
 // cases that must prove nothing changed outside the material taxonomy can.
-const BREAD = 'baked_bread';
+const NON_SOURCE_STACK = 'stag_antler'; // Vendor junk, not a reagent or consumable.
 const SWORD = 'worn_sword';
 
 const ENCHANTED: ItemInstancePayload = {
@@ -123,6 +123,34 @@ function marketSetup() {
 }
 
 describe('marketListInstance: escrow', () => {
+  it('lists a chosen potion maker from a mixed stack and preserves it through reload and purchase', () => {
+    const { sim, pid } = marketSetup();
+    const potion = 'minor_healing_potion';
+    sim.addItemInstance(potion, { signer: 'Ana' }, pid, 2);
+    sim.addItemInstance(potion, { signer: 'Bru' }, pid, 3);
+    sim.marketListInstance(potion, 100, { signer: 'Ana' }, pid);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    const listing = playerListings(sim)[0];
+    expect(listing.count).toBe(1);
+    expect(listing.materialSources).toEqual([{ source: { signer: 'Ana' }, count: 1 }]);
+    expect(slotsOf(sim, pid, potion)[0].materialSources).toEqual([
+      { source: { signer: 'Ana' }, count: 1 },
+      { source: { signer: 'Bru' }, count: 3 },
+    ]);
+    sim.loadMarket(JSON.parse(JSON.stringify(sim.serializeMarket())));
+    const buyer = sim.addPlayer('warrior', 'Buyer');
+    standAtMerchant(sim, buyer);
+    sim.players.get(buyer)!.copper = 10000;
+    sim.addItemInstance(potion, { signer: 'Bru' }, buyer, 2);
+    sim.marketBuy(listing.id, undefined, buyer);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    expect(slotsOf(sim, buyer, potion)).toHaveLength(1);
+    expect(slotsOf(sim, buyer, potion)[0].materialSources).toEqual([
+      { source: { signer: 'Ana' }, count: 1 },
+      { source: { signer: 'Bru' }, count: 2 },
+    ]);
+  });
+
   it('lists the exact instanced copy (count 1) and leaves the plain stack alone', () => {
     const { sim, pid } = marketSetup();
     sim.addItem(BOOTS, 1, pid);
@@ -265,12 +293,12 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     const buyer = sim.addPlayer('mage', 'Buyer');
     standAtMerchant(sim, buyer);
     sim.players.get(buyer)!.copper = 100000;
-    sim.addItemInstance(BREAD, { ...SIGNED }, pid);
-    sim.marketListInstance(BREAD, 100, SIGNED, pid);
+    sim.addItemInstance(NON_SOURCE_STACK, { ...SIGNED }, pid);
+    sim.marketListInstance(NON_SOURCE_STACK, 100, SIGNED, pid);
     const id = playerListings(sim)[0].id;
     const buyerMeta = metaOf(sim, buyer);
     buyerMeta.inventory.length = 0;
-    sim.addItem(BREAD, 1, buyer);
+    sim.addItem(NON_SOURCE_STACK, 1, buyer);
     fillBackpack(sim, buyer);
 
     sim.drainEvents();
@@ -279,11 +307,13 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     expect(sim.players.get(buyer)!.copper).toBe(100000);
 
     // A byte-equal signed stack with room IS instanced room, as it always was.
-    const plainIdx = buyerMeta.inventory.findIndex((s) => s.itemId === BREAD && !s.instance);
-    buyerMeta.inventory[plainIdx] = { itemId: BREAD, count: 1, instance: { ...SIGNED } };
+    const plainIdx = buyerMeta.inventory.findIndex(
+      (s) => s.itemId === NON_SOURCE_STACK && !s.instance,
+    );
+    buyerMeta.inventory[plainIdx] = { itemId: NON_SOURCE_STACK, count: 1, instance: { ...SIGNED } };
     sim.marketBuy(id, undefined, buyer);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
-    const merged = slotsOf(sim, buyer, BREAD).filter((s) => s.instance);
+    const merged = slotsOf(sim, buyer, NON_SOURCE_STACK).filter((s) => s.instance);
     expect(merged).toHaveLength(1);
     expect(merged[0].count).toBe(2);
     expect(merged[0].instance).toEqual(SIGNED);
@@ -549,13 +579,13 @@ describe('persistence: pre-payload saves and size bounds', () => {
           id: 1002,
           sellerKey: '7',
           sellerName: 'Old Seller',
-          itemId: BREAD,
+          itemId: NON_SOURCE_STACK,
           count: 3,
           price: 250,
           secondsLeft: 1000,
         },
       ],
-      collections: [{ key: '7', copper: 120, items: [{ itemId: BREAD, count: 2 }] }],
+      collections: [{ key: '7', copper: 120, items: [{ itemId: NON_SOURCE_STACK, count: 2 }] }],
       nextListingId: 1003,
     };
     const sim = makeWorld();

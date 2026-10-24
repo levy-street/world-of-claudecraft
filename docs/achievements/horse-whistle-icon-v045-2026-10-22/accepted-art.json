@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "horse-whistle-icon-v045-2026-10-22",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "whistle_horse",
+      "family": "buddy",
+      "batch": "horse-whistle-icon-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/whistle_horse.webp",
+      "canonicalDisplayName": "Horse Whistle",
+      "acceptedSha256": "21a3529d24e87980294f4d24023a5cb00dcd2de3ae30a02f96cffc4fbb7fa96d",
+      "acceptedBytes": 1672,
+      "sources": [
+        {
+          "path": "public/models/buddies/horse.glb",
+          "sha256": "e0a06456224885947a2d768147e383d36e13f3e32f07ca5103290bb74af377d7",
+          "bytes": 744968
+        },
+        {
+          "path": "scripts/wiki/stills_render_entry.js",
+          "sha256": "782256c6dc8f939a34bb7502fba55a8265dba2d456a1b190607077d09fafbac5",
+          "bytes": 5949
+        },
+        {
+          "path": "scripts/wiki/stills_focus.js",
+          "sha256": "6acd2a017172ca3e5c597465d56577ed56e4e0362dec6a3de400eb63eb3cba9e",
+          "bytes": 1671
+        },
+        {
+          "path": "src/render/characters/manifest.ts",
+          "sha256": "b96061b56549f86c29039b65a645e38a62bb5bc4bae7c45f06967a5b396a08a0",
+          "bytes": 379258
+        },
+        {
+          "path": "tmp/icon-audit/horse-prepare.mjs",
+          "sha256": "d004cff263bbd930a78c71778885f1d608fd10566875c927f43aff7f4125fd79",
+          "bytes": 770
+        },
+        {
+          "path": "tmp/icon-audit/horse-render.mjs",
+          "sha256": "b6409cdd6864a2946f7fb160210ad7923256aec664ea0faefaeb1635c52f2365",
+          "bytes": 828
+        },
+        {
+          "path": "tmp/imagegen/v045-buddy/horse-render.png",
+          "sha256": "a3b454fb27f6b36bd441c4dfc8e5dcc6a3e7d8a12aaade5a4d04030db1abd736",
+          "bytes": 66784
+        },
+        {
+          "path": "tmp/imagegen/v045-buddy/whistle_horse-master.png",
+          "sha256": "21034e2e7339e594259a4c0a90e02be06d5a4b9acf1970f9a074310e50cf8731",
+          "bytes": 100747
+        },
+        {
+          "path": "public/ui/items/whistle_horse.webp",
+          "sha256": "21a3529d24e87980294f4d24023a5cb00dcd2de3ae30a02f96cffc4fbb7fa96d",
+          "bytes": 1672
+        }
+      ],
+      "processing": [
+        "Rendered the exact shipped Tug horse GLB with the existing Guide model-still browser renderer, Idle at 0.6 sec, yaw -0.6, height 0.75, 512px canvas. Trimmed transparent margins, fitted the full horse inside 420px with 46px padding on an opaque #20242b background, then encoded 128px WebP quality 90. No generated or edited model, no text-to-image artwork."
+      ],
+      "review": {
+        "sourceAndMaster": "Full horse matches Tug model and existing portrait; no generated interpretation.",
+        "gameCaptureStatus": "Verified static item image loads and decodes in desktop and mobile landscape inventory captures.",
+        "gameCaptures": [
+          "docs/screenshots/horse-whistle-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/horse-whistle-v045/bag-icons-after-mobile.png"
+        ],
+        "evidence": "docs/screenshots/horse-whistle-v045/small-size-review.png",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64
+      }
+    }
+  ]
+}

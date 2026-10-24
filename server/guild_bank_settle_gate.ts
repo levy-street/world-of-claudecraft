@@ -36,8 +36,8 @@ import {
   guildBankDeltaIdentityKey,
   guildBankRungsBought,
 } from '../src/sim/guild_bank';
-import { isMaterialItemId } from '../src/sim/material_ids';
 import type { MaterialSourceTransferSelection } from '../src/sim/material_source_transfer_selection';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type { InvSlot } from '../src/sim/types';
 import type { GuildBankInfo } from '../src/world_api';
 import {
@@ -239,7 +239,7 @@ export function guildBankUnsettledRefusal(
   if (op === 'withdraw') {
     const slot = Number.isInteger(request.slot) ? live.slots[request.slot as number] : undefined;
     if (!slot) return null;
-    const material = isMaterialItemId(slot.itemId);
+    const material = isStackProvenanceItemId(slot.itemId);
     const materialTake = material
       ? guildBankMaterialWithdrawal(request, live.slots, unsettled.sourceUnits)
       : null;

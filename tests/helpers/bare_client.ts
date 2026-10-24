@@ -7,12 +7,13 @@
 // hand-rolling either fixture again.
 
 import type { ClientSession, GameServer } from '../../server/game';
+import { AccountBankRequests } from '../../src/net/account_bank_wire';
 import { ActionBarLayoutUploader } from '../../src/net/action_bar_upload';
+import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
 import { ClientWorld } from '../../src/net/online';
 import { freshAccountLedger } from '../../src/sim/account_ledger';
-import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import { emptyAllocation, emptyModifiers } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
 import { freshDeedStats } from '../../src/sim/deeds';
@@ -75,6 +76,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
     weaponSkinLoadout: {},
   };
   c.accountAdmin = false;
+  c.selfBuddies = emptyBuddySelfMirror();
   c.petSpecialCommandsSupported = false;
   c.movementWireVersion = 1;
   c.reconAuthoritativeX = null;
@@ -122,12 +124,16 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.hillInfo = null;
   c.cardMinigameInfo = { queued: false, available: true, match: null };
   c.socialInfo = null;
+  c.referralCardsState = null;
   c.whoInfo = null;
   c.marketInfo = null;
   c.marketCollectPending = false;
   c.mailInfo = null;
   c.mailUnread = 0;
   c.bankInfo = null;
+  c.accountBankInfo = null;
+  c.accountBankRequests = new AccountBankRequests();
+  c.courierInfo = null;
   c.bankPurchasedSlots = null;
   c.vaultInfo = null;
   c.weeklyRewardInfo = null;
@@ -144,6 +150,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeTitle = null;
   c.activeBorder = null;
   c.delveRun = null;
+  c.dungeonRun = null;
   c.companionState = null;
   c.riftFloor = null;
   // The reserved "no token" sentinel (src/sim/colliders.ts allocRiftCollisionToken
@@ -152,6 +159,13 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   // region to register a token for in the first place.
   c.riftCollisionToken = 0;
   c.lockpickState = null;
+  // The Shardpike trial's three self fields (src/sim/lance_trial.ts, lance_guidance.ts). All
+  // null/0 between pikes, which is the state almost every suite wants.
+  c.lanceTrial = null;
+  c.lanceRestRemaining = 0;
+  c.lanceGuidance = null;
+  // Lantern Hall's board mirror (src/net/guild_hall_wire_state.ts): the empty board.
+  c.guildContracts = { week: '', offered: [], done: [], lifetime: 0 };
   c.delveMarks = 0;
   c.companionUpgrades = {};
   c.craftSkills = emptyCraftSkills();
@@ -178,12 +192,12 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   // null until the first `ggoal` snapshot decodes, matching the class field
   // default (src/net/online.ts).
   c.gatheringGoal = null;
-  // The tslot/fplot self-delta mirrors and the static patch table, matching
-  // the class's own static defaults (src/net/online.ts): a consumer test
-  // reading IWorldFarming or the tool slots through this fixture must see
-  // what a freshly constructed online client sees, not undefined.
+  // The tslot/fplot self-delta mirrors, matching the class's own static
+  // defaults (src/net/online.ts): a consumer test reading IWorldFarming or
+  // the tool slots through this fixture must see what a freshly constructed
+  // online client sees, not undefined. farmPatches is a prototype getter over
+  // the active world, so the fixture inherits it.
   c.toolEffectSlots = [];
-  c.farmPatches = FARM_PATCHES;
   c.myFarmPlots = [];
   c.delveClears = {};
   c.delveDaily = { date: '', firstClearXp: [], markClears: 0 };
@@ -191,6 +205,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.townFocus = {};
   c.nodeCooldowns = new Map();
   c.recipeList = ALL_RECIPES;
+  c.activeInstanceDungeonDifficulty = null;
   // stationPlacements is a getter on ClientWorld (it resolves the active
   // content bundle, which wraps the builtin STATIONS on shipped hosts), so
   // the bare client already reads STATIONS without an assignment here.
@@ -226,6 +241,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeVarkhulAssemblies = [];
   c.activeTemporalHourglasses = [];
   c.activeConsecrations = [];
+  c.activeSporeBursts = [];
   c.profanityWords = [];
   c.mouselookFacing = null;
   c.lastInputSentAt = 0;

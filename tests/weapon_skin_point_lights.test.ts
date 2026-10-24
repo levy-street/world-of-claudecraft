@@ -73,4 +73,17 @@ describe('weapon-skin point-light budgeting', () => {
     expect(entry.worldPos.x).toBe(1);
     expect(entry.light.intensity).toBe(5);
   });
+
+  it('keeps authored steady lights ahead of slightly closer ambient lights', () => {
+    const ambient = new THREE.PointLight(0xff8800, 2);
+    const authored = new THREE.PointLight(0xffffff, 4);
+    authored.userData.steady = true;
+    const ranked = [rank(ambient, 4), rank(authored, 7)];
+
+    applyPointLightBudget(ranked, 0, 0, 1, 1, 55 * 55);
+
+    expect(authored.visible).toBe(true);
+    expect(authored.intensity).toBe(4);
+    expect(ambient.visible).toBe(false);
+  });
 });

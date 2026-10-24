@@ -1,10 +1,12 @@
 // /dev town: resolve a town name to its zone hub so a tester can jump to any
 // settlement without knowing coordinates. Pure and data-driven: the ONLY
-// destinations are the hub records the zone content already declares, so the
-// command can never be steered to an arbitrary point (that is what /dev tp is
-// for, and both ride the same ctx.devCommands gate, which the server arms only
-// from ALLOW_DEV_COMMANDS and production never sets). Unknown names resolve
-// to null and the caller refuses without moving anyone.
+// destinations are the hub records the zone content already declares (or, where
+// a rebuilt town stands a building on its hub, that building's authored door
+// step), so the command can never be steered to an arbitrary point (that is
+// what /dev tp is for, and both ride the same ctx.devCommands gate, which the
+// server arms only from ALLOW_DEV_COMMANDS and production never sets). Unknown
+// names resolve to null and the caller refuses without moving anyone.
+import { distancePointToObb, type Point2 } from '../placed_town_kit';
 import type { ZoneDef } from '../types';
 
 export interface DevTownTarget {
@@ -57,6 +59,33 @@ export function resolveDevTown(zones: readonly ZoneDef[], query: string): DevTow
     targets.find((target) => devTownSlug(target.zoneId) === wanted) ??
     null
   );
+}
+
+/** A rebuilt town's building (sim/authored_town_registry.ts): its walled body
+ *  and the step a visitor stands on before its door. */
+export interface DevTownBuilding {
+  readonly position: Point2;
+  readonly rotation: number;
+  readonly nativeDimensions: { readonly width: number; readonly depth: number };
+  readonly frontStandingPoint: Point2;
+}
+
+/** Where /dev town sets the tester down: the hub itself, or, when a building's
+ *  walls stand on the hub (Bridgemere's island inn fills its island), that
+ *  building's door step, so a jump never lands inside walls. */
+export function devTownLanding(target: Point2, buildings: readonly DevTownBuilding[]): Point2 {
+  const covering = buildings.find(
+    (building) =>
+      distancePointToObb(target, {
+        id: '',
+        center: building.position,
+        halfWidth: building.nativeDimensions.width / 2,
+        halfDepth: building.nativeDimensions.depth / 2,
+        rotation: building.rotation,
+      }) === 0,
+  );
+  const landing = covering?.frontStandingPoint ?? target;
+  return { x: landing.x, z: landing.z };
 }
 
 /** The readout `/dev town` (no argument) and an unknown name print. */

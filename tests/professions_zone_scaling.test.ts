@@ -17,7 +17,7 @@ import { buildGatherNodes } from '../src/render/gather_nodes';
 import type { Collider } from '../src/sim/colliders';
 import { queryOpenWorldColliders } from '../src/sim/colliders';
 import { GATHER_NODE_TYPES } from '../src/sim/content/gather_nodes';
-import { GATHER_NODES, ZONES } from '../src/sim/data';
+import { GATHER_NODES, gatherNodesInActiveWorld, ZONES } from '../src/sim/data';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -78,7 +78,7 @@ describe('node colliders: solid ore and wood, soft herb, per authored node', () 
     // clusters deliberately collide with nothing.
     let solid = 0;
     let soft = 0;
-    for (const node of GATHER_NODES) {
+    for (const node of gatherNodesInActiveWorld()) {
       const out: Collider[] = [];
       queryOpenWorldColliders(
         WORLD_SEED,

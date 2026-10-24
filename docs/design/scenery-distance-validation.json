@@ -1,0 +1,631 @@
+{
+  "status": "Mac/Redmi comparison, loading and visual qualification complete. Windows hardware review and fully green merge gate remain open. Remote feature-branch publication authorized; no merge or deployment.",
+  "candidate": {
+    "tag": "handoff-v6",
+    "baseCommit": "a0659eb667c46273836f3345e5dcdf7e098459c4",
+    "sourceFiles": [
+      {
+        "file": "src/render/eastbrook_town.ts",
+        "sha256": "c4a77190ce1c677502c81cef22becf6fe925aa27d7376e361346eacc03352e8b"
+      },
+      {
+        "file": "src/render/fenbridge_town.ts",
+        "sha256": "16c3b10b558485a37b243ec481d89e173e31972dfb06c5af8354dbcf0bdf8300"
+      },
+      {
+        "file": "src/render/garden_features.ts",
+        "sha256": "d9b0e56d1fdcb4315e820a6e64b4b3f9e92d6925269638803eb3fbd678ea6d4f"
+      },
+      {
+        "file": "src/render/gfx.ts",
+        "sha256": "98253fda62749788f349d5a584d854990407d9fc3575e84f17a7a891354fb1f1"
+      },
+      {
+        "file": "src/render/jungle_features.ts",
+        "sha256": "e7a0bc2af15ae5ca9bc4ccd637cefc5b84ae016d9f818c8954389f97926f2027"
+      },
+      {
+        "file": "src/render/props.ts",
+        "sha256": "c8d6b236fc28b4d980703d0f6ea0b221f542fb46fbb66d9abeef064af354fa05"
+      },
+      {
+        "file": "src/render/renderer.ts",
+        "sha256": "79288abcee707611ccb23d508d1dd6d743f5b9401f6ef28b524e96088ff1506e"
+      },
+      {
+        "file": "src/render/scenery_detail.ts",
+        "sha256": "9e8e9ddd850e20f29ad7cd97f9694233ecfc5ca1f66caa2ddecc1b2511f6b8a3"
+      },
+      {
+        "file": "src/render/scenery_detail_core.ts",
+        "sha256": "3a6fc3080b8932389b04ad76fd90ac710489b08db031024ab63c6393cbbf0565"
+      },
+      {
+        "file": "src/render/scenery_detail_indices.ts",
+        "sha256": "eba0101a3cfb1a95d14d63f6ddec3741989e8de41f0eb4006aef8fde78ec799c"
+      },
+      {
+        "file": "src/render/scenery_detail_shadow.ts",
+        "sha256": "d749033e7cde2b01f16d8955f88ca7b25bc2caf76d7b76ba3a01843d1d8a3974"
+      },
+      {
+        "file": "src/render/zone_feature_sweep.ts",
+        "sha256": "110713e266b5dfa53318c767b10010c80f417255caf07d77f02ef0d03d44427e"
+      },
+      {
+        "file": "tests/architecture.test.ts",
+        "sha256": "7a05e254b7a841cc305319472d3607c2df4ff06505838faab7c36ad6c6dcbffa"
+      },
+      {
+        "file": "tests/gfx_override_core.test.ts",
+        "sha256": "83610c3d58dc31ab82b0d6628d406e6377b7f598ac9b35465c03a4c566ef1508"
+      },
+      {
+        "file": "tests/scenery_detail.test.ts",
+        "sha256": "ce2112b097394588d4293b6d5d4e73a0315af7ae4c79d88073d4bec731352a18"
+      },
+      {
+        "file": "tests/scenery_detail_shadow.test.ts",
+        "sha256": "3a36710384679394d99b9f0fadc3db6d9ef6ab5033481d9b22ecfac306ca154a"
+      },
+      {
+        "file": "src/render/scenery_bands/atlas_preparation.ts",
+        "sha256": "eff638275d09ad8850e51ebf309779b4455438a3251b75c35590f7cc2642e2fa"
+      },
+      {
+        "file": "src/render/scenery_bands/batches.ts",
+        "sha256": "51deb4b29ad51b94bd10b5d3715cbcaf73b939105cc521f206067b85364961e6"
+      },
+      {
+        "file": "src/render/scenery_bands/collect.ts",
+        "sha256": "3380024f016cbb1cdcbabea7b0cec43d13a90976d4a3b7f1462faaa04b1a95ea"
+      },
+      {
+        "file": "src/render/scenery_bands/geometry.ts",
+        "sha256": "9e57bc4b06d66cf8063c47c0baaa9b58fd5c4272ea94a23feb3c3be1a31ea24b"
+      },
+      {
+        "file": "src/render/scenery_bands/giants.ts",
+        "sha256": "f47be665eaca78c28560f8205428d2b92ba2253c034bf3c5a975cb6da04de5fa"
+      },
+      {
+        "file": "src/render/scenery_bands/index.ts",
+        "sha256": "afa8b2aea89167c45f3b9f5657ffdc97f842afe69b05ee5fa4295bcf27f88f9f"
+      },
+      {
+        "file": "src/render/scenery_bands/material.ts",
+        "sha256": "a5bf4daec93bf5b3854745f18caeb1d3a7480cc2272a439dfcf325522f5ec08e"
+      },
+      {
+        "file": "src/render/scenery_bands/near.ts",
+        "sha256": "04aeb120cb2e822b16b6eb3691900f6c1a9e47f4ffc32482c275a2d8fed00a55"
+      },
+      {
+        "file": "src/render/scenery_bands/policy_core.ts",
+        "sha256": "b4dbb078c2c4b6f6019c9ad894e56930a4bfc7508d68d477c1521fb9038bf7dc"
+      },
+      {
+        "file": "src/render/scenery_bands/session.ts",
+        "sha256": "e846b7c424052970b0b02f726680afbc0f5149d37fb947c65031b575648c4370"
+      },
+      {
+        "file": "src/render/scenery_bands/types.ts",
+        "sha256": "270c15680bf7c5322e93b8d09c83c8e22cd4a85923244c0d317bd8b7e064d00e"
+      },
+      {
+        "file": "src/render/scenery_detail_batches.ts",
+        "sha256": "278afed99e8e258d77a42bdc9453d41539f4b6acb7998f060f1c460a559c6606"
+      },
+      {
+        "file": "src/render/scenery_detail_canopy.ts",
+        "sha256": "d8a3a2ffffcfd65b226ceb35f9a95c964b2a6d4c7c6696d8db4fcbc433a53dc3"
+      },
+      {
+        "file": "src/render/scenery_detail_placements.ts",
+        "sha256": "03ce5a97e6fce3375490efc82391f50f8ff37e9991f64c077de5be265222b23d"
+      },
+      {
+        "file": "src/render/scenery_detail_topology.ts",
+        "sha256": "eb2c5529ba4c255d3461177ca8ffd09cb24f5764f06f53f9b505897f44294ca9"
+      },
+      {
+        "file": "src/render/scenery_empty_draw.ts",
+        "sha256": "fd772306880e55a8b798eacf7b3e9b9490caa8f068a40aef69f9c5f972b391de"
+      },
+      {
+        "file": "tests/scenery_bands_atlas_preparation.test.ts",
+        "sha256": "4c4d812ea250d2b8b98667c28455cc6a1094a5128bc7580b4d3b71ad73dfdf00"
+      },
+      {
+        "file": "tests/scenery_bands_ownership.test.ts",
+        "sha256": "59d854ff12ce8660ea7fdbd9b16f039bba8d4636fddacd879d55ef949045a13f"
+      },
+      {
+        "file": "tests/scenery_bands_reference.test.ts",
+        "sha256": "fd3dcf917378c70e2cafca6da26d2e272cb23d7f00eed3cbf7c101f185470d4d"
+      },
+      {
+        "file": "tests/scenery_detail_batches.test.ts",
+        "sha256": "a4d78292fa7c5ba45098b0520892c59781bba4e39fbb755e766319ff8585f0fb"
+      },
+      {
+        "file": "tests/scenery_detail_canopy.test.ts",
+        "sha256": "bc8613ab0ebfa76a8c9f4aa1126685866045905716a483eb54c567f32759a0c8"
+      },
+      {
+        "file": "tests/scenery_detail_loading.test.ts",
+        "sha256": "e2631487c5282f139e4b9a2bd1304ebf79c921d27333e9a6aea46db7d056d464"
+      },
+      {
+        "file": "tests/scenery_empty_draw.test.ts",
+        "sha256": "a3299d7ac17ba0aa72334f52754215bcde8f3d59d74ede3636dbb78dc3f07a13"
+      }
+    ],
+    "media": 2146,
+    "missingMedia": []
+  },
+  "focusedValidation": {
+    "started": "2026-10-14T12:12:37.246Z",
+    "checks": [
+      {
+        "name": "handoff-red",
+        "command": "node_modules/.bin/vitest",
+        "args": [
+          "run",
+          "tests/scenery_bands_ownership.test.ts",
+          "-t",
+          "keeps existing cheap bands",
+          "--maxWorkers=2"
+        ],
+        "status": 1
+      },
+      {
+        "name": "handoff-lint",
+        "command": "node_modules/.bin/biome",
+        "args": [
+          "check",
+          "src/render/eastbrook_town.ts",
+          "src/render/fenbridge_town.ts",
+          "src/render/garden_features.ts",
+          "src/render/gfx.ts",
+          "src/render/jungle_features.ts",
+          "src/render/props.ts",
+          "src/render/renderer.ts",
+          "src/render/scenery_detail.ts",
+          "src/render/scenery_detail_core.ts",
+          "src/render/scenery_detail_indices.ts",
+          "src/render/scenery_detail_shadow.ts",
+          "src/render/zone_feature_sweep.ts",
+          "tests/architecture.test.ts",
+          "tests/gfx_override_core.test.ts",
+          "tests/scenery_detail.test.ts",
+          "tests/scenery_detail_shadow.test.ts",
+          "src/render/scenery_bands/atlas_preparation.ts",
+          "src/render/scenery_bands/batches.ts",
+          "src/render/scenery_bands/collect.ts",
+          "src/render/scenery_bands/geometry.ts",
+          "src/render/scenery_bands/giants.ts",
+          "src/render/scenery_bands/index.ts",
+          "src/render/scenery_bands/material.ts",
+          "src/render/scenery_bands/near.ts",
+          "src/render/scenery_bands/policy_core.ts",
+          "src/render/scenery_bands/session.ts",
+          "src/render/scenery_bands/types.ts",
+          "src/render/scenery_detail_batches.ts",
+          "src/render/scenery_detail_canopy.ts",
+          "src/render/scenery_detail_placements.ts",
+          "src/render/scenery_detail_topology.ts",
+          "src/render/scenery_empty_draw.ts",
+          "tests/scenery_bands_atlas_preparation.test.ts",
+          "tests/scenery_bands_ownership.test.ts",
+          "tests/scenery_bands_reference.test.ts",
+          "tests/scenery_detail_batches.test.ts",
+          "tests/scenery_detail_canopy.test.ts",
+          "tests/scenery_detail_loading.test.ts",
+          "tests/scenery_empty_draw.test.ts"
+        ],
+        "status": 0
+      },
+      {
+        "name": "handoff-green",
+        "command": "node_modules/.bin/vitest",
+        "args": [
+          "run",
+          "tests/monolith_budget.test.ts",
+          "tests/scenery_empty_draw.test.ts",
+          "tests/architecture.test.ts",
+          "tests/gfx_override_core.test.ts",
+          "tests/scenery_bands_ownership.test.ts",
+          "tests/scenery_bands_reference.test.ts",
+          "tests/scenery_bands_atlas_preparation.test.ts",
+          "tests/zone_feature_sweep.test.ts",
+          "tests/zone_feature_visibility.test.ts",
+          "tests/scenery_detail.test.ts",
+          "tests/scenery_detail_loading.test.ts",
+          "tests/scenery_detail_batches.test.ts",
+          "tests/scenery_detail_canopy.test.ts",
+          "tests/scenery_detail_shadow.test.ts",
+          "--maxWorkers=2"
+        ],
+        "status": 1,
+        "knownBaselineFailure": "Only gfx_override_core settings-byte pin; reproduced with HEAD gfx.ts and HEAD test, identical six hash mismatches. Independent structural audit proves all six preset settings unchanged except sceneryDetail.",
+        "evidence": ["gfx-baseline-pin-reproducer.log", "gfx-baseline-audit.log"]
+      },
+      {
+        "name": "handoff-types",
+        "command": "node_modules/.bin/tsc",
+        "args": ["--noEmit"],
+        "status": 0
+      },
+      {
+        "name": "build-handoff-v6",
+        "command": "/opt/homebrew/Cellar/node/24.1.0/bin/node",
+        "args": ["tmp/scenery-recovery/build.mjs", "handoff-v6"],
+        "status": 0
+      }
+    ],
+    "complete": true,
+    "finished": "2026-10-14T12:19:02.663Z"
+  },
+  "selectiveGate": {
+    "command": "node scripts/gate_select.mjs",
+    "exitCode": 1,
+    "passed": [
+      "i18n/wiki/SFX artifact generation",
+      "i18n freshness",
+      "SFX and media manifest regeneration/trackedness/freshness",
+      "security:gate"
+    ],
+    "failedStage": "biome (changed files)",
+    "baselineFailures": [
+      {
+        "file": "src/sim/content/pvp_honor.ts",
+        "issue": "formatting at line 888",
+        "identicalToHead": true,
+        "sha256": "b7fe804f8965dd61e90fb3b7f3f3a8bce664b040f346d941213e1d8258d9233c"
+      },
+      {
+        "file": "tests/static_instance_cells.test.ts",
+        "issue": "useIterableCallbackReturn at line 46",
+        "identicalToHead": true,
+        "sha256": "ff7fa8059701a4dbdf062dc0ec6603b0337a95652cfc418a406750ef6075306d"
+      }
+    ],
+    "laterGateStages": "not run",
+    "scope": "No task code changed after frozen handoff-v6 build; baseline cleanup deferred."
+  },
+  "publicationPreflight": {
+    "reason": "Publication was authorized. The static-instance callback is from this branch's earlier Low coconut commit f4a45631064, so its lint-only correction is in scope. PvP formatting remains untouched.",
+    "base": "631ba14ea5933ed3140b80e54f86ec403e316f29",
+    "baseReason": "git merge-base HEAD feature/v045-integration, the user-specified integration base.",
+    "checks": [
+      {
+        "command": "node node_modules/vitest/vitest.mjs run tests/static_instance_cells.test.ts --maxWorkers=2",
+        "passed": true,
+        "tests": 3
+      },
+      {
+        "command": "GATE_SELECT_BASE=631ba14ea5933ed3140b80e54f86ec403e316f29 node scripts/ci_changed.mjs",
+        "exitCode": 0,
+        "files": 473,
+        "warnings": 1501,
+        "infos": 19
+      },
+      {
+        "command": "node node_modules/vitest/vitest.mjs run tests/architecture.test.ts tests/localization_fixes.test.ts --maxWorkers=2",
+        "exitCode": 0,
+        "passed": 163,
+        "skipped": 3
+      },
+      {
+        "command": "Tracked branch copy-rule scan against 631ba14ea5933ed3140b80e54f86ec403e316f29",
+        "findings": 0
+      },
+      {
+        "command": "node_modules/.bin/tsc --noEmit",
+        "exitCode": 0
+      },
+      {
+        "command": "Untracked text copy-rule scan",
+        "files": 38,
+        "findings": 0
+      },
+      {
+        "command": "node node_modules/@biomejs/biome/bin/biome check docs/design/scenery-distance-measurements.json docs/design/scenery-distance-validation.json scripts/scenery_review tests/static_instance_cells.test.ts",
+        "exitCode": 0,
+        "files": 11,
+        "existingWarnings": 4
+      },
+      {
+        "command": "Explicit Biome check of all staged TypeScript, JavaScript and JSON additions/changes",
+        "exitCode": 0,
+        "summary": ["Checked 50 files in 225ms. No fixes applied.", "Found 55 warnings."],
+        "requestedFiles": 51,
+        "checkedFiles": 50,
+        "warnings": 55
+      },
+      {
+        "command": "git diff --cached --check",
+        "exitCode": 0
+      },
+      {
+        "command": "SHA-256 comparison against handoff-v6 recorded TypeScript sources",
+        "files": 39,
+        "mismatches": 0
+      }
+    ],
+    "limits": "Final application code, Mac/Redmi comparisons, loading routes, Low sanity checks and planned screenshot review are complete. Report render inspection passed at 1440px and 390px with all 42 inline images loaded. The initial selective gate did not complete its later stages; known baseline limits remain disclosed. Windows hardware testing is pending.",
+    "installedHook": "core.hooksPath points to an absent pre-push hook. Publication checks are being run explicitly; no hook configuration changed.",
+    "remoteObservation": "git ls-remote --heads origin refs/heads/feature/cel-shading-rnd succeeded with no matching remote branch at 2026-10-14 14:34 UTC; recheck before push.",
+    "typecheckCommandCorrection": "The legacy compiler path failed before checking code. Corrected to the repository native compiler entry point node_modules/.bin/tsc --noEmit, which passed.",
+    "sparseCheckout": "Report paths are outside the sparse definition; staged with explicit git add --sparse without changing checkout rules.",
+    "reportInspection": {
+      "at": "2026-10-14T16:49:19.753Z",
+      "report": "docs/design/scenery-distance-report.html",
+      "errors": [],
+      "views": [
+        "final-portable-report-desktop-top.png",
+        "final-portable-report-desktop-fps.png",
+        "final-portable-report-desktop-pair.png",
+        "final-portable-report-desktop-final-low.png",
+        "final-portable-report-mobile-top.png"
+      ],
+      "desktop": {
+        "width": 1440,
+        "documentWidth": 1440,
+        "pairs": 20,
+        "images": 42
+      },
+      "mobile": {
+        "width": 390,
+        "documentWidth": 390
+      },
+      "complete": true,
+      "htmlSha256": "5a22f159caafba5b920d5e48b1be2f577a6c1d378c7bc1cc45075f6b057ba93b"
+    },
+    "finalStagedChecks": {
+      "branch": "feature/cel-shading-rnd",
+      "base": "631ba14ea5933ed3140b80e54f86ec403e316f29",
+      "headBeforeCommit": "a0659eb667c46273836f3345e5dcdf7e098459c4",
+      "stagedFiles": 105,
+      "copyFindings": [],
+      "whitespaceCheck": "git diff --cached --check passed",
+      "sourceHashCheck": "39 recorded TypeScript files match handoff-v6 exactly",
+      "scope": "All staged additions and earlier branch changes compared with the actual integration base; locale exclusions match the repository hook."
+    },
+    "reviewCompletion": "All five previously delegated reviewers are complete. The historical middle-band initial-empty-selection finding is resolved: current lastSelection initializes to null. Final Low handoff and native-shadow/empty-draw reviews reported no remaining blocker."
+  },
+  "windowsHarness": {
+    "at": "2026-10-14T14:24:33.589Z",
+    "kind": "Windows harness validation on Mac, not Windows performance acceptance",
+    "buildCompleted": true,
+    "verifiedMedia": 2146,
+    "focusedValidationTests": {
+      "command": "node --test scripts/scenery_review/checks.test.mjs",
+      "passed": 5
+    },
+    "lint": {
+      "command": "node node_modules/@biomejs/biome/bin/biome check scripts/scenery_review",
+      "passed": true
+    },
+    "smoke": {
+      "path": "tmp/scenery-review/smoke-2026-10-14T14-18-17.242Z/results.json",
+      "sha256": "79f76b61b9113e672bdab1c1d292f303eb2358e4585f0cc045f4467f25b078d3",
+      "complete": true,
+      "rows": 2,
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
+        "character visual unavailable, skipping view (player_druid): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
+        "character visual unavailable, skipping view (player_druid): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "viewport": [1920, 1080],
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)"
+    },
+    "visualInspection": "Both actual screenshots inspected: fixed camera and near character/terrain retained; distant giant crowns become coarser. No entry overlays. Console contains local API 502s and character preload warnings, so this is not a clean-console claim.",
+    "limits": "One-second windows validate harness only. Actual Windows, driver/power queries and RTX3060 renderer check require that device. App source used by the phone remains frozen handoff-v6."
+  },
+  "visualReview": {
+    "build": "handoff-v6",
+    "pairs": [
+      {
+        "device": "Mac",
+        "tier": "medium",
+        "scene": "thornpeak",
+        "files": [
+          "higher-v6-medium-thornpeak-stock.webp",
+          "higher-v6-medium-thornpeak-detail.webp"
+        ],
+        "observed": "Near character, terrain detail and conifers retained. Distant giant tree crowns become visibly flatter leaf clusters with a less dense silhouette. Animated motes differ between clients. Static matched viewpoint, not pixel-identical animation."
+      },
+      {
+        "device": "Mac",
+        "tier": "medium",
+        "scene": "beach",
+        "files": ["higher-v6-medium-beach-stock.webp", "higher-v6-medium-beach-detail.webp"],
+        "observed": "Near palm trunks, coconuts, character and ground textures retained. Far canopy is coarser and less dense. Animated mist differs; do not treat the haze difference as a fog-setting change."
+      },
+      {
+        "device": "Mac",
+        "tier": "high",
+        "scene": "thornpeak",
+        "files": ["higher-v6-high-thornpeak-stock.webp", "higher-v6-high-thornpeak-detail.webp"],
+        "observed": "Near character, terrain texture, conifers and grass retained. Distant giant crowns become flatter, less dense leaf clusters; a visible compromise. Native fog settings unchanged in captures."
+      },
+      {
+        "device": "Mac",
+        "tier": "high",
+        "scene": "beach",
+        "files": ["higher-v6-high-beach-stock.webp", "higher-v6-high-beach-detail.webp"],
+        "observed": "Near trunks, coconuts, rocks, ground texture and grass retained. Coarser distant canopy; animated mist differs independently."
+      },
+      {
+        "device": "Redmi",
+        "tier": "medium",
+        "scene": "thornpeak",
+        "files": [
+          "higher-phone-v6-medium-forward-stock-thornpeak.webp",
+          "higher-phone-v6-medium-forward-detail-thornpeak.webp"
+        ],
+        "observed": "Near character and terrain remain readable at the measured buffer resolution. Distant giant crowns simplify visibly. Motes differ with animation; source textures remain."
+      },
+      {
+        "device": "Redmi",
+        "tier": "medium",
+        "scene": "beach",
+        "files": [
+          "higher-phone-v6-medium-forward-stock-beach.webp",
+          "higher-phone-v6-medium-forward-detail-beach.webp"
+        ],
+        "observed": "Near trunks, coconuts, character, ground texture and plants retain their appearance. Coarser distant canopy remains visible. Animated mist differs substantially between these independent-time captures; native fog values checked separately."
+      },
+      {
+        "device": "Mac",
+        "tier": "ultra",
+        "scene": "thornpeak",
+        "files": ["higher-v6-ultra-thornpeak-stock.webp", "higher-v6-ultra-thornpeak-detail.webp"],
+        "observed": "Nearby character, terrain, grass, rocks and conifers retain detail. Distant giant-tree crown shapes simplify, with a fuller silhouette than the Medium reduction. Animated motes differ."
+      },
+      {
+        "device": "Mac",
+        "tier": "ultra",
+        "scene": "beach",
+        "files": ["higher-v6-ultra-beach-stock.webp", "higher-v6-ultra-beach-detail.webp"],
+        "observed": "Nearby palms, coconuts, grass, rocks and ground textures retained. Background canopy simplification is subtle in this view; animated mist differs. No observed near-scene omission."
+      },
+      {
+        "device": "Mac",
+        "tier": "insane",
+        "scene": "thornpeak",
+        "files": [
+          "higher-v6-insane-thornpeak-stock.webp",
+          "higher-v6-insane-thornpeak-detail.webp"
+        ],
+        "observed": "Nearby character, terrain textures, grass, rocks and conifers retain detail. Distant giant crowns remain substantially full, with modest leaf-cluster silhouette changes. No observed near-scene omission in this fixed view. Animated motes and foliage phases differ."
+      },
+      {
+        "device": "Mac",
+        "tier": "insane",
+        "scene": "beach",
+        "files": ["higher-v6-insane-beach-stock.webp", "higher-v6-insane-beach-detail.webp"],
+        "observed": "Near palms, coconuts, character, dense grass, ferns, rocks and ground textures are retained. Distant scenery changes are subtle in this view. No observed near-scene omission. Mist and foliage phases differ between clients."
+      },
+      {
+        "device": "Redmi",
+        "tier": "high",
+        "scene": "thornpeak",
+        "files": [
+          "higher-phone-v6-high-forward-stock-thornpeak.webp",
+          "higher-phone-v6-high-forward-detail-thornpeak.webp"
+        ],
+        "observed": "Nearby character, conifers, grass, rocks and terrain textures retain their appearance at the measured phone resolution. Distant giant crowns simplify visibly. No observed near-scene omission. Animated motes differ between captures."
+      },
+      {
+        "device": "Redmi",
+        "tier": "high",
+        "scene": "beach",
+        "files": [
+          "higher-phone-v6-high-forward-stock-beach.webp",
+          "higher-phone-v6-high-forward-detail-beach.webp"
+        ],
+        "observed": "Nearby palms, coconuts, character, rocks, ferns, grass and ground textures remain readable and present. Distant canopy reduction is less prominent in this view. Animated mist and foliage differ between independent captures; this is not evidence of changed fog settings."
+      },
+      {
+        "device": "Redmi",
+        "tier": "ultra",
+        "scene": "thornpeak",
+        "files": [
+          "higher-phone-v6-ultra-forward-stock-thornpeak.webp",
+          "higher-phone-v6-ultra-forward-detail-thornpeak.webp"
+        ],
+        "observed": "Near character, terrain detail, conifers and rocks are retained. Distant giant-tree crowns are somewhat coarser; changes are subtle at the measured phone buffer. Snow and foliage animation phases differ between independent captures. No observed near-scene omission in this fixed view."
+      },
+      {
+        "device": "Redmi",
+        "tier": "ultra",
+        "scene": "beach",
+        "files": [
+          "higher-phone-v6-ultra-forward-stock-beach.webp",
+          "higher-phone-v6-ultra-forward-detail-beach.webp"
+        ],
+        "observed": "Near palms, trunks, coconuts, character, rocks, grass and ground textures remain visible. Distant canopy differences are subtle in this view. Mist and foliage phases differ between captures; this does not establish a lighting change. No observed near-scene omission."
+      },
+      {
+        "device": "Redmi",
+        "tier": "insane",
+        "scene": "thornpeak",
+        "files": [
+          "higher-phone-v6-insane-forward-stock-thornpeak.webp",
+          "higher-phone-v6-insane-forward-detail-thornpeak.webp"
+        ],
+        "observed": "Nearby character, conifers, grass, rocks and terrain detail remain present and readable at the measured phone buffer. Distant giant-tree crowns show only modest silhouette changes in this view. No observed near-scene omission. Snow and foliage animation phases differ between captures."
+      },
+      {
+        "device": "Redmi",
+        "tier": "insane",
+        "scene": "beach",
+        "files": [
+          "higher-phone-v6-insane-forward-stock-beach.webp",
+          "higher-phone-v6-insane-forward-detail-beach.webp"
+        ],
+        "observed": "Nearby character, palm trunks, coconuts, rocks, dense grass and ground textures remain present. Distant scenery changes are subtle in this view. Animated mist differs substantially, so the clearer right-hand background is not evidence of a fog or lighting setting change. No observed near-scene omission."
+      }
+    ],
+    "complete": true,
+    "scope": "All 16 planned final-build higher-preset fixed-view pairs inspected. Final Low and route captures are separate checks.",
+    "supplementary": [
+      {
+        "device": "Redmi",
+        "tier": "medium",
+        "file": "movement-higher-v6-phone-14.webp",
+        "observed": "Nearby character, terrain and visible conifers remain present along the route. This is a still at one route position, not proof of all transitions."
+      },
+      {
+        "device": "Redmi",
+        "tier": "medium",
+        "file": "movement-higher-v6-phone-44.webp",
+        "observed": "Nearby character, terrain and visible conifers remain present along the route. This is a still at one route position, not proof of all transitions. Enemy nameplates overlap part of the background."
+      },
+      {
+        "device": "Redmi",
+        "tier": "medium",
+        "file": "movement-higher-v6-phone-89.webp",
+        "observed": "The Evergarden boundary capture retains the near character, slope, water, distant giant tree and visible structures. Zone-entry text covers part of the upper image, limiting visual inspection there."
+      },
+      {
+        "device": "Redmi",
+        "tier": "low",
+        "file": "movement-phone-handoff-v6-end.webp",
+        "observed": "At the Evergarden boundary, the near character, slope and water remain present. Distant dressing is strongly reduced, small tree crowns are very coarse and the large tree silhouette remains visible through fog. Zone-entry text obscures part of the upper view. This endpoint is not proof that every transition is seamless."
+      },
+      {
+        "device": "Redmi",
+        "tier": "low",
+        "file": "low-v6-final-thornpeak.webp",
+        "observed": "Final Low retains the near character, trees, bushes and rocks. Ground and distant dressing remain sparse; giant-tree sprites are conspicuously pale through the fog, and distant tree crowns are very coarse. This preserves the selected performance tradeoff, not finished visual polish."
+      },
+      {
+        "device": "Redmi",
+        "tier": "low",
+        "file": "low-v6-final-beach.webp",
+        "observed": "Final Low retains the near character, palm trunks, coconuts, bushes and ground surface. Distant dressing is sparse and the simplified canopies are coarse. No new near-scene omission was observed in this fixed view."
+      }
+    ],
+    "finalLowInspected": true
+  },
+  "limits": "Raw multi-megabyte diagnostic captures remain local. The companion measurement record preserves individual window frame counts/durations, costs, interruption records and route observations; source hashes link it to the retained raw captures. Windows smoke windows are not performance acceptance."
+}

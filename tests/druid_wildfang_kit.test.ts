@@ -353,7 +353,7 @@ describe('Pin, the Bruin Rush to Cat Form rider', () => {
 });
 
 describe('Stalk moves at full speed', () => {
-  it('stealths a Cat at 1.0x while rogue Duskveil keeps its 0.5x crawl', () => {
+  it('stealths a Cat at 1.0x, the same full speed as rogue Duskveil', () => {
     const { sim, player } = rig();
     cast(sim, 'cat_form');
     // The shift's Loping Stride (+60%) rides on the Cat Form passive (+15%).
@@ -372,9 +372,9 @@ describe('Stalk moves at full speed', () => {
     rogue.castAbility('stealth');
     rogue.tick();
     const duskveil = rogue.player.auras.find((a) => a.kind === 'stealth');
-    expect(duskveil?.value).toBe(0.5);
-    expect(moveSpeedMult(rogue.player)).toBe(0.5);
-    expect(ABILITIES.stealth.description).toContain('50% slower');
+    expect(duskveil?.value).toBe(1);
+    expect(moveSpeedMult(rogue.player)).toBe(1);
+    expect(ABILITIES.stealth.description).toContain('full speed');
     expect(ABILITIES.prowl.description).not.toContain('slower');
   });
 });

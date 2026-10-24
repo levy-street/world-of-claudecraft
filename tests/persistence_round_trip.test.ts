@@ -46,6 +46,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     meta.loadouts = [{ name: 'PvP', alloc: meta.talents, bar: [] }];
     meta.activeLoadout = 0;
     meta.delveMarks = 17;
+    meta.heroicMarks = 23;
     meta.delveClears = { crypt: 4 };
     meta.companionUpgrades = { tessa: 2 };
     meta.delveLoreUnlocked = new Set(['lore_1']);
@@ -80,6 +81,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     expect(s2.lifetimeHonor).toBe(654);
     expect(s2.honorArenaDaily).toEqual(meta.honorArenaDaily);
     expect(s2.delveMarks).toBe(17);
+    expect(s2.heroicMarks).toBe(23);
     expect(s2.loadouts?.length).toBe(1);
     expect(s2.skinCatalog).toBe('mech');
     expect(s2.bank?.purchasedSlots).toBe(6);

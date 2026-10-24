@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-paladin-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 105,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_holy_helmet",
+      "family": "holy",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_holy_helmet.webp",
+      "canonicalDisplayName": "Sunvigil Circlet",
+      "acceptedSha256": "2f9c079a10bfacd6a004fba42e9d0380c3fc10671be1f7a500e092826dc82254",
+      "acceptedBytes": 3692,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_holy_helmet.png",
+        "sha256": "842ea6d8edff6024e2fef11c215123c5e49cb6e4783ddcb5d7629e55fd973aca",
+        "bytes": 2203810,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_holy_helmet.png",
+        "sha256": "ab02bcb2f33b7f1f4eba1adfac4c4a1691f900b96e89c2d2bea33ac6c8fbe74d",
+        "bytes": 539436,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Sunvigil Circlet: one complete open crown-like circlet, low sweeping golden brow arcs with one amber center stone; empty interior, no head or full helmet.. Coordinated holy paladin mail set: luminous but weathered pale silver, warm antique gold rims, ivory quilted cloth and amber inset stones. Fine interlinked chainmail, gentle restrained sunlit reflection, elegant rounded arcing construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_holy_shoulder",
+      "family": "holy",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_holy_shoulder.webp",
+      "canonicalDisplayName": "Sunvigil Mantle",
+      "acceptedSha256": "024ed8e59ca36c04b56405c92b8cfcb532025435cafaca156fdc9d7119fd76aa",
+      "acceptedBytes": 4240,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_holy_shoulder.png",
+        "sha256": "f767a42b6d236c1d4c42313a2e35e77e1349370af39d0506f5bed6239182e6bf",
+        "bytes": 2523410,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_holy_shoulder.png",
+        "sha256": "8580ee1136c51a7c57e35ba1d4243d228a1b86ae2375a6d726339ac4f17e55e4",
+        "bytes": 563904,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Sunvigil Mantle: compact matched pair of chainmail shoulder mantles with curved silver caps, gold rims and short ivory cloth tabs; no torso.. Coordinated holy paladin mail set: luminous but weathered pale silver, warm antique gold rims, ivory quilted cloth and amber inset stones. Fine interlinked chainmail, gentle restrained sunlit reflection, elegant rounded arcing construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_holy_chest",
+      "family": "holy",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_holy_chest.webp",
+      "canonicalDisplayName": "Sunvigil Hauberk",
+      "acceptedSha256": "cbc6de34db1f806b32f2d9acafdb027ef3ff8a641c6fda2c1b493fcb813ed331",
+      "acceptedBytes": 4712,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_holy_chest.png",
+        "sha256": "6488acf6a1a7ed21ec498bf952a45561c8731cc1791d30314a9ecf5152d9488a",
+        "bytes": 2677670,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_holy_chest.png",
+        "sha256": "d41d634b38aeffefad32be9cdd121282fdb7deb755ec774953c192c0477bd8a5",
+        "bytes": 614025,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Sunvigil Hauberk: one empty front-facing short sleeved fine silver chainmail torso garment, broad sculpted gold collar and ivory trim, no legs or mannequin.. Coordinated holy paladin mail set: luminous but weathered pale silver, warm antique gold rims, ivory quilted cloth and amber inset stones. Fine interlinked chainmail, gentle restrained sunlit reflection, elegant rounded arcing construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_holy_legs",
+      "family": "holy",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_holy_legs.webp",
+      "canonicalDisplayName": "Sunvigil Legmail",
+      "acceptedSha256": "64847d51bd9c37da675de3a0758a48d4fdf6935c41c27c55ba0bf4e8c1c5897b",
+      "acceptedBytes": 3644,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_holy_legs.png",
+        "sha256": "7e90d51621739404f0337d10bca36c220d960a1351e4572ac3fc1ba4d43a8cb4",
+        "bytes": 2420527,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_holy_legs.png",
+        "sha256": "003d03043cb118c7f818b263c63222de4b025e28786a342df771e828d2d53fee",
+        "bytes": 543212,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Sunvigil Legmail: complete pair of fitted chainmail leggings joined at belt, ivory quilted upper sections, silver mail knees and shins; no boots.. Coordinated holy paladin mail set: luminous but weathered pale silver, warm antique gold rims, ivory quilted cloth and amber inset stones. Fine interlinked chainmail, gentle restrained sunlit reflection, elegant rounded arcing construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_holy_gloves",
+      "family": "holy",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_holy_gloves.webp",
+      "canonicalDisplayName": "Sunvigil Gloves",
+      "acceptedSha256": "ff304176dbb6c0dec43baa86395342acd0ee6588dd70e856dbfbb213d7db8f20",
+      "acceptedBytes": 4706,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_holy_gloves.png",
+        "sha256": "78c28172cb4cc604f2a791f8e89d8375d2b4e3d5f434960f64d0925145869072",
+        "bytes": 2612378,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_holy_gloves.png",
+        "sha256": "9e0e7af97b35f7fc153a5be76e8b9aeec345f7bf4cb787d0b8fbb50a80904ee4",
+        "bytes": 626342,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Sunvigil Gloves: a compact matched pair of ivory leather gloves with silver articulated finger armor and amber-set golden wrist cuffs; empty gloves.. Coordinated holy paladin mail set: luminous but weathered pale silver, warm antique gold rims, ivory quilted cloth and amber inset stones. Fine interlinked chainmail, gentle restrained sunlit reflection, elegant rounded arcing construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_protection_helmet",
+      "family": "protection",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_protection_helmet.webp",
+      "canonicalDisplayName": "Shieldvow Helm",
+      "acceptedSha256": "e726144a985261c3c7c28d0a446e211caa3f871338f6958147e0376771f63291",
+      "acceptedBytes": 4254,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_protection_helmet.png",
+        "sha256": "0b60aeea3c97317602b1e3f58fd1876dcde770bdfa332ca50f0b1f67025d075c",
+        "bytes": 2603565,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_protection_helmet.png",
+        "sha256": "44933ced542e4eb9a057598f4a3753ccc28d02ee3cb514e24043071c2268dba4",
+        "bytes": 609950,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Shieldvow Helm: one complete closed broad helmet with shield-shaped brow and short cheek guards, fine chainmail neck curtain, no head or shoulders.. Coordinated protection paladin mail set: thick burnished gold-edged dark silver armor over fine chainmail, royal blue quilting, small pale azure gems. Massive rounded shield-like overlapping plates and riveted reinforced rims, dignified defensive construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_protection_shoulder",
+      "family": "protection",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_protection_shoulder.webp",
+      "canonicalDisplayName": "Shieldvow Pauldrons",
+      "acceptedSha256": "a0d6fe10f2ff29674d2c21ca87180dcab78dc638947dfd44f97b9c91e1d6392f",
+      "acceptedBytes": 4454,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_protection_shoulder.png",
+        "sha256": "9f91cfd8377d4ba8cd0e765a0c28cb204d63a42b5a88971884833ea45a89cbf5",
+        "bytes": 2551420,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_protection_shoulder.png",
+        "sha256": "686b0f0763c7811a739e81c74d8dc899ba545f5b0e7d9015c3f2d5dc47a8d829",
+        "bytes": 566374,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Shieldvow Pauldrons: compact matched pair of heavy shield-shaped shoulder guards, broad domed silver plates, gold raised rims and royal blue lining; no torso.. Coordinated protection paladin mail set: thick burnished gold-edged dark silver armor over fine chainmail, royal blue quilting, small pale azure gems. Massive rounded shield-like overlapping plates and riveted reinforced rims, dignified defensive construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_protection_chest",
+      "family": "protection",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_protection_chest.webp",
+      "canonicalDisplayName": "Shieldvow Breastplate",
+      "acceptedSha256": "d48587a0becea97987a77c084f9e960aceb858aefaf9979d8d146480423f26dc",
+      "acceptedBytes": 5734,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_protection_chest.png",
+        "sha256": "640f2c44b8e5fda4a605f1979b412c98c92960cb5fbf46fddffa04486dd7c65b",
+        "bytes": 2816537,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_protection_chest.png",
+        "sha256": "e183213cc28274220f2d7bf1a3468aa2fbaf633d174cd1ec2da25591854aead3",
+        "bytes": 635500,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Shieldvow Breastplate: one complete empty front-facing protective chest armor, broad shield-shaped central plate, thick layered side plates and visible chainmail hem.. Coordinated protection paladin mail set: thick burnished gold-edged dark silver armor over fine chainmail, royal blue quilting, small pale azure gems. Massive rounded shield-like overlapping plates and riveted reinforced rims, dignified defensive construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_protection_legs",
+      "family": "protection",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_protection_legs.webp",
+      "canonicalDisplayName": "Shieldvow Legplates",
+      "acceptedSha256": "8524b4b05f130b8c3e4e8821f4475d9bfe4c5b5c0d89554fa9647c8ffd1092aa",
+      "acceptedBytes": 4362,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_protection_legs.png",
+        "sha256": "3c286ee66cabf24ec1d8e2f2c76c2ba35c5127fcb03fbbb6ea0e586571129f2e",
+        "bytes": 2476776,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_protection_legs.png",
+        "sha256": "22f83cdff860ba394ed2e389de2f099a46ce579de42bb9caca10359af52833e9",
+        "bytes": 576653,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Shieldvow Legplates: complete joined pair of armored leggings with rounded heavy shield-shaped knees, overlapping riveted greaves and fine chainmail joints; no feet.. Coordinated protection paladin mail set: thick burnished gold-edged dark silver armor over fine chainmail, royal blue quilting, small pale azure gems. Massive rounded shield-like overlapping plates and riveted reinforced rims, dignified defensive construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_protection_gloves",
+      "family": "protection",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_protection_gloves.webp",
+      "canonicalDisplayName": "Shieldvow Gauntlets",
+      "acceptedSha256": "1004de2a4538297136285f1304de325499b8e7420585778547dedb76396f0e18",
+      "acceptedBytes": 5166,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_protection_gloves.png",
+        "sha256": "be87bfa10d9b56df2a04010c181d82eee0e109150356813a7147bcf3dec57ed7",
+        "bytes": 2624596,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_protection_gloves.png",
+        "sha256": "31bf51e954809a26dac83b8a5bf4f5bbf8fd8374a9332835ae04fb5f6e42a33b",
+        "bytes": 599771,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Shieldvow Gauntlets: a compact matched pair of heavy silver articulated armored gloves, gold shield-shaped cuffs, royal blue padding and chainmail joints; empty gloves.. Coordinated protection paladin mail set: thick burnished gold-edged dark silver armor over fine chainmail, royal blue quilting, small pale azure gems. Massive rounded shield-like overlapping plates and riveted reinforced rims, dignified defensive construction. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_retribution_helmet",
+      "family": "retribution",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_retribution_helmet.webp",
+      "canonicalDisplayName": "Lightbrand Crown",
+      "acceptedSha256": "93bb5c31d8ae803f799e94dd016c44b55a24f2041f1fa47746827f550aaf0c60",
+      "acceptedBytes": 4684,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_retribution_helmet.png",
+        "sha256": "b605f15b962082422d72c8aa81058070704fc98006d18ef183b823d4df498a98",
+        "bytes": 2363878,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_retribution_helmet.png",
+        "sha256": "bc685337abaea34b4deb767c9684bf52612c1e3d9d1f743bec64a42df3f60b19",
+        "bytes": 589608,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Lightbrand Crown: one complete tall martial crown, angular gold brow band with three upward blade-shaped finials and a single amber central inset; empty interior, no head, no helmet faceplate.. Coordinated retribution paladin mail set: rich burnished gold and bright worn steel, deep burgundy padded cloth, amber light restrained to small inset stones. Angular swept blade-like edges and flared pointed construction express disciplined radiant offense; visible interlinked chainmail joints. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_retribution_shoulder",
+      "family": "retribution",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_retribution_shoulder.webp",
+      "canonicalDisplayName": "Lightbrand Spaulders",
+      "acceptedSha256": "6f77fe09bf36fb271d0816dde793a7d203fb9d58f9e979ed32ab048806f62a1f",
+      "acceptedBytes": 4398,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_retribution_shoulder.png",
+        "sha256": "a9e49ddf070f0e93554854fc03115b5f6e83bcaa0c44ebd77b94ecea1e5a0065",
+        "bytes": 2470508,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_retribution_shoulder.png",
+        "sha256": "e8490fbecdcdb4a31070ae2c772df3aa7e348a3009aaad136724b45a91f2408b",
+        "bytes": 569982,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Lightbrand Spaulders: compact matched pair of angular layered gold and steel shoulder plates, swept rising outer blades, burgundy backing; no torso.. Coordinated retribution paladin mail set: rich burnished gold and bright worn steel, deep burgundy padded cloth, amber light restrained to small inset stones. Angular swept blade-like edges and flared pointed construction express disciplined radiant offense; visible interlinked chainmail joints. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_retribution_chest",
+      "family": "retribution",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_retribution_chest.webp",
+      "canonicalDisplayName": "Lightbrand Cuirass",
+      "acceptedSha256": "3566412fdfc9befc1a9b23eaadd71f4d9eb6169976f5f8bac24c4de34d38f914",
+      "acceptedBytes": 5094,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_retribution_chest.png",
+        "sha256": "cf7ca141a2b673aad79eb61b60094b09c03e48b3accbf2a2ae839270c02f6b2f",
+        "bytes": 2563321,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_retribution_chest.png",
+        "sha256": "b45bc7ebacf20fd86f4e196c8841f5e15528d22fb26c3128488bebd34714dbf8",
+        "bytes": 597205,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Lightbrand Cuirass: one complete empty front-facing steel torso armor with angular golden central ridge, pointed layered waist plates and burgundy mail-backed side panels.. Coordinated retribution paladin mail set: rich burnished gold and bright worn steel, deep burgundy padded cloth, amber light restrained to small inset stones. Angular swept blade-like edges and flared pointed construction express disciplined radiant offense; visible interlinked chainmail joints. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_retribution_legs",
+      "family": "retribution",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_retribution_legs.webp",
+      "canonicalDisplayName": "Lightbrand Legguards",
+      "acceptedSha256": "7c7c509c0e8376a301aada8c535179cfc66b6605a23cf3c00dc685744f3034c0",
+      "acceptedBytes": 3598,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_retribution_legs.png",
+        "sha256": "c169f123fe1a52d1159051111c0e4ef97cba1f464363bd3513a7a4993e6d68b3",
+        "bytes": 2247962,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_retribution_legs.png",
+        "sha256": "7101b0e5576343aa89306102347686287ebdcc7b0b7861fdb67dec8542875503",
+        "bytes": 503572,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Lightbrand Legguards: complete joined pair of segmented armored leggings with pointed golden kneecaps, swept steel shin ridges and burgundy chainmail-backed thighs; no boots.. Coordinated retribution paladin mail set: rich burnished gold and bright worn steel, deep burgundy padded cloth, amber light restrained to small inset stones. Angular swept blade-like edges and flared pointed construction express disciplined radiant offense; visible interlinked chainmail joints. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_paladin_retribution_gloves",
+      "family": "retribution",
+      "batch": "warfare-season2-paladin-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_paladin_retribution_gloves.webp",
+      "canonicalDisplayName": "Lightbrand Gauntlets",
+      "acceptedSha256": "5ba0e72236e557b943bd502816ace26461a47ee5791227f5c6596df68d658c60",
+      "acceptedBytes": 4564,
+      "original": {
+        "path": "tmp/imagegen/v045-paladin/originals/vanguard_paladin_retribution_gloves.png",
+        "sha256": "2d6e32f08eac0d19c65ce258deb215b9e77c5012cb1dcd0441958b5318bb8f52",
+        "bytes": 2488606,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-paladin/masters/vanguard_paladin_retribution_gloves.png",
+        "sha256": "0bceb626303afc4b806c4d7aa05602f0a49f1639afeb12be41c0e1e3dcddbe2c",
+        "bytes": 581695,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Lightbrand Gauntlets: compact matched pair of articulated gold-edged steel gloves with pointed flared wrist guards, burgundy leather palms and small amber cuff insets; empty gloves.. Coordinated retribution paladin mail set: rich burnished gold and bright worn steel, deep burgundy padded cloth, amber light restrained to small inset stones. Angular swept blade-like edges and flared pointed construction express disciplined radiant offense; visible interlinked chainmail joints. for World of ClaudeCraft, woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges and softer peripheral brushwork, no photograph or plastic 3D render. Warm top-left key light and cool deep shadows; opaque charcoal/umber painted vignette and subtle grounded shadow. Complete centered subject fills 72 percent of square with safe padding, readable at 22px and in a circle. No wearer, mannequin, skin, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, label, watermark, transparency, collage, split sheet or unrelated objects. Output one finished icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-paladin-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-paladin-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

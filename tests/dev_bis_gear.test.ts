@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { DEV_KIT_ROLES, devKitRole } from '../src/sim/content/dev_kit_roles';
 import { ITEMS } from '../src/sim/data';
 import {
   bestEpicGearFor,
@@ -12,7 +13,7 @@ import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
 import { canEquipItemInSlot, MASTERWROUGHT_EQUIP_CAP } from '../src/sim/equipment_rules';
 import { RIFT_BAND_MAX_UPGRADE, RIFT_GEM_RATING } from '../src/sim/rift/band_ladder';
 import { Sim } from '../src/sim/sim';
-import type { EquipSlot, ItemDef } from '../src/sim/types';
+import type { EquipSlot, ItemDef, PlayerClass } from '../src/sim/types';
 
 // /dev bis: the one-shot best-in-slot outfit for level-cap playtesting.
 
@@ -265,7 +266,9 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
     // signature bonuses or combat ratings, so no other slot is forced into a
     // collection to make an item-level claim look like measured BiS. Spec-less
     // means the class's first role decides the line; the authored class
-    // restriction still excludes caster mail for warriors.
+    // restriction still excludes caster mail for warriors. Non-healer roles
+    // never see Healing Power pieces, so the warlock's chest is the caster
+    // cloth collection piece rather than a healer chest.
     const expected: Record<(typeof CLASSES)[number], string[]> = {
       warrior: ['chest:crucible_str_mail_chest'],
       paladin: ['chest:crucible_healer_mail_chest', 'feet:crucible_healer_mail_feet'],
@@ -274,7 +277,9 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       rogue: [],
       priest: [],
       mage: [],
-      warlock: [],
+      // No Healing Power pieces for a non-healer spec, so the warlock chest is
+      // the caster collection piece rather than a healer chest.
+      warlock: ['chest:crucible_caster_cloth_chest'],
       druid: ['chest:crucible_caster_leather_chest', 'waist:crucible_caster_leather_waist'],
     };
     const flaggedFrom = (picks: Partial<Record<EquipSlot, string>>): string[] =>
@@ -605,5 +610,47 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
     } finally {
       for (const def of SYNTH) delete ITEMS[def.id];
     }
+  });
+});
+
+describe('dev bis gear: Healing Power pieces only reach healer specs', () => {
+  // bestEpicGearFor scores armor plus the class line, which cannot tell a
+  // healer piece from a damage-caster piece, so it skips Healing Power gear for
+  // every non-healer role (the role a spec-less caller resolves to is the
+  // class's first-listed DEV_KIT_ROLES role). Swept over every class and spec,
+  // plus the spec-less call, so no slot or class can quietly re-admit them.
+  const roleFlag = (cls: PlayerClass, spec: string | null): boolean =>
+    ((spec ? devKitRole(cls, spec) : null) ?? DEV_KIT_ROLES[cls][0]).healer === true;
+  const healerPicks = (cls: PlayerClass, spec: string | null): string[] =>
+    Object.values(bestEpicGearFor(cls, spec)).filter(
+      (id): id is string => !!id && (ITEMS[id]?.healPower ?? 0) > 0,
+    );
+
+  it('a non-healer spec never wears one, a healer spec still does', () => {
+    let nonHealer = 0;
+    let healer = 0;
+    for (const cls of Object.keys(DEV_KIT_ROLES) as PlayerClass[]) {
+      for (const spec of [null, ...DEV_KIT_ROLES[cls].map((role) => role.spec)]) {
+        const picks = healerPicks(cls, spec);
+        if (roleFlag(cls, spec)) {
+          healer++;
+          expect(picks.length, `${cls}/${spec ?? 'spec-less'} healer kit`).toBeGreaterThan(0);
+        } else {
+          nonHealer++;
+          expect(picks, `${cls}/${spec ?? 'spec-less'} non-healer kit`).toEqual([]);
+        }
+      }
+    }
+    // Both arms ran, so neither can pass vacuously.
+    expect(nonHealer).toBeGreaterThan(0);
+    expect(healer).toBeGreaterThan(0);
+  });
+
+  it('the exclusion is real: a non-healer spec could legally equip a Healing Power piece', () => {
+    // Positive control: without the filter these pieces are equip-legal for a
+    // damage caster, so the empty lists above are the filter's doing.
+    expect(ITEMS.springbinder_sash.healPower ?? 0).toBeGreaterThan(0);
+    expect(canEquipItemInSlot('priest', ITEMS.springbinder_sash, 'waist', 'shadow')).toBe(true);
+    expect(roleFlag('priest', 'shadow')).toBe(false);
   });
 });

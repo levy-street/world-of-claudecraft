@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const nl_NL: Record<string, string> = {
+  'error.buddyGrantFailed': 'Het toekennen van de metgezel is mislukt.',
+  'error.characterAlreadyHasThat': 'Dat personage heeft die metgezel of dat uiterlijk al.',
+  'moderationHistory.actionGrantBuddy': 'Metgezel toegekend',
+  'moderationHistory.actionAnnounce': 'Realmaankondiging',
+  'moderationHistory.actionGmInvisible': 'Onzichtbaar geworden',
+  'moderationHistory.actionGmVisible': 'Zichtbaar geworden',
+  'moderationHistory.actionUnwatch': 'Van de volglijst verwijderd',
+  'moderationHistory.actionWatch': 'Aan de volglijst toegevoegd',
   'error.flagActiveExists': 'dit account heeft al een openstaande markering van dat type',
   'wealth.largeMovementsUnavailable':
     'grote bankmutaties konden niet worden geladen (het uitlezen van het grootboek gaf een time-out); het goudoverzicht hierboven is volledig',
@@ -355,8 +363,6 @@ export const nl_NL: Record<string, string> = {
   'detail.accountActions': 'Acties voor accountmoderatie',
   'detail.banReason': 'Reden van verbod:{value}',
   'detail.suspensionReason': 'Reden van opschorting:{value}',
-  'detail.deactivatedNotice': 'De speler heeft dit account op {value} gedeactiveerd.',
-  'detail.reactivate': 'Heractiveren',
   'detail.notePlaceholder': 'Moderatornotitie / reden',
   'detail.suspend1h': '1u Schorsen',
   'detail.suspend24h': '24u Schorsen',
@@ -455,7 +461,6 @@ export const nl_NL: Record<string, string> = {
   'dialog.confirmBan': 'Verbanning bevestigen',
   'dialog.confirmUnban': 'Opheffing verbanning bevestigen',
   'dialog.confirmUnsuspension': 'Bevestig de opschorting',
-  'dialog.confirmReactivation': 'Heractivering bevestigen',
   'dialog.character': 'Personage',
   'dialog.account': 'Account',
   'dialog.action': 'Actie',
@@ -469,8 +474,6 @@ export const nl_NL: Record<string, string> = {
   'dialog.actionUnban': 'Inlogtoegang tot account herstellen',
   'dialog.actionUnsuspend':
     'Herstel de inlogtoegang van uw account vóór het verstrijken van de opschorting',
-  'dialog.actionReactivate':
-    'De deactivering door de speler zelf ongedaan maken en de inlogtoegang tot het account herstellen',
   'dialog.confirm': 'Bevestigen',
   'dialog.cancel': 'Annuleren',
   'dialog.warning': 'Waarschuwing',
@@ -1087,14 +1090,6 @@ export const nl_NL: Record<string, string> = {
     'Elk personage op het account draagt het openbare label totdat deze gespeelde tijd is opgebruikt.',
   'detail.cheaterMarkRelengthHint':
     'Vervangt het resterende budget volledig en telt er niets bij op. Het openbare label blijft zichtbaar.',
-  'detail.worldQuestBlockModeration': 'Wereldquests',
-  'detail.worldQuestBlockActions': 'Moderatieacties voor wereldquests',
-  'detail.worldQuestBlockApply': 'Wereldquests blokkeren',
-  'detail.worldQuestBlockLift': 'Wereldquests deblokkeren',
-  'detail.worldQuestBlockReason': 'Reden van blokkade: {value}',
-  'detail.worldQuestBlockedAt': 'Geblokkeerd: {value}',
-  'detail.worldQuestBlockHint':
-    'Voor botgebruik bij wereldquests in plaats van een ban: geen enkel personage op het account kan nog wereldquests starten, er voortgang in boeken of er beloningen mee verdienen. Al het andere blijft speelbaar.',
   'dialog.confirmCheaterMark': 'Valsspelersmarkering bevestigen',
   'dialog.confirmCheaterMarkRelength': 'Nieuwe duur van markering bevestigen',
   'dialog.confirmCheaterMarkLift': 'Opheffen van markering bevestigen',
@@ -1102,22 +1097,12 @@ export const nl_NL: Record<string, string> = {
     'Elk personage op dit account voorzien van het openbare label Valsspeler',
   'dialog.actionCheaterMarkRelength': 'Het resterende speeltijdbudget van deze markering vervangen',
   'dialog.actionCheaterMarkLift': 'Valsspelersmarkering voortijdig opheffen',
-  'dialog.confirmWorldQuestBlock': 'Blokkade van wereldquests bevestigen',
-  'dialog.confirmWorldQuestUnblock': 'Opheffen van blokkade van wereldquests bevestigen',
-  'dialog.actionWorldQuestBlock': 'Alle personages op dit account blokkeren voor wereldquests',
-  'dialog.actionWorldQuestUnblock': 'Wereldquests op dit account weer toestaan',
   'alert.cheaterMarkDurationInvalid': 'Voer een geheel getal van 1 tot {max} uur in.',
   'error.cheaterMarkDurationInvalid': 'Het speeltijdbudget moet tussen 1 en 100 uur liggen.',
   'error.cheaterMarkNotMarked': 'Dit account draagt de valsspelersmarkering niet.',
   'error.cheaterMarkAdminTarget': 'Beheerdersaccounts kunnen de valsspelersmarkering niet krijgen.',
-  'error.worldQuestBlockAdminTarget':
-    'Beheerdersaccounts kunnen niet worden geblokkeerd voor wereldquests.',
-  'error.worldQuestBlockAlreadyBlocked': 'Dit account is al geblokkeerd voor wereldquests.',
-  'error.worldQuestBlockNotBlocked': 'Dit account is niet geblokkeerd voor wereldquests.',
   'moderationHistory.actionCheaterMark': 'Valsspelersmarkering toegepast',
   'moderationHistory.actionCheaterMarkLift': 'Valsspelersmarkering opgeheven',
-  'moderationHistory.actionWorldQuestsBlock': 'Wereldquests geblokkeerd',
-  'moderationHistory.actionWorldQuestsUnblock': 'Wereldquests gedeblokkeerd',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Goud',
   'error.flagInvalidStatus': 'ongeldige vlagstatus',

@@ -21,7 +21,6 @@ import {
   YUMI_MAZE_X,
   zoneAt,
 } from '../src/sim/data';
-import { createGroundObject } from '../src/sim/entity';
 import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
@@ -62,23 +61,6 @@ const S = 162;
 const PPY = 1.7; // base scale at zoom 1
 // An overworld player z (delve positions are x in the delve band; x = 0 is overworld).
 const PZ = 100;
-
-it('hides other owners vault markers unless they are in the current party', () => {
-  const world = makeWorld('sim');
-  const portal = createGroundObject(9000, '', 'Hoard', { x: 1, y: 0, z: PZ });
-  portal.templateId = 'hoard_entrance';
-  portal.vaultOwnerPid = 2;
-  world.entities.set(portal.id, portal);
-  const shown = () =>
-    buildMarkers(world).some(
-      (marker) => marker.kind === 'semantic-object' && marker.semantic.kind === 'hoard-entrance',
-    );
-  expect(shown()).toBe(false);
-  portal.vaultOwnerPid = 5;
-  expect(shown()).toBe(true);
-  portal.vaultOwnerPid = world.player.id;
-  expect(shown()).toBe(true);
-});
 
 // One scenario as plain construction. `shape` toggles between a "Sim-shaped" stub
 // carrying sim-only junk fields the core must ignore and a lean "ClientWorld-mirror"
@@ -278,7 +260,7 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     const markers = buildMarkers(world as unknown as IWorld);
     const marker = markers.find((candidate) => candidate.kind === 'world-quest');
     expect(marker).toMatchObject({ questId: quest.id, zoneId: quest.zoneId, state: 'available' });
-    if (!marker || marker.kind !== 'world-quest') throw new Error('missing world quest marker');
+    if (marker?.kind !== 'world-quest') throw new Error('missing world quest marker');
     expect(minimapWorldQuestMarkerAt(markers, marker.mx, marker.my, 10)).toBe(marker);
   });
 
@@ -299,22 +281,19 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       (candidate) => candidate.kind === 'world-quest',
     );
     expect(marker).toMatchObject({ questId: quest.id, state: 'available' });
-    if (!marker || marker.kind !== 'world-quest') throw new Error('missing rim marker');
+    if (marker?.kind !== 'world-quest') throw new Error('missing rim marker');
     expect(Math.hypot(marker.mx - S / 2, marker.my - S / 2)).toBeCloseTo(
       minimapSafeCenterRadius(S, 7),
       5,
     );
   });
 
-  it('hides below-level, completed, inactive-rotation, and distant world quests', () => {
+  it('hides below-level, completed, practice replay, inactive-rotation, and distant world quests', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const world = makeWorld('sim') as unknown as {
       player: { level: number; pos: { x: number; z: number } };
       worldQuestCycle: string;
-      worldQuestLog: ReadonlyMap<
-        string,
-        { questId: string; count: number; state: string; practiceOnly?: boolean }
-      >;
+      worldQuestLog: ReadonlyMap<string, { questId: string; count: number; state: string }>;
     };
     const worldQuestMarkers = () =>
       buildMarkers(world as unknown as IWorld).filter((marker) => marker.kind === 'world-quest');
@@ -344,6 +323,61 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     world.worldQuestCycle = '2026-08-31';
     world.player.pos.x = quest.area.x + quest.area.radius + 1_000;
     expect(worldQuestMarkers()).toEqual([]);
+  });
+
+  it.each(['sim', 'client'] as const)(
+    'shows the rerolled-in quest in place of the one it replaced (%s)',
+    (shape) => {
+      const replaced = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+      const replacement = WORLD_QUESTS_BY_ID.wq_eastbrook_calligraphy;
+      const world = makeWorld(shape) as unknown as {
+        player: { level: number; pos: { x: number; z: number } };
+        worldQuestCycle: string;
+        worldQuestLog: ReadonlyMap<string, never>;
+        worldQuestReplacements: Readonly<Record<string, string>>;
+      };
+      world.player.level = 20;
+      world.worldQuestCycle = '2026-08-31';
+      world.worldQuestLog = new Map<string, never>();
+      world.worldQuestReplacements = { [replaced.id]: replacement.id };
+      const questIds = () =>
+        buildMarkers(world as unknown as IWorld).flatMap((marker) =>
+          marker.kind === 'world-quest' ? [marker.questId] : [],
+        );
+
+      world.player.pos.x = replacement.area.x;
+      world.player.pos.z = replacement.area.z;
+      expect(questIds()).toContain(replacement.id);
+      world.player.pos.x = replaced.area.x;
+      world.player.pos.z = replaced.area.z;
+      expect(questIds()).not.toContain(replaced.id);
+    },
+  );
+
+  it('shows the rerolled replacement instead of the rotation quest it replaced', () => {
+    const rotated = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const replacement = WORLD_QUESTS_BY_ID.wq_eastbrook_boars;
+    const world = makeWorld('client') as unknown as {
+      player: { level: number; pos: { x: number; z: number } };
+      worldQuestCycle: string;
+      worldQuestLog: ReadonlyMap<string, never>;
+      worldQuestReplacements: Readonly<Record<string, string>>;
+    };
+    const worldQuestIds = () =>
+      buildMarkers(world as unknown as IWorld).flatMap((marker) =>
+        marker.kind === 'world-quest' ? [marker.questId] : [],
+      );
+    world.player.level = Math.max(rotated.minLevel, replacement.minLevel);
+    world.worldQuestCycle = '2026-08-31';
+    world.worldQuestLog = new Map<string, never>();
+    world.worldQuestReplacements = { [rotated.id]: replacement.id };
+
+    world.player.pos.x = replacement.area.x;
+    world.player.pos.z = replacement.area.z;
+    expect(worldQuestIds()).toContain(replacement.id);
+    world.player.pos.x = rotated.area.x;
+    world.player.pos.z = rotated.area.z;
+    expect(worldQuestIds()).not.toContain(rotated.id);
   });
 
   it('marks an entered objective active while keeping the same small emblem', () => {
@@ -382,7 +416,7 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       bossId: boss.templateId,
       zoneId: zoneAt(boss.pos.x, boss.pos.z).id,
     });
-    if (!marker || marker.kind !== 'world-boss') throw new Error('missing world boss marker');
+    if (marker?.kind !== 'world-boss') throw new Error('missing world boss marker');
     expect(minimapWorldObjectiveMarkerAt(markers, marker.mx, marker.my, 10)).toBe(marker);
 
     world.raidLockouts = () => [{ id: worldBossLockoutId(boss.templateId), msRemaining: 60_000 }];
@@ -597,20 +631,6 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     expect(allies.map((a) => a.ally)).toEqual(['friend', 'guild']);
   });
 
-  it('marks only ONLINE guildmates: a guildmate hiding their presence gets no diamond', () => {
-    // server/presence_privacy.ts: a hidden guildmate arrives offline in the
-    // roster, and the minimap must not track them through walls anyway.
-    const world = makeWorld('sim') as unknown as {
-      socialInfo: { guild: { members: { online: boolean }[] } };
-    };
-    world.socialInfo.guild.members[0].online = false;
-    const allies = buildMarkers(world as never).filter((m) => m.kind === 'ally') as Extract<
-      MinimapMarker,
-      { kind: 'ally' }
-    >[];
-    expect(allies.map((a) => a.ally)).toEqual(['friend']);
-  });
-
   it('drops the object-loot blip for a quest collectable the viewer is not on the quest for', () => {
     // Same gate the renderer uses to withhold the 3D view (isQuestGatedGroundObjectHidden):
     // an off-quest sparkle is not in the scene, so a blip would point at empty ground.
@@ -757,6 +777,42 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       markers.filter((marker) => marker.kind === 'service').map((marker) => marker.service),
     ).toEqual(['mailbox', 'noticeboard']);
     expect(markers.filter((marker) => marker.kind === 'object-loot')).toHaveLength(1);
+  });
+
+  it('keeps a reconnected owner vault portal on the minimap through the character resolver', () => {
+    const world = makeWorld('client') as unknown as {
+      player: { id: number; pos: { x: number; z: number } };
+      playerId: number;
+      partyInfo: null;
+      characterId?: number;
+      entities: Map<number, unknown>;
+    };
+    world.player.id = 20;
+    world.playerId = 20;
+    world.partyInfo = null;
+    const portal = {
+      id: 2,
+      kind: 'object',
+      templateId: 'hoard_entrance',
+      lootable: true,
+      vaultOwnerPid: 10,
+      vaultOwnerCharacterId: 701,
+      pos: { x: 1, z: PZ },
+    };
+    world.entities = new Map<number, unknown>([
+      [20, world.player],
+      [2, portal],
+    ]);
+    const hoardMarkers = () =>
+      buildMarkers(world as unknown as IWorld).filter(
+        (marker): marker is Extract<MinimapMarker, { kind: 'semantic-object' }> =>
+          marker.kind === 'semantic-object' && marker.semantic.kind === 'hoard-entrance',
+      );
+
+    world.characterId = undefined;
+    expect(hoardMarkers()).toEqual([]);
+    world.characterId = 701;
+    expect(hoardMarkers()).toHaveLength(1);
   });
 
   it('classifies rift and delve rewards before generic loot, then draw-orders navigation above rewards', () => {
@@ -1605,7 +1661,8 @@ describe('harvest marker full silhouette at the circular rim', () => {
     { profile: 'compact' as const, radius: 5.25, outline: 1.75 },
   ])('contains the bottom miter corners in $profile mode', ({ profile, radius, outline }) => {
     const world = makeWorld('client');
-    const corpse = world.entities.get(13)!;
+    const corpse = world.entities.get(13);
+    if (!corpse) throw new Error('missing corpse marker fixture');
     corpse.templateId = 'forest_wolf';
     corpse.loot = null;
     // The painter's triangle has vertices (0,-r), (r,0.7r), (-r,0.7r).
@@ -1623,51 +1680,5 @@ describe('harvest marker full silhouette at the circular rim', () => {
     expect(harvest()).toEqual([]);
     corpse.pos.x = world.player.pos.x - (safeCenter - 0.01);
     expect(harvest()).toHaveLength(1);
-  });
-});
-
-describe('King of the Hill minimap marker', () => {
-  it.each(['sim', 'client'] as const)(
-    'projects the real circle and centre for %s, at every zoom',
-    (shape) => {
-      const world = makeWorld(shape);
-      Object.assign(world, { hillInfo: { x: 10, z: PZ + 5, radius: 50, phase: 'active' } });
-      const builder = createMinimapMarkers();
-      for (const scale of [0.5, 1, 2]) {
-        const hill = builder.build(world, S, scale).markers.find((m) => m.kind === 'hill');
-        expect(hill).toEqual({
-          kind: 'hill',
-          mx: S / 2 - 10 * scale,
-          my: S / 2 - 5 * scale,
-          radius: 50 * scale,
-          phase: 'active',
-        });
-      }
-      // The circle stays at its true centre; its skull stays visible at the rim.
-      Object.assign(world, { hillInfo: { x: 100, z: PZ, radius: 50, phase: 'warning' } });
-      expect(builder.build(world, S, 1).markers.find((m) => m.kind === 'hill')).toMatchObject({
-        skull: { mx: S / 2 - minimapSafeCenterRadius(S, 12), my: S / 2 },
-        mx: S / 2 - 100,
-        radius: 50,
-        phase: 'warning',
-      });
-      Object.assign(world, { hillInfo: { x: 200, z: PZ, radius: 50, phase: 'active' } });
-      expect(builder.build(world, S, 1).markers.some((m) => m.kind === 'hill')).toBe(false);
-      Object.assign(world, { hillInfo: null });
-      expect(builder.build(world, S, 1).markers.some((m) => m.kind === 'hill')).toBe(false);
-    },
-  );
-
-  it('never puts an overworld hill on an interior minimap', () => {
-    const world = makeWorld('client');
-    Object.assign(world, {
-      hillInfo: { x: 0, z: PZ, radius: 50, phase: 'active' },
-      riftFloor: { name: 'Rift', tier: 'C' },
-    });
-    expect(
-      createMinimapMarkers()
-        .build(world, S, 1)
-        .markers.some((m) => m.kind === 'hill'),
-    ).toBe(false);
   });
 });

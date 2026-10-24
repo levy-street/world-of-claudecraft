@@ -39,6 +39,7 @@ import {
   usesLiveDayNightLighting,
   warmDuskGrade,
 } from '../src/render/day_night_core';
+import { NOON_PHASE } from '../src/sim/day_night';
 import type { BiomeId } from '../src/sim/types';
 
 // The day_night_core: the pure clock-to-grade math of the world day/night cycle.
@@ -71,7 +72,7 @@ describe('open-air instances follow the live cycle (source pins)', () => {
     expect(usesLiveDayNightLighting('hoardValley')).toBe(true);
     expect(usesLiveDayNightLighting('battleground')).toBe(true);
     expect(usesLiveDayNightLighting('dungeon')).toBe(false);
-    expect(usesLiveDayNightLighting('wildheartField')).toBe(false);
+    expect(usesLiveDayNightLighting('wildheartBasin')).toBe(false);
   });
 
   it('keeps Thornhollow fog, lights, and IBL on the same live grade as its sky', () => {
@@ -89,14 +90,24 @@ describe('water follows the cycle (source pins)', () => {
     const source = readFileSync(new URL('../src/render/water.ts', import.meta.url), 'utf8');
     expect(source).toContain('uSunDir: WATER_SUN_UNIFORM');
     expect(source).toContain('uDayNight: WATER_DAYNIGHT_UNIFORM');
-    expect(source).toContain('uniform vec3 uDayNight;');
-    expect(source).toContain('col *= uDayNight;');
+    // The surface (ocean/ocean_surface_glsl.ts) grades every light it adds
+    // itself: the sun and the fallback sky take the multiplier, while the sky
+    // it reflects is a capture of the dome, which carries the grade already.
+    const surface = readFileSync(
+      new URL('../src/render/ocean/ocean_surface_glsl.ts', import.meta.url),
+      'utf8',
+    );
+    expect(surface).toContain('uniform vec3 uDayNight;');
+    expect(surface).toContain('vec3 sunRad = uSunColor * uDayNight');
+    expect(surface).toContain(': uSkyColor * uDayNight * 0.8;');
   });
 
   it('the renderer drives both from its key-light update every frame', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     expect(source).toContain('setWaterSunDirection(this.lightDir);');
     expect(source).toContain('setWaterDayNight(this.dnGrade.fog);');
+    const sky = readFileSync(new URL('../src/render/sky.ts', import.meta.url), 'utf8');
+    expect(sky).toContain('dome.material.color.setRGB(mul[0], mul[1], mul[2]);');
   });
 
   it('precipitation follows the cycle too, or snow falls white at midnight', () => {
@@ -763,6 +774,9 @@ describe('day/night clock override (the /daynight dev command)', () => {
     setDayNightPhaseOverride(0.5);
     expect(dayNightPhaseOverride()).toBe(0.5);
     expect(currentDayNightPhase()).toBe(0.5);
+    // The sim leaf's noon, the one definition the render clock reports under DAY_ONLY.
+    expect(NOON_PHASE).toBe(0.5);
+    expect(currentDayNightPhase()).toBe(NOON_PHASE);
     setDayNightPhaseOverride(null);
     expect(dayNightPhaseOverride()).toBeNull();
     const live = currentDayNightPhase();

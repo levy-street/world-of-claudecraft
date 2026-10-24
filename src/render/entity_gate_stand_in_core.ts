@@ -31,7 +31,7 @@ export interface DrawableRig {
   root: { visible: boolean };
 }
 
-/** The six character rigs one entity view can own. */
+/** The seven character rigs one entity view can own. */
 export interface CharacterFormRigSlots {
   visual: ActivatableRig | null;
   sheepVisual: ActivatableRig | null;
@@ -39,9 +39,10 @@ export interface CharacterFormRigSlots {
   catVisual: ActivatableRig | null;
   travelVisual: ActivatableRig | null;
   metamorphVisual: ActivatableRig | null;
+  sporemenderVisual: ActivatableRig | null;
 }
 
-/** The same six, plus the one bespoke body that replaces all of them. */
+/** The same seven, plus the one bespoke body that replaces all of them. */
 export interface EntityRigSlots {
   visual: DrawableRig | null;
   sheepVisual: DrawableRig | null;
@@ -49,6 +50,7 @@ export interface EntityRigSlots {
   catVisual: DrawableRig | null;
   travelVisual: DrawableRig | null;
   metamorphVisual: DrawableRig | null;
+  sporemenderVisual: DrawableRig | null;
   /** the Mage fireball travel form: a bespoke visual that takes every rig out
    *  of the frame, so its presence IS the body for that window */
   fireballTravelVisual: unknown;
@@ -73,6 +75,7 @@ export function applyCharacterFormVisibility(
   rigs.catVisual?.setActive(visibility.cat);
   rigs.travelVisual?.setActive(visibility.travel);
   rigs.metamorphVisual?.setActive(visibility.metamorph);
+  rigs.sporemenderVisual?.setActive(visibility.sporemender);
 }
 
 /** Is any body of this entity actually drawn right now? */
@@ -84,7 +87,8 @@ export function anyCharacterRigDrawing(rigs: EntityRigSlots): boolean {
     rigs.bearVisual?.root.visible ||
     rigs.catVisual?.root.visible ||
     rigs.travelVisual?.root.visible ||
-    rigs.metamorphVisual?.root.visible
+    rigs.metamorphVisual?.root.visible ||
+    rigs.sporemenderVisual?.root.visible
   );
 }
 
@@ -156,9 +160,9 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     file: 'src/render/renderer.ts',
     callSite: '(settled) => this.gateSwapFlagOnCompile(target, settled),',
     hides:
-      'the freshly baked far mesh and its shadow proxy; the SAME injected gate also stages the transparent effect clones (visual.ts stageEffectSwap), which hide nothing at all, reveals the face decals of a body built with them deferred (visual.ts attachDeferredDecals), which hide only themselves, and holds the first mount of the Moonwing and Gloamveil form adornments (characters/form_adornments.ts), which also hide only themselves',
+      'the freshly baked far mesh and its shadow proxy; the SAME injected gate also stages the transparent effect clones (visual.ts stageEffectSwap), which hide nothing at all, reveals the face decals of a body built with them deferred (visual.ts attachDeferredDecals), which hide only themselves, holds the first mount of the Moonwing form adornments (characters/form_adornments.ts), which also hide only themselves, and links the first merged head and merged armor of a WOC body (characters/woc_head_merge.ts, characters/woc_armor_merge.ts), which hide only themselves, and reveals a streamed WOC armor file once it is attached (characters/woc_armor_dressing.ts: on the spot for a body built directly, as one unit of the work queue for a world view), which hides only itself, and reveals a WOC head piece hung after its body was built (characters/woc_head_dressing.ts: a hairstyle or a beard whose file a world body did not wait for, or a piece picked later), which hides only itself',
     standIn:
-      'the articulated rig, held by farMeshShown (characters/far_lod_reveal_core.ts); for the effect-clone use, the body itself, still drawing its current opaque materials until the swap commits; for the deferred decals, the same body, drawn whole from the frame it entered range with only its stubble and makeup paint arriving late; for the form adornments, the same body in its form tint, with only the cosmetic antlers, crescent, wings or veil arriving a link later',
+      'the articulated rig, held by farMeshShown (characters/far_lod_reveal_core.ts), and for the shadow proxy of a WOC body the stand-in silhouette of its visual key, cast for as long as the baked proxy cannot (shadowStandInShown); for the effect-clone use, the body itself, still drawing its current opaque materials until the swap commits (Gloamveil alone mounts its own program-free stand-in clones meanwhile, effect_materials.ts createShadowformStandInMaterial, so the form reads from the frame of the shift); for the deferred decals, the same body, drawn whole from the frame it entered range with only its stubble and makeup paint arriving late; for the form adornments, the same body in its form tint, with only the cosmetic antlers, crescent and wings arriving a link later; for a merged head or merged armor, the very pieces it folds, which keep drawing until its programs link and are only then taken out of the render lists; for a streamed armor file, the same body in its own suit (or the file of the same set it replaces, which keeps drawing until the new one links), from the frame it entered range, with only the set arriving late; for a late head piece, the body and its bare head, drawn with nameplate and click target from the frame the body entered range (a world body never waits on a hairstyle or a beard file, characters/woc_head_stream_core.ts wocHeadLiveLook), with only the hair or the beard arriving a link later, and for a piece picked later the piece it replaces, held until the new one links',
   },
   {
     gate: 'gateSwapFlagOnCompile',
@@ -217,5 +221,13 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
       "a placed mobile crafting station's prop cluster (the town station's bonfire, cauldron or anvil with its clutter, mobile_stations_core.ts) on its first appearance in interest scope, under the label kind mobile-station; a group retired before its gate settles (the station replaced or despawned) is never shown",
     standIn:
       "the station ENTITY itself, whose own view (the invisible click proxy the feast also gets, quest_objects.ts buildGroundQuestObject with no item) and nameplate (nameplate_view.ts feastNear, which admits a mobile-station templateId within INTERACT_RANGE + 1) never ride this gate, so the owner's name and the tool read on approach whatever the link state; the crafting gate itself reads the sim slot, never the prop, so a held cluster delays decoration only, bounded by GATED_ATTACH_WATCHDOG_MS",
+  },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/courier_visual.ts',
+    callSite: 'void attachSceneGroupGated(',
+    hides: 'the owner-only cosmetic flying donkey while its material compiles',
+    standIn:
+      'the Courier window status and cargo remain available through the action bar; transport uses authoritative simulation state independently of the model',
   },
 ];

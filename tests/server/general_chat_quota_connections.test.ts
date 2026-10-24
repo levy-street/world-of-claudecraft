@@ -74,7 +74,7 @@ vi.mock('pg', () => {
 // the writer-capability startup option is carried on a SEPARATE `options`
 // property, never folded back into the connection string.
 const COMPOSED_CONNECTION_STRING = 'postgres://writer-composed.invalid/woc';
-const COMPOSED_WRITER_OPTIONS = '-c search_path=woc_writer -c woc.material_source_writer=1';
+const COMPOSED_WRITER_OPTIONS = '-c search_path=woc_writer -c woc.material_source_writer=2';
 
 function mockSharedPool(overrides: Partial<{ options: CapturedPgConfig }> = {}) {
   vi.doMock('../../server/db', () => ({

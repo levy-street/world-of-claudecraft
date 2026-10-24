@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-shaman-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 45,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_elemental_helmet",
+      "family": "elemental",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_elemental_helmet.webp",
+      "canonicalDisplayName": "Tempestwrit Coif",
+      "acceptedSha256": "171672749cf2d3a62864c5cac603c30f0b55436916b59ff8afb7c06d24ade0e9",
+      "acceptedBytes": 4120,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_elemental_helmet.png",
+        "sha256": "2f19fb25da257c2a3c318b65823a9ddb64aba9779b626358d53988bb1364b70c",
+        "bytes": 2638925,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_elemental_helmet.png",
+        "sha256": "f82355e7f246ea78e794e46b45e7a89f5e37847f069309c2d47d0c57aef53a5c",
+        "bytes": 552930,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Tempestwrit Coif: empty chainmail coif hood with indigo leather brow band and small copper lightning crest. Coordinated elemental Shaman MAIL set: dark gunmetal interlocking chainmail, indigo leather bindings, narrow aged copper edging and small pale-blue faceted stones. Angular lightning-shaped hardware, no actual lightning or floating magic. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_elemental_shoulder",
+      "family": "elemental",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_elemental_shoulder.webp",
+      "canonicalDisplayName": "Tempestwrit Pauldrons",
+      "acceptedSha256": "a623baca8f478a6240f06d58b53e6a5f3726a54c10ab0783e7d97823c7697a84",
+      "acceptedBytes": 4404,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_elemental_shoulder.png",
+        "sha256": "98cfc2700bab1b0487f15cb23b3944aed7401c568a9dbef04547a1dda3388c18",
+        "bytes": 2519155,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_elemental_shoulder.png",
+        "sha256": "2966032c4e30ab7606df94e792ebd6e8eb82bf77f4038ba73d4aed743309ff80",
+        "bytes": 535723,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Tempestwrit Pauldrons: pair of compact layered chainmail shoulder guards supported by copper-edged angular rims, no torso. Coordinated elemental Shaman MAIL set: dark gunmetal interlocking chainmail, indigo leather bindings, narrow aged copper edging and small pale-blue faceted stones. Angular lightning-shaped hardware, no actual lightning or floating magic. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_elemental_chest",
+      "family": "elemental",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_elemental_chest.webp",
+      "canonicalDisplayName": "Tempestwrit Hauberk",
+      "acceptedSha256": "455a507e8afb51288ac8956672ccd5e4786d5e04d255222228594839a7be6ba8",
+      "acceptedBytes": 4886,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_elemental_chest.png",
+        "sha256": "8ab4db6c1e101e3a5802b89e9575e7774064565a64c6cb019686294863f164f2",
+        "bytes": 2882443,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_elemental_chest.png",
+        "sha256": "ef81b7f22dafc6de989b84648513c30cea6fce46b700591afa33e70724e75fd4",
+        "bytes": 612576,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Tempestwrit Hauberk: complete empty long-sleeved chainmail hauberk with indigo yoke, copper buckles, split thigh-length hem and belt, no legs. Coordinated elemental Shaman MAIL set: dark gunmetal interlocking chainmail, indigo leather bindings, narrow aged copper edging and small pale-blue faceted stones. Angular lightning-shaped hardware, no actual lightning or floating magic. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_elemental_legs",
+      "family": "elemental",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_elemental_legs.webp",
+      "canonicalDisplayName": "Tempestwrit Legmail",
+      "acceptedSha256": "feb969d80f50b943e952ba12b6de9b69435e44794e0f3152d081134f3b47b366",
+      "acceptedBytes": 3310,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_elemental_legs.png",
+        "sha256": "fe8f6320429e02c1a4e7a02cb4aa8c493bdcfa2046805722ca2d15b80e11027d",
+        "bytes": 2545308,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_elemental_legs.png",
+        "sha256": "0797eb2f08f5e6eb14bac55be9e515829f4d8bfda2a3469fc292cb309235f58e",
+        "bytes": 533102,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Tempestwrit Legmail: complete pair of chainmail leggings with indigo waist and copper knee reinforcement, clearly separated legs, no boots. Coordinated elemental Shaman MAIL set: dark gunmetal interlocking chainmail, indigo leather bindings, narrow aged copper edging and small pale-blue faceted stones. Angular lightning-shaped hardware, no actual lightning or floating magic. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_elemental_gloves",
+      "family": "elemental",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_elemental_gloves.webp",
+      "canonicalDisplayName": "Tempestwrit Gauntlets",
+      "acceptedSha256": "d73ef733f6276a70699878a644f0ba749c4491b4f58309e32c1d5a41b7272a91",
+      "acceptedBytes": 4708,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_elemental_gloves.png",
+        "sha256": "b08dc9ab16422c1419bf2ecb8ae8e0b123f35bc7ddb32608e5f7075d213ee3dc",
+        "bytes": 2717741,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_elemental_gloves.png",
+        "sha256": "ca834bb2efaade64bb2af4127d1b4ee27583682285012e4fc4eea312297620d7",
+        "bytes": 587891,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Tempestwrit Gauntlets: pair of empty chainmail gloves with indigo cuffs and copper knuckle strips, five covered fingers each. Coordinated elemental Shaman MAIL set: dark gunmetal interlocking chainmail, indigo leather bindings, narrow aged copper edging and small pale-blue faceted stones. Angular lightning-shaped hardware, no actual lightning or floating magic. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_enhancement_helmet",
+      "family": "enhancement",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_enhancement_helmet.webp",
+      "canonicalDisplayName": "Galeborn Helm",
+      "acceptedSha256": "75f93c9f244a16fddf26aab43af96db9f2b885089915c4a4be98db6668efa1cc",
+      "acceptedBytes": 4460,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_enhancement_helmet.png",
+        "sha256": "ac77a1af657d3b24bc90f97cfded87a0cda3e417e80c8c353e38fade999b723f",
+        "bytes": 2739369,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_enhancement_helmet.png",
+        "sha256": "564d94fe1f52f18bf1ae466e913e3e3c839ce03adbdd604ce2daf8699ea078be",
+        "bytes": 600807,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Galeborn Helm: empty open-face helm with silver-grey metal brow, small swept-back brow ridges and hanging chainmail cheek-and-neck curtain, no face. Coordinated enhancement Shaman MAIL set: weathered silver-grey chainmail with rugged brown leather harness straps, teal textile knots and dull bronze fasteners. Broad curved wind-swept edges, sturdy practical melee armor. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_enhancement_shoulder",
+      "family": "enhancement",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_enhancement_shoulder.webp",
+      "canonicalDisplayName": "Galeborn Spaulders",
+      "acceptedSha256": "2732db9b21e8fca03d7f56cb5554107fcfc469562c194204865318ffe940df29",
+      "acceptedBytes": 3860,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_enhancement_shoulder.png",
+        "sha256": "9bfa15badea6ab1c217ef581549323d2e7a595f3ec9cd2d9e960e7a5615d5aa6",
+        "bytes": 2465497,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_enhancement_shoulder.png",
+        "sha256": "f9cad8a9710c4e4c66ff14e9d072f9fe16a06f6c1af1a4a2e6026cc9b87421d5",
+        "bytes": 520687,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Galeborn Spaulders: pair of compact bronze-rimmed shoulder guards with silver-grey chainmail skirts and brown straps, no torso. Coordinated enhancement Shaman MAIL set: weathered silver-grey chainmail with rugged brown leather harness straps, teal textile knots and dull bronze fasteners. Broad curved wind-swept edges, sturdy practical melee armor. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_enhancement_chest",
+      "family": "enhancement",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_enhancement_chest.webp",
+      "canonicalDisplayName": "Galeborn Chainmail",
+      "acceptedSha256": "8cf38b13acaf564c771d30432e1c89d0bc451ecde32f7d0cecbf2568907dd9a8",
+      "acceptedBytes": 4718,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_enhancement_chest.png",
+        "sha256": "b020318e887949172868814207d6be1e25d3b9096b8cea3738754233f73757b6",
+        "bytes": 2768564,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_enhancement_chest.png",
+        "sha256": "a87be337e6765aefe2c98e9a31c3bde67611287e2e1ef98c6b748dae62b771c9",
+        "bytes": 593516,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Galeborn Chainmail: complete empty chainmail shirt with crossed brown leather harness, teal sash and bronze fasteners, split hip-length hem, no legs. Coordinated enhancement Shaman MAIL set: weathered silver-grey chainmail with rugged brown leather harness straps, teal textile knots and dull bronze fasteners. Broad curved wind-swept edges, sturdy practical melee armor. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_enhancement_legs",
+      "family": "enhancement",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_enhancement_legs.webp",
+      "canonicalDisplayName": "Galeborn Legguards",
+      "acceptedSha256": "e01a53c75ce8f3cd4db27d31f96a1d62a0cd04e65e7f62d5f78704c9986f74b5",
+      "acceptedBytes": 3462,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_enhancement_legs.png",
+        "sha256": "8c2444aa63701279542a0b56cf3329c4f54029d74b3c88367b9ffee5b8d6850c",
+        "bytes": 2525633,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_enhancement_legs.png",
+        "sha256": "bd6c595dc928090f4cc788074c1292249502a66b14717b971e8d318abb109414",
+        "bytes": 551044,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Galeborn Legguards: pair of sturdy silver-grey chainmail leggings with brown leather knee panels, teal ties and broad waist belt, no boots. Coordinated enhancement Shaman MAIL set: weathered silver-grey chainmail with rugged brown leather harness straps, teal textile knots and dull bronze fasteners. Broad curved wind-swept edges, sturdy practical melee armor. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_enhancement_gloves",
+      "family": "enhancement",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_enhancement_gloves.webp",
+      "canonicalDisplayName": "Galeborn Grips",
+      "acceptedSha256": "c1419a6ab522abe016330d900c37dd1b1299e002905d458d6ef842980ef1886a",
+      "acceptedBytes": 4440,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_enhancement_gloves.png",
+        "sha256": "c10d31a95b6a9fcf1588028732dbb0e8e6bd1853d19f7e1baabd643ccf1af74c",
+        "bytes": 2707785,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_enhancement_gloves.png",
+        "sha256": "19fc60938855db623f178d97679cb3a1d1bb0ee39302d5e469323cc03fb7eb92",
+        "bytes": 573857,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Galeborn Grips: pair of empty reinforced mail gloves with brown leather palms and teal wrist ties, five covered fingers each. Coordinated enhancement Shaman MAIL set: weathered silver-grey chainmail with rugged brown leather harness straps, teal textile knots and dull bronze fasteners. Broad curved wind-swept edges, sturdy practical melee armor. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_restoration_helmet",
+      "family": "restoration",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_restoration_helmet.webp",
+      "canonicalDisplayName": "Brineward Circlet",
+      "acceptedSha256": "11da56191a55d23c58c19ba9cc84847c96197bb988da3b1f22157a96cf7c810f",
+      "acceptedBytes": 2856,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_restoration_helmet.png",
+        "sha256": "7cc7678c3c00e7add5724d7d1a12dfb91906a4efba5369344d9c0a222cc540c7",
+        "bytes": 2342010,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_restoration_helmet.png",
+        "sha256": "4a8510fe60d2b09a93530a16f763b648800aa7da83aa3ef36cee2f4b6387e136",
+        "bytes": 512723,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Brineward Circlet: one complete open silver circlet with low wave-shaped front, small pearl centerpiece and narrow sea-green ribbon, no head, no hood. Coordinated restoration Shaman MAIL set: fine sea-grey chainmail with muted sea-green and cream woven panels, aged silver wave-shaped fittings and small pearl clasps. Flowing rounded folds over clearly visible fine metal rings; nautical healer armor, no water effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_restoration_shoulder",
+      "family": "restoration",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_restoration_shoulder.webp",
+      "canonicalDisplayName": "Brineward Mantle",
+      "acceptedSha256": "5813b2966f25a4e490136c82719a82be3e5cb4fd56cd34a7e371dd433e85cf45",
+      "acceptedBytes": 4944,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_restoration_shoulder.png",
+        "sha256": "445e3872754e32a219e4db405e5c15bec579d53bdd660548ff34c2187f286c42",
+        "bytes": 3108535,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_restoration_shoulder.png",
+        "sha256": "24f3e53871dad54c9e18816d3a3530c96d49ca288d3daa16b1ddaca975841b31",
+        "bytes": 619521,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Brineward Mantle: broad shoulder mantle of fine sea-grey chainmail with sea-green textile edging and pearl clasp, no torso. Coordinated restoration Shaman MAIL set: fine sea-grey chainmail with muted sea-green and cream woven panels, aged silver wave-shaped fittings and small pearl clasps. Flowing rounded folds over clearly visible fine metal rings; nautical healer armor, no water effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_restoration_chest",
+      "family": "restoration",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_restoration_chest.webp",
+      "canonicalDisplayName": "Brineward Hauberk",
+      "acceptedSha256": "461bbe02b2f431fd7f202221f9abf1310ac88174d7b72140f03cd56620c9ee48",
+      "acceptedBytes": 4208,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_restoration_chest.png",
+        "sha256": "67244b3c46502cc80754d4b47a7f6c8383cfd1ac112e2942065e3211d3a43277",
+        "bytes": 3108672,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_restoration_chest.png",
+        "sha256": "f7c4eddb69552bc4f2eaab99b46cdef2c04d1504b14b7922f3c60dbe599f124b",
+        "bytes": 629190,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Brineward Hauberk: complete empty long-sleeved fine chainmail hauberk with sea-green textile front panels, cream inner trim and pearl waist clasp, knee-length split hem, no legs. Coordinated restoration Shaman MAIL set: fine sea-grey chainmail with muted sea-green and cream woven panels, aged silver wave-shaped fittings and small pearl clasps. Flowing rounded folds over clearly visible fine metal rings; nautical healer armor, no water effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_restoration_legs",
+      "family": "restoration",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_restoration_legs.webp",
+      "canonicalDisplayName": "Brineward Kilt",
+      "acceptedSha256": "039b2d24054a493ce1af93acd4dfc1aedda97e69e253a8d01e92f3b4e47919b5",
+      "acceptedBytes": 4656,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_restoration_legs.png",
+        "sha256": "1bf11593dd1b5527a174928cb93fbe84f26d1d9683de9da210f48832473e8ff4",
+        "bytes": 3104198,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_restoration_legs.png",
+        "sha256": "194e5eb479f6f35301bab12342de6410d93787e56624881cf125cc1e7691326b",
+        "bytes": 625717,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Brineward Kilt: one complete waist-to-ankle armored kilt of fine sea-grey chainmail with sea-green layered side panels, cream hem and silver belt clasp, no torso or feet. Coordinated restoration Shaman MAIL set: fine sea-grey chainmail with muted sea-green and cream woven panels, aged silver wave-shaped fittings and small pearl clasps. Flowing rounded folds over clearly visible fine metal rings; nautical healer armor, no water effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_shaman_restoration_gloves",
+      "family": "restoration",
+      "batch": "warfare-season2-shaman-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_shaman_restoration_gloves.webp",
+      "canonicalDisplayName": "Brineward Handwraps",
+      "acceptedSha256": "c905ac3edc9c0dd543c119f37f41cc07c58d33275e1021dd5d3dc147ec000441",
+      "acceptedBytes": 4172,
+      "original": {
+        "path": "tmp/imagegen/v045-shaman/originals/vanguard_shaman_restoration_gloves.png",
+        "sha256": "c350c45de2cda35c915dd8df01c14ee600ab591d13daf2f668cad8f93ca6ed22",
+        "bytes": 2989246,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-shaman/masters/vanguard_shaman_restoration_gloves.png",
+        "sha256": "43b3c641c1f6e4468bf7ca4121a65df448d7c4259a20893c7625cc0bb8ba71d2",
+        "bytes": 619197,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Brineward Handwraps: pair of empty glove-shaped sea-green handwraps with cream cloth and fine mail back-of-hand panels, pearl wrist clasps, all five fingers fully covered, no skin. Coordinated restoration Shaman MAIL set: fine sea-grey chainmail with muted sea-green and cream woven panels, aged silver wave-shaped fittings and small pearl clasps. Flowing rounded folds over clearly visible fine metal rings; nautical healer armor, no water effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile metal rings and woven cloth, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-shaman-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-shaman-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

@@ -12,7 +12,14 @@ export const FRAME_MENU_GROUPS = [
 
 export function frameMenuGroup(id: string): (typeof FRAME_MENU_GROUPS)[number][0] {
   if (
-    ['playerFrame', 'targetFrame', 'targetOfTarget', 'partyFrames', 'petFrame'].includes(id) ||
+    [
+      'playerFrame',
+      'playerResource',
+      'targetFrame',
+      'targetOfTarget',
+      'partyFrames',
+      'petFrame',
+    ].includes(id) ||
     id.startsWith('focusTarget')
   )
     return 'units';
@@ -87,5 +94,7 @@ export function frameSettingRelated(id: string, key: string): boolean {
   if (id === 'minimap') return /minimap/i.test(key);
   if (id === 'chat') return /^(chat|compactChat|filterProfanity)/.test(key);
   if (id === 'petFrame') return key === 'showPetFrame' || key.startsWith('petFrame');
+  if (id === 'playerResource') return key.startsWith('playerFrameResource');
+  if (id === 'hillBar') return key === 'hillBarOpacity';
   return false;
 }

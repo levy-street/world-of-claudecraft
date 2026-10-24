@@ -14,4 +14,9 @@ describe('options_slider_format', () => {
     expect(f(0.6)).toBe('Right 60%');
     expect(f(0)).toBe('Center');
   });
+
+  it('reads a pixel size as a whole number of px', () => {
+    expect(sliderFormatter('pixels')(232)).toBe('232 px');
+    expect(sliderFormatter('pixels')(11.4)).toBe('11 px');
+  });
 });

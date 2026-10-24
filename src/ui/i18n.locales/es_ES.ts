@@ -217,7 +217,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Pasivo: los críticos de tus hechizos prenden al objetivo y le infligen un 40% del daño causado a lo largo de 6 s; el efecto se acumula. (Maestría de Fuego)',
   'entities.abilities.mass_barrier.name': 'Barrera colectiva',
   'entities.abilities.mass_barrier.description':
-    'Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe 130 de daño durante 60 s. (Talento de mago)',
+    'Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe {damage} de daño durante 15 s. (Talento de mago)',
   'entities.abilities.overload.name': 'Potenciación',
   'entities.abilities.overload.description':
     'Potencia tu siguiente hechizo un 40%, pero aumenta su coste de maná un 50%. Permanece 10 s. (Talento de mago)',
@@ -391,7 +391,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Cada golpe añade 1 de Ritual de Veneno (máx. 6) y restaura 15 de energía. Con 6 de Ritual de Veneno, Descanso Eterno se convierte en Desgarraveneno (inflige al instante todo tu daño de sangrado restante).',
   'entities.abilities.blade_flurry.description':
-    'Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (motor de Thuggery)',
+    'Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 30 s. (motor de Thuggery)',
   'entities.abilities.cheap_shot.description':
     'Golpea al objetivo por {damage} de daño, aturdiéndolo durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.',
   'entities.abilities.cheap_shot.specNote_subtlety':
@@ -401,7 +401,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.cold_blood.description':
-    'Concentra tu instinto asesino para que tu próximo ataque sea un golpe crítico. (motor de Knifework)',
+    'Concentra tu instinto asesino para que tus próximos 5 ataques sean golpes críticos. (motor de Knifework)',
   'entities.abilities.dark_pact.description':
     'Sacrifica un 10% de tu salud actual para absorber una cantidad de daño equivalente al 30% de tu salud máxima durante 8 s.',
   'entities.abilities.dark_pact.name': 'Sanguine Covenant',
@@ -426,23 +426,19 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     'Golpea al enemigo por daño de arma más {damage}, causa daño de sangrado durante 12 s y aumenta el daño de sangrado recibido un 40%. Otorga 1 punto de combo. Cada segundo uso añade 1 de Penumbra (máx. 3). (motor de Skulduggery)',
   'entities.abilities.kidney_shot.description':
-    'Movimiento de remate que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s).',
+    'Movimiento de remate que aturde al objetivo durante 2 s más 1 s por punto de combo (5 puntos de combo: 7 s).',
   'entities.abilities.maul.description':
     'Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa una gran cantidad de amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te sana el equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
   'entities.abilities.ossuary_mark.description':
     'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 Fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.rake.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.regrowth.description':
-    'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s.',
-  'entities.abilities.regrowth.specNote_restoration':
-    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5).',
+    'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.',
   'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
-  'entities.abilities.rejuvenation.specNote_restoration':
-    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración.',
   'entities.abilities.rip.description':
     'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
   'entities.abilities.ruinous_brand.description':
@@ -468,9 +464,9 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta los 3.',
   'entities.abilities.stealth.description':
-    'Te oculta entre las sombras: los enemigos apenas te perciben, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
+    'Te oculta entre las sombras: los enemigos apenas te perciben y te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
   'entities.abilities.swiftmend.description':
-    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Las plantaciones de Floración Silvestre y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
+    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Sporemending, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
   'entities.abilities.swipe.description':
     'Barre con tus garras a los enemigos cercanos infligiendo {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -535,4 +531,9 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.capacityPools':
     'Artículos {generalUsed}/{generalTotal}, materiales {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Solo para materiales',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.description':
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min; solo tú y tu grupo podéis verla. El primer enemigo que la active sangra por {damage} de daño Físico durante 15 s y queda ralentizado un 50% durante 4 s. El daño aumenta con el poder de ataque a distancia. Solo puede haber una Trampa para Osos activa a la vez. Puede coexistir con tu Trampa Fauces de Escarcha. Colocar otra Trampa para Osos reemplaza la anterior.',
+  'entities.abilities.frostjaw_trap.description':
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo podéis verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
 };

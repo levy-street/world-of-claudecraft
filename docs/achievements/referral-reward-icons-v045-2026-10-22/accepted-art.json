@@ -1,0 +1,432 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "referral-reward-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 5,
+    "temporaryAliasesReplaced": 5,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "reins_referral_raptor",
+      "family": "referral",
+      "batch": "referral-reward-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/reins_referral_raptor.webp",
+      "canonicalDisplayName": "Friendship Raptor Reins",
+      "acceptedSha256": "55d7fbf0cbd50ec6fb4cad42653b6a9d53921596c70f0354592679509498b21c",
+      "acceptedBytes": 4052,
+      "original": {
+        "path": "tmp/imagegen/v045-referral/originals/reins_referral_raptor.png",
+        "sha256": "8838f727ea51c18812fed88a3b852a9738de39b5adcef11e0f45668a90c799c2",
+        "bytes": 2280168,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-referral/masters/reins_referral_raptor.png",
+        "sha256": "a22e67b192b99a66319d151bff8b7b459decef1bc4653e96b1ae786092aeadb3",
+        "bytes": 590095,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint Friendship Raptor Reins (reins_referral_raptor) in World of ClaudeCraft woc-item-icon-v1 style. Subject and identity: A complete three-quarter bust portrait of a friendly alert olive-gold scaled raptor mount, angular saurian muzzle, small brow ridges, amber eye, cream throat scales, sturdy dark brown leather bridle and saddle straps with two linked plain gold ring fittings. Preserve the recognizable Drakemaw raptor mount identity; no feathers, no wings, no rider. Bust ends intentionally at lower chest, entire head and tack safely inside frame. Premium hand-painted classic fantasy MMO inventory art, tactile materials, crisp focal edges with softer peripheral brushwork, warm top-left key light and cool deep shadows. Center complete object on an opaque deep charcoal-umber painted vignette, subtle atmosphere and grounded contact shadow. About 72 percent subject fill with safe padding, readable at 22, 28 and 40 pixels and in a 64px circular crop. One icon only, square 1024x1024, no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand or cropped subject.",
+        "references": [
+          {
+            "path": "public/ui/items/referral_chest.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "8094aebe70e4c6630f724f6f5eae8835aa23e55c793385132f72cbf2423f1c1d"
+          },
+          {
+            "path": "public/ui/items/reins_drakemaw_raptor.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0ec73f5943bfbf72155b2746194e4ffc9e5a6cfa44bccb96f223aa4ebf0ce317"
+          },
+          {
+            "path": "public/ui/items/reins_terrorspark_groundshaker.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0e7d7972dd89e15086d1f69730459a2883d027ecbdc2b32067f98b3ef9ce31bf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/referral-rewards-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all five authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-mobile.png"
+        ]
+      },
+      "supersededAlias": {
+        "runtimeUrl": "/ui/items/reins_drakemaw_raptor.webp",
+        "sha256": "0ec73f5943bfbf72155b2746194e4ffc9e5a6cfa44bccb96f223aa4ebf0ce317",
+        "disposition": "Source owner retained; only temporary alias routing removed."
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_satchel",
+      "family": "referral",
+      "batch": "referral-reward-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/referral_satchel.webp",
+      "canonicalDisplayName": "Friendship Satchel",
+      "acceptedSha256": "07366461f8b9551a5fb74d89ac5e35dc700b76b96c57599d03b70c33e773691e",
+      "acceptedBytes": 3466,
+      "original": {
+        "path": "tmp/imagegen/v045-referral/originals/referral_satchel.png",
+        "sha256": "87742443364341ebdf9672500b5b5a6e2e4a44bc10a83c5e043704a31ae2034b",
+        "bytes": 2482510,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-referral/masters/referral_satchel.png",
+        "sha256": "ad5554519428fef787b1b7156986019adcc5f24055516d3def61361e875d2dc6",
+        "bytes": 532401,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint Friendship Satchel (referral_satchel) in World of ClaudeCraft woc-item-icon-v1 style. Subject and identity: One sturdy roomy midnight-blue cloth satchel reinforced with worn brown leather corners and shoulder strap, silver clasp plate and two linked plain gold ring fittings on the flap. Rounded rectangular volume, clearly visible flap and closure, three-quarter view. No loose inventory, no lettering. Premium hand-painted classic fantasy MMO inventory art, tactile materials, crisp focal edges with softer peripheral brushwork, warm top-left key light and cool deep shadows. Center complete object on an opaque deep charcoal-umber painted vignette, subtle atmosphere and grounded contact shadow. About 72 percent subject fill with safe padding, readable at 22, 28 and 40 pixels and in a 64px circular crop. One icon only, square 1024x1024, no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand or cropped subject.",
+        "references": [
+          {
+            "path": "public/ui/items/referral_chest.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "8094aebe70e4c6630f724f6f5eae8835aa23e55c793385132f72cbf2423f1c1d"
+          },
+          {
+            "path": "public/ui/items/reins_drakemaw_raptor.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0ec73f5943bfbf72155b2746194e4ffc9e5a6cfa44bccb96f223aa4ebf0ce317"
+          },
+          {
+            "path": "public/ui/items/reins_terrorspark_groundshaker.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0e7d7972dd89e15086d1f69730459a2883d027ecbdc2b32067f98b3ef9ce31bf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/referral-rewards-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all five authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-mobile.png"
+        ]
+      },
+      "supersededAlias": {
+        "runtimeUrl": "/ui/items/resonant_weave_bag.webp",
+        "sha256": "4e8f897412df77417a3df2674819b2ce1b6666846fa9ab7080da7b4835713714",
+        "disposition": "Source owner retained; only temporary alias routing removed."
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_hollow_charm",
+      "family": "referral",
+      "batch": "referral-reward-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/referral_hollow_charm.webp",
+      "canonicalDisplayName": "Oathkeeper's Heart",
+      "acceptedSha256": "1341e2e00ee2140567cb653b9b0bc46ac6cf51bf015e6438ef48e2a4685b9bc1",
+      "acceptedBytes": 2754,
+      "original": {
+        "path": "tmp/imagegen/v045-referral/originals/referral_hollow_charm.png",
+        "sha256": "bd209151a1cb04e43f97da670dc3bcbc9db9db5b8f625194f89a8172cdc6dcb5",
+        "bytes": 2238173,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-referral/masters/referral_hollow_charm.png",
+        "sha256": "2c28fcceb162d5a19a931fe82df4004d218c4a73a18f529acb7cf431b2704dd4",
+        "bytes": 491751,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint Oathkeeper's Heart (referral_hollow_charm) in World of ClaudeCraft woc-item-icon-v1 style. Subject and identity: One compact heart-shaped polished dark green stone amulet enclosed by a modest silver cage, with two linked plain gold rings forming its hanging loop. A quiet unawakened talisman, solid dark stone with restrained reflected highlights and no magical glow. Chunky complete heart silhouette and short loop, no long chain. This is the first tier of a paired Oathkeeper talisman. Premium hand-painted classic fantasy MMO inventory art, tactile materials, crisp focal edges with softer peripheral brushwork, warm top-left key light and cool deep shadows. Center complete object on an opaque deep charcoal-umber painted vignette, subtle atmosphere and grounded contact shadow. About 72 percent subject fill with safe padding, readable at 22, 28 and 40 pixels and in a 64px circular crop. One icon only, square 1024x1024, no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand or cropped subject.",
+        "references": [
+          {
+            "path": "public/ui/items/referral_chest.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "8094aebe70e4c6630f724f6f5eae8835aa23e55c793385132f72cbf2423f1c1d"
+          },
+          {
+            "path": "public/ui/items/reins_drakemaw_raptor.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0ec73f5943bfbf72155b2746194e4ffc9e5a6cfa44bccb96f223aa4ebf0ce317"
+          },
+          {
+            "path": "public/ui/items/reins_terrorspark_groundshaker.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0e7d7972dd89e15086d1f69730459a2883d027ecbdc2b32067f98b3ef9ce31bf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/referral-rewards-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all five authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-mobile.png"
+        ]
+      },
+      "supersededAlias": {
+        "runtimeUrl": "/ui/items/makers_charm.webp",
+        "sha256": "123ad1af3ea91c2fb1008c4163f6db3e1f9c3859b10d9a4d3f117cdad0b180d6",
+        "disposition": "Source owner retained; only temporary alias routing removed."
+      }
+    },
+    {
+      "kind": "item",
+      "id": "referral_fog_charm",
+      "family": "referral",
+      "batch": "referral-reward-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/referral_fog_charm.webp",
+      "canonicalDisplayName": "Awakened Oathkeeper's Heart",
+      "acceptedSha256": "20fb0e327cd0729e7d3ff9c55a1fc2469a69c597200fbe8e91e9d201ad21fccc",
+      "acceptedBytes": 3744,
+      "original": {
+        "path": "tmp/imagegen/v045-referral/originals/referral_fog_charm.png",
+        "sha256": "09a59ffcab6f7dae6f5ece3f83a9b17ac0cac8972f43d0549d15a3d08f6fb87b",
+        "bytes": 2411255,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-referral/masters/referral_fog_charm.png",
+        "sha256": "9212375889c945cad400b1fe989da1af4a34b84be2677cbe856bffb83a4d2f6e",
+        "bytes": 585310,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint Awakened Oathkeeper's Heart (referral_fog_charm) in World of ClaudeCraft woc-item-icon-v1 style. Subject and identity: One awakened heart-shaped pale teal crystal amulet in an ornate silver cage, with two linked plain gold rings forming its hanging loop. Same underlying heart shape as a simpler dark-green-stone Oathkeeper talisman, now upgraded: luminous cyan core visible through a faceted translucent teal heart, a few bright silver leaf-shaped supports and restrained mist close to the object. Keep glow contained so the complete heart silhouette remains distinct; short loop, no long chain. Premium hand-painted classic fantasy MMO inventory art, tactile materials, crisp focal edges with softer peripheral brushwork, warm top-left key light and cool deep shadows. Center complete object on an opaque deep charcoal-umber painted vignette, subtle atmosphere and grounded contact shadow. About 72 percent subject fill with safe padding, readable at 22, 28 and 40 pixels and in a 64px circular crop. One icon only, square 1024x1024, no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand or cropped subject.",
+        "references": [
+          {
+            "path": "public/ui/items/referral_chest.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "8094aebe70e4c6630f724f6f5eae8835aa23e55c793385132f72cbf2423f1c1d"
+          },
+          {
+            "path": "public/ui/items/reins_drakemaw_raptor.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0ec73f5943bfbf72155b2746194e4ffc9e5a6cfa44bccb96f223aa4ebf0ce317"
+          },
+          {
+            "path": "public/ui/items/reins_terrorspark_groundshaker.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0e7d7972dd89e15086d1f69730459a2883d027ecbdc2b32067f98b3ef9ce31bf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/referral-rewards-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all five authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-mobile.png"
+        ]
+      },
+      "supersededAlias": {
+        "runtimeUrl": "/ui/items/gleamstag_charm.webp",
+        "sha256": "a14386a3ededb6280a46c6983c0cb25024e682e18b45a2728131c98ed78c17bf",
+        "disposition": "Source owner retained; only temporary alias routing removed."
+      }
+    },
+    {
+      "kind": "item",
+      "id": "reins_referral_tank",
+      "family": "referral",
+      "batch": "referral-reward-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/reins_referral_tank.webp",
+      "canonicalDisplayName": "Friendship Tank Reins",
+      "acceptedSha256": "a321edd5516677f1873f764b74be6c0e3a8f88cee9113a693a254e190be799de",
+      "acceptedBytes": 4876,
+      "original": {
+        "path": "tmp/imagegen/v045-referral/originals/reins_referral_tank.png",
+        "sha256": "f4b224e925d0d30a98d35d8a7e00b7fa7c62bdd52812362c579513e9f9c4a79d",
+        "bytes": 2400582,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-referral/masters/reins_referral_tank.png",
+        "sha256": "14640522bee9ff3ffeb4dc83e81383e1d786978d3f73e95e66d8f5e1ce5ea051",
+        "bytes": 561853,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint Friendship Tank Reins (reins_referral_tank) in World of ClaudeCraft woc-item-icon-v1 style. Subject and identity: One complete three-quarter portrait of a compact fantasy goblin tank mount, squat purple armored turret and hull, gold brass trim, broad dark iron caterpillar tracks with bronze road wheels, thick short cannon pointing diagonally toward upper left and a small brass chimney. A small pair of linked plain gold ring fittings on a navy panel conveys the Friendship reward. Preserve the recognizable Dreadspark Groundshaker vehicle silhouette, no rider, no ground scene, no firing effects, no modern military insignia. Premium hand-painted classic fantasy MMO inventory art, tactile materials, crisp focal edges with softer peripheral brushwork, warm top-left key light and cool deep shadows. Center complete object on an opaque deep charcoal-umber painted vignette, subtle atmosphere and grounded contact shadow. About 72 percent subject fill with safe padding, readable at 22, 28 and 40 pixels and in a 64px circular crop. One icon only, square 1024x1024, no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand or cropped subject.",
+        "references": [
+          {
+            "path": "public/ui/items/referral_chest.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "8094aebe70e4c6630f724f6f5eae8835aa23e55c793385132f72cbf2423f1c1d"
+          },
+          {
+            "path": "public/ui/items/reins_drakemaw_raptor.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0ec73f5943bfbf72155b2746194e4ffc9e5a6cfa44bccb96f223aa4ebf0ce317"
+          },
+          {
+            "path": "public/ui/items/reins_terrorspark_groundshaker.webp",
+            "role": "subject identity and reward-family reference, visually reviewed; not an image-edit input",
+            "sha256": "0e7d7972dd89e15086d1f69730459a2883d027ecbdc2b32067f98b3ef9ce31bf"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/referral-rewards-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all five authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/referral-rewards-v045/bag-icons-after-mobile.png"
+        ]
+      },
+      "supersededAlias": {
+        "runtimeUrl": "/ui/items/reins_terrorspark_groundshaker.webp",
+        "sha256": "0e7d7972dd89e15086d1f69730459a2883d027ecbdc2b32067f98b3ef9ce31bf",
+        "disposition": "Source owner retained; only temporary alias routing removed."
+      }
+    }
+  ]
+}

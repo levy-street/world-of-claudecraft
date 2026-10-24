@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "membership-weapon-2026-10-14",
+    "acceptedDate": "2026-10-14",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "membership_staff",
+      "runtimeUrl": "/ui/items/membership_staff.webp",
+      "acceptedSha256": "2afa9b1f55064da40748dfd6c8665262f2ec03b3d357f456f22c7f8223e1d9dc",
+      "acceptedBytes": 1978,
+      "original": {
+        "path": "tmp/membership-weapon-art/originals/membership_staff.png",
+        "sha256": "81835e77403eb24dd14c694317b86eaf246447e464c85c53b3ab6c79524340a5",
+        "bytes": 2311110,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-weapon-art/masters/membership_staff.png",
+        "sha256": "85b45c28f3e9d9685aebe90485946315ba65375100d354606b0822200c4aed9c",
+        "bytes": 492291,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One complete diagonal staff with a midnight-blue wrapped shaft, silver crescent prongs, antique-gold bands and a restrained pale-blue crystal.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 2,
+        "retries": 1,
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory icon. Paint an original Staff of Changing (membership_staff) for World of ClaudeCraft, contract woc-item-icon-v1. This is a NEW authored item, not an edit or duplicate of any reference. Subject: one complete magical staff with a dark midnight-blue wrapped shaft, brushed silver fittings, narrow antique-gold bands, and a distinctive faceted pale-blue crystal enclosed in two asymmetrical silver crescent prongs, suggesting a weapon that changes form. Clear substantial staff silhouette, full tip and pommel visible, diagonal from lower-left to upper-right, approximately 72 percent square fill and safe padding on every side. No additional weapons or objects. Input roles: Image 1 (kingsbane_last_oath) is STYLE ONLY for diagonal long-weapon composition and safe tip padding, do not copy its sword; Image 2 (eastbrook_buckler) is STYLE ONLY for brushed metal and tactile materials, do not copy its shield; Image 3 (arcanite_mining_pick) is STYLE ONLY for restrained magical accent, do not copy its pick or purple palette. Premium hand-painted classic dark-fantasy MMO inventory art with crisp focal edges, softer peripheral brushwork, tactile wood/leather/metal, warm top-left key light, cool deep bottom-right shadow. The background is a fully opaque charcoal, muted umber and midnight-navy painted vignette with restrained atmosphere and grounded contact shadow, no flat black void. Magical blue light remains confined to the crystal so it cannot erase the silhouette. Readable at 22, 28, 40, 128 pixels and in a 64px circular crop. Square 1024x1024 output. No text, letters, numbers, runes, pseudo-writing, signature, watermark, rarity border, frame, UI chrome, checkerboard, transparency, mannequin, person, hand, split sheet, collage, clipped tip or cropped base.",
+        "references": [
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "Style only: diagonal composition and safe padding",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "Style only: metal and wood material rendering",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/arcanite_mining_pick.webp",
+            "role": "Style only: restrained magical accent",
+            "sha256": "1f68e6bfbc521b2eb7c67cf7931bad05d1c68d68b132b7cf328d6c0d135f43b6"
+          }
+        ],
+        "framingPrompt": "Edit only the framing of this original Staff of Changing inventory painting. Keep the staff design, its blue crystal, two silver crescent prongs, dark blue wrapped shaft, gold bands, diagonal orientation, painterly rendering, opaque textured dark background, and lighting. Make the entire staff about 18 percent smaller around the image center, adding generous dark painted background padding at BOTH ends. The complete silhouette, including both upper silver prong tips and the bottom pommel, must fit inside a centered inscribed circle of diameter 90 percent of the square, so a circular action-slot crop cannot cut it. Subject remains clearly readable and prominent but must have true safe margins. Maintain square output and fully opaque dark painted backdrop. No text, letters, numbers, markings, border, watermark, transparency or new objects.",
+        "rejectedFirstResult": {
+          "path": "tmp/membership-weapon-art/originals/membership_staff-first.png",
+          "sha256": "68cfa015daf0efde161004db667a64257c5469c47ec452e93b58a82e897e67fd",
+          "bytes": 2261179,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colourspace": "srgb",
+          "alpha": "opaque",
+          "reason": "Insufficient tip padding for circular action-slot crop."
+        },
+        "framingReference": {
+          "path": "tmp/membership-weapon-art/originals/membership_staff-first.png",
+          "role": "Edit target: preserve original staff identity and painting; add padding only."
+        }
+      },
+      "processing": "Sharp square 512px sRGB opaque master; repository assets:items converter at default quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-weapon-2026-10-14/small-size-review.png",
+        "status": "accepted",
+        "notes": "Complete staff and crystal remain readable at all required sizes, in grayscale, and within the circular crop. Full silhouette has safe padding. No lettering, symbols resembling writing, border, transparency or watermark."
+      }
+    }
+  ]
+}

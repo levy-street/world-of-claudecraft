@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  buildAuthoredPointSources,
   buildWorldAmbientSources,
   footstepSurfaceAt,
   isOnDockDeck,
 } from '../src/render/world_audio';
+import { TAVERN_FLOOR_Y, TAVERN_ORIGIN } from '../src/sim/content/mirefen_tavern';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
@@ -100,6 +102,55 @@ describe('world audio routing', () => {
       [eastbrookSmithy?.position.x, eastbrookSmithy?.position.z],
       [-4.5, 673.5],
     ]);
+    // the Mirefen tavern's room bed, anchored at the hall's middle (built-in world only)
+    expect(sources.filter((source) => source.kind === 'tavern')).toEqual([
+      {
+        id: 'world:tavern:mirefen',
+        kind: 'tavern',
+        x: TAVERN_ORIGIN.x,
+        y: TAVERN_FLOOR_Y + 2,
+        z: TAVERN_ORIGIN.z,
+      },
+    ]);
+  });
+
+  // The editor's Sound tool saves y as a height ABOVE the terrain seat (the
+  // same convention its viewport badges draw at), so a node authored on a
+  // hillside must not end up buried in / floating over the ground in playtest.
+  it('seats authored point sounds on the terrain and carries clip, gain, and radius', () => {
+    const nodes = [
+      { x: 12, z: -30, y: 2, sound: 'amb_campfire', volume: 0.6, radius: 24 },
+      { x: -80, z: 140, y: 0, sound: 'amb_water', volume: 1, radius: 8 },
+    ];
+
+    expect(buildAuthoredPointSources(nodes, SEED)).toEqual([
+      {
+        id: 'map:sound:0',
+        key: 'amb_campfire',
+        x: 12,
+        y: groundHeight(12, -30, SEED) + 2,
+        z: -30,
+        volume: 0.6,
+        radius: 24,
+      },
+      {
+        id: 'map:sound:1',
+        key: 'amb_water',
+        x: -80,
+        y: groundHeight(-80, 140, SEED),
+        z: 140,
+        volume: 1,
+        radius: 8,
+      },
+    ]);
+  });
+
+  it('gives every authored point sound its own loop id', () => {
+    const node = { x: 5, z: 5, y: 1, sound: 'amb_campfire', volume: 0.5, radius: 12 };
+    // Two emitters stacked on one spot (a maker layering ambience) must not
+    // collide into a single loop slot and silence one another.
+    const sources = buildAuthoredPointSources([node, { ...node }], SEED);
+    expect(new Set(sources.map((source) => source.id)).size).toBe(2);
   });
 
   it('uses active custom props without leaking Eastbrook ambient anchors', () => {
@@ -114,5 +165,7 @@ describe('world audio routing', () => {
     expect(campfires.map(({ x, z }) => [x, z])).toEqual(props.campfires);
     expect(forges.map(({ x, z }) => [x, z])).toEqual([[-4.5, 673.5]]);
     expect(sources.some((source) => source.id === 'world:forge:4.5:18.5')).toBe(false);
+    // a custom map has no tavern, so no tavern bed
+    expect(sources.some((source) => source.kind === 'tavern')).toBe(false);
   });
 });

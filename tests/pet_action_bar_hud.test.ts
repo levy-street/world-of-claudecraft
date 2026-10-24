@@ -60,13 +60,13 @@ interface PetBarHarness {
   pendingPetFeed: boolean;
   petModeMenuOpen: boolean;
   peekGuard: { consume(): boolean };
-  attachTooltip(): void;
+  attachTooltip(el: HTMLElement, html: () => string, isSpell?: () => boolean): void;
   hideTooltip(): void;
   hasPetFood(): boolean;
   cancelPetFeed(): void;
   renderBags(): void;
   showError(): void;
-  renderPetBar(pet: unknown): void;
+  renderPetBar(pet: unknown): unknown;
 }
 
 function pointerEvent(type: string): Event {
@@ -154,8 +154,14 @@ describe('Hud Warlock pet signature bar', () => {
     const hud = makeHud('emberkin');
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const felbolt = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="emberkin_felbolt"]',
+    );
     expect(felbolt).not.toBeNull();
+    expect(felbolt?.getAttribute('aria-label')).toBe('Felbolt');
+    expect(felbolt?.hasAttribute('title')).toBe(false);
+    const spellKind = vi.mocked(hud.attachTooltip).mock.calls.find(([el]) => el === felbolt)?.[2];
+    expect(spellKind?.()).toBe(true);
     // Shared socket pins keep pet state and icon structure on the common visual recipe.
     expect(felbolt?.classList.contains('ui-socket')).toBe(true);
     expect(felbolt?.querySelector('.ui-socket-art')).not.toBeNull();
@@ -177,7 +183,7 @@ describe('Hud Warlock pet signature bar', () => {
       document.querySelector<HTMLElement>('[data-focus-key="stance-menu"] .icon-label')?.style
         .backgroundImage,
     ).toContain('mock:ability:pet_defensive');
-    expect(document.querySelector('[title="Taunt"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).toBeNull();
     expect(felbolt?.getAttribute('aria-description')).toBe(
       'Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.',
     );
@@ -210,12 +216,14 @@ describe('Hud Warlock pet signature bar', () => {
     const hud = makeHud('gloomshade');
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const chain = document.querySelector<HTMLButtonElement>('[title="Abyssal Chain"]');
+    const chain = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="gloomshade_abyssal_chain"]',
+    );
     expect(chain).not.toBeNull();
     expect(chain?.querySelector<HTMLElement>('.icon-label')?.style.backgroundImage).toContain(
       'mock:ability:gloomshade_abyssal_chain',
     );
-    expect(document.querySelector('[title="Taunt"]')).not.toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).not.toBeNull();
 
     chain?.dispatchEvent(pointerEvent('pointerdown'));
     vi.advanceTimersByTime(2100);
@@ -262,7 +270,9 @@ describe('Hud Warlock pet signature bar', () => {
     const hud = makeHud('emberkin', true, { petSkillTimer: 7.2, petAutoSkill: false });
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const felbolt = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="emberkin_felbolt"]',
+    );
     expect(felbolt?.classList.contains('cooldown')).toBe(true);
     expect(felbolt?.querySelector('.cdtext')?.textContent).toBe('8');
     expect(felbolt?.getAttribute('aria-label')).toBe('Felbolt, 8 seconds remaining');
@@ -279,20 +289,20 @@ describe('Hud Warlock pet signature bar', () => {
   it('fails closed and hides signature buttons without negotiated server support', () => {
     const emberkin = makeHud('emberkin', false);
     emberkin.renderPetBar(emberkin.sim.entities.get(2) ?? null);
-    expect(document.querySelector('[title="Felbolt"]')).toBeNull();
-    expect(document.querySelector('[title="Taunt"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="emberkin_felbolt"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).toBeNull();
 
     document.body.innerHTML = '<div id="petbar"></div>';
     const gloomshade = makeHud('gloomshade', false);
     gloomshade.renderPetBar(gloomshade.sim.entities.get(2) ?? null);
-    expect(document.querySelector('[title="Abyssal Chain"]')).toBeNull();
-    expect(document.querySelector('[title="Taunt"]')).not.toBeNull();
+    expect(document.querySelector('[data-focus-key="gloomshade_abyssal_chain"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).not.toBeNull();
   });
 
   it('restores the same action focus across a cooldown repaint', () => {
     const hud = makeHud('emberkin');
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
-    const first = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const first = document.querySelector<HTMLButtonElement>('[data-focus-key="emberkin_felbolt"]');
     first?.focus();
 
     const pet = hud.sim.entities.get(2);
@@ -300,7 +310,9 @@ describe('Hud Warlock pet signature bar', () => {
     pet.petSkillTimer = 7.2;
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const replacement = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const replacement = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="emberkin_felbolt"]',
+    );
     expect(document.activeElement).toBe(replacement);
     expect(replacement?.dataset.focusKey).toBe('emberkin_felbolt');
     expect(replacement?.dataset.suppressFocusTooltip).toBe('true');
@@ -385,5 +397,119 @@ describe('Hud Warlock pet signature bar', () => {
     expect(forcedColors).toContain('.pet-btn.autocast');
     expect(forcedColors).toContain('outline: 3px double Highlight');
     expect(forcedColors).toContain('content: "↻"');
+  });
+});
+
+describe('Hud pet bar: dragging a command onto the action bar', () => {
+  type DragHud = PetBarHarness & {
+    dragAction: { action: { type: string; id: string }; sourceIndex: number | null } | null;
+    optionsHooks?: { settings: { get(key: string): unknown } };
+    clearActionDropTargets(): void;
+  };
+
+  function dragHud(lockActionBars = false): DragHud {
+    const hud = makeHud('forest_wolf', true, {}, 'hunter') as DragHud;
+    hud.dragAction = null;
+    hud.optionsHooks = { settings: { get: (key) => key === 'lockActionBars' && lockActionBars } };
+    hud.clearActionDropTargets = vi.fn();
+    hud.petModeMenuOpen = true;
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
+    return hud;
+  }
+
+  function dragEvent(type: string): { event: Event; data: Map<string, string> } {
+    const data = new Map<string, string>();
+    const event = new Event(type, { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'dataTransfer', {
+      value: {
+        effectAllowed: 'uninitialized',
+        setData: (k: string, v: string) => data.set(k, v),
+        getData: (k: string) => data.get(k) ?? '',
+      },
+    });
+    return { event, data };
+  }
+
+  it('makes exactly the six commands draggable, never feed or the stance toggle', () => {
+    dragHud();
+    const draggable = [...document.querySelectorAll<HTMLButtonElement>('.pet-btn')]
+      .filter((b) => b.draggable)
+      .map((b) => b.dataset.focusKey);
+    expect(draggable.sort()).toEqual(
+      [
+        'pet_attack',
+        'pet_growl',
+        'stance-aggressive',
+        'stance-assist',
+        'stance-defensive',
+        'stance-passive',
+      ].sort(),
+    );
+  });
+
+  it('starts a copy drag carrying the pet command, and clears it on dragend', () => {
+    const hud = dragHud();
+    const passive = document.querySelector<HTMLButtonElement>('[data-focus-key="stance-passive"]');
+    const { event, data } = dragEvent('dragstart');
+    passive?.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+    expect(hud.dragAction).toEqual({ action: { type: 'pet', id: 'stop' }, sourceIndex: null });
+    expect(JSON.parse(data.get('application/x-woc-hotbar-action') ?? 'null')).toEqual({
+      type: 'pet',
+      id: 'stop',
+    });
+    expect((event as Event & { dataTransfer: DataTransfer }).dataTransfer.effectAllowed).toBe(
+      'copy',
+    );
+
+    passive?.dispatchEvent(new Event('dragend'));
+    expect(hud.dragAction).toBeNull();
+    expect(hud.clearActionDropTargets).toHaveBeenCalled();
+  });
+
+  it('offers Assist in the stance menu with Pet Attack art, selecting and dragging as assist', () => {
+    const hud = dragHud();
+    const assist = document.querySelector<HTMLButtonElement>('[data-focus-key="stance-assist"]');
+    expect(assist?.getAttribute('aria-label')).toBe('Assist');
+    expect(assist?.querySelector<HTMLElement>('.icon-label')?.style.backgroundImage).toContain(
+      'mock:ability:pet_attack',
+    );
+    const { event } = dragEvent('dragstart');
+    assist?.dispatchEvent(event);
+    expect(hud.dragAction).toEqual({ action: { type: 'pet', id: 'assist' }, sourceIndex: null });
+    assist?.dispatchEvent(new Event('dragend'));
+    assist?.click();
+    expect(hud.sim.setPetMode).toHaveBeenCalledWith('assist');
+  });
+
+  it('refuses the drag while the action bars are locked', () => {
+    const hud = dragHud(true);
+    const attack = document.querySelector<HTMLButtonElement>('[data-focus-key="pet_attack"]');
+    const { event } = dragEvent('dragstart');
+    attack?.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(hud.dragAction).toBeNull();
+  });
+
+  it('holds the buttons still mid-drag so the drag source is not rebuilt away', () => {
+    const hud = dragHud();
+    const attack = document.querySelector<HTMLButtonElement>('[data-focus-key="pet_attack"]');
+    attack?.dispatchEvent(dragEvent('dragstart').event);
+    // A taunt cooldown tick changes the signature, which would rebuild the bar.
+    (hud.sim.entities.get(2) as Record<string, unknown>).petTauntTimer = 5;
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
+    expect(attack?.isConnected).toBe(true);
+
+    attack?.dispatchEvent(new Event('dragend'));
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
+    expect(attack?.isConnected).toBe(false);
+  });
+
+  it('hands the commanded pet back for the action bar, or null with none', () => {
+    const hud = dragHud();
+    const pet = hud.sim.entities.get(2) ?? null;
+    expect(hud.renderPetBar(pet)).toBe(pet);
+    hud.sim.entities.delete(2);
+    expect(hud.renderPetBar(null)).toBeNull();
   });
 });

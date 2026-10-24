@@ -18,34 +18,34 @@
 //
 //   node scripts/_add_wildheart_death_anim.mjs [in.glb] [out.glb]
 //
-// With no args it edits all five creature GLBs in place; with args it processes
-// the one file. Byte-stable from the FIRST pass: 'Death' is dropped and
+// With no args it edits the three drawn creature GLBs in place (DEFAULT_FILES);
+// with args it processes the one file. Byte-stable from the FIRST pass: 'Death' is dropped and
 // re-authored AFTER the trims (matching the accessor order a guard-skipping
 // re-run reproduces, so f(raw) == f(f(raw)) and re-runs never invalidate the
 // minted media-manifest hashes), and the trims skip clips already at game
-// length. Meshopt encoder/decoder are registered like the cantor script (these
-// particular GLBs ship uncompressed with WebP textures, which the write
-// preserves).
+// length. Meshopt encoder/decoder and texture extensions are registered so
+// existing geometry and KTX2 texture compression survive the write.
 //
 // AXIS NOTE: this is the 41-joint Tripo biped (Root/Hip/Pelvis/Waist/...),
 // authored facing local +X, every wildheart VisualDef corrects with
 // yaw: -Math.PI/2 (manifest.ts). Nothing here hardcodes that frame: the topple
 // axis, per-bone slump directions, and the tip angle that lands the spine flat
-// are all derived from the rig's measured rest orientation, and the written
+// are all derived from the rig's measured Idle pose, and the written
 // file is re-loaded and checked (spine within 20deg of horizontal at the final
 // keyframe) before the script reports success.
 import { statSync } from 'node:fs';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
+import { wildheartDeathBase } from './wildheart_death_pose.mjs';
 
-const DEFAULT_FILES = [
-  'wildheart_stalker',
-  'wildheart_ravager',
-  'wildheart_hexcaller',
-  'wildheart_beastmaster',
-  'wildheart_high_priest',
-].map((n) => `public/models/creatures/${n}.glb`);
+// The relaxed-arm Death is baked into the three rigs the basin still draws.
+// The Fanglord Beastmaster and Zulgar now wear their art-guide bodies
+// (wildheart_creature_looks.ts), so their shipped troll GLBs keep the takes
+// they have; pass one explicitly to re-cut it.
+const DEFAULT_FILES = ['wildheart_stalker', 'wildheart_ravager', 'wildheart_hexcaller'].map(
+  (n) => `public/models/creatures/${n}.glb`,
+);
 const FILES =
   process.argv[2] !== undefined
     ? [[process.argv[2], process.argv[3] ?? process.argv[2]]]
@@ -81,11 +81,11 @@ const TIP_MARGIN = 0.06; // rad
 const HIP_REST_FRACTION = 0.35;
 
 // Secondary bones slumped about the same (body-relative) left-right axis,
-// layered on rest, so the plank of a rigid hip-only rotation reads as a limp
+// layered on Idle, so the plank of a rigid hip-only rotation reads as a limp
 // collapse. Signs are derived per bone below: knees flex, the head lolls back,
 // the arms settle to the ground beside the body. Bones the clip does not
 // target would hold whatever pose was live at death (or bind pose for a corpse
-// entering interest), so the arms are included to pin the whole corpse.
+// entering interest), so every remaining joint is pinned to its Idle donor.
 const SLUMP_BONES = [
   { name: 'Waist', peak: 0.1 },
   { name: 'Spine01', peak: 0.12 },
@@ -340,20 +340,22 @@ async function processFile(inPath, outPath) {
 
   const hip = need('Hip');
   const waist = need('Waist');
+  const basePose = wildheartDeathBase(root);
   const fallDir = FACING.map((v) => -v); // onto the back
   const tipAxis = cross(UP, fallDir); // body-relative left-right axis, world frame
 
-  // Tip angle that lands the measured rest spine on the horizon: rotate the
-  // rest spine direction (Waist local +Y in world) about tipAxis until its
-  // vertical component is gone, i.e. the in-plane angle left to reach -facing.
-  const spineDir = qRotate(restWorldRotation(waist), [0, 1, 0]);
+  // Measure the donor's actual torso, not Waist local +Y: the donor has a
+  // forward hunch through Spine01/02 that otherwise drives the head underground.
+  const waistPos = restWorldPosition(waist, basePose);
+  const neckPos = restWorldPosition(need('NeckTwist01'), basePose);
+  const spineDir = neckPos.map((v, i) => v - waistPos[i]);
   const spinePlane = [dot(spineDir, FACING), dot(spineDir, UP)];
   const tipPeak = Math.PI - Math.atan2(spinePlane[1], spinePlane[0]) - TIP_MARGIN;
 
-  const hipParentRot = restWorldRotation(hip.getParentNode());
-  const hipRest = hip.getRotation();
-  const hipT = hip.getTranslation();
-  const hipHeight = restWorldPosition(hip)[1];
+  const hipParentRot = restWorldRotation(hip.getParentNode(), basePose);
+  const hipRest = basePose.get(hip)?.rotation ?? hip.getRotation();
+  const hipT = basePose.get(hip)?.translation ?? hip.getTranslation();
+  const hipHeight = restWorldPosition(hip, basePose)[1];
   const sinkWorld = Math.max(0, hipHeight * (1 - HIP_REST_FRACTION));
   const downLocal = qRotate(qInv(hipParentRot), [0, -1, 0]);
   const preRot = (angle) =>
@@ -386,12 +388,12 @@ async function processFile(inPath, outPath) {
   );
   for (const { name, peak } of SLUMP_BONES) {
     const node = need(name);
-    const rest = node.getRotation();
-    const parentRot = restWorldRotation(node.getParentNode());
+    const rest = basePose.get(node)?.rotation ?? node.getRotation();
+    const parentRot = restWorldRotation(node.getParentNode(), basePose);
     // Bend about the body's left-right axis, signed so the bone tip moves
     // toward the fall (knees flex, the head and arms settle with the body).
     // Bones lying along the tip axis get no useful signal; keep them positive.
-    const tipDir = qRotate(restWorldRotation(node), [0, 1, 0]);
+    const tipDir = qRotate(restWorldRotation(node, basePose), [0, 1, 0]);
     const swing = dot(cross(tipAxis, tipDir), fallDir);
     const sign = Math.abs(swing) < 0.05 ? 1 : Math.sign(swing);
     const slumpRot = (angle) => qMul(qMul(qInv(parentRot), qAboutAxis(tipAxis, angle)), parentRot);
@@ -405,6 +407,30 @@ async function processFile(inPath, outPath) {
       D_LIMP.flatMap((f) => qMul(slumpRot(sign * peak * f), rest)),
       `whDeathSlump_${name}`,
     );
+  }
+
+  // Pin the remaining donor bindings too: an already-dead mob loaded into
+  // interest must look identical to one that just finished its death action.
+  const authored = new Map();
+  for (const channel of death.listChannels()) {
+    const paths = authored.get(channel.getTargetNode()) ?? new Set();
+    paths.add(channel.getTargetPath());
+    authored.set(channel.getTargetNode(), paths);
+  }
+  for (const [node, pose] of basePose) {
+    for (const [path, value] of Object.entries(pose)) {
+      if (authored.get(node)?.has(path)) continue;
+      addChannel(
+        doc,
+        buffer,
+        death,
+        node,
+        path,
+        D_TIMES,
+        D_TIMES.flatMap(() => value),
+        `whDeathBase_${node.getName()}_${path}`,
+      );
+    }
   }
 
   await io.write(outPath, doc);
@@ -453,8 +479,11 @@ async function verifyFile(path) {
   const byName = new Map(root.listNodes().map((n) => [n.getName(), n]));
   const waist = byName.get('Waist');
   const hip = byName.get('Hip');
-  const spineEnd = qRotate(restWorldRotation(waist, finalPose), [0, 1, 0]);
-  const spineFromHorizontal = (Math.asin(Math.abs(spineEnd[1])) * 180) / Math.PI;
+  const waistEnd = restWorldPosition(waist, finalPose);
+  const neckEnd = restWorldPosition(byName.get('NeckTwist01'), finalPose);
+  const spineEnd = neckEnd.map((v, i) => v - waistEnd[i]);
+  const spineFromHorizontal =
+    (Math.asin(Math.abs(spineEnd[1]) / Math.hypot(...spineEnd)) * 180) / Math.PI;
   const hipEndY = restWorldPosition(hip, finalPose)[1];
   const hipRestY = restWorldPosition(hip)[1];
   console.log(

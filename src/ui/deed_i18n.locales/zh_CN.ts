@@ -7,6 +7,115 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  cmb_balgath: {
+    name: '工头不再',
+    desc: '将埋葬工头送回他的坟冢。',
+  },
+  cmb_balgath_ten: {
+    name: '坟冢留不住',
+    desc: '击败埋葬工头十次。',
+  },
+  cmb_point_taken: {
+    name: '一矛中的',
+    desc: '在征召营训练场熄灭稻草工头的灯笼，让它的木板承受实打实的攻击。',
+  },
+  dgn_olen_buttress: {
+    name: '守住城墙',
+    desc: '击败骑士指挥官奥伦，且其回弹壁盾从未击中第二名玩家。',
+  },
+  dgn_ossick_moored: {
+    name: '安全港湾',
+    desc: '击败狱卒奥西克，且无人被拖入溺亡之坑。',
+  },
+  dgn_vael_beacon: {
+    name: '灯塔之光',
+    desc: '击败缚雾者维尔，且未引爆任何雾影。',
+  },
+  dgn_turretback: {
+    name: '驱逐令',
+    desc: '击败海难船长，且无人被幽灵舷炮齐射击中。',
+  },
+  dgn_selthe_pitch: {
+    name: '声声和谐',
+    desc: '击败唱诗母塞尔瑟，每次合唱均由两人或以上分担，且独唱从未触及其他人。',
+  },
+  dgn_colossus_mirror: {
+    name: '击碎镜面',
+    desc: '击败潮镜巨像，且每个倒影均在出现后 15 秒内被击碎。',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: '滴水不沾',
+    desc: '击败伊索蕾，溺月化身，且无人被她的潮汐冲击击中。',
+  },
+  dgn_mere_hydra: {
+    name: '三首俱灭',
+    desc: '在 10 秒的时间差内杀死湖泊九头蛇的全部三个头颅。',
+  },
+  dgn_crypt_knellwyrm: {
+    name: '毫发未焦',
+    desc: '击败丧钟巨龙，且无人被它的火葬扫射烧伤。',
+  },
+  dgn_turnkey_cage: {
+    name: '牢笼困不住我们',
+    desc: '击败牢狱钥匙官，且无人被铁笼碾压。',
+  },
+  dgn_beastmaster_apart: {
+    name: '保持距离',
+    desc: '击败獠牙领主驯兽师及其巨型美洲豹，且兽群羁绊生效的总时间少于 10 秒。',
+  },
+  dgn_gorgebloom_clean: {
+    name: '除草能手',
+    desc: '击败噬花，且没有任何荆棘幼芽长出。',
+  },
+  dgn_zulgar_uncaught: {
+    name: '从未被捕',
+    desc: '击败盆地之声祖尔加，且无人受到撕咬重伤。',
+  },
+  dgn_great_saurian: {
+    name: '巨兽倾覆',
+    desc: '在 20 秒的时间差内击败巨型蜥脚兽及其驮轿巫咒师。',
+  },
+  dgn_korgath_all_chains: {
+    name: '仁慈的终结',
+    desc: '击败被缚者科加斯，并打断他的全部四条锁链。',
+  },
+  dgn_korgath_still_bound: {
+    name: '锁链仍固',
+    desc: '在英雄难度击败被缚者科加斯，且至少两条锁链始终未被打断。',
+  },
+  dgn_velkhar_cold: {
+    name: '冰冷慰藉',
+    desc: '击败大死灵法师维尔卡，且没有任何复生骨行者第二次站起。',
+  },
+  dgn_korzul_thin_ice: {
+    name: '如履薄冰',
+    desc: '击败墓龙科祖尔，且湖面的十九块冰板中至少十二块未破碎。',
+  },
+  dgn_sledge_tusker: {
+    name: '冰冷货物',
+    desc: '击败拖橇巨牙兽，且无人被它的践踏击中。',
+  },
+  dgn_drowned_temple_cantor: {
+    name: '最后的诗节',
+    desc: '在苍白唱诗班最后的领唱陪伴下，击败伊索蕾，溺月化身。',
+    title: '唱诗班的见证者',
+  },
+  dgn_marrow_tidy: {
+    name: '整洁的教堂墓园',
+    desc: '击败司事马罗，且每个敞开之墓均放置在钟庭边缘。',
+  },
+  dgn_lady_nobody_hanging: {
+    name: '无人悬而未决',
+    desc: '击败寒骨夫人，且她从未从冰封之拥中摔落任何人。',
+  },
+  dgn_ilvane_hush: {
+    name: '归于寂静',
+    desc: '击败领唱者伊尔凡，且她的空洞挽歌从未击中任何人。',
+  },
+  dgn_morthen_candlelight: {
+    name: '烛火长明',
+    desc: '击败唤墓者莫森，并在其不息护盾出现后 20 秒内重新点燃全部四支追思蜡烛。',
+  },
   exp_arcane_calligraphy: {
     name: '稳健的笔触',
     desc: '在东溪谷完成奥术书法。',
@@ -321,6 +430,7 @@ export const table: DeedLocaleTable = {
     desc: '完成绍尔编年史的第一章：办完东溪的最初差事，摸清溪谷的山川地势，初尝这里的行当滋味。',
   },
   chr_vale_chapter_ii: {
+    desc: '完成绍尔编年史的第二章：剿灭强盗、鱼人和矿洞害兽，并勇闯圣物库。',
     name: '溪谷编年史·第二章',
   },
   chr_vale_chapter_iii: {
@@ -939,29 +1049,61 @@ export const table: DeedLocaleTable = {
     name: '人赃俱获',
     desc: '在埋藏的宝藏中击杀钱袋窜贼，在它带着金币逃脱前。',
   },
+  exp_wisp_maze_hard: {
+    name: '比暗影更明亮',
+    desc: '在困难难度下找回被盗的钱袋，逃出常青园的迷宫。',
+  },
+  prog_titan: { name: '泰坦', desc: '累计获得10,000,000点终身经验。', title: '泰坦' },
   pvp_flag_1h: {
-    name: '勇敢者',
-    desc: '在开启世界PvP的状态下于开放世界累计游玩1小时。退出游戏、死亡或身处副本时会暂停进度；关闭PvP会重置进度。已获得的称号永久保留。',
-    title: '勇敢者',
+    name: '勇毅者',
+    desc: '在存活且位于开放世界或PvP比赛时，保持世界PvP开启，累计游玩1小时。庇护所、PvE副本、死亡和下线都会暂停进度；关闭世界PvP会重置进度。获得的头衔永久保留。',
+    title: '勇毅者',
   },
   pvp_flag_3h: {
-    name: '挑战者',
-    desc: '在开启世界PvP的状态下于开放世界累计游玩3小时。退出游戏、死亡或身处副本时会暂停进度；关闭PvP会重置进度。已获得的称号永久保留。',
-    title: '挑战者',
+    name: '抗争者',
+    desc: '在存活且位于开放世界或PvP比赛时，保持世界PvP开启，累计游玩3小时。庇护所、PvE副本、死亡和下线都会暂停进度；关闭世界PvP会重置进度。获得的头衔永久保留。',
+    title: '抗争者',
   },
   pvp_flag_6h: {
     name: '无畏者',
-    desc: '在开启世界PvP的状态下于开放世界累计游玩6小时。退出游戏、死亡或身处副本时会暂停进度；关闭PvP会重置进度。已获得的称号永久保留。',
+    desc: '在存活且位于开放世界或PvP比赛时，保持世界PvP开启，累计游玩6小时。庇护所、PvE副本、死亡和下线都会暂停进度；关闭世界PvP会重置进度。获得的头衔永久保留。',
     title: '无畏者',
   },
   pvp_flag_24h: {
     name: '不屈者',
-    desc: '在开启世界PvP的状态下于开放世界累计游玩24小时。退出游戏、死亡或身处副本时会暂停进度；关闭PvP会重置进度。已获得的称号永久保留。',
+    desc: '在存活且位于开放世界或PvP比赛时，保持世界PvP开启，累计游玩24小时。庇护所、PvE副本、死亡和下线都会暂停进度；关闭世界PvP会重置进度。获得的头衔永久保留。',
     title: '不屈者',
   },
   pvp_flag_168h: {
     name: '不败者',
-    desc: '在开启世界PvP的状态下于开放世界累计游玩7天。退出游戏、死亡或身处副本时会暂停进度；关闭PvP会重置进度。已获得的称号永久保留。',
+    desc: '在存活且位于开放世界或PvP比赛时，保持世界PvP开启，累计游玩7天。庇护所、PvE副本、死亡和下线都会暂停进度；关闭世界PvP会重置进度。获得的头衔永久保留。',
     title: '不败者',
+  },
+  dgn_guild_first_contract: {
+    name: '契约已签',
+    desc: '完成一份灯火大厅的每周地下城契约。',
+  },
+  dgn_guild_ten_contracts: {
+    name: '告示板常客',
+    desc: '完成10份灯火大厅的每周地下城契约。',
+  },
+  dgn_guild_fifty_contracts: {
+    name: '契约老手',
+    desc: '完成50份灯火大厅的每周地下城契约。',
+  },
+  feat_guild_writ_runner: {
+    name: '令状信使',
+    desc: '以6枚灯火印章从灯火大厅军需官加里克·霍尔特处购得。',
+    title: '令状信使',
+  },
+  feat_guild_hallsworn: {
+    name: '大厅誓约者',
+    desc: '以14枚灯火印章从灯火大厅军需官加里克·霍尔特处购得。',
+    title: '大厅誓约者',
+  },
+  feat_guild_of_lantern_hall: {
+    name: '灯火大厅之人',
+    desc: '以24枚灯火印章从灯火大厅军需官加里克·霍尔特处购得。',
+    title: '灯火大厅之人',
   },
 };

@@ -112,7 +112,7 @@ describe('reveal gate wiring (source pins)', () => {
     // reads and the SAME depth-twin cache the shadow arm fills, so the depth
     // programs are polled under the twins that own them.
     expect(wiring).toContain(
-      'settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),',
+      'settle: pieceProgramSettle(liveMaterialProperties(this.webgl), this.prewarmDepthMaterials),',
     );
     expect(wiring).toContain(
       'upload: (target, priority) => this.uploadGateTexturesGated(target, priority),',
@@ -164,8 +164,12 @@ describe('reveal gate wiring (source pins)', () => {
     );
     expect(entryArm).not.toContain('setBandRevealGate');
     expect(entryArm).not.toContain('this.foliage.setRevealGate');
-    expect(wiring).toContain('this.eastbrookTownView.setRevealGate(');
-    expect(wiring).toContain('this.fenbridgeTownView.setRevealGate(');
+    // every rebuilt town's view (Eastbrook, Fenbridge, Highwatch) gets its own
+    // gate over its own roots, in one loop
+    expect(wiring).toContain('for (const town of this.townViews) {');
+    expect(wiring).toContain(
+      'town.setRevealGate(createRevealGate(revealHost, () => town.staticRevealRoots()));',
+    );
     // The foliage buckets ride the SAME host and the same queue: one more
     // createRevealGate, never a second host (foliage.ts revealRoots hands back
     // the one representative bucket mesh per program key).
@@ -208,15 +212,22 @@ describe('reveal gate wiring (source pins)', () => {
 
   it('props threads the gate into the per-frame far-cell and band updates', () => {
     const propsSource = read('../src/render/props.ts');
+    // The cull position and reach go through the scenery-detail helpers since
+    // the low-tier parity pass (8bff2cec638) and the clutter reach (28539d3de5c):
+    // `cullX`/`cullZ` are the camera (its look-at eye on the low cull), and both reaches
+    // are floored at the fog far (`Math.max(fogFar, ...)` in scenery_detail.ts),
+    // so a cheaper preset never culls a band or a cell nearer than the fog does.
     expect(propsSource).toContain(
-      'updatePropCell(cell, camX, camZ, fogFar, undefined, revealGate);',
+      'updatePropCell(cell, cullX, cullZ, structureFar, undefined, revealGate);',
     );
     // The bands go through the LIST pass, not the per-band entry: that is what
     // consults a frame's imminent bands nearest to the camera first, and its
     // scratch is built once per view rather than per frame.
-    expect(propsSource).toContain(
-      'updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);',
+    expect(propsSource.replace(/\s+/g, ' ')).toContain(
+      'updatePropCullables( cullables, cullX, cullZ, clutterFar, clutterFarSq, bandRevealGate, cullPass, );',
     );
+    expect(propsSource).toContain('const clutterFar = sceneryClutterFar(fogFar);');
+    expect(propsSource).toContain('const structureFar = sceneryStructureFar(fogFar);');
     expect(propsSource).toContain('const cullPass = newPropCullPass();');
     expectNoClock(propsSource, 'props.ts');
     expect(propsSource).toContain('setBandRevealGate(gate: RevealGateCore | null): void {');
@@ -299,9 +310,13 @@ describe('reveal gate wiring (source pins)', () => {
         source,
         'townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);',
       );
+      // Since 28539d3de5c the micro (clutter) batches also answer to their own
+      // fog reach; every batch still passes through the piecewise hold.
       const cullAt = anchor(
         source,
-        'staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);',
+        'staticCullTargets[index].visible =\n' +
+          '          (index >= microBatchCount || microVisible) &&\n' +
+          '          townRootVisible(reveal, staticPiecewise, index);',
       );
       const baseAt = anchor(source, 'const buildingRootBase = staticCullTargets.length;');
       const buildingAt = anchor(source, buildingWrite);

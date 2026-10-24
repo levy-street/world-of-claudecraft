@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import {
   RIFT_ESSENCE_ITEM_ID,
   RIFT_GEAR_ITEM_IDS,
@@ -668,7 +668,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     ).toBe(true);
     // NO Heroic Marks on the corpse at any rank: marks stay a heroic
     // dungeon/raid currency (maintainer decision).
-    const marks = (boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID);
+    const marks = (boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_CURRENCY_ID);
     expect(marks).toEqual([]);
   });
 
@@ -682,7 +682,9 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     tickSeconds(sim, 1.2);
     // The heroic daily gate is dungeon/raid state: a rift clear never stamps it.
     expect([...meta.heroicDaily.marked].some((k) => k.startsWith('rift_'))).toBe(false);
-    expect((boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID)).toEqual([]);
+    expect((boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_CURRENCY_ID)).toEqual(
+      [],
+    );
     // A dev-portal run has no rank: never pays, never seals.
     sim.enterRift(4242, 15, sim.player.id);
     const inst2 = sim.riftInstances.find((i) => i.partyKey !== null && i.seed === 4242)!;
@@ -712,7 +714,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     tickSeconds(sim, 1.2);
     expect(inst.rewarded).toBe(true);
     const rewardItems = boss.loot?.items ?? [];
-    expect(rewardItems.filter((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toEqual([]);
+    expect(rewardItems.filter((item) => item.itemId === HEROIC_MARK_CURRENCY_ID)).toEqual([]);
     expect(rewardItems.some((item) => item.itemId === RIFT_ESSENCE_ITEM_ID)).toBe(false);
     expect(
       rewardItems.some((item) => (RIFT_GEM_IDS as readonly string[]).includes(item.itemId)),

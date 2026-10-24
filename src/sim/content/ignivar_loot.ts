@@ -10,13 +10,18 @@
 // mob-loot block would price the drops at their kill level instead of the
 // raid tier the plan sets. Stat lines are budget-exact per item_budget.ts
 // (35 x slot mult x 0.7, largest-remainder normalized), pinned by
-// tests/ignivar_loot.test.ts.
+// tests/ignivar_loot.test.ts; the three healer waists are the one deliberate
+// exception (see springbinder_sash).
 //
 // Ratings ladder step (docs/prd/ignivar-raid-loot.md): armor pieces carry a
-// 60-point primary and a 25-point secondary rating; jewelry, shields, and
-// held offhands carry a single 25. Hit appears exactly where the plan's Hit
-// program says: the elective waists at 60 and the physical neck/ring plus
-// the spell-damage ring at 25.
+// 60-point primary and a 25-point secondary rating (the healer waists aside);
+// jewelry, shields, and held offhands carry a single 25. Hit appears exactly
+// where the plan's Hit program says: the non-healer elective waists at 60 and
+// the physical neck/ring plus the spell-damage ring at 25. Healer pieces
+// (Healing Power) never carry Hit, since direct heals are not resisted (the
+// damage-converting healers, arcane and discipline, give up Hit by design):
+// their elective rating is Crit (25 ring, 30 weapon, and 30 on the healer
+// waists, whose other 30 moved into Int/Spi).
 //
 // The five-piece sets are class-locked and carry `set:` tags; their
 // ITEM_SETS entries (the 2/4-piece engine bonuses of
@@ -29,12 +34,15 @@
 // universal mark, a sigil is class-locked, and the loot path does not gate
 // need/greed or FFA pickup on class, so a wrong-class looter must be able
 // to destroy the token or it wedges a bag slot forever (soulbound blocks
-// trade, mail, market, and sale). One sigil buys any one matching-slot set
-// piece for the holder's class at the Crucible Quartermaster
-// (CRUCIBLE_VENDOR_STOCK).
+// trade, mail, market, and sale). The roller does keep a sigil family off
+// the table when no loot-eligible class can redeem it
+// (loot/class_locked_drop.ts), so a dead sigil only reaches a wrong-class
+// looter when someone else in the raid could have used it. One sigil buys
+// any one matching-slot set piece for the holder's class at the Crucible
+// Quartermaster (CRUCIBLE_VENDOR_STOCK).
 //
 // Binding policy (PRs #3788 and #3789): the 15 sigils and the 145 sigil-redeemed
-// tier set pieces are soulbound, matching the tokens that buy them; the 41
+// tier set pieces are soulbound, matching the tokens that buy them; the 42
 // ordinary boss drops (offset, jewelry, held, weapons) carry no `soulbound`
 // flag and trade freely. Pinned by tests/ignivar_loot.test.ts.
 
@@ -2665,10 +2673,14 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 75, int: 9, spi: 8, sta: 6 },
+    // Int 15 / Spi 12 is 10 points over the ilvl-35 waist line on purpose (a
+    // deliberate healer buff): the 30 Crit cut (60 to 30) was converted at
+    // the dev-kit healer weights (rating 0.3, Int 1, Spi 0.7: 30 x 0.3 = 9 ~
+    // 6 + 4 x 0.7). The Hit it replaced was worth nothing to a direct healer.
+    stats: { armor: 75, int: 15, spi: 12, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    hitRating: 60,
+    critRating: 30,
     sellValue: 10000,
     requiredClass: ['mage', 'priest'],
   },
@@ -2785,10 +2797,11 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 150, int: 9, spi: 8, sta: 6 },
+    // Over the waist line on purpose: see springbinder_sash.
+    stats: { armor: 150, int: 15, spi: 12, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    hitRating: 60,
+    critRating: 30,
     sellValue: 10000,
     requiredClass: ['druid'],
   },
@@ -2905,10 +2918,11 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 270, int: 9, spi: 8, sta: 6 },
+    // Over the waist line on purpose: see springbinder_sash.
+    stats: { armor: 270, int: 15, spi: 12, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    hitRating: 60,
+    critRating: 30,
     sellValue: 10000,
     requiredClass: ['paladin', 'shaman'],
   },
@@ -3028,12 +3042,12 @@ export const IGNIVAR_JEWELRY_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     stats: { int: 8, spi: 7, sta: 5 },
     healPower: 8,
-    hitRating: 25,
+    critRating: 25,
     sellValue: 8000,
   },
 };
 
-// Shields and held offhands (Heroic Varkhul chase pieces).
+// Shields, held offhands, and the hunter quiver (Heroic Varkhul chase pieces).
 export const IGNIVAR_HELD_ITEMS: Record<string, ItemDef> = {
   bulwark_of_the_inner_crucible: {
     id: 'bulwark_of_the_inner_crucible',
@@ -3092,14 +3106,38 @@ export const IGNIVAR_HELD_ITEMS: Record<string, ItemDef> = {
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
+  infernal_quiver: {
+    id: 'infernal_quiver',
+    name: 'Infernal Quiver',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The hunter counterpart to the two held offhands above, off the same
+    // Heroic Varkhul slot (the direfang_quiver precedent on Nythraxis). Worn,
+    // not held: it costs no two-hander, so it prices on the worn line,
+    // primaryStatBudget(35, epic, offhand, WORN_OFFHAND_STAT_MULT) = 11,
+    // split 7 agility and the 4-point stamina baseline. Ratings are crit 25
+    // like every held offhand of the tier, plus Hit 50, the one Hit-carrying
+    // offhand of the Crucible and a Heroic-only Hit lane beside the marquee
+    // weapons. It keeps the hunter quiver ladder's physical Hit identity (the
+    // ilvl-33 heroic_direfang_quiver carries Hit 55 + crit 20).
+    occupiesHand: false,
+    stats: { agi: 7, sta: 4 },
+    critRating: 25,
+    hitRating: 50,
+    sellValue: 12000,
+    requiredClass: ['hunter'],
+  },
 };
 
 // The 10 raid weapons: one-hand dps rides weaponDpsBudget(35) = 17.2 with a
 // plus-or-minus 20 percent spread around average = dps x speed; two-handers
 // carry the TWOHAND_DPS_MULT premium (19.8) and the 33-point stat line
 // (25 x TWOHAND_STAT_MULT). Class locks name the three archetype sets
-// equipment_rules enforces. Hit sits exactly where the plan's weapon
-// program says: the Kris, the Cleaver, and the Wand.
+// equipment_rules enforces. Every non-healer weapon carries the 30 Hit
+// secondary (the 2026-08-30 lane widening); the two healer weapons carry it
+// as Crit.
 export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
   forgefathers_warhammer: {
     id: 'forgefathers_warhammer',
@@ -3187,7 +3225,7 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     stats: { int: 17, spi: 16, sta: 11 },
     healPower: 68,
     hasteRating: 70,
-    hitRating: 30,
+    critRating: 30,
     sellValue: 16000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -3218,7 +3256,7 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     stats: { int: 13, spi: 12, sta: 8 },
     healPower: 40,
     hasteRating: 70,
-    hitRating: 30,
+    critRating: 30,
     sellValue: 14000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -3253,15 +3291,15 @@ export const IGNIVAR_LOOT_ITEMS: Record<string, ItemDef> = {
 // art-pending icon ledger. Order follows the tables above.
 export const IGNIVAR_LOOT_ITEM_IDS: readonly string[] = Object.keys(IGNIVAR_LOOT_ITEMS);
 
-// The art-pending ledger: EMPTY since the Crucible art wave landed
-// (crucible-set-icons-2026-08-29 in public/ui/items/mapping.json painted
-// all 192 non-weapon pieces; the weapons shipped painted from the start).
-// The machinery stays: ITEM_ART_PENDING (src/ui/icons.ts) serves the
-// procedural icon for any id listed here, and the item-art audit CLI
+// The art-pending ledger. The Crucible art wave
+// (crucible-set-icons-2026-08-29 in public/ui/items/mapping.json) painted
+// all 192 original non-weapon pieces, and the weapons shipped painted from
+// the start. ITEM_ART_PENDING (src/ui/icons.ts) serves the procedural icon
+// for any id listed here, and the item-art audit CLI
 // (scripts/item_art_audit.mjs) excludes it from the
-// every-live-item-has-art sweep, so a future content wave can stage
-// unpainted items the same way.
-export const IGNIVAR_ART_PENDING_ITEM_IDS: readonly string[] = [];
+// every-live-item-has-art sweep. Open entry: the hunter quiver, added after
+// that wave; its painted icon is owed by the next item-art pass.
+export const IGNIVAR_ART_PENDING_ITEM_IDS: readonly string[] = ['infernal_quiver'];
 
 // The Crucible Quartermaster's redemption stock: every set piece priced at
 // exactly one sigil of its slot and class group. The buy path additionally

@@ -6,6 +6,15 @@ import { describe, expect, it } from 'vitest';
 const sourcePath = path.resolve(process.cwd(), 'src/main.ts');
 const sourceText = fs.readFileSync(sourcePath, 'utf8');
 const sourceFile = ts.createSourceFile(sourcePath, sourceText, ts.ScriptTarget.Latest, true);
+// The world hover cursor moved whole out of main.ts into its own module.
+const hoverSourcePath = path.resolve(process.cwd(), 'src/game/hover_cursor.ts');
+const hoverSourceText = fs.readFileSync(hoverSourcePath, 'utf8');
+const hoverSourceFile = ts.createSourceFile(
+  hoverSourcePath,
+  hoverSourceText,
+  ts.ScriptTarget.Latest,
+  true,
+);
 const perfSourcePath = path.resolve(process.cwd(), 'src/game/perf.ts');
 const perfSourceText = fs.readFileSync(perfSourcePath, 'utf8');
 const perfSourceFile = ts.createSourceFile(
@@ -295,8 +304,8 @@ describe('client frame allocation guards', () => {
   });
 
   it('reuses caller-owned hover membership sets', () => {
-    expect(sourceText).toContain('activePvpOpponentIds(world, hoverPvpOpponentIds)');
-    expect(sourceText).toContain('partyMemberIds(hoverPartyMemberIds)');
+    expect(hoverSourceText).toContain('activePvpOpponentIds(world, hoverPvpOpponentIds)');
+    expect(hoverSourceText).toContain('partyMemberIds(hoverPartyMemberIds)');
 
     let partyMemberIds: ts.FunctionDeclaration | undefined;
     const findPartyMemberIds = (node: ts.Node): void => {
@@ -306,10 +315,10 @@ describe('client frame allocation guards', () => {
       }
       ts.forEachChild(node, findPartyMemberIds);
     };
-    findPartyMemberIds(sourceFile);
+    findPartyMemberIds(hoverSourceFile);
     if (!partyMemberIds?.body) throw new Error('partyMemberIds() was not found');
 
-    const helperText = partyMemberIds.getText(sourceFile);
+    const helperText = partyMemberIds.getText(hoverSourceFile);
     expect(helperText).toContain('ids.clear()');
     expect(helperText).toContain('return ids');
     expect(helperText).not.toContain('new Set');

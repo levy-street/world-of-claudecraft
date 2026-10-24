@@ -46,6 +46,7 @@ export interface MapMarkerInteractionDeps {
   questArea(refs: readonly QuestObjectiveRef[], activeCount: number): string;
   paint(html: string, clientX: number, clientY: number): void;
   clearMemo(): void;
+  hide?(): void;
 }
 
 const EMPTY_MARKERS = Object.freeze([]) as readonly never[];
@@ -75,13 +76,29 @@ export class MapMarkerInteractionController {
   private geometryCanvas: HTMLCanvasElement | null = null;
   private readonly tooltipResolvers: MapMarkerTooltipResolvers;
   private readonly clearMemo: () => void;
+  private readonly hide: () => void;
+  private portCandidate = false;
+  private refreshingPort = false;
+  private activePortTip: {
+    canvas: HTMLCanvasElement;
+    x: number;
+    y: number;
+    touch: boolean;
+    html: string;
+  } | null = null;
+  private activeTouch = false;
 
   constructor(deps: MapMarkerInteractionDeps) {
     this.semantics = new MapSemanticAccessibilityCore(deps.names);
     this.clearMemo = deps.clearMemo;
+    this.hide = deps.hide ?? (() => {});
     this.tooltipResolvers = {
       npc: deps.npc,
-      navigation: deps.navigation,
+      navigation: (marker) => {
+        const html = deps.navigation(marker);
+        this.portCandidate = !!html && marker.kind === 'ferry-port';
+        return html;
+      },
       station: deps.station,
       service: deps.service,
       gather: deps.gather,
@@ -89,7 +106,13 @@ export class MapMarkerInteractionController {
       worldQuest: deps.worldQuest,
       worldBoss: deps.worldBoss,
       questArea: deps.questArea,
-      paint: deps.paint,
+      paint: (html, x, y) => {
+        const prior = this.activePortTip;
+        if (this.portCandidate && this.geometryCanvas) {
+          this.activePortTip = { canvas: this.geometryCanvas, x, y, touch: this.activeTouch, html };
+        } else this.activePortTip = null;
+        if (!this.refreshingPort || html !== prior?.html) deps.paint(html, x, y);
+      },
     };
   }
 
@@ -114,7 +137,9 @@ export class MapMarkerInteractionController {
 
   showAt(canvas: HTMLCanvasElement, clientX: number, clientY: number, touch = false): boolean {
     if (canvas !== this.geometryCanvas) return false;
-    return showMapMarkerTooltipAt(
+    this.portCandidate = false;
+    this.activeTouch = touch;
+    const shown = showMapMarkerTooltipAt(
       this.geometry,
       clientX,
       clientY,
@@ -133,6 +158,35 @@ export class MapMarkerInteractionController {
       this.semantics,
       this.tooltipResolvers,
     );
+    if (!shown) this.stopPortRefresh();
+    return shown;
+  }
+
+  stopPortRefresh(): void {
+    this.activePortTip = null;
+  }
+
+  /** Reuse the map redraw cadence; unchanged seconds perform no tooltip DOM work. */
+  refreshPortTooltip(): void {
+    const tip = this.activePortTip;
+    if (!tip) return;
+    this.refreshingPort = true;
+    try {
+      if (!this.showAt(tip.canvas, tip.x, tip.y, tip.touch)) {
+        this.stopPortRefresh();
+        this.hide();
+      }
+    } finally {
+      this.refreshingPort = false;
+    }
+  }
+
+  setContinentPorts(ports: readonly MapNavigationMarker[]): void {
+    const tip = this.activePortTip;
+    this.clear();
+    this.activePortTip = tip;
+    this.navigation = ports;
+    this.refreshPortTooltip();
   }
 
   selectWorldQuest(questId: string | null): boolean {
@@ -161,6 +215,7 @@ export class MapMarkerInteractionController {
   }
 
   clear(): void {
+    this.stopPortRefresh();
     this.questAreas = EMPTY_MARKERS;
     this.worldQuests = EMPTY_MARKERS;
     this.worldBosses = EMPTY_MARKERS;
@@ -193,5 +248,6 @@ export class MapMarkerInteractionController {
       this.selectedWorldQuestId = null;
     }
     this.clearMemo();
+    this.refreshPortTooltip();
   }
 }

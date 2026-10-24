@@ -6,7 +6,7 @@
 //
 // Shows a live attempt count and retry countdown (ticked every second) rather
 // than a static string: on a lossy/throttled connection a single retry cycle
-// can run up to RECONNECT_MAX_DELAY_MS (src/net/online.ts), and a frozen
+// can run up to RECONNECT_MAX_DELAY_MS (src/net/reconnect_policy.ts), and a frozen
 // message with no feedback is indistinguishable from a hung client.
 //
 // SHOW GRACE: the overlay mounts only once the drop has persisted for

@@ -19,12 +19,11 @@
 // takes it out first, which is also where a transfer strips the owner's grouping.
 
 import { isChargeBearingPayload } from './item_instance_merge';
-import { type MaterialComposition, mergeMaterialCompositions } from './material_sources';
 import {
-  compatibleMaterialStacks,
   type MaterialStackError,
   type MaterialStackSlot,
   normalizeMaterialStack,
+  PreparedMaterialStack,
   takeMaterialStack,
 } from './material_stack';
 
@@ -82,7 +81,7 @@ function freshSlotRoom(slots: number, perSlot: number, cap: number): number {
 interface TopUpTarget {
   readonly index: number;
   /** The NORMALIZED held stack: what the replacement is built from. */
-  readonly held: MaterialStackSlot;
+  readonly held: PreparedMaterialStack;
   /** Units it can still take before the cap, always positive. */
   readonly room: number;
 }
@@ -111,42 +110,91 @@ function buildPackingModel(request: MaterialPackRequest): MaterialPackingResult<
 
   const arriving = normalizeMaterialStack(incoming, materialIds);
   if (!arriving.ok) return arriving;
-  const want = arriving.value.count;
 
-  const targets: TopUpTarget[] = [];
-  let room = 0;
-  for (let index = 0; index < inventory.length; index++) {
-    const slot = inventory[index];
-    if (slot.itemId !== incoming.itemId) continue;
-    const held = normalizeMaterialStack(slot, materialIds);
-    if (!held.ok) return held;
-    // Payload, crafted marker and the owner's separation choice are all decided
-    // there, never re-derived here, so bags and this plan cannot disagree.
-    const compatible = compatibleMaterialStacks(held.value, arriving.value, materialIds);
-    if (!compatible.ok) return compatible;
-    if (!compatible.value) continue;
-    // A legacy OVER-CAP holding is kept exactly as it is: it simply offers
-    // nothing, and never appears in a plan that would clip it back.
-    const free = stackSize - held.value.count;
-    if (free <= 0) continue;
-    targets.push({ index, held: held.value, room: free });
-    room = addUpTo(room, free, want);
+  const prepared = PreparedMaterialInventory.read(inventory, incoming.itemId, materialIds);
+  if (!prepared.ok) return prepared;
+  return prepared.value.model(arriving.value, stackSize, maxNewSlots);
+}
+
+/** Only raw reads create these opaque, detached rows. Reuse is restricted to
+ * the synchronous planning owner; no backing array or prepared row is exposed. */
+export class PreparedMaterialInventory {
+  #rows: { index: number; held: PreparedMaterialStack }[];
+  #materialIds: ReadonlySet<string>;
+
+  private constructor(
+    rows: { index: number; held: PreparedMaterialStack }[],
+    ids: ReadonlySet<string>,
+  ) {
+    this.#rows = rows;
+    this.#materialIds = new Set(ids);
   }
 
-  // Only a charge-bearing payload stays one per fresh slot (isChargeBearingPayload,
-  // the bags.ts instancedCountCap load-path rule mirrored here): a LOCKED
-  // payload has no per-unit identity, since locking is one flag over the WHOLE
-  // counted stack (item_lock.ts setItemLocked locks every unit in place, never
-  // peeling one off), so it packs a fresh slot up to the normal cap exactly
-  // like an unlocked stack. `compatibleMaterialStacks` above still keeps two
-  // SEPARATE locked (or charged) stacks from topping up into one another: that
-  // anti-taint rule is a different question from how big ONE incoming stack's
-  // fresh slots are, and conflating the two was what split a whole locked
-  // stack into one-unit slots on every deposit into a new container (vault,
-  // bank, guild bank).
-  const perFreshSlot = isChargeBearingPayload(arriving.value.instance) ? 1 : stackSize;
-  room = addUpTo(room, freshSlotRoom(maxNewSlots, perFreshSlot, want), want);
-  return succeed({ incoming: arriving.value, targets, perFreshSlot, fit: room });
+  static read(
+    inventory: readonly MaterialStackSlot[],
+    itemId: string,
+    ids: ReadonlySet<string>,
+  ): MaterialPackingResult<PreparedMaterialInventory> {
+    const rows: { index: number; held: PreparedMaterialStack }[] = [];
+    for (let index = 0; index < inventory.length; index++) {
+      const slot = inventory[index];
+      if (slot.itemId !== itemId) continue;
+      const held = PreparedMaterialStack.read(slot, ids);
+      if (!held.ok) return held;
+      rows.push({ index, held: held.value });
+    }
+    return succeed(new PreparedMaterialInventory(rows, ids));
+  }
+
+  someIdentity(predicate: (slot: MaterialStackSlot) => boolean): boolean {
+    return this.#rows.some(({ held }) => predicate(held.identity()));
+  }
+
+  plan(
+    incoming: MaterialStackSlot,
+    stackSize: number,
+    maxNewSlots: number,
+  ): MaterialPackingResult<MaterialAddPlan> {
+    const model = this.model(incoming, stackSize, maxNewSlots);
+    return model.ok ? planPackingModel(model.value, this.#materialIds) : model;
+  }
+
+  model(
+    incoming: MaterialStackSlot,
+    stackSize: number,
+    maxNewSlots: number,
+  ): MaterialPackingResult<PackingModel> {
+    if (!Number.isSafeInteger(stackSize) || stackSize <= 0) return fail('invalid-capacity');
+    if (!Number.isSafeInteger(maxNewSlots) || maxNewSlots < 0) return fail('invalid-capacity');
+    const prepared = PreparedMaterialStack.read(incoming, this.#materialIds);
+    if (!prepared.ok) return prepared;
+    const arriving = { value: prepared.value.identity() };
+    const want = incoming.count;
+    const targets: TopUpTarget[] = [];
+    let room = 0;
+    for (const { index, held } of this.#rows) {
+      if (!held.compatible(prepared.value)) continue;
+      const free = stackSize - held.count;
+      if (free <= 0) continue;
+      targets.push({ index, held, room: free });
+      room = addUpTo(room, free, want);
+    }
+
+    // Only a charge-bearing payload stays one per fresh slot (isChargeBearingPayload,
+    // the bags.ts instancedCountCap load-path rule mirrored here): a LOCKED
+    // payload has no per-unit identity, since locking is one flag over the WHOLE
+    // counted stack (item_lock.ts setItemLocked locks every unit in place, never
+    // peeling one off), so it packs a fresh slot up to the normal cap exactly
+    // like an unlocked stack. `compatibleMaterialStacks` above still keeps two
+    // SEPARATE locked (or charged) stacks from topping up into one another: that
+    // anti-taint rule is a different question from how big ONE incoming stack's
+    // fresh slots are, and conflating the two was what split a whole locked
+    // stack into one-unit slots on every deposit into a new container (vault,
+    // bank, guild bank).
+    const perFreshSlot = isChargeBearingPayload(arriving.value.instance) ? 1 : stackSize;
+    room = addUpTo(room, freshSlotRoom(maxNewSlots, perFreshSlot, want), want);
+    return succeed({ incoming: prepared.value.materialize(), targets, perFreshSlot, fit: room });
+  }
 }
 
 /**
@@ -158,17 +206,6 @@ function buildPackingModel(request: MaterialPackRequest): MaterialPackingResult<
 export function materialStackFit(request: MaterialPackRequest): MaterialPackingResult<number> {
   const model = buildPackingModel(request);
   return model.ok ? succeed(model.value.fit) : model;
-}
-
-/** A topped-up copy of a held stack. The owner's bag cell, payload, crafted
- *  marker and grouping stay exactly as they were; only the quantity and the
- *  composition move. `held` is already this module's own normalized copy. */
-function toppedUp(
-  held: MaterialStackSlot,
-  added: number,
-  composition: MaterialComposition,
-): MaterialStackSlot {
-  return { ...held, count: held.count + added, materialSources: composition };
 }
 
 /**
@@ -188,7 +225,13 @@ export function planMaterialStackAdd(
 ): MaterialPackingResult<MaterialAddPlan> {
   const built = buildPackingModel(request);
   if (!built.ok) return built;
-  const model = built.value;
+  return planPackingModel(built.value, request.materialIds);
+}
+
+function planPackingModel(
+  model: PackingModel,
+  materialIds: ReadonlySet<string>,
+): MaterialPackingResult<MaterialAddPlan> {
   if (model.fit < model.incoming.count) return fail('insufficient-space');
 
   // `takeMaterialStack` strips the owner's bag cell and grouping from what it
@@ -202,14 +245,13 @@ export function planMaterialStackAdd(
   for (const target of model.targets) {
     if (pending === null) break;
     const moved = Math.min(target.room, pending.count);
-    const split = takeMaterialStack(pending, moved, request.materialIds);
+    const split = takeMaterialStack(pending, moved, materialIds);
     if (!split.ok) return split;
-    const merged = mergeMaterialCompositions(
-      target.held.materialSources ?? [],
-      split.value.taken.materialSources ?? [],
-    );
-    if (!merged.ok) return fail(merged.error);
-    replacements.push({ index: target.index, slot: toppedUp(target.held, moved, merged.value) });
+    const taken = PreparedMaterialStack.read(split.value.taken, materialIds);
+    if (!taken.ok) return taken;
+    const merged = target.held.merge(taken.value);
+    if (!merged.ok) return merged;
+    replacements.push({ index: target.index, slot: merged.value.materialize() });
     pending = split.value.remaining;
   }
 
@@ -217,7 +259,7 @@ export function planMaterialStackAdd(
   // fresh slots were counted for, and each pass takes at least one unit.
   while (pending !== null) {
     const moved = Math.min(model.perFreshSlot, pending.count);
-    const split = takeMaterialStack(pending, moved, request.materialIds);
+    const split = takeMaterialStack(pending, moved, materialIds);
     if (!split.ok) return split;
     const fresh = split.value.taken;
     appended.push(separated ? { ...fresh, materialSeparated: true } : fresh);

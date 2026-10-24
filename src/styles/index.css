@@ -1,6 +1,6 @@
-/* index.css: the single style barrel for the game client. Both game entries
-   (index.html and play.html) are bootstrapped by src/main.ts, which imports this
-   file once, so this barrel serves both. It declares the one canonical @layer
+/* index.css: the single style barrel for the game client. Both game entries load it:
+   play.html through src/main.ts, index.html through src/boot.ts (which imports it before
+   loading src/main.ts), so this barrel serves both. It declares the one canonical @layer
    cascade order up front, then @imports the layer modules in that order. Vite
    inlines these local @imports into one stylesheet at build, so there is no runtime
    import waterfall.
@@ -44,6 +44,7 @@
 @import "./library.css";
 @import "./hud.css";
 @import "./components.css";
+@import "./referral_cards.css";
 @import "./hud.gathering-goal.css";
 @import "./shell.css";
 @import "./hud.mobile.css";

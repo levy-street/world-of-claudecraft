@@ -1,0 +1,42 @@
+[
+  {
+    "id": "dgn_selthe_pitch",
+    "src": "http://localhost:5194/ui/deeds/dgn_selthe_pitch.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_colossus_mirror",
+    "src": "http://localhost:5194/ui/deeds/dgn_colossus_mirror.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_ysolei_high_and_dry",
+    "src": "http://localhost:5194/ui/deeds/dgn_ysolei_high_and_dry.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_mere_hydra",
+    "src": "http://localhost:5194/ui/deeds/dgn_mere_hydra.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_drowned_temple_cantor",
+    "src": "http://localhost:5194/ui/deeds/dgn_drowned_temple_cantor.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

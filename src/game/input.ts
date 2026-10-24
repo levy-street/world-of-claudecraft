@@ -8,9 +8,11 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
 import { detectBrowserEngine } from './browser_env';
+import { clampCamPitch } from './camera_pitch_range';
+import { BASE_ZOOM_MAX } from './camera_zoom_ceiling';
 import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
-import { clampGliderCameraPitch, gliderPitchFromCamera } from './glider_pitch_input';
+import { gliderPitchFromCamera } from './glider_pitch_input';
 import {
   comboCode,
   isModifierCode,
@@ -18,6 +20,7 @@ import {
   makeCombo,
   partyTargetActionSlot,
 } from './keybinds';
+import { applyLanceLean, lanceLeanIntent } from './lance_lean_intent';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import { toggleFriendlyNameplates } from './nameplate_view_prefs';
 import {
@@ -27,7 +30,8 @@ import {
   shouldEngagePointerLockOnMouseDown,
   shouldReleasePointerLock,
 } from './pointer_lock';
-import { normalizePointerLookDelta } from './pointer_look_delta';
+import { RawPointerLockRequester } from './pointer_lock_request';
+import { LookDeltaGuard, normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
 import { isStaleChromeButton } from './stale_chrome_focus';
 import { wheelCodeForDelta, zoomStepForAction } from './wheel_binds';
@@ -175,9 +179,13 @@ export interface InputDebugState {
   hoverActive: boolean;
 }
 
+// The camera's pitch range and clamp live in camera_pitch_range.ts (the
+// renderer reads CAM_PITCH_UP from here).
+export { CAM_PITCH_DOWN, CAM_PITCH_UP } from './camera_pitch_range';
+
 // Camera-driven swimming. camPitch is POSITIVE looking DOWN (renderer.ts seats
-// the boom at eyeY + sin(pitch) * dist), clamped to [-0.4, 1.35], and RESTS at
-// 0.32 — so the bands cannot be centred on zero: a neutral camera has to mean
+// the boom at eyeY + sin(pitch) * dist), clamped by clampCamPitch
+// (camera_pitch_range.ts), and RESTS at 0.32 - so the bands cannot be centred on zero: a neutral camera has to mean
 // "hold this depth", or every swimmer would sink on sight. Diving needs a
 // deliberate ~17 degrees past rest, surfacing about 15 degrees back the other
 // way, leaving a wide dead band in between.
@@ -210,6 +218,9 @@ export class Input {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // The zoom-out ceiling (yards): 22, raised in a PvE boss context by
+  // camera_zoom_wiring.ts so a towering boss fits the frame.
+  zoomMax = BASE_ZOOM_MAX;
   // Fired whenever the player changes the zoom distance (wheel / pinch), so main.ts can
   // persist it to settings (issue 1657). Not fired on a direct camDist assignment (the
   // startup restore / Reset path sets the field itself), so restoring never re-persists.
@@ -233,6 +244,9 @@ export class Input {
   // True while the current click-to-move was issued as an attack-move (walk to
   // the point and auto-attack enemies). Set by setClickMoveTarget, cleared on stop.
   clickMoveAttack = false;
+  // A walk the game itself asked for (to a seat, src/game/seat_interact.ts): it runs
+  // whether or not the player turned click-to-move on.
+  clickMoveForced = false;
   // When on (the Attack Move setting), only the attack-move key itself is
   // reserved. Other movement keys still work so enabling Attack Move cannot
   // make WASD appear dead.
@@ -261,6 +275,16 @@ export class Input {
   // Firefox rejects requestPointerLock() when it is deferred to a later
   // mousemove; computed once since the browser cannot change mid-session.
   private readonly needsSyncPointerLockGesture = detectPointerLockNeedsSyncGesture();
+  // Asks for raw (unadjusted) mouse input where the engine can give it, the
+  // main defense against sudden camera jumps on high polling-rate mice; Gecko
+  // stays on the plain synchronous request (see pointer_lock_request.ts).
+  private readonly pointerLockRequester = new RawPointerLockRequester(
+    !this.needsSyncPointerLockGesture,
+  );
+  // Discards the bogus single-event deltas a locked pointer can report: the
+  // first one after the lock engages, and a lone spike that the next calm
+  // event shows was not real motion.
+  private readonly lookDeltaGuard = new LookDeltaGuard();
   private downX = 0;
   private downY = 0;
   private downAt = 0;
@@ -371,6 +395,11 @@ export class Input {
         this.releaseCapture('pointerlock');
         return;
       }
+      // The lock just engaged. The browser warps the OS cursor as it lands and
+      // that can surface as one large movement delta; never let it turn the
+      // camera. (Unlock needs no skip: releaseCapture above clears the drag
+      // buttons, so no move reaches the camera until the next fresh press.)
+      this.lookDeltaGuard.skipNextDelta();
       // A fast click can beat the async requestPointerLock() grant: the
       // mousedown-synchronous request above (Firefox) or the drag-threshold
       // request (Chromium) can resolve AFTER mouseup already ran, so nothing
@@ -486,7 +515,7 @@ export class Input {
   /** Move the camera in/out, clamped to the zoom limits. */
   zoomBy(delta: number): void {
     if (this.cb.isCameraMotionLocked?.()) return;
-    const next = Math.min(22, Math.max(3, this.camDist + delta));
+    const next = Math.min(this.zoomMax, Math.max(3, this.camDist + delta));
     if (next === this.camDist) return;
     this.camDist = next;
     this.onCameraDistChange?.(next);
@@ -569,6 +598,11 @@ export class Input {
     if (!on && document.pointerLockElement === this.canvas) {
       document.exitPointerLock?.();
     }
+  }
+
+  /** The "Raw Mouse Input" setting; takes effect on the next lock request. */
+  setRawMouseInput(on: boolean): void {
+    this.pointerLockRequester.setRawEnabled(on);
   }
 
   setMouseCameraEnabled(on: boolean): void {
@@ -756,7 +790,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT * this.touchLookSpeed;
     this.camYaw -= dx * dragSens;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch + this.touchPitchSign * dy * dragSens,
       this.cb.isGliderActive?.() === true,
     );
@@ -804,10 +838,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (yawDelta === 0 && pitchDelta === 0) return;
     this.camYaw += yawDelta;
-    this.camPitch = clampGliderCameraPitch(
-      this.camPitch + pitchDelta,
-      this.cb.isGliderActive?.() === true,
-    );
+    this.camPitch = clampCamPitch(this.camPitch + pitchDelta, this.cb.isGliderActive?.() === true);
     this.swimAimPitch = this.camPitch;
     this.noteIntent('look');
   }
@@ -824,7 +855,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (!this.touchLookActive) return;
     this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch +
         this.touchPitchSign *
           this.touchLookVector.y *
@@ -871,8 +902,10 @@ export class Input {
     entityId: number | null = null,
     path: { x: number; z: number }[] = [target],
     attack = false,
+    forced = false,
   ): void {
     this.applyClickMovePath(target, path);
+    this.clickMoveForced = forced;
     this.clickMoveStop = stopDistance;
     this.clickMoveEntityId = entityId;
     this.clickMoveAttack = attack;
@@ -912,6 +945,7 @@ export class Input {
     this.clickMoveEntityId = null;
     this.clickMoveFacing = null;
     this.clickMoveAttack = false;
+    this.clickMoveForced = false;
     this.noteIntent('move');
   }
 
@@ -994,7 +1028,17 @@ export class Input {
     )
       return;
     this.pointerLockRequestedForDrag = true;
-    this.canvas.requestPointerLock?.();
+    this.requestDragPointerLock();
+  }
+
+  private requestDragPointerLock(): void {
+    // When raw input turns out to be unsupported, re-arm the one-request-per-
+    // drag flag so the next move of this same drag asks for a plain lock. A
+    // rejection that lands after a newer press leaves that press alone.
+    const press = this.downAt;
+    this.pointerLockRequester.request(this.canvas, () => {
+      if (this.downAt === press) this.pointerLockRequestedForDrag = false;
+    });
   }
 
   private activateCameraDrag(): void {
@@ -1373,6 +1417,9 @@ export class Input {
     // click-pick may start under it (a grab that misses a frame would otherwise
     // spin the camera or retarget). Presses already in flight are unaffected.
     if (this.cb.isCameraLocked?.()) return;
+    // A second button joining a drag already in flight (left+right run-and-steer)
+    // keeps the look guard's recent motion and any pending post-lock skip.
+    if (!this.leftDown && !this.rightDown) this.lookDeltaGuard.reset();
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
     if (e.button === 0 || e.button === 2) e.preventDefault?.();
@@ -1409,7 +1456,7 @@ export class Input {
       })
     ) {
       this.pointerLockRequestedForDrag = true;
-      void this.canvas.requestPointerLock?.()?.catch?.(() => {});
+      this.requestDragPointerLock();
     }
     this.updateCursor();
   }
@@ -1619,16 +1666,21 @@ export class Input {
     // Normalize the raw movement delta to Chromium's physical-pixel unit so
     // mouselook keeps the same speed and drag-start feel on Firefox, where the
     // deltas arrive in CSS pixels (#1834). A no-op on Chromium/WebKit.
-    const { dx: mx, dy: my } = normalizePointerLookDelta({
+    const raw = normalizePointerLookDelta({
       movementX: e.movementX ?? 0,
       movementY: e.movementY ?? 0,
       isGecko: this.isGeckoEngine,
       devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     });
-    if (mx === 0 && my === 0) {
+    if (raw.dx === 0 && raw.dy === 0) {
       if (this.cameraDragActive) this.maybeEngageDragPointerLock();
       return;
     }
+    // Drops the cursor-warp delta right after the lock lands and isolated
+    // spikes; a suspect it held and the next event confirmed comes back summed.
+    const look = this.lookDeltaGuard.filter(raw.dx, raw.dy, e.timeStamp);
+    if (!look) return;
+    const { dx: mx, dy: my } = look;
     const heldMs = this.pressDurationMs();
     if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
       return;
@@ -1645,7 +1697,7 @@ export class Input {
     // player kept holding a drag button.
     this.maybeEngageDragPointerLock();
     this.camYaw -= mx * this.lookSensitivity;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch + my * this.lookSensitivity * this.lookPitchSign,
       this.cb.isGliderActive?.() === true,
     );
@@ -1756,7 +1808,9 @@ export class Input {
         surface: false,
       };
     }
-    if (this.controllerMoveInput) return { ...this.controllerMoveInput };
+    if (this.controllerMoveInput) {
+      return applyLanceLean({ ...this.controllerMoveInput }, lanceLeanIntent);
+    }
     const held = (id: string) => this.heldAction(id);
     const bothButtons = this.leftDown && this.rightDown;
     const forward =
@@ -1779,7 +1833,7 @@ export class Input {
     // while swimming, so aiming the camera around on land is inert. See
     // SWIM_LOOK_* for the bands and swimSteer for the graded rate.
     const flying = this.cb?.isGliderActive?.() === true;
-    this.camPitch = clampGliderCameraPitch(this.camPitch, flying);
+    this.camPitch = clampCamPitch(this.camPitch, flying);
     const { dive, surface, swimSteer } = flying
       ? { dive: this.heldAction('dive') || this.touchDive, surface: false, swimSteer: 0 }
       : this.readSwimSteer(this.anyMoveHeld());
@@ -1795,7 +1849,39 @@ export class Input {
           );
 
     if (this.mouseCameraEnabled) {
-      return {
+      return applyLanceLean(
+        {
+          forward,
+          back,
+          jump,
+          dive,
+          surface,
+          swimSteer,
+          gliderPitch,
+          turnLeft: false,
+          turnRight: false,
+          strafeLeft:
+            held('strafeLeft') ||
+            held('turnLeft') ||
+            this.touchMove.strafeLeft ||
+            this.gamepadMove.strafeLeft,
+          strafeRight:
+            held('strafeRight') ||
+            held('turnRight') ||
+            this.touchMove.strafeRight ||
+            this.gamepadMove.strafeRight,
+        },
+        lanceLeanIntent,
+      );
+    }
+
+    const mouselook = this.isMouselookActive();
+    const aHeld = held('turnLeft');
+    const dHeld = held('turnRight');
+    // A couched Shardpike turns the left/right keys (and the on-screen lean keycaps) into
+    // its balance stick (lance_lean_intent.ts); a no-op outside a brace.
+    return applyLanceLean(
+      {
         forward,
         back,
         jump,
@@ -1803,44 +1889,20 @@ export class Input {
         surface,
         swimSteer,
         gliderPitch,
-        turnLeft: false,
-        turnRight: false,
         strafeLeft:
           held('strafeLeft') ||
-          held('turnLeft') ||
+          (mouselook && aHeld) ||
           this.touchMove.strafeLeft ||
           this.gamepadMove.strafeLeft,
         strafeRight:
           held('strafeRight') ||
-          held('turnRight') ||
+          (mouselook && dHeld) ||
           this.touchMove.strafeRight ||
           this.gamepadMove.strafeRight,
-      };
-    }
-
-    const mouselook = this.isMouselookActive();
-    const aHeld = held('turnLeft');
-    const dHeld = held('turnRight');
-    return {
-      forward,
-      back,
-      jump,
-      dive,
-      surface,
-      swimSteer,
-      gliderPitch,
-      strafeLeft:
-        held('strafeLeft') ||
-        (mouselook && aHeld) ||
-        this.touchMove.strafeLeft ||
-        this.gamepadMove.strafeLeft,
-      strafeRight:
-        held('strafeRight') ||
-        (mouselook && dHeld) ||
-        this.touchMove.strafeRight ||
-        this.gamepadMove.strafeRight,
-      turnLeft: !mouselook && aHeld,
-      turnRight: !mouselook && dHeld,
-    };
+        turnLeft: !mouselook && aHeld,
+        turnRight: !mouselook && dHeld,
+      },
+      lanceLeanIntent,
+    );
   }
 }

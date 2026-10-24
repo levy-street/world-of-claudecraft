@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Kotlina Divokého srdce',
-    desc: 'Příznačné zbraně od Zulgara a od Tesákopána, krotitele zvěře.',
+    desc: 'Typické zbraně od Tesákopána, krotitele zvěře, Hltokvětu a Zulgara.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Hrdinská: Kotlina Divokého srdce',
-    desc: 'Epické předměty dostupné jen hrdinsky od Zulgara, hlasu Kotliny.',
+    desc: 'Epické předměty a talismany pouze z hrdinské obtížnosti od Tesákopána, krotitele zvěře, Hltokvětu a Zulgara, hlasu Kotliny.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, probouzející se štít',
     desc: 'Osobní epická kořist od světového bosse Probouzejícího se štítu.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Pohřbený Předák',
+    desc: 'Kořist vyrvaná zpět z mohyl Mirefenu.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Zhroucený relikviář',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galerie Válčení',
-    desc: 'Pět bojových sad Válčení první sezóny, nyní prodávaných kus po kuse za zlato.',
+    desc: 'Pět bojových sad Válčení, získaných kus po kuse za čest.',
   },
   conquerors_warfare_armory: {
     name: 'Zbrojnice Válčení',
-    desc: 'Šperky a zbraně Válčení, první sezóna za zlato a dvě cetky za čest.',
+    desc: 'Šperky, zbraně a zboží Válčení koupené za tvrdě vydobytou čest.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galerie Předvoje',

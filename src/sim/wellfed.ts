@@ -32,9 +32,9 @@
 // by reference off FoodItemDef.wellFed at sit-down by the src/sim/consuming.ts
 // builder), so the shared draw stream is untouched and no catalog lookup
 // happens here.
-// The minted aura is TRANSIENT across save/load: no persistence path
-// serializes entity auras (serializeCharacter carries no auras key), so a
-// relog drops the buff, matching every other temporary aura.
+// The minted aura PERSISTS across save/load with its remaining time frozen
+// while offline (src/sim/aura_persist.ts lists WELL_FED_AURA_ID for every
+// food that carries a wellFed payload), so a relog keeps the buff.
 
 import type { SimContext } from './sim_context';
 import type { Entity, TimedStatBuffPayload } from './types';

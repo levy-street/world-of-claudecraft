@@ -1,10 +1,7 @@
 import { DRUID_FORM_ENTRY } from '../../../sim/combat/druid_form_entry';
 import { NATURES_BOON_ABILITIES } from '../../../sim/combat/druid_natures_boon';
 import { abilityBelongsToForm, hasFormRequirement } from '../../../sim/combat/form_requirement';
-import {
-  classTalentChoiceAbilityGroups,
-  type TalentAllocation,
-} from '../../../sim/content/talents';
+import { classTalentChoiceAbilityGroups } from '../../../sim/content/talents';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
 import {
@@ -16,6 +13,7 @@ import {
 } from '../../../world_api/action_bar';
 import { knownItemDef } from '../../known_item';
 import { isStanceBarAbilityGroup } from '../../stance_bar_view';
+import { isActionBarItem } from './action_bar_item_core';
 import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 import {
   actionBarFormSeededKey,
@@ -27,14 +25,11 @@ import {
 } from './action_bar_layout_sync';
 import {
   actionForAttackSlot,
-  applyLoadoutBar,
   attackSlotStorageKey,
   buildDefaultFormBar,
   clearHotbarSlot,
   type HotbarAction,
   isAbilityActionBarEligible,
-  loadoutGrantedAbilityIds,
-  loadoutKnownAbilityIds,
   parseHotbarActions,
   placeAbilityOnSlot,
   classHasFormBars as playerClassHasFormBars,
@@ -51,7 +46,7 @@ import {
   ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from './owned_class_spec_defaults';
-import { isUsableTrinketId } from './trinket_slot_core';
+import { isPetSlotCommand } from './pet_slot_core';
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
@@ -79,11 +74,6 @@ export interface ActionBarControllerDeps {
   playerName: string;
   playerLevel(): number;
   talentSpec(): string | null;
-  // The live talent allocation (IWorld `talents`): what the active spec and its
-  // choice rows GRANT, read when a per-spec bar is first seeded so the spec's
-  // own spells land on it. Required on purpose: the heal only reaches players
-  // through the HUD supplying it, and a required dep makes tsc pin that wiring.
-  talentAllocation(): TalentAllocation;
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
   showAttackButton(): boolean;
@@ -127,10 +117,6 @@ export class ActionBarController {
   private talentSpecAtLastSync: string | null | undefined;
   private playerLevelAtLastSync: number | null = null;
   private pendingLoadoutKnownAbilityIds: Set<string> | null = null;
-  // True from a load that seeded the active spec's bar from the unsuffixed
-  // (pre-spec) key until the next sync consumes it: that copy is another
-  // context's arrangement and has never held this spec's own granted spells.
-  private specBarSeededFromLegacy = false;
   private attackActionState: HotbarAction = null;
   // Suppresses the persistence seam while the controller is loading/seeding from
   // storage: only user-driven changes after init should upload. Flipped true at
@@ -308,52 +294,19 @@ export class ActionBarController {
     this.unsavedChanges = true;
   }
 
-  /** Install a saved build's bar. `targetKnownAbilityIds` is the build's own
-   *  ability set (it may not have landed in the live known list yet), and every
-   *  id in it counts as already synced so the next sync does not dump the
-   *  build's spells onto the first empty slots; the saved bar owns placement.
-   *  The one exception is `grantedAbilityIds` (what the build itself grants):
-   *  a granted spell the bar LACKS is left unsynced, so the next sync
-   *  auto-places it. A build saved while its spec's bar was still a legacy
-   *  copy (see specBarSeededFromLegacy) recorded no granted spell at all, and
-   *  they vanished on every switch back to it; this repairs such builds in
-   *  place. The stated price: a granted spell a player took OFF a build's bar
-   *  returns on the next apply (pinned in tests/action_bar_controller.test.ts).
-   *  Base spells taken off a build's bar stay off. */
   replaceActionsForLoadout(
     actions: HotbarAction[],
     targetKnownAbilityIds: ReadonlySet<string>,
-    grantedAbilityIds: ReadonlySet<string> = new Set(),
   ): void {
     if (this.isSpectating()) return;
     this.activeSpecState = this.deps.talentSpec();
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
     this.pendingLoadoutKnownAbilityIds = new Set(targetKnownAbilityIds);
-    const synced = new Set([...this.deps.knownAbilityIds(), ...targetKnownAbilityIds]);
-    for (const id of grantedAbilityIds) {
-      if (!this.actionState.some((action) => action?.type === 'ability' && action.id === id)) {
-        synced.delete(id);
-      }
-    }
-    this.knownAbilityIdsAtLastSync = synced;
-  }
-
-  /** Apply a saved build's bar for its allocation (formerly Hud.applyLoadoutBar).
-   *  Only ids the TARGET allocation grants land, resolved from `alloc` rather
-   *  than the live known list: two builds on one class can grant disjoint sets,
-   *  and the server round trip of the switch has not necessarily landed yet. A
-   *  SavedLoadout carries ability ids only, so an item shortcut in a slot the
-   *  build leaves blank is kept (#1889). The caller saves. */
-  applyLoadout(bar: readonly (string | null)[], alloc: TalentAllocation): void {
-    const cls = this.deps.playerClass;
-    const level = this.deps.playerLevel();
-    const known = loadoutKnownAbilityIds(cls, alloc, level);
-    this.replaceActionsForLoadout(
-      applyLoadoutBar(this.actionState, bar, ACTION_BAR_ABILITY_SLOTS, (id) => known.has(id)),
-      known,
-      loadoutGrantedAbilityIds(cls, alloc, level),
-    );
+    this.knownAbilityIdsAtLastSync = new Set([
+      ...this.deps.knownAbilityIds(),
+      ...targetKnownAbilityIds,
+    ]);
   }
 
   get attackAction(): HotbarAction {
@@ -411,10 +364,6 @@ export class ActionBarController {
 
   syncKnownAbilities(): void {
     if (this.isSpectating()) return;
-    // Consumed here whichever branch runs below (an owned-class reseed returns
-    // early and replaces the whole bar, so the flag must not survive it).
-    const seededFromLegacy = this.specBarSeededFromLegacy;
-    this.specBarSeededFromLegacy = false;
     const liveKnownAbilityIds = [...this.deps.knownAbilityIds()];
     if (
       this.pendingLoadoutKnownAbilityIds &&
@@ -456,14 +405,6 @@ export class ActionBarController {
         );
       if (!this.loadedFromStorage || loadedWarlockBarNeedsOverhaulRepair) {
         for (const id of knownAbilityIds) consider(id);
-      } else if (seededFromLegacy) {
-        // A per-spec bar just seeded from the unsuffixed key is a copy of
-        // another context's arrangement, and reads as "stored" above, so the
-        // spec's OWN spells (its signature, its choice-row grants) would never
-        // auto-place: the reported "spec spells missing" after a spec switch.
-        // Place exactly those, once; every other spell stays as the copy had
-        // it (a base spell taken off the bar stays off).
-        for (const id of this.activeGrantedAbilityIds()) consider(id);
       }
     } else {
       for (const id of knownAbilityIds) {
@@ -489,15 +430,6 @@ export class ActionBarController {
 
   private isSpectating(): boolean {
     return this.deps.spectating?.() === true;
-  }
-
-  /** What the live allocation grants (its signature plus its choice rows). */
-  private activeGrantedAbilityIds(): ReadonlySet<string> {
-    return loadoutGrantedAbilityIds(
-      this.deps.playerClass,
-      this.deps.talentAllocation(),
-      this.deps.playerLevel(),
-    );
   }
 
   private trySeedOwnedSpecDefault(
@@ -604,37 +536,7 @@ export class ActionBarController {
   }
 
   isHotbarItemId(itemId: string): boolean {
-    // Gathering implements (#2343): the simple pole (use.type 'fishing') and
-    // every gatherTool (picks, axes, sickles, tiered rods) are placeable, so
-    // a keybound press works the tool exactly like the bags click.
-    // Reins: the mounts-as-items pivot routes kind 'mount' through the same
-    // useItem dispatch a potion rides (src/sim/items.ts -> summonMountItem), so
-    // reins are placeable for the same reason a potion is. Without this arm the
-    // bag drag never writes a hotbar payload and the bar cannot accept them.
-    // Recipe patterns (kind 'recipe') ride that same dispatch but are DELIBERATELY
-    // not placeable (elixirs, scrolls since phase 06, and flasks since phase 10
-    // are the precedent that riding useItem does not imply a slot, though their
-    // reason differs): a pattern is a one-shot unlock consumed on its first
-    // successful use, so a hotbar slot would hold a dead button from the first
-    // press on; the bags are its home. Scrolls and flasks live on the mobile
-    // consumable tray instead.
-    // Elixirs: same useItem dispatch (kind 'elixir' -> applyAura), usable in
-    // combat with no shared potion cooldown, so they are placeable exactly
-    // like a potion; the view paints no cooldown swipe on their slot.
-    // Trinkets with a use effect: pressed through the same useItem, which uses
-    // the WORN copy (the slot state reads the equipment, trinket_slot_core.ts).
-    const item = ITEMS[itemId];
-    return (
-      isUsableTrinketId(itemId) ||
-      item?.kind === 'food' ||
-      item?.kind === 'drink' ||
-      item?.kind === 'potion' ||
-      item?.kind === 'elixir' ||
-      item?.kind === 'mount' ||
-      item?.use?.type === 'fishing' ||
-      item?.use?.type === 'gatherTool' ||
-      item?.use?.type === 'harvestPreference'
-    );
+    return isActionBarItem(knownItemDef(ITEMS, itemId));
   }
 
   /**
@@ -652,6 +554,7 @@ export class ActionBarController {
 
   isAssignableAction(action: Exclude<HotbarAction, null>): boolean {
     if (action.type === 'item') return this.isHotbarItemId(action.id);
+    if (action.type === 'pet') return isPetSlotCommand(action.id);
     return (
       this.deps.knownAbilityIds().includes(action.id) && this.isAbilityPlacementAllowed(action.id)
     );
@@ -850,7 +753,6 @@ export class ActionBarController {
 
   private loadActions(): void {
     const currentKey = this.slotMapKey();
-    this.specBarSeededFromLegacy = false;
     let raw: unknown = null;
     let stored = false;
     let storedRaw: string | null = null;
@@ -870,7 +772,6 @@ export class ActionBarController {
           storedRaw = legacyRaw;
           raw = parsedLegacy;
           stored = true;
-          this.specBarSeededFromLegacy = true;
           this.deps.storage.setItem(currentKey, legacyRaw);
         }
       } catch {

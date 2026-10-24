@@ -11,6 +11,8 @@ import type { TreasureMapRarity } from '../content/treasure_maps';
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
 import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, PlayerClass, RiftTier } from '../types';
+import type { HoardAddCastState } from './hoard_add_casts';
+import type { HoardLightningStrikeState } from './hoard_lightning_strike';
 import type { HoardReward } from './hoard_reward_roll';
 import type { VaultZoneId } from './vault_seed';
 
@@ -338,14 +340,12 @@ export interface RiftInstance {
    * lingers after the kill never double-pays. */
   rewarded: boolean;
   /** Set when the run is a treasure vault (src/sim/treasure_vault.ts): the map's
-   *  rarity, its owner, and its fixed suggested party size. Null on
+   *  rarity, its owner, and the head count the mobs were scaled for. Null on
    *  every ordinary rift. */
   vault: {
     rarity: TreasureMapRarity;
     /** Stable consumed-map attempt identity, absent on dev portals. */
     attemptId?: string;
-    expiresAtMs?: number;
-    bossKilledAtMs?: number;
     ownerPid: number;
     /** Stable identity used to rebind the owner after a reconnect. */
     ownerCharacterId?: number;
@@ -383,8 +383,8 @@ export interface RiftInstance {
   /** Runtime-only Buried Hoard boss kit. Ordinary Rifts never create it. */
   hoardBoss?: HoardBossState;
   /** Runtime-only Storm Caller Lightning Strikes (hoard_lightning_strike.ts). */
-  hoardStrikes?: import('./hoard_lightning_strike').HoardLightningStrikeState;
-  hoardAddCasts?: import('./hoard_add_casts').HoardAddCastState;
+  hoardStrikes?: HoardLightningStrikeState;
+  hoardAddCasts?: HoardAddCastState;
   /** Runtime-only Coinsack Scurrier, when the room rolled one (hoard_goblin.ts). */
   hoardGoblin?: HoardGoblinState;
 }

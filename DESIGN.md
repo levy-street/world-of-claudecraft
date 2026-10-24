@@ -688,16 +688,18 @@ the click-pick router remains `src/game/interactions.ts`.
 ### 7.13 World-space UI: nameplates and markers
 
 Nameplates stay renderer-owned positioned DOM (`src/render/nameplate_view.ts` +
-`nameplate_painter.ts`) with their documented colors-as-literals exception and their
-declutter pass (`nameplate_declutter.ts`). Restyle within those constraints:
+`nameplate_painter.ts`) with their documented colors-as-literals exception. Plates draw at
+their own projected anchors and are never stacked apart; NPC plates show only up close
+(`NPC_NAMEPLATE_RANGE`) and carry just the name, role line and quest marker. Restyle within
+those constraints:
 
 - Names in 13 / 15 Cinzel with the four-way black outline; no panel background on standard
   friendly plates; health bars stay thin (about 76 x 6) with the one-pixel keyline.
 - Reaction colors, threat tint, quest `!` and `?` markers, raid marks, combo pips, cast
   bars, guild tags, and badges all keep their slots; the current target's plate is always
-  visible and slightly larger, coordinated with the selection ring in the world.
-- A new declutter priority policy remains future Echoes work (section 15). The coordinated
-  interface delivery does not change which plates shed.
+  visible and slightly larger, coordinated with the selection ring in the world. NPC plates
+  are the exception: name, role line and quest marker only, inside `NPC_NAMEPLATE_RANGE`,
+  targeted or not.
 - The update cadence stays on the static tier knob (`nameplateIntervalSec` in
   `src/game/ui_tier_knobs.ts`), never the FPS governor.
 
@@ -1116,9 +1118,9 @@ rollback clarity:
 5. Mobile HUD surfaces and shared mobile chrome.
 6. Controller HUD and controller cross hotbar.
 
-Echoes remains future work after that coordinated delivery: nameplate declutter priority,
-the guide and editor token mirrors, and the broader mobile layout program. The font
-self-hosting plan in section 5.2 is also future work, outside this delivery.
+Echoes remains future work after that coordinated delivery: the guide and editor token
+mirrors, and the broader mobile layout program. The font self-hosting plan in section 5.2
+is also future work, outside this delivery.
 
 ## 16. Acceptance criteria
 
@@ -1165,7 +1167,7 @@ only; behavior changes are named in the linked section.
 | Web store promo banner (`store_promo_card.ts`) | Out of scope; unchanged (7.7) | Out of scope |
 | `#chatlog-wrap` (tabs, log, `#chat-input`) | Restyle; new idle/focus state (7.10) | Coordinated PR |
 | Interaction prompt | New static root and HOT painter (7.12) | Coordinated PR |
-| `#nameplates` layer | Type restyle within renderer constraints; declutter priority remains future (7.13) | Coordinated PR, then Echoes |
+| `#nameplates` layer | Type restyle within renderer constraints (7.13) | Coordinated PR |
 | FCT pool (`.fct`) | Type restyle only (7.14) | Coordinated PR |
 | `#banner`, `#quest-banner`, `#subzone-banner`, `#error-msg`, `#prompt-stack` | Restyle (7.14) | Coordinated PR |
 | `#low-health-vignette`, `#death-overlay`, `#ghost-prompt` | Restyle; flows unchanged | Coordinated PR |
@@ -1178,4 +1180,5 @@ only; behavior changes are named in the linked section.
 | `#arena-status`, spectate badge, reconnect overlay, tutorial cards | Restyle | Coordinated PR |
 | Discord surfaces (`#mm-discord` panel behavior, `#discord-window`, index-only CTA) | Keep the existing micro-menu behavior and restyle the window in place | Coordinated PR |
 | `#perf-overlay`, `#click-move-marker`, skip links, live regions | Unchanged | n/a |
+| `#graphics-restore-note` (transient status line over the held 3D view after a WebGL context restore) | New, composes `ui-pill` | This PR |
 | Mobile touch controls and sheets | Restyle the mobile HUD in the coordinated PR; broader mobile layout remains future Echoes work | Coordinated PR, then Echoes |

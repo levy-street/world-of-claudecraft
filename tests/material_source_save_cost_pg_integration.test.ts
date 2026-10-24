@@ -48,6 +48,7 @@ import {
 import { ITEMS } from '../src/sim/data';
 import { materialItemIds } from '../src/sim/material_ids';
 import type { MaterialComposition } from '../src/sim/material_sources';
+import { VAULT_UPGRADE_RUNGS, vaultCapacityPerMaterial } from '../src/sim/materials_vault';
 import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 
 const url = process.env.TEST_DATABASE_URL ?? '';
@@ -65,6 +66,7 @@ const WIDEST_STACK = MATERIAL_IDS.reduce(
 const BANK_SLOTS = BANK_BASE_SLOTS + BANK_PURCHASED_SLOTS_MAX + BANK_MAX_BONUS_SLOTS;
 const BAG_SLOTS = 16 + 4 * 24;
 const FULL_BANK_SLOTS = BANK_SLOTS + BANK_BAG_SOCKETS * 24;
+const VAULT_ITEM_CEILING = vaultCapacityPerMaterial({ upgrades: VAULT_UPGRADE_RUNGS });
 const MAX_NAME = 'W'.repeat(MAX_CRAFTED_BY_LENGTH);
 
 /** One bucket per unit at the real INT id bound. The ONLINE shape (a gatherer,
@@ -98,10 +100,10 @@ function maximalState(): Record<string, unknown> {
       stock: {},
       special: MATERIAL_IDS.map((id, index) => ({
         itemId: id,
-        count: 200,
-        materialSources: maxComposition(200),
+        count: VAULT_ITEM_CEILING,
+        materialSources: maxComposition(VAULT_ITEM_CEILING),
       })),
-      upgrades: 0,
+      upgrades: VAULT_UPGRADE_RUNGS,
     },
   };
 }
@@ -263,6 +265,7 @@ d('material source save cost against real PostgreSQL', () => {
       bankSlotsWithSockets: FULL_BANK_SLOTS,
       bagSlots: BAG_SLOTS,
       vaultSpecialRows: MATERIAL_IDS.length,
+      vaultUnitsPerMaterial: VAULT_ITEM_CEILING,
       unitsPerSlot: WIDEST_STACK,
       storedBytes: stored,
       textBytes: text,

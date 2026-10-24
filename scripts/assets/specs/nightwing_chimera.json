@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/nightwing_chimera.glb",
+      "out": "models/mounts/nightwing_chimera.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Idle_Look", "Walk", "Run", "WalkBackward", "Jump", "Land", "Death"],
+      "maxTex": 1024,
+      "keepExtras": true
+    }
+  ]
+}

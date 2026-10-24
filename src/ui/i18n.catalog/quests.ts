@@ -64,6 +64,12 @@ const questStringsEn = {
       clueTalkAria: 'Ask about the clue: {name}',
       clueDeliver: 'Hand over {count} {item}.',
       clueDeliverAria: 'Hand over {count} {item} to {name}',
+      // A faction quartermaster's Allied Hearthstone row
+      // (hearthstone_attune_row_core.ts): binds the stone to this hub. The
+      // label stays short so it fits a phone-width dialog; the aria label
+      // names the hub ({hub} is the localized hudChrome.factionRewards.hub_*).
+      attuneHearthstone: 'Attune my Allied Hearthstone here.',
+      attuneHearthstoneAria: 'Attune your Allied Hearthstone to {hub} with {name}',
       // The profession masters' locked-quest hint row. Deliberately terse:
       // both {placeholders} resolve to already
       // localized leaves (the giver NPC's name, the intro quest's title), and
@@ -95,6 +101,10 @@ const questStringsEn = {
       rewards: 'Rewards',
       xpReward: '{xp} experience',
       itemReward: 'Item reward:',
+      // Choose-one quest rewards: the turn-in heading, and the preview heading
+      // on the accept step and in the quest log.
+      chooseReward: 'Choose your reward:',
+      rewardChoices: 'You will be able to choose one of these rewards:',
       objectiveProgress: '{label}: {current}/{total}',
       requiresLevel: 'Requires Level {level}',
     },
@@ -112,6 +122,7 @@ const questStringsEn = {
       activeStatus: 'Active world quest',
       expiresIn: 'Expires in {time}',
       mineOre: 'Mine copper ore',
+      mineMaterial: 'Mine {name}',
       recoverObject: 'Recover {name}',
       redirectLeyBeam: 'Redirect the ley beam',
       matchConfections: 'Match enchanted confections',
@@ -469,6 +480,9 @@ const questStringsEn = {
       treasureMapEarned: 'Every world quest of the day is done: you found a {map}.',
       treasureMapLost:
         'Every world quest of the day is done, but your bags have no room for the treasure map.',
+      // A world quest reward item the bags could not hold, posted instead
+      // (src/sim/world_quest_reward_mail.ts). {items} is a list of item names.
+      worldQuestRewardMailed: 'Your bags are full. Your reward was sent to your mailbox: {items}.',
       treasureMapRead: 'You study the {map}. The X lies somewhere in {zone}.',
       treasureMapUpgraded: 'The map is redrawn in finer ink: it is now a {map}.',
       treasureVaultOpened: 'The ground gives way. A buried hoard lies open before you.',
@@ -488,6 +502,7 @@ const questStringsEn = {
       incomplete: 'That quest is not complete.',
       giverMissing: 'That quest giver is not nearby.',
       turnInMissing: 'That quest turn-in is not nearby.',
+      rewardNotOffered: 'That reward is not offered.',
       tooFar: 'Too far away.',
       escortAway: 'Your escort is not at their post right now. They will return there shortly.',
     },

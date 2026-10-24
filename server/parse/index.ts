@@ -79,10 +79,7 @@ export function createParseSubsystem(opts: ParseSubsystemOptions): ParseSubsyste
   let census: CensusExporter | null = null;
   if (flags.censusEnabled) {
     census = new CensusExporter(
-      (snapshotDate) =>
-        loadCensusRows(opts.realm, snapshotDate, () => {
-          counters.censusBatchRetries++;
-        }),
+      (snapshotDate) => loadCensusRows(opts.realm, snapshotDate),
       shipper,
       counters,
       flags.censusUtcHour,

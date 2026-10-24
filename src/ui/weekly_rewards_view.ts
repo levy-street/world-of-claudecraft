@@ -1,5 +1,6 @@
 import type { PlayerClass } from '../sim/types';
-import { weeklyRewardTableOptions } from '../sim/weekly_reward_options';
+import { weeklyRewardAvailability } from '../sim/weekly_reward_availability';
+import { WEEKLY_BOSS_TABLES, type WeeklyBossUnlocks } from '../sim/weekly_reward_tables';
 import {
   earnedWeeklyRolls,
   WEEKLY_POOL_IDS,
@@ -18,20 +19,34 @@ export function weeklyCountdown(resetAtMs: number, nowMs: number): string {
     seconds: n(total % 60),
   });
 }
-export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: PlayerClass) {
+/** Heroic unlocks include Normal; used only for the read-only loot catalog. */
+const EVERY_WEEKLY_BOSS_UNLOCK: WeeklyBossUnlocks = Object.freeze(
+  Object.fromEntries(WEEKLY_BOSS_TABLES.map(({ bossId }) => [bossId, 2])),
+);
+
+export type WeeklyLootCatalog = 'eligible' | 'all';
+
+export function buildWeeklyRewardsView(
+  info: WeeklyRewardInfo,
+  playerClass: PlayerClass,
+  options: { catalog?: WeeklyLootCatalog } = {},
+) {
+  const catalog = options.catalog ?? 'eligible';
+  const bossUnlocks = catalog === 'all' ? EVERY_WEEKLY_BOSS_UNLOCK : info.state.bossUnlocks;
   const earned = earnedWeeklyRolls(info.state);
   const progress = [
-    info.state.raidClears.length,
+    info.state.raids.filter(Boolean).length,
     info.state.dungeons.length,
     info.state.world,
     info.state.pvp,
   ];
   const tiers = {
-    raid: info.state.raidClears,
+    raid: info.state.raids.filter(Boolean).sort((a, b) => b - a),
     dungeon: info.state.dungeons,
   };
   return (['raid', 'dungeon', 'world', 'pvp'] as const).map((category, index) => ({
     category,
+    catalog,
     progress: progress[index],
     thresholds: WEEKLY_THRESHOLDS[category],
     available: category !== 'world' || info.worldQuestsAvailable,
@@ -49,22 +64,25 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
     }),
     pools: WEEKLY_POOL_IDS.flatMap((pool, poolIndex) => {
       if (pool !== category && pool !== `${category}_heroic`) return [];
-      const tables = weeklyRewardTableOptions(
+      const availability = weeklyRewardAvailability(
         {
           resetAtMs: 0,
           choices: [],
-          bossUnlocks: info.state.weeklyBossUnlocks ?? info.state.bossUnlocks,
+          bossUnlocks,
           raidUnlocks: info.state.raidUnlocks,
         },
         { pool },
         playerClass,
         info.playerLevel,
+        info.state.lootSpec,
       );
+      const tables = availability.tables;
       const items = [...new Set(tables.flatMap((table) => table.items))].sort();
       return [
         {
           pool,
           tables,
+          emptyReason: availability.reason,
           items,
           earned: earned[poolIndex],
         },

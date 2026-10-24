@@ -10,7 +10,7 @@ import {
   skinnableWeaponTypesFor,
 } from '../sim/content/weapon_skin_rules';
 import {
-  WEAPON_SKIN_LIST,
+  STORE_WEAPON_SKIN_LIST,
   WEAPON_SKIN_RARITY_ORDER,
   type WeaponSkinCollection,
   type WeaponSkinDef,
@@ -93,7 +93,7 @@ export function buildArmorySections(
     skinnableWeaponTypesFor(ctx.cls, ctx.mainhandItemId, ctx.skinCatalog, ctx.offhandItemId),
   );
   const sections = new Map<string, ArmorySection>();
-  for (const skin of WEAPON_SKIN_LIST) {
+  for (const skin of STORE_WEAPON_SKIN_LIST) {
     const service = serviceRows.get(skin.id);
     const owned = (service?.owned ?? false) || ctx.cosmetics.weaponSkinIds.includes(skin.id);
     const costClaudium =

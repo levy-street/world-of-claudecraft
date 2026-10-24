@@ -473,7 +473,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r5_tactical_retreat',
           name: 'Tactical Retreat',
-          description: 'Trailbreak stores 2 uses and removes roots and movement slows when used.',
+          description: 'Trailbreak stores 2 uses.',
           icon: 'trailbreak',
           effect: { ability: [{ ability: 'trailbreak', bonusCharges: 1 }] },
         },
@@ -529,17 +529,17 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
+          // Renamed from Beastguard in the Fieldcraft rework; the id is frozen.
           id: 'hun_r8_beastguard',
-          name: 'Beastguard',
+          name: 'Lonely Soul',
           description:
-            'Redirect 15% of damage to a living pet without reducing it below 20% health. Without one, take 8% less damage below 50% health.',
+            'Redirect 30% of damage taken to a living pet without reducing it below 20% health. Without a living pet, deal 10% more damage.',
           icon: 'concussive_shot',
           effect: {
-            global: { petDmgSharePct: 0.15 },
+            global: { petDmgSharePct: 0.3 },
             runtime: {
               petHealthFloorPct: 0.2,
-              fallbackDamageReductionPct: 0.08,
-              healthThresholdPct: 0.5,
+              noPetDamagePct: 0.1,
             },
           },
         },
@@ -553,7 +553,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r11_double_hush',
           name: 'Double Hush',
-          description: 'Hushing Shot stores 2 uses, each with a 24 sec recharge.',
+          description: 'Hushing Shot stores 2 uses, each recharging 4 sec slower (19 sec).',
           icon: 'counter_shot',
           effect: {
             ability: [{ ability: 'counter_shot', bonusCharges: 1, cooldownFlat: 4 }],
@@ -563,10 +563,10 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r11_binding_payload',
           name: 'Binding Payload',
           description:
-            'Frostjaw Trap roots every enemy in its trigger area for 3 sec, then slows them by 40% for 4 sec.',
+            'Your traps root every enemy in their trigger area for 3 sec, then slow them by 40% for 4 sec.',
           icon: 'frostjaw_trap',
           effect: {
-            ability: [{ ability: 'frostjaw_trap' }],
+            ability: [{ ability: 'frostjaw_trap' }, { ability: 'bear_trap' }],
             runtime: { rootDuration: 3, slowPct: 0.4, slowDuration: 4 },
           },
         },
@@ -603,9 +603,14 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r14_trapcraft',
           name: 'Trapcraft',
           description:
-            "Frostjaw Trap's cooldown is reduced by 20%. Triggering it restores 20 Focus and reduces Trailbreak's cooldown by 5 sec.",
+            "Each trap's cooldown is reduced by 20%. Triggering a trap restores 20 Focus and reduces Trailbreak's cooldown by 5 sec.",
           icon: 'frostjaw_trap',
-          effect: { ability: [{ ability: 'frostjaw_trap', cooldownPct: -0.2 }] },
+          effect: {
+            ability: [
+              { ability: 'frostjaw_trap', cooldownPct: -0.2 },
+              { ability: 'bear_trap', cooldownPct: -0.2 },
+            ],
+          },
         },
         {
           id: 'hun_r14_guise_mastery',
@@ -698,10 +703,10 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r20_chain_reaction',
           name: 'Chain Reaction',
           description:
-            'Frostjaw Trap marks enemies within 4 yards for 8 sec. Your next 3 Focus spenders echo 40% damage between marked enemies.',
+            'Your traps mark enemies within 4 yards for 8 sec when triggered. Your next 3 Focus spenders echo 40% damage between marked enemies.',
           icon: 'frostjaw_trap',
           effect: {
-            ability: [{ ability: 'frostjaw_trap' }],
+            ability: [{ ability: 'frostjaw_trap' }, { ability: 'bear_trap' }],
             runtime: { radius: 4, markDuration: 8, charges: 3, echoPct: 0.4 },
           },
         },
@@ -1802,7 +1807,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r5_improved_wrath',
           name: 'Wildshift',
           description:
-            'Shapeshifting into Cat, Bruin, or Moonwing Form removes breakable roots and slows.',
+            'Shapeshifting into Cat, Bruin, Moonwing, or Sporemender Form removes breakable roots and slows.',
           icon: 'travel_form',
           effect: { intrinsic: { mechanic: 'druid_wildshift', metrics: {} } },
         },
@@ -1970,7 +1975,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r14_empowered_touch',
           name: 'Seedspread',
           description:
-            'Overbloom replants a fresh Wildbloom on every ally whose healing it harvested.',
+            'Overbloom replants a fresh Sporemending on every ally whose healing it harvested.',
           icon: 'rejuvenation',
           effect: {
             intrinsic: { mechanic: 'druid_seedspread', metrics: {} },

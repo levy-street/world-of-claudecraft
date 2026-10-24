@@ -5,6 +5,7 @@ import {
   createStowTransition,
   forceStow,
   requestStow,
+  syncSittingStow,
   tickStow,
 } from '../src/render/characters/stow_transition';
 
@@ -61,5 +62,40 @@ describe('stow transition', () => {
     expect(requestStow(t, true, 0)).toBe(true);
     expect(tickStow(t, 1 / 60)).toBe('swap');
     expect(t.attached).toBe(true);
+  });
+
+  it('sheathes weapons and shields while sitting and restores the prior drawn/sheathed state on stand-up', () => {
+    const t = createStowTransition();
+    // Drawn weapons sheathe immediately when sitting starts, with no pending timer.
+    expect(syncSittingStow(t, true)).toBe(true);
+    expect(t.attached).toBe(true);
+    expect(t.target).toBe(false);
+    expect(t.timer).toBe(0);
+    expect(syncSittingStow(t, true)).toBe(false);
+
+    // Toggling Z while seated updates target without playing the standing gesture or unstowing.
+    expect(requestStow(t, true, 0.3)).toBe(false);
+    expect(t.attached).toBe(true);
+    expect(t.target).toBe(true);
+    expect(t.timer).toBe(0);
+
+    // Standing up with target === true keeps weapons sheathed.
+    expect(syncSittingStow(t, false)).toBe(false);
+    expect(t.attached).toBe(true);
+
+    // Sitting again while sheathed, then forceStow(false) while seated updates target
+    // without unstowing until the character stands up.
+    expect(syncSittingStow(t, true)).toBe(false);
+    expect(forceStow(t, false)).toBe(false);
+    expect(t.target).toBe(false);
+    expect(t.attached).toBe(true);
+    expect(syncSittingStow(t, false)).toBe(true);
+    expect(t.attached).toBe(false);
+
+    // Sitting while target === false (drawn) sheathes on sit and restores drawn on stand.
+    expect(syncSittingStow(t, true)).toBe(true);
+    expect(t.attached).toBe(true);
+    expect(syncSittingStow(t, false)).toBe(true);
+    expect(t.attached).toBe(false);
   });
 });

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
+  COMBAT_MECH_WEARABLE,
   COSMETICS_TABS,
   type CosmeticsSnapshot,
   cosmeticsSig,
@@ -14,6 +15,7 @@ import {
 
 const snap = (over: Partial<CosmeticsSnapshot> = {}): CosmeticsSnapshot => ({
   tab: 'mounts',
+  buddies: { owned: [], pending: [], active: '' },
   ownedMountSkins: [],
   wornMountSkin: null,
   ownsAnyMount: true,
@@ -26,15 +28,20 @@ const snap = (over: Partial<CosmeticsSnapshot> = {}): CosmeticsSnapshot => ({
 });
 
 describe('cosmetics tabs', () => {
-  it('is the closed three-tab set with a WAI-ARIA strip', () => {
-    expect(COSMETICS_TABS).toEqual(['mounts', 'skins', 'mech']);
+  it('is the closed four-tab set with a WAI-ARIA strip', () => {
+    expect(COSMETICS_TABS).toEqual(['mounts', 'skins', 'mech', 'buddies']);
     expect(isCosmeticsTab('mech')).toBe(true);
-    expect(isCosmeticsTab('buddies')).toBe(false);
-    const strip = cosmeticsTabStrip('skins', { mounts: 'M', skins: 'S', mech: 'X' }, 'Sections');
+    expect(isCosmeticsTab('buddies')).toBe(true);
+    const strip = cosmeticsTabStrip(
+      'skins',
+      { mounts: 'M', skins: 'S', mech: 'X', buddies: 'B' },
+      'Sections',
+    );
     expect(strip.tabs.map((t) => [t.id, t.label, t.selected])).toEqual([
       ['mounts', 'M', false],
       ['skins', 'S', true],
       ['mech', 'X', false],
+      ['buddies', 'B', false],
     ]);
     expect(strip.panelId).toBe('cosmetics-panel');
     expect(strip.tabClass).toBe('cos-tab');
@@ -110,6 +117,7 @@ describe('mech chroma cards', () => {
     const other = MECH_CHROMAS[0].id;
     const cards = mechChromaCards(
       snap({ mechChromaIds: [worn, other], wornMech: { catalog: 'mech', skin: 3 } }),
+      true,
     );
     expect(cards.map((c) => c.id)).toEqual([other, worn]);
     expect(cards[0]).toMatchObject({ index: 0, worn: false, action: 'wear' });
@@ -124,8 +132,36 @@ describe('mech chroma cards', () => {
   it('marks nothing worn while the class body is shown', () => {
     const cards = mechChromaCards(
       snap({ mechChromaIds: [MECH_CHROMAS[3].id], wornMech: { catalog: 'class', skin: 3 } }),
+      true,
     );
     expect(cards[0]).toMatchObject({ worn: false, action: 'wear' });
+  });
+
+  // The mech is switched off while it is reworked for the new character bodies.
+  it('still lists an owned chroma while switched off, with no wear action', () => {
+    const id = MECH_CHROMAS[0].id;
+    const cards = mechChromaCards(snap({ mechChromaIds: [id] }), false);
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({ id, index: 0, worn: false, action: 'unavailable' });
+  });
+
+  it('keeps take off on the worn chroma while switched off, so a wearer is never stranded', () => {
+    const worn = MECH_CHROMAS[3].id;
+    const other = MECH_CHROMAS[0].id;
+    const cards = mechChromaCards(
+      snap({ mechChromaIds: [worn, other], wornMech: { catalog: 'mech', skin: 3 } }),
+      false,
+    );
+    expect(cards.map((c) => c.action)).toEqual(['unavailable', 'takeOff']);
+  });
+
+  // Setting COMBAT_MECH_WEARABLE back to true is the whole re-enable. When it
+  // flips, this pin flips with it, together with the switched-off assertions in
+  // tests/cosmetics_window.test.ts and tests/char_skin_window.test.ts.
+  it('ships switched off, and the default follows the switch', () => {
+    expect(COMBAT_MECH_WEARABLE).toBe(false);
+    const cards = mechChromaCards(snap({ mechChromaIds: [MECH_CHROMAS[0].id] }));
+    expect(cards[0].action).toBe('unavailable');
   });
 });
 

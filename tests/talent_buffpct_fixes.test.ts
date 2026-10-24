@@ -62,7 +62,7 @@ describe('talent buffPct resolver fixes', () => {
     );
     const effect = ability.effects.find((candidate) => candidate.type === 'selfBuff');
 
-    expect(ability.cooldown).toBeCloseTo(240, 6);
+    expect(ability.cooldown).toBeCloseTo(72, 6); // Ghostfoot 90 sec x 0.8
     expect(effect).toMatchObject({ kind: 'buff_dodge', value: 0.65 });
   });
 

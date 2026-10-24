@@ -40,13 +40,13 @@
 // (cached for the frame, never per-marker); every other literal (font, radius,
 // line width, label offset, triangle geometry) is a named constant.
 
-import { getActiveWorldContent, type ZoneDef } from '../sim/data';
+import { getActiveWorldContent, isBuiltinWorldActive, type ZoneDef } from '../sim/data';
 import type { GatherNodeType, RiftTier } from '../sim/types';
 import { type Decoration, generateDecorationsInBounds } from '../sim/world';
 import type { IWorld } from '../world_api';
 import type { CastlePlanMarker } from './castle_plan_core';
 import { dungeonDisplayName, riftFloorLabel, zoneDisplayName, zonePoiLabel } from './entity_i18n';
-import { drawHillMapMarker, drawMapSkull } from './hill_map_marker_painter';
+import { drawFerryPortMapMarker } from './ferry_port_map_painter';
 import { formatNumber } from './i18n';
 import {
   EMPTY_MAP_MARKER_ART,
@@ -126,6 +126,37 @@ const WORLD_QUEST_BADGE_INNER_RATIO = 0.62;
 const WORLD_QUEST_STAR_RADIUS_RATIO = 0.72;
 const WORLD_QUEST_STAR_CORNER_RATIO = 0.34;
 const WORLD_QUEST_CHECK_WIDTH_RATIO = 0.22;
+const WORLD_BOSS_SKULL_CRANIUM_RATIO = 0.34;
+const WORLD_BOSS_SKULL_JAW_HALF_RATIO = 0.22;
+const WORLD_BOSS_SKULL_JAW_TOP_RATIO = 0.13;
+const WORLD_BOSS_SKULL_JAW_HEIGHT_RATIO = 0.26;
+const WORLD_BOSS_SKULL_EYE_RATIO = 0.085;
+
+function drawWorldBossSkull(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  fill: string,
+  socket: string,
+): void {
+  const craniumRadius = radius * WORLD_BOSS_SKULL_CRANIUM_RATIO;
+  const jawHalf = radius * WORLD_BOSS_SKULL_JAW_HALF_RATIO;
+  const jawTop = y + radius * WORLD_BOSS_SKULL_JAW_TOP_RATIO;
+  const jawHeight = radius * WORLD_BOSS_SKULL_JAW_HEIGHT_RATIO;
+  const eyeRadius = radius * WORLD_BOSS_SKULL_EYE_RATIO;
+  ctx.fillStyle = fill;
+  ctx.beginPath();
+  ctx.arc(x, y - radius * 0.08, craniumRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(x - jawHalf, jawTop, jawHalf * 2, jawHeight);
+  ctx.fillStyle = socket;
+  ctx.beginPath();
+  ctx.arc(x - craniumRadius * 0.42, y - radius * 0.08, eyeRadius, 0, Math.PI * 2);
+  ctx.arc(x + craniumRadius * 0.42, y - radius * 0.08, eyeRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(x - eyeRadius * 0.35, jawTop, eyeRadius * 0.7, jawHeight);
+}
 // Zone-map gathering fallbacks mirror the loader's cached state grammar while
 // an image is loading or unavailable. The normal painted path is one blit.
 const GATHER_READY_RADIUS_RATIO = 0.275;
@@ -409,6 +440,10 @@ function drawMapNavigationFallback(
   ctx.fillStyle = colors.portalDot;
   ctx.strokeStyle = colors.outline;
   ctx.lineWidth = geometry.markerOutlineWidth;
+  if (marker.kind === 'ferry-port') {
+    drawFerryPortMapMarker(ctx, marker, size, colors.player, colors.outline);
+    return;
+  }
   if (marker.kind === 'hoard-entrance') {
     for (let pass = 0; pass < 2; pass++) {
       ctx.strokeStyle = pass === 0 ? colors.outline : colors.questBadgeFill;
@@ -527,6 +562,18 @@ export interface MapPaintResult {
  * Owns painting the overworld map onto the map-window canvas. One instance is
  * built by Hud; it caches decorations per zone and reuses them across redraws.
  */
+// Breathing room around a label's measured ink when testing it against the
+// labels already on the plate, so two names never touch.
+const POI_LABEL_PAD = 2;
+
+// The px size out of a CSS font shorthand ("600 13px Georgia, serif"), for the
+// label's box height. The sprite cache measures advance width but not height,
+// and the plate's fonts are always px-sized; 12 is a safe floor if one is not.
+function fontPixelSize(font: string): number {
+  const m = /(\d+(?:\.\d+)?)px/.exec(font);
+  return m ? Number(m[1]) : 12;
+}
+
 export class MapWindowPainter {
   private decorationsByZone = new Map<string, Decoration[]>();
   // Every on-canvas label, rasterized once per (font, fill, outline, text) and
@@ -841,12 +888,13 @@ export class MapWindowPainter {
     const title = model.rift
       ? riftFloorLabel(model.rift.name, model.rift.rank)
       : zoneDisplayName(model.zoneId);
-    this.labels.draw(ctx, title, S / 2, geometry.titleBaselineY, {
+    const titleStyle: TextSpriteStyle = {
       font: geometry.titleFont,
       fill: colors.label,
       stroke: colors.outline,
       lineWidth: geometry.textOutlineWidth,
-    });
+    };
+    this.labels.draw(ctx, title, S / 2, geometry.titleBaselineY, titleStyle);
 
     // POI labels (the title's outline + label color, one size down).
     const poiLabel: TextSpriteStyle = {
@@ -855,8 +903,51 @@ export class MapWindowPainter {
       stroke: colors.outline,
       lineWidth: geometry.textOutlineWidth,
     };
+    // Declutter. A city map names thirty places, and at a zone-wide zoom a
+    // district, its square and the tavern on it land within a few pixels of
+    // each other: drawn blind they overprint into an unreadable smear. The
+    // model arrives sorted biggest-landmark-first, so draw greedily and drop
+    // any label whose box collides with one already down - the coarse place
+    // names survive, and zooming in gives the small ones room to appear.
+    // measureAdvance reads the same sprite cache draw() does, so this costs
+    // no extra text rasterization. Authored maps only: the built-in world's
+    // handful of POI points draws every label exactly as it always did.
+    const declutter = !isBuiltinWorldActive();
+    const labelPx = fontPixelSize(geometry.labelFont);
+    // The title is already on the plate and never moves, so it seeds the
+    // occupied set: a landmark whose name would run into it yields instead.
+    const titlePx = fontPixelSize(geometry.titleFont);
+    const titleHalf = this.labels.measureAdvance(title, titleStyle) / 2 + POI_LABEL_PAD;
+    const placedLabels: { x0: number; y0: number; x1: number; y1: number }[] = [
+      {
+        x0: S / 2 - titleHalf,
+        x1: S / 2 + titleHalf,
+        y0: geometry.titleBaselineY - titlePx * 0.8 - POI_LABEL_PAD,
+        y1: geometry.titleBaselineY + titlePx * 0.3 + POI_LABEL_PAD,
+      },
+    ];
     for (const poi of model.pois) {
-      this.labels.draw(ctx, zonePoiLabel(poi.zoneId, poi.poiIndex), poi.mx, poi.labelMy, poiLabel);
+      const text = poi.label ?? zonePoiLabel(poi.zoneId, poi.poiIndex);
+      if (!declutter) {
+        this.labels.draw(ctx, text, poi.mx, poi.labelMy, poiLabel);
+        continue;
+      }
+      const half = this.labels.measureAdvance(text, poiLabel) / 2 + POI_LABEL_PAD;
+      // The declutter box sits on the DRAWN baseline (labelMy), which a
+      // navigation badge on the same spot may have lifted off `my`.
+      const box = {
+        x0: poi.mx - half,
+        x1: poi.mx + half,
+        y0: poi.labelMy - labelPx * 0.8 - POI_LABEL_PAD,
+        y1: poi.labelMy + labelPx * 0.3 + POI_LABEL_PAD,
+      };
+      if (
+        placedLabels.some((b) => box.x0 < b.x1 && box.x1 > b.x0 && box.y0 < b.y1 && box.y1 > b.y0)
+      ) {
+        continue;
+      }
+      placedLabels.push(box);
+      this.labels.draw(ctx, text, poi.mx, poi.labelMy, poiLabel);
     }
 
     // Dungeon entrance portals: a purple dot plus the dungeon name above it. The
@@ -896,7 +987,7 @@ export class MapWindowPainter {
     // Long labels would collide with POIs at the full-zone scale; hover/tap owns
     // the localized name while this high-salience layer stays immediately legible.
     for (const marker of model.navigation) {
-      if (marker.kind === 'hoard-entrance') {
+      if (marker.kind === 'hoard-entrance' || marker.kind === 'ferry-port') {
         const size =
           MAP_MARKER_SIZES[profile === 'compact' ? 'mapNavigationCompact' : 'mapNavigation'];
         drawMapNavigationFallback(ctx, marker, size, colors, geometry);
@@ -991,17 +1082,7 @@ export class MapWindowPainter {
       ctx.arc(marker.mx, marker.my, radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
-      drawMapSkull(ctx, marker.mx, marker.my, radius, colors.player, colors.outline);
-    }
-
-    if (model.hill) {
-      drawHillMapMarker(
-        ctx,
-        model.hill,
-        geometry.questBadgeRadius + WORLD_QUEST_BADGE_OUTER_ADD,
-        colors.worldQuestAvailable,
-        colors.outline,
-      );
+      drawWorldBossSkull(ctx, marker.mx, marker.my, radius, colors.player, colors.outline);
     }
 
     // Dungeon Finder "Show on Map" highlight: a steady double ring around the

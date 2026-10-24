@@ -1,10 +1,12 @@
 // Pure world-to-audio routing. Static prop data determines footstep surfaces
 // and positional ambience anchors without adding presentation-only sim events.
 
-import { DUNGEON_X_THRESHOLD, getActiveWorldContent } from '../sim/data';
+import { TAVERN_FLOOR_Y, TAVERN_ORIGIN } from '../sim/content/mirefen_tavern';
+import { DUNGEON_X_THRESHOLD, getActiveWorldContent, isBuiltinWorldActive } from '../sim/data';
 import { dockSectionAt } from '../sim/dock_layout';
+import type { MapPointSound } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
-import type { AmbientPointSource, Surface } from './audio_sink';
+import type { AmbientPointSource, PointSoundSource, Surface } from './audio_sink';
 
 export function isOnDockDeck(x: number, z: number): boolean {
   for (const dock of getActiveWorldContent().props.docks)
@@ -63,6 +65,42 @@ export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
       x: stall.x,
       y: groundHeight(stall.x, stall.z, seed) + 1,
       z: stall.z,
+    });
+  }
+  // the Mirefen tavern's room bed (built-in world only, where the tavern stands): anchored at
+  // the hall's middle; src/game/tavern_ambience_core.ts decides its level and tone
+  if (isBuiltinWorldActive()) {
+    sources.push({
+      id: 'world:tavern:mirefen',
+      kind: 'tavern',
+      x: TAVERN_ORIGIN.x,
+      y: TAVERN_FLOOR_Y + 2,
+      z: TAVERN_ORIGIN.z,
+    });
+  }
+  return sources;
+}
+
+/** Resolve the document's authored point sounds (editor Sound tool) into world
+ *  space once per session: the saved `y` is a height above the terrain seat, the
+ *  same convention the editor viewport's badges use, so it is seated here rather
+ *  than in the audio engine. Ids are index-based because the list is fixed for
+ *  the life of the world (a playtest re-launches on every edit). */
+export function buildAuthoredPointSources(
+  nodes: readonly MapPointSound[],
+  seed: number,
+): PointSoundSource[] {
+  const sources: PointSoundSource[] = [];
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i];
+    sources.push({
+      id: `map:sound:${i}`,
+      key: n.sound,
+      x: n.x,
+      y: groundHeight(n.x, n.z, seed) + n.y,
+      z: n.z,
+      volume: n.volume,
+      radius: n.radius,
     });
   }
   return sources;

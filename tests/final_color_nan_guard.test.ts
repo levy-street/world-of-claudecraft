@@ -220,7 +220,13 @@ describe('patchOpaqueFragmentNanGuard coverage in stock shaders', () => {
         return /opaque_fragment|outgoingLight, diffuseColor(?:\\)?\.a/.test(text);
       })
       .map(({ file }) => file);
+    // The cel-shading material ink (`?cel=on`) also names the chunk: it INSERTS
+    // a block before the write and never replaces the include, so the guard
+    // still runs; tests/cel_shading_core.test.ts pins that it composes with
+    // the guard in either order and comes back out leaving the guard intact.
     expect(naming).toEqual([
+      'render/cel_shading.ts',
+      'render/cel_shading_core.ts',
       'render/final_color_nan_guard.ts',
       'render/final_color_nan_guard_core.ts',
     ]);

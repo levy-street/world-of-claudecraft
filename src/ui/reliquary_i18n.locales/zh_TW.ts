@@ -49,12 +49,12 @@ export const table: ReliquaryLocaleTable = {
     desc: '墓龍科祖爾身上僅限英雄難度掉落的史詩物品。',
   },
   conquerors_wildheart_basin: {
+    desc: '來自獠牙領主馴獸師、噬花和祖爾加的標誌性武器。',
     name: '荒野之心盆地',
-    desc: '來自祖爾加與獠牙領主馴獸師的標誌性武器。',
   },
   conquerors_wildheart_basin_heroic: {
+    desc: '來自獠牙領主馴獸師、噬花和盆地之聲祖爾加的英雄難度專屬史詩裝備與飾品。',
     name: '英雄：荒野之心盆地',
-    desc: '盆地之聲祖爾加身上僅限英雄難度掉落的史詩物品。',
   },
   // The arena entity reads 尼思拉克西斯團隊競技場; the page collects the raid's
   // spoils rather than naming the room, so the arena noun gives way to the
@@ -71,6 +71,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: '桑扎爾，覺醒之峰',
     desc: '來自覺醒之峰世界首領的個人史詩戰利品。',
+  },
+  conquerors_balgath: {
+    name: '巴爾加斯，被埋葬的工頭',
+    desc: '從迷霧沼澤古塚中拖出的戰利品。',
   },
   conquerors_collapsed_reliquary: {
     name: '崩塌的聖物庫',
@@ -164,11 +168,11 @@ export const table: ReliquaryLocaleTable = {
   // (wocStore.armoryTitle 兵器庫).
   conquerors_warfare_gallery: {
     name: '戰爭展廳',
-    desc: '第一賽季的五套戰爭戰鬥裝備，現以金幣一件件出售。',
+    desc: '五套戰爭戰鬥裝備，以榮譽一件件掙得。',
   },
   conquerors_warfare_armory: {
     name: '戰爭兵器庫',
-    desc: '第一賽季的戰爭飾品與武器，以金幣購買，兩件飾品以榮譽購買。',
+    desc: '以來之不易的榮譽購得的戰爭飾品、武器與物品。',
   },
   conquerors_vanguard_gallery: {
     name: '先鋒展廳',

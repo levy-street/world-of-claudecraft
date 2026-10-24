@@ -39,6 +39,20 @@
 // authored, the fix is to render the requirement line at skillReq 0 as well
 // (with wording that does not read as "Requires Alchemy 0").
 //
+// What the taught thing MAKES or DOES rides below the gate lines, the way a
+// classic recipe tooltip reads: each crafted product's own item card (so its
+// stats, use effect, and set bonuses are on the pattern itself, not only in
+// the crafting window after learning it), then that recipe's materials. The
+// card is rendered by the HOST through `productCard` (Hud.itemTooltip with
+// compare off, the itemCompareBlock precedent), since the card builder owns
+// Hud state; a caller that passes none gets the materials line alone. A
+// collection manual teaches several pieces of ONE set, so every card but the
+// last of a set is asked to omit its set block (the `omitSet` flag): the
+// bonuses read once instead of once per piece, which kept a three-piece
+// manual taller than a laptop viewport. A
+// formula has no product item, so it states the enchant's effect instead
+// (the same stat-line key and proc sentence the enchant picker renders).
+//
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { ENCHANTS } from '../../../sim/content/enchants';
@@ -48,7 +62,8 @@ import { collectionManualRecipes } from '../../../sim/professions/collection_man
 import { tierForSkill } from '../../../sim/professions/wheel';
 import type { ItemDef } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
-import { formatNumber, t } from '../../i18n';
+import { formatList, formatNumber, type TranslationKey, t } from '../../i18n';
+import { itemNumber, itemStatName } from '../../item_instance_tooltip';
 import { tooltipLine } from '../../tooltip_line_core';
 import { craftNameKey } from './craft_name_view';
 import { enchantNameKey } from './enchant_apply_view';
@@ -73,6 +88,12 @@ export interface RecipePatternViewerInput {
   craftSkills: Readonly<Record<string, number>>;
 }
 
+/** One material a taught recipe or formula consumes. */
+export interface PatternReagent {
+  itemId: string;
+  count: number;
+}
+
 /** What the tooltip needs to know about the recipe a pattern teaches. */
 export interface RecipePatternTooltipModel {
   /** The taught recipe's id (RecipeItemDef.teachesRecipeId, resolved). */
@@ -83,6 +104,9 @@ export interface RecipePatternTooltipModel {
   resultItemIds?: readonly string[];
   /** Formulas teach an enchant, not a craftable surrogate item. */
   enchantId?: string;
+  /** What each taught product costs to make, parallel to the result ids (one
+   *  entry per recipe, in teach order; a formula carries its enchant's). */
+  reagents: readonly (readonly PatternReagent[])[];
   professionId: string;
   skillReq: number;
   /** True when the viewer's skill in that craft clears the learn gate, meaning
@@ -128,6 +152,7 @@ export function recipePatternTooltipModel(
       recipeId: enchant.id,
       resultItemId: '',
       enchantId: enchant.id,
+      reagents: [enchant.reagents],
       professionId: 'enchanting',
       skillReq: enchant.skillReq ?? 0,
       skillMet: Number.isFinite(skill) && skill >= (enchant.skillReq ?? 0),
@@ -146,6 +171,7 @@ export function recipePatternTooltipModel(
     recipeId: recipe.id,
     resultItemId: recipe.resultItemId,
     ...(item.teachesRecipeIds ? { resultItemIds: recipes.map((entry) => entry.resultItemId) } : {}),
+    reagents: recipes.map((entry) => entry.reagents),
     professionId: recipe.professionId,
     skillReq: recipe.skillReq,
     // Both of resolvePatternLearn's skill arms, in its order: practiced at all,
@@ -155,10 +181,109 @@ export function recipePatternTooltipModel(
   };
 }
 
-/** The tooltip lines for one pattern item, or '' for any other item. */
-export function recipePatternTooltipLines(item: ItemDef, viewer: RecipePatternViewerInput): string {
+/** Renders one crafted product's item card (the host's item tooltip).
+ *  `omitSet` asks the host to leave the card's set block out, because a later
+ *  product in the same pattern shows the same set's block. */
+export type RecipeProductCard = (product: ItemDef, omitSet: boolean) => string;
+
+/** True when a product AFTER `index` in `ids` belongs to the same item set as
+ *  `product`, so that later card carries the shared set block instead. */
+function setShownLater(product: ItemDef, ids: readonly string[], index: number): boolean {
+  if (!product.set) return false;
+  return ids.some(
+    (id, at) => at > index && Object.hasOwn(ITEMS, id) && ITEMS[id].set === product.set,
+  );
+}
+
+/** The materials line for one taught recipe: the crafting window's own
+ *  "Requires:" label over a localized list of "{name} x{count}" entries.
+ *  Reagents whose item this bundle does not know are skipped (R34), and a
+ *  recipe with no printable reagent renders nothing. */
+function reagentsLine(reagents: readonly PatternReagent[]): string {
+  const entries: string[] = [];
+  for (const reagent of reagents) {
+    const def = Object.hasOwn(ITEMS, reagent.itemId) ? ITEMS[reagent.itemId] : undefined;
+    if (!def) continue;
+    entries.push(
+      t('hudChrome.pattern.reagent', {
+        name: itemDisplayName(def),
+        count: formatNumber(reagent.count, { maximumFractionDigits: 0 }),
+      }),
+    );
+  }
+  if (!entries.length) return '';
+  return tooltipLine(
+    'tt-sub',
+    t('hudChrome.pattern.reagents', {
+      label: t('hudChrome.crafting.reagentsNeeded'),
+      list: formatList(entries),
+    }),
+  );
+}
+
+/** What a taught enchant does: its proc sentence when it has one, else one
+ *  green "+N Stat" line per stat axis, the enchant picker's own wording. */
+function enchantEffectLines(enchantId: string): string {
+  const enchant = ENCHANTS[enchantId];
+  if (enchant.weaponProc)
+    return tooltipLine(
+      'tt-green',
+      t(`hudChrome.enchantDescription.${enchantId}` as TranslationKey),
+    );
+  let html = '';
+  for (const [stat, value] of Object.entries(enchant.statBonus)) {
+    if (!value) continue;
+    html += tooltipLine(
+      'tt-green',
+      t('itemUi.tooltip.stat', { value: itemNumber(value), stat: itemStatName(stat) }),
+    );
+  }
+  return html;
+}
+
+/** What the pattern makes or does: a formula's enchant effect, or each
+ *  product's card, each followed by the materials that recipe consumes. These
+ *  are static content facts, so they render unsynced too. A product that is
+ *  itself a pattern never embeds (no card-in-card recursion), and a product
+ *  id with no ItemDef embeds nothing, matching the teaches line's silence. */
+function patternProductLines(
+  model: RecipePatternTooltipModel,
+  productCard: RecipeProductCard | undefined,
+): string {
+  if (model.enchantId)
+    return enchantEffectLines(model.enchantId) + reagentsLine(model.reagents[0] ?? []);
+  let html = '';
+  const ids = model.resultItemIds ?? [model.resultItemId];
+  ids.forEach((id, index) => {
+    const product = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
+    if (!product) return;
+    let block = '';
+    if (productCard && product.kind !== 'recipe')
+      block += productCard(product, setShownLater(product, ids, index));
+    block += reagentsLine(model.reagents[index] ?? []);
+    if (block) html += `<div class="tt-recipe-product">${block}</div>`;
+  });
+  return html;
+}
+
+/** The tooltip lines for one pattern item, or '' for any other item.
+ *  `productCard`, when given, renders each crafted product's item card below
+ *  the gate lines (see the header). */
+export function recipePatternTooltipLines(
+  item: ItemDef,
+  viewer: RecipePatternViewerInput,
+  productCard?: RecipeProductCard,
+): string {
   const model = recipePatternTooltipModel(item, viewer);
   if (!model) return '';
+  return patternGateLines(model, viewer) + patternProductLines(model, productCard);
+}
+
+/** The teaches line, then (once synced) the requirement and known lines. */
+function patternGateLines(
+  model: RecipePatternTooltipModel,
+  viewer: RecipePatternViewerInput,
+): string {
   let html = '';
   // hasOwn-gated like icons.ts itemFallback: ITEMS is a prototype-bearing
   // Record, so a resultItemId of 'constructor' would otherwise resolve a

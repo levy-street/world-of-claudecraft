@@ -1,5 +1,5 @@
 // v0.42.0 class balance: the pure primary-healing amplification helper
-// (src/sim/primary_healing.ts). Custom-path wiring (Aegis, Wildbloom replant,
+// (src/sim/primary_healing.ts). Custom-path wiring (Aegis, Sporemending replant,
 // Perpetual Sun) is covered separately in tests/v042_healer_custom_scaling.test.ts;
 // this file pins the leaf helper's own contract in isolation.
 import { describe, expect, it } from 'vitest';

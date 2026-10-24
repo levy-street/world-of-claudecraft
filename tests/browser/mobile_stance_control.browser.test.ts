@@ -142,7 +142,7 @@ const PLAYER_FRAME_MARKUP = `
                model a stance-bearing warrior. -->
           <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-hidden="true" style="display: none"></div>
           <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
-          <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+          <div id="pf-resource-frame"><div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div></div>
         </div>
       </div>`;
 

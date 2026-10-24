@@ -65,9 +65,11 @@ import {
 } from '../types';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
+import { isPetMode } from './pet_assist';
 import { isTameableFamily } from './pet_scaling';
 import { isPrimaryOwnedPetEntity } from './pet_selection';
 import { petCanForceTaunt } from './pet_taunt_gate';
+import { retainedTamedPetScale } from './pet_visual_scale';
 import { warlockPetScaleAtLevel } from './warlock_pet_growth';
 import { useWarlockPetSkill } from './warlock_pet_skills';
 
@@ -91,11 +93,17 @@ function templateHasPetSpecial(templateId: string): boolean {
   return !!template && (!!template.petChainPull || !!template.petRanged?.active);
 }
 
-// A live pet check fails while inside a delve even for owners with a valid
-// equipped pet (it is stowed for the run, see stowPetForDelve/restorePetFromDelveStash),
-// so the surfaced error must say why instead of implying the pet was lost.
-function noPetError(e: Entity, fallback = 'You have no pet.'): string {
-  return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : fallback;
+// A live pet check fails while inside a delve for owners whose pet is stowed for
+// the run (see stowPetForDelve/restorePetFromDelveStash), so the surfaced error
+// must say why instead of implying the pet was lost. A hunter's beast and a
+// warlock's demon are not stowed (delves/delve_pet.ts), so a petless one gets the
+// plain message.
+function petStowedInDelve(ctx: SimContext, e: Entity): boolean {
+  return isDelvePos(e.pos.x) && ctx.delvePetStash.has(e.id);
+}
+
+function noPetError(ctx: SimContext, e: Entity, fallback = 'You have no pet.'): string {
+  return petStowedInDelve(ctx, e) ? 'Pets are not allowed inside the delves.' : fallback;
 }
 
 // Encounter-authored movement locks freeze the owner's direct command surface too.
@@ -200,8 +208,13 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
   // stashed snapshot, otherwise a save taken mid-delve (autosave, disconnect, or
   // shutdown saveAll) would persist pet:null and lose the pet on reload.
   if (!pet) return ctx.delvePetStash.get(ownerPid) ?? null;
+  const template = MOBS[pet.templateId];
+  const scale = template
+    ? retainedTamedPetScale(template, ctx.players.get(ownerPid)?.cls, pet.scale)
+    : undefined;
   return {
     templateId: pet.templateId,
+    ...(template && scale !== undefined && scale !== template.scale ? { scale } : {}),
     name: pet.name,
     level: pet.level,
     hp: pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp)),
@@ -262,7 +275,9 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
   const level = owner.level;
   const pos = ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1);
   const pet = createMob(ctx.nextId++, template, level, pos);
-  pet.scale = warlockPetScaleAtLevel(template, level);
+  pet.scale =
+    retainedTamedPetScale(template, ctx.players.get(owner.id)?.cls, state.scale) ??
+    warlockPetScaleAtLevel(template, level);
   pet.name = cleanPetName(state.name) ?? template.name;
   pet.ownerId = owner.id;
   pet.petMode = state.mode ?? 'defensive';
@@ -310,7 +325,9 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   pet.weapon = scaled.weapon;
   pet.stats.armor = scaled.stats.armor;
   pet.moveSpeed = scaled.moveSpeed;
-  pet.scale = warlockPetScaleAtLevel(template, owner.level);
+  pet.scale =
+    retainedTamedPetScale(template, ctx.players.get(owner.id)?.cls, pet.scale) ??
+    warlockPetScaleAtLevel(template, owner.level);
   pet.color = scaled.color;
   pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
   // maxHp/armor were just rebuilt from the template alone, so the owner's share is
@@ -357,6 +374,7 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
     ctx.groundPos(p.pos.x + 2, p.pos.z + 1),
   );
   pet.name = target.name;
+  pet.scale = target.scale;
   pet.ownerId = p.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
@@ -575,7 +593,7 @@ export function abandonPet(ctx: SimContext, pid?: number): void {
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   ctx.emit({ type: 'log', text: `You abandon ${pet.name}.`, color: '#f66', pid: r.e.id });
@@ -592,7 +610,7 @@ export function renamePet(ctx: SimContext, name: string, pid?: number): void {
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   const clean = cleanPetName(name);
@@ -617,7 +635,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!pet.dead) {
@@ -659,7 +677,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pets = combatCommandPetsOf(ctx, r.e.id);
   if (pets.length === 0) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
@@ -689,7 +707,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   if (!petCanForceTaunt(pet.templateId)) return;
@@ -756,7 +774,7 @@ export function petSpecial(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount;
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   // Manual commands share the pet AI's control gate: a stunned demon cannot
@@ -785,7 +803,7 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number, slotIndex
   if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living pet.'));
     return;
   }
   const item = ITEMS[itemId];
@@ -853,7 +871,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e, 'You have no living demon.'));
+    ctx.error(r.e.id, noPetError(ctx, r.e, 'You have no living demon.'));
     return;
   }
   if (pet.hp >= pet.maxHp) {
@@ -888,6 +906,9 @@ export function healPet(ctx: SimContext, pid?: number): void {
 }
 
 export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
+  // The sim owns the stance list: the server hands the raw `pet_mode` wire value
+  // straight through, so an unknown mode stops here.
+  if (!isPetMode(mode)) return;
   const r = ctx.resolve(pid);
   if (!r) return;
   if (!isPetClass(r.meta.cls)) {
@@ -900,7 +921,7 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
   const deadPrimary = petOf(ctx, r.e.id, true);
   if (deadPrimary && !pets.some((pet) => pet.id === deadPrimary.id)) pets.push(deadPrimary);
   if (pets.length === 0) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   for (const pet of pets) {
@@ -931,7 +952,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!petCanForceTaunt(pet.templateId)) {
@@ -956,7 +977,7 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!MOBS[pet.templateId]?.petRanged?.jet) {
@@ -978,7 +999,7 @@ export function setPetAutoSpecial(ctx: SimContext, enabled: boolean, pid?: numbe
   r.meta.lastActiveTick = ctx.tickCount;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, noPetError(r.e));
+    ctx.error(r.e.id, noPetError(ctx, r.e));
     return;
   }
   if (!templateHasPetSpecial(pet.templateId)) {
@@ -1049,4 +1070,16 @@ export function restorePetFromDelveStash(ctx: SimContext, pid: number): void {
   ctx.delvePetStash.delete(pid);
   if (petOf(ctx, pid, true)) return;
   restorePet(ctx, e, state);
+}
+
+/** Session-only owner inputs shared by pet commands and the pet AI. */
+export interface PetOwnerRuntimeState {
+  // Tick of the player's last deliberate action (movement, ability cast, or pet
+  // command). Session-only, never persisted. Powers the anti-AFK gate on
+  // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
+  // cannot farm the area alone.
+  lastActiveTick: number;
+  // The enemy this player's last committed cast was aimed at (session-only): what
+  // an Assist-stance pet may attack, while it is still the active target.
+  petAssistTargetId?: number | null;
 }

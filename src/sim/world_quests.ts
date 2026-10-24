@@ -1,4 +1,3 @@
-import { bagPools, bagsFullError, canAddItem } from './bags';
 import { maybeAwardClueScroll, updateClueHunt } from './clue_scrolls';
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
 import { FORGE_QUEST_ID } from './content/world_quest_forging';
@@ -26,6 +25,7 @@ import {
 import { formatMoney } from './format_money';
 import { sanitizeForgeResult } from './minigames/forge_workshop';
 import { applyGliderBoost } from './minigames/glider_boost';
+import { grantHonor } from './pvp';
 import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
@@ -45,7 +45,6 @@ import {
   updateWorldQuestAmbush,
 } from './world_quest_ambush';
 import { positionInWorldQuestArea } from './world_quest_area';
-import { suspendBlockedWorldQuests, worldQuestsBlocked } from './world_quest_block';
 import {
   awardWorldQuestBonusCopper,
   WISP_MAZE_HARD_BONUS,
@@ -79,16 +78,17 @@ import {
   updateGliderLaunchUpdraft,
 } from './world_quest_glider';
 import { sanitizeGliderResult } from './world_quest_glider_wire';
+import { worldQuestHonorRewardForQuest } from './world_quest_honor_slots';
 import {
   accuseInvestigationSuspect,
   clearInvestigationEncounter,
   ensureInvestigationPost,
-  investigationKillCounts,
   readInvestigationClue,
   talkToInvestigation,
   updateInvestigationEncounter,
 } from './world_quest_investigation';
 import { worldQuestItemRewardForQuest } from './world_quest_item_slots';
+import { creditWorldQuestKills } from './world_quest_kill_credit';
 import {
   claimLeyBonus,
   leyBonusPending,
@@ -108,6 +108,7 @@ import {
   worldQuestPuzzleInitialRotations,
 } from './world_quest_puzzle';
 import { playerActiveWorldQuests } from './world_quest_reroll';
+import { grantWorldQuestRewardItems, type WorldQuestRewardItem } from './world_quest_reward_mail';
 import {
   activeWorldQuestsForCycle,
   normalizeWorldQuestCycle,
@@ -307,12 +308,6 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   // first, inside or outside the site, so an abandoned rift still tears down.
   updateWorldQuestAmbush(ctx, FARSHORE_SALVAGE_AMBUSH);
   updateWorldQuestChampions(ctx);
-  // An operator-blocked account (world_quest_block.ts) still advances the shared
-  // sites above, then tears its own state down instead of starting anything.
-  if (worldQuestsBlocked(meta)) {
-    suspendBlockedWorldQuests(ctx, meta, player);
-    return;
-  }
   const shadowProgress = meta.worldQuestLog.get(SHADOW_QUEST_ID);
   if (updateShadowEncounter(ctx, meta, player) && shadowProgress)
     creditWorldQuest(ctx, meta, WORLD_QUESTS_BY_ID[SHADOW_QUEST_ID], shadowProgress);
@@ -389,19 +384,24 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     }
     if (quest.objective.type === 'wisp_maze') {
       ensureWispMazeInstructor(ctx);
-      if (existing && updateWispMaze(ctx, meta, player, existing) && existing.state === 'active') {
+      if (existing && updateWispMaze(ctx, meta, player, existing)) {
         const hard = existing.wispMaze?.difficulty === 'hard';
-        creditWorldQuest(ctx, meta, quest, existing);
-        if (hard)
-          awardWorldQuestBonusCopper(
-            ctx,
-            meta,
-            worldQuestBonusCopper(
-              WISP_MAZE_HARD_BONUS.base,
-              WISP_MAZE_HARD_BONUS.perLevel,
-              player.level,
-            ),
-          );
+        if (existing.state === 'active') {
+          creditWorldQuest(ctx, meta, quest, existing);
+          if (hard)
+            awardWorldQuestBonusCopper(
+              ctx,
+              meta,
+              worldQuestBonusCopper(
+                WISP_MAZE_HARD_BONUS.base,
+                WISP_MAZE_HARD_BONUS.perLevel,
+                player.level,
+              ),
+            );
+        }
+        // Any Hard win earns its deed, a replay after today's credit included
+        // (the calligraphy Gold rule): the deed marks the feat, not the reward.
+        if (hard) grantDeed(ctx, meta, 'exp_wisp_maze_hard');
       }
     }
     if (quest.objective.type === 'glider') {
@@ -500,9 +500,6 @@ export function talkToWorldQuestInstructor(
   meta: PlayerMeta,
   player: Entity,
 ): boolean {
-  // A blocked account's instructor talk opens nothing; false lets the NPC fall
-  // through to the ordinary talk path exactly as for any non-instructor.
-  if (worldQuestsBlocked(meta)) return false;
   resetCycleIfNeeded(ctx, meta);
   if (talkToInvestigation(ctx, npc, meta, player)) return true;
   if (npc.templateId === GLIDER_APPRENTICE_NPC_DEF.id) {
@@ -590,7 +587,8 @@ export function talkToWorldQuestInstructor(
 
 /** The bundle every world quest pays: XP, copper, then the quest's fixed extra
  *  (if any), then the day's item when this quest's zone is one of the cycle's
- *  item slots and the character is in the item bracket; standing follows in
+ *  item slots and the character is in the item bracket, then the day's Honor
+ *  bonus when the zone is one of the cycle's Honor slots; standing follows in
  *  the caller's order. No rng: the item is fixed per cycle, zone and class
  *  (src/sim/world_quest_item_slots.ts), so the map hover can show it in advance. */
 export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQuestDef): void {
@@ -610,17 +608,21 @@ export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQ
       pid: meta.entityId,
     });
   }
+  // The quest's fixed extra, then the day's piece. Capacity is a caller
+  // pre-check for addItem (bags.ts addStacked): an item the bags cannot hold
+  // is posted to the Ravenpost instead, because the quest completes once per
+  // cycle and there is no second turn-in to defer to.
+  const rewardItems: WorldQuestRewardItem[] = [];
   const extra = quest.reward?.extraItem;
-  if (extra) ctx.addItem(extra.itemId, extra.count, meta.entityId);
+  if (extra) rewardItems.push({ itemId: extra.itemId, count: extra.count });
   const dailyItemId = worldQuestItemRewardForQuest(meta.worldQuestCycle, quest, meta.cls, level);
-  if (dailyItemId) {
-    // Capacity is a caller pre-check for addItem (bags.ts addStacked). A full
-    // bag loses the day's piece and says so, the Clue Scroll's rule: the quest
-    // completes once per cycle, so there is no second turn-in to defer to.
-    if (canAddItem(meta.inventory, bagPools(meta.bags), dailyItemId, 1))
-      ctx.addItem(dailyItemId, 1, meta.entityId);
-    else bagsFullError(ctx, meta.entityId, dailyItemId);
-  }
+  if (dailyItemId) rewardItems.push({ itemId: dailyItemId, count: 1 });
+  grantWorldQuestRewardItems(ctx, meta, rewardItems);
+  // The day's Honor bonus: two rotating quests per cycle, the same two for the
+  // whole realm (src/sim/world_quest_honor_slots.ts). grantHonor emits the
+  // personal honor event the HUD floats and logs.
+  const honor = worldQuestHonorRewardForQuest(meta.worldQuestCycle, quest);
+  if (honor > 0) grantHonor(ctx, meta, honor, 'world_quest');
 
   const factionId = worldQuestFaction(quest);
   const standingAward = worldQuestStandingReward(quest, level);
@@ -654,9 +656,6 @@ function creditWorldQuest(
   progress: WorldQuestProgress,
   amount = 1,
 ): void {
-  // The reward choke point: a blocked account earns no progress, completion,
-  // or payout, whatever path reached here.
-  if (worldQuestsBlocked(meta)) return;
   progress.count = Math.min(quest.count, progress.count + amount);
   const practice =
     progress.practiceOnly ||
@@ -789,23 +788,9 @@ export function completeWorldQuestVehicle(
 /** Credits an eligible participant for a target killed inside the active area. */
 export function onMobKilledForWorldQuests(ctx: SimContext, mob: Entity, meta: PlayerMeta): void {
   resetCycleIfNeeded(ctx, meta);
-  const player = ctx.entities.get(meta.entityId);
-  if (!player || player.dead) return;
-  const activeQuests = playerActiveWorldQuests(meta);
-  for (const progress of meta.worldQuestLog.values()) {
-    if (progress.state !== 'active') continue;
-    const quest = activeQuests.find((candidate) => candidate.id === progress.questId);
-    if (
-      !quest ||
-      (quest.objective.type !== 'kill' && quest.objective.type !== 'investigation') ||
-      (quest.objective.type === 'investigation' && !investigationKillCounts(meta, mob)) ||
-      mob.templateId !== quest.objective.targetMobId ||
-      !inWorldQuestArea(player, quest) ||
-      !inWorldQuestArea(mob, quest)
-    )
-      continue;
+  creditWorldQuestKills(ctx, mob, meta, (quest, progress) => {
     creditWorldQuest(ctx, meta, quest, progress);
-  }
+  });
 }
 
 /** Credits one successful authoritative profession-node harvest. */
@@ -889,7 +874,7 @@ export function onObjectInteractedForWorldQuests(
     if (!quest || !inWorldQuestArea(player, quest) || !inWorldQuestArea(obj, quest)) continue;
     if (quest.objective.type === 'puzzle' || quest.objective.type === 'match3') {
       if (quest.objective.activationObjectItemId !== obj.objectItemId) continue;
-      if (player.level < quest.minLevel || worldQuestsBlocked(meta)) continue;
+      if (player.level < quest.minLevel) continue;
       const pendingBonus: boolean = leyBonusPending(progress);
       if (progress.state === 'completed' && !pendingBonus) {
         if (quest.objective.type === 'puzzle') unlockLeyBonus(progress, progress.puzzleDay);

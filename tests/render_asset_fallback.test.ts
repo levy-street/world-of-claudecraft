@@ -63,12 +63,12 @@ describe('render asset preload fallbacks', () => {
     ).toThrow('sky shader is missing the pinned log-depth vertex anchor');
   });
 
-  it('keeps water construction non-fatal when shader normal maps were not preloaded', async () => {
+  it('builds water with no asset preloaded at all: the shader tier reads no image', async () => {
     vi.resetModules();
     mockEmptyAssetLoads();
 
     const { buildWater, hasWaterShaderAssets } = await import('../src/render/water');
-    expect(hasWaterShaderAssets()).toBe(false);
+    expect(hasWaterShaderAssets()).toBe(true);
 
     const water = buildWater(20061);
     expect(water.meshes.length).toBeGreaterThan(0);

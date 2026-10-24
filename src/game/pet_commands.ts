@@ -1,11 +1,13 @@
 // The pet bar's command routing, shared by the keyboard arm (input.ts onPet,
-// Ctrl+1..5 by default) and the controller arm (main.ts dispatchGamepadAction),
-// so the two can never map a bind to different IWorld pet commands. Pure: it
-// only needs the pet slice of IWorld.
+// Ctrl+1..5 by default), the controller arm (main.ts dispatchGamepadAction) and
+// a pet-command action-bar slot (Hud.castSlot), so none of them can map a
+// command to a different IWorld pet call. Pure: it only needs the pet slice of
+// IWorld.
 
 import type { IWorld } from '../world_api';
+import type { PetCommand } from '../world_api/pet';
 
-export type PetCommand = 'attack' | 'taunt' | 'stop' | 'defensive' | 'aggressive';
+export type { PetCommand };
 
 export type PetCommandWorld = Pick<IWorld, 'petAttack' | 'petTaunt' | 'setPetMode'>;
 

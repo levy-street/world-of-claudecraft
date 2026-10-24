@@ -29,6 +29,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { IWorld } from '../world_api';
+import { FERRY_PORTS, type FerryPortMapMarker } from './ferry_port_map_core';
 
 /** An axis-aligned rectangle in canvas-pixel space. */
 export interface ContinentRect {
@@ -80,9 +81,10 @@ export interface ContinentMapModel {
   /** Party members other than self, at their live world position (issue 2652).
    *  Empty solo, with no party formed, or when every member is off the world. */
   party: ContinentPartyMarker[];
+  /** Ferry landing markers, projected through the continent's art bounds. */
+  ports: FerryPortMapMarker[];
   /** The zone id the player currently stands in (the on-canvas subtitle). */
   currentZoneId: string;
-  hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
 }
 
 export interface ContinentMapInput {
@@ -136,7 +138,6 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
   });
 
   const p = world.player;
-  const hill = world.hillInfo;
   const currentZoneId = zoneAt(p.pos.x, p.pos.z).id;
 
   const regions: ContinentZoneRegion[] = ZONES.map((zone) => {
@@ -185,13 +186,21 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
     }
   }
 
+  const ports: FerryPortMapMarker[] =
+    world.ferryView() === null
+      ? []
+      : FERRY_PORTS.map((port) => {
+          const { mx, my } = toMap(port.x, port.z);
+          return { ...port, mx, my };
+        });
+
   return {
     image: { mx: imageX, my: imageY, w: imageW, h: imageH },
     regions,
     player,
     party,
+    ports,
     currentZoneId,
-    hill: hill && inWorld(hill.x, hill.z) ? { ...toMap(hill.x, hill.z), phase: hill.phase } : null,
   };
 }
 

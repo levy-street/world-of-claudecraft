@@ -1,0 +1,247 @@
+{
+  "testedCommit": "c33418ac34895a94ebf0ff7c25f895c2628634a4",
+  "publicationBase": "4cb80dae0bef38b5fe237d2c45d869fc6db59c3e",
+  "rawResults": {
+    "bytes": 31317169,
+    "sha256": "2b4cf57230841e3fbaec595f75e796f7010b8bab5dfeb2d35007ae294ba9eefa",
+    "compressedPath": "docs/design/scenery-windows-4070-2026-10-15/results.json.gz"
+  },
+  "summaryPathConvention": "Repository-relative paths; numeric measurements unchanged from the local summary.",
+  "files": [
+    {
+      "path": "docs/design/scenery-windows-4070-2026-10-15/audit.json",
+      "bytes": 327,
+      "sha256": "3616b5d9295c0df55a07350fafdd3e083030d490e3e1326441752b9531401ca2"
+    },
+    {
+      "path": "docs/design/scenery-windows-4070-2026-10-15/audit.mjs.txt",
+      "bytes": 2911,
+      "sha256": "3475ebf0536d514b7a11cf018ecdf5f355b0648daf29458e820f2766a7179175"
+    },
+    {
+      "path": "docs/design/scenery-windows-4070-2026-10-15/bench-4070.mjs.txt",
+      "bytes": 6875,
+      "sha256": "98695e46622bc3d14a0b418d91c52adf3ea82301308b8704bbaa5aad26f93a22"
+    },
+    {
+      "path": "docs/design/scenery-windows-4070-2026-10-15/build-provenance.json",
+      "bytes": 467,
+      "sha256": "618fe954fa1759e5068d542292d429b891920d791f38d7b1abbfc6cb41fe0363"
+    },
+    {
+      "path": "docs/design/scenery-windows-4070-2026-10-15/results.json.gz",
+      "bytes": 1008435,
+      "sha256": "3778e3a2cba37010976c26072c3a3de8a699b59d8460450dc1a021e3c2996f74"
+    },
+    {
+      "path": "docs/design/scenery-windows-4070-2026-10-15/summarize.mjs.txt",
+      "bytes": 2796,
+      "sha256": "6072fa60096a8539198baeeb7c6ea3956a780cdd3c4a09f5ee3ee3ca584db6b9"
+    },
+    {
+      "path": "docs/design/scenery-windows-4070-2026-10-15/summary.json",
+      "bytes": 67899,
+      "sha256": "3e278c7f9b22ee1d481969487947db94aadb9c30a91590e9deb14e6f7fdc47f5"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-forward-existing-beach.webp",
+      "bytes": 369714,
+      "sha256": "85c4c4751744cb6df0b28d055772bbe1617eb2f98cd0f4ee0d595592b90529ae"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-forward-existing-thornpeak.webp",
+      "bytes": 368272,
+      "sha256": "c5a1c32961c90937b66920fce00ca8fe63d9bb3b4ff014fa78d17f5c0ec7d416"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-forward-updated-beach.webp",
+      "bytes": 364920,
+      "sha256": "02fb1337f1c66a14392a1f85de067563e420190e06f74c8bd19e5c2a386d4587"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-forward-updated-thornpeak.webp",
+      "bytes": 364332,
+      "sha256": "3fb02021a7038b8d22eb44eeb21298ec96e347aaa8062666def0816c7f58b23b"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-reverse-existing-beach.webp",
+      "bytes": 365156,
+      "sha256": "d7aa385989a6815ab97e82065d34bd9c7706681ea37a68a108623b266a45aac4"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-reverse-existing-thornpeak.webp",
+      "bytes": 369370,
+      "sha256": "b882b305e7040377c77abd0ad8cabe37be2f73151a9fb958e4072192e3aef3eb"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-reverse-updated-beach.webp",
+      "bytes": 364664,
+      "sha256": "f2b9929024e39125eb60e5b0b85a5d3f4c315213e3462e3cb21697bc948f1cae"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/high-reverse-updated-thornpeak.webp",
+      "bytes": 367242,
+      "sha256": "39bc1e6144fd788aa55be8042939b5b8111759619657c75bd1c94c3d8e9b9016"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-forward-existing-beach.webp",
+      "bytes": 386870,
+      "sha256": "6d2743aaf9739d6019b832721837b5c1b8c0a99a5831d1d00592ce7608c416be"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-forward-existing-thornpeak.webp",
+      "bytes": 362510,
+      "sha256": "bb4c9357f752302ee65b2aa8020fc2d41f660a02c39d90b4883ea6484136dc08"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-forward-updated-beach.webp",
+      "bytes": 387478,
+      "sha256": "74c29626c6fd4ac55656b115cf9d5f4fef6a627d2eac9553953b50ef657b8128"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-forward-updated-thornpeak.webp",
+      "bytes": 365760,
+      "sha256": "8cefdae8604959f419310f7adf3ddfae99454b3e1c93ac0900861b77be57330b"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-reverse-existing-beach.webp",
+      "bytes": 385844,
+      "sha256": "ffe43679ecef936f3d5298915ff2e5878938f3f6c649fa1442292baa148425f0"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-reverse-existing-thornpeak.webp",
+      "bytes": 367308,
+      "sha256": "5ad89c1451e50361d12d1f83b3956a7355209d22750e3436bc9a17f5505f2e5b"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-reverse-updated-beach.webp",
+      "bytes": 386160,
+      "sha256": "f4601e952897e590e5d06e75f2e7b3405fb831ac4600714d05f9a631dfba6bc0"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/insane-reverse-updated-thornpeak.webp",
+      "bytes": 367178,
+      "sha256": "a771ff6ecefed5d36636c48534c10317da05e16b90e2be205a3c2a28618db50d"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-forward-existing-beach.webp",
+      "bytes": 179066,
+      "sha256": "adce3e900da3e1daad4330f304cecaad4cea9becfdeb95b78cc2d9714b2c0ea7"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-forward-existing-thornpeak.webp",
+      "bytes": 154928,
+      "sha256": "6a1adf421b665b505f4d0ea3efa4d557a15caee5e31ab5de6af05ef9dd4471c8"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-forward-updated-beach.webp",
+      "bytes": 177866,
+      "sha256": "547ce71e6044126cc4d6a7a25ebd34acfb513c9c320217a8449e07aff7425a61"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-forward-updated-thornpeak.webp",
+      "bytes": 147538,
+      "sha256": "23f3250597a429483d718905996c0d186127edf7507f6a2e3933824192cfa26a"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-reverse-existing-beach.webp",
+      "bytes": 179568,
+      "sha256": "bc86effba48b15323fb03aa53d2b5ac0bc14b189953b3ec07e4dcf914e35339d"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-reverse-existing-thornpeak.webp",
+      "bytes": 154812,
+      "sha256": "a541212df0347588526b4c8597279b27f36b1dd31e54b9675326c5e165f070c0"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-reverse-updated-beach.webp",
+      "bytes": 177428,
+      "sha256": "0b32895a03078f49b35a08636b57dc3d25464c8b6dd24f9029a45dc6eff15eb3"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/low-reverse-updated-thornpeak.webp",
+      "bytes": 147788,
+      "sha256": "0baf54712922c7cf7d6f22773756db645e6591a8b6cd2b87477009ca24bf9e8e"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-forward-existing-beach.webp",
+      "bytes": 290334,
+      "sha256": "3c4c56b2f67c5dde47df3ba1ff2ee458a94769b3ea336b941d6a16019bd0d786"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-forward-existing-thornpeak.webp",
+      "bytes": 309794,
+      "sha256": "829b71fa15ef67ab5f4cd4eefcca30bb382bccc408b81d37982f276b3ae7b12f"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-forward-updated-beach.webp",
+      "bytes": 290794,
+      "sha256": "3f17a34238d6d965cae176830b6da64bc54ae58f9005f725642e482a8eead63f"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-forward-updated-thornpeak.webp",
+      "bytes": 306148,
+      "sha256": "1bf343bddc1d276229888fa14f0c5f65035e3432196b72324e9b4ac91ebde7d3"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-reverse-existing-beach.webp",
+      "bytes": 288384,
+      "sha256": "b6cd6538aaeb47c77222538467ca9c426e18f6b5e98de4fa6ec06673abcad1fa"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-reverse-existing-thornpeak.webp",
+      "bytes": 310608,
+      "sha256": "71d0bb2bb4ac55c7677ac028dcbdcf9fe8f660c507a73d3ace653166c5980a56"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-reverse-updated-beach.webp",
+      "bytes": 287632,
+      "sha256": "5a62e2d7baea4a73af3ec66b42032e7c3a7109d9a4404adf3375fc06ecaa3fa4"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/medium-reverse-updated-thornpeak.webp",
+      "bytes": 304812,
+      "sha256": "913ebc09c53a20e225812407751890b3cfffdfc894e9eec8627f7331c86ebd23"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-forward-existing-beach.webp",
+      "bytes": 386104,
+      "sha256": "9a7748c0add6ae63150c4369c3572d1852439e633699efffb1c02aa6100f5e18"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-forward-existing-thornpeak.webp",
+      "bytes": 365140,
+      "sha256": "7fd5b134589511c0d352c5f9797132b8046765cedc2ad5fdaf065997a9c2019c"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-forward-updated-beach.webp",
+      "bytes": 387512,
+      "sha256": "842269388d067a182708bc79715b7c6334142ede48995ae79c6f29a51a56df9f"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-forward-updated-thornpeak.webp",
+      "bytes": 365878,
+      "sha256": "f74de79336204fde6dd6ed6fdea37acd46fd6ec70a3f1097581aceb960d7d43e"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-reverse-existing-beach.webp",
+      "bytes": 387934,
+      "sha256": "59f50eaaf983c9e7ef4d9edb744cbef700adc1f0e67b4f199a149c8ad4e8b247"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-reverse-existing-thornpeak.webp",
+      "bytes": 363270,
+      "sha256": "17a96cd8ee4b893d0ff63118d3c0fe45d85af676aac49220d37cedfb48a3da2b"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-reverse-updated-beach.webp",
+      "bytes": 385490,
+      "sha256": "396daa2b55be99aa95f3660f15a4f1557be31200d5cf36d57e2ee272d1cbe6c9"
+    },
+    {
+      "path": "docs/screenshots/scenery-windows-4070-2026-10-15/ultra-reverse-updated-thornpeak.webp",
+      "bytes": 364740,
+      "sha256": "45a40d4e8549e4969852e6b0484de1382966239fb627a55da9aa14701276f849"
+    }
+  ]
+}

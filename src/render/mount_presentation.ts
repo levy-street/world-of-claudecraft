@@ -21,12 +21,20 @@
 // pass reads the pitch already on the body and adds to it.
 
 import type * as THREE from 'three';
+import type { SpatialAudioSink } from './audio_sink';
 import type { AnimState, CharacterVisual } from './characters/visual';
 import { applyRocketSledAttitude } from './goblin_rocket_sled_fx';
+import { updateMountEmbers } from './mount_embers';
 import { type MountGlows, updateMountGlows } from './mount_glow';
 import { applyMountJumpAttitude } from './mount_jump_attitude';
 import { type MountLamps, updateMountLamps } from './mount_lamps';
 import { seatRiderOnBone } from './mount_lifecycle';
+import {
+  createMountRearState,
+  type MountRearState,
+  mountRearHopCancel,
+  stepMountRear,
+} from './mount_rear_core';
 import { type MountVisualSpec, mountBobY } from './mount_visuals';
 import { spinMountWheels, updateRickshawPuller } from './rickshaw_mount';
 import { type ExhaustPhase, RALLYCART_EXHAUST_PORTS } from './vehicle_exhaust_core';
@@ -64,6 +72,11 @@ export interface MountPresentationHost {
   mountWheels?: Parameters<typeof spinMountWheels>[0]['mountWheels'];
   mountPullerVisual: Parameters<typeof updateRickshawPuller>[0]['mountPullerVisual'];
   mountLamps: MountLamps | null;
+  /** The last summon edge (MountViewState.mountSummonAt): the clock a summon flare runs from. */
+  mountSummonAt?: number;
+  /** The standing rear-up's latch (mount_rear_core.ts), created on first sight of a rearing
+   *  mount. */
+  mountRear?: MountRearState;
   mountGlows: MountGlows | null;
   mountSeatBone: THREE.Object3D | null;
   /** True while the current mount root's swapped-in materials are still
@@ -106,9 +119,9 @@ export interface MountPresentationInputs {
   present: boolean;
   animate: boolean;
   vfx: Vfx;
-  /** Where this entity's engine audio is, for visuals that want to land on a
-   *  specific moment inside an authored take. Null with no engine running. */
-  enginePhase: { state: 'idle' | 'starting' | 'moving' | 'stopping'; elapsed: number } | null;
+  /** This rider's audio (mountAudio): the engine phase, for visuals that want to land on
+   *  a specific moment inside an authored take, and the rear's whinny. */
+  audio: MountAudioPort;
   groundSample: (x: number, z: number) => number;
   dt: number;
 }
@@ -116,23 +129,56 @@ export interface MountPresentationInputs {
 /**
  * The mount's locomotion, borrowed from its rider: the shared gait facts copied
  * into the mount's own scratch, with the REAL airborne flag (the rider's is
- * suppressed while seated; the mount carries the jump) and none of the
- * rider-only facts (casting, sitting, dead never reach a gait clip).
+ * suppressed while seated; the mount carries the jump), the rider's turn bank,
+ * and none of the rider-only facts (casting, sitting, dead never reach a gait clip).
  */
+/** One rider's audio, as the mount presentation sees it: the sink, the entity, and whether it
+ *  is the local player (whose own calls play non-spatially). */
+export interface MountAudioPort {
+  sink: Pick<SpatialAudioSink, 'mountEnginePhase' | 'mountNeigh'> | null;
+  id: number;
+  self: boolean;
+}
+
+const audioPort: MountAudioPort = { sink: null, id: 0, self: false };
+
+/** The audio port for this frame's mount pass. ONE shared scratch, rewritten per call: the
+ *  renderer builds it inline in the presentation input and the pass consumes it before the
+ *  next entity's, so the per-frame entity sweep allocates nothing for it. */
+export function mountAudio(
+  sink: MountAudioPort['sink'] | undefined,
+  id: number,
+  self: boolean,
+): MountAudioPort {
+  audioPort.sink = sink ?? null;
+  audioPort.id = id;
+  audioPort.self = self;
+  return audioPort;
+}
+
+function mountEnginePhaseOf(audio: MountAudioPort) {
+  return audio.sink?.mountEnginePhase(audio.id) ?? null;
+}
+
 export function borrowRiderLocomotion(mount: AnimState, rider: AnimState, airborne: boolean): void {
   mount.speed = rider.speed;
   mount.moving = rider.moving;
   mount.running = rider.running;
   mount.airborne = airborne;
   mount.backwards = rider.backwards;
+  // a direction fact like the backpedal: a mount rig with side runs strafes too
+  mount.strafe = rider.strafe;
   mount.swimming = rider.swimming;
+  // The mount banks with its rider: without this the rider leans into a turn
+  // and the animal under them stays bolt upright.
+  mount.bankRoll = rider.bankRoll;
 }
 
 // Dormant since the Rallycart RXT retired (RETIRED_MOUNT_SKIN_IDS): no live
 // spec sets the 'pipes' exhaust, so nothing reaches this or the 'pipes'
 // branches below until a vehicle skin ships again or the asset sweep removes them.
 function rallycartExhaustPhase(input: MountPresentationInputs): ExhaustPhase {
-  const phase = input.enginePhase;
+  const phase = mountEnginePhaseOf(input.audio);
   if (!phase) return 'idle';
   if (
     phase.state === 'stopping' &&
@@ -209,6 +255,30 @@ export function updateMountPresentation(
           spec.seatFwd,
         );
       }
+      // A standing jump on a mount that rears: the rear clip and its whinny on the take-off
+      // edge, and the hop held to the ground for its length (the sim's jump is untouched).
+      if (spec.rear) {
+        v.mountRear ??= createMountRearState();
+        const rear = stepMountRear(v.mountRear, {
+          now: input.time,
+          airborne: input.airborne,
+          moving: input.moving,
+          canRear: true,
+        });
+        // moving off mid-rear: blend the clip quickly into the gait instead of a cut
+        if (rear.broke) v.mountVisual.endFlourish(0.25);
+        if (rear.start) {
+          v.mountVisual.playFlourish();
+          const p = v.group.position;
+          input.audio.sink?.mountNeigh?.(p.x, p.y, p.z, input.mountKey, input.audio.self);
+        }
+        const p = v.group.position;
+        const hold = mountRearHopCancel(rear.active, p.y, input.groundSample(p.x, p.z));
+        v.mountVisual.root.position.y += hold;
+        // and the saddle lift the nameplate and chat bubble ride (body units, so unscaled):
+        // they stay put over the rearing horse instead of bobbing with the hidden hop
+        v.mountLift += hold / (v.group.scale.y || 1);
+      }
       if (spec.seatBone) {
         seatRiderOnBone(v.group, riderRoot, v.mountVisual.root, spec, v);
       }
@@ -244,12 +314,25 @@ export function updateMountPresentation(
       }
     }
     // Ambient mount particles: the snail paints its slime path while gliding,
-    // the hover cycle streams aether exhaust off its tail.
+    // the hover cycle streams aether exhaust off its tail, the lantern horse strikes sparks.
     if (presented) {
       if (spec.fx === 'slime') {
         if (input.moving) input.vfx.mountSlimeTrail(v.group.position, dt);
       } else if (spec.fx === 'exhaust') {
         input.vfx.mountExhaust(v.group.position, input.facing, dt, input.moving);
+      } else if (spec.fx === 'embers' && spec.embers && v.mountVisual) {
+        // the lantern horse: sparks off each striking hoof, cinders off its swinging lanterns
+        const running = input.anim.running;
+        const groundY = v.group.position.y;
+        updateMountEmbers(
+          v.mountVisual.root,
+          spec.embers,
+          input.vfx,
+          dt,
+          input.moving,
+          running,
+          groundY,
+        );
       } else if (spec.fx === 'pipes' && v.mountSuspension) {
         // Piped exhaust rides the chassis matrix, so it keeps its place through
         // the body's pitch, roll and landing squat.
@@ -259,7 +342,7 @@ export function updateMountPresentation(
           frontSign: v.mountSuspension.frontSign,
           ports: RALLYCART_EXHAUST_PORTS,
           phase: rallycartExhaustPhase(input),
-          elapsed: input.enginePhase?.elapsed ?? 0,
+          elapsed: mountEnginePhaseOf(input.audio)?.elapsed ?? 0,
           reversing: input.anim.backwards,
           pivoting: v.mountPivot,
           vfx: input.vfx,
@@ -267,7 +350,14 @@ export function updateMountPresentation(
         });
       }
     }
-    if (v.mountLamps) updateMountLamps(v.mountLamps, input.time);
+    if (v.mountLamps) {
+      // a mount whose summon burst is light opens its lamps wide as it arrives
+      const flareAge =
+        spec.summonFx === 'lanternBurst' && v.mountSummonAt !== undefined
+          ? performance.now() / 1000 - v.mountSummonAt
+          : Infinity;
+      updateMountLamps(v.mountLamps, input.time, flareAge);
+    }
     if (v.mountGlows) updateMountGlows(v.mountGlows, input.time);
     // Last: the puller is parented into the cart, so it reads the attitude
     // this pass just wrote rather than last frame's.

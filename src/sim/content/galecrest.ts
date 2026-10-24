@@ -10,6 +10,7 @@
 // content/wickharbor_harbor.ts and content/wickharbor_wharf.ts.
 
 import { GLIDER_APPROACH_PATH } from '../glider_approach_path';
+import { paintedTownBuildingDefs, WICKHARBOR_LAYOUT } from '../painted_towns';
 import type {
   CampDef,
   GroundObjectDef,
@@ -111,11 +112,12 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
 
 // Authored always-bloom flower circles (render/foliage.ts reads these the
 // way the dusk realm reads REALM_FLOWER_MEADOWS): the little fenced gardens
-// behind the beacon-road houses, and the Mirror Tarn's flowering banks.
+// by the harbor market and the Beacon keepers' cottage, and the Mirror
+// Tarn's flowering banks. (The two beacon-road gardens at (428.5, 340) and
+// (439, 331) went with their houses, on and against the painted harbour
+// inn's ground.)
 export const GALECREST_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
-  { x: 428.5, z: 340, r: 2.2 },
   { x: 444, z: 354, r: 2.2 },
-  { x: 439, z: 331, r: 2 },
   { x: 471, z: 308, r: 2.2 },
   { x: 286, z: 556, r: 7 },
   { x: 292, z: 541, r: 5 },
@@ -664,19 +666,11 @@ export const GALECREST_QUEST_CAMPS: CampDef[] = [
 export const GALECREST_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Wickharbor: the coast's medieval harbor city, laid out along its four
-  // street spokes (the roads above): every house fronts a street with open
-  // ground around it, the blue-roofed KayKit quarter (decorProps below)
-  // holds the square and the corners, and the walkable stilt piers of the
+  // street spokes (the roads above): the painted inn, smithy and market hall
+  // round the square and two houses down the roads in (the painted rebuild,
+  // sim/painted_towns/wickharbor.ts), and the walkable stilt piers of the
   // harbor (sim/gale_harbor.ts) run out over the bay from the dock district
-  buildings: [
-    // the inn on the south square's west side, timber houses down the roads
-    { kind: 'inn', x: 405, z: 371, w: 6, d: 7, rot: Math.PI },
-    { kind: 'house', x: 376, z: 371, w: 5, d: 5, rot: Math.PI },
-    { kind: 'house', x: 413, z: 381, w: 5, d: 5, rot: 1.62 },
-    { kind: 'house', x: 434, z: 390, w: 5, d: 5, rot: -1.48 },
-    { kind: 'house', x: 417, z: 405, w: 5, d: 6, rot: 1.52 },
-    { kind: 'house', x: 409, z: 394, w: 5, d: 5, rot: 1.68 },
-  ],
+  buildings: [...paintedTownBuildingDefs(WICKHARBOR_LAYOUT)],
   wells: [{ x: 427, z: 362, r: 1.5 }],
   stalls: [
     // the square market, flanking the south road out of the junction
@@ -687,7 +681,9 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x: 452, z: 370, rot: -0.7, r: 1.6 },
   ],
   crates: [
-    [437, 365],
+    // (this one stood at (437, 365) until the painted market hall took the
+    // ground; it waits by the hall's barrels now)
+    [441, 359],
     [402, 366],
     [364, 633], // Edda's stacked salvage on the Wreckfields shore
     [357, 627],
@@ -714,24 +710,17 @@ export const GALECREST_PROPS: ZonePropsDef = {
   // render/wickharbor_harbor.ts)
   docks: [],
   fences: [
-    // Wickharbor's stone garden walls (the KayKit scalloped fence): the
-    // townhall's back wall, the walled churchyard, the West Street edging
-    // by the inn, and the road-side house gardens down the south road
-    { x1: 406, z1: 334, x2: 422, z2: 334, kind: 'stone' },
+    // Wickharbor's walled churchyard (the KayKit scalloped fence). The
+    // townhall's back wall, the West Street edging by the old inn and the
+    // road-side cottage gardens went with the buildings they edged (the
+    // painted rebuild, sim/painted_towns/wickharbor.ts).
     { x1: 394, z1: 336, x2: 394, z2: 348, kind: 'stone' },
     { x1: 394, z1: 348, x2: 406, z2: 348, kind: 'stone' },
-    { x1: 396, z1: 366, x2: 402, z2: 366, kind: 'stone' },
-    { x1: 408, z1: 366, x2: 414, z2: 366, kind: 'stone' },
-    { x1: 409, z1: 376, x2: 409, z2: 386, kind: 'stone' },
-    { x1: 430, z1: 385, x2: 430, z2: 394, kind: 'stone' },
-    // little fenced flower gardens behind the beacon-road houses (wood
-    // rails; the matching bloom circles live in GALECREST_FLOWER_MEADOWS)
-    { x1: 424, z1: 337, x2: 433, z2: 337 },
-    { x1: 424, z1: 337, x2: 424, z2: 344 },
+    // little fenced flower gardens: the market hall's by the harbor market,
+    // and the Beacon keepers' (wood rails; the matching bloom circles live
+    // in GALECREST_FLOWER_MEADOWS)
     { x1: 438, z1: 351, x2: 447, z2: 351 },
     { x1: 447, z1: 351, x2: 447, z2: 360 },
-    { x1: 436, z1: 327, x2: 443, z2: 327 },
-    { x1: 436, z1: 327, x2: 436, z2: 336 },
     { x1: 466, z1: 305, x2: 475, z2: 305 },
     { x1: 475, z1: 305, x2: 475, z2: 313 },
     // the stables' walled south yard: stone runs close the barn yard's open
@@ -749,19 +738,12 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x1: 344, z1: 650, x2: 356, z2: 648, kind: 'palisade' },
     { x1: 341, z1: 654, x2: 344, z2: 663, kind: 'palisade' },
   ],
-  // the blue-roofed medieval quarter, the dock district, the Beacon's
-  // keepers, and the stables hamlet (float: hulls ride at their draft)
+  // the dock district, the Beacon's keepers, and the stables hamlet (float:
+  // hulls ride at their draft). (Wickharbor's blue-roofed hexagon quarter,
+  // the town hall, market hall, shore tavern, workshop and four homes, gave
+  // way to the painted town: its rows live on as
+  // WICKHARBOR_LAYOUT.replacedDecorProps, sim/painted_towns/wickharbor.ts.)
   decorProps: [
-    // the square: townhall north, market hall east, tavern by the shore
-    { key: 'hexbTownhall', x: 414, z: 342, rot: 0.5, scale: 8, r: 6.5, h: 15 },
-    { key: 'hexbMarket', x: 433, z: 369, rot: -1.9, scale: 6, r: 4.5, h: 7 },
-    { key: 'hexbTavern', x: 441, z: 380, rot: -1.45, scale: 7.5, r: 5.5, h: 11 },
-    { key: 'hexbWorkshop', x: 390, z: 373, rot: Math.PI, scale: 7, r: 6, h: 8 },
-    // homes fronting the beacon road and the downs road
-    { key: 'hexbHomeA', x: 429, z: 342, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
-    { key: 'hexbHomeB', x: 442, z: 356, rot: -2.5, scale: 7.5, r: 5, h: 10 },
-    { key: 'hexbHomeA', x: 441, z: 332, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
-    { key: 'hexbHomeB', x: 386, z: 336, rot: -0.28, scale: 7.5, r: 5, h: 10 },
     // the dock district, breathing room on both sides of the beacon road:
     // the shipwright's yard alone by the north shingle, and the ship
     // monument ACROSS the road on the inland rise, the anchor at its side
@@ -800,7 +782,9 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexCrateBig', x: 457, z: 362, rot: 0.4, scale: 5 },
     { key: 'hexCrateOpen', x: 447, z: 362, rot: 1.7, scale: 5 },
     { key: 'hexSack', x: 462, z: 357, rot: 2.8, scale: 5 },
-    { key: 'hexSack', x: 437, z: 372, rot: 0.9, scale: 5 },
+    // (this sack lay at (437, 372) until the painted market hall took the
+    // ground; it lies beside the hall's barrels now)
+    { key: 'hexSack', x: 443, z: 362, rot: 0.9, scale: 5 },
     { key: 'hexCrateBig', x: 446, z: 383, rot: 2.1, scale: 5 },
     // the Beacon's keepers, spread across the head: the cottage across the
     // road on the inland side, the store wide on the headland

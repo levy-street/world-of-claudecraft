@@ -47,15 +47,14 @@ import {
   normalizeMaterialStack,
   takeMaterialStack,
 } from './material_stack';
-import { type MaterialAddPlan, planMaterialStackAdd } from './material_stack_packing';
+import {
+  type MaterialAddPlan,
+  PreparedMaterialInventory,
+  planMaterialStackAdd,
+} from './material_stack_packing';
 import { sanitizeRiftGearInstance } from './rift/progression';
 import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from './types';
-import {
-  absorbsCompactStock,
-  drawableStockUnits,
-  needsSourceRow,
-  readSourceRows,
-} from './vault_material_sources';
+import { absorbsCompactStock, drawableStockUnits, needsSourceRow } from './vault_material_sources';
 
 // ---------------------------------------------------------------------------
 // Rows
@@ -216,6 +215,53 @@ export interface VaultDepositPlan {
  * grouping flag are stripped, which is right, the vault is a different
  * container and has no separation feature of its own.
  */
+function prepareVaultDeposit(
+  special: readonly InvSlot[],
+  slot: InvSlot,
+  moved: number,
+  pooled: number,
+  materialIds: ReadonlySet<string>,
+  selectedSources?: readonly MaterialSourceCount[],
+): { plan: VaultDepositPlan; held: PreparedMaterialInventory } | null {
+  const normalized = normalizeMaterialStack(slot, materialIds);
+  if (!normalized.ok) return null;
+  const split = takeMaterialStack(normalized.value, moved, materialIds, selectedSources);
+  if (!split.ok) return null;
+  const held = PreparedMaterialInventory.read(special, slot.itemId, materialIds);
+  if (!held.ok) return null;
+
+  const taken = split.value.taken;
+  const remaining = split.value.remaining;
+  const shareable = held.value.someIdentity(absorbsCompactStock);
+  if (!needsSourceRow(taken) && !shareable) {
+    return {
+      held: held.value,
+      plan: {
+        compactCount: pooled + moved,
+        clearsCompact: false,
+        foldUnits: 0,
+        grant: null,
+        remaining,
+      },
+    };
+  }
+  // A corrupt compact count is NOT foldable: it stays where it is rather than
+  // being asserted into a composition whose total it cannot state. Judged by the
+  // one shared rule rather than a second copy of it.
+  const foldUnits = absorbsCompactStock(taken) ? drawableStockUnits(pooled) : 0;
+  return {
+    held: held.value,
+    plan: {
+      compactCount: null,
+      clearsCompact: foldUnits > 0,
+      foldUnits,
+      grant: taken,
+      remaining,
+    },
+  };
+}
+
+/** Public decision-only API retains its raw-input validation contract. */
 export function planVaultDeposit(
   special: readonly InvSlot[],
   slot: InvSlot,
@@ -224,36 +270,48 @@ export function planVaultDeposit(
   materialIds: ReadonlySet<string>,
   selectedSources?: readonly MaterialSourceCount[],
 ): VaultDepositPlan | null {
-  const normalized = normalizeMaterialStack(slot, materialIds);
-  if (!normalized.ok) return null;
-  const split = takeMaterialStack(normalized.value, moved, materialIds, selectedSources);
-  if (!split.ok) return null;
-  const held = readSourceRows(special, slot.itemId, materialIds);
-  if (held === null) return null;
+  return (
+    prepareVaultDeposit(special, slot, moved, pooled, materialIds, selectedSources)?.plan ?? null
+  );
+}
 
-  const taken = split.value.taken;
-  const remaining = split.value.remaining;
-  const shareable = held.some((row) => absorbsCompactStock(row));
-  if (!needsSourceRow(taken) && !shareable) {
-    return {
-      compactCount: pooled + moved,
-      clearsCompact: false,
-      foldUnits: 0,
-      grant: null,
-      remaining,
-    };
+/** One owned reading feeds routing and packing. The rare compact fold retains
+ * its original separate add, before the actual grant; no unit or target order
+ * is combined or changed. No live row changes until the caller commits. */
+export function planVaultDepositMutation(
+  special: readonly InvSlot[],
+  slot: InvSlot,
+  moved: number,
+  pooled: number,
+  materialIds: ReadonlySet<string>,
+  selectedSources?: readonly MaterialSourceCount[],
+): { readonly plan: VaultDepositPlan; readonly rows: readonly InvSlot[] } | null {
+  const prepared = prepareVaultDeposit(special, slot, moved, pooled, materialIds, selectedSources);
+  if (prepared === null) return null;
+  const { plan } = prepared;
+  let held = prepared.held;
+  let rows = special;
+  if (plan.foldUnits > 0) {
+    const folded = held.plan(
+      { itemId: slot.itemId, count: plan.foldUnits },
+      VAULT_ROW_STACK_SIZE,
+      plan.foldUnits,
+    );
+    if (!folded.ok) return null;
+    rows = appliedVaultRowAdd(rows, folded.value);
+    const reread = PreparedMaterialInventory.read(rows, slot.itemId, materialIds);
+    if (!reread.ok) return null;
+    held = reread.value;
   }
-  // A corrupt compact count is NOT foldable: it stays where it is rather than
-  // being asserted into a composition whose total it cannot state. Judged by the
-  // one shared rule rather than a second copy of it.
-  const foldUnits = absorbsCompactStock(taken) ? drawableStockUnits(pooled) : 0;
-  return {
-    compactCount: null,
-    clearsCompact: foldUnits > 0,
-    foldUnits,
-    grant: taken,
-    remaining,
-  };
+  if (plan.grant !== null) {
+    const size = vaultRowMovesWhole(plan.grant.instance)
+      ? stackSizeOf(ITEMS[slot.itemId])
+      : VAULT_ROW_STACK_SIZE;
+    const added = held.plan(plan.grant, size, plan.grant.count);
+    if (!added.ok) return null;
+    rows = appliedVaultRowAdd(rows, added.value);
+  }
+  return { plan, rows };
 }
 
 // ---------------------------------------------------------------------------

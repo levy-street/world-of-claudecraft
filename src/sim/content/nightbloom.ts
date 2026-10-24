@@ -8,6 +8,11 @@
 // world.ts; the glowing flora, dreambeams, and standing stones live in
 // render/night_features.ts.
 
+import {
+  MOONREST_LAYOUT,
+  MOONREST_MOONSPRING_ROAD,
+  paintedTownBuildingDefs,
+} from '../painted_towns';
 import type {
   CampDef,
   GroundObjectDef,
@@ -62,11 +67,10 @@ export const NIGHTBLOOM_ROADS: { x: number; z: number }[][] = [
     { x: -368, z: 1382 },
     { x: -370, z: 1420 },
   ], // the Nightgate -> Moonrest
-  [
-    { x: -370, z: 1420 },
-    { x: -334, z: 1402 },
-    { x: -308, z: 1388 },
-  ], // Moonrest -> the Moonspring's shore
+  // Moonrest -> the Moonspring's shore: it leaves the square south-south-west
+  // between the painted inn and the Nightgate road, then swings west to its
+  // old line at the shore (sim/painted_towns/moonrest.ts)
+  MOONREST_MOONSPRING_ROAD.map((point) => ({ ...point })),
   [
     { x: -370, z: 1420 },
     { x: -408, z: 1452 },
@@ -566,13 +570,10 @@ export const NIGHTBLOOM_QUEST_CAMPS: CampDef[] = [
 
 export const NIGHTBLOOM_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Moonrest: a snug lantern village on its rise
-  buildings: [
-    { kind: 'inn', x: -378, z: 1424, w: 6, d: 7, rot: 0.6 },
-    { kind: 'house', x: -361, z: 1416, w: 6, d: 6, rot: -1.1 },
-    { kind: 'house', x: -376, z: 1410, w: 5, d: 5, rot: 2.2 },
-    { kind: 'chapel', x: -364, z: 1430, w: 5, d: 7, rot: -2.4 }, // the moon shrine
-  ],
+  // Moonrest: a snug lantern village on its rise, its painted inn west of the
+  // square, the moon shrine south over the graves and a house north-east, each
+  // turned to the square (sim/painted_towns/moonrest.ts)
+  buildings: [...paintedTownBuildingDefs(MOONREST_LAYOUT)],
   wells: [{ x: -370, z: 1422, r: 1.5 }],
   stalls: [
     { x: -373, z: 1416, rot: 0.4, r: 1.6 },

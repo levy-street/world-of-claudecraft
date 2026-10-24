@@ -8,7 +8,12 @@
 // what keeps every test double on one import).
 import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
-import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import {
+  isGrantableWeaponSkin,
+  isWeaponSkinType,
+  WEAPON_SKINS,
+} from '../src/sim/content/weapon_skins';
+import type { GuildAccountPort } from '../src/sim/guild_quartermaster';
 import type { Entity, SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../src/sim/types';
 import type { AccountCosmetics } from '../src/world_api';
 import {
@@ -116,6 +121,19 @@ export class AccountCosmeticsService {
       .catch((err) => console.error('failed to save account mech chroma:', err));
   }
 
+  /** Ownership is session-scoped. Online purchases must commit the character charge
+   * and account grant together; this synchronous port can never grant a skin. */
+  ledger(
+    session: CosmeticsSession,
+    purchaseWeaponSkin?: (offerId: string) => void,
+  ): GuildAccountPort {
+    return {
+      ownsWeaponSkin: (skinId) => session.accountCosmetics.weaponSkinIds.includes(skinId),
+      grantWeaponSkin: () => false,
+      purchaseWeaponSkin,
+    };
+  }
+
   /**
    * Grant a mech-chroma cosmetic to an account by id (a Discord swag claim, whose
    * points/claim are already resolved durably server-side). Best-effort live update:
@@ -139,7 +157,8 @@ export class AccountCosmeticsService {
   grantWeaponSkins(accountId: number, skinIds: string[]): void {
     this.grantSkins(
       accountId,
-      skinIds.filter((id) => WEAPON_SKINS[id]),
+      // never a skin reserved for a future raid, whatever the economy ledger carries
+      skinIds.filter(isGrantableWeaponSkin),
       'weaponSkinIds',
       grantAccountWeaponSkins,
     );

@@ -1322,29 +1322,206 @@ export const table: DeedLocaleTable = {
     name: 'Apanhado em Flagrante',
     desc: 'Capture um Corredor Bolsa-de-moedas em um Tesouro Enterrado antes que escape com o ouro.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Mais brilhante que as sombras',
+    desc: 'Recupere as bolsas de moedas roubadas e escape do labirinto de Evergarden no modo Hard.',
+  },
+  prog_titan: {
+    name: 'Titã',
+    desc: 'Obtenha 10.000.000 de experiência ao longo da vida.',
+    title: 'Titã',
+  },
   pvp_flag_1h: {
     name: 'Ousado',
-    desc: 'Mantenha o PvP mundial ativo por 1 hora de tempo jogado no mundo aberto. Sair do jogo, morrer ou entrar em instâncias pausa o progresso; desativar reinicia o progresso. Os títulos conquistados são permanentes.',
+    desc: 'Mantenha o JxJ mundial ativo por 1 hora de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
     title: 'Ousado',
   },
   pvp_flag_3h: {
     name: 'Desafiador',
-    desc: 'Mantenha o PvP mundial ativo por 3 horas de tempo jogado no mundo aberto. Sair do jogo, morrer ou entrar em instâncias pausa o progresso; desativar reinicia o progresso. Os títulos conquistados são permanentes.',
+    desc: 'Mantenha o JxJ mundial ativo por 3 horas de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
     title: 'Desafiador',
   },
   pvp_flag_6h: {
     name: 'Destemido',
-    desc: 'Mantenha o PvP mundial ativo por 6 horas de tempo jogado no mundo aberto. Sair do jogo, morrer ou entrar em instâncias pausa o progresso; desativar reinicia o progresso. Os títulos conquistados são permanentes.',
+    desc: 'Mantenha o JxJ mundial ativo por 6 horas de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
     title: 'Destemido',
   },
   pvp_flag_24h: {
-    name: 'Inflexível',
-    desc: 'Mantenha o PvP mundial ativo por 24 horas de tempo jogado no mundo aberto. Sair do jogo, morrer ou entrar em instâncias pausa o progresso; desativar reinicia o progresso. Os títulos conquistados são permanentes.',
-    title: 'Inflexível',
+    name: 'Inabalável',
+    desc: 'Mantenha o JxJ mundial ativo por 24 horas de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
+    title: 'Inabalável',
   },
   pvp_flag_168h: {
     name: 'Indomável',
-    desc: 'Mantenha o PvP mundial ativo por 7 dias de tempo jogado no mundo aberto. Sair do jogo, morrer ou entrar em instâncias pausa o progresso; desativar reinicia o progresso. Os títulos conquistados são permanentes.',
+    desc: 'Mantenha o JxJ mundial ativo por 7 dias de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
     title: 'Indomável',
+  },
+  cmb_balgath: {
+    name: 'Capataz nunca mais',
+    desc: 'Devolva o Capataz Enterrado ao túmulo.',
+  },
+
+  cmb_balgath_ten: {
+    name: 'O túmulo não retém nada',
+    desc: 'Derrube o Capataz Enterrado dez vezes.',
+  },
+
+  cmb_point_taken: {
+    name: 'Ponta certeira',
+    desc: 'Apague a lanterna do Capataz de Palha no pátio de treino da convocação e aproveite suas tábuas caídas.',
+  },
+
+  dgn_olen_buttress: {
+    name: 'Segurem a muralha',
+    desc: 'Derrote o Cavaleiro Comandante Olen sem que Baluarte ricocheteante atinja um segundo jogador.',
+  },
+
+  dgn_ossick_moored: {
+    name: 'Porto seguro',
+    desc: 'Derrote o Carcereiro Ossick sem ninguém ser arrastado ao Fosso de afogamento.',
+  },
+
+  dgn_vael_beacon: {
+    name: 'À luz do farol',
+    desc: 'Derrote Vael o Fogbinder sem explodir nenhuma Sombra de Névoa.',
+  },
+
+  dgn_turretback: {
+    name: 'Aviso de despejo',
+    desc: 'Derrote o Capitão do Naufrágio sem ninguém ser atingido por Salva espectral.',
+  },
+
+  dgn_selthe_pitch: {
+    name: 'Todas as vozes afinadas',
+    desc: 'Derrote a Mãe do Coro Selthe compartilhando todo Coro entre pelo menos dois jogadores e sem que nenhum Solo toque outra pessoa.',
+  },
+
+  dgn_colossus_mirror: {
+    name: 'Quebre o vidro',
+    desc: 'Derrote o Colosso de Vidro de Maré rompendo cada Reflexo em até 15 segundos após surgir.',
+  },
+
+  dgn_ysolei_high_and_dry: {
+    name: 'A salvo e a seco',
+    desc: 'Derrote Ysolei, Avatar da Lua Afogada, sem ninguém receber seu Impacto de maré.',
+  },
+
+  dgn_mere_hydra: {
+    name: 'Todas as cabeças caídas',
+    desc: 'Mate as três cabeças da Hidra da Lagoa com no máximo 10 segundos de diferença entre elas.',
+  },
+
+  dgn_crypt_knellwyrm: {
+    name: 'Nem um fio chamuscado',
+    desc: 'Derrote a Serpe do Dobre sem ninguém ser queimado pela Passagem de fogo da pira.',
+  },
+
+  dgn_turnkey_cage: {
+    name: 'Nenhuma jaula nos segura',
+    desc: 'Derrote o Carcereiro da Prisão sem ninguém ser esmagado numa Jaula de ferro.',
+  },
+
+  dgn_beastmaster_apart: {
+    name: 'Mantidos à distância',
+    desc: 'Derrote o Mestre das Feras Senhor das Presas e seu Grande Jaguar com Vínculo da matilha ativo por menos de 10 segundos no total.',
+  },
+
+  dgn_gorgebloom_clean: {
+    name: 'Controle de ervas daninhas',
+    desc: 'Derrote a Flor Devoradora sem nenhum Broto Espinhoso crescer.',
+  },
+
+  dgn_zulgar_uncaught: {
+    name: 'Nunca alcançados',
+    desc: 'Derrote Zulgar, Voz da Bacia, sem ninguém ficar Dilacerado.',
+  },
+
+  dgn_great_saurian: {
+    name: 'Titã derrubado',
+    desc: 'Derrote o Grande Sauriano e seu Invocador de Feitiços da Plataforma com no máximo 20 segundos de diferença.',
+  },
+
+  dgn_korgath_all_chains: {
+    name: 'Um fim mais gentil',
+    desc: 'Derrote Korgath, o Acorrentado, com as quatro correntes rompidas.',
+  },
+
+  dgn_korgath_still_bound: {
+    name: 'O selo resiste',
+    desc: 'Derrote Korgath, o Acorrentado, na dificuldade heroica sem nunca romper pelo menos duas de suas correntes.',
+  },
+
+  dgn_velkhar_cold: {
+    name: 'Consolo gelado',
+    desc: 'Derrote o Grande Necromante Velkhar sem nenhum Andarilho de Ossos Reerguido se levantar pela segunda vez.',
+  },
+
+  dgn_korzul_thin_ice: {
+    name: 'Gelo fino',
+    desc: 'Derrote Korzul o Gravewyrm com pelo menos doze das dezenove placas do lago intactas.',
+  },
+
+  dgn_sledge_tusker: {
+    name: 'Carga fria',
+    desc: 'Derrote o Presudo do Trenó sem ninguém ser atingido por Atropelar.',
+  },
+
+  dgn_drowned_temple_cantor: {
+    name: 'O último verso',
+    desc: 'Derrote Ysolei, Avatar da Lua Afogada, com o Último Cantor do Coro Pálido ao seu lado.',
+    title: 'Testemunha do Coro',
+  },
+
+  dgn_marrow_tidy: {
+    name: 'Um cemitério arrumado',
+    desc: 'Derrote o Sacristão Marrow com toda Cova aberta colocada na borda do Pátio do Sino.',
+  },
+
+  dgn_lady_nobody_hanging: {
+    name: 'Ninguém fica pendurado',
+    desc: 'Derrote a Dama do Frio nos Ossos sem deixar ninguém cair do Abraço congelado.',
+  },
+
+  dgn_ilvane_hush: {
+    name: 'Silêncio agora',
+    desc: 'Derrote Cantor Ilvane sem que Canto fúnebre do vazio atinja ninguém.',
+  },
+
+  dgn_morthen_candlelight: {
+    name: 'Todas as velas acesas',
+    desc: 'Derrote Morthen o Gravecaller após reacender as quatro Velas da Lembrança em até 20 segundos após surgir a Proteção inquieta.',
+  },
+
+  dgn_guild_first_contract: {
+    name: 'Documento assinado',
+    desc: 'Conclua um contrato semanal de masmorra do Salão da Lanterna.',
+  },
+
+  dgn_guild_ten_contracts: {
+    name: 'Habitual do quadro',
+    desc: 'Conclua 10 contratos semanais de masmorra do Salão da Lanterna.',
+  },
+
+  dgn_guild_fifty_contracts: {
+    name: 'Veterano dos contratos',
+    desc: 'Conclua 50 contratos semanais de masmorra do Salão da Lanterna.',
+  },
+
+  feat_guild_writ_runner: {
+    name: 'Corredor de Contratos',
+    desc: 'Comprado de Garrick Holt, intendente do Salão da Lanterna, por 6 selos da lanterna.',
+    title: 'Corredor de Contratos',
+  },
+
+  feat_guild_hallsworn: {
+    name: 'Juramentado do Salão',
+    desc: 'Comprado de Garrick Holt, intendente do Salão da Lanterna, por 14 selos da lanterna.',
+    title: 'Juramentado do Salão',
+  },
+
+  feat_guild_of_lantern_hall: {
+    name: 'Do Salão da Lanterna',
+    desc: 'Comprado de Garrick Holt, intendente do Salão da Lanterna, por 24 selos da lanterna.',
+    title: 'do Salão da Lanterna',
   },
 };

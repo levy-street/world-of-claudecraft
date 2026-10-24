@@ -38,8 +38,8 @@ import type { BankInfo, VaultInfo } from '../src/world_api';
 const insertMock = vi.mocked(insertBankLedgerRow);
 const saveCharacterMock = vi.mocked(saveCharacterState);
 // The vault observer writes through the BATCHED sibling (one insert per op,
-// however many materials the diff produced); the personal bank and guild arms
-// stay on the single-row writer above.
+// however many materials the diff produced). Mixed consumable personal moves
+// also use one batch; single-row personal moves retain the legacy writer.
 const insertRowsMock = vi.mocked(insertBankLedgerRows);
 
 interface LedgerBatchView {
@@ -95,6 +95,39 @@ function info(
 }
 
 describe('diffBankOp (pure)', () => {
+  it('counts only the incoming maker when a legacy signed potion joins a mixed stack', () => {
+    expect(
+      diffBankOp(
+        'deposit',
+        info([
+          {
+            itemId: 'minor_healing_potion',
+            count: 2,
+            instance: { signer: 'Ana' },
+          },
+        ]),
+        info([
+          {
+            itemId: 'minor_healing_potion',
+            count: 5,
+            materialSources: [
+              { source: { signer: 'Ana' }, count: 2 },
+              { source: { signer: 'Bru' }, count: 3 },
+            ],
+          },
+        ]),
+      ),
+    ).toEqual([
+      {
+        itemId: 'minor_healing_potion',
+        count: 3,
+        instance: { signer: 'Bru' },
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
   it('a deposit of a new stack yields the deposited count', () => {
     expect(diffBankOp('deposit', info([]), info([{ itemId: 'wolf_fang', count: 3 }]))).toEqual([
       { itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
@@ -341,6 +374,33 @@ describe('bank ledger dispatch integration', () => {
     saveCharacterMock.mockResolvedValue(true);
   });
 
+  it('batches a mixed-consumable legacy recorder move into one database call', async () => {
+    recordBankOp(
+      'deposit',
+      { characterId: 42, accountId: 7 },
+      info([]),
+      info([
+        {
+          itemId: 'minor_healing_potion',
+          count: 5,
+          materialSources: [
+            { source: { signer: 'Ana' }, count: 2 },
+            { source: { signer: 'Bru' }, count: 3 },
+          ],
+        },
+      ]),
+    );
+    await bankLedgerIdle();
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(insertRowsMock).toHaveBeenCalledTimes(1);
+    expect(
+      insertRowsMock.mock.calls[0][0].map(({ count, instance }) => ({ count, instance })),
+    ).toEqual([
+      { count: 2, instance: { signer: 'Ana' } },
+      { count: 3, instance: { signer: 'Bru' } },
+    ]);
+  });
+
   it('deposit, withdraw, and buy stage exact rows until the matching character snapshot commits', async () => {
     const server = new GameServer();
     const fw = fakeWs();
@@ -432,7 +492,7 @@ describe('bank ledger dispatch integration', () => {
     const sim = server.sim as any;
     bringBankerToPlayer(sim, pid);
     const meta = sim.players.get(pid);
-    meta.copper = 1000000; // exactly the first socket price (src/sim/bank.ts)
+    meta.copper = 750000; // exactly the first socket price (src/sim/bank.ts)
     sim.addItem('linen_pouch', 1, pid);
     sim.addItem('burlap_reagent_pouch', 1, pid);
 
@@ -449,7 +509,7 @@ describe('bank ledger dispatch integration', () => {
         itemId: null,
         count: null,
         instance: null,
-        copperDelta: -1000000,
+        copperDelta: -750000,
         purchasedSlotsAfter: 0,
         container: 'personal',
         containerId: null,
@@ -624,7 +684,13 @@ describe('bank ledger dispatch integration', () => {
 // tests/vault_wire.test.ts; this block owns the pure diff contract.
 // ---------------------------------------------------------------------------
 
-import { diffVaultOp, recordVaultOp, vaultSpecialLedgerIdentity } from '../server/bank_ledger';
+import {
+  buildVaultCraftConsumeLedgerRows,
+  diffVaultOp,
+  recordVaultOp,
+  vaultCountGroups,
+  vaultSpecialLedgerIdentity,
+} from '../server/bank_ledger';
 import {
   noopGameMetricsCounters,
   setGameMetricsCounters,
@@ -648,6 +714,39 @@ function vinfo(
     nextUpgradeCost,
   };
 }
+
+describe("craft_consume rows for the crafter's own signed units", () => {
+  it('key a signed take exactly as the custody ledger keys that vault bucket', () => {
+    // The gatherer is provenance, never part of the custody key, so a bucket
+    // the crafter both gathered and signed keys signer-only.
+    const row: VaultInfo['special'][number] = {
+      itemId: 'copper_ore',
+      count: 2,
+      materialSources: [
+        {
+          source: { gatherer: { kind: 'character', id: 11, name: 'Ana' }, signer: 'Ana' },
+          count: 2,
+        },
+      ],
+    };
+    const rows = buildVaultCraftConsumeLedgerRows([
+      {
+        who: { characterId: 1, accountId: 1 },
+        takes: [
+          { itemId: 'copper_ore', count: 3 },
+          { itemId: 'copper_ore', count: 2, signer: 'Ana' },
+        ],
+        upgrades: 1,
+      },
+    ]);
+
+    expect(rows.map((r) => [r.count, r.instance])).toEqual([
+      [3, null],
+      [2, { vaultSpecial: 1, instance: { signer: 'Ana' }, craftedRecipeId: null }],
+    ]);
+    expect(vaultCountGroups(row)).toEqual([{ identity: rows[1].instance, count: 2 }]);
+  });
+});
 
 describe('diffVaultOp (pure)', () => {
   it('a deposit of a new material yields the deposited count with a null instance', () => {

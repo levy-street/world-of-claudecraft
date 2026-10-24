@@ -114,14 +114,28 @@ export function buildStationFlame(geo: THREE.BufferGeometry, usePbr: boolean): T
 }
 
 const loadedStationGltf = new Map<StationPropKind, THREE.Group>();
+const stationSceneLoads = new Map<StationPropKind, Promise<THREE.Group>>();
+
+/** The parsed station model, retained for the session once loaded. Another
+ *  consumer of the same GLB reads it here rather than through loadGltf:
+ *  props.ts releases the loader entry after its own extraction, so a later
+ *  loadGltf of that url fetches and parses the file a second time. */
+export function loadStationScene(kind: StationPropKind): Promise<THREE.Group> {
+  let task = stationSceneLoads.get(kind);
+  if (!task) {
+    task = loadGltf(STATION_ASSET_URL[kind]).then((gltf) => {
+      loadedStationGltf.set(kind, gltf.scene);
+      return gltf.scene;
+    });
+    task.catch(() => stationSceneLoads.delete(kind));
+    stationSceneLoads.set(kind, task);
+  }
+  return task;
+}
 
 if (typeof window !== 'undefined') {
-  for (const [kind, url] of Object.entries(STATION_ASSET_URL) as [StationPropKind, string][]) {
-    registerDeferredPreload(() =>
-      loadGltf(url).then((gltf) => {
-        loadedStationGltf.set(kind, gltf.scene);
-      }),
-    );
+  for (const kind of Object.keys(STATION_ASSET_URL) as StationPropKind[]) {
+    registerDeferredPreload(() => loadStationScene(kind));
   }
 }
 

@@ -13,12 +13,2218 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
-  'footer.guideBest': 'Лучшие MMORPG',
-  'footer.guideFree': 'Бесплатные MMORPG',
-  'footer.guideNew': 'Новые MMORPG',
-  'guide.footer.guideBest': 'Лучшие MMORPG',
-  'guide.footer.guideFree': 'Бесплатные MMORPG',
-  'guide.footer.guideNew': 'Новые MMORPG',
+  'editor.buildMode.materialNames.Cliff003': 'Изломанная скала',
+  'editor.buildMode.materialNames.Cliff004': 'Выветрившийся утёс',
+  'editor.buildMode.materialNames.Cliff005': 'Слоистый утёс',
+  'editor.buildMode.materialNames.Cliff006': 'Выжженный солнцем утёс',
+  'hudChrome.expeditions.leader': 'Под началом {name}',
+  'hudChrome.expeditions.solo': 'Пройти в одиночку',
+  'editor.city.roadCancel': 'Отмена',
+  'abilityUi.cast.sanctum_thaw_the_held': 'Оттаять пленников',
+  'abilityUi.cast.trash_demo_nova': 'Тестовая вспышка',
+  'abilityUi.cast.trash_demo_nova_unstoppable': 'Тестовая вспышка',
+  'abilityUi.cast.trash_demo_walker': 'Тестовая сфера',
+  'auth.bodyTypeA': 'Тип A',
+  'auth.bodyTypeB': 'Тип B',
+  'auth.wocBuilder.bodyGlyph.a': 'A',
+  'auth.wocBuilder.bodyGlyph.b': 'B',
+  'auth.wocBuilder.cat.bodyType': 'Телосложение',
+  'auth.wocBuilder.cat.face': 'Лицо',
+  'auth.wocBuilder.eye.blue': 'Синие',
+  'auth.wocBuilder.eye.grey': 'Серые',
+  'auth.wocBuilder.eye.paleBlue': 'Светло-синие',
+  'auth.wocBuilder.eye.teal': 'Бирюзовые',
+  'auth.wocBuilder.hairColor.red': 'Рыжий',
+  'auth.wocBuilder.piercing.brow': 'Бровь',
+  'auth.wocBuilder.piercing.ears': 'Полный набор для ушей',
+  'auth.wocBuilder.piercing.full': 'Полный набор',
+  'auth.wocBuilder.piercing.lip': 'Губа',
+  'auth.wocBuilder.piercing.none': 'Нет',
+  'auth.wocBuilder.section.ears': 'Уши',
+  'auth.wocBuilder.section.mouth': 'Губы',
+  'auth.wocBuilder.section.nose': 'Нос',
+  'auth.wocBuilder.skin.fair': 'Светлый',
+  'auth.wocBuilder.skin.rose': 'Розовый',
+  'auth.wocBuilder.skin.sand': 'Песочный',
+  'auth.wocBuilder.skin.tan': 'Смуглый',
+  'auth.wocBuilder.slider.bodyScale': 'Размер тела',
+  'auth.wocBuilder.slider.eyeTilt': 'Наклон глаз',
+  'auth.wocHead.brows.slim': 'Тонкие',
+  'auth.wocHead.brows.soft': 'Мягкие',
+  'auth.wocHead.brows.soft_arch': 'Мягкая дуга',
+  'auth.wocHead.hair.bald': 'Лысый',
+  'auth.wocHead.hair.bob': 'Каре',
+  'auth.wocHead.hair.long': 'Длинные',
+  'auth.wocHead.mouth.full': 'Полные',
+  'auth.wocHead.mouth.thin': 'Тонкие',
+  'auth.wocHead.nose.soft': 'Мягкий',
+  'hudChrome.bg.flagDroppedByLog': '{name} теряет флаг команды {team}.',
+  'hudChrome.bg.flagNameAzure': 'Лазурный флаг',
+  'hudChrome.bg.flagNameCrimson': 'Багровый флаг',
+  'hudChrome.bg.flagReturnedByLog': '{name} возвращает флаг команды {team}.',
+  'hudChrome.collections.armor.mail': 'Кольчуга',
+  'hudChrome.collections.detail.vendor': '{npc} ({location}), цена: {price}',
+  'hudChrome.collections.detail.vendorLabel': 'Продаёт',
+  'hudChrome.collections.tabs.sets': 'Комплекты предметов',
+  'hudChrome.dungeonTracker.heroicTitle': '{name} ({difficulty})',
+  'hudChrome.raidBossGuide.dungeonSubtitle': '{dungeon} | {boss} | {difficulty}',
+  'hudChrome.shardpike.blindBanner': 'КУРГАННАЯ ШКУРА ПРОБИТА',
+  'hudChrome.shardpike.promptStrike': 'УДАРЬТЕ В ГЛАЗ сейчас, {seconds} с',
+  'hudChrome.shardpike.promptTally': 'Потушено: {count}',
+  'hudChrome.warfareShop.companionOwnedAria': '{item}, уже собран или ожидает раскрытия',
+  'hudChrome.warfareShop.companionPurchase':
+    'Навсегда открывает этого спутника и немедленно призывает его. Предмет в сумки не добавляется.',
+  'bossJournal.bastion.captain.phaseName': 'Ров',
+  'bossJournal.bastion.vael.phaseVeilName': 'Туманная завеса',
+  'bossJournal.crypt.lady.rimeName': 'Тропа инея',
+  'bossJournal.crypt.marrow.phaseYardName': 'Колокольный двор',
+  'bossJournal.crypt.morthen.nameDeadName': 'Назвать мёртвых',
+  'bossJournal.sanctum.korgath.lastLinkName': 'Последнее звено',
+  'bossJournal.sanctum.korgath.phaseLockName': 'Замок',
+  'bossJournal.sanctum.korzul.noIceName': 'Льда больше нет',
+  'bossJournal.sanctum.tusker.phaseRoadName': 'На дороге',
+  'bossJournal.temple.selthe.soloName': 'Соло',
+  'bossJournal.temple.ysolei.phaseMoonName': 'Полнолуние',
+  'bossJournal.wildheart.beast.bondName': 'Узы стаи',
+  'bossJournal.wildheart.beast.huntName': 'Зов охоты',
+  'bossJournal.wildheart.beast.waryName': 'Настороже',
+  'entities.mobs.buddy_alon.name': 'Алон',
+  'entities.mobs.buddy_bull.name': 'Бык',
+  'entities.mobs.buddy_cate_coin.name': 'Монета Кейт',
+  'entities.mobs.buddy_frog.name': 'Лягушка',
+  'entities.mobs.buddy_moss_hare.name': 'Моховой заяц',
+  'entities.mobs.buddy_stag.name': 'Олень',
+  'entities.zones.goldcrest_harbor.name': 'Голдкрестская гавань',
+  'entities.zones.goldcrest_harbor.pois.0.label': 'Великие врата',
+  'entities.zones.goldcrest_harbor.pois.1.label': 'Большая площадь',
+  'entities.zones.goldcrest_harbor.pois.2.label': 'Голдкрестская биржа',
+  'entities.zones.goldcrest_harbor.pois.3.label': 'Рыночный квартал',
+  'entities.zones.goldcrest_harbor.pois.4.label': 'Портовый квартал',
+  'entities.zones.goldcrest_harbor.pois.5.label': 'Цитадель Высокой Короны',
+  'entities.zones.goldcrest_harbor.pois.6.label': 'Шпиль Света',
+  'entities.zones.goldcrest_harbor.pois.7.label': 'Золотой свет',
+  'entities.zones.goldcrest_harbor.pois.8.label': 'Золотой пролёт',
+  'entities.zones.goldcrest_harbor.welcome':
+    'Голдкрестская гавань, средоточие Мирового рынка. Здесь сходятся все дороги, приливы и торговые книги королевства.',
+  'editor.tree.volumeRise': 'Высота',
+  'editor.tree.volumeScale': 'Размер сферы',
+  'editor.tree.volumeSpread': 'Размах',
+  'editor.tree.volumeSy': 'Растяжение',
+  'editor.tree.volumeX': 'Ось X',
+  'editor.tree.volumeY': 'Ось Y',
+  'editor.tree.volumeZ': 'Ось Z',
+  'editor.tree.windSection': 'Ветер и коллизия',
+  'editor.tunnel.autoMouth': 'Вырезать собственный вход',
+  'editor.tunnel.autoMouthHint':
+    'Труба вырезает землю там, где пересекает поверхность, поэтому вручную совмещать отверстие со входом больше не нужно. Закопанные участки ничего не вырезают, а земля под участками над поверхностью остаётся нетронутой.',
+  'editor.tunnel.carveDelete': 'Удалить вырез',
+  'editor.tunnel.carveHint':
+    'Нажмите на землю для создания синего ПРИЗРАКА объёма, перетащите и настройте его, затем нажмите «Закрепить вырез» (или Enter), чтобы вырезать НАСТОЯЩУЮ комнату или туннель из скалы: объём имеет проходимый пол, каменные стены и потолок и перестраивает сетку земли вокруг. Шар создаёт камеру, наклонная капсула в склоне туннель, параллелепипед зал; увеличьте смешивание, чтобы соседние вырезы слились в одну аккуратную пещеру. Войти можно через любую грань, пересекающую поверхность.',
+  'editor.tunnel.carveLabel': 'Вырез {n}',
+  'editor.tunnel.carveList': 'Вырезы',
+  'editor.tunnel.caveLabel': 'Пещера {n} (точек: {nodes})',
+  'editor.tunnel.cutArch': 'Арка',
+  'editor.tunnel.cutBend': 'Изгиб',
+  'editor.tunnel.cutBlend': 'Смешивание',
+  'editor.tunnel.cutBrush': 'Следующий вырез',
+  'editor.tunnel.cutDepth': 'Глубина',
+  'editor.tunnel.cutHeight': 'Высота',
+  'editor.tunnel.cutLength': 'Длина',
+  'editor.tunnel.cutPitch': 'Наклон',
+  'editor.tunnel.cutShape.box': 'Параллелепипед',
+  'editor.tunnel.cutShape.capsule': 'Капсула',
+  'editor.tunnel.cutShape.sphere': 'Шар',
+  'editor.tunnel.cutShape.tube': 'Вход в пещеру (по проходу)',
+  'editor.tunnel.cutShape.voxel': 'Выкопанная порода',
+  'editor.tunnel.cutTaper': 'Сужение',
+  'editor.tunnel.cutWarp': 'Волнистость',
+  'editor.tunnel.cutWarpScale': 'Размер волн',
+  'editor.tunnel.cutWobble': 'Колебания',
+  'editor.tunnel.cutWobbleLen': 'Длина колебаний',
+  'editor.tunnel.cutYaw': 'Поворот',
+  'editor.tunnel.delete': 'Удалить пещеру',
+  'editor.tunnel.digAlpha.crescent': 'Серп',
+  'editor.tunnel.digAlpha.halfmoon': 'Полумесяц',
+  'editor.tunnel.digAlpha.ragged': 'Рваная',
+  'editor.tunnel.digAlpha.round': 'Круглая',
+  'editor.tunnel.digAlphaLabel': 'Альфа-маска кисти',
+  'editor.tunnel.digCell': 'Детализация копания (ячейка в ярдах)',
+  'editor.tunnel.digCellCoarsened':
+    'Для этого размера кисти детализация копания установлена на {cell} ярдов (более мелкая ячейка превысила бы допустимый объём).',
+  'editor.tunnel.digCellHint':
+    'Мазки запекаются прямо в карту одним объёмом породы с этим размером ячейки (мелкие ячейки требуют больше памяти и треугольников). Размер фиксируется после первого мазка.',
+  'editor.tunnel.digClear': 'Очистить выкопанную породу',
+  'editor.tunnel.digNoise': 'Шум края',
+  'editor.tunnel.digVolumeFull':
+    'Объём выкопанной породы достиг предела карты; очистите его или копайте ближе к уже выкопанному.',
+  'editor.tunnel.endOpen': 'Открытый выход',
+  'editor.tunnel.eraseConfirm': 'Стереть пещеры',
+  'editor.tunnel.eraseDone': 'Стёрто записей пещер внутри рамки: {n}',
+  'editor.tunnel.eraseGhostHint':
+    'Рамка стоит там, где вы нажали; нажмите снова для перемещения. После подтверждения всё, связанное с пещерами внутри неё, будет удалено.',
+  'editor.tunnel.eraseHalf': 'Половина ширины (ярды)',
+  'editor.tunnel.eraseNothing': 'В рамке нет пещер',
+  'editor.tunnel.eraseTitle': 'Рамка стирания',
+  'editor.tunnel.fillHint':
+    'Нажмите на землю для размещения РАМКИ СТИРАНИЯ, задайте ширину, длину и высоту ползунками или манипулятором, затем нажмите «Стереть пещеры» (или Enter): все вырезы, отверстия и выкопанные объёмы внутри удаляются, а частично покрытый вырез заполняется твёрдой породой в покрытой части. Один шаг отмены.',
+  'editor.tunnel.floorVariance': 'Неровности пола',
+  'editor.tunnel.generate': 'Создать пещеру (готово: {count})',
+  'editor.tunnel.ghostCancel': 'Отмена',
+  'editor.tunnel.ghostConfirm': 'Закрепить вырез',
+  'editor.tunnel.ghostGizmoHint':
+    'Нажмите 2, 3 или 4 (перемещение, поворот, масштаб), чтобы двигать призрак манипулятором, затем вернитесь к инструменту пещер для вырезания.',
+  'editor.tunnel.ghostHint':
+    'Синий призрак показывает объём, который удалит вырез. Перетащите его (нажмите или удерживайте в любом месте земли), настройте размер, форму и глубину ниже, затем нажмите «Закрепить вырез» (или Enter) для применения либо «Отмена» / Escape для отказа. До применения ничего не удаляется.',
+  'editor.tunnel.ghostLockHint':
+    'Enter закрепляет вырез, Escape отменяет. Инструменты 2-4 сначала перемещают, поворачивают и масштабируют призрак.',
+  'editor.tunnel.ghostTitle': 'Ожидающий вырез',
+  'editor.tunnel.guideHint':
+    'Синие узлы с пунктирной линией составляют модель пещеры (видны во всех инструментах). Двигайте узел инструментом перемещения, поднимайте или опускайте стрелкой Y, масштабируйте для расширения пещеры в этом месте; труба перестраивается сразу и ВСЕГДА точно сохраняет заданный размер. Зелёный шар = вход, красная стрелка = выход.',
+  'editor.tunnel.height': 'Внутренняя высота',
+  'editor.tunnel.hint':
+    'Нажмите на землю для узла ВХОДА, продолжайте ставить синие точки (последняя станет выходом), затем нажмите «Создать». Пещера представляет отдельную трубу только по вашим узлам; окружающий рельеф не сжимает и не меняет её форму. Включите «Вырезать собственный вход», чтобы труба открывала землю в местах пересечения поверхности; иначе используйте режим отверстия и двигайте трубу через выбор всей пещеры и инструмент перемещения.',
+  'editor.tunnel.holeDelete': 'Удалить отверстие',
+  'editor.tunnel.holeHint':
+    'Нажмите на землю для синего ПРИЗРАКА отверстия, перетащите его, затем нажмите «Вырезать в земле», чтобы пробить сетку рельефа насквозь. Земля там исчезает, а вокруг отверстия вырастает каменный обод; совместите вход пещеры снизу, чтобы войти или спрыгнуть. Сначала выберите форму: шар, ориентированный параллелепипед для щели или двери либо капсулу для арки. Меняйте размер или удаляйте применённые отверстия ниже; отмена убирает последнее.',
+  'editor.tunnel.holeLabel': 'Отверстие {n}',
+  'editor.tunnel.holeList': 'Отверстия',
+  'editor.tunnel.listTitle': 'Пещеры',
+  'editor.tunnel.modeCarve': 'Вырезание',
+  'editor.tunnel.modeDig': 'Копать пещеру',
+  'editor.tunnel.modeFill': 'Кисть заполнения',
+  'editor.tunnel.modeHole': 'Вырезать отверстие',
+  'editor.tunnel.modePatch': 'Залатать отверстие',
+  'editor.tunnel.modeRemesh': 'Перестроить сетку',
+  'editor.tunnel.modeSculpt': 'Кисть копания',
+  'editor.tunnel.modeSmooth': 'Сглаживание',
+  'editor.tunnel.mouthBlend': 'Смешивание входа',
+  'editor.tunnel.needExit':
+    'Вход размещён. Продолжайте ставить точки пути (последняя станет выходом), затем нажмите «Создать».',
+  'editor.tunnel.noRig': 'У этой пещеры нет узлов каркаса для захвата; создайте новую пещеру.',
+  'editor.tunnel.patchDelete': 'Удалить заплатку',
+  'editor.tunnel.patchHint':
+    'Нажмите на землю для заплатки (шириной с радиус кисти, с теми же формами, что у отверстия), ЗАПОЛНЯЮЩЕЙ землю в местах пересечения с отверстиями; подрезайте ею пустоты вокруг каждого отверстия. Заплатка всегда важнее затронутых отверстий. Меняйте размер или удаляйте заплатки ниже; отмена убирает последнюю.',
+  'editor.tunnel.patchLabel': 'Заплатка {n}',
+  'editor.tunnel.patchList': 'Заплатки',
+  'editor.tunnel.remeshAll': 'Перестроить сетку всех пещер',
+  'editor.tunnel.remeshAllHint':
+    'Единый размер ячейки для всех вырезов и выкопанных объёмов карты: крупные ячейки дают гораздо меньше треугольников. Применяется ко всей карте сразу с перестроением сетки; области ниже всё ещё могут отдельно уточнять или огрублять участки поверх этой настройки.',
+  'editor.tunnel.remeshAllTitle': 'Перестроить сетку всех пещер',
+  'editor.tunnel.remeshCell': 'Детализация (ячейка в ярдах)',
+  'editor.tunnel.remeshDelete': 'Удалить область',
+  'editor.tunnel.remeshGlobal': 'Детализация сетки пещеры (ячейка в ярдах)',
+  'editor.tunnel.remeshHint':
+    'Нажмите для области ДЕТАЛИЗАЦИИ шириной с радиус кисти: каждый затронутый вырез перестраивается с выбранным размером ячейки, мельче ИЛИ крупнее стандартного. Тратьте мелкую топологию именно там, где пещере нужна чёткость; увеличьте ячейку для облегчения дорогого выреза. Мелкие ячейки требуют больше треугольников.',
+  'editor.tunnel.remeshLabel': 'Область {n} ({r} ярдов, ячейки {cell} ярдов)',
+  'editor.tunnel.remeshList': 'Области детализации',
+  'editor.tunnel.remeshRegionsTitle': 'Области детализации (кисть)',
+  'editor.tunnel.reverse': 'Поменять вход/выход',
+  'editor.tunnel.sculptHint':
+    'Ведите по стене, полу или потолку выреза, чтобы ВЫКОПАТЬ породу, как кистью для глины: каждый проход вырезает сглаженный канал размером штампа (по радиусу кисти). Ведите по открытой земле, чтобы углубляться в поверхность. Один шаг отмены на мазок.',
+  'editor.tunnel.selectCave': 'Выбрать всю пещеру',
+  'editor.tunnel.smoothHint':
+    'Ведите вдоль выкопанного края для СГЛАЖИВАНИЯ: каждый проход повышает смешивание всех вырезов и заполнений под кистью, сливая складки и бугры вдоль мазка в одну округлую поверхность. Один шаг отмены на мазок.',
+  'editor.tunnel.spikeSize': 'Размер образований',
+  'editor.tunnel.stalactites': 'Сталактиты',
+  'editor.tunnel.stalagmites': 'Сталагмиты',
+  'editor.tunnel.startOpen': 'Открытый вход',
+  'editor.tunnel.texDefault': 'Гранит (по умолчанию)',
+  'editor.tunnel.texture': 'Текстура интерьера',
+  'editor.tunnel.tooShort':
+    'Точки каркаса слишком близко; разнесите их хотя бы на несколько ярдов.',
+  'editor.tunnel.variance': 'Вариативность',
+  'editor.tunnel.width': 'Ширина',
+  'editor.water.hue': 'Цветовой тон',
+  'editor.water.light': 'Светлота',
+  'editor.water.placeWaterfall': 'Разместить водопад',
+  'editor.water.placeWaterfallTitle':
+    'Подготовить анимированный водопад для размещения (нажмите на утёс)',
+  'editor.water.tintReset': 'Сбросить тонировку',
+  'editor.water.tintTitle': 'Тонировка воды',
+  'editor.water.waterfallHint':
+    'Анимированная завеса падающей воды с пенным бассейном. Увеличьте её вдоль утёса клавишей S или манипулятором; ручкой масштаба Y растягивайте только высоту.',
+  'editor.water.waterfallLabel': 'Водопад',
+  'editor.water.waterfallTitle': 'Водопады',
+  'editor.weather.addStep': 'Добавить этап',
+  'editor.weather.addStepTitle':
+    'Проходить этапы по порядку, выдерживая каждый заданное число минут, затем повторять',
+  'editor.weather.aurora': 'Полярное сияние',
+  'editor.weather.auroraHint':
+    'Завесы висят высоко над камерой, куда бы она ни двигалась: ярче всего ночью и едва заметны днём.',
+  'editor.weather.auto': 'Авто',
+  'editor.weather.blizzard': 'Метель',
+  'editor.weather.clear': 'Ясно',
+  'editor.weather.cloudCover': 'Облачность',
+  'editor.weather.cloudHeight': 'Высота облаков (ярды)',
+  'editor.weather.cloudHint':
+    'Низкие облака облегают рельеф и выглядят как клубящийся приземный туман.',
+  'editor.weather.intensity': 'Интенсивность',
+  'editor.weather.minutesShort': 'мин',
+  'editor.weather.rain': 'Дождь',
+  'editor.weather.removeStep': 'Удалить этот этап',
+  'editor.weather.scheduleHint':
+    'Этапы повторяются по порядку (дождь 5 мин, затем ясно 10 мин и так далее). Сохраняется с картой и работает в пробном запуске.',
+  'editor.weather.scheduleTitle': 'Динамическая погода',
+  'editor.weather.scheduleWins': 'Работает расписание: оно заменяет фиксированную погоду выше.',
+  'editor.weather.snow': 'Снег',
+  'editor.weather.sparkle': 'Золотые искры',
+  'editor.weather.stepMinutes': 'Длительность этапа в минутах',
+  'editor.weather.stepMode': 'Погода этапа',
+  'editor.weather.title': 'Погода',
+  'editor.weather.zoneHint':
+    'Погода этой зоны заменяет общую погоду карты, пока игрок находится внутри, поэтому у отдельной области могут быть собственные бури.',
+  'editor.weather.zoneTitle': 'Погода в этой зоне',
+  'editor.worldLink.cancel': 'Отмена',
+  'editor.worldLink.dragHint':
+    'Перетащите золотой прямоугольник для размещения карты. Точка отмечает ваше место появления.',
+  'editor.worldLink.hint':
+    'Перетащите контур карты туда, где она должна находиться в базовом мире игры. Пробный запуск разместит там её рельеф, объекты и места появления, а вокруг будут работать собственные существа, NPC и задания мира. Можно разместить её и в открытом море за краями старого мира: карта станет новой сушей. Рабочее пространство не меняется; привязка используется только при пробном запуске.',
+  'editor.worldLink.linked': 'Карта привязана к миру в ({x}, {z}).',
+  'editor.worldLink.save': 'Сохранить привязку',
+  'editor.worldLink.standaloneOnly':
+    'К миру можно привязать только отдельные созданные карты (сначала откройте пустую карту или импортируйте её).',
+  'editor.worldLink.statusLinked': 'Привязано: начало координат карты находится в ({x}, {z}) мира.',
+  'editor.worldLink.statusUnlinked':
+    'Отдельно: пробный запуск карты идёт в собственном пространстве.',
+  'editor.worldLink.title': 'Привязать к миру',
+  'editor.worldLink.unlinked': 'Карта отвязана: пробный запуск снова идёт отдельно.',
+  'editor.zoneTool.deleteTitle': 'Удалить это место',
+  'editor.zoneTool.hideBoxes': 'Скрыть рамки областей',
+  'editor.zoneTool.hint':
+    'Протяните рамку по земле и назовите её: внутри неё это имя показывается как местоположение в пробном запуске.',
+  'editor.zoneTool.namePrompt': 'Название места',
+  'editor.zoneTool.none': 'Именованных мест пока нет.',
+  'editor.zoneTool.title': 'Именованные места',
+  'editor.status.exportBlockedInvalid':
+    'Экспорт заблокирован: карта не прошла проверку совместимости с движком. Сохраните копию и проверьте последние изменения перед повторной попыткой.',
+  'editor.status.exportBlockedMissingDeps':
+    'Экспорт заблокирован: в браузере отсутствуют файлы используемых моделей, текстур или скайбоксов ({count}). Восстановите их перед экспортом, чтобы движок получил полную карту.',
+  'editor.status.holeCapReached':
+    'Достигнут предел отверстий ({max}). Сначала удалите или отмените отверстие.',
+  'editor.status.importMissingDeps':
+    'Отсутствуют файлы моделей/текстур/скайбоксов ({count}), поэтому части карты пусты. Импортируйте пакет .wocmap.zip заново, чтобы включить их.',
+  'editor.status.loading3dAssets': 'Загрузка ресурсов...',
+  'editor.status.loading3dEngine': 'Запуск движка...',
+  'editor.status.loading3dZone': 'Построение мира...',
+  'editor.status.newFlatMap': 'Пустая карта создана.',
+  'editor.status.openFailedLocal':
+    'Не удалось прочитать сохранение (повреждено или обрезано). Если вы экспортировали копию, файл ещё можно попробовать импортировать через «Ещё» > «Импорт».',
+  'editor.status.publishedMapOpened':
+    'Открыта ваша опубликованная карта «{name}»: это версия карты, поставляемая с игрой.',
+  'editor.status.selectionCopied': 'Скопировано выбранных элементов: {count}.',
+  'editor.status.selectionNothingToCopy': 'Перед копированием выберите ресурс, NPC или существо.',
+  'editor.status.selectionNothingToPaste': 'Перед вставкой скопируйте ресурс, NPC или существо.',
+  'editor.status.selectionPasted': 'Вставлено элементов: {count}.',
+  'editor.status.shippedMapOpened': 'Открыта редактируемая копия «{name}».',
+  'editor.status.waterReapplied': 'Вода перестроена по текущему рельефу.',
+  'editor.tool.build': 'Создать модель',
+  'editor.tool.building': 'Режим строительства',
+  'editor.tool.city': 'Строительство города',
+  'editor.tool.clutter': 'Рисовать мелкий декор',
+  'editor.tool.collider': 'Коллайдер',
+  'editor.tool.decal': 'Декаль',
+  'editor.tool.entity': 'Перемещать NPC и существ',
+  'editor.tool.eyedropper': 'Пипетка',
+  'editor.tool.fluid': 'Бассейн жидкости',
+  'editor.tool.foliage': 'Рисовать растительность',
+  'editor.tool.grassClear': 'Удалить траву',
+  'editor.tool.light': 'Точечный свет',
+  'editor.tool.meshFix': 'Исправление сетки',
+  'editor.tool.move': 'Перемещение',
+  'editor.tool.rock': 'Генератор камней',
+  'editor.tool.rotate': 'Поворот',
+  'editor.tool.sound': 'Точечный звук',
+  'editor.tool.tree': 'Генератор деревьев',
+  'editor.tool.tunnel': 'Пещеры',
+  'editor.toolGroup.assets': 'Ресурсы',
+  'editor.toolGroup.effects': 'Эффекты',
+  'editor.toolGroup.terrain': 'Рельеф',
+  'editor.toolGroup.world': 'Мир',
+  'editor.topbar.axisGimbal': 'Индикатор ориентации камеры',
+  'editor.topbar.axisGimbalTitle': 'Показать или скрыть индикатор ориентации камеры',
+  'editor.topbar.dungeonTitle': 'Редактировать созданную планировку интерьера подземелья',
+  'editor.topbar.evenBuildings': 'Выровнять пропорции зданий',
+  'editor.topbar.evenBuildingsDone': 'Пропорции зданий выровнены: {count}.',
+  'editor.topbar.evenBuildingsNone': 'Сплющенных зданий не найдено.',
+  'editor.topbar.evenBuildingsTitle':
+    'Исправить здания, растянутые в стороны для заполнения участка: каждое сохраняет высоту и площадь основания, но ширина и глубина становятся равными, убирая сплющенный вид',
+  'editor.topbar.fullBuildDone': 'Все зоны загружены: {total}.',
+  'editor.topbar.fullBuildPreview': 'Предпросмотр всей сборки',
+  'editor.topbar.fullBuildPreviewTitle':
+    'Загрузить все зоны карты в область просмотра (может занять время)',
+  'editor.topbar.fullBuildProgress': 'Построение зон: {done}/{total}',
+  'editor.topbar.generateTerrain': 'Создать рельеф',
+  'editor.topbar.generateTerrainTitle':
+    'Создать рельеф карты из региона базового мира игры: перетащите контур по карте мира, чтобы выбрать часть старой планировки',
+  'editor.topbar.hitboxes': 'Хитбоксы',
+  'editor.topbar.hitboxesTitle':
+    'Показывать формы коллизии, реально блокирующие проход в игре (синие = созданные в редакторе коллизий, красные = автоматически запечённые параллелепипеды)',
+  'editor.topbar.importModel': 'Импорт модели',
+  'editor.topbar.importModelTitle':
+    'Загрузить и разместить модель .glb или .gltf с этого компьютера полностью офлайн (хранится в этом сеансе)',
+  'editor.topbar.mapWindowTitle': 'Открыть карту текущей зоны (с кнопкой всего мира)',
+  'editor.topbar.minimapTitle': 'Переключить миникарту в углу (вид сверху, следующий за камерой)',
+  'editor.topbar.moreTitle':
+    'Другие действия: сохранить как, автосохранение, копия, импорт/экспорт, загрузка',
+  'editor.topbar.musicTitle':
+    'Воспроизводить музыку области под камерой (сначала трек музыкальной области, затем карты, затем собственная тема зоны). При полёте музыка следует за вами.',
+  'editor.topbar.newFlat': 'Пустая карта',
+  'editor.topbar.newFlatTitle':
+    'Создать совершенно новую пустую карту выбранного размера без содержимого базовой игры',
+  'editor.topbar.presetPrompt': 'Спрашивать о предустановках при закреплении',
+  'editor.topbar.presetPromptTitle':
+    'После закрепления в редакторе коллизий спрашивать, сохранять ли параллелепипеды также как предустановку хитбоксов на этом устройстве. Включите снова, если выбрали «Больше не спрашивать».',
+  'editor.topbar.previewTitle':
+    'Посмотреть карту как в игре: скрывает служебные наложения редактора (коллайдеры, музыкальные области, метки, кольца, манипуляторы)',
+  'editor.topbar.primaryTools': 'Основные инструменты трансформации',
+  'editor.topbar.projectionOrthographic': 'Ортографическая',
+  'editor.topbar.projectionPerspective': 'Перспективная',
+  'editor.topbar.projectionTitle': 'Переключить перспективную/ортографическую проекцию (Num 5)',
+  'editor.topbar.publishMap': 'Опубликовать в игре',
+  'editor.topbar.publishMapTitle':
+    'Записать карту в локальный репозиторий как настоящее содержимое игры (data/maps + src/sim/maps); запуск через ?map=<slug>',
+  'editor.topbar.settingsTitle': 'Настройки графики и звука (общие с пробным запуском)',
+  'editor.topbar.unpublishMap': 'Удалить из игры',
+  'editor.topbar.unpublishMapTitle':
+    'Удалить карту из локальной игры: удаляет файлы, записанные публикацией, и восстанавливает стандартный мир ClaudeCraft',
+  'editor.topbar.workspace': 'Вид',
+  'editor.topbar.workspaceTitle': 'Вид, карта, предпросмотр и режимы рабочей области',
+  'editor.topbar.worldLink': 'Привязать к миру',
+  'editor.topbar.worldLinkTitle':
+    'Разместить карту внутри базового мира игры: перетащите её контур на карту мира, и пробный запуск встроит её туда с работающим вокруг базовым миром',
+  'editor.topbar.zoneIsolateOff': 'Вся сборка',
+  'editor.topbar.zoneIsolateOn': 'Зона: {zone}',
+  'editor.topbar.zoneIsolateTitle':
+    'Вся сборка ⇄ Зона: изолировать зону камеры; всё за её пределами выгружается до обратного переключения. Только отображение, сама карта не меняется.',
+  'editor.transform.moveHint':
+    'Тяните стрелку манипулятора для движения вдоль оси или жёлтый квадрат для свободного движения. Стрелки клавиатуры сдвигают понемногу.',
+  'editor.transform.pickHint': 'Нажмите на ресурс для выбора; на выбранном появится манипулятор.',
+  'editor.transform.rotateHint':
+    'Тяните кольцо манипулятора для вращения вокруг оси. Shift+колёсико также вращает с шагом 15 градусов.',
+  'editor.transform.scaleHint':
+    'Тяните осевую ручку манипулятора для растяжения по оси или жёлтый центральный куб для равномерного масштаба.',
+  'editor.tree.addVolume': 'Добавить сферу',
+  'editor.tree.bark': 'Текстура коры',
+  'editor.tree.barkTile': 'Размер плитки коры (ярды)',
+  'editor.tree.branchAngle': 'Размах',
+  'editor.tree.branchDepth': 'Уровни',
+  'editor.tree.branchDroop': 'Поникание',
+  'editor.tree.branchLen': 'Длина',
+  'editor.tree.branchSection': 'Ветви',
+  'editor.tree.branchTaper': 'Сужение',
+  'editor.tree.branchTwist': 'Искривление',
+  'editor.tree.branches': 'На ветвь',
+  'editor.tree.canopyHint':
+    'Листья появляются только внутри этих сфер. Выберите форму их расположения, затем настройте размах и размер либо редактируйте отдельную сферу ниже, чтобы вручную вылепить крону.',
+  'editor.tree.canopySection': 'Объёмы кроны',
+  'editor.tree.collide': 'Хитбокс ствола',
+  'editor.tree.collideHint':
+    'Радиус коллайдера ствола как множитель его толщины. 0 позволяет игрокам проходить насквозь.',
+  'editor.tree.copyToTool': 'Использовать по умолчанию для инструмента',
+  'editor.tree.editVolumes': 'Редактировать сферы',
+  'editor.tree.girth': 'Толщина',
+  'editor.tree.heightScale': 'Высота ствола',
+  'editor.tree.hint':
+    'Нажмите на землю, чтобы вырастить дерево. Все настройки ниже задают СЛЕДУЮЩЕЕ дерево; выберите размещённое дерево инструментом выбора для изменения формы сразу.',
+  'editor.tree.leafBranchBias': 'Притянуть к ветвям',
+  'editor.tree.leafClump': 'Группирование',
+  'editor.tree.leafCross': 'Перекрёстные карточки',
+  'editor.tree.leafCrossHint':
+    'Два четырёхугольника на лист вместо одного: вдвое дороже, зато крона имеет настоящую глубину.',
+  'editor.tree.leafDroop': 'Поникание',
+  'editor.tree.leafFill': 'Заполнение',
+  'editor.tree.leafFillHint':
+    '0 размещает листья на оболочке каждой сферы; 1 заполняет её целиком.',
+  'editor.tree.leafGlow': 'Свечение',
+  'editor.tree.leafJitter': 'Разброс поворота',
+  'editor.tree.leafOrient': 'Ориентация',
+  'editor.tree.leafSection': 'Листья',
+  'editor.tree.leafSet': 'Изображение листа',
+  'editor.tree.leafSizeVar': 'Вариация размера',
+  'editor.tree.leafTint': 'Тонировка',
+  'editor.tree.leafTintVar': 'Вариация цвета',
+  'editor.tree.leaves': 'Количество',
+  'editor.tree.openStudio': 'Редактировать в студии деревьев',
+  'editor.tree.openStudioHint':
+    'Открывает дерево отдельно в пустой сцене, чтобы менять форму без мешающей деревни. Сохраните результат, и он станет настройкой инструмента по умолчанию.',
+  'editor.tree.orient.billboard': 'К камере',
+  'editor.tree.orient.droop': 'Поникающие',
+  'editor.tree.orient.out': 'Наружу',
+  'editor.tree.orient.random': 'Случайная',
+  'editor.tree.orient.up': 'Вертикальная',
+  'editor.tree.orient.volume': 'По кроне',
+  'editor.tree.preset': 'Предустановка',
+  'editor.tree.presetHint':
+    'Начальный вариант для биома. Все настройки затем остаются редактируемыми.',
+  'editor.tree.randomize': 'Новое зерно',
+  'editor.tree.randomizeHint':
+    'Заново случайно задаёт рост ветвей и разброс листьев без изменения настроек.',
+  'editor.tree.removeVolume': 'Удалить',
+  'editor.tree.resetVolumes': 'Вернуться к форме предустановки',
+  'editor.tree.shape': 'Форма',
+  'editor.tree.shapeName.column': 'Колонна',
+  'editor.tree.shapeName.cone': 'Конус',
+  'editor.tree.shapeName.dome': 'Купол',
+  'editor.tree.shapeName.sockets': 'На ветвях',
+  'editor.tree.shapeName.sphere': 'Шар',
+  'editor.tree.shapeName.umbrella': 'Зонтик',
+  'editor.tree.shapeName.weeping': 'Плакучая',
+  'editor.tree.showVolumes': 'Показывать сферы',
+  'editor.tree.stats': 'Листьев: {leaves}, ветвей: {branches}, высота: {height} ярдов',
+  'editor.tree.studioBanner': 'Студия деревьев',
+  'editor.tree.studioHint':
+    'Придайте дереву форму здесь, затем сохраните его как настройку инструмента по умолчанию или отмените. Исходная карта ждёт вас.',
+  'editor.tree.studioKeep': 'Использовать это дерево',
+  'editor.tree.studioKept':
+    'Настройки студии деревьев теперь используются инструментом по умолчанию.',
+  'editor.tree.studioMapName': 'Студия деревьев',
+  'editor.tree.sway': 'Колыхание',
+  'editor.tree.title': 'Генератор деревьев',
+  'editor.tree.trunk': 'Основа',
+  'editor.tree.trunkSection': 'Ствол',
+  'editor.tree.volumeCount': 'Сферы',
+  'editor.tree.volumeJitter': 'Разброс',
+  'editor.tree.volumeLabel': 'Сфера {n}',
+  'editor.music.areaN': 'Область {num}',
+  'editor.music.areaTrack': 'Музыка новых областей',
+  'editor.music.areasTitle': 'Музыкальные области',
+  'editor.music.default': 'Авто (тема биома)',
+  'editor.music.dragHint':
+    'Протяните рамку по земле, чтобы добавить область с выбранной выше музыкой. Нажмите на область для выбора (Delete удаляет). При пересечении приоритет у меньшей области.',
+  'editor.music.hint':
+    'Выберите музыку для всей карты или рисуйте рамки для областей с собственной музыкой. В пробном запуске музыка меняется при пересечении их границ.',
+  'editor.music.none': 'Музыкальных областей пока нет.',
+  'editor.music.previewDisabled': 'Музыка выключена в настройках.',
+  'editor.music.previewOff': 'Музыка области остановлена.',
+  'editor.music.previewZone': 'Сейчас играет: {zone}',
+  'editor.music.removeArea': 'Удалить эту музыкальную область',
+  'editor.music.rowTrack': 'Музыка этой области',
+  'editor.music.selectArea': 'Выбрать эту область в мире (её рамка подсветится; Delete удаляет)',
+  'editor.music.track.dungeon_gravewyrm_sanctum':
+    'Подземелье: Святилище могильного змея (путь боссов)',
+  'editor.music.track.dungeon_hollow_crypt': 'Подземелье: Полая крипта (танец скелетов)',
+  'editor.music.track.dungeon_sunken_bastion':
+    'Подземелье: Затонувший бастион (затопленная крепость)',
+  'editor.music.track.marsh': 'Болото (квакающая трясина)',
+  'editor.music.track.peaks': 'Горы (героические народные мотивы)',
+  'editor.music.track.town_eastbrook': 'Город: Истбрук (тёплая пастораль)',
+  'editor.music.track.town_fenbridge': 'Город: Фенбридж (старое средневековье)',
+  'editor.music.track.town_goldcrest': 'Город: Голдкрестская гавань (торговый порт)',
+  'editor.music.track.town_highwatch': 'Город: Хайвотч (бодрый марш)',
+  'editor.music.track.vale': 'Долина (игривый луг)',
+  'editor.music.track.vale_legacy': 'Старая долина (исходная тема)',
+  'editor.music.zoneTrack': 'Музыка карты',
+  'editor.newMap.height': 'Высота (ярды)',
+  'editor.newMap.hint':
+    'Выберите предустановку или задайте размер в ярдах. Карта ограничена: стены по краям рельефа и невидимые преграды периметра удерживают пробный запуск внутри неё.',
+  'editor.newMap.interior': 'Интерьер (60 x 60)',
+  'editor.newMap.openWorld': 'Открытый мир (360 x 1080)',
+  'editor.newMap.scale': 'Множитель масштаба',
+  'editor.newMap.title': 'Новая карта',
+  'editor.newMap.width': 'Ширина (ярды)',
+  'editor.newMap.zone': 'Зона (240 x 360)',
+  'editor.openDrawer.colType': 'Тип',
+  'editor.openDrawer.openCopy': 'Открыть копию',
+  'editor.openDrawer.publishedUnreadable':
+    'Не удалось прочитать опубликованную карту «{slug}» с сервера разработки.',
+  'editor.openDrawer.tabShipped': 'Карты из комплекта',
+  'editor.openDrawer.typePublished': 'Опубликовано в игре ({slug})',
+  'editor.openDrawer.typeShippedPublished': '{group} · ваша опубликованная версия',
+  'editor.playtestBack': 'Вернуться в редактор',
+  'editor.playtestBackTitle':
+    'Вернуться в редактор карты (карта сохранена при запуске пробной игры)',
+  'editor.publish.done':
+    'Опубликовано. Запустите через /index.html?map={slug}; для выпуска зафиксируйте созданные файлы в репозитории.',
+  'editor.publish.failed': 'Публикация заблокирована: {error}',
+  'editor.publish.noDevServer':
+    'Публикация записывает данные в проект, поэтому нужен локальный сервер разработки (npm run dev).',
+  'editor.publish.rejected': 'Публикация отклонена: {error}',
+  'editor.publish.removeConfirm':
+    'Удаляет опубликованные файлы «{slug}» (data/maps + src/sim/maps) и восстанавливает стандартный мир ClaudeCraft. Карта в редакторе не меняется, и её можно снова опубликовать в любой момент.',
+  'editor.publish.removeTitle': 'Удалить эту карту из игры?',
+  'editor.publish.removed':
+    'Карта «{slug}» удалена из игры. Стандартный мир ClaudeCraft восстановлен.',
+  'editor.publish.removedNothing':
+    'Удалять нечего: карта «{slug}» не опубликована в этом репозитории.',
+  'editor.rock.baseTex': 'Основная текстура',
+  'editor.rock.chainCount': 'Размещено точек: {count}',
+  'editor.rock.chainHint':
+    'Нажимайте, чтобы ставить синие точки; генерация протягивает через них ОДНО объединённое твёрдое тело (прямыми линиями через впадины) с проходимым верхом, превращая цепочку в мост или гребень. После генерации точки остаются: перемещайте или масштабируйте их манипуляторами, и тело изменится вслед за ними.',
+  'editor.rock.chainMode': 'Режим моста / гребня',
+  'editor.rock.chainTooShort': 'Сначала разместите хотя бы две точки.',
+  'editor.rock.clearChain': 'Очистить точки',
+  'editor.rock.depth': 'Глубина заглубления',
+  'editor.rock.detail': 'Детализация формы',
+  'editor.rock.generateChain': 'Создать каменный гребень',
+  'editor.rock.height': 'Высота',
+  'editor.rock.hint':
+    'Нажмите на землю, чтобы вырастить процедурный валун. Ползунки ниже задают СЛЕДУЮЩИЙ камень; выберите размещённый камень инструментом выбора, чтобы менять его форму сразу. Манипулятором растягивайте камни в плиты и пластины утёсов.',
+  'editor.rock.jag': 'Изломанность',
+  'editor.rock.noise': 'Количество шума',
+  'editor.rock.reroll': 'Случайная форма заново',
+  'editor.rock.selTitle': 'Созданный камень',
+  'editor.rock.sharp': 'Острота',
+  'editor.rock.texBare': 'Без покрытия (с тонировкой)',
+  'editor.rock.texSandstone': 'Песчаник',
+  'editor.rock.texStone': 'Камень',
+  'editor.rock.title': 'Генератор камней',
+  'editor.rock.walkable': 'Проходимый верх',
+  'editor.scene.count': 'Объектов: {n}',
+  'editor.scene.hiddenBadge': 'скрыт',
+  'editor.scene.hideTitle': 'Скрыть объект в редакторе (он остаётся на карте)',
+  'editor.scene.hint':
+    'Все размещённые объекты. Нажмите для выбора, дважды нажмите на имя для переименования.',
+  'editor.scene.isolateTitle':
+    'Изолировать {zone}: выгрузить всё за пределами зоны (только отображение)',
+  'editor.scene.none': 'Объектов пока нет.',
+  'editor.scene.pinTitle': 'Сфокусировать камеру на этом объекте и выбрать его',
+  'editor.scene.renameLabel': 'Имя объекта',
+  'editor.scene.residentBadge': 'загружена',
+  'editor.scene.showTitle': 'Снова показать этот объект',
+  'editor.scene.streamGuide': 'Показать границу загруженной области',
+  'editor.scene.streamGuideHint':
+    'Рисует светло-красные стены на границе загруженных зон, чтобы край потоковой загрузки был виден и его не приходилось угадывать.',
+  'editor.scene.title': 'Коллекция сцены',
+  'editor.scene.zoneLockTitle':
+    'Зафиксировать загрузку этой зоны: оставаться здесь до снятия фиксации независимо от камеры',
+  'editor.scene.zoneStream': 'Загружать зоны рядом с камерой',
+  'editor.scene.zoneStreamAt':
+    'Загрузка {zone} (зон: {count}). Вылетите за их пределы для загрузки следующего набора.',
+  'editor.scene.zoneStreamHint':
+    'Держать загруженными {count} ближайших к камере зон и заменять весь набор, когда вы вылетаете за его пределы.',
+  'editor.scene.zoneStreamLocked':
+    'Зафиксировано: {zone}. Снимите фиксацию, чтобы снова следовать за камерой.',
+  'editor.scene.zoneStreamOn': 'Загрузка {zone}: зон в памяти {count}, всё остальное выгружено.',
+  'editor.scene.zoneUnlockTitle': 'Снять фиксацию: снова следовать за камерой в следующую зону',
+  'editor.sculpt.alphaHint':
+    'Альфа-маски меняют настоящую поверхность рельефа и одинаковы в редакторе и пробном запуске.',
+  'editor.sculpt.alphaNone': 'Круглая',
+  'editor.sculpt.alphaTitle': 'Альфа-маска скульптинга',
+  'editor.sculpt.autoTex': 'Автотекстурирование по углу',
+  'editor.sculpt.autoTexAngle': 'Крутизна от (градусы)',
+  'editor.sculpt.autoTexFlat': 'Текстура ровной земли',
+  'editor.sculpt.autoTexHint':
+    'Каждый мазок перекрашивает изменённый участок по углу земли: одна текстура ниже порога, другая выше (мгновенные утёсы).',
+  'editor.sculpt.autoTexNone': 'Оставить как есть',
+  'editor.sculpt.autoTexSteep': 'Текстура крутой земли',
+  'editor.sculpt.grab': 'Захват / вытягивание (змеиный крюк)',
+  'editor.sculpt.grabHint':
+    'Нажмите, чтобы захватить землю под кистью, и тяните: рельеф следует за курсором в любом направлении, вверх поднимается, вниз вдавливается, вбок смещается по карте, как глина. Один захват отменяется одним шагом. Размер кисти задаёт ширину захваченного участка.',
+  'editor.sculpt.hardness': 'Жёсткость кисти',
+  'editor.sculpt.hint': 'Ведите кистью, чтобы поднимать землю; включите флажок для вырезания вниз.',
+  'editor.sculpt.lower': 'Опускать вместо подъёма',
+  'editor.sculpt.shapeTitle': 'Форма кисти',
+  'editor.sculpt.shiftHint':
+    'Удерживайте Shift при перетаскивании для обратного действия (подъём становится опусканием и наоборот).',
+  'editor.selection.collisionBaked':
+    'Блокировка запечённой формой модели ({count} параллелепипедов по сетке). Ползунок радиуса заменяет её простым кругом; «Авто» восстанавливает запечённую форму.',
+  'editor.selection.collisionCopied': 'Коллизия скопирована: {name}, {count} шт.',
+  'editor.selection.collisionCopyAll': 'Скопировать коллизию на все {name} ({count})',
+  'editor.selection.collisionCopyAllHint':
+    'Задаёт всем остальным {name} на карте тот же тип и форму коллизии с размером под каждую копию, чтобы маленькая копия не получила огромную область.',
+  'editor.selection.collisionCopyConfirm': 'Скопировать на все',
+  'editor.selection.collisionCopyConfirmBody':
+    'Все остальные {name} на карте ({count}) получат этот тип и форму коллизии взамен своих, с размером по собственному масштабу (маленькая копия получит маленькую область, а не эту). Ctrl+Z отменяет всё копирование.',
+  'editor.selection.collisionCopyConfirmTitle': 'Скопировать коллизию на все {name}?',
+  'editor.selection.collisionCustom':
+    'Пользовательская область (круг/квадрат) заменяет запечённую форму модели. Нажмите «Авто» для восстановления.',
+  'editor.selection.collisionEdited':
+    'Пользовательские хитбоксы (параллелепипедов: {count}). Симуляция блокирует проход точно по ним.',
+  'editor.selection.collisionTitle': 'Коллизия',
+  'editor.selection.collisionType': 'Тип коллизии',
+  'editor.selection.collisionTypeBaked': 'Запечённые хитбоксы',
+  'editor.selection.collisionTypeBasic': 'Базовая (радиус)',
+  'editor.selection.collisionTypeMesh': 'Точная коллизия (затратная)',
+  'editor.selection.collisionTypeNone': 'Без коллизии',
+  'editor.selection.combine': 'Объединить ({count})',
+  'editor.selection.combineGrouped': 'Размещений сгруппировано: {count}.',
+  'editor.selection.combineHint':
+    'Объединяет выбранное в один объект. Части разделённого здания снова становятся зданием; прочее группируется для общего выбора, перетаскивания и удаления.',
+  'editor.selection.combineNeedsTwo': 'Для объединения выберите хотя бы два размещения.',
+  'editor.selection.combineRejoined': 'Снова объединено в {name}.',
+  'editor.selection.hitboxAdd': 'Добавить хитбокс',
+  'editor.selection.hitboxCap': 'Достигнут предел хитбоксов ({max} на ресурс).',
+  'editor.selection.hitboxClearPreset': 'Очистить сохранённую предустановку',
+  'editor.selection.hitboxDelete': 'Удалить выбранное',
+  'editor.selection.hitboxDone': 'Завершить редактирование',
+  'editor.selection.hitboxEdit': 'Редактировать хитбоксы',
+  'editor.selection.hitboxHint':
+    'Нажмите на хитбокс для выбора; Ctrl/Shift+щелчок выбирает несколько. Меняйте их форму инструментами перемещения, поворота и масштаба (или манипулятором), как у других объектов. Delete удаляет выбранные параллелепипеды; Esc выходит из режима редактирования.',
+  'editor.selection.hitboxPresetCleared': 'Предустановка хитбоксов очищена.',
+  'editor.selection.hitboxPresetHint':
+    'Предустановки хранятся на этом устройстве: все будущие размещения ресурса получают сохранённые хитбоксы.',
+  'editor.selection.hitboxPresetSaved':
+    'Предустановка хитбоксов сохранена для {name}. Новые размещения копируют эти параллелепипеды.',
+  'editor.selection.hitboxReset': 'Сбросить к запечённым',
+  'editor.selection.hitboxSavePreset': 'Сохранить как предустановку',
+  'editor.selection.hitboxSelected': 'Выбрано хитбоксов: {count}',
+  'editor.selection.meshBakeDone': 'Точная коллизия готова (параллелепипедов: {count}).',
+  'editor.selection.meshBakeFailed': 'Не удалось запечь точную коллизию для этого ресурса.',
+  'editor.selection.meshBaking': 'Запекание точной коллизии из сетки модели...',
+  'editor.selection.meshHint':
+    'Точная коллизия заново строит хитбоксы по настоящей сетке модели (много мелких параллелепипедов). Это затратно, используйте для особых случаев; запекается один раз на ресурс при выборе.',
+  'editor.selection.meshReady':
+    'Точная коллизия активна: плотный набор параллелепипедов облегает настоящую сетку модели.',
+  'editor.selection.multiCount': 'Выбрано ресурсов: {count}',
+  'editor.selection.multiHint':
+    'Перемещение, дублирование Shift+D и Delete действуют на весь выбор; Shift+щелчок добавляет или убирает ресурсы.',
+  'editor.selection.pieces': 'Редактировать элементы ({count})',
+  'editor.selection.piecesCap': 'Недостаточно места размещения для разделения здания.',
+  'editor.selection.piecesDone': 'Разделено на элементы: {count}.',
+  'editor.selection.piecesHint':
+    'Разделяет это созданное в Blender здание на элементы набора и оболочку, каждый как отдельное размещение для перемещения, поворота, масштаба или удаления. Ctrl+Z собирает здание обратно.',
+  'editor.selection.scaleAllButton': 'Масштабировать все {name} ({count})',
+  'editor.selection.scaleAllConfirm': 'Масштабировать все',
+  'editor.selection.scaleAllConfirmBody':
+    'Все {name} на карте ({count}, включая этот) получат случайный масштаб от {min} до {max} взамен текущего. Ctrl+Z отменяет действие.',
+  'editor.selection.scaleAllConfirmTitle': 'Масштабировать все {name}?',
+  'editor.selection.scaleAllDone': 'Масштаб изменён: {name}, {count} шт.',
+  'editor.selection.scaleAllHint':
+    'Назначает каждой копии ресурса случайный масштаб от минимума до максимума (задайте одинаковые границы для единого масштаба).',
+  'editor.selection.scaleAllTitle': 'Масштабировать все копии',
+  'editor.selection.scaleMax': 'Максимальный масштаб',
+  'editor.selection.scaleMin': 'Минимальный масштаб',
+  'editor.selection.selectAllOfAsset': 'Выбрать все экземпляры ресурса ({count})',
+  'editor.selection.selectAllOfAssetTitle':
+    'Выбрать все размещения ресурса на карте, чтобы перемещение, удаление или изменение свойства применялось ко всем.',
+  'editor.selection.squareCollision': 'Квадратная коллизия (следует повороту)',
+  'editor.selection.sway': 'Колыхание на ветру',
+  'editor.selection.swayHint':
+    'Колышет ресурс на ветру. Включено для растений по умолчанию. Применяется ко ВСЕМ размещениям ресурса на карте, а не только к выбранному.',
+  'editor.selection.ungroup': 'Разгруппировать ({count})',
+  'editor.selection.ungroupDone': 'Разгруппировано размещений: {count}.',
+  'editor.selection.y': 'Ось Y',
+  'editor.settings.applyGraphics': 'Перезагрузите редактор для применения',
+  'editor.settings.graphicsHigh': 'Высокое',
+  'editor.settings.graphicsHint':
+    'Применяется к следующему пробному запуску, а после перезагрузки и к редактору.',
+  'editor.settings.graphicsLow': 'Низкое',
+  'editor.settings.graphicsMedium': 'Среднее',
+  'editor.settings.graphicsTitle': 'Качество графики',
+  'editor.settings.graphicsUltra': 'Максимальное',
+  'editor.settings.hint':
+    'Графика и звук для редактора и пробного запуска. Это те же настройки, что и в игре, сохранённые в этом браузере.',
+  'editor.settings.music': 'Воспроизводить музыку',
+  'editor.settings.musicVolume': 'Громкость музыки',
+  'editor.settings.sfxVolume': 'Громкость эффектов',
+  'editor.settings.soundTitle': 'Звук',
+  'editor.soundTool.capReached': 'Достигнут предел точечных звуков ({max}).',
+  'editor.soundTool.clip': 'Звуковой эффект',
+  'editor.soundTool.deleteTitle': 'Удалить этот звук',
+  'editor.soundTool.height': 'Высота (ярды)',
+  'editor.soundTool.hint':
+    'Нажмите на землю, чтобы разместить зацикленный источник звука, затем выберите запись и задайте максимальную громкость и радиус. Сфера затухания показывает дальность звучания; в пробном запуске звук пространственный.',
+  'editor.soundTool.none': 'Точечных звуков пока нет.',
+  'editor.soundTool.radius': 'Радиус (ярды)',
+  'editor.soundTool.selectTitle': 'Выбрать этот звук в мире (значок увеличится; Delete удаляет)',
+  'editor.soundTool.soundN': 'Звук {num}',
+  'editor.soundTool.title': 'Точечные звуки',
+  'editor.soundTool.volume': 'Максимальная громкость',
+  'editor.spawn.area': 'Область появления: {width} x {height} ярдов',
+  'editor.status.bundleExported':
+    'Карта «{name}» экспортирована с моделями, текстурами и скайбоксом. На другом компьютере импортируйте .wocmap.zip (не отдельный .json).',
+  'editor.status.caveCapReached':
+    'Достигнут предел пещер ({max}). Сначала удалите или отмените пещеру.',
+  'editor.status.entityCapReached':
+    'Достигнут предел сущностей карты. Часть скопированных NPC или существ не вставлена.',
+  'editor.foliageTool.grassClump': 'Размер пучка (стеблей)',
+  'editor.foliageTool.grassHue': 'Цветовой тон травы',
+  'editor.foliageTool.grassLight': 'Светлота травы',
+  'editor.foliageTool.grassPreview': 'Цвет для новой нарисованной травы',
+  'editor.foliageTool.hint':
+    'Ведите по земле, чтобы рассыпать включённую растительность в пределах кисти; каждый мазок отменяется одним шагом. Убирайте элементы стиранием.',
+  'editor.foliageTool.makeAllAmbientEditable': 'Сделать ВСЮ растительность редактируемой',
+  'editor.foliageTool.makeAmbientEditable': 'Сделать ближайшую растительность редактируемой',
+  'editor.foliageTool.makeZoneEditable': 'Сделать ЭТУ зону редактируемой',
+  'editor.foliageTool.makeZoneEditableHint':
+    'Преобразует каждое дерево и камень в зоне под камерой в редактируемые размещения; редактирование далёких участков по одной зоне безопасно для производительности.',
+  'editor.foliageTool.maxScale': 'Максимальный размер',
+  'editor.foliageTool.minScale': 'Минимальный размер',
+  'editor.foliageTool.noneSelected': 'Для рисования включите хотя бы одну группу растительности.',
+  'editor.foliageTool.rocks': 'Камни',
+  'editor.foliageTool.title': 'Кисть растительности',
+  'editor.foliageTool.trees': 'Деревья',
+  'editor.genTerrain.clear': 'Выровнять карту',
+  'editor.genTerrain.cleared': 'Источник рельефа очищен: карта снова стала плоской заготовкой.',
+  'editor.genTerrain.dragHint':
+    'Перетащите золотой прямоугольник на рельеф для копирования. Точка отмечает ваше место появления.',
+  'editor.genTerrain.generated': 'Рельеф создан по планировке мира около ({x}, {z}).',
+  'editor.genTerrain.hint':
+    'Выберите часть старой планировки мира, из которой будет создан рельеф карты: перетащите золотой прямоугольник на нужный регион. Его холмы, озёра и береговые линии станут основой рельефа, который затем можно менять скульптингом. Генерация заменяет текущие изменения скульптинга; карта остаётся отдельным пространством.',
+  'editor.genTerrain.save': 'Создать',
+  'editor.genTerrain.status': 'Считывание планировки мира около ({x}, {z}).',
+  'editor.genTerrain.title': 'Создать рельеф',
+  'editor.grassClearTool.hint':
+    'Нажимайте или ведите кистью, чтобы стереть процедурную луговую траву, в том числе запечённую во встроенном мире. Большой кистью можно очистить широкий участок за один мазок.',
+  'editor.grassClearTool.restore': 'Восстановить всю траву',
+  'editor.grassClearTool.title': 'Удалить траву',
+  'editor.help.key.multiSelect':
+    'Shift+щелчок добавляет или убирает ресурсы из выбора. В инструменте NPC и существ Ctrl+щелчок выбирает несколько сущностей.',
+  'editor.help.tool.clutter':
+    'Рисуйте кистью мелкий декор земли (разбитая плитка, галька, письма, листья), отображаемый при высоком качестве графики и выше.',
+  'editor.help.tool.collider':
+    'Размещайте объёмы коллизии в виде параллелепипедов, сфер или плоскостей пола, невидимые при пробном запуске.',
+  'editor.help.tool.foliage': 'Рисуйте кистью траву, кусты, деревья и камни с вариацией размера.',
+  'editor.help.tool.meshfix':
+    'Удаляйте растянутые остаточные полигоны рельефа вокруг выреза или входа в пещеру либо восстанавливайте их. Пока инструмент активен, включён каркас.',
+  'editor.help.tool.move': 'Перемещайте выбранный ресурс стрелками трёхосевого манипулятора.',
+  'editor.help.tool.rotate': 'Вращайте выбранный ресурс кольцами манипулятора.',
+  'editor.help.tool.scale':
+    'Масштабируйте выбранный ресурс ручками манипулятора по отдельным осям или равномерно.',
+  'editor.help.tool.tree':
+    'Вырастите полностью настраиваемое дерево: ствол, ветви, объёмы кроны и листья.',
+  'editor.importModel.failed': 'Не удалось прочитать этот файл модели.',
+  'editor.importModel.imported':
+    'Импортировано: «{name}». Сохраняется на время этого сеанса; после перезагрузки импортируйте снова.',
+  'editor.importModel.notModel': 'Выберите файл .glb или .gltf.',
+  'editor.importModel.tooLarge': 'Этот файл превышает предел импорта 64 МиБ.',
+  'editor.inspector.lightingTab': 'Освещение',
+  'editor.inspector.sceneTab': 'Сцена',
+  'editor.lightTool.capReached': 'Достигнут предел источников света ({max}).',
+  'editor.lightTool.deleteTitle': 'Удалить этот источник света',
+  'editor.lightTool.height': 'Высота (ярды)',
+  'editor.lightTool.hint':
+    'Нажмите на землю для размещения света. Он виден в редакторе и пробном запуске (не более {max}; одновременно светят несколько ближайших).',
+  'editor.lightTool.intensity': 'Интенсивность',
+  'editor.lightTool.lightN': 'Свет {num}',
+  'editor.lightTool.none': 'Источников света пока нет.',
+  'editor.lightTool.range': 'Радиус (ярды)',
+  'editor.lightTool.selectTitle':
+    'Выбрать этот свет в мире (значок лампочки увеличится; Delete удаляет)',
+  'editor.lightTool.title': 'Точечные источники света',
+  'editor.lighting.ambient': 'Интенсивность фонового света',
+  'editor.lighting.azimuth': 'Направление солнца',
+  'editor.lighting.birdCount': 'Количество',
+  'editor.lighting.birdFormation': 'Летать клином',
+  'editor.lighting.birds': 'Птицы в небе',
+  'editor.lighting.birdsTitle': 'Птицы',
+  'editor.lighting.caveLight': 'Яркость пещер',
+  'editor.lighting.caveLightHint':
+    'Насколько темнеют стены выкопанной пещеры с глубиной. 0 соответствует исходной темноте пещер; около 0.4 позволяет различать большую пещеру при свете факела.',
+  'editor.lighting.customHint': 'Пользовательское освещение (изменено из предустановки).',
+  'editor.lighting.day': 'День',
+  'editor.lighting.dusk': 'Сумерки',
+  'editor.lighting.elevation': 'Высота солнца',
+  'editor.lighting.environment': 'Фоновый свет неба',
+  'editor.lighting.hint':
+    'Освещение карты сохраняется и используется как в редакторе, так и в пробном запуске.',
+  'editor.lighting.night': 'Ночь',
+  'editor.lighting.nightFloor': 'Яркость ночи',
+  'editor.lighting.nightFloorHint':
+    'Сколько дневного света сохраняется глубокой ночью. 0 соответствует исходной ночи; около 0.35 сохраняет различимость и холодные тона вместо мутной темноты.',
+  'editor.lighting.overcast': 'Пасмурно',
+  'editor.lighting.presetLabel': 'Предустановка освещения',
+  'editor.lighting.skyColor': 'Тонировка неба',
+  'editor.lighting.skyboxCustomActive': 'Пользовательский скайбокс включён.',
+  'editor.lighting.skyboxDefault': 'Небо по умолчанию',
+  'editor.lighting.skyboxHint':
+    'Выберите готовое небо или загрузите панорамное (равнопромежуточное) изображение. Сохраняется с картой и показывается в игре при пробном запуске.',
+  'editor.lighting.skyboxImportFailed': 'Не удалось импортировать это изображение.',
+  'editor.lighting.skyboxImported': 'Скайбокс импортирован.',
+  'editor.lighting.skyboxMissing': 'Этот скайбокс больше не хранится в этом браузере.',
+  'editor.lighting.skyboxTitle': 'Скайбокс',
+  'editor.lighting.skyboxTooLarge': 'Изображение скайбокса слишком велико (не более 24 МБ).',
+  'editor.lighting.skyboxUpload': 'Загрузить скайбокс...',
+  'editor.lighting.skybox_amber_sunset': 'Янтарный закат HDR',
+  'editor.lighting.skybox_ember_storm': 'Буря углей HDR',
+  'editor.lighting.skybox_fen_day': 'День на болоте HDR',
+  'editor.lighting.skybox_frost_twilight': 'Морозные сумерки HDR',
+  'editor.lighting.skybox_hollow_dusk': 'Сумерки в лощине HDR',
+  'editor.lighting.skybox_marsh_backdrop': 'Рисованный фон болота',
+  'editor.lighting.skybox_marsh_overcast': 'Пасмурное болото HDR',
+  'editor.lighting.skybox_night': 'Ночь HDR',
+  'editor.lighting.skybox_nightbloom_dream': 'Сон ночного цветения HDR',
+  'editor.lighting.skybox_peaks_backdrop': 'Рисованный фон гор',
+  'editor.lighting.skybox_peaks_dawn': 'Рассвет в горах HDR',
+  'editor.lighting.skybox_space_galaxy': 'Космическая галактика',
+  'editor.lighting.skybox_toon_day': 'Мультяшное синее небо',
+  'editor.lighting.skybox_vale_backdrop': 'Рисованный фон долины',
+  'editor.lighting.skybox_vale_day': 'День в долине HDR',
+  'editor.lighting.skybox_wraithwood_gloom': 'Мрак призрачного леса HDR',
+  'editor.lighting.sun': 'Интенсивность солнца',
+  'editor.lighting.sunColor': 'Цвет солнца',
+  'editor.lighting.title': 'Освещение',
+  'editor.lighting.worldSpeed': 'Скорость анимации',
+  'editor.lighting.worldSpeedHint':
+    'Ускоряет или замедляет всё движение окружения (воду, огонь, колыхание растений, птиц, погоду). Только внешний вид; не меняет игровой процесс и время в пробном запуске.',
+  'editor.lighting.worldSpeedReset': 'Сбросить к обычной скорости',
+  'editor.lighting.worldSpeedTitle': 'Скорость мира',
+  'editor.lighting.zoneHint':
+    'Выберите зону и задайте ей собственное освещение, скайбокс и скорость окружения.',
+  'editor.lighting.zoneReset': 'Использовать атмосферу карты',
+  'editor.lighting.zoneSelect': 'Зона для редактирования',
+  'editor.lighting.zoneTitle': 'Атмосфера зоны',
+  'editor.map.pinHint': 'Нажмите на карту, чтобы поставить метку телепортации.',
+  'editor.map.showWorld': 'Показать весь мир',
+  'editor.map.showZone': 'Показать эту зону',
+  'editor.map.teleportToPin': 'Телепортироваться к метке',
+  'editor.map.useLiveTerrain': 'Использовать текущий рельеф',
+  'editor.map.usePainted': 'Использовать нарисованную карту',
+  'editor.markerTool.capReached': 'Достигнут предел меток ({max}).',
+  'editor.markerTool.defaultName': '{kind} {num}',
+  'editor.markerTool.deleteTitle': 'Удалить эту метку',
+  'editor.markerTool.hint':
+    'Заметки только для редактора для генерации заданий/событий ИИ («здесь выдающий задания», «здесь сундук»). Никогда не видны при пробном запуске.',
+  'editor.markerTool.kind': 'Тип метки',
+  'editor.markerTool.none': 'Меток пока нет.',
+  'editor.markerTool.npc': 'Неигровой персонаж',
+  'editor.markerTool.object': 'Интерактивный объект',
+  'editor.markerTool.place': 'Размещать метки вместо перемещения места появления',
+  'editor.markerTool.title': 'Метки ИИ',
+  'editor.materials.color': 'Тонировка',
+  'editor.meshFixTool.capReached':
+    'Предел исправлений сетки достигнут ({max} участков). Восстановите часть, прежде чем удалять дальше.',
+  'editor.meshFixTool.clear': 'Восстановить всё',
+  'editor.meshFixTool.count': 'Удалённых участков: {n}',
+  'editor.meshFixTool.hint':
+    'При активном инструменте включён каркас. Ведите по растянутым полигонам рельефа, закрывающим вход в пещеру (снаружи или изнутри), чтобы УДАЛИТЬ их; каждый полигон с центром под кистью перестаёт рисоваться. Только отрисовка: земля для ходьбы не меняется. Один шаг отмены на мазок.',
+  'editor.meshFixTool.miss': 'Наведитесь на сетку рельефа: под курсором ничего не было.',
+  'editor.meshFixTool.nudgeHint':
+    'Чтобы ПЕРЕМЕСТИТЬ растянутый полигон вместо удаления, используйте подъём или опускание очень маленькой кистью на его вершинах.',
+  'editor.meshFixTool.restore': 'Режим восстановления (возвращает удалённые полигоны под кистью)',
+  'editor.meshFixTool.title': 'Исправление сетки',
+  'editor.meshFixTool.vertexClearAll': 'Сбросить все перемещённые вершины',
+  'editor.meshFixTool.vertexClearSel': 'Очистить выделение',
+  'editor.meshFixTool.vertexCount': 'Выбрано: {sel}, перемещено вершин: {n}',
+  'editor.meshFixTool.vertexHint':
+    'Каждая вершина рельефа у курсора показана маленьким квадратом; выбранные желтеют. Нажмите для выбора одной, протяните рамку для нескольких, Shift+щелчок или Shift+перетаскивание добавляет, Ctrl/Cmd+щелчок переключает, Alt+щелчок убирает. Затем ПЕРЕТАЩИТЕ выбранную вершину вверх или вниз. Только отрисовка: земля для ходьбы не меняется.',
+  'editor.meshFixTool.vertexMode': 'Режим вершин (выбор и перемещение отдельных вершин)',
+  'editor.meshFixTool.vertexReset': 'Сбросить выбранные вершины',
+  'editor.mobTool.delete': 'Удалить существо',
+  'editor.mobTool.deleteMany': 'Удалить существ: {count}',
+  'editor.mobTool.deleteManyNpcs': 'Удалить персонажей: {count}',
+  'editor.mobTool.deleteNpc': 'Удалить персонажа',
+  'editor.mobTool.deleted': 'Удалено существ: {count}.',
+  'editor.mobTool.deletedNpcs': 'Удалено персонажей: {count}.',
+  'editor.mobTool.hint':
+    'Нажмите на существо на карте, чтобы изменить тип, уровни, характеристики, патруль и возрождение.',
+  'editor.mobTool.levelDefaultHint': 'Для этого существа используется диапазон уровней шаблона.',
+  'editor.mobTool.mixedHint':
+    'Выбранные существа различаются. Показаны значения первого; изменения применяются ко всем.',
+  'editor.mobTool.mixedType': 'Разные типы',
+  'editor.mobTool.overrideLevels': 'Переопределить диапазон уровней',
+  'editor.mobTool.patrolCancel': 'Отмена',
+  'editor.mobTool.patrolClear': 'Очистить патруль',
+  'editor.mobTool.patrolDraftPoints': 'Размещено точек: {count}',
+  'editor.mobTool.patrolEdit': 'Изменить маршрут патруля',
+  'editor.mobTool.patrolFinish': 'Завершить маршрут',
+  'editor.mobTool.patrolFull': 'Маршрут патруля вмещает не более {max} точек.',
+  'editor.mobTool.patrolLoop': 'Возвращаться к началу по кругу',
+  'editor.mobTool.patrolMode': 'В конце пути',
+  'editor.mobTool.patrolNeedPoints': 'Прежде чем завершить маршрут, разместите хотя бы две точки.',
+  'editor.mobTool.patrolNone':
+    'Это существо бродит рядом с местом появления. Задайте патруль, чтобы оно ходило по пути.',
+  'editor.mobTool.patrolNoneNpc':
+    'Этот персонаж стоит там, где вы его разместили. Задайте патруль, чтобы он ходил по пути.',
+  'editor.mobTool.patrolPickHint':
+    'Нажимайте на карту, чтобы ставить точки по порядку. Завершите двойным щелчком по последней точке или нажатием Enter.',
+  'editor.mobTool.patrolPingpong': 'Разворачиваться и идти обратно',
+  'editor.mobTool.patrolPoints': 'Патруль по {count} точкам',
+  'editor.mobTool.patrolRemoved': 'Патруль очищен.',
+  'editor.mobTool.patrolSaved': 'Патруль задан: точек {count}.',
+  'editor.mobTool.patrolSet': 'Задать маршрут патруля',
+  'editor.mobTool.patrolSpeed': 'Скорость ходьбы',
+  'editor.mobTool.patrolTitle': 'Патруль',
+  'editor.mobTool.patrolUndoPoint': 'Удалить последнюю точку',
+  'editor.mobTool.patrolWait': 'Пауза в каждой точке',
+  'editor.mobTool.patrolWaitHint':
+    'Эта пауза назначается каждой точке, которую вы разместите с этого момента.',
+  'editor.mobTool.respawnDefault': 'Скорость возрождения по умолчанию',
+  'editor.mobTool.respawnDefaultHint':
+    'Для этого существа используется настройка игрового мира по умолчанию (редкие существа и боссы возрождаются дольше).',
+  'editor.mobTool.respawnSeconds': 'Возрождаться через',
+  'editor.mobTool.respawnTitle': 'Возрождение',
+  'editor.mobTool.seconds': '{value} с',
+  'editor.mobTool.statAttackSpeed': 'Время взмаха',
+  'editor.mobTool.statBonus': '{value}x (+{percent}%)',
+  'editor.mobTool.statDamage': 'Урон',
+  'editor.mobTool.statDefault': '{value}x от стандартного',
+  'editor.mobTool.statLevels': 'Уровни шаблона {min}-{max}',
+  'editor.mobTool.statMoveSpeed': 'Скорость движения',
+  'editor.mobTool.statPenalty': '{value}x (-{percent}%)',
+  'editor.mobTool.statsHint':
+    'Множители характеристик, рассчитанных по уровню. Выше 1 даёт бонус, ниже 1 штраф. Нажмите на значение, чтобы ввести точное число.',
+  'editor.mobTool.statsReset': 'Сбросить модификаторы',
+  'editor.mobTool.statsTitle': 'Модификаторы характеристик',
+  'editor.mobTool.type': 'Тип существа',
+  'editor.mobTool.typeHeader': 'Существо: {name}',
+  'editor.mobTool.typeHeaderMany': 'Существо: {name} (выбрано: {count})',
+  'editor.mobTool.yardsPerSecond': '{value} ярдов/с',
+  'editor.music.areaCap': 'Достигнут предел музыкальных областей ({max}).',
+  'editor.decalTool.opacity': 'Непрозрачность',
+  'editor.decalTool.pickFirst': 'Сначала выберите декаль в библиотеке.',
+  'editor.decalTool.randomRotate': 'Случайный поворот каждого штампа',
+  'editor.decalTool.removed': 'Декаль удалена.',
+  'editor.decalTool.selectTitle': 'Выбрать эту декаль в мире (Delete удаляет её)',
+  'editor.decalTool.size': 'Размер (ярды)',
+  'editor.decalTool.sortOrder': 'Рисовать поверх',
+  'editor.decalTool.stamped': 'Штамп «{name}» размещён.',
+  'editor.decalTool.tint': 'Тонировка',
+  'editor.decalTool.title': 'Декали',
+  'editor.dungeon.addBarrier': 'Добавить преграду',
+  'editor.dungeon.addDecor': 'Добавить декор',
+  'editor.dungeon.addDoor': 'Добавить дверь',
+  'editor.dungeon.addOpening': 'Добавить проём',
+  'editor.dungeon.addRoom': 'Добавить комнату',
+  'editor.dungeon.collapse': 'Свернуть',
+  'editor.dungeon.exit': 'Вернуться к карте',
+  'editor.dungeon.expand': 'Развернуть',
+  'editor.dungeon.field.hd': 'Половина глубины',
+  'editor.dungeon.field.hw': 'Половина ширины',
+  'editor.dungeon.field.id': 'Идентификатор',
+  'editor.dungeon.field.innerScale': 'Внутренний масштаб',
+  'editor.dungeon.field.key': 'Модель',
+  'editor.dungeon.field.scaleX': 'Масштаб X',
+  'editor.dungeon.field.scaleZ': 'Масштаб Z',
+  'editor.dungeon.field.style': 'Стиль',
+  'editor.dungeon.field.x': 'Ось X',
+  'editor.dungeon.field.x0': 'Западный край (x0)',
+  'editor.dungeon.field.x1': 'Восточный край (x1)',
+  'editor.dungeon.field.y': 'Смещение высоты',
+  'editor.dungeon.field.yaw': 'Поворот (радианы)',
+  'editor.dungeon.field.z': 'Ось Z',
+  'editor.dungeon.field.z0': 'Ближний край (z0)',
+  'editor.dungeon.field.z1': 'Дальний край (z1)',
+  'editor.dungeon.hint':
+    'Нажатие выбирает (повторное переключает перекрывающиеся объекты). Перетаскивание перемещает. Стрелки сдвигают, Delete удаляет, Ctrl+Z отменяет. Shift+перетаскивание панорамирует, средняя кнопка с перетаскиванием вращает камеру.',
+  'editor.dungeon.kind.barrier': 'Преграда',
+  'editor.dungeon.kind.dais': 'Помост босса',
+  'editor.dungeon.kind.decor': 'Декор',
+  'editor.dungeon.kind.door': 'Дверь',
+  'editor.dungeon.kind.opening': 'Визуальный проём',
+  'editor.dungeon.kind.room': 'Комната',
+  'editor.dungeon.noIssues': 'Проблем не найдено',
+  'editor.dungeon.none': 'Ничего не выбрано. Нажмите на контур на плане.',
+  'editor.dungeon.save': 'Сохранить в исходник',
+  'editor.dungeon.saveFailed':
+    'Точка сохранения разработки недоступна; вместо этого планировка скачана',
+  'editor.dungeon.saved': 'Планировка записана в src/sim/dungeon_layout.ts (сервер разработки)',
+  'editor.dungeon.title': 'Планировка подземелья',
+  'editor.dungeon.unsaved': 'Несохранённые изменения планировки',
+  'editor.dungeon.validate': 'Проверить',
+  'editor.entityTool.aiNotesPlaceholder':
+    'Опишите личность, тон диалогов, расписания, реакции и правила взаимодействия.',
+  'editor.entityTool.automaticModel': 'Автоматическая модель шаблона',
+  'editor.entityTool.automaticModelHint': 'Использовать персонажа, назначенного этим шаблоном NPC.',
+  'editor.entityTool.cancelPlacement': 'Отменить размещение',
+  'editor.entityTool.categoryForm': 'Облики',
+  'editor.entityTool.categoryPlayer': 'Модели игроков',
+  'editor.entityTool.characterModel': 'Персонаж со скелетом',
+  'editor.entityTool.chooseNpcModel': 'Выбрать модель персонажа',
+  'editor.entityTool.facing': 'Направление',
+  'editor.entityTool.hint':
+    'Выберите NPC, чтобы настроить модель, роль, визуальные эффекты и задание для ИИ. Выберите существо, чтобы задать тип, уровни, модификаторы характеристик, патруль и возрождение.',
+  'editor.entityTool.manyMobs': 'Существ: {count}',
+  'editor.entityTool.name': 'Отображаемое имя',
+  'editor.entityTool.none': 'Нажмите на существо или NPC на карте, чтобы выбрать его.',
+  'editor.entityTool.oneMob': '1 существо',
+  'editor.entityTool.placeNpc': 'Разместить NPC',
+  'editor.entityTool.placeNpcHint': '{name} готов. Нажмите на рельеф, чтобы разместить этого NPC.',
+  'editor.entityTool.questNotesPlaceholder':
+    'Оставьте инструкции для будущих заданий, целей и сюжетных событий, создаваемых ИИ.',
+  'editor.entityTool.role': 'Роль в сюжете',
+  'editor.entityTool.rolePlaceholder': 'Выдающий задания, торговец, стражник, наставник...',
+  'editor.entityTool.selected': 'Выбрано: {name}',
+  'editor.entityTool.title': 'NPC и существа',
+  'editor.entityTool.titleField': 'Титул',
+  'editor.eyedropperTool.empty':
+    'Здесь ничего не нарисовано; нажмите на нарисованную текстуру, чтобы выбрать её.',
+  'editor.fire.add': '+ Добавить источник огня',
+  'editor.fire.anchor': 'Прикрепить к',
+  'editor.fire.anchorBase': 'Основание модели',
+  'editor.fire.anchorCenter': 'Центр модели',
+  'editor.fire.anchorTop': 'Верх модели',
+  'editor.fire.blend': 'Режим смешивания',
+  'editor.fire.blendAdditive': 'Аддитивное свечение',
+  'editor.fire.blendAlpha': 'Естественная прозрачность',
+  'editor.fire.colorMotion': 'Цвет и движение',
+  'editor.fire.customize': 'Открыть все настройки',
+  'editor.fire.duplicate': 'Дублировать источник',
+  'editor.fire.embers': 'Летящие угли',
+  'editor.fire.emitter': 'Огонь {count}',
+  'editor.fire.enabled': 'Источник включён',
+  'editor.fire.flameShape': 'Форма пламени',
+  'editor.fire.flicker': 'Мерцание',
+  'editor.fire.glow': 'Интенсивность свечения',
+  'editor.fire.glowRange': 'Радиус свечения (ярды)',
+  'editor.fire.height': 'Высота пламени',
+  'editor.fire.hint':
+    'Добавляйте независимые процедурные источники огня, выбирайте один и используйте манипулятор перемещения в области просмотра, чтобы точно разместить его на модели.',
+  'editor.fire.hue': 'Цветовой тон огня',
+  'editor.fire.intensity': 'Интенсивность шейдера',
+  'editor.fire.layers': 'Слои пламени',
+  'editor.fire.legacy': 'Прежнее одиночное пламя',
+  'editor.fire.light': 'Источник свечения',
+  'editor.fire.opacity': 'Непрозрачность пламени',
+  'editor.fire.position': 'Положение',
+  'editor.fire.positionX': 'Локальная X (ярды)',
+  'editor.fire.positionY': 'Локальная Y (ярды)',
+  'editor.fire.positionZ': 'Локальная Z (ярды)',
+  'editor.fire.preset': 'Предустановка эффекта',
+  'editor.fire.remove': 'Удалить источник',
+  'editor.fire.removeAll': 'Удалить весь огонь',
+  'editor.fire.saturation': 'Насыщенность',
+  'editor.fire.scale': 'Общий масштаб',
+  'editor.fire.smokeAmount': 'Количество дыма',
+  'editor.fire.smokeRise': 'Подъём дыма',
+  'editor.fire.smokeScale': 'Масштаб дыма',
+  'editor.fire.speed': 'Скорость анимации',
+  'editor.fire.style.bonfire': 'Костёр',
+  'editor.fire.style.embers': 'Слой углей',
+  'editor.fire.style.soulfire': 'Огонь душ',
+  'editor.fire.style.torch': 'Факел',
+  'editor.fire.style.wildfire': 'Лесной пожар',
+  'editor.fire.title': 'Эффекты огня ресурса',
+  'editor.fire.turbulence': 'Турбулентность',
+  'editor.fire.width': 'Ширина пламени',
+  'editor.flatMapName': 'Плоский мир',
+  'editor.flatten.noiseHint':
+    'Мелкие бугры с высокой шероховатостью выглядят как каменистая изломанная земля; крупные с низкой шероховатостью похожи на луговые холмы. Сила кисти задаёт их высоту.',
+  'editor.flatten.noiseRough': 'Шероховатость',
+  'editor.flatten.noiseSize': 'Размер бугров (ярды)',
+  'editor.flatten.shiftHint':
+    'Удерживайте Shift при перетаскивании, чтобы поменять выравнивание и сглаживание для этого мазка.',
+  'editor.flatten.smoothMode': 'Сглаживать вместо выравнивания',
+  'editor.flatten.style.noise': 'Шум',
+  'editor.flatten.style.sharpen': 'Заострение',
+  'editor.flatten.style.smooth': 'Сглаживание',
+  'editor.flatten.style.terrace': 'Террасирование',
+  'editor.flatten.styleHint.noise':
+    'Рисует естественные неровности по всей кисти: слои подъёмов и впадин с мелкими деталями сверху. Один мазок сохраняет один узор, поэтому перетаскивание создаёт волнистую землю; новый мазок добавляет новые детали.',
+  'editor.flatten.styleHint.sharpen':
+    'Обратное сглаживанию: каждый проход заостряет гребни и углубляет овраги.',
+  'editor.flatten.styleHint.smooth':
+    'Усредняет землю под кистью; повторные проходы убирают неровности.',
+  'editor.flatten.styleHint.terrace':
+    'Превращает склоны в ступенчатые уступы. Сила кисти задаёт высоту ступени.',
+  'editor.fluid.fxBubbles': 'Пузыри',
+  'editor.fluid.fxHaze': 'Дымка',
+  'editor.fluid.fxLight': 'Источник свечения',
+  'editor.fluid.hint':
+    'Выберите жидкость и нажмите на землю для размещения бассейна. Инструментами трансформации перемещайте его, растягивайте основание и опускайте поверхность в углубление.',
+  'editor.fluid.hue': 'Цветовой тон',
+  'editor.fluid.kind.acid': 'Кислота',
+  'editor.fluid.kind.lava': 'Лава',
+  'editor.fluid.kind.spectral': 'Призрачная жидкость',
+  'editor.fluid.kind.water': 'Стоячая вода',
+  'editor.fluid.light': 'Светлота',
+  'editor.fluid.resetPreset': 'Сбросить к предустановке',
+  'editor.fluid.selHint':
+    'Манипулятор масштабирует основание бассейна (X/Z), а стрелка Y меняет высоту поверхности. Урон всем в жидкости наносится раз в секунду.',
+  'editor.fluid.surfaceOffset': 'Высота поверхности',
+  'editor.fluid.title': 'Бассейн жидкости',
+  'editor.foliage.bake': 'Сохранить как ресурс',
+  'editor.foliage.bakeFailed': 'Не удалось сохранить растение: {reason}',
+  'editor.foliage.bakeHint':
+    'Записывает растение в public/models/generated как GLB, превращая его из рецепта в обычный ресурс каталога: оно объединяется с другими в пакетную отрисовку, получает запечённую коллизию и размещается на любой карте. Настройки сохраняются в файле для повторного открытия и запекания. Нужен сервер разработки.',
+  'editor.foliage.bakePrompt': 'Назовите это растение',
+  'editor.foliage.baked':
+    'Сохранено как {id}. Пересоздайте каталог ресурсов, чтобы увидеть его в обозревателе.',
+  'editor.foliage.clumps': 'Пучки листьев',
+  'editor.foliage.footprint': 'Разброс',
+  'editor.foliage.hang': 'Свисание',
+  'editor.foliage.kind': 'Растение',
+  'editor.foliage.kinds.bush': 'Куст',
+  'editor.foliage.kinds.fern': 'Папоротник',
+  'editor.foliage.kinds.grass': 'Пучок травы',
+  'editor.foliage.kinds.tree': 'Дерево',
+  'editor.foliage.kinds.vine': 'Лоза',
+  'editor.foliage.plantHeight': 'Высота',
+  'editor.foliage.preset': 'Начальный вариант',
+  'editor.foliage.presets.bushBerry': 'Ягодный куст',
+  'editor.foliage.presets.bushDry': 'Сухой кустарник',
+  'editor.foliage.presets.bushRound': 'Округлый куст',
+  'editor.foliage.presets.fernForest': 'Лесной папоротник',
+  'editor.foliage.presets.grassMeadow': 'Луговой пучок',
+  'editor.foliage.presets.grassTuft': 'Пучок',
+  'editor.foliage.presets.vineHanging': 'Свисающая лоза',
+  'editor.foliage.splay': 'Раскрытие',
+  'editor.foliage.strands': 'Плети',
+  'editor.foliageTool.ambientAllHint':
+    'Преобразование всей карты превращает тысячи деревьев и камней в отдельные размещения и расходует больше памяти, чем варианты для зоны или партии.',
+  'editor.foliageTool.ambientConverted':
+    'Ближайшие элементы растительности ({count}) теперь можно редактировать.',
+  'editor.foliageTool.ambientConvertedAll':
+    'Вся фоновая растительность ({count} элементов) теперь доступна для редактирования.',
+  'editor.foliageTool.ambientEditableHint':
+    'Фоновая растительность выключена. Каждый элемент, нарисованный этой кистью, можно выбрать, переместить, повернуть, масштабировать или стереть.',
+  'editor.foliageTool.ambientHint':
+    'Встроенные деревья и камни процедурные и не выбираются. Направьте камеру на участок, затем преобразуйте эту зону (рекомендуется), ближайшую партию или всю карту.',
+  'editor.foliageTool.ambientPartial':
+    'Преобразовано элементов: {count}; повысьте предел или повторите преобразование для остальных.',
+  'editor.foliageTool.ambientTitle': 'Существующая растительность карты',
+  'editor.foliageTool.bushes': 'Кусты',
+  'editor.foliageTool.collide': 'Новая растительность блокирует движение',
+  'editor.foliageTool.customChosen': 'Рисование: {name}',
+  'editor.foliageTool.customClear': 'Вернуться к встроенной растительности',
+  'editor.foliageTool.customHint':
+    'Рассеивайте собственный ресурс вместо встроенных наборов. Выберите любую модель в обозревателе ниже и рисуйте как обычно.',
+  'editor.foliageTool.customNeedsPick':
+    'Сначала откройте обозреватель ресурсов и выберите ресурс для пользовательской кисти.',
+  'editor.foliageTool.customPick': 'Выбрать в обозревателе ресурсов',
+  'editor.foliageTool.customTitle': 'Ресурс пользовательской кисти',
+  'editor.foliageTool.density': 'Плотность',
+  'editor.foliageTool.ferns': 'Папоротники и грибы',
+  'editor.foliageTool.grass': 'Трава (анимированная)',
+  'editor.city.styleWoodFence': 'Деревянная ограда',
+  'editor.city.tabKit': 'Набор элементов',
+  'editor.city.tabPrefabs': 'Префабы',
+  'editor.city.tabRoads': 'Дороги',
+  'editor.city.tabRoutes': 'Маршруты',
+  'editor.city.tabWalls': 'Стены',
+  'editor.city.title': 'Строительство города',
+  'editor.city.wallBuildFailed': 'Не удалось создать ресурсы стен. Ваш путь по-прежнему доступен.',
+  'editor.city.wallCancel': 'Отмена',
+  'editor.city.wallClosed': 'Замкнуть контур',
+  'editor.city.wallDraw': 'Нарисовать стену',
+  'editor.city.wallDrawing':
+    'Нажимайте, чтобы добавлять углы на видимой сетке. Двойной щелчок по узлу или Enter завершает. Backspace или Delete удаляет последний узел; Esc отменяет.',
+  'editor.city.wallEditHint':
+    'Выберите любой элемент стены, чтобы активировать весь участок. Вернитесь к «Стенам», чтобы изменить его форму, или нажмите Delete в режиме выбора, чтобы удалить весь участок.',
+  'editor.city.wallFinish': 'Завершить стену',
+  'editor.city.wallGateHint': 'Сегменты ворот пропускаются, оставляя проём в стене.',
+  'editor.city.wallHeight': 'Высота',
+  'editor.city.wallLiveEdit': 'Настройки выше сразу обновляют последнюю созданную вами стену.',
+  'editor.city.wallNodes': 'Размещено узлов стены: {n}.',
+  'editor.city.wallPlaced': 'Участок стены размещён (элементов: {n}).',
+  'editor.city.wallPostEvery': 'Расстояние между столбами',
+  'editor.city.wallPostsOff': 'Без столбов',
+  'editor.city.wallScale': 'Масштаб стены',
+  'editor.city.wallStairs': 'Лестницы наверх',
+  'editor.city.wallStyle': 'Стиль стены',
+  'editor.city.wallThickness': 'Толщина',
+  'editor.city.wallTooShort': 'Нарисуйте хотя бы две точки, чтобы построить стену.',
+  'editor.city.wallUndoPoint': 'Отменить точку',
+  'editor.city.wallWalkHint':
+    '«Проходимый верх» добавляет вдоль стены настил для патруля, по которому игроки ходят в пробном запуске; «Лестницы наверх» добавляет лестницу с земли на настил у каждого конца (или рядом с замкнутым контуром).',
+  'editor.city.wallWalkTop': 'Проходимый верх',
+  'editor.clutterTool.capReached':
+    'Достигнут предел мелкого декора ({max} штампов); сотрите часть, чтобы рисовать дальше.',
+  'editor.clutterTool.clearAll': 'Удалить весь нарисованный мелкий декор',
+  'editor.clutterTool.clumps': 'Группирование (0 = равномерное распределение)',
+  'editor.clutterTool.count': 'Нарисовано штампов мелкого декора: {count}',
+  'editor.clutterTool.density': 'Плотность',
+  'editor.clutterTool.erase': 'Режим стирания (убирает нарисованный мелкий декор под кистью)',
+  'editor.clutterTool.hint':
+    'Ведите кистью по земле, чтобы рассыпать включённый мелкий декор в её пределах; каждый мазок отменяется одним шагом. Элементы никогда не блокируют движение.',
+  'editor.clutterTool.kinds.leaves': 'Опавшие листья',
+  'editor.clutterTool.kinds.letter': 'Обронённые письма',
+  'editor.clutterTool.kinds.paper_scraps': 'Мятая бумага',
+  'editor.clutterTool.kinds.pebbles': 'Галька',
+  'editor.clutterTool.kinds.pot_shards': 'Разбитая керамика',
+  'editor.clutterTool.kinds.splinters': 'Щепки',
+  'editor.clutterTool.kinds.stones': 'Рассыпанные камни',
+  'editor.clutterTool.kinds.straw': 'Солома',
+  'editor.clutterTool.kinds.tile_broken': 'Треснувшие тротуарные плиты',
+  'editor.clutterTool.kinds.tile_shards': 'Осколки плитки',
+  'editor.clutterTool.kindsTitle': 'Виды мелкого декора',
+  'editor.clutterTool.maxScale': 'Максимальный размер',
+  'editor.clutterTool.minScale': 'Минимальный размер',
+  'editor.clutterTool.noneSelected': 'Для рисования включите хотя бы один вид мелкого декора.',
+  'editor.clutterTool.tierNote':
+    'Мелкий декор виден в игре при высоком качестве графики и выше; на более низких уровнях он пропускается без затрат.',
+  'editor.clutterTool.title': 'Кисть мелкого декора',
+  'editor.collider.box': 'Коллайдер-параллелепипед',
+  'editor.collider.depth': 'Глубина',
+  'editor.collider.diameter': 'Диаметр',
+  'editor.collider.floorOffset': 'Смещение высоты пола',
+  'editor.collider.height': 'Высота',
+  'editor.collider.hideVolumes': 'Скрыть объёмы коллизии',
+  'editor.collider.hideVolumesHint':
+    'Скрывает зелёные объёмы в области просмотра (в пробном запуске они по-прежнему блокируют проход).',
+  'editor.collider.hint':
+    'Выберите фигуру и нажмите на землю для размещения. Меняйте форму инструментами перемещения, поворота и масштаба (или ползунками ниже).',
+  'editor.collider.plane': 'Плоскость пола',
+  'editor.collider.playtestNote':
+    'Объёмы показаны зелёным в редакторе и невидимы при пробном запуске: параллелепипеды и сферы блокируют движение, плоскости пола поднимают проходимую землю.',
+  'editor.collider.shapeLabel': 'Форма коллайдера',
+  'editor.collider.sizeHint':
+    'Размеры указаны в ярдах при масштабе 1; инструмент масштаба умножает их.',
+  'editor.collider.sphere': 'Сферический коллайдер',
+  'editor.collider.title': 'Объёмы коллизии',
+  'editor.collider.wall': 'Плоскость стены',
+  'editor.collider.width': 'Ширина',
+  'editor.collisionMaster.addMenuTitle':
+    'Добавить примитив коллизии: настоящий триангулированный объём (цилиндр имеет настоящую цилиндрическую сетку)',
+  'editor.collisionMaster.adopted':
+    'Обновлено размещений на этой карте: {count}; они используют только что созданную вами коллизию.',
+  'editor.collisionMaster.assetLabel': 'Создание коллизии по умолчанию для {name}.',
+  'editor.collisionMaster.barLabel': 'Инструменты моделирования коллизии',
+  'editor.collisionMaster.cancel': 'Вернуться к карте',
+  'editor.collisionMaster.catalogOnly':
+    'Редактор коллизий работает с ресурсами каталога. Импортированные модели сохраняют коллизию, запечённую при импорте.',
+  'editor.collisionMaster.copied':
+    'Скопировано объёмов коллизии: {n}; вставьте через Ctrl+V (работает между ресурсами).',
+  'editor.collisionMaster.copyEmpty': 'Нет объёмов коллизии для копирования.',
+  'editor.collisionMaster.delete': 'Удалить',
+  'editor.collisionMaster.deleteTitle': 'Удалить выбранные параллелепипеды',
+  'editor.collisionMaster.devOnly':
+    'Закрепление записывает файлы проекта, поэтому нужен локальный сервер разработки (npm run dev).',
+  'editor.collisionMaster.duplicate': 'Дублировать',
+  'editor.collisionMaster.duplicateTitle': 'Дублировать выбранные параллелепипеды',
+  'editor.collisionMaster.dyntopo': 'Динамическая топология',
+  'editor.collisionMaster.dyntopoTitle':
+    'Динамическая топология локально делит длинные рёбра и безопасно схлопывает короткие вокруг кисти скульптинга.',
+  'editor.collisionMaster.fill': 'Заполнить',
+  'editor.collisionMaster.fillTitle':
+    'Заполнить три или более выбранных граничных вершины новой гранью.',
+  'editor.collisionMaster.fittedBox': 'Подогнанный параллелепипед',
+  'editor.collisionMaster.fittedBoxTitle':
+    'Начать с одного параллелепипеда, подогнанного вокруг всего ресурса',
+  'editor.collisionMaster.fromBake': 'Из запечённой коллизии',
+  'editor.collisionMaster.fromBakeTitle':
+    'Начать с автоматически запечённых воксельных параллелепипедов ресурса',
+  'editor.collisionMaster.fromClear': 'Начать с пустого',
+  'editor.collisionMaster.fromClearTitle': 'Удалить все фигуры коллизии и начать с пустой сцены',
+  'editor.collisionMaster.fromCylinder': 'Начать с цилиндра',
+  'editor.collisionMaster.fromCylinderTitle':
+    'Начать с одного редактируемого цилиндра вокруг основания ресурса',
+  'editor.collisionMaster.heroStatus': 'Коллизия ресурса: {mode}',
+  'editor.collisionMaster.heroTitle': 'Редактор коллизий',
+  'editor.collisionMaster.hint':
+    'Создавайте коллизию ресурса на панели выбора ниже: выберите тип коллизии, редактируйте параллелепипеды манипулятором (перемещение / поворот / масштаб), добавляйте или удаляйте их. Закрепление сохраняет результат в проект как коллизию этого ресурса по умолчанию везде.',
+  'editor.collisionMaster.inset': 'Вставка грани',
+  'editor.collisionMaster.insetTitle':
+    'Вставить выбранную грань внутрь и создать соединённое кольцо по краю.',
+  'editor.collisionMaster.lockInTitle':
+    'Сохранить как коллизию ресурса по умолчанию (с записью в проект) и вернуться на карту',
+  'editor.collisionMaster.locked': 'Закреплено: {name} теперь везде использует эту коллизию.',
+  'editor.collisionMaster.loopCut': 'Кольцевой разрез',
+  'editor.collisionMaster.loopCutFail':
+    'Сначала выберите ребро параллелепипеда в режиме рёбер: кольцевой разрез требует ребра четырёхугольника (не крышки и не сферы).',
+  'editor.collisionMaster.loopCutTitle':
+    'Вставить кольцо рёбер: в режиме рёбер выберите ребро, затем кольцевой разрез добавит параллельное кольцо вокруг фигуры (перетащите новое кольцо для сдвига).',
+  'editor.collisionMaster.mapName': 'Редактор коллизий: {name}',
+  'editor.collisionMaster.meshUnsupported':
+    'Настоящая сетка запекается для каждой карты отдельно и не может стать настройкой проекта по умолчанию. Выберите запечённую, базовую коллизию или отсутствие коллизии.',
+  'editor.collisionMaster.mirror': 'Зеркально по X',
+  'editor.collisionMaster.mirrorTitle':
+    'Добавить зеркальную копию выбранного объёма относительно его локальной оси X.',
+  'editor.collisionMaster.modeEdge': 'Ребро',
+  'editor.collisionMaster.modeEdgeTitle':
+    'Выбор рёбер (V): нажмите на ребро, и манипулятор переместит / повернёт / масштабирует две его вершины',
+  'editor.collisionMaster.modeFace': 'Грань',
+  'editor.collisionMaster.modeFaceTitle':
+    'Выбор граней (C): нажмите на грань, и манипулятор локально переместит / повернёт / масштабирует её',
+  'editor.collisionMaster.modeObject': 'Объект',
+  'editor.collisionMaster.modeObjectTitle':
+    'Режим объекта (Tab): перемещайте / поворачивайте / масштабируйте целые объёмы манипулятором',
+  'editor.collisionMaster.modeVertex': 'Вершина',
+  'editor.collisionMaster.modeVertexTitle':
+    'Выбор вершин (Z): нажмите на вершину, и манипулятор переместит ТОЛЬКО её; Ctrl+перетаскивание выделяет несколько вершин лассо',
+  'editor.collisionMaster.noBoxes':
+    'Нет параллелепипедов коллизии для закрепления. Добавьте хотя бы один или выберите базовую коллизию/отсутствие коллизии.',
+  'editor.collisionMaster.openFromSelection': 'Редактор коллизий',
+  'editor.collisionMaster.openFromSelectionTitle':
+    'Создать коллизию ресурса ПО УМОЛЧАНИЮ в сцене редактора коллизий (сохраняется в проект; карта автоматически сохранится, затем вы вернётесь сюда)',
+  'editor.collisionMaster.pasted': 'Вставлено объёмов коллизии: {n}.',
+  'editor.collisionMaster.polyBuildFail':
+    'Эта модель достигла предела детализации, дальнейшее выдавливание невозможно.',
+  'editor.collisionMaster.polyBuildHint':
+    'Построение полигонов: нажмите и потяните грань модели, чтобы выдавить её наружу и вручную строить формы. Выключите для возврата к вращению камеры и выбору.',
+  'editor.collisionMaster.polyBuildShort': 'Построение полигонов',
+  'editor.collisionMaster.polySnap': 'Кисть привязки полигонов',
+  'editor.collisionMaster.polySnapHint':
+    'Ведите по поверхности модели, чтобы создать плоскость коллизии по геометрии: начало и конец задают длину и поворот, а замеренные высоты задают вертикальную полосу. Подходит для стен, крыш и пандусов.',
+  'editor.collisionMaster.polySnapShort': 'Привязка полигонов',
+  'editor.collisionMaster.presetPromptBody':
+    'Закрепление уже сделало эту коллизию стандартной для {name} во всём проекте, и каждая копия на карте теперь её использует. Предустановка добавляет возможность только на этом устройстве: каждое НОВОЕ размещение {name} получает эти параллелепипеды как собственные редактируемые хитбоксы, которые можно отдельно менять через «Редактировать хитбоксы». Для работы коллизии это не требуется.',
+  'editor.collisionMaster.presetPromptDontAsk':
+    'Больше не спрашивать (можно включить снова в «Ещё» > «Спрашивать о предустановках при закреплении»)',
+  'editor.collisionMaster.presetPromptNo': 'Нет, спасибо',
+  'editor.collisionMaster.presetPromptTitle': 'Сохранить также как предустановку?',
+  'editor.collisionMaster.presetPromptYes': 'Сохранить предустановку',
+  'editor.collisionMaster.primBox': 'Параллелепипед',
+  'editor.collisionMaster.primCylinder': 'Цилиндр',
+  'editor.collisionMaster.primPlane': 'Плоскость',
+  'editor.collisionMaster.primSphere': 'Сфера',
+  'editor.collisionMaster.primTitle': 'Добавить примитив «{name}» в набор коллизии',
+  'editor.collisionMaster.primWedge': 'Пандус',
+  'editor.collisionMaster.rampToggle': 'Проходимость',
+  'editor.collisionMaster.rampToggleTitle':
+    'Проходимый пандус: выбранный объём поднимает проходимую землю вдоль своего склона (игрок идёт по нему вверх), а не блокирует. Примитивы пандуса изначально проходимы.',
+  'editor.collisionMaster.saveEndpointFailed':
+    'Не удалось сохранить настройку по умолчанию: {error}',
+  'editor.collisionMaster.saveFailed':
+    'Не удалось сохранить карту перед открытием редактора коллизий.',
+  'editor.collisionMaster.saveUnreachable':
+    'Не удалось подключиться к точке сохранения (работает ли сервер разработки?). Коллизия скачана файлом, поэтому ничего не потеряно; запустите «npm run dev» и закрепите снова или объедините файл с data/asset_collision_overrides.json.',
+  'editor.collisionMaster.sculptCrease': 'Скульптинг: складка',
+  'editor.collisionMaster.sculptDeflate': 'Скульптинг: сдутие',
+  'editor.collisionMaster.sculptDetail': 'Детализация',
+  'editor.collisionMaster.sculptGrab': 'Скульптинг: захват',
+  'editor.collisionMaster.sculptInflate': 'Скульптинг: раздувание',
+  'editor.collisionMaster.sculptOff': 'Скульптинг: выкл.',
+  'editor.collisionMaster.sculptPinch': 'Скульптинг: стягивание',
+  'editor.collisionMaster.sculptRelax': 'Скульптинг: расслабление',
+  'editor.collisionMaster.sculptSettings': 'Настройки скульптинга',
+  'editor.collisionMaster.sculptSmooth': 'Скульптинг: сглаживание',
+  'editor.collisionMaster.sculptStrength': 'Сила',
+  'editor.collisionMaster.sculptTitle': 'Динамическая кисть скульптинга сетки',
+  'editor.collisionMaster.singleBox': 'Один параллелепипед',
+  'editor.collisionMaster.singleBoxTitle':
+    'Начать с одного обычного параллелепипеда у основания ресурса',
+  'editor.collisionMaster.stashOnly':
+    'Хранилище браузера заблокировано, поэтому карта хранится в памяти: вы вернётесь к ней из редактора коллизий, но для долговечной копии экспортируйте её.',
+  'editor.collisionMaster.subdivide': 'Подразделить',
+  'editor.collisionMaster.subdivideTitle':
+    'Разделить каждый треугольник на четыре треугольника с общими рёбрами для большей детализации модели.',
+  'editor.collisionMaster.symmetry': 'Симметрия',
+  'editor.collisionMaster.symmetryHint':
+    'Отражать каждый мазок скульптинга относительно выбранных локальных осей X, Y и Z.',
+  'editor.collisionMaster.title': 'Редактор коллизий',
+  'editor.collisionMaster.topologyFail':
+    'Эту операцию с топологией нельзя применить к текущему выделению.',
+  'editor.collisionMaster.weld': 'Сварить',
+  'editor.collisionMaster.weldTitle': 'Объединить выбранные вершины в их центре.',
+  'editor.decalTool.aspect': 'Растяжение',
+  'editor.decalTool.capReached': 'Достигнут предел декалей ({max}).',
+  'editor.decalTool.catArcane': 'Тайная магия',
+  'editor.decalTool.catBurn': 'Ожоги',
+  'editor.decalTool.catDamage': 'Повреждения',
+  'editor.decalTool.catGore': 'Кровь',
+  'editor.decalTool.catMarker': 'Метки',
+  'editor.decalTool.catNature': 'Природа',
+  'editor.decalTool.catTracks': 'Следы',
+  'editor.decalTool.decalN': 'Декаль {num}',
+  'editor.decalTool.deleteTitle': 'Удалить эту декаль',
+  'editor.decalTool.glow': 'Свечение',
+  'editor.decalTool.hint':
+    'Выберите декаль и нажмите на землю для штампа. Штампы облегают рельеф и загружаются только вблизи камеры, поэтому карта может содержать их много. Нажмите на штамп для выбора; Delete удаляет его.',
+  'editor.decalTool.importDecal': 'Импорт изображения декали',
+  'editor.decalTool.importFailed': 'Не удалось прочитать это изображение.',
+  'editor.decalTool.importTitle':
+    'Выберите PNG/WebP с прозрачностью: он станет декалью для штампов (хранится в этом браузере и включается в пакеты карт)',
+  'editor.decalTool.imported': 'Импортированные',
+  'editor.decalTool.importedDecal': 'Импортировано: «{name}».',
+  'editor.decalTool.library': 'Библиотека декалей',
+  'editor.decalTool.libraryTitle':
+    'Встроенные декали из комплекта редактора (оригинальная графика CC0). Выберите декаль и нажмите на землю, чтобы поставить штамп.',
+  'editor.decalTool.none': 'Декали ещё не размещены.',
+  'editor.appearance.fire': 'Эффект огня (анимированное пламя)',
+  'editor.appearance.glow': 'Цвет свечения',
+  'editor.appearance.glowStrength': 'Сила свечения',
+  'editor.appearance.hint':
+    'В пробном запуске вид тот же: оттенок меняет цвет, прозрачность создаёт призрачный вид, а свечение добавляет излучаемый свет.',
+  'editor.appearance.opacity': 'Непрозрачность',
+  'editor.appearance.reset': 'Сбросить внешний вид',
+  'editor.appearance.tint': 'Цвет тонировки',
+  'editor.appearance.title': 'Внешний вид (шейдер)',
+  'editor.assets.allTab': 'Все ({count})',
+  'editor.assets.collision.authored': 'Коллизия: создана в редакторе коллизий',
+  'editor.assets.collision.baked':
+    'Коллизия: запечённые параллелепипеды (автоматически созданная форма)',
+  'editor.assets.collision.none':
+    'Коллизия: отсутствует; размещённый объект блокирует проход лишь своим мягким кругом, если он есть',
+  'editor.assets.collisionMaster': 'Редактор коллизий: создать коллизию этого ресурса по умолчанию',
+  'editor.assets.favouriteAdd': 'Добавить {name} в избранное',
+  'editor.assets.favouriteRemove': 'Убрать {name} из избранного',
+  'editor.assets.favouritesEmpty':
+    'Избранного пока нет. Нажмите звезду у любого ресурса, чтобы сохранить его здесь.',
+  'editor.assets.favouritesTab': 'Избранное ({count})',
+  'editor.assets.importedEmpty':
+    'В этом сеансе нет импортированных моделей. Используйте «Импорт модели», чтобы загрузить файл .glb или .gltf с этого компьютера.',
+  'editor.assets.importedTab': 'Импортированные',
+  'editor.assets.recentsEmpty':
+    'В этом браузере ещё ничего не размещено. Размещённые вами ресурсы появятся здесь.',
+  'editor.assets.recentsTab': 'Недавние',
+  'editor.assets.removeImported': 'Удалить импортированную модель (только в этом сеансе)',
+  'editor.assets.resizeHandle': 'Перетащите, чтобы изменить размер обозревателя ресурсов',
+  'editor.assets.subcategory.buildings': 'Здания',
+  'editor.assets.subcategory.containers': 'Контейнеры',
+  'editor.assets.subcategory.decor': 'Декор',
+  'editor.assets.subcategory.enemies': 'Противники',
+  'editor.assets.subcategory.environment': 'Окружение',
+  'editor.assets.subcategory.furniture': 'Мебель',
+  'editor.assets.subcategory.lighting': 'Освещение',
+  'editor.assets.subcategory.modular': 'Модули',
+  'editor.assets.subcategory.nature': 'Природа',
+  'editor.assets.subcategory.other': 'Прочее',
+  'editor.assets.subcategory.structure': 'Конструкции',
+  'editor.assets.subcategoryAll': 'Все ({count})',
+  'editor.assets.subcategoryTab': '{name} ({count})',
+  'editor.authoring.aiBrief': 'Задание для ИИ и описание заданий',
+  'editor.authoring.aiNotes': 'Указания для ИИ',
+  'editor.authoring.allGroups': 'Все',
+  'editor.authoring.browseAll': 'Просмотреть всё',
+  'editor.authoring.defaults': 'По умолчанию',
+  'editor.authoring.filterLabel': 'Фильтр группы каталога',
+  'editor.authoring.noResults': 'Подходящих записей нет.',
+  'editor.authoring.questNotes': 'Заметки по созданию заданий',
+  'editor.authoring.resultCount': 'Записей: {count}',
+  'editor.authoring.search': 'Поиск по всем моделям...',
+  'editor.authoring.searchLabel': 'Поиск в каталоге',
+  'editor.authoring.showing':
+    'Показано {shown} из {total}. Уточните поиск, чтобы увидеть остальные.',
+  'editor.authoring.vfxArcane': 'Частицы тайной магии',
+  'editor.authoring.vfxFire': 'Тлеющие угли',
+  'editor.authoring.vfxFrost': 'Мерцание инея',
+  'editor.authoring.vfxHint':
+    'Пул частиц снижает нагрузку от эффекта в редакторе и пробном запуске.',
+  'editor.authoring.vfxHoly': 'Священное сияние',
+  'editor.authoring.vfxIntensity': 'Интенсивность визуальных эффектов',
+  'editor.authoring.vfxNature': 'Природные огоньки',
+  'editor.authoring.vfxNone': 'Нет',
+  'editor.authoring.vfxPreset': 'Предустановка',
+  'editor.authoring.vfxShadow': 'Частицы тени',
+  'editor.authoring.vfxTitle': 'Визуальные эффекты окружения',
+  'editor.biome.alphaImport': 'Импорт альфа-маски',
+  'editor.biome.alphaImportFailed': 'Не удалось прочитать это изображение как альфа-маску кисти.',
+  'editor.biome.alphaImportTitle':
+    'Загрузить изображение в оттенках серого как маску кисти: белое рисует, чёрное скрывает (хранится в этом браузере)',
+  'editor.biome.alphaNone': 'Нет',
+  'editor.biome.alphaRemove': 'Удалить эту импортированную альфа-маску',
+  'editor.biome.alphaTitle': 'Альфа-маска кисти',
+  'editor.biome.autoAllOff': 'Только рисование (выключить всё)',
+  'editor.biome.autoAllOffTitle':
+    'Отключить все автоматические правила, чтобы уклон, высота и береговая линия не меняли текстуры земли. Останется только ваша покраска.',
+  'editor.biome.autoHint':
+    'Правила автоматического текстурирования действуют ПОД вашей покраской: включённое правило постоянно меняет оттенок своей земли, поэтому покрашенный утёс снова станет каменным. Снимите флажок, чтобы убрать правило на всей карте. На новых картах все эти правила выключены.',
+  'editor.biome.autoRetexture': 'Автоматически обновить текстуры карты',
+  'editor.biome.autoRetextureDone':
+    'Обновлены текстуры ячеек: {count}. Любую часть можно перекрасить кистью.',
+  'editor.biome.autoRetextureHint':
+    'Одним нажатием перекрашивает всю карту подходящими встроенными текстурами с учётом высоты, уклона, воды, зон и троп: песок в пустынях и на пляжах, скалы на крутых склонах, разнообразные трава и земля, булыжник в городах и на дорогах. Затем всё можно редактировать и перекрашивать кистью.',
+  'editor.biome.autoRim': 'Горы по краям карты',
+  'editor.biome.autoScree': 'Каменные осыпи на утёсах (высокое качество графики)',
+  'editor.biome.autoShoreSand': 'Песок у воды',
+  'editor.biome.autoSlopeRock': 'Скалы на крутых склонах',
+  'editor.biome.autoSnowCaps': 'Заснеженные вершины',
+  'editor.biome.autoTitle': 'Автоматические текстуры',
+  'editor.biome.bucket': 'Заливка (замена текстуры)',
+  'editor.biome.bucketArmedHint':
+    'Заливка готова: нажмите на землю, чтобы заменить выбранную текстуру по всей карте.',
+  'editor.biome.bucketDone': 'Заменено окрашенных ячеек: {count}.',
+  'editor.biome.bucketTitle':
+    'Включите заливку и нажмите на землю: все ячейки с выбранной нажатием текстурой получат выбранный образец',
+  'editor.biome.builtinGroup': 'Библиотека текстур',
+  'editor.biome.builtinTitle':
+    'Встроенные текстуры земли из комплекта редактора: выбор добавляет текстуру на карту как образец (доступен на любом компьютере)',
+  'editor.biome.customFull': 'Достигнут предел образцов ({max}).',
+  'editor.biome.customHint':
+    'Пользовательские образцы меняют только цвет земли (форма рельефа сохраняет биом зоны) и сохраняются с картой.',
+  'editor.biome.depth': 'Глубина поверхности',
+  'editor.biome.edgeDetail': 'Детализация границ',
+  'editor.biome.edgeHint':
+    'Определяет вид границы двух нарисованных текстур по всей карте. Мягкая кисть хранит край как россыпь отдельных ячеек (одна ячейка вмещает лишь одну текстуру), а шаг сетки рисования равен четверти ярда. Поэтому при нулевых значениях обоих параметров граница будет жёсткой линией с крапом независимо от ползунка жёсткости. Мягкость края расширяет смешивание, превращая россыпь в плавный переход; детализация края слегка смещает границу шумом, чтобы текстуры переплетались как на настоящей земле, а не следовали сетке. Оба параметра не требуют дополнительных чтений текстур, но широкая мягкость размывает более узкие нарисованные детали.',
+  'editor.biome.edgeSoftness': 'Мягкость границ',
+  'editor.biome.galleryCount': 'Текстур: {n}',
+  'editor.biome.galleryCurrent': 'Текущая',
+  'editor.biome.galleryHint': 'Просмотрите все текстуры и закрепите ту, которой хотите рисовать.',
+  'editor.biome.galleryTitle': 'Выбрать текстуру земли',
+  'editor.biome.groupBiomes': 'Биомы',
+  'editor.biome.groupSwatches': 'Ваши образцы',
+  'editor.biome.hardness': 'Жёсткость кисти',
+  'editor.biome.hue': 'Цветовой тон',
+  'editor.biome.importTexture': 'Импорт образца текстуры',
+  'editor.biome.importTextureFailed': 'Не удалось прочитать это изображение.',
+  'editor.biome.importTextureTitle':
+    'Выберите файл изображения: новый образец при рисовании повторяется по земле (хранится в этом браузере; другие компьютеры видят его средний цвет)',
+  'editor.biome.light': 'Светлее/темнее',
+  'editor.biome.pickTexture': 'Выберите текстуру для рисования',
+  'editor.biome.removeSwatch': 'Удалить образец',
+  'editor.biome.removeSwatchTitle':
+    'Удалить этот пользовательский образец из карты. Окрашенный им рельеф вернётся к исходному виду биома.',
+  'editor.biome.saveSwatch': 'Сохранить тонировку как образец',
+  'editor.biome.saveSwatchTitle':
+    'Сохранить эту версию цветового тона и яркости отдельным образцом, чтобы использовать тонировку после изменения ползунков',
+  'editor.biome.swatchRemoved': 'Образец «{name}» удалён.',
+  'editor.biome.swatchSaved': 'Образец «{name}» сохранён.',
+  'editor.biome.textureSlots': 'Слоты текстур: занято {used} / {max} · свободно {free}',
+  'editor.biome.textureSlotsFull':
+    'На карте отображаются лишь {max} образцов с текстурами; остальные показываются сплошным цветом. Уберите неиспользуемую текстуру, чтобы освободить слот.',
+  'editor.biome.textureSlotsOver':
+    'Предел превышен на {over}: последние добавленные текстуры рисуют сплошным цветом. Удалите образец текстуры, чтобы освободить слот.',
+  'editor.biome.textureSlotsTitle':
+    'Каждая отдельная текстура карты занимает один из {max} слотов. Снежные текстуры используют слой снега рельефа и не занимают слоты. Удаление образца текстуры освобождает его слот.',
+  'editor.biome.tileSize': 'Размер плитки текстуры (ярды)',
+  'editor.biome.variation': 'Вариативность',
+  'editor.biome.variationHint':
+    'Разбивает повторяющуюся сетку вторым чтением текстуры в повёрнутой системе координат. 0% означает обычное повторение без дополнительных затрат; большие значения добавляют одно чтение текстуры везде, где используется этот образец. Глубина поверхности затеняет впадины самой текстуры по её карте окружающего затенения, чтобы окрашенная земля не выглядела плоской; затраты те же.',
+  'editor.brush.reapplyWater': 'Обновить воду',
+  'editor.brush.reapplyWaterTitle':
+    'Перестроить воду по текущему рельефу. Мазки уже обновляют затронутую воду; используйте это для оставшихся участков, например котловины, выкопанной там, где воды вообще не было.',
+  'editor.build.banner': 'Создание модели',
+  'editor.build.bannerHint':
+    'Добавляйте фигуры и редактируйте вершины, рёбра и грани на панели моделирования.',
+  'editor.build.bare': 'Обычный (без текстуры)',
+  'editor.build.collision': 'Использовать сетку для коллизии',
+  'editor.build.collisionHint':
+    'Твёрдые части модели блокируют игрока. Проходимые фигуры (зелёные) становятся пандусами.',
+  'editor.build.done': 'Готово',
+  'editor.build.editModel': 'Редактировать модель',
+  'editor.build.entered':
+    'Редактирование модели: добавьте фигуры, примените текстуру, настройте коллизию, затем нажмите «Готово».',
+  'editor.build.hue': 'Цветовой тон',
+  'editor.build.light': 'Яркость',
+  'editor.build.material': 'Материал',
+  'editor.build.materialHint':
+    'Материалы библиотеки проецируются на фигуру шейдером (без растяжения на ступенях, склонах и изгибах) и тонируются цветовым тоном, насыщенностью и яркостью.',
+  'editor.build.materialMany':
+    'Настройки материала применяются ко всем выбранным построенным моделям ({n}).',
+  'editor.build.newHint':
+    'Нажмите на карту, чтобы начать новую модель, или выберите существующую для редактирования.',
+  'editor.build.panelTitle': 'Построенная модель',
+  'editor.build.resetLook': 'Сбросить тонировку материала',
+  'editor.build.saturation': 'Насыщенность',
+  'editor.build.shapes': 'Фигур: {n}',
+  'editor.build.texture': 'Текстура поверхности',
+  'editor.build.tileSize': 'Масштаб текстуры',
+  'editor.build.tileSizeUnit': 'ярдов / плитку',
+  'editor.build.walkableTip':
+    'Совет: включите «Проходимость» на панели моделирования, чтобы сделать фигуру пандусом.',
+  'editor.buildMode.addLevel': 'Добавить этаж',
+  'editor.buildMode.autoBase': 'Задаётся первым размещением',
+  'editor.buildMode.bare': 'Исходная поверхность',
+  'editor.buildMode.bareFinish': 'Исходная поверхность',
+  'editor.buildMode.bareWall': 'Голая стена',
+  'editor.buildMode.baseY': 'Высота фундамента (ярды)',
+  'editor.buildMode.building': 'Здание',
+  'editor.buildMode.buildingNumber': 'Здание {number}',
+  'editor.buildMode.capacity':
+    'Эта постройка слишком велика. Нарисуйте меньшую секцию или удалите неиспользуемые элементы.',
+  'editor.buildMode.chooseAsset': 'Сначала выберите ресурс.',
+  'editor.buildMode.choosePaintWall': 'Нажмите на стену здания или ресурс стены.',
+  'editor.buildMode.chooseWall':
+    'Выберите ресурс стены и дождитесь предпросмотра или выберите «Голая стена».',
+  'editor.buildMode.chosenAsset': 'Выбранный ресурс',
+  'editor.buildMode.fineRotation': 'Точное вращение (15°)',
+  'editor.buildMode.finishHint': 'Выберите отделку, затем нажмите на стену, чтобы покрасить её.',
+  'editor.buildMode.finishRun': 'Применить к соединённым стенам',
+  'editor.buildMode.finishSide': 'Сторона покраски',
+  'editor.buildMode.finishTexture': 'Текстура стены',
+  'editor.buildMode.finishTile': 'Повторение текстуры (ярды)',
+  'editor.buildMode.floorHeight': 'Высота этажа (ярды)',
+  'editor.buildMode.floorHint': 'Протяните прямоугольник, чтобы добавить пол на этом этаже.',
+  'editor.buildMode.floorNumber': 'Этаж {number}',
+  'editor.buildMode.foundationLocked':
+    'Настройки фундамента фиксируются после начала строительства.',
+  'editor.buildMode.gridCell': '{size} ярдов',
+  'editor.buildMode.gridOff': 'Выкл.',
+  'editor.buildMode.gridSize': 'Шаг сетки',
+  'editor.buildMode.groundFloor': 'Первый этаж',
+  'editor.buildMode.hideAbove': 'Скрыть верхние этажи',
+  'editor.buildMode.importFailed':
+    'Импорт текстуры не удался. Используйте PNG, JPG или WebP меньше 8 МБ с размером каждой стороны до 8192 пикселей.',
+  'editor.buildMode.importTexture': 'Импорт текстуры',
+  'editor.buildMode.importedTexture': 'Импортированная текстура {number}',
+  'editor.buildMode.importingTexture': 'Импорт текстуры...',
+  'editor.buildMode.invalid':
+    'Эта стена или комната не помещается. Измените сетку или выберите другой элемент.',
+  'editor.buildMode.larger': 'Больше',
+  'editor.buildMode.levels': 'Этажи здания',
+  'editor.buildMode.materialNames.Bricks076C': 'Замшелый кирпич',
+  'editor.buildMode.materialNames.Cliff001': 'Красный утёс',
+  'editor.buildMode.materialNames.Cliff002': 'Замшелая скала',
+  'editor.buildMode.materialNames.Cobblestone001': 'Мощёная дорога',
+  'editor.buildMode.materialNames.Cobblestone002': 'Старая брусчатка',
+  'editor.buildMode.materialNames.Concrete034': 'Литой бетон',
+  'editor.buildMode.materialNames.Gravel024': 'Гравий',
+  'editor.buildMode.materialNames.Marble012': 'Мрамор с прожилками',
+  'editor.buildMode.materialNames.Metal032': 'Шлифованная сталь',
+  'editor.buildMode.materialNames.Metal034': 'Окрашенная сталь',
+  'editor.buildMode.materialNames.PavingStones046': 'Тротуарный камень',
+  'editor.buildMode.materialNames.PavingStones131': 'Замшелая брусчатка',
+  'editor.buildMode.materialNames.Plaster001': 'Известковая штукатурка',
+  'editor.buildMode.materialNames.Rock029': 'Выветрившаяся скала',
+  'editor.buildMode.materialNames.Rock035': 'Слоистый камень',
+  'editor.buildMode.materialNames.Rock051': 'Гранит',
+  'editor.buildMode.materialNames.Rock052': 'Грубый камень',
+  'editor.buildMode.materialNames.Rock053': 'Железная скала',
+  'editor.buildMode.materialNames.Rock054': 'Поверхность песчаника',
+  'editor.buildMode.materialNames.Rock055': 'Ржавая скала',
+  'editor.buildMode.materialNames.Rock056': 'Луговые камни',
+  'editor.buildMode.materialNames.Rock057': 'Тёмный камень с прожилками',
+  'editor.buildMode.materialNames.Roots001': 'Сплетённые корни',
+  'editor.buildMode.materialNames.Roots002': 'Живые корни',
+  'editor.buildMode.materialNames.Rust004': 'Ржавое железо',
+  'editor.buildMode.materialNames.Tiles001': 'Плиты с лишайником',
+  'editor.buildMode.materialNames.Tiles002': 'Сланцевая брусчатка',
+  'editor.buildMode.materialNames.Wood001': 'Дубовые доски',
+  'editor.buildMode.materialNames.Wood002': 'Сосновые доски',
+  'editor.buildMode.materialNames.Wood003': 'Выветрившаяся кора',
+  'editor.buildMode.materialNames.Wood004': 'Замшелая кора',
+  'editor.buildMode.modeFinish': 'Отделка стен',
+  'editor.buildMode.modeFloor': 'Полы',
+  'editor.buildMode.modeObject': 'Объекты',
+  'editor.buildMode.modeRoom': 'Комнаты',
+  'editor.buildMode.modeWall': 'Стены',
+  'editor.buildMode.newBuilding': 'Новое здание',
+  'editor.buildMode.noAsset': 'Выберите ресурс в обозревателе.',
+  'editor.buildMode.noBuilding': 'Новое здание',
+  'editor.buildMode.objectHint': 'Размещайте объекты на выбранном этаже.',
+  'editor.buildMode.pickAsset': 'Выбрать ресурс',
+  'editor.buildMode.roomHint': 'Протяните прямоугольник, чтобы создать комнату со стенами и полом.',
+  'editor.buildMode.rotateLeft': 'Повернуть влево',
+  'editor.buildMode.rotateRight': 'Повернуть вправо',
+  'editor.buildMode.selectExisting': 'Выбрать существующий элемент',
+  'editor.buildMode.selectedAsset': 'Ресурс: {name}',
+  'editor.buildMode.settings': 'Сетка и фундамент',
+  'editor.buildMode.sideBack': 'Задняя',
+  'editor.buildMode.sideBoth': 'Обе стороны',
+  'editor.buildMode.sideClicked': 'Выбранная нажатием сторона',
+  'editor.buildMode.sideFront': 'Передняя',
+  'editor.buildMode.smaller': 'Меньше',
+  'editor.buildMode.thickness': 'Толщина стены (ярды)',
+  'editor.buildMode.title': 'Построить здание',
+  'editor.buildMode.transformControls': 'Управление ресурсом',
+  'editor.buildMode.transformEmpty': 'Выберите ресурс для поворота или изменения размера.',
+  'editor.buildMode.transformReadout': 'Поворот: {degrees}° | Размер: {scale}x',
+  'editor.buildMode.transformShortcuts': 'Поворот: , и . | Размер: [ и ]',
+  'editor.buildMode.wallHint': 'Протяните, чтобы нарисовать прямую стену.',
+  'editor.buildMode.wallSource': 'Тип стены',
+  'editor.camera.assetViewDistance': 'Дистанция исчезновения размещённых ресурсов',
+  'editor.camera.assetViewHint':
+    'Расстояние, на котором размещённый декор плавно исчезает и перестаёт рисоваться ради производительности. Уменьшите его, чтобы раньше отсекать далёкие ресурсы; увеличьте, чтобы видеть дальше. Сохраняется с картой, поэтому пробный запуск выглядит так же.',
+  'editor.camera.assetViewMax': 'До границы тумана',
+  'editor.camera.assetViewTitle': 'Дальность видимости ресурсов',
+  'editor.camera.axisWidget': 'Осевые виды камеры',
+  'editor.camera.flySpeedSet': 'Скорость полёта: {value}x',
+  'editor.camera.focus': 'Сфокусироваться на выбранном (.)',
+  'editor.camera.focusTitle':
+    'Переместить центр вращения на выбранный объект, чтобы камера вращалась вокруг него; если ничего не выбрано, вместить в кадр всю карту',
+  'editor.camera.freeFly': 'Свободный полёт (Shift+F)',
+  'editor.camera.freeFlyHint':
+    'WASD перемещает, Q/E поднимает и опускает, перетаскивание поворачивает взгляд от первого лица, а колёсико задаёт скорость.',
+  'editor.camera.invertPan': 'Инвертировать камеру',
+  'editor.camera.loadingHaze': 'Дымка загрузки',
+  'editor.camera.lookSpeed': 'Скорость обзора мышью',
+  'editor.camera.moveSpeed': 'Скорость движения WASD',
+  'editor.camera.panSpeed': 'Скорость панорамирования',
+  'editor.camera.perfAssets': 'Размещённые ресурсы',
+  'editor.camera.perfCoords': 'Мир (x, z)',
+  'editor.camera.perfFps': 'Кадров/с',
+  'editor.camera.perfFrameMs': 'Время кадра (мс)',
+  'editor.camera.perfHint':
+    'Текущие показатели, закреплённые в углу области просмотра во время редактирования.',
+  'editor.camera.perfSelTris': 'Полигонов в выбранном',
+  'editor.camera.perfShow': 'Показывать показатели в области просмотра',
+  'editor.camera.perfStreaming': 'Потоковая загрузка рельефа',
+  'editor.camera.perfTerrain': 'Изменения рельефа',
+  'editor.camera.perfTitle': 'Показатели производительности',
+  'editor.camera.perfTris': 'Полигонов в сцене',
+  'editor.camera.resetSpeeds': 'Сбросить скорости',
+  'editor.camera.showBoundary': 'Показывать стены границ карты',
+  'editor.camera.showPlayer': 'Показывать игрока пробного запуска',
+  'editor.camera.snapNegativeX': 'Вид с отрицательной стороны X',
+  'editor.camera.snapNegativeY': 'Вид снизу',
+  'editor.camera.snapNegativeZ': 'Вид с отрицательной стороны Z',
+  'editor.camera.snapPositiveX': 'Вид с положительной стороны X',
+  'editor.camera.snapPositiveY': 'Вид сверху',
+  'editor.camera.snapPositiveZ': 'Вид с положительной стороны Z',
+  'editor.camera.speedHint':
+    'Скорость полёта, обзора и панорамирования камеры области просмотра. Только для редактора. В свободном полёте колёсико мыши работает как газ: меняет скорость движения вместо приближения.',
+  'editor.camera.speedTitle': 'Скорости перемещения',
+  'editor.camera.visibilityDistance': 'Дальность видимости рельефа',
+  'editor.camera.visibilityHint':
+    'Рельеф исходной детализации загружается около камеры. Дымка скрывает каждую зону до её готовности. Большая дальность сильнее нагружает видеокарту и память.',
+  'editor.camera.visibilityTitle': 'Видимость рельефа',
+  'editor.camera.wireframe': 'Каркасный режим',
+  'editor.camera.xray': 'Прозрачный рентгеновский режим',
+  'editor.camp.aiNotesPlaceholder':
+    'Опишите для ИИ поведение, логику патруля, темп сражений или подсказки диалогов.',
+  'editor.camp.catalogMeta': '{family} | Уровень {min}-{max}',
+  'editor.camp.chooseMob': 'Выбрать модель существа',
+  'editor.camp.levelMax': 'Максимальный уровень',
+  'editor.camp.overrideLevels': 'Переопределить уровни шаблона',
+  'editor.camp.questNotesPlaceholder':
+    'Объясните, как этот лагерь должен поддерживать цели, награды или продвижение по заданиям.',
+  'editor.camp.statAggro': 'Агро: {value} ярдов',
+  'editor.camp.statFamily': 'Семейство: {value}',
+  'editor.camp.statScale': 'Масштаб: {value}',
+  'editor.camp.tagBoss': 'Босс',
+  'editor.camp.tagCaster': 'Заклинатель',
+  'editor.camp.tagElite': 'Элита',
+  'editor.camp.tagEnrage': 'Берсерк',
+  'editor.camp.tagRare': 'Редкий',
+  'editor.camp.tagStationary': 'Неподвижный',
+  'editor.camp.tagSummoner': 'Призыватель',
+  'editor.camp.tagSupport': 'Поддержка',
+  'editor.camp.tagSwimmer': 'Пловец',
+  'editor.city.gridOff': 'Выкл.',
+  'editor.city.gridSize': 'Размер сетки',
+  'editor.city.kitChosen': 'Размещение: {name}',
+  'editor.city.kitGhostBlocked': 'Заблокировано: пересечение с размещённым ресурсом.',
+  'editor.city.kitNone':
+    'Выберите ресурс в обозревателе, затем нажмите на карту, чтобы разместить его на сетке.',
+  'editor.city.kitPick': 'Выбрать ресурс',
+  'editor.city.kitRotate': 'Повернуть (R)',
+  'editor.city.kitScale': 'Масштаб элемента',
+  'editor.city.kitTileHint':
+    'Соединение плиток привязывает каждый элемент по его размеру и к высоте ПЕРВОЙ плитки, чтобы полы стыковались краями и оставались ровными на неровной земле. Esc или выбор нового ресурса начинает новый уровень; выключите режим для мировой сетки.',
+  'editor.city.kitTileSnap': 'Соединять плитки',
+  'editor.city.prefabCount': 'Элементов: {n}',
+  'editor.city.prefabName': 'Название префаба',
+  'editor.city.prefabNeedSelection':
+    'Сначала выберите один или несколько размещённых ресурсов (Shift+щелчок или рамка).',
+  'editor.city.prefabNone':
+    'Префабов пока нет. Выберите несколько размещённых ресурсов и сохраните их как префаб.',
+  'editor.city.prefabSave': 'Сохранить выбранное как префаб',
+  'editor.city.prefabSaved': 'Префаб сохранён: {name}',
+  'editor.city.prefabStamp': 'Штамп',
+  'editor.city.prefabStamped': 'Префаб размещён (элементов: {n}).',
+  'editor.city.roadAuthored': 'Дорога {n}',
+  'editor.city.roadDraw': 'Нарисовать дорогу',
+  'editor.city.roadDrawing':
+    'Нажимайте для добавления точек. Enter или двойной щелчок завершает, Esc отменяет.',
+  'editor.city.roadFinish': 'Завершить дорогу',
+  'editor.city.roadHint':
+    'Дороги плавно вписываются в рельеф, как встроенные дороги мира, и выравнивают неровности под собой.',
+  'editor.city.roadLegacy': 'Встроенная дорога',
+  'editor.city.roadLimit': 'На этой карте уже достигнут предел количества дорог.',
+  'editor.city.roadList': 'Дороги этой карты',
+  'editor.city.roadPlaced': 'Дорога размещена.',
+  'editor.city.roadTooShort': 'Нарисуйте хотя бы две точки, чтобы построить дорогу.',
+  'editor.city.roadType': 'Тип дороги',
+  'editor.city.roadTypePath': 'Тропа',
+  'editor.city.rotSnap': 'Привязка вращения',
+  'editor.city.routeAddHint':
+    'Каждое нажатие добавляет точку. Enter завершает, Esc прекращает редактирование.',
+  'editor.city.routeClear': 'Очистить маршрут',
+  'editor.city.routeCleared': 'Маршрут очищен.',
+  'editor.city.routeCount': 'Точек маршрута: {n}',
+  'editor.city.routeEditing': 'Маршрут для {name}: нажимайте на карту, чтобы добавить точки.',
+  'editor.city.routeFinish': 'Сохранить маршрут',
+  'editor.city.routeMode': 'Способ обхода',
+  'editor.city.routeModeLoop': 'По кругу',
+  'editor.city.routeModePingPong': 'Туда и обратно',
+  'editor.city.routeNoNpc': 'NPC не выбран. Сначала нажмите на NPC в области просмотра.',
+  'editor.city.routePick': 'Нажмите на NPC, чтобы изменить его маршрут.',
+  'editor.city.routeSaved': 'Маршрут сохранён (точек: {n}).',
+  'editor.city.routeSpeed': 'Скорость ходьбы',
+  'editor.city.routeWait': 'Ожидание в точках маршрута',
+  'editor.city.routeWaitUnit': 'секунд',
+  'editor.city.settings': 'Настройки строительства',
+  'editor.city.snapHint':
+    'Привязка к сетке действует на узлы стен, размещение элементов набора и штампы префабов.',
+  'editor.city.styleCastle': 'Замковая стена',
+  'editor.city.styleCastleFence': 'Замковая ограда',
+  'editor.city.styleHexWall': 'Шестигранная стена',
+  'editor.city.styleMetalFence': 'Металлическая ограда',
+  'editor.city.styleStone': 'Каменная стена',
+  'auth.wocBuilder.cat.skinTone': 'Тон кожи',
+  'auth.wocBuilder.slider.eyeSize': 'Размер глаз',
+  'hudChrome.raidBossGuide.damageRange': 'от {min} до {max}',
+  'hudChrome.trinkets.range': 'от {min} до {max}',
+  'editor.assets.subcategory.players': 'Игроки',
+  'editor.assets.subcategory.props': 'Реквизит',
+  'editor.biome.galleryLockIn': 'Закрепить',
+  'editor.buildMode.redo': 'Повторить',
+  'editor.buildMode.undo': 'Отменить',
+  'editor.camera.title': 'Камера',
+  'editor.camp.levelMin': 'Минимальный уровень',
+  'editor.city.prefabDelete': 'Удалить',
+  'editor.city.roadDelete': 'Удалить',
+  'editor.city.roadTypeRoad': 'Дорога',
+  'editor.collisionMaster.addMenu': 'Добавить',
+  'editor.collisionMaster.lockIn': 'Закрепить',
+  'editor.collisionMaster.sculptRadius': 'Радиус',
+  'editor.decalTool.rotation': 'Поворот',
+  'editor.dungeon.delete': 'Удалить',
+  'editor.dungeon.field.r': 'Радиус столкновения',
+  'editor.dungeon.field.scale': 'Масштаб',
+  'editor.entityTool.categoryCreature': 'Существа',
+  'editor.entityTool.categoryHumanoid': 'Гуманоиды',
+  'editor.entityTool.categoryNpc': 'NPC',
+  'editor.fire.smoke': 'Дымчатый',
+  'editor.fluid.dps': 'Урон в секунду',
+  'editor.fluid.fxSmoke': 'Дымчатый',
+  'editor.inspector.cameraTab': 'Камера',
+  'editor.inspector.toolTab': 'Инструменты',
+  'editor.lightTool.color': 'Цвет',
+  'editor.map.close': 'Закрыть',
+  'editor.map.worldTitle': 'Карта мира',
+  'editor.map.zoneTitle': 'Карта региона',
+  'editor.mobTool.statArmor': 'Броня',
+  'editor.mobTool.statHealth': 'Здоровье',
+  'editor.mobTool.statScale': 'Размер',
+  'editor.music.title': 'Музыка',
+  'editor.newMap.create': 'Создать',
+  'editor.rock.size': 'Размер',
+  'editor.rock.texture': 'Текстура',
+  'editor.settings.close': 'Закрыть',
+  'editor.settings.title': 'Настройки',
+  'editor.tool.music': 'Музыка',
+  'editor.tool.scale': 'Масштаб',
+  'editor.tool.zone': 'Зона',
+  'editor.topbar.dungeon': 'Подземелье',
+  'editor.topbar.mapWindow': 'Карта',
+  'editor.topbar.minimap': 'Мини-карта',
+  'editor.topbar.more': 'Еще',
+  'editor.topbar.music': 'Музыка',
+  'editor.topbar.preview': 'Предпросмотр',
+  'editor.topbar.settings': 'Настройки',
+  'editor.tree.leafSize': 'Размер',
+  'editor.tree.studioDiscard': 'Отбросить',
+  'editor.tree.volumeR': 'Радиус',
+  'editor.tunnel.holeRadius': 'Радиус',
+  'editor.worldLink.unlink': 'Отвязать',
+  'hudChrome.expeditions.bellCount.one': 'Открыть группы: {count} уведомление',
+  'hudChrome.expeditions.bellCount.other': 'Открыть группы: {count} уведомлений',
+  'hudChrome.adventureGuide.catalogueCountPlural.one': '{count} приключение',
+  'hudChrome.adventureGuide.catalogueCountPlural.other': '{count} приключений',
+  'hudChrome.adventureGuide.title': 'Путеводитель по приключениям',
+  'hudChrome.adventureGuide.eyebrow': 'Журнал экспедиций',
+  'hudChrome.adventureGuide.intro': 'Откройте мир. Изучите врага. Выберите следующее приключение.',
+  'hudChrome.adventureGuide.dungeons': 'Подземелья',
+  'hudChrome.adventureGuide.raids': 'Рейды',
+  'hudChrome.adventureGuide.delves': 'Вылазки',
+  'hudChrome.adventureGuide.search': 'Поиск приключений',
+  'hudChrome.adventureGuide.eligible': 'Мой уровень',
+  'hudChrome.adventureGuide.catalogueCount': 'Приключений: {count}',
+  'hudChrome.adventureGuide.empty': 'По этим фильтрам приключений не найдено.',
+  'hudChrome.adventureGuide.reset': 'Сбросить фильтры',
+  'hudChrome.adventureGuide.delve': 'Вылазка',
+  'hudChrome.adventureGuide.delveTravel':
+    'Войдите через вход в вылазку. Выберите ступень на доске у входа; автоматический подбор группы недоступен.',
+  'hudChrome.adventureGuide.dungeonTravel':
+    'Изучите бои ниже, затем выберите группу или отправляйтесь ко входу.',
+  'hudChrome.adventureGuide.raidTravel':
+    'Соберите рейд, изучите бои и проверьте сохранение рейда перед входом.',
+  'hudChrome.adventureGuide.soloTravel':
+    'Одиночное приключение. Чтобы начать, отправляйтесь ко входу.',
+  'hudChrome.adventureGuide.browseOnly': 'Отправиться ко входу',
+  'hudChrome.adventureGuide.findGroup': 'Найти группу',
+  'hudChrome.adventureGuide.inspectLoot': 'Возможная добыча',
+  'hudChrome.adventureGuide.lootClass': 'Класс',
+  'hudChrome.adventureGuide.lootSpec': 'Специализация',
+  'hudChrome.adventureGuide.allSpecs': 'Все специализации',
+  'hudChrome.adventureGuide.lootHint':
+    'Доступное снаряжение с характеристиками, подходящими выбранной специализации. Общие награды остаются видимыми. Вероятности выпадения рассчитаны по полной таблице добычи.',
+  'hudChrome.adventureGuide.lootEmpty': 'Нет снаряжения для этого класса и специализации.',
+  'hudChrome.adventureGuide.fullTableRoll': 'Один предмет из полной таблицы добычи',
+  'hudChrome.adventureGuide.encountersCount': 'Боёв: {count}',
+  'hudChrome.adventureGuide.tiers': 'Доступные ступени: {tiers}',
+  'hudChrome.expeditions.bell': 'Открыть группы: уведомлений {count}',
+  'hudChrome.expeditions.alerts': 'Уведомления',
+  'hudChrome.expeditions.groups': 'Группы',
+  'hudChrome.expeditions.rewards': 'Награды',
+  'hudChrome.expeditions.sections': 'Разделы экспедиций',
+  'hudChrome.expeditions.noAlerts': 'Нет уведомлений об экспедициях, требующих вашего внимания.',
+  'hudChrome.expeditions.findGroup': 'Найти группу',
+  'hudChrome.expeditions.recruitPlayers': 'Набрать игроков',
+  'hudChrome.expeditions.recruitIntro':
+    'Выберите подземелье и цель группы. Проверьте объявление и опубликуйте его.',
+  'hudChrome.expeditions.recruitDungeon': 'Подземелье',
+  'hudChrome.expeditions.recruitDifficulty': 'Сложность',
+  'hudChrome.expeditions.recruitPreview': 'Предпросмотр объявления',
+  'hudChrome.expeditions.recruitPublish': 'Опубликовать группу',
+  'hudChrome.expeditions.recruitPublishing': 'Публикация группы...',
+  'hudChrome.expeditions.recruitBeforeEntry':
+    'Можно набирать игроков до входа в подземелье. Публикация не телепортирует группу.',
+  'hudChrome.expeditions.recruitUnconfirmed':
+    'Объявление не подтверждено. Проверьте соединение или сообщения в чате и повторите попытку.',
+  'hudChrome.expeditions.recruitLoading': 'Загрузка вариантов набора...',
+  'hudChrome.expeditions.recruitAlreadyOpen': 'Набор уже открыт. Перейдите к управлению группой.',
+  'hudChrome.expeditions.recruitExistingRun':
+    'У вас уже есть экспедиция. Управляйте набором в разделе «Ваша группа».',
+  'hudChrome.expeditions.recruitLeaveQueue':
+    'Покиньте очередь подбора перед публикацией своей группы.',
+  'hudChrome.expeditions.recruitFinishProposal':
+    'Ответьте на приглашение подбора группы перед публикацией группы.',
+  'hudChrome.expeditions.recruitCancelRequests':
+    'Отзовите ожидающие ответа заявки перед публикацией своей группы.',
+  'hudChrome.expeditions.recruitNoActivities':
+    'Нет подземелий, подходящих вашей группе по уровню и числу мест.',
+  'hudChrome.expeditions.recruitNoRoles': 'Для вашего персонажа нет доступных подходящих ролей.',
+  'hudChrome.expeditions.recruitInvalidNote':
+    'Заметка должна содержать не более 120 символов без управляющих символов.',
+  'hudChrome.expeditions.manageRecruitment': 'Управление набором',
+  'hudChrome.expeditions.formingGroup': 'Сбор группы',
+  'hudChrome.expeditions.groupGathering':
+    'Ваша группа собирается. Когда будете готовы, соберитесь у входа в подземелье.',
+  'hudChrome.expeditions.groupChooseDungeon':
+    'Выберите подземелье для группы и наберите недостающих игроков.',
+  'hudChrome.expeditions.waitForLeader': 'Лидер группы может выбрать подземелье и открыть набор.',
+  'hudChrome.expeditions.recruitmentNext':
+    'Набор открыт. Когда будете готовы, соберите группу у входа в подземелье.',
+  'hudChrome.expeditions.findGroupNext':
+    'Вы не состоите в группе. Найдите группу, чтобы начать экспедицию.',
+  'hudChrome.expeditions.awaitingReply': 'Ожидание ответа от групп: {count}.',
+  'hudChrome.expeditions.requestSent': 'Заявка отправлена. Ожидание ответа лидера группы.',
+  'hudChrome.expeditions.readyToTravel':
+    'Группа готова. Отправляйтесь в подземелье, когда будете готовы.',
+  'hudChrome.expeditions.groupRecruiting': 'Ваша экспедиция продолжается. Набор открыт.',
+  'hudChrome.expeditions.groupInProgress': 'Ваша экспедиция продолжается.',
+  'hudChrome.expeditions.title': 'Открытые экспедиции',
+  'hudChrome.expeditions.entryTitle': 'Идти одному или открыть группу?',
+  'hudChrome.expeditions.entryBody': 'Начните сейчас. Группу можно открыть позже в любой момент.',
+  'hudChrome.expeditions.open': 'Открыть группу',
+  'hudChrome.expeditions.closeRecruitment': 'Закрыть набор',
+  'hudChrome.expeditions.travel': 'Отправиться к группе',
+  'hudChrome.expeditions.request': '{name} хочет присоединиться в роли: {role}.',
+  'hudChrome.expeditions.level': 'Уровень {level}',
+  'hudChrome.expeditions.accept': 'Принять',
+  'hudChrome.expeditions.decline': 'Отклонить',
+  'hudChrome.expeditions.acceptPlayer': 'Принять игрока',
+  'hudChrome.expeditions.declinePlayer': 'Отклонить игрока',
+  'hudChrome.expeditions.chooseRole': 'Ваша роль',
+  'hudChrome.expeditions.send': 'Отправить заявку',
+  'hudChrome.expeditions.confirmRequest': 'Подтвердить заявку',
+  'hudChrome.expeditions.chooseRoleAction': 'Выбрать роль',
+  'hudChrome.expeditions.cancel': 'Отмена',
+  'hudChrome.expeditions.pending': 'Заявка ожидает ответа',
+  'hudChrome.expeditions.join': 'Подать заявку',
+  'hudChrome.expeditions.members': 'Игроков: {current}/{total}',
+  'hudChrome.expeditions.progress': 'Боссов побеждено: {defeated}/{total}',
+  'hudChrome.expeditions.needed': 'Рекомендуемые роли: {roles}',
+  'hudChrome.expeditions.close': 'Закрыть',
+  'hudChrome.expeditions.empty': 'Сейчас нет открытых экспедиций.',
+  'hudChrome.expeditions.finder': 'Открыть поиск подземелий',
+  'hudChrome.expeditions.groupsCount': 'Открытых групп: {count}',
+  'hudChrome.expeditions.requestsCount': 'Заявок на вступление: {count}',
+  'hudChrome.expeditions.yourGroup': 'Ваша группа',
+  'hudChrome.expeditions.otherGroups': 'Другие группы',
+  'hudChrome.expeditions.manageGroup': 'Ваша экспедиция и заявки на вступление',
+  'hudChrome.expeditions.browseGroups': 'Выберите группу, которой хотите помочь',
+  'hudChrome.expeditions.noCurrentGroup': 'Вы не участвуете в экспедиции.',
+  'hudChrome.expeditions.noCurrentGroupHint': 'Войдите в подземелье или подайте заявку в группу.',
+  'hudChrome.expeditions.recruitmentOpen': 'Набор открыт',
+  'hudChrome.expeditions.recruitmentClosed': 'Набор закрыт',
+  'hudChrome.expeditions.groupRoster': 'Участники группы',
+  'hudChrome.expeditions.noRequests': 'Нет заявок, ожидающих ответа.',
+  'hudChrome.expeditions.requestsCombat': 'Есть ожидающие заявки. Рассмотрите их после боя.',
+  'hudChrome.expeditions.expires': 'Истекает через {time}',
+  'hudChrome.expeditions.waiting': 'Ожидание ответа от {name}.',
+  'hudChrome.expeditions.outcomeAccepted':
+    '{name} принимает вашу заявку. Когда будете готовы, нажмите «Отправиться к группе».',
+  'hudChrome.expeditions.outcomeDeclined': '{name} отклоняет вашу заявку.',
+  'hudChrome.expeditions.outcomeExpired': 'Срок заявки истёк. Можно отправить новую.',
+  'hudChrome.expeditions.outcomeCancelled': 'Вы отменили заявку.',
+  'hudChrome.expeditions.outcomeClosed': 'Эта группа больше не принимает вашу заявку.',
+  'hudChrome.expeditions.editDetails': 'Изменить сведения о группе',
+  'hudChrome.expeditions.purpose': 'Цель группы',
+  'hudChrome.expeditions.purposeFirstTime': 'Первый раз',
+  'hudChrome.expeditions.purposeRelaxed': 'Спокойное прохождение',
+  'hudChrome.expeditions.purposeClear': 'Пройти подземелье',
+  'hudChrome.expeditions.purposeNeedsHelp': 'Нужна помощь',
+  'hudChrome.expeditions.note': 'Краткая заметка (необязательно, до 120 символов)',
+  'hudChrome.expeditions.saveDetails': 'Сохранить сведения',
+  'hudChrome.expeditions.available': 'Готов помочь',
+  'hudChrome.expeditions.stopHelping': 'Отключить уведомления о помощи',
+  'hudChrome.expeditions.helperRoles': 'Предлагаемые вами роли',
+  'hudChrome.expeditions.helperOn':
+    'Уведомления о помощи включены. Вы сами выбираете, к какой группе присоединиться.',
+  'hudChrome.expeditions.helperPaused':
+    'Уведомления о помощи приостановлены, пока вы в группе, в очереди или ожидаете ответа на заявку.',
+  'hudChrome.expeditions.helperFound': 'Подходящих групп, которым нужна помощь: {count}.',
+  'hudChrome.expeditions.viewGroups': 'Посмотреть группы',
+  'hudChrome.expeditions.sound': 'Звуковой сигнал при появлении новых групп и заявок',
+  'hudChrome.expeditions.shop': 'Магазин очков подбора',
+  'hudChrome.expeditions.backToGroups': 'Назад к группам',
+  'hudChrome.expeditions.shopIntro': 'Награда за помощь',
+  'hudChrome.expeditions.shopDescription':
+    'Тратьте очки, полученные за помощь другим игрокам в завершении экспедиций.',
+  'hudChrome.expeditions.shopCollection': 'Коллекция колокольчиков',
+  'hudChrome.expeditions.shopOwned': 'В вашей коллекции',
+  'hudChrome.expeditions.shopLocked': 'Можно открыть',
+  'hudChrome.expeditions.shopRules': 'Как заработать очки',
+  'hudChrome.expeditions.pendingRequests': 'Ваши ожидающие заявки: {count}/5',
+  'hudChrome.expeditions.multiApplyHint':
+    'Можно подать заявки в пять групп. Вступление в одну отзовёт остальные заявки.',
+  'hudChrome.expeditions.multiApplyLimit':
+    'У вас уже пять ожидающих заявок. Отмените одну, чтобы подать заявку в другую группу.',
+  'hudChrome.expeditions.points': 'Очки подбора: {count}',
+  'hudChrome.expeditions.dailyPoints': 'Получено сегодня: {earned}/{cap}',
+  'hudChrome.expeditions.rewardRules':
+    'Помощники получают 5 очков за каждого босса, для которого выполнены условия участия, и 10 за завершение. Очки выдаются после прохождения подземелья. Для зачёта участия нанесите или получите эффективный урон либо восстановите здоровье на величину не менее 1% здоровья каждого босса. Каждый босс и завершение дают очки один раз в день для каждой сложности подземелья, не более 60 очков в день. Вступление в группу или ожидание у входа не дают очков.',
+  'hudChrome.expeditions.rewardScope':
+    'Оформления колокольчика навсегда открываются этому персонажу. Они не влияют на игровой процесс.',
+  'hudChrome.expeditions.bronze': 'Бронзовый колокольчик',
+  'hudChrome.expeditions.silver': 'Серебряный колокольчик',
+  'hudChrome.expeditions.gold': 'Золотой колокольчик',
+  'hudChrome.expeditions.price': 'Очки подбора: {count}',
+  'hudChrome.expeditions.buy': 'Купить и применить',
+  'hudChrome.expeditions.equip': 'Применить',
+  'hudChrome.expeditions.equipped': 'Применено',
+  'hudChrome.expeditions.defaultBell': 'Стандартный колокольчик',
+  'hudChrome.expeditions.dismiss': 'Скрыть',
+  'hudChrome.finder.groups': 'Группы',
+  'hudChrome.finder.dungeonGuide': 'Путеводитель по подземельям',
+  'hudChrome.finder.backToGroups': 'Назад к группам',
+  'hudChrome.finder.createGroup': 'Создать группу',
+  'hudChrome.finder.cancelCreate': 'Отмена',
+  'hudChrome.finder.activeQueue': 'Ваша очередь',
+  'hudChrome.finder.yourRole': 'Ваша роль',
+  'hudChrome.finder.createQueueLocked': 'Покиньте очередь подбора перед публикацией.',
+  'hudChrome.finder.noCreateActivities': 'В этой категории нет доступных вам занятий.',
+  'hudChrome.finder.showGuide': 'Показать руководство',
+  'hudChrome.finder.hideGuide': 'Скрыть руководство',
+  'hudChrome.finder.levelUnavailable': 'Не подходит вашему уровню',
+  'hudChrome.finder.guideUnavailable': 'Подробная тактика для этого боя пока недоступна.',
+  'hudChrome.finder.guide.pulse':
+    'Периодически наносит урон игрокам рядом с боссом. Бойцы дальнего боя и лекари могут уменьшить получаемый урон, держась на расстоянии. Лекарям следует подготовиться к исцелению игроков ближнего боя.',
+  'hudChrome.finder.guide.cleave':
+    'Удары ближнего боя также наносят урон другим игрокам рядом с текущей целью. Держитесь подальше от танка; позиция за спиной босса сама по себе не защищает от этого урона по области.',
+  'hudChrome.finder.guide.adds':
+    'По ходу боя прибывают подкрепления. Танк должен собрать их, прежде чем они доберутся до лекаря. Бойцам следует помочь уничтожить их, чтобы группе не пришлось сражаться сразу с несколькими волнами.',
+  'hudChrome.finder.guide.enrage':
+    'При низком здоровье босс атакует быстрее и наносит больше урона. Сохраните защитные и лечебные способности с долгим восстановлением для этой заключительной части боя и добейте босса, продолжая соблюдать остальные механики.',
+  'hudChrome.finder.guide.stomp':
+    'Периодический удар наносит урон и ненадолго оглушает ближайших игроков. Лекарям и бойцам дальнего боя следует держаться подальше. Поддерживайте здоровье танка перед ударом: оглушённые союзники рядом могут оказаться не в состоянии действовать.',
+  'hudChrome.finder.guide.inferno':
+    'Босс прекращает двигаться и атаковать, поддерживая всё более сильные огненные импульсы. Отойдите от босса сразу после начала поддержания и вернитесь, когда оно закончится. Рассредоточение внутри огня не защищает от урона.',
+  'hudChrome.finder.guide.mending':
+    'Периодически исцеляет раненых ближайших союзников, включая себя. Сосредоточьте урон на лекаре и не приводите дополнительных врагов в область его исцеления. Это мгновенный эффект, его нельзя прервать как произнесение заклинания.',
+  'hudChrome.finder.guide.manaBurn':
+    'Успешные удары ближнего боя могут отнимать ману у цели, использующей ману. Не позволяйте боссу атаковать лекаря и других уязвимых заклинателей. Персонажи с яростью или энергией не теряют ресурсы от этого эффекта.',
+  'hudChrome.finder.guide.mortalWound':
+    'Удары ближнего боя могут уменьшать получаемое целью исцеление. Пока действует рана, используйте защитные способности с долгим восстановлением; лекарю потребуется больше исцеления, чтобы восстановить то же количество здоровья.',
+  'hudChrome.finder.guide.bleed':
+    'Удары ближнего боя могут вызывать кровотечение, продолжающее наносить урон жертве. Следите за раненым игроком, даже если враг сменил цель, и восстанавливайте его здоровье, пока действует кровотечение.',
+  'hudChrome.finder.guide.haste':
+    'Периодически увеличивает скорость атаки ближайших союзников. Не сражайтесь с дополнительными группами врагов рядом с повелителем зверей. Подготовьте защитные способности с долгим восстановлением, когда эффект получают несколько врагов.',
+  'hudChrome.finder.guide.ward':
+    'Периодически накладывает на ближайших союзников щит, поглощающий урон. Вместе атакуйте одну цель, чтобы пробить щит и добить её до следующего щита, вместо распределения урона по всей группе врагов.',
+  'hudChrome.finder.guide.knockback':
+    'Удары ближнего боя могут отбрасывать цель. Оставьте за танком безопасное пространство, не стойте рядом с ещё не вступившими в бой врагами и будьте готовы снова подойти на расстояние ближнего боя после отбрасывания.',
+  'hudChrome.specPanel.healing': 'исцеление',
+  'hudChrome.specPanel.absorption': 'поглощение урона',
+  'hudChrome.specPanel.physicalAbilityDamage': 'урон способностей ближнего и дальнего боя',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Увеличивает основное исцеление на {pct} после применения остальных бонусов к исцелению.',
+  'hudChrome.options.enemyHighlightDistance': '{yards} ярд.',
+  'hud.pet.stanceDesc': 'Нажмите, чтобы выбрать Пассивный, Защитный, Агрессивный или Помощь.',
+  'editor.liveWorld.name': 'Правки игрового мира',
+  'editor.liveWorld.scope':
+    'Игровой мир: редактируйте высоту и окраску рельефа, дороги, позиции игровых объектов и добавленные декорации. Существующие здания закреплены. Сохраните правки для проверки кнопкой экспорта.',
+  'hudChrome.courier.inventory': 'Инвентарь',
+  'hudChrome.courier.bankTitle': 'Банк',
+  'hudChrome.courier.capacity': '{used} / {capacity} ячеек',
+  'hudChrome.courier.cargoSafe':
+    'Если сумки полны, доставленные предметы сохраняются сверх лимита. После доставки курьер исчезает до следующего вызова.',
+  'entities.abilities.courier.description':
+    'Призывает летающего ослика для перевозки предметов между вашими сумками и ближайшим банком. Дорога до банка занимает 10 секунд, обратная дорога тоже 10 секунд. За рейс можно выбрать до 24 стопок. Возвращённые предметы помещаются даже в полные сумки сверх лимита, после чего курьер исчезает до следующего вызова. Обратный путь приостанавливается, пока вы мертвы или находитесь в инстансе. Для нового рейса нужна активная подписка.',
+  'itemUi.tooltip.membershipWeaponAdaptive':
+    'При экипировке тип, внешний вид и характеристики оружия подстраиваются под ваш класс и специализацию.',
+  'itemUi.tooltip.membershipScaling':
+    'Уровень предмета: {level}. Всегда на 5 выше уровня персонажа.',
+  'itemUi.tooltip.membershipRequired':
+    'После окончания подписки характеристики снаряжения и бонусы комплекта отключаются до её продления.',
+  'itemUi.tooltip.membershipDormant':
+    'Неактивно: продлите подписку, чтобы восстановить характеристики снаряжения и бонусы комплекта.',
+  'entities.items.lantern_seal.name': 'Печать Фонаря',
+  'entities.items.reins_lantern_hall_destrier.name': 'Поводья боевого коня Зала Фонаря',
+  'entities.items.membership_staff.name': 'Посох перемен',
+  'hudChrome.bags.membershipSlot': 'Ячейка сумки по подписке',
+  'hudChrome.bags.membershipSlotLocked': 'Оформите подписку, чтобы открыть эту ячейку сумки.',
+  'hudChrome.bags.membershipSlotHint':
+    'Активная подписка позволяет надеть ещё одну сумку. После её окончания сумка и предметы сохраняются.',
+  'hudChrome.wocStore.subscription.benefitBag':
+    'Наденьте дополнительную сумку в ячейку по подписке.',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'Получите редкую персональную броню и Посох перемен. Их характеристики подстраиваются под класс и специализацию, а уровень предметов всегда на 5 выше уровня персонажа. Все 7 частей брони дают на 20% больше опыта.',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'После окончания подписки дополнительные ячейки персонажей, бонусы снаряжения и ячейка сумки блокируются до продления. Сумка и предметы сохраняются, лишние предметы остаются сверх лимита. Базовые ячейки персонажей остаются доступными.',
+  'hudChrome.bank.accountArmour': 'Получить снаряжение подписки',
+  'hudChrome.courier.title': 'Курьер',
+  'hudChrome.courier.close': 'Закрыть курьера',
+  'hudChrome.courier.ready': 'Готов к доставке',
+  'hudChrome.courier.outbound': 'Летит в банк',
+  'hudChrome.courier.returning': 'Возвращается с предметами',
+  'hudChrome.courier.waiting': 'Ожидает передачи предметов',
+  'hudChrome.courier.bags': 'Отправить в банк',
+  'hudChrome.courier.bank': 'Забрать из банка',
+  'hudChrome.courier.cargo': 'Груз курьера',
+  'hudChrome.courier.empty': 'Нет предметов',
+  'hudChrome.courier.send': 'Отправить курьера',
+  'hudChrome.courier.selected': 'Выбрано стопок: {count} / {limit}',
+  'hudChrome.courier.select': 'Выбрать: {item}, {count}',
+  'hudChrome.courier.selectedItem': 'Снять выбор: {item}, {count}',
+  'hudChrome.courier.instructions':
+    'Выберите целые стопки. Курьер сначала положит их в банк, затем заберёт выбранные предметы. Предметы заданий отправлять нельзя.',
+  'hudChrome.courier.membership': 'Продлите подписку, чтобы начать новую доставку.',
+  'hudChrome.courier.unavailable': 'Призовите курьера, чтобы подготовить доставку.',
+  'entities.abilities.courier.name': 'Курьер',
+  // Membership additions: same-change non-Latin coverage (M16).
+  'hudChrome.wocStore.subscription.benefitsTitle': 'Преимущества действующего членства',
+  'hudChrome.wocStore.subscription.benefitBank':
+    'Пользуйтесь банками других своих персонажей у любого банкира.',
+  'hudChrome.wocStore.subscription.benefitSlots': 'Откройте ещё 10 ячеек персонажей.',
+  'hudChrome.wocStore.subscription.benefitTax': 'Платите половину обычного налога на аукционе.',
+  'character.membershipRequired': 'Продлите членство, чтобы играть этим персонажем.',
+  'character.membershipSlots': 'Откройте ячейки персонажей с членством',
+  'character.emptySlot': 'Свободная ячейка персонажа',
+  'hudChrome.bank.accountTab': 'Другие персонажи',
+  'hudChrome.bank.accountMembership':
+    'При действующем членстве здесь можно пользоваться банками других своих персонажей.',
+  'hudChrome.bank.accountCharacters': 'Банки персонажей',
+  'hudChrome.bank.accountEmpty':
+    'Создайте ещё одного персонажа, чтобы пользоваться его банком здесь.',
+  'hudChrome.bank.accountSelect': 'Выберите персонажа, чтобы загрузить его банк.',
+  'hudChrome.bank.accountUnavailable':
+    'Этот банк недоступен. Выберите персонажа ещё раз, чтобы обновить данные.',
+  'hudChrome.bank.accountDepositHint':
+    'Нажмите, чтобы положить эту стопку в банк выбранного персонажа.',
+  'hudChrome.bank.accountWithdrawHint': 'Нажмите, чтобы забрать эту стопку в свои сумки.',
+  'hudChrome.bank.accountBound':
+    'Привязанные, заблокированные и квестовые предметы нельзя передавать между персонажами.',
+  'hudChrome.bank.accountLoading': 'Загрузка персонажей...',
+  'hudChrome.bank.accountOpening': 'Открываем банк персонажа {name}...',
+  'hudChrome.bank.accountOnline':
+    'Персонаж {name} в игре. Выйдите этим персонажем, чтобы открыть его банк здесь.',
+  'hudChrome.bank.accountBusy': 'Банк занят. Попробуйте ещё раз через мгновение.',
+  'hudChrome.bank.accountNoFit': 'Для этой стопки нет места.',
+  'hudChrome.bank.accountStale': 'Стопка изменилась до переноса. Попробуйте ещё раз.',
+  'hudChrome.bank.accountTooLarge':
+    'Банк персонажа {name} слишком велик, чтобы открыть его отсюда. Войдите за персонажа {name}, чтобы им воспользоваться.',
+  'hudChrome.bank.accountRetry': 'Повторить',
+  'hudChrome.bank.accountBankTitle': 'Банк персонажа {name}',
+  'hudChrome.bank.accountBagsTitle': 'Ваши сумки',
+  'hudChrome.bank.accountSlots': 'Ячеек: {used} / {total}',
+  'hudChrome.bank.accountWithdrawLead': 'Нажмите на предмет, чтобы забрать его в сумки.',
+  'hudChrome.bank.accountDepositLead':
+    'Нажмите на предмет, чтобы отправить его в банк персонажа {name}.',
+  'hudChrome.bank.accountBankEmpty': 'Этот банк пуст.',
+  'hudChrome.bank.accountBagsEmpty': 'Ваши сумки пусты.',
+  'hudChrome.wocStore.subscription.tokenTitle': 'Передаваемый жетон членства',
+  'hudChrome.wocStore.subscription.tokenTerms':
+    'Разовый платёж {price} за 30 дней. Жетон придёт этому персонажу по почте. Используйте его, чтобы продлить членство, или продайте на аукционе.',
+  'hudChrome.wocStore.subscription.tokenBuy': 'Купить жетон членства',
+  'hudChrome.wocStore.subscription.tokenClaim': 'Получить купленный жетон',
+  'hudChrome.wocStore.subscription.tokenPending':
+    'После оплаты вернитесь к этому персонажу и получите жетон. Если платёж ещё обрабатывается, повторите попытку чуть позже.',
+  'hudChrome.wocStore.subscription.tokenDelivered': 'Ваш жетон отправлен по почте.',
+  'itemUi.tooltip.membershipToken':
+    'Использование: расходует жетон и добавляет {days} дней членства к вашей учётной записи. Оставшееся время сохраняется. До использования жетон можно передать или продать на аукционе.',
+  'itemUi.tooltip.membershipAdaptive':
+    'Характеристики и тип брони подстраиваются под ваш класс и специализацию.',
+  'itemUi.tooltip.membershipPerfected': 'Совершенный предмет: уровень {level}.',
+  'itemUi.tooltip.membershipFullSet':
+    'Наденьте все {pieces} предметов доспехов участника, чтобы получать на {percent}% больше опыта. Требуется действующее членство.',
+  'entities.items.membership_token.name': 'Жетон членства (30 дней)',
+  'entities.items.membership_helmet.name': 'Шлем участника',
+  'entities.items.membership_shoulder.name': 'Наплечники участника',
+  'entities.items.membership_chest.name': 'Кираса участника',
+  'entities.items.membership_waist.name': 'Пояс участника',
+  'entities.items.membership_legs.name': 'Поножи участника',
+  'entities.items.membership_gloves.name': 'Рукавицы участника',
+  'entities.items.membership_feet.name': 'Сапоги участника',
+  'entities.letters.membership_token_delivery.sender': 'Вороновая почта',
+  'entities.letters.membership_token_delivery.subject': 'Ваш жетон членства',
+  'entities.letters.membership_token_delivery.body':
+    'К письму приложен купленный вами жетон. Используйте его, чтобы добавить 30 дней членства к своей учётной записи, или обменяйте с другим искателем приключений.',
+  'hudChrome.wocStore.subscription.title': 'Подписка на игру',
+  'hudChrome.wocStore.subscription.price': '{price} в месяц',
+  'hudChrome.wocStore.subscription.terms':
+    'Продлевается ежемесячно. Оплата фиатной валютой через Stripe. Отмена в настройках платежей.',
+  'hudChrome.wocStore.subscription.subscribe': 'Подписаться',
+  'hudChrome.wocStore.subscription.manage': 'Управление подпиской',
+  'hudChrome.wocStore.subscription.ending': 'Будет отменена в конце расчётного периода',
+  'hudChrome.wocStore.subscription.error':
+    'Не удалось открыть страницу оплаты. Разрешите всплывающие окна и повторите попытку.',
+  'hudChrome.wocStore.subscription.status.none': 'Нет подписки',
+  'hudChrome.wocStore.subscription.status.incomplete': 'Оплата не завершена',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': 'Срок оплаты истёк',
+  'hudChrome.wocStore.subscription.status.trialing': 'Пробный период',
+  'hudChrome.wocStore.subscription.status.active': 'Активна',
+  'hudChrome.wocStore.subscription.status.past_due': 'Платёж просрочен',
+  'hudChrome.wocStore.subscription.status.canceled': 'Отменена',
+  'hudChrome.wocStore.subscription.status.unpaid': 'Не оплачена',
+  'hudChrome.wocStore.subscription.status.paused': 'Приостановлена',
+  'abilityUi.cast.ghost_captain_boarding': 'Призрачный абордаж',
+  'abilityUi.cast.ghost_captain_anchor': 'Проклятый якорь',
+  'abilityUi.cast.ghost_captain_broadside': 'Призрачный бортовой залп',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -355,6 +2561,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': 'Обмотки отбойного течения властителя',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     'Находится в наградном сундуке зарытого клада, к которому ведёт карта сокровищ',
+  'hudChrome.reliquary.sourceActivityLanternHall':
+    'Покупается за печати Фонаря у интенданта Зала Фонаря',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     'Ветер принёс пепел с восточных дюн, а пустой песок пепла не носит. Хранительница гарнизонных складов записывает каждый дозор. Она заговорит, как только её кто-нибудь накормит.',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -425,8 +2633,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Использование: укрепляет нагрудный доспех, повышая броню на 12 на 1 ч.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Использование: устанавливает Боевое знамя Священного Рассвета на 5 мин., значительно ускоряя восполнение здоровья и маны вне боя у всех союзников поблизости. Если оставаться рядом с ним 10 сек., вы также получите Благословение Рассвета (+5% ко всем характеристикам на 30 мин.). (Восстановление 5 мин.)',
-  'hudChrome.factionRewards.hub_automatons': 'Южный Предел (Литейная автоматонов)',
+    'Использование: устанавливает Боевое знамя Священного Рассвета на 5 мин. Игроки вне боя в радиусе 15 ярдов восстанавливают на 10% больше здоровья; использующие ману также восстанавливают ману в размере 5% своего духа каждые 2 сек. После 10 сек. рядом со знаменем вы получаете Благословение Рассвета, повышающее силу, ловкость, выносливость, интеллект и дух на 5% на 30 мин. (Восстановление: 5 мин.)',
+  'hudChrome.factionRewards.hub_automatons': 'Змеиный дозор (Автоматоны)',
   'hudChrome.factionRewards.hub_church_order': 'Истврукская долина (Церковный орден)',
   'hudChrome.factionRewards.hub_none':
     'Нет (используйте рядом с оплотом фракции, чтобы привязаться)',
@@ -544,8 +2752,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Добавьте это заклинание в группу, чтобы показать его кнопку.',
   'hudChrome.cooldownManager.notKnown': '{spell} (ещё не изучено)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Показывать только когда готово',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Показывать только пока активно',
   'hudChrome.cooldownManager.opacity': 'Прозрачность',
   'hudChrome.cooldownManager.orientation': 'Ориентация',
   'hudChrome.cooldownManager.otherSpells': 'Другие заклинания',
@@ -569,12 +2775,34 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перетащите заклинание в группу или выберите его, чтобы задать группу и оповещения. Кнопка следует за своим заклинанием, если оно меняется на другое, и загорается при этом.',
   'hudChrome.cooldownManager.trackedTitle': 'Отслеживаемые заклинания',
   'hudChrome.cooldownManager.vertical': 'Вертикально',
-  'hudChrome.cooldownManager.visAlways': 'Всегда видно',
   'hudChrome.cooldownManager.visCombat': 'В бою',
-  'hudChrome.cooldownManager.visHidden': 'Скрыто',
   'hudChrome.cooldownManager.visHiddenHint':
     'Скрытая группа по-прежнему проигрывает звуки и подсвечивает панель действий.',
-  'hudChrome.cooldownManager.visibility': 'Видимость',
+  'hudChrome.cooldownManager.auraActive': 'Активна',
+  'hudChrome.cooldownManager.auraMissing': 'Отсутствует',
+  'hudChrome.cooldownManager.auraShowWhen': 'Показывать кнопку, пока аура',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Подсвечивать при отсутствии',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Если не отмечено ни одно место, группа никогда не показывается и не воспроизводит звуки.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Если не отмечено ничего, кнопка не показывается, но звук по-прежнему играет.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Не готово значит на перезарядке или сейчас недоступно.',
+  'hudChrome.cooldownManager.placeHint':
+    'Подземелья включают данжи, рейды, вылазки, разломы, поля боя, арену и другие инстансы. Вне отмеченных мест группа скрыта и молчит.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Кнопка ярче, с обводкой и пульсирует, пока ауры нет.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Напоминание о баффе: кнопка светится, пока этой ауры нет, и исчезает, когда она появляется.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Звучит, когда аура спадает.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Показывать кнопку, когда',
+  'hudChrome.cooldownManager.showIn': 'Показывать в',
+  'hudChrome.cooldownManager.showInInstances': 'Подземелья',
+  'hudChrome.cooldownManager.showInWorld': 'Открытый мир',
+  'hudChrome.cooldownManager.showNotReady': 'Не готово',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Вне боя',
+  'hudChrome.cooldownManager.showReady': 'Готово',
+  'hudChrome.cooldownManager.showWhile': 'Показывать',
   'hudChrome.crafting.mobileStationTitle': '{station} {name}',
   'hudChrome.hill.contestNone': 'Чтобы захватить холм, удерживайте большинство внутри {total}.',
   'hudChrome.hill.contestOther': 'Вы теряете холм: {seconds} из {total}',
@@ -601,6 +2829,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}, {quality}',
   'hudChrome.mapAtlas.collapseHint': 'Свернуть боковую панель карты',
   'hudChrome.mapAtlas.expandHint': 'Развернуть боковую панель карты',
+  'hudChrome.mapAtlas.resizeRailAria': 'Ширина боковой панели карты',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Перетащите, чтобы изменить ширину боковой панели карты. Двойной щелчок сбрасывает ширину.',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': 'Активный профиль',
   'hudChrome.meters.activeProfileDesc':
@@ -674,6 +2905,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Одновременно отображаемые полосы (0 = без ограничений, автоподбор по высоте окна).',
   'hudChrome.meters.noDeathEvents': 'Перед гибелью не записано событий',
   'hudChrome.meters.noDetailedData': 'Нет подробных данных',
+  'hudChrome.meters.detailHealSubtitle':
+    'Эффективное исцеление: {effective} | Избыточное исцеление: {overheal} ({overhealPercent}) | Попаданий: {hits} ({critPercent} крит.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Попаданий: {hits} | Крит. ударов: {crits} ({critPercent}) | Среднее: {average} | Мин./макс.: {min} / {max}',
   'hudChrome.meters.noTargetData': 'Нет данных об игроках по этой цели',
   'hudChrome.meters.numCompact': 'Числа: сокращённые (тыс./млн)',
   'hudChrome.meters.numDetailed': 'Числа: подробные',
@@ -804,25 +3039,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Другие игроки с флагом смогут атаковать вас где угодно и забрать до {cap} из вашего кошелька, если победят. Вы сможете снова отключить флаг, но это займёт {minutes} минут.',
   'hudChrome.worldPvp.confirmCancel': 'Отмена',
   'hudChrome.worldPvp.disable': 'Отключить мировое PvP',
-  'hudChrome.worldPvp.disarmLine':
-    'Отключение занимает {minutes} минут и ожидает выхода из активной горы и окончания боя.',
+  'hudChrome.worldPvp.disarmLine': 'Отключение занимает {minutes} минут и ждёт окончания боя.',
   'hudChrome.worldPvp.enable': 'Включить мировое PvP',
   'hudChrome.worldPvp.greyLine':
     'Игроки более чем на {levels} уровней ниже вас не приносят награды.',
   'hudChrome.worldPvp.groundContested':
     'Все остальные земли являются спорной территорией: там могут сражаться только два игрока с флагом.',
   'hudChrome.worldPvp.groundFfa':
-    'Зоны Земли Драконов, Морозный Предел и Янтарная Падь используют обычные флаги PvP. Вход в активный круг «Короля горы» поднимает ваш флаг.',
+    'Земли Драконов, Морозный Предел и Янтарная Падь являются территориями свободного боя: там может сражаться каждый, с флагом или без.',
   'hudChrome.worldPvp.groundSanctuary':
-    'Берег Испытаний — единственное святилище: здесь нельзя включить мировое PvP или сражаться с другими игроками.',
+    'Берег Испытаний и Истврукская долина являются святилищами: мирового PvP там не бывает совсем.',
   'hudChrome.worldPvp.groupLine':
     'Участники группы и рейда никогда не враждебны друг другу. Согильдийцы вне вашей группы могут сражаться с вами.',
   'hudChrome.worldPvp.honorLine': '{honor} Чести за убийство, разделённых между всеми, кто помог.',
   'hudChrome.worldPvp.keepUp': 'Оставить флаг поднятым',
   'hudChrome.worldPvp.levelReq': 'Требуется уровень {level}.',
   'hudChrome.worldPvp.markLine':
-    'Вход в активный круг горы включает мировой PvP. После выхода флаг сохраняется.',
-  'hudChrome.worldPvp.noStakeLine': 'Игроков без флага нельзя атаковать в открытом мире.',
+    'Атака игрока без флага поднимает ваш собственный флаг; атака игрока с флагом не поднимает его никогда.',
+  'hudChrome.worldPvp.noStakeLine':
+    'Игрок без флага, погибший на территории свободного боя, не теряет золота.',
   'hudChrome.worldPvp.noTakeLine':
     'Боец без флага тоже не получает золота: оно переходит только между двумя игроками с флагом.',
   'hudChrome.worldPvp.pending': 'Ожидание статуса PvP от мира.',
@@ -830,8 +3065,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': 'Счёт: {kills} убийств, {deaths} смертей',
   'hudChrome.worldPvp.repeatLine':
     'Повторные убийства одного и того же игрока приносят {second}, затем {third}, а потом ничего; счётчик сбрасывается через {reset} после первого убийства.',
+  'hudChrome.worldPvp.skullName': 'Череп игрока {name}',
   'hudChrome.worldPvp.splitLine':
     'Чистый бой один на один приносит всю награду целиком; помощники и их лекари делят её между собой.',
+  'hudChrome.worldPvp.spoilsLine':
+    'Если у обоих поднят флаг, золото нанёсшего смертельный удар падает на тело вместе с черепом проигравшего.',
   'hudChrome.worldPvp.stakeLine':
     'Проигравший платит {cap} или {percent}% от своего кошелька, в зависимости от того, что меньше.',
   'hudChrome.worldPvp.statusDisarming':
@@ -841,6 +3079,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.statusOffFfa':
     'Ваш флаг PvP опущен, но на территории свободного боя вы всё равно можете атаковать и быть атакованным.',
   'hudChrome.worldPvp.statusOn': 'Ваш флаг PvP поднят. Игроки с флагом могут атаковать вас.',
+  'hudChrome.worldPvp.rewardTitles':
+    'Постоянные титулы выдаются за {thresholds} игрового времени с включенным мировым PvP в открытом мире или PvP-инстансах. Выход из игры, смерть, PvE-инстансы и святилища приостанавливают таймер. Отключение PvP сбрасывает его.',
+  'hudChrome.worldPvp.rewardPaused':
+    'Текущая серия PvP: {time} игрового времени (приостановлена в святилище)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Текущая серия PvP: {time} игрового времени (приостановлена, пока вы мертвы)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Текущая серия PvP: {time} игрового времени (приостановлена в PvE-инстансах)',
+  'hudChrome.worldPvp.rewardProgress': 'Текущая серия PvP: {time} игрового времени',
   'hudChrome.worldPvp.tab': 'Мировое PvP',
   'hudChrome.worldPvp.title': 'Мировое PvP',
   'hudChrome.worldPvp.zoneContested': 'Спорная территория: здесь сражаются только игроки с флагом.',
@@ -920,24 +3167,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.label': 'Отсчёт холма',
   'guide.arenaPage.vanguardBody':
     'Снаряжение Авангарда является вторым сезоном снаряжения Боевой мощи, его продают те же два квартирмейстера чести, что и исходный комплект, который остаётся в продаже. У каждой специализации есть собственный комплект Авангарда из пяти предметов: на голову, плечи, грудь, ноги и руки, а магазин показывает только три комплекта, которые может носить ваш класс, а следом идёт оружие Авангарда, доступное вам. Предмет Авангарда несёт те же рейтинги Боевой мощи, что и исходный комплект, но с более высоким уровнем предмета, а у каждого комплекта есть два бонуса, за два и за четыре предмета, меняющие одно из умений вашей специализации. В отличие от исходных комплектов, эти бонусы действуют везде, включая бои с монстрами, но созданы они для боя с игроками, так что рейдовый комплект остаётся лучшим выбором внутри рейда.',
-  'guide.arenaPage.vanguardStatsBody':
-    'В отличие от первого сезона, снаряжение Авангарда несёт и боевые рейтинги: у каждого доспеха, оружия и подвески Авангарда есть рейтинг крит. удара или рейтинг ускорения, а предметы для заклинателей и лекарей добавляют силу заклинаний или силу исцеления. Кольца и подвески Авангарда продаются рядом с оружием, и их может носить любой класс. Два кольца Авангарда для ближнего боя дают ровно столько рейтинга меткости, чтобы снять базовый шанс промаха ваших атак по игроку вашего уровня, а два кольца для заклинаний так же снимают шанс сопротивления вашим заклинаниям. Автоатаки при бое двумя оружиями сохраняют дополнительный шанс промаха. Кольцо лекаря вместо этого даёт рейтинг ускорения.',
   'guide.arenaPage.vanguardHeading': 'Снаряжение Авангарда: Боевая мощь, сезон 2',
   'guide.settingsPage.ifColorblindMode':
     'Перекрашивает опасные зоны на полу у Нитраксиса (кольцо удара Могильного извержения, лужи Могильного пламени и Пламени души, линию Могильного огня и метки Разрыва души) в безопасную для дальтоников палитру с различными оттенками и яркостью, чтобы перекрывающиеся круги сохраняли свои края. Размеры, таймеры и положения никогда не меняются.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Располагает полосу усилений и ослаблений рамки цели под рамкой вместо классического расположения над ней. По умолчанию выключено, поскольку стандартная рамка цели стоит прямо над панелью действий; включите эту опцию, когда переместите рамку туда, где под ней есть место.',
+    'Размещает полосу положительных и отрицательных эффектов под рамкой цели, под именем и полосой здоровья, а не над ней: классическая компоновка. В исходной позиции рамка цели вместе с вашей полосой произнесения и таймерами ударов поднимается на одну строку, чтобы первая строка эффектов не перекрывала панель действий. Перемещённая вами рамка остаётся на своём месте.',
   'guide.stats.warfareBodyPets':
     'Боевая мощь является характеристикой снаряжения чести для боя с игроками. В боях между игроками она повышает урон, который вы и ваш питомец наносите другим игрокам и их питомцам, и снижает урон, который вы и ваш питомец получаете от них. Она также повышает ваше максимальное здоровье везде, кроме подземелий, рейдов, вылазок и разломов, поэтому игрок в снаряжении чести гораздо труднее убить, чем игрока без него. Ваш лист персонажа показывает всё это одной строкой. Она берётся от снаряжения Боевой мощи, которое вы покупаете за честь, так что это награда за игру в PvP, а не то, к чему нужно стремиться во время получения уровней.',
   'entities.abilities.lava_burst.name': 'Взрыв магмы',
   'entities.abilities.lava_burst.description':
-    'Наносит {damage} урона от огня. Всегда наносит критический удар по цели, охваченной вашим Тлеющим разрядом. Прилив магмы: каждый тик Тлеющего разряда с вероятностью 20% сбрасывает время восстановления этого умения и делает следующий Взрыв магмы в течение 10 сек. мгновенным. Урон растёт с силой заклинаний. (Стихии)',
+    'Наносит {damage} урона от огня. Попадание даёт 1 заряд Грома. Всегда наносит критический удар по цели, горящей от вашего Пепельного толчка. Критический удар дополнительно наносит 24% урона обычного попадания. Всплеск магмы: каждый периодический урон Пепельного толчка с вероятностью 20% сбрасывает восстановление и делает следующий Взрыв магмы в течение 10 сек. мгновенным. Урон растёт с силой заклинаний. (Стихии)',
   'entities.abilities.lightning_overload.name': 'Дуговая перегрузка',
   'entities.abilities.lightning_overload.description':
     'Пассивно: Дуговая стрела и Разветвленная молния с вероятностью 20% вызывают Перегрузку, поражая первую цель повторно на 50% нанесённого урона и даруя 1 Гром. (Стихии)',
   'entities.abilities.thunderstorm.name': 'Раскол бури',
   'entities.abilities.thunderstorm.description':
     'Призывает раскат грома, нанося {damage} урона от природы врагам в пределах 10 м и замедляя их на 50% на 5 сек. Восстанавливает 8% от максимального запаса маны. Урон растёт с силой заклинаний. (Стихии)',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    'Три контракта в неделю, вывешиваю после каждого сброса. Ни подписей, ни сборов: выполни один, и печати твои.',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'Тобиас Рен',
+  'entities.npcs.contract_clerk_tobias_wren.title': 'Писарь контрактов',
   'entities.npcs.glider_apprentice.name': 'Скай',
   'entities.items.vanguard_druid_balance_chest.name': 'Жилет звёздного стража',
   'entities.items.vanguard_druid_balance_gloves.name': 'Перчатки звёздного стража',
@@ -1077,16 +3326,404 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_fang_dagger.name': 'Клык Авангарда',
   'entities.items.vanguard_oath_blade.name': 'Клятва Авангарда',
   'entities.items.vanguard_verdict_greatsword.name': 'Приговор Авангарда',
-  'entities.items.vanguard_feral_staff.name': 'Посох дикой силы авангарда',
   'entities.items.vanguard_warstaff.name': 'Боевой посох Авангарда',
-  'entities.items.vanguard_band_of_might.name': 'Кольцо мощи Авангарда',
-  'entities.items.vanguard_band_of_precision.name': 'Кольцо точности Авангарда',
-  'entities.items.vanguard_band_of_focus.name': 'Кольцо сосредоточения Авангарда',
-  'entities.items.vanguard_band_of_mending.name': 'Кольцо исцеления Авангарда',
-  'entities.items.vanguard_pendant_of_might.name': 'Подвеска мощи Авангарда',
-  'entities.items.vanguard_pendant_of_precision.name': 'Подвеска точности Авангарда',
-  'entities.items.vanguard_pendant_of_focus.name': 'Подвеска сосредоточения Авангарда',
-  'entities.items.vanguard_pendant_of_mending.name': 'Подвеска исцеления Авангарда',
+  'entities.items.infernal_quiver.name': 'Инфернальный колчан',
+  'entities.items.brookwatch_robe.name': 'Одеяние дозора у ручья',
+  'entities.items.brookwatch_leggings.name': 'Штаны дозора у ручья',
+  'entities.items.brookwatch_slippers.name': 'Туфли дозора у ручья',
+  'entities.items.brookwatch_hood.name': 'Капюшон дозора у ручья',
+  'entities.items.brookwatch_gloves.name': 'Перчатки дозора у ручья',
+  'entities.items.brookwatch_mantle.name': 'Оплечье дозора у ручья',
+  'entities.items.brookwatch_sash.name': 'Кушак дозора у ручья',
+  'entities.items.brookwatch_jerkin.name': 'Куртка дозора у ручья',
+  'entities.items.brookwatch_breeches.name': 'Бриджи дозора у ручья',
+  'entities.items.brookwatch_boots.name': 'Сапоги дозора у ручья',
+  'entities.items.brookwatch_cap.name': 'Шапка дозора у ручья',
+  'entities.items.brookwatch_grips.name': 'Хваты дозора у ручья',
+  'entities.items.brookwatch_shoulderpads.name': 'Плечевые накладки дозора у ручья',
+  'entities.items.brookwatch_belt.name': 'Ремень дозора у ручья',
+  'entities.items.brookwatch_hauberk.name': 'Хауберк дозора у ручья',
+  'entities.items.brookwatch_legguards.name': 'Набедренники дозора у ручья',
+  'entities.items.brookwatch_sabatons.name': 'Сабатоны дозора у ручья',
+  'entities.items.brookwatch_helm.name': 'Шлем дозора у ручья',
+  'entities.items.brookwatch_gauntlets.name': 'Рукавицы дозора у ручья',
+  'entities.items.brookwatch_pauldrons.name': 'Наплечья дозора у ручья',
+  'entities.items.brookwatch_girdle.name': 'Пояс дозора у ручья',
+  'entities.items.brookwatch_chainmail.name': 'Кольчуга дозора у ручья',
+  'entities.items.brookwatch_chausses.name': 'Шоссы дозора у ручья',
+  'entities.items.brookwatch_greaves.name': 'Наголенники дозора у ручья',
+  'entities.items.brookwatch_coif.name': 'Койф дозора у ручья',
+  'entities.items.brookwatch_handguards.name': 'Латные перчатки дозора у ручья',
+  'entities.items.brookwatch_spaulders.name': 'Наплечники дозора у ручья',
+  'entities.items.brookwatch_cord.name': 'Шнур дозора у ручья',
+  'entities.items.hedgerow_robe.name': 'Одеяние живой изгороди',
+  'entities.items.hedgerow_leggings.name': 'Штаны живой изгороди',
+  'entities.items.hedgerow_slippers.name': 'Туфли живой изгороди',
+  'entities.items.hedgerow_hood.name': 'Капюшон живой изгороди',
+  'entities.items.hedgerow_gloves.name': 'Перчатки живой изгороди',
+  'entities.items.hedgerow_mantle.name': 'Оплечье живой изгороди',
+  'entities.items.hedgerow_sash.name': 'Кушак живой изгороди',
+  'entities.items.hedgerow_jerkin.name': 'Куртка живой изгороди',
+  'entities.items.hedgerow_breeches.name': 'Бриджи живой изгороди',
+  'entities.items.hedgerow_boots.name': 'Сапоги живой изгороди',
+  'entities.items.hedgerow_cap.name': 'Шапка живой изгороди',
+  'entities.items.hedgerow_grips.name': 'Хваты живой изгороди',
+  'entities.items.hedgerow_shoulderpads.name': 'Плечевые накладки живой изгороди',
+  'entities.items.hedgerow_belt.name': 'Ремень живой изгороди',
+  'entities.items.hedgerow_hauberk.name': 'Хауберк живой изгороди',
+  'entities.items.hedgerow_legguards.name': 'Набедренники живой изгороди',
+  'entities.items.hedgerow_sabatons.name': 'Сабатоны живой изгороди',
+  'entities.items.hedgerow_helm.name': 'Шлем живой изгороди',
+  'entities.items.hedgerow_gauntlets.name': 'Рукавицы живой изгороди',
+  'entities.items.hedgerow_pauldrons.name': 'Наплечья живой изгороди',
+  'entities.items.hedgerow_girdle.name': 'Пояс живой изгороди',
+  'entities.items.hedgerow_chainmail.name': 'Кольчуга живой изгороди',
+  'entities.items.hedgerow_chausses.name': 'Шоссы живой изгороди',
+  'entities.items.hedgerow_greaves.name': 'Наголенники живой изгороди',
+  'entities.items.hedgerow_coif.name': 'Койф живой изгороди',
+  'entities.items.hedgerow_handguards.name': 'Латные перчатки живой изгороди',
+  'entities.items.hedgerow_spaulders.name': 'Наплечники живой изгороди',
+  'entities.items.hedgerow_cord.name': 'Шнур живой изгороди',
+  'entities.items.bogwalker_robe.name': 'Одеяние болотного странника',
+  'entities.items.bogwalker_leggings.name': 'Штаны болотного странника',
+  'entities.items.bogwalker_slippers.name': 'Туфли болотного странника',
+  'entities.items.bogwalker_hood.name': 'Капюшон болотного странника',
+  'entities.items.bogwalker_gloves.name': 'Перчатки болотного странника',
+  'entities.items.bogwalker_mantle.name': 'Оплечье болотного странника',
+  'entities.items.bogwalker_sash.name': 'Кушак болотного странника',
+  'entities.items.bogwalker_jerkin.name': 'Куртка болотного странника',
+  'entities.items.bogwalker_breeches.name': 'Бриджи болотного странника',
+  'entities.items.bogwalker_boots.name': 'Сапоги болотного странника',
+  'entities.items.bogwalker_cap.name': 'Шапка болотного странника',
+  'entities.items.bogwalker_grips.name': 'Хваты болотного странника',
+  'entities.items.bogwalker_shoulderpads.name': 'Плечевые накладки болотного странника',
+  'entities.items.bogwalker_belt.name': 'Ремень болотного странника',
+  'entities.items.bogwalker_hauberk.name': 'Хауберк болотного странника',
+  'entities.items.bogwalker_legguards.name': 'Набедренники болотного странника',
+  'entities.items.bogwalker_sabatons.name': 'Сабатоны болотного странника',
+  'entities.items.bogwalker_helm.name': 'Шлем болотного странника',
+  'entities.items.bogwalker_gauntlets.name': 'Рукавицы болотного странника',
+  'entities.items.bogwalker_pauldrons.name': 'Наплечья болотного странника',
+  'entities.items.bogwalker_girdle.name': 'Пояс болотного странника',
+  'entities.items.bogwalker_chainmail.name': 'Кольчуга болотного странника',
+  'entities.items.bogwalker_chausses.name': 'Шоссы болотного странника',
+  'entities.items.bogwalker_greaves.name': 'Наголенники болотного странника',
+  'entities.items.bogwalker_coif.name': 'Койф болотного странника',
+  'entities.items.bogwalker_handguards.name': 'Латные перчатки болотного странника',
+  'entities.items.bogwalker_spaulders.name': 'Наплечники болотного странника',
+  'entities.items.bogwalker_cord.name': 'Шнур болотного странника',
+  'entities.items.thornspire_robe.name': 'Одеяние тернового шпиля',
+  'entities.items.thornspire_leggings.name': 'Штаны тернового шпиля',
+  'entities.items.thornspire_slippers.name': 'Туфли тернового шпиля',
+  'entities.items.thornspire_hood.name': 'Капюшон тернового шпиля',
+  'entities.items.thornspire_gloves.name': 'Перчатки тернового шпиля',
+  'entities.items.thornspire_mantle.name': 'Оплечье тернового шпиля',
+  'entities.items.thornspire_sash.name': 'Кушак тернового шпиля',
+  'entities.items.thornspire_jerkin.name': 'Куртка тернового шпиля',
+  'entities.items.thornspire_breeches.name': 'Бриджи тернового шпиля',
+  'entities.items.thornspire_boots.name': 'Сапоги тернового шпиля',
+  'entities.items.thornspire_cap.name': 'Шапка тернового шпиля',
+  'entities.items.thornspire_grips.name': 'Хваты тернового шпиля',
+  'entities.items.thornspire_shoulderpads.name': 'Плечевые накладки тернового шпиля',
+  'entities.items.thornspire_belt.name': 'Ремень тернового шпиля',
+  'entities.items.thornspire_hauberk.name': 'Хауберк тернового шпиля',
+  'entities.items.thornspire_legguards.name': 'Набедренники тернового шпиля',
+  'entities.items.thornspire_sabatons.name': 'Сабатоны тернового шпиля',
+  'entities.items.thornspire_helm.name': 'Шлем тернового шпиля',
+  'entities.items.thornspire_gauntlets.name': 'Рукавицы тернового шпиля',
+  'entities.items.thornspire_pauldrons.name': 'Наплечья тернового шпиля',
+  'entities.items.thornspire_girdle.name': 'Пояс тернового шпиля',
+  'entities.items.thornspire_chainmail.name': 'Кольчуга тернового шпиля',
+  'entities.items.thornspire_chausses.name': 'Шоссы тернового шпиля',
+  'entities.items.thornspire_greaves.name': 'Наголенники тернового шпиля',
+  'entities.items.thornspire_coif.name': 'Койф тернового шпиля',
+  'entities.items.thornspire_handguards.name': 'Латные перчатки тернового шпиля',
+  'entities.items.thornspire_spaulders.name': 'Наплечники тернового шпиля',
+  'entities.items.thornspire_cord.name': 'Шнур тернового шпиля',
+  'entities.items.hollowveil_robe.name': 'Одеяние сокрытой лощины',
+  'entities.items.hollowveil_leggings.name': 'Штаны сокрытой лощины',
+  'entities.items.hollowveil_slippers.name': 'Туфли сокрытой лощины',
+  'entities.items.hollowveil_hood.name': 'Капюшон сокрытой лощины',
+  'entities.items.hollowveil_gloves.name': 'Перчатки сокрытой лощины',
+  'entities.items.hollowveil_mantle.name': 'Оплечье сокрытой лощины',
+  'entities.items.hollowveil_sash.name': 'Кушак сокрытой лощины',
+  'entities.items.hollowveil_jerkin.name': 'Куртка сокрытой лощины',
+  'entities.items.hollowveil_breeches.name': 'Бриджи сокрытой лощины',
+  'entities.items.hollowveil_boots.name': 'Сапоги сокрытой лощины',
+  'entities.items.hollowveil_cap.name': 'Шапка сокрытой лощины',
+  'entities.items.hollowveil_grips.name': 'Хваты сокрытой лощины',
+  'entities.items.hollowveil_shoulderpads.name': 'Плечевые накладки сокрытой лощины',
+  'entities.items.hollowveil_belt.name': 'Ремень сокрытой лощины',
+  'entities.items.hollowveil_hauberk.name': 'Хауберк сокрытой лощины',
+  'entities.items.hollowveil_legguards.name': 'Набедренники сокрытой лощины',
+  'entities.items.hollowveil_sabatons.name': 'Сабатоны сокрытой лощины',
+  'entities.items.hollowveil_helm.name': 'Шлем сокрытой лощины',
+  'entities.items.hollowveil_gauntlets.name': 'Рукавицы сокрытой лощины',
+  'entities.items.hollowveil_pauldrons.name': 'Наплечья сокрытой лощины',
+  'entities.items.hollowveil_girdle.name': 'Пояс сокрытой лощины',
+  'entities.items.hollowveil_chainmail.name': 'Кольчуга сокрытой лощины',
+  'entities.items.hollowveil_chausses.name': 'Шоссы сокрытой лощины',
+  'entities.items.hollowveil_greaves.name': 'Наголенники сокрытой лощины',
+  'entities.items.hollowveil_coif.name': 'Койф сокрытой лощины',
+  'entities.items.hollowveil_handguards.name': 'Латные перчатки сокрытой лощины',
+  'entities.items.hollowveil_spaulders.name': 'Наплечники сокрытой лощины',
+  'entities.items.hollowveil_cord.name': 'Шнур сокрытой лощины',
+  'entities.items.trailwarden_robe.name': 'Одеяние стража троп',
+  'entities.items.trailwarden_leggings.name': 'Штаны стража троп',
+  'entities.items.trailwarden_slippers.name': 'Туфли стража троп',
+  'entities.items.trailwarden_hood.name': 'Капюшон стража троп',
+  'entities.items.trailwarden_gloves.name': 'Перчатки стража троп',
+  'entities.items.trailwarden_mantle.name': 'Оплечье стража троп',
+  'entities.items.trailwarden_sash.name': 'Кушак стража троп',
+  'entities.items.trailwarden_jerkin.name': 'Куртка стража троп',
+  'entities.items.trailwarden_breeches.name': 'Бриджи стража троп',
+  'entities.items.trailwarden_boots.name': 'Сапоги стража троп',
+  'entities.items.trailwarden_cap.name': 'Шапка стража троп',
+  'entities.items.trailwarden_grips.name': 'Хваты стража троп',
+  'entities.items.trailwarden_shoulderpads.name': 'Плечевые накладки стража троп',
+  'entities.items.trailwarden_belt.name': 'Ремень стража троп',
+  'entities.items.trailwarden_hauberk.name': 'Хауберк стража троп',
+  'entities.items.trailwarden_legguards.name': 'Набедренники стража троп',
+  'entities.items.trailwarden_sabatons.name': 'Сабатоны стража троп',
+  'entities.items.trailwarden_helm.name': 'Шлем стража троп',
+  'entities.items.trailwarden_gauntlets.name': 'Рукавицы стража троп',
+  'entities.items.trailwarden_pauldrons.name': 'Наплечья стража троп',
+  'entities.items.trailwarden_girdle.name': 'Пояс стража троп',
+  'entities.items.trailwarden_chainmail.name': 'Кольчуга стража троп',
+  'entities.items.trailwarden_chausses.name': 'Шоссы стража троп',
+  'entities.items.trailwarden_greaves.name': 'Наголенники стража троп',
+  'entities.items.trailwarden_coif.name': 'Койф стража троп',
+  'entities.items.trailwarden_handguards.name': 'Латные перчатки стража троп',
+  'entities.items.trailwarden_spaulders.name': 'Наплечники стража троп',
+  'entities.items.trailwarden_cord.name': 'Шнур стража троп',
+  'entities.items.highgale_robe.name': 'Одеяние буревого гребня',
+  'entities.items.highgale_leggings.name': 'Штаны буревого гребня',
+  'entities.items.highgale_slippers.name': 'Туфли буревого гребня',
+  'entities.items.highgale_hood.name': 'Капюшон буревого гребня',
+  'entities.items.highgale_gloves.name': 'Перчатки буревого гребня',
+  'entities.items.highgale_mantle.name': 'Оплечье буревого гребня',
+  'entities.items.highgale_sash.name': 'Кушак буревого гребня',
+  'entities.items.highgale_jerkin.name': 'Куртка буревого гребня',
+  'entities.items.highgale_breeches.name': 'Бриджи буревого гребня',
+  'entities.items.highgale_boots.name': 'Сапоги буревого гребня',
+  'entities.items.highgale_cap.name': 'Шапка буревого гребня',
+  'entities.items.highgale_grips.name': 'Хваты буревого гребня',
+  'entities.items.highgale_shoulderpads.name': 'Плечевые накладки буревого гребня',
+  'entities.items.highgale_belt.name': 'Ремень буревого гребня',
+  'entities.items.highgale_hauberk.name': 'Хауберк буревого гребня',
+  'entities.items.highgale_legguards.name': 'Набедренники буревого гребня',
+  'entities.items.highgale_sabatons.name': 'Сабатоны буревого гребня',
+  'entities.items.highgale_helm.name': 'Шлем буревого гребня',
+  'entities.items.highgale_gauntlets.name': 'Рукавицы буревого гребня',
+  'entities.items.highgale_pauldrons.name': 'Наплечья буревого гребня',
+  'entities.items.highgale_girdle.name': 'Пояс буревого гребня',
+  'entities.items.highgale_chainmail.name': 'Кольчуга буревого гребня',
+  'entities.items.highgale_chausses.name': 'Шоссы буревого гребня',
+  'entities.items.highgale_greaves.name': 'Наголенники буревого гребня',
+  'entities.items.brookwatch_tunic.name': 'Туника дозора у ручья',
+  'entities.items.brookwatch_legwraps.name': 'Обмотки дозора у ручья',
+  'entities.items.brookwatch_treads.name': 'Башмаки дозора у ручья',
+  'entities.items.brookwatch_headguard.name': 'Наголовник дозора у ручья',
+  'entities.items.brookwatch_handwraps.name': 'Наручные обмотки дозора у ручья',
+  'entities.items.brookwatch_shoulderguards.name': 'Наплечные щитки дозора у ручья',
+  'entities.items.brookwatch_waistguard.name': 'Опояска дозора у ручья',
+  'entities.items.hedgerow_tunic.name': 'Туника живой изгороди',
+  'entities.items.hedgerow_legwraps.name': 'Обмотки живой изгороди',
+  'entities.items.hedgerow_treads.name': 'Башмаки живой изгороди',
+  'entities.items.hedgerow_headguard.name': 'Наголовник живой изгороди',
+  'entities.items.hedgerow_handwraps.name': 'Наручные обмотки живой изгороди',
+  'entities.items.hedgerow_shoulderguards.name': 'Наплечные щитки живой изгороди',
+  'entities.items.hedgerow_waistguard.name': 'Опояска живой изгороди',
+  'entities.items.bogwalker_tunic.name': 'Туника болотного странника',
+  'entities.items.bogwalker_legwraps.name': 'Обмотки болотного странника',
+  'entities.items.bogwalker_treads.name': 'Башмаки болотного странника',
+  'entities.items.bogwalker_headguard.name': 'Наголовник болотного странника',
+  'entities.items.bogwalker_handwraps.name': 'Наручные обмотки болотного странника',
+  'entities.items.bogwalker_shoulderguards.name': 'Наплечные щитки болотного странника',
+  'entities.items.bogwalker_waistguard.name': 'Опояска болотного странника',
+  'entities.items.thornspire_tunic.name': 'Туника тернового шпиля',
+  'entities.items.thornspire_legwraps.name': 'Обмотки тернового шпиля',
+  'entities.items.thornspire_treads.name': 'Башмаки тернового шпиля',
+  'entities.items.thornspire_headguard.name': 'Наголовник тернового шпиля',
+  'entities.items.thornspire_handwraps.name': 'Наручные обмотки тернового шпиля',
+  'entities.items.thornspire_shoulderguards.name': 'Наплечные щитки тернового шпиля',
+  'entities.items.thornspire_waistguard.name': 'Опояска тернового шпиля',
+  'entities.items.hollowveil_tunic.name': 'Туника сокрытой лощины',
+  'entities.items.hollowveil_legwraps.name': 'Обмотки сокрытой лощины',
+  'entities.items.hollowveil_treads.name': 'Башмаки сокрытой лощины',
+  'entities.items.hollowveil_headguard.name': 'Наголовник сокрытой лощины',
+  'entities.items.hollowveil_handwraps.name': 'Наручные обмотки сокрытой лощины',
+  'entities.items.hollowveil_shoulderguards.name': 'Наплечные щитки сокрытой лощины',
+  'entities.items.hollowveil_waistguard.name': 'Опояска сокрытой лощины',
+  'entities.items.trailwarden_tunic.name': 'Туника стража троп',
+  'entities.items.trailwarden_legwraps.name': 'Обмотки стража троп',
+  'entities.items.trailwarden_treads.name': 'Башмаки стража троп',
+  'entities.items.trailwarden_headguard.name': 'Наголовник стража троп',
+  'entities.items.trailwarden_handwraps.name': 'Наручные обмотки стража троп',
+  'entities.items.trailwarden_shoulderguards.name': 'Наплечные щитки стража троп',
+  'entities.items.trailwarden_waistguard.name': 'Опояска стража троп',
+  'entities.items.highgale_tunic.name': 'Туника буревого гребня',
+  'entities.items.highgale_legwraps.name': 'Обмотки буревого гребня',
+  'entities.items.highgale_treads.name': 'Башмаки буревого гребня',
+  'entities.items.highgale_headguard.name': 'Наголовник буревого гребня',
+  'entities.items.highgale_handwraps.name': 'Наручные обмотки буревого гребня',
+  'entities.items.highgale_shoulderguards.name': 'Наплечные щитки буревого гребня',
+  'entities.items.highgale_waistguard.name': 'Опояска буревого гребня',
+  'entities.items.highgale_coif.name': 'Койф буревого гребня',
+  'entities.items.highgale_handguards.name': 'Латные перчатки буревого гребня',
+  'entities.items.highgale_spaulders.name': 'Наплечники буревого гребня',
+  'entities.items.highgale_cord.name': 'Шнур буревого гребня',
+  'entities.items.breakwater_mantle.name': 'Оплечье волнолома',
+  'entities.items.breakwater_shoulderpads.name': 'Плечевые накладки волнолома',
+  'entities.items.breakwater_spaulders.name': 'Наплечники волнолома',
+  'entities.items.gravebell_treads.name': 'Башмаки погребального колокола',
+  'entities.items.gravebell_greaves.name': 'Наголенники погребального колокола',
+  'entities.items.cryptbound_tunic.name': 'Туника склепных уз',
+  'entities.items.cryptbound_chainmail.name': 'Кольчуга склепных уз',
+  'entities.items.oathbroken_leggings.name': 'Штаны нарушенной клятвы',
+  'entities.items.oathbroken_breeches.name': 'Бриджи нарушенной клятвы',
+  'entities.items.oathbroken_legwraps.name': 'Обмотки нарушенной клятвы',
+  'entities.items.oathbroken_legguards.name': 'Набедренники нарушенной клятвы',
+  'entities.items.oathbroken_chausses.name': 'Шоссы нарушенной клятвы',
+  'entities.items.seamist_legwraps.name': 'Обмотки морского тумана',
+  'entities.items.seamist_chausses.name': 'Шоссы морского тумана',
+  'entities.items.warmonger_treads.name': 'Башмаки поджигателя войны',
+  'entities.items.warmonger_greaves.name': 'Наголенники поджигателя войны',
+  'entities.items.sparkglass_leggings.name': 'Штаны искрящегося стекла',
+  'entities.items.sparkglass_breeches.name': 'Бриджи искрящегося стекла',
+  'entities.items.sparkglass_legwraps.name': 'Обмотки искрящегося стекла',
+  'entities.items.sparkglass_legguards.name': 'Набедренники искрящегося стекла',
+  'entities.items.sparkglass_chausses.name': 'Шоссы искрящегося стекла',
+  'entities.items.stillhymn_treads.name': 'Башмаки безмолвного гимна',
+  'entities.items.stillhymn_greaves.name': 'Наголенники безмолвного гимна',
+  'entities.items.pearlglow_headguard.name': 'Наголовник жемчужного сияния',
+  'entities.items.pearlglow_coif.name': 'Койф жемчужного сияния',
+  'entities.items.sealkeeper_gloves.name': 'Перчатки хранителя печати',
+  'entities.items.sealkeeper_grips.name': 'Хваты хранителя печати',
+  'entities.items.sealkeeper_handwraps.name': 'Наручные обмотки хранителя печати',
+  'entities.items.sealkeeper_gauntlets.name': 'Рукавицы хранителя печати',
+  'entities.items.sealkeeper_handguards.name': 'Латные перчатки хранителя печати',
+  'entities.items.fetterbound_leggings.name': 'Штаны тяжких оков',
+  'entities.items.fetterbound_breeches.name': 'Бриджи тяжких оков',
+  'entities.items.fetterbound_legwraps.name': 'Обмотки тяжких оков',
+  'entities.items.fetterbound_legguards.name': 'Набедренники тяжких оков',
+  'entities.items.fetterbound_chausses.name': 'Шоссы тяжких оков',
+  'entities.items.shroudcaller_tunic.name': 'Туника призывателя саванов',
+  'entities.items.shroudcaller_chainmail.name': 'Кольчуга призывателя саванов',
+  'entities.items.wyrmshadow_tunic.name': 'Туника тени змея',
+  'entities.items.wyrmshadow_chainmail.name': 'Кольчуга тени змея',
+  'entities.items.cinderbrood_shoulderpads.name': 'Плечевые накладки пепельного выводка',
+  'entities.items.cinderbrood_shoulderguards.name': 'Наплечные щитки пепельного выводка',
+  'entities.items.cinderbrood_pauldrons.name': 'Наплечья пепельного выводка',
+  'entities.items.hoarfrost_mantle.name': 'Оплечье изморози',
+  'entities.items.hoarfrost_shoulderpads.name': 'Плечевые накладки изморози',
+  'entities.items.hoarfrost_spaulders.name': 'Наплечники изморози',
+  'entities.items.blackmere_mantle.name': 'Оплечье чёрного озера',
+  'entities.items.blackmere_shoulderpads.name': 'Плечевые накладки чёрного озера',
+  'entities.items.blackmere_shoulderguards.name': 'Наплечные щитки чёрного озера',
+  'entities.items.blackmere_pauldrons.name': 'Наплечья чёрного озера',
+  'entities.items.blackmere_spaulders.name': 'Наплечники чёрного озера',
+  'entities.items.reedhush_mantle.name': 'Оплечье тихого камыша',
+  'entities.items.reedhush_shoulderpads.name': 'Плечевые накладки тихого камыша',
+  'entities.items.reedhush_shoulderguards.name': 'Наплечные щитки тихого камыша',
+  'entities.items.reedhush_pauldrons.name': 'Наплечья тихого камыша',
+  'entities.items.reedhush_spaulders.name': 'Наплечники тихого камыша',
+  'entities.items.cairnking_mantle.name': 'Оплечье курганного короля',
+  'entities.items.cairnking_shoulderpads.name': 'Плечевые накладки курганного короля',
+  'entities.items.cairnking_shoulderguards.name': 'Наплечные щитки курганного короля',
+  'entities.items.cairnking_pauldrons.name': 'Наплечья курганного короля',
+  'entities.items.cairnking_spaulders.name': 'Наплечники курганного короля',
+  'entities.items.palehunt_mantle.name': 'Оплечье бледной охоты',
+  'entities.items.palehunt_shoulderpads.name': 'Плечевые накладки бледной охоты',
+  'entities.items.palehunt_shoulderguards.name': 'Наплечные щитки бледной охоты',
+  'entities.items.palehunt_pauldrons.name': 'Наплечья бледной охоты',
+  'entities.items.palehunt_spaulders.name': 'Наплечники бледной охоты',
+  'entities.items.jadeshrine_mantle.name': 'Оплечье нефритового святилища',
+  'entities.items.jadeshrine_shoulderpads.name': 'Плечевые накладки нефритового святилища',
+  'entities.items.jadeshrine_shoulderguards.name': 'Наплечные щитки нефритового святилища',
+  'entities.items.jadeshrine_pauldrons.name': 'Наплечья нефритового святилища',
+  'entities.items.jadeshrine_spaulders.name': 'Наплечники нефритового святилища',
+  'entities.items.gildhedge_mantle.name': 'Оплечье золочёной изгороди',
+  'entities.items.gildhedge_shoulderpads.name': 'Плечевые накладки золочёной изгороди',
+  'entities.items.gildhedge_spaulders.name': 'Наплечники золочёной изгороди',
+  'entities.items.saltwrack_mantle.name': 'Оплечье солёных обломков',
+  'entities.items.saltwrack_shoulderpads.name': 'Плечевые накладки солёных обломков',
+  'entities.items.saltwrack_spaulders.name': 'Наплечники солёных обломков',
+  'entities.items.brookwatch_vest.name': 'Жилет дозора у ручья',
+  'entities.items.brookwatch_trousers.name': 'Брюки дозора у ручья',
+  'entities.items.brookwatch_moccasins.name': 'Мокасины дозора у ручья',
+  'entities.items.brookwatch_cowl.name': 'Куколь дозора у ручья',
+  'entities.items.brookwatch_mitts.name': 'Митенки дозора у ручья',
+  'entities.items.brookwatch_epaulets.name': 'Эполеты дозора у ручья',
+  'entities.items.brookwatch_cinch.name': 'Подпояска дозора у ручья',
+  'entities.items.hedgerow_vest.name': 'Жилет живой изгороди',
+  'entities.items.hedgerow_trousers.name': 'Брюки живой изгороди',
+  'entities.items.hedgerow_moccasins.name': 'Мокасины живой изгороди',
+  'entities.items.hedgerow_cowl.name': 'Куколь живой изгороди',
+  'entities.items.hedgerow_mitts.name': 'Митенки живой изгороди',
+  'entities.items.hedgerow_epaulets.name': 'Эполеты живой изгороди',
+  'entities.items.hedgerow_cinch.name': 'Подпояска живой изгороди',
+  'entities.items.bogwalker_vest.name': 'Жилет болотного странника',
+  'entities.items.bogwalker_trousers.name': 'Брюки болотного странника',
+  'entities.items.bogwalker_moccasins.name': 'Мокасины болотного странника',
+  'entities.items.bogwalker_cowl.name': 'Куколь болотного странника',
+  'entities.items.bogwalker_mitts.name': 'Митенки болотного странника',
+  'entities.items.bogwalker_epaulets.name': 'Эполеты болотного странника',
+  'entities.items.bogwalker_cinch.name': 'Подпояска болотного странника',
+  'entities.items.thornspire_vest.name': 'Жилет тернового шпиля',
+  'entities.items.thornspire_trousers.name': 'Брюки тернового шпиля',
+  'entities.items.thornspire_moccasins.name': 'Мокасины тернового шпиля',
+  'entities.items.thornspire_cowl.name': 'Куколь тернового шпиля',
+  'entities.items.thornspire_mitts.name': 'Митенки тернового шпиля',
+  'entities.items.thornspire_epaulets.name': 'Эполеты тернового шпиля',
+  'entities.items.thornspire_cinch.name': 'Подпояска тернового шпиля',
+  'entities.items.hollowveil_vest.name': 'Жилет сокрытой лощины',
+  'entities.items.hollowveil_trousers.name': 'Брюки сокрытой лощины',
+  'entities.items.hollowveil_moccasins.name': 'Мокасины сокрытой лощины',
+  'entities.items.hollowveil_cowl.name': 'Куколь сокрытой лощины',
+  'entities.items.hollowveil_mitts.name': 'Митенки сокрытой лощины',
+  'entities.items.hollowveil_epaulets.name': 'Эполеты сокрытой лощины',
+  'entities.items.hollowveil_cinch.name': 'Подпояска сокрытой лощины',
+  'entities.items.trailwarden_vest.name': 'Жилет стража троп',
+  'entities.items.trailwarden_trousers.name': 'Брюки стража троп',
+  'entities.items.trailwarden_moccasins.name': 'Мокасины стража троп',
+  'entities.items.trailwarden_cowl.name': 'Куколь стража троп',
+  'entities.items.trailwarden_mitts.name': 'Митенки стража троп',
+  'entities.items.trailwarden_epaulets.name': 'Эполеты стража троп',
+  'entities.items.trailwarden_cinch.name': 'Подпояска стража троп',
+  'entities.items.highgale_vest.name': 'Жилет буревого гребня',
+  'entities.items.highgale_trousers.name': 'Брюки буревого гребня',
+  'entities.items.highgale_moccasins.name': 'Мокасины буревого гребня',
+  'entities.items.highgale_cowl.name': 'Куколь буревого гребня',
+  'entities.items.highgale_mitts.name': 'Митенки буревого гребня',
+  'entities.items.highgale_epaulets.name': 'Эполеты буревого гребня',
+  'entities.items.highgale_cinch.name': 'Подпояска буревого гребня',
+  'entities.items.breakwater_shoulderguards.name': 'Наплечные щитки волнолома',
+  'entities.items.breakwater_pauldrons.name': 'Наплечья волнолома',
+  'entities.items.breakwater_epaulets.name': 'Эполеты волнолома',
+  'entities.items.gravebell_moccasins.name': 'Мокасины погребального колокола',
+  'entities.items.oathbroken_trousers.name': 'Брюки нарушенной клятвы',
+  'entities.items.sparkglass_trousers.name': 'Брюки искрящегося стекла',
+  'entities.items.stillhymn_moccasins.name': 'Мокасины безмолвного гимна',
+  'entities.items.sealkeeper_mitts.name': 'Митенки хранителя печати',
+  'entities.items.fetterbound_trousers.name': 'Брюки тяжких оков',
+  'entities.items.wyrmshadow_vest.name': 'Жилет тени змея',
+  'entities.items.cinderbrood_spaulders.name': 'Наплечники пепельного выводка',
+  'entities.items.cinderbrood_epaulets.name': 'Эполеты пепельного выводка',
+  'entities.items.hoarfrost_shoulderguards.name': 'Наплечные щитки изморози',
+  'entities.items.hoarfrost_pauldrons.name': 'Наплечья изморози',
+  'entities.items.hoarfrost_epaulets.name': 'Эполеты изморози',
+  'entities.items.blackmere_epaulets.name': 'Эполеты чёрного озера',
+  'entities.items.reedhush_epaulets.name': 'Эполеты тихого камыша',
+  'entities.items.cairnking_epaulets.name': 'Эполеты курганного короля',
+  'entities.items.palehunt_epaulets.name': 'Эполеты бледной охоты',
+  'entities.items.jadeshrine_epaulets.name': 'Эполеты нефритового святилища',
+  'entities.items.gildhedge_shoulderguards.name': 'Наплечные щитки золочёной изгороди',
+  'entities.items.gildhedge_pauldrons.name': 'Наплечья золочёной изгороди',
+  'entities.items.gildhedge_epaulets.name': 'Эполеты золочёной изгороди',
+  'entities.items.saltwrack_shoulderguards.name': 'Наплечные щитки солёных обломков',
+  'entities.items.saltwrack_pauldrons.name': 'Наплечья солёных обломков',
+  'entities.items.saltwrack_epaulets.name': 'Эполеты солёных обломков',
   'hudChrome.paperdoll.trinketSlot': 'Аксессуар',
   'questUi.worldQuest.practiceRewards':
     'Тренировка: играйте снова без дополнительных монет, опыта и репутации.',
@@ -1101,6 +3738,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.selectedTable': 'Выбрана {count} таблица',
   'hudChrome.weeklyRewards.selectedTables': 'Выбрано таблиц: {count}',
   'hudChrome.weeklyRewards.noLevelLoot': 'На вашем текущем уровне нет подходящей добычи.',
+  'hudChrome.weeklyRewards.lootFocus': 'Специализация добычи',
+  'hudChrome.weeklyRewards.allClassGear': 'Всё снаряжение класса',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Только для ещё не открытых хранилищ.',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Нет подходящей добычи. Выберите другую специализацию.',
+  'hudChrome.weeklyRewards.rolledFocus': 'Специализация при розыгрыше: {focus}',
   'hudChrome.weeklyRewards.tableItem': '{count} предмет',
   'hudChrome.weeklyRewards.tableItemCount': 'Предметов: {count}',
   'hudChrome.weeklyRewards.previouslyRolled': 'Ранее разыгранная награда',
@@ -1110,6 +3752,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Все подходящие предметы уже разыграны. Выберите одну из открытых наград.',
   'hudChrome.weeklyRewards.worldPoolRule':
     'Снаряжение Nythraxis обычной сложности. Прохождение рейдов не требуется.',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    'Все таблицы, из которых могут разыгрываться эти хранилища. Победа над боссом навсегда открывает его добычу для будущих хранилищ. Таблица подземелья включает только побеждённых вами боссов, а победа на героической сложности открывает и обычную. Из розыгрыша исключены уже разыгранные предметы. Снаряжение, требуемый уровень которого превышает ваш более чем на {maxLevelOffset}, не показывается.',
   'hudChrome.weeklyRewards.selectionPoolRule':
     'Для наград за рейды и подземелья перед открытием выберите одну или несколько таблиц. Таблицы подземелий объединяют добычу боссов, которых вы победили на этой сложности. Из розыгрыша исключены дубликаты, легендарные предметы и снаряжение, требуемый уровень которого превышает ваш более чем на {maxLevelOffset}.',
   'questUi.worldQuest.puzzleRetry': 'Повторить',
@@ -1124,6 +3768,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.castingOff': 'Паром на {dest} отчаливает',
   'hudChrome.ferry.boardHint': 'Стойте на палубе в момент отплытия. Переправа бесплатна.',
   'hudChrome.ferry.sailing': 'Курс на {dest}',
+  'hudChrome.ferry.portLabel': '{port}: паром на {dest}',
+  'hudChrome.ferry.portTitle': '{port}: паромный причал',
+  'hudChrome.ferry.destination': 'Пункт назначения: {dest}',
+  'hudChrome.ferry.boardNow': 'Можно садиться на паром',
+  'hudChrome.ferry.arrivesIn': 'Паром прибудет через {time}',
+  'hudChrome.ferry.scheduleUnavailable': 'Расписание парома недоступно.',
   'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
   'hudChrome.framePresets.pickerLabel': 'Профили рамок: {name}',
   'hudChrome.framePresets.overwrite': 'Перезаписать профиль',
@@ -1170,6 +3820,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC Рекорды',
   'landing.scout': 'WoC Разведка',
   'landing.parseService': 'WoC Боевые отчёты',
+  'editor.buildMode.materialNames.WardenStone': 'Гладкий камень',
+  'editor.buildMode.diagonal': 'Диагональные стены',
+  'editor.buildMode.diagonalHint':
+    'Перетащите указатель между узлами сетки, чтобы построить стену под любым углом.',
   'guide.professions.endgameBodyRaidCollections':
     'Ковка мастера объединяет вещи с меткой «Уникальный (экипируется): Ковка мастера». Прежняя вершина ремесла по-прежнему использует найденные схемы, промежуточные изделия с суточным ограничением и общие материалы финального этапа. Комплекты Горнила представляют отдельный путь с рейдовыми материалами, а не дополнительные расходы поверх прежней цепочки. Обе группы делят один предел ношения в две вещи, поэтому конкурируют за одни и те же два места в вашей сборке. Готовые вещи свободно продаются, пока доведение до совершенства или заказное изготовление не привяжет конкретный экземпляр.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -1184,7 +3838,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чары делятся на четыре уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия, вторую руку и каждый слот доспеха, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота: щиты и держимые заклинателем предметы во второй руке берут собственные чары на Стойкость, так что ни один надетый слот не остаётся без чар. Высший уровень стоит один осколок перезвона плюс эссенцию: более сильные бонусы для слотов с наибольшим влиянием. Кроме того, осколки кормят ещё три стока: два рецепта оберегов по одному за каждый (остальная цена оберега это эссенция и пыль), верхнюю ступень пополнения эффектов инструментов и светозарный уровень, где чары оружия и нагрудника берут по одному, а «Светозарное вливание», два, так что отложите несколько, прежде чем тратить.\n\nМежду ними сидят пять рунных зачарований, по одному потребителю на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берёт две эссенции перезвона; там, где у слота и характеристики есть и базовые, и высшие чары, рунный бонус ложится между ними, тогда как Runed Weave, самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, единственное зачарование поножей на Ловкость. Точные бонусы все в таблице ниже.\n\nНад обычными нижними уровнями стоит светозарный уровень, вершина обычных чар этого ремесла: Enchanting 100 для четырёх и 125 для «Светозарного вливания», как показано в столбце «Навык» ниже. Каждое берёт светозарный реагент и поднимает на одну ступень свой собственный слот: оружие (варианты мощи и силы заклинаний), нагрудник и сапоги. Последнее из них, «Светозарное вливание», ложится только на предмет, доведённый до совершенства: доведение до совершенства, это работа самого владельца, а не зачарователя, и страница Ремесел рассказывает, как предмет его достигает.\n\n«Рвение Последнего Пламени» изучается по отдельной рейдовой формуле и не относится к бесплатным обычным чарам. Перед нанесением изучите продаваемую формулу при навыке Наложения чар 100. Каждое нанесение расходует 3 Ядра Последнего Пламени и 2 осколка перезвона. Формула выпадает в Горниле или покупается у его интенданта за одно ядро. Правила срабатывания в ближнем бою и зависимости от скорости оружия полностью приведены ниже.',
   'guide.profPages.ench.formulaRequired': 'Требуется формула',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Некоторые вещи несут имя. Строки источника материала указывают, кто собрал каждую группу единиц, а отдельная отметка «подписано» называет привилегированного автора подписи, если он есть. Эти два факта независимы: обычный собранный материал фиксирует сборщика, но не обязательно получает подпись, а старый подписанный запас может называть автора подписи, честно сообщая, что сборщик не был зафиксирован. Готовое изделие вместо этого называет того, кто его изготовил. Эти записи сопровождают предмет через торговлю, банк, почту, Мировой рынок и даже обратный выкуп у торговца и никогда не исчезают.\n\nСбор автоматически подписывает лучшие результаты: любая добыча редкого или лучшего качества приходит подписанной, а редкая находка подписывает весь свой пятикратный дополнительный урожай целиком. Удачный бросок при сборе с трупа подписывает добычу, если у семейства нет образца для выдачи, а если образец есть, оставляет добычу без подписи и создаёт рядом подписанный безупречный образец. Ремесло подписывает по тому же принципу: каждый экземпляр изделия редкого или лучшего качества выходит подписанным, а шедевр всегда подписывается независимо от качества, поэтому лучший вариант любой вещи всегда называет своего создателя. Подпись обычного материала закреплена за самими единицами и не может быть потеряна только из-за того, что совместимая стопка уже содержит другого сборщика или автора подписи. Отдельный безупречный образец, это отдельный предмет, которому по-прежнему нужно место; если он не помещается, обычная добыча с трупа остаётся, а образец теряется.\n\nГотовые предметы сохраняют одну строгую идентичность, поэтому два экземпляра объединяются только при полном совпадении всех отметок: тот же предмет, тот же автор подписи, те же характеристики шедевра, те же чары, та же привязка. Совместимые материалы делят одну ячейку между разными сборщиками и авторами подписи, сохраняя при этом счётчик для каждого источника. Всплывающая подсказка при наведении показывает краткую сводку источников; щёлкните по стопке правой кнопкой, чтобы увидеть полный список (на сенсорном экране используйте её кнопку «Источники»). Разделение по сборщику держит такие стопки раздельными в сумке, и сортировка учитывает этот выбор. Переданный материал может складываться в стопку с материалами получателя как обычно.\n\nПодписи приносят пользу и мастерам: наличие у верстака любого подписанного экземпляра нужного реагента, независимо от того, кто его подписал, добавляет 2 процентных пункта к вероятности шедевра, а реагент, подписанный вашей собственной рукой, уменьшает его требуемое количество на один (но не ниже одного), если только этот реагент не помечен как не подлежащий скидке; рейдовые ядра всегда сохраняют полную стоимость. Собственная подписанная работа редкого или лучшего качества продолжает обучать вас, сегодня только через изготовленные зелья: выпейте редкое зелье, которое вы сварили и подписали, и небольшой ручеёк навыка вернётся в ремесло, которое его создало, пока это ремесло остаётся одной из ваших активных основных профессий. Это действительно касается только зелий и ничего больше, поэтому эликсир, свиток или флакон вершины не возвращают навык, как бы изящно они ни были подписаны.',
+    'Некоторые вещи несут имя. Строки источника материала указывают, кто собрал каждую группу единиц, а отдельная отметка «подписано» называет привилегированного автора подписи, если он есть. Эти два факта независимы: обычный собранный материал фиксирует сборщика, но не обязательно получает подпись, а старый подписанный запас может называть автора подписи, честно сообщая, что сборщик не был зафиксирован. Готовое изделие вместо этого называет того, кто его изготовил. Эти записи сопровождают предмет через торговлю, банк, почту, Мировой рынок и даже обратный выкуп у торговца и никогда не исчезают.\n\nСбор автоматически подписывает лучшие результаты: любая добыча редкого или лучшего качества приходит подписанной, а редкая находка подписывает весь свой пятикратный дополнительный урожай целиком. Удачный бросок при сборе с трупа подписывает добычу, если у семейства нет образца для выдачи, а если образец есть, оставляет добычу без подписи и создаёт рядом подписанный безупречный образец. Ремесло подписывает по тому же принципу: каждый экземпляр изделия редкого или лучшего качества выходит подписанным, а шедевр всегда подписывается независимо от качества, поэтому лучший вариант любой вещи всегда называет своего создателя. Подпись обычного материала закреплена за самими единицами и не может быть потеряна только из-за того, что совместимая стопка уже содержит другого сборщика или автора подписи. Отдельный безупречный образец, это отдельный предмет, которому по-прежнему нужно место; если он не помещается, обычная добыча с трупа остаётся, а образец теряется.\n\nГотовые предметы сохраняют одну строгую идентичность, поэтому два экземпляра объединяются только при полном совпадении всех отметок: тот же предмет, тот же автор подписи, те же характеристики шедевра, те же чары, та же привязка. Совместимые материалы делят одну ячейку между разными сборщиками и авторами подписи, сохраняя при этом счётчик для каждого источника. Всплывающая подсказка при наведении показывает краткую сводку источников; щёлкните по стопке правой кнопкой, чтобы увидеть полный список (на сенсорном экране используйте её кнопку «Источники»). Разделение по сборщику держит такие стопки раздельными в сумке, и сортировка учитывает этот выбор. Переданный материал может складываться в стопку с материалами получателя как обычно.\n\nПодписи приносят пользу и мастерам: наличие любого подписанного экземпляра нужного реагента, независимо от подписанта, в сумках либо Хранилище материалов, откуда его может взять ремесло, добавляет 2 процентных пункта к вероятности шедевра, а реагент, подписанный вашей собственной рукой, уменьшает его требуемое количество на один (но не ниже одного), если только этот реагент не помечен как не подлежащий скидке; рейдовые ядра всегда сохраняют полную стоимость. Собственная подписанная работа редкого или лучшего качества продолжает обучать вас, сегодня только через изготовленные зелья: выпейте редкое зелье, которое вы сварили и подписали, и небольшой ручеёк навыка вернётся в ремесло, которое его создало, пока это ремесло остаётся одной из ваших активных основных профессий. Это действительно касается только зелий и ничего больше, поэтому эликсир, свиток или флакон вершины не возвращают навык, как бы изящно они ни были подписаны.',
   'guide.profPages.econ.introRaidCollections':
     'Как деньги движутся через ремёсла: точные сборы и расходы, востребованные товары, правила Мирового рынка, рабочие заказы, изготовление по заказу и место комплектов с рейдовыми материалами рядом с обычным ремеслом.',
   'guide.profPages.econ.doctrineBodyRaidCollections':
@@ -1281,10 +3935,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_piston_drive.name': 'Формула: Поршневой привод',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': 'Рвение Последнего Пламени',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Попавшие в цель атаки ближнего боя могут повысить силу на 50 на 15 сек. и восстановить вам 200 ед. здоровья. Действуют модификаторы исцеления. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Обе руки дают одно общее усиление; любое срабатывание обновляет его, и оно никогда не суммируется. Дальние атаки не вызывают этот эффект. В облике волка вместо этого используется базовая скорость атаки в 1 сек.',
+    'Ваши успешные атаки ближнего боя могут дать 50 силы на 15 сек. и восстановить вам 200 здоровья. Действуют модификаторы исцеления. Каждое попадание получает шанс 1% за каждые 0,6 сек. базовой скорости ударившего оружия. Внутреннего времени восстановления нет. Обе руки используют один эффект: любое срабатывание обновляет его, он не суммируется. Дальние атаки его не вызывают. В Облике кота автоатаки используют скорость лап в 1 сек. Удары и завершающие приёмы в Облике кота и Облике бурого используют скорость самого оружия; Разящие когти проверяют срабатывание один раз за применение, а не за каждую цель.',
   'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': 'Грация Странника Разлома',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Попавшие в цель атаки ближнего боя могут повысить ловкость на 60 и ускорить атаки ближнего боя на 2% на 15 сек. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Обе руки дают одно общее усиление; любое срабатывание обновляет его, и оно никогда не суммируется. Дальние атаки не вызывают этот эффект. В облике кота вместо этого используется базовая скорость атаки в 1 сек.',
+    'Ваши успешные атаки ближнего боя могут дать 60 ловкости и ускорить атаки ближнего боя на 2% на 15 сек. Каждое попадание получает шанс 1% за каждые 0,6 сек. базовой скорости ударившего оружия. Внутреннего времени восстановления нет. Обе руки используют один эффект: любое срабатывание обновляет его, он не суммируется. Дальние атаки его не вызывают. В Облике кота автоатаки используют скорость лап в 1 сек. Удары и завершающие приёмы в Облике кота и Облике бурого используют скорость самого оружия; Разящие когти проверяют срабатывание один раз за применение, а не за каждую цель.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Травление оружия: Рассветное пламя',
   'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
     'Навсегда наносит на оружие травление, дающее 18 к силе заклинаний. Сила заклинаний также учитывается в силе исцеления. Фиксированный бонус, он не масштабируется.',
@@ -1376,6 +4030,49 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framePetTitle': 'Ваш питомец',
   'guide.interfacePage.winBagsTitle': 'Сумки (B)',
   'guide.riftsPage.rankFmt': 'Ранг {rank}',
+  'hudChrome.shardpike.braceLabel': 'Упереть Осколочную пику',
+  'hudChrome.shardpike.braceTooltip':
+    'Воткните пятку в землю и поднимите острие. Клавиши шага в сторону  это балансир: луч сам уходит в сторону, и каждый удар великана его подбивает. Удержите его вне рельсов {set} с, и пика встанет. Нужна твёрдая земля, и не из седла.',
+  'hudChrome.shardpike.thrustLabel': 'Удар Курганного стекла',
+  'hudChrome.shardpike.thrustTooltip':
+    'Вгоните упёртую пику в глаз, нанося {damage} ед. урона. Ничто его не масштабирует: ни уровень, ни сила атаки, ни сама пика. Ослепляет Смотрителя и срывает Курганную шкуру, так что любое другое оружие в топях наконец начинает кусать. Нанести его может только упёртая пика, в пределах {reach} м, а окно длится {seconds} с.',
+  'hudChrome.shardpike.releaseLabel': 'Опустить Осколочную пику',
+  'hudChrome.shardpike.releaseTooltip':
+    'Убрать пику. За отказ нет наказания: вы теряете упор, а не саму попытку, и через {rest} с можно упереть её снова.',
+  'hudChrome.shardpike.whyResting':
+    'Вы только что опустили пику. Дождитесь конца отсчёта на значке.',
+  'hudChrome.shardpike.whyAlreadyCouched':
+    'Пика уже упёрта. Опустите её, прежде чем упирать снова.',
+  'hudChrome.shardpike.whyNotSet': 'Пика не встала. Сначала уприте её и держите ровно.',
+  'hudChrome.shardpike.whyNothingCouched': 'Опускать нечего: пика не упёрта.',
+  'hudChrome.shardpike.beamLabel': 'Равновесие Осколочной пики',
+  'hudChrome.shardpike.beamStatus': 'Равновесие пики {balance}, упор {set} процентов.',
+  'hudChrome.shardpike.beamDanger': 'Равновесие пики {balance}, вот-вот сорвётся.',
+  'hudChrome.shardpike.promptHoldSteady': 'Держите пику ровно клавишами шага в сторону',
+  'hudChrome.shardpike.promptCatchIt': 'Выровняйте, пика уходит',
+  'hudChrome.shardpike.promptEyeOut': 'Глаз выбит, {seconds} с: бейте изо всех сил',
+  'hudChrome.shardpike.promptSealed': 'Его глаз закрыт. Откроется через {seconds} с',
+  'hudChrome.shardpike.promptResetting': 'Пика встаёт заново, {seconds} с',
+  'hudChrome.shardpike.promptCloser': 'Подойдите к Смотрителю, ещё {yards} м',
+  'hudChrome.shardpike.promptBrace': 'Уприте Осколочную пику и держите её ровно',
+  'hudChrome.shardpike.promptFindBoss': 'Осколочная пика Скеррита: выбейте ею глаз Смотрителя',
+  'hudChrome.shardpike.leanRightKey': 'Наклон вправо ({key})',
+  'hudChrome.shardpike.leanLeftKey': 'Наклон влево ({key})',
+  'hudChrome.shardpike.leanRight': 'Наклон вправо',
+  'hudChrome.shardpike.leanLeft': 'Наклон влево',
+  'hudChrome.shardpike.promptHoldSteadyLean':
+    'Держите пику ровно: наклоняйте клавишами {left} и {right}',
+  'hudChrome.shardpike.promptFindBossMuster':
+    'Осколочная пика ополчения: выбейте ею глаз Смотрителя',
+  'hudChrome.shardpike.promptTakePike':
+    'Нажмите {key} или щёлкните по стойке, чтобы взять осколочную пику',
+  'hudChrome.shardpike.promptTakePikeClick': 'Щёлкните по стойке, чтобы взять осколочную пику',
+  'hudChrome.shardpike.promptTakePikeTap': 'Коснитесь стойки, чтобы взять осколочную пику',
+  'hudChrome.shardpike.promptPikeLevelCap':
+    'Ополчение выдаёт копья только новобранцам до {level}-го уровня включительно',
+  'hudChrome.shardpike.braceTooltipLean':
+    'Воткните пятку в землю и поднимите острие. Наклоняйте клавишами шага в сторону или поворота либо удерживайте две клавиши над лучом: он сам уходит в сторону, и каждый удар великана его подбивает. Удержите его вне рельсов {set} с, и пика встанет. Нужна твёрдая земля, и не из седла.',
+  'hudChrome.shardpike.promptLabel': 'Указание Осколочной пики',
   'hudChrome.comboMeter.label': 'ОС',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'Приблизить',
@@ -1422,7 +4119,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': 'AFK',
-  'hudChrome.nameplate.bountyTag': 'Награда {honor}',
   'hudChrome.nameplate.cheaterTag': '< Читер >',
   'hudChrome.nameplate.pledgeTag': 'Присяга: {guild}',
   'hudChrome.nameplate.npcRoleTag': '<{role}>',
@@ -1443,6 +4139,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.npcRole.armorVendor': 'Торговец доспехами',
   'hudChrome.nameplate.npcRole.armsDealer': 'Торговец вооружением',
   'hudChrome.nameplate.npcRole.foodVendor': 'Торговец едой и напитками',
+  'hudChrome.nameplate.npcRole.innkeeper': 'Хозяин таверны',
   'hudChrome.nameplate.npcRole.potionVendor': 'Торговец зельями',
   'hudChrome.nameplate.npcRole.stableMaster': 'Смотритель стойл',
   'hudChrome.nameplate.npcRole.generalGoods': 'Товары общего назначения',
@@ -1488,6 +4185,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
   'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
   'entities.items.eastbrook_buckler.name': 'Истврукский баклер',
+  'entities.items.lychgate_buckler.name': 'Баклер кладбищенских врат',
+  'entities.items.bastion_kite_shield.name': 'Каплевидный щит бастиона',
+  'entities.items.barrowfield_tower_shield.name': 'Башенный щит Курганного поля',
   'entities.abilities.avatar.name': 'Аватара',
   'entities.abilities.bladestorm.name': 'Клинковая буря',
   'entities.abilities.battle_stance.description':
@@ -1536,7 +4236,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Устрашающий клич, обращающий в бегство до 5 врагов в пределах 8 м на 4 сек. Урон может разрушить эффект.',
   'entities.abilities.intimidating_shout.name': 'Устрашающий крик',
   'entities.abilities.iron_resolve.description':
-    'Стисните зубы и игнорируйте боль: расходует до 40 ед. ярости (минимум 20), поглощая {absorbPerRage} ед. урона за каждую потраченную единицу ярости в течение не более 10 сек. (ветка «Защита»)',
+    'Стисните зубы и игнорируйте боль: щит поглощает урон в размере {damage}% от максимального запаса здоровья на момент применения в течение не более {duration} сек. (ветка «Защита»)',
   'entities.abilities.iron_resolve.name': 'Железная решимость',
   'entities.abilities.measured_fury.description':
     'Ваша размеренная ярость оттачивает расход: ваши способности стоят на 10% меньше ярости. (ветка «Оружие»)',
@@ -1586,6 +4286,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.complexityMedium': 'Средняя',
   'hudChrome.specPanel.exampleAbilities': 'Примеры способностей',
   'hudChrome.specPanel.primaryAttr': 'Основная характеристика',
+  'hudChrome.specPanel.specBonus': 'Бонус специализации',
   'hudChrome.specPanel.selectSpec': 'Выбрать специализацию',
   'hudChrome.specPanel.viewTalents': 'Смотреть таланты',
   'hudChrome.talentRows.comingSoon': 'Скоро',
@@ -1638,7 +4339,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': 'Песнь рощи',
   'entities.abilities.typhoon.name': 'Тайфун',
   'entities.abilities.typhoon.description':
-    'Порыв ветра отбрасывает всех врагов в радиусе 8 м и дезориентирует их, снижая скорость передвижения на 50% на 4 сек.',
+    'Порыв ветра отбрасывает всех врагов в радиусе 8 м на 15 м от вас и оглушает их чувства, замедляя движение на 50% на 4 сек. Вражеские игроки летят по прямой через воздух: за краем уступа продолжают полёт и получают урон от падения; смертельное падение засчитывается как ваше убийство.',
   'entities.abilities.voidfeast.name': 'Пир Бездны',
   'entities.abilities.voidfeast.description':
     'Поглощает один магический эффект (положительный с врага или отрицательный с союзника) и восстанавливает 6% от максимального запаса здоровья.',
@@ -1692,6 +4393,32 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': 'Закалённое углями',
   'hudChrome.wocStore.collections.hoarfrost': 'Иней',
   'hudChrome.wocStore.collections.fallen_star': 'Падшая звезда',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'Гаррик Холт не продаст этот клинок чужаку. Он отдаёт его тем, кто неделю за неделей выполнял контракты Зала Фонаря, и каждый раз говорит одно и то же: фонарь в гарде зажжён от очага самого зала, так что куда бы вы его ни понесли, зал идёт с вами. Огонь в доле лишь украшение. Главное в нём обещание.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    'Широкий стальной клинок с долом, полным тлеющего огня фонаря, позолоченные щёчки, фонарь в клетке, горящий в гарде, рукоять из синей кожи.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Клинок Зала Фонаря',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Пламя Очага',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    'Пламевидный клинок из воронёной стали с раскалёнными кромками, расплавленный шов ветвится по обеим сторонам, гарда из бронзовых языков пламени вокруг горящего камня, рукоять цвета бычьей крови.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    'В Зале Фонаря есть очаг, который не гас с тех пор, как зал был построен, и Гаррик Холт клянётся, что этот клинок закаляли в его углях. Те, кто его носит, говорят, что рукоять остаётся тёплой в самый холодный дозор. Огонь вдоль кромок лишь украшение.',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': 'Гребень Шквала',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    'Длинный клинок цвета морской синевы с кромками, яркими, как разбивающаяся волна, грозовой дол с раздвоенной молнией, позолоченная волна над пятой клинка, плавник вдоль одной кромки и гарда из позолоченных бурунов вокруг грозовой жемчужины.',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    'Капитан, ходившая под парусом ради гильдии, привезла этот клинок из шквала, который сломал ей мачту и заставил корабль звенеть, как колокол. Гаррик продаёт его только за печати и предупреждает каждого покупателя, что перед бурей клинок гудит. Молния и морское сияние лишь украшение.',
+  'hudChrome.wocStore.skins.rimelight_staff.name': 'Посох Инейного Света',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    'Светлое древко, окованное серебром и обвитое светящимся инеем, увенчано серебряной лапой, что держит большой кристалл холодного света в короне ледяных осколков; с воротника свисают сосульки.',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    'Зимний дозор Зала Фонаря ходил с такими посохами по горной дороге, зажигая их навершия для путников, заблудившихся в снегу. Гаррик держит один на стойке для тех, у кого есть лишние печати. Иней и его холодный свет лишь украшение.',
+  'hudChrome.wocStore.skins.duskwick_staff.name': 'Посох Сумеречного Фитиля',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    'Две скрученные пряди чёрного дерева, окованные железом, увенчаны открытым железным фонарём, в котором между двумя загнутыми рогами горит фиолетовое сумеречное пламя; с его дна свисают цепи.',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    'Все фонари зала горят ярко, кроме одного. Сумеречное пламя зажгли, чтобы стеречь зал по ночам, и там, где другие дают свет, оно даёт тень; Гаррик сам подрезает его фитиль. Дым и фиолетовое сияние лишь украшение.',
+  'hudChrome.wocStore.collections.lantern_hall': 'Зал Фонаря',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Боевой меч с клеймом гильдии',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     'Клинок из воронёной стали, бронзовая гарда «рыбий хвост», рукоять из кожи, окрашенной в бирюзовый цвет, и небольшое клеймо гильдии.',
@@ -1838,6 +4565,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Выкован из сырого метеоритного металла, пока кратер Mirefen ещё светился. Обломки, «слишком горячие для рук», стали космически-чёрными плечами с созвездиями, а вдоль ложа заключили расплавленно-золотое ядро. Арбалет не заряжают болтом — он создаёт его сам: стрелу звёздного пламени, выпущенную как приговор и падающую как его исполнение. Когда Highwatch боялся, что даже бессмертная корона Nythraxis — не худшее под горами, именно это оружие хотели видеть на стене. Цельтесь точно.',
   'hudChrome.wocStore.seasonOne': 'Сезон 1',
+  'hudChrome.wocStore.membershipPromo.open': 'Членство в магазине WOC',
+  'hudChrome.wocStore.membershipPromo.close': 'Закрыть рекламу членства',
+  'hudChrome.wocStore.membershipPromo.eyebrow': 'Преимущества аккаунта',
+  'hudChrome.wocStore.membershipPromo.title': 'Членство',
+  'hudChrome.wocStore.membershipPromo.cta': 'Вступить',
+  'hudChrome.wocStore.referralPromo.close': 'Закрыть рекламу «Пригласить друга»',
+  'hudChrome.wocStore.referralPromo.eyebrow': 'Приключения вместе',
+  'hudChrome.wocStore.referralPromo.cta': 'Пригласить друзей',
   'hudChrome.wocStore.rarity.uncommon': 'Необычный',
   'hudChrome.wocStore.rarity.rare': 'Редкий',
   'hudChrome.wocStore.rarity.epic': 'Эпический',
@@ -1981,6 +4716,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveRiteUi.hard': 'Сложный',
   'delveUi.object.bell_rope': 'Колокольная Верёвка',
   'editor.topbar.redo': 'Повторить',
+  'editor.objectMove.title': 'Игровой объект',
+  'editor.objectMove.kindFarmBed': 'Грядка',
+  'editor.objectMove.kindPracticeDummy': 'Тренировочный манекен',
+  'editor.objectMove.kindGatherNode': 'Точка сбора',
+  'editor.objectMove.kindDungeonDoor': 'Вход в подземелье',
+  'editor.objectMove.position': 'Позиция: {x}, {z}',
+  'editor.objectMove.moved': 'Перемещён на этой карте.',
+  'editor.objectMove.original': 'На исходном месте.',
+  'editor.objectMove.hint':
+    'Перетащите его или сдвиньте стрелками. Перемещение действует только на этой карте, а объект сохраняет свой идентификатор, поэтому сохранённый прогресс его по-прежнему находит.',
+  'editor.objectMove.reset': 'Вернуть на исходное место',
   'editor.topbar.undo': 'Отменить',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',
   'hudChrome.bags.capacity': '{used}/{total}',
@@ -2068,6 +4814,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
+  'hudChrome.realmMotd.line': 'Сообщение дня: {text}',
+  'hudChrome.realmMotd.updated': 'Сообщение дня обновлено.',
+  'hudChrome.realmMotd.cleared': 'Сообщение дня удалено.',
+  'hudChrome.realmMotd.none': 'Сообщение дня не задано.',
+  'hudChrome.realmMotd.usage':
+    'Использование: /motd "<сообщение>", чтобы задать его, /motd clear, чтобы удалить.',
+  'hudChrome.realmMotd.tooLong': 'Сообщение дня не может быть длиннее {max} символов.',
+  'hudChrome.realmMotd.saveFailed':
+    'Не удалось сохранить сообщение дня: после перезапуска оно будет потеряно.',
   'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
   'hudChrome.readyCheck.ready': 'Готов',
   'hudChrome.readyCheck.notReady': 'Не готов',
@@ -2152,7 +4907,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'Напоминание о списке желаемого',
   'hudChrome.interfaceUnlock.frameNames.minimap': 'Мини-карта',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'Панель стоек',
+  'hudChrome.interfaceUnlock.frameNames.shardpikeBar': 'Панель Осколочной пики',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Игрок',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Полоса ресурса',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Цель',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': 'Группа',
   'hudChrome.interfaceUnlock.frameNames.chat': 'Чат',
@@ -2169,6 +4926,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': 'Трекер деяний',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': 'Трекер вылазки',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': 'Трекер разлома',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': 'Трекер подземелья',
+  'hudChrome.dungeonTracker.complete': 'Пройдено',
   'hudChrome.interfaceUnlock.frameNames.targetDots': 'Эффекты на целях',
   'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
   'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
@@ -2508,12 +5267,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.onlineHeader': 'В сети ({n})',
   'hudChrome.social.offlineHeader': 'Не в сети ({n})',
   'hudChrome.social.hideOffline': 'Скрыть офлайн',
-  'hudChrome.social.presence.label': 'Показывать меня в сети',
-  'hudChrome.social.presence.everyone': 'Всем',
-  'hudChrome.social.presence.friends': 'Только друзьям',
-  'hudChrome.social.presence.none': 'Никому',
-  'hudChrome.social.presence.title':
-    'Кто видит, что вы в сети, в списках друзей и составе гильдии, вместе с вашей зоной и положением на карте. Группа видит вас всегда.',
   'hudChrome.social.hideOfflineTitle': 'Скрыть офлайн участников гильдии',
   'hudChrome.social.billboard.label': 'Доска объявлений гильдии',
   'hudChrome.social.billboard.empty': 'На доске объявлений пока пусто.',
@@ -2570,6 +5323,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetNone': 'Нет подземелий для сброса.',
   'hudChrome.dungeonDifficulty.resetOccupied':
     'Нельзя сбросить подземелья, пока внутри кто-то находится.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Смена сложности поставлена в очередь: внутри подземелья ещё есть игрок или его тело. Изменение применится, когда подземелья освободятся.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Ожидающая смена сложности отменена, поскольку изменились группа или её лидер.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
   'hudChrome.dungeonDifficulty.resetUsage':
@@ -2717,8 +5474,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.buyOwnedAria': 'Купить {item} за {honor}, уже получено',
   'hudChrome.warfareShop.buyConfirmBody':
     'Купить {item} за {honor}? Покупки за честь не подлежат возврату.',
-  'hudChrome.warfareShop.buyConfirmBodyGold':
-    'Купить {item} за {price}? Эта покупка не подлежит возврату.',
   'hudChrome.keybinds.bgFlag': 'Действие с флагом',
   'hudChrome.keybinds.friendlyNameplates': 'Таблички дружественных',
   'hudChrome.pvp.mobileLabel': 'PvP',
@@ -2847,12 +5602,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Книга деяний тоже ведёт счёт вашей репутации: Доверенный у фракции и Чемпион у фракции записываются как отдельные деяния, а Чемпион у всех трёх сразу есть своё деяние. Как и все деяния, они лишь украшение и никогда не сила, а деяния Чемпиона дают титул, который можно носить.',
   'guide.commandsPage.pvp':
     'Флаг мирового PvP: /pvp переключает его, /pvp on и /pvp off задают. Игроки с флагом могут сражаться друг с другом где угодно; отключение занимает 5 минут.',
-  'guide.commandsPage.presence':
-    'Кто видит, что вы в сети, в списках друзей, составе гильдии и /who: /presence everyone (по умолчанию), /presence friends (только игроки из вашего списка друзей) или /presence none. Когда вы скрыты, они не видят вашего статуса, зоны и положения на карте, но шёпот и приглашения до вас доходят; группа видит вас всегда. Просто /presence покажет текущую настройку.',
-  'guide.commandsPage.flair':
-    'Показывает или скрывает вашу роль в Discord для других игроков: цветное имя, метку роли и подтверждённую метку в чате. /flair on показывает её, /flair off скрывает, а просто /flair сообщает текущую настройку. Нужен привязанный аккаунт Discord.',
   'guide.commandsPage.pvpZones':
-    'Флаг мирового PvP: /pvp переключает его, /pvp on и /pvp off включают и выключают. На спорной территории игроки с флагом могут сражаться друг с другом; в святилищах мировой PvP запрещён. Вход в активный круг «Короля горы» поднимает ваш флаг. Отключение занимает 5 минут.',
+    'Флаг мирового PvP: /pvp переключает его, /pvp on и /pvp off задают. Игроки с флагом могут сражаться друг с другом на спорной территории, в святилищах мировые бои не разрешены вовсе, а на территориях свободного боя сражаться можно и с флагом, и без него; отключение занимает 5 минут.',
   'guide.nav.worldPvp': 'Мировое PvP',
   'guide.worldPvpPage.heading': 'Мировое PvP',
   'guide.worldPvpPage.intro':
@@ -2867,27 +5618,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.limitsBody':
     'Повторные победы над одним и тем же игроком приносят всё меньше и вскоре ничего, а счётчик обнуляется с ежедневным сбросом. Цель, намного ниже вас по уровню, не приносит ничего. На полях боя и аренах действуют собственные правила, пока вы внутри, и они платят больше Чести, чем открытый мир, так что мировое PvP является более медленным путём к тому же торговцу.',
   'guide.worldPvpPage.introZones':
-    'PvP в открытом мире добровольное, а правила зависят от территории. На спорной территории поднятый флаг делает врагами других игроков с флагом вне вашей группы или рейда. Опустив флаг, после небольшой задержки вы снова становитесь наблюдателем. Берег Испытаний является единственным святилищем без мирового PvP. Три самые северные зоны используют те же добровольные правила флага, что и остальной мир. Вход в активный круг «Короля горы» автоматически поднимает ваш флаг. Участники вашей группы и рейда нигде не становятся врагами; согильдийцы вне группы могут сражаться с вами на общих основаниях.',
+    'Сражения между игроками в открытом мире доступны только по желанию, и то, что это значит, решает земля у вас под ногами. Поднимите флаг PvP, и каждый игрок с флагом, не состоящий в вашей группе или рейде, станет врагом на спорной территории; опустите его, и через короткое время вы снова станете сторонним наблюдателем. Две зоны являются святилищами, где мировых боёв не бывает совсем, а три самые северные зоны являются территориями свободного боя, где законной целью является каждый присутствующий, с флагом или без. Товарищи по группе и рейду нигде не станут вашими врагами, а согильдийцы вне вашей группы являются законной целью, как и все остальные.',
   'guide.worldPvpPage.zonesHeading': 'Где происходит мировое PvP',
   'guide.worldPvpPage.zonesBody':
-    'Берег Испытаний является единственным святилищем: мировой PvP там запрещён и поднять флаг нельзя. Уже поднятый флаг сохраняется, но прогресс званий за время игры приостанавливается до выхода. Во всех остальных местах, включая зоны Земли Драконов, Морозный Предел и Янтарная Падь, сражаться могут только игроки с флагом. Вход в активный круг «Короля горы» автоматически поднимает флаг, если выполнено обычное требование к уровню. Предупредительный круг флаг не поднимает. После выхода из активного круга флаг сохраняется; /pvp off запускает обычный пятиминутный отсчёт, который не может завершиться внутри активной горы или во время боя.',
+    'В мире есть три вида земли. Берег Испытаний и Истврукская долина являются святилищами: мирового PvP там не бывает совсем, с флагом или без, так что нового персонажа никогда не вызовут на бой раньше, чем он узнает, что такое флаг. Большая часть мира является спорной территорией, где правило флага, описанное выше, и есть вся история. Земли Драконов, Морозный Предел и Янтарная Падь являются территориями свободного боя: каждый, кто в них стоит, может атаковать любого другого, кто в них стоит, с флагом или без, и вам сообщают и при входе, и при выходе. Атака игрока без флага там поднимает ваш собственный флаг, так что риск в итоге всегда несёт нападающий. Удар по игроку, у которого флаг уже поднят, не поднимает его никогда, а значит, защищать себя или защищать того, у кого флага нет, не стоит вам ничего.',
   'guide.worldPvpPage.flagBodyAid':
     'Введите /pvp в чате или откройте окно PvP клавишей G и перейдите на вкладку мирового PvP, где также показаны ваш счёт и ставки. Поднятие флага происходит мгновенно после начальных уровней. Опускание запускает отсчёт в несколько минут, и флаг не опустится, пока вы ещё сражаетесь, так что отключение никогда не станет способом сбежать из боя, который вы начали. Исцеление, щит или усиление игрока с флагом, находящегося в бою, поднимает и ваш флаг, так что никто не поддерживает бойца, не нося флага сам; помощь игроку без флага не поднимает ничего.',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'Когда игрока с флагом побеждает другой игрок, проигравший платит небольшую долю золота из своего кошелька (с умеренным пределом), а победители получают Честь на PvP-снаряжение. Игроков без флага нельзя атаковать в открытом мире. Всё это делят все, кто помог: нанёсший последний удар, те, кто незадолго до этого наносил урон цели, и лекари, державшие этих бойцов на ногах. Чистый бой один на один приносит всю награду; группа делит её.',
+    'Когда игрока с флагом побеждает другой игрок, проигравший платит небольшую долю золота из своего кошелька (с умеренным пределом), а победители получают Честь на PvP-снаряжение. Игрок, у которого флага не было, не платит золота вовсе, даже когда падает в зоне свободного боя. Всё это делят все, кто помог: нанёсший последний удар, те, кто незадолго до этого наносил урон цели, и лекари, державшие этих бойцов на ногах. Чистый бой один на один приносит всю награду; группа делит её.',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'Боец без флага золота тоже не получает: оно переходит только между двумя игроками с флагом, но Честь получают все, кто помог.',
   'guide.worldPvpPage.limitsBodyHour':
     'Повторные победы над одним и тем же игроком приносят всё меньше и вскоре ничего, а ваш счёт против этого игрока начинается заново лишь примерно через час после первого из таких убийств, так что караулить одну жертву никогда не стоит ожидания. Цель, намного ниже вас по уровню, не приносит ничего. На полях боя и аренах действуют собственные правила, пока вы внутри, и они платят больше Чести, чем открытый мир, так что мировое PvP является более медленным путём к тому же торговцу.',
   'guide.worldPvpPage.hillBodyRamp':
-    'Каждые два часа гора появляется в одной из зон: Земли Драконов, Морозный Предел или Янтарная Падь. За пятнадцать минут весь мир получает предупреждение, а на открытой местности отмечается круг. Гора активна тридцать минут. Вход в активный круг поднимает флаг мирового PvP по обычным правилам уровня, в том числе у участников рейда. Группа с наибольшим числом подходящих игроков внутри захватывает гору после минуты непрерывного большинства. Одиночка считается группой из одного человека, но участники рейда и игроки ниже требуемого для PvP уровня не могут захватывать гору или получать за неё Честь. Каждый участник удерживающей группы внутри получает Честь со всё большей скоростью. Выплаты и их рост ускорены, сохраняя общее количество Чести прежнего сорокапятиминутного события. При смене владельца рост начинается заново. Выход из круга не снимает флаг; /pvp off использует обычную задержку в пять минут и не может завершиться внутри активной горы или в бою. Полоса горы показывает владельца, численность и прогресс захвата; /hill сообщает местоположение.',
-  'guide.worldPvpPage.hillBodyRanked':
-    'Каждые два часа гора появляется в одной из зон: Земли Драконов, Морозный Предел или Янтарная Падь. За пятнадцать минут весь мир получает предупреждение, а на открытой местности отмечается круг. Гора активна тридцать минут. Вход в активный круг поднимает флаг мирового PvP по обычным правилам уровня, в том числе у участников рейда. Группа с наибольшим числом подходящих игроков внутри захватывает гору после минуты непрерывного большинства. Одиночка считается группой из одного человека, но участники рейда и игроки ниже требуемого для PvP уровня не могут захватывать гору или получать за неё Честь. Каждый участник удерживающей группы внутри получает Честь со всё большей скоростью; при смене владельца рост начинается заново. Пока гора активна, каждые пять минут весь мир получает напоминание о её местоположении и рейтинг групп по времени удержания. Когда гора исчезает, если группа с наибольшим суммарным временем удержания удерживала гору в сумме не менее десяти минут, игроки этой группы, которые простояли в круге не менее минуты во время её удержания и всё ещё состоят в группе, получают одну победу в PvP-прогрессе еженедельного хранилища. Выход из круга не снимает флаг; /pvp off использует обычную задержку в пять минут и не может завершиться внутри активной горы или в бою. Полоса горы показывает владельца, численность и прогресс захвата; /hill сообщает местоположение.',
+    'Раз в три часа, в момент, который никто не может предсказать, всему миру объявляют, что через пятнадцать минут в одной из зон свободного боя поднимется холм, и круг, где он встанет, отмечается на открытой местности. Поднявшись, холм стоит сорок пять минут, а затем исчезает. Холм оспаривает та группа, у которой внутри круга стоит больше всего игроков, и после минуты непрерывного большинства холм становится её; игрок в одиночку считается группой из одного человека, а участники рейда не учитываются вовсе. Пока группа удерживает холм, каждый её участник внутри круга каждую минуту получает Честь, и чем дольше холм удерживает одна и та же группа, тем больше приносит каждая минута: полная группа, без боя удерживающая холм всё время, пока он стоит, получает примерно столько же, сколько три победы на поле боя. Когда холм переходит к другим, новые владельцы начинают отсчёт заново. Полоса над полем показывает, кто удерживает холм, ваши силы против чужих и отсчёт захвата; команда /hill в чате подскажет, где он стоит.',
+  'guide.worldPvpPage.hillBodyPause':
+    'Раз в три часа холм появляется в одной из зон свободного боя. Пока он стоит, каждые пять минут всему миру сообщают его местоположение и рейтинг групп по времени удержания. Когда холм исчезает, если группа с самым долгим суммарным удержанием удерживала его не меньше десяти минут, игроки этой группы получают одну победу в PvP-прогресс еженедельного хранилища, если они простояли в круге не меньше минуты во время удержания своей группы и всё ещё состоят в этой группе в момент окончания.',
   'guide.worldPvpPage.limitsBodyRaids':
     'Повторные победы над одним и тем же игроком приносят всё меньше и вскоре ничего, а ваш счёт против этого игрока начинается заново лишь примерно через час после первого из таких убийств, так что караулить одну жертву никогда не стоит ожидания. Цель, намного ниже вас по уровню, не приносит ничего. На полях боя и аренах действуют собственные правила, пока вы внутри, и они платят больше Чести, чем открытый мир, так что мировое PvP является более медленным путём к тому же торговцу. Рейды ничего не получают за убийства в мире: участник рейда не получает ни Чести, ни золота и не уменьшает долю остальных, так что сражайтесь группой, чтобы получать награду.',
   'guide.worldPvpPage.hillHeading': 'Король горы',
   'guide.worldPvpPage.hillBody':
-    'Каждые два часа гора появляется в одной из зон: Земли Драконов, Морозный Предел или Янтарная Падь. За пятнадцать минут весь мир получает предупреждение, а на открытой местности отмечается круг. Гора активна тридцать минут. Вход в активный круг поднимает флаг мирового PvP по обычным правилам уровня, в том числе у участников рейда. Группа с наибольшим числом подходящих игроков внутри захватывает гору после минуты непрерывного большинства. Одиночка считается группой из одного человека, но участники рейда и игроки ниже требуемого для PvP уровня не могут захватывать гору или получать за неё Честь. Каждый участник удерживающей группы внутри получает Честь со всё большей скоростью. Выплаты и их рост ускорены, сохраняя общее количество Чести прежнего сорокапятиминутного события. При смене владельца рост начинается заново. Выход из круга не снимает флаг; /pvp off использует обычную задержку в пять минут и не может завершиться внутри активной горы или в бою. Полоса горы показывает владельца, численность и прогресс захвата; /hill сообщает местоположение.',
+    'Раз в три часа, в момент, который никто не может предсказать, всему миру объявляют, что через пятнадцать минут в одной из зон свободного боя поднимется холм, и круг, где он встанет, отмечается на открытой местности. Поднявшись, холм стоит сорок пять минут, а затем исчезает. Холм оспаривает та группа, у которой внутри круга стоит больше всего игроков, и после минуты непрерывного большинства холм становится её; игрок в одиночку считается группой из одного человека, а участники рейда не учитываются вовсе. Пока группа удерживает холм, каждый её участник внутри круга каждую минуту получает немного Чести, так что полная группа, без боя удерживающая холм всё время, пока он стоит, получает чуть меньше, чем приносит одна победа на поле боя. Полоса над полем показывает, кто удерживает холм, ваши силы против чужих и отсчёт захвата; команда /hill в чате подскажет, где он стоит.',
   'guide.thornhollowPage.heading': 'Терновая Лощина',
   'guide.thornhollowPage.intro':
     'Рейтинговое поле боя 5 на 5 за захват флага в обнесённой стеной лощине среди старого леса под Терновым пиком, где две разрушенные крепости смотрят друг на друга вдоль ущелья, а между ними лежит двор постарше, так и не доставшийся никому. Две команды по пять, две крепости, одна цель: унести чужое знамя домой раньше, чем унесут ваше.',
@@ -2915,6 +5666,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': 'Защита',
   'hudChrome.charSheet.spell': 'Заклинание',
   'hudChrome.charSheet.ratings': 'Рейтинги',
+  'hudChrome.charSheet.gearScore': 'Рейтинг экипировки',
   'hudChrome.charSheet.playtimeLabel': 'Время в игре',
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Меньше минуты',
@@ -3128,6 +5880,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': 'Сенсорное управление',
   'hudChrome.options.gfxCustomNote':
     'Изменение любого регулятора переключает пресет качества на «Расширенное»: собственный набор на основе базы «Высокое», начинающийся с уровней, показанных для текущего пресета.',
+  'hudChrome.options.ambienceVolume': 'Громкость окружения',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
@@ -3137,6 +5890,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.lockCursorOnRotate': 'Блокировать курсор при вращении',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.',
+  'hudChrome.options.rawMouseInput': 'Необработанный ввод мыши',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Считывает движение мыши напрямую с устройства, пока вы вращаете камеру перетаскиванием, минуя системные скорость и ускорение указателя, чтобы поворот был ровнее. Отключите, чтобы использовать системные настройки мыши. Работает только при включённой опции «Блокировать курсор при вращении» и поддерживается не во всех браузерах и системах.',
   'hudChrome.options.showWalletOnCharacterScreen': 'Показывать кошелек на экране персонажей',
   'hudChrome.options.showPlaytime': 'Показывать время в игре на экране персонажей',
   'hudChrome.options.showWalletOnPlayerCard': 'Показывать кошелек на карточке игрока',
@@ -3194,6 +5950,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': 'Подтверждать продажу от качества',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     'Предметы ниже этого качества продаются одним щелчком; ошибочно проданный предмет можно выкупить у торговца.',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Предметы ниже этого качества продаются одним щелчком. Ошибочно проданный предмет можно выкупить у торговца, кроме неподписанных серых предметов.',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showThirdActionBar': 'Показывать третью панель действий',
   'hudChrome.options.hideUnusedActionSlots': 'Скрыть неиспользуемые ячейки действий',
@@ -3375,10 +6133,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'footer.privacy': 'Политика конфиденциальности',
   'footer.discordLabel': 'Присоединиться к Discord',
   'footer.levyStreet': 'Levy Street',
-  'footer.guidesLabel': 'Гайды для игроков',
-  'footer.guideGamesLikeWow': 'Игры, похожие на WoW',
-  'footer.guideBrowser': 'Браузерные MMORPG',
-  'footer.guideGamesLikeDiablo': 'Игры, похожие на Diablo',
   'highscores.title': 'Таблица рекордов',
   'highscores.desc': 'Отслеживайте величайших чемпионов игрового мира и сравнивайте свои успехи.',
   'wiki.title': 'Вики и руководство',
@@ -3904,6 +6658,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.otherStandaloneDetail': 'Держите устройство в полноэкранном альбомном режиме.',
   'mobilePreflight.otherInstallDetail':
     'Установите эту страницу или добавьте ее на главный экран для лучшего мобильного полноэкранного опыта.',
+  'graphicsPrompt.title': 'Выберите графику',
+  'graphicsPrompt.intro':
+    'Выберите графический пресет для этого устройства. Низкие пресеты работают плавнее, высокие выглядят богаче.',
+  'graphicsPrompt.autoDesc': 'Подбирает пресет под это устройство. Определено: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Максимальная плавность. Лучше всего для телефонов, планшетов и старой или встроенной графики.',
+  'graphicsPrompt.mediumDesc':
+    'Баланс качества и производительности. Подходит большинству ноутбуков.',
+  'graphicsPrompt.highDesc': 'Больше деталей и насыщеннее окружение. Для дискретной видеокарты.',
+  'graphicsPrompt.ultraDesc': 'Самый насыщенный фиксированный пресет. Для мощной видеокарты.',
+  'graphicsPrompt.changeLater':
+    'Это можно изменить в любой момент в настройках, в разделе «Качество графики».',
+  'graphicsPrompt.confirm': 'Продолжить',
   'serverUnavailable.title': 'World of ClaudeCraft - мир недоступен',
   'serverUnavailable.logoAlt': 'World of ClaudeCraft',
   'serverUnavailable.eyebrow': 'Технические работы',
@@ -4179,6 +6946,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.respawnKeeperToll':
     'Целитель душ воскресил вас, но вы ослабли: болезнь воскрешения снижает все ваши характеристики, пока не пройдёт.',
+  'hud.system.moonbridgeBanner': 'Лунный мост возведён',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
   'hud.system.playerNotNearby': 'Этого игрока нет рядом.',
@@ -4318,6 +7086,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passive': 'Пассивный',
   'hud.pet.defensive': 'Защитный',
   'hud.pet.aggressive': 'Агрессивный',
+  'hud.pet.assist': 'Помощь',
   'hud.pet.petAttackTitle': 'Атака питомца',
   'hud.pet.petAttackDesc': 'Прикажите питомцу атаковать вашу текущую враждебную цель.',
   'hud.pet.petTauntTitle': 'Провокация питомца',
@@ -4327,10 +7096,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'Нажмите, затем выберите пищу в сумках, чтобы кормить и исцелять питомца 5 секунд.',
   'hud.pet.stanceTitle': 'Стойка питомца',
-  'hud.pet.stanceDesc': 'Нажмите, чтобы выбрать Пассивный, Защитный или Агрессивный.',
   'hud.pet.passiveDesc': 'Атакует только по вашей команде.',
   'hud.pet.defensiveDesc': 'Атакует врагов, которые ранят вас или питомца.',
   'hud.pet.aggressiveDesc': 'Атакует ближайших враждебных врагов.',
+  'hud.pet.assistDesc':
+    'Атакует только вашу текущую цель после того, как вы применили к ней способность. Игнорирует врагов, которые атакуют вас.',
   'hud.pet.rename': 'Переименовать питомца',
   'hud.pet.revive': 'Подлатать',
   'hud.pet.abandon': 'Оставить питомца',
@@ -4434,7 +7204,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Включает или выключает автоатаку по вашей цели. Щелчок правой кнопкой по врагу также начинает атаку.',
   'abilityUi.actionBar.attackRemoveHint':
     'Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.',
-  'abilityUi.actionBar.moveHint': 'Shift-перетаскивание, чтобы переместить',
   'abilityUi.actionBar.emptySlot': 'Пустая ячейка',
   'abilityUi.actionBar.slotAria': 'Ячейка действия {slot}: {ability}',
   'abilityUi.actionBar.emptySlotAria': 'Ячейка действия {slot}: пусто',
@@ -4548,6 +7317,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.detail.rewards': 'Награды',
   'questUi.detail.xpReward': '{xp} опыта',
   'questUi.detail.itemReward': 'Предметная награда:',
+  'questUi.detail.chooseReward': 'Выберите награду:',
+  'questUi.detail.rewardChoices': 'Вы сможете выбрать одну из этих наград:',
   'questUi.detail.objectiveProgress': '{label}: {current}/{total}',
   'questUi.detail.requiresLevel': 'Требуется уровень {level}',
   'questUi.worldQuest.title': '{zone}: {target}',
@@ -4558,6 +7329,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': 'Активное локальное задание',
   'questUi.worldQuest.expiresIn': 'Истекает через {time}',
   'questUi.worldQuest.mineOre': 'Добыть медную руду',
+  'questUi.worldQuest.mineMaterial': 'Добудьте {name}',
   'questUi.worldQuest.recoverObject': 'Вернуть: {name}',
   'questUi.worldQuest.redirectLeyBeam': 'Направить силовой луч',
   'questUi.worldQuest.puzzleTitle': 'Настройка силового луча',
@@ -4626,6 +7398,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Это задание не завершено.',
   'questUi.errors.giverMissing': 'Выдавший это задание не рядом.',
   'questUi.errors.turnInMissing': 'Место сдачи этого задания не рядом.',
+  'questUi.errors.rewardNotOffered': 'Эта награда не предлагается.',
   'questUi.errors.tooFar': 'Слишком далеко.',
   'questUi.errors.escortAway':
     'Тот, кого вы должны сопроводить, сейчас не на месте. Он скоро туда вернётся.',
@@ -4703,7 +7476,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.dps': '({dps} урона в секунду)',
   'itemUi.tooltip.armorStat': '{value} брони',
   'itemUi.tooltip.stat': '+{value} {stat}',
-  'itemUi.tooltip.warfareMainHandOnly': 'Боевая мощь учитывается только в правой руке.',
   'itemUi.tooltip.useFood':
     'Использование: восстанавливает {amount} здоровья за {seconds} сек. Нужно оставаться сидя во время еды.',
   'itemUi.tooltip.useDrink':
@@ -4795,6 +7567,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': 'Продать хлам',
   'itemUi.vendor.sellJunkAria': 'Продать весь хлам за {price}',
   'itemUi.vendor.sellJunkHint': 'Продает все серые предметы в сумках, кроме предметов заданий.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Неподписанные серые предметы не попадают в список выкупа, поэтому их продажу нельзя отменить.',
   'itemUi.market.title': 'Мировой рынок',
   'itemUi.market.subtitle': 'биржа Торговца',
   'itemUi.market.close': 'Закрыть рынок',
@@ -4892,7 +7666,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': 'Ничего не ждет. Выручка и истекшие лоты собираются здесь.',
   'itemUi.market.collectNote': 'Выручка и возвращенные товары, которые Торговец хранит для вас.',
   'itemUi.market.saleProceeds': 'Выручка',
-  'itemUi.market.saleOlder': 'Ещё {count} более ранних продаж, включены в общую сумму.',
+  'itemUi.market.saleOlder': 'Ещё {count} более ранних продаж, не показанных в списке.',
   'itemUi.market.collectAll': 'Забрать все',
   'itemUi.market.history': 'История',
   'itemUi.market.historyEmpty':
@@ -5070,13 +7844,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sprint.description': 'Повышает скорость передвижения на 70% на 15 сек.',
   'entities.abilities.kidney_shot.name': 'Подлый удар',
   'entities.abilities.kidney_shot.description':
-    'Завершающий приём, оглушающий цель на 1 сек. плюс 1 сек. за каждую серию приёмов (5 серий приёмов: 6 сек.).',
+    'Завершающий приём, оглушающий цель на 2 сек. плюс 1 сек. за каждую серию приёмов (5 серий приёмов: 7 сек.).',
   'entities.abilities.ambush.name': 'Удар скрытня',
   'entities.abilities.ambush.description':
     'Нападает из засады, нанося 250% урона оружием плюс {damage}. Нужно быть в незаметности и позади цели. Требуется кинжал. Дает 1 прием серии.',
   'entities.abilities.stealth.name': 'Сумеречная завеса',
   'entities.abilities.stealth.description':
-    'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Сумеречную завесу. Примените снова, чтобы выйти.',
+    'Скрывает вас в тенях: враги почти не замечают вас, а вы двигаетесь с полной скоростью. Атака или получение урона прерывает Сумеречную завесу. Примените снова, чтобы выйти.',
   'entities.abilities.adrenaline_rush.name': 'Ускоренная кровь',
   'entities.abilities.adrenaline_rush.description':
     'Кровь закипает, мгновенно восстанавливая 60 энергии.',
@@ -5102,7 +7876,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Завершающий приём, ранящий цель: она кровоточит каждые 2 сек., в течение 6 сек. плюс 2 сек. за каждую серию приёмов (5 серий приёмов: 16 сек. и {damage} суммарного урона).',
   'entities.abilities.vanish.name': 'Дымный шаг',
   'entities.abilities.vanish.description':
-    'Исчезает из виду, входя в Сумеречную завесу даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек.',
+    'Исчезает из виду, входя в Сумеречную завесу даже в бою. Пока вы скрыты, вы двигаетесь с полной скоростью. Длится до 10 сек.',
   'entities.abilities.instant_poison.name': 'Укус гадюки',
   'entities.abilities.instant_poison.description':
     'Покрывает ваше оружие ядом на 30 мин, заставляя каждый ваш удар в ближнем бою наносить {damage} дополнительных ед. урона от сил природы.',
@@ -5185,7 +7959,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы принимаете облик куницы, повышая свой шанс уклонения на 8% на 30 мин.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Облик скакуна',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Вы принимаете Облик скакуна, повышая свою скорость передвижения на 30% на 30 мин. Пока эффект активен, получение урона дезориентирует вас, вдвое снижая скорость передвижения на 4 сек (каждый удар обновляет дезориентацию).',
+    'Вы принимаете Облик скакуна, повышая свою скорость передвижения на 30% на 30 мин. Пока эффект активен, получение урона дезориентирует вас, вдвое снижая скорость передвижения на 2 сек (каждый удар обновляет дезориентацию).',
   'entities.abilities.aimed_shot.name': 'Долгий натяг',
   'entities.abilities.aimed_shot.description':
     'Стреляет в цель, нанося {damage} физического урона. Урон растёт с силой атаки в дальнем бою.',
@@ -5242,7 +8016,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Окружает вас молниями на 10 мин. Следующие 3 атаки в ближнем бою по вам наносят атакующему {buff} урона от природы, не чаще раза в 5 сек.',
   'entities.abilities.flame_shock.name': 'Пепельный толчок',
   'entities.abilities.flame_shock.description':
-    'Наносит {damage} урона от огня, затем {overTime} урона от огня за 12 сек. Первое попадание растёт с силой заклинаний.',
+    'Наносит {damage} урона от огня, затем {overTime} урона от огня за {duration} сек. Первое попадание растёт с силой заклинаний.',
   'entities.abilities.flametongue_weapon.name': 'Оружие пламенного клейма',
   'entities.abilities.flametongue_weapon.description':
     'Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона от огня.',
@@ -5292,13 +8066,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы.',
   'entities.abilities.healing_touch.name': 'Дикое заживление',
   'entities.abilities.healing_touch.description': 'Исцеляет дружественную цель на {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Каждое завершённое применение добавляет 1 стадию Зелени (максимум 3). Накопленная Зелень сокращает время применения: 2,2 сек. при 1 стадии, 1,9 сек. при 2 и 1,5 сек. при 3. Благодать природы делает его мгновенным, бесплатным и на 25% сильнее.',
   'entities.abilities.mark_of_the_wild.name': 'Оберег дикой природы',
   'entities.abilities.mark_of_the_wild.description':
     'Накладывает Оберег дикой природы на дружественную цель, повышая броню на {buff} на 30 мин.',
   'entities.abilities.moonfire.name': 'Лунная буря',
   'entities.abilities.moonfire.description':
     'Сжигает врага лунным огнем, нанося {damage} ед. урона от тайной магии и периодический урон.',
-  'entities.abilities.rejuvenation.name': 'Дикий расцвет',
+  'entities.abilities.rejuvenation.name': 'Спороисцеление',
   'entities.abilities.rejuvenation.description': 'Исцеляет цель на {damage} за 12 сек.',
   'entities.abilities.thorns.name': 'Терновая защита',
   'entities.abilities.thorns.description':
@@ -5308,7 +8084,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оплетает цель корнями на месте на срок до 12 сек.',
   'entities.abilities.bear_form.name': 'Облик бурого',
   'entities.abilities.bear_form.description':
-    'Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Смена облика также даёт эффект «Стремительная поступь» — краткий всплеск скорости передвижения. Примените снова, чтобы вернуться к облику заклинателя.',
+    'Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Вы атакуете вдвое быстрее, нанося вдвое меньше урона за удар, и каждый удар накапливает вдвое больше ярости. Смена облика также даёт эффект «Стремительная поступь» — краткий всплеск скорости передвижения. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
@@ -5320,10 +8096,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Рычит на цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек. Только в облике бурого.',
   'entities.abilities.cat_form.name': 'Облик кота',
   'entities.abilities.cat_form.description':
-    'Превращает вас в волка: ловкость растёт с вашим уровнем, сила атаки +8 плюс 2 за уровень, ваши атаки тратят энергию и серии приёмов, и вы создаёте на 29% меньше угрозы. Превращение в любой облик даёт Иноходь: 60% скорости передвижения на 3 сек., раз в 20 сек. Примените снова, чтобы вернуться в облик заклинателя.',
+    'Примите облик кота: ловкость растёт с уровнем, сила атаки +8 и ещё 2 за уровень, атаки используют энергию и серии приёмов, скорость движения выше на 15%, угроза ниже на 29%. Любая смена облика даёт эффект «Стремительная поступь», краткое ускорение. Повторное применение возвращает облик заклинателя.',
   'entities.abilities.claw.name': 'Рвущий коготь',
   'entities.abilities.claw.description':
     'Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике кота.',
+  'entities.abilities.scratch.name': 'Царапание',
+  'entities.abilities.scratch.description':
+    'Царапает ближайшие цели в пределах 6 м, нанося урон оружием плюс {damage}. Дает 1 прием серии за каждую пораженную цель. Раскрывает врагов в незаметности в зоне удара. Только в облике кота.',
   'entities.abilities.ferocious_bite.name': 'Кровавый укус',
   'entities.abilities.ferocious_bite.description':
     'Завершающий прием, наносящий {damage}. Только в облике кота.',
@@ -5332,7 +8111,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Размахивает по ближайшим врагам, нанося {damage} ед. урона. Создает дополнительную угрозу. Только в облике бурого.',
   'entities.abilities.regrowth.name': 'Второй расцвет',
   'entities.abilities.regrowth.description':
-    'Исцеляет дружественную цель на {damage} и дополнительно в течение 21 сек.',
+    'Исцеляет дружественную цель на {damage} и дополнительно в течение 15 сек. Если эффект действует до конца, он снова исцеляет цель на ту же величину, что и первоначальное исцеление.',
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
@@ -5357,19 +8136,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description': 'Снижает броню цели на {damage}% на 40 сек.',
   'entities.abilities.hibernate.name': 'Дремота',
   'entities.abilities.hibernate.description':
-    'Погружает цель в глубокий сон на срок до 8 сек. Любой урон пробуждает ее.',
+    'Погружает цель в глубокий сон на срок до 8 сек. Любой урон пробуждает её. Против игроков каждое повторение в течение 18 сек. длится вдвое меньше предыдущего, а четвёртое не действует.',
   'entities.abilities.dash.name': 'Рывок',
   'entities.abilities.dash.description':
-    'Рывок вперед, повышающий скорость передвижения на 50% на 15 сек. Только в облике кота.',
+    'Если вы ещё не в Облике кота, примите его, затем ускорьтесь на 50% на 15 сек. Доступно в любом облике. Мгновенно и не вызывает глобального восстановления.',
   'entities.abilities.pounce.name': 'Крадущийся удар',
   'entities.abilities.lunge.description':
-    'Бросок на врага на расстоянии до 12 м, наносящий 60% урона от оружия и дающий 1 очко серии приёмов. Только в облике волка.',
+    'Бросок на врага на расстоянии до 12 м, наносящий 60% урона от оружия и дающий 1 очко серии приёмов. Только в облике кота.',
   'entities.abilities.lunge.name': 'Выпад',
   'entities.abilities.hamstring_bite.description':
-    'Завершающий приём, оглушающий цель на 1 сек. плюс 1 сек. за каждую серию приёмов (5 серий приёмов: 6 сек.). Только в облике волка.',
+    'Завершающий приём, оглушающий цель на 1 сек. плюс 1 сек. за каждую серию приёмов (5 серий приёмов: 6 сек.). Только в облике кота.',
   'entities.abilities.hamstring_bite.name': 'Повал',
   'entities.abilities.pounce.description':
-    'Открывающая атака из скрытности, оглушающая цель на 2 сек. Дает 1 прием серии. Только в облике волка. Вне скрытности эта кнопка становится Выпадом.',
+    'Открывающая атака из скрытности, оглушающая цель на 2 сек. Дает 1 прием серии. Только в облике кота. Вне скрытности эта кнопка становится Выпадом.',
   'entities.abilities.insect_swarm.name': 'Жалящий рой',
   'entities.abilities.insect_swarm.description':
     'Враг атакован роем насекомых и получает {damage} ед. урона от сил Природы в течение 12 сек.',
@@ -5378,7 +8157,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенно восстанавливает {rage} ед. энергии и повышает силу атаки на {buff} на {duration} сек. Только в облике кота.',
   'entities.abilities.rip.name': 'Кровавый разлом',
   'entities.abilities.rip.description':
-    'Завершающий приём, заставляющий цель кровоточить каждые 2 сек. в течение 24 сек.: 36 урона плюс 24 за каждую потраченную серию приёмов (5 серий приёмов: {damage} суммарно). Только в облике кота.',
+    'Завершающий приём, вызывающий кровотечение каждые 2 сек. в течение 24 сек.: 72 урона плюс 48 за каждый потраченный приём серии (5 приёмов: всего {damage}). Только в Облике кота.',
   'entities.abilities.mortal_strike.name': 'Калечащий удар',
   'entities.abilities.mortal_strike.description':
     'Жестокий удар, наносящий урон оружием плюс {damage}. (ключевая способность ветки «Оружие»)',
@@ -5417,19 +8196,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Подчиняет вашей воле Духорождённого, элитного демона, который издалека обрушивает тяжёлый урон от Тьмы. Долгое время восстановления сдерживает его разрушительную мощь. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
   'entities.abilities.bear_charge.name': 'Натиск бурого',
   'entities.abilities.bear_charge.description':
-    'Бросок на врага, дающий 9 единиц ярости и оглушающий его на 1 сек. В течение 3 сек. после этого Облик волка не стоит маны и пригвождает цель, замедляя её на 50% на 4 сек. Дальность 8-25 м. Только в облике бурого.',
+    'Бросок на врага, дающий 9 единиц ярости и оглушающий его на 1 сек. В течение 3 сек. после этого Облик кота не стоит маны и пригвождает цель, замедляя её на 50% на 4 сек. Дальность 8-25 м. Только в облике бурого.',
   'entities.abilities.demoralizing_roar.name': 'Трусливый рёв',
   'entities.abilities.demoralizing_roar.description':
     'Деморализует врагов поблизости, снижая их силу атаки на 20 на 20 сек. Только в облике бурого.',
   'entities.abilities.prowl.name': 'Скрадывание',
   'entities.abilities.prowl.description':
-    'Переход в скрытность в облике волка. Нельзя использовать в бою.',
+    'Переход в скрытность в облике кота. Нельзя использовать в бою.',
   'entities.abilities.rake.name': 'Свежевание',
   'entities.abilities.rake.description':
-    'Полосует врага на урон оружия плюс {damage} и вызывает кровотечение на 18 сек. Даёт 1 серию приёмов. Только в облике кота.',
+    'Полосует врага на урон оружия плюс {damage} и {overTime} урона от кровотечения за 18 сек. Даёт 1 серию приёмов. Только в облике кота.',
   'entities.abilities.revive_pet.name': 'Подлатать',
   'entities.abilities.revive_pet.description':
-    'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
+    'Подлечивает питомца: если он жив, восстанавливает ему здоровье за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
+  'entities.abilities.tactical_camo.name': 'Тактический камуфляж',
+  'entities.abilities.tactical_camo.description':
+    'Вы сливаетесь с окружением: враги почти не замечают вас, а скорость передвижения составляет 80%. Атака или получение урона снимает Тактический камуфляж. Примените повторно, чтобы выйти. (Полевая выучка)',
+  'entities.abilities.play_dead.name': 'Притвориться мёртвым',
+  'entities.abilities.play_dead.description':
+    'Вы падаете на землю и выглядите мёртвым: всем видно, что ваше здоровье и запас концентрации пусты. Враги забывают о вас, а вражеские игроки, выбравшие вас целью, теряют цель. Движение, атака или другая способность прерывают эффект. Если применить способность в движении, у вас есть 1 сек., чтобы остановиться, иначе движение прервёт эффект. Примените повторно, чтобы встать.',
   'entities.abilities.holy_shock.name': 'Разряд Света',
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
@@ -5456,10 +8241,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
   'entities.abilities.cold_blood.name': 'Хладнокровие',
   'entities.abilities.cold_blood.description':
-    'Сосредоточивает убийственное намерение, чтобы следующая атака стала критической. (знаковое умение Ликвидации)',
+    'Сосредоточивает убийственное намерение, чтобы следующие 5 атак стали критическими. (знаковое умение Ликвидации)',
   'entities.abilities.blade_flurry.name': 'Шквал клинков',
   'entities.abilities.blade_flurry.description':
-    'Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)',
+    'Обрушивает шквал клинков, повышая скорость атаки на 20% на 30 сек. (знаковое умение Боя)',
   'entities.abilities.hemorrhage.name': 'Кровоизлияние',
   'entities.abilities.hemorrhage.description':
     'Бьёт врага на урон оружия плюс {damage}, вызывает кровотечение на 12 сек. и повышает получаемый уроном от кровотечения на 40%. Даёт 1 серию приёмов. Каждое 2-е применение добавляет 1 Сумрак (максимум 3). (знаковое умение Скрытности)',
@@ -5489,7 +8274,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Высвобождает первобытную силу. В облике кота скорость восстановления энергии повышается на 100% на 10 сек. В облике бурого мгновенно дает 50 ед. ярости. (знаковое умение Силы зверя)',
   'entities.abilities.swiftmend.name': 'Быстрое восстановление',
   'entities.abilities.swiftmend.description':
-    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Посевы Дикого расцвета и Второго расцвета добавляют Зелень; при 5 Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
+    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Каждое применение Спороисцеления, Второго расцвета и Дикого заживления добавляет 1 стадию Зелени; при 3 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Спороисцеление и Второй расцвет накапливают Зелень; при 5 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
   'entities.abilities.crusader_strike.name': 'Удар воина Света',
   'entities.abilities.crusader_strike.description':
     'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
@@ -5797,6 +8584,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': 'Караван лекарств Ивовой Топи',
   'entities.mobs.frostveil_supply_caravan.name': 'Караван припасов Морозного Предела',
   'entities.mobs.restless_bones.name': 'Беспокойные кости',
+  'entities.mobs.marrow_restless_bones.name': 'Беспокойные кости',
   'entities.mobs.gorrak.name': 'Горрак Безжалостный',
   'entities.mobs.mire_prowler.name': 'Болотный хищник',
   'entities.mobs.deepfen_murloc.name': 'Глубинный щелкун',
@@ -5848,6 +8636,36 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.drowned_thrall.name': 'Утопший раб',
   'entities.mobs.knight_commander_olen.name': 'Рыцарь-командор Олен',
   'entities.mobs.vael_the_mistcaller.name': 'Ваэль Вязатель Тумана',
+  'entities.mobs.drowned_watchman.name': 'Утонувший дозорный',
+  'entities.mobs.fogbound_arbalest.name': 'Скованный туманом арбалетчик',
+  'entities.mobs.barnacle_crawler.name': 'Матрос, связанный с остовом',
+  'entities.mobs.bastion_warhound.name': 'Боевой пёс бастиона',
+  'entities.mobs.mistweaver.name': 'Певчий тумана',
+  'entities.mobs.drowned_sergeant.name': 'Утонувший сержант',
+  'entities.mobs.shackled_prisoner.name': 'Закованный узник',
+  'entities.mobs.gaol_turnkey.name': 'Тюремный ключник',
+  'entities.mobs.turretback_hermit.name': 'Капитан затонувшего корабля',
+  'entities.mobs.vael_fog_shade.name': 'Ваэль Вязатель Тумана',
+  'entities.mobs.gaoler_ossick.name': 'Тюремщик Оссик',
+  'entities.mobs.lagoon_snapper.name': 'Лагунная кусачая черепаха',
+  'entities.mobs.ice_wraith.name': 'Ледяной призрак',
+  'entities.mobs.moonlit_siren.name': 'Лунная сирена',
+  'entities.mobs.tidewisp.name': 'Приливный огонёк',
+  'entities.mobs.drowned_pilgrim.name': 'Утонувший паломник',
+  'entities.mobs.mere_hydra_head_left.name': 'Озёрная гидра',
+  'entities.mobs.mere_hydra_head_center.name': 'Озёрная гидра',
+  'entities.mobs.mere_hydra_head_right.name': 'Озёрная гидра',
+  'entities.mobs.tideglass_colossus.name': 'Колосс Приливного стекла',
+  'entities.mobs.tideglass_reflection.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_warrior.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_paladin.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_hunter.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_rogue.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_priest.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_shaman.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_mage.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_warlock.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_druid.name': 'Отражение Приливного стекла',
   'entities.mobs.sanctum_boneguard.name': 'Костяной страж святилища',
   'entities.mobs.sanctum_drakonid.name': 'Чешуйчатый страж святилища',
   'entities.mobs.raised_bonewalker.name': 'Поднятый костеход',
@@ -5875,15 +8693,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': 'Затаившийся Мерцающечешуйный',
   'entities.mobs.moonspawn.name': 'Лунное отродье',
   'entities.mobs.pale_choir_acolyte.name': 'Послушник Бледного хора',
-  'entities.mobs.pearlguard_sentinel.name': 'Часовой Жемчужной стражи',
+  'entities.mobs.pearlguard_sentinel.name': 'Скат лунной мантии',
   'entities.mobs.sethrael_palecoil.name': 'Сетраэль Бледное Кольцо',
   'entities.mobs.warlock_imp.name': 'Огненный демон',
   'entities.mobs.warlock_voidwalker.name': 'Демон Пустоты',
   'entities.mobs.ysolei.name': 'Изолея, Воплощение Утонувшей луны',
   'hudChrome.death.resurrectAtCorpse': 'Воскреснуть у тела',
-  'hudChrome.death.pvpResurrect': 'PvP-воскрешение',
-  'hudChrome.death.pvpResurrectTitle':
-    'Воскреснуть на ближайшем кладбище с полным здоровьем, без новой болезни воскрешения.',
   'hudChrome.death.resurrectAtHealer': 'Целитель душ (болезнь воскрешения)',
   'hudChrome.death.healerConfirmTitle': 'Принять болезнь воскрешения?',
   'hudChrome.death.healerConfirmBody':
@@ -5905,6 +8720,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.spiritHealerAlive': 'Целитель душ оберегает мёртвых. Вы всё ещё среди живых.',
   'hudChrome.death.ghostHint':
     'Бегите к месту своей гибели или поговорите с Целителем душ, чтобы воскреснуть',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    'Печати на почести, друг. На моих полках нет ничего, что заточит клинок, но каждый зал Хайвотча узнает, где ты это заслужил.',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'Гаррик Холт',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'Интендант гильдии',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    'Ищешь отряд? У каждого склепа, бастиона и храма на этой карте есть имя в моём списке. Скажи, куда держишь путь.',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'Мира Фэйрвезер',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'Вербовщица гильдии',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    'Добро пожаловать в Зал Фонаря, {className}. Тобиас вывешивает контракты недели на доску, Гаррик меняет наши печати на почести, которые не стыдно носить, а Мира найдёт тебе отряд к любой двери под горой. Принеси трофей, и он повиснет в зале за моей спиной.',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'Геспер Данмор',
+  'entities.npcs.guildmaster_hesper_dunmore.title': 'Глава гильдии Зала Фонаря',
   'entities.npcs.spirit_healer.name': 'Целитель душ',
   'entities.npcs.spirit_healer.title': 'Хранитель мёртвых',
   'entities.npcs.spirit_healer.greeting':
@@ -6514,6 +9341,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Курганы троллей',
   'entities.zones.mirefen_marsh.pois.6.label': 'Лагерь Могильного Зова',
   'entities.zones.mirefen_marsh.pois.7.label': 'Затонувший бастион',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Курганные Владения',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Кратер Упавшей Звезды',
   'entities.zones.thornpeak_heights.name': 'Терновые высоты',
   'entities.zones.thornpeak_heights.welcome': 'Капитан Тессали едва удерживает стену Хайвотча.',
   'entities.zones.thornpeak_heights.welcomeDone':
@@ -7601,6 +10430,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petEatsFoodOnly': 'Ваш питомец ест только пищу.',
   'mode.play': 'Играть',
   'mode.playAria': 'Играть в World of ClaudeCraft',
+  'mode.playLoading': 'Загрузка',
+  'mode.playStarting': 'Запуск',
   'mode.serverAria': 'Выберите мир: В сети или Не в сети',
   'mode.serverLabel': 'Выберите свой мир',
   'mode.serverOffline': 'Не в сети',
@@ -7621,6 +10452,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'auth.realm': 'Мир',
   'auth.newCharacter': 'Новый персонаж',
   'auth.appearance': 'Внешность',
+  'auth.modelLoading': 'Загрузка персонажа...',
+  'auth.previewPinchHint': 'Масштаб щипком',
   'auth.class': 'Класс',
   'auth.name': 'Имя',
   'auth.chromaOption': 'Расцветка {n}',
@@ -8014,6 +10847,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Цель',
   'hudChrome.mobile.toggleHaptics': 'Вкл/выкл вибрацию',
   'hudChrome.rest.resting': 'Отдых',
+  'hudChrome.rest.restArea':
+    'Отдых: эта таверна служит местом отдыха, и здесь вы накапливаете бодрость.',
   'hudChrome.swing.ready': 'Замах',
   'hudChrome.swing.seconds': '{seconds} сек.',
   'hudChrome.widgets.clockTitle': 'Местное время — нажмите для переключения 12/24-часового формата',
@@ -8171,9 +11006,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': 'Шнур Пламени души',
   'entities.items.stormcallers_waistguard.name': 'Поясная защита призывателя бурь',
   'entities.mobs.thunzharr_waking_peak.name': 'Тунзарр, Пробуждающийся пик',
+  'entities.mobs.balgath_cyclops.name': 'Балгат, Одноглазый Десятник',
+  'entities.npcs.muster_commander.name': 'Командир ополчения',
+  'entities.mobs.muster_sergeant.name': 'Сержант ополчения',
+  'entities.mobs.muster_chaplain.name': 'Капеллан ополчения',
+  'entities.mobs.muster_footman.name': 'Пехотинец ополчения',
   'entities.mobs.thunzharr_stormling.name': 'Пробуждённый элементаль бури',
   'entities.mobs.stable_horse.name': 'Конюшенная лошадь',
-  'hudChrome.worldBoss.spawn': '{name} поднимается над Терновыми высотами!',
+  'hudChrome.worldBoss.spawn': '{name} восстаёт над {zone}!',
+  'hudChrome.worldBoss.wake': '{name} пробуждается над {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} спит до рассвета.',
   'entities.items.stormcallers_spaulders.name': 'Наплечники Зова Бури',
   'entities.items.bonewrought_greatsword.name': 'Костокованый двуручный меч',
   'entities.items.direfang_greatblade.name': 'Великий клинок Лютого Клыка',
@@ -8694,7 +11536,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'На сенсорном экране у панели «Графика» появляется собственная карточка «Сенсорное управление»: размер и мёртвая зона джойстика, размер экранных кнопок, непрозрачность управления, необязательный стик камеры, зеркальная раскладка для левшей и обращённый сенсорный обзор, чтобы экран подстраивался под ваши руки, а не наоборот.',
   'guide.settingsPage.audioTitle': 'Звук и язык',
   'guide.settingsPage.audioBody':
-    'Окно настроек состоит не из одних пикселей. «Звук» держит три ползунка громкости, для звуковых эффектов, музыки и голоса, плюс переключатель музыки и четыре переключателя для звуков, которые приедаются быстрее прочих: голоса NPC, шаги, звуки интерфейса и отклик на щелчок. Вкладка «Общее» панели «Интерфейс» несёт выбор языка, который перелокализует весь интерфейс на месте, без перезагрузки, и выбор темы для оформления окон.',
+    'Окно настроек управляет и звуком. Раздел «Звук» содержит четыре регулятора громкости: эффекты, окружение, музыку и голоса, переключатель музыки и четыре переключателя часто утомляющих звуков: голоса NPC, шаги, звуки интерфейса и отклик щелчков. На вкладке «Общие» панели «Интерфейс» можно выбрать язык, мгновенно переводящий весь интерфейс без перезагрузки, и тему оформления окон.',
   'guide.combat.intro':
     'Бой подчиняется привычным правилам классических MMO. Чтобы хорошо играть, изучать их вовсе не обязательно, это лишь общее представление о том, как устроены сражения.',
   'guide.combat.hitTitle': 'Не каждый удар достигает цели',
@@ -8897,9 +11739,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Смените сложность, пока ваша группа всё ещё держит занятые проходы, и старые притязания задержатся ненадолго, прежде чем отпустятся сами. Лидер группы может отпустить их разом: выберите «Сбросить все копии» в меню собственного портрета либо наберите /dungeon reset. Сброс работает только после того, как сложность действительно сменили, только пока внутри не осталось никого, живого или павшего, только когда каждое тело там обобрано начисто, и один сброс от следующего отделяет короткое время восстановления. Придёте к двери с неверной сложностью — игра скажет об этом прежде, чем проход начнётся. Рейд так не сбрасывается никогда; действуют его собственные правила привязки.',
   'guide.dungeonsPage.resetTitle': 'Сброс инстансов',
   'guide.dungeonsPage.sanctumBody':
-    'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
+    'Скрытый ледник высоко на Терновых высотах, где в толще льда замёрз дракон, а культ сжигает украденные души, чтобы растопить его. Спуститесь с высокого перевала мимо ледяных башен, разорванных цепей Кузнеца и костров культа к замёрзшему озеру у подножия ледника.',
   'guide.dungeonsPage.wildheartBody':
-    'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду, чтобы увидеть, кто ждёт на вершине.',
+    'Скрытая за Затонувшим идолом кальдера в джунглях, окружённая скалами и полная грохота водопадов. Перейдите речной брод, пройдите охотничьи террасы и водопады, минуйте руины колонии и поднимитесь к ступенчатому святилищу под исполинской каменной головой ягуара.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -9232,6 +12074,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Монеты смазывают весь мир: на них покупают снаряжение, припасы и походный набор, и они переходят из рук в руки между игроками. Всё это приходит к вам просто по ходу игры, так что считайте эту страницу картой того, откуда берутся и куда уходят ваши деньги.',
   'guide.economy.junkBody':
     'Добыча, которой вам не найти применения, всё равно продаётся любому торговцу, так что опустошайте сумки всякий раз, проходя через город, а не давайте им забиться. На вкладке продажи у торговца даже есть кнопка, что одним нажатием продаёт весь хлам плохого качества разом. Совсем уж бесполезную мелочь можно и попросту выбросить, чтобы освободить место.',
+  'guide.economy.junkBodyFinal':
+    'Добыча, которой вам не найти применения, всё равно продаётся любому торговцу, так что опустошайте сумки всякий раз, проходя через город, а не давайте им забиться. На вкладке продажи у торговца даже есть кнопка, что одним нажатием продаёт весь хлам плохого качества разом. Совсем уж бесполезную мелочь можно и попросту выбросить, чтобы освободить место. Неподписанные серые предметы, проданные так, не попадают в список выкупа, так что перед нажатием убедитесь, что среди них нет ничего нужного.',
   'guide.economy.junkTitle': 'Избавление от хлама',
   'guide.economy.mailBody':
     'В каждом узловом городе стоит резной вороний столб: почтовый ящик Вороновой почты, почтовой службы королевства. Встаньте у него, чтобы написать любому персонажу по имени, другу в сети или давно вышедшему, и приложите к письму монеты или вещи за небольшой почтовый сбор. Ворону нужно время на перелёт; когда он приземляется, значок конверта сообщает получателю, что его что-то ждёт.',
@@ -10249,9 +13093,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Кто ближе, тот бьёт по Костяному шипу: несколько попаданий от кого угодно разбивают его, независимо от урона. Лекари держат пронзённых в живых, пока шипы не падут.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': 'Могильное извержение',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    'Каждые {everyNormal} сек. костлявые руки отмечают {countNormal} кругов радиусом {radius} м под рейдерами. Через {warning} сек. каждый круг взрывается на {burstNormal} максимального здоровья как урон тьмой, а затем горит Могильным пламенем ещё {flameNormal} сек., нанося {tickNormal} максимального здоровья каждую секунду всем, кто в нём стоит. Этого не происходит, пока активны метки Разрыва души, и ещё {gap} сек. после их исчезновения.',
+    'Каждые {everyNormal} сек. костлявые руки отмечают {countNormal} кругов радиусом {radius} м под рейдерами. Через {warning} сек. каждый круг взрывается на {burstNormal} максимального здоровья как урон тьмой, а затем горит Могильным пламенем ещё {flameNormal} сек., нанося {tickNormal} максимального здоровья каждую секунду всем, кто в нём стоит.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    'Каждые {everyHeroic} сек. костлявые руки отмечают {countHeroic} кругов радиусом {radius} м под рейдерами. Через {warning} сек. каждый круг взрывается на {burstHeroic} максимального здоровья как урон тьмой, а затем горит Могильным пламенем ещё {flameHeroic} сек., нанося {tickHeroic} максимального здоровья каждую секунду всем, кто в нём стоит. Этого не происходит, пока активны метки Разрыва души, и ещё {gap} сек. после их исчезновения.',
+    'Каждые {everyHeroic} сек. костлявые руки отмечают {countHeroic} кругов радиусом {radius} м под рейдерами. Через {warning} сек. каждый круг взрывается на {burstHeroic} максимального здоровья как урон тьмой, а затем горит Могильным пламенем ещё {flameHeroic} сек., нанося {tickHeroic} максимального здоровья каждую секунду всем, кто в нём стоит.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     'Выходите из каждого предупреждающего круга до его взрыва и держитесь подальше от горящей земли. Танки уводят Нитраксиса подальше от пламени, чтобы у бойцов ближнего боя оставалось место для работы.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Печать связывания',
@@ -10325,6 +13169,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.damageReduction': 'Уменьшает весь получаемый урон на {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Спит до рассвета. Его нельзя атаковать, и он не проснется ни для кого.',
   'hudChrome.auraEffect.guardianWard':
     'Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%',
   'hudChrome.auraEffect.increase.ap': 'Повышает силу атаки на {value}',
@@ -10376,7 +13222,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.stealth': 'Скрытность; скорость передвижения снижена на {pct}%',
   'hudChrome.auraEffect.formBear': 'Облик бурого: повышенное здоровье и броня',
   'hudChrome.auraEffect.wolfForm':
-    'Облик волка: урон в ближнем бою и энергия; скорость передвижения повышена на {pct}%',
+    'Облик кота: урон в ближнем бою и энергия; скорость передвижения повышена на {pct}%',
   'hudChrome.auraEffect.formTravel': 'Форма скорохода: скорость передвижения повышена на {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Стойка стража: сниженный получаемый урон, больше угрозы',
   'hudChrome.auraEffect.righteousFury':
@@ -10523,7 +13369,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Дробление костей наносит на 30% больше урона, а его аварийная защита больше не заменяет удар.',
   'entities.itemSets.grovespring.name': 'Одеяние рощевого родника',
   'entities.itemSets.grovespring.bonus2':
-    'Быстрое восстановление сначала поглощает ваш собственный Дикий расцвет или Второй расцвет и исцеляет на 25% больше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+    'Быстрое восстановление сначала поглощает ваше собственное Спороисцеление или Второй расцвет и исцеляет на 25% больше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.grovespring.bonus4':
     'Сверхцветение собирает 75% оставшегося исцеления ваших эффектов, после чего добавляет 1 стадию Зелени.',
   'entities.items.lastflame_core.name': 'Ядро Последнего Пламени',
@@ -10538,7 +13384,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Кровопускание всегда приводит вас в Бешенство, а его исцеление возрастает до 8% вашего максимального запаса здоровья.',
   'entities.itemSets.forgewall.name': 'Эгида кузнечной стены',
   'entities.itemSets.forgewall.bonus2':
-    'Железная решимость преобразует ярость в 5 единиц поглощения за каждую единицу вместо 4.',
+    'Щит Железной решимости поглощает 25% от максимального запаса здоровья вместо 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Каждое применение Раскола щита сокращает оставшееся время восстановления Железной решимости на 2 сек.',
   'entities.itemSets.dawnforged.name': 'Облачение рассветной ковки',
@@ -10597,31 +13443,36 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
   'entities.itemSets.warfare_ashstalker.name': 'Снаряжение пепельного ловчего',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Убийство враждебного игрока даёт Пепельный шаг, повышающий скорость передвижения на 40% на 6 сек.',
   'entities.itemSets.warfare_cinderweave.name': 'Регалии Тлеющего плетения',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Ваши заклинания с вероятностью 15% дают Угольную стражу, поглощающую 120 урона в течение 8 сек.',
   'entities.itemSets.warfare_furyforged.name': 'Яростнокованый боевой доспех',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_furyforged.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Убийство враждебного игрока даёт Нерушимую клятву, поглощающую 200 урона в течение 10 сек.',
   'entities.itemSets.warfare_stormbound.name': 'Одеяние Уз Бури',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Ваши заклинания с вероятностью 15% дают Угольную стражу, поглощающую 120 урона в течение 8 сек.',
   'entities.itemSets.warfare_thornhide.name': 'Одеяние Терновой шкуры',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -10764,11 +13615,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.open': 'Discord',
   'hudChrome.discord.viewCharacter': 'Показать {name}',
   'hudChrome.discord.rank': 'Ранг',
+  'hudChrome.discord.roleTag.admin': 'Администратор',
   'hudChrome.discord.roleTag.levyst': 'Levy St',
   'hudChrome.discord.roleTag.devs': 'Разработчик',
   'hudChrome.discord.roleTag.mods': 'Модератор',
-  'hudChrome.discord.roleTag.seniormods': 'Страж',
-  'hudChrome.discord.roleTag.juniormods': 'Наблюдатель',
+  'hudChrome.discord.roleTag.seniormods': 'Старший модератор',
+  'hudChrome.discord.roleTag.juniormods': 'Младший модератор',
   'hudChrome.discord.roleTag.contentcreator': 'Контент-мейкер',
   'hudChrome.discord.voice.channel': 'В {channel}',
   'hudChrome.discord.swag.title': 'Мерч',
@@ -11025,6 +13877,162 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.flatten.hint':
     'Выравнивание приводит землю к высоте под курсором в момент начала перетаскивания.',
   'editor.flatten.hardEdge': 'Резкий край',
+  'editor.topbar.pushMapChanges': 'Отправить изменения в карту репозитория',
+  'editor.topbar.pushMapChangesTitle':
+    'Применить к текущему файлу репозитория только то, что вы изменили после открытия этой карты, сохранив отправки других.',
+  'editor.push.notLinked':
+    'Эта карта открыта не из карты репозитория, поэтому отправлять некуда. Сначала откройте карту через «Открыть», встроенные карты.',
+  'editor.push.baseMissing':
+    'Версия, с которой вы начали, больше недоступна. Откройте карту репозитория заново и повторите изменения.',
+  'editor.push.repoMissing': 'Карта репозитория, из которой сделана эта копия, отсутствует.',
+  'editor.push.missingIds':
+    'В карте репозитория есть объекты без идентификатора или с общим идентификатором, поэтому изменения нельзя сопоставить.',
+  'editor.push.nothing': 'Нечего отправлять: после открытия в этой копии нет изменений.',
+  'editor.push.done':
+    'В {slug} отправлено изменений: {count}. Редактор показывает объединённую карту.',
+  'editor.push.withUpgrades':
+    'Одна из ваших правок касалась объекта, добавленного редактором при открытии карты, поэтому его обновления тоже сохранены.',
+  'editor.push.overwriteTitle': 'Заменить более новые изменения репозитория?',
+  'editor.push.overwriteBody':
+    'После того как вы открыли эту карту, кто-то отправил в неё изменения. Публикация заменит весь файл и удалит их. Чтобы сохранить их, используйте «Отправить изменения в карту репозитория».',
+  'editor.push.conflictsTitle': 'Отправка отклонена: конфликт изменений',
+  'editor.push.conflictsBody':
+    'Ваших изменений, конфликтующих с отправленными после открытия карты: {count}. Ничего не записано. Откройте карту репозитория заново через «Открыть» и повторите:',
+  'editor.push.conflictRow': '{kind} {id}: {reason}',
+  'editor.push.conflictsMore': 'И ещё {count}.',
+  'editor.push.reasonBoth': 'вы и кто-то другой оба изменили это',
+  'editor.push.reasonDeleted': 'один из вас удалил это, а другой изменил',
+  'editor.push.reasonOverlap': 'ваш мазок рельефа пересекается с более новым',
+  'editor.push.kindPlacement': 'Объект',
+  'editor.push.kindTerrain': 'Мазок рельефа',
+  'editor.push.kindGrassClear': 'Очищенная от травы область',
+  'editor.push.kindNpc': 'НИП',
+  'editor.push.kindObjectMove': 'Игровой объект',
+  'editor.push.kindPaint': 'Окрашенные клетки',
+  'editor.push.kindField': 'Настройка карты',
+  'editor.push.kindRoad': 'Дорога',
+  'editor.push.kindRoadEdit': 'Дорога мира',
+  'editor.city.roadMode': 'Инструмент дорог',
+  'editor.city.roadModeDraw': 'Нарисовать новую дорогу',
+  'editor.city.roadModeEdit': 'Изменить дороги',
+  'editor.city.roadEditHint':
+    'Щёлкните дорогу, чтобы выбрать её. Перетащите точку маршрута, чтобы сдвинуть её, перетащите линию дороги, чтобы добавить изгиб, и нажмите Delete, чтобы удалить выбранную точку.',
+  'editor.city.roadEditNone':
+    'Дорога не выбрана. Щёлкните её в окне просмотра или выберите в списке ниже.',
+  'editor.city.roadEditing': 'Правка: {name}',
+  'editor.city.roadWaypoints': 'Точек маршрута: {n}',
+  'editor.city.roadWaypointHeld': 'Выбрана точка {n}.',
+  'editor.city.roadDeletePoint': 'Удалить точку',
+  'editor.city.roadRemove': 'Убрать дорогу',
+  'editor.city.roadReset': 'Сбросить',
+  'editor.city.roadRestore': 'Вернуть',
+  'editor.city.roadSelect': 'Выбрать',
+  'editor.city.roadBuiltin': 'Дорога мира {n}',
+  'editor.city.roadBuiltinEdited': '{name} (изменена)',
+  'editor.city.roadBuiltinRemoved': '{name} (убрана)',
+  'editor.city.roadWorldList': 'Дороги мира ({n})',
+  'editor.city.roadBuiltinNote':
+    'Дороги мира: это собственные дороги игры. Изменения действуют только на этой карте, а «Сбросить» возвращает дорогу на место.',
+  'editor.city.roadPointTooShort':
+    'У дороги должно быть не меньше двух точек. Вместо этого используйте «Убрать дорогу».',
+  'editor.city.roadPointLimit': 'У этой дороги уже максимальное число точек.',
+  'editor.city.roadRemoved': 'Дорога убрана. Отмена вернёт её.',
+  'editor.push.close': 'Закрыть',
+  'editor.objectMove.edited': 'Изменено на этой карте.',
+  'editor.objectMove.rotation': 'Поворот (градусы)',
+  'editor.objectMove.size': 'Размер',
+  'editor.objectMove.resetAll': 'Вернуть исходное',
+  'editor.objectMove.delete': 'Удалить с этой карты',
+  'editor.objectMove.deleteHint':
+    'Удаляет только с этой карты. Позже его можно восстановить из списка удалённых объектов.',
+  'editor.objectMove.doorDeleteHint':
+    'Удаление двери подземелья убирает её вход на поверхности с этой карты.',
+  'editor.objectMove.dummyDeleteHint':
+    'Уроки Хейла используют эти манекены: если удалить один, его урок на этой карте нельзя будет завершить.',
+  'editor.objectMove.doorFixed':
+    'Двери подземелий можно перемещать и удалять, но не поворачивать и не менять размер.',
+  'editor.objectMove.deletedTitle': 'Удалённые игровые объекты',
+  'editor.objectMove.deletedHint':
+    'Удалены с этой карты. Восстановите объект, чтобы вернуть его на прежнее место.',
+  'editor.objectMove.deletedRow': '{kind}: {name}',
+  'editor.objectMove.restore': 'Восстановить',
+  'editor.objectMove.restoredLater': 'Восстановлено. Объект появится после перезагрузки карты.',
+  'editor.selection.heightOffset': 'Смещение по высоте (ярды)',
+  'editor.selection.heightStep': 'Шаг (ярды)',
+  'editor.selection.raiseAsset': 'Поднять',
+  'editor.selection.lowerAsset': 'Опустить',
+  'editor.selection.heightHint': 'Отрицательные значения опускают объекты ниже их основания.',
+  'editor.brush.shape': 'Форма кисти',
+  'editor.brush.circle': 'Круг',
+  'editor.brush.square': 'Квадрат',
+  'editor.help.tool.pond': 'Нажмите, чтобы выкопать пруд с собственным уровнем воды.',
+  'editor.weather.showSnowfall': 'Показывать снегопад',
+  'editor.weather.snowfallHint': 'Настройка предпросмотра студии сохраняется в этом браузере.',
+  'editor.tool.pond': 'Пруд',
+  'editor.pond.title': 'Создать пруд',
+  'editor.pond.add': 'Добавить пруд',
+  'editor.pond.radius': 'Радиус пруда',
+  'editor.pond.depth': 'Глубина пруда',
+  'editor.pond.hint':
+    'Нажмите на землю, чтобы выкопать круглый пруд и заполнить его водой. Круг включает пологий берег. Отмена убирает воду и углубление вместе.',
+  'editor.pond.invalid': 'На этом участке нельзя выкопать пруд. Выберите другое место.',
+  'editor.picking.target': 'Объект: {name}',
+  'editor.picking.choose': 'Выбрать перекрывающийся объект ({count})',
+  'editor.picking.chooser': 'Выберите объект под указателем',
+  'editor.picking.front': 'На переднем плане',
+  'editor.picking.behind': 'За другим объектом',
+  'editor.picking.close': 'Закрыть',
+  'editor.picking.keyboard':
+    'Сравнивайте кнопками «Предыдущий»/«Следующий» или стрелками. Enter: выбрать, Escape: закрыть.',
+  'editor.picking.hint':
+    'Щёлкните ещё раз для переключения перекрывающихся объектов или выберите в списке.',
+  'editor.picking.asset': 'Объект {number}',
+  'editor.picking.overlapAt': 'Перекрывающиеся объекты у {name}',
+  'editor.picking.previous': 'Предыдущий',
+  'editor.picking.next': 'Следующий',
+  'editor.picking.position': '{current} из {count}',
+  'editor.picking.details': 'Объект {number} · Этаж {level} · Высота {height}',
+  'editor.picking.ungroupedDetails': 'Объект {number} · Высота {height}',
+  'editor.picking.hideAbove': 'Скрыть этажи выше выбранного',
+  'editor.picking.allFloors': 'Все этажи видны',
+  'editor.picking.filteredFloors': 'Этажи выше {level} скрыты',
+  'editor.quickActions.title': 'Выбранный объект',
+  'editor.quickActions.move': 'Переместить',
+  'editor.quickActions.frame': 'Показать целиком',
+  'editor.quickActions.remove': 'Удалить',
+  'editor.quickActions.count': 'Выбрано: {count}',
+  'editor.tool.slope': 'Склон',
+  'editor.help.tool.slope':
+    'Щёлкните правой кнопкой, чтобы задать начальную высоту, затем перетащите от другой высоты, чтобы проложить плавный склон.',
+  'editor.slope.hint':
+    'Щёлкните правой кнопкой по земле там, где должен начинаться склон. Затем нажмите там, где он должен закончиться, и ведите вдоль пути: земля плавно выровняется в пандус между двумя высотами.',
+  'editor.slope.start': 'Начальная высота: {height} ярдов',
+  'editor.slope.noStart':
+    'Начало ещё не задано. Щёлкните правой кнопкой по земле, чтобы задать его.',
+  'editor.slope.clearStart': 'Сбросить начало',
+  'editor.slope.needStart': 'Сначала щёлкните правой кнопкой по земле, чтобы задать начало склона.',
+  'editor.slope.startPicked': 'Начало склона задано на высоте {height} ярдов.',
+  'editor.flatten.levelTitle': 'Целевая высота (ярды)',
+  'editor.flatten.levelPlaceholder': 'Начало перетаскивания',
+  'editor.flatten.levelClear': 'Сбросить',
+  'editor.flatten.levelHint':
+    'Каждое перетаскивание выравнивает землю до этой высоты. Щёлкните правой кнопкой по земле, чтобы выбрать другую.',
+  'editor.flatten.levelHintNone':
+    'Щёлкните правой кнопкой по земле, чтобы зафиксировать её высоту, затем перетаскивайте в любом месте, чтобы выровнять до неё. Пусто: каждое перетаскивание выравнивает до высоты точки начала.',
+  'editor.flatten.levelPicked': 'Высота зафиксирована: {height} ярдов.',
+  'editor.selection.setGround': 'Опустить на землю',
+  'editor.selection.setGroundTitle':
+    'Вернуть выбранные объекты на рельеф под ними, убрав парение и подъём',
+  'editor.selection.snapGround': 'Прижимать к земле при перемещении',
+  'editor.materials.title': 'Материалы',
+  'editor.materials.hint':
+    'Выберите текстуру для каждой части модели. Текстуры повторяются в мировых координатах, не используют UV модели и сохраняются вместе с картой.',
+  'editor.materials.loading':
+    'Модель ещё загружается. Выберите её снова чуть позже, чтобы изменить материалы.',
+  'editor.materials.original': 'Исходный',
+  'editor.materials.texture': 'Текстура',
+  'editor.materials.tile': 'Масштаб текстуры (ярдов на плитку)',
+  'editor.materials.reset': 'Вернуть исходный',
   'editor.water.title': 'Уровень воды',
   'editor.water.level': 'Уровень воды',
   'editor.water.hint': 'Задает высоту поверхности воды для всей карты, от {min} до {max} ярдов.',
@@ -13098,11 +16106,83 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagFullClear': 'Полная зачистка',
   'hudChrome.finder.tagLearning': 'Новичкам рады',
   'hudChrome.finder.tagFastRun': 'Быстрый заход',
+  'hudChrome.finder.tagGuildOnly': 'Гильдейская группа',
+  'hudChrome.finder.guildPartyToggle': 'Гильдейская группа',
+  'hudChrome.finder.guildPartyHint': 'Заявки принимаются только от членов гильдии {guild}.',
+  'hudChrome.finder.guildPartyNeedsGuild': 'Вступите в гильдию, чтобы создать гильдейскую группу.',
+  'hudChrome.finder.guildPartyNote': 'Гильдейские группы принимают только членов гильдии лидера.',
+  'hudChrome.finder.guildPartyBadge': 'Только {guild}',
+  'hudChrome.finder.guildPartyLocked': 'Только для гильдии',
+  'hudChrome.finder.filterContent': 'Контент',
+  'hudChrome.finder.filterAll': 'Весь контент',
+  'hudChrome.finder.filterDungeons': 'Подземелья',
+  'hudChrome.finder.filterRaids': 'Рейды',
+  'hudChrome.finder.filterEmpty': 'Нет объявлений, подходящих под этот фильтр.',
+  'hudChrome.finder.postHeading': 'Рекламировать группу',
+  'hudChrome.finder.postGeneral': 'Написать в Общий',
+  'hudChrome.finder.postDiscord': 'Опубликовать в Discord',
+  'hudChrome.finder.postReadyIn': 'Доступно через {minutes} мин',
+  'hudChrome.finder.postDiscordOffline': 'Только в онлайн-игре',
+  'hudChrome.finder.inspect': 'Осмотреть',
+  'hudChrome.finder.inspectApplicantAria': 'Осмотреть: {name}',
+  'hudChrome.finder.partyHeading': 'Ваша группа идёт с вами',
+  'hudChrome.finder.partyNote':
+    'Ваша группа присоединяется к этому отряду. Выберите роль для каждого участника или оставьте его собственную.',
+  'hudChrome.finder.partyRolesHeading': 'Роли в группе',
+  'hudChrome.finder.partyRolesNote':
+    'Выберите роль для каждого участника или оставьте его собственную.',
+  'hudChrome.finder.partyRoleOwn': 'На их выбор',
+  'hudChrome.finder.partyRoleAria': 'Роль: {name}',
+  'hudChrome.finder.partyMemberMeta': '{cls}, уровень {level}',
+  'hudChrome.finder.difficultyHeading': 'Сложность',
   'hudChrome.finder.mech.shadow_pulse': 'Пульс тьмы (периодический урон по области)',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'Полная лопата (каждые 11 секунд он швыряет могильную землю конусом на 8 ярдов перед собой: полтора его удара и замедление на 50% на 6 секунд, так что стойте у него за спиной)',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    'Мерка для могилы (каждые 15 секунд он метит игрока, не танка; через 4 секунды под ним обрушивается Открытая могила, 42–52 урона в радиусе 3 ярдов на обычной сложности, и яма остаётся до конца боя: 9 урона в секунду и замедление на 40% внутри, так что оставляйте могилы у края двора)',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    'Погребальный звон (на 66 и 33 процентах здоровья он шагает к колокольной верёвке, неуязвимый, и звонит 3 секунды: 30–38 урона от тьмы всем на обычной сложности, и из каждой Открытой могилы встают Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'Героический: Удар могильщика каждые 9 секунд по танку (каждый заряд увеличивает получаемый урон на 6% на 20 секунд, до 6 зарядов), Могильная сила (стоя в могиле, он бьёт на 30% быстрее) и Неспокойная земля (кто пробудет в могиле 2 секунды, поднимает там Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    'Плач невесты (каждые 22 секунды 3-секундный вопль: 60–75 урона от холода на обычной сложности всем вне света горящего могильного фонаря, и ещё половина за каждый заряд Затяжного плача от уже пережитых Плачей. Фонарь укрывает не больше двух игроков и гаснет на 28 секунд, укрыв кого-то, так что разделяйтесь и чередуйтесь)',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    'Ледяные объятия (каждые 30 секунд она хватает игрока, не танка, и поднимается с ним на 5 ярдов в воздух, 6 урона от холода в секунду: снимите 6% её здоровья за 8 секунд, и она опустит его, иначе она его уронит, 150–180 урона на обычной сложности)',
+  'hudChrome.finder.mech.crypt_rime_path':
+    'Инеистая тропа (там, где она проплывает, на 25 секунд остаётся скользкий иней: на нём разгоняешься медленно и продолжаешь скользить, когда останавливаешься или поворачиваешь)',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    'Свадебная стужа (на половине здоровья весь пол ущелья замерзает: скользкий лёд до конца боя)',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'Героический: каждый горящий фонарь ещё и сам гаснет через 30 секунд на 10 секунд, а Ледяные объятия хватают двух игроков',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    'Погребальная песнь Пустоты (каждые 16 секунд 2,5-секундная песнь, которую можно прервать: если она её допоёт, 105–125 урона от тьмы на обычной сложности и немота на 4 секунды всем в пределах 45 ярдов, кто её видит, так что прерывайте или прячьтесь за колоннами хора)',
+  'hudChrome.finder.mech.crypt_harmony':
+    'Гармония (каждый живой Хорист уменьшает получаемый ею урон на 30%: сначала убейте Хористов)',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    'Костяной орган (каждые 26 секунд она играет на Костяном органе: две волны теневых нот взрываются полосами по полу хоров, 100–115 урона в полосе на обычной сложности, вторая волна заполняет промежутки первой)',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'Крещендо (ниже 30 процентов здоровья её Песнь длится 1,8 секунды и звучит каждые 11 секунд, а орган играет третью волну)',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'Героический: Бис (Хорист, пролежавший мёртвым 10 секунд, пока второй ещё стоит, поднимается снова, так что убивайте их вместе) и Непрерывный стих (каждую третью Песнь нельзя прервать: прячьтесь)',
   'hudChrome.finder.mech.reaping_arc': 'Жатвенная дуга (рассекающий удар спереди)',
   'hudChrome.finder.mech.mist_surge': 'Волна тумана (периодический урон по области)',
   'hudChrome.finder.mech.summons_adds': 'Призывает подкрепления',
   'hudChrome.finder.mech.lunar_tide': 'Лунный прилив (периодический урон по области)',
+  'hudChrome.finder.mech.chorus_and_solo':
+    'Хор и соло (соберитесь у одной метки, разойдитесь от другой)',
+  'hudChrome.finder.mech.tideglass_reflections':
+    'Отражения Приливного стекла (убивайте отражения друг друга)',
+  'hudChrome.finder.mech.hydra_three_elements':
+    'Три стихии (левая голова выдыхает конус холода на 18 ярдов, который замедляет вас на 70 процентов на 4 секунды, средняя плюёт ядом под ноги не более чем 3 игрокам: он взрывается через 1,5 секунды и 6 секунд горит там, куда упал, а правая бьёт потоком по полосе длиной 26 ярдов и отбрасывает вас на 8 ярдов. Выходите из каждой атаки. Когда голова падает, её атаку перенимают уцелевшие головы)',
+  'hudChrome.finder.mech.hydra_tsunami':
+    'Цунами (головы на 4,5 секунды уходят под воду, получая на 75 процентов меньше урона, и волна накрывает одну половину водоёма, а в следующий раз другую: от 160 до 190 урона от холода на обычной сложности и отбрасывание на 10 ярдов. Перейдите на другую половину или встаньте за колонну у края; в героическом режиме через 3,5 секунды волна откатывается по другой половине. Первое цунами приходит через 24 секунды после начала боя, каждое следующее через 40 секунд после того, как прошло предыдущее)',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    'Слитое дыхание (между цунами головы сливают две свои атаки, всегда в одном порядке: Скованный льдом поток замораживает всех на своей полосе на 2 секунды и оставляет Ледяную стену, которая может укрыть вас от следующей волны, Ядовитое течение сдвигает ядовитые лужи наружу, а Ядовитая изморозь замораживает лужи в кристаллы, которые взрываются через 4 секунды. Один раз между цунами на обычной сложности, дважды в героическом режиме)',
+  'hudChrome.finder.mech.hydra_regrowth':
+    'Отрастание (упавшая голова отрастает через 20 секунд с половиной здоровья, пока жива хоть одна другая, и каждая упавшая голова заставляет остальные наносить на 15 процентов больше урона: убивайте все три почти одновременно)',
+  'hudChrome.finder.mech.rising_tide':
+    'Прилив (затапливает половину острова, переходите на сухую сторону)',
+  'hudChrome.finder.mech.undertow': 'Отбойное течение (притягивает всех, убегайте до удара)',
   'hudChrome.finder.mech.enrage': 'Приходит в ярость при низком здоровье',
   'hudChrome.finder.mech.shuddering_stomp': 'Сотрясающий топот (оглушение по области)',
   'hudChrome.finder.mech.grave_inferno':
@@ -13137,6 +16217,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Бессмертный двор (только на героическом, королевский двор восстаёт после Бессмертной ярости)',
   'hudChrome.finder.mech.bloodmane_rend': 'Кровавый разрыв (кровотечение, следите за сменой цели)',
   'hudChrome.finder.mech.tusk_sweep': 'Удар бивнями (рассекающий удар спереди)',
+  'hudChrome.finder.mech.grave_breath':
+    'Могильное дыхание (конус огня спереди, раскалывает лёд под собой)',
+  'hudChrome.finder.mech.plate_floor':
+    'Ломкий лёд (его огонь раскалывает и топит плиты озера, не заходите в открытую воду)',
+  'hudChrome.finder.mech.wyrm_flights':
+    'Полёты (на 70% и 40%: несите Око змея на целый лёд, соберитесь там, где он должен приземлиться)',
   'hudChrome.finder.mech.ancestral_sap': 'Соки предков (лечит союзников)',
   'hudChrome.finder.mech.call_of_the_hunt': 'Зов охоты (ускоряет союзников поблизости)',
   'hudChrome.finder.mech.thickhide_ward': 'Толстокожая защита (щит для союзников поблизости)',
@@ -13234,7 +16320,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.watchFull': 'Список отслеживания полон (не более {cap})',
   'hudChrome.deeds.watchAria': 'Следить за деянием {name} на экране',
   'hudChrome.deeds.unwatchAria': 'Перестать следить за деянием {name}',
-  'hudChrome.deeds.cosmeticsSection': 'Звания и рамки',
+  'hudChrome.deeds.cosmeticsSection': 'Звания, рамки и спутники',
   'hudChrome.deeds.titlesSection': 'Звания',
   'hudChrome.deeds.titlesAria': 'Выберите отображаемое звание',
   'hudChrome.deeds.titlesNone': 'Без звания',
@@ -13344,7 +16430,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
   'hudChrome.mounts.name_avian_strider': 'Изумрудный Долиноход',
+  'hudChrome.mounts.name_nightwing_chimera': 'Ночнокрылая химера',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    'Двуглавая сумеречная виверна с древних ветвей: в покое стоит на когтистых задних лапах, а в движении парит над землёй на крыльях с тайными рунами.',
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
+  'hudChrome.mounts.name_lantern_hall_destrier': 'Боевой конь Зала Фонаря',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor':
     'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
@@ -13355,9 +16445,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Огромная верховая птица, чьи тяжёлые когти и сложенные крылья превращают любое путешествие в громоподобный бросок.',
   'hudChrome.mounts.desc_lanternback_troll':
     'Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    'Боевой конь Зала Фонаря в дубово-железной броне под синим сукном гильдии; два штормовых фонаря, качаясь у седла, освещают дорогу домой.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
+  'hudChrome.mounts.name_wobbles_slime': 'Слизень Трясунчик',
+  'hudChrome.mounts.desc_wobbles_slime':
+    'Большой синий слизень, приученный к седлу. Он не ходит, а прыгает, колышется под всадником, а сквозь его желе медленно поднимаются пузырьки.',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Ужасоискр, сотрясатель земли',
   'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',
   'hudChrome.mounts.desc_valorsteed':
@@ -13437,10 +16532,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Кнопка с сундуком на экране открывает окно ежедневных наград. Каждый день предлагает несколько задач: выполнять задания, сражаться в Пепельном Колизее, выигрывать матч Кубка Долины, а также даёт бесплатный поворот колеса призов, и всё это приносит очки в дневной зачёт, а лучшие за день делят призовой фонд для владельцев необязательного токена сообщества. Ничто из этого не даёт силы в игре. Само окно разъясняет правила дня и условия участия, показывает таблицу лидеров и хранит вашу историю.',
   'guide.economy.dailyTitle': 'Ежедневные награды',
   'guide.footer.linksLabel': 'Ссылки на игру и сообщество',
-  'guide.footer.guidesLabel': 'Гайды для игроков',
-  'guide.footer.guideGamesLikeWow': 'Игры, похожие на WoW',
-  'guide.footer.guideBrowser': 'Браузерные MMORPG',
-  'guide.footer.guideGamesLikeDiablo': 'Игры, похожие на Diablo',
   'guide.gear.bagsBody':
     'Всё, что вы подбираете, едет в одном общем мешке, и вы расширяете его, надевая сумки. В окне сумок четыре ячейки: щёлкните сумку в мешке, чтобы вставить её в свободную ячейку, и каждая надетая сумка добавляет собственное место. Простые сумки — дешёвый товар торговцев, более вместительные падают со зверей, а лучшие приходят от боссов подземелий, поэтому место для переноски растёт ровно вместе со снаряжением. Всё, что складывается в стопки, указывает в подсказке, сколько штук вмещает одна ячейка, и именно так вы заранее знаете, что порядочная закупка зелий обойдётся вам в две ячейки.',
   'guide.gear.bagsTitle': 'Сумки и место для переноски',
@@ -13462,6 +16553,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': 'Облик бурого',
   'guide.models.formCat': 'Облик кота',
   'guide.models.formTravel': 'Форма скорохода',
+  'guide.models.formSporemender': 'Облик спороцелителя',
   'guide.models.groupForms': 'Облики друида',
   'guide.nav.sidebarLabel': 'Разделы руководства',
   'guide.professions.craftHowTitle': 'Окно ремесла',
@@ -13608,7 +16700,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Направляет заклинание 3 сек., нанося {damage} урона от тьмы каждую секунду врагам в пределах 8 м от области цели. Урон растёт с силой заклинаний. (талант жреца)',
   'entities.abilities.multi_shot.description':
-    'Выпускает веер стрел в выбранную область, нанося противникам в радиусе 8 м {damage} ед. физического урона. (талант охотника)',
+    'Выпускает веер стрел в выбранную область, нанося противникам в радиусе 8 ярдов {damage} ед. физического урона. (талант охотника)',
   'entities.abilities.prayer_of_healing.description':
     'Исцеляет союзников в пределах 30 м на {damage}. Исцеление растёт с силой заклинаний. (Свет)',
   'entities.abilities.preparation.description':
@@ -13618,7 +16710,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Приводит в ужас врагов в пределах 8 м на срок до 4 сек. Урон может разрушить эффект.',
   'entities.abilities.shadowstep.description':
-    'Вы проходите сквозь тени к своей цели, союзнику или врагу, не прерывая Сумеречную завесу. (талант разбойника)',
+    'Вы проходите сквозь тени к своей цели, союзнику или врагу, не прерывая Сумеречную завесу. Хранит до 2 зарядов. (талант разбойника)',
   'entities.abilities.silence.description':
     'Лишает цель возможности произносить заклинания на 4 сек. (талант жреца)',
   'entities.abilities.tranquility.description':
@@ -13732,7 +16824,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пассивно: критические эффекты ваших заклинаний поджигают цель, нанося 30% от причинённого урона за 6 сек. Эффект суммируется. (искусность ветки «Огонь»)',
   'entities.abilities.mass_barrier.name': 'Массовый барьер',
   'entities.abilities.mass_barrier.description':
-    'Окружает щитами вас и до 4 ближайших союзников в радиусе 30 м. Каждый щит поглощает 130 ед. урона в течение 60 сек. (талант мага)',
+    'Окружает щитами вас и до 4 ближайших союзников в радиусе 30 м. Каждый щит поглощает {damage} ед. урона в течение 15 сек. (талант мага)',
   'entities.abilities.overload.name': 'Перегрузка',
   'entities.abilities.overload.description':
     'Следующее заклинание усиливается на 40%, но расходует на 50% больше маны. Время действия: 10 сек. (талант мага)',
@@ -13872,7 +16964,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
   'hudChrome.options.showTargetSwingTimer': 'Показывать таймер замаха цели',
+  'hudChrome.options.enemyHighlightStyle': 'Стиль выделения врага',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Стрелка у края экрана, если цель вне кадра',
+  'hudChrome.options.enemyHighlightNameplate': 'Крупная табличка цели в рамке',
+  'hudChrome.options.enemyHighlightOverhead': 'Парящий маркер над головой',
+  'hudChrome.options.enemyHighlightReticle': 'Усиленный круг враждебной цели',
   'hudChrome.options.showPetFrame': 'Показывать вашего питомца',
+  'hudChrome.options.playerFrameResourceDetached': 'Отделить полосу ресурса',
+  'hudChrome.options.playerFrameResourceWidth': 'Ширина полосы ресурса',
+  'hudChrome.options.playerFrameResourceHeight': 'Высота полосы ресурса',
+  'hudChrome.options.hillBarOpacity': 'Прозрачность фона „Короля горы“',
   'hudChrome.options.showDefensivesTrack': 'Показывать защитные умения',
   'hudChrome.options.showSelfBuffTrack': 'Показывать мои эффекты',
   'hudChrome.options.showOffensiveTrack': 'Показывать атакующие умения',
@@ -13880,10 +16981,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': 'Включать скрытность и формы передвижения',
   'hudChrome.options.showFriendlyTrack': 'Показывать мои эффекты на союзниках',
   'hudChrome.options.showShieldTrack': 'Показывать мои щиты',
+  'hudChrome.options.classicCombatText': 'Классический боевой текст',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.options.showNameplateDots': 'Показывать мои эффекты на полосах имён',
   'hudChrome.options.nameplateDotScale': 'Размер эффектов на полосах имён',
+  'hudChrome.options.showNameplateCooldowns': 'Отслеживание атаки/защиты',
+  'hudChrome.options.nameplateCooldownScale': 'Размер отслеживания атаки/защиты',
   'hudChrome.options.showTargetDots': 'Показывать эффекты на целях',
+  'hudChrome.options.showDungeonHints': 'Подсказки по механикам подземелий',
+  'hudChrome.options.showDungeonHintsNote':
+    'Показывает подсказку, которая объясняет механику подземелья и что с ней делать. Отключение скрывает только эти подсказки: предупреждения на земле, полосы применения и отрицательные эффекты остаются. Подсказки, требующие действия, показываются всегда: клетка, из которой нужно вырваться, цепь, которую нужно разбить, предмет, который можно использовать.',
   'hudChrome.targetDots.title': 'Эффекты на целях',
   'hudChrome.targetDots.overflow': 'ещё {count}, не показаны',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
@@ -14008,6 +17115,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Заходите с причала, погрейте руки. Корабль у нашего пирса идёт вдоль длинного восточного берега до Викхарбора и обратно. Далеко на западе другой паром ходит между пристанями Истврука и Ночецветья. На карте на стене видны оба маршрута. Отдохните у огня, прежде чем подниматься к Змеиному дозору.',
   'entities.npcs.harbormaster_tamsin.name': 'Начальница гавани Тамсин',
   'entities.npcs.harbormaster_tamsin.title': 'Смотрительница причалов Змеиного дозора',
+  'entities.npcs.innkeeper_maudie.greeting':
+    'Заходите, друг, спасайтесь от сырости, и осторожнее со ступенькой вниз к огню. Чайник уже на огне, скамьи тёплые, а комнаты наверху сухие. Путники из Фенбриджа клянутся, что болотная дорога днём спокойна, но после темноты по ней никто не ходит. Посидите немного, дайте ногам отдохнуть.',
+  'entities.npcs.innkeeper_maudie.name': 'Моди Тапрайт',
+  'entities.npcs.innkeeper_maudie.title': 'Хозяйка таверны',
+  'entities.npcs.patron_amos_eelby.greeting':
+    'Садись на скамью, {className}. Гриссел вот клянётся, что большой угорь под Фенбриджем просто выдумка. А я его дважды в руках держал. Дважды! Скользкий, как сборщик податей, и длиной почти с эту скамью.',
+  'entities.npcs.patron_amos_eelby.name': 'Эймос Илби',
+  'entities.npcs.patron_amos_eelby.title': 'Ловец угрей',
+  'entities.npcs.patron_grissel_sedgeworth.greeting':
+    'Не слушай Эймоса. Сорок лет режу торф и вытащила из этого болота больше странностей, чем он угрей: сапоги, кости, шлем, а голова внутри до сих пор чем-то встревожена. Грейся, огонь бесплатный.',
+  'entities.npcs.patron_grissel_sedgeworth.name': 'Гриссел Седжворт',
+  'entities.npcs.patron_grissel_sedgeworth.title': 'Резчица торфа',
+  'entities.npcs.patron_ned_oxley.greeting':
+    'Гнал сорок голов по гати и двух потерял в трясине ещё до Фенбриджа. Только эль Моди на этой дороге ни разу не подвёл. Но за свой плати сам.',
+  'entities.npcs.patron_ned_oxley.name': 'Нед Оксли',
+  'entities.npcs.patron_ned_oxley.title': 'Погонщик скота',
+  'entities.npcs.patron_hester_quillby.greeting':
+    'Каждая карта этого болота, что я покупала, через сезон оказывалась неверной. Вода двигает тропы, а тропы двигают воду. Вот я и рисую свои и сижу здесь, где сухо, пока сохнут чернила.',
+  'entities.npcs.patron_hester_quillby.name': 'Хестер Квилби',
+  'entities.npcs.patron_hester_quillby.title': 'Картограф',
   'entities.npcs.head_gardener_amaranth.greeting':
     'Не обращай внимания на тени у меня под глазами. Кто-то должен бодрствовать, пока сад видит сны.',
   'entities.npcs.head_gardener_amaranth.name': 'Старшая садовница Амарант',
@@ -14307,7 +17434,29 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
   'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',
   'entities.mobs.wildheart_beastmaster.name': 'Повелитель клыков',
+  'entities.mobs.the_gorgebloom.name': 'Цветожор',
+  'entities.mobs.fanglord_jaguar.name': 'Великий ягуар Повелителя клыков',
+  'entities.mobs.howdah_hexcaller.name': 'Заклинатель с паланкина',
+  'entities.mobs.great_saurian.name': 'Великий завр',
+  'entities.mobs.vine_lasher.name': 'Хлестун спутанной лозы',
+  'entities.mobs.spore_toad.name': 'Спороносная жаба',
+  'entities.mobs.basin_raptor.name': 'Котловинный раптор',
+  'entities.mobs.sunbone_totem.name': 'Тотем Солнечной Кости',
+  'entities.mobs.sunbone_totem_binder.name': 'Связыватель тотемов Солнечной Кости',
+  'entities.mobs.sunbone_dread_totem.name': 'Тотем ужаса Солнечной Кости',
   'entities.mobs.wildheart_high_priest.name': 'Зулгар, Голос Котловины',
+  'entities.mobs.broodsworn_thawcaller.name': 'Талоклич Клятвы Выводка',
+  'entities.mobs.broodsworn_goadsmith.name': 'Кузнец-погонщик Клятвы Выводка',
+  'entities.mobs.broodsworn_pyre_tender.name': 'Хранитель костров Клятвы Выводка',
+  'entities.mobs.soul_brazier.name': 'Жаровня душ',
+  'entities.mobs.rime_whelp.name': 'Изморозный дракончик',
+  'entities.mobs.ogre_sledge_hauler.name': 'Огр-тягач саней',
+  'entities.mobs.glacier_splinter.name': 'Осколок ледника',
+  'entities.mobs.sledge_tusker.name': 'Санный бивнерог',
+  'entities.mobs.sanctum_shackle_hammer.name': 'Оковы Молота',
+  'entities.mobs.sanctum_shackle_tongs.name': 'Оковы Клещей',
+  'entities.mobs.sanctum_shackle_anvil.name': 'Оковы Наковальни',
+  'entities.mobs.sanctum_shackle_bellows.name': 'Оковы Мехов',
   'entities.mobs.apprentice_wren.name': 'Ученица Рен',
   'entities.mobs.barrow_wight.name': 'Курганное умертвие',
   'entities.mobs.castaway_navigator.name': 'Штурман Сули',
@@ -14323,15 +17472,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.the_meredark.name': 'Озёрный Мрак',
   'entities.dungeons.wildheart_basin.name': 'Котловина Дикого Сердца',
   'entities.dungeons.wildheart_basin.enterText':
-    'Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.',
+    'Вы проходите сквозь пасть идола на уступ высоко над котловиной. С края скал грохочут водопады, а далеко внизу что-то огромное бредёт через брод.',
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText':
     'Вы входите в холодные безмолвные залы Последнего оплота.',
+  'entities.items.reins_wobbles_slime.name': 'Желейное седло: Трясунчик',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
   'entities.items.reins_avian_strider.name': 'Поводья изумрудного долинохода',
+  'entities.items.reins_nightwing_chimera.name': 'Поводья ночнокрылой химеры',
   'entities.items.reins_lanternback_troll.name': 'Ярмо фонарщика: Грумбол',
   'entities.items.reins_chimeglass_tortoise.name': 'Колокольный ремень путеблюстителя: Толливер',
   'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',
@@ -14421,6 +17572,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.marshlight_hauberk.name': 'Хауберк болотного света',
   'entities.items.duskthorn_mantle.name': 'Оплечье сумеречного терна',
   'entities.items.fenshadow_maul.name': 'Молот болотной тени',
+  'entities.items.skerrits_shardpike.name': 'Осколочная пика Скеррита',
+  'entities.items.muster_shardpike.name': 'Осколочная пика ополчения',
+  'entities.npcs.socketwright_skerrit.name': 'Мабен Скеррит',
+  'entities.npcs.socketwright_skerrit.title': 'Гнездовщик',
+  'entities.npcs.socketwright_skerrit.greeting':
+    'Сорок лет с тех пор, как я огранил тот глаз и посадил его в глазницу, и ни дня оплаты. Хочешь сделать Смотрителю больно, {className}? Тогда бей по моей работе.',
+  'entities.quests.q_socketwrights_due.title': 'Долг Гнездовщика',
+  'entities.quests.q_socketwrights_due.text':
+    'Курганное стекло в эту глазницу посадил я сам: огранил линзу, усадил, заклинил ровно. Хозяева курганов не заплатили мне и медяка, а теперь моя работа ходит по топям и всё вытаптывает. Возьми мою Осколочную пику. Воткни пятку, держи острие ровно, сколько бы это ни заняло, и когда руки будут уверены  проведи её через глаз. Шкура, что он носит, привязана к тому осколку, {playerName}: ослепи его, и любой клинок в топях наконец начнёт кусать.',
+  'entities.quests.q_socketwrights_due.completion':
+    'Почувствовал, как поддалось? Сорок лет процентов, выплачено через глазницу. Пика твоя, друг. Он исцелится, он всегда исцеляется, так что заходи получать снова, когда захочется.',
+  'entities.quests.q_socketwrights_due.objectives.0.label': 'Глаз Смотрителя выбит',
+  'entities.items.foremans_barrowmaul.name': 'Курганный молот Десятника',
+  'entities.items.loomshard_eye.name': 'Око из курганного стекла',
+  'entities.items.barrowhide_pauldrons.name': 'Курганные наплечники',
+  'entities.items.mirestone_stride.name': 'Поступь Топьекамня',
+  'entities.items.foremans_wage_band.name': 'Кольцо жалованья Старшины',
+  'entities.items.mirelight_locket.name': 'Медальон болотного света',
+  'entities.items.fenwright_grips.name': 'Рукавицы болотного мастера',
   'entities.items.wildgrove_cinch.name': 'Пояс Дикой рощи',
   'entities.items.cragward_pauldrons.name': 'Наплечники скального стража',
   'entities.items.cragthorn_greatstaff.name': 'Большой посох скального терна',
@@ -15982,9 +19152,102 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'auth.browSoft': 'Мягкие',
   'auth.browThick': 'Густые',
   'auth.browAngled': 'Наклонные',
+  'auth.wocHead.hair.swept': 'Зачёсанные',
+  'auth.wocHead.hair.mohawk': 'Ирокез',
+  'auth.wocHead.hair.quiff': 'Короткий кок',
+  'auth.wocHead.hair.undercut': 'Андеркат',
+  'auth.wocHead.hair.topknot': 'Пучок на макушке',
+  'auth.wocHead.hair.shoulder': 'До плеч',
+  'auth.wocHead.hair.waves': 'Волны',
+  'auth.wocHead.hair.ponytail': 'Высокий хвост',
+  'auth.wocHead.hair.braid': 'Коса',
+  'auth.wocHead.hair.crown': 'Коса-корона',
+  'auth.wocHead.hair.twins': 'Две косы',
+  'auth.wocHead.hair.curls': 'Собранные кудри',
+  'auth.wocHead.beard.none': 'Без бороды',
+  'auth.wocHead.beard.moustache': 'Усы',
+  'auth.wocHead.beard.handlebar': 'Закрученные усы',
+  'auth.wocHead.beard.goatee': 'Эспаньолка',
+  'auth.wocHead.beard.chin': 'Бородка',
+  'auth.wocHead.beard.boxed': 'Короткая борода',
+  'auth.wocHead.beard.long': 'Длинная борода',
+  'auth.wocHead.beard.chops': 'Бакенбарды',
+  'auth.wocHead.beard.chinstrap': 'Борода-ремешок',
+  'auth.wocHead.nose.default': 'Классический',
+  'auth.wocHead.nose.broad': 'Широкий',
+  'auth.wocHead.nose.aquiline': 'Орлиный',
+  'auth.wocHead.nose.button': 'Курносый',
+  'auth.wocHead.mouth.default': 'Классические',
+  'auth.wocHead.mouth.smirk': 'Ухмылка',
+  'auth.wocHead.mouth.relaxed': 'Расслабленные',
+  'auth.wocHead.mouth.cupids_bow': 'Лук Купидона',
+  'auth.wocHead.mouth.narrow': 'Узкие',
+  'auth.wocHead.mouth.rounded': 'Округлые',
+  'auth.wocHead.brows.default': 'Классические',
+  'auth.wocHead.brows.arched': 'Дугообразные',
+  'auth.wocHead.brows.straight': 'Прямые',
+  'auth.wocHead.brows.relaxed': 'Расслабленные',
+  'auth.wocHead.brows.rounded': 'Округлые',
+  'auth.wocHead.ears.default': 'Классические',
+  'auth.wocHead.ears.large': 'Большие',
+  'auth.wocHead.ears.pointed': 'Острые',
+  'auth.wocHead.ears.round': 'Круглые',
+  'auth.wocHead.eyes.default': 'Классические',
+  'auth.wocHead.eyes.almond': 'Миндалевидные',
+  'auth.wocHead.eyes.hooded': 'С нависшими веками',
+  'auth.wocBuilder.cat.eyesBrows': 'Глаза и брови',
+  'auth.wocBuilder.cat.eyeColor': 'Цвет глаз',
+  'auth.wocBuilder.cat.hairstyle': 'Причёска',
+  'auth.wocBuilder.cat.facialHair': 'Борода и усы',
+  'auth.wocBuilder.cat.hairColor': 'Цвет волос',
+  'auth.wocBuilder.cat.browColor': 'Цвет бровей',
+  'auth.wocBuilder.cat.piercings': 'Пирсинг',
+  'auth.wocBuilder.section.hair': 'Причёска',
+  'auth.wocBuilder.section.brows': 'Форма бровей',
+  'auth.wocBuilder.section.eyes': 'Форма глаз',
+  'auth.wocBuilder.slider.eyeSpacing': 'Расстояние между глазами',
+  'auth.wocBuilder.slider.browHeight': 'Высота бровей',
+  'auth.wocBuilder.slider.chinWidth': 'Ширина подбородка',
+  'auth.wocBuilder.piercing.lobes': 'Мочки',
+  'auth.wocBuilder.piercing.nose': 'Ноздря',
+  'auth.wocBuilder.piercing.septum': 'Септум',
+  'auth.wocBuilder.skin.porcelain': 'Фарфоровый',
+  'auth.wocBuilder.skin.ivory': 'Слоновая кость',
+  'auth.wocBuilder.skin.peach': 'Персиковый',
+  'auth.wocBuilder.skin.beige': 'Бежевый',
+  'auth.wocBuilder.skin.honey': 'Медовый',
+  'auth.wocBuilder.skin.olive': 'Оливковый',
+  'auth.wocBuilder.skin.caramel': 'Карамельный',
+  'auth.wocBuilder.skin.bronze': 'Бронзовый',
+  'auth.wocBuilder.skin.chestnut': 'Каштановый',
+  'auth.wocBuilder.skin.umber': 'Умбра',
+  'auth.wocBuilder.skin.mahogany': 'Махагоновый',
+  'auth.wocBuilder.skin.ebony': 'Эбеновый',
+  'auth.wocBuilder.eye.brown': 'Карие',
+  'auth.wocBuilder.eye.darkBrown': 'Тёмно-карие',
+  'auth.wocBuilder.eye.hazel': 'Ореховые',
+  'auth.wocBuilder.eye.amber': 'Янтарные',
+  'auth.wocBuilder.eye.green': 'Зелёные',
+  'auth.wocBuilder.eye.violet': 'Фиолетовые',
+  'auth.wocBuilder.hairColor.platinum': 'Платиновый',
+  'auth.wocBuilder.hairColor.blonde': 'Блонд',
+  'auth.wocBuilder.hairColor.golden': 'Золотистый',
+  'auth.wocBuilder.hairColor.copper': 'Медный',
+  'auth.wocBuilder.hairColor.auburn': 'Тёмно-рыжий',
+  'auth.wocBuilder.hairColor.lightBrown': 'Светло-каштановый',
+  'auth.wocBuilder.hairColor.brown': 'Каштановый',
+  'auth.wocBuilder.hairColor.darkBrown': 'Тёмно-каштановый',
+  'auth.wocBuilder.hairColor.black': 'Чёрный',
+  'auth.wocBuilder.hairColor.silver': 'Серебристый',
+  'auth.wocBuilder.hairColor.white': 'Белый',
+  'auth.wocBuilder.matchHair': 'В тон волосам',
+  'auth.wocBuilder.resetDefault': 'Вернуть по умолчанию',
+  'auth.wocBuilder.customColorAria': 'Выбрать свой цвет',
+  'auth.wocBuilder.customSkinAria': 'Выбрать свой тон кожи',
   'hudChrome.paperdoll.hideHelmAria': 'Скрыть шлем',
   'hudChrome.paperdoll.showHelmAria': 'Показать шлем',
   'hudChrome.options.waterRipples': 'Рябь на воде (кильватер)',
+  'hudChrome.options.spellEffects': 'Эффекты заклинаний',
   'hudChrome.options.actionCam': 'Экшен-камера',
   'hudChrome.options.actionCamShoulder': 'Плечо экшен-камеры',
   'hudChrome.options.actionCamShoulderLeft': 'Слева {pct}',
@@ -16030,10 +19293,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Отмечает одного участника группы как ваш «Маяк Света». 50% вашего эффективного прямого исцеления другого участника группы в пределах 60 м также исцеляет Маяк. Исцеление по области и периодическое исцеление не переносятся. Действует, пока один из вас не погибнет.',
   'entities.abilities.beacon_of_light.name': 'Маяк Света',
   'entities.abilities.bloodhook.description':
-    'Рывок к врагу на расстоянии от 8 до 25 м, открывающий основную рану с кровотечением на 24 ед. урона за 12 сек. (Фирменная способность Полевой выучки)',
+    'Рывок к врагу с наложением раны Кровавого крюка: 34 базового физического урона плюс 26% силы атаки дальнего боя за 12 сек. в 4 срабатывания. При прибытии замедляет цель на 30% на 3 сек. (Выживание)',
   'entities.abilities.bloodhook.name': 'Кровавый крюк',
   'entities.abilities.bloodtrail_assault.description':
-    'На 12 сек. усиливает Кровавый крюк, Разрыв раны, Шрапнельный заряд и последующие атаки питомца.',
+    'На 12 сек. Кровавый крюк распространяет рану с 60% силы на максимум 2 врагов в радиусе 5 м, Рваная рана приказывает питомцу атаковать на 18 урона, а Шрапнельный заряд достигает на 2 м дальше, наносит основной цели на 25% больше базового урона и вызывает на 50% больше урона раны. Пока нет живого питомца, Концентрация также восстанавливается на 100% быстрее.',
   'entities.abilities.bloodtrail_assault.name': 'Натиск по кровавому следу',
   'entities.abilities.body_blow.description':
     'Тяжелый удар, наносящий 130% урона от оружия плюс 10. Дает 2 очка серии приемов и добавляет 1 деление Redline (максимум 4). (механика Боя)',
@@ -16050,6 +19313,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'На 10 сек. делает кожу твёрдой, как остывший шлак, и снижает весь получаемый урон на 25%.',
   'entities.abilities.cinderhide.name': 'Шлаковая кожа',
   'entities.abilities.claw.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
+  'entities.abilities.scratch.specNote_feral':
     'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.cold_focus.description':
     'На 12 сек. Выверенный выстрел дает больше концентрации, а Дальний натяг становится быстрее и дешевле. (Фирменная способность Холодного взора)',
@@ -16100,7 +19365,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.specNote_feral':
     'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Кровавой жатвой: укус, расходующий Старую кровь на более мощный удар, который также мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, и восстанавливает энергию.',
   'entities.abilities.fieldcraft_reentry.description':
-    'Пассивно: Разрыв следа обновляет Охотничий натиск и на 12 сек. усиливает следующий Потрошащий удар или Кровавый крюк. Потрошащий удар наносит на 15% больше урона за каждый заряд. Кровавый крюк наносит еще от 18 до 24 ед. физического урона, увеличенного на 15% за каждый заряд и зависящего от силы атаки дальнего боя. При 3 зарядах любая атака поглощает Охотничий натиск. (Полевая выучка)',
+    'Пассивно: при наличии Охотничьего натиска Разрыв следа подготавливает следующий Потрошащий удар или Кровавый крюк на 12 сек. Потрошащий удар наносит на 15% больше урона за заряд. Кровавый крюк наносит дополнительно от 18 до 24 физического урона, растущего на 15% за заряд и с силой атаки дальнего боя. При 3 зарядах любая из этих атак расходует Охотничий натиск. (Выживание)',
   'entities.abilities.fieldcraft_reentry.name': 'Подготовленное возвращение',
   'entities.abilities.final_edict.description':
     'Наносит сокрушительный удар оружием и при попадании создает 1 ед. Преданности. Успешное попадание сокращает оставшееся время восстановления «Падения рассвета» на 2 сек. Успешные автоматические атаки и попадания «Последнего эдикта» с вероятностью 15% дают «Гнев рассвета» на 8 сек. Вознесение также создает вокруг вас взрыв Света.',
@@ -16109,7 +19374,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Осыпает метательными ножами всех врагов в радиусе 6 м, нанося {damage} ед. физического урона и давая 2 очка серии приемов. (талант разбойника)',
   'entities.abilities.flurry_of_knives.name': 'Вихрь ножей',
   'entities.abilities.frostjaw_trap.description':
-    'Устанавливает взведенную ловушку у выбранного врага или у ваших ног. Она обездвиживает первого сработавшего на ней врага и замедляет врагов рядом.',
+    'Устанавливает ловушку в выбранном месте. Она взводится через 0,75 сек. и действует 1 мин. Видеть её можете только вы и ваша группа. Первый враг, попавший в неё, обездвиживается на 3 сек., а враги в радиусе 4 м замедляются на 50% на 4 сек.',
   'entities.abilities.frostjaw_trap.name': 'Капкан ледяной пасти',
   'entities.abilities.funeral_harvest.description':
     'Когда погибает противник, которому недавно нанесли урон вы или ваши мертвецы, вы получаете 1 осколок души. Эффект срабатывает не чаще раза в 3 сек.',
@@ -16135,7 +19400,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Обрушивает суд на ваш основной дурной глаз на 15 сек., создаёт 40 ед. Осуждения и 3 Нити судьбы, активирует Одержимость, удваивает Осуждение от основного дурного глаза и повышает урон «Приговора» на 20%. Первый «Приговор» возвращает 50 ед. Осуждения.',
   'entities.abilities.hour_of_judgment.name': 'Час суда',
   'entities.abilities.hunting_momentum.description':
-    'Пассивно: Потрошащий удар дает 1 заряд Охотничьего натиска на 8 сек., вплоть до 3 зарядов. При 3 зарядах Ответный клык наносит на 45% больше урона от удара и поглощает все заряды. (Полевая выучка)',
+    'Пассивно: Потрошащий удар и Шрапнельный заряд, попавший по врагу, дают по 1 заряду Охотничьего натиска, максимум 3. Заряды остаются до расходования или выхода из боя; каждый повышает скорость движения на 15%. При 3 зарядах Рваная рана наносит на 60% больше урона удара и расходует заряды. (Выживание)',
   'entities.abilities.hunting_momentum.name': 'Охотничий натиск',
   'entities.abilities.hushbrand.description':
     'Прерывает применение заклинания и на 4 сек. запрещает заклинания той же школы.',
@@ -16156,13 +19421,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваше проклятое око раз в 2,5 сек. атакует выбранную основную цель дурного глаза и наносит урон от Тьмы. Одержимость дурным глазом удваивает скорость атак.',
   'entities.abilities.maledict_gaze.name': 'Проклятый взор',
   'entities.abilities.marrowbreak.description':
-    'Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья на 8 сек. и возвращает 15 ед. ярости.',
+    'Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он исцеляет вас на 18% максимального здоровья и возвращает 15 ед. ярости.',
   'entities.abilities.marrowbreak.name': 'Дробление костей',
   'entities.abilities.martyrs_aegis.description':
     'Уменьшает получаемый союзником урон на 40% на 8 сек.',
   'entities.abilities.martyrs_aegis.name': 'Эгида мученика',
   'entities.abilities.maul.specNote_feral':
-    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Дроблением костей: удар, наносящий от 78 до 96 ед. урона с высокой угрозой; ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья и возвращает 15 ед. ярости.',
+    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Дроблением костей: удар, наносящий от 78 до 96 ед. урона с высокой угрозой; ниже половины здоровья вместо удара он исцеляет вас на 18% максимального здоровья и возвращает 15 ед. ярости.',
   'entities.abilities.measured_shot.description':
     'Выверенный выстрел наносит {damage} ед. физического урона и при попадании дает 20 ед. концентрации.',
   'entities.abilities.measured_shot.name': 'Выверенный выстрел',
@@ -16187,7 +19452,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Отмечает противника на 15 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 ярдов и создаёт 1 осколок души.',
   'entities.abilities.ossuary_mark.name': 'Метка оссуария',
   'entities.abilities.overbloom.description':
-    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет.',
+    'Расходует ваши 3 стадии Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Спороисцеление.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новое Спороисцеление.',
   'entities.abilities.overbloom.name': 'Сверхцветение',
   'entities.abilities.pack_command.description':
     'Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи.',
@@ -16231,9 +19498,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает {rage} ед. энергии. Работает даже без очков серии приемов.',
   'entities.abilities.redharvest.name': 'Кровавая жатва',
   'entities.abilities.regrowth.specNote_restoration':
-    'Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5).',
+    'Каждое применение добавляет 1 стадию Зелени (максимум 3), даже если обновляет уже действующий расцвет.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5). При 5 стадиях Зелени Быстрое восстановление становится Сверхцветением.',
+    'Каждое применение добавляет 1 стадию Зелени (максимум 3), даже если обновляет уже действующий расцвет. При 3 стадиях Зелени Быстрое восстановление становится Сверхцветением.',
   'entities.abilities.rip.specNote_feral':
     'Попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.ruinous_brand.description':
@@ -16264,7 +19531,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Снижает получаемый урон на 60% на 8 сек., но во время действия запрещает атаковать.',
   'entities.abilities.shellskin.name': 'Панцирная кожа',
   'entities.abilities.shrapnel_charge.description':
-    'Поражает цель и ближайших врагов шрапнелью, затем распространяет с основной цели короткое кровотечение.',
+    'Поражает конус длиной 10 м перед вами. Ваша цель, либо ближайший поражённый враг, если цель вне конуса, получает от 24 до 30 физического урона. Остальные враги в конусе получают от 7 до 9 урона и кровоточат на 12 урона за 6 сек. Если на основной цели есть ваша рана Кровавого крюка, немедленно наносит 1 срабатывание её урона. Попадание по врагу даёт 1 Охотничий натиск. Прямой урон растёт с силой атаки дальнего боя.',
   'entities.abilities.shrapnel_charge.name': 'Шрапнельный заряд',
   'entities.abilities.sinister_strike.specNote_assassination':
     'Добавляет 1 этап Ядовитого ритуала (максимум 6).',
@@ -16316,13 +19583,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Условный свист подстегивает вашу группу, увеличивая скорость атаки, произнесения заклинаний и поддержания на 10% на 10 сек. Союзники, недавно получившие групповое ускорение, слишком истощены, чтобы получить эффект. (талант разбойника)',
   'entities.abilities.thieves_chorus.name': 'Хор воров',
   'entities.abilities.thunder_reservoir.description':
-    'Пассивно: Дуга молнии и Небесная ветвь накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)',
+    'Пассивно: Дуговая стрела, Разветвленная молния и Взрыв магмы дают Гром, максимум 5 зарядов. Земной толчок расходует весь Гром и наносит на 25% больше урона за заряд (125% при 5). Пробуждение разлома расходует весь Гром и наносит на 20% больше урона за заряд (100% при 5). (Стихии)',
   'entities.abilities.thunder_reservoir.name': 'Грозовой запас',
   'entities.abilities.tidecall.description':
     'Исцеляет дружественную цель на {damage}. Исцеление усиливается силой заклинаний. Добавляет полный объем до избыточного исцеления в Поток исцеления, вплоть до 30% максимального здоровья цели.',
   'entities.abilities.tidecall.name': 'Зов прилива',
   'entities.abilities.trailbreak.description':
-    'Отпрыгивает назад, не теряя состояние специализации. Полевая выучка также подготавливает следующее возвращение в бой.',
+    'Отпрыгивает на 25 м назад и снимает эффекты обездвиживания и замедления. После приземления скорость передвижения повышается на 50% на 3 сек. Если у вас есть Охотничий натиск, он обновляется и дает Подготовленное возвращение на 12 сек.',
   'entities.abilities.trailbreak.name': 'Разрыв следа',
   'entities.abilities.umbral_anchor.description':
     'Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек.',
@@ -16460,13 +19727,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Облик ближнего боя: энергия и приёмы серии, как у разбойника, и куда меньше угрозы.',
   'guide.classPage.formLine.form_travel':
     'Дорожный облик: по земле вы двигаетесь куда быстрее, но других способностей нет, пока не выйдете из него.',
+  'guide.classPage.formLine.form_sporemender':
+    'Целительный облик Исцеления: прочная шкура и более сильное исцеление при более медленном шаге, а все заклинания и мана остаются при вас.',
   'guide.classPage.formName.form_bear': 'Облик бурого',
   'guide.classPage.formName.form_travel': 'Форма скорохода',
+  'guide.classPage.formName.form_sporemender': 'Облик спороцелителя',
   'guide.classPage.formsHeading': 'Смена облика',
   'guide.classPage.formsMoonwing':
-    'Друид ветки Баланса получает ещё один облик, Облик лунного совуха — облик заклинателя, в котором такой друид и сражается. Это единственный звериный облик, что сохраняет ваши заклинания, а ваш жезл работает лишь в нём или в обычном облике заклинателя.',
+    'Друид Баланса получает ещё один облик — Облик лунного совуха, в котором эта специализация сражается как заклинатель. Подобно Облику спороцелителя Исцеления, он сохраняет ваши заклинания; жезл работает только в этих двух обликах или в обычном облике заклинателя.',
   'guide.classPage.formsWolfEngage':
-    'Волк открывает бой Натиском бурого, сразу переходит в Облик волка, чтобы пригвоздить цель, сокращает дистанцию Выпадом, когда не скрывается, и удерживает врага Повалом.',
+    'Волк открывает бой Натиском бурого, сразу переходит в Облик кота, чтобы пригвоздить цель, сокращает дистанцию Выпадом, когда не скрывается, и удерживает врага Повалом.',
   'guide.classPage.formsAutoUnshift':
     'Лечащее или атакующее заклинание, применённое в облике, само выводит вас из него. Такой выход не стоит маны и не тратит общее восстановление, поэтому мгновенное заклинание срабатывает в тот же миг, как вы его нажали. Обратное превращение остаётся обычной способностью и по-прежнему стоит маны и общего восстановления.',
   'guide.classPage.formsNote':
@@ -17120,6 +20390,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     'Открывает второй ряд панели способностей, а следом за ним и третий. Ячейки остаются доступны по своим горячим клавишам, даже пока ряды скрыты.',
   'guide.settingsPage.ifFctScale': 'Размер чисел урона и лечения, что всплывают над вашей целью.',
+  'guide.settingsPage.ifClassicCombatText':
+    'Возвращает простые белые и бледно-золотые числа урона, которые поднимаются прямо вверх. Если оставить выключенным (по умолчанию), числа становятся ярче и разлетаются в стороны, а критические и особо крупные удары вспыхивают.',
   'guide.settingsPage.ifFramesIntro':
     'Ваша собственная рамка, рамка цели и вся раскладка группы. У группового блока есть ещё и ползунки масштаба, ширины, высоты, отступов и числа столбцов, чтобы рейдовая сетка вписалась в ваш экран, а кнопка «Сброс» внизу вкладки возвращает все рамки на исходные места.',
   'guide.settingsPage.ifGeneralIntro':
@@ -17217,6 +20489,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Как далеко вдаль отрисовывается мир, прежде чем растаять. Каждый пресет задаёт это за вас, пока вы не сдвинете ползунок сами.',
   'guide.settingsPage.rowWaterQuality':
     'Как затеняются озёра, реки и открытое море, от плоского и дешёвого до полностью отражающего.',
+  'guide.settingsPage.rowSpellEffects':
+    'Свечение, искры, снаряды и вспышки попаданий от заклинаний игроков и их питомцев, включая ваши. Выключите их, чтобы успокоить картинку или выиграть пару кадров в крупных групповых боях. Всё, что применяют враги, по-прежнему видно, как и круги, отмечающие зону, из которой нужно выйти, метки над оглушёнными, испуганными или обездвиженными целями и все полосы чтения.',
   'guide.settingsPage.rowWaterRipples':
     'Следы и круги, что расходятся за вами, пока вы плывёте. По умолчанию выключено, и это единственный водный эффект, который правда стоит кадров; на брызги и пузыри он не влияет никак.',
   'guide.settingsPage.valueUltraOrInsane':
@@ -17328,7 +20602,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     'В этом окне использовано {used} из {cap} сек. сокращения восстановления',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Облик волка не тратит ману и пригвождает цель вашего Натиска бурого, замедляя её на {pct}% на {sec} сек.',
+    'Облик кота не тратит ману и пригвождает цель вашего Натиска бурого, замедляя её на {pct}% на {sec} сек.',
   'hudChrome.auraEffect.dawnsWrath': 'МГ: любое здоровье · +1 применение · КД 0 · +{pct}% урона',
   'hudChrome.auraEffect.desolation':
     'Заряды: {charges}. Следующая Стрела хаоса применяется на {castPct}% быстрее, либо Огненный дождь падает мгновенно',
@@ -17351,6 +20625,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Облик демона: размер тела увеличен на {pct}%; прочие бонусы показаны отдельными эффектами',
   'hudChrome.auraEffect.formMoonkin':
     'Облик лунного крыла: урон заклинаний повышен на {pct}%, а броня на {armorPct}%',
+  'hudChrome.auraEffect.formSporemender':
+    'Облик спороцелителя: исходящее исцеление повышено на {pct}%, броня на {armorPct}%, а скорость передвижения снижена на {slowPct}%',
   'hudChrome.auraEffect.formShadow': 'Сумрачный облик: урон от темной магии повышен на {pct}%',
   'hudChrome.auraEffect.freeExecute': 'Следующее подходящее добивающее умение не требует ресурсов',
   'hudChrome.auraEffect.funeralHarvestLock':
@@ -17423,7 +20699,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     'Ядовитый ритуал: этап {stacks} из {max}. «Трусливый выпад», «Злодейский разрез» и «Ядовитый дротик» добавляют по 1 этапу; на этапе {max} «Вечный сон» превращается в «Ядовитый разрыв»',
   'hudChrome.auraEffect.verdance':
-    'Зелень: стадия {stacks} из {max}. Каждый НОВЫЙ посаженный Дикий расцвет или Второй расцвет добавляет 1. При {max} Быстрое восстановление становится Сверхцветением',
+    'Зелень: стадия {stacks} из {max}. Каждый применённый Спороисцеление, Второй расцвет или Дикое заживление добавляет 1, и каждая стадия сокращает время применения Дикого заживления. При {max} Быстрое восстановление становится Сверхцветением',
   'hudChrome.auraEffect.warlockAnchor':
     'Повторное применение в пределах {range} м возвращает сюда и поглощает якорь',
   'hudChrome.auraEffect.wintersChill':
@@ -17719,7 +20995,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professionTrainers.mining': 'Учитель горного дела',
   'hudChrome.professionTrainers.hobby': 'Учитель увлечений',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    'Уже вернулся с берега? Это был паромный колокол. Его близнец висит вон там, у почтового столба Вранопочты: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.',
+    'Уже вернулся с берега? Это был паромный колокол. Его близнец висит прямо рядом, на причале: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     'Добро пожаловать на Берег Испытаний. Страж Там ждет чуть дальше на берегу: подойдите к нему. Когда захотите уйти, позвоните в колокол рядом с моим причалом, и он в любое время перенесет вас в долину.',
   'hudChrome.tutorialGreeting.noteClose': 'Понятно',
@@ -17864,7 +21140,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': 'Странница Брин',
   'entities.npcs.wayfarer_bryn.title': 'Проводница гавани',
   'entities.npcs.wayfarer_bryn.greeting':
-    'Истврукская долина принимает всех, друг. А для тех, кто еще нетвердо стоит на ногах, всегда есть Берег Испытаний: паромный колокол у почтового столба Вранопочты перезвонит тебя туда в любой день года, а его близнец на острове позвонит домой.',
+    'Истврукская долина принимает всех, друг. А для тех, кто еще нетвердо стоит на ногах, всегда есть Берег Испытаний: паромный колокол на причале перезвонит тебя туда в любой день года, а его близнец на острове позвонит домой.',
   'entities.npcs.instructor_maren.name': 'Наставница Марен',
   'entities.npcs.instructor_maren.title': 'Мастер испытаний',
   'entities.npcs.instructor_maren.greeting':
@@ -18243,7 +21519,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Это два отдельных действия над одним и тем же телом. Всё, что держит туша, монеты и выпавшие вещи вместе с компонентами для разделки, открывается в одном окне, но клавиша взаимодействия и «Взять добычу» забирают только обычную добычу, которая подчиняется обычным правилам добычи. Разделка же относится к стороне ремёсел: это снятие материалов с самой туши, и происходит она, лишь когда вы выбираете в этом окне «Собрать».\n\nРазделка идёт по правилу «кто первый»: каждая туша разделывается ровно один раз, тем, кто заявит её первым, и в онлайне тоже. Что вам достанется, задаёт «Фокус города»: стоя в узловом городе, вы распределяете 10 очков фокуса по тем видам компонентов, что вам важны, и каждый компонент под фокусом выпадает уровнем выше (каждые 5 очков поднимают его на ступень, но не более чем на две ступени) и приносит больше (10 процентов за очко). Компонентам без фокуса хуже не становится никогда.',
   'guide.profPages.faq.a4':
-    'Вам повезло. Примерно один сбор из 90 оборачивается редкой находкой (древняя сердцевина на дереве, нетронутая жила в руде, лунный цветок среди трав): добыча умножается впятеро, каждая единица подписывается вашим именем, и о находке узнаёт вся зона. Обычный сбор с броском редкого качества или выше тоже подписывает добычу.\n\nПодписанные материалы стоит беречь или продавать дорого: любая подписанная копия нужного реагента у станка добавляет 2 процентных пункта к шансу шедевра. Помните только, что они складываются в стопку лишь с одинаково подписанными копиями, поэтому занимают собственную ячейку сумки.',
+    'Вам попался богатый урожай. Примерно 1 из 90 сборов запускает редкое событие: древнюю сердцевину дерева, нетронутую рудную жилу или лунный цветок среди трав. Добыча увеличивается впятеро, каждая единица получает вашу подпись, а находка объявляется всей зоне. Обычный сбор с выпавшим редким или более высоким качеством тоже подписывает добычу.\n\nПодписанные материалы стоит сохранить или дорого продать: любой подписанный экземпляр нужного реагента в сумках либо Хранилище материалов, откуда его может взять ремесло, добавляет 2 процентных пункта к вероятности шедевра. Они могут делить совместимую стопку с неподписанными материалами и единицами других сборщиков и подписантов, не теряя отметок; каждый источник и его количество хранятся отдельно.',
   'guide.profPages.faq.a5':
     'Подойдите с вещью в сумках к любому ремесленному станку и заплатите мастеру. Плата идёт по качеству вещи: 25 серебра за необычную, 1 золото за редкую, 4 золота за эпическую; легендарная платит по ставке эпической, а заказная вещь обычного качества — по ставке необычной. Станок должен быть настоящим: передвижная станция такой услуги не оказывает никогда.\n\nПлата даёт чистый лист, а не лекарство: вещь остаётся заказной, так что при следующем обмене она снова привяжется к тому, кто её получит. Если в одной стопке лежит несколько привязанных копий, за каждую плату отделяется и освобождается одна копия.',
   'guide.profPages.faq.a8':
@@ -18636,12 +21912,306 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Прекрасно начертано! Ваши шаги заслужили золотую оценку.',
   'questUi.worldQuest.traceReaction.elianComplete':
     'Руна завершена! Старательная практика сделает следующую ещё лучше.',
+  'entities.mobs.buddy_alpaca.name': 'Альпака',
+  'entities.mobs.buddy_sapling.name': 'Деревце',
+  'entities.items.whistle_sapling.name': 'Свисток: Деревце',
+  'hudChrome.collections.presence.sapling': 'Позади топают маленькие корни, вороша опавшую листву.',
+  'hudChrome.collections.buddyLore.sapling':
+    'Молодое деревце с улыбкой на коре и любопытными фиолетовыми глазами. Его корни весело несут его вперевалку, куда бы вы ни отправились.',
+  'entities.mobs.buddy_horse.name': 'Лошадь',
+  'entities.mobs.buddy_ansem.name': 'Ансем',
+  'entities.mobs.buddy_crimson_claw_crab.name': 'Багровоклешневый краб',
+  'entities.mobs.buddy_crystal_lich.name': 'Хрустальный лич',
+  'entities.mobs.buddy_crystal_tide.name': 'Хрустальный прилив',
+  'entities.mobs.buddy_ember_fox.name': 'Тлеющая лисица',
+  'entities.mobs.buddy_emerald_wolf.name': 'Изумрудный волк',
+  'entities.mobs.buddy_forgemaw.name': 'Горнилозев Расплавленный',
+  'entities.mobs.buddy_sprites.name': 'Мерцай и Искорка',
+  'entities.mobs.buddy_frostfire.name': 'Ледяное пламя',
+  'entities.mobs.buddy_golden_sentinel.name': 'Золотой страж',
+  'entities.mobs.buddy_kekius.name': 'Кекиус',
+  'entities.mobs.buddy_loot_goblin.name': 'Гоблин-барыга',
+  'entities.mobs.buddy_nightfang.name': 'Ночной Клык',
+  'entities.mobs.buddy_penny_goldspark.name': 'Пенни Златоискра',
+  'entities.mobs.buddy_phantom.name': 'Фантом',
+  'entities.mobs.buddy_proud_grunt.name': 'Гордый рубака',
+  'entities.mobs.buddy_raptor.name': 'Раптор',
+  'entities.mobs.buddy_rocky.name': 'Рокки',
+  'entities.mobs.buddy_skeleton.name': 'Скелет',
+  'entities.mobs.buddy_solbot.name': 'Солбот',
+  'entities.mobs.buddy_spider.name': 'Паук',
+  'entities.mobs.buddy_tiger.name': 'Тигр',
+  'entities.mobs.buddy_triple_t.name': 'Тройное Т',
+  'entities.mobs.buddy_trollface.name': 'Тролльфейс',
+  'entities.mobs.buddy_tuskhorn_boar.name': 'Клыкорогий вепрь',
+  'entities.items.whistle_alon.name': 'Свисток: Алон',
+  'entities.items.whistle_alpaca.name': 'Свисток: Альпака',
+  'entities.items.whistle_horse.name': 'Свисток: Лошадь',
+  'entities.items.whistle_ansem.name': 'Свисток: Ансем',
+  'entities.items.whistle_bull.name': 'Свисток: Бык',
+  'entities.items.whistle_cate_coin.name': 'Свисток: Кейт Коин',
+  'entities.items.whistle_crimson_claw_crab.name': 'Свисток: Багровоклешневый краб',
+  'entities.items.whistle_crystal_lich.name': 'Свисток: Хрустальный лич',
+  'entities.items.whistle_crystal_tide.name': 'Свисток: Хрустальный прилив',
+  'entities.items.whistle_ember_fox.name': 'Свисток: Тлеющая лисица',
+  'entities.items.whistle_emerald_wolf.name': 'Свисток: Изумрудный волк',
+  'entities.items.whistle_forgemaw.name': 'Свисток: Горнилозев Расплавленный',
+  'entities.items.whistle_frog.name': 'Свисток: Лягушка',
+  'entities.items.whistle_frostfire.name': 'Свисток: Ледяное пламя',
+  'entities.items.whistle_golden_sentinel.name': 'Свисток: Золотой страж',
+  'entities.items.whistle_kekius.name': 'Свисток: Кекиус',
+  'entities.items.whistle_loot_goblin.name': 'Свисток: Гоблин-барыга',
+  'entities.items.whistle_moss_hare.name': 'Свисток: Моховой заяц',
+  'entities.items.whistle_nightfang.name': 'Свисток: Ночной Клык',
+  'entities.items.whistle_penny_goldspark.name': 'Свисток: Пенни Златоискра',
+  'entities.items.whistle_phantom.name': 'Свисток: Фантом',
+  'entities.items.whistle_proud_grunt.name': 'Свисток: Гордый рубака',
+  'entities.items.whistle_raptor.name': 'Свисток: Раптор',
+  'entities.items.whistle_rocky.name': 'Свисток: Рокки',
+  'entities.items.whistle_skeleton.name': 'Свисток: Скелет',
+  'entities.items.whistle_solbot.name': 'Свисток: Солбот',
+  'entities.items.whistle_spider.name': 'Свисток: Паук',
+  'entities.items.whistle_stag.name': 'Свисток: Олень',
+  'entities.items.whistle_tiger.name': 'Свисток: Тигр',
+  'entities.items.whistle_triple_t.name': 'Свисток: Тройное Т',
+  'entities.items.whistle_trollface.name': 'Свисток: Тролльфейс',
+  'entities.items.whistle_tuskhorn_boar.name': 'Свисток: Клыкорогий вепрь',
+  'entities.items.whistle_sprites.name': 'Свисток: Мерцай и Искорка',
+  'hudChrome.buddyMenu.rename': 'Переименовать спутника',
+  'hudChrome.buddyMenu.nameLabel': 'Имя спутника',
+  'hudChrome.buddyMenu.autolootEnable': 'Включить автосбор',
+  'hudChrome.buddyMenu.autolootDisable': 'Выключить автосбор',
+  'hudChrome.buddyMenu.autolootHint':
+    'Спутник соберёт добычу с ваших собственных трупов в радиусе 30 ярдов.',
+  'hudChrome.buddyMenu.cancel': 'Отмена',
+  'hudChrome.collections.title': 'Охота',
+  'hudChrome.collections.close': 'Закрыть охоту',
+  'hudChrome.collections.keybindLabel': 'Охота',
+  'hudChrome.collections.launcherTitle': 'Охота: спутники, транспорт и комплекты',
+  'hudChrome.collections.tabs.buddies': 'Спутники',
+  'hudChrome.collections.tabs.mounts': 'Транспорт',
+  'hudChrome.collections.state.owned': 'Собрано',
+  'hudChrome.collections.state.notOwned': 'Не собрано',
+  'hudChrome.collections.state.unavailable': 'Пока недоступно',
+  'hudChrome.collections.petKind.beast': 'Звери',
+  'hudChrome.collections.petKind.humanoid': 'Гуманоиды',
+  'hudChrome.collections.petKind.elemental': 'Элементали',
+  'hudChrome.collections.petKind.undead': 'Нежить',
+  'hudChrome.collections.petKind.celebrity': 'Знаменитости',
+  'hudChrome.collections.armor.cloth': 'Ткань',
+  'hudChrome.collections.armor.leather': 'Кожа',
+  'hudChrome.collections.stat.strength': 'Сила',
+  'hudChrome.collections.stat.agility': 'Ловкость',
+  'hudChrome.collections.stat.intellect': 'Интеллект',
+  'hudChrome.collections.stat.mixed': 'Гибрид',
+  'hudChrome.collections.set.owned': '{owned} из {total} предметов',
+  'hudChrome.collections.set.bonusLabel': 'предметов: {pieces}',
+  'hudChrome.collections.set.itemLevel': 'ур. предмета {level}',
+  'hudChrome.collections.detail.dropLabel': 'Выпадает с',
+  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% за убийство',
+  'hudChrome.collections.detail.dropWithHeroic':
+    '{mob} ({location}), {chance}% за убийство, {heroicChance}% в героическом режиме',
+  'hudChrome.collections.detail.heroicDrop':
+    '{mob} ({location}), только героический режим, {chance}% за убийство',
+  'hudChrome.collections.detail.globalDrop':
+    'Любой противник, {chance}% за убийство, один из {count} этой редкости',
+  'hudChrome.collections.detail.fishingDrop': 'Рыбалка где угодно, {chance}% за улов',
+  'hudChrome.collections.detail.noSource': 'В игре пока нет источника',
+  'hudChrome.collections.detail.noItem': 'Пока ни один предмет это не даёт',
+  'hudChrome.collections.detail.bindLabel': 'Привязка',
+  'hudChrome.collections.detail.soulbound': 'Персональный',
+  'hudChrome.collections.detail.tradeable': 'Можно обменять',
+  'hudChrome.collections.detail.sellLabel': 'Торговец платит',
+  'hudChrome.collections.detail.noSell': 'Нельзя продать',
+  'hudChrome.collections.detail.setLabel': 'Собрано',
+  'hudChrome.collections.detail.marketLabel': 'Мировой рынок',
+  'hudChrome.collections.detail.marketNone': 'Нет лотов',
+  'hudChrome.collections.detail.marketChecking': 'Проверка…',
+  'hudChrome.collections.detail.marketAtMerchant': 'Показано у торговца',
+  'hudChrome.collections.detail.exchangeLabel': 'Биржа $WOC',
+  'hudChrome.collections.detail.exchangeNone': 'Нет лотов',
+  'hudChrome.collections.detail.exchangeUnavailable': 'Недоступно в этом клиенте',
+  'hudChrome.collections.detail.honorPrice': '{amount} чести',
+  'hudChrome.collections.detail.marksPrice': '{amount} героических знаков',
+  'hudChrome.options.showPetNames': 'Показывать имена питомцев',
+  'hudChrome.warfareShop.companions': 'Спутники',
+  'itemUi.kind.buddy': 'Спутник',
+  'hudChrome.collections.buddyLore.alon':
+    'Талисман путников с дороги, которую не признаёт ни одна карта; появляется везде, где план идёт наперекосяк. Смотрит, одобряет и не помогает совершенно ничем.',
+  'hudChrome.collections.buddyLore.alpaca':
+    'В стадах Гейлкреста их держат ради шерсти и нрава: в бурю никто не сохраняет такого спокойствия. Этот плюётся ровно в одного человека за поездку.',
+  'hudChrome.collections.buddyLore.horse':
+    'Пони из Истврукской долины, выведенный мелким для садовых дорожек, и никто так и не сказал ему, что он не боевой конь. Держится у вашего плеча и пойдёт за любым, кто хоть раз угостил его яблоком.',
+  'hudChrome.collections.buddyLore.ansem':
+    'Говорит о дверях и о тьме и больше ни слова не скажет ни о том, ни о другом. Культисты Ночецветья зовут его своим, а он уходит всякий раз, когда они начинают обряд.',
+  'hudChrome.collections.buddyLore.bull':
+    'Бык из Истврукской долины размером с собаку, и это единственная причина, по которой его согласились держать в доме. Нрав вместе с остальным уменьшаться не стал.',
+  'hudChrome.collections.buddyLore.cate_coin':
+    'Кот, который ни за что не расстанется с монетой, на которой сидит, и которого никто никогда не видел за едой. Торговцы Истврука до сих пор спорят, кто из этих двоих чей питомец.',
+  'hudChrome.collections.buddyLore.crimson_claw_crab':
+    'Приливный краб с Дальнего Берега, клешня которого остаётся красной ещё долго после того, как он выйдет из воды. Портовые артели когда-то гоняли их наперегонки по доскам на деньги.',
+  'hudChrome.collections.buddyLore.crystal_lich':
+    'Осколок самого Нитраксиса, всё ещё гудящий тем холодом, что его создал. Он слушается того, кто вытащил его из обломков рейда, и до сих пор этого не простил.',
+  'hudChrome.collections.buddyLore.crystal_tide':
+    'Приливный дух верхом на собственной капле морского стекла, выуженный из тихой воды рыбаками от Истврукской долины до Дальнего Берега, которые ловили себе ужин. Он хранит ту воду, в которой поднялся, и уговорить его вернуться невозможно.',
+  'hudChrome.collections.buddyLore.ember_fox':
+    'Лисица из живых изгородей Истврукской долины, названная за угольно-красную шубу, что просвечивает сквозь зимний подлесок. Тамошние звероловы махнули рукой на её выводки поколения назад и вместо этого начали оставлять им еду.',
+  'hudChrome.collections.buddyLore.emerald_wolf':
+    'Волчонок из Призрачной Чащи; в свете крон, что почти не достаёт до земли, его шерсть кажется зелёной. Стражи выхаживают всех сирот, которых оставляет лес.',
+  'hudChrome.collections.buddyLore.sprites':
+    'Два маленьких огненных духа, золотой и бирюзовый, которые никак не решат, кто из них главный. Сблизившись, они сливаются в одно зелёное пламя и со смехом разлетаются снова.',
+  'hudChrome.collections.buddyLore.forgemaw':
+    'Выкованный в Горниле Последнего Источника и так и не законченный, он вышел из литейной Игнивара, пока молоты ещё били. Найти его можно только в героическом спуске: расплавленное создание всё возвращается в горн, что его сделал, и уходит домой за тем, кто выжил в огне дважды.',
+  'hudChrome.collections.buddyLore.frog':
+    'Мирефенская топь растит их упитанными и беспечными; они поют всю ночь напролёт из тростников. Болотные проводники божатся, что лодка с такой на борту никогда не садится на мель.',
+  'hudChrome.collections.buddyLore.frostfire':
+    'Рождённый в Морозном Пределе там, где сквозь ледяное поле пробивается горячий источник, он так и не решил, к какой из половин принадлежит. На холоде парит, в тепле дрожит.',
+  'hudChrome.collections.buddyLore.golden_sentinel':
+    'Жук-часовой из Янтарной Пади, позолоченный смолой, в которой вырос. Имя старше смолы: стражи этого рода берегли те рощи задолго до того, как кому-то пришло в голову разливать сок по склянкам.',
+  'hudChrome.collections.buddyLore.kekius':
+    'Смеющийся спутник неясного происхождения, взятый на скаковых дворах Гейлкреста как талисман. Он пережил четыре конюшни, что на него божились.',
+  'hudChrome.collections.buddyLore.loot_goblin':
+    'Он ходит за всяким, у кого есть Героические знаки, и ни разу не был пойман на воровстве. Интендант Векс настаивает, что это ровным счётом ничего не доказывает.',
+  'hudChrome.collections.buddyLore.moss_hare':
+    'Заяц Ивовой Топи, зазеленевший от жизни в мокром торфе. Болотные травники считают их к удаче и не позволят прогнать такого от порога.',
+  'hudChrome.collections.buddyLore.nightfang':
+    'Юный охотник из Ночецветья, тихий даже по меркам своего рода. Он ходит следом ради общества и не охотится ни на что крупнее мотылька.',
+  'hudChrome.collections.buddyLore.penny_goldspark':
+    'Подмастерье гнома-механика, что берёт почасовую плату и отрабатывает каждую медяшку. Бронник Ходе взял её в счёт долга, а теперь продаёт этот уговор всякому, у кого при себе тысяча золотых.',
+  'hudChrome.collections.buddyLore.phantom':
+    'Призрак размером с ладонь из курганов Призрачной Чащи, весь из савана и без единой косточки; заводится в закрытом рюкзаке и остаётся ради компании. Никто не понял, чего он хочет, и он ни разу никого не попытался напугать.',
+  'hudChrome.collections.buddyLore.proud_grunt':
+    'Ветеран военных складов, сохранивший выправку и потерявший чин. Военный маршал Дравен Коул отдаёт такого любому солдату, чьей чести хватает, чтобы понимать, чего это стоило.',
+  'hudChrome.collections.buddyLore.raptor':
+    'Выводок из Земель Драконов, которого продают прежде, чем он поймёт, как быстро умеет бегать. Каждому новому хозяину велят его кормить, и дважды повторять никому не приходится.',
+  'hudChrome.collections.buddyLore.rocky':
+    'Каменнопанцирный ползун с осыпей Терновых высот, медлительный и совершенно невозмутимый. Горняки держат их за то, как они замирают за миг до обвала.',
+  'hudChrome.collections.buddyLore.skeleton':
+    'Он выбрался из курганов Призрачной Чащи, отряхнулся и с тех пор ходит за людьми. Чьи это были кости, так никто и не установил.',
+  'hudChrome.collections.buddyLore.solbot':
+    'Маленький автоматон, питающийся солнцем; его откопали наполовину засыпанным в пепле Земель Драконов, и он всё ещё тикал. Мастерская, что его собрала, не оставила на корпусе ни единого клейма.',
+  'hudChrome.collections.buddyLore.spider':
+    'Ткач из Призрачной Чащи размером с ладонь, который перестраивает по-своему любой рюкзак, где его несут. Паутина крепче тех ниток, что она заменяет.',
+  'hudChrome.collections.buddyLore.stag':
+    'Кровь Вечного Сада, выведенная из тех больших оленей, на которых когда-то ездили стражи. Он до сих пор склоняет голову перед поднятой рукой — по привычке, что старше его самого.',
+  'hudChrome.collections.buddyLore.tiger':
+    'Полосы Пальмового Берега на звере, который Пальмового Берега в глаза не видел: эту линию держат в неволе с тех пор, как закрылись старые зверинцы. Он отзывается на свист и больше ни на что.',
+  'hudChrome.collections.buddyLore.triple_t':
+    'То ли три чего-то, то ли одно и то же трижды. Свидетельства расходятся, а само существо не стоит на месте достаточно долго, чтобы его пересчитать.',
+  'hudChrome.collections.buddyLore.trollface':
+    'Ухмыляющаяся тварь, которую Призрачная Чаща выпустила и обратно брать отказалась. Всякая попытка её описать кончается тем, что описывающий начинает смеяться и бросает.',
+  'hudChrome.collections.buddyLore.tuskhorn_boar':
+    'Порода с Терновых высот, выведенная коротконогой пастухами, которым нужен был вепрь, не способный завалить изгородь. Нрав при этом остался прежним.',
+  'entities.mobs.buddy_emberfall_phoenix.name': 'Феникс Пепелопада',
+  'entities.items.whistle_emberfall_phoenix.name': 'Свисток: Феникс Пепелопада',
+  'hudChrome.collections.buddyLore.emberfall_phoenix':
+    'Каждую осень он сгорает до уголька и к весне поднимается из собственного пепла — вот и всё, что о нём вообще могут сказать. Гнезда его никто не находил, и дважды одного и того же никто не ловил.',
+  'hudChrome.collections.state.pending': 'Кто-то следует за вами',
+  'hudChrome.collections.presenceDefault': 'Вы чувствуете, что за вами кто-то наблюдает.',
+  'hudChrome.collections.revealed': '{name} решает следовать за вами.',
+  'hudChrome.collections.cosmeticUnlocked': 'Новый облик для {name}: {look}.',
+  'hudChrome.collections.presence.ember_fox':
+    'Что-то маленькое и тёплое тихо семенит у вас за спиной.',
+  'hudChrome.collections.presence.moss_hare': 'Шорох в торфе идёт в ногу с вашими шагами.',
+  'hudChrome.collections.presence.frog': 'На каждый ваш шаг отвечает влажное кваканье.',
+  'hudChrome.collections.presence.crimson_claw_crab': 'Что-то щёлкает и суетится за краем зрения.',
+  'hudChrome.collections.presence.golden_sentinel':
+    'Из травы за вами следит слабый золотистый блеск.',
+  'hudChrome.collections.presence.nightfang': 'Бесшумные лапы следуют там, где вам не видно.',
+  'hudChrome.collections.presence.tuskhorn_boar': 'Фырканье и топот: что-то упрямое идёт за вами.',
+  'hudChrome.collections.presence.emerald_wolf':
+    'В подлеске моргают зелёные глаза, а затем идут следом.',
+  'hudChrome.collections.presence.tiger': 'На краю зрения мелькают полосы.',
+  'hudChrome.collections.presence.cate_coin':
+    'Вы слышите тихий звон монеты, которая вам не принадлежит.',
+  'hudChrome.collections.presence.alon': 'Вы чувствуете, что за вами наблюдают и молча одобряют.',
+  'hudChrome.collections.presence.trollface': 'Где-то позади вас что-то ухмыляется.',
+  'hudChrome.collections.presence.ansem': 'Шёпот о дверях и тьме следует за вами.',
+  'hudChrome.collections.presence.triple_t': 'Там, где должен быть один шаг, слышны три.',
+  'hudChrome.collections.presence.kekius': 'Сдавленный смешок тянется за вами по дороге.',
+  'hudChrome.collections.presence.solbot': 'Тихое тиканье отсчитывает ритм вашего шага.',
+  'hudChrome.collections.presence.frostfire': 'Пар и иней кружатся у вас за спиной.',
+  'hudChrome.collections.presence.rocky': 'Позади вас шевелятся камешки, хотя ветра нет.',
+  'hudChrome.collections.presence.proud_grunt': 'Где-то позади вас сапог щёлкает по стойке смирно.',
+  'hudChrome.collections.presence.loot_goblin': 'Что-то шёпотом пересчитывает ваши монеты.',
+  'hudChrome.collections.presence.penny_goldspark':
+    'В чужом кармане позвякивают крошечные инструменты.',
+  'hudChrome.collections.presence.stag': 'На вашу тропу ложится тень с рогами.',
+  'hudChrome.collections.presence.alpaca': 'Что-то шерстистое и неторопливое решило пойти с вами.',
+  'hudChrome.collections.presence.horse':
+    'Где-то позади копыта отбивают неспешный, терпеливый ритм.',
+  'hudChrome.collections.presence.bull': 'Низкое фырканье поднимает пыль у вас за спиной.',
+  'hudChrome.collections.presence.spider': 'Шелковая нить касается вашего плеча.',
+  'hudChrome.collections.presence.raptor': 'Быстрые когти постукивают по камню у ваших пят.',
+  'hudChrome.collections.presence.skeleton': 'Сухие кости гремят в такт вашим шагам.',
+  'hudChrome.collections.presence.crystal_lich':
+    'Из обломков поднимается холодный гул, и он смотрит на вас.',
+  'hudChrome.collections.presence.sprites':
+    'К вам пристали два маленьких огонька, и гаснуть они не собираются.',
+  'hudChrome.collections.presence.forgemaw': 'Жар кузни не оставил вас. Что-то вышло вместе с ним.',
+  'hudChrome.collections.presence.crystal_tide': 'Капля моря отказывается сорваться с вашей лески.',
+  'hudChrome.collections.presence.phantom': 'Воздух позади вас чуть слишком неподвижен.',
+  'hudChrome.collections.presence.emberfall_phoenix':
+    'Тепло, словно от притушенного огня, ложится вам на спину.',
+  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Скованный льдом',
+  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Гальванический',
+  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Пепельный',
+  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Раскалённый добела',
+  'hudChrome.collections.cosmetic.stag_acorn': 'Желудёвый венец',
+  'hudChrome.collections.cosmetic.stag_gilded': 'Позолоченный',
+  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Зелёный',
+  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Полководец',
+  'hudChrome.collections.actions.summon': 'Призвать',
+  'hudChrome.collections.actions.dismiss': 'Отпустить',
+  'hudChrome.collections.actions.wear': 'Надеть',
+  'hudChrome.collections.actions.remove': 'Снять',
+  'hudChrome.collections.looks.title': 'Облики',
+  'hudChrome.collections.looks.unlocked': 'Открыт',
+  'hudChrome.collections.looks.locked': 'Закрыт',
+  'hudChrome.collections.looks.worn': 'Надет',
+  'hudChrome.collections.looks.none': 'Для этого спутника облики ещё не созданы',
+  'hudChrome.collections.source.bossLabel': 'Питомец босса',
+  'hudChrome.collections.source.bossDrop':
+    '{mob} ({location}), {chance}% каждому игроку за убийство',
+  'hudChrome.collections.source.bossDropWithHeroic':
+    '{mob} ({location}), {chance}% каждому игроку, {heroicChance}% в героическом режиме',
+  'hudChrome.collections.source.bossDropHeroicOnly':
+    '{mob} ({location}), только героический режим, {chance}% каждому игроку',
+  'hudChrome.collections.source.rollNote':
+    'Каждый игрок бросает отдельно; никто не теряет шанс из-за напарника.',
+  'hudChrome.collections.source.deedLabel': 'Награда за',
+  'hudChrome.collections.source.deed': 'Деяние: {deed}',
+  'hudChrome.collections.source.challengeLabel': 'Испытание',
+  'hudChrome.collections.source.challengeSpeed': 'Победить {mob} за {seconds} секунд с начала боя',
+  'hudChrome.collections.source.challengeDps':
+    'Наносить {mob} {dps} урона в секунду на протяжении боя',
+  'hudChrome.collections.source.craftLabel': 'Изготовление',
+  'hudChrome.collections.source.craft': '{item} (рецепт: {profession})',
+  'hudChrome.collections.source.grantLabel': 'Награда',
+  'hudChrome.collections.source.grantOnly':
+    'Сезонная награда: месячный рейтинг и лучшие результаты',
+  'hudChrome.collections.source.tokenLabel': 'Жетон',
+  'hudChrome.collections.source.token': '{item}, используется один раз, чтобы привязать спутника',
+  'entities.items.charm_stag_acorn.name': 'Оберег желудёвого венца',
+  'entities.items.charm_stag_gilded.name': 'Позолоченный оберег',
+  'itemUi.kind.buddyCosmetic': 'Облик спутника',
+  'hudChrome.collections.cosmetic.frog_sapphire': 'Сапфировая лягушка',
+  'hudChrome.deeds.buddiesSection': 'Спутники',
+  'hudChrome.deeds.buddiesNone': 'Без спутника',
+  'hudChrome.deeds.buddiesEmpty': 'Соберите спутника, чтобы призывать его отсюда.',
+  'hudChrome.deeds.buddyDragHint': 'Перетащите на панель действий',
+  'hudChrome.deeds.looksSection': 'Облики спутника',
+  'hudChrome.deeds.looksNone': 'Собственный облик',
+  'hudChrome.deeds.looksNoBuddy': 'Призовите спутника, чтобы выбрать его облик здесь.',
+  'hudChrome.deeds.looksEmpty': 'У этого спутника пока нет открытых обликов.',
+  'hudChrome.realmBuilder.title': 'Зодчий месяца',
+  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'guide.arenaPage.honorFinalNoteSoldBack':
     'Покупки за честь окончательны. Список выкупа у торговца хранит лишь то, что вы продали: купленное за монеты обычно можно продать обратно по цене продажи и, если вы снова передумаете, выкупить из этого списка, но снаряжение Боевой мощи становится персональным в тот же миг, как вы его купили, так что его нельзя ни обменять, ни отправить почтой, ни продать обратно хоть за что-нибудь, и в этот список оно не попадает никогда. Потому магазин и просит подтверждения: прочтите описание вещи, прежде чем нажать.',
   'guide.arenaPage.rewardsBodyLossShare':
     'Победа в рейтинговом матче приносит честь, валюту сражений игрок против игрока, а поражение в бою, который вы доиграли до конца, всё равно приносит меньшую её долю, как и ничья, так что по-настоящему поражение стоит вам одного лишь рейтинга. Честь задумана как награда за настоящие бои: победа над тем же противником или той же командой ещё раз в тот же день не приносит ничего сверх (как и повторное поражение от них), за долгий победный день первые победы платят сполна, дальше победа платит вдвое меньше, а ещё глубже в дне снова вдвое меньше, и на том останавливается, а матч, который противник сдал, всё же двигает ваш рейтинг, но чести не приносит вовсе. Этот день принадлежит самому королевству: он сменяется в его ночной час сброса, на той же границе, где спадает каждая суточная привязка.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'На каждой вещи Боевой мощи есть рейтинг атаки и рейтинг защиты Боевой мощи, и против чудовищ эти два рейтинга не делают ровным счётом ничего. Они работают лишь тогда, когда вы сражаетесь с другим игроком: на дуэли, на арене или на поле боя, где атака добавляет урона вашим ударам, а защита срезает урон по вам, и каждая до своего предела. Каждое семейство брони к тому же и комплект, а его бонусы — снова рейтинг Боевой мощи или эффекты, что работают только против игроков, так что бонусы комплекта у полного набора за честь ничего не стоят против босса подземелья. Сами же вещи по-прежнему несут обычные характеристики, броню и урон оружия, и всё это работает везде; против чудовища замолкают лишь рейтинги Боевой мощи и бонусы комплекта.',
+    'На каждой вещи Боевой мощи есть рейтинг атаки и рейтинг защиты Боевой мощи, и против чудовищ эти два рейтинга не делают ровным счётом ничего. Они работают лишь тогда, когда вы сражаетесь с другим игроком: на дуэли, на арене или на поле боя, где атака добавляет урона вашим ударам, а защита срезает урон по вам, и каждая до своего предела. Каждое семейство брони к тому же и комплект, а его бонусы — снова рейтинг Боевой мощи или эффекты, что работают только против игроков, так что бонусы комплекта у полного набора за честь ничего не стоят против босса подземелья. Сами же вещи по-прежнему несут обычные характеристики, броню и урон оружия, и всё это работает везде; против чудовища замолкают лишь рейтинги Боевой мощи и бонусы комплекта. Одно исключение действует везде: два предмета любого из этих комплектов также делают так, что получаемый урон больше не замедляет чтение ваших заклинаний.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Такова осознанная плата. Снаряжение Боевой мощи создано для боёв с игроками, а не как обходной путь мимо ступеней подземелий: вещь Боевой мощи никогда не несёт тех боевых характеристик, что несёт эпическая вещь из подземелья в том же слоте, а рейтинг Боевой мощи и бонусы комплекта, которые она несёт взамен, целиком тратятся на других игроков. Хотите держаться на арене — покупайте её. Хотите быстрее проходить героические подземелья — добывайте снаряжение в подземельях.',
   'guide.social.calendarBodyDoubleHonor':
@@ -18658,8 +22228,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '«Редактирование фреймов» также отпускает стопку трекеров под ним (отслеживаемые задания и их цели, ход ваших деяний, ваши страницы Реликвария, рецепты, закреплённые вами при крафте, вылазка, в которой вы находитесь, любой разлом, в котором вы участвуете, и рецепт или заказ, который вы отслеживаете), панель действий питомца рядом с рамкой питомца, рамку «Эффекты на целях» для ваших ослабляющих эффектов на ближних врагах, медальон «Преданность» паладина, «Шкалу ресурсов Колдовства» чернокнижника, оверлей срабатывания заклинаний, полосу замаха оружия в левой руке для тех, кто дерётся с оружием в каждой руке, и окно счётчика урона с вкладками, и у каждого из них, пока он отпущен, есть ярлычок с его названием.',
   'guide.interfacePage.framesGovernedTalkingHead':
     '«Редактировать фреймы» также освобождает панель диалога: она показывает реплику NPC, пока тот находится вне вашего поля зрения, и носит свою табличку с именем, пока откреплена.',
+  'guide.interfacePage.framesGovernedShardpike':
+    '«Редактировать фреймы» также освобождает панель Осколочной пики: это короткий ряд действий квестового предмета, который появляется рядом с панелями команд, только пока вы несёте саму Осколочную пику. Она носит свою табличку с именем, пока откреплена, так что её можно поставить на место до боя, а не во время него.',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '«Редактирование фреймов» также освобождает фрейм подсказки: место, где появляется карточка того, на что наведён курсор. Для существа это уровень и вид, для другого игрока: звание, гильдия, уровень и класс, а также специализация с её ролью. Перетащите фрейм куда угодно, и карточка будет раскрываться оттуда в сторону от ближайших краёв экрана. Снимите флажок «Подсказка» в разделе «Показать или скрыть фреймы» в «Настройках фреймов», чтобы совсем скрыть эту карточку.',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Включите «Отделить полосу ресурса» на вкладке «Рамки», и «Редактирование фреймов» освободит и полосу ресурса: ману, энергию или ярость можно поставить куда угодно отдельно, а «Ширина полосы ресурса» и «Высота полосы ресурса» на той же вкладке задают её размер. «Редактирование фреймов» освобождает и полосу «Короля горы», а «Прозрачность фона „Короля горы“» на той же вкладке приглушает её панель, не трогая текст.',
   'guide.interfacePage.framesGovernedAuraTracks':
     '«Редактирование фреймов» также отпускает шесть необязательных дорожек эффектов, если вы включили их на вкладке «Бой» тех же настроек интерфейса: дорожки «Мои эффекты», «Защитные умения», «Мои щиты», «Атакующие умения», «Движение и скрытность» и «Мои эффекты на союзниках». По умолчанию все они выключены, а пока дорожка отпущена, на ней висит ярлык с её названием.',
   'guide.interfacePage.mapBodyZoneFirst':
@@ -18668,6 +22242,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Трекер цели сбора присоединяется к стопке, как только вы отслеживаете рецепт в окне создания или заказ на доске: он называет рецепт или заказ, который вы отслеживаете, сколько вы собираете, и насколько ваши материалы при себе и на складе приближают вас к цели. "Отследить" заменяет вашу текущую цель, а "Очистить" явно её сбрасывает; ни то, ни другое никогда не меняет вашу настройку сбора.',
   'guide.interfacePage.hubPracticeTrackerBody':
     'Рядом с узлом Eastbrook в стопку добавляется трекер тренировок, как только вы начинаете проходить там управляемые тренировочные уроки: он держит на виду ваши лучшие результаты против тренировочных манекенов. Пока урок активен, полоса подсказок рядом с ним проведет вас через текущий шаг урока, от открытия Счетчиков урона до сравнения второго забега.',
+  'guide.interfacePage.dungeonTrackerBody':
+    'Внутри группового подземелья трекер подземелья занимает верх стопки: табличка с названием подземелья (в героическом забеге с пометкой «Героический»), полоса, которая заполняется по ходу прохождения, а под ней все боссы этого подземелья в том порядке, в котором их встречает маршрут; каждый считается как 0 / 1, пока не падёт. Босс, у боя с которым есть второй акт, остаётся незакрытым до конца всего боя, поэтому список читается завершённым только тогда, когда завершён сам забег. Трекер исчезает, когда вы выходите, а «Редактирование фреймов» освобождает его, как и остальные трекеры, под собственной плашкой с названием.',
   'guide.interfacePage.mobileBodyTwoPages':
     'Сенсорное управление появляется само, а раскладка подгоняется под ваш экран: компактная на маленьком телефоне, обычная на телефоне побольше и просторная на планшете.\n\nСпособности лежат кольцом, а не рядом цифр: кнопка атаки и четыре кнопки действий рядом с ней, плюс переключатель страниц, который перебрасывает кольцо между его {pages} страницами, а вместе они дотягиваются до всех ваших ячеек способностей, всех {slots}, независимо от того, включены ли дополнительные настольные панели. Пятое место на дуге этого кольца отведено расходникам: коснитесь его, чтобы применить то, что там лежит, либо удержите его или смахните внутрь, чтобы открыть ряд, который сам наполняется из того, что вы несёте. Вокруг кольца стоят кнопки, к которым чаще всего тянется рука на сенсорном экране: смена цели, взаимодействие с тем, что перед вами, и прыжок.\n\nУ нижнего края вместо ряда кнопок стоит один элемент «Быстрые действия». Он открывает всё остальное: транспорт, чат, карту, сумки, общение, задания, персонажа, книгу заклинаний, игровое меню и пункт «Еще», в котором лежат остальные ваши окна, среди них «Поиск подземелий», PvP, эмоции и вики. Окна здесь занимают весь экран, а не висят поверх него.\n\nПеремещение рамок существ — дело настольной версии: на сенсорном экране раскладка расставляет их за вас.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -18677,6 +22253,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'Этот выбор материалов больше недоступен.',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × Сборщик: {name}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Взят у игрока {name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned':
     '{count} × Сборщик: {name}, подпись: {signer}',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × Сборщик не указан',
@@ -18710,14 +22287,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': 'Разделить по сборщикам',
   'hudChrome.itemMenu.takeChosenQuantity': 'Взять выбранное количество',
   'hudChrome.itemMenu.combine': 'Объединить стопки материалов',
-  'hudChrome.realmBuilder.title': 'Зодчий месяца',
-  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'hudChrome.realmBuilder.placeholderName': 'Ваше имя',
   'hudChrome.realmBuilder.placeholderHint': 'Эта табличка ждёт своего первого имени.',
   'hudChrome.realmBuilder.pastTitle': 'Прежние зодчие',
   'hudChrome.realmBuilder.pastEmpty': 'В списке пока нет имён.',
   'hudChrome.realmBuilder.close': 'Закрыть',
   'worldContent.realmBuilderMonumentName': 'Памятник зодчим королевства',
+  'worldContent.musterRackName': 'Оружейная стойка ополчения',
   'hudChrome.talkingHead.label': 'Диалог',
   'hudChrome.hubLesson.target': 'Сначала возьми манекен в цель.',
   'hudChrome.hubLesson.openWindow': 'Открой {meters}.',
@@ -18767,13 +22343,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Учетные записи операторов нельзя отключить.',
   'apiError.kick.reason_required': 'Необходимо указать причину.',
   'apiError.kick.target_offline': 'Этот игрок больше не в сети на этом мире.',
-  'apiError.world_quest_block.admin_target':
-    'Учетные записи операторов нельзя лишить доступа к локальным заданиям.',
-  'apiError.world_quest_block.reason_required': 'Необходимо указать причину.',
-  'apiError.world_quest_block.already_blocked':
-    'Эта учетная запись уже лишена доступа к локальным заданиям.',
-  'apiError.world_quest_block.not_blocked':
-    'Эта учетная запись не лишена доступа к локальным заданиям.',
   'entities.items.reins_goblin_rocket_sled.name': 'Ключ зажигания гоблинских ракетных саней',
   'entities.items.reins_rallycart_rxt.name': 'Ключ зажигания ралликарта RXT',
   'guide.settingsPage.ifAuraBarBelowFrame':
@@ -18887,6 +22456,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': 'Кольцо Стража Разлома',
   'entities.items.rift_surveyors_satchel.name': 'Сумка Разведчика Разлома',
   'entities.items.emissary_cache.name': 'Тайник эмиссара',
+  'entities.items.pvp_trophy_skull.name': 'Трофейный череп',
   'entities.npcs.weekly_emissary.name': 'Чам Пит',
   'entities.npcs.weekly_emissary.title': 'Эмиссар',
   'entities.npcs.weekly_emissary.greeting':
@@ -18948,7 +22518,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.wocToken': 'Токен WoC',
   'hudChrome.currencies.heroicMarkNote':
     'Героические подземелья . тратится у героического интенданта',
-  'hudChrome.currencies.honorNote': 'Поля боя и арена',
+  'hudChrome.currencies.honorNote': 'Поля боя, арена и мировые задания',
   'hudChrome.currencies.delveMarkNote': 'Пройденные вылазки',
   'hudChrome.currencies.wocTokenNote': 'Баланс привязанного кошелька',
   'hudChrome.currencies.walletNotLinked': 'Кошелёк не привязан',
@@ -19004,6 +22574,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.anyDifficulty': 'Любая сложность',
   'hudChrome.weekly.choose': 'Выбрать задание',
   'hudChrome.weekly.inProgress': 'В процессе ({count}/{required})',
+  'hudChrome.weekly.completedLastWeek': 'Выполнено на прошлой неделе',
+  'hudChrome.weekly.claimFirst': 'Сначала заберите награду',
   'hudChrome.weekly.completed': 'Выполнено на этой неделе',
   'hudChrome.weekly.lockedThisWeek': 'Закрыто на этой неделе',
   'hudChrome.weekly.footerPick':
@@ -19016,7 +22588,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Вы также получите:',
   'hudChrome.weekly.tally': '{count} / {required}',
   'hudChrome.weekly.cacheDesc':
-    'Открывается в один предмет из обычного рейда для вашего класса (никогда не часть комплекта), плюс {item} x {count}.',
+    'Открывается в один предмет из обычного рейда для вашего класса (никогда не часть комплекта Игнивара), плюс {item} x {count}.',
   'hudChrome.weekly.dialogNote':
     'Активным может быть только одно еженедельное поручение. Оно {reset}',
   'hudChrome.weekly.accept': 'Принять',
@@ -19046,6 +22618,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': 'Еженедельное задание выполнено: {category}',
   'hudChrome.weekly.commendHeading': 'Рекомендация эмиссара',
   'hudChrome.weekly.commendNote': '{amount} репутации одной фракции на ваш выбор, раз в неделю.',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} репутации за прошлую неделю ещё не получено. Получите их, чтобы выбрать новое поручение.',
   'hudChrome.weekly.commendClaimed': 'Рекомендация этой недели досталась фракции {faction}.',
   'hudChrome.weekly.commendRewardLine': '{amount} репутации с фракцией на ваш выбор',
   'hudChrome.reputation.standingGained': 'Репутация с фракцией {faction}: +{amount}.',
@@ -19197,6 +22771,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': 'Ездовые животные',
   'hudChrome.cosmetics.tabSkins': 'Облики',
   'hudChrome.cosmetics.tabMech': 'Мех',
+  'hudChrome.cosmetics.buddyActive': 'Призван',
+  'hudChrome.cosmetics.buddyDrag': 'Перетащите на панель действий',
   'hudChrome.cosmetics.legend':
     'Аккаунт: общее для всех персонажей. Персонаж: только этот персонаж.',
   'hudChrome.cosmetics.scopeAccount': 'Аккаунт',
@@ -19236,6 +22812,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Исцеление)',
   'entities.abilities.grove_awakening.name': 'Пробуждение рощи',
+  'entities.abilities.sporemender_form.name': 'Облик спороцелителя',
+  'entities.abilities.sporemender_form.description':
+    'Вы принимаете Облик спороцелителя: исходящее исцеление повышается на 20%, а броня на 40%, но скорость передвижения снижается на 20%. Все заклинания обычного облика остаются доступны. Действует, пока вы не смените облик. Смена облика также даёт эффект «Стремительная поступь», краткий всплеск скорости передвижения. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Исцеления)',
   'entities.abilities.prayer_of_returning.description':
     'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Свет и Послушание)',
   'entities.abilities.prayer_of_returning.name': 'Молитва возвращения',
@@ -19248,6 +22827,42 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': 'Ускорить созревание',
   'devCommand.fields.bed': 'ID грядки (необязательно)',
   'guide.profPages.oncePerDay': 'Раз в день',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': 'ОСЛЕПЛЁН! ТЕПЕРЬ ВЕСЬ РЕЙД БЬЁТ В ПОЛНУЮ СИЛУ',
+  'hudChrome.shardpike.promptStrikeLantern': 'БЕЙТЕ В ФОНАРЬ сейчас, {seconds} с',
+  'hudChrome.shardpike.promptLanternOut': 'Фонарь погас, {seconds} с: бейте своим оружием',
+  'hudChrome.shardpike.promptCloserEffigy': 'Подойдите к Соломенному Десятнику, ещё {yards} м',
+  'hudChrome.auraEffect.effigyPlankHide':
+    'Отводит {pct}% каждого удара, пока удар Осколочной пики не погасит фонарь в его глазу',
+  'hudChrome.auraEffect.effigyLanternOut':
+    'Для вас фонарь Соломенного Десятника погас: ваши удары и удары питомца пробивают Дощатую шкуру и проходят в полную силу',
+  'character.lockoutWeeklyQuests': 'Еженедельные задания',
+  'entities.mobs.muster_drillmaster.name': 'Муштровщик ополчения',
+  'entities.mobs.muster_effigy.name': 'Соломенный Десятник',
+  'entities.npcs.muster_commander.title': 'Ополчение Фенбриджа',
+  'entities.npcs.muster_commander.greeting':
+    'Сначала пики, {className}, потом все остальные. В этом всё дело, и это держит лагерь в живых.',
+  'entities.quests.q_muster_summons.title': 'Зов ополчения',
+  'entities.quests.q_muster_summons.text':
+    'Все копья, что я мог выделить, окопались вокруг кратера Звездопада, {playerName}, чтобы окружить то, что из него выходит. Командир ополчения держит лагерь на южном склоне над кратером, к юго-востоку отсюда. Доложи Командиру. Тебе расскажут, как мы с ним бьёмся, и ты выслушаешь, потому что те, кто не слушал, лежат в камышах.',
+  'entities.quests.q_muster_summons.completion':
+    'Гонец Фенвика? Хорошо. Слушай, скажу один раз, а он и вовсе не скажет. Балгат обходит наши заставы: край кратера, западные пустоши, южный склон, брешь на юго-западном краю, и снова по кругу, и каждую заставу, где он остановится, он сравнивает с землёй. Сталь его не берёт. Шкура её отводит, и рейд, который просто рубит его, лишь умирает уставшим. Единственная слабость у него глаз. Упёртая пика сквозь Курганное стекло ослепляет его, и пока он слеп, шкура с него сходит: вот тогда весь рейд бьёт его, и бьёт в полную силу. Потом она смыкается, и мы ждём следующего шанса. Сначала пики, {playerName}, потом все остальные. Стойка выдаёт пики только новобранцам до 19-го уровня включительно: молодые выбивают глаз, ветераны используют это окно.',
+  'entities.quests.q_muster_summons.objectives.0.label': 'Доложить Командиру ополчения',
+  'entities.quests.q_muster_pike_drill.title': 'Сначала пики',
+  'entities.quests.q_muster_pike_drill.text':
+    'Слова дёшевы, пики нет. Возьми Осколочную пику со стойки рядом со мной, потом иди к Соломенному Десятнику в западном конце лагеря: ребята собрали его из досок и соломы, вполовину меньше настоящего, с фонарём там, где глаз. Упри пику и держи острие ровно, пока муштровщик бьёт в землю, потому что настоящий трясёт её сильнее. Когда руки будут уверены, проведи острие сквозь фонарь. Доски с него слетят: тогда бей его своим оружием, {playerName}, и почувствуй разницу. Стойка выдаёт пики только новобранцам до 19-го уровня включительно.',
+  'entities.quests.q_muster_pike_drill.completion':
+    'Почувствовал, как проходит? На настоящем это четырнадцать вдохов, пока машет весь рейд, а потом шкура снова смыкается. Запомни урок. Десятник его проверит.',
+  'entities.quests.q_muster_pike_drill.objectives.0.label':
+    'Осколочная пика взята со стойки ополчения',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': 'Фонарь Соломенного Десятника погашен',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': 'Удары, пока доски сняты',
+  'entities.quests.q_muster_trophy.title': 'Кусок Десятника',
+  'entities.quests.q_muster_trophy.text':
+    'Каждую неделю он встаёт, и каждую неделю мы снова его валим. Для этого нужен рейд, а ополчению одному его не собрать. Найди следующий рейд, что пойдёт на Балгата, и помоги его свалить, {playerName}. Руби его, прикрывай тех, кто рубит, или лечи их: в счёт идёт каждая рука, что с ним билась. Когда он падёт, возвращайся и доложи мне. Ополчение платит за каждое убийство.',
+  'entities.quests.q_muster_trophy.completion':
+    'Опять повален, и ты был в том бою. Сегодня же ночью Фенбридж получит мой доклад. Кошель так далеко от дома тонкий, но это твоё. Возвращайся, когда он снова встанет.',
+  'entities.quests.q_muster_trophy.objectives.0.label': 'Балгат: убито',
   'hudChrome.vehicle.title': 'Пушка Северного Дозора',
   'hudChrome.vehicle.objective': 'Защитите Северный Дозор',
   'hudChrome.vehicle.lastKeepTitle': 'Пушка Последнего оплота',
@@ -19711,9 +23326,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.heartNova':
     'Тратит все стаки жара на огненную вспышку, которая наносит {perHeat} ед. урона от огня за стак ({max} ед. при {maxHeat} стаках) каждому врагу в пределах {radius} м и провоцирует каждое задетое существо. Урон растет с силой атаки. Требуется стак жара.',
   'hudChrome.auraEffect.trinket.lastStandCooldown':
-    'Щит «Последний бастион» от Печати бастиона уже использован. Пока этот эффект не истечет, падение здоровья ниже {threshold}% не создаст его снова.',
+    'Защитный щит уже сработал. До окончания этого эффекта получение урона при здоровье ниже {threshold}% не создаст новый щит.',
   'hudChrome.auraEffect.trinket.lastBastion':
-    'Поглощает {value} ед. урона. Печать бастиона создала этот щит, когда вы получили урон при здоровье ниже {threshold}%.',
+    'Поглощает {value} урона. Аксессуар создал этот щит, когда вы получили урон при здоровье ниже {threshold}%.',
   'hudChrome.auraEffect.trinket.retaliate':
     'Враги, напрямую поражающие вас, получают физический урон, равный {pct}% здоровья, которое у вас отнял этот удар. Периодический урон эффект не вызывает.',
   'hudChrome.auraEffect.trinket.moored':
@@ -19801,8 +23416,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.completedTask.worldMany': 'Выполнено локальных заданий: {count}',
   'hudChrome.weeklyRewards.completedTask.pvpOne': 'Выигран {count} рейтинговый матч',
   'hudChrome.weeklyRewards.completedTask.pvpMany': 'Выиграно рейтинговых матчей: {count}',
-  'hudChrome.weeklyRewards.completedTask.pvpWinOne': 'Побед в PvP: {count}',
-  'hudChrome.weeklyRewards.completedTask.pvpWinMany': 'Побед в PvP: {count}',
   'hudChrome.weeklyRewards.requiredTask.raidOne': 'Победите {count} рейдового босса',
   'hudChrome.weeklyRewards.requiredTask.raidMany': 'Победите рейдовых боссов: {count}',
   'hudChrome.weeklyRewards.requiredTask.dungeonOne': 'Пройдите {count} подземелье',
@@ -19811,16 +23424,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.requiredTask.worldMany': 'Выполните локальных заданий: {count}',
   'hudChrome.weeklyRewards.requiredTask.pvpOne': 'Выиграйте {count} рейтинговый матч',
   'hudChrome.weeklyRewards.requiredTask.pvpMany': 'Выиграйте рейтинговых матчей: {count}',
-  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Одержите победы в PvP: {count}',
-  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Одержите победы в PvP: {count}',
   'hudChrome.weeklyRewards.readyWeeks':
     'Неполученных недель: {count}. Сначала получите награду за самую раннюю завершенную неделю.',
   'hudChrome.weeklyRewards.claimLastWeek': 'Получить награду за прошлую неделю',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Награды ждут вас. Посетите смотрителя хранилища в Иствруке, чтобы открыть хранилища и получить награду.',
   'hudChrome.weeklyRewards.readyTitle': 'Ваши еженедельные награды готовы',
   'hudChrome.weeklyRewards.readyDescription':
     'Награды за завершенную неделю ждут вас. Откройте заработанные хранилища и выберите один предмет.',
-  'hudChrome.weeklyRewards.previewClaimNotice':
-    'Награды ждут вас. Посетите смотрителя хранилища в Иствруке, чтобы открыть хранилища и получить награду.',
   'hudChrome.weeklyRewards.notNow': 'Не сейчас',
   'hudChrome.weeklyRewards.completedWeek': 'Неделя завершилась {date}',
   'hudChrome.weeklyRewards.currentWeek': 'Вернуться к прогрессу этой недели',
@@ -19918,32 +23529,32 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Faultline также снижает получаемый урон на 10% на 6 сек.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Авангард: Sunvigil Regalia',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    '2 предмета: время восстановления Life Covenant сокращается на 30 сек.',
+    '2 предмета: время восстановления Life Covenant сокращается на 30 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '4 предмета: Life Covenant также накладывает на союзника щит на 8% его максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Авангард: Shieldvow Bastion',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '2 предмета: время восстановления Oath Chain сокращается на 2 сек.',
+    '2 предмета: время восстановления Oath Chain сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     '4 предмета: враги, притянутые Oath Chain, произносят заклинания на 30% медленнее 4 сек.; успешная связка может дать Solar Reprisal.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Авангард: Lightbrand Warplate',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    '2 предмета: время восстановления Valkyr Calling сокращается на 15 сек.',
+    '2 предмета: время восстановления Valkyr Calling сокращается на 15 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     '4 предмета: Valkyr Calling сбрасывает Final Edict и повышает урон следующего Final Edict в течение 6 сек. после приземления на 15%.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Авангард: Packwarden Harness',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    '2 предмета: время восстановления Rattling Shot сокращается на 4 сек.',
+    '2 предмета: время восстановления Rattling Shot сокращается на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     '4 предмета: Rattling Shot сокращает оставшееся время восстановления Howling Rage на 1 сек.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Авангард: Farsight Harness',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    '2 предмета: время восстановления Trailbreak сокращается на 4 сек.',
+    '2 предмета: время восстановления Trailbreak сокращается на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     '4 предмета: Trailbreak делает следующий Long Draw в течение 6 сек. мгновенным. Не чаще раза в 15 сек.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Авангард: Snaretooth Harness',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    '2 предмета: время восстановления Bloodhook сокращается на 3 сек.',
+    '2 предмета: время восстановления Bloodhook сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     '4 предмета: Bloodhook дает 1 Hunting Momentum.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Авангард: Nightcut Leathers',
@@ -19953,7 +23564,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Low Blow делает следующую атаку в течение 6 сек. критической.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Авангард: Brawlmark Leathers',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    '2 предмета: время восстановления Swift Heels сокращается на 60 сек.',
+    '2 предмета: время восстановления Swift Heels сокращается на 15 сек.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4 предмета: пока действует Swift Heels, Wicked Slash и Haymaker дают на 1 прием серии больше.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Авангард: Shadewalk Leathers',
@@ -19963,97 +23574,2332 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Gut Punch из Smokefade дает на 2 приема серии больше.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Авангард: Veilpsalm Raiment',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '2 предмета: время восстановления Terror Canticle сокращается на 3 сек.',
+    '2 предмета: время восстановления Terror Canticle сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     '4 предмета: когда Psalm of Warding полностью поглощен, защищенный союзник получает +20% скорости на 3 сек. Не чаще раза в 8 сек.',
   'entities.itemSets.vanguard_priest_holy.name': 'Авангард: Gracewing Raiment',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    '2 предмета: время восстановления Veilstep сокращается на 6 сек.',
+    '2 предмета: время восстановления Veilstep сокращается на 6 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     '4 предмета: Veilstep также накладывает на вас щит на 8% максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Авангард: Duskhymn Regalia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    '2 предмета: Litany of Woe также замедляет цель на 30% во время поддержания.',
+    '2 предмета: Litany of Woe также замедляет цель на 30% во время поддержания. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     '4 предмета: Call Tithefiend также накладывает на вас щит на 10% максимального здоровья на 8 сек.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Авангард: Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    '2 предмета: время восстановления Unleash Weapon сокращается на 3 сек.',
+    '2 предмета: время восстановления Unleash Weapon сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     '4 предмета: Unleash Weapon позволяет произносить заклинания на ходу и повышает скорость на 20% на 4 сек. Не чаще раза в 20 сек.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Авангард: Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    '2 предмета: Ancestral Strike замедляет цель на 30% на 4 сек.',
+    '2 предмета: Ancestral Strike замедляет цель на 30% на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     '4 предмета: Ancestral Strike сокращает оставшееся время восстановления Elemental Trance на 4 сек.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Авангард: Brineward Chainmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '2 предмета: Mending Waters применяется на 0,5 сек. быстрее к союзнику с менее чем 50% здоровья.',
+    '2 предмета: Mending Waters применяется на 0,5 сек. быстрее к союзнику с менее чем 50% здоровья. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '4 предмета: Tidecall также накладывает на цель щит на 5% вашего максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Авангард: Hourbinder Vestments',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    '2 предмета: время восстановления Temporal Barrier сокращается на 2 сек.',
+    '2 предмета: время восстановления Temporal Barrier сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     '4 предмета: Temporal Barrier также повышает скорость защищенной цели на 20% на 3 сек.',
   'entities.itemSets.vanguard_mage_fire.name': 'Авангард: Emberlash Regalia',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    '2 предмета: Cinderfall перезаряжается на 3 сек. быстрее.',
+    '2 предмета: Cinderfall перезаряжается на 3 сек. быстрее. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     '4 предмета: применение Cinderfall сокращает оставшееся время восстановления Blazing Barrier на 2 сек.',
   'entities.itemSets.vanguard_mage_frost.name': 'Авангард: Rimewarden Garb',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    '2 предмета: время восстановления Icebind сокращается на 2 сек.',
+    '2 предмета: время восстановления Icebind сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     '4 предмета: применение Icebind сокращает оставшееся время восстановления Flitstep на 5 сек.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Авангард: Dreadquill Vestments',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    '2 предмета: время произнесения Harrow сокращается на 0,3 сек.',
+    '2 предмета: время произнесения Harrow сокращается на 0,3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4 предмета: Consume лечит на 30% больше и может поддерживаться на ходу.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Авангард: Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    '2 предмета: время восстановления Bone Armor сокращается на 10 сек.',
+    '2 предмета: время восстановления Bone Armor сокращается на 10 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     '4 предмета: Reaping Command сокращает оставшееся время восстановления Bone Armor на 2 сек.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Авангард: Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2 предмета: время восстановления Cinderhide сокращается на 30 сек.',
+    '2 предмета: время восстановления Cinderhide сокращается на 30 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным.',
   'entities.itemSets.vanguard_druid_feral.name': 'Шкура кровавой гривы',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'Время восстановления Выпада и Натиска бурого сокращается на 3 сек.',
+    '2 предмета: время восстановления Bruin Rush сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
-    'Время восстановления Рывка сокращается на 15 сек.',
+    '4 предмета: Bruin Rush накладывает щит на 6% максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Облачение чертополоха',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    '2 предмета: время восстановления Fleetmend сокращается на 1 сек.',
+    '2 предмета: время восстановления Fleetmend сокращается на 1 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     '4 предмета: Fleetmend также повышает вашу скорость передвижения на 30% на 3 сек.',
   'entities.itemSets.vanguard_druid_balance.name': 'Облачение звездного стража',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Время применения Хватких корней сокращается на 0,5 сек.',
+    'Время применения Хватких корней сокращается на 0,5 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
-  'hudChrome.worldPvp.rewardBonus':
-    'При включенном мировом PvP вы получаете на {percent} больше опыта и репутации фракций. Бонусы прекращаются сразу после запроса на отключение.',
-  'hudChrome.worldPvp.rewardTitles':
-    'Постоянные титулы выдаются за {thresholds} игрового времени в открытом мире с включенным мировым PvP. Выход из игры, смерть, пребывание в подземельях и на Берегу Испытаний приостанавливают таймер. Отключение PvP сбрасывает его.',
-  'hudChrome.worldPvp.rewardPaused':
-    'Текущая серия PvP: {time} игрового времени (приостановлена на Берегу Испытаний)',
-  'hudChrome.worldPvp.rewardPausedDead':
-    'Текущая серия PvP: {time} игрового времени (приостановлена, пока вы мертвы)',
-  'hudChrome.worldPvp.rewardPausedInstance':
-    'Текущая серия PvP: {time} игрового времени (приостановлена в подземельях)',
-  'hudChrome.worldPvp.rewardProgress': 'Текущая серия PvP: {time} игрового времени',
-  'hudChrome.hill.pvpEntry': 'Вход в активный круг включает мировой PvP.',
-  'hudChrome.hill.pvpBanner': 'PvP',
-  'hudChrome.hill.callout.killingSpree': '{name}: серия убийств!',
-  'hudChrome.hill.callout.rampage': '{name}: буйство!',
-  'hudChrome.hill.callout.unstoppable': '{name}: неудержим!',
-  'hudChrome.hill.callout.dominating': '{name}: доминирует!',
-  'hudChrome.hill.callout.godlike': '{name}: подобен богу!',
-  'hudChrome.hill.callout.legendary': '{name}: легендарен!',
-  'hudChrome.hill.callout.shutDown': '{killer} прервал серию {victim}!',
+  'entities.letters.world_quest_reward.sender': 'Воронья почта',
+  'entities.letters.world_quest_reward.subject': 'Ваша награда за локальное задание',
+  'entities.letters.world_quest_reward.body':
+    'Когда вы получили эту награду за локальное задание, ваши сумки были полны, поэтому вороны доставили её сюда. Освободите место и заберите её у любого вороньего столба.\n\n- Воронья почта',
+  'questUi.logs.worldQuestRewardMailed':
+    'Ваши сумки полны. Награда отправлена в почтовый ящик: {items}.',
+  'hudChrome.death.pvpResurrect': 'PvP-воскрешение',
+  'hudChrome.death.pvpResurrectTitle':
+    'Воскреснуть у ближайшего кладбища с полным здоровьем, без новой платы Хранителю.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP-воскрешение ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'PvP-воскрешение будет доступно через {seconds}: вы подниметесь у ближайшего кладбища.',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'PvP-воскрешение готово: вы подниметесь у ближайшего кладбища.',
+  'hudChrome.options.spellTooltipOnHover': 'Подсказки заклинаний при наведении',
+  'hudChrome.skullBag.title': 'Мешок черепов',
+  'hudChrome.skullBag.total': 'Черепов: {count}',
+  'hudChrome.skullBag.close': 'Закрыть мешок черепов',
+  'hudChrome.skullBag.clickOpen': 'Нажмите, чтобы открыть',
+  'hudChrome.skullBag.notCarried':
+    'Носите мешок черепов в сумках, чтобы хранить или доставать черепа.',
+  'hudChrome.skullBag.empty':
+    'Пусто. Пока мешок при вас, подобранные черепа сразу попадают в него.',
+  'hudChrome.skullBag.unrecorded': 'Трофейный череп',
+  'hudChrome.skullBag.store': 'Убрать переносимые черепа ({count})',
+  'hudChrome.skullBag.storeNone': 'Нет черепов для хранения',
+  'hudChrome.skullBag.tooltip':
+    'Хранит любое число трофейных черепов без места в сумке. Пока он в сумках, подобранные черепа сразу попадают в него. Нажмите на него в сумках, чтобы убрать или достать черепа.',
+  'hudChrome.treasureMap.inkPickerTitle': 'На какую карту использовать чернила картографа?',
+  'hudChrome.treasureMap.inkPickerHeld': 'У вас чернил картографа: {held}.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Отслеживается: X находится в {zone}. X остается на месте.',
+  'hudChrome.treasureMap.inkPickerUnread': 'Не прочитано ({count})',
+  'hudChrome.treasureMap.inkPickerCost': 'Перерисовать до {rarity}: чернила {inks}',
+  'hudChrome.treasureMap.inkPickerCancel': 'Отмена',
+  'hudChrome.bags.reorderLocked':
+    'Закрепленные предметы остаются в своих ячейках. Снимите закрепление, чтобы переместить.',
+  'hudChrome.nameplate.bountyTag': 'Награда',
+  'hudChrome.keybindLayout.title': 'Раскладка клавиатуры',
+  'hudChrome.keybindLayout.open': 'Преобразовать',
+  'hudChrome.keybindLayout.from': 'Горячие клавиши для',
+  'hudChrome.keybindLayout.to': 'Преобразовать в',
+  'hudChrome.keybindLayout.keepMovement': 'Оставить клавиши движения на месте',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'В прошлый раз клавиши движения остались на месте, поэтому они снова остаются. Сбросьте настройки, чтобы начать заново.',
+  'hudChrome.keybindLayout.help':
+    'Каждая горячая клавиша переносится на клавишу, которая печатает тот же символ в новой раскладке. Цифровой ряд остается на месте. Названия клавиш в списке — позиции QWERTY; обзор клавиатуры показывает вашу раскладку.',
+  'hudChrome.keybindLayout.moves': 'Перемещаемых горячих клавиш: {count}',
+  'hudChrome.keybindLayout.noChange': 'Между этими раскладками горячие клавиши не меняются.',
+  'hudChrome.keybindLayout.apply': 'Преобразовать горячие клавиши',
+  'hudChrome.keybindLayout.converted': 'Горячие клавиши преобразованы из {from} в {to}.',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (немецкая)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (швейцарская)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (французская)',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (бельгийская)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (испанская)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (итальянская)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (шведская, финская)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (датская)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (норвежская)',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (бразильская ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (португальская)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (турецкая)',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Дворак',
+  'hudChrome.keybindLayout.layouts.colemak': 'Колемак',
+  'errors.searchUpdates': 'Искать обновления',
+  'errors.noUpdateFound': 'Обновление не найдено. Повторите попытку позже.',
+  'errors.updateUnavailable': 'Обновите через магазин игры или скачайте последний клиент.',
+  'errors.updateSearchFailed': 'Не удалось проверить обновления. Повторите попытку.',
+  'entities.abilities.spore_burst.name': 'Взрыв спор',
+  'entities.abilities.spore_burst.description':
+    'Призывает споровый взрыватель в указанную область. Через {duration} сек. он взрывается, исцеляя союзников на {healing} и нанося {damage} ед. урона от сил природы врагам в радиусе 8 м.',
+  'entities.abilities.spore_burst.specNote_balance':
+    'При 3 Лунном приливе на 25% сильнее и тратит ваш Лунный прилив.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Также накладывает Спороисцеление на каждого исцеленного союзника. При полной Зелени на 25% сильнее и тратит вашу Зелень.',
+  'entities.abilities.natures_boon.name': 'Дар природы',
+  'entities.abilities.natures_boon.description':
+    'Ваши заклинания могут подготовить Дар природы на 10 сек.: названное им заклинание становится бесплатным, на 25% сильнее и доступно в любой форме. Новый срабатывание обновляет длительность.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Каждая попавшая автоатака в ближнем бою с шансом 1 к 15 подготавливает его для Спороисцеления, а в облике бурого — для Дубовой шкуры.',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Каждый ваш Дикий заряд или Небопад с шансом 10% подготавливает его для Взрыва спор, не чаще раза в 10 сек.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Каждый тик ваших эффектов исцеления со временем с шансом 10% подготавливает его для Взрыва спор, не чаще раза в 10 сек.',
+  'entities.items.pvp_skull_bag.name': 'Мешок черепов',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Раз в три часа, в непредсказуемый момент, всему миру сообщают, что через пятнадцать минут в одной из зон свободного боя появится холм, а его круг заранее отмечают на открытой земле. Холм стоит сорок пять минут, затем исчезает. Пока он стоит, каждые пять минут объявляют его местоположение и группы с наибольшим суммарным временем удержания. Группа с наибольшим числом игроков внутри круга оспаривает холм и захватывает его после тридцати секунд численного превосходства. Появление соперников лишь приостанавливает отсчёт, пока ваша группа снова не выйдет вперёд; отсчёт сбрасывается, только если внутри не останется ни одного живого участника вашей группы. Одиночка считается группой из одного игрока и сохраняет занятый холм при создании группы, но участники рейда не учитываются вовсе. Каждый участник удерживающей холм группы, стоящий внутри круга, каждую минуту получает одинаковое количество Чести независимо от длительности удержания. Полная группа, беспрепятственно удерживающая холм всё время его существования, получает примерно столько же Чести, сколько за три победы на поле боя. Когда холм исчезает, если группа с наибольшим суммарным удержанием продержалась хотя бы десять минут, каждый, кто провёл внутри круга не менее минуты во время удержания этой группой и всё ещё состоит в ней, получает одну победу в PvP-ряд Еженедельного хранилища. Полоса над полем показывает владельца, численность обеих сторон и таймер захвата; команда /hill в чате сообщает, где стоит холм.',
+  'hudChrome.graphicsRestore.note': 'Восстановление графики',
+  'hudChrome.hill.contestOtherPaused': 'Противник на паузе: {seconds} из {total}',
+  'hudChrome.hill.contestYouPaused': 'Пауза: {seconds} из {total}',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Великобритания)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (США)',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.skullBag.takeAll': 'Забрать всё',
+  'hudChrome.skullBag.takeAllAria': 'Забрать всё: {item}',
+  'hudChrome.skullBag.takeOne': 'Забрать 1',
+  'hudChrome.skullBag.takeOneAria': 'Забрать 1: {item}',
+  'hudChrome.warfare.reasons.worldQuest': 'локальное задание',
+  'hudChrome.warfareShop.goods': 'Товары',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} побед в PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} победа в PvP',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Одержать {count} побед в PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Одержать {count} победу в PvP',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'questUi.dialog.attuneHearthstone': 'Привязать мой союзный камень возвращения здесь.',
+  'questUi.dialog.attuneHearthstoneAria': 'Привязать союзный камень возвращения к {hub} у {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Ваш союзный камень возвращения не привязан. Поговорите с союзным интендантом или используйте его в союзном опорном пункте.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Ваш союзный камень возвращения теперь привязан к {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Камень возвращения переносит вас в {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Этот предмет ещё не готов (осталось {minutes} мин).',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Медвежий капкан',
+  'entities.abilities.bear_trap.description':
+    'Установите капкан в выбранном месте. Он взводится через 0,75 сек. и действует 1 мин.; его видите только вы и ваша группа. Первый противник, который его активирует, получает {damage} ед. физического урона от кровотечения за 15 сек. и замедляется на 50% на 4 сек. Урон увеличивается от силы атаки дальнего боя. Одновременно может действовать только один Медвежий капкан. Он может быть установлен вместе с вашим Капканом ледяной пасти. Новый Медвежий капкан заменяет предыдущий.',
+  'entities.abilities.scatterbolt.name': 'Рассеивающий болт',
+  'entities.abilities.scatterbolt.description':
+    'Выпустите град болтов в конусе с углом 90 градусов на 8 ярдов перед собой, отбрасывая противников на расстояние до 20 ярдов от вас. Противники, невосприимчивые к отбрасыванию, не затрагиваются. Не наносит урона.',
+  'entities.abilities.phosphor_flask.name': 'Фосфорная колба',
+  'entities.abilities.phosphor_flask.description':
+    'Запечатанный сосуд с реактивной химической смесью, которая на 3 сек. вспыхивает раскалённым добела пламенем в области 8 м. Враги, стоящие в пламени, получают {damage} ед. урона от огня каждые 0,5 сек. Урон растёт с силой атаки в дальнем бою.',
+  'hudChrome.options.pixelsValue': '{value} пикс.',
+  'hudChrome.wocStore.subscription.monthlyTitle': 'Ежемесячное членство',
+  'hudChrome.wocStore.subscription.annualTitle': 'Набор членства на 12 месяцев',
+  'hudChrome.wocStore.subscription.annualPrice': '{price} за 12 месяцев, оплата сразу',
+  'hudChrome.wocStore.subscription.annualTerms':
+    'Ежегодное продление по той же цене. Оплата обычной валютой через Stripe. Отмена в настройках платежей.',
+  'hudChrome.wocStore.subscription.annualMount':
+    'После оплаты заберите по почте персональные поводья Ночнокрылой химеры на персонаже, купившем этот комплект. Верховое животное останется у вас после окончания подписки.',
+  'hudChrome.wocStore.subscription.trialTerms':
+    'Бесплатный пробный период на {days} дней доступен один раз на аккаунт. Требуется способ оплаты. Если не отменить подписку, по окончании будет списано {price}.',
+  'hudChrome.wocStore.subscription.startTrial': 'Начать пробные 7 дней',
+  'hudChrome.wocStore.subscription.annualClaim': 'Получить транспорт набора',
+  'hudChrome.wocStore.subscription.annualPending':
+    'После оплаты вернитесь на персонажа, купившего набор, чтобы получить транспорт. Если платеж обрабатывается или действует пробный период, повторите попытку после оплаты.',
+  'hudChrome.wocStore.subscription.annualDelivered':
+    'Ключ от транспорта набора доставлен по почте.',
+  'hudChrome.wocStore.subscription.resumeCheckout': 'Продолжить оформление',
+  'entities.letters.membership_annual_reward.sender': 'Воронья почта',
+  'entities.letters.membership_annual_reward.subject': 'Транспорт годового членства',
+  'entities.letters.membership_annual_reward.body':
+    'Оплата годовой подписки завершена. К письму приложены поводья верхового животного. Храните поводья в сумках или банке, чтобы владеть им. Оно останется у вас после окончания подписки. Требуется навык верховой езды.',
+  'hudChrome.wocStore.subscription.checkoutClosed':
+    'Это оформление завершено, неполученных наград нет. Выберите план членства ещё раз, чтобы начать новое оформление.',
+  'itemUi.tooltip.referralFullSet':
+    'Наденьте все {pieces} предметов доспехов дружбы, чтобы получать на {percent}% больше опыта в группе с {member}. Подписка пригласившего должна быть активна.',
+  'itemUi.tooltip.referralInviter': 'пригласившим вас участником',
+  'itemUi.tooltip.referralRetained':
+    'Характеристики доспехов растут с уровнем, даже когда вы не в группе с пригласившим вас игроком.',
+  'itemUi.tooltip.referralDormant':
+    'Неактивно: этот аккаунт не получил доспехи дружбы по приглашению подписчика.',
+  'entities.items.referral_helmet.name': 'Шлем дружбы',
+  'entities.items.referral_shoulder.name': 'Наплечники дружбы',
+  'entities.items.referral_chest.name': 'Кираса дружбы',
+  'entities.items.referral_waist.name': 'Пояс дружбы',
+  'entities.items.referral_legs.name': 'Поножи дружбы',
+  'entities.items.referral_gloves.name': 'Рукавицы дружбы',
+  'entities.items.referral_feet.name': 'Сапоги дружбы',
+  'hudChrome.bank.referralArmour': 'Получить доспехи дружбы',
+  'entities.items.knucklebone_of_balgath.name': 'Костяшка Балгата',
+  'entities.items.muster_standard.name': 'Знамя ополчения',
+  'entities.items.guttered_eye.name': 'Угасшее Око',
+  'entities.items.barrowstone_heart.name': 'Сердце из курганного камня',
+  'entities.items.muster_grapnel.name': 'Абордажный крюк ополчения',
+  'entities.items.craterglass_stave.name': 'Посох из кратерного стекла',
+  'hudChrome.trinkets.equip.stoneHeart':
+    'Когда удар должен убить вас, вы вместо этого превращаетесь в камень на {statue} сек.: не получаете урона и не можете двигаться или действовать, затем возвращаетесь с {restore} ед. здоровья ({restorePct}% от максимального запаса). Срабатывает не чаще раза в {icd}. Не действует в дуэлях и на арене, где бой заканчивается смертельным ударом.',
+  'hudChrome.trinkets.use.foremanShape':
+    'Принять Облик Десятника на {duration} сек.: вы становитесь одноглазым циклопом и сражаетесь кулаками, сохраняя все способности и их урон. Броня увеличивается на {armorPct}%, и вас нельзя отбросить. Спешивает вас.',
+  'hudChrome.trinkets.use.musterStandard':
+    'Водрузить у ног Знамя ополчения. В течение {duration} сек. {soldiers} ополченца идут рядом с вами и сражаются с вашей целью врукопашную, каждый нанося {damage} ед. физического урона раз в {every} сек. Они атакуют только вашу цель и только когда она уже в бою. У каждого {hpPct}% вашего максимального здоровья. Отстав больше чем на {leash} м, они сразу возвращаются к вам. Они уходят, когда знамя падает или вы погибаете. Урон зависит от силы атаки или силы атаки дальнего боя (что выше) на момент установки.',
+  'hudChrome.trinkets.use.gutteredGlare':
+    'Поддерживать луч {duration} сек.: из вас в сторону взгляда бьёт луч длиной {length} м, нанося {tick} ед. тайного урона раз в {every} сек. до {max} противникам на его пути ({total} каждому за всё время). Поворачивайтесь, чтобы вести луч; движение или произнесение заклинания прерывает его. Урон зависит от силы заклинаний.',
+  'hudChrome.trinkets.use.grapnel':
+    'Зацепить крюком видимого участника группы или рейда в пределах {range} м и перетянуть его по воздуху к себе; при приземлении он восстанавливает {heal} ед. здоровья. Не действует на противников и на союзников в транспорте, на корабле, обращённых в камень или удерживаемых эффектом, который нельзя снять. Лечение зависит от силы исцеления.',
+  'hudChrome.auraEffect.trinket.foremanShape':
+    'Вы Десятник: броня увеличена на {armorPct}%, вас нельзя отбросить.',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    'Ваше Знамя ополчения водружено. Его воины идут за вами и сражаются с вашей целью.',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    'Луч наносит {tick} ед. тайного урона раз в {every} сек. противникам на своём пути. Движение или произнесение заклинания прерывает его.',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    'Обращены в камень: не получаете урона и не можете действовать. Вы вернётесь с {pct}% максимального здоровья.',
+  // The Hollow Crypt rework (M16 non-Latin fills for its new names).
+  'entities.items.gravedirt_treads.name': 'Сапоги могильной земли',
+  'entities.items.bellrope_girdle.name': 'Пояс из колокольной верёвки',
+  'entities.items.sextons_spadehaft.name': 'Черенок лопаты пономаря',
+  'entities.items.rimesilk_mantle.name': 'Наплечье из инейного шёлка',
+  'entities.items.bonechill_carapace_vest.name': 'Кольчуга костяного холода',
+  'entities.items.rimeweb_hunters_leggings.name': 'Поножи с инеистой шнуровкой',
+  'entities.items.rimeweb_fang.name': 'Сосулька невесты',
+  'entities.items.cantors_cassock.name': 'Ряса кантора',
+  'entities.items.choirward_leggings.name': 'Поножи хорового стража',
+  'entities.items.choristers_gloves.name': 'Перчатки хориста',
+  'entities.items.cantors_hymnal.name': 'Псалтырь кантора',
+  'entities.items.gravecallers_vestments.name': 'Облачение Могильного Зова',
+  'entities.items.unquiet_stalkers_hood.name': 'Капюшон неупокоенного следопыта',
+  'entities.items.sextons_burial_spade.name': 'Погребальная лопата пономаря',
+  'entities.items.rimesilk_hood.name': 'Капюшон из инейного шёлка',
+  'entities.items.knight_commanders_longsword.name': 'Длинный меч рыцаря-командора',
+  'entities.items.gaolers_chain_girdle.name': 'Цепной пояс тюремщика',
+  'entities.items.rusted_shackle_grips.name': 'Перчатки с ржавыми кандалами',
+  'entities.items.drowned_wardens_mantle.name': 'Мантия утонувшего стража',
+  'entities.items.gaolyard_cudgel.name': 'Дубинка тюремного двора',
+  'entities.items.drowned_commanders_breastplate.name': 'Нагрудник утонувшего командира',
+  'entities.items.gaolyard_striders.name': 'Сапоги тюремного двора',
+  'entities.items.gaolers_iron_key.name': 'Железный ключ тюремщика',
+  'entities.items.conchplate_girdle.name': 'Пояс из раковинных пластин',
+  'entities.items.pale_chorus_leggings.name': 'Поножи Бледного хора',
+  'entities.items.refrain_silk_gloves.name': 'Шёлковые перчатки припева',
+  'entities.items.chorus_conch.name': 'Раковина хора',
+  'entities.items.tideglass_pauldrons.name': 'Наплечники Приливного стекла',
+  'entities.items.moonburn_treads.name': 'Ступни лунного ожога',
+  'entities.items.prism_etched_cowl.name': 'Капюшон с призменной гравировкой',
+  'entities.items.tideglass_shiv.name': 'Заточка Приливного стекла',
+  'entities.items.pale_chorus_vestment.name': 'Облачение Бледного хора',
+  'entities.items.tideglass_warmaul.name': 'Боевой молот Приливного стекла',
+  'hudChrome.trinkets.use.shackle':
+    'Сковывает цель в пределах {range} м на месте на {duration} сек. Существо, невосприимчивое к контролю (например, босс), вместо этого замедляется на {slow}%, если оно не невосприимчиво и к замедлению.',
+  'hudChrome.auraEffect.trinket.shackle': 'Скован цепью: не может двигаться.',
+  'hudChrome.auraEffect.trinket.shackleSlow':
+    'Скован цепью: скорость передвижения снижена на {pct}%.',
+  'entities.mobs.ossuary_sentinel.name': 'Страж оссуария',
+  'entities.mobs.hollow_gravedigger.name': 'Могильщик Пустоты',
+  'entities.mobs.rimeweb_hatchling.name': 'Паучок Инеистой Паутины',
+  'entities.mobs.rimeweb_spinner.name': 'Прядильщица Инеистой Паутины',
+  'entities.mobs.candlewright_acolyte.name': 'Послушник-свечник',
+  'entities.mobs.hollow_chorister.name': 'Хорист Пустоты',
+  'entities.mobs.bound_soul.name': 'Связанная душа',
+  'entities.mobs.rimeweb.name': 'Госпожа Костяного Холода',
+  'entities.mobs.cantor_ilvane.name': 'Кантор Ильвейн',
+  'entities.mobs.rime_egg_sac.name': 'Инеистый кокон с яйцами',
+  // The Hollow Crypt trash (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_grave_bolt': 'Могильная стрела',
+  'abilityUi.cast.crypt_raise_bones': 'Подъём костей',
+  'abilityUi.cast.crypt_murder_call': 'Зов стаи',
+  'abilityUi.cast.crypt_stone_shriek': 'Каменный вопль',
+  'abilityUi.cast.crypt_grave_cleave': 'Могильный размах',
+  'abilityUi.cast.crypt_barrowflame_breath': 'Дыхание курганного пламени',
+  'abilityUi.cast.crypt_tail_lash': 'Удар хвостом',
+  'abilityUi.cast.crypt_wing_gust': 'Порыв крыльев',
+  'abilityUi.cast.crypt_grave_rupture': 'Разрыв могилы',
+  'abilityUi.cast.crypt_carrion_eye': 'Око падальщика',
+  'abilityUi.cast.crypt_marrow_crush': 'Костодробящий удар',
+  'abilityUi.cast.crypt_rimesilk_spit': 'Плевок инейным шёлком',
+  'abilityUi.cast.bastion_brine_mend': 'Целительный рассол',
+  'abilityUi.cast.bastion_fog_ward': 'Туманный оберег',
+  'abilityUi.cast.bastion_halberd_sweep': 'Размах алебарды',
+  'abilityUi.cast.bastion_piercing_bolt': 'Пронзающий болт',
+  'abilityUi.cast.bastion_claw_sweep': 'Взмах клешни',
+  'abilityUi.cast.bastion_shell_slam': 'Удар панцирем',
+  'abilityUi.cast.bastion_boathook': 'Рывок багром',
+  'abilityUi.cast.bastion_fog_bank': 'Полоса тумана',
+  'abilityUi.cast.bastion_brine_column': 'Столб рассола',
+  'abilityUi.cast.bastion_oathbound_charge': 'Клятвенный натиск',
+  'abilityUi.cast.bastion_gaolers_cudgel': 'Дубинка тюремщика',
+  'abilityUi.cast.bastion_mist_surge': 'Туманный прилив',
+  'abilityUi.cast.bastion_drowning_hymn': 'Гимн утопленников',
+  'abilityUi.cast.temple_lullaby': 'Колыбельная',
+  'abilityUi.cast.temple_call_the_tide': 'Зов прилива',
+  'abilityUi.cast.temple_static_coil': 'Статический виток',
+  'abilityUi.cast.temple_snapper_snap': 'Укус',
+  'abilityUi.cast.temple_trident_sweep': 'Взмах трезубца',
+  'abilityUi.cast.temple_sea_song': 'Песнь моря',
+  'abilityUi.cast.temple_tidal_slap': 'Приливная пощёчина',
+  'abilityUi.cast.temple_tide_breath': 'Леденящее дыхание',
+  'abilityUi.cast.temple_moonlight_lance': 'Копьё лунного света',
+  'abilityUi.cast.temple_prism_flare': 'Вспышка призмы',
+  'abilityUi.cast.temple_resonant_slam': 'Резонирующий удар',
+  'abilityUi.cast.temple_moonwater_bolt': 'Стрела лунной воды',
+  'abilityUi.cast.temple_drowning_aria': 'Ария утопления',
+  'abilityUi.cast.temple_mere_surge': 'Вал из озера',
+  'abilityUi.cast.temple_tideglass_fracture': 'Трещина Приливного стекла',
+  'abilityUi.cast.temple_undertow': 'Отбойное течение',
+  'abilityUi.cast.temple_lunar_tide': 'Лунный прилив',
+  'abilityUi.cast.temple_skewering_trident': 'Пронзающий трезубец',
+  'abilityUi.cast.temple_pale_mending': 'Бледное исцеление',
+  'abilityUi.cast.temple_glimmer_venom': 'Мерцающий яд',
+  'abilityUi.cast.temple_pearl_slam': 'Приливный взмах крыльев',
+  'abilityUi.cast.temple_frostlocked_torrent': 'Скованный льдом поток',
+  'abilityUi.cast.temple_venom_current': 'Ядовитое течение',
+  'abilityUi.cast.temple_toxic_rime': 'Ядовитая изморозь',
+  'abilityUi.cast.temple_beckoning_moon': 'Зов луны',
+  'abilityUi.cast.temple_falling_moon': 'Падающая луна',
+  'abilityUi.cast.temple_lightning_spit': 'Молниевый плевок',
+  'abilityUi.cast.temple_crushing_torrent': 'Сокрушительный поток',
+  'abilityUi.cast.temple_hydra_tsunami': 'Цунами',
+  'abilityUi.cast.temple_ysolei_call': 'Зов лунного отродья',
+  'abilityUi.cast.temple_ysolei_wrath': 'Утопленный гнев',
+  'abilityUi.cast.temple_prism_glare': 'Взор призмы',
+  'abilityUi.cast.temple_arcing_spark': 'Дуговая искра',
+  'abilityUi.cast.crypt_gravespark_volley': 'Залп могильных искр',
+  'abilityUi.cast.bastion_loose_on_my_mark': 'Огонь по моей метке',
+  'abilityUi.cast.temple_call_of_the_shallows': 'Зов отмелей',
+  'entities.mobs.crypt_ossuary_warrior.name': 'Воин оссуария',
+  'entities.mobs.crypt_gravecaller_adept.name': 'Адепт Могильного Зова',
+  'entities.mobs.crypt_ossuary_cutthroat.name': 'Головорез оссуария',
+  'entities.mobs.crypt_gravecaller_necromancer.name': 'Некромант Могильного Зова',
+  'entities.mobs.crypt_bone_minion.name': 'Костяной прислужник',
+  'entities.mobs.crypt_bone_brute.name': 'Костяной громила',
+  'entities.mobs.crypt_bone_pile.name': 'Шевелящиеся кости',
+  'entities.mobs.crypt_chapel_gargoyle.name': 'Часовенная горгулья',
+  'entities.mobs.crypt_crow_caller.name': 'Зовущий воронов',
+  'entities.mobs.crypt_carrion_crow.name': 'Ворон-падальщик',
+  'entities.mobs.crypt_ossuary_drake.name': 'Костяной дракон оссуария',
+  // The Hollow Crypt finale (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_morthen_rite_wakes': 'Пробуждение обряда',
+  'abilityUi.cast.crypt_morthen_rise': 'Восход Могильного Зова',
+  'abilityUi.cast.crypt_morthen_proclaim': 'Могильное воззвание',
+  'abilityUi.cast.crypt_morthen_descend': 'Нисхождение',
+  'abilityUi.cast.crypt_knellwyrm_arrive': 'Спуск с небес',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': 'Погребальный налёт',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': 'Огненный заход',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': 'Жуткий рёв',
+  'abilityUi.cast.crypt_marrow_shovelful': 'Полная лопата',
+  'abilityUi.cast.crypt_marrow_measure': 'Мерка для могилы',
+  'abilityUi.cast.crypt_marrow_burial_toll': 'Погребальный звон',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': 'Удар могильщика',
+  'abilityUi.cast.crypt_lady_brides_lament': 'Плач невесты',
+  'abilityUi.cast.crypt_lady_frozen_embrace': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_embrace_hold': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_bridal_freeze': 'Свадебная стужа',
+  'abilityUi.cast.crypt_ilvane_dirge': 'Погребальная песнь Пустоты',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': 'Непрерывный стих',
+  'abilityUi.cast.crypt_ilvane_bone_organ': 'Костяной орган',
+  'entities.mobs.crypt_knellwyrm.name': 'Погребальный змий',
+  // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
+  'abilityUi.cast.bastion_iron_cage': 'Железная клетка',
+  'abilityUi.cast.bastion_drowned_anchor_cast': 'Утопленный якорь',
+  'abilityUi.cast.bastion_shackle_pair': 'Парные кандалы',
+  'abilityUi.cast.bastion_shadowstep': 'Переход сквозь тень',
+  'abilityUi.cast.bastion_reaping_scythe': 'Жнущая коса',
+  'abilityUi.cast.bastion_veil_rise': 'Туманная завеса',
+  'abilityUi.cast.bastion_veil_gather': 'Сгущение тумана',
+  'abilityUi.cast.bastion_vael_rise': 'Смерть восстаёт',
+  'abilityUi.cast.bastion_vael_sink': 'В туман',
+  'abilityUi.cast.bastion_hallowed_brine': 'Освящённый рассол',
+  'abilityUi.cast.bastion_rebounding_bulwark': 'Отскакивающий щит',
+  'abilityUi.cast.bastion_tide_sentence': 'Приговор прилива',
+  'abilityUi.cast.bastion_oath_kneel': 'Нерушимая клятва',
+  'abilityUi.cast.bastion_oath_vigil': 'Нерушимая клятва',
+  'entities.mobs.bastion_gaol_cage.name': 'Железная клетка',
+  'entities.mobs.bastion_drowned_anchor.name': 'Утопленный якорь',
+  'entities.items.jailers_iron_gauntlets.name': 'Железные рукавицы тюремщика',
+  'entities.items.turnkeys_keyring_belt.name': 'Пояс со связкой ключей надзирателя',
+  'entities.items.turnkeys_lantern_cowl.name': 'Капюшон надзирателя с фонарём',
+  'hudChrome.finder.mech.iron_cage':
+    'Железная клетка (жмите клавишу взаимодействия, чтобы вырваться; союзники могут ломать прутья)',
+  'hudChrome.finder.mech.drowned_anchor':
+    'Утопленный якорь (жертву подтягивает к яме: добегите на 3 ярда к горящему швартовому столбу, чтобы пришвартовать цепь, столб гаснет на 30 секунд, или разбейте цепь 12 ударами, 16 в героическом режиме)',
+  'hudChrome.finder.mech.shackle_pair':
+    'Парные кандалы (двое скованных игроков должны держаться вместе)',
+  'hudChrome.finder.mech.hallowed_brine':
+    'Освящённый рассол (лужа тёмной святой воды радиусом 9 ярдов, 10 в героическом режиме: 18 урона в секунду всем внутри, 26 в героическом, а он получает на 40 процентов меньше урона, пока стоит в ней: вытащите его)',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    'Отскакивающий щит (щит отскакивает к ближайшему игроку в 10 метрах от последнего поражённого, до 3 игроков, 4 в героике: рассредоточьтесь)',
+  'hudChrome.finder.mech.tide_sentence':
+    'Приговор прилива (через 5 секунд после метки столп света бьёт всех в 6 метрах от отмеченного, 8 в героике: примите его вдали от группы)',
+  'hudChrome.finder.mech.unbroken_oath':
+    'Нерушимая клятва (один раз, на половине здоровья, он до 60 секунд неуязвим в пузыре: убейте его солдат, затем он оглушён на 4 секунды и 10 секунд получает на 20 процентов больше урона)',
+  'hudChrome.finder.mech.fog_veil':
+    'Туманная завеса (четыре фигуры, одна настоящая: в луче маяка фонарь настоящего Ваэля вспыхивает)',
+  'hudChrome.finder.mech.reaper_behind':
+    'Переход сквозь тень (трижды подряд встаёт за спиной игрока, каждый раз другого, пока хватает игроков: выйдите из дуги косы)',
+  'hudChrome.bastionCage.title': 'Вы заперты в железной клетке!',
+  'hudChrome.bastionCage.promptKey': 'Жмите {key} снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptNoKey':
+    'Жмите клавишу взаимодействия снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptClick': 'Щёлкайте здесь снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptTap': 'Нажимайте сюда снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.buttonAria': 'Вырваться из железной клетки',
+  'hudChrome.bastionCage.progressAria': 'Прогресс побега: {pct}',
+  'hudChrome.bastionChain.anchoredTitle': 'Прикован к Утопленному якорю!',
+  'hudChrome.bastionChain.anchoredLine':
+    'Бегите к горящему швартовому столбу, чтобы пришвартовать цепь, или пусть группа разобьёт её, пока лебёдка не утащила вас в яму',
+  'hudChrome.bastionChain.allyTitle': 'Разбейте цепь!',
+  'hudChrome.bastionChain.allyLine':
+    '{name} тащат к яме: бейте Утопленный якорь или помогите добежать до горящего столба',
+  'hudChrome.auraEffect.bastion.anchored':
+    'Прикованы к Утопленному якорю: двигаться можно, но не дальше от лебёдки, которая подтягивает вас к яме. Подойдите на {reach} ярда к горящему швартовому столбу не ближе {run} ярдов от места, где вас зацепило, чтобы пришвартовать цепь (этот столб гаснет на {dark} сек.), или пусть группа разобьёт её за {links} ударов ({linksHeroic} в героическом режиме). Яма отнимает {pit}% максимального здоровья ({pitHeroic}% в героическом режиме).',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    'Вас сковал столб морской воды: вы получаете {min}-{max} ед. урона от сил природы каждые {tick} сек. в течение {seconds} сек. Прервите или оглушите Приливного послушника, чтобы освободиться.',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    'Получает на {pct}% меньше урона, пока в пределах {radius} ярд. стоит другой Утонувший дозорный. Разведите их.',
+  'hudChrome.auraEffect.bastion.fogShroud':
+    'Получает на {pct}% меньше урона, пока стоит в полосе тумана. Вытащите его из тумана.',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    'Поглотил мертвецов ({stacks} из {max}): каждый заряд увеличивает радиус высвобождения душ на {radius} ярд. и урон на {pct}%.',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    'Его цепи разорваны. Он больше не сражается, неуязвим и скоро уйдёт.',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    'Все вороны в бою охотятся на вас {seconds} сек. Бегите к танку, чтобы стаю можно было убить разом.',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    'Получает на {pct}% меньше урона, и камень утолщается каждые {every} сек., до {max} слоёв. Оглушение раскалывает его, и цель {seconds} сек. получает на {cracked}% больше урона.',
+  'hudChrome.bastionChain.shackledTitle': 'Скован с {name}',
+  'hudChrome.bastionChain.shackledLine':
+    'Держитесь в пределах {range} ярдов друг от друга (сейчас {dist} ярдов)',
+  'hudChrome.bastionChain.strainedLine':
+    'Слишком далеко! Цепь ранит обоих: сойдитесь ближе {range} ярдов',
+  'hudChrome.bastionChain.brokenAria': 'Цепь разбита: {pct}',
+  'hudChrome.bastionChain.reachAria': 'Натяжение цепи: {pct}',
+  'hudChrome.bastionChain.linksLeft': 'Осталось звеньев цепи: {count} из {total}',
+  'hudChrome.bastionChain.linkRule':
+    'Каждый удар по якорю разбивает одно звено, как бы силён он ни был',
+  'hudChrome.bastionChain.linksTarget': 'Звеньев: {count} из {total}',
+  'hudChrome.bastionChain.linkBroken': 'Звено разбито!',
+  'entities.items.beastpit_warbelt.name': 'Боевой пояс звериных ям',
+  'entities.items.jaguar_hide_jerkin.name': 'Куртка из шкуры ягуара',
+  'entities.items.hexbone_handwraps.name': 'Обмотки из заклятой кости',
+  'entities.items.rootbound_sabatons.name': 'Сабатоны, оплетённые корнями',
+  'entities.items.pollen_dusted_leggings.name': 'Поножи в пыльце',
+  'entities.items.bloomsilk_cowl.name': 'Капюшон из цветочного шёлка',
+  'entities.items.falls_blessed_staff.name': 'Посох, благословлённый водопадами',
+  'entities.items.fanglords_hide_mantle.name': 'Кожаная мантия Повелителя клыков',
+  'entities.items.thornroot_greathelm.name': 'Великий шлем в терновом венце',
+  'entities.items.fanglords_whistle.name': 'Свисток Повелителя клыков',
+  'entities.items.gorgebloom_seedpod.name': 'Семенная коробочка Цветожора',
+  'hudChrome.trinkets.use.spiritPack':
+    'Призывает духа-ягуара, который сражается рядом с вами {duration} сек. Он бежит к вашей цели и кусает её каждые {every} сек., нанося от {min} до {max} ед. физического урона, и переключается на любого другого врага, которого вы выберете целью. Если враг не выбран, он атакует ближайшего к вам врага в радиусе {range} м. Урон растёт с силой атаки или силой дальнего боя (большей из них) и фиксируется при призыве. Требуется враждебная цель в пределах {range} м.',
+  'hudChrome.trinkets.use.seedburst':
+    'Сажает семя на вашу цель в пределах {range} м. Через {delay} сек. оно лопается там, где стоит цель (или где она погибла), нанося {damage} ед. урона от сил природы каждому врагу в радиусе {radius} м, или на {bonus}% больше ({empowered}), если цель погибла раньше. Урон растёт с силой заклинаний и фиксируется при посадке. Если вы погибнете до того, как семя лопнет, оно засохнет.',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    'Дух-ягуар сражается рядом с вами, кусая вашу цель каждые {every} сек. и нанося от {min} до {max} ед. физического урона.',
+  'hudChrome.auraEffect.trinket.seedburst':
+    'Семя Цветожора. Когда эффект закончится, оно лопнет, нанося {damage} ед. урона от сил природы каждому врагу в радиусе {radius} м, или на {bonus}% больше ({empowered}), если этот враг погибнет раньше.',
+  'entities.items.foremans_grips.name': 'Рукавицы бригадира',
+  'entities.items.serac_stride_boots.name': 'Сапоги ледяных зубцов',
+  'entities.items.seal_rune_mantle.name': 'Мантия печатных рун',
+  'entities.items.thawbound_legguards.name': 'Поножи талых оков',
+  'entities.items.pyre_tenders_hood.name': 'Капюшон хранителя костра',
+  'entities.items.meltwater_cord.name': 'Шнур талой воды',
+  'entities.items.hammer_of_the_open_lock.name': 'Молот отпертого замка',
+  'entities.items.vestments_of_the_waking_rite.name': 'Облачение обряда пробуждения',
+  'entities.items.foremans_last_link.name': 'Последнее звено бригадира',
+  'entities.items.phial_of_the_tithe.name': 'Фиал десятины',
+  'entities.items.quenchwater_flask.name': 'Фляга закалочной воды',
+  'hudChrome.trinkets.use.tether':
+    'Приковывает вас цепью к дружественному игроку в пределах {range} м на {duration} сек. {share}% урона, который дошёл бы до его здоровья, вместо этого получаете вы. Действие прекращается досрочно, если вы погибнете. Требуется целью дружественный игрок, отличный от вас.',
+  'hudChrome.trinkets.use.harvest':
+    'В течение {duration} сек. каждое враждебное существо, погибшее в радиусе {radius} м от вас, восполняет {pct}% вашего максимального здоровья ({health}) и {pct}% вашей максимальной маны.',
+  'hudChrome.trinkets.use.quench':
+    'Ваши следующие {hits} попаданий оружием ближнего или дальнего боя в течение {duration} сек. наносят дополнительно {damage} ед. урона от магии льда. Последнее из них также закаляет цель, замедляя её атаки на {slow}% на {slowDuration} сек. Неиспользованные попадания пропадают по окончании эффекта. Урон растёт с силой атаки или силой дальнего боя (большей из них).',
+  'hudChrome.auraEffect.trinket.tether':
+    'Скован Последним звеном бригадира: {pct}% урона, который дошёл бы до вашего здоровья, вместо этого получает тот, кто вас приковал.',
+  'hudChrome.auraEffect.trinket.tetherLink':
+    'Вы получаете {pct}% урона, который получил бы прикованный к вам союзник.',
+  'hudChrome.auraEffect.trinket.harvest':
+    'Каждое враждебное существо, погибшее в радиусе {radius} м от вас, восполняет {pct}% вашего максимального здоровья и маны.',
+  'hudChrome.auraEffect.trinket.quench':
+    'Ваши следующие {stacks} попаданий оружием наносят дополнительно {damage} ед. урона от магии льда. Последнее замедляет атаки цели на {slow}%.',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    'Следующие {stacks} попаданий оружием наносят дополнительный урон от магии льда. Последнее замедляет атаки цели на {slow}%.',
+  'hudChrome.auraEffect.trinket.quenched': 'Скорость атаки снижена на {pct}%.',
+  'abilityUi.cast.wildheart_ancestral_sap': 'Сок предков',
+  'abilityUi.cast.wildheart_plant_totem': 'Установка тотема',
+  'abilityUi.cast.wildheart_entangling_lash': 'Опутывающий хлыст',
+  'abilityUi.cast.wildheart_saurian_tail_swipe': 'Удар хвостом',
+  'abilityUi.cast.wildheart_saurian_stomp': 'Сотрясающий топот',
+  'abilityUi.cast.wildheart_beast_pit_quake': 'Сотрясение звериных ям',
+  'abilityUi.cast.wildheart_jaguar_heel': 'К ноге!',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': 'Семенной дождь',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': 'Удар лозы',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': 'Пожирание',
+  'abilityUi.cast.wildheart_zulgar_pulse': 'Импульс Дикого Сердца',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': 'Дух охоты',
+  'abilityUi.cast.wildheart_quarry_mark': 'Метка добычи',
+  'abilityUi.cast.wildheart_war_roar': 'Боевой рёв',
+  'abilityUi.cast.wildheart_toad_hex': 'Жабья порча',
+  'abilityUi.cast.wildheart_rattling_dread': 'Гремящий ужас',
+  'abilityUi.cast.wildheart_snaring_tongue': 'Ловчий язык',
+  'abilityUi.cast.sanctum_cinder_breath': 'Пепельное дыхание',
+  'abilityUi.cast.sanctum_warming_rite': 'Обряд согревания',
+  'abilityUi.cast.sanctum_goad': 'Подстрекательство',
+  'abilityUi.cast.sanctum_plant_brazier': 'Установить жаровню душ',
+  'abilityUi.cast.sanctum_ice_block_toss': 'Бросок ледяной глыбы',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': 'Взмах бивнями',
+  'abilityUi.cast.sanctum_korzul_break_free': 'Вырваться на волю',
+  'abilityUi.cast.sanctum_korzul_grave_breath': 'Могильное дыхание',
+  'abilityUi.cast.sanctum_korzul_tail_sweep': 'Взмах хвостом',
+  'abilityUi.cast.sanctum_korzul_grave_inferno': 'Могильное пекло',
+  'abilityUi.cast.sanctum_korzul_wing_gale': 'Порыв крыльев',
+  'abilityUi.cast.sanctum_korzul_plunging_fire': 'Низвергающийся огонь',
+  'abilityUi.cast.sanctum_korzul_crashing_descent': 'Сокрушительное падение',
+  'abilityUi.cast.sanctum_tusker_trample': 'Растаптывание',
+  'abilityUi.cast.sanctum_counterweight_lash': 'Удар хвостом-противовесом',
+  'abilityUi.cast.sanctum_branding_iron': 'Клеймо',
+  'abilityUi.cast.sanctum_rime_breath': 'Изморозное дыхание',
+  'abilityUi.cast.kituse_sanctum_topple_brazier': 'Опрокинуть жаровню',
+  'abilityUi.cast.sanctum_korgath_maul_arc': 'Дуга кувалды',
+  'abilityUi.cast.sanctum_korgath_chain_flail': 'Цепной хлыст',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': 'Рывок через порог',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': 'Рёв бригадира',
+  'abilityUi.cast.sanctum_korgath_strain': 'Натяжение',
+  'abilityUi.cast.sanctum_korgath_stomp': 'Сотрясающий топот',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': 'Переклёпка',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': 'Траншея душевного огня',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': 'Залп тьмы',
+  'hudChrome.finder.mech.waking_thaw':
+    'Пробуждающая оттепель (мертвецы выбираются из талых прудов)',
+  'hudChrome.finder.mech.unquenched_held':
+    'Скованные или Неугасшие (убивайте мертвецов на холодном льду, никогда в талой воде)',
+  'hudChrome.finder.mech.soulfire_trench':
+    'Траншея душевного огня (линия душевного огня, затем полоса талой воды)',
+  'hudChrome.finder.mech.shadow_volley': 'Залп тьмы (урон тьмой по всем)',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    'Тёплые руки и Дважды пробуждённые (только героический режим: не давайте мертвецам стоять; восставший возвращается сильнее)',
+  'entities.mobs.thorn_sprout.name': 'Терновый росток',
+  'hudChrome.finder.mech.pack_bond':
+    'Узы стаи (вместе получают вдвое меньше урона: разведите их на 15 ярдов)',
+  'hudChrome.finder.mech.stalk':
+    'Выслеживание (ягуар охотится на отмеченного, но не на танка; в одиночку он охотится на вас: уводите его, замедляйте, обездвиживайте, оглушайте)',
+  'hudChrome.finder.mech.shared_health': 'Общее здоровье (один запас: бейте того, кого безопаснее)',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    'К ноге! и Неистовые узы (ягуар прыгает к хозяину, узы действуют на 20 ярдов)',
+  'hudChrome.finder.mech.seed_rain':
+    'Семенной дождь (чистые игроки давят семена, пока те не проросли)',
+  'hudChrome.finder.mech.pollinate':
+    'Опыление (золотые игроки держатся подальше от семян, иначе те тут же прорастут)',
+  'hudChrome.finder.mech.vine_lash': 'Удар лозы (выйдите из колючей полосы, иначе вас обездвижит)',
+  'hudChrome.finder.mech.gorge': 'Пожирание (тяжёлый укус и яд на танке)',
+  'hudChrome.finder.mech.burrowing_seeds':
+    'Зарывающиеся семена и Пыльцевое облако (через 6 секунд росток встаёт рядом с игроком, золото передаётся)',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    'Дух охоты (Добыча уводит аватара через горящие солнечные глифы; растерзанный игрок получает фору)',
+  'hudChrome.finder.mech.twin_prey_ambush':
+    'Двойная добыча и Засада (две Добычи, затем прыжок на самого дальнего игрока)',
+  'hudChrome.finder.mech.seal_shackles':
+    'Печатные оковы (каждая разбитая цепь увеличивает получаемый им урон на 20% и освобождает одну из его атак)',
+  'hudChrome.finder.mech.chain_strain': 'Натяжение (отойдите от каждого столпа, чья цепь ещё цела)',
+  'hudChrome.finder.mech.korgath_stomp': 'Сотрясающий топот (выйдите из кольца вокруг него)',
+  'hudChrome.finder.mech.rerivet_last_link':
+    'Переклёпка и Последнее звено (прервите кузнеца-погонщика, заново склёпывающего цепь; когда остаётся одна цепь, Натяжение каждые 10 секунд)',
+  'hudChrome.bastionAlert.sentencedTitle': 'Приговор падёт на тебя!',
+  'hudChrome.bastionAlert.sentencedLine': 'Столп света ударит всех рядом с тобой: отойди от группы',
+  'hudChrome.bastionAlert.brineTitle': 'Ты в освящённом рассоле!',
+  'hudChrome.bastionAlert.brineLine': 'Он жжёт каждую секунду: выйди из лужи',
+  'hudChrome.bastionAlert.reapedTitle': 'Смерть встаёт за твоей спиной!',
+  'hudChrome.bastionAlert.reapedLine': 'Выйди из дуги косы: вперёд или в сторону',
+  'hudChrome.bastionAlert.veilTitle': 'Туманная завеса',
+  'hudChrome.bastionAlert.veilLine':
+    'Следи за лучом маяка: настоящий Ваэль тот, чей фонарь вспыхивает',
+  'hudChrome.bastionAlert.realTitle': 'Луч нашёл его!',
+  'hudChrome.bastionAlert.realLine': 'Это настоящий Ваэль: бей его, чтобы разорвать завесу',
+  'hudChrome.bastionAlert.shadeTitle': 'Пустая тень',
+  'hudChrome.bastionAlert.shadeLine':
+    'Свет проходит сквозь неё: оставь её, найди того, кого освещает луч',
+  'hudChrome.bastionAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.wildheartAlert.preyTitle': 'Вы добыча!',
+  'hudChrome.wildheartAlert.preyLine':
+    'Зулгар охотится на вас: ведите его через горящие солнечные глифы',
+  'hudChrome.wildheartAlert.preyWaitLine':
+    'Сейчас он гонится за другой Добычей: будьте готовы, он сменит цель',
+  'hudChrome.wildheartAlert.stalkedTitle': 'Вас выслеживают!',
+  'hudChrome.wildheartAlert.stalkedLine': 'Ягуар охотится на вас: уведите его подальше от хозяина',
+  'hudChrome.wildheartAlert.pollinatedTitle': 'Опылены!',
+  'hudChrome.wildheartAlert.pollinatedLine':
+    'Держитесь подальше от семян: от вашего касания они прорастают',
+  'hudChrome.wildheartAlert.bondTitle': 'Узы стаи',
+  'hudChrome.wildheartAlert.bondLine': 'Вместе они получают вдвое меньше урона: разведите их',
+  'hudChrome.wildheartAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.sanctumAlert.quenchTitle': 'В закалочной воде!',
+  'hudChrome.sanctumAlert.quenchLine':
+    'Она жжёт и замедляет: плывите к ближайшему льду или на берег',
+  'hudChrome.sanctumAlert.plungeTitle': 'Низвергающийся огонь!',
+  'hudChrome.sanctumAlert.plungeLine': 'Вся ваша плита сейчас загорится: немедленно уходите с неё',
+  'hudChrome.sanctumAlert.descentTitle': 'Сокрушительное снижение!',
+  'hudChrome.sanctumAlert.descentLine': 'Он приземлится прямо здесь: выйдите из его тени',
+  'hudChrome.sanctumAlert.eyeTitle': 'Око вирма на вас!',
+  'hudChrome.sanctumAlert.eyeLine':
+    'Когда метка спадёт, ваша плита загорится: стойте на целом льду, подальше от группы',
+  'hudChrome.sanctumAlert.eyeCrackedLine':
+    'Вы стоите на треснувшем льду: перейдите на целую плиту, пока метка не спала',
+  'hudChrome.sanctumAlert.flailTitle': 'Цепной цеп!',
+  'hudChrome.sanctumAlert.flailLine': 'Цепь хлестнёт вдоль отмеченной полосы: уйдите с неё',
+  'hudChrome.sanctumAlert.chargeTitle': 'Рывок с порога!',
+  'hudChrome.sanctumAlert.chargeLine': 'Он бросится вдоль полосы: уйдите с неё и подальше от края',
+  'hudChrome.sanctumAlert.trenchTitle': 'Траншея душевного огня!',
+  'hudChrome.sanctumAlert.trenchLine':
+    'Душевный огонь прорежет полосу и оставит талую воду: уйдите с неё',
+  'hudChrome.sanctumAlert.strainTitle': 'Натяжение цепей!',
+  'hudChrome.sanctumAlert.strainLine': 'Целые столпы вот-вот ударят: отойдите от них',
+  'hudChrome.sanctumAlert.infernoTitle': 'Могильное пекло!',
+  'hudChrome.sanctumAlert.infernoLine':
+    'Каждый импульс сильнее прежнего: выйдите из его досягаемости',
+  'hudChrome.sanctumAlert.stompTitle': 'Сотрясающий топот!',
+  'hudChrome.sanctumAlert.stompLine': 'Отойдите от него, пока нога не опустилась',
+  'hudChrome.sanctumAlert.breathTitle': 'Могильное дыхание!',
+  'hudChrome.sanctumAlert.breathLine': 'Вы в конусе дыхания: уйдите в сторону',
+  'hudChrome.sanctumAlert.maulTitle': 'Дуга кувалды!',
+  'hudChrome.sanctumAlert.maulLine': 'Он сметает всё перед собой: зайдите ему за спину',
+  'hudChrome.sanctumAlert.tailTitle': 'Удар хвостом!',
+  'hudChrome.sanctumAlert.tailLine': 'Вы стоите позади него: уйдите, пока не ударил хвост',
+  'hudChrome.sanctumAlert.meltwaterTitle': 'В талой воде',
+  'hudChrome.sanctumAlert.meltwaterLine':
+    'Ваш костеход стоит в талой воде: вытащите его на холодный лёд',
+  'hudChrome.sanctumAlert.meltwaterTargetLine':
+    'Если цель умрёт в талой воде, она поднимется снова: дождитесь холодного льда',
+  'hudChrome.sanctumAlert.crackedTitle': 'Треснувший лёд',
+  'hudChrome.sanctumAlert.crackedLine': 'Огонь здесь разобьёт эту плиту: уводите его пламя отсюда',
+  'hudChrome.sanctumAlert.flightTitle': 'Корзул взлетает',
+  'hudChrome.sanctumAlert.flightLine':
+    'Соберитесь на целом льду, чтобы выбрать место его посадки, затем разойдитесь',
+  'hudChrome.sanctumAlert.lockboundTitle': 'Скованный замком',
+  'hudChrome.sanctumAlert.lockboundLine':
+    'Держится цепей: {chains}. Он получает на {pct}% меньше урона. Разбейте печатные кандалы, чтобы снять защиту.',
+  'hudChrome.sanctumAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.sanctumAlert.brandedTitle': 'Заклеймён!',
+  'hudChrome.sanctumAlert.brandedLine':
+    'Клеймо жжёт до конца действия: потушите его в луже талой воды',
+  'hudChrome.sanctumAlert.rimeTitle': 'Ползучая изморозь!',
+  'hudChrome.sanctumAlert.rimeLine':
+    'Ползучая изморозь {stacks}/{max}: выйдите из дыхания дракончиков',
+  'hudChrome.sanctumAlert.slabTitle': 'Ледяная глыба',
+  'hudChrome.sanctumAlert.slabLine':
+    'Сплошной лёд: он закрывает обзор. Укройтесь за ним от заклинаний',
+  'hudChrome.kitUse.toppleLine': 'Опрокиньте на стаю: пролитое пламя обжигает врагов',
+  'hudChrome.kitUse.toppleKey': 'Опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleTap': 'Нажмите здесь, чтобы опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleClick': 'Щёлкните здесь, чтобы опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleFar': 'Подойдите ближе чем на {range} м, чтобы опрокинуть',
+  'hudChrome.kitUse.toppleAria': 'Опрокинуть: {name}',
+  'hudChrome.kitUse.usingLine': 'Не двигайтесь: удар, шаг или оглушение прервут действие',
+  'hudChrome.kitUse.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.sanctum.branded':
+    'Наносит {value} ед. урона ({school}) каждые {interval} сек. в течение {seconds} сек. Встаньте в лужу талой воды, чтобы сразу потушить клеймо.',
+  'hudChrome.auraEffect.sanctum.creepingRime':
+    'Снижает скорость передвижения на {pct}%, по {per}% за каждый эффект. Каждое Изморозное дыхание добавляет эффект и сбрасывает длительность до {seconds} сек. При {max} эффектах вы замерзаете (Обледенение) на {freeze} сек., и эффекты снимаются.',
+  'hudChrome.auraEffect.sanctum.icedOver':
+    'Скован Ползучей изморозью: невозможно двигаться и действовать.',
+  'hudChrome.auraEffect.sanctum.lockbound':
+    'Получает на {pct}% меньше урона: по {per}% за каждую ещё целую цепь. Разбейте печатные кандалы, чтобы сбросить их цепь.',
+  'hudChrome.auraEffect.sanctum.enrage': 'Наносит на {pct}% больше урона.',
+  'hudChrome.auraEffect.sanctum.grasp':
+    'Стоит в талой воде и наносит на {pct}% больше урона. Если умрёт в талой воде, утонет и поднимется снова через {seconds} сек.; убейте его на холодном льду, чтобы он не встал.',
+  'hudChrome.auraEffect.sanctum.twiceWoken':
+    'Поднялся из талой воды снова и наносит на {pct}% больше урона.',
+  'hudChrome.auraEffect.sanctum.doused':
+    'Плита под ним треснула, и закалочная вода погасила его Могильное пекло.',
+  'hudChrome.auraEffect.sanctum.airborne':
+    'В воздухе, атаковать нельзя. Он приземлится Сокрушительным снижением на плиту, где стоит больше всего игроков, нанося {min}-{max} ед. урона ({heroicMin}-{heroicMax} в героическом режиме) всем в радиусе {radius} м.',
+  'hudChrome.auraEffect.sanctum.wyrmsEye':
+    'Когда эффект закончится, Корзул обрушит Низвергающийся огонь на всю плиту, где вы стоите: {min}-{max} ед. урона ({heroicMin}-{heroicMax} в героическом режиме) всем на ней, а плита треснет или разобьётся, если уже была треснувшей. Стойте на целом льду, подальше от группы.',
+  'hudChrome.auraEffect.sanctum.quenchWater':
+    'В открытой закалочной воде: скорость снижена на {slow}%, каждую секунду {damage} ед. урона ({heroic} в героическом режиме). Плывите к любой плите или на берег.',
+  'hudChrome.auraEffect.sanctum.shardFlare':
+    'Осколок сердца вспыхивает: Могильное дыхание каждые {breath} сек., Порыв крыльев каждые {gale} сек.',
+  'hudChrome.auraEffect.wildheart.packBond':
+    'Получает на {pct}% меньше урона, пока напарник рядом. Разведите Повелителя клыков и его ягуара, чтобы разорвать узы.',
+  'hudChrome.auraEffect.wildheart.packBondFury':
+    'Наносит на {pct}% больше урона, пока напарник рядом.',
+  'hudChrome.auraEffect.wildheart.stalked':
+    'Великий ягуар охотится на вас и не поддаётся провокации. Каждый укус наносит {min}–{max} физического урона ({heroicMin}–{heroicMax} в героическом режиме) и вызывает кровотечение. Уведите его от хозяина.',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    'Оглушение уже сработало. Пока эффект действует, новые оглушения не срабатывают.',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    'Обездвиживание уже сработало. Пока эффект действует, новые обездвиживания не срабатывают.',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    'Замедление уже сработало. Пока эффект действует, новые замедления не срабатывают.',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    'От вашего касания семенной стручок сразу прорастает Терновым ростком. Держитесь подальше от семян, пусть их давят чистые игроки; нетронутый стручок прорастает через {seconds} сек. (в героическом режиме через {heroic} сек. он зарывается и вылезает рядом с ближайшим игроком).',
+  'hudChrome.auraEffect.wildheart.prey':
+    'Зулгар охотится на вас. Проведите его через горящий солнечный глиф, чтобы замедлить на {slow}%. Если он вас догонит, вас растерзают: {damage} урона ({heroic} в героическом режиме) и падение на {stun} сек.',
+  'hudChrome.auraEffect.wildheart.avatar':
+    'Движется на {pct}% быстрее и охотится на свою Добычу. Замедления и обездвиживания действуют, оглушения длятся вдвое меньше.',
+  'hudChrome.auraEffect.wildheart.vanished':
+    'Скрыт и неуязвим. Вот-вот бросится на самого дальнего игрока.',
+  // The Drowned Temple lore guide, Laverock (src/sim/content/drowned_temple_cantor.ts).
+  'dungeonGuide.drownedTemple.greet.1':
+    'Я был самым юным голосом Бледного хора. В ночь обряда я не выпил и сбежал. С тех пор каждое полнолуние я слышу, как они поют под водой. Я должен увидеть её, прежде чем умру. Позвольте мне идти позади вас. Я не стану сражаться и не задержу вас.',
+  'dungeonGuide.drownedTemple.greet.2':
+    'Каждое полнолуние я прихожу к этим вратам, и каждое полнолуние мне изменяет мужество. Но не сегодня. Хор поёт, а сбежал от него я. Отведите меня к ней, и я не буду вам мешать.',
+  'dungeonGuide.drownedTemple.row.join': 'Идём с нами.',
+  'dungeonGuide.drownedTemple.row.decline': 'Мы пойдём одни.',
+  'dungeonGuide.drownedTemple.joined': 'Ведите. Я прямо за вами.',
+  'dungeonGuide.drownedTemple.singing': 'Дайте мне петь. Ступайте, и ступайте с миром.',
+  'dungeonGuide.drownedTemple.accept.1': 'Спасибо. Я пойду позади вас и не стану мешать.',
+  'dungeonGuide.drownedTemple.accept.2':
+    'Значит, наконец-то я спускаюсь. Идите вперёд. Я не отстану.',
+  'dungeonGuide.drownedTemple.decline': 'Я понимаю. Я буду слушать отсюда, сверху, как всегда.',
+  'dungeonGuide.drownedTemple.heroicWater':
+    'Вода сегодня стоит высоко, выше, чем я когда-либо видел. Она вот-вот проснётся.',
+  'dungeonGuide.drownedTemple.memory.votaries':
+    'Утопленники на берегу вошли в воду уже после того, как врата закрылись. Их забрала не луна, а только вода.',
+  'dungeonGuide.drownedTemple.memory.rubbing':
+    'Страж приливов прочёл мои слова на прибрежном камне. «Оно лишь спит». Я вырезал их наутро.',
+  'dungeonGuide.drownedTemple.area.steps':
+    'Ступени паломников. В ту ночь я взбежал по ним через три ступени и ни разу не оглянулся.',
+  'dungeonGuide.drownedTemple.sight.pilgrim':
+    'Паломники из прибрежных деревень. Каждую весну они несли свою святыню на спине. Теперь несут её вечно.',
+  'dungeonGuide.drownedTemple.sight.acolyte':
+    'Послушницы. Я учился грамоте рядом с ними. Теперь они поют во сне и никогда не просыпаются.',
+  'dungeonGuide.drownedTemple.area.causeway.1':
+    'В ночи обряда луна ложилась на эту дамбу, словно вторая дорога.',
+  'dungeonGuide.drownedTemple.area.causeway.2':
+    'Посмотрите на воду. Она всё ещё помнит, как держать луну.',
+  'dungeonGuide.drownedTemple.sight.templeguard':
+    'Стража лестницы. Они поклялись держать храм, пока не зайдёт луна. Луна так и не зашла.',
+  'dungeonGuide.drownedTemple.sight.snapper':
+    'Мы пили лунную воду из таких раковин. Свою я уронил на лестнице.',
+  'dungeonGuide.drownedTemple.sight.siren':
+    'Этот голос. Она пела рядом со мной в хоре. До сих пор вступает на полдоли раньше.',
+  'dungeonGuide.drownedTemple.sight.lurker':
+    'Дети ловили таких сетями на мелководье. Они были с большой палец и светились.',
+  'dungeonGuide.drownedTemple.sight.tidewisp':
+    'Это сама лунная вода, тот глоток, что мы должны были выпить. Не дайте ей вас коснуться.',
+  'dungeonGuide.drownedTemple.area.colonnade':
+    'Колоннада приливов. Мы шли по ней по двое, распевая восходящий стих.',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    'Лунные скаты из прудов у ворот. Послушниками мы кормили их жемчугом на восходе луны. Теперь они стерегут двери, а наш жемчуг стал их сердцами.',
+  'dungeonGuide.drownedTemple.sight.eel':
+    'Угри лагуны. Послушницы кормили их хлебом в сумерках. Они разжирели на наших гимнах.',
+  'dungeonGuide.drownedTemple.area.veil':
+    'За этой завесой Двор хора. Я не стоял там с тех пор, как был мальчишкой.',
+  'dungeonGuide.drownedTemple.selthe.pre.1':
+    'Матушка Селте. Она учила меня дышать животом. Она научила нас всех тонуть, не умирая.',
+  'dungeonGuide.drownedTemple.selthe.pre.2':
+    'Матерь хора Селте. Каждую ноту, что я знаю, вложила в меня она. Прости меня, матушка.',
+  'dungeonGuide.drownedTemple.selthe.post.1':
+    'Она молчит. За все мои годы в хоре она ни разу не молчала.',
+  'dungeonGuide.drownedTemple.selthe.post.2':
+    'Покойся, матушка. Ты была права насчёт меня. Я так и не научился держать долгие ноты.',
+  'dungeonGuide.drownedTemple.area.terraces':
+    'Приливные заводи. Послушницы чистили их и кормили маленьких светящихся созданий, что жили в них.',
+  'dungeonGuide.drownedTemple.area.falls':
+    'За водопадом вода заглушает любой голос. Я прятался здесь, когда прогуливал спевки.',
+  'dungeonGuide.drownedTemple.area.pool':
+    'Лунный пруд. Они стояли вокруг него на коленях и пили из своих раковин. Я не смог поднять свою.',
+  'dungeonGuide.drownedTemple.hydra.pre':
+    'Змей пруда. Когда я был мальчишкой, у него была одна голова, и он ел у нас с рук.',
+  'dungeonGuide.drownedTemple.hydra.post':
+    'Слушайте. Под водопадом они всё ещё поют. Теперь ближе.',
+  'dungeonGuide.drownedTemple.area.prismStair':
+    'Лестница призмы. Мы поднимались по ней на восходе луны, чтобы пробудить великое стекло.',
+  'dungeonGuide.drownedTemple.colossus.pre':
+    'Великая призма. Мы пели в неё, чтобы поймать луну. Я и не знал, что она может встать.',
+  'dungeonGuide.drownedTemple.sight.reflection':
+    'Оно показывает, во что вас превратила бы вода. Разбейте его!',
+  'dungeonGuide.drownedTemple.colossus.post':
+    'Стекло разбито. Теперь не осталось ничего, что поймает луну, кроме неё.',
+  'dungeonGuide.drownedTemple.area.moonbridge.1':
+    'Мост из лунного света. Старейшины говорили, что пройти по нему могут лишь верные.',
+  'dungeonGuide.drownedTemple.area.moonbridge.2':
+    'Я никогда не был верным. Что ж. Посмотрим, выдержит ли он меня.',
+  'dungeonGuide.drownedTemple.area.altarLanding':
+    'Вот где я стоял. Прямо здесь. Здесь я повернулся и побежал.',
+  'dungeonGuide.drownedTemple.ysolei.pre':
+    'Вот она. Всю жизнь я спрашивал себя, богиня она или чудовище. Покажите мне.',
+  'dungeonGuide.drownedTemple.ysolei.preHeroic':
+    'В такую ночь с ней поёт весь хор. Держитесь, все вы.',
+  'dungeonGuide.drownedTemple.sight.moonspawn':
+    'Это никогда не были мои люди. Они её, сотканные из одного лунного света.',
+  'dungeonGuide.drownedTemple.farewell.answer':
+    'Она не была ни тем, ни другим. Она была луной в воде, а на колени вставали мы сами.',
+  'dungeonGuide.drownedTemple.farewell.verse':
+    'У обряда был последний стих, тот, что даёт певцам уснуть. Я так его и не спел.',
+  'dungeonGuide.drownedTemple.farewell.stay':
+    'Они ждали достаточно. Я останусь и спою его для них сейчас.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.1':
+    'Поднимайтесь в ночь. Если услышите пение в полнолуние, это всего лишь я.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.2':
+    'Спасибо, что довели старого труса до конца его песни. Теперь ступайте.',
+  'dungeonGuide.drownedTemple.farewell.emote':
+    '{name} возвышает голос над алтарём, и лагуна затихает.',
+  'dungeonGuide.drownedTemple.wipe':
+    'Вставайте. Прошу вас. Не оставляйте меня здесь внизу одного снова.',
+  'dungeonGuide.drownedTemple.catchUp': 'Ноги мои стары, но я знаю здесь каждую ступень. Я здесь.',
+  'abilityUi.cast.cantor_last_verse': 'Последний стих',
+  'entities.npcs.cantor_laverock.name': 'Лаверок',
+  'entities.npcs.cantor_laverock.title': 'Последний кантор Бледного хора',
+  'entities.npcs.cantor_laverock.greeting':
+    'Я был самым юным голосом Бледного хора. В ночь обряда я не выпил и сбежал. С тех пор каждое полнолуние я слышу, как они поют под водой. Я должен увидеть её, прежде чем умру. Позвольте мне идти позади вас. Я не стану сражаться и не задержу вас.',
+  'hudChrome.cryptAlert.measuredTitle': 'Мерка для могилы!',
+  'hudChrome.cryptAlert.measuredLine':
+    'Когда полоса истечёт, под вами обрушится могила: отнесите её к краю двора',
+  'hudChrome.cryptAlert.embracedTitle': 'Ледяные объятия!',
+  'hudChrome.cryptAlert.embracedLine':
+    'Она держит вас в воздухе: группа должна ранить её, чтобы она вас опустила',
+  'hudChrome.cryptAlert.lamentTitle': 'Плач невесты!',
+  'hudChrome.cryptAlert.lamentShelteredLine':
+    'Вы в свете горящего фонаря, и для вас есть место: стойте на месте',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    'Встаньте в свет горящего фонаря, пока не прозвучал вопль: по двое на фонарь',
+  'hudChrome.cryptAlert.graveTitle': 'Вы в Открытой могиле!',
+  'hudChrome.cryptAlert.graveLine': 'Могильная земля жжёт и замедляет вас: выйдите из неё',
+  'hudChrome.cryptAlert.tollTitle': 'Погребальный звон!',
+  'hudChrome.cryptAlert.tollLine':
+    'Пока он звонит в колокол, его нельзя ранить: готовьтесь к Звону и к мертвецам, которых он поднимет',
+  'hudChrome.cryptAlert.harmonyTitle': 'Гармония',
+  'hudChrome.cryptAlert.harmonyLine':
+    'Её Хористы снимают {pct}% получаемого ею урона: сначала убейте их',
+  'hudChrome.cryptAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.crypt.measured':
+    'Когда эффект закончится, там, где вы стоите, обрушится Открытая могила: от {min} до {max} урона (от {heroicMin} до {heroicMax} на героической сложности) всем в радиусе {radius} ярдов. Могила остаётся до конца боя, так что отнесите метку к краю двора, подальше от группы.',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    'Вы стоите в Открытой могиле: скорость передвижения снижена на {slow}%, и каждую секунду вы получаете {damage} урона от тьмы ({heroic} на героической сложности). На героической сложности, если пробыть в могиле {linger} сек., из неё встают Беспокойные кости. Выйдите из могилы.',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    'Скорость передвижения снижена на {pct}%. Полная лопата бьёт всех перед Пономарём Марроу: стойте у него за спиной.',
+  'hudChrome.auraEffect.crypt.blow':
+    'Получаемый урон увеличен на {pct}%: {per}% за каждый заряд, сейчас {stacks} из {max}. Каждый Удар могильщика добавляет заряд и обновляет длительность до {seconds} сек.',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    'Атакует на {pct}% быстрее, пока стоит в Открытой могиле. Не давайте ему стоять в могилах.',
+  'hudChrome.auraEffect.crypt.tolling':
+    'Неуязвим, пока идёт к колокольной верёвке и звонит в Погребальный колокол. Когда звон стихнет, Погребальный звон наносит от {min} до {max} урона от тьмы (от {heroicMin} до {heroicMax} на героической сложности) всем, и из каждой Открытой могилы встают Беспокойные кости.',
+  'hudChrome.auraEffect.crypt.embraced':
+    'Госпожа держит вас в воздухе: вы не можете действовать и каждую секунду получаете {tick} урона от холода ({tickHeroic} на героической сложности). Если группа снимет {share}% её максимального здоровья ({shareHeroic}% на героической сложности), она бережно опустит вас; если она продержит вас наверху {hold} сек., то уронит на лёд: от {min} до {max} урона (от {heroicMin} до {heroicMax} на героической сложности).',
+  'hudChrome.auraEffect.crypt.lament':
+    'Когда Плач невесты закончится, он наносит от {min} до {max} урона от холода (от {heroicMin} до {heroicMax} на героической сложности) всем, кто не находится в пределах {radius} ярдов от горящего могильного фонаря. Фонарь укрывает {cap} ближайших к нему игроков, затем гаснет и пропускает следующий Плач.',
+  'hudChrome.auraEffect.crypt.lingering':
+    'Следующий Плач невесты нанесёт вам на {pct}% больше урона: {per}% за каждый заряд, не больше {max} зарядов. Встретьте следующий в свете фонаря.',
+  'hudChrome.auraEffect.crypt.slippery':
+    'Вы на скользком льду: ваша скорость меняется не больше чем на {grip} ярд/сек. за секунду, поэтому вы медленно разгоняетесь, скользите дальше, когда останавливаетесь, и вас заносит на поворотах. Сойдите со льда, чтобы снова твёрдо стоять на ногах.',
+  'hudChrome.auraEffect.crypt.harmony':
+    'Получает на {pct}% меньше урона: {per}% за каждого живого Хориста. Сначала убейте Хористов.',
+  'hudChrome.auraEffect.crypt.crescendo':
+    'Поёт быстрее: Погребальная песнь Пустоты длится {cast} сек. вместо {castNormal} сек. и звучит каждые {every} сек. вместо {everyNormal} сек., а Костяной орган играет {waves} волны нот вместо {wavesNormal}.',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': 'Пульс тьмы',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': 'Обряд неупокоенных',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': 'Жатва неупокоенных',
+  'abilityUi.cast.kituse_crypt_relight_candle': 'Зажечь свечу',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': 'Пылающий звон',
+  'entities.mobs.crypt_remembrance_candle.name': 'Поминальная свеча',
+  'hudChrome.auraEffect.crypt.gorged':
+    'Наносит на {pct}% больше урона: {per}% за каждую Связанную душу, достигшую его, сейчас {stacks} из {max}, до конца боя. Каждая дошедшая душа также исцеляет его на {heal}% максимального здоровья. Встаньте на пути души, чтобы принять её на себя.',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    'Неуязвим, пока творит Обряд неупокоенных у алтаря: зажжено поминальных свечей: {lit} из {total}. Зажечь свечу заново: поддерживаемое действие на {channel} сек., которое каждую секунду отнимает {drain}% максимального здоровья зажигающего ({drainHeroic}% на героической сложности); удары его не прерывают, а шаг или оглушение прерывают. Последняя свеча разбивает оберег. На героической сложности зажигайте их в порядке, который называет Реестр: неверная свеча гасит последнюю зажжённую и наносит зажигающему от {wrongMin} до {wrongMax} урона от тьмы.',
+  'hudChrome.auraEffect.crypt.riteBroken':
+    'Оглушён: разбитый оберег лишает его возможности действовать на {seconds} сек.',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    'Получает на {pct}% больше урона в течение {seconds} сек.: зажжённые свечи разбили его оберег. Бейте сильнейшими атаками сейчас.',
+  'hudChrome.auraEffect.crypt.graveChill':
+    'Каждую секунду вы получаете {bite} урона от тьмы ({biteHeroic} на героической сложности), пока длится Обряд неупокоенных, и урон растёт на {step} ({stepHeroic} на героической сложности) каждые {every} сек. Зажгите поминальные свечи, чтобы прекратить его.',
+  'hudChrome.auraEffect.crypt.graspMark':
+    'Через {fuse} сек. из круга под вами вырвутся руки: все в пределах {radius} м от места, где он появился, будут обездвижены на {root} сек. и получат от {min} до {max} урона от тьмы. Выйдите из круга.',
+  'hudChrome.auraEffect.crypt.graspRoot':
+    'Вас держат руки могилы: вы не можете двигаться {seconds} сек.',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    'Парит над Кругом обряда, вне досягаемости. Отмечает половину круга на {mark} сек., затем заливает её призрачным огнём: от {min} до {max} урона от огня всем внутри. За один полёт выжигает половину круга столько раз: {breaths}, затем приземляется.',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    'Пульс тьмы (каждые 12 секунд заклинание на 2 секунды, затем от 24 до 30 урона от тьмы на обычной сложности всем в пределах 12 м от него, так что отойдите; в его Последнем обряде каждые 9 секунд)',
+  'hudChrome.finder.mech.crypt_gravecall':
+    'Могильный зов (каждые 15 секунд Связанная душа плывёт к нему из следующей ниши с саркофагом; дойдя до него, она даёт ему Пресыщение мёртвыми: на 10 процентов больше урона за каждую душу, до 10 стопок, и исцеление на 3 процента здоровья. Игрок на её пути принимает её на себя: от 12 до 16 урона от тьмы на обычной сложности)',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    'Обряд неупокоенных (на 65 процентах здоровья он возвращается к алтарю, неуязвимый внутри Оберега неупокоенных, а Могильный холод наносит всем 3 урона от тьмы в секунду, растущие на 1 каждые 5 секунд, и из ниш выбираются 2 Беспокойные кости. Зажгите заново 4 Поминальные свечи: каждая требует 4 секунды поддержания и каждую секунду отнимает 6 процентов максимального здоровья зажигающего; удары не прерывают, а шаг или оглушение прерывают. Последняя свеча ломает Обряд: он оглушён на 8 секунд и получает на 25 процентов больше урона)',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    'Жатва неупокоенных (ниже 35 процентов здоровья души перестают идти; каждые 14 секунд после заклинания на 2 секунды он взмахивает косой: от 55 до 65 урона от тьмы на обычной сложности всем в дуге 120 градусов на 14 м перед ним. Пульс тьмы тогда приходит каждые 9 секунд)',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    'Героическая сложность: Назови мёртвых (Реестр называет порядок свечей: неверная свеча гасит последнюю зажжённую и наносит зажигающему от 252 до 288 урона от тьмы, а каждое зажигание отнимает 8 процентов здоровья в секунду), Хватка могилы (каждые 16 секунд у 2 игроков появляется круг радиусом 4 м; через 1,5 секунды из него вырываются руки: обездвиживание на 3 секунды и от 162 до 198 урона от тьмы) и Пылающий звон Погребального змия (он взлетает, отмечает половину круга на 4,5 секунды и заливает её призрачным огнём: от 1000 до 1120 урона от огня, 3 половины за полёт)',
+  'hudChrome.cryptAlert.knellTitle': 'Пылающий звон!',
+  'hudChrome.cryptAlert.knellLine':
+    'Когда полоса иссякнет, на эту половину круга обрушится призрачный огонь: перейдите на другую половину',
+  'hudChrome.cryptAlert.graspTitle': 'Хватка могилы!',
+  'hudChrome.cryptAlert.graspLine': 'Из этого круга вырвутся руки и схватят всех внутри: выйдите',
+  'hudChrome.cryptAlert.reapTitle': 'Жатва неупокоенных!',
+  'hudChrome.cryptAlert.reapLine': 'Его коса сметает всё перед ним: зайдите ему за спину',
+  'hudChrome.cryptAlert.riteTitle': 'Обряд неупокоенных',
+  'hudChrome.cryptAlert.riteLine':
+    'Зажгите заново Поминальные свечи, чтобы разбить его оберег: зажжено {lit} из {total}',
+  'hudChrome.cryptAlert.riteNamedLine':
+    'Зажигайте только свечу, которую Реестр называет следующей: зажжено {lit} из {total}',
+  'hudChrome.cryptAlert.soulTitle': 'Связанная душа',
+  'hudChrome.cryptAlert.soulLine':
+    'Душа плывёт к Мортену: встаньте на её пути и примите её, пока она его не напитала',
+  'hudChrome.kitUse.relightLine':
+    'Пока вы поддерживаете действие, оно каждую секунду отнимает здоровье: удары не прерывают его, а шаг или оглушение прерывают',
+  'hudChrome.kitUse.relightKey': 'Зажечь заново: {name}',
+  'hudChrome.kitUse.relightTap': 'Нажмите здесь, чтобы зажечь заново: {name}',
+  'hudChrome.kitUse.relightClick': 'Щёлкните здесь, чтобы зажечь заново: {name}',
+  'hudChrome.kitUse.relightFar': 'Подойдите ближе чем на {range} м, чтобы зажечь её',
+  'hudChrome.kitUse.relightAria': 'Зажечь заново: {name}',
+  'hudChrome.kitUse.relightUsingLine':
+    'Не двигайтесь, пока оно вытягивает здоровье: удары не прерывают, а шаг или оглушение прерывают',
+  // The lower dungeons' normal blues (M16 non-Latin fills for their new names).
+  'entities.items.spadeworn_gauntlets.name': 'Рукавицы, стёртые лопатой',
+  'entities.items.gravedirt_grips.name': 'Перчатки могильной земли',
+  'entities.items.bellrope_mitts.name': 'Митенки колокольной верёвки',
+  'entities.items.rimewreath_coif.name': 'Кольчужный капюшон инейного венца',
+  'entities.items.rime_laced_hood.name': 'Капюшон с инеистой шнуровкой',
+  'entities.items.lamenting_veil.name': 'Скорбная вуаль',
+  'entities.items.choirward_pauldrons.name': 'Наплечники хорового стража',
+  'entities.items.choristers_spaulders.name': 'Наплечники хориста',
+  'entities.items.cantors_stole.name': 'Стола кантора',
+  'entities.items.knellbound_hauberk.name': 'Кольчуга погребального звона',
+  'entities.items.candlewatch_jerkin.name': 'Куртка свечного дозора',
+  'entities.items.robe_of_the_unquiet_rite.name': 'Одеяние Неупокоенного обряда',
+  'entities.items.gravecallers_rod.name': 'Жезл Могильного Зова',
+  'entities.items.portcullis_girdle.name': 'Пояс опускной решётки',
+  'entities.items.cellwatch_belt.name': 'Пояс тюремного дозора',
+  'entities.items.lanternwick_sash.name': 'Кушак фонарного фитиля',
+  'entities.items.turnkeys_shank.name': 'Тюремный нож надзирателя',
+  'entities.items.gaolyard_jerkin.name': 'Куртка тюремного двора',
+  'entities.items.brinewarden_robe.name': 'Одеяние стража солёных вод',
+  'entities.items.fogbinders_rod.name': 'Жезл Вязателя Тумана',
+  'entities.items.conchplate_sabatons.name': 'Сабатоны из раковинных пластин',
+  'entities.items.pale_chorus_slippers.name': 'Туфли Бледного хора',
+  'entities.items.tideglass_gauntlets.name': 'Рукавицы Приливного стекла',
+  'entities.items.moonburn_grips.name': 'Перчатки лунного ожога',
+  'entities.items.prism_etched_handwraps.name': 'Обмотки с призменной гравировкой',
+  'entities.items.mere_crested_helm.name': 'Шлем с озёрным гребнем',
+  'entities.items.mereskin_hood.name': 'Капюшон из озёрной шкуры',
+  'entities.items.merewater_cowl.name': 'Капюшон озёрной воды',
+  'entities.items.merecleaver.name': 'Озёрный секач',
+  'entities.items.moonwrack_stave.name': 'Посох Лунной погибели',
+  'referralCards.celebration.earned': 'Награда за приключение',
+  'referralCards.celebration.title': 'Награда получена!',
+  'referralCards.celebration.titleReward': 'Получен титул: {title}',
+  'referralCards.celebration.together': 'Заслужено вместе с {friend}.',
+  'referralCards.celebration.continue': 'Продолжить приключение',
+  'referralCards.title': 'Пригласить друга',
+  'referralCards.subtitle': 'Путешествуйте вместе и собирайте отметки.',
+  'referralCards.close': 'Закрыть приглашение друзей',
+  'referralCards.launcher': 'Карточки отметок',
+  'referralCards.pages': 'Страницы карточек',
+  'referralCards.firstPage': 'Первая страница',
+  'referralCards.nextPage': 'Другие карточки',
+  'referralCards.trailmateTitle': 'Спутник',
+  'referralCards.friendshipAura': 'Дружба',
+  'referralCards.protectiveCharm': 'Защитный оберег',
+  'referralCards.bankBonus': 'Завершённые карточки',
+  'referralCards.bankBonusHelp':
+    'Помогите двум связанным друзьям завершить карточки, чтобы навсегда открыть 20 ячеек банка.',
+  'referralCards.friendshipUse':
+    'Повышает вашу силу, ловкость, выносливость, интеллект и дух на {stats} на {duration} сек.',
+  'referralCards.readyCount': 'Карточки: доступно наград: {count}',
+  'referralCards.loading': 'Подключение к вашим карточкам...',
+  'referralCards.empty': 'Пригласите нового игрока и вместе начните первую карточку.',
+  'referralCards.inviteTitle': 'Пригласить друга',
+  'referralCards.inviteHelp':
+    'Поделитесь ссылкой до того, как друг создаст аккаунт. Связанными друзьями становятся только новые аккаунты, созданные по вашей ссылке.',
+  'referralCards.inviteLabel': 'Ваша ссылка-приглашение',
+  'referralCards.inviteUnavailable': 'Ваша ссылка-приглашение пока недоступна.',
+  'referralCards.membership':
+    'Когда связанный друг впервые купит подписку, вы получите облигацию подписки.',
+  'referralCards.cardBetween': '{you} и {friend}',
+  'referralCards.yourCard': 'Карточка: {name}',
+  'referralCards.unassigned': 'Персонаж не выбран',
+  'referralCards.start': 'Начать карточку',
+  'referralCards.startPrompt':
+    'Начать карточки с {friend}? Вы оба должны согласиться. Оба персонажа должны быть ниже 5-го уровня и ещё не завершить последнее задание учебного острова.',
+  'referralCards.accept': 'Принять',
+  'referralCards.decline': 'Отклонить',
+  'referralCards.declinePrompt':
+    'Вы уверены, что хотите отказаться? Пока оба персонажа соответствуют условиям, карточку можно начать позже через меню.',
+  'referralCards.declineConfirmed':
+    'Карточка не начата. Вы можете начать её через меню, пока оба персонажа соответствуют условиям.',
+  'referralCards.waiting': 'Ожидание согласия связанного друга.',
+  'referralCards.cancel': 'Отмена',
+  'referralCards.okay': 'Хорошо',
+  'referralCards.understand': 'Да, я понимаю',
+  'referralCards.confirmLock': 'Да, закрепить карточку',
+  'referralCards.lockFirst':
+    'Получив награду за Вязателя Тумана, вы навсегда закрепите карточку за персонажем {name}. Карточку и её награды больше нельзя будет перенести на другого персонажа. Вы понимаете?',
+  'referralCards.lockSecond':
+    'Вы уверены? Получить награду за Вязателя Тумана и навсегда закрепить карточку за персонажем {name}.',
+  'referralCards.locked': 'Карточка закреплена за персонажем {name}. Перенести её больше нельзя.',
+  'referralCards.unlocked':
+    'До получения награды за Вязателя Тумана карточку можно перенести на другого подходящего персонажа. Получение награды навсегда закрепит её за текущим персонажем.',
+  'referralCards.move': 'Перенести карточку на этого персонажа',
+  'referralCards.movePrompt':
+    'Перенести карточку с {oldName} на {newName}? Весь прогресс и все награды этой карточки будут перенесены. Эти награды будут удалены у {oldName}.',
+  'referralCards.confirmMove': 'Да, перенести карточку',
+  'referralCards.summon': 'Призвать связанного друга',
+  'referralCards.summonPrompt': '{friend} хочет призвать вас к себе. Принять призыв?',
+  'referralCards.summonHelp': 'Призовите связанного друга к себе. Доступно раз в 30 минут.',
+  'referralCards.summonCooldown': 'Призыв через {minutes} мин {seconds} сек',
+  'referralCards.reward': 'Награда: {reward}',
+  'referralCards.earned': 'Получено',
+  'referralCards.redeemed': 'Награда получена',
+  'referralCards.emptyStamp': 'Ещё не получено',
+  'referralCards.stamping': 'Ставим отметку на карточке...',
+  'referralCards.redeem': 'Получить награду',
+  'referralCards.previous': 'Сначала получите награды за предыдущие отметки.',
+  'referralCards.playTogether': 'Выполняйте этапы в группе с персонажами, указанными на карточке.',
+  'referralCards.fallback':
+    'Уже выполнили этапное задание в одиночку? Снова объединитесь с другом в группу, чтобы получить отметку за учебный остров. Для отметок за последующие задания вместе пройдите соответствующее подземелье.',
+  'referralCards.questGroup': 'Задания карточки',
+  'referralCards.questWithFriend': '{quest} вместе с {friend}',
+  'referralCards.browseCards': 'Просмотреть все страницы карточек',
+  'referralCards.nextQuest': 'Карточка: {quest}',
+  'referralCards.questIndicator': 'Это задание приближает вас к следующей награде карточки.',
+  'referralCards.completion': 'Поздравляем! {friend} завершает карточку с вашей помощью.',
+  'referralCards.openInvites': 'Открыть приглашение друзей',
+  'referralCards.referrerTitle': 'Друзья, которым вы помогли',
+  'referralCards.referrerCount': 'Друзей с завершённой карточкой: {count}',
+  'referralCards.friendTier': 'Помощь друзьям: {count}',
+  'referralCards.awarded': 'Выдано',
+  'referralCards.pending': 'Ещё не выдано',
+  'referralCards.milestones.tutorial': 'Последнее задание учебного острова',
+  'referralCards.milestones.hollow': 'В Пустоту',
+  'referralCards.milestones.fogbinder': 'Вязатель Тумана',
+  'referralCards.milestones.gravewyrm': 'Корзул Могильный Вирм',
+  'referralCards.milestones.raid': 'Победите первого рейдового босса',
+  'referralCards.rewards.tutorial':
+    'Уникальное звание и сумка высшего ранга, привязанная к вашему персонажу.',
+  'referralCards.rewards.hollow':
+    'Аксессуар, повышающий выносливость и автоматически создающий щит при низком здоровье.',
+  'referralCards.rewards.fogbinder':
+    'Аксессуар улучшается: даёт больше выносливости и активный эффект, повышающий все характеристики на 5 на 15 секунд. Перезарядка: 2 минуты.',
+  'referralCards.rewards.gravewyrm': 'Бесплатное обучение верховой езде.',
+  'referralCards.rewards.raid': 'Ездовой слизень Трясунчик.',
+  'referralCards.referrerRewards.1': 'Эксклюзивный ездовой раптор дружбы.',
+  'referralCards.referrerRewards.2': '20 ячеек банка и 5 слотов персонажей.',
+  'referralCards.referrerRewards.3': 'Награда: 1 000 Claudium.',
+  'referralCards.referrerRewards.4': 'Награда: 1 000 Claudium.',
+  'referralCards.referrerRewards.5': 'Спутники Мерцай и Искорка.',
+  'referralCards.reasons.notParticipant': 'Этот аккаунт не участвует в данной связи друзей.',
+  'referralCards.reasons.staleRevision':
+    'Карточка изменилась. Проверьте текущий прогресс и повторите попытку.',
+  'referralCards.reasons.invalidCharacters':
+    'Персонажи группы не принадлежат этой паре связанных друзей.',
+  'referralCards.reasons.notTogether': 'Оба связанных друга должны быть в одной группе.',
+  'referralCards.reasons.levelTooHigh':
+    'Персонажи для новой карточки должны быть ниже 5-го уровня.',
+  'referralCards.reasons.tutorialCompleted':
+    'Один из персонажей уже завершил последнее задание учебного острова.',
+  'referralCards.reasons.alreadyStarted':
+    'У этой пары уже есть карточка. Каждая пара связанных друзей может иметь только одну активную карточку.',
+  'referralCards.reasons.notPending': 'Нет приглашения начать карточку, ожидающего ответа.',
+  'referralCards.reasons.declinePending': 'Связанный друг решает, отказаться ли от карточки.',
+  'referralCards.reasons.declineNotConfirmed':
+    'Подтвердите отказ, прежде чем завершить приглашение.',
+  'referralCards.reasons.notActive': 'Сначала вместе начните карточку, чтобы получать награды.',
+  'referralCards.reasons.wrongCharacter':
+    'Используйте персонажей, указанных на карточке, или перенесите незакреплённую карточку на подходящего персонажа.',
+  'referralCards.reasons.locked': 'Карточка закреплена за персонажем, и её нельзя перенести.',
+  'referralCards.reasons.sameCharacter': 'Карточка уже принадлежит этому персонажу.',
+  'referralCards.reasons.invalidMilestone': 'Эта отметка не относится к данной карточке.',
+  'referralCards.reasons.notEarned': 'Сначала вместе выполните этот этап, затем получите награду.',
+  'referralCards.reasons.alreadyRedeemed': 'Эта награда уже получена.',
+  'referralCards.reasons.previousRewardRequired': 'Сначала получите награды за предыдущие отметки.',
+  'referralCards.reasons.confirmationRequired':
+    'Перед получением награды за Вязателя Тумана прочитайте предупреждение о закреплении карточки.',
+  'referralCards.reasons.newAccountsOnly':
+    'Связанными друзьями можно стать только при создании нового аккаунта по реферальной ссылке. Уже существующие аккаунты связать нельзя.',
+  'referralCards.reasons.unavailable': 'Сейчас это действие недоступно. Попробуйте позже.',
+  'entities.items.referral_satchel.name': 'Сумка дружбы',
+  'entities.items.referral_hollow_charm.name': 'Сердце хранителя клятвы',
+  'entities.items.referral_fog_charm.name': 'Пробуждённое сердце хранителя клятвы',
+  'entities.items.reins_referral_tank.name': 'Поводья танка дружбы',
+  'entities.items.reins_referral_raptor.name': 'Поводья раптора дружбы',
+  'hud.social.friendFirstPage': 'Первая страница',
+  'hud.social.friendNextPage': 'Следующая страница',
+  'hud.social.boundFriend': 'Связанный друг',
+  'hud.social.boundFriendLink': 'Связанные друзья объединены приглашением по реферальной ссылке.',
+  'hudChrome.mounts.name_referral_tank': 'Танк дружбы',
+  'hudChrome.mounts.name_referral_raptor': 'Раптор дружбы',
+  'hudChrome.mounts.desc_referral_tank': 'Прежняя награда за заполнение карты приглашения друзей.',
+  'hudChrome.mounts.desc_referral_raptor':
+    'Награда за помощь первому связанному другу в завершении карточки с отметками.',
+  'apiError.character.referral_transfer_pending':
+    'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
+  'apiError.character.referral_bond_pending':
+    'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
+  'hudChrome.guildHall.title': 'Зал Фонаря',
+  'hudChrome.guildHall.close': 'Закрыть окно гильдии',
+  'hudChrome.guildHall.tabsLabel': 'Разделы Зала Фонаря',
+  'hudChrome.guildHall.tabs.contracts': 'Контракты',
+  'hudChrome.guildHall.tabs.quartermaster': 'Интендант',
+  'hudChrome.guildHall.seals': 'Печати Фонаря: {count}',
+  'hudChrome.guildHall.resetIn': 'Новые контракты через {time}',
+  'hudChrome.guildHall.resetSoon': 'Новые контракты после еженедельного сброса',
+  'hudChrome.guildHall.contractsIntro':
+    'Три контракта в неделю, одни и те же для всех искателей приключений королевства. Подписывать ничего не нужно: выполните контракт, и его печати сразу попадут в ваши сумки, раз в неделю.',
+  'hudChrome.guildHall.kinds.boss': 'Награда за голову',
+  'hudChrome.guildHall.kinds.heroic': 'Героическое прохождение',
+  'hudChrome.guildHall.kinds.task': 'Поручение',
+  'hudChrome.guildHall.goals.boss': 'Победите {boss} в подземелье «{dungeon}» на любой сложности.',
+  'hudChrome.guildHall.goals.heroic':
+    'Пройдите «{dungeon}» на героической сложности: победите {boss} на героической сложности.',
+  'hudChrome.guildHall.goals.task': '{task} («{dungeon}»)',
+  'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
+  'hudChrome.guildHall.done': 'Выполнено на этой неделе',
+  'hudChrome.guildHall.open': 'Открыт',
+  'hudChrome.guildHall.lifetime': 'Выполнено контрактов: {count}',
+  'hudChrome.guildHall.emptyBoard': 'Доску переписывают. Возвращайтесь после еженедельного сброса.',
+  'hudChrome.guildHall.quartermasterIntro':
+    'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний, облик меча гильдии и её боевого коня. Ничто здесь не сделает вас сильнее в бою.',
+  'hudChrome.guildHall.titleOffer': 'Звание: {title}',
+  'hudChrome.guildHall.titlePreview': 'Отображается как {preview}',
+  'hudChrome.guildHall.buy': 'Купить',
+  'hudChrome.guildHall.owned': 'Есть',
+  'hudChrome.guildHall.needSeals': 'Не хватает: {count}',
+  'hudChrome.guildHall.bought': 'Вы купили звание {title}. Выберите его в Книге Деяний.',
+  'hudChrome.guildHall.refused.owned': 'У вас это уже есть.',
+  'hudChrome.guildHall.refused.seals': 'У вас недостаточно печатей Фонаря.',
+  'hudChrome.guildHall.refused.bags': 'Ваши сумки полны.',
+  'hudChrome.guildHall.refused.riding': 'Сначала научитесь верховой езде.',
+  'hudChrome.guildHall.boughtSkin': 'Вы купили облик «{skin}». Примените его в окне косметики.',
+  'hudChrome.guildHall.boughtMount': 'Вы купили скакуна «{mount}». Поводья в ваших сумках.',
+  'hudChrome.guildHall.skinPreview':
+    'Меняет облик надетого меча у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
+  'hudChrome.guildHall.skinOffer': 'Облик меча: {skin}',
+  'hudChrome.guildHall.mountPreview':
+    'Наземный скакун: +{pct}% к скорости передвижения верхом. Требуется навык верховой езды.',
+  'hudChrome.guildHall.mountOffer': 'Скакун: {mount}',
+  'hudChrome.guildHall.refused.range': 'Чтобы торговать, встаньте рядом с интендантом.',
+  'hudChrome.guildHall.reward.one': '{count} печать Фонаря',
+  'hudChrome.guildHall.reward.few': '{count} печати Фонаря',
+  'hudChrome.guildHall.reward.many': '{count} печатей Фонаря',
+  'hudChrome.guildHall.reward.other': '{count} печати Фонаря',
+  'hudChrome.guildHall.contractDone.one':
+    'Контракт выполнен: {contract}. Вы получаете {count} печать Фонаря.',
+  'hudChrome.guildHall.contractDone.few':
+    'Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря.',
+  'hudChrome.guildHall.contractDone.many':
+    'Контракт выполнен: {contract}. Вы получаете {count} печатей Фонаря.',
+  'hudChrome.guildHall.contractDone.other':
+    'Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря.',
+  'hudChrome.guildHall.signSubtitle': 'Гильдия искателей приключений',
+  'hudChrome.guildHall.board.noticesLabel': 'Контракты этой недели',
+  'hudChrome.guildHall.board.weekProgress':
+    'На этой неделе: выполнено {done} из {total} контрактов',
+  'hudChrome.guildHall.board.weekProgressAria': 'Контракты, выполненные на этой неделе',
+  'hudChrome.guildHall.board.cardProgress': '{done}/{total} на этой неделе',
+  'hudChrome.guildHall.board.rewardLine': 'Награда: {reward}',
+  'hudChrome.guildHall.board.stamp': 'Скреплено',
+  'hudChrome.guildHall.board.sealsTip':
+    'Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Они привязаны к вам.',
+  'hudChrome.guildHall.shop.stockLabel': 'Товары Гаррика Холта',
+  'hudChrome.guildHall.shop.kindMount': 'Скакун',
+  'hudChrome.guildHall.shop.kindSword': 'Облик меча',
+  'hudChrome.guildHall.shop.mountHeading': 'Вы в седле',
+  'hudChrome.guildHall.shop.skinHeading': 'В вашей руке',
+  'hudChrome.guildHall.shop.stageLabel': '3D-просмотр: {name}',
+  'hudChrome.guildHall.shop.stageUnavailable': '3D-просмотр недоступен на этом устройстве.',
+  'hudChrome.guildHall.shop.mountHowTo':
+    'После покупки поводья окажутся в ваших сумках. Используйте их, чтобы сесть верхом: конь ваш, пока поводья при вас.',
+  'hudChrome.guildHall.shop.mountOwned': 'Этот скакун уже ваш. Поводья в ваших сумках.',
+  'hudChrome.guildHall.shop.skinHowTo':
+    'После покупки примените облик в окне косметики. Он действует для всех персонажей вашей учетной записи.',
+  'hudChrome.guildHall.shop.skinOwned': 'Этот облик уже ваш. Примените его в окне косметики.',
+  'hudChrome.guildHall.shop.kindTitle': 'Звание',
+  'hudChrome.guildHall.shop.plateHeading': 'Ваша табличка с именем',
+  'hudChrome.guildHall.shop.howTo':
+    'После покупки выберите его в Книге Деяний, чтобы оно отображалось рядом с вашим именем.',
+  'hudChrome.guildHall.shop.cosmetic': 'Только внешний вид: характеристики не меняются.',
+  'hudChrome.guildHall.shop.price': 'Цена: {price}',
+  'hudChrome.guildHall.shop.have': 'У вас: {count}',
+  'hudChrome.guildHall.shop.ownedLong': 'Это звание уже ваше. Выберите его в Книге Деяний.',
+  'hudChrome.guildHall.shop.short.one': 'Нужна ещё {count} печать Фонаря.',
+  'hudChrome.guildHall.shop.short.few': 'Нужно ещё {count} печати Фонаря.',
+  'hudChrome.guildHall.shop.short.many': 'Нужно ещё {count} печатей Фонаря.',
+  'hudChrome.guildHall.shop.short.other': 'Нужно ещё {count} печати Фонаря.',
+  'hudChrome.raidBossGuide.dungeonButton': 'Тактика: {dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': 'Боссы подземелья',
+  'hudChrome.raidBossGuide.rankMiniboss': 'Мини-босс',
+  'hudChrome.raidBossGuide.rankFinal': 'Финальный босс',
+  'hudChrome.raidBossGuide.defeated': 'Побеждён',
+  'hudChrome.raidBossGuide.browseBossDefeated': 'Показать: {boss} (побеждён)',
+  'hudChrome.raidBossGuide.heroicHeading': 'Что меняется в героическом режиме',
+  'hudChrome.raidBossGuide.tipsHeading': 'Советы по ролям',
+  'hudChrome.raidBossGuide.choicesHeading': 'Ключевые решения',
+  'hudChrome.raidBossGuide.choiceGain': 'Вы получаете',
+  'hudChrome.raidBossGuide.choiceRisk': 'Вы рискуете',
+  'hudChrome.raidBossGuide.markHeroicOnly': 'Только героический',
+  'hudChrome.raidBossGuide.markHeroicChanged': 'Изменено в героическом режиме',
+  'hudChrome.raidBossGuide.damageCompare': 'Обычный {normal} | Героический {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': 'Тактика на босса',
+  'hudChrome.raidBossGuide.finderOpenLabel': 'Открыть тактику на босса: {boss}',
+  'bossJournal.common.enrageName': 'Бешенство',
+  'bossJournal.common.phaseEnrageSummary':
+    'При здоровье ниже {health} босс впадает в бешенство до конца боя.',
+  'bossJournal.common.enrageSummary':
+    'При здоровье ниже {health} его атаки ближнего боя наносят на {damage} больше урона и проводятся на {haste} быстрее до конца боя.',
+  'bossJournal.common.enrageResponse':
+    'Танк и лекарь приберегают защитные способности и лечение для этой фазы. Остальные наращивают урон, чтобы быстро закончить бой.',
+  'bossJournal.common.heroicHarder':
+    'Каждая способность на этой странице бьёт в {scale} раз сильнее, чем в обычном режиме.',
+  'bossJournal.sanctum.tusker.overview':
+    'Бивнерог размером с дом тащит по Санной дороге сани с горящими жаровнями душ. Он ходит по дороге кругами и отцепляет сани там, где вы его остановите. На половине здоровья сани опрокидываются и разливают огонь позади него.',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    'С самого начала две предупреждаемые атаки: размах перед собой и рывок по отмеченной полосе.',
+  'bossJournal.sanctum.tusker.phaseSpillName': 'Сани опрокидываются',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    'При {health} здоровья сани опрокидываются, и позади него разливается душевный огонь.',
+  'bossJournal.sanctum.tusker.phaseEnrageName': 'В бешенстве',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    'Когда остаётся меньше {health} здоровья, он впадает в бешенство до конца боя.',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    'Каждые {every} сек. произносит заклинание {cast} сек., затем бивни сметают конус {arc} градусов перед ним на {range} м от тела: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.sanctum.tusker.sweepResponse':
+    'Танк удерживает его лицом от группы. Остальные атакуют сбоку или сзади.',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    'Каждые {every} сек. заклинание {cast} сек. рисует полосу длиной {length} м в сторону самого дальнего игрока, затем он несётся по ней: от {min} до {max} урона и сбивание с ног на {stun} сек. всем, кто в ней.',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    'Шагните в сторону из отмеченной полосы до конца заклинания. Целью становится самый дальний игрок, так что бойцы дальнего боя оставляют себе место для шага.',
+  'bossJournal.sanctum.tusker.spillName': 'Рассыпанные жаровни',
+  'bossJournal.sanctum.tusker.spillSummary':
+    'Один раз, при {health} здоровья: сани опрокидываются, и позади него {count} пятен душевного огня ({radius} м) горят {seconds} сек., нанося от {min} до {max} урона в секунду всем внутри.',
+  'bossJournal.sanctum.tusker.spillResponse': 'Сразу выходите из огня и сражайтесь вдали от пятен.',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    'Когда остаётся меньше {health} здоровья, он наносит на {damage} больше урона до конца боя.',
+  'bossJournal.sanctum.tusker.enrageResponse':
+    'Приберегите лечение и защитные способности для последнего отрезка и быстро добейте его.',
+  'bossJournal.sanctum.tusker.tipTank':
+    'Держите его лицом от группы и стойте на месте, чтобы конус размаха не задевал союзников. Каждый Взмах бивнями отбрасывает.',
+  'bossJournal.sanctum.tusker.tipHealer':
+    'Взмах бивнями и Растаптывание дают пики урона. Стойте сбоку от него, а не на дальнем краю, куда целится Растаптывание, и приберегите способность для его бешенства при здоровье ниже {health}.',
+  'bossJournal.sanctum.tusker.tipDamage':
+    'Атакуйте сбоку или сзади. Следите за полом: заметив отмеченную полосу, выйдите из неё. На половине здоровья уходите от огня позади него.',
+  'bossJournal.sanctum.korgath.overview':
+    'Бригадир кузнеца, прикованный к четырём печатным столпам. Каждая оставшаяся на нём цепь снижает получаемый им урон на {perChain}, так что разбивать цепи выгодно. Но каждая разбитая цепь освобождает ещё одну его атаку до конца боя.',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    'Он начинает бой связанным {chains} цепями, по одной к каждому столпу. Печатные оковы у столпа удерживают его цепь.',
+  'bossJournal.sanctum.korgath.phaseFreedName': 'Разбитые цепи',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    'Каждая разбитая цепь освобождает одну атаку до конца боя, даже если цепь потом переклепают.',
+  'bossJournal.sanctum.korgath.phaseEnrageName': 'В бешенстве',
+  'bossJournal.sanctum.korgath.lockboundName': 'Скованный замком',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    'Каждая целая цепь снижает получаемый им урон на {perChain}: пока держатся все четыре, он получает на {all} меньше урона.',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    'Разбивайте цепи, чтобы ускорить убийство. Сначала решите, сколько: каждая также освобождает атаку.',
+  'bossJournal.sanctum.korgath.shacklesName': 'Печатные оковы',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    'У подножия каждого столпа стоят Печатные оковы. Атаковать их нельзя, пока Коргата не пуллят. Убийство оков разбивает их цепь. Пока держится цепь Наковальни, он не может отойти от середины террасы дальше чем на {leash} м.',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    'Бойцы убивают Печатные оковы тех цепей, которые вы решили разбить. Танк тем временем держит Коргата посередине.',
+  'bossJournal.sanctum.korgath.strainSummary':
+    'Пока держится хоть одна цепь: каждые {every} сек. заклинание {cast} сек., затем взрыв в кольце {radius} м вокруг каждого столпа, цепь которого ещё держится: от {min} до {max} урона и отбрасывание. Прекращается, когда разбиты все четыре цепи.',
+  'bossJournal.sanctum.korgath.strainResponse':
+    'Отойдите от каждого столпа с целой цепью до конца заклинания.',
+  'bossJournal.sanctum.korgath.stompSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем кольцо на {radius} м от его тела: от {min} до {max} урона всем внутри.',
+  'bossJournal.sanctum.korgath.stompResponse':
+    'Бойцы дальнего боя стоят за пределами кольца. Бойцы ближнего боя выходят из него, если успевают; лекари лечат всех, кого задело.',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    'Через {delay} сек. после разрыва цепи Кузнец-погонщик Клятвы Выводка перелезает через край за её столпом, идёт к оковам и направляет Переклёпку {channel} сек. Если он закончит, цепь и новые Печатные оковы возвращаются со снижением урона на {perChain}, но освобождённая атака остаётся.',
+  'bossJournal.sanctum.korgath.rerivetResponse':
+    'Прервите, оглушите или убейте Кузнеца-погонщика до конца направляемого заклинания.',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    'Пока остаётся ровно одна цепь, Натяжение происходит каждые {every} сек. вместо каждых {base} сек.',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    'Быстро разбейте последнюю цепь или будьте готовы уходить от её столпа каждые {every} сек.',
+  'bossJournal.sanctum.korgath.maulSummary':
+    'Цепь Молота разбита: каждые {every} сек. заклинание {cast} сек., затем сметающий удар по конусу {arc} градусов перед ним на {range} м от тела с силой {mult} его удара в ближнем бою.',
+  'bossJournal.sanctum.korgath.maulResponse':
+    'Перед ним стоит только танк. Все остальные во время заклинания заходят ему за спину.',
+  'bossJournal.sanctum.korgath.flailSummary':
+    'Цепь Клещей разбита: каждые {every} сек. заклинание {cast} сек. рисует полосу длиной {length} м на самом дальнем игроке, который не танк, затем плеть бьёт всех в ней: от {min} до {max} урона.',
+  'bossJournal.sanctum.korgath.flailResponse': 'Шагните в сторону из полосы до конца заклинания.',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    'Цепь Наковальни разбита: он может уйти с середины террасы. Каждые {every} сек. заклинание {cast} сек. рисует полосу длиной {length} м на самом дальнем игроке, затем он несётся по ней: от {min} до {max} урона и отбрасывание.',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    'Выйдите из полосы. Пока держится цепь Наковальни, он остаётся в пределах {leash} м от середины и не совершает рывков.',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    'Цепь Мехов разбита: каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона всем и отталкивание от него на {push} м.',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    'Бьёт по всей группе, и избежать этого нельзя: лекари должны подлечить всех до удара.',
+  'bossJournal.sanctum.korgath.tipTank':
+    'Держите его посередине лицом от группы. Когда цепь Молота разбита, Дуга кувалды задевает всё перед ним. Пока цепь Наковальни цела, он не может отойти от середины дальше чем на {leash} м.',
+  'bossJournal.sanctum.korgath.tipHealer':
+    'Натяжение, Сотрясающий топот и каждая освобождённая атака бьют сильно. Каждая оставленная цепь затягивает бой; каждая разбитая добавляет атаку, которую нужно пролечить.',
+  'bossJournal.sanctum.korgath.tipDamage':
+    'Убивайте Печатные оковы, чтобы разбить выбранные цепи, затем жгите Коргата. Выходите из отмеченных полос и отходите от столпов, где ещё держится цепь.',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    'Убивайте Печатные оковы, чтобы разбить выбранные цепи, затем жгите Коргата. Останавливайте каждого Кузнеца-погонщика до конца его Переклёпки. Выходите из отмеченных полос и отходите от столпов, где ещё держится цепь.',
+  'bossJournal.sanctum.korgath.choiceName': 'Сколько цепей вы разобьёте?',
+  'bossJournal.sanctum.korgath.choiceGain':
+    'Каждая разбитая цепь убирает {perChain} его снижения урона: с {all} при всех четырёх цепях до нуля. Бой становится намного короче.',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    'Каждая разбитая цепь освобождает одну атаку до конца боя. Молот: Дуга кувалды. Клещи: Цепной хлыст. Наковальня: Рывок через порог, и он может уйти с середины. Мехи: Рёв бригадира.',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    'Каждая разбитая цепь освобождает одну атаку до конца боя. Молот: Дуга кувалды. Клещи: Цепной хлыст. Наковальня: Рывок через порог, и он может уйти с середины. Мехи: Рёв бригадира. Кроме того, к каждой разбитой цепи приходит Кузнец-погонщик, чтобы переклепать её.',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    'Переклёпка: через {delay} сек. после разрыва цепи Кузнец-погонщик пытается её восстановить. Прервите, оглушите или убейте его.',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    'Последнее звено: когда остаётся одна цепь, Натяжение происходит каждые {every} сек.',
+  'bossJournal.sanctum.velkhar.overview':
+    'Велхар поднимает оттаявших мертвецов из трёх луж талой воды. Их удерживает на земле только холод: костеход, убитый на сухом льду, остаётся мёртвым, а убитый в талой воде встаёт снова и лечит его.',
+  'bossJournal.sanctum.velkhar.phaseVaultName': 'Ритуальный свод',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    'Костеходы продолжают вылезать из луж. При {wave1} и {wave2} здоровья поднимается дополнительная волна, по одному из каждой лужи.',
+  'bossJournal.sanctum.velkhar.thawName': 'Пробуждающая оттепель',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    'Каждые {every} сек. костёр у одной из луж вспыхивает, и через {warn} сек. вылезают {count} Поднятых костеходов. Лужи действуют по очереди. При {wave1} и {wave2} здоровья из каждой лужи вылезает ещё один.',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    'Танк собирает их и оттаскивает на сухой лёд. Бойцы убивают их там.',
+  'bossJournal.sanctum.velkhar.heldName': 'Удержан и не угашен',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    'Костеход, убитый на сухом льду, удержан: он застывает статуей и остаётся мёртвым. Убитый в талой воде тонет, затем через {delay} сек. встаёт снова с {share} здоровья и лечит Велхара на {heal} его здоровья.',
+  'bossJournal.sanctum.velkhar.heldResponse':
+    'Убивайте костеходов только на сухом льду: никогда в луже и не на полосе талой воды.',
+  'bossJournal.sanctum.velkhar.graspName': 'Хватка оттаявших',
+  'bossJournal.sanctum.velkhar.graspSummary':
+    'Костеход, стоящий в талой воде, наносит на {bonus} больше урона.',
+  'bossJournal.sanctum.velkhar.graspResponse': 'Танк не подпускает костеходов к воде.',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    'Каждые {every} сек. заклинание {cast} сек. рисует полосу шириной {width} м от него к игроку, который не танк, до края свода. Затем от {min} до {max} урона всем в ней, а полоса остаётся талой водой на {seconds} сек.',
+  'bossJournal.sanctum.velkhar.trenchResponse':
+    'Выйдите из полосы. Не убивайте костеходов на оставшейся полосе талой воды.',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона от тьмы всем.',
+  'bossJournal.sanctum.velkhar.volleyResponse':
+    'Избежать нельзя: лекари поддерживают здоровье всей группы.',
+  'bossJournal.sanctum.velkhar.warmHandsName': 'Тёплые руки',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    'Костеход, простоявший на месте {still} сек., растапливает под собой лужу талой воды радиусом {radius} м на {seconds} сек.',
+  'bossJournal.sanctum.velkhar.warmHandsResponse':
+    'Не давайте костеходам стоять на месте и никогда не добивайте их над лужей.',
+  'bossJournal.sanctum.velkhar.twiceWokenName': 'Дважды пробуждённый',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    'Костеход, вставший снова, возвращается с полным здоровьем и наносит на {bonus} больше урона.',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse':
+    'Не давайте никому подняться: убивайте всех на сухом льду.',
+  'bossJournal.sanctum.velkhar.tipTank':
+    'Берите на себя каждого костехода и оттаскивайте на сухой лёд, прочь от луж и полос талой воды. В талой воде они бьют на {bonus} сильнее.',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    'Берите на себя каждого костехода и оттаскивайте на сухой лёд, прочь от луж и полос талой воды. Не давайте им стоять на месте: стоящий растапливает под собой лужу.',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    'Залп тьмы бьёт по всем каждые {every} сек. Костеходы в талой воде бьют на {bonus} сильнее, так что следите за танком, когда они доходят до воды.',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    'Убивайте костеходов только на сухом льду, затем возвращайтесь к Велхару. Выходите из полосы Траншеи душевного огня.',
+  'bossJournal.sanctum.velkhar.choiceName': 'Где падут мёртвые?',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    'Костеход, убитый на сухом льду, исчезает навсегда: меньше помощников и чище бой.',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    'Убитый в талой воде, он встаёт снова и каждый раз лечит Велхара на {heal} его здоровья. Оттаскивание на сухой лёд отнимает время, так что выберите место убийства до того, как начнёте их жечь.',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    'Тёплые руки: костеход, простоявший на месте {still} сек., растапливает лужу талой воды.',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    'Дважды пробуждённый: костеход, вставший снова, возвращается с полным здоровьем и наносит на {bonus} больше урона.',
+  'bossJournal.sanctum.korzul.overview':
+    'Бой с драконом на замёрзшем озере, которое его огонь постоянно ломает. Каждое дыхание тратит лёд, а огонь направляет группа, так что группа решает, какой лёд потерять. Вирм, у которого не осталось льда, дышит без пауз.',
+  'bossJournal.sanctum.korzul.phaseLakeName': 'Замёрзшее озеро',
+  'bossJournal.sanctum.korzul.phaseLakeSummary':
+    'Он вырывается из льда и приземляется посреди озера. Бой начинается, когда он коснётся земли.',
+  'bossJournal.sanctum.korzul.phaseFlightName': 'Полёты',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    'При {first} и {second} здоровья он взлетает и сражается с воздуха, пока не рухнет обратно.',
+  'bossJournal.sanctum.korzul.phaseLastName': 'Последняя фаза',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    'После второго полёта: на земле Могильное дыхание каждые {breath} сек. и Порыв крыльев каждые {gale} сек.',
+  'bossJournal.sanctum.korzul.iceName': 'Ломающийся лёд',
+  'bossJournal.sanctum.korzul.iceSummary':
+    'Озеро состоит из ледяных плит. Его огонь трескает целую плиту и разбивает треснувшую. Треснувшая плита снова замерзает через {refreeze} сек. Разбитая плита становится открытой водой.',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    'Озеро состоит из ледяных плит. Его огонь трескает целую плиту и разбивает треснувшую. Глубокая закалка: в героическом режиме треснувшая плита больше не замерзает. Разбитая плита становится открытой водой.',
+  'bossJournal.sanctum.korzul.iceResponse':
+    'Тратьте лёд осознанно: направляйте его огонь на плиты, которые группа может позволить себе потерять.',
+  'bossJournal.sanctum.korzul.waterName': 'Открытая вода',
+  'bossJournal.sanctum.korzul.waterSummary':
+    'В открытой воде вы замедляетесь на {slow} и получаете {perSecond} урона в секунду.',
+  'bossJournal.sanctum.korzul.waterResponse':
+    'Оставайтесь на льду. Если отбросило в воду, сразу выходите из неё.',
+  'bossJournal.sanctum.korzul.breathSummary':
+    'Каждые {every} сек. заклинание {cast} сек. вдоль линии танка, затем огненный конус {arc} градусов на {range} м от его тела: от {min} до {max} урона всем в нём, кроме танка. До {plates} плит под конусом горят, начиная с ближайших.',
+  'bossJournal.sanctum.korzul.breathResponse':
+    'Перед ним стоит только танк. Танк поворачивает дыхание на лёд, который группа может потерять.',
+  'bossJournal.sanctum.korzul.tailSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем хвост сметает {arc} градусов позади него на {range} м от тела: от {min} до {max} урона и отбрасывание.',
+  'bossJournal.sanctum.korzul.tailResponse': 'Никогда не стойте позади него. Атакуйте сбоку.',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    'Каждые {every} сек. и один раз при {health} здоровья он направляет заклинание {duration} сек.: {pulses} огненных импульсов в радиусе {radius} м, каждый сильнее предыдущего (последний наносит от {min} до {max}). Импульс {crack} трескает плиту под ним, а импульс {brk} разбивает её: когда она разбивается, он Погашен, и заклинание прерывается.',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    'Отойдите от него на {radius} м. Начните бой с ним на треснувшей плите, и заклинание прервётся на импульсе {crack}.',
+  'bossJournal.sanctum.korzul.galeSummary':
+    'Заклинание {cast} сек., затем всех отбрасывает от него на {push} м.',
+  'bossJournal.sanctum.korzul.galeResponse':
+    'Не оставляйте открытую воду у себя за спиной, чтобы отбрасывание закинуло вас на лёд.',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    'В воздухе он помечает игрока, который не танк, Оком вирма на {eye} сек. Когда оно спадает, он обрушивает Низвергающийся огонь на всю плиту этого игрока: предупреждение {warn} сек., затем от {min} до {max} урона всем на ней, и плита горит. {roundsFirst} залпов в первом полёте, {roundsSecond} во втором.',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    'В воздухе он помечает двух игроков, которые не танки, Оком вирма на {eye} сек. (Двойное око). Когда оно спадает, он обрушивает Низвергающийся огонь на всю плиту каждого помеченного игрока: предупреждение {warn} сек., затем от {min} до {max} урона всем на ней, и плита горит. {roundsFirst} залпов в первом полёте, {roundsSecond} во втором.',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    'Если вы помечены: идите на целую плиту подальше от группы. Все остальные уходят с этой плиты.',
+  'bossJournal.sanctum.korzul.broodName': 'Выводок из глубин',
+  'bossJournal.sanctum.korzul.broodSummary':
+    'Когда он взлетает, из каждой разбитой плиты вылезает Чешуйчатый страж, но не больше {max}.',
+  'bossJournal.sanctum.korzul.broodResponse':
+    'Танк берёт их на себя, а группа убивает их, пока он в воздухе.',
+  'bossJournal.sanctum.korzul.descentSummary':
+    'Каждый полёт он заканчивает приземлением на целую плиту, где больше всего игроков: тень {warn} сек., затем от {min} до {max} урона в радиусе {radius} м и отбрасывание, а плита горит.',
+  'bossJournal.sanctum.korzul.descentResponse':
+    'Соберитесь на плите, которую не жалко треснуть, затем выбегайте из тени до его приземления.',
+  'bossJournal.sanctum.korzul.flareName': 'Вспышка осколка',
+  'bossJournal.sanctum.korzul.flareSummary':
+    'После второго полёта осколок вспыхивает: на земле Могильное дыхание каждые {breath} сек. и Порыв крыльев каждые {gale} сек.',
+  'bossJournal.sanctum.korzul.flareResponse':
+    'Дыхание учащается: заранее решите, какие плиты ещё можно потратить.',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    'Если разбиты все плиты, он зависает над открытой водой и дышит без пауз.',
+  'bossJournal.sanctum.korzul.noIceResponse': 'Не остаться без льда: это заканчивает бой вайпом.',
+  'bossJournal.sanctum.korzul.tipTank':
+    'Направляйте Могильное дыхание на лёд, который группа может потерять, и никогда через группу. Перед Могильным пеклом переведите его на треснувшую плиту, чтобы сократить его.',
+  'bossJournal.sanctum.korzul.tipHealer':
+    'Импульсы Могильного пекла быстро усиливаются: следите, чтобы все ушли. Низвергающийся огонь, Сокрушительное падение и каждое отбрасывание в воду бьют сильно.',
+  'bossJournal.sanctum.korzul.tipDamage':
+    'Никогда не стойте ни перед ним, ни за ним. С Оком вирма идите на целую плиту подальше от группы. Убивайте Чешуйчатых стражей во время полётов.',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    'Никогда не стойте ни перед ним, ни за ним. Око вирма получают сразу двое: каждый идёт на свою целую плиту подальше от группы. Убивайте Чешуйчатых стражей во время полётов.',
+  'bossJournal.sanctum.korzul.choiceIceName': 'Какой лёд вы потратите?',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    'Направляйте его дыхание, Низвергающийся огонь и посадку на выбранные плиты, и остальное озеро останется безопасным.',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    'Каждая разбитая плита становится открытой водой, и из каждой при следующем полёте вылезает Чешуйчатый страж (не больше {max}). Когда льда не остаётся, он дышит без пауз.',
+  'bossJournal.sanctum.korzul.choiceDouseName': 'Погасить пекло?',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    'Если он стоит на треснувшей плите, импульс {crack} разбивает её, он Погашен, и Могильное пекло заканчивается раньше, до самых сильных импульсов.',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    'Эта плита потеряна навсегда. На целом льду заклинание доходит до импульса {brk} и всё равно разбивает плиту.',
+  'bossJournal.sanctum.korzul.heroicDeepQuench':
+    'Глубокая закалка: треснувшая плита больше не замерзает.',
+  'bossJournal.sanctum.korzul.heroicTwinEyes':
+    'Двойное око: Око вирма помечает сразу двух игроков.',
+  'bossJournal.wildheart.saurian.overview':
+    'Боевой зверь размером с дом, несущий паланкин, ходит кругами по речному броду. Обойти его нельзя: лозовые мосты откроются, только когда он умрёт. Два заметных удара, лекарь-наездник на половине здоровья и бешенство в конце.',
+  'bossJournal.wildheart.saurian.phaseFordName': 'Речной брод',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    'С начала боя он чередует взмах хвоста позади себя и топот вокруг себя. Одновременно идёт только один удар.',
+  'bossJournal.wildheart.saurian.phaseHowdahName': 'Паланкин разбит',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    'При здоровье {health} паланкин раскалывается, и Заклинатель с паланкина спрыгивает вниз, чтобы лечить Великого завра.',
+  'bossJournal.wildheart.saurian.phaseEnrageName': 'Бешенство',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    'При здоровье ниже {health} он впадает в бешенство до конца боя.',
+  'bossJournal.wildheart.saurian.tailSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем хвост сметает конус {arc} градусов позади него на {range} м от центра: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.wildheart.saurian.tailResponse': 'Никогда не стойте позади него. Атакуйте сбоку.',
+  'bossJournal.wildheart.saurian.stompSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем все в радиусе {radius} м от его центра получают от {min} до {max} урона и сбиваются с ног на {stun} сек.',
+  'bossJournal.wildheart.saurian.stompResponse':
+    'Все, кто может, выходят из круга до конца заклинания. Танк принимает удар; лекари потом подлечивают танка.',
+  'bossJournal.wildheart.saurian.riderName': 'Наездник с паланкина',
+  'bossJournal.wildheart.saurian.riderSummary':
+    'Один раз, при здоровье {health}: Заклинатель с паланкина спрыгивает рядом с Великим завром, сражается вместе с ним и лечит его Соком предков.',
+  'bossJournal.wildheart.saurian.riderResponse':
+    'Танк берёт наездника на себя. Бойцы прерывают его лечение или убивают его первым.',
+  'bossJournal.wildheart.saurian.sapSummary':
+    'Лечение наездника: заклинание {cast} сек. каждые {every} сек., восстанавливающее {heal} максимального здоровья Великого завра.',
+  'bossJournal.wildheart.saurian.sapResponse': 'Прерывайте каждый раз или убейте наездника.',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    'При здоровье ниже {health} всё, что он делает, наносит на {damage} больше урона: ближний бой, Удар хвостом и Сотрясающий топот.',
+  'bossJournal.wildheart.saurian.tipTank':
+    'Держите его лицом от группы, чтобы никто не оказался позади хвоста. Берите Заклинателя с паланкина на себя, едва он приземлится.',
+  'bossJournal.wildheart.saurian.tipHealer':
+    'Сотрясающий топот сбивает с ног всех рядом, поэтому лечите танка после каждого. Приберегите способность для бешенства.',
+  'bossJournal.wildheart.saurian.tipDamage':
+    'Стойте сбоку, вне конуса хвоста и круга топота. На половине здоровья прервите Сок предков или убейте наездника.',
+  'bossJournal.wildheart.saurian.choiceName': 'Сначала наездник или сначала завр?',
+  'bossJournal.wildheart.saurian.choiceGain':
+    'Смерть наездника навсегда прекращает лечение: каждый Сок предков восстанавливает {heal} здоровья завра раз в {every} сек.',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    'Пока вы убиваете наездника, завр продолжает мести хвостом и топтать. Если оставить наездника, кому-то придётся прерывать каждое лечение.',
+  'bossJournal.wildheart.beast.overview':
+    'Повелитель клыков и его Великий ягуар делят одну полосу здоровья и умирают вместе. Рядом они гораздо прочнее и бьют сильнее, поэтому танк уводит хозяина прочь, пока ягуар охотится на отмеченного игрока.',
+  'bossJournal.wildheart.beast.phasePitsName': 'Звериные ямы',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    'Один бой, два тела. Их таймеры идут весь бой; фаз по здоровью нет.',
+  'bossJournal.wildheart.beast.bondSummary':
+    'Пока Повелитель клыков и ягуар находятся в {reach} м друг от друга, оба получают на {dr} меньше урона и наносят на {damage} больше.',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    'Неистовые узы: пока Повелитель клыков и ягуар находятся в {reach} м друг от друга, оба получают на {dr} меньше урона и наносят на {damage} больше.',
+  'bossJournal.wildheart.beast.bondResponse':
+    'Танк уводит Повелителя клыков от ягуара дальше чем на {reach} м и удерживает его там.',
+  'bossJournal.wildheart.beast.sharedName': 'Общее здоровье',
+  'bossJournal.wildheart.beast.sharedSummary':
+    'Два тела делят один запас здоровья: урон по любому засчитывается одинаково, а когда умирает одно, умирает и другое.',
+  'bossJournal.wildheart.beast.sharedResponse':
+    'Бейте того, до кого безопаснее добраться. От смены цели вы ничего не теряете.',
+  'bossJournal.wildheart.beast.stalkName': 'Выслеживание',
+  'bossJournal.wildheart.beast.stalkSummary':
+    'Ягуар отмечает игрока, который не танк хозяина, и охотится на него {seconds} сек., игнорируя провокацию. Когда достаёт, кусает каждые {biteEvery} сек.: от {min} до {max} урона, затем кровотечение {bleed} каждые {bleedEvery} сек. в течение {bleedSeconds} сек. Потом выбирает новую добычу.',
+  'bossJournal.wildheart.beast.stalkResponse':
+    'Отмеченный: бегите и уводите ягуара от Повелителя клыков. Остальные замедляют, обездвиживают или оглушают его.',
+  'bossJournal.wildheart.beast.warySummary':
+    'Каждый вид контроля (оглушение, обездвиживание, замедление) срабатывает на ягуаре один раз, затем этот вид не действует на него {lockout} сек. Паралич, страх и превращение считаются оглушением.',
+  'bossJournal.wildheart.beast.waryResponse':
+    'Чередуйте: одно обездвиживание, одно замедление, одно оглушение, а не три одинаковых.',
+  'bossJournal.wildheart.beast.quakeSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем все в радиусе {radius} м от Повелителя клыков получают от {min} до {max} урона.',
+  'bossJournal.wildheart.beast.quakeResponse': 'Все, кроме танка, отходят от Повелителя клыков.',
+  'bossJournal.wildheart.beast.huntSummary':
+    'Каждые {every} сек. оба зверя атакуют на {haste} быстрее в течение {seconds} сек.',
+  'bossJournal.wildheart.beast.huntResponse':
+    'Танк и лекарь используют способности на это время; ягуар тоже кусает быстрее.',
+  'bossJournal.wildheart.beast.wardName': 'Толстокожая защита',
+  'bossJournal.wildheart.beast.wardSummary':
+    'Каждые {every} сек. ягуар получает щит, поглощающий {amount} урона, на {seconds} сек.',
+  'bossJournal.wildheart.beast.wardResponse':
+    'Пока щит активен, бейте Повелителя клыков: запас здоровья общий.',
+  'bossJournal.wildheart.beast.heelSummary':
+    'Каждые {every} сек. ягуар произносит заклинание {cast} сек., затем прыгает обратно к Повелителю клыков, и узы возвращаются.',
+  'bossJournal.wildheart.beast.heelResponse':
+    'Оглушите, парализуйте или превратите ягуара во время заклинания, чтобы отменить его. Это работает, только если ягуар ещё не насторожен к оглушениям.',
+  'bossJournal.wildheart.beast.tipTank':
+    'Сразу уведите Повелителя клыков дальше чем на {normal} м от ягуара и держите его там лицом от группы.',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    'Сразу уведите Повелителя клыков дальше чем на {heroic} м от ягуара и держите его там. После каждого К ноге! уводите его снова.',
+  'bossJournal.wildheart.beast.tipHealer':
+    'Следите за целью Выслеживания: укусы и кровотечение приходят быстро, а во время Зова охоты ещё быстрее.',
+  'bossJournal.wildheart.beast.tipDamage':
+    'Бейте того, кто безопаснее. Если выслеживают вас, уводите ягуара от хозяина; иначе по очереди замедляйте, обездвиживайте и оглушайте его.',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    'Бейте того, кто безопаснее. Держите оглушение наготове для каждого заклинания К ноге! и по очереди замедляйте и обездвиживайте ягуара.',
+  'bossJournal.wildheart.beast.choiceName': 'Контролировать ягуара сейчас или приберечь?',
+  'bossJournal.wildheart.beast.choiceGain':
+    'Замедления, обездвиживания и оглушения не подпускают ягуара к добыче и уводят его от Повелителя клыков.',
+  'bossJournal.wildheart.beast.choiceRisk':
+    'Каждый вид контроля срабатывает один раз, затем не действует {lockout} сек., так что если потратить все три сразу, на следующую охоту ничего не останется.',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    'Каждый вид контроля срабатывает один раз, затем не действует {lockout} сек. Потратите оглушение рано, и следующий К ноге! будет нечем отменить.',
+  'bossJournal.wildheart.beast.heroicBond': 'Неистовые узы: Узы стаи действуют на {reach} м.',
+  'bossJournal.wildheart.beast.heroicHeel':
+    'К ноге!: ягуар прыгает обратно к Повелителю клыков, если во время заклинания его не оглушить. Толстокожая защита поглощает {amount}.',
+  'bossJournal.wildheart.bloom.overview':
+    'Укоренившийся цветок-людоед сыплет семенные стручки на грядки с перегноем вокруг себя. Игроки без пыльцы давят стручки, пока они не проросли; опылённые должны держаться от них подальше, иначе стручки прорастают тут же.',
+  'bossJournal.wildheart.bloom.phaseTerraceName': 'Плачущие водопады',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    'Он никогда не двигается. Таймеры его заклинаний стоят, пока идёт другое заклинание, поэтому указанные интервалы это кратчайшие паузы.',
+  'bossJournal.wildheart.bloom.seedSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем падают семенные стручки (всего {count}), по одному на каждую грядку. Если наступить на стручок без Опыления, он раздавлен. Нетронутый стручок через {sprout} сек. даёт Терновый росток.',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем падают семенные стручки (всего {count}), по одному на каждую грядку. Если наступить на стручок без Опыления, он раздавлен. Зарывающиеся семена: нетронутый стручок через {burrow} сек. уходит под землю, и рядом с ближайшим игроком вырастает Терновый росток.',
+  'bossJournal.wildheart.bloom.seedResponse':
+    'Неопылённые игроки быстро пробегают по каждому стручку. Опылённые держатся от них подальше.',
+  'bossJournal.wildheart.bloom.pollinateName': 'Опыление',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    'Каждые {every} сек. опыляются игроки (всего {count}) на {seconds} сек. Опылённый игрок, коснувшийся стручка, тут же заставляет его прорасти.',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    'Каждые {every} сек. опыляются игроки (всего {count}) на {seconds} сек. Опылённый игрок, коснувшийся стручка, тут же заставляет его прорасти. Пыльцевое облако: если стоять в радиусе {cloudRadius} м от опылённого игрока {cloudSeconds} сек., вы тоже будете опылены.',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    'Опылены: держитесь подальше от стручков, пока эффект не спадёт, а в героическом режиме ещё и подальше от союзников.',
+  'bossJournal.wildheart.bloom.sproutName': 'Терновый росток',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    'Элитный приспешник, вырастающий из проросшего стручка и атакующий ближайшего игрока. Ростки вянут, когда умирает Цветожор.',
+  'bossJournal.wildheart.bloom.sproutResponse': 'Танк берёт его на себя, а бойцы убивают.',
+  'bossJournal.wildheart.bloom.lashSummary':
+    'Каждые {every} сек. заклинание {cast} сек. нацеливает полосу длиной {length} м и шириной {width} м на игрока (по возможности не танка): от {min} до {max} урона и обездвиживание на {root} сек.',
+  'bossJournal.wildheart.bloom.lashResponse': 'Шагните вбок из полосы до конца заклинания.',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    'Каждые {every} сек. заклинание {cast} сек. на цель, затем укус с множителем {mult} к урону ближнего боя и Переваривание: {perSecond} урона в секунду в течение {seconds} сек. Движением уклониться нельзя.',
+  'bossJournal.wildheart.bloom.gorgeResponse':
+    'Танк: используйте защитную способность. Лекари покрывают урон от Переваривания.',
+  'bossJournal.wildheart.bloom.spitName': 'Цветочный плевок',
+  'bossJournal.wildheart.bloom.spitSummary':
+    'Если цель держится вне его досягаемости {delay} сек., он плюёт каждые {every} сек., нанося от {min} до {max} урона.',
+  'bossJournal.wildheart.bloom.spitResponse': 'Танк остаётся в зоне ближнего боя.',
+  'bossJournal.wildheart.bloom.tipTank':
+    'Оставайтесь в ближнем бою: стоит отойти, и прилетит Цветочный плевок. Используйте способность на каждое Пожирание и берите на себя каждый Терновый росток.',
+  'bossJournal.wildheart.bloom.tipHealer':
+    'Пожирание это сильный удар по танку, за ним идёт Переваривание. Удар лозы обездвиживает и ранит всех в своей полосе.',
+  'bossJournal.wildheart.bloom.tipDamage':
+    'Если вы не опылены, давите стручки между атаками. Уходите из Удара лозы и быстро убивайте любой Терновый росток.',
+  'bossJournal.wildheart.bloom.choiceName': 'Кто давит семена?',
+  'bossJournal.wildheart.bloom.choiceGain':
+    'Каждый раздавленный стручок это на один элитный Терновый росток меньше, а бой остаётся сосредоточен на цветке.',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    'Бег к грядкам стоит урона и времени в ближнем бою, а опылённый игрок, коснувшийся стручка, тут же его прорастит.',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    'Зарывающиеся семена: нетронутый стручок через {burrow} сек. уходит под землю, и его росток вырастает рядом с ближайшим игроком.',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    'Пыльцевое облако: если стоять в радиусе {cloudRadius} м от опылённого игрока {cloudSeconds} сек., вы тоже будете опылены.',
+  'bossJournal.wildheart.zulgar.overview':
+    'Верховный жрец котловины. Ровный бой с заметным кольцом, пока он не превратится в дух ягуара и не начнёт охоту на одного игрока. Преследуемый ведёт его через горящие солнечные глифы, которые его замедляют.',
+  'bossJournal.wildheart.zulgar.phaseShrineName': 'Святилище',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary':
+    'Он сражается в ближнем бою и пускает вокруг себя кольцо импульса.',
+  'bossJournal.wildheart.zulgar.phaseHuntName': 'Дух охоты',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    'При здоровье {first} и {second} он становится духом ягуара на {seconds} сек. и преследует отмеченного игрока.',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': 'Бешенство',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем один взрыв по всем в радиусе {radius} м от него: от {min} до {max} урона.',
+  'bossJournal.wildheart.zulgar.pulseResponse':
+    'Все, кроме танка, выходят из кольца до конца заклинания.',
+  'bossJournal.wildheart.zulgar.roarName': 'Рёв ягуара',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    'Каждый удар в ближнем бою с шансом {chance} отбрасывает цель на {distance} м.',
+  'bossJournal.wildheart.zulgar.roarResponse': 'Танк оставляет позади себя свободное место.',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    'При здоровье {first} и {second}: заклинание {cast} сек., затем {seconds} сек. он охотится на одного отмеченного игрока (Добычу, никогда не на танка, пока есть другие). Он бегает на {speed} быстрее игрока, игнорирует провокацию и не атакует. Если он настигает Добычу: {maul} урона и оглушение на {stun} сек., затем он выбирает новую Добычу. Растерзанный игрок в безопасности {respite} сек.',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    'При здоровье {first} и {second}: заклинание {cast} сек., затем {seconds} сек. он охотится на Добычу. Двойная добыча: отмечены двое игроков, и он переключается между ними каждые {switchEvery} сек. Он бегает на {speed} быстрее игрока, игнорирует провокацию и не атакует. Если он настигает Добычу: {maul} урона и оглушение на {stun} сек.',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    'Добыча: бегите через горящие солнечные глифы, чтобы замедлить его. Остальные замедляют, обездвиживают и оглушают его, пока он охотится.',
+  'bossJournal.wildheart.zulgar.glyphName': 'Солнечные глифы',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    'Глифов вокруг святилища: {count}. Когда дух ягуара пересекает горящий глиф, он замедляется на {slow} на {seconds} сек., а этот глиф гаснет на {dark} сек. Во время охоты замедления и обездвиживания действуют, а оглушения длятся вдвое меньше.',
+  'bossJournal.wildheart.zulgar.glyphResponse':
+    'Расходуйте глифы по одному: не сжигайте все на первой охоте.',
+  'bossJournal.wildheart.zulgar.ambushName': 'Засада охотника',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    'После каждой охоты он исчезает на {seconds} сек. Круг радиусом {radius} м отмечает самого дальнего игрока и даёт {warn} сек. предупреждения, затем он приземляется туда: от {min} до {max} урона всем внутри.',
+  'bossJournal.wildheart.zulgar.ambushResponse': 'Выйдите из круга.',
+  'bossJournal.wildheart.zulgar.tipTank':
+    'Оставляйте позади себя свободное место для Рёва ягуара. Когда охота заканчивается, он возвращается к вам: будьте готовы его принять.',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    'Импульс Дикого Сердца бьёт всех, кто остался в кольце. Растерзание это сильный одиночный удар: подлечивайте Добычу.',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    'Выходите из кольца импульса. Во время охоты замедляйте, обездвиживайте и оглушайте его, защищая Добычу, а если Добыча вы, бегите через горящие глифы.',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    'Выходите из кольца импульса. Во время охоты замедляйте, обездвиживайте и оглушайте его, защищая обе Добычи. После каждой охоты выходите из круга Засады.',
+  'bossJournal.wildheart.zulgar.choiceName': 'Потратить глиф сейчас или приберечь?',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    'Каждый горящий глиф, через который вы его проведёте, сильно замедляет его и выигрывает время для Добычи.',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    'Использованный глиф остаётся тёмным {dark} сек., а каждая охота длится {seconds} сек.: сожжёте все в начале, и в конце охоты их не будет.',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    'Двойная добыча: охота идёт на двоих игроков; он переключается каждые {switchEvery} сек.',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    'Засада: после каждой охоты он прыгает в круг радиусом {radius} м на самого дальнего игрока.',
+  'bossJournal.crypt.drake.overview':
+    'Костяной дракон кружит высоко над Процессией. Пройдите под ним, и он приземлится и вступит в бой: огненное дыхание перед собой, удар хвостом позади и порыв крыльев вокруг.',
+  'bossJournal.crypt.drake.phaseName': 'Процессия',
+  'bossJournal.crypt.drake.phaseSummary':
+    'Приземляется там, куда его утащили, и сражается на земле.',
+  'bossJournal.crypt.drake.breathSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем огонь конусом {arc} градусов на {range} м перед ним: от {min} до {max} урона. На время заклинания его направление фиксируется.',
+  'bossJournal.crypt.drake.breathResponse':
+    'Спереди стоит только танк. Все остальные остаются по бокам.',
+  'bossJournal.crypt.drake.tailSummary':
+    'Каждые {every} сек., если кто-то стоит позади него: заклинание {cast} сек., затем размах хвоста на {arc} градусов и {range} м позади него, от {min} до {max} урона.',
+  'bossJournal.crypt.drake.tailResponse': 'Никогда не стойте у него за спиной.',
+  'bossJournal.crypt.drake.gustSummary':
+    'Каждые {every} сек., если кто-то рядом: заклинание {cast} сек., затем все в пределах {radius} м получают от {min} до {max} урона и отбрасываются на {push} м.',
+  'bossJournal.crypt.drake.gustResponse': 'Ждите отбрасывания и не стойте спиной к краю.',
+  'bossJournal.crypt.drake.embersName': 'Курганные угли',
+  'bossJournal.crypt.drake.embersSummary':
+    'Земля под каждым дыханием горит ещё {seconds} сек.: от {min} до {max} урона в секунду всем, кто на ней стоит.',
+  'bossJournal.crypt.drake.embersResponse': 'Уведите дракона с горящей земли и сами сойдите с неё.',
+  'bossJournal.crypt.drake.tipTank':
+    'Разворачивайте его так, чтобы дыхание шло в сторону от группы, а на героической сложности уводите его с горящей земли.',
+  'bossJournal.crypt.drake.tipHealer':
+    'Дыхание и порыв крыльев дают пики урона. Стойте у него сбоку.',
+  'bossJournal.crypt.drake.tipDamage': 'Атакуйте сбоку: не спереди и не сзади.',
+  'bossJournal.crypt.drake.heroicEmbers':
+    'Курганные угли: каждое дыхание оставляет землю гореть {seconds} сек.',
+  'bossJournal.crypt.marrow.overview':
+    'Поднятый могильщик, который снимает с игроков мерку для могилы. Каждая могила остаётся открытой, замедляя и обжигая всех в ней, и из каждой встают Беспокойные кости, когда он звонит в Погребальный колокол. Копайте могилы у края двора и не давайте им множиться.',
+  'bossJournal.crypt.marrow.phaseYardSummary':
+    'Роет могилы под отмеченными игроками и бьёт лопатой по танку.',
+  'bossJournal.crypt.marrow.phaseTollName': 'Погребальный звон',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    'При здоровье {first} и {second} он идёт к колокольной верёвке и звонит в Погребальный звон.',
+  'bossJournal.crypt.marrow.shovelSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем удар лопатой конусом {arc} градусов на {range} м перед ним: урон, равный его удару в ближнем бою, умноженному на {mult}. Все пострадавшие получают Землю в глазах: замедление на {slow} на {seconds} сек.',
+  'bossJournal.crypt.marrow.shovelResponse':
+    'Спереди стоит только танк. Танк может отойти во время заклинания.',
+  'bossJournal.crypt.marrow.measureSummary':
+    'Каждые {every} сек. заклинание {cast} сек. отмечает игрока. Через {mark} сек. на его месте обрушивается могила: от {min} до {max} урона всем в пределах {radius} м. Могила остаётся открытой до конца боя: внутри вы замедлены на {slow} и получаете {dirt} урона в секунду. Не больше {cap} могил; новая заполняет самую старую.',
+  'bossJournal.crypt.marrow.measureResponse':
+    'Если вас отметили: идите к краю двора, пока не открылась могила. Никогда не стойте в Открытой могиле.',
+  'bossJournal.crypt.marrow.blowSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по танку: удар в ближнем бою, добавляющий заряд, при котором получаемый урон выше на {vuln}. До {stacks} зарядов ({max}), на {seconds} сек.',
+  'bossJournal.crypt.marrow.blowResponse':
+    'Танк: по мере роста зарядов используйте защитные способности. Лекари следят за танком.',
+  'bossJournal.crypt.marrow.vigorName': 'Могильная сила',
+  'bossJournal.crypt.marrow.vigorSummary':
+    'Пока он стоит в Открытой могиле, он бьёт на {haste} быстрее.',
+  'bossJournal.crypt.marrow.vigorResponse': 'Танк не подпускает его к могилам.',
+  'bossJournal.crypt.marrow.unquietName': 'Неспокойная земля',
+  'bossJournal.crypt.marrow.unquietSummary':
+    'Игрок, который пробыл в могиле {linger} сек., поднимает из неё Беспокойные кости. После этого могила затихает на {rest} сек.',
+  'bossJournal.crypt.marrow.unquietResponse': 'Немедленно выходите из могил.',
+  'bossJournal.crypt.marrow.tollSummary':
+    'Он идёт к верёвке и звонит в колокол {ring} сек., оставаясь неуязвимым, пока идёт и звонит. Затем каждый игрок получает от {min} до {max} урона, а из каждой Открытой могилы встают Беспокойные кости.',
+  'bossJournal.crypt.marrow.tollResponse':
+    'Лекари лечат всех до последнего удара колокола. Танк подбирает Беспокойные кости; бойцы их убивают.',
+  'bossJournal.crypt.marrow.tipTank':
+    'Держите его лицом от группы. После каждого Погребального звона подберите все Беспокойные кости.',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    'Держите его лицом от группы и подальше от всех могил. Удар могильщика накладывается: по мере роста зарядов используйте защитные способности.',
+  'bossJournal.crypt.marrow.tipHealer':
+    'Погребальный звон бьёт по всей группе. Могилы замедляют и обжигают всех в них, так что помогайте тому, кто застрял.',
+  'bossJournal.crypt.marrow.tipDamage':
+    'Если вас отметили, отнесите могилу к краю двора. После каждого Звона убейте Беспокойные кости и возвращайтесь к Марроу.',
+  'bossJournal.crypt.marrow.choiceName': 'Куда копать могилы?',
+  'bossJournal.crypt.marrow.choiceGain':
+    'Могилы у края двора оставляют середину свободной для боя и уклонения.',
+  'bossJournal.crypt.marrow.choiceRisk':
+    'Каждая Открытая могила, где бы она ни была, поднимает Беспокойные кости при следующем Звоне, до {cap} одновременно.',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    'Каждая Открытая могила, где бы она ни была, поднимает Беспокойные кости при следующем Звоне, до {cap} одновременно. На героической сложности могила рядом с танком ещё и ускоряет Марроу.',
+  'bossJournal.crypt.marrow.heroicBlow':
+    'Удар могильщика: удар по танку, накладывающий заряд, при котором получаемый урон выше на {vuln}.',
+  'bossJournal.crypt.marrow.heroicVigor': 'Могильная сила: в могиле он бьёт на {haste} быстрее.',
+  'bossJournal.crypt.marrow.heroicUnquiet':
+    'Неспокойная земля: {linger} сек. в могиле поднимают Беспокойные кости.',
+  'bossJournal.crypt.lady.overview':
+    'Призрачная невеста, чей вопль ранит всех, кого не укрывает могильный фонарь. Каждый фонарь укрывает только двоих, а потом гаснет, так что группе нужно меняться по очереди. Она также поднимает игрока в воздух и не отпускает, пока группа не нанесёт ей достаточно урона.',
+  'bossJournal.crypt.lady.phaseRavineName': 'Морозное ущелье',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    'Вокруг ущелья стоят три могильных фонаря. Её путь превращается в скользкий лёд.',
+  'bossJournal.crypt.lady.phaseFreezeName': 'Свадебная стужа',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    'При здоровье {health} весь пол ущелья замерзает до конца боя.',
+  'bossJournal.crypt.lady.lamentSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона каждому игроку, которого не укрывает фонарь. Каждое попадание добавляет заряд Затяжного плача: на {perStack} больше урона от Плача за заряд, на {seconds} сек., до {stacks} зарядов.',
+  'bossJournal.crypt.lady.lamentResponse': 'Встаньте в свет горящего фонаря до конца заклинания.',
+  'bossJournal.crypt.lady.lanternName': 'Могильные фонари',
+  'bossJournal.crypt.lady.lanternSummary':
+    'Горящий фонарь укрывает от Плача до {cap} игроков в пределах {radius} м. Фонарь, который кого-то укрыл, гаснет на {dark} сек., так что при следующем Плаче он всё ещё тёмный.',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    'Горящий фонарь укрывает от Плача до {cap} игроков в пределах {radius} м. Фонарь, который кого-то укрыл, гаснет на {dark} сек. На героической сложности горящий фонарь ещё и сам прогорает через {lit} сек. и остаётся тёмным {gutter} сек.',
+  'bossJournal.crypt.lady.lanternResponse':
+    'Заранее решите, кто какой фонарь занимает, и на каждый Плач переходите к горящему.',
+  'bossJournal.crypt.lady.embraceSummary':
+    'Каждые {every} сек. она хватает игрока, не танка, поднимает его в воздух и держит. Нанесите ей {share} здоровья за {hold} сек., и она аккуратно опустит его. Иначе она его бросит: от {min} до {max} урона.',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    'Каждые {every} сек. она хватает {victims} игроков, не танков, поднимает их в воздух и держит. Нанесите ей {share} здоровья за {hold} сек., и она аккуратно опустит их. Иначе она их бросит: от {min} до {max} урона.',
+  'bossJournal.crypt.lady.embraceResponse':
+    'Все сразу бьют по ней изо всех сил, как только она кого-то схватила. Лекари лечат схваченного.',
+  'bossJournal.crypt.lady.rimeSummary':
+    'Там, где она проплывает, остаётся скользкий лёд; каждое пятно держится {seconds} сек. На льду вы скользите и медленно поворачиваете.',
+  'bossJournal.crypt.lady.rimeResponse': 'Обходите её след, когда нужно двигаться быстро.',
+  'bossJournal.crypt.lady.freezeSummary':
+    'При здоровье {health} заклинание {cast} сек., затем весь пол становится скользким льдом до конца боя. Это отменяет уже читаемый Плач.',
+  'bossJournal.crypt.lady.freezeResponse':
+    'Двигайтесь заранее: на льду до фонаря добираться дольше.',
+  'bossJournal.crypt.lady.tipTank':
+    'Держите её ближе к середине, чтобы до каждого фонаря группа могла дотянуться.',
+  'bossJournal.crypt.lady.tipHealer':
+    'Неукрытые игроки получают Плач и копят заряды. Схваченный игрок получает урон, пока она его держит.',
+  'bossJournal.crypt.lady.tipDamage':
+    'Бейте изо всех сил, как только она кого-то схватила. На каждый Плач переходите между горящими фонарями.',
+  'bossJournal.crypt.lady.choiceName': 'Кто примет Плач?',
+  'bossJournal.crypt.lady.choiceGain':
+    'Если использовать все три фонаря, каждый укроет до {cap} игроков, и этот Плач не заденет никого.',
+  'bossJournal.crypt.lady.choiceRisk':
+    'Использованные фонари при следующем Плаче всё ещё тёмные, так что кто-то получит его тогда, а каждый заряд Затяжного плача добавляет {perStack} урона.',
+  'bossJournal.crypt.lady.heroicEmbrace': 'Ледяные объятия хватают сразу {victims} игроков.',
+  'bossJournal.crypt.lady.heroicLanterns':
+    'Горящий фонарь сам прогорает через {lit} сек. и остаётся тёмным {gutter} сек.',
+  'bossJournal.crypt.ilvane.overview':
+    'Регент хора, которую охраняют два Хориста Пустоты: пока они живы, они ослабляют получаемый ею урон. Её Песнь ранит и заставляет замолчать всех, кто её видит, так что прервите её или спрячьтесь за колонной. Она также играет на Костяном органе, пуская полосы нот по хорам.',
+  'bossJournal.crypt.ilvane.phaseLoftName': 'Хоры',
+  'bossJournal.crypt.ilvane.phaseLoftSummary': 'Она поёт с хоров, рядом с ней два Хориста Пустоты.',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': 'Крещендо',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    'При здоровье {health} она поёт быстрее, и орган играет третью волну.',
+  'bossJournal.crypt.ilvane.harmonyName': 'Гармония',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    'Каждый живой Хорист снижает получаемый ею урон на {per}: на {both}, пока стоят оба.',
+  'bossJournal.crypt.ilvane.harmonyResponse': 'Сначала убейте Хористов.',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    'Каждые {every} сек. заклинание {cast} сек. Если она допоёт, все, кто её видит, получают от {min} до {max} урона и замолкают на {silence} сек. После прерывания она не поёт Песнь {quiet} сек.',
+  'bossJournal.crypt.ilvane.dirgeResponse':
+    'Прервите её или разорвите линию обзора за колонной до конца заклинания.',
+  'bossJournal.crypt.ilvane.organSummary':
+    'Каждые {every} сек. она идёт к органу и играет {waves} волн полос нот по хорам. Каждая полоса показывается {gather} сек., затем взрывается: от {min} до {max} урона.',
+  'bossJournal.crypt.ilvane.organResponse':
+    'Встаньте между первыми полосами, затем шагните в полосу, которая уже взорвалась.',
+  'bossJournal.crypt.ilvane.encoreName': 'Бис',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    'Хорист, пролежавший мёртвым {seconds} сек., пока его напарник ещё стоит, встаёт снова с полным здоровьем.',
+  'bossJournal.crypt.ilvane.encoreResponse':
+    'Убейте обоих Хористов с разницей не больше {seconds} сек.',
+  'bossJournal.crypt.ilvane.unbrokenSummary':
+    'Каждая {nth}-я Песнь становится Непрерывным стихом: её нельзя прервать.',
+  'bossJournal.crypt.ilvane.unbrokenResponse': 'На неё прячьтесь за колонной.',
+  'bossJournal.crypt.ilvane.crescendoName': 'Крещендо',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    'При здоровье ниже {health} Песнь длится {cast} сек. и звучит каждые {every} сек., а орган играет {waves} волн. Третья волна повторяет полосы первой.',
+  'bossJournal.crypt.ilvane.crescendoResponse':
+    'Прерывайте каждую Песнь и на третью волну отходите от первых полос.',
+  'bossJournal.crypt.ilvane.tipTank':
+    'Держите Хористов вместе, чтобы их можно было быстро убить, затем берите Ильвейн.',
+  'bossJournal.crypt.ilvane.tipHealer':
+    'Допетая Песнь заставляет замолчать и вас: спрячьтесь за колонной, если некому её прервать.',
+  'bossJournal.crypt.ilvane.tipDamage':
+    'Сначала убейте Хористов, прервите Песнь и уворачивайтесь от полос органа.',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    'Убейте обоих Хористов с разницей не больше {seconds} сек., прервите Песнь и прячьтесь от каждого Непрерывного стиха.',
+  'bossJournal.crypt.ilvane.choiceName': 'Прервать или спрятаться?',
+  'bossJournal.crypt.ilvane.choiceGain':
+    'Прерывание останавливает Песнь и заставляет её молчать {quiet} сек.',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    'Укрытие за колонной стоит времени атаки. Сорванное прерывание заставляет замолчать и ранит всех в зоне видимости.',
+  'bossJournal.crypt.ilvane.heroicEncore':
+    'Бис: Хорист, пролежавший мёртвым {seconds} сек., пока его напарник жив, встаёт снова.',
+  'bossJournal.crypt.ilvane.heroicUnbroken':
+    'Непрерывный стих: каждую {nth}-ю Песнь нельзя прервать.',
+  'bossJournal.crypt.morthen.overview':
+    'Епископ-лич, ведущий обряд в трёх действиях. Сначала он зовёт души, чтобы усилиться; при здоровье {rite} он прячется за оберегом, пока группа ценой здоровья заново не зажжёт четыре свечи; при {last} он взмахивает огромной косой.',
+  'bossJournal.crypt.morthen.phaseCallingName': 'Призыв',
+  'bossJournal.crypt.morthen.phaseCallingSummary':
+    'Он выпускает вокруг себя импульсы тьмы и зовёт души, которые его питают.',
+  'bossJournal.crypt.morthen.phaseRiteName': 'Обряд неупокоенных',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    'При здоровье {health} он возвращается к алтарю и становится неуязвимым, пока не загорятся снова все четыре свечи.',
+  'bossJournal.crypt.morthen.phaseLastName': 'Последний обряд',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    'При здоровье {health} он берётся за косу для финала боя.',
+  'bossJournal.crypt.morthen.pulseSummary':
+    'Каждые {every} сек. ({everyLast} сек. в Последнем обряде) заклинание {cast} сек., затем от {min} до {max} урона всем в пределах {radius} м.',
+  'bossJournal.crypt.morthen.pulseResponse':
+    'Все, включая танка, отходят на {radius} м до конца заклинания.',
+  'bossJournal.crypt.morthen.gravecallName': 'Могильный зов',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    'Каждые {every} сек. из ниши к нему плывёт Связанная душа. Если она доберётся, он наносит на {per} больше урона за заряд (до {stacks}) и исцеляет {heal} здоровья. Первый игрок, которого она коснётся, принимает её на себя: от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.gravecallResponse': 'Свободный игрок встаёт на путь каждой души.',
+  'bossJournal.crypt.morthen.graspName': 'Хватка могилы',
+  'bossJournal.crypt.morthen.graspSummary':
+    'Каждые {every} сек. под {count} игроками появляется кольцо радиусом {radius} м. Через {fuse} сек. вырываются руки: все внутри обездвиживаются на {root} сек. и получают от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.graspResponse': 'Сразу выйдите из кольца.',
+  'bossJournal.crypt.morthen.riteSummary':
+    'Он становится неуязвимым, и {candles} свечи гаснут. Выбираются Беспокойные кости ({bones}). Могильный холод бьёт всех каждую секунду: {base} урона, растущего на {step} каждые {chillEvery} сек., без предела.',
+  'bossJournal.crypt.morthen.riteResponse':
+    'Быстро зажгите заново все четыре свечи: холод не перестаёт расти.',
+  'bossJournal.crypt.morthen.relightName': 'Зажечь заново Поминальные свечи',
+  'bossJournal.crypt.morthen.relightSummary':
+    'Поддерживайте заклинание {channel} сек. у свечи (в пределах {range} м), чтобы зажечь её заново. Это стоит зажигающему {drain} максимального здоровья. Когда загорается четвёртая, он оглушён на {stun} сек. и получает на {vuln} больше урона.',
+  'bossJournal.crypt.morthen.relightResponse':
+    'Распределите свечи между игроками с запасом здоровья и бейте изо всех сил, пока он оглушён.',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    'Свечи нужно зажигать в порядке, который показывает золотой луч от Реестра. Неверная свеча гасит последнюю зажжённую и наносит зажигающему от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.nameDeadResponse':
+    'Зажигайте только ту свечу, на которую указывает луч.',
+  'bossJournal.crypt.morthen.reapSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по танку, затем взмах косы конусом {arc} градусов на {range} м перед ним: от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.reapResponse':
+    'Спереди стоит только танк. Танк может сделать шаг в сторону во время заклинания.',
+  'bossJournal.crypt.morthen.tipTank':
+    'Держите его лицом от группы и выходите из Пульса тьмы вместе со всеми.',
+  'bossJournal.crypt.morthen.tipHealer':
+    'Каждая свеча забирает у зажигающего большую долю здоровья, а Могильный холод всё растёт: лечите зажигающих в первую очередь.',
+  'bossJournal.crypt.morthen.tipDamage':
+    'Перекрывайте путь Связанным душам своим телом, зажигайте свечи в Обряде, затем бейте изо всех сил, пока он оглушён.',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    'Перекрывайте путь Связанным душам и уворачивайтесь от Хватки могилы. В Обряде идите за золотым лучом к нужной свече.',
+  'bossJournal.crypt.morthen.choiceCandleName': 'Сколько зажигающих?',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    'Если несколько игроков зажигают одновременно, Обряд кончается раньше, пока Могильный холод не вырос.',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    'Каждый зажигающий платит {normal} максимального здоровья за свечу, пока холод продолжает расти.',
+  'bossJournal.crypt.morthen.choiceSoulName': 'Перекрывать путь душам?',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    'Перехваченная душа не доходит до него: ни стопки урона, ни исцеления.',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    'Тот, кто перехватил, получает урон от души. Каждая прошедшая душа добавляет ему {per} урона и исцеляет его на {heal}.',
+  'bossJournal.crypt.morthen.heroicNameDead':
+    'Назови мёртвых: свечи нужно зажигать в порядке, который показывает Реестр.',
+  'bossJournal.crypt.morthen.heroicGrasp':
+    'Хватка могилы: кольца, которые обездвиживают и ранят, в каждом действии.',
+  'bossJournal.crypt.morthen.heroicDrain':
+    'Каждая свеча стоит зажигающему {drain} максимального здоровья.',
+  'bossJournal.crypt.wyrm.overview':
+    'Предсмертный обряд Мортена зажигает костёр, и в него опускается костяной змий. Он сражается как Костяной дракон оссуария, плюс пылающие полосы налёта и рёв, который отбрасывает игроков, но открывает его для урона.',
+  'bossJournal.crypt.wyrm.phaseName': 'Костёр Зова змия',
+  'bossJournal.crypt.wyrm.phaseSummary':
+    'Он планирует из недосягаемой вышины и опускается в кольцо со вспышкой огня.',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    'Каждые {every} сек. он отмечает на {mark} сек. полосу шириной {width} м через игрока, затем пролетает над ней, изливая огонь: от {min} до {max} урона всем в ней. Полоса горит ещё {seconds} сек.: {burn} урона в секунду.',
+  'bossJournal.crypt.wyrm.strafeResponse':
+    'Шагните в сторону из отмеченной полосы и не заходите на горящую землю.',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона и отбрасывание на {push} м в пределах {radius} м. После этого {seconds} сек. он получает на {vuln} больше урона.',
+  'bossJournal.crypt.wyrm.bellowResponse':
+    'Не дайте отбросить себя в горящую полосу. Тратьте способности в окно после этого.',
+  'bossJournal.crypt.wyrm.knellSummary':
+    'Каждые {every} сек. он взлетает из зоны досягаемости и дышит огнём на половину кольца {breaths} раза. Каждая половина отмечается за {mark} сек. до огня: от {min} до {max} урона всем в ней.',
+  'bossJournal.crypt.wyrm.knellResponse': 'Каждый раз бегите на неотмеченную половину кольца.',
+  'bossJournal.crypt.wyrm.tipTank': 'Держите его лицом от группы и уводите из горящих полос.',
+  'bossJournal.crypt.wyrm.tipHealer':
+    'Погребальный налёт и Жуткий рёв дают пики урона; лечите тех, кого отбросило в горящую полосу.',
+  'bossJournal.crypt.wyrm.tipDamage':
+    'Выходите из отмеченных полос и тратьте способности после каждого Жуткого рёва.',
+  'bossJournal.crypt.wyrm.tipDamageHeroic':
+    'Выходите из отмеченных полос, а во время Пылающего звона каждый раз бегите на безопасную половину.',
+  'bossJournal.crypt.wyrm.heroicKnell':
+    'Пылающий звон: он взлетает и дышит огнём на половину кольца {breaths} раза.',
+  'bossJournal.bastion.captain.overview':
+    'Парящий призрачный капитан патрулирует ров Нижнего двора, и подъёмный мост остаётся поднятым, пока он жив. Он по очереди применяет три атаки по полосам, нацеленные на игрока, который не танк; каждая рисуется на полу до удара.',
+  'bossJournal.bastion.captain.phaseSummary':
+    'Первая способность срабатывает через {first} сек. после начала боя, затем по очереди идут Призрачный бортовой залп, Проклятый якорь и Призрачный абордаж с интервалом {recovery} сек. Во время каждой способности он стоит на месте.',
+  'bossJournal.bastion.captain.broadsideSummary':
+    'После предупреждения в {warn} сек. одновременно бьют параллельные полосы длиной {length} м (всего их {lanes}): от {min} до {max} урона всем в полосе.',
+  'bossJournal.bastion.captain.broadsideResponse': 'Встаньте в просвет между полосами.',
+  'bossJournal.bastion.captain.anchorSummary':
+    'После предупреждения в {warn} сек. проклятый якорь протаскивают на {length} м назад по полосе за {seconds} сек., и он бьёт всех на пути: от {min} до {max} урона.',
+  'bossJournal.bastion.captain.anchorResponse': 'Уйдите с полосы до удара.',
+  'bossJournal.bastion.captain.boardingSummary':
+    'После предупреждения в {warn} сек. все в полосе длиной {length} м получают от {min} до {max} урона, и он совершает рывок по ней.',
+  'bossJournal.bastion.captain.boardingResponse': 'Отойдите в сторону от полосы.',
+  'bossJournal.bastion.captain.sailorsName': 'Матросы, связанные с остовом',
+  'bossJournal.bastion.captain.sailorsSummary':
+    'При здоровье {first} и {second} в бой вступают матросы, связанные с остовом: по {count} каждый раз. Вскоре после смерти матрос взрывается энергией души.',
+  'bossJournal.bastion.captain.sailorsResponse':
+    'Танк подбирает их. Отойдите от только что умершего матроса.',
+  'bossJournal.bastion.captain.tipTank':
+    'Удерживайте его на месте и подбирайте матросов, связанных с остовом. Его полосы бьют по остальным, а не по вам.',
+  'bossJournal.bastion.captain.tipHealer':
+    'Призрачный бортовой залп бьёт сильнее всего: лечите тех, кто стоял в полосе.',
+  'bossJournal.bastion.captain.tipDamage':
+    'Следите за полом: каждая способность рисуется до удара. Стойте в просветах Бортового залпа.',
+  'bossJournal.bastion.olen.overview':
+    'Павший рыцарь-паладин. Лужи освящённого рассола защищают его, поэтому танк вытаскивает его из них; группа рассредоточена, чтобы отскакивающий щит и столп Приговора били только одного игрока. На половине здоровья он опускается на колено и неуязвим, пока живы его утонувшие сержанты.',
+  'bossJournal.bastion.olen.phaseBreachName': 'Пробитый бастион',
+  'bossJournal.bastion.olen.phaseBreachSummary':
+    'Он применяет по одной способности; во время его заклинаний таймеры стоят.',
+  'bossJournal.bastion.olen.phaseOathName': 'Нерушимая клятва',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    'При здоровье {health} он опускается на колено, неуязвимый, пока за него сражаются утонувшие сержанты.',
+  'bossJournal.bastion.olen.brineSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем под ним возникает лужа освящённого рассола радиусом {radius} м на {seconds} сек.: {perSecond} урона в секунду всем внутри. Пока он стоит в любой луже, он получает на {shield} меньше урона.',
+  'bossJournal.bastion.olen.brineResponse':
+    'Танк вытаскивает его из лужи. Остальные тоже выходят из неё.',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по игроку, который не танк. Щит наносит ему от {min} до {max} урона, затем отскакивает к ближайшему непоражённому игроку в пределах {reach} м, всего до {hits} игроков.',
+  'bossJournal.bastion.olen.bulwarkResponse':
+    'Рассредоточьтесь: держитесь дальше {reach} м от всех остальных.',
+  'bossJournal.bastion.olen.sentenceSummary':
+    'Каждые {every} сек. заклинание {cast} сек. отмечает игрока, который не танк. Через {seconds} сек. на него, где бы он ни был, падает столп: от {min} до {max} урона всем в радиусе {radius} м.',
+  'bossJournal.bastion.olen.sentenceResponse':
+    'Вас отметили: отойдите от группы до падения столпа.',
+  'bossJournal.bastion.olen.arcName': 'Жатвенная дуга',
+  'bossJournal.bastion.olen.arcSummary':
+    'Каждый его удар в ближнем бою также задевает всех остальных игроков в радиусе {radius} м от танка на {share} от силы замаха.',
+  'bossJournal.bastion.olen.arcResponse': 'Никто, кроме танка, не стоит ближе {radius} м к танку.',
+  'bossJournal.bastion.olen.oathSummary':
+    'Один раз, при здоровье {health}: он опускается на колено и направляет заклинание до {max} сек., неуязвимый, пока утонувшие сержанты (их {count}) встают и атакуют игроков, которые не танк. Убейте всех, и он оглушён на {stun} сек. и получает на {vuln} больше урона {vulnSeconds} сек.',
+  'bossJournal.bastion.olen.oathResponse':
+    'Танк собирает сержантов; все убивают их, затем обрушивают весь урон на Олена, пока он оглушён.',
+  'bossJournal.bastion.olen.tipTank':
+    'Вытаскивайте его из каждой лужи рассола. Не пускайте группу в {radius} м вокруг вас: там его удары задевают область.',
+  'bossJournal.bastion.olen.tipHealer':
+    'Отскакивающий щит и Приговор прилива бьют сильнее всего, когда игроки стоят вместе. Сержанты впадают в бешенство при низком здоровье.',
+  'bossJournal.bastion.olen.tipDamage':
+    'Рассредоточьтесь, держитесь дальше {reach} м друг от друга и от танка. В фазе клятвы сначала убивайте сержантов.',
+  'bossJournal.bastion.olen.choiceName': 'Кучей или врассыпную?',
+  'bossJournal.bastion.olen.choiceGain':
+    'Если рассредоточиться, Отскакивающий щит, Приговор прилива и Жатвенная дуга бьют только одного игрока.',
+  'bossJournal.bastion.olen.choiceRisk':
+    'Все в пределах {reach} м от пострадавшего получают отскок, а все в пределах {radius} м от танка получают урон по области.',
+  'bossJournal.bastion.olen.heroicChanges':
+    'Лужи рассола радиусом {radius} м, щит отскакивает к {hits} игрокам, столп Приговора радиусом {sentence} м, сержантов встаёт {count}.',
+  'bossJournal.bastion.turnkey.overview':
+    'Тюремный ключник запирает игроков в Железных клетках. Узник вырывается, снова и снова нажимая клавишу взаимодействия, а союзники ускоряют это, ударяя по клетке.',
+  'bossJournal.bastion.turnkey.phaseName': 'Тюремная решётка',
+  'bossJournal.bastion.turnkey.phaseSummary':
+    'Он запирает игроков по строгому таймеру и освобождает узников на половине здоровья.',
+  'bossJournal.bastion.turnkey.cageSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем на игрока, который не танк, падает клетка и оглушает его. У клетки {hits} очков прочности: каждое нажатие клавиши взаимодействия узником сбивает {press}, каждый удар союзника сбивает {helper}, а клетка понемногу восстанавливается. Через {max} сек. клетка давит узника, нанося {crush} от его максимального здоровья.',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем клетки падают сразу на нескольких игроков, которые не танки (всего {cages}). У каждой клетки {hits} очков прочности: каждое нажатие клавиши взаимодействия узником сбивает {press}, каждый удар союзника сбивает {helper}. Внутри поднимающийся рассол каждую секунду отнимает здоровье. Через {max} сек. клетка давит, нанося {crush} от максимального здоровья.',
+  'bossJournal.bastion.turnkey.cageResponse':
+    'Вы в клетке: быстро жмите клавишу взаимодействия. Остальные бьют клетку, чтобы сломать её.',
+  'bossJournal.bastion.turnkey.cellsName': 'Открыть камеры',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    'При здоровье {health} он выпускает закованных узников (их {count}). При четверти здоровья их цепи рвутся, и они выходят из боя.',
+  'bossJournal.bastion.turnkey.cellsResponse':
+    'Доведите их до четверти здоровья; убивать их не нужно.',
+  'bossJournal.bastion.turnkey.tipTank': 'Держите его и узников; клетки никогда не целятся в вас.',
+  'bossJournal.bastion.turnkey.tipHealer':
+    'Подлечивайте игроков в клетках: давление отнимает долю их здоровья.',
+  'bossJournal.bastion.turnkey.tipDamage':
+    'Сразу переключайтесь на каждую клетку и бейте, пока она не сломается.',
+  'bossJournal.bastion.turnkey.heroicCages':
+    'Железная клетка запирает сразу несколько игроков: {cages}.',
+  'bossJournal.bastion.turnkey.heroicFlood':
+    'Рассольный потоп: игрок в клетке теряет здоровье каждую секунду, пока его не освободят.',
+  'bossJournal.bastion.ossick.overview':
+    'Тюремщик цепляет игрока якорем и тащит его к яме утопления. Игрок бежит к горящему швартовому столбу, или группа разбивает цепь. Тем временем двое других игроков скованы цепью и должны держаться рядом.',
+  'bossJournal.bastion.ossick.phaseName': 'Двор утопленников',
+  'bossJournal.bastion.ossick.phaseSummary':
+    'При здоровье {first} и {second} каждый раз из камер выходят закованные узники (их {count}).',
+  'bossJournal.bastion.ossick.anchorSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем якорь цепляет игрока, который не танк. Через {settle} сек. цепь тянет его к яме. Спасение: оказаться в пределах {reach} м от горящего швартового столба, который находится не ближе {run} м от места, где вас зацепили (этот столб гаснет на {dark} сек.), или группа наносит по якорю {hits} ударов. Падение в яму: {pit} от максимального здоровья и оглушение на {stun} сек.',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем якорь цепляет игрока, который не танк; при падении якорь бьёт всех остальных в радиусе {crashRadius} м, нанося от {min} до {max} урона. Через {settle} сек. цепь тянет его к яме. Спасение: горящий швартовый столб не ближе {run} м или {hits} ударов по якорю. Падение в яму: {pit} от максимального здоровья и оглушение на {stun} сек.',
+  'bossJournal.bastion.ossick.anchorResponse':
+    'Вас зацепили: бегите к горящему столбу заранее. Остальные бьют якорь.',
+  'bossJournal.bastion.ossick.shackleSummary':
+    'Каждые {every} сек. заклинание {cast} сек. сковывает двух игроков цепью на {seconds} сек. Каждую секунду, пока они дальше {range} м друг от друга, оба получают от {min} до {max} урона.',
+  'bossJournal.bastion.ossick.shackleResponse':
+    'Вы скованы: оставайтесь в пределах {range} м от напарника.',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по танку: урон в {mult} раз больше обычного удара в ближнем бою, игнорирует броню, и скорость движения снижена на {slow} на {seconds} сек.',
+  'bossJournal.bastion.ossick.cudgelResponse':
+    'Танк: используйте способность с перезарядкой. Лекари, ждите удара.',
+  'bossJournal.bastion.ossick.tipTank':
+    'Держите его ближе к центру и подбирайте узников. Дубинка тюремщика игнорирует вашу броню.',
+  'bossJournal.bastion.ossick.tipHealer':
+    'Следите за зацепленными и скованными игроками: яма забирает большую долю здоровья.',
+  'bossJournal.bastion.ossick.tipDamage':
+    'Бейте якорь, как только кого-то зацепили. Если вы скованы, держитесь рядом с напарником.',
+  'bossJournal.bastion.ossick.choiceName': 'Бежать к столбу или разбивать цепь?',
+  'bossJournal.bastion.ossick.choiceGain':
+    'Горящий столб освобождает только зацепленного игрока, так что группа продолжает атаковать.',
+  'bossJournal.bastion.ossick.choiceRisk':
+    'Столб должен быть не ближе {run} м и гаснет на {dark} сек. Когда цепь становится короткой, ни один столб не достать, и остаётся только разбить её.',
+  'bossJournal.bastion.ossick.heroicCrash':
+    'Падение якоря: якорь бьёт всех в радиусе {crashRadius} м от зацепленного игрока.',
+  'bossJournal.bastion.ossick.heroicChanges':
+    'Чтобы разбить цепь, нужно {hits} ударов по якорю, а скованные игроки должны держаться в пределах {range} м.',
+  'bossJournal.bastion.vael.overview':
+    'Жнец в капюшоне. Три раза подряд он встаёт из теневой лужи позади игрока и проводит косой по его спине. При {first} и {second} здоровья он прячется среди одинаковых копий, пока гимн ранит всех; луч Туманного маяка показывает, какая фигура настоящая.',
+  'bossJournal.bastion.vael.phaseCrownName': 'Венец маяка',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    'Он встаёт из венца, когда на него наступает игрок. При здоровье {first} и {second} в бой вступают утопшие рабы: по {count} каждый раз.',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    'При здоровье {first} и {second} он прячется среди одинаковых копий.',
+  'bossJournal.bastion.vael.surgeSummary':
+    'Заклинание {cast} сек., затем от {min} до {max} урона всем в радиусе {radius} м от него. Каждые {every} сек. в открытом бою; каждые {lastEvery} сек. при здоровье ниже {below}.',
+  'bossJournal.bastion.vael.surgeResponse': 'Бойцы дальнего боя держатся дальше {radius} м.',
+  'bossJournal.bastion.vael.crossingSummary':
+    'Каждые {every} сек. он проходит сквозь тени до {chain} раз подряд, каждый раз за спиной другого игрока: в {behind} м позади него открывается лужа, он встаёт и проводит косой по дуге в {arc} градусов на {range} м в его сторону: от {min} до {max} урона.',
+  'bossJournal.bastion.vael.crossingResponse':
+    'Метка смерти: выйдите вперёд из зоны удара или встаньте за лужу. Остальные никогда не стоят перед отмеченным игроком.',
+  'bossJournal.bastion.vael.graveName': 'Могильная тень',
+  'bossJournal.bastion.vael.graveSummary':
+    'Каждая теневая лужа держится {seconds} сек. и жжёт всех в радиусе {radius} м, нанося {perSecond} урона в секунду.',
+  'bossJournal.bastion.vael.graveResponse': 'Держитесь подальше от старых луж.',
+  'bossJournal.bastion.vael.veilSummary':
+    'Он прячется, и вокруг венца встают четыре фигуры: Ваэль и три Туманные тени. Все четверо поют Гимн утопленников {seconds} сек., и с каждой секундой он ранит всех сильнее. Луч Туманного маяка проходит каждые {beam} сек.: настоящий Ваэль вспыхивает. Нанесите ему {share} его здоровья, чтобы разорвать завесу: он оглушён на {stun} сек. и получает на {vuln} больше урона {vulnSeconds} сек.',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    'Он прячется, и вокруг венца встают четыре фигуры: Ваэль и три Туманные тени, смещающиеся на одно место каждые {drift} сек. Все четверо поют Гимн утопленников {seconds} сек. Луч Туманного маяка показывает настоящего Ваэля. Нанесите ему {share} его здоровья, чтобы разорвать завесу: оглушение на {stun} сек. и на {vuln} больше получаемого урона {vulnSeconds} сек.',
+  'bossJournal.bastion.vael.veilResponse':
+    'Следите за лучом, затем все бьют только настоящего Ваэля.',
+  'bossJournal.bastion.vael.fogburstName': 'Туманный взрыв',
+  'bossJournal.bastion.vael.fogburstSummary':
+    'Любой удар по Туманной тени взрывает её: от {min} до {max} урона и оглушение на {stun} сек. игрокам в радиусе {radius} м от неё.',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    'Любой удар по Туманной тени взрывает её: от {min} до {max} урона и оглушение на {stun} сек. игрокам в радиусе {radius} м от неё, а на её месте встаёт утопший раб.',
+  'bossJournal.bastion.vael.fogburstResponse': 'Не бейте копию: дождитесь луча.',
+  'bossJournal.bastion.vael.tipTank':
+    'Подбирайте утопших рабов. Во время завесы помогите найти настоящего Ваэля.',
+  'bossJournal.bastion.vael.tipHealer':
+    'Гимн утопленников усиливается для всех, пока завеса не будет разорвана. Туманный прилив бьёт всех в радиусе {radius} м от него.',
+  'bossJournal.bastion.vael.tipDamage':
+    'С Меткой смерти выйдите вперёд или встаньте за лужу. Во время завесы бейте только фигуру, которую освещает луч.',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    'С Меткой смерти выйдите вперёд или встаньте за лужу и избегайте старых луж. Во время завесы бейте только фигуру, которую освещает луч.',
+  'bossJournal.bastion.vael.choiceName': 'Ждать луча или гадать?',
+  'bossJournal.bastion.vael.choiceGain':
+    'Если ждать луча, каждый удар достаётся настоящему Ваэлю, и завеса рвётся быстрее.',
+  'bossJournal.bastion.vael.choiceRisk':
+    'С каждой секундой завесы гимн ранит сильнее. Ошибка взрывает копию: урон и оглушение вокруг неё.',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    'С каждой секундой завесы гимн ранит сильнее. Ошибка взрывает копию, оглушая игроков рядом, и оставляет утопшего раба.',
+  'bossJournal.bastion.vael.heroicGrave':
+    'Могильная тень: каждая теневая лужа продолжает гореть {seconds} сек.',
+  'bossJournal.bastion.vael.heroicVeil':
+    'Во время завесы фигуры смещаются каждые {drift} сек., а взорванная копия оставляет утопшего раба.',
+  'bossJournal.temple.selthe.overview':
+    'Матерь хора поёт из своего бассейна, никогда не двигается и не бьёт в ближнем бою. Она помечает игроков для общего Хора и одинокого Соло, выпускает в одного игрока луч нарастающей арии и посылает волну через весь двор. Её стрелы и ария прерываются.',
+  'bossJournal.temple.selthe.phaseName': 'Двор хора',
+  'bossJournal.temple.selthe.phaseSummary':
+    'Одна фаза, все способности по таймерам. Если время способности наступило во время каста, она ждёт его окончания.',
+  'bossJournal.temple.selthe.chorusName': 'Хор',
+  'bossJournal.temple.selthe.chorusSummary':
+    'Каждые {every} сек. метка на {mark} сек. ложится на игрока, который не танк. По окончании {total} урона делится поровну между всеми в радиусе {radius} м от него.',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    'Каждые {every} сек. метка на {mark} сек. ложится на игрока, который не танк. По окончании {total} урона делится поровну между всеми в радиусе {radius} м от него. Эхо: через {echo} сек. то же место взрывается снова и наносит {echoDamage} каждому, кто там остался, без разделения.',
+  'bossJournal.temple.selthe.chorusResponse':
+    'Все собираются у игрока с Хором, затем покидают место до Эха.',
+  'bossJournal.temple.selthe.soloSummary':
+    'Через {offset} сек. после каждого Хора метка на {mark} сек. ложится на другого игрока. По окончании отмеченный игрок и все в радиусе {radius} м получают по {damage} урона.',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    'Дуэт: Соло приходит одновременно с Хором, на другого игрока. По окончании отмеченный игрок и все в радиусе {radius} м получают по {damage}, а через {echo} сек. то же место взрывается снова.',
+  'bossJournal.temple.selthe.soloResponse': 'Игрок с Соло отходит от всех, затем покидает место.',
+  'bossJournal.temple.selthe.songSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона от холода каждому игроку во дворе.',
+  'bossJournal.temple.selthe.songResponse': 'Избежать нельзя: лекари держат всем здоровье полным.',
+  'bossJournal.temple.selthe.boltSummary':
+    'Её основная атака: заклинание {cast} сек. по цели, урон от холода в {mult} раза больше её удара в ближнем бою. После любого прерывания она не использует ни стрелу, ни арию в течение {quiet} сек.',
+  'bossJournal.temple.selthe.boltResponse': 'Прерывайте стрелы, когда ария не готовится.',
+  'bossJournal.temple.selthe.ariaSummary':
+    'Каждые {every} сек. она {channel} сек. направляет луч в игрока, который не танк: {pulses} импульсов, растущих от {min} до {max} по одной и той же цели. Игрок, шагнувший в луч, принимает импульс на себя, и нарастание начинается заново.',
+  'bossJournal.temple.selthe.ariaResponse':
+    'Прервите её, разорвите линию видимости за колонной с лампой или шагните в луч, чтобы разделить урон.',
+  'bossJournal.temple.selthe.surgeSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по игроку, который не танк, затем волна в секторе {arc} градусов длиной {range} м: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.temple.selthe.surgeResponse': 'Шагните в сторону из сектора.',
+  'bossJournal.temple.selthe.tipTank':
+    'Стойте там, где она вас видит, чтобы стрелы летели в вас. Больше здесь танку делать нечего.',
+  'bossJournal.temple.selthe.tipHealer':
+    'Песнь моря бьёт по всем каждые {every} сек. Следите за целью арии и за теми, кого Хор застал в одиночку.',
+  'bossJournal.temple.selthe.tipDamage':
+    'Собирайтесь на Хор, расходитесь на Соло, прерывайте арию и уходите из Вала из озера.',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    'Собирайтесь на Хор и одновременно расходитесь на Соло, затем покиньте оба места до Эха. Прерывайте арию.',
+  'bossJournal.temple.selthe.choiceName': 'Прервать арию или принять её на себя?',
+  'bossJournal.temple.selthe.choiceGain':
+    'Прерывание или колонна обрывают луч сразу. Шаг в луч заново запускает нарастание уже на вас.',
+  'bossJournal.temple.selthe.choiceRisk':
+    'Прерванная ария на время глушит и её стрелы, но если никто не среагирует, всё нарастание достанется одному игроку.',
+  'bossJournal.temple.selthe.heroicDuet': 'Дуэт: Хор и Соло приходят одновременно на двух игроков.',
+  'bossJournal.temple.selthe.heroicEcho':
+    'Эхо: каждая метка взрывается снова в том же месте через {echo} сек.',
+  'bossJournal.temple.hydra.overview':
+    'Три головы с тремя стихиями делят один бой: лёд, яд и вода. Павшая голова передаёт свою атаку следующей и отрастает через {regrow} сек., пока жива другая. Волны по таймеру накрывают половину бассейна, а между волнами две головы сливают своё дыхание.',
+  'bossJournal.temple.hydra.phaseName': 'Бассейн гидры',
+  'bossJournal.temple.hydra.phaseSummary':
+    'Левая голова дышит льдом, средняя плюётся ядом, правая шлёт воду.',
+  'bossJournal.temple.hydra.phaseComboName': 'Слитое дыхание',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    'Через {after} сек. после каждой волны две головы сливаются, всегда в одном порядке: Скованный льдом поток, Ядовитое течение, Ядовитая изморозь.',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    'Через {early} сек. и {after} сек. после каждой волны две головы сливаются, в порядке: Скованный льдом поток, Ядовитое течение, Ядовитая изморозь.',
+  'bossJournal.temple.hydra.headsName': 'Три головы',
+  'bossJournal.temple.hydra.headsSummary':
+    'Павшая голова передаёт свою стихию следующей, а каждая живая голова наносит на {enrage} больше урона за каждую павшую. Павшая голова отрастает через {regrow} сек. со здоровьем {share}, пока жива другая голова.',
+  'bossJournal.temple.hydra.headsResponse':
+    'Убивайте все три головы вместе и добивайте их в течение {regrow} сек.',
+  'bossJournal.temple.hydra.breathSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по игроку, который не танк, затем ледяной конус {arc} градусов длиной {range} м: от {min} до {max} урона и замедление на {slow} на {seconds} сек.',
+  'bossJournal.temple.hydra.breathResponse': 'Выйдите из конуса.',
+  'bossJournal.temple.hydra.spitName': 'Ядовитый плевок',
+  'bossJournal.temple.hydra.spitSummary':
+    'Каждые {every} сек. до {count} лужиц радиусом {radius} м под разными игроками взрываются через {warn} сек.: от {min} до {max} урона, затем яд горит на этом месте {seconds} сек., нанося {perSecond} в секунду.',
+  'bossJournal.temple.hydra.spitResponse': 'Разойдитесь, затем выйдите из лужиц.',
+  'bossJournal.temple.hydra.torrentSummary':
+    'Каждые {every} сек. заклинание {cast} сек. направляет полосу длиной {length} м на игрока, который не танк: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.temple.hydra.torrentResponse': 'Шагните в сторону из полосы.',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    'Первая волна через {first} сек., затем через {every} сек. после окончания предыдущей: заклинание {cast} сек., пока головы получают на {reduction} меньше урона, затем волна накрывает половину бассейна: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    'Первая волна через {first} сек., затем через {every} сек. после окончания предыдущей: заклинание {cast} сек., пока головы получают на {reduction} меньше урона, затем волна накрывает половину бассейна: от {min} до {max} урона и отбрасывание. Откат волны: через {backwash} сек. она прокатывается по другой половине.',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    'Перейдите на другую половину, встаньте за колонну у края или за Ледяную стену. Не бейте головы, пока они под водой.',
+  'bossJournal.temple.hydra.frostlockSummary':
+    'Полоса, направленная на игрока: от {min} до {max} урона и заморозка на {stun} сек. Оставляет Ледяную стену на {wall} сек.: если стоять за ней не дальше {lee} м, она укроет от следующей волны, но волна её разобьёт.',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    'Полоса, направленная на игрока: от {min} до {max} урона и заморозка на {stun} сек. Оставляет Ледяную стену: если стоять за ней, она укроет от следующей волны. Когда стена разбивается, все в радиусе {reach} м от неё получают от {shardMin} до {shardMax}.',
+  'bossJournal.temple.hydra.frostlockResponse':
+    'Уклонитесь от полосы, затем используйте стену как укрытие от Цунами.',
+  'bossJournal.temple.hydra.currentSummary':
+    'Ядовитые лужи расширяются до {radius} м и скользят на {slide} м от центра бассейна, нанося {perSecond} в секунду.',
+  'bossJournal.temple.hydra.currentResponse': 'Отойдите в сторону с пути скольжения.',
+  'bossJournal.temple.hydra.rimeSummary':
+    'Ядовитые лужи замерзают в кристаллы, которые взрываются через {seconds} сек.: от {min} до {max} урона в радиусе {radius} м.',
+  'bossJournal.temple.hydra.rimeResponse': 'Отойдите от каждого кристалла до взрыва.',
+  'bossJournal.temple.hydra.tipTank':
+    'Держите те головы, до которых достаёте. Их атаки целятся в остальных.',
+  'bossJournal.temple.hydra.tipHealer':
+    'Цунами и слитое дыхание дают пики урона. Каждая павшая голова заставляет остальные бить сильнее.',
+  'bossJournal.temple.hydra.tipDamage':
+    'Распределяйте урон поровну, чтобы все три головы пали в пределах {regrow} сек. друг от друга. Прекращайте бить на время каждого Цунами.',
+  'bossJournal.temple.hydra.choiceName': 'Какую голову убить первой?',
+  'bossJournal.temple.hydra.choiceGain':
+    'Если убить все три вместе, бой заканчивается. Порядок не важен, если они падают почти одновременно.',
+  'bossJournal.temple.hydra.choiceRisk':
+    'Каждая павшая голова заставляет остальные наносить на {enrage} больше урона и отрастает через {regrow} сек., а последняя оставшаяся голова несёт все стихии.',
+  'bossJournal.temple.hydra.heroicChanges':
+    'Отросшая голова возвращается со здоровьем {share}, а каждая волна даёт откат.',
+  'bossJournal.temple.colossus.overview':
+    'Ходячий стеклянный великан. На трёх отметках здоровья каждый игрок получает зеркальную копию, которая его преследует. Свою копию бить нельзя, а каждая живая копия защищает Колосса щитом. Между этим: полосы, удары и пол, раскалывающийся по частям.',
+  'bossJournal.temple.colossus.phaseName': 'Призменная терраса',
+  'bossJournal.temple.colossus.phaseSummary':
+    'Он упирается ногами для каждого заклинания и никогда не покидает террасу.',
+  'bossJournal.temple.colossus.phaseFlareName': 'Вспышка призмы',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    'При здоровье {first}, {second} и {third} он призывает Отражения Приливного стекла.',
+  'bossJournal.temple.colossus.lanceSummary':
+    'Каждые {every} сек. заклинание {cast} сек. направляет полосу длиной {length} м на игрока, который не танк: от {min} до {max} урона.',
+  'bossJournal.temple.colossus.lanceResponse': 'Шагните в сторону из полосы.',
+  'bossJournal.temple.colossus.slamSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона и отбрасывание на {push} м в радиусе {radius} м.',
+  'bossJournal.temple.colossus.slamResponse':
+    'Бойцы ближнего боя могут отойти, лекари прикрывают танка.',
+  'bossJournal.temple.colossus.fractureSummary':
+    'Первый раз через {first} сек., затем каждые {every} сек.: пол раскалывается на {slices} частей на {rounds} раундов. В каждом раунде несколько частей краснеют и взрываются через {warn} сек.: от {min} до {max} урона. Центр взрывается каждый раунд.',
+  'bossJournal.temple.colossus.fractureResponse':
+    'В каждом раунде переходите на чистую часть пола и держитесь подальше от центра.',
+  'bossJournal.temple.colossus.flareSummary':
+    'Заклинание {cast} сек., затем каждый игрок получает Отражение Приливного стекла со здоровьем {share} от здоровья Колосса, которое его преследует. Своё Отражение бить нельзя.',
+  'bossJournal.temple.colossus.flareResponse': 'Убивайте Отражения друг друга, но никогда своё.',
+  'bossJournal.temple.colossus.wardName': 'Призменный оберег',
+  'bossJournal.temple.colossus.wardSummary':
+    'Каждое живое Отражение снижает урон, получаемый Колоссом, на {per}, максимум до {cap}.',
+  'bossJournal.temple.colossus.wardResponse': 'Уберите Отражения, затем вернитесь к Колоссу.',
+  'bossJournal.temple.colossus.shatterName': 'Разбивающееся стекло',
+  'bossJournal.temple.colossus.shatterSummary':
+    'Когда Отражение разбивается, все в радиусе {radius} м от него получают {damage} урона.',
+  'bossJournal.temple.colossus.shatterResponse':
+    'Не стойте рядом с Отражением, которое вот-вот умрёт.',
+  'bossJournal.temple.colossus.swapName': 'Обмен образами',
+  'bossJournal.temple.colossus.swapSummary':
+    'Каждые {every} сек. Отражения меняются владельцами, поэтому меняется и то, какую копию вы можете бить.',
+  'bossJournal.temple.colossus.swapResponse':
+    'После каждого обмена снова проверяйте, какую копию вы можете бить.',
+  'bossJournal.temple.colossus.tipTank':
+    'После каждой вспышки снова берите Колосса на себя: он идёт за своей целью.',
+  'bossJournal.temple.colossus.tipHealer':
+    'Отражения бьют своих владельцев. Трещина Приливного стекла наказывает тех, кто остался на красной части пола.',
+  'bossJournal.temple.colossus.tipDamage':
+    'На каждой вспышке убивайте Отражение товарища, затем переходите с части на часть во время Трещины.',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    'На каждой вспышке убивайте Отражение товарища, после обмена проверяйте снова. Не стойте у умирающей копии.',
+  'bossJournal.temple.colossus.choiceName': 'Убивать Отражения или Колосса?',
+  'bossJournal.temple.colossus.choiceGain':
+    'Убийство копий снимает до {cap} снижения урона и прекращает их преследование.',
+  'bossJournal.temple.colossus.choiceRisk':
+    'Время на копии это время не на Колосса, а в героическом режиме каждая копия взрывается при разрушении.',
+  'bossJournal.temple.colossus.heroicShatter':
+    'Разбивающееся стекло: разрушающееся Отражение ранит всех в радиусе {radius} м.',
+  'bossJournal.temple.colossus.heroicSwap':
+    'Обмен образами: Отражения меняются владельцами каждые {every} сек.',
+  'bossJournal.temple.ysolei.overview':
+    'Воплощение Утонувшей луны затягивает всех к себе и бьёт, затопляет половину своего острова, призывает Лунное отродье и катит на себя Слёзы лунного света. В конце луна падает, если группа не успеет разбить её оберег.',
+  'bossJournal.temple.ysolei.phaseAltarName': 'Лунный алтарь',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    'Она никогда не двигается. Радиус её атак большой: бойцы ближнего боя стоят далеко от её центра.',
+  'bossJournal.temple.ysolei.phaseTideName': 'Прилив',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    'При здоровье {health} половина острова затопляется, а затем затопление переходит на другую сторону.',
+  'bossJournal.temple.ysolei.phaseMoonSummary': 'При здоровье {health} она обрушивает луну.',
+  'bossJournal.temple.ysolei.lunarSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона всем в радиусе {radius} м от её центра.',
+  'bossJournal.temple.ysolei.lunarResponse':
+    'Дальнобойные остаются снаружи. Ближний бой всегда в зоне, поэтому лекари прикрывают его.',
+  'bossJournal.temple.ysolei.undertowSummary':
+    'Каждые {every} сек. она {seconds} сек. притягивает всех к себе со скоростью {pull} м в секунду. Затем Приливный удар: от {min} до {max} урона в радиусе {radius} м.',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    'Каждые {every} сек. она {seconds} сек. притягивает всех к себе. Затем Приливный удар: от {min} до {max} урона в радиусе {radius} м. Разрывное течение: на месте каждого игрока открывается лужа, которая горит {pool} сек., нанося {riptide} в секунду.',
+  'bossJournal.temple.ysolei.undertowResponse':
+    'Все, включая ближний бой, во время канала бегут к сухой земле. Вода затопления замедляет.',
+  'bossJournal.temple.ysolei.tearsSummary':
+    'При здоровье {first} и {second} она призывает {count} Слёз лунного света, катящихся к ней. Слеза, коснувшаяся игрока, останавливается: от {min} до {max} урона плюс {bonus} за каждый заряд Лунного ожога, который длится {sear} сек. Слеза, достигшая её, даёт ей на {swell} больше урона до конца боя и лечит её на {heal}.',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    'При здоровье {first} и {second} она призывает {count} Слёз лунного света, катящихся к ней. Слеза, коснувшаяся игрока, останавливается: от {min} до {max} урона плюс {bonus} за каждый заряд Лунного ожога и оставляет Пролитый лунный свет, горящий с уроном {glow} в секунду. Слеза, достигшая её, даёт ей на {swell} больше урона и лечит её на {heal}.',
+  'bossJournal.temple.ysolei.tearsResponse':
+    'Закрывайте собой каждую слезу, сменяя друг друга, чтобы ни у кого не накопился Лунный ожог.',
+  'bossJournal.temple.ysolei.tideName': 'Прилив',
+  'bossJournal.temple.ysolei.tideSummary':
+    'При здоровье {health} половина острова затопляется сразу. Каждые {every} сек. затопление переходит на другую сторону, а перед этим {warn} сек. мерцает вода. В воде: {perSecond} урона в секунду и замедление на {slow}.',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    'При здоровье {health} половина острова затопляется сразу. Каждые {every} сек. затопление переходит на другую сторону. В воде: {perSecond} урона в секунду и замедление на {slow}. Утонувшая луна: каждые {moonEvery} сек. из затопленной половины выбирается Лунное отродье.',
+  'bossJournal.temple.ysolei.tideResponse':
+    'Оставайтесь на сухой половине и переходите, когда мерцает другая.',
+  'bossJournal.temple.ysolei.callSummary':
+    'При здоровье {first} и {second} она призывает {count} Лунного отродья.',
+  'bossJournal.temple.ysolei.callResponse': 'Танк берёт их на себя, бойцы убивают.',
+  'bossJournal.temple.ysolei.moonSummary':
+    'Заклинание {cast} сек. под оберегом, равным {ward} её здоровья. Успейте разбить оберег: она оглушена на {stun} сек. и получает на {vuln} больше урона. Если оберег выдержит: от {min} до {max} урона всем на острове, и до конца боя она наносит на {might} больше урона.',
+  'bossJournal.temple.ysolei.moonResponse': 'Все бойцы бьют её оберег, лекари готовятся к удару.',
+  'bossJournal.temple.ysolei.tipTank':
+    'Берите на себя всё Лунное отродье. Бегите из Отбойного течения вместе со всеми.',
+  'bossJournal.temple.ysolei.tipHealer':
+    'Лунный прилив бьёт ближний бой при каждом касте. Слёзы накладывают Лунный ожог: лечите того, кто закрыл слезу.',
+  'bossJournal.temple.ysolei.tipDamage':
+    'Бегите из каждого Отбойного течения, по очереди закрывайте слёзы, убивайте Лунное отродье и сбивайте оберег Падающей луны.',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    'Бегите из каждого Отбойного течения и его луж Разрывного течения, по очереди закрывайте слёзы, убивайте Лунное отродье и быстро сбивайте оберег Падающей луны.',
+  'bossJournal.temple.ysolei.choiceName': 'Закрывать слёзы или пропускать?',
+  'bossJournal.temple.ysolei.choiceGain':
+    'Закрытая слеза не достигает её: нет прибавки {swell} к урону и нет лечения на {heal}.',
+  'bossJournal.temple.ysolei.choiceRisk':
+    'Закрывший получает удар и заряд Лунного ожога: следующая слеза, попавшая в него, бьёт на {bonus} сильнее. Сменяйте друг друга.',
+  'bossJournal.temple.ysolei.heroicRiptide':
+    'Разрывное течение: после каждого Отбойного течения на месте игроков остаются горящие лужи.',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    'Утонувшая луна: каждые {moonEvery} сек. из потока выбирается Лунное отродье.',
+  'bossJournal.temple.ysolei.heroicTears':
+    '{count} слёз за волну, а каст Падающей луны длится {cast} сек.',
 };

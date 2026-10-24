@@ -1,15 +1,15 @@
 # Permanent loot quality
 
-An enemy-dropped equipment copy can have a permanent quality above Ordinary.
+A newly earned equipment copy can have a permanent quality above Ordinary.
 Quality is independent of its green, blue, purple or orange item rarity. It does
 not change the item's identity, artwork, binding rules, required level or effects.
 
 ## Eligibility and rates
 
 Only uncommon-or-better weapons, armor and held offhands with an equipment slot
-qualify. Jewelry is included. Roll after the enemy's ordinary loot table and
-difficulty selection have selected an item, before anyone can inspect or claim
-the copy. A stack of equipment rolls once per copy. Quality does not increase
+qualify. Jewelry is included. An enemy drop rolls after the enemy's ordinary loot
+table and difficulty selection have selected an item, before anyone can inspect
+or claim the copy; a chest, cache or reward rolls when its copy is granted. A stack of equipment rolls once per copy. Quality does not increase
 the number of items dropped or their underlying drop chance.
 
 | Quality | Badge | Added item levels | Chance per eligible copy |
@@ -22,9 +22,17 @@ the number of items dropped or their underlying drop chance.
 
 These are mutually exclusive outcomes, with the same rates for every eligible
 source. Outdoor enemies, dungeon and raid enemies, world bosses and Rift enemy
-rewards use this rule. Quest rewards, quest-specific drops, vendor purchases,
-profession creation and generic item grants do not. Materials, tools, bags,
-currency and consumables cannot qualify. An enemy-dropped copy of an item also
+rewards use this rule (`src/sim/loot/enemy_quality.ts`). So does every other
+place a reward copy first enters the world (`src/sim/loot/fresh_quality_grant.ts`):
+profession creation (each copy of a craft, alongside its signer, masterwork,
+Perfecting or commission payload), quest and world-quest rewards, weekly vault
+choices, emissary caches, treasure caskets, delve and Rift chests, and the
+Buried Hoard (treasure vault) parcel. The hoard rolls its gear piece's quality
+last in the parcel roll and freezes it into the durable claim, so a retried,
+offline or mailed delivery grants the same copy. Vendor purchases (gold, Marks
+or other currency), quest-specific drops, dev grants and every transfer (mail,
+trade, bank, buyback, market escrow) do not roll. Materials, tools, bags,
+currency and consumables cannot qualify. A looted or crafted copy of an item also
 sold by a vendor can qualify; the vendor's copies remain Ordinary.
 
 ## Power and variation
@@ -91,4 +99,6 @@ older Rift sanitizers: the prior binary rebuilds a band without this descriptor
 and would permanently strip its quality on load/save. A rollback or mixed-version
 deployment requires a preservation-only compatibility patch on that older binary.
 Compatibility with ordinary existing saves does not imply that older binaries
-can safely rewrite newly enhanced items.
+can safely rewrite newly enhanced items. The same holds for Buried Hoard claims:
+a binary from before release/v0.45.0 delivers a pending enhanced hoard piece as
+the Ordinary copy, because it ignores the claim line's descriptor.

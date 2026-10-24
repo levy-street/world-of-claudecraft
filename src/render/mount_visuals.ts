@@ -88,6 +88,20 @@ export interface MountRideSpec {
   /** Extra chest pitch ON TOP of the clip, positive = forward. Additive, so
    *  the torso keeps breathing with the seated loop. */
   lean?: number;
+  /** The shin's own outward opening, when it should hang closer to vertical than
+   *  the thigh: a rider astride a broad barrel opens the thighs wide over it and
+   *  lets the shins fall down its flanks. Defaults to `spread`. */
+  shinSpread?: number;
+  /** Take up the reins: the arms reach forward and down so both fists meet low
+   *  over the pommel (characters/ride_pose.ts), instead of the seated loop's
+   *  fists-on-knees. Yields to any attack or cast the rider plays. */
+  reins?: boolean;
+  /** Optional left-side upper-arm target quaternion [x, y, z, w] (y and z
+   *  mirrored on the right arm), overriding the seated clip's flared elbows. */
+  upperArm?: readonly [number, number, number, number];
+  /** Optional left-side forearm target quaternion [x, y, z, w] (y and z
+   *  mirrored on the right arm), placing the hands on a saddle horn or pommel. */
+  lowerArm?: readonly [number, number, number, number];
 }
 
 /** A seat carried on the mount's own skeleton, for mounts whose saddle MOVES
@@ -101,6 +115,16 @@ export interface MountSeatSpec {
   /** Where the rider's ROOT sits in that bone's local space, in MODEL units, so
    *  it survives any `height` the manifest normalizes the mount to. */
   offset: readonly [number, number, number];
+}
+
+/** Embers a lantern-bearing mount sheds (src/render/mount_embers.ts): sparks kicked off
+ *  each hoof as it strikes at a run, and cinders shaken from its lanterns. Cosmetic only. */
+export interface MountEmberSpec {
+  /** Hoof-tip bones, by the RUNTIME node name (GLTFLoader strips '.', so the GLB's
+   *  `toes_01.l_011` is `toes_01l_011` here). */
+  hooves: readonly string[];
+  /** Lantern bones whose glass sheds cinders (the same bones and offsets as `lamps`). */
+  lanterns: readonly { bone: string; offset: readonly [number, number, number] }[];
 }
 
 export interface MountVisualSpec {
@@ -131,7 +155,12 @@ export interface MountVisualSpec {
   bobShape: 'hover' | 'hop';
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
-  fx: 'slime' | 'exhaust' | 'pipes' | null;
+  fx: 'slime' | 'exhaust' | 'pipes' | 'embers' | null;
+  /** The ember sources for fx 'embers' (null for every other mount). */
+  embers: MountEmberSpec | null;
+  /** The burst when the mount is summoned: the shared shimmer every mount throws, or the
+   *  lantern-light burst of a mount that carries its own fire. */
+  summonFx: 'shimmer' | 'lanternBurst';
   /** Lit lamps carried on the rig (empty for every mount that carries none). */
   lamps: readonly MountLampSpec[];
   /** Seat bone the rider is anchored to, or null to sit at the fixed `seat`
@@ -142,6 +171,9 @@ export interface MountVisualSpec {
   glows: readonly MountGlowSpec[];
   /** Straddle pose for the rider, or null to keep the plain seated loop. */
   ride: MountRideSpec | null;
+  /** Rears up on a standing jump (mount_rear_core.ts): the mount's flourish clip plays and the
+   *  in-place hop is held to the ground. False for every mount without a rear clip. */
+  rear: boolean;
 }
 
 const spec = (
@@ -150,7 +182,7 @@ const spec = (
   rigged: boolean,
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
-  fx: 'slime' | 'exhaust' | 'pipes' | null = null,
+  fx: 'slime' | 'exhaust' | 'pipes' | 'embers' | null = null,
   lamps: readonly MountLampSpec[] = [],
   seatBone: MountSeatSpec | null = null,
   // Two rarely-set fields ride an options bag rather than extending an already
@@ -161,6 +193,9 @@ const spec = (
     ride?: MountRideSpec;
     jumpTips?: boolean;
     groundLift?: number;
+    embers?: MountEmberSpec;
+    summonFx?: 'shimmer' | 'lanternBurst';
+    rear?: boolean;
   } = {},
 ): MountVisualSpec => ({
   visualKey,
@@ -173,11 +208,14 @@ const spec = (
   bobIdle: bob?.idle ?? false,
   bobShape: bob?.shape ?? 'hop',
   fx,
+  embers: extra.embers ?? null,
+  summonFx: extra.summonFx ?? 'shimmer',
   lamps,
   seatBone,
   glows: extra.glows ?? [],
   ride: extra.ride ?? null,
   jumpTips: extra.jumpTips ?? false,
+  rear: extra.rear ?? false,
 });
 
 // The Lanternback's two storm lanterns. Each hangs from the TOP of its chain
@@ -251,6 +289,43 @@ const LENS_GLOW = {
   radius: LENS_GLOW_RADIUS,
 } as const;
 
+// Lantern Hall's destrier carries two storm lanterns on swinging bones hung from crooks behind
+// the saddle. Measured off the rest bones by the build (build_steed.py report_spec_offsets):
+// each bone runs straight down from its hook, the glass centre 0.195 model units along it.
+const DESTRIER_LANTERN_OFFSET = [0, 0.195, 0] as const;
+const DESTRIER_LANTERN_BONES = ['lantern_l', 'lantern_r'] as const;
+/** A storm lantern on a war horse: hotter than the troll's flame, because these two lanterns
+ *  are the destrier's whole identity at night and hang low, at a rider's hip, so they have to
+ *  pool real light on the road and the barding around them; still a touch tighter than the
+ *  troll's reach, which hangs its pair off a throne on a 7-unit creature. */
+const DESTRIER_LAMP = { intensity: 10, distance: 15 } as const;
+/** The halo on each lantern's glass: a flame, so it breathes faster and deeper than the
+ *  tortoise's enchanted lenses, and wide enough to read as a burning lantern from a distance.
+ *  Radius in model units against a 0.05-unit glass. */
+const DESTRIER_LANTERN_GLOW = {
+  color: MOUNT_LAMP_COLOR,
+  opacity: 1,
+  pulse: 0.34,
+  pulseHz: 1.6,
+  radius: 0.2,
+} as const;
+
+// The Drakemaw Raptor's rider rides its `Saddle` bone (scripts/assets/drakemaw_raptor/):
+// the saddle is rigid on the hips, and the hips bob through the sprint's two
+// flights a stride, pitch into the jump and drop into the landing, so a fixed
+// seat would leave the rider floating clear of the saddle or sunk into it. The
+// bone sits at the front of the saddle's dish, where the seat starts up toward
+// the pommel; the offset (model units, normScale 1, the model's own axes)
+// carries the rider's root back so the plain seated loop rests them on the flat
+// of the dish, a centimetre or two over the leather on either body
+// (tests/drakemaw_raptor_mount.test.ts pins the clearance). The spec's `seat`
+// and `seatFwd` restate where that root rides at the Idle's sizing frame, so
+// the nameplate, chat bubble and click box sit over the rider's real head, and
+// a missing bone falls back to the same seat. The old fixed seat (2.35 up, 0.1
+// toward the tail) left the rider 0.24 above the dish and 0.66 behind it,
+// perched on the cantle.
+const RAPTOR_SEAT: MountSeatSpec = { bone: 'Saddle', offset: [0, -0.2449, 0.1713] };
+
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // seat tuned to the authored horse model: its saddle sits forward of the
   // origin and lower than the old Tripo build, so the rider shifts toward the
@@ -278,9 +353,29 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // on the authored cushion when parked.
 
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
-  // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
-  // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
-  drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  referral_tank: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
+  referral_raptor: spec(
+    'mount_drakemaw_raptor',
+    2.06,
+    true,
+    undefined,
+    0.48,
+    null,
+    [],
+    RAPTOR_SEAT,
+  ),
+  // The Drakemaw Raptor: the rider sits the saddle's dish over its hips, behind
+  // the neck spines, in the plain seated loop (RAPTOR_SEAT).
+  drakemaw_raptor: spec(
+    'mount_drakemaw_raptor',
+    2.06,
+    true,
+    undefined,
+    0.48,
+    null,
+    [],
+    RAPTOR_SEAT,
+  ),
   // The authored saddle is over the hips. The mount ships at 120% of its
   // initial world fit, so the world-space socket offsets scale with it and
   // keep the rider on the same authored point of the saddle.
@@ -293,6 +388,58 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // the rider exactly; a seat bone here would buy sub-millimetre motion and pay
   // a per-frame matrix decompose for it.
   avian_strider: spec('mount_avian_strider', 2.62, true, undefined, 0.2),
+  // Lantern Hall's destrier, at 4.25 (the riding horse is 3.8): its rest height is 1.77 model
+  // units and the saddle top 1.227 over the hooves (build_steed.py prints both), so the seat
+  // sits just under 4.25 / 1.77 * 1.226 and a hair over the horse's own forward shift. The rider
+  // straddles a broad barded barrel: thighs opened wide over it, shins falling down its flanks
+  // past the saddle skirts, toes forward toward the stirrups, both hands on the reins.
+  lantern_hall_destrier: spec(
+    'mount_lantern_hall_destrier',
+    2.92,
+    true,
+    undefined,
+    0.12,
+    'embers',
+    DESTRIER_LANTERN_BONES.map((bone) => ({
+      bone,
+      offset: DESTRIER_LANTERN_OFFSET,
+      ...DESTRIER_LAMP,
+    })),
+    // The saddle bone (build_steed.py): it stands straight up out of the seat on the spine,
+    // so the rider rides the back through every bob and pitch of the gallop instead of
+    // holding a fixed lift the back rises through. `seat`/`seatFwd` above stay the fallback
+    // and the nameplate anchor; measured in game, the fixed seat sits on this bone's head.
+    { bone: 'saddle', offset: [0, -0.02, 0] },
+    {
+      glows: DESTRIER_LANTERN_BONES.map((bone) => ({
+        bone,
+        offset: DESTRIER_LANTERN_OFFSET,
+        ...DESTRIER_LANTERN_GLOW,
+      })),
+      ride: {
+        spread: 0.72,
+        thigh: 0.3,
+        knee: 0.22,
+        shinSpread: 0.38,
+        ankle: 0.2,
+        hips: -0.05,
+        reins: true,
+      },
+      embers: {
+        hooves: [
+          'toes_01l_011',
+          'toes_01r_018',
+          'toes_01_dupli_001l_046',
+          'toes_01_dupli_001r_054',
+        ],
+        lanterns: DESTRIER_LANTERN_BONES.map((bone) => ({ bone, offset: DESTRIER_LANTERN_OFFSET })),
+      },
+      summonFx: 'lanternBurst',
+      // a standing jump rears him onto his hind legs with a whinny (the clip is 'Rear',
+      // the manifest's flourish; the take is mount_neigh_lantern_hall_destrier)
+      rear: true,
+    },
+  ),
   // The Lanternback Troll: the rider sits IN the iron throne strapped across
   // his shoulders, not astride a back, so the seat is high and set BEHIND the
   // model origin. `seat`/`seatFwd` here are only the FALLBACK and the anchor the
@@ -318,6 +465,46 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     // rider's root rides a hair above the pan so the sit pose's hips carry his
     // weight onto it.
     { bone: 'chair', offset: [0, 0.918, 0.25] },
+  ),
+  // Wobbles the Slime (docs/design/slime-mount). The jelly squashes, leans and
+  // hops under the rider in every clip, so the rider rides the `saddle` bone,
+  // which carries the seat rigidly over the wobble. Offset measured in Blender:
+  // the seat's low point sits 0.19 model units above the bone head, centred
+  // between pommel and cantle, and the rider's root rides a hair above it.
+  // `seat` is the fallback at the manifest height 4.0 (seat 5.53 of 6.61 model
+  // units). No slime trail: it hops, so a continuous smear behind it reads wrong.
+  wobbles_slime: spec('mount_wobbles_slime', 3.35, true, undefined, 0, null, [], {
+    bone: 'saddle',
+    offset: [0, 0.22, 0],
+  }),
+  // The Nightwing Chimaera: rider sits in the saddle nestled between the base
+  // of the two dragon necks. Anchoring to `saddle` carries the rider smoothly
+  // from the perched bipedal idle up into the airborne flight pose when moving.
+  // The WOC modular player body's thigh rest is a half-turn about Z (not X as on
+  // KayKit), and the thighs/shins are held nearly parallel (spread = pi - 0.032)
+  // and pitched forward (thigh = pi - 1.08) so both legs stay separated and run
+  // cleanly down the central channel between the two necks without colliding at
+  // the boots or clipping into the necks.
+  nightwing_chimera: spec(
+    'mount_nightwing_chimera',
+    3.61,
+    true,
+    undefined,
+    0.4,
+    null,
+    [],
+    { bone: 'saddle', offset: [0, -0.022, 0.068] },
+    {
+      ride: {
+        spread: 3.11,
+        thigh: 2.062,
+        knee: -1.02,
+        ankle: 0.85,
+        hips: -0.04,
+        upperArm: [0.3201, 0.1239, -0.6185, 0.7069],
+        lowerArm: [0.3042, 0.4618, 0.0173, 0.833],
+      },
+    },
   ),
 };
 
@@ -471,6 +658,13 @@ export function mountVisualSpecFor(
   return MOUNT_VISUAL_SPECS[mountKey as MountKey];
 }
 
+/** The summon burst for what a mount PRESENTS as (mountPresentationKey: a worn skin's id or
+ *  the mount key); '' (a dismount) and anything unknown throw the shared shimmer. */
+export function mountSummonFx(look: string): MountVisualSpec['summonFx'] {
+  if (isMountSkinId(look)) return MOUNT_SKIN_VISUAL_SPECS[look].summonFx;
+  return look in MOUNTS ? MOUNT_VISUAL_SPECS[look as MountKey].summonFx : 'shimmer';
+}
+
 /** World-unit rider lift for what the mount presents as ('' or unknown: 0). */
 export function mountSeatLiftFor(mountKey: string, mountSkinId: string | null | undefined): number {
   return mountVisualSpecFor(mountKey, mountSkinId)?.seat ?? 0;
@@ -493,6 +687,19 @@ export function mountLampFlicker(timeSec: number, index: number): number {
   const a = Math.sin(timeSec * 7.3 + phase);
   const b = Math.sin(timeSec * 11.9 + phase * 1.7);
   return 0.96 + 0.12 * a + 0.06 * b;
+}
+
+/**
+ * The lanterns' flare on a summon, as a multiplier on a lamp's level: the burst the destrier
+ * arrives in (summonFx 'lanternBurst') is LIGHT, not only sparks, so its lamps open at more
+ * than three times their burning level and settle back over about a second and a half.
+ * `ageSec` is the time since the summon edge; a lamp that was never summoned (a rider already
+ * mounted when he came into view) passes Infinity and burns at its plain level. Pure and
+ * allocation-free like the flicker, so tests/mount_visuals.test.ts can pin the curve.
+ */
+export function mountLampSummonFlare(ageSec: number): number {
+  if (!(ageSec >= 0) || ageSec >= 2.5) return 1;
+  return 1 + 2.4 * Math.exp(-ageSec * 2.2);
 }
 
 /**

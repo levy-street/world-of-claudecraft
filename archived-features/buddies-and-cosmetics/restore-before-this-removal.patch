@@ -1,0 +1,4290 @@
+diff --git a/docs/design/buddy-acquisition.md b/docs/design/buddy-acquisition.md
+--- a/docs/design/buddy-acquisition.md
++++ b/docs/design/buddy-acquisition.md
+@@ -1,61 +1,95 @@
+-# Buddy companions: acquisition
++# Buddy companions: acquisition and cosmetics
+ 
+-The active roster is Horse, Crystal Lich and Forgemaw The Molten. Buddies are
+-non-combat followers, owned per character. Hunting (Shift+C) lists them with
+-Summon/Dismiss and their acquisition sources. The list has no category filters
+-or alternate-look controls.
++Status: the active roster is Horse, Sapling, Crystal Lich and Forgemaw The Molten.
++Content rates are placeholders marked CALIBRATE in the tables.
+ 
+-## Obtaining the remaining buddies
++## The shape
+ 
+-| Buddy | Normal gameplay source | Chance per eligible player |
++Buddies are rare. They are the culmination of hard work or a rare reward for a
++challenging fight. Mounts already fill the "cosmetic you can buy or farm in a
++dozen ways" space; buddies fill a different one, so a companion is never bag
++loot and never a gold vendor row.
++
++A companion **attaches to the character**: ownership is the per-character
++collection (`PlayerMeta.buddies`, persisted as `CharacterState.buddies`), never
++an item in a bag. Nothing about a companion trades, mails, lists or sells.
++
++Acquisition is authored in `src/sim/content/buddy_sources.ts`:
++
++1. **Boss pets** (`BUDDY_BOSS_DROPS`). A boss kill rolls once per eligible
++   player, independently, at very low odds (per-player chance, a heroic rate,
++   and an optional heroic-only gate). Nobody loses a roll to a party member.
++   A win does not drop an item: the companion attaches as a *pending* buddy,
++   the player reads a per-companion "presence" line in chat, and the buddy
++   reveals itself (owned, announced, summoned) when they walk out of the
++   instance or `BUDDY_WORLD_REVEAL_DISTANCE` away from a world boss. Logging
++   out with a pending companion is safe: it reveals at the next join.
++Crystal Lich comes from Nythraxis; Forgemaw comes from the heroic Crucible
++bosses. Horse and Sapling have no acquisition source yet. The deed reward
++table is empty, and no vendor sells a companion.
++
++### Grant tokens
++
++The whistle items survive only as **grant tokens**: soulbound, consumed on use,
++attaching the companion. No loot table lists one. A duplicate token is refused
++unconsumed. They are the channel a vendor, a letter or an admin grant uses to
++hand a companion over, and the reason `/dev give whistle_<key>` still works.
++
++Historical whistles and cosmetic charms remain readable in existing inventories,
++but tokens for removed companions or looks cannot be used and are not consumed.
++Their vendor and crafting sources are removed. Saved companion collections are
++normalized through the active catalogs, discarding removed ownership, pending
++rewards, equipped looks and last-summoned keys on load.
++
++## Cosmetics ("looks")
++
++A look is a per-character unlock (`buddies.cosmetics`), one of which can be
++worn per buddy (`buddies.equipped`). The only kind today is a tint: the worn
++dye replaces the follower entity's color, which the existing entity-tint
++render path already honors (`tint: 'entity'` rigs take it outright; the
++baked-texture buddy rigs opt in with `tint: 'cosmetic'`, which leaves the
++authored look alone until a cosmetic dyes it). Catalog:
++`src/sim/content/buddy_cosmetics.ts`.
++
++Sources, all derived for the Hunting window:
++
++| Source | Table | Mechanism |
+ |---|---|---|
+-| Horse | No authored acquisition source yet | Not available through ordinary gameplay |
+-| Crystal Lich | Defeat Nythraxis, Scourge of Thornpeak | 0.5% normal, 1% heroic |
+-| Forgemaw The Molten | Defeat Ignivar or Varkhul in the heroic Crucible | 1% from either boss; no normal-mode drop |
++| Challenge | `BUDDY_COSMETIC_CHALLENGES` | Resolved at the boss's death for every credited player (`src/sim/buddy_challenges.ts`). `speed`: kill within N seconds of the attempt's first damage. `dps`: the player's own damage on the boss over the attempt meets a rate. Both re-arm on evade or respawn. |
+ 
+-The rates in `src/sim/content/buddy_sources.ts` are design placeholders marked
+-CALIBRATE. Rolls are independent per eligible player, using the nearby kill-credit
+-roster. A successful boss roll creates a pending companion, rather than an item.
+-A chat presence line signals the win; leaving the instance reveals, collects and
+-summons it. Pending rewards persist across logout.
++The active looks are Frostbound and Voltaic for Crystal Lich, and Ashen and
++White-Hot for Forgemaw. Deed and seasonal cosmetic reward tables are empty;
++there are no live cosmetic token recipes or vendor rows.
+ 
+-There are no companion vendors or deed rewards in the active tables.
++## The seasonal award channel
+ 
+-## Local testing and admin grants
++Monthly PvP-ladder, top-parse-per-boss-and-spec and zodiac/gemstone awards are
++decided outside the game (the ladder, the parse service). They land through
++`POST /admin/api/moderation/characters/:id/grant-buddy` with `{ buddyKey }` or
++`{ cosmeticId }` plus a reason (permission `moderation.act`, audited as
++`grant_buddy`). An online target takes the sim's grant path at once; an
++offline target is queued in `character_buddy_grants` and drained at the next
++join (`server/buddy_wire.ts`). Zodiac pets and gemstone looks are content
++records added to the two catalogs as each month's award is authored.
+ 
+-With developer commands enabled, enter `/dev buddies` in chat to collect all
+-remaining buddies immediately. Open Hunting with Shift+C and choose Summon.
++## Player surfaces
+ 
+-To grant one at a time, enter one of these commands and use the resulting whistle
+-from the inventory:
++- Hunting window (Shift+C): one flat buddy list without category filters or
++  group headings, the companion's own name, a Summon/Dismiss button
++  for a collected buddy, the source lines (per-player boss rolls with the
++  heroic rate, the deed, the token vendor), the pending state, and a Looks list
++  with unlock state, sources and Wear/Remove.
++- Chat: `buddyPresence`, `buddyRevealed`, `buddyCosmeticUnlocked` are text-free
++  events rendered by `src/ui/buddy_event_lines.ts`.
++- The bare buddy keybind dismisses, or re-summons the last companion out; the
++  last companion also walks back out at login.
++- Dev: `/dev buddies` (collect everything), `/dev buddy <key>` (stage a boss
++  win at your feet), `/dev buddylook <id>`.
+ 
+-- `/dev give whistle_horse 1`
+-- `/dev give whistle_crystal_lich 1`
+-- `/dev give whistle_forgemaw 1`
++## Determinism
+ 
+-`/dev buddy <key>` instead stages a pending world-source reward at the player's
+-feet; walk 80 yards away to reveal it. The keys are `horse`, `crystal_lich` and
+-`forgemaw`. Developer commands are restricted to development environments.
+-
+-The authorized admin endpoint
+-`POST /admin/api/moderation/characters/:id/grant-buddy` accepts a `buddyKey` and
+-reason. It grants immediately to an online character, or queues a grant for the
+-next login. It no longer accepts cosmetic grants.
+-
+-## Archived buddies and cosmetics
+-
+-`archived-features/buddies-and-cosmetics/README.md` describes the restoration
+-bundle. It preserves Sapling, all previously removed buddies, their dedicated
+-models, copies of shared models/icons, original full-roster definitions, and the
+-removed alternate-look implementation and tests.
+-
+-The live game has no buddy look catalog, unlock/equip actions, challenge tracking,
+-look rewards, or Looks interface. Old cosmetic wire fields are ignored and the
+-retired wire command is inert. Historical whistle/charm definitions and their
+-icons remain solely so existing inventory entries are readable; removed tokens
+-cannot unlock content and are not consumed.
+-
+-Loading a character normalizes its collection to the active roster. Retired
+-ownership, pending rewards, last selection and old cosmetic unlock/equipment
+-fields are discarded. The code archive does not back up character saves; keep
+-an original save separately if its retired unlocks must be restored later.
++The per-player roll draws `rng.chance()` once per (player, row) only for a boss
++with rows; ordinary kills draw nothing. The old per-kill whistle tiers and the
++fishing catch slice are gone, so every parity golden that kills a mob or lands
++a catch was re-minted with the change. The challenge tracker and the reveal
++sweep draw no rng.
+diff --git a/scripts/assets/render_buddy_charm_icons.mjs b/scripts/assets/render_buddy_charm_icons.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/assets/render_buddy_charm_icons.mjs
+@@ -0,0 +1,49 @@
++// Renders the bag-icon WebP for every buddy COSMETIC charm item (ItemDef kind
++// 'buddy_cosmetic', content/items.ts) by re-tinting the committed whistle icon
++// of the companion the look belongs to: the same rendered-from-GLB still the
++// whistle ships, multiplied toward the cosmetic's own dye. Deterministic, no
++// text-to-image generation, no internet reference art; the charm reads as
++// "that companion, in that look", which is exactly what using it unlocks.
++//
++// Usage: node scripts/assets/render_buddy_charm_icons.mjs
++import { existsSync } from 'node:fs';
++import path from 'node:path';
++import sharp from 'sharp';
++
++const ROOT = process.cwd();
++const OUT_DIR = path.join(ROOT, 'public/ui/items');
++
++/** charm item id -> [source whistle id, tint] (content/buddy_cosmetics.ts). */
++export const CHARM_ICON_BATCH = [
++  { itemId: 'charm_stag_acorn', source: 'whistle_stag', tint: 0xb8863b },
++  { itemId: 'charm_stag_gilded', source: 'whistle_stag', tint: 0xffd700 },
++];
++
++const ICON_SIZE = 128;
++
++async function renderOne({ itemId, source, tint }) {
++  const src = path.join(OUT_DIR, `${source}.webp`);
++  if (!existsSync(src)) throw new Error(`missing source icon ${src}`);
++  const r = (tint >> 16) & 0xff;
++  const g = (tint >> 8) & 0xff;
++  const b = tint & 0xff;
++  // A 50% lerp toward the dye over the whole still: strong enough to read as
++  // the look at 32px in a bag cell, weak enough to keep the silhouette.
++  const dyed = await sharp(src)
++    .resize(ICON_SIZE, ICON_SIZE)
++    .removeAlpha()
++    .raw()
++    .toBuffer({ resolveWithObject: true });
++  const px = dyed.data;
++  for (let i = 0; i < px.length; i += 3) {
++    px[i] = Math.round(px[i] * 0.5 + r * 0.5);
++    px[i + 1] = Math.round(px[i + 1] * 0.5 + g * 0.5);
++    px[i + 2] = Math.round(px[i + 2] * 0.5 + b * 0.5);
++  }
++  await sharp(px, { raw: { width: dyed.info.width, height: dyed.info.height, channels: 3 } })
++    .webp({ quality: 82, effort: 6 })
++    .toFile(path.join(OUT_DIR, `${itemId}.webp`));
++  console.log(`rendered ${itemId}.webp from ${source}`);
++}
++
++for (const entry of CHARM_ICON_BATCH) await renderOne(entry);
+diff --git a/scripts/assets/render_buddy_item_icons.mjs b/scripts/assets/render_buddy_item_icons.mjs
+--- a/scripts/assets/render_buddy_item_icons.mjs
++++ b/scripts/assets/render_buddy_item_icons.mjs
+@@ -1,6 +1,7 @@
+-// Renders the bag-icon WebP for each active buddy whistle from its shipped
+-// GLB. Retired batch rows are preserved in archived-features/buddies-and-cosmetics.
+-// No text-to-image generation, no internet reference art. Reuses the
++// Renders the bag-icon WebP for every buddy whistle item straight from the
++// buddy's own shipped GLB (public/models/buddies/*.glb, or the shared
++// Quaternius fox.glb tinted per species for ember_fox/moss_hare) — no
++// text-to-image generation, no internet reference art. Reuses the
+ // asset-pipeline's generic headless preview renderer (hero turntable view:
+ // auto-framed bounding sphere, no weapon-specific tilt).
+ //
+@@ -23,9 +24,50 @@
+ mkdirSync(TMP_DIR, { recursive: true });
+ 
+ export const BUDDY_ICON_BATCH = [
+-  { itemId: 'whistle_horse', glb: 'public/models/buddies/horse.glb' },
++  { itemId: 'whistle_sapling', glb: 'public/models/buddies/sapling.glb' },
++  { itemId: 'whistle_ember_fox', glb: 'public/models/creatures/fox.glb', tint: [0xd9, 0x66, 0x2b] },
++  { itemId: 'whistle_moss_hare', glb: 'public/models/creatures/fox.glb', tint: [0x6f, 0x8f, 0x5a] },
++  { itemId: 'whistle_frog', glb: 'public/models/buddies/frog.glb' },
++  { itemId: 'whistle_crimson_claw_crab', glb: 'public/models/buddies/crimson_claw_crab.glb' },
++  { itemId: 'whistle_golden_sentinel', glb: 'public/models/buddies/golden_sentinel.glb' },
++  { itemId: 'whistle_nightfang', glb: 'public/models/buddies/nightfang.glb' },
++  { itemId: 'whistle_tuskhorn_boar', glb: 'public/models/buddies/tuskhorn_boar.glb' },
++  { itemId: 'whistle_emerald_wolf', glb: 'public/models/buddies/emerald_wolf.glb' },
++  { itemId: 'whistle_tiger', glb: 'public/models/buddies/tiger.glb' },
++  { itemId: 'whistle_cate_coin', glb: 'public/models/buddies/cate_coin.glb' },
++  { itemId: 'whistle_alon', glb: 'public/models/buddies/alon.glb' },
++  { itemId: 'whistle_trollface', glb: 'public/models/buddies/trollface.glb' },
++  { itemId: 'whistle_ansem', glb: 'public/models/buddies/ansem.glb' },
++  { itemId: 'whistle_triple_t', glb: 'public/models/buddies/triple_t.glb' },
++  { itemId: 'whistle_kekius', glb: 'public/models/buddies/kekius.glb' },
++  { itemId: 'whistle_solbot', glb: 'public/models/buddies/solbot.glb' },
++  { itemId: 'whistle_frostfire', glb: 'public/models/buddies/frostfire.glb' },
++  { itemId: 'whistle_rocky', glb: 'public/models/buddies/rocky.glb' },
++  // The three vendor companions (content/buddies.ts): same lane, humanoid rigs.
++  { itemId: 'whistle_proud_grunt', glb: 'public/models/buddies/proud_grunt.glb' },
++  { itemId: 'whistle_loot_goblin', glb: 'public/models/buddies/loot_goblin.glb' },
++  { itemId: 'whistle_penny_goldspark', glb: 'public/models/buddies/penny_goldspark.glb' },
++  // The beast tier and the undead, rendered from the shipped creature rigs
++  // the buddy visuals reuse, tinted to each buddy dye (content/buddy_mobs.ts).
++  { itemId: 'whistle_stag', glb: 'public/models/creatures/stag.glb', tint: [0xb9, 0x8a, 0x4e] },
++  { itemId: 'whistle_alpaca', glb: 'public/models/creatures/alpaca.glb', tint: [0xe8, 0xdc, 0xc6] },
++  { itemId: 'whistle_bull', glb: 'public/models/creatures/bull.glb', tint: [0x6b, 0x4a, 0x37] },
++  { itemId: 'whistle_spider', glb: 'public/models/creatures/spider.glb', tint: [0x4a, 0x3d, 0x63] },
++  {
++    itemId: 'whistle_raptor',
++    glb: 'public/models/creatures/velociraptor.glb',
++    tint: [0x5f, 0x8a, 0x4a],
++  },
++  { itemId: 'whistle_skeleton', glb: 'public/models/chars/enemies/skeleton_minion.glb' },
++  // The epic Nythraxis drop, from its own GLB.
+   { itemId: 'whistle_crystal_lich', glb: 'public/models/buddies/crystal_lich.glb' },
++  // The world-boss companion (content/buddy_sources.ts: Thunzharr).
++  { itemId: 'whistle_emberfall_phoenix', glb: 'public/models/buddies/emberfall_phoenix.glb' },
++  // The epic heroic-Crucible drop, from its own GLB.
+   { itemId: 'whistle_forgemaw', glb: 'public/models/buddies/forgemaw.glb' },
++  // The fishing catch and the green elemental, both from their own GLBs.
++  { itemId: 'whistle_crystal_tide', glb: 'public/models/buddies/crystal_tide.glb' },
++  { itemId: 'whistle_phantom', glb: 'public/models/buddies/phantom.glb' },
+ ];
+ 
+ /** True when a GLB declares the KTX2 texture extension, which the preview
+diff --git a/scripts/prepare_buddy_sapling.mjs b/scripts/prepare_buddy_sapling.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/prepare_buddy_sapling.mjs
+@@ -0,0 +1,74 @@
++// Prepare the approved sapling animation export for the buddy roster.
++// Usage: node scripts/prepare_buddy_sapling.mjs <sapling-waddle.glb>
++// Then run scripts/assets/compress_glb_textures.mjs on the output GLB.
++// No geometry simplification or animation retargeting: retain the approved waddle.
++import { createHash } from 'node:crypto';
++import { readFileSync } from 'node:fs';
++import path from 'node:path';
++import {
++  dedup,
++  meshopt,
++  prune,
++  resample,
++  tangents,
++  textureCompress,
++  unweld,
++  weld,
++} from '@gltf-transform/functions';
++import { MeshoptEncoder } from 'meshoptimizer';
++import { generateTangents } from 'mikktspace';
++import sharp from 'sharp';
++import { openGlb, saveGlb } from './asset_pipeline/lib/glb.mjs';
++
++const input = process.argv[2];
++if (!input) throw new Error('Pass the approved sapling-waddle.glb source.');
++const output = path.resolve('public/models/buddies/sapling.glb');
++if (path.resolve(input) === output)
++  throw new Error('Keep the approved source separate from the export.');
++const doc = await openGlb(input);
++const root = doc.getRoot();
++const names = root.listAnimations().map((clip) => clip.getName());
++for (const name of ['Idle', 'Walk', 'Run']) {
++  if (!names.includes(name)) throw new Error(`Approved source is missing ${name}.`);
++}
++// A skin is positioned by its joints. Keep skinned mesh nodes at scene root,
++// and rotate the complete skeleton from the source's +X to the game's +Z.
++for (const scene of root.listScenes()) {
++  for (const node of root.listNodes()) {
++    if (!node.getSkin()) continue;
++    for (const parent of [...node.listParents()]) {
++      if (parent.propertyType === 'Node') parent.removeChild(node);
++    }
++    scene.addChild(node);
++  }
++  const axis = doc.createNode('SaplingForward').setRotation([0, -Math.SQRT1_2, 0, Math.SQRT1_2]);
++  for (const node of [...scene.listChildren()]) {
++    if (node.getSkin()) continue;
++    scene.removeChild(node);
++    axis.addChild(node);
++  }
++  scene.addChild(axis);
++}
++await MeshoptEncoder.ready;
++await doc.transform(
++  unweld(),
++  tangents({ generateTangents }),
++  weld(),
++  textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [512, 512] }),
++  resample(),
++  prune(),
++  dedup(),
++  meshopt({ encoder: MeshoptEncoder, level: 'high' }),
++);
++root.setExtras({
++  ...root.getExtras(),
++  asset: 'Sapling buddy',
++  sourceSha256: createHash('sha256').update(readFileSync(input)).digest('hex'),
++  generationTask: '210d80e7-3360-4f16-8682-3eac128249e7',
++  rigTask: 'b0e39abb-708f-4e53-987e-a0970ffda400',
++  animation: 'Locally authored Idle, Walk and Run; approved side-to-side waddle.',
++  orientation:
++    'Y up, +Z forward; height and ground normalization supplied by the character loader.',
++});
++await saveGlb(doc, output);
++console.log(`Prepared ${output}`);
+diff --git a/server/admin.ts b/server/admin.ts
+--- a/server/admin.ts
++++ b/server/admin.ts
+@@ -3290,9 +3290,9 @@
+ }
+ 
+ /** POST /admin/api/moderation/characters/:id/grant-buddy: attach a buddy
+- *  companion on a character (the channel the
++ *  companion or unlock a buddy cosmetic on a character (the channel the
+  *  monthly PvP ladder, top-parse and zodiac awards land through; owner plan
+- *  2026-09-09). Body: { buddyKey }, plus reason. Audit
++ *  2026-09-09). Body: { buddyKey } or { cosmeticId }, plus reason. Audit
+  *  first, then: ONLINE targets take the sim's grant path at once; OFFLINE
+  *  targets are queued (server/buddy_grants_db.ts queueBuddyGrant) and drained at the
+  *  character's next join, so an award never depends on the winner being
+@@ -3304,13 +3304,16 @@
+   const body = await readBody(ctx.req);
+   const bodyError = buddyGrantBodyError(body);
+   if (bodyError) return fail(ctx.res, 400, bodyError);
+-  const grant: BuddyGrant = { buddyKey: String(body.buddyKey) };
++  const grant: BuddyGrant =
++    typeof body.buddyKey === 'string'
++      ? { buddyKey: body.buddyKey }
++      : { cosmeticId: String(body.cosmeticId) };
+   try {
+     await adminDb().recordProfessionsRestore({
+       characterId: id,
+       adminAccountId: ctxAccountId(ctx),
+       action: 'grant_buddy',
+-      detail: grant.buddyKey ?? '',
++      detail: grant.buddyKey ?? grant.cosmeticId ?? '',
+       reason: body.reason,
+     });
+     const result = rt.adminGrantBuddy(id, grant);
+diff --git a/server/buddy_wire.ts b/server/buddy_wire.ts
+--- a/server/buddy_wire.ts
++++ b/server/buddy_wire.ts
+@@ -6,31 +6,36 @@
+ //
+ // The sim owns every rule (src/sim/buddies.ts re-validates key, ownership and
+ // fit); this module only moves values between the wire, the database and the
+-// sim's own grant/summon entry points.
++// sim's own grant/summon/equip entry points.
+ 
+ import { buddyDef } from '../src/sim/content/buddies';
++import { buddyCosmeticDef } from '../src/sim/content/buddy_cosmetics';
+ import type { Sim } from '../src/sim/sim';
+ import { type BuddyGrantRow, takePendingBuddyGrants } from './buddy_grants_db';
+ 
+-/** Buddy grant, including the retired cosmetic id shape in historical queue rows. */
++/** One admin grant request: exactly one of the two ids. */
+ export interface BuddyGrant {
+   buddyKey?: string;
+   cosmeticId?: string;
+ }
+ 
+-/** Validate an active companion grant. Retired cosmetic grants are refused. */
++/** Validate a grant body against the catalogs. Null when it names exactly one
++ *  known companion or look; a reason string otherwise. */
+ export function buddyGrantBodyError(body: {
+   buddyKey?: unknown;
+   cosmeticId?: unknown;
+ }): string | null {
+   const hasBuddy = typeof body.buddyKey === 'string' && body.buddyKey.length > 0;
+-  if (body.cosmeticId !== undefined) return 'unknown cosmetic id';
+-  if (!hasBuddy || !buddyDef(body.buddyKey as string)) return 'unknown buddy key';
++  const hasLook = typeof body.cosmeticId === 'string' && body.cosmeticId.length > 0;
++  if (hasBuddy === hasLook) return 'name exactly one of buddyKey or cosmeticId';
++  if (hasBuddy && !buddyDef(body.buddyKey as string)) return 'unknown buddy key';
++  if (hasLook && !buddyCosmeticDef(body.cosmeticId as string)) return 'unknown cosmetic id';
+   return null;
+ }
+ 
+ /** The heavy self-snapshot keys for the buddy collection (IWorldBuddies):
+- *  owned companions `budOwn` and boss-roll wins pending their reveal `budPend`.
++ *  owned companions `budOwn`, unlocked cosmetics `budCos`, the worn look per
++ *  buddy `budEq`, and the boss-roll wins pending their reveal `budPend`.
+  *  Every writer (src/sim/buddies.ts) bumps meta.wireRev, which is what makes
+  *  the heavy block due, so the gate needs no command list of its own. */
+ export function emitBuddySelfKeys(
+@@ -39,6 +44,8 @@
+   maybe: (key: string, value: unknown) => void,
+ ): void {
+   maybe('budOwn', sim.ownedBuddiesFor(pid));
++  maybe('budCos', sim.ownedBuddyCosmeticsFor(pid));
++  maybe('budEq', sim.equippedBuddyCosmeticsFor(pid));
+   maybe('budPend', sim.pendingBuddiesFor(pid));
+ }
+ 
+@@ -60,8 +67,10 @@
+     case 'buddy_summon':
+       if (typeof msg.key === 'string') sim.summonBuddyFor(pid, msg.key);
+       break;
+-    // Retired append-only protocol token: old clients cannot activate archived looks.
++    // Wear a cosmetic on a collected buddy (null = its own look).
+     case 'buddy_cosmetic':
++      if (typeof msg.key === 'string' && (typeof msg.id === 'string' || msg.id === null))
++        sim.equipBuddyCosmeticFor(pid, msg.key, msg.id);
+       break;
+     // A preference flip, settable with no buddy out; the errand itself runs in
+     // the Sim tick (src/sim/pet/buddy_autoloot.ts).
+@@ -72,10 +81,10 @@
+ }
+ 
+ /** Apply one grant to a LIVE player through the sim's own idempotent entry
+- *  point. False for retired cosmetic grants or when the character already had it. */
++ *  points. False when the character already had it. */
+ export function applyBuddyGrantToSim(sim: Sim, pid: number, grant: BuddyGrant): boolean {
+-  if (grant.cosmeticId !== undefined) return false;
+   if (typeof grant.buddyKey === 'string') return sim.grantBuddyFor(pid, grant.buddyKey);
++  if (typeof grant.cosmeticId === 'string') return sim.grantBuddyCosmeticFor(pid, grant.cosmeticId);
+   return false;
+ }
+ 
+diff --git a/src/net/buddy_wire.ts b/src/net/buddy_wire.ts
+--- a/src/net/buddy_wire.ts
++++ b/src/net/buddy_wire.ts
+@@ -1,18 +1,21 @@
+-// The client-side mirror of the buddy collection (IWorldBuddies): the two
++// The client-side mirror of the buddy collection (IWorldBuddies): the four
+ // delta-guarded self-snapshot keys the server emits (server/buddy_wire.ts
+-// emitBuddySelfKeys), decoded through the active catalog so archived keys
+-// never reach the HUD. A key omitted from a snapshot keeps
++// emitBuddySelfKeys), decoded through the catalog so a key or look a content
++// change removed can never reach the HUD. A key omitted from a snapshot keeps
+ // the prior mirror, exactly like mntOwn. Pure: no DOM, no world state.
+ 
+ import { type BuddyKey, normalizeBuddyKey } from '../sim/content/buddies';
++import { buddyCosmeticDef } from '../sim/content/buddy_cosmetics';
+ 
+ export interface BuddySelfMirror {
+   owned: BuddyKey[];
++  cosmetics: string[];
++  equipped: Record<string, string>;
+   pending: BuddyKey[];
+ }
+ 
+ export function emptyBuddySelfMirror(): BuddySelfMirror {
+-  return { owned: [], pending: [] };
++  return { owned: [], cosmetics: [], equipped: {}, pending: [] };
+ }
+ 
+ function keyList(value: unknown): BuddyKey[] | null {
+@@ -23,16 +26,32 @@
+ }
+ 
+ /** Fold one self snapshot into the mirror. Returns the same object when the
+- *  snapshot carried neither active key, so a caller can keep identity. */
++ *  snapshot carried none of the four keys, so a caller can keep identity. */
+ export function decodeBuddySelf(
+   s: Record<string, unknown>,
+   prev: BuddySelfMirror,
+ ): BuddySelfMirror {
+   const owned = keyList(s.budOwn);
+   const pending = keyList(s.budPend);
+-  if (!owned && !pending) return prev;
++  const cosmetics = Array.isArray(s.budCos)
++    ? (s.budCos as unknown[]).filter(
++        (id): id is string => typeof id === 'string' && buddyCosmeticDef(id) !== null,
++      )
++    : null;
++  let equipped: Record<string, string> | null = null;
++  if (s.budEq !== undefined && s.budEq !== null && typeof s.budEq === 'object') {
++    equipped = {};
++    for (const [key, id] of Object.entries(s.budEq as Record<string, unknown>)) {
++      const norm = normalizeBuddyKey(key);
++      const cosmetic = typeof id === 'string' ? buddyCosmeticDef(id) : null;
++      if (norm && cosmetic?.buddy === norm) equipped[norm] = cosmetic.id;
++    }
++  }
++  if (!owned && !pending && !cosmetics && !equipped) return prev;
+   return {
+     owned: owned ?? prev.owned,
++    cosmetics: cosmetics ?? prev.cosmetics,
++    equipped: equipped ?? prev.equipped,
+     pending: pending ?? prev.pending,
+   };
+ }
+diff --git a/src/net/online.ts b/src/net/online.ts
+--- a/src/net/online.ts
++++ b/src/net/online.ts
+@@ -4051,17 +4051,27 @@
+   toggleMounted(): void {
+     this.cmd({ cmd: 'mount_toggle' });
+   }
+-  // --- IWorldBuddies: collection, summon and dismiss. All changes stay
+-  // authoritative (server-validated ownership), and the active identity mirror
+-  // (bud) lands on the next snapshot. ---
++  // --- IWorldBuddies: collection + dismiss. Summoning a specific buddy is an
++  // item use, not a buddy command, so nothing here sends one. The toggle stays
++  // authoritative (server-validated ownership) and the active identity mirror
++  // (bud) lands on the next snapshot either way. ---
+   ownedBuddies(): readonly BuddyKey[] {
+     return this.selfBuddies.owned;
+   }
++  ownedBuddyCosmetics(): readonly string[] {
++    return this.selfBuddies.cosmetics;
++  }
++  equippedBuddyCosmetics(): Readonly<Record<string, string>> {
++    return this.selfBuddies.equipped;
++  }
+   pendingBuddies(): readonly BuddyKey[] {
+     return this.selfBuddies.pending;
+   }
+   summonBuddy(key: BuddyKey): void {
+     this.cmd({ cmd: 'buddy_summon', key });
++  }
++  equipBuddyCosmetic(key: BuddyKey, cosmeticId: string | null): void {
++    this.cmd({ cmd: 'buddy_cosmetic', key, id: cosmeticId });
+   }
+   toggleBuddy(): void {
+     this.cmd({ cmd: 'buddy_toggle' });
+diff --git a/src/render/assets/manifest.generated.ts b/src/render/assets/manifest.generated.ts
+--- a/src/render/assets/manifest.generated.ts
++++ b/src/render/assets/manifest.generated.ts
+@@ -288,9 +288,32 @@
+   "models/biome/sea_shark.glb": "/media/models/biome/sea_shark.d848547a4929.glb",
+   "models/biome/sea_swordfish.glb": "/media/models/biome/sea_swordfish.1817dddb3aca.glb",
+   "models/biome/sea_whale.glb": "/media/models/biome/sea_whale.3126c37c7a3e.glb",
++  "models/buddies/alon.glb": "/media/models/buddies/alon.f6a264ea8349.glb",
++  "models/buddies/ansem.glb": "/media/models/buddies/ansem.20d228a38bed.glb",
++  "models/buddies/cate_coin.glb": "/media/models/buddies/cate_coin.0f4cade6a0b9.glb",
++  "models/buddies/crimson_claw_crab.glb": "/media/models/buddies/crimson_claw_crab.fe1c138571b4.glb",
+   "models/buddies/crystal_lich.glb": "/media/models/buddies/crystal_lich.3b059ea9fe43.glb",
++  "models/buddies/crystal_tide.glb": "/media/models/buddies/crystal_tide.d8b0ebfe2b01.glb",
++  "models/buddies/emberfall_phoenix.glb": "/media/models/buddies/emberfall_phoenix.7e2345dd1551.glb",
++  "models/buddies/emerald_wolf.glb": "/media/models/buddies/emerald_wolf.c9b9a9ae273d.glb",
+   "models/buddies/forgemaw.glb": "/media/models/buddies/forgemaw.e3260fb461e1.glb",
++  "models/buddies/frog.glb": "/media/models/buddies/frog.0379fa7385b1.glb",
++  "models/buddies/frostfire.glb": "/media/models/buddies/frostfire.5768213586ac.glb",
++  "models/buddies/golden_sentinel.glb": "/media/models/buddies/golden_sentinel.a874b6301a9f.glb",
+   "models/buddies/horse.glb": "/media/models/buddies/horse.1ea4b23d96ab.glb",
++  "models/buddies/kekius.glb": "/media/models/buddies/kekius.1c2128d9c699.glb",
++  "models/buddies/loot_goblin.glb": "/media/models/buddies/loot_goblin.bea5b99a5545.glb",
++  "models/buddies/nightfang.glb": "/media/models/buddies/nightfang.d1b78e1108d0.glb",
++  "models/buddies/penny_goldspark.glb": "/media/models/buddies/penny_goldspark.591bd57ecd68.glb",
++  "models/buddies/phantom.glb": "/media/models/buddies/phantom.65fca3cd5c96.glb",
++  "models/buddies/proud_grunt.glb": "/media/models/buddies/proud_grunt.07b1830d56fd.glb",
++  "models/buddies/rocky.glb": "/media/models/buddies/rocky.ebab6bdce520.glb",
++  "models/buddies/sapling.glb": "/media/models/buddies/sapling.2ca4ed3f105a.glb",
++  "models/buddies/solbot.glb": "/media/models/buddies/solbot.3bbd09f20775.glb",
++  "models/buddies/tiger.glb": "/media/models/buddies/tiger.d8b3f0313f46.glb",
++  "models/buddies/triple_t.glb": "/media/models/buddies/triple_t.eb973f07ecd4.glb",
++  "models/buddies/trollface.glb": "/media/models/buddies/trollface.0cd92c5b60c0.glb",
++  "models/buddies/tuskhorn_boar.glb": "/media/models/buddies/tuskhorn_boar.468c891580af.glb",
+   "models/chars/enemies/necromancer.glb": "/media/models/chars/enemies/necromancer.9f1e4ea76333.glb",
+   "models/chars/enemies/necromancer_hit_variety_anims.glb": "/media/models/chars/enemies/necromancer_hit_variety_anims.ad8dfeb177f6.glb",
+   "models/chars/enemies/skelboss_ability_anims.glb": "/media/models/chars/enemies/skelboss_ability_anims.8135e53d97cc.glb",
+diff --git a/src/render/characters/assets.ts b/src/render/characters/assets.ts
+--- a/src/render/characters/assets.ts
++++ b/src/render/characters/assets.ts
+@@ -2263,6 +2263,7 @@
+ 
+ function tintFor(def: VisualDef, entityColor: number): number | null {
+   if (def.tint === undefined) return null;
++  if (def.tint === 'cosmetic') return entityColor === 0xffffff ? null : entityColor;
+   return def.tint === 'entity' ? entityColor : def.tint;
+ }
+ 
+diff --git a/src/render/characters/manifest.ts b/src/render/characters/manifest.ts
+--- a/src/render/characters/manifest.ts
++++ b/src/render/characters/manifest.ts
+@@ -217,8 +217,10 @@
+    *  (the Nythraxis Bone Spike, which shares its footprint with the raider
+    *  it pins). Presentation-side targeting help only: the sim never reads it. */
+   clickRadius?: number;
+-  /** Material tint: an explicit color, 'entity' (use e.color), or none. */
+-  tint?: number | 'entity';
++  /** material tint: explicit color, 'entity' (use e.color), 'cosmetic' (use
++   *  e.color ONLY when it is not the 0xffffff default, so a baked-texture rig
++   *  keeps its authored look until a buddy cosmetic dyes it), or none */
++  tint?: number | 'entity' | 'cosmetic';
+   /** lerp amount toward the tint (default 0.4) */
+   tintStrength?: number;
+   /** u/s at which the walk/run cycles look right (timeScale matching) */
+@@ -2429,21 +2431,35 @@
+     tint: 'entity',
+     tintStrength: 0.35,
+   },
+-  // Cosmetic followers: each active buddy keeps its authored rig and colors.
++  // Cosmetic followers: each active buddy has its own rig and tint policy.
+   buddy_horse: {
+     url: `${BUDDIES_DIR}/horse.glb`,
+     height: 0.75,
+     clips: BUDDY_CLIPS,
++    tint: 'cosmetic',
++    tintStrength: 0.5,
++  },
++  buddy_sapling: {
++    url: `${BUDDIES_DIR}/sapling.glb`,
++    height: 0.75,
++    clips: { ...BUDDY_CLIPS, run: 'Run' },
++    authoredAtlas: true,
++    tint: 'cosmetic',
++    tintStrength: 0.5,
+   },
+   buddy_crystal_lich: {
+     url: `${BUDDIES_DIR}/crystal_lich.glb`,
+     height: 0.9,
+     clips: BUDDY_CLIPS,
++    tint: 'cosmetic',
++    tintStrength: 0.5,
+   },
+   buddy_forgemaw: {
+     url: `${BUDDIES_DIR}/forgemaw.glb`,
+     height: 0.85,
+     clips: BUDDY_CLIPS,
++    tint: 'cosmetic',
++    tintStrength: 0.5,
+     // The rig is authored facing -Z, so without this it heels the owner
+     // back-to-front: chest toward the camera while its owner walks away.
+     yaw: Math.PI,
+@@ -3876,6 +3892,7 @@
+   guardian_tithefiend: 'mob_demonalt',
+   // Active cosmetic buddy followers.
+   buddy_horse: 'buddy_horse',
++  buddy_sapling: 'buddy_sapling',
+   buddy_crystal_lich: 'buddy_crystal_lich',
+   buddy_forgemaw: 'buddy_forgemaw',
+   // Packlord Stampede guardians are transient local templates, not MOBS rows.
+diff --git a/src/sim/buddies.ts b/src/sim/buddies.ts
+--- a/src/sim/buddies.ts
++++ b/src/sim/buddies.ts
+@@ -1,5 +1,5 @@
+-// Buddies: the per-character collection plus summon/dismiss.
+-// A sibling sim system behind the SimContext seam
++// Cosmetic buddies: the per-character COLLECTION plus summon/dismiss and the
++// cosmetic wardrobe. A sibling sim system behind the SimContext seam
+ // (module-first; sim.ts keeps thin delegates).
+ //
+ // Ownership model (owner plan, 2026-09-09): a buddy ATTACHES TO THE CHARACTER.
+@@ -11,7 +11,10 @@
+ //
+ // Two ways in (src/sim/content/buddy_sources.ts): a per-player boss roll
+ // that lands as a PENDING companion and reveals itself on the zone-out
+-// (src/sim/buddy_drops.ts), or a Book of Deeds grant.
++// (src/sim/buddy_drops.ts), or a Book of Deeds grant. Cosmetics are a second
++// per-character set (`cosmetics`), one of which can be worn per buddy
++// (`equipped`); the worn look is a tint the follower entity carries as its
++// color (content/buddy_cosmetics.ts).
+ //
+ // A buddy IS a real server-simulated owned mob entity (content/buddy_mobs.ts's
+ // MobTemplate, heeled by pet/buddy_ai.ts's updateBuddyMob using the same
+@@ -23,6 +26,7 @@
+ // `src/sim`-pure and rng-free.
+ 
+ import { BUDDY_KEYS, type BuddyKey, buddyDef, normalizeBuddyKey } from './content/buddies';
++import { buddyCosmeticDef } from './content/buddy_cosmetics';
+ import { ITEMS } from './data';
+ import { despawnBuddyEntity, spawnBuddyEntity } from './pet/buddy_ai';
+ import type { PlayerMeta } from './sim';
+@@ -41,6 +45,10 @@
+ 
+ export interface BuddyCollection {
+   owned: Set<BuddyKey>;
++  /** Unlocked cosmetic ids (content/buddy_cosmetics.ts). */
++  cosmetics: Set<string>;
++  /** The worn cosmetic per buddy; absent = the buddy's own look. */
++  equipped: Map<BuddyKey, string>;
+   pending: PendingBuddy[];
+   /** The companion the bare toggle keybind brings back out: the last one
+    *  summoned. '' until the first summon. */
+@@ -51,7 +59,6 @@
+  *  empty, so pre-buddy saves stay byte-equal. */
+ export interface SavedBuddyCollection {
+   owned?: string[];
+-  /** Legacy save fields, accepted on input and discarded on restore. */
+   cosmetics?: string[];
+   equipped?: Record<string, string>;
+   pending?: { key: string; source: string; x?: number; z?: number }[];
+@@ -59,7 +66,7 @@
+ }
+ 
+ export function freshBuddyCollection(): BuddyCollection {
+-  return { owned: new Set(), pending: [], last: '' };
++  return { owned: new Set(), cosmetics: new Set(), equipped: new Map(), pending: [], last: '' };
+ }
+ 
+ /** Restore a saved collection through the catalog: a key or cosmetic a
+@@ -70,6 +77,16 @@
+   for (const key of saved.owned ?? []) {
+     const norm = normalizeBuddyKey(typeof key === 'string' ? key : '');
+     if (norm) out.owned.add(norm);
++  }
++  for (const id of saved.cosmetics ?? []) {
++    if (typeof id === 'string' && buddyCosmeticDef(id)) out.cosmetics.add(id);
++  }
++  for (const [key, id] of Object.entries(saved.equipped ?? {})) {
++    const norm = normalizeBuddyKey(key);
++    const def = typeof id === 'string' ? buddyCosmeticDef(id) : null;
++    // A worn look must be owned and must fit the buddy it is worn on.
++    if (norm && def && def.buddy === norm && out.cosmetics.has(def.id) && out.owned.has(norm))
++      out.equipped.set(norm, def.id);
+   }
+   for (const p of saved.pending ?? []) {
+     const norm = normalizeBuddyKey(typeof p?.key === 'string' ? p.key : '');
+@@ -90,9 +107,18 @@
+ /** The save-side shape, or null while nothing is collected (zero-default
+  *  omission: the caller leaves the key out). */
+ export function serializeBuddyCollection(c: BuddyCollection): SavedBuddyCollection | null {
+-  if (c.owned.size === 0 && c.pending.length === 0 && c.last === '') return null;
++  if (
++    c.owned.size === 0 &&
++    c.cosmetics.size === 0 &&
++    c.equipped.size === 0 &&
++    c.pending.length === 0 &&
++    c.last === ''
++  )
++    return null;
+   return {
+     ...(c.owned.size > 0 ? { owned: BUDDY_KEYS.filter((k) => c.owned.has(k)) } : {}),
++    ...(c.cosmetics.size > 0 ? { cosmetics: [...c.cosmetics].sort() } : {}),
++    ...(c.equipped.size > 0 ? { equipped: Object.fromEntries(c.equipped) } : {}),
+     ...(c.pending.length > 0 ? { pending: c.pending.map((p) => ({ ...p })) } : {}),
+     ...(c.last !== '' ? { last: c.last } : {}),
+   };
+@@ -129,9 +155,27 @@
+   return BUDDY_KEYS.filter((key) => meta.buddies.owned.has(key));
+ }
+ 
++/** The unlocked cosmetic ids, in catalog-stable (sorted) order. */
++export function ownedBuddyCosmetics(meta: PlayerMeta): string[] {
++  return [...meta.buddies.cosmetics].sort();
++}
++
++/** The worn cosmetic per buddy as a plain record for the wire. */
++export function equippedBuddyCosmetics(meta: PlayerMeta): Record<string, string> {
++  return Object.fromEntries(meta.buddies.equipped);
++}
++
+ /** The pending (won, unrevealed) companions, catalog order. */
+ export function pendingBuddies(meta: PlayerMeta): BuddyKey[] {
+   return meta.buddies.pending.map((p) => p.key);
++}
++
++/** The color the follower entity wears: the equipped cosmetic's tint, else
++ *  null for the template's own color. */
++export function buddyWornTint(meta: PlayerMeta, key: BuddyKey): number | null {
++  const id = meta.buddies.equipped.get(key);
++  const def = id ? buddyCosmeticDef(id) : null;
++  return def ? def.tint : null;
+ }
+ 
+ function spawnFor(ctx: SimContext, meta: PlayerMeta, e: { id: number }, key: BuddyKey): void {
+@@ -139,7 +183,7 @@
+   if (!owner) return;
+   owner.buddyKey = key;
+   meta.buddies.last = key;
+-  spawnBuddyEntity(ctx, owner, key);
++  spawnBuddyEntity(ctx, owner, key, buddyWornTint(meta, key));
+ }
+ 
+ /** Attach `key` to the character outright: owned, announced (buddyRevealed)
+@@ -263,6 +307,62 @@
+   return true;
+ }
+ 
++/** Unlock a cosmetic for the character (challenge, deed, token, or grant).
++ *  Idempotent: returns false when already owned so nothing re-announces. */
++export function grantBuddyCosmetic(ctx: SimContext, pid: number, cosmeticId: string): boolean {
++  const meta = ctx.players.get(pid);
++  const def = buddyCosmeticDef(cosmeticId);
++  if (!meta || !def) return false;
++  if (meta.buddies.cosmetics.has(def.id)) return false;
++  meta.buddies.cosmetics.add(def.id);
++  meta.wireRev++;
++  ctx.emit({ type: 'buddyCosmeticUnlocked', pid, cosmeticId: def.id });
++  return true;
++}
++
++/** Use a cosmetic token item: unlock and consume. Refused unconsumed when the
++ *  look is already unlocked, same rule as the buddy token. */
++export function useBuddyCosmeticToken(ctx: SimContext, pid: number, itemId: string): boolean {
++  const meta = ctx.players.get(pid);
++  const item = ITEMS[itemId];
++  if (!meta || !item || item.kind !== 'buddy_cosmetic' || !buddyCosmeticDef(item.cosmetic))
++    return false;
++  if (meta.buddies.cosmetics.has(item.cosmetic)) {
++    ctx.error(pid, 'You already have that look.');
++    return false;
++  }
++  ctx.removeItem(itemId, 1, pid);
++  return grantBuddyCosmetic(ctx, pid, item.cosmetic);
++}
++
++/** Wear `cosmeticId` on `key` (null = the buddy's own look). Silent no-op on
++ *  anything invalid: an unowned buddy, an unowned look, or a look authored
++ *  for another companion. A buddy that is out is re-spawned so its body picks
++ *  up the new dye (a fresh entity identity is how the wire re-sends color). */
++export function equipBuddyCosmetic(
++  ctx: SimContext,
++  pid: number,
++  key: string,
++  cosmeticId: string | null,
++): boolean {
++  const meta = ctx.players.get(pid);
++  const def = buddyDef(key);
++  if (!meta || !def || !meta.buddies.owned.has(def.key)) return false;
++  if (cosmeticId === null) {
++    if (!meta.buddies.equipped.has(def.key)) return false;
++    meta.buddies.equipped.delete(def.key);
++  } else {
++    const cos = buddyCosmeticDef(cosmeticId);
++    if (!cos || cos.buddy !== def.key || !meta.buddies.cosmetics.has(cos.id)) return false;
++    if (meta.buddies.equipped.get(def.key) === cos.id) return false;
++    meta.buddies.equipped.set(def.key, cos.id);
++  }
++  meta.wireRev++;
++  const e = ctx.entities.get(pid);
++  if (e && e.buddyKey === def.key) spawnFor(ctx, meta, e, def.key);
++  return true;
++}
++
+ /** Enable/disable the autoloot errand for whatever buddy this player has out
+  *  (src/sim/pet/buddy_autoloot.ts does the work each tick). A PREFERENCE, not
+  *  a buddy command: it is settable with no buddy out and survives a
+diff --git a/src/sim/buddy_challenges.ts b/src/sim/buddy_challenges.ts
+new file mode 100644
+--- /dev/null
++++ b/src/sim/buddy_challenges.ts
+@@ -0,0 +1,90 @@
++// Boss-pet cosmetic challenges: the per-attempt timing and damage tracker,
++// resolved at the boss's death for every credited player.
++//
++// Two task kinds (content/buddy_sources.ts BUDDY_COSMETIC_CHALLENGES):
++//   speed  - the kill lands within N seconds of the attempt's first damage;
++//   dps    - the player's OWN damage on the boss over the attempt, divided by
++//            its length, meets a rate.
++// Both re-arm when the boss evades home or respawns (resetBuddyChallenge,
++// called beside resetDeedEncounter), exactly like the deed encounter tasks,
++// so a wipe never carries a stale clock into the next pull.
++//
++// Bookkeeping is a WeakMap keyed on the boss entity: no seam member, no
++// per-Sim runtime bag, and a dropped entity takes its record with it. Only
++// bosses in BUDDY_CHALLENGE_BOSSES are tracked, so the damage hot path pays
++// one Set lookup for every other mob. Draws no rng.
++//
++// `src/sim`-pure.
++
++import { grantBuddyCosmetic } from './buddies';
++import { BUDDY_CHALLENGE_BOSSES, buddyCosmeticChallengesFor } from './content/buddy_sources';
++import type { PlayerMeta } from './sim';
++import type { SimContext } from './sim_context';
++import { type Entity, TICK_RATE } from './types';
++
++interface Attempt {
++  /** Tick of the attempt's first damage. */
++  startTick: number;
++  /** Damage on the boss per contributing player entity id (pet damage
++   *  credits the owner). */
++  damage: Map<number, number>;
++}
++
++const attempts = new WeakMap<Entity, Attempt>();
++
++/** Damage-site hook: fold `amount` from `source` into the boss's attempt,
++ *  opening one on the first hit. */
++export function recordBossDamageForBuddies(
++  ctx: SimContext,
++  source: Entity | null,
++  target: Entity,
++  amount: number,
++): void {
++  if (!source || amount <= 0 || !BUDDY_CHALLENGE_BOSSES.has(target.templateId)) return;
++  const contributorId = source.kind === 'player' ? source.id : source.ownerId;
++  if (contributorId === null) return;
++  let attempt = attempts.get(target);
++  if (!attempt) {
++    attempt = { startTick: ctx.tickCount, damage: new Map() };
++    attempts.set(target, attempt);
++  }
++  attempt.damage.set(contributorId, (attempt.damage.get(contributorId) ?? 0) + amount);
++}
++
++/** Evade/respawn: forget the attempt so the next pull starts a fresh clock. */
++export function resetBuddyChallenge(boss: Entity): void {
++  attempts.delete(boss);
++}
++
++/** The attempt's length so far in seconds (0 with no attempt open). */
++export function buddyAttemptSeconds(ctx: SimContext, boss: Entity): number {
++  const attempt = attempts.get(boss);
++  return attempt ? Math.max(0, ctx.tickCount - attempt.startTick) / TICK_RATE : 0;
++}
++
++/** Death-site hook: resolve every challenge the boss carries for every
++ *  recipient, then consume the attempt. A speed task pays everyone credited;
++ *  a dps task pays each player on their own damage. */
++export function resolveBuddyChallenges(
++  ctx: SimContext,
++  boss: Entity,
++  recipients: readonly PlayerMeta[],
++): void {
++  const rows = buddyCosmeticChallengesFor(boss.templateId);
++  if (rows.length === 0) return;
++  const attempt = attempts.get(boss);
++  attempts.delete(boss);
++  if (!attempt) return;
++  // A kill on the same tick as the first hit is a one-tick fight, never a
++  // division by zero.
++  const seconds = Math.max(1 / TICK_RATE, (ctx.tickCount - attempt.startTick) / TICK_RATE);
++  for (const row of rows) {
++    for (const meta of recipients) {
++      const ok =
++        row.kind === 'speed'
++          ? seconds <= row.seconds
++          : (attempt.damage.get(meta.entityId) ?? 0) / seconds >= row.dps;
++      if (ok) grantBuddyCosmetic(ctx, meta.entityId, row.cosmeticId);
++    }
++  }
++}
+diff --git a/src/sim/buddy_drops.ts b/src/sim/buddy_drops.ts
+--- a/src/sim/buddy_drops.ts
++++ b/src/sim/buddy_drops.ts
+@@ -18,8 +18,15 @@
+ //
+ // `src/sim`-pure.
+ 
+-import { attachPendingBuddy, grantBuddy, revealPendingBuddies } from './buddies';
+ import {
++  attachPendingBuddy,
++  buddyWornTint,
++  grantBuddy,
++  grantBuddyCosmetic,
++  revealPendingBuddies,
++} from './buddies';
++import {
++  BUDDY_COSMETIC_DEED_REWARDS,
+   BUDDY_DEED_REWARDS,
+   BUDDY_WORLD_REVEAL_DISTANCE,
+   buddyBossDropsFor,
+@@ -84,7 +91,7 @@
+   }
+ }
+ 
+-/** Login, three jobs. (1) A deed earned before its companion was
++/** Login, three jobs. (1) A deed earned before its companion or look was
+  *  authored pays out now (the deed evaluator's retro pass skips deeds already
+  *  earned, so the reward table is reconciled here instead). (2) A companion
+  *  left pending by a logout mid-instance reveals at once when the player
+@@ -98,11 +105,14 @@
+   for (const [deedId, key] of Object.entries(BUDDY_DEED_REWARDS)) {
+     if (meta.deedsEarned.has(deedId)) grantBuddy(ctx, pid, key);
+   }
++  for (const [deedId, id] of Object.entries(BUDDY_COSMETIC_DEED_REWARDS)) {
++    if (meta.deedsEarned.has(deedId)) grantBuddyCosmetic(ctx, pid, id);
++  }
+   const inside = playerInsideInstance(ctx, e);
+   revealPendingBuddies(ctx, pid, (p) => p.source === 'world' || !inside);
+   const last = meta.buddies.last;
+   if (!e.buddyKey && !e.dead && last && meta.buddies.owned.has(last)) {
+     e.buddyKey = last;
+-    spawnBuddyEntity(ctx, e, last);
++    spawnBuddyEntity(ctx, e, last, buddyWornTint(meta, last));
+   }
+ }
+diff --git a/src/sim/combat/damage.ts b/src/sim/combat/damage.ts
+--- a/src/sim/combat/damage.ts
++++ b/src/sim/combat/damage.ts
+@@ -23,6 +23,7 @@
+ // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
+ // (enforced by tests/architecture.test.ts).
+ 
++import { recordBossDamageForBuddies, resolveBuddyChallenges } from '../buddy_challenges';
+ import { rollBossBuddyDrops } from '../buddy_drops';
+ import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
+ import * as deedsMod from '../deeds';
+@@ -1159,6 +1160,9 @@
+   // persisted lifetime damage counters beside the session RewardCounters
+   // below, plus encounter participant tracking for the roster tasks.
+   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
++  // Boss-pet cosmetic challenges (src/sim/buddy_challenges.ts): the attempt
++  // clock and per-player damage on the few bosses that carry one. Zero rng.
++  recordBossDamageForBuddies(ctx, source, target, amount);
+   // The hub dummy lesson (tutorial/dummy_drill.ts): one credit per blow that
+   // actually lands on a training dummy. Zero rng.
+   if (source && amount > 0) creditDummyDrill(ctx, source, target);
+@@ -1862,6 +1866,7 @@
+     // boss that carries a companion row.
+     if (!template?.worldBoss) {
+       rollBossBuddyDrops(ctx, e, heroicRewardRecipients, claimedInst);
++      resolveBuddyChallenges(ctx, e, heroicRewardRecipients);
+     }
+     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
+     // Intentional Gathering PR3: the kill-credit priority snapshot for a
+@@ -1881,6 +1886,7 @@
+     if (worldBossContribs) {
+       ctx.rollWorldBossLoot(e, worldBossContribs);
+       rollBossBuddyDrops(ctx, e, worldBossContribs, null);
++      resolveBuddyChallenges(ctx, e, worldBossContribs);
+       // World-boss deeds ride the same never-pruned contributor roster.
+       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
+     }
+diff --git a/src/sim/content/buddies.ts b/src/sim/content/buddies.ts
+--- a/src/sim/content/buddies.ts
++++ b/src/sim/content/buddies.ts
+@@ -18,13 +18,12 @@
+ // imports and runs unchanged on the server, offline, and headless.
+ // ---------------------------------------------------------------------------
+ 
+-export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw';
++export type BuddyKey = 'horse' | 'sapling' | 'crystal_lich' | 'forgemaw';
+ 
+ // Historical whistle identities remain readable in existing bags and bank saves.
+ // This type is only for item definitions; active ownership uses BuddyKey.
+ export type BuddyTokenKey =
+   | BuddyKey
+-  | 'sapling'
+   | 'ember_fox'
+   | 'moss_hare'
+   | 'frog'
+@@ -67,6 +66,10 @@
+     key: 'horse',
+     name: 'Horse',
+   },
++  sapling: {
++    key: 'sapling',
++    name: 'Sapling',
++  },
+   crystal_lich: {
+     key: 'crystal_lich',
+     name: 'Crystal Lich',
+diff --git a/src/sim/content/buddy_cosmetics.ts b/src/sim/content/buddy_cosmetics.ts
+new file mode 100644
+--- /dev/null
++++ b/src/sim/content/buddy_cosmetics.ts
+@@ -0,0 +1,76 @@
++// ---------------------------------------------------------------------------
++// Buddy cosmetics: the declarative catalog of looks a collected companion can
++// wear. A cosmetic is a per-character unlock (PlayerMeta.buddies.cosmetics,
++// src/sim/buddies.ts) and, once unlocked, can be EQUIPPED on the buddy it
++// belongs to (one worn cosmetic per buddy). Zero gameplay effect, like the
++// buddy itself.
++//
++// The only cosmetic kind today is a TINT: the entity dye the renderer already
++// applies to any rig whose VISUALS entry opts in (`tint: 'entity'` or the
++// cosmetic-only `tint: 'cosmetic'`, src/render/characters/manifest.ts). The
++// worn tint replaces the buddy template's own color on the follower entity
++// (spawnBuddyEntity), so the same wire field (`c`) carries it with no new
++// protocol. Kinds that need more than a dye (particle trails, held props) are
++// a later catalog extension; the unlock/equip plumbing does not care.
++//
++// WHERE a cosmetic comes from is NOT authored here: sources live in
++// src/sim/content/buddy_sources.ts (challenges, deeds, tokens, grants) so the
++// Hunting pane can derive them from the live tables, the same rule the
++// buddies themselves follow.
++//
++// `src/sim`-pure, rng-free.
++// ---------------------------------------------------------------------------
++
++import type { BuddyKey } from './buddies';
++
++export interface BuddyCosmeticDef {
++  id: string;
++  /** The one buddy this look fits. A cosmetic never crosses companions. */
++  buddy: BuddyKey;
++  /** Canonical English display name (localized at the client boundary through
++   *  hudChrome.collections.cosmetic.<id>). */
++  name: string;
++  /** The entity dye worn while equipped (replaces the template color). */
++  tint: number;
++}
++
++export const BUDDY_COSMETICS: Record<string, BuddyCosmeticDef> = {
++  // -- Boss pets: the challenge looks. Speedrun the boss the pet dropped from
++  // or hold a damage rate through the fight (buddy_sources.ts). -------------
++  crystal_lich_frostbound: {
++    id: 'crystal_lich_frostbound',
++    buddy: 'crystal_lich',
++    name: 'Frostbound',
++    tint: 0x9fd8ff,
++  },
++  crystal_lich_voltaic: {
++    id: 'crystal_lich_voltaic',
++    buddy: 'crystal_lich',
++    name: 'Voltaic',
++    tint: 0xffe066,
++  },
++  forgemaw_ashen: {
++    id: 'forgemaw_ashen',
++    buddy: 'forgemaw',
++    name: 'Ashen',
++    tint: 0x8d8d8d,
++  },
++  forgemaw_whitehot: {
++    id: 'forgemaw_whitehot',
++    buddy: 'forgemaw',
++    name: 'White-Hot',
++    tint: 0xfff2cc,
++  },
++};
++
++/** Catalog order: declaration order. */
++export const BUDDY_COSMETIC_IDS = Object.keys(BUDDY_COSMETICS) as readonly string[];
++
++export function buddyCosmeticDef(id: string): BuddyCosmeticDef | null {
++  return (BUDDY_COSMETICS as Record<string, BuddyCosmeticDef | undefined>)[id] ?? null;
++}
++
++/** Every cosmetic authored for `buddy`, in catalog order. */
++export function buddyCosmeticsFor(buddy: BuddyKey): BuddyCosmeticDef[] {
++  return BUDDY_COSMETIC_IDS.map((id) => BUDDY_COSMETICS[id]).filter((def) => def.buddy === buddy);
++}
+diff --git a/src/sim/content/buddy_mobs.ts b/src/sim/content/buddy_mobs.ts
+--- a/src/sim/content/buddy_mobs.ts
++++ b/src/sim/content/buddy_mobs.ts
+@@ -59,6 +59,7 @@
+ 
+ export const BUDDY_MOBS: Record<string, MobTemplate> = {
+   [buddyTemplateId('horse')]: buddyTemplate('horse', 'Horse', 'beast', 0xffffff),
++  [buddyTemplateId('sapling')]: buddyTemplate('sapling', 'Sapling', 'elemental', 0xffffff),
+   [buddyTemplateId('crystal_lich')]: buddyTemplate(
+     'crystal_lich',
+     'Crystal Lich',
+diff --git a/src/sim/content/buddy_sources.ts b/src/sim/content/buddy_sources.ts
+--- a/src/sim/content/buddy_sources.ts
++++ b/src/sim/content/buddy_sources.ts
+@@ -1,5 +1,5 @@
+ // ---------------------------------------------------------------------------
+-// Where buddies COME FROM: the acquisition tables.
++// Where buddies and their cosmetics COME FROM: the acquisition tables.
+ //
+ // Design (owner plan, 2026-09-09): buddies are rare. They are never bag loot
+ // and never a store row. There are exactly two ways to a companion:
+@@ -12,6 +12,13 @@
+ //      instance or away from the world boss (src/sim/buddy_drops.ts).
+ //   2. ACHIEVEMENT PETS. A Book of Deeds entry names a companion; earning the
+ //      deed grants it outright (src/sim/deeds.ts grantDeed -> buddies.ts).
++//
++// Cosmetics for BOSS pets are mostly challenge unlocks on the boss that drops
++// the pet (a speed kill, a damage rate). Cosmetics for ACHIEVEMENT pets are
++// mostly crafted (a token item whose recipe eats rare gathered materials).
++// Both kinds can also be a vendor token (the store) or a plain grant (the
++// monthly ladder / top-parse awards an out-of-game job hands out through the
++// admin grant endpoint, server/admin.ts).
+ //
+ // The whistle items (content/items.ts, kind 'buddy') survive as GRANT TOKENS
+ // only: soulbound, consumed on use, attaching an active companion. Historical
+@@ -64,6 +71,53 @@
+  *  title/border reward; the buddy rides beside it. */
+ export const BUDDY_DEED_REWARDS: Readonly<Record<string, BuddyKey>> = {};
+ 
++// Cosmetic challenges: resolved at the boss's death for every player the
++// encounter credits (src/sim/buddy_challenges.ts). A 'speed' task measures
++// from the first damage of the attempt to the kill; a 'dps' task is the
++// player's OWN damage on the boss over that same window. Both re-arm when the
++// boss evades or respawns, exactly like the deed encounter tasks.
++export type BuddyCosmeticChallenge =
++  | { cosmeticId: string; bossId: string; kind: 'speed'; seconds: number }
++  | { cosmeticId: string; bossId: string; kind: 'dps'; dps: number };
++
++// CALIBRATE: placeholders, retune against live pull timings and parses.
++export const BUDDY_COSMETIC_CHALLENGES: readonly BuddyCosmeticChallenge[] = [
++  {
++    cosmeticId: 'crystal_lich_frostbound',
++    bossId: 'nythraxis_scourge_of_thornpeak',
++    kind: 'speed',
++    seconds: 300,
++  },
++  {
++    cosmeticId: 'crystal_lich_voltaic',
++    bossId: 'nythraxis_scourge_of_thornpeak',
++    kind: 'dps',
++    dps: 600,
++  },
++  {
++    cosmeticId: 'forgemaw_ashen',
++    bossId: 'ignivar_herald_of_the_last_flame',
++    kind: 'speed',
++    seconds: 240,
++  },
++  {
++    cosmeticId: 'forgemaw_whitehot',
++    bossId: 'varkhul_forgefather_of_the_last_flame',
++    kind: 'dps',
++    dps: 600,
++  },
++];
++
++/** Deed id -> the cosmetic earning it unlocks. */
++export const BUDDY_COSMETIC_DEED_REWARDS: Readonly<Record<string, string>> = {};
++
++/** Cosmetics that NOTHING in the game hands out: they exist to be granted by
++ *  an out-of-game award (the monthly PvP ladder, the monthly top parse per
++ *  boss and spec, the zodiac/gemstone seasonal rewards) through the admin
++ *  grant endpoint. Listed so the Hunting pane can say "seasonal reward"
++ *  instead of "not obtainable". */
++export const BUDDY_COSMETIC_GRANT_ONLY: ReadonlySet<string> = new Set();
++
+ /** How far a player has to walk from an open-world boss kill before a pending
+  *  companion from it reveals itself. Instance kills reveal on the zone-out. */
+ export const BUDDY_WORLD_REVEAL_DISTANCE = 80;
+@@ -75,10 +129,25 @@
+   BOSS_DROPS_BY_BOSS.set(drop.bossId, list);
+ }
+ 
++const CHALLENGES_BY_BOSS = new Map<string, BuddyCosmeticChallenge[]>();
++for (const challenge of BUDDY_COSMETIC_CHALLENGES) {
++  const list = CHALLENGES_BY_BOSS.get(challenge.bossId) ?? [];
++  list.push(challenge);
++  CHALLENGES_BY_BOSS.set(challenge.bossId, list);
++}
++
+ /** The per-player rolls a kill of `bossId` makes (empty for every other mob). */
+ export function buddyBossDropsFor(bossId: string): readonly BuddyBossDrop[] {
+   return BOSS_DROPS_BY_BOSS.get(bossId) ?? [];
+ }
++
++/** The cosmetic challenges a kill of `bossId` resolves (empty for every other mob). */
++export function buddyCosmeticChallengesFor(bossId: string): readonly BuddyCosmeticChallenge[] {
++  return CHALLENGES_BY_BOSS.get(bossId) ?? [];
++}
++
++/** Bosses whose attempts need the damage/timing tracker running at all. */
++export const BUDDY_CHALLENGE_BOSSES: ReadonlySet<string> = new Set(CHALLENGES_BY_BOSS.keys());
+ 
+ /** Every boss-drop row for one companion, for the Hunting pane. */
+ export function buddyBossDropsOf(key: BuddyKey): readonly BuddyBossDrop[] {
+@@ -92,3 +161,16 @@
+   }
+   return null;
+ }
++
++/** The deed (if any) that unlocks one cosmetic. */
++export function buddyCosmeticDeedOf(cosmeticId: string): string | null {
++  for (const [deedId, id] of Object.entries(BUDDY_COSMETIC_DEED_REWARDS)) {
++    if (id === cosmeticId) return deedId;
++  }
++  return null;
++}
++
++/** Every challenge row for one cosmetic, for the Hunting pane. */
++export function buddyCosmeticChallengesOf(cosmeticId: string): readonly BuddyCosmeticChallenge[] {
++  return BUDDY_COSMETIC_CHALLENGES.filter((challenge) => challenge.cosmeticId === cosmeticId);
++}
+diff --git a/src/sim/deeds.ts b/src/sim/deeds.ts
+--- a/src/sim/deeds.ts
++++ b/src/sim/deeds.ts
+@@ -27,8 +27,8 @@
+ // in Node, the browser, and the headless RL env.
+ 
+ import { recordAccountDeed, selfEarner } from './account_ledger';
+-import { grantBuddy } from './buddies';
+-import { BUDDY_DEED_REWARDS } from './content/buddy_sources';
++import { grantBuddy, grantBuddyCosmetic } from './buddies';
++import { BUDDY_COSMETIC_DEED_REWARDS, BUDDY_DEED_REWARDS } from './content/buddy_sources';
+ import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
+ import { FARM_CROP_IDS } from './content/farm_crops';
+ import { GATHERING_PROFESSION_IDS } from './content/professions';
+@@ -794,12 +794,14 @@
+     pid: meta.entityId,
+     ...(opts?.retro ? { retro: true } : {}),
+   });
+-  // Achievement pets (content/buddy_sources.ts): a deed that names
+-  // a companion grants it on the same call, retro grants
++  // Achievement pets and looks (content/buddy_sources.ts): a deed that names
++  // a companion or a cosmetic grants it on the same call, retro grants
+   // included (a character who earned the deed before the pet existed gets it
+-  // at their next login). The grant is idempotent and draws no rng.
++  // at their next login). Both grants are idempotent and draw no rng.
+   const buddyReward = BUDDY_DEED_REWARDS[deedId];
+   if (buddyReward) grantBuddy(ctx, meta.entityId, buddyReward);
++  const lookReward = BUDDY_COSMETIC_DEED_REWARDS[deedId];
++  if (lookReward) grantBuddyCosmetic(ctx, meta.entityId, lookReward);
+   // Horizons titles score catalogRankOwned. Live grant of a title relic can
+   // cross a Curator threshold; keep display rank and zero-Renown bridges aligned
+   // without waiting for join retro. The rank bridges for ranks 2 to 4 are
+diff --git a/src/sim/dev_commands.ts b/src/sim/dev_commands.ts
+--- a/src/sim/dev_commands.ts
++++ b/src/sim/dev_commands.ts
+@@ -1,6 +1,7 @@
+-import { attachPendingBuddy, grantBuddy } from './buddies';
++import { attachPendingBuddy, grantBuddy, grantBuddyCosmetic } from './buddies';
+ import { applyCourserDaze } from './combat/hunter_shared';
+ import { BUDDY_KEYS } from './content/buddies';
++import { BUDDY_COSMETIC_IDS } from './content/buddy_cosmetics';
+ import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
+ import { MOUNT_SKIN_IDS } from './content/mount_skins';
+ import { MOUNT_KEYS } from './content/mounts';
+@@ -340,14 +341,16 @@
+     return null;
+   }
+ 
+-  // /dev buddies: collect every companion outright.
++  // /dev buddies: collect every companion and every look outright.
+   if (/^\/(?:dev\s+buddi?es?|devbuddi?es?)\s*$/i.test(raw)) {
+     let granted = 0;
+     for (const key of BUDDY_KEYS) if (grantBuddy(ctx, pid, key)) granted += 1;
++    let looks = 0;
++    for (const id of BUDDY_COSMETIC_IDS) if (grantBuddyCosmetic(ctx, pid, id)) looks += 1;
+     emitDevLog(
+       ctx,
+       pid,
+-      `[dev] Collected ${granted} buddies (${BUDDY_KEYS.length} in the catalog). Summon one from the Hunting pane.`,
++      `[dev] Collected ${granted} buddies and ${looks} looks (${BUDDY_KEYS.length} in the catalog). Summon one from the Hunting pane.`,
+     );
+     return null;
+   }
+@@ -371,6 +374,19 @@
+     );
+     return null;
+   }
++  // /dev buddylook <id>: unlock one cosmetic outright.
++  const lookMatch = /^\/dev\s+buddylook\s+([a-z_]+)\s*$/i.exec(raw);
++  if (lookMatch) {
++    const id = lookMatch[1].toLowerCase();
++    const unlocked = grantBuddyCosmetic(ctx, pid, id);
++    emitDevLog(
++      ctx,
++      pid,
++      unlocked ? `[dev] Unlocked look ${id}.` : `[dev] Unknown or owned look: ${id}`,
++    );
++    return null;
++  }
++
+   // Grant every catalog mount skin to the (offline, session-local) account
+   // cosmetics so the Cosmetics window can be exercised without the store.
+   // Server-side the session cosmetics are the authority, so this only ever
+@@ -1158,7 +1174,7 @@
+   if (/^\/dev(?:\s|$)/i.test(raw)) {
+     ctx.error(
+       pid,
+-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
++      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev buddylook <id>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+     );
+     return null;
+   }
+diff --git a/src/sim/items.ts b/src/sim/items.ts
+--- a/src/sim/items.ts
++++ b/src/sim/items.ts
+@@ -25,7 +25,7 @@
+   equipBag as equipBagCmd,
+   stackSizeOf,
+ } from './bags';
+-import { useBuddyToken } from './buddies';
++import { useBuddyCosmeticToken, useBuddyToken } from './buddies';
+ import { buildConsuming } from './consuming';
+ import { isRawCookingCatch } from './content/items';
+ import { ITEMS, NPCS } from './data';
+@@ -1199,7 +1199,8 @@
+     // Summoning an owned buddy is a Hunting-window command, not an item use.
+     useBuddyToken(ctx, meta.entityId, itemId);
+   } else if (def.kind === 'buddy_cosmetic') {
+-    // Historical cosmetic tokens remain readable but are no longer usable.
++    // Same shape for a look: unlock it for the character, consume the token.
++    useBuddyCosmeticToken(ctx, meta.entityId, itemId);
+   } else if (def.kind === 'recipe') {
+     // A pattern teaches the recipe it names and is spent doing so.
+     // useRecipePatternItem owns every gate and the consume; it sits here, below
+diff --git a/src/sim/mob/lifecycle.ts b/src/sim/mob/lifecycle.ts
+--- a/src/sim/mob/lifecycle.ts
++++ b/src/sim/mob/lifecycle.ts
+@@ -31,6 +31,7 @@
+ // resetNythraxisEncounter, the rng/emit/grid/players/entities/cfg primitives) routes
+ // through the seam, all of which still resolve on Sim.
+ 
++import { resetBuddyChallenge } from '../buddy_challenges';
+ import { MOBS } from '../data';
+ import * as deedsMod from '../deeds';
+ import { resetIgnivarEncounter } from '../encounters/ignivar';
+@@ -96,6 +97,7 @@
+   despawnSummonedAdds(ctx, mob);
+   // A respawn ends the attempt; the deed window re-arms.
+   deedsMod.resetDeedEncounter(ctx, mob);
++  resetBuddyChallenge(mob);
+   // The respawn reuses the entity id: an UNCREDITED death (untapped, or a
+   // non-player kill) skips the credited-kill taint consumption, so drop any
+   // kill-order taint here or the fresh mender spawns pre-denied. Respawn only:
+diff --git a/src/sim/mob/locomotion.ts b/src/sim/mob/locomotion.ts
+--- a/src/sim/mob/locomotion.ts
++++ b/src/sim/mob/locomotion.ts
+@@ -31,6 +31,7 @@
+ // sibling targeting module are imported directly (already pure); everything that
+ // touches not-yet-extracted Sim state routes through the seam.
+ 
++import { resetBuddyChallenge } from '../buddy_challenges';
+ import { hasUnbreakableMovementLock } from '../combat/cc';
+ import { YUMI_TEMPLATE_ID } from '../content/yumi';
+ import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+@@ -1523,6 +1524,7 @@
+   ctx.despawnSummonedAdds(mob);
+   // An evade ends the attempt; the deed window re-arms.
+   deedsMod.resetDeedEncounter(ctx, mob);
++  resetBuddyChallenge(mob);
+   mob.firedSummons = 0;
+   mob.enraged = false;
+   mob.healedThisPull = false;
+diff --git a/src/sim/pet/buddy_ai.ts b/src/sim/pet/buddy_ai.ts
+--- a/src/sim/pet/buddy_ai.ts
++++ b/src/sim/pet/buddy_ai.ts
+@@ -85,12 +85,21 @@
+ 
+ /** Spawns `key`'s buddy for `owner`, replacing any buddy it already has out.
+  *  Zero-stat, zero-loot, never hostile: nothing ever targets it. */
+-export function spawnBuddyEntity(ctx: SimContext, owner: Entity, key: BuddyKey): void {
++export function spawnBuddyEntity(
++  ctx: SimContext,
++  owner: Entity,
++  key: BuddyKey,
++  /** The worn cosmetic's dye (src/sim/buddies.ts buddyWornTint); null keeps
++   *  the template's own color. Carried as the entity color, so the ordinary
++   *  `c` wire field and the renderer's entity tint path do the rest. */
++  tint: number | null = null,
++): void {
+   const existing = buddyOf(ctx, owner.id);
+   if (existing) ctx.dropEntity(existing.id);
+   const template = MOBS[buddyTemplateId(key)];
+   if (!template) return;
+   const buddy = createMob(ctx.nextId++, template, owner.level, buddyFollowTarget(owner));
++  if (tint !== null) buddy.color = tint;
+   buddy.ownerId = owner.id;
+   buddy.hostile = false;
+   buddy.aiState = 'idle';
+diff --git a/src/sim/sim.ts b/src/sim/sim.ts
+--- a/src/sim/sim.ts
++++ b/src/sim/sim.ts
+@@ -1841,8 +1841,8 @@
+   // account earned each deed and found each relic. Host-loaded INPUT per join,
+   // appended by the grant paths; never serialized into CharacterState.
+   accountLedger: AccountLedger;
+-  // The buddy collection (src/sim/buddies.ts): owned companions and
+-  // the boss-roll wins still pending
++  // The buddy collection (src/sim/buddies.ts): owned companions, unlocked
++  // cosmetics, the worn look per buddy, and the boss-roll wins still pending
+   // their reveal. Persisted (character_state.ts `buddies`); the ACTIVE buddy
+   // stays a session-only entity field (Entity.buddyKey), like the mount.
+   buddies: buddiesMod.BuddyCollection;
+@@ -3503,7 +3503,7 @@
+       // recompute, and the validated title/border re-apply.
+       restoreBookOfDeeds(meta, player, s);
+       // The buddy collection restores beside the Book (buddies.ts): owned
+-      // companions and pending boss reveals.
++      // companions, cosmetics, looks and pending boss reveals.
+       meta.buddies = buddiesMod.restoreBuddyCollection(s.buddies);
+       // Resume with the weapon sheathed exactly as saved (absent = drawn).
+       if (s.weaponStowed) player.weaponStowed = true;
+@@ -4387,8 +4387,22 @@
+   summonBuddyFor(pid: number, key: string): boolean {
+     return buddiesMod.summonBuddy(this.ctx, pid, key);
+   }
++  equipBuddyCosmeticFor(pid: number, key: string, cosmeticId: string | null): boolean {
++    return buddiesMod.equipBuddyCosmetic(this.ctx, pid, key, cosmeticId);
++  }
+   grantBuddyFor(pid: number, key: string): boolean {
+     return buddiesMod.grantBuddy(this.ctx, pid, key);
++  }
++  grantBuddyCosmeticFor(pid: number, cosmeticId: string): boolean {
++    return buddiesMod.grantBuddyCosmetic(this.ctx, pid, cosmeticId);
++  }
++  ownedBuddyCosmeticsFor(pid: number): string[] {
++    const meta = this.players.get(pid);
++    return meta ? buddiesMod.ownedBuddyCosmetics(meta) : [];
++  }
++  equippedBuddyCosmeticsFor(pid: number): Record<string, string> {
++    const meta = this.players.get(pid);
++    return meta ? buddiesMod.equippedBuddyCosmetics(meta) : {};
+   }
+   pendingBuddiesFor(pid: number): BuddyKey[] {
+     const meta = this.players.get(pid);
+@@ -4399,11 +4413,20 @@
+   ownedBuddies(): readonly BuddyKey[] {
+     return this.ownedBuddiesFor(this.primaryId);
+   }
++  ownedBuddyCosmetics(): readonly string[] {
++    return this.ownedBuddyCosmeticsFor(this.primaryId);
++  }
++  equippedBuddyCosmetics(): Readonly<Record<string, string>> {
++    return this.equippedBuddyCosmeticsFor(this.primaryId);
++  }
+   pendingBuddies(): readonly BuddyKey[] {
+     return this.pendingBuddiesFor(this.primaryId);
+   }
+   summonBuddy(key: BuddyKey): void {
+     this.summonBuddyFor(this.primaryId, key);
++  }
++  equipBuddyCosmetic(key: BuddyKey, cosmeticId: string | null): void {
++    this.equipBuddyCosmeticFor(this.primaryId, key, cosmeticId);
+   }
+   toggleBuddy(): void {
+     this.toggleBuddyFor(this.primaryId);
+diff --git a/src/sim/types.ts b/src/sim/types.ts
+--- a/src/sim/types.ts
++++ b/src/sim/types.ts
+@@ -1531,11 +1531,13 @@
+   weapon?: never;
+ }
+ 
+-// Historical buddy cosmetic token shape, retained for existing inventories.
+-// Tokens no longer unlock looks and are not consumed on use.
++// A buddy COSMETIC token: using it unlocks the named look for the character
++// (src/sim/buddies.ts useBuddyCosmeticToken) and consumes the token. This is
++// how a crafted look (a recipe result) and a store look (a vendor row) reach
++// the wardrobe; challenge, deed and admin unlocks skip the item entirely.
+ export interface BuddyCosmeticItemDef extends BaseItemDef {
+   kind: 'buddy_cosmetic';
+-  /** Historical cosmetic id, retained for old inventory records. */
++  /** content/buddy_cosmetics.ts id. */
+   cosmetic: string;
+   armorType?: never;
+   weapon?: never;
+@@ -7880,13 +7882,15 @@
+   // text-free: the client renders its own localized line off `pairId`.
+   | { type: 'attuned'; pid: number; pairId: string }
+   // Buddy companions (src/sim/buddies.ts, content/buddy_sources.ts). All
+-  // events are personal and text-free: the client renders a localized chat
++  // three are personal and text-free: the client renders a localized chat
+   // line off the id. `buddyPresence` fires when a boss roll attaches a
+   // PENDING companion ("you feel a presence watching you"); `buddyRevealed`
+   // when a companion becomes owned (the zone-out reveal, a deed grant, a
+-  // token use, an admin grant).
++  // token use, an admin grant); `buddyCosmeticUnlocked` when a look unlocks
++  // (a challenge, a deed, a token, a grant).
+   | { type: 'buddyPresence'; pid: number; key: string }
+   | { type: 'buddyRevealed'; pid: number; key: string }
++  | { type: 'buddyCosmeticUnlocked'; pid: number; cosmeticId: string }
+   // Attunement celebration, zone broadcast (Professions 2.0): the soft
+   // zone-wide copy of an attunement, one per overworld player currently in the
+   // celebrant's zone INCLUDING the celebrant, `pid` being the RECIPIENT (the
+diff --git a/src/styles/components.css b/src/styles/components.css
+--- a/src/styles/components.css
++++ b/src/styles/components.css
+@@ -10245,8 +10245,9 @@
+     gap: 8px;
+   }
+   /* The buddy shelf: the whistle still as the option's icon, the drag grip
+-     for the action bar. */
+-  .deeds-buddies .deed-title-option {
++     for the action bar, and the look swatch (the cosmetic's dye). */
++  .deeds-buddies .deed-title-option,
++  .deeds-buddy-looks .deed-title-option {
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+@@ -10258,7 +10259,8 @@
+     border: 1px solid #4a3d26;
+     flex: 0 0 auto;
+   }
+-  .deed-buddy-icon-empty {
++  .deed-buddy-icon-empty,
++  .deed-look-swatch-empty {
+     background: linear-gradient(160deg, #17130c, #0c0a07);
+   }
+   .deed-buddy-drag {
+@@ -10274,6 +10276,14 @@
+   }
+   .deed-buddy-drag:hover {
+     color: var(--color-deed-banner-text);
++  }
++  .deed-look-swatch {
++    width: 16px;
++    height: 16px;
++    border-radius: 50%;
++    border: 1px solid #4a3d26;
++    flex: 0 0 auto;
++    background: var(--deed-look-swatch, #17130c);
+   }
+   .deed-border-swatch {
+     flex: none;
+@@ -14111,12 +14121,42 @@
+   .col-row.col-locked {
+     opacity: 0.55;
+   }
+-  /* The buddy pane's summon/dismiss command: the shared
++  /* The buddy pane's commands (summon/dismiss, wear/remove): the shared
+      button chrome at the pane's own rhythm. */
+   .col-action {
+     margin: 6px 0 4px;
+     padding: 4px 12px;
+     min-height: 40px;
++  }
++  /* The looks list under a companion: one row per authored cosmetic, its dye
++     as a swatch, state, control, and source lines. A locked look dims like a
++     locked catalog row. */
++  .col-looks {
++    list-style: none;
++    margin: 0;
++    padding: 0;
++  }
++  .col-look {
++    display: flex;
++    flex-wrap: wrap;
++    align-items: center;
++    gap: 6px 8px;
++    padding: 4px 0;
++    border-bottom: 1px solid var(--color-border-showcase);
++  }
++  .col-look.col-locked {
++    opacity: 0.55;
++  }
++  .col-look .col-line {
++    flex: 1 0 100%;
++  }
++  .col-swatch {
++    flex: 0 0 auto;
++    width: 14px;
++    height: 14px;
++    border-radius: 50%;
++    border: 1px solid var(--color-border-showcase);
++    background: var(--col-swatch, currentColor);
+   }
+   .col-row-name {
+     flex: 1;
+diff --git a/src/ui/buddy_event_lines.ts b/src/ui/buddy_event_lines.ts
+--- a/src/ui/buddy_event_lines.ts
++++ b/src/ui/buddy_event_lines.ts
+@@ -1,5 +1,5 @@
+-// The chat lines for the two text-free buddy events (src/sim/types.ts
+-// buddyPresence / buddyRevealed): a pure plan the HUD
++// The chat lines for the three text-free buddy events (src/sim/types.ts
++// buddyPresence / buddyRevealed / buddyCosmeticUnlocked): a pure plan the HUD
+ // paints, so the wording and colour are unit-pinned away from the coordinator.
+ //
+ // The presence line is the whole point of the boss-pet reveal (owner plan):
+@@ -8,6 +8,7 @@
+ // (hudChrome.collections.presence.<key>); a companion without one falls back
+ // to the shared line, so a new catalog entry never paints a raw key.
+ 
++import { buddyCosmeticDef } from '../sim/content/buddy_cosmetics';
+ import { buddyTemplateId } from '../sim/content/buddy_mobs';
+ import { tEntity } from './entity_i18n';
+ import { type TranslationKey, t, tOptional } from './i18n';
+@@ -26,6 +27,13 @@
+   return tEntity({ kind: 'mob', id: buddyTemplateId(key as never), field: 'name' });
+ }
+ 
++/** A cosmetic's localized name (hudChrome.collections.cosmetic.<id>), falling
++ *  back to the catalog's English when the key is absent. */
++export function buddyCosmeticDisplayName(cosmeticId: string): string {
++  const key = `hudChrome.collections.cosmetic.${cosmeticId}` as TranslationKey;
++  return tOptional(key) ?? buddyCosmeticDef(cosmeticId)?.name ?? cosmeticId;
++}
++
+ export function buddyPresenceLine(key: string): BuddyEventLine {
+   const own = `hudChrome.collections.presence.${key}` as TranslationKey;
+   const text = tOptional(own) ?? t('hudChrome.collections.presenceDefault');
+@@ -39,6 +47,17 @@
+   };
+ }
+ 
++export function buddyCosmeticUnlockedLine(cosmeticId: string): BuddyEventLine {
++  const def = buddyCosmeticDef(cosmeticId);
++  return {
++    text: t('hudChrome.collections.cosmeticUnlocked', {
++      look: buddyCosmeticDisplayName(cosmeticId),
++      name: def ? buddyDisplayName(def.buddy) : cosmeticId,
++    }),
++    color: BUDDY_REVEAL_COLOR,
++  };
++}
++
+ /** The HUD's log() arguments for one event: `this.log(...buddyEventLogArgs(ev))`. */
+ export function buddyEventLogArgs(ev: Parameters<typeof buddyEventLine>[0]): [string, string] {
+   const line = buddyEventLine(ev);
+@@ -47,12 +66,17 @@
+ 
+ /** One entry point for the HUD's event switch. */
+ export function buddyEventLine(
+-  ev: { type: 'buddyPresence'; key: string } | { type: 'buddyRevealed'; key: string },
++  ev:
++    | { type: 'buddyPresence'; key: string }
++    | { type: 'buddyRevealed'; key: string }
++    | { type: 'buddyCosmeticUnlocked'; cosmeticId: string },
+ ): BuddyEventLine {
+   switch (ev.type) {
+     case 'buddyPresence':
+       return buddyPresenceLine(ev.key);
+     case 'buddyRevealed':
+       return buddyRevealedLine(ev.key);
++    case 'buddyCosmeticUnlocked':
++      return buddyCosmeticUnlockedLine(ev.cosmeticId);
+   }
+ }
+diff --git a/src/ui/collections/CLAUDE.md b/src/ui/collections/CLAUDE.md
+--- a/src/ui/collections/CLAUDE.md
++++ b/src/ui/collections/CLAUDE.md
+@@ -9,9 +9,9 @@
+ 
+ | Module | What it is |
+ |---|---|
+-| `collection_sources.ts` | **The derivation.** For an item id: its vendors, its drop tables, its bind state and its vendor sell value. For a buddy key (`buddySourceFacts`): the per-player boss rolls, the deed, and the grant token's vendors (`src/sim/content/buddy_sources.ts`). All read from the live content tables. Pure, memoized per id. |
+-| `collections_view.ts` | The pure view model: the three tabs as rows (a buddy row carries its collection state, its pending boss-roll flag, its own sources), plus the set grouping (armour type, then primary stat). DOM-free, i18n-free, and free of any `src/render` import. |
+-| `collections_window.ts` | The thin DOM painter and the window's view-state (tab, selection, render-skip signature, focus return). The buddy pane's summon/dismiss command goes through `IWorldBuddies`; the server re-validates it. |
++| `collection_sources.ts` | **The derivation.** For an item id: its vendors, its drop tables, its bind state and its vendor sell value. For a buddy key (`buddySourceFacts`): the per-player boss rolls, the deed, and the grant token's vendors (`src/sim/content/buddy_sources.ts`). For a look id (`buddyCosmeticFacts`): its challenges, deed, crafting recipe, token vendors, and whether it is a seasonal grant. All read from the live content tables. Pure, memoized per id. |
++| `collections_view.ts` | The pure view model: the three tabs as rows (a buddy row carries its collection state, its pending boss-roll flag, its own sources and its looks), plus the set grouping (armour type, then primary stat). DOM-free, i18n-free, and free of any `src/render` import. |
++| `collections_window.ts` | The thin DOM painter and the window's view-state (tab, selection, render-skip signature, focus return). The buddy pane's two commands (summon/dismiss, wear/remove a look) go out through `IWorldBuddies`; the server re-validates both. |
+ | `collections_host.ts` | The construction bag Hud hands the window, plus the two things that need the render and net layers: the visual-key maps and the Exchange price lookup. |
+ 
+ ## The rules that keep this window honest
+@@ -38,7 +38,7 @@
+   "not available on this client" are three different answers and the pane keeps
+   them apart. A blank or a stale figure is never acceptable on a price row.
+ 
+-Buddies are a per-character collection, never an item (`src/sim/buddies.ts`; design: `docs/design/buddy-acquisition.md`): the buddy tab reads ownership and pending wins off `IWorldBuddies`, and names each row after the companion itself rather than its grant token.
++Buddies are a per-character collection, never an item (`src/sim/buddies.ts`; design: `docs/design/buddy-acquisition.md`): the buddy tab reads ownership, looks, and pending wins off `IWorldBuddies`, and names each row after the companion itself rather than its grant token.
+ 
+ The buddy tab shows the active catalog as one flat list, ordered by rarity and
+ then catalog order. It has no pet-kind headings or filter controls. The Mounts
+diff --git a/src/ui/collections/collection_sources.ts b/src/ui/collections/collection_sources.ts
+--- a/src/ui/collections/collection_sources.ts
++++ b/src/ui/collections/collection_sources.ts
+@@ -1,7 +1,7 @@
+ // Where a collectible comes from, DERIVED from the live content tables rather
+ // than authored twice.
+ //
+-// The Collections window has to answer, for every buddy, mount and item
++// The Collections window has to answer, for every buddy, look, mount and item
+ // set in the game: where does it come from, who sells it, is it tradeable or
+ // soulbound, and what does a vendor pay for it. Every one of those answers
+ // already exists somewhere in src/sim/content (a mob's loot table, an NPC's
+@@ -14,16 +14,27 @@
+ //
+ // Buddies are NOT items (src/sim/buddies.ts): a companion's sources are the
+ // per-player boss rolls and the deed that grants it (content/buddy_sources.ts),
+-// plus the vendor that sells its grant TOKEN where one still does.
++// plus the vendor that sells its grant TOKEN where one still does. A look's
++// sources are its boss challenges, its deed, the recipe that crafts its token,
++// the vendor that sells one, or the seasonal grant channel.
+ //
+ // Pure and DOM-free (tests/collections_sources.test.ts drives it directly), and
+ // it holds no per-frame state: the catalog is static content, so the whole
+ // derivation is memoized once per id on first ask.
+ 
+ import type { BuddyKey } from '../../sim/content/buddies';
+-import { buddyBossDropsOf, buddyDeedOf } from '../../sim/content/buddy_sources';
++import { type BuddyCosmeticDef, buddyCosmeticDef } from '../../sim/content/buddy_cosmetics';
++import {
++  BUDDY_COSMETIC_GRANT_ONLY,
++  type BuddyCosmeticChallenge,
++  buddyBossDropsOf,
++  buddyCosmeticChallengesOf,
++  buddyCosmeticDeedOf,
++  buddyDeedOf,
++} from '../../sim/content/buddy_sources';
+ import { HEROIC_BOSS_LOOT } from '../../sim/content/heroic_loot';
+ import { HEROIC_VENDOR_STOCK } from '../../sim/content/heroic_vendor';
++import { ALL_RECIPES } from '../../sim/content/recipes';
+ import { DUNGEONS, ITEMS, MOBS, NPCS, zoneAt } from '../../sim/data';
+ import type { ItemDef } from '../../sim/types';
+ 
+@@ -95,8 +106,44 @@
+   obtainable: boolean;
+ }
+ 
++export interface CollectionChallengeSource {
++  bossId: string;
++  bossName: string;
++  location: string;
++  kind: BuddyCosmeticChallenge['kind'];
++  /** Seconds for a 'speed' task, damage per second for a 'dps' task. */
++  amount: number;
++}
++
++export interface CollectionCraftSource {
++  recipeId: string;
++  professionId: string;
++  /** The token item the recipe produces. */
++  itemId: string;
++}
++
++/** Everything the looks list needs about one cosmetic's sources. */
++export interface BuddyCosmeticFacts {
++  id: string;
++  buddy: BuddyKey;
++  /** Canonical English name; the window localizes through hudChrome.collections.cosmetic. */
++  name: string;
++  tint: number;
++  challenges: CollectionChallengeSource[];
++  deedId: string | null;
++  craft: CollectionCraftSource | null;
++  /** Vendors selling the look's token, where one exists. */
++  vendors: CollectionVendorSource[];
++  /** The token item id, when the look has one. */
++  tokenItemId: string | null;
++  /** True for a look only the seasonal grant channel hands out. */
++  grantOnly: boolean;
++  obtainable: boolean;
++}
++
+ const cache = new Map<string, CollectionItemFacts>();
+ const buddyCache = new Map<string, BuddySourceFacts>();
++const cosmeticCache = new Map<string, BuddyCosmeticFacts>();
+ 
+ function zoneNameAt(x: number, z: number): string {
+   return zoneAt(x, z).name;
+@@ -215,6 +262,14 @@
+ export function buddyTokenItemId(key: string): string | null {
+   for (const def of Object.values(ITEMS)) {
+     if (def.kind === 'buddy' && def.buddy === key) return def.id;
++  }
++  return null;
++}
++
++/** The token item for a look, if a recipe or vendor hands one out. */
++export function buddyCosmeticTokenItemId(cosmeticId: string): string | null {
++  for (const def of Object.values(ITEMS)) {
++    if (def.kind === 'buddy_cosmetic' && def.cosmetic === cosmeticId) return def.id;
+   }
+   return null;
+ }
+@@ -247,9 +302,59 @@
+   return facts;
+ }
+ 
++function craftSourceFor(tokenItemId: string | null): CollectionCraftSource | null {
++  if (!tokenItemId) return null;
++  const recipe = ALL_RECIPES.find((r) => r.resultItemId === tokenItemId);
++  return recipe
++    ? { recipeId: recipe.id, professionId: recipe.professionId, itemId: tokenItemId }
++    : null;
++}
++
++/** Everything the looks list needs about one cosmetic's sources. Null for an
++ *  unknown id. */
++export function buddyCosmeticFacts(cosmeticId: string): BuddyCosmeticFacts | null {
++  const cached = cosmeticCache.get(cosmeticId);
++  if (cached) return cached;
++  const def: BuddyCosmeticDef | null = buddyCosmeticDef(cosmeticId);
++  if (!def) return null;
++  const challenges: CollectionChallengeSource[] = buddyCosmeticChallengesOf(def.id).map((row) => ({
++    bossId: row.bossId,
++    bossName: MOBS[row.bossId]?.name ?? row.bossId,
++    location: bossLocation(row.bossId),
++    kind: row.kind,
++    amount: row.kind === 'speed' ? row.seconds : row.dps,
++  }));
++  const deedId = buddyCosmeticDeedOf(def.id);
++  const tokenItemId = buddyCosmeticTokenItemId(def.id);
++  const token = tokenItemId ? collectionItemFacts(tokenItemId) : null;
++  const craft = craftSourceFor(tokenItemId);
++  const grantOnly = BUDDY_COSMETIC_GRANT_ONLY.has(def.id);
++  const facts: BuddyCosmeticFacts = {
++    id: def.id,
++    buddy: def.buddy,
++    name: def.name,
++    tint: def.tint,
++    challenges,
++    deedId,
++    craft,
++    vendors: token?.vendors ?? [],
++    tokenItemId,
++    grantOnly,
++    obtainable:
++      challenges.length > 0 ||
++      deedId !== null ||
++      craft !== null ||
++      (token?.vendors.length ?? 0) > 0 ||
++      grantOnly,
++  };
++  cosmeticCache.set(def.id, facts);
++  return facts;
++}
++
+ /** Drop the memos. Only the tests need this (they swap the active world
+  *  content, which re-resolves zones and NPCs under the same ids). */
+ export function resetCollectionSourceCache(): void {
+   cache.clear();
+   buddyCache.clear();
+-}
++  cosmeticCache.clear();
++}
+diff --git a/src/ui/collections/collections_host.ts b/src/ui/collections/collections_host.ts
+--- a/src/ui/collections/collections_host.ts
++++ b/src/ui/collections/collections_host.ts
+@@ -148,6 +148,8 @@
+     restoreFocus: host.restoreFocus,
+     mountPreview: host.mountPreview,
+     ownedBuddyKeys: () => new Set<string>(host.world().ownedBuddies()),
++    ownedBuddyCosmetics: () => new Set<string>(host.world().ownedBuddyCosmetics()),
++    equippedBuddyCosmetics: () => host.world().equippedBuddyCosmetics(),
+     pendingBuddyKeys: () => new Set<string>(host.world().pendingBuddies()),
+     // The entity mirror is the one authority for "which buddy is out", for
+     // the local player exactly as for anyone else (src/world_api/buddies.ts).
+@@ -156,6 +158,7 @@
+       return world.entities.get(world.playerId)?.buddyKey ?? '';
+     },
+     summonBuddy: (key) => host.world().summonBuddy(key as BuddyKey),
++    equipBuddyCosmetic: (key, id) => host.world().equipBuddyCosmetic(key as BuddyKey, id),
+     ownedMountKeys: () => new Set<string>(host.world().ownedMounts()),
+     ownedItemIds: () =>
+       new Set<string>([
+diff --git a/src/ui/collections/collections_view.ts b/src/ui/collections/collections_view.ts
+--- a/src/ui/collections/collections_view.ts
++++ b/src/ui/collections/collections_view.ts
+@@ -8,13 +8,16 @@
+ // window opens and cheap enough to rebuild on a tab switch.
+ 
+ import { BUDDIES, BUDDY_KEYS, type BuddyKey } from '../../sim/content/buddies';
++import { buddyCosmeticsFor } from '../../sim/content/buddy_cosmetics';
+ import { BUDDY_MOBS, buddyTemplateId } from '../../sim/content/buddy_mobs';
+ import { MOUNTS, type MountKey } from '../../sim/content/mounts';
+ import { ITEM_SETS, ITEMS } from '../../sim/data';
+ import { itemLevel } from '../../sim/item_level';
+ import type { ArmorType, ItemDef } from '../../sim/types';
+ import {
++  type BuddyCosmeticFacts,
+   type BuddySourceFacts,
++  buddyCosmeticFacts,
+   buddySourceFacts,
+   type CollectionItemFacts,
+   collectionItemFacts,
+@@ -69,6 +72,21 @@
+   /** Buddy rows only: the companion's own sources (boss rolls, deed, token
+    *  vendors). Null for a mount, whose sources ride `facts`. */
+   buddyFacts: BuddySourceFacts | null;
++  /** Buddy rows only: the looks authored for this companion, catalog order. */
++  looks: CollectionLookView[];
++}
++
++/** One cosmetic (look) row under a buddy. */
++export interface CollectionLookView {
++  id: string;
++  /** Canonical English name; the painter localizes. */
++  name: string;
++  tint: number;
++  /** Unlocked for this character. */
++  owned: boolean;
++  /** Currently worn on the buddy. */
++  worn: boolean;
++  facts: BuddyCosmeticFacts;
+ }
+ 
+ /** The primary stat an epic set is itemized around. 'mixed' is a real answer
+@@ -200,11 +218,12 @@
+     pending: false,
+     obtainable: facts?.obtainable ?? false,
+     buddyFacts: null,
++    looks: [],
+   };
+ }
+ 
+ /** A buddy row: the mount shape plus the collection-flag ownership, the
+- *  pending state, the companion's own sources. */
++ *  pending state, the companion's own sources and its looks. */
+ function buddyEntryFor(key: BuddyKey, input: CollectionsViewInput): CollectionEntryView {
+   const base = entryFor(
+     key,
+@@ -218,11 +237,30 @@
+     BUDDY_MOBS[buddyTemplateId(key)]?.color ?? 0xffffff,
+   );
+   const buddyFacts = buddySourceFacts(key);
++  const worn = input.equippedBuddyCosmetics?.[key] ?? null;
++  const looks: CollectionLookView[] = buddyCosmeticsFor(key).flatMap((def) => {
++    const facts = buddyCosmeticFacts(def.id);
++    if (!facts) return [];
++    return [
++      {
++        id: def.id,
++        name: def.name,
++        tint: def.tint,
++        owned: input.ownedBuddyCosmetics?.has(def.id) ?? false,
++        worn: worn === def.id,
++        facts,
++      },
++    ];
++  });
+   return {
+     ...base,
++    // The worn look's dye replaces the follower's own color in the preview,
++    // exactly as spawnBuddyEntity does on the live entity.
++    tint: looks.find((look) => look.worn)?.tint ?? base.tint,
+     pending: !base.owned && (input.pendingBuddyKeys?.has(key) ?? false),
+     obtainable: buddyFacts.obtainable,
+     buddyFacts,
++    looks,
+   };
+ }
+ 
+@@ -230,6 +268,10 @@
+   /** Buddy keys the viewer has collected (IWorld.ownedBuddies): the
+    *  character's own collection flag, resolved by the sim for both worlds. */
+   ownedBuddyKeys: ReadonlySet<string>;
++  /** Unlocked look ids (IWorld.ownedBuddyCosmetics). */
++  ownedBuddyCosmetics?: ReadonlySet<string>;
++  /** The worn look per buddy key (IWorld.equippedBuddyCosmetics). */
++  equippedBuddyCosmetics?: Readonly<Record<string, string>>;
+   /** Boss-roll wins pending their reveal (IWorld.pendingBuddies). */
+   pendingBuddyKeys?: ReadonlySet<string>;
+   /** Mount keys the viewer owns (IWorld.ownedMounts), same model as above. */
+diff --git a/src/ui/collections/collections_window.ts b/src/ui/collections/collections_window.ts
+--- a/src/ui/collections/collections_window.ts
++++ b/src/ui/collections/collections_window.ts
+@@ -23,16 +23,18 @@
+ import { ITEMS } from '../../sim/data';
+ import type { ArmorType } from '../../sim/types';
+ import type { IWorld } from '../../world_api';
+-import { buddyDisplayName } from '../buddy_event_lines';
++import { buddyCosmeticDisplayName, buddyDisplayName } from '../buddy_event_lines';
+ import { deedName } from '../deed_i18n';
+ import { markDialogRoot } from '../dialog_root';
+ import { itemDisplayName, itemSetBonusField, tEntity } from '../entity_i18n';
+ import { esc } from '../esc';
++import { craftNameText } from '../hud/professions/craft_name_view';
+ import { formatMoney, formatNumber, type TranslationKey, t } from '../i18n';
+ import type { PainterHostPresentation } from '../painter_host';
+ import { svgIcon } from '../ui_icons';
+ import { itemIconImgHtml } from '../unknown_item_icon';
+ import type {
++  BuddyCosmeticFacts,
+   BuddySourceFacts,
+   CollectionBossDropSource,
+   CollectionDropSource,
+@@ -73,12 +75,16 @@
+   ownedBuddyKeys(): ReadonlySet<string>;
+   ownedMountKeys(): ReadonlySet<string>;
+   ownedItemIds(): ReadonlySet<string>;
+-  /** The rest of the buddy collection (IWorldBuddies): boss-roll wins pending their reveal, and the
++  /** The rest of the buddy collection (IWorldBuddies): unlocked looks, the
++   *  worn look per buddy, the boss-roll wins pending their reveal, and the
+    *  buddy currently out (the entity mirror's buddyKey, '' for none). */
++  ownedBuddyCosmetics(): ReadonlySet<string>;
++  equippedBuddyCosmetics(): Readonly<Record<string, string>>;
+   pendingBuddyKeys(): ReadonlySet<string>;
+   activeBuddyKey(): string;
+-  /** The summon command is validated by the world. */
++  /** The two buddy commands the pane sends; the world re-validates both. */
+   summonBuddy(key: string): void;
++  equipBuddyCosmetic(key: string, cosmeticId: string | null): void;
+   /** key -> renderer visual key for mount rows (src/render/mount_visuals.ts). */
+   buddyVisualKeys(): Readonly<Partial<Record<string, string>>>;
+   mountVisualKeys(): Readonly<Partial<Record<string, string>>>;
+@@ -111,6 +117,7 @@
+  *  the buddy that lost its blurb, instead of a missing string appearing live. */
+ const BUDDY_LORE: Readonly<Record<string, TranslationKey>> = {
+   horse: 'hudChrome.collections.buddyLore.horse',
++  sapling: 'hudChrome.collections.buddyLore.sapling',
+   crystal_lich: 'hudChrome.collections.buddyLore.crystal_lich',
+   forgemaw: 'hudChrome.collections.buddyLore.forgemaw',
+ };
+@@ -225,6 +232,8 @@
+   private collections(): CollectionsView {
+     return buildCollectionsView({
+       ownedBuddyKeys: this.deps.ownedBuddyKeys(),
++      ownedBuddyCosmetics: this.deps.ownedBuddyCosmetics(),
++      equippedBuddyCosmetics: this.deps.equippedBuddyCosmetics(),
+       pendingBuddyKeys: this.deps.pendingBuddyKeys(),
+       ownedMountKeys: this.deps.ownedMountKeys(),
+       ownedItemIds: this.deps.ownedItemIds(),
+@@ -249,6 +258,8 @@
+       view.buddies.filter((row) => row.owned).length,
+       view.buddies.filter((row) => row.pending).length,
+       this.deps.activeBuddyKey(),
++      this.deps.ownedBuddyCosmetics().size,
++      this.deps.equippedBuddyCosmetics(),
+       view.mounts.filter((row) => row.owned).length,
+       view.setGroups.reduce((sum, group) => sum + group.sets.length, 0),
+       [...this.exchangePrices].sort(),
+@@ -459,7 +470,7 @@
+       ${row.buddyFacts ? this.buddyActionHtml(row) : ''}
+       ${lore}
+       ${row.buddyFacts ? this.buddyFactsHtml(row.buddyFacts) : this.factsHtml(row.facts)}
+-      `;
++      ${row.buddyFacts ? this.looksHtml(row) : ''}`;
+   }
+ 
+   /** Summon or dismiss the selected companion: one button, only for a
+@@ -541,6 +552,92 @@
+       );
+     }
+     return lines.join('');
++  }
++
++  private lookSourceLines(facts: BuddyCosmeticFacts): string[] {
++    const lines: string[] = [];
++    for (const challenge of facts.challenges) {
++      const mob = tEntity({ kind: 'mob', id: challenge.bossId, field: 'name' });
++      lines.push(
++        this.line(
++          'hudChrome.collections.source.challengeLabel',
++          challenge.kind === 'speed'
++            ? t('hudChrome.collections.source.challengeSpeed', {
++                mob,
++                seconds: num(challenge.amount),
++              })
++            : t('hudChrome.collections.source.challengeDps', { mob, dps: num(challenge.amount) }),
++        ),
++      );
++    }
++    if (facts.deedId) {
++      lines.push(
++        this.line(
++          'hudChrome.collections.source.deedLabel',
++          t('hudChrome.collections.source.deed', { deed: deedName(facts.deedId) }),
++        ),
++      );
++    }
++    if (facts.craft) {
++      lines.push(
++        this.line(
++          'hudChrome.collections.source.craftLabel',
++          t('hudChrome.collections.source.craft', {
++            item: itemDisplayName(ITEMS[facts.craft.itemId]),
++            profession: craftNameText(facts.craft.professionId),
++          }),
++        ),
++      );
++    }
++    lines.push(...this.vendorLines(facts.vendors, 'hudChrome.collections.detail.vendorLabel'));
++    if (facts.grantOnly) {
++      lines.push(
++        this.line(
++          'hudChrome.collections.source.grantLabel',
++          t('hudChrome.collections.source.grantOnly'),
++        ),
++      );
++    }
++    if (lines.length === 0) {
++      lines.push(
++        this.line(
++          'hudChrome.collections.detail.dropLabel',
++          t('hudChrome.collections.detail.noSource'),
++        ),
++      );
++    }
++    return lines;
++  }
++
++  /** The looks authored for the selected companion, each with its state, its
++   *  sources, and a Wear/Remove control once unlocked (collected buddy only). */
++  private looksHtml(row: CollectionEntryView): string {
++    const rows = row.looks
++      .map((look) => {
++        const state = look.worn
++          ? 'hudChrome.collections.looks.worn'
++          : look.owned
++            ? 'hudChrome.collections.looks.unlocked'
++            : 'hudChrome.collections.looks.locked';
++        const control =
++          look.owned && row.owned
++            ? look.worn
++              ? `<button type="button" class="btn col-action" data-unwear="${esc(row.key)}">${esc(t('hudChrome.collections.actions.remove'))}</button>`
++              : `<button type="button" class="btn col-action" data-wear="${esc(look.id)}" data-wear-key="${esc(row.key)}">${esc(t('hudChrome.collections.actions.wear'))}</button>`
++            : '';
++        return `
++        <li class="col-look${look.owned ? ' col-owned' : ' col-locked'}">
++          <span class="col-swatch" style="--col-swatch: #${look.tint.toString(16).padStart(6, '0')}" aria-hidden="true"></span>
++          <span class="col-row-name">${esc(buddyCosmeticDisplayName(look.id))}</span>
++          <span class="col-row-state">${esc(t(state as TranslationKey))}</span>
++          ${control}
++          ${this.lookSourceLines(look.facts).join('')}
++        </li>`;
++      })
++      .join('');
++    return `
++      <h4 class="col-group-head">${esc(t('hudChrome.collections.looks.title'))}</h4>
++      ${rows ? `<ul class="col-looks">${rows}</ul>` : `<p class="col-note">${esc(t('hudChrome.collections.looks.none'))}</p>`}`;
+   }
+ 
+   private setDetailHtml(sets: readonly CollectionSetView[], selectedKey: string): string {
+@@ -643,13 +740,31 @@
+       if (!item) continue;
+       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
+     }
+-    // Summon/dismiss the selected companion. The next snapshot repaints the pane.
++    // The buddy commands: summon/dismiss the selected companion, wear or
++    // remove a look. Server-authoritative: the next snapshot repaints the pane.
+     root.querySelector<HTMLElement>('[data-summon]')?.addEventListener('click', (ev) => {
+       const key = (ev.currentTarget as HTMLElement).dataset.summon ?? '';
+       if (!key) return;
+       audio.click();
+       this.deps.summonBuddy(key);
+     });
++    for (const button of root.querySelectorAll<HTMLElement>('[data-wear]')) {
++      button.addEventListener('click', () => {
++        const id = button.dataset.wear ?? '';
++        const key = button.dataset.wearKey ?? '';
++        if (!id || !key) return;
++        audio.click();
++        this.deps.equipBuddyCosmetic(key, id);
++      });
++    }
++    for (const button of root.querySelectorAll<HTMLElement>('[data-unwear]')) {
++      button.addEventListener('click', () => {
++        const key = button.dataset.unwear ?? '';
++        if (!key) return;
++        audio.click();
++        this.deps.equipBuddyCosmetic(key, null);
++      });
++    }
+     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+     const preview = root.querySelector<HTMLElement>('[data-preview]');
+     const visualKey = preview?.dataset.preview ?? '';
+diff --git a/src/ui/collections/index.ts b/src/ui/collections/index.ts
+--- a/src/ui/collections/index.ts
++++ b/src/ui/collections/index.ts
+@@ -1,5 +1,7 @@
+ export {
++  type BuddyCosmeticFacts,
+   type BuddySourceFacts,
++  buddyCosmeticFacts,
+   buddySourceFacts,
+   type CollectionBossDropSource,
+   type CollectionCurrency,
+@@ -20,6 +22,7 @@
+   COLLECTION_SET_STATS,
+   COLLECTIONS_TABS,
+   type CollectionEntryView,
++  type CollectionLookView,
+   type CollectionSetGroupView,
+   type CollectionSetPieceView,
+   type CollectionSetStat,
+diff --git a/src/ui/deeds_view.ts b/src/ui/deeds_view.ts
+--- a/src/ui/deeds_view.ts
++++ b/src/ui/deeds_view.ts
+@@ -19,6 +19,8 @@
+ //   every surface consumes; the Renown leaderboard displays no deed count.
+ 
+ import { type AccountEarner, accountEarnedDays } from '../sim/account_ledger';
++import type { BuddyKey } from '../sim/content/buddies';
++import { buddyCosmeticsFor } from '../sim/content/buddy_cosmetics';
+ import { countsTowardCompletion } from '../sim/deeds_completion';
+ import type { DeedDef, DeedStats, DeedTrigger } from '../sim/types';
+ import type { DeedsRarity } from '../world_api';
+@@ -232,11 +234,14 @@
+   renown: number;
+   activeTitle: string | null;
+   // The buddy shelf reads (IWorldBuddies): collected keys in catalog order,
+-  // the summoned key ('' for none, the entity mirror's buddyKey).
++  // the summoned key ('' for none, the entity mirror's buddyKey), the unlocked
++  // look ids and the worn look per buddy.
+   // Optional: a caller with no buddy surface (the completion suites) leaves
+   // the shelf at its None heads.
+   ownedBuddies?: readonly string[];
+   activeBuddy?: string;
++  ownedBuddyLooks?: ReadonlySet<string>;
++  equippedBuddyLooks?: Readonly<Record<string, string>>;
+   // The selected nameplate border, a deed id like activeTitle (never the
+   // reward slug): the picker marks this option active.
+   activeBorder: string | null;
+@@ -348,6 +353,13 @@
+   active: boolean;
+ }
+ 
++/** One look picker option for the summoned buddy: null is its own look;
++ *  otherwise an unlocked cosmetic id (content/buddy_cosmetics.ts). */
++export interface DeedLookOption {
++  id: string | null;
++  active: boolean;
++}
++
+ export interface DeedBorderOption {
+   // null is the "No Border" option.
+   id: string | null;
+@@ -364,8 +376,11 @@
+   // renders verbatim: array order is a consumer contract, never re-sorted.
+   borders: DeedBorderOption[];
+   // The buddy shelf beside the two worn cosmetics: collected companions behind
+-  // a None head (catalog order, the picker renders verbatim).
++  // a None head (catalog order, the picker renders verbatim), and the looks
++  // unlocked for the SUMMONED companion behind an own-look head (empty of
++  // options while no buddy is out).
+   buddies: DeedBuddyOption[];
++  buddyLooks: DeedLookOption[];
+   // input.focusDeedId when that deed rendered an entry this paint, else null.
+   focusDeedId: string | null;
+ }
+@@ -385,6 +400,14 @@
+     { id: null, active: activeBuddy === '' },
+     ...(input.ownedBuddies ?? []).map((key) => ({ id: key, active: key === activeBuddy })),
+   ];
++  const wornLook = activeBuddy === '' ? null : (input.equippedBuddyLooks?.[activeBuddy] ?? null);
++  const buddyLooks: DeedLookOption[] = [{ id: null, active: wornLook === null }];
++  if (activeBuddy !== '') {
++    for (const look of buddyCosmeticsFor(activeBuddy as BuddyKey)) {
++      if (!input.ownedBuddyLooks?.has(look.id)) continue;
++      buddyLooks.push({ id: look.id, active: wornLook === look.id });
++    }
++  }
+   let earnedCount = 0;
+   let visibleTotal = 0;
+   // The account-wide earned map: this character's own earns plus every deed an
+@@ -457,6 +480,7 @@
+     titles,
+     borders,
+     buddies,
++    buddyLooks,
+     focusDeedId: focus !== null && entries.some((e) => e.id === focus) ? focus : null,
+   };
+ }
+@@ -754,9 +778,12 @@
+   accountDigest?: number;
+   activeTitle: string | null;
+   activeBorder: string | null;
+-  // The buddy shelf: which companion is out and how many are collected.
++  // The buddy shelf: which companion is out, how many are collected, and the
++  // worn look of the one out (its unlocked-look count rides ownedLookCount).
+   activeBuddy?: string;
+   ownedBuddyCount?: number;
++  activeLook?: string | null;
++  ownedLookCount?: number;
+   filter: DeedsFilter;
+   search: string;
+   category: DeedDisplayCategory | 'titles';
+@@ -775,6 +802,8 @@
+     parts.activeBorder,
+     parts.activeBuddy ?? '',
+     parts.ownedBuddyCount ?? 0,
++    parts.activeLook ?? null,
++    parts.ownedLookCount ?? 0,
+     parts.filter,
+     parts.search,
+     parts.category,
+diff --git a/src/ui/deeds_window.ts b/src/ui/deeds_window.ts
+--- a/src/ui/deeds_window.ts
++++ b/src/ui/deeds_window.ts
+@@ -10,10 +10,11 @@
+ import { audio } from '../game/audio';
+ import { accountEarnedDays } from '../sim/account_ledger';
+ import type { BuddyKey } from '../sim/content/buddies';
++import { buddyCosmeticDef } from '../sim/content/buddy_cosmetics';
+ import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
+ import { DEEDS_RECENT_CAP } from '../sim/deeds';
+ import type { DeedsRarity, IWorld } from '../world_api';
+-import { buddyDisplayName } from './buddy_event_lines';
++import { buddyCosmeticDisplayName, buddyDisplayName } from './buddy_event_lines';
+ import { buddyTokenItemId } from './collections/collection_sources';
+ import {
+   borderAccent,
+@@ -104,6 +105,7 @@
+     'data-title',
+     'data-border-pick',
+     'data-buddy-pick',
++    'data-look-pick',
+     'data-recent',
+   ]) {
+     const value = active.getAttribute(attr);
+@@ -336,6 +338,8 @@
+       activeBorder: world.activeBorder,
+       activeBuddy: this.activeBuddyKey(),
+       ownedBuddyCount: world.ownedBuddies().length,
++      activeLook: world.equippedBuddyCosmetics()[this.activeBuddyKey()] ?? null,
++      ownedLookCount: world.ownedBuddyCosmetics().length,
+       filter: this.filter,
+       search: this.search,
+       category: this.category,
+@@ -469,6 +473,8 @@
+       activeBorder: world.activeBorder,
+       ownedBuddies: world.ownedBuddies(),
+       activeBuddy: this.activeBuddyKey(),
++      ownedBuddyLooks: new Set(world.ownedBuddyCosmetics()),
++      equippedBuddyLooks: world.equippedBuddyCosmetics(),
+       deeds: DEEDS,
+       order: DEED_ORDER,
+       category: this.category,
+@@ -746,17 +752,31 @@
+ 
+   /** The buddy shelf beside the worn cosmetics: the collected companions
+    *  (pick one to summon it, pick it again or None to dismiss), each option
+-   *  also a drag source for the action bar. Reuses the title option button. */
++   *  also a drag source for the action bar, then the looks unlocked for the
++   *  one that is out. Both groups reuse the title option button. */
+   private buddyShelfHtml(model: DeedsViewModel): string {
+-    return this.pickerGroupHtml({
+-      cls: 'deeds-buddies',
+-      pickAttr: 'data-buddy-pick',
+-      headingKey: 'hudChrome.deeds.buddiesSection',
+-      emptyKey: 'hudChrome.deeds.buddiesEmpty',
+-      options: model.buddies,
+-      label: (id) => (id === null ? t('hudChrome.deeds.buddiesNone') : buddyDisplayName(id)),
+-      decorate: (id, label) => this.buddyOptionInner(id, label),
+-    });
++    const active = model.buddies.find((option) => option.active)?.id ?? null;
++    return (
++      this.pickerGroupHtml({
++        cls: 'deeds-buddies',
++        pickAttr: 'data-buddy-pick',
++        headingKey: 'hudChrome.deeds.buddiesSection',
++        emptyKey: 'hudChrome.deeds.buddiesEmpty',
++        options: model.buddies,
++        label: (id) => (id === null ? t('hudChrome.deeds.buddiesNone') : buddyDisplayName(id)),
++        decorate: (id, label) => this.buddyOptionInner(id, label),
++      }) +
++      this.pickerGroupHtml({
++        cls: 'deeds-buddy-looks',
++        pickAttr: 'data-look-pick',
++        headingKey: 'hudChrome.deeds.looksSection',
++        emptyKey: active === null ? 'hudChrome.deeds.looksNoBuddy' : 'hudChrome.deeds.looksEmpty',
++        options: model.buddyLooks,
++        label: (id) =>
++          id === null ? t('hudChrome.deeds.looksNone') : buddyCosmeticDisplayName(id),
++        decorate: (id, label) => this.lookOptionInner(id, label),
++      })
++    );
+   }
+ 
+   /** The whistle still as the companion's icon, the name, and the drag grip
+@@ -770,6 +790,15 @@
+       ? `<img class="deed-buddy-icon" src="${esc(itemImageUrl(tokenId))}" alt="" draggable="false">`
+       : `<span class="deed-buddy-icon deed-buddy-icon-empty" aria-hidden="true"></span>`;
+     return `${icon}${name}<span class="deed-buddy-drag" ${BUDDY_DRAG_ATTR}="${esc(id)}" draggable="true" title="${esc(t('hudChrome.deeds.buddyDragHint'))}" aria-label="${esc(t('hudChrome.deeds.buddyDragHint'))}">${svgIcon('menu')}</span>`;
++  }
++
++  private lookOptionInner(id: string | null, label: string): string {
++    const name = esc(label);
++    const tint = id === null ? null : buddyCosmeticDef(id)?.tint;
++    if (tint === null || tint === undefined) {
++      return `<span class="deed-look-swatch deed-look-swatch-empty" aria-hidden="true"></span>${name}`;
++    }
++    return `<span class="deed-look-swatch" aria-hidden="true" style="--deed-look-swatch: #${tint.toString(16).padStart(6, '0')}"></span>${name}`;
+   }
+ 
+   /** Canonical seal plus a small material sample and the existing deed name.
+@@ -983,6 +1012,20 @@
+       });
+       grip.addEventListener('dragend', () => endBuddyDrag(this.deps));
+     }
++    for (const btn of el.querySelectorAll<HTMLElement>('[data-look-pick]')) {
++      btn.addEventListener('click', () => {
++        if (this.deps.consumePeek()) {
++          this.deps.hideTooltip();
++          return;
++        }
++        const active = this.activeBuddyKey();
++        if (active === '') return;
++        const id = btn.dataset.lookPick ?? '';
++        this.deps.world().equipBuddyCosmetic(active as BuddyKey, id === '' ? null : id);
++        audio.click();
++        this.render();
++      });
++    }
+     for (const btn of el.querySelectorAll<HTMLElement>('[data-border-pick]')) {
+       const preview = (): void => this.paintBorderPreview(btn.dataset.borderPick || null);
+       const restorePreview = (): void => {
+diff --git a/src/ui/hud.ts b/src/ui/hud.ts
+--- a/src/ui/hud.ts
++++ b/src/ui/hud.ts
+@@ -12001,6 +12001,7 @@
+           break;
+         case 'buddyPresence':
+         case 'buddyRevealed':
++        case 'buddyCosmeticUnlocked':
+           this.log(...buddyEventLogArgs(ev));
+           break;
+         case 'gatherResult':
+diff --git a/src/ui/world_entity_i18n.ts b/src/ui/world_entity_i18n.ts
+--- a/src/ui/world_entity_i18n.ts
++++ b/src/ui/world_entity_i18n.ts
+@@ -20,7 +20,6 @@
+ // Historical name keys remain for maintained locale overlays. They do not
+ // register active mobs, rewards or Hunting entries.
+ const RETIRED_BUDDY_NAMES = {
+-  buddy_sapling: { name: 'Sapling' },
+   buddy_ember_fox: { name: 'Ember Fox' },
+   buddy_moss_hare: { name: 'Moss Hare' },
+   buddy_frog: { name: 'Frog' },
+diff --git a/src/world_api.ts b/src/world_api.ts
+--- a/src/world_api.ts
++++ b/src/world_api.ts
+@@ -860,8 +860,6 @@
+ // is called directly on the Sim by the headless RL action layer, never over the
+ // wire. Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
+ export const DISPATCH_ONLY_COMMANDS = [
+-  // Retired buddy-look command, retained as an inert append-only protocol token.
+-  'buddy_cosmetic',
+   'dev_level',
+   'dev_teleport',
+   'dev_give',
+@@ -1179,11 +1177,14 @@
+   // IWorldBuddies: cosmetic followers (snake_case wire strings, by design,
+   // mirroring mount_toggle). The active buddy is a self-snapshot read (terse
+   // `bud`, no send, untagged); the collection reads (ownedBuddies,
+-  // pendingBuddies) ride the self snapshot too (budOwn/budPend, untagged).
++  // ownedBuddyCosmetics, equippedBuddyCosmetics, pendingBuddies) ride the
++  // self snapshot too (budOwn/budCos/budEq/budPend, untagged).
+   buddy_toggle: 'IWorldBuddies',
+   // buddy_summon: summon/dismiss a specific collected buddy (the Hunting
+   // window's button); the entity mirror `bud` carries the result.
+   buddy_summon: 'IWorldBuddies',
++  // buddy_cosmetic: wear a look on a collected buddy; the result rides `budEq`.
++  buddy_cosmetic: 'IWorldBuddies',
+   // buddy_autoloot: enable/disable the buddy's loot errand (snake_case wire
+   // string, same family as buddy_toggle). The result rides the same self
+   // snapshot the toggle does (terse `budal`, no send, untagged).
+diff --git a/src/world_api/buddies.ts b/src/world_api/buddies.ts
+--- a/src/world_api/buddies.ts
++++ b/src/world_api/buddies.ts
+@@ -8,7 +8,8 @@
+ //
+ // Ownership is a per-CHARACTER collection (src/sim/buddies.ts): a companion
+ // attaches to the character (a boss roll, a deed, a grant token), never sits
+-// in a bag, and never trades. The live "which buddy is out" state rides
++// in a bag, and never trades. Cosmetics are a second per-character set, one
++// of which can be worn per buddy. The live "which buddy is out" state rides
+ // the entity mirror (Entity.buddyKey, synced in identity fields like
+ // skin/mountKey), exactly like the active mount: there is deliberately no
+ // `activeBuddy()` read here, mirroring `IWorldMounts`. HUD/UI code reads
+@@ -20,11 +21,17 @@
+   /** The collected subset of the catalog, in catalog order. A fresh player
+    *  owns nothing. */
+   ownedBuddies(): readonly BuddyKey[];
++  /** The unlocked cosmetic ids (src/sim/content/buddy_cosmetics.ts), sorted. */
++  ownedBuddyCosmetics(): readonly string[];
++  /** The worn cosmetic per buddy key; a buddy absent here wears its own look. */
++  equippedBuddyCosmetics(): Readonly<Record<string, string>>;
+   /** Companions won off a boss that have not revealed themselves yet (the
+    *  player read the presence line; the reveal waits for the zone-out). */
+   pendingBuddies(): readonly BuddyKey[];
+   /** Summon a specific collected buddy, or dismiss it when it is the one out. */
+   summonBuddy(key: BuddyKey): void;
++  /** Wear `cosmeticId` on `key` (null = the buddy's own look). */
++  equipBuddyCosmetic(key: BuddyKey, cosmeticId: string | null): void;
+   /** Dismiss the active buddy, or bring the last summoned one back out. */
+   toggleBuddy(): void;
+   /** Enable/disable the buddy autoloot errand: while on, the buddy walks to
+diff --git a/tests/authored_surfaces.test.ts b/tests/authored_surfaces.test.ts
+--- a/tests/authored_surfaces.test.ts
++++ b/tests/authored_surfaces.test.ts
+@@ -65,10 +65,6 @@
+  *  authored rig here instead of flagging it is a conscious choice, not the
+  *  default: a new Tripo or Blender creature sets `authoredAtlas: true`. */
+ const LEGACY_UNFLAGGED_DEFS = new Set([
+-  // Retained buddies keep their existing low-tier material response.
+-  'buddy_horse',
+-  'buddy_crystal_lich',
+-  'buddy_forgemaw',
+   'delve_mob_acolyte',
+   'form_bear',
+   'form_ghost_wolf',
+@@ -123,6 +119,7 @@
+ 
+ /** The creature and mount defs whose authored atlas showed the low-tier film. */
+ const AUTHORED_ATLAS_DEFS = [
++  'buddy_sapling',
+   'form_cat',
+   'mob_wolf',
+   'greyjaw',
+diff --git a/tests/buddies.test.ts b/tests/buddies.test.ts
+--- a/tests/buddies.test.ts
++++ b/tests/buddies.test.ts
+@@ -18,16 +18,20 @@
+   attachPendingBuddy,
+   buddyItemId,
+   buddyOwned,
++  equipBuddyCosmetic,
+   grantBuddy,
++  grantBuddyCosmetic,
+   ownedBuddies,
+   restoreBuddyCollection,
+   revealPendingBuddies,
+   serializeBuddyCollection,
+   summonBuddy,
+   toggleBuddy,
++  useBuddyCosmeticToken,
+   useBuddyToken,
+ } from '../src/sim/buddies';
+ import { BUDDIES, BUDDY_KEYS, buddyDef, normalizeBuddyKey } from '../src/sim/content/buddies';
++import { BUDDY_COSMETICS } from '../src/sim/content/buddy_cosmetics';
+ import { buddyTemplateId } from '../src/sim/content/buddy_mobs';
+ import { MOBS } from '../src/sim/data';
+ import { createMob } from '../src/sim/entity';
+@@ -74,11 +78,18 @@
+   it('buddyDef/normalizeBuddyKey resolve known ids and reject unknown ones', () => {
+     expect(buddyDef('horse')?.name).toBe('Horse');
+     expect(buddyDef('not_a_buddy')).toBeNull();
+-    expect(normalizeBuddyKey('forgemaw')).toBe('forgemaw');
++    expect(normalizeBuddyKey('sapling')).toBe('sapling');
+     expect(normalizeBuddyKey('not_a_buddy')).toBe('');
+     expect(normalizeBuddyKey(null)).toBe('');
+     expect(normalizeBuddyKey(undefined)).toBe('');
+   });
++
++  it('every cosmetic names a catalog buddy', () => {
++    for (const [id, def] of Object.entries(BUDDY_COSMETICS)) {
++      expect(def.id).toBe(id);
++      expect(buddyDef(def.buddy), `${id} -> ${def.buddy}`).not.toBeNull();
++    }
++  });
+ });
+ 
+ describe('buddy ownership: a per-character collection flag, never an item', () => {
+@@ -89,9 +100,9 @@
+     expect(ownedBuddies(meta)).toEqual([]);
+     expect(buddyOwned(meta, 'horse')).toBe(false);
+ 
+-    expect(grantBuddy(sim.ctx, pid, 'forgemaw')).toBe(true);
++    expect(grantBuddy(sim.ctx, pid, 'sapling')).toBe(true);
+     expect(grantBuddy(sim.ctx, pid, 'horse')).toBe(true);
+-    expect(ownedBuddies(meta)).toEqual(['horse', 'forgemaw']); // catalog order
++    expect(ownedBuddies(meta)).toEqual(['horse', 'sapling']); // catalog order
+     expect(buddyOwned(meta, 'horse')).toBe(true);
+   });
+ 
+@@ -101,8 +112,8 @@
+     const meta = sim.players.get(pid)!;
+     sim.addItem('whistle_horse', 1, pid);
+     expect(buddyOwned(meta, 'horse')).toBe(false);
+-    meta.bank.inventory.push({ itemId: 'whistle_forgemaw', count: 1 });
+-    expect(buddyOwned(meta, 'forgemaw')).toBe(false);
++    meta.bank.inventory.push({ itemId: 'whistle_sapling', count: 1 });
++    expect(buddyOwned(meta, 'sapling')).toBe(false);
+   });
+ 
+   it('a grant is idempotent, announces once, and summons the companion', () => {
+@@ -159,8 +170,11 @@
+   it('a retired cosmetic charm is refused without consumption or an unlock', () => {
+     const sim = makeWorld();
+     const pid = join(sim);
++    const meta = sim.players.get(pid)!;
+     sim.addItem('charm_stag_gilded', 1, pid);
+     useItem(sim.ctx, 'charm_stag_gilded', pid);
++    expect(meta.buddies.cosmetics.size).toBe(0);
++    expect(useBuddyCosmeticToken(sim.ctx, pid, 'charm_stag_gilded')).toBe(false);
+     expect(sim.countItem('charm_stag_gilded', pid)).toBe(1);
+   });
+ });
+@@ -187,10 +201,10 @@
+     const sim = makeWorld();
+     const pid = join(sim);
+     grantBuddy(sim.ctx, pid, 'horse');
+-    grantBuddy(sim.ctx, pid, 'forgemaw');
++    grantBuddy(sim.ctx, pid, 'sapling');
+     summonBuddy(sim.ctx, pid, 'horse');
+-    expect(summonBuddy(sim.ctx, pid, 'forgemaw')).toBe(true);
+-    expect(sim.entities.get(pid)!.buddyKey).toBe('forgemaw');
++    expect(summonBuddy(sim.ctx, pid, 'sapling')).toBe(true);
++    expect(sim.entities.get(pid)!.buddyKey).toBe('sapling');
+   });
+ 
+   it('refuses an uncollected buddy with the collection refusal, and leaves the current one', () => {
+@@ -227,6 +241,54 @@
+     const pid = join(sim);
+     expect(toggleBuddy(sim.ctx, pid)).toBe(false);
+     expect(sim.entities.get(pid)!.buddyKey).toBe('');
++  });
++});
++
++describe('cosmetics: unlock, wear, and the dye on the follower', () => {
++  it('unlocks once, announces once, and refuses an unknown id', () => {
++    const sim = makeWorld();
++    const pid = join(sim);
++    expect(grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound')).toBe(true);
++    expect(grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound')).toBe(false);
++    expect(grantBuddyCosmetic(sim.ctx, pid, 'no_such_look')).toBe(false);
++    const unlocked = drain(sim, 'buddyCosmeticUnlocked');
++    expect(unlocked).toHaveLength(1);
++    expect(unlocked[0]).toMatchObject({ pid, cosmeticId: 'crystal_lich_frostbound' });
++  });
++
++  it('wears a look only on a collected buddy it was authored for, and only when unlocked', () => {
++    const sim = makeWorld();
++    const pid = join(sim);
++    const meta = sim.players.get(pid)!;
++    // Not collected yet.
++    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
++    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound')).toBe(false);
++    grantBuddy(sim.ctx, pid, 'crystal_lich');
++    grantBuddy(sim.ctx, pid, 'sapling');
++    // Wrong buddy for the look.
++    expect(equipBuddyCosmetic(sim.ctx, pid, 'sapling', 'crystal_lich_frostbound')).toBe(false);
++    // Not unlocked.
++    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_voltaic')).toBe(false);
++    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound')).toBe(true);
++    expect(meta.buddies.equipped.get('crystal_lich')).toBe('crystal_lich_frostbound');
++    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', null)).toBe(true);
++    expect(meta.buddies.equipped.has('crystal_lich')).toBe(false);
++    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', null)).toBe(false);
++  });
++
++  it('the worn look re-spawns the live follower with the cosmetic dye as its color', () => {
++    const sim = makeWorld();
++    const pid = join(sim);
++    grantBuddy(sim.ctx, pid, 'crystal_lich');
++    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
++    const plain = buddyOf(sim.ctx, pid)!;
++    expect(plain.color).toBe(MOBS[buddyTemplateId('crystal_lich')].color);
++    equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound');
++    const dyed = buddyOf(sim.ctx, pid)!;
++    expect(dyed.id).not.toBe(plain.id);
++    expect(dyed.color).toBe(BUDDY_COSMETICS.crystal_lich_frostbound.tint);
++    equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', null);
++    expect(buddyOf(sim.ctx, pid)!.color).toBe(MOBS[buddyTemplateId('crystal_lich')].color);
+   });
+ });
+ 
+@@ -268,24 +330,30 @@
+     const meta = sim.players.get(pid)!;
+     expect(serializeBuddyCollection(meta.buddies)).toBeNull();
+     grantBuddy(sim.ctx, pid, 'crystal_lich');
++    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
++    equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound');
+     attachPendingBuddy(sim.ctx, pid, 'forgemaw', 'instance', { x: 3, z: 4 });
+     const saved = serializeBuddyCollection(meta.buddies)!;
+     expect(saved).toEqual({
+       owned: ['crystal_lich'],
++      cosmetics: ['crystal_lich_frostbound'],
++      equipped: { crystal_lich: 'crystal_lich_frostbound' },
+       pending: [{ key: 'forgemaw', source: 'instance', x: 3, z: 4 }],
+       last: 'crystal_lich',
+     });
+     const restored = restoreBuddyCollection(JSON.parse(JSON.stringify(saved)));
+     expect([...restored.owned]).toEqual(['crystal_lich']);
++    expect([...restored.cosmetics]).toEqual(['crystal_lich_frostbound']);
++    expect(restored.equipped.get('crystal_lich')).toBe('crystal_lich_frostbound');
+     expect(restored.pending).toEqual([{ key: 'forgemaw', source: 'instance', x: 3, z: 4 }]);
+     expect(restored.last).toBe('crystal_lich');
+   });
+ 
+-  it('drops retired ownership and all legacy cosmetic state', () => {
++  it('drops ids the catalog no longer carries, and a worn look that no longer fits', () => {
+     const restored = restoreBuddyCollection({
+       owned: ['crystal_lich', 'retired_buddy'],
+       cosmetics: ['crystal_lich_frostbound', 'no_such_look'],
+-      equipped: { crystal_lich: 'no_such_look', forgemaw: 'forgemaw_ashen' },
++      equipped: { crystal_lich: 'no_such_look', sapling: 'forgemaw_ashen' },
+       pending: [
+         { key: 'crystal_lich', source: 'world' },
+         { key: 'gone', source: 'world' },
+@@ -293,46 +361,29 @@
+       last: 'retired_buddy',
+     });
+     expect([...restored.owned]).toEqual(['crystal_lich']);
++    expect([...restored.cosmetics]).toEqual(['crystal_lich_frostbound']);
++    expect(restored.equipped.size).toBe(0);
+     // An owned companion is never also pending.
+     expect(restored.pending).toEqual([]);
+     expect(restored.last).toBe('');
+-    expect(serializeBuddyCollection(restored)).toEqual({ owned: ['crystal_lich'] });
+   });
+ 
+   it('rides Sim.serializeCharacter and comes back through addPlayer', () => {
+     const sim = makeWorld();
+     const pid = join(sim);
+     grantBuddy(sim.ctx, pid, 'crystal_lich');
++    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
+     const state = sim.serializeCharacter(pid)!;
+     expect(state.buddies).toEqual({
+       owned: ['crystal_lich'],
++      cosmetics: ['crystal_lich_frostbound'],
+       last: 'crystal_lich',
+     });
+     const again = makeWorld();
+     const pid2 = again.addPlayer('warrior', 'Owner', { state });
+     again.tick();
+     expect(again.ownedBuddiesFor(pid2)).toEqual(['crystal_lich']);
+-  });
+-});
+-
+-describe('legacy buddy cosmetics', () => {
+-  it('loads an owned companion in its base color and drops the archived wardrobe', () => {
+-    const sim = makeWorld();
+-    const pid = join(sim);
+-    const state = sim.serializeCharacter(pid)!;
+-    state.buddies = {
+-      owned: ['crystal_lich'],
+-      cosmetics: ['crystal_lich_frostbound'],
+-      equipped: { crystal_lich: 'crystal_lich_frostbound' },
+-      last: 'crystal_lich',
+-    };
+-    const again = makeWorld();
+-    const restoredId = again.addPlayer('warrior', 'Owner', { state });
+-    expect(buddyOf(again.ctx, restoredId)?.color).toBe(MOBS.buddy_crystal_lich.color);
+-    expect(again.serializeCharacter(restoredId)!.buddies).toEqual({
+-      owned: ['crystal_lich'],
+-      last: 'crystal_lich',
+-    });
++    expect(again.ownedBuddyCosmeticsFor(pid2)).toEqual(['crystal_lich_frostbound']);
+   });
+ });
+ 
+@@ -342,8 +393,12 @@
+     sim.tick();
+     const pid = sim.player.id;
+     grantBuddy(sim.ctx, pid, 'crystal_lich');
++    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
+     expect(sim.ownedBuddies()).toEqual(['crystal_lich']);
++    expect(sim.ownedBuddyCosmetics()).toEqual(['crystal_lich_frostbound']);
+     expect(sim.pendingBuddies()).toEqual([]);
++    sim.equipBuddyCosmetic('crystal_lich', 'crystal_lich_frostbound');
++    expect(sim.equippedBuddyCosmetics()).toEqual({ crystal_lich: 'crystal_lich_frostbound' });
+     sim.toggleBuddy();
+     expect(sim.entities.get(pid)!.buddyKey).toBe('');
+     sim.summonBuddy('crystal_lich');
+@@ -379,14 +434,14 @@
+     const sim = makeWorld();
+     const pid = join(sim);
+     grantBuddy(sim.ctx, pid, 'horse');
+-    grantBuddy(sim.ctx, pid, 'forgemaw');
++    grantBuddy(sim.ctx, pid, 'sapling');
+     summonBuddy(sim.ctx, pid, 'horse');
+     const first = buddyOf(sim.ctx, pid)!;
+-    summonBuddy(sim.ctx, pid, 'forgemaw');
++    summonBuddy(sim.ctx, pid, 'sapling');
+     const second = buddyOf(sim.ctx, pid)!;
+     expect(second.id).not.toBe(first.id);
+     expect(sim.entities.has(first.id)).toBe(false);
+-    expect(second.templateId).toBe(buddyTemplateId('forgemaw'));
++    expect(second.templateId).toBe(buddyTemplateId('sapling'));
+   });
+ 
+   it('heels back onto its right-and-back offset after the owner walks away', () => {
+diff --git a/tests/buddy_challenges.test.ts b/tests/buddy_challenges.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/buddy_challenges.test.ts
+@@ -0,0 +1,158 @@
++import { describe, expect, it, vi } from 'vitest';
++
++vi.mock('../server/db', () => ({
++  pool: { query: vi.fn(async () => ({ rows: [] })) },
++  saveCharacterState: vi.fn(async () => {}),
++  openPlaySession: vi.fn(async () => 1),
++  touchCharacterLogin: vi.fn(async () => {}),
++  closePlaySession: vi.fn(async () => {}),
++  insertChatLogs: vi.fn(async () => {}),
++  walletForAccount: vi.fn(async () => null),
++  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
++  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
++}));
++
++import {
++  buddyAttemptSeconds,
++  recordBossDamageForBuddies,
++  resetBuddyChallenge,
++  resolveBuddyChallenges,
++} from '../src/sim/buddy_challenges';
++import { buddyCosmeticDef } from '../src/sim/content/buddy_cosmetics';
++import {
++  BUDDY_CHALLENGE_BOSSES,
++  BUDDY_COSMETIC_CHALLENGES,
++  type BuddyCosmeticChallenge,
++  buddyCosmeticChallengesFor,
++} from '../src/sim/content/buddy_sources';
++import { MOBS } from '../src/sim/data';
++import { createMob } from '../src/sim/entity';
++import { Sim } from '../src/sim/sim';
++import { type Entity, TICK_RATE } from '../src/sim/types';
++import { VENDOR_TEST_WORLD } from './sim_shared';
++
++const NYTHRAXIS = 'nythraxis_scourge_of_thornpeak';
++
++function makeWorld() {
++  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: VENDOR_TEST_WORLD });
++}
++
++function join(sim: Sim, name = 'Owner'): number {
++  const pid = sim.addPlayer('warrior', name);
++  sim.tick();
++  return pid;
++}
++
++function bossAt(sim: Sim, templateId: string): Entity {
++  const template = MOBS[templateId];
++  const boss = createMob(sim.ctx.nextId++, template, template.maxLevel, { x: 5, y: 0, z: 5 });
++  sim.ctx.addEntity(boss);
++  return boss;
++}
++
++function ticks(sim: Sim, n: number): void {
++  for (let i = 0; i < n; i++) sim.tick();
++}
++
++describe('boss-pet cosmetic challenges', () => {
++  const speed = BUDDY_COSMETIC_CHALLENGES.find(
++    (c): c is Extract<BuddyCosmeticChallenge, { kind: 'speed' }> =>
++      c.bossId === NYTHRAXIS && c.kind === 'speed',
++  )!;
++  const dps = BUDDY_COSMETIC_CHALLENGES.find(
++    (c): c is Extract<BuddyCosmeticChallenge, { kind: 'dps' }> =>
++      c.bossId === NYTHRAXIS && c.kind === 'dps',
++  )!;
++
++  it('the content table names real bosses and real looks', () => {
++    expect(speed).toBeTruthy();
++    expect(dps).toBeTruthy();
++    for (const row of BUDDY_COSMETIC_CHALLENGES) {
++      expect(MOBS[row.bossId], row.bossId).toBeTruthy();
++      expect(buddyCosmeticDef(row.cosmeticId), row.cosmeticId).not.toBeNull();
++      expect(BUDDY_CHALLENGE_BOSSES.has(row.bossId)).toBe(true);
++    }
++    expect(buddyCosmeticChallengesFor('forest_wolf')).toEqual([]);
++  });
++
++  it('tracks nothing for an untracked mob', () => {
++    const sim = makeWorld();
++    const pid = join(sim);
++    const wolf = bossAt(sim, 'forest_wolf');
++    recordBossDamageForBuddies(sim.ctx, sim.entities.get(pid)!, wolf, 100);
++    expect(buddyAttemptSeconds(sim.ctx, wolf)).toBe(0);
++  });
++
++  it('a fast kill pays the speed look to every recipient; a slow one pays nobody', () => {
++    const sim = makeWorld();
++    const a = join(sim, 'Alpha');
++    const b = join(sim, 'Beta');
++    const boss = bossAt(sim, NYTHRAXIS);
++    recordBossDamageForBuddies(sim.ctx, sim.entities.get(a)!, boss, 10);
++    ticks(sim, TICK_RATE * 5);
++    expect(buddyAttemptSeconds(sim.ctx, boss)).toBeCloseTo(5, 5);
++    resolveBuddyChallenges(sim.ctx, boss, [sim.players.get(a)!, sim.players.get(b)!]);
++    expect(sim.players.get(a)!.buddies.cosmetics.has(speed.cosmeticId)).toBe(true);
++    expect(sim.players.get(b)!.buddies.cosmetics.has(speed.cosmeticId)).toBe(true);
++
++    // Second attempt, too slow.
++    const c = join(sim, 'Gamma');
++    const slow = bossAt(sim, NYTHRAXIS);
++    recordBossDamageForBuddies(sim.ctx, sim.entities.get(c)!, slow, 10);
++    ticks(sim, TICK_RATE * (speed.seconds + 1));
++    resolveBuddyChallenges(sim.ctx, slow, [sim.players.get(c)!]);
++    expect(sim.players.get(c)!.buddies.cosmetics.has(speed.cosmeticId)).toBe(false);
++  });
++
++  it('the dps look is personal: only the player whose own damage meets the rate earns it', () => {
++    const sim = makeWorld();
++    const a = join(sim, 'Alpha');
++    const b = join(sim, 'Beta');
++    const boss = bossAt(sim, NYTHRAXIS);
++    const seconds = 10;
++    recordBossDamageForBuddies(sim.ctx, sim.entities.get(a)!, boss, dps.dps * seconds);
++    recordBossDamageForBuddies(sim.ctx, sim.entities.get(b)!, boss, 1);
++    ticks(sim, TICK_RATE * seconds);
++    resolveBuddyChallenges(sim.ctx, boss, [sim.players.get(a)!, sim.players.get(b)!]);
++    expect(sim.players.get(a)!.buddies.cosmetics.has(dps.cosmeticId)).toBe(true);
++    expect(sim.players.get(b)!.buddies.cosmetics.has(dps.cosmeticId)).toBe(false);
++  });
++
++  it('pet damage credits the owner', () => {
++    const sim = makeWorld();
++    const pid = join(sim);
++    const boss = bossAt(sim, NYTHRAXIS);
++    const pet = createMob(sim.ctx.nextId++, MOBS.forest_wolf, 1, { x: 1, y: 0, z: 1 });
++    pet.ownerId = pid;
++    recordBossDamageForBuddies(sim.ctx, pet, boss, dps.dps * 10);
++    ticks(sim, TICK_RATE * 10);
++    resolveBuddyChallenges(sim.ctx, boss, [sim.players.get(pid)!]);
++    expect(sim.players.get(pid)!.buddies.cosmetics.has(dps.cosmeticId)).toBe(true);
++  });
++
++  it('an evade or respawn re-arms the clock', () => {
++    const sim = makeWorld();
++    const pid = join(sim);
++    const boss = bossAt(sim, NYTHRAXIS);
++    recordBossDamageForBuddies(sim.ctx, sim.entities.get(pid)!, boss, 10);
++    ticks(sim, TICK_RATE * (speed.seconds + 5));
++    resetBuddyChallenge(boss);
++    expect(buddyAttemptSeconds(sim.ctx, boss)).toBe(0);
++    recordBossDamageForBuddies(sim.ctx, sim.entities.get(pid)!, boss, 10);
++    ticks(sim, TICK_RATE * 2);
++    resolveBuddyChallenges(sim.ctx, boss, [sim.players.get(pid)!]);
++    expect(sim.players.get(pid)!.buddies.cosmetics.has(speed.cosmeticId)).toBe(true);
++  });
++
++  it('a kill with no recorded attempt pays nothing and draws no rng', () => {
++    const sim = makeWorld();
++    const pid = join(sim);
++    const boss = bossAt(sim, NYTHRAXIS);
++    const next = vi.spyOn(sim.ctx.rng, 'next');
++    const chance = vi.spyOn(sim.ctx.rng, 'chance');
++    resolveBuddyChallenges(sim.ctx, boss, [sim.players.get(pid)!]);
++    expect(sim.players.get(pid)!.buddies.cosmetics.size).toBe(0);
++    expect(next).not.toHaveBeenCalled();
++    expect(chance).not.toHaveBeenCalled();
++  });
++});
+diff --git a/tests/buddy_deed_rewards.test.ts b/tests/buddy_deed_rewards.test.ts
+--- a/tests/buddy_deed_rewards.test.ts
++++ b/tests/buddy_deed_rewards.test.ts
+@@ -13,7 +13,13 @@
+ }));
+ 
+ import { BUDDY_KEYS } from '../src/sim/content/buddies';
+-import { BUDDY_DEED_REWARDS, buddyDeedOf } from '../src/sim/content/buddy_sources';
++import { BUDDY_COSMETIC_IDS } from '../src/sim/content/buddy_cosmetics';
++import {
++  BUDDY_COSMETIC_DEED_REWARDS,
++  BUDDY_DEED_REWARDS,
++  buddyCosmeticDeedOf,
++  buddyDeedOf,
++} from '../src/sim/content/buddy_sources';
+ import { grantDeed } from '../src/sim/deeds';
+ import { Sim } from '../src/sim/sim';
+ import { VENDOR_TEST_WORLD } from './sim_shared';
+@@ -33,7 +39,9 @@
+ describe('retired companion rewards leave the Book of Deeds intact', () => {
+   it('has no companion or cosmetic deed source for the retained roster', () => {
+     expect(BUDDY_DEED_REWARDS).toEqual({});
++    expect(BUDDY_COSMETIC_DEED_REWARDS).toEqual({});
+     for (const key of BUDDY_KEYS) expect(buddyDeedOf(key)).toBeNull();
++    for (const id of BUDDY_COSMETIC_IDS) expect(buddyCosmeticDeedOf(id)).toBeNull();
+   });
+ 
+   it.each(retiredRewardDeeds)(
+@@ -46,8 +54,13 @@
+       expect(grantDeed(sim.ctx, meta, deedId)).toBe(true);
+       expect(meta.deedsEarned.has(deedId)).toBe(true);
+       expect(meta.buddies.owned.size).toBe(0);
++      expect(meta.buddies.cosmetics.size).toBe(0);
+       expect(sim.entities.get(pid)!.buddyKey).toBe('');
+-      expect(sim.tick().filter((ev) => ev.type === 'buddyRevealed')).toEqual([]);
++      expect(
++        sim
++          .tick()
++          .filter((ev) => ev.type === 'buddyRevealed' || ev.type === 'buddyCosmeticUnlocked'),
++      ).toEqual([]);
+       expect(grantDeed(sim.ctx, meta, deedId)).toBe(false);
+     },
+   );
+@@ -66,6 +79,9 @@
+     const restored = again.players.get(pid2)!;
+     for (const deedId of retiredRewardDeeds) expect(restored.deedsEarned.has(deedId)).toBe(true);
+     expect(restored.buddies.owned.size).toBe(0);
+-    expect(events.filter((ev) => ev.type === 'buddyRevealed')).toEqual([]);
++    expect(restored.buddies.cosmetics.size).toBe(0);
++    expect(
++      events.filter((ev) => ev.type === 'buddyRevealed' || ev.type === 'buddyCosmeticUnlocked'),
++    ).toEqual([]);
+   });
+ });
+diff --git a/tests/buddy_event_lines.test.ts b/tests/buddy_event_lines.test.ts
+--- a/tests/buddy_event_lines.test.ts
++++ b/tests/buddy_event_lines.test.ts
+@@ -1,8 +1,10 @@
+ import { describe, expect, it } from 'vitest';
+ import { BUDDY_KEYS } from '../src/sim/content/buddies';
++import { BUDDY_COSMETICS } from '../src/sim/content/buddy_cosmetics';
+ import {
+   BUDDY_PRESENCE_COLOR,
+   BUDDY_REVEAL_COLOR,
++  buddyCosmeticDisplayName,
+   buddyDisplayName,
+   buddyEventLine,
+ } from '../src/ui/buddy_event_lines';
+@@ -35,4 +37,17 @@
+     expect(line.text).toBe(`${buddyDisplayName('crystal_lich')} has decided to follow you.`);
+     expect(line.color).toBe(BUDDY_REVEAL_COLOR);
+   });
++
++  it('the look line names both the look and its companion', () => {
++    setLanguage('en');
++    const line = buddyEventLine({
++      type: 'buddyCosmeticUnlocked',
++      cosmeticId: 'crystal_lich_frostbound',
++    });
++    expect(line.text).toContain(buddyCosmeticDisplayName('crystal_lich_frostbound'));
++    expect(line.text).toContain(buddyDisplayName('crystal_lich'));
++    for (const id of Object.keys(BUDDY_COSMETICS)) {
++      expect(buddyCosmeticDisplayName(id)).not.toContain('hudChrome.');
++    }
++  });
+ });
+diff --git a/tests/buddy_sources_content.test.ts b/tests/buddy_sources_content.test.ts
+--- a/tests/buddy_sources_content.test.ts
++++ b/tests/buddy_sources_content.test.ts
+@@ -2,7 +2,13 @@
+ // loot, never a gold vendor row, and every source the tables name resolves.
+ import { describe, expect, it } from 'vitest';
+ import { BUDDY_KEYS, buddyDef } from '../src/sim/content/buddies';
+-import { BUDDY_BOSS_DROPS, BUDDY_DEED_REWARDS } from '../src/sim/content/buddy_sources';
++import { BUDDY_COSMETICS } from '../src/sim/content/buddy_cosmetics';
++import {
++  BUDDY_BOSS_DROPS,
++  BUDDY_COSMETIC_CHALLENGES,
++  BUDDY_COSMETIC_GRANT_ONLY,
++  BUDDY_DEED_REWARDS,
++} from '../src/sim/content/buddy_sources';
+ import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+ import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+ import { ALL_RECIPES } from '../src/sim/content/recipes';
+@@ -19,6 +25,7 @@
+       'whistle_crystal_lich',
+       'whistle_forgemaw',
+       'whistle_horse',
++      'whistle_sapling',
+     ]);
+   });
+ 
+@@ -80,10 +87,6 @@
+ });
+ 
+ describe('every buddy source resolves', () => {
+-  it('has no deed rewards', () => {
+-    expect(BUDDY_DEED_REWARDS).toEqual({});
+-  });
+-
+   it('boss rows name real bosses and real companions, and Forgemaw stays heroic-only', () => {
+     expect(BUDDY_BOSS_DROPS.map((row) => [row.key, row.bossId])).toEqual([
+       ['crystal_lich', 'nythraxis_scourge_of_thornpeak'],
+@@ -99,14 +102,38 @@
+     for (const row of forge) expect(row.heroicOnly).toBe(true);
+   });
+ 
++  it('has no deed rewards and keeps only the four boss challenge looks', () => {
++    expect(BUDDY_DEED_REWARDS).toEqual({});
++    expect(Object.keys(BUDDY_COSMETICS)).toEqual([
++      'crystal_lich_frostbound',
++      'crystal_lich_voltaic',
++      'forgemaw_ashen',
++      'forgemaw_whitehot',
++    ]);
++    for (const def of Object.values(BUDDY_COSMETICS)) {
++      expect((BUDDY_KEYS as readonly string[]).includes(def.buddy), def.id).toBe(true);
++    }
++  });
++
+   it('historical charms have no active look and no remaining crafting source', () => {
+     expect(charms.map((charm) => charm.id).sort()).toEqual([
+       'charm_stag_acorn',
+       'charm_stag_gilded',
+     ]);
++    for (const charm of charms) {
++      const cosmetic = (charm as { cosmetic: string }).cosmetic;
++      expect(BUDDY_COSMETICS[cosmetic], charm.id).toBeUndefined();
++    }
+     const recipes = ALL_RECIPES.filter((r) =>
+       ['buddy', 'buddy_cosmetic'].includes(ITEMS[r.resultItemId]?.kind),
+     );
+     expect(recipes).toEqual([]);
+   });
++
++  it('every retained look has a challenge and no grant-only label remains', () => {
++    expect([...BUDDY_COSMETIC_GRANT_ONLY]).toEqual([]);
++    expect(BUDDY_COSMETIC_CHALLENGES.map((challenge) => challenge.cosmeticId)).toEqual(
++      Object.keys(BUDDY_COSMETICS),
++    );
++  });
+ });
+diff --git a/tests/buddy_wire.test.ts b/tests/buddy_wire.test.ts
+--- a/tests/buddy_wire.test.ts
++++ b/tests/buddy_wire.test.ts
+@@ -32,12 +32,12 @@
+ }
+ 
+ describe('client mirror decode (src/net/buddy_wire.ts)', () => {
+-  it('keeps the prior mirror when neither active key is present', () => {
++  it('keeps the prior mirror when none of the four keys is present', () => {
+     const prev = emptyBuddySelfMirror();
+     expect(decodeBuddySelf({ inv: [] }, prev)).toBe(prev);
+   });
+ 
+-  it('decodes active keys through the catalog and keeps omitted state', () => {
++  it('decodes each key through the catalog and keeps the others', () => {
+     const one = decodeBuddySelf({ budOwn: ['crystal_lich', 'nope'] }, emptyBuddySelfMirror());
+     expect(one.owned).toEqual(['crystal_lich']);
+     const two = decodeBuddySelf(
+@@ -48,18 +48,17 @@
+       one,
+     );
+     expect(two.owned).toEqual(['crystal_lich']);
+-    expect(two).toBe(one);
+-    expect(two).not.toHaveProperty('cosmetics');
+-    expect(two).not.toHaveProperty('equipped');
++    expect(two.cosmetics).toEqual(['crystal_lich_frostbound']);
++    expect(two.equipped).toEqual({ crystal_lich: 'crystal_lich_frostbound' });
+     const three = decodeBuddySelf({ budPend: ['forgemaw'] }, two);
+     expect(three.pending).toEqual(['forgemaw']);
+-    expect(three.owned).toEqual(['crystal_lich']);
++    expect(three.equipped).toEqual({ crystal_lich: 'crystal_lich_frostbound' });
+   });
+ 
+   it('drops retired companions and looks from an older server snapshot', () => {
+     const decoded = decodeBuddySelf(
+       {
+-        budOwn: ['horse', 'stag', 'sapling'],
++        budOwn: ['horse', 'stag'],
+         budCos: ['crystal_lich_frostbound', 'stag_gilded'],
+         budEq: {
+           crystal_lich: 'crystal_lich_frostbound',
+@@ -72,20 +71,19 @@
+       emptyBuddySelfMirror(),
+     );
+     expect(decoded.owned).toEqual(['horse']);
+-    expect(decoded).not.toHaveProperty('cosmetics');
+-    expect(decoded).not.toHaveProperty('equipped');
++    expect(decoded.cosmetics).toEqual(['crystal_lich_frostbound']);
++    expect(decoded.equipped).toEqual({ crystal_lich: 'crystal_lich_frostbound' });
+     expect(decoded.pending).toEqual(['forgemaw']);
+   });
+ });
+ 
+ describe('server wire (server/buddy_wire.ts)', () => {
+-  it('emits only active collection keys without reading cosmetic state', () => {
++  it('emits the four self keys', () => {
+     const sim = fakeSim();
+     const maybe = vi.fn();
+     emitBuddySelfKeys(sim as never, 7, maybe);
+-    expect(maybe.mock.calls.map((c) => c[0])).toEqual(['budOwn', 'budPend']);
+-    expect(sim.ownedBuddyCosmeticsFor).not.toHaveBeenCalled();
+-    expect(sim.equippedBuddyCosmeticsFor).not.toHaveBeenCalled();
++    expect(maybe.mock.calls.map((c) => c[0])).toEqual(['budOwn', 'budCos', 'budEq', 'budPend']);
++    expect(maybe).toHaveBeenCalledWith('budEq', { crystal_lich: 'crystal_lich_frostbound' });
+   });
+ 
+   it('dispatches each buddy command with its validated argument', () => {
+@@ -104,11 +102,12 @@
+     expect(sim.toggleBuddyFor).toHaveBeenCalledWith(7);
+     expect(sim.summonBuddyFor).toHaveBeenCalledTimes(1);
+     expect(sim.summonBuddyFor).toHaveBeenCalledWith(7, 'crystal_lich');
+-    expect(sim.equipBuddyCosmeticFor).not.toHaveBeenCalled();
++    expect(sim.equipBuddyCosmeticFor).toHaveBeenCalledTimes(2);
++    expect(sim.equipBuddyCosmeticFor).toHaveBeenLastCalledWith(7, 'crystal_lich', null);
+     expect(sim.setBuddyAutolootFor).toHaveBeenCalledTimes(1);
+   });
+ 
+-  it('accepts only active buddy grants and refuses every cosmetic grant', () => {
++  it('validates a grant body: exactly one known id', () => {
+     expect(buddyGrantBodyError({})).toBeTruthy();
+     expect(
+       buddyGrantBodyError({ buddyKey: 'crystal_lich', cosmeticId: 'crystal_lich_frostbound' }),
+@@ -118,13 +117,7 @@
+     expect(buddyGrantBodyError({ buddyKey: 'stag' })).toBe('unknown buddy key');
+     expect(buddyGrantBodyError({ cosmeticId: 'stag_gilded' })).toBe('unknown cosmetic id');
+     expect(buddyGrantBodyError({ buddyKey: 'crystal_lich' })).toBeNull();
+-    expect(buddyGrantBodyError({ cosmeticId: 'crystal_lich_frostbound' })).toBe(
+-      'unknown cosmetic id',
+-    );
+-    expect(buddyGrantBodyError({ buddyKey: 'sapling' })).toBe('unknown buddy key');
+-    expect(buddyGrantBodyError({ buddyKey: 'horse', cosmeticId: null })).toBe(
+-      'unknown cosmetic id',
+-    );
++    expect(buddyGrantBodyError({ cosmeticId: 'crystal_lich_frostbound' })).toBeNull();
+   });
+ 
+   it('applies a grant through the sim entry points and reports already-owned', () => {
+@@ -134,11 +127,6 @@
+       false,
+     );
+     expect(applyBuddyGrantToSim(sim as never, 7, {})).toBe(false);
+-    expect(applyBuddyGrantToSim(sim as never, 7, { buddyKey: 'horse', cosmeticId: 'old' })).toBe(
+-      false,
+-    );
+-    expect(sim.grantBuddyFor).toHaveBeenCalledTimes(1);
+-    expect(sim.grantBuddyCosmeticFor).not.toHaveBeenCalled();
+   });
+ 
+   it('drains the offline queue at join and saves once when something landed', async () => {
+@@ -150,23 +138,11 @@
+     const save = vi.fn(async () => true);
+     await drainPendingBuddyGrants(sim as never, 7, 42, 'Owner', save);
+     expect(sim.grantBuddyFor).toHaveBeenCalledWith(7, 'crystal_lich');
+-    expect(sim.grantBuddyCosmeticFor).not.toHaveBeenCalled();
++    expect(sim.grantBuddyCosmeticFor).toHaveBeenCalledWith(7, 'crystal_lich_frostbound');
+     expect(save).toHaveBeenCalledTimes(1);
+     // Nothing queued: no save.
+     save.mockClear();
+     await drainPendingBuddyGrants(sim as never, 7, 42, 'Owner', save);
+-    expect(save).not.toHaveBeenCalled();
+-  });
+-
+-  it('ignores historical cosmetic-only queues without mutating or saving the character', async () => {
+-    const sim = fakeSim();
+-    vi.mocked(takePendingBuddyGrants).mockResolvedValueOnce([
+-      { cosmeticId: 'crystal_lich_frostbound' },
+-    ]);
+-    const save = vi.fn(async () => true);
+-    await drainPendingBuddyGrants(sim as never, 7, 42, 'Owner', save);
+-    expect(sim.grantBuddyFor).not.toHaveBeenCalled();
+-    expect(sim.grantBuddyCosmeticFor).not.toHaveBeenCalled();
+     expect(save).not.toHaveBeenCalled();
+   });
+ 
+diff --git a/tests/collections_sources.test.ts b/tests/collections_sources.test.ts
+--- a/tests/collections_sources.test.ts
++++ b/tests/collections_sources.test.ts
+@@ -1,9 +1,15 @@
+ import { beforeEach, describe, expect, it } from 'vitest';
+ import { BUDDY_KEYS } from '../src/sim/content/buddies';
+-import { BUDDY_BOSS_DROPS, BUDDY_DEED_REWARDS } from '../src/sim/content/buddy_sources';
++import { BUDDY_COSMETICS } from '../src/sim/content/buddy_cosmetics';
++import {
++  BUDDY_BOSS_DROPS,
++  BUDDY_COSMETIC_CHALLENGES,
++  BUDDY_DEED_REWARDS,
++} from '../src/sim/content/buddy_sources';
+ import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+ import { ITEMS, NPCS } from '../src/sim/data';
+ import {
++  buddyCosmeticFacts,
+   buddySourceFacts,
+   collectionItemFacts,
+   resetCollectionSourceCache,
+@@ -42,12 +48,14 @@
+     expect(NPCS[vendor?.npcId ?? ''].heroicVendor).toBe(true);
+   });
+ 
+-  it('does not advertise retired buddy tokens as obtainable', () => {
++  it('does not advertise retired buddy tokens or looks as obtainable', () => {
+     for (const id of ['whistle_proud_grunt', 'whistle_loot_goblin', 'whistle_penny_goldspark']) {
+       const facts = collectionItemFacts(id);
+       expect(facts?.obtainable ?? false, id).toBe(false);
+       expect(facts?.vendors ?? [], id).toEqual([]);
+     }
++    expect(buddyCosmeticFacts('stag_acorn')).toBeNull();
++    expect(buddyCosmeticFacts('frog_sapphire')).toBeNull();
+   });
+ 
+   it('derives the per-player boss rolls for a boss pet, with the heroic rate and gate', () => {
+@@ -67,7 +75,7 @@
+   });
+ 
+   it('keeps companions without authored acquisition sources unobtainable', () => {
+-    for (const key of ['horse'] as const) {
++    for (const key of ['horse', 'sapling'] as const) {
+       const facts = buddySourceFacts(key);
+       expect(facts.deedId).toBeNull();
+       expect(facts.bossDrops).toEqual([]);
+@@ -82,6 +90,30 @@
+     ]);
+     for (const key of BUDDY_KEYS) {
+       expect(buddySourceFacts(key).obtainable, key).toBe(sourced.has(key));
++    }
++  });
++
++  it('derives a retained look challenge without inventing other sources', () => {
++    const frost = buddyCosmeticFacts('crystal_lich_frostbound');
++    expect(frost?.challenges).toHaveLength(1);
++    expect(frost?.challenges[0].kind).toBe('speed');
++    expect(frost?.challenges[0].amount).toBe(
++      BUDDY_COSMETIC_CHALLENGES.find((c) => c.cosmeticId === 'crystal_lich_frostbound')!.kind ===
++        'speed'
++        ? 300
++        : -1,
++    );
++    expect(frost?.obtainable).toBe(true);
++    expect(frost?.craft).toBeNull();
++    expect(frost?.vendors).toEqual([]);
++    expect(frost?.deedId).toBeNull();
++    expect(frost?.grantOnly).toBe(false);
++    expect(buddyCosmeticFacts('no_such_look')).toBeNull();
++  });
++
++  it('every authored look is obtainable one way or another', () => {
++    for (const id of Object.keys(BUDDY_COSMETICS)) {
++      expect(buddyCosmeticFacts(id)?.obtainable, id).toBe(true);
+     }
+   });
+ 
+diff --git a/tests/collections_view.test.ts b/tests/collections_view.test.ts
+--- a/tests/collections_view.test.ts
++++ b/tests/collections_view.test.ts
+@@ -45,8 +45,9 @@
+     for (const row of view.buddies) {
+       expect(row.obtainable, row.key).toBe(row.buddyFacts?.obtainable ?? false);
+     }
+-    // Horse has no acquisition source yet, but remains visible.
++    // Horse and Sapling have no acquisition sources yet, but remain visible.
+     expect(view.buddies.find((b) => b.key === 'horse')?.obtainable).toBe(false);
++    expect(view.buddies.find((b) => b.key === 'sapling')?.obtainable).toBe(false);
+     // And the row still carries a name and a preview key either way, so an
+     // unobtainable entry renders as a real, greyed-out catalog entry.
+     expect(rows.every((row) => row.name.length > 0)).toBe(true);
+@@ -77,6 +78,27 @@
+     expect(horse?.pending).toBe(false); // owned wins over a stale pending flag
+     expect(view.buddies.find((b) => b.key === 'crystal_lich')?.pending).toBe(true);
+     expect(view.buddies.filter((b) => b.owned)).toHaveLength(1);
++  });
++
++  it('lists every authored look under its companion, with unlock and worn state', () => {
++    const view = buildCollectionsView({
++      ...EMPTY,
++      ownedBuddyKeys: new Set(['crystal_lich']),
++      ownedBuddyCosmetics: new Set(['crystal_lich_frostbound']),
++      equippedBuddyCosmetics: { crystal_lich: 'crystal_lich_frostbound' },
++    });
++    const lich = view.buddies.find((b) => b.key === 'crystal_lich')!;
++    expect(lich.looks.map((look) => look.id)).toEqual([
++      'crystal_lich_frostbound',
++      'crystal_lich_voltaic',
++    ]);
++    const frostbound = lich.looks.find((look) => look.id === 'crystal_lich_frostbound')!;
++    expect(frostbound.owned).toBe(true);
++    expect(frostbound.worn).toBe(true);
++    expect(lich.tint).toBe(frostbound.tint);
++    expect(lich.looks.find((look) => look.id === 'crystal_lich_voltaic')?.owned).toBe(false);
++    expect(view.buddies.find((b) => b.key === 'horse')?.looks).toEqual([]);
++    expect(view.buddies.find((b) => b.key === 'sapling')?.looks).toEqual([]);
+   });
+ 
+   it('groups epic-or-better sets by armor type then primary stat, and admits nothing below epic', () => {
+@@ -102,12 +124,13 @@
+     expect(seen).toEqual(ordered);
+   });
+ 
+-  it('lists the three buddies together in stable rarity order', () => {
++  it('lists the four buddies together in stable rarity order', () => {
+     const view = buildCollectionsView(EMPTY);
+     expect(view.buddies.map((row) => row.key).sort()).toEqual([
+       'crystal_lich',
+       'forgemaw',
+       'horse',
++      'sapling',
+     ]);
+     const ranks = view.buddies.map((row) => rarityRank(row.quality));
+     expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
+diff --git a/tests/collections_window_scroll.test.ts b/tests/collections_window_scroll.test.ts
+--- a/tests/collections_window_scroll.test.ts
++++ b/tests/collections_window_scroll.test.ts
+@@ -29,9 +29,12 @@
+     restoreFocus: () => {},
+     mountPreview: () => {},
+     ownedBuddyKeys: () => new Set(),
++    ownedBuddyCosmetics: () => new Set(),
++    equippedBuddyCosmetics: () => ({}),
+     pendingBuddyKeys: () => new Set(),
+     activeBuddyKey: () => '',
+     summonBuddy: () => {},
++    equipBuddyCosmetic: () => {},
+     ownedMountKeys: () => new Set(),
+     ownedItemIds: () => new Set(),
+     buddyVisualKeys: () => ({}),
+@@ -49,31 +52,21 @@
+     document.body.innerHTML = '<div id="collections-window"></div>';
+   });
+ 
+-  it('shows the three buddies in one complete list with tabs and no category controls', () => {
++  it('shows the four buddies in one complete list with tabs and no category controls', () => {
+     const win = makeWindow();
+     win.toggle();
+-    expect(rowKeys().sort()).toEqual(['crystal_lich', 'forgemaw', 'horse']);
++    expect(rowKeys().sort()).toEqual(['crystal_lich', 'forgemaw', 'horse', 'sapling']);
+     expect(list().querySelector('.col-group-head')).toBeNull();
+     expect(root().querySelector('input, select')).toBeNull();
+     expect(
+       [...root().querySelectorAll<HTMLElement>('[data-tab]')].map((tab) => tab.dataset.tab),
+     ).toEqual(['buddies', 'mounts', 'sets']);
+ 
+-    (root().querySelector('[data-key="horse"]') as HTMLElement).click();
++    (root().querySelector('[data-key="sapling"]') as HTMLElement).click();
+     (root().querySelector('[data-tab="mounts"]') as HTMLElement).click();
+     (root().querySelector('[data-tab="buddies"]') as HTMLElement).click();
+-    expect(root().querySelector('.col-row.active')?.getAttribute('data-key')).toBe('horse');
+-    expect(rowKeys()).toHaveLength(3);
+-  });
+-
+-  it('shows no Looks controls for any remaining buddy', () => {
+-    const win = makeWindow();
+-    win.toggle();
+-    for (const key of rowKeys()) {
+-      (root().querySelector(`[data-key="${key}"]`) as HTMLElement).click();
+-      expect(root().querySelector('.col-looks, .col-look, [data-wear], [data-unwear]')).toBeNull();
+-      expect(root().querySelector('.col-detail')?.textContent).not.toContain('Looks');
+-    }
++    expect(root().querySelector('.col-row.active')?.getAttribute('data-key')).toBe('sapling');
++    expect(rowKeys()).toHaveLength(4);
+   });
+ 
+   it('keeps the catalog where the player left it when a companion is picked', () => {
+diff --git a/tests/command_schema.test.ts b/tests/command_schema.test.ts
+--- a/tests/command_schema.test.ts
++++ b/tests/command_schema.test.ts
+@@ -174,10 +174,9 @@
+ // buddy commands (buddy_toggle, buddy_summon, buddy_cosmetic, buddy_autoloot)
+ // each have a client send and a dispatch, so +4 on both axes over the
+ // release/v0.44.0 base (225 / 239).
+-// The retired buddy_cosmetic token remains dispatchable but is no longer sent.
+-const EXPECTED_SEND_COUNT = 228;
++const EXPECTED_SEND_COUNT = 229;
+ const EXPECTED_DISPATCH_COUNT = 243;
+-const EXPECTED_DISPATCH_ONLY_COUNT = 15;
++const EXPECTED_DISPATCH_ONLY_COUNT = 14;
+ 
+ // The chat sub-channel routing switch (server/game.ts `switch
+ // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must
+diff --git a/tests/corpse_harvest_sim.test.ts b/tests/corpse_harvest_sim.test.ts
+--- a/tests/corpse_harvest_sim.test.ts
++++ b/tests/corpse_harvest_sim.test.ts
+@@ -2536,8 +2536,8 @@
+     // without touching `tagged` either. Plus the five Eastbrook healing-training
+     // role dummies (src/sim/content/healing_training.ts), which are friendly
+     // practice targets, not corpses to butcher: 196. The four retained cosmetic
+-    // buddies are also untagged, bringing the measured complement to 199.
+-    expect(Object.keys(MOBS).length - tagged.length).toBe(199);
++    // buddies are also untagged, bringing the measured complement to 200.
++    expect(Object.keys(MOBS).length - tagged.length).toBe(200);
+     withMixedTemplates(() => {
+       const mixed = mixedTemplates();
+       expect(mixed.map(([id]) => id).sort()).toEqual(
+diff --git a/tests/deeds_border_picker.test.ts b/tests/deeds_border_picker.test.ts
+--- a/tests/deeds_border_picker.test.ts
++++ b/tests/deeds_border_picker.test.ts
+@@ -84,7 +84,10 @@
+         deedsRarity: async () => null,
+         deedsRecent: async () => null,
+         ownedBuddies: () => [],
++        ownedBuddyCosmetics: () => [],
++        equippedBuddyCosmetics: () => ({}),
+         summonBuddy: () => {},
++        equipBuddyCosmetic: () => {},
+         entities: new Map(),
+         playerId: 1,
+         cfg: { playerClass: 'warrior' },
+@@ -237,8 +240,9 @@
+     // h3 the group points at), not a second aria-label string.
+     expect(el.querySelector('.deeds-titles')?.getAttribute('role')).toBe('group');
+     expect(el.querySelector('.deeds-borders')?.getAttribute('role')).toBe('group');
+-    // Three heads: titles, borders and the buddy shelf's Buddies group.
+-    expect(el.querySelectorAll('.deeds-picker-head').length).toBe(3);
++    // Four heads: titles, borders, plus the buddy shelf's Buddies and Buddy
++    // Looks groups (tests/deeds_buddy_picker.test.ts owns those two).
++    expect(el.querySelectorAll('.deeds-picker-head').length).toBe(4);
+     for (const cls of ['.deeds-titles', '.deeds-borders']) {
+       const group = el.querySelector(cls) as HTMLElement;
+       const labelledBy = group.getAttribute('aria-labelledby') ?? '';
+diff --git a/tests/deeds_buddy_picker.test.ts b/tests/deeds_buddy_picker.test.ts
+--- a/tests/deeds_buddy_picker.test.ts
++++ b/tests/deeds_buddy_picker.test.ts
+@@ -12,19 +12,22 @@
+ interface WorldState {
+   owned: string[];
+   active: string;
++  looks: string[];
++  equipped: Record<string, string>;
+   /** False models the ONLINE mirror: the command goes out, the local read does
+    *  not move until the snapshot echo lands. */
+   applyLocally: boolean;
+ }
+ 
+ function baseState(over: Partial<WorldState> = {}): WorldState {
+-  return { owned: [], active: '', applyLocally: true, ...over };
++  return { owned: [], active: '', looks: [], equipped: {}, applyLocally: true, ...over };
+ }
+ 
+ interface Harness {
+   w: DeedsWindow;
+   el: HTMLElement;
+   summonBuddy: ReturnType<typeof vi.fn>;
++  equipBuddyCosmetic: ReturnType<typeof vi.fn>;
+ }
+ 
+ function makeWindow(state: WorldState): Harness {
+@@ -34,6 +37,11 @@
+   const stats = freshDeedStats();
+   const summonBuddy = vi.fn((key: string) => {
+     if (state.applyLocally) state.active = state.active === key ? '' : key;
++  });
++  const equipBuddyCosmetic = vi.fn((key: string, id: string | null) => {
++    if (!state.applyLocally) return;
++    if (id === null) delete state.equipped[key];
++    else state.equipped[key] = id;
+   });
+   const deps: DeedsWindowDeps = {
+     root: () => el,
+@@ -52,7 +60,10 @@
+         deedsRarity: async () => null,
+         deedsRecent: async () => null,
+         ownedBuddies: () => state.owned,
++        ownedBuddyCosmetics: () => state.looks,
++        equippedBuddyCosmetics: () => state.equipped,
+         summonBuddy,
++        equipBuddyCosmetic,
+         playerId: 1,
+         get entities() {
+           return new Map([[1, { buddyKey: state.active }]]);
+@@ -75,7 +86,7 @@
+   };
+   const w = new DeedsWindow(deps);
+   w.open('titles');
+-  return { w, el, summonBuddy };
++  return { w, el, summonBuddy, equipBuddyCosmetic };
+ }
+ 
+ const picks = (el: HTMLElement, attr: string): string[] =>
+@@ -126,10 +137,30 @@
+     expect(summonBuddy).not.toHaveBeenCalled();
+   });
+ 
+-  it('keeps the companion picker without a Looks group', () => {
+-    const { el } = makeWindow(baseState({ owned: ['crystal_lich'], active: 'crystal_lich' }));
+-    expect(picks(el, 'data-buddy-pick')).toEqual(['', 'crystal_lich']);
+-    expect(el.querySelector('.deeds-buddy-looks, [data-look-pick]')).toBeNull();
++  it('the looks group follows the summoned companion: its unlocked looks only', () => {
++    const state = baseState({
++      owned: ['crystal_lich', 'forgemaw'],
++      active: 'crystal_lich',
++      looks: ['crystal_lich_frostbound', 'forgemaw_ashen'],
++    });
++    const { el, equipBuddyCosmetic } = makeWindow(state);
++    expect(picks(el, 'data-look-pick')).toEqual(['', 'crystal_lich_frostbound']);
++    expect(pressed(el, 'data-look-pick')).toEqual(['']);
++    (el.querySelector('[data-look-pick="crystal_lich_frostbound"]') as HTMLElement).click();
++    expect(equipBuddyCosmetic).toHaveBeenLastCalledWith('crystal_lich', 'crystal_lich_frostbound');
++    expect(pressed(el, 'data-look-pick')).toEqual(['crystal_lich_frostbound']);
++    (el.querySelector('[data-look-pick=""]') as HTMLElement).click();
++    expect(equipBuddyCosmetic).toHaveBeenLastCalledWith('crystal_lich', null);
++  });
++
++  it('with no companion out the looks group is only its head and says so', () => {
++    const { el, equipBuddyCosmetic } = makeWindow(
++      baseState({ owned: ['crystal_lich'], looks: ['crystal_lich_frostbound'] }),
++    );
++    expect(picks(el, 'data-look-pick')).toEqual(['']);
++    expect(el.querySelector('.deeds-buddy-looks .deeds-empty')).not.toBeNull();
++    (el.querySelector('[data-look-pick=""]') as HTMLElement).click();
++    expect(equipBuddyCosmetic).not.toHaveBeenCalled();
+   });
+ 
+   it('writes nothing optimistically: the marks follow the world reads', () => {
+diff --git a/tests/deeds_window.test.ts b/tests/deeds_window.test.ts
+--- a/tests/deeds_window.test.ts
++++ b/tests/deeds_window.test.ts
+@@ -743,11 +743,17 @@
+       painter.match(
+         /if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}/g,
+       )?.length,
+-      // Watch, title, border and the buddy shelf's summon pick.
+-    ).toBe(4);
++      // Watch, title, border, plus the buddy shelf's summon and look picks.
++    ).toBe(5);
+     // Association, not just count: the guard is the FIRST statement of each
+     // action handler specifically, never merely present somewhere in the file.
+-    for (const selector of ['data-watch', 'data-title', 'data-border-pick', 'data-buddy-pick']) {
++    for (const selector of [
++      'data-watch',
++      'data-title',
++      'data-border-pick',
++      'data-buddy-pick',
++      'data-look-pick',
++    ]) {
+       const loopStart = painter.indexOf(`el.querySelectorAll<HTMLElement>('[${selector}]')`);
+       expect(loopStart).toBeGreaterThan(-1);
+       const nextLoop = painter.indexOf('\n    for (const btn of ', loopStart + 1);
+diff --git a/tests/deeds_window_focus.test.ts b/tests/deeds_window_focus.test.ts
+--- a/tests/deeds_window_focus.test.ts
++++ b/tests/deeds_window_focus.test.ts
+@@ -53,7 +53,10 @@
+         deedsRarity: async () => null,
+         deedsRecent: async () => null,
+         ownedBuddies: () => [],
++        ownedBuddyCosmetics: () => [],
++        equippedBuddyCosmetics: () => ({}),
+         summonBuddy: () => {},
++        equipBuddyCosmetic: () => {},
+         entities: new Map(),
+         playerId: 1,
+         setActiveTitle: (id: string | null) => {
+diff --git a/tests/deeds_window_jump.test.ts b/tests/deeds_window_jump.test.ts
+--- a/tests/deeds_window_jump.test.ts
++++ b/tests/deeds_window_jump.test.ts
+@@ -56,7 +56,10 @@
+         deedsRarity: async () => null,
+         deedsRecent: async () => state.recent,
+         ownedBuddies: () => [],
++        ownedBuddyCosmetics: () => [],
++        equippedBuddyCosmetics: () => ({}),
+         summonBuddy: () => {},
++        equipBuddyCosmetic: () => {},
+         entities: new Map(),
+         playerId: 1,
+         setActiveTitle: (id: string | null) => {
+diff --git a/tests/dev_commands.test.ts b/tests/dev_commands.test.ts
+--- a/tests/dev_commands.test.ts
++++ b/tests/dev_commands.test.ts
+@@ -490,7 +490,7 @@
+     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+   });
+ 
+-  it('/dev buddies collects every catalog companion outright, no items involved', () => {
++  it('/dev buddies collects every catalog companion and look outright, no items involved', () => {
+     const sim = devSim();
+     const meta = sim.players.get(sim.playerId);
+     if (!meta) throw new Error('missing player meta');
+@@ -498,8 +498,7 @@
+     sim.chat('/dev buddies');
+ 
+     expect(sim.ownedBuddies().length).toBe(BUDDY_KEYS.length);
+-    expect(sim.ownedBuddies()).toEqual(['horse', 'crystal_lich', 'forgemaw']);
+-    expect(meta.buddies).not.toHaveProperty('cosmetics');
++    expect(sim.ownedBuddyCosmetics().length).toBeGreaterThan(0);
+     expect(meta.inventory.some((s) => s.itemId.startsWith('whistle_'))).toBe(false);
+   });
+ 
+diff --git a/tests/gathering.test.ts b/tests/gathering.test.ts
+--- a/tests/gathering.test.ts
++++ b/tests/gathering.test.ts
+@@ -367,9 +367,9 @@
+     // the five Eastbrook healing-training role dummies, which are friendly
+     // practice targets rather than harvestable corpses: 196. Plus the four retained
+     // cosmetic buddy companions (content/buddies.ts): owned followers, never
+-    // a corpse anyone butchers, so no componentTags: 199.
++    // a corpse anyone butchers, so no componentTags: 200.
+     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
+-    expect(untagged).toHaveLength(199);
++    expect(untagged).toHaveLength(200);
+     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
+     // The three literals above are the load-bearing ones; this sum states that
+     // they partition MOBS, so a template that fell out of all three would read
+diff --git a/tests/professions_blob_growth.test.ts b/tests/professions_blob_growth.test.ts
+--- a/tests/professions_blob_growth.test.ts
++++ b/tests/professions_blob_growth.test.ts
+@@ -1637,7 +1637,17 @@
+ 
+   // Deeds no longer grant companions. Arm the complete retained collection
+   // explicitly so removing those rewards does not shrink this field to absent.
+-  meta.buddies.owned = new Set(['horse', 'crystal_lich', 'forgemaw']);
++  meta.buddies.owned = new Set(['horse', 'sapling', 'crystal_lich', 'forgemaw']);
++  meta.buddies.cosmetics = new Set([
++    'crystal_lich_frostbound',
++    'crystal_lich_voltaic',
++    'forgemaw_ashen',
++    'forgemaw_whitehot',
++  ]);
++  meta.buddies.equipped = new Map([
++    ['crystal_lich', 'crystal_lich_frostbound'],
++    ['forgemaw', 'forgemaw_whitehot'],
++  ]);
+   meta.buddies.last = 'crystal_lich';
+ 
+   // Progression at the cap, every counter wide.
+@@ -1953,13 +1963,20 @@
+     expect(s3).toEqual(s2);
+     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+     expect(s2.buddies).toEqual({
+-      owned: ['horse', 'crystal_lich', 'forgemaw'],
++      owned: ['horse', 'sapling', 'crystal_lich', 'forgemaw'],
++      cosmetics: [
++        'crystal_lich_frostbound',
++        'crystal_lich_voltaic',
++        'forgemaw_ashen',
++        'forgemaw_whitehot',
++      ],
++      equipped: { crystal_lich: 'crystal_lich_frostbound', forgemaw: 'forgemaw_whitehot' },
+       last: 'crystal_lich',
+     });
+-    // MEASURED after retirement: 78 bytes for the complete retained collection
++    // MEASURED after retirement: 273 bytes for the complete retained collection
+     // including its top-level key, replacing 129 bytes of implicit deed rewards.
+     const buddyCollectionBytes = Buffer.byteLength(JSON.stringify(s2.buddies), 'utf8') + 11;
+-    expect(buddyCollectionBytes).toBe(78);
++    expect(buddyCollectionBytes).toBe(273);
+ 
+     // The professions block rides inside at its own ceiling: the same band the
+     // professions arm pins, so the two measurements can never describe
+@@ -2341,7 +2358,7 @@
+       // charm item ids joining
+       // deedStats.itemsDiscovered (each `"<id>",` in the sorted array, id
+       // length + 3, summed off the catalog). The explicitly armed retained
+-      // collection contributes the independently measured 78 bytes above.
++      // collection contributes the independently measured 273 bytes above.
+       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
+         183 +
+         1548 +
+@@ -2388,8 +2405,8 @@
+       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
+       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
+       // RE-MEASURED after retirement: the release's 209,773 plus 706 bytes of
+-      // historical item ids and 78 bytes of explicitly armed buddy collection.
+-    ).toBe(210557);
++      // historical item ids and 273 bytes of explicitly armed buddy collection.
++    ).toBe(210752);
+     // Removing ONLY field_kit (the Bramblehide release content and the two
+     // dev-mount reins items still present, current staged tree) reproduces
+     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
+@@ -2400,9 +2417,9 @@
+     expect(
+       counterfactualBytes,
+       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
+-      // RE-MEASURED after retirement: -77 against the prior 212,231
+-      // (collection 78 - 129, less the retired recipe's 26 bytes).
+-    ).toBe(212154);
++      // RE-MEASURED after retirement: +118 against the prior 212,231
++      // (collection 273 - 129, less the retired recipe's 26 bytes).
++    ).toBe(212349);
+     const priorContent = withoutCrucibleContent(s2);
+     const contentDelta = Object.fromEntries(
+       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
+@@ -2458,12 +2475,12 @@
+     // deedStats.itemsDiscovered for 34 whistle and 2 charm ids, 129 for the
+     // top-level `buddies` field, 26 in knownRecipes for the charm recipe).
+     // Floor at measurement minus 380, edge at measurement plus one.
+-    // RE-MEASURED after roster and cosmetic retirement: 212,166 bytes, -77 from the
+-    // explicit retained collection (78 replacing 129) and -26 from the
++    // RE-MEASURED after roster retirement: 212,361 bytes, +118 from the
++    // explicit retained collection (273 replacing 129) and -26 from the
+     // retired Acorn Crown recipe. Same 381-byte band width and unchanged
+     // structural/warning ceilings; all field deltas above remain pinned.
+-    expect(bytes, reMint).toBeGreaterThan(211786);
+-    expect(bytes, reMint).toBeLessThan(212167);
++    expect(bytes, reMint).toBeGreaterThan(211981);
++    expect(bytes, reMint).toBeLessThan(212362);
+ 
+     // The Crucible database review approved 229,376 bytes (224 KiB), the first
+     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
+diff --git a/tests/sapling_buddy.test.ts b/tests/sapling_buddy.test.ts
+--- a/tests/sapling_buddy.test.ts
++++ b/tests/sapling_buddy.test.ts
+@@ -4,10 +4,12 @@
+ import { useItem } from '../src/sim/items';
+ import { buddyOf } from '../src/sim/pet/buddy_ai';
+ import { Sim } from '../src/sim/sim';
++import { buddySourceFacts } from '../src/ui/collections/collection_sources';
++import { buildCollectionsView } from '../src/ui/collections/collections_view';
+ import { VENDOR_TEST_WORLD } from './sim_shared';
+ 
+-describe('retired Sapling buddy', () => {
+-  it('keeps its saved whistle inert without consuming it or spawning a follower', () => {
++describe('Sapling buddy integration', () => {
++  it('consumes its grant token and summons, dismisses and recalls its own follower', () => {
+     const sim = new Sim({
+       seed: 42,
+       playerClass: 'warrior',
+@@ -15,47 +17,58 @@
+       world: VENDOR_TEST_WORLD,
+     });
+     const pid = sim.addPlayer('warrior', 'Owner');
++    sim.tick();
+     const meta = sim.players.get(pid)!;
++
+     sim.addItem('whistle_sapling', 1, pid);
++    expect(buddyOwned(meta, 'sapling')).toBe(false);
+     useItem(sim.ctx, 'whistle_sapling', pid);
+-    expect(sim.countItem('whistle_sapling', pid)).toBe(1);
+-    expect(buddyOwned(meta, 'sapling')).toBe(false);
+-    expect(summonBuddy(sim.ctx, pid, 'sapling')).toBe(false);
++
++    expect(buddyOwned(meta, 'sapling')).toBe(true);
++    expect(meta.inventory.some((slot) => slot.itemId === 'whistle_sapling')).toBe(false);
++    expect(sim.entities.get(pid)!.buddyKey).toBe('sapling');
++    const first = buddyOf(sim.ctx, pid)!;
++    expect(first.templateId).toBe('buddy_sapling');
++    expect(first.ownerId).toBe(pid);
++    expect(first.hostile).toBe(false);
++    expect(MOBS[first.templateId].family).toBe('elemental');
++    expect(MOBS[first.templateId].scale).toBe(MOBS.buddy_horse.scale);
++
++    summonBuddy(sim.ctx, pid, 'sapling');
+     expect(buddyOf(sim.ctx, pid)).toBeNull();
+-    expect(MOBS.buddy_sapling).toBeUndefined();
++    expect(sim.entities.has(first.id)).toBe(false);
++    summonBuddy(sim.ctx, pid, 'sapling');
++    expect(buddyOf(sim.ctx, pid)?.templateId).toBe('buddy_sapling');
++    expect(buddyOwned(meta, 'sapling')).toBe(true);
++  });
++
++  it('lists the unsourced companion without granting ownership', () => {
++    const view = buildCollectionsView({
++      buddyVisualKeys: { sapling: 'buddy_sapling' },
++      ownedBuddyKeys: new Set<string>(),
++      ownedMountKeys: new Set<string>(),
++      ownedItemIds: new Set<string>(),
++      mountVisualKeys: {},
++    });
++    const row = view.buddies.find((entry) => entry.key === 'sapling');
++    expect(row).toMatchObject({ name: 'Sapling', owned: false, obtainable: false });
++    expect(view.buddies.filter((entry) => entry.key === 'sapling')).toHaveLength(1);
++
++    const source = buddySourceFacts('sapling');
++    expect(source).toMatchObject({ bossDrops: [], deedId: null, obtainable: false });
++    expect(source.token).toMatchObject({
++      itemId: 'whistle_sapling',
++      tradeable: false,
++      vendors: [],
++      drops: [],
++      obtainable: false,
++    });
+     expect(ITEMS.whistle_sapling).toMatchObject({
+       kind: 'buddy',
+       buddy: 'sapling',
+       soulbound: true,
++      quality: 'common',
++      sellValue: 50_000,
+     });
+   });
+-
+-  it('discards saved Sapling ownership, pending reveals and last selection on login', () => {
+-    const sim = new Sim({
+-      seed: 42,
+-      playerClass: 'warrior',
+-      noPlayer: true,
+-      world: VENDOR_TEST_WORLD,
+-    });
+-    const pid = sim.addPlayer('warrior', 'Owner');
+-    const state = sim.serializeCharacter(pid)!;
+-    state.buddies = {
+-      owned: ['horse', 'sapling'],
+-      pending: [{ key: 'sapling', source: 'world', x: 0, z: 0 }],
+-      last: 'sapling',
+-      cosmetics: ['crystal_lich_frostbound'],
+-      equipped: { crystal_lich: 'crystal_lich_frostbound' },
+-    };
+-    const again = new Sim({
+-      seed: 42,
+-      playerClass: 'warrior',
+-      noPlayer: true,
+-      world: VENDOR_TEST_WORLD,
+-    });
+-    const restoredId = again.addPlayer('warrior', 'Owner', { state });
+-    expect(again.ownedBuddiesFor(restoredId)).toEqual(['horse']);
+-    expect(again.pendingBuddiesFor(restoredId)).toEqual([]);
+-    expect(buddyOf(again.ctx, restoredId)).toBeNull();
+-    expect(again.serializeCharacter(restoredId)!.buddies).toEqual({ owned: ['horse'] });
+-  });
+ });
+diff --git a/tests/sapling_buddy_asset.test.ts b/tests/sapling_buddy_asset.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/sapling_buddy_asset.test.ts
+@@ -0,0 +1,104 @@
++import { readFileSync } from 'node:fs';
++import { NodeIO } from '@gltf-transform/core';
++import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
++import { MeshoptDecoder } from 'meshoptimizer';
++import { describe, expect, it } from 'vitest';
++import { mobVisualKey, VISUALS } from '../src/render/characters/manifest';
++
++const file = 'public/models/buddies/sapling.glb';
++
++describe('Sapling buddy asset', () => {
++  it('uses its own authored atlas and run clip through the normal buddy visual', () => {
++    expect(mobVisualKey('buddy_sapling')).toBe('buddy_sapling');
++    expect(VISUALS.buddy_sapling).toMatchObject({
++      url: 'models/buddies/sapling.glb',
++      height: 0.75,
++      authoredAtlas: true,
++      tint: 'cosmetic',
++      clips: { idle: 'Idle', walk: 'Walk', run: 'Run', attack: [], death: 'Idle' },
++    });
++  });
++
++  it('ships the rig, compressed textures and seamless distinct waddle cycles', async () => {
++    const bytes = readFileSync(file);
++    const json = JSON.parse(bytes.toString('utf8', 20, 20 + bytes.readUInt32LE(12)));
++    expect(json.extensionsRequired).toContain('EXT_meshopt_compression');
++    expect(json.extensionsRequired).toContain('KHR_texture_basisu');
++    expect(
++      json.images.every((image: { mimeType: string }) => image.mimeType === 'image/ktx2'),
++    ).toBe(true);
++
++    await MeshoptDecoder.ready;
++    const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
++      'meshopt.decoder': MeshoptDecoder,
++    });
++    const doc = await io.read(file);
++    const root = doc.getRoot();
++    expect(root.listSkins()).toHaveLength(1);
++    expect(root.listSkins()[0].listJoints()).toHaveLength(41);
++    expect(root.listTextures()).toHaveLength(3);
++    expect(root.listMaterials()[0].getBaseColorTexture()).not.toBeNull();
++    expect(
++      root
++        .listAnimations()
++        .map((clip) => clip.getName())
++        .sort(),
++    ).toEqual(['Idle', 'Run', 'Walk']);
++    expect(root.listTextures().every((texture) => texture.getSize()?.every((n) => n <= 512))).toBe(
++      true,
++    );
++    const triangles = root
++      .listMeshes()
++      .flatMap((mesh) => mesh.listPrimitives())
++      .reduce((sum, primitive) => sum + primitive.getIndices()!.getCount() / 3, 0);
++    expect(triangles).toBe(3020);
++    const run = root.listAnimations().find((clip) => clip.getName() === 'Run')!;
++    expect(
++      run.listChannels().some((channel) => channel.getTargetNode()?.getName() === 'Root'),
++    ).toBe(true);
++    expect(
++      run.listChannels().some((channel) => channel.getTargetNode()?.getName() === 'L_Thigh'),
++    ).toBe(true);
++    expect(
++      run.listChannels().some((channel) => channel.getTargetNode()?.getName() === 'R_Thigh'),
++    ).toBe(true);
++    for (const clip of root.listAnimations()) {
++      for (const sampler of clip.listSamplers()) {
++        const output = sampler.getOutput()!;
++        const first = output.getElement(0, []);
++        const last = output.getElement(output.getCount() - 1, []);
++        first.forEach((value, i) => {
++          expect(last[i], `${clip.getName()} loop seam`).toBeCloseTo(value, 5);
++        });
++      }
++    }
++    expect(run.listSamplers()[0].getInput()!.getMax([])[0]).toBeCloseTo(1.04, 3);
++    const walk = root.listAnimations().find((clip) => clip.getName() === 'Walk')!;
++    expect(walk.listSamplers()[0].getInput()!.getMax([])[0]).toBeCloseTo(1.65, 3);
++    for (const [bone, minimumTurn] of [
++      ['Root', 0.08],
++      ['L_Thigh', 0.3],
++      ['R_Thigh', 0.3],
++    ] as const) {
++      const channel = run
++        .listChannels()
++        .find(
++          (candidate) =>
++            candidate.getTargetNode()?.getName() === bone &&
++            candidate.getTargetPath() === 'rotation',
++        );
++      const output = channel!.getSampler()!.getOutput()!;
++      const first = output.getElement(0, []);
++      let largestTurn = 0;
++      for (let index = 1; index < output.getCount(); index++) {
++        const value = output.getElement(index, []);
++        const dot = Math.min(
++          1,
++          Math.abs(first.reduce((sum, component, i) => sum + component * value[i], 0)),
++        );
++        largestTurn = Math.max(largestTurn, 2 * Math.acos(dot));
++      }
++      expect(largestTurn, `${bone} must move, not hold a static pose`).toBeGreaterThan(minimumTurn);
++    }
++  });
++});
+diff --git a/tests/snapshots.test.ts b/tests/snapshots.test.ts
+--- a/tests/snapshots.test.ts
++++ b/tests/snapshots.test.ts
+@@ -5168,6 +5168,8 @@
+   'bg',
+   'blk',
+   'bpsl',
++  'budCos',
++  'budEq',
+   'budOwn',
+   'budPend',
+   'buyback',
+@@ -5295,6 +5297,8 @@
+   bags: 'bags',
+   bank: 'bankInfo',
+   blk: 'blockChance',
++  budCos: 'ownedBuddyCosmetics',
++  budEq: 'equippedBuddyCosmetics',
+   budOwn: 'ownedBuddies',
+   budPend: 'pendingBuddies',
+   buyback: 'vendorBuyback',
+@@ -6481,7 +6485,7 @@
+ });
+ 
+ describe('delta-key contract pins (anti-drift)', () => {
+-  it('ALL_DELTA_KEYS contains exactly 97 unique keys in sorted order', () => {
++  it('ALL_DELTA_KEYS contains exactly 99 unique keys in sorted order', () => {
+     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
+     // commission order board's corder key (issue #1298), +1: the character
+     // sheet's lifetime played-time key ptime, for 67, then +16: the static
+@@ -6525,10 +6529,10 @@
+     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
+     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
+     // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95. The
+-    // buddy collection (server/buddy_wire.ts) adds budOwn and budPend.
+-    // The retired budCos/budEq fields are absent, leaving 97.
+-    expect(ALL_DELTA_KEYS).toHaveLength(97);
+-    expect(new Set(ALL_DELTA_KEYS).size).toBe(97);
++    // buddy collection (server/buddy_wire.ts) adds budOwn, budCos, budEq and
++    // budPend, for 99 on the merged tree.
++    expect(ALL_DELTA_KEYS).toHaveLength(99);
++    expect(new Set(ALL_DELTA_KEYS).size).toBe(99);
+     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
+   });
+ 
+@@ -6691,8 +6695,8 @@
+     // sibling, likewise inside the recursive scrape) makes 93.
+     // The candidate self in-combat key cbt brings the combined inventory to 94;
+     // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
+-    // The buddy collection's budOwn and budPend make 97.
+-    expect(scraped.size).toBe(97);
++    // The buddy collection's budOwn, budCos, budEq and budPend make 99.
++    expect(scraped.size).toBe(99);
+     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
+   });
+ 
+diff --git a/tests/world_api_parity.test.ts b/tests/world_api_parity.test.ts
+--- a/tests/world_api_parity.test.ts
++++ b/tests/world_api_parity.test.ts
+@@ -482,8 +482,11 @@
+   { name: 'mountRaceView', kind: 'method' }, // read-returning
+   // --- cosmetic buddies (IWorldBuddies) ---
+   { name: 'ownedBuddies', kind: 'method' }, // read-returning
++  { name: 'ownedBuddyCosmetics', kind: 'method' }, // read-returning
++  { name: 'equippedBuddyCosmetics', kind: 'method' }, // read-returning
+   { name: 'pendingBuddies', kind: 'method' }, // read-returning
+   { name: 'summonBuddy', kind: 'method' },
++  { name: 'equipBuddyCosmetic', kind: 'method' },
+   { name: 'toggleBuddy', kind: 'method' },
+   { name: 'setBuddyAutoloot', kind: 'method' },
+   // --- Dungeon Finder facet (IWorldDungeonFinder) ---
+@@ -873,11 +876,11 @@
+     // and the account-wide Book of Deeds / Reliquary read halves. Counted
+     // directly off the resolved IWORLD_MEMBERS literal.
+     // The buddy merge (feature/buddy-companions-v43) adds the IWorldBuddies
+-    // facet: eight methods (four read-returning), no data members. Retiring
+-    // the three buddy-look methods leaves 383 members, 107 data, 276 methods.
+-    expect(IWORLD_MEMBERS.length).toBe(383);
++    // facet: eight methods (four read-returning), no data members: 386
++    // members, 107 data, 279 method, read off the merged member table.
++    expect(IWORLD_MEMBERS.length).toBe(386);
+     expect(DATA_MEMBERS.length).toBe(107);
+-    expect(METHOD_MEMBERS.length).toBe(276);
++    expect(METHOD_MEMBERS.length).toBe(279);
+   });
+   it('has no duplicate member names', () => {
+     const names = IWORLD_MEMBERS.map((m) => m.name);
+@@ -1020,10 +1023,12 @@
+       'entities',
+       'entityRosterVersion',
+       'equipBag',
++      'equipBuddyCosmetic',
+       'equipItem',
+       'equipItemToSlot',
+       'equipment',
+       'equipmentInstances',
++      'equippedBuddyCosmetics',
+       'extractEssence',
+       'farmNowMs',
+       'farmPatches',
+@@ -1125,6 +1130,7 @@
+       'nodeRespawnSeconds',
+       'openCommissionOrder',
+       'ownedBuddies',
++      'ownedBuddyCosmetics',
+       'ownedMounts',
+       'partyAccept',
+       'partyDecline',
+@@ -1473,8 +1479,10 @@
+       'enterDelve',
+       'enterDungeon',
+       'equipBag',
++      'equipBuddyCosmetic',
+       'equipItem',
+       'equipItemToSlot',
++      'equippedBuddyCosmetics',
+       'extractEssence',
+       'farmNowMs',
+       'feedPet',
+@@ -1552,6 +1560,7 @@
+       'nodeRespawnSeconds',
+       'openCommissionOrder',
+       'ownedBuddies',
++      'ownedBuddyCosmetics',
+       'ownedMounts',
+       'partyAccept',
+       'partyDecline',
+@@ -2171,8 +2180,11 @@
+ 
+ const FACET_BUDDIES = [
+   'ownedBuddies',
++  'ownedBuddyCosmetics',
++  'equippedBuddyCosmetics',
+   'pendingBuddies',
+   'summonBuddy',
++  'equipBuddyCosmetic',
+   'toggleBuddy',
+   'setBuddyAutoloot',
+ ] as const satisfies readonly (keyof IWorldBuddies)[];
+@@ -2422,8 +2434,8 @@
+     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
+     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
+     // must always agree.
+-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(383);
+-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(383);
++    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(386);
++    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(386);
+     const sortedUnion = [...union].sort();
+     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
+     expect(sortedUnion).toEqual(pinned);
+diff --git a/tests/buddy_retirement.test.ts b/tests/buddy_retirement.test.ts
+--- a/tests/buddy_retirement.test.ts
++++ b/tests/buddy_retirement.test.ts
+@@ -4,11 +4,12 @@
+   buddyItemId,
+   grantBuddy,
+   restoreBuddyCollection,
+-  serializeBuddyCollection,
+   summonBuddy,
++  useBuddyCosmeticToken,
+   useBuddyToken,
+ } from '../src/sim/buddies';
+ import { BUDDY_KEYS, buddyDef, normalizeBuddyKey } from '../src/sim/content/buddies';
++import { BUDDY_COSMETICS } from '../src/sim/content/buddy_cosmetics';
+ import { BUDDY_TEMPLATE_IDS } from '../src/sim/content/buddy_mobs';
+ import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+ import { ALL_RECIPES } from '../src/sim/content/recipes';
+@@ -18,7 +19,6 @@
+ import { VENDOR_TEST_WORLD } from './sim_shared';
+ 
+ const RETIRED_KEYS = [
+-  'sapling',
+   'ember_fox',
+   'moss_hare',
+   'frog',
+@@ -64,10 +64,11 @@
+ ];
+ 
+ describe('retired buddies', () => {
+-  it('keeps only the requested three buddies and follower templates', () => {
+-    expect(BUDDY_KEYS).toEqual(['horse', 'crystal_lich', 'forgemaw']);
++  it('keeps only the requested four buddies and follower templates', () => {
++    expect(BUDDY_KEYS).toEqual(['horse', 'sapling', 'crystal_lich', 'forgemaw']);
+     expect([...BUDDY_TEMPLATE_IDS]).toEqual([
+       'buddy_horse',
++      'buddy_sapling',
+       'buddy_crystal_lich',
+       'buddy_forgemaw',
+     ]);
+@@ -76,6 +77,12 @@
+       expect(normalizeBuddyKey(key)).toBe('');
+       expect(buddyItemId(key)).toBeNull();
+     }
++    expect(Object.keys(BUDDY_COSMETICS)).toEqual([
++      'crystal_lich_frostbound',
++      'crystal_lich_voltaic',
++      'forgemaw_ashen',
++      'forgemaw_whitehot',
++    ]);
+   });
+ 
+   it('drops retired saved ownership, pending reveals, looks and last selection', () => {
+@@ -87,14 +94,10 @@
+       last: 'frog',
+     });
+     expect([...restored.owned]).toEqual(['horse', 'crystal_lich']);
++    expect([...restored.cosmetics]).toEqual(['crystal_lich_frostbound']);
++    expect([...restored.equipped]).toEqual([['crystal_lich', 'crystal_lich_frostbound']]);
+     expect(restored.pending.map((entry) => entry.key)).toEqual(['forgemaw']);
+     expect(restored.last).toBe('');
+-    expect(restored).not.toHaveProperty('cosmetics');
+-    expect(restored).not.toHaveProperty('equipped');
+-    expect(serializeBuddyCollection(restored)).toEqual({
+-      owned: ['horse', 'crystal_lich'],
+-      pending: [{ key: 'forgemaw', source: 'instance', x: 0, z: 0 }],
+-    });
+   });
+ 
+   it('refuses retired grants, summons and token use without consuming saved tokens', () => {
+@@ -116,10 +119,12 @@
+       sim.addItem(itemId, 1, pid);
+       useItem(sim.ctx, itemId, pid);
+       expect(useBuddyToken(sim.ctx, pid, itemId)).toBe(false);
++      expect(useBuddyCosmeticToken(sim.ctx, pid, itemId)).toBe(false);
+       expect(sim.countItem(itemId, pid), itemId).toBe(1);
+       sim.removeItem(itemId, 1, pid);
+     }
+     expect(meta.buddies.owned.size).toBe(0);
++    expect(meta.buddies.cosmetics.size).toBe(0);
+     expect(meta.buddies.pending).toEqual([]);
+     expect(sim.entities.get(pid)!.buddyKey).toBe('');
+   });
+diff --git a/tests/buddy_render_catalog.test.ts b/tests/buddy_render_catalog.test.ts
+--- a/tests/buddy_render_catalog.test.ts
++++ b/tests/buddy_render_catalog.test.ts
+@@ -3,8 +3,8 @@
+ import { BUDDY_MOBS } from '../src/sim/content/buddy_mobs';
+ 
+ describe('active buddy render catalog', () => {
+-  it('keeps only the three requested follower bodies and templates', () => {
+-    const expected = ['buddy_crystal_lich', 'buddy_forgemaw', 'buddy_horse'];
++  it('keeps only the four requested follower bodies and templates', () => {
++    const expected = ['buddy_crystal_lich', 'buddy_forgemaw', 'buddy_horse', 'buddy_sapling'];
+     expect(
+       Object.keys(VISUALS)
+         .filter((key) => key.startsWith('buddy_'))
+@@ -12,7 +12,6 @@
+     ).toEqual(expected);
+     expect(Object.keys(BUDDY_MOBS).sort()).toEqual(expected);
+     for (const key of expected) {
+-      expect(VISUALS[key].tint).toBeUndefined();
+       expect(VISUALS[key].url).toBe(`models/buddies/${key.slice('buddy_'.length)}.glb`);
+     }
+   });

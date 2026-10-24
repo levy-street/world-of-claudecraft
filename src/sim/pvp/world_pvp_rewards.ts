@@ -18,20 +18,25 @@ export type WorldPvpRewardPauseCause = 'dead' | 'instance' | 'sanctuary';
  * Why the armed streak does not tick for this player where they are now, or
  * null when it does. The streak rewards time spent where a flagged rival can
  * reach you, so it pauses wherever nobody can: dead (a corpse, or a released
- * ghost, which keeps `dead`), inside any instance (dungeon, raid, delve, rift,
- * maze, arena, battleground: all on the far-east plane past
- * DUNGEON_X_THRESHOLD, the same line Vitality reads in vitality.ts), and on
+ * ghost, which keeps `dead`), inside a PvE instance (dungeon, raid, delve,
+ * rift, maze: all on the far-east plane past DUNGEON_X_THRESHOLD), and on
  * sanctuary ground. Without these a flagged player could lie dead or park in
  * a private dungeon copy and bank the titles risk-free. `zone` is the policy
  * at the player's position when the caller already holds it; otherwise it is
- * read only for a living player on open-world ground.
+ * read only for a living player on open-world ground. Seated battleground
+ * and arena participants (including Fiesta and Protect Yumi) keep accruing
+ * while alive, including preparation and the match's return countdown.
+ * Membership uses at most two keyed probes, never a walk of the match books.
  */
 export function worldPvpRewardPause(
-  e: Pick<Entity, 'dead' | 'pos'>,
+  ctx: Pick<SimContext, 'bgMatches' | 'arenaMatches'>,
+  e: Pick<Entity, 'id' | 'dead' | 'pos'>,
   zone?: WorldPvpZonePolicy,
 ): WorldPvpRewardPauseCause | null {
   if (e.dead) return 'dead';
-  if (e.pos.x > DUNGEON_X_THRESHOLD) return 'instance';
+  if (e.pos.x > DUNGEON_X_THRESHOLD) {
+    return ctx.bgMatches.has(e.id) || ctx.arenaMatches.has(e.id) ? null : 'instance';
+  }
   return (zone ?? worldPvpZonePolicyAt(e.pos.x, e.pos.z)) === 'sanctuary' ? 'sanctuary' : null;
 }
 
@@ -48,7 +53,7 @@ export function updateWorldPvpRewards(ctx: SimContext): void {
     )
       continue;
     const player = ctx.entities.get(meta.entityId)!;
-    if (worldPvpRewardPause(player) !== null) continue;
+    if (worldPvpRewardPause(ctx, player) !== null) continue;
     const before = state.rewardTicks ?? 0;
     if (before >= WORLD_PVP_MAX_REWARD_TICKS) continue;
     const ticks = before + 1;

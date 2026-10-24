@@ -189,6 +189,14 @@ describe('linkdead grace lifecycle', () => {
     expect(setTrackingConnection).toHaveBeenCalledTimes(1);
     expect(setTrackingConnection).toHaveBeenCalledWith(session.botTrackingContext, false);
 
+    const referralPage = vi.spyOn(
+      (
+        server as unknown as {
+          referral: { command: (session: ClientSession, action: { type: 'page' }) => void };
+        }
+      ).referral,
+      'command',
+    );
     const ws2 = fakeWs();
     const resumeMeta = {
       ip: '203.0.113.45',
@@ -199,6 +207,7 @@ describe('linkdead grace lifecycle', () => {
       server.join(ws2, 11, 101, 'Comeback', 'warrior', null, false, resumeMeta),
     );
 
+    expect(referralPage).toHaveBeenCalledWith(session, { type: 'page' });
     expect(resumed).toBe(session);
     expect(resumed.linkdead).toBe(false);
     expect(resumed.graceUntil).toBe(0);
@@ -871,6 +880,9 @@ describe('World PvP rewards during disconnect grace', () => {
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 101, 'Flagbearer', 'warrior', null));
     server.sim.setPlayerLevel(20, session.pid);
+    const player = server.sim.entities.get(session.pid)!;
+    player.pos = { x: 60, y: 0, z: 700 };
+    player.prevPos = { ...player.pos };
     server.sim.setWorldPvpFlag(true, session.pid);
     const meta = server.sim.meta(session.pid)!;
     meta.worldPvp!.rewardTicks = 72_000 - 1;
@@ -880,7 +892,7 @@ describe('World PvP rewards during disconnect grace', () => {
     expect(meta.deedsEarned.has('pvp_flag_1h')).toBe(false);
     const saved = server.sim.serializeCharacter(session.pid)!;
     expect(saved.worldPvp!.rewardTicks).toBe(71_999);
-    expect(JSON.stringify(saved)).not.toContain('pvpRewardsPaused');
+    expect(saved.worldPvp).not.toHaveProperty('pvpRewardsPaused');
     const resumed = expectJoined(server.join(fakeWs(), 11, 101, 'Flagbearer', 'warrior', null));
     expect(resumed.pid).toBe(session.pid);
     server.sim.tick();

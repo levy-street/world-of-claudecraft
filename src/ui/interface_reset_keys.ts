@@ -23,6 +23,10 @@ export const INTERFACE_OFF_MENU_KEYS: Record<InterfaceTab, readonly (keyof GameS
     'focusTarget2Height',
     'focusTarget3Width',
     'focusTarget3Height',
+    // Rendered only while the bar is detached, so a reset with it docked
+    // still has to name them.
+    'playerFrameResourceWidth',
+    'playerFrameResourceHeight',
     'showPetFrame',
     'showEmptyFocusFrames',
     'partyFrameWidth',

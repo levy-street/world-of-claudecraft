@@ -27,13 +27,20 @@
 // in Node, the browser, and the headless RL env.
 
 import { recordAccountDeed, selfEarner } from './account_ledger';
+import { grantBuddy } from './buddies';
+import { BUDDY_DEED_REWARDS } from './content/buddy_sources';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { FARM_CROP_IDS } from './content/farm_crops';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
+import { REFERRAL_TITLE } from './content/referral_rewards';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
+import { onKillForGuildContracts } from './guild_contracts';
+import { MUSTER_PIKE_MAX_LEVEL } from './lance_balance_core';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
+import { emitReferralBossEvidence } from './referral_evidence';
+import { ownsReferralTitle } from './referral_rewards';
 import {
   accountReliquaryOwnership,
   isHorizonsTitleDeed,
@@ -169,7 +176,7 @@ export const FLAWLESS_TASKS: Record<string, string> = {
 };
 
 // Kill-order tasks: at boss death, every add it summoned this attempt is dead.
-const ADD_TASKS: Record<string, string> = {
+export const ADD_TASKS: Record<string, string> = {
   vael_the_mistcaller: 'dgn_vael_thralls',
   ysolei: 'dgn_ysolei_moonspawn',
   grand_necromancer_velkhar: 'dgn_velkhar_bonewalkers',
@@ -179,7 +186,7 @@ const ADD_TASKS: Record<string, string> = {
 // Positioning tasks tainted when the boss's signature splash strikes a player
 // other than its current target (Olen's Reaping Arc cleave; Nythraxis's
 // Gravebreaker frontal arc). One taint flag per boss attempt.
-const SPLASH_TASKS: Record<string, string> = {
+export const SPLASH_TASKS: Record<string, string> = {
   knight_commander_olen: 'dgn_olen_arc',
   nythraxis_scourge_of_thornpeak: 'dgn_nythraxis_gravebreaker',
 };
@@ -209,6 +216,7 @@ const ENCOUNTER_ROOM_RADIUS: Record<string, number> = {
 };
 
 const THUNZHARR_ID = 'thunzharr_waking_peak';
+const BALGATH_ID = 'balgath_cyclops';
 const WOLF_PACK_TEMPLATE = 'forest_wolf';
 const BOG_BLOAT_TEMPLATE = 'bog_bloat';
 const MENDER_TEMPLATE = 'gravecaller_mender';
@@ -541,6 +549,10 @@ export interface DeedEncounterState {
   bellTainted: boolean;
   // Live entity ids of every add this boss summoned this attempt.
   addIds: number[];
+  // Adds whose body lies dead but that are not destroyed yet (Velkhar's
+  // Unquenched Bonewalkers, sunk and waiting to rise): the kill-order task
+  // fails while any is pending.
+  pendingAddIds?: Set<number>;
   // World boss only: character keys (deedCharKey) of contributors who died
   // between joining the roster and the kill (cmb_thunzharr_unbroken is personal,
   // not raid-wide). Keyed by character so a relog cannot launder the death.
@@ -799,6 +811,12 @@ export function grantDeed(
     pid: meta.entityId,
     ...(opts?.retro ? { retro: true } : {}),
   });
+  // Achievement pets (content/buddy_sources.ts): a deed that names
+  // a companion grants it on the same call, retro grants
+  // included (a character who earned the deed before the pet existed gets it
+  // at their next login). The grant is idempotent and draws no rng.
+  const buddyReward = BUDDY_DEED_REWARDS[deedId];
+  if (buddyReward) grantBuddy(ctx, meta.entityId, buddyReward);
   // Horizons titles score catalogRankOwned. Live grant of a title relic can
   // cross a Curator threshold; keep display rank and zero-Renown bridges aligned
   // without waiting for join retro. The rank bridges for ranks 2 to 4 are
@@ -846,6 +864,12 @@ export function setActiveTitle(
 ): void {
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
+    if (deedId === REFERRAL_TITLE) {
+      if (!ownsReferralTitle(meta.referralRewards)) return;
+      meta.activeTitle = deedId;
+      e.title = deedId;
+      return;
+    }
     if (devBadgeTitleTier(deedId) !== undefined) {
       if (!opts?.restore && !canWearDevBadgeTitle(deedId, e.devTier)) return;
       meta.activeTitle = deedId;
@@ -1525,6 +1549,12 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   if (player.level >= MAX_LEVEL && meta.restedXp <= 0) {
     grantDeed(ctx, meta, 'prog_well_rested', { retro: true });
   }
+  // Stranded: the muster's rack lends its pikes to level 19 and below only (muster_pike.ts),
+  // so past that level the pike drill behind Point Taken can never be finished again, and a
+  // level never goes back down. Below the cap the drill's own turn-in stays the only grant.
+  if (player.level > MUSTER_PIKE_MAX_LEVEL && !meta.questsDone.has('q_muster_pike_drill')) {
+    grantDeed(ctx, meta, 'cmb_point_taken', { retro: true });
+  }
   // Proof: unique catalogued Reliquary fills already live on itemsDiscovered.
   // Veterans who crossed Curator rank thresholds before the rank deed bridges
   // shipped get cosmetic titles/borders on join (zero Renown; grantDeed is
@@ -1665,6 +1695,24 @@ export function onPlayerDeathForDeeds(ctx: SimContext, e: Entity): void {
 export function onBossAddsSummonedForDeeds(ctx: SimContext, boss: Entity, addIds: number[]): void {
   if (!ADD_TASKS[boss.templateId]) return;
   ensureEncounter(ctx, boss.id).addIds.push(...addIds);
+}
+
+/** A tracked boss's dead add is pending (its body lies dead but it will rise
+ *  again: Velkhar's Unquenched Bonewalkers) or no longer pending. */
+export function setBossAddPendingForDeeds(
+  ctx: SimContext,
+  boss: Entity,
+  addId: number,
+  pending: boolean,
+): void {
+  if (!ADD_TASKS[boss.templateId]) return;
+  const st = ensureEncounter(ctx, boss.id);
+  if (!pending) {
+    st.pendingAddIds?.delete(addId);
+    return;
+  }
+  st.pendingAddIds ??= new Set();
+  st.pendingAddIds.add(addId);
 }
 
 /** The boss's tracked splash (Reaping Arc cleave / Gravebreaker arc) struck a
@@ -1874,9 +1922,12 @@ export function onMobKillCreditForDeeds(
       ? playersInRoom(ctx, mob, roomRadius, ctx.instanceOriginOf(inst))
       : playersInInstance(ctx, inst)
     : eligible;
+  // the tasks this kill met, for Lantern Hall's task contracts (guild_contracts.ts) below
+  const tasksMet: string[] = [];
   const flawlessDeed = FLAWLESS_TASKS[mob.templateId];
   if (flawlessDeed && inst?.difficulty === 'heroic' && !st?.deathTainted) {
     for (const meta of taskRecipients) grantDeed(ctx, meta, flawlessDeed);
+    tasksMet.push(flawlessDeed);
   }
   const trioDeed = TRIO_TASKS[mob.templateId];
   if (trioDeed) {
@@ -1892,15 +1943,21 @@ export function onMobKillCreditForDeeds(
   }
   const addDeed = ADD_TASKS[mob.templateId];
   if (addDeed) {
-    const allDead = (st?.addIds ?? []).every((id) => {
-      const add = ctx.entities.get(id);
-      return !add || add.dead;
-    });
-    if (allDead) for (const meta of taskRecipients) grantDeed(ctx, meta, addDeed);
+    const allDead =
+      (st?.pendingAddIds?.size ?? 0) === 0 &&
+      (st?.addIds ?? []).every((id) => {
+        const add = ctx.entities.get(id);
+        return !add || add.dead;
+      });
+    if (allDead) {
+      for (const meta of taskRecipients) grantDeed(ctx, meta, addDeed);
+      tasksMet.push(addDeed);
+    }
   }
   const splashDeed = SPLASH_TASKS[mob.templateId];
   if (splashDeed && !st?.splashTainted) {
     for (const meta of taskRecipients) grantDeed(ctx, meta, splashDeed);
+    tasksMet.push(splashDeed);
   }
   const bellDeed = BELL_TASKS[mob.templateId];
   if (bellDeed && !st?.bellTainted) {
@@ -1909,6 +1966,17 @@ export function onMobKillCreditForDeeds(
   if (mob.templateId === 'nythraxis_scourge_of_thornpeak' && !st?.rageResolved) {
     for (const meta of taskRecipients) grantDeed(ctx, meta, 'dgn_nythraxis_wardens');
   }
+  // Lantern Hall's weekly contracts ride the same credit: the kill's eligible roster, the
+  // encounter's recipients and the tasks met (src/sim/guild_contracts.ts)
+  onKillForGuildContracts(
+    ctx,
+    mob,
+    inst?.difficulty === 'heroic',
+    eligible,
+    taskRecipients,
+    tasksMet,
+    (meta, deedId) => grantDeed(ctx, meta, deedId),
+  );
   ctx.deedRuntime.encounters.delete(mob.id);
 }
 
@@ -1921,6 +1989,7 @@ export function onNythraxisKillForDeeds(
 ): void {
   onDungeonFinalBossKilledForDeeds(ctx, boss, instanceForMob(ctx, boss), roomMetas);
   onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[boss.templateId], roomMetas);
+  emitReferralBossEvidence(ctx, boss, roomMetas);
 }
 
 /** World-boss credit: the loot-roster snapshot (never pruned by dying). */
@@ -1929,6 +1998,17 @@ export function onWorldBossKilledForDeeds(
   mob: Entity,
   contributors: PlayerMeta[],
 ): void {
+  // Per-boss credit, matched on template id. An explicit branch per boss rather than a
+  // table because the deeds differ in SHAPE: only Thunzharr has an unbroken-run deed, so a
+  // table would carry optionals most bosses never use.
+  if (mob.templateId === BALGATH_ID) {
+    for (const meta of contributors) {
+      grantDeed(ctx, meta, 'cmb_balgath');
+      bumpDeedStat(ctx, meta, 'balgathKills', 1);
+    }
+    ctx.deedRuntime.encounters.delete(mob.id);
+    return;
+  }
   if (mob.templateId !== THUNZHARR_ID) return;
   const st = ctx.deedRuntime.encounters.get(mob.id);
   for (const meta of contributors) {

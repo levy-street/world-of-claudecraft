@@ -41,6 +41,17 @@ import type { ItemDef } from '../src/sim/types';
 // fraction rule at item level 35, so it joins the exemption on the same terms.
 const FRACTIONAL_BY_DESIGN: ReadonlySet<string> = new Set([...FURY_STOCK, ...SEASON2_STOCK]);
 
+// The three Crucible healer waists sit 10 OVER their line by design: half of
+// their elective Crit (60 to 30) was reallocated into Int/Spi (+6 / +4), since
+// ratings are off the primary budget (docs/prd/ignivar-raid-loot.md, the
+// 2026-10-12 healer Crit amendment; exact lines pinned in
+// tests/ignivar_loot.test.ts). Exempt from the exact-line check only.
+const REALLOCATED_RATING_BY_DESIGN: ReadonlySet<string> = new Set([
+  'springbinder_sash',
+  'grovetender_belt',
+  'tidebinder_links',
+]);
+
 // Items whose primary total was off their budget BEFORE the stamina model landed
 // (the 2026-09-10 inventory: the level-18 crafted set 1 to 3 over, leveling drift
 // of a point or two, and a few outliers such as Kingsbane's Last Oath 21 under
@@ -162,11 +173,15 @@ const STAT_DRIFT_ALLOWLIST_CEILING = 103;
 // real line now (the two untiered feet rows carry sta 6, one over their tiered
 // raid mirror, because the proxy floor rounds an 11-point line up to 6).
 const UNTIERED_WITH_PROXY_FLOOR = 77;
-const GENERATED_ITEM_COUNT = 111;
+// 119 and 86 with the dungeon rework's eight generated Heroic variants (the
+// Spadehaft, Bride's Icicle (rimeweb_fang), Cantor's Hymnal, Knight-Commander's Longsword,
+// Gaolyard Cudgel, Chorus Conch, Tideglass Shiv and Falls-Blessed Staff).
+// 149 and 116 with the lower dungeons' normal blues' 30 generated Heroic
+// variants (tests/lower_dungeon_blues.test.ts names the base pieces).
+const GENERATED_ITEM_COUNT = 149;
 const WARFARE_STOCK_COUNT = 47;
-// 135 set pieces, 5 weapons and 8 jewelry pieces (the jewelry joined 2026-10-02).
-const SEASON2_STOCK_COUNT = 148;
-const HEROIC_VARIANT_COUNT = 78;
+const SEASON2_STOCK_COUNT = 139;
+const HEROIC_VARIANT_COUNT = 116;
 
 // Items with no derivable source (vendor, starter and quest oddities) have no
 // tier to price against; their floor is taken from their own authored line, the
@@ -356,7 +371,12 @@ describe('stamina baseline model: the merged catalog', () => {
   it('every tiered item off the drift allowlist sits exactly on its line and total', () => {
     const failures: string[] = [];
     for (const item of tiered) {
-      if (STAT_DRIFT_ALLOWLIST.has(item.id) || FRACTIONAL_BY_DESIGN.has(item.id)) continue;
+      if (
+        STAT_DRIFT_ALLOWLIST.has(item.id) ||
+        FRACTIONAL_BY_DESIGN.has(item.id) ||
+        REALLOCATED_RATING_BY_DESIGN.has(item.id)
+      )
+        continue;
       const check = checkStaminaModel(item.stats, expectedLineBudget(item) as number);
       if (!check.onLine)
         failures.push(
@@ -387,6 +407,26 @@ describe('stamina baseline model: the merged catalog', () => {
       const check = checkStaminaModel(item.stats, line as number);
       expect(check.meetsFloor, `${id} floor`).toBe(true);
       expect(check.onLine, `${id} is priced at a fraction, so off its line`).toBe(false);
+    }
+  });
+
+  it('the reallocated-rating exemption is exactly the three healer waists, 10 over and floored', () => {
+    expect([...REALLOCATED_RATING_BY_DESIGN].sort()).toEqual([
+      'grovetender_belt',
+      'springbinder_sash',
+      'tidebinder_links',
+    ]);
+    for (const id of REALLOCATED_RATING_BY_DESIGN) {
+      expect(STAT_DRIFT_ALLOWLIST.has(id), `${id} is on both lists`).toBe(false);
+      expect(FRACTIONAL_BY_DESIGN.has(id), `${id} is also a WARFARE fraction`).toBe(false);
+      expect(ITEMS[id].slot, `${id} is a waist`).toBe('waist');
+      expect(ITEMS[id].healPower ?? 0, `${id} is healer gear`).toBeGreaterThan(0);
+      const item = ITEMS[id];
+      const line = expectedLineBudget(item);
+      expect(line, `${id} has a tier`).toBeDefined();
+      const check = checkStaminaModel(item.stats, line as number);
+      expect(check.meetsFloor, `${id} floor`).toBe(true);
+      expect(check.line - check.expectedLine, `${id} line is 10 over`).toBe(10);
     }
   });
 

@@ -1,0 +1,15 @@
+.ed-placement-height .ed-row > button {
+  flex: 1;
+  min-height: 40px;
+}
+
+.ed-placement-height .ed-field > span {
+  font-family: inherit;
+}
+
+@media (pointer: coarse) {
+  .ed-placement-height :is(input, select) {
+    font-size: 16px;
+    min-height: 40px;
+  }
+}

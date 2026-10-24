@@ -30,6 +30,7 @@
 // proportion difference is already divided out.
 import * as THREE from 'three';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
+import { decalMapSide, FULL_DECAL_TEXTURE_SIZES } from './decal_texture_size_core';
 import {
   type BlushShade,
   blushColor,
@@ -45,6 +46,7 @@ import {
   cachedHeadFrame,
   DECAL_TEX_SIZE,
   type DecalRegion,
+  decalTextureSizes,
   decalUv,
 } from './stubble';
 
@@ -151,14 +153,15 @@ export const MAKEUP_REGION: DecalRegion = {
 // through. That makes the cache key the pair of shades, which is fine, there
 // are 4x5 = 20 of them at most and the map is small.
 
-/** Side of the generated map. A quarter of the stubble map's: these patches
+/** Side of the generated map, on every profile (`decalTextureSizes().makeup`).
+ *  A quarter of the full stubble map's: these patches
  *  cover a few hundred square degrees between them rather than a whole head,
  *  and every texel outside them is wasted. */
-export const MAKEUP_TEX_SIZE = 512;
+export const MAKEUP_TEX_SIZE = FULL_DECAL_TEXTURE_SIZES.makeup;
 
 export function makeupTextureData(
   sel: Pick<MakeupSelection, 'blush' | 'eyeshadow'>,
-  size = MAKEUP_TEX_SIZE,
+  size = decalTextureSizes().makeup,
 ): Uint8Array<ArrayBuffer> {
   const out = new Uint8Array(new ArrayBuffer(size * size * 4));
   makeupTextureRows(sel, out, 0, size, size);
@@ -176,7 +179,7 @@ export function makeupTextureRows(
   out: Uint8Array,
   rowStart: number,
   rowEnd: number,
-  size = MAKEUP_TEX_SIZE,
+  size = decalTextureSizes().makeup,
 ): void {
   const shadow = shadowColor(sel.eyeshadow);
   const blush = blushColor(sel.blush);
@@ -256,13 +259,8 @@ export function makeupTextureFromData(
   const key = makeupKeyOf(sel);
   const hit = textureCache.get(key);
   if (hit) return hit;
-  const tex = new THREE.DataTexture(
-    data,
-    MAKEUP_TEX_SIZE,
-    MAKEUP_TEX_SIZE,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType,
-  );
+  const side = decalMapSide(data.length);
+  const tex = new THREE.DataTexture(data, side, side, THREE.RGBAFormat, THREE.UnsignedByteType);
   tex.name = `makeup_${key}`;
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.ClampToEdgeWrapping;

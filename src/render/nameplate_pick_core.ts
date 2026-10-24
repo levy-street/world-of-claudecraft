@@ -32,8 +32,9 @@ export function nameplateHealthBarTop(anchorY: number, castVisible: boolean): nu
 
 /**
  * Return the entity whose visible health bar owns this screen point. Later
- * candidates draw over earlier ones, so a residual overlap resolves to the
- * same plate the player sees on top. `count` excludes unused high-water slots.
+ * candidates draw over earlier ones and plates are never moved apart, so an
+ * overlap resolves to the same plate the player sees on top. `count` excludes
+ * unused high-water slots.
  */
 export function pickNameplateHealthBarAt(
   candidates: readonly NameplatePickCandidate[],
@@ -57,4 +58,26 @@ export function pickNameplateHealthBarAt(
     }
   }
   return null;
+}
+
+/**
+ * Move the candidate with `id` to the end of the live prefix, keeping every
+ * other candidate in its order. Plates draw in candidate order, so the raised
+ * one paints over any plate it overlaps and wins a click on the shared spot.
+ * The painter raises the current target this way. No-op when `id` is absent.
+ */
+export function raiseNameplateCandidate<T extends { id: number }>(
+  candidates: T[],
+  count: number,
+  id: number | null,
+): void {
+  if (id === null) return;
+  const last = Math.min(candidates.length, Math.max(0, Math.trunc(count))) - 1;
+  for (let i = 0; i < last; i++) {
+    if (candidates[i].id !== id) continue;
+    const raised = candidates[i];
+    for (let j = i; j < last; j++) candidates[j] = candidates[j + 1];
+    candidates[last] = raised;
+    return;
+  }
 }

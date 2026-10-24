@@ -122,6 +122,9 @@ export interface MovableFrameConfig {
   observeSizeChanges?: boolean;
   /** Keep legacy size fields durable until the owner migrates them to settings. */
   preserveSavedSize?: boolean;
+  /** A child frame's saved hide belongs only to its independent desktop seat.
+   *  Keep the preference, but show it whenever it returns to its stock parent. */
+  userHiddenOnlyWhenPositioned?: boolean;
 }
 
 /** One settings-backed axis for resizeMode 'dimensions'. `factor` converts one
@@ -515,13 +518,19 @@ export class MovableFrame {
    *  writes; persisted beside the saved box so the choice survives reloads. */
   setUserHidden(hidden: boolean): void {
     this.userHidden = hidden;
-    this.cfg.frame.classList.toggle(FRAME_USER_HIDDEN_CLASS, hidden);
+    this.applyUserHidden();
     try {
       if (hidden) localStorage.setItem(this.cfg.storageKey + HIDDEN_STORAGE_SUFFIX, '1');
       else localStorage.removeItem(this.cfg.storageKey + HIDDEN_STORAGE_SUFFIX);
     } catch {
       /* storage unavailable */
     }
+  }
+
+  private applyUserHidden(): void {
+    const active =
+      !this.cfg.userHiddenOnlyWhenPositioned || (this.pos !== null && !this.cfg.isMobileLayout());
+    this.cfg.frame.classList.toggle(FRAME_USER_HIDDEN_CLASS, this.userHidden && active);
   }
 
   /** True while the frame accepts a drag / grip gesture. */
@@ -580,6 +589,7 @@ export class MovableFrame {
     document.body.classList.remove(this.cfg.draggingBodyClass);
     this.setUnlocked(false);
     this.pos = null;
+    this.applyUserHidden();
     this.lastBottom = null;
     for (const prop of [
       'left',
@@ -602,6 +612,7 @@ export class MovableFrame {
   restoreSavedPosition(): void {
     const saved = readFrameStorage(this.cfg.storageKey, this.cfg.legacyStorageKeys);
     this.pos = this.adoptPos(parseTargetFramePos(saved.value, this.maxScale()));
+    this.applyUserHidden();
     if (this.pos) this.applyPos();
   }
 
@@ -616,7 +627,7 @@ export class MovableFrame {
     } catch {
       this.userHidden = false;
     }
-    this.cfg.frame.classList.toggle(FRAME_USER_HIDDEN_CLASS, this.userHidden);
+    this.applyUserHidden();
     if (positioned) this.restoreSavedPosition();
   }
 
@@ -624,7 +635,15 @@ export class MovableFrame {
   detachAtCurrentPosition(fallback: { left: number; top: number }): void {
     if (this.pos) return;
     const rect = this.cfg.frame.getBoundingClientRect();
-    this.pos = rect.width > 0 && rect.height > 0 ? { left: rect.left, top: rect.top } : fallback;
+    this.detachAtPosition(
+      rect.width > 0 && rect.height > 0 ? { left: rect.left, top: rect.top } : fallback,
+    );
+  }
+
+  /** Use an explicit first seat, retaining any position the player already saved. */
+  detachAtPosition(position: { left: number; top: number }): void {
+    if (this.pos) return;
+    this.pos = position;
     this.applyPos();
     this.persistPos();
   }
@@ -1328,6 +1347,7 @@ export class MovableFrame {
 
   private applyPos(): void {
     if (!this.pos) return;
+    this.applyUserHidden();
     const frame = this.cfg.frame;
     // On the mobile layout the desktop-saved position must not apply. Clear any
     // inline left/top/right/bottom (e.g. left over after a live desktop-to-mobile

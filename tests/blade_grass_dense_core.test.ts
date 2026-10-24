@@ -70,7 +70,12 @@ describe('blade grass dense submission', () => {
     expect(updateStart).toBeGreaterThan(0);
     expect(steadyReturn).toBeGreaterThan(0);
     for (const transitionWork of [
-      'scanTargetBlock(baseI, baseJ, PLACE_BUDGET)',
+      // a block jump of a whole grid or more (a teleport) refills at a quarter
+      // pool per frame instead of PLACE_BUDGET (28539d3de5c); both arms run
+      // only past the steady-state return
+      'fastRefill = true;',
+      'const budget = fastRefill ? Math.max(PLACE_BUDGET, Math.ceil(POOL / 4)) : PLACE_BUDGET;',
+      'scanTargetBlock(baseI, baseJ, budget)',
       // the banded ranges and the per-sector counts and bounds live in
       // blade_grass_sector_pool.ts; the update only drives it
       'sectorPool.queueUploads();',

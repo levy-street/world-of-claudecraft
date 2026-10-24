@@ -260,6 +260,7 @@ export function buildMobileConsumableSeat(
             centers: open.placement.centers,
             live,
             viewportWidth: open.viewportWidth,
+            clampLeft: open.clampLeft,
             margin: open.margin,
           })
         : null,

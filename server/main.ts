@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { pipeline } from 'node:stream';
 import { WebSocketServer } from 'ws';
+import type { MembershipSnapshot } from '../src/membership_contract';
 import { bankGrantStorageSlots } from '../src/sim/bank';
 import { DEEDS } from '../src/sim/content/deeds';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
@@ -16,6 +17,7 @@ import {
   paginateDevLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
+import { settleAllWorldPvpSpoils } from '../src/sim/pvp/world_pvp_spoils';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
@@ -48,6 +50,7 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
+import { loadAccountBuddies } from './account_buddies_db';
 import { loadAccountLedger } from './account_ledger_db';
 import { accountLedgerKeysFor } from './account_ledger_keys_cache';
 import { relicRecordsIdle } from './account_ledger_records';
@@ -151,6 +154,7 @@ import {
   configureClaudiumRuntime,
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
+  handleMembershipStripeWebhook,
 } from './claudium';
 import { claudiumSpendDetailed } from './claudium_proxy';
 import { configureCommunityTestAccounts } from './community_test_accounts';
@@ -362,6 +366,8 @@ import {
   readMarketSoldVolumeSince,
   recordMarketSoldVolumeRowBounded,
 } from './market_sold_volume_db';
+import { configureMembershipRewardStores } from './membership_annual_store';
+import { getMembership } from './membership_service';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
@@ -381,12 +387,7 @@ import {
   pruneAccountIpAssociationsBatch,
   prunePlaySessionsBatch,
 } from './play_session_retention_db';
-import {
-  captureReferral,
-  cardUploadContentLengthTooLarge,
-  handleCardRoutes,
-  handleCardUpload,
-} from './player_card';
+import { cardUploadContentLengthTooLarge, handleCardRoutes, handleCardUpload } from './player_card';
 import { prunePlayerActivityDailyBatch } from './player_metrics_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { progressEventsIdle } from './progress_events';
@@ -412,6 +413,9 @@ import {
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { publishRealmBuilderRoll } from './realm_builder';
+import { referralCapacityEarned } from './referral_account_entitlements_db';
+import { referralArmourForAccount, resolveReferralSignup } from './referral_armour_db';
+import { registerReferralMetrics } from './referral_metrics';
 import { configureReliquaryRuntime } from './reliquary';
 import { reliquaryRarityCounts } from './reliquary_rarity_db';
 import { resolveReportTarget } from './report_target';
@@ -430,7 +434,6 @@ import {
   requestedSfxVersion,
   sfxBlobIntegrityMatches,
 } from './static_cache';
-import { STATIC_PAGE_ALIASES, spaFallbackStatus } from './static_fallback';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import {
@@ -463,6 +466,7 @@ import {
   assetsListMineCore,
   assetUploadCore,
 } from './user_assets_routes';
+import { createVaultRewardsDb } from './vault_rewards_db';
 import {
   configureWalletRuntime,
   handleDesktopWalletHandoffClaim,
@@ -510,7 +514,6 @@ import { bustWorldQuestLeaderboardCaches, worldQuestScoresIdle } from './world_q
 import { pruneWorldQuestScoresBatch } from './world_quest_scores_db';
 import { createWsAuth } from './ws_auth';
 import { bufferHandshakeMessages } from './ws_buffer';
-import { wsPerMessageDeflateOptions } from './ws_compression';
 
 // The one validated boot Config, loaded ONCE and memoized. Boot-consumed values
 // (port, retention, dispatch, ws cap) thread directly off the local `config` in
@@ -548,6 +551,35 @@ const STATIC_DIR = path.join(__dirname, '..', 'dist');
 const SFX_PACK_DIR = process.env.SFX_PACK_DIR?.trim()
   ? path.resolve(process.env.SFX_PACK_DIR.trim())
   : null;
+// Pretty URLs that serve standalone static HTML pages.
+const STATIC_PAGE_ALIASES = new Map([
+  ['/links', '/links.html'],
+  ['/links/', '/links.html'],
+  ['/social', '/links.html'],
+  ['/social/', '/links.html'],
+  ['/social-media-links', '/links.html'],
+  ['/social-media-links/', '/links.html'],
+  ['/play', '/play.html'],
+  ['/play/', '/play.html'],
+  ['/wallet-handoff', '/wallet-handoff.html'],
+  ['/wallet-handoff/', '/wallet-handoff.html'],
+  ['/privacy', '/privacy.html'],
+  ['/privacy/', '/privacy.html'],
+  ['/terms', '/terms.html'],
+  ['/terms/', '/terms.html'],
+  ['/merch', '/merch.html'],
+  ['/merch/', '/merch.html'],
+  ['/press', '/press.html'],
+  ['/press/', '/press.html'],
+  ['/data-deletion', '/data-deletion.html'],
+  ['/data-deletion/', '/data-deletion.html'],
+  ['/support', '/support.html'],
+  ['/support/', '/support.html'],
+  ['/wiki', '/guide.html'],
+  ['/wiki/', '/guide.html'],
+  ['/editor', '/editor.html'],
+  ['/editor/', '/editor.html'],
+]);
 // Chat-log and perf-report retention days (0 = forever) plus the Turnstile secret
 // and the hard per-IP WS cap now live on the boot Config (see activeConfig above):
 // startServer reads config.chatLogRetentionDays / .perfReportRetentionDays /
@@ -1283,6 +1315,8 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 function characterListPayload(
   chars: CharacterRow[],
   weaponSkinLoadout: Record<string, string>,
+  membership: MembershipSnapshot,
+  referralCapacity = false,
 ): unknown {
   // Delegates to the RouteDef arm's shared builder (review follow-up on the
   // weaponSkinId addition): one implementation means the retained legacy arm
@@ -1294,6 +1328,9 @@ function characterListPayload(
     chars,
     (characterId) => [...liveGame().clients.values()].some((s) => s.characterId === characterId),
     weaponSkinLoadout,
+    Date.now(),
+    membership,
+    referralCapacity,
   );
 }
 
@@ -1439,8 +1476,6 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
     return;
   }
   let urlPath = requestUrl.pathname;
-  // The raw pathname, kept for the SPA fallback's status (urlPath is rewritten below).
-  const requestPath = urlPath;
   // The curated Guide is the site wiki: a client-routed SPA served at /wiki with its
   // own shell, so deep paths (/wiki/classes/...) fall back to guide.html rather than the
   // game's index.html. (It previously 302'd to a standalone MediaWiki; that is retired.)
@@ -1487,13 +1522,10 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
       res.end('not found');
       return;
     }
-    // SPA fallback. Known client routes answer 200; any other path gets the same shell
-    // with a 404 status, so invented URLs are not soft-404 copies of the homepage
-    // (server/static_fallback.ts).
+    // SPA fallback
     const index = path.join(STATIC_DIR, shell);
     if (fs.existsSync(index)) {
-      const status = spaFallbackStatus(requestPath, isAdminRequest(req), STATIC_PAGE_ALIASES);
-      res.writeHead(status, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
+      res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
       streamStaticFile(index, res);
     } else {
       res.writeHead(404);
@@ -1673,7 +1705,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 409, { error: 'username already taken', code: 'account.username_taken' });
       let account: Awaited<ReturnType<typeof createAccount>>;
       try {
-        account = await createAccount(body.username, await hashPassword(body.password), meta);
+        const referral = await resolveReferralSignup(body.ref);
+        account = await createAccount(body.username, await hashPassword(body.password), meta, {
+          referral,
+        });
       } catch (err: any) {
         // a concurrent registration can win the insert after our findAccount
         // check; the username UNIQUE index is the real guard. Surface it as a
@@ -1716,11 +1751,6 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         username: account.username,
         ...meta,
       }).catch((err) => logger.error({ err }, 'suspicious registration report failed'));
-      // Capture the referral when this account signed up via a card link
-      // (?ref=<slug>). Best-effort: never block or fail registration on it.
-      void captureReferral(account.id, body.ref).catch((err) =>
-        logger.error({ err }, 'referral capture failed'),
-      );
       // emailMissing is always false here (email is required above); sent so the
       // client can use one uniform post-auth check across register and login.
       return json(res, 200, {
@@ -1823,6 +1853,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         characterListPayload(
           await listCharacters(accountId),
           (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          await getMembership(accountId),
+          await referralCapacityEarned(accountId),
         ),
       );
     }
@@ -1836,6 +1868,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           characterListPayload(
             await listCharacters(accountId),
             (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+            await getMembership(accountId),
+            await referralCapacityEarned(accountId),
           ),
         );
       }
@@ -2746,6 +2780,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url === '/api/claudium/stripe/webhook') {
       return handleClaudiumStripeWebhook(req, res);
     }
+    if (req.method === 'POST' && url === '/api/claudium/membership/stripe/webhook') {
+      return handleMembershipStripeWebhook(req, res);
+    }
     if (url.startsWith('/api/claudium')) {
       const preAuthLimit = claudiumPreAuthMutationRateLimited(req);
       if (preAuthLimit && !preAuthLimit.allowed) {
@@ -2923,8 +2960,7 @@ configureLeaderboardRuntime({
   perfProfile: () => liveGame().perfProfile(),
   getLeaderboard,
   getGuildLeaderboard,
-  // Officers online on the PUBLIC guild board: a hidden officer reads offline.
-  isCharacterOnline: (id) => liveGame().social.shownOnlinePublicly(id),
+  isCharacterOnline: (id) => liveGame().hasSessionForCharacter(id),
   getDevLeaderboard: () => topContributors(),
   getDeedsLeaderboard,
   deedsSelfRank,
@@ -3343,6 +3379,7 @@ configureClaudiumRuntime({
   grantMountSkins: (accountId, skinIds) => liveGame().grantMountSkinsToAccount(accountId, skinIds),
   storagePurchase: (input) => executeStoragePurchase(storagePurchaseHost(), input),
 });
+configureMembershipRewardStores(() => liveGame().membership);
 
 // configureAdminRuntime(game) and configureInternalRuntime(game) pass the live
 // GameServer BY VALUE (AdminRuntime / InternalRuntime are Picks of GameServer, so
@@ -3624,6 +3661,12 @@ export async function startServer(): Promise<http.Server> {
     onError: (error) => console.error('bank ledger growth monitor failed:', error),
   });
   const generalChatQuotaListener = createGeneralChatQuotaListener({
+    accountBlocks: {
+      invalidate: (accountId) => game.invalidateAccountBlocks(accountId),
+      disconnected: () => game.accountBlockListenerDisconnected(),
+      resync: () => game.resyncAccountBlocks(),
+      refresh: (accountId) => game.refreshAccountBlocks(accountId),
+    },
     activeAccountIds: () => [...game.liveAccountIds()],
     onResync: (accountIds, policies) => {
       game.resyncGeneralChatRateLimits(accountIds, policies);
@@ -3707,6 +3750,7 @@ export async function startServer(): Promise<http.Server> {
   await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
+  await game.realmMotd.load();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
@@ -3798,16 +3842,13 @@ export async function startServer(): Promise<http.Server> {
 
   // cap frame size: the largest legitimate client message is a small JSON
   // command; without this the ws default (~100 MiB) lets one socket force a
-  // huge allocation + parse before any field-level validation runs. Outbound
-  // frames are deflated (server/ws_compression.ts); maxPayload also caps a
-  // compressed client message's inflated length, so the cap holds either way.
-  const wss = new WebSocketServer({
-    noServer: true,
-    maxPayload: WS_MAX_PAYLOAD_BYTES,
-    perMessageDeflate: wsPerMessageDeflateOptions(config.wsPerMessageDeflate),
-  });
+  // huge allocation + parse before any field-level validation runs
+  const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
+  const vaultRewardsDb = createVaultRewardsDb(pool, REALM);
   const wsAuth = createWsAuth({
     game,
+    getMembership,
+    referralArmourForAccount,
     accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
@@ -3817,6 +3858,7 @@ export async function startServer(): Promise<http.Server> {
     metaRequestUserData,
     metaEventSourceUrl,
     loadAccountCosmetics,
+    loadAccountBuddies,
     loadAccountLedger,
     isConnectionRefused,
     bufferHandshakeMessages,
@@ -3826,6 +3868,7 @@ export async function startServer(): Promise<http.Server> {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
+    guestPayoutsForCycle: (id, cycle) => vaultRewardsDb.guestPayoutsForCycle(id, cycle),
   });
   wsAuth.attachUpgrade(server, wss);
 
@@ -3893,6 +3936,7 @@ export async function startServer(): Promise<http.Server> {
   // request and cached process-locally. No collector and no query: the gauges read
   // that cache at scrape time and the counters ride the push itself.
   registerDiscordBotMetrics(httpMetrics.registry);
+  registerReferralMetrics(httpMetrics.registry);
 
   // Business gauges use isolated, staggered, timeout-protected engagement and
   // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
@@ -4245,7 +4289,10 @@ export async function startServer(): Promise<http.Server> {
     // Stop the wealth sweep's timer (an in-flight pass logs its own failure if
     // it races the pool close; the next boot's first pass rebuilds the totals).
     accountWealthSweep.stop();
-    game.stop();
+    await game.stop();
+    // World PvP spoils live only in memory: pay every unlooted body out before
+    // the final save (src/sim/pvp/world_pvp_spoils.ts).
+    settleAllWorldPvpSpoils(game.sim.ctx);
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();

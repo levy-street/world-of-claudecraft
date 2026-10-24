@@ -11,7 +11,8 @@
 import { ITEMS } from '../data';
 import { isShieldItem } from '../equipment_rules';
 import { meetsLevelRequirement } from '../item_level_req';
-import type { AbilityEffect, EquipSlot } from '../types';
+import { isMembershipWeapon, membershipWeaponForm } from '../membership_weapon';
+import type { AbilityEffect, EquipSlot, PlayerClass } from '../types';
 
 type WornItems = Partial<Record<EquipSlot, string>>;
 
@@ -23,8 +24,21 @@ export function shieldEquipped(worn: WornItems): boolean {
 
 /** Does the worn main hand count as a dagger at this level? Mirrors the
  *  `weapon.dagger` recalcPlayerStats derives for the cast gate. */
-export function wieldsDagger(worn: WornItems, level: number): boolean {
+export function wieldsDagger(
+  worn: WornItems,
+  level: number,
+  cls?: PlayerClass,
+  spec?: string | null,
+  membershipActive = false,
+): boolean {
   const mainhand = worn.mainhand !== undefined ? ITEMS[worn.mainhand] : undefined;
+  if (mainhand && isMembershipWeapon(mainhand.id))
+    return (
+      !!cls &&
+      membershipActive &&
+      membershipWeaponForm(cls, spec).dagger &&
+      meetsLevelRequirement(level, mainhand)
+    );
   return (
     mainhand?.weapon?.dagger === true &&
     mainhand !== undefined &&

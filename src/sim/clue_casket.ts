@@ -6,9 +6,11 @@
 // full deeds pass. Every roll draws from ctx.rng, so the three hosts agree.
 
 import { delveChestItemsForTier } from './content/delves/lockpick_tiers';
-import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from './content/dungeon_difficulty';
 import type { MountKey } from './content/mounts';
+import { assertHeroicMarksGrantsFit } from './heroic_marks';
 import type { LootTier } from './lockpick';
+import { grantFreshLoot } from './loot/fresh_quality_grant';
 import { mountOwned } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -70,20 +72,21 @@ export function openTreasureCasket(
   consumeOneUnit: () => void,
 ): void {
   const pid = meta.entityId;
+  // Reserve the possible marks before consuming the casket or drawing rewards.
+  assertHeroicMarksGrantsFit(meta, [
+    { itemId: HEROIC_MARK_CURRENCY_ID, count: CASKET_HEROIC_MARKS },
+  ]);
   consumeOneUnit();
   const copper = treasureCasketCopper(player.level);
   const itemIds: string[] = [];
   const material = CASKET_MATERIAL_POOL[ctx.rng.int(0, CASKET_MATERIAL_POOL.length - 1)];
   ctx.addItem(material, CASKET_MATERIAL_COUNT, pid);
   itemIds.push(material);
-  if (ctx.rng.chance(CASKET_GEAR_CHANCE)) {
-    const piece = rollCasketPiece(ctx, meta);
-    ctx.addItem(piece.itemId, piece.count, pid);
-    itemIds.push(piece.itemId);
-  }
+  const piece = ctx.rng.chance(CASKET_GEAR_CHANCE) ? rollCasketPiece(ctx, meta) : undefined;
+  if (piece) itemIds.push(piece.itemId);
   if (ctx.rng.chance(CASKET_HEROIC_MARK_CHANCE)) {
-    ctx.addItem(HEROIC_MARK_ITEM_ID, CASKET_HEROIC_MARKS, pid);
-    itemIds.push(HEROIC_MARK_ITEM_ID);
+    ctx.addItem(HEROIC_MARK_CURRENCY_ID, CASKET_HEROIC_MARKS, pid);
+    itemIds.push(HEROIC_MARK_CURRENCY_ID);
   }
   // The mount roll is always drawn (the rng sequence never depends on what
   // the character owns); an owner simply receives nothing from it.
@@ -91,6 +94,9 @@ export function openTreasureCasket(
     ctx.addItem(CASKET_MOUNT_REINS_ITEM_ID, 1, pid);
     itemIds.push(CASKET_MOUNT_REINS_ITEM_ID);
   }
+  // The gear piece is granted last: its loot-quality draw follows the mark
+  // and mount rolls, so those keep their old stream positions.
+  if (piece) grantFreshLoot(ctx, piece.itemId, piece.count, pid);
   meta.copper += copper;
   meta.clueCasketsOpened = (meta.clueCasketsOpened ?? 0) + 1;
   // The clueCasketsOpened meter reads the top-level PlayerMeta field with no

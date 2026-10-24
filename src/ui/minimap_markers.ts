@@ -36,7 +36,19 @@
 import type { GatheringProfessionId } from '../sim/content/professions';
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
-import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
+import {
+  activeGatherNodes,
+  activeZoneAt,
+  GATHER_NODES,
+  getActiveWorldContent,
+  isBgPos,
+  isDelvePos,
+  isYumiMazePos,
+  QUESTS,
+  STATIONS,
+  zoneAt,
+} from '../sim/data';
+import { isAuthoredMapPresentation } from '../sim/map_presentation';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
@@ -47,10 +59,9 @@ import {
   type GatherNodeType,
   type StationType,
 } from '../sim/types';
-import { vaultPortalVisible } from '../sim/vault_visibility';
+import { vaultPortalVisible } from '../sim/vault_portal_visibility';
 import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
-import { worldQuestCompletedForBoard } from '../sim/world_quest_practice';
-import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
+import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
 import type { IWorld } from '../world_api';
 import { dungeonMapActive } from './dungeon_map_view';
 import { viewerUsableToolTier } from './hud/professions/gathering_view';
@@ -66,6 +77,7 @@ import {
   mapMarkerSemanticLayer,
 } from './map_marker_semantics_core';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from './map_navigation_landmarks_core';
+import { worldQuestReadsActive, worldQuestReadsCompleted } from './world_quest_progress_state';
 
 // The painter clips the 162px minimap two pixels inside the canvas. Visibility
 // is footprint-aware: a painted square must fit its full half-diagonal inside
@@ -197,14 +209,6 @@ export type MinimapObjectSemantic = Exclude<MapMarkerSemantic, { kind: 'dungeon'
 /** One overworld minimap marker, in canvas-pixel space. A DISCRIMINATED union (not a
  *  flat struct): each variant carries exactly the fields its draw branch needs. */
 export type MinimapMarker =
-  | {
-      kind: 'hill';
-      mx: number;
-      my: number;
-      radius: number;
-      phase: 'warning' | 'active';
-      skull?: { mx: number; my: number };
-    }
   // An online friend/guild ally who is NOT in the party (party members are the
   // party-disc/arrow variants). Strangers get no marker, and neither does a
   // friend/guildmate sitting on the ENEMY roster of a live battleground match.
@@ -429,7 +433,9 @@ export function createMinimapMarkers(): MinimapMarkers {
       navigationMarkers.length = 0;
       stableNavigationMarkers.length = 0;
       npcMarkers.length = 0;
-      model.zoneId = zoneAt(p.pos.x, p.pos.z).id;
+      // activeZoneAt: an authored map's own zone names the '#zone-label' (its
+      // maker-typed name, '' until named), the shipped zone otherwise.
+      model.zoneId = activeZoneAt(p.pos.x, p.pos.z).id;
       // Inside a rift the overworld zone (zoneAt reads x/z; rifts displace on x well
       // past any land) is the wrong label; surface the generated rift floor name + rank.
       const rf = world.riftFloor;
@@ -442,12 +448,7 @@ export function createMinimapMarkers(): MinimapMarkers {
       const friendNames = social
         ? new Set(social.friends.filter((f) => f.online).map((f) => f.name))
         : null;
-      // Both sets are ONLINE-only, the rule the world map already applies: a
-      // friend or guildmate whose presence setting hides them from this viewer
-      // (server/presence_privacy.ts) arrives offline and gets no dot.
-      const guildNames = social?.guild
-        ? new Set(social.guild.members.filter((m) => m.online).map((m) => m.name))
-        : null;
+      const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
       const partyPids = world.partyInfo ? new Set(world.partyInfo.members.map((m) => m.pid)) : null;
       // The same roster as a list, the shape the corpse indicator's rights
       // check consumes (the VIEWER's party, handed over as the tapper's only
@@ -542,7 +543,15 @@ export function createMinimapMarkers(): MinimapMarkers {
           // top of the larger painted station marker.
           npcMarkers.push({ kind: 'npc', mx, my, glyph, marker: folded });
         } else if (e.kind === 'object') {
-          if (!vaultPortalVisible(e, p.id, world.partyInfo?.members ?? null)) continue;
+          if (
+            !vaultPortalVisible(
+              e,
+              world.playerId,
+              world.partyInfo,
+              (world as { characterId?: number }).characterId,
+            )
+          )
+            continue;
           // A quest collectable this viewer is not on the quest for draws nothing at
           // all, in any layer: it is not in the 3D scene either (the renderer withholds
           // its view), so any blip would point at empty ground.
@@ -616,6 +625,9 @@ export function createMinimapMarkers(): MinimapMarkers {
 
       // Gatherable world nodes (issue 1124): static content positions (never entities), each
       // classified ready/cooldown for THIS viewer only via nodeHarvestableByMe.
+      // Built-in geography: an authored map has none, so its minimap draws no
+      // phantom node dots where the shipped world's veins happen to sit.
+      const gatherNodes = activeGatherNodes();
       // `locked` memoizes the wield-filtered usable-tool scan per profession,
       // lazily on the first in-rim node: the common no-nearby-node frame
       // skips the scan entirely at the minimap's 10Hz cadence. The memo is a
@@ -626,7 +638,7 @@ export function createMinimapMarkers(): MinimapMarkers {
       // getter copies the live map per access, so reading it per profession
       // would allocate per build. Same lazy shape as the memo itself.
       let proficiency: Readonly<Record<string, number>> | undefined;
-      for (const node of GATHER_NODES) {
+      for (const node of gatherNodes) {
         const dx = -(node.pos.x - p.pos.x) * pxPerYard;
         const dz = -(node.pos.z - p.pos.z) * pxPerYard;
         const dist2 = dx * dx + dz * dz;
@@ -742,10 +754,15 @@ export function createMinimapMarkers(): MinimapMarkers {
       // objective radius is intentionally withheld until this emblem is selected
       // and the zone map opens.
       const worldQuestClearance = compact ? 10 : 7;
-      for (const quest of activeWorldQuestsForCycle(world.worldQuestCycle)) {
+      // The player's board: a rerolled-in quest replaces the one it displaced.
+      const worldQuests = playerActiveWorldQuests({
+        worldQuestCycle: world.worldQuestCycle,
+        worldQuestReplacements: world.worldQuestReplacements ?? {},
+      });
+      for (const quest of worldQuests) {
         if (p.level < quest.minLevel) continue;
         const progress = world.worldQuestLog.get(quest.id);
-        if (worldQuestCompletedForBoard(progress)) continue;
+        if (worldQuestReadsCompleted(progress)) continue;
         const isGlider = quest.objective.type === 'glider';
         const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
         const dx = -(position.x - p.pos.x) * pxPerYard;
@@ -760,7 +777,7 @@ export function createMinimapMarkers(): MinimapMarkers {
           my: half + dz * scale,
           questId: quest.id,
           zoneId: quest.zoneId,
-          state: progress?.state === 'active' ? 'active' : 'available',
+          state: worldQuestReadsActive(progress) ? 'active' : 'available',
         });
       }
 
@@ -786,35 +803,6 @@ export function createMinimapMarkers(): MinimapMarkers {
           bossId: boss.templateId,
           zoneId: zoneAt(boss.pos.x, boss.pos.z).id,
         });
-      }
-
-      // Preserve the true circle; clamp only its skull so an approaching
-      // player can identify the boundary before crossing it.
-      const hill = world.hillInfo;
-      if (hill && minimapMode(world) === 'overworld') {
-        const dx = -(hill.x - p.pos.x) * pxPerYard;
-        const dz = -(hill.z - p.pos.z) * pxPerYard;
-        const radius = hill.radius * pxPerYard;
-        const distance = Math.hypot(dx, dz);
-        if (distance <= clipRadius + radius) {
-          // Include the warning ring and stroke in the clearance.
-          const rim = minimapSafeCenterRadius(S, compact ? 10 : 12);
-          const skull =
-            distance > rim
-              ? {
-                  mx: half + (dx * rim) / distance,
-                  my: half + (dz * rim) / distance,
-                }
-              : undefined;
-          markers.push({
-            kind: 'hill',
-            mx: half + dx,
-            my: half + dz,
-            radius,
-            phase: hill.phase,
-            ...(skull ? { skull } : {}),
-          });
-        }
       }
 
       // Navigation-critical dynamic markers paint over the larger static

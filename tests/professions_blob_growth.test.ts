@@ -46,14 +46,16 @@ import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { MEMBERSHIP_ITEMS } from '../src/sim/content/membership';
 import {
   CRAFT_RING,
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_ITEMS,
 } from '../src/sim/content/professions';
-import { SEASON2_JEWELRY_IDS } from '../src/sim/content/pvp_honor_season2';
 import { recipeById } from '../src/sim/content/recipes';
+import { REFERRAL_ITEMS } from '../src/sim/content/referral';
+import { REFERRAL_STAMP_ITEMS } from '../src/sim/content/referral_rewards';
 import {
   RELIQUARY_ITEM_TO_PAGES,
   RELIQUARY_MARK_IDS,
@@ -164,6 +166,11 @@ const PROFESSIONS_BLOB_FIELDS = [
 // included, since a key absent from the fixture is harmless here while a
 // missing one is not.
 const NON_PROFESSIONS_BLOB_FIELDS = [
+  // Per-link reward receipts and the bounded inviter tier mask, never crafting state.
+  'referralRewards',
+  'referralInviterRewards',
+  // The buddy collection (src/sim/buddies.ts): owned, last and custom names.
+  'buddies',
   // Written by the SERVER, not by serializeCharacter: server/game.ts stamps
   // state.jail onto the serialized blob before persisting, so no sim fixture
   // can arm it and the source scrape below cannot see it either. Classified
@@ -179,6 +186,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'lifetimeHonor',
   'honorArenaDaily',
   'worldPvp',
+  // The World PvP Skull Bag's stored skulls (src/sim/pvp/skull_bag.ts).
+  'skullBag',
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
@@ -193,6 +202,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'corpsePos',
   'resSickness',
   'unstuckSickness',
+  // Persisted buffs (src/sim/aura_persist.ts auraSaveFragment): bounded by
+  // MAX_PERSISTED_AURAS and absent while no buff is worn.
+  'auras',
   'equipment',
   'inventory',
   'bags',
@@ -200,6 +212,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'vault',
   'vendorBuyback',
   'questLog',
+  // Paused helper cosmetics are retained as bounded character progression.
+  'queueRewards',
   'questsDone',
   'worldQuests',
   // Faction standing rows (src/sim/factions.ts), persisted beside the
@@ -1362,7 +1376,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     // put crafted copies into inventory, not equipment), so the clamp must
     // bite there too; the review round found an equipment-only first cut.
     if (!s1.inventory?.[0]) throw new Error('ceiling fixture has no inventory row');
-    s1.inventory[0].instance = { enchant: 'enchant_weapon_might', signer: overSigner };
+    // Current saves carry canonical source buckets. This arm models historical
+    // sourceless stock, whose legacy instance signer is sanitized on load;
+    // retaining the buckets would create a different, ambiguous source record.
+    s1.inventory[0] = {
+      itemId: 'roasted_boar',
+      count: 1,
+      instance: { enchant: 'enchant_weapon_might', signer: overSigner },
+    };
     // The SURVIVOR half of the bag arm: a legal maximum-length signer on
     // another bag row must come back byte-faithfully, or a clamp that simply
     // deleted every bag signer would pass the drop pins above.
@@ -1426,10 +1447,18 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe(legalSigner);
     expect('signer' in (s2.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.signer).toBe(legalSigner);
+    expect(s2.inventory?.[bagSurvivorIndex]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.enchant).toBe('enchant_weapon_might');
     expect('signer' in (s2.bank?.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.bank?.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.bank?.inventory?.[1]?.instance?.signer).toBe(legalSigner);
+    expect(s2.bank?.inventory?.[1]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.bank?.inventory?.[1]?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(s2.bank?.inventory?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
+    expect(s2.vendorBuyback?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
     expect('signer' in (s2.vendorBuyback?.[0]?.instance ?? {})).toBe(false);
     expect(s2.vendorBuyback?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
   });
@@ -1667,6 +1696,17 @@ function maximalCharacterSim(): Sim {
   const longName = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
   const instanceItemId = STORED_COLLECTION_ITEM_ID;
 
+  // Deeds no longer grant companions. Arm the complete retained collection
+  // explicitly so removing those rewards does not shrink this field to absent.
+  meta.buddies.owned = new Set(['horse', 'crystal_lich', 'forgemaw', 'sapling']);
+  meta.buddies.last = 'crystal_lich';
+  meta.buddies.names = {
+    horse: 'ABCDEFGHIJKLMNOP',
+    crystal_lich: 'ABCDEFGHIJKLMNOP',
+    forgemaw: 'ABCDEFGHIJKLMNOP',
+    sapling: 'ABCDEFGHIJKLMNOP',
+  };
+
   // Progression at the cap, every counter wide.
   sim.setPlayerLevel(MAX_LEVEL);
   meta.lifetimeXp = 999_999_999;
@@ -1899,7 +1939,8 @@ function applyMeasuredMaterialCase(sim: Sim, shape: MaterialSourceCase): void {
   const bankSlots = BANK_BASE_SLOTS + BANK_PURCHASED_SLOTS_MAX + BANK_MAX_BONUS_SLOTS;
   meta.bank.inventory = Array.from({ length: bankSlots + BANK_BAG_SOCKETS * 24 }, () => stack(20));
   meta.vault.stock = {};
-  meta.vault.special = materialIds.map((id) => ({ ...stack(200), itemId: id }));
+  const perMaterial = vaultCapacityPerMaterial(meta.vault);
+  meta.vault.special = materialIds.map((id) => ({ ...stack(perMaterial), itemId: id }));
   meta.vendorBuyback = Array.from({ length: 12 }, () => stack(20));
 }
 
@@ -1937,20 +1978,22 @@ describe('whole-character material source composition matrix', () => {
 
       expect(third).toEqual(second);
       expect(second.inventory).toHaveLength(112);
-      expect(second.bank?.inventory).toHaveLength(208);
+      expect(second.bank?.inventory).toHaveLength(228);
       expect(second.vendorBuyback).toHaveLength(12);
       expect(second.vault?.special).toHaveLength(vaultMaterialIds().size);
       expect(second.vault?.stock).toEqual({});
       expect(second.inventory.every((slot) => slot.count === 20)).toBe(true);
       expect(second.bank?.inventory.every((slot) => slot.count === 20)).toBe(true);
-      expect(second.vault?.special?.every((slot) => slot.count === 200)).toBe(true);
+      const perMaterial = vaultCapacityPerMaterial({ upgrades: VAULT_UPGRADE_RUNGS });
+      expect(perMaterial).toBe(1000);
+      expect(second.vault?.special?.every((slot) => slot.count === perMaterial)).toBe(true);
 
       const expectedSources =
         shape === 'representative'
           ? 1
           : shape === 'varied'
             ? 5
-            : 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200;
+            : 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial;
       expect(sourceCount(second)).toBe(expectedSources);
       process.stdout.write(
         `[professions-blob-material-sources] ${JSON.stringify({
@@ -1960,7 +2003,7 @@ describe('whole-character material source composition matrix', () => {
           warningBytes: CHARACTER_BLOB_WARN_BYTES,
           relationToWarning:
             materialSourceBytes(second) < CHARACTER_BLOB_WARN_BYTES ? 'below' : 'at-or-above',
-          physicalUnits: 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200,
+          physicalUnits: 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial,
         })}\n`,
       );
     }
@@ -1968,6 +2011,46 @@ describe('whole-character material source composition matrix', () => {
 });
 
 describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () => {
+  it('measures the conservative full-gear plus referral-receipt field envelope without truncation', () => {
+    const source = maximalCharacterSim();
+    const settled = makeSim(54, CEILING_EPOCH_MS);
+    const pid = settled.addPlayer('warrior', 'ReceiptEnvelope', {
+      state: source.serializeCharacter(source.playerId)!,
+    });
+    const baseline = settled.serializeCharacter(pid)!;
+    // Independent field maxima, NOT a simultaneously reachable storage state:
+    // 284 actual receipts need 284 protected bags (proved in referral_reward_growth),
+    // so their bags would replace the heavy item payloads in this fixture.
+    const receipts = Object.fromEntries(
+      Array.from({ length: 284 }, (_, index) => [2_147_483_647 - index, { redeemed: 31 }]),
+    );
+    const loaded = makeSim(55, CEILING_EPOCH_MS);
+    const loadedPid = loaded.addPlayer('warrior', 'ReceiptEnvelope', {
+      state: { ...baseline, referralRewards: receipts, referralInviterRewards: 31 },
+    });
+    const state = loaded.serializeCharacter(loadedPid)!;
+    expect(state.referralRewards).toEqual(receipts);
+    expect(state.referralInviterRewards).toBe(31);
+    expect(state.bank).toEqual(baseline.bank);
+    const bytes = Buffer.byteLength(JSON.stringify(state));
+    const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
+    // +19 at the merge of the Staff of Changing's discovery id (PR 4281);
+    // +26 with reins_nightwing_chimera.
+    // 258,415 -> 258,437 with Wobbles the Slime's reins (+22, kept).
+    // Release merge adds 555 bytes, independently pinned by the content equation below:
+    // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
+    // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
+    expect(baselineBytes).toBe(259291);
+    expect(bytes - baselineBytes).toBe(8284);
+    // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
+    expect(bytes).toBe(267575);
+    // Keep the warning threshold unchanged: saves above it remain whole.
+    expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
+    process.stdout.write(
+      `[referral-conservative-blob-envelope] ${JSON.stringify({ bytes, baselineBytes, receiptBytes: bytes - baselineBytes, warningBytes: CHARACTER_BLOB_WARN_BYTES })}\n`,
+    );
+  });
+
   it('settles to a fixed point with every container at its legal ceiling, inside the band', () => {
     const sim = maximalCharacterSim();
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
@@ -1979,6 +2062,21 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const s3 = third.serializeCharacter(pid3) as CharacterState;
     expect(s3).toEqual(s2);
     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+    expect(s2.buddies).toEqual({
+      owned: ['horse', 'crystal_lich', 'forgemaw', 'sapling'],
+      last: 'crystal_lich',
+      names: {
+        horse: 'ABCDEFGHIJKLMNOP',
+        crystal_lich: 'ABCDEFGHIJKLMNOP',
+        forgemaw: 'ABCDEFGHIJKLMNOP',
+        sapling: 'ABCDEFGHIJKLMNOP',
+      },
+    });
+    // Four retained companions and maximum-length custom names, including the key.
+    const fullBuddyCollectionBytes = Buffer.byteLength(JSON.stringify(s2.buddies), 'utf8') + 11;
+    expect(fullBuddyCollectionBytes).toBe(218);
+    const stampBuddyBytes = 39; // Sapling's owned id (10) plus named row (29).
+    const buddyCollectionBytes = fullBuddyCollectionBytes - stampBuddyBytes;
 
     // The professions block rides inside at its own ceiling: the same band the
     // professions arm pins, so the two measurements can never describe
@@ -2010,9 +2108,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       s2.inventory?.every((row) => row.instance?.signer?.length === MAX_CRAFTED_BY_LENGTH),
     ).toBe(true);
-    expect(s2.bank?.inventory).toHaveLength(24 + 72 + 16 + 4 * 16);
+    expect(s2.bank?.inventory).toHaveLength(24 + 72 + 36 + 4 * 16);
     expect(s2.bank?.purchasedSlots).toBe(72);
-    expect(s2.bank?.bonusSlots).toBe(16);
+    expect(s2.bank?.bonusSlots).toBe(36);
     expect(s2.bank?.unlockedSockets).toBe(4);
     expect(s2.bank?.appliedStorageKeys).toHaveLength(12);
     expect(s2.bank?.appliedStorageKeys?.every((k) => k.length === 200)).toBe(true);
@@ -2152,6 +2250,120 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+    // Attribute the stamp-card feature independently from the historical ledger:
+    // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
+    // an existing illuminated page and add no character-save key in this fixture.
+    // Preserve this historical attribution: Wobbles already existed before its reins
+    // moved into the referral table, and Sapling remains owned after Sprites replaces it.
+    const stampIds = new Set(
+      Object.keys(REFERRAL_STAMP_ITEMS).filter((id) => id !== 'reins_wobbles_slime'),
+    );
+    const beforeStampCards: CharacterState = {
+      ...s2,
+      buddies: {
+        ...s2.buddies!,
+        owned: s2.buddies!.owned!.filter((id) => id !== 'sapling'),
+        names: Object.fromEntries(
+          Object.entries(s2.buddies!.names ?? {}).filter(([id]) => id !== 'sapling'),
+        ),
+      },
+      bank: {
+        ...s2.bank!,
+        bonusSlots: 16,
+        inventory: s2.bank!.inventory.slice(0, -20),
+      },
+      deedStats: {
+        ...s2.deedStats,
+        itemsDiscovered: (s2.deedStats?.itemsDiscovered ?? []).filter((id) => !stampIds.has(id)),
+      },
+    };
+    expect(stampIds.size).toBe(5);
+    const stampCardBytes = bytes - Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
+    const bankRewardBytes =
+      20 * (Buffer.byteLength(JSON.stringify(s2.bank!.inventory[0]), 'utf8') + 1);
+    const stampDiscoveryBytes = [...stampIds].reduce((sum, id) => sum + id.length + 3, 0);
+    expect(stampCardBytes).toBe(bankRewardBytes + stampDiscoveryBytes + stampBuddyBytes);
+    // Check the current payload independently of the historical counterfactual ledger.
+    expect(bytes).toBeLessThan(CHARACTER_BLOB_WARN_BYTES);
+    process.stdout.write(
+      `[referral-blob-growth] ${JSON.stringify({ bytes, stampCardBytes, bankRewardBytes, stampDiscoveryBytes, stampBuddyBytes })}\n`,
+    );
+    // Referral armour adds seven discovery ids and no saved entitlement fields.
+    // Strip only these entries before replaying the historical growth ledger.
+    const referralIds = new Set(Object.keys(REFERRAL_ITEMS));
+    const withoutReferral: CharacterState = {
+      ...beforeStampCards,
+      deedStats: {
+        ...beforeStampCards.deedStats,
+        itemsDiscovered: (beforeStampCards.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !referralIds.has(id),
+        ),
+      },
+    };
+    expect(referralIds.size).toBe(7);
+    const beforeReferralBytes = Buffer.byteLength(JSON.stringify(withoutReferral), 'utf8');
+    // 241,763 on the membership integration: the release's 233,515 plus the
+    // quest gear (+5,019), quest blues (+1,688) and role fill (+1,541) underneath.
+    // 242,954 on the v0.45.0 integration: plus the Mirefen world-boss branch (+1,191).
+    // 249,054 with the five-dungeon rework (PR 4352), re-measured 2026-10 at
+    // its merge 106a086b617: +6,100, not the +3,130 first attributed here
+    // (reliquary +2,453, deedStats.itemsDiscovered +2,818, and 24 more deeds
+    // +829). 249,939 with the account-wide buddy merge 7bc9c74af57: +885, the
+    // new buddies record (+179 with its key) and +706 of discoverable item ids.
+    // Unchanged from there through the referral cards and the later v0.45.0
+    // integration merges. 249,958 with the Staff of Changing's discovery id
+    // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
+    // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
+    expect(beforeReferralBytes).toBe(250860);
+    expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
+    expect(
+      fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
+    ).toBe(122);
+    // Membership adds nine discoverable item ids (the eight pieces, then the
+    // Staff of Changing's 19 bytes, PR 4281) and no character entitlement
+    // fields; the byte history below predates the staff. Isolate the measured content-only growth from the settled save:
+    // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered (241,608 ->
+    // 241,763 with the quest gear, blues and role fill underneath; 242,799 -> 242,954 with
+    // the Mirefen world-boss branch too; 249,784 -> 249,939 with the five-dungeon
+    // rework and the account-wide buddies). Removing only those ids
+    // must reproduce the preceding measurement exactly.
+    const membershipIds = new Set(Object.keys(MEMBERSHIP_ITEMS));
+    const withoutMembership: CharacterState = {
+      ...withoutReferral,
+      deedStats: {
+        ...withoutReferral.deedStats,
+        itemsDiscovered: (withoutReferral.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !membershipIds.has(id),
+        ),
+      },
+    };
+    expect(membershipIds.size).toBe(9);
+    const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
+    // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
+    expect(beforeMembershipBytes).toBe(250686);
+    expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
+    expect(
+      fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
+    ).toBe(174);
+
+    // Isolate this retune from all inherited content and identity changes.
+    const priorVault = structuredClone(s2);
+    if (!priorVault.vault) throw new Error('maximal fixture lacks its vault');
+    const stockRows = Object.keys(priorVault.vault.stock).length;
+    priorVault.vault.upgrades = 5;
+    for (const id of Object.keys(priorVault.vault.stock)) priorVault.vault.stock[id] = 200;
+    const vaultRetuneBytes = bytes - Buffer.byteLength(JSON.stringify(priorVault), 'utf8');
+    expect(vaultRetuneBytes).toBe(stockRows + 1);
+    expect(vaultRetuneBytes).toBe(119);
+    process.stdout.write(
+      `[professions-blob-compact-vault] ${JSON.stringify({
+        bytes,
+        stockRows,
+        vaultRetuneBytes,
+        warningBytes: CHARACTER_BLOB_WARN_BYTES,
+      })}\n`,
+    );
+
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2201,7 +2413,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const fixtureDelta = Object.fromEntries(
       Object.entries(fixtureBaseline).map(([key, value]) => [
         key,
-        fieldBytes(s2, key as keyof typeof fixtureBaseline) - value,
+        fieldBytes(withoutReferral, key as keyof typeof fixtureBaseline) - value,
       ]),
     );
     // Re-pinned 2026-09-11 with the stamina baseline model: a masterwork or
@@ -2236,7 +2448,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // deedStats.itemsDiscovered, the hammer recipe/proof content below is
     // diffed against this SAME field-kit-excluded snapshot, so neither term
     // contaminates the other regardless of merge order.
-    const fieldKitDiscoveries = (s2.deedStats?.itemsDiscovered ?? []).filter(
+    const fieldKitDiscoveries = (withoutReferral.deedStats?.itemsDiscovered ?? []).filter(
       (id) => id === 'field_kit',
     );
     expect(
@@ -2244,14 +2456,42 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'field_kit must appear exactly once in the settled itemsDiscovered set',
     ).toHaveLength(1);
     const withoutFieldKit: CharacterState = {
-      ...s2,
+      ...withoutReferral,
       deedStats: {
-        ...s2.deedStats,
-        itemsDiscovered: (s2.deedStats?.itemsDiscovered ?? []).filter((id) => id !== 'field_kit'),
+        ...withoutReferral.deedStats,
+        itemsDiscovered: (withoutReferral.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => id !== 'field_kit',
+        ),
       },
     };
     const counterfactualBytes = Buffer.byteLength(JSON.stringify(withoutFieldKit), 'utf8');
-    expect(bytes - counterfactualBytes, 'field_kit contributes exactly one array entry').toBe(12);
+    // The five World PvP deed dates add only 138 bytes: three 27-byte rows,
+    // one 28-byte row and one 29-byte row. The timer is unarmed in this fixture.
+    const pvpTitleDeedIds = [
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+    ] as const;
+    const withoutPvpTitleDeeds = JSON.parse(JSON.stringify(withoutFieldKit)) as CharacterState;
+    for (const id of pvpTitleDeedIds) {
+      expect(withoutFieldKit.deeds?.[id]).toBe('2026-08-08');
+      delete withoutPvpTitleDeeds.deeds?.[id];
+    }
+    expect(fieldBytes(withoutFieldKit, 'deeds') - fieldBytes(withoutPvpTitleDeeds, 'deeds')).toBe(
+      138,
+    );
+    expect(
+      counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutPvpTitleDeeds), 'utf8'),
+    ).toBe(138);
+    for (const key of Object.keys(withoutFieldKit) as (keyof CharacterState)[]) {
+      if (key !== 'deeds') expect(withoutPvpTitleDeeds[key], key).toEqual(withoutFieldKit[key]);
+    }
+    expect(
+      beforeReferralBytes - counterfactualBytes,
+      'field_kit contributes exactly one array entry',
+    ).toBe(12);
 
     // The one-time hammer recipe/proof content adds against the pre-hammer,
     // field-kit-excluded fixture (156144): the Crucible fixture-repair deltas
@@ -2261,7 +2501,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // one new deed, 28 deedStats.itemsDiscovered ids across the normal and
     // heroic forms, 14 reliquary.firstFind rows, and one new
     // reliquary.illuminatedPages entry, all still present in
-    // `withoutFieldKit`). Diffed against `withoutFieldKit` (not `s2`) so
+    // `withoutFieldKit`). Diffed against `withoutFieldKit` (not `withoutReferral`) so
     // field_kit's 12 bytes never leak into either attributed term. MEASURED
     // after this release merge's settle (hammer content, field_kit, and the
     // Bramblehide content together): the equation and every forgeBaseline
@@ -2328,6 +2568,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'reins_rallycart_rxt',
       'reins_goblin_rocket_sled',
       'reins_avian_strider',
+      'reins_nightwing_chimera',
+      'reins_wobbles_slime',
     ] as const;
     function withoutDevMountReleaseContent(state: CharacterState): CharacterState {
       const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
@@ -2340,11 +2582,114 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const withoutDevMountRelease = withoutDevMountReleaseContent(withoutFieldKit);
     const devMountReleaseDelta =
       fieldBytes(withoutFieldKit, 'deedStats') - fieldBytes(withoutDevMountRelease, 'deedStats');
-    expect(devMountReleaseDelta).toBe(71);
+    // 97 -> 119 with Wobbles the Slime's reins (`"reins_wobbles_slime",`, 22 bytes).
+    expect(devMountReleaseDelta).toBe(119);
     expect(
       counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8'),
-    ).toBe(71);
-    const preReleaseCounterfactual = withoutBramblehideContent(withoutDevMountRelease);
+    ).toBe(119);
+    // The Mirefen world boss (Balgath, the One-Eyed Foreman) and its quest
+    // chain: the one content mover on this branch. Attributed exactly the way
+    // withoutFieldKit, withoutBramblehideContent and withoutDevMountRelease
+    // above are, by cloning the settled state and removing only this feature's
+    // ids. It touches five top-level keys and nothing else, and each term is
+    // MEASURED, not inferred:
+    //   questsDone    +22  `"q_socketwrights_due",`, the Socketwright's Due
+    //                      quest that hands out the Shardpike.
+    //   raidLockouts  +42  `"worldboss:balgath_cyclops":<ms>,`, the world-boss
+    //                      lockout row the fixture arms for every shipped boss,
+    //                      beside the existing worldboss:thunzharr_waking_peak.
+    //   deeds         +58  cmb_balgath (27) and cmb_balgath_ten (31) as
+    //                      `"<id>":"2026-08-08",`.
+    //   deedStats    +181  the balgathKills counter the two deeds trigger on
+    //                      (22) plus the eight new item ids in the closed-world
+    //                      itemsDiscovered set (159).
+    //   reliquary    +369  seven firstFind rows (348) and the one
+    //                      conquerors_balgath illuminated page (21).
+    // skerrits_shardpike is the eighth discovered id but carries NO firstFind
+    // row: the quest tool is not a Reliquary relic, so it pays in
+    // itemsDiscovered only. Diffed against withoutDevMountRelease, like the
+    // Bramblehide block below, so none of the three release deltas can leak
+    // into another; the id sets are disjoint, so the order they compose in
+    // cannot change any term.
+    const BALGATH_ITEM_IDS = [
+      'barrowhide_pauldrons',
+      'fenwright_grips',
+      'foremans_barrowmaul',
+      'foremans_wage_band',
+      'loomshard_eye',
+      'mirelight_locket',
+      'mirestone_stride',
+      'skerrits_shardpike',
+      // The Mirefen muster rework's lent pike: `"muster_shardpike",` (19 bytes) in
+      // itemsDiscovered only, no firstFind row (a loan is not a relic).
+      'muster_shardpike',
+      // Balgath's loot: five trinkets and the Craterglass Stave, each with an
+      // itemsDiscovered id and a Reliquary firstFind row (115 + 295 bytes).
+      'knucklebone_of_balgath',
+      'muster_standard',
+      'guttered_eye',
+      'barrowstone_heart',
+      'muster_grapnel',
+      'craterglass_stave',
+    ] as const;
+    // The muster quest chain (content/mirefen_muster_quests.ts) and its drill deed.
+    const MUSTER_QUEST_IDS = ['q_muster_summons', 'q_muster_pike_drill', 'q_muster_trophy'];
+    function withoutBalgathContent(state: CharacterState): CharacterState {
+      const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
+      const itemIds = new Set<string>(BALGATH_ITEM_IDS);
+      if (copy.deeds) {
+        delete copy.deeds['cmb_balgath'];
+        delete copy.deeds['cmb_balgath_ten'];
+        delete copy.deeds['cmb_point_taken'];
+      }
+      if (copy.deedStats?.counters) delete copy.deedStats.counters['balgathKills'];
+      if (copy.deedStats?.itemsDiscovered)
+        copy.deedStats.itemsDiscovered = copy.deedStats.itemsDiscovered.filter(
+          (id) => !itemIds.has(id),
+        );
+      if (copy.questsDone)
+        copy.questsDone = copy.questsDone.filter(
+          (id) => id !== 'q_socketwrights_due' && !MUSTER_QUEST_IDS.includes(id),
+        );
+      if (copy.raidLockouts) {
+        delete copy.raidLockouts['worldboss:balgath_cyclops'];
+        delete copy.raidLockouts['weeklyquest:q_muster_trophy'];
+      }
+      if (copy.reliquary) {
+        for (const id of BALGATH_ITEM_IDS) delete copy.reliquary.firstFind?.[id];
+        copy.reliquary.illuminatedPages = copy.reliquary.illuminatedPages?.filter(
+          (id) => id !== 'conquerors_balgath',
+        );
+      }
+      return copy;
+    }
+    const withoutBalgath = withoutBalgathContent(withoutDevMountRelease);
+    const balgathDelta = Object.fromEntries(
+      (['questsDone', 'raidLockouts', 'deeds', 'deedStats', 'reliquary'] as const).map((key) => [
+        key,
+        fieldBytes(withoutDevMountRelease, key) - fieldBytes(withoutBalgath, key),
+      ]),
+    );
+    // The muster quest chain adds MEASURED: questsDone +59 (its three quest ids) and deeds
+    // +31 (cmb_point_taken); its weekly is a kill credit that owns no item, so deedStats
+    // gains nothing from it, and the fixture's weekly lock is not armed, so raidLockouts
+    // is unchanged.
+    expect(balgathDelta).toEqual({
+      questsDone: 81,
+      raidLockouts: 42,
+      deeds: 89,
+      // deedStats 200 -> 315 and reliquary 369 -> 664 with Balgath's loot (six ids).
+      deedStats: 315,
+      reliquary: 664,
+    });
+    // The five keys above are the WHOLE delta: the whole-state diff matches
+    // their sum, so no other field moved with this feature.
+    expect(
+      Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8') -
+        Buffer.byteLength(JSON.stringify(withoutBalgath), 'utf8'),
+    ).toBe(1191);
+    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(1191);
+    const preReleaseCounterfactual = withoutBramblehideContent(withoutBalgath);
     // The Bramblehide/Nythgap release content, attributed exactly against
     // f73615a511 (the last test-ledger commit, where the settled ceiling
     // measured 209,486): one deed (35 bytes), 28 deedStats.itemsDiscovered
@@ -2353,13 +2698,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 1,548-byte total this merge's content brought in (current staged
     // measures 211,034, exactly 209,486 + 1,548). Every other professions
     // and non-professions field is byte-identical across the merge.
-    // Measured against withoutDevMountRelease, not withoutFieldKit: the two
-    // dev-mount ids isolated above must not leak into this delta, or the
-    // deedStats term would read 813 (742 + the 71 already attributed).
+    // Measured against withoutBalgath, not withoutFieldKit: the three dev-mount
+    // ids and the world-boss content isolated above must not leak into this
+    // delta, or the deedStats term would read 813 (742 + the 71 already
+    // attributed) and then more again with the world boss's own ids.
     const bramblehideDelta = Object.fromEntries(
       (['deeds', 'deedStats', 'reliquary'] as const).map((key) => [
         key,
-        fieldBytes(withoutDevMountRelease, key) - fieldBytes(preReleaseCounterfactual, key),
+        fieldBytes(withoutBalgath, key) - fieldBytes(preReleaseCounterfactual, key),
       ]),
     );
     expect(bramblehideDelta).toEqual({ deeds: 35, deedStats: 742, reliquary: 771 });
@@ -2395,13 +2741,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Plus 13,496 for the Warfare Season 2 honor stock (139 item ids across the
     // maximal fixture's discovered-item and reliquary fields). MEASURED on the
     // release: the settled blob grew by exactly this much when the stock landed.
+    // Plus 1,209 for the Mirefen world-boss branch merged over release/v0.44.0 (799,
+    // then +410 with Balgath's loot): the five-key balgathDelta measured and summed above.
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
         1548 +
         50 +
-        // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation.
-        71 +
+        // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation; 97 with reins_nightwing_chimera (+26); 119 with
+        // reins_wobbles_slime (+22).
+        119 +
         375 +
         358 +
         // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
@@ -2429,13 +2778,6 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // 139 honor item ids (deedStats.itemsDiscovered +4,648 and the reliquary
         // rows +8,848, the release's own attribution).
         13496 +
-        // The feral staff adds one discovery (23 bytes) and one existing-page
-        // Reliquary entry (53 bytes), isolated below.
-        76 +
-        // The eight Season 2 rings and necks (2026-10-02): eight discoveries
-        // (+224, each id plus 3 bytes) and eight existing-page Reliquary entries
-        // (+464, each id plus 33 bytes), isolated below. MEASURED.
-        688 +
         // Plus 154 at the fourth release/v0.44.0 base merge (the ferry deed and
         // its four visit marks, attributed above).
         154 +
@@ -2451,8 +2793,74 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
         4711 +
-        // Five earned PvP flag deed IDs plus fixed dates, isolated below.
-        138,
+        // Plus 1,191 for the Mirefen world-boss branch (balgathDelta above), at its
+        // release/v0.45.0 merge.
+        1191 +
+        // Plus 5,019 at the choose-one leveling quest gear: its 245 item ids in
+        // deedStats.itemsDiscovered (5,019 = the ids' characters plus 245 x 3 of
+        // quoting and comma; greens carry no Reliquary pages). Predicted from the
+        // literals BEFORE the run and MEASURED equal (77,204 to 82,223).
+        5019 +
+        // Plus 1,688 at the quest blue rewards: the 76 rare item ids generated for
+        // the quests that already reward a blue (1,688 = the ids' characters plus
+        // 76 x 3; quest rares carry no Reliquary pages either). Predicted from the
+        // literals BEFORE the run and MEASURED equal (82,223 to 83,911).
+        1688 +
+        // Plus 1,541 at the quest role fill: the 49 leather caster greens and the
+        // 26 rares of the own-armor rule (1,541 = the ids' characters plus 75 x 3,
+        // no Reliquary pages). Predicted from the literals BEFORE the run and
+        // MEASURED equal (83,911 to 85,452).
+        1541 +
+        // Membership's nine discoverable item ids (the eight pieces plus the Staff
+        // of Changing's 19 bytes, PR 4281), isolated from withoutReferral above.
+        174 +
+        // Plus 6,100 at the five-dungeon rework (PR 4352) on the v0.45.0
+        // integration, MEASURED 2026-10 across its merge (fc742198392 to
+        // 106a086b617): deeds +829 (24 more deed rows, its encounter deeds and
+        // its lore guide's), deedStats.itemsDiscovered +2,818 and reliquary
+        // +2,453. The branch's own attribution (3,089 + 41) undercounted the
+        // merged tree by 2,970.
+        829 +
+        2818 +
+        2453 +
+        // Legacy whistle and charm discovery ids, plus the retained buddy collection.
+        706 +
+        // Plus 18 for the sprite buddy's whistle id (`"whistle_sprites",`, id
+        // length + 3) in itemsDiscovered.
+        18 +
+        buddyCollectionBytes +
+        // Lantern Hall deeds and discovered seal/reins ids.
+        281 +
+        // Plus 42 for the World PvP trophy skull: `"pvp_trophy_skull",` in
+        // deedStats.itemsDiscovered (+19; the deedStats row below moves by the
+        // same 19) and, because the skull is a provenance-tracked material, its
+        // row in the Materials Vault stock this fixture fills to every
+        // material's ceiling (+23). MEASURED on this tree.
+        42 +
+        // Plus 26 for the sixth lifetime-XP rung: prog_titan in the deeds row
+        // (10 characters of id plus 16 bytes of quoting, colon, date and comma),
+        // earned by this maximal fixture. MEASURED (77,204 to 77,230).
+        26 +
+        // The five World PvP title dates, isolated above without any other field change.
+        138 +
+        // Plus 34 for the Hard wisp-maze deed row that this maximal fixture earns,
+        // measured on the merged v0.45 tree.
+        34 +
+        // Plus 62 for the World PvP Skull Bag (an honor purchase, so a Warfare
+        // armory relic): `"pvp_skull_bag",` in deedStats.itemsDiscovered (+16)
+        // and its reliquary.firstFind row (+46). MEASURED on this tree.
+        62 +
+        // The ten-rung vault raises the compact ceiling from 200 to 1000:
+        // one extra digit in each of 118 stock rows plus upgrades 5 to 10.
+        // This composes with every inherited content delta above.
+        119 +
+        // The Crucible hunter quiver adds 18 deedStats and 48 reliquary bytes.
+        66 +
+        // Plus 68 for the three leveling quest shields (content/quest_shields.ts):
+        // `"lychgate_buckler",` (+19), `"bastion_kite_shield",` (+22) and
+        // `"barrowfield_tower_shield",` (+27) in deedStats.itemsDiscovered. Quest
+        // rewards carry no Reliquary page, so no firstFind row. MEASURED.
+        68,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2495,13 +2903,27 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
       // (the +154 above).
-      deeds: 881,
+      // deeds 743 -> 1,572 and reliquary 11,501 -> 13,954 at the five-dungeon
+      // rework, lore guide deed included, MEASURED 2026-10 across its merge
+      // (the +829 and +2,453 above; the branch's own +648 + 41 and +993
+      // undercounted the merged tree).
+      // deeds 1,572 -> 1,808 with Lantern Hall (#4530), its deed rows (+236 of the +281
+      // above), MEASURED on the merged tree.
+      deeds: 2006,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      // The feral staff adds 23 discovery bytes and 53 Reliquary bytes.
-      // The eight Season 2 rings and necks add 224 and 464 (2026-10-02).
-      deedStats: 9674,
-      reliquary: 12018,
+      // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
+      // 245 item ids (the +5,019 above), then -> 16,134 at the quest blue
+      // rewards' 76 rare ids (the +1,688 above), then -> 17,675 at the quest
+      // role fill's 75 ids (the +1,541 above).
+      // Then -> 17,830 with membership item discovery (+155, measured above).
+      // Then -> 20,648 at the five-dungeon rework (PR 4352): the +2,818 above,
+      // MEASURED across its merge (the branch's own +1,448 undercounted).
+      // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
+      // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
+      // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
+      deedStats: 21557,
+      reliquary: 14048,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2538,9 +2960,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-      // 231,943 -> 232,631 for the eight Season 2 rings and necks (+688,
-      // attributed above, kept here).
-    ).toBe(232631);
+      // 231,729 -> 236,748 at the choose-one leveling quest gear (+5,019, the
+      // 245 item ids attributed above, kept here).
+      // 236,748 -> 238,436 at the quest blue rewards (+1,688, the 76 rare ids).
+      // 238,436 -> 239,977 at the quest role fill (+1,541, the 75 ids).
+      // Membership's eight discovered item ids remain here: +155 bytes (240,132).
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +6,100
+      // (240,132 -> 246,232), MEASURED 2026-10 across its merge (the +829,
+      // +2,818 and +2,453 attributed above; the branch's own +3,130 undercounted).
+      // Retained buddy data adds 706 discovery bytes and 179 collection bytes (247,117).
+      // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
+      // The sprite buddy's whistle id adds 18 (247,154).
+    ).toBe(247990);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2555,7 +2986,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Season 2: exactly +13,496, the same 139 honor item ids.
     expect(
       counterfactualBytes,
-      'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
+      'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount+Balgath baseline',
       // 211,370 -> 211,745 at the release/v0.43.0 merge into feature/world-quests:
       // plus the world-quest deeds and items (+375), which this baseline keeps.
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
@@ -2568,20 +2999,34 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-      // 233,562 -> 234,250 for the eight Season 2 rings and necks (+688, kept).
-    ).toBe(234250);
-    const priorContent = withoutCrucibleContent(s2);
+      // 233,348 -> 238,367 at the choose-one leveling quest gear (+5,019, kept).
+      // 238,367 -> 240,055 at the quest blue rewards (+1,688, kept).
+      // 240,055 -> 241,596 at the quest role fill (+1,541, kept).
+      // Membership's eight discovered item ids remain here: +155 bytes (241,751).
+      // 241,751 -> 242,942 with the Mirefen world-boss branch on the v0.45.0
+      // integration (+1,191, the balgathDelta above: the boss content, Balgath's
+      // loot, and the muster weekly as a kill credit with no item of its own).
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +6,100
+      // (242,942 -> 249,042), MEASURED 2026-10 across its merge (the branch's
+      // own +3,130 undercounted).
+      // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
+      // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
+      // reins_wobbles_slime adds 22 (249,994).
+    ).toBe(250848);
+    const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
         key,
-        fieldBytes(s2, key) - fieldBytes(priorContent, key),
+        fieldBytes(withoutReferral, key) - fieldBytes(priorContent, key),
       ]),
     );
     expect(contentDelta).toEqual({ knownRecipes: 1221, deedStats: 1328, reliquary: 1971 });
-    expect(bytes - Buffer.byteLength(JSON.stringify(priorContent), 'utf8')).toBe(4520);
+    expect(beforeReferralBytes - Buffer.byteLength(JSON.stringify(priorContent), 'utf8')).toBe(
+      4520,
+    );
     const metadataDelta = Object.fromEntries(
       (['perfectingBonus', 'perfectingBound'] as const).map((field) => {
-        const stripped = JSON.parse(JSON.stringify(s2)) as CharacterState;
+        const stripped = JSON.parse(JSON.stringify(withoutReferral)) as CharacterState;
         const instances = [
           ...Object.values(stripped.equipmentInstance ?? {}),
           ...(stripped.inventory ?? []).map((row) => row.instance),
@@ -2589,7 +3034,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
           ...(stripped.vendorBuyback ?? []).map((row) => row.instance),
         ];
         for (const instance of instances) if (instance) delete instance[field];
-        return [field, bytes - Buffer.byteLength(JSON.stringify(stripped), 'utf8')];
+        return [field, beforeReferralBytes - Buffer.byteLength(JSON.stringify(stripped), 'utf8')];
       }),
     );
     expect(metadataDelta).toEqual({ perfectingBonus: 11872, perfectingBound: 5934 });
@@ -2660,56 +3105,62 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    // PvP title content adds exactly 138 bytes, all in the earned-deeds map.
-    // The reward timer is not armed in this professions fixture.
-    const withoutPvpTitles = JSON.parse(JSON.stringify(s2)) as CharacterState;
-    for (const id of [
-      'pvp_flag_1h',
-      'pvp_flag_3h',
-      'pvp_flag_6h',
-      'pvp_flag_24h',
-      'pvp_flag_168h',
-    ]) {
-      expect(withoutPvpTitles.deeds?.[id]).toBe('2026-08-08');
-      delete withoutPvpTitles.deeds![id];
-    }
-    expect(bytes - Buffer.byteLength(JSON.stringify(withoutPvpTitles), 'utf8')).toBe(138);
-    expect(Buffer.byteLength(JSON.stringify(withoutPvpTitles), 'utf8')).toBe(234124);
-    const withoutFeralStaff = JSON.parse(JSON.stringify(s2)) as CharacterState;
-    expect(withoutFeralStaff.deedStats?.itemsDiscovered).toContain('vanguard_feral_staff');
-    withoutFeralStaff.deedStats!.itemsDiscovered =
-      withoutFeralStaff.deedStats!.itemsDiscovered!.filter((id) => id !== 'vanguard_feral_staff');
-    expect(withoutFeralStaff.reliquary?.firstFind?.vanguard_feral_staff).toEqual({
-      clears: 999,
-      count: 999999,
-    });
-    delete withoutFeralStaff.reliquary!.firstFind!.vanguard_feral_staff;
-    expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutFeralStaff, 'deedStats')).toBe(23);
-    expect(fieldBytes(s2, 'reliquary') - fieldBytes(withoutFeralStaff, 'reliquary')).toBe(53);
-    expect(bytes - Buffer.byteLength(JSON.stringify(withoutFeralStaff), 'utf8')).toBe(76);
-    // The eight Season 2 rings and necks, isolated like the feral staff.
-    const withoutSeason2Jewelry = JSON.parse(JSON.stringify(s2)) as CharacterState;
-    for (const id of SEASON2_JEWELRY_IDS) {
-      expect(withoutSeason2Jewelry.deedStats?.itemsDiscovered).toContain(id);
-      expect(withoutSeason2Jewelry.reliquary?.firstFind?.[id]).toEqual({
-        clears: 999,
-        count: 999999,
-      });
-      delete withoutSeason2Jewelry.reliquary!.firstFind![id];
-    }
-    withoutSeason2Jewelry.deedStats!.itemsDiscovered =
-      withoutSeason2Jewelry.deedStats!.itemsDiscovered!.filter(
-        (id) => !SEASON2_JEWELRY_IDS.includes(id),
-      );
-    expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutSeason2Jewelry, 'deedStats')).toBe(224);
-    expect(fieldBytes(s2, 'reliquary') - fieldBytes(withoutSeason2Jewelry, 'reliquary')).toBe(464);
-    expect(bytes - Buffer.byteLength(JSON.stringify(withoutSeason2Jewelry), 'utf8')).toBe(688);
-    // Re-measured 233,574, then 234,262 with the eight Season 2 rings and necks
-    // (+688, 2026-10-02); the band re-based to measured minus 380 and plus one,
-    // the save warning limit unchanged.
-    expect(bytes).toBe(234262);
-    expect(bytes, reMint).toBeGreaterThan(233882);
-    expect(bytes, reMint).toBeLessThan(234263);
+    // RE-BASED at the choose-one leveling quest gear: 238,379 bytes, up 5,019
+    // from 233,360: its 245 item ids in deedStats.itemsDiscovered, attributed in
+    // the growth equation above (predicted from the literals and measured
+    // equal); no container or ceiling changed shape. Floor at measurement minus
+    // 380, edge at measurement plus one: 237999..238380.
+    // RE-BASED at the quest blue rewards: 240,067 bytes, up 1,688 from 238,379:
+    // the 76 rare item ids in deedStats.itemsDiscovered, attributed above
+    // (predicted and measured equal); no container or ceiling changed shape.
+    // Floor at measurement minus 380, edge at measurement plus one:
+    // 239687..240068.
+    // RE-BASED for memberships: measured 233,515 bytes, exactly +155 from
+    // eight ids in deedStats.itemsDiscovered, isolated above. No container,
+    // persisted entitlement field, or ceiling changed. The same 381-byte band
+    // moves to measurement minus 380 and measurement plus one.
+    // RE-BASED for referral armour: measured 233,637 bytes, exactly +122
+    // from the seven discovery ids isolated above. Trusted inviter/account
+    // entitlement stays outside CharacterState. Preserve the same 381-byte band.
+    // RE-BASED at the quest role fill: 241,608 bytes, up 1,541 from 240,067:
+    // the 75 leather caster and own-armor ids in deedStats.itemsDiscovered,
+    // attributed above (predicted and measured equal); no container or ceiling
+    // changed shape. Floor at measurement minus 380, edge at measurement plus
+    // one: 241228..241609.
+    // RE-BASED at the membership integration (quest gear, quest blues, the role
+    // fill, memberships and referral armour together): 241,885 bytes = 233,360 +
+    // 5,019 + 1,688 + 1,541 + 155 + 122, each attributed above. Floor at
+    // measurement minus 380, edge at measurement plus one: 241505..241886.
+    // RE-BASED at the v0.45.0 integration (the membership integration plus the
+    // Mirefen world-boss branch): 243,076 bytes = 241,885 + 1,191 (the
+    // balgathDelta attributed above); no container or ceiling changed shape.
+    // Floor at measurement minus 380, edge at measurement plus one:
+    // 242696..243077.
+    // RE-BASED with the five-dungeon rework (PR 4352) on the v0.45.0 integration:
+    // 246,206 bytes = 243,076 + 3,089 + 41, attributed above. Floor at measurement
+    // minus 380, edge at measurement plus one: 245826..246207.
+    // Buddy discovery and collection fields add 885 bytes; keep the 381-byte band.
+    // RE-BASED 2026-10 on the merged v0.45.0 integration: 250,061 bytes =
+    // 243,076 + 6,100 (the five-dungeon rework MEASURED across its merge
+    // 106a086b617: deeds +829, deedStats.itemsDiscovered +2,818, reliquary
+    // +2,453; the 3,089 + 41 above undercounted by 2,970) + 885 (buddies). No
+    // container or ceiling changed shape, and nothing has moved it since through
+    // the head of the integration branch. Floor at measurement minus 380, edge
+    // at measurement plus one: 249681..250062.
+    // RE-BASED for the Staff of Changing (PR 4281): 250,080 bytes, exactly +19
+    // from its one discovery id, isolated above with membership.
+    // RE-BASED for the Nightwing Chimaera (reins_nightwing_chimera): 250,106 bytes,
+    // +26 from its discovery id, isolated above in DEV_MOUNT_RELEASE_ITEM_IDS.
+    // Same 381-byte band: 249726..250107.
+    // RE-BASED for Wobbles the Slime (reins_wobbles_slime): 250,128 bytes, +22
+    // from its discovery id, isolated above in DEV_MOUNT_RELEASE_ITEM_IDS.
+    // Same 381-byte band: 249748..250129.
+    // RE-BASED for the sprite buddy: 250,146 bytes, +18 from its whistle id in
+    // itemsDiscovered. Floor at measurement minus 380, edge at measurement plus
+    // one: 249766..250147.
+    // Release composition: 250,982 bytes excluding referral cards; retain the 381-byte band.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250602);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250983);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

@@ -1,0 +1,25 @@
+{
+  "bagBar": [
+    "http://localhost:5173/ui/items/backpack.webp",
+    "http://localhost:5173/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5173/ui/items/baked_bread.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_beast_mastery_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_beast_mastery_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_beast_mastery_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_beast_mastery_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_beast_mastery_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_marksmanship_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_marksmanship_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_marksmanship_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_marksmanship_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_marksmanship_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_survival_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_survival_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_survival_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_survival_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_hunter_survival_gloves.webp"
+  ],
+  "allDecoded": true
+}

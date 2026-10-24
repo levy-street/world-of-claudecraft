@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-warrior-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 120,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_arms_helmet",
+      "family": "arms",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_arms_helmet.webp",
+      "canonicalDisplayName": "Bladewake Greathelm",
+      "acceptedSha256": "b3ed319411f7c6e0226f5567a25b66a0064811898f7eaff9f1a2b6ae5d084e73",
+      "acceptedBytes": 3860,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_arms_helmet.png",
+        "sha256": "03f1f58d57a5b792b343bfc3a81dc8d2cc0788e8fdaabe3a9485cbb57fe20455",
+        "bytes": 2418502,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_arms_helmet.png",
+        "sha256": "f9d324283d72c9feeceb338ec644672c9b56753c5c53834d7ea23f883bd8f2da",
+        "bytes": 545784,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Bladewake Greathelm (vanguard_warrior_arms_helmet) for World of ClaudeCraft, woc-item-icon-v1. A complete empty greathelm for an arms warrior, forged dark battle-worn steel with riveted reinforced brows, layered blade-shaped cheek guards, visible small interlinked chainmail at the lower neck, restrained oxblood cloth lining and aged brass edge accents. Angular disciplined martial silhouette; no horns, no skull, no wearer, no face or eyes, no shoulders. Slight three-quarter front view; full helmet centered and occupying 72 percent of the square, with generous safe margin. Premium hand-painted classic fantasy MMO inventory art, tactile brushed steel and leather, strong readable silhouette at 22px, crisp focal edges, softer brushwork elsewhere. Opaque charcoal and smoky umber painted vignette with subtle grounded contact shadow, warm key light from upper left and cool deep shadow bottom right. No text, letters, numerals, pseudo-writing, frame, border, labels, watermark, collage, split sheet, extra objects, transparency, photograph, vector shapes or plastic 3D rendering. This is a new generation. The displayed helmet, buckler and robe are house-style references only, not objects to reproduce. Output just the single finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_arms_shoulder",
+      "family": "arms",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_arms_shoulder.webp",
+      "canonicalDisplayName": "Bladewake Pauldrons",
+      "acceptedSha256": "305ba486cf0e0d4a813b089d775cfaab2489eb4cc4ac337e70469ef8275edb60",
+      "acceptedBytes": 2498,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_arms_shoulder.png",
+        "sha256": "4a14a1c825c91887aa3d80fe51086b51f5427aa6571634982de4e235b393271b",
+        "bytes": 2375803,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_arms_shoulder.png",
+        "sha256": "3535c9cfd4259ba1560fff124efe433b550047857d87ed28b74ce222edff163b",
+        "bytes": 455303,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create ONE square opaque 1024x1024 painted fantasy MMORPG inventory icon for World of ClaudeCraft, woc-item-icon-v1. Bladewake arms-warrior coordinated set: dark battle-worn steel, visible interlinked chainmail, restrained oxblood cloth and aged brass trim; angular blade-edged construction. Match the tactile hand-painted material treatment of the previous Bladewake Greathelm. Opaque charcoal and smoky umber painted vignette, warm upper-left key light, cool deep shadows. Full object must occupy only 70 to 75 percent of square height AND width, leaving at least 12 percent visible dark background on ALL four edges. Crisp readable silhouette at 22px, brush-painted edges and material variation. NO text, numbers, pseudo-writing, symbols resembling writing, UI border, frame, watermark, extra objects, body, skin, head, arms, legs, hands, mannequin, human, transparent background, vector art, photograph, or plastic 3D rendering. No collage or multiple panels. Bladewake Pauldrons: a compact symmetrical pair of empty forged steel shoulder guards joined by a short dark oxblood collar strap, layered swept blade-shaped overlapping plates over short interlinked chainmail fringes. Front three-quarter view of ONLY the shoulder armour pair, no chest or helmet.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_arms_chest",
+      "family": "arms",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_arms_chest.webp",
+      "canonicalDisplayName": "Bladewake Hauberk",
+      "acceptedSha256": "f3037628e0fd80f3fd419d5af415c76fa86e3a4feada61ff43bd9163d3416437",
+      "acceptedBytes": 3098,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_arms_chest.png",
+        "sha256": "7fa92beb07e8b60da257dc674ca3aef8b4509c5f3cc21eab3b6857155f46ab46",
+        "bytes": 2403234,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_arms_chest.png",
+        "sha256": "d71259ffdc839e25922257202128c8005574a4cc979439745b45f5205c29b12b",
+        "bytes": 498480,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create ONE square opaque 1024x1024 painted fantasy MMORPG inventory icon for World of ClaudeCraft, woc-item-icon-v1. Bladewake arms-warrior coordinated set: dark battle-worn steel, visible interlinked chainmail, restrained oxblood cloth and aged brass trim; angular blade-edged construction. Match the tactile hand-painted material treatment of the previous Bladewake Greathelm. Opaque charcoal and smoky umber painted vignette, warm upper-left key light, cool deep shadows. Full object must occupy only 70 to 75 percent of square height AND width, leaving at least 12 percent visible dark background on ALL four edges. Crisp readable silhouette at 22px, brush-painted edges and material variation. NO text, numbers, pseudo-writing, symbols resembling writing, UI border, frame, watermark, extra objects, body, skin, head, arms, legs, hands, mannequin, human, transparent background, vector art, photograph, or plastic 3D rendering. No collage or multiple panels. Bladewake Hauberk: one empty front-facing chainmail torso garment reinforced with overlapping steel chest plates, aged brass angular edge bands, oxblood padded lining visible at armholes and hem, and narrow buckled leather fastenings. Clearly show interlinked mail at sides and lower hem. No shoulder pauldrons or helmet.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_arms_legs",
+      "family": "arms",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_arms_legs.webp",
+      "canonicalDisplayName": "Bladewake Legplates",
+      "acceptedSha256": "06fa4ab23fcd1894088289c6553bd37473f488ba9983ebb3a1129aba129a8469",
+      "acceptedBytes": 2338,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_arms_legs.png",
+        "sha256": "10708e6b685badc13bc491c951d16db0438deec2d7d3e725442a71044c431309",
+        "bytes": 2193631,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_arms_legs.png",
+        "sha256": "ff4515d2a40e4376ee6de3bc7384500f5cddeea8d12b94b66893e668e4141d4e",
+        "bytes": 440937,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create ONE square opaque 1024x1024 painted fantasy MMORPG inventory icon for World of ClaudeCraft, woc-item-icon-v1. Bladewake arms-warrior coordinated set: dark battle-worn steel, visible interlinked chainmail, restrained oxblood cloth and aged brass trim; angular blade-edged construction. Match the tactile hand-painted material treatment of the previous Bladewake Greathelm. Opaque charcoal and smoky umber painted vignette, warm upper-left key light, cool deep shadows. Full object must occupy only 70 to 75 percent of square height AND width, leaving at least 12 percent visible dark background on ALL four edges. Crisp readable silhouette at 22px, brush-painted edges and material variation. NO text, numbers, pseudo-writing, symbols resembling writing, UI border, frame, watermark, extra objects, body, skin, head, arms, legs, hands, mannequin, human, transparent background, vector art, photograph, or plastic 3D rendering. No collage or multiple panels. Bladewake Legplates: a single paired set of empty armoured trouser legs hanging from a narrow belt, overlapping battle-worn steel thigh and knee plates with blade-edged brass trim, clearly visible dark chainmail panels and restrained oxblood textile backing. Front view; complete waist to ankle guards, no boots or feet.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_arms_gloves",
+      "family": "arms",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_arms_gloves.webp",
+      "canonicalDisplayName": "Bladewake Crushers",
+      "acceptedSha256": "88d3fff54b4fba0b6e172774fb5c7c4adf9b10cb008e43f26e0dc217f447562d",
+      "acceptedBytes": 3240,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_arms_gloves.png",
+        "sha256": "3024f1c7a0942819366ccbbf56f2ca2aa6e3254c50952a9fe81996200947fdec",
+        "bytes": 2463188,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_arms_gloves.png",
+        "sha256": "b68ae9e2d7501c7999ed6a37a17cee9c6d532092501d75a569e3e1207a9b799d",
+        "bytes": 517647,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Create ONE square opaque 1024x1024 painted fantasy MMORPG inventory icon for World of ClaudeCraft, woc-item-icon-v1. Bladewake arms-warrior coordinated set: dark battle-worn steel, visible interlinked chainmail, restrained oxblood cloth and aged brass trim; angular blade-edged construction. Match the tactile hand-painted material treatment of the previous Bladewake Greathelm. Opaque charcoal and smoky umber painted vignette, warm upper-left key light, cool deep shadows. Full object must occupy only 70 to 75 percent of square height AND width, leaving at least 12 percent visible dark background on ALL four edges. Crisp readable silhouette at 22px, brush-painted edges and material variation. NO text, numbers, pseudo-writing, symbols resembling writing, UI border, frame, watermark, extra objects, body, skin, head, arms, legs, hands, mannequin, human, transparent background, vector art, photograph, or plastic 3D rendering. No collage or multiple panels. Bladewake Crushers: one compact natural pair of empty steel gauntlets, articulated fingers curled slightly inward, substantial angular blade-edged knuckle plates with aged brass trim, chainmail at wrists and restrained oxblood padded cuffs. Show both full gauntlets, natural matching pair, not detached fingers or hands.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_fury_helmet",
+      "family": "fury",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_fury_helmet.webp",
+      "canonicalDisplayName": "Bloodmarch Visage",
+      "acceptedSha256": "d9021386c6a2f8265143b4eaf39165fedecda50605abc8601cef403cc2028249",
+      "acceptedBytes": 3578,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_fury_helmet.png",
+        "sha256": "071151fdd488245c2c4a1790c669f091bd811691fa07774589b0f9edbe7e7ce9",
+        "bytes": 2400643,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_fury_helmet.png",
+        "sha256": "11778f596d17f9853744f9b2c3b44909da17207de6decf3cb11f559005f24646",
+        "bytes": 527118,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Create one opaque square 1024x1024 fantasy MMORPG inventory painting, World of ClaudeCraft woc-item-icon-v1. Bloodmarch fury-warrior armour set: blackened iron reinforcement over clear interlinked dark chainmail, deep crimson leather bindings, restrained hammered copper edge details, aggressive broad blunt-toothed ridges and angular knuckle forms; no writing or emblems. Premium painterly fantasy MMO art with tactile worn materials and broad readable values, not photographic or plastic 3D. Warm key light from upper left, cool deep shadows, subdued opaque charcoal and burgundy painted vignette. A single complete inventory subject centered, occupying 70 percent of the canvas with broad dark margin around it, extremely readable at 22px. No human, face, skin, mannequin, hands, body or head. No text, pseudo-writing, symbols, letters, watermark, border, frame, transparent background, collage, sheet, unrelated objects or cropped silhouette. Bloodmarch Visage: one empty war helm with a heavy ridged brow, open dark eye slit, jagged crimson-cheek reinforcement and a short broad central comb, visible dark chainmail collar. Three-quarter front view; no horns, no glowing eyes.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_fury_shoulder",
+      "family": "fury",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_fury_shoulder.webp",
+      "canonicalDisplayName": "Bloodmarch Shoulderguards",
+      "acceptedSha256": "030a794bca3f0fb2825d91c3a0cdc7c034a264bdb79b992e0cc0af06944f3b8b",
+      "acceptedBytes": 3842,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_fury_shoulder.png",
+        "sha256": "e8ea3f77527a71ca43255ecb97d20e518025f6eca97bb24b26ae545b56e249fa",
+        "bytes": 2467545,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_fury_shoulder.png",
+        "sha256": "46bd3e30754565fe4e6dabe3f9a934412f6804439c4efe791d21c85f0323eb28",
+        "bytes": 520946,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Create one opaque square 1024x1024 fantasy MMORPG inventory painting, World of ClaudeCraft woc-item-icon-v1. Bloodmarch fury-warrior armour set: blackened iron reinforcement over clear interlinked dark chainmail, deep crimson leather bindings, restrained hammered copper edge details, aggressive broad blunt-toothed ridges and angular knuckle forms; no writing or emblems. Premium painterly fantasy MMO art with tactile worn materials and broad readable values, not photographic or plastic 3D. Warm key light from upper left, cool deep shadows, subdued opaque charcoal and burgundy painted vignette. A single complete inventory subject centered, occupying 70 percent of the canvas with broad dark margin around it, extremely readable at 22px. No human, face, skin, mannequin, hands, body or head. No text, pseudo-writing, symbols, letters, watermark, border, frame, transparent background, collage, sheet, unrelated objects or cropped silhouette. Bloodmarch Shoulderguards: a compact natural pair of heavy iron shoulder guards with broad serrated ridges, copper rivets, crimson leather straps and chainmail fringe, slightly asymmetric battle scars. Front view, no chest or helmet.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_fury_chest",
+      "family": "fury",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_fury_chest.webp",
+      "canonicalDisplayName": "Bloodmarch Chainmail",
+      "acceptedSha256": "8dfc962aa83a57c0131a79fd981379890d5b9518a2f3285a801b582b11b38c44",
+      "acceptedBytes": 3536,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_fury_chest.png",
+        "sha256": "e6e4c705db6a793e01ae8ac69830708cac9a052d0e336ae934782221f0479850",
+        "bytes": 2478542,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_fury_chest.png",
+        "sha256": "a833ed30217d9d91e085f86b6b0208244e01433ed214fcc630b9aea85c6024cd",
+        "bytes": 519867,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Create one opaque square 1024x1024 fantasy MMORPG inventory painting, World of ClaudeCraft woc-item-icon-v1. Bloodmarch fury-warrior armour set: blackened iron reinforcement over clear interlinked dark chainmail, deep crimson leather bindings, restrained hammered copper edge details, aggressive broad blunt-toothed ridges and angular knuckle forms; no writing or emblems. Premium painterly fantasy MMO art with tactile worn materials and broad readable values, not photographic or plastic 3D. Warm key light from upper left, cool deep shadows, subdued opaque charcoal and burgundy painted vignette. A single complete inventory subject centered, occupying 70 percent of the canvas with broad dark margin around it, extremely readable at 22px. No human, face, skin, mannequin, hands, body or head. No text, pseudo-writing, symbols, letters, watermark, border, frame, transparent background, collage, sheet, unrelated objects or cropped silhouette. Bloodmarch Chainmail: one empty sleeveless front-facing chainmail torso shirt with heavy blackened iron chest reinforcement, broad crimson leather cross-straps fastened with copper rivets, interlinked mail clearly visible over abdomen and skirt. No extra shoulder armour.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_fury_legs",
+      "family": "fury",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_fury_legs.webp",
+      "canonicalDisplayName": "Bloodmarch Leggings",
+      "acceptedSha256": "399836c52661cd3b88908ff7f9042b9dc39075357b5584561326823f132d18f2",
+      "acceptedBytes": 2928,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_fury_legs.png",
+        "sha256": "6cab3b8c995449fb1f5edfd2b810f3dfe91fe2e1471039ca631cf2366bc0c8e4",
+        "bytes": 2231496,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_fury_legs.png",
+        "sha256": "7ebef0b8aa5cd0be628c3262a2679647bd01c4970affbe211d1ae95d22755722",
+        "bytes": 500057,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Create one opaque square 1024x1024 fantasy MMORPG inventory painting, World of ClaudeCraft woc-item-icon-v1. Bloodmarch fury-warrior armour set: blackened iron reinforcement over clear interlinked dark chainmail, deep crimson leather bindings, restrained hammered copper edge details, aggressive broad blunt-toothed ridges and angular knuckle forms; no writing or emblems. Premium painterly fantasy MMO art with tactile worn materials and broad readable values, not photographic or plastic 3D. Warm key light from upper left, cool deep shadows, subdued opaque charcoal and burgundy painted vignette. A single complete inventory subject centered, occupying 70 percent of the canvas with broad dark margin around it, extremely readable at 22px. No human, face, skin, mannequin, hands, body or head. No text, pseudo-writing, symbols, letters, watermark, border, frame, transparent background, collage, sheet, unrelated objects or cropped silhouette. Bloodmarch Leggings: one paired set of armoured trousers, broad blackened iron thigh and knee reinforcement over dark interlinked chainmail, crimson leather belt and side panels, copper rivets. Full front view waist to ankle, no boots.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_fury_gloves",
+      "family": "fury",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_fury_gloves.webp",
+      "canonicalDisplayName": "Bloodmarch Grips",
+      "acceptedSha256": "cfbef8da2674e5c619445b0a8b4c9cdf2f78b554f75fc46d1f5e6ee7007e3f49",
+      "acceptedBytes": 3784,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_fury_gloves.png",
+        "sha256": "e196724bd188d813bf2dd38103e7180fe5f58c4f01cfd8983fa5608c906aa48d",
+        "bytes": 2396390,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_fury_gloves.png",
+        "sha256": "cb2acc9f74af57df1aed3798701c51fd1b07e8e4d0e2b809fbf4965546745979",
+        "bytes": 524847,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Create one opaque square 1024x1024 fantasy MMORPG inventory painting, World of ClaudeCraft woc-item-icon-v1. Bloodmarch fury-warrior armour set: blackened iron reinforcement over clear interlinked dark chainmail, deep crimson leather bindings, restrained hammered copper edge details, aggressive broad blunt-toothed ridges and angular knuckle forms; no writing or emblems. Premium painterly fantasy MMO art with tactile worn materials and broad readable values, not photographic or plastic 3D. Warm key light from upper left, cool deep shadows, subdued opaque charcoal and burgundy painted vignette. A single complete inventory subject centered, occupying 70 percent of the canvas with broad dark margin around it, extremely readable at 22px. No human, face, skin, mannequin, hands, body or head. No text, pseudo-writing, symbols, letters, watermark, border, frame, transparent background, collage, sheet, unrelated objects or cropped silhouette. Bloodmarch Grips: a compact pair of empty heavy iron gauntlets, articulated fingers loosely clenched, blunt-toothed knuckle bars, copper rivets, wide crimson leather cuffs and dark mail wrist panels. Complete natural matching pair.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_prot_helmet",
+      "family": "prot",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_prot_helmet.webp",
+      "canonicalDisplayName": "Ironmarch Helm",
+      "acceptedSha256": "67e83d92d97253b3ec4eecf8690b4430a9a9c5e4b8aaec23cf5689f9ccb8c9e3",
+      "acceptedBytes": 2050,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_prot_helmet.png",
+        "sha256": "7cb163c51b48fed6323987ea13c6d1f5f8c7a57cf1e25a3216833dc61f21bd31",
+        "bytes": 2189058,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_prot_helmet.png",
+        "sha256": "da81bb4278d0bca9220bdbf2f001fe714217f322c27c32aba27cac3c99361ee9",
+        "bytes": 474426,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case stylized-concept. Paint exactly ONE square opaque 1024px fantasy MMORPG item icon for World of ClaudeCraft, woc-item-icon-v1. Ironmarch protection-warrior set: practical heavy blue-grey tempered steel over interlinked chainmail, thick rounded reinforced rims, broad riveted bands, deep navy quilted lining, restrained silver edges, shield-shaped construction but no separate shield. Painterly classic fantasy MMO art with tactile metal, crisp broad edge highlights and soft peripheral brushwork; not a photo, vector or plastic render. IMPORTANT FRAMING: zoom out. The entire object is small enough to fit inside the central 70 percent of the canvas, with at least 15 percent quiet background above and below and both sides. Do not fill the canvas with a close-up. Deep charcoal and navy painted vignette, opaque square; warm upper-left light, cool lower-right shadow. One complete recognizable item or its natural matching pair. No wearer, skin, body parts, face, head, mannequin, hands, extra items, words, lettering, pseudo-writing, logo, watermark, frame, border, transparency, collage or split sheet. Ironmarch Helm: one compact empty defensive greathelm, rounded fortified crown and thick raised brow band, narrow horizontal dark viewing slit, broad cheek protection, a short dark chainmail neck curtain. Slight three-quarter front view. No horns or spikes, no eyes. Keep the complete dome comfortably below the upper margin.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_prot_shoulder",
+      "family": "prot",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_prot_shoulder.webp",
+      "canonicalDisplayName": "Ironmarch Spaulders",
+      "acceptedSha256": "5a518246194a15e93fea35ef1d3e0e58ab9ceaaff32bbd86491157eeb51d2573",
+      "acceptedBytes": 2336,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_prot_shoulder.png",
+        "sha256": "2158caf14f55a797c39321979f8b2fc88c9b43529f966fd77bb4a7bf52ec3e09",
+        "bytes": 2098298,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_prot_shoulder.png",
+        "sha256": "4ed624cc998aa79cfb98f18b302ca7d4d0a1c9999eee949b8fc086ffe6a36eee",
+        "bytes": 458806,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case stylized-concept. Paint exactly ONE square opaque 1024px fantasy MMORPG item icon for World of ClaudeCraft, woc-item-icon-v1. Ironmarch protection-warrior set: practical heavy blue-grey tempered steel over interlinked chainmail, thick rounded reinforced rims, broad riveted bands, deep navy quilted lining, restrained silver edges, shield-shaped construction but no separate shield. Painterly classic fantasy MMO art with tactile metal, crisp broad edge highlights and soft peripheral brushwork; not a photo, vector or plastic render. IMPORTANT FRAMING: zoom out. The entire object is small enough to fit inside the central 70 percent of the canvas, with at least 15 percent quiet background above and below and both sides. Do not fill the canvas with a close-up. Deep charcoal and navy painted vignette, opaque square; warm upper-left light, cool lower-right shadow. One complete recognizable item or its natural matching pair. No wearer, skin, body parts, face, head, mannequin, hands, extra items, words, lettering, pseudo-writing, logo, watermark, frame, border, transparency, collage or split sheet. Ironmarch Spaulders: one compact natural pair of rounded steel shoulder guards, concentric layered defensive bands and rivets over navy padding with a short chainmail fringe, connected by a narrow navy collar strap. Front view, empty shoulders only; no chest or helmet.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_prot_chest",
+      "family": "prot",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_prot_chest.webp",
+      "canonicalDisplayName": "Ironmarch Chestguard",
+      "acceptedSha256": "25e21efebc127bf27eeaf4d7c2b4327d65c885e43aec7edc18b9e47b982c9867",
+      "acceptedBytes": 2292,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_prot_chest.png",
+        "sha256": "38aeed0b0e2af0335a88b43481c9ee495cb05cf23a16b6e3db6209fab1b59996",
+        "bytes": 2277755,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_prot_chest.png",
+        "sha256": "fab0502752ec77f8f8f1de38037513e503941e73df439ee349914cd2333cb978",
+        "bytes": 489428,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case stylized-concept. Paint exactly ONE square opaque 1024px fantasy MMORPG item icon for World of ClaudeCraft, woc-item-icon-v1. Ironmarch protection-warrior set: practical heavy blue-grey tempered steel over interlinked chainmail, thick rounded reinforced rims, broad riveted bands, deep navy quilted lining, restrained silver edges, shield-shaped construction but no separate shield. Painterly classic fantasy MMO art with tactile metal, crisp broad edge highlights and soft peripheral brushwork; not a photo, vector or plastic render. IMPORTANT FRAMING: zoom out. The entire object is small enough to fit inside the central 70 percent of the canvas, with at least 15 percent quiet background above and below and both sides. Do not fill the canvas with a close-up. Deep charcoal and navy painted vignette, opaque square; warm upper-left light, cool lower-right shadow. One complete recognizable item or its natural matching pair. No wearer, skin, body parts, face, head, mannequin, hands, extra items, words, lettering, pseudo-writing, logo, watermark, frame, border, transparency, collage or split sheet. Ironmarch Chestguard: one empty sleeveless torso cuirass, broad gently curved blue-grey steel chest plates with raised central defensive ridge and thick riveted rims, dark interlinked chainmail at the sides and lower edge, navy quilted lining at the open neck. Front view, no shoulder guards.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_prot_legs",
+      "family": "prot",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_prot_legs.webp",
+      "canonicalDisplayName": "Ironmarch Legguards",
+      "acceptedSha256": "dceeb757d10440e7b128e350a5b3e4376b9210bebdf59e2ecc2d092ccc43083d",
+      "acceptedBytes": 2282,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_prot_legs.png",
+        "sha256": "dd7bd23b93c1c2847655d26c0aeb6ad28c1e029799db036d1067dc9abcfb59f8",
+        "bytes": 2228616,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_prot_legs.png",
+        "sha256": "7b953b276c10a4b887bcf34a788114df69346f636dff04acd518902fd28bdee3",
+        "bytes": 494258,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case stylized-concept. Paint exactly ONE square opaque 1024px fantasy MMORPG item icon for World of ClaudeCraft, woc-item-icon-v1. Ironmarch protection-warrior set: practical heavy blue-grey tempered steel over interlinked chainmail, thick rounded reinforced rims, broad riveted bands, deep navy quilted lining, restrained silver edges, shield-shaped construction but no separate shield. Painterly classic fantasy MMO art with tactile metal, crisp broad edge highlights and soft peripheral brushwork; not a photo, vector or plastic render. IMPORTANT FRAMING: zoom out. The entire object is small enough to fit inside the central 70 percent of the canvas, with at least 15 percent quiet background above and below and both sides. Do not fill the canvas with a close-up. Deep charcoal and navy painted vignette, opaque square; warm upper-left light, cool lower-right shadow. One complete recognizable item or its natural matching pair. No wearer, skin, body parts, face, head, mannequin, hands, extra items, words, lettering, pseudo-writing, logo, watermark, frame, border, transparency, collage or split sheet. Ironmarch Legguards: a single paired set of empty armoured trousers, blue-grey steel thigh reinforcement, broad domed knee guards and overlapping ankle plates over dark chainmail and navy quilting. Full front view from belt to ankles, no feet or boots. Strong compact silhouette, legs slightly bent so the object fits within the central 70 percent of square height.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warrior_prot_gloves",
+      "family": "prot",
+      "batch": "warfare-season2-warrior-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warrior_prot_gloves.webp",
+      "canonicalDisplayName": "Ironmarch Handguards",
+      "acceptedSha256": "61bd269fb40dc94b216dd1f5ab73eb51a4d8b7b423663b39f1c9c927926c878c",
+      "acceptedBytes": 2980,
+      "original": {
+        "path": "tmp/imagegen/v045-icon-backlog/originals/vanguard_warrior_prot_gloves.png",
+        "sha256": "f4e344830cc5330f3509ef8d3d35dc894dbba6251bab997c1d8799451cb8fe99",
+        "bytes": 2339443,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-icon-backlog/masters/vanguard_warrior_prot_gloves.png",
+        "sha256": "30c8a7506938e8ac7a9aca0ff604490f448819ceacb8f4b2e468148e893edb6f",
+        "bytes": 514217,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case stylized-concept. Paint exactly ONE square opaque 1024px fantasy MMORPG item icon for World of ClaudeCraft, woc-item-icon-v1. Ironmarch protection-warrior set: practical heavy blue-grey tempered steel over interlinked chainmail, thick rounded reinforced rims, broad riveted bands, deep navy quilted lining, restrained silver edges, shield-shaped construction but no separate shield. Painterly classic fantasy MMO art with tactile metal, crisp broad edge highlights and soft peripheral brushwork; not a photo, vector or plastic render. IMPORTANT FRAMING: zoom out. The entire object is small enough to fit inside the central 70 percent of the canvas, with at least 15 percent quiet background above and below and both sides. Do not fill the canvas with a close-up. Deep charcoal and navy painted vignette, opaque square; warm upper-left light, cool lower-right shadow. One complete recognizable item or its natural matching pair. No wearer, skin, body parts, face, head, mannequin, hands, extra items, words, lettering, pseudo-writing, logo, watermark, frame, border, transparency, collage or split sheet. Ironmarch Handguards: one compact matching pair of empty defensive steel gauntlets, rounded heavy knuckle plates, articulated fingers, thick riveted cuffs, navy quilted lining and short visible chainmail wrist panels. Full matching pair, not hands.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warrior-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warrior-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

@@ -18,6 +18,8 @@
 // garbage on the hot path), mirroring the speedStreaksInto / cameraSpace out-param
 // idiom elsewhere in src/render.
 
+import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { isFeastTemplateId } from '../sim/professions/feast';
 import { isMobileStationTemplateId } from '../sim/professions/mobile_station_object';
 import { HOARD_BROOD_EGG_TEMPLATE } from '../sim/rift/hoard_boss_kits';
@@ -31,6 +33,12 @@ import { isMobThreateningViewer } from './nameplate_threat';
 // nameplate-visibility concern, so it lives with the view model now.
 export const NAMEPLATE_RANGE = 55;
 export const NAMEPLATE_RANGE_SQ = NAMEPLATE_RANGE * NAMEPLATE_RANGE;
+
+// Town NPC plates (vendors, trainers, quest givers) only show up close, so a
+// busy hub does not fill the screen with labels for people across the square.
+// Their marker on the minimap still points the way from further out.
+export const NPC_NAMEPLATE_RANGE = 10;
+export const NPC_NAMEPLATE_RANGE_SQ = NPC_NAMEPLATE_RANGE * NPC_NAMEPLATE_RANGE;
 
 // Within this many yards (or when targeted / casting) a nameplate refreshes its
 // content every render pass, not just on the throttled full pass, so a nearby
@@ -47,6 +55,13 @@ export const NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT = 0.2;
 // The crypt's sealed royal door carries no floating label (it reads as back wall,
 // not a portal billboard).
 const UNLABELED_DOOR_DUNGEON_ID = 'nythraxis_boss_arena';
+
+/** An NPC plate: a town NPC, or a friendly mob that offers quests (the
+ *  painter draws both through its NPC branch). These plates show only up
+ *  close and carry just the name, role line and quest marker. */
+export function isNpcPlateEntity(e: Entity): boolean {
+  return e.kind === 'npc' || (e.kind === 'mob' && !e.hostile && (e.questIds?.length ?? 0) > 0);
+}
 
 /** Per-entity nameplate decisions the painter consumes. Mutated in place by
  *  nameplatePlanInto so the painter can reuse one instance across all entities. */
@@ -65,6 +80,13 @@ export interface NameplatePlan {
   threat: boolean;
   /** combo pips the viewer has built on this entity (0 = hide the row) */
   comboPips: number;
+  /** never draw a health bar for this plate even when otherwise shown: a
+   *  cosmetic buddy (src/sim/content/buddy_mobs.ts) always sits at 1/1 hp, so
+   *  a sliver would be pure noise rather than information. */
+  noHealthBar: boolean;
+  /** an NPC plate: just the name, its role line and its quest marker, never a
+   *  cast bar, combo pips, threat tint or raid mark */
+  nameOnly: boolean;
 }
 
 /** A zeroed plan for the painter to own and reuse. */
@@ -76,6 +98,8 @@ export function newNameplatePlan(): NameplatePlan {
     hasOverheadEmote: false,
     threat: false,
     comboPips: 0,
+    noHealthBar: false,
+    nameOnly: false,
   };
 }
 
@@ -88,7 +112,8 @@ export function newNameplatePlan(): NameplatePlan {
  * player's. `showPlayerNameplates` is the other-players toggle (defaults on):
  * when off, other players' plates hide, except the current target so a clicked
  * player stays readable; the self plate stays governed by showOwnNameplate
- * alone, and mob/object plates are unaffected. `standIn` says this entity has
+ * alone, and mob/object plates are unaffected. An NPC plate shows only inside
+ * NPC_NAMEPLATE_RANGE and is `nameOnly`. `standIn` says this entity has
  * no in-world body at all right now (a compile gate hides it, see
  * entity_gate_stand_in_core.ts): its plate is then the only thing telling the
  * player the entity is there, so it overrides BOTH nameplate toggles, the
@@ -100,8 +125,13 @@ export function newNameplatePlan(): NameplatePlan {
  * It still overrides nothing that is not about a hidden body: a looted corpse,
  * the deliberately label-less sealed crypt door and the Vale Cup ball stay
  * hidden, and the self plate stays the player's own choice (the local player's
- * view is never gated). Pure: same inputs give the same plan, no DOM/Three/i18n,
- * no Math.random/Date.now/performance.now.
+ * view is never gated). `showPetNames` is the dedicated, off-by-default
+ * cosmetic-buddy toggle (src/sim/pet/buddy_ai.ts's isBuddyMob):
+ * a buddy's plate ignores `showNameplates` entirely (it is never a hostile,
+ * attackable mob) and is hidden unless this is on, in which case it shows
+ * name-only (noHealthBar is always true for a buddy — see that field). Pure:
+ * same inputs give the same plan, no DOM/Three/i18n, no
+ * Math.random/Date.now/performance.now.
  */
 export function nameplatePlanInto(
   out: NameplatePlan,
@@ -111,12 +141,14 @@ export function nameplatePlanInto(
   showNameplates: boolean,
   showOwnNameplate: boolean,
   showPlayerNameplates: boolean,
+  showPetNames: boolean,
   standIn: boolean,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
   const d2 = dx * dx + dz * dz;
   const isSelf = e.id === player.id;
+  const isNpc = isNpcPlateEntity(e);
   const hasOverheadEmote = !!(e.kind === 'player' && e.overheadEmoteId && !e.dead);
   const isDoor = e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit';
   const isDelveInteract =
@@ -139,6 +171,7 @@ export function nameplatePlanInto(
     e.templateId === 'delve_bell_rope' ||
     e.templateId === 'delve_bell_rope_pulled';
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+  const isBuddyPet = isBuddyMob(e);
   // The placed harvest feast (Phase 12): labels like the delve interactables,
   // and like every object plate it carries no hp bar (the flag-family object
   // treatment). The pad is INTERACT_RANGE + 1, the delve-family hysteresis
@@ -152,6 +185,10 @@ export function nameplatePlanInto(
   const feastNear =
     (isFeastTemplateId(e.templateId) || isMobileStationTemplateId(e.templateId)) &&
     d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+  // The muster's weapon rack (its art is the camp's, its entity a pick volume) labels
+  // the same way, so the one thing to click at the command camp names itself up close.
+  const rackNear =
+    e.templateId === MUSTER_RACK_TEMPLATE_ID && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
@@ -159,11 +196,17 @@ export function nameplatePlanInto(
     e.templateId === HOARD_BROOD_EGG_TEMPLATE ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
+    // A buddy's own dedicated toggle, unconditional even over standIn: it is
+    // never a hostile, attackable mob, so it earns none of the "tell the
+    // player it's there" urgency a gated loot pile or quest object does.
+    (isBuddyPet && !showPetNames) ||
     (!standIn &&
       (d2 > NAMEPLATE_RANGE_SQ ||
-        (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear) ||
-        (!showNameplates && e.kind === 'mob' && !e.dead) ||
+        (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear && !rackNear) ||
+        (!isBuddyPet && !showNameplates && e.kind === 'mob' && !e.dead) ||
+        (isNpc && d2 > NPC_NAMEPLATE_RANGE_SQ) ||
         (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
+  out.noHealthBar = isBuddyPet;
   out.anchorYOffset =
     viewHeight * e.scale +
     (isSelf && hasOverheadEmote && !showOwnNameplate
@@ -172,7 +215,8 @@ export function nameplatePlanInto(
   out.urgent =
     e.id === player.targetId || d2 < NAMEPLATE_URGENT_RANGE_SQ || e.castingAbility !== null;
   out.hasOverheadEmote = hasOverheadEmote;
-  out.threat = isMobThreateningViewer(e, player.id);
-  out.comboPips = comboPipsFor(player, e);
+  out.nameOnly = isNpc;
+  out.threat = !isNpc && isMobThreateningViewer(e, player.id);
+  out.comboPips = isNpc ? 0 : comboPipsFor(player, e);
   return out;
 }

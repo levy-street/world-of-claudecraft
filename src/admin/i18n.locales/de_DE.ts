@@ -7,6 +7,15 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const de_DE: Record<string, string> = {
+  'error.buddyGrantFailed': 'Der Begleiter konnte nicht vergeben werden.',
+  'error.characterAlreadyHasThat':
+    'Dieser Charakter besitzt diesen Begleiter oder dieses Aussehen bereits.',
+  'moderationHistory.actionGrantBuddy': 'Begleiter vergeben',
+  'moderationHistory.actionAnnounce': 'Realm-Ankündigung',
+  'moderationHistory.actionGmInvisible': 'Unsichtbar geworden',
+  'moderationHistory.actionGmVisible': 'Sichtbar geworden',
+  'moderationHistory.actionUnwatch': 'Von der Beobachtungsliste entfernt',
+  'moderationHistory.actionWatch': 'Zur Beobachtungsliste hinzugefügt',
   'error.flagActiveExists': 'dieses Konto hat bereits eine offene Meldung dieser Art',
   'wealth.largeMovementsUnavailable':
     'große Bankbewegungen konnten nicht geladen werden (das Zeitlimit beim Lesen des Hauptbuchs wurde überschritten); die Goldaufschlüsselung oben ist vollständig',
@@ -360,8 +369,6 @@ export const de_DE: Record<string, string> = {
   'detail.accountActions': 'Aktionen zur Kontomoderation',
   'detail.banReason': 'Sperrgrund:{value}',
   'detail.suspensionReason': 'Sperrgrund:{value}',
-  'detail.deactivatedNotice': 'Der Spieler hat dieses Konto am {value} deaktiviert.',
-  'detail.reactivate': 'Reaktivieren',
   'detail.notePlaceholder': 'Moderatornotiz / Grund',
   'detail.suspend1h': '1 Std. aussetzen',
   'detail.suspend24h': '24 Std. aussetzen',
@@ -460,7 +467,6 @@ export const de_DE: Record<string, string> = {
   'dialog.confirmBan': 'Sperrung bestätigen',
   'dialog.confirmUnban': 'Entsperrung bestätigen',
   'dialog.confirmUnsuspension': 'Bestätigen Sie die Aufhebung der Suspendierung',
-  'dialog.confirmReactivation': 'Reaktivierung bestätigen',
   'dialog.character': 'Charakter',
   'dialog.account': 'Konto',
   'dialog.action': 'Aktion',
@@ -474,8 +480,6 @@ export const de_DE: Record<string, string> = {
   'dialog.actionUnban': 'Konto-Login wieder freischalten',
   'dialog.actionUnsuspend':
     'Stellen Sie den Anmeldezugriff für Ihr Konto vor Ablauf der Sperrung wieder her',
-  'dialog.actionReactivate':
-    'Die vom Spieler selbst vorgenommene Deaktivierung aufheben und den Konto-Login wieder freischalten',
   'dialog.confirm': 'Bestätigen',
   'dialog.cancel': 'Abbrechen',
   'dialog.warning': 'Warnung',
@@ -1099,14 +1103,6 @@ export const de_DE: Record<string, string> = {
     'Jeder Charakter des Kontos trägt das öffentliche Kennzeichen, bis diese Spielzeit aufgebraucht ist.',
   'detail.cheaterMarkRelengthHint':
     'Ersetzt das verbleibende Kontingent vollständig und addiert nichts hinzu. Das öffentliche Kennzeichen bleibt sichtbar.',
-  'detail.worldQuestBlockModeration': 'Weltquests',
-  'detail.worldQuestBlockActions': 'Moderationsaktionen für Weltquests',
-  'detail.worldQuestBlockApply': 'Weltquests sperren',
-  'detail.worldQuestBlockLift': 'Weltquests entsperren',
-  'detail.worldQuestBlockReason': 'Sperrgrund: {value}',
-  'detail.worldQuestBlockedAt': 'Gesperrt: {value}',
-  'detail.worldQuestBlockHint':
-    'Bei Weltquest-Botting statt eines Banns: Kein Charakter des Kontos kann Weltquests mehr beginnen, darin vorankommen oder Belohnungen daraus erhalten. Alles andere bleibt spielbar.',
   'dialog.confirmCheaterMark': 'Schummler-Markierung bestätigen',
   'dialog.confirmCheaterMarkRelength': 'Neue Dauer der Markierung bestätigen',
   'dialog.confirmCheaterMarkLift': 'Entfernen der Markierung bestätigen',
@@ -1115,23 +1111,13 @@ export const de_DE: Record<string, string> = {
   'dialog.actionCheaterMarkRelength':
     'Das verbleibende Spielzeitkontingent dieser Markierung ersetzen',
   'dialog.actionCheaterMarkLift': 'Schummler-Markierung vorzeitig entfernen',
-  'dialog.confirmWorldQuestBlock': 'Weltquest-Sperre bestätigen',
-  'dialog.confirmWorldQuestUnblock': 'Aufhebung der Weltquest-Sperre bestätigen',
-  'dialog.actionWorldQuestBlock': 'Alle Charaktere dieses Kontos für Weltquests sperren',
-  'dialog.actionWorldQuestUnblock': 'Weltquests für dieses Konto wieder erlauben',
   'alert.cheaterMarkDurationInvalid': 'Gib eine ganze Zahl von 1 bis {max} Stunden ein.',
   'error.cheaterMarkDurationInvalid':
     'Das Spielzeitkontingent muss zwischen 1 und 100 Stunden liegen.',
   'error.cheaterMarkNotMarked': 'Dieses Konto trägt keine Schummler-Markierung.',
   'error.cheaterMarkAdminTarget': 'Administratorkonten können keine Schummler-Markierung erhalten.',
-  'error.worldQuestBlockAdminTarget':
-    'Administratorkonten können nicht für Weltquests gesperrt werden.',
-  'error.worldQuestBlockAlreadyBlocked': 'Dieses Konto ist bereits für Weltquests gesperrt.',
-  'error.worldQuestBlockNotBlocked': 'Dieses Konto ist nicht für Weltquests gesperrt.',
   'moderationHistory.actionCheaterMark': 'Schummler-Markierung angewendet',
   'moderationHistory.actionCheaterMarkLift': 'Schummler-Markierung entfernt',
-  'moderationHistory.actionWorldQuestsBlock': 'Weltquests gesperrt',
-  'moderationHistory.actionWorldQuestsUnblock': 'Weltquests entsperrt',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Gold',
   'error.flagInvalidStatus': 'Ungültiger Flaggenstatus',

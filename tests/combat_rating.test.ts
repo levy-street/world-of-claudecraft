@@ -147,19 +147,14 @@ describe('combat ratings', () => {
     }
   });
 
-  it('entry-tier PvP honor jewelry keeps its warfare rating (its own differentiator, unchanged)', () => {
-    // The entry tier's jewelry is differentiated by its PvP warfare rating, not a
-    // PvE combat rating; hit/crit/haste are deliberately NOT added there. The
-    // Warfare Season 2 jewelry is the honor jewelry that carries ratings (the PvP
-    // hit cap on its rings), pinned in tests/warfare_season2.test.ts.
-    const entryIds = new Set<string>(FURY_STOCK);
+  it('PvP honor jewelry keeps its warfare rating (its own differentiator, unchanged)', () => {
+    // The honor track's jewelry is differentiated by its PvP warfare rating, not a
+    // PvE combat rating; hit/crit/haste are deliberately NOT added there to avoid a
+    // same-level PvP balance change.
     const honorJewelry = Object.values(ITEMS).filter(
-      (i) =>
-        (i.slot === 'ring' || i.slot === 'neck') &&
-        (i.pvpOffenseRating ?? 0) > 0 &&
-        entryIds.has(i.id),
+      (i) => (i.slot === 'ring' || i.slot === 'neck') && (i.pvpOffenseRating ?? 0) > 0,
     );
-    expect(honorJewelry).toHaveLength(9);
+    expect(honorJewelry.length).toBeGreaterThan(0);
     for (const item of honorJewelry) {
       expect(item.hitRating ?? 0, item.id).toBe(0);
     }

@@ -7,8 +7,8 @@
 import type { FactionId } from '../../../sim/factions';
 import { worldQuestFaction } from '../../../sim/factions';
 import type { WorldQuestProgress } from '../../../sim/types';
-import { worldQuestCompletedForBoard } from '../../../sim/world_quest_practice';
 import { playerActiveWorldQuests } from '../../../sim/world_quest_reroll';
+import { worldQuestReadsActive, worldQuestReadsCompleted } from '../../world_quest_progress_state';
 
 export type WorldQuestRailState = 'available' | 'active' | 'completed';
 
@@ -68,6 +68,8 @@ const REASON_BY_TEXT: ReadonlyMap<string, WorldQuestRerollReason> = new Map([
   ['No active world quest cycle.', 'noCycle'],
   ['Daily world quest reroll already used today.', 'usedToday'],
   ['Completed world quests cannot be rerolled.', 'completed'],
+  // Retired: in-progress quests can be replaced now, so neither host sends this.
+  // The row and its catalog key stay until the locale overlays drop the key.
   ['In-progress world quests cannot be rerolled.', 'inProgress'],
   ['This world quest is not currently active for you.', 'notActive'],
   ['No alternative assignments available in this zone today.', 'noAlternative'],
@@ -92,9 +94,9 @@ export function buildWorldQuestRailView(input: WorldQuestRailInput): WorldQuestR
   let completed = 0;
   for (const quest of board) {
     const progress = input.worldQuestLog.get(quest.id);
-    const state: WorldQuestRailState = worldQuestCompletedForBoard(progress)
+    const state: WorldQuestRailState = worldQuestReadsCompleted(progress)
       ? 'completed'
-      : progress?.state === 'active'
+      : worldQuestReadsActive(progress)
         ? 'active'
         : 'available';
     if (state === 'completed') completed++;

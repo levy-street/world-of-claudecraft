@@ -43,6 +43,7 @@ import { voice } from '../game/voice';
 import { coachTrailPlan, distanceToTrail } from '../render/coach_trail_core';
 import type { Renderer } from '../render/renderer';
 import { BOOTCAMP_COURSE_CHECKPOINTS, isOnProvingShore } from '../sim/content/proving_shore';
+import { isFerryPassenger } from '../sim/ferry_passenger';
 import { GAUNTLET_QUEST_ID } from '../sim/tutorial/gauntlet_run';
 import { startingAttackFor } from '../sim/tutorial/starting_attack';
 import type { Entity } from '../sim/types';
@@ -324,7 +325,10 @@ export class BootcampOverlay {
     if (now - this.guideVeerCheckedAt < 1000) return;
     this.guideVeerCheckedAt = now;
     const p = world.player;
-    if (!p) return;
+    if (!p || isFerryPassenger(p)) {
+      this.guideOffPathSince = null;
+      return;
+    }
     const ghostBody =
       world.player?.ghost && world.player.corpsePos
         ? { x: world.player.corpsePos.x, z: world.player.corpsePos.z }

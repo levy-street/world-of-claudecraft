@@ -14,6 +14,7 @@ vi.mock('../server/db', () => ({
 
 import { isUpdateDue } from '../server/entity_update_cadence';
 import { GameServer, wireEntity } from '../server/game';
+import { MOBS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 
@@ -42,6 +43,14 @@ interface RefSent {
 
 // interestLimitSq re-typed verbatim from server/interest_policy.ts.
 function refInterestLimitSq(e: Entity, known: boolean): number {
+  // A world-boss LANDMARK carries a zone-sized range, far outside any grid query, so the
+  // reference reaches it the same way the server does: appended to the scan, then cut by
+  // this limit rather than by the query radius. Re-derived from the template here rather
+  // than imported, so a change to the server's rule has to be made twice to stay green.
+  if (e.kind === 'mob') {
+    const range = MOBS[e.templateId]?.landmarkRange;
+    if (range) return range * range;
+  }
   if (e.kind === 'npc') {
     return known ? NPC_DROP_RADIUS * NPC_DROP_RADIUS : NPC_INTEREST_RADIUS * NPC_INTEREST_RADIUS;
   }
@@ -68,57 +77,63 @@ function referenceEntsKeep(
   const keep: number[] = [];
   const present = new Set<number>();
   const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
-  server.sim.grid.forEachInRadius(
-    anchor.pos.x,
-    anchor.pos.z,
-    gatherRadius,
-    (e: Entity, d2: number) => {
-      if (d2 > queryLimitSq) return;
-      if (e.id === anchor.id) return;
-      if (!server.canObserveEntity(anchor, e, d2)) return;
-      const known = shadow.get(e.id);
-      const limitSq =
-        anchor.targetId === e.id
-          ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
-          : refInterestLimitSq(e, known !== undefined);
-      if (d2 > limitSq) return;
-      present.add(e.id);
-      const cache = server.wireCacheFor(e, stableTimerWire);
-      if (known === undefined) {
-        ents.push(stableTimerWire ? cache.fullAuraJson : cache.fullJson);
-        shadow.set(e.id, {
-          idVer: cache.idVer,
-          dynVer: cache.dynVer,
-          auraVer: cache.auraVer,
-          sentAtTick: tick,
-          settled: true,
-        });
-        return;
-      }
-      const auraChanged = stableTimerWire && known.auraVer !== cache.auraVer;
-      if (known.idVer !== cache.idVer) {
-        ents.push(auraChanged ? cache.fullAuraJson : cache.fullJson);
-        known.idVer = cache.idVer;
-        known.dynVer = cache.dynVer;
-        known.auraVer = cache.auraVer;
-        known.sentAtTick = tick;
-        known.settled = false;
-        return;
-      }
-      if (
-        !isUpdateDue(tick, e, d2, anchor, known.sentAtTick) ||
-        (known.dynVer === cache.dynVer && !auraChanged && known.settled)
-      ) {
-        keep.push(e.id);
-        return;
-      }
-      known.settled = known.dynVer === cache.dynVer;
+  const visit = (e: Entity, d2: number): void => {
+    const landmarkSq = e.kind === 'mob' ? MOBS[e.templateId]?.landmarkRange : undefined;
+    if (d2 > (landmarkSq ? landmarkSq * landmarkSq : queryLimitSq)) return;
+    if (e.id === anchor.id) return;
+    if (!server.canObserveEntity(anchor, e, d2)) return;
+    const known = shadow.get(e.id);
+    const limitSq =
+      anchor.targetId === e.id
+        ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
+        : refInterestLimitSq(e, known !== undefined);
+    if (d2 > limitSq) return;
+    present.add(e.id);
+    const cache = server.wireCacheFor(e, stableTimerWire);
+    if (known === undefined) {
+      ents.push(stableTimerWire ? cache.fullAuraJson : cache.fullJson);
+      shadow.set(e.id, {
+        idVer: cache.idVer,
+        dynVer: cache.dynVer,
+        auraVer: cache.auraVer,
+        sentAtTick: tick,
+        settled: true,
+      });
+      return;
+    }
+    const auraChanged = stableTimerWire && known.auraVer !== cache.auraVer;
+    if (known.idVer !== cache.idVer) {
+      ents.push(auraChanged ? cache.fullAuraJson : cache.fullJson);
+      known.idVer = cache.idVer;
       known.dynVer = cache.dynVer;
       known.auraVer = cache.auraVer;
       known.sentAtTick = tick;
-      ents.push(auraChanged ? cache.liteAuraJson : cache.liteJson);
-    },
-  );
+      known.settled = false;
+      return;
+    }
+    if (
+      !isUpdateDue(tick, e, d2, anchor, known.sentAtTick) ||
+      (known.dynVer === cache.dynVer && !auraChanged && known.settled)
+    ) {
+      keep.push(e.id);
+      return;
+    }
+    known.settled = known.dynVer === cache.dynVer;
+    known.dynVer = cache.dynVer;
+    known.auraVer = cache.auraVer;
+    known.sentAtTick = tick;
+    ents.push(auraChanged ? cache.liteAuraJson : cache.liteJson);
+  };
+  server.sim.grid.forEachInRadius(anchor.pos.x, anchor.pos.z, gatherRadius, visit);
+  // The landmark lane, second and deduped by `present` exactly as the server's append is
+  // deduped by entity id: a boss already inside the grid radius must not be counted twice.
+  for (const e of server.sim.entities.values()) {
+    if (e.dead || e.kind !== 'mob' || !MOBS[e.templateId]?.landmarkRange) continue;
+    if (present.has(e.id)) continue;
+    const dx = e.pos.x - anchor.pos.x;
+    const dz = e.pos.z - anchor.pos.z;
+    visit(e, dx * dx + dz * dz);
+  }
   for (const id of shadow.keys()) {
     if (!present.has(id)) shadow.delete(id);
   }
@@ -412,9 +427,6 @@ describe('shared interest-candidate gathering', () => {
     mod.session.spectating = {
       characterId: target.characterId,
       name: 'Target',
-      savedPos: { ...server.sim.entities.get(mod.pid)!.pos },
-      priorGm: false,
-      stowedPet: null,
     };
     for (let t = 0; t < 4; t++) {
       server.sim.tick();
@@ -456,31 +468,22 @@ describe('shared interest-candidate gathering', () => {
     expect(denseQueries).toBeLessThan(denseCrowd.length);
   });
 
-  it('reveals a moderator leaving spectate to co-located viewers this tick (new hoisted ordering)', () => {
-    // The one intentional non-byte-identical behavior change: hoisting all anchor
-    // resolution (including the vanished-spectate exitSpectate fallback) ahead of the
-    // shared-candidate build makes a moderator leaving spectate limbo visible to
-    // co-located viewers one tick earlier, never later. Gameplay-neutral. This pin is
-    // DECISIVE against the hoist because the NEIGHBOR joins BEFORE the moderator: under
-    // the old single-pass inline ordering the neighbor's snapshot is built while the
-    // moderator is still in limbo (its exitSpectate fallback runs later, during the
-    // moderator's own iteration), so it would NOT see the moderator this tick. Only the
-    // hoisted resolve pass, which restores the moderator before any snapshot builds,
-    // reveals it now, so the final assertion passes only with the hoist in place.
+  it('keeps a spectating moderator visible to co-located viewers throughout', () => {
+    // /spectate moves only the camera: the moderator's body stays where it
+    // stands (server/spectate_body.ts), so a neighbor sees it while the
+    // spectate runs and after the vanished-target fallback ends it.
     const server = new GameServer();
-    const neighbor = joinAt(server, 1, 'Neighbor', 18, 18); // joins FIRST, near mod's savedPos
+    const neighbor = joinAt(server, 1, 'Neighbor', 18, 18);
     const mod = joinAt(server, 2, 'Mod', 20, 20);
     const target = joinAt(server, 3, 'Target', 400, 400);
-    (server as any).enterSpectate(mod.session, target.session); // mod -> limbo, savedPos = (20,20)
-    // while spectating, the moderator sits in limbo and the neighbor cannot see it.
+    (server as any).enterSpectate(mod.session, target.session);
     server.sim.tick();
     (server as any).broadcastSnapshots();
-    expect(framePresentIds(neighbor.lastFrame).has(mod.pid)).toBe(false);
-    // target goes offline this tick: mod's broadcast-pass exitSpectate fallback restores
-    // mod to savedPos in the hoisted resolve pass, before the neighbor's snapshot builds.
+    expect(framePresentIds(neighbor.lastFrame).has(mod.pid)).toBe(true);
     target.session.left = true;
     server.sim.tick();
     (server as any).broadcastSnapshots();
+    expect(mod.session.spectating).toBeNull();
     expect(framePresentIds(neighbor.lastFrame).has(mod.pid)).toBe(true);
   });
 
@@ -532,13 +535,29 @@ describe('shared interest-candidate gathering', () => {
     server.sim.tick();
     refreshGrids(server);
     // independent expectation: entities within INTEREST_QUERY_RADIUS of each anchor,
-    // self included (grid's own d2 <= radius^2 cutoff, and d2(self) = 0).
+    // self included (grid's own d2 <= radius^2 cutoff, and d2(self) = 0), PLUS the landmark
+    // lane. The counter's contract is the set the per-viewer filter actually visited, and a
+    // world boss appended from outside the grid radius is visited like anything else; the
+    // world this rig builds has one alive (worldBossAtBoot), so this arm is not vacuous.
     let expected = 0;
+    const landmarks = [...server.sim.entities.values()].filter(
+      (e) => !e.dead && e.kind === 'mob' && MOBS[e.templateId]?.landmarkRange,
+    );
+    expect(landmarks.length).toBeGreaterThan(0);
     for (const m of crowd) {
       const a = server.sim.entities.get(m.pid)!;
-      server.sim.grid.forEachInRadius(a.pos.x, a.pos.z, INTEREST_QUERY_RADIUS, () => {
+      const seen = new Set<number>();
+      server.sim.grid.forEachInRadius(a.pos.x, a.pos.z, INTEREST_QUERY_RADIUS, (e: Entity) => {
+        seen.add(e.id);
         expected++;
       });
+      for (const e of landmarks) {
+        if (seen.has(e.id)) continue;
+        const range = MOBS[e.templateId]?.landmarkRange ?? 0;
+        const dx = e.pos.x - a.pos.x;
+        const dz = e.pos.z - a.pos.z;
+        if (dx * dx + dz * dz <= range * range) expected++;
+      }
     }
     (server as any).perfDetailActive = true;
     (server as any).bcVisits = 0;

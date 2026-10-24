@@ -16,7 +16,7 @@
 
 import { spellCritChance } from '../sim/combat/spell_combat';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
-import { ABILITIES, ITEMS } from '../sim/data';
+import { ABILITIES } from '../sim/data';
 import type { IWorld } from '../world_api';
 import { abilityDisplayName } from './ability_display_name';
 import { auraDisplayNameForHud } from './aura_display_name';
@@ -29,6 +29,7 @@ import {
   type StatTooltipModel,
   weaponDps,
 } from './stat_tooltip';
+import { wornItemForPlayer } from './worn_item_definition_core';
 
 /** The slice of IWorld the stat sheet reads: the shown player, their worn
  *  equipment (by item id), and their class. */
@@ -40,12 +41,12 @@ export type CharStatWorld = Pick<IWorld, 'player' | 'equipment' | 'cfg'>;
 export function charStatModel(world: CharStatWorld, stat: StatId): StatTooltipModel {
   const p = world.player;
   const cls = world.cfg.playerClass;
-  const wpn = world.equipment.mainhand ? ITEMS[world.equipment.mainhand] : null;
+  const wpn = wornItemForPlayer(world, world.equipment.mainhand);
   // Equipped items + active auras feed the upstream "Made up of:" source
   // breakdown; names resolve the same way the buff bar resolves them.
   const gear: GearStatSource[] = [];
   for (const id of Object.values(world.equipment)) {
-    const item = id ? ITEMS[id] : null;
+    const item = wornItemForPlayer(world, id);
     if (!item || (!item.stats && !item.spellPower && !item.healPower)) continue;
     gear.push({
       name: itemDisplayName(item),

@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { AURA_CUE_NONE, AURA_CUES } from '../src/game/aura_cue_catalog';
 import {
   assignCooldownSpell,
-  COOLDOWN_GRID_MAX_SIDE,
   COOLDOWN_GROUP_NAME_MAX,
   COOLDOWN_LINE_MAX,
   COOLDOWN_MAX_GROUPS,
   type CooldownGroup,
   cooldownCell,
+  cooldownGroupActive,
   cooldownGroupCapacity,
   cooldownGroupOf,
   cooldownGroupShown,
@@ -70,12 +70,74 @@ describe('cooldown manager groups: capacity and layout cells', () => {
 });
 
 describe('cooldown manager groups: visibility and search', () => {
-  it('shows always, in combat only, or never, and the placement preview shows all', () => {
-    expect(cooldownGroupShown('always', false, false)).toBe(true);
-    expect(cooldownGroupShown('combat', false, false)).toBe(false);
-    expect(cooldownGroupShown('combat', true, false)).toBe(true);
-    expect(cooldownGroupShown('hidden', true, false)).toBe(false);
-    expect(cooldownGroupShown('hidden', false, true)).toBe(true);
+  const when = (
+    showOutOfCombat: boolean,
+    showInCombat: boolean,
+    showInWorld = true,
+    showInInstances = true,
+  ) => ({ showOutOfCombat, showInCombat, showInWorld, showInInstances });
+
+  it('shows by the ticked combat state, and the placement preview shows all', () => {
+    // [inCombat, inInstance]
+    expect(cooldownGroupShown(when(true, true), false, false, false)).toBe(true);
+    expect(cooldownGroupShown(when(true, true), true, false, false)).toBe(true);
+    expect(cooldownGroupShown(when(false, true), false, false, false)).toBe(false);
+    expect(cooldownGroupShown(when(false, true), true, false, false)).toBe(true);
+    expect(cooldownGroupShown(when(true, false), false, false, false)).toBe(true);
+    expect(cooldownGroupShown(when(true, false), true, false, false)).toBe(false);
+    expect(cooldownGroupShown(when(false, false), true, false, false)).toBe(false);
+    expect(cooldownGroupShown(when(false, false), true, false, true)).toBe(true);
+  });
+
+  it('shows and stays active only in the ticked places, combining with the combat row', () => {
+    const instanceOnly = when(true, true, false, true);
+    expect(cooldownGroupActive(instanceOnly, false)).toBe(false);
+    expect(cooldownGroupActive(instanceOnly, true)).toBe(true);
+    expect(cooldownGroupShown(instanceOnly, false, false, false)).toBe(false);
+    expect(cooldownGroupShown(instanceOnly, true, true, false)).toBe(true);
+    const worldOnly = when(true, true, true, false);
+    expect(cooldownGroupActive(worldOnly, false)).toBe(true);
+    expect(cooldownGroupActive(worldOnly, true)).toBe(false);
+    // In combat AND in an instance: both rows must hold.
+    const raidCombat = when(false, true, false, true);
+    expect(cooldownGroupShown(raidCombat, false, true, false)).toBe(false);
+    expect(cooldownGroupShown(raidCombat, true, false, false)).toBe(false);
+    expect(cooldownGroupShown(raidCombat, true, true, false)).toBe(true);
+    // No place ticked: off everywhere, though the preview still shows it.
+    const nowhere = when(true, true, false, false);
+    expect(cooldownGroupActive(nowhere, false)).toBe(false);
+    expect(cooldownGroupActive(nowhere, true)).toBe(false);
+    expect(cooldownGroupShown(nowhere, true, true, true)).toBe(true);
+    // The combat row never deactivates (mutes) a group.
+    expect(cooldownGroupActive(when(false, false), false)).toBe(true);
+  });
+
+  it('reads a pre-checkmark visibility save into the combat row, every place ticked', () => {
+    const read = (visibility: unknown) => {
+      const g = sanitizeCooldownGroup({ id: 'g1', kind: 'single', visibility });
+      return g && [g.showOutOfCombat, g.showInCombat, g.showInWorld, g.showInInstances];
+    };
+    expect(read('always')).toEqual([true, true, true, true]);
+    expect(read('combat')).toEqual([false, true, true, true]);
+    expect(read('hidden')).toEqual([false, false, true, true]);
+    expect(read('nonsense')).toEqual([true, true, true, true]);
+    // A checkmark save wins over any legacy field it still carries.
+    const both = sanitizeCooldownGroup({
+      id: 'g1',
+      kind: 'single',
+      visibility: 'hidden',
+      showOutOfCombat: true,
+      showInCombat: true,
+      showInWorld: false,
+      showInInstances: 'yes',
+    });
+    expect(both).toMatchObject({
+      showOutOfCombat: true,
+      showInCombat: true,
+      showInWorld: false,
+      showInInstances: true,
+    });
+    expect(both).not.toHaveProperty('visibility');
   });
 
   it('matches spell names by substring, ignoring case and accents; empty matches all', () => {
@@ -123,6 +185,8 @@ describe('cooldown manager groups: sanitizing a save', () => {
       orientation: 'diagonal',
       direction: 'sideways',
       visibility: 'sometimes',
+      showInCombat: 'often',
+      showInInstances: 1,
       showTimer: 'yes',
     });
     expect(wild).toMatchObject({
@@ -135,7 +199,10 @@ describe('cooldown manager groups: sanitizing a save', () => {
       lines: 12,
       orientation: 'horizontal',
       direction: 'forward',
-      visibility: 'always',
+      showOutOfCombat: true,
+      showInCombat: true,
+      showInWorld: true,
+      showInInstances: true,
       showTimer: true,
     });
   });
@@ -169,10 +236,27 @@ describe('cooldown manager groups: sanitizing a save', () => {
       soundId: AURA_CUE_NONE,
       soundVolume: 0.7,
       glowWhenReady: true,
-      onlyWhenReady: false,
+      showReady: true,
+      showNotReady: true,
       hotbarGlow: false,
       alertStacks: 0,
     });
+    // A pre-checkmark "Only Show When Ready" save is the ready box alone.
+    expect(sanitizeCooldownSpellConfig({ onlyWhenReady: true })).toMatchObject({
+      showReady: true,
+      showNotReady: false,
+    });
+    expect(sanitizeCooldownSpellConfig({ onlyWhenReady: false }).showNotReady).toBe(true);
+    expect(
+      sanitizeCooldownSpellConfig({ onlyWhenReady: true, showNotReady: true }).showNotReady,
+    ).toBe(true);
+    expect(sanitizeCooldownSpellConfig({ showReady: false })).toMatchObject({
+      showReady: false,
+      showNotReady: true,
+    });
+    expect(sanitizeCooldownSpellConfig({ onlyWhenReady: true })).not.toHaveProperty(
+      'onlyWhenReady',
+    );
     const cue = AURA_CUES[0].id;
     expect(sanitizeCooldownSpellConfig({ soundId: cue, hotbarGlow: true })).toMatchObject({
       soundId: cue,

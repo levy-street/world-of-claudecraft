@@ -312,3 +312,49 @@ export const TOWN_WALL_TALL_PILLAR_ALONG = 2.62 / 3.175;
 export const TOWN_WALL_SHORT_PILLAR_ALONG = -2.9 / 3.175;
 /** Pillar half-width as a fraction of the wing's native length. */
 export const TOWN_WALL_PILLAR_HW_FRAC = 0.36 / 6.35;
+
+/** One standing column of a ruin ring. */
+export interface RuinRingColumn {
+  /** Its index round the ring (the heights and tilts key off it). */
+  index: number;
+  x: number;
+  z: number;
+  /** Every fourth column is an intact monolith; the rest are broken stumps. */
+  intact: boolean;
+  /** The y scale the renderer draws it at. */
+  scaleY: number;
+  /** Its drawn top above the ground: the native top (1.0 intact, 0.65
+   *  broken) times the y scale, minus the 0.1 the group sinks. */
+  top: number;
+}
+
+/**
+ * The columns of a ruin ring, at the angles and heights BOTH the collider set
+ * and the renderer use. A ring may omit columns by index: the Fallen Chapel's
+ * nave ring drops the one that stood on the Hollow Crypt's door lane
+ * (src/sim/hollow_crypt_entrance.ts).
+ */
+export function ruinRingColumns(ring: {
+  readonly x: number;
+  readonly z: number;
+  readonly ringR: number;
+  readonly columns: number;
+  readonly omit?: readonly number[];
+}): RuinRingColumn[] {
+  const out: RuinRingColumn[] = [];
+  for (let index = 0; index < ring.columns; index++) {
+    if (ring.omit?.includes(index)) continue;
+    const ang = (index / ring.columns) * Math.PI * 2;
+    const intact = index % 4 === 1;
+    const scaleY = intact ? 3.5 + (index % 2) * 0.5 : 1.7 + (index % 3) * 0.85;
+    out.push({
+      index,
+      x: ring.x + Math.sin(ang) * ring.ringR,
+      z: ring.z + Math.cos(ang) * ring.ringR,
+      intact,
+      scaleY,
+      top: (intact ? 1 : 0.65) * scaleY - 0.1,
+    });
+  }
+  return out;
+}

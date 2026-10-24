@@ -379,6 +379,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Kronik Lembah, Bab II',
+    desc: 'Selesaikan bab kedua kronik Saul: tumbangkan bandit, murloc, dan hama tambang, lalu beranikan diri memasuki Relikuari.',
   },
   chr_vale_chapter_iii: {
     name: 'Kronik Sang Lembah',
@@ -1236,29 +1237,174 @@ export const table: DeedLocaleTable = {
     name: 'Tertangkap Saat Berbuat Buruk',
     desc: 'Tangkap Penari Mata Uang dalam Harta Karun Terkubur sebelum dia kabur dengan emas.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Lebih Terang dari Bayangan',
+    desc: 'Rebut kembali kantong koin yang dicuri dan keluar dari labirin Evergarden pada tingkat Hard.',
+  },
+  prog_titan: {
+    name: 'Raksasa',
+    desc: 'Dapatkan total 10.000.000 pengalaman seumur hidup.',
+    title: 'Raksasa',
+  },
   pvp_flag_1h: {
-    name: 'Pemberani',
-    desc: 'Biarkan PvP Dunia aktif selama 1 jam waktu bermain di dunia terbuka. Keluar dari permainan, mati, dan berada di instans menjeda progres; menonaktifkannya mengatur ulang progres. Gelar yang diperoleh bersifat permanen.',
-    title: 'Pemberani',
+    name: 'Berani',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 1 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Berani',
   },
   pvp_flag_3h: {
     name: 'Pembangkang',
-    desc: 'Biarkan PvP Dunia aktif selama 3 jam waktu bermain di dunia terbuka. Keluar dari permainan, mati, dan berada di instans menjeda progres; menonaktifkannya mengatur ulang progres. Gelar yang diperoleh bersifat permanen.',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 3 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
     title: 'Pembangkang',
   },
   pvp_flag_6h: {
     name: 'Tak Gentar',
-    desc: 'Biarkan PvP Dunia aktif selama 6 jam waktu bermain di dunia terbuka. Keluar dari permainan, mati, dan berada di instans menjeda progres; menonaktifkannya mengatur ulang progres. Gelar yang diperoleh bersifat permanen.',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 6 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
     title: 'Tak Gentar',
   },
   pvp_flag_24h: {
-    name: 'Pantang Menyerah',
-    desc: 'Biarkan PvP Dunia aktif selama 24 jam waktu bermain di dunia terbuka. Keluar dari permainan, mati, dan berada di instans menjeda progres; menonaktifkannya mengatur ulang progres. Gelar yang diperoleh bersifat permanen.',
-    title: 'Pantang Menyerah',
+    name: 'Tak Tergoyahkan',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 24 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Tak Tergoyahkan',
   },
   pvp_flag_168h: {
-    name: 'Tak Terkalahkan',
-    desc: 'Biarkan PvP Dunia aktif selama 7 hari waktu bermain di dunia terbuka. Keluar dari permainan, mati, dan berada di instans menjeda progres; menonaktifkannya mengatur ulang progres. Gelar yang diperoleh bersifat permanen.',
-    title: 'Tak Terkalahkan',
+    name: 'Tak Tertaklukkan',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 7 hari waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Tak Tertaklukkan',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Semua Lilin Menyala',
+    desc: 'Kalahkan Morthen Pemanggil Makam setelah menyalakan kembali keempat Lilin Kenangan dalam 20 detik setelah Perisai Arwah Gelisahnya muncul.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Diamlah Kini',
+    desc: 'Kalahkan Kantor Ilvane tanpa Ratapan Kehampaannya pernah mengenai siapa pun.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Tak Ada yang Dibiarkan Menggantung',
+    desc: 'Kalahkan Nyonya Dingin Tulang tanpa ia pernah menjatuhkan siapa pun dari Pelukan Bekunya.',
+  },
+  dgn_marrow_tidy: {
+    name: 'Halaman Gereja yang Rapi',
+    desc: 'Kalahkan Pengurus Makam Marrow dengan setiap Makam Terbuka ditempatkan di tepi Halaman Lonceng.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Bait Terakhir',
+    desc: 'Kalahkan Ysolei, Avatar Bulan Tenggelam, dengan Kantor Terakhir Paduan Suara Pucat di sisimu.',
+    title: 'Saksi Paduan Suara',
+  },
+  dgn_sledge_tusker: {
+    name: 'Muatan Dingin',
+    desc: 'Kalahkan Binatang Gading Penarik Kereta tanpa siapa pun terkena Injak-injaknya.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Es Tipis',
+    desc: 'Kalahkan Korzul Wyrm Makam dengan setidaknya dua belas dari sembilan belas lempeng danau tetap utuh.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Penghiburan Dingin',
+    desc: 'Kalahkan Nekromancer Agung Velkhar tanpa satu pun Pejalan Tulang yang Dibangkitkan bangkit untuk kedua kalinya.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Gembok Tetap Kukuh',
+    desc: 'Kalahkan Korgath yang Terikat pada kesulitan Heroik dengan setidaknya dua rantainya tidak pernah diputus.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Akhir yang Lebih Belas Kasih',
+    desc: 'Kalahkan Korgath yang Terikat setelah memutus keempat rantainya.',
+  },
+  dgn_great_saurian: {
+    name: 'Titan Tumbang',
+    desc: 'Kalahkan Kadal Raksasa dan Pemanggil Kutukan Tandunya dengan selisih waktu tidak lebih dari 20 detik.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Tak Pernah Tertangkap',
+    desc: 'Kalahkan Zulgar, Suara Cekungan, tanpa siapa pun dicabik.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Pengendalian Gulma',
+    desc: 'Kalahkan Bunga Pelahap tanpa satu pun Tunas Duri tumbuh.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Tetap Berjauhan',
+    desc: 'Kalahkan Penguasa Taring Sang Penguasa Binatang dan Jaguar Besarnya dengan Ikatan Kawanan aktif kurang dari 10 detik secara keseluruhan.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Tak Ada Kurungan yang Menahan Kami',
+    desc: 'Kalahkan Sipir Penjara tanpa siapa pun diremukkan di dalam Kurungan Besi.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Tak Sehelai Rambut Hangus',
+    desc: 'Kalahkan Wyrm Lonceng Kematian tanpa siapa pun terbakar Sapuan Api Unggunnya.',
+  },
+  dgn_mere_hydra: {
+    name: 'Semua Kepala Tumbang',
+    desc: 'Bunuh ketiga kepala Hidra Danau dengan selisih waktu tidak lebih dari 10 detik.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Tinggi dan Kering',
+    desc: 'Kalahkan Ysolei, Avatar Bulan Tenggelam, tanpa siapa pun terkena Hantaman Pasangnya.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Pecahkan Kacanya',
+    desc: 'Kalahkan Kolosus Kaca Pasang dengan setiap Bayangan dihancurkan dalam 15 detik setelah muncul.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Semua Suara Selaras',
+    desc: 'Kalahkan Ibu Paduan Suara Selthe dengan setiap Paduan Suara ditanggung bersama oleh dua pemain atau lebih dan tanpa Solo menyentuh pemain lain.',
+  },
+  dgn_turretback: {
+    name: 'Pemberitahuan Pengusiran',
+    desc: 'Kalahkan Kapten Kapal Karam tanpa siapa pun terkena Rentetan Meriam Hantu.',
+  },
+  dgn_vael_beacon: {
+    name: 'Dengan Cahaya Mercusuar',
+    desc: 'Kalahkan Vael Pengikat Kabut tanpa meledakkan satu pun Bayangan Kabut.',
+  },
+  dgn_ossick_moored: {
+    name: 'Pelabuhan Aman',
+    desc: 'Kalahkan Sipir Ossick tanpa siapa pun terseret ke Lubang Penenggelaman.',
+  },
+  dgn_olen_buttress: {
+    name: 'Pertahankan Tembok',
+    desc: 'Kalahkan Komandan Kesatria Olen tanpa Benteng Memantul miliknya pernah mengenai pemain kedua.',
+  },
+  cmb_point_taken: {
+    name: 'Ujung Tombak Berbicara',
+    desc: 'Padamkan lentera Mandor Jerami di lapangan latihan pengerahan dan buat papan-papannya merasakan hantaman.',
+  },
+  cmb_balgath_ten: {
+    name: 'Gundukan Tak Menyimpan Apa Pun',
+    desc: 'Tumbangkan Mandor Terkubur sepuluh kali.',
+  },
+  cmb_balgath: {
+    name: 'Bukan Mandor Lagi',
+    desc: 'Kembalikan Mandor Terkubur ke gundukan makamnya.',
+  },
+  dgn_guild_first_contract: {
+    name: 'Surat Perintah Ditandatangani',
+    desc: 'Selesaikan satu kontrak dungeon mingguan Balai Lentera.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Langganan Papan Kontrak',
+    desc: 'Selesaikan 10 kontrak dungeon mingguan Balai Lentera.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Veteran Kontrak',
+    desc: 'Selesaikan 50 kontrak dungeon mingguan Balai Lentera.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Pembawa Surat Perintah',
+    desc: 'Dibeli dari Garrick Holt, pengurus perbekalan Balai Lentera, dengan 6 Segel Lentera.',
+    title: 'Pembawa Surat Perintah',
+  },
+  feat_guild_hallsworn: {
+    name: 'Setia pada Balai',
+    desc: 'Dibeli dari Garrick Holt, pengurus perbekalan Balai Lentera, dengan 14 Segel Lentera.',
+    title: 'Setia pada Balai',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Dari Balai Lentera',
+    desc: 'Dibeli dari Garrick Holt, pengurus perbekalan Balai Lentera, dengan 24 Segel Lentera.',
+    title: 'dari Balai Lentera',
   },
 };

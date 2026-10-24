@@ -30,7 +30,12 @@ import {
   fenbridgeSupportMapFingerprint,
 } from '../scripts/assets/fenbridge_town/support_maps.mjs';
 import { FENBRIDGE_SURFACE_WORLD_SPAN } from '../src/render/fenbridge_surface_atlas';
-import { FENBRIDGE_LAYOUT, localToWorld } from '../src/sim/fenbridge_layout';
+import {
+  distancePointToObb,
+  FENBRIDGE_BUILDINGS_BY_ID,
+  FENBRIDGE_LAYOUT,
+  localToWorld,
+} from '../src/sim/fenbridge_layout';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const EVIDENCE_ROOT = path.join(REPO_ROOT, 'docs/screenshots/fenbridge-rebuild/assets');
@@ -40,14 +45,10 @@ const INTAKE_ROOT = path.join(REPO_ROOT, 'docs/design/fenbridge-rebuild/img2thre
 // compress_glb_textures.mjs is a fingerprint input from PR #3775's
 // Tripo baseColor UASTC routing. The GLBs were size-preserving reminted from
 // the candidate bytes so only the sourceFingerprint hex and sha256 pins moved.
-// v0.44.7: re-stamped only the two fingerprint fields after the package version
-// bump; reversing them restores each prior GLB byte for byte.
 const EXPECTED_SOURCE_FINGERPRINT =
-  '5f1dbd28ea76fe8a09e57e5a315e23ead5b97b9f296b4ca1c2175464e579e3fa';
+  '157bccf64a310bd0f277cf587d3e3765c7882feca45f28d3ca182e7c71e90870';
 const EXPECTED_SUPPORT_FINGERPRINT =
-  'fb8cc23a5076a734b1d2c20a365f43b2610be2319a9b2785bcde051a64ac6e1a';
-const FOUNDATION_TRIANGLES = 84;
-const RENDERER_HARD_CEILING = 88_000;
+  'ce9c07dde16bbddf7d44b29bcddd2ac4efc5e0d993c7ea93d42a85037314d38b';
 
 interface ExpectedArtifact {
   bytes: number;
@@ -59,85 +60,85 @@ interface ExpectedArtifact {
 const EXPECTED_ARTIFACTS: Readonly<Record<string, ExpectedArtifact>> = {
   warden_gatehouse: {
     bytes: 141_848,
-    sha256: 'd6a5a9c6433beceb506b42055a39bb88a0b5478141a6cfd06bb85f2e6ea3bb9b',
+    sha256: 'e88fd6dae6940e9035fa6e842396440a3610cb1f7bf2170ca4a099c716a4e217',
     triangles: 8_766,
     primitiveTriangles: [8_695, 71],
   },
   crooked_reed_inn: {
     bytes: 149_080,
-    sha256: '895331dfe52648b1bedee7eb125a8077de84b3cac90c44840c0e0e7ed10d1f76',
+    sha256: 'c31fef34fdeb94d5e7c76f46c692d651a718028e26ab44eb6a881e1063cd0429',
     triangles: 8_949,
     primitiveTriangles: [8_807, 142],
   },
   lantern_chapel: {
     bytes: 107_392,
-    sha256: '048d0a635a76dea0e785863bbbe7425e9d7d8b78969eb594cb78e8691ee0e0ff',
+    sha256: 'ddfb91a2d0d8b1a11394712e0389771e08bc5d549c47bb67656b89125752ced8',
     triangles: 6_671,
     primitiveTriangles: [6_486, 185],
   },
   moonwort_apothecary: {
     bytes: 104_468,
-    sha256: '2445a6947e9e80844b08c94dcd0693a40408e3f5c9bc200cca5f4c19f5efefca',
+    sha256: 'cbfda17b47365509a5e700baee7f97449b1ea74f3b754ca40f0602a057023076',
     triangles: 6_086,
     primitiveTriangles: [6_017, 69],
   },
   gilded_strongbox: {
     bytes: 69_908,
-    sha256: '172d0fed3ea980efca78b10d5ae7c2afd471db25072433894cdf5836e1b764f3',
+    sha256: '12beb0fffde44c256c13d9a6d30f1d2979f949d108581aa302927d887d01d371',
     triangles: 4_133,
     primitiveTriangles: [4_033, 100],
   },
   hesk_tannery: {
     bytes: 198_908,
-    sha256: '1db78a06a17f4f815ea0a86cffa6ad9c2088c47d437074056f2ba591af85a957',
+    sha256: '8fde736b53f069bb1f71d10aaaa7c5d4bc3ecd419fae71dd926e0894904a2642',
     triangles: 12_740,
     primitiveTriangles: [12_581, 159],
   },
   scout_lodge: {
     bytes: 110_556,
-    sha256: '5d7595ee1d2cc89021e9deb5143af61190610ab067106b186d5000caea192758',
+    sha256: 'e912c2e9bda513482c172ba109214e7c2814dc8b2bdd743dc9fecfd6c411c9e4',
     triangles: 6_507,
     primitiveTriangles: [6_431, 76],
   },
   mirelight_cistern: {
     bytes: 48_940,
-    sha256: 'f6af8e15501407f8beae39487b5d05bcb16e37da447be52dc90a304aaf1d9662',
+    sha256: 'f25dca1e89f3a549b8170bed4aeec9edf0d907107d5cb7a73111dfaef0c5595e',
     triangles: 2_388,
     primitiveTriangles: [2_328, 60],
   },
   provision_stall: {
     bytes: 26_332,
-    sha256: 'ff3c04c3f9f531d5f51c68319bf11a8b2d2681c4f6fb7c1f0e8ad5d8cd3682b8',
+    sha256: 'a78a3615c16813ff3ddf1f5e743f92526eade2d516fd87f946bb39b3fc5ffb3d',
     triangles: 1_304,
     primitiveTriangles: [1_280, 24],
   },
   palisade_wing: {
     bytes: 15_680,
-    sha256: 'b80a3f8247ee0d6b33e87ecd5b51a7f52e79bc75851b79110dae172b80b664ff',
+    sha256: '72b74ce891157517e9718c9849180610fc4da3e10179347a4194517dc7235ca4',
     triangles: 766,
     primitiveTriangles: [766],
   },
   gate_arch: {
     bytes: 24_276,
-    sha256: '3f680bc9ffadf4d3b068357f4e3b8b4f093ea8f6520c6ef8a55d843d4fd3d5d9',
+    sha256: 'e87172ea5455c898e3138c18d3be1fd5bbab72fbe15aaf90ab3174bd0151b8e2',
     triangles: 1_216,
     primitiveTriangles: [1_192, 24],
   },
   boardwalk: {
     bytes: 9_264,
-    sha256: 'b37632e5d71c56bea6bcd090f900689cc1947cc677a4d764f10e940c70480d61',
+    sha256: '22ca544534dcc0dd188405cc6151cdb16a9eecf8875cc47b7beb30e1bb6b6ceb',
     triangles: 376,
     primitiveTriangles: [376],
   },
   muster_board: {
     bytes: 17_480,
-    sha256: 'c8b12ea2693d8696b43aebc2c041bca6340353158720a7a140f511a1981aefbf',
+    sha256: '2098a8bf9884f75fc697e9aeb8a5510dbb197e628c9848bab599ae8a8aed4da1',
     triangles: 760,
     primitiveTriangles: [736, 24],
   },
   muster_order: {
     bytes: 6_888,
-    sha256: 'd02c8483f3ba856d862c63d154ab93b1b282b6c147d655fcab1f122b20adec0e',
+    sha256: '0ecad9e5ef82b6a1bc913646b1b39d04af30f9e1163de5e547dbe3746f3652e7',
     triangles: 204,
     primitiveTriangles: [204],
   },
@@ -145,8 +146,18 @@ const EXPECTED_ARTIFACTS: Readonly<Record<string, ExpectedArtifact>> = {
 const EXPECTED_TOTALS = {
   bytes: 1_031_020,
   uniqueTriangles: 60_866,
-  // boardwalk placementCount 12 (was 10): +2 * 376 tris
+  // The wave this family was exported for (model.js placementCount): one of
+  // each building and the boardwalk placementCount 12 (was 10: +2 * 376 tris).
   placementWeightedTriangles: 80_344,
+  // Added for the painted town: what the built-in town still places of this
+  // family (FENBRIDGE_LAYOUT). The painted Tidehold models replaced all seven
+  // buildings (-53_852) and the boardwalks went 12 to 10 (-752), so the town
+  // kept 25_740 of the wave. Re-pinned for the open town: the 16 palisade
+  // wings (-12_256) and the 4 gate arches (-4_864) came down, so it keeps
+  // 8_620: the cistern, stall, muster board, 10 boardwalks and the 2 muster
+  // orders. Sibling pin: the legacy-family share of the whole-town budget in
+  // tests/fenbridge_town_renderer.test.ts; move both together.
+  townPlacementTriangles: 8_620,
 } as const;
 
 const SUPPORT_MAPS = {
@@ -182,6 +193,30 @@ function sha256(bytes: Uint8Array): string {
 function outputPath(assetId: string): string {
   const contract = FENBRIDGE_TOWN_CONTRACTS[assetId];
   return path.join(REPO_ROOT, 'public', contract.outputDirectory, contract.outputName);
+}
+
+/** The URL the layout names a family asset by. */
+function familyAssetUrl(assetId: string): string {
+  const contract = FENBRIDGE_TOWN_CONTRACTS[assetId];
+  return `/${contract.outputDirectory}/${contract.outputName}`;
+}
+
+/** How many times the built-in town places each asset URL (FENBRIDGE_LAYOUT). */
+function townPlacementsByUrl(): Map<string, number> {
+  const placements = new Map<string, number>();
+  const place = (url: string): void => {
+    placements.set(url, (placements.get(url) ?? 0) + 1);
+  };
+  for (const building of FENBRIDGE_LAYOUT.buildings) place(building.assetId);
+  place(FENBRIDGE_LAYOUT.civic.cistern.assetId);
+  place(FENBRIDGE_LAYOUT.civic.provisionStall.assetId);
+  place(FENBRIDGE_LAYOUT.civic.musterBoard.assetId);
+  // Empty since the town opened (no wall wing, and the entrances carry no
+  // arch), but still counted, so a wing laid back on the ring shows up here.
+  for (const segment of FENBRIDGE_LAYOUT.wall.segments) place(segment.assetId);
+  for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) place(boardwalk.assetId);
+  for (const order of FENBRIDGE_LAYOUT.repeated.musterOrders) place(order.assetId);
+  return placements;
 }
 
 function expectApproxArray(
@@ -384,6 +419,45 @@ describe('Fenbridge shipping asset family', () => {
       const contract = FENBRIDGE_TOWN_CONTRACTS[assetId];
       expect(contract.sockets, `${assetId} socket contract`).toHaveLength(2);
       expect(contract.placementCount).toBeLessThanOrEqual(contract.placementCeiling);
+    }
+    // Added for the painted town: what the built-in town really places of this
+    // family (FENBRIDGE_LAYOUT), beside the wave it was exported for above.
+    // The painted Tidehold models replaced every building and the boardwalks
+    // went to 10, and the town never places more of an asset than that wave
+    // budgeted (the triangle sibling is EXPECTED_TOTALS.townPlacementTriangles).
+    // Re-pinned for the open town: the palisade wings and the gate arches came
+    // down, so the town places none of either.
+    const townPlacements = townPlacementsByUrl();
+    expect(
+      Object.fromEntries(
+        FENBRIDGE_TOWN_ASSET_IDS.map((id) => [id, townPlacements.get(familyAssetUrl(id)) ?? 0]),
+      ),
+    ).toEqual({
+      warden_gatehouse: 0,
+      crooked_reed_inn: 0,
+      lantern_chapel: 0,
+      moonwort_apothecary: 0,
+      gilded_strongbox: 0,
+      hesk_tannery: 0,
+      scout_lodge: 0,
+      mirelight_cistern: 1,
+      provision_stall: 1,
+      palisade_wing: 0,
+      gate_arch: 0,
+      boardwalk: 10,
+      muster_board: 1,
+      muster_order: 2,
+    });
+    for (const assetId of FENBRIDGE_TOWN_ASSET_IDS) {
+      expect(townPlacements.get(familyAssetUrl(assetId)) ?? 0, assetId).toBeLessThanOrEqual(
+        FENBRIDGE_TOWN_CONTRACTS[assetId].placementCount,
+      );
+    }
+    // Both ring models stay shipped (Studio still lists them); the town just
+    // stands none of them.
+    for (const assetId of ['palisade_wing', 'gate_arch'] as const) {
+      expect(existsSync(outputPath(assetId)), `${assetId} still shipped`).toBe(true);
+      expect(townPlacements.has(familyAssetUrl(assetId)), `${assetId} in town`).toBe(false);
     }
 
     const optimizerSpec = JSON.parse(
@@ -589,6 +663,8 @@ describe('Fenbridge shipping asset family', () => {
     let totalBytes = 0;
     let uniqueTriangles = 0;
     let placementWeightedTriangles = 0;
+    let townPlacementTriangles = 0;
+    const townPlacements = townPlacementsByUrl();
 
     for (const assetId of FENBRIDGE_TOWN_ASSET_IDS) {
       const contract = FENBRIDGE_TOWN_CONTRACTS[assetId];
@@ -727,21 +803,33 @@ describe('Fenbridge shipping asset family', () => {
       totalBytes += bytes.length;
       uniqueTriangles += triangles;
       placementWeightedTriangles += triangles * contract.placementCount;
+      townPlacementTriangles += triangles * (townPlacements.get(familyAssetUrl(assetId)) ?? 0);
     }
 
-    expect({ totalBytes, uniqueTriangles, placementWeightedTriangles }).toEqual({
+    expect({
+      totalBytes,
+      uniqueTriangles,
+      placementWeightedTriangles,
+      townPlacementTriangles,
+    }).toEqual({
       totalBytes: EXPECTED_TOTALS.bytes,
       uniqueTriangles: EXPECTED_TOTALS.uniqueTriangles,
       placementWeightedTriangles: EXPECTED_TOTALS.placementWeightedTriangles,
+      townPlacementTriangles: EXPECTED_TOTALS.townPlacementTriangles,
     });
     expect(totalBytes).toBeLessThanOrEqual(FENBRIDGE_TOWN_WAVE_CEILINGS.glbBytes);
     expect(uniqueTriangles).toBeLessThanOrEqual(FENBRIDGE_TOWN_WAVE_CEILINGS.uniqueTriangles);
     expect(placementWeightedTriangles).toBeLessThanOrEqual(
       FENBRIDGE_TOWN_WAVE_CEILINGS.placementWeightedTriangles,
     );
-    expect(placementWeightedTriangles + FOUNDATION_TRIANGLES).toBeLessThanOrEqual(
-      RENDERER_HARD_CEILING,
-    );
+    // Re-staged for the painted town: this check added the renderer's
+    // 84-triangle skirt reserve to the wave and held it under the renderer's
+    // 88_000 hard ceiling. The town stands none of this family's buildings
+    // now and reserves no skirt (the painted models bury their own footing),
+    // so the town's share of the family sits inside the exported wave, and
+    // the whole town (that share plus the painted buildings) is held under the
+    // hard ceiling by tests/fenbridge_town_renderer.test.ts.
+    expect(townPlacementTriangles).toBeLessThanOrEqual(placementWeightedTriangles);
     const supportBytes = Object.values(SUPPORT_MAPS).reduce(
       (sum, supportMap) => sum + supportMap.bytes,
       0,
@@ -751,40 +839,99 @@ describe('Fenbridge shipping asset family', () => {
     );
   });
 
-  it('matches every building front socket and the split bank entrance/teller contract exactly', () => {
-    for (const building of FENBRIDGE_LAYOUT.buildings) {
-      const contract = Object.values(FENBRIDGE_TOWN_CONTRACTS).find(
-        (candidate) => candidate.id === building.id,
+  it('keeps every shipped legacy building GLB on its own front-entry contract, none of them in town', () => {
+    // Re-staged for the painted town: this test matched each layout building to
+    // its GLB contract here (size, front socket, the strongbox's split
+    // entrance and teller window). The town's five buildings are painted
+    // Tidehold models now (makePlacedBuilding in src/sim/fenbridge_layout.ts),
+    // measured off their own files in tests/fenbridge_placed_buildings.test.ts,
+    // so the layout reads none of these contracts. The seven building GLBs stay
+    // shipped (Studio still lists them), so their own contract is pinned here
+    // on its own: one front entrance on the ground, on the +Z front face,
+    // inside the front's width.
+    const buildingIds = FENBRIDGE_TOWN_ASSET_IDS.filter((assetId) =>
+      FENBRIDGE_TOWN_CONTRACTS[assetId].sockets.some((socket) => socket.id === 'front-entry'),
+    );
+    expect(buildingIds).toEqual([
+      'warden_gatehouse',
+      'crooked_reed_inn',
+      'lantern_chapel',
+      'moonwort_apothecary',
+      'gilded_strongbox',
+      'hesk_tannery',
+      'scout_lodge',
+    ]);
+    const townPlacements = townPlacementsByUrl();
+    for (const assetId of buildingIds) {
+      const contract = FENBRIDGE_TOWN_CONTRACTS[assetId];
+      const entrance = contract.sockets.find((socket) => socket.id === 'front-entry');
+      if (!entrance) throw new Error(`${assetId} lost its front entrance`);
+      const [x, y, z] = entrance.position;
+      expect(y, `${assetId} entrance on the ground`).toBe(0);
+      expect(z, `${assetId} entrance on the front face`).toBe(contract.dimensions.depth / 2);
+      expect(Math.abs(x), `${assetId} entrance inside the front`).toBeLessThan(
+        contract.dimensions.width / 2,
       );
-      expect(contract, building.id).toBeDefined();
-      const entrance = contract?.sockets.find((socket) => socket.id === 'front-entry');
-      expect(entrance, `${building.id}:front-entry`).toBeDefined();
-      expect(building.nativeDimensions).toEqual(contract?.dimensions);
-      expect(building.sockets.entrance.localPosition).toEqual({
-        x: entrance?.position[0],
-        z: entrance?.position[2],
-      });
+      expect(existsSync(outputPath(assetId)), `${assetId} still shipped`).toBe(true);
+      expect(townPlacements.get(familyAssetUrl(assetId)), `${assetId} in town`).toBeUndefined();
     }
-
-    const bankBuilding = FENBRIDGE_LAYOUT.buildings.find(
-      (building) => building.id === 'fenbridge_gilded_strongbox',
-    );
-    if (!bankBuilding) throw new Error('Fenbridge bank building is missing');
-    expect(FENBRIDGE_LAYOUT.services.bank.entrance.localPosition).toEqual({ x: 1.75, z: 3.25 });
-    expect(FENBRIDGE_LAYOUT.services.bank.teller.localPosition).toEqual({ x: -1.25, z: 3.25 });
-    expect(FENBRIDGE_LAYOUT.services.bank.entrance.position).not.toEqual(
-      FENBRIDGE_LAYOUT.services.bank.teller.position,
-    );
-    expect(FENBRIDGE_LAYOUT.services.bank.teller.standingPoint).toEqual(
-      localToWorld(bankBuilding.position, bankBuilding.rotation, -1.25, 4.75),
-    );
-    const bankContract = FENBRIDGE_TOWN_CONTRACTS.gilded_strongbox;
-    expect(bankContract.sockets.find((socket) => socket.id === 'front-entry')?.position).toEqual([
+    // The strongbox GLB keeps its SPLIT contract: the teller window at counter
+    // height three yards along the same front from the door.
+    const strongbox = FENBRIDGE_TOWN_CONTRACTS.gilded_strongbox;
+    expect(strongbox.sockets.find((socket) => socket.id === 'front-entry')?.position).toEqual([
       1.75, 0, 3.25,
     ]);
-    expect(bankContract.sockets.find((socket) => socket.id === 'teller-window')?.position).toEqual([
+    expect(strongbox.sockets.find((socket) => socket.id === 'teller-window')?.position).toEqual([
       -1.25, 1.45, 3.25,
     ]);
+    // Every building the town stands is a painted Tidehold model instead.
+    for (const building of FENBRIDGE_LAYOUT.buildings) {
+      expect(building.assetId, building.id).toMatch(/\/tidehold\/(?:fenrire\/)?[a-z_]+\.glb$/);
+    }
+  });
+
+  it('stands the bank entrance and teller on one doorstep socket at the painted bank door', () => {
+    // Re-staged for the painted town: the strongbox GLB split its entrance and
+    // its teller window three yards apart along its front. The painted bank
+    // has one door and Petra keeps it, so the teller IS the entrance socket
+    // under its own id: the door on the model's front (-Z) wall face, in the
+    // MODEL's own axes at the bank's placed size, and the stand straight out
+    // of it, 1.8 yd at authored size, grown with the building.
+    const { bank } = FENBRIDGE_LAYOUT.services;
+    const bankBuilding = FENBRIDGE_BUILDINGS_BY_ID[bank.buildingId];
+    expect(bankBuilding.id).toBe('fenbridge_gilded_strongbox');
+    expect(bankBuilding.assetId).toMatch(/\/tidehold\/(?:fenrire\/)?shop_a\.glb$/);
+    expect(bank.entrance).toBe(bankBuilding.sockets.entrance);
+    // the authored door (-1.6, -4.2) at the grand bank's 1.5
+    const scale = bankBuilding.placement.scale;
+    expect(scale).toBe(1.5);
+    expect(bank.entrance.localPosition.x).toBeCloseTo(-1.6 * scale, 9);
+    expect(bank.entrance.localPosition.z).toBeCloseTo(-4.2 * scale, 9);
+    expect(bank.teller).toEqual({ ...bank.entrance, id: 'fenbridge_gilded_strongbox_teller' });
+    expect(bank.teller.id).not.toBe(bank.entrance.id);
+
+    const { x, z } = bank.entrance.localPosition;
+    const door = localToWorld(bankBuilding.placement, bankBuilding.rotation, x, z);
+    expect(bank.entrance.position.x).toBeCloseTo(door.x, 9);
+    expect(bank.entrance.position.z).toBeCloseTo(door.z, 9);
+    // The door is on the wall line: the wall box reads it at 0, and the stand
+    // straight out of it reads the full step, which a door set back inside the
+    // walls could not.
+    const step = 1.8 * scale;
+    expect(distancePointToObb(bank.entrance.position, bankBuilding.footprint)).toBeCloseTo(0, 9);
+    const stand = localToWorld(bankBuilding.placement, bankBuilding.rotation, x, z - step);
+    expect(bank.teller.standingPoint.x).toBeCloseTo(stand.x, 9);
+    expect(bank.teller.standingPoint.z).toBeCloseTo(stand.z, 9);
+    expect(
+      Math.hypot(
+        bank.teller.standingPoint.x - bank.entrance.position.x,
+        bank.teller.standingPoint.z - bank.entrance.position.z,
+      ),
+    ).toBeCloseTo(step, 9);
+    expect(distancePointToObb(bank.teller.standingPoint, bankBuilding.footprint)).toBeCloseTo(
+      step,
+      9,
+    );
   });
 
   it('requires complete render evidence and agent-reviewed >= 0.70 visual acceptance', async () => {

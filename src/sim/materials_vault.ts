@@ -2,7 +2,7 @@
 // the slot-based bank (bank.ts) at the same banker counter. Where the bank pools
 // SLOTS over a list of item stacks, the vault gives every material id one
 // shared count ceiling: rung 0 unlocks it for 2 gold and every further rung
-// widens that ceiling by 40, so the ladder reads 40/80/120/160/200. Ordinary
+// widens that ceiling by 100, so the ladder reads 100/200/.../1000. Ordinary
 // UNATTRIBUTED auto-craftable material remains pooled in a compact id-to-count
 // map. Identity-bearing material lives beside it in a full InvSlot collection,
 // preserving instance glyphs, crafted provenance AND per-unit source buckets
@@ -29,9 +29,11 @@
 // because every one was premium, rolled, bound, locked or recipe-marked;
 // plainly gathered material is none of those, so it stays drawable now that its
 // representation moved, and a premium bucket stays undrawable inside a mixed
-// row rather than refusing the row whole. Recording a gatherer grants no
-// benefit and unlocks no unit. The read and the spend take their per-id total
-// from the same helper, so they agree by construction.
+// row rather than refusing the row whole, with ONE exception: units signed with
+// the drawing crafter's own name are theirs to spend, after every plain unit
+// (vault_material_sources.ts autoDrawableSource). Recording a gatherer grants
+// no benefit and unlocks no unit. The read and the spend take their per-id
+// total from the same helper, so they agree by construction.
 //
 // Shape follows bank.ts exactly: free functions `fn(ctx, ...)` behind
 // SimContext, backing state on PlayerMeta.vault (persisted INSIDE the character
@@ -90,9 +92,11 @@ import { addStacked, bagPools, bagsFullError, countFit } from './bags';
 import { nearBanker } from './bank';
 import { warnDroppedInstanceKeys } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
+import { isItemLocked } from './item_lock_flag';
 import { normalizePartyTradeSlots } from './loot/bop_trade_cleanup';
 import { materialItemIds } from './material_ids';
 import { applyMaterialInventoryTake } from './material_inventory_take';
+import { savedMaterialSlot } from './material_slot_load';
 import { resolveMaterialSourceTransferSelection } from './material_source_transfer_selection';
 import type { MaterialComposition, MaterialSourceCount } from './material_sources';
 import type { PlayerMeta } from './sim';
@@ -107,26 +111,27 @@ import {
   sameMaterialComposition,
 } from './vault_material_sources';
 import {
-  appliedVaultRowAdd,
   coalesceVaultRows,
   loadVaultSpecialRow,
-  planVaultDeposit,
-  planVaultRowAdd,
+  planVaultDepositMutation,
   planVaultRowWithdraw,
   vaultRowMovesWhole,
 } from './vault_slot_ops';
 
 /** Per-material ceiling the first (unlocking) rung grants. */
-export const VAULT_BASE_CAP = 40;
+export const VAULT_BASE_CAP = 100;
 /** Extra per-material ceiling each rung past the unlock adds. */
-export const VAULT_UPGRADE_STEP = 40;
+export const VAULT_UPGRADE_STEP = 100;
 /** Copper cost of each successive vault rung, cheapest first: index 0 is the
- *  2 gold UNLOCK, the rest widen the ceiling. The entry count is the purchase
- *  cap, so the ladder tops out at 200 per material. Data-as-code: the price is
+ *  2 gold UNLOCK, the rest widen the ceiling (2g, 4g, 7g, 12g, 20g, 32g, 50g,
+ *  75g, 110g, 160g; 472g total). The entry count is the purchase cap, so the
+ *  ladder tops out at 1000 per material. Data-as-code: the price is
  *  always this table lookup, never a client-supplied value, so it is inherently
  *  overflow-safe. These are the compiled sim defaults; the server-side override
  *  seam is a later phase. */
-export const VAULT_UPGRADE_PRICES: readonly number[] = [20000, 50000, 100000, 200000, 400000];
+export const VAULT_UPGRADE_PRICES: readonly number[] = [
+  20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000,
+];
 
 /** GEOMETRY, not a price: the rung count client code may import (the client
  *  price-table guard bans VAULT_UPGRADE_PRICES itself from the client trees).
@@ -188,7 +193,7 @@ export function savedVaultState(state: MaterialsVaultState): SavedMaterialsVault
     ...(state.special.length > 0
       ? {
           special: state.special.map((slot) => {
-            const clone = cloneInvSlot(slot);
+            const clone = savedMaterialSlot(slot);
             delete clone.slot;
             return clone;
           }),
@@ -291,7 +296,7 @@ export function resolveVaultSpecialIndex(
 }
 
 /** How many of ONE material the vault can hold: nothing while locked, then
- *  40/80/120/160/200 as the rungs are bought. */
+ *  100/200/.../1000 as the rungs are bought. */
 export function vaultCapacityPerMaterial<T extends { upgrades: number }>(state: T): number {
   if (state.upgrades <= 0) return 0;
   return VAULT_BASE_CAP + VAULT_UPGRADE_STEP * (state.upgrades - 1);
@@ -321,7 +326,7 @@ function bumpVaultWireRev(meta: Pick<PlayerMeta, 'vaultWireRev'>): void {
  * cannot route one slot differently (the differential pin in
  * tests/materials_vault.test.ts would catch it). Callers read the compact row
  * themselves, keeping their own-property guards where a reader looks for them;
- * false means the plan refused with nothing written.
+ * null means refusal; success returns only the detached actual moved stack.
  */
 function applyVaultDeposit(
   vault: MaterialsVaultState,
@@ -330,8 +335,8 @@ function applyVaultDeposit(
   moved: number,
   pooled: number,
   selectedSources?: MaterialComposition,
-): boolean {
-  const plan = planVaultDeposit(
+): InvSlot | null {
+  const mutation = planVaultDepositMutation(
     vault.special,
     inventory[slotIndex],
     moved,
@@ -339,28 +344,9 @@ function applyVaultDeposit(
     vaultMaterialIds(),
     selectedSources,
   );
-  if (plan === null) return false;
+  if (mutation === null) return null;
+  const { plan, rows } = mutation;
   const itemId = inventory[slotIndex].itemId;
-  // Mergeable identity rows are packed at the VAULT's row size
-  // (vault_slot_ops.ts VAULT_ROW_STACK_SIZE), never the bag stack size: one
-  // material identity is one row however many units it holds. Whole-move
-  // payloads keep the item's normal fresh-row cap, so a tolerated over-cap
-  // locked stack splits into capped rows without allowing partial deposit.
-  // Both adds are decided on a copy before anything is written, so a refusal
-  // leaves the live store untouched; the packing core deep-clones every
-  // payload and composition it places, so the vault never aliases the removed
-  // carried row.
-  let rows: readonly InvSlot[] = vault.special;
-  if (plan.foldUnits > 0) {
-    const fold = planVaultRowAdd(rows, { itemId, count: plan.foldUnits }, vaultMaterialIds());
-    if (fold === null) return false;
-    rows = appliedVaultRowAdd(rows, fold);
-  }
-  if (plan.grant !== null) {
-    const grant = planVaultRowAdd(rows, plan.grant, vaultMaterialIds());
-    if (grant === null) return false;
-    rows = appliedVaultRowAdd(rows, grant);
-  }
   // A plain assignment is safe here (unlike the load path's fromEntries)
   // because the id passed the content-derived material set, which contains no
   // '__proto__'.
@@ -377,7 +363,7 @@ function applyVaultDeposit(
   // deposited from, not the one that stayed.
   if (plan.remaining === null) inventory.splice(slotIndex, 1);
   else inventory[slotIndex] = plan.remaining;
-  return true;
+  return cloneInvSlot(plan.grant ?? { itemId, count: moved });
 }
 
 /** Deposit a carried material into the vault. Ordinary UNATTRIBUTED fungible
@@ -389,6 +375,23 @@ function applyVaultDeposit(
  *  spends. A charge-bearing or locked stack moves whole or not at all
  *  (vault_slot_ops.ts vaultRowMovesWhole); any other payload splits the way
  *  the bags already split it. */
+/** Detached facts from one successful mutation, never a persistent last-delta
+ * field. Only actual transferred units are present; compact folds are absent. */
+export interface VaultMoveFacts {
+  readonly kind: 'move';
+  readonly slots: readonly InvSlot[];
+  readonly upgrades: number;
+}
+export interface VaultUpgradeFacts {
+  readonly kind: 'upgrade';
+  readonly price: number;
+  readonly upgrades: number;
+}
+export type VaultCommandFacts = VaultMoveFacts | VaultUpgradeFacts;
+
+export type VaultDepositArgs =
+  Parameters<typeof vaultDeposit> extends [SimContext, ...infer Args] ? Args : never;
+
 export function vaultDeposit(
   ctx: SimContext,
   slotIndex: number,
@@ -397,7 +400,7 @@ export function vaultDeposit(
     | number
     | import('./material_source_transfer_selection').MaterialSourceTransferSelection,
   pid?: number,
-): void {
+): VaultMoveFacts | undefined {
   const selection = typeof pidOrSelection === 'number' ? undefined : pidOrSelection;
   const resolvedPid = typeof pidOrSelection === 'number' ? pidOrSelection : pid;
   const r = ctx.resolve(resolvedPid);
@@ -445,6 +448,13 @@ export function vaultDeposit(
     return;
   const want = count === undefined ? slot.count : Math.floor(count);
   if (!(want > 0) || want > slot.count) return;
+  // A player-locked copy stays pinned in its bag cell (inventory_order.ts), the
+  // personal and guild banks' rule. Aloud here; the sweep's shared predicate
+  // (isVaultDepositableSlot) skips it silently.
+  if (isItemLocked(slot.instance)) {
+    ctx.error(meta.entityId, 'That item is locked and cannot be stored in the vault.');
+    return;
+  }
   // A charge-bearing or locked payload is one identity per unit, so only the
   // exact whole-stack request is valid for it. Every other payload already
   // rides counted stacks in the bags (a split clones it onto both halves), and
@@ -480,9 +490,11 @@ export function vaultDeposit(
   // together and the item count is conserved exactly. A slot (or an existing row
   // of the same material) whose provenance the shared model cannot read refuses
   // silently and writes nothing, the malformed-input idiom above.
-  if (!applyVaultDeposit(vault, meta.inventory, slotIndex, moved, pooled, selectedSources)) return;
+  const taken = applyVaultDeposit(vault, meta.inventory, slotIndex, moved, pooled, selectedSources);
+  if (taken === null) return;
   bumpVaultWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
+  return { kind: 'move', slots: [taken], upgrades: vault.upgrades };
 }
 
 /** The ONE eligibility predicate the deposit-all sweep and its UI replay
@@ -511,6 +523,7 @@ export function isVaultDepositableSlot(
 ): boolean {
   return (
     materialIds.has(slot.itemId) &&
+    !isItemLocked(slot.instance) &&
     Number.isInteger(slot.count) &&
     slot.count > 0 &&
     slot.count <= Number.MAX_SAFE_INTEGER
@@ -549,7 +562,7 @@ export function isVaultDepositableSlot(
  *  makes, so the sweep conserves counts exactly and a mid-list ineligible
  *  slot leaves everything else untouched. Draws NO rng, emits NO success
  *  text; ONE quest-inventory recompute at the end covers every moved stack. */
-export function vaultDepositAll(ctx: SimContext, pid?: number): void {
+export function vaultDepositAll(ctx: SimContext, pid?: number): VaultMoveFacts | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -565,7 +578,7 @@ export function vaultDepositAll(ctx: SimContext, pid?: number): void {
   }
   const cap = vaultCapacityPerMaterial(vault);
   const materials = vaultMaterialIds();
-  let movedAny = false;
+  const movedSlots: InvSlot[] = [];
   for (let i = meta.inventory.length - 1; i >= 0; i--) {
     const slot = meta.inventory[i];
     if (!isVaultDepositableSlot(slot, materials)) continue;
@@ -590,12 +603,14 @@ export function vaultDepositAll(ctx: SimContext, pid?: number): void {
     // before anything moves, the item count is conserved exactly, and a slot
     // whose provenance the shared model cannot read is SKIPPED (the sweep's
     // silent-skip idiom) rather than packed around.
-    if (!applyVaultDeposit(vault, meta.inventory, i, moved, pooled)) continue;
-    movedAny = true;
+    const taken = applyVaultDeposit(vault, meta.inventory, i, moved, pooled);
+    if (taken === null) continue;
+    movedSlots.push(taken);
   }
-  if (movedAny) {
+  if (movedSlots.length > 0) {
     bumpVaultWireRev(meta);
     ctx.onInventoryChangedForQuests(meta);
+    return { kind: 'move', slots: movedSlots, upgrades: vault.upgrades };
   }
 }
 
@@ -619,7 +634,7 @@ export function vaultWithdraw(
   specialOrPid?: VaultSpecialRef | number,
   pid?: number,
   selection?: VaultWithdrawSelection,
-): void {
+): VaultMoveFacts | undefined {
   const specialRef = typeof specialOrPid === 'number' ? undefined : specialOrPid;
   const resolvedPid = typeof specialOrPid === 'number' ? specialOrPid : pid;
   const r = ctx.resolve(resolvedPid);
@@ -707,7 +722,7 @@ export function vaultWithdraw(
       );
       bumpVaultWireRev(meta);
       ctx.onInventoryChangedForQuests(meta);
-      return;
+      return { kind: 'move', slots: [cloneInvSlot(outcome.taken)], upgrades: vault.upgrades };
     }
     const moved = countFit(
       meta.inventory,
@@ -726,7 +741,18 @@ export function vaultWithdraw(
     addStacked(meta.inventory, itemId, moved, slot.instance, slot.craftedRecipeId);
     bumpVaultWireRev(meta);
     ctx.onInventoryChangedForQuests(meta);
-    return;
+    return {
+      kind: 'move',
+      slots: [
+        cloneInvSlot({
+          itemId,
+          count: moved,
+          instance: slot.instance,
+          craftedRecipeId: slot.craftedRecipeId,
+        }),
+      ],
+      upgrades: vault.upgrades,
+    };
   }
   // hasOwn, not a plain index: withdraw is un-gated on the material set, so a
   // prototype-named itemId ('constructor', 'toString') would otherwise read an
@@ -757,6 +783,7 @@ export function vaultWithdraw(
   addStacked(meta.inventory, itemId, moved);
   bumpVaultWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
+  return { kind: 'move', slots: [{ itemId, count: moved }], upgrades: vault.upgrades };
 }
 
 /** How many units of `itemId` a vault stock RECORD can actually pay out: the
@@ -832,8 +859,9 @@ export function drawableCounterFor(
  *  provenance, no identity row was auto-drawable, because every one was
  *  premium, rolled, bound, locked or recipe-marked. Plainly gathered material is
  *  none of those, so it stays spendable now that its representation moved; a
- *  premium bucket stays unspendable, including inside a mixed row, and a row
- *  keeping any per-copy identity contributes nothing. `planVaultDraw` refuses
+ *  premium bucket stays unspendable, including inside a mixed row, unless
+ *  `selfSigner` names its own signer (the crafter spending units they signed),
+ *  and a row keeping any per-copy identity contributes nothing. `planVaultDraw` refuses
  *  anything past the SAME per-id total the projection publishes, which is what
  *  makes read and spend agree by construction rather than by review.
  *
@@ -862,6 +890,7 @@ export function consumeVaultStock(
   vault: MaterialsVaultState,
   itemId: string,
   count: number,
+  selfSigner?: string,
 ): boolean {
   const held = drawableVaultCount(vault.stock, itemId);
   // The WHOLE draw is planned before a single write, across BOTH stores: the
@@ -870,7 +899,14 @@ export function consumeVaultStock(
   // the eligible identity rows, where premium buckets stay untouched. A plan
   // that cannot be paid in full answers null and nothing moves, which is the
   // all-or-nothing contract this function has always had.
-  const plan = planVaultDraw(vault.stock, vault.special, itemId, count, vaultMaterialIds());
+  const plan = planVaultDraw(
+    vault.stock,
+    vault.special,
+    itemId,
+    count,
+    vaultMaterialIds(),
+    selfSigner,
+  );
   if (plan === null) return false;
   // Byte-for-byte `vaultWithdraw`'s write shape (delete at zero, else
   // decrement), and that is a requirement rather than a coincidence: it is the
@@ -894,9 +930,11 @@ export function consumeVaultStock(
 
 /** Apply a planned draw to a LIVE player vault and advance its wire revision
  *  immediately after the decrement. Scratch batch simulation keeps calling
- *  consumeVaultStock directly, so planning remains side-effect free. */
+ *  consumeVaultStock directly, so planning remains side-effect free. The
+ *  player's own name rides along so units they signed themself are spendable,
+ *  exactly as `vaultDrawStock` projected them. */
 export function consumePlayerVaultStock(meta: PlayerMeta, itemId: string, count: number): boolean {
-  if (!consumeVaultStock(meta.vault, itemId, count)) return false;
+  if (!consumeVaultStock(meta.vault, itemId, count, meta.name)) return false;
   bumpVaultWireRev(meta);
   return true;
 }
@@ -1002,7 +1040,7 @@ export function craftVaultDrawBlockedFor(ctx: SimContext, pid: number): boolean 
  *  (the resolved table's length, equal to VAULT_UPGRADE_PRICES.length by
  *  construction) and when the player cannot afford the table price; neither
  *  refusal mutates anything. */
-export function vaultBuyUpgrade(ctx: SimContext, pid?: number): void {
+export function vaultBuyUpgrade(ctx: SimContext, pid?: number): VaultUpgradeFacts | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -1033,6 +1071,7 @@ export function vaultBuyUpgrade(ctx: SimContext, pid?: number): void {
   // A purchase changes persisted trigger inputs, so re-check this player's
   // deeds, the same beat bankBuySlots ends on.
   ctx.markDeedsDirty(meta.entityId);
+  return { kind: 'upgrade', price, upgrades: vault.upgrades };
 }
 
 /** The proximity-gated vault snapshot the IWorld seam exposes (the bankInfoFor
@@ -1056,6 +1095,42 @@ export function vaultInfoWireRevFor(ctx: SimContext, pid: number): number | null
 /** Cheap ungated revision for the craft-from-vault wire. */
 export function vaultWireRevFor(ctx: SimContext, pid: number): number | null {
   return ctx.players.get(pid)?.vaultWireRev ?? null;
+}
+
+/** A synchronous read cursor may use these live references only while its pin
+ * remains current. No source/row copying or enumeration occurs at bootstrap. */
+type DeepReadonlyVault<T> = T extends readonly (infer Entry)[]
+  ? readonly DeepReadonlyVault<Entry>[]
+  : T extends object
+    ? { readonly [Key in keyof T]: DeepReadonlyVault<T[Key]> }
+    : T;
+
+export interface VaultInfoRead {
+  readonly value: DeepReadonlyVault<VaultInfo>;
+  readonly revision: number;
+  isCurrent(): boolean;
+}
+
+export function vaultInfoReadFor(ctx: SimContext, pid: number): VaultInfoRead | null {
+  const meta = vaultViewerFor(ctx, pid);
+  if (!meta) return null;
+  const vault = meta.vault;
+  const revision = meta.vaultWireRev;
+  return {
+    revision,
+    value: {
+      stock: vault.stock,
+      special: vault.special,
+      upgrades: vault.upgrades,
+      perMaterialCap: vaultCapacityPerMaterial(vault),
+      nextUpgradeCost:
+        vault.upgrades >= ctx.storagePrices.vaultUpgrades.length
+          ? null
+          : ctx.storagePrices.vaultUpgrades[vault.upgrades],
+    },
+    isCurrent: () =>
+      vaultViewerFor(ctx, pid) === meta && meta.vault === vault && meta.vaultWireRev === revision,
+  };
 }
 
 export function vaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {

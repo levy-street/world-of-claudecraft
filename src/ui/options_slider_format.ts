@@ -13,6 +13,8 @@ export function sliderFormatter(fmt: SliderFmt): (v: number) => string {
   if (fmt === 'degrees')
     return (v) => `${formatNumber(Math.round(v), { maximumFractionDigits: 0 })}°`;
   if (fmt === 'oneDecimal') return (v) => formatNumber(v, { maximumFractionDigits: 1 });
+  if (fmt === 'pixels')
+    return (v) => t('hudChrome.options.pixelsValue', { value: formatNumber(Math.round(v)) });
   if (fmt === 'shoulder')
     return (v) => {
       const r = actionCamShoulderReadout(v);

@@ -399,7 +399,10 @@ const IN_GLIMMERMERE_SHALLOWS = { x: -55, z: 765 }; // above the line, inside th
 const ON_WICKHARBOR_COVE_FLOOR = { x: 448, z: 400 }; // 3.6yd under the sea plane, no declared body
 const ON_A_DRY_SHORE_WITH_WATER_IN_REACH = { x: 210, z: -24 }; // dry underfoot, sea inside the disc
 const ON_MAZE_WALL_POCKET = { x: -232, z: 452 }; // steep, and encloses its own standable foot
-const DEEP_INSIDE_A_BUILDING = { x: 17, z: -6 }; // standable ground is 4.5yd out
+// Inside the sealed quay cottage (EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage):
+// re-staged there when the genshin artstyle merge (8bff2cec638) cleared the
+// Wolf Run barracks the old (17, -6) fixture sat inside.
+const DEEP_INSIDE_A_BUILDING = { x: -59, z: -55 }; // standable ground is 4yd out
 const ON_THE_EASTBROOK_NORTH_LANE = { x: 0, z: 10 }; // the road itself: dry, flat, unblocked
 
 const MAZE_WALL_FLOOD_BOX = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);

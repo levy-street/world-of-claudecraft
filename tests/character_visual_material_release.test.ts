@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX } from '../src/render/characters/tinted_material_cache_core';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 type VisualModule = typeof import('../src/render/characters/visual');
@@ -31,6 +32,7 @@ async function loadModules(): Promise<{ assets: AssetsModule; visual: VisualModu
   }));
   const assets = (await import('../src/render/characters/assets')) as AssetsModule;
   await assets.charactersReady();
+  await landWocBodies(assets);
   const visual = (await import('../src/render/characters/visual')) as VisualModule;
   return { assets, visual };
 }
@@ -127,34 +129,38 @@ describe('CharacterVisual tinted-material release', () => {
 
   it('color cycling with an active overlay holds one effect-clone set, not one per color', async () => {
     const { visual: visualModule } = await loadModules();
+    const { spiritVeilPassOf } = await import('../src/render/characters/ghost_veil');
     // tint: 'entity', the pooled-reuse case: setEntityColor re-runs
     // applySkinMaterials, swapping every SOURCE material the effect maps key
     // by. The ratchet that only emptied those maps in dispose() accumulated
     // one unreachable clone set per rift color worn.
     const v = new visualModule.CharacterVisual('mob_mushroom_pixie', 0x100000);
     v.setGhost(true);
-    const maps = v as unknown as { ghostMaterials: Map<THREE.Material, THREE.Material> };
-    const clonesPerSet = maps.ghostMaterials.size;
+    const maps = v as unknown as {
+      veilMaterials: Map<string, Map<THREE.Material, THREE.Material>>;
+    };
+    const veils = (): THREE.Material[] =>
+      [...maps.veilMaterials.values()].flatMap((bySource) => [...bySource.values()]);
+    const clonesPerSet = veils().length;
     expect(clonesPerSet).toBeGreaterThan(0);
-    const firstClones = [...maps.ghostMaterials.values()];
+    const firstClones = veils();
     const firstSpies = firstClones.map((mat) => vi.spyOn(mat, 'dispose'));
 
     for (let i = 1; i <= 12; i++) v.setEntityColor(0x100000 + i * 37);
 
     // One clone set for the CURRENT sources, not one per color worn, and the
     // first color's clones were genuinely disposed as their sources swapped.
-    expect(maps.ghostMaterials.size).toBe(clonesPerSet);
+    expect(veils()).toHaveLength(clonesPerSet);
     for (const spy of firstSpies) expect(spy).toHaveBeenCalledTimes(1);
 
     // The overlay survived the swaps visually: the mounted body material is
-    // a live ghost clone re-derived from the CURRENT source (transparent,
-    // faded), not the raw tint clone and not a stale disposed clone.
+    // a live veil re-derived from the CURRENT source, not the raw tint clone
+    // and not a stale disposed one.
     const body = v.root.getObjectByName('body') as THREE.Mesh;
     const mounted = body.material as THREE.Material;
-    expect([...maps.ghostMaterials.values()]).toContain(mounted);
+    expect(veils()).toContain(mounted);
     expect(firstClones).not.toContain(mounted);
-    expect(mounted.transparent).toBe(true);
-    expect(mounted.opacity).toBeLessThan(1);
+    expect(spiritVeilPassOf(mounted)).toBe('color');
 
     v.dispose();
   }, 20000);

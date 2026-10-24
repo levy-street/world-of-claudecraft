@@ -86,9 +86,10 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   of those sites resolve that through the shared `reagent_sources.ts` plan, so
   the gate can never approve a draw the consume performs differently. Vault
   units are reported on `CraftResult.vaultDraws`, present only when a unit
-  really moved. Two things stay INVENTORY-only on purpose: the #1145
-  self-signed discount and the masterwork signed-reagent term, because vault
-  stock is bare counts with no instance payloads and can carry no signer.
+  really moved. The vault may pay with units the crafter signed themself
+  (after every plain unit). The #1145 self-signed discount stays INVENTORY-only
+  on purpose; the masterwork signed-reagent term also reads the vault's
+  identity rows wherever the vault draw is allowed (`hasSignedInstance`).
 - `craft_cast_duration.ts`: the pure content-band duration table
   (`craftCastDurationSec`: skillReq/combo band, floor/ceiling clamp; no rng,
   no player state).

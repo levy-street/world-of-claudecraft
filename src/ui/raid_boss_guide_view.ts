@@ -71,7 +71,6 @@ import {
 import {
   NYTHRAXIS_BONE_STORM_CHARGE_SECONDS,
   NYTHRAXIS_BONE_STORM_CHARGES,
-  NYTHRAXIS_BONE_STORM_ENABLED,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
   NYTHRAXIS_BONE_STORM_RADIUS,
@@ -117,7 +116,6 @@ import {
   nythraxisKingsWrathDamageBonus,
   nythraxisWrathGraveEruptionEvery,
 } from '../sim/nythraxis_kings_wrath';
-import { NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS } from '../sim/nythraxis_soul_rend';
 import { IGNIVAR_BOSS_ID, NYTHRAXIS_ADDS_ENABLED, NYTHRAXIS_BOSS_ID } from '../sim/types';
 import { VARKHUL_ANVILS_DECREE_STRIKES } from '../sim/varkhul_anvils_decree';
 import {
@@ -624,7 +622,6 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
           flameHeroic: NYTHRAXIS_GRAVE_FLAME_SECONDS_HEROIC,
           tickNormal: NYTHRAXIS_GRAVE_FLAME_TICK_MAX_HP_NORMAL,
           tickHeroic: NYTHRAXIS_GRAVE_FLAME_TICK_MAX_HP_HEROIC,
-          gap: NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS,
         },
         percentValues: ['burstNormal', 'burstHeroic', 'tickNormal', 'tickHeroic'],
       },
@@ -773,7 +770,6 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       },
       {
         id: 'bone-storm',
-        enabled: NYTHRAXIS_BONE_STORM_ENABLED,
         iconId: 'raid_nythraxis_bone_storm',
         nameKey: key('nythraxis.boneStormName'),
         summaryKey: {

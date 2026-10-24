@@ -33,7 +33,8 @@ export type GpuPrepEventKind =
   | 'submit-stop'
   | 'live-program'
   | 'arrival'
-  | 'touch-unproven';
+  | 'touch-unproven'
+  | 'context-restore';
 
 export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'reveal-watchdog',
@@ -44,6 +45,7 @@ export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'live-program',
   'arrival',
   'touch-unproven',
+  'context-restore',
 ];
 
 /**
@@ -65,7 +67,10 @@ export interface GpuPrepEvent {
   kind: GpuPrepEventKind;
   /** What the event is about: a reveal key, a group name, a gate label. For
    *  an `arrival`: `cover` when the arrival curtain was up on the landing
-   *  frame, `no-cover` when the player landed in live frames. */
+   *  frame, `no-cover` when the player landed in live frames. For a
+   *  `context-restore`: how its world-draw hold ended (`settled`, `bound`,
+   *  `cancelled`, `disposed`); ageMs is the hold, readyRoots/totalRoots the
+   *  hold's units settled out of those submitted, units the records reset. */
   key: string;
   /** How long the target had been waiting when the escape fired. 0 for an
    *  `arrival`, which marks an instant. */
@@ -206,6 +211,7 @@ const counts: Record<GpuPrepEventKind, number> = {
   'live-program': 0,
   arrival: 0,
   'touch-unproven': 0,
+  'context-restore': 0,
 };
 
 const reveal: GpuPrepRevealCounters = {

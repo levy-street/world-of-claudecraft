@@ -1,0 +1,58 @@
+[
+  {
+    "id": "prog_rift_watch_trusted",
+    "src": "http://localhost:5194/ui/deeds/prog_rift_watch_trusted.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "prog_church_order_trusted",
+    "src": "http://localhost:5194/ui/deeds/prog_church_order_trusted.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "prog_automatons_trusted",
+    "src": "http://localhost:5194/ui/deeds/prog_automatons_trusted.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "prog_rift_watch_champion",
+    "src": "http://localhost:5194/ui/deeds/prog_rift_watch_champion.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "prog_church_order_champion",
+    "src": "http://localhost:5194/ui/deeds/prog_church_order_champion.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "prog_automatons_champion",
+    "src": "http://localhost:5194/ui/deeds/prog_automatons_champion.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "prog_faction_champion_all",
+    "src": "http://localhost:5194/ui/deeds/prog_faction_champion_all.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

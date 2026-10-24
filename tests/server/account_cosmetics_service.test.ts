@@ -1,9 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const { persist } = vi.hoisted(() => ({ persist: vi.fn() }));
+const { persist, persistWeapon } = vi.hoisted(() => ({
+  persist: vi.fn(),
+  persistWeapon: vi.fn(),
+}));
 vi.mock('../../server/db', () => ({
   grantAccountMountSkins: persist,
-  grantAccountWeaponSkins: vi.fn(),
+  grantAccountWeaponSkins: persistWeapon,
   grantAccountMechChroma: vi.fn(),
   markAccountQuestComplete: vi.fn(),
   setAccountWeaponSkinLoadout: vi.fn(),
@@ -12,6 +15,7 @@ vi.mock('../../server/db', () => ({
 import { EMPTY_LIVE_ACCOUNT_COSMETICS } from '../../server/account_cosmetics_live';
 import { AccountCosmeticsService } from '../../server/account_cosmetics_service';
 import { RETIRED_MOUNT_SKIN_IDS } from '../../src/sim/content/mount_skins';
+import { RESERVED_WEAPON_SKIN_IDS } from '../../src/sim/content/weapon_skins';
 
 const base = () => ({ ...EMPTY_LIVE_ACCOUNT_COSMETICS, mountSkinIds: [] as string[] });
 const flush = async () => {
@@ -20,6 +24,7 @@ const flush = async () => {
 afterEach(() => {
   vi.restoreAllMocks();
   persist.mockReset();
+  persistWeapon.mockReset();
 });
 
 function setup() {
@@ -38,6 +43,29 @@ function setup() {
   service.remember(7, base());
   return { service, sessions, sim };
 }
+
+describe('weapon skins reserved for a future raid', () => {
+  it('never mirrors one the economy ledger grants, nor grants one through the guild ledger', () => {
+    const { service, sessions } = setup();
+    expect(RESERVED_WEAPON_SKIN_IDS.length).toBe(4);
+    service.grantWeaponSkins(7, [...RESERVED_WEAPON_SKIN_IDS, 'not_a_skin']);
+    expect(persistWeapon).not.toHaveBeenCalled();
+    expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
+    const ledger = service.ledger(sessions[0] as never);
+    for (const id of RESERVED_WEAPON_SKIN_IDS) expect(ledger.grantWeaponSkin(id), id).toBe(false);
+    expect(sessions[0].accountCosmetics.weaponSkinIds).toEqual([]);
+    // Even an allowed earned skin must go through the atomic character/account
+    // purchase coordinator; a synchronous grant cannot safely charge seals.
+    expect(ledger.grantWeaponSkin('lantern_hall_sword')).toBe(false);
+    expect(persistWeapon).not.toHaveBeenCalled();
+    const purchase = vi.fn();
+    const onlineLedger = service.ledger(sessions[0], purchase);
+    onlineLedger.purchaseWeaponSkin?.('weapon_skin_lantern_hall_sword');
+    expect(purchase).toHaveBeenCalledExactlyOnceWith('weapon_skin_lantern_hall_sword');
+    expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
+    expect(persistWeapon).not.toHaveBeenCalled();
+  });
+});
 
 describe('durable mount skin grants', () => {
   it('never mirrors a retired skin the economy ledger still grants', () => {

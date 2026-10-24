@@ -10,7 +10,7 @@ import {
   WEAPON_VFX,
 } from '../src/render/weapon_vfx';
 
-const KNOWN_FX_KINDS = ['coreSprite', 'motes', 'aurora', 'drift', 'twinkles'];
+const KNOWN_FX_KINDS = ['coreSprite', 'motes', 'aurora', 'drift', 'twinkles', 'arcs'];
 
 describe('WEAPON_VFX specs', () => {
   it('has at least 20 weapons and every tier exists in TIERS', () => {

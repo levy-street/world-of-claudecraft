@@ -127,11 +127,13 @@ server store always canonical.
    the instance/room presence roster, so a healer or taunt tank who leaves no
    damage trace is still credited, and because instance slots are group-private
    a passenger riding the kill is the group's own choice, not open-world AFK.
-   Approved exception: the opt-in played-time deeds `pvp_flag_1h`,
-   `pvp_flag_3h`, `pvp_flag_6h`, `pvp_flag_24h`, and `pvp_flag_168h`
-   count connected flagged time alive in the open world, including AFK, but
-   pause while dead, inside every instance and on the Proving Shore.
-   Logout preserves progress; requesting PvP off resets it. Earned titles remain.
+   The five World PvP flag titles (`pvp_flag_1h`, `pvp_flag_3h`,
+   `pvp_flag_6h`, `pvp_flag_24h`, `pvp_flag_168h`) are the explicit exception:
+   they measure a continuous armed streak of played time, granting permanent
+   cosmetic titles at 1, 3, 6, 24 and 168 hours. Only connected, living players
+   outside sanctuary or inside a registered battleground or arena match
+   accumulate time; PvE instances, death and logout pause it. Requesting
+   World PvP off immediately resets the streak, including its disarm countdown.
 7. **Thresholds sit where natural play lands.** Most of the catalog is
    reachable in the first two-thirds of a character's journey; sub-1%
    unlocks are deliberate prestige only.

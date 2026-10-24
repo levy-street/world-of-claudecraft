@@ -11,7 +11,6 @@ export const TALENT_ABILITIES_V2_A = {
     castTime: 0,
     cooldown: 20,
     range: 35,
-    minRange: 8,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -56,14 +55,13 @@ export const TALENT_ABILITIES_V2_A = {
     castTime: 0,
     cooldown: 8,
     range: 35,
-    minRange: 8,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: false,
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 62, max: 74, radius: 8 }],
     description:
-      'Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)',
+      'Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. (Hunter talent)',
   },
   deterrence: {
     id: 'deterrence',
@@ -317,9 +315,10 @@ export const TALENT_ABILITIES_V2_A = {
     name: 'Shadeslip',
     class: 'rogue',
     learnLevel: 10,
-    cost: 20,
+    cost: 0,
     castTime: 0,
     cooldown: 24,
+    maxCharges: 2,
     range: 24,
     school: 'physical',
     requiresTarget: true,
@@ -330,7 +329,7 @@ export const TALENT_ABILITIES_V2_A = {
     targetType: 'any',
     effects: [{ type: 'blinkForward', distance: 24 }],
     description:
-      'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
+      'Steps through the shadows to your target, friend or foe, without breaking Duskveil. Stores up to 2 charges. (Rogue talent)',
   },
 
   silence: {

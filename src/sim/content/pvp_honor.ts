@@ -38,6 +38,7 @@
 // tests/warfare_gear_tier.test.ts. Design doc: docs/design/warfare.md.
 
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../eastbrook_layout';
+import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../pvp/world_pvp_trophy';
 import type { ItemDef, NpcDef } from '../types';
 import {
   SET_WARFARE_ASHSTALKER,
@@ -88,26 +89,6 @@ export const WARFARE_RATING_FRACTION = 1.0;
 // below the badge jewelry (WARFARE_JEWELRY_STAT_FRACTION above).
 export const WARFARE_CASTER_STAMINA_PREMIUM_SHARE = 0.5;
 
-// Season 1 sells for GOLD now that Warfare Season 2 is the honor tier (owner
-// rule, 2026-10-02: "make the last season of PvP sets just worth gold, perhaps
-// 100g for the set"). Copper per purchase, by slot: the seven armor pieces of
-// one family come to exactly 100 gold, split in proportion to the old honor
-// prices (5,400 Honor for the seven) and rounded to whole gold; jewelry and
-// weapons follow the same rate (neck 400 Honor to 7 gold, ring 275 to 5, weapon
-// 1,200 to 22). The two Warfare trinkets stay honor purchases.
-export const WARFARE_SEASON1_PRICE_COPPER = {
-  helmet: 170_000,
-  shoulder: 130_000,
-  chest: 220_000,
-  waist: 90_000,
-  legs: 190_000,
-  gloves: 100_000,
-  feet: 100_000,
-  neck: 70_000,
-  ring: 50_000,
-  mainhand: 220_000,
-} as const;
-
 export const WARFARE_ITEMS: Record<string, ItemDef> = {
   // Furyforged Battlegear: Strength and Stamina mail.
   furyforged_warhelm: {
@@ -122,7 +103,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 292, str: 6, sta: 10 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.helmet,
+    priceHonor: 900,
     sellValue: 0,
     soulbound: true,
   },
@@ -138,7 +119,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 240, str: 6, sta: 8 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.shoulder,
+    priceHonor: 700,
     sellValue: 0,
     soulbound: true,
   },
@@ -154,7 +135,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 335, str: 8, sta: 12 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.chest,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
   },
@@ -170,7 +151,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 224, str: 5, sta: 9 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.waist,
+    priceHonor: 450,
     sellValue: 0,
     soulbound: true,
   },
@@ -186,7 +167,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 315, str: 8, sta: 10 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.legs,
+    priceHonor: 1050,
     sellValue: 0,
     soulbound: true,
   },
@@ -202,7 +183,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 224, str: 5, sta: 9 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.gloves,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -218,7 +199,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 212, str: 7, sta: 6 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.feet,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -236,7 +217,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 292, int: 8, sta: 8, spi: 3 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.helmet,
+    priceHonor: 900,
     sellValue: 0,
     soulbound: true,
   },
@@ -252,7 +233,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 240, int: 6, sta: 7, spi: 3 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.shoulder,
+    priceHonor: 700,
     sellValue: 0,
     soulbound: true,
   },
@@ -268,7 +249,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 335, int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.chest,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
   },
@@ -284,7 +265,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 224, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.waist,
+    priceHonor: 450,
     sellValue: 0,
     soulbound: true,
   },
@@ -300,7 +281,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 315, int: 8, sta: 9, spi: 3 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.legs,
+    priceHonor: 1050,
     sellValue: 0,
     soulbound: true,
   },
@@ -316,7 +297,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 224, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.gloves,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -332,7 +313,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 212, int: 7, sta: 6, spi: 3 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.feet,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -350,7 +331,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 168, agi: 8, sta: 8 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.helmet,
+    priceHonor: 900,
     sellValue: 0,
     soulbound: true,
   },
@@ -366,7 +347,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 148, agi: 6, sta: 8 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.shoulder,
+    priceHonor: 700,
     sellValue: 0,
     soulbound: true,
   },
@@ -382,7 +363,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 172, agi: 8, sta: 12 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.chest,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
   },
@@ -398,7 +379,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 100, agi: 5, sta: 9 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.waist,
+    priceHonor: 450,
     sellValue: 0,
     soulbound: true,
   },
@@ -414,7 +395,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 132, agi: 8, sta: 10 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.legs,
+    priceHonor: 1050,
     sellValue: 0,
     soulbound: true,
   },
@@ -430,7 +411,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 104, agi: 5, sta: 9 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.gloves,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -446,7 +427,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 96, agi: 7, sta: 6 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.feet,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -464,7 +445,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 76, int: 8, sta: 8, spi: 3 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.helmet,
+    priceHonor: 900,
     sellValue: 0,
     soulbound: true,
   },
@@ -480,7 +461,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 56, int: 6, sta: 7, spi: 3 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.shoulder,
+    priceHonor: 700,
     sellValue: 0,
     soulbound: true,
   },
@@ -496,7 +477,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 90, int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.chest,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
   },
@@ -512,7 +493,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 48, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.waist,
+    priceHonor: 450,
     sellValue: 0,
     soulbound: true,
   },
@@ -528,7 +509,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 72, int: 8, sta: 9, spi: 3 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.legs,
+    priceHonor: 1050,
     sellValue: 0,
     soulbound: true,
   },
@@ -544,7 +525,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 52, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.gloves,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -560,7 +541,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 44, int: 7, sta: 6, spi: 3 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.feet,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -591,7 +572,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 168, int: 8, sta: 8, spi: 3 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.helmet,
+    priceHonor: 900,
     sellValue: 0,
     soulbound: true,
   },
@@ -607,7 +588,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 148, int: 6, sta: 7, spi: 3 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.shoulder,
+    priceHonor: 700,
     sellValue: 0,
     soulbound: true,
   },
@@ -623,7 +604,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 172, int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.chest,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
   },
@@ -639,7 +620,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 100, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.waist,
+    priceHonor: 450,
     sellValue: 0,
     soulbound: true,
   },
@@ -655,7 +636,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 132, int: 8, sta: 9, spi: 3 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.legs,
+    priceHonor: 1050,
     sellValue: 0,
     soulbound: true,
   },
@@ -671,7 +652,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 104, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.gloves,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -687,7 +668,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 96, int: 7, sta: 6, spi: 3 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.feet,
+    priceHonor: 550,
     sellValue: 0,
     soulbound: true,
   },
@@ -705,7 +686,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { str: 6, sta: 5 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.neck,
+    priceHonor: 400,
     sellValue: 0,
     soulbound: true,
   },
@@ -719,7 +700,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 6, sta: 5 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.neck,
+    priceHonor: 400,
     sellValue: 0,
     soulbound: true,
   },
@@ -733,7 +714,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 6, sta: 5, spi: 1 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.neck,
+    priceHonor: 400,
     sellValue: 0,
     soulbound: true,
   },
@@ -749,7 +730,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { str: 4, sta: 6 },
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.ring,
+    priceHonor: 275,
     sellValue: 0,
     soulbound: true,
   },
@@ -763,7 +744,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { str: 6, sta: 4 },
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.ring,
+    priceHonor: 275,
     sellValue: 0,
     soulbound: true,
   },
@@ -777,7 +758,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 6, sta: 4 },
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.ring,
+    priceHonor: 275,
     sellValue: 0,
     soulbound: true,
   },
@@ -791,7 +772,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 4, sta: 6 },
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.ring,
+    priceHonor: 275,
     sellValue: 0,
     soulbound: true,
   },
@@ -805,7 +786,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 6, sta: 4, spi: 1 },
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.ring,
+    priceHonor: 275,
     sellValue: 0,
     soulbound: true,
   },
@@ -819,7 +800,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 4, sta: 4, spi: 3 },
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.ring,
+    priceHonor: 275,
     sellValue: 0,
     soulbound: true,
   },
@@ -839,7 +820,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { str: 8, sta: 12 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.mainhand,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
     requiredClass: ['warrior', 'paladin', 'shaman'],
@@ -855,7 +836,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 8, sta: 12 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.mainhand,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
     requiredClass: ['rogue', 'hunter', 'druid'],
@@ -871,7 +852,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
-    buyValue: WARFARE_SEASON1_PRICE_COPPER.mainhand,
+    priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
@@ -894,16 +875,27 @@ export const FURY_STOCK: readonly string[] = Object.keys(WARFARE_ITEMS);
 // honor purchase.
 export const WARFARE_TRINKET_STOCK: readonly string[] = ['medallion_of_defiance', 'duelists_brand'];
 
-// What both honor quartermasters sell: the Warfare entry tier above (for gold,
-// WARFARE_SEASON1_PRICE_COPPER), then Warfare
+// World PvP goods: the Skull Bag (src/sim/pvp/skull_bag.ts), a 500 honor
+// sub-inventory for trophy skulls. No stats and no set, so it sits outside the
+// gear arithmetic; the shop window gives it its own Goods section.
+export const WORLD_PVP_GOODS_STOCK: readonly string[] = [WORLD_PVP_SKULL_BAG_ITEM_ID];
+
+// What both honor quartermasters sell: the Warfare entry tier above, then Warfare
 // Season 2 (content/pvp_honor_season2.ts), the item-level-35 spec sets and
-// weapons, with the two honor trinkets between them (the release pins the entry
-// tier as the head of the list and Season 2 as its tail). FURY_STOCK keeps
+// weapons, with the two honor trinkets and the World PvP goods between them
+// (the release pins the entry tier as the head of the list and Season 2 as its
+// tail). FURY_STOCK keeps
 // meaning the entry tier everywhere it is read.
 export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [
   ...FURY_STOCK,
   ...WARFARE_TRINKET_STOCK,
+  ...WORLD_PVP_GOODS_STOCK,
   ...SEASON2_STOCK,
+];
+/** Shared honor vendor stock; FURY_STOCK remains the gear-only list. */
+export const HONOR_VENDOR_STOCK: readonly string[] = [
+  ...HONOR_QUARTERMASTER_STOCK,
+  'whistle_horse',
 ];
 
 export const FURY_NPC: NpcDef = {
@@ -914,7 +906,7 @@ export const FURY_NPC: NpcDef = {
   facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.facing,
   color: 0xb52a2a,
   questIds: [],
-  vendorItems: [...HONOR_QUARTERMASTER_STOCK],
+  vendorItems: [...HONOR_VENDOR_STOCK],
   dynamic: true,
   // The Eastbrook mirror sells the identical stock, so it presents the identical
   // set-divided shop window. One canonical stock, two placements.

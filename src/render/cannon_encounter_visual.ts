@@ -1,19 +1,23 @@
 // Owner-only encounter pool. No shared entities, lights, profile-dependent
 // visibility or per-shot GPU allocation. The entry barrier warms every mesh
-// before the player can start the timed encounter.
+// before the player can start the timed encounter, the three rift portals
+// included: they are built hidden with the rest and only move and show when
+// a station's encounter starts.
 import * as THREE from 'three';
 import { CANNON_ACTIONS } from '../sim/content/cannon_encounter';
 import { VEHICLE_STATIONS } from '../sim/content/vehicle_stations';
 import type { VehicleSession } from '../sim/types';
 import { vehicleStationById } from '../sim/vehicle_stations';
-import { loadGltf } from './assets/loader';
 import { timeBuildSpan } from './build_spans';
 import { CannonEnemyVisuals } from './cannon_enemy_visuals';
 import { CannonTacticalVisuals, cannonBarrelTemplate } from './cannon_tactical_visuals';
 import { charactersReady } from './characters/assets';
 import { buildDoorBody, buildRiftGateBody } from './door_portal';
 import { attachSceneGroupGated } from './gated_scene_attach';
+import { loadStationScene } from './stations';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
+
+const PORTAL_LANES = [0.2, 0.5, 0.8] as const;
 
 export class CannonEncounterVisual {
   readonly group = new THREE.Group();
@@ -35,13 +39,13 @@ export class CannonEncounterVisual {
   private stationId: string | null = null;
   private readonly markers: { mesh: THREE.Mesh; u: number; v: number }[] = [];
   private readonly portalsRoot = new THREE.Group();
-  private readonly portals: { body: THREE.Group; portal?: THREE.Mesh }[] = [];
+  private readonly portals: { body: THREE.Group; portal?: THREE.Mesh }[];
 
   constructor(
     scene: THREE.Object3D,
     private readonly groundAt: (x: number, z: number) => number,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
-    private readonly lowGfx = false,
+    lowGfx = false,
   ) {
     this.group.name = 'personal-cannon-encounter';
     this.group.add(this.content);
@@ -67,6 +71,17 @@ export class CannonEncounterVisual {
       this.markers.push({ mesh: marker, u: (x - field.minX) / (field.maxX - field.minX), v: 1 });
     }
     this.portalsRoot.name = 'cannon-portals';
+    this.portalsRoot.visible = false;
+    // The rift gate GLB is a boot preload, settled before the Renderer (and so
+    // this pool) is built: the arch fallback only covers a missing asset.
+    this.portals = PORTAL_LANES.map(() => {
+      const built = buildRiftGateBody(lowGfx, 'A') ?? buildDoorBody(true, undefined, lowGfx);
+      built.body.name = 'cannon-rift-portal';
+      if (built.portal) built.portal.name = 'cannon-rift-portal-membrane';
+      built.body.scale.setScalar(0.85);
+      this.portalsRoot.add(built.body);
+      return built;
+    });
     this.content.add(this.portalsRoot);
     this.content.visible = false;
     this.readyForEntry = this.prepare(scene, compileGate);
@@ -87,9 +102,9 @@ export class CannonEncounterVisual {
     scene: THREE.Object3D,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
   ): Promise<void> {
-    const [, barrel] = await Promise.all([charactersReady(), loadGltf('/models/props/barrel.glb')]);
+    const [, barrel] = await Promise.all([charactersReady(), loadStationScene('barrel')]);
     if (this.disposed) return;
-    const template = cannonBarrelTemplate(barrel.scene);
+    const template = cannonBarrelTemplate(barrel);
     this.enemies = timeBuildSpan('zone:cannon-enemies', () => new CannonEnemyVisuals(template));
     this.tactics = new CannonTacticalVisuals(template, scene);
     this.content.add(this.tactics.root);
@@ -109,7 +124,7 @@ export class CannonEncounterVisual {
     this.content.visible = !!session;
     this.enemies?.update(session, dt, this.groundAt, reducedMotion);
     this.tactics?.update(session, this.groundAt, reducedMotion);
-    if (!reducedMotion) {
+    if (!reducedMotion && this.portalsRoot.visible) {
       for (const p of this.portals) {
         if (p.portal) p.portal.rotation.z += dt * 1.4;
       }
@@ -117,7 +132,7 @@ export class CannonEncounterVisual {
     if (!session || !station) {
       if (this.stationId !== null) {
         this.stationId = null;
-        this.clearPortals();
+        this.portalsRoot.visible = false;
       }
       return;
     }
@@ -129,19 +144,14 @@ export class CannonEncounterVisual {
         const z = field.minZ + v * (field.maxZ - field.minZ);
         mesh.position.set(x, this.groundAt(x, z) + 0.12, z);
       }
-      this.clearPortals();
-      for (const lane of [0.2, 0.5, 0.8]) {
-        const x = field.minX + lane * (field.maxX - field.minX);
+      for (let i = 0; i < this.portals.length; i++) {
+        const { body, portal } = this.portals[i];
+        const x = field.minX + PORTAL_LANES[i] * (field.maxX - field.minX);
         const z = field.minZ;
-        const built =
-          buildRiftGateBody(this.lowGfx, 'A') ?? buildDoorBody(true, undefined, this.lowGfx);
-        built.body.name = 'cannon-rift-portal';
-        if (built.portal) built.portal.name = 'cannon-rift-portal-membrane';
-        built.body.scale.setScalar(0.85);
-        built.body.position.set(x, this.groundAt(x, z), z);
-        this.portalsRoot.add(built.body);
-        this.portals.push(built);
+        body.position.set(x, this.groundAt(x, z), z);
+        if (portal) portal.rotation.z = 0;
       }
+      this.portalsRoot.visible = true;
     }
     const state = session.encounter;
     for (let i = 0; i < this.shots.length; i++) {
@@ -169,19 +179,12 @@ export class CannonEncounterVisual {
     }
   }
 
-  private clearPortals(): void {
-    for (const portal of this.portals) {
-      portal.body.removeFromParent();
-    }
-    this.portals.length = 0;
-  }
-
   dispose(): void {
     this.disposed = true;
     this.group.removeFromParent();
     this.enemies?.dispose();
     this.tactics?.dispose();
-    this.clearPortals();
+    this.portalsRoot.clear();
     this.sphere.dispose();
     this.box.dispose();
     this.ring.dispose();

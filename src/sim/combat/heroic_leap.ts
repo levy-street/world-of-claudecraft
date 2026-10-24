@@ -1,7 +1,9 @@
-import { MANTLE_REACH, resolvePosition, seatGroundedAt } from '../colliders';
+import { resolvePosition, seatGroundedAt } from '../colliders';
 import { VANGUARD_FURY_4PC_ENRAGE_DURATION_SEC } from '../content/vanguard_set_bonuses_a';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { riftPlayerLift } from '../rift/runs';
 import type { SimContext } from '../sim_context';
+import { traversalBand } from '../traversal_band';
 import { type AbilityDef, DT, ENRAGE_DMG_DONE, type Entity, type Vec3 } from '../types';
 import { groundHeight, terrainSteepnessAt, waterLevelAt } from '../world';
 import { hasUnbreakableMovementLock } from './cc';
@@ -106,7 +108,7 @@ export function computeHeroicLeapLanding(
   from: { x: number; y: number; z: number; onGround: boolean },
   to: { x: number; z: number },
 ): { x: number; z: number } {
-  const lift = from.onGround ? 0 : MANTLE_REACH;
+  const lift = from.onGround ? 0 : traversalBand();
   const landing = sweepLeapLanding(
     seed,
     from.x,
@@ -160,12 +162,17 @@ function wasExternallyRelocated(entity: Entity): boolean {
   );
 }
 
-export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
+export function sweptLanding(
+  ctx: SimContext,
+  entity: Entity,
+  aim: Vec3,
+  feetY: number = entity.pos.y,
+): Vec3 {
   return sweepLeapLanding(
     ctx.cfg.seed,
     entity.pos.x,
     entity.pos.z,
-    entity.pos.y,
+    feetY,
     aim,
     (x, z) => ctx.resolveMovePoint(x, z, PLAYER_BODY_RADIUS, entity),
     (x, z) =>
@@ -176,7 +183,7 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
         PLAYER_BODY_RADIUS,
         false,
         undefined,
-        { y: entity.pos.y + FLIGHT_APEX, lift: 0 },
+        { y: feetY + FLIGHT_APEX, lift: 0 },
         ctx.riftCollisionToken,
       ),
   );
@@ -201,11 +208,18 @@ export function armHeroicLeap(
   ability: Pick<AbilityDef, 'id' | 'name' | 'school'>,
 ): void {
   if (hasUnbreakableMovementLock(entity)) return;
-  const landing = sweptLanding(ctx, entity, aim);
+  // A rift's raised deck is a Y lift the movement step strips before it runs and
+  // re-applies after (player_movement_modes.ts, rift/runs.ts riftPlayerLift), so
+  // the flight lives in the lift-free frame that step sees. Armed in the lifted
+  // frame, the strip on the first tick read as an outside relocation and the leap
+  // cancelled itself with its cooldown spent (Warlord Grask player report). The
+  // landing seats on the flat floor and the lift puts it back on the deck.
+  const feetY = entity.pos.y - riftPlayerLift(ctx, entity);
+  const landing = sweptLanding(ctx, entity, aim, feetY);
   entity.chargeTargetId = null;
   entity.chargePath = [];
   entity.leap = {
-    from: { ...entity.pos },
+    from: { ...entity.pos, y: feetY },
     to: landing,
     elapsed: 0,
     duration: FLIGHT_DURATION,
@@ -222,6 +236,9 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
   if (!flight) return false;
   if (entity.dead || hasUnbreakableMovementLock(entity) || wasExternallyRelocated(entity)) {
     entity.leap = null;
+    // Stopped before it ever left the ground: the leap never happened, so it
+    // costs no cooldown. One stopped mid-air was a real leap and keeps it.
+    if (flight.elapsed <= 0) entity.cooldowns.delete(flight.abilityId);
     return false;
   }
 
@@ -237,19 +254,36 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
   entity.jumping = false;
   entity.fallStartY = entity.pos.y;
   entity.leap = null;
-  ctx.emit({
-    type: 'spellfxAt',
-    x: entity.pos.x,
-    z: entity.pos.z,
-    school: flight.school,
-    fx: 'nova',
-    radius: flight.landingAoe.radius,
-    ability: flight.abilityId,
-  });
-  for (const target of ctx.hostilesInRadius(entity, entity.pos, flight.landingAoe.radius)) {
-    if (!ctx.hasLineOfSight(entity, target)) continue;
-    const damage = Math.round(ctx.rng.range(flight.landingAoe.min, flight.landingAoe.max));
-    ctx.dealDamage(entity, target, damage, false, flight.school, flight.abilityName, 'hit');
+  // A flight with no landing blast (the Muster Grapnel's haul, balgath_trinkets.ts)
+  // lands quietly: no nova, no damage sweep, no draw.
+  if (flight.landingAoe.radius > 0) {
+    ctx.emit({
+      type: 'spellfxAt',
+      x: entity.pos.x,
+      z: entity.pos.z,
+      school: flight.school,
+      fx: 'nova',
+      radius: flight.landingAoe.radius,
+      ability: flight.abilityId,
+    });
+    for (const target of ctx.hostilesInRadius(entity, entity.pos, flight.landingAoe.radius)) {
+      if (!ctx.hasLineOfSight(entity, target)) continue;
+      const damage = Math.round(ctx.rng.range(flight.landingAoe.min, flight.landingAoe.max));
+      ctx.dealDamage(entity, target, damage, false, flight.school, flight.abilityName, 'hit');
+    }
+  }
+  // The Muster Grapnel's haul lands with a heal from whoever threw it (never crits, so
+  // the tooltip's number is the number healed; draws no rng).
+  if (flight.landingHeal) {
+    const healer = ctx.entities.get(flight.landingHeal.sourceId) ?? entity;
+    ctx.applyHeal(
+      healer,
+      entity,
+      flight.landingHeal.amount,
+      flight.landingHeal.name,
+      flight.abilityId,
+      false,
+    );
   }
   enrageOnVaultingLanding(ctx, entity, flight.abilityId);
   return true;

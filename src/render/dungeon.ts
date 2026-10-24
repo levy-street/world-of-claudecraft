@@ -5,15 +5,8 @@
 // drift. Repeated modules render as one InstancedMesh per kind (~30 draws
 // per interior instance).
 //
-// Three looks from two layouts:
-//   Hollow Crypt   (interior 'crypt',  origin x 900 band)  - blue flame, coffins/graves/bones
-//   Sunken Bastion (interior 'crypt',  origin x 1500 band) - teal flame, cargo/banners fortress
-//   Gravewyrm Sanctum (interior 'sanctum')                 - green ritual fire, necromantic
-//   Drowned Temple (interior 'temple')                     - pale moon-violet, drowned reliquaries
-//   Abandoned Crypt raid (interior 'nythraxis')            - dark violet soul wards
-//   Crucible of the Last Spring (interior 'ignivar')       - hot amber forge light
+// Per-interior layouts and themes select their own kit dressing and lighting.
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arenaOriginAt, instanceOrigin } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
@@ -50,7 +43,7 @@ import {
   type WallSeg,
 } from '../sim/rift/authored';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
 import { hash2, stackDaisBlocks } from './dais_blocks_core';
@@ -64,12 +57,25 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import {
+  type DungeonPlacementRecord,
   type PendingArenaWall,
   type PendingArenaWalls,
   Placements,
   pendingArenaWallsFor,
 } from './dungeon_arena_walls';
+
+// Re-exported for the editor's shipped-map adapter, which reads the tape here.
+export type { DungeonPlacementRecord } from './dungeon_arena_walls';
+
 import { dungeonBannerKind, hangsKitBanners } from './dungeon_banner_core';
+import {
+  capturePlacementRecords,
+  disposeKeyedInterior,
+  type KeyedBuildRegistries,
+  type KeyedInteriorBuild,
+  keyedBuildTracker,
+} from './dungeon_keyed_builds';
+import { createTempleWaterMaterial } from './dungeon_temple_water';
 import {
   dungeonFloorKind,
   dungeonFloorQuadKind,
@@ -89,7 +95,7 @@ import {
 } from './dungeon_wall_occlusion';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
-import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT } from './gfx';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
 import { buildIgnivarLavaMoat, ensureIgnivarLavaMoatAssets } from './ignivar_lava_moat';
 import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
@@ -110,13 +116,13 @@ import {
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { OPEN_AIR_FIELDS, OpenAirFieldRoster } from './open_air_fields';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { riftPlatformSlabs } from './rift_platform_core';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
 import { radialGlowTexture } from './textures';
 import { addTorchGlowDecal } from './torch_glow_decal';
-import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
 
 const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
@@ -199,6 +205,12 @@ export function dungeonVariantKeepsFightingFloorClear(variant: DungeonInteriorVa
   return isArenaVariant(variant) || variant === 'ignivar';
 }
 
+/** The point-light colour a variant's torches burn, so the editor can seat the
+ *  same warm glow on an imported dungeon map (editor/shipped_maps.ts). */
+export function dungeonTorchLightColor(variant: DungeonInteriorVariant): number {
+  return TORCH_COLORS[variant].light;
+}
+
 // The Drowned Litany reuses the same KayKit crypt-stone wall/floor/pillar kit as
 // every other interior, so without a tint it would just read as a recolored
 // crypt. These multiply the shared pack material toward wet mossy stone (walls,
@@ -235,55 +247,6 @@ const KEEP_FLOOR_TINT = 0xdccdb2;
 // tintedMaterial path; no other interior is touched.
 const DAWNHOLD_WALL_TINT = 0xf0e7ca;
 const DAWNHOLD_FLOOR_TINT = 0xe2ddb8;
-
-// The Drowned Temple is flooded — a translucent, self-animating water sheet
-// (driven by the shared uTime so it needs no per-frame plumbing) with cheap
-// layered-sine caustics, a fresnel sheen and bioluminescent glow in the
-// ripples. Nothing else in the game floods its floor, which is the point.
-const TEMPLE_WATER_VERT = /* glsl */ `
-  uniform float uTime;
-  varying vec3 vWPos;
-  #include <fog_pars_vertex>
-  void main() {
-    vec3 pos = position;
-    pos.y += sin(uTime * 1.3 + pos.x * 0.5) * 0.02 + sin(uTime * 0.9 + pos.z * 0.42) * 0.02;
-    vec4 wp = modelMatrix * vec4(pos, 1.0);
-    vWPos = wp.xyz;
-    // Name this mvPosition: the fog_vertex chunk reads mvPosition for vFogDepth,
-    // so a different name fails to compile once USE_FOG is defined (outdoor fog).
-    vec4 mvPosition = viewMatrix * wp;
-    gl_Position = projectionMatrix * mvPosition;
-    #include <fog_vertex>
-  }
-`;
-const TEMPLE_WATER_FRAG = /* glsl */ `
-  uniform float uTime;
-  uniform vec3 uShallow;
-  uniform vec3 uDeep;
-  uniform vec3 uGlow;
-  varying vec3 vWPos;
-  #include <common>
-  #include <fog_pars_fragment>
-  void main() {
-    vec3 V = normalize(cameraPosition - vWPos);
-    float fres = 0.12 + 0.88 * pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
-    // layered-sine caustic web (three octaves so the veins read from any angle)
-    vec2 p = vWPos.xz;
-    float c = sin(p.x * 0.8 + uTime * 1.1) * sin(p.y * 0.75 - uTime * 0.95)
-            + 0.6 * sin((p.x - p.y) * 0.55 + uTime * 0.8)
-            + 0.4 * sin((p.x + p.y) * 1.3 - uTime * 1.4);
-    float caust = smoothstep(0.5, 1.5, c * 0.5 + 0.7);
-    // slow deep/shallow banding so the sheet never reads as a flat slab
-    vec3 col = mix(uDeep, uShallow, 0.45 + 0.45 * sin(p.x * 0.18 + p.y * 0.12 + uTime * 0.3));
-    col += uGlow * caust;                            // bright bioluminescent veins
-    col = mix(col, uShallow * 1.35, fres * 0.55);    // glassy fresnel sheen at grazing
-    float alpha = clamp(0.72 + caust * 0.22, 0.0, 0.97);
-    gl_FragColor = vec4(col, alpha);
-    #include <tonemapping_fragment>
-    #include <colorspace_fragment>
-    #include <fog_fragment>
-  }
-`;
 
 // ---------------------------------------------------------------------------
 // Module assets: loaded once at import, geometry merged per model, one shared
@@ -384,7 +347,7 @@ function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
   geo.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
 }
 
-function extractModule(name: string, pack: Pack, gltf: GLTF): void {
+function extractModule(name: string, pack: Pack, gltf: LoadedGltf): void {
   const geos: THREE.BufferGeometry[] = [];
   gltf.scene.updateMatrixWorld(true);
   gltf.scene.traverse((obj) => {
@@ -413,8 +376,10 @@ function extractModule(name: string, pack: Pack, gltf: GLTF): void {
 }
 
 function loadModuleAsset(name: string, pack: Pack): Promise<void> {
+  if (moduleAssets.has(name)) return Promise.resolve();
   const url = `models/dungeon/${name}.glb`;
   return loadGltf(url).then((g) => {
+    if (moduleAssets.has(name)) return;
     extractModule(name, pack, g);
     releaseGltf(url);
   });
@@ -424,7 +389,12 @@ export function ensureDungeonAssets(): Promise<void> {
   dungeonAssetsPromise ??= Promise.all([
     ...KIT_MODELS.map((name) => loadModuleAsset(name, 'kit')),
     ...BITS_MODELS.map((name) => loadModuleAsset(name, 'bits')),
-  ]).then(() => undefined);
+  ])
+    .then(() => undefined)
+    .catch((error) => {
+      dungeonAssetsPromise = null;
+      throw error;
+    });
   return dungeonAssetsPromise;
 }
 
@@ -553,7 +523,10 @@ export class DungeonInteriors {
   private waterMat: THREE.ShaderMaterial | null = null;
   private arenaHideables: WallHideable[] = [];
   private wallPropBindings: WallPropBinding[] = [];
+  // Keyed builds the world editor's dungeon mode rebuilds live (dungeon_keyed_builds.ts).
+  private builtByKey = new Map<string, KeyedInteriorBuild>();
   private readonly interiorResources = new Map<THREE.Group, OwnedInteriorResourceRegistry>();
+  readonly openAirFields = new OpenAirFieldRoster();
 
   constructor(
     private scene: THREE.Scene,
@@ -566,6 +539,10 @@ export class DungeonInteriors {
     // but the lazily minted tinted grades (tintedMats) and bespoke shaders
     // otherwise link synchronously at first draw.
     private compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    // World-editor dungeon mode only: the RAW fire-light registry behind the
+    // sink above, plus its rank-dirty hook (see dungeon_keyed_builds.ts).
+    private fireLightRegistry?: THREE.PointLight[],
+    private onFireLightsChanged?: () => void,
     // The renderer removes lights, flames, and hideable-wall entries that are
     // registered outside the interior root when a build fails. The resource
     // registry itself is always cleaned here, even for direct/off-screen users.
@@ -647,21 +624,30 @@ export class DungeonInteriors {
       // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
       // overrides the torch/light colours. Undefined for authored dungeons/delves.
       style?: InteriorStyle;
+      /** Track this build so disposeInterior(key) can tear it down live
+       *  (world-editor dungeon mode). Untracked without it. */
+      key?: string;
+      /** Editor importer only: compute the exact placement plan without
+       *  loading assets, emitting meshes, or attaching the group to a scene. */
+      captureOnly?: boolean;
     },
   ): Promise<THREE.Group> {
-    await ensureDungeonAssets();
-    await ensureIgnivarRaidDressingAssets(interior);
-    await ensureIgnivarTileAssets(interior, loadModuleAsset);
-    if (interior === 'wildheart') {
-      const group = buildWildheartFieldInterior({
-        lowGfx: this.lowGfx,
-        flames: this.flames,
-        fireLights: this.fireLights,
-      });
-      group.position.set(ox, 0, oz);
-      group.userData.renderCategory = 'dungeon';
+    if (!opts?.captureOnly) {
+      await ensureDungeonAssets();
+      await ensureIgnivarRaidDressingAssets(interior);
+      await ensureIgnivarTileAssets(interior, loadModuleAsset);
+    }
+    // Snapshot AFTER the asset awaits: the kit build below is synchronous (an
+    // open-air field's own builder may await, so a keyed field build must not
+    // race another build; the editor builds one at a time).
+    const track = keyedBuildTracker(this.builtByKey, opts?.key, () => this.keyedRegistries());
+    const field = OPEN_AIR_FIELDS[interior];
+    if (field) {
+      // Open-air fields: their own builders, same deps and compile gate.
+      const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
+      const group = await this.openAirFields.build(field, deps, ox, oz);
       await attachSceneGroupGated(this.scene, group, this.compileGate);
-      return group;
+      return track(group);
     }
     // Delve modules pass an explicit per-module layout so render geometry matches
     // the SAME layout sim/colliders.ts derives collision from (what you see is
@@ -767,6 +753,7 @@ export class DungeonInteriors {
           if (layout.illusionWalls?.length) {
             this.placeIllusionWalls(group, layout.illusionWalls, variant);
           }
+          if (opts?.captureOnly) return capturePlacementRecords(group, p, arenaWalls);
           // The authored floor honours its InteriorStyle's stone grade (the base kit
           // reads as grey crypt otherwise). Scoped to this path: the procedural rift
           // floors keep the look they shipped with; the keep grades its stone warm.
@@ -795,7 +782,7 @@ export class DungeonInteriors {
             this.compileGate,
             () => registry.isRetired,
           );
-          return group;
+          return track(group);
         }
 
         this.placeFloor(p, layout, variant, interior);
@@ -840,6 +827,7 @@ export class DungeonInteriors {
           }
         }
 
+        if (opts?.captureOnly) return capturePlacementRecords(group, p, arenaWalls);
         this.emit(group, p, variant);
         if (interior === 'ignivar') {
           group.add(buildIgnivarLavaMoat({ lowGfx: this.lowGfx }));
@@ -862,7 +850,7 @@ export class DungeonInteriors {
         group.userData.renderCategory = 'dungeon';
         this.collectInteriorResources(group);
         await attachSceneGroupGated(this.scene, group, this.compileGate, () => registry.isRetired);
-        return group;
+        return track(group);
       },
       (failedGroup, report) => {
         this.interiorResources.delete(failedGroup);
@@ -875,6 +863,36 @@ export class DungeonInteriors {
         }
       },
     );
+  }
+
+  /** Build one interior WITHOUT loading assets or attaching it to a scene, and
+   *  hand back the placement plan. The editor's shipped-map adapter turns these
+   *  into ordinary editable placements. */
+  static async captureDungeonPlacementRecords(
+    interior: string,
+    opts: Parameters<DungeonInteriors['buildInterior']>[3],
+  ): Promise<DungeonPlacementRecord[]> {
+    const dungeons = new DungeonInteriors(new THREE.Scene(), true, [], []);
+    const group = await dungeons.buildInterior(interior, 0, 0, { ...opts, captureOnly: true });
+    return (group.userData.dungeonPlacementRecords ?? []) as DungeonPlacementRecord[];
+  }
+
+  private keyedRegistries(): KeyedBuildRegistries {
+    const { flames, fireLightRegistry, arenaHideables } = this;
+    return { flames, fireLightRegistry, arenaHideables };
+  }
+
+  /** Tear down a keyed interior build (world-editor live rebuild; see
+   *  dungeon_keyed_builds.ts disposeKeyedInterior). */
+  disposeInterior(key: string): void {
+    const record = this.builtByKey.get(key);
+    if (!record) return;
+    this.builtByKey.delete(key);
+    this.scene.remove(record.group);
+    const registries = this.keyedRegistries();
+    this.arenaHideables = disposeKeyedInterior(record, registries, this.onFireLightsChanged);
+    // The keyed build owns a resource registry too; it goes with the record.
+    this.disposeInteriorResources(record.group);
   }
 
   private collectInteriorResources(group: THREE.Group): void {
@@ -941,23 +959,7 @@ export class DungeonInteriors {
   // -------------------------------------------------------------------------
 
   private templeWaterMaterial(): THREE.ShaderMaterial {
-    if (this.waterMat) return this.waterMat;
-    this.waterMat = markSharedMaterial(
-      new THREE.ShaderMaterial({
-        uniforms: {
-          ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
-          uTime: sharedUniforms.uTime,
-          uShallow: { value: new THREE.Color(0x49c9bd) },
-          uDeep: { value: new THREE.Color(0x07303c) },
-          uGlow: { value: new THREE.Color(0x76f0dd) },
-        },
-        vertexShader: TEMPLE_WATER_VERT,
-        fragmentShader: TEMPLE_WATER_FRAG,
-        transparent: true,
-        depthWrite: false,
-        fog: true,
-      }),
-    );
+    this.waterMat ??= createTempleWaterMaterial();
     return this.waterMat;
   }
 

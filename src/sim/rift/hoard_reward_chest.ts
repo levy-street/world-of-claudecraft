@@ -142,8 +142,8 @@ export function openHoardRewardChest(ctx: SimContext, objectId: number, pid?: nu
     });
     return;
   }
+  if (!payTreasureVault(ctx, inst.vault, [player], state.bossTemplateId)) return;
   state.claimed.push(player);
-  payTreasureVault(ctx, inst.vault, [player], state.bossTemplateId);
   // The first hand on it swings the lid open for everyone in the room.
   if (chest.templateId === HOARD_REWARD_CHEST_TEMPLATE) {
     chest.templateId = HOARD_REWARD_CHEST_OPEN_TEMPLATE;
@@ -158,8 +158,8 @@ export function settleHoardRewardChest(ctx: SimContext, inst: RiftInstance, pid:
   const state = inst.vault?.chest;
   if (!inst.vault || !state || !unclaimed(state, pid)) return;
   if (ctx.cfg.vaultRewardNeedsSave && inst.vault.attemptId) return;
+  if (!payTreasureVault(ctx, inst.vault, [pid], state.bossTemplateId)) return;
   state.claimed.push(pid);
-  payTreasureVault(ctx, inst.vault, [pid], state.bossTemplateId);
   closeIfSpent(ctx, state);
 }
 

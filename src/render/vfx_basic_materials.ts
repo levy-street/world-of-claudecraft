@@ -108,7 +108,11 @@ function withRgbaVertexColors(source: THREE.BufferGeometry): THREE.BufferGeometr
  *  per program they can draw (tests/weapon_aura_prewarm_parity.test.ts walks
  *  every aura channel on every mainhand geometry): the full-blade imbue (it
  *  shares the beacon's program; its own stand-in keeps it covered if either
- *  table changes), the tip ramp, and Stonebound's shell and shards. */
+ *  table changes), the tip ramp, and Stonebound's shell and shards. A held
+ *  model whose own mesh carries an RGBA vertex colour (the Balgath Craterglass
+ *  Stave and the muster mallet) hands that 4-wide colour attribute to the aura
+ *  clone, a geometry shape of its own, so the full-blade imbue and the shell
+ *  get an RGBA-geometry twin each. */
 export function buildCastVfxBasicStandIns(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'cast-vfx-basics';
@@ -121,6 +125,7 @@ export function buildCastVfxBasicStandIns(): THREE.Group {
     ['corpse-beacon', corpseBeaconMaterialOptions(), geometry],
     ['weapon-imbue', weaponImbueAuraMaterialOptions(0x58d63c, false), geometry],
     ['weapon-imbue-tip', weaponImbueAuraMaterialOptions(0x8fd455, true), tipGeometry],
+    ['weapon-imbue-rgba', weaponImbueAuraMaterialOptions(0x58d63c, false), tipGeometry],
     [
       'weapon-stonebound-shell',
       stoneboundShellMaterialOptions({
@@ -128,6 +133,14 @@ export function buildCastVfxBasicStandIns(): THREE.Group {
         wireframe: stoneboundStyle.wireframe,
       }),
       geometry,
+    ],
+    [
+      'weapon-stonebound-shell-rgba',
+      stoneboundShellMaterialOptions({
+        opacity: stoneboundStyle.shellOpacity,
+        wireframe: stoneboundStyle.wireframe,
+      }),
+      tipGeometry,
     ],
     [
       'weapon-stonebound-shard',

@@ -1,0 +1,21 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/foremans_grips.webp",
+    "http://localhost:5194/ui/items/serac_stride_boots.webp",
+    "http://localhost:5194/ui/items/seal_rune_mantle.webp",
+    "http://localhost:5194/ui/items/thawbound_legguards.webp",
+    "http://localhost:5194/ui/items/pyre_tenders_hood.webp",
+    "http://localhost:5194/ui/items/meltwater_cord.webp",
+    "http://localhost:5194/ui/items/hammer_of_the_open_lock.webp",
+    "http://localhost:5194/ui/items/vestments_of_the_waking_rite.webp",
+    "http://localhost:5194/ui/items/foremans_last_link.webp",
+    "http://localhost:5194/ui/items/phial_of_the_tithe.webp",
+    "http://localhost:5194/ui/items/quenchwater_flask.webp"
+  ],
+  "allDecoded": true
+}

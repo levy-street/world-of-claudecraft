@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -430,7 +430,11 @@ describe('driver wiring', () => {
 
   function runDriver(
     runJson: object,
-    options: { jobsJson?: object; env?: Record<string, string | undefined> } = {},
+    options: {
+      jobsJson?: object;
+      env?: Record<string, string | undefined>;
+      probe?: string;
+    } = {},
   ): DriverRun {
     const stubDir = mkdtempSync(path.join(os.tmpdir(), 'woc-ci-stall-'));
     try {
@@ -454,40 +458,63 @@ describe('driver wiring', () => {
         path.join(stubDir, 'annotations.json'),
         JSON.stringify([{ message: TIMEOUT_ANNOTATION }, { message: CANCEL_ANNOTATION }]),
       );
-      const stub = [
-        '#!/bin/bash',
-        'printf \'%s\\n\' "$*" >> "$STUB_LOG"',
-        'case "$*" in',
-        '  *rerun-failed-jobs*)',
-        '    if [ -n "$STUB_FAIL_RERUN" ]; then echo "HTTP 403" >&2; exit 1; fi',
-        '    exit 0 ;;',
-        '  *check-runs*)',
-        '    if [ -n "$STUB_FAIL_ANNOTATIONS" ]; then echo "HTTP 500" >&2; exit 1; fi',
-        '    cat "$STUB_DIR/annotations.json" ;;',
-        '  *"jobs?per_page=100"*) cat "$STUB_DIR/jobs.json" ;;',
-        '  *actions/runs/*) cat "$STUB_DIR/run.json" ;;',
-        '  *) echo "unexpected gh call: $*" >&2; exit 64 ;;',
-        'esac',
-        '',
-      ].join('\n');
-      const stubPath = path.join(stubDir, 'gh');
+      // Preload before the real ESM driver binds spawnSync. A Bash executable
+      // plus PATH shadowing silently used the developer's real gh on Windows.
+      // Every child-process entry point is blocked except our in-memory gh stub.
+      const stub = `
+const cp = require('node:child_process');
+const { appendFileSync, readFileSync } = require('node:fs');
+const path = require('node:path');
+const blocked = () => { throw new Error('Unexpected subprocess in isolated driver test'); };
+for (const name of ['spawn', 'exec', 'execSync', 'execFile', 'execFileSync', 'fork']) {
+  cp[name] = blocked;
+}
+cp.ChildProcess.prototype.spawn = blocked;
+cp.spawnSync = (command, args) => {
+  if (command !== 'gh') return blocked();
+  const call = args.join(' ');
+  appendFileSync(process.env.STUB_LOG, call + '\\n');
+  const result = (status, stdout = '', stderr = '') => ({ status, stdout, stderr });
+  if (call.includes('rerun-failed-jobs')) {
+    return process.env.STUB_FAIL_RERUN ? result(1, '', 'HTTP 403') : result(0);
+  }
+  let file;
+  if (call.includes('check-runs')) {
+    if (process.env.STUB_FAIL_ANNOTATIONS) return result(1, '', 'HTTP 500');
+    file = 'annotations.json';
+  } else if (call.includes('jobs?per_page=100')) {
+    file = 'jobs.json';
+  } else if (call.includes('actions/runs/')) {
+    file = 'run.json';
+  } else {
+    throw new Error('Unexpected gh call: ' + call);
+  }
+  return result(0, readFileSync(path.join(process.env.STUB_DIR, file), 'utf8'));
+};
+require('node:module').syncBuiltinESMExports();
+`;
+      const stubPath = path.join(stubDir, 'isolate.cjs');
       writeFileSync(stubPath, stub);
-      chmodSync(stubPath, 0o755);
-      const result = spawnSync('node', [path.join(root, 'scripts/ci_stall_rerun.mjs')], {
-        cwd: root,
+      const entry = options.probe
+        ? ['--input-type=module', '-e', options.probe]
+        : [path.join(root, 'scripts/ci_stall_rerun.mjs')];
+      const result = spawnSync(process.execPath, ['--require', stubPath, ...entry], {
+        cwd: stubDir,
         encoding: 'utf8',
+        timeout: 10_000,
+        // No inherited credentials, NODE_OPTIONS, alternate-cased Path, or
+        // executable search path. Missing/broken preloads fail before the driver.
         env: {
-          ...process.env,
-          PATH: `${stubDir}:${process.env.PATH ?? ''}`,
+          SystemRoot: process.env.SystemRoot,
           RUN_ID: '31392590628',
           GITHUB_REPOSITORY: 'levy-street/world-of-claudecraft',
+          ...options.env,
+          PATH: '',
           STUB_DIR: stubDir,
           STUB_LOG: logPath,
-          STUB_FAIL_RERUN: undefined,
-          STUB_FAIL_ANNOTATIONS: undefined,
-          ...options.env,
         },
       });
+      if (result.error) throw result.error;
       return {
         status: result.status,
         stdout: result.stdout,
@@ -499,6 +526,32 @@ describe('driver wiring', () => {
       rmSync(stubDir, { recursive: true, force: true });
     }
   }
+
+  it('blocks unexpected process launches before any executable can run', () => {
+    const { status, stderr, log } = runDriver(
+      {},
+      {
+        probe:
+          "import { spawnSync } from 'node:child_process'; spawnSync(process.execPath, ['-e', 'process.exit(0)']);",
+      },
+    );
+    expect(status).toBe(1);
+    expect(stderr).toContain('Unexpected subprocess in isolated driver test');
+    expect(log).toBe('');
+  });
+
+  it('rejects unknown gh commands without falling through to an installed CLI', () => {
+    const { status, stderr, log } = runDriver(
+      {},
+      {
+        probe:
+          "import { spawnSync } from 'node:child_process'; spawnSync('gh', ['auth', 'status']);",
+      },
+    );
+    expect(status).toBe(1);
+    expect(stderr).toContain('Unexpected gh call: auth status');
+    expect(log).toBe('auth status\n');
+  });
 
   it('reruns the incident run exactly once through the real endpoint', () => {
     const { status, stdout, log } = runDriver({

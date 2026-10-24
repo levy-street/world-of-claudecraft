@@ -421,8 +421,6 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
       host.fragmentsAt?.('stone_chip', cx, cy + 0.3, cz, 0xa69883, 5, 0.45, -dx, -dz, 0.23);
       count++;
     }
-    host.glowPulse(slot.casterId, slot.color, 0.25 + p.weight * 0.2, false);
-    count++;
   } else if (p.shape !== 'quiet') {
     if (p.material === 'steel' && slot.tier === 0) {
       host.fragmentsAt?.(
@@ -487,11 +485,9 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
         slot.abilityId,
         beat,
       );
-    if (slot.targetId !== slot.casterId)
-      host.glowPulse(slot.targetId, slot.accent, 0.18 * remaining, false);
     host.pulseLight(slot.targetId, slot.spec.palette, p.weight * 0.85 * remaining, 0.09, 3);
     if (slot.tier === 0) host.shakeAt(hitX, hitY, hitZ, Math.min(0.26, p.weight * 0.12));
-    count += 2;
+    count++;
   }
   host.countPrimitive(slot.abilityId, count);
 }

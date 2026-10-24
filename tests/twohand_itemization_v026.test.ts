@@ -93,14 +93,31 @@ describe('v0.26 two-handed greatblade itemization', () => {
 
 describe('v0.26 two-handed Rogue proficiency', () => {
   it('denies every current and future two-hander at the equipment boundary', () => {
+    // Quest TOOLS are excluded, and the exclusion is asserted below rather than merely
+    // filtered: the ban protects combat identity, and an implement with 1-to-2 weapon damage
+    // has none to protect. Denying one would gate a MECHANIC (the world boss's level-blind
+    // Shardpike trial, which every class is meant to be able to perform) instead of gating
+    // power, which is the opposite of what this rule is for. See the questTool arm at the top
+    // of canEquipItem in src/sim/equipment_rules.ts.
     const twoHanders = Object.values(ITEMS).filter(
-      (item) => item.kind === 'weapon' && weaponHand(item) === 'twohand',
+      (item) => item.kind === 'weapon' && weaponHand(item) === 'twohand' && !item.questTool,
     );
     expect(twoHanders.length).toBeGreaterThanOrEqual(3);
     for (const item of twoHanders) {
       expect(canEquipItem('rogue', item), item.id).toBe(false);
       expect(canEquipItemInSlot('rogue', item, 'mainhand', null), item.id).toBe(false);
       expect(item.requiredClass ?? [], item.id).not.toContain('rogue');
+    }
+    // The exclusion is deliberate, so it is pinned in the positive direction too: a
+    // two-handed quest tool must stay wieldable by the class the ban would otherwise lock
+    // out, and it must carry no real weapon budget that would make that a power grant.
+    const questTools = Object.values(ITEMS).filter(
+      (item) => item.kind === 'weapon' && weaponHand(item) === 'twohand' && item.questTool,
+    );
+    expect(questTools.length).toBeGreaterThan(0);
+    for (const item of questTools) {
+      expect(canEquipItem('rogue', item), item.id).toBe(true);
+      expect(item.weapon?.max ?? 0, item.id).toBeLessThanOrEqual(5);
     }
 
     const futureTwoHander: ItemDef = {

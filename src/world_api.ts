@@ -46,7 +46,9 @@
 //                                            with canEdit marking officer-plus EDITS,
 //                                            proximity-gated info + gold/item/buy-slots commands)
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
+//   lance_trial.ts      IWorldLanceTrial     the Shardpike balance trial: self view + verbs
 //   vehicles.ts         IWorldVehicles       personal vehicle session + enter/action/leave
+//   buddies.ts          IWorldBuddies        cosmetic followers: pick + summon/dismiss
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
@@ -55,6 +57,7 @@
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //   transport.ts        IWorldTransport      the scheduled ferry's phase, ship pose, passenger bit
 //   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
+//   seating.ts          IWorldSeating        sit on a piece of furniture by its seat id
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -70,6 +73,7 @@
 import type { IWorldActionBar } from './world_api/action_bar';
 import type { IWorldBank } from './world_api/bank';
 import type { IWorldBattleground } from './world_api/battleground';
+import type { IWorldBuddies } from './world_api/buddies';
 import type { IWorldCardMinigame } from './world_api/card_minigame';
 import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
@@ -85,6 +89,7 @@ import type { IWorldFarming } from './world_api/farming';
 import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
+import type { IWorldLanceTrial } from './world_api/lance_trial';
 import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
@@ -98,6 +103,7 @@ import type { IWorldQuests } from './world_api/quests';
 export type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from './world_api/quests';
 
 import type { IWorldReliquary } from './world_api/reliquary';
+import type { IWorldSeating } from './world_api/seating';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
@@ -265,9 +271,15 @@ export type { VehicleSession } from './world_api/vehicles';
 // Above both parents: an epoch-44 client would draw the ship moored and predict
 // a deck the server has sailed away; an epoch-30 client lacks the world-quest
 // wire. Both must fail closed.
-// 46 = Weekly raid vault progress counts repeated final-boss clears. Older
-// clients omit the new raidClears field and would display the wrong milestones.
-export const ONLINE_WORLD_LAYOUT_VERSION = 46 as const;
+// 46 = Wildheart's entrance gate collision moves from empty grass onto the
+// visible stone feet. Epoch 45 clients predict the misplaced blockers, so
+// mixed binaries must fail closed instead of restoring invisible walls.
+// 47 = Large Materials Vault snapshots stream in bounded, paced chunks.
+// Earlier clients cannot decode the transfer envelope and must fail closed.
+// 48 = Withdraw #4297 and restore the preceding Wildheart gate collision.
+// Epoch 46 and 47 clients still predict the withdrawn stone-foot blockers;
+// reject them while preserving epoch 47's chunked vault envelope.
+export const ONLINE_WORLD_LAYOUT_VERSION = 48 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -311,7 +323,13 @@ export type {
   ActionBarSlotAction,
   StoredActionBarLayout,
 } from './world_api/action_bar';
-export type { BankBonusSource, BankInfo, VaultInfo, VaultSpecialRef } from './world_api/bank';
+export type {
+  AccountBankInfo,
+  BankBonusSource,
+  BankInfo,
+  VaultInfo,
+  VaultSpecialRef,
+} from './world_api/bank';
 export type {
   BgFlagInfo,
   BgInfo,
@@ -330,6 +348,7 @@ export type {
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
   ActiveNythraxisGravefire,
+  ActiveSporeBurst,
   ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,
@@ -372,12 +391,15 @@ export type {
 } from './world_api/duel_arena';
 export type {
   DungeonFinderApplicantView,
+  DungeonFinderApplicationView,
   DungeonFinderBoard,
+  DungeonFinderExpeditionView,
   DungeonFinderInfo,
   DungeonFinderListingView,
   DungeonFinderMyListingView,
   DungeonFinderProposalView,
   DungeonFinderQueueView,
+  ExpeditionSettings,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
 export type {
@@ -403,6 +425,7 @@ export type {
   CorpseHarvestInfo,
   WorldInteractionOutcome,
 } from './world_api/interaction';
+export type { LanceGuidanceView, LanceTrialView } from './world_api/lance_trial';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView, MarketSweepQuote } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
@@ -453,13 +476,13 @@ export type {
 export type { TradeInfo, TradeOffer } from './world_api/trade';
 export type { TransportFerryView } from './world_api/transport';
 export type {
-  HillCalloutInfo,
   HillInfo,
   HillPhaseInfo,
   HillSide,
   HillStandingInfo,
+  SkullBagAction,
+  SkullBagInfo,
   WorldPvpInfo,
-  WorldPvpRewardPause,
   WorldPvpZone,
 } from './world_api/world_pvp';
 
@@ -500,9 +523,12 @@ export interface IWorld
     IWorldReliquary,
     IWorldMounts,
     IWorldFarming,
+    IWorldLanceTrial,
     IWorldVehicles,
     IWorldTransport,
-    IWorldWorldPvp {}
+    IWorldWorldPvp,
+    IWorldBuddies,
+    IWorldSeating {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -664,6 +690,9 @@ export const COMMAND_NAMES = [
   'lockpick_engage',
   'lockpick_action',
   'lockpick_abort',
+  'lance_brace',
+  'lance_thrust',
+  'lance_release',
   'collect_delve_chest_loot',
   'delve_rite_choose',
   'telemetry',
@@ -687,6 +716,10 @@ export const COMMAND_NAMES = [
   'heroic_buy',
   'crucible_buy',
   'mount_toggle',
+  'buddy_toggle',
+  'buddy_autoloot',
+  'buddy_summon',
+  'buddy_cosmetic',
   'mount_train_begin',
   'mount_train_answer',
   'mount_train_abort',
@@ -942,6 +975,33 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  'df_expedition_open',
+  'df_expedition_travel',
+  'df_expedition_apply',
+  'df_expedition_configure',
+  'weekly_loot_spec',
+  // World PvP Skull Bag: store or take trophy skulls (IWorldWorldPvp.skullBagAction).
+  'skull_bag',
+  // Allied Hearthstone: a faction quartermaster binds the stone to its hub
+  // (IWorldQuests.attuneAlliedHearthstone, the quest dialog's attune row).
+  'allied_hearthstone_attune',
+  'account_bank_list',
+  'account_bank_select',
+  'account_bank_transfer',
+  'membership_claim_armour',
+  'courier_dispatch',
+  // A dungeon guide's offer answered for the whole group
+  // (IWorldDungeons.answerDungeonGuide; src/sim/dungeon_guide owns every rule).
+  'dungeon_guide_answer',
+  // Rename a specific summoned buddy; the sim verifies its current owner.
+  'buddy_rename',
+  'referralCards',
+  // Sit on a piece of furniture by its seat id (IWorldSeating.sitOnSeat).
+  'sit_seat',
+  // Lantern Hall's quartermaster: buy one cosmetic for Lantern Seals
+  // (IWorldQuests.buyGuildCosmetic; src/sim/guild_quartermaster.ts). Appended at the END
+  // because wire tokens are never reordered.
+  'guild_buy_cosmetic',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -951,10 +1011,12 @@ export type CommandName = (typeof COMMAND_NAMES)[number];
 // Dispatch-only extras: commands the server routes but ClientWorld never sends.
 // `dev_*` are env-gated cheats (ALLOW_DEV_COMMANDS, never production);
 // `enter_crypt`/`leave_crypt` are legacy aliases that fall through to the
-// dungeon cases; `social_refresh` is a server-push refresh path; `targetNearest`
+// dungeon cases; `targetNearest`
 // is called directly on the Sim by the headless RL action layer, never over the
 // wire. Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
 export const DISPATCH_ONLY_COMMANDS = [
+  // Retired buddy-look command, retained as an inert append-only protocol token.
+  'buddy_cosmetic',
   'dev_level',
   'dev_teleport',
   'dev_give',
@@ -962,7 +1024,6 @@ export const DISPATCH_ONLY_COMMANDS = [
   'dev_complete_all_quests',
   'enter_crypt',
   'leave_crypt',
-  'social_refresh',
   'targetNearest',
   'dev_bg_start',
   // Riding-lesson leftovers: 'mount_train_answer' (the removed lean-cue arm) and
@@ -1031,12 +1092,16 @@ export type WorldFacet =
   | 'IWorldReliquary'
   | 'IWorldMounts'
   | 'IWorldFarming'
+  | 'IWorldLanceTrial'
   | 'IWorldVehicles'
-  | 'IWorldWorldPvp';
+  | 'IWorldWorldPvp'
+  | 'IWorldBuddies'
+  | 'IWorldSeating';
 
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
   weekly_reward_open: 'IWorldBank',
+  weekly_loot_spec: 'IWorldBank',
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
@@ -1057,6 +1122,7 @@ export const COMMAND_FACETS = {
   world_quest_start: 'IWorldQuests',
   world_quest_reroll: 'IWorldQuests',
   clue_hunt_abandon: 'IWorldQuests',
+  allied_hearthstone_attune: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
@@ -1175,6 +1241,8 @@ export const COMMAND_FACETS = {
   // GET (no wire command); accountFlair is a pure local read of the flair the entity
   // wire and the chat event already carry (no command); social_refresh is a
   // dispatch-only server push (untagged).
+  referralCards: 'IWorldSocialGraph',
+  social_refresh: 'IWorldSocialGraph',
   friend_add: 'IWorldSocialGraph',
   friend_remove: 'IWorldSocialGraph',
   block_add: 'IWorldSocialGraph',
@@ -1247,7 +1315,12 @@ export const COMMAND_FACETS = {
   delve_rite_choose: 'IWorldDelves',
   // IWorldBank: the per-character deposit box (snake_case wire strings, by design).
   // bankInfo is a proximity-gated snapshot read (no send, untagged).
+  courier_dispatch: 'IWorldBank',
   bank_deposit: 'IWorldBank',
+  account_bank_list: 'IWorldBank',
+  account_bank_select: 'IWorldBank',
+  account_bank_transfer: 'IWorldBank',
+  membership_claim_armour: 'IWorldInventory',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
   // The Materials Vault rides the SAME facet as the personal bank (same bursars,
@@ -1278,6 +1351,11 @@ export const COMMAND_FACETS = {
   // mount_train_begin is the legacy riding-lesson entry point; its feedback
   // rides the mountTrain* events (no snapshot field).
   mount_toggle: 'IWorldMounts',
+  // IWorldLanceTrial: the Shardpike balance trial's verbs (the beam itself is steered by
+  // ordinary movement intent, so leaning costs no command).
+  lance_brace: 'IWorldLanceTrial',
+  lance_thrust: 'IWorldLanceTrial',
+  lance_release: 'IWorldLanceTrial',
   mount_train_begin: 'IWorldMounts',
   // mount_race_start begins a show-jumping race from the glowing platform;
   // mount_race_cancel exits it. Both are validated server-side and feed the
@@ -1287,6 +1365,19 @@ export const COMMAND_FACETS = {
   // learn_riding: purchase the riding skill from Marla (80g, once). No snapshot
   // field; the result rides the ridingTrained snapshot delta (mntRtd).
   learn_riding: 'IWorldMounts',
+  // IWorldBuddies: cosmetic followers (snake_case wire strings, by design,
+  // mirroring mount_toggle). The active buddy is a self-snapshot read (terse
+  // `bud`, no send, untagged); the collection reads (ownedBuddies,
+  // pendingBuddies) ride the self snapshot too (budOwn/budPend, untagged).
+  buddy_toggle: 'IWorldBuddies',
+  // buddy_summon: summon/dismiss a specific collected buddy (the Cosmetics
+  // window's button); the entity mirror `bud` carries the result.
+  buddy_summon: 'IWorldBuddies',
+  buddy_rename: 'IWorldBuddies',
+  // buddy_autoloot: enable/disable the buddy's loot errand (snake_case wire
+  // string, same family as buddy_toggle). The result rides the same self
+  // snapshot the toggle does (terse `budal`, no send, untagged).
+  buddy_autoloot: 'IWorldBuddies',
   // IWorldDungeonFinder: the group finder (snake_case wire strings, by design).
   // dungeonFinderInfo / dungeonFinderBoard are snapshot reads (no send, untagged).
   df_roles: 'IWorldDungeonFinder',
@@ -1298,6 +1389,10 @@ export const COMMAND_FACETS = {
   df_apply: 'IWorldDungeonFinder',
   df_apply_cancel: 'IWorldDungeonFinder',
   df_app_respond: 'IWorldDungeonFinder',
+  df_expedition_open: 'IWorldDungeonFinder',
+  df_expedition_travel: 'IWorldDungeonFinder',
+  df_expedition_apply: 'IWorldDungeonFinder',
+  df_expedition_configure: 'IWorldDungeonFinder',
   // IWorldDeeds: the Book of Deeds cosmetic selections, title and nameplate
   // border (snake_case wire strings, by design).
   // deedsEarned/deedStats/renown/activeTitle/activeBorder are snapshot reads
@@ -1322,4 +1417,10 @@ export const COMMAND_FACETS = {
   // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
   // self-delta mirror) carries no wire command and stays untagged.
   pvp_flag: 'IWorldWorldPvp',
+  skull_bag: 'IWorldWorldPvp',
+  // IWorldDungeons: the dungeon guide's offer answer (the guide's state is a
+  // snapshot read off his entity, `gds`).
+  dungeon_guide_answer: 'IWorldDungeons',
+  // IWorldSeating: sit on a seat (the seats and who holds one are derived, untagged).
+  sit_seat: 'IWorldSeating',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

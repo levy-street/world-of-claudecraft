@@ -17,23 +17,28 @@ import {
   terrainHeight,
   WATER_LEVEL,
 } from '../sim/world';
+import { carryGeometryLod } from './assets/geometry_lod';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
+import { activeWorldPromoted } from './promoted_scenery_gate';
+import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
+import { buildStaticInstanceCells } from './static_instance_cells';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface JungleFeaturesView {
   group: THREE.Group;
   update(time: number): void;
+  dispose(): void;
 }
 
 // The three beach-palm models, instanced per variant so the whole strand is a
 // handful of draws. Preloaded at import; buildJungleFeatures reads the cache.
 const PALM_URLS = [
-  '/models/biome/beach_palm_1.glb',
-  '/models/biome/beach_palm_2.glb',
-  '/models/biome/beach_palm_3.glb',
+  '/models/biome/beach_palm_1_lod.glb',
+  '/models/biome/beach_palm_2_lod.glb',
+  '/models/biome/beach_palm_3_lod.glb',
 ];
 const palmScenes: (THREE.Group | null)[] = [null, null, null];
 PALM_URLS.forEach((url, i) => {
@@ -60,7 +65,7 @@ export function bakedPalmVariant(variant: number): PalmPart[] | null {
 // meshopt-quantized, so attributes are converted to float32 before the node
 // transform is folded into the geometry; writing world-space values back into
 // normalized int16 attributes would clip (same recipe as foliage.ts).
-function bakePalmParts(scene: THREE.Group): PalmPart[] {
+export function bakePalmParts(scene: THREE.Group): PalmPart[] {
   scene.updateMatrixWorld(true);
   const parts: PalmPart[] = [];
   scene.traverse((obj) => {
@@ -79,6 +84,7 @@ function bakePalmParts(scene: THREE.Group): PalmPart[] {
     }
     if (src.index) geo.setIndex(src.index.clone());
     geo.applyMatrix4(mesh.matrixWorld);
+    carryGeometryLod(src, geo);
     parts.push({ geometry: geo, material: mesh.material });
   });
   return parts;
@@ -87,7 +93,7 @@ function bakePalmParts(scene: THREE.Group): PalmPart[] {
 // The banyans reuse the twisted-elder model the Hollow's centerpiece and the
 // Wraithwood's giants wear (already preloaded twice over, so free), regrown
 // lush and hung with vines.
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 let greatTreeScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
@@ -211,6 +217,7 @@ function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.Me
 export function buildJungleFeatures(seed: number): JungleFeaturesView {
   const group = new THREE.Group();
   group.name = 'jungle-features';
+  const coconutCells: THREE.InstancedMesh[] = [];
 
   const instance = (geo: THREE.BufferGeometry, material: THREE.Material, spots: Placement[]) => {
     if (spots.length === 0) return;
@@ -236,14 +243,22 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
     for (const part of extractParts(scene)) {
-      instance(part.geo, part.mat, spots);
+      if (key === 'coconuts') {
+        const cells = buildStaticInstanceCells(part.geo, part.mat, spots, GFX.coconutCellSize);
+        coconutCells.push(...cells);
+        group.add(...cells);
+      } else {
+        instance(part.geo, part.mat, spots);
+      }
     }
   };
 
   // --- the palms: the three beach models instanced across the strand, each
   // at the deterministic spot (world.ts) the sim also gives a trunk collider,
-  // so the strand you walk matches the one the sim blocks ---
-  {
+  // so the strand you walk matches the one the sim blocks. Skipped whole when
+  // the document owns the strand as placements: drawing it here as well put a
+  // second, unpickable palm inside every movable one. ---
+  if (!activeWorldPromoted('reachPalms')) {
     const byVariant: ReachPalm[][] = [[], [], []];
     for (const sp of reachPalmSpots(seed)) byVariant[sp.variant]?.push(sp);
     const m = new THREE.Matrix4();
@@ -272,7 +287,8 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
   }
 
   // --- the fallen coconuts: clusters dropped around the palm trunks ---
-  instanceProp('coconuts', reachCoconutSpots(seed));
+  // Stands down when the document owns the coconut clusters as placements.
+  if (!activeWorldPromoted('jungleCoconuts')) instanceProp('coconuts', reachCoconutSpots(seed));
 
   // --- the still water dressing: lily rafts and reeds on the lakes ---
   {
@@ -355,31 +371,41 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     vineGeo.translate(0, -0.5, 0); // hangs from its anchor
     const vineMats = [mat(0x4a8c46, 0.9), mat(0x6aa858, 0.9)]; // two-tone curtain
     const vineSpots: { x: number; z: number; y: number; s: number; rot: number }[][] = [[], []];
-    const rootParts: THREE.BufferGeometry[] = [];
     const barkMat = mat(0x6a5a48, 0.92);
     const trees = PALMREACH_PROPS.greatTrees ?? [];
+    // The document may own the giants themselves as placements. Only the TRUNK
+    // stands down then: the buttress roots and the vine curtain are ground
+    // dressing with no placement of their own, and a banyan without them reads
+    // as a plain elder set down on the sand.
+    const trunksArePlacements = activeWorldPromoted('greatTrees');
     if (greatTreeScene) {
       for (const t of trees) {
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;
-        const tree = greatTreeScene.clone(true);
         const scale = t.r * (2.5 + hash2(t.x, t.z, seed + 5201) * 0.5);
-        tree.position.set(t.x, y - 0.2, t.z);
-        tree.scale.setScalar(scale);
-        tree.rotation.y = hash2(t.z, t.x, seed + 5211) * Math.PI * 2;
-        tree.traverse((obj) => {
-          const mesh = obj as THREE.Mesh;
-          if (mesh.isMesh) {
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            mesh.material = Array.isArray(mesh.material)
-              ? mesh.material.map(lushen)
-              : lushen(mesh.material);
-          }
-        });
-        group.add(tree);
+        let banyan: THREE.Group | null = null;
+        if (!trunksArePlacements) {
+          banyan = new THREE.Group();
+          const tree = greatTreeScene.clone(true);
+          tree.position.set(t.x, y - 0.2, t.z);
+          tree.scale.setScalar(scale);
+          tree.rotation.y = hash2(t.z, t.x, seed + 5211) * Math.PI * 2;
+          tree.traverse((obj) => {
+            const mesh = obj as THREE.Mesh;
+            if (mesh.isMesh) {
+              mesh.castShadow = true;
+              mesh.receiveShadow = true;
+              mesh.material = Array.isArray(mesh.material)
+                ? mesh.material.map(lushen)
+                : lushen(mesh.material);
+            }
+          });
+          banyan.add(tree);
+          group.add(banyan);
+        }
         // the buttress roots: tapered flares leaning into the trunk base,
         // so the giant reads rooted instead of set down
+        const treeRootParts: THREE.BufferGeometry[] = [];
         const roots = 5 + Math.floor(hash2(t.z, t.x, seed + 5271) * 3);
         for (let k = 0; k < roots; k++) {
           const ang = (k / roots) * Math.PI * 2 + hash2(k, t.z, seed + 5281) * 0.8;
@@ -390,8 +416,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
           g.rotateX(0.5); // lean the flare outward, foot away from the trunk
           g.rotateY(ang);
           g.translate(t.x + Math.sin(ang) * len, y - 0.3, t.z + Math.cos(ang) * len);
-          rootParts.push(g.toNonIndexed());
+          treeRootParts.push(g.toNonIndexed());
         }
+        if (treeRootParts.length > 0) (banyan ?? group).add(mergeBoxes(treeRootParts, barkMat));
         // the vine curtain: strands hung in a ring under the crown, plus an
         // inner ring so the canopy reads properly overgrown
         const crownR = scale * 1.6;
@@ -412,7 +439,6 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         }
       }
     }
-    if (rootParts.length > 0) group.add(mergeBoxes(rootParts, barkMat));
     // vines scale on Y only: compose with a per-instance non-uniform scale
     vineSpots.forEach((list, tone) => {
       if (list.length === 0) return;
@@ -433,8 +459,19 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     });
   }
 
+  if (GFX.sceneryGeometryLodDistance > 0) prepareSceneryGeometryLod(group);
   return {
     group,
+    dispose(): void {
+      // Release cell buffers and the rebaked geometry, never borrowed GLB materials.
+      const geometries = new Set(coconutCells.map((mesh) => mesh.geometry));
+      for (const mesh of coconutCells) {
+        mesh.removeFromParent();
+        mesh.dispose();
+      }
+      for (const geometry of geometries) geometry.dispose();
+      coconutCells.length = 0;
+    },
     update(): void {
       // still air: the global wind shader sways the modeled foliage; the
       // strand itself holds its pose

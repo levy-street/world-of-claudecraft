@@ -1,0 +1,46 @@
+[
+  {
+    "state": "portrait-earned",
+    "id": "dgn_korgath_all_chains",
+    "src": "http://localhost:5194/ui/deeds/dgn_korgath_all_chains.webp",
+    "decoded": true,
+    "earned": true,
+    "screenshot": "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_all_chains-mobile-portrait-earned.png",
+    "inViewport": true,
+    "occludedBy": "existing Rotate to Landscape overlay",
+    "unobstructedVisualVerification": false
+  },
+  {
+    "state": "portrait-earned",
+    "id": "dgn_korgath_still_bound",
+    "src": "http://localhost:5194/ui/deeds/dgn_korgath_still_bound.webp",
+    "decoded": true,
+    "earned": true,
+    "screenshot": "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_still_bound-mobile-portrait-earned.png",
+    "inViewport": true,
+    "occludedBy": "existing Rotate to Landscape overlay",
+    "unobstructedVisualVerification": false
+  },
+  {
+    "state": "portrait-unearned",
+    "id": "dgn_korgath_all_chains",
+    "src": "http://localhost:5194/ui/deeds/dgn_korgath_all_chains.webp",
+    "decoded": true,
+    "earned": false,
+    "screenshot": "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_all_chains-mobile-portrait-unearned.png",
+    "inViewport": true,
+    "occludedBy": "existing Rotate to Landscape overlay",
+    "unobstructedVisualVerification": false
+  },
+  {
+    "state": "portrait-unearned",
+    "id": "dgn_korgath_still_bound",
+    "src": "http://localhost:5194/ui/deeds/dgn_korgath_still_bound.webp",
+    "decoded": true,
+    "earned": false,
+    "screenshot": "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_still_bound-mobile-portrait-unearned.png",
+    "inViewport": true,
+    "occludedBy": "existing Rotate to Landscape overlay",
+    "unobstructedVisualVerification": false
+  }
+]

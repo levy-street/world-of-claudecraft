@@ -1199,29 +1199,174 @@ export const table: DeedLocaleTable = {
     name: 'Přistižen při činu',
     desc: 'Chyť Hbitce s měšcem v Pohřbeném pokladu dřív, než uteče se zlatem.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Jasnejsi nez stiny',
+    desc: 'Ziskej zpet ukradene mesce s mincemi a unikni z bludiste Evergarden na obtiznost Hard.',
+  },
+  prog_titan: {
+    name: 'Titán',
+    desc: 'Získej za život celkem 10 000 000 zkušeností.',
+    title: 'Titán',
+  },
   pvp_flag_1h: {
     name: 'Smělý',
-    desc: 'Nechte světové PvP zapnuté po 1 hodinu odehraného času v otevřeném světě. Odhlášení, smrt a instance postup pozastaví; vypnutí jej vynuluje. Získané tituly jsou trvalé.',
+    desc: 'Nech světové PvP zapnuté po 1 hodinu herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
     title: 'Smělý',
   },
   pvp_flag_3h: {
     name: 'Vzdorovitý',
-    desc: 'Nechte světové PvP zapnuté po 3 hodiny odehraného času v otevřeném světě. Odhlášení, smrt a instance postup pozastaví; vypnutí jej vynuluje. Získané tituly jsou trvalé.',
+    desc: 'Nech světové PvP zapnuté po 3 hodiny herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
     title: 'Vzdorovitý',
   },
   pvp_flag_6h: {
     name: 'Neohrožený',
-    desc: 'Nechte světové PvP zapnuté po 6 hodin odehraného času v otevřeném světě. Odhlášení, smrt a instance postup pozastaví; vypnutí jej vynuluje. Získané tituly jsou trvalé.',
+    desc: 'Nech světové PvP zapnuté po 6 hodin herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
     title: 'Neohrožený',
   },
   pvp_flag_24h: {
     name: 'Neústupný',
-    desc: 'Nechte světové PvP zapnuté po 24 hodin odehraného času v otevřeném světě. Odhlášení, smrt a instance postup pozastaví; vypnutí jej vynuluje. Získané tituly jsou trvalé.',
+    desc: 'Nech světové PvP zapnuté po 24 hodin herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
     title: 'Neústupný',
   },
   pvp_flag_168h: {
     name: 'Nezdolný',
-    desc: 'Nechte světové PvP zapnuté po 7 dní odehraného času v otevřeném světě. Odhlášení, smrt a instance postup pozastaví; vypnutí jej vynuluje. Získané tituly jsou trvalé.',
+    desc: 'Nech světové PvP zapnuté po 7 dní herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
     title: 'Nezdolný',
+  },
+  cmb_balgath: {
+    name: 'Už žádný předák',
+    desc: 'Vrať Pohřbeného předáka zpět do jeho mohyly.',
+  },
+  cmb_balgath_ten: {
+    name: 'Mohyla nic neudrží',
+    desc: 'Poraz Pohřbeného předáka desetkrát.',
+  },
+  cmb_point_taken: {
+    name: 'Zásah do černého',
+    desc: 'Zhasni lucernu Slaměného předáka na odvodním cvičišti a dej jeho prknům co proto.',
+  },
+  dgn_olen_buttress: {
+    name: 'Udržte zeď',
+    desc: 'Poraz Rytířského velitele Olena, aniž by jeho Odrazný štít někdy zasáhl druhého hráče.',
+  },
+  dgn_ossick_moored: {
+    name: 'Bezpečný přístav',
+    desc: 'Poraz Žalářníka Ossicka, aniž by někdo byl vtažen do Jámy tonutí.',
+  },
+  dgn_vael_beacon: {
+    name: 'Ve světle majáku',
+    desc: 'Poraz Vaela Mlhovazače, aniž bys nechal prasknout jediný Mlžný stín.',
+  },
+  dgn_turretback: {
+    name: 'Výpověď z nájmu',
+    desc: 'Poraz Kapitána vraku, aniž by někoho zasáhla Přízračná boční salva.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Každý hlas ladí',
+    desc: 'Poraz Matku sboru Selthe tak, aby každý Sbor sdíleli alespoň dva hráči a žádný Sólový zpěv nezasáhl nikoho dalšího.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Rozbij sklo',
+    desc: 'Poraz Kolosa přílivového skla a rozbij každý Odraz do 15 sekund od jeho vzniku.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'V suchu',
+    desc: 'Poraz Ysolei, avatar utopeného měsíce, aniž by někoho zasáhl její Přílivový náraz.',
+  },
+  dgn_mere_hydra: {
+    name: 'Všechny hlavy dolů',
+    desc: 'Zabij všechny tři hlavy Jezerní hydry v rozmezí 10 sekund od sebe.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Ani vlásek se nespálil',
+    desc: 'Poraz Draka umíráčku, aniž by někoho spálil jeho Přelet s pohřebním ohněm.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Žádná klec nás neudrží',
+    desc: 'Poraz Žalářního klíčníka, aniž by někdo byl rozdrcen v Železné kleci.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Drženi od sebe',
+    desc: 'Poraz Tesákopána, krotitele zvěře, a jeho Velkého jaguára tak, aby Pouto smečky bylo aktivní celkem méně než 10 sekund.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Hubení plevele',
+    desc: 'Poraz Hltokvět, aniž by vyrostl jediný Trnitý výhonek.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Nikdy nechyceni',
+    desc: 'Poraz Zulgara, hlas Kotliny, aniž by někdo byl Rozdrásaný.',
+  },
+  dgn_great_saurian: {
+    name: 'Svržený titán',
+    desc: 'Poraz Velkého ještěra a jeho Zaklínače z plošiny v rozmezí 20 sekund od sebe.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Laskavější konec',
+    desc: 'Poraz Korgatha Spoutaného se všemi čtyřmi řetězy přetrženými.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Zámek drží',
+    desc: 'Poraz Korgatha Spoutaného na hrdinskou obtížnost tak, aby alespoň dva jeho řetězy nebyly nikdy přetrženy.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Chladná útěcha',
+    desc: 'Poraz Velkého nekromanta Velkhara, aniž by jediný Oživený kostlivec povstal podruhé.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Tenký led',
+    desc: 'Poraz Korzula Hrobového draka s alespoň dvanácti z devatenácti jezerních desek nerozbitými.',
+  },
+  dgn_sledge_tusker: {
+    name: 'Chladný náklad',
+    desc: 'Poraz Sáňového kelnatce, aniž by někoho zasáhlo jeho Pošlapání.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Poslední sloka',
+    desc: 'Poraz Ysolei, avatar utopeného měsíce, s Posledním kantorem Bledého sboru po boku.',
+    title: 'Svědek sboru',
+  },
+  dgn_marrow_tidy: {
+    name: 'Upravený hřbitov',
+    desc: 'Poraz Kostelníka Marrowa tak, aby každý Otevřený hrob ležel na okraji Zvonového nádvoří.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Nikdo nezůstane viset',
+    desc: 'Poraz Paní kostního chladu, aniž by kdy někoho upustila ze svého Ledového objetí.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Teď už ticho',
+    desc: 'Poraz Kantorku Ilvane, aniž by její Žalozpěv prázdnoty někoho zasáhl.',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Každá svíčka hoří',
+    desc: 'Poraz Morthena Hrobovolajícího po opětovném zapálení všech čtyř Vzpomínkových svíček do 20 sekund od vzniku jeho Ochrany neklidných.',
+  },
+  dgn_guild_first_contract: {
+    name: 'Podepsaná listina',
+    desc: 'Dokonči jednu z týdenních zakázek na kobky Síně luceren.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Pravidelný návštěvník nástěnky',
+    desc: 'Dokonči 10 týdenních zakázek na kobky Síně luceren.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Veterán zakázek',
+    desc: 'Dokonči 50 týdenních zakázek na kobky Síně luceren.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Posel listin',
+    desc: 'Zakoupeno od Garricka Holta, zásobovače Síně luceren, za 6 Lucernových pečetí.',
+    title: 'Posel listin',
+  },
+  feat_guild_hallsworn: {
+    name: 'Přísežný síně',
+    desc: 'Zakoupeno od Garricka Holta, zásobovače Síně luceren, za 14 Lucernových pečetí.',
+    title: 'Přísežný síně',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Ze Síně luceren',
+    desc: 'Zakoupeno od Garricka Holta, zásobovače Síně luceren, za 24 Lucernových pečetí.',
+    title: 'ze Síně luceren',
   },
 };

@@ -27,7 +27,7 @@ it('lets the ferry arrival choose guidance without changing quest tracking', () 
   const paragraphs = [...el.querySelectorAll('.cd-para')].map((p) => p.textContent ?? '');
   expect(paragraphs).toHaveLength(2);
   expect(paragraphs[0]).toContain('Marshal Redbrook');
-  expect(paragraphs[1]).toContain('Ravenpost');
+  expect(paragraphs[1]).toContain('right beside you on the quay');
   const off = el.querySelector<HTMLButtonElement>('[data-guidance="off"]');
   expect(off).not.toBeNull();
   off?.click();

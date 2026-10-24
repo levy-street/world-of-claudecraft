@@ -1,13 +1,16 @@
 // One batched Canvas2D compositor for every overhead nameplate. The renderer
 // owns character/object views; this painter owns resolved label state, numeric
-// projection, decluttering, text/image caches, and the single canvas surface.
+// projection, text/image caches, and the single canvas surface. Plates draw at
+// their own projected anchors: overlapping plates are never stacked apart.
 
 import * as THREE from 'three';
 import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
 import { isOwnAura } from '../sim/aura_classify';
+import { isPlayingDead } from '../sim/combat/hunter_play_dead';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
 import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
@@ -22,8 +25,8 @@ import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
 import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
+import { entityDisplayName } from '../ui/entity_display_core';
 import { tEntity } from '../ui/entity_i18n';
-import { hillBountyTagLabel } from '../ui/hill_bounty_tag';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
 import {
@@ -38,6 +41,7 @@ import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 import { castBarState } from './cast_bar';
 import { anyCharacterRigDrawing, entityHasNoBody } from './entity_gate_stand_in_core';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
+import { interiorHidesNameplate } from './interior_camera';
 import {
   createNameplateCanvasState,
   type NameplateCanvasState,
@@ -45,27 +49,55 @@ import {
   type NameplateMarkerTone,
 } from './nameplate_canvas';
 import { COMBO_PIP_MAX } from './nameplate_combo';
-import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
+import { resolveNameplateCooldowns } from './nameplate_cooldown_resolve';
+import { nameplateCooldownScale as nameplateCooldownScaleSetting } from './nameplate_cooldown_scale';
 import { nameplateDotScale as nameplateDotScaleSetting } from './nameplate_dot_scale';
 import {
   clampNameplateDotScale,
   type NameplateDotAura,
-  nameplateDotRowHeight,
   nameplateDotsInto,
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
-import { nameplateHeraldryLift } from './nameplate_heraldry_core';
+import { nameplateSubRowsLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
-import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
+import {
+  type NameplatePickCandidate,
+  pickNameplateHealthBarAt,
+  raiseNameplateCandidate,
+} from './nameplate_pick_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
-import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
+import { nameplateHasBounty } from './nameplate_tag_fill_core';
+import {
+  newTargetOverlay,
+  TARGET_OVERLAY_ARROW,
+  TARGET_OVERLAY_CHEVRON,
+  TARGET_OVERLAY_NONE,
+} from './nameplate_target_highlight';
+import {
+  isNpcPlateEntity,
+  NAMEPLATE_ANCHOR_LIFT,
+  type NameplatePlan,
+  nameplatePlanInto,
+  newNameplatePlan,
+} from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
-import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
+import { FRIENDLY, isFriendlyPet, isMobHostileToViewer, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
+import {
+  edgeArrowInto,
+  newEdgeArrowPlacement,
+  newTargetHighlightFlags,
+  type TargetHighlightFlags,
+} from './target_highlight_core';
 import { WorldQuestTraceLabels } from './world_quest_trace_labels';
+
+/** Dead for display: really dead, or a hunter playing dead (feign death). */
+function shownDead(entity: Entity): boolean {
+  return entity.dead || isPlayingDead(entity);
+}
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
 // The dot countdown's two shapes, hoisted for the same reason the level options
@@ -163,12 +195,21 @@ export interface NameplatePainterDeps {
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
+  showPetNames: () => boolean;
   /** The nameplate dot row's SIZE, with 0 meaning off: the showNameplateDots
    *  toggle and the nameplateDotScale slider fold into this one number at the
    *  settings site. A player preference, never a graphics tier. Defaults to the
    *  live setting (nameplate_dot_scale.ts); injectable so a test can drive it. */
   nameplateDotScale?: () => number;
+  /** The enemy cooldown row's SIZE on hostile player plates, 0 meaning off (the
+   *  showNameplateCooldowns toggle folded with its slider, nameplate_cooldown_scale.ts).
+   *  A player preference, never a graphics tier; injectable so a test can drive it. */
+  nameplateCooldownScale?: () => number;
   isHostilePlayer: (e: Entity) => boolean;
+  /** The Style of Enemy Highlight cues, a live object the renderer owns and
+   *  main.ts keeps in step with the settings. Absent (a test host, the editor)
+   *  means every cue off. */
+  targetHighlight?: TargetHighlightFlags;
 }
 
 /** A scripted mob cast (a rift execution, a Buried Hoard control) is no ABILITIES
@@ -191,14 +232,19 @@ export class NameplatePainter {
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
+  private readonly showPetNames: () => boolean;
   private readonly nameplateDotScale: () => number;
+  private readonly nameplateCooldownScale: () => number;
   private readonly isHostilePlayer: (e: Entity) => boolean;
+  private readonly targetHighlight: TargetHighlightFlags;
+  // The target cue drawn outside any plate this pass, its arrow scratch, and the
+  // distance caption cached by whole yards (re-formatted only when it changes).
+  private readonly targetOverlay = newTargetOverlay();
+  private readonly edgeArrow = newEdgeArrowPlacement();
+  private edgeArrowYards = -1;
+  private edgeArrowLabel = '';
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
-  /** The King of the Hill bounty each plate's name row was built with (absent
-   *  for none): like the /pvp flag, a change re-resolves the row the same frame.
-   *  Kept here, not on the canvas state, and pruned with it. */
-  private readonly plateBounty = new Map<number, number>();
   private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
@@ -206,7 +252,7 @@ export class NameplatePainter {
   // The bound ownership predicate and the id it was bound for (see resolveDots).
   private dotsOwnerId = -1;
   private dotsIsOwn: (aura: NameplateDotAura) => boolean = () => false;
-  private readonly anchorScratch: Array<NameplateAnchor & NameplatePickCandidate> = [];
+  private readonly anchorScratch: NameplatePickCandidate[] = [];
   private anchorCount = 0;
   private i18nRevision = -1;
   private readonly paintGate = new NameplatePaintGate();
@@ -252,8 +298,11 @@ export class NameplatePainter {
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
+    this.showPetNames = deps.showPetNames;
     this.nameplateDotScale = deps.nameplateDotScale ?? nameplateDotScaleSetting;
+    this.nameplateCooldownScale = deps.nameplateCooldownScale ?? nameplateCooldownScaleSetting;
     this.isHostilePlayer = deps.isHostilePlayer;
+    this.targetHighlight = deps.targetHighlight ?? newTargetHighlightFlags();
     this.surface = new NameplateCanvasSurface(deps.layer);
   }
 
@@ -268,12 +317,14 @@ export class NameplatePainter {
       this.surface.clearTextCache();
     }
     this.anchorCount = 0;
+    let targetPlated = false;
 
     const showNameplates = this.showNameplates();
     const showFriendlyNameplates = this.showFriendlyNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
+    const showPetNames = this.showPetNames();
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
     if (fullPass) this.questMarkerCtx = null;
@@ -331,6 +382,7 @@ export class NameplatePainter {
         showNameplates,
         showOwnNameplate,
         showPlayerNameplates,
+        showPetNames,
         standIn,
       );
       if (plan.hidden) continue;
@@ -338,6 +390,11 @@ export class NameplatePainter {
       this.tmpV.copy(view.group.position);
       this.tmpV.y += plan.anchorYOffset;
       if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) continue;
+      // indoors (a walk-in interior holds the player), a plate outside shows only through a
+      // doorway, never through the walls; the unit frame of a selected target is untouched
+      // (tested after the cheap frustum check, so only on-screen plates pay for the walk)
+      const p = view.group.position;
+      if (interiorHidesNameplate(this.camera, p.x, p.y, p.z, this.tmpV.y)) continue;
       this.tmpV.project(this.camera);
       if (this.tmpV.z < -1 || this.tmpV.z > 1) continue;
       const screenX = (this.tmpV.x * 0.5 + 0.5) * width;
@@ -349,35 +406,25 @@ export class NameplatePainter {
         state = createNameplateCanvasState();
         this.states.set(id, state);
       }
+      // The bounty bit is read against the row BEFORE updateDynamicState writes
+      // it, so a flip re-resolves the `<Bounty>` tag this frame like the flag.
+      const bountyFlipped = state.bounty !== nameplateHasBounty(entity);
       this.updateDynamicState(state, entity, player, plan, languageChanged);
-      // The /pvp flag and the hill bounty are the content inputs read every pass:
-      // a change re-resolves the row THIS frame, never on the tier cadence.
-      const pvpFlipped =
-        state.pvpFlag !== (entity.pvpFlag === true) ||
-        this.plateBounty.get(id) !== entity.hillBounty;
-      if (!state.initialized || fullPass || plan.urgent || languageChanged || pvpFlipped) {
+      // The /pvp flag is the one content input read every pass: a flip
+      // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
+      const pvpFlipped = state.pvpFlag !== (entity.pvpFlag === true);
+      // Play Dead (hunter feign death) hides a player's bar the frame it lands.
+      const feignFlipped = entity.kind === 'player' && state.hpVisible === shownDead(entity);
+      const flipped = pvpFlipped || bountyFlipped || feignFlipped;
+      if (!state.initialized || fullPass || plan.urgent || languageChanged || flipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
-        // Recorded here, not inside resolveContent's early-returning branches,
-        // so a hidden own plate with a bounty does not re-resolve every frame.
-        if (entity.hillBounty) this.plateBounty.set(id, entity.hillBounty);
-        else this.plateBounty.delete(id);
       }
 
       const anchor = this.anchorScratch[this.anchorCount];
-      // Every pixel this plate paints ABOVE its name row, which is what decides
-      // the declutter envelope: the deed heraldry's seal and ribbon, plus the
-      // dot row, which sits under the name row and therefore pushes the name row
-      // and everything above it up by its own height. drawEmote already mirrors
-      // that step; without this the anchor did not, so two dotted plates in a
-      // crowd overlapped without being nudged apart.
-      const extraLift =
-        nameplateHeraldryLift(state.border) +
-        nameplateDotRowHeight(state.dots.count, state.dots.scale);
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;
         anchor.sy = screenY;
-        anchor.extraLift = extraLift;
         anchor.hpVisible = state.hpVisible;
         anchor.castVisible = state.castVisible;
         anchor.boss = state.frame === 'boss';
@@ -387,7 +434,6 @@ export class NameplatePainter {
           id,
           sx: screenX,
           sy: screenY,
-          extraLift,
           hpVisible: state.hpVisible,
           castVisible: state.castVisible,
           boss: state.frame === 'boss',
@@ -395,17 +441,20 @@ export class NameplatePainter {
         });
       }
       this.anchorCount++;
+      if (id === player.targetId) targetPlated = true;
     }
 
-    declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
+    // Plates are never moved apart, so overlapping ones share a spot: the
+    // current target draws last, on top, and a click there picks it.
+    raiseNameplateCandidate(this.anchorScratch, this.anchorCount, player.targetId);
+    const overlay = this.resolveTargetOverlay(player, width, height, targetPlated, languageChanged);
 
-    // The repaint decision comes AFTER decluttering, because decluttering is
-    // what moves an anchor: the gate must compare the anchors that will
-    // actually be drawn. A pass whose plates, anchors, viewport, surface ratio
-    // and style revision all match the last PAINTED pass would redraw the same
-    // pixels, so the whole clear-and-repaint of this full-viewport surface is
-    // skipped. Anything a player reads (a moved plate, HP, cast, selection,
-    // threat, content, opacity) differs and paints on its own frame.
+    // The repaint gate compares the anchors that will actually be drawn. A pass
+    // whose plates, anchors, viewport, surface ratio and style revision all
+    // match the last PAINTED pass would redraw the same pixels, so the whole
+    // clear-and-repaint of this full-viewport surface is skipped. Anything a
+    // player reads (a moved plate, HP, cast, selection, threat, content,
+    // opacity) differs and paints on its own frame.
     const surfacePixelRatio = this.getSurfacePixelRatio();
     this.paintGate.beginPass(width, height, surfacePixelRatio, this.surface.styleRevision());
     for (let i = 0; i < this.anchorCount; i++) {
@@ -413,6 +462,7 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.paintGate.notePlate(anchor.id, anchor.sx, anchor.sy, state);
     }
+    this.paintGate.noteOverlay(overlay.kind, overlay.x, overlay.y, overlay.angle, overlay.label);
     if (!this.paintGate.needsPaint()) {
       this.paintsSkipped++;
       return;
@@ -421,8 +471,9 @@ export class NameplatePainter {
     // Zero plates drawn (the toggle is off, or none are in view): drop the
     // layer so the compositor stops carrying a full-screen surface for it. The
     // first plate back unhides it below, before anything is drawn.
-    this.surface.setLayerHidden(this.anchorCount === 0);
-    if (this.anchorCount === 0) {
+    const nothingDrawn = this.anchorCount === 0 && overlay.kind === TARGET_OVERLAY_NONE;
+    this.surface.setLayerHidden(nothingDrawn);
+    if (nothingDrawn) {
       this.paintGate.commit();
       return;
     }
@@ -441,7 +492,72 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawEmote(state, anchor.sx, anchor.sy);
     }
+    this.surface.drawTargetOverlay(overlay);
     this.paintGate.commit();
+  }
+
+  /**
+   * The Style of Enemy Highlight cue drawn outside any plate: the screen-edge
+   * arrow while a hostile target is off camera, or the overhead chevron over an
+   * on-screen hostile target that has no plate this pass (plates toggled off,
+   * or past plate range). A target WITH a plate carries its chevron on the
+   * plate itself (state.overheadMarker).
+   */
+  private resolveTargetOverlay(
+    player: Entity,
+    width: number,
+    height: number,
+    targetPlated: boolean,
+    languageChanged: boolean,
+  ) {
+    const overlay = this.targetOverlay;
+    overlay.kind = TARGET_OVERLAY_NONE;
+    overlay.label = '';
+    const cues = this.targetHighlight;
+    if ((!cues.edgeArrow && !cues.overhead) || player.targetId === null) return overlay;
+    const target = this.world.entities.get(player.targetId);
+    if (!target || target.dead || !this.isHostileEntity(target)) return overlay;
+    const view = this.views.get(target.id);
+    const head = this.tmpV;
+    if (view) {
+      head.copy(view.group.position);
+      head.y += (view.height + view.mountLift) * target.scale + NAMEPLATE_ANCHOR_LIFT;
+    } else {
+      head.set(target.pos.x, target.pos.y + 2 * target.scale, target.pos.z);
+    }
+    const cam = this.tmpV2.copy(head).applyMatrix4(this.camera.matrixWorldInverse);
+    head.project(this.camera);
+    const arrow = this.edgeArrow;
+    if (edgeArrowInto(arrow, cam.x, cam.y, cam.z, head.x, head.y, width, height)) {
+      if (!cues.edgeArrow) return overlay;
+      const yards = Math.round(
+        Math.hypot(target.pos.x - player.pos.x, target.pos.z - player.pos.z),
+      );
+      if (yards !== this.edgeArrowYards || languageChanged) {
+        this.edgeArrowYards = yards;
+        this.edgeArrowLabel = t('hudChrome.options.enemyHighlightDistance', {
+          yards: formatNumber(yards, NAMEPLATE_LEVEL_NUMBER_OPTIONS),
+        });
+      }
+      overlay.kind = TARGET_OVERLAY_ARROW;
+      overlay.x = arrow.x;
+      overlay.y = arrow.y;
+      overlay.angle = arrow.angle;
+      overlay.label = this.edgeArrowLabel;
+      return overlay;
+    }
+    if (!cues.overhead || targetPlated) return overlay;
+    overlay.kind = TARGET_OVERLAY_CHEVRON;
+    overlay.x = (head.x * 0.5 + 0.5) * width;
+    overlay.y = (-head.y * 0.5 + 0.5) * height - 4;
+    return overlay;
+  }
+
+  /** Hostile the way the plate reads it: a hostile mob, or an enemy player. */
+  private isHostileEntity(entity: Entity): boolean {
+    return entity.kind === 'mob'
+      ? isMobHostileToViewer(entity, this.world.entities, this.isHostilePlayer)
+      : entity.kind === 'player' && this.isHostilePlayer(entity);
   }
 
   /** Surface repaint accounting for `Renderer.perfStats()`: how many passes
@@ -452,7 +568,6 @@ export class NameplatePainter {
 
   remove(id: number): void {
     this.states.delete(id);
-    this.plateBounty.delete(id);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       if (anchor.id !== id) continue;
@@ -468,7 +583,6 @@ export class NameplatePainter {
   dispose(): void {
     this.anchorCount = 0;
     this.states.clear();
-    this.plateBounty.clear();
     this.paintGate.invalidate();
     this.surface.dispose();
   }
@@ -483,7 +597,12 @@ export class NameplatePainter {
    * rogue's poisons and a druid's Lunar Tempest land here exactly like a warlock's
    * Blackrot, with no ability or class list anywhere on the path.
    */
-  private resolveDots(state: NameplateCanvasState, entity: Entity, player: Entity): void {
+  private resolveDots(
+    state: NameplateCanvasState,
+    entity: Entity,
+    player: Entity,
+    languageChanged: boolean,
+  ): void {
     const scale = this.nameplateDotScale();
     if (scale <= 0 || entity.kind !== 'mob' || entity.dead) {
       state.dots.count = 0;
@@ -506,6 +625,13 @@ export class NameplatePainter {
         const source = entity.auras.find((aura) => aura.id === slot.iconKey);
         slot.iconUrl = nameplateDotIconUrl(slot.iconKey, source?.kind ?? '');
       }
+      // A language switch re-formats both cached numbers: a steady stack count
+      // (unlike the countdown) would otherwise keep the old locale's digits
+      // until it next moved.
+      if (languageChanged) {
+        slot.timeValue = Number.NaN;
+        slot.stacksValue = Number.NaN;
+      }
       // Re-format only when the number actually moves at the drawn precision:
       // above ten seconds that is once a second rather than once a frame, and
       // the cached text is what the draw path reads either way.
@@ -514,6 +640,12 @@ export class NameplatePainter {
       if (slot.timeText === '' || quantized !== slot.timeValue) {
         slot.timeValue = quantized;
         slot.timeText = formatNumber(quantized, NAMEPLATE_DOT_NUMBER_OPTIONS[slot.decimals]);
+      }
+      // The stack badge only re-formats when the count moves (an application
+      // landing or falling off), never per frame.
+      if (slot.stacks !== slot.stacksValue) {
+        slot.stacksValue = slot.stacks;
+        slot.stacksText = slot.stacks > 0 ? formatNumber(slot.stacks) : '';
       }
     }
   }
@@ -531,13 +663,35 @@ export class NameplatePainter {
     // dead-enemy arm below already trusts).
     state.hostile = entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity));
     state.deadEnemy =
-      entity.dead && (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
+      shownDead(entity) &&
+      (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
+    // World PvP bounty: the whole tag paints blood red, read live like hostile.
+    state.bounty = nameplateHasBounty(entity);
     state.myPet = entity.ownerId === player.id;
     state.threat = plan.threat;
+    const highlighted = state.currentTarget && this.isHostileEntity(entity) && !entity.dead;
+    state.emphasis = highlighted && this.targetHighlight.nameplate;
+    state.overheadMarker = highlighted && this.targetHighlight.overhead;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
-    state.hpFill = entity.hp / Math.max(1, entity.maxHp);
-    this.resolveDots(state, entity, player);
+    state.hpFill = isPlayingDead(entity) ? 0 : entity.hp / Math.max(1, entity.maxHp);
+    // A hostile player's tracked cooldowns, on the same per-frame cadence as the dots.
+    // The resolver also clears non-player rows before a name-only NPC returns.
+    resolveNameplateCooldowns(
+      state.cooldowns,
+      entity,
+      state.hostile,
+      this.nameplateCooldownScale(),
+      languageChanged,
+    );
 
+    if (plan.nameOnly) {
+      state.dots.count = 0;
+      state.castVisible = false;
+      state.castSource = '';
+      state.castLabel = '';
+      return;
+    }
+    this.resolveDots(state, entity, player, languageChanged);
     const cast = castBarState(entity);
     state.castVisible = cast.visible;
     state.castFill = cast.fill;
@@ -588,7 +742,7 @@ export class NameplatePainter {
     state.emoteLabel = '';
     state.friendlyPet = false;
 
-    const raidMark = this.world.markerFor(entity.id);
+    const raidMark = plan.nameOnly ? null : this.world.markerFor(entity.id);
     if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
 
     let emote = null;
@@ -628,11 +782,9 @@ export class NameplatePainter {
       state.pvpFlag = entity.pvpFlag === true;
       const pvpTag = state.pvpFlag ? `<${t('hudChrome.nameplate.pvpTag')}> ` : '';
       const afkTag = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ` : '';
-      // The King of the Hill bounty (src/ui/hill_bounty_tag.ts, shared with the
-      // target frame): what this player is worth while a kill streak runs.
-      const bountyLabel = hillBountyTagLabel(entity);
-      const bountyTag = bountyLabel ? `${bountyLabel} ` : '';
-      state.name = `${pvpTag}${bountyTag}${afkTag}${baseName}`;
+      // The bounty's non-colour cue (forced colours flatten the blood red).
+      const bountyTag = state.bounty ? `<${t('hudChrome.nameplate.bountyTag')}> ` : '';
+      state.name = `${bountyTag}${pvpTag}${afkTag}${baseName}`;
       state.nameColor = roleColor ?? '#7fb8ff';
       // A member's line is their guild; a PLEDGE (docs/prd/guild-pledge-board.md)
       // borrows the same line with the localized pledge wording, so an
@@ -650,7 +802,17 @@ export class NameplatePainter {
       if (entity.guild) state.guildLabel = `<${entity.guild}>`;
       else if (entity.pledgeGuild)
         state.guildLabel = t('hudChrome.nameplate.pledgeTag', { guild: entity.pledgeGuild });
-      state.hpVisible = !entity.dead;
+      state.hpVisible = !shownDead(entity);
+      // A World PvP body holding spoils THIS viewer may take (only the killing
+      // blow: src/sim/pvp/world_pvp_spoils.ts) wears the corpse loot satchel,
+      // through the same per-viewer rule as a mob corpse.
+      if (entity.dead) {
+        const spoils = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+        if (spoils !== 'none') {
+          state.marker = spoils;
+          state.markerTone = spoils;
+        }
+      }
       state.title = entity.title ? deedTitleText(entity.title) : '';
       state.border = deedBorderSlug(entity.border);
       state.aiLabel = entity.aiAccount === true ? t('hudChrome.playerMenu.aiTag') : '';
@@ -707,7 +869,7 @@ export class NameplatePainter {
 
     state.badges.length = 0;
 
-    if (entity.kind === 'npc' || (!entity.hostile && entity.questIds.length > 0)) {
+    if (isNpcPlateEntity(entity)) {
       state.name =
         entity.kind === 'npc'
           ? npcDisplayName(entity.templateId)
@@ -741,8 +903,9 @@ export class NameplatePainter {
     const elite = !!template?.elite;
     const boss = !!template?.boss;
     state.friendlyPet = isFriendlyPet(entity, this.world.entities, this.isHostilePlayer);
-    const mobName =
-      entity.ownerId !== null
+    const mobName = isBuddyMob(entity)
+      ? entityDisplayName(entity)
+      : entity.ownerId !== null
         ? (localizeSimAuraName(entity.name) ?? entity.name)
         : mobDisplayName(entity.templateId);
     state.name = entity.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
@@ -753,7 +916,7 @@ export class NameplatePainter {
           level: formatNumber(entity.level, NAMEPLATE_LEVEL_NUMBER_OPTIONS),
         });
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
-    state.hpVisible = !entity.dead;
+    state.hpVisible = !entity.dead && !plan.noHealthBar;
     // What this body still offers THIS viewer, never the bare lootable flag: a
     // harvest-only body keeps `lootable` true through its grace window, and a
     // stranger's owner-locked kill is lootable for someone else. Ordinary loot

@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-mage-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 30,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_mage_arcane_helmet",
+      "family": "arcane",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_arcane_helmet.webp",
+      "canonicalDisplayName": "Hourbinder's Hood",
+      "acceptedSha256": "c4ef6867f356ae01a85ef7f62b2b63ee3b323c99aec265614fc0d7e99947fa43",
+      "acceptedBytes": 3636,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_arcane_helmet.png",
+        "sha256": "de65f1120f2c7334d3fc11c594c6085c9d004face696d9408990d020683d7bc6",
+        "bytes": 2418385,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_arcane_helmet.png",
+        "sha256": "283b25dc5409f191a4675733ab9d5b7e71623ae02237a4c0a944c60f4ed9f8d7",
+        "bytes": 534756,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Hourbinder's Hood: empty pointed cloth hood with violet inner lining and tiny hourglass-shaped gold clasp at neck, no face. Coordinated arcane Mage CLOTH set: deep midnight-blue and muted violet woven cloth with narrow aged-gold piping and small amber hourglass-shaped clasps. Tailored layered fabric with circular stitched ornament, no visible writing, numbers or clock faces. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_arcane_shoulder",
+      "family": "arcane",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_arcane_shoulder.webp",
+      "canonicalDisplayName": "Hourbinder's Amice",
+      "acceptedSha256": "8f24cbe2c2676202800d399c2c6dd9663a36fd9e52c4d31f164f4ac3730640ef",
+      "acceptedBytes": 4214,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_arcane_shoulder.png",
+        "sha256": "4f97373f627f96db37626a55df67b49df59870b088a26e0b606d8f3605ea25a9",
+        "bytes": 2506564,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_arcane_shoulder.png",
+        "sha256": "f586e8261092fc5dce2227817cfcfcf6e31f9814343ab15e0aedc38ae539a5fd",
+        "bytes": 547648,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Hourbinder's Amice: broad short layered fabric shoulder cape with a high folded collar, gold piping and amber clasp, no torso. Coordinated arcane Mage CLOTH set: deep midnight-blue and muted violet woven cloth with narrow aged-gold piping and small amber hourglass-shaped clasps. Tailored layered fabric with circular stitched ornament, no visible writing, numbers or clock faces. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_arcane_chest",
+      "family": "arcane",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_arcane_chest.webp",
+      "canonicalDisplayName": "Hourbinder's Robe",
+      "acceptedSha256": "7e841ff5902fa23721d256a66760456a6b027175ab50a171d026adae779288ed",
+      "acceptedBytes": 3860,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_arcane_chest.png",
+        "sha256": "9a3c9c82adf6c1935a07573e0eff96df4564170b910dab0c972d7c9a1481cc6c",
+        "bytes": 2483369,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_arcane_chest.png",
+        "sha256": "03c979bc00177deb8b21d686e2fd51b3f847b22c2edf0057ac7b892ca4920f0c",
+        "bytes": 548993,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Hourbinder's Robe: complete empty floor-length tailored robe with full sleeves, violet central panel and gold-edged narrow sash, no body. Coordinated arcane Mage CLOTH set: deep midnight-blue and muted violet woven cloth with narrow aged-gold piping and small amber hourglass-shaped clasps. Tailored layered fabric with circular stitched ornament, no visible writing, numbers or clock faces. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_arcane_legs",
+      "family": "arcane",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_arcane_legs.webp",
+      "canonicalDisplayName": "Hourbinder's Trousers",
+      "acceptedSha256": "323e692ffedbaf1bcdaac5a77a72f45806600a298ce2c94617db56f2f42ce244",
+      "acceptedBytes": 3204,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_arcane_legs.png",
+        "sha256": "30736b2220d5f9e21585c3d6dc25fdd1f4020f64f92153a50710e91fc261e56f",
+        "bytes": 2415524,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_arcane_legs.png",
+        "sha256": "d4e0f4f883ca963546363e41c602aa611e5be7f5b0df2ee28b9678718a942165",
+        "bytes": 523551,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Hourbinder's Trousers: pair of loose woven trousers with violet side panels, gold cuff piping and amber sash clasp, separated legs, no boots. Coordinated arcane Mage CLOTH set: deep midnight-blue and muted violet woven cloth with narrow aged-gold piping and small amber hourglass-shaped clasps. Tailored layered fabric with circular stitched ornament, no visible writing, numbers or clock faces. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_arcane_gloves",
+      "family": "arcane",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_arcane_gloves.webp",
+      "canonicalDisplayName": "Hourbinder's Gloves",
+      "acceptedSha256": "25b65339a2df28a9ebec0a290480b837c5879a2f992de792f2fc0a5adb1059cb",
+      "acceptedBytes": 4140,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_arcane_gloves.png",
+        "sha256": "1ead1acc75686dfb49f8ad75bfb786296da2db6b049146ce7abfaae7da8c6fad",
+        "bytes": 2714833,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_arcane_gloves.png",
+        "sha256": "0e8d058bd24b076ff013abffd6105570ab740a2e574589c5bd2b0527a3ab56a5",
+        "bytes": 573590,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Hourbinder's Gloves: pair of empty fitted woven gloves with violet turn-back cuffs and amber clasps, five covered fingers each. Coordinated arcane Mage CLOTH set: deep midnight-blue and muted violet woven cloth with narrow aged-gold piping and small amber hourglass-shaped clasps. Tailored layered fabric with circular stitched ornament, no visible writing, numbers or clock faces. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_fire_helmet",
+      "family": "fire",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_fire_helmet.webp",
+      "canonicalDisplayName": "Emberlash Cowl",
+      "acceptedSha256": "8af54f5d20a79798aeebc79c96a028137929075aab71567387c59ce36fa41d5d",
+      "acceptedBytes": 3710,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_fire_helmet.png",
+        "sha256": "5796d840865601e863c9626d2bfd51357a3848a1516ab585c80fe9ef8fc98686",
+        "bytes": 2491062,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_fire_helmet.png",
+        "sha256": "560ab37c306ad6eee593367cd0ef17af32b6a2bec7764b0908d7cc9c1de45f75",
+        "bytes": 547458,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Emberlash Cowl: empty draped charcoal cloth hood with burnt-orange folded rim and garnet clasp, no face. Coordinated fire Mage CLOTH set: deep burnt-orange and charcoal woven cloth, muted crimson lining, narrow copper-thread trim and small garnet clasps. Layered flame-shaped fabric panels and warm ember accents, no actual fire or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_fire_shoulder",
+      "family": "fire",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_fire_shoulder.webp",
+      "canonicalDisplayName": "Emberlash Mantle",
+      "acceptedSha256": "7bd4bd1ffed2f959226d1069ebe24eefa689222ff91125cdba9b1f77b78d145e",
+      "acceptedBytes": 4618,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_fire_shoulder.png",
+        "sha256": "a1883a0666ce20a15f1e4221b4d26451d1b1a2c11723e4bc17deb2fcf1b9684e",
+        "bytes": 2697782,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_fire_shoulder.png",
+        "sha256": "931b3d9493031a0c5a30e7cafc0bed82be89fdd5d56f46aa3189c50550e119d1",
+        "bytes": 559835,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Emberlash Mantle: broad layered flame-shaped fabric shoulder mantle with copper-thread edging, no torso. Coordinated fire Mage CLOTH set: deep burnt-orange and charcoal woven cloth, muted crimson lining, narrow copper-thread trim and small garnet clasps. Layered flame-shaped fabric panels and warm ember accents, no actual fire or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_fire_chest",
+      "family": "fire",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_fire_chest.webp",
+      "canonicalDisplayName": "Emberlash Robes",
+      "acceptedSha256": "d0ad1fd88ec671e87567b588d57398fd1de425cc1d2154afdb366efe6ee79314",
+      "acceptedBytes": 3954,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_fire_chest.png",
+        "sha256": "385f7c27687a1c8dcf4a34eb6e820ef6976b8fb355f73f2f4bfdde7ddbdd7c1e",
+        "bytes": 2422783,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_fire_chest.png",
+        "sha256": "01f3077db44f7c0bd05ede47f838edb8338cf879e950cf897e6f183bf80e426b",
+        "bytes": 552078,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Emberlash Robes: complete empty floor-length robe with burnt-orange central panels, charcoal sleeves and split flared fabric hem, no body. Coordinated fire Mage CLOTH set: deep burnt-orange and charcoal woven cloth, muted crimson lining, narrow copper-thread trim and small garnet clasps. Layered flame-shaped fabric panels and warm ember accents, no actual fire or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_fire_legs",
+      "family": "fire",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_fire_legs.webp",
+      "canonicalDisplayName": "Emberlash Leggings",
+      "acceptedSha256": "ec5121e196441c8f7820a86aef9767038544c6d47214bc27fdc2fcfb6a314910",
+      "acceptedBytes": 3456,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_fire_legs.png",
+        "sha256": "2d7dc8c6b740c7547ff4b627072413114714cb861f5362af531515db009bc9b3",
+        "bytes": 2369038,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_fire_legs.png",
+        "sha256": "2d18c854334dec196c0c9c9b019d1c290cda98b199eea8cb0521b2ac20c02206",
+        "bytes": 551041,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Emberlash Leggings: pair of charcoal cloth leggings with orange layered hip drapes and copper-thread cuff trim, separated legs, no boots. Coordinated fire Mage CLOTH set: deep burnt-orange and charcoal woven cloth, muted crimson lining, narrow copper-thread trim and small garnet clasps. Layered flame-shaped fabric panels and warm ember accents, no actual fire or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_fire_gloves",
+      "family": "fire",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_fire_gloves.webp",
+      "canonicalDisplayName": "Emberlash Gloves",
+      "acceptedSha256": "01bb72a4f2e2dba96c09b0019c6d62c4013469f6932dc969a918603653003fa1",
+      "acceptedBytes": 3916,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_fire_gloves.png",
+        "sha256": "50cae82a6c4a49e8c738d87a223c94f76b07a838d805bf117f0d4d6979d7c87d",
+        "bytes": 2677193,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_fire_gloves.png",
+        "sha256": "cb5d1ac8be44291a7362377d5e7318746f5d530b8c2e37c6eb01448bd2374388",
+        "bytes": 545820,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Emberlash Gloves: pair of empty charcoal woven gloves with burnt-orange pointed cuffs and garnet wrist clasps, five covered fingers each. Coordinated fire Mage CLOTH set: deep burnt-orange and charcoal woven cloth, muted crimson lining, narrow copper-thread trim and small garnet clasps. Layered flame-shaped fabric panels and warm ember accents, no actual fire or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_frost_helmet",
+      "family": "frost",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_frost_helmet.webp",
+      "canonicalDisplayName": "Rimewarden Hood",
+      "acceptedSha256": "722083b92ec0fd10ece119d5bbd23fca1c30316444a56dbdc578815f2fdb3c48",
+      "acceptedBytes": 3670,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_frost_helmet.png",
+        "sha256": "e9e6c3da53ee18a334190b8600dcf059ce812f0f4e9ae488cbfb79866b3da862",
+        "bytes": 2452314,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_frost_helmet.png",
+        "sha256": "599fc77a1db4596eef45e0e1fd91498c78393952bf415e290599f3e85f5a7ae9",
+        "bytes": 586867,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Rimewarden Hood: empty padded slate-blue cloth hood with narrow white fur rim and frosted-blue neck clasp, no face. Coordinated frost Mage CLOTH set: slate-blue and pale ice-grey thick woven cloth with restrained white fur edging, narrow tarnished-silver fittings and small frosted-blue stones. Padded soft winter fabric and angular stitched trim, no metal armor or actual ice effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_frost_shoulder",
+      "family": "frost",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_frost_shoulder.webp",
+      "canonicalDisplayName": "Rimewarden Shoulderpads",
+      "acceptedSha256": "40c2839fc4c1e4de56fd06bfe9cf40e6420abf40021c655b9faacd9d36f339dc",
+      "acceptedBytes": 4178,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_frost_shoulder.png",
+        "sha256": "b031e4b7b8ad4f52edce375c95ceacf6a4ebd6550a1714e56c669e054ca9a183",
+        "bytes": 2643461,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_frost_shoulder.png",
+        "sha256": "8457e7b00e496c92f1b325bc30869595901fd7c057ab2f314c21a23de208c436",
+        "bytes": 598688,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Rimewarden Shoulderpads: pair of thick padded cloth shoulder guards with pale-grey angular panels and white fur edging, no torso. Coordinated frost Mage CLOTH set: slate-blue and pale ice-grey thick woven cloth with restrained white fur edging, narrow tarnished-silver fittings and small frosted-blue stones. Padded soft winter fabric and angular stitched trim, no metal armor or actual ice effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_frost_chest",
+      "family": "frost",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_frost_chest.webp",
+      "canonicalDisplayName": "Rimewarden Vestment",
+      "acceptedSha256": "14011905fc7c946575341b1ddd23bde5da2a72b24ef7c0df4c27ccf73103f649",
+      "acceptedBytes": 3712,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_frost_chest.png",
+        "sha256": "d494788cc4a15a82ea93bbd011b1be2b5cdf26ddfb378310b0ae82715c158a04",
+        "bytes": 2683061,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_frost_chest.png",
+        "sha256": "086078755f5b15687bf3c23af07c88e1d5aea1d8e442b6a05548a6b1a336a353",
+        "bytes": 609522,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Rimewarden Vestment: complete empty full-length slate-blue winter cloth vestment with pale-grey front panels, fur collar and thick sleeves, no body. Coordinated frost Mage CLOTH set: slate-blue and pale ice-grey thick woven cloth with restrained white fur edging, narrow tarnished-silver fittings and small frosted-blue stones. Padded soft winter fabric and angular stitched trim, no metal armor or actual ice effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_frost_legs",
+      "family": "frost",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_frost_legs.webp",
+      "canonicalDisplayName": "Rimewarden Legwraps",
+      "acceptedSha256": "72640a6f86c2a4619167a95369631c4ca5199109eeeb6a37ea76c0f87673ac87",
+      "acceptedBytes": 3754,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_frost_legs.png",
+        "sha256": "c3b75dbd0f221af4c43e4a5f59fa2cf77939ade74094afafda8439f3e38bdd94",
+        "bytes": 2389500,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_frost_legs.png",
+        "sha256": "c556881c205fefcc698307bb8ea49f90efdd12a6c8dccede11b2635e6152f30d",
+        "bytes": 567091,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Rimewarden Legwraps: pair of padded slate-blue cloth legwraps with pale-grey spiral bindings and narrow fur ankle edging, separated legs, no boots. Coordinated frost Mage CLOTH set: slate-blue and pale ice-grey thick woven cloth with restrained white fur edging, narrow tarnished-silver fittings and small frosted-blue stones. Padded soft winter fabric and angular stitched trim, no metal armor or actual ice effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_mage_frost_gloves",
+      "family": "frost",
+      "batch": "warfare-season2-mage-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_mage_frost_gloves.webp",
+      "canonicalDisplayName": "Rimewarden Mitts",
+      "acceptedSha256": "5f02016fffcfea4e49d7f249bccc728d377bc3bc5ee9d54a63bbb950605b2f19",
+      "acceptedBytes": 3566,
+      "original": {
+        "path": "tmp/imagegen/v045-mage/originals/vanguard_mage_frost_gloves.png",
+        "sha256": "069c6fae2c13b4cf8c4e0c614c41f02d39e587f7040b40fea891f4466129e814",
+        "bytes": 2866779,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-mage/masters/vanguard_mage_frost_gloves.png",
+        "sha256": "2014695be555eebae5d6bbe4f1f0bb945143d42910927497ec5c5ac2f4222eb7",
+        "bytes": 605164,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Rimewarden Mitts: pair of empty soft padded slate-blue mittens with one thumb and a rounded shared finger pocket on each, pale-grey palms and narrow white fur cuffs, no skin. Coordinated frost Mage CLOTH set: slate-blue and pale ice-grey thick woven cloth with restrained white fur edging, narrow tarnished-silver fittings and small frosted-blue stones. Padded soft winter fabric and angular stitched trim, no metal armor or actual ice effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave and clear fabric folds, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-mage-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-mage-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

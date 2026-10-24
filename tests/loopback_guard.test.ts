@@ -183,6 +183,7 @@ const GUARDED_SCRIPTS = [
   'scripts/mob_stall_repro.mjs',
   'scripts/profile_recent_finds_shot.mjs',
   'scripts/profiler/geared_arrival_roster.mjs',
+  'scripts/realm_motd_shot.mjs',
   'scripts/store_intent_durability_probe.mjs',
   'scripts/store_online_ladder_probe.mjs',
 ] as const;
@@ -200,10 +201,16 @@ const URL_GUARDED_SCRIPTS = [
   'scripts/bank_guild_pane_probe.mjs',
   'scripts/crowd_fps_bench.mjs',
   'scripts/form_adornment_shot.mjs',
+  // The Gloamveil before/after capture: /dev cheats (god mode, a spawned wolf)
+  // through the sim of the page it opens, against a local Vite server, no database.
+  'scripts/gloamveil_look_shot.mjs',
   'scripts/gpu_hitch_capture.mjs',
   // The druid cat form acceptance drive: offline commands against a local Vite
   // server, no database of its own.
   'scripts/druid_cat_game_check.mjs',
+  // The WOC crowd A/B rig: it adds and dresses bot players through the sim of
+  // the page it opens, against one arm's local Vite server, no database.
+  'scripts/woc_crowd_ab.mjs',
 ] as const;
 
 // Full-line // comments are stripped before the scan: this file's own subject

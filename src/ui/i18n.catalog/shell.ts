@@ -98,6 +98,10 @@ export const shellStrings = {
       selectClass: 'Please select a class.',
       pickClass: 'Pick a class.',
       returnToLogin: 'Return to Login',
+      searchUpdates: 'Search for updates',
+      noUpdateFound: 'No update found. Try again shortly.',
+      updateUnavailable: 'Update through your game store or download the latest client.',
+      updateSearchFailed: 'Could not check for updates. Please try again.',
       api: {
         tooManyAttempts: 'Too many attempts. Wait a minute and try again.',
         usernameShape: 'Username must be 3-24 characters and use letters, digits, or underscore.',
@@ -264,6 +268,9 @@ export const shellStrings = {
     character: {
       loading: 'Loading...',
       noneYet: 'No characters yet. Create one below.',
+      membershipRequired: 'Renew your membership to play this character.',
+      membershipSlots: 'Unlock slots with a membership',
+      emptySlot: 'Available character slot',
       levelClass: 'Level {level} {className}',
       inWorld: 'in world',
       takeOver: 'Take Over',
@@ -277,6 +284,8 @@ export const shellStrings = {
       lockoutRaids: 'Raids',
       lockoutDungeons: 'Dungeons',
       lockoutWorldBosses: 'World bosses',
+      // Weekly quests locked until the weekly reset (src/sim/quests/weekly_quest_lock.ts).
+      lockoutWeeklyQuests: 'Weekly quests',
       takeOverConfirm:
         'This will disconnect this character from another session and bring it here. Continue?',
       renameRequired: 'rename required',
@@ -399,6 +408,18 @@ export const shellStrings = {
       otherStandaloneDetail: 'Keep your device in landscape fullscreen.',
       otherInstallDetail:
         'Install or add this page to your Home screen for the best fullscreen mobile experience.',
+    },
+    graphicsPrompt: {
+      title: 'Choose Your Graphics',
+      intro:
+        'Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.',
+      autoDesc: 'Picks a preset that suits this device. Detected: {preset}.',
+      lowDesc: 'Smoothest performance. Best for phones, tablets, and older or integrated graphics.',
+      mediumDesc: 'A balance of visuals and performance. Suits most laptops.',
+      highDesc: 'More detail and fuller scenery. Suits a dedicated graphics card.',
+      ultraDesc: 'The richest fixed preset. Suits a high-end graphics card.',
+      changeLater: 'You can change this any time in Options, under Graphics Quality.',
+      confirm: 'Continue',
     },
     serverUnavailable: {
       title: 'World of ClaudeCraft - World Unavailable',

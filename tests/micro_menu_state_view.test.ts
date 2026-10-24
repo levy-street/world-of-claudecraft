@@ -62,8 +62,7 @@ describe('micro_menu_state_view: the open-window ring', () => {
   });
 
   it('never rings a launcher that is not a window opener', () => {
-    // The ring means "this button's window is open". #mm-music keeps its own
-    // mm-on gold, and the three non-window launchers open no `.window` at all.
+    // The ring means "this button's window is open".
     const selectors = MICRO_MENU_LAUNCHERS.map((l) => l.selector);
     // The positive control: an emptied registry would satisfy every exclusion below
     // without ringing anything, so name launchers that MUST still be here.
@@ -79,6 +78,7 @@ describe('micro_menu_state_view: the open-window ring', () => {
         '#mm-harvest-journal',
         '#mm-loot-explorer',
         '#mm-perfecting',
+        '#expedition-bell',
       ]),
     );
     for (const excluded of ['#mm-music', '#mm-emote', '#mm-wiki', '#mm-discord']) {
@@ -170,8 +170,15 @@ describe('micro_menu_state_view: the registry is real', () => {
     }
   });
 
-  it('maps every launcher to a distinct window', () => {
-    const windows = MICRO_MENU_LAUNCHERS.map((l) => l.windowId);
+  it('maps launchers to distinct windows except the explicit Groups bell alias', () => {
+    expect(
+      MICRO_MENU_LAUNCHERS.filter((l) => l.windowId === 'dungeon-finder-window').map(
+        (l) => l.selector,
+      ),
+    ).toEqual(['#mm-dfinder', '#expedition-bell']);
+    const windows = MICRO_MENU_LAUNCHERS.filter((l) => l.selector !== '#expedition-bell').map(
+      (l) => l.windowId,
+    );
     expect(new Set(windows).size).toBe(windows.length);
     const selectors = MICRO_MENU_LAUNCHERS.map((l) => l.selector);
     expect(new Set(selectors).size).toBe(selectors.length);

@@ -940,6 +940,11 @@ async function drainStragglingSaves(): Promise<void> {
       if (spin > 2_000) throw new Error('a previous world never drained its save queues');
       await new Promise((r) => setTimeout(r, 0));
     }
+    // A GameServer's referral services start their retry and delivery timers in
+    // the constructor, and those timers hold the whole server (its Sim and every
+    // world entity) until stop() clears them. A sweep builds hundreds of worlds,
+    // so an unstopped one per seed pinned them all and OOMed the CI fork.
+    await server.stop();
   }
   straggleWatch.length = 0;
 }

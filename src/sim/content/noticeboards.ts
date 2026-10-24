@@ -151,7 +151,9 @@ export const NOTICEBOARDS: readonly NoticeboardDef[] = Object.freeze([
   // Nudged off the pass-side square furniture (the placements probe).
   hubBoard('icemantle_noticeboard', 2_000_000_007, FROSTVEIL_ZONE, -8, -10),
   hubBoard('lanternmere_noticeboard', 2_000_000_008, AMBERFALL_ZONE, -5),
-  hubBoard('bridgemere_noticeboard', 2_000_000_009, WILLOWFEN_ZONE, -5),
+  // At the causeway's head in the island inn's forecourt (the painted inn
+  // stands over its old spot, sim/painted_towns/bridgemere.ts).
+  hubBoard('bridgemere_noticeboard', 2_000_000_009, WILLOWFEN_ZONE, -5, -15),
   hubBoard('moonrest_noticeboard', 2_000_000_010, NIGHTBLOOM_ZONE, -5),
   hubBoard('gallowmere_noticeboard', 2_000_000_011, WRAITHWOOD_ZONE, 5),
   hubBoard('drifthaven_noticeboard', 2_000_000_012, PALMREACH_ZONE, -5),

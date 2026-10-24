@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { HOARD_LOOT_CLASS_BIAS } from '../src/sim/content/hoard_loot';
-import { VAULT_GUEST_GEAR_CHANCE, VAULT_PAYOUTS } from '../src/sim/content/treasure_maps';
+import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
+import { VAULT_MATERIAL_POOL, VAULT_PAYOUTS } from '../src/sim/content/treasure_maps';
+import { ITEMS } from '../src/sim/data';
 import { rollHoardReward } from '../src/sim/rift/hoard_reward_roll';
 import { Rng } from '../src/sim/rng';
 
@@ -24,29 +26,9 @@ function scriptedRng(ints: number[], chances: boolean[]) {
 }
 
 describe('rollHoardReward', () => {
-  it.each([
-    ['common', 0.0025],
-    ['rare', 0.005],
-    ['epic', 0.0075],
-    ['legendary', 0.01],
-  ] as const)('rolls the %s mount chance from the chest', (rarity, mountChance) => {
-    const script = scriptedRng([0], [false, false, false, false]);
-    rollHoardReward(script.rng, {
-      rarity,
-      cls: 'hunter',
-      level: 20,
-      owner: true,
-      guestCapped: false,
-      mountOwned: false,
-    });
-    expect(script.calls.filter(([kind]) => kind === 'chance').at(-2)).toEqual([
-      'chance',
-      mountChance,
-    ]);
-  });
-
   it('preserves the owners full payout and exact draw order', () => {
-    const script = scriptedRng([1, 0], [true, true, true, true, true]);
+    // The trailing 0 is the gear piece's loot-quality draw: Ordinary, and last.
+    const script = scriptedRng([1, 0, 0], [true, true, true, true, true]);
     const reward = rollHoardReward(script.rng, {
       rarity: 'rare',
       bossTemplateId: 'rift_boss_arcane',
@@ -60,7 +42,7 @@ describe('rollHoardReward', () => {
       capped: false,
       copper: 54_000,
       items: [
-        { itemId: 'elderwood_log', count: 6 },
+        { itemId: 'pristine_silk', count: 6 },
         { itemId: 'rare_collapsar_band_of_nyxaris', count: 1 },
         { itemId: 'heroic_mark', count: 2 },
         { itemId: 'reins_lanternback_troll', count: 1 },
@@ -68,13 +50,14 @@ describe('rollHoardReward', () => {
       ],
     });
     expect(script.calls).toEqual([
-      ['int', 0, 2],
+      ['int', 0, 4],
       ['chance', VAULT_PAYOUTS.rare.gearChance],
       ['chance', HOARD_LOOT_CLASS_BIAS],
       ['int', 0, 3],
       ['chance', VAULT_PAYOUTS.rare.markChance],
       ['chance', VAULT_PAYOUTS.rare.mountChance],
       ['chance', VAULT_PAYOUTS.rare.nextMapChance],
+      ['int', 0, 9999],
     ]);
     expect(script.ints).toEqual([]);
     expect(script.chances).toEqual([]);
@@ -96,10 +79,10 @@ describe('rollHoardReward', () => {
     expect(reward).toEqual({
       capped: false,
       copper: 54_000,
-      items: [{ itemId: 'sunpetal_herb', count: 8 }],
+      items: [{ itemId: 'pristine_venom_gland', count: 8 }],
     });
     expect(script.calls).toEqual([
-      ['int', 0, 2],
+      ['int', 0, 4],
       ['chance', 0.2],
       ['chance', VAULT_PAYOUTS.epic.markChance],
       ['chance', VAULT_PAYOUTS.epic.mountChance],
@@ -107,26 +90,19 @@ describe('rollHoardReward', () => {
     ]);
   });
 
-  it('pays a guest with old capped state', () => {
-    const script = scriptedRng([0], [false, false, false, false]);
-    const reward = rollHoardReward(script.rng, {
-      rarity: 'legendary',
-      cls: 'druid',
-      level: 20,
-      owner: false,
-      guestCapped: true,
-      mountOwned: false,
-    });
-    expect(reward.capped).toBe(false);
-    expect(reward.copper).toBeGreaterThan(0);
-    expect(reward.items.length).toBeGreaterThan(0);
-    expect(script.calls).toEqual([
-      ['int', 0, 2],
-      ['chance', VAULT_GUEST_GEAR_CHANCE.legendary],
-      ['chance', VAULT_PAYOUTS.legendary.markChance],
-      ['chance', VAULT_PAYOUTS.legendary.mountChance],
-      ['chance', VAULT_PAYOUTS.legendary.nextMapChance],
-    ]);
+  it('returns a capped guest with no payout and no random draws', () => {
+    const script = scriptedRng([], []);
+    expect(
+      rollHoardReward(script.rng, {
+        rarity: 'legendary',
+        cls: 'druid',
+        level: 20,
+        owner: false,
+        guestCapped: true,
+        mountOwned: false,
+      }),
+    ).toEqual({ capped: true, copper: 0, items: [] });
+    expect(script.calls).toEqual([]);
   });
 
   it('draws the mount chance even when already owned', () => {
@@ -139,10 +115,10 @@ describe('rollHoardReward', () => {
       guestCapped: false,
       mountOwned: true,
     });
-    expect(reward.items).toEqual([{ itemId: 'thorium_ore', count: 4 }]);
+    expect(reward.items).toEqual([{ itemId: 'pristine_hide', count: 4 }]);
     expect(reward.copper).toBe(18_450);
     expect(script.calls).toEqual([
-      ['int', 0, 2],
+      ['int', 0, 4],
       ['chance', VAULT_PAYOUTS.common.gearChance],
       ['chance', VAULT_PAYOUTS.common.markChance],
       ['chance', VAULT_PAYOUTS.common.mountChance],
@@ -161,5 +137,24 @@ describe('rollHoardReward', () => {
       mountOwned: false,
     };
     expect(rollHoardReward(new Rng(473), input)).toEqual(rollHoardReward(new Rng(473), input));
+  });
+});
+
+describe('vault reward pools', () => {
+  it('pays only corpse-harvest specimens as its material', () => {
+    expect([...VAULT_MATERIAL_POOL]).toEqual([
+      'pristine_hide',
+      'pristine_silk',
+      'pristine_venom_gland',
+      'pristine_claw',
+      'prime_cut',
+    ]);
+    expect([...VAULT_MATERIAL_POOL].sort()).toEqual(
+      Object.values(HARVEST_COMPONENT_SPECIMENS).sort(),
+    );
+    for (const id of VAULT_MATERIAL_POOL) {
+      expect(ITEMS[id]?.kind, id).toBe('junk');
+      expect(ITEMS[id].quality, id).toBe('rare');
+    }
   });
 });

@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { buildSanctumExitPortal } from './sanctum_exit_portal';
 import { markOwnedMaterial, markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
 
@@ -247,7 +247,7 @@ function cloneWildheartGate(): THREE.Object3D | null {
 // rather than a rotating ball. White so the material colour tints it per rank.
 let riftPortalTex: THREE.CanvasTexture | null = null;
 
-function riftPortalTexture(): THREE.CanvasTexture | null {
+export function riftPortalTexture(): THREE.CanvasTexture | null {
   if (riftPortalTex) return riftPortalTex;
   if (typeof document === 'undefined') return null;
   const S = 256;
@@ -325,7 +325,12 @@ const RIFT_GATE_URL = '/models/props/rift_portal.glb';
 // Target world height (yards) the ~1.13-unit native model is scaled up to; the
 // gate looms taller than the old 5 yd arch to read from across the zone.
 const RIFT_GATE_HEIGHT = 6.0;
-let riftGateGltf: GLTF | null = null;
+let riftGateGltf: LoadedGltf | null = null;
+
+/** Test-only: stand in for the rift gate GLB the boot preload loads (Node has no fetch path). */
+export function setRiftGateGltfForTest(gltf: LoadedGltf | null): void {
+  riftGateGltf = gltf;
+}
 
 // The rift boulder / rolling boulder reuse a real detailed rock mesh (a shipped
 // KayKit-style prop) instead of a bare dodecahedron, so they read as proper craggy
@@ -333,17 +338,17 @@ let riftGateGltf: GLTF | null = null;
 // `--model-file` import lane's spirit): no new GLB, no Tripo credits. Cached +
 // shared like the gate; buildRiftPuzzleProp falls back to a dodecahedron if absent.
 const RIFT_ROCK_URL = '/models/props/rock_large_f.glb';
-let riftRockGltf: GLTF | null = null;
+let riftRockGltf: LoadedGltf | null = null;
 // Tripo-generated rift props (see CREDITS.md): an arcane flame that crowns the rune
 // pylons (replacing the old crystal/beam) and a carved rune monolith for the
 // sequence runes. Preloaded + shared like the rock; builders fall back to procedural
 // geometry if the asset is still loading.
 const RIFT_FLAME_URL = '/models/props/rift_flame.glb';
-let riftFlameGltf: GLTF | null = null;
+let riftFlameGltf: LoadedGltf | null = null;
 const RIFT_RUNE_URL = '/models/props/rift_rune.glb';
-let riftRuneGltf: GLTF | null = null;
+let riftRuneGltf: LoadedGltf | null = null;
 
-function markGltfShared(gltf: GLTF): void {
+function markGltfShared(gltf: LoadedGltf): void {
   gltf.scene.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
@@ -361,7 +366,7 @@ function markGltfShared(gltf: GLTF): void {
  * Recolor allocates a NEW per-clone material (the cached original stays shared and
  * untouched), disposed with the view like the procedural props. */
 function fittedPropClone(
-  gltf: GLTF,
+  gltf: LoadedGltf,
   height: number,
   stone?: { color: number; emissive: number },
 ): THREE.Group {
@@ -984,6 +989,25 @@ export function doorArchAuthoredElsewhere(
   placements: readonly { key: string; x?: number; z?: number }[] = FORGEFATHER_FORTRESS_PLACEMENTS,
 ): boolean {
   if (dungeonId === 'nythraxis_crypt') return true;
+  // The Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts) is the door: its
+  // pylons frame the walk-in lane and its cold mist film is the portal look.
+  if (dungeonId === 'gravewyrm_sanctum') return true;
+  // The Sunken Bastion's Drowned Gate Tower (sunken_bastion_entrance.ts) is
+  // the door: its inner arch frames the walk-in lane and the flooded passage
+  // it draws behind the arch is the portal look.
+  if (dungeonId === 'sunken_bastion') return true;
+  // The Hollow Crypt's Fallen Chapel (hollow_crypt_entrance.ts) is the door:
+  // its stair-house portal frames the walk-in lane and the stair it draws
+  // behind the arch is the portal look.
+  if (dungeonId === 'hollow_crypt') return true;
+  // The Drowned Temple's Moon Stair (drowned_temple_entrance.ts) is the door:
+  // its moongate ring frames the walk-in lane and the film of cold moonlight
+  // it draws in the ring is the portal look.
+  if (dungeonId === 'drowned_temple') return true;
+  // The Wildheart Basin's Jaguar Maw (wildheart_basin_entrance.ts) is the
+  // door: its muzzle frames the walk-in lane and the flooded throat it draws
+  // behind the fangs is the portal look.
+  if (dungeonId === 'wildheart_basin') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
   // Forge-Lift since the lift became the first room; the Halls id stays
   // covered so a chain reshuffle can never resurrect the generic arch
@@ -995,7 +1019,7 @@ export function doorArchAuthoredElsewhere(
   // the moment a castle_door is baked into the fortress table AT the keep
   // door; one placed elsewhere is some other site's gate).
   if (dungeonId === 'the_last_keep') {
-    const door = DUNGEONS.the_last_keep.doorPos;
+    const door = activeDungeonDoorPos(DUNGEONS.the_last_keep);
     return placements.some(
       (p) =>
         p.key === 'castle_door' &&
@@ -1017,17 +1041,22 @@ export function buildDoorBody(
   dungeonId: string | null | undefined,
   lowGfx: boolean,
 ): { body: THREE.Group; portal?: THREE.Mesh } {
+  if (!entering && dungeonId === SANCTUM_EXIT_DUNGEON) {
+    return buildSanctumExitPortal(lowGfx, riftPortalTexture());
+  }
   const body = new THREE.Group();
   // Doors whose visible arch is authored elsewhere render only an invisible
   // click-box: the Nythraxis crypt arch is baked into that dungeon's
   // geometry, and the Forgefather raid door yields to the owner's placed
   // dungeon_entrance facade with its mist gate (ignivar_mist_gate.ts) the
   // moment one is baked into the fortress table; until then it keeps the
-  // generic arch so the door is never invisible.
+  // generic arch so the door is never invisible. The Sanctum's Seal Gate
+  // (sanctum_seal_gate.ts) draws its pylons and its mouth mist itself.
   if (entering && doorArchAuthoredElsewhere(dungeonId)) {
     // The shared 4.6x4.2 box is a deliberate one-size click affordance: it
     // covers the crypt arch AND the facade's doorway (about 3.3yd wide at
-    // the owner's scale), and the walk-in trigger owns actual entry.
+    // the owner's scale) AND the Seal Gate's 4yd lane, and the walk-in
+    // trigger owns actual entry.
     const clickBox = new THREE.Mesh(doorNythraxisClickGeometry(), doorNythraxisClickMaterial());
     clickBox.position.y = 2.1;
     body.add(clickBox);
@@ -1087,4 +1116,31 @@ export function buildDoorBody(
     if (!wildheartGate) body.scale.setScalar(1.65);
   }
   return { body, portal };
+}
+
+/** The dungeon whose exit draws its own body (sanctum_exit_portal.ts). */
+const SANCTUM_EXIT_DUNGEON = 'gravewyrm_sanctum';
+
+/**
+ * The door family's boot prewarm bodies, side by side in one group: the
+ * generic entrance and exit arches, and the Gravewyrm Sanctum's frost exit.
+ * The frost exit is the only door body whose textured membrane no other boot
+ * artifact links, and it first appears in the seconds after a boss kill, so
+ * it is staged here rather than left to its view's gate. The renderer places
+ * the group, links it with the monolithic compile and tears it out at world
+ * entry; every material and geometry under it is a shared, process-lifetime
+ * resource, exactly the instances the live views draw.
+ */
+export function buildDoorPrewarmBodies(lowGfx: boolean): THREE.Group {
+  const group = new THREE.Group();
+  const bodies = [
+    buildDoorBody(true, null, lowGfx).body,
+    buildDoorBody(false, null, lowGfx).body,
+    buildDoorBody(false, SANCTUM_EXIT_DUNGEON, lowGfx).body,
+  ];
+  bodies.forEach((body, i) => {
+    body.position.x = (i - (bodies.length - 1) / 2) * 6;
+    group.add(body);
+  });
+  return group;
 }

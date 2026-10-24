@@ -1,5 +1,6 @@
 import { ITEMS } from '../sim/data';
 import { WEEKLY_REWARD_MAX_LEVEL_OFFSET } from '../sim/weekly_reward_options';
+import { needsWeeklyBossTable } from '../sim/weekly_reward_tables';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
@@ -30,13 +31,23 @@ export function appendWeeklyLootCategory(
     rule.textContent = t(
       pool.pool === 'world'
         ? 'hudChrome.weeklyRewards.worldPoolRule'
-        : 'hudChrome.weeklyRewards.selectionPoolRule',
+        : row.catalog === 'all' && needsWeeklyBossTable(pool.pool)
+          ? 'hudChrome.weeklyRewards.previewPoolRule'
+          : 'hudChrome.weeklyRewards.selectionPoolRule',
       { maxLevelOffset: formatNumber(WEEKLY_REWARD_MAX_LEVEL_OFFSET) },
     );
     group.append(title, rule);
     if (!pool.tables.length) {
       const empty = document.createElement('p');
-      empty.textContent = t('hudChrome.weeklyRewards.noLevelLoot');
+      empty.textContent = t(
+        pool.emptyReason === 'focus'
+          ? 'hudChrome.weeklyRewards.noFocusedLoot'
+          : pool.emptyReason === 'level'
+            ? 'hudChrome.weeklyRewards.noLevelLoot'
+            : pool.emptyReason === 'exhausted'
+              ? 'hudChrome.weeklyRewards.tablesExhausted'
+              : 'hudChrome.weeklyRewards.noTables',
+      );
       group.append(empty);
     }
     for (const table of pool.tables) {

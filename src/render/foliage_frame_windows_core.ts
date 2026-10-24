@@ -78,7 +78,13 @@ export function resolveFoliageFrameWindows(
 ): void {
   const { dists, spritesOn, fogFar, atmosFogNear, atmosFogFar } = input;
   const distanceScale = foliageDistanceScale(input.modelQuality, input.leanFoliage);
-  const fogLimit = foliageFogLimit(fogFar, input.modelQuality);
+  // When LowSceneryBands clamps fogFar to its clear-air handoff (60 yd inside
+  // atmosFogNear), trimming fogLimit by modelQuality opens a 46.8..60 yd dead
+  // ring where source trees collapse before the middle band takes over at 60 yd.
+  const fogLimit =
+    input.leanFoliage && fogFar < atmosFogNear
+      ? fogFar
+      : foliageFogLimit(fogFar, input.modelQuality);
   // Sprite arm: the handoff follows the budget (sprites are legible in
   // clear air); lean arm: the old fog-blend law, trees end in the murk.
   const detailFar = spritesOn

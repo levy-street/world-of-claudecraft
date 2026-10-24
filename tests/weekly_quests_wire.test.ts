@@ -26,6 +26,53 @@ function mirrors(): QuestSelfMirrors {
 }
 
 describe('weekly quest wire', () => {
+  it('carries a pending commendation through the owner snapshot into ClientWorld', () => {
+    const carried = {
+      questId: 'wk_raid',
+      week: 'wk_1',
+      count: 1,
+      state: 'completed' as const,
+      carried: true as const,
+    };
+    const meta = {
+      questLog: new Map(),
+      questsDone: new Set(),
+      worldQuestCycle: 'wq1_3',
+      worldQuestLog: new Map(),
+      weeklyQuest: carried,
+    };
+    const emitted: Record<string, unknown> = {};
+    emitQuestSelfKeys(
+      (key, value) => {
+        emitted[key] = value;
+      },
+      { worldQuestExpiresAtMs: 5, weeklyQuestResetAtMs: 9 } as never,
+      meta as never,
+    );
+    const client = bareClient(7);
+    const snapshotClient = client as unknown as {
+      applySnapshot(snapshot: unknown): void;
+    };
+    snapshotClient.applySnapshot({
+      t: 'snap',
+      tick: 1,
+      time: 0,
+      ents: [],
+      self: { id: 7, k: 'player', nm: 'Ari', lv: 20, x: 0, y: 0, z: 0, f: 0, ...emitted },
+    });
+    expect(client.weeklyQuest).toEqual(carried);
+    snapshotClient.applySnapshot({ t: 'snap', tick: 2, time: 0, ents: [], self: { id: 7 } });
+    expect(client.weeklyQuest).toEqual(carried);
+    snapshotClient.applySnapshot({
+      t: 'snap',
+      tick: 3,
+      time: 0,
+      ents: [],
+      self: { id: 7, wkq: null },
+    });
+    expect(client.weeklyQuest).toBeNull();
+  });
+
   it('sends the pick as its own command and validates it before the authoritative call', () => {
     expect(COMMAND_NAMES).toContain('world_quest_weekly_choose');
     expect(isWorldQuestWireCommand('world_quest_weekly_choose')).toBe(true);

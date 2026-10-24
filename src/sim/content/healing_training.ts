@@ -102,10 +102,13 @@ export const HEALING_TRAINING_MOBS: Record<string, MobTemplate> = {
   },
 };
 
+// One east-west row behind (north of) the quay cottage, beside Drillmaster Hale's yard: the
+// cottage (eastbrook_layout.ts eastbrook_quay_cottage) stands where the old north-south column
+// began, and its tank and soldier would have spawned inside its walls.
 export const HEALING_TRAINING_GROUND_SPAWNS = [
-  { mobId: HEALING_DUMMY_TANK_ID, pos: { x: -76, z: -50 } },
-  { mobId: HEALING_DUMMY_SOLDIER_ID, pos: { x: -76, z: -46 } },
-  { mobId: HEALING_DUMMY_SCOUT_ID, pos: { x: -76, z: -42 } },
-  { mobId: HEALING_DUMMY_CASTER_ID, pos: { x: -76, z: -38 } },
-  { mobId: HEALING_DUMMY_RANGER_ID, pos: { x: -76, z: -34 } },
+  { mobId: HEALING_DUMMY_TANK_ID, pos: { x: -84, z: -39 } },
+  { mobId: HEALING_DUMMY_SOLDIER_ID, pos: { x: -80, z: -39 } },
+  { mobId: HEALING_DUMMY_SCOUT_ID, pos: { x: -76, z: -39 } },
+  { mobId: HEALING_DUMMY_CASTER_ID, pos: { x: -72, z: -39 } },
+  { mobId: HEALING_DUMMY_RANGER_ID, pos: { x: -68, z: -39 } },
 ] as const;

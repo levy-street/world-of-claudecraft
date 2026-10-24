@@ -11,7 +11,6 @@
 
 import { describe, expect, it } from 'vitest';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../src/sim/nythraxis_bone_spike';
-import { NYTHRAXIS_BONE_STORM_ENABLED } from '../src/sim/nythraxis_bone_storm';
 import { NYTHRAXIS_ARENA_ID } from '../src/sim/nythraxis_dev_raid';
 import { Sim } from '../src/sim/sim';
 import { type Entity, NYTHRAXIS_ADD_ID, NYTHRAXIS_BOSS_ID, type SimEvent } from '../src/sim/types';
@@ -172,8 +171,9 @@ const EXPECTED_CALLOUTS = [
   'sigilBound',
   'sigilUnbound',
   'kingsWrath',
-  // Bone Storm is retired from play (NYTHRAXIS_BONE_STORM_ENABLED).
-  ...(NYTHRAXIS_BONE_STORM_ENABLED ? ['boneStormBegins', 'boneStormCharge', 'boneStormEnds'] : []),
+  'boneStormBegins',
+  'boneStormCharge',
+  'boneStormEnds',
   'crownEndures',
 ];
 
@@ -186,18 +186,14 @@ const EXPECTED_DAMAGE = [
   'Soul Rend',
   'Deathless Rage',
   'Unbound',
-  ...(NYTHRAXIS_BONE_STORM_ENABLED ? ['Bone Storm', 'Bone Slam'] : []),
+  'Bone Storm',
+  'Bone Slam',
 ];
 
 // Damage sources the fight must NOT produce any more: Soulfire (the pool a
 // Soul Rend detonation used to leave) and Gravefire (the line the boss and
 // the Bone Slam used to spit out) were retired from play in v0.42.2.
-// Bone Storm and its Bone Slam joined them on 2026-10-02 (NYTHRAXIS_BONE_STORM_ENABLED).
-const FORBIDDEN_DAMAGE = [
-  'Soulfire',
-  'Gravefire',
-  ...(NYTHRAXIS_BONE_STORM_ENABLED ? [] : ['Bone Storm', 'Bone Slam']),
-];
+const FORBIDDEN_DAMAGE = ['Soulfire', 'Gravefire'];
 
 const EXPECTED_AURAS = [
   'Dread Curse',
@@ -207,7 +203,7 @@ const EXPECTED_AURAS = [
   'Unbound',
   'Deathless Rage Interrupted',
   "King's Wrath",
-  ...(NYTHRAXIS_BONE_STORM_ENABLED ? ['Bone Storm'] : []),
+  'Bone Storm',
   'The Crown Endures',
 ];
 

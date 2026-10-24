@@ -152,6 +152,15 @@ function makeInput(over: Partial<DeedsViewInput> = {}): DeedsViewInput {
 // ---------------------------------------------------------------------------
 
 describe('deedProgress', () => {
+  it('lists the referral title only for its current character owner without changing deed totals', () => {
+    const base = buildDeedsView(makeInput());
+    const owned = buildDeedsView(
+      makeInput({ referralTitleOwned: true, activeTitle: 'referral_trailmate' }),
+    );
+    expect(base.titles.some((row) => row.id === 'referral_trailmate')).toBe(false);
+    expect(owned.titles).toContainEqual({ id: 'referral_trailmate', active: true });
+    expect(owned.summary).toEqual(base.summary);
+  });
   it('reads stat counters and clamps at the target, never over', () => {
     const s = stats((x) => {
       x.counters.kills = 7;
@@ -874,15 +883,20 @@ describe('real catalog integration', () => {
     // standing deeds, 285 with the two Clue Scroll casket deeds (all visible,
     // none feat or hidden).
     // 286 with the release's ferry round trip (exp_harbor_to_harbor).
-    // 287 with the Buried Hoards Coinsack catch (cmb_coinsack_caught, visible).
-    // Five visible World PvP played-time deeds bring this to 292.
-    expect(view.summary.visibleTotal).toBe(292);
+    // 287 with the Buried Hoards Coinsack catch (cmb_coinsack_caught, visible),
+    // 290 with the Mirefen world-boss branch's three combat deeds (none feat or hidden).
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 314.
+    // 317 with Lantern Hall's three contract milestones (visible; its three bought
+    // titles are feats).
+    expect(view.summary.visibleTotal).toBe(324);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
     // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
-    // four appends, then 309 with the Buried Hoards Coinsack catch and
-    // 314 with the five PvP flag titles.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(314);
+    // four appends, then 309 with the Buried Hoards Coinsack catch, and 312 with
+    // the world-boss branch's three.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 336.
+    // 342 with Lantern Hall's six (three milestones plus the three title feats).
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(349);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

@@ -136,8 +136,15 @@ describe('dependency-sync gate preflight', () => {
         JSON.stringify({ name: 'fixture', version: '1.0.0' }),
       );
       const fakeNpmDir = mkdtempSync(join(tmpdir(), 'woc-depsync-fakenpm-'));
-      const fakeNpm = join(fakeNpmDir, 'npm');
-      writeFileSync(fakeNpm, '#!/bin/sh\necho "not json at all"\nexit 1\n', { mode: 0o755 });
+      const windows = process.platform === 'win32';
+      const fakeNpm = join(fakeNpmDir, windows ? 'npm.cmd' : 'npm');
+      writeFileSync(
+        fakeNpm,
+        windows
+          ? '@echo off\r\necho not json at all\r\nexit /b 1\r\n'
+          : '#!/bin/sh\necho "not json at all"\nexit 1\n',
+        { mode: 0o755 },
+      );
       try {
         const result = spawnSync(process.execPath, [GATE_SCRIPT], {
           cwd: dir,
