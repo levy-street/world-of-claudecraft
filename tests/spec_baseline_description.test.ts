@@ -70,7 +70,7 @@ describe('spec card Specialization bonus line (hidden spec power made visible)',
     expect(line('warlock', 'destruction')).toContain('Increases spell damage by 21%.');
     // No legacy bucket: the offense bonus stands alone.
     expect(line('hunter', 'marksmanship')).toContain(
-      'Increases melee and ranged ability damage by 10%.',
+      'Increases melee and ranged ability damage by 50%.',
     );
     expect(line('hunter', 'survival')).toContain(
       'Increases melee and ranged ability damage by 45%.',
