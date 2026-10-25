@@ -292,6 +292,7 @@ import {
 } from './snapshot_timer_wire';
 import { applySocialPositions, socialInfoFromFrame } from './social_frame_wire';
 import { applySocialSelfWire } from './social_self_wire';
+import { drawStallWindowMs, SocketStallWatchdog } from './socket_stall_watchdog';
 import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { applyFerryWire, clientFerryView } from './transport_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
@@ -1608,6 +1609,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // see src/net/reconnect_policy.ts
   private timeoutRejections = 0;
   private reconnectTimer: number | undefined;
+  // undefined on Object.create(ClientWorld.prototype) fixtures (no initializers run)
+  private readonly stallWatchdog: SocketStallWatchdog | undefined = new SocketStallWatchdog(
+    drawStallWindowMs(Math.random),
+  );
+  private backgrounded = false; // last foreground/background signal, DOM or native
   // set by close() and by a server 'error' frame: the session is over for
   // good, so a subsequent socket close must not schedule a reconnect
   private sessionEnded = false;
@@ -1700,10 +1706,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.openSocket();
     // unconditional input stream beat; constants + gate shared with the
     // cadence-model matrix via input_send_cadence.ts (R13)
-    this.sendTimer = window.setInterval(
-      () => this.sendMovementTimerTick(),
-      INPUT_SEND_TIMER_INTERVAL_MS,
-    );
+    this.sendTimer = window.setInterval(() => {
+      this.pollStallWatchdog();
+      this.sendMovementTimerTick();
+    }, INPUT_SEND_TIMER_INTERVAL_MS);
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -1768,6 +1774,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // 'appStateChange' listener above, so a native app recovers a zombie socket
   // on the native lifecycle signal even when visibilitychange never fires.
   private handleForegroundBackground(visible: boolean): void {
+    this.backgrounded = !visible;
     if (!visible) {
       // Backgrounding (tab switch, tab close, phone lock) is the last reliable
       // beat to get an in-flight debounced layout edit to the server while the
@@ -1803,6 +1810,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // never delivered while suspended (the zombie-socket case). Drive the
     // same path a real close would have.
     if (this.connected) this.socketClosed();
+  }
+
+  // A path that died without a FIN/RST never delivers onclose (see
+  // socket_stall_watchdog.ts): retire the socket and take a real drop's path.
+  private pollStallWatchdog(now = performance.now()): void {
+    if (!this.stallWatchdog?.poll(now, this.backgrounded, this.connected)) return;
+    this.ws.onclose = null;
+    this.ws.close();
+    this.socketClosed();
   }
 
   private openSocket(): void {
@@ -2205,6 +2221,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     } catch {
       return;
     }
+    this.stallWatchdog?.noteFrame(parseStart, msg.t === 'snap');
     const parseMs = performance.now() - parseStart;
     // A commandOutcome/corpseHarvestInfo reply routes to its owner; anything
     // else falls through unchanged.

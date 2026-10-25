@@ -13,6 +13,7 @@ import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
 import { ClientWorld } from '../../src/net/online';
+import { SocketStallWatchdog } from '../../src/net/socket_stall_watchdog';
 import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { emptyAllocation, emptyModifiers } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
@@ -283,6 +284,10 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.conflictRejections = 0;
   c.timeoutRejections = 0;
   c.sessionEnded = false;
+  // the silent-stall watchdog at its window floor: the class draws a per-client
+  // jitter with Math.random, which a fixture has no reason to consume
+  c.stallWatchdog = new SocketStallWatchdog();
+  c.backgrounded = false;
   c.counterfangWindowDeadlineMs = 0;
   c.invChanged = false;
   c.cosmeticsChanged = false;
