@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { KEEPALIVE_STALL_FACTOR, keepaliveSweepDelayed } from '../../server/keepalive_sweep';
+import {
+  KEEPALIVE_STALL_FACTOR,
+  keepaliveSweepDelayed,
+  terminateIntoGrace,
+} from '../../server/keepalive_sweep';
 
 describe('keepalive sweep stall detection', () => {
   it('pins the stall factor to the literal 1.5', () => {
@@ -24,5 +28,35 @@ describe('keepalive sweep stall detection', () => {
   it('flags a sweep that fired far late', () => {
     // A 70000 ms gap is well beyond the 45000 ms threshold: the process stalled.
     expect(keepaliveSweepDelayed(70_000, 0, 30_000)).toBe(true);
+  });
+});
+
+describe('terminateIntoGrace (the shared reap)', () => {
+  it('terminates the current socket, then hands that same socket to socketClosed', () => {
+    const order: string[] = [];
+    const ws = { terminate: () => order.push('terminate') };
+    const session = { ws };
+    const seen: unknown[] = [];
+    terminateIntoGrace(session, (s, closedWs) => {
+      order.push('socketClosed');
+      seen.push(s, closedWs);
+      return true;
+    });
+    expect(order).toEqual(['terminate', 'socketClosed']);
+    expect(seen).toEqual([session, ws]);
+  });
+
+  it('still enters the grace when terminate throws on an already torn-down socket', () => {
+    const ws = {
+      terminate: () => {
+        throw new Error('socket already destroyed');
+      },
+    };
+    let closed: unknown = null;
+    terminateIntoGrace({ ws }, (_s, closedWs) => {
+      closed = closedWs;
+      return true;
+    });
+    expect(closed).toBe(ws);
   });
 });

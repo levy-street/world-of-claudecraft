@@ -1854,7 +1854,11 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED to 9690 at the sync with the courier full-bank change (PR 4598): its
     // wiring composes with the extractions above, still under the release 9751. wc -l.
     // 9694 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 9694,
+    // LOWERED 9694 -> 9674 at the second release/v0.45.0 merge into
+    // fix/reconnect-resume-token: the branch's own -20 (both hello frames to
+    // server/session_hello.ts, the three terminate-into-grace reaps to
+    // server/keepalive_sweep.ts). wc -l after biome on the merged tree. Exact count.
+    ceiling: 9674,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2056,7 +2060,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5338 -> 5330 at the integration merge of #4525: the reconnect backoff
     // schedule moved into reconnect_policy.ts beside its predicates, paying for the
     // tavern's resting getter and sitOnSeat send. wc -l. Exact count.
-    ceiling: 5330,
+    // LOWERED 5330 -> 5301 at the release/v0.45.0 merge into fix/reconnect-resume-token:
+    // the resume token's field and the socket-identity guards in openSocket are paid
+    // for by the hello and censor decodes moving to src/net/hello_frame_wire.ts, so
+    // the branch nets zero on the release's 5301. wc -l after biome. Exact count.
+    // LOWERED 5301 -> 5300 at the second release/v0.45.0 merge: the release's file
+    // shrank to 5300 and the branch still nets zero on it. wc -l. Exact count.
+    ceiling: 5300,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

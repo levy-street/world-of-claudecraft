@@ -78,3 +78,20 @@ export function shouldReapSession(
 ): boolean {
   return (session.awaitingPong && !delayed) || socketSilentPastDeadline(session.ws, lastSweepAtMs);
 }
+
+// Terminate a session's current socket and hand it to the linkdead grace: the one
+// reap shared by the sweep above (GameServer.pingLiveSessions), the outbound
+// backpressure terminate (GameServer.sendRaw), and a same-client supersede
+// (planJoin's supersede arm, server/linkdead.ts), so a superseded socket goes
+// down exactly the way a swept one does. socketClosed's socket-identity guard
+// keeps the terminated socket's own late close/error event a no-op.
+export function terminateIntoGrace<S extends { ws: { terminate(): void } }>(
+  session: S,
+  socketClosed: (session: S, ws: S['ws']) => boolean,
+): void {
+  const ws = session.ws;
+  try {
+    ws.terminate();
+  } catch {} // socket already torn down
+  socketClosed(session, ws);
+}

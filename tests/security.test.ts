@@ -172,6 +172,28 @@ describe('websocket authentication', () => {
       movementWire: 2,
     });
   });
+
+  it('echoes a held resume token and omits the key entirely when there is none', () => {
+    const resumeToken = 'r'.repeat(43);
+    expect(buildWebSocketAuthMessage('a'.repeat(64), 42, 'seed-123', resumeToken)).toEqual({
+      t: ONLINE_WORLD_AUTH_TYPE,
+      token: 'a'.repeat(64),
+      character: 42,
+      clientSeed: 'seed-123',
+      dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
+      timerWire: STABLE_TIMER_WIRE_VERSION,
+      petSpecialWire: PET_SPECIAL_WIRE_VERSION,
+      movementWire: 2,
+      resumeToken,
+    });
+    for (const absent of [null, '']) {
+      const frame = buildWebSocketAuthMessage('a'.repeat(64), 42, '', absent);
+      expect(Object.keys(frame)).not.toContain('resumeToken');
+      expect(JSON.stringify(frame)).toBe(
+        JSON.stringify(buildWebSocketAuthMessage('a'.repeat(64), 42)),
+      );
+    }
+  });
 });
 
 describe('desktop app request origins', () => {

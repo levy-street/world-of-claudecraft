@@ -39,14 +39,24 @@ export interface LinkdeadSessionView {
 
 export type JoinPlan =
   | { action: 'resume' }
+  // The held session's socket still looks live, but the reconnect proved it is
+  // the same client (sameClientProof below): terminate the stale socket into
+  // the grace, then resume onto the new one, exactly as if the keepalive sweep
+  // had already reaped it.
+  | { action: 'supersede' }
   | { action: 'reject'; error: string }
   | { action: 'join' };
 
 // Decide what a join request means given the account's existing sessions.
 // - The same character is already in the world: resume it when it is linkdead
-//   and owned by the requesting account (an accidental-disconnect reconnect);
-//   otherwise reject, so the explicit takeover flow stays the only way to
-//   displace a session whose socket is still alive.
+//   and owned by the requesting account (an accidental-disconnect reconnect).
+//   When its socket still looks live, supersede it only when the reconnect
+//   presented the session's own resume token (server/resume_token.ts: the very
+//   client tab that socket served, reconnecting before the keepalive sweep
+//   noticed the black-holed drop); otherwise reject, so the explicit takeover
+//   flow stays the only way to displace a session played from elsewhere.
+//   Every refusal guard (left, escrowQuarantined, a foreign account) applies to
+//   the supersede arm exactly as to the resume arm.
 // - A different character: the account's linkdead sessions never block the
 //   login (the caller displaces them, switching the account over to the new
 //   character immediately instead of at the end of the grace window); only
@@ -55,22 +65,25 @@ export function planJoin(opts: {
   accountId: number;
   isGm: boolean;
   sameCharacter: LinkdeadSessionView | null;
+  // True only when the reconnect presented the held session's current resume
+  // token (constant-time matched by the caller). Absent means false.
+  sameClientProof?: boolean;
   liveOtherSessions: number;
   maxPerAccount: number;
 }): JoinPlan {
   if (opts.sameCharacter) {
     if (
-      opts.sameCharacter.linkdead &&
       !opts.sameCharacter.left &&
       !opts.sameCharacter.escrowQuarantined &&
       opts.sameCharacter.accountId === opts.accountId
     ) {
-      return { action: 'resume' };
+      if (opts.sameCharacter.linkdead) return { action: 'resume' };
+      if (opts.sameClientProof === true) return { action: 'supersede' };
     }
-    // Mid-teardown (left), escrow-quarantined, and live-socket sessions all
-    // reject with the transient conflict error; the client's reconnect policy
-    // retries it, and the retry lands on a clean fresh join once the teardown
-    // finishes.
+    // Mid-teardown (left), escrow-quarantined, and unproven live-socket
+    // sessions all reject with the transient conflict error; the client's
+    // reconnect policy retries it, and the retry lands on a clean fresh join
+    // once the teardown finishes.
     return { action: 'reject', error: 'character already in world' };
   }
   if (!opts.isGm && opts.liveOtherSessions >= opts.maxPerAccount) {

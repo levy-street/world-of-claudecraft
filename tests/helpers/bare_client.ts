@@ -280,6 +280,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.wireSeen = new Set();
   c.lastStopAutoAttackOnTargetSwitch = null;
   c.reconnectAttempts = 0;
+  c.resumeToken = null;
   c.conflictRejections = 0;
   c.timeoutRejections = 0;
   c.sessionEnded = false;

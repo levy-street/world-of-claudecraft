@@ -839,3 +839,123 @@ describe('ClientWorld reconnect error-frame tolerance (first join attempt, never
     });
   });
 });
+
+// The same-client resume token (server/resume_token.ts): the tab echoes the
+// last hello's token on its auto-reconnect auth frame so the server can
+// supersede its own stale socket, and keeps it in memory only.
+describe('ClientWorld same-client resume token', () => {
+  afterEach(() => {
+    StubWebSocket.instances = [];
+    vi.restoreAllMocks();
+  });
+
+  const authFrame = (socket: StubWebSocket): Record<string, unknown> => {
+    socket.onopen?.();
+    return JSON.parse(socket.sent[0]) as Record<string, unknown>;
+  };
+
+  it('sends no token on the first join, then echoes the latest hello token on reconnect', () => {
+    const g = globalThis as Record<string, unknown>;
+    const prevLocal = g.localStorage;
+    const prevSession = g.sessionStorage;
+    const stored: string[] = [];
+    const storage = {
+      getItem: () => null,
+      setItem: (key: string, value: string) => {
+        stored.push(`${key}=${value}`);
+      },
+      removeItem: () => undefined,
+    };
+    g.localStorage = storage;
+    g.sessionStorage = storage;
+    try {
+      withDomStubs((_doc, harness) => {
+        const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+        const wire = world as unknown as { onMessage(raw: string): void };
+        const first = StubWebSocket.instances[0];
+        expect(authFrame(first)).not.toHaveProperty('resumeToken');
+
+        const firstToken = 'a'.repeat(43);
+        wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42, resumeToken: firstToken }));
+        first.readyState = StubWebSocket.CLOSED;
+        first.onclose?.();
+        harness.fire(harness.timers[0].id);
+        const second = StubWebSocket.instances[1];
+        expect(authFrame(second)).toMatchObject({ resumeToken: firstToken });
+
+        // The reconnect's hello rotates the token; the next drop echoes the new one.
+        const secondToken = 'b'.repeat(43);
+        wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42, resumeToken: secondToken }));
+        second.readyState = StubWebSocket.CLOSED;
+        second.onclose?.();
+        harness.fire(harness.timers[0].id);
+        expect(authFrame(StubWebSocket.instances[2])).toMatchObject({ resumeToken: secondToken });
+
+        // A hello from an older server carries none: the tab stops presenting a
+        // token it can no longer vouch for.
+        wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+        StubWebSocket.instances[2].readyState = StubWebSocket.CLOSED;
+        StubWebSocket.instances[2].onclose?.();
+        harness.fire(harness.timers[0].id);
+        expect(authFrame(StubWebSocket.instances[3])).not.toHaveProperty('resumeToken');
+        world.close();
+      });
+      // Memory only: never written to any browser storage.
+      expect(stored.filter((entry) => entry.includes('a'.repeat(43)))).toEqual([]);
+      expect(stored.filter((entry) => entry.includes('b'.repeat(43)))).toEqual([]);
+    } finally {
+      g.localStorage = prevLocal;
+      g.sessionStorage = prevSession;
+    }
+  });
+
+  it('ignores a replaced socket whose close or frames land after the newer socket is live', () => {
+    // The zombie path: the visibility handler drives the close by hand, the
+    // retry opens a second socket that joins (hello), and only THEN does the
+    // first socket's real close arrive. Acting on it would open a third socket
+    // carrying the second's token, superseding the live one server-side, whose
+    // own close would open a fourth: a ping-pong no attempt cap ever ends.
+    withDomStubs((doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const wire = world as unknown as {
+        onMessage(raw: string): void;
+        reconnectAttempts: number;
+        sessionEnded: boolean;
+      };
+      const first = StubWebSocket.instances[0];
+      first.onmessage?.({ data: JSON.stringify({ t: 'hello', pid: 1, seed: 42 }) });
+      first.readyState = StubWebSocket.CLOSING;
+      doc.setVisible(true); // zombie: drives the close path by hand
+      expect(harness.timers).toHaveLength(1);
+      harness.fire(harness.timers[0].id);
+      const second = StubWebSocket.instances[1];
+      second.onmessage?.({
+        data: JSON.stringify({ t: 'hello', pid: 1, seed: 42, resumeToken: 'd'.repeat(43) }),
+      });
+      expect(wire.reconnectAttempts).toBe(0);
+
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.();
+      first.onmessage?.({ data: JSON.stringify({ t: 'error', error: 'character taken over' }) });
+
+      expect(harness.timers).toHaveLength(0);
+      expect(StubWebSocket.instances).toHaveLength(2);
+      expect(wire.reconnectAttempts).toBe(0);
+      expect(wire.sessionEnded).toBe(false);
+      world.close();
+    });
+  });
+
+  it('never carries one ClientWorld token into a new ClientWorld', () => {
+    withDomStubs(() => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      (world as unknown as { onMessage(raw: string): void }).onMessage(
+        JSON.stringify({ t: 'hello', pid: 1, seed: 42, resumeToken: 'c'.repeat(43) }),
+      );
+      world.close();
+      const next = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      expect(authFrame(StubWebSocket.instances[1])).not.toHaveProperty('resumeToken');
+      next.close();
+    });
+  });
+});
