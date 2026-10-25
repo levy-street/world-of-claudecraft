@@ -69,8 +69,11 @@ const OFFENSIVE_SPEC_TUNING: Partial<Record<PlayerClass, Record<string, Offensiv
     // Fieldcraft: survival offensive ability bonus (0.30 legacy + 0.15 here
     // = 0.45 total); AP is a stats.apPct edit (0.15 -> 0.22).
     survival: { physical: 0.15 },
-    // Coldsight numeric budget: a new offensive physical bonus, no AP change.
-    marksmanship: { physical: 0.1 },
+    // Coldsight numeric budget: an offensive physical bonus, no AP change.
+    // 0.10 -> 0.50 lifts Marksmanship about 18% on the level-22 Nythraxis
+    // profile (158 to 187 DPS, Fieldcraft 181) without touching autos, pet,
+    // or sibling specs (docs/design/marksmanship-dps-lift.md).
+    marksmanship: { physical: 0.5 },
   },
   priest: {
     // Doctrine: discipline personal primary damage x1.30. Discipline carries

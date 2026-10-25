@@ -518,6 +518,34 @@ describe('v0.42.0 offense-only package: real combat-path packets', () => {
     });
   });
 
+  describe('Coldsight (hunter/marksmanship): Fell Shot (arcane_shot) complete hit', () => {
+    it('scales by the literal 1.86 marksmanship total (0.12 mastery meleeDmgPct + 0.24 ability dmgPct + 0.50 offense-only), base and Ranged Attack Power rider together', () => {
+      function castArcaneShot(spec: 'marksmanship' | null, seed: number, rap: number): number {
+        const sim = makeSim('hunter', seed);
+        sim.setPlayerLevel(20);
+        if (spec) expect(sim.setSpec(spec)).toBe(true);
+        const target = spawnDummy(sim, 9402, 12);
+        const pin = () => {
+          noCrit(sim.player);
+          sim.player.rangedPower = rap;
+        };
+        pin();
+        sim.player.resource = sim.player.maxResource;
+        sim.player.gcdRemaining = 0;
+        sim.castAbility('arcane_shot');
+        const events = drive(sim, 40, pin);
+        const amount = hitAmount(events, sim.playerId, target.id, 'Fell Shot');
+        if (amount === undefined) throw new Error('Fell Shot did not land');
+        return amount;
+      }
+      for (const rap of [0, 800]) {
+        const base = castArcaneShot(null, 1202, rap);
+        const boosted = castArcaneShot('marksmanship', 1202, rap);
+        expect(boosted / base).toBeCloseTo(1.86, 1);
+      }
+    });
+  });
+
   describe('Doctrine (priest/discipline): Scouring Hymn complete hit', () => {
     function castSmite(spec: 'discipline' | null, spellPower: number, seed: number): number {
       const sim = makeSim('priest', seed);
