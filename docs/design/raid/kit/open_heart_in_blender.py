@@ -1,15 +1,19 @@
-"""The Smith's Heart's final room laid out for review in Blender (phase 2J):
-the Anvil of the World on its keel with its balustrade, the four altars and
-the roots of the mountain gripping them, the Heart Bridge down from the
-Arrival Terrace with its return portal and its standing stones, the heart's
-bed deep in the chasm, and on the platform the Masterless Strength's body
-assembled as the runtime binds it (its rock pieces round the crystal heart,
-at rest), a 2 yd figure for scale.
+"""The Smith's Heart's final room laid out for review in Blender (phases 2J
+and 2K): the Anvil of the World on its keel with its balustrade, its walk the
+four elemental quarters round the central ring (phase 2K: each quarter's
+seams lit in its vein's colour, the four ridges and their horns, the dais),
+the four altars and the roots of the mountain gripping them, the Heart
+Bridge down from the Arrival Terrace with its return portal and its
+standing stones, the heart's bed deep in the chasm, and on the platform the
+Masterless Strength's body assembled as the runtime binds it (its rock
+pieces round the crystal heart, at rest), a 2 yd figure for scale.
 
 Run (background renders, then the scene saved for the owner to open):
   blender -b --factory-startup --python open_heart_in_blender.py -- \
-      --out DIR [--save scene.blend]
-Writes DIR/blender_corazon_fase2j.png and DIR/blender_coloso_fase2j.png.
+      --out DIR [--save scene.blend] [--label fase2k]
+Writes DIR/blender_sala_cuartos_<label>.png (the room from above the
+terrace) and DIR/blender_cresta_<label>.png (a ridge and its horn over the
+Heat and the Breath); --label names them (fase2k by default).
 
 Frames: the room's centre is the origin, the game's north (+Z) is Blender
 -Y, a game yaw r is a Blender turn of r about +Z (heart_room_kit_plan_core.ts,
@@ -46,6 +50,23 @@ def place(name, loc, rz=0.0, scale=(1.0, 1.0, 1.0), tilt=(0.0, 0.0)):
     bpy.context.scene.collection.objects.link(obj)
     obj.hide_render = False
     obj.hide_set(False)
+    return obj
+
+
+# The quarters' vein colours for the review (SMITH_HEART_VEIN_COLORS, linear).
+VEIN_TINT = {'Hammer': (0.58, 0.28, 0.05), 'Breath': (0.1, 0.48, 0.8), 'Quench': (0.33, 0.69, 1.0),
+             'Heat': (1.0, 0.79, 0.35)}
+
+
+def tinted_copy(obj, glow, tint):
+    """Give a placed piece its own copy of the glow slot, tinted."""
+    m = glow.copy()
+    m.name = f'{glow.name}{obj.name}'
+    for n in m.node_tree.nodes:
+        if n.type == 'MIX':
+            n.inputs['B'].default_value = (*tint, 1.0)
+    obj.data = obj.data.copy()
+    obj.data.materials[1] = m
     return obj
 
 
@@ -124,6 +145,12 @@ def main():
         o.hide_set(True)
     # ---- the platform, the terrace, the bridge, the bed ---------------------------------------
     place('AnvilFloor', (0, 0, 0))
+    # Phase 2K: the four quarters, each seam in its vein, the ridges, the dais.
+    for vein in ('Hammer', 'Breath', 'Quench', 'Heat'):
+        tinted_copy(place(f'Quarter{vein}', (0, 0, 0)), materials[1], VEIN_TINT[vein])
+    for k in range(4):
+        place('HeartRidge', (0, 0, 0), rz=k * math.pi / 2)
+    place('HeartDais', (0, 0, 0))
     place('AnvilKeel', (0, 0, 0))
     place('TerraceFloor', TERRACE)
     place('TerraceKeel', TERRACE)
@@ -146,11 +173,14 @@ def main():
     cam.data.clip_end = 2000
     scene.camera = cam
     look(cam, Vector((-112, 104, 58)), Vector((6, -4, -6)))
-    scene.render.filepath = os.path.join(out, 'blender_corazon_fase2j.png')
+    label = arg('--label') or 'fase2k'
+    look(cam, Vector((-92, 86, 70)), Vector((4, -4, -4)))
+    scene.render.filepath = os.path.join(out, f'blender_sala_cuartos_{label}.png')
     bpy.ops.render.render(write_still=True)
-    cam.data.lens = 35
-    look(cam, Vector((-34, 30, 11)), Vector((0, 0, 11)))
-    scene.render.filepath = os.path.join(out, 'blender_coloso_fase2j.png')
+    cam.data.lens = 32
+    # A ridge (the Heat and the Breath, ridge 3) and its horn over the lip.
+    look(cam, Vector((-4, -10, 7.5)), Vector((-19, -33, 2.5)))
+    scene.render.filepath = os.path.join(out, f'blender_cresta_{label}.png')
     bpy.ops.render.render(write_still=True)
     # Leave the review camera on the whole room.
     cam.data.lens = 24

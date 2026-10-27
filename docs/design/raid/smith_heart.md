@@ -179,7 +179,7 @@ the first flame's crystal and the seams of fire in its floor (phase 2I, section 
 | The Arrival Terrace | a small round island, a little above the platform, south-west of it | `HEART_TERRACE`, `HEART_ARRIVAL` |
 | The return portal | on the terrace's west side, beside the arrival (never behind it) | `HEART_RETURN_PORTAL` |
 | The Heart Bridge | a short bridge from the terrace onto the platform; its gate seals while the final boss fights | `HEART_BRIDGE_GATE`, gate `heart_bridge` |
-| The Anvil of the World | the final boss's round platform (84 yd across), hung over the chasm | `HEART_ROOM` |
+| The Anvil of the World | the final boss's round platform (84 yd across), hung over the chasm; since phase 2K four elemental quarters set in a pinwheel round a central ring (section 5.21) | `HEART_ROOM`, `HEART_QUARTERS` |
 | The four altars | at the platform's compass points, each gripped by its root of the mountain | `HEART_ALTARS` |
 | The chasm | open air round the platform, down to the Smith's glowing heart | `HEART_ROOM_CHASM_R` |
 
@@ -768,7 +768,7 @@ by `heart_room_kit.ts`; the body and its effects are `../smith_heart_fx/final_fx
 
 | Piece | Look | Where |
 |---|---|---|
-| The Anvil of the World | A vast carved rock disc: dressed granite flags in courses round a basalt hub, three bands of dark basalt where the rune rings burn (14, 26, 38.5), four channels from the hub to the altars carrying each vein's light, a carved fascia two lifts deep and a coped balustrade round the lip (newels crowned with crystal lamps, open where the bridge lands); under it the mountain's rock as an inverted peak, a carved drum of the Smith's chevrons under the fascia, buttressed under each altar, each vein's crystal breaking out of it under its altar, crystal hanging from its root | `Kit_AnvilFloor`, `Kit_AnvilKeel` |
+| The Anvil of the World | (Its walk rebuilt as the four quarters in phase 2K, section 5.21; the rim, fascia and keel stand.) A vast carved rock disc: dressed granite flags in courses round a basalt hub, three bands of dark basalt where the rune rings burn (14, 26, 38.5), four channels from the hub to the altars carrying each vein's light, a carved fascia two lifts deep and a coped balustrade round the lip (newels crowned with crystal lamps, open where the bridge lands); under it the mountain's rock as an inverted peak, a carved drum of the Smith's chevrons under the fascia, buttressed under each altar, each vein's crystal breaking out of it under its altar, crystal hanging from its root | `Kit_AnvilFloor`, `Kit_AnvilKeel` |
 | The Arrival Terrace | The same carved disc, smaller, its keel, the return portal's basin and kerb with crystal studs, two tall standing stones past the lip behind it | `Kit_TerraceFloor`, `Kit_TerraceKeel` |
 | The Heart Bridge | A carved stone bridge: its deck in courses down the field's own ramp, a coped parapet each side (a gap for the gate's stones), a segmental arch of voussoirs with a crystal keystone, its spandrels in courses, its abutments falling into the keels | `Kit_HeartBridge` |
 | The altars | On a shared stepped plinth carved with chevrons, each in its vein's stone: the Hammer's ochre granite split round a geode, the Breath's twisted storm stone bored by the wind with two blades over its crystal, the Quench's frost granite under three fused columns of clear ice (the ice slot), the Heat's bundled basalt bursting with fire crystal. Taller than their colliders (r 3, never wider), so a body hidden behind one reads hidden from Forge Wrath. Their crystal lights and dims per vein (`setVein`, for the later altar drags) | `Kit_Altar*`, `heart_room_kit.ts` |
@@ -955,6 +955,93 @@ charge fitted to its bar and the blades tearing free, an echo, the crossing, the
 heaving, and a frosty breath in the player's own ear as their bar passes three quarters.
 The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`);
 its voice is a later audition.
+
+### 5.21 The Anvil of the World's four quarters (phase 2K)
+
+The owner's decision (27 Oct 2026): the final boss fights on the Anvil of the World split
+into FOUR QUARTERS by four curved ridges set in a pinwheel round a CENTRAL RING. Each quarter
+belongs to one vein; the quarter the Masterless Strength stands in is the active strength (its
+floor wakes, the other three go dark); the central ring is where it goes for the final 15
+percent, when all four light at once. The owner's top-down reference came from another game:
+only the idea is used (a ring, four curved ridges, four tinted quarters), built in our painted
+style with our own veins and the Heart kit. This phase is the room and its look only: no
+mechanic and no number changed.
+
+**The geometry core.** One pure, host-agnostic module, `src/sim/content/smith_heart_quarters.ts`,
+answers which quarter (or the ring) a point is in (`heartQuarterAt`); the renderer and the
+later fight both read it. The quarters in bearing order are the Breath (north), the Quench
+(east), the Hammer (south) and the Heat (west), each holding its altar at the rim
+(`HEART_QUARTER_ORDER`). Ridge k runs between quarter k and k + 1 (`heartRidgeBearingDeg`):
+swept back by `HEART_QUARTERS.sweepDeg` where it leaves the ring, running straight out to the
+rim, where it ends `rimOffsetDeg` past the diagonal between its two altars (clear of the Heart
+Bridge's landing and of every altar). Unwinding a point's bearing by the sweep at its radius
+leaves four straight sectors, so the test is exact and rotation-invariant; a point on a
+ridge's line reads the clockwise quarter. Pinned by `tests/smith_heart_quarters.test.ts` (the
+ring's edge, the ridge lines, a quarter turn turning the quarter by one, the altars clear of
+every ridge, the bridge clear of every ridge's end, the preview spots).
+
+**The floor (the Heart kit: `docs/design/raid/kit/quarter_pieces.py`, its numbers
+`quarter_geom.py`).** The kit's walk is rebuilt; `Kit_AnvilFloor` keeps only the grit bed, the
+fascia and the balustrade (open where the bridge lands and where each ridge rises into its
+horn, its newels and their crystal lamps moved to flank them).
+
+| Piece | Look |
+|---|---|
+| `Kit_QuarterHammer` | heavy slabs of ochre-gold granite laid in rows across the quarter, many dressed with the mason's hammer (bands of tool grooves), wide joints, tremor cracks of light running through some |
+| `Kit_QuarterBreath` | the wind-scoured storm stone (violet and teal greys) in lanes of long flags running out along the pinwheel's own spiral, split in two past mid-way; long spiral scorings (the wind's lines, lit when the quarter wakes) and pale scour streaks across them |
+| `Kit_QuarterQuench` | frost stone in an irregular crazy paving, nearly half of it glazed under ice (the ice slot), frost veins of light branching across it |
+| `Kit_QuarterHeat` | the tops of basalt columns (hexagons) with wide joints, some dusted with ash, fissures of white-gold fire crystal running out from the ring |
+| `Kit_HeartRidge` | one ridge (the runtime turns it a quarter for each of the four): a low spine of dark rock on the walk, knuckles of the same rock half sunk along its flanks, its vein of crystal in a groove down its crest; past the lip it rises off the fascia and curls on along the pinwheel's turn into a hooked horn of rock, a seam of crystal up its inner face |
+| `Kit_HeartDais` | the central ring: the basalt hub the body hovers over, a rosette of the heart's crystal, rays of crystal toward the four quarters and the four ridges, the rune band (the runtime's one ring of runes, `HEART_DAIS_RUNE_R`), and a low carved kerb with a crystal channel and studs |
+
+Every quarter's joints show a sheet of pale crystal laid just under its paving (its glow
+slot), so its seams ignite as one network when it wakes. **The ridges are low enough to walk
+over** (at most 0.25 yd on the walk, no collider: they are visual borders, not walls; the
+horns stand only past the lip), and the quarters' paving stays under the floor telegraphs'
+lift, so no footprint is hidden under a quarter (a ridge covers at most a narrow strip of one,
+the same on every tier). **The four altars stay**, one per quarter at its rim, each 30 degrees
+or more from the nearest ridge: they are the later altar drags' targets and Forge Wrath's
+cover, and they crown their quarters. The arrival's torn rocks rest inside the quarters, never
+on a ridge (the two shoulders moved), and their scars are drawn smaller so the quarters read
+from above. Pinned against the shipped GLB by `tests/smith_heart_quarters_kit.test.ts` (each
+quarter's stones in its own quarter by the core, its tops under the telegraphs, the ridge low
+on its line, the horn past the lip, the dais in the ring, no collider, the torn rocks off the
+ridges).
+
+**The quarter awake (`src/render/smith_heart/heart_quarters.ts`; its pure state
+`heart_quarters_core.ts`; its shaders `heart_quarters_glsl.ts`).** The final boss's effects
+(`final_fx.ts`, which read the boss from IWorld) note where it stands each frame once the
+arrival's shockwave has passed and while it stands (`noteHeartQuarterBoss`); the interior's
+frame driver steps the room's light from it with the geometry core (presentation only, the
+same online and offline; no wire change):
+
+| State | Look |
+|---|---|
+| A quarter awake | its seams ignite in its vein's colour, the flood running out of the ring to the rim with a bright front, its light washed over its stones; its element rises off it: the Breath's dust devils and wind streaks along the spiral, the Hammer's ochre-gold grit and a tremor running out through its slabs every few seconds (the grit hopping, dust lifting), the Quench's frost mist and crystal growing along its frost veins as the flood reaches them, the Heat's embers off its fire crystal and molten light flowing out along its seams; the ridges bordering it glow in its colour, a curtain of light rising off their veins |
+| The other three | dark: their stones dimmed (a multiply shade under the wash), a faint glow left in their seams so the room still reads as four quarters |
+| A crossing | the old quarter's light drains back into the ring (a pulse through the dais), the new one floods out of it a breath later, and a shockwave races both ways along the ridge the boss crossed from where it crossed, its curtain flaring tall, sparks thrown up and falling back |
+| The final look | the boss in the ring with a fight on: all four quarters awake at once, the ring blazing (the dais's crystal, a column of its light, motes of the four veins spiralling up out of its kerb) |
+| Resting | the boss in the ring before the pull: every quarter's seams breathing faintly, the ring warm |
+| Asleep, fallen | before the arrival's shockwave and once the heart goes dark: all of it dark with the room |
+
+Which quarter is awake reads on every tier: the seams, the floods, the shades, the washes, the
+ridges and their curtains, the shockwave and the ring draw everywhere; the low tier keeps about
+a third of the cosmetic air (`HEART_QUARTER_LOW_SHARE`). Every material is built with the
+interior (the compile gate links it), no light, no texture; the shades and the washes are floor
+marks on the ground rung (3 and 4, over the dais's runes on 2), registered strict in
+`tests/floor_vfx_layer.test.ts`; every shader places its points through `modelViewMatrix`
+(camera-relative). Pinned by `tests/smith_heart_quarters_look.test.ts`. The straight channels
+and the two outer rune rings of phase 2J are gone with the kit (the blockout keeps its three).
+
+**Preview.** `/dev heart final quarter <breath|quench|hammer|heat|ring>`
+(`src/sim/dev/smith_heart_final_dev.ts`, dev-gated with every other `/dev heart` verb) moves
+the boss and its home into the middle of that quarter, or onto the ring's centre (`ring` also
+pulls it onto the player: the final look is a fight's). Pinned by
+`tests/smith_heart_final_dev.test.ts`.
+
+**Known limit (for the mechanics phase).** The boss's spot is the ring's centre, so a pull
+there shows the final look until it steps out into a quarter; the mechanics phase decides
+where it waits and when it walks to the ring.
 
 ## 6. Set pieces (phase 2 specs)
 
@@ -1543,6 +1630,7 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart portal` | force the seal's portal open for the run (the hop then works) |
 | `/dev heart seal` | print the `smithHeartProgress` readout (and whether the heart is awake) |
 | `/dev heart arrival` | replay the arrival scene: the heart sleeps a moment and wakes again with a living player in the Heart |
+| `/dev heart final quarter <zone>` | zone breath, quench, hammer, heat or ring: move the final boss (and its home) into the middle of that quarter of the Anvil of the World, or onto the central ring's centre (ring also pulls it onto you: the final look); the quarter it stands in wakes (section 5.21) |
 | `/dev heart reset` | free the run and claim a fresh one |
 | `/dev heart council` | the Hammer Council's readout (difficulty, each member's health, energy, Wraths, the fallen in order) |
 | `/dev heart council pull` | pull all three onto you |
