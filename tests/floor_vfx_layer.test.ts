@@ -397,6 +397,13 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Guardian of the Heat's fight in the Hearth: the same split, its burn
   // sheaths ride the bodies at the default order 0.
   { file: 'src/render/smith_heart_fx/heat_fight_fx.ts', layer: 'encounter', strict: false },
+  // Its parts and its two floor seams: every rung off the Heat's own floor
+  // ladder (heat_floor_ladder_core.ts, pinned untied in
+  // tests/smith_heart_heat_floor.test.ts).
+  { file: 'src/render/smith_heart_fx/heat_well_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/heat_cinder_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/heat_molten_decal.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/heat_telegraph.ts', layer: 'encounter', strict: true },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];

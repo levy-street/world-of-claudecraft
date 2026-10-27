@@ -82,6 +82,7 @@ import {
   restJoint,
   type V3,
 } from './heat_body_core';
+import { heatParticleSteps } from './heat_floor_ladder_core';
 
 const SCAN_SEC = 0.1;
 /** The giant's scale (the body's frame to the world). */
@@ -293,6 +294,9 @@ export class HeatBody {
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
+      // Its own rungs of the Heat's floor ladder (never a tie with the
+      // fight's floor marks under it).
+      heatParticleSteps('heat_body'),
     );
     const carrierGeo = new THREE.BufferGeometry();
     carrierGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));

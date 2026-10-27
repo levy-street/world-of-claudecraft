@@ -31,6 +31,7 @@ import {
   heatTimedOf,
   HEAT_TUNING as T,
 } from '../../sim/encounters/smith_heart/heat_ids';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   TELEGRAPH_THREAT_COLORS,
   type TelegraphFan,
@@ -38,6 +39,7 @@ import {
 } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { HEAT_FIGHT_COLORS as C, fallLook, HEAT_FIGHT_POOLS as P } from './heat_fight_fx_core';
+import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 
@@ -89,6 +91,7 @@ const ADD_FLAME = {
 };
 
 const BALL_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vL;
 varying vec3 vW;
@@ -97,7 +100,7 @@ void main() {
   vL = position;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 /** A living ball of the first flame: molten gold boiling over a white heart,
@@ -240,7 +243,7 @@ export class HeatCinderFx {
       const corona = new THREE.Sprite(coronaMat);
       corona.visible = false;
       host.root.add(corona);
-      const reach = host.kit.fan(8);
+      const reach = host.telegraphs.fan('cinderReach');
       host.kit.layOutFan(reach, 360, DANGER);
       reach.group.visible = false;
       this.cinders.push({
@@ -258,7 +261,7 @@ export class HeatCinderFx {
       });
     }
     for (let i = 0; i < P.falls; i++) {
-      const fan = host.kit.fan(8);
+      const fan = host.telegraphs.fan('fall');
       host.kit.layOutFan(fan, 360, DANGER);
       fan.group.visible = false;
       const ballMat = host.sprite(0xffe0a0, 'smithHeartHeatCinderFall');
@@ -291,7 +294,7 @@ export class HeatCinderFx {
       this.trackAge[i] = 99;
     }
     if (this.track.instanceColor) this.track.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    this.track.renderOrder = floorVfxRenderOrder('encounter', 2);
+    this.track.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.cinderTrack.step);
     this.track.visible = false;
     host.root.add(this.track);
     // The hunted's marks.
@@ -305,6 +308,9 @@ export class HeatCinderFx {
       fragmentShader: CHEVRON_FRAG,
       transparent: true,
       depthWrite: false,
+      // Additive like every glow round it (the seeds', the adds'), so it
+      // commutes with them wherever they cross: no camera-angle flicker.
+      blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide,
       toneMapped: false,
     });
@@ -315,7 +321,7 @@ export class HeatCinderFx {
       chevron.frustumCulled = false;
       chevron.visible = false;
       host.root.add(chevron);
-      const ring = host.kit.fan(9);
+      const ring = host.telegraphs.fan('hunted');
       host.kit.layOutFan(ring, 360, DANGER);
       ring.group.visible = false;
       this.marks.push({ id: -1, chevron, ring });

@@ -47,8 +47,13 @@ function allRenderTs(): string[] {
 }
 
 /** Floor shaders the ladder import does not reach: the Warrior kit's baked
- *  impact layers lay their ground smoke and dust flat on any floor. */
-const EXTRA_FLOOR_SHADERS = ['src/render/ability_vfx/baked_impact_layers.ts'];
+ *  impact layers lay their ground smoke and dust flat on any floor; the
+ *  Guardian of the Heat's swells' wakes and craters (their rungs ride
+ *  heat_molten_decal.ts, inside the Smith's Heart's instance band). */
+const EXTRA_FLOOR_SHADERS = [
+  'src/render/ability_vfx/baked_impact_layers.ts',
+  'src/render/smith_heart_fx/heat_fx.ts',
+];
 
 let scanned: string[] | null = null;
 

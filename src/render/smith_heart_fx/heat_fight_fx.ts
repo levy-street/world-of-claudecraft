@@ -81,9 +81,12 @@ import {
   zoneOfCached,
   zoneRadii,
 } from './heat_fight_fx_core';
+import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { moltenDecal } from './heat_molten_decal';
 import { floorRingGeometry } from './heat_shapes';
+import { HeatTelegraphs } from './heat_telegraph';
 import { HeatWellFx } from './heat_well_fx';
 
 const SCAN_SEC = 0.1;
@@ -176,6 +179,7 @@ const BOLT = {
 // ---- shaders ---------------------------------------------------------------------------
 
 const DISC_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vXY;
 varying vec3 vP;
 varying vec3 vW;
@@ -184,7 +188,7 @@ void main() {
   vP = instanceColor;
   vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
   vW = wp.xyz;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 /** A burning patch (vP: burn, kind, seed): molten ground, its rim the danger
@@ -213,13 +217,14 @@ void main() {
 }
 `;
 const RING_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 /** A Wakefire band between its two radii (uv.y inner 0 to outer 1): both rims
@@ -325,6 +330,7 @@ export class HeatFightFx implements HeatFxHost {
   readonly density: number;
   readonly particles: EngineParticles;
   readonly kit: TelegraphKit;
+  readonly telegraphs: HeatTelegraphs;
   readonly geometries: THREE.BufferGeometry[] = [];
   readonly materials: THREE.Material[] = [];
   readonly glowTex: THREE.Texture | null;
@@ -381,8 +387,21 @@ export class HeatFightFx implements HeatFxHost {
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
+      heatParticleSteps('heat_fight_fx'),
     );
     this.kit = new TelegraphKit(this.root, this.detail);
+    // Every warning of the fight (the seeds, the rivers' lanes, the falls, a
+    // cinder's reach, the hunted's rings) in the Hearth's molten paint, on
+    // the fight's own rungs of the Heat's floor ladder.
+    this.telegraphs = new HeatTelegraphs(
+      this.kit,
+      {
+        char: HEAT_FLOOR.fightTelegraphChar.step,
+        glow: HEAT_FLOOR.fightTelegraphGlow.step,
+        curtain: HEAT_FLOOR.fightTelegraphCurtain.step,
+      },
+      this.materials,
+    );
     this.glowTex = hasDom ? radialGlowTexture() : null;
     for (const k of KINDS) this.ids.set(k, []);
 
@@ -405,10 +424,10 @@ export class HeatFightFx implements HeatFxHost {
     this.root.add(this.seedOrbs);
     const seedGlow = this.sprite(0xffd890, 'smithHeartHeatSeedGlow');
     for (let i = 0; i < P.seeds; i++) {
-      const core = this.kit.fan(7);
+      const core = this.telegraphs.fan('seedCore');
       this.kit.layOutFan(core, 360, DANGER);
       core.group.visible = false;
-      const reach = this.kit.fan(4);
+      const reach = this.telegraphs.fan('seedReach');
       this.kit.layOutFan(reach, 360, DANGER);
       reach.group.visible = false;
       this.seeds.push({ id: -1, born: 0, life: T.seedLife, core, reach });
@@ -423,30 +442,25 @@ export class HeatFightFx implements HeatFxHost {
       const [inner, outer] = zoneRadii(i);
       const geo = floorRingGeometry(inner / outer, 128);
       this.geometries.push(geo);
-      const mat = new THREE.ShaderMaterial({
-        name: 'smithHeartHeatWakefire',
-        uniforms: {
-          uTime: this.uTime,
-          uBuild: { value: 0 },
-          uBurn: { value: 0 },
-          uRim: { value: new THREE.Color(TELEGRAPH_THREAT_COLORS.danger) },
-          uClip: { value: new THREE.Vector4(-1e9, 1e9, -1e9, 1e9) },
+      // Char and glow passes: two bands meet on their shared radius.
+      const { mesh, mat } = moltenDecal(
+        {
+          name: 'smithHeartHeatWakefire',
+          geometry: geo,
+          vertexShader: RING_VERT,
+          fragmentShader: ZONE_FRAG,
+          uniforms: {
+            uTime: this.uTime,
+            uBuild: { value: 0 },
+            uBurn: { value: 0 },
+            uRim: { value: new THREE.Color(TELEGRAPH_THREAT_COLORS.danger) },
+            uClip: { value: new THREE.Vector4(-1e9, 1e9, -1e9, 1e9) },
+          },
+          charStep: HEAT_FLOOR.zoneChar.step,
+          glowStep: HEAT_FLOOR.zoneGlow.step,
         },
-        vertexShader: RING_VERT,
-        fragmentShader: ZONE_FRAG,
-        transparent: true,
-        depthWrite: false,
-        toneMapped: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -2,
-        polygonOffsetUnits: -2,
-      });
-      this.materials.push(mat);
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.name = 'smithHeartHeatWakefire';
-      mesh.frustumCulled = false;
-      mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 3);
+        this.materials,
+      );
       this.root.add(mesh);
       this.zones.push({ id: -1, band: i, state: null, born: 0, mesh, mat });
     }
@@ -480,7 +494,7 @@ export class HeatFightFx implements HeatFxHost {
       this.patchSlots.push({ id: -1, born: 0 });
     }
     if (this.patches.instanceColor) this.patches.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    this.patches.renderOrder = floorVfxRenderOrder('encounter', 2);
+    this.patches.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.patches.step);
     this.patches.visible = false;
     this.root.add(this.patches);
 

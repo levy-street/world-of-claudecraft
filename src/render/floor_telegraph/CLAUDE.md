@@ -19,3 +19,5 @@ Rules:
 - The fill is the sim's cast bar (`telegraphFillOf`); nothing here changes timing.
 - Painters pass the FLOOR height under the caster; the kit floats the shape a hand
   over it (never add a lift in the painter, or the footprint z-fights the floor).
+- A raid may dress a footprint's PAINT over the kit's own uniforms (the Heat's molten
+  telegraphs, `../smith_heart_fx/heat_telegraph.ts`), never its drape or its fill.

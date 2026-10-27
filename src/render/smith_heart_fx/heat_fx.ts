@@ -37,6 +37,7 @@ import {
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { wrapAngle } from '../facing_smooth';
 import {
   TELEGRAPH_THREAT_COLORS,
@@ -45,7 +46,6 @@ import {
   type TelegraphLane,
   type TelegraphPaint,
 } from '../floor_telegraph';
-import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
@@ -56,6 +56,7 @@ import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
 import { heatClaimOrigin } from './heat_fight_fx_core';
+import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import {
   HEAT_FX_COLORS as C,
   craterLook,
@@ -68,7 +69,9 @@ import {
   swellHeight,
 } from './heat_fx_core';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { moltenDecal } from './heat_molten_decal';
 import { basaltColumn, crystalPrism, swellWallGeometry } from './heat_shapes';
+import { HeatTelegraphs } from './heat_telegraph';
 
 const SCAN_SEC = 0.1;
 /** The spot is lethal, the lanes danger (the floor telegraph's threat
@@ -121,13 +124,14 @@ const SMOKE_PUFF = {
 // ---- shaders ---------------------------------------------------------------------------
 
 const UV_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 /** A rolling wall of molten rock: its face boiling white-gold up toward the
@@ -303,8 +307,20 @@ export class HeatFx {
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
+      heatParticleSteps('heat_fx'),
     );
     this.kit = new TelegraphKit(this.root, this.detail);
+    // The spot and the lanes in the Hearth's molten paint, on this module's
+    // own rungs of the Heat's floor ladder.
+    const telegraphs = new HeatTelegraphs(
+      this.kit,
+      {
+        char: HEAT_FLOOR.fistTelegraphChar.step,
+        glow: HEAT_FLOOR.fistTelegraphGlow.step,
+        curtain: HEAT_FLOOR.fistTelegraphCurtain.step,
+      },
+      this.materials,
+    );
     this.glowTex = hasDom ? radialGlowTexture() : null;
 
     // ---- the fists ----
@@ -326,7 +342,7 @@ export class HeatFx {
     });
     this.materials.push(haloMat);
     for (let i = 0; i < P.fists; i++) {
-      const fan = this.kit.fan(10);
+      const fan = telegraphs.fan('fist');
       this.kit.layOutFan(fan, 360, FAN_STYLE);
       fan.group.visible = false;
       const fist = this.buildFist(column, prism, stone, glow, haloMat, i);
@@ -343,7 +359,7 @@ export class HeatFx {
     for (let i = 0; i < wuv.count; i++) wuv.setY(i, wpos.getZ(i));
     this.geometries.push(wallGeo, wakeGeo);
     for (let i = 0; i < P.lanes; i++) {
-      const lane = this.kit.lane(10);
+      const lane = telegraphs.lane('swell');
       lane.group.visible = false;
       const wallMat = new THREE.ShaderMaterial({
         name: 'smithHeartHeatSwellWall',
@@ -360,29 +376,27 @@ export class HeatFx {
       wall.frustumCulled = false;
       wall.visible = false;
       this.root.add(wall);
-      const wakeMat = new THREE.ShaderMaterial({
-        name: 'smithHeartHeatSwellWake',
-        uniforms: {
-          uTime: this.uTime,
-          uFront: { value: 0 },
-          uLen: { value: T.laneLength },
-          uCool: { value: T.waveSpeed * 2.5 },
+      // The wake: char and glow passes (crossing wakes out of one crater
+      // compose the same from every angle).
+      const { mesh: wake, mat: wakeMat } = moltenDecal(
+        {
+          name: 'smithHeartHeatSwellWake',
+          geometry: wakeGeo,
+          vertexShader: UV_VERT,
+          fragmentShader: WAKE_FRAG,
+          uniforms: {
+            uTime: this.uTime,
+            uFront: { value: 0 },
+            uLen: { value: T.laneLength },
+            uCool: { value: T.waveSpeed * 2.5 },
+          },
+          charStep: HEAT_FLOOR.wakeChar.step,
+          glowStep: HEAT_FLOOR.wakeGlow.step,
         },
-        vertexShader: UV_VERT,
-        fragmentShader: WAKE_FRAG,
-        transparent: true,
-        depthWrite: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -2,
-        polygonOffsetUnits: -2,
-      });
-      const wake = new THREE.Mesh(wakeGeo, wakeMat);
-      wake.name = 'smithHeartHeatSwellWake';
-      wake.frustumCulled = false;
-      wake.visible = false;
-      wake.renderOrder = floorVfxRenderOrder('encounter', 6);
+        this.materials,
+      );
       this.root.add(wake);
-      this.materials.push(wallMat, wakeMat);
+      this.materials.push(wallMat);
       this.lanes.push({
         id: -1,
         born: 0,
@@ -406,27 +420,22 @@ export class HeatFx {
     const craterGeo = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
     this.geometries.push(craterGeo);
     for (let i = 0; i < P.craters; i++) {
-      const mat = new THREE.ShaderMaterial({
-        name: 'smithHeartHeatCrater',
-        uniforms: {
-          uGlow: { value: 0 },
-          uFlash: { value: 0 },
-          uSeed: { value: heatFxHash(i, 3) * 9 },
+      const { mesh, mat } = moltenDecal(
+        {
+          name: 'smithHeartHeatCrater',
+          geometry: craterGeo,
+          vertexShader: UV_VERT,
+          fragmentShader: CRATER_FRAG,
+          uniforms: {
+            uGlow: { value: 0 },
+            uFlash: { value: 0 },
+            uSeed: { value: heatFxHash(i, 3) * 9 },
+          },
+          charStep: HEAT_FLOOR.craterChar.step,
+          glowStep: HEAT_FLOOR.craterGlow.step,
         },
-        vertexShader: UV_VERT,
-        fragmentShader: CRATER_FRAG,
-        transparent: true,
-        depthWrite: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -2,
-        polygonOffsetUnits: -2,
-      });
-      this.materials.push(mat);
-      const mesh = new THREE.Mesh(craterGeo, mat);
-      mesh.name = 'smithHeartHeatCrater';
-      mesh.frustumCulled = false;
-      mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 5);
+        this.materials,
+      );
       this.root.add(mesh);
       const flashMat = new THREE.SpriteMaterial({
         map: this.glowTex,

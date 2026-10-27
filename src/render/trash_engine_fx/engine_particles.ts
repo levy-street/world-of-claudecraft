@@ -57,6 +57,24 @@ void main() {
 }
 `;
 
+/** The encounter steps of the pools and the shock rings. An owner that
+ *  shares a floor with other encounter painters passes its own (the Heat's
+ *  ladder, heat_floor_ladder_core.ts), so its pools never tie theirs. */
+export interface EngineParticleSteps {
+  ring: number;
+  smoke: number;
+  fire: number;
+  glow: number;
+}
+
+/** The steps every engine layer has always drawn its pools on. */
+export const ENGINE_PARTICLE_STEPS: Readonly<EngineParticleSteps> = {
+  ring: 4,
+  smoke: 6,
+  fire: 7,
+  glow: 8,
+};
+
 interface Ring {
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
@@ -97,6 +115,7 @@ export class EngineParticles {
     private readonly rand: () => number,
     private readonly reducedMotion: () => boolean,
     flameTex: THREE.Texture | null,
+    steps: EngineParticleSteps = ENGINE_PARTICLE_STEPS,
   ) {
     const pool = (
       name: string,
@@ -126,15 +145,29 @@ export class EngineParticles {
       return p;
     };
     this.pools = {
-      smoke: pool('trashEngineSmoke', PARTICLE_VERT, DUST_FRAG, THREE.NormalBlending, 1200, 6),
-      glow: pool('trashEngineGlow', PARTICLE_VERT, GLOW_FRAG, THREE.AdditiveBlending, 1200, 8),
+      smoke: pool(
+        'trashEngineSmoke',
+        PARTICLE_VERT,
+        DUST_FRAG,
+        THREE.NormalBlending,
+        1200,
+        steps.smoke,
+      ),
+      glow: pool(
+        'trashEngineGlow',
+        PARTICLE_VERT,
+        GLOW_FRAG,
+        THREE.AdditiveBlending,
+        1200,
+        steps.glow,
+      ),
       soulfire: pool(
         'trashEngineSoulfire',
         FIRE_VERT,
         FIRE_FRAG.replace(GHOST_RAMP, rampGlsl(SOULFIRE_RAMP, 'ghostRamp')),
         THREE.AdditiveBlending,
         700,
-        7,
+        steps.fire,
       ),
       pyre: pool(
         'trashEnginePyre',
@@ -142,7 +175,7 @@ export class EngineParticles {
         FIRE_FRAG.replace(GHOST_RAMP, rampGlsl(PYRE_RAMP, 'ghostRamp')),
         THREE.AdditiveBlending,
         600,
-        7,
+        steps.fire,
       ),
     };
     this.poolList = [this.pools.smoke, this.pools.glow, this.pools.soulfire, this.pools.pyre];
@@ -167,7 +200,7 @@ export class EngineParticles {
       const mesh = new THREE.Mesh(ringGeo, mat);
       mesh.frustumCulled = false;
       mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 4);
+      mesh.renderOrder = floorVfxRenderOrder('encounter', steps.ring);
       root.add(mesh);
       this.rings.push({ mesh, mat, born: 0, radius: 0, span: 1, alive: false });
     }

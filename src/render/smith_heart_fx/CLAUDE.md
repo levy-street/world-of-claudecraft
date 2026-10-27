@@ -42,15 +42,20 @@ offline and online look the same. The interior's static dressing and air are
 | `quench_fight_fx.ts` | `QuenchFightFx`: every fight footprint at the sim's exact radius through the shared floor telegraph on EVERY tier (the crack at the hole's radius, the echoes in danger with a hot edge and no safe ring beside them, the crossing's lane, the freeze's splash ring), the frost and rime ring on every cold body, the holes' water, the frozen blocks, the warmth's glow and threads, the shore ice; mist, embers, glints and splashes cosmetic. The echoes borrow `QuenchFx`'s looks (`echoAt`, wired by `../rift_death_zone.ts`). Feeds `../../game/smith_heart_quench_audio.ts`. |
 | `quench_blades_fx.ts` | `QuenchBladesFx`: the Smith's four blades over their claim objects: the kit's sunk blade, torn free with its tip shown, floating upright with its light and a chevron the way the echoes run, flying (heroic), the torn socket in the ice. Every motion smooth whatever the snapshot rate: the drawn blade follows its object, the awakening runs on at its bar's pace between reads, the crossing is drawn from the lane's two ends on the sim's eased curve, leaning, banking and laying a frost wake. |
 | `heat_fx_core.ts` | PURE (`RENDER_PURE_CORES`): Basalt Fist's and the Molten Swells' look off the sim's numbers (never tuned here): the fist's fall through its bar (`fistLook`), the crater cooling (`craterLook`), a wave's wall where the sim strikes (`swellFront`, `swellHeight`), its wake (`wakeHeat`), the palette, the pools. |
-| `heat_fx.ts` | `HeatFx`: the fist's spot (`lethal`) and its three lanes (`danger`, clipped at the floor's edge) through the shared floor telegraph on every tier, filling with the bar; the giant fist plunging out of the smoke; the crater, rings and shake on its cue; the rolling walls of molten rock and their crusting wakes. |
+| `heat_fx.ts` | `HeatFx`: the fist's spot (`lethal`) and its three lanes (`danger`, clipped at the floor's edge) through the shared floor telegraph in the molten paint (`heat_telegraph.ts`) on every tier, filling with the bar; the giant fist plunging out of the smoke; the crater, rings and shake on its cue; the rolling walls of molten rock and their crusting wakes. |
 | `heat_body_core.ts` | PURE (`RENDER_PURE_CORES`): the Guardian of the Heat's provisional body (design doc 7.4): a giant of the first flame in columnar basalt and white-gold crystal (Heart kit colossus basalt repainted, Heat kit fire crystal), drawn `HEAT_BODY_SCALE` times its frame and sunk to its waist (`HEAT_HALF_SUNK`; all the way under through an overflow, `HEAT_FULL_SUNK`); the stages, then Basalt Fist's bar, then the one-shots (`heatBodyAction`, `heatSink`, `heatBodyLook`), its fire whitening phase by phase (`heatWhiteness`), the arms, the fall, the state aura's read (`heatBodyState`). |
 | `heat_body.ts` | `HeatBody`: the giant over the bodyless guardian, sunk in the wellspring, plunging under and climbing out with a splash, lava dripping off it, the fist's orb flaring, embers and haze, the fall in smoke. |
 | `heat_fight_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Heat fight's look: the objects' kinds (`heatObjectKind`), the claimed cues (all of `HEAT_CUES`), the wellspring calm and overflowing (`wellLook`), a river (`riverLook`), a seed's throb (`seedLook`), a Wakefire band (`zoneLook`, `zoneRadii`), a cinder's fall (`fallLook`), a burning patch (`patchLook`), the palette, the pools. |
 | `heat_fight_fx.ts` | `HeatFightFx` (the `HeatFxHost` of its parts): the Hearthseeds (core and reach on every tier), Wakefire's bands (each ring at its exact radii, building, erupting), the burning patches, Hearth Flare's bolts, the Kindling Marks' sigils; sparks, embers, haze and smoke cosmetic. Feeds `../../game/smith_heart_heat_audio.ts`. |
 | `heat_well_fx.ts` | `HeatWellFx`, a part of `HeatFightFx`: the first wellspring's pool, lip stumps, rim and glow, heaving over its lip while it overflows; the overflow's rivers (their lanes, then their fire), clipped at the floor's edge. |
 | `heat_cinder_fx.ts` | `HeatCinderFx`, a part of `HeatFightFx`: a Rolling Cinder's fall and fireball, its track, the chevrons over its quarry, its crust; the adds' glow. |
-| `heat_fx_host.ts` | Type-only: `HeatFxHost`, what the parts read off their host (root, kit, particles, the floor's height, the pools). |
+| `heat_fx_host.ts` | Type-only: `HeatFxHost`, what the parts read off their host (root, kit and its molten dressing, particles, the floor's height, the pools). |
 | `heat_lava_glsl.ts`, `heat_shapes.ts` | The fight's shared molten shader chunks and its basalt and crystal geometry builders. |
+| `heat_floor_ladder_core.ts` | PURE (`RENDER_PURE_CORES`): the Heat's floor ladder, `HEAT_FLOOR`: one encounter rung per floor layer of `HeatFx`, `HeatFightFx` and its parts and the three particle owners (the body's too), never tied; bottom to top the wellspring, the lasting scorch, the molten surfaces' chars then glows, the warnings' chars, glows and curtains, the particles (`heatParticleSteps`); `heatFloorFaults` (a tie, a step off the band, a pooled normal blend). |
+| `heat_molten_decal.ts` | `moltenDecal`: a molten floor surface (crater, wake, river, Wakefire band) drawn as a CHAR pass (multiply by 1 - alpha) and a GLOW pass (add colour x alpha) off one shader, the glow riding the char mesh: a lone piece is exactly its normal blend, crossing pieces of one pool commute (no camera-sorted tie). |
+| `heat_telegraph_core.ts` | PURE (`RENDER_PURE_CORES`): the molten telegraph's looks per kind (`HEAT_TELEGRAPH_LOOKS`: char, flow, falloff, joints, cracks, edge, curtain), the char's strength (`heatTelegraphChar`), when a mark has landed. |
+| `heat_telegraph_glsl.ts` | The molten telegraph's shaders (char and glow from one source) over the kit's own uniforms: scorched basalt, cracks lighting white-gold behind a ragged fill front, the flow churning, the edge a hot line in the threat colour, the warning's flare; noise on yards off the mark's own spot. |
+| `heat_telegraph.ts` | `HeatTelegraphs`: the kit's pooled fans and lanes dressed in the molten paint (the kit keeps the drape and the fill, the sim's shape and bar; the dressing swaps the paint and moves the rungs to its owner's). |
 | `hammer_fx.ts` | `HammerFx`: Mountain's Wrath (molten cracks racing out over its bar, loose stones lifting, dust drawn in; on landing the dust wall, rubble, rings, flash, grit off the terraces, a shake), Hammerfall (a fan of cracks in its arc, rubble, dust), the Slab breaking (the split flaring, the burst both ways, dust, rings, grit off the lintel while the halves part) and the Pit Mouth slamming shut (a dust skirt). |
 
 Rules:
@@ -64,6 +69,13 @@ Rules:
   floor telegraph on EVERY tier (threat colour `danger`, the vein's white-gold as the
   accent); its fire, sparks and smoke are cosmetic and thin. The Heat is the Hearth: its
   fire is white-gold, never volcanic red.
+- Every floor piece of the Heat fight takes its rung from `HEAT_FLOOR` (never a literal step)
+  and every warning draws through `HeatTelegraphs` (never straight off the kit): no two Heat
+  floor layers share a rung across modules, and a pool sharing one blends commutatively
+  (`moltenDecal`'s char and glow, the telegraphs' char and glow, additive curtains and
+  sparks) or is one draw. Every floor shader projects camera-relative (`wocCamRelView` or
+  `modelViewMatrix`): the instance sits a hundred thousand yards out. Pinned by
+  `tests/smith_heart_heat_floor.test.ts`.
 - The Guardian of the Heat's rise spots, crystal reach rings, rays, the burn on bodies, the
   channel's lane (brimming and flowing), the embers' rims and the wind-up's floor glow and body
   flash draw on EVERY tier (`HeatFightFx`, `HeatBody`); sparks, embers, haze, smoke and the
@@ -115,5 +127,5 @@ Tests: `tests/smith_heart_council_fx.test.ts`, `tests/smith_heart_council_soul_f
 `tests/smith_heart_breath_fight_fx.test.ts` and `tests/smith_heart_breath_body.test.ts` and
 `tests/smith_heart_quench_fx.test.ts`, `tests/smith_heart_quench_blades_fx.test.ts` (the blades' smooth motion), `tests/smith_heart_quench_body.test.ts` (the Quench
 body's and fight's cores), `tests/smith_heart_heat_fx.test.ts`, `tests/smith_heart_heat_body.test.ts`,
-`tests/smith_heart_heat_fight_fx.test.ts` and
+`tests/smith_heart_heat_fight_fx.test.ts`, `tests/smith_heart_heat_floor.test.ts` (the Heat's floor ladder and molten telegraphs) and
 `tests/smith_heart_final_fx.test.ts` (each core and a smoke run over a fake world).

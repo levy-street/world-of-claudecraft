@@ -232,7 +232,10 @@ export function buildHeatAir(lowGfx: boolean): THREE.Group {
       { uColor: col(0x4a4440), uLit: col(0x7a5a3c), uAlpha: { value: 0.34 } },
       false,
     ),
-    4,
+    // Over the Hearth's floor dressing (its vein's light river on 4 and 5,
+    // the pour on 6): the one normal blend here, so it ties with none of
+    // them (a tie with an additive river sorts by the camera and flickers).
+    7,
   );
   // The haze, faint, over the hottest places.
   if (plan.haze.length)

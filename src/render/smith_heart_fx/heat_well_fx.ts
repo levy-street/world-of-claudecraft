@@ -26,6 +26,7 @@ import {
   HEAT_TUNING as T,
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity } from '../../sim/types';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   TELEGRAPH_THREAT_COLORS,
   type TelegraphLane,
@@ -44,8 +45,10 @@ import {
   wellLook,
   wellOfCached,
 } from './heat_fight_fx_core';
+import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { moltenDecal } from './heat_molten_decal';
 import { basaltColumn } from './heat_shapes';
 
 const LIP_STUMPS = 26;
@@ -114,13 +117,14 @@ const RIVER_FLAME = {
 };
 
 const UV_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 /** The wellspring's molten pool: slow swirling flow under plates of crust,
@@ -253,7 +257,7 @@ export class HeatWellFx {
     this.pool.name = 'smithHeartHeatWellPool';
     this.pool.frustumCulled = false;
     this.pool.visible = false;
-    this.pool.renderOrder = floorVfxRenderOrder('encounter', 0);
+    this.pool.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.wellPool.step);
     host.root.add(this.pool);
 
     // The lip: hexagonal basalt stumps, fire in their joints (the glow ring).
@@ -289,7 +293,7 @@ export class HeatWellFx {
     this.rim.name = 'smithHeartHeatWellRim';
     this.rim.frustumCulled = false;
     this.rim.visible = false;
-    this.rim.renderOrder = floorVfxRenderOrder('encounter', 1);
+    this.rim.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.wellRim.step);
     host.root.add(this.rim);
     this.glowMat = host.sprite(0xffc860, 'smithHeartHeatWellGlow');
     this.glow = new THREE.Sprite(this.glowMat);
@@ -304,31 +308,26 @@ export class HeatWellFx {
     for (let i = 0; i < buv.count; i++) buv.setY(i, bpos.getZ(i));
     g.push(ribbon);
     for (let i = 0; i < P.rivers; i++) {
-      const lane = host.kit.lane(10);
+      const lane = host.telegraphs.lane('river');
       lane.group.visible = false;
-      const mat = new THREE.ShaderMaterial({
-        name: 'smithHeartHeatRiver',
-        uniforms: {
-          uTime: host.uTime,
-          uFront: { value: 0 },
-          uHeat: { value: 0 },
-          uLen: { value: T.riverLength },
+      // Char and glow passes: rivers meet at the lip and cross the lanes.
+      const { mesh, mat } = moltenDecal(
+        {
+          name: 'smithHeartHeatRiver',
+          geometry: ribbon,
+          vertexShader: UV_VERT,
+          fragmentShader: RIVER_FRAG,
+          uniforms: {
+            uTime: host.uTime,
+            uFront: { value: 0 },
+            uHeat: { value: 0 },
+            uLen: { value: T.riverLength },
+          },
+          charStep: HEAT_FLOOR.riverChar.step,
+          glowStep: HEAT_FLOOR.riverGlow.step,
         },
-        vertexShader: UV_VERT,
-        fragmentShader: RIVER_FRAG,
-        transparent: true,
-        depthWrite: false,
-        toneMapped: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -2,
-        polygonOffsetUnits: -2,
-      });
-      host.materials.push(mat);
-      const mesh = new THREE.Mesh(ribbon, mat);
-      mesh.name = 'smithHeartHeatRiver';
-      mesh.frustumCulled = false;
-      mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 3);
+        host.materials,
+      );
       host.root.add(mesh);
       this.rivers.push({ id: -1, born: 0, state: null, facing: 0, length: 1, lane, mesh, mat });
     }
