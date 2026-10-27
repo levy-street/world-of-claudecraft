@@ -41,6 +41,7 @@ import {
   heartPortalStage,
 } from './heart_portal_core';
 import { buildHeartProps, buildHeartWalls } from './heart_props';
+import { buildHeartQuarters } from './heart_quarters';
 import { buildHeartRivers } from './heart_rivers';
 import { dressHeartMountain, ensureHeartRockKit } from './heart_rock';
 import { setHeartRockSlot } from './heart_rock_cutaway';
@@ -192,6 +193,10 @@ export async function buildSmithHeartInterior(
   group.add(buildHeatPour(deps.lowGfx));
   const heartKit = heartReady ? buildHeartRoomKit(deps.lowGfx) : null;
   if (heartKit) group.add(heartKit.group);
+  // The platform's four quarters round the central ring (phase 2K), the one
+  // the final boss stands in awake.
+  const quarters = heartReady ? buildHeartQuarters(deps.lowGfx) : null;
+  if (quarters) group.add(quarters.group);
   const room = buildHeartRoom(
     deps.lowGfx,
     new Set([...(ringReady ? ['seal_dais'] : []), ...(heartReady ? HEART_KIT_KEELS : [])]),
@@ -260,9 +265,9 @@ export async function buildSmithHeartInterior(
       room.setHeart(1 - dark);
       heartKit?.setHeart(1 - dark);
       for (const v of SMITH_HEART_VEINS) {
-        room.setVein(v, 1 - 0.85 * dark);
         heartKit?.setVein(v, 1 - 0.7 * dark);
       }
+      quarters?.update(slot, now, dt, dark);
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);
       rivers.update(view);

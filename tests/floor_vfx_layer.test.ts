@@ -390,6 +390,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // ring) and the Heart's rune rings: floor marks under every telegraph.
   { file: 'src/render/smith_heart/heart_portal.ts', layer: 'ground', strict: true },
   { file: 'src/render/smith_heart/heart_room.ts', layer: 'ground', strict: true },
+  // The Anvil of the World's quarters awake (phase 2K): each quarter's light
+  // washed over its stones, a floor mark one rung over the dais's runes.
+  { file: 'src/render/smith_heart/heart_quarters.ts', layer: 'ground', strict: true },
   // The Guardian of the Quench's fight on the ice: its floor discs ride the
   // encounter band; the provisional body's blocks and collars keep the default
   // order 0 on purpose (scene objects, never floor marks), so not strict.

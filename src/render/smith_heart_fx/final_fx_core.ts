@@ -144,17 +144,17 @@ export const COLOSSUS_SHARDS = { skirt: 6, back: 4, skirtR: 4.6, backR: 5.4 } as
 const SHARD_PIECES = ['Kit_ColShardA', 'Kit_ColShardB', 'Kit_ColShardC'];
 
 /** Every piece of the body, in the order the heart tears them out. The rest
- *  spots lie on the platform's walk between the altars and the channels,
- *  never on the bridge's line (where the raid walks in) nor an altar; the
- *  shards rise out of the chasm under the lip. */
+ *  spots lie on the platform's walk inside the quarters (phase 2K: never on
+ *  a ridge), never on the bridge's line (where the raid walks in) nor an
+ *  altar; the shards rise out of the chasm under the lip. */
 export const COLOSSUS_PIECES: readonly ColossusPiece[] = (() => {
   const out: ColossusPiece[] = [];
   const big: [string, string, ColossusJoint, -1 | 0 | 1, number, number, number, number][] = [
     // id, piece, joint, side, size, scale, bearing, r
     ['hip', 'Kit_ColHip', 'hip', 0, 8, 1.2, 340, 27],
     ['torso', 'Kit_ColTorso', 'torso', 0, 11, 1.25, 20, 30],
-    ['shoulderL', 'Kit_ColShoulder', 'shoulder', 1, 6.8, 1.35, 120, 29],
-    ['shoulderR', 'Kit_ColShoulder', 'shoulder', -1, 6.8, 1.35, 300, 29],
+    ['shoulderL', 'Kit_ColShoulder', 'shoulder', 1, 6.8, 1.35, 112, 29],
+    ['shoulderR', 'Kit_ColShoulder', 'shoulder', -1, 6.8, 1.35, 292, 29],
     ['upperL', 'Kit_ColUpperArm', 'upper', 1, 7.8, 1.2, 150, 23],
     ['upperR', 'Kit_ColUpperArm', 'upper', -1, 7.8, 1.2, 325, 21],
     ['foreL', 'Kit_ColForearm', 'fore', 1, 7.5, 1.25, 104, 35],

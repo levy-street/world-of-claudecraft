@@ -163,8 +163,12 @@ export function heartKeelBottom(k: HeartKeel): number {
   return k.h + k.profile[k.profile.length - 1][1];
 }
 
-/** The platform's rune rings (radii from the room's centre). */
+/** The platform's rune rings (radii from the room's centre): the
+ *  blockout's three. */
 export const HEART_RUNE_RINGS: readonly number[] = [14, 26, 38.5];
+/** With the Heart kit (phase 2K) one ring of runes, in the dais's basalt
+ *  band round the central ring (quarter_pieces.py, 8.75 to 9.85). */
+export const HEART_DAIS_RUNE_R = 9.3;
 
 /** The chasm's embers: a rising swirl over the core, by the static preset. */
 export function heartEmberCount(lowGfx: boolean): number {

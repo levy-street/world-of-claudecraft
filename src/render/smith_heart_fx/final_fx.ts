@@ -59,6 +59,7 @@ import {
   heartKitMeshes,
   SMITH_HEART_HEART_KIT_URL,
 } from '../smith_heart/heart_kit';
+import { noteHeartQuarterBoss } from '../smith_heart/heart_quarters_core';
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { HEART_CORE_BED_Y } from '../smith_heart/heart_room_kit_plan_core';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from '../smith_heart/heart_seal_core';
@@ -603,7 +604,8 @@ export class FinalFx {
           for (const m of g.children) if (m instanceof THREE.Mesh) m.castShadow = false;
           this.body.add(g);
         }
-        if (p.socket) p.socket.scale.setScalar(0.35 + p.def.size * 0.055);
+        // Phase 2K: smaller scars, so the quarters still read from above.
+        if (p.socket) p.socket.scale.setScalar(0.22 + p.def.size * 0.034);
         if (p.rubble) p.rubble.scale.setScalar(0.6 + p.def.size * 0.1);
       }
     }
@@ -748,6 +750,15 @@ export class FinalFx {
     } else if (t < 0) {
       this.skipAt = -1;
     }
+    // The quarter it stands in wakes (phase 2K, the interior paints it):
+    // only once the body is whole and while it stands.
+    noteHeartQuarterBoss(
+      this.slotKey,
+      boss.pos.x - o.x,
+      boss.pos.z - o.z,
+      engaged,
+      !boss.dead && t >= ARRIVAL_WAVE_AT,
+    );
     this.readCast(boss);
     this.poseBody(boss, t, dt);
     this.arrivalMoments(t);
