@@ -5,9 +5,11 @@
 // to the rim, its element rises off it and the ridges bordering it glow; the
 // other three go dark. A crossing drains the old quarter's light back into
 // the ring, floods the new one out of it, and sends a shockwave along the
-// ridge the boss crossed. In the central ring with a fight on, all four wake
-// at once and the ring blazes (the final phase's look); in the ring before
-// the pull the room rests, every quarter's seams breathing faintly.
+// ridge the boss crossed. In the central ring in its final phase (the last
+// `HEART_FINAL_PHASE_SHARE` of its health, or forced by the dev preview) all
+// four wake at once and the ring blazes (the final phase's look); in the ring
+// otherwise the room rests: no quarter awake, every quarter's seams
+// breathing faintly (phase 2L).
 //
 //   - The memory (`noteHeartQuarterBoss`): what the final boss's effects
 //     (../smith_heart_fx/final_fx.ts, which read the boss from IWorld) saw
@@ -42,11 +44,13 @@ import { heartHash } from './heart_plan_core';
 // ---- the memory ---------------------------------------------------------------------------
 
 /** What the final boss's effects saw this frame: where it stands
- *  (instance-local) and whether a fight is on. */
+ *  (instance-local), whether a fight is on and whether it is in its final
+ *  phase (`heartFinalPhase`: its last share of health). */
 export interface HeartQuarterBoss {
   x: number;
   z: number;
   engaged: boolean;
+  final: boolean;
 }
 
 const memory = new Map<string, HeartQuarterBoss>();
@@ -59,6 +63,7 @@ export function noteHeartQuarterBoss(
   z: number,
   engaged: boolean,
   awake: boolean,
+  final = false,
 ): void {
   if (!awake) {
     memory.delete(key);
@@ -69,7 +74,8 @@ export function noteHeartQuarterBoss(
     m.x = x;
     m.z = z;
     m.engaged = engaged;
-  } else memory.set(key, { x, z, engaged });
+    m.final = final;
+  } else memory.set(key, { x, z, engaged, final });
 }
 
 /** The slot's final boss as last seen, or null. */
@@ -85,16 +91,17 @@ export function clearHeartQuarterMemoryForTest(): void {
 // ---- the look's modes and timings --------------------------------------------------------
 
 /** The room's mode: asleep (before the arrival, or the boss gone), resting
- *  (the boss in the ring before the pull), one quarter awake, or the final
- *  look (all four, the ring blazing). */
+ *  (the boss in the ring outside its final phase: no quarter awake), one
+ *  quarter awake, or the final look (all four, the ring blazing). */
 export type HeartQuartersMode = 'asleep' | 'rest' | 'quarter' | 'final';
 
 export const HEART_QUARTERS_LOOK = {
   /** The faint glow of a dormant quarter's seams (never fully black: the
    *  room still reads as four quarters). */
   dormant: 0.06,
-  /** Every quarter's seams breathing while the room rests. */
-  rest: 0.24,
+  /** Every quarter's seams breathing while the room rests (no quarter
+   *  awake: a touch over dormant, never a flood). */
+  rest: 0.1,
   /** The flood's front, yards per second, out of the ring to the rim. */
   floodSpeed: 26,
   /** The drain's front, yards per second, back into the ring. */
@@ -166,7 +173,7 @@ export function heartQuartersModeOf(boss: HeartQuarterBoss | null): {
 } {
   if (!boss) return { mode: 'asleep', zone: null };
   const zone = heartQuarterAt(boss.x, boss.z);
-  if (zone === 'ring') return { mode: boss.engaged ? 'final' : 'rest', zone };
+  if (zone === 'ring') return { mode: boss.engaged && boss.final ? 'final' : 'rest', zone };
   return { mode: 'quarter', zone };
 }
 
@@ -275,13 +282,38 @@ export interface HeartQuarterSeed {
 /** The tunings of each quarter's air: how many of each particle on the
  *  high tier (the low tier keeps about a third). */
 export const HEART_QUARTER_AIR = {
-  hammer: { grit: 150, dust: 26 },
-  breath: { devils: 4, perDevil: 46, streaks: 70 },
-  quench: { mist: 34, crystals: 96 },
-  heat: { embers: 170, haze: 18 },
-  sparks: 90,
-  blaze: 110,
+  hammer: { grit: 240, dust: 70, chips: 60, stones: 26 },
+  breath: { devils: 6, perDevil: 70, streaks: 130, sheets: 30 },
+  quench: { mist: 46, crystals: 150, frost: 200 },
+  heat: { embers: 300, haze: 30, flames: 44 },
+  sparks: 150,
+  blaze: 220,
 } as const;
+
+/** Each quarter's own light (phase 2L): its colour and the white-hot of its
+ *  brightest, its idle life asleep (the Heat smoulders: it reads as fire
+ *  even dark), its seams' and its wash's gain, and how far its stones are
+ *  dimmed while it sleeps. The Heat is the guardian's hearth's red-orange
+ *  (never gold) and the Hammer an earthy sand-amber, apart in hue and in
+ *  value; the Breath a storm violet, the Quench an ice blue. */
+export const HEART_QUARTER_PALETTE: Readonly<
+  Record<
+    SmithHeartVein,
+    { color: number; hot: number; idle: number; seams: number; wash: number; shade: number }
+  >
+> = {
+  hammer: { color: 0xe0a650, hot: 0xfff0c8, idle: 0.07, seams: 1, wash: 1, shade: 0.44 },
+  breath: { color: 0xa98cff, hot: 0xc8fff2, idle: 0.07, seams: 1.35, wash: 1.15, shade: 0.42 },
+  quench: { color: 0x6cc8ff, hot: 0xf2fbff, idle: 0.1, seams: 1.4, wash: 1.7, shade: 0.32 },
+  heat: { color: 0xff5214, hot: 0xffc23a, idle: 0.3, seams: 1.15, wash: 1, shade: 0.55 },
+};
+
+/** The opaque platform's draw order (phase 2L): the floors (the quarters,
+ *  the rim's dirt bed, the dais) first, then each ridge's spine drawn with no
+ *  depth write and its light over it, then everything else. A floor
+ *  telegraph (transparent, depth-tested against the floor) therefore always
+ *  shows over a spine, and a body walking over one stands on it. */
+export const HEART_PLATFORM_ORDER = { floor: -3, spine: -2, spineGlow: -1 } as const;
 
 /** The low tier's share of the cosmetic air. */
 export const HEART_QUARTER_LOW_SHARE = 0.35;

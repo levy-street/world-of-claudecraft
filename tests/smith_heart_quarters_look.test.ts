@@ -3,8 +3,9 @@
 // painter (heart_quarters.ts) over the boss memory the final boss's effects
 // write.
 //   - the memory: what the effects saw, cleared when the heart sleeps;
-//   - the modes: a quarter, the ring resting before the pull, the final
-//     look in the ring with a fight on, asleep;
+//   - the modes: a quarter, the ring resting (no quarter awake, even with a
+//     fight on), the final look in the ring only in the final phase (phase
+//     2L), asleep;
 //   - a quarter floods out of the ring to the rim; a crossing drains the
 //     old one into the ring, holds the new one a breath, then floods it,
 //     and shocks the ridge between them from where the boss stands; the
@@ -15,14 +16,18 @@
 //     stay dark; the washes ride the ground rung; every tier draws the same
 //     lights (which quarter is awake is never shed).
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { heartKitSlotMaterial } from '../src/render/smith_heart/heart_kit';
 import { buildHeartQuarters } from '../src/render/smith_heart/heart_quarters';
 import {
   clearHeartQuarterMemoryForTest,
+  HEART_PLATFORM_ORDER,
   HEART_QUARTER_AIR,
   HEART_QUARTER_LOW_SHARE,
+  HEART_QUARTER_PALETTE,
   HEART_QUARTERS_LOOK,
   heartQuarterBoss,
   heartQuarterCount,
@@ -44,9 +49,10 @@ import {
   heartRidgeDistance,
 } from '../src/sim/content/smith_heart_quarters';
 
-const spot = (zone: Parameters<typeof heartQuarterSpot>[0], engaged = false) => ({
+const spot = (zone: Parameters<typeof heartQuarterSpot>[0], engaged = false, final = engaged) => ({
   ...heartQuarterSpot(zone),
   engaged,
+  final,
 });
 
 /** Run the state `seconds` at 60 frames a second from `t0`. */
@@ -70,10 +76,10 @@ afterEach(() => clearHeartQuarterMemoryForTest());
 describe('the boss memory', () => {
   it('keeps what the effects saw, and forgets it when the heart sleeps', () => {
     expect(heartQuarterBoss('k')).toBeNull();
-    noteHeartQuarterBoss('k', 1, 2, true, true);
-    expect(heartQuarterBoss('k')).toEqual({ x: 1, z: 2, engaged: true });
+    noteHeartQuarterBoss('k', 1, 2, true, true, true);
+    expect(heartQuarterBoss('k')).toEqual({ x: 1, z: 2, engaged: true, final: true });
     noteHeartQuarterBoss('k', 3, 4, false, true);
-    expect(heartQuarterBoss('k')).toEqual({ x: 3, z: 4, engaged: false });
+    expect(heartQuarterBoss('k')).toEqual({ x: 3, z: 4, engaged: false, final: false });
     expect(heartQuarterBoss('other')).toBeNull();
     noteHeartQuarterBoss('k', 3, 4, false, false);
     expect(heartQuarterBoss('k')).toBeNull();
@@ -81,14 +87,18 @@ describe('the boss memory', () => {
 });
 
 describe('the modes', () => {
-  it('reads a quarter, the ring at rest, the final look and sleep', () => {
+  it('reads a quarter, the ring at rest, the final look only in the final phase, and sleep', () => {
     expect(heartQuartersModeOf(null)).toEqual({ mode: 'asleep', zone: null });
     for (const v of HEART_QUARTER_ORDER) {
       expect(heartQuartersModeOf(spot(v))).toEqual({ mode: 'quarter', zone: v });
       expect(heartQuartersModeOf(spot(v, true))).toEqual({ mode: 'quarter', zone: v });
     }
     expect(heartQuartersModeOf(spot('ring'))).toEqual({ mode: 'rest', zone: 'ring' });
+    // A pull in the ring above the final phase's share wakes no quarter.
+    expect(heartQuartersModeOf(spot('ring', true, false))).toEqual({ mode: 'rest', zone: 'ring' });
     expect(heartQuartersModeOf(spot('ring', true))).toEqual({ mode: 'final', zone: 'ring' });
+    // The final phase outside a fight is no final look.
+    expect(heartQuartersModeOf(spot('ring', false, true))).toEqual({ mode: 'rest', zone: 'ring' });
   });
 });
 
@@ -150,7 +160,7 @@ describe('the light stepped', () => {
     expect(s.ringPulse).toBeGreaterThan(0.9);
   });
 
-  it('wakes all four and blazes the ring for the final look; rests before the pull', () => {
+  it('wakes all four and blazes the ring for the final look; rests before it, pulled or not', () => {
     const s = newHeartQuartersState();
     let t = run(s, spot('ring'), 0, 3);
     expect(s.mode).toBe('rest');
@@ -159,6 +169,13 @@ describe('the light stepped', () => {
       expect(s.quarters[v].base).toBeCloseTo(HEART_QUARTERS_LOOK.rest, 6);
     }
     expect(s.ring).toBeCloseTo(HEART_QUARTERS_LOOK.ringRest, 6);
+    // The pull at full health (the boss starts in the ring): still no
+    // quarter awake, no blaze, the rest no brighter than a faint breath.
+    t = run(s, spot('ring', true, false), t, 3);
+    expect(s.mode).toBe('rest');
+    for (const v of SMITH_HEART_VEINS) expect(s.quarters[v].awake, v).toBe(0);
+    expect(s.blaze).toBe(0);
+    expect(HEART_QUARTERS_LOOK.rest).toBeLessThanOrEqual(0.12);
     t = run(s, spot('ring', true), t, 3);
     expect(s.mode).toBe('final');
     for (const v of SMITH_HEART_VEINS) {
@@ -312,5 +329,81 @@ describe('the painter', () => {
       expect(m.vertexShader, m.name).toMatch(/modelViewMatrix/);
       expect(m.vertexShader, m.name).not.toMatch(/viewMatrix\s*\*\s*(modelMatrix|vec4)/);
     }
+  });
+});
+
+describe('the quarters read apart (phase 2L)', () => {
+  const hsl = (hex: number) => new THREE.Color(hex).getHSL({ h: 0, s: 0, l: 0 });
+
+  it("lights the Heat in the hearth's red-orange, never gold, and the Hammer apart from it", () => {
+    const heat = hsl(HEART_QUARTER_PALETTE.heat.color);
+    const hammer = hsl(HEART_QUARTER_PALETTE.hammer.color);
+    // Hue in turns: red-orange under about 25 degrees, the Hammer's sand-amber
+    // well round from it.
+    expect(heat.h * 360).toBeLessThan(25);
+    expect(hammer.h * 360 - heat.h * 360).toBeGreaterThan(15);
+    // The Heat smoulders asleep (it reads as fire even dark); the others
+    // barely breathe.
+    expect(HEART_QUARTER_PALETTE.heat.idle).toBeGreaterThan(0.2);
+    for (const v of ['hammer', 'breath', 'quench'] as const)
+      expect(HEART_QUARTER_PALETTE[v].idle, v).toBeLessThan(HEART_QUARTER_PALETTE.heat.idle / 2);
+    // The cold quarters apart in hue too (violet against ice blue).
+    expect(
+      Math.abs(
+        hsl(HEART_QUARTER_PALETTE.breath.color).h - hsl(HEART_QUARTER_PALETTE.quench.color).h,
+      ) * 360,
+    ).toBeGreaterThan(40);
+  });
+
+  it('dims the pale Quench harder asleep, so its waking reads', () => {
+    for (const v of ['hammer', 'breath', 'heat'] as const)
+      expect(HEART_QUARTER_PALETTE.quench.shade, v).toBeLessThan(HEART_QUARTER_PALETTE[v].shade);
+  });
+
+  it('draws the floors, then the spines with no depth write, so a telegraph always shows over one', () => {
+    expect(HEART_PLATFORM_ORDER.floor).toBeLessThan(HEART_PLATFORM_ORDER.spine);
+    expect(HEART_PLATFORM_ORDER.spine).toBeLessThan(HEART_PLATFORM_ORDER.spineGlow);
+    // Everything else (bodies, telegraphs on the ladder) draws after them.
+    expect(HEART_PLATFORM_ORDER.spineGlow).toBeLessThan(0);
+    expect(floorVfxRenderOrder('ground', 0)).toBeGreaterThan(HEART_PLATFORM_ORDER.spineGlow);
+    const spine = heartKitSlotMaterial('spine');
+    expect(spine.depthWrite).toBe(false);
+    expect(heartKitSlotMaterial('stone').depthWrite).toBe(true);
+    const src = readFileSync('src/render/smith_heart/heart_quarters.ts', 'utf8');
+    expect(src).toMatch(/heartKitSlotMaterial\('spine'\)/);
+    expect(src).toMatch(/spineGlow\.depthWrite = false/);
+    expect(src).toMatch(/renderOrder = HEART_PLATFORM_ORDER\.spine;/);
+    expect(src).toMatch(/renderOrder = HEART_PLATFORM_ORDER\.floor;/);
+    const kit = readFileSync('src/render/smith_heart/heart_room_kit.ts', 'utf8');
+    expect(kit).toMatch(/Kit_AnvilFloor:[\s\S]*HEART_PLATFORM_ORDER\.floor/);
+  });
+
+  it('raises every element in layers, more of it than before, a share on the low tier', () => {
+    const A = HEART_QUARTER_AIR;
+    expect(A.hammer.grit + A.hammer.chips + A.hammer.dust + A.hammer.stones).toBeGreaterThan(300);
+    expect(
+      A.breath.devils * A.breath.perDevil + A.breath.streaks + A.breath.sheets,
+    ).toBeGreaterThan(500);
+    expect(A.quench.mist + A.quench.frost + A.quench.crystals).toBeGreaterThan(350);
+    expect(A.heat.embers + A.heat.haze + A.heat.flames).toBeGreaterThan(350);
+    const hi = buildHeartQuarters(false).group;
+    const lo = buildHeartQuarters(true).group;
+    const names = (g: THREE.Object3D) => {
+      const out: string[] = [];
+      g.traverse((o) => {
+        if (o.name.startsWith('heartQuarter') || o.name.startsWith('heartRidge')) out.push(o.name);
+      });
+      return out.sort();
+    };
+    expect(names(lo)).toEqual(names(hi));
+    for (const layer of [
+      'heartQuarterChips:hammer',
+      'heartQuarterDust:hammer',
+      'heartQuarterSheets:breath',
+      'heartQuarterFrost:quench',
+      'heartQuarterFlames:heat',
+      'heartRidgeDust:0',
+    ])
+      expect(names(hi), layer).toContain(layer);
   });
 });

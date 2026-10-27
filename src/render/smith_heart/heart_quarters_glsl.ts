@@ -1,10 +1,10 @@
-// The shaders of the Anvil of the World's quarters awake (phase 2K,
-// heart_quarters.ts paints with them): the quarters' seams, the ridges' veins,
-// the dais's crystal, the light washed over each quarter's floor, and the
-// air each element raises off its quarter. Texture-free; every motion runs
-// on the shared clock; every point goes through `modelViewMatrix` on a
-// positioned mesh (the room's centre), so its own `position` is room-local
-// and its radius is the platform's.
+// The shaders of the Anvil of the World's quarters awake (phases 2K and 2L,
+// heart_quarters.ts paints with them): the quarters' seams, cracks, fissures
+// and ice, the ridges' veins, the dais's crystal, the light washed over each
+// quarter's floor, and the air each element raises off its quarter. Texture-
+// free; every motion runs on the shared clock; every point goes through
+// `modelViewMatrix` on a positioned mesh (the room's centre), so its own
+// `position` is room-local and its radius is the platform's.
 //
 // A flat effect quad is drawn double sided; no `pow()` of a value that can go
 // negative (src/render/smith_heart/CLAUDE.md).
@@ -15,6 +15,13 @@ import { HEART_QUARTERS_LOOK } from './heart_quarters_core';
 const f = (v: number) => (Number.isInteger(v) ? `${v}.0` : `${v}`);
 const RING = f(HEART_QUARTERS.ringR);
 const RIM = f(HEART_QUARTERS.rimR);
+const SHOCK_SPEED = f(HEART_QUARTERS_LOOK.shockSpeed);
+const SHOCK_LIFE = f(HEART_QUARTERS_LOOK.shockLife);
+/** The Hammer's tremor: a wave out of the ring every few seconds (the seams,
+ *  the grit, the chips and the dust all read the same clock). */
+const TREMOR = /* glsl */ `
+    float tp = fract(uTime / 2.6);
+    float pr = mix(${RING}, ${RIM} + 4.0, tp);`;
 
 /** The vertex half every kit glow here shares: the facet's shade (its
  *  vertex colour) and its room-local point. */
@@ -28,41 +35,69 @@ void main() {
 }`;
 
 /** Each quarter's own life in its seams (sets `flav` 0 to about 2, and
- *  `hot`, the white in it). */
+ *  `hot`, the white in it; `idleK` its life while it sleeps). */
 const FLAVOUR: Record<string, string> = {
-  // A tremor running out through the slabs every few seconds.
-  hammer: `
-    float tp = fract(uTime / 2.6);
-    float pr = mix(${RING}, ${RIM} + 4.0, tp);
-    float tremor = exp(-(r - pr) * (r - pr) / 1.8) * (1.0 - tp);
-    float flav = 0.82 + 1.15 * tremor;
-    float hot = tremor * 0.6;`,
+  // A tremor running out through the blocks every few seconds.
+  hammer: `${TREMOR}
+    float tremor = exp(-(r - pr) * (r - pr) / 2.2) * (1.0 - tp);
+    float flav = 0.78 + 1.5 * tremor;
+    float hot = tremor * 0.75;
+    float idleK = 1.0 + 1.6 * tremor;`,
   // Bands of light wheeling round with the wind's spiral.
   breath: `
     float band = 0.5 + 0.5 * sin(ang * 5.0 + r * 0.32 - uTime * 2.6);
-    float flav = 0.62 + 0.62 * band * band;
-    float hot = band * band * band * 0.35;`,
+    float flav = 0.6 + 0.75 * band * band;
+    float hot = band * band * band * 0.45;
+    float idleK = 0.8 + 0.4 * band;`,
   // A slow cold shimmer, glints of frost catching.
   quench: `
     float sh = 0.5 + 0.5 * sin(r * 0.7 - uTime * 0.8 + ang * 2.0);
     float glint = max(0.0, sin(dot(vP.xz, vec2(12.9898, 78.233)) * 3.1 + uTime * 2.3));
     glint = glint * glint * glint * glint * glint * glint * glint * glint;
-    float flav = 0.72 + 0.4 * sh + 0.9 * glint;
-    float hot = glint * 0.8;`,
-  // Molten light flowing out along the seams.
+    float flav = 0.75 + 0.45 * sh + 1.1 * glint;
+    float hot = glint * 0.85 + 0.15 * sh;
+    float idleK = 0.85 + 0.3 * sh;`,
+  // Molten light flowing out along the fissures, a pulse of lava running
+  // out of the ring every few seconds (asleep too: the Heat smoulders).
   heat: `
     float flow = 0.5 + 0.5 * sin(r * 1.6 - uTime * 3.4 + sin(ang * 7.0 + uTime * 0.7) * 1.8);
-    float flav = 0.7 + 0.65 * flow;
-    float hot = flow * flow * 0.7;`,
+    float lp = fract(uTime / 3.4);
+    float lpr = mix(${RING} - 2.0, ${RIM} + 3.0, lp);
+    float pulse = exp(-(r - lpr) * (r - lpr) / 5.0);
+    float flav = 0.7 + 0.55 * flow + 0.9 * pulse;
+    float hot = flow * flow * 0.55 + pulse * 0.7;
+    float idleK = 0.7 + 0.25 * flow + 1.4 * pulse;`,
 };
 
-/** A quarter's seams (its kit glow slot): dark but for a faint base glow,
- *  lit inside its flood's front with its own life, the front itself a
- *  bright wave. */
+/** The Quench's sheets of ice (its glow faces painted blue): deep dark ice
+ *  with a cold rim and a slow sheen while it sleeps, lit from inside when
+ *  the quarter wakes (moving caustics, the front a bright wave). */
+const ICE = /* glsl */ `
+  float isIce = step(0.2, vShade.b - vShade.r);
+  if (isIce > 0.5) {
+    float rim = smoothstep(0.08, 0.3, vShade.r);
+    vec3 deep = mix(vec3(0.16, 0.27, 0.4), vec3(0.52, 0.64, 0.76), rim);
+    float sheen = max(0.0, sin((vP.x + vP.z * 0.6) * 0.42 + uTime * 0.18));
+    sheen = sheen * sheen * sheen * sheen * sheen * sheen * sheen * sheen;
+    float caust = sin(vP.x * 1.7 + uTime * 1.3 + sin(vP.z * 1.1 - uTime * 0.7)) * sin(vP.z * 1.9 - uTime * 1.1);
+    caust = 0.5 + 0.5 * caust;
+    vec3 asleep = deep * (1.0 + 0.6 * max(uBase, uIdle)) + vec3(0.5, 0.65, 0.8) * sheen * 0.4;
+    vec3 awakeC = mix(uColor * 1.15, vec3(0.92, 0.98, 1.0), 0.25 + 0.45 * rim) * (0.75 + 0.6 * caust * caust);
+    vec3 c = mix(asleep, awakeC * uGain, inside) + mix(uColor, white, 0.7) * edge * 1.4;
+    gl_FragColor = vec4(c * (1.0 - 0.85 * uDark), 1.0);
+    #include <colorspace_fragment>
+    return;
+  }`;
+
+/** A quarter's seams (its kit glow slot): dark but for a faint base glow
+ *  (and its idle life: the Heat's fissures smoulder), lit inside its
+ *  flood's front with its own life, the front itself a bright wave. */
 export function quarterGlowFrag(vein: string): string {
   return /* glsl */ `
 uniform vec3 uColor;
+uniform vec3 uHot;
 uniform float uBase;
+uniform float uIdle;
 uniform float uAwake;
 uniform float uFront;
 uniform float uGain;
@@ -77,14 +112,16 @@ void main() {
   float inside = uAwake * (1.0 - smoothstep(uFront - 2.2, uFront, r));
   float dr = r - uFront;
   float edge = uAwake * exp(-dr * dr / 2.4) * (1.0 - smoothstep(${RIM} - 1.0, ${RIM} + 1.5, uFront));
-  float breathe = 0.82 + 0.18 * sin(uTime * 1.3 + r * 0.4);
-  float level = max(uBase * breathe, inside * flav);
-  vec3 dark = mix(vec3(0.035, 0.035, 0.045), uColor * 0.1, 0.5) * (0.5 + 0.6 * vShade.r);
   vec3 white = vec3(1.0, 0.97, 0.9);
-  vec3 lit = uColor * (0.5 + 0.65 * vShade.r) * level * 1.3 * mix(1.0, uGain, step(uBase * breathe, inside * flav));
-  lit += mix(uColor, white, 0.35 + 0.5 * hot) * hot * inside * 0.55;
-  lit += mix(uColor, white, 0.6) * edge * 1.5;
-  lit += white * smoothstep(0.9, 1.0, vShade.r) * 0.3 * inside;
+  ${vein === 'quench' ? ICE : ''}
+  float breathe = 0.82 + 0.18 * sin(uTime * 1.3 + r * 0.4);
+  float rest = max(uBase * breathe, uIdle * idleK);
+  float level = max(rest, inside * flav);
+  vec3 dark = mix(vec3(0.035, 0.035, 0.045), uColor * 0.1, 0.5) * (0.5 + 0.6 * vShade.r);
+  vec3 lit = uColor * (0.45 + 0.7 * vShade.r) * level * 1.3 * mix(1.0, uGain, step(rest, inside * flav));
+  lit += mix(uColor, uHot, 0.35 + 0.5 * hot) * hot * max(inside, uIdle * 0.6) * 0.75;
+  lit += mix(uColor, white, 0.6) * edge * 1.7;
+  lit += uHot * smoothstep(0.9, 1.0, vShade.r) * 0.35 * max(inside, uIdle);
   gl_FragColor = vec4((dark + lit) * (1.0 - 0.85 * uDark), 1.0);
   #include <colorspace_fragment>
 }`;
@@ -111,14 +148,14 @@ void main() {
   float flow = 0.7 + 0.45 * sin(r * 0.55 - uTime * 3.2);
   float shock = 0.0;
   if (uShockAge >= 0.0) {
-    float d = abs(abs(r - uShockR) - uShockAge * ${f(HEART_QUARTERS_LOOK.shockSpeed)});
-    shock = exp(-d * d / 1.6) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.5)}, ${f(HEART_QUARTERS_LOOK.shockLife)}, uShockAge));
+    float d = abs(abs(r - uShockR) - uShockAge * ${SHOCK_SPEED});
+    shock = exp(-d * d / 3.2) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.5)}, ${SHOCK_LIFE}, uShockAge));
   }
   float level = max(uBase * (0.85 + 0.15 * sin(uTime * 1.1 + r * 0.3)), inside * flow);
   vec3 dark = vec3(0.04, 0.038, 0.045) * (0.5 + 0.6 * vShade.r);
   vec3 white = vec3(1.0, 0.97, 0.9);
-  vec3 lit = uColor * (0.5 + 0.65 * vShade.r) * level * 2.1;
-  lit += mix(uShockColor, white, 0.55) * shock * 3.6;
+  vec3 lit = uColor * (0.5 + 0.65 * vShade.r) * level * 2.3;
+  lit += mix(uShockColor, white, 0.55) * shock * 5.0;
   gl_FragColor = vec4((dark + lit) * (1.0 - 0.85 * uDark), 1.0);
   #include <colorspace_fragment>
 }`;
@@ -154,10 +191,10 @@ void main() {
   float beat = 0.8 + 0.2 * sin(uTime * 2.856);
   float spin = 0.75 + 0.25 * sin(b * 0.0349 * 4.0 - uTime * 1.6 + r * 0.5);
   vec3 c = heart * uRing * beat * spin;
-  c += vc * ql * smoothstep(2.5, 8.5, r) * 1.1;
-  c *= 1.0 + uBlaze * (1.3 + 0.7 * sin(uTime * 4.2 - r * 0.9));
+  c += vc * ql * smoothstep(2.5, 8.5, r) * 1.3;
+  c *= 1.0 + uBlaze * (1.8 + 0.9 * sin(uTime * 4.2 - r * 0.9));
   float pr = (1.0 - uPulse) * ${RING};
-  c += vec3(1.0, 0.95, 0.85) * uPulse * exp(-(r - pr) * (r - pr) / 4.0) * 1.6;
+  c += vec3(1.0, 0.95, 0.85) * uPulse * exp(-(r - pr) * (r - pr) / 4.0) * 2.2;
   vec3 dark = vec3(0.05, 0.045, 0.045) * (0.5 + 0.6 * vShade.r);
   vec3 lit = c * (0.55 + 0.6 * vShade.r);
   gl_FragColor = vec4((dark + lit) * (1.0 - 0.85 * uDark), 1.0);
@@ -191,7 +228,7 @@ void main() {
   float dr = r - uFront;
   float edge = uAwake * exp(-dr * dr / 3.0) * (1.0 - smoothstep(${RIM} - 1.0, ${RIM} + 1.5, uFront));
   float pool = 0.55 + 0.45 * sin(uTime * 0.9 + r * 0.25);
-  float a = (inside * 0.16 * pool + edge * 0.34) * uGain * vEdge * (1.0 - uDark);
+  float a = (inside * 0.2 * pool + edge * 0.4) * uGain * vEdge * (1.0 - uDark);
   if (a < 0.003) discard;
   gl_FragColor = vec4(uColor * a, 1.0);
   #include <colorspace_fragment>
@@ -214,12 +251,13 @@ void main() {
 }`;
 
 /** The gate every quarter particle shares: shown inside its quarter's
- *  flood (`uLit`, `uFront`), hidden (collapsed) otherwise. */
-const GATE = /* glsl */ `
+ *  flood (`uLit`, `uFront`), hidden (collapsed) otherwise; `stretch` draws
+ *  the quad taller than wide (a flame, a column of haze). */
+const gate = (stretch = '1.0') => /* glsl */ `
   float rr = length(position.xz);
   vFade *= uLit * (1.0 - smoothstep(uFront - 1.5, uFront + 0.5, rr));
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  mv.xy += aCorner * size * step(0.002, vFade);
+  mv.xy += aCorner * vec2(1.0, ${stretch}) * size * step(0.002, vFade);
   vCorner = aCorner;
   gl_Position = projectionMatrix * mv;`;
 
@@ -234,39 +272,56 @@ varying float vFade;
 varying float vHot;
 `;
 
-/** The Hammer's grit: glints of ochre-gold rising slowly off the slabs and
- *  hanging, kicked up as each tremor runs under them. */
+/** The Hammer's floating grit: glints of ochre and sand lifting off the
+ *  blocks and hanging in the air, kicked higher as each tremor runs under
+ *  them. */
 export const HAMMER_GRIT_VERT = /* glsl */ `${HEAD}
 void main() {
   float seed = aParams.x;
-  float life = fract(uTime * aParams.z * 0.08 + seed);
+  float life = fract(uTime * aParams.z * 0.07 + seed);
   float r0 = length(position.xz);
-  float tp = fract(uTime / 2.6);
-  float pr = mix(${RING}, ${RIM} + 4.0, tp);
+  ${TREMOR}
   float hop = exp(-(r0 - pr) * (r0 - pr) / 2.0) * (1.0 - tp);
   vec3 p = position;
-  p.y = 0.15 + life * (1.0 + 2.6 * aParams.w) + hop * 0.7;
-  p.xz += vec2(sin(uTime * 0.4 + seed * 30.0), cos(uTime * 0.33 + seed * 17.0)) * 0.5 * life;
-  vFade = sin(3.14159 * life) * (0.55 + 0.45 * sin(uTime * 7.0 + seed * 50.0)) + hop * 0.6;
+  p.y = 0.2 + life * (1.4 + 3.4 * aParams.w) + hop * 1.1;
+  p.xz += vec2(sin(uTime * 0.4 + seed * 30.0), cos(uTime * 0.33 + seed * 17.0)) * 0.7 * life;
+  vFade = sin(3.14159 * life) * (0.6 + 0.4 * sin(uTime * 7.0 + seed * 50.0)) + hop * 0.8;
   vHot = hop;
-  float size = 0.045 + 0.06 * aParams.y + hop * 0.04;
-  ${GATE}
+  float size = 0.1 + 0.14 * aParams.y + hop * 0.1;
+  ${gate()}
 }`;
 
-/** The Hammer's dust: soft puffs lifting off the floor as a tremor runs
- *  under them. */
+/** The Hammer's dust: great puffs bursting off the floor as a tremor runs
+ *  under them, rising and spreading. */
 export const HAMMER_DUST_VERT = /* glsl */ `${HEAD}
 void main() {
   float r0 = length(position.xz);
-  float tp = fract(uTime / 2.6);
-  float pr = mix(${RING}, ${RIM} + 4.0, tp);
-  float hop = exp(-(r0 - pr) * (r0 - pr) / 6.0) * (1.0 - tp);
+  ${TREMOR}
+  float hop = exp(-(r0 - pr) * (r0 - pr) / 7.0) * (1.0 - tp);
+  float since = clamp((tp - (r0 - ${RING}) / (${RIM} + 4.0 - ${RING})) * 2.6, 0.0, 2.6);
+  float puff = step(0.001, since) * exp(-since * 1.2);
   vec3 p = position;
-  p.y = 0.35 + hop * 0.8;
-  vFade = hop * (0.5 + 0.5 * aParams.x);
+  p.y = 0.4 + since * 0.9;
+  vFade = puff * (0.55 + 0.45 * aParams.x);
   vHot = 0.0;
-  float size = (1.0 + 1.4 * aParams.y) * (0.7 + 0.5 * hop);
-  ${GATE}
+  float size = (1.4 + 2.2 * aParams.y) * (0.6 + 0.6 * since);
+  ${gate()}
+}`;
+
+/** The Hammer's chips: shards of stone thrown up where the tremor's front
+ *  passes and falling back. */
+export const HAMMER_CHIP_VERT = /* glsl */ `${HEAD}
+void main() {
+  float r0 = length(position.xz);
+  ${TREMOR}
+  float t = (tp - (r0 - ${RING}) / (${RIM} + 4.0 - ${RING})) * 2.6;
+  float on = step(0.0, t) * step(t, 0.9);
+  float v = 3.0 + 3.0 * aParams.w;
+  vec3 p = position + vec3((aParams.y - 0.5) * 2.4 * t, max(0.0, v * t - 6.5 * t * t), (aParams.z - 0.5) * 2.4 * t);
+  vFade = on * (1.0 - t / 0.9);
+  vHot = 1.0 - t;
+  float size = 0.12 + 0.12 * aParams.x;
+  ${gate()}
 }`;
 
 /** The Breath's dust devils: columns of dust spiralling up and wandering
@@ -274,19 +329,19 @@ void main() {
 export const BREATH_DEVIL_VERT = /* glsl */ `${HEAD}
 void main() {
   float seed = aParams.x;
-  vec2 c = position.xz + vec2(sin(uTime * 0.27 + aParams.w * 6.28), cos(uTime * 0.21 + aParams.w * 4.0)) * 2.4;
+  vec2 c = position.xz + vec2(sin(uTime * 0.27 + aParams.w * 6.28), cos(uTime * 0.21 + aParams.w * 4.0)) * 3.0;
   float h = fract(seed + uTime * aParams.z * 0.16);
-  float rad = 0.3 + h * 1.7;
-  float ang = seed * 40.0 + uTime * (3.6 - h * 1.6);
-  vec3 p = vec3(c.x + sin(ang) * rad, h * 5.8, c.y + cos(ang) * rad);
-  vFade = sin(3.14159 * h) * 0.85;
-  vHot = h * 0.4;
-  float size = (0.1 + 0.2 * aParams.y) * (0.6 + h);
-  ${GATE}
+  float rad = 0.4 + h * 2.5;
+  float ang = seed * 40.0 + uTime * (3.8 - h * 1.6);
+  vec3 p = vec3(c.x + sin(ang) * rad, h * 8.5, c.y + cos(ang) * rad);
+  vFade = sin(3.14159 * h) * 0.9;
+  vHot = h * 0.45;
+  float size = (0.16 + 0.3 * aParams.y) * (0.6 + h);
+  ${gate()}
 }`;
 
-/** The Breath's streaks: thin lines of wind running low over the quarter
- *  along the spiral (`aOther`: the wind's direction there). */
+/** The Breath's streaks: lines of wind running low over the quarter along
+ *  the spiral (`aOther`: the wind's direction there). */
 export const BREATH_STREAK_VERT = /* glsl */ `
 uniform float uTime;
 uniform float uLit;
@@ -299,10 +354,10 @@ varying float vFade;
 varying float vHot;
 void main() {
   float seed = aParams.x;
-  float travel = 9.0;
+  float travel = 12.0;
   float s = fract(uTime * aParams.z / travel + seed * 7.13);
   vec3 p = position + aOther * (s - 0.5) * travel;
-  p.y = 0.25 + 1.3 * aParams.w + sin(uTime * 0.9 + seed * 20.0) * 0.15;
+  p.y = 0.3 + 1.9 * aParams.w + sin(uTime * 0.9 + seed * 20.0) * 0.2;
   float len = aParams.y;
   vec4 a = modelViewMatrix * vec4(p, 1.0);
   vec4 b = modelViewMatrix * vec4(p + aOther * len, 1.0);
@@ -315,10 +370,33 @@ void main() {
   float rr = length(position.xz);
   vFade = smoothstep(0.0, 0.2, s) * (1.0 - smoothstep(0.7, 1.0, s));
   vFade *= uLit * (1.0 - smoothstep(uFront - 1.5, uFront + 0.5, rr));
-  mv.xy += side * aCorner.y * 0.045 * step(0.002, vFade);
+  mv.xy += side * aCorner.y * 0.09 * step(0.002, vFade);
   vCorner = vec2(0.0, aCorner.y);
-  vHot = 0.3;
+  vHot = 0.35;
   gl_Position = projectionMatrix * mv;
+}`;
+
+/** The Breath's ground sheets: wide veils of dust skating low over the
+ *  stones along the wind (`aOther`: its direction). */
+export const BREATH_SHEET_VERT = /* glsl */ `
+uniform float uTime;
+uniform float uLit;
+uniform float uFront;
+attribute vec2 aCorner;
+attribute vec4 aParams;
+attribute vec3 aOther;
+varying vec2 vCorner;
+varying float vFade;
+varying float vHot;
+void main() {
+  float seed = aParams.x;
+  float s = fract(uTime * 0.08 * (0.7 + aParams.z) + seed * 3.7);
+  vec3 p = position + aOther * (s - 0.5) * 9.0;
+  p.y = 0.35 + 0.3 * aParams.w;
+  vFade = sin(3.14159 * s) * (0.6 + 0.4 * aParams.y);
+  vHot = 0.0;
+  float size = 2.4 + 2.2 * aParams.y;
+  ${gate('0.45')}
 }`;
 
 /** The Quench's frost mist: wide soft banks hugging the floor, drifting. */
@@ -326,39 +404,72 @@ export const QUENCH_MIST_VERT = /* glsl */ `${HEAD}
 void main() {
   float seed = aParams.x;
   vec3 p = position;
-  p.xz += vec2(sin(uTime * 0.11 + seed * 9.0), cos(uTime * 0.09 + seed * 5.0)) * 1.6;
-  p.y = 0.35 + 0.5 * aParams.w;
+  p.xz += vec2(sin(uTime * 0.11 + seed * 9.0), cos(uTime * 0.09 + seed * 5.0)) * 1.8;
+  p.y = 0.45 + 0.7 * aParams.w;
   vFade = 0.55 + 0.45 * sin(uTime * 0.35 + seed * 20.0);
-  vHot = 0.0;
-  float size = 2.2 + 2.4 * aParams.y;
-  ${GATE}
+  vHot = 0.15 * aParams.z;
+  float size = 3.0 + 3.4 * aParams.y;
+  ${gate()}
 }`;
 
-/** The Heat's embers: sparks of white-gold rising off the fire crystal and
- *  the seams, cooling to gold as they climb. */
+/** The Quench's frost motes: points of rime rising slowly off the ice and
+ *  twinkling as they turn. */
+export const QUENCH_FROST_VERT = /* glsl */ `${HEAD}
+void main() {
+  float seed = aParams.x;
+  float life = fract(seed + uTime * aParams.z * 0.05);
+  vec3 p = position;
+  p.y = 0.15 + life * (2.5 + 3.5 * aParams.w);
+  p.xz += vec2(sin(uTime * 0.6 + seed * 23.0), cos(uTime * 0.5 + seed * 31.0)) * 0.5 * life;
+  float tw = 0.5 + 0.5 * sin(uTime * 9.0 + seed * 80.0);
+  vFade = sin(3.14159 * life) * (0.35 + 0.65 * tw * tw);
+  vHot = tw;
+  float size = 0.07 + 0.1 * aParams.y;
+  ${gate()}
+}`;
+
+/** The Heat's embers: sparks of fire rising off the fissures, cooling from
+ *  gold to deep red as they climb. */
 export const HEAT_EMBER_VERT = /* glsl */ `${HEAD}
 void main() {
   float seed = aParams.x;
-  float life = fract(seed + uTime * aParams.z * 0.12);
+  float life = fract(seed + uTime * aParams.z * 0.11);
   vec3 p = position;
-  p.y = 0.1 + life * (3.0 + 5.0 * aParams.w);
-  p.xz += vec2(sin(uTime * 1.3 + seed * 40.0), cos(uTime * 1.1 + seed * 23.0)) * 0.6 * life;
-  vFade = smoothstep(0.0, 0.08, life) * (1.0 - smoothstep(0.55, 1.0, life)) * (0.6 + 0.4 * sin(uTime * 11.0 + seed * 70.0));
+  p.y = 0.1 + life * (4.0 + 8.0 * aParams.w);
+  p.xz += vec2(sin(uTime * 1.3 + seed * 40.0), cos(uTime * 1.1 + seed * 23.0)) * 0.9 * life;
+  vFade = smoothstep(0.0, 0.06, life) * (1.0 - smoothstep(0.5, 1.0, life)) * (0.6 + 0.4 * sin(uTime * 11.0 + seed * 70.0));
   vHot = 1.0 - life;
-  float size = 0.05 + 0.07 * aParams.y;
-  ${GATE}
+  float size = 0.09 + 0.13 * aParams.y;
+  ${gate()}
 }`;
 
-/** The Heat's glow: soft molten light breathing low over its fissures. */
+/** The Heat's haze: columns of shimmering heat rising off the fissures. */
 export const HEAT_GLOW_VERT = /* glsl */ `${HEAD}
 void main() {
   float seed = aParams.x;
+  float life = fract(seed + uTime * 0.16 * (0.7 + aParams.y));
   vec3 p = position;
-  p.y = 0.25;
-  vFade = 0.55 + 0.45 * sin(uTime * 1.7 + seed * 13.0);
-  vHot = 0.5;
-  float size = 1.6 + 1.3 * aParams.y;
-  ${GATE}
+  p.y = 0.4 + life * 3.2;
+  vFade = sin(3.14159 * life) * (0.6 + 0.4 * sin(uTime * 2.3 + seed * 13.0));
+  vHot = 0.35 + 0.4 * (1.0 - life);
+  float size = 1.3 + 1.2 * aParams.y;
+  ${gate('1.9')}
+}`;
+
+/** The Heat's flames: tongues of fire licking up out of the fissures,
+ *  flickering and dying back. */
+export const HEAT_FLAME_VERT = /* glsl */ `${HEAD}
+void main() {
+  float seed = aParams.x;
+  float cyc = fract(seed + uTime * (0.45 + 0.35 * aParams.z));
+  float lick = sin(3.14159 * cyc);
+  vec3 p = position;
+  p.y = 0.25 + lick * (0.55 + 0.6 * aParams.w);
+  p.x += sin(uTime * 6.0 + seed * 40.0) * 0.08;
+  vFade = lick * (0.7 + 0.3 * sin(uTime * 17.0 + seed * 90.0));
+  vHot = 0.35 + 0.65 * (1.0 - cyc);
+  float size = (0.3 + 0.3 * aParams.y) * (0.6 + 0.6 * lick);
+  ${gate('2.4')}
 }`;
 
 /** A ridge's sparks: thrown up as its shockwave passes (`uShockR`,
@@ -373,17 +484,44 @@ varying float vFade;
 varying float vHot;
 void main() {
   float r0 = length(position.xz);
-  float tp = abs(r0 - uShockR) / ${f(HEART_QUARTERS_LOOK.shockSpeed)};
+  float tp = abs(r0 - uShockR) / ${SHOCK_SPEED};
   float t = uShockAge - tp;
-  float on = step(0.0, uShockAge) * step(0.0, t) * step(t, 1.0);
+  float on = step(0.0, uShockAge) * step(0.0, t) * step(t, 1.2);
   vec2 out2 = normalize(position.xz + vec2(1e-4));
-  vec2 lat = vec2(-out2.y, out2.x) * (aParams.y - 0.5) * 6.0;
-  vec3 v = vec3(lat.x + out2.x * (aParams.z - 0.5) * 3.0, 4.0 + 5.0 * aParams.w, lat.y + out2.y * (aParams.z - 0.5) * 3.0);
+  vec2 lat = vec2(-out2.y, out2.x) * (aParams.y - 0.5) * 8.0;
+  vec3 v = vec3(lat.x + out2.x * (aParams.z - 0.5) * 4.0, 6.0 + 7.0 * aParams.w, lat.y + out2.y * (aParams.z - 0.5) * 4.0);
   vec3 p = position + v * t + vec3(0.0, -9.0 * t * t, 0.0);
-  p.y = max(0.05, p.y + 0.2);
-  vFade = on * (1.0 - t);
+  p.y = max(0.05, p.y + 0.5);
+  vFade = on * (1.0 - t / 1.2);
   vHot = 1.0 - t;
-  float size = 0.16 + 0.26 * aParams.x;
+  float size = 0.22 + 0.36 * aParams.x;
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  mv.xy += aCorner * size * on;
+  vCorner = aCorner;
+  gl_Position = projectionMatrix * mv;
+}`;
+
+/** A ridge's dust: great puffs bursting off its flanks as the shockwave
+ *  passes, rising and spreading. */
+export const RIDGE_DUST_VERT = /* glsl */ `
+uniform float uShockR;
+uniform float uShockAge;
+attribute vec2 aCorner;
+attribute vec4 aParams;
+varying vec2 vCorner;
+varying float vFade;
+varying float vHot;
+void main() {
+  float r0 = length(position.xz);
+  float tp = abs(r0 - uShockR) / ${SHOCK_SPEED};
+  float t = uShockAge - tp;
+  float on = step(0.0, uShockAge) * step(0.0, t) * step(t, 1.6);
+  vec2 out2 = normalize(position.xz + vec2(1e-4));
+  vec2 lat = vec2(-out2.y, out2.x) * (aParams.y - 0.5) * 3.0;
+  vec3 p = position + vec3(lat.x * t, 0.6 + 2.2 * t * (0.6 + aParams.w), lat.y * t);
+  vFade = on * exp(-t * 1.6) * (0.6 + 0.4 * aParams.z);
+  vHot = 0.0;
+  float size = (1.0 + 1.6 * aParams.x) * (0.6 + 0.9 * t);
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   mv.xy += aCorner * size * on;
   vCorner = aCorner;
@@ -403,12 +541,12 @@ varying float vHot;
 void main() {
   float seed = aParams.x;
   float h = fract(seed + uTime * aParams.z * 0.14);
-  float ang = atan(position.x, position.z) + h * 2.2 + uTime * 0.45;
-  float rad = length(position.xz) * (1.0 - 0.45 * h);
-  vec3 p = vec3(sin(ang) * rad, h * 18.0, cos(ang) * rad);
+  float ang = atan(position.x, position.z) + h * 2.6 + uTime * 0.55;
+  float rad = length(position.xz) * (1.0 - 0.5 * h);
+  vec3 p = vec3(sin(ang) * rad, h * 24.0, cos(ang) * rad);
   vFade = sin(3.14159 * h) * uBlaze;
   vHot = aParams.w;
-  float size = (0.16 + 0.24 * aParams.y) * (1.0 + h);
+  float size = (0.24 + 0.36 * aParams.y) * (1.0 + h);
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   mv.xy += aCorner * size * step(0.002, vFade);
   vCorner = aCorner;
@@ -442,9 +580,9 @@ uniform float uDark;
 varying float vH;
 varying float vFace;
 void main() {
-  float a = (0.35 + 0.45 * vFace) * (0.55 + 0.45 * vH) * (1.0 - uDark);
+  float a = (0.45 + 0.55 * vFace) * (0.6 + 0.5 * vH) * (1.0 - uDark);
   if (a < 0.003) discard;
-  vec3 c = mix(uColor, vec3(0.95, 0.99, 1.0), 0.35 + 0.4 * vH);
+  vec3 c = mix(uColor, vec3(0.95, 0.99, 1.0), 0.35 + 0.45 * vH);
   gl_FragColor = vec4(c * a, 1.0);
   #include <colorspace_fragment>
 }`;
@@ -467,7 +605,7 @@ void main() {
   gl_FragColor = vec4(vec3(0.94, 0.95, 1.0) * m + (1.0 - m) * vec3(0.0, 0.0, 0.03), 1.0);
 }`;
 
-/** A ridge's curtain of light: rising off its vein while a neighbour is
+/** A ridge's curtain of light: rising off its spine while a neighbour is
  *  awake (`aV` 0 at the crest to 1 at its top, `aR` its radius), flaring
  *  tall where the shockwave runs. */
 export const CURTAIN_VERT = /* glsl */ `
@@ -481,11 +619,11 @@ varying float vShock;
 void main() {
   float shock = 0.0;
   if (uShockAge >= 0.0) {
-    float d = abs(abs(aR - uShockR) - uShockAge * ${f(HEART_QUARTERS_LOOK.shockSpeed)});
-    shock = exp(-d * d / 3.0) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.4)}, ${f(HEART_QUARTERS_LOOK.shockLife)}, uShockAge));
+    float d = abs(abs(aR - uShockR) - uShockAge * ${SHOCK_SPEED});
+    shock = exp(-d * d / 4.0) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.4)}, ${SHOCK_LIFE}, uShockAge));
   }
   vec3 p = position;
-  p.y = 0.18 + aV * (1.4 + 4.2 * shock);
+  p.y = 0.45 + aV * (1.8 + 7.0 * shock);
   vV = aV;
   vR = aR;
   vShock = shock;
@@ -505,7 +643,7 @@ void main() {
   float inside = uLit * (1.0 - smoothstep(uFront - 2.2, uFront, vR));
   float flick = 0.7 + 0.3 * sin(vR * 1.3 - uTime * 4.0 + vV * 3.0);
   float fall = (1.0 - vV) * (1.0 - vV);
-  float a = (inside * 0.5 * flick * fall + vShock * (1.0 - vV * 0.8) * 2.2) * (1.0 - uDark);
+  float a = (inside * 0.6 * flick * fall + vShock * (1.0 - vV * 0.8) * 2.8) * (1.0 - uDark);
   if (a < 0.003) discard;
   vec3 c = mix(uColor, uShockColor, clamp(vShock * 1.5, 0.0, 1.0));
   c = mix(c, vec3(1.0, 0.97, 0.9), 0.25 + 0.35 * vShock);

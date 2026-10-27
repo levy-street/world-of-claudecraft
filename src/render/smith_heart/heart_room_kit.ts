@@ -30,6 +30,7 @@ import {
   instanceHeartKit,
   SMITH_HEART_HEART_KIT_URL,
 } from './heart_kit';
+import { HEART_PLATFORM_ORDER } from './heart_quarters_core';
 import {
   HEART_KIT_KINDS,
   planHeartCoreBed,
@@ -103,15 +104,18 @@ const tmp = new THREE.Matrix4();
 export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
   const group = new THREE.Group();
   group.name = 'smithHeartHeartKit';
-  group.add(
-    instanceHeartKit(
-      SMITH_HEART_HEART_KIT_URL,
-      planHeartRoomKit(),
-      lowGfx,
-      'smithHeartHeartStatic',
-      220,
-    ),
+  const statics = instanceHeartKit(
+    SMITH_HEART_HEART_KIT_URL,
+    planHeartRoomKit(),
+    lowGfx,
+    'smithHeartHeartStatic',
+    220,
   );
+  // The platform's rim and its joints' dirt draw with the quarters' floors,
+  // before the ridges' spines (phase 2L, HEART_PLATFORM_ORDER).
+  for (const m of statics.children)
+    if (m.name.startsWith('Kit_AnvilFloor:')) m.renderOrder = HEART_PLATFORM_ORDER.floor;
+  group.add(statics);
   // The heart's bed, its crystal on its own glow (it dims with the heart).
   const bedGlow = new THREE.MeshBasicMaterial({
     vertexColors: true,

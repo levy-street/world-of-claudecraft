@@ -57,9 +57,18 @@ export type HeartBakedPiece = Partial<Record<HeartKitSlot, THREE.BufferGeometry>
 export const HEART_KIT_SLOTS: readonly HeartKitSlot[] = ['stone', 'glow', 'ice'];
 /** The materials a kit slot draws with: its own, or (the mountain's rock,
  *  phase 2E) the stone slot drawn as `rock`, the same lit vertex colour
- *  with a heavier, broader triplanar fracture (big faces seen from far). */
-export type HeartKitMaterial = HeartKitSlot | 'rock';
-export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = ['stone', 'glow', 'ice', 'rock'];
+ *  with a heavier, broader triplanar fracture (big faces seen from far), or
+ *  (the Anvil's ridges, phase 2L) as `spine`: the stone's own program drawn
+ *  with no depth write, so a floor telegraph always shows over a ridge's
+ *  spine (heart_quarters.ts draws it after the floors). */
+export type HeartKitMaterial = HeartKitSlot | 'rock' | 'spine';
+export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = [
+  'stone',
+  'glow',
+  'ice',
+  'rock',
+  'spine',
+];
 
 /** How long the interior waits for a kit before building with placeholders. */
 const KIT_WAIT_MS = 8000;
@@ -233,7 +242,7 @@ export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
       m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitRock' });
       applyRockCutaway(m);
     }
-  } else if (slot === 'stone') {
+  } else if (slot === 'stone' || slot === 'spine') {
     if (GFX.standardMaterials) {
       const std = new THREE.MeshStandardMaterial({
         vertexColors: true,
@@ -247,6 +256,10 @@ export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
       m = std;
     } else {
       m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitStone' });
+    }
+    if (slot === 'spine') {
+      m.name = 'SmithHeartKitSpine';
+      m.depthWrite = false;
     }
   } else if (slot === 'ice') {
     m = GFX.standardMaterials

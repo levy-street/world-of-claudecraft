@@ -11,8 +11,9 @@
 //    tank, slams both fists into the floor for Forge Fist, flings its arms
 //    up over Forge Wrath's bar and cups its hands for Forge Pour;
 //  - the arrival: the heart rising out of its bed in the chasm and gliding
-//    in, each piece trembling, tearing free of the paving with its dust and
-//    leaving its scar, spiralling in round the heart and locking with a
+//    in, each piece trembling, tearing free of the paving with its dust (its
+//    socket is carved into the quarter it lay in, phase 2L), spiralling in
+//    round the heart and locking with a
 //    flash, the shards rising out of the chasm, then the four-colour
 //    shockwave and the camera's thud (reduced motion drops the shake). A
 //    pull during it runs the scene on to its end at once;
@@ -37,6 +38,7 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { HEART_ROOM, SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
+import { heartFinalPhase } from '../../sim/content/smith_heart_quarters';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -283,7 +285,6 @@ interface PieceRig {
   def: ColossusPiece;
   index: number;
   holder: THREE.Group | null;
-  socket: THREE.Group | null;
   rubble: THREE.Group | null;
   /** Its pose this frame (room-local), for the threads and the fall. */
   pos: THREE.Vector3;
@@ -551,7 +552,6 @@ export class FinalFx {
       def,
       index,
       holder: null,
-      socket: null,
       rubble: null,
       pos: new THREE.Vector3(),
       quat: new THREE.Quaternion(),
@@ -575,7 +575,7 @@ export class FinalFx {
       });
   }
 
-  /** The rock pieces, the heart, the scars and the rubble (the kit's meshes,
+  /** The rock pieces, the heart and the rubble (the kit's meshes,
    *  the seams on this module's glow). */
   private buildBody(): void {
     if (this.built) return;
@@ -596,16 +596,13 @@ export class FinalFx {
         this.body.add(p.holder);
       }
       if (p.def.joint !== 'shard') {
-        p.socket = kitGroup('Kit_TornSocket', null);
+        // Its socket is the quarter's own (the kit carves it, phase 2L).
         p.rubble = kitGroup('Kit_RubbleScatter', null);
-        for (const g of [p.socket, p.rubble]) {
-          if (!g) continue;
-          g.visible = false;
-          for (const m of g.children) if (m instanceof THREE.Mesh) m.castShadow = false;
-          this.body.add(g);
+        if (p.rubble) {
+          p.rubble.visible = false;
+          for (const m of p.rubble.children) if (m instanceof THREE.Mesh) m.castShadow = false;
+          this.body.add(p.rubble);
         }
-        // Phase 2K: smaller scars, so the quarters still read from above.
-        if (p.socket) p.socket.scale.setScalar(0.22 + p.def.size * 0.034);
         if (p.rubble) p.rubble.scale.setScalar(0.6 + p.def.size * 0.1);
       }
     }
@@ -751,13 +748,15 @@ export class FinalFx {
       this.skipAt = -1;
     }
     // The quarter it stands in wakes (phase 2K, the interior paints it):
-    // only once the body is whole and while it stands.
+    // only once the body is whole and while it stands; the final look only
+    // in its final phase (phase 2L).
     noteHeartQuarterBoss(
       this.slotKey,
       boss.pos.x - o.x,
       boss.pos.z - o.z,
       engaged,
       !boss.dead && t >= ARRIVAL_WAVE_AT,
+      engaged && heartFinalPhase(boss.hp, boss.maxHp),
     );
     this.readCast(boss);
     this.poseBody(boss, t, dt);
@@ -1135,20 +1134,6 @@ export class FinalFx {
         h.position.copy(p.pos);
         h.quaternion.copy(p.quat);
         h.visible = true;
-      }
-      if (p.socket) {
-        // The scar it tore out of the paving, once it has lifted free.
-        const torn = t >= colossusTearAt(p.def) + ARRIVAL.tremble;
-        if (torn && !p.socket.visible) {
-          const r = colossusRestPoint(p.def);
-          p.socket.position.set(
-            r.x,
-            this.groundY(this.originX + r.x, this.originZ + r.z) + 0.01,
-            r.z,
-          );
-          p.socket.rotation.y = fxHash(17, p.index) * Math.PI * 2;
-        }
-        p.socket.visible = torn;
       }
       if (p.rubble) p.rubble.visible = false;
     }
