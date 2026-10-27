@@ -117,6 +117,10 @@ export interface WellLook {
   heat: number;
   surge: number;
   boil: number;
+  /** Its glow's breath (0..1): a slow heave at rest, quicker and deeper as
+   *  the fight deepens, a hard throb while the guardian is under and the
+   *  Hearth overflows. */
+  pulse: number;
 }
 
 /** The wellspring in `state` with the guardian in `phase` (0 out of the
@@ -125,17 +129,23 @@ export function wellLook(
   state: HeatWellState,
   phase: number,
   t: number,
-  out: WellLook = { heat: 0, surge: 0, boil: 0 },
+  out: WellLook = { heat: 0, surge: 0, boil: 0, pulse: 0 },
 ): WellLook {
   const deep = clamp01((Math.max(1, phase) - 1) / 3);
   out.heat = phase > 0 ? 0.85 + 0.35 * deep : 0.7;
   out.surge = 0;
   out.boil = 0.35 + 0.4 * deep;
+  // A slow breath (one every 4 s out of the fight, every 2.5 s by phase 3).
+  const rate = phase > 0 ? 0.25 + 0.15 * deep : 0.18;
+  const b = 0.5 + 0.5 * Math.sin(t * rate * Math.PI * 2);
+  out.pulse = (phase > 0 ? 0.45 + 0.3 * deep : 0.3) * b * b;
   if (state === 'over') {
     // The Hearth overflows: it heaves over its lip in slow swells.
     out.heat = 1.45;
     out.surge = 0.6 + 0.4 * (0.5 + 0.5 * Math.sin(t * 1.7));
     out.boil = 1;
+    // Each swell a throb of the glow, on the heave's own clock.
+    out.pulse = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(t * 1.7));
   }
   return out;
 }

@@ -1,18 +1,25 @@
 // The first wellspring and the overflow's rivers (plan: heat_fight_fx_core.ts
-// wellLook, riverLook; docs/design/raid/smith_heart.md section 7.4), a part
-// of HeatFightFx over its root, particles and floor telegraph kit:
+// wellLook, riverLook; the pool's flow and bubbles heat_well_core.ts;
+// docs/design/raid/smith_heart.md section 7.4), a part of HeatFightFx over
+// its root, particles and floor telegraph kit:
 //  - the pool: a molten wellspring at the claim object's spot and the sim's
-//    own radius, flowing and boiling (white-gold under drifting plates of dark
-//    crust, seams of light), a ring of hexagonal basalt stumps round its lip
-//    with fire in their joints, a glow over it; whiter and boiling harder as
-//    the fight deepens; heaving over its lip in slow swells while the Hearth
-//    overflows;
+//    own radius, in slow convection (welling up under the guardian, spreading
+//    to the lip with a turn, a two-phase flow map so it never tears into rays
+//    however long the session runs): dark plates of cooling crust drifting
+//    over bright lava, thin over the upwelling and thick at the lip, their
+//    broken edges warm; bubbles swelling through the crust and popping with
+//    a spark; a ring of hexagonal basalt stumps round its lip with fire in
+//    their joints, heat shimmer standing over the lip, a glow breathing with
+//    the fight; whiter and boiling harder as the fight deepens; heaving over
+//    its lip in slow swells, the crust broken, the glow throbbing, while the
+//    guardian is under and the Hearth overflows;
 //  - the rivers: each lane at its exact length and half width (the shared
 //    floor telegraph, danger, every tier) filling over its warning, then a
 //    river of the first flame racing out of the pool down it and burning,
 //    flames licking off it.
-// The pool, its lip and every river (lane and fire) draw on every tier; the
-// embers, the haze, the bubbles and the flames thin on the low tier.
+// The pool (crust, lava, bubbles), its lip, rim and glow and every river
+// (lane and fire) draw on every tier; the shimmer goes, and the embers, the
+// haze, the bubbles' count and sparks and the flames thin, on the low tier.
 //
 // Built in the constructor under the host's root (one gated attach), fixed
 // pools, no per-frame allocation, no light.
@@ -34,6 +41,7 @@ import {
 } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
+import { HEAT_BODY_COLORS } from './heat_body_core';
 import {
   HEAT_FIGHT_COLORS as C,
   HEAT_WELL,
@@ -50,11 +58,20 @@ import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { moltenDecal } from './heat_molten_decal';
 import { basaltColumn } from './heat_shapes';
+import {
+  stepWellBubbles,
+  WELL_BUBBLES,
+  WELL_FLOW,
+  type WellBubble,
+  wellBubbleLook,
+  wellBubbleSlots,
+} from './heat_well_core';
 
 const LIP_STUMPS = 26;
 const RIVER_STYLE = { color: TELEGRAPH_THREAT_COLORS.danger, accent: C.accent };
 const PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
-const _well: WellLook = { heat: 0, surge: 0, boil: 0 };
+const _well: WellLook = { heat: 0, surge: 0, boil: 0, pulse: 0 };
+const _bubble = { radius: 0, pop: 0 };
 const _river: RiverLook = { fill: 0, lane: false, front: 0, heat: 0 };
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
@@ -82,11 +99,12 @@ const HAZE = {
   drag: 0.8,
   radius: 2,
 };
-const BUBBLE = {
-  speed: 3,
-  up: 3,
-  life: 0.6,
-  size: [0.45, 0.1] as [number, number],
+/** A bubble's pop: sparks flung up out of the burst. */
+const BUBBLE_POP = {
+  speed: 3.4,
+  up: 3.6,
+  life: 0.65,
+  size: [0.42, 0.08] as [number, number],
   color: C.spark,
   alpha: 1,
   pool: 'glow' as const,
@@ -127,33 +145,122 @@ void main() {
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
-/** The wellspring's molten pool: slow swirling flow under plates of crust,
- *  boiling whiter at its heart, a cooled skin at its lip. */
+const f3 = (v: number) => v.toFixed(3);
+/** The wellspring's molten pool in slow convection (heat_well_core.ts): two
+ *  phases of the field, each dragged along the flow for one period only and
+ *  restarted (on a fresh offset) while its weight is zero, so the warp stays
+ *  under `wellFlowMaxDrift` yards at any clock. Dark crust plates drift over
+ *  bright lava (thin over the upwelling, thick at the lip; a hotter pool and
+ *  an overflow break them), their broken edges warm; bubbles push the crust
+ *  aside, swell, glow at their crowns and pop in a ring of light. All on
+ *  yards off the pool's middle, never world coordinates. */
 const POOL_FRAG = /* glsl */ `
+#define WELL_BUBBLES ${WELL_BUBBLES}
 uniform float uTime;
 uniform float uHeat;
 uniform float uBoil;
 uniform float uSurge;
+uniform float uPulse;
+uniform float uR;
+uniform vec4 uBub[WELL_BUBBLES];
 varying vec2 vUv;
-varying vec3 vW;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
-${HEAT_LAVA_GLSL}
+const float PERIOD = ${f3(WELL_FLOW.period)};
+const float SPEED = ${f3(WELL_FLOW.speed)};
+const float SWIRL = ${f3(WELL_FLOW.swirl)};
+// Convection: still over the upwelling, out across the pool with a turn,
+// slowing at the lip (wellOutflow).
+vec2 wellFlow(vec2 L, float rn) {
+  vec2 dir = L / max(length(L), 1e-3);
+  float out1 = SPEED * smoothstep(0.0, 0.25, rn) * (1.0 - 0.6 * smoothstep(0.6, 1.0, rn));
+  return dir * out1 + vec2(-dir.y, dir.x) * SWIRL * smoothstep(0.0, 0.3, rn);
+}
+// One phase: the field dragged 'age' seconds back along the flow. Returns
+// the lava's roll, the crust's soft mask, its warm broken edge and the fine
+// cracks splitting a plate.
+vec4 phaseField(vec2 L, vec2 flow, float age, vec2 seed, float gap) {
+  vec2 S = L - flow * age + seed;
+  float body = fbm(S * 0.17);
+  float e = cellEdge(S * 0.36 + body * 0.6);
+  float crust = smoothstep(gap, gap + 0.2, e);
+  float warm = 1.0 - smoothstep(gap, gap + 0.32, e);
+  float fine = 1.0 - smoothstep(0.0, 0.05, cellEdge(S * 1.15 + 3.7));
+  return vec4(body, crust, warm, fine);
+}
 void main() {
   vec2 p = vUv * 2.0 - 1.0;
-  float r = length(p);
-  if (r > 1.0) discard;
-  // A slow swirl round the guardian and out toward the lip.
-  float a = atan(p.y, p.x);
-  vec2 flow = vec2(cos(a + 1.3), sin(a + 1.3)) * 0.6 + p * 0.5;
-  float lvl = lavaLevel(vW.xz, flow, uTime, 1.0);
-  float heart = 1.0 - smoothstep(0.0, 0.75, r);
-  float boil = smoothstep(0.7, 0.95, vn(vW.xz * 0.9 + vec2(uTime * 1.3, -uTime)) ) * uBoil;
-  float m = lvl * (0.75 + 0.35 * heart) + boil * 0.5 + heart * 0.25;
-  // The cooled skin at its lip, broken when it surges.
-  float lip = smoothstep(0.82, 0.98, r) * (1.0 - uSurge * 0.8);
-  m = mix(m, m * 0.35, lip);
-  vec3 col = molten(clamp(m * uHeat, 0.0, 1.0));
+  float rn = length(p);
+  if (rn > 1.0) discard;
+  vec2 L = p * uR;
+  // How thick the crust lies here (wellCrust).
+  float lipK = smoothstep(0.12, 0.92, rn);
+  float hot = clamp((uHeat - 0.7) / 0.75, 0.0, 1.0);
+  float crustAmt = (0.42 + 0.48 * lipK) * (1.0 - 0.3 * hot) * (1.0 - 0.65 * uSurge);
+  float gap = mix(0.24, 0.03, crustAmt);
+  vec2 flow = wellFlow(L, rn);
+  // The two phases (wellFlowPhases), each on its own offset per restart.
+  float ta = uTime / PERIOD;
+  float tb = ta + 0.5;
+  float a = fract(ta);
+  float b = fract(tb);
+  float wa = 1.0 - abs(1.0 - 2.0 * a);
+  vec2 seedA = vec2(hh2(vec2(floor(ta), 1.7)), hh2(vec2(floor(ta), 8.3))) * 53.0;
+  vec2 seedB = vec2(hh2(vec2(floor(tb), 4.1)), hh2(vec2(floor(tb), 2.9))) * 53.0 + 17.0;
+  vec4 A = phaseField(L, flow, a * PERIOD, seedA, gap);
+  vec4 B = phaseField(L, flow, b * PERIOD, seedB, gap);
+  float body = mix(B.x, A.x, wa);
+  // Blend the soft masks, then sharpen: a plate melts away or forms as its
+  // phase hands over, never a ghost of two.
+  float crust = smoothstep(0.38, 0.62, mix(B.y, A.y, wa));
+  float warm = mix(B.z, A.z, wa);
+  float fine = mix(B.w, A.w, wa);
+  // The bubbles: a dome of fresh melt pushing the crust aside, brightest at
+  // its thinning crown, a shadowed skin at its foot; then the pop, a ring of
+  // light racing out and a flash in the open crater.
+  float clear = 0.0;
+  float dome = 0.0;
+  float skin = 0.0;
+  float burst = 0.0;
+  for (int i = 0; i < WELL_BUBBLES; i++) {
+    vec4 bb = uBub[i];
+    if (bb.z <= 0.0) continue;
+    float d = length(L - bb.xy);
+    float rad = bb.z;
+    if (bb.w <= 0.0) {
+      float k = clamp(1.0 - d / rad, 0.0, 1.0);
+      clear = max(clear, smoothstep(0.0, 0.3, k));
+      dome += k * k;
+      skin += (1.0 - smoothstep(0.0, 0.08 + rad * 0.12, abs(d - rad * 0.92))) * 0.6;
+    } else {
+      float fade = 1.0 - bb.w;
+      float rr = rad * (1.0 + 1.3 * bb.w);
+      burst += (1.0 - smoothstep(0.0, 0.1 + rad * 0.14, abs(d - rr))) * fade;
+      burst += (1.0 - smoothstep(0.0, rad, d)) * fade * fade * 0.7;
+      clear = max(clear, (1.0 - smoothstep(rad * 0.7, rad * 1.2, d)) * fade);
+    }
+  }
+  crust *= 1.0 - clear;
+  // The cooled skin at its lip, broken while it surges.
+  float lip = smoothstep(0.86, 0.99, rn) * (1.0 - 0.8 * uSurge);
+  crust = max(crust, lip * 0.85);
+  // The lava: broad rolls of gold, whiter over the upwelling and on the
+  // breath of the glow.
+  float heat = uHeat * (1.0 + 0.16 * uPulse);
+  float lava = 0.4 + 0.3 * smoothstep(0.28, 0.72, body);
+  lava += (1.0 - smoothstep(0.0, 0.45, rn)) * 0.12 + uBoil * 0.03;
+  lava += dome * 0.3 + burst * 0.5 - skin * 0.22;
+  // Amber and gold under the crust; white only in a seam's heart, a
+  // bubble's crown or a pop (the bloom lifts those).
+  vec3 lavaCol = molten(clamp(lava * heat, 0.0, 1.0)) * 0.8;
+  // The crust: dark basalt, its value drifting plate to plate, its broken
+  // edges glowing with the melt under them.
+  float tone = 0.72 + 0.6 * smoothstep(0.25, 0.75, body);
+  vec3 crustCol = vec3(0.07, 0.058, 0.05) * tone;
+  crustCol += molten(0.5) * warm * warm * 0.4 * heat;
+  // Thin cracks of light splitting the plates (thinner toward the cold lip).
+  crustCol += molten(0.62) * fine * (0.32 - 0.2 * lipK) * heat;
+  vec3 col = mix(lavaCol, crustCol, crust);
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
 }
@@ -200,6 +307,27 @@ void main() {
 }
 `;
 
+/** Heat shimmer standing over the lip: faint warm streaks wavering up the
+ *  air (periodic round the ring, so no seam), fading at the floor and the
+ *  top. Cosmetic: off on the low tier. */
+const SHIMMER_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uHeat;
+varying vec2 vUv;
+void main() {
+  float h = vUv.y;
+  float a = vUv.x * 6.28318;
+  float bend = sin(h * 5.0 - uTime * 1.6 + a * 3.0) * 0.35;
+  float wave = 0.5 + 0.5 * sin(a * 23.0 + bend * 6.0 + sin(a * 7.0 + uTime * 0.7));
+  float rise = 0.5 + 0.5 * sin(h * 9.0 - uTime * 2.4 + a * 11.0);
+  float streak = pow(wave, 6.0) * (0.35 + 0.65 * rise);
+  float fade = smoothstep(0.0, 0.12, h) * (1.0 - smoothstep(0.3, 1.0, h));
+  vec3 col = vec3(1.0, 0.74, 0.4) * streak * fade * 0.13 * uHeat;
+  gl_FragColor = vec4(col, 1.0);
+  #include <colorspace_fragment>
+}
+`;
+
 interface RiverSlot {
   id: number;
   born: number;
@@ -220,6 +348,25 @@ export class HeatWellFx {
   private readonly rimMat: THREE.ShaderMaterial;
   private readonly glow: THREE.Sprite;
   private readonly glowMat: THREE.SpriteMaterial;
+  private readonly shimmer: THREE.Mesh;
+  private readonly shimmerMat: THREE.ShaderMaterial;
+  /** The bubbles (heat_well_core.ts) and the shader's view of them. */
+  private readonly bubbles: WellBubble[] = wellBubbleSlots();
+  private readonly bubbleU: THREE.Vector4[] = Array.from(
+    { length: WELL_BUBBLES },
+    () => new THREE.Vector4(0, 0, 0, 0),
+  );
+  private readonly rand = (): number => this.host.rand();
+  private readonly onPop = (bx: number, bz: number, size: number): void => {
+    // The burst flings sparks up out of the pool.
+    this.host.particles.puff(
+      this.x + bx,
+      this.y + 0.35,
+      this.z + bz,
+      Math.round(3 + size * 4),
+      BUBBLE_POP,
+    );
+  };
   private readonly rivers: RiverSlot[] = [];
   private placedFor = -1;
   private state: HeatWellState = 'calm';
@@ -244,6 +391,9 @@ export class HeatWellFx {
         uHeat: { value: 1 },
         uBoil: { value: 0.4 },
         uSurge: { value: 0 },
+        uPulse: { value: 0 },
+        uR: { value: HEAT_WELL.r },
+        uBub: { value: this.bubbleU },
       },
       vertexShader: UV_VERT,
       fragmentShader: POOL_FRAG,
@@ -260,8 +410,21 @@ export class HeatWellFx {
     this.pool.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.wellPool.step);
     host.root.add(this.pool);
 
-    // The lip: hexagonal basalt stumps, fire in their joints (the glow ring).
+    // The lip: hexagonal stumps of the Hearth's sooted basalt (the body's
+    // own, never the kit's pale stone), fire in their joints (the glow ring).
     const stump = basaltColumn(0.5, 1);
+    const sc = stump.getAttribute('color') as THREE.BufferAttribute;
+    const bc = HEAT_BODY_COLORS.basalt;
+    const bd = HEAT_BODY_COLORS.basaltShade;
+    for (let i = 0; i < sc.count; i++) {
+      const v = Math.min(1, sc.getX(i)) * 0.7;
+      sc.setXYZ(
+        i,
+        bd[0] + (bc[0] - bd[0]) * v,
+        bd[1] + (bc[1] - bd[1]) * v,
+        bd[2] + (bc[2] - bd[2]) * v,
+      );
+    }
     g.push(stump);
     this.lip = new THREE.InstancedMesh(stump, heartKitSlotMaterial('stone'), LIP_STUMPS);
     this.lip.name = 'smithHeartHeatWellLip';
@@ -300,6 +463,27 @@ export class HeatWellFx {
     this.glow.name = 'smithHeartHeatWellGlow';
     this.glow.visible = false;
     host.root.add(this.glow);
+    // Heat shimmer standing over the lip (cosmetic: the low tier goes without).
+    const sleeve = new THREE.CylinderGeometry(1, 1, 1, 64, 1, true).translate(0, 0.5, 0);
+    g.push(sleeve);
+    this.shimmerMat = new THREE.ShaderMaterial({
+      name: 'smithHeartHeatWellShimmer',
+      uniforms: { uTime: host.uTime, uHeat: { value: 1 } },
+      vertexShader: UV_VERT,
+      fragmentShader: SHIMMER_FRAG,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+    });
+    host.materials.push(this.shimmerMat);
+    this.shimmer = new THREE.Mesh(sleeve, this.shimmerMat);
+    this.shimmer.name = 'smithHeartHeatWellShimmer';
+    this.shimmer.frustumCulled = false;
+    this.shimmer.visible = false;
+    this.shimmer.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.wellShimmer.step);
+    host.root.add(this.shimmer);
 
     // The rivers.
     const ribbon = new THREE.PlaneGeometry(1, 1, 1, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5);
@@ -354,6 +538,10 @@ export class HeatWellFx {
       this.lip.setMatrixAt(i, _m.compose(_v, _q, _s));
     }
     this.lip.instanceMatrix.needsUpdate = true;
+    this.shimmer.position.set(this.x, this.y - 0.1, this.z);
+    this.shimmer.scale.set(this.r + 1.7, 4.5, this.r + 1.7);
+    this.shimmer.visible = this.host.detail;
+    for (const b of this.bubbles) b.age = -1;
     this.pool.visible = true;
     this.lip.visible = true;
     this.rim.visible = true;
@@ -386,14 +574,19 @@ export class HeatWellFx {
     u.uHeat.value = look.heat;
     u.uBoil.value = look.boil;
     u.uSurge.value = look.surge;
+    u.uPulse.value = look.pulse;
     const sw = this.r + 0.3 + look.surge * 1.2;
+    u.uR.value = sw;
     this.pool.scale.set(sw, 1, sw);
     this.pool.position.y = this.y + 0.08 + look.surge * 0.35;
-    this.rimMat.uniforms.uHeat.value = 0.6 + 0.6 * look.heat;
+    this.rimMat.uniforms.uHeat.value = 0.6 + 0.6 * look.heat + 0.35 * look.pulse;
+    this.shimmerMat.uniforms.uHeat.value = look.heat * (0.8 + 0.4 * look.pulse);
+    // The glow breathes with the fight and throbs while the Hearth overflows.
     this.glow.position.set(this.x, this.y + 2.5, this.z);
-    const gs = this.r * (4.2 + 0.8 * look.surge);
+    const gs = this.r * (4.2 + 0.8 * look.surge) * (1 + 0.08 * look.pulse);
     this.glow.scale.set(gs, gs * 0.55, 1);
-    this.glowMat.opacity = Math.min(0.8, 0.28 + 0.25 * look.heat);
+    this.glowMat.opacity = Math.min(0.7, 0.2 + 0.2 * look.heat + 0.15 * look.pulse);
+    this.paintBubbles(look, dt);
     this.cosmetics(look, dt);
     this.paintRivers(riverIds, clock, dt);
   }
@@ -412,17 +605,6 @@ export class HeatWellFx {
         EMBER,
       );
     }
-    if (h.rand() < dt * 10 * look.boil * d) {
-      const a = h.rand() * Math.PI * 2;
-      const rr = Math.sqrt(h.rand()) * this.r * 0.9;
-      h.particles.puff(
-        this.x + Math.sin(a) * rr,
-        this.y + 0.3,
-        this.z + Math.cos(a) * rr,
-        4,
-        BUBBLE,
-      );
-    }
     if (h.detail && h.rand() < dt * 4) h.particles.puff(this.x, this.y + 3, this.z, 1, HAZE);
     if (look.surge > 0 && h.rand() < dt * 30 * d) {
       // It spills over its lip while the Hearth overflows.
@@ -436,6 +618,19 @@ export class HeatWellFx {
         1,
         SPILL,
       );
+    }
+  }
+
+  /** The bubbles' frame: age them, pop the spent with a spark, swell new
+   *  ones in (more as it boils; fewer on the low tier), and hand the shader
+   *  each one's spot, radius and pop. */
+  private paintBubbles(look: WellLook, dt: number): void {
+    const rate = (1.2 + 4.5 * look.boil) * this.host.density;
+    stepWellBubbles(this.bubbles, dt, rate, this.r, this.rand, this.onPop);
+    for (let i = 0; i < WELL_BUBBLES; i++) {
+      const b = this.bubbles[i];
+      const v = wellBubbleLook(b, _bubble);
+      this.bubbleU[i].set(b.x, b.z, v.radius, v.pop);
     }
   }
 
@@ -522,6 +717,7 @@ export class HeatWellFx {
     this.lip.visible = false;
     this.rim.visible = false;
     this.glow.visible = false;
+    this.shimmer.visible = false;
     for (const s of this.rivers) {
       s.id = -1;
       s.state = null;

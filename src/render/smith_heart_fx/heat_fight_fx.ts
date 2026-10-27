@@ -12,8 +12,10 @@
 //    hunted's marks, the adds' fire;
 // and paints itself:
 //  - the Hearthseeds: each seed's burning heart throbbing faster to its
-//    burst, its near-lethal core and its whole reach on the floor (danger,
-//    every tier), the burst's flash and ring;
+//    burst; every live seed's near-lethal core and whole reach on the floor
+//    as ONE field (heat_seed_field.ts: one outer edge round a cluster, the
+//    summed burst hottest on each seed; danger, every tier); the burst's
+//    flash and ring;
 //  - Wakefire: each band round the wellspring at its exact radii, building
 //    (cracks of fire spreading through the basalt between its two rims, the
 //    rims the danger colour, every tier), then erupting in a sheet of flame;
@@ -45,12 +47,7 @@ import {
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
-import {
-  TELEGRAPH_THREAT_COLORS,
-  type TelegraphFan,
-  TelegraphKit,
-  type TelegraphPaint,
-} from '../floor_telegraph';
+import { TELEGRAPH_THREAT_COLORS, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -73,7 +70,6 @@ import {
   heatTimedOfCached,
   HEAT_FIGHT_POOLS as P,
   patchLook,
-  SEED_CORE_R,
   type SeedLook,
   seedLook,
   type ZoneLook,
@@ -85,6 +81,8 @@ import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { moltenDecal } from './heat_molten_decal';
+import { HeatSeedField } from './heat_seed_field';
+import type { SeedMark } from './heat_seed_field_core';
 import { floorRingGeometry } from './heat_shapes';
 import { HeatTelegraphs } from './heat_telegraph';
 import { HeatWellFx } from './heat_well_fx';
@@ -92,8 +90,6 @@ import { HeatWellFx } from './heat_well_fx';
 const SCAN_SEC = 0.1;
 /** The Hearth's floor's box (instance-local): a band never draws past it. */
 const HEARTH_FLOOR_BOX = { x0: -256, x1: -174, z0: -46, z1: 46 } as const;
-const DANGER = { color: TELEGRAPH_THREAT_COLORS.danger, accent: C.accent };
-const PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
 const _seed: SeedLook = { fill: 0, beat: 0, glow: 0, size: 0 };
 const _zone: ZoneLook = { build: 0, burn: 0 };
 const _m = new THREE.Matrix4();
@@ -296,8 +292,11 @@ interface SeedSlot {
   id: number;
   born: number;
   life: number;
-  core: TelegraphFan;
-  reach: TelegraphFan;
+  /** Its place in the field's laid order (-1: not laid). */
+  laid: number;
+  x: number;
+  z: number;
+  reach: number;
 }
 
 interface ZoneSlot {
@@ -340,6 +339,10 @@ export class HeatFightFx implements HeatFxHost {
   private readonly well: HeatWellFx;
   private readonly cinder: HeatCinderFx;
   private readonly seeds: SeedSlot[] = [];
+  /** Every live seed's footprint, one field (laid once per wave). */
+  private readonly seedField: HeatSeedField;
+  private readonly seedMarks: SeedMark[] = [];
+  private laidSeeds = 0;
   private readonly seedOrbs: THREE.InstancedMesh;
   private readonly seedGlows: THREE.Sprite[] = [];
   private readonly zones: ZoneSlot[] = [];
@@ -423,14 +426,17 @@ export class HeatFightFx implements HeatFxHost {
     this.seedOrbs.visible = false;
     this.root.add(this.seedOrbs);
     const seedGlow = this.sprite(0xffd890, 'smithHeartHeatSeedGlow');
+    this.seedField = new HeatSeedField(
+      this.root,
+      P.seeds,
+      this.detail,
+      this.uTime,
+      this.geometries,
+      this.materials,
+    );
     for (let i = 0; i < P.seeds; i++) {
-      const core = this.telegraphs.fan('seedCore');
-      this.kit.layOutFan(core, 360, DANGER);
-      core.group.visible = false;
-      const reach = this.telegraphs.fan('seedReach');
-      this.kit.layOutFan(reach, 360, DANGER);
-      reach.group.visible = false;
-      this.seeds.push({ id: -1, born: 0, life: T.seedLife, core, reach });
+      this.seedMarks.push({ x: 0, z: 0, reach: T.seedReach, fill: 0 });
+      this.seeds.push({ id: -1, born: 0, life: T.seedLife, laid: -1, x: 0, z: 0, reach: 0 });
       const g = new THREE.Sprite(seedGlow);
       g.visible = false;
       this.root.add(g);
@@ -776,11 +782,11 @@ export class HeatFightFx implements HeatFxHost {
   /** Every seed, band and patch object to its slot (released when gone). */
   private assign(world: IWorld): void {
     const seeds = this.ids.get('seed') ?? [];
+    let reseed = false;
     for (const s of this.seeds)
       if (s.id >= 0 && !seeds.includes(s.id)) {
         s.id = -1;
-        s.core.group.visible = false;
-        s.reach.group.visible = false;
+        reseed = true;
       }
     for (const id of seeds) {
       if (this.seeds.some((s) => s.id === id)) continue;
@@ -790,12 +796,12 @@ export class HeatFightFx implements HeatFxHost {
       slot.id = id;
       slot.born = this.clock;
       slot.life = heatTimedOf(HEAT_OBJECTS.seedPrefix, e.templateId) ?? T.seedLife;
-      const y = this.groundY(e.pos.x, e.pos.z);
-      this.kit.drapeFan(slot.core, this.groundY, e.pos.x, y, e.pos.z, 0, SEED_CORE_R);
-      this.kit.drapeFan(slot.reach, this.groundY, e.pos.x, y, e.pos.z, 0, e.scale || T.seedReach);
-      slot.core.group.visible = true;
-      slot.reach.group.visible = true;
+      slot.x = e.pos.x;
+      slot.z = e.pos.z;
+      slot.reach = e.scale || T.seedReach;
+      reseed = true;
     }
+    if (reseed) this.layOutSeeds();
     const zones = this.ids.get('zone') ?? [];
     for (const z of this.zones)
       if (z.id >= 0 && !zones.includes(z.id)) {
@@ -820,9 +826,9 @@ export class HeatFightFx implements HeatFxHost {
     this.cinder.hide();
     for (const s of this.seeds) {
       s.id = -1;
-      s.core.group.visible = false;
-      s.reach.group.visible = false;
+      s.laid = -1;
     }
+    this.seedField.hide();
     for (const g of this.seedGlows) g.visible = false;
     this.seedOrbs.visible = false;
     for (const z of this.zones) {
@@ -848,16 +854,7 @@ export class HeatFightFx implements HeatFxHost {
       const e = world.entities.get(s.id);
       if (!e) continue;
       const look = seedLook(this.clock - s.born, s.life, _seed);
-      PAINT.fill = look.fill;
-      PAINT.clock = this.clock;
-      PAINT.range = SEED_CORE_R;
-      PAINT.front = undefined;
-      PAINT.fade = undefined;
-      this.kit.paintFan(s.core, PAINT);
-      PAINT.fill = look.fill * 0.5;
-      PAINT.range = e.scale || T.seedReach;
-      PAINT.fade = 0.35 + 0.45 * look.fill;
-      this.kit.paintFan(s.reach, PAINT);
+      if (s.laid >= 0) this.seedMarks[s.laid].fill = look.fill;
       const y = this.groundY(e.pos.x, e.pos.z);
       const size = 0.55 + 0.75 * look.size;
       _v.set(e.pos.x, y + 1.1 + 0.15 * look.beat, e.pos.z);
@@ -879,6 +876,27 @@ export class HeatFightFx implements HeatFxHost {
     }
     this.seedOrbs.instanceMatrix.needsUpdate = true;
     this.seedOrbs.visible = n > 0;
+    this.seedField.paint(this.seedMarks, this.laidSeeds, this.clock);
+  }
+
+  /** Lay every live seed into the field, in slot order (once per change of
+   *  the set: a wave landing, a seed bursting). */
+  private layOutSeeds(): void {
+    let n = 0;
+    for (const s of this.seeds) {
+      if (s.id < 0) {
+        s.laid = -1;
+        continue;
+      }
+      const m = this.seedMarks[n];
+      m.x = s.x;
+      m.z = s.z;
+      m.reach = s.reach;
+      m.fill = seedLook(this.clock - s.born, s.life, _seed).fill;
+      s.laid = n++;
+    }
+    this.laidSeeds = n;
+    this.seedField.layout(this.seedMarks, n, this.groundY);
   }
 
   // ---- Wakefire -----------------------------------------------------------------------------

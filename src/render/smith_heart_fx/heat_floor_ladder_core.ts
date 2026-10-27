@@ -12,8 +12,9 @@
 //    tests/smith_heart_heat_floor.test.ts), bottom to top: the wellspring and
 //    the floor's lasting scorch, the molten surfaces (craters, wakes, rivers,
 //    Wakefire), the warnings (every telegraph a player must react to, over
-//    the fire it warns of), then the particles over everything on the floor;
-//  - a POOL that shares one rung (six lanes, ten seeds, three craters...)
+//    the fire it warns of), then the particles over everything on the floor,
+//    then the wellspring's shimmer standing in the air over its lip;
+//  - a POOL that shares one rung (six lanes, three craters...)
 //    blends commutatively, so the order its pieces are drawn in cannot change
 //    the picture: a multiply (the char that darkens the basalt) or an
 //    additive (the glow), split from one source so a lone piece still looks
@@ -92,6 +93,9 @@ export const HEAT_FLOOR = {
   fistSparks: rung(21, 'heat_fx', 'additive', true),
   fightSparks: rung(22, 'heat_fight_fx', 'additive', true),
   bodySparks: rung(23, 'heat_body', 'additive', true),
+  // The wellspring's heat shimmer standing over its lip (a sleeve of air,
+  // additive, one draw): over the floor's marks and the particles' smoke.
+  wellShimmer: rung(24, 'heat_well_fx', 'additive', false),
 } as const satisfies Record<string, HeatFloorRung>;
 
 export type HeatFloorLayer = keyof typeof HEAT_FLOOR;

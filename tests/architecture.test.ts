@@ -1122,6 +1122,9 @@ const RENDER_PURE_CORES = [
   // telegraphs' looks.
   'src/render/smith_heart_fx/heat_floor_ladder_core.ts',
   'src/render/smith_heart_fx/heat_telegraph_core.ts',
+  // The wellspring's bounded flow and its bubbles; the Hearthseeds' one field.
+  'src/render/smith_heart_fx/heat_well_core.ts',
+  'src/render/smith_heart_fx/heat_seed_field_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

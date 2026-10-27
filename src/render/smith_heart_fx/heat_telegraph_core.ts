@@ -16,7 +16,8 @@
 //
 // Three-free, DOM-free, deterministic.
 
-/** Every floor warning the Heat fight draws through the kit. */
+/** Every floor warning the Heat fight paints (the seeds' two kinds are read
+ *  by their one field, heat_seed_field.ts; the rest draw through the kit). */
 export type HeatTelegraphKind =
   | 'fist'
   | 'swell'

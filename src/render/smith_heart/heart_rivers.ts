@@ -5,7 +5,9 @@
 // flowing toward the seal, a white-hot surge riding its front (phase 2F).
 // Floor marks on the floor ladder's ground rung, so every telegraph paints
 // over them. Drawn on every tier: the light leading to each guardian is
-// route information.
+// route information. The Heat's dim ribbon is the Hearth's own mark, a seam
+// of fire burned into the stone (heat_route_seam.ts), on the same line,
+// width and rung.
 
 import * as THREE from 'three';
 import {
@@ -27,6 +29,7 @@ import {
   planHeartRiver,
 } from './heart_rivers_core';
 import type { HeartSealView } from './heart_seal_core';
+import { heatRouteSeamMaterial } from './heat_route_seam';
 
 const dimMaterials = new Map<SmithHeartVein, THREE.MeshBasicMaterial>();
 
@@ -92,7 +95,15 @@ export function buildHeartRivers(): HeartRivers {
     litGeometry.setAttribute('aSide', new THREE.BufferAttribute(sides, 1));
     litGeometry.computeBoundingSphere();
     litGeometry.setDrawRange(0, 0);
-    const dim = new THREE.Mesh(dimGeometry, dimMaterial(vein));
+    // The Heat's seam reads the same yards along and side across.
+    if (vein === 'heat') {
+      dimGeometry.setAttribute('aArc', new THREE.BufferAttribute(arcs.slice(), 1));
+      dimGeometry.setAttribute('aSide', new THREE.BufferAttribute(sides.slice(), 1));
+    }
+    const dim = new THREE.Mesh(
+      dimGeometry,
+      vein === 'heat' ? heatRouteSeamMaterial() : dimMaterial(vein),
+    );
     dim.name = `river:${vein}:dim`;
     dim.renderOrder = floorVfxRenderOrder('ground', 3);
     // The bright ribbon is the slot's own (its surge is this slot's state).

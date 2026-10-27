@@ -3,7 +3,8 @@
 // the giant sunk in its wellspring with the raid before it, Basalt Fist's
 // spot and lanes, the Molten Swells rolling, the overflow's rivers and the
 // Wellspawn, the Hearthseeds and Wakefire, a Rolling Cinder on the hunt,
-// heroic's second overflow with its Wellkeepers. A small raid of dev-only stand-in
+// heroic's second overflow with its Wellkeepers, the wellspring at the raid's
+// height with the route seam and a wave of seeds. A small raid of dev-only stand-in
 // players is added to the offline world. Evidence tooling, not a repo test.
 // Needs a dev Vite serving the worktree (ALLOW_DEV_COMMANDS is implied
 // offline).
@@ -262,6 +263,19 @@ try {
       await chat('/dev heart heat intermission', 9000);
       await place([BOSS.x + 22, BOSS.z + 8], [BOSS.x + 6, BOSS.z], 0.1, 0.6, 17);
       await sleep(4000);
+    },
+    // The wellspring at the raid's height, phase 2's boil: the crust plates
+    // drifting over the lava, the bubbles, the basalt lip and the shimmer;
+    // the Heat's route seam running off east; the raid's Hearthseeds to the
+    // north as one field.
+    async '07_pozo'() {
+      await pull();
+      await chat('/dev heart heat phase 2', 400);
+      await holdAll();
+      for (let i = 1; i < 8; i++) await raider(i, BOSS.x + 6 + i * 2.2, BOSS.z + 13 + (i % 3) * 2);
+      await chat('/dev heart heat seeds', 300);
+      await place([BOSS.x + 19, BOSS.z - 12], [BOSS.x + 1, BOSS.z + 1], 0.12, 0.42, 14);
+      await sleep(5200);
     },
   };
 

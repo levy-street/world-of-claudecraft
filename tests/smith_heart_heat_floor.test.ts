@@ -144,6 +144,9 @@ describe('heat_floor_ladder_core: one untied rung per Heat floor layer', () => {
     for (let i = 0; i + 1 < groups.length; i++)
       expect(Math.max(...groups[i])).toBeLessThan(Math.min(...groups[i + 1]));
     expect(s('wellPool')).toBeLessThan(Math.min(...scorch));
+    // The wellspring's shimmer stands in the air over everything on the floor.
+    expect(s('wellShimmer')).toBeGreaterThan(Math.max(...particles));
+    expect(HEAT_FLOOR.wellShimmer).toMatchObject({ blend: 'additive', pooled: false });
     // Every multiply under every glow of its group (the chars commute, then the sums).
     for (const r of Object.values(HEAT_FLOOR))
       if (r.blend === 'multiply') expect(r.pooled).toBe(true);
@@ -225,9 +228,36 @@ describe('the built Heat roots: no camera-sorted tie on the encounter band', () 
         expect(blendOf(glow?.material as THREE.Material)).toBe('additive');
         expect(glow?.geometry).toBe((o as THREE.Mesh).geometry);
       });
-    // Two fists and six lanes; ten seeds twice, six river lanes, six falls,
-    // six cinders' reaches, twelve hunted rings.
-    expect(dressed).toBe(2 + 6 + 20 + 6 + 6 + 6 + 12);
+    // Two fists and six lanes; six river lanes, six falls, six cinders'
+    // reaches, twelve hunted rings (the seeds draw as one field, below).
+    expect(dressed).toBe(2 + 6 + 6 + 6 + 6 + 12);
+  });
+
+  it("draws every seed's footprint as ONE field on the fight's warning rungs, char then glow", () => {
+    const fight = roots[1];
+    const fields: THREE.Mesh[] = [];
+    fight.traverse((o) => {
+      if (o.name === 'smithHeartHeatSeedField') fields.push(o as THREE.Mesh);
+    });
+    expect(fields).toHaveLength(1);
+    const field = fields[0];
+    expect(blendOf(field.material as THREE.Material)).toBe('multiply');
+    expect(field.renderOrder).toBe(
+      floorVfxRenderOrder('encounter', HEAT_FLOOR.fightTelegraphChar.step),
+    );
+    const glow = field.children.find((c) => c.name === 'smithHeartHeatSeedFieldGlow') as THREE.Mesh;
+    expect(blendOf(glow.material as THREE.Material)).toBe('additive');
+    expect(glow.geometry).toBe(field.geometry);
+    expect(glow.renderOrder).toBe(
+      floorVfxRenderOrder('encounter', HEAT_FLOOR.fightTelegraphGlow.step),
+    );
+    // No seed draws a footprint of its own any more.
+    let seedFans = 0;
+    fight.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
+      if (m?.uniforms?.uChar?.value === HEAT_TELEGRAPH_LOOKS.seedReach.char) seedFans++;
+    });
+    expect(seedFans).toBe(0);
   });
 });
 
