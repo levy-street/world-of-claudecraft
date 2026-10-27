@@ -353,51 +353,21 @@ def _rim(p, rng, R, opens, z_lifts=((-1.5, 0.0), (-3.25, -1.5)), newels=(), lamp
 
 # ================================================================ the platform
 def anvil_floor(bpy):
-    """The Anvil of the World's walk (see the module doc)."""
+    """The Anvil of the World's rim (see the module doc): since phase 2K the
+    walk itself is the four quarters, the ridges and the dais
+    (quarter_pieces.py); this is the grit bed under them, the fascia, the
+    string course and the balustrade, open where the bridge lands and where
+    each ridge rises into its horn over the lip, its newels with their
+    crystal lamps."""
+    import quarter_geom as qg
     p = HSP('Kit_AnvilFloor', seed=5001, ao=0.3, ao_dist=0.6, dust=0.45)
     rng = p.rng
     _grit_disc(p, ROOM_R + 0.08, -0.06, n=240)
-    # The hub: a round stone of dark basalt where the four channels meet,
-    # the body of the Masterless Strength hovering over it.
-    with p.as_kind(DRESSED):
-        prism_top(p, polar_outline([('arc', HUB_R, 0.0, 359.0)], step=0.4), 0.034, -0.4, p.vary(BASALT, 0.03),
-                  bevel=0.1)
-    gaps = [(b, 1.34) for b in CHANNELS]
-    tones = _tones(rng)
-    basalt = _basalt_tone(rng)
-    courses = [
-        (HUB_R, 3.3, 'pale'), (3.3, 5.1, 'flag'), (5.1, 7.1, 'flag'), (7.1, 9.3, 'flag'), (9.3, 11.4, 'flag'),
-        (11.4, 12.4, 'flag'), (12.4, 15.6, 'band'), (15.6, 17.7, 'flag'), (17.7, 19.9, 'flag'),
-        (19.9, 22.1, 'flag'), (22.1, 24.4, 'flag'), (24.4, 27.6, 'band'), (27.6, 29.8, 'flag'),
-        (29.8, 32.0, 'flag'), (32.0, CHANNEL_END, 'flag'), (CHANNEL_END, 36.8, 'flag'), (36.8, 40.2, 'band'),
-        (40.2, ROOM_R, 'flag'),
-    ]
-    for (r0, r1, kind) in courses:
-        g = gaps if r1 <= CHANNEL_END + 1e-6 else []
-        if kind == 'band':
-            _flags_round(p, rng, r0, r1, basalt, g, lo=1.0, hi=1.7)
-        elif kind == 'pale':
-            _flags_round(p, rng, r0, r1, lambda: FLAG_PALE if rng.random() < 0.6 else FLAG_WARM, g, lo=1.0, hi=1.6)
-        else:
-            lo, hi = (1.3, 2.3) if r1 < 20 else (1.7, 3.1)
-            _flags_round(p, rng, r0, r1, tones, g, lo=lo, hi=hi)
-    for b in CHANNELS:
-        _channel(p, rng, b, HUB_R - 0.2, CHANNEL_END)
-    # Grit and a few spalls drifted into the joints (flat).
-    with p.as_kind(RAW):
-        for _ in range(60):
-            r = rng.uniform(4.0, ROOM_R - 1.0)
-            d = rng.uniform(0, 360)
-            x, y = bp(r, d)
-            s = rng.uniform(0.1, 0.26)
-            slab(p, (x, y, 0.036), (s * 1.4, s, s * 0.2), p.vary(FLAG_PALE, 0.08), yaw=rng.uniform(0, TAU),
-                 chamfer=0.25, jitter=0.15)
-    # The rim: fascia, string course, balustrade open over the bridge, its
-    # newels flanking the bridge and between the altars.
     bridge_w = math.degrees(math.asin(BRIDGE_HALF / ROOM_R)) + 0.6
-    newels = [22.5, 67.5, 112.5, 157.5, BRIDGE_BEARING - bridge_w - 1.3, BRIDGE_BEARING + bridge_w + 1.3, 292.5,
-              337.5]
-    _rim(p, rng, ROOM_R, [(BRIDGE_BEARING, bridge_w)], newels=newels)
+    horns = [(b, 4.2) for b in qg.rim_ends()]
+    newels = [18.0, 72.0, 108.0, 162.0, 198.0, BRIDGE_BEARING - bridge_w - 1.3, BRIDGE_BEARING + bridge_w + 1.3,
+              252.0, 288.0, 342.0]
+    _rim(p, rng, ROOM_R, [(BRIDGE_BEARING, bridge_w)], newels=newels, skip=horns)
     return p
 
 

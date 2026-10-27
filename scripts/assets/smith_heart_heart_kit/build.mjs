@@ -25,6 +25,15 @@ export const SMITH_HEART_HEART_KIT_PIECES = [
   // The Anvil of the World: its walk and balustrade, its keel.
   'AnvilFloor',
   'AnvilKeel',
+  // The walk as four elemental quarters round the central ring (phase 2K):
+  // each quarter's paving, one ridge (the runtime turns it for all four),
+  // the central ring's dais.
+  'QuarterHammer',
+  'QuarterBreath',
+  'QuarterQuench',
+  'QuarterHeat',
+  'HeartRidge',
+  'HeartDais',
   // The Arrival Terrace and its keel, the Heart Bridge.
   'TerraceFloor',
   'TerraceKeel',
@@ -81,6 +90,8 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/ring_sculpt.py',
     'docs/design/raid/kit/heat_pieces.py',
     'docs/design/raid/kit/heart_pieces.py',
+    'docs/design/raid/kit/quarter_geom.py',
+    'docs/design/raid/kit/quarter_pieces.py',
     'docs/design/raid/kit/build_smith_heart_heart_kit.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',
     'scripts/assets/smith_heart_heart_kit/build.mjs',

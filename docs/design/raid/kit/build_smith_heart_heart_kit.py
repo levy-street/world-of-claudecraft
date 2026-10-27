@@ -13,6 +13,11 @@ only; `--pieces` builds a subset for review renders and writes nothing); the
 shipping build (scripts/assets/smith_heart_heart_kit/build.mjs) validates,
 fingerprints and meshopts it into public/models/props/smith_heart_heart_kit.glb.
 
+Phase 2K rebuilt the platform's walk as four elemental quarters set in a
+pinwheel round a central ring (quarter_pieces.py, quarter_geom.py): the
+quarters' paving, one ridge (turned a quarter for each of the four), the
+dais; Kit_AnvilFloor keeps the rim.
+
 Pieces are named Kit_* (the runtime bakes each by name, heart_kit.ts) on the
 kit's three slots: KitStone (lit: the granite, the basalt, the frost stone),
 KitGlow (the crystal: the tinted veins pale grey, the fixed crystal its own
@@ -29,12 +34,20 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import shkit  # noqa: E402,F401  (puts the shared dungeon kit on the path)
 import heart_pieces as hp  # noqa: E402
+import quarter_pieces as qp  # noqa: E402
 from build_smith_heart_hammer_kit import camera, look, scale_figure  # noqa: E402
 from hckit import export_kit  # noqa: E402
 
 BUILDERS = {
     'AnvilFloor': lambda: hp.anvil_floor(bpy),
     'AnvilKeel': lambda: hp.anvil_keel(bpy),
+    # Phase 2K: the walk as four elemental quarters round the central ring.
+    'QuarterHammer': lambda: qp.quarter_hammer(bpy),
+    'QuarterBreath': lambda: qp.quarter_breath(bpy),
+    'QuarterQuench': lambda: qp.quarter_quench(bpy),
+    'QuarterHeat': lambda: qp.quarter_heat(bpy),
+    'HeartRidge': lambda: qp.heart_ridge(bpy),
+    'HeartDais': lambda: qp.heart_dais(bpy),
     'TerraceFloor': lambda: hp.terrace_floor(bpy),
     'TerraceKeel': lambda: hp.terrace_keel(bpy),
     'HeartBridge': lambda: hp.heart_bridge(bpy),
