@@ -383,7 +383,7 @@ void main() {
   p.y = max(0.05, p.y + 0.2);
   vFade = on * (1.0 - t);
   vHot = 1.0 - t;
-  float size = 0.1 + 0.14 * aParams.x;
+  float size = 0.16 + 0.26 * aParams.x;
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   mv.xy += aCorner * size * on;
   vCorner = aCorner;
@@ -408,7 +408,7 @@ void main() {
   vec3 p = vec3(sin(ang) * rad, h * 18.0, cos(ang) * rad);
   vFade = sin(3.14159 * h) * uBlaze;
   vHot = aParams.w;
-  float size = (0.1 + 0.14 * aParams.y) * (1.0 + h);
+  float size = (0.16 + 0.24 * aParams.y) * (1.0 + h);
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   mv.xy += aCorner * size * step(0.002, vFade);
   vCorner = aCorner;
@@ -485,7 +485,7 @@ void main() {
     shock = exp(-d * d / 3.0) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.4)}, ${f(HEART_QUARTERS_LOOK.shockLife)}, uShockAge));
   }
   vec3 p = position;
-  p.y = 0.18 + aV * (1.4 + 7.5 * shock);
+  p.y = 0.18 + aV * (1.4 + 4.2 * shock);
   vV = aV;
   vR = aR;
   vShock = shock;

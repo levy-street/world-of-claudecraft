@@ -101,7 +101,7 @@ const HEART_QUARTER_SHADE = 0.42;
 const QUARTER_GAIN: Readonly<Record<SmithHeartVein, { seams: number; wash: number }>> = {
   hammer: { seams: 1, wash: 1 },
   breath: { seams: 1.7, wash: 1.9 },
-  quench: { seams: 1.6, wash: 2 },
+  quench: { seams: 1.35, wash: 1.2 },
   heat: { seams: 1, wash: 0.85 },
 };
 
@@ -748,7 +748,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       set(du.uPulse, state.ringPulse);
       set(du.uDark, dark);
       set(blazeMat.uniforms.uBlaze, state.blaze * (1 - dark));
-      set(columnMat.uniforms.uK, state.blaze * 0.55 * (1 - dark));
+      set(columnMat.uniforms.uK, state.blaze * 0.9 * (1 - dark));
     },
   };
 }
