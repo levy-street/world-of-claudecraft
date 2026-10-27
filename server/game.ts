@@ -347,6 +347,7 @@ import {
 } from './interest_policy';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import { itemUseAim } from './item_use_wire';
 import { keepaliveSweepDelayed, shouldReapSession, WS_KEEPALIVE_PING_MS } from './keepalive_sweep';
 import { lanceSelfWire, runLanceVerb } from './lance_wire';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
@@ -6297,11 +6298,10 @@ export class GameServer {
             );
             break;
           }
-          // The bag index the client named, re-validated in the sim against ITS
-          // OWN inventory: an unrecognized value reads as undefined (the legacy
-          // id-only path), never as index 0. inkMap rides raw; the sim sanitizes it.
+          // Bag index re-validated sim-side (bad value: legacy id-only path, never
+          // index 0). inkMap rides raw; aim is shape-checked, the sim clamps range.
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-          const result = sim.useItem(msg.item, pid, slot, undefined, msg.inkMap);
+          const result = sim.useItem(msg.item, pid, slot, itemUseAim(msg.aim), msg.inkMap);
           if (result?.type === 'mechChroma')
             this.cosmetics.noteMechChroma(session, result.chromaId);
         }
