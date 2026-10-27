@@ -1,15 +1,18 @@
 // /dev heart final quarter <zone> (src/sim/dev/smith_heart_final_dev.ts,
 // phase 2K) over a REAL Sim: the Masterless Strength stands in the middle of
 // the named quarter (the geometry core reads that quarter there), it stays
-// put a while (its home moved with it), `ring` sets it on the centre and
-// pulls it onto the player, an unknown zone prints the help, outside a run it
-// refuses, and a non-dev world never runs it.
+// put a while (its home moved with it) at its full health, `ring` sets it on
+// the centre at its final phase's share of health (phase 2L: the final look
+// shows only then) and pulls it onto the player, an unknown zone prints the
+// help, outside a run it refuses, and a non-dev world never runs it.
 
 import { describe, expect, it } from 'vitest';
 import { SMITH_HEART_DUNGEON, SMITH_HEART_FINAL_BOSS } from '../src/sim/content/smith_heart';
 import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import {
+  HEART_FINAL_PHASE_SHARE,
   HEART_QUARTER_ORDER,
+  heartFinalPhase,
   heartQuarterAt,
   heartQuarterSpot,
 } from '../src/sim/content/smith_heart_quarters';
@@ -60,13 +63,16 @@ describe('/dev heart final quarter', () => {
       expect(heartQuarterAt(lx, lz)).toBe(zone);
       expect(boss.spawnPos.x).toBeCloseTo(boss.pos.x, 6);
       expect(boss.spawnPos.z).toBeCloseTo(boss.pos.z, 6);
+      // A quarter's preview never touches its health (no final look).
+      expect(boss.hp).toBe(boss.maxHp);
+      expect(heartFinalPhase(boss.hp, boss.maxHp)).toBe(false);
       // It stays where it was set down (the raid stands far off on the terrace).
       for (let i = 0; i < 40; i++) sim.tick();
       expect(heartQuarterAt(boss.pos.x - o.x, boss.pos.z - o.z)).toBe(zone);
     }
   });
 
-  it('ring sets it on the centre and turns it on the player', () => {
+  it('ring sets it on the centre at its final phase and turns it on the player', () => {
     const { sim, dev, claim } = devSim();
     sim.setPlayerLevel(20);
     dev('/dev heart tp heartroom');
@@ -84,6 +90,10 @@ describe('/dev heart final quarter', () => {
     expect(
       Math.hypot(boss.spawnPos.x - o.x - HEART_ROOM.x, boss.spawnPos.z - o.z - HEART_ROOM.z),
     ).toBeLessThan(0.01);
+    // The final phase forced: its share of health, never more.
+    expect(heartFinalPhase(boss.hp, boss.maxHp)).toBe(true);
+    expect(boss.hp).toBeLessThanOrEqual(boss.maxHp * HEART_FINAL_PHASE_SHARE);
+    expect(boss.hp).toBeGreaterThan(boss.maxHp * HEART_FINAL_PHASE_SHARE - 2);
   });
 
   it('prints the help for an unknown zone and refuses outside a run', () => {

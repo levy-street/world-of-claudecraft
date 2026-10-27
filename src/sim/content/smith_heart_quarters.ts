@@ -154,5 +154,16 @@ export function heartQuarterSpot(zone: HeartQuarterZone): { x: number; z: number
   return { x: HEART_ROOM.x + Math.sin(mid) * r, z: HEART_ROOM.z + Math.cos(mid) * r };
 }
 
+/** The final phase's share of the Masterless Strength's health (design doc
+ *  section 5.21: the last 15 percent, when it goes to the central ring and
+ *  all four quarters wake at once). The room shows the final look only at or
+ *  under it; above it a boss in the ring wakes no quarter. */
+export const HEART_FINAL_PHASE_SHARE = 0.15;
+
+/** Whether a fought boss at `hp` of `maxHp` is in its final phase. */
+export function heartFinalPhase(hp: number, maxHp: number): boolean {
+  return maxHp > 0 && hp > 0 && hp <= maxHp * HEART_FINAL_PHASE_SHARE;
+}
+
 /** The zones a dev preview names (`/dev heart final quarter <zone>`). */
 export const HEART_QUARTER_ZONES: readonly HeartQuarterZone[] = [...HEART_QUARTER_ORDER, 'ring'];

@@ -2,13 +2,16 @@
 // Anvil of the World's quarters (phase 2K, design doc section 5.21). Moves the
 // Masterless Strength (and its home, so it stays put) into the middle of that
 // quarter, or onto the central ring's centre; the renderer wakes the quarter
-// it stands in (presentation only, smith_heart_quarters.ts). `ring` also
-// pulls it onto the player: the final phase's look (all four quarters awake,
-// the ring blazing) is a fight's. Dev-gated like every /dev heart branch
-// (the ctx.devCommands seam); never reached in production.
+// it stands in (presentation only, smith_heart_quarters.ts). `ring` forces
+// the final phase: it sets the boss to the final phase's share of its health
+// (HEART_FINAL_PHASE_SHARE) and pulls it onto the player, so the final look
+// (all four quarters awake, the ring blazing) shows; a boss in the ring above
+// that share wakes no quarter (phase 2L). Dev-gated like every /dev heart
+// branch (the ctx.devCommands seam); never reached in production.
 
 import { SMITH_HEART_DUNGEON, SMITH_HEART_FINAL_BOSS } from '../content/smith_heart';
 import {
+  HEART_FINAL_PHASE_SHARE,
   HEART_QUARTER_ZONES,
   type HeartQuarterZone,
   heartQuarterSpot,
@@ -52,11 +55,13 @@ export function smithHeartFinalDevTrigger(
   if (boss.leashAnchor) boss.leashAnchor = { ...pos };
   ctx.rebucket(boss);
   if (zone === 'ring') {
+    // The final phase forced: its share of health (never raised past it).
+    boss.hp = Math.min(boss.hp, Math.max(1, Math.floor(boss.maxHp * HEART_FINAL_PHASE_SHARE)));
     const me = ctx.entities.get(pid);
     const pulled = !!me && !me.dead && ctx.aggroMob(boss, me, false);
     return pulled
-      ? 'The Masterless Strength stands in the central ring and turns on you: the final look.'
-      : 'The Masterless Strength stands in the central ring (it could not be pulled).';
+      ? 'The Masterless Strength stands in the central ring at its final phase and turns on you: the final look.'
+      : 'The Masterless Strength stands in the central ring at its final phase (it could not be pulled).';
   }
   return `The Masterless Strength stands in the ${zone} quarter.`;
 }
