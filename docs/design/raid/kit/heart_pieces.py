@@ -51,8 +51,9 @@ bed's, the lamps') carries its emitted colour.
   - Kit_Col*: the colossus's rock pieces (torso, hip, head, shoulder, upper
     arm, forearm, fist, three shards): the room's granite in its beds, seams
     of the heart's light in their cracks. One body until the final model.
-  - Kit_TornSocket: the scar a torn-out piece leaves in the paving (flat);
-    Kit_RubbleScatter: the low rubble a crumbled piece leaves.
+  - Kit_RubbleScatter: the low rubble a crumbled piece leaves (the torn
+    pieces' sockets are carved into the quarters since phase 2L,
+    quarter_pieces.py).
 
 Frames (yards, +Z up, the game's +Z is Blender -Y):
   - Kit_AnvilFloor, Kit_AnvilKeel: origin at the platform's centre on its
@@ -69,7 +70,7 @@ Frames (yards, +Z up, the game's +Z is Blender -Y):
     rising out along +Y (away from the platform's centre) to the crown.
   - Kit_HeartCrystal, Kit_Col*: the piece's centre (the runtime moves it).
   - Kit_CoreBed: the hollow's centre at the bed's rim height.
-  - Kit_TornSocket, Kit_RubbleScatter: the centre on the floor.
+  - Kit_RubbleScatter: the centre on the floor.
 Deterministic: every draw is the piece's own seeded rng.
 """
 import math
@@ -362,7 +363,10 @@ def anvil_floor(bpy):
     import quarter_geom as qg
     p = HSP('Kit_AnvilFloor', seed=5001, ao=0.3, ao_dist=0.6, dust=0.45)
     rng = p.rng
-    _grit_disc(p, ROOM_R + 0.08, -0.06, n=240)
+    # Phase 2L: each quarter's own dirt in its joints, holed under the
+    # arrival's sockets (quarter_pieces.joint_bed).
+    import quarter_pieces as qp
+    qp.joint_bed(p)
     bridge_w = math.degrees(math.asin(BRIDGE_HALF / ROOM_R)) + 0.6
     horns = [(b, 4.2) for b in qg.rim_ends()]
     newels = [18.0, 72.0, 108.0, 162.0, 198.0, BRIDGE_BEARING - bridge_w - 1.3, BRIDGE_BEARING + bridge_w + 1.3,
@@ -1365,54 +1369,6 @@ def col_shard(bpy, variant):
 
 
 # ================================================================ the floor marks
-def torn_socket(bpy):
-    """The scar a torn-out piece leaves in the paving (flat, a hand high at
-    most): a ring of broken flag edges round a dark hollow of dust and
-    grit, cracks running out from it."""
-    p = HSP('Kit_TornSocket', seed=6101, ao=0.3, ao_dist=0.5, dust=0.2)
-    rng = p.rng
-    bm = p.bm
-    before = set(bm.faces)
-    n = 40
-    vs = []
-    for k in range(n):
-        a = TAU * k / n
-        r = 3.0 + 0.5 * math.sin(a * 3 + 1.0) + rng.uniform(-0.2, 0.2)
-        vs.append(bm.verts.new((math.cos(a) * r, math.sin(a) * r, 0.05)))
-    bm.faces.new(vs)
-    faces = [f for f in bm.faces if f not in before]
-    with p.as_kind(PAINT):
-        p._paint(faces, (0.21, 0.2, 0.2), 0)
-    p.facing(faces, (0, 0, 1))
-    with p.as_kind(RAW):
-        for k in range(26):
-            a = rng.uniform(0, TAU)
-            r = rng.uniform(2.6, 4.0)
-            s = rng.uniform(0.25, 0.6)
-            slab(p, (math.cos(a) * r, math.sin(a) * r, 0.06), (s * 1.4, s, 0.1), p.vary(FLAG if k % 2 else FLAG_DARK,
-                                                                                    0.06),
-                 yaw=rng.uniform(0, TAU), pitch=rng.uniform(-0.1, 0.1), chamfer=0.2, jitter=0.15)
-        for k in range(30):
-            a = rng.uniform(0, TAU)
-            r = rng.uniform(0.0, 2.6)
-            s = rng.uniform(0.08, 0.2)
-            slab(p, (math.cos(a) * r, math.sin(a) * r, 0.07), (s * 1.4, s, s * 0.35), p.vary(GRANITE_DARK, 0.08),
-                 yaw=rng.uniform(0, TAU), chamfer=0.25, jitter=0.2)
-    # Cracks out across the paving (dark, flat).
-    with p.as_kind(PAINT):
-        for k in range(7):
-            a = rng.uniform(0, TAU)
-            r = 3.0
-            for i in range(6):
-                x, y = math.cos(a) * r, math.sin(a) * r
-                L = rng.uniform(0.5, 0.9)
-                crystal(p, (x, y, 0.045), (0.07, L, 0.02), (0.1, 0.095, 0.1), n=8, boxy=0.9, jitter=0.05,
-                        yaw=-a + rng.uniform(-0.4, 0.4))
-                a += rng.uniform(-0.12, 0.12)
-                r += L * 0.85
-    return p
-
-
 def rubble_scatter(bpy):
     """The low rubble a crumbled piece leaves on the platform (under 0.6)."""
     p = HSP('Kit_RubbleScatter', seed=6201, ao=0.5, ao_dist=0.8, dust=0.3)

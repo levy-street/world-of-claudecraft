@@ -47,6 +47,7 @@ BUILDERS = {
     'QuarterQuench': lambda: qp.quarter_quench(bpy),
     'QuarterHeat': lambda: qp.quarter_heat(bpy),
     'HeartRidge': lambda: qp.heart_ridge(bpy),
+    'HeartRidgeHorn': lambda: qp.heart_ridge_horn(bpy),
     'HeartDais': lambda: qp.heart_dais(bpy),
     'TerraceFloor': lambda: hp.terrace_floor(bpy),
     'TerraceKeel': lambda: hp.terrace_keel(bpy),
@@ -68,7 +69,6 @@ BUILDERS = {
     'ColShardA': lambda: hp.col_shard(bpy, 'A'),
     'ColShardB': lambda: hp.col_shard(bpy, 'B'),
     'ColShardC': lambda: hp.col_shard(bpy, 'C'),
-    'TornSocket': lambda: hp.torn_socket(bpy),
     'RubbleScatter': lambda: hp.rubble_scatter(bpy),
     # Mythic's Walking Slab (the Slabwright's soul dragging its pillar).
     'SlabClaw': lambda: hp.slab_claw(bpy),

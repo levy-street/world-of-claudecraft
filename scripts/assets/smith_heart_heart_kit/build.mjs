@@ -26,13 +26,14 @@ export const SMITH_HEART_HEART_KIT_PIECES = [
   'AnvilFloor',
   'AnvilKeel',
   // The walk as four elemental quarters round the central ring (phase 2K):
-  // each quarter's paving, one ridge (the runtime turns it for all four),
-  // the central ring's dais.
+  // each quarter's paving, one ridge's spine and its horn (the runtime turns
+  // them for all four), the central ring's dais.
   'QuarterHammer',
   'QuarterBreath',
   'QuarterQuench',
   'QuarterHeat',
   'HeartRidge',
+  'HeartRidgeHorn',
   'HeartDais',
   // The Arrival Terrace and its keel, the Heart Bridge.
   'TerraceFloor',
@@ -58,8 +59,8 @@ export const SMITH_HEART_HEART_KIT_PIECES = [
   'ColShardA',
   'ColShardB',
   'ColShardC',
-  // The marks the torn and the crumbled pieces leave on the platform.
-  'TornSocket',
+  // The rubble a crumbled piece leaves on the platform (the torn pieces'
+  // sockets are carved into the quarters since phase 2L).
   'RubbleScatter',
   // Mythic's Walking Slab (the Slabwright's soul dragging its pillar,
   // src/render/smith_heart_fx/council_slab_fx.ts): its claws, its collar, its face.

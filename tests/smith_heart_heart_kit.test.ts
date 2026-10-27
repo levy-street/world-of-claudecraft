@@ -144,7 +144,6 @@ describe('Smith Heart Heart kit: the piece list and the shipped GLB', () => {
       'ColTorso',
       'ColHead',
       'ColFist',
-      'TornSocket',
       'RubbleScatter',
     ])
       expect(list, piece).toContain(piece);
@@ -162,7 +161,9 @@ describe('Smith Heart Heart kit: the piece list and the shipped GLB', () => {
       expect(statSync(KIT).size).toBeLessThanOrEqual(5 * 1024 * 1024);
       let tris = 0;
       for (const s of shapes.values()) tris += s.triangles;
-      expect(tris).toBeLessThanOrEqual(215000);
+      // Phase 2L: the quarters' hand-painted stones (dense painted tops)
+      // and the sculpted spines raised the budget from 215k.
+      expect(tris).toBeLessThanOrEqual(250000);
     },
   );
 });

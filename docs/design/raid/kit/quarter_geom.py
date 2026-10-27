@@ -62,3 +62,43 @@ def polar_of(x, y):
 def rim_ends():
     """Each ridge's bearing where it meets the rim."""
     return [(45.0 + 90.0 * k + RIM_OFFSET) % 360.0 for k in range(4)]
+
+
+# ---- the arrival's sockets (phase 2L) ---------------------------------------------------
+# Where the heart tears the colossus's big rock pieces out of the paving: each
+# piece's rest spot (bearing, r) and size, the same as
+# src/render/smith_heart_fx/final_fx_core.ts COLOSSUS_PIECES (pinned against
+# each other by tests/smith_heart_quarters_kit.test.ts). The kit carves a
+# socket there: the paving broken round a pit.
+SOCKETS = (
+    (340.0, 27.0, 8.0),  # hip
+    (20.0, 30.0, 11.0),  # torso
+    (112.0, 29.0, 6.8),  # shoulder L
+    (292.0, 29.0, 6.8),  # shoulder R
+    (150.0, 23.0, 7.8),  # upper arm L
+    (325.0, 21.0, 7.8),  # upper arm R
+    (104.0, 35.0, 7.5),  # forearm L
+    (284.0, 35.0, 7.5),  # forearm R
+    (162.0, 33.0, 5.8),  # fist L
+    (252.0, 31.0, 5.8),  # fist R
+    (62.0, 33.0, 5.7),  # head
+)
+
+
+def socket_radius(size):
+    """A socket's pit radius (yards) for a piece of `size`."""
+    return 0.85 + size * 0.085
+
+
+def socket_zone(size):
+    """The broken paving round a socket's pit reaches this far."""
+    return socket_radius(size) + 1.15
+
+
+def quarter_of(x, y):
+    """The quarter index (ORDER) a Blender point lies in, or -1 in the ring."""
+    r, b = polar_of(x, y)
+    if r < RING_R:
+        return -1
+    phi = unwind(b, r)
+    return int(((phi - (-45.0 + RIM_OFFSET)) % 360.0) // 90.0)
