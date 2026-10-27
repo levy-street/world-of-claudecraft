@@ -4741,6 +4741,38 @@ export const ja_JP: EnTranslations = {
         "creepingRime": "移動速度が{pct}%低下する（スタック1つにつき{per}%）。霧氷のブレスを受けるたびにスタックが1つ増え、効果時間が{seconds}秒にリセットされる。{max}スタックに達すると{freeze}秒間凍りつき（凍結）、スタックは消える。",
         "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
       },
+      "council": {
+        "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：ダメージ{heroic}%増加。",
+        "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。",
+        "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。",
+        "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。"
+      },
+      "breathGuardian": {
+        "wind": "息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。",
+        "draw": "守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、ふいごの突風が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、{throw}ヤード外へ吹き飛ばす。",
+        "pinned": "風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。",
+        "anchor": "テサリー隊長の凪があなたを支えている：風も吸引も爆風も吹き飛ばしも、あなたを動かせない。ダメージは受ける。",
+        "spent": "錨の効果が切れた：これが消えるまで、テサリー隊長の凪の円はあなたを再び支えられない。",
+        "drawn": "{every}秒ごとに足元へ雷が落ちる：{warn}秒後、{radius}ヤード以内の全員に{min}から{max}のダメージを与え、{charged}秒間毎秒{cmin}から{cmax}のダメージを与える帯電した地面を残す。動き続け、落雷を味方から離れた縁へ導こう。",
+        "cradled": "嵐の中へ持ち上げられ、{hold}秒間拘束される。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満（ヒロイックでは{heroicSoakers}人）だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。",
+        "stormForm": "裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。",
+        "swell": "{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。"
+      },
+      "quenchGuardian": {
+        "cold": "あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。",
+        "warmth": "レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。",
+        "frozen": "霜に閉ざされている：行動できない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受けて霜脆化状態になり、{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。",
+        "brittle": "あらゆる攻撃から受けるダメージが{pct}%増加する。",
+        "trapped": "氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。",
+        "awake": "鍛冶師の四本の剣が目覚めている。焼き入れの吐息と焼き戻しの一撃が決まるたび、{delay}秒後（体力{lowPct}%未満では{low}秒後）に、すべての剣が浮かぶ場所から同じ向きでそれを繰り返す。剣の陰、攻撃と反対側は常に安全だ。",
+        "deepening": "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。"
+      },
+      "heatGuardian": {
+        "heat": "炉床の熱：{max}中{heat}。毎秒{rise}ずつ自然に上がる。{every}秒ごとに炉床の脈動が炉床の床にいる全員に{min}～{most}の火炎ダメージを与え（この熱の場合）、熱いほど強くなる。プレイヤーが燃え立つ光線を1本受けるごとに{cool}下がり、{range}ヤード以内に誰もいない光線は守護者に戻り{back}上がる。{max}で炉床は過熱する。",
+        "burn": "受ける火炎・冷気・自然・闇・秘術ダメージが{pct}%増加：スタック{stacks}個それぞれ{per}%、最大{most}個。燃え立つ光線を受けるたびに1スタック増え、最後の変化から{decay}秒後に1スタック消える（ヒロイックでは{heroicDecay}秒）。",
+        "stoked": "炉床の熱の上昇が{total}%速くなっている：戦闘中{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。",
+        "overheating": "熱が{at}に達した。{max}で炉床は過熱し、炉床爆発が床にいる全員に{min}～{most}の火炎ダメージを与える（ヒロイックでは{heroicMin}～{heroicMost}）。その後、熱は{vent}から再び上がる。結晶の光線で冷ますか、身構えよ。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -7196,6 +7228,164 @@ export const ja_JP: EnTranslations = {
       "glyphLightingLine": "灯るまで太陽紋の上にとどまれ。離れるとやり直しになる",
       "breathTitle": "偶像の息吹！",
       "breathLine": "石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ"
+    },
+    "council": {
+      "warn": {
+        "wrath": "山の怒り！柱の陰に隠れろ！",
+        "enrage": "山の怒りが速まった！山の怒りがずっと早く来る。",
+        "weight": "{player}に槌の重み：タンク交代！",
+        "wake": "石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。",
+        "wakeHeir": "{players}の足元で石が目覚める：動け！",
+        "rock": "{player}に落石！遮蔽物から離れて一緒に受けろ！",
+        "song": "鉱脈の歌！詠唱を止めろ！",
+        "resonance": "{players}に共鳴：一番傷んだ柱を割れ、無傷の柱には近づくな！",
+        "fell_guardian": "槌の守護者が倒れた。その怒りは残された石へと移る！",
+        "fell_slabwright": "石板の匠が倒れた。これからは石が好きな場所にせり上がる！",
+        "fell_singer": "鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！",
+        "soul_guardian": "守護者の魂が石に宿った！その柱から怒りの残響が放たれる。",
+        "soul_slabwright": "石板の匠の魂が石に宿った！歩む石板が君たちを追って這い寄る。",
+        "soul_singer": "鉱脈の歌い手の魂が石に宿った！終わらぬ歌は脈打つたびに強まる。",
+        "echo": "怒りの残響！魂の柱との間に別の柱を挟め！",
+        "soulBreak_guardian": "守護者の魂の柱が砕けた！残響が静まる。",
+        "soulBreak_slabwright": "石板の匠の魂の柱が砕けた！歩む石板が止まる。",
+        "soulBreak_singer": "鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。"
+      },
+      "say": {
+        "guardian_pull": "採石場によそ者か。槌の力は肉などに屈しはせぬ。",
+        "guardian_wrath": "山が我に応える！石が匿ってくれるなら隠れるがいい！",
+        "guardian_death": "我が力を……石に託す。",
+        "guardian_remember": "石は覚えている。あの者のものは、今や我がものだ。",
+        "guardian_soul": "我はもはや石そのもの。我が怒りには、朽ちる体などない。",
+        "guardian_wipe": "塵だ。肉はすべてそうなる。",
+        "guardian_defeat": "槌の力は……お前たちが担え。",
+        "slabwright_pull": "壁に石が足りん。じっとしていろ、お前たちを積み込んでやる。",
+        "slabwright_wake": "そこに立て。お前の足元から石がせり上がる！",
+        "slabwright_rock": "上を見ろ、ちびども！山が落ちてくるぞ！",
+        "slabwright_death": "石板が……割れる……",
+        "slabwright_remember": "石は覚えている。仕事は俺が仕上げる。",
+        "slabwright_soul": "手はもうない。だがこの石をお前たちのもとへ引きずっていくぞ。",
+        "slabwright_wipe": "据えて、埋めた。いい仕事だ。",
+        "slabwright_defeat": "採石場が……静まる。",
+        "singer_pull": "鉱脈の歌が聞こえる？ずっとあなたたちの声を待っていたの。",
+        "singer_song": "一緒に歌って、そして砕けなさい！",
+        "singer_death": "私の歌が……岩へと流れていく……",
+        "singer_remember": "石は覚えている。聞いて、まだ歌っている。",
+        "singer_soul": "聞いて。石の中で、私の歌は終わらない。",
+        "singer_wipe": "静かに。鉱脈は眠ったわ。",
+        "singer_defeat": "最後の音が……消えていく。"
+      },
+      "alert": {
+        "wakeTitle": "石の目覚め！",
+        "wakeLine": "立っている場所に柱がせり上がる：レイドが必要な場所に遮蔽物を置こう",
+        "rockTitle": "落石！",
+        "rockLine": "柱から離れ、少なくとも3人の味方を集めよう",
+        "resonanceTitle": "共鳴",
+        "resonanceLine": "柱の近くにいると割ってしまう：一番傷んだ柱のそばで待とう",
+        "resonanceCracking": "柱を割っている：守るなら離れよう",
+        "rockLineSoul": "遮蔽物から離れ、魂の柱のそばで少なくとも3人の味方を集めよう",
+        "resonanceLineSoul": "魂の柱のそばで待って魂の印を砕こう、無傷の柱には近づかないこと",
+        "resonanceBreaking": "魂の印を砕いている：魂の柱のそばにとどまろう",
+        "weightTitle": "槌の重み",
+        "weightLine": "物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう",
+        "timeAria": "残り{seconds}秒"
+      }
+    },
+    "breathGuardian": {
+      "warn": {
+        "inhale": "守護者が息を吸い込む！口の前の渦に入るな！",
+        "gust": "ふいごの突風！衝撃に備えろ！",
+        "gales": "はぐれ旋風が岩棚を駆け巡る！近づくな！",
+        "circle": "テサリー隊長が凪の円を置いた！入れるのは{seats}人まで。",
+        "fell": "{player}が虚空へ吹き飛ばされた！",
+        "storm": "嵐が裂ける！岩棚じゅうに雷が落ちてくる！",
+        "fork": "{player}に跳ねる雷撃！散開しろ！",
+        "cradle": "{player}が嵐の中へ持ち上げられた！その真下に集まれ！",
+        "drawn": "{player}に招雷！落雷を縁へ導け！",
+        "stormGust": "嵐の突風が集まる！風に備えろ！"
+      },
+      "say": {
+        "guardian_pull": "山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。",
+        "guardian_blow": "風が向きを変えるのを感じよ。縁は思うより近いぞ。",
+        "guardian_inhale": "近う寄れ。皆、残らず。",
+        "guardian_storm": "息はもう十分だ。今こそ嵐を！",
+        "guardian_cradle": "昇れ、小さき者よ。仲間に受け止めてもらうがいい。",
+        "guardian_drawn": "空がお前を選んだ。逃げよ、雷は追ってくる。",
+        "guardian_wipe": "吹き飛ばされた。頂の塵のように。",
+        "guardian_death": "息吹は……山へ……還る……",
+        "thessaly_pull": "ハイウォッチは共に戦う！壁の裂け目に気をつけろ、風に押し出されるぞ！",
+        "thessaly_circle_a": "急げ、私の凪の中へ！入れるのは三人までだ！",
+        "thessaly_circle_b": "ここだ！私と並べ、風をこの身で受け止める！",
+        "thessaly_circle_c": "石の上に凪を！三人、今すぐ！",
+        "thessaly_inhale": "奴が息を吸っている！口の前ではなく横へ回れ！",
+        "thessaly_storm": "嵐が裂ける！私の凪ではもう持たない。散開しろ！",
+        "thessaly_fall": "石にしがみつけ！",
+        "thessaly_victory": "息吹は解き放たれた。ハイウォッチはこの登攀を忘れない。",
+        "thessaly_wipe": "下がって息を整えろ。もう一度行くぞ。"
+      }
+    },
+    "quenchGuardian": {
+      "warn": {
+        "rim": "岸の氷がせり上がる！湖の上へ移れ！",
+        "frozen": "{player}が凍りついた！氷が砕ける前に離れろ！",
+        "crack": "固まった集団の下で氷がきしむ！散らばれ！",
+        "wake": "鍛冶師の剣が湖から引き抜かれた！打ち込まれる時は剣の陰に立て！",
+        "cross": "二本の剣が湖を横切る！その進路から離れろ！"
+      },
+      "say": {
+        "pull": "我が湖に温かい血か。その温もりも長くは続かぬ。",
+        "shatter": "芯まで凍った。さあ、砕けよ。",
+        "hole": "氷はすべての足音を覚えている。寄り集まれば、崩れる。",
+        "wake": "鍛冶師の剣よ、目覚めよ！我が一撃のすべてに応えよ！",
+        "echo": "我が打つものは、剣もまた打つ。",
+        "cross": "交われ、剣よ！奴らに新たな岸を刻め！",
+        "deepen": "感じるか？冷気がさらに深くなっていく。",
+        "wipe": "静まり、黙し、焼き入れられた。",
+        "death": "冷気が……離れていく……焼き入れはお前たちのものだ。"
+      }
+    },
+    "quenchAlert": {
+      "coldTitle": "冷気",
+      "freezingTitle": "凍えている！",
+      "warmTitle": "身を寄せた温もり",
+      "frozenTitle": "霜に閉ざされた！",
+      "waterTitle": "氷の下！",
+      "coldLine": "{radius}ヤード以内で他の{others}人以上と身を寄せて温まろう",
+      "warmLine": "冷気が下がっている。{seconds}秒以内に集団ごと移動しないと氷が割れる",
+      "frozenLine": "{seconds}秒後に氷が砕ける：近くの者は離れろ",
+      "waterLine": "{seconds}秒後に這い上がる",
+      "coldBar": "冷気 {cold} / {max}",
+      "coldAria": "冷気 {max}中{cold}",
+      "timeAria": "残り{seconds}秒"
+    },
+    "heatGuardian": {
+      "warn": {
+        "crystals": "燃え立つ結晶が現れた！その光線を浴びて炉床を冷ませ！",
+        "channel": "炉床があふれる！流路が床を二つに分けるぞ！",
+        "windup": "炉床が過熱寸前だ！結晶で冷ますか、身構えろ！",
+        "overheat": "炉床が過熱した！"
+      },
+      "say": {
+        "pull": "お前たちは最初の炎へ踏み込んだ。何ものも変わらずには出られぬ。",
+        "shed": "我が熱を受け取れ、抱えきれるものならな。",
+        "channel": "炉床があふれる。どちら側に立つか選べ。",
+        "windup": "一つの体には多すぎる炎だ……どこかへ向かわねばならぬ！",
+        "overheat": "我と共に燃えよ！",
+        "stoke": "お前たちの吐く息のすべてが炎を育てる。",
+        "wipe": "灰だ、一人残らず。炉床は燃え続ける。",
+        "death": "炎が……石の中へ……沈んでいく。大切に運べ。"
+      }
+    },
+    "heatAlert": {
+      "heatTitle": "炉床が熱くなる",
+      "coolingTitle": "炉床が冷えていく",
+      "burningTitle": "結晶の火傷 x{stacks}",
+      "overheatTitle": "過熱が迫る！",
+      "heatLine": "燃え立つ結晶から{range}ヤード以内に立ち、光線を受けて炉床を冷ませ",
+      "coolingLine": "結晶の光線が炉床を冷ましている：すべての光線に誰かを立たせ続けよ",
+      "burningLine": "受ける呪文ダメージが{pct}%増加：離れて、光線を他の者に任せよ",
+      "overheatLine": "{max}で炉床が全員を焼き尽くす：防御技を使え",
+      "heatBar": "熱 {heat} / {max}",
+      "heatAria": "熱 {max}中{heat}"
     },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
@@ -16480,6 +16670,32 @@ export const ja_JP: EnTranslations = {
       "sanctum_counterweight_lash": "重り尾の鞭打ち",
       "sanctum_branding_iron": "焼き印",
       "sanctum_rime_breath": "霧氷のブレス",
+      "heart_mountains_wrath": "山の怒り",
+      "heart_bellows_gust": "ふいごの突風",
+      "heart_storm_lance": "嵐の槍",
+      "heart_quenching_breath": "焼き入れの息吹",
+      "heart_molten_pour": "溶鉄の注ぎ",
+      "heart_anvil_clang": "灼熱の弔鐘",
+      "heart_forge_wrath": "炉の怒り",
+      "heart_forge_pour": "炉の注ぎ",
+      "heart_gale_bolt": "Gale Bolt",
+      "heart_rime_bolt": "Rime Bolt",
+      "heart_ember_bolt": "残り火の矢",
+      "heart_hammers_weight": "槌の重み",
+      "heart_wake_the_stone": "石の目覚め",
+      "heart_falling_rock": "落石",
+      "heart_seam_bolt": "鉱脈の矢",
+      "heart_song_of_the_seam": "鉱脈の歌",
+      "heart_song_of_the_seam_unbroken": "鉱脈の歌",
+      "heart_echo_of_wrath": "怒りの残響",
+      "heart_endless_song": "終わらぬ歌",
+      "heart_breath_inhale": "吸い込む息",
+      "heart_breath_storm_break": "嵐の決壊",
+      "heart_breath_forking_bolt": "跳ねる雷撃",
+      "heart_breath_thunders_cradle": "雷のゆりかご",
+      "heart_breath_drawn_lightning": "招雷",
+      "heart_quench_blades_wake": "剣の目覚め",
+      "heart_heat_shed": "熱を流す",
       "kituse_sanctum_topple_brazier": "火鉢倒し",
       "trash_demo_nova": "テストノヴァ",
       "trash_demo_nova_unstoppable": "テストノヴァ",
@@ -26320,6 +26536,51 @@ export const ja_JP: EnTranslations = {
       "sanctum_shackle_bellows": {
         "name": "ふいごの枷"
       },
+      "heart_hammer_warder": {
+        "name": "槌脈の番人"
+      },
+      "heart_ring_warder": {
+        "name": "環炉の番人"
+      },
+      "heart_breath_warder": {
+        "name": "息吹脈の番人"
+      },
+      "heart_breath_caller": {
+        "name": "息吹脈の呼び手"
+      },
+      "heart_quench_warder": {
+        "name": "焼き入れ脈の番人"
+      },
+      "heart_quench_caller": {
+        "name": "焼き入れ脈の呼び手"
+      },
+      "heart_heat_warder": {
+        "name": "熱脈の番人"
+      },
+      "heart_heat_caller": {
+        "name": "熱脈の呼び手"
+      },
+      "heart_hammer_guardian": {
+        "name": "槌の守護者"
+      },
+      "heart_slabwright": {
+        "name": "石板の匠"
+      },
+      "heart_seam_singer": {
+        "name": "鉱脈の歌い手"
+      },
+      "heart_breath_guardian": {
+        "name": "息吹の守護者"
+      },
+      "heart_quench_guardian": {
+        "name": "焼き入れの守護者"
+      },
+      "heart_heat_guardian": {
+        "name": "熱の守護者"
+      },
+      "heart_masterless_strength": {
+        "name": "主なき剛力"
+      },
       "thorn_sprout": {
         "name": "茨の芽"
       },
@@ -26735,6 +26996,11 @@ export const ja_JP: EnTranslations = {
         "name": "隊長テサリー",
         "title": "ハイウォッチ隊長",
         "greeting": "この壁は二百年立ち続けています、{className}。私が守る限り崩れませんが、悲鳴を上げています。"
+      },
+      "heart_captain_thessaly": {
+        "name": "隊長テサリー",
+        "title": "ハイウォッチ隊長",
+        "greeting": "足を踏ん張れ、{className}。ふいごが息をしたら、私の凪の中へ入り、風を我らで受け止めろ。"
       },
       "brother_aldric_highwatch": {
         "name": "アルドリック修道士",
@@ -30142,6 +30408,11 @@ export const ja_JP: EnTranslations = {
         "name": "墓ワームの聖所",
         "enterText": "空気が冷たくなります。下で巨大な何かが息をしています...",
         "leaveText": "山風の中へよろめき戻ります。"
+      },
+      "smith_heart": {
+        "name": "鍛冶師の心臓",
+        "enterText": "山があなたを包んで唸る。夜のために火を落とした炉のように……",
+        "leaveText": "ストームクラッグの風の中へと登って戻る。"
       },
       "nythraxis_crypt": {
         "name": "放棄された地下墓所",

@@ -52,18 +52,86 @@ export function interiorReach(r: number): number {
   return r * Math.SQRT2 + 1e-3;
 }
 
+/** What the reads need of a lookup (a Map, or an overlay over a base's). */
+interface Lookup<K, V> {
+  get(key: K): V | undefined;
+}
+
 interface InteriorCellIndex {
   /** The list length at build time: a list grown in place re-indexes. */
   len: number;
-  cells: Map<number, Collider[]>;
+  cells: Lookup<number, Collider[]>;
   /** Ring reads, keyed cellKey * 4 + ring. */
   rings: Map<number, Collider[]>;
-  order: Map<Collider, number>;
+  order: Lookup<Collider, number>;
+}
+
+/** A lookup that answers from its own entries first, then its base's: an
+ *  appended list's index shares every cell its tail never touches. */
+class Overlay<K, V> implements Lookup<K, V> {
+  constructor(
+    private readonly base: Lookup<K, V>,
+    private readonly own: Map<K, V>,
+  ) {}
+  get(key: K): V | undefined {
+    return this.own.get(key) ?? this.base.get(key);
+  }
 }
 
 const EMPTY: Collider[] = [];
 const indexes = new WeakMap<readonly Collider[], InteriorCellIndex>();
+/** Lists published as `base.concat(tail)` (a slot's live combat walls over
+ *  its interior: instances/combat_wall_state.ts): their index is the base's
+ *  plus the tail's cells, never a rebuild of the whole field. */
+const appended = new WeakMap<readonly Collider[], readonly Collider[]>();
 let indexEnabled = true;
+
+/**
+ * Declare that `list` is `base` followed by a short tail (`list =
+ * base.concat(tail)`, both never mutated in place: the module's contract).
+ * Its index then reuses the base's cells and files only the tail: a wall that
+ * walks (the mythic Walking Slab) re-indexes a few cells, not the room's
+ * thousands. Exact: every cell keeps the input order (the tail comes last).
+ */
+export function noteAppendedColliders(list: readonly Collider[], base: readonly Collider[]): void {
+  if (list.length >= base.length) appended.set(list, base);
+}
+
+/** Every cell a collider's AABB (grown by the margin) touches. */
+function fileCollider(c: Collider, into: (key: number) => void): void {
+  const b = colliderBounds(c);
+  const x0 = Math.floor((b.minX - INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
+  const x1 = Math.floor((b.maxX + INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
+  const z0 = Math.floor((b.minZ - INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
+  const z1 = Math.floor((b.maxZ + INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
+  for (let gx = x0; gx <= x1; gx++) for (let gz = z0; gz <= z1; gz++) into(cellKey(gx, gz));
+}
+
+/** An appended list's index: the base's, with the tail filed over it. */
+function appendedIndex(list: readonly Collider[], base: readonly Collider[]): InteriorCellIndex {
+  const under = indexFor(base);
+  const cells = new Map<number, Collider[]>();
+  const order = new Map<Collider, number>();
+  for (let i = base.length; i < list.length; i++) {
+    const c = list[i];
+    order.set(c, i);
+    fileCollider(c, (key) => {
+      let cell = cells.get(key);
+      if (!cell) {
+        // The base's cell, copied once (never written in place), then the tail.
+        cell = (under.cells.get(key) ?? EMPTY).slice();
+        cells.set(key, cell);
+      }
+      cell.push(c);
+    });
+  }
+  return {
+    len: list.length,
+    cells: new Overlay(under.cells, cells),
+    rings: new Map(),
+    order: new Overlay(under.order, order),
+  };
+}
 
 /** Test seam: false makes every read return the full list (the pre-index
  *  scan), which is what the equivalence suite compares against. */
@@ -74,24 +142,22 @@ export function setInteriorCellIndexEnabled(on: boolean): void {
 function indexFor(list: readonly Collider[]): InteriorCellIndex {
   let index = indexes.get(list);
   if (index && index.len === list.length) return index;
+  const base = appended.get(list);
+  if (base && base !== list && base.length <= list.length) {
+    index = appendedIndex(list, base);
+    indexes.set(list, index);
+    return index;
+  }
   const cells = new Map<number, Collider[]>();
   const order = new Map<Collider, number>();
   for (let i = 0; i < list.length; i++) {
     const c = list[i];
     order.set(c, i);
-    const b = colliderBounds(c);
-    const x0 = Math.floor((b.minX - INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
-    const x1 = Math.floor((b.maxX + INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
-    const z0 = Math.floor((b.minZ - INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
-    const z1 = Math.floor((b.maxZ + INTERIOR_CELL_MARGIN) / INTERIOR_CELL);
-    for (let gx = x0; gx <= x1; gx++) {
-      for (let gz = z0; gz <= z1; gz++) {
-        const key = cellKey(gx, gz);
-        const cell = cells.get(key);
-        if (cell) cell.push(c);
-        else cells.set(key, [c]);
-      }
-    }
+    fileCollider(c, (key) => {
+      const cell = cells.get(key);
+      if (cell) cell.push(c);
+      else cells.set(key, [c]);
+    });
   }
   index = { len: list.length, cells, rings: new Map(), order };
   indexes.set(list, index);

@@ -801,6 +801,40 @@ const mergeStringsEn = {
       sanctum_counterweight_lash: 'Counterweight Lash',
       sanctum_branding_iron: 'Branding Iron',
       sanctum_rime_breath: 'Rime Breath',
+      // The Smith's Heart raid blockout's sketch kits (content/smith_heart.ts).
+      // None of these bars can be kicked.
+      heart_mountains_wrath: "Mountain's Wrath",
+      heart_bellows_gust: 'Bellows Gust',
+      heart_storm_lance: 'Storm Lance',
+      heart_quenching_breath: 'Quenching Breath',
+      heart_molten_pour: 'Molten Pour',
+      heart_anvil_clang: 'Searing Knell',
+      heart_forge_wrath: 'Forge Wrath',
+      heart_forge_pour: 'Forge Pour',
+      heart_gale_bolt: 'Gale Bolt',
+      heart_rime_bolt: 'Rime Bolt',
+      heart_ember_bolt: 'Ember Bolt',
+      // The Hammer Council (encounters/smith_heart/council_ids.ts COUNCIL_CASTS).
+      // Seam Bolt and Song of the Seam can be kicked; an heir's song cannot.
+      heart_hammers_weight: "Hammer's Weight",
+      heart_wake_the_stone: 'Wake the Stone',
+      heart_falling_rock: 'Falling Rock',
+      heart_seam_bolt: 'Seam Bolt',
+      heart_song_of_the_seam: 'Song of the Seam',
+      heart_song_of_the_seam_unbroken: 'Song of the Seam',
+      // Mythic: a soul pillar's own bars (council_soul.ts), never kicked.
+      heart_echo_of_wrath: 'Echo of Wrath',
+      heart_endless_song: 'Endless Song',
+      // The Guardian of the Breath's bars (encounters/smith_heart/breath_ids.ts).
+      heart_breath_inhale: 'Indrawn Breath',
+      heart_breath_storm_break: 'The Storm Breaks',
+      heart_breath_forking_bolt: 'Leaping Bolt',
+      heart_breath_thunders_cradle: "Thunder's Cradle",
+      heart_breath_drawn_lightning: 'Drawn Lightning',
+      // The Guardian of the Quench's awakening (encounters/smith_heart/quench_ids.ts).
+      heart_quench_blades_wake: 'The Blades Wake',
+      // The Guardian of the Heat's Shed Heat (encounters/smith_heart/heat_ids.ts).
+      heart_heat_shed: 'Shed Heat',
       // The player's own bar while kicking a Soul Brazier over (the trash
       // engine's G3 use, trash_kit/encounter_use.ts).
       kituse_sanctum_topple_brazier: 'Topple Brazier',

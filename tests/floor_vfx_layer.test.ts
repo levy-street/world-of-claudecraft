@@ -382,6 +382,21 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/gravewyrm_sanctum/sanctum_lights.ts', layer: 'ground', strict: true },
   { file: 'src/render/gravewyrm_sanctum/sanctum_vault.ts', layer: 'ground', strict: true },
   { file: 'src/render/gravewyrm_sanctum/sanctum_works.ts', layer: 'ground', strict: true },
+  // The Smith's Heart's floor light-rivers and the heart seal's inlay: the
+  // floor's own marks, under every telegraph.
+  { file: 'src/render/smith_heart/heart_rivers.ts', layer: 'ground', strict: true },
+  { file: 'src/render/smith_heart/heart_seal.ts', layer: 'ground', strict: true },
+  // The seal's portal (its floor vortex and shockwave rings, the hop's floor
+  // ring) and the Heart's rune rings: floor marks under every telegraph.
+  { file: 'src/render/smith_heart/heart_portal.ts', layer: 'ground', strict: true },
+  { file: 'src/render/smith_heart/heart_room.ts', layer: 'ground', strict: true },
+  // The Guardian of the Quench's fight on the ice: its floor discs ride the
+  // encounter band; the provisional body's blocks and collars keep the default
+  // order 0 on purpose (scene objects, never floor marks), so not strict.
+  { file: 'src/render/smith_heart_fx/quench_fight_fx.ts', layer: 'encounter', strict: false },
+  // The Guardian of the Heat's fight in the Hearth: the same split, its burn
+  // sheaths ride the bodies at the default order 0.
+  { file: 'src/render/smith_heart_fx/heat_fight_fx.ts', layer: 'encounter', strict: false },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];

@@ -22477,6 +22477,256 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
   'apiError.character.referral_bond_pending':
     '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
+  // The Smith's Heart raid: its name, guardians, vein warders and casts (M16 fills).
+  'entities.dungeons.smith_heart.name': '鍛冶師の心臓',
+  'entities.dungeons.smith_heart.enterText':
+    '山があなたを包んで唸る。夜のために火を落とした炉のように……',
+  'entities.dungeons.smith_heart.leaveText': 'ストームクラッグの風の中へと登って戻る。',
+  'entities.mobs.heart_hammer_guardian.name': '槌の守護者',
+  'entities.mobs.heart_breath_guardian.name': '息吹の守護者',
+  'entities.mobs.heart_quench_guardian.name': '焼き入れの守護者',
+  'entities.mobs.heart_heat_guardian.name': '熱の守護者',
+  'entities.mobs.heart_masterless_strength.name': '主なき剛力',
+  'entities.mobs.heart_hammer_warder.name': '槌脈の番人',
+  'entities.mobs.heart_ring_warder.name': '環炉の番人',
+  'entities.mobs.heart_breath_warder.name': '息吹脈の番人',
+  'entities.mobs.heart_breath_caller.name': '息吹脈の呼び手',
+  'entities.mobs.heart_quench_warder.name': '焼き入れ脈の番人',
+  'entities.mobs.heart_quench_caller.name': '焼き入れ脈の呼び手',
+  'entities.mobs.heart_heat_warder.name': '熱脈の番人',
+  'entities.mobs.heart_heat_caller.name': '熱脈の呼び手',
+  'abilityUi.cast.heart_mountains_wrath': '山の怒り',
+  'abilityUi.cast.heart_bellows_gust': 'ふいごの突風',
+  'abilityUi.cast.heart_storm_lance': '嵐の槍',
+  'abilityUi.cast.heart_quenching_breath': '焼き入れの息吹',
+  'abilityUi.cast.heart_molten_pour': '溶鉄の注ぎ',
+  'abilityUi.cast.heart_anvil_clang': '灼熱の弔鐘',
+  'abilityUi.cast.heart_forge_wrath': '炉の怒り',
+  'abilityUi.cast.heart_forge_pour': '炉の注ぎ',
+  'abilityUi.cast.heart_ember_bolt': '残り火の矢',
+  // The Smith's Heart's Hammer Council (M16 fills).
+  'entities.mobs.heart_slabwright.name': '石板の匠',
+  'entities.mobs.heart_seam_singer.name': '鉱脈の歌い手',
+  'abilityUi.cast.heart_hammers_weight': '槌の重み',
+  'abilityUi.cast.heart_wake_the_stone': '石の目覚め',
+  'abilityUi.cast.heart_falling_rock': '落石',
+  'abilityUi.cast.heart_seam_bolt': '鉱脈の矢',
+  'abilityUi.cast.heart_song_of_the_seam': '鉱脈の歌',
+  'abilityUi.cast.heart_song_of_the_seam_unbroken': '鉱脈の歌',
+  'hudChrome.council.warn.wrath': '山の怒り！柱の陰に隠れろ！',
+  'hudChrome.council.warn.enrage': '山の怒りが速まった！山の怒りがずっと早く来る。',
+  'hudChrome.council.warn.weight': '{player}に槌の重み：タンク交代！',
+  'hudChrome.council.warn.wake':
+    '石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。',
+  'hudChrome.council.warn.wakeHeir': '{players}の足元で石が目覚める：動け！',
+  'hudChrome.council.warn.rock': '{player}に落石！遮蔽物から離れて一緒に受けろ！',
+  'hudChrome.council.warn.song': '鉱脈の歌！詠唱を止めろ！',
+  'hudChrome.council.warn.resonance': '{players}に共鳴：一番傷んだ柱を割れ、無傷の柱には近づくな！',
+  'hudChrome.council.warn.fell_guardian': '槌の守護者が倒れた。その怒りは残された石へと移る！',
+  'hudChrome.council.warn.fell_slabwright':
+    '石板の匠が倒れた。これからは石が好きな場所にせり上がる！',
+  'hudChrome.council.warn.fell_singer':
+    '鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！',
+  'hudChrome.council.alert.wakeTitle': '石の目覚め！',
+  'hudChrome.council.alert.wakeLine':
+    '立っている場所に柱がせり上がる：レイドが必要な場所に遮蔽物を置こう',
+  'hudChrome.council.alert.rockTitle': '落石！',
+  'hudChrome.council.alert.rockLine': '柱から離れ、少なくとも3人の味方を集めよう',
+  'hudChrome.council.alert.resonanceTitle': '共鳴',
+  'hudChrome.council.alert.resonanceLine':
+    '柱の近くにいると割ってしまう：一番傷んだ柱のそばで待とう',
+  'hudChrome.council.alert.resonanceCracking': '柱を割っている：守るなら離れよう',
+  'hudChrome.council.alert.weightTitle': '槌の重み',
+  'hudChrome.council.alert.weightLine':
+    '物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう',
+  'hudChrome.council.alert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.council.wakeMark':
+    '効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：ダメージ{heroic}%増加。',
+  'hudChrome.auraEffect.council.rockMark':
+    '効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。',
+  'hudChrome.auraEffect.council.resonance':
+    '柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。',
+  'hudChrome.auraEffect.council.memory':
+    '与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。',
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': '怒りの残響',
+  'abilityUi.cast.heart_endless_song': '終わらぬ歌',
+  'hudChrome.council.warn.soul_guardian':
+    '守護者の魂が石に宿った！その柱から怒りの残響が放たれる。',
+  'hudChrome.council.warn.soul_slabwright':
+    '石板の匠の魂が石に宿った！歩む石板が君たちを追って這い寄る。',
+  'hudChrome.council.warn.soul_singer':
+    '鉱脈の歌い手の魂が石に宿った！終わらぬ歌は脈打つたびに強まる。',
+  'hudChrome.council.warn.echo': '怒りの残響！魂の柱との間に別の柱を挟め！',
+  'hudChrome.council.warn.soulBreak_guardian': '守護者の魂の柱が砕けた！残響が静まる。',
+  'hudChrome.council.warn.soulBreak_slabwright': '石板の匠の魂の柱が砕けた！歩む石板が止まる。',
+  'hudChrome.council.warn.soulBreak_singer': '鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。',
+  'hudChrome.council.alert.rockLineSoul':
+    '遮蔽物から離れ、魂の柱のそばで少なくとも3人の味方を集めよう',
+  'hudChrome.council.alert.resonanceLineSoul':
+    '魂の柱のそばで待って魂の印を砕こう、無傷の柱には近づかないこと',
+  'hudChrome.council.alert.resonanceBreaking': '魂の印を砕いている：魂の柱のそばにとどまろう',
+  'hudChrome.council.say.guardian_pull': '採石場によそ者か。槌の力は肉などに屈しはせぬ。',
+  'hudChrome.council.say.guardian_wrath': '山が我に応える！石が匿ってくれるなら隠れるがいい！',
+  'hudChrome.council.say.guardian_death': '我が力を……石に託す。',
+  'hudChrome.council.say.guardian_remember': '石は覚えている。あの者のものは、今や我がものだ。',
+  'hudChrome.council.say.guardian_soul': '我はもはや石そのもの。我が怒りには、朽ちる体などない。',
+  'hudChrome.council.say.guardian_wipe': '塵だ。肉はすべてそうなる。',
+  'hudChrome.council.say.guardian_defeat': '槌の力は……お前たちが担え。',
+  'hudChrome.council.say.slabwright_pull':
+    '壁に石が足りん。じっとしていろ、お前たちを積み込んでやる。',
+  'hudChrome.council.say.slabwright_wake': 'そこに立て。お前の足元から石がせり上がる！',
+  'hudChrome.council.say.slabwright_rock': '上を見ろ、ちびども！山が落ちてくるぞ！',
+  'hudChrome.council.say.slabwright_death': '石板が……割れる……',
+  'hudChrome.council.say.slabwright_remember': '石は覚えている。仕事は俺が仕上げる。',
+  'hudChrome.council.say.slabwright_soul':
+    '手はもうない。だがこの石をお前たちのもとへ引きずっていくぞ。',
+  'hudChrome.council.say.slabwright_wipe': '据えて、埋めた。いい仕事だ。',
+  'hudChrome.council.say.slabwright_defeat': '採石場が……静まる。',
+  'hudChrome.council.say.singer_pull': '鉱脈の歌が聞こえる？ずっとあなたたちの声を待っていたの。',
+  'hudChrome.council.say.singer_song': '一緒に歌って、そして砕けなさい！',
+  'hudChrome.council.say.singer_death': '私の歌が……岩へと流れていく……',
+  'hudChrome.council.say.singer_remember': '石は覚えている。聞いて、まだ歌っている。',
+  'hudChrome.council.say.singer_soul': '聞いて。石の中で、私の歌は終わらない。',
+  'hudChrome.council.say.singer_wipe': '静かに。鉱脈は眠ったわ。',
+  'hudChrome.council.say.singer_defeat': '最後の音が……消えていく。',
+  // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.warn.inhale': '守護者が息を吸い込む！口の前の渦に入るな！',
+  'hudChrome.breathGuardian.warn.gust': 'ふいごの突風！衝撃に備えろ！',
+  'hudChrome.breathGuardian.warn.gales': 'はぐれ旋風が岩棚を駆け巡る！近づくな！',
+  'hudChrome.breathGuardian.warn.circle': 'テサリー隊長が凪の円を置いた！入れるのは{seats}人まで。',
+  'hudChrome.breathGuardian.warn.fell': '{player}が虚空へ吹き飛ばされた！',
+  'hudChrome.breathGuardian.warn.storm': '嵐が裂ける！岩棚じゅうに雷が落ちてくる！',
+  'hudChrome.breathGuardian.warn.fork': '{player}に跳ねる雷撃！散開しろ！',
+  'hudChrome.breathGuardian.warn.cradle': '{player}が嵐の中へ持ち上げられた！その真下に集まれ！',
+  'hudChrome.breathGuardian.warn.drawn': '{player}に招雷！落雷を縁へ導け！',
+  'hudChrome.breathGuardian.warn.stormGust': '嵐の突風が集まる！風に備えろ！',
+  'hudChrome.breathGuardian.say.guardian_pull':
+    '山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。',
+  'hudChrome.breathGuardian.say.guardian_blow': '風が向きを変えるのを感じよ。縁は思うより近いぞ。',
+  'hudChrome.breathGuardian.say.guardian_inhale': '近う寄れ。皆、残らず。',
+  'hudChrome.breathGuardian.say.guardian_storm': '息はもう十分だ。今こそ嵐を！',
+  'hudChrome.breathGuardian.say.guardian_cradle':
+    '昇れ、小さき者よ。仲間に受け止めてもらうがいい。',
+  'hudChrome.breathGuardian.say.guardian_drawn': '空がお前を選んだ。逃げよ、雷は追ってくる。',
+  'hudChrome.breathGuardian.say.guardian_wipe': '吹き飛ばされた。頂の塵のように。',
+  'hudChrome.breathGuardian.say.guardian_death': '息吹は……山へ……還る……',
+  'hudChrome.breathGuardian.say.thessaly_pull':
+    'ハイウォッチは共に戦う！壁の裂け目に気をつけろ、風に押し出されるぞ！',
+  'hudChrome.breathGuardian.say.thessaly_circle_a': '急げ、私の凪の中へ！入れるのは三人までだ！',
+  'hudChrome.breathGuardian.say.thessaly_circle_b': 'ここだ！私と並べ、風をこの身で受け止める！',
+  'hudChrome.breathGuardian.say.thessaly_circle_c': '石の上に凪を！三人、今すぐ！',
+  'hudChrome.breathGuardian.say.thessaly_inhale': '奴が息を吸っている！口の前ではなく横へ回れ！',
+  'hudChrome.breathGuardian.say.thessaly_storm': '嵐が裂ける！私の凪ではもう持たない。散開しろ！',
+  'hudChrome.breathGuardian.say.thessaly_fall': '石にしがみつけ！',
+  'hudChrome.breathGuardian.say.thessaly_victory':
+    '息吹は解き放たれた。ハイウォッチはこの登攀を忘れない。',
+  'hudChrome.breathGuardian.say.thessaly_wipe': '下がって息を整えろ。もう一度行くぞ。',
+  'hudChrome.auraEffect.breathGuardian.wind':
+    '息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。',
+  'hudChrome.auraEffect.breathGuardian.draw':
+    '守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、ふいごの突風が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、{throw}ヤード外へ吹き飛ばす。',
+  'hudChrome.auraEffect.breathGuardian.pinned':
+    '風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。',
+  'hudChrome.auraEffect.breathGuardian.anchor':
+    'テサリー隊長の凪があなたを支えている：風も吸引も爆風も吹き飛ばしも、あなたを動かせない。ダメージは受ける。',
+  'hudChrome.auraEffect.breathGuardian.spent':
+    '錨の効果が切れた：これが消えるまで、テサリー隊長の凪の円はあなたを再び支えられない。',
+  'hudChrome.auraEffect.breathGuardian.drawn':
+    '{every}秒ごとに足元へ雷が落ちる：{warn}秒後、{radius}ヤード以内の全員に{min}から{max}のダメージを与え、{charged}秒間毎秒{cmin}から{cmax}のダメージを与える帯電した地面を残す。動き続け、落雷を味方から離れた縁へ導こう。',
+  'hudChrome.auraEffect.breathGuardian.cradled':
+    '嵐の中へ持ち上げられ、{hold}秒間拘束される。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満（ヒロイックでは{heroicSoakers}人）だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。',
+  'hudChrome.auraEffect.breathGuardian.stormForm':
+    '裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。',
+  'hudChrome.auraEffect.breathGuardian.swell':
+    '{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。',
+  'abilityUi.cast.heart_breath_inhale': '吸い込む息',
+  'abilityUi.cast.heart_breath_storm_break': '嵐の決壊',
+  'abilityUi.cast.heart_breath_forking_bolt': '跳ねる雷撃',
+  'abilityUi.cast.heart_breath_thunders_cradle': '雷のゆりかご',
+  'abilityUi.cast.heart_breath_drawn_lightning': '招雷',
+  'entities.npcs.heart_captain_thessaly.name': '隊長テサリー',
+  'entities.npcs.heart_captain_thessaly.title': 'ハイウォッチ隊長',
+  'entities.npcs.heart_captain_thessaly.greeting':
+    '足を踏ん張れ、{className}。ふいごが息をしたら、私の凪の中へ入り、風を我らで受け止めろ。',
+  // The Smith's Heart's Guardian of the Quench (M16 fills).
+  'hudChrome.quenchGuardian.warn.rim': '岸の氷がせり上がる！湖の上へ移れ！',
+  'hudChrome.quenchGuardian.warn.frozen': '{player}が凍りついた！氷が砕ける前に離れろ！',
+  'hudChrome.quenchGuardian.warn.crack': '固まった集団の下で氷がきしむ！散らばれ！',
+  'hudChrome.quenchGuardian.warn.wake':
+    '鍛冶師の剣が湖から引き抜かれた！打ち込まれる時は剣の陰に立て！',
+  'hudChrome.quenchGuardian.warn.cross': '二本の剣が湖を横切る！その進路から離れろ！',
+  'hudChrome.quenchGuardian.say.pull': '我が湖に温かい血か。その温もりも長くは続かぬ。',
+  'hudChrome.quenchGuardian.say.shatter': '芯まで凍った。さあ、砕けよ。',
+  'hudChrome.quenchGuardian.say.hole': '氷はすべての足音を覚えている。寄り集まれば、崩れる。',
+  'hudChrome.quenchGuardian.say.wake': '鍛冶師の剣よ、目覚めよ！我が一撃のすべてに応えよ！',
+  'hudChrome.quenchGuardian.say.echo': '我が打つものは、剣もまた打つ。',
+  'hudChrome.quenchGuardian.say.cross': '交われ、剣よ！奴らに新たな岸を刻め！',
+  'hudChrome.quenchGuardian.say.deepen': '感じるか？冷気がさらに深くなっていく。',
+  'hudChrome.quenchGuardian.say.wipe': '静まり、黙し、焼き入れられた。',
+  'hudChrome.quenchGuardian.say.death': '冷気が……離れていく……焼き入れはお前たちのものだ。',
+  'hudChrome.auraEffect.quenchGuardian.cold':
+    'あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。',
+  'hudChrome.auraEffect.quenchGuardian.warmth':
+    'レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。',
+  'hudChrome.auraEffect.quenchGuardian.frozen':
+    '霜に閉ざされている：行動できない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受けて霜脆化状態になり、{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。',
+  'hudChrome.auraEffect.quenchGuardian.brittle': 'あらゆる攻撃から受けるダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.quenchGuardian.trapped':
+    '氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。',
+  'hudChrome.auraEffect.quenchGuardian.awake':
+    '鍛冶師の四本の剣が目覚めている。焼き入れの吐息と焼き戻しの一撃が決まるたび、{delay}秒後（体力{lowPct}%未満では{low}秒後）に、すべての剣が浮かぶ場所から同じ向きでそれを繰り返す。剣の陰、攻撃と反対側は常に安全だ。',
+  'hudChrome.auraEffect.quenchGuardian.deepening':
+    '湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。',
+  'abilityUi.cast.heart_quench_blades_wake': '剣の目覚め',
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': '冷気',
+  'hudChrome.quenchAlert.freezingTitle': '凍えている！',
+  'hudChrome.quenchAlert.warmTitle': '身を寄せた温もり',
+  'hudChrome.quenchAlert.frozenTitle': '霜に閉ざされた！',
+  'hudChrome.quenchAlert.waterTitle': '氷の下！',
+  'hudChrome.quenchAlert.coldLine': '{radius}ヤード以内で他の{others}人以上と身を寄せて温まろう',
+  'hudChrome.quenchAlert.warmLine':
+    '冷気が下がっている。{seconds}秒以内に集団ごと移動しないと氷が割れる',
+  'hudChrome.quenchAlert.frozenLine': '{seconds}秒後に氷が砕ける：近くの者は離れろ',
+  'hudChrome.quenchAlert.waterLine': '{seconds}秒後に這い上がる',
+  'hudChrome.quenchAlert.coldBar': '冷気 {cold} / {max}',
+  'hudChrome.quenchAlert.coldAria': '冷気 {max}中{cold}',
+  'hudChrome.quenchAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.heatGuardian.warn.crystals': '燃え立つ結晶が現れた！その光線を浴びて炉床を冷ませ！',
+  'hudChrome.heatGuardian.warn.channel': '炉床があふれる！流路が床を二つに分けるぞ！',
+  'hudChrome.heatGuardian.warn.windup': '炉床が過熱寸前だ！結晶で冷ますか、身構えろ！',
+  'hudChrome.heatGuardian.warn.overheat': '炉床が過熱した！',
+  'hudChrome.heatGuardian.say.pull':
+    'お前たちは最初の炎へ踏み込んだ。何ものも変わらずには出られぬ。',
+  'hudChrome.heatGuardian.say.shed': '我が熱を受け取れ、抱えきれるものならな。',
+  'hudChrome.heatGuardian.say.channel': '炉床があふれる。どちら側に立つか選べ。',
+  'hudChrome.heatGuardian.say.windup': '一つの体には多すぎる炎だ……どこかへ向かわねばならぬ！',
+  'hudChrome.heatGuardian.say.overheat': '我と共に燃えよ！',
+  'hudChrome.heatGuardian.say.stoke': 'お前たちの吐く息のすべてが炎を育てる。',
+  'hudChrome.heatGuardian.say.wipe': '灰だ、一人残らず。炉床は燃え続ける。',
+  'hudChrome.heatGuardian.say.death': '炎が……石の中へ……沈んでいく。大切に運べ。',
+  'hudChrome.auraEffect.heatGuardian.heat':
+    '炉床の熱：{max}中{heat}。毎秒{rise}ずつ自然に上がる。{every}秒ごとに炉床の脈動が炉床の床にいる全員に{min}～{most}の火炎ダメージを与え（この熱の場合）、熱いほど強くなる。プレイヤーが燃え立つ光線を1本受けるごとに{cool}下がり、{range}ヤード以内に誰もいない光線は守護者に戻り{back}上がる。{max}で炉床は過熱する。',
+  'hudChrome.auraEffect.heatGuardian.burn':
+    '受ける火炎・冷気・自然・闇・秘術ダメージが{pct}%増加：スタック{stacks}個それぞれ{per}%、最大{most}個。燃え立つ光線を受けるたびに1スタック増え、最後の変化から{decay}秒後に1スタック消える（ヒロイックでは{heroicDecay}秒）。',
+  'hudChrome.auraEffect.heatGuardian.stoked':
+    '炉床の熱の上昇が{total}%速くなっている：戦闘中{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。',
+  'hudChrome.auraEffect.heatGuardian.overheating':
+    '熱が{at}に達した。{max}で炉床は過熱し、炉床爆発が床にいる全員に{min}～{most}の火炎ダメージを与える（ヒロイックでは{heroicMin}～{heroicMost}）。その後、熱は{vent}から再び上がる。結晶の光線で冷ますか、身構えよ。',
+  'hudChrome.heatAlert.heatTitle': '炉床が熱くなる',
+  'hudChrome.heatAlert.coolingTitle': '炉床が冷えていく',
+  'hudChrome.heatAlert.burningTitle': '結晶の火傷 x{stacks}',
+  'hudChrome.heatAlert.overheatTitle': '過熱が迫る！',
+  'hudChrome.heatAlert.heatLine':
+    '燃え立つ結晶から{range}ヤード以内に立ち、光線を受けて炉床を冷ませ',
+  'hudChrome.heatAlert.coolingLine':
+    '結晶の光線が炉床を冷ましている：すべての光線に誰かを立たせ続けよ',
+  'hudChrome.heatAlert.burningLine': '受ける呪文ダメージが{pct}%増加：離れて、光線を他の者に任せよ',
+  'hudChrome.heatAlert.overheatLine': '{max}で炉床が全員を焼き尽くす：防御技を使え',
+  'hudChrome.heatAlert.heatBar': '熱 {heat} / {max}',
+  'hudChrome.heatAlert.heatAria': '熱 {max}中{heat}',
+  'abilityUi.cast.heart_heat_shed': '熱を流す',
   'hudChrome.guildHall.title': '燈火の館',
   'hudChrome.guildHall.close': 'ギルドのウィンドウを閉じる',
   'hudChrome.guildHall.tabsLabel': '燈火の館の項目',

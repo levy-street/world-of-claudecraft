@@ -24640,6 +24640,275 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
   'apiError.character.referral_bond_pending':
     'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
+  // The Smith's Heart raid: its name, guardians, vein warders and casts (M16 fills).
+  'entities.dungeons.smith_heart.name': 'Сердце Кузнеца',
+  'entities.dungeons.smith_heart.enterText': 'Гора гудит вокруг вас, словно горн, притушенный на ночь...',
+  'entities.dungeons.smith_heart.leaveText': 'Вы выбираетесь обратно на ветер Грозового Утеса.',
+  'entities.mobs.heart_hammer_guardian.name': 'Страж Молота',
+  'entities.mobs.heart_breath_guardian.name': 'Страж Дыхания',
+  'entities.mobs.heart_quench_guardian.name': 'Страж Закалки',
+  'entities.mobs.heart_heat_guardian.name': 'Страж Жара',
+  'entities.mobs.heart_masterless_strength.name': 'Сила без хозяина',
+  'entities.mobs.heart_hammer_warder.name': 'Хранитель Жилы Молота',
+  'entities.mobs.heart_ring_warder.name': 'Хранитель Кольцевого Горна',
+  'entities.mobs.heart_breath_warder.name': 'Хранитель Жилы Дыхания',
+  'entities.mobs.heart_breath_caller.name': 'Призыватель Жилы Дыхания',
+  'entities.mobs.heart_quench_warder.name': 'Хранитель Жилы Закалки',
+  'entities.mobs.heart_quench_caller.name': 'Призыватель Жилы Закалки',
+  'entities.mobs.heart_heat_warder.name': 'Хранитель Жилы Жара',
+  'entities.mobs.heart_heat_caller.name': 'Призыватель Жилы Жара',
+  'abilityUi.cast.heart_mountains_wrath': 'Гнев горы',
+  'abilityUi.cast.heart_bellows_gust': 'Порыв мехов',
+  'abilityUi.cast.heart_storm_lance': 'Грозовое копьё',
+  'abilityUi.cast.heart_quenching_breath': 'Дыхание закалки',
+  'abilityUi.cast.heart_molten_pour': 'Литьё расплава',
+  'abilityUi.cast.heart_anvil_clang': 'Палящий звон',
+  'abilityUi.cast.heart_forge_wrath': 'Гнев горна',
+  'abilityUi.cast.heart_forge_pour': 'Литьё горна',
+  'abilityUi.cast.heart_ember_bolt': 'Угольная стрела',
+  // The Smith's Heart's Hammer Council (M16 fills).
+  'entities.mobs.heart_slabwright.name': 'Плитотёс',
+  'entities.mobs.heart_seam_singer.name': 'Певец Жилы',
+  'abilityUi.cast.heart_hammers_weight': 'Тяжесть Молота',
+  'abilityUi.cast.heart_wake_the_stone': 'Пробуждение камня',
+  'abilityUi.cast.heart_falling_rock': 'Камнепад',
+  'abilityUi.cast.heart_seam_bolt': 'Стрела жилы',
+  'abilityUi.cast.heart_song_of_the_seam': 'Песнь жилы',
+  'abilityUi.cast.heart_song_of_the_seam_unbroken': 'Песнь жилы',
+  'hudChrome.council.warn.wrath': 'Гнев горы! Спрячьтесь за колонной!',
+  'hudChrome.council.warn.enrage': 'Гнев горы нарастает! Теперь Гнев горы приходит гораздо чаще.',
+  'hudChrome.council.warn.weight': 'Тяжесть Молота на {player}: смена танков!',
+  'hudChrome.council.warn.wake':
+    'Пробуждение камня: колонны поднимутся под {players}! Встаньте там, где нужно укрытие.',
+  'hudChrome.council.warn.wakeHeir': 'Камень просыпается под {players}: двигайтесь!',
+  'hudChrome.council.warn.rock': 'Камнепад на {player}! Разделите удар, подальше от укрытий!',
+  'hudChrome.council.warn.song': 'Песнь жилы! Прервите её!',
+  'hudChrome.council.warn.resonance':
+    'Резонанс на {players}: раскалывайте самую повреждённую колонну, держитесь подальше от целых!',
+  'hudChrome.council.warn.fell_guardian':
+    'Страж Молота пал. Его гнев переходит в оставшийся камень!',
+  'hudChrome.council.warn.fell_slabwright': 'Плитотёс пал. Теперь камень поднимается где захочет!',
+  'hudChrome.council.warn.fell_singer':
+    'Певец Жилы пал. Его песнь продолжается, и теперь её не остановить!',
+  'hudChrome.council.alert.wakeTitle': 'Пробуждение камня!',
+  'hudChrome.council.alert.wakeLine':
+    'Колонна поднимется там, где вы стоите: поставьте укрытие туда, где оно нужно рейду',
+  'hudChrome.council.alert.rockTitle': 'Камнепад!',
+  'hudChrome.council.alert.rockLine':
+    'Соберите рядом с собой хотя бы трёх союзников, подальше от колонн',
+  'hudChrome.council.alert.resonanceTitle': 'Резонанс',
+  'hudChrome.council.alert.resonanceLine':
+    'Рядом с колонной вы её раскалываете: ждите у самой повреждённой',
+  'hudChrome.council.alert.resonanceCracking':
+    'Вы раскалываете колонну: отойдите, чтобы её сберечь',
+  'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
+  'hudChrome.council.alert.weightLine':
+    'Вы получаете двойной физический урон: другой танк должен забрать Стража',
+  'hudChrome.council.alert.timeAria': 'Осталось {seconds} с',
+  'hudChrome.auraEffect.council.wakeMark':
+    'Когда эффект закончится, из пола под вами вырвется колонна: от {min} до {max} урона всем в пределах {radius} м и отбрасывание. Встаньте там, где рейду нужно укрытие. Героический и мифический режимы: урон выше на {heroic}%.',
+  'hudChrome.auraEffect.council.rockMark':
+    'Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Мифический режим: колонна души в пределах {soulReach} м вместо этого теряет метку души и рушится, когда их не останется. Героический и мифический режимы: урон выше на {heroic}%.',
+  'hudChrome.auraEffect.council.resonance':
+    'Если простоять в пределах {reach} м от колонны {seconds} с подряд, от неё откалывается кусок, и снова каждые {seconds} с, пока вы рядом. Снять нельзя: переждите Гнев горы у самой повреждённой колонны и держитесь подальше от целых. Мифический режим: у колонны души то же ожидание снимает с неё метку души ({singerSeconds} с у колонны Певца Жилы), и без меток она рушится.',
+  'hudChrome.auraEffect.council.memory':
+    'Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота.',
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': 'Эхо гнева',
+  'abilityUi.cast.heart_endless_song': 'Бесконечная песнь',
+  'hudChrome.council.warn.soul_guardian':
+    'Душа Стража вселяется в камень! Эхо гнева ударит из колонны.',
+  'hudChrome.council.warn.soul_slabwright':
+    'Душа Плитотёса вселяется в камень! Шагающая плита ползёт за вами.',
+  'hudChrome.council.warn.soul_singer':
+    'Душа Певца Жилы вселяется в камень! Бесконечная песнь крепнет с каждым ударом.',
+  'hudChrome.council.warn.echo':
+    'Эхо гнева! Встаньте так, чтобы между вами и колонной души была другая колонна!',
+  'hudChrome.council.warn.soulBreak_guardian': 'Колонна души Стража рушится! Его эхо смолкает.',
+  'hudChrome.council.warn.soulBreak_slabwright':
+    'Колонна души Плитотёса рушится! Шагающая плита замирает.',
+  'hudChrome.council.warn.soulBreak_singer':
+    'Колонна души Певца Жилы рушится! Бесконечная песнь смолкает.',
+  'hudChrome.council.alert.rockLineSoul':
+    'Соберите рядом хотя бы трёх союзников, подальше от укрытий и у колонны души',
+  'hudChrome.council.alert.resonanceLineSoul':
+    'Ждите у колонны души, чтобы снять её метки, и не подходите к целым колоннам',
+  'hudChrome.council.alert.resonanceBreaking': 'Вы снимаете метку души: оставайтесь у колонны души',
+  'hudChrome.council.say.guardian_pull':
+    'Чужаки в Каменоломне. Сила Молота не склонится перед плотью.',
+  'hudChrome.council.say.guardian_wrath': 'Гора отвечает мне! Прячьтесь, если камень вас примет!',
+  'hudChrome.council.say.guardian_death': 'Моя сила... я отдаю её камню.',
+  'hudChrome.council.say.guardian_remember': 'Камень помнит. Что было их, теперь моё.',
+  'hudChrome.council.say.guardian_soul':
+    'Теперь я камень. У моего гнева нет тела, что может пасть.',
+  'hudChrome.council.say.guardian_wipe': 'Прах. Как и всякая плоть.',
+  'hudChrome.council.say.guardian_defeat': 'Сила Молота... теперь ваша ноша.',
+  'hudChrome.council.say.slabwright_pull':
+    'Стене нужно больше камня. Не шевелитесь, я вложу вас в неё.',
+  'hudChrome.council.say.slabwright_wake': 'Стой там. Камень встанет там, где ты стоишь!',
+  'hudChrome.council.say.slabwright_rock': 'Гляньте вверх, мелюзга! Гора падает!',
+  'hudChrome.council.say.slabwright_death': 'Плита... раскалывается...',
+  'hudChrome.council.say.slabwright_remember': 'Камень помнит. Я закончу работу.',
+  'hudChrome.council.say.slabwright_soul': 'Рук больше нет, но я дотащу этот камень до вас.',
+  'hudChrome.council.say.slabwright_wipe': 'Уложено и засыпано. Хорошая работа.',
+  'hudChrome.council.say.slabwright_defeat': 'Каменоломня... затихает.',
+  'hudChrome.council.say.singer_pull': 'Слышите, как поёт жила? Она так долго ждала ваших голосов.',
+  'hudChrome.council.say.singer_song': 'Пойте со мной и разбейтесь!',
+  'hudChrome.council.say.singer_death': 'Моя песнь... уходит в скалу...',
+  'hudChrome.council.say.singer_remember': 'Камень помнит. Слушайте, он всё ещё поёт.',
+  'hudChrome.council.say.singer_soul': 'Слушайте. В камне моя песнь не кончается.',
+  'hudChrome.council.say.singer_wipe': 'Тише. Жила умолкла.',
+  'hudChrome.council.say.singer_defeat': 'Последняя нота... тает.',
+  // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.warn.inhale': 'Страж делает вдох! Не стойте в вихре перед его пастью!',
+  'hudChrome.breathGuardian.warn.gust': 'Порыв мехов! Приготовьтесь к удару!',
+  'hudChrome.breathGuardian.warn.gales':
+    'По Карнизу носятся блуждающие вихри! Держитесь от них подальше!',
+  'hudChrome.breathGuardian.warn.circle':
+    'Капитан Тессали ставит круг затишья! В нём поместятся {seats}.',
+  'hudChrome.breathGuardian.warn.fell': '{player} уносит в пустоту!',
+  'hudChrome.breathGuardian.warn.storm': 'Буря разражается! Молнии падают по всему Карнизу!',
+  'hudChrome.breathGuardian.warn.fork': 'Скачущая молния на {player}! Рассредоточьтесь!',
+  'hudChrome.breathGuardian.warn.cradle': '{player} поднят в бурю! Соберитесь под ним!',
+  'hudChrome.breathGuardian.warn.drawn': 'Притянутая молния на {player}! Уводите удары к краю!',
+  'hudChrome.breathGuardian.warn.stormGust': 'Собирается штормовой порыв! Держитесь против ветра!',
+  'hudChrome.breathGuardian.say.guardian_pull':
+    'Вы взобрались на вершину горы, чтобы украсть её дыхание? Тогда дышите вместе со мной.',
+  'hudChrome.breathGuardian.say.guardian_blow':
+    'Чувствуете, как поворачивает ветер? Край ближе, чем вам кажется.',
+  'hudChrome.breathGuardian.say.guardian_inhale': 'Подойдите ближе. Все до единого.',
+  'hudChrome.breathGuardian.say.guardian_storm': 'Довольно дыхания. Теперь буря!',
+  'hudChrome.breathGuardian.say.guardian_cradle': 'Поднимайся, малыш. Пусть они тебя поймают.',
+  'hudChrome.breathGuardian.say.guardian_drawn':
+    'Небо выбрало тебя. Беги, и оно последует за тобой.',
+  'hudChrome.breathGuardian.say.guardian_wipe': 'Сдуты, как пыль с вершины.',
+  'hudChrome.breathGuardian.say.guardian_death': 'Дыхание... возвращается... в гору...',
+  'hudChrome.breathGuardian.say.thessaly_pull':
+    'Хайвотч с вами! Берегитесь проломов в стене: ветер выбросит вас через них!',
+  'hudChrome.breathGuardian.say.thessaly_circle_a':
+    'В моё затишье, быстрее! Оно вмещает троих, не больше!',
+  'hudChrome.breathGuardian.say.thessaly_circle_b':
+    'Сюда! Встаньте со мной, пусть ветер разобьётся о нас!',
+  'hudChrome.breathGuardian.say.thessaly_circle_c': 'Затишье на камне! Трое, немедленно!',
+  'hudChrome.breathGuardian.say.thessaly_inhale':
+    'Он делает вдох! Обходите его с боков, только не перед пастью!',
+  'hudChrome.breathGuardian.say.thessaly_storm':
+    'Буря разражается! Моё затишье этого не выдержит. Рассредоточьтесь!',
+  'hudChrome.breathGuardian.say.thessaly_fall': 'Держитесь за камень!',
+  'hudChrome.breathGuardian.say.thessaly_victory':
+    'Дыхание свободно. Хайвотч не забудет этого восхождения.',
+  'hudChrome.breathGuardian.say.thessaly_wipe': 'Отходим и переводим дух. Попробуем снова.',
+  'hudChrome.auraEffect.breathGuardian.wind':
+    'Ветер Стража Дыхания несёт вас туда, куда дует, со скоростью {speed} ярда в секунду. Идите против него, чтобы устоять: он не прерывает заклинания. Прижатые к стене края, вы получаете от {pinMin} до {pinMax} урона каждую секунду. Там, где стена разрушена, ничто вас не удержит: вы падаете в пустоту.',
+  'hudChrome.auraEffect.breathGuardian.draw':
+    'Страж делает вдох и тянет вас к себе со скоростью {speed} ярда в секунду. Его вихрь наносит от {min} до {max} урона каждые {tick} сек. всем, кто стоит перед его пастью. Затем Порыв мехов наносит от {gustMin} до {gustMax} урона всем на Карнизе и отбрасывает их на {throw} ярдов наружу.',
+  'hudChrome.auraEffect.breathGuardian.pinned':
+    'Ветер прижал вас к стене края: от {min} до {max} урона каждую секунду, пока ветер не стихнет или вы не отойдёте от стены.',
+  'hudChrome.auraEffect.breathGuardian.anchor':
+    'Затишье капитана Тессали держит вас: ни ветер, ни притяжение, ни взрыв, ни отбрасывание не сдвинут вас с места. Урон по-прежнему проходит.',
+  'hudChrome.auraEffect.breathGuardian.spent':
+    'Ваша опора иссякла: пока действует этот эффект, круг затишья капитана Тессали не может снова удержать вас.',
+  'hudChrome.auraEffect.breathGuardian.drawn':
+    'Каждые {every} сек. туда, где вы стоите, бьёт молния: через {warn} сек. она наносит от {min} до {max} урона всем в радиусе {radius} ярдов и оставляет заряженную землю, наносящую от {cmin} до {cmax} урона каждую секунду в течение {charged} сек. Не стойте на месте и уводите удары к краю, подальше от рейда.',
+  'hudChrome.auraEffect.breathGuardian.cradled':
+    'Вас подняли в бурю и держат {hold} сек. Затем разряд наносит {total} урона, поделённого между вами и всеми, кто стоит в радиусе {radius} ярдов под вами. Если делят меньше {soakers} (на героическом уровне {heroicSoakers}), каждый получает на {penalty}% больше, а все на Карнизе получают от {bmin} до {bmax} урона.',
+  'hudChrome.auraEffect.breathGuardian.stormForm':
+    'Разорван и обращён в тело из молний: штормовая половина боя, пока Страж Дыхания не падёт.',
+  'hudChrome.auraEffect.breathGuardian.swell':
+    'Каждые {every} сек. разрастающаяся буря наносит от {min} до {max} урона всем на Карнизе, на {growth}% больше за каждый предыдущий импульс: уже {stacks}.',
+  'abilityUi.cast.heart_breath_inhale': 'Вдох',
+  'abilityUi.cast.heart_breath_storm_break': 'Разрыв бури',
+  'abilityUi.cast.heart_breath_forking_bolt': 'Скачущая молния',
+  'abilityUi.cast.heart_breath_thunders_cradle': 'Колыбель грома',
+  'abilityUi.cast.heart_breath_drawn_lightning': 'Притянутая молния',
+  'entities.npcs.heart_captain_thessaly.name': 'Капитан Тессали',
+  'entities.npcs.heart_captain_thessaly.title': 'Капитан Хайвотча',
+  'entities.npcs.heart_captain_thessaly.greeting':
+    'Держитесь на ногах, {className}. Когда меха вздохнут, вставайте в моё затишье, и пусть ветер разобьётся о нас.',
+  // The Smith's Heart's Guardian of the Quench (M16 fills).
+  'hudChrome.quenchGuardian.warn.rim': 'Береговой лёд вздымается! На озеро!',
+  'hudChrome.quenchGuardian.warn.frozen':
+    '{player} промерзает насквозь! Отойдите, пока лёд не разлетелся!',
+  'hudChrome.quenchGuardian.warn.crack': 'Лёд стонет под толпой! Разойдитесь!',
+  'hudChrome.quenchGuardian.warn.wake':
+    'Клинки Кузнеца вырываются из озера! Когда они бьют, вставайте за клинок!',
+  'hudChrome.quenchGuardian.warn.cross': 'Два клинка пересекают озеро! Уйдите с их пути!',
+  'hudChrome.quenchGuardian.say.pull': 'Тёплая кровь на моём озере. Тёплой она пробудет недолго.',
+  'hudChrome.quenchGuardian.say.shatter': 'Промёрз насквозь. Теперь разбейся.',
+  'hudChrome.quenchGuardian.say.hole': 'Лёд помнит каждый шаг. Встаньте вместе, и он не выдержит.',
+  'hudChrome.quenchGuardian.say.wake': 'Клинки Кузнеца, проснитесь! Отвечайте на каждый мой удар!',
+  'hudChrome.quenchGuardian.say.echo': 'Что бью я, то бьют и они.',
+  'hudChrome.quenchGuardian.say.cross': 'Скреститесь, клинки! Прорежьте им новый берег!',
+  'hudChrome.quenchGuardian.say.deepen': 'Чувствуете? Холод уходит глубже.',
+  'hudChrome.quenchGuardian.say.wipe': 'Тихо. Безмолвно. Закалено.',
+  'hudChrome.quenchGuardian.say.death': 'Холод... отпускает... Закалка ваша.',
+  'hudChrome.auraEffect.quenchGuardian.cold':
+    'Ваш холод: {cold} из {max}. В одиночку он заполняется примерно за {fill} сек. Если в пределах {radius} м от вас стоят {others} или больше других игроков, он вместо этого падает на {fall} в секунду. На {max} вас на {freeze} сек сковывает иней, затем лёд разлетается.',
+  'hudChrome.auraEffect.quenchGuardian.warmth':
+    'Вы греетесь вместе с рейдом: холод падает на {fall} в секунду. Если группа простоит на одном месте {linger} сек, лёд под ней треснет и откроется прорубь с ледяной водой, так что не стойте на месте.',
+  'hudChrome.auraEffect.quenchGuardian.frozen':
+    'Скован инеем: вы не можете действовать. Когда эффект закончится, лёд разлетится: вы получите от {min} до {max} ед. урона от магии льда и станете Хрупким от мороза, а все в пределах {radius} м от вас получат {cold} холода ({heroicRadius} м и {heroicCold} холода в героическом режиме).',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    'Получаемый урон от всех источников увеличен на {pct}%.',
+  'hudChrome.auraEffect.quenchGuardian.trapped':
+    'Вы провалились сквозь лёд в ледяную воду: вы не можете двигаться, каждую секунду получаете от {min} до {max} ед. урона от магии льда, и ваш холод растёт. Через {seconds} сек вы выбираетесь на край. Сама вода никогда не убивает.',
+  'hudChrome.auraEffect.quenchGuardian.awake':
+    'Четыре клинка Кузнеца пробудились. Через {delay} сек после каждого Закаляющего дыхания и Закаляющего удара ({low} сек при здоровье ниже {lowPct}%) каждый клинок повторяет его со своего места, в ту же сторону. За клинком, с противоположной от атаки стороны, всегда безопасно.',
+  'hudChrome.auraEffect.quenchGuardian.deepening':
+    'Холод озера растёт на {total}% быстрее: на {step}% больше каждые {every} сек с пробуждения клинков ({stacks} раз).',
+  'abilityUi.cast.heart_quench_blades_wake': 'Пробуждение клинков',
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': 'Холод',
+  'hudChrome.quenchAlert.freezingTitle': 'Вы замерзаете!',
+  'hudChrome.quenchAlert.warmTitle': 'Тепло группы',
+  'hudChrome.quenchAlert.frozenTitle': 'Скован инеем!',
+  'hudChrome.quenchAlert.waterTitle': 'Подо льдом!',
+  'hudChrome.quenchAlert.coldLine':
+    'Встаньте в пределах {radius} м от {others} или больше других игроков, чтобы согреться',
+  'hudChrome.quenchAlert.warmLine':
+    'Холод спадает. Сдвиньте группу в течение {seconds} сек, иначе лёд треснет',
+  'hudChrome.quenchAlert.frozenLine': 'Лёд разлетится через {seconds} сек: всем рядом отойти',
+  'hudChrome.quenchAlert.waterLine': 'Выберетесь через {seconds} сек',
+  'hudChrome.quenchAlert.coldBar': 'Холод {cold} / {max}',
+  'hudChrome.quenchAlert.coldAria': 'Холод {cold} из {max}',
+  'hudChrome.quenchAlert.timeAria': 'Осталось {seconds} сек',
+  'hudChrome.heatGuardian.warn.crystals':
+    'Поднимаются Пылающие кристаллы! Встаньте под их лучи, чтобы остудить Очаг!',
+  'hudChrome.heatGuardian.warn.channel': 'Очаг переполняется! Русло разделит зал надвое!',
+  'hudChrome.heatGuardian.warn.windup':
+    'Очаг вот-вот перегреется! Остудите его кристаллами или готовьтесь!',
+  'hudChrome.heatGuardian.warn.overheat': 'Очаг перегрелся!',
+  'hudChrome.heatGuardian.say.pull': 'Вы вошли в первое пламя. Никто не выходит из него прежним.',
+  'hudChrome.heatGuardian.say.shed': 'Возьмите мой жар, если сумеете удержать.',
+  'hudChrome.heatGuardian.say.channel': 'Очаг переполняется. Выбирайте сторону.',
+  'hudChrome.heatGuardian.say.windup': 'Слишком много огня для одного тела... ему нужен выход!',
+  'hudChrome.heatGuardian.say.overheat': 'ГОРИТЕ СО МНОЙ!',
+  'hudChrome.heatGuardian.say.stoke': 'Каждый ваш вдох питает пламя.',
+  'hudChrome.heatGuardian.say.wipe': 'Пепел, все до одного. Очаг горит дальше.',
+  'hudChrome.heatGuardian.say.death': 'Пламя... уходит... обратно в камень. Берегите его.',
+  'hudChrome.auraEffect.heatGuardian.heat':
+    'Жар Очага: {heat} из {max}. Сам по себе растёт на {rise} в секунду. Каждые {every} сек Пульс Очага наносит {min}–{most} ед. урона от огня всем на полу Очага при этом жаре, и тем больше, чем горячее. Каждый Пылающий луч, принятый игроком, снижает жар на {cool}; луч, рядом с которым на {range} м никого нет, уходит в стража и поднимает жар на {back}. На {max} Очаг перегревается.',
+  'hudChrome.auraEffect.heatGuardian.burn':
+    'Получаемый урон от огня, магии льда, сил природы, тьмы и тайной магии увеличен на {pct}%: по {per}% за каждый из {stacks} эффектов, не более {most}. Каждый поразивший вас Пылающий луч добавляет эффект; один эффект спадает через {decay} сек после последнего изменения ({heroicDecay} сек в героическом режиме).',
+  'hudChrome.auraEffect.heatGuardian.stoked':
+    'Жар Очага растёт на {total}% быстрее: на {step}% больше каждые {every} сек боя ({stacks} раз).',
+  'hudChrome.auraEffect.heatGuardian.overheating':
+    'Жар достиг {at}. На {max} Очаг перегревается: Взрыв Очага наносит {min}–{most} ед. урона от огня всем на полу ({heroicMin}–{heroicMost} в героическом режиме), затем жар снова растёт с {vent}. Остудите его лучами кристаллов или готовьтесь.',
+  'hudChrome.heatAlert.heatTitle': 'Очаг накаляется',
+  'hudChrome.heatAlert.coolingTitle': 'Очаг остывает',
+  'hudChrome.heatAlert.burningTitle': 'Ожог кристалла x{stacks}',
+  'hudChrome.heatAlert.overheatTitle': 'Близится перегрев!',
+  'hudChrome.heatAlert.heatLine':
+    'Встаньте в {range} м от Пылающего кристалла, примите его луч и остудите Очаг',
+  'hudChrome.heatAlert.coolingLine':
+    'Лучи кристаллов остужают Очаг: держите кого-нибудь под каждым лучом',
+  'hudChrome.heatAlert.burningLine':
+    'Получаемый урон от заклинаний увеличен на {pct}%: отойдите и передайте луч другому',
+  'hudChrome.heatAlert.overheatLine':
+    'На {max} Очаг взорвётся по всем: используйте защитные способности',
+  'hudChrome.heatAlert.heatBar': 'Жар {heat} / {max}',
+  'hudChrome.heatAlert.heatAria': 'Жар {heat} из {max}',
+  'abilityUi.cast.heart_heat_shed': 'Сброс жара',
   'hudChrome.guildHall.title': 'Зал Фонаря',
   'hudChrome.guildHall.close': 'Закрыть окно гильдии',
   'hudChrome.guildHall.tabsLabel': 'Разделы Зала Фонаря',

@@ -220,7 +220,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import { CHAT_TEMPLATE_KEYS, localizeChatBody } from './chat_templates';
+import { CHAT_TEMPLATE_KEYS, localizeChatBody, raidWarningSpeaker } from './chat_templates';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
@@ -12083,7 +12083,7 @@ export class Hud {
               {
                 const text = localizeChatBody(ev);
                 this.chatLogFrom(
-                  ev.from,
+                  raidWarningSpeaker(ev, bubbleSpeaker),
                   text,
                   CHAT_TEMPLATE_KEYS.raidWarning,
                   'raidWarning',
@@ -12104,7 +12104,7 @@ export class Hud {
                   bubbleSpeaker?.templateId,
                   ev.classId,
                 ),
-                localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId),
+                localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId),
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -12241,7 +12241,7 @@ export class Hud {
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
             const visibleText =
               ev.channel === 'yell'
-                ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
+                ? localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId)
                 : ev.text;
             const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;

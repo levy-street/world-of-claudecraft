@@ -18,6 +18,12 @@ export type { CageEscapeDeps } from './cage_escape_painter';
 export { CageEscapePrompt } from './cage_escape_painter';
 export type { CageEscapeInput, CageEscapeLive, CageEscapeView } from './cage_escape_view';
 export { buildCageEscapeView } from './cage_escape_view';
+export type {
+  CouncilAlertInput,
+  CouncilAlertKind,
+  CouncilAlertView,
+} from './council_alert_view';
+export { buildCouncilAlertView, COUNCIL_ALERT_KINDS } from './council_alert_view';
 export type { CryptSceneEntity, CryptSceneWorld } from './crypt_alert_scene_core';
 export { CryptAlertSceneScan } from './crypt_alert_scene_core';
 export type {

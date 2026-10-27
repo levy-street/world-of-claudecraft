@@ -9,6 +9,7 @@ import {
   shouldResetMusicForDungeonEntry,
 } from './music';
 import { ALL_MUSIC_ZONES } from './music_zones';
+import { smithHeartMusicZoneAt } from './smith_heart_music';
 
 export interface InstanceMusicEntity {
   kind: string;
@@ -149,9 +150,15 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
     ? null
     : resolveMapMusicZone(input.mapMusic, input.playerPos.x, input.playerPos.z);
   const crucibleFloor = input.inDungeon && !riftFloor ? crucibleFloorForDungeon(instanceId) : null;
+  // The Smith's Heart scores by area (each vein its own cue, the Heart its own).
+  const smithHeartZone =
+    !riftFloor && instanceId === 'smith_heart'
+      ? smithHeartMusicZoneAt(input.playerPos.x, input.playerPos.z)
+      : null;
   const zone = riftFloor
     ? riftMusicZoneForTheme(riftFloor.themeName)
-    : (mapZone ??
+    : (smithHeartZone ??
+      mapZone ??
       musicZoneForLocation(
         input.zone.id,
         input.zone.biome,

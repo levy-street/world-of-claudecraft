@@ -62,6 +62,7 @@ import {
   TURN_SPEED,
 } from './types';
 import { terrainWallStandoff } from './wall_standoff';
+import { windDrift } from './wind_drift';
 import {
   groundHeight,
   groundHeightAtBody,
@@ -111,6 +112,8 @@ const moveParams: CharacterMoveParams = {
 };
 /** Scratch for the ice slide's velocity (no allocation on the 20 Hz path). */
 const slideOut = { x: 0, z: 0 };
+/** Scratch for an encounter wind's drift (wind_drift.ts), zeroed when none. */
+const driftOut = { x: 0, z: 0 };
 const moveOut: CharacterMoveResult = {
   x: 0,
   y: 0,
@@ -546,11 +549,21 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // straight line unsteered: held keys cannot curl the throw back to a ledge.
   const airSteering = moving && !p.onGround && !swimming && !p.launchedBy;
   const slide = steepSlide;
+  // An encounter's wind (wind_drift.ts) carries the body on top of its own
+  // step, through the same gates and collision: a wall stops it, a bare lip
+  // lets it walk off. It is not input, so no cast breaks under it.
+  let drifting = windDrift(p, driftOut);
+  if (drifting && swimming) {
+    drifting = false;
+    driftOut.x = 0;
+    driftOut.z = 0;
+  }
   if (
     slide ||
     movingOnGround ||
     airSteering ||
     iceSliding ||
+    drifting ||
     (!p.onGround && (p.vx !== 0 || p.vz !== 0))
   ) {
     if (slide && p.castingAbility) deps.cancelCast(p);
@@ -585,20 +598,23 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         p.vz *= k;
       }
     }
-    const stepX = slide
+    const baseX = slide
       ? slide.x * STEEP_SLIDE_SPEED
       : grip > 0
         ? p.vx
         : movingOnGround
           ? wishX * wishSpeed
           : p.vx;
-    const stepZ = slide
+    const baseZ = slide
       ? slide.z * STEEP_SLIDE_SPEED
       : grip > 0
         ? p.vz
         : movingOnGround
           ? wishZ * wishSpeed
           : p.vz;
+    // Off the wind the step is exactly the old one (no +0 for a -0).
+    const stepX = drifting ? baseX + driftOut.x : baseX;
+    const stepZ = drifting ? baseZ + driftOut.z : baseZ;
     // Slide along buildings, trees, crypt walls; but while airborne from a
     // jump, pass through fences for the whole arc. Keying off the jump itself
     // (not a height threshold) makes this independent of slope: an uphill

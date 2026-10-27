@@ -1,14 +1,14 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-42370-9f139de0-81225950-157d-421e9565-e4972e75",
+    "id": "live-424b0-d23290b9-ec9e6049-157d-421e9565-e4972e75",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "42370-9f139de0-81225950",
+    "overworldBase": "424b0-d23290b9-ec9e6049",
     "overworldRevision": "157d-421e9565-e4972e75"
   },
   "content": {
@@ -5925,6 +5925,20 @@
         "color": 4086394,
         "questIds": [],
         "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets.",
+        "dynamic": true
+      },
+      "heart_captain_thessaly": {
+        "id": "heart_captain_thessaly",
+        "name": "Captain Thessaly",
+        "title": "Highwatch Captain",
+        "pos": {
+          "x": 0,
+          "z": 0
+        },
+        "facing": 0,
+        "color": 8753822,
+        "questIds": [],
+        "greeting": "Keep your feet, $C. When the bellows breathes, step into my calm and let the wind break on us.",
         "dynamic": true
       }
     },

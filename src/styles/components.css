@@ -18616,6 +18616,9 @@
   #wildheart-alert,
   #sanctum-alert,
   #crypt-alert,
+  #heart-council-alert,
+  #heart-quench-alert,
+  #heart-heat-alert,
   #temple-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
@@ -18626,6 +18629,9 @@
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #heart-council-alert,
+  body.show-actionbar3 #heart-quench-alert,
+  body.show-actionbar3 #heart-heat-alert,
   body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
@@ -18636,6 +18642,9 @@
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
+  body.mobile-touch #heart-council-alert,
+  body.mobile-touch #heart-quench-alert,
+  body.mobile-touch #heart-heat-alert,
   body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
@@ -19053,6 +19062,243 @@
     }
   }
   body.mobile-touch #wildheart-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Smith's Heart's Hammer Council alert (the rock, the wake, the Weight, Resonance) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/council_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the
+     rock to share throbs in the soak gold, the wake sits in the vein's ochre,
+     the Weight in the hostile tone, a climbing crack in the hostile tone. */
+  #heart-council-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #heart-council-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #heart-council-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-council-alert .fa-hint {
+    display: none;
+  }
+  #heart-council-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #heart-council-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-council-alert.is-rock {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-council-alert.is-weight,
+  #heart-council-alert.is-cracking {
+    border-color: var(--color-hostile);
+  }
+  #heart-council-alert.is-weight .fa-title,
+  #heart-council-alert.is-cracking .fa-title,
+  #heart-council-alert.is-weight .fa-fill,
+  #heart-council-alert.is-cracking .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #heart-council-alert.is-resonance {
+    border-color: var(--color-energy);
+  }
+  #heart-council-alert.is-resonance .fa-title,
+  #heart-council-alert.is-resonance .fa-fill {
+    color: var(--color-energy);
+    --bar-color: var(--color-energy);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-council-alert {
+      animation: none;
+    }
+  }
+
+  /* ---------- The Smith's Heart's Guardian of the Quench cold bar ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/quench_alert_view.ts: the player's own cold, the whole
+     fight, on every graphics tier (never hidden by the hints setting). It
+     never takes the pointer. The state is carried by the text too: the cold
+     rises in the frost tone, freezing and the freeze in the hostile tone, the
+     huddle's warmth in the gold, the water in the mana blue. */
+  #heart-quench-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+  }
+  #heart-quench-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-debuff-frost);
+  }
+  #heart-quench-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-quench-alert .fa-hint {
+    display: none;
+  }
+  #heart-quench-alert .fa-bar {
+    --bar-h: 14px;
+    --bar-color: var(--color-debuff-frost);
+    width: 100%;
+  }
+  #heart-quench-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-quench-alert.is-warm {
+    border-color: var(--color-gold);
+  }
+  #heart-quench-alert.is-warm .fa-title,
+  #heart-quench-alert.is-warm .fa-fill {
+    color: var(--color-gold);
+    --bar-color: var(--color-gold);
+  }
+  #heart-quench-alert.is-freezing,
+  #heart-quench-alert.is-frozen {
+    border-color: var(--color-hostile);
+  }
+  #heart-quench-alert.is-freezing .fa-title,
+  #heart-quench-alert.is-frozen .fa-title,
+  #heart-quench-alert.is-freezing .fa-fill,
+  #heart-quench-alert.is-frozen .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #heart-quench-alert.is-freezing {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-quench-alert.is-water {
+    border-color: var(--color-mana);
+  }
+  #heart-quench-alert.is-water .fa-title,
+  #heart-quench-alert.is-water .fa-fill {
+    color: var(--color-mana);
+    --bar-color: var(--color-mana);
+  }
+  body.mobile-touch #heart-quench-alert {
+    min-width: min(340px, calc(100vw - 32px));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-quench-alert {
+      animation: none;
+    }
+  }
+  /* ---------- The Smith's Heart's Guardian of the Heat gauge ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/heat_alert_view.ts: the Hearth's heat and the
+     player's own Crystal Burn, the whole fight, on every graphics tier
+     (never hidden by the hints setting). It never takes the pointer. The
+     state is carried by the text too: the heat in the gold, cooling in the
+     mana blue, a heavy burn and the overheat's wind-up in the hostile tone
+     (the wind-up throbs). */
+  #heart-heat-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #heart-heat-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #heart-heat-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-heat-alert .fa-hint {
+    display: none;
+  }
+  #heart-heat-alert .fa-bar {
+    --bar-h: 14px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #heart-heat-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-heat-alert.is-cooling {
+    border-color: var(--color-mana);
+  }
+  #heart-heat-alert.is-cooling .fa-title {
+    color: var(--color-mana);
+  }
+  #heart-heat-alert.is-burning,
+  #heart-heat-alert.is-overheat {
+    border-color: var(--color-hostile);
+  }
+  #heart-heat-alert.is-burning .fa-title,
+  #heart-heat-alert.is-overheat .fa-title,
+  #heart-heat-alert.is-overheat .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #heart-heat-alert.is-overheat {
+    animation: bce-throb 0.45s ease-in-out infinite alternate;
+  }
+  body.mobile-touch #heart-heat-alert {
+    min-width: min(340px, calc(100vw - 32px));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-heat-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #heart-council-alert {
     min-width: min(420px, calc(100vw - 32px));
   }
 

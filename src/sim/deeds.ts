@@ -37,6 +37,7 @@ import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
 import { onKillForGuildContracts } from './guild_contracts';
+import { instanceHalfWidthOf } from './instances/instance_footprint';
 import { MUSTER_PIKE_MAX_LEVEL } from './lance_balance_core';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { emitReferralBossEvidence } from './referral_evidence';
@@ -1648,7 +1649,9 @@ export function onPlayerDeathForDeeds(ctx: SimContext, e: Entity): void {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
     const origin = ctx.instanceOriginOf(inst);
-    const inBand = Math.abs(e.pos.x - origin.x) < 120 && Math.abs(e.pos.z - origin.z) < 250;
+    const inBand =
+      Math.abs(e.pos.x - origin.x) < instanceHalfWidthOf(inst.dungeonId) &&
+      Math.abs(e.pos.z - origin.z) < 250;
     for (const mobId of inst.mobIds) {
       const boss = ctx.entities.get(mobId);
       if (!boss || boss.dead) continue;
@@ -1739,11 +1742,13 @@ export function onDeathlessRageResolvedForDeeds(ctx: SimContext, boss: Entity): 
 // use the kill-credit eligible snapshot instead, exactly like XP).
 function playersInInstance(ctx: SimContext, inst: InstanceSlot): PlayerMeta[] {
   const origin = ctx.instanceOriginOf(inst);
+  const halfWidth = instanceHalfWidthOf(inst.dungeonId);
   const out: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e) continue;
-    if (Math.abs(e.pos.x - origin.x) < 120 && Math.abs(e.pos.z - origin.z) < 250) out.push(meta);
+    if (Math.abs(e.pos.x - origin.x) < halfWidth && Math.abs(e.pos.z - origin.z) < 250)
+      out.push(meta);
   }
   return out;
 }

@@ -4,10 +4,18 @@
 //
 //   ELEVENLABS_API_KEY=... node scripts/audition_raid_boss_voices.mjs
 //   node scripts/audition_raid_boss_voices.mjs --only ignivar --dry-run
+//   node scripts/audition_raid_boss_voices.mjs --set council --out <dir>
+//
+// --set picks the briefs (ignivar, the default: the Ignivar raid's bosses;
+// council: the Smith's Heart's Hammer Council); --out writes the candidates
+// somewhere other than tmp/raid-boss-voice-auditions (a review folder).
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { RAID_BOSS_VOICE_PROMPTS } from './voices/raid_boss_voice_prompts.mjs';
+import {
+  HAMMER_COUNCIL_VOICE_PROMPTS,
+  RAID_BOSS_VOICE_PROMPTS,
+} from './voices/raid_boss_voice_prompts.mjs';
 import {
   auditionRelativeDir,
   buildVoiceDesignRequest,
@@ -16,7 +24,6 @@ import {
 
 const API = 'https://api.elevenlabs.io';
 const root = process.cwd();
-const outputRoot = path.join(root, 'tmp', 'raid-boss-voice-auditions');
 const args = process.argv.slice(2);
 
 function optionValue(name) {
@@ -30,15 +37,20 @@ function optionValue(name) {
 const only = optionValue('--only');
 const force = args.includes('--force');
 const dryRun = args.includes('--dry-run');
-const allowedArgs = new Set(['--only', '--force', '--dry-run', only]);
+const set = optionValue('--set') ?? 'ignivar';
+const out = optionValue('--out');
+const allowedArgs = new Set(['--only', '--set', '--out', '--force', '--dry-run', only, set, out]);
+const SETS = { ignivar: RAID_BOSS_VOICE_PROMPTS, council: HAMMER_COUNCIL_VOICE_PROMPTS };
+if (!Object.hasOwn(SETS, set)) throw new Error(`Unknown set: ${set}. Expected ignivar or council.`);
+const prompts = SETS[set];
+const outputRoot = out ? path.resolve(out) : path.join(root, 'tmp', 'raid-boss-voice-auditions');
 const unknown = args.find((arg) => !allowedArgs.has(arg));
 if (unknown) throw new Error(`Unknown argument: ${unknown}`);
 
-const selected = only
-  ? RAID_BOSS_VOICE_PROMPTS.filter((prompt) => prompt.npcId === only)
-  : RAID_BOSS_VOICE_PROMPTS;
+const selected = only ? prompts.filter((prompt) => prompt.npcId === only) : prompts;
 if (selected.length === 0) {
-  throw new Error(`Unknown raid boss: ${only}. Expected ignivar or varkhul.`);
+  const ids = [...new Set(prompts.map((prompt) => prompt.npcId))].join(', ');
+  throw new Error(`Unknown raid boss: ${only}. Expected one of: ${ids}.`);
 }
 
 try {

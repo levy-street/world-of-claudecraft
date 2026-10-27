@@ -214,6 +214,7 @@ import { NPC_PROP_SET_IDS, type NpcLook, type NpcPropSet, npcLookFor } from './n
 import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks';
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import type { SeatClipSet } from './seat_clips';
+import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
@@ -4164,6 +4165,85 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.4,
+  },
+  // The Masterless Strength (the Smith's Heart's final boss, phase 2J): a
+  // bodyless target, its click capsule, nameplate and bars over the colossus
+  // of rock pieces and crystal the raid's own effects draw
+  // (smith_heart_fx/final_fx.ts) until its own model ships. Bound off the
+  // goleling's rig (never seen); its height times the boss's scale (3.6) is
+  // the colossus's, so the nameplate rides over its head. Every Smith's Heart
+  // bodyless target binds ELEMENTAL_FLOATING, so each carries mob_elemental's
+  // Elemental_Attack donor (already loaded for the raid's elemental warders).
+  smith_heart_colossus: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 5.6,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 4.4,
+  },
+  // The Hammer Council's Slabwright and Seam Singer (the Smith's Heart's first
+  // boss, design doc 7.1): bodyless targets, their click capsules, nameplates
+  // and bars over the provisional rock-and-crystal bodies the raid's own
+  // effects draw (smith_heart_fx/council_bodies.ts) until their own models
+  // ship. Bound off the goleling's rig (never seen); height times the
+  // template's scale is the body's (about 2 to 2.5 times a player).
+  smith_heart_slabwright: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.15,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.4,
+  },
+  smith_heart_seam_singer: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.5,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.0,
+  },
+  // The Guardian of the Breath (the Storm Cornice, design doc 7.2): a
+  // bodyless target, its click capsule, nameplate and bars over the
+  // provisional living bellows of storm granite and crystal the raid's own
+  // effects draw (smith_heart_fx/breath_body.ts) until its own model ships.
+  // Height times the template's scale (3.4) is the body's crown, about three
+  // and a half players.
+  smith_heart_breath_guardian: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.0,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.6,
+  },
+  // The Guardian of the Quench (the Frozen Lake, design doc 7.3): a bodyless
+  // target, its click capsule, nameplate and bars over the provisional ice
+  // guardian of frost granite and lake ice the raid's own effects draw
+  // (smith_heart_fx/quench_body.ts) until its own model ships. Height times
+  // the template's scale (3) is the body's crown, about three and a half
+  // players.
+  smith_heart_quench_guardian: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.3,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.6,
+  },
+  // The Guardian of the Heat (the Hearth, design doc 7.4): a bodyless target,
+  // its click capsule, nameplate and bars over the provisional being of the
+  // first flame in basalt and crystal the raid's own effects draw
+  // (smith_heart_fx/heat_body.ts) until its own model ships. Height times the
+  // template's scale (3) is the body's crown, about three and a half players.
+  smith_heart_heat_guardian: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.4,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.7,
   },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
@@ -8330,6 +8410,7 @@ const MOB_KEYS: Record<string, string> = {
   ...WILDHEART_MOB_KEYS,
   ...SANCTUM_MOB_KEYS,
   ...SANCTUM_BOSS_MOB_KEYS,
+  ...SMITH_HEART_PLACEHOLDER_LOOKS,
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
   ),
@@ -8466,6 +8547,9 @@ const NPC_KEYS: Record<string, string> = {
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
+  // Captain Thessaly at the head of the Storm Cornice (the Smith's Heart's
+  // Guardian of the Breath): the same captain, the same knight.
+  heart_captain_thessaly: 'npc_knight',
   // The two WARFARE quartermasters (one stock, two placements). Both sell the
   // game's most prestigious armor and both fell through to the tinted villager
   // body before this, which read as a townsperson selling epics; the armored

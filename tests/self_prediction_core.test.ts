@@ -57,6 +57,35 @@ const step = (motion: MotionState): void => {
 };
 
 describe('self prediction core', () => {
+  it('replays each frame from the mirrored state it was first predicted from', () => {
+    // A marker aura the step reads, and that the step itself takes off (a
+    // glider ending on landing): a replay must start the frame WITH it.
+    const marker = {
+      id: 'mark',
+      name: 'm',
+      kind: 'internal_cd',
+      remaining: 9,
+      duration: 9,
+      value: 0,
+      sourceId: 0,
+      school: 'nature',
+    } as MotionState['auras'][number];
+    const stepMarked = (m: MotionState): void => {
+      const held = m.auras.some((a) => a.id === 'mark');
+      m.pos.x += held ? 1 : 0.5;
+      if (held) m.auras = m.auras.filter((a) => a.id !== 'mark');
+    };
+    const ring = new PredictionRing();
+    let s = predictTick(ring, state(0), frame(0), stepMarked);
+    s = predictTick(ring, { ...s, auras: [marker] }, frame(1), stepMarked);
+    s = predictTick(ring, s, frame(2), stepMarked);
+    expect(s.pos.x).toBe(2);
+    // The acknowledged frame 0 lands a little east: replay frames 1 and 2.
+    const result = reconcile(ring, 0, { x: 0.6, y: 2, z: 3, facing: 0 }, 0, 0, stepMarked);
+    expect(result.mode).toBe('replayed');
+    expect(ring.head?.pose.pos.x).toBeCloseTo(2.1, 9);
+  });
+
   it('steps once and records a full independent motion state', () => {
     const ring = new PredictionRing();
     const initial = state();

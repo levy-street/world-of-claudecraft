@@ -18,13 +18,20 @@ import {
 } from './field_mesh_core';
 import {
   basaltDetail,
+  type DetailPair,
   flagstoneDetail,
   glacierWallDetail,
   gratingDetail,
+  hearthDetail,
   iceDetail,
+  lakeIceDetail,
   mossDetail,
+  pavingDetail,
   plateDetail,
+  quarryDetail,
+  rimeDetail,
   rockDetail,
+  scouredDetail,
   slateDetail,
   snowDetail,
   soilDetail,
@@ -64,6 +71,12 @@ export interface FieldTerrainOptions {
   cliffRock?: 'slabs' | 'strata' | 'glacier';
   /** The cliff faces' vertex paint (the plan's default rock tint otherwise). */
   cliffPaint?: CliffPaint;
+  /** Surfaces whose walkable tops the dungeon's own kit draws (FieldTopOptions.omit). */
+  omitTops?: ReadonlySet<string>;
+  /** A dungeon's own material for one top family (the Smith's Heart's Frozen
+   *  Lake draws its ice with depth): handed the family's detail pair, it
+   *  returns the material that family's mesh draws with. */
+  topMaterial?: Partial<Record<FieldTopFamily, (pair: DetailPair) => THREE.Material>>;
 }
 
 /** Build the ground of a field: tops (one mesh per texture family) and cliffs. */
@@ -76,6 +89,7 @@ export function buildAuthoredFieldTerrain(
   const tops = planFieldTops(def, {
     maxEdge: opts.maxEdge ?? (opts.lowGfx ? 6 : 3),
     layerLift: 0,
+    ...(opts.omitTops ? { omit: opts.omitTops } : {}),
   });
   const rock =
     opts.cliffRock === 'strata'
@@ -103,18 +117,35 @@ export function buildAuthoredFieldTerrain(
     snow: { detail: snowDetail, rough: 0.92 },
     ice: { detail: iceDetail, rough: 0.46, metal: 0.04 },
     slate: { detail: slateDetail, rough: 0.7 },
+    // The Smith's Heart's quarry: dry cut granite, matte.
+    quarry: { detail: quarryDetail, rough: 0.9 },
+    // The Hammer Gallery's worn paving: dry dressed granite, matte.
+    paving: { detail: pavingDetail, rough: 0.88 },
+    // The Breath's storm-scoured granite: polished by the wind, a hair less
+    // matte than the quarry.
+    scoured: { detail: scouredDetail, rough: 0.8 },
+    // The Quench (phase 2H): frost-bound granite, matte under its rime; the
+    // Frozen Lake's polished ice (its depth is the dungeon's own material).
+    rime: { detail: rimeDetail, rough: 0.86 },
+    lake_ice: { detail: lakeIceDetail, rough: 0.3, metal: 0.02 },
+    // The Heat (phase 2I): the basalt columns' worn heads, matte, the fire
+    // in their joints the dungeon's own material.
+    hearth: { detail: hearthDetail, rough: 0.84 },
   };
   for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];
     if (data.positions.length === 0) continue;
     const pair = looks[family].detail();
-    const material = surfaceMat({
-      map: pair.map,
-      normalMap: opts.lowGfx ? undefined : pair.normalMap,
-      vertexColors: true,
-      roughness: looks[family].rough,
-      ...(looks[family].metal !== undefined ? { metalness: looks[family].metal } : {}),
-    });
+    const own = opts.topMaterial?.[family];
+    const material = own
+      ? own(pair)
+      : surfaceMat({
+          map: pair.map,
+          normalMap: opts.lowGfx ? undefined : pair.normalMap,
+          vertexColors: true,
+          roughness: looks[family].rough,
+          ...(looks[family].metal !== undefined ? { metalness: looks[family].metal } : {}),
+        });
     const mesh = new THREE.Mesh(geometryOf(data, false), material);
     mesh.name = `fieldTop:${family}`;
     mesh.receiveShadow = true;

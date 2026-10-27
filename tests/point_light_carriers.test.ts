@@ -522,6 +522,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the Wildheart Basin Sunbone braziers and the jaguar eyes, pushed through the fireLights adopter sink the interiors are handed',
   'render/gravewyrm_sanctum/sanctum_lights.ts':
     'the Gravewyrm Sanctum braziers, soul brazier, Thaw Works soul pyres and the vault thaw pyres, pushed through the fireLights adopter sink the interiors are handed',
+  'render/smith_heart/heart_lights.ts':
+    "the Smith's Heart vein keys and mouth accents, the seal glow, the forge crucibles and the lake braziers, pushed through the fireLights adopter sink the interiors are handed",
   'render/sunken_bastion/bastion_lights.ts':
     'the Sunken Bastion lanterns, braziers, fog-fire and the Fogbeacon lamp, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
@@ -667,6 +669,9 @@ describe('every point-light producer is a carrier source', () => {
       'render/placed_assets.ts: sparks',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
+      // The Smith's Heart: one mesh hook, never a scene: the sky dome, the
+      // interior's frame driver (the gates, the seal and the light-rivers).
+      'render/smith_heart/heart_sky.ts: mesh',
       // The sprite buddy's flame meshes step and upload their own uniforms.
       'render/sprites_buddy_flame.ts: mesh',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to

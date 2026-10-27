@@ -7,6 +7,13 @@ import {
 import { IGNIVAR_RAID_ENVIRONMENT } from '../src/render/ignivar_raid_environment';
 import type { FogSceneState } from '../src/render/interior_light_rig';
 import {
+  BREATH,
+  CLEFT,
+  HAMMER_PIT,
+  HEART_ROOM,
+  QUENCH,
+} from '../src/sim/content/smith_heart_layout';
+import {
   battlegroundOrigin,
   DUNGEON_LIST,
   delveOrigin,
@@ -74,6 +81,72 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
     expect(resolveFogScene(true, interiorPx('sunken_bastion'), 5, cam, SEED).desired).toBe(
       'sunkenBastion',
     );
+    // The Smith's Heart's main map borrows the Bastion's storm-dusk state;
+    // its Heart (the separate final room) has its own ember-night state, its
+    // Hammer vein its own quarry dusk and the Ring its own (phase 2F), each
+    // read from where the camera stands in the slot.
+    const heart = DUNGEON_LIST.find((d) => d.id === 'smith_heart');
+    if (!heart) throw new Error('no smith_heart dungeon');
+    const slotOrigin = instanceOrigin(heart.index, 2);
+    const inHeart = { x: slotOrigin.x + HEART_ROOM.x, z: slotOrigin.z + HEART_ROOM.z };
+    const onRing = { x: slotOrigin.x, z: slotOrigin.z + 70 };
+    const inQuarry = { x: slotOrigin.x + HAMMER_PIT.x, z: slotOrigin.z + HAMMER_PIT.z };
+    const atCleft = { x: slotOrigin.x + CLEFT.x, z: slotOrigin.z + CLEFT.z };
+    expect(resolveFogScene(true, slotOrigin.x, 5, inHeart, SEED).desired).toBe('smithHeartCore');
+    expect(resolveFogScene(true, slotOrigin.x, 5, onRing, SEED).desired).toBe('smithHeartRing');
+    // The camera standing back past the Ring's rim still sees it in its own light.
+    const pastRim = { x: slotOrigin.x, z: slotOrigin.z + 96 };
+    expect(resolveFogScene(true, slotOrigin.x, 5, pastRim, SEED).desired).toBe('smithHeartRing');
+    // The Quench has its own cold lake light (phase 2H): the Frozen Lake,
+    // the Singing Ice, and east of the Ring past its mouth (the first
+    // landing, a camera standing back from it) over the Ring's.
+    const inQuench = { x: slotOrigin.x + QUENCH.lake.x, z: slotOrigin.z + QUENCH.lake.z };
+    expect(resolveFogScene(true, slotOrigin.x, 5, inQuench, SEED).desired).toBe('smithHeartQuench');
+    for (const [x, z] of [
+      [156, -86],
+      [110, 0],
+      [101, 4],
+    ]) {
+      const at = { x: slotOrigin.x + x, z: slotOrigin.z + z };
+      expect(resolveFogScene(true, slotOrigin.x, 5, at, SEED).desired).toBe('smithHeartQuench');
+    }
+    // The Quench's mouth on the Ring keeps the Ring's light.
+    const atMouth = { x: slotOrigin.x + 84, z: slotOrigin.z };
+    expect(resolveFogScene(true, slotOrigin.x, 5, atMouth, SEED).desired).toBe('smithHeartRing');
+    // The Heat has the Hearth's own light (phase 2I): the Forge, the casting
+    // floor, the hall past the Ring's rim; its mouth on the Ring keeps the
+    // Ring's.
+    for (const [x, z] of [
+      [-214, 0],
+      [-150, 20],
+      [-100, 0],
+    ]) {
+      const at = { x: slotOrigin.x + x, z: slotOrigin.z + z };
+      expect(resolveFogScene(true, slotOrigin.x, 5, at, SEED).desired).toBe('smithHeartHeat');
+    }
+    const atHeatMouth = { x: slotOrigin.x - 70, z: slotOrigin.z };
+    expect(resolveFogScene(true, slotOrigin.x, 5, atHeatMouth, SEED).desired).toBe(
+      'smithHeartRing',
+    );
+    // The Breath has its own storm summit light (phase 2G), the Cornice and
+    // the Wind Bridge both.
+    const onCornice = { x: slotOrigin.x + BREATH.cornice.x, z: slotOrigin.z + BREATH.cornice.z };
+    const onBridge = { x: slotOrigin.x - 84, z: slotOrigin.z + 140 };
+    expect(resolveFogScene(true, slotOrigin.x, 5, onCornice, SEED).desired).toBe(
+      'smithHeartBreath',
+    );
+    expect(resolveFogScene(true, slotOrigin.x, 5, onBridge, SEED).desired).toBe('smithHeartBreath');
+    // North of the Ring past its mouth (the first landing, the chimney) the
+    // Breath's light wins over the Ring's.
+    for (const [x, z] of [
+      [0, 106],
+      [-30, 110],
+    ]) {
+      const at = { x: slotOrigin.x + x, z: slotOrigin.z + z };
+      expect(resolveFogScene(true, slotOrigin.x, 5, at, SEED).desired).toBe('smithHeartBreath');
+    }
+    expect(resolveFogScene(true, slotOrigin.x, 5, inQuarry, SEED).desired).toBe('smithHeartHammer');
+    expect(resolveFogScene(true, slotOrigin.x, 5, atCleft, SEED).desired).toBe('smithHeartHammer');
     expect(resolveFogScene(true, interiorPx('gravewyrm_sanctum'), 5, cam, SEED).desired).toBe(
       'gravewyrmSanctum',
     );
@@ -115,6 +188,12 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['gravewyrmSanctum', 0x3d5a82, 90, 980],
     ['hollowCrypt', 0x1c2238, 70, 460],
     ['sunkenBastion', 0x4d5a57, 70, 640],
+    ['smithHeartCore', 0x1c1424, 80, 520],
+    ['smithHeartHammer', 0x6c6c70, 90, 600],
+    ['smithHeartRing', 0x686a72, 120, 700],
+    ['smithHeartBreath', 0x707b88, 80, 560],
+    ['smithHeartQuench', 0x8899ac, 70, 520],
+    ['smithHeartHeat', 0x6e645c, 80, 560],
     ['drownedTemple', 0x252a4c, 140, 1050],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],

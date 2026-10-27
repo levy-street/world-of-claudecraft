@@ -78,7 +78,15 @@ describe('the Rift body class is derived from content', () => {
     // is updated on purpose. The rule itself is pinned by the witness tests below.
     const hoardBodies = bodies.filter((url) => url.includes('/hoard_')).sort();
     expect(hoardBodies.length).toBeGreaterThanOrEqual(28);
-    expect([...ios.rift, ...ios.hoard].sort()).toEqual(hoardBodies);
+    // The Smith's Heart's Breath caller and Quench warder borrow two hoard
+    // bodies as placeholder looks (smith_heart_placeholder_looks.ts), so a
+    // dungeon draws them and they stay in the post-entry stream.
+    const raidShared = hoardBodies.filter(
+      (url) => url.endsWith('/hoard_storm_caller.glb') || url.endsWith('/hoard_rime_elemental.glb'),
+    );
+    expect(raidShared).toHaveLength(2);
+    const riftOnly = hoardBodies.filter((url) => !raidShared.includes(url));
+    expect([...ios.rift, ...ios.hoard].sort()).toEqual(riftOnly);
   });
 
   it('leaves no body only Rift templates draw in the post-entry stream', () => {

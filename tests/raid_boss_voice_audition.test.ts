@@ -151,3 +151,38 @@ describe('voice design audition request', () => {
     ).toThrow('preview 1 has no audio');
   });
 });
+
+describe('Hammer Council voice audition prompts', () => {
+  it('briefs each council member with its own lines, auditions only', async () => {
+    const { HAMMER_COUNCIL_VOICE_PROMPTS } = await import(
+      '../scripts/voices/raid_boss_voice_prompts.mjs'
+    );
+    const { COUNCIL_LINES } = await import('../src/sim/encounters/smith_heart/council_voice');
+    const byRole = {
+      'heart-guardian': 'guardian',
+      'heart-slabwright': 'slabwright',
+      'heart-singer': 'singer',
+    } as const;
+    expect(HAMMER_COUNCIL_VOICE_PROMPTS.map((p: { npcId: string }) => p.npcId)).toEqual(
+      Object.keys(byRole),
+    );
+    for (const prompt of HAMMER_COUNCIL_VOICE_PROMPTS) {
+      const request = buildVoiceDesignRequest(prompt);
+      expect(request.model_id).toBe('eleven_ttv_v3');
+      expect(auditionRelativeDir(prompt)).toEqual([prompt.npcId, prompt.takeId]);
+      expect(prompt.voiceDescription.toLowerCase()).toContain('non-human');
+      // Every line the preview speaks is one the member really says in game.
+      const spoken = prompt.previewText
+        .split(/\[[^\]]*\]/)
+        .map((line: string) => line.trim())
+        .filter(Boolean);
+      const own = Object.values(COUNCIL_LINES[byRole[prompt.npcId as keyof typeof byRole]]);
+      expect(spoken.length).toBeGreaterThanOrEqual(5);
+      for (const line of spoken) expect(own, prompt.npcId).toContain(line);
+    }
+    // Never mixed into the shipped raid bosses' briefs (nothing is finalized).
+    expect(
+      RAID_BOSS_VOICE_PROMPTS.some((p: { npcId: string }) => p.npcId.startsWith('heart-')),
+    ).toBe(false);
+  });
+});

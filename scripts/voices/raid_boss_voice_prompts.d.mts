@@ -9,3 +9,4 @@ export interface RaidBossVoicePrompt {
 }
 
 export declare const RAID_BOSS_VOICE_PROMPTS: RaidBossVoicePrompt[];
+export declare const HAMMER_COUNCIL_VOICE_PROMPTS: RaidBossVoicePrompt[];

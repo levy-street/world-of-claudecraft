@@ -125,7 +125,11 @@ import {
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
 } from '../sim/varkhul_shared_pyre';
 import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
+import { breathAuraEffectDescriptor } from './breath_aura_effect';
+import { councilAuraEffectDescriptor } from './council_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
+import { heatAuraEffectDescriptor } from './heat_aura_effect';
+import { quenchAuraEffectDescriptor } from './quench_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
 import { templeAuraEffectDescriptor } from './temple_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
@@ -195,6 +199,18 @@ export function auraEffectDescriptor(
   // The Gravewyrm Sanctum's boss auras say their rule (sanctum_aura_effect.ts).
   const sanctum = sanctumAuraEffectDescriptor(a);
   if (sanctum) return sanctum;
+  // The Smith's Heart's Hammer Council marks say theirs (council_aura_effect.ts).
+  const council = councilAuraEffectDescriptor(a);
+  if (council) return council;
+  // The Guardian of the Breath's wind, calm and storm say theirs (breath_aura_effect.ts).
+  const breath = breathAuraEffectDescriptor(a);
+  if (breath) return breath;
+  // The Guardian of the Quench's cold, ice and blades say theirs (quench_aura_effect.ts).
+  const quench = quenchAuraEffectDescriptor(a);
+  if (quench) return quench;
+  // The Guardian of the Heat's heat, burn and stoking say theirs (heat_aura_effect.ts).
+  const heat = heatAuraEffectDescriptor(a);
+  if (heat) return heat;
   // The Sunken Bastion's marks say theirs (bastion_aura_effect.ts).
   const bastion = bastionAuraEffectDescriptor(a);
   if (bastion) return bastion;

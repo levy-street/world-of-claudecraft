@@ -30,6 +30,7 @@ import { IGNIVAR_RAID_ROOM_IDS } from '../ignivar_raid_ids';
 export const RAID_REQUIRED_DUNGEON_IDS: ReadonlySet<string> = new Set([
   'nythraxis_boss_arena',
   ...IGNIVAR_RAID_ROOM_IDS,
+  'smith_heart',
 ]);
 
 /** Does a Reset All Instances replacement claim for this dungeon carry the

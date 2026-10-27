@@ -22,6 +22,10 @@ import {
 } from '../src/sim/colliders';
 import { DUNGEON_FLOOR_Y, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
+  clearCombatWallStateForTest,
+  setCombatWalls,
+} from '../src/sim/instances/combat_wall_state';
+import {
   clearDungeonGateStateForTest,
   setOpenDungeonGates,
 } from '../src/sim/instances/dungeon_gate_state';
@@ -32,7 +36,7 @@ import {
   interiorReach,
   setInteriorCellIndexEnabled,
 } from '../src/sim/interior_collider_cells';
-import { derivedInteriorColliders } from '../src/sim/interior_collider_sets';
+import { derivedInteriorColliders, interiorCollidersFor } from '../src/sim/interior_collider_sets';
 
 const SEED = 93;
 const REWORKED = [
@@ -220,4 +224,60 @@ describe('interior collider cell index', () => {
     expect(mismatches).toEqual([]);
     expect(blocked).toBeGreaterThan(100);
   });
+
+  it('a slot whose walls move re-files only the walls, exactly as a full rebuild would', () => {
+    // The Smith's Heart's Quarry with the mythic Walking Slab dragging past
+    // two standing pillars: the walled list is the base plus its walls
+    // (instances/combat_wall_state.ts), indexed as the base's cells with the
+    // walls filed over them, never a rebuild of the field.
+    const id = 'smith_heart';
+    const def = DUNGEONS[id];
+    const o = instanceOrigin(def.index, 2);
+    const interior = def.interior as string;
+    const base = interiorCollidersFor(id, interior, o.x, o.z);
+    const wall = (wid: number, templateId: string, x: number, z: number) => ({
+      id: wid,
+      templateId,
+      x,
+      z,
+      y: DUNGEON_FLOOR_Y,
+      rot: 0,
+      scale: 1,
+    });
+    const mismatches: string[] = [];
+    try {
+      for (let step = 0; step < 3; step++) {
+        const sx = 8 + step * 0.5;
+        setCombatWalls(o.x, o.z, [
+          wall(1, 'sh_council_pillar_3', 14, -182),
+          wall(2, 'sh_council_risen_1', 0, -166),
+          wall(3, 'sh_council_soul_slabwright_c_3', sx, -172),
+          wall(4, 'sanctum_ice_slab', -2, -190),
+        ]);
+        const walled = interiorCollidersFor(id, interior, o.x, o.z);
+        expect(walled.length).toBe(base.length + 4);
+        // A cell the walls never touch is the base's own (shared, not rebuilt).
+        const far = base.find((c) => Math.hypot(c.x - 8, c.z + 170) > 60) as Collider;
+        const farCell = interiorCellCandidates(base, far.x, far.z, interiorReach(0.5));
+        expect(farCell?.length).toBeGreaterThan(0);
+        expect(interiorCellCandidates(walled, far.x, far.z, interiorReach(0.5))).toBe(farCell);
+        let k = 0;
+        for (let x = -18; x <= 30; x += 1.7)
+          for (let z = -196; z <= -150; z += 1.7)
+            for (const r of [0.5, 1.6]) {
+              k++;
+              const [a, b] = both(() => resolvePosition(SEED, o.x + x, o.z + z, r));
+              if (a.x !== b.x || a.z !== b.z) mismatches.push(`step ${step} (${x}, ${z}) r ${r}`);
+              if (k % 6 !== 0) continue;
+              const [c, d] = both(() =>
+                lineOfSightClear(SEED, { x: o.x + x, z: o.z + z }, { x: o.x + sx, z: o.z - 150 }),
+              );
+              if (c !== d) mismatches.push(`sight step ${step} (${x}, ${z})`);
+            }
+      }
+    } finally {
+      clearCombatWallStateForTest();
+    }
+    expect(mismatches).toEqual([]);
+  }, 120_000);
 });

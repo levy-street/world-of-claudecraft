@@ -29,6 +29,7 @@ const OPEN_AIR_INTERIORS = [
   'sunken_bastion',
   'drowned_temple',
   'gravewyrm_sanctum',
+  'smith_heart',
 ];
 
 const dungeonOf = (interior: string) => {

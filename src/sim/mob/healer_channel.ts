@@ -1,5 +1,6 @@
 import { TEMPLE_BOSS_CAST_SCHOOLS } from '../encounters/drowned_temple/ids';
 import { ILVANE_CAST_SCHOOLS } from '../encounters/hollow_crypt/ilvane_ids';
+import { COUNCIL_KICK_SCHOOLS } from '../encounters/smith_heart/council_ids';
 import {
   HOARD_ADD_CAST_SCHOOLS,
   HOARD_CONTROL_CAST_SCHOOLS,
@@ -54,4 +55,8 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   // The trash engine's demonstration kit (mob/trash_kit/engine_demo.ts): the
   // dev-only kickable nova.
   ...TRASH_DEMO_CAST_SCHOOLS,
+  // The Smith's Heart's Hammer Council: the Seam Singer's Seam Bolt and Song
+  // of the Seam (encounters/smith_heart/council_ids.ts); its heir's song runs
+  // under an id registered nowhere.
+  ...COUNCIL_KICK_SCHOOLS,
 };

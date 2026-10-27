@@ -153,3 +153,88 @@ export const RAID_BOSS_VOICE_PROMPTS = [
     guidanceScale: 0.78,
   },
 ];
+
+// The Smith's Heart's Hammer Council (src/sim/encounters/smith_heart/
+// council_voice.ts COUNCIL_LINES): one audition brief per member, its preview
+// the member's own lines in the order a pull hears them. Auditions only, like
+// the briefs above: nothing here is finalized until the designer picks a
+// candidate (node scripts/audition_raid_boss_voices.mjs --set council).
+
+const COUNCIL_REFS = [
+  'docs/design/raid/smith_heart.md',
+  'src/render/smith_heart_fx/council_bodies_core.ts',
+];
+
+/** @type {RaidBossVoicePrompt[]} */
+export const HAMMER_COUNCIL_VOICE_PROMPTS = [
+  {
+    npcId: 'heart-guardian',
+    takeId: 'quarry-colossus',
+    name: 'Guardian of the Hammer, Quarry Colossus',
+    voiceDescription:
+      'Native English, male-presenting, ageless. Perfect audio quality. Persona: the Guardian of ' +
+      'the Hammer, a vast golem of carved quarry stone that has kept a mountain forge for ' +
+      'centuries. Emotion: patient, immovable, then thunderous. A non-human voice: a very low, ' +
+      'slow bass with a gravel surface and a faint hollow resonance, as if the words are spoken ' +
+      'from inside a stone chest. Each phrase is short and deliberate, consonants landing like ' +
+      'set blocks, long pauses between sentences. Never a clean human narrator, never a robot, ' +
+      'never a growling beast: an ancient guardian who does not need to shout until the ' +
+      'mountain answers him.',
+    previewText: [
+      "[slow, a low stone rumble] Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
+      '[thunderous] The mountain answers me! Hide, if the stone will have you!',
+      '[quiet, grinding] The stone remembers. What was theirs is mine.',
+      '[cold, from far inside the rock] I am the stone now. My wrath has no body left to fail.',
+      '[fading] My strength... I give it to the stone.',
+      "[a last breath of dust] The Hammer's strength... is yours to carry.",
+    ].join(' '),
+    visualReferences: COUNCIL_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-slabwright',
+    takeId: 'gruff-mason',
+    name: 'The Slabwright, Gruff Stone Mason',
+    voiceDescription:
+      'Native English with a broad, earthy working accent. Male-presenting, ageless. Perfect ' +
+      'audio quality. Persona: the Slabwright, a broad, blocky stone being with slab shoulders ' +
+      'who raises pillars and drops rock like a mason at work. Emotion: gruff, practical, darkly ' +
+      'amused. A non-human voice: a rough mid-low baritone with a dry gravel rasp and a short ' +
+      'chesty grunt on effort, quicker and blunter than the Guardian, as if every line is said ' +
+      'between two hammer blows. Clipped sentences, heavy stress, a craftsman proud of his ' +
+      'stonework. Never a cartoon dwarf, never an ogre, never a clean human.',
+    previewText: [
+      '[gruff, unhurried] More stone for the wall. Hold still, and I will set you in it.',
+      '[a grunt of effort] Stand there. The stone rises where you stand!',
+      '[barking, amused] Look up, little ones! The mountain is falling!',
+      '[low] The stone remembers. I will finish the work.',
+      '[dragging, strained] No hands left, but I will drag this stone to you.',
+      '[cracking apart] The slab... splits...',
+    ].join(' '),
+    visualReferences: COUNCIL_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-singer',
+    takeId: 'resonant-seam',
+    name: 'The Seam Singer, Resonant Seam',
+    voiceDescription:
+      'Native English, female-presenting, ageless. Perfect audio quality. Persona: the Seam ' +
+      'Singer, a tall, slender being of stone and glowing amber crystal whose voice is the ' +
+      'humming of an ore seam deep in a mountain. Emotion: serene, eerie, quietly cruel. A ' +
+      'non-human voice: a clear, low alto with a soft crystalline shimmer and a faint natural ' +
+      'echo, as if each word rings inside a cave. Slow, melodic phrasing that almost sings, ' +
+      'breathy hushes, then a sudden cutting edge on commands. Never a sweet human singer, never ' +
+      'a whisper-only ghost, never robotic.',
+    previewText: [
+      '[softly, almost singing] Hear the seam sing? It has waited so long for your voices.',
+      '[rising to a ringing command] Sing with me, and break!',
+      '[a calm hush] The stone remembers. Listen, it still sings.',
+      '[echoing, inside the stone] Listen. In the stone, my song never ends.',
+      '[a fading note] My song... runs into the rock...',
+      '[gently] Hush now. The seam is still.',
+    ].join(' '),
+    visualReferences: COUNCIL_REFS,
+    guidanceScale: 0.65,
+  },
+];

@@ -65,6 +65,23 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   snow: [0.66, 0.72, 0.8],
   ice: [0.3, 0.47, 0.6],
   slate: [0.2, 0.21, 0.235],
+  // The Smith's Heart's quarry: Stormcrag's cool grey granite bedrock, cut
+  // and dusty (the warm comes from the low sun and the dust drifts).
+  quarry: [0.3, 0.3, 0.315],
+  // The Hammer Gallery's paving: dressed granite flags, a warm grey (the
+  // kerbs a shade paler), dust in the joints.
+  paving: [0.33, 0.315, 0.3],
+  // The Breath's summit (phase 2G): pale granite bedrock scoured by the
+  // storm, a cool grey a value over the quarry's.
+  scoured: [0.4, 0.405, 0.415],
+  // The Quench (phase 2H): Stormcrag granite gone pale and blue under the
+  // frost, snow drifted over it; and the Frozen Lake's clear ice, a cold
+  // blue the lake shader deepens to dark water.
+  rime: [0.36, 0.395, 0.45],
+  lake_ice: [0.36, 0.5, 0.62],
+  // The Heat (phase 2I): the mountain's basalt cooled in columns, their worn
+  // heads a dark warm grey, sooted, ash settled over them.
+  hearth: [0.25, 0.235, 0.225],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -78,13 +95,34 @@ export const FIELD_TOP_FAMILIES = [
   'snow',
   'ice',
   'slate',
+  'quarry',
+  'paving',
+  'scoured',
+  'rime',
+  'lake_ice',
+  'hearth',
 ] as const;
 export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 
 /** Texture repeats per yard of a top family (most tile every 4 yd; the
  *  slate flags are drawn at a plate's real size, one tile every 12 yd). */
 export function fieldFamilyUvScale(family: FieldTopFamily): number {
-  return family === 'slate' ? 1 / 12 : 0.25;
+  if (family === 'slate') return 1 / 12;
+  // The quarry's cut panels are a few yards across: one tile every 16 yd
+  // (a broad tile, so the floor's repeat never reads as a grid of tiles).
+  if (family === 'quarry') return 1 / 16;
+  // The Gallery's flags are a yard or two each: one tile every 10 yd.
+  if (family === 'paving') return 1 / 10;
+  // The scoured bedrock's slabs are several yards across: one tile every 14.
+  if (family === 'scoured') return 1 / 14;
+  // The Quench's frost-cracked slabs, a few yards across: one tile every 12.
+  if (family === 'rime') return 1 / 12;
+  // The lake's cracks and bubble streams run long: one tile every 18.
+  if (family === 'lake_ice') return 1 / 18;
+  // The basalt columns' heads, a yard and a half to two across: one tile
+  // every 10.
+  if (family === 'hearth') return 1 / 10;
+  return 0.25;
 }
 
 /** Which texture family a ground kind draws with. */
@@ -95,6 +133,12 @@ export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'snow') return 'snow';
   if (ground === 'ice') return 'ice';
   if (ground === 'slate') return 'slate';
+  if (ground === 'quarry') return 'quarry';
+  if (ground === 'paving') return 'paving';
+  if (ground === 'scoured') return 'scoured';
+  if (ground === 'rime') return 'rime';
+  if (ground === 'lake_ice') return 'lake_ice';
+  if (ground === 'hearth') return 'hearth';
   if (ground === 'plate') return 'plate';
   if (ground === 'grating') return 'grating';
   return ground === 'earth' ||
@@ -339,16 +383,19 @@ function surfaceTris(s: FieldSurface, maxEdge: number): Tri[] {
  * surface (the drawbridge that exists once lowered) never cuts the ground
  * under it, so that ground stays drawn while the bridge is raised.
  */
-export function laterClippers(def: AuthoredFieldDef): PreparedClipper[][] {
+export function laterClippers(
+  def: AuthoredFieldDef,
+  omit: ReadonlySet<string> = new Set(),
+): PreparedClipper[][] {
   const rings = def.surfaces.map((s) => renderOutline(s));
   const boxes = rings.map((r) => ringBox(r));
   const prepared = new Map<number, PreparedClipper>();
   return def.surfaces.map((s, i) => {
     const out: PreparedClipper[] = [];
-    if (s.hidden) return out;
+    if (s.hidden || omit.has(s.id)) return out;
     const box = boxes[i];
     for (let j = i + 1; j < def.surfaces.length; j++) {
-      if (def.surfaces[j].hidden) continue;
+      if (def.surfaces[j].hidden || omit.has(def.surfaces[j].id)) continue;
       const b = boxes[j];
       if (b.minX >= box.maxX || box.minX >= b.maxX || b.minZ >= box.maxZ || box.minZ >= b.maxZ) {
         continue;
@@ -370,6 +417,10 @@ export interface FieldTopOptions {
   /** Each later surface floats this much above the one before (a z-fight
    *  guard; 0 is right now the tops are clipped and never overlap). */
   layerLift: number;
+  /** Surfaces whose tops a dungeon's own kit draws (a stair laid tread by
+   *  tread): neither drawn nor cutting the ground under them, as a hidden
+   *  surface's top. Their cliffs are still the field's. */
+  omit?: ReadonlySet<string>;
 }
 
 /** Vertex paint of a walkable top: ground colour, broad mottling, grit. */
@@ -396,10 +447,124 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   if (ground === 'snow') return snowColor(base, x, z, onPath);
   if (ground === 'ice') return iceColor(base, x, z);
   if (ground === 'slate') return slateColor(base, k, x, z, onPath);
+  if (ground === 'quarry') return quarryColor(base, k, patch, dirt);
+  if (ground === 'paving') return pavingColor(base, k, patch, dirt);
+  if (ground === 'scoured') return scouredColor(base, k, x, z, patch);
+  if (ground === 'rime') return rimeColor(base, k, x, z, onPath);
+  if (ground === 'lake_ice') return lakeIceColor(base, x, z);
+  if (ground === 'hearth') return hearthColor(base, k, x, z, onPath);
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
   return [r, g, b];
+}
+
+/** Quarried bedrock: cool grey granite in broad beds, darker and bluer in
+ *  the worked hollows, warm pale dust drifted over it in patches (the only
+ *  warm in the floor); never green, never wet. */
+function quarryColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
+  const dust = Math.max(0, patch - 0.48) * 2.0;
+  const shade = Math.min(1, dirt * 1.6);
+  const t = k * (1 - shade * 0.42);
+  return [
+    base[0] * t + dust * 0.15,
+    base[1] * t + dust * 0.13,
+    base[2] * t * (1 + shade * 0.06) + dust * 0.1,
+  ];
+}
+
+/** The Gallery's paving: a warm grey in broad drifts (the flags' own tones
+ *  live in the texture), the dust settled in patches and the low spots
+ *  cooler and darker; never one flat colour, never the quarry's pale slab. */
+function pavingColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
+  const dust = Math.max(0, patch - 0.5) * 1.6;
+  const shade = Math.min(1, dirt * 1.4);
+  const t = k * (1 - shade * 0.32);
+  return [
+    base[0] * t + dust * 0.1,
+    base[1] * t + dust * 0.085,
+    base[2] * t * (1 + shade * 0.08) + dust * 0.06,
+  ];
+}
+
+/** The Breath's scoured bedrock (phase 2G): a pale cool grey in long drifts
+ *  laid down the wind (the storm polishes the rock in streaks, never in
+ *  blots), a cold blue-grey in the hollows where the rain stands, a little
+ *  grey-green lichen on the high spots. */
+function scouredColor(base: Rgb, k: number, x: number, z: number, patch: number): Rgb {
+  // Streaks along the prevailing wind (from the north-west): the noise
+  // stretched across it.
+  const along = x * 0.6 + z * 0.8;
+  const across = x * 0.8 - z * 0.6;
+  const streak = fieldNoise(along * 0.025 + 31, across * 0.16 - 9, 2);
+  const wet = Math.max(0, 0.42 - patch) * 1.6;
+  const lichen = Math.max(0, patch - 0.66) * 1.4;
+  const t = k * (0.9 + streak * 0.22) * (1 - wet * 0.22);
+  return [
+    base[0] * t - lichen * 0.02,
+    base[1] * t + lichen * 0.015,
+    base[2] * t * (1 + wet * 0.12) - lichen * 0.01,
+  ];
+}
+
+/** The Quench's frost-bound granite (phase 2H): a pale cold blue-grey in
+ *  broad drifts, snow lying in long soft drifts over it (whiter, a cold blue
+ *  in their hollows), thinned where the walk is trodden; never one flat
+ *  colour, never the Gravewyrm's slate. */
+function rimeColor(base: Rgb, k: number, x: number, z: number, onPath: boolean): Rgb {
+  // Soft drifts (a gentle ramp: the vertex paint must never draw a hard
+  // white blot), a little powder blown between them.
+  const drift = Math.max(0, fieldNoise(x * 0.045 + 17, z * 0.045 - 23, 3) - 0.5) * 1.7;
+  const powder = Math.max(0, fieldNoise(x * 0.15 - 4, z * 0.15 + 9, 2) - 0.6) * 1.2;
+  const snow = Math.min(0.8, (drift + powder * 0.5) * (onPath ? 0.55 : 1));
+  const t = k * 0.86;
+  const hollow = Math.max(0, 0.45 - fieldNoise(x * 0.09 + 3, z * 0.09 - 8, 2)) * 1.4;
+  const rock: Rgb = [
+    base[0] * t * (1 - hollow * 0.12),
+    base[1] * t,
+    base[2] * t * (1 + hollow * 0.06),
+  ];
+  const w = snow * 0.8;
+  return [
+    rock[0] + (0.74 - rock[0]) * w,
+    rock[1] + (0.8 - rock[1]) * w,
+    rock[2] + (0.88 - rock[2]) * w,
+  ];
+}
+
+/** The Frozen Lake's ice (phase 2H): a cold blue, darker where the ice is
+ *  clear over deep water, paler where it clouds; the lake shader
+ *  (smith_heart/quench_lake_ice.ts) draws its depth, bubbles and edge snow. */
+function lakeIceColor(base: Rgb, x: number, z: number): Rgb {
+  const cloud = fieldNoise(x * 0.04 + 41, z * 0.04 - 7, 3);
+  const k = 0.82 + cloud * 0.36;
+  return [base[0] * k, base[1] * k, base[2] * k];
+}
+
+/** The Heat's columnar basalt (phase 2I): a dark warm grey in broad
+ *  drifts, soot pooled darker in patches, pale ash settled over it in soft
+ *  drifts (thinned where the walk is trodden), the stone baked a breath
+ *  warmer in long bands where the fire runs under it; never one flat
+ *  colour, never black, never orange (the fire is the joints' own light,
+ *  smith_heart/heat_hearth_floor.ts). */
+function hearthColor(base: Rgb, k: number, x: number, z: number, onPath: boolean): Rgb {
+  const soot = Math.max(0, fieldNoise(x * 0.06 - 9, z * 0.06 + 14, 3) - 0.55) * 1.6;
+  const ash =
+    Math.min(0.5, Math.max(0, fieldNoise(x * 0.05 + 21, z * 0.05 - 3, 3) - 0.55) * 1.4) *
+    (onPath ? 0.6 : 1);
+  const warm = Math.max(0, fieldNoise(x * 0.025 + 5, z * 0.08 - 11, 2) - 0.6) * 1.5;
+  const t = k * 0.9 * (1 - soot * 0.3);
+  const rock: Rgb = [
+    base[0] * t * (1 + warm * 0.18),
+    base[1] * t * (1 + warm * 0.08),
+    base[2] * t * (1 - warm * 0.05),
+  ];
+  const w = ash * 0.55;
+  return [
+    rock[0] + (0.52 - rock[0]) * w,
+    rock[1] + (0.49 - rock[1]) * w,
+    rock[2] + (0.45 - rock[2]) * w,
+  ];
 }
 
 /** Jungle moss: bright sunlit cushions, darker damp loam showing through,
@@ -521,10 +686,16 @@ export function planFieldTops(
     snow: { positions: [], colors: [], uvs: [], indices: [] },
     ice: { positions: [], colors: [], uvs: [], indices: [] },
     slate: { positions: [], colors: [], uvs: [], indices: [] },
+    quarry: { positions: [], colors: [], uvs: [], indices: [] },
+    paving: { positions: [], colors: [], uvs: [], indices: [] },
+    scoured: { positions: [], colors: [], uvs: [], indices: [] },
+    rime: { positions: [], colors: [], uvs: [], indices: [] },
+    lake_ice: { positions: [], colors: [], uvs: [], indices: [] },
+    hearth: { positions: [], colors: [], uvs: [], indices: [] },
   };
-  const clippers = laterClippers(def);
+  const clippers = laterClippers(def, opts.omit);
   def.surfaces.forEach((s, layer) => {
-    if (s.hidden) return;
+    if (s.hidden || opts.omit?.has(s.id)) return;
     const ground: FieldGround = s.ground ?? (s.kind === 'path' ? 'flagstone' : 'earth');
     const batch = out[fieldGroundFamily(ground)];
     const uvScale = fieldFamilyUvScale(fieldGroundFamily(ground));

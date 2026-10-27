@@ -4741,6 +4741,38 @@ export const zh_CN: EnTranslations = {
         "creepingRime": "移动速度降低{pct}%，每层{per}%。每次霜凇吐息都会叠加一层并将持续时间重置为{seconds}秒。叠到{max}层时你会被冻结（冰封）{freeze}秒，并清除所有层数。",
         "icedOver": "被蔓延霜凇冻结：无法移动或行动。"
       },
+      "council": {
+        "wakeMark": "结束时，一根石柱会从你脚下的地面冲出，对{radius}码内的所有人造成{min}到{max}点伤害并将其击退。站到团队需要掩体的位置。英雄和史诗难度：伤害提高{heroic}%。",
+        "rockMark": "结束时，一块巨石砸向你：{total}点伤害由{radius}码内的所有人分担。若不足{soakers}人分担，每人多受{penalty}%伤害，且全团受到{tremorMin}到{tremorMax}点伤害。{radius}码内的每根石柱都会损失一块，所以要远离掩体分担。史诗难度：{soulReach}码内的灵魂石柱改为失去一个灵魂印记，印记耗尽时碎裂。英雄和史诗难度：伤害提高{heroic}%。",
+        "resonance": "在石柱{reach}码内连续站立{seconds}秒会震落它的一块，之后每多待{seconds}秒再震落一块。无法移除：在最破损的石柱旁躲过山岳之怒，远离完好的石柱。史诗难度：在灵魂石柱旁等待同样的时间会改为击碎它的一个灵魂印记（矿脉歌者的石柱为{singerSeconds}秒），印记耗尽时碎裂。",
+        "memory": "造成的伤害提高{pct}%：重锤议会每倒下一名成员提高{per}%。"
+      },
+      "breathGuardian": {
+        "wind": "气息守护者的风以每秒{speed}码的速度将你带往它吹去的方向。逆风而行便能站稳，它不会打断你的施法。被压在边缘的墙上时，你每秒受到{pinMin}到{pinMax}点伤害。墙壁破损处没有任何阻挡：你会坠入虚空。",
+        "draw": "守护者吸气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后风箱狂风对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们向外击飞{throw}码。",
+        "pinned": "被风压在边缘的墙上：在风停歇或你离开墙边之前，每秒受到{min}到{max}点伤害。",
+        "anchor": "瑟萨莉队长的宁静稳住了你：风、拉扯、冲击和击飞都无法移动你。伤害照常生效。",
+        "spent": "你的锚定已经耗尽：在此效果结束前，瑟萨莉队长的宁静之环无法再次锚定你。",
+        "drawn": "每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。",
+        "cradled": "被举入风暴，持续{hold}秒。随后的放电造成{total}点伤害，由你和你下方{radius}码内的所有人分担。分担人数少于{soakers}人（英雄难度为{heroicSoakers}人）时，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}点伤害。",
+        "stormForm": "撕裂为闪电之躯：战斗的风暴后半段，直到气息守护者倒下。",
+        "swell": "每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。"
+      },
+      "quenchGuardian": {
+        "cold": "你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，它反而每秒下降{fall}。达到{max}时你会被霜封{freeze}秒，随后冰层碎裂。",
+        "warmth": "与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。",
+        "frozen": "被霜封住：无法行动。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害并陷入霜脆状态，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。",
+        "brittle": "受到的所有伤害提高{pct}%。",
+        "trapped": "踏穿冰面掉进冰冷的水中：无法移动，每秒受到{min}到{max}点冰霜伤害，寒意不断上升。{seconds}秒后你会爬上岸边。仅凭冰水绝不会致死。",
+        "awake": "铁匠的四把刃已苏醒。每次淬火吐息与回火打击命中后{delay}秒（生命值低于{lowPct}%时为{low}秒），每把刃都会在漂浮之处朝同一方向重复它。站在刃后、背对攻击的一侧，永远安全。",
+        "deepening": "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。"
+      },
+      "heatGuardian": {
+        "heat": "炉心热度：{heat}/{max}。它每秒自行上升{rise}。每{every}秒，炉心脉动对炉心地面上的所有人造成{min}到{most}点火焰伤害（按当前热度），越热伤害越高。玩家每承受一道燃焰光束，热度下降{cool}；{range}码内无人时，光束会回到守护者体内，使热度上升{back}。达到{max}时炉心过热。",
+        "burn": "受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%：你的{stacks}层每层{per}%，最多{most}层。每被一道燃焰光束击中叠加一层；最后一次变化{decay}秒后消退一层（英雄难度为{heroicDecay}秒）。",
+        "stoked": "炉心热度上升快了{total}%：战斗中每{every}秒再快{step}%（目前{stacks}次）。",
+        "overheating": "热度已达到{at}。达到{max}时炉心过热：炉心爆裂对地面上的所有人造成{min}到{most}点火焰伤害（英雄难度为{heroicMin}到{heroicMost}），之后热度从{vent}重新上升。用水晶的光束降温，否则就做好准备。"
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -7196,6 +7228,164 @@ export const zh_CN: EnTranslations = {
       "glyphLightingLine": "留在符文上直到它被点亮。离开就要重新开始",
       "breathTitle": "神像吐息！",
       "breathLine": "石美洲豹即将向平台的这一半吐息。跑到另一半去"
+    },
+    "council": {
+      "warn": {
+        "wrath": "山岳之怒！躲到石柱后面！",
+        "enrage": "山岳的怒火加速了！山岳之怒会来得更快。",
+        "weight": "{player}受到重锤之压：换坦克！",
+        "wake": "唤醒岩石：石柱将在{players}脚下升起！站到需要掩体的地方。",
+        "wakeHeir": "岩石在{players}脚下苏醒：快移动！",
+        "rock": "落石砸向{player}！远离掩体，一起分担！",
+        "song": "矿脉之歌！打断它！",
+        "resonance": "{players}获得共鸣：去震裂最破损的石柱，远离完好的石柱！",
+        "fell_guardian": "重锤守护者倒下了。它的怒火传入了剩下的岩石！",
+        "fell_slabwright": "石板匠倒下了。现在岩石会随意升起！",
+        "fell_singer": "矿脉歌者倒下了。它的歌声被传承下去，再也无法打断！",
+        "soul_guardian": "守护者之魂附入了岩石！怒火回响将从那根石柱中爆发。",
+        "soul_slabwright": "石板匠之魂附入了岩石！行走石板正拖着身躯向你们逼近。",
+        "soul_singer": "矿脉歌者之魂附入了岩石！无尽之歌每一次脉动都更加响亮。",
+        "echo": "怒火回响！让另一根石柱挡在你和灵魂石柱之间！",
+        "soulBreak_guardian": "守护者的灵魂石柱碎裂了！它的回响归于沉寂。",
+        "soulBreak_slabwright": "石板匠的灵魂石柱碎裂了！行走石板停了下来。",
+        "soulBreak_singer": "矿脉歌者的灵魂石柱碎裂了！无尽之歌归于沉寂。"
+      },
+      "say": {
+        "guardian_pull": "采石场来了外人。铁锤之力绝不向血肉屈服。",
+        "guardian_wrath": "群山回应了我！若岩石肯收留你们，就躲起来吧！",
+        "guardian_death": "我的力量……交给岩石。",
+        "guardian_remember": "岩石铭记。它们的一切，如今归我。",
+        "guardian_soul": "如今我即是岩石。我的怒火再无会倒下的躯体。",
+        "guardian_wipe": "尘土。一切血肉终归如此。",
+        "guardian_defeat": "铁锤之力……由你们来承担。",
+        "slabwright_pull": "墙还缺石头。别动，我把你们砌进去。",
+        "slabwright_wake": "站在那儿。岩石会从你脚下升起！",
+        "slabwright_rock": "抬头看，小家伙们！山要塌了！",
+        "slabwright_death": "石板……裂开了……",
+        "slabwright_remember": "岩石铭记。这活儿我来干完。",
+        "slabwright_soul": "我已没有双手，但我会把这块石头拖到你们面前。",
+        "slabwright_wipe": "砌好，埋好。干得漂亮。",
+        "slabwright_defeat": "采石场……安静了。",
+        "singer_pull": "听见矿脉在歌唱吗？它等你们的声音等了好久。",
+        "singer_song": "与我同唱，然后碎裂吧！",
+        "singer_death": "我的歌……流入了岩石……",
+        "singer_remember": "岩石铭记。听，它仍在歌唱。",
+        "singer_soul": "听啊。在岩石之中，我的歌永不终结。",
+        "singer_wipe": "嘘。矿脉已归于寂静。",
+        "singer_defeat": "最后一个音……消散了。"
+      },
+      "alert": {
+        "wakeTitle": "唤醒岩石！",
+        "wakeLine": "石柱会在你站的地方升起：把掩体放在团队需要的位置",
+        "rockTitle": "落石！",
+        "rockLine": "远离石柱，让至少三名队友站到你身边",
+        "resonanceTitle": "共鸣",
+        "resonanceLine": "靠近石柱就会震裂它：在最破损的石柱旁等待",
+        "resonanceCracking": "正在震裂石柱：离开它以保住它",
+        "rockLineSoul": "远离掩体，在灵魂石柱旁聚集至少三名队友",
+        "resonanceLineSoul": "在灵魂石柱旁等待以击碎灵魂印记，不要靠近完好的石柱",
+        "resonanceBreaking": "正在击碎灵魂印记：留在灵魂石柱旁",
+        "weightTitle": "重锤之压",
+        "weightLine": "你受到双倍物理伤害：另一名坦克必须接手守护者",
+        "timeAria": "剩余{seconds}秒"
+      }
+    },
+    "breathGuardian": {
+      "warn": {
+        "inhale": "守护者正在吸气！别站在它嘴前的漩涡里！",
+        "gust": "风箱狂风！准备承受冲击！",
+        "gales": "游荡的狂风横扫崖台！离它们远点！",
+        "circle": "瑟萨莉队长布下了宁静之环！最多可容{seats}人。",
+        "fell": "{player}被卷入了虚空！",
+        "storm": "风暴爆发了！闪电将落满整个崖台！",
+        "fork": "跳跃雷击落在{player}身上！散开！",
+        "cradle": "{player}被举入了风暴！到他的下方集合！",
+        "drawn": "引雷落在{player}身上！把落雷引向边缘！",
+        "stormGust": "风暴阵风正在聚集！顶住风！"
+      },
+      "say": {
+        "guardian_pull": "你们爬上山巅，是来偷走它的气息吗？那就与我一同呼吸吧。",
+        "guardian_blow": "感受风向的转变。边缘比你想的更近。",
+        "guardian_inhale": "靠近些。所有人。",
+        "guardian_storm": "气息够了。现在，迎接风暴！",
+        "guardian_cradle": "升起吧，小家伙。让他们接住你。",
+        "guardian_drawn": "天空选中了你。跑吧，它会紧随而至。",
+        "guardian_wipe": "被吹散了，就像山巅的尘埃。",
+        "guardian_death": "气息……回归……群山……",
+        "thessaly_pull": "高望与你们并肩！当心墙上的缺口：风会把你们从那里扔出去！",
+        "thessaly_circle_a": "快进我的宁静之中！最多三人，不能再多！",
+        "thessaly_circle_b": "这里！站在我身边，让风撞碎在我们身上！",
+        "thessaly_circle_c": "石上的宁静！三个人，现在就来！",
+        "thessaly_inhale": "它在吸气！绕到它的两侧，千万别站在它嘴前！",
+        "thessaly_storm": "风暴要爆发了！我的宁静挡不住这个。散开！",
+        "thessaly_fall": "抓紧岩石！",
+        "thessaly_victory": "气息自由了。高望会记住这次攀登。",
+        "thessaly_wipe": "退后，喘口气。我们再来一次。"
+      }
+    },
+    "quenchGuardian": {
+      "warn": {
+        "rim": "岸冰隆起！快到湖面上去！",
+        "frozen": "{player}被冻透了！在冰碎裂之前离开！",
+        "crack": "抱团的人群下冰面在呻吟！散开！",
+        "wake": "铁匠之刃从湖中挣脱！它们出击时站到刃后！",
+        "cross": "两把刃横越湖面！离开它们的路径！"
+      },
+      "say": {
+        "pull": "我的湖上来了温热的血。它不会温热太久。",
+        "shatter": "冻透了。现在，碎裂吧。",
+        "hole": "冰记得每一步。聚在一起，它便会崩塌。",
+        "wake": "铁匠之刃，苏醒吧！回应我的每一击！",
+        "echo": "我击打的，它们也会再击一次。",
+        "cross": "交错吧，刃！为他们劈出新的湖岸！",
+        "deepen": "感觉到了吗？寒意正越来越深。",
+        "wipe": "静止。无声。淬火已成。",
+        "death": "寒意……放手了……淬火归你们了。"
+      }
+    },
+    "quenchAlert": {
+      "coldTitle": "寒意",
+      "freezingTitle": "快冻僵了！",
+      "warmTitle": "抱团取暖",
+      "frozenTitle": "被霜封住！",
+      "waterTitle": "在冰下！",
+      "coldLine": "站到{radius}码内有{others}名或更多其他玩家的地方取暖",
+      "warmLine": "寒意正在下降。{seconds}秒内移动人群，否则冰面会裂开",
+      "frozenLine": "冰层将在{seconds}秒后碎裂：附近的人请离开",
+      "waterLine": "{seconds}秒后爬上岸",
+      "coldBar": "寒意 {cold} / {max}",
+      "coldAria": "寒意 {cold}/{max}",
+      "timeAria": "剩余{seconds}秒"
+    },
+    "heatGuardian": {
+      "warn": {
+        "crystals": "燃焰水晶升起了！站进它们的光束为炉心降温！",
+        "channel": "炉心满溢了！流槽将把地面一分为二！",
+        "windup": "炉心即将过热！用水晶降温，否则就做好准备！",
+        "overheat": "炉心过热了！"
+      },
+      "say": {
+        "pull": "你们走进了最初的火焰。没有什么能毫无改变地离开。",
+        "shed": "接下我的热量吧，如果你们承受得住。",
+        "channel": "炉心满溢了。选好你们站的那一边。",
+        "windup": "一个躯体装不下这么多火焰……它必须找到出口！",
+        "overheat": "与我一同燃烧！",
+        "stoke": "你们的每一次呼吸都在喂养火焰。",
+        "wipe": "都化为灰烬吧。炉心依旧燃烧。",
+        "death": "火焰……沉回……岩石之中。好好带着它。"
+      }
+    },
+    "heatAlert": {
+      "heatTitle": "炉心升温",
+      "coolingTitle": "炉心降温",
+      "burningTitle": "水晶灼伤 x{stacks}",
+      "overheatTitle": "即将过热！",
+      "heatLine": "站在燃焰水晶{range}码内承受光束，为炉心降温",
+      "coolingLine": "水晶的光束正在为炉心降温：每道光束都要有人站着",
+      "burningLine": "受到的法术伤害提高{pct}%：离开光束，换别人来承受",
+      "overheatLine": "达到{max}时炉心会烧向所有人：使用减伤技能",
+      "heatBar": "热度 {heat} / {max}",
+      "heatAria": "热度 {heat}/{max}"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -16480,6 +16670,32 @@ export const zh_CN: EnTranslations = {
       "sanctum_counterweight_lash": "配重尾鞭",
       "sanctum_branding_iron": "烙铁",
       "sanctum_rime_breath": "霜凇吐息",
+      "heart_mountains_wrath": "山岳之怒",
+      "heart_bellows_gust": "风箱狂风",
+      "heart_storm_lance": "风暴长枪",
+      "heart_quenching_breath": "淬火吐息",
+      "heart_molten_pour": "熔流倾泻",
+      "heart_anvil_clang": "灼热丧钟",
+      "heart_forge_wrath": "熔炉之怒",
+      "heart_forge_pour": "熔炉倾泻",
+      "heart_gale_bolt": "Gale Bolt",
+      "heart_rime_bolt": "Rime Bolt",
+      "heart_ember_bolt": "余烬箭",
+      "heart_hammers_weight": "重锤之压",
+      "heart_wake_the_stone": "唤醒岩石",
+      "heart_falling_rock": "落石",
+      "heart_seam_bolt": "矿脉箭",
+      "heart_song_of_the_seam": "矿脉之歌",
+      "heart_song_of_the_seam_unbroken": "矿脉之歌",
+      "heart_echo_of_wrath": "怒火回响",
+      "heart_endless_song": "无尽之歌",
+      "heart_breath_inhale": "深吸之息",
+      "heart_breath_storm_break": "风暴破裂",
+      "heart_breath_forking_bolt": "跳跃雷击",
+      "heart_breath_thunders_cradle": "雷霆摇篮",
+      "heart_breath_drawn_lightning": "引雷",
+      "heart_quench_blades_wake": "诸刃苏醒",
+      "heart_heat_shed": "泄放热量",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "测试新星",
       "trash_demo_nova_unstoppable": "测试新星",
@@ -26320,6 +26536,51 @@ export const zh_CN: EnTranslations = {
       "sanctum_shackle_bellows": {
         "name": "风箱镣铐"
       },
+      "heart_hammer_warder": {
+        "name": "锤脉守卫"
+      },
+      "heart_ring_warder": {
+        "name": "环炉守卫"
+      },
+      "heart_breath_warder": {
+        "name": "息脉守卫"
+      },
+      "heart_breath_caller": {
+        "name": "息脉召唤者"
+      },
+      "heart_quench_warder": {
+        "name": "淬脉守卫"
+      },
+      "heart_quench_caller": {
+        "name": "淬脉召唤者"
+      },
+      "heart_heat_warder": {
+        "name": "热脉守卫"
+      },
+      "heart_heat_caller": {
+        "name": "热脉召唤者"
+      },
+      "heart_hammer_guardian": {
+        "name": "重锤守护者"
+      },
+      "heart_slabwright": {
+        "name": "石板匠"
+      },
+      "heart_seam_singer": {
+        "name": "矿脉歌者"
+      },
+      "heart_breath_guardian": {
+        "name": "吐息守护者"
+      },
+      "heart_quench_guardian": {
+        "name": "淬火守护者"
+      },
+      "heart_heat_guardian": {
+        "name": "炽热守护者"
+      },
+      "heart_masterless_strength": {
+        "name": "无主之力"
+      },
       "thorn_sprout": {
         "name": "荆棘幼芽"
       },
@@ -26735,6 +26996,11 @@ export const zh_CN: EnTranslations = {
         "name": "瑟萨莉队长",
         "title": "高望队长",
         "greeting": "这面墙已经站了两百年，{className}。只要我守着它，它就不会倒，虽然它正在呻吟。"
+      },
+      "heart_captain_thessaly": {
+        "name": "瑟萨莉队长",
+        "title": "高望队长",
+        "greeting": "站稳脚跟，{className}。当风箱呼吸时，进入我的宁静之中，让风撞碎在我们身上。"
       },
       "brother_aldric_highwatch": {
         "name": "奥德里克修士",
@@ -30142,6 +30408,11 @@ export const zh_CN: EnTranslations = {
         "name": "墓龙圣所",
         "enterText": "空气变得冰冷。下方有庞然之物在呼吸...",
         "leaveText": "你踉跄回到山风之中。"
+      },
+      "smith_heart": {
+        "name": "铁匠之心",
+        "enterText": "群山在你周围低鸣，宛如一座为夜晚封住的熔炉……",
+        "leaveText": "你爬回风暴岩的狂风之中。"
       },
       "nythraxis_crypt": {
         "name": "废弃墓穴",

@@ -401,6 +401,24 @@ const MOB_IDS = [
   'sanctum_shackle_tongs',
   'sanctum_shackle_anvil',
   'sanctum_shackle_bellows',
+  // The Smith's Heart raid blockout (content/smith_heart.ts): provisional
+  // descriptive names for placeholder bodies.
+  'heart_hammer_warder',
+  'heart_ring_warder',
+  'heart_breath_warder',
+  'heart_breath_caller',
+  'heart_quench_warder',
+  'heart_quench_caller',
+  'heart_heat_warder',
+  'heart_heat_caller',
+  'heart_hammer_guardian',
+  // The Hammer Council's other two (encounters/smith_heart/council.ts).
+  'heart_slabwright',
+  'heart_seam_singer',
+  'heart_breath_guardian',
+  'heart_quench_guardian',
+  'heart_heat_guardian',
+  'heart_masterless_strength',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
   // Zulgar's Hunting Spear: the usable body a teammate pulls out
@@ -488,6 +506,8 @@ const NPC_IDS = [
   'herbalist_yara',
   'scout_maren',
   'captain_thessaly',
+  // The same captain on the Smith's Heart's Storm Cornice (content/smith_heart.ts).
+  'heart_captain_thessaly',
   'brother_aldric_highwatch',
   'scout_maren_highwatch',
   'quartermaster_bree',
@@ -879,6 +899,7 @@ const DUNGEON_IDS = [
   'hollow_crypt',
   'sunken_bastion',
   'gravewyrm_sanctum',
+  'smith_heart',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
   'ignivar_forge_lift',

@@ -393,8 +393,12 @@ describe('isHarvestableCorpse', () => {
     // buddy_sprites, the flame-sprite pair (Flicker and Glimmer): 300.
     // Retiring buddy_sapling leaves 299. Zulgar's Hunting Spear is an encounter
     // object without harvest components, bringing the merged roster to 300.
+    // The Smith's Heart raid (content/smith_heart.ts) adds fifteen untagged
+    // templates, like every dungeon template: eight vein warders and callers,
+    // the six bosses of the Council and the guardians, and the final boss: 315.
     expect(untagged).toContain(MOBS.wildheart_hunting_spear);
-    expect(untagged).toHaveLength(300);
+    expect(untagged).toContain(MOBS.heart_heat_guardian);
+    expect(untagged).toHaveLength(315);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

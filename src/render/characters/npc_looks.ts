@@ -3289,6 +3289,9 @@ function baseId(templateId: string): string {
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
   if (templateId === 'scout_maren_wastes') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
+  // Captain Thessaly at the head of the Smith's Heart's Storm Cornice (a
+  // quest-less copy of her Highwatch NPC): the same face, sword and shield.
+  if (templateId === 'heart_captain_thessaly') return 'captain_thessaly';
   // The Muster Standard's soldiers (combat/balgath_trinkets.ts) are the camp's own.
   if (templateId === 'guardian_muster_standard_spear') return 'muster_footman';
   if (templateId === 'guardian_muster_standard_sword') return 'muster_sergeant';

@@ -714,6 +714,11 @@ const UI_PURE_CORES = [
   // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
+  // The Smith's Heart's alerts: the Hammer Council, the Guardian of the
+  // Quench's cold bar and the Guardian of the Heat's heat gauge.
+  'src/ui/hud/dungeon/council_alert_view.ts',
+  'src/ui/hud/dungeon/quench_alert_view.ts',
+  'src/ui/hud/dungeon/heat_alert_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.
@@ -1055,6 +1060,65 @@ const RENDER_PURE_CORES = [
   'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_works_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_surface_wear_core.ts',
+  'src/render/smith_heart/heart_plan_core.ts',
+  'src/render/smith_heart/heart_walls_core.ts',
+  'src/render/smith_heart/heart_rivers_core.ts',
+  'src/render/smith_heart/heart_seal_core.ts',
+  'src/render/smith_heart/heart_gates_core.ts',
+  'src/render/smith_heart/heart_sightline_core.ts',
+  // The Smith's Heart's portal moments (the opening, the hop, the area blend),
+  // the Heart's chains, keels and core, and the mountain round every floor.
+  'src/render/smith_heart/heart_portal_core.ts',
+  'src/render/smith_heart/heart_room_core.ts',
+  'src/render/smith_heart/heart_mountain_core.ts',
+  // The Hammer vein's cliff faces' quarry granite paint.
+  'src/render/smith_heart/heart_cliff_paint_core.ts',
+  // The Hammer vein's Blender kit: the placement record and its plan.
+  'src/render/smith_heart/heart_kit_core.ts',
+  'src/render/smith_heart/hammer_kit_plan_core.ts',
+  // The mountain's rock kit (phase 2E): its bands and lips, and the Hammer
+  // Gallery's kerb and chain rail.
+  'src/render/smith_heart/heart_rock_plan_core.ts',
+  'src/render/smith_heart/hammer_walk_plan_core.ts',
+  // The Ring's kit (phase 2F): the Ring, its stairs, the dais, the spires, the mouths.
+  'src/render/smith_heart/ring_kit_plan_core.ts',
+  // The Hammer vein's air and the Hammer guardian's and the Slab's effects.
+  'src/render/smith_heart/hammer_air_core.ts',
+  'src/render/smith_heart_fx/hammer_fx_core.ts',
+  // The Breath vein (phase 2G): its kit's plan, its air and weather, its
+  // guardian's effects.
+  'src/render/smith_heart/breath_kit_plan_core.ts',
+  'src/render/smith_heart/breath_air_core.ts',
+  'src/render/smith_heart_fx/breath_fx_core.ts',
+  // The Quench vein (phase 2H): its kit's plan, the shared lip walls, its
+  // frost on the mountain, its air and weather, its guardian's effects.
+  'src/render/smith_heart/quench_kit_plan_core.ts',
+  'src/render/smith_heart/lip_walls_core.ts',
+  'src/render/smith_heart/quench_frost_core.ts',
+  'src/render/smith_heart/quench_air_core.ts',
+  'src/render/smith_heart_fx/quench_fx_core.ts',
+  // The Smith's Heart's Heat vein (phase 2I): its kit's plan, its basalt on
+  // the mountain, its air and the pour's timeline, its guardian's effects.
+  'src/render/smith_heart/heat_kit_plan_core.ts',
+  'src/render/smith_heart/heat_soot_core.ts',
+  'src/render/smith_heart/heat_air_core.ts',
+  'src/render/smith_heart/heat_pour_core.ts',
+  'src/render/smith_heart_fx/heat_fx_core.ts',
+  // The Smith's Heart's final room (phase 2J): its kit's plan, its crown of
+  // rock, the final boss's memory, its body and effects.
+  'src/render/smith_heart/heart_room_kit_plan_core.ts',
+  'src/render/smith_heart/heart_crown_core.ts',
+  'src/render/smith_heart/heart_final_core.ts',
+  'src/render/smith_heart_fx/final_fx_core.ts',
+  'src/render/smith_heart_fx/council_fx_core.ts',
+  'src/render/smith_heart_fx/council_bodies_core.ts',
+  // The Guardian of the Breath's body (its storm form) and its fight's effects.
+  'src/render/smith_heart_fx/breath_body_core.ts',
+  'src/render/smith_heart_fx/breath_fight_fx_core.ts',
+  'src/render/smith_heart_fx/quench_body_core.ts',
+  'src/render/smith_heart_fx/quench_fight_fx_core.ts',
+  'src/render/smith_heart_fx/heat_body_core.ts',
+  'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

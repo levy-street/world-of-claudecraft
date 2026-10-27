@@ -1234,6 +1234,365 @@ export const SFX = [
   { key: 'rift_ice_glide', custom: true, loop: true }, // point-source loop for a player currently gliding
   { key: 'rift_ice_stop', custom: true }, // skidding to a halt off the ice
   { key: 'rift_lava_tick', custom: true }, // the 1 Hz lava/blackwater hazard burn tick
+
+  // --- The Smith's Heart: the Hammer Council (ElevenLabs Sound Effects) ------
+  // Positioned one-shots and one loop for the council's moments, played by
+  // src/game/smith_heart_council_audio.ts off the council's own cues and cast
+  // bars (the base council and mythic's Soul in the Stone).
+  {
+    key: 'heart_council_wrath_charge',
+    duration: 4,
+    prompt:
+      'A deep earthquake rumble building over four seconds inside a stone quarry: grinding bedrock, small stones rattling loose, pressure rising to a peak. No music.',
+  },
+  {
+    key: 'heart_council_wrath_blast',
+    duration: 2,
+    prompt:
+      'A massive stone shockwave blast in a quarry: a huge boom of rock splitting, a wall of dust and gravel rushing outward, a deep sub impact. Single event, no music.',
+  },
+  {
+    key: 'heart_council_pillar_rise',
+    duration: 1.5,
+    prompt:
+      'A heavy stone pillar bursting up out of a rock floor: a violent grinding crack, debris thrown, a deep thud as it locks in place. No music.',
+  },
+  {
+    key: 'heart_council_pillar_crack',
+    duration: 1,
+    prompt:
+      'A large stone column cracking under strain: a sharp rock fracture snap with crumbling chips and a short gritty trickle of dust. No music.',
+  },
+  {
+    key: 'heart_council_pillar_collapse',
+    duration: 2.5,
+    prompt:
+      'A tall stone column toppling and breaking apart: a groaning tilt, then a massive crash of falling rubble and settling dust. No music.',
+  },
+  {
+    key: 'heart_council_pillar_pulse',
+    duration: 0.8,
+    prompt:
+      'A low resonant hum pulse from a stone pillar: one soft deep thrum of earth energy, short and dull. No music.',
+  },
+  {
+    key: 'heart_council_rock_fall',
+    duration: 1.2,
+    prompt:
+      'A huge boulder falling from high above: a deep rushing whoosh growing louder as it descends, no impact. No music.',
+  },
+  {
+    key: 'heart_council_rock_impact',
+    duration: 1.6,
+    prompt:
+      'A giant boulder slamming into a stone floor: a heavy crunching boom, rock shattering apart, a spray of gravel. Single impact, no music.',
+  },
+  {
+    key: 'heart_council_seam_bolt',
+    duration: 1,
+    prompt:
+      'A crystalline shard bolt flying and shattering on impact: a bright glassy whoosh ending in a ringing crystal break. No music.',
+  },
+  {
+    key: 'heart_council_song_cast',
+    duration: 3,
+    prompt:
+      'An eerie resonant hum swelling inside a cave, like an ore vein ringing: layered crystalline tones over a low drone, rising for three seconds. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_council_soul_take',
+    duration: 2,
+    prompt:
+      'A rush of spectral energy pouring into stone: a deep ghostly whoosh that sinks into rock and ends in a low resonant awakening hum. No music, no voice.',
+  },
+  {
+    key: 'heart_council_echo_charge',
+    duration: 3,
+    prompt:
+      'A tense rising rumble with ember crackle charging inside a stone pillar over three seconds, pressure building to a peak. No music.',
+  },
+  {
+    key: 'heart_council_echo_blast',
+    duration: 1.8,
+    prompt:
+      'A fiery stone shockwave bursting from a pillar: a deep boom with an ember whoosh and rolling rock dust. Single event, no music.',
+  },
+  {
+    key: 'heart_council_slab_grind',
+    duration: 3,
+    loop: true,
+    prompt:
+      'A huge stone slab being dragged slowly across a rock floor: continuous heavy grinding and scraping over a deep rumble. Seamless loop, no music.',
+  },
+  {
+    key: 'heart_council_slab_crush',
+    duration: 1.2,
+    prompt:
+      'A massive stone slab slamming down and crushing: a heavy crunching thud with cracking rock. Single impact, no music.',
+  },
+  {
+    key: 'heart_council_song_pulse',
+    duration: 1.2,
+    prompt:
+      'A resonant crystalline sound pulse ringing out across a cavern: a deep bell-like ring of stone with a shimmering shockwave. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_council_soul_pip',
+    duration: 0.8,
+    prompt:
+      'A sharp crystal chip breaking off a stone with a bright magical spark and a quick shimmer. Short, no music.',
+  },
+  {
+    key: 'heart_council_soul_burst',
+    duration: 2.5,
+    prompt:
+      'A stone pillar bursting with released spirit energy: a bright shattering crack, a ghostly whoosh rising and fading away, rubble falling. No music, no voice.',
+  },
+
+  // --- The Smith's Heart: the Guardian of the Breath (ElevenLabs Sound Effects)
+  // Positioned one-shots and two loops for the Storm Cornice fight, played by
+  // src/game/smith_heart_breath_audio.ts off the fight's cues, its wind's
+  // phases and the guardian's bars.
+  {
+    key: 'heart_breath_gather',
+    duration: 2.5,
+    prompt:
+      'A great gale gathering on a mountain summit: a deep rising howl of wind swelling through hollow stone, a huge creature drawing breath, building to a peak. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_blow_loop',
+    duration: 5,
+    loop: true,
+    prompt:
+      'A steady, powerful gale roaring across an exposed mountaintop plateau, wind rushing and buffeting, grit hissing over stone, constant and loopable. No music.',
+  },
+  {
+    key: 'heart_breath_calm',
+    duration: 2.5,
+    prompt:
+      'A roaring gale dying away to a long soft sigh of wind over stone, the air falling still. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_inhale',
+    duration: 5,
+    prompt:
+      'An enormous stone creature inhaling: air sucked violently in through a vast hollow throat, a vortex of wind roaring inward and rising in pitch and pressure. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_exhale',
+    duration: 2,
+    prompt:
+      'A colossal exhaled blast of wind: a deep whump of air pressure and a roaring gust hurled outward, grit and pebbles scattering across stone. Single event, no music.',
+  },
+  {
+    key: 'heart_breath_storm_break',
+    duration: 4,
+    prompt:
+      'Wind sucked inward to a sudden tense silence, then electric static crackling and building, a deep stone groan straining under pressure. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_tear',
+    duration: 3,
+    prompt:
+      'A stone shell bursting apart with a huge thunderclap: rock fragments flung outward, a roaring surge of crackling lightning, thunder rolling across the sky. No music.',
+  },
+  {
+    key: 'heart_breath_strike',
+    duration: 1.5,
+    prompt:
+      'A close lightning strike hitting stone: a sharp searing crack of electricity and a short booming thunder snap. Single event, no music.',
+  },
+  {
+    key: 'heart_breath_fork',
+    duration: 1.2,
+    prompt:
+      'Chain lightning leaping from target to target: rapid sharp electric zaps and crackles jumping in quick succession. No music.',
+  },
+  {
+    key: 'heart_breath_discharge',
+    duration: 2.5,
+    prompt:
+      'A massive bolt of lightning discharging into the ground: a blinding electric crack, a deep thunder boom and a crackling electric hum fading. No music.',
+  },
+  {
+    key: 'heart_breath_gale_loop',
+    duration: 4,
+    loop: true,
+    prompt:
+      'A small whirling tornado spinning across stone: a twisting whooshing wind vortex with debris rattling, constant and loopable. No music.',
+  },
+  {
+    key: 'heart_breath_toss',
+    duration: 1,
+    prompt:
+      'A sudden whoosh of whirlwind flinging something into the air, a sharp gust and a tumble. Short, no music.',
+  },
+  {
+    key: 'heart_breath_calm_land',
+    duration: 1.8,
+    prompt:
+      'A gentle protective blessing landing on stone: a soft bright chime and a hush as the wind around falls quiet, calm and reassuring. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_swell',
+    duration: 2,
+    prompt:
+      'Rolling thunder rumbling across a dark storm sky, deep and growing, with distant crackles of lightning. No music.',
+  },
+  {
+    key: 'heart_breath_fall',
+    duration: 1.8,
+    prompt:
+      'A rush of wind howling down past a cliff edge into a deep chasm, falling away into the distance. No music, no voice.',
+  },
+
+  // --- The Smith's Heart: the Guardian of the Quench (ElevenLabs Sound Effects)
+  // Positioned one-shots for the Frozen Lake fight, played by
+  // src/game/smith_heart_quench_audio.ts off the fight's cues, the cracks as
+  // they appear and the guardian's awakening bar.
+  {
+    key: 'heart_quench_freeze',
+    duration: 1.5,
+    prompt:
+      'A body being encased in ice in an instant: a fast crystalline crackle of freezing water locking solid, a sharp glassy tightening. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_shatter',
+    duration: 1.6,
+    prompt:
+      'A thick block of ice exploding apart: a bright violent shatter, shards of ice tinkling and skittering across a frozen lake, a cold whoosh. Single event, no music.',
+  },
+  {
+    key: 'heart_quench_crack',
+    duration: 2.5,
+    prompt:
+      'Thick lake ice groaning and cracking under heavy weight: a deep resonant twang of stressed ice, a spreading crackle racing outward. No music.',
+  },
+  {
+    key: 'heart_quench_hole',
+    duration: 2,
+    prompt:
+      'Lake ice giving way: a loud crack and collapse of breaking ice, a heavy splash of freezing water surging up through the hole, chunks of ice bobbing. No music.',
+  },
+  {
+    key: 'heart_quench_plunge',
+    duration: 1,
+    prompt:
+      'A person plunging through ice into freezing water: a heavy splash and gurgle, ice chunks knocking, a gasp-like rush of bubbles. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_climb',
+    duration: 1.5,
+    prompt:
+      'Someone hauling themselves out of icy water onto ice: water pouring and dripping off, a scrape on ice, a wet slap. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_wake_charge',
+    duration: 4,
+    prompt:
+      'Deep ice groaning and straining under a frozen lake, a rising crystalline choir-like hum of resonating ice building in tension for four seconds. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_quench_wake',
+    duration: 3,
+    prompt:
+      'Giant swords of ice tearing free from a frozen lake: a huge explosive crack of breaking ice, massive shards bursting upward, a ringing crystalline resonance like a struck glass bell. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_echo',
+    duration: 1.5,
+    prompt:
+      'A blast of freezing wind and ice released from a floating crystal blade: a sharp resonant ice whoosh with a glassy echo tail. Single event, no music.',
+  },
+  {
+    key: 'heart_quench_cross',
+    duration: 2,
+    prompt:
+      'Two enormous ice blades swooping fast across a frozen lake: a deep doubled whoosh of cutting air, ice crackling and splintering in their wake. No music.',
+  },
+  {
+    key: 'heart_quench_rim',
+    duration: 0.5,
+    prompt:
+      'A ring of shore ice heaving up out of a frozen lake: a deep grinding rumble of ice plates pushing upward, cracking and settling. No music.',
+  },
+];
+
+// --- The Smith's Heart: the Guardian of the Heat, TAKES STILL TO GENERATE.
+// The ElevenLabs credits ran out before this fight's sounds were made, so
+// src/game/smith_heart_heat_audio_core.ts builds every Heat sound from the
+// pack's existing samples (pitched and layered). These are the prompts for
+// the fight's own takes: when credits return, move each row into SFX above
+// (then `npm run sfx:gen`, `npm run sfx:conform`, `npm run sfx:manifest`) and
+// point its cue at `heart_heat_<name>`. Deliberately NOT in SFX: a row there
+// without its committed file fails the manifest's conformance checks.
+export const HEAT_SFX_TO_GENERATE = [
+  {
+    key: 'heart_heat_ray',
+    duration: 1,
+    prompt:
+      'A focused ray of white-hot fire fired from a singing crystal: a bright crystalline tone over a searing hiss and crackle of flame striking a body. Single event, no music.',
+  },
+  {
+    key: 'heart_heat_ray_back',
+    duration: 1.2,
+    prompt:
+      'A ray of fire swallowed by a huge living flame: a deep rising whoomph of fire being drawn in, a low satisfied roar of a furnace-like blaze growing hotter. No music, no voice.',
+  },
+  {
+    key: 'heart_heat_pulse',
+    duration: 0.8,
+    prompt:
+      'A soft heavy wave of heat rolling outward from a great fire: a low breathy whoosh of hot air with a faint crackle, short and unobtrusive. No music.',
+  },
+  {
+    key: 'heart_heat_windup',
+    duration: 6,
+    prompt:
+      'A colossal fire building toward an explosion: a rising roar of white-hot flame swelling for six seconds, crystal ringing and cracking under the strain, pressure mounting. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_heat_overheat',
+    duration: 3,
+    prompt:
+      'A gigantic eruption of white fire filling a stone hall: a blinding thunderous blast of flame, a shockwave of roaring heat, crystal shards bursting, a long crackling tail. Single event, no music.',
+  },
+  {
+    key: 'heart_heat_crystal_rise',
+    duration: 2,
+    prompt:
+      'A glowing crystal tearing up out of cracked basalt: stone grinding and splitting, a rising bright crystalline chime humming with fire. No music.',
+  },
+  {
+    key: 'heart_heat_crystal_fade',
+    duration: 1.5,
+    prompt:
+      'A fire crystal burning out and cracking apart: a glassy splintering crack, the inner flame guttering out with a soft sigh, cinders tinkling. No music.',
+  },
+  {
+    key: 'heart_heat_burn',
+    duration: 0.6,
+    prompt:
+      'A short sharp sizzle of skin-searing heat, a hot crackle close to the ear. Single event, no music, no voice.',
+  },
+  {
+    key: 'heart_heat_channel_brim',
+    duration: 4,
+    prompt:
+      'A channel of liquid fire filling up and about to overflow: a deep rumbling bubbling of molten flame rising for four seconds, hissing and crackling. No music.',
+  },
+  {
+    key: 'heart_heat_channel_flow',
+    duration: 3,
+    prompt:
+      'A river of white-gold fire rushing down a stone channel: a powerful roaring flow of flame, crackling and hissing, pouring over an edge into a chasm. No music.',
+  },
+  {
+    key: 'heart_heat_embers',
+    duration: 1.5,
+    prompt:
+      'Burning embers scattered on a stone floor catching alight: a low smouldering crackle and hiss flaring up. No music.',
+  },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

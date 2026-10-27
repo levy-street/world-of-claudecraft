@@ -1103,6 +1103,9 @@ export const VOICE_ALIAS = {
   shadow_sentry_south: 'lampman_cobb',
   shadow_watch_east: 'lampman_cobb',
   shadow_watch_west: 'lampman_cobb',
+  // Captain Thessaly herself, recurring inside the Smith's Heart raid
+  // (content/smith_heart.ts) where she fights beside the raid on the Storm Cornice.
+  heart_captain_thessaly: 'captain_thessaly',
   // Keeper Liora wardens a hedge maze of wisps and speaks her instructions with
   // the same unhurried, luminous calm as the keeper of the sealed hollow.
   wisp_maze_keeper: 'keeper_saelwyn',

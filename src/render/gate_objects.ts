@@ -27,6 +27,7 @@ import {
   type IgnivarRaidGatePlan,
   ignivarRaidGatePlan,
 } from './ignivar_raid_gate';
+import { isHeartSealMarker, observeHeartSealMarker } from './smith_heart/heart_seal_core';
 import { isTrashEngineObject } from './trash_engine_fx/trash_engine_fx_core';
 
 export interface DungeonGateAnchorPlan {
@@ -70,6 +71,13 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
     // A story marker's view reports its crack step to the face's memory (a
     // template swap rebuilds the view, so every rise is seen here).
     observeSanctumStoryMarker(e, sharedUniforms.uTime.value);
+    return { encounterAnchor: true, height: 2 };
+  }
+  // The Smith's Heart's seal markers: the seal and the light-rivers read the
+  // lit-vein mask they carry (render/smith_heart). A template swap rebuilds
+  // the view, so every vein lighting is reported here.
+  if (isHeartSealMarker(e.templateId)) {
+    observeHeartSealMarker(e, sharedUniforms.uTime.value);
     return { encounterAnchor: true, height: 2 };
   }
   if (dungeonGateStateOf(e.templateId) === null || !e.dungeonId) return null;
