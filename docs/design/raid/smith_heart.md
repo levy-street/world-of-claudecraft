@@ -796,8 +796,8 @@ rides the markers' template id like the veins (no wire change). The timeline (`A
 up out of the chasm and the heart rides it up past the platform's far rim, swollen with light,
 and glides in over the platform; one by one the room's rocks (eleven resting on the walk
 between the altars and the channels, off the bridge's line, and ten shards under the lip)
-tremble, tear free of the paving with a burst of dust and broken stone (leaving a scar,
-`Kit_TornSocket`), lift, spiral in round the heart tumbling with a trail of light and lock into
+tremble, tear free of the paving with a burst of dust and broken stone (leaving a socket,
+carved into its quarter since phase 2L), lift, spiral in round the heart tumbling with a trail of light and lock into
 the body with a flash and a thread of a vein's light; as the last locks, the four-colour
 shockwave races over the platform and the chasm and the camera thuds (reduced motion drops
 the shakes). A pull during the scene runs it on to its end in under a second. Nothing is
@@ -956,7 +956,7 @@ heaving, and a frosty breath in the player's own ear as their bar passes three q
 The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`);
 its voice is a later audition.
 
-### 5.21 The Anvil of the World's four quarters (phase 2K)
+### 5.21 The Anvil of the World's four quarters (phases 2K and 2L)
 
 The owner's decision (27 Oct 2026): the final boss fights on the Anvil of the World split
 into FOUR QUARTERS by four curved ridges set in a pinwheel round a CENTRAL RING. Each quarter
@@ -1039,9 +1039,64 @@ the boss and its home into the middle of that quarter, or onto the ring's centre
 pulls it onto the player: the final look is a fight's). Pinned by
 `tests/smith_heart_final_dev.test.ts`.
 
-**Known limit (for the mechanics phase).** The boss's spot is the ring's centre, so a pull
-there shows the final look until it steps out into a quarter; the mechanics phase decides
-where it waits and when it walks to the ring.
+**Phase 2L: the polish round (the owner's lead's review of 2K).** Every point below replaced
+what 2K shipped; the layout, the geometry core, the preview verb and the gameplay are unchanged.
+
+- **Painted stone, never tile.** Each quarter is repainted in the style guide's language
+  (`quarter_pieces.py`): large irregular stones (the Hammer a random ashlar of hammer-dressed
+  blocks cut by hand-skewed lines; the Breath irregular flags drawn out along the wind's
+  spiral; the Quench and the Heat irregular Voronoi stones from darts, part relaxed, never a
+  honeycomb), every outline bent by one smooth shared field (nothing ruler-straight, every
+  joint closed), each stone a dense painted top (`painted_slab`: colour drifting between its
+  warm and cool companions, brush strokes along its long axis, a painted light across it, a
+  worn pale lip, dirt toward its joints) over a worn arris; broken stones (split in two along
+  a jagged line, each half settled on its own) and missing ones (rubble in the hole). The
+  joints show each quarter's own dirt, always darker than its stones (`joint_bed`, in
+  `Kit_AnvilFloor`): no lit grid anywhere. The element lives in the stone: the Hammer's
+  tremor cracks and tool grooves, the Breath's scour streaks and spiral scorings, the
+  Quench's rime on the arrises, frost veins and sheets of ice glazed over the joints (glow
+  faces painted blue: the runtime draws them as deep ice asleep, lit from inside awake), the
+  Heat's molten fissures (a bed of fire under each, the plates split along them, their lips
+  glowing, the stone scorched round them, ash on the plates).
+- **Fire reads as fire.** The Heat is dark cooled basalt with red-orange fissures (the Heat
+  guardian's hearth, never gold), smouldering even asleep; the Hammer is sand and ochre
+  granite with a sand-amber light. The four read apart in value too (the Quench palest, the
+  Hammer, the Breath, the Heat darkest). Each quarter's light is `HEART_QUARTER_PALETTE`
+  (`heart_quarters_core.ts`: colour, white-hot, idle smoulder, gains, its dimming asleep).
+- **Ridges are spines.** `Kit_HeartRidge` is now a sculpted spine of rock (vertebrae fused on
+  a broad back, faceted, chipped, a groove down its crest with the vein's light in it, cracks
+  across its notches, knuckles at its foot), its crest about half a yard; `Kit_HeartRidgeHorn`
+  carries it on past the rim into the horn. **Walkable everywhere, no collider** (the visuals
+  match: a border a body steps over). It never hides a floor telegraph: the platform's floors
+  draw first, then each spine with no depth write and its light over it
+  (`HEART_PLATFORM_ORDER`, the kit's `spine` material), so a telegraph (depth-tested against
+  the floor) always shows over a spine, and a body crossing one stands on it.
+- **Sockets, not stains.** The arrival's scars are carved into the quarter each rock lay in
+  (`quarter_geom.SOCKETS`, the colossus's list): the paving broken round a jagged pit, its
+  fragments tipped toward it (some missing, the grit showing), its walls of fresh broken stone
+  falling to rubble about half a yard down, a crack of the vein's light at its bottom. The
+  runtime's `Kit_TornSocket` is gone.
+- **The air reads from the raid camera.** Each quarter's air is layered and larger
+  (`HEART_QUARTER_AIR`): the Hammer's floating grit and stones, chips thrown up and dust
+  bursting where each tremor runs; the Breath's six dust devils, wind streaks and low veils of
+  dust; the Quench's mist banks, rising rime and taller crystals; the Heat's embers, columns
+  of haze, flames licking out of its fissures and lava pulses running out along them (its
+  floor's own). A crossing's curtain flares about seven yards and its ridge throws sparks and
+  bursts of dust; the final look's column and blaze are larger. The low tier keeps a share of
+  the air; which quarter is awake draws on every tier.
+- **The Quench wakes.** Asleep it is dimmed hardest (its pale stone) with its ice deep; awake
+  its ice lights from inside, its wash is stronger, and rime rises off it.
+- **The final look only in the final phase.** `heartFinalPhase` (the sim's core,
+  `HEART_FINAL_PHASE_SHARE` = 15 percent of its health) gates it: a boss in the ring above that
+  share wakes no quarter (the room rests, its seams barely breathing), so the pull at the
+  ring's centre no longer shows the final look. `/dev heart final quarter ring` forces it by
+  setting the boss to that share before the pull (pinned by `tests/smith_heart_final_dev.test.ts`).
+
+Pinned by `tests/smith_heart_quarters_kit.test.ts` (the value ladder, the painted tops, the
+dirt darker than the stones, the ice tag, the fire bed, the spine's height and line, the horn,
+the sockets against the colossus's list and carved as pits) and
+`tests/smith_heart_quarters_look.test.ts` (the palette's hues, the draw order and the spine's
+depth write, the layers of air, the final phase's gate).
 
 ## 6. Set pieces (phase 2 specs)
 
@@ -1630,7 +1685,7 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart portal` | force the seal's portal open for the run (the hop then works) |
 | `/dev heart seal` | print the `smithHeartProgress` readout (and whether the heart is awake) |
 | `/dev heart arrival` | replay the arrival scene: the heart sleeps a moment and wakes again with a living player in the Heart |
-| `/dev heart final quarter <zone>` | zone breath, quench, hammer, heat or ring: move the final boss (and its home) into the middle of that quarter of the Anvil of the World, or onto the central ring's centre (ring also pulls it onto you: the final look); the quarter it stands in wakes (section 5.21) |
+| `/dev heart final quarter <zone>` | zone breath, quench, hammer, heat or ring: move the final boss (and its home) into the middle of that quarter of the Anvil of the World, or onto the central ring's centre (ring also sets it to its final phase, 15 percent of its health, and pulls it onto you: the final look); the quarter it stands in wakes (section 5.21) |
 | `/dev heart reset` | free the run and claim a fresh one |
 | `/dev heart council` | the Hammer Council's readout (difficulty, each member's health, energy, Wraths, the fallen in order) |
 | `/dev heart council pull` | pull all three onto you |

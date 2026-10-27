@@ -10,10 +10,10 @@ pieces round the crystal heart, at rest), a 2 yd figure for scale.
 
 Run (background renders, then the scene saved for the owner to open):
   blender -b --factory-startup --python open_heart_in_blender.py -- \
-      --out DIR [--save scene.blend] [--label fase2k]
+      --out DIR [--save scene.blend] [--label fase2l]
 Writes DIR/blender_sala_cuartos_<label>.png (the room from above the
 terrace) and DIR/blender_cresta_<label>.png (a ridge and its horn over the
-Heat and the Breath); --label names them (fase2k by default).
+Heat and the Breath); --label names them (fase2l by default).
 
 Frames: the room's centre is the origin, the game's north (+Z) is Blender
 -Y, a game yaw r is a Blender turn of r about +Z (heart_room_kit_plan_core.ts,
@@ -54,8 +54,8 @@ def place(name, loc, rz=0.0, scale=(1.0, 1.0, 1.0), tilt=(0.0, 0.0)):
 
 
 # The quarters' vein colours for the review (SMITH_HEART_VEIN_COLORS, linear).
-VEIN_TINT = {'Hammer': (0.58, 0.28, 0.05), 'Breath': (0.1, 0.48, 0.8), 'Quench': (0.33, 0.69, 1.0),
-             'Heat': (1.0, 0.79, 0.35)}
+VEIN_TINT = {'Hammer': (0.75, 0.38, 0.08), 'Breath': (0.4, 0.26, 1.0), 'Quench': (0.15, 0.58, 1.0),
+             'Heat': (1.0, 0.09, 0.007)}
 
 
 def tinted_copy(obj, glow, tint):
@@ -145,11 +145,14 @@ def main():
         o.hide_set(True)
     # ---- the platform, the terrace, the bridge, the bed ---------------------------------------
     place('AnvilFloor', (0, 0, 0))
-    # Phase 2K: the four quarters, each seam in its vein, the ridges, the dais.
+    # Phase 2K: the four quarters, each seam in its light (phase 2L's
+    # palette, heart_quarters_core.ts HEART_QUARTER_PALETTE, linear), the
+    # ridges' spines and horns, the dais.
     for vein in ('Hammer', 'Breath', 'Quench', 'Heat'):
         tinted_copy(place(f'Quarter{vein}', (0, 0, 0)), materials[1], VEIN_TINT[vein])
     for k in range(4):
-        place('HeartRidge', (0, 0, 0), rz=k * math.pi / 2)
+        place('HeartRidge', (0, 0, 0), rz=-k * math.pi / 2)
+        place('HeartRidgeHorn', (0, 0, 0), rz=-k * math.pi / 2)
     place('HeartDais', (0, 0, 0))
     place('AnvilKeel', (0, 0, 0))
     place('TerraceFloor', TERRACE)
@@ -173,7 +176,7 @@ def main():
     cam.data.clip_end = 2000
     scene.camera = cam
     look(cam, Vector((-112, 104, 58)), Vector((6, -4, -6)))
-    label = arg('--label') or 'fase2k'
+    label = arg('--label') or 'fase2l'
     look(cam, Vector((-92, 86, 70)), Vector((4, -4, -4)))
     scene.render.filepath = os.path.join(out, f'blender_sala_cuartos_{label}.png')
     bpy.ops.render.render(write_still=True)
