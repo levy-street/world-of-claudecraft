@@ -36,7 +36,17 @@ export type FinalTelegraphKind =
   | 'orb'
   | 'tremor'
   | 'anvil'
-  | 'crushed';
+  | 'crushed'
+  // Part 2 (final_phase_fx.ts): each Splinter's Shearing Blow in its own
+  // element, Bursting Coal's reach, Gale Pounce's landing, the hunt's
+  // Buffeting Gale.
+  | 'shearFire'
+  | 'shearFrost'
+  | 'shearStorm'
+  | 'shearStone'
+  | 'coal'
+  | 'pounce'
+  | 'buffet';
 
 export interface FinalTelegraphLook {
   element: FinalElement;
@@ -97,6 +107,13 @@ export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTel
   tremor: look('stone', 0.58, 0.8, 0.55, 1),
   anvil: look('stone', 0.6, 0.9, 0.32, 1),
   crushed: look('stone', 0.4, 0.6, 0.9, 0.8, { rim: 0.8, curtain: false }),
+  shearFire: look('fire', 0.55, 1, 0.6, 1, { curtain: false }),
+  shearFrost: look('frost', 0.6, 1, 0.6, 1, { curtain: false }),
+  shearStorm: look('storm', 0.5, 0.9, 0.6, 1, { curtain: false }),
+  shearStone: look('stone', 0.62, 0.9, 0.5, 1, { curtain: false }),
+  coal: look('fire', 0.3, 0.7, 0.6, 0.9, { falloff: 0.6, curtain: false }),
+  pounce: look('storm', 0.45, 0.9, 0.9, 1, { curtain: false }),
+  buffet: look('storm', 0.22, 0.8, 0.5, 0.7, { rim: 0.85, curtain: false }),
 };
 
 /** The dressed fans each element keeps (fixed, allocated at build): the

@@ -112,6 +112,7 @@ import {
   wrathBlastLook,
   wrathGather,
 } from './final_fx_core';
+import { finalPhaseMaskOf } from './final_phase_fx_core';
 import { fxHash } from './hammer_fx_core';
 
 const C = FINAL_FX_COLORS;
@@ -664,6 +665,8 @@ export class FinalFx {
       engaged,
       !boss.dead && t >= ARRIVAL_WAVE_AT,
       engaged && heartFinalPhase(boss.hp, boss.maxHp),
+      // Part 2: the quarters whose Splinters live through a call.
+      finalPhaseMaskOf(boss),
     );
     this.readCast(boss);
     this.poseBody(boss, t, dt);

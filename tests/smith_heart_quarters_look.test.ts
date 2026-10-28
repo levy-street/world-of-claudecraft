@@ -90,9 +90,9 @@ describe('the boss memory', () => {
   it('keeps what the effects saw, and forgets it when the heart sleeps', () => {
     expect(heartQuarterBoss('k')).toBeNull();
     noteHeartQuarterBoss('k', 1, 2, true, true, true);
-    expect(heartQuarterBoss('k')).toEqual({ x: 1, z: 2, engaged: true, final: true });
+    expect(heartQuarterBoss('k')).toEqual({ x: 1, z: 2, engaged: true, final: true, mask: 0 });
     noteHeartQuarterBoss('k', 3, 4, false, true);
-    expect(heartQuarterBoss('k')).toEqual({ x: 3, z: 4, engaged: false, final: false });
+    expect(heartQuarterBoss('k')).toEqual({ x: 3, z: 4, engaged: false, final: false, mask: 0 });
     expect(heartQuarterBoss('other')).toBeNull();
     noteHeartQuarterBoss('k', 3, 4, false, false);
     expect(heartQuarterBoss('k')).toBeNull();

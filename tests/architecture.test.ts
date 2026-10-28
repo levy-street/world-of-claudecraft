@@ -1117,6 +1117,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_landmarks_core.ts',
   'src/render/smith_heart_fx/final_fx_core.ts',
   'src/render/smith_heart_fx/final_kit_fx_core.ts',
+  'src/render/smith_heart_fx/final_phase_fx_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',
   // The Guardian of the Breath's body (its storm form) and its fight's effects.

@@ -51,6 +51,9 @@ export interface HeartQuarterBoss {
   z: number;
   engaged: boolean;
   final: boolean;
+  /** Part 2: the quarters awake through an intermission's call (its living
+   *  Splinters', final_phase_ids.ts `quarterBit`), 0 or absent none. */
+  mask?: number;
 }
 
 const memory = new Map<string, HeartQuarterBoss>();
@@ -64,6 +67,7 @@ export function noteHeartQuarterBoss(
   engaged: boolean,
   awake: boolean,
   final = false,
+  mask = 0,
 ): void {
   if (!awake) {
     memory.delete(key);
@@ -75,7 +79,8 @@ export function noteHeartQuarterBoss(
     m.z = z;
     m.engaged = engaged;
     m.final = final;
-  } else memory.set(key, { x, z, engaged, final });
+    m.mask = mask;
+  } else memory.set(key, { x, z, engaged, final, mask });
 }
 
 /** The slot's final boss as last seen, or null. */
@@ -93,7 +98,7 @@ export function clearHeartQuarterMemoryForTest(): void {
 /** The room's mode: asleep (before the arrival, or the boss gone), resting
  *  (the boss in the ring outside its final phase: no quarter awake), one
  *  quarter awake, or the final look (all four, the ring blazing). */
-export type HeartQuartersMode = 'asleep' | 'rest' | 'quarter' | 'final';
+export type HeartQuartersMode = 'asleep' | 'rest' | 'quarter' | 'final' | 'call';
 
 export const HEART_QUARTERS_LOOK = {
   /** The faint glow of a dormant quarter's seams (never fully black: the
@@ -112,6 +117,8 @@ export const HEART_QUARTERS_LOOK = {
   /** The ridge's shockwave: its speed (yards per second each way) and life. */
   shockSpeed: 30,
   shockLife: 1.6,
+  /** The ring's level through an intermission's call (part 2). */
+  ringCall: 0.75,
   /** The ring's level resting, under one quarter, and blazing. */
   ringRest: 0.5,
   ringQuarter: 0.32,
@@ -149,6 +156,8 @@ export interface HeartQuartersState {
   blaze: number;
   /** A pulse through the ring as the light passes it (0 to 1, decaying). */
   ringPulse: number;
+  /** Part 2: the call's awake mask as last applied. */
+  mask: number;
 }
 
 export function newHeartQuartersState(): HeartQuartersState {
@@ -163,6 +172,7 @@ export function newHeartQuartersState(): HeartQuartersState {
     ring: 0,
     blaze: 0,
     ringPulse: 0,
+    mask: 0,
   };
 }
 
@@ -173,6 +183,8 @@ export function heartQuartersModeOf(boss: HeartQuarterBoss | null): {
 } {
   if (!boss) return { mode: 'asleep', zone: null };
   const zone = heartQuarterAt(boss.x, boss.z);
+  if (zone === 'ring' && boss.engaged && (boss.mask ?? 0) > 0 && !boss.final)
+    return { mode: 'call', zone };
   if (zone === 'ring') return { mode: boss.engaged && boss.final ? 'final' : 'rest', zone };
   return { mode: 'quarter', zone };
 }
@@ -196,7 +208,8 @@ export function stepHeartQuarters(
   const { ringR, rimR } = HEART_QUARTERS;
   const step = Math.max(0, Math.min(0.25, dt));
   const { mode, zone } = heartQuartersModeOf(boss);
-  if (zone !== s.zone || mode !== s.mode) {
+  const mask = mode === 'call' ? (boss?.mask ?? 0) : 0;
+  if (zone !== s.zone || mode !== s.mode || mask !== s.mask) {
     const prev = s.zone;
     // A crossing between neighbours: the shockwave along their ridge, from
     // where the boss stands.
@@ -214,7 +227,10 @@ export function stepHeartQuarters(
     if (prev !== null && prev !== zone) s.ringPulse = 1;
     for (const v of SMITH_HEART_VEINS) {
       const q = s.quarters[v];
-      const want = mode === 'final' || (mode === 'quarter' && zone === v);
+      const want =
+        mode === 'final' ||
+        (mode === 'quarter' && zone === v) ||
+        (mode === 'call' && (mask & (1 << HEART_QUARTER_ORDER.indexOf(v))) !== 0);
       if (want && !q.rising) {
         q.rising = true;
         q.awake = 1;
@@ -230,6 +246,7 @@ export function stepHeartQuarters(
     }
     s.mode = mode;
     s.zone = zone;
+    s.mask = mask;
   }
   for (const v of SMITH_HEART_VEINS) {
     const q = s.quarters[v];
@@ -248,7 +265,15 @@ export function stepHeartQuarters(
     if (r.age > L.shockLife) r.age = -1;
   }
   const ringTarget =
-    mode === 'asleep' ? 0 : mode === 'rest' ? L.ringRest : mode === 'final' ? 1 : L.ringQuarter;
+    mode === 'asleep'
+      ? 0
+      : mode === 'rest'
+        ? L.ringRest
+        : mode === 'final'
+          ? 1
+          : mode === 'call'
+            ? L.ringCall
+            : L.ringQuarter;
   s.ring = approach(s.ring, ringTarget, L.ease * step);
   s.blaze = approach(s.blaze, mode === 'final' ? 1 : 0, L.ease * step * 0.8);
   s.ringPulse = Math.max(0, s.ringPulse - step * 1.4);

@@ -63,6 +63,14 @@ describe("the final kits' element telegraphs", () => {
       tremor: 'stone',
       anvil: 'stone',
       crushed: 'stone',
+      // Part 2: each Splinter's frontal in its own element.
+      shearFire: 'fire',
+      shearFrost: 'frost',
+      shearStorm: 'storm',
+      shearStone: 'stone',
+      coal: 'fire',
+      pounce: 'storm',
+      buffet: 'storm',
     };
     for (const [k, el] of Object.entries(want))
       expect(finalTelegraphElement(k as FinalTelegraphKind), k).toBe(el);
