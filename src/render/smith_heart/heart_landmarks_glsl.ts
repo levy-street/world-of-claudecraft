@@ -164,7 +164,7 @@ void main() {
   float phase = aParams.x;
   float slot = floor(uTime * 9.0 + phase * 31.0);
   float r = fract(sin(slot * 12.9898 + phase * 78.233) * 43758.5453);
-  float on = step(0.72, r) * uLit;
+  float on = step(0.62, r) * uLit;
   float flash = 1.0 - fract(uTime * 9.0 + phase * 31.0);
   float mid = sin(3.14159 * aParams.z);
   vec3 jit = vec3(fract(sin((slot + aParams.z * 17.0) * 3.1) * 4375.5) - 0.5,
@@ -174,7 +174,7 @@ void main() {
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   vec3 t = (modelViewMatrix * vec4(aOther, 0.0)).xyz;
   vec2 side = normalize(vec2(-t.y, t.x) + vec2(1e-4, 0.0));
-  float w = 0.32 + 0.22 * mid;
+  float w = 0.46 + 0.34 * mid;
   mv.xy += side * aCorner.y * w * step(0.002, on);
   vCorner = vec2(0.0, aCorner.y);
   vFade = on * (0.55 + 0.45 * flash);
@@ -201,7 +201,13 @@ void main() {
   gl_Position = projectionMatrix * mv;
 }`;
 
-export function wellFrag(wellR: number, depth: number, sweepDeg: number, firstDeg: number): string {
+export function wellFrag(
+  wellR: number,
+  depth: number,
+  sweepDeg: number,
+  firstDeg: number,
+  lowGfx = false,
+): string {
   return /* glsl */ `
 uniform vec3 uV0;
 uniform vec3 uV1;
@@ -249,61 +255,77 @@ void main() {
   const float DEPTH = ${f(depth)};
   vec3 V = normalize(vEye);
   vec3 D = -V;
-  float dy = max(0.12, -D.y);
+  float dy = max(0.08, -D.y);
   vec2 p = vP.xz;
   vec2 d = D.xz;
-  float tFloor = DEPTH / dy;
-  float a = dot(d, d);
-  float bq = 2.0 * dot(p, d);
-  float cq = dot(p, p) - R * R;
-  float tWall = a > 1e-5 ? (-bq + sqrt(max(0.0, bq * bq - 4.0 * a * cq))) / (2.0 * a) : 1e9;
-  float t = min(tFloor, tWall);
-  vec2 hp = p + d * t;
-  float depthAt = dy * t;
   vec3 heart = vec3(1.0, 0.86, 0.55);
   float beat = 0.82 + 0.18 * sin(uTime * 2.856);
+  // Phase 2N: a funnel of rock falling away in broken courses, the eye's
+  // ray marched down it. From above its narrowing courses read as rings
+  // stepping down into the dark; from the side its wall rises over the bed.
+  float t = 0.0;
+  float depthAt = DEPTH;
+  float wallHit = 0.0;
+  vec2 hp = p;
+  for (int k = 1; k <= 28; k++) {
+    float z = DEPTH * float(k) / 28.0;
+    vec2 q = p + d * (z / dy);
+    float course = floor(z / (DEPTH / 7.0));
+    float rw = R * (1.0 - 0.055 * course - 0.012 * z) + 0.35 * sin(atan(q.x, q.y) * 7.0 + course * 2.1);
+    if (length(q) > rw) { depthAt = z; hp = q; wallHit = 1.0; break; }
+    hp = q;
+  }
   float qlit;
   vec3 qc = quarterAt(hp, qlit);
   float deep = clamp(depthAt / DEPTH, 0.0, 1.0);
   vec3 col;
-  if (tWall < tFloor) {
-    // The wall: dark rock in falling courses, veins of light in it.
+  // The heart's light from below, pulsing up the well.
+  float pulseUp = 0.5 + 0.5 * sin(uTime * 2.856 - depthAt * 0.9);
+  if (wallHit > 0.5) {
+    // The wall: dark rock in falling courses, each course's lip catching
+    // the heart's light from below, veins of the quarters' light in it.
     float bear = atan(hp.x, hp.y);
+    float cf = fract(depthAt / (DEPTH / 7.0));
     float strata = wfbm(vec2(bear * 6.0, depthAt * 1.3));
-    vec3 rock = mix(vec3(0.018, 0.016, 0.022), vec3(0.06, 0.05, 0.056), strata);
-    float vein = smoothstep(0.62, 0.78, wfbm(vec2(bear * 9.0, depthAt * 0.7 - uTime * 0.12)));
-    col = rock * (1.0 - 0.55 * deep);
+    vec3 rock = mix(vec3(0.02, 0.018, 0.024), vec3(0.075, 0.062, 0.066), strata);
+    float lip = smoothstep(0.75, 1.0, cf);
+    col = rock * (1.0 - 0.5 * deep) * (0.7 + 0.6 * (1.0 - cf));
+    col += heart * lip * (0.06 + 0.2 * deep) * (0.4 + 0.6 * uRing) * (0.6 + 0.4 * pulseUp);
+    float vein = smoothstep(0.6, 0.78, wfbm(vec2(bear * 9.0, depthAt * 0.7 - uTime * 0.12)));
     col += mix(heart * 0.45, qc * 1.1, qlit) * vein * (0.2 + 0.8 * max(uRing, qlit)) * (0.35 + 0.65 * deep);
   } else {
     // The bed: dark crystal round the heart's light, the quarters' colours
     // where they open.
-    float rr = length(hp) / R;
+    float rr = length(hp) / (R * 0.55);
     float cells = wfbm(hp * 0.42);
     float facet = smoothstep(0.5, 0.72, wfbm(hp * 1.1 + 7.0));
     vec3 bed = mix(vec3(0.02, 0.018, 0.026), vec3(0.075, 0.06, 0.065), cells);
-    float core = exp(-rr * rr * 4.0);
+    float core = exp(-rr * rr * 3.0);
     col = bed * (0.6 + 0.6 * facet);
-    col += heart * (0.05 + 0.55 * core) * uRing * beat * (0.3 + 1.0 * facet * facet);
-    // The quarters' light only where the bed meets the wall on their side.
-    col += qc * qlit * facet * smoothstep(0.75, 1.0, rr) * 0.3;
+    col += heart * (0.08 + 0.9 * core) * uRing * beat * (0.35 + 1.0 * facet * facet);
+    col += qc * qlit * facet * smoothstep(0.7, 1.0, rr) * 0.3;
   }
-  // Mist in layers between the walk and what the eye meets, drifting and
-  // turning slowly round the well.
+  // The heart's glow welling up the shaft (a soft column of light seen
+  // through the mist, stronger toward the bed).
+  float shaft = exp(-dot(p + d * (DEPTH * 0.6 / dy), p + d * (DEPTH * 0.6 / dy)) / (R * R * 0.22));
+  col += heart * shaft * (0.08 + 0.22 * uRing) * (0.6 + 0.4 * pulseUp);
+  // Mist in layers between the walk and what the eye meets, each its own
+  // drift and turn, lit from below by the heart (warmer the deeper), the
+  // nearest thinnest so a body on the well's floor still stands in it.
   float mist = 0.0;
   vec3 mistC = vec3(0.0);
-  for (int k = 0; k < 4; k++) {
-    float z = (float(k) + 0.55) * DEPTH * 0.24;
+  for (int k = 0; k < ${lowGfx ? 4 : 6}; k++) {
+    float z = (float(k) + 0.6) * DEPTH * 0.15;
     if (z > depthAt) break;
     vec2 q = p + d * (z / dy);
-    float sw = uTime * (0.025 + 0.01 * float(k));
+    float sw = uTime * (0.02 + 0.012 * float(k)) * (mod(float(k), 2.0) > 0.5 ? -1.0 : 1.0);
     mat2 turn = mat2(cos(sw), -sin(sw), sin(sw), cos(sw));
-    float n = wfbm(turn * q * 0.075 + vec2(float(k) * 3.1, 1.7));
-    n = smoothstep(0.15, 1.0, n);
-    float am = n * 0.17 * (1.0 - mist);
-    // Grey-violet mist, warmed by the heart from below (never split into
-    // the quarters' colours: they live on the wall's veins).
-    vec3 tint = mix(vec3(0.2, 0.18, 0.24), heart * 0.45, 0.2 + 0.5 * uRing);
-    mistC += tint * am * (0.7 + 0.5 * uRing + 1.2 * uBlaze);
+    float n = wfbm(turn * q * (0.07 + 0.012 * float(k)) + vec2(float(k) * 3.1, 1.7 + uTime * 0.01));
+    n = smoothstep(0.2, 0.95, n);
+    float am = n * (0.1 + 0.035 * float(k)) * (1.0 - mist);
+    float warm = float(k) / 5.0;
+    vec3 tint = mix(vec3(0.2, 0.18, 0.24), heart * 0.55, (0.15 + 0.6 * warm) * (0.3 + 0.7 * uRing));
+    mistC += tint * am * (0.7 + 0.5 * uRing + 0.4 * pulseUp * uRing + 1.2 * uBlaze);
     mist += am;
   }
   col = col * (1.0 - mist) + mistC;
@@ -312,9 +334,9 @@ void main() {
   float pr = (1.0 - uPulse) * R;
   col += vec3(1.0, 0.95, 0.85) * uPulse * exp(-(rp - pr) * (rp - pr) / 4.0) * 1.2;
   col *= 1.0 + uBlaze * (1.6 + 0.8 * sin(uTime * 4.2 - rp * 0.6));
-  col += heart * uBlaze * 0.3 * exp(-rp * rp / 40.0);
+  col += heart * uBlaze * 0.35 * exp(-rp * rp / 40.0);
   // The rim's shadow on the well's lip (its inner face looming over it).
-  col *= 0.45 + 0.55 * smoothstep(R, R - 1.6, rp);
+  col *= 0.4 + 0.6 * smoothstep(R, R - 2.2, rp);
   gl_FragColor = vec4(col * (1.0 - 0.88 * uDark), 1.0);
   #include <colorspace_fragment>
 }`;

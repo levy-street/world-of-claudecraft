@@ -1,7 +1,8 @@
-// The Anvil of the World's wall landmarks (phase 2M, design doc section
-// 5.21): the pure half of heart_landmarks.ts. One great formation of each
-// element stands past the platform's rim at the middle of its quarter,
-// behind its altar (the Heart kit's Kit_Landmark* pieces, built by
+// The Anvil of the World's wall landmarks (phases 2M and 2N, design doc
+// section 5.21): the pure half of heart_landmarks.ts. One great formation of
+// each element stands past the platform's rim (since phase 2N its quarter's
+// outer wall, running along the rim from seam to seam, `HEART_LANDMARK_SPAN`),
+// its heart behind its altar (the Heart kit's Kit_Landmark* pieces, built by
 // docs/design/raid/kit/landmark_pieces.py): the Heat's molten outcrop, the
 // Hammer's golden crystal-and-granite crag, the Quench's ice spires, the
 // Breath's storm horns. The floor is one common stone; the element lives on
@@ -57,14 +58,39 @@ export function heartLandmarkPoint(
   };
 }
 
-/** The Breath's horns (landmark_pieces.py `horns`): foot (u, v), height,
- *  and the curl (per yard of height) toward their tips. */
+/** Each landmark's run along the rim (phase 2N, landmark_pieces.py SPAN):
+ *  degrees round from its altar's bearing (clockwise +), from just past
+ *  the seam's horn behind it nearly to the next; the Hammer's stops short
+ *  of the Heart Bridge. The landmark is its quarter's outer wall. */
+export const HEART_LANDMARK_SPAN: Readonly<Record<SmithHeartVein, readonly [number, number]>> = {
+  heat: [-18, 50],
+  hammer: [-18, 35],
+  quench: [-18, 50],
+  breath: [-18, 50],
+};
+
+/** A point `r` yards out at `d` degrees round from a landmark's bearing,
+ *  `h` up (landmark_pieces.py Frame.ad). */
+export function heartLandmarkAt(
+  vein: SmithHeartVein,
+  d: number,
+  r: number,
+  h: number,
+): HeartLandmarkPoint {
+  const a = (d * Math.PI) / 180;
+  return heartLandmarkPoint(vein, r * Math.cos(a), r * Math.sin(a), h);
+}
+
+/** The Breath's horns (landmark_pieces.py BREATH_HORNS): foot (u, v),
+ *  height, and the curl (per yard of height) toward their tips; the first
+ *  two rise either side of the storm's split and curl toward each other. */
 const BREATH_HORNS: readonly { u: number; v: number; h: number; cu: number; cv: number }[] = [
-  { u: 72, v: 0, h: 19, cu: -0.35, cv: 0 },
-  { u: 69, v: -6, h: 14, cu: -0.25, cv: 0.35 },
-  { u: 69.5, v: 6.2, h: 15, cu: -0.25, cv: -0.35 },
-  { u: 76, v: -3.2, h: 11, cu: 0.1, cv: 0.2 },
-  { u: 76, v: 4, h: 12, cu: 0.1, cv: -0.25 },
+  { u: 71.73, v: 6.28, h: 31, cu: -0.12, cv: 0.13 },
+  { u: 69.81, v: 21.34, h: 29, cu: -0.12, cv: -0.13 },
+  { u: 73.29, v: -10.3, h: 22, cu: -0.1, cv: 0.1 },
+  { u: 64.29, v: 38.63, h: 24, cu: -0.05, cv: -0.12 },
+  { u: 50.35, v: 48.63, h: 16, cu: 0, cv: -0.1 },
+  { u: 64.72, v: -17.32, h: 14, cu: 0, cv: 0.08 },
 ];
 
 /** The tips of the Breath's horns (the crystal's foot, room-local). */
@@ -80,30 +106,36 @@ export function heartBreathHornTips(): HeartLandmarkPoint[] {
 }
 
 /** Each landmark's signature spots, where its air rises and its light
- *  pools: the Heat's crater and its lava's spill, the Hammer's great
- *  crystal and its shoulders, the Quench's spires' crowns, the Breath's
- *  horns' tips. */
+ *  pools (landmark_pieces.py): the Heat's crater and the heads of its five
+ *  lava falls, the Hammer's four great crystals, the Quench's spires'
+ *  crowns and its frozen falls, the Breath's horns' tips. */
 export function heartLandmarkSpots(vein: SmithHeartVein): HeartLandmarkPoint[] {
+  const at = (d: number, r: number, h: number) => heartLandmarkAt(vein, d, r, h);
   if (vein === 'heat')
     return [
-      heartLandmarkPoint('heat', 71, 0, 8.5),
-      heartLandmarkPoint('heat', 63.5, 0, 2.4),
-      heartLandmarkPoint('heat', 61.5, -6, 0.6),
-      heartLandmarkPoint('heat', 61.5, 6.8, 0.6),
+      at(4, 74, 22),
+      at(0, 61.6, 0.8),
+      at(12, 61.6, 0.8),
+      at(-10, 61.6, 0.8),
+      at(25, 61.6, 0.8),
+      at(-16.7, 65.5, 3),
+      at(48.7, 65.5, 3),
+      at(21, 76, 18),
     ];
   if (vein === 'hammer')
-    return [
-      heartLandmarkPoint('hammer', 63.5, 0.5, 5.5),
-      heartLandmarkPoint('hammer', 70.5, -5.2, 9.0),
-      heartLandmarkPoint('hammer', 69.5, 5.7, 7.6),
-    ];
+    return [at(0, 66.5, 12), at(17, 71.2, 18), at(-10, 72.2, 16), at(29, 68.8, 13)];
   if (vein === 'quench')
     return [
-      heartLandmarkPoint('quench', 69.8, 0, 13.0),
-      heartLandmarkPoint('quench', 68, -5.5, 9.5),
-      heartLandmarkPoint('quench', 67.4, 6.4, 10.4),
-      heartLandmarkPoint('quench', 64.5, -2.5, 4.2),
-      heartLandmarkPoint('quench', 63.6, 3.4, 3.6),
+      at(2, 73.6, 27),
+      at(-4, 69.6, 19),
+      at(8, 70.2, 21),
+      at(4, 79.8, 23),
+      at(31, 74.4, 19),
+      at(37, 70.6, 14),
+      at(-12, 62, 3),
+      at(16, 62, 3),
+      at(30, 62, 3),
+      at(45, 62, 3),
     ];
   return heartBreathHornTips();
 }
@@ -128,14 +160,18 @@ export interface HeartBolt {
 export function heartBreathBolts(): HeartBolt[] {
   const tips = heartBreathHornTips();
   const pairs: [HeartLandmarkPoint, HeartLandmarkPoint][] = [
+    // The great arc across the storm's split, its twin a breath apart.
     [tips[0], tips[1]],
+    [tips[1], tips[0]],
     [tips[0], tips[2]],
     [tips[1], tips[3]],
-    [tips[2], tips[4]],
     [tips[3], tips[4]],
-    [tips[0], heartLandmarkPoint('breath', 58.5, -3, 0.4)],
-    [tips[2], heartLandmarkPoint('breath', 57.5, 5, 0.4)],
-    [tips[1], heartLandmarkPoint('breath', 58, -8.5, 0.4)],
+    [tips[2], tips[5]],
+    // Strikes down into the quarter's edge.
+    [tips[0], heartLandmarkAt('breath', 6, 58.5, 0.4)],
+    [tips[1], heartLandmarkAt('breath', 16, 57.5, 0.4)],
+    [tips[3], heartLandmarkAt('breath', 31, 58, 0.4)],
+    [tips[2], heartLandmarkAt('breath', -8, 58, 0.4)],
   ];
   return pairs.map(([a, b], i) => {
     const n = 12;

@@ -48,7 +48,7 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
-import { heartBeamMaterial } from './heart_fx_materials';
+import { heartFloorMaterial } from './heart_floor';
 import {
   heartKitMeshes,
   heartKitPiece,
@@ -98,9 +98,11 @@ import {
   RIDGE_GLOW_FRAG,
   RIDGE_SPARK_VERT,
   SHADE_FRAG,
-  WASH_FRAG,
   WASH_VERT,
+  washFrag,
 } from './heart_quarters_glsl';
+import { buildHeartRingColumn } from './heart_ring_column';
+import { buildHeartSurround } from './heart_surround';
 
 /** Each quarter's kit piece. */
 export const HEART_QUARTER_PIECES: Readonly<Record<SmithHeartVein, string>> = {
@@ -349,6 +351,8 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       for (const m of floor.children) {
         if (!(m instanceof THREE.Mesh)) continue;
         if (m.name.endsWith(':glow')) m.material = glow;
+        // Phase 2N: the slabs, joints, wear and soot painted on the sheet.
+        if (m.name.endsWith(':stone')) m.material = heartFloorMaterial(lowGfx);
         // A floor a breath over the walk casts nothing worth a shadow.
         m.castShadow = false;
         m.renderOrder = HEART_PLATFORM_ORDER.floor;
@@ -366,7 +370,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         uDark: { value: 0 },
       },
       vertexShader: WASH_VERT,
-      fragmentShader: WASH_FRAG,
+      fragmentShader: washFrag(vein),
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
@@ -783,6 +787,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       HEART_RING_LOOK.depth,
       HEART_QUARTERS.sweepDeg,
       -45 + HEART_QUARTERS.rimOffsetDeg,
+      lowGfx,
     ),
     fog: false,
   });
@@ -836,16 +841,14 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     mesh.name = 'heartRingBlaze';
     group.add(mesh);
   }
-  const columnMat = heartBeamMaterial(0xffe2a8, 'smithHeartRingColumn', 1.2);
-  {
-    const h = 40;
-    const w = HEART_RING_LOOK.wellR;
-    const g = new THREE.CylinderGeometry(w - 0.6, w * 0.62, h, 48, 1, true).translate(0, h / 2, 0);
-    const column = new THREE.Mesh(g, columnMat);
-    column.position.copy(centre);
-    column.name = 'heartRingColumn';
-    group.add(column);
-  }
+  // Phase 2N: the column of the heart's light, layered and swirling, its
+  // shards riding it up (heart_ring_column.ts).
+  const column = buildHeartRingColumn(lowGfx, centre);
+  group.add(column.group);
+  // Phase 2N: the abyss's glow under the lip and the haze before the crown
+  // (heart_surround.ts).
+  const surround = buildHeartSurround(centre);
+  group.add(surround.group);
 
   // ---- the wall landmarks (phase 2M) ----------------------------------------------------------
   const landmarks = buildHeartLandmarks(lowGfx, centre);
@@ -954,7 +957,8 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       set(wu.uPulse, state.ringPulse);
       set(wu.uDark, dark);
       set(blazeMat.uniforms.uBlaze, state.blaze * (1 - dark));
-      set(columnMat.uniforms.uK, state.blaze * 1.2 * (1 - dark));
+      column.set(state.blaze, dark);
+      surround.set(state.ring, state.blaze, dark);
     },
   };
 }

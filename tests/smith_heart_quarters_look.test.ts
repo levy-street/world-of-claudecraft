@@ -28,6 +28,7 @@ import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import { heartKitSlotMaterial } from '../src/render/smith_heart/heart_kit';
 import {
   HEART_LANDMARK_FRAME,
+  HEART_LANDMARK_SPAN,
   heartBreathBolts,
   heartBreathHornTips,
   heartLandmarkLit,
@@ -508,11 +509,18 @@ describe('the edges awake (phase 2M)', () => {
         expect(Math.hypot(p.x, p.z), v).toBeGreaterThan(HEART_QUARTERS.rimR);
         expect(p.y, v).toBeGreaterThan(0);
       }
-      // At its altar's bearing.
+      // Along its landmark's run (phase 2N: the quarter's outer wall), the
+      // first at its heart behind the altar.
       const b = HEART_LANDMARK_FRAME.bearing[v];
+      const [d0, d1] = HEART_LANDMARK_SPAN[v];
+      for (const p of spots) {
+        const off = (((Math.atan2(p.x, p.z) * 180) / Math.PI - b + 540) % 360) - 180;
+        expect(off, v).toBeGreaterThan(d0 - 1);
+        expect(off, v).toBeLessThan(d1 + 1);
+      }
       const c = spots[0];
       const got = ((Math.atan2(c.x, c.z) * 180) / Math.PI + 360) % 360;
-      expect(Math.abs(((got - b + 540) % 360) - 180), v).toBeLessThan(8);
+      expect(Math.abs(((got - b + 540) % 360) - 180), v).toBeLessThan(12);
     }
   });
 

@@ -27,12 +27,15 @@ import {
 /** The Smith's heart in the chasm: centre (instance-local), radius. */
 export const HEART_CORE = { x: HEART_ROOM.x, y: -50, z: HEART_ROOM.z, r: 22 } as const;
 
-/** The shafts of the core's light rising through the chasm ring. */
+/** The shafts of the core's light rising through the chasm ring. Phase 2N:
+ *  drawn in close round the lip, in the gaps the wall landmarks leave
+ *  between them by each seam's horn (never through a landmark), framing
+ *  the room. */
 export const HEART_CORE_SHAFTS: readonly { x: number; z: number; r: number; tilt: number }[] = [
-  20, 80, 140, 300, 345,
+  57, 147, 329,
 ].map((deg, i) => {
   const a = (deg * Math.PI) / 180;
-  const d = HEART_ROOM.r + 12 + (i % 3) * 4;
+  const d = HEART_ROOM.r + 6.5 + (i % 3) * 1.5;
   return {
     x: HEART_ROOM.x + Math.sin(a) * d,
     z: HEART_ROOM.z + Math.cos(a) * d,

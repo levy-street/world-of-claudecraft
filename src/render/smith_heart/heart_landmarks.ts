@@ -50,10 +50,10 @@ export const HEART_LANDMARK_PIECES: Readonly<Record<SmithHeartVein, string>> = {
 /** How many of each landmark's motes on the high tier (the low tier keeps a
  *  share). */
 export const HEART_LANDMARK_AIR = {
-  heat: { embers: 260, smoke: 26 },
-  hammer: { motes: 200 },
-  quench: { rime: 220, mist: 24 },
-  breath: { sparks: 160 },
+  heat: { embers: 460, smoke: 44 },
+  hammer: { motes: 360 },
+  quench: { rime: 380, mist: 40 },
+  breath: { sparks: 280 },
 } as const;
 
 /** One landmark's rig: its light and its air, read every frame. */
@@ -74,7 +74,8 @@ function bounds(spots: readonly { x: number; y: number; z: number }[]): THREE.Sp
   const c = new THREE.Vector3();
   for (const s of spots) c.add(new THREE.Vector3(s.x, s.y, s.z));
   c.divideScalar(Math.max(1, spots.length));
-  return new THREE.Sphere(c.setY(c.y + 10), 34);
+  // Phase 2N: a landmark runs along its quarter's whole wall.
+  return new THREE.Sphere(c.setY(c.y + 10), 64);
 }
 
 function airMat(
@@ -189,7 +190,7 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       vein,
       `heartLandmarkHalo:${vein}`,
       spots.map((s) => [s.x, s.y, s.z] as HeartAirV3),
-      spots.map((_, i) => [heartHash(8301, i), size * (i === 0 ? 1 : 0.55), heartHash(8302, i), 0]),
+      spots.map((_, i) => [heartHash(8301, i), size * (i === 0 ? 1 : 0.4), heartHash(8302, i), 0]),
       mat,
     );
   };
@@ -204,9 +205,9 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       e.bases,
       e.params,
       airMat('smithHeartLandmarkEmbers', LANDMARK_PLUME_VERT, 0xd83a10, 0xffd060, 1, {
-        uRise: { value: 22 },
-        uSpread: { value: 2.6 },
-        uSize: { value: 0.2 },
+        uRise: { value: 34 },
+        uSpread: { value: 3.4 },
+        uSize: { value: 0.26 },
         uSpeed: { value: 0.16 },
       }),
     );
@@ -217,11 +218,11 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       s.bases,
       s.params,
       airMat('smithHeartLandmarkSmoke', LANDMARK_BILLOW_VERT, 0x5a2a1c, 0xff6a2a, 0.22, {
-        uRise: { value: 18 },
-        uSize: { value: 4.2 },
+        uRise: { value: 26 },
+        uSize: { value: 6.0 },
       }),
     );
-    halo('heat', P.heat.color, 1);
+    halo('heat', P.heat.color, 1.1);
   }
   // The Hammer: gold motes rising off its crystal, the crystal's glow.
   {
@@ -232,13 +233,13 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       m.bases,
       m.params,
       airMat('smithHeartLandmarkMotes', LANDMARK_PLUME_VERT, 0xe0a650, 0xfff2c8, 1, {
-        uRise: { value: 14 },
-        uSpread: { value: 3.4 },
-        uSize: { value: 0.17 },
+        uRise: { value: 20 },
+        uSpread: { value: 4.6 },
+        uSize: { value: 0.22 },
         uSpeed: { value: 0.07 },
       }),
     );
-    halo('hammer', P.hammer.color, 0.9);
+    halo('hammer', P.hammer.color, 1.3);
   }
   // The Quench: rime swirling up off its spires, frost mist off its feet,
   // their cold glow.
@@ -250,9 +251,9 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       r.bases,
       r.params,
       airMat('smithHeartLandmarkRime', LANDMARK_PLUME_VERT, 0x9ad8ff, 0xffffff, 1, {
-        uRise: { value: 12 },
-        uSpread: { value: 4.0 },
-        uSize: { value: 0.13 },
+        uRise: { value: 16 },
+        uSpread: { value: 5.4 },
+        uSize: { value: 0.17 },
         uSpeed: { value: 0.06 },
       }),
     );
@@ -263,11 +264,11 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       m.bases.map((b) => [b[0], 0.4, b[2]] as HeartAirV3),
       m.params,
       airMat('smithHeartLandmarkMist', LANDMARK_BILLOW_VERT, 0x8cc8ff, 0xe8f6ff, 0.16, {
-        uRise: { value: 3 },
-        uSize: { value: 4.6 },
+        uRise: { value: 4 },
+        uSize: { value: 6.2 },
       }),
     );
-    halo('quench', P.quench.color, 0.9);
+    halo('quench', P.quench.color, 1.2);
   }
   // The Breath: violet lightning between its horns' tips and down into its
   // quarter, sparks thrown off the tips, the tips' glow.
@@ -307,13 +308,13 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       s.bases,
       s.params,
       airMat('smithHeartLandmarkSparks', LANDMARK_PLUME_VERT, 0xa98cff, 0xc8fff2, 1, {
-        uRise: { value: 6 },
-        uSpread: { value: 5.0 },
-        uSize: { value: 0.12 },
+        uRise: { value: 9 },
+        uSpread: { value: 6.0 },
+        uSize: { value: 0.16 },
         uSpeed: { value: 0.3 },
       }),
     );
-    halo('breath', P.breath.color, 0.8);
+    halo('breath', P.breath.color, 1.1);
   }
 
   const set = (u: THREE.IUniform, v: number) => {

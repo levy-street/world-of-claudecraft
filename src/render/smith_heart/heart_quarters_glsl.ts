@@ -112,9 +112,14 @@ void main() {
     // The border light: a thin line of the quarter's tint, its light
     // running out along the seam while it is awake.
     float run = 0.55 + 0.45 * sin(r * 0.8 - uTime * 5.5);
-    float lvl = max(quiet * 0.8, inside * (1.3 + 0.9 * run));
-    vec3 c = uColor * lvl * 1.35 + mix(uColor, white, 0.6) * edge * 2.4;
-    c += mix(uColor, uHot, 0.5) * inside * run * run * 0.6;
+    // Phase 2N: a bright core over a dimmer halo (the halo's tag a value
+    // lower), so the line reads soft-edged and crisp from above.
+    float core = smoothstep(0.55, 0.68, vShade.g);
+    float k = mix(0.42, 1.0, core);
+    float lvl = max(quiet * 0.8, inside * (1.3 + 0.9 * run)) * k;
+    vec3 c = uColor * lvl * 1.35 + mix(uColor, white, 0.6) * edge * 2.4 * k;
+    c += mix(uColor, uHot, 0.5) * inside * run * run * 0.6 * core;
+    c += mix(uColor, white, 0.35) * core * max(quiet * 0.35, inside * 0.5);
     gl_FragColor = vec4(c * (1.0 - 0.85 * uDark), 1.0);
     #include <colorspace_fragment>
     return;
@@ -153,7 +158,7 @@ void main() {
   float shock = 0.0;
   if (uShockAge >= 0.0) {
     float d = abs(abs(r - uShockR) - uShockAge * ${SHOCK_SPEED});
-    shock = exp(-d * d / 3.2) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.5)}, ${SHOCK_LIFE}, uShockAge));
+    shock = exp(-d * d / 5.0) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.5)}, ${SHOCK_LIFE}, uShockAge));
   }
   float level = max(uBase * (0.85 + 0.15 * sin(uTime * 1.1 + r * 0.3)), inside * flow);
   vec3 dark = vec3(0.04, 0.038, 0.045) * (0.5 + 0.6 * vShade.r);
@@ -219,7 +224,47 @@ void main() {
   vEdge = aEdge;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }`;
-export const WASH_FRAG = /* glsl */ `
+/** Phase 2N: each element's own life in the wash round the circle's rim,
+ *  layered under the crackle's crisp lines (sets `life`, an additive
+ *  glow in the quarter's colour, `hotL` the white in it): the Breath's
+ *  storm forks flashing, the Quench's frost glinting and spreading, the
+ *  Hammer's tremor rings with gold glinting in them, the Heat's molten
+ *  glow flowing out with embers. */
+const WASH_LIFE: Record<string, string> = {
+  breath: `
+    float slotW = floor(uTime * 11.0);
+    float fork = abs(wn(vec2(r * 0.9 + slotW * 3.7, ang * 7.0 + slotW)) - 0.5);
+    float flash = step(0.55, fract(sin(slotW * 12.9898 + floor(ang * 6.0) * 4.1) * 43758.5453));
+    float life = (1.0 - smoothstep(0.0, 0.035, fork)) * flash * 1.6 + 0.25 * flash;
+    float hotL = flash * (1.0 - smoothstep(0.0, 0.02, fork));`,
+  quench: `
+    vec2 gq = floor(vP * 1.6);
+    float gh = fract(sin(dot(gq, vec2(127.1, 311.7))) * 43758.5453);
+    float tw = max(0.0, sin(uTime * (1.5 + 2.0 * gh) + gh * 40.0));
+    float glint = step(0.93, gh) * tw * tw * tw;
+    float sr = r - ${RING} - fract(uTime * 0.3) * 16.0;
+    float spread = exp(-sr * sr / 6.0);
+    float life = 0.35 + 1.6 * glint + 0.6 * spread;
+    float hotL = glint + 0.3 * spread;`,
+  hammer: `${TREMOR}
+    float ring = exp(-(r - pr) * (r - pr) / 1.6) * (1.0 - tp);
+    vec2 gq = floor(vP * 1.3);
+    float gh = fract(sin(dot(gq, vec2(269.5, 183.3))) * 43758.5453);
+    float glint = step(0.94, gh) * (0.5 + 0.5 * sin(uTime * 3.0 + gh * 30.0));
+    float life = 0.3 + 1.8 * ring + 1.2 * glint * (0.4 + ring);
+    float hotL = ring * 0.6 + glint;`,
+  heat: `
+    float flowW = wn(vec2(r * 0.35 - uTime * 0.9, ang * 4.0 + sin(uTime * 0.3)));
+    float molten = smoothstep(0.45, 0.8, flowW);
+    vec2 gq = floor(vP * 1.4 + vec2(0.0, uTime * 0.6));
+    float gh = fract(sin(dot(gq, vec2(127.1, 311.7))) * 43758.5453);
+    float ember = step(0.95, gh) * (0.5 + 0.5 * sin(uTime * 7.0 + gh * 50.0));
+    float life = 0.35 + 1.3 * molten + 1.4 * ember;
+    float hotL = molten * 0.4 + ember;`,
+};
+
+export function washFrag(vein: string): string {
+  return /* glsl */ `
 uniform vec3 uColor;
 uniform float uAwake;
 uniform float uFront;
@@ -228,8 +273,16 @@ uniform float uTime;
 uniform float uDark;
 varying vec2 vP;
 varying float vEdge;
+float wh(vec2 q) { return fract(sin(dot(q, vec2(127.1, 311.7))) * 43758.5453); }
+float wn(vec2 q) {
+  vec2 i = floor(q);
+  vec2 u = fract(q);
+  u = u * u * (3.0 - 2.0 * u);
+  return mix(mix(wh(i), wh(i + vec2(1.0, 0.0)), u.x), mix(wh(i + vec2(0.0, 1.0)), wh(i + vec2(1.0, 1.0)), u.x), u.y);
+}
 void main() {
   float r = length(vP);
+  float ang = atan(vP.x, vP.y);
   float inside = uAwake * (1.0 - smoothstep(uFront - 3.0, uFront, r));
   float dr = r - uFront;
   float edge = uAwake * exp(-dr * dr / 3.0) * (1.0 - smoothstep(${RIM} - 1.0, ${RIM} + 1.5, uFront));
@@ -239,11 +292,19 @@ void main() {
   // element lives.
   float nearRing = 1.0 - smoothstep(${RING}, ${RING} + 12.0, r);
   float nearRim = smoothstep(${RIM} - 14.0, ${RIM}, r);
-  float a = (inside * (0.05 + 0.13 * nearRing + 0.08 * nearRim) * pool + edge * 0.26) * uGain * vEdge * (1.0 - uDark);
+  ${WASH_LIFE[vein]}
+  // Phase 2N: the element's own life layered round the rim, fading out
+  // into the quarter.
+  float band = (1.0 - smoothstep(${RING} + 2.0, ${RING} + 17.0, r)) * smoothstep(${RING} - 0.2, ${RING} + 0.8, r);
+  float a = (inside * (0.05 + 0.13 * nearRing + 0.08 * nearRim) * pool + edge * 0.26) * uGain * vEdge;
+  float l = inside * band * life * 0.16 * uGain * vEdge;
+  a = (a + l) * (1.0 - uDark);
   if (a < 0.003) discard;
-  gl_FragColor = vec4(uColor * a, 1.0);
+  vec3 c = mix(uColor, vec3(1.0, 0.97, 0.9), clamp(hotL * 0.5, 0.0, 0.7) * step(0.003, l));
+  gl_FragColor = vec4(c * a, 1.0);
   #include <colorspace_fragment>
 }`;
+}
 
 /** The quad particles' shared fragment: a soft round mote. */
 export const MOTE_FRAG = /* glsl */ `
@@ -631,10 +692,11 @@ void main() {
   float shock = 0.0;
   if (uShockAge >= 0.0) {
     float d = abs(abs(aR - uShockR) - uShockAge * ${SHOCK_SPEED});
-    shock = exp(-d * d / 4.0) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.4)}, ${SHOCK_LIFE}, uShockAge));
+    shock = exp(-d * d / 7.0) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.4)}, ${SHOCK_LIFE}, uShockAge));
   }
   vec3 p = position;
-  p.y = 0.45 + aV * (1.1 + 7.0 * shock);
+  // Phase 2N: at 120 yd the crossing's wall of light stands taller.
+  p.y = 0.45 + aV * (1.3 + 13.0 * shock);
   vV = aV;
   vR = aR;
   vShock = shock;

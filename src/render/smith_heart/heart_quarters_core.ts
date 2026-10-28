@@ -312,7 +312,7 @@ export const HEART_QUARTER_PALETTE: Readonly<
 /** The central circle (phase 2M, the kit's Kit_HeartDais and Kit_HeartWell,
  *  quarter_pieces.py WELL_R, RIM_OUT): the well's edge (the rim's inner
  *  foot), the rim's outer foot, and how deep the shader draws the well. */
-export const HEART_RING_LOOK = { wellR: 13.4, rimOut: 16.4, depth: 3.2 } as const;
+export const HEART_RING_LOOK = { wellR: 13.4, rimOut: 16.4, depth: 9 } as const;
 
 /** The opaque platform's draw order (phase 2L): the floors (the quarters,
  *  the rim's dirt bed, the dais) first, then each ridge's spine drawn with no
