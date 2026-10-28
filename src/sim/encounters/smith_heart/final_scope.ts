@@ -6,7 +6,7 @@
 // none of them reaches into another. Zero rng but the damage rolls.
 
 import { HEART_ROOM, SMITH_HEART_HEIGHTS } from '../../content/smith_heart_layout';
-import { HEART_QUARTERS } from '../../content/smith_heart_quarters';
+import { HEART_QUARTERS, heartQuarterAt } from '../../content/smith_heart_quarters';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
@@ -110,10 +110,32 @@ export function facingTo(a: FPoint, b: FPoint): number {
   return Math.atan2(b.x - a.x, b.z - a.z);
 }
 
-/** Is the boss free to begin a bar now? */
+/** The boss's tank (its aggro target) while it stands alive on the Anvil,
+ *  else null. */
+export function bossTank(s: Pick<FinalScope, 'boss' | 'players'>): Entity | null {
+  const id = s.boss.aggroTargetId;
+  if (id === null) return null;
+  for (const p of s.players) if (p.id === id) return p.dead ? null : p;
+  return null;
+}
+
+/** Is the boss being dragged: its root over, its tank standing in another
+ *  zone than the one it holds? */
+export function beingDragged(s: FinalScope): boolean {
+  if (s.st.rootLeft > 0) return false;
+  const tank = bossTank(s);
+  if (!tank) return false;
+  const p = at(s, tank);
+  return heartQuarterAt(p.x, p.z) !== s.st.zone;
+}
+
+/** Is the boss free to begin a bar now? Never while it is being dragged or
+ *  in the drag's grace right after its root lets go: a planted bar then is
+ *  the boss that will not follow (Jose's playtest of 28 Oct 2026). */
 export function bossFree(s: FinalScope): boolean {
   if (s.st.bar || s.boss.castingAbility !== null) return false;
-  if (s.st.gap > 0) return false;
+  if (s.st.gap > 0 || s.st.dragGrace > 0) return false;
+  if (beingDragged(s)) return false;
   return !s.ctx.isStunned(s.boss);
 }
 

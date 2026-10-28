@@ -122,6 +122,11 @@ export interface FinalFightState {
   /** Taking Root's seconds left, and the spot it holds. */
   rootLeft: number;
   rootAt: { x: number; y: number; z: number } | null;
+  /** Seconds after a root lets go in which no planted bar begins (the
+   *  tank's window to start the drag). */
+  dragGrace: number;
+  /** Each bar's near-full raid warning, given once per fill. */
+  overloadWarned: Record<SmithHeartVein, boolean>;
   /** Heroic: the switch mark's seconds left (raid-wide). */
   shakenLeft: number;
   switches: number;

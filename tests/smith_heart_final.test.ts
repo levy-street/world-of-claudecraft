@@ -20,6 +20,7 @@ import {
   FINAL_OBJECTS,
   FINAL_ZONE_CODES,
   finalZoneOf,
+  FINAL_OVERLOAD as O,
   overloadAuraId,
   overloadStep,
   pulseScale,
@@ -54,15 +55,50 @@ function spread(f: FinalFight, vein: SmithHeartVein): void {
 }
 
 describe('the pure rules', () => {
-  it('a bar fills in 40 s, drains at a third, and pulses harder the fuller it is', () => {
+  it('a bar fills in 60 s, drains at a third, and pulses harder the fuller it is', () => {
+    expect(O.fillSeconds).toBe(60);
+    expect(O.drainShare).toBeCloseTo(1 / 3, 9);
     let fill = 0;
-    for (let i = 0; i < sec(20); i++) fill = overloadStep(fill, true, 1 / 20);
+    for (let i = 0; i < sec(30); i++) fill = overloadStep(fill, true, 1 / 20);
     expect(fill).toBeCloseTo(0.5, 2);
     let drain = 0.5;
-    for (let i = 0; i < sec(20); i++) drain = overloadStep(drain, false, 1 / 20);
+    for (let i = 0; i < sec(30); i++) drain = overloadStep(drain, false, 1 / 20);
     expect(drain).toBeCloseTo(0.5 - 0.5 / 3, 2);
     expect(pulseScale(1)).toBeGreaterThan(pulseScale(0.5));
     expect(pulseScale(0.5)).toBeGreaterThan(pulseScale(0));
+  });
+
+  // The pace (FINAL_OVERLOAD): a visit lasts at least the root plus a short
+  // drag. Bouncing between two quarters cannot be held; a rotation through
+  // three or four is comfortable for a six-minute fight.
+  const peakOf = (quarters: number, visit: number, seconds: number) => {
+    const bars = new Array(quarters).fill(0);
+    let peak = 0;
+    for (let i = 0; i < sec(seconds); i++) {
+      const active = Math.floor(i / sec(visit)) % quarters;
+      for (let q = 0; q < quarters; q++) bars[q] = overloadStep(bars[q], q === active, 1 / 20);
+      peak = Math.max(peak, ...bars);
+    }
+    return peak;
+  };
+  it('bouncing between two quarters fills a bar to bursting within three minutes', () => {
+    for (const visit of [T.rootSeconds + 4, 20]) expect(peakOf(2, visit, 180), `${visit}`).toBe(1);
+  });
+  it('a rotation through four quarters never passes one visit, through three it stays clear', () => {
+    for (const visit of [T.rootSeconds + 4, 20, 25])
+      expect(peakOf(4, visit, 360), `4 x ${visit}`).toBeLessThan(visit / O.fillSeconds + 0.01);
+    for (const visit of [T.rootSeconds + 4, 20])
+      expect(peakOf(3, visit, 360), `3 x ${visit}`).toBeLessThan(0.9);
+  });
+  it('the burst: survivable with healing on Normal, heavy on Heroic, lethal on Mythic', () => {
+    // The level-20 cloth reference: about 1,135 to 1,345 health.
+    expect(O.burst.normal.max).toBeLessThan(1135 * 0.75);
+    expect(O.burst.heroic.min).toBeGreaterThan(1135 * 0.85);
+    expect(O.burst.heroic.max).toBeLessThan(1345);
+    expect(O.burst.mythic.min).toBeGreaterThan(1345 * 3);
+    expect(FINAL_DIFFICULTY.normal.burstTier).toBe('survivable');
+    expect(FINAL_DIFFICULTY.heroic.burstTier).toBe('heavy');
+    expect(FINAL_DIFFICULTY.mythic.burstTier).toBe('lethal');
   });
 
   it('the Anvil splits its blow, harder when too few share it, three times for the Crushed', () => {
@@ -95,7 +131,7 @@ describe('the quarter rules', () => {
     f.pullIn('heat');
     const ev = f.tick(sec(12));
     const st = f.state();
-    expect(st?.overload.heat).toBeGreaterThan(0.25);
+    expect(st?.overload.heat).toBeGreaterThan(0.18);
     expect(st?.overload.quench).toBe(0);
     const pulses = hits(ev, FINAL_NAMES.pulse, f.pids[1]);
     expect(pulses.length).toBe(3);
@@ -106,19 +142,55 @@ describe('the quarter rules', () => {
     expect(bar?.value2).toBe(1);
   });
 
-  it('a full bar bursts on the whole raid and empties', () => {
+  for (const tier of ['normal', 'heroic', 'mythic'] as const)
+    it(`a full bar warns near full, then bursts on the whole raid at ${tier}'s numbers and empties`, () => {
+      const f = finalFight(5);
+      if (tier !== 'normal') f.dev(`/dev heart final ${tier}`);
+      f.pullIn('hammer');
+      f.dev('/dev heart final fill hammer 84');
+      const near = f.tick(sec(1));
+      const warns = near.filter(
+        (e) => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
+      ) as Extract<SimEvent, { type: 'chat' }>[];
+      const nearKey = { normal: 'nearFull', heroic: 'nearFullHeavy', mythic: 'nearFullLethal' }[
+        tier
+      ];
+      expect(warns.map((w) => w.textKey)).toContain(`hudChrome.finalBoss.warn.${nearKey}`);
+      f.dev('/dev heart final fill hammer 99');
+      const ev = f.tick(sec(1));
+      const burst = hits(ev, FINAL_NAMES.burst);
+      expect(new Set(burst.map((d) => d.targetId)).size).toBe(5);
+      for (const b of burst) {
+        expect(b.amount).toBeGreaterThanOrEqual(O.burst[tier].min);
+        expect(b.amount).toBeLessThanOrEqual(O.burst[tier].max);
+      }
+      const burstKey = { normal: 'burst', heroic: 'burstHeavy', mythic: 'burstLethal' }[tier];
+      const lines = (
+        ev.filter(
+          (e) => e.type === 'chat' && e.channel === 'raidWarning' && e.pid === f.pids[0],
+        ) as Extract<SimEvent, { type: 'chat' }>[]
+      ).map((w) => w.textKey);
+      expect(lines).toContain(`hudChrome.finalBoss.warn.${burstKey}`);
+      expect(f.state()?.overload.hammer).toBeLessThan(0.05);
+      expect(f.state()?.bursts).toBe(1);
+    });
+
+  it('Mythic: a full bar kills a raid with no defensives', () => {
     const f = finalFight(5);
+    f.dev('/dev heart final mythic');
     f.pullIn('hammer');
+    // Real level-20 health (the helper's great store taken away).
+    for (const p of f.players) {
+      p.auras = p.auras.filter((a) => a.id !== 'test_final_vigour');
+      p.maxHp = 1345;
+      p.hp = 1345;
+    }
     f.dev('/dev heart final fill hammer 99');
-    const ev = f.tick(sec(1));
-    const burst = hits(ev, FINAL_NAMES.burst);
-    expect(new Set(burst.map((d) => d.targetId)).size).toBe(5);
-    expect(burst[0].amount).toBeGreaterThanOrEqual(T.burstMin);
-    expect(f.state()?.overload.hammer).toBeLessThan(0.05);
-    expect(f.state()?.bursts).toBe(1);
+    f.tick(sec(1), false);
+    expect(f.players.every((p) => p.dead)).toBe(true);
   });
 
-  it('roots 15 s on entering a quarter, then follows its tank across a ridge', () => {
+  it('roots on entering a quarter, then follows its tank across a ridge', () => {
     const f = finalFight(5);
     f.pullIn('heat');
     const tank = f.players[0];
@@ -457,7 +529,16 @@ describe('difficulty gating', () => {
     if (tier !== 'normal') f.dev(`/dev heart final ${tier}`);
     f.pullIn(vein);
     spread(f, vein);
-    const ev = f.tick(sec(seconds));
+    // The tank holds its ground by the boss (it walks into the gale), so the
+    // boss stays in its quarter once its root lets go.
+    const ev: SimEvent[] = [];
+    const tank = f.players[0];
+    for (let i = 0; i < sec(seconds); i++) {
+      const at = f.local(f.boss());
+      const here = f.local(tank);
+      if (Math.hypot(here.x - at.x, here.z - at.z) > 3) f.put(tank, at.x + 2, at.z + 2);
+      ev.push(...f.tick(1));
+    }
     return { f, ev };
   };
 

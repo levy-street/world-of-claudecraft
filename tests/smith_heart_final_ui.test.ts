@@ -18,6 +18,7 @@ import {
   FINAL_BOSS,
   FINAL_NAMES,
   FINAL_ZONE_CODES,
+  FINAL_OVERLOAD as O,
   overloadAuraId,
   FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
@@ -73,7 +74,8 @@ describe('The Masterless Strength: what the raid reads', () => {
       'enterQuench',
       'enterBreath',
       'enterHammer',
-      'burst',
+      'burstLethal',
+      'nearFullLethal',
       'unbound',
       'embers',
       'wind',
@@ -116,9 +118,13 @@ describe('The Masterless Strength: tooltips', () => {
   it('each bar, mark and the root say their rule with the live numbers', () => {
     const bar = say({ id: overloadAuraId('quench'), kind: 'internal_cd', value: 40 });
     expect(bar).toContain('40% full');
-    expect(bar).toContain(`${T.overloadFillSeconds} sec`);
-    expect(bar).toContain(`${T.burstMin} to ${T.burstMax}`);
-    expect(bar).toContain(`up to ${T.pulseMax + T.pulseRise}`);
+    expect(bar).toContain(`${O.fillSeconds} sec`);
+    expect(bar).toContain(`up to ${O.pulseMax + O.pulseRise}`);
+    // The burst per difficulty: survivable, heavy, lethal.
+    const n = (v: number) => String(v);
+    expect(bar).toContain(`${n(O.burst.normal.min)} to ${n(O.burst.normal.max)} damage on Normal`);
+    expect(bar).toContain(`${n(O.burst.heroic.min)} to ${n(O.burst.heroic.max)} on Heroic (heavy`);
+    expect(bar).toContain(`${n(O.burst.mythic.min)} to ${n(O.burst.mythic.max)} on Mythic (lethal`);
     expect(say({ id: FINAL_AURAS.root, kind: 'root' })).toContain(`${T.rootSeconds} sec`);
     expect(say({ id: FINAL_AURAS.unbound, kind: 'internal_cd', stacks: 3 })).toContain(
       `(${T.unboundPerStack * 3} now)`,

@@ -2,16 +2,19 @@
 // section 7.5, the owner's approved design of 28 Oct 2026):
 //
 //   Overload        one bar per quarter. It fills while the boss stands in
-//                   that quarter (empty to full in 40 s), and the active bar
+//                   that quarter (empty to full in 60 s), and the active bar
 //                   pulses the raid every 4 s, harder the fuller it is; full,
-//                   it bursts (a heavy raid blast) and empties. Away from its
-//                   quarter a bar drains at a third of its fill speed. Every
-//                   difficulty.
+//                   it bursts and empties: survivable with healing on Normal,
+//                   heavy on Heroic, lethal on Mythic (FINAL_OVERLOAD). Away
+//                   from its quarter a bar drains at a third of its fill
+//                   speed; near full it warns the raid once. Every difficulty.
 //   Vein Shock      Heroic and Mythic: every quarter change hits the raid and
 //                   leaves Vein-Shaken (20 s) on everyone struck; a change
 //                   while still shaken hits three times as hard.
-//   Taking Root     on entering a quarter (the first one too) the boss roots
-//                   for 15 s: it cannot be dragged out. Every difficulty.
+//   Taking Root     on entering a new quarter (the first one too) the boss
+//                   roots for 10 s: it cannot be dragged out. Back into the
+//                   quarter it just left (a dip into the ring) it does not.
+//                   Every difficulty.
 //   Heart Unbound   in the central ring above its final phase (15 percent)
 //                   the boss gains a stack every second and pulses the raid
 //                   for each stack: the tanks drag it through, never park it.
@@ -19,8 +22,11 @@
 //                   fight (the state aura carries it: the hook for the form's
 //                   extra loot item, phase 2).
 //
-// Between roots the boss follows its tank like any boss: the tanks drag it
-// across a ridge into the next quarter, and the kit changes with it.
+// Between roots the boss follows its tank (followTank): its long melee reach
+// alone would park it ten yards short of a tank waiting just past a ridge, so
+// a free boss whose tank stands in another zone closes on it, and no planted
+// bar begins while it is dragged (final_scope.ts bossFree). The kit changes
+// with the quarter.
 // Deterministic: no pick here draws; the only rng draws are the damage rolls,
 // in claim-player order.
 
@@ -40,6 +46,8 @@ import {
   FINAL_CUES,
   FINAL_NAMES,
   FINAL_ZONE_CODES,
+  type FinalDifficultyRules,
+  FINAL_OVERLOAD as O,
   overloadAuraId,
   overloadStep,
   pulseScale,
@@ -48,6 +56,7 @@ import {
 import {
   at,
   auraOf,
+  bossTank,
   cueAt,
   cueOn,
   dropAura,
@@ -64,18 +73,25 @@ import {
  *  boss must step before the zone it left lets go: a boss swaying on a
  *  ridge never flickers between two quarters (each change roots it and, on
  *  Heroic, shocks the raid). */
-export const ZONE_HOLD = { ridge: 3, ring: 1.5 } as const;
+export const ZONE_HOLD = { ridge: 2, ring: 1.5 } as const;
 
 /** The zone the boss stands in now, held by the one it is in (ZONE_HOLD)
- *  unless `fresh` (the pull). */
+ *  unless `fresh` (the pull) or its tank already stands in the zone it has
+ *  stepped into: a boss following its tank over a ridge crosses at once (the
+ *  hold is only for a boss swaying on a ridge on its own). */
 export function bossZone(
-  s: Pick<FinalScope, 'ctx' | 'inst' | 'boss' | 'st'>,
+  s: Pick<FinalScope, 'ctx' | 'inst' | 'boss' | 'st' | 'players'>,
   fresh = false,
 ): HeartQuarterZone {
   const p = at(s, s.boss);
   const raw = heartQuarterAt(p.x, p.z);
   const cur = s.st.zone;
   if (fresh || raw === cur) return raw;
+  const tank = bossTank(s);
+  if (tank) {
+    const t = at(s, tank);
+    if (heartQuarterAt(t.x, t.z) === raw) return raw;
+  }
   const r = fromCentre(p);
   if (cur === 'ring') return r < HEART_QUARTERS.ringR + ZONE_HOLD.ring ? 'ring' : raw;
   if (raw === 'ring') return r < HEART_QUARTERS.ringR - ZONE_HOLD.ring ? 'ring' : cur;
@@ -139,13 +155,18 @@ export function holdRoot(s: FinalScope): void {
   s.ctx.rebucket(b);
 }
 
-/** One tick of the root: its clock, the hold, its end. */
+/** One tick of the root: its clock, the hold, its end (and the drag's
+ *  grace after it). */
 export function stepRoot(s: FinalScope): void {
   const st = s.st;
+  st.dragGrace = Math.max(0, st.dragGrace - DT);
   if (st.rootLeft <= 0) return;
   st.rootLeft = Math.max(0, st.rootLeft - DT);
   holdRoot(s);
-  if (st.rootLeft <= 1e-9) endRoot(s);
+  if (st.rootLeft <= 1e-9) {
+    endRoot(s);
+    st.dragGrace = T.dragGrace;
+  }
 }
 
 /** The root ends now (its clock, or a dev move). */
@@ -153,6 +174,27 @@ export function endRoot(s: FinalScope): void {
   s.st.rootLeft = 0;
   s.st.rootAt = null;
   dropAura(s.boss, FINAL_AURAS.root);
+}
+
+/** The drag: a free boss (no root, no bar, not held by control) whose tank
+ *  stands in another zone than the one it holds closes on its tank to
+ *  `dragCloseR`, past its long melee reach, so the tank's step over a ridge
+ *  always carries it across. Runs after the mob AI, and only when the AI
+ *  stood it still in reach (a chasing boss is already walking). Zero rng. */
+export function followTank(s: FinalScope): void {
+  const st = s.st;
+  const b = s.boss;
+  if (st.rootLeft > 0 || st.bar || b.castingAbility !== null) return;
+  if (b.aiState !== 'attack') return;
+  if (s.ctx.isStunned(b) || s.ctx.isRooted(b)) return;
+  const tank = bossTank(s);
+  if (!tank) return;
+  const p = at(s, tank);
+  if (heartQuarterAt(p.x, p.z) === st.zone) return;
+  const d = Math.hypot(tank.pos.x - b.pos.x, tank.pos.z - b.pos.z);
+  if (d <= T.dragCloseR) return;
+  const speed = b.moveSpeed * s.ctx.moveSpeedMult(b);
+  s.ctx.moveToward(b, tank.pos, Math.min(speed, (d - T.dragCloseR) / DT));
 }
 
 // ---- the zone changes ----------------------------------------------------------------------
@@ -178,19 +220,23 @@ export function veinShock(s: FinalScope): Entity[] {
   return struck;
 }
 
-/** The boss has entered `zone` (the kit's clocks are the coordinator's). Returns true when it entered a quarter. */
+/** The boss has entered `zone` (the kit's clocks are the coordinator's).
+ *  Returns true when it entered a NEW quarter (a switch, or the pull's
+ *  first): only then does it root, shock and warn. Back into the quarter it
+ *  last stood in (a dip into the ring) it simply drinks on. */
 export function enterZone(s: FinalScope, zone: HeartQuarterZone): boolean {
   const st = s.st;
   st.zone = zone;
   if (zone === 'ring') return false;
   const last = st.lastQuarter;
-  if (last !== null && last !== zone) {
+  if (last === zone) return false;
+  if (last !== null) {
     st.switches++;
     if (s.rules.switchShock) veinShock(s);
   }
   if (st.baseForm === null) st.baseForm = zone;
   st.lastQuarter = zone;
-  st.pulseTimer = T.pulseEvery;
+  st.pulseTimer = O.pulseEvery;
   takeRoot(s);
   raidWarn(s, ENTER_KEY[zone], ENTER_TEXT[zone]);
   return true;
@@ -198,16 +244,48 @@ export function enterZone(s: FinalScope, zone: HeartQuarterZone): boolean {
 
 // ---- the Overload bars ---------------------------------------------------------------------
 
-/** A bar bursts: the heavy raid blast; the bar empties. Returns who. */
+type BurstTier = FinalDifficultyRules['burstTier'];
+
+/** Each tier's raid warning as a bar bursts. */
+const BURST_WARN: Readonly<Record<BurstTier, readonly [string, string]>> = {
+  survivable: ['burst', 'Overload! The strength bursts through the Anvil!'],
+  heavy: ['burstHeavy', 'Overload! The strength bursts through the Anvil! Brace and heal!'],
+  lethal: ['burstLethal', 'Overload! The strength bursts through the Anvil! Nothing survives it!'],
+};
+
+/** Each tier's near-full raid warning (once per fill, at FINAL_OVERLOAD's
+ *  `warnAt`): what the burst will do, and what to do about it. */
+const NEAR_WARN: Readonly<Record<BurstTier, readonly [string, string]>> = {
+  survivable: [
+    'nearFull',
+    'An Overload bar is nearly full! Drag the Strength on, or heal the raid up before it bursts!',
+  ],
+  heavy: [
+    'nearFullHeavy',
+    'An Overload bar is nearly full! Drag the Strength on: its burst hits hard, heal up and use defensives!',
+  ],
+  lethal: [
+    'nearFullLethal',
+    'An Overload bar is nearly full! Drag the Strength on now: its burst kills the raid!',
+  ],
+};
+
+/** A bar bursts on the whole raid (its tier's numbers, FINAL_OVERLOAD:
+ *  the tier's damageMult is already in them); the bar empties. Returns
+ *  who. */
 export function burstBar(s: FinalScope, vein: SmithHeartVein): Entity[] {
   s.st.overload[vein] = 0;
+  s.st.overloadWarned[vein] = false;
   s.st.bursts++;
-  s.st.pulseTimer = T.pulseEvery;
+  s.st.pulseTimer = O.pulseEvery;
   cueOn(s, s.boss, FINAL_CUES.burst, 'arcane');
-  raidWarn(s, 'burst', 'Overload! The strength bursts through the Anvil!');
+  const [key, text] = BURST_WARN[s.rules.burstTier];
+  raidWarn(s, key, text);
+  const burst = O.burst[s.st.difficulty];
+  const own = s.boss.mechanicDamageMult ?? 1;
   const struck: Entity[] = [];
   for (const p of livePlayers(s)) {
-    hit(s, p, roll(s, T.burstMin, T.burstMax), FINAL_NAMES.burst, 'arcane');
+    hit(s, p, roll(s, burst.min, burst.max, own), FINAL_NAMES.burst, 'arcane');
     struck.push(p);
   }
   return struck;
@@ -219,7 +297,7 @@ export function pulseBar(s: FinalScope, vein: SmithHeartVein): Entity[] {
   cueOn(s, s.boss, FINAL_CUES.pulse, 'arcane');
   const struck: Entity[] = [];
   for (const p of livePlayers(s)) {
-    hit(s, p, Math.round(roll(s, T.pulseMin, T.pulseMax) * scale), FINAL_NAMES.pulse, 'arcane');
+    hit(s, p, Math.round(roll(s, O.pulseMin, O.pulseMax) * scale), FINAL_NAMES.pulse, 'arcane');
     struck.push(p);
   }
   return struck;
@@ -229,16 +307,24 @@ export function pulseBar(s: FinalScope, vein: SmithHeartVein): Entity[] {
 export function stepOverload(s: FinalScope): void {
   const st = s.st;
   const active = st.zone === 'ring' ? null : st.zone;
-  for (const vein of HEART_QUARTER_ORDER)
+  for (const vein of HEART_QUARTER_ORDER) {
     st.overload[vein] = overloadStep(st.overload[vein], vein === active, DT);
+    // Drained well back from the line, it may warn again on its next fill.
+    if (st.overload[vein] < O.warnAt - 0.1) st.overloadWarned[vein] = false;
+  }
   if (!active) return;
   if (st.overload[active] >= 1 - 1e-9) {
     burstBar(s, active);
     return;
   }
+  if (st.overload[active] >= O.warnAt && !st.overloadWarned[active]) {
+    st.overloadWarned[active] = true;
+    const [key, text] = NEAR_WARN[s.rules.burstTier];
+    raidWarn(s, key, text);
+  }
   st.pulseTimer -= DT;
   if (st.pulseTimer > 1e-9) return;
-  st.pulseTimer = T.pulseEvery;
+  st.pulseTimer = O.pulseEvery;
   pulseBar(s, active);
 }
 

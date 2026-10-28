@@ -61,8 +61,10 @@ describe('/dev heart final quarter', () => {
       expect(lx).toBeCloseTo(spot.x, 3);
       expect(lz).toBeCloseTo(spot.z, 3);
       expect(heartQuarterAt(lx, lz)).toBe(zone);
-      expect(boss.spawnPos.x).toBeCloseTo(boss.pos.x, 6);
-      expect(boss.spawnPos.z).toBeCloseTo(boss.pos.z, 6);
+      // Its home never moves (a reset or a wipe brings it back to the
+      // middle of the Anvil, tests/smith_heart_final_home.test.ts).
+      expect(boss.spawnPos.x - o.x).toBeCloseTo(HEART_ROOM.x, 3);
+      expect(boss.spawnPos.z - o.z).toBeCloseTo(HEART_ROOM.z, 3);
       // A quarter's preview never touches its health (no final look).
       expect(boss.hp).toBe(boss.maxHp);
       expect(heartFinalPhase(boss.hp, boss.maxHp)).toBe(false);

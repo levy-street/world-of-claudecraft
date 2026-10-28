@@ -6005,13 +6005,13 @@ export const hudChromeStrings = {
       stateRing:
         'In the central ring it drinks no quarter. Above {pct}% health it grows Heart Unbound there every second.',
       overloadHeat:
-        "The Heat's Overload, {value}% full. It fills while the boss stands in the Heat quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "The Heat's Overload, {value}% full. It fills while the boss stands in the Heat quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed.",
       overloadQuench:
-        "The Quench's Overload, {value}% full. It fills while the boss stands in the Quench quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "The Quench's Overload, {value}% full. It fills while the boss stands in the Quench quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed.",
       overloadBreath:
-        "The Breath's Overload, {value}% full. It fills while the boss stands in the Breath quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "The Breath's Overload, {value}% full. It fills while the boss stands in the Breath quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed.",
       overloadHammer:
-        "The Hammer's Overload, {value}% full. It fills while the boss stands in the Hammer quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "The Hammer's Overload, {value}% full. It fills while the boss stands in the Hammer quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed.",
       root: 'Rooted for {seconds} sec after entering a quarter: it cannot be dragged out until the root ends.',
       unbound:
         'Deals {per} damage to the whole raid every second for each stack ({total} now) and gains a stack every second while it stands in the central ring. Drag it out of the ring to end it.',
@@ -10386,6 +10386,14 @@ export const hudChromeStrings = {
       enterHammer:
         'The Masterless Strength drinks the Hammer! Step out of the cracks and share the Anvil!',
       burst: 'Overload! The strength bursts through the Anvil!',
+      burstHeavy: 'Overload! The strength bursts through the Anvil! Brace and heal!',
+      burstLethal: 'Overload! The strength bursts through the Anvil! Nothing survives it!',
+      nearFull:
+        'An Overload bar is nearly full! Drag the Strength on, or heal the raid up before it bursts!',
+      nearFullHeavy:
+        'An Overload bar is nearly full! Drag the Strength on: its burst hits hard, heal up and use defensives!',
+      nearFullLethal:
+        'An Overload bar is nearly full! Drag the Strength on now: its burst kills the raid!',
       unbound: 'The strength is unbound in the centre! Drag it out!',
       embers: 'Embers fall at the ranged! Stack the marks in one corner, then move out!',
       ice: 'The ice groans under you! Step off before it breaks!',

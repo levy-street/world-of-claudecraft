@@ -30,6 +30,7 @@
 // claim-player order. Every visible state rides existing entity fields
 // (final_ids.ts says which): no wire or IWorld change.
 
+import { HEART_ROOM, HEART_TERRACE } from '../../content/smith_heart_layout';
 import { HEART_QUARTER_ORDER } from '../../content/smith_heart_quarters';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -74,6 +75,7 @@ import {
   FINAL_CASTS,
   FINAL_CUES,
   FINAL_DIFFICULTY,
+  FINAL_OVERLOAD,
   type FinalDifficulty,
   FINAL_TUNING as T,
 } from './final_ids';
@@ -84,6 +86,7 @@ import {
   clearRules,
   endRoot,
   enterZone,
+  followTank,
   holdRoot,
   showState,
   stepOverload,
@@ -169,9 +172,11 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     baseForm: null,
     lastQuarter: null,
     overload: { breath: 0, quench: 0, hammer: 0, heat: 0 },
-    pulseTimer: T.pulseEvery,
+    pulseTimer: FINAL_OVERLOAD.pulseEvery,
     rootLeft: 0,
     rootAt: null,
+    dragGrace: 0,
+    overloadWarned: { breath: false, quench: false, hammer: false, heat: false },
     shakenLeft: 0,
     switches: 0,
     bursts: 0,
@@ -219,12 +224,13 @@ function scopeOf(
 
 // ---- the zone ------------------------------------------------------------------------------
 
-/** Watch the zone the boss stands in: a change enters the new one (its root,
- *  its kit's fresh clocks, the switch's shock). */
+/** Watch the zone the boss stands in: a change into a NEW quarter enters it
+ *  (its root, its kit's fresh clocks, the switch's shock); back into the
+ *  quarter it last stood in, its kit runs on where it was. */
 function watchZone(s: FinalScope, first: boolean): void {
   const zone = bossZone(s, first);
   if (!first && zone === s.st.zone) return;
-  if (zone !== 'ring') s.st.kit = freshKit();
+  if (zone !== 'ring' && zone !== s.st.lastQuarter) s.st.kit = freshKit();
   enterZone(s, zone);
 }
 
@@ -341,9 +347,32 @@ function clearFight(
   clearRules(boss);
 }
 
+/** The boss's authored home (world yards and facing): the middle of the
+ *  Anvil, facing the terrace it is first seen from. The dungeon's spawn
+ *  record (content/smith_heart.ts) puts it there; a reset, a wipe and the
+ *  dev verbs bring it back here, never to wherever a dev move set it. */
+export function finalHome(
+  ctx: SimContext,
+  inst: InstanceSlot,
+): { x: number; y: number; z: number; facing: number } {
+  const o = ctx.instanceOriginOf(inst);
+  const g = ctx.groundPos(o.x + HEART_ROOM.x, o.z + HEART_ROOM.z);
+  const facing = Math.atan2(HEART_TERRACE.x - HEART_ROOM.x, HEART_TERRACE.z - HEART_ROOM.z);
+  return { x: g.x, y: g.y, z: g.z, facing };
+}
+
+/** Its home is its authored one again (a stale dev move undone), so the
+ *  evade that ends a wipe walks it there. */
+function reHome(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
+  const h = finalHome(ctx, inst);
+  boss.spawnPos = { x: h.x, y: h.y, z: h.z };
+  if (boss.leashAnchor) boss.leashAnchor = { ...boss.spawnPos };
+}
+
 function resetFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   clearFight(ctx, inst, boss, boss.smithHeartFinal ?? null);
   boss.smithHeartFinal = undefined;
+  reHome(ctx, inst, boss);
 }
 
 function finishFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: FinalFightState): void {
@@ -379,6 +408,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   st.clock += DT;
   stepBar(s);
   stepRoot(s);
+  followTank(s);
   watchZone(s, false);
   stepOverload(s);
   stepUnbound(s);
@@ -433,15 +463,21 @@ export function resetFinalForDev(ctx: SimContext, inst: InstanceSlot): string {
   resetFinal(ctx, inst, boss);
   if (boss.dead)
     return 'The Masterless Strength has fallen in this run (/dev heart reset for a fresh one).';
-  boss.hp = boss.maxHp;
-  boss.aiState = 'idle';
-  boss.inCombat = false;
+  // The shared evade reset (health, auras, threat, pins, the pull's own
+  // state), then straight home: its authored spot and facing.
+  ctx.resetEvadingMob(boss);
   boss.aggroTargetId = null;
+  boss.castingAbility = null;
+  boss.castRemaining = 0;
+  boss.castTotal = 0;
   clearThreat(boss);
-  boss.pos = { ...boss.spawnPos, y: ctx.groundPos(boss.spawnPos.x, boss.spawnPos.z).y };
+  const h = finalHome(ctx, inst);
+  boss.pos = { x: h.x, y: h.y, z: h.z };
   boss.prevPos = { ...boss.pos };
+  boss.facing = h.facing;
+  boss.prevFacing = h.facing;
   ctx.rebucket(boss);
-  return 'The Masterless Strength stands whole again, out of its fight.';
+  return 'The Masterless Strength stands whole again, home and out of its fight.';
 }
 
 const VEINS: readonly string[] = HEART_QUARTER_ORDER;
@@ -485,7 +521,7 @@ export function finalDevMechanic(
       return `Vein Shock: ${veinShock(s).length} struck.`;
     case 'root':
       takeRoot(s);
-      return 'Taking Root: it holds where it stands for 15 s.';
+      return `Taking Root: it holds where it stands for ${T.rootSeconds} s.`;
     case 'unroot':
       endRoot(s);
       return 'Taking Root ends.';

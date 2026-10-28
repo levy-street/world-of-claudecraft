@@ -6,7 +6,8 @@
 // state and marks ride quiet `internal_cd` markers (no stat at all), so each
 // says its rule instead. Every number comes from the fight's tuning
 // (src/sim/encounters/smith_heart/final_ids.ts), the same constants the sim
-// reads (Normal's numbers); the bar's fill, a stack count and the zone come
+// reads (Normal's numbers, but the Overload burst's, which names all three
+// tiers: survivable, heavy, lethal); the bar's fill, a stack count and the zone come
 // off the aura itself. The final's wind is the wind kernel's own aura, told
 // from the Guardian of the Breath's by its tag (`value3`). Pinned by
 // tests/smith_heart_final_ui.test.ts.
@@ -17,6 +18,7 @@ import { FINAL_WIND_TAG } from '../sim/encounters/smith_heart/final_breath';
 import {
   FINAL_AURAS,
   finalZoneOf,
+  FINAL_OVERLOAD as O,
   overloadAuraId,
   FINAL_TUNING as T,
 } from '../sim/encounters/smith_heart/final_ids';
@@ -64,12 +66,16 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       key: `${KEY}.${overload}`,
       nums: {
         value: Math.max(0, Math.min(100, Math.round(a.value ?? 0))),
-        fill: T.overloadFillSeconds,
-        every: T.pulseEvery,
-        min: T.pulseMin,
-        max: T.pulseMax + T.pulseRise,
-        burstMin: T.burstMin,
-        burstMax: T.burstMax,
+        fill: O.fillSeconds,
+        every: O.pulseEvery,
+        min: O.pulseMin,
+        max: O.pulseMax + O.pulseRise,
+        normalMin: O.burst.normal.min,
+        normalMax: O.burst.normal.max,
+        heroicMin: O.burst.heroic.min,
+        heroicMax: O.burst.heroic.max,
+        mythicMin: O.burst.mythic.min,
+        mythicMax: O.burst.mythic.max,
       },
     };
   switch (a.id) {

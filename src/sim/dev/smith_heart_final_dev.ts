@@ -7,7 +7,7 @@
 //   final reset                 the boss whole, home and out of its fight
 //   final normal|heroic|mythic  this run's tier for the fight (a live fight
 //                               takes it at once)
-//   final quarter <zone>        move the boss (and its home) into the middle
+//   final quarter <zone>        move the boss (never its home) into the middle
 //                               of that quarter, or onto the ring's centre
 //                               (phase 2K's preview; in a live fight the move
 //                               is a quarter change: its root, its kit, its
@@ -50,17 +50,17 @@ export function smithHeartFinalBoss(ctx: SimContext, inst: InstanceSlot): Entity
   return null;
 }
 
-/** Move the boss (and its home) to a zone's spot. */
+/** Move the boss to a zone's spot. Its HOME stays its authored one (the
+ *  middle of the Anvil): an idle boss already stays where it is set down (it
+ *  never wanders), and a reset or a wipe must bring it home, never to the
+ *  last quarter a dev move named (Jose's playtest of 28 Oct 2026: moving its
+ *  home here left it respawning in a quarter). */
 function standIn(ctx: SimContext, inst: InstanceSlot, boss: Entity, zone: HeartQuarterZone): void {
   const o = instanceOrigin(DUNGEONS[SMITH_HEART_DUNGEON].index, inst.slot);
   const spot = heartQuarterSpot(zone);
   const pos = ctx.groundPos(o.x + spot.x, o.z + spot.z);
   boss.pos = pos;
   boss.prevPos = { ...pos };
-  // Its home moves with it: an idle boss stays where it was set down, a
-  // leash measures from here.
-  boss.spawnPos = { ...pos };
-  if (boss.leashAnchor) boss.leashAnchor = { ...pos };
   ctx.rebucket(boss);
 }
 

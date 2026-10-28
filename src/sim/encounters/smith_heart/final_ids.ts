@@ -211,6 +211,9 @@ export type FinalDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface FinalDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** How a full Overload bar's burst reads on this tier (FINAL_OVERLOAD
+   *  holds its numbers): survivable with healing, heavy, or lethal. */
+  burstTier: 'survivable' | 'heavy' | 'lethal';
   /** A quarter change hits the raid and leaves Vein-Shaken. */
   switchShock: boolean;
   /** Heat: embers drop at ranged players' feet. */
@@ -238,6 +241,7 @@ export interface FinalDifficultyRules {
 export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyRules>> = {
   normal: {
     damageMult: 1,
+    burstTier: 'survivable',
     switchShock: false,
     embers: false,
     forgeFire: false,
@@ -252,6 +256,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
   heroic: {
     damageMult: 1.2,
+    burstTier: 'heavy',
     switchShock: true,
     embers: true,
     forgeFire: false,
@@ -266,6 +271,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
   mythic: {
     damageMult: 1.3,
+    burstTier: 'lethal',
     switchShock: true,
     embers: true,
     forgeFire: true,
@@ -280,15 +286,31 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   },
 };
 
-// ---- tuning ---------------------------------------------------------------------------
+// ---- the Overload bars: their one tuning table -----------------------------------------
 
-export const FINAL_TUNING = {
-  // -- the rules --
-  /** An Overload bar fills from empty to full in this long while the boss
-   *  stands in its quarter. */
-  overloadFillSeconds: 40,
+/** Every number of the four Overload bars (Jose's playtest of 28 Oct 2026:
+ *  the sketch's 40 s fill ran too fast; a full bar on Mythic must be a wipe).
+ *
+ *  The pace: empty to full in 60 s in its quarter, draining at a third of
+ *  that (180 s from full) away from it. With the 10 s root and a drag of a
+ *  few seconds, a visit lasts 15 s or more and fills a quarter of the bar:
+ *  bouncing between two quarters gains about a sixth of a bar every round
+ *  trip and bursts within about two and a half minutes, while a rotation
+ *  through all four never climbs past one visit's fill and a rotation
+ *  through three (visits of up to 20 s) stays clear of full for a six-minute
+ *  fight (pinned by tests/smith_heart_final.test.ts).
+ *
+ *  The burst, per difficulty (the level-20 cloth reference is about 1,135
+ *  to 1,345 health): Normal 700 to 800, survivable with healing; Heroic
+ *  1,050 to 1,200, heavy (top the raid up and use defensives); Mythic 4,500
+ *  to 5,200, lethal (only a big personal defensive lives: effectively a
+ *  wipe). These are the final numbers: the tier's damageMult is NOT
+ *  applied on top (the body's own mechanic factor still is). */
+export const FINAL_OVERLOAD = {
+  /** Empty to full while the boss stands in its quarter. */
+  fillSeconds: 60,
   /** Away, it drains at this share of its fill speed. */
-  overloadDrainShare: 1 / 3,
+  drainShare: 1 / 3,
   /** The active bar pulses the raid this often. */
   pulseEvery: 4,
   /** A pulse: this much at an empty bar, rising by `pulseRise` at a full one
@@ -296,17 +318,40 @@ export const FINAL_TUNING = {
   pulseMin: 60,
   pulseMax: 70,
   pulseRise: 300,
-  /** A full bar bursts: the heavy raid blast (then it is empty again). */
-  burstMin: 900,
-  burstMax: 1000,
+  /** A bar this full (0 to 1) warns the raid once per fill. */
+  warnAt: 0.85,
+  /** The burst of a full bar, per difficulty (then it is empty again). */
+  burst: {
+    normal: { min: 700, max: 800 },
+    heroic: { min: 1050, max: 1200 },
+    mythic: { min: 4500, max: 5200 },
+  },
+} as const satisfies {
+  burst: Readonly<Record<FinalDifficulty, { min: number; max: number }>>;
+  [k: string]: unknown;
+};
+
+// ---- tuning ---------------------------------------------------------------------------
+
+export const FINAL_TUNING = {
+  // -- the rules (the Overload bars' numbers are FINAL_OVERLOAD's) --
   /** Heroic: the shockwave of a quarter change, and the mark it leaves. */
   shockMin: 180,
   shockMax: 220,
   shakenSeconds: 20,
   /** A change while marked hits this many times as hard. */
   shakenMult: 3,
-  /** Taking Root: on entering a quarter (the pull's too), it cannot move. */
-  rootSeconds: 15,
+  /** Taking Root: on entering a new quarter (the pull's too), it cannot
+   *  move. 10 s, down from the sketch's 15 (Jose's playtest of 28 Oct 2026:
+   *  the long root read as a boss that will not follow). */
+  rootSeconds: 10,
+  /** After the root lets go, no planted bar begins for this long: the
+   *  tank's window to start the drag. */
+  dragGrace: 3,
+  /** A free boss whose tank stands in another zone closes on its tank to
+   *  this far (yards), past its long melee reach: the drag always carries
+   *  it over the ridge. */
+  dragCloseR: 2,
   /** Heart Unbound: in the central ring above the final phase, a stack every
    *  second and a raid pulse of `unboundPerStack` a stack every second. */
   unboundEvery: 1,
@@ -461,14 +506,14 @@ export function finalHash(a: number, b: number): number {
 
 /** An Overload pulse's damage before the roll's spread (`fill` 0 to 1). */
 export function pulseScale(fill: number): number {
-  return 1 + (FINAL_TUNING.pulseRise / FINAL_TUNING.pulseMin) * Math.max(0, Math.min(1, fill));
+  return 1 + (FINAL_OVERLOAD.pulseRise / FINAL_OVERLOAD.pulseMin) * Math.max(0, Math.min(1, fill));
 }
 
 /** One bar's step over `dt` seconds (0 to 1): filling while the boss stands
- *  in its quarter, else draining at a third of that. */
+ *  in its quarter, else draining at FINAL_OVERLOAD's share of that. */
 export function overloadStep(fill: number, active: boolean, dt: number): number {
-  const rate = 1 / FINAL_TUNING.overloadFillSeconds;
-  const next = active ? fill + rate * dt : fill - rate * FINAL_TUNING.overloadDrainShare * dt;
+  const rate = 1 / FINAL_OVERLOAD.fillSeconds;
+  const next = active ? fill + rate * dt : fill - rate * FINAL_OVERLOAD.drainShare * dt;
   return Math.max(0, Math.min(1, next));
 }
 

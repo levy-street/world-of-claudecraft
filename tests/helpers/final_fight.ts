@@ -36,6 +36,10 @@ export interface FinalFight {
   gather: (x: number, z: number, r: number) => void;
   /** Keep the raid alive through the run (the tests measure hits). */
   tick: (n?: number, keepAlive?: boolean) => SimEvent[];
+  /** One tick of `e` WALKING (its real move input, colliders and all)
+   *  toward instance-local (x, z); stops within `near` yards. Returns
+   *  whether it has arrived. */
+  walkStep: (e: Entity, x: number, z: number, near?: number) => boolean;
 }
 
 /** A claim with `n` warriors in the Heart. */
@@ -104,6 +108,17 @@ export function finalFight(n = 5, seed = 41): FinalFight {
     }
     return out;
   };
+  const walkStep = (e: Entity, x: number, z: number, near = 1) => {
+    const meta = sim.ctx.players.get(e.id);
+    if (!meta) throw new Error('not a player');
+    const here = local(e);
+    const d = Math.hypot(x - here.x, z - here.z);
+    meta.moveInput.forward = d > near;
+    if (d > near) e.facing = Math.atan2(x - here.x, z - here.z);
+    tick(1);
+    if (d <= near) meta.moveInput.forward = false;
+    return d <= near;
+  };
   const pullIn = (vein: SmithHeartVein) => {
     dev(`/dev heart final quarter ${vein}`);
     const spot = heartQuarterSpot(vein);
@@ -132,5 +147,6 @@ export function finalFight(n = 5, seed = 41): FinalFight {
     pullIn,
     gather,
     tick,
+    walkStep,
   };
 }
