@@ -3821,6 +3821,7 @@ export const id_ID: EnTranslations = {
       "equipLockout": "Memakainya memulai pendinginan {seconds} detik pada penggunaannya, atau pendinginan yang tersisa pada perhiasan yang digantikannya jika lebih lama.",
       "equip": {
         "lastStand": "Menerima kerusakan saat kesehatan di bawah {threshold}% memberikan perisai yang menyerap {absorb} kerusakan ({absorbPct}% kesehatan maksimalmu) selama {duration} detik. Dapat terjadi sekali setiap {icd} detik.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Penyembuhan berlebih dari penyembuh langsung disimpan dalam jam pasir, hingga {cap} ({capPct}% kesehatan maksimalmu). Penyembuhan disimpan hilang {fade} detik setelah terakhir kali tumbuh.",
         "twinStrike": "Pukulan auto-attack kamu memiliki peluang {chance}% untuk membuat ayunan senjata tangan utama jarak dekat ekstra. Dapat terjadi sekali setiap {icd} detik.",
         "tally": "Pukulan auto-attack yang kritis dan pukulan penutupmu menambah tanda centang, hingga {max}. Tanda bertahan {duration} detik, disegarkan setiap kali kamu mendapat tanda.",

@@ -21063,6 +21063,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '装備すると使用効果に{seconds}秒のクールダウンが発生する。置き換えた装飾品の残りクールダウンの方が長い場合はそちらになる。',
   'hudChrome.trinkets.equip.lastStand':
     '体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    '体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージを吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。',
   'hudChrome.trinkets.equip.hourglass':
     '直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。',
   'hudChrome.trinkets.equip.twinStrike':

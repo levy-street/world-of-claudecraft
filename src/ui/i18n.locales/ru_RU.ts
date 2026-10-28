@@ -23178,6 +23178,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'При надевании его использование уходит на восстановление на {seconds} сек. или на оставшееся время восстановления заменяемого аксессуара, если оно дольше.',
   'hudChrome.trinkets.equip.lastStand':
     'Получая урон при здоровье ниже {threshold}%, вы получаете щит, поглощающий {absorb} ед. урона ({absorbPct}% от максимального здоровья), на {duration} сек. Срабатывает не чаще раза в {icd} сек.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Получая урон при здоровье ниже {threshold}%, вы получаете щит, поглощающий {absorb} ед. урона, на {duration} сек. Срабатывает не чаще раза в {icd} сек.',
   'hudChrome.trinkets.equip.hourglass':
     'Избыточное исцеление от ваших прямых исцелений копится в песочных часах, вплоть до {cap} ед. ({capPct}% от максимального здоровья). Накопленное исцеление исчезает через {fade} сек. после последнего пополнения.',
   'hudChrome.trinkets.equip.twinStrike':

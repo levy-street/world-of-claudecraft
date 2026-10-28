@@ -3821,6 +3821,7 @@ export const fr_CA: EnTranslations = {
       "equipLockout": "L'équiper démarre un temps de recharge de {seconds} s sur son utilisation, ou le temps de recharge restant du bijou qu'il remplace si celui-ci est plus long.",
       "equip": {
         "lastStand": "Subir des dégâts en dessous de {threshold}% de vie accorde un bouclier qui absorbe {absorb} points de dégâts ({absorbPct}% de vos points de vie maximum) pendant {duration} s. Ne peut se produire qu'une fois toutes les {icd} s.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Les soins excédentaires de vos soins directs sont stockés dans le sablier, jusqu'à {cap} ({capPct}% de vos points de vie maximum). Les soins stockés se dissipent {fade} s après leur dernière augmentation.",
         "twinStrike": "Vos coups d'attaque automatique ont {chance}% de chances de porter un coup de mêlée supplémentaire de la main principale. Ne peut se produire qu'une fois toutes les {icd} s.",
         "tally": "Chacun de vos coups critiques d'attaque automatique et de vos coups fatals ajoute une marque de décompte, jusqu'à {max}. Les marques durent {duration} s, rafraîchies à chaque nouvelle marque.",

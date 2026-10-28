@@ -21672,6 +21672,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '裝備後，其使用效果會進入 {seconds} 秒的冷卻；如果被替換的飾品剩餘冷卻更長，則改為該剩餘冷卻。',
   'hudChrome.trinkets.equip.lastStand':
     '在生命值低於 {threshold}% 時受到傷害，會獲得一個吸收 {absorb} 點傷害（你最大生命值的 {absorbPct}%）的護盾，持續 {duration} 秒。每 {icd} 秒只能觸發一次。',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    '在生命值低於 {threshold}% 時受到傷害，會獲得一個吸收 {absorb} 點傷害的護盾，持續 {duration} 秒。每 {icd} 秒只能觸發一次。',
   'hudChrome.trinkets.equip.hourglass':
     '你的直接治療產生的過量治療會儲存在沙漏中，最多 {cap} 點（你最大生命值的 {capPct}%）。儲存的治療量在最後一次增加後 {fade} 秒消散。',
   'hudChrome.trinkets.equip.twinStrike':

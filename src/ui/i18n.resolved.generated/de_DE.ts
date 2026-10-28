@@ -3821,6 +3821,7 @@ export const de_DE: EnTranslations = {
       "equipLockout": "Das Ausrüsten löst eine {seconds} Sek. lange Abklingzeit für seinen Einsatz aus, oder die verbleibende Abklingzeit des ersetzten Schmuckstücks, falls diese länger ist.",
       "equip": {
         "lastStand": "Erleidest du Schaden unter {threshold}% Gesundheit, erhältst du für {duration} Sek. einen Schild, der {absorb} Schaden absorbiert ({absorbPct}% deiner maximalen Gesundheit). Kann nur alle {icd} Sek. einmal ausgelöst werden.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Überheilung aus deinen direkten Heilungen wird in der Sanduhr gespeichert, bis zu {cap} ({capPct}% deiner maximalen Gesundheit). Gespeicherte Heilung verblasst {fade} Sek., nachdem sie zuletzt gewachsen ist.",
         "twinStrike": "Deine automatischen Angriffstreffer haben eine Chance von {chance}%, einen zusätzlichen Nahkampfschlag mit der Haupthand auszuführen. Kann nur alle {icd} Sek. einmal ausgelöst werden.",
         "tally": "Jeder kritische automatische Angriffstreffer und jeder tödliche Treffer fügt eine Kerbe hinzu, bis zu {max}. Kerben halten {duration} Sek. an und werden erneuert, sooft du eine erhältst.",

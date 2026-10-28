@@ -3821,6 +3821,7 @@ export const pl_PL: EnTranslations = {
       "equipLockout": "Wyposażenie go powoduje {seconds} sek cooldown na jego użycie lub cooldown pozostały na talizman, który zastępuje, jeśli ten jest dłuższy.",
       "equip": {
         "lastStand": "Otrzymanie obrażeń poniżej {threshold}% zdrowia udziela ekranu, który pochłania {absorb} obrażeń ({absorbPct}% twojego maksymalnego zdrowia) przez {duration} sek. Może się zdarzyć raz na {icd} sek.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Przeleczenie z twoich bezpośrednich uzdrowień jest przechowywane w klepsydrze, do {cap} ({capPct}% twojego maksymalnego zdrowia). Przechowywane leczenie zanika {fade} sek po ostatnim wzroście.",
         "twinStrike": "Twoje trafienia auto-ataku mają {chance}% szansę na wykonanie dodatkowego zamachu broni głównej melee. Może się zdarzyć raz na {icd} sek.",
         "tally": "Twoje auto-atak trafienia krytyczne i twoje ostateczne ciosy każdorazowo dodają znacznik, do {max}. Znaczniki trwają {duration} sek, odświeżane za każdym razem, gdy zyskasz jeden.",

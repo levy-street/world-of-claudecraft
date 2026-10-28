@@ -21019,6 +21019,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '착용하면 사용 효과에 {seconds}초의 재사용 대기시간이 시작됩니다. 교체한 장신구의 남은 재사용 대기시간이 더 길면 그 시간이 적용됩니다.',
   'hudChrome.trinkets.equip.lastStand':
     '생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해(최대 생명력의 {absorbPct}%)를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    '생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.',
   'hudChrome.trinkets.equip.hourglass':
     '직접 치유로 발생한 초과 치유량이 모래시계에 저장되며, 최대 {cap}(최대 생명력의 {capPct}%)까지 저장됩니다. 저장된 치유량은 마지막으로 늘어난 뒤 {fade}초가 지나면 사라집니다.',
   'hudChrome.trinkets.equip.twinStrike':

@@ -18116,6 +18116,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.trinkets.equip.hourglass'
   | 'hudChrome.trinkets.equip.ignite'
   | 'hudChrome.trinkets.equip.lastStand'
+  | 'hudChrome.trinkets.equip.lastStandFlat'
   | 'hudChrome.trinkets.equip.stoneHeart'
   | 'hudChrome.trinkets.equip.storm'
   | 'hudChrome.trinkets.equip.tally'

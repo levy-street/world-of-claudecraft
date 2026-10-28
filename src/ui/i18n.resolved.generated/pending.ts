@@ -11,23 +11,49 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [],
   "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "fr_FR": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "fr_CA": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "de_DE": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "nl_NL": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "pl_PL": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "id_ID": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "tr_TR": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "sv_SE": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "vi_VN": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ],
+  "da_DK": [
+    "hudChrome.trinkets.equip.lastStandFlat"
+  ]
 };
