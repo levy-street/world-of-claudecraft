@@ -1,4 +1,4 @@
-// The Anvil of the World's quarters awake (phase 2K, design doc section 5.21):
+// The Anvil of the World's quarters awake (phases 2K to 2M, design doc section 5.21):
 // the pure state (src/render/smith_heart/heart_quarters_core.ts) and its
 // painter (heart_quarters.ts) over the boss memory the final boss's effects
 // write.
@@ -14,13 +14,25 @@
 //     sparks on their ridge; the low tier keeps a share;
 //   - the painter: the awake quarter's seams, wash and air wake, the others
 //     stay dark; the washes ride the ground rung; every tier draws the same
-//     lights (which quarter is awake is never shed).
+//     lights (which quarter is awake is never shed);
+//   - phase 2M: every quarter keeps its quiet tint asleep (one floor, never
+//     darkened); each quarter's wall landmark erupts as its flood reaches
+//     the wall, all four in the final look, dark with the heart; the
+//     landmarks' spots stand in their own quarters, the Breath's bolts run
+//     from its horns' tips; the circle's well and rim draw with the room.
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import { heartKitSlotMaterial } from '../src/render/smith_heart/heart_kit';
+import {
+  HEART_LANDMARK_FRAME,
+  heartBreathBolts,
+  heartBreathHornTips,
+  heartLandmarkLit,
+  heartLandmarkSpots,
+} from '../src/render/smith_heart/heart_landmarks_core';
 import { buildHeartQuarters } from '../src/render/smith_heart/heart_quarters';
 import {
   clearHeartQuarterMemoryForTest,
@@ -355,9 +367,11 @@ describe('the quarters read apart (phase 2L)', () => {
     ).toBeGreaterThan(40);
   });
 
-  it('dims the pale Quench harder asleep, so its waking reads', () => {
-    for (const v of ['hammer', 'breath', 'heat'] as const)
-      expect(HEART_QUARTER_PALETTE.quench.shade, v).toBeLessThan(HEART_QUARTER_PALETTE[v].shade);
+  it('keeps every quarter at its quiet tint asleep (one floor, never darkened)', () => {
+    // Phase 2M: the element lives on the edges; a sleeping quarter's floor
+    // keeps its stone (the 2L shades dimmed it to a third).
+    for (const v of SMITH_HEART_VEINS)
+      expect(HEART_QUARTER_PALETTE[v].shade, v).toBeGreaterThanOrEqual(0.85);
   });
 
   it('draws the floors, then the spines with no depth write, so a telegraph always shows over one', () => {
@@ -405,5 +419,133 @@ describe('the quarters read apart (phase 2L)', () => {
       'heartRidgeDust:0',
     ])
       expect(names(hi), layer).toContain(layer);
+  });
+});
+
+describe('the edges awake (phase 2M)', () => {
+  const materialsOf = (g: THREE.Object3D) => {
+    const out = new Map<string, THREE.ShaderMaterial>();
+    g.traverse((o) => {
+      const m = (o as THREE.Mesh).material;
+      if (m instanceof THREE.ShaderMaterial) out.set(m.name, m);
+    });
+    return out;
+  };
+
+  it('erupts a landmark as its flood reaches the wall, never before', () => {
+    const s = newHeartQuartersState();
+    const q = s.quarters.heat;
+    expect(heartLandmarkLit(q)).toBe(0);
+    q.awake = 1;
+    q.front = HEART_QUARTERS.ringR + 2;
+    expect(heartLandmarkLit(q)).toBe(0);
+    q.front = HEART_QUARTERS.rimR - 7;
+    const mid = heartLandmarkLit(q);
+    expect(mid).toBeGreaterThan(0.2);
+    expect(mid).toBeLessThan(0.8);
+    q.front = HEART_QUARTERS.rimR;
+    expect(heartLandmarkLit(q)).toBe(1);
+    q.awake = 0;
+    expect(heartLandmarkLit(q)).toBe(0);
+  });
+
+  it("lights the boss quarter's landmark, the others quiet, all four in the final look, dark with the heart", () => {
+    const q = buildHeartQuarters(false);
+    const mats = materialsOf(q.group);
+    const lm = (v: string) => mats.get(`smithHeartLandmarkGlow:${v}`)?.uniforms;
+    for (const v of SMITH_HEART_VEINS) expect(lm(v), v).toBeDefined();
+    let t = 0;
+    const frames = (n: number, dark: number) => {
+      for (let i = 0; i < n; i++) {
+        t += 1 / 60;
+        q.update('slot', t, 1 / 60, dark);
+      }
+    };
+    const s = heartQuarterSpot('quench');
+    noteHeartQuarterBoss('slot', s.x, s.z, true, true);
+    frames(240, 0);
+    expect(lm('quench')?.uLit.value).toBe(1);
+    for (const v of ['hammer', 'breath', 'heat']) {
+      expect(lm(v)?.uLit.value, v).toBe(0);
+      // Quiet, never dark: the room still reads as four.
+      expect(lm(v)?.uQuiet.value, v).toBeGreaterThan(0.1);
+    }
+    // Its air wakes with it.
+    expect(mats.get('smithHeartLandmarkRime')?.uniforms.uLit.value).toBe(1);
+    expect(mats.get('smithHeartLandmarkEmbers')?.uniforms.uLit.value).toBe(0);
+    // The final look: all four erupt.
+    noteHeartQuarterBoss('slot', HEART_ROOM.x, HEART_ROOM.z, true, true, true);
+    frames(300, 0);
+    for (const v of SMITH_HEART_VEINS) expect(lm(v)?.uLit.value, v).toBe(1);
+    expect(mats.get('smithHeartLandmarkBolts')?.uniforms.uLit.value).toBe(1);
+    // The heart gone dark: all of it with it.
+    frames(400, 1);
+    for (const v of SMITH_HEART_VEINS) {
+      expect(lm(v)?.uLit.value, v).toBe(0);
+      expect(lm(v)?.uQuiet.value, v).toBe(0);
+    }
+  });
+
+  it('draws the circle: its rim as a spine (no depth write), its well a floor through modelViewMatrix', () => {
+    const mats = materialsOf(buildHeartQuarters(false).group);
+    const well = mats.get('smithHeartWell');
+    expect(well).toBeDefined();
+    expect(well?.vertexShader).toMatch(/modelViewMatrix/);
+    expect(well?.vertexShader).not.toMatch(/viewMatrix\s*\*\s*(modelMatrix|vec4)/);
+    expect(well?.transparent).toBe(false);
+    expect(mats.get('smithHeartDaisGlow')?.depthWrite).toBe(false);
+    const src = readFileSync('src/render/smith_heart/heart_quarters.ts', 'utf8');
+    expect(src).toMatch(/Kit_HeartWell/);
+    expect(src).toMatch(/daisGlow\.depthWrite = false/);
+  });
+
+  it("stands each landmark's spots in its own quarter, past the rim", () => {
+    for (const v of SMITH_HEART_VEINS) {
+      const spots = heartLandmarkSpots(v);
+      expect(spots.length, v).toBeGreaterThan(2);
+      for (const p of spots) {
+        expect(heartQuarterAt(HEART_ROOM.x + p.x, HEART_ROOM.z + p.z), v).toBe(v);
+        expect(Math.hypot(p.x, p.z), v).toBeGreaterThan(HEART_QUARTERS.rimR);
+        expect(p.y, v).toBeGreaterThan(0);
+      }
+      // At its altar's bearing.
+      const b = HEART_LANDMARK_FRAME.bearing[v];
+      const c = spots[0];
+      const got = ((Math.atan2(c.x, c.z) * 180) / Math.PI + 360) % 360;
+      expect(Math.abs(((got - b + 540) % 360) - 180), v).toBeLessThan(8);
+    }
+  });
+
+  it("runs the Breath's lightning from its horns' tips, the same every time", () => {
+    const tips = heartBreathHornTips();
+    const bolts = heartBreathBolts();
+    expect(bolts.length).toBeGreaterThan(5);
+    for (const b of bolts) {
+      const first = b.points[0];
+      expect(tips.some((t) => Math.hypot(t.x - first.x, t.y - first.y, t.z - first.z) < 1e-9)).toBe(
+        true,
+      );
+      expect(b.points.length).toBeGreaterThan(8);
+    }
+    expect(heartBreathBolts()).toEqual(bolts);
+  });
+
+  it("keeps a share of the landmarks' air on the low tier, the same lights", () => {
+    const quads = (g: THREE.Object3D, name: string) => {
+      let n = 0;
+      g.traverse((o) => {
+        if (o.name === name) n = ((o as THREE.Mesh).geometry.index?.count ?? 0) / 6;
+      });
+      return n;
+    };
+    const hi = buildHeartQuarters(false).group;
+    const lo = buildHeartQuarters(true).group;
+    expect(quads(lo, 'heartLandmarkEmbers:heat')).toBeLessThan(
+      quads(hi, 'heartLandmarkEmbers:heat'),
+    );
+    expect(quads(lo, 'heartLandmarkEmbers:heat')).toBeGreaterThan(0);
+    // The bolts and the halos (which quarter is awake) are never shed.
+    expect(quads(lo, 'heartLandmarkBolts:breath')).toBe(quads(hi, 'heartLandmarkBolts:breath'));
+    expect(quads(lo, 'heartLandmarkHalo:heat')).toBe(quads(hi, 'heartLandmarkHalo:heat'));
   });
 });

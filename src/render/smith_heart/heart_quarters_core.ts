@@ -282,12 +282,13 @@ export interface HeartQuarterSeed {
 /** The tunings of each quarter's air: how many of each particle on the
  *  high tier (the low tier keeps about a third). */
 export const HEART_QUARTER_AIR = {
-  hammer: { grit: 240, dust: 70, chips: 60, stones: 26 },
-  breath: { devils: 6, perDevil: 70, streaks: 130, sheets: 30 },
-  quench: { mist: 46, crystals: 150, frost: 200 },
-  heat: { embers: 300, haze: 30, flames: 44 },
-  sparks: 150,
-  blaze: 220,
+  // Phase 2M: the room doubled in area; the air keeps its density over it.
+  hammer: { grit: 320, dust: 90, chips: 80, stones: 34 },
+  breath: { devils: 8, perDevil: 70, streaks: 120, sheets: 40 },
+  quench: { mist: 60, crystals: 190, frost: 260 },
+  heat: { embers: 380, haze: 40, flames: 56 },
+  sparks: 190,
+  blaze: 260,
 } as const;
 
 /** Each quarter's own light (phase 2L): its colour and the white-hot of its
@@ -302,11 +303,16 @@ export const HEART_QUARTER_PALETTE: Readonly<
     { color: number; hot: number; idle: number; seams: number; wash: number; shade: number }
   >
 > = {
-  hammer: { color: 0xe0a650, hot: 0xfff0c8, idle: 0.07, seams: 1, wash: 1, shade: 0.44 },
-  breath: { color: 0xa98cff, hot: 0xc8fff2, idle: 0.07, seams: 1.35, wash: 1.15, shade: 0.42 },
-  quench: { color: 0x6cc8ff, hot: 0xf2fbff, idle: 0.1, seams: 1.4, wash: 1.7, shade: 0.32 },
-  heat: { color: 0xff5214, hot: 0xffc23a, idle: 0.3, seams: 1.15, wash: 1, shade: 0.55 },
+  hammer: { color: 0xe0a650, hot: 0xfff0c8, idle: 0.07, seams: 1.25, wash: 0.9, shade: 0.9 },
+  breath: { color: 0xa98cff, hot: 0xc8fff2, idle: 0.07, seams: 1.45, wash: 1, shade: 0.9 },
+  quench: { color: 0x6cc8ff, hot: 0xf2fbff, idle: 0.1, seams: 1.45, wash: 1.1, shade: 0.88 },
+  heat: { color: 0xff5214, hot: 0xffc23a, idle: 0.3, seams: 1.3, wash: 0.7, shade: 0.9 },
 };
+
+/** The central circle (phase 2M, the kit's Kit_HeartDais and Kit_HeartWell,
+ *  quarter_pieces.py WELL_R, RIM_OUT): the well's edge (the rim's inner
+ *  foot), the rim's outer foot, and how deep the shader draws the well. */
+export const HEART_RING_LOOK = { wellR: 13.4, rimOut: 16.4, depth: 3.2 } as const;
 
 /** The opaque platform's draw order (phase 2L): the floors (the quarters,
  *  the rim's dirt bed, the dais) first, then each ridge's spine drawn with no

@@ -55,11 +55,15 @@ import {
   heartKitSlotMaterial,
   SMITH_HEART_HEART_KIT_URL,
 } from './heart_kit';
+import { buildHeartLandmarks, heartMaterialCarriers } from './heart_landmarks';
+import { heartLandmarkLit } from './heart_landmarks_core';
+import { WELL_VERT, wellFrag } from './heart_landmarks_glsl';
 import { heartHash } from './heart_plan_core';
 import {
   HEART_PLATFORM_ORDER,
   HEART_QUARTER_AIR,
   HEART_QUARTER_PALETTE,
+  HEART_RING_LOOK,
   heartQuarterBoss,
   heartQuarterCount,
   heartQuarterLit,
@@ -184,7 +188,13 @@ function seamPoints(vein: SmithHeartVein, n: number, salt = 0): HeartAirV3[] {
   const out: HeartAirV3[] = [];
   if (!pos) return out;
   const cand: number[] = [];
-  for (let i = 0; i < pos.count; i++) if (pos.getY(i) > 0.01) cand.push(i);
+  const col = geo?.getAttribute('color');
+  for (let i = 0; i < pos.count; i++) {
+    if (pos.getY(i) <= 0.01) continue;
+    // Not the border light (its green tag): the crackle alone.
+    if (col && col.getY(i) - col.getX(i) > 0.2) continue;
+    cand.push(i);
+  }
   if (cand.length === 0) return out;
   for (let k = 0; k < n; k++) {
     const i = cand[Math.floor(((k * 0.6180339887 + 0.137 + salt * 0.31) % 1) * cand.length)];
@@ -452,7 +462,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
   // The Breath: dust devils (every mote of a devil on its anchor), streaks
   // and low veils of dust along the spiral.
   {
-    const anchors = heartQuarterSeeds('breath', A.breath.devils, 3, 5, 15, 37);
+    const anchors = heartQuarterSeeds('breath', A.breath.devils, 3, 5, 20, 54);
     const bases: HeartAirV3[] = [];
     const params: HeartAirV4[] = [];
     anchors.forEach((a, d) => {
@@ -482,7 +492,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         streaks.map((s) => [s.h[0], 2.2 + s.h[1] * 3.2, 7 + s.h[2] * 8, s.h[3]]),
         streaks.map((s) => windDir(s.r)),
       ),
-      airMaterial('smithHeartQuarterStreaks', BREATH_STREAK_VERT, 0xd8e2ff, 0xffffff, 0.7),
+      airMaterial('smithHeartQuarterStreaks', BREATH_STREAK_VERT, 0xc8c8ff, 0xffffff, 0.42),
     );
     const sheets = heartQuarterSeeds('breath', n(A.breath.sheets), 9);
     addAir(
@@ -730,18 +740,66 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     uBlaze: { value: 0 },
     uPulse: { value: 0 },
   });
+  // Phase 2M: the central circle's rim is a spine of dark rock round the
+  // well (drawn after the floors with no depth write, like the seams', so
+  // a telegraph always shows over it); its light in each quarter's colour.
+  daisGlow.depthWrite = false;
   const dais = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, 'Kit_HeartDais');
   if (dais) {
     dais.name = 'Kit_HeartDais:ring';
     dais.position.copy(centre);
     for (const m of dais.children) {
       if (!(m instanceof THREE.Mesh)) continue;
-      if (m.name.endsWith(':glow')) m.material = daisGlow;
+      if (m.name.endsWith(':glow')) {
+        m.material = daisGlow;
+        m.renderOrder = HEART_PLATFORM_ORDER.spineGlow;
+      } else {
+        m.material = heartKitSlotMaterial('spine');
+        m.renderOrder = HEART_PLATFORM_ORDER.spine;
+      }
       m.castShadow = false;
-      m.renderOrder = HEART_PLATFORM_ORDER.floor;
     }
     group.add(dais);
   }
+  // The well inside it: flat on the walk, drawn as a sunken well of mist
+  // and crystal where the heart's light lives (heart_landmarks_glsl.ts).
+  const wellMat = new THREE.ShaderMaterial({
+    name: 'smithHeartWell',
+    uniforms: {
+      uTime: sharedUniforms.uTime,
+      uV0: vein4[0],
+      uV1: vein4[1],
+      uV2: vein4[2],
+      uV3: vein4[3],
+      uQ: daisGlow.uniforms.uQ,
+      uRing: { value: 0 },
+      uBlaze: { value: 0 },
+      uPulse: { value: 0 },
+      uDark: { value: 0 },
+    },
+    vertexShader: WELL_VERT,
+    fragmentShader: wellFrag(
+      HEART_RING_LOOK.wellR,
+      HEART_RING_LOOK.depth,
+      HEART_QUARTERS.sweepDeg,
+      -45 + HEART_QUARTERS.rimOffsetDeg,
+    ),
+    fog: false,
+  });
+  const well = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, 'Kit_HeartWell');
+  if (well) {
+    well.name = 'Kit_HeartWell:ring';
+    well.position.copy(centre);
+    for (const m of well.children) {
+      if (!(m instanceof THREE.Mesh)) continue;
+      m.material = wellMat;
+      m.castShadow = false;
+      m.receiveShadow = false;
+      m.renderOrder = HEART_PLATFORM_ORDER.floor;
+    }
+    group.add(well);
+  }
+  group.add(heartMaterialCarriers([wellMat, daisGlow]));
   const blazeMat = new THREE.ShaderMaterial({
     name: 'smithHeartRingBlaze',
     uniforms: {
@@ -764,7 +822,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     const params: HeartAirV4[] = [];
     for (let i = 0; i < m; i++) {
       const b = (i / m) * Math.PI * 2;
-      const rr = 10.6 - 3.5 * ((i * 0.381966) % 1);
+      const rr = HEART_RING_LOOK.wellR - 0.4 - 4.5 * ((i * 0.381966) % 1);
       bases.push([Math.sin(b) * rr, 0, Math.cos(b) * rr]);
       params.push([
         (i * 0.618034) % 1,
@@ -781,12 +839,17 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
   const columnMat = heartBeamMaterial(0xffe2a8, 'smithHeartRingColumn', 1.2);
   {
     const h = 40;
-    const g = new THREE.CylinderGeometry(10.6, 7.2, h, 48, 1, true).translate(0, h / 2, 0);
+    const w = HEART_RING_LOOK.wellR;
+    const g = new THREE.CylinderGeometry(w - 0.6, w * 0.62, h, 48, 1, true).translate(0, h / 2, 0);
     const column = new THREE.Mesh(g, columnMat);
     column.position.copy(centre);
     column.name = 'heartRingColumn';
     group.add(column);
   }
+
+  // ---- the wall landmarks (phase 2M) ----------------------------------------------------------
+  const landmarks = buildHeartLandmarks(lowGfx, centre);
+  group.add(landmarks.group);
 
   // ---- the frame ------------------------------------------------------------------------------
   const state = newHeartQuartersState();
@@ -825,6 +888,14 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
           set(m.uniforms.uFront, q.front, 100);
           if (m.uniforms.uDark) set(m.uniforms.uDark, dark);
         }
+        // Its wall landmark: a quiet glow of its tint, erupting as its
+        // flood reaches the wall.
+        landmarks.set(
+          vein,
+          q.base * 4 + (awakeRoom ? P[vein].idle * 0.5 : 0),
+          heartLandmarkLit(q),
+          dark,
+        );
       }
       for (let k = 0; k < 4; k++) {
         const [va, vb] = heartRidgeNeighbours(k);
@@ -877,6 +948,11 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       set(du.uBlaze, state.blaze);
       set(du.uPulse, state.ringPulse);
       set(du.uDark, dark);
+      const wu = wellMat.uniforms;
+      set(wu.uRing, state.ring);
+      set(wu.uBlaze, state.blaze);
+      set(wu.uPulse, state.ringPulse);
+      set(wu.uDark, dark);
       set(blazeMat.uniforms.uBlaze, state.blaze * (1 - dark));
       set(columnMat.uniforms.uK, state.blaze * 1.2 * (1 - dark));
     },

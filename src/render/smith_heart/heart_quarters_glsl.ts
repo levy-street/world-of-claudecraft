@@ -1,6 +1,7 @@
-// The shaders of the Anvil of the World's quarters awake (phases 2K and 2L,
-// heart_quarters.ts paints with them): the quarters' seams, cracks, fissures
-// and ice, the ridges' veins, the dais's crystal, the light washed over each
+// The shaders of the Anvil of the World's quarters awake (phases 2K to 2M,
+// heart_quarters.ts paints with them): each quarter's edges (since 2M the
+// crackle out of the central circle's rim and the border light along its
+// seams), the seams' veins, the rim's crystal, the light washed over each
 // quarter's floor, and the air each element raises off its quarter. Texture-
 // free; every motion runs on the shared clock; every point goes through
 // `modelViewMatrix` on a positioned mesh (the room's centre), so its own
@@ -34,64 +35,56 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }`;
 
-/** Each quarter's own life in its seams (sets `flav` 0 to about 2, and
- *  `hot`, the white in it; `idleK` its life while it sleeps). */
+/** Each quarter's crackle's own life (sets `flav` 0 to about 2.5, and
+ *  `hot`, the white in it; `idleK` its life while it sleeps). Since phase 2M
+ *  the glow lives on the edges: the crackle bursting out of the central
+ *  circle's rim, the border light along its seams. */
 const FLAVOUR: Record<string, string> = {
-  // A tremor running out through the blocks every few seconds.
+  // A tremor running out of the rim through the fissures every few
+  // seconds, the gold glinting in them.
   hammer: `${TREMOR}
     float tremor = exp(-(r - pr) * (r - pr) / 2.2) * (1.0 - tp);
-    float flav = 0.78 + 1.5 * tremor;
-    float hot = tremor * 0.75;
-    float idleK = 1.0 + 1.6 * tremor;`,
-  // Bands of light wheeling round with the wind's spiral.
+    float flav = 0.9 + 1.7 * tremor;
+    float hot = tremor * 0.8;
+    float idleK = 1.0 + 1.4 * tremor;`,
+  // Storm crackle: the forks flashing in bursts, a jolt running out.
   breath: `
-    float band = 0.5 + 0.5 * sin(ang * 5.0 + r * 0.32 - uTime * 2.6);
-    float flav = 0.6 + 0.75 * band * band;
-    float hot = band * band * band * 0.45;
-    float idleK = 0.8 + 0.4 * band;`,
-  // A slow cold shimmer, glints of frost catching.
+    float slot = floor(uTime * 13.0);
+    float fl = step(0.5, fract(sin(slot * 12.9898 + floor(r * 1.1) * 78.233 + floor(ang * 9.0) * 3.1) * 43758.5453));
+    float jr = r - ${RING} - fract(uTime * 0.9) * 14.0;
+    float jolt = exp(-jr * jr / 3.0);
+    float flav = 0.55 + 1.5 * fl + 1.2 * jolt;
+    float hot = fl * 0.7 + jolt * 0.5;
+    float idleK = 0.7 + 0.6 * fl;`,
+  // Frost cracks: a cold shimmer, glints of frost catching, rime spreading.
   quench: `
     float sh = 0.5 + 0.5 * sin(r * 0.7 - uTime * 0.8 + ang * 2.0);
     float glint = max(0.0, sin(dot(vP.xz, vec2(12.9898, 78.233)) * 3.1 + uTime * 2.3));
     glint = glint * glint * glint * glint * glint * glint * glint * glint;
-    float flav = 0.75 + 0.45 * sh + 1.1 * glint;
-    float hot = glint * 0.85 + 0.15 * sh;
+    float sr = r - ${RING} - fract(uTime * 0.35) * 12.0;
+    float spread = exp(-sr * sr / 5.0);
+    float flav = 0.85 + 0.45 * sh + 1.1 * glint + 0.8 * spread;
+    float hot = glint * 0.85 + 0.15 * sh + spread * 0.3;
     float idleK = 0.85 + 0.3 * sh;`,
-  // Molten light flowing out along the fissures, a pulse of lava running
-  // out of the ring every few seconds (asleep too: the Heat smoulders).
+  // Molten cracks: light flowing out along them, a pulse of lava running
+  // out of the rim every few seconds (asleep too: the Heat smoulders).
   heat: `
     float flow = 0.5 + 0.5 * sin(r * 1.6 - uTime * 3.4 + sin(ang * 7.0 + uTime * 0.7) * 1.8);
     float lp = fract(uTime / 3.4);
-    float lpr = mix(${RING} - 2.0, ${RIM} + 3.0, lp);
-    float pulse = exp(-(r - lpr) * (r - lpr) / 5.0);
-    float flav = 0.7 + 0.55 * flow + 0.9 * pulse;
-    float hot = flow * flow * 0.55 + pulse * 0.7;
-    float idleK = 0.7 + 0.25 * flow + 1.4 * pulse;`,
+    float lpr = mix(${RING} - 1.0, ${RING} + 14.0, lp);
+    float pulse = exp(-(r - lpr) * (r - lpr) / 4.0);
+    float flav = 0.75 + 0.6 * flow + 1.1 * pulse;
+    float hot = flow * flow * 0.55 + pulse * 0.75;
+    float idleK = 0.7 + 0.25 * flow + 1.2 * pulse;`,
 };
 
-/** The Quench's sheets of ice (its glow faces painted blue): deep dark ice
- *  with a cold rim and a slow sheen while it sleeps, lit from inside when
- *  the quarter wakes (moving caustics, the front a bright wave). */
-const ICE = /* glsl */ `
-  float isIce = step(0.2, vShade.b - vShade.r);
-  if (isIce > 0.5) {
-    float rim = smoothstep(0.08, 0.3, vShade.r);
-    vec3 deep = mix(vec3(0.16, 0.27, 0.4), vec3(0.52, 0.64, 0.76), rim);
-    float sheen = max(0.0, sin((vP.x + vP.z * 0.6) * 0.42 + uTime * 0.18));
-    sheen = sheen * sheen * sheen * sheen * sheen * sheen * sheen * sheen;
-    float caust = sin(vP.x * 1.7 + uTime * 1.3 + sin(vP.z * 1.1 - uTime * 0.7)) * sin(vP.z * 1.9 - uTime * 1.1);
-    caust = 0.5 + 0.5 * caust;
-    vec3 asleep = deep * (1.0 + 0.6 * max(uBase, uIdle)) + vec3(0.5, 0.65, 0.8) * sheen * 0.4;
-    vec3 awakeC = mix(uColor * 1.15, vec3(0.92, 0.98, 1.0), 0.25 + 0.45 * rim) * (0.75 + 0.6 * caust * caust);
-    vec3 c = mix(asleep, awakeC * uGain, inside) + mix(uColor, white, 0.7) * edge * 1.4;
-    gl_FragColor = vec4(c * (1.0 - 0.85 * uDark), 1.0);
-    #include <colorspace_fragment>
-    return;
-  }`;
-
-/** A quarter's seams (its kit glow slot): dark but for a faint base glow
- *  (and its idle life: the Heat's fissures smoulder), lit inside its
- *  flood's front with its own life, the front itself a bright wave. */
+/** A quarter's edges (its kit glow slot): the crackle bursting out of the
+ *  rim (grey faces, fading out into the stone; the Heat's fire bed under
+ *  the walk) and the border light along its two seams (faces tagged green
+ *  over red). Asleep both keep a quiet glow of the quarter's tint (its
+ *  idle life: the Heat smoulders); inside its flood they blaze with its
+ *  element's life, the flood's front a bright wave running out along the
+ *  seams to the wall. */
 export function quarterGlowFrag(vein: string): string {
   return /* glsl */ `
 uniform vec3 uColor;
@@ -113,15 +106,26 @@ void main() {
   float dr = r - uFront;
   float edge = uAwake * exp(-dr * dr / 2.4) * (1.0 - smoothstep(${RIM} - 1.0, ${RIM} + 1.5, uFront));
   vec3 white = vec3(1.0, 0.97, 0.9);
-  ${vein === 'quench' ? ICE : ''}
-  float breathe = 0.82 + 0.18 * sin(uTime * 1.3 + r * 0.4);
-  float rest = max(uBase * breathe, uIdle * idleK);
-  float level = max(rest, inside * flav);
-  vec3 dark = mix(vec3(0.035, 0.035, 0.045), uColor * 0.1, 0.5) * (0.5 + 0.6 * vShade.r);
-  vec3 lit = uColor * (0.45 + 0.7 * vShade.r) * level * 1.3 * mix(1.0, uGain, step(rest, inside * flav));
-  lit += mix(uColor, uHot, 0.35 + 0.5 * hot) * hot * max(inside, uIdle * 0.6) * 0.75;
-  lit += mix(uColor, white, 0.6) * edge * 1.7;
-  lit += uHot * smoothstep(0.9, 1.0, vShade.r) * 0.35 * max(inside, uIdle);
+  float breathe = 0.85 + 0.15 * sin(uTime * 1.3 + r * 0.4);
+  float quiet = max(uBase * 4.5 * breathe, uIdle * idleK);
+  if (vShade.g - vShade.r > 0.2) {
+    // The border light: a thin line of the quarter's tint, its light
+    // running out along the seam while it is awake.
+    float run = 0.55 + 0.45 * sin(r * 0.8 - uTime * 5.5);
+    float lvl = max(quiet * 0.8, inside * (1.3 + 0.9 * run));
+    vec3 c = uColor * lvl * 1.35 + mix(uColor, white, 0.6) * edge * 2.4;
+    c += mix(uColor, uHot, 0.5) * inside * run * run * 0.6;
+    gl_FragColor = vec4(c * (1.0 - 0.85 * uDark), 1.0);
+    #include <colorspace_fragment>
+    return;
+  }
+  float level = max(quiet, inside * flav * uGain);
+  float bed = step(vP.y, -0.001);
+  vec3 lit = uColor * (0.4 + 0.8 * vShade.r) * level * (1.5 + 0.4 * bed);
+  lit += mix(uColor, uHot, 0.4 + 0.5 * hot) * hot * max(inside, uIdle * 0.5) * (0.4 + 0.8 * vShade.r);
+  lit += mix(uColor, white, 0.6) * edge * 1.7 * vShade.r;
+  lit += uHot * smoothstep(0.9, 1.0, vShade.r) * 0.4 * max(inside, uIdle);
+  vec3 dark = uColor * 0.04;
   gl_FragColor = vec4((dark + lit) * (1.0 - 0.85 * uDark), 1.0);
   #include <colorspace_fragment>
 }`;
@@ -190,8 +194,10 @@ void main() {
   vec3 heart = vec3(1.0, 0.86, 0.55);
   float beat = 0.8 + 0.2 * sin(uTime * 2.856);
   float spin = 0.75 + 0.25 * sin(b * 0.0349 * 4.0 - uTime * 1.6 + r * 0.5);
-  vec3 c = heart * uRing * beat * spin;
-  c += vc * ql * smoothstep(2.5, 8.5, r) * 1.3;
+  // Phase 2M: the rim's light, each side in the quarter it opens onto: a
+  // quiet tint while the room is awake, blazing with its quarter.
+  vec3 c = heart * uRing * beat * spin * 0.75;
+  c += vc * (0.22 * uRing + ql * 2.1);
   c *= 1.0 + uBlaze * (1.8 + 0.9 * sin(uTime * 4.2 - r * 0.9));
   float pr = (1.0 - uPulse) * ${RING};
   c += vec3(1.0, 0.95, 0.85) * uPulse * exp(-(r - pr) * (r - pr) / 4.0) * 2.2;
@@ -228,7 +234,12 @@ void main() {
   float dr = r - uFront;
   float edge = uAwake * exp(-dr * dr / 3.0) * (1.0 - smoothstep(${RIM} - 1.0, ${RIM} + 1.5, uFront));
   float pool = 0.55 + 0.45 * sin(uTime * 0.9 + r * 0.25);
-  float a = (inside * 0.2 * pool + edge * 0.4) * uGain * vEdge * (1.0 - uDark);
+  // Phase 2M: the floor's tint deepens a little over the whole quarter and
+  // more toward its edges (the circle's rim and the wall), where its
+  // element lives.
+  float nearRing = 1.0 - smoothstep(${RING}, ${RING} + 12.0, r);
+  float nearRim = smoothstep(${RIM} - 14.0, ${RIM}, r);
+  float a = (inside * (0.05 + 0.13 * nearRing + 0.08 * nearRim) * pool + edge * 0.26) * uGain * vEdge * (1.0 - uDark);
   if (a < 0.003) discard;
   gl_FragColor = vec4(uColor * a, 1.0);
   #include <colorspace_fragment>
@@ -623,7 +634,7 @@ void main() {
     shock = exp(-d * d / 4.0) * (1.0 - smoothstep(${f(HEART_QUARTERS_LOOK.shockLife * 0.4)}, ${SHOCK_LIFE}, uShockAge));
   }
   vec3 p = position;
-  p.y = 0.45 + aV * (1.8 + 7.0 * shock);
+  p.y = 0.45 + aV * (1.1 + 7.0 * shock);
   vV = aV;
   vR = aR;
   vShock = shock;

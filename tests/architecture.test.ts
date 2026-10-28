@@ -1111,6 +1111,8 @@ const RENDER_PURE_CORES = [
   // The Anvil of the World's quarters awake (phase 2K): the boss memory, the
   // floods, drains and shocks, the air's seeds.
   'src/render/smith_heart/heart_quarters_core.ts',
+  // Phase 2M: the wall landmarks' frame, spots, eruption and lightning.
+  'src/render/smith_heart/heart_landmarks_core.ts',
   'src/render/smith_heart_fx/final_fx_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',
