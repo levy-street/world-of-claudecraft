@@ -201,7 +201,10 @@ float n(vec2 p) {
 void main() {
   float t = n(vec2(vUv.x * 64.0, vUv.y * 2.0 - uTime * 3.0)) * 0.6 + n(vec2(vUv.x * 140.0, vUv.y * 4.0)) * 0.4;
   float top = 0.35 + 0.6 * t;
-  float a = uAlpha * (1.0 - smoothstep(top - 0.3, top, vUv.y));
+  // A bright lip low down fading fast upward, ragged: a wall of light you
+  // read the wave by, never a sheet that hides the floor.
+  float a = uAlpha * (1.0 - smoothstep(top - 0.3, top, vUv.y)) * pow(1.0 - vUv.y, 1.6);
+  a *= 0.55 + 0.45 * t;
   if (a <= 0.003) discard;
   gl_FragColor = vec4(mix(uGold, uCore, 1.0 - vUv.y) * a * 1.4, a);
   #include <colorspace_fragment>
@@ -1418,8 +1421,14 @@ export class FinalFx {
     this.wrathWall.position.set(e.pos.x, y, e.pos.z);
     (this.wrathMat.uniforms.uGold.value as THREE.Color).copy(this.burstTint);
     this.wrathWall.visible = true;
-    this.flash(hx, this.heartPos.y, hz, 70, 0.7, tint);
-    this.particles.shockRing(e.pos.x, e.pos.z, tint, this.sim.burstRadius, 1.4);
+    // The heart's flash: bright and short, sized to the heart, not the room
+    // (Jose's playtest: the old 70 yd flash hid the whole screen).
+    this.flash(hx, this.heartPos.y, hz, 18, 0.35, tint);
+    // Two rings off the body; the wall of light carries the wave over the
+    // rest of the Anvil. (A ring the room's size laid its pale wake over the
+    // whole floor: Jose's playtest, the disc that hid the screen.)
+    this.particles.shockRing(e.pos.x, e.pos.z, tint, 14, 0.6);
+    this.particles.shockRing(e.pos.x, e.pos.z, tint, 26, 0.7);
     for (let i = 0; i < Math.round(70 * this.density); i++) {
       const a = this.rand() * Math.PI * 2;
       this.particles.puff(hx, this.heartPos.y, hz, 1, {
@@ -1473,8 +1482,8 @@ export class FinalFx {
       return;
     }
     const r = Math.max(0.5, wave.front);
-    this.wrathWall.scale.set(r, 6 + 6 * look.glow, r);
-    this.wrathMat.uniforms.uAlpha.value = look.wall * wave.alpha * 0.95;
+    this.wrathWall.scale.set(r, 4 + 5 * look.glow, r);
+    this.wrathMat.uniforms.uAlpha.value = look.wall * wave.alpha * 0.6;
   }
 
   dispose(): void {

@@ -11,7 +11,9 @@
 //     `rootRise`);
 //   - the vein palette, the cues the painter claims (no generic burst doubles
 //     them), the floor rungs (`FINAL_KIT_FLOOR`: never tied with FinalFx's
-//     particles or HeatFx's fist and lanes, which share the Anvil), the pools.
+//     particles or HeatFx's fist and lanes, which share the Anvil), the pools,
+//     the switch's shockwave (`shockWave`).
+// Each footprint's element paint is final_telegraph_core.ts's.
 //
 // Three-free, DOM-free, deterministic.
 
@@ -111,6 +113,11 @@ export const FINAL_FOOTPRINTS = {
   drawn: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xc8b8ff },
   bolt: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xc8b8ff },
   rim: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xc8b8ff },
+  /** Your own cold's reach in the Quench (crowd control: alone you freeze):
+   *  the ring the two allies must stand in. */
+  cold: { color: TELEGRAPH_THREAT_COLORS.control, accent: 0xbfe6ff },
+  /** Crushed: you must stay out of the next Anvil. */
+  crushed: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe8c070 },
 } as const;
 
 /** The footprints' radii (yards), the sim's own. */
@@ -124,6 +131,10 @@ export const FINAL_REACH = {
   anvil: T.anvilR,
   drawn: T.drawnReach,
   bolt: T.boltJump,
+  cold: T.coldReach,
+  /** Crushed's mark under its player (a body's width: it marks who, not
+   *  where). */
+  crushed: 1.6,
   /** The rim's band the gale strikes in: from here to the rim. */
   rimInner: HEART_ROOM.r - T.rimBand,
   rimOuter: HEART_ROOM.r,
@@ -161,6 +172,16 @@ export function orbBob(t: number, left: number): { y: number; crackle: number } 
   return { y: 1.4 + 0.25 * Math.sin(t * 3.1), crackle: 0.35 + 0.65 * (1 - clamp01(left)) };
 }
 
+/** The switch's shockwave on the floor `age` seconds after it: its front
+ *  (yards out from the crossing) and its strength, fading as it spreads over
+ *  the whole Anvil. */
+export function shockWave(age: number): { front: number; alpha: number } {
+  const T_SHOCK = 1.5;
+  if (age < 0 || age >= T_SHOCK) return { front: 0, alpha: 0 };
+  const k = age / T_SHOCK;
+  return { front: 4 + 92 * (1 - (1 - k) ** 2), alpha: (1 - k) ** 1.3 };
+}
+
 /** Taking Root's rock spikes round the boss's feet: how far up they stand
  *  (0..1) `left` seconds before the root lets go. */
 export function rootRise(left: number, total = T.rootSeconds): number {
@@ -181,14 +202,20 @@ export function finalKitClaims(ability: string | null | undefined): boolean {
 
 // ---- the floor -----------------------------------------------------------------------
 
-/** The kit's encounter rungs on the Anvil: the gale's rim band, the
- *  footprints (their curtains two rungs up), the particles; clear of
- *  FinalFx's engine particles (ENGINE_PARTICLE_STEPS) and of HeatFx's fist
- *  and lanes (the Heat's ladder, 4 to 21), which draw on the same floor. */
+/** The kit's encounter rungs on the Anvil: the element telegraphs' char
+ *  (every multiply on one rung: they commute), their glows, their curtains,
+ *  the switch's floor shockwave, the gale's rim band, the particles, the
+ *  marks over everything; clear of FinalFx's engine particles
+ *  (ENGINE_PARTICLE_STEPS) and of HeatFx's fist and lanes (the Heat's
+ *  ladder: 4, 5, 8, 9, 12, 14, 16, 18, 21), which draw on the same floor.
+ *  The chars sit under every glow but the Heat crater's, so a mark of one
+ *  element never darkens another's light. */
 export const FINAL_KIT_FLOOR = {
+  telegraphChar: 13,
+  telegraphGlow: 15,
+  telegraphCurtain: 17,
+  shock: 20,
   rim: 22,
-  footprint: 23,
-  footprintCurtain: 25,
   particles: { ring: 24, smoke: 26, fire: 27, glow: 28 },
   marks: 29,
 } as const;
@@ -196,7 +223,15 @@ export const FINAL_KIT_FLOOR = {
 /** Every rung the kit draws on (the tests pin them untied). */
 export function finalKitRungs(): number[] {
   const F = FINAL_KIT_FLOOR;
-  return [F.rim, F.footprint, F.footprintCurtain, ...Object.values(F.particles), F.marks];
+  return [
+    F.telegraphChar,
+    F.telegraphGlow,
+    F.telegraphCurtain,
+    F.shock,
+    F.rim,
+    ...Object.values(F.particles),
+    F.marks,
+  ];
 }
 
 /** FinalFx's own particle rungs (the engine's defaults). */
@@ -204,7 +239,6 @@ export const FINAL_FX_PARTICLE_RUNGS: readonly number[] = Object.values(ENGINE_P
 
 /** The pools (fixed, allocated at build). */
 export const FINAL_KIT_POOLS = {
-  footprints: 28,
   whirls: 6,
   orbs: 6,
   ice: 10,

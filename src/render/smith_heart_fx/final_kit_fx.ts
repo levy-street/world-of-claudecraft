@@ -5,24 +5,27 @@
 // objects, the boss's bar and auras, the players' marks, the cues), so
 // offline and online look the same:
 //   - every footprint at the sim's exact radius through the shared floor
-//     telegraph on EVERY tier: a Fire Whirl's (danger), a burning pool's
-//     (danger), a Groaning Ice crack (lethal, filling to its break), a Tremor
-//     Crack (danger, filling), a Storm Orb (the soak's gold), Weight of the
-//     Anvil's mark (the soak's gold, filling with the bar, turning with it on
-//     Mythic), the ring round an Ember Mark (the pool it will drop), round
-//     Drawn Lightning (its reach), round Leaping Bolt's target (its leap), and
-//     the gale's rim band while it gathers and blows;
-//   - the reaction and the impact, cosmetic over them: the whirls' columns
-//     of fire and their embers, the pools' flames, frost and ice shards at a
-//     crack, the gale's streaks and dust racing the way it blows, lightning
-//     leaping between bodies, the orbs' crackling spheres, the great anvil
-//     hanging over its mark and dropping onto it, the stone shells, the ice
-//     round a frozen player, Taking Root's spikes of rock round the boss's
-//     feet, Heart Unbound's blaze, the switch's shockwave in the four veins'
-//     light.
-// The footprints, the rim band, the ice, the shells, the anvil and the root's
-// spikes draw on every tier; the particles thin on the low tier and the shakes
-// go under reduced motion.
+//     telegraph on EVERY tier, dressed in its quarter's element at the Heat
+//     telegraph's bar (final_telegraphs.ts): a Fire Whirl's, a burning
+//     pool's and an Ember Mark's in the molten basalt; a Groaning Ice crack
+//     (lethal, frost creeping in to its break) and your own cold's reach in
+//     frost; a Storm Orb (the soak's gold), Drawn Lightning's reach and
+//     Leaping Bolt's leap in storm; a Tremor Crack, Weight of the Anvil's
+//     mark (the soak's gold, turning on Mythic) and Crushed in granite; and
+//     the gale's rim band (a ragged storm edge where the safe floor ends);
+//   - the reaction and the impact, cosmetic over them: the whirls' twisting
+//     funnels of fire with their white-hot cores, the pools' flames, frost at
+//     a crack, the gale's streaks and dust, lightning leaping between bodies,
+//     the orbs (a crackling fresnel shell, a pulsing core, a turning ring),
+//     the great anvil of carved stone and gold crystal hanging over its mark
+//     and dropping onto it, the granite shells, the ice round a frozen
+//     player, Taking Root's spikes, Heart Unbound's blazing ring of the four
+//     veins, the switch's shockwave racing over the floor in the four veins'
+//     bands.
+// The footprints, the rim band, the ice, the shells, the anvil, the root's
+// spikes, the centre's ring and the shockwave draw on every tier; the
+// footprints' rime, streaks and glints and the particles thin on the low
+// tier and the shakes go under reduced motion.
 //
 // Rules (src/render/CLAUDE.md): every geometry and material is built in the
 // constructor under one root attached through `attachSceneGroupGated`; fixed
@@ -43,12 +46,7 @@ import {
 } from '../../sim/encounters/smith_heart/final_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
-import {
-  type TelegraphFan,
-  TelegraphKit,
-  type TelegraphStyle,
-  telegraphFillOf,
-} from '../floor_telegraph';
+import { TelegraphKit, type TelegraphStyle, telegraphFillOf } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -68,14 +66,38 @@ import {
   FINAL_KIT_POOLS as P,
   FINAL_REACH as R,
   rootRise,
+  shockWave,
   timedFill,
   whirlSpin,
 } from './final_kit_fx_core';
+import {
+  ICE_FRAG,
+  KIT_UV_VERT,
+  ORB_CORE_FRAG,
+  ORB_FRAG,
+  RIM_FRAG,
+  RIM_VERT,
+  SHELL_FRAG,
+  SHOCK_FRAG,
+  UNBOUND_FRAG,
+  WHIRL_FRAG,
+  WHIRL_VERT,
+} from './final_kit_glsl';
+import { anvilCrystals, anvilStone, iceCrust, shellStone } from './final_kit_shapes';
+import {
+  coldReachFill,
+  FINAL_TELEGRAPH_POOLS,
+  type FinalElement,
+  type FinalTelegraphKind,
+  finalTelegraphElement,
+} from './final_telegraph_core';
+import { type FinalTelegraphFan, FinalTelegraphs } from './final_telegraphs';
 import { fxHash } from './hammer_fx_core';
 
 const SCAN_SEC = 0.25;
 /** The switch's shockwave: one ring per vein. */
 const VEIN_RINGS: readonly number[] = [C.heat, C.quench, C.breath, C.hammer];
+const ELEMENTS: readonly FinalElement[] = ['fire', 'frost', 'storm', 'stone'];
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
 const _v = new THREE.Vector3();
@@ -83,106 +105,8 @@ const _v2 = new THREE.Vector3();
 const _s = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
 
-const WHIRL_VERT = /* glsl */ `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-/** A column of fire turning on itself: bands of flame climbing and
- *  twisting, a white-hot core low down, ragged at the top. */
-const WHIRL_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-uniform vec3 uCore;
-uniform vec3 uFire;
-varying vec2 vUv;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  vec2 q = vec2(vUv.x * 6.0 + vUv.y * 3.0 - uTime * 1.8, vUv.y * 3.0 - uTime * 2.6);
-  float f = n(q) * 0.65 + n(q * 2.3 + 4.1) * 0.35;
-  float top = 1.0 - smoothstep(0.55, 1.0, vUv.y + (f - 0.5) * 0.35);
-  float body = smoothstep(0.25, 0.75, f) * top;
-  vec3 col = mix(uFire, uCore, smoothstep(0.55, 0.95, f) * (1.0 - vUv.y));
-  gl_FragColor = vec4(col * (0.8 + 0.6 * f), body * uAlpha);
-}
-`;
-
-const UV_VERT = WHIRL_VERT;
-/** A Storm Orb: a globe of violet lightning, its rim bright, forks of white
- *  crawling over it, harder as it nears its burst. */
-const ORB_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uCrackle;
-uniform vec3 uStorm;
-varying vec2 vUv;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  vec2 q = vUv * vec2(12.0, 6.0) + vec2(uTime * 0.7, -uTime * 1.3);
-  float fork = 1.0 - abs(n(q) * 2.0 - 1.0);
-  fork = pow(fork, 10.0) * (0.6 + uCrackle);
-  float rim = 0.35 + 0.65 * abs(vUv.y - 0.5) * 2.0;
-  vec3 col = uStorm * (0.55 + rim * 0.5) + vec3(1.0) * fork;
-  gl_FragColor = vec4(col, 0.55 + fork * 0.45);
-}
-`;
-
-/** The ice round a frozen player: pale, bright at its edges, glinting. */
-const ICE_FRAG = /* glsl */ `
-uniform float uTime;
-uniform vec3 uFrost;
-varying vec2 vUv;
-void main() {
-  vec2 e = min(vUv, 1.0 - vUv);
-  float edge = 1.0 - smoothstep(0.0, 0.12, min(e.x, e.y));
-  float glint = smoothstep(0.96, 1.0, sin((vUv.x + vUv.y) * 9.0 - uTime * 2.0));
-  gl_FragColor = vec4(uFrost * (0.6 + edge * 0.8 + glint), 0.32 + edge * 0.45);
-}
-`;
-
-/** The gale's rim band: streams of storm light racing round with the wind,
- *  brighter where the wind drives (its heading), a hard edge at the rim. */
-const RIM_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-uniform float uHeading;
-uniform vec3 uColor;
-varying vec2 vUv;
-varying vec3 vLocal;
-void main() {
-  float a = atan(vLocal.x, vLocal.z);
-  float facing = 0.35 + 0.65 * max(0.0, cos(a - uHeading));
-  float streak = 0.5 + 0.5 * sin(a * 40.0 - uTime * 9.0 + vUv.x * 6.0);
-  float edge = smoothstep(0.75, 1.0, vUv.x);
-  float a2 = (0.25 + 0.45 * streak + 0.6 * edge) * facing;
-  gl_FragColor = vec4(uColor * (0.8 + 0.6 * edge), a2 * uAlpha);
-}
-`;
-const RIM_VERT = /* glsl */ `
-varying vec2 vUv;
-varying vec3 vLocal;
-void main() {
-  vUv = uv;
-  vLocal = position;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
 interface FootSlot {
-  fan: TelegraphFan;
+  d: FinalTelegraphFan;
   key: number;
   style: TelegraphStyle | null;
   seen: boolean;
@@ -200,6 +124,20 @@ interface Arc {
   seed: number;
 }
 
+interface WhirlBody {
+  outer: THREE.Mesh;
+  core: THREE.Mesh;
+  outerU: { uAlpha: { value: number } };
+  coreU: { uAlpha: { value: number } };
+}
+
+interface OrbBody {
+  shell: THREE.Mesh;
+  core: THREE.Mesh;
+  ring: THREE.Mesh;
+  crackle: { value: number };
+}
+
 export class FinalKitFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -207,25 +145,34 @@ export class FinalKitFx {
   private readonly density: number;
   private readonly particles: EngineParticles;
   private readonly kit: TelegraphKit;
-  private readonly slots: FootSlot[] = [];
+  private readonly tele: FinalTelegraphs;
+  private readonly pools: Record<FinalElement, FootSlot[]> = {
+    fire: [],
+    frost: [],
+    storm: [],
+    stone: [],
+  };
   private readonly slotByKey = new Map<number, FootSlot>();
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
-  private readonly whirls: THREE.Mesh[] = [];
-  private readonly whirlMat: THREE.ShaderMaterial;
-  private readonly orbs: THREE.Mesh[] = [];
-  private readonly orbMat: THREE.ShaderMaterial;
+  private readonly whirls: WhirlBody[] = [];
+  private readonly orbs: OrbBody[] = [];
   private readonly ice: THREE.Mesh[] = [];
   private readonly shells: THREE.Mesh[] = [];
   private readonly arcsMesh: THREE.InstancedMesh;
   private readonly arcs: Arc[] = [];
   private readonly spikes: THREE.InstancedMesh;
   private readonly anvil = new THREE.Group();
-  private readonly anvilGlow: THREE.MeshBasicMaterial;
+  private readonly anvilStoneMat: THREE.MeshLambertMaterial;
+  private readonly anvilCrystalMat: THREE.MeshBasicMaterial;
   private readonly rim: THREE.Mesh;
   private readonly rimMat: THREE.ShaderMaterial;
   private readonly unboundRing: THREE.Mesh;
-  private readonly unboundMat: THREE.MeshBasicMaterial;
+  private readonly unboundK = { value: 0 };
+  private readonly shock: THREE.Mesh;
+  private readonly shockFront = { value: 0 };
+  private readonly shockAlpha = { value: 0 };
+  private shockAt = -99;
   private readonly seen = new Map<number, ObjSeen>();
   private readonly objectIds: number[] = [];
   private readonly playerIds: number[] = [];
@@ -265,98 +212,137 @@ export class FinalKitFx {
       hasDom ? getFlameTex() : null,
       F.particles,
     );
-    // Every footprint: one pooled fan each (a full ring), every tier.
+    // Every footprint: pooled fans per element, each dressed in its paint
+    // (a full ring), every tier.
     this.kit = new TelegraphKit(this.root, detail);
-    for (let i = 0; i < P.footprints; i++)
-      this.slots.push({ fan: this.kit.fan(F.footprint), key: 0, style: null, seen: false });
+    this.tele = new FinalTelegraphs(
+      this.kit,
+      { char: F.telegraphChar, glow: F.telegraphGlow, curtain: F.telegraphCurtain },
+      this.materials,
+    );
+    for (const el of ELEMENTS)
+      for (let i = 0; i < FINAL_TELEGRAPH_POOLS[el]; i++)
+        this.pools[el].push({
+          d: this.tele.fan(el, F.telegraphChar),
+          key: 0,
+          style: null,
+          seen: false,
+        });
     const col = (c: readonly [number, number, number]) => ({ value: new THREE.Color(...c) });
-    // The whirls' columns of fire.
-    const whirlGeo = new THREE.CylinderGeometry(0.55, 1.35, 1, 24, 6, true).translate(0, 0.5, 0);
-    this.geometries.push(whirlGeo);
-    this.whirlMat = new THREE.ShaderMaterial({
-      name: 'smithHeartFinalWhirl',
-      uniforms: {
+    const shader = (
+      name: string,
+      uniforms: Record<string, THREE.IUniform>,
+      vertexShader: string,
+      fragmentShader: string,
+      extra: Partial<THREE.ShaderMaterialParameters> = {},
+    ) => {
+      const m = new THREE.ShaderMaterial({
+        name,
+        uniforms,
+        vertexShader,
+        fragmentShader,
+        transparent: true,
+        depthWrite: false,
+        ...extra,
+      });
+      this.materials.push(m);
+      return m;
+    };
+    const mesh = (geo: THREE.BufferGeometry, mat: THREE.Material, name: string) => {
+      const m = new THREE.Mesh(geo, mat);
+      m.name = name;
+      m.visible = false;
+      m.frustumCulled = false;
+      this.root.add(m);
+      return m;
+    };
+    // The whirls: a funnel of flame twisting up (narrow at the floor, wide at
+    // its lip) round a white-hot core, each its own seed.
+    const funnel = new THREE.CylinderGeometry(1.25, 0.32, 1, 28, 18, true).translate(0, 0.5, 0);
+    const coreGeo = new THREE.CylinderGeometry(0.5, 0.14, 1, 18, 14, true).translate(0, 0.5, 0);
+    this.geometries.push(funnel, coreGeo);
+    for (let i = 0; i < P.whirls; i++) {
+      const seedU = { value: fxHash(i, 5) * 20 };
+      const outerU = {
         uTime: this.uTime,
         uAlpha: { value: 1 },
+        uCoreK: { value: 0 },
+        uSeed: seedU,
+        uTwist: { value: 1.6 },
         uCore: col(C.fireCore),
         uFire: col(C.fire),
-      },
-      vertexShader: WHIRL_VERT,
-      fragmentShader: WHIRL_FRAG,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
-    this.materials.push(this.whirlMat);
-    for (let i = 0; i < P.whirls; i++) {
-      const m = new THREE.Mesh(whirlGeo, this.whirlMat);
-      m.name = 'smithHeartFinalWhirl';
-      m.visible = false;
-      m.frustumCulled = false;
-      this.root.add(m);
-      this.whirls.push(m);
+      };
+      const coreU = {
+        ...outerU,
+        uAlpha: { value: 1 },
+        uCoreK: { value: 1 },
+        uTwist: { value: 2.6 },
+      };
+      const extra = { side: THREE.DoubleSide, blending: THREE.AdditiveBlending } as const;
+      const outer = mesh(
+        funnel,
+        shader('smithHeartFinalWhirl', outerU, WHIRL_VERT, WHIRL_FRAG, extra),
+        'smithHeartFinalWhirl',
+      );
+      const core = mesh(
+        coreGeo,
+        shader('smithHeartFinalWhirlCore', coreU, WHIRL_VERT, WHIRL_FRAG, extra),
+        'smithHeartFinalWhirlCore',
+      );
+      this.whirls.push({ outer, core, outerU, coreU });
     }
-    // The Storm Orbs.
-    const orbGeo = new THREE.SphereGeometry(1, 24, 16);
-    this.geometries.push(orbGeo);
-    this.orbMat = new THREE.ShaderMaterial({
-      name: 'smithHeartFinalOrb',
-      uniforms: { uTime: this.uTime, uCrackle: { value: 0.4 }, uStorm: col(C.storm) },
-      vertexShader: UV_VERT,
-      fragmentShader: ORB_FRAG,
+    // The Storm Orbs: a fresnel shell of storm light, a pulsing core, a ring
+    // turning round it.
+    const orbGeo = new THREE.SphereGeometry(1, 32, 20);
+    const orbCoreGeo = new THREE.SphereGeometry(0.42, 16, 12);
+    const orbRingGeo = new THREE.TorusGeometry(1.35, 0.045, 6, 48);
+    this.geometries.push(orbGeo, orbCoreGeo, orbRingGeo);
+    const ringMat = new THREE.MeshBasicMaterial({
+      name: 'smithHeartFinalOrbRing',
+      color: 0xd8ccff,
       transparent: true,
-      depthWrite: false,
+      opacity: 0.8,
       blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      toneMapped: false,
     });
-    this.materials.push(this.orbMat);
+    this.materials.push(ringMat);
     for (let i = 0; i < P.orbs; i++) {
-      const m = new THREE.Mesh(orbGeo, this.orbMat);
-      m.name = 'smithHeartFinalOrb';
-      m.visible = false;
-      m.frustumCulled = false;
-      this.root.add(m);
-      this.orbs.push(m);
+      const crackle = { value: 0.4 };
+      const u = { uTime: this.uTime, uCrackle: crackle, uStorm: col(C.storm) };
+      const extra = { blending: THREE.AdditiveBlending } as const;
+      const shell = mesh(
+        orbGeo,
+        shader('smithHeartFinalOrb', u, KIT_UV_VERT, ORB_FRAG, extra),
+        'smithHeartFinalOrb',
+      );
+      const core = mesh(
+        orbCoreGeo,
+        shader('smithHeartFinalOrbCore', u, KIT_UV_VERT, ORB_CORE_FRAG, extra),
+        'smithHeartFinalOrbCore',
+      );
+      const ring = mesh(orbRingGeo, ringMat, 'smithHeartFinalOrbRing');
+      this.orbs.push({ shell, core, ring, crackle });
     }
-    // The ice round the frozen, the stone round the shelled.
-    const iceGeo = new THREE.BoxGeometry(1.6, 2.6, 1.6).translate(0, 1.3, 0);
-    this.geometries.push(iceGeo);
-    const iceMat = new THREE.ShaderMaterial({
-      name: 'smithHeartFinalIce',
-      uniforms: { uTime: this.uTime, uFrost: col(C.frost) },
-      vertexShader: UV_VERT,
-      fragmentShader: ICE_FRAG,
-      transparent: true,
-      depthWrite: false,
-    });
-    this.materials.push(iceMat);
-    for (let i = 0; i < P.ice; i++) {
-      const m = new THREE.Mesh(iceGeo, iceMat);
-      m.name = 'smithHeartFinalIce';
-      m.visible = false;
-      m.frustumCulled = false;
-      this.root.add(m);
-      this.ice.push(m);
-    }
-    const shellGeo = new THREE.IcosahedronGeometry(1.25, 0).translate(0, 1.1, 0);
-    this.geometries.push(shellGeo);
-    const shellMat = new THREE.MeshLambertMaterial({
-      name: 'smithHeartFinalShell',
-      color: new THREE.Color(...C.stone),
-      transparent: true,
-      opacity: 0.55,
-      flatShading: true,
-      depthWrite: false,
-    });
-    this.materials.push(shellMat);
-    for (let i = 0; i < P.shells; i++) {
-      const m = new THREE.Mesh(shellGeo, shellMat);
-      m.name = 'smithHeartFinalShell';
-      m.visible = false;
-      m.frustumCulled = false;
-      this.root.add(m);
-      this.shells.push(m);
-    }
+    // The ice round the frozen, the granite round the shelled.
+    const iceGeo = iceCrust();
+    const shellGeo = shellStone();
+    this.geometries.push(iceGeo, shellGeo);
+    const iceMat = shader(
+      'smithHeartFinalIce',
+      { uTime: this.uTime, uFrost: col(C.frost) },
+      KIT_UV_VERT,
+      ICE_FRAG,
+    );
+    for (let i = 0; i < P.ice; i++) this.ice.push(mesh(iceGeo, iceMat, 'smithHeartFinalIce'));
+    const shellMat = shader(
+      'smithHeartFinalShell',
+      { uTime: this.uTime, uStone: col(C.stone), uGold: col([1.0, 0.78, 0.36]) },
+      KIT_UV_VERT,
+      SHELL_FRAG,
+    );
+    for (let i = 0; i < P.shells; i++)
+      this.shells.push(mesh(shellGeo, shellMat, 'smithHeartFinalShell'));
     // The lightning: thin segments between the bodies it leaps through.
     const arcGeo = new THREE.CylinderGeometry(1, 1, 1, 5, 1, true).translate(0, 0.5, 0);
     this.geometries.push(arcGeo);
@@ -393,93 +379,95 @@ export class FinalKitFx {
     this.spikes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < P.rootSpikes; i++) this.spikes.setMatrixAt(i, _m.makeScale(0, 0, 0));
     this.root.add(this.spikes);
-    // The great anvil: dark iron, its face and horn, its underside glowing.
-    // Dark forged iron, hot from within (its emissive): it reads as a black
-    // weight against the bright room, never a pale box under its light.
-    const iron = new THREE.MeshLambertMaterial({
-      name: 'smithHeartFinalAnvilIron',
-      color: 0x4a423c,
-      emissive: 0x1c0802,
+    // The great anvil: carved from one block of granite (its stone toned per
+    // vertex, chiselled flat), gold crystals set in its face, heel and
+    // flanks, its veins and crystals hotter as it falls. Built-in materials
+    // (lit by the room like the rest of the Heart's stone): only their
+    // colours move a frame, never their programs.
+    const stoneGeo = anvilStone();
+    const crystalGeo = anvilCrystals();
+    this.geometries.push(stoneGeo, crystalGeo);
+    this.anvilStoneMat = new THREE.MeshLambertMaterial({
+      name: 'smithHeartFinalAnvilStone',
+      vertexColors: true,
       flatShading: true,
+      emissive: 0x120804,
     });
-    this.anvilGlow = new THREE.MeshBasicMaterial({
-      name: 'smithHeartFinalAnvilGlow',
-      color: C.soak,
-      transparent: true,
-      opacity: 0.6,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
+    this.anvilCrystalMat = new THREE.MeshBasicMaterial({
+      name: 'smithHeartFinalAnvilCrystal',
+      color: 0xffb030,
       toneMapped: false,
     });
-    this.materials.push(iron, this.anvilGlow);
-    const piece = (
-      geo: THREE.BufferGeometry,
-      x: number,
-      y: number,
-      z: number,
-      mat: THREE.Material,
-    ) => {
-      this.geometries.push(geo);
+    this.materials.push(this.anvilStoneMat, this.anvilCrystalMat);
+    for (const [geo, mat] of [
+      [stoneGeo, this.anvilStoneMat],
+      [crystalGeo, this.anvilCrystalMat],
+    ] as const) {
       const m = new THREE.Mesh(geo, mat);
-      m.position.set(x, y, z);
       m.frustumCulled = false;
       this.anvil.add(m);
-      return m;
-    };
-    piece(new THREE.BoxGeometry(7, 1.6, 4.4), 0, 0.8, 0, iron);
-    piece(new THREE.BoxGeometry(4, 2.4, 2.6), 0, 2.8, 0, iron);
-    piece(new THREE.BoxGeometry(9, 1.8, 3.6), -0.6, 4.9, 0, iron);
-    piece(new THREE.ConeGeometry(1.4, 4, 8).rotateZ(Math.PI / 2), 5.8, 4.9, 0, iron);
-    piece(new THREE.CircleGeometry(5.2, 32).rotateX(Math.PI / 2), 0, 0.02, 0, this.anvilGlow);
+    }
     this.anvil.name = 'smithHeartFinalAnvil';
     this.anvil.visible = false;
     this.root.add(this.anvil);
-    // The gale's rim band (every tier): a flat ring from the band's inner edge
-    // to the rim, on its own floor rung.
-    const rimGeo = new THREE.RingGeometry(R.rimInner, R.rimOuter, 160, 1).rotateX(-Math.PI / 2);
+    // The gale's rim band (every tier): a flat ring from just inside the
+    // band's edge to the rim, on its own floor rung.
+    const rimGeo = new THREE.RingGeometry(R.rimInner - 2, R.rimOuter, 200, 2).rotateX(-Math.PI / 2);
     this.geometries.push(rimGeo);
-    this.rimMat = new THREE.ShaderMaterial({
-      name: 'smithHeartFinalRimBand',
-      uniforms: {
+    this.rimMat = shader(
+      'smithHeartFinalRimBand',
+      {
         uTime: this.uTime,
         uAlpha: { value: 0 },
         uHeading: { value: 0 },
+        uInner: { value: R.rimInner },
+        uOuter: { value: R.rimOuter },
+        uDetail: { value: detail ? 1 : 0 },
         uColor: { value: new THREE.Color(FINAL_FOOTPRINTS.rim.color) },
+        uStorm: col(C.storm),
       },
-      vertexShader: RIM_VERT,
-      fragmentShader: RIM_FRAG,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
-    this.materials.push(this.rimMat);
-    this.rim = new THREE.Mesh(rimGeo, this.rimMat);
-    this.rim.name = 'smithHeartFinalRimBand';
+      RIM_VERT,
+      RIM_FRAG,
+      { side: THREE.DoubleSide, blending: THREE.AdditiveBlending },
+    );
+    this.rim = mesh(rimGeo, this.rimMat, 'smithHeartFinalRimBand');
     this.rim.renderOrder = floorVfxRenderOrder('encounter', F.rim);
-    this.rim.visible = false;
-    this.rim.frustumCulled = false;
-    this.root.add(this.rim);
-    // Heart Unbound's blaze round the boss in the ring.
-    const ringGeo = new THREE.RingGeometry(6, 9, 64, 1).rotateX(-Math.PI / 2);
+    const veins = {
+      uHeat: { value: new THREE.Color(C.heat) },
+      uQuench: { value: new THREE.Color(C.quench) },
+      uBreath: { value: new THREE.Color(C.breath) },
+      uHammer: { value: new THREE.Color(C.hammer) },
+    };
+    // Heart Unbound's blazing ring round the boss in the centre.
+    const ringGeo = new THREE.RingGeometry(2.5, 14, 96, 3).rotateX(-Math.PI / 2);
     this.geometries.push(ringGeo);
-    this.unboundMat = new THREE.MeshBasicMaterial({
-      name: 'smithHeartFinalUnbound',
-      color: 0xffd890,
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      toneMapped: false,
-    });
-    this.materials.push(this.unboundMat);
-    this.unboundRing = new THREE.Mesh(ringGeo, this.unboundMat);
-    this.unboundRing.name = 'smithHeartFinalUnbound';
+    this.unboundRing = mesh(
+      ringGeo,
+      shader(
+        'smithHeartFinalUnbound',
+        { uTime: this.uTime, uK: this.unboundK, ...veins },
+        RIM_VERT,
+        UNBOUND_FRAG,
+        { side: THREE.DoubleSide, blending: THREE.AdditiveBlending },
+      ),
+      'smithHeartFinalUnbound',
+    );
     this.unboundRing.renderOrder = floorVfxRenderOrder('encounter', F.marks);
-    this.unboundRing.visible = false;
-    this.unboundRing.frustumCulled = false;
-    this.root.add(this.unboundRing);
+    // The switch's shockwave over the floor (every tier).
+    const shockGeo = new THREE.CircleGeometry(100, 160).rotateX(-Math.PI / 2);
+    this.geometries.push(shockGeo);
+    this.shock = mesh(
+      shockGeo,
+      shader(
+        'smithHeartFinalShock',
+        { uFront: this.shockFront, uAlpha: this.shockAlpha, ...veins },
+        RIM_VERT,
+        SHOCK_FRAG,
+        { side: THREE.DoubleSide, blending: THREE.AdditiveBlending },
+      ),
+      'smithHeartFinalShock',
+    );
+    this.shock.renderOrder = floorVfxRenderOrder('encounter', F.shock);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -634,6 +622,10 @@ export class FinalKitFx {
   /** The switch's shockwave: rings of the four veins' light racing out over
    *  the whole Anvil from where the boss crossed. */
   private veinShockAt(x: number, z: number): void {
+    // The floor wave (every tier): four bands racing out over the Anvil.
+    this.shockAt = this.clock;
+    this.shock.position.set(x, this.groundY(x, z) + 0.06, z);
+    this.shock.visible = true;
     for (let i = 0; i < VEIN_RINGS.length; i++)
       this.particles.shockRing(x, z, VEIN_RINGS[i], 30 + i * 9, 0.9 + i * 0.15);
     this.sparkAt(x, z, [1, 0.9, 0.7], 40, 6);
@@ -682,17 +674,19 @@ export class FinalKitFx {
     }
     this.active = true;
     this.scan(world, dt);
-    for (const s of this.slots) s.seen = false;
+    for (const el of ELEMENTS) for (const s of this.pools[el]) s.seen = false;
     this.paintObjects(world);
     this.paintMarks(world);
     this.paintBoss(world);
-    for (const s of this.slots)
-      if (!s.seen && s.key !== 0) {
-        this.slotByKey.delete(s.key);
-        s.key = 0;
-        s.fan.group.visible = false;
-      }
+    for (const el of ELEMENTS)
+      for (const s of this.pools[el])
+        if (!s.seen && s.key !== 0) {
+          this.slotByKey.delete(s.key);
+          s.key = 0;
+          s.d.fan.group.visible = false;
+        }
     this.paintArcs(world);
+    this.paintShock();
     this.particles.update(this.clock);
   }
 
@@ -718,9 +712,11 @@ export class FinalKitFx {
     for (const id of this.seen.keys()) if (!world.entities.has(id)) this.seen.delete(id);
   }
 
-  /** The fan for `key` this frame, styled and draped at (x, z). */
+  /** The fan for `key` this frame in `kind`'s element paint, styled and
+   *  draped at (x, z). */
   private foot(
     key: number,
+    kind: FinalTelegraphKind,
     style: TelegraphStyle,
     x: number,
     z: number,
@@ -731,23 +727,24 @@ export class FinalKitFx {
     let s = this.slotByKey.get(key);
     let fresh = false;
     if (!s) {
-      s = this.slots.find((q) => q.key === 0);
+      s = this.pools[finalTelegraphElement(kind)].find((q) => q.key === 0);
       if (!s) return;
       s.key = key;
       this.slotByKey.set(key, s);
       fresh = true;
     }
     s.seen = true;
+    this.tele.setLook(s.d, kind);
     if (s.style !== style) {
-      this.kit.layOutFan(s.fan, 360, style);
+      this.kit.layOutFan(s.d.fan, 360, style);
       s.style = style;
     }
     if (fresh || moving) {
       const y = this.groundY(x, z);
-      this.kit.drapeFan(s.fan, this.groundY, x, y, z, 0, radius);
+      this.kit.drapeFan(s.d.fan, this.groundY, x, y, z, 0, radius);
     }
-    this.kit.paintFan(s.fan, { fill, clock: this.clock, range: radius });
-    s.fan.group.visible = true;
+    this.kit.paintFan(s.d.fan, { fill, clock: this.clock, range: radius });
+    s.d.fan.group.visible = true;
   }
 
   private paintObjects(world: IWorld): void {
@@ -769,14 +766,19 @@ export class FinalKitFx {
         case 'whirlWarn':
         case 'whirl': {
           const warn = kind === 'whirlWarn' ? timedFill(age, T.whirlWarn) : 1;
-          this.foot(id, FINAL_FOOTPRINTS.whirl, x, z, R.whirl, warn, true);
-          const m = this.whirls[whirl++];
-          if (m) {
+          this.foot(id, 'whirl', FINAL_FOOTPRINTS.whirl, x, z, R.whirl, warn, true);
+          const w = this.whirls[whirl++];
+          if (w) {
             const spin = whirlSpin(this.clock, warn);
-            m.position.set(x, y, z);
-            m.rotation.y = spin.angle;
-            m.scale.set(R.whirl * 0.9, spin.height, R.whirl * 0.9);
-            m.visible = true;
+            const live = kind === 'whirl' ? 1 : 0.35 + 0.5 * warn;
+            w.outer.position.set(x, y, z);
+            w.outer.scale.set(R.whirl * 0.95, spin.height, R.whirl * 0.95);
+            w.core.position.set(x, y, z);
+            w.core.scale.set(R.whirl * 0.8, spin.height * 0.92, R.whirl * 0.8);
+            w.outerU.uAlpha.value = live;
+            w.coreU.uAlpha.value = live;
+            w.outer.visible = true;
+            w.core.visible = true;
           }
           if (kind === 'whirl' && this.rand() < 0.8 * this.density)
             this.particles.puff(x, y + 1, z, 2, {
@@ -793,7 +795,7 @@ export class FinalKitFx {
         }
         case 'emberPool':
         case 'forgePool': {
-          this.foot(id, FINAL_FOOTPRINTS.pool, x, z, r, 1, false);
+          this.foot(id, 'pool', FINAL_FOOTPRINTS.pool, x, z, r, 1, false);
           if (this.rand() < (kind === 'emberPool' ? 0.9 : 0.7) * this.density)
             this.particles.puff(x, y + 0.2, z, 2, {
               speed: 0.6,
@@ -809,7 +811,7 @@ export class FinalKitFx {
         }
         case 'crack': {
           const fill = timedFill(age, finalObjectSeconds(e.templateId));
-          this.foot(id, FINAL_FOOTPRINTS.crack, x, z, r, fill, false);
+          this.foot(id, 'crack', FINAL_FOOTPRINTS.crack, x, z, r, fill, false);
           if (this.rand() < 0.5 * this.density)
             this.particles.puff(x, y + 0.2, z, 1, {
               speed: 1,
@@ -824,7 +826,7 @@ export class FinalKitFx {
         }
         case 'tremor': {
           const fill = timedFill(age, finalObjectSeconds(e.templateId));
-          this.foot(id, FINAL_FOOTPRINTS.tremor, x, z, r, fill, false);
+          this.foot(id, 'tremor', FINAL_FOOTPRINTS.tremor, x, z, r, fill, false);
           if (this.rand() < fill * 0.7 * this.density)
             this.particles.puff(x, y + 0.2, z, 1, {
               speed: 1.2,
@@ -841,14 +843,28 @@ export class FinalKitFx {
         case 'orb': {
           const life = finalObjectSeconds(e.templateId) || T.orbLife;
           const left = 1 - timedFill(age, life);
-          this.foot(id, FINAL_FOOTPRINTS.orb, x, z, r + 0.5, 1 - left, false);
-          const m = this.orbs[orb++];
-          if (m) {
+          this.foot(id, 'orb', FINAL_FOOTPRINTS.orb, x, z, r + 0.5, 1 - left, false);
+          const ob = this.orbs[orb++];
+          if (ob) {
             const bob = orbBob(this.clock + id, left);
-            m.position.set(x, y + bob.y, z);
-            m.scale.setScalar(1.5 + 0.2 * Math.sin(this.clock * 9 + id));
-            this.orbMat.uniforms.uCrackle.value = bob.crackle;
-            m.visible = true;
+            const size = 1.5 + 0.12 * Math.sin(this.clock * 9 + id);
+            ob.shell.position.set(x, y + bob.y, z);
+            ob.shell.scale.setScalar(size);
+            ob.core.position.copy(ob.shell.position);
+            ob.core.scale.setScalar(size * (0.9 + 0.25 * bob.crackle));
+            ob.ring.position.copy(ob.shell.position);
+            ob.ring.scale.setScalar(size);
+            ob.ring.rotation.set(
+              1.1 + 0.3 * Math.sin(this.clock * 0.7 + id),
+              this.clock * 2.2 + id,
+              0,
+            );
+            ob.crackle.value = bob.crackle;
+            ob.shell.visible = true;
+            ob.core.visible = true;
+            ob.ring.visible = true;
+            if (this.rand() < bob.crackle * 0.35 * this.density)
+              this.sparkAt(x, z, C.storm, 1, 1.4);
           }
           break;
         }
@@ -859,11 +875,29 @@ export class FinalKitFx {
             boss && boss.castingAbility === FINAL_CASTS.anvil
               ? telegraphFillOf(boss.castRemaining, boss.castTotal > 0 ? boss.castTotal : total)
               : timedFill(age, total);
-          this.foot(id, FINAL_FOOTPRINTS.anvil, x, z, r, fill, true);
+          this.foot(id, 'anvil', FINAL_FOOTPRINTS.anvil, x, z, r, fill, true);
           const drop = anvilDrop(fill);
           this.anvil.position.set(x, y + drop.height, z);
-          this.anvil.rotation.y = this.clock * 0.15;
-          this.anvilGlow.opacity = 0.25 + 0.55 * drop.glow;
+          this.anvil.rotation.y = 0.9 + this.clock * 0.12;
+          // Its crystals and the heat in its stone burn hotter as it falls.
+          this.anvilCrystalMat.color.setRGB(
+            0.8 + 0.7 * drop.glow,
+            0.45 + 0.4 * drop.glow,
+            0.1 + 0.12 * drop.glow,
+          );
+          this.anvilStoneMat.emissive.setRGB(0.09 * drop.glow, 0.035 * drop.glow, 0.01);
+          // Grit and gold motes falling off it as it hangs and drops.
+          if (this.rand() < 0.5 * this.density)
+            this.particles.puff(x, y + drop.height + 0.5, z, 1, {
+              speed: 0.6,
+              up: -3,
+              life: 1.2,
+              size: [0.3, 0.12],
+              color: [1, 0.8, 0.45],
+              alpha: 1,
+              pool: 'glow',
+              radius: R.anvil * 0.6,
+            });
           this.anvil.visible = true;
           anvilShown = true;
           break;
@@ -875,8 +909,16 @@ export class FinalKitFx {
         default:
       }
     }
-    for (let i = whirl; i < this.whirls.length; i++) this.whirls[i].visible = false;
-    for (let i = orb; i < this.orbs.length; i++) this.orbs[i].visible = false;
+    for (let i = whirl; i < this.whirls.length; i++) {
+      this.whirls[i].outer.visible = false;
+      this.whirls[i].core.visible = false;
+    }
+    for (let i = orb; i < this.orbs.length; i++) {
+      const ob = this.orbs[i];
+      ob.shell.visible = false;
+      ob.core.visible = false;
+      ob.ring.visible = false;
+    }
     if (!anvilShown) this.anvil.visible = false;
     this.paintWind(wind);
   }
@@ -894,7 +936,7 @@ export class FinalKitFx {
     const cz = this.originZ + HEART_ROOM.z;
     this.rim.position.set(cx, this.groundY(cx, cz) + 0.08, cz);
     this.rimMat.uniforms.uHeading.value = this.windHeading;
-    this.rimMat.uniforms.uAlpha.value = blowing ? 1 : 0.35 + 0.25 * Math.sin(this.clock * 8);
+    this.rimMat.uniforms.uAlpha.value = blowing ? 1 : 0.45 + 0.25 * Math.sin(this.clock * 8);
     this.rim.visible = true;
     const n = blowing ? 6 : 1;
     const sx = Math.sin(this.windHeading);
@@ -942,7 +984,7 @@ export class FinalKitFx {
       for (const a of p.auras) {
         if (a.id === FINAL_AURAS.ember) {
           const fill = a.duration > 0 ? 1 - a.remaining / a.duration : 1;
-          this.foot(-(pid * 8 + 1), FINAL_FOOTPRINTS.ember, x, z, R.ember, fill, true);
+          this.foot(-(pid * 8 + 1), 'ember', FINAL_FOOTPRINTS.ember, x, z, R.ember, fill, true);
           if (this.rand() < 0.5 * this.density)
             this.particles.puff(x, y + 2.2, z, 1, {
               speed: 1,
@@ -955,7 +997,7 @@ export class FinalKitFx {
               radius: 0.5,
             });
         } else if (a.id === FINAL_AURAS.drawn) {
-          this.foot(-(pid * 8 + 2), FINAL_FOOTPRINTS.drawn, x, z, R.drawn, 0, true);
+          this.foot(-(pid * 8 + 2), 'drawn', FINAL_FOOTPRINTS.drawn, x, z, R.drawn, 0, true);
           if (this.rand() < 0.6 * this.density) this.sparkAt(x, z, C.storm, 1, 0.6);
         } else if (a.id === FINAL_AURAS.frozen || a.id === FINAL_AURAS.underIce) {
           const m = this.ice[ice++];
@@ -971,6 +1013,23 @@ export class FinalKitFx {
             m.rotation.y = this.clock * 0.2 + pid;
             m.visible = true;
           }
+        } else if (a.id === FINAL_AURAS.crushed) {
+          const fill = a.duration > 0 ? 1 - a.remaining / a.duration : 1;
+          this.foot(
+            -(pid * 8 + 4),
+            'crushed',
+            FINAL_FOOTPRINTS.crushed,
+            x,
+            z,
+            R.crushed,
+            fill,
+            true,
+          );
+        } else if (a.id === FINAL_AURAS.cold && pid === world.playerId && (a.value ?? 0) > 0) {
+          // Your own cold's reach: the ring your two allies must stand in,
+          // frost closing in as the cold rises.
+          const fill = coldReachFill(a.value ?? 0);
+          this.foot(-(pid * 8 + 5), 'cold', FINAL_FOOTPRINTS.cold, x, z, R.cold, fill, true);
         }
       }
     }
@@ -994,7 +1053,16 @@ export class FinalKitFx {
           boss.castRemaining,
           boss.castTotal > 0 ? boss.castTotal : T.boltCast,
         );
-        this.foot(-(t.id * 8 + 3), FINAL_FOOTPRINTS.bolt, t.pos.x, t.pos.z, R.bolt, fill, true);
+        this.foot(
+          -(t.id * 8 + 3),
+          'bolt',
+          FINAL_FOOTPRINTS.bolt,
+          t.pos.x,
+          t.pos.z,
+          R.bolt,
+          fill,
+          true,
+        );
         if (this.rand() < 0.7 * this.density) this.sparkAt(t.pos.x, t.pos.z, C.storm, 1, 1);
       }
     }
@@ -1028,8 +1096,8 @@ export class FinalKitFx {
     if (stacks > 0) {
       const k = Math.min(1, stacks / 10);
       this.unboundRing.position.set(x, y + 0.1, z);
-      this.unboundRing.scale.setScalar(1 + 0.6 * k + 0.08 * Math.sin(this.clock * 10));
-      this.unboundMat.opacity = 0.35 + 0.5 * k;
+      this.unboundRing.scale.setScalar(1 + 0.25 * k + 0.03 * Math.sin(this.clock * 10));
+      this.unboundK.value = k;
       if (this.rand() < (0.4 + k) * this.density) this.sparkAt(x, z, [1, 0.8, 0.45], 2, 7);
     }
   }
@@ -1073,16 +1141,39 @@ export class FinalKitFx {
     this.arcsMesh.visible = n > 0;
   }
 
+  /** The switch's floor wave, riding out and fading. */
+  private paintShock(): void {
+    if (!this.shock.visible) return;
+    const w = shockWave(this.clock - this.shockAt);
+    if (w.alpha <= 0) {
+      this.shock.visible = false;
+      return;
+    }
+    this.shockFront.value = w.front;
+    this.shockAlpha.value = w.alpha;
+  }
+
   private leave(): void {
     this.active = false;
     this.rosterSeen = Number.NaN;
-    for (const s of this.slots) {
-      s.key = 0;
-      s.fan.group.visible = false;
-    }
+    for (const el of ELEMENTS)
+      for (const s of this.pools[el]) {
+        s.key = 0;
+        s.d.fan.group.visible = false;
+      }
     this.slotByKey.clear();
     this.seen.clear();
-    for (const m of [...this.whirls, ...this.orbs, ...this.ice, ...this.shells]) m.visible = false;
+    for (const w of this.whirls) {
+      w.outer.visible = false;
+      w.core.visible = false;
+    }
+    for (const ob of this.orbs) {
+      ob.shell.visible = false;
+      ob.core.visible = false;
+      ob.ring.visible = false;
+    }
+    for (const m of [...this.ice, ...this.shells]) m.visible = false;
+    this.shock.visible = false;
     this.anvil.visible = false;
     this.rim.visible = false;
     this.spikes.visible = false;

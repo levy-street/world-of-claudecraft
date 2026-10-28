@@ -16,6 +16,7 @@ import { FINAL_WIND_TAG } from '../src/sim/encounters/smith_heart/final_breath';
 import {
   FINAL_AURAS,
   FINAL_BOSS,
+  FINAL_CASTS,
   FINAL_NAMES,
   FINAL_ZONE_CODES,
   FINAL_OVERLOAD as O,
@@ -25,6 +26,7 @@ import {
 import type { Aura, SimEvent } from '../src/sim/types';
 import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
+import { castDisplayName } from '../src/ui/cast_display_name';
 import { buildFinalAlertView } from '../src/ui/hud/dungeon/final_alert_view';
 import { HeartOverloadPanel } from '../src/ui/hud/dungeon/heart_overload_painter';
 import {
@@ -86,6 +88,14 @@ describe('The Masterless Strength: what the raid reads', () => {
     ])
       expect(keys, k).toContain(`hudChrome.finalBoss.warn.${k}`);
     for (const w of warns) expect(t(w.textKey as never)).toBe(w.text);
+  });
+
+  it("its bars' cast labels read their names, never a raw id", () => {
+    // Jose's playtest: the Anvil's bar read heart_final_anvil on the target
+    // frame and the nameplate.
+    expect(castDisplayName(FINAL_CASTS.anvil)).toBe('Weight of the Anvil');
+    expect(castDisplayName(FINAL_CASTS.bolt)).toBe('Leaping Bolt');
+    expect(castDisplayName(FINAL_CASTS.fist)).toBe('Basalt Fist');
   });
 
   it('every damage and aura name re-localizes', () => {

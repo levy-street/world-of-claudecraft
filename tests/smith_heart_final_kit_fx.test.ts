@@ -114,7 +114,12 @@ describe("the final kits' plan", () => {
       expect(r).toBeGreaterThanOrEqual(0);
       expect(r).toBeLessThan(30);
     }
-    expect(FINAL_KIT_FLOOR.footprintCurtain).toBe(FINAL_KIT_FLOOR.footprint + 2);
+    // The element telegraphs: every char (multiplies commute) under every
+    // glow, the cosmetic curtains over both.
+    expect(FINAL_KIT_FLOOR.telegraphChar).toBeLessThan(FINAL_KIT_FLOOR.telegraphGlow);
+    expect(FINAL_KIT_FLOOR.telegraphGlow).toBeLessThan(FINAL_KIT_FLOOR.telegraphCurtain);
+    for (const r of [HEAT_FLOOR.fistTelegraphGlow.step, HEAT_FLOOR.wakeGlow.step])
+      expect(FINAL_KIT_FLOOR.telegraphChar).not.toBe(r);
   });
 
   it('hangs the anvil high through its bar and lands it at the end; the root rises and sinks', () => {
@@ -315,7 +320,10 @@ describe('FinalKitFx over a fake world', () => {
     // bolt's target ring: every tier.
     expect(footprintsShown(root)).toBe(9);
     expect(visibleNamed(root, 'smithHeartFinalWhirl')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalWhirlCore')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalOrb')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalOrbCore')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalOrbRing')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalIce')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalShell')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(1);
@@ -346,6 +354,12 @@ describe('FinalKitFx over a fake world', () => {
     expect(fx.handleEvent(land)).toBe(true);
     expect(shaken).toBeGreaterThan(0);
     expect(fx.handleEvent({ ...land, ability: 'heart_heat_fist_land' } as SimEvent)).toBe(false);
+    // The switch's shockwave rides out over the floor and fades.
+    expect(fx.handleEvent({ ...land, ability: FINAL_CUES.shock } as SimEvent)).toBe(true);
+    fx.update(1 / 30);
+    expect(visibleNamed(root, 'smithHeartFinalShock')).toBe(1);
+    for (let i = 0; i < 60; i++) fx.update(1 / 30);
+    expect(visibleNamed(root, 'smithHeartFinalShock')).toBe(0);
     // An object gone: its footprint goes with it.
     entities.delete(10);
     (world as { entityRosterVersion: number }).entityRosterVersion = 2;

@@ -412,6 +412,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // FINAL_KIT_FLOOR, pinned untied in tests/smith_heart_final_kit_fx.test.ts);
   // its whirls, orbs, ice, shells and anvil are bodies at the default order.
   { file: 'src/render/smith_heart_fx/final_kit_fx.ts', layer: 'encounter', strict: true },
+  // Its element telegraphs (the Quench's frost, the Breath's storm, the
+  // Hammer's granite, the Heat's molten basalt): char, glow and curtain on
+  // the kit's own rungs (FINAL_KIT_FLOOR).
+  { file: 'src/render/smith_heart_fx/final_telegraphs.ts', layer: 'encounter', strict: true },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];
