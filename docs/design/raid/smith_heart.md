@@ -1674,10 +1674,11 @@ Flare-Scorched, The First Wellspring, The First Flame and Wellspring Fire are pl
   sketch (form choice at an altar, altar drags, adds at every 25 percent) is superseded.
 - **Part 1, built (this section).** The rules and the four kits on Normal, Heroic and
   Mythic, the base form, the dev verbs, the raid HUD, the warnings, the tooltips and the
-  kits' look. **Part 2, not built:** the intermissions at 70 and 40 percent with the four
-  adds, the 15 percent final phase's mix and its soft enrage, the Mythic hidden phase, loot
-  (the base form's extra item: the state aura carries the base form as its hook), the final
-  models, the voice.
+  kits' look. **Part 2, built (28 Oct 2026, below "Part 2"):** the intermissions at 70 and
+  40 percent with their Splinters, the poured elements, the 15 percent final phase's mix and
+  its soft enrage. **Not built:** the Mythic hidden phase (its hook only), loot (the base
+  form's extra item: the state aura carries the base form as its hook), the final models,
+  the voice.
 
 **A PROTOTYPE, numbers unmeasured.** Every tunable lives in one table, `FINAL_TUNING` and
 `FINAL_DIFFICULTY` in `src/sim/encounters/smith_heart/final_ids.ts`, so a change is one
@@ -1750,6 +1751,84 @@ gating, determinism, a headless full fight per tier dragged round all four quart
 burned down, the wipe), `tests/smith_heart_final_ui.test.ts`,
 `tests/smith_heart_final_wire.test.ts`, `tests/smith_heart_final_kit_fx.test.ts`,
 `tests/smith_heart_final_fx.test.ts`, `tests/smith_heart_final_dev.test.ts`.
+
+#### Part 2: the intermissions, the poured elements, the final phase
+
+**A PROTOTYPE, numbers unmeasured**, all in one table: `FINAL_PHASES` and
+`FINAL_PHASE_DIFFICULTY` in `src/sim/encounters/smith_heart/final_phase_ids.ts`. The code:
+`final_intermission.ts` (the thresholds, the stride, the shield, the call, the pour, the
+release), `final_adds.ts` (the Splinters), `final_last.ts` (the poured elements, the final
+phase, the enrage, the Mythic hook), `final_phase_dev.ts` (the dev verbs). The approved design
+is Jose's (28 Oct 2026, tab "5. The Masterless Strength", "Fight design"); every detail in the
+table that the design left open is a design call Jose may veto.
+
+| Piece | How it works (Normal unless said) | Where |
+|---|---|---|
+| The thresholds | At 70 and 40 percent of its health (a damage floor holds each line, so no burst skips one) | `final_intermission.ts` |
+| The stride | It strides to the centre at 16 yd a second (at most 3 s; never dragged), shielded from its first step (Gathered Strength: immune, untargetable); its bar, the bar's footprint and its root are dropped | `final_intermission.ts` |
+| Held still | Through the stride and the call the Overload bars neither fill, drain nor pulse; the switch mark's clock and every player's Vein-Shaken hold; Heart Unbound never ticks; the quarter kit stops (footprints already down run out) | `final_intermission.ts`, `final_rules.ts` |
+| Call of the Quarters | A 40 s channel (a real cast bar). One Splinter rises from each of the fullest bars' quarters: 2 Normal, 3 Heroic, 4 Mythic (ties: the quarter it stood in last, then clockwise). Each climbs out for 2.5 s (immune), then takes the player nearest it. The awake quarters are the living Splinters' (the room lights them) | `final_intermission.ts` |
+| Splintered Strength | Every living Splinter strikes the whole raid every 3 s for 30 to 36, 30 percent more each pulse of the call | `final_intermission.ts` |
+| The end | All Splinters dead: the shield breaks at once. The channel run out: each Splinter still alive pours its element into the boss for the rest of the fight. Then it takes the fight from the centre, walks to its tank, and Heart Unbound holds 8 s (no root if it returns to the quarter it last drank) | `final_intermission.ts` |
+| Shearing Blow (every Splinter) | Every 11 s a 2 s bar at its target, facing locked, the cone (100 degrees, 10 yd) on the floor: its target takes 1,100 to 1,250, anyone else in it 4,200 to 4,600 (lethal) | `final_adds.ts` |
+| Splinter of the Heat | Cinder Trail: a burning patch (3 yd, 18 s, 110 to 130 a second) every 3 yd it is dragged: kite it away. Bursting Coal every 15 s: one marked player (two on Mythic); 6 s later it bursts on everyone else within 8 yd (1,600 to 1,800) and a little on them (280 to 320) | `final_adds.ts` |
+| Splinter of the Quench | Rime Toll every 12 s: a kickable 2.5 s bar; rung out, 650 to 720 to the whole raid; a kick's lockout blocks the next. Quenching Ring every 9 s: a ring of frost expands from it (7 yd a second to 42 yd) with 3 gaps (2 on Heroic and Mythic, 30 degrees each); whoever it reaches outside a gap takes 380 to 420 and is chilled (50 percent slower, 3 s) | `final_adds.ts` |
+| Splinter of the Hammer | Mounting Weight: every landed swing a stack on its target (the swing kernel's stacking poison, 6 a second a stack, 25 s), and its swings land 15 percent harder per stack it sees on its target (18 on Heroic, 20 on Mythic): the tanks swap at about 5 | `final_adds.ts`, content `stackPoison` |
+| Splinter of the Breath | Gale Pounce every 14 s: a 1.5 s bar on a hashed player (never its tank), then it leaps onto them (300 to 340) and hunts them 8 s (Wind-Tethered); its Buffeting Gale strikes everyone else within 7 yd of it every second (240 to 280): the quarry drags it out of the group. Its circles every 13 s: Storm Orbs round it (2, or 3 on Mythic), each a solo soak (the kit's orbs) | `final_adds.ts` |
+| Poured elements | For the rest of the fight, wherever it stands: Heat, Fire Whirls every 26 s; Breath, Leaping Bolt every 22 s; Hammer, Tremor Cracks every 20 s; Quench, the cold everywhere at half its rise. Poured twice: twice as often (the cold never past whole). Painful together, never an instant wipe: each is a Normal mechanic, slower | `final_last.ts` |
+| The final phase | At 15 percent it strides into the centre and stays there; all four quarters wake; the bars are off and the ring is its own. Every 7 s, in turn: Fire Whirls, Groaning Ice, Leaping Bolt, Weight of the Anvil (each with its tier's additions), never two at once | `final_last.ts` |
+| Masterless Fury | The soft enrage: 120 s into the final phase (warned 10 s before) it strikes the raid every 2 s for 120 to 140, 35 percent more each pulse | `final_last.ts` |
+| The Mythic hidden phase | Not designed: `FINAL_PHASE_DIFFICULTY.hiddenPhase` (false everywhere) and `mythicHiddenPhase` are its clean hook | `final_last.ts` |
+| No adds from adds | No Splinter raises anything (pinned by the tests) | `final_adds.ts` |
+
+Splinter health per tier: 6,500 Normal, 7,000 Heroic, 7,500 Mythic (each its whole pool).
+Every mechanic's damage takes the tier's `damageMult` on top. Bodies: borrowed, retinted and
+drawn about 2.5 times a player (`render/characters/smith_heart_placeholder_looks.ts`: the
+Heat's the stone goleling in white-gold, the Quench's the rime elemental, the Breath's the
+storm caller, the Hammer's the stone golem); each wants its own model.
+
+**What every client reads** (no wire or `IWorld` change; pinned through the real server by
+`tests/smith_heart_final_phase_wire.test.ts`): the stage, the awake mask and the call's or
+the enrage's seconds on the boss's phase aura; Gathered Strength, each poured element and
+Masterless Fury as auras on the boss (their counts in `value`: a stack count of one never
+crosses the wire); the Splinters as real mobs with real cast bars (Rime Toll kickable); the
+Quenching Rings as objects (their gaps hashed from the template's seed, the same function in
+the sim and the painter); the marks as player auras.
+
+**The HUD** (`heart_overload_view.ts`): through a call the bars hold still and dim, the
+quarters whose Splinters live are lit, and the shield's seconds and the Splinters' count read
+under them; in the final phase the bars are off and the enrage's seconds (then Masterless
+Fury's stacks) read instead; the poured elements read on their own line all fight. The
+personal alert (`final_alert_view.ts`) puts Bursting Coal first, then Wind-Tethered, and tells
+a tank near the swap about Mounting Weight. Raid warnings `hudChrome.finalBoss.warn.*`,
+tooltips `hudChrome.auraEffect.finalBoss.*` (`src/ui/final_phase_aura_effect.ts`), the five
+non-Latin locales filled.
+
+**The look** (`render/smith_heart_fx/final_phase_fx.ts`, its plan `final_phase_fx_core.ts`):
+on every tier, Gathered Strength's dome of the four veins (crackling in the call's last 10 s),
+each Splinter's sigil in its vein's colour, Shearing Blow's cone in the Splinter's own element
+(lethal), Bursting Coal's reach and its coal, Gale Pounce's landing, the hunt's ring and storm
+tether, every Quenching Ring at the sim's front with its gaps cut clean and framed, the poured
+elements' rings round the boss's body, Masterless Fury's crown; the room lights the living
+Splinters' quarters (`heart_quarters_core.ts` mode `call`). Over them: the stride's trail of
+the four veins, a column of light as each Splinter rises, a beam as an element pours in, the
+shield shattering, four columns as the final phase wakes the quarters, the slash, the coal's
+burst, the toll's nova. Its floor rungs are its own (`FINAL_PHASE_FLOOR`).
+
+**Tests.** `tests/smith_heart_final_phase.test.ts` (the thresholds, the stride, the shield,
+the Splinters per tier and their quarters, the held rules, both ends of the call, each
+Splinter's signature, no add from an add, the final phase, the mix, the enrage, the poured
+elements, determinism, the full fight 100 to 0 per tier),
+`tests/smith_heart_final_phase_ui.test.ts`, `tests/smith_heart_final_phase_wire.test.ts`,
+`tests/smith_heart_final_phase_fx.test.ts`.
+
+Part 2's names (IP check 28 Oct 2026, exact phrase plus coined tokens against the major game
+wikis and a general search): Splinter of the Heat, Quench, Breath and Hammer, Splintered
+Strength, Shearing Blow, Bursting Coal, Rime Toll, Quenching Ring, Mounting Weight, Gale
+Pounce, Wind-Tethered, Buffeting Gale, Gathered Strength, Call of the Quarters, Poured Heat,
+Quench, Breath and Hammer, Masterless Fury: no game use found (CLEAR). "Splinter Cleave" was
+dropped for Shearing Blow (it surfaced as a term in a World of Warcraft talent note). Cinder
+Trail and Storm Orb are the raid's own, already checked.
 
 IP check (28 Oct 2026, exact phrase plus coined token on the major game wikis and a general
 search): Overload Pulse, Overload Burst, Vein Shock, Vein-Shaken, Heart Unbound, Weight of

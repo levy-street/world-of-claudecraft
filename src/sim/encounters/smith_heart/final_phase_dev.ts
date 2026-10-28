@@ -4,7 +4,7 @@
 //
 //   inter70 | inter40     an intermission now (its health set to the line)
 //   splinter <vein>       one Splinter rises out of that quarter now
-//   killadds              every Splinter dies now
+//   killadds [vein]       every Splinter (or that quarter's) dies now
 //   endcall               the call ends now (the living Splinters pour in)
 //   last                  its health to 15 percent: the final phase's stride
 //   enrage                Masterless Fury now (the final phase begun first)
@@ -69,8 +69,11 @@ export function finalPhaseDev(
       return raiseSplinter(s, v) ? `A Splinter of the ${v} rises.` : null;
     }
     case 'killadds': {
+      // `killadds <vein>`: only that quarter's.
+      const only = arg && HEART_QUARTER_ORDER.includes(arg as SmithHeartVein) ? arg : null;
       let n = 0;
       for (const a of ph.adds) {
+        if (only && a.vein !== only) continue;
         const e = addBody(s, a);
         if (!e) continue;
         e.damageImmune = false;
