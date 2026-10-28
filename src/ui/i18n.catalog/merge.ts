@@ -809,6 +809,8 @@ const mergeStringsEn = {
       heart_quenching_breath: 'Quenching Breath',
       heart_forge_wrath: 'Forge Wrath',
       heart_forge_pour: 'Forge Pour',
+      heart_final_leaping_bolt: 'Leaping Bolt',
+      heart_final_anvil: 'Weight of the Anvil',
       heart_gale_bolt: 'Gale Bolt',
       heart_rime_bolt: 'Rime Bolt',
       heart_ember_bolt: 'Ember Bolt',

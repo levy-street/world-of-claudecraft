@@ -57,6 +57,7 @@ import {
   stoneShell,
 } from './final_hammer';
 import {
+  clearFist,
   clearHeat,
   forgeFire,
   landFist,
@@ -96,6 +97,7 @@ import {
   bossFree,
   cueOn,
   dropAura,
+  dropFightObject,
   type FinalScope,
   heartListeners,
   holdPlanted,
@@ -400,11 +402,21 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
 
 /** The fight's scope for a dev command or a test (starting the fight state
  *  if none runs yet), or null when the claim holds no living boss. */
-/** A dev move of the boss mid-fight: its root lets go first. */
+/** A dev move of the boss mid-fight: its root lets go and its bar (and the
+ *  bar's footprint) is dropped first, so nothing holds it where it was. */
 export function releaseRootForDev(ctx: SimContext, inst: InstanceSlot): void {
   const boss = finalBoss(ctx, inst);
   const st = boss?.smithHeartFinal;
-  if (boss && st) endRoot(scopeOf(ctx, inst, st, boss));
+  if (!boss || !st) return;
+  const s = scopeOf(ctx, inst, st, boss);
+  endRoot(s);
+  if (!st.bar) return;
+  st.bar = null;
+  st.boltTarget = null;
+  clearFist(s);
+  if (st.anvil) dropFightObject(ctx, inst, st.anvil.objectId);
+  st.anvil = null;
+  clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
 }
 
 export function finalScopeForDev(ctx: SimContext, inst: InstanceSlot): FinalScope | null {

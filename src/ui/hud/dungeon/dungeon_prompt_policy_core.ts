@@ -12,7 +12,9 @@
 //    button), Gaoler Ossick's chain alert (a live gauge the player steers by:
 //    the links left on the anchor and the shackle's reach used, with the
 //    distance), the Smith's Heart's Guardian of the Quench cold bar (the
-//    player's own gauge, steered by the whole fight), and the use prompt (the
+//    player's own gauge, steered by the whole fight), the Masterless
+//    Strength's alert (the same cold gauge and the marks the player must
+//    move for), and the use prompt (the
 //    panel is the interact press on a brazier or a candle).
 //    It is a player-chosen interface preference, never a graphics-tier knob:
 //    this module takes the setting's own boolean and reads no preset, effects
@@ -35,6 +37,7 @@ export type DungeonPromptId =
   | 'crypt'
   | 'council'
   | 'quench'
+  | 'final'
   | 'temple'
   | 'kitUse';
 
@@ -49,6 +52,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   crypt: true,
   council: true,
   quench: false,
+  final: false,
   temple: true,
   kitUse: false,
 };
@@ -72,6 +76,8 @@ export interface DungeonPromptSlotState {
   council: boolean;
   /** The Smith's Heart's Guardian of the Quench cold bar. */
   quench: boolean;
+  /** The Smith's Heart's Masterless Strength alert (its cold, its marks). */
+  final: boolean;
   temple: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
   cryptSoft: boolean;
@@ -92,6 +98,7 @@ export function usePromptYields(s: DungeonPromptSlotState): boolean {
     (s.crypt && !s.cryptSoft) ||
     s.temple ||
     s.council ||
-    s.quench
+    s.quench ||
+    s.final
   );
 }

@@ -4779,6 +4779,29 @@ export const zh_CN: EnTranslations = {
         "hunted": "一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。",
         "crust": "已冷却变硬：此效果结束前，击打无法将它打退。"
       },
+      "finalBoss": {
+        "stateHeat": "饮下炽热：玄武岩之拳砸向一名玩家所在的位置，三道熔岩涌浪从那里滚滚而出，火焰旋风在地面上穿行。英雄难度下，余烬印记会在远程玩家脚下落下火焰；史诗难度下，它的正面攻击会留下熔炉之火。",
+        "stateQuench": "饮下淬火：{reach}码内其他玩家少于{allies}名的人会越来越冷并被冻结。英雄难度下，被标记玩家脚下的冰面会碎裂；史诗难度下，它的正面攻击会减速{slow}%。",
+        "stateBreath": "饮下吐息：狂风把团队推向边缘，跳跃雷击会在彼此相距{jump}码以内的玩家之间跳跃。英雄难度下，引雷会标记玩家；史诗难度下，每个风暴宝珠都必须由一名玩家拾取。",
+        "stateHammer": "饮下重锤：震颤裂痕在玩家脚下爆发，铁砧之重把伤害分摊给标记内的所有人。英雄难度下，石壳会吸收治疗，铁砧的分摊者会被粉碎；史诗难度下，铁砧的标记会绕着它旋转。",
+        "stateRing": "身处中央圆环时，它不饮下任何一角的力量。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。",
+        "overloadHeat": "炽热过载，已满{value}%。首领站在炽热区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。充满时会爆发，对整个团队造成{burstMin}至{burstMax}点伤害并清空。首领离开该区域后，它以三分之一的速度消退。",
+        "overloadQuench": "淬火过载，已满{value}%。首领站在淬火区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。充满时会爆发，对整个团队造成{burstMin}至{burstMax}点伤害并清空。首领离开该区域后，它以三分之一的速度消退。",
+        "overloadBreath": "吐息过载，已满{value}%。首领站在吐息区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。充满时会爆发，对整个团队造成{burstMin}至{burstMax}点伤害并清空。首领离开该区域后，它以三分之一的速度消退。",
+        "overloadHammer": "重锤过载，已满{value}%。首领站在重锤区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。充满时会爆发，对整个团队造成{burstMin}至{burstMax}点伤害并清空。首领离开该区域后，它以三分之一的速度消退。",
+        "root": "进入一个区域后扎根{seconds}秒：扎根结束前无法把它拖出去。",
+        "unbound": "每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。",
+        "shaken": "持续期间，切换区域对你造成的伤害提高至{mult}倍（{min}至{max}点，而非{baseMin}至{baseMax}点）。每次切换都会将其刷新为{seconds}秒。",
+        "cold": "寒冷值{value}/100。{reach}码内其他玩家少于{allies}名时每秒上升{rise}点，达到人数后下降。达到100时你会被霜封住：昏迷{freeze}秒并受到{min}至{max}点冰霜伤害。",
+        "frozen": "昏迷。你因独自站立而被冻结：在它饮下淬火时，保持在{allies}名或更多其他玩家的{reach}码内。",
+        "underIce": "昏迷：你从碎裂的冰面掉了下去。",
+        "numbing": "被它的正面攻击减速{pct}%，持续{seconds}秒。",
+        "ember": "{seconds}秒后余烬会落在你的脚下，在{radius}码的范围内阴燃{life}秒，每秒对其中的任何人造成{min}至{max}点火焰伤害。与其他被标记的玩家站到同一个角落，然后离开。",
+        "wind": "狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。",
+        "drawn": "在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。",
+        "shell": "吸收你受到的下{value}点治疗。",
+        "crushed": "{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。"
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -7385,6 +7408,45 @@ export const zh_CN: EnTranslations = {
         "wipe": "都化为灰烬吧。炉心依旧燃烧。",
         "death": "火焰……沉回……岩石之中。好好带着它。"
       }
+    },
+    "finalBoss": {
+      "warn": {
+        "enterHeat": "无主之力饮下了炽热！躲开拳头、涌浪和旋风！",
+        "enterQuench": "无主之力饮下了淬火！靠在一起，否则会冻结！",
+        "enterBreath": "无主之力饮下了吐息！散开并顶着风走！",
+        "enterHammer": "无主之力饮下了重锤！离开裂痕，分摊铁砧！",
+        "burst": "过载！力量冲破了铁砧！",
+        "unbound": "力量在中央脱缚了！把它拖出去！",
+        "embers": "余烬落向远程！把印记集中到一个角落，然后离开！",
+        "ice": "冰面在你脚下呻吟！在它碎裂之前离开！",
+        "wind": "吐息聚起了狂风！顶着风走，远离边缘！",
+        "drawn": "引雷！被标记的人与所有人保持8码距离！",
+        "orbs": "风暴宝珠！每个由一名玩家在它爆发前踩上去！",
+        "anvil": "铁砧之重！分摊它：所有未被粉碎的人站到标记下！"
+      }
+    },
+    "finalOverload": {
+      "title": "过载",
+      "heat": "Heat",
+      "quench": "淬火",
+      "breath": "吐息",
+      "hammer": "重锤",
+      "rooted": "扎根 {seconds}",
+      "free": "可以拖动",
+      "shaken": "动摇 {seconds}",
+      "unbound": "脱缚 x{stacks}",
+      "barAria": "{quarter}过载 百分之{pct}",
+      "activeAria": "当前区域：{quarter}",
+      "groupAria": "无主之力：过载条"
+    },
+    "finalAlert": {
+      "frozenLine": "{seconds}秒后解冻：然后与两名或更多其他人站在一起",
+      "emberTitle": "余烬印记！",
+      "emberLine": "{seconds}秒后余烬落在你脚下：与其他被标记的人去同一个角落",
+      "drawnTitle": "引雷！",
+      "drawnLine": "{seconds}秒内与所有人保持{reach}码距离",
+      "crushedTitle": "粉碎",
+      "crushedLine": "避开下一次铁砧之重（{seconds}秒）"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -16675,6 +16737,8 @@ export const zh_CN: EnTranslations = {
       "heart_quenching_breath": "淬火吐息",
       "heart_forge_wrath": "熔炉之怒",
       "heart_forge_pour": "熔炉倾泻",
+      "heart_final_leaping_bolt": "跳跃雷击",
+      "heart_final_anvil": "铁砧之重",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "余烬箭",

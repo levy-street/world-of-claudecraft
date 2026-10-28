@@ -128,6 +128,7 @@ import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
 import { breathAuraEffectDescriptor } from './breath_aura_effect';
 import { councilAuraEffectDescriptor } from './council_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
+import { finalAuraEffectDescriptor } from './final_aura_effect';
 import { heatAuraEffectDescriptor } from './heat_aura_effect';
 import { quenchAuraEffectDescriptor } from './quench_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
@@ -199,6 +200,10 @@ export function auraEffectDescriptor(
   // The Gravewyrm Sanctum's boss auras say their rule (sanctum_aura_effect.ts).
   const sanctum = sanctumAuraEffectDescriptor(a);
   if (sanctum) return sanctum;
+  // The Smith's Heart's Masterless Strength says its rules and marks
+  // (final_aura_effect.ts; before the Breath's, which share the wind's id).
+  const final = finalAuraEffectDescriptor(a);
+  if (final) return final;
   // The Smith's Heart's Hammer Council marks say theirs (council_aura_effect.ts).
   const council = councilAuraEffectDescriptor(a);
   if (council) return council;

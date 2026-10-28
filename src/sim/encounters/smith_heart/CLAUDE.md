@@ -4,7 +4,7 @@ The raid's gating, its first boss, the Guardian of the Breath and the Guardian o
 Quench and the Guardian of the Heat (`docs/design/raid/smith_heart.md`), ticked once per claim by `tickSmithHeart`
 (`seal.ts`), called from `instances/dungeons.ts` `updateInstances`: the Hammer Council first
 (so its fall lights the Hammer vein the same tick), then the Breath's guardian, then the
-Quench's, then the Heat's, then the seal and the arrival, then the portal hops.
+Quench's, then the Heat's, then the Masterless Strength's, then the seal and the arrival, then the portal hops.
 
 | Module | Role |
 |---|---|
@@ -56,6 +56,15 @@ Quench's, then the Heat's, then the seal and the arrival, then the portal hops.
 | `heat_cinder_ward.ts` | Pure leaf: a Rolling Cinder is a ward (a hit lands one point), hooked at `combat/damage.ts`. |
 | `heat_voice.ts` | What the guardian SAYS (`hudChrome.heatGuardian.say.*`, `HEAT_LINES` the same English). |
 | `heat.ts` | The coordinator: the pull, the phases and their damage floors, the overflows' stages (sinking, under, rising: the guardian untargetable), the wipe's reset, the fall, the dev tier switch (`setHeatDevTier`) and the `/dev heart heat` triggers and readout. |
+| `final_ids.ts` | Leaf: the Masterless Strength's cast, aura, object and cue ids (its Basalt Fist reuses the Heat guardian's cast and objects), the names (`FINAL_NAMES`, the guardians' reused ones and the IP-checked new ones), the per-difficulty rules (`FINAL_DIFFICULTY`: a row per tier, Heroic's and Mythic's additions as fields), the SKETCH tuning (`FINAL_TUNING`), the pure helpers (`overloadStep`, `pulseScale`, `anvilShare`, `boltScale`, the zone codes) and the objects' template codecs. |
+| `final_state.ts` | Type-only: `FinalFightState` (`Entity.smithHeartFinal` on the boss). |
+| `final_scope.ts` | The per-tick scope: the players on the Anvil and the Heart's listeners, the bar (planted), the rolls, the hits, the raid warnings (`hudChrome.finalBoss.warn.*`), the cues, the hashed picks, `onFloor`. |
+| `final_rules.ts` | The four quarter rules: the zone it stands in (held by `ZONE_HOLD` so a boss on a ridge never flickers), Taking Root (a root aura and the hold), Vein Shock and Vein-Shaken (Heroic), the four Overload bars (fill, drain, pulses, the burst), Heart Unbound in the ring, the base form, and the state written to the boss's auras. |
+| `final_heat.ts` | The Heat quarter: Basalt Fist and its Molten Swells (the Heat guardian's objects and numbers, lanes to the Anvil's rim via `laneReach`), Fire Whirls, Heroic's Ember Marks and their pools, Mythic's Forge Fire off the frontal. |
+| `final_quench.ts` | The Quench quarter: Quenching Cold and Encased in Rime (alone you freeze), Heroic's Groaning Ice and Under the Ice, Mythic's Numbing Frost off the frontal. |
+| `final_breath.ts` | The Breath quarter: Bellows Wind (the wind kernel's aura, tagged `FINAL_WIND_TAG`) and Pressed to the Rim, Leaping Bolt, Heroic's Drawn Lightning, Mythic's Storm Orbs. |
+| `final_hammer.ts` | The Hammer quarter: Tremor Cracks, Weight of the Anvil (the fight's ONLY group damage share), Heroic's Stone Shell and Crushed, Mythic's turning Anvil. |
+| `final.ts` | The coordinator: the pull (the base form), the zone's changes (root, fresh kit clocks, shock), the bar, the active quarter's kit, Mythic's watch on the frontal, the wipe's reset, the fall, the dev tier switch (`setFinalDevTier`) and the `/dev heart final` mechanics and readout (`sim/dev/smith_heart_final_dev.ts` routes them). |
 | `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switches for heroic and mythic (`setCouncilDevTier`; a switch mid-fight applies whole through `council_soul.ts` `syncSoulsToTier`) and the `/dev heart council` triggers. |
 
 Rules:
@@ -87,5 +96,5 @@ Rules:
   `tests/helpers/quench_fight.ts`), `tests/smith_heart_quench_ui.test.ts`,
   `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`; the Heat:
   `tests/smith_heart_heat.test.ts` (on `tests/helpers/heat_fight.ts`),
-  `tests/smith_heart_heat_ui.test.ts`, `tests/smith_heart_heat_wire.test.ts`. A live raid of bots fights it over a dev server:
+  `tests/smith_heart_heat_ui.test.ts`, `tests/smith_heart_heat_wire.test.ts`; the Masterless Strength: `tests/smith_heart_final.test.ts` (on `tests/helpers/final_fight.ts`: the rules, the kits per tier, determinism, the headless full fight), `tests/smith_heart_final_ui.test.ts` (warnings, tooltips, the Overload HUD, the alert), `tests/smith_heart_final_wire.test.ts` (the online mirror), `tests/smith_heart_final_dev.test.ts`. A live raid of bots fights it over a dev server:
   `scripts/heart_council_raid.mjs`.

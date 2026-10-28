@@ -65,10 +65,21 @@ export type {
   EncounterAlertView,
 } from './encounter_alert_view';
 export { fctAvoidanceText } from './fct_avoidance_core';
+export type { FinalAlertInput, FinalAlertKind, FinalAlertView } from './final_alert_view';
+export { buildFinalAlertView, FINAL_ALERT_KINDS } from './final_alert_view';
 export type { GaolChainDeps } from './gaol_chain_painter';
 export { GaolChainAlert } from './gaol_chain_painter';
 export type { GaolChainInput, GaolChainKind, GaolChainView } from './gaol_chain_view';
 export { buildGaolChainView, wardHealthText, wardHitText } from './gaol_chain_view';
+export type { HeartOverloadDeps } from './heart_overload_painter';
+export { HeartOverloadPanel } from './heart_overload_painter';
+export type { OverloadBoss, OverloadRow, OverloadView } from './heart_overload_view';
+export {
+  buildOverloadView,
+  HeartFinalScan,
+  makeOverloadView,
+  OVERLOAD_DANGER_AT,
+} from './heart_overload_view';
 export type {
   KitUseBody,
   KitUsePromptInput,

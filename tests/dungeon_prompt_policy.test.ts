@@ -56,6 +56,7 @@ const ALL_IDS: DungeonPromptId[] = [
   'crypt',
   'council',
   'quench',
+  'final',
   'temple',
   'kitUse',
 ];
@@ -74,6 +75,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       crypt: true,
       council: true,
       quench: false,
+      final: false,
       temple: true,
       kitUse: false,
     });
@@ -97,6 +99,8 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('kitUse', false)).toBe(true);
     // The Guardian of the Quench's cold bar is the player's own gauge.
     expect(dungeonPromptEnabled('quench', false)).toBe(true);
+    // So is the Masterless Strength's (the same cold, and marks to move for).
+    expect(dungeonPromptEnabled('final', false)).toBe(true);
   });
 });
 
@@ -110,6 +114,7 @@ describe('dungeon prompt policy: the shared slot', () => {
     crypt: false,
     council: false,
     quench: false,
+    final: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -129,6 +134,7 @@ describe('dungeon prompt policy: the shared slot', () => {
       'crypt',
       'council',
       'quench',
+      'final',
       'temple',
     ] as const) {
       expect(usePromptYields({ ...none, [id]: true }), id).toBe(true);

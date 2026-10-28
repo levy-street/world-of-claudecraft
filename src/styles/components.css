@@ -18618,6 +18618,7 @@
   #crypt-alert,
   #heart-council-alert,
   #heart-quench-alert,
+  #heart-final-alert,
   #temple-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
@@ -18630,6 +18631,7 @@
   body.show-actionbar3 #crypt-alert,
   body.show-actionbar3 #heart-council-alert,
   body.show-actionbar3 #heart-quench-alert,
+  body.show-actionbar3 #heart-final-alert,
   body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
@@ -18642,6 +18644,7 @@
   body.mobile-touch #crypt-alert,
   body.mobile-touch #heart-council-alert,
   body.mobile-touch #heart-quench-alert,
+  body.mobile-touch #heart-final-alert,
   body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
@@ -19222,6 +19225,211 @@
   }
   body.mobile-touch #heart-council-alert {
     min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Smith's Heart's Masterless Strength alert (the cold, the ember, the lightning, Crushed) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/final_alert_view.ts: what the final fight asks of the
+     local player, on every graphics tier (never hidden by the hints setting).
+     It never takes the pointer. The state is carried by the text too: the
+     cold in the frost tone, freezing and the freeze in the hostile tone, the
+     Ember Mark in the fire tone, Drawn Lightning in the storm's violet,
+     Crushed in the Hammer's gold. */
+  #heart-final-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+    --final-alert-tone: var(--color-debuff-frost);
+  }
+  #heart-final-alert.is-ember {
+    --final-alert-tone: var(--color-debuff-fire);
+  }
+  #heart-final-alert.is-drawn {
+    --final-alert-tone: var(--color-debuff-shadow);
+  }
+  #heart-final-alert.is-crushed {
+    --final-alert-tone: var(--color-gold);
+  }
+  #heart-final-alert.is-freezing,
+  #heart-final-alert.is-frozen {
+    --final-alert-tone: var(--color-hostile);
+  }
+  #heart-final-alert {
+    border-color: var(--final-alert-tone);
+  }
+  #heart-final-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--final-alert-tone);
+  }
+  #heart-final-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-final-alert .fa-hint {
+    display: none;
+  }
+  #heart-final-alert .fa-bar {
+    --bar-h: 14px;
+    --bar-color: var(--final-alert-tone);
+    width: 100%;
+  }
+  #heart-final-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-final-alert.is-freezing,
+  #heart-final-alert.is-ember,
+  #heart-final-alert.is-drawn {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  body.mobile-touch #heart-final-alert {
+    min-width: min(340px, calc(100vw - 32px));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-final-alert {
+      animation: none;
+    }
+  }
+
+  /* ---------- The Masterless Strength's Overload bars (the raid HUD) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/heart_overload_painter.ts from
+     heart_overload_view.ts while the final fight runs: four bars in one row
+     at the top of the screen, over the raid warnings, one per quarter in its
+     vein's tone, the quarter the boss drinks lit and framed, a bar near its
+     burst throbbing in the hostile tone; the foot says Taking Root's seconds
+     (or that it can be dragged), Vein-Shaken's and Heart Unbound's. Every
+     tier, never hidden by the hints setting; it never takes the pointer. The
+     state is carried by text too (each bar prints its percent). */
+  #heart-overload {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    z-index: 31;
+    padding: 6px 12px 8px;
+    max-width: calc(100vw - 32px);
+    pointer-events: none;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-gold-700);
+  }
+  #heart-overload .ho-title {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-gold);
+  }
+  #heart-overload .ho-rows {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(72px, 112px));
+    gap: 8px;
+  }
+  #heart-overload .ho-row {
+    --ho-tone: var(--color-gold);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 2px 6px;
+    padding: 3px 5px 4px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    opacity: 0.72;
+  }
+  #heart-overload .ho-row.is-breath {
+    --ho-tone: var(--color-debuff-shadow);
+  }
+  #heart-overload .ho-row.is-quench {
+    --ho-tone: var(--color-debuff-frost);
+  }
+  #heart-overload .ho-row.is-hammer {
+    --ho-tone: var(--color-gold-500);
+  }
+  #heart-overload .ho-row.is-heat {
+    --ho-tone: var(--color-debuff-fire);
+  }
+  #heart-overload .ho-row.is-active {
+    opacity: 1;
+    border-color: var(--ho-tone);
+    box-shadow: 0 0 8px var(--ho-tone);
+  }
+  #heart-overload .ho-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ho-tone);
+  }
+  #heart-overload .ho-pct {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  #heart-overload .ho-bar {
+    --bar-h: 9px;
+    --bar-color: var(--ho-tone);
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  #heart-overload .ho-fill {
+    width: 0;
+    transition: width 200ms linear;
+  }
+  #heart-overload .ho-row.is-danger .ho-pct,
+  #heart-overload .ho-row.is-danger .ho-label {
+    color: var(--color-hostile);
+  }
+  #heart-overload .ho-row.is-danger .ho-bar {
+    --bar-color: var(--color-hostile);
+  }
+  #heart-overload .ho-row.is-danger.is-active {
+    animation: bce-throb 0.7s ease-in-out infinite alternate;
+  }
+  #heart-overload .ho-foot {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    font-size: 12px;
+  }
+  #heart-overload .ho-root.is-rooted {
+    color: var(--color-gold);
+    font-weight: 700;
+  }
+  #heart-overload .ho-shaken,
+  #heart-overload .ho-unbound {
+    color: var(--color-hostile);
+    font-weight: 700;
+  }
+  body.mobile-touch #heart-overload {
+    top: 4px;
+    padding: 4px 8px 6px;
+  }
+  body.mobile-touch #heart-overload .ho-rows {
+    grid-template-columns: repeat(4, minmax(56px, 1fr));
+    gap: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-overload .ho-row {
+      animation: none;
+    }
   }
 
   /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */

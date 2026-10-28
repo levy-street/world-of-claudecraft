@@ -4779,6 +4779,29 @@ export const nl_NL: EnTranslations = {
         "hunted": "A Rolling Cinder or a Seedflame is after you. A Rolling Cinder that reaches you kills you and burns everyone within {radius} yd: keep away, and let allies strike it, each strike knocks it {knock} yd back (then not again for {crust} sec).",
         "crust": "Cooled hard: strikes cannot knock it back until this ends."
       },
+      "finalBoss": {
+        "stateHeat": "Drinking the Heat: Basalt Fist slams a player's spot and three Molten Swells roll out of it, and Fire Whirls cross the floor. On Heroic, Ember Marks drop fire at ranged players' feet; on Mythic, its frontal leaves Forge Fire.",
+        "stateQuench": "Drinking the Quench: anyone with fewer than {allies} other players within {reach} yd grows cold and freezes. On Heroic, the ice breaks under marked players; on Mythic, its frontal slows by {slow}%.",
+        "stateBreath": "Drinking the Breath: a gale pushes the raid toward the rim, and Leaping Bolt leaps between players within {jump} yd of each other. On Heroic, Drawn Lightning marks players; on Mythic, each Storm Orb must be taken by one player.",
+        "stateHammer": "Drinking the Hammer: Tremor Cracks erupt under players, and Weight of the Anvil splits its blow among everyone under its mark. On Heroic, Stone Shell absorbs healing and the Anvil's soakers are Crushed; on Mythic, the Anvil's mark turns round it.",
+        "stateRing": "In the central ring it drinks no quarter. Above {pct}% health it grows Heart Unbound there every second.",
+        "overloadHeat": "The Heat's Overload, {value}% full. It fills while the boss stands in the Heat quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "overloadQuench": "The Quench's Overload, {value}% full. It fills while the boss stands in the Quench quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "overloadBreath": "The Breath's Overload, {value}% full. It fills while the boss stands in the Breath quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "overloadHammer": "The Hammer's Overload, {value}% full. It fills while the boss stands in the Hammer quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Full, it bursts for {burstMin} to {burstMax} damage to the whole raid and empties. Away from its quarter it drains at a third of that speed.",
+        "root": "Rooted for {seconds} sec after entering a quarter: it cannot be dragged out until the root ends.",
+        "unbound": "Deals {per} damage to the whole raid every second for each stack ({total} now) and gains a stack every second while it stands in the central ring. Drag it out of the ring to end it.",
+        "shaken": "A quarter change hits you {mult} times as hard while this lasts ({min} to {max} damage instead of {baseMin} to {baseMax}). Each change renews it for {seconds} sec.",
+        "cold": "Cold {value} of 100. Rises {rise} a second while fewer than {allies} other players stand within {reach} yd of you, and falls when they do. At 100 you are Encased in Rime: stunned for {freeze} sec and dealt {min} to {max} Frost damage.",
+        "frozen": "Stunned. You froze standing alone: stay within {reach} yd of {allies} or more other players while it drinks the Quench.",
+        "underIce": "Stunned: you fell through the breaking ice.",
+        "numbing": "Movement speed reduced by {pct}% for {seconds} sec by its frontal.",
+        "ember": "In {seconds} sec embers fall at your feet and smoulder for {life} sec in a {radius} yd pool that deals {min} to {max} Fire damage a second to anyone in it. Join the other marked players in one corner, then move out.",
+        "wind": "The gale carries you {speed} yd a second the way it blows; walk into it to hold your ground (it does not interrupt casts). Within {band} yd of the rim you take {min} to {max} Nature damage every second while it blows.",
+        "drawn": "Every second for {seconds} sec it arcs from you to every other player within {reach} yd, dealing {min} to {max} Nature damage to each. Keep {reach} yd from everyone.",
+        "shell": "Absorbs the next {value} healing you receive.",
+        "crushed": "Standing under the next Weight of the Anvil within {seconds} sec, you take your share {mult} times over. Let the other group share it."
+      },
       "sharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over het aantal spelers in de cirkel ({perPlayer}% elk bij {players} spelers).",
       "varkhulSharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over de spelers in de cirkel ({perPlayer}% elk bij {players} spelers). Elke ontbrekende speler doet bovendien {missingPenalty}% van de maximale gezondheid aan de hele raid, inclusief spelers in de cirkel.",
       "makersBrand": "Gedurende {duration} sec verhoogt elke stapeling de schade die je van Varkhul oploopt met {pct}%. Stapelt tot {max} keer. Tanks moeten wisselen bij {swap} stapelingen.",
@@ -7385,6 +7408,45 @@ export const nl_NL: EnTranslations = {
         "wipe": "Ash, all of you. The Hearth burns on.",
         "death": "The flame... sinks back... into the stone. Carry it well."
       }
+    },
+    "finalBoss": {
+      "warn": {
+        "enterHeat": "The Masterless Strength drinks the Heat! Dodge the fist, the swells and the whirls!",
+        "enterQuench": "The Masterless Strength drinks the Quench! Stay close together or freeze!",
+        "enterBreath": "The Masterless Strength drinks the Breath! Spread out and lean into the wind!",
+        "enterHammer": "The Masterless Strength drinks the Hammer! Step out of the cracks and share the Anvil!",
+        "burst": "Overload! The strength bursts through the Anvil!",
+        "unbound": "The strength is unbound in the centre! Drag it out!",
+        "embers": "Embers fall at the ranged! Stack the marks in one corner, then move out!",
+        "ice": "The ice groans under you! Step off before it breaks!",
+        "wind": "The Breath gathers a gale! Walk into the wind, away from the rim!",
+        "drawn": "Drawn Lightning! The marked keep 8 yards from everyone!",
+        "orbs": "Storm Orbs! One player steps on each before it bursts!",
+        "anvil": "Weight of the Anvil! Share it: everyone not Crushed, under the mark!"
+      }
+    },
+    "finalOverload": {
+      "title": "Overload",
+      "heat": "Heat",
+      "quench": "Quench",
+      "breath": "Breath",
+      "hammer": "Hammer",
+      "rooted": "Rooted {seconds}",
+      "free": "Can be dragged",
+      "shaken": "Shaken {seconds}",
+      "unbound": "Unbound x{stacks}",
+      "barAria": "{quarter} Overload {pct} percent",
+      "activeAria": "Active quarter: {quarter}",
+      "groupAria": "The Masterless Strength: Overload bars"
+    },
+    "finalAlert": {
+      "frozenLine": "Free in {seconds} sec: then stand with two or more others",
+      "emberTitle": "Ember Mark!",
+      "emberLine": "Embers fall at your feet in {seconds} sec: join the other marked in one corner",
+      "drawnTitle": "Drawn Lightning!",
+      "drawnLine": "Keep {reach} yards from everyone for {seconds} sec",
+      "crushedTitle": "Crushed",
+      "crushedLine": "Stay out of the next Weight of the Anvil ({seconds} sec)"
     },
     "sanctumAlert": {
       "quenchTitle": "In het bluswater!",
@@ -16675,6 +16737,8 @@ export const nl_NL: EnTranslations = {
       "heart_quenching_breath": "Quenching Breath",
       "heart_forge_wrath": "Forge Wrath",
       "heart_forge_pour": "Forge Pour",
+      "heart_final_leaping_bolt": "Leaping Bolt",
+      "heart_final_anvil": "Weight of the Anvil",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",

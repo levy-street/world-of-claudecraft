@@ -14,7 +14,9 @@
 // melody, its answer and her broken voice) and the Smith's Heart's Hammer
 // Council's (council_alert_view.ts: the rock, the wake, the Weight,
 // Resonance), its Guardian of the Quench's cold bar (quench_alert_view.ts:
-// the player's own gauge, never advisory), plus the trash engine's
+// the player's own gauge, never advisory) and its Masterless Strength's
+// (final_alert_view.ts: the cold, the ember, the lightning, Crushed; never
+// advisory), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -24,6 +26,10 @@
 // Sanctum, Crypt, Wildheart and Temple alerts and the use prompt keep their
 // scenes off the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
 // wildheart_alert_scene_core.ts, temple_alert_scene_core.ts, KitUseSceneScan).
+//
+// Beside the slot it paints the Masterless Strength's raid HUD, the four
+// Overload bars at the top of the screen (heart_overload_view.ts and
+// heart_overload_painter.ts), on every tier and whatever the hints setting.
 //
 // The prompts share one slot over the action bar, so the use prompt gives way
 // to every encounter prompt above it (a strike to dodge or a cage to break
@@ -56,8 +62,16 @@ import {
   usePromptYields,
 } from './dungeon_prompt_policy_core';
 import { EncounterAlert } from './encounter_alert_painter';
+import { buildFinalAlertView, FINAL_ALERT_KINDS } from './final_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
+import { HeartOverloadPanel } from './heart_overload_painter';
+import {
+  buildOverloadView,
+  HeartFinalScan,
+  makeOverloadView,
+  type OverloadBoss,
+} from './heart_overload_view';
 import {
   buildKitUsePromptView,
   KIT_USE_PROMPT_KINDS,
@@ -113,7 +127,8 @@ export interface DungeonPromptsFrame {
         CryptSceneEntity &
         WildheartSceneEntity &
         TempleSceneEntity &
-        KitUseBody
+        KitUseBody &
+        OverloadBoss
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -139,6 +154,10 @@ export class DungeonPrompts {
   private readonly crypt: EncounterAlert;
   private readonly council: EncounterAlert;
   private readonly quench: EncounterAlert;
+  private readonly final: EncounterAlert;
+  private readonly overload: HeartOverloadPanel;
+  private readonly overloadView = makeOverloadView();
+  private readonly finalScan = new HeartFinalScan();
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly councilSoul = new CouncilSoulScan();
   private readonly temple: EncounterAlert;
@@ -160,6 +179,7 @@ export class DungeonPrompts {
     crypt: false,
     council: false,
     quench: false,
+    final: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -198,6 +218,12 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert heart-quench-alert',
       kinds: QUENCH_ALERT_KINDS,
     });
+    this.final = new EncounterAlert(deps, {
+      id: 'heart-final-alert',
+      className: 'ui-panel-strong encounter-alert heart-final-alert',
+      kinds: FINAL_ALERT_KINDS,
+    });
+    this.overload = new HeartOverloadPanel(deps);
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
       className: 'ui-panel-strong encounter-alert temple-alert',
@@ -292,6 +318,13 @@ export class DungeonPrompts {
       ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
       : HINT_HIDDEN;
     this.quench.paint(quench);
+    // The Masterless Strength's alert: the player's own gauge and marks,
+    // never advisory; its raid HUD beside the slot.
+    const final = dungeonPromptEnabled('final', hints)
+      ? buildFinalAlertView({ auras: p.auras, dead: p.dead })
+      : HINT_HIDDEN;
+    this.final.paint(final);
+    this.overload.paint(buildOverloadView(this.finalScan.frame(f.world), this.overloadView));
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
           selfPos: p.pos,
@@ -311,6 +344,7 @@ export class DungeonPrompts {
     slot.crypt = crypt.visible;
     slot.council = council.visible;
     slot.quench = quench.visible;
+    slot.final = final.visible;
     slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
     slot.wildheartSoft = wildheartSoft;
@@ -341,6 +375,8 @@ export class DungeonPrompts {
     this.crypt.dispose();
     this.council.dispose();
     this.quench.dispose();
+    this.final.dispose();
+    this.overload.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }
