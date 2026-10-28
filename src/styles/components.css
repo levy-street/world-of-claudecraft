@@ -19262,8 +19262,15 @@
   #heart-final-alert.is-drawn {
     --final-alert-tone: var(--color-debuff-shadow);
   }
-  #heart-final-alert.is-crushed {
+  #heart-final-alert.is-crushed,
+  #heart-final-alert.is-weight {
     --final-alert-tone: var(--color-gold);
+  }
+  #heart-final-alert.is-coal {
+    --final-alert-tone: var(--color-hostile);
+  }
+  #heart-final-alert.is-tether {
+    --final-alert-tone: var(--color-debuff-frost);
   }
   #heart-final-alert.is-freezing,
   #heart-final-alert.is-frozen {
@@ -19294,7 +19301,9 @@
   }
   #heart-final-alert.is-freezing,
   #heart-final-alert.is-ember,
-  #heart-final-alert.is-drawn {
+  #heart-final-alert.is-drawn,
+  #heart-final-alert.is-coal,
+  #heart-final-alert.is-tether {
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
   body.mobile-touch #heart-final-alert {
@@ -19418,6 +19427,42 @@
     color: var(--color-hostile);
     font-weight: 700;
   }
+  /* Part 2: through an intermission the bars hold still (dimmed, no
+     motion) and the quarters whose Splinters live are lit; in the final
+     phase the bars are off and the enrage's line takes their place; the
+     poured elements read on their own line. */
+  #heart-overload.is-frozen .ho-row {
+    opacity: 0.5;
+  }
+  #heart-overload.is-frozen .ho-fill {
+    transition: none;
+  }
+  #heart-overload .ho-row.is-awake {
+    opacity: 1;
+    border-color: var(--ho-tone);
+    box-shadow: 0 0 10px var(--ho-tone);
+  }
+  #heart-overload.is-off .ho-rows {
+    display: none;
+  }
+  #heart-overload .ho-phase {
+    color: var(--color-gold);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  #heart-overload .ho-phase.is-urgent {
+    color: var(--color-hostile);
+    animation: bce-throb 0.7s ease-in-out infinite alternate;
+  }
+  #heart-overload .ho-splinters {
+    color: var(--color-text-light);
+    font-weight: 700;
+  }
+  #heart-overload .ho-poured {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-debuff-fire);
+  }
   body.mobile-touch #heart-overload {
     top: 4px;
     padding: 4px 8px 6px;
@@ -19427,7 +19472,8 @@
     gap: 4px;
   }
   @media (prefers-reduced-motion: reduce) {
-    #heart-overload .ho-row {
+    #heart-overload .ho-row,
+    #heart-overload .ho-phase {
       animation: none;
     }
   }

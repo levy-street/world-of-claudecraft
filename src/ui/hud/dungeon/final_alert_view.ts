@@ -7,18 +7,35 @@
 //  - Drawn Lightning: keep 8 yd from everyone while the bar runs;
 //  - the Quench quarter's cold (the bar, 0 to 100): rising, stand with two or
 //    more others; past three quarters it turns urgent;
-//  - Crushed: sit the next Weight of the Anvil out while the bar runs.
+//  - Crushed: sit the next Weight of the Anvil out while the bar runs;
+//  - part 2: Bursting Coal (leave the group before it bursts), Wind-Tethered
+//    (drag the Splinter of the Breath away), Mounting Weight on a tank near
+//    the swap (final_phase_ids.ts).
 // The cold is a live gauge the player steers by, so the alert is an ACTION
 // prompt (the hints setting never hides it), on every graphics tier.
-// Priority: frozen, then the ember, the lightning, the cold, Crushed. The cold
+// Priority: the coal, the tether, frozen, then the ember, the lightning, the cold, Crushed. The cold
 // reuses the Guardian of the Quench's lines (quenchAlert.*). The painter is
 // the shared encounter alert's (encounter_alert_painter.ts).
 
 import { FINAL_AURAS, FINAL_TUNING as T } from '../../../sim/encounters/smith_heart/final_ids';
+import {
+  FINAL_PHASE_AURAS,
+  MOUNTING_WEIGHT_AURA,
+  FINAL_PHASES as P,
+} from '../../../sim/encounters/smith_heart/final_phase_ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
-export type FinalAlertKind = 'frozen' | 'ember' | 'drawn' | 'cold' | 'freezing' | 'crushed';
+export type FinalAlertKind =
+  | 'frozen'
+  | 'ember'
+  | 'drawn'
+  | 'cold'
+  | 'freezing'
+  | 'crushed'
+  | 'coal'
+  | 'tether'
+  | 'weight';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const FINAL_ALERT_KINDS: readonly FinalAlertKind[] = [
@@ -28,6 +45,9 @@ export const FINAL_ALERT_KINDS: readonly FinalAlertKind[] = [
   'cold',
   'freezing',
   'crushed',
+  'coal',
+  'tether',
+  'weight',
 ];
 
 /** Past this much cold (of 100) a rising bar is urgent. */
@@ -44,6 +64,7 @@ interface AlertAura {
   duration?: number;
   value?: number;
   value2?: number;
+  stacks?: number;
 }
 
 export interface FinalAlertInput {
@@ -79,6 +100,25 @@ function timed(kind: FinalAlertKind, title: string, line: string, mark: AlertAur
 export function buildFinalAlertView(input: FinalAlertInput): FinalAlertView {
   if (input.dead) return HIDDEN;
   const a = input.auras;
+  const coal = auraOf(a, FINAL_PHASE_AURAS.coal);
+  if (coal)
+    return timed(
+      'coal',
+      t('hudChrome.finalAlert.coalTitle'),
+      t('hudChrome.finalAlert.coalLine', {
+        reach: formatNumber(P.coalReach, { maximumFractionDigits: 0 }),
+        seconds: whole(coal.remaining ?? 0),
+      }),
+      coal,
+    );
+  const tether = auraOf(a, FINAL_PHASE_AURAS.tether);
+  if (tether)
+    return timed(
+      'tether',
+      t('hudChrome.finalAlert.tetherTitle'),
+      t('hudChrome.finalAlert.tetherLine', { seconds: whole(tether.remaining ?? 0) }),
+      tether,
+    );
   const frozen = auraOf(a, FINAL_AURAS.frozen);
   if (frozen)
     return timed(
@@ -137,6 +177,19 @@ export function buildFinalAlertView(input: FinalAlertInput): FinalAlertView {
       t('hudChrome.finalAlert.crushedTitle'),
       t('hudChrome.finalAlert.crushedLine', { seconds: whole(crushed.remaining ?? 0) }),
       crushed,
+    );
+  const weight = auraOf(a, MOUNTING_WEIGHT_AURA);
+  const stacks = Math.round(weight?.stacks ?? 0);
+  if (weight && stacks >= P.weightSwap - 1)
+    return timed(
+      'weight',
+      t('hudChrome.finalAlert.weightTitle', {
+        stacks: formatNumber(stacks, { maximumFractionDigits: 0 }),
+      }),
+      t('hudChrome.finalAlert.weightLine', {
+        swap: formatNumber(P.weightSwap, { maximumFractionDigits: 0 }),
+      }),
+      weight,
     );
   return HIDDEN;
 }

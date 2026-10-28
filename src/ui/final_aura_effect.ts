@@ -24,6 +24,7 @@ import {
 } from '../sim/encounters/smith_heart/final_ids';
 import { WIND_DRIFT_AURA } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
+import { finalPhaseAuraEffectDescriptor } from './final_phase_aura_effect';
 
 const KEY = 'hudChrome.auraEffect.finalBoss';
 
@@ -60,6 +61,9 @@ function stateDescriptor(a: AuraEffectInput): AuraEffectDescriptor {
 
 /** The fight's aura's descriptor, or null when `a` is not one of them. */
 export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  // Part 2 (the intermissions, the poured elements, the final phase).
+  const phase = finalPhaseAuraEffectDescriptor(a);
+  if (phase) return phase;
   const overload = a.id ? OVERLOAD_KEYS[a.id] : undefined;
   if (overload)
     return {
