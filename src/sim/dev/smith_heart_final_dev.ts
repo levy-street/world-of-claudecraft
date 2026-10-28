@@ -109,7 +109,9 @@ export function smithHeartFinalDevTrigger(
   const me = ctx.entities.get(pid);
   if (verb === 'pull') {
     if (me) displacePlayerForDev(ctx, me, boss.pos.x + 6, boss.pos.z - 6);
-    return me && ctx.aggroMob(boss, me, false)
+    // Already on you (it woke as you came near): that is the pull too.
+    const pulled = !!me && (ctx.aggroMob(boss, me, false) || boss.aggroTargetId === me.id);
+    return pulled
       ? 'The Masterless Strength wakes on the Anvil and turns on you.'
       : 'The Masterless Strength cannot be pulled.';
   }

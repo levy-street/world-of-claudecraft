@@ -394,9 +394,13 @@ export class FinalKitFx {
     for (let i = 0; i < P.rootSpikes; i++) this.spikes.setMatrixAt(i, _m.makeScale(0, 0, 0));
     this.root.add(this.spikes);
     // The great anvil: dark iron, its face and horn, its underside glowing.
+    // Dark forged iron, hot from within (its emissive): it reads as a black
+    // weight against the bright room, never a pale box under its light.
     const iron = new THREE.MeshLambertMaterial({
       name: 'smithHeartFinalAnvilIron',
-      color: 0x3a3430,
+      color: 0x4a423c,
+      emissive: 0x1c0802,
+      flatShading: true,
     });
     this.anvilGlow = new THREE.MeshBasicMaterial({
       name: 'smithHeartFinalAnvilGlow',
@@ -842,7 +846,7 @@ export class FinalKitFx {
           if (m) {
             const bob = orbBob(this.clock + id, left);
             m.position.set(x, y + bob.y, z);
-            m.scale.setScalar(0.9 + 0.15 * Math.sin(this.clock * 9 + id));
+            m.scale.setScalar(1.5 + 0.2 * Math.sin(this.clock * 9 + id));
             this.orbMat.uniforms.uCrackle.value = bob.crackle;
             m.visible = true;
           }
