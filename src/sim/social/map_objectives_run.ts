@@ -511,7 +511,7 @@ function dropFlag(ctx: SimContext, run: ObjectiveRun, flag: ObjFlag, at: Entity 
 }
 
 /** Strip every stealth-kind aura and refresh the cache: a flag grab is a
- *  deliberate, revealing act (mirrors Sim.breakStealth). */
+ *  deliberate, revealing act (mirrors combat/stealth_break.ts breakStealth). */
 function breakStealthFor(ctx: SimContext, e: Entity): void {
   for (let i = e.auras.length - 1; i >= 0; i--) {
     if (e.auras[i].kind !== 'stealth') continue;

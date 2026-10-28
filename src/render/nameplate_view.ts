@@ -134,7 +134,12 @@ export function newNameplatePlan(): NameplatePlan {
  * cosmetic-buddy toggle (src/sim/pet/buddy_ai.ts's isBuddyMob):
  * a buddy's plate ignores `showNameplates` entirely (it is never a hostile,
  * attackable mob) and is hidden unless this is on, in which case it shows
- * name-only (noHealthBar is always true for a buddy; see that field). Pure:
+ * name-only (noHealthBar is always true for a buddy; see that field).
+ * `stealthedEnemy` (Stealth Rework) says `e` is a stealthed ENEMY player the
+ * viewer has spotted: its plate stays hidden unless it is the viewer's
+ * target, so a spotted stealther reads as a faint body and nothing more until
+ * it is selected (the body itself is the stand-in, so a gated body still gets
+ * its plate as above). Pure:
  * same inputs give the same plan, no DOM/Three/i18n, no
  * Math.random/Date.now/performance.now.
  */
@@ -148,6 +153,7 @@ export function nameplatePlanInto(
   showPlayerNameplates: boolean,
   showPetNames: boolean,
   standIn: boolean,
+  stealthedEnemy = false,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
@@ -209,7 +215,8 @@ export function nameplatePlanInto(
       (d2 > NAMEPLATE_RANGE_SQ ||
         (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear && !rackNear) ||
         (!isBuddyPet && !showNameplates && e.kind === 'mob' && !e.dead) ||
-        (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
+        (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId) ||
+        (stealthedEnemy && e.id !== player.targetId)));
   out.noHealthBar = isBuddyPet;
   out.anchorYOffset =
     viewHeight * e.scale +

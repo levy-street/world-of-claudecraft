@@ -62,7 +62,6 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'trailbreak',
       'wildheart',
       'shellskin',
-      'tactical_camo',
       'frostjaw_trap',
       'bear_trap',
       'scatterbolt',

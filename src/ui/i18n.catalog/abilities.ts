@@ -245,7 +245,7 @@ const classAbilityNamesEn = {
       [
         'tactical_camo',
         'Tactical Camo',
-        'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
+        'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking, taking damage, or calling a pet breaks Tactical Camo. Cast again to step out. Requires Lonely Soul and no pet.',
       ],
       [
         'frostjaw_trap',

@@ -160,7 +160,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     (target.dead ||
       isEvadingWildMob(target) ||
       !ctx.isHostileTo(pet, target) ||
-      !petCanSeeTarget(target) ||
+      !petCanSeeTarget(pet, target) ||
       petQuestGateBlocksTarget(ctx, pet, target))
   )
     target = null;
@@ -279,7 +279,7 @@ function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
     isEvadingWildMob(target) ||
     !ctx.isHostileTo(pet, target) ||
     petQuestGateBlocksTarget(ctx, pet, target) ||
-    !petCanSeeTarget(target) ||
+    !petCanSeeTarget(pet, target) ||
     dist2d(pet.pos, target.pos) > range;
   if (canceled) {
     clearWaterJetChannel(ctx, pet, true);
@@ -696,7 +696,7 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_ASSIST_RANGE, (m) => {
     if (m.id === pet.id || m.dead || isEvadingWildMob(m) || !ctx.isHostileTo(pet, m)) return;
     if (petQuestGateBlocksTarget(ctx, pet, m)) return;
-    if (!petCanSeeTarget(m)) return;
+    if (!petCanSeeTarget(pet, m)) return;
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
     // "Assist my target": the owner has this thing targeted AND is actually engaged with
@@ -712,8 +712,14 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
       (owner.autoAttack ||
         (m.kind === 'mob' && m.threat.has(owner.id)) ||
         (m.kind === 'player' && owner.inCombat));
+    // Aggressive stance never auto-acquires a stealthed player, even one inside
+    // the pet's detection radius: spotting a stealther is the owner's call. The
+    // owner targeting and fighting one (ownerOffense) still sends the pet in.
     const aggressive =
-      pet.petMode === 'aggressive' && !ownerIdle && dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE;
+      pet.petMode === 'aggressive' &&
+      !ownerIdle &&
+      !isStealthedPlayer(m) &&
+      dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE;
     if (!engagingUs && !ownerOffense && !aggressive) return;
     const d = dist2d(pet.pos, m.pos);
     if (d < bestD) {
@@ -732,22 +738,25 @@ function petAssistPick(ctx: SimContext, pet: Entity, owner: Entity): Entity | nu
   if (!m || m.id === pet.id || m.dead || isEvadingWildMob(m) || !ctx.isHostileTo(pet, m)) {
     return null;
   }
-  if (petQuestGateBlocksTarget(ctx, pet, m) || !petCanSeeTarget(m)) return null;
+  if (petQuestGateBlocksTarget(ctx, pet, m) || !petCanSeeTarget(pet, m)) return null;
   return dist2d(pet.pos, m.pos) <= PET_ASSIST_RANGE ? m : null;
+}
+
+function isStealthedPlayer(e: Entity): boolean {
+  return e.kind === 'player' && e.auras.some((a) => a.kind === 'stealth');
 }
 
 function petQuestGateBlocksTarget(ctx: SimContext, pet: Entity, target: Entity): boolean {
   return target.kind === 'mob' && questGateBlocksAggro(ctx.players, target, pet);
 }
 
-// A pet cannot see a stealthed enemy player AT ALL, exactly like the enemy
-// player it is fighting beside cannot: no close-range proximity detection, the
-// way a mob gets. petCanSeeStealthedTarget owns that rule; keep it identical to
-// the combat/damage.ts hit gate, or a pet could strike what it cannot see.
-// updatePet re-checks this every tick, so a target that Vanishes or Stealths is
-// dropped, not just never acquired. The observing pet is irrelevant (the rule
-// keys on the target's stealth alone), so it takes no pet argument.
-function petCanSeeTarget(target: Entity): boolean {
+// A pet sees a stealthed enemy player exactly as the enemy player it is
+// fighting beside does: the PvP proximity rule (level-scaled, full radius in
+// front, halved behind). petCanSeeStealthedTarget owns that rule; keep it
+// identical to the combat/damage.ts hit gate, or a pet could strike what it
+// cannot see. updatePet re-checks this every tick, so a target that Vanishes,
+// or slips out of the pet's detection radius, is dropped, not just never acquired.
+function petCanSeeTarget(pet: Entity, target: Entity): boolean {
   if (target.kind !== 'player') return true;
-  return petCanSeeStealthedTarget(target);
+  return petCanSeeStealthedTarget(target, pet);
 }

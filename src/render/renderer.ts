@@ -453,7 +453,7 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
-import { characterGhostLook } from './ghost_style_core';
+import { ghostLookFor } from './ghost_style_core';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { updateGodRayShafts } from './god_ray_shafts';
@@ -10342,7 +10342,7 @@ export class Renderer {
         v.clickTarget = active.clickProxy;
       }
       v.height = active.height;
-      const ghostLook = characterGhostLook(this.sim.playerId, e, ghostWolf, veilboundState);
+      const ghostLook = ghostLookFor(this.sim, e, ghostWolf, veilboundState);
       active.setGhost(ghostLook !== null, ghostLook ?? 'spirit');
       active.setSoulRend(hasSoulRend);
       // Shadowform (Gloamveil) keeps the priest's rig and colours and climbs the dark up it

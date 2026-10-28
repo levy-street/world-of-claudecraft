@@ -87,6 +87,7 @@ import {
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, isMobHostileToViewer, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
+import { isStealthed } from './stealth';
 import {
   edgeArrowInto,
   newEdgeArrowPlacement,
@@ -393,6 +394,7 @@ export class NameplatePainter {
         showPlayerNameplates,
         showPetNames,
         standIn,
+        entity.kind === 'player' && isStealthed(entity) && this.isHostilePlayer(entity),
       );
       if (plan.hidden) continue;
 

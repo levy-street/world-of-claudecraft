@@ -534,9 +534,10 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r8_beastguard',
           name: 'Lonely Soul',
           description:
-            'Redirect 30% of damage taken to a living pet without reducing it below 20% health. Without a living pet, deal 10% more damage.',
+            'Redirect 30% of damage taken to a living pet without reducing it below 20% health. Without a living pet, deal 10% more damage and gain Tactical Camo, a stealth usable while you have no pet.',
           icon: 'concussive_shot',
           effect: {
+            grant: { ability: 'tactical_camo' },
             global: { petDmgSharePct: 0.3 },
             runtime: {
               petHealthFloorPct: 0.2,

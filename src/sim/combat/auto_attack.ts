@@ -39,7 +39,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { disciplineWandOffenseMultiplier } from '../spec_output_tuning';
 import { resolveTalentHitMult } from '../talent_hit_mult';
-import { addThreat, hasEscapeStealth } from '../threat';
+import { addThreat, hiddenFromHostile } from '../threat';
 import { creditAbilityDrill } from '../tutorial/ability_drill';
 import {
   angleTo,
@@ -74,6 +74,7 @@ import {
   rangedAutoProfile,
 } from './form_swing';
 import { isTravelFormAuraKind } from './forms';
+import { breakTacticalCamoOnAttack } from './hunter_lonely_soul';
 import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
 import { applyRequitalAutoAttack } from './paladin_talents';
@@ -155,15 +156,17 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // still-alive snapshot just as quietly. A genuinely invalid target (none, or a
   // friendly) still reports the error.
   if (t?.dead) return;
-  // Vanish (hasEscapeStealth) makes the target fully undetectable, same as a
-  // mob that lost line of sight on a stealthed player (mob/targeting.ts): a
-  // fresh engage against it is refused exactly like any other invalid target.
-  if (!t || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
+  // Vanish makes the target fully undetectable, and a stealthed enemy player
+  // beyond the attacker's detection radius is unseen (hiddenFromHostile, the
+  // PvP proximity rule): a fresh engage against it is refused exactly like any
+  // other invalid target.
+  if (!t || !ctx.isHostileTo(p, t) || hiddenFromHostile(p, t)) {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
   // Auto-dismount when the player is mounted and starts auto-attack.
   if (p.mountKey !== '') forceDismount(ctx, p);
+  breakTacticalCamoOnAttack(ctx, p); // attacking ends Camo on the press
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
@@ -247,11 +250,12 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
   }
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  // A target that slips into Vanish's escape stealth mid-fight must drop the
-  // swing too (issue #2426): the client stops rendering it as targeted, but
-  // without this the swing kept connecting on a target the caster could no
-  // longer see, the same detection the mob AI already honors (mobCanSeeTarget).
-  if (!t || t.dead || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
+  // A target that slips into Vanish's escape stealth, or out of the attacker's
+  // stealth detection radius, mid-fight must drop the swing too (issue #2426):
+  // the client stops rendering it as targeted, but without this the swing kept
+  // connecting on a target the caster could no longer see, the same detection
+  // the mob AI already honors (mobCanSeeTarget).
+  if (!t || t.dead || !ctx.isHostileTo(p, t) || hiddenFromHostile(p, t)) {
     p.autoAttack = false;
     return;
   }

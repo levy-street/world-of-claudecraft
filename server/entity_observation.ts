@@ -1,5 +1,5 @@
 import type { Sim } from '../src/sim/sim';
-import { stealthDetectionRadius } from '../src/sim/threat';
+import { stealthDetectionRadius, withinPvpStealthDetection } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
 import { vaultPortalVisibleToPlayer } from '../src/sim/vault_visibility';
 import { INTEREST_RADIUS, isStealthed } from './interest_policy';
@@ -10,8 +10,17 @@ function inViewerGroup(sim: Sim, viewer: Entity, entity: Entity): boolean {
   return sim.partyOf(viewer.id)?.members.includes(entity.id) ?? false;
 }
 
-/** Viewer-specific admission, re-evaluated even for already-known entities. */
-export function canObserveEntity(sim: Sim, viewer: Entity, entity: Entity, d2: number): boolean {
+/** Viewer-specific admission, re-evaluated even for already-known entities.
+ *  `known` is true when the viewer already holds the entity: a spotted enemy
+ *  stealther then stays revealed on the held radius (front radius plus the
+ *  hysteresis, whatever the arc). */
+export function canObserveEntity(
+  sim: Sim,
+  viewer: Entity,
+  entity: Entity,
+  d2: number,
+  known = false,
+): boolean {
   if (entity.vaultOwnerPid !== undefined && !vaultPortalVisibleToPlayer(sim.ctx, entity, viewer.id))
     return false;
   if (entity.kind !== 'player') return true;
@@ -22,7 +31,11 @@ export function canObserveEntity(sim: Sim, viewer: Entity, entity: Entity, d2: n
   // visible to everyone.
   if (entity.ghost && !viewer.ghost && !inViewerGroup(sim, viewer, entity)) return false;
   if (!isStealthed(entity)) return true;
-  if (sim.isHostileTo(viewer, entity)) return false;
+  // An enemy sees a stealther only inside the PvP detection radius (Stealth
+  // Rework: level-scaled, full in front, halved behind; Vanish and Greater
+  // Invisibility never). The sim gates casting, auto-attack and pets on the
+  // same rule, so what is shipped here is exactly what the viewer may act on.
+  if (sim.isHostileTo(viewer, entity)) return withinPvpStealthDetection(viewer, entity, known);
   const sameParty = inViewerGroup(sim, viewer, entity);
   const duel = sim.duelFor(viewer.id);
   const duelingEachOther = duel !== null && (duel.a === entity.id || duel.b === entity.id);

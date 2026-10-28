@@ -10845,7 +10845,10 @@ function authoredChoiceDescription(choice: TalentRowOption): string {
   if (grantId === 'spell_lock') return choice.description;
   // Stilled Mind's Shadow critical bonus is a runtime rider, absent from the
   // generic grant description. Keep the authored choice's consumption rules.
-  if (choice.id === 'pri_r11_inner_focus') {
+  // Lonely Soul's grant (Tactical Camo) is its secondary effect: the pet
+  // redirect and the petless damage bonus are the pick, so the authored text
+  // leads the same way.
+  if (choice.id === 'pri_r11_inner_focus' || choice.id === 'hun_r8_beastguard') {
     return [choice.description, grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
   }
   const lang = getLanguage();

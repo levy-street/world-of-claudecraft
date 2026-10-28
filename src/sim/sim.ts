@@ -121,6 +121,8 @@ import {
 } from './combat/casting_lifecycle';
 import {
   hasUnbreakableMovementLock,
+  isControlAuraKind,
+  isIceBlockCrowdControlAura,
   isRooted,
   isStunned,
   isUnbreakableControlAura,
@@ -138,7 +140,6 @@ import { steerFearFromWalls } from './combat/fear_steering';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
-import { applyGreaterInvisibilityAftereffect } from './combat/greater_invisibility';
 import { updateGuardian } from './combat/guardians';
 import {
   applyHeal as applyHealImpl,
@@ -164,13 +165,13 @@ import {
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import { beginSpiritBombRaidPull } from './combat/priest/spirit_bomb_raid';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
-import { duskLingerOnStealthBreak } from './combat/rogue_talents';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
 import { clearShamanTalentState, onGhostWolfExited } from './combat/shaman_talents';
 import { blockedMeleeDamage } from './combat/shield_block';
 import { spellCritChance, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isMobSpellResisted } from './combat/spell_resist';
+import { breakStealth } from './combat/stealth_break';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { threatMod as threatModImpl } from './combat/threat_modifiers';
 import { auraGuarded, onTrinketAvoidance, restorableCooldown } from './combat/trinket_seams';
@@ -722,6 +723,8 @@ import {
   revivePlayerAt,
   spawnOverworldSpiritHealers,
 } from './spirit';
+import { stealthFootprintsSeenBy } from './stealth_footprints';
+import { stealthShimmersSeenBy } from './stealth_shimmer';
 import { resolveStoragePrices, type StoragePrices } from './storage_prices';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
@@ -4646,6 +4649,12 @@ export class Sim {
   get nearbyWorldQuestTraces() {
     return worldQuestState.nearbyWorldQuestTraces(this, this.playerId);
   }
+  get stealthFootprints() {
+    return stealthFootprintsSeenBy(this.ctx, this.playerId);
+  }
+  get stealthShimmers() {
+    return stealthShimmersSeenBy(this.ctx, this.playerId);
+  }
   get factions(): Readonly<Record<FactionId, number>> {
     return this.primary.factions;
   }
@@ -5398,7 +5407,7 @@ export class Sim {
       diminishedCrowdControlDuration: sim.diminishedCrowdControlDuration.bind(sim),
       hostilesInRadius: sim.hostilesInRadius.bind(sim),
       friendliesInRadius: sim.friendliesInRadius.bind(sim),
-      breakStealth: sim.breakStealth.bind(sim),
+      breakStealth: (e) => breakStealth(sim.ctx, e),
       applyTaunt: sim.applyTaunt.bind(sim),
       summonPet: sim.summonPet.bind(sim),
       petOf: sim.petOf.bind(sim),
@@ -6286,18 +6295,7 @@ export class Sim {
     return !!template && (template.canSwim === true || template.family === 'mudfin');
   }
   private isControlAura(kind: AuraKind): boolean {
-    return kind === 'stun' || kind === 'root' || kind === 'incapacitate' || kind === 'polymorph';
-  }
-  private isIceBlockCrowdControlAura(kind: AuraKind): boolean {
-    return (
-      this.isControlAura(kind) ||
-      kind === 'silence' ||
-      kind === 'blind' ||
-      kind === 'disarm' ||
-      kind === 'slow' ||
-      kind === 'lockout' ||
-      kind === 'tongues'
-    );
+    return isControlAuraKind(kind);
   }
   private isIceBlocked(target: Entity): boolean {
     return target.auras.some(
@@ -6838,7 +6836,7 @@ export class Sim {
     }
     if (
       this.isIceBlocked(target) &&
-      this.isIceBlockCrowdControlAura(aura.kind) &&
+      isIceBlockCrowdControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
       !isUnbreakableControlAura(aura)
     )
@@ -7030,17 +7028,6 @@ export class Sim {
       if (!e.dead && (e.id === source.id || this.isFriendlyTo(source, e))) out.push(e);
     });
     return out;
-  }
-
-  private breakStealth(e: Entity): void {
-    const idx = e.auras.findIndex((a) => a.kind === 'stealth');
-    if (idx < 0) return;
-    const removed = e.auras[idx];
-    e.auras.splice(idx, 1);
-    e.stealthed = false; // keep the cache live without waiting for updateAuras
-    this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
-    duskLingerOnStealthBreak(this.ctx, e);
-    applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
   }
 
   private breakGhostWolf(e: Entity): void {

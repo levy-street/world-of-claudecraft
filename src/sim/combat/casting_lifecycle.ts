@@ -61,7 +61,7 @@ import type { SimContext } from '../sim_context';
 import { primaryHealingMultiplier } from '../spec_output_tuning';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
-import { hasEscapeStealth } from '../threat';
+import { hiddenFromHostile } from '../threat';
 import type { AbilityDef, AbilityEffect, Aura, Entity, Vec3 } from '../types';
 import {
   ALLIED_HEARTHSTONE_CAST_ID,
@@ -192,6 +192,7 @@ import {
   consumeColdsightReadReservation,
 } from './hunter_coldsight_read';
 import { bloodhookStartError } from './hunter_fieldcraft';
+import { breakTacticalCamoOnAttack } from './hunter_lonely_soul';
 import { packCommandError } from './hunter_packlord';
 import { applyPatchUp } from './hunter_patch_up';
 import { playDeadOnCastAttempt } from './hunter_play_dead';
@@ -393,7 +394,7 @@ function hasAbilityCharge(
   return !!state && state.charges > 0;
 }
 
-type ActiveCastRestriction = 'combat' | 'instance';
+type ActiveCastRestriction = 'combat' | 'instance' | 'pet';
 
 function activeCastRestriction(
   ctx: SimContext,
@@ -406,6 +407,7 @@ function activeCastRestriction(
   if (ability.requiresOutsideInstance && instanceInfoAt(ctx, player.pos)) {
     return 'instance';
   }
+  if (ability.requiresNoPet && ctx.petOf(player.id)) return 'pet';
   return null;
 }
 
@@ -416,6 +418,8 @@ function emitActiveCastRestrictionError(
 ): void {
   if (restriction === 'combat') {
     ctx.error(playerId, "You can't do that while in combat.");
+  } else if (restriction === 'pet') {
+    ctx.error(playerId, 'You already have a pet.');
   } else {
     ctx.error(playerId, 'Leave the dungeon first.');
   }
@@ -1574,10 +1578,11 @@ export function castAbility(
       !target ||
       target.dead ||
       (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target)) ||
-      // Vanish (hasEscapeStealth) makes a HOSTILE target fully undetectable
-      // (issue #2426); a friendly cast (self/party heal) is unaffected, since
-      // allies can always perceive a stealthed party member.
-      (ctx.isHostileTo(p, target) && hasEscapeStealth(target))
+      // Vanish makes a HOSTILE target fully undetectable (issue #2426), and a
+      // stealthed enemy player is unseen beyond the caster's detection radius
+      // (hiddenFromHostile); a friendly cast (self/party heal) is unaffected,
+      // since allies can always perceive a stealthed party member.
+      (ctx.isHostileTo(p, target) && hiddenFromHostile(p, target))
     ) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
@@ -1605,10 +1610,11 @@ export function castAbility(
         if (target) p.targetId = target.id;
       }
     }
-    // Vanish (hasEscapeStealth) makes the target fully undetectable, same gate
-    // the mob AI already applies (mob/targeting.ts): a hostile cast against it
-    // is refused exactly like an out-of-range or dead target (issue #2426).
-    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
+    // Vanish, or a stealthed enemy player beyond the caster's detection radius
+    // (hiddenFromHostile), hides the target, the same gate the mob AI already
+    // applies (mob/targeting.ts): a hostile cast against it is refused exactly
+    // like an out-of-range or dead target (issue #2426).
+    if (!target || target.dead || !ctx.isHostileTo(p, target) || hiddenFromHostile(p, target)) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
@@ -2579,9 +2585,10 @@ function applyChannelTick(
   }
 
   const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
-  // A channel whose target vanishes mid-cast (Vanish, hasEscapeStealth) stops
-  // ticking on it, same as an out-of-range or dead target (issue #2426).
-  if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
+  // A channel whose target vanishes mid-cast (Vanish, or a stealther slipping
+  // out of detection: hiddenFromHostile) stops ticking on it, same as an
+  // out-of-range or dead target (issue #2426).
+  if (!target || target.dead || !ctx.isHostileTo(p, target) || hiddenFromHostile(p, target)) {
     cancelCast(ctx, p);
     return;
   }
@@ -2928,7 +2935,7 @@ function applyAbility(
       !target ||
       target.dead ||
       (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target)) ||
-      (ctx.isHostileTo(p, target) && hasEscapeStealth(target))
+      (ctx.isHostileTo(p, target) && hiddenFromHostile(p, target))
     ) {
       ctx.error(p.id, 'You have no target.');
       return;
@@ -2945,7 +2952,7 @@ function applyAbility(
     }
   } else if (ability.requiresTarget) {
     target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
-    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
+    if (!target || target.dead || !ctx.isHostileTo(p, target) || hiddenFromHostile(p, target)) {
       ctx.error(p.id, 'You have no target.');
       return;
     }
@@ -3106,6 +3113,9 @@ function applyAbility(
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res, target);
+    // A shot's effects (and the usual stealth break) wait for it to land;
+    // Tactical Camo ends on the release instead (attacking breaks it).
+    if (ctx.isHostileTo(p, target)) breakTacticalCamoOnAttack(ctx, p);
     armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
     res = reserveRuinousBrandCopy(ctx, p, meta, target, res);
     res = reserveShadowStilledMind(ctx, p, res);

@@ -1,13 +1,16 @@
 import type { SimContext } from '../sim_context';
+import { hostileCanSeeStealthed, isFeigningDeath } from '../threat';
 import type { Entity } from '../types';
 
 // When a player slips into stealth (Rogue Duskveil/Smokestep, Druid Stalk, Mage
 // Greater Invisibility, all kind:'stealth' auras) every hostile hunter that
 // cannot see them loses its LIVE lock on the caster.
 //
-// Enemy PLAYERS and PETS can never observe a stealthed target at any range
-// (canObserveEntity / petCanSeeStealthedTarget), so their target lock is dropped
-// outright here. An ally keeps sight of a stealthed friend, so a party heal
+// Enemy PLAYERS and PETS see a stealthed player only inside the PvP detection
+// radius (hostileCanSeeStealthed: level-scaled, full in front, halved behind;
+// the server's canObserveEntity and petCanSeeStealthedTarget apply the same
+// rule), so one that can still see the caster keeps its lock and everyone else
+// drops it here. An ally keeps sight of a stealthed friend, so a party heal
 // target is never dropped.
 //
 // MOBS deliberately keep their CLASSIC proximity stealth detection
@@ -45,6 +48,9 @@ export function dropTargetsOnStealth(
       // player branch below, which asks whether the enemy player holding the lock
       // is hostile to the caster.
       if (e.dead || !ctx.isHostileTo(hidden, e)) continue;
+      // An enemy PET still close enough to see the caster keeps its lock.
+      if (e.ownerId !== null && canStillSee(ctx, e, e.aggroTargetId ?? e.targetId, hiddenIds))
+        continue;
       if (e.aggroTargetId !== null && hiddenIds.includes(e.aggroTargetId)) e.aggroTargetId = null;
       if (e.targetId !== null && hiddenIds.includes(e.targetId)) e.targetId = null;
       if (e.forcedTargetId !== null && hiddenIds.includes(e.forcedTargetId)) {
@@ -55,7 +61,8 @@ export function dropTargetsOnStealth(
       e.kind === 'player' &&
       e.targetId !== null &&
       hiddenIds.includes(e.targetId) &&
-      ctx.isHostileTo(e, hidden)
+      ctx.isHostileTo(e, hidden) &&
+      !canStillSee(ctx, e, e.targetId, hiddenIds)
     ) {
       e.targetId = null;
       e.autoAttack = false;
@@ -64,4 +71,24 @@ export function dropTargetsOnStealth(
       delete e.queuedOnSwingCostMultiplier;
     }
   }
+}
+
+// Does `observer` still perceive the hidden unit it has locked? Only the PvP
+// detection rule can keep a lock, and only on a stealthed PLAYER: a lock on a
+// co-hidden pet (alsoHidden) still drops as before, and a lock on anything
+// outside `hiddenIds` is not this sweep's business.
+function canStillSee(
+  ctx: SimContext,
+  observer: Entity,
+  lockedId: number | null,
+  hiddenIds: readonly number[],
+): boolean {
+  if (lockedId === null || !hiddenIds.includes(lockedId)) return false;
+  const locked = ctx.entities.get(lockedId);
+  if (!locked || locked.kind !== 'player' || !locked.auras.some((a) => a.kind === 'stealth'))
+    return false;
+  // Play Dead clears locks through this sweep before its own aura lands; a
+  // feigning hunter is never kept, camouflaged or not.
+  if (isFeigningDeath(locked)) return false;
+  return hostileCanSeeStealthed(observer, locked, true);
 }

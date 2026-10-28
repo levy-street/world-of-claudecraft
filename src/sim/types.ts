@@ -4590,6 +4590,9 @@ export interface AbilityDef {
   exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
+  // Refused while the caster has a living pet out (Tactical Camo, the Lonely
+  // Soul stealth): the cast reports "You already have a pet."
+  requiresNoPet?: boolean;
   // The ability cannot be activated while physically inside a claimed dungeon or
   // raid instance. Toggle buffs may still be cancelled there to avoid trapping the
   // player in an action-locking form.
@@ -7749,6 +7752,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Hosts read it per interest-scan visit (O(viewers x neighbors)); recomputing
   // it from auras each visit was a measurable cost in crowds.
   stealthed: boolean;
+  // Stealth Rework footprints (sim/stealth_footprints.ts): the bounded ring of
+  // prints a moving stealthed player leaves for enemies to read. Presentation
+  // only (never a gameplay input, never persisted); absent when there are none.
+  stealthTrail?: import('./stealth_footprints').StealthTrail;
   // Practice bot for an authored map's objective rehearsal
   // (sim/social/map_objectives_run.ts + map_objective_bots.ts). Absent on every
   // other entity, so nothing outside that module changes behaviour for one.

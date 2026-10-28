@@ -13,6 +13,10 @@ import type { MaterialComposition } from '../sim/material_sources';
 // an absent key keeps the prior readout, null before the first snapshot).
 
 import type { HillCalloutKind } from '../sim/pvp/hill_bounty_rules';
+import type { VisibleFootprint } from '../sim/stealth_footprints';
+import type { StealthShimmer } from '../sim/stealth_shimmer';
+
+export type { StealthShimmer, VisibleFootprint };
 
 export type WorldPvpZone = 'sanctuary' | 'contested' | 'ffa';
 
@@ -149,4 +153,17 @@ export interface IWorldWorldPvp {
   /** The announced or standing King of the Hill circle, or null while none
    *  is (between hills, or on a realm whose World PvP switch is set). */
   hillInfo: HillInfo | null;
+  /** Stealth Rework: the footprints this player can read, left by ENEMY
+   *  stealthed players (at least 2 sec old, within the read radius; see
+   *  sim/stealth_footprints.ts). Offline the Sim projects them for the primary
+   *  player; online ClientWorld mirrors the server's `sfp` snapshot suffix
+   *  (absent means none). Empty in the common case. */
+  readonly stealthFootprints: readonly VisibleFootprint[];
+  /** Stealth Rework: the shimmers this player gets from ENEMY stealthers just
+   *  past the detection cone's spot radius (out to twice it; see
+   *  sim/stealth_shimmer.ts). Rounded positions with a fade, no id: not an
+   *  entity, so never targetable. Offline the Sim projects them for the
+   *  primary player; online ClientWorld mirrors the server's `ssh` snapshot
+   *  suffix (absent means unchanged, [] clears). Empty in the common case. */
+  readonly stealthShimmers: readonly StealthShimmer[];
 }

@@ -3469,7 +3469,8 @@ export function runEffects(
         // gets the SAME hostile drop as Smokestep/Vanish: dropSelfFromHostileFocus
         // wipes the mob hate tables and drops the mage from combat, then
         // dropTargetsOnStealth clears the residual mob target and every enemy
-        // player's lock (pets already go blind via petCanSeeStealthedTarget).
+        // player's lock (pets go blind too: petCanSeeStealthedTarget treats
+        // Greater Invisibility as a full escape, like Vanish).
         // Same order and same p.stealthed gate as the selfBuff/Vanish path above.
         if (p.stealthed) {
           const alsoHidden = dropSelfFromHostileFocus(ctx, p);

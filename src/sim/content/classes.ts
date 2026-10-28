@@ -394,7 +394,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'rapid_fire',
       'shrapnel_charge',
       'bloodtrail_assault',
-      'tactical_camo',
       'play_dead',
       'volley',
       'phosphor_flask',
@@ -4383,7 +4382,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     tooltipOmitEffectLines: true,
     name: 'Tactical Camo',
     class: 'hunter',
-    specs: ['survival'],
+    // Granted by the Lonely Soul talent (hun_r8_beastguard) to every hunter
+    // spec, and usable only without a living pet.
     learnLevel: 10,
     cost: 0,
     castTime: 0,
@@ -4393,10 +4393,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     requiresOutOfCombat: true,
+    requiresNoPet: true,
     // Duskveil's stealth at 80% movement speed: attacking or taking damage breaks it.
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.8, duration: 3600 }],
     description:
-      'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
+      'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking, taking damage, or calling a pet breaks Tactical Camo. Cast again to step out. Requires Lonely Soul and no pet.',
   },
   frostjaw_trap: {
     id: 'frostjaw_trap',

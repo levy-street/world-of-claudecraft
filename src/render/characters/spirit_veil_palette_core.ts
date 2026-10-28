@@ -14,6 +14,8 @@ export type SpiritVeilPalette =
   | 'march'
   | 'stealth-rogue'
   | 'stealth-other'
+  | 'stealth-enemy'
+  | 'stealth-enemy-target'
   | 'moonkin'
   | 'soul-rend';
 
@@ -101,6 +103,31 @@ export const SPIRIT_VEIL_PALETTES: Readonly<
     keepColor: 0.58,
     band: 0.36,
   },
+  // Any stealthed ENEMY player the viewer has spotted (Stealth Rework): a
+  // neutral cool rim in the shimmer band's colours, whatever the stealth.
+  'stealth-enemy': {
+    tint: 0x6b7690,
+    deep: 0x1a2a4a,
+    rim: 0xe2eeff,
+    rimStrength: 1.2,
+    opacity: 0.1,
+    rise: 1.1,
+    shimmer: 0,
+    keepColor: 0.6,
+    band: 0.3,
+  },
+  // The same enemy while it is the viewer's target: the rim turns red.
+  'stealth-enemy-target': {
+    tint: 0x6b7690,
+    deep: 0x1a2a4a,
+    rim: 0x9f3e2d,
+    rimStrength: 2.55,
+    opacity: 0.1,
+    rise: 1.1,
+    shimmer: 0,
+    keepColor: 0.6,
+    band: 0.3,
+  },
   // The balance druid's Moonwing Form (no rig of its own: the druid's body).
   moonkin: {
     tint: 0x9373dd,
@@ -141,6 +168,8 @@ export const SPIRIT_VEIL_POLICY: Readonly<Record<SpiritVeilPalette, Readonly<Spi
   march: { castsShadow: false, weaponVfx: true },
   'stealth-rogue': { castsShadow: false, weaponVfx: false },
   'stealth-other': { castsShadow: false, weaponVfx: false },
+  'stealth-enemy': { castsShadow: false, weaponVfx: false },
+  'stealth-enemy-target': { castsShadow: false, weaponVfx: false },
   moonkin: { castsShadow: true, weaponVfx: true },
   'soul-rend': { castsShadow: false, weaponVfx: true },
 };

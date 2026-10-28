@@ -197,6 +197,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'pledgeGuild', // server-set display only (guild pledge board)
   'guildTier', // server-set display only (guild colour tier)
   'prevPos', // render interpolation
+  'stealthTrail', // presentation-only footprint ring (sim/stealth_footprints.ts)
   'prevFacing',
   'dungeonEntrySeq', // transient online acknowledgement generation; never read by gameplay
   'netUpdatedAt', // online wire cadence
