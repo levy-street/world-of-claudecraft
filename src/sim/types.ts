@@ -23,6 +23,7 @@ import type {
 } from './encounters/hollow_crypt/boss_state';
 import type { BreathFightState } from './encounters/smith_heart/breath_state';
 import type { CouncilFightState } from './encounters/smith_heart/council_state';
+import type { FinalFightState } from './encounters/smith_heart/final_state';
 import type { HeatFightState } from './encounters/smith_heart/heat_state';
 import type { QuenchFightState } from './encounters/smith_heart/quench_state';
 import type { GrassClearCircle } from './grass_clear';
@@ -8390,6 +8391,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  encounters/smith_heart/heat.ts). Server-local sim state: the client
    *  reads the fight from its resource, auras, bars and the fight's objects. */
   smithHeartHeat?: HeatFightState;
+  /** The Smith's Heart's Masterless Strength's fight state (on the boss:
+   *  encounters/smith_heart/final.ts). Server-local sim state: the client
+   *  reads the fight from the boss's auras, bars and the fight's objects. */
+  smithHeartFinal?: FinalFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
    *  mob/trash_kit/death_burst.ts): seconds left, its floor ring, and whether it
    *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides

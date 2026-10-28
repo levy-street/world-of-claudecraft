@@ -1,13 +1,24 @@
-// /dev heart final quarter <breath|hammer|quench|heat|ring>: preview the
-// Anvil of the World's quarters (phase 2K, design doc section 5.21). Moves the
-// Masterless Strength (and its home, so it stays put) into the middle of that
-// quarter, or onto the central ring's centre; the renderer wakes the quarter
-// it stands in (presentation only, smith_heart_quarters.ts). `ring` forces
-// the final phase: it sets the boss to the final phase's share of its health
-// (HEART_FINAL_PHASE_SHARE) and pulls it onto the player, so the final look
-// (all four quarters awake, the ring blazing) shows; a boss in the ring above
-// that share wakes no quarter (phase 2L). Dev-gated like every /dev heart
-// branch (the ctx.devCommands seam); never reached in production.
+// /dev heart final ...: the Masterless Strength's dev verbs (design doc
+// sections 5.21 and 7.5). Dev-gated like every /dev heart branch (the
+// ctx.devCommands seam); never reached in production.
+//
+//   final                       the fight's readout
+//   final pull                  set you down on the Anvil beside the boss and pull it
+//   final reset                 the boss whole, home and out of its fight
+//   final normal|heroic|mythic  this run's tier for the fight (a live fight
+//                               takes it at once)
+//   final quarter <zone>        move the boss (and its home) into the middle
+//                               of that quarter, or onto the ring's centre
+//                               (phase 2K's preview; in a live fight the move
+//                               is a quarter change: its root, its kit, its
+//                               shock). `ring` out of a fight forces the final
+//                               look (its final phase's share of health, and
+//                               it pulls the boss onto you)
+//   final fill [vein|all] [pct] set an Overload bar (95 by default)
+//   final burst|shock|root|unroot   the rules now
+//   final <mechanic>            one ability now: fist, whirl, embers, freeze,
+//                               cold <n>, ice, wind [deg], bolt, drawn, orbs,
+//                               tremor, anvil, shell
 
 import { SMITH_HEART_DUNGEON, SMITH_HEART_FINAL_BOSS } from '../content/smith_heart';
 import {
@@ -17,9 +28,18 @@ import {
   heartQuarterSpot,
 } from '../content/smith_heart_quarters';
 import { DUNGEONS, instanceOrigin } from '../data';
+import {
+  finalDevMechanic,
+  finalDifficulty,
+  finalReadout,
+  releaseRootForDev,
+  resetFinalForDev,
+  setFinalDevTier,
+} from '../encounters/smith_heart';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { displacePlayerForDev } from './dev_displace';
 
 /** The claim's living final boss, or null. */
 export function smithHeartFinalBoss(ctx: SimContext, inst: InstanceSlot): Entity | null {
@@ -30,20 +50,8 @@ export function smithHeartFinalBoss(ctx: SimContext, inst: InstanceSlot): Entity
   return null;
 }
 
-/** Handles `final ...` (the words after `/dev heart`); returns the reply
- *  line, or null when the words name nothing (the caller prints the help). */
-export function smithHeartFinalDevTrigger(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  arg: string,
-  pid: number,
-): string | null {
-  const m = /^quarter\s+(\S+)$/.exec(arg);
-  if (!m) return null;
-  const zone = m[1] as HeartQuarterZone;
-  if (!HEART_QUARTER_ZONES.includes(zone)) return null;
-  const boss = smithHeartFinalBoss(ctx, inst);
-  if (!boss) return 'The Masterless Strength has fallen in this run (/dev heart reset).';
+/** Move the boss (and its home) to a zone's spot. */
+function standIn(ctx: SimContext, inst: InstanceSlot, boss: Entity, zone: HeartQuarterZone): void {
   const o = instanceOrigin(DUNGEONS[SMITH_HEART_DUNGEON].index, inst.slot);
   const spot = heartQuarterSpot(zone);
   const pos = ctx.groundPos(o.x + spot.x, o.z + spot.z);
@@ -54,7 +62,17 @@ export function smithHeartFinalDevTrigger(
   boss.spawnPos = { ...pos };
   if (boss.leashAnchor) boss.leashAnchor = { ...pos };
   ctx.rebucket(boss);
-  if (zone === 'ring') {
+}
+
+function quarterVerb(ctx: SimContext, inst: InstanceSlot, arg: string, pid: number): string | null {
+  const zone = arg as HeartQuarterZone;
+  if (!HEART_QUARTER_ZONES.includes(zone)) return null;
+  const boss = smithHeartFinalBoss(ctx, inst);
+  if (!boss) return 'The Masterless Strength has fallen in this run (/dev heart reset).';
+  const live = boss.smithHeartFinal !== undefined;
+  if (live) releaseRootForDev(ctx, inst);
+  standIn(ctx, inst, boss, zone);
+  if (zone === 'ring' && !live) {
     // The final phase forced: its share of health (never raised past it).
     boss.hp = Math.min(boss.hp, Math.max(1, Math.floor(boss.maxHp * HEART_FINAL_PHASE_SHARE)));
     const me = ctx.entities.get(pid);
@@ -63,5 +81,40 @@ export function smithHeartFinalDevTrigger(
       ? 'The Masterless Strength stands in the central ring at its final phase and turns on you: the final look.'
       : 'The Masterless Strength stands in the central ring at its final phase (it could not be pulled).';
   }
+  if (zone === 'ring') return 'The Masterless Strength stands in the central ring.';
   return `The Masterless Strength stands in the ${zone} quarter.`;
+}
+
+/** Handles `final ...` (the words after `/dev heart`); returns the reply
+ *  line, or null when the words name nothing (the caller prints the help). */
+export function smithHeartFinalDevTrigger(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  arg: string,
+  pid: number,
+): string | null {
+  const words = arg.trim();
+  if (!words) return finalReadout(ctx, inst).replace(/^\[dev\] /, '');
+  const [verb, rest = ''] = words.split(/\s+(.*)/s);
+  if (verb === 'quarter') return quarterVerb(ctx, inst, rest.trim(), pid);
+  if (verb === 'reset') return resetFinalForDev(ctx, inst);
+  if (verb === 'normal' || verb === 'heroic' || verb === 'mythic') {
+    setFinalDevTier(inst, verb);
+    const live = smithHeartFinalBoss(ctx, inst)?.smithHeartFinal;
+    if (live) live.difficulty = finalDifficulty(inst);
+    return `The Masterless Strength fights on ${finalDifficulty(inst)} for this run.`;
+  }
+  const boss = smithHeartFinalBoss(ctx, inst);
+  if (!boss) return 'The Masterless Strength has fallen in this run (/dev heart reset).';
+  const me = ctx.entities.get(pid);
+  if (verb === 'pull') {
+    if (me) displacePlayerForDev(ctx, me, boss.pos.x + 6, boss.pos.z - 6);
+    return me && ctx.aggroMob(boss, me, false)
+      ? 'The Masterless Strength wakes on the Anvil and turns on you.'
+      : 'The Masterless Strength cannot be pulled.';
+  }
+  // A mechanic forced on a boss nobody pulled pulls it first (an unpulled
+  // boss resets its fight on the next tick).
+  if (!boss.inCombat && me && !me.dead) ctx.aggroMob(boss, me, false);
+  return finalDevMechanic(ctx, inst, words, pid);
 }

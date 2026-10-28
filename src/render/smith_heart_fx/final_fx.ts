@@ -9,7 +9,10 @@
 //    crystal with the four veins turning inside it, threads of the veins'
 //    light stitching each piece to it; it hovers and breathes, swings at the
 //    tank, slams both fists into the floor for Forge Fist, flings its arms
-//    up over Forge Wrath's bar and cups its hands for Forge Pour;
+//    up over a gathering bar (Basalt Fist, Weight of the Anvil) and slams
+//    them down as it lands, and cups its hands for Leaping Bolt; its seams
+//    and its halo burn in the colour of the quarter it drinks (the state
+//    aura, encounters/smith_heart/final_ids.ts), white-gold in the ring;
 //  - the arrival: the heart rising out of its bed in the chasm and gliding
 //    in, each piece trembling, tearing free of the paving with its dust (its
 //    socket is carved into the quarter it lay in, phase 2L), spiralling in
@@ -17,11 +20,10 @@
 //    flash, the shards rising out of the chasm, then the four-colour
 //    shockwave and the camera's thud (reduced motion drops the shake). A
 //    pull during it runs the scene on to its end at once;
-//  - Forge Pour's cone through the shared floor telegraph on EVERY tier
-//    (threat colour `danger`, the heart's white-gold as the accent; before
-//    2J it had only its bar) and the torrent of fire it pours; Forge Wrath's
-//    gather and its wall of light riding out on the trash engine's wave
-//    clock (its sight field, the actionable part, is the engine's own);
+//  - an Overload Burst: the heart's flash and a wall of the quarter's light
+//    riding out over the whole Anvil on the trash engine's wave clock, a
+//    pulse a low ring of it (the bars themselves are the HUD's, the floor's
+//    light the room's);
 //  - the death: the threads snapping, every piece falling, crumbling to
 //    rubble or tumbling off the lip into the chasm, the heart flickering
 //    dark and sinking into its bed (the room goes dark with it:
@@ -33,22 +35,17 @@
 // under the root before its gated attach (the kit's rock pieces, which land
 // later, draw with the kit's own shared slot materials, linked with the
 // interior, and this module's glow); no light; fixed pools, no per-frame
-// allocation; the pour's floor fire rides the floor ladder's encounter band.
+// allocation.
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { HEART_ROOM, SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
 import { heartFinalPhase } from '../../sim/content/smith_heart_quarters';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
+import { FINAL_AURAS, FINAL_CUES, finalZoneOf } from '../../sim/encounters/smith_heart/final_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
-import {
-  TELEGRAPH_THREAT_COLORS,
-  type TelegraphFan,
-  TelegraphKit,
-  telegraphFillOf,
-} from '../floor_telegraph';
-import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { telegraphFillOf } from '../floor_telegraph';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX, sharedUniforms } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
@@ -100,20 +97,16 @@ import {
   colossusWristTarget,
   DEATH,
   DEATH_END,
+  FINAL_BODY_CASTS,
   FINAL_BOSS,
   FINAL_FX_COLORS,
   FINAL_FX_POOLS,
   FORGE_FIST_CUE,
-  FORGE_POUR,
-  FORGE_WRATH,
   finalBossKit,
   HEART_RISE_FROM,
   heartArrivalPoint,
   heartDeathLevel,
   heartSink,
-  POUR_FLOW_SECONDS,
-  POUR_LINGER_SECONDS,
-  pourFlowLook,
   pourGather,
   type V3,
   wrathBlastLook,
@@ -191,54 +184,7 @@ void main() {
 
 // ---- the pour's floor fire ------------------------------------------------------------------
 
-const FAN_VERT = /* glsl */ `
-varying vec2 vP;
-void main() {
-  vP = position.xz;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-/** Forge Pour's fire on the floor: white-gold rushing out behind its front
- *  (never past the cone's range or arc), cooling to a dark crust in plates.
- *  The fan is the unit sector (radius 1, its arc `uHalf` either side of +Z). */
-const FAN_FRAG = /* glsl */ `
-uniform float uFront;
-uniform float uHeat;
-uniform float uCrust;
-uniform float uHalf;
-uniform float uTime;
-uniform float uRange;
-uniform vec3 uCore;
-uniform vec3 uFire;
-uniform vec3 uCrustCol;
-varying vec2 vP;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  float r = length(vP);
-  float a = abs(atan(vP.x, vP.y));
-  float rag = n(vec2(a * 9.0, r * 6.0)) * 0.08;
-  if (r > uFront || r > 1.0 - rag * 0.5 || a > uHalf * (0.97 - rag)) discard;
-  vec2 q = vec2(a * uRange * 0.6, r * uRange) * 0.5;
-  float rip = n(q - vec2(0.0, uTime * 4.0)) * 0.6 + n(q * 2.3 - vec2(0.0, uTime * 6.0)) * 0.4;
-  vec3 hot = mix(uFire, uCore, smoothstep(0.55, 0.9, rip));
-  float plates = smoothstep(0.32, 0.58, n(q * 0.9) * 0.7 + n(q * 2.4) * 0.3);
-  float crust = clamp(uCrust * 1.2 - (1.0 - plates) * 0.4, 0.0, 1.0);
-  vec3 col = mix(hot * (0.7 + 0.5 * uHeat), uCrustCol, crust);
-  float lead = smoothstep(uFront - 0.06, uFront, r) * step(uFront, 0.999);
-  col += uCore * lead * uHeat * 0.6;
-  float alpha = (1.0 - smoothstep(0.85, 1.0, r)) * (0.45 + 0.5 * max(uHeat, crust));
-  gl_FragColor = vec4(col, alpha * max(uHeat, crust * 0.9));
-  #include <colorspace_fragment>
-}
-`;
-
-/** The wall of light riding out with Forge Wrath, rising off the floor. */
+/** The wall of light riding out with an Overload Burst, rising off the floor. */
 const WALL_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform float uTime;
@@ -303,8 +249,6 @@ export class FinalFx {
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly particles: EngineParticles;
-  private readonly kit: TelegraphKit;
-  private readonly fan: TelegraphFan;
   private readonly sim = finalBossKit();
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
@@ -316,8 +260,6 @@ export class FinalFx {
     [];
   private readonly threads: THREE.InstancedMesh;
   private readonly threadColor = new THREE.Color();
-  private readonly pourFire: THREE.Mesh;
-  private readonly pourMat: THREE.ShaderMaterial;
   private readonly wrathWall: THREE.Mesh;
   private readonly wrathMat: THREE.ShaderMaterial;
   private readonly riseBeam: THREE.Mesh;
@@ -348,11 +290,15 @@ export class FinalFx {
   private swingSide: -1 | 1 = 1;
   private castId: string | null = null;
   private castProgress = 0;
+  /** The pose the running bar holds ('wrath' arms up, 'pour' cupped). */
+  private castPose: 'wrath' | 'pour' | null = null;
   private pourAt = -99;
-  private pourX = 0;
-  private pourZ = 0;
-  private pourYaw = 0;
   private wrathAt = -99;
+  private burstAt = -99;
+  /** The seams' colour easing toward the quarter it drinks. */
+  private readonly seamTint = new THREE.Color(C.seam);
+  private readonly seamTarget = new THREE.Color(C.seam);
+  private readonly burstTint = new THREE.Color(C.seam);
   private fistImpactDue = -1;
   private bossHitAt = -99;
 
@@ -380,9 +326,6 @@ export class FinalFx {
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
     );
-    // Forge Pour's footprint: on every tier.
-    this.kit = new TelegraphKit(this.root, detail);
-    this.fan = this.kit.fan(10);
     // The body's glow (its seams) and the heart's own shader, each with a
     // hidden carrier so the compile gate links them before the kit lands.
     this.seamGlow = heartVeinGlowMaterial(C.seam, 'smithHeartColossusSeams');
@@ -477,50 +420,12 @@ export class FinalFx {
       this.threads.setColorAt(i, this.threadColor.setHex(0xffffff));
     }
     this.root.add(this.threads);
-    // Forge Pour's fire on the floor and Forge Wrath's wall of light.
-    const half = (this.sim.pourArcDeg * Math.PI) / 360;
-    const fanGeo = new THREE.CircleGeometry(1, 40, Math.PI / 2 - half, half * 2).rotateX(
-      -Math.PI / 2,
-    );
-    // CircleGeometry's sector is about +X in its own plane; turned flat it
-    // lies about -Z. Turn it to +Z (the boss's front).
-    fanGeo.rotateY(Math.PI);
-    this.geometries.push(fanGeo);
+    // The Overload Burst's wall of light riding out over the whole Anvil.
     const col = (c: readonly [number, number, number]) => ({ value: new THREE.Color(...c) });
-    this.pourMat = new THREE.ShaderMaterial({
-      name: 'smithHeartForgePourFire',
-      uniforms: {
-        uFront: { value: 0 },
-        uHeat: { value: 0 },
-        uCrust: { value: 0 },
-        uHalf: { value: half },
-        uTime: this.uTime,
-        uRange: { value: this.sim.pourRange },
-        uCore: col(C.core),
-        uFire: col(C.gold),
-        uCrustCol: col(C.crust),
-      },
-      vertexShader: FAN_VERT,
-      fragmentShader: FAN_FRAG,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: -2,
-      polygonOffsetUnits: -2,
-    });
-    this.pourFire = new THREE.Mesh(fanGeo, this.pourMat);
-    this.pourFire.name = 'smithHeartForgePourFire';
-    // Over the telegraph's fill, under its fill front.
-    this.pourFire.renderOrder = floorVfxRenderOrder('encounter', 18);
-    this.pourFire.scale.setScalar(this.sim.pourRange);
-    this.pourFire.visible = false;
-    this.pourFire.frustumCulled = false;
-    this.root.add(this.pourFire);
     const wallGeo = new THREE.CylinderGeometry(1, 1, 1, 96, 1, true).translate(0, 0.5, 0);
     this.geometries.push(wallGeo);
     this.wrathMat = new THREE.ShaderMaterial({
-      name: 'smithHeartForgeWrathWall',
+      name: 'smithHeartOverloadWall',
       uniforms: { uAlpha: { value: 0 }, uTime: this.uTime, uCore: col(C.core), uGold: col(C.gold) },
       vertexShader: UV_VERT,
       fragmentShader: WALL_FRAG,
@@ -529,9 +434,9 @@ export class FinalFx {
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
     });
-    this.materials.push(this.pourMat, this.wrathMat);
+    this.materials.push(this.wrathMat);
     this.wrathWall = new THREE.Mesh(wallGeo, this.wrathMat);
-    this.wrathWall.name = 'smithHeartForgeWrathWall';
+    this.wrathWall.name = 'smithHeartOverloadWall';
     this.wrathWall.visible = false;
     this.wrathWall.frustumCulled = false;
     this.root.add(this.wrathWall);
@@ -663,10 +568,10 @@ export class FinalFx {
       this.action = 'fist';
       this.actionAt = this.clock;
       this.fistImpactDue = this.clock + COLOSSUS_FIST_IMPACT * COLOSSUS_FIST_SECONDS;
-    } else if (ev.ability === FORGE_WRATH && ev.fx === 'nova') {
-      this.wrathLands(e);
-    } else if (ev.ability === FORGE_POUR && ev.fx === 'nova') {
-      this.pourLands(e);
+    } else if (ev.ability === FINAL_CUES.burst && ev.fx === 'nova') {
+      this.burstLands(e, 1);
+    } else if (ev.ability === FINAL_CUES.pulse && ev.fx === 'nova') {
+      this.burstLands(e, 0);
     }
     return false;
   }
@@ -692,7 +597,6 @@ export class FinalFx {
       this.body.visible = false;
       this.heartHalo.visible = false;
       this.riseBeam.visible = false;
-      this.fan.group.visible = false;
       this.particles.update(this.clock);
       return;
     }
@@ -764,7 +668,7 @@ export class FinalFx {
     this.prevArrival = t;
     this.updateThreads(t);
     this.updateFlashes();
-    this.updatePour();
+    this.updateTint(boss, dt);
     this.updateWrath();
     if (this.fistImpactDue > 0 && this.clock >= this.fistImpactDue) {
       this.fistImpactDue = -1;
@@ -846,60 +750,40 @@ export class FinalFx {
     );
   }
 
+  /** The bar it holds (final_fx_core.ts FINAL_BODY_CASTS: arms raised or
+   *  hands cupped) and its fill; a raising bar's end slams both fists into
+   *  the floor. */
   private readCast(boss: Entity): void {
     const id = boss.castingAbility ?? null;
-    if (id === FORGE_WRATH || id === FORGE_POUR) {
-      const total =
-        boss.castTotal > 0
-          ? boss.castTotal
-          : id === FORGE_WRATH
-            ? this.sim.wrathCast
-            : this.sim.pourCast;
-      this.castProgress = telegraphFillOf(boss.castRemaining, total);
-      if (this.castId !== id) {
-        this.castId = id;
-        if (id === FORGE_POUR) {
-          this.pourX = boss.pos.x;
-          this.pourZ = boss.pos.z;
-          this.pourYaw = boss.facing;
-          this.kit.layOutFan(this.fan, this.sim.pourArcDeg, {
-            color: TELEGRAPH_THREAT_COLORS.danger,
-            accent: C.accent,
-          });
-        }
-      }
-    } else {
-      this.castId = null;
-      this.castProgress = 0;
-    }
-    // Forge Pour's footprint, filling with its bar (every tier).
-    if (this.castId === FORGE_POUR && !boss.dead) {
-      this.pourYaw = boss.facing;
-      const y = this.groundY(this.pourX, this.pourZ);
-      this.kit.drapeFan(
-        this.fan,
-        this.groundY,
-        this.pourX,
-        y,
-        this.pourZ,
-        this.pourYaw,
-        this.sim.pourRange,
+    const body = id ? FINAL_BODY_CASTS[id] : undefined;
+    if (id && body) {
+      this.castProgress = telegraphFillOf(
+        boss.castRemaining,
+        boss.castTotal > 0 ? boss.castTotal : 1,
       );
-      this.kit.paintFan(this.fan, {
-        fill: this.castProgress,
-        clock: this.clock,
-        range: this.sim.pourRange,
-      });
-      this.fan.group.visible = true;
-    } else {
-      this.fan.group.visible = false;
+      this.castId = id;
+      this.castPose = body.pose;
+      return;
     }
+    if (this.castId) {
+      const was = FINAL_BODY_CASTS[this.castId];
+      if (was?.slam && !boss.dead) {
+        // The arms are already up: the slam starts at the top of its arc.
+        this.action = 'fist';
+        this.actionAt = this.clock - 0.2 * COLOSSUS_FIST_SECONDS;
+        this.fistImpactDue = this.clock + (COLOSSUS_FIST_IMPACT - 0.2) * COLOSSUS_FIST_SECONDS;
+      } else if (was?.pose === 'pour') {
+        this.pourAt = this.clock;
+      }
+    }
+    this.castId = null;
+    this.castPose = null;
+    this.castProgress = 0;
   }
 
   /** The action the body plays this frame and its own clock (0..1). */
   private actionNow(): { action: ColossusAction; k: number } {
-    if (this.castId === FORGE_WRATH) return { action: 'wrath', k: this.castProgress };
-    if (this.castId === FORGE_POUR) return { action: 'pour', k: this.castProgress };
+    if (this.castPose) return { action: this.castPose, k: this.castProgress };
     const age = this.clock - this.actionAt;
     if (this.action === 'fist' && age < COLOSSUS_FIST_SECONDS)
       return { action: 'fist', k: age / COLOSSUS_FIST_SECONDS };
@@ -935,7 +819,7 @@ export class FinalFx {
     this.lean += (lean - this.lean) * Math.min(1, dt * 6);
     const breath = colossusBreath(this.clock);
     const part =
-      action === 'wrath' && this.castId === FORGE_WRATH ? wrathGather(this.castProgress).part : 0;
+      action === 'wrath' && this.castPose === 'wrath' ? wrathGather(this.castProgress).part : 0;
     const drift = breath.drift + part;
     const R = COLOSSUS_ARM;
     for (const p of this.pieces) {
@@ -1015,7 +899,7 @@ export class FinalFx {
     // The heart in its socket.
     const h = COLOSSUS_SLOTS.heart;
     const flare =
-      action === 'wrath' && this.castId === FORGE_WRATH ? wrathGather(this.castProgress).glow : 0;
+      action === 'wrath' && this.castPose === 'wrath' ? wrathGather(this.castProgress).glow : 0;
     this.bodyPoint(boss, h.x, h.y + flare * 0.4, h.z + drift * 0.2, true, this.heartPos);
   }
 
@@ -1089,8 +973,13 @@ export class FinalFx {
       }
     } else {
       this.riseBeam.visible = false;
-      const c = this.castId === FORGE_WRATH ? wrathGather(this.castProgress).glow : 0;
-      flare = c * 0.35 + Math.max(0, 1 - (this.clock - this.wrathAt) / 0.4) * 0.8;
+      const c =
+        this.castPose === 'wrath'
+          ? wrathGather(this.castProgress).glow
+          : this.castPose === 'pour'
+            ? pourGather(this.castProgress) * 0.7
+            : 0;
+      flare = c * 0.35 + Math.max(0, 1 - (this.clock - this.burstAt) / 0.4) * 0.8;
     }
     this.heartMat.uniforms.uLevel.value = heartLevel;
     this.heartMat.uniforms.uFlare.value = flare;
@@ -1488,115 +1377,55 @@ export class FinalFx {
     }
   }
 
-  // ---- Forge Pour -------------------------------------------------------------------------------
+  // ---- the quarter it drinks --------------------------------------------------------------
 
-  private pourLands(e: Entity): void {
-    this.pourAt = this.clock;
-    this.pourX = e.pos.x;
-    this.pourZ = e.pos.z;
-    this.pourYaw = e.facing;
-    this.fan.group.visible = false;
-    const y = this.groundY(this.pourX, this.pourZ);
-    this.pourFire.position.set(this.pourX, y + 0.07, this.pourZ);
-    this.pourFire.rotation.y = this.pourYaw;
-    this.pourFire.visible = true;
-    // The torrent out of the cupped hands down the cone.
-    const half = (this.sim.pourArcDeg * Math.PI) / 360;
-    const R = this.sim.pourRange;
-    const n = Math.round(46 * this.density);
-    for (let i = 0; i < n; i++) {
-      const a = this.pourYaw + (this.rand() * 2 - 1) * half * 0.9;
-      this.particles.puff(
-        this.pourX + Math.sin(a) * 4,
-        y + 6 + this.rand() * 3,
-        this.pourZ + Math.cos(a) * 4,
-        1,
-        {
-          speed: (R / POUR_FLOW_SECONDS) * (0.4 + this.rand() * 0.5),
-          life: 0.7,
-          size: [1.6, 0.6],
-          color: [1.0, 0.8, 0.4],
-          alpha: 1,
-          pool: 'pyre',
-          dir: [Math.sin(a), -0.32, Math.cos(a)],
-          spread: 0.08,
-          drag: 0.8,
-        },
-      );
-    }
-    for (let i = 0; i < Math.round(20 * this.density); i++) {
-      const a = this.pourYaw + (this.rand() * 2 - 1) * half;
-      const r = R * this.rand();
-      this.particles.puff(this.pourX + Math.sin(a) * r, y + 0.4, this.pourZ + Math.cos(a) * r, 1, {
-        speed: 5,
-        up: 6,
-        life: 0.9,
-        size: [0.3, 0.06],
-        color: C.spark,
-        alpha: 1,
-        pool: 'glow',
-        gravity: 12,
-      });
-    }
-    this.particles.shockRing(
-      this.pourX + Math.sin(this.pourYaw) * 4,
-      this.pourZ + Math.cos(this.pourYaw) * 4,
-      C.ring,
-      9,
-      0.4,
-    );
-    this.shakeNear(this.pourX, this.pourZ, 0.35);
+  /** The seams burn in the colour of the quarter it stands in (white-gold in
+   *  the ring): the strength it drinks reads on its body from anywhere in the
+   *  room, on every tier. */
+  private updateTint(boss: Entity, dt: number): void {
+    let state: Entity['auras'][number] | undefined;
+    for (const a of boss.auras)
+      if (a.id === FINAL_AURAS.state) {
+        state = a;
+        break;
+      }
+    const zone = finalZoneOf(state?.value);
+    if (zone === 'ring') this.seamTarget.setHex(C.seam);
+    else this.seamTarget.setHex(SMITH_HEART_VEIN_COLORS[zone]);
+    this.seamTint.lerp(this.seamTarget, Math.min(1, dt * 2.5));
+    const u = this.seamGlow.uniforms.uColor.value as THREE.Color;
+    u.copy(this.seamTint).multiplyScalar(1.8);
+    (this.heartHalo.material as THREE.SpriteMaterial).color.copy(this.seamTint);
   }
 
-  private updatePour(): void {
-    if (!this.pourFire.visible) return;
-    const age = this.clock - this.pourAt;
-    if (age > POUR_LINGER_SECONDS) {
-      this.pourFire.visible = false;
-      return;
-    }
-    const look = pourFlowLook(age);
-    this.pourMat.uniforms.uFront.value = look.front;
-    this.pourMat.uniforms.uHeat.value = look.heat;
-    this.pourMat.uniforms.uCrust.value = look.crust;
-    if (look.heat > 0.05 && this.rand() < 0.6 * this.density) {
-      // Smoke off the cooling floor.
-      const half = (this.sim.pourArcDeg * Math.PI) / 360;
-      const a = this.pourYaw + (this.rand() * 2 - 1) * half;
-      const r = this.sim.pourRange * look.front * this.rand();
-      const x = this.pourX + Math.sin(a) * r;
-      const z = this.pourZ + Math.cos(a) * r;
-      this.particles.puff(x, this.groundY(x, z) + 0.3, z, 1, {
-        speed: 0.8,
-        up: 2.2,
-        life: 2.2,
-        size: [1.2, 3.6],
-        color: [0.3, 0.27, 0.25],
-        alpha: 0.3,
-        drag: 0.6,
-      });
-    }
-    // The fire gathering in the hands over the bar is drawn in poseBody's
-    // flare; here only the floor.
-    void pourGather;
-  }
+  // ---- the Overload Burst and its pulses ---------------------------------------------------
 
-  // ---- Forge Wrath -------------------------------------------------------------------------------
-
-  private wrathLands(e: Entity): void {
-    this.wrathAt = this.clock;
-    const y = this.groundY(e.pos.x, e.pos.z);
-    this.wrathWall.position.set(e.pos.x, y, e.pos.z);
-    this.wrathWall.visible = true;
+  /** A bar's burst (`big` 1: the wall of light over the whole Anvil, the
+   *  heart's flash, the camera's thud) or a pulse (`big` 0: a low ring of the
+   *  quarter's light off the body). */
+  private burstLands(e: Entity, big: 0 | 1): void {
     const hx = this.originX + this.heartPos.x;
     const hz = this.originZ + this.heartPos.z;
-    this.flash(hx, this.heartPos.y, hz, 60, 0.6);
-    for (let i = 0; i < Math.round(60 * this.density); i++) {
+    this.burstTint.copy(this.seamTarget);
+    const tint = this.burstTint.getHex();
+    if (!big) {
+      this.particles.shockRing(e.pos.x, e.pos.z, tint, 16, 0.55);
+      this.flash(hx, this.heartPos.y, hz, 22, 0.35, tint);
+      return;
+    }
+    this.burstAt = this.clock;
+    const y = this.groundY(e.pos.x, e.pos.z);
+    this.wrathWall.position.set(e.pos.x, y, e.pos.z);
+    (this.wrathMat.uniforms.uGold.value as THREE.Color).copy(this.burstTint);
+    this.wrathWall.visible = true;
+    this.flash(hx, this.heartPos.y, hz, 70, 0.7, tint);
+    this.particles.shockRing(e.pos.x, e.pos.z, tint, this.sim.burstRadius, 1.4);
+    for (let i = 0; i < Math.round(70 * this.density); i++) {
       const a = this.rand() * Math.PI * 2;
       this.particles.puff(hx, this.heartPos.y, hz, 1, {
-        speed: 22 + this.rand() * 14,
+        speed: 22 + this.rand() * 16,
         life: 0.9,
-        size: [0.5, 0.1],
+        size: [0.55, 0.1],
         color: C.spark,
         alpha: 1,
         pool: 'glow',
@@ -1605,12 +1434,12 @@ export class FinalFx {
         drag: 0.6,
       });
     }
-    this.shakeNear(e.pos.x, e.pos.z, 0.7, this.sim.wrathRadius + 30);
+    this.shakeNear(e.pos.x, e.pos.z, 0.8, this.sim.burstRadius + 30);
   }
 
   private updateWrath(): void {
-    // Over its bar: the light drawn into the heart.
-    if (this.castId === FORGE_WRATH && this.rand() < 0.9 * this.density) {
+    // Over a raising bar: the light drawn into the heart.
+    if (this.castPose === 'wrath' && this.rand() < 0.9 * this.density) {
       const g = wrathGather(this.castProgress);
       const hx = this.originX + this.heartPos.x;
       const hz = this.originZ + this.heartPos.z;
@@ -1635,16 +1464,17 @@ export class FinalFx {
       );
     }
     if (!this.wrathWall.visible) return;
-    const age = this.clock - this.wrathAt;
-    const wave = novaWave(age, this.sim.wrathRadius);
-    const look = wrathBlastLook(age, wave.front / this.sim.wrathRadius);
+    const R = this.sim.burstRadius;
+    const age = this.clock - this.burstAt;
+    const wave = novaWave(age, R);
+    const look = wrathBlastLook(age, wave.front / R);
     if (age > NOVA_WAVE_SECONDS + 1.2) {
       this.wrathWall.visible = false;
       return;
     }
     const r = Math.max(0.5, wave.front);
-    this.wrathWall.scale.set(r, 5 + 4 * look.glow, r);
-    this.wrathMat.uniforms.uAlpha.value = look.wall * wave.alpha * 0.9;
+    this.wrathWall.scale.set(r, 6 + 6 * look.glow, r);
+    this.wrathMat.uniforms.uAlpha.value = look.wall * wave.alpha * 0.95;
   }
 
   dispose(): void {
@@ -1652,7 +1482,6 @@ export class FinalFx {
     this.disposed = true;
     this.root.removeFromParent();
     this.particles.dispose();
-    this.kit.dispose();
     this.threads.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();

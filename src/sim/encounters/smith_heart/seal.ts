@@ -51,6 +51,7 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { tickBreathGuardian } from './breath';
 import { tickHammerCouncil } from './council';
+import { tickFinalBoss } from './final';
 import { tickHeatGuardian } from './heat';
 import { tickSmithHeartPortal } from './portal';
 import { tickQuenchGuardian } from './quench';
@@ -298,6 +299,7 @@ export function tickSmithHeart(ctx: SimContext): void {
     tickBreathGuardian(ctx, inst);
     tickQuenchGuardian(ctx, inst);
     tickHeatGuardian(ctx, inst);
+    tickFinalBoss(ctx, inst);
     const value = tickSmithHeartSeal(ctx, inst);
     if (value !== null) tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value));
   }

@@ -8,13 +8,16 @@
 //     the chasm; the arrival tears them out in order and locks every one
 //     before the shockwave; the heart rises out of its bed into the body;
 //   - the arm's reach keeps its bones' lengths; Forge Fist strikes inside its
-//     arc and reach; the pour's hands reach forward;
+//     arc and reach; the cupped hands reach forward;
 //   - the fall lands every piece on the platform or sends it into the chasm,
 //     and the heart goes dark; the room's memory follows it;
 //   - the seal memory reads the arrival live when it is seen waking and long
 //     past when first seen awake (a late arrival sees the body whole);
-//   - FinalFx over a fake world telegraphs Forge Pour on every tier, pours
-//     its fire when it lands, never claims an event, disposes.
+//   - FinalFx over a fake world raises its arms over a gathering bar and
+//     slams them down when it lands, cups its hands for Leaping Bolt, burns
+//     its seams in the colour of the quarter it drinks, rides an Overload
+//     Burst's wall of light out over the Anvil, never claims an event,
+//     disposes.
 
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -48,23 +51,32 @@ import {
   colossusTearAt,
   colossusWristTarget,
   DEATH_END,
+  FINAL_BODY_CASTS,
   FINAL_BOSS,
   FORGE_FIST_CUE,
-  FORGE_POUR,
-  FORGE_WRATH,
   finalBossKit,
   heartArrivalPoint,
   heartDeathLevel,
-  pourFlowLook,
 } from '../src/render/smith_heart_fx/final_fx_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
-import { HEART_ALTARS, HEART_ROOM, HEART_TERRACE } from '../src/sim/content/smith_heart_layout';
+import {
+  HEART_ALTARS,
+  HEART_ROOM,
+  HEART_TERRACE,
+  SMITH_HEART_VEIN_COLORS,
+} from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   SMITH_HEART_AWAKE_BIT,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_SEAL_FULL,
 } from '../src/sim/encounters/smith_heart';
+import {
+  FINAL_AURAS,
+  FINAL_CASTS,
+  FINAL_CUES,
+  FINAL_ZONE_CODES,
+} from '../src/sim/encounters/smith_heart/final_ids';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
@@ -72,18 +84,15 @@ const bearingDeg = (x: number, z: number) =>
   ((Math.atan2(x - HEART_ROOM.x, z - HEART_ROOM.z) * 180) / Math.PI + 360) % 360;
 
 describe("the Masterless Strength's body", () => {
-  it('reads Forge Fist, Forge Wrath and Forge Pour off the sim template', () => {
+  it("reads Forge Fist off the sim template, the burst's reach off the room, a pose for every bar", () => {
     const m = SMITH_HEART_MOBS[FINAL_BOSS];
     const k = finalBossKit();
     expect(k.fistRange).toBe(m.arcCleave?.range);
     expect(k.fistArcDeg).toBe(m.arcCleave?.arcDeg);
-    expect(k.wrathRadius).toBe(m.trashKit?.nova?.radius);
-    expect(k.wrathCast).toBe(m.trashKit?.nova?.castTime);
-    expect(k.pourRange).toBe(m.trashKit?.cone?.range);
-    expect(k.pourArcDeg).toBe(m.trashKit?.cone?.arcDeg);
-    expect(k.pourCast).toBe(m.trashKit?.cone?.castTime);
-    expect(m.trashKit?.nova?.castId).toBe(FORGE_WRATH);
-    expect(m.trashKit?.cone?.castId).toBe(FORGE_POUR);
+    expect(k.burstRadius).toBe(HEART_ROOM.r);
+    // The sketch kit is gone: no nova, no cone.
+    expect(m.trashKit).toBeUndefined();
+    for (const id of Object.values(FINAL_CASTS)) expect(FINAL_BODY_CASTS[id], id).toBeDefined();
   });
 
   it('rests its pieces on the walk before the heart wakes: off the bridge, the altars, each other', () => {
@@ -234,11 +243,6 @@ describe("the Masterless Strength's body", () => {
     expect(heartDeathLevel(DEATH_END)).toBeCloseTo(0, 6);
     expect(heartDeathLevel(0.1)).toBeGreaterThan(0.3);
   });
-
-  it('pours its fire down the cone and never past it', () => {
-    for (let t = 0; t < 4; t += 0.05) expect(pourFlowLook(t).front).toBeLessThanOrEqual(1);
-    expect(pourFlowLook(0.2).heat).toBe(1);
-  });
 });
 
 describe("the Heart's memories: the arrival and the fall", () => {
@@ -316,7 +320,7 @@ describe('FinalFx', () => {
     return n;
   }
 
-  it('telegraphs Forge Pour, pours its fire, plays the fist and the wrath, claims nothing, disposes', () => {
+  it('raises its arms over a bar and slams them, wears its quarter, bursts, claims nothing, disposes', () => {
     const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
     const entities = new Map<number, Entity>();
     const me = entity(1, 'player', 'warrior', o.x + HEART_ROOM.x - 10, o.z + HEART_ROOM.z - 10);
@@ -339,38 +343,57 @@ describe('FinalFx', () => {
     const root = scene.getObjectByName('smith-heart-final-fx');
     expect(root).toBeDefined();
     fx.update(1 / 30);
+    // No floor telegraph of its own any more (the kits' are their own).
     expect(telegraphsShown(root)).toBe(0);
-    boss.castingAbility = FORGE_POUR;
-    boss.castTotal = 2.5;
-    boss.castRemaining = 2.5;
-    for (let i = 0; i < 30; i++) {
+    // The Anvil's bar: arms up; its end: the slam (a shake).
+    boss.castingAbility = FINAL_CASTS.anvil;
+    boss.castTotal = 6;
+    boss.castRemaining = 6;
+    for (let i = 0; i < 60; i++) {
       boss.castRemaining = Math.max(0, boss.castRemaining - 1 / 30);
       fx.update(1 / 30);
     }
-    expect(telegraphsShown(root)).toBe(1);
-    const pour = {
+    boss.castingAbility = null;
+    const before = shaken;
+    for (let i = 0; i < 30; i++) fx.update(1 / 30);
+    expect(shaken).toBeGreaterThan(before);
+    // It drinks the Heat: its seams burn the Heat's colour.
+    boss.auras = [
+      {
+        id: FINAL_AURAS.state,
+        name: 'x',
+        kind: 'internal_cd',
+        remaining: 1,
+        duration: 1,
+        value: FINAL_ZONE_CODES.heat,
+        sourceId: boss.id,
+      },
+    ] as Entity['auras'];
+    for (let i = 0; i < 90; i++) fx.update(1 / 30);
+    const seams = (root?.getObjectByName('smithHeartColossusCarrier') as THREE.Mesh | undefined)
+      ?.material as THREE.ShaderMaterial | undefined;
+    if (!seams) throw new Error('no seam carrier');
+    const tint = (seams.uniforms.uColor.value as THREE.Color).clone().multiplyScalar(1 / 1.8);
+    const heat = new THREE.Color(SMITH_HEART_VEIN_COLORS.heat);
+    expect(
+      Math.abs(tint.r - heat.r) + Math.abs(tint.g - heat.g) + Math.abs(tint.b - heat.b),
+    ).toBeLessThan(0.05);
+    const fist = {
       type: 'spellfx',
       sourceId: boss.id,
       targetId: boss.id,
       school: 'fire',
-      fx: 'nova',
-      ability: FORGE_POUR,
+      fx: 'windup',
+      ability: FORGE_FIST_CUE,
     } as SimEvent;
-    expect(fx.handleEvent(pour)).toBe(false);
-    boss.castingAbility = null;
-    fx.update(1 / 30);
-    expect(telegraphsShown(root)).toBe(0);
-    expect(root?.getObjectByName('smithHeartForgePourFire')?.visible).toBe(true);
-    const fist = { ...pour, fx: 'windup', ability: FORGE_FIST_CUE } as SimEvent;
     expect(fx.handleEvent(fist)).toBe(false);
-    const wrath = { ...pour, ability: FORGE_WRATH } as SimEvent;
-    expect(fx.handleEvent(wrath)).toBe(false);
+    const burst = { ...fist, fx: 'nova', ability: FINAL_CUES.burst } as SimEvent;
+    expect(fx.handleEvent(burst)).toBe(false);
     fx.update(1 / 30);
-    expect(root?.getObjectByName('smithHeartForgeWrathWall')?.visible).toBe(true);
+    expect(root?.getObjectByName('smithHeartOverloadWall')?.visible).toBe(true);
     expect(shaken).toBeGreaterThan(0);
     for (let i = 0; i < 200; i++) fx.update(1 / 30);
-    expect(root?.getObjectByName('smithHeartForgePourFire')?.visible).toBe(false);
-    expect(root?.getObjectByName('smithHeartForgeWrathWall')?.visible).toBe(false);
+    expect(root?.getObjectByName('smithHeartOverloadWall')?.visible).toBe(false);
     // The fall: the room's memory goes dark with it.
     boss.dead = true;
     for (let i = 0; i < 30; i++) fx.update(1 / 30);

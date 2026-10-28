@@ -13,7 +13,7 @@
 //   the posts      where the Wellspawn climb out, the Wellkeepers rise, and
 //                  the shore points a Rolling Cinder lands on
 
-import { FORGE_POINTS, HEARTH_WELL } from '../../content/smith_heart_layout';
+import { FORGE_POINTS, HEART_ROOM, HEARTH_WELL } from '../../content/smith_heart_layout';
 import { HEAT_TUNING as T, ZONE_BANDS } from './heat_ids';
 
 export interface HPoint {
@@ -103,6 +103,23 @@ export function floorReach(x: number, z: number, facing: number, max: number): n
   const c = Math.cos(facing);
   let d = 0;
   while (d < max && inHearthFloor(x + s * (d + 1), z + c * (d + 1))) d++;
+  return Math.max(1, Math.min(max, d));
+}
+
+/** How far a Molten Swell's lane runs from (x, z) along `facing`, at most
+ *  `max` yards: on the Hearth's floor to its edge (`floorReach`), on the
+ *  Anvil of the World (the Masterless Strength's Heat quarter, final_heat.ts)
+ *  to its rim. The sim's waves and the renderer's lanes both read it. */
+export function laneReach(x: number, z: number, facing: number, max: number): number {
+  if (inHearthFloor(x, z)) return floorReach(x, z, facing, max);
+  const s = Math.sin(facing);
+  const c = Math.cos(facing);
+  let d = 0;
+  while (
+    d < max &&
+    Math.hypot(x + s * (d + 1) - HEART_ROOM.x, z + c * (d + 1) - HEART_ROOM.z) <= HEART_ROOM.r
+  )
+    d++;
   return Math.max(1, Math.min(max, d));
 }
 

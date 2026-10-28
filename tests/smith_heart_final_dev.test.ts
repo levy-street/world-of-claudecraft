@@ -4,7 +4,7 @@
 // put a while (its home moved with it) at its full health, `ring` sets it on
 // the centre at its final phase's share of health (phase 2L: the final look
 // shows only then) and pulls it onto the player, an unknown zone prints the
-// help, outside a run it refuses, and a non-dev world never runs it.
+// help, outside a run it steps in first, and a non-dev world never runs it.
 
 import { describe, expect, it } from 'vitest';
 import { SMITH_HEART_DUNGEON, SMITH_HEART_FINAL_BOSS } from '../src/sim/content/smith_heart';
@@ -96,17 +96,16 @@ describe('/dev heart final quarter', () => {
     expect(boss.hp).toBeGreaterThan(boss.maxHp * HEART_FINAL_PHASE_SHARE - 2);
   });
 
-  it('prints the help for an unknown zone and refuses outside a run', () => {
-    const { sim, dev } = devSim();
+  it('enters the run first, prints the help for an unknown zone, and reads the fight', () => {
+    const { sim, dev, claim } = devSim();
+    // Outside a run: `final` claims one and steps in first (like `heat`).
     expect(dev('/dev heart final quarter north')).toBe(true);
-    // Not inside a run yet.
-    expect(said(sim.tick()).some((l) => l.includes('Not inside'))).toBe(true);
-    dev('/dev heart tp heartroom');
-    sim.tick();
-    expect(dev('/dev heart final quarter north')).toBe(true);
-    expect(said(sim.tick()).some((l) => l.includes('final quarter <'))).toBe(true);
+    expect(claim()).not.toBeNull();
+    expect(
+      said(sim.tick()).some((l) => l.includes('quarter <breath|quench|hammer|heat|ring>')),
+    ).toBe(true);
     expect(dev('/dev heart final')).toBe(true);
-    expect(said(sim.tick()).some((l) => l.includes('final quarter <'))).toBe(true);
+    expect(said(sim.tick()).some((l) => l.includes('The Masterless Strength'))).toBe(true);
   });
 
   it('does nothing in a world without dev commands', () => {

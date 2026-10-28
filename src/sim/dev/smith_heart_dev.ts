@@ -26,6 +26,14 @@
 //                                    centre (ring also pulls it onto you: the
 //                                    final phase's look is a fight's); the
 //                                    quarter it stands in wakes (phase 2K)
+//   /dev heart final [what]          the Masterless Strength (enters first):
+//                                    its readout, pull, reset, normal,
+//                                    heroic or mythic, fill [vein|all] [pct],
+//                                    burst, shock, root, unroot, or one
+//                                    ability now (fist, whirl, embers,
+//                                    freeze, cold <n>, ice, wind [deg], bolt,
+//                                    drawn, orbs, tremor, anvil, shell);
+//                                    sim/dev/smith_heart_final_dev.ts
 //   /dev heart reset                 free the run and claim a fresh one
 //   /dev heart council               the Hammer Council's readout
 //   /dev heart council <what>        pull (all three onto you), reset (whole
@@ -170,7 +178,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | final quarter <breath|quench|hammer|heat|ring> | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
@@ -349,11 +357,8 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     return true;
   }
   if (verb === 'final') {
-    const inst = claimFor(ctx, pid);
-    if (!inst) {
-      ctx.error(pid, "[dev] Not inside a Smith's Heart run (/dev heart enter).");
-      return true;
-    }
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
     const reply = smithHeartFinalDevTrigger(ctx, inst, arg, pid);
     if (reply === null) {
       ctx.error(pid, HELP);

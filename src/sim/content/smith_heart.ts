@@ -80,8 +80,6 @@ export const SMITH_HEART_CASTS = {
   breathGust: 'heart_bellows_gust',
   breathLance: 'heart_storm_lance',
   quenchBreath: 'heart_quenching_breath',
-  finalWrath: 'heart_forge_wrath',
-  finalPour: 'heart_forge_pour',
   galeBolt: 'heart_gale_bolt',
   rimeBolt: 'heart_rime_bolt',
   emberBolt: 'heart_ember_bolt',
@@ -517,40 +515,19 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     color: 0xfff2c0,
   },
   // ---- the final boss ------------------------------------------------------------
-  // The strength without its master. Phase 1 sketch: one form, a blast to hide
-  // from behind the altars and a frontal pour. The altar form choice, the
-  // altar drags and the adds are phase 2 (design doc, "Final boss").
+  // The strength without its master (design doc 7.5). Its fight is the
+  // encounter's (encounters/smith_heart/final*.ts): the four quarters' rules
+  // and kits. Its own swing cleave, Forge Fist, is its frontal (Mythic's Heat
+  // quarter leaves fire where it strikes, the Quench's slows); the sketch's
+  // Forge Wrath and Forge Pour are gone. Health a SKETCH: 70,000 base (about
+  // 161,000 after the elite factor), the guardians' anchor scaled for the
+  // raid's last fight. It cannot be controlled or slowed: only its own Taking
+  // Root holds it.
   heart_masterless_strength: {
     ...boss('heart_masterless_strength', 'The Masterless Strength', 70000, 0xd8c8a0, 3.6),
+    ccImmune: true,
+    slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Forge Fist' },
-    trashKit: {
-      nova: {
-        castId: C.finalWrath,
-        name: 'Forge Wrath',
-        castTime: 3,
-        every: 24,
-        first: 12,
-        school: 'fire',
-        // Phase 2M: the Anvil grew from 84 to 120 yd across and its altars
-        // moved out to 54 yd; the nova scales with it (40 of 42 then, 57 of
-        // 60 now) so it still reaches every altar and hiding still matters.
-        radius: 57,
-        min: 260,
-        max: 300,
-      },
-      cone: {
-        castId: C.finalPour,
-        name: 'Forge Pour',
-        castTime: 2.5,
-        every: 13,
-        first: 6,
-        school: 'fire',
-        range: 22,
-        arcDeg: 70,
-        min: 240,
-        max: 280,
-      },
-    },
   },
 };
 

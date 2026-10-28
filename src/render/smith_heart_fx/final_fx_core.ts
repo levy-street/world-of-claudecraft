@@ -9,8 +9,8 @@
 // than a player. When it dies the body crumbles, the rocks fall over the
 // room and the heart goes dark.
 //
-// Presentation only: the sim's numbers (Forge Fist's arc and reach, Forge
-// Wrath's radius and bar, Forge Pour's cone, range and bar) are read here,
+// Presentation only: the sim's numbers (Forge Fist's arc and reach, the
+// Overload Burst's reach, the bars' casts) are read here,
 // never changed, and the arrival is a timeline from the moment the heart
 // woke (the seal markers' arrival bit, heart_seal_core.ts `awakeSince`),
 // never a sim state of its own. The body is the Heart kit's rock pieces and
@@ -23,48 +23,44 @@
 //
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
-import {
-  SMITH_HEART_CASTS,
-  SMITH_HEART_FINAL_BOSS,
-  SMITH_HEART_MOBS,
-} from '../../sim/content/smith_heart';
+import { SMITH_HEART_FINAL_BOSS, SMITH_HEART_MOBS } from '../../sim/content/smith_heart';
 import { HEART_ROOM } from '../../sim/content/smith_heart_layout';
+import { FINAL_CASTS } from '../../sim/encounters/smith_heart/final_ids';
 import { HEART_CORE_BED_Y } from '../smith_heart/heart_room_kit_plan_core';
 import { fxHash } from './hammer_fx_core';
 
-/** The boss whose body this is, and its casts. */
+/** The boss whose body this is. */
 export const FINAL_BOSS = SMITH_HEART_FINAL_BOSS;
-export const FORGE_WRATH = SMITH_HEART_CASTS.finalWrath;
-export const FORGE_POUR = SMITH_HEART_CASTS.finalPour;
 /** The arc cleave's cue (mob_swing.ts emits it as the cleave lands). */
 export const FORGE_FIST_CUE = 'brood_cleave';
 
-/** The sim's own numbers (read, never tuned here). */
+/** What the body does over each of its bars (final_ids.ts FINAL_CASTS):
+ *  Basalt Fist and Weight of the Anvil raise both arms (the light gathering,
+ *  the slam when the bar lands), Leaping Bolt cups the storm in its hands. */
+export const FINAL_BODY_CASTS: Readonly<Record<string, { pose: 'wrath' | 'pour'; slam: boolean }>> =
+  {
+    [FINAL_CASTS.fist]: { pose: 'wrath', slam: true },
+    [FINAL_CASTS.anvil]: { pose: 'wrath', slam: true },
+    [FINAL_CASTS.bolt]: { pose: 'pour', slam: false },
+  };
+
+/** The sim's own numbers (read, never tuned here): Forge Fist's arc and
+ *  reach, the Overload Burst's reach (the whole Anvil). */
 export function finalBossKit(): {
   fistRange: number;
   fistArcDeg: number;
-  wrathRadius: number;
-  wrathCast: number;
-  pourRange: number;
-  pourArcDeg: number;
-  pourCast: number;
+  burstRadius: number;
 } {
   const m = SMITH_HEART_MOBS[FINAL_BOSS];
-  const k = m?.trashKit;
   return {
     fistRange: m?.arcCleave?.range ?? 9,
     fistArcDeg: m?.arcCleave?.arcDeg ?? 110,
-    wrathRadius: k?.nova?.radius ?? 40,
-    wrathCast: k?.nova?.castTime ?? 3,
-    pourRange: k?.cone?.range ?? 22,
-    pourArcDeg: k?.cone?.arcDeg ?? 70,
-    pourCast: k?.cone?.castTime ?? 2.5,
+    burstRadius: HEART_ROOM.r,
   };
 }
 
 /** The palette (linear 0..1): the heart's white-gold, its gold, the veins'
- *  four colours for the threads and the shockwave, dust, the crust a pour
- *  leaves. */
+ *  four colours for the threads and the shockwave, dust. */
 export const FINAL_FX_COLORS = {
   core: [1.0, 0.95, 0.8] as const,
   gold: [1.0, 0.76, 0.36] as const,
@@ -299,8 +295,9 @@ export type ColossusAction = 'idle' | 'swing' | 'fist' | 'wrath' | 'pour';
 
 /** Where one wrist (side 1 left, -1 right) wants to be in the body's frame
  *  for an action at `k` (its own 0..1 clock): the idle hang, a swing at the
- *  tank, Forge Fist's two-fisted slam into the floor ahead, Forge Wrath's
- *  arms flung up over its bar, Forge Pour's hands cupped forward. And how far
+ *  tank, the two-fisted slam into the floor ahead (Forge Fist, a bar's
+ *  landing), the arms flung up over a gathering bar (`wrath`), the hands
+ *  cupped forward (`pour`, the storm held). And how far
  *  the body leans in (radians, forward). */
 export function colossusWristTarget(
   action: ColossusAction,
@@ -598,18 +595,18 @@ export function heartSink(t: number): number {
  *  the room as it ends: rubble, the heart dark in its bed). */
 export const DEATH_END = DEATH.heartSinkAt + DEATH.heartSinkSeconds + 0.5;
 
-// ---- Forge Wrath and Forge Pour ---------------------------------------------------------------
+// ---- the gathering bars and the Overload Burst ---------------------------------------------
 
-/** Forge Wrath over its bar (`progress` 0..1): how hard the light gathers
- *  into the heart, how far the pieces part (the body drawing breath). */
+/** A gathering bar (`progress` 0..1): how hard the light gathers into the
+ *  heart, how far the pieces part (the body drawing breath). */
 export function wrathGather(progress: number): { glow: number; part: number } {
   const p = clamp01(progress);
   return { glow: 0.3 + 0.7 * smooth(p / 0.9), part: 1.6 * smooth(p) };
 }
 
-/** Forge Wrath landing `elapsed` seconds ago: the flash, the wall of light
- *  riding out to the nova's radius on the trash engine's wave clock (its
- *  front at `front` of the radius), the afterglow. */
+/** The Overload Burst landing `elapsed` seconds ago: the flash, the wall of
+ *  light riding out over the whole Anvil on the trash engine's wave clock
+ *  (its front at `front` of the radius), the afterglow. */
 export function wrathBlastLook(
   elapsed: number,
   front: number,
@@ -625,23 +622,9 @@ export function wrathBlastLook(
   };
 }
 
-/** Forge Pour over its bar: the fire gathering in the cupped hands. */
+/** A cupped bar (Leaping Bolt): the storm gathering in the hands. */
 export function pourGather(progress: number): number {
   return 0.2 + 0.8 * smooth(clamp01(progress) / 0.9);
-}
-
-/** Forge Pour landing `elapsed` seconds ago: how far down the cone the
- *  torrent has run (a share of its range), how hot it burns, how far the
- *  floor has crusted over. */
-export const POUR_FLOW_SECONDS = 0.45;
-export const POUR_LINGER_SECONDS = 3.4;
-export function pourFlowLook(elapsed: number): { front: number; heat: number; crust: number } {
-  return {
-    front: easeOut(elapsed / POUR_FLOW_SECONDS),
-    heat: elapsed < POUR_FLOW_SECONDS ? 1 : Math.max(0, 1 - (elapsed - POUR_FLOW_SECONDS) / 1.4),
-    crust:
-      smooth((elapsed - 0.6) / 1.6) * (1 - smooth((elapsed - POUR_LINGER_SECONDS + 0.8) / 0.8)),
-  };
 }
 
 /** The pools (fixed, allocated at build). */

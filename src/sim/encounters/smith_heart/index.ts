@@ -37,6 +37,20 @@ export {
 export type { CouncilFightState, CouncilSoul } from './council_state';
 export { SMITH_HEART_CLOSED_TEXT, SMITH_HEART_PLAYABLE, smithHeartEntryOpen } from './entry';
 export {
+  finalBoss,
+  finalDevMechanic,
+  finalDifficulty,
+  finalReadout,
+  finalScopeForDev,
+  releaseRootForDev,
+  resetFinalForDev,
+  setFinalDevTier,
+  tickFinalBoss,
+} from './final';
+export { FINAL_WIND_TAG } from './final_breath';
+export * from './final_ids';
+export type { FinalFightState } from './final_state';
+export {
   heatDevTrigger,
   heatDifficulty,
   heatGuardian,
