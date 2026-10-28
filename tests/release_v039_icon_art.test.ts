@@ -535,11 +535,12 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // plus reins_nightwing_chimera, so all 138 live hotbar items are painted; none remain parked.
     // Wobbles the Slime's reins ship committed art (a render of the mount): 139.
     // Halloween adds 22 usable rewards with committed item art.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(275);
+    // The Ossuary Charger's reins ship committed art (a render of the mount): 276.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(276);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(275);
+    ).toHaveLength(276);
     expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([]);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
