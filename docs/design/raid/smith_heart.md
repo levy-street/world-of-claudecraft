@@ -1266,6 +1266,18 @@ Blender pieces), `tests/smith_heart_quarters_kit.test.ts` (one flat sheet per qu
 landmarks as the quarters' walls, the crackle's longer reach) and
 `tests/smith_heart_quarters_look.test.ts` (the spots along each landmark's run).
 
+**The fight on the quarters (the final boss, mechanics part 1, 28 Oct 2026).** The room now
+carries its fight: the quarter the boss stands in is the strength it drinks and its kit, the
+four Overload bars, Taking Root on every quarter it enters, Vein Shock on Heroic and Heart
+Unbound in the central ring (above its final 15 percent), each quarter's kit on Normal,
+Heroic and Mythic, its raid HUD and its look on the floor (section 7.5 has the whole of it).
+The geometry core (`heartQuarterAt`) is the fight's own: a zone changes once the boss is 3
+yd past a ridge's line (`final_rules.ts` `ZONE_HOLD`). The altars stay as the quarters'
+crowns; the altar drags and Forge Wrath's cover behind them are superseded by the approved
+design and gone with the sketch kit. The quarter awake and the crossing's shockwave (above)
+now read with the fight: the boss's seams take its quarter's colour, the switch throws a
+shockwave in the four veins' light over the Anvil.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -1651,35 +1663,104 @@ Flare-Scorched, The First Wellspring, The First Flame and Wellspring Fire are pl
 
 - Look (phase 2J, section 5.17): the mountain's heart, a great crystal with the four veins
   turning inside it, binding the room's rocks into a colossus of floating mountain over
-  the Anvil of the World as the raid first arrives; the body until its own model.
-- Phase 1 (`heart_masterless_strength`): Forge Fist (frontal arc cleave); Forge
-  Wrath (line-of-sight nova: hide behind an altar); Forge Pour (cast-bar frontal
-  cone). One form only.
-- Target design:
-  1. **Form choice before the pull.** The raid touches one of the four altars. That
-     strength is the first the body drinks; the boss assembles in that form,
-     changing its shape, colour and core abilities:
-     - Breath: light and fast, floats; chained lightning and pushing gusts; demands
-       spreading and constant movement.
-     - Quench: ice and steel plates; stacking cold cleansed only at braziers,
-       slippery floor; demands brazier coordination.
-     - Heat: living embers; growing pools and split strikes; demands heavy healing.
-     - Hammer: heavy and slow, hits very hard; columns that block line of sight to
-       healers and boulders the raid must soak together; demands strong tanks.
-  2. **Altar drags.** Tanks drag the boss onto another altar; it drinks that
-     strength for 45 seconds and adds its abilities on top of its form. A drunk altar
-     goes cold until every altar has been used, then all relight. The raid picks the
-     order for its composition (few healers: clear the hardest strength first).
-  3. **Adds at every 25 percent.** At 75, 50 and 25 percent health all four altars
-     release adds at once; the raid must pick them up before they reach the healers.
-  4. **Heroic.** The boss drinks two strengths at once on each drag, and chooses the
-     second itself (for example Breath plus Quench: spread for the lightning, gather
-     at braziers for the cold).
-  5. **Why the choice matters.** The form reshapes the whole fight, so each raid
-     picks for its group and can try another form each week; the form also decides
-     one extra loot item (section 8).
-- Altar drags are inspired conceptually by a known raid encounter; mechanics,
-  names and look are our own.
+  the Anvil of the World as the raid first arrives; the body until its own model. Its
+  seams and halo now burn in the colour of the quarter it drinks (white-gold in the ring).
+- **The approved design (the owner, 28 Oct 2026; the team doc's tab "5. The Masterless
+  Strength", "Fight design").** The boss fights on the Anvil's four quarters (section
+  5.21); the quarter it stands in is the strength it drinks, and four rules make the tanks
+  drag it from quarter to quarter. Each quarter has ONE type of mechanic; the Anvil is the
+  fight's ONLY group damage share (solo step-on soaks are fine). Removed by the owner:
+  hiding behind columns, golems, any second group damage share. The earlier altar-drag
+  sketch (form choice at an altar, altar drags, adds at every 25 percent) is superseded.
+- **Part 1, built (this section).** The rules and the four kits on Normal, Heroic and
+  Mythic, the base form, the dev verbs, the raid HUD, the warnings, the tooltips and the
+  kits' look. **Part 2, not built:** the intermissions at 70 and 40 percent with the four
+  adds, the 15 percent final phase's mix and its soft enrage, the Mythic hidden phase, loot
+  (the base form's extra item: the state aura carries the base form as its hook), the final
+  models, the voice.
+
+**A PROTOTYPE, numbers unmeasured.** Every tunable lives in one table, `FINAL_TUNING` and
+`FINAL_DIFFICULTY` in `src/sim/encounters/smith_heart/final_ids.ts`, so a change is one
+number. The code is `src/sim/encounters/smith_heart/final*.ts`: the coordinator `final.ts`,
+the rules `final_rules.ts`, one module per quarter (`final_heat.ts`, `final_quench.ts`,
+`final_breath.ts`, `final_hammer.ts`), the scope and the leaf. Health 70,000 base (about
+161,000 after the elite factor). Its own swing cleave, Forge Fist (110 degrees, 9 yd, every
+third landed swing), is its frontal; the sketch's Forge Wrath and Forge Pour are gone. It
+cannot be controlled or slowed: only its own Taking Root holds it.
+
+| Rule | How it works (Normal unless said) | Where |
+|---|---|---|
+| Overload | One bar per quarter. The bar of the quarter it stands in fills (empty to full in 40 s) and pulses the raid every 4 s, harder the fuller it is (60 to 70 at empty, up to 370 at full); full, it bursts (900 to 1,000 to everyone) and empties. Away from its quarter a bar drains at a third of the fill speed; in the ring nothing fills | `final_rules.ts` |
+| Vein Shock (Heroic, Mythic) | Every quarter change hits the raid (180 to 220) and leaves Vein-Shaken (20 s) on everyone struck; a change while still shaken hits three times as hard | `final_rules.ts` |
+| Taking Root | On entering a quarter (the pull's first one too) it roots for 15 s: it cannot be dragged out. Between roots it follows its tank like any boss, across a ridge into the next quarter. A zone only changes once the boss is 3 yd past a ridge's line (1.5 yd past the ring's edge), so a boss swaying on a ridge never flickers | `final_rules.ts` |
+| Heart Unbound | In the central ring above 15 percent it gains a stack every second and every second deals 45 to the whole raid for each stack: drag it through, never park it | `final_rules.ts` |
+| The base form | The first quarter it enters is its base form for the fight (the state aura's `value2`; the extra loot item's hook) | `final_rules.ts` |
+
+| Quarter | Normal | Heroic adds | Mythic adds |
+|---|---|---|---|
+| Heat (dodge and place) | Basalt Fist every 16 s: a 3 s bar on a hashed player's spot (6 yd, 2,200 to 2,400), then three Molten Swells roll out of it (the Heat guardian's own objects, lanes and numbers, 32 yd or to the Anvil's rim). Fire Whirls every 13 s: three rise by hashed players (1.5 s of warning) and run 9 s across the floor, turning back off the rim (300 to 340, once a second at most) | Ember Mark every 22 s: up to three ranged players (12 yd or more from it, never the tank); 6 s later embers drop at their feet and smoulder 30 s (5 yd, 150 to 170 a second): stack the marks in one corner, then move out | Forge Fire: its frontal leaves a pool of fire (4 yd, 20 s) where it struck |
+| Quench (stack, no split) | Quenching Cold: anyone with fewer than two other players within 10 yd grows cold (a bar, full in 5 s alone; it falls when huddled); full, Encased in Rime (stunned 4 s, 300 to 340). The cold goes once it leaves the quarter | Groaning Ice every 18 s: the floor cracks under two hashed players (4 yd); 3 s later it breaks and whoever stands on it falls Under the Ice (600 to 680, stunned 3 s) | Numbing Frost: its frontal slows everyone it strikes by 75 percent for 6 s |
+| Breath (spread) | Bellows Wind every 20 s: 2 s of gathering, then 8 s of gale toward a hashed bearing, carrying everyone 3.5 yd a second (the wind kernel's aura: both hosts step it, the online client predicts it); within 5 yd of the rim while it blows, Pressed to the Rim (220 to 260 a second). Leaping Bolt every 11 s: a 2 s bar on a hashed player; it leaps to every player within 6 yd of anyone struck, each leap half again as hard (300 to 340 first) | Drawn Lightning every 22 s: two marked players for 6 s; every second it arcs to everyone within 8 yd of them (200 to 230) | Storm Orbs every 25 s: three orbs round it; each must be stepped on within 8 s (one player: 250 to 280; two or more on it: each twice that), or it bursts on the whole raid (450 to 500) |
+| Hammer (the only group soak) | Tremor Cracks every 10 s: under three hashed players (4 yd), erupting 2.5 s later (500 to 560). Weight of the Anvil every 25 s: a 6 s bar, a 6 yd mark where a hashed player stood; 9,000 split between everyone under it (half as much again each with fewer than three); nobody under it: 1,500 to 1,600 to everyone | Stone Shell every 20 s: three hashed players absorb their next 600 healing. Crushed: everyone who shared the Anvil for 30 s; a Crushed player under the next Anvil takes their share three times over (two groups rotate). Four Tremor Cracks | The turning Anvil: its mark turns round the boss through its bar (11 yd out, 25 degrees a second) |
+
+Difficulty multiplies every mechanic's damage (Normal 1, Heroic 1.2, Mythic 1.3); Mythic
+carries every Heroic rule. A new tier is one `FINAL_DIFFICULTY` row, never a branch on a
+tier's name. The raid has no heroic or mythic tier of its own yet: `/dev heart final
+heroic|mythic` switches a run (section 11).
+
+**What every client reads** (no wire or `IWorld` change; pinned through the real server
+into the online mirror by `tests/smith_heart_final_wire.test.ts`): the zone, the base form
+and the switch mark's seconds on the boss's state aura; the four bars as four auras
+(`value` 0 to 100, `value2` the trend); Taking Root and Heart Unbound as auras; the bars as
+cast bars (Basalt Fist the Heat guardian's own cast); every footprint as an object (Basalt
+Fist's spot, lanes and waves the Heat guardian's); the marks as player auras; the gale as
+the wind kernel's aura, told from the Breath guardian's by its tag.
+
+**The raid HUD** (`src/ui/hud/dungeon/heart_overload_view.ts`, painted by
+`heart_overload_painter.ts`): four bars in a row at the top of the screen in their veins'
+colours, the quarter it drinks lit and framed, a bar three quarters full turning hostile and
+throbbing, and under them Taking Root's seconds (or that it can be dragged), Vein-Shaken's
+and Heart Unbound's. A personal alert in the prompts' slot (`final_alert_view.ts`) carries
+the player's cold (the Quench guardian's lines), Encased in Rime, the Ember Mark, Drawn
+Lightning and Crushed. Both draw on every tier and whatever the hints setting (the player
+steers by them). Every raid warning is a `hudChrome.finalBoss.warn.*` key, every tooltip a
+`hudChrome.auraEffect.finalBoss.*` key with the live numbers (`src/ui/final_aura_effect.ts`),
+every damage and aura name re-localized (`src/ui/sim_i18n.ts`); the five non-Latin locales
+are filled.
+
+**The look** (`src/render/smith_heart_fx/final_kit_fx.ts`, its plan
+`final_kit_fx_core.ts`): every footprint at the sim's exact radius through the shared floor
+telegraph on every tier (the threat colours; the Anvil and the Storm Orbs in the soak's
+gold), the gale's rim band, then the reaction and the impact over them: columns of fire
+turning across the floor, pools of embers and forge fire, frost and shattering ice, the gale's
+streaks and dust racing the way it blows, lightning leaping between bodies, storm orbs
+crackling harder as they near their burst, the great anvil hanging over its mark and dropping
+onto it with a shockwave, tremor cracks spitting grit, stone shells and blocks of ice on
+bodies, Taking Root's spikes of rock round its feet, Heart Unbound's blaze, the switch's
+shockwave in the four veins' light. The body (`final_fx.ts`) raises its arms over Basalt
+Fist's and the Anvil's bars and slams them down as they land, cups its hands over Leaping
+Bolt, and an Overload Burst throws a wall of the quarter's light over the whole Anvil.
+Particles thin on the low tier, shakes go under reduced motion; footprints, bodies' marks
+and the anvil never do. The kit's floor rungs are its own (`FINAL_KIT_FLOOR`), untied with
+FinalFx's and HeatFx's on the same floor.
+
+**Tests.** `tests/smith_heart_final.test.ts` (each rule and each ability per tier, the
+gating, determinism, a headless full fight per tier dragged round all four quarters and
+burned down, the wipe), `tests/smith_heart_final_ui.test.ts`,
+`tests/smith_heart_final_wire.test.ts`, `tests/smith_heart_final_kit_fx.test.ts`,
+`tests/smith_heart_final_fx.test.ts`, `tests/smith_heart_final_dev.test.ts`.
+
+IP check (28 Oct 2026, exact phrase plus coined token on the major game wikis and a general
+search): Overload Pulse, Overload Burst, Vein Shock, Vein-Shaken, Heart Unbound, Weight of
+the Anvil, Tremor Crack, Ember Mark, Numbing Frost and Storm Orb returned no game use
+(CLEAR). Overload, Taking Root, Fire Whirl, Smouldering Embers, Forge Fire, Crushed and Stone
+Shell are plain English (generic, kept; "Stone Shell" appears only inside a longer coined
+WoW name, "Stone Shell Detonation", never alone). Basalt Fist, Molten Swell, Quenching Cold,
+Encased in Rime, Groaning Ice, Under the Ice, Bellows Wind, Pressed to the Rim, Leaping Bolt
+and Drawn Lightning are the guardians' own, already checked. None of Kurog Grimtotem's names
+(Primal Shift, Primal Break, Molten Rupture, Frost Binds, Enveloping Earth, Elemental Surge,
+Sundering Strike and the rest) is used; the quartered room and the elemental drags are
+inspired by a known raid encounter as a concept only.
 
 ## 8. Loot hook (not wired in phase 1)
 
@@ -1854,6 +1935,14 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart seal` | print the `smithHeartProgress` readout (and whether the heart is awake) |
 | `/dev heart arrival` | replay the arrival scene: the heart sleeps a moment and wakes again with a living player in the Heart |
 | `/dev heart final quarter <zone>` | zone breath, quench, hammer, heat or ring: move the final boss (and its home) into the middle of that quarter of the Anvil of the World, or onto the central ring's centre (ring also sets it to its final phase, 15 percent of its health, and pulls it onto you: the final look); the quarter it stands in wakes (section 5.21) |
+| `/dev heart final` | the Masterless Strength's readout (difficulty, health, the zone it stands in, its base form, the root, the switch mark, Heart Unbound, the four bars, switches and bursts); every `final` verb enters the run first |
+| `/dev heart final pull` | set you down beside it and pull it (it takes root in the quarter it stands in) |
+| `/dev heart final reset` | the boss whole, home and out of its fight; every footprint and mark gone |
+| `/dev heart final normal`, `heroic`, `mythic` | this run's tier for the fight; a live fight takes it at once |
+| `/dev heart final quarter <zone>` (in a fight) | a quarter change: the boss lets go of its root and its bar and stands in that quarter (it roots again; Heroic shocks the raid) |
+| `/dev heart final fill [breath, quench, hammer, heat, all] [pct]` | set an Overload bar (95 by default; 99 bursts within a second in its quarter) |
+| `/dev heart final burst`, `shock`, `root`, `unroot` | the active bar bursts, a Vein Shock, Taking Root now, the root lets go |
+| `/dev heart final <ability>` | one ability now, on any tier: `fist` (on you), `whirl`, `embers`, `freeze` (you), `cold <n>`, `ice`, `wind [deg]`, `bolt`, `drawn`, `orbs`, `tremor`, `anvil` (on you), `shell` |
 | `/dev heart reset` | free the run and claim a fresh one |
 | `/dev heart council` | the Hammer Council's readout (difficulty, each member's health, energy, Wraths, the fallen in order) |
 | `/dev heart council pull` | pull all three onto you |
