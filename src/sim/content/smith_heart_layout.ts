@@ -286,31 +286,40 @@ export const HEARTH_WELL = { x: -224, z: 0, r: 8 } as const;
 
 // ---- the Heart: the separate final room ---------------------------------------------
 
-/** The Anvil of the World: the final boss's platform (84 yd across), hung by
- *  four chains over the Smith's glowing heart. */
-export const HEART_ROOM = { x: 188, z: 172, r: 42, h: H.heartRoom } as const;
+/** The Anvil of the World: the final boss's platform (120 yd across since
+ *  phase 2M), held by four roots of the mountain over the Smith's glowing
+ *  heart. */
+export const HEART_ROOM = { x: 188, z: 172, r: 60, h: H.heartRoom } as const;
 /** The open air round the platform (its chasm, down to the glowing heart):
- *  no rock stands within this radius of the room's centre. */
-export const HEART_ROOM_CHASM_R = 70;
-/** The Arrival Terrace, south-west of the platform, outside the boss's reach. */
-export const HEART_TERRACE = { x: 138.5, z: 122.5, r: 13, h: H.heartTerrace } as const;
+ *  no rock stands within this radius of the room's centre (the platform's
+ *  rim plus the old 28 yd of air; the wall landmarks stand in it). */
+export const HEART_ROOM_CHASM_R = 88;
+/** The Arrival Terrace, south-west of the platform, outside the boss's reach
+ *  (phase 2M: moved out with the platform's rim, so the bridge between them
+ *  keeps its length and its ramp). */
+export const HEART_TERRACE = { x: 125.75, z: 109.75, r: 13, h: H.heartTerrace } as const;
 /** Where the Ring's portal sets the raid down (facing the platform). */
-export const HEART_ARRIVAL = { x: 141, z: 125, facing: Math.PI / 4 } as const;
+export const HEART_ARRIVAL = { x: 128.25, z: 112.25, facing: Math.PI / 4 } as const;
 /** The return portal on the terrace's west side, back to the Seal Dais: to
  *  the side of the arrival, never behind it (a camera behind a player who
  *  just arrived never stands in it). */
-export const HEART_RETURN_PORTAL = { x: 132.5, z: 128.5, r: 3.5 } as const;
+export const HEART_RETURN_PORTAL = { x: 119.75, z: 115.75, r: 3.5 } as const;
 /** Everything of the Heart lies within this radius of the room's centre; the
  *  main map lies wholly outside it (the area split for music, fog, sky). */
-export const HEART_ROOM_AREA_R = 125;
+export const HEART_ROOM_AREA_R = 128;
+
+/** How far each altar stands from the platform's centre (phase 2M: at the
+ *  foot of its quarter's wall landmark, 6 yd in from the rim). */
+export const HEART_ALTAR_R = 54;
 
 /** The four altars round the Anvil of the World, one per vein at its compass
- *  point; each takes its vein's light down its chain. */
+ *  point, each at the foot of its quarter's landmark; each takes its vein's
+ *  light down its root. */
 export const HEART_ALTARS: readonly { vein: SmithHeartVein; x: number; z: number }[] = [
-  { vein: 'breath', x: HEART_ROOM.x, z: HEART_ROOM.z + 36 },
-  { vein: 'quench', x: HEART_ROOM.x + 36, z: HEART_ROOM.z },
-  { vein: 'hammer', x: HEART_ROOM.x, z: HEART_ROOM.z - 36 },
-  { vein: 'heat', x: HEART_ROOM.x - 36, z: HEART_ROOM.z },
+  { vein: 'breath', x: HEART_ROOM.x, z: HEART_ROOM.z + HEART_ALTAR_R },
+  { vein: 'quench', x: HEART_ROOM.x + HEART_ALTAR_R, z: HEART_ROOM.z },
+  { vein: 'hammer', x: HEART_ROOM.x, z: HEART_ROOM.z - HEART_ALTAR_R },
+  { vein: 'heat', x: HEART_ROOM.x - HEART_ALTAR_R, z: HEART_ROOM.z },
 ];
 
 /** The unit vector from the terrace toward the platform's centre. */

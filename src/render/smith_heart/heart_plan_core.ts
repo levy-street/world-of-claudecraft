@@ -520,17 +520,17 @@ export function planHeartLights(): HeartLightSpot[] {
       z: HEART_ROOM.z,
       lift: -28,
       color: 0xffd890,
-      intensity: 12,
-      range: 90,
+      intensity: 14,
+      range: 110,
     },
     {
       id: 'key:heart',
       x: HEART_ROOM.x,
       z: HEART_ROOM.z,
-      lift: 20,
+      lift: 26,
       color: 0xffe6c0,
-      intensity: 6,
-      range: 64,
+      intensity: 8,
+      range: 88,
     },
     // Each altar lights its own quarter of the platform (phase 2J: the
     // altars stand taller, their vein's light over their quarter).

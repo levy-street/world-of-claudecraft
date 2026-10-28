@@ -115,6 +115,12 @@ describe("the Masterless Strength's body", () => {
       const r = colossusRestPoint(p);
       expect(r.y).toBeLessThan(HEART_ROOM.h - 10);
       expect(Math.hypot(r.x - HEART_ROOM.x, r.z - HEART_ROOM.z)).toBeGreaterThan(HEART_ROOM.r);
+      // Phase 2M: never under a wall landmark (they stand at 0, 90, 180 and
+      // 270, their feet buttressed under the lip): a shard rises clear.
+      for (const l of [0, 90, 180, 270]) {
+        const off = Math.abs(((bearingDeg(r.x, r.z) - l + 540) % 360) - 180);
+        expect(off, `${p.id} by ${l}`).toBeGreaterThanOrEqual(13.99);
+      }
     }
   });
 

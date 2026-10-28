@@ -143,6 +143,20 @@ export const COLOSSUS_SHARDS = { skirt: 6, back: 4, skirtR: 4.6, backR: 5.4 } as
 
 const SHARD_PIECES = ['Kit_ColShardA', 'Kit_ColShardB', 'Kit_ColShardC'];
 
+/** A shard's bearing nudged clear of the wall landmarks (phase 2M: each
+ *  quarter's formation stands past the rim at its middle, 0, 90, 180 and
+ *  270 degrees, its foot buttressed down under the lip): at least 14
+ *  degrees off each, so a shard rising out of the chasm never rises
+ *  through one. */
+export function clearOfLandmarks(bearing: number): number {
+  const b = ((bearing % 360) + 360) % 360;
+  for (const l of [0, 90, 180, 270, 360]) {
+    const d = b - l;
+    if (Math.abs(d) < 14) return (((l + (d < 0 ? -14 : 14)) % 360) + 360) % 360;
+  }
+  return b;
+}
+
 /** Every piece of the body, in the order the heart tears them out. The rest
  *  spots lie on the platform's walk inside the quarters (phase 2K: never on
  *  a ridge), never on the bridge's line (where the raid walks in) nor an
@@ -151,17 +165,17 @@ export const COLOSSUS_PIECES: readonly ColossusPiece[] = (() => {
   const out: ColossusPiece[] = [];
   const big: [string, string, ColossusJoint, -1 | 0 | 1, number, number, number, number][] = [
     // id, piece, joint, side, size, scale, bearing, r
-    ['hip', 'Kit_ColHip', 'hip', 0, 8, 1.2, 340, 27],
-    ['torso', 'Kit_ColTorso', 'torso', 0, 11, 1.25, 20, 30],
-    ['shoulderL', 'Kit_ColShoulder', 'shoulder', 1, 6.8, 1.35, 112, 29],
-    ['shoulderR', 'Kit_ColShoulder', 'shoulder', -1, 6.8, 1.35, 292, 29],
-    ['upperL', 'Kit_ColUpperArm', 'upper', 1, 7.8, 1.2, 150, 23],
-    ['upperR', 'Kit_ColUpperArm', 'upper', -1, 7.8, 1.2, 325, 21],
-    ['foreL', 'Kit_ColForearm', 'fore', 1, 7.5, 1.25, 104, 35],
-    ['foreR', 'Kit_ColForearm', 'fore', -1, 7.5, 1.25, 284, 35],
-    ['fistL', 'Kit_ColFist', 'fist', 1, 5.8, 1.45, 162, 33],
-    ['fistR', 'Kit_ColFist', 'fist', -1, 5.8, 1.45, 252, 31],
-    ['head', 'Kit_ColHead', 'head', 0, 5.7, 1.3, 62, 33],
+    ['hip', 'Kit_ColHip', 'hip', 0, 8, 1.2, 340, 38.5],
+    ['torso', 'Kit_ColTorso', 'torso', 0, 11, 1.25, 20, 43],
+    ['shoulderL', 'Kit_ColShoulder', 'shoulder', 1, 6.8, 1.35, 112, 41.5],
+    ['shoulderR', 'Kit_ColShoulder', 'shoulder', -1, 6.8, 1.35, 292, 41.5],
+    ['upperL', 'Kit_ColUpperArm', 'upper', 1, 7.8, 1.2, 150, 33],
+    ['upperR', 'Kit_ColUpperArm', 'upper', -1, 7.8, 1.2, 325, 30],
+    ['foreL', 'Kit_ColForearm', 'fore', 1, 7.5, 1.25, 104, 47],
+    ['foreR', 'Kit_ColForearm', 'fore', -1, 7.5, 1.25, 284, 47],
+    ['fistL', 'Kit_ColFist', 'fist', 1, 5.8, 1.45, 162, 46],
+    ['fistR', 'Kit_ColFist', 'fist', -1, 5.8, 1.45, 252, 44],
+    ['head', 'Kit_ColHead', 'head', 0, 5.7, 1.3, 62, 46],
   ];
   big.forEach(([id, piece, joint, side, size, scale, bearing, r], i) => {
     out.push({ id, piece, joint, side, size, scale, rest: { bearing, r, chasm: false }, order: i });
@@ -175,7 +189,11 @@ export const COLOSSUS_PIECES: readonly ColossusPiece[] = (() => {
       side: 0,
       size: 1.6 + (i % 3) * 0.8,
       scale: 0.85 + 0.35 * fxHash(91, i),
-      rest: { bearing: (i * 360) / n + 13, r: 50 + 4 * fxHash(93, i), chasm: true },
+      rest: {
+        bearing: clearOfLandmarks((i * 360) / n + 13),
+        r: HEART_ROOM.r + 8 + 4 * fxHash(93, i),
+        chasm: true,
+      },
       order: i,
     });
   }
@@ -447,7 +465,10 @@ export function colossusSpin(k: number): number {
  *  terrace), then gliding in over the platform to the body's heart. */
 export const HEART_RISE_FROM = (() => {
   const a = Math.PI / 4;
-  return { x: HEART_ROOM.x + Math.sin(a) * 54, z: HEART_ROOM.z + Math.cos(a) * 54 };
+  return {
+    x: HEART_ROOM.x + Math.sin(a) * (HEART_ROOM.r + 12),
+    z: HEART_ROOM.z + Math.cos(a) * (HEART_ROOM.r + 12),
+  };
 })();
 
 /** The heart at `t` seconds after it woke, toward `slot` (its place in the

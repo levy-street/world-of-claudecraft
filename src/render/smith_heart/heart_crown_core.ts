@@ -17,7 +17,7 @@
 import { HEART_ROOM, SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
 
 /** The crown's reach (yards from the Heart's centre). */
-export const HEART_CROWN = { in0: 58, in1: 74, out0: 112, out1: 124 } as const;
+export const HEART_CROWN = { in0: 76, in1: 92, out0: 115, out1: 127 } as const;
 
 const smooth = (a: number, b: number, v: number) => {
   const t = Math.max(0, Math.min(1, (v - a) / (b - a)));

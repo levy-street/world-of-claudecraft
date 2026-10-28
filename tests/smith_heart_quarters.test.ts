@@ -1,4 +1,4 @@
-// The Anvil of the World's four quarters (phase 2K, design doc section 5.21):
+// The Anvil of the World's four quarters (phases 2K to 2M, design doc section 5.21):
 // the pure geometry core src/sim/content/smith_heart_quarters.ts that the
 // renderer and the future fight read.
 //   - each altar stands in its own vein's quarter, well clear of the ridges;
@@ -123,7 +123,9 @@ describe('the ridges', () => {
         if (prev >= 0) expect(step).toBeLessThanOrEqual(prev + 1e-9);
         prev = step;
       }
-      expect(firstStep).toBeGreaterThan(3);
+      // Swept where it leaves the ring: its first yard out runs more than
+      // half a yard across (the arc its turn sweeps at the ring's radius).
+      expect((firstStep * Math.PI * ringR) / 180).toBeGreaterThan(0.5);
     }
   });
 

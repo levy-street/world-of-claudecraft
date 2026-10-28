@@ -7,8 +7,9 @@
 //     centre along the bridge's line (the deck at the field's own heights);
 //   - the four altars on the layout's altar props (ids frozen), each facing
 //     the platform's centre, and the four roots of the mountain in the same
-//     frames, rising out of each altar's crown to the mountain's crown (the
-//     chains of the blockout are gone: the raid has no metal);
+//     frames (since phase 2M rising out of each quarter's wall landmark
+//     behind its altar) to the mountain's crown (the chains of the blockout
+//     are gone: the raid has no metal);
 //   - the heart's bed deep in the chasm under the platform.
 // Once the kit has landed the field omits the tops the kit draws
 // (`HEART_KIT_OMIT_TOPS`), keeps only a shallow keel under the bridge (its
@@ -56,13 +57,46 @@ export const HEART_ALTAR_PIECES: Readonly<Record<SmithHeartVein, string>> = {
 /** The altars' rise (a placement's `rise`: taller, never wider than their
  *  colliders) and the roots' lift to grip their crowns. */
 export const HEART_ALTAR_RISE = 1.4;
-export const HEART_ROOT_LIFT = 4.4;
+export const HEART_ROOT_LIFT = 6;
+/** Phase 2M: each root rises out of its quarter's wall landmark, this far
+ *  behind the altar (out from the platform's centre), never across it, so
+ *  the landmark reads from above. */
+export const HEART_ROOT_OUT = 18;
+
+/** Where a root rises and which way it runs (phase 2M): straight out of the
+ *  back of its landmark, but the Hammer's. South of the Heart the crown of
+ *  rock falls away toward the Quench's chasm (no rock high enough within a
+ *  root's reach straight out), so the Hammer's rises from its landmark's
+ *  east shoulder and runs south-east into the crown where it stands high.
+ *  `foot`: degrees round from the altar's bearing; `aim`: the root's world
+ *  bearing (degrees clockwise from north), or null for straight out. */
+export const HEART_ROOT_AIM: Readonly<
+  Record<SmithHeartVein, { foot: number; aim: number | null }>
+> = {
+  breath: { foot: 0, aim: null },
+  quench: { foot: 0, aim: null },
+  hammer: { foot: -8, aim: 112 },
+  heat: { foot: 0, aim: null },
+};
+
+/** A root's frame: its foot (instance-local) and its yaw (its local -Z, the
+ *  piece's outward, along its run). */
+export function heartRootFrame(vein: SmithHeartVein): { x: number; z: number; rot: number } {
+  const f = heartAltarFrame(vein);
+  const R = Math.hypot(f.x - HEART_ROOM.x, f.z - HEART_ROOM.z) + HEART_ROOT_OUT;
+  const altarBearing = Math.atan2(f.x - HEART_ROOM.x, f.z - HEART_ROOM.z);
+  const b = altarBearing + (HEART_ROOT_AIM[vein].foot * Math.PI) / 180;
+  const aim = HEART_ROOT_AIM[vein].aim;
+  // Outward is the piece's local -Z: (-sin rot, -cos rot) along the aim.
+  const rot = aim === null ? f.rot : (aim * Math.PI) / 180 + Math.PI;
+  return { x: HEART_ROOM.x + Math.sin(b) * R, z: HEART_ROOM.z + Math.cos(b) * R, rot };
+}
 
 /** The heart's bed is drawn this much larger than its piece: its crater
  *  reaches past the platform's lip, so a raid looking over the balustrade
  *  sees the heart's crystal glowing deep below (the core is never hidden
  *  under the platform). */
-export const HEART_CORE_BED_SCALE = 2.4;
+export const HEART_CORE_BED_SCALE = 3.3;
 
 /** How far the heart's bed sits under the platform (its hollow's rim). */
 export const HEART_CORE_BED_Y = HEART_CORE.y + 2;
@@ -104,7 +138,7 @@ export function heartRootPoint(
   vein: SmithHeartVein,
   t: number,
 ): { x: number; y: number; z: number } {
-  const f = heartAltarFrame(vein);
+  const f = heartRootFrame(vein);
   const [a, b, c] = HEART_ROOT_SPINE;
   const u = 1 - t;
   const out = u * u * a.out + 2 * u * t * b.out + t * t * c.out;
@@ -168,9 +202,11 @@ export function planHeartCoreBed(): HeartKitPlacement {
   };
 }
 
-/** One vein's own pieces: its altar and its root, in the altar's frame. */
+/** One vein's own pieces: its altar and its root (behind it, out of its
+ *  landmark), in the altar's frame. */
 export function planHeartVeinPieces(vein: SmithHeartVein): HeartKitPlacement[] {
   const f = heartAltarFrame(vein);
+  const root = heartRootFrame(vein);
   return [
     {
       piece: HEART_ALTAR_PIECES[vein],
@@ -182,10 +218,10 @@ export function planHeartVeinPieces(vein: SmithHeartVein): HeartKitPlacement[] {
     },
     {
       piece: 'Kit_HeartRoot',
-      x: f.x,
+      x: root.x,
       y: HEART_ROOM.h + HEART_ROOT_LIFT,
-      z: f.z,
-      rot: f.rot,
+      z: root.z,
+      rot: root.rot,
       noShadow: true,
     },
   ];

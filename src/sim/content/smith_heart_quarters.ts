@@ -43,8 +43,9 @@ export const HEART_QUARTER_ORDER: readonly SmithHeartVein[] = [...HEART_ALTARS]
 
 /** The pinwheel's measures (yards, degrees). */
 export const HEART_QUARTERS = {
-  /** The central ring's radius (the dais round the heart's light). */
-  ringR: 11,
+  /** The central ring's radius (phase 2M: the raised dark-rock rim round
+   *  the sunken well of the heart's light; its outer foot). */
+  ringR: 16,
   /** The platform's walk ends here (its balustrade beyond). */
   rimR: HEART_ROOM.r,
   /** How far back a ridge is swept where it leaves the ring. */
@@ -55,10 +56,10 @@ export const HEART_QUARTERS = {
   /** A ridge's rim end past the diagonal between its two altars. */
   rimOffsetDeg: 20,
   /** A ridge's half width on the walk (its foot either side of its line). */
-  ridgeHalfWidth: 1.7,
+  ridgeHalfWidth: 1.8,
   /** How far from the room's centre the boss stands in a quarter (the dev
    *  preview, `heartQuarterSpot`): its middle, short of the altar. */
-  spotR: 24,
+  spotR: 34,
 } as const;
 
 const DEG = Math.PI / 180;

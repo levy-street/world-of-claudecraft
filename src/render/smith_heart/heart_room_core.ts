@@ -25,7 +25,7 @@ import {
 } from '../../sim/content/smith_heart_layout';
 
 /** The Smith's heart in the chasm: centre (instance-local), radius. */
-export const HEART_CORE = { x: HEART_ROOM.x, y: -50, z: HEART_ROOM.z, r: 20 } as const;
+export const HEART_CORE = { x: HEART_ROOM.x, y: -50, z: HEART_ROOM.z, r: 22 } as const;
 
 /** The shafts of the core's light rising through the chasm ring. */
 export const HEART_CORE_SHAFTS: readonly { x: number; z: number; r: number; tilt: number }[] = [
@@ -165,10 +165,11 @@ export function heartKeelBottom(k: HeartKeel): number {
 
 /** The platform's rune rings (radii from the room's centre): the
  *  blockout's three. */
-export const HEART_RUNE_RINGS: readonly number[] = [14, 26, 38.5];
-/** With the Heart kit (phase 2K) one ring of runes, in the dais's basalt
- *  band round the central ring (quarter_pieces.py, 8.75 to 9.85). */
-export const HEART_DAIS_RUNE_R = 9.3;
+export const HEART_RUNE_RINGS: readonly number[] = [20, 37, 55];
+/** With the Heart kit (phase 2K) one ring of runes; since phase 2M it
+ *  floats on the well's mist inside the central circle's rim (the well's
+ *  edge at 13.4, quarter_pieces.py WELL_R). */
+export const HEART_DAIS_RUNE_R = 11.4;
 
 /** The chasm's embers: a rising swirl over the core, by the static preset. */
 export function heartEmberCount(lowGfx: boolean): number {

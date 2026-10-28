@@ -531,7 +531,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
         every: 24,
         first: 12,
         school: 'fire',
-        radius: 40,
+        // Phase 2M: the Anvil grew from 84 to 120 yd across and its altars
+        // moved out to 54 yd; the nova scales with it (40 of 42 then, 57 of
+        // 60 now) so it still reaches every altar and hiding still matters.
+        radius: 57,
         min: 260,
         max: 300,
       },
