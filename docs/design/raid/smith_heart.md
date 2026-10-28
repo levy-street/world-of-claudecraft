@@ -179,7 +179,7 @@ the first flame's crystal and the seams of fire in its floor (phase 2I, section 
 | The Arrival Terrace | a small round island, a little above the platform, south-west of it | `HEART_TERRACE`, `HEART_ARRIVAL` |
 | The return portal | on the terrace's west side, beside the arrival (never behind it) | `HEART_RETURN_PORTAL` |
 | The Heart Bridge | a short bridge from the terrace onto the platform; its gate seals while the final boss fights | `HEART_BRIDGE_GATE`, gate `heart_bridge` |
-| The Anvil of the World | the final boss's round platform (84 yd across), hung over the chasm; since phase 2K four elemental quarters set in a pinwheel round a central ring (section 5.21) | `HEART_ROOM`, `HEART_QUARTERS` |
+| The Anvil of the World | the final boss's round platform (120 yd across since phase 2M), held over the chasm; four elemental quarters set in a pinwheel round a central circle, one common floor with each element on its edges (section 5.21) | `HEART_ROOM`, `HEART_QUARTERS` |
 | The four altars | at the platform's compass points, each gripped by its root of the mountain | `HEART_ALTARS` |
 | The chasm | open air round the platform, down to the Smith's glowing heart | `HEART_ROOM_CHASM_R` |
 
@@ -956,7 +956,7 @@ heaving, and a frosty breath in the player's own ear as their bar passes three q
 The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`);
 its voice is a later audition.
 
-### 5.21 The Anvil of the World's four quarters (phases 2K and 2L)
+### 5.21 The Anvil of the World's four quarters (phases 2K to 2M)
 
 The owner's decision (27 Oct 2026): the final boss fights on the Anvil of the World split
 into FOUR QUARTERS by four curved ridges set in a pinwheel round a CENTRAL RING. Each quarter
@@ -1097,6 +1097,90 @@ dirt darker than the stones, the ice tag, the fire bed, the spine's height and l
 the sockets against the colossus's list and carved as pits) and
 `tests/smith_heart_quarters_look.test.ts` (the palette's hues, the draw order and the spine's
 depth write, the layers of air, the final phase's gate).
+
+**Phase 2M: the great room (the owner's verdict on 2L: "No me gusta mucho la sala").** The
+owner sent the top-down reference again (another game's room: only its composition is used,
+never copied). What it asks for, and what replaced 2K and 2L:
+
+- **A bigger room.** The Anvil of the World is 120 yd across (`HEART_ROOM.r` 60, was 42). The
+  chasm round it grew with it (`HEART_ROOM_CHASM_R` 88: the rim plus the old 28 yd of air), the
+  crown of rock moved out with it (`HEART_CROWN` 76 to 127) and the Heart's area is
+  `HEART_ROOM_AREA_R` 128 (the Quench's lake shelf is the nearest main-map floor, 130 out, so
+  it can grow no further). The Arrival Terrace, the arrival and the return portal moved 18 yd
+  out along the bridge's line, so the bridge keeps its length, its ramp and its gate
+  (`towardHeart` unchanged). The geometry core grew with it (`HEART_QUARTERS`: the ring 16,
+  the seam's foot 1.8, the preview spot 34; the sweep, its fall-off and the rim offset as
+  before), the altars stand at `HEART_ALTAR_R` 54, the colossus's rocks and their sockets moved
+  out in proportion (the same bearings), the heart rises past the far rim 12 yd out, the core's
+  and the key's lights reach the whole floor. **One number of the fight changed, on purpose:**
+  Forge Wrath's radius 40 became 57 (it covered 40 of 42 yd; it covers 57 of 60 now, so it
+  still reaches every altar and hiding behind one still matters).
+- **One common floor.** The four quarters' 2L materials are gone. The whole walk is one
+  hand-painted warm stone (`quarter_pieces.py` `floor_cells`, `StonePainter`): large irregular
+  slabs laid once over the platform (the same seeds and the same per-stone draws for every
+  quarter, so a stone cut by a seam is the same stone on both sides), worn arrises, painted
+  light and shadow, dust, old stains, hairline cracks, a few broken and missing stones. Each
+  quarter only drifts a few percent toward its element (`QUARTER_TINT`: the Breath a breath of
+  violet, the Quench of cold blue, the Hammer of ochre, the Heat of ember red); its joint dirt
+  drifts with it.
+- **The central circle.** `Kit_HeartDais` is now a raised rim of dark rock (crest about 0.6 yd,
+  between the well's edge 13.4 and the ring's 16.4, walkable, no collider, drawn like a seam's
+  spine so a telegraph always shows over it), its light in its crest's groove and its notches in
+  the colour of the quarter each side opens onto. `Kit_HeartWell` is the well's floor, flat on
+  the walk (bodies stand on it), painted with the mist tag: the runtime draws a sunken well
+  under it (`heart_landmarks_glsl.ts` `wellFrag`: the eye's ray carried down into a cylinder
+  3.2 yd deep, meeting the dark rock of its wall with veins of each quarter's light or its bed of
+  crystal round the heart's light, through drifting layers of mist). The one ring of runes floats
+  on the mist (`HEART_DAIS_RUNE_R` 11.4).
+- **Four dividing curves.** The four seams (the 2L spines, rescaled) only divide: low, dark,
+  walkable. Each quarter carries a thin border light along both its seams at the spine's foot
+  (its glow slot, `BORDER_TAG`), so every seam is edged in the tints of the two quarters it
+  bounds.
+- **The element on the edges.** At the circle's rim each quarter bursts with its element
+  (`_rim_crackle`): the Breath's forked violet storm crackle, the Quench's pale-blue frost cracks
+  branching at a frost fern's angles, the Hammer's ochre-gold earth fissures with gold glints,
+  the Heat's red-orange molten cracks over a bed of fire, each over its scar in the stone, fading
+  as they run 6 to 13 yd out. At the wall each quarter has its landmark past the rim, behind its
+  altar (`landmark_pieces.py`, `Kit_Landmark*`): the Heat's molten outcrop of heaved basalt
+  columns with a crater of lava, lava spilling down its face to the lip and falling into the
+  chasm; the Hammer's crag of ochre granite blocks split by great clusters of golden crystal; the
+  Quench's faceted ice spires (the ice slot) leaning together over frost granite, rime and
+  icicles; the Breath's storm stone wrung into tall twisted horns crowned with violet crystal.
+  Each stands on a heaved foot buttressed into the keel, never over the walk; the balustrade
+  opens across its foot. The roots of the mountain now rise out of the landmarks behind the
+  altars (`HEART_ROOT_OUT` 18), never across them, so each landmark reads from above.
+- **The awake quarter, re-aimed.** The 2K/2L state is kept (the flood out of the ring, the drain,
+  the crossing's shockwave, the final phase only in the final phase, nothing awake at the start).
+  What it lights changed: the quarter the boss stands in blazes its rim crackle with its
+  element's life (`quarterGlowFrag`: the storm's forks flashing and a jolt running out, the
+  frost's glints and spreading rime, the tremor through the fissures, the lava's pulses), its
+  border lights run with its light out along its seams, its floor's tint deepens a little (more
+  toward the rim and the wall), its ambience rises, and as the flood reaches the wall its
+  landmark erupts (`heartLandmarkLit`): the Heat's lava flowing, an ember plume and smoke off
+  its crater; the Hammer's crystal breathing with glints running up it and gold motes rising;
+  the Quench's frost shimmering, rime swirling and mist off its feet; the Breath's veins
+  flickering and violet lightning arcing between its horns' tips and down into its quarter
+  (`heartBreathBolts`); each with a great glow on its spot. The other three keep their quiet
+  tint (no quarter is darkened any more, `HEART_QUARTER_PALETTE.shade` at least 0.85), their
+  crackle, border lights and landmarks glowing softly. The final phase blazes the well (its
+  mist and bed white-gold, the column and the motes of the four veins) and wakes all four
+  edges and all four landmarks.
+
+Gameplay neutrality and the GPU rules stand: which quarter is awake (the crackle, the border
+lights, the landmarks' light and glow, the bolts) draws on every tier, the low tier keeps a share
+of the motes; every new material is built with the interior (a hidden carrier links the well's
+and the landmarks' glows even before their pieces are in view), no light, no texture; every
+shader places its points through `modelViewMatrix` (the well reads the eye's direction through
+`transpose(mat3(modelViewMatrix))`, camera-relative); no new floor rung (the well draws as the
+platform's floor, under every telegraph). The kit's budget grew with the room (285k triangles,
+6.25 MB). Pinned by `tests/smith_heart_quarters.test.ts` (the core at the new size),
+`tests/smith_heart_quarters_kit.test.ts` (one floor within a few percent, each drifted toward
+its element, the crackle at the rim, the border lights on both seams, the circle and its well,
+the landmarks past the rim at their quarters' middles), `tests/smith_heart_quarters_look.test.ts`
+(no quarter darkened, the landmarks erupting with their floods, all four in the final look, the
+well and the rim's draw, the spots and the bolts), `tests/smith_heart_heart_kit.test.ts` (the
+roots out of the landmarks, the bridge at the new terrace) and the areas, route and render-core
+tests at the new size.
 
 ## 6. Set pieces (phase 2 specs)
 
