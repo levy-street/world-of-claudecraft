@@ -5,6 +5,7 @@ export { BreathFx } from './breath_fx';
 export { CouncilBodies } from './council_bodies';
 export { CouncilFx } from './council_fx';
 export { FinalFx } from './final_fx';
+export { FinalKitFx } from './final_kit_fx';
 export { HammerFx } from './hammer_fx';
 export { HeatBody } from './heat_body';
 export { HeatFightFx } from './heat_fight_fx';

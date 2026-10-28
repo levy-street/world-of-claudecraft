@@ -27,7 +27,8 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import { floorReach } from '../../sim/encounters/smith_heart/heat_geometry';
+import { SMITH_HEART_FINAL_BOSS } from '../../sim/content/smith_heart';
+import { laneReach } from '../../sim/encounters/smith_heart/heat_geometry';
 import {
   HEAT_CUES,
   HEAT_OBJECTS,
@@ -74,6 +75,20 @@ import { basaltColumn, crystalPrism, swellWallGeometry } from './heat_shapes';
 import { HeatTelegraphs } from './heat_telegraph';
 
 const SCAN_SEC = 0.1;
+
+/** The nearer of two bodies to (x, z) (either may be missing). */
+function nearerOf(
+  a: { pos: { x: number; z: number } } | undefined,
+  b: { pos: { x: number; z: number } } | undefined,
+  x: number,
+  z: number,
+): { pos: { x: number; z: number } } | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  const da = Math.hypot(a.pos.x - x, a.pos.z - z);
+  const db = Math.hypot(b.pos.x - x, b.pos.z - z);
+  return db < da ? b : a;
+}
 /** The spot is lethal, the lanes danger (the floor telegraph's threat
  *  colours; the vein's white-gold the accent). */
 const LANE_STYLE = { color: TELEGRAPH_THREAT_COLORS.danger, accent: C.accent };
@@ -278,6 +293,7 @@ export class HeatFx {
   private readonly candidateIds: number[] = [];
   private rosterSeen = Number.NaN;
   private guardianId = -1;
+  private finalId = -1;
   private active = false;
   private scanTimer = 0;
   private clock = 0;
@@ -604,8 +620,10 @@ export class HeatFx {
       const ids = this.candidateIds;
       ids.length = 0;
       this.guardianId = -1;
+      this.finalId = -1;
       for (const e of world.entities.values()) {
         if (e.kind === 'mob' && e.templateId === 'heart_heat_guardian') this.guardianId = e.id;
+        if (e.kind === 'mob' && e.templateId === SMITH_HEART_FINAL_BOSS) this.finalId = e.id;
         if (e.kind !== 'object') continue;
         const t = e.templateId;
         if (
@@ -637,7 +655,8 @@ export class HeatFx {
         s.wall.visible = false;
         s.wake.visible = false;
       }
-    const guardian = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
+    const heatGuardian = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
+    const finalBoss = this.finalId >= 0 ? world.entities.get(this.finalId) : undefined;
     for (const id of live) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -650,6 +669,9 @@ export class HeatFx {
         slot.seconds = heatTimedOf(HEAT_OBJECTS.fistPrefix, e.templateId) ?? T.fistCast;
         slot.x = e.pos.x;
         slot.z = e.pos.z;
+        // It leans in from whichever fist-bearer is nearer: the Heat guardian
+        // in the Hearth, the Masterless Strength on the Anvil.
+        const guardian = nearerOf(heatGuardian, finalBoss, e.pos.x, e.pos.z);
         slot.yaw = guardian ? Math.atan2(e.pos.x - guardian.pos.x, e.pos.z - guardian.pos.z) : 0;
         const y = this.groundY(e.pos.x, e.pos.z);
         this.kit.drapeFan(slot.fan, this.groundY, e.pos.x, y, e.pos.z, 0, e.scale || T.fistR);
@@ -673,8 +695,10 @@ export class HeatFx {
         slot.facing = e.facing;
         const half = e.scale || T.laneHalf;
         const o = heatClaimOrigin(e.pos.x, e.pos.z);
+        // On the Hearth's floor to its edge; on the Anvil of the World (the
+        // Masterless Strength's Heat quarter reuses the fist) to its rim.
         slot.length = o
-          ? floorReach(e.pos.x - o.x, e.pos.z - o.z, e.facing, T.laneLength)
+          ? laneReach(e.pos.x - o.x, e.pos.z - o.z, e.facing, T.laneLength)
           : T.laneLength;
         this.kit.drapeLane(
           slot.lane,

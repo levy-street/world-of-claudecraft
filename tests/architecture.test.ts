@@ -718,6 +718,8 @@ const UI_PURE_CORES = [
   // Quench's cold bar.
   'src/ui/hud/dungeon/council_alert_view.ts',
   'src/ui/hud/dungeon/quench_alert_view.ts',
+  'src/ui/hud/dungeon/final_alert_view.ts',
+  'src/ui/hud/dungeon/heart_overload_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.
@@ -1114,6 +1116,7 @@ const RENDER_PURE_CORES = [
   // Phase 2M: the wall landmarks' frame, spots, eruption and lightning.
   'src/render/smith_heart/heart_landmarks_core.ts',
   'src/render/smith_heart_fx/final_fx_core.ts',
+  'src/render/smith_heart_fx/final_kit_fx_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',
   // The Guardian of the Breath's body (its storm form) and its fight's effects.

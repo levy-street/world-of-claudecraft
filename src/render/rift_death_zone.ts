@@ -61,6 +61,7 @@ import {
   CouncilBodies,
   CouncilFx,
   FinalFx,
+  FinalKitFx,
   HammerFx,
   HeatBody,
   HeatFightFx,
@@ -178,6 +179,7 @@ export class RiftDeathZoneVisuals {
   private readonly heatFight: HeatFightFx;
   private readonly heatBody: HeatBody;
   private readonly finalFx: FinalFx;
+  private readonly finalKit: FinalKitFx;
   private readonly councilFx: CouncilFx;
   private readonly councilBodies: CouncilBodies;
   // The Smith's Heart's seal moments felt in the camera.
@@ -331,6 +333,7 @@ export class RiftDeathZoneVisuals {
     this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatBody = new HeatBody(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalFx = new FinalFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.finalKit = new FinalKitFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.councilFx = new CouncilFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.councilBodies = new CouncilBodies(
       scene,
@@ -430,6 +433,7 @@ export class RiftDeathZoneVisuals {
     this.heatFight.update(dt);
     this.heatBody.update(dt);
     this.finalFx.update(dt);
+    this.finalKit.update(dt);
     this.councilFx.update(dt);
     this.councilBodies.update(dt);
     this.sealShake.update();
@@ -488,6 +492,7 @@ export class RiftDeathZoneVisuals {
     this.heatFight.dispose();
     this.heatBody.dispose();
     this.finalFx.dispose();
+    this.finalKit.dispose();
     this.councilFx.dispose();
     this.councilBodies.dispose();
     this.hoardPresentation.dispose();
@@ -526,6 +531,7 @@ export class RiftDeathZoneVisuals {
     this.heatBody.handleEvent(event);
     const heat = this.heatFight.handleEvent(event);
     this.finalFx.handleEvent(event);
+    const finalKit = this.finalKit.handleEvent(event);
     this.councilBodies.handleEvent(event);
     const council = this.councilFx.handleEvent(event);
     return (
@@ -539,7 +545,8 @@ export class RiftDeathZoneVisuals {
       council ||
       breath ||
       quench ||
-      heat
+      heat ||
+      finalKit
     );
   }
 
