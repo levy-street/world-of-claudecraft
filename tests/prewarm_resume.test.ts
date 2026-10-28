@@ -474,10 +474,10 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(publications).toBe(1);
   });
 
-  it('releases deferred compile, texture and sky work only after first paint', () => {
+  it('retains first-paint release for constrained work and bypasses it for complete desktop entry', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-    const resumeStart = renderer.indexOf('void settlePrewarmBeforePublish(');
+    const resumeStart = renderer.indexOf('settleInitialPrewarmRemainder({');
     const resumeEnd = renderer.indexOf(
       '// Sky uploads deferred behind a slow prefetch',
       resumeStart,
@@ -494,8 +494,11 @@ describe('resumeDroppedPrewarmEntries', () => {
     );
     expect(firstPaintAt).toBeGreaterThan(prewarmAt);
     expect(releaseAt).toBeGreaterThan(firstPaintAt);
-    expect(resumeBlock).toContain('await options.resumeAfterFirstPaint;');
-    expect(skyBlock).toContain('await options.resumeAfterFirstPaint;');
+    expect(resumeBlock).toContain('afterFirstPaint: resumeAfterFirstPaint,');
+    expect(renderer).toContain(
+      'const resumeAfterFirstPaint = completeBeforeReveal ? undefined : options.resumeAfterFirstPaint;',
+    );
+    expect(skyBlock).toContain('await resumeAfterFirstPaint;');
   });
 
   it('wires the production compile resume lane to bounded units', () => {
@@ -551,7 +554,7 @@ describe('resumeDroppedPrewarmEntries', () => {
     // Without it every boot-linked program paid the driver's uniform-table
     // round trip at its FIRST LIVE DRAW (shader-program audit F15).
     expect(unitsSlice).toContain(
-      'tail: entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork)',
+      '...entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork)',
     );
     expect(compileUnitsSource).toContain(
       'if (options.tail) await runInitialSceneCompileTail(options.tail, root)',
@@ -573,8 +576,8 @@ describe('resumeDroppedPrewarmEntries', () => {
     const runSlice = compileEntry.slice(runStart, runEnd);
     expect(runSlice).toContain('Promise.race([');
     expect(runSlice).not.toContain('performance.now() >= gpuSubmitDeadline');
-    expect(source).toContain('void settlePrewarmBeforePublish(');
-    expect(source).toContain('resumeDroppedPrewarmEntries(resume, {');
+    expect(source).toContain('settleInitialPrewarmRemainder({');
+    expect(source).toContain('entries: droppedEntries,');
     // releaseTail: a resume unit's wall time is its off-thread links; without
     // the tail release each unit occupied the whole serial queue for seconds
     // and live compile gates could not start (the travel-hitch amplifier).
@@ -620,12 +623,16 @@ describe('resumeDroppedPrewarmEntries', () => {
     // an unrelated call site. The resume lane's contract is the class-driven
     // flag, and the kickoff must order debt ahead of the serial lane's
     // cosmetic entries (queue priority cannot reorder within the lane).
-    expect(source).toContain('const resume = orderPrewarmResumeEntries(droppedEntries);');
+    const completion = readFileSync(
+      new URL('../src/render/prewarm_completion.ts', import.meta.url),
+      'utf8',
+    );
+    expect(completion).toContain('const resume = orderPrewarmResumeEntries(options.entries);');
     expect(source).toContain('dropEntry(entry, entry.resumeUnits?.() ?? []);');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     // A started entry's partial remainder comes from the fail-soft runner
     // (prewarm_entry.ts, behavior in tests/prewarm_entry.test.ts).
-    expect(source).toContain('await runStartedPrewarmEntry(entry, () =>');
+    expect(source).toContain('runStartedPrewarmEntry(entry, () =>');
     expect(source).toContain(
       'if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });',
     );
@@ -657,7 +664,9 @@ describe('resumeDroppedPrewarmEntries', () => {
     // The settle-then-publish scheduling must run whenever EITHER a real
     // entry was dropped OR pool publication was withheld, never
     // droppedEntries.length alone.
-    expect(block).toContain('if (droppedEntries.length > 0 || deferPoolPublication) {');
+    expect(block).toContain(
+      'if (droppedEntries.length > 0 || deferPoolPublication || completeBeforeReveal) {',
+    );
     // resumeDroppedPrewarmEntries stays unconditional on `resume` (it is
     // itself a no-op over an empty array, per resumeDroppedPrewarmEntries'
     // own 'does nothing for empty entries' contract): gating THIS call on
@@ -665,10 +674,12 @@ describe('resumeDroppedPrewarmEntries', () => {
     // Promise.allSettled await of submittedCompileUnits whenever the resume
     // list is empty, so the in-flight early-submitted units would still
     // never be awaited for the empty-remainder case.
-    expect(block).toContain('return resumeDroppedPrewarmEntries(resume, {');
-    expect(block).toContain(
-      'await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));',
+    expect(block).toContain('settleInitialPrewarmRemainder({');
+    const completion = readFileSync(
+      new URL('../src/render/prewarm_completion.ts', import.meta.url),
+      'utf8',
     );
+    expect(completion).toContain('await Promise.all(options.submitted.map((unit) => unit.done));');
     // Exactly one publish call backs this whole block: no duplicate
     // publication path was added alongside the widened guard.
     expect(

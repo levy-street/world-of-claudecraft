@@ -23,6 +23,43 @@ vi.mock('../src/render/characters', () => ({
 }));
 
 describe('private cannon scene', () => {
+  it('skips the parked encounter and composes its current station on the first visible frame', async () => {
+    const scene = new THREE.Scene();
+    const visual = new CannonEncounterVisual(scene, () => 3);
+    await visual.readyForEntry;
+    const content = visual.group.children[0];
+    const walk = vi.spyOn(content, 'updateMatrixWorld');
+    const markers = content.children.slice(6);
+    const inventory: THREE.Object3D[] = [];
+    visual.group.traverse((node) => inventory.push(node));
+    try {
+      scene.updateMatrixWorld(true);
+      expect(walk).not.toHaveBeenCalled();
+      const session: VehicleSession = {
+        kind: 'cannon',
+        stationId: LAST_KEEP_CANNON.id,
+        cycle: 'wq3_8',
+        origin: { x: LAST_KEEP_CANNON.x, y: 0, z: LAST_KEEP_CANNON.z },
+        encounter: createCannonEncounter(),
+      };
+      visual.update(session);
+      scene.updateMatrixWorld();
+      expect(walk).toHaveBeenCalledOnce();
+      const marker = markers[0];
+      expect(marker.matrixWorld.elements.slice(12, 15)).toEqual(marker.position.toArray());
+      visual.update(null);
+      walk.mockClear();
+      scene.updateMatrixWorld();
+      expect(walk).not.toHaveBeenCalled();
+      // Compile discovery still sees parked meshes without a visible-matrix walk.
+      const parked: THREE.Object3D[] = [];
+      visual.group.traverse((node) => parked.push(node));
+      expect(parked).toEqual(inventory);
+    } finally {
+      visual.dispose();
+    }
+  });
+
   it('moves the existing marker pool and shot origin to the active station', async () => {
     const visual = new CannonEncounterVisual(new THREE.Scene(), (x, z) => x + z);
     await visual.readyForEntry;

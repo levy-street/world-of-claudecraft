@@ -735,7 +735,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
   // Re-minted for the one-colour market canopies on the current integration base.
   // No capture was retaken.
-  'a74dec3c70b5e365354324851b7f9e458973b3c964b119b65ff6a1bf45bfa596';
+  'ea0fab5a4f69ef74f9192385c9f275a7dd37f1ace9fe2e0b9dde23f49c9d0198';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

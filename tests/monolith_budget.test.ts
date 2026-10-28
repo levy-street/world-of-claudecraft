@@ -1062,7 +1062,8 @@ const MONOLITHS: MonolithRow[] = [
     // Exact count.
     // First-person camera integration extracts the spatial-audio listener.
     // Keep the release branch ceiling ratcheted down by the same eight lines.
-    ceiling: 12346,
+    // Initial desktop resume orchestration moved to prewarm_completion.ts.
+    ceiling: 12256,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

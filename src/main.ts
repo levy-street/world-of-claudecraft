@@ -215,6 +215,7 @@ import { clickPlacedMover } from './game/placed_mover_input';
 import { mountPlaytestDevPanel } from './game/playtest_dev_panel';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
+import { handlePrewarmEntryFailure } from './game/prewarm_entry_failure';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
 import { wireSeatInteraction } from './game/seat_interact_wiring';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
@@ -4852,10 +4853,7 @@ async function startGame(
       ...renderEntryDiagnostics(),
       prewarmFailed: true,
     });
-    // Shader prewarm is an optimization; a failed program warmup can safely
-    // fall back to Three's normal first-use compilation once the zone itself
-    // has been materialized successfully.
-    console.warn('Renderer prewarm failed', err);
+    if (handlePrewarmEntryFailure(err, fatalOverlay)) return;
   }
   initialPrewarmResumeStartGate.armBackstop();
   loadPhaseEnd('prewarm-initial');

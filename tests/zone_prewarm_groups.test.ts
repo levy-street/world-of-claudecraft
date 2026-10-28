@@ -12,10 +12,13 @@ import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PooledObjectView } from '../src/render/ground_object_pool';
 import {
+  buildCompleteNpcPrewarmGroup,
+  buildCompletePlayerPrewarmGroup,
   buildEntityPrewarmGroup,
   buildNpcPrewarmGroup,
   buildObjectPrewarmGroup,
   buildPlayerPrewarmGroup,
+  ensurePrewarmCatalogAssets,
   PREWARM_MOB_POOL_COPIES,
   PREWARM_OBJECT_ITEM_IDS,
   PREWARM_OBJECT_POOL_COPIES,
@@ -125,6 +128,48 @@ beforeEach(() => {
 });
 
 describe('buildNpcPrewarmGroup warmed/planned/trimmed semantics', () => {
+  it('waits for demanded catalog bodies rather than permanently accepting an asset skip', async () => {
+    vi.useFakeTimers();
+    try {
+      state.cold.add('model:npc_guard');
+      let ready = false;
+      const task = ensurePrewarmCatalogAssets(makeHost(['npc_guard']), ZONE, NO_DEADLINE).then(
+        () => {
+          ready = true;
+        },
+      );
+      await vi.advanceTimersByTimeAsync(50);
+      expect(ready).toBe(false);
+      state.cold.clear();
+      await vi.advanceTimersByTimeAsync(50);
+      await task;
+      expect(ready).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it('cooperatively finishes every desktop catalog member without a deadline cut', async () => {
+    vi.useFakeTimers();
+    try {
+      const npc = buildCompleteNpcPrewarmGroup(
+        makeHost(['npc_guard', 'npc_mage']),
+        ZONE,
+        NO_DEADLINE,
+      );
+      expect(state.createCalls).toEqual([]);
+      await vi.runAllTimersAsync();
+      expect((await npc).warmed).toBe(2);
+      const player = buildCompletePlayerPrewarmGroup(makeHost([]), NO_DEADLINE);
+      await vi.runAllTimersAsync();
+      const built = await player;
+      expect(built.trimmed).toBe(false);
+      expect(built.visualCount).toBe(built.plannedVisuals);
+      expect(state.auraGlowCalls).toHaveLength(ALL_CLASSES.length);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('leaves an asset-skipped id uncounted and its model unmarked, so a later pass retries it', () => {
     state.unavailable.add('npc_guard');
     const host = makeHost(['npc_guard', 'npc_knight']);
@@ -198,6 +243,15 @@ describe('cold body files are asked about, never built over', () => {
 });
 
 describe('buildEntityPrewarmGroup copy counts and session dedupe', () => {
+  it('does not mark a cold mob body warmed and retries it when resident', () => {
+    const host = makeHost(['forest_wolf']);
+    state.cold.add('model:forest_wolf');
+    expect(buildEntityPrewarmGroup(host, ZONE).pooled).toHaveLength(0);
+    expect(host.prewarmedMobTemplates.has('forest_wolf')).toBe(false);
+    state.cold.clear();
+    expect(buildEntityPrewarmGroup(host, ZONE).pooled).toHaveLength(PREWARM_MOB_POOL_COPIES);
+    expect(host.prewarmedMobTemplates.has('forest_wolf')).toBe(true);
+  });
   it('pools a PREWARM_MOB_COMMON_IDS template several-deep and every other template once', () => {
     // forest_wolf is in the common set (group spawner), rare_oddity is not:
     // the copy split is the pool-depth rule the extraction carried over.
@@ -238,7 +292,7 @@ describe('buildPlayerPrewarmGroup metamorph ordering, arithmetic, and the trim a
     expect(state.activeCalls).toEqual(['warlock:true']);
     // plannedVisuals arithmetic: one skin variant per class (mocked skinCount)
     // plus one aura-glow rig per class; the metamorph rig rides as an extra.
-    expect(built.plannedVisuals).toBe(ALL_CLASSES.length * 2);
+    expect(built.plannedVisuals).toBe(ALL_CLASSES.length * 2 + 1);
     expect(built.visuals).toHaveLength(ALL_CLASSES.length * 2 + 1);
     expect(built.visualCount).toBe(ALL_CLASSES.length * 2 + 1);
     expect(built.trimmed).toBe(false);
@@ -256,7 +310,7 @@ describe('buildPlayerPrewarmGroup metamorph ordering, arithmetic, and the trim a
       expect(built.trimmed).toBe(true);
       expect(built.visuals).toHaveLength(3);
       expect(built.visualCount).toBe(3);
-      expect(built.plannedVisuals).toBe(ALL_CLASSES.length * 2);
+      expect(built.plannedVisuals).toBe(ALL_CLASSES.length * 2 + 1);
       expect(built.visuals.length).toBeLessThan(built.plannedVisuals);
     } finally {
       nowSpy.mockRestore();

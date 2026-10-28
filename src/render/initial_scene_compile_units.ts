@@ -34,6 +34,8 @@ export interface InitialSceneCompileUnitOptions {
   compileColor: (root: THREE.Object3D) => Promise<unknown>;
   compileShadow: (root: THREE.Object3D) => Promise<unknown>;
   onCompiledRoot: () => void;
+  /** Complete desktop entry also prepares hidden resident effects and decor. */
+  residentScene?: boolean;
   /** The link tail, OPT-IN and off by default: without it the lane keeps its
    *  colour-then-shadow shape and every program it links pays the driver's
    *  uniform-table round trip at its first live draw (see the tail below). */
@@ -73,6 +75,8 @@ export interface InitialSceneCompileTail {
   timeoutMs: number;
   /** Injectable for tests; production uses real timers. */
   scheduler?: CompileGateScheduler;
+  /** Complete entry cannot publish a unit whose variant poll or touch failed. */
+  requireSettled?: boolean;
 }
 
 const defaultTailScheduler: CompileGateScheduler = {
@@ -132,7 +136,13 @@ export async function runInitialSceneCompileTail(
     fired = true;
   }, tail.timeoutMs);
   try {
-    await tail.settle(root, deadline);
+    const result = await tail.settle(root, deadline);
+    if (
+      tail.requireSettled &&
+      (deadline.fired || (result as { settled?: boolean } | undefined)?.settled === false)
+    ) {
+      throw new Error(`Prewarm program variants did not settle: ${root.name || root.type}`);
+    }
     // BOOT_DEBT names the lane the tail belongs to; the pieces themselves ride
     // at TAIL_PIECE either way (linkedProgramTouchPriority), which is the one
     // sub-VISIBLE_PREWARM class the arrival cover's admission rule admits, so
@@ -145,7 +155,8 @@ export async function runInitialSceneCompileTail(
       failed: false,
       timedOut: deadline.fired,
     });
-  } catch {
+  } catch (error) {
+    if (tail.requireSettled) throw error;
     // See the fail-soft contract above.
   } finally {
     scheduler.clearTimeout(guard);
@@ -164,12 +175,14 @@ function compileRoots(roots: readonly THREE.Object3D[], visibleOnly: boolean): T
   return materialRoots;
 }
 
-function programContentKeys(root: THREE.Object3D): unknown[] {
+export function programContentKeys(root: THREE.Object3D): unknown[] {
   const mesh = root as THREE.Mesh & {
     isSkinnedMesh?: boolean;
     isInstancedMesh?: boolean;
     isBatchedMesh?: boolean;
     instanceColor?: unknown;
+    morphTexture?: unknown;
+    colorTexture?: unknown;
   };
   const materials = Array.isArray(mesh.material)
     ? mesh.material
@@ -183,6 +196,8 @@ function programContentKeys(root: THREE.Object3D): unknown[] {
       isSkinnedMesh: mesh.isSkinnedMesh === true,
       isInstancedMesh: mesh.isInstancedMesh === true,
       hasInstanceColor: mesh.instanceColor != null,
+      hasInstanceMorph: mesh.isInstancedMesh === true && mesh.morphTexture != null,
+      hasBatchColor: mesh.isBatchedMesh === true && mesh.colorTexture !== null,
       isBatchedMesh: mesh.isBatchedMesh === true,
       hasMorphPositions: morphs?.position !== undefined,
       morphTargetCount: morphs?.position?.length ?? 0,
@@ -206,34 +221,37 @@ export function buildInitialSceneCompileUnits(
   const stagedRoots = new Set<THREE.Object3D>(
     options.stagedGroups.flatMap(([, group]) => (group ? [group] : [])),
   );
-  return buildPrewarmCompileUnits(
-    [
-      ...(options.includeGroup('scene')
-        ? [
-            {
-              id: 'scene',
-              // Near-first: the resume lane drains these in order, and the
-              // debt the camera can reach first must be the debt paid first
-              // (hitch-hunt P3a; the S10 632-681 ms submit stalls were reveals
-              // winning the race against their own compile). Anchor on the
-              // PLAYER: the camera is still at its constructor default during
-              // early submission.
-              roots: orderRootsByDistanceSq(
-                compileRoots(
-                  options.scene.children.filter((root) => !stagedRoots.has(root)),
-                  true,
-                ),
-                (root) => compileRootDistanceSq(root, options.playerX, options.playerZ),
+  const groups = [
+    ...(options.includeGroup('scene')
+      ? [
+          {
+            id: 'scene',
+            // Near-first: the resume lane drains these in order, and the
+            // debt the camera can reach first must be the debt paid first
+            // (hitch-hunt P3a; the S10 632-681 ms submit stalls were reveals
+            // winning the race against their own compile). Anchor on the
+            // PLAYER: the camera is still at its constructor default during
+            // early submission.
+            roots: orderRootsByDistanceSq(
+              compileRoots(
+                options.scene.children.filter((root) => !stagedRoots.has(root)),
+                !options.residentScene,
               ),
-            },
-          ]
-        : []),
-      ...options.stagedGroups.flatMap(([id, group]) =>
-        group && options.includeGroup(id)
-          ? [{ id, roots: compileRoots(group.children, false) }]
-          : [],
-      ),
-    ],
+              (root) => compileRootDistanceSq(root, options.playerX, options.playerZ),
+            ),
+          },
+        ]
+      : []),
+    ...options.stagedGroups.flatMap(([id, group]) =>
+      group && options.includeGroup(id) ? [{ id, roots: compileRoots(group.children, false) }] : [],
+    ),
+  ];
+  // Retained player anchors must acquire their own program references before a
+  // same-key live material can consume the shared dedupe entry.
+  if (options.residentScene)
+    groups.sort((a, b) => Number(b.id === 'players') - Number(a.id === 'players'));
+  return buildPrewarmCompileUnits(
+    groups,
     async (root) => {
       await options.compileColor(root);
       await options.compileShadow(root);
@@ -285,10 +303,19 @@ export interface SceneRestoreCompileUnitOptions {
 export function buildSceneRestoreCompileUnits(
   options: SceneRestoreCompileUnitOptions,
 ): PrewarmResumeUnit[] {
-  const roots = orderRootsByDistanceSq(
-    compileRoots(options.scene.children, options.reach === 'visible'),
-    (root) => compileRootDistanceSq(root, options.playerX, options.playerZ),
+  const anchors = options.scene.children.filter(
+    (root) => root.userData.prewarmProgramAnchor === true,
   );
+  const roots = [
+    ...compileRoots(anchors, false),
+    ...orderRootsByDistanceSq(
+      compileRoots(
+        options.scene.children.filter((root) => !anchors.includes(root)),
+        options.reach === 'visible',
+      ),
+      (root) => compileRootDistanceSq(root, options.playerX, options.playerZ),
+    ),
+  ];
   return buildPrewarmCompileUnits(
     [{ id: `context-restore-${options.reach}`, roots }],
     async (root) => {

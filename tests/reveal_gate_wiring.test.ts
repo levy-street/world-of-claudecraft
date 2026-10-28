@@ -378,24 +378,26 @@ describe('reveal gate wiring (source pins)', () => {
     },
   );
 
-  it('the boot scene sweep stays visible-only, and the idle zone prepare links both arms', () => {
+  it('bounded boot stays visible-only, desktop includes residents, and idle prepare links both arms', () => {
     // Measured (iGPU, far login, 2026-08-17): a `traverse` sweep also
     // collects the entity views hidden behind their live compile gates; their
     // already-linked programs settle instantly, the adaptive link budget of
     // the early submit lane reads that as progress and keeps submitting until
     // the hard deadline (13.8 s instead of stalling after one unit), and the
     // whole manifest behind it (settle-state, textures, the initial frame)
-    // times out. Hidden decor is the reveal gates' job, not the sweep's.
+    // times out. Keep that bounded path visible-only. Complete desktop
+    // preparation waits for the whole catalog and includes hidden residents.
     const compileUnits = read('../src/render/initial_scene_compile_units.ts');
     const sweep = compileUnits.slice(
       anchor(compileUnits, "id: 'scene',"),
       anchor(compileUnits, 'compileRootDistanceSq(root, options.playerX'),
     );
-    // The scene unit's collector call, whitespace-agnostic: the visible-only
-    // flag is the literal `true` second argument.
+    // The scene collector includes hidden residents only for complete desktop
+    // preparation; bounded entry retains the visible-only collector.
     expect(sweep).toMatch(
-      /compileRoots\(\s*options\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*true,\s*\)/,
+      /compileRoots\(\s*options\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*!options\.residentScene,\s*\)/,
     );
+    expect(rendererSource).toContain('residentScene: completeBeforeReveal,');
     // The background (idle) zone prepare compiles the shadow-pass depth
     // variant AFTER the colour one, inside the same queue unit.
     const idle = rendererSource.slice(
