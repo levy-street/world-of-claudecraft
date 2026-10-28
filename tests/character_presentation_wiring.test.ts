@@ -131,7 +131,7 @@ describe('character presentation sleep wiring', () => {
     expect(setup).toContain('v.mountVisual.root.visible = mountPresented;');
     expect(setup).toContain('v.mountLift = mountPresented && mountSpec ? mountSpec.seat : 0;');
     expect(setup).toContain(
-      'v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null);',
+      'v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null, v.mountLift > 0);',
     );
     expect(setup).toContain('if (!(runCharacterPresentation && mountPresented)) {');
     expect(setup).toContain(

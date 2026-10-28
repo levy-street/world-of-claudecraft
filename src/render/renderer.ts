@@ -10361,7 +10361,7 @@ export class Renderer {
       // barrel (characters/visual.ts setRidePose). The seated loop stays the
       // base underneath: it is what carries his hips down onto the saddle, and
       // every seat offset in this file was fitted against it.
-      v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null);
+      v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null, v.mountLift > 0);
       // The presented mount block below re-derives the whole rider transform
       // after the mixer advances (attitude, bob, seat bone), so the seat is
       // solved here only when that block will not run this frame.
