@@ -86,11 +86,7 @@ describe('CharacterVisual form adornments', () => {
     const visual = new CharacterVisual('player_druid', 0xffffff, 0);
     expect(pieceNames(visual)).toEqual([]);
     visual.setMoonkin(true);
-    expect(pieceNames(visual)).toEqual([
-      'moonwing_crescent',
-      'moonwing_wing_left_feathers',
-      'moonwing_wing_right_feathers',
-    ]);
+    expect(pieceNames(visual)).toEqual(['moonwing_crescent']);
     visual.setMoonkin(false);
     expect(pieceNames(visual)).toEqual([]);
     visual.dispose();
@@ -171,9 +167,7 @@ describe('CharacterVisual form adornments', () => {
   it('hides the pieces while the body is a stealth or spirit ghost', () => {
     const visual = new CharacterVisual('player_druid', 0xffffff, 0);
     visual.setMoonkin(true);
-    const roots = ['moonwing_head', 'moonwing_wing_left', 'moonwing_wing_right'].map(
-      (name) => visual.root.getObjectByName(name) as THREE.Object3D,
-    );
+    const roots = [visual.root.getObjectByName('moonwing_head') as THREE.Object3D];
     expect(roots.every((root) => root.visible)).toBe(true);
     for (const style of ['stealth-rogue', 'stealth-other', 'spirit'] as const) {
       visual.setGhost(true, style);
@@ -194,7 +188,7 @@ describe('CharacterVisual form adornments', () => {
     });
     visual.setMoonkin(true);
     const head = visual.root.getObjectByName('moonwing_head') as THREE.Object3D;
-    expect(settles.length).toBe(3);
+    expect(settles.length).toBe(1);
     expect(head.visible).toBe(false);
     for (const settle of settles) settle();
     visual.update(0.01, idleState(), true, false);
@@ -202,13 +196,14 @@ describe('CharacterVisual form adornments', () => {
     visual.dispose();
   });
 
-  it('animates the wings on the per-frame update', () => {
+  it('grows no wings and drifts the crescent on the per-frame update', () => {
     const visual = new CharacterVisual('player_druid', 0xffffff, 0);
     visual.setMoonkin(true);
-    const wing = visual.root.getObjectByName('moonwing_wing_right') as THREE.Object3D;
-    const folded = wing.rotation.y;
+    expect(pieceNames(visual).some((name) => name.startsWith('moonwing_wing'))).toBe(false);
+    const crescent = visual.root.getObjectByName('moonwing_crescent') as THREE.Object3D;
+    const rest = crescent.position.y;
     visual.update(1, idleState(), true, false);
-    expect(wing.rotation.y).toBeLessThan(folded);
+    expect(crescent.position.y).not.toBe(rest);
     visual.dispose();
   });
 });
