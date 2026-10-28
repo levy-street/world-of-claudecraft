@@ -367,13 +367,17 @@ describe('runBackgroundPrewarm', () => {
       'return linkColorPrograms(this.compileArms, root, includeOffscreenVariant);',
     );
 
-    expect(zoneMethod).toContain('() => this.compilePrewarmColorPrograms(childRoot, true)');
-    expect(zoneMethod).toContain('() => this.compileShadowPrograms(childRoot)');
-    expect(zoneMethod).toContain('runUpload: (work, label) =>');
+    expect(zoneMethod).toContain('(root) => this.compilePrewarmColorPrograms(root, true)');
+    expect(zoneMethod).toContain('(root) => this.compileShadowPrograms(root)');
+    const zonePrewarm = readFileSync(
+      new URL('../src/render/zone_prewarm.ts', import.meta.url),
+      'utf8',
+    );
+    expect(zonePrewarm).toContain('runUpload: (work, label) =>');
     // The decomposed upload: texture batches first, then the bounded render.
-    expect(zoneMethod).toContain('warmChildUnits: (groupLike, child) =>');
+    expect(zonePrewarm).toContain('warmChildUnits: (group, child) =>');
     expect(zoneMethod).toContain('this.webgl.initTexture(texture)');
-    expect(zoneMethod).toContain('this.renderBoundedPrewarmRoot(group, childRoot)');
+    expect(zoneMethod).toContain('this.renderBoundedPrewarmRoot(group, child)');
     expect(prepareMethod).toContain('const featureGroups = this.lastAttachedFeatureGroups.slice()');
     const hideAt = prepareMethod.indexOf('withHiddenPrewarmGroups(featureGroups');
     const queueAt = prepareMethod.indexOf('this.backgroundGpuWork.run(', hideAt);

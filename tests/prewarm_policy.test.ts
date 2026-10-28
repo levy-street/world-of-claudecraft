@@ -87,8 +87,9 @@ it('pins the production soft, compile, hard, and view budgets plus their policy 
     'maxViewsLow: VIEW_PREWARM_MAX_VIEWS_LOW,',
     'maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,',
     '? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED\n      : (pacing.knobs.hardMaxMs ?? VIEW_PREWARM_HARD_MAX_MS);',
-    'const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);',
-    'const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);',
+    '? COMPLETE_PREWARM_WATCHDOG_MS',
+    ': Math.max(0, options.maxMs ?? policy.maxMs);',
+    ': Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);',
   ]) {
     expect(renderer).toContain(wiring);
   }
@@ -246,7 +247,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(p.finishFullManifestBeforeReveal).toBe(false);
   });
 
-  it('keeps the complete desktop Insane manifest behind the entry cover', () => {
+  it('keeps the complete parallel-compile desktop manifest behind the entry cover', () => {
     const p = resolvePrewarmPolicy({ ...BASE, finishFullManifestBeforeReveal: true });
     expect(p.finishFullManifestBeforeReveal).toBe(true);
 
@@ -254,9 +255,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     ).replace(/\r\n/g, '\n');
-    expect(renderer).toContain(
-      "finishFullManifestBeforeReveal: GFX.tier === 'insane' && !GFX.constrainedMemory",
-    );
+    expect(renderer).toContain('finishFullManifestBeforeReveal: completeBeforeReveal');
     expect(renderer).toContain(
       'const buildDeadline = prewarmBuildDeadline(\n      deadline,\n      hardDeadline,\n      PREWARM_BUILD_RESERVE_MS,\n      policy.finishFullManifestBeforeReveal,\n    );',
     );
@@ -631,12 +630,13 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     );
     expect(renderer).toContain('awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),');
     expect(renderer).toContain(
-      'submitPrewarmCompileUnit(unit, lane, {\n              lifecycle: compileLifecycle,\n              pacing,',
+      'submitPrewarmCompileUnit(unit, lane, {\n            lifecycle: compileLifecycle,\n            pacing,',
     );
     // Pushed as each unit is submitted, never collected from the loop's return:
     // a rejection inside the loop must not lose already-submitted units from
     // the set the compile entry awaits.
-    expect(renderer).toContain('submit: (unit) =>\n          submittedCompileUnits.push(');
+    expect(renderer).toContain('completion.track(submitted.done);');
+    expect(renderer).toContain('submittedCompileUnits.push(submitted);');
     // The loop itself is the extracted runPrewarmCompileSubmission, which owns
     // the between-units check and the never-drop contract; the renderer keeps
     // only the wiring above and the deferral bookkeeping below.
@@ -657,7 +657,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];',
     );
     expect(renderer).toContain(
-      "droppedEntries.push({\n        id: 'programs.compile-submit',\n        units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),\n      });",
+      "droppedEntries.push({\n          id: 'programs.compile-submit',\n          units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),\n        });",
     );
     expect(renderer).toContain('deferPoolPublication ||=');
     // The deferral is visible in the prewarm summary on both entries.
@@ -1306,8 +1306,8 @@ describe('archetype and scene-texture progress hooks stay honest (review round 2
       new URL('../src/render/zone_prewarm_groups.ts', import.meta.url),
       'utf8',
     ).replace(/\r\n/g, '\n');
-    const builderStart = groups.indexOf('export function buildNpcPrewarmGroup(');
-    const builderEnd = groups.indexOf('export function buildPlayerPrewarmGroup(', builderStart);
+    const builderStart = groups.indexOf('function* npcPrewarmSteps(');
+    const builderEnd = groups.indexOf('function* playerPrewarmSteps(', builderStart);
     expect(builderStart).toBeGreaterThan(-1);
     expect(builderEnd).toBeGreaterThan(builderStart);
     const builder = groups.slice(builderStart, builderEnd);
@@ -1804,7 +1804,7 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
     const deferredLaneAt = source.indexOf(
       'if (skyAssetPrefetch && !skyWarmComplete && skyAssetPrefetch.rejection() === null) {',
     );
-    const sharedResumeAt = source.indexOf('resumeDroppedPrewarmEntries(resume, {');
+    const sharedResumeAt = source.indexOf('settleInitialPrewarmRemainder({');
     expect(deferredLaneAt).toBeGreaterThan(-1);
     expect(sharedResumeAt).toBeGreaterThan(-1);
     expect(source).toContain('if (split.missing.length === 0) skyWarmComplete = true;');
@@ -1844,7 +1844,7 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
   });
 
   it('resolves every ran entry through the honest status gate', () => {
-    expect(rendererSource()).toContain('await runStartedPrewarmEntry(entry, () =>');
+    expect(rendererSource()).toContain('runStartedPrewarmEntry(entry, () =>');
     const runner = readFileSync(new URL('../src/render/prewarm_entry.ts', import.meta.url), 'utf8');
     expect(runner).toContain("if (status === 'completed') status = resolvePrewarmEntryStatus(");
   });

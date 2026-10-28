@@ -1433,7 +1433,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
   // Re-minted for the one-colour market canopies on the current integration base.
   // No capture was retaken.
-  '4466561ebe777e344dfef52fa751ea69af1b8f973c6dcb1e0e8b6db6ddcf326b';
+  '4a337a39de1ad6f48ce8bacab19198d85af5fc7985527e148025dbc835e3af2d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1487,7 +1487,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
   // Re-minted for the one-colour market canopies on the current integration base.
   // No capture was retaken.
-  'a74dec3c70b5e365354324851b7f9e458973b3c964b119b65ff6a1bf45bfa596';
+  'ea0fab5a4f69ef74f9192385c9f275a7dd37f1ace9fe2e0b9dde23f49c9d0198';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2892,7 +2892,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // One-colour market canopies on the current integration base: recomputed
       // from the swept evidence. No capture was retaken.
-    ).toBe('2441702873a5a0fbb302a99c26eed732f5755a667abeded533c38f92efbd32ce');
+    ).toBe('01e0c64a86aaadc0d57607365a61927cf17b6cf471fd2021130731042f707084');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

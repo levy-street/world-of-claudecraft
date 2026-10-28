@@ -1,3 +1,8 @@
+import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   aggregate,
@@ -84,6 +89,33 @@ const recursiveProfile = {
 };
 
 describe('cpu profile window', () => {
+  it('analyzes a profile through the actual CLI on native filesystem paths', () => {
+    const directory = mkdtempSync(path.join(os.tmpdir(), 'woc cpu profile '));
+    try {
+      const file = path.join(directory, 'sample.cpuprofile');
+      writeFileSync(file, JSON.stringify(profile));
+      const result = spawnSync(
+        process.execPath,
+        [
+          fileURLToPath(new URL('../scripts/profiler/cpu_profile_window.mjs', import.meta.url)),
+          file,
+          '--from',
+          '1002',
+          '--to',
+          '1004',
+        ],
+        { encoding: 'utf8', timeout: 15_000, windowsHide: true },
+      );
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain('window 1002 to 1004 ms on the page clock');
+      expect(result.stdout).toContain('sampled 3.0 ms');
+      expect(result.stdout).toContain('compile shaders.ts:42');
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
   it('maps profiler microseconds onto the page performance.now() clock', () => {
     expect(toPageMs(profile, 5_000_000)).toBe(1000);
     expect(toPageMs(profile, 5_003_500)).toBe(1003.5);

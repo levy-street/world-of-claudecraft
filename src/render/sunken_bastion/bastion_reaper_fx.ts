@@ -42,6 +42,7 @@ import {
 } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { pickVeilClaim, type VeilCandidate } from './bastion_boss_fx_core';
 import {
   GRAVE_SHADOW_RADIUS,
@@ -171,7 +172,7 @@ interface PoolSlot {
 }
 
 export class BastionReaperFx {
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly kit: TelegraphKit;
   private readonly fx: BastionParticles;
   private readonly pools: PoolSlot[] = [];

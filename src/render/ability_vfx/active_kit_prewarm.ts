@@ -128,7 +128,12 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
 /** This optional manifest record owns a small local recipe. It does not spend
  * the loading deadline or enter the serial whole-catalogue resume chain.
  * Registration is unconditional, including a skipped constrained entry. */
-export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKitHost) {
+export function activeKitPrewarmEntry(
+  scene: object,
+  cls: string,
+  host: ActiveKitHost,
+  completeBeforeReveal = false,
+) {
   cancelActiveAbilityKit(scene);
   const state: Preparation = {
     scene,
@@ -148,7 +153,11 @@ export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKi
     category: 'vfx' as const,
     priority: 61.5,
     required: false,
-    run: () => {},
+    run: async () => {
+      if (!completeBeforeReveal) return;
+      await ensureActiveAbilityKit(scene, cls);
+      if (recipe(state, cls).length > 0) throw new Error('Active ability kit did not finish');
+    },
     progress: () => {
       const remaining = recipe(state, state.localClass).length;
       return {

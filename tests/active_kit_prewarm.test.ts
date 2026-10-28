@@ -30,7 +30,7 @@ import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
 
-function fixture(cls = 'warrior') {
+function fixture(cls = 'warrior', completeBeforeReveal = false) {
   const scene = new THREE.Scene();
   const geometry = new THREE.PlaneGeometry();
   const material = new THREE.MeshBasicMaterial();
@@ -82,14 +82,19 @@ function fixture(cls = 'warrior') {
     }),
   };
   const upload = vi.fn();
-  const entry = activeKitPrewarmEntry(scene, cls, {
-    queue: queue as unknown as Pick<
-      import('../src/render/background_gpu_queue').BackgroundGpuQueue,
-      'run'
-    >,
-    geometry: (kinds) => prep.units(host, kinds),
-    texture: upload,
-  });
+  const entry = activeKitPrewarmEntry(
+    scene,
+    cls,
+    {
+      queue: queue as unknown as Pick<
+        import('../src/render/background_gpu_queue').BackgroundGpuQueue,
+        'run'
+      >,
+      geometry: (kinds) => prep.units(host, kinds),
+      texture: upload,
+    },
+    completeBeforeReveal,
+  );
   return {
     scene,
     prep,
@@ -131,6 +136,17 @@ function fixture(cls = 'warrior') {
     },
   };
 }
+
+it('awaits the active local kit during complete desktop entry', async () => {
+  const f = fixture('warrior', true);
+  try {
+    await f.entry.run();
+    expect(f.entry.progress().trimmed).toBe(false);
+    expect(f.queue.run).toHaveBeenCalledTimes(123);
+  } finally {
+    f.close();
+  }
+});
 
 it('registers without GPU work and resumes only the twenty-seven selected Warrior shapes', async () => {
   const f = fixture();

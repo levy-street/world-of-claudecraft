@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { findBrowserPath } from './browser_path_resolve.mjs';
 import { dismissEntryOverlays, enterOfflineGame } from './enter_offline_game.mjs';
@@ -936,7 +936,7 @@ export async function capture(args) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     const args = parseArgs(process.argv.slice(2));
     if (args.help) {

@@ -4,6 +4,7 @@ import type { CompileGateResult } from '../src/render/compile_gate';
 import {
   buildInitialSceneCompileUnits,
   type InitialSceneCompileTail,
+  runInitialSceneCompileTail,
 } from '../src/render/initial_scene_compile_units';
 import type { MaterialPropertiesLike } from '../src/render/linked_program_touch';
 import { pieceProgramSettle } from '../src/render/program_variant_settle';
@@ -40,6 +41,60 @@ async function run(units: ReturnType<typeof buildInitialSceneCompileUnits>): Pro
 }
 
 describe('buildInitialSceneCompileUnits', () => {
+  it('includes hidden residents when complete desktop preparation is requested', async () => {
+    const scene = new THREE.Scene();
+    const hidden = mesh(new THREE.MeshStandardMaterial());
+    hidden.visible = false;
+    scene.add(hidden);
+    const compiled: THREE.Object3D[] = [];
+    await run(
+      buildInitialSceneCompileUnits({
+        scene,
+        stagedGroups: [],
+        includeGroup: () => true,
+        residentScene: true,
+        playerX: 0,
+        playerZ: 0,
+        batchSize: 1,
+        sharedDedupe: { seen: new Set(), seenKeys: new Set() },
+        compileColor: async (root) => compiled.push(root),
+        compileShadow: async () => {},
+        onCompiledRoot() {},
+      }),
+    );
+    expect(compiled).toEqual([hidden]);
+  });
+
+  it('rejects incomplete variants and failed touches in strict desktop mode', async () => {
+    const root = mesh(new THREE.MeshBasicMaterial());
+    const touch = touchSpy();
+    await expect(
+      runInitialSceneCompileTail(
+        {
+          settle: async () => ({ settled: false }),
+          touch,
+          timeoutMs: 100,
+          requireSettled: true,
+        },
+        root,
+      ),
+    ).rejects.toThrow('did not settle');
+    expect(touch).not.toHaveBeenCalled();
+    await expect(
+      runInitialSceneCompileTail(
+        {
+          settle: async () => ({ settled: true }),
+          touch: async () => {
+            throw new Error('lost context');
+          },
+          timeoutMs: 100,
+          requireSettled: true,
+        },
+        root,
+      ),
+    ).rejects.toThrow('lost context');
+  });
+
   it('collects only visible non-catalog roots for the scene group', async () => {
     const scene = new THREE.Scene();
     const visible = mesh(new THREE.MeshBasicMaterial());

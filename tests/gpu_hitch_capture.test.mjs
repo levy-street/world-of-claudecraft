@@ -1,4 +1,6 @@
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
@@ -90,6 +92,18 @@ describe('gpu hitch capture program attribution', () => {
 });
 
 describe('gpu hitch capture CLI', () => {
+  it('runs the actual CLI entry point on native filesystem paths', () => {
+    const result = spawnSync(
+      process.execPath,
+      [fileURLToPath(new URL('../scripts/gpu_hitch_capture.mjs', import.meta.url)), '--help'],
+      { encoding: 'utf8', timeout: 15_000, windowsHide: true },
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('GPU hitch capture');
+    expect(result.stdout).toContain('--duration-ms');
+  });
+
   it('parses the supported capture modes and profiles', () => {
     expect(
       parseArgs([

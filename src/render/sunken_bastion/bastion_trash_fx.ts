@@ -45,6 +45,7 @@ import {
 } from '../../sim/mob/trash_kit/bastion_cast_ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { BastionBoathookFx } from './bastion_boathook_fx';
 import { BastionBrineColumnFx } from './bastion_brine_column_fx';
 import { modelPointWorld } from './bastion_creature_fx_core';
@@ -200,7 +201,7 @@ export class BastionTrashFx {
     reducedMotion: () => boolean,
     private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
-    const group = new THREE.Group();
+    const group = new VisibleChildrenGroup();
     group.name = 'sunken-bastion-trash-fx';
     root.add(group);
     const kit = new TrashFxKit(group, groundY, world, glow, mist, density, reducedMotion);

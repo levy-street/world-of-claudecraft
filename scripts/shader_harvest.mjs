@@ -33,7 +33,7 @@
 // The tour is only as complete as its script. The report's unseen list and a
 // later diff against production sessions are what expose the gap.
 
-import { execFileSync, spawn } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,6 +48,7 @@ import {
   shaderTokensOf,
 } from './lib/shader_harvest_corpus.mjs';
 import { installShaderHarvestHook } from './lib/shader_harvest_hook.mjs';
+import { startHarvestVite } from './lib/shader_harvest_server.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VIEWPORT = { width: 1600, height: 900, deviceScaleFactor: 1 };
@@ -118,30 +119,10 @@ function git(argv, fallback) {
 // agent worktree never sees edits and its transform cache outlives a restart)
 // ---------------------------------------------------------------------------
 
-function killPort(port) {
-  try {
-    execFileSync('fuser', ['-k', `${port}/tcp`], { stdio: 'ignore' });
-  } catch {
-    // nothing was listening
-  }
-}
-
-function startVite(port, logFile) {
-  killPort(port);
-  for (const dir of ['node_modules/.vite', 'node_modules/.vite-temp']) {
-    fs.rmSync(path.join(ROOT, dir), { recursive: true, force: true });
-  }
-  const log = fs.openSync(logFile, 'w');
-  return spawn(
-    'npx',
-    ['vite', '--force', '--port', String(port), '--strictPort', '--host', '127.0.0.1'],
-    { cwd: ROOT, stdio: ['ignore', log, log] },
-  );
-}
-
-async function waitForVite(port, timeoutMs) {
+async function waitForVite(vite, port, timeoutMs) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
+    vite.assertRunning();
     try {
       if ((await fetch(`http://127.0.0.1:${port}/`)).ok) return;
     } catch {
@@ -163,7 +144,10 @@ async function verifyServedModule(port) {
 // the tour
 // ---------------------------------------------------------------------------
 
+const checkpoints = new WeakMap();
+
 async function setStep(page, label) {
+  await checkpoints.get(page)?.(label);
   await page.evaluate((label) => {
     window.__shaderHarvest.step = label;
   }, label);
@@ -194,7 +178,8 @@ async function settle(page, args) {
         if (h.liveSeen.has(id)) continue;
         h.liveSeen.add(id);
         const program = (window.__game.renderer.webgl?.info?.programs ?? []).find(
-          (p) => p.cacheKey === e.key,
+          // Live-program labels prefer the material name over the cache key.
+          (p) => p.cacheKey === e.key || p.name === e.key,
         );
         h.live.push({
           step: h.step,
@@ -371,6 +356,9 @@ const TOUR = {
       }, key);
       await settle(page, args);
     }
+    // The sim reconciles ownership every tick. Selecting an unowned skin is a
+    // silent no-op, so grant the offline dev catalog before testing appearances.
+    await dev(page, '/dev mountskins');
     for (const skin of catalog.skins) {
       await setStep(page, `mountskin:${skin}`);
       await page.evaluate((skin) => {
@@ -379,6 +367,21 @@ const TOUR = {
         window.__game.sim.changeMountSkin(skin);
       }, skin);
       await settle(page, args);
+      const selected = await page.evaluate(() => window.__game.sim.player.mountSkinId);
+      if (selected !== skin) throw new Error(`mount skin ${skin} did not apply: ${selected}`);
+      const appearance = await page.evaluate(async (skin) => {
+        const { MOUNT_SKINS } = await import('/src/sim/content/mount_skins.ts');
+        const g = window.__game;
+        const view = g.renderer.views.get(g.sim.player.id);
+        return {
+          expected: MOUNT_SKINS[skin].visualKey,
+          actual: view?.mountVisualKey,
+          ready: !!view?.mountVisual && view.mountCompilePending === false,
+          mounted: !!g.sim.player.mountKey,
+        };
+      }, skin);
+      if (!appearance.ready || !appearance.mounted || appearance.actual !== appearance.expected)
+        throw new Error(`mount skin ${skin} not rendered: ${JSON.stringify(appearance)}`);
       const moved = await rideForward(page, 1500);
       await settle(page, args);
       const state = await page.evaluate(() => {
@@ -505,23 +508,49 @@ function readbackFidelity() {
   return out;
 }
 
-async function harvestProfile(browser, args, profile, corpus, log) {
+async function harvestProfile(browser, args, profile, corpus, log, checkpoint) {
   const page = await browser.newPage();
   const errors = [];
-  page.on('pageerror', (e) => errors.push(String(e.message)));
+  page.on('pageerror', (e) => {
+    errors.push(String(e.message));
+    log(`[${profile}] page error: ${e.message}`);
+  });
+  page.on('console', (message) => {
+    if (message.type() === 'error') log(`[${profile}] console error: ${message.text()}`);
+  });
   await page.evaluateOnNewDocument(installShaderHarvestHook);
-  const url = `http://localhost:${args.port}/?gfx=${profile}${args.livePrograms ? '&perfTrace=1&perf' : ''}`;
+  await page.evaluateOnNewDocument(() => {
+    window.__harvestBootReady = false;
+    document.addEventListener(
+      'woc:boot-splash-owned',
+      () => {
+        window.__harvestBootReady = true;
+      },
+      { once: true },
+    );
+  });
+  const url = `http://localhost:${args.port}/?boot=now&gfx=${profile}${args.livePrograms ? '&perfTrace=1&perf' : ''}`;
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+  // With boot=now this event follows start-screen listener wiring. The static
+  // button exists earlier, so clicking it at DOMContentLoaded can do nothing.
+  await page.waitForFunction(() => window.__harvestBootReady, { timeout: 120_000 });
   const booted = await enterOfflineGame(page, {
     charClass: 'warrior',
     charName: 'Harvester',
     gameBootTimeoutMs: 180_000,
+    selectorTimeoutMs: 90_000,
   });
   if (!booted) throw new Error(`profile ${profile}: the offline world never booted`);
   await settle(page, args);
   await dev(page, '/dev level 60');
   await dev(page, '/dev god');
   await dev(page, '/dev noaggro');
+  let added = 0;
+  checkpoints.set(page, async (nextStep) => {
+    const drain = await page.evaluate(() => window.__shaderHarvest.drain());
+    added += foldDrain(corpus, profile, drain);
+    checkpoint({ profile, nextStep, links: drain.links });
+  });
   const started = Date.now();
   for (const step of args.steps) {
     if (step === 'boot') continue;
@@ -547,14 +576,15 @@ async function harvestProfile(browser, args, profile, corpus, log) {
       dynamicShadows: GFX.dynamicShadows,
     };
   });
-  const added = foldDrain(corpus, profile, drain);
+  added += foldDrain(corpus, profile, drain);
+  checkpoints.delete(page);
   await page.close();
   return {
     profile,
     gfx: tier,
     seconds: Math.round((Date.now() - started) / 1000),
     links: drain.links,
-    unique: drain.programs.length,
+    unique: drain.meta.length,
     addedToCorpus: added,
     fidelity,
     livePrograms,
@@ -695,10 +725,11 @@ async function main() {
   fs.mkdirSync(path.join(outDir, 'shaders'), { recursive: true });
   const log = (line) => process.stdout.write(`${line}\n`);
 
-  const vite = startVite(args.port, path.join(outDir, 'vite.log'));
+  const vite = await startHarvestVite(ROOT, args.port, path.join(outDir, 'vite.log'));
   let browser = null;
   try {
-    await waitForVite(args.port, 120_000);
+    await waitForVite(vite, args.port, 120_000);
+    vite.assertRunning();
     await verifyServedModule(args.port);
     log(`vite: serving this worktree on :${args.port} (verified)`);
     browser = await puppeteer.launch({
@@ -718,9 +749,26 @@ async function main() {
     });
     const corpus = createCorpus();
     const runs = [];
+    const checkpoint = (progress) => {
+      for (const shader of corpus.shaders.values()) {
+        const target = path.join(outDir, 'shaders', `${shader.hash}.${shader.stage}.glsl`);
+        if (!fs.existsSync(target)) fs.writeFileSync(target, shader.text);
+      }
+      fs.writeFileSync(
+        path.join(outDir, 'checkpoint.json'),
+        JSON.stringify(
+          corpusIndex(corpus, {
+            partial: true,
+            dirty,
+            progress,
+            updatedAt: new Date().toISOString(),
+          }),
+        ),
+      );
+    };
     for (const profile of args.profiles) {
       log(`profile ${profile}: starting`);
-      runs.push(await harvestProfile(browser, args, profile, corpus, log));
+      runs.push(await harvestProfile(browser, args, profile, corpus, log, checkpoint));
     }
     const meta = {
       gitSha: git(['rev-parse', '--short', 'HEAD'], 'unknown'),
@@ -747,8 +795,7 @@ async function main() {
     log(`report: ${path.join(outDir, 'report.md')}`);
   } finally {
     if (browser) await browser.close().catch(() => undefined);
-    vite.kill('SIGTERM');
-    killPort(args.port);
+    await vite.stop();
     fs.rmSync(path.join(outDir, 'chrome-profile'), { recursive: true, force: true });
   }
 }

@@ -109,9 +109,18 @@ export class BossImpostorField {
   private live = new Map<number, Landmark>();
   private quad: THREE.BufferGeometry | null = null;
   private light = new THREE.Vector3(1, 1, 1);
+  private readonly programKeeper: Landmark;
 
   constructor(private scene: THREE.Scene) {
     this.group.name = 'bossImpostors';
+    // Restore the hidden owner during the visible hold, before a boss can reappear.
+    this.group.userData.prewarmProgramAnchor = true;
+    // The resident prewarm traverses hidden meshes. Keep one material from the live
+    // factory for the field's whole lifetime: disposing the last live sprite otherwise
+    // releases its shader-stage cache entries, so its next appearance links again.
+    // No atlas is baked here; a null sampler uniform has the same program as a baked one.
+    this.programKeeper = this.build();
+    this.programKeeper.mesh.visible = false;
     // He is a solid body on the horizon, not a glow: he must occlude and be occluded by the
     // terrain in front of him like anything else, so this group keeps the default render
     // order (never a Group order: tests/floor_vfx_layer.test.ts) with depth writes on.
@@ -274,6 +283,7 @@ export class BossImpostorField {
   dispose(): void {
     for (const lm of this.live.values()) lm.mat.dispose();
     this.live.clear();
+    this.programKeeper.mat.dispose();
     this.quad?.dispose();
     this.quad = null;
     this.atlas?.dispose();

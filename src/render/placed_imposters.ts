@@ -79,6 +79,10 @@ export class PlacedImposters {
   private readonly maxLod: number;
   private readonly geometry: THREE.InstancedBufferGeometry;
   private readonly material: THREE.MeshLambertMaterial;
+  // Keep USE_MAP/UV shape stable before the first lazy atlas bake. Initial
+  // resident prewarm sees this hidden mesh even while it has zero instances.
+  // Retain the seed until disposal: prewarm material clones may still use it.
+  private readonly shaderSeed = new THREE.DataTexture(new Uint8Array(4), 1, 1);
   private readonly slots = new SlotTable();
   private capacity = INITIAL_CAPACITY;
   private seat = new Float32Array(INITIAL_CAPACITY * 4);
@@ -122,7 +126,10 @@ export class PlacedImposters {
     this.geometry.setIndex([0, 1, 2, 0, 2, 3]);
     this.geometry.instanceCount = 0;
     this.installInstanceAttributes();
+    this.shaderSeed.colorSpace = THREE.NoColorSpace;
+    this.shaderSeed.needsUpdate = true;
     this.material = new THREE.MeshLambertMaterial({
+      map: this.shaderSeed,
       alphaTest: 0.5,
       side: THREE.DoubleSide,
       fog: true,
@@ -303,6 +310,7 @@ export class PlacedImposters {
     this.blitMaterial?.dispose();
     this.blitMaterial = null;
     this.material.dispose();
+    this.shaderSeed.dispose();
     this.geometry.dispose();
   }
 

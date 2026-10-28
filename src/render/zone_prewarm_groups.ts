@@ -13,6 +13,7 @@ import { type CharacterVisual, createCharacterVisual, visualAssetsResident } fro
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { characterVisualPoolKey } from './characters/visual_pool';
 import type { PooledObjectView } from './ground_object_pool';
+import { PrewarmCompletionError } from './prewarm_completion';
 import { buildGroundQuestObject, prewarmFarshoreSalvageObjects } from './quest_objects';
 import { setRenderCategory } from './renderer_diagnostics';
 
@@ -101,30 +102,30 @@ export function buildEntityPrewarmGroup(
     group.add(obj);
     idx++;
   };
-  const build = (templateId: string, copies: number): void => {
+  const build = (templateId: string, copies: number): boolean => {
     const template = MOBS[templateId];
-    if (!template) return;
+    if (!template) return true;
     for (let i = 0; i < copies; i++) {
       const entity = h.prewarmEntity('mob', template.id, template.color, template.scale);
       // A lazily loaded body (the training dummy) is fetched here and warmed by a
       // later pass instead of throwing out of createCharacterVisual.
-      if (!visualAssetsResident(visualKeyFor(entity))) continue;
+      if (!visualAssetsResident(visualKeyFor(entity))) return false;
       const visual = createCharacterVisual(entity);
       // Assets unavailable: skip the seed so a later zone preparation can retry it.
-      if (!visual) continue;
+      if (!visual) return false;
       const poolKey = characterVisualPoolKey(entity);
       if (poolKey) pooled.push({ key: poolKey, visual });
       visual.root.visible = true;
       place(visual.root);
     }
+    return true;
   };
   // Warm only templates that can appear in this zone. The per-template set
   // persists across transitions, so shared families are paid once per session.
   for (const templateId of h.templateIdsInZone(zone, 'mob')) {
     if (h.prewarmedMobTemplates.has(templateId)) continue;
     const copies = PREWARM_MOB_COMMON_IDS.has(templateId) ? PREWARM_MOB_POOL_COPIES : 1;
-    build(templateId, copies);
-    h.prewarmedMobTemplates.add(templateId);
+    if (build(templateId, copies)) h.prewarmedMobTemplates.add(templateId);
   }
   return { group, pooled };
 }
@@ -136,21 +137,24 @@ export function buildEntityPrewarmGroup(
 // each: its body is seeded into the pool under that NPC's own template id. These
 // are NOT speculative rigs: each is a resident of the zone, built to be drawn, so
 // it asks for its own hairstyle and class set like any body entering view.
-export function buildNpcPrewarmGroup(
+function* npcPrewarmSteps(
   host: object,
   zone: ZoneDef,
   deadline: number,
-): {
-  group: THREE.Group;
-  pooled: { key: string; visual: CharacterVisual }[];
-  /** Ids whose model ended the loop warm: freshly built here, already warm
-   *  from an earlier id or session pass, or with no static record to build.
-   *  An asset-unavailable skip stays uncounted so warmed < planned reports
-   *  the unwarmed remainder instead of masquerading as complete work. */
-  warmed: number;
-  planned: number;
-  trimmed: boolean;
-} {
+): Generator<
+  void,
+  {
+    group: THREE.Group;
+    pooled: { key: string; visual: CharacterVisual }[];
+    /** Ids whose model ended the loop warm: freshly built here, already warm
+     *  from an earlier id or session pass, or with no static record to build.
+     *  An asset-unavailable skip stays uncounted so warmed < planned reports
+     *  the unwarmed remainder instead of masquerading as complete work. */
+    warmed: number;
+    planned: number;
+    trimmed: boolean;
+  }
+> {
   const h = host as ZonePrewarmGroupHost;
   const group = new THREE.Group();
   const pooled: { key: string; visual: CharacterVisual }[] = [];
@@ -162,6 +166,7 @@ export function buildNpcPrewarmGroup(
   let warmed = 0;
   let trimmed = false;
   for (const npcId of npcIds) {
+    yield;
     if (performance.now() >= deadline) {
       trimmed = true;
       break;
@@ -202,23 +207,52 @@ export function buildNpcPrewarmGroup(
  *  group above seeds real residents instead, and so does not pass this. */
 const SPECULATIVE = { fetchStreamed: false } as const;
 
-export function buildPlayerPrewarmGroup(
+/** Body/animation files are demands for complete entry. Armor cosmetics retain
+ * their existing stream gates, but a missing base body cannot skip a catalog. */
+export async function ensurePrewarmCatalogAssets(
+  host: object,
+  zone: ZoneDef,
+  deadline: number,
+): Promise<void> {
+  const h = host as ZonePrewarmGroupHost;
+  const keys = new Set<string>(['form_metamorph']);
+  for (const cls of ALL_CLASSES)
+    keys.add(visualKeyFor(h.prewarmEntity('player', cls, 0xffffff, 1)));
+  for (const kind of ['mob', 'npc'] as const) {
+    for (const id of h.templateIdsInZone(zone, kind)) {
+      if (!(kind === 'mob' ? MOBS[id] : NPCS[id])) continue;
+      keys.add(visualKeyFor(h.prewarmEntity(kind, id, 0xffffff, 1)));
+    }
+  }
+  for (;;) {
+    const missing = [...keys].filter((key) => !visualAssetsResident(key));
+    if (missing.length === 0) return;
+    if (performance.now() >= deadline)
+      throw new PrewarmCompletionError(`body assets: ${missing.join(', ')}`);
+    await new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+}
+
+function* playerPrewarmSteps(
   host: object,
   deadline: number,
-): {
-  group: THREE.Group;
-  visualCount: number;
-  visuals: CharacterVisual[];
-  plannedVisuals: number;
-  trimmed: boolean;
-} {
+): Generator<
+  void,
+  {
+    group: THREE.Group;
+    visualCount: number;
+    visuals: CharacterVisual[];
+    plannedVisuals: number;
+    trimmed: boolean;
+  }
+> {
   const h = host as ZonePrewarmGroupHost;
   const group = new THREE.Group();
   const p = h.sim.player;
   group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
   setRenderCategory(group, 'prewarm');
   // Skin variants plus one aura-glow rig per class (the second loop below).
-  const plannedVisuals = prewarmPlayerSkinVariantCount() + ALL_CLASSES.length;
+  const plannedVisuals = 1 + prewarmPlayerSkinVariantCount() + ALL_CLASSES.length;
   let idx = 0;
   const visuals: CharacterVisual[] = [];
   const place = (obj: THREE.Object3D): void => {
@@ -255,6 +289,7 @@ export function buildPlayerPrewarmGroup(
   for (const cls of ALL_CLASSES) {
     const variants = skinCount(`player_${cls}`);
     for (let skin = 0; skin < variants; skin++) {
+      yield;
       if (performance.now() >= deadline) {
         return { group, visualCount: idx, visuals, plannedVisuals, trimmed: true };
       }
@@ -281,6 +316,7 @@ export function buildPlayerPrewarmGroup(
   // group is removed in the prewarm finally, but linked programs stay cached
   // for the session.
   for (const cls of ALL_CLASSES) {
+    yield;
     if (performance.now() >= deadline) {
       return { group, visualCount: idx, visuals, plannedVisuals, trimmed: true };
     }
@@ -294,6 +330,39 @@ export function buildPlayerPrewarmGroup(
     visuals.push(visual);
   }
   return { group, visualCount: idx, visuals, plannedVisuals, trimmed: false };
+}
+
+/** Preserve the synchronous zone-transition API; boot drains the same finite
+ * catalog cooperatively so input/paint and driver polling remain responsive. */
+function finishSteps<T>(steps: Generator<void, T>): T {
+  for (;;) {
+    const step = steps.next();
+    if (step.done) return step.value;
+  }
+}
+
+async function finishStepsCooperatively<T>(steps: Generator<void, T>): Promise<T> {
+  for (;;) {
+    const step = steps.next();
+    if (step.done) return step.value;
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  }
+}
+
+export function buildNpcPrewarmGroup(host: object, zone: ZoneDef, deadline: number) {
+  return finishSteps(npcPrewarmSteps(host, zone, deadline));
+}
+
+export function buildPlayerPrewarmGroup(host: object, deadline: number) {
+  return finishSteps(playerPrewarmSteps(host, deadline));
+}
+
+export function buildCompleteNpcPrewarmGroup(host: object, zone: ZoneDef, deadline: number) {
+  return finishStepsCooperatively(npcPrewarmSteps(host, zone, deadline));
+}
+
+export function buildCompletePlayerPrewarmGroup(host: object, deadline: number) {
+  return finishStepsCooperatively(playerPrewarmSteps(host, deadline));
 }
 
 export function buildObjectPrewarmGroup(host: object): THREE.Group {

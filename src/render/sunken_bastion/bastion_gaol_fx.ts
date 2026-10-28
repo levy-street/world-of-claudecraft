@@ -47,6 +47,7 @@ import {
   telegraphFillOf,
 } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { bastionSlotOrigin, chainPoints, chainSag } from './bastion_boss_fx_core';
 import {
   ANCHOR_MARK_RADIUS,
@@ -93,7 +94,7 @@ function auraOf(e: EntityView, id: string): EntityView['auras'][number] | undefi
 }
 
 export class BastionGaolFx {
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly kit: TelegraphKit;
   private readonly fx: BastionParticles;
   private readonly marks: MarkSlot[] = [];
