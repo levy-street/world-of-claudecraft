@@ -361,6 +361,9 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // neck and drops a touch
   valorsteed: spec('mount_valorsteed', 2.4, true, undefined, 0.15),
   grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
+  // seat 0.1 under the saddle's dip (0.60 model units at height 3.8), the same gap the
+  // bear's seat keeps; the dip sits about 0.1 model units toward the tail
+  ossuary_charger: spec('mount_ossuary_charger', 2.66, true, undefined, -0.45),
   stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3, 'slime'),
   aether_hover_cycle: spec(
     'mount_aether_hover_cycle',

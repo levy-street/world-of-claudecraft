@@ -2603,6 +2603,7 @@ export const ja_JP: EnTranslations = {
       "name_emberbristle_broom": "エンバーブリッスルの箒",
       "name_wobbles_slime": "スライムのプルプル",
       "name_nightwing_chimera": "ナイトウィング・キマイラ",
+      "name_ossuary_charger": "納骨堂の軍馬",
       "desc_valorsteed": "革の鞍を備えた、丈夫で足取りの確かな馬。",
       "desc_grag_bear": "重厚な鞍を備えた、丈夫で足取りの確かな熊。",
       "desc_stalkglider_snail": "苔むした殻を背負った、粘り強くたくましいカタツムリ。",
@@ -2625,7 +2626,8 @@ export const ja_JP: EnTranslations = {
       "desc_nightwing_chimera": "古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。",
-      "desc_emberbristle_broom": "オレンジのリボンを巻いた収穫の箒。地面から手のひらひとつ分浮かび、穂先から燠火をこぼす。ゴードライトの宵が終わると藁に戻って崩れ落ちる。"
+      "desc_emberbristle_broom": "オレンジのリボンを巻いた収穫の箒。地面から手のひらひとつ分浮かび、穂先から燠火をこぼす。ゴードライトの宵が終わると藁に戻って崩れ落ちる。",
+      "desc_ossuary_charger": "骨だけになるまで朽ち果てた軍馬。戦場の納骨堂から呼び起こされ、空ろな眼窩には青白い炎が燃え、背骨には朽ちた鞍が今も括り付けられている。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -20788,6 +20790,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "ヴィリジアン・ヴェイルストライダーの手綱"
+      },
+      "reins_ossuary_charger": {
+        "name": "納骨堂の軍馬の手綱"
       },
       "reins_nightwing_chimera": {
         "name": "ナイトウィング・キマイラの手綱"

@@ -122,10 +122,14 @@ function ride(sim: Sim, pid: number, key: string): void {
 describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
     // Existing mount identities remain stable, including the retired tanks and guild destrier.
-    expect(MOUNT_KEYS).toHaveLength(17);
+    expect(MOUNT_KEYS).toHaveLength(18);
     // Pinned as a literal: the acquisition sweeps below iterate this list, so a
     // mount dropped from it would silently lose its no-route checks.
-    expect(DEVELOPER_MOUNTS).toEqual(['terrorspark_groundshaker', 'referral_tank']);
+    expect(DEVELOPER_MOUNTS).toEqual([
+      'terrorspark_groundshaker',
+      'referral_tank',
+      'ossuary_charger',
+    ]);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');

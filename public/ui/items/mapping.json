@@ -322,6 +322,16 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "reins_ossuary_charger",
+      "name": "Reins of the Ossuary Charger",
+      "sourcePack": "project-authored",
+      "sourceFile": "front three-quarter head render of the shipped mount model (public/models/mounts/ossuary_charger.glb) through scripts/mount_icon_entry.js at 512px, composited onto an opaque dark vignette and downscaled to the 128px opaque woc-item-icon-v1 shipping format",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)",
+      "sourceSha256": "8f3063cab4eee7eb3739528b4bd41510b5bb452e77e1b7a73d7ff29c1191b46c",
+      "shippingSha256": "990fece886dfcfefec9a210ef21724e5512514a73c23cf0432556e10600c97c9"
+    },
+    {
       "itemId": "reins_rickshaw_mount",
       "name": "Bonebound Rickshaw Reins",
       "sourcePack": "woc_item_icon_v1_generated",

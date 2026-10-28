@@ -531,6 +531,7 @@ If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
 | Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
 | Generated prop model (spore_burster) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D image-to-model from a project concept; cap spots baked into the texture locally) | Project asset | With the project only |
+| Ossuary Charger mount model (`public/models/mounts/ossuary_charger.glb`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI text-to-image concept, image-to-3D and quadruped auto-rig, owned under the Tripo paid-plan license); gait clips baked procedurally by `scripts/bake_mount_gaits.mjs` | Project asset | With the project only |
 
 ### Orbital Lightning
 

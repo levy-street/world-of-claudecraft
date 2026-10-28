@@ -2603,6 +2603,7 @@ export const fr_FR: EnTranslations = {
       "name_emberbristle_broom": "Balai aux brins de braise",
       "name_wobbles_slime": "Tremblote le limon",
       "name_nightwing_chimera": "Chimère Aile-de-nuit",
+      "name_ossuary_charger": "Ossuary Charger",
       "desc_valorsteed": "Un destrier robuste au pied sûr, équipé d'une selle en cuir.",
       "desc_grag_bear": "Un ours robuste au pied sûr, équipé d'une lourde selle.",
       "desc_stalkglider_snail": "Un escargot robuste au rythme paisible, à la coquille moussue.",
@@ -2625,7 +2626,8 @@ export const fr_FR: EnTranslations = {
       "desc_nightwing_chimera": "Une wyverne crépusculaire bicéphale venue des branches anciennes, perchée sur ses pattes arrière griffues au repos et rasant le sol sur des ailes gravées de runes arcaniques.",
       "desc_chimeglass_tortoise": "Une tortue des salines qui a dépassé trois générations de caravanes. Les bricoleurs lui ont arraché des lunettes en verre tempête et lui ont accroché une cloche de bronze à la gorge, pour que la route l'entende bien avant de le voir.",
       "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course.",
-      "desc_emberbristle_broom": "Un balai de moisson noué d’un ruban orange, qui flotte à une main du sol et sème des braises depuis ses brins. Une récompense permanente de la Veillée des courges."
+      "desc_emberbristle_broom": "Un balai de moisson noué d’un ruban orange, qui flotte à une main du sol et sème des braises depuis ses brins. Une récompense permanente de la Veillée des courges.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -20788,6 +20790,9 @@ export const fr_FR: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Rênes de l'Arpente-vallon viridien"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of the Ossuary Charger"
       },
       "reins_nightwing_chimera": {
         "name": "Rênes de la Chimère Aile-de-nuit"

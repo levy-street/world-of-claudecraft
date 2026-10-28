@@ -2603,6 +2603,7 @@ export const it_IT: EnTranslations = {
       "name_emberbristle_broom": "Scopa dalle setole ardenti",
       "name_wobbles_slime": "Wobbles la Melma",
       "name_nightwing_chimera": "Chimera Ala Notturna",
+      "name_ossuary_charger": "Ossuary Charger",
       "desc_valorsteed": "Un destriero robusto dal passo sicuro con una sella di cuoio.",
       "desc_grag_bear": "Un orso robusto dal passo sicuro con una sella pesante.",
       "desc_stalkglider_snail": "Una lumaca robusta dal ritmo tranquillo con un guscio muschioso.",
@@ -2625,7 +2626,8 @@ export const it_IT: EnTranslations = {
       "desc_nightwing_chimera": "Una viverna crepuscolare a due teste proveniente dai rami antichi, che riposa sulle zampe posteriori artigliate e sfiora il terreno con ali incise di rune arcane.",
       "desc_chimeglass_tortoise": "Una tartaruga salata che ha superato tre generazioni di carovane. I calderai gli montarono gli occhiali di vetro anti-tempesta e gli appesero una campana di bronzo al collo, così la strada lo sentì molto prima di vederlo.",
       "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata.",
-      "desc_emberbristle_broom": "Una scopa del raccolto legata con un nastro arancione, che fluttua a un palmo dal suolo e sparge braci dalle setole. Una ricompensa permanente della Notte delle zucche."
+      "desc_emberbristle_broom": "Una scopa del raccolto legata con un nastro arancione, che fluttua a un palmo dal suolo e sparge braci dalle setole. Una ricompensa permanente della Notte delle zucche.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Premi {key} per salire sul Valorsteed di addestramento.",
@@ -20788,6 +20790,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Redini del Valestrider Verdeggiante"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of the Ossuary Charger"
       },
       "reins_nightwing_chimera": {
         "name": "Redini della chimera Ala Notturna"

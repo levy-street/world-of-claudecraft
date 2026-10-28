@@ -2603,6 +2603,7 @@ export const es_ES: EnTranslations = {
       "name_emberbristle_broom": "Escoba de cerdas ardientes",
       "name_wobbles_slime": "Tembleques el Moco",
       "name_nightwing_chimera": "Quimera de Ala Nocturna",
+      "name_ossuary_charger": "Ossuary Charger",
       "desc_valorsteed": "Un corcel resistente y de paso seguro con una silla de cuero.",
       "desc_grag_bear": "Un oso resistente y de paso seguro con una silla pesada.",
       "desc_stalkglider_snail": "Un caracol robusto y de ritmo tranquilo con un caparazón musgoso.",
@@ -2625,7 +2626,8 @@ export const es_ES: EnTranslations = {
       "desc_nightwing_chimera": "Un dracoleón crepuscular bicéfalo de las ramas antiguas, que descansa sobre sus patas traseras con garras y roza el suelo con alas grabadas de runas arcanas.",
       "desc_chimeglass_tortoise": "Una tortuga salada que ha dejado atrás a tres generaciones de caravanas. Los caldereros le quitaron las gafas de cristal de tormenta y le colgaron una campana de bronce en el cuello, de modo que la carretera le oye mucho antes de verlo.",
       "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera.",
-      "desc_emberbristle_broom": "Una escoba de cosecha atada con una cinta naranja que flota a un palmo del suelo y desprende brasas de sus cerdas. Una recompensa permanente de la Noche de las Calabazas."
+      "desc_emberbristle_broom": "Una escoba de cosecha atada con una cinta naranja que flota a un palmo del suelo y desprende brasas de sus cerdas. Una recompensa permanente de la Noche de las Calabazas.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
@@ -20788,6 +20790,9 @@ export const es_ES: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Riendas del Corcel Esmeralda del Valle"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of the Ossuary Charger"
       },
       "reins_nightwing_chimera": {
         "name": "Riendas de la Quimera de Ala Nocturna"

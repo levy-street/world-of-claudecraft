@@ -2603,6 +2603,7 @@ export const pt_BR: EnTranslations = {
       "name_emberbristle_broom": "Vassoura de cerdas em brasa",
       "name_wobbles_slime": "Balanço, o Limo",
       "name_nightwing_chimera": "Quimera de Asa Noturna",
+      "name_ossuary_charger": "Ossuary Charger",
       "desc_valorsteed": "Um corcel resistente de passos firmes com uma sela de couro.",
       "desc_grag_bear": "Um urso resistente de passos firmes com uma sela pesada.",
       "desc_stalkglider_snail": "Um caracol robusto de ritmo tranquilo com uma concha musgosa.",
@@ -2625,7 +2626,8 @@ export const pt_BR: EnTranslations = {
       "desc_nightwing_chimera": "Uma serpe alada crepuscular de duas cabeças dos galhos antigos, que descansa nas patas traseiras com garras e raspa o chão voando com asas gravadas em magia arcana.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
       "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada.",
-      "desc_emberbristle_broom": "Uma vassoura da colheita amarrada com uma fita laranja, que flutua a um palmo do chão e solta brasas de suas cerdas. Uma recompensa permanente da Noite das Abóboras."
+      "desc_emberbristle_broom": "Uma vassoura da colheita amarrada com uma fita laranja, que flutua a um palmo do chão e solta brasas de suas cerdas. Uma recompensa permanente da Noite das Abóboras.",
+      "desc_ossuary_charger": "A war horse long since picked to the bone, raised from a battlefield ossuary with a pale fire burning in its empty sockets and a rotted saddle still strapped to its spine."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -20788,6 +20790,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Rédeas do Andarilho do Vale Viridiano"
+      },
+      "reins_ossuary_charger": {
+        "name": "Reins of the Ossuary Charger"
       },
       "reins_nightwing_chimera": {
         "name": "Rédeas da Quimera de Asa Noturna"

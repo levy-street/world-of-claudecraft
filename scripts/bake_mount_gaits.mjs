@@ -102,6 +102,21 @@ const RIGS = {
     },
     head: { bone: 'tripo::Head_0', amp: 3 },
   },
+  ossuary_charger: {
+    root: 'tripo::Root',
+    fwd: -1,
+    // horse trot on diagonal pairs (FL+RR, FR+RL). The auto-rig left the
+    // front-left leg on a two-joint stub (bone_4 -> bone_5, which carries
+    // its skin weights) and the front-right shoulder on bone_6 above its
+    // limb chain, so those are the swinging joints for the front pair.
+    legs: [
+      ['bone_4', 'bone_5', 0, 0.85], // front left
+      ['bone_6', 'tripo::0_Right_Limb_1', 0.5, 0.85], // front right
+      ['tripo::1_Left_Limb_0', 'tripo::1_Left_Limb_2', 0.5, 0.85], // rear left
+      ['tripo::0_Left_Limb_0', 'tripo::0_Left_Limb_1', 0, 0.85], // rear right
+    ],
+    head: { bone: 'tripo::Head_0', amp: 3 },
+  },
   stormfeather_griffin: {
     root: 'rig_root',
     fwd: -1,

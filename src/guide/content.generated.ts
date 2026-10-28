@@ -7776,6 +7776,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Ossuary Charger"
+      },
+      {
+        "kind": "mount",
         "name": "Friendship Raptor"
       },
       {

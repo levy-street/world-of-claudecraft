@@ -14467,6 +14467,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_nightwing_chimera': '밤날개 키메라',
   'hudChrome.mounts.desc_nightwing_chimera':
     '고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.',
+  'hudChrome.mounts.name_ossuary_charger': '납골당 군마',
+  'hudChrome.mounts.desc_ossuary_charger':
+    '뼈만 남을 때까지 썩어 버린 군마로, 전장의 납골당에서 되살아났다. 텅 빈 눈구멍에는 창백한 불꽃이 타오르고, 등뼈에는 썩은 안장이 아직 묶여 있다.',
   'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
   'hudChrome.mounts.name_lantern_hall_destrier': '등불 회관 군마',
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
@@ -15500,6 +15503,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '드레드스파크 시동 열쇠',
   'entities.items.reins_avian_strider.name': '비리디안 베일스트라이더의 고삐',
   'entities.items.reins_nightwing_chimera.name': '밤날개 키메라의 고삐',
+  'entities.items.reins_ossuary_charger.name': '납골당 군마의 고삐',
   'entities.items.reins_lanternback_troll.name': '점등인의 멍에: 그룸볼',
   'entities.items.reins_chimeglass_tortoise.name': '길지기의 종끈: 톨리버',
   'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',

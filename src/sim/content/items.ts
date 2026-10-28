@@ -421,6 +421,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer mount (content/mounts.ts DEVELOPER_MOUNTS): soulbound until it
+  // gains a player-facing acquisition path.
+  reins_ossuary_charger: {
+    id: 'reins_ossuary_charger',
+    name: 'Reins of the Ossuary Charger',
+    kind: 'mount',
+    mount: 'ossuary_charger',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // The Rift Watch's Champion mount: sold by Quartermaster Vaelen in
   // Drifthaven behind Champion standing (content/faction_vendors.ts,
   // docs/design/factions.md). Priced in Rift Watch marks, never coin: buyValue

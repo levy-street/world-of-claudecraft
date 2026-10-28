@@ -2603,6 +2603,7 @@ export const zh_TW: EnTranslations = {
       "name_emberbristle_broom": "餘燼鬃毛掃帚",
       "name_wobbles_slime": "晃晃史萊姆",
       "name_nightwing_chimera": "夜翼奇美拉",
+      "name_ossuary_charger": "藏骸所戰駒",
       "desc_valorsteed": "一匹堅韌穩健、配有皮革馬鞍的駿馬。",
       "desc_grag_bear": "一頭堅韌穩健、配有厚重鞍具的巨熊。",
       "desc_stalkglider_snail": "一隻堅毅耐久、背負苔蘚外殼的蝸牛。",
@@ -2625,7 +2626,8 @@ export const zh_TW: EnTranslations = {
       "desc_nightwing_chimera": "來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。",
-      "desc_emberbristle_broom": "一把繫著橙色緞帶的收穫掃帚，懸浮在離地一掌高的地方，鬃毛不斷灑落餘燼。南瓜燈之夜結束時，它會化回一堆稻草。"
+      "desc_emberbristle_broom": "一把繫著橙色緞帶的收穫掃帚，懸浮在離地一掌高的地方，鬃毛不斷灑落餘燼。南瓜燈之夜結束時，它會化回一堆稻草。",
+      "desc_ossuary_charger": "一匹早已腐朽至只剩骨架的戰馬，從戰場的藏骸所中被喚起，空洞的眼窩裡燃著蒼白的火焰，脊骨上仍綁著一副腐爛的馬鞍。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -20788,6 +20790,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "蒼翠谷行者的韁繩"
+      },
+      "reins_ossuary_charger": {
+        "name": "藏骸所戰駒的韁繩"
       },
       "reins_nightwing_chimera": {
         "name": "夜翼奇美拉的韁繩"

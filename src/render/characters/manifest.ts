@@ -3435,6 +3435,19 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 13.4,
     lazyPreload: true,
   },
+  // The Ossuary Charger: a Tripo quadruped (asset pipeline creature lane) carrying the
+  // procedural trot from scripts/bake_mount_gaits.mjs. Sized like the valorsteed;
+  // walkRef/runRef are the measured stride refs (scripts/anim/measure_gait.mjs on the
+  // two rear hooves, 1_Left_Limb_3 and 0_Left_Limb_2).
+  mount_ossuary_charger: {
+    url: `${MOUNTS_DIR}/ossuary_charger.glb`,
+    authoredAtlas: true,
+    height: 3.8,
+    clips: MOUNT_RIGGED,
+    walkRef: 4.2,
+    runRef: 9.4,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

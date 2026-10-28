@@ -527,6 +527,11 @@ describe('mount running audio', () => {
     }
     expect(mountAudioKey('valorsteed')).toBe('valorsteed');
     expect(mountAudioKey('not_a_mount')).toBe('not_a_mount');
+    // The Ossuary Charger gallops on the valorsteed's hoof set (no clip of its own yet).
+    expect(mountAudioKey('ossuary_charger')).toBe('valorsteed');
+    nowT += 0.5;
+    sfx.mountRun(0, 0, 0, 'ossuary_charger', 'grass', true);
+    expect(sources.at(-1)?.buffer).toBe(buffers.get('mount_run_valorsteed'));
     expect(sfx.mountEngine(0, 0, 0, 'referral_tank', true, 999)).toBe(true);
     expect(sfx.mountEngine(0, 0, 0, 'referral_raptor', true, 998)).toBe(false);
     sfx.mountEngineReset(999);
