@@ -47,6 +47,7 @@ import {
   dropAura,
   dropFightObject,
   type FinalScope,
+  type FPoint,
   facingTo,
   fromCentre,
   hit,
@@ -232,15 +233,23 @@ export function stepDrawn(s: FinalScope): Entity[] {
 
 // ---- Storm Orbs ----------------------------------------------------------------------------
 
-/** Mythic: three orbs round the boss. Returns how many. */
-export function raiseOrbs(s: FinalScope): number {
+/** Mythic: three orbs round the boss (or `around` a Splinter of the Breath,
+ *  `count` of them, part 2: its circles, the same solo soaks). Returns how
+ *  many. */
+export function raiseOrbs(
+  s: FinalScope,
+  opts: { around?: FPoint; count?: number; salt?: number } = {},
+): number {
   const st = s.st;
-  st.kit.orb = T.orbEvery;
-  const b = at(s, s.boss);
-  for (let i = 0; i < T.orbCount; i++) {
-    const h = finalHash(s.boss.id, st.casts * 17 + i);
+  const count = opts.count ?? T.orbCount;
+  if (!opts.around) st.kit.orb = T.orbEvery;
+  const b = opts.around ?? at(s, s.boss);
+  const near = opts.around ? 6 : 12;
+  const span = opts.around ? 6 : 13;
+  for (let i = 0; i < count; i++) {
+    const h = finalHash(s.boss.id + (opts.salt ?? 0), st.casts * 17 + i);
     const ang = ((h % 360) * Math.PI) / 180;
-    const r = 12 + (h % 13);
+    const r = near + (h % span);
     const spot = onFloor({ x: b.x + Math.sin(ang) * r, z: b.z + Math.cos(ang) * r }, 3);
     const obj = spawnFightObject(
       s.ctx,
@@ -255,7 +264,7 @@ export function raiseOrbs(s: FinalScope): number {
   }
   st.casts++;
   raidWarn(s, 'orbs', 'Storm Orbs! One player steps on each before it bursts!');
-  return T.orbCount;
+  return count;
 }
 
 /** One tick of the orbs: each taken by whoever steps on it, or bursting at

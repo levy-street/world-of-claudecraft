@@ -811,6 +811,12 @@ const mergeStringsEn = {
       heart_forge_pour: 'Forge Pour',
       heart_final_leaping_bolt: 'Leaping Bolt',
       heart_final_anvil: 'Weight of the Anvil',
+      // Its part 2 (final_phase_ids.ts FINAL_PHASE_CASTS): Rime Toll can be
+      // kicked; the call, Shearing Blow and Gale Pounce cannot.
+      heart_final_call: 'Call of the Quarters',
+      heart_final_shearing_blow: 'Shearing Blow',
+      heart_final_rime_toll: 'Rime Toll',
+      heart_final_gale_pounce: 'Gale Pounce',
       heart_gale_bolt: 'Gale Bolt',
       heart_rime_bolt: 'Rime Bolt',
       heart_ember_bolt: 'Ember Bolt',

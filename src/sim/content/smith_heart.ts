@@ -21,6 +21,11 @@ import {
 } from '../encounters/smith_heart/breath_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import {
+  FINAL_ADD_MOBS,
+  FINAL_PHASE_NAMES,
+  FINAL_PHASES,
+} from '../encounters/smith_heart/final_phase_ids';
+import {
   HEAT_MOBS,
   HEAT_NAMES,
   HEAT_TUNING,
@@ -185,6 +190,36 @@ function boss(id: string, name: string, hp: number, color: number, scale: number
 }
 
 const C = SMITH_HEART_CASTS;
+
+/** A Splinter of the Masterless Strength (encounters/smith_heart/
+ *  final_adds.ts): an intermission's add, tanked, never controlled or slowed
+ *  (its own signature moves it), clearly bigger than a player. Its health is
+ *  the encounter's per tier (FINAL_PHASE_DIFFICULTY), set as it rises; its
+ *  kit is the encounter's (none of it raises another body). */
+function splinter(id: string, name: string, color: number, scale: number): MobTemplate {
+  return {
+    id,
+    name,
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 2000,
+    hpPerLevel: 0,
+    dmgBase: 34,
+    dmgPerLevel: 6,
+    attackSpeed: 2.2,
+    armorPerLevel: 35,
+    moveSpeed: 7,
+    aggroRadius: 0,
+    ccImmune: true,
+    slowImmune: true,
+    xpMult: 0,
+    loot: [],
+    scale,
+    color,
+  };
+}
 
 /** The Hammer Council's Mountain's Wrath declaration (encounter-driven: the
  *  council starts and lands it; the trash engine only reads its look). */
@@ -523,6 +558,26 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // 161,000 after the elite factor), the guardians' anchor scaled for the
   // raid's last fight. It cannot be controlled or slowed: only its own Taking
   // Root holds it.
+  // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): one rises
+  // out of each awakened quarter as an intermission's call begins.
+  [FINAL_ADD_MOBS.heat]: splinter(FINAL_ADD_MOBS.heat, FINAL_PHASE_NAMES.heat, 0xffd27a, 2.6),
+  [FINAL_ADD_MOBS.quench]: splinter(FINAL_ADD_MOBS.quench, FINAL_PHASE_NAMES.quench, 0x9ad8ff, 2.5),
+  [FINAL_ADD_MOBS.breath]: splinter(FINAL_ADD_MOBS.breath, FINAL_PHASE_NAMES.breath, 0x6ac8f0, 2.4),
+  // The Hammer's: Mounting Weight rides the swing kernel's stacking poison
+  // (its aura id MOUNTING_WEIGHT_AURA); the encounter makes its swing land
+  // harder for every stack its target carries.
+  [FINAL_ADD_MOBS.hammer]: {
+    ...splinter(FINAL_ADD_MOBS.hammer, FINAL_PHASE_NAMES.hammer, 0xc8903c, 2.7),
+    stackPoison: {
+      chance: 1,
+      perTick: FINAL_PHASES.weightPerTick,
+      interval: 1,
+      duration: FINAL_PHASES.weightSeconds,
+      maxStacks: FINAL_PHASES.weightMaxStacks,
+      name: FINAL_PHASE_NAMES.weight,
+      school: 'physical',
+    },
+  },
   heart_masterless_strength: {
     ...boss('heart_masterless_strength', 'The Masterless Strength', 70000, 0xd8c8a0, 3.6),
     ccImmune: true,

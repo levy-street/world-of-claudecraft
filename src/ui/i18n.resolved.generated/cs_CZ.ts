@@ -4800,7 +4800,20 @@ export const cs_CZ: EnTranslations = {
         "wind": "The gale carries you {speed} yd a second the way it blows; walk into it to hold your ground (it does not interrupt casts). Within {band} yd of the rim you take {min} to {max} Nature damage every second while it blows.",
         "drawn": "Every second for {seconds} sec it arcs from you to every other player within {reach} yd, dealing {min} to {max} Nature damage to each. Keep {reach} yd from everyone.",
         "shell": "Absorbs the next {value} healing you receive.",
-        "crushed": "Standing under the next Weight of the Anvil within {seconds} sec, you take your share {mult} times over. Let the other group share it."
+        "crushed": "Standing under the next Weight of the Anvil within {seconds} sec, you take your share {mult} times over. Let the other group share it.",
+        "phaseCall": "Call of the Quarters: shielded in the centre for {seconds} sec while its Splinters live. Every Splinter deals {min} to {max} damage to the whole raid every {every} sec, {rise}% more with each pulse. Kill them all to break the shield early; any still alive when the call ends pours its element into it for the rest of the fight.",
+        "phaseFight": "At {first}% and {second}% health it strides into the centre, shielded, and calls a Splinter out of each of its fullest quarters. At {final}% all four quarters wake for its last stand.",
+        "phaseFinal": "All four quarters are awake: it stays in the central ring and casts Fire Whirls, Groaning Ice, Leaping Bolt and Weight of the Anvil in turn, one every {every} sec. After {enrage} sec it loses all restraint (Masterless Fury).",
+        "shield": "Gathered Strength: immune to all damage and cannot be targeted.",
+        "pouredHeat": "The Heat poured into it: it raises Fire Whirls every {every} sec wherever it stands, for the rest of the fight (poured {times} times).",
+        "pouredQuench": "The Quench poured into it: anyone with fewer than {allies} other players within {reach} yd grows cold everywhere, at {share}% of the Quench quarter's pace, for the rest of the fight (poured {times} times).",
+        "pouredBreath": "The Breath poured into it: it casts Leaping Bolt every {every} sec wherever it stands, leaping between players within {jump} yd of each other, for the rest of the fight (poured {times} times).",
+        "pouredHammer": "The Hammer poured into it: Tremor Cracks erupt under players every {every} sec wherever it stands, for the rest of the fight (poured {times} times).",
+        "fury": "Masterless Fury: deals {min} to {max} damage to the whole raid every {every} sec, {rise}% more with each pulse. Kill it now.",
+        "coal": "In {seconds} sec the coal bursts: {min} to {max} Fire damage to every other player within {reach} yd of you, and {selfMin} to {selfMax} to you. Leave the group now.",
+        "tether": "The Splinter of the Breath hunts you for {seconds} sec. Its Buffeting Gale deals {min} to {max} Nature damage every second to everyone else within {reach} yd of it: drag it away from the group.",
+        "chill": "Movement speed reduced by {pct}% for {seconds} sec: you crossed a Quenching Ring outside its gaps.",
+        "weight": "Deals {total} Physical damage a second ({per} per stack). Each stack makes the Splinter of the Hammer hit you {step}% harder ({harder}% now). Lasts {seconds} sec; the tanks swap at {swap} stacks."
       },
       "sharedPyre": "Způsobí {total} % maximálního zdraví každého hráče, rozděleno počtem hráčů uvnitř kruhu ({perPlayer} % na hráče při {players} hráčích).",
       "varkhulSharedPyre": "Způsobí {total} % maximálního zdraví každého hráče, rozděleno mezi hráče uvnitř kruhu ({perPlayer} % na hráče při {players} hráčích). Každý chybějící hráč navíc způsobí celému raidu {missingPenalty} % maximálního zdraví, včetně hráčů uvnitř kruhu.",
@@ -7427,7 +7440,17 @@ export const cs_CZ: EnTranslations = {
         "wind": "The Breath gathers a gale! Walk into the wind, away from the rim!",
         "drawn": "Drawn Lightning! The marked keep 8 yards from everyone!",
         "orbs": "Storm Orbs! One player steps on each before it bursts!",
-        "anvil": "Weight of the Anvil! Share it: everyone not Crushed, under the mark!"
+        "anvil": "Weight of the Anvil! Share it: everyone not Crushed, under the mark!",
+        "intermission": "The Masterless Strength gathers its strength in the centre! Its Splinters rise: kill them before the call ends!",
+        "toll": "Rime Toll! Interrupt the Splinter of the Quench!",
+        "coal": "Bursting Coal! The marked carry it out of the group before it bursts!",
+        "pounce": "Gale Pounce! Its quarry drags the Splinter of the Breath out of the group!",
+        "poured": "The Splinters pour into the Masterless Strength! Their elements stay with it to the end!",
+        "release": "The shield breaks! Drag the Masterless Strength out of the centre!",
+        "final": "The Masterless Strength strides into the heart of the Anvil!",
+        "awaken": "All four quarters wake! The Masterless Strength drinks every strength at once!",
+        "furySoon": "The Masterless Strength is about to lose all restraint! Burn it down!",
+        "fury": "Masterless Fury! It tears the Anvil apart: kill it now!"
       }
     },
     "finalOverload": {
@@ -7442,7 +7465,16 @@ export const cs_CZ: EnTranslations = {
       "unbound": "Unbound x{stacks}",
       "barAria": "{quarter} Overload {pct} percent",
       "activeAria": "Active quarter: {quarter}",
-      "groupAria": "The Masterless Strength: Overload bars"
+      "groupAria": "The Masterless Strength: Overload bars",
+      "titleCall": "Call of the Quarters",
+      "titleFinal": "All quarters awake",
+      "call": "Shield {seconds}",
+      "splinters": "Splinters {count}",
+      "striding": "Striding to the centre",
+      "enrage": "Enrage in {seconds}",
+      "fury": "Masterless Fury x{stacks}",
+      "poured": "Poured in: {elements}",
+      "pouredTimes": "{quarter} x{times}"
     },
     "finalAlert": {
       "frozenLine": "Free in {seconds} sec: then stand with two or more others",
@@ -7451,7 +7483,13 @@ export const cs_CZ: EnTranslations = {
       "drawnTitle": "Drawn Lightning!",
       "drawnLine": "Keep {reach} yards from everyone for {seconds} sec",
       "crushedTitle": "Crushed",
-      "crushedLine": "Stay out of the next Weight of the Anvil ({seconds} sec)"
+      "crushedLine": "Stay out of the next Weight of the Anvil ({seconds} sec)",
+      "coalTitle": "Bursting Coal!",
+      "coalLine": "Leave the group: it bursts on everyone within {reach} yards in {seconds} sec",
+      "tetherTitle": "Wind-Tethered!",
+      "tetherLine": "The Splinter of the Breath hunts you: drag it away from the group ({seconds} sec)",
+      "weightTitle": "Mounting Weight x{stacks}",
+      "weightLine": "Its swings hit you harder each stack: swap tanks at {swap}"
     },
     "sanctumAlert": {
       "quenchTitle": "V kalicí vodě!",
@@ -16744,6 +16782,10 @@ export const cs_CZ: EnTranslations = {
       "heart_forge_pour": "Forge Pour",
       "heart_final_leaping_bolt": "Leaping Bolt",
       "heart_final_anvil": "Weight of the Anvil",
+      "heart_final_call": "Call of the Quarters",
+      "heart_final_shearing_blow": "Shearing Blow",
+      "heart_final_rime_toll": "Rime Toll",
+      "heart_final_gale_pounce": "Gale Pounce",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
@@ -26658,6 +26700,18 @@ export const cs_CZ: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "Rolling Cinder"
+      },
+      "heart_final_splinter_heat": {
+        "name": "Splinter of the Heat"
+      },
+      "heart_final_splinter_quench": {
+        "name": "Splinter of the Quench"
+      },
+      "heart_final_splinter_breath": {
+        "name": "Splinter of the Breath"
+      },
+      "heart_final_splinter_hammer": {
+        "name": "Splinter of the Hammer"
       },
       "thorn_sprout": {
         "name": "Trnitý výhonek"

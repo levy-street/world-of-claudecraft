@@ -96,8 +96,9 @@ export function encase(s: FinalScope, p: Entity): void {
 }
 
 /** One tick of the cold on every player (`active`: the boss is in the
- *  Quench quarter). */
-export function stepCold(s: FinalScope, active: boolean): void {
+ *  Quench quarter, or the Quench poured into it; `rate` its rise's share:
+ *  a poured Quench's is slower, part 2). */
+export function stepCold(s: FinalScope, active: boolean, rate = 1): void {
   const st = s.st;
   for (const id of Object.keys(st.frozen)) {
     const k = Number(id);
@@ -113,7 +114,7 @@ export function stepCold(s: FinalScope, active: boolean): void {
     if (st.frozen[p.id] !== undefined) continue;
     const alone = active && alliesNear(s, p) < T.coldAllies;
     const next = alone
-      ? Math.min(T.coldMax, was + T.coldRise * DT)
+      ? Math.min(T.coldMax, was + T.coldRise * rate * DT)
       : Math.max(0, was - T.coldFall * DT);
     st.cold[p.id] = next;
     if (alone && next >= T.coldMax - 1e-9) {

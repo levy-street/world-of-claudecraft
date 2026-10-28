@@ -4800,7 +4800,20 @@ export const ko_KR: EnTranslations = {
         "wind": "강풍이 부는 방향으로 매초 {speed}미터씩 밀려납니다. 바람을 거슬러 걸으면 버틸 수 있습니다(시전은 끊기지 않습니다). 바람이 부는 동안 가장자리 {band}미터 안에 있으면 매초 {min}~{max}의 자연 피해를 받습니다.",
         "drawn": "{seconds}초 동안 매초 당신에게서 {reach}미터 안의 다른 모든 플레이어에게 번개가 튀어 각각 {min}~{max}의 자연 피해를 줍니다. 모두에게서 {reach}미터 떨어지세요.",
         "shell": "다음에 받는 치유 {value}을(를) 흡수합니다.",
-        "crushed": "{seconds}초 안에 다음 모루의 무게 아래에 서면 분담 피해를 {mult}배로 받습니다. 다른 조에게 맡기세요."
+        "crushed": "{seconds}초 안에 다음 모루의 무게 아래에 서면 분담 피해를 {mult}배로 받습니다. 다른 조에게 맡기세요.",
+        "phaseCall": "네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다.",
+        "phaseFight": "생명력이 {first}%와 {second}%가 되면 보호막을 두른 채 중앙으로 걸어 들어가, 가장 많이 찬 구역마다 파편을 하나씩 불러냅니다. {final}%에서는 네 구역이 모두 깨어나 마지막 저항이 시작됩니다.",
+        "phaseFinal": "네 구역이 모두 깨어났습니다: 중앙 원에 머물며 불의 회오리, 신음하는 얼음, 튀어 오르는 번개, 모루의 무게를 {every}초마다 하나씩 차례로 시전합니다. {enrage}초 후에는 모든 절제를 잃습니다(주인 없는 분노).",
+        "shield": "모은 힘: 모든 피해에 면역이며 대상으로 지정할 수 없습니다.",
+        "pouredHeat": "열기가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 불의 회오리를 일으킵니다({times}회 쏟아부어짐).",
+        "pouredQuench": "담금질이 쏟아부어졌습니다: 전투가 끝날 때까지 {reach}미터 안에 다른 플레이어가 {allies}명 미만인 사람은 어디서든 추워집니다. 속도는 담금질 구역의 {share}%입니다({times}회 쏟아부어짐).",
+        "pouredBreath": "숨결이 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 튀어 오르는 번개를 시전하며, 서로 {jump}미터 안에 있는 플레이어 사이를 튑니다({times}회 쏟아부어짐).",
+        "pouredHammer": "망치가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 플레이어 발밑에서 진동 균열이 터집니다({times}회 쏟아부어짐).",
+        "fury": "주인 없는 분노: {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 지금 처치하십시오.",
+        "coal": "{seconds}초 후 석탄이 터집니다: 당신으로부터 {reach}미터 안의 다른 모든 플레이어에게 {min}~{max}의 화염 피해, 당신에게 {selfMin}~{selfMax}. 지금 무리를 떠나십시오.",
+        "tether": "숨결의 파편이 {seconds}초 동안 당신을 쫓습니다. 그 몰아치는 돌풍은 파편으로부터 {reach}미터 안의 다른 모든 사람에게 매초 {min}~{max}의 자연 피해를 줍니다: 파편을 무리에서 떼어 놓으십시오.",
+        "chill": "{seconds}초 동안 이동 속도가 {pct}% 감소합니다: 담금질 고리를 틈이 아닌 곳으로 넘었습니다.",
+        "weight": "매초 {total}의 물리 피해를 입힙니다(중첩당 {per}). 중첩마다 망치의 파편이 당신을 {step}% 더 세게 칩니다(현재 {harder}%). {seconds}초 동안 지속되며, 탱커는 {swap}중첩에서 교대합니다."
       },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
@@ -7427,7 +7440,17 @@ export const ko_KR: EnTranslations = {
         "wind": "숨결이 강풍을 모은다! 바람을 거슬러 가장자리에서 멀어져라!",
         "drawn": "끌려오는 번개! 표식이 찍힌 사람은 모두에게서 8미터 떨어져라!",
         "orbs": "폭풍 구슬! 터지기 전에 한 명씩 밟아라!",
-        "anvil": "모루의 무게! 나눠 맞아라: 짓눌리지 않은 사람은 모두 표식 아래로!"
+        "anvil": "모루의 무게! 나눠 맞아라: 짓눌리지 않은 사람은 모두 표식 아래로!",
+        "intermission": "주인 없는 힘이 중앙에서 힘을 모은다! 파편들이 솟아난다: 부름이 끝나기 전에 처치하라!",
+        "toll": "서리 종소리! 담금질의 파편을 차단하라!",
+        "coal": "터지는 석탄! 표식이 찍힌 사람은 터지기 전에 무리 밖으로 옮겨라!",
+        "pounce": "돌풍 덮치기! 노려진 사람은 숨결의 파편을 무리 밖으로 끌고 가라!",
+        "poured": "파편들이 주인 없는 힘에게 쏟아져 들어간다! 그 원소들은 끝까지 남는다!",
+        "release": "보호막이 깨졌다! 주인 없는 힘을 중앙에서 끌어내라!",
+        "final": "주인 없는 힘이 모루의 심장부로 걸어 들어간다!",
+        "awaken": "네 구역이 모두 깨어났다! 주인 없는 힘이 모든 힘을 한꺼번에 마신다!",
+        "furySoon": "주인 없는 힘이 모든 절제를 잃으려 한다! 몰아붙여 쓰러뜨려라!",
+        "fury": "주인 없는 분노! 모루를 찢어발긴다: 지금 처치하라!"
       }
     },
     "finalOverload": {
@@ -7442,7 +7465,16 @@ export const ko_KR: EnTranslations = {
       "unbound": "풀려남 x{stacks}",
       "barAria": "{quarter} 과부하 {pct}퍼센트",
       "activeAria": "현재 구역: {quarter}",
-      "groupAria": "주인 없는 힘: 과부하 막대"
+      "groupAria": "주인 없는 힘: 과부하 막대",
+      "titleCall": "네 구역의 부름",
+      "titleFinal": "모든 구역 각성",
+      "call": "보호막 {seconds}",
+      "splinters": "파편 {count}",
+      "striding": "중앙으로 이동 중",
+      "enrage": "격노까지 {seconds}",
+      "fury": "주인 없는 분노 x{stacks}",
+      "poured": "쏟아부어진 원소: {elements}",
+      "pouredTimes": "{quarter} x{times}"
     },
     "finalAlert": {
       "frozenLine": "{seconds}초 후 풀립니다: 그 뒤 다른 두 명 이상과 함께 서세요",
@@ -7451,7 +7483,13 @@ export const ko_KR: EnTranslations = {
       "drawnTitle": "끌려오는 번개!",
       "drawnLine": "{seconds}초 동안 모두에게서 {reach}미터 떨어지세요",
       "crushedTitle": "짓눌림",
-      "crushedLine": "다음 모루의 무게에서 빠지세요({seconds}초)"
+      "crushedLine": "다음 모루의 무게에서 빠지세요({seconds}초)",
+      "coalTitle": "터지는 석탄!",
+      "coalLine": "무리를 떠나십시오: {seconds}초 후 {reach}미터 안의 모두에게 터집니다",
+      "tetherTitle": "바람에 묶임!",
+      "tetherLine": "숨결의 파편이 당신을 쫓습니다: 무리에서 떼어 놓으십시오({seconds}초)",
+      "weightTitle": "쌓이는 무게 x{stacks}",
+      "weightLine": "중첩마다 공격이 더 세집니다: {swap}에서 탱커 교대"
     },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
@@ -16744,6 +16782,10 @@ export const ko_KR: EnTranslations = {
       "heart_forge_pour": "화로 붓기",
       "heart_final_leaping_bolt": "튀어 오르는 번개",
       "heart_final_anvil": "모루의 무게",
+      "heart_final_call": "네 구역의 부름",
+      "heart_final_shearing_blow": "베어 가르는 일격",
+      "heart_final_rime_toll": "서리 종소리",
+      "heart_final_gale_pounce": "돌풍 덮치기",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "잔불 화살",
@@ -26658,6 +26700,18 @@ export const ko_KR: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "구르는 잉걸불"
+      },
+      "heart_final_splinter_heat": {
+        "name": "열기의 파편"
+      },
+      "heart_final_splinter_quench": {
+        "name": "담금질의 파편"
+      },
+      "heart_final_splinter_breath": {
+        "name": "숨결의 파편"
+      },
+      "heart_final_splinter_hammer": {
+        "name": "망치의 파편"
       },
       "thorn_sprout": {
         "name": "가시 새싹"

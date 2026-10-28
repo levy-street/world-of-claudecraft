@@ -4800,7 +4800,20 @@ export const zh_CN: EnTranslations = {
         "wind": "狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。",
         "drawn": "在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。",
         "shell": "吸收你受到的下{value}点治疗。",
-        "crushed": "{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。"
+        "crushed": "{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。",
+        "phaseCall": "四角召唤：只要碎片还活着，它就在中央受到护盾保护{seconds}秒。每个碎片每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。将它们全部击杀可提前打破护盾；召唤结束时仍存活的碎片会把自己的元素注入它体内，直到战斗结束。",
+        "phaseFight": "生命值降到{first}%和{second}%时，它会在护盾保护下走入中央，从最满的几个角各召出一个碎片。降到{final}%时四个角全部苏醒，开始最后的抵抗。",
+        "phaseFinal": "四个角已全部苏醒：它停留在中央圆环，每{every}秒依次施放一种技能：火焰旋风、呻吟之冰、跳跃闪电、铁砧之重。{enrage}秒后它将失去一切克制（无主之怒）。",
+        "shield": "聚集之力：免疫所有伤害，且无法被选为目标。",
+        "pouredHeat": "炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会掀起火焰旋风（已注入{times}次）。",
+        "pouredQuench": "淬火注入其中：直到战斗结束，{reach}码内其他玩家少于{allies}名的人在任何地方都会变冷，速度为淬火之角的{share}%（已注入{times}次）。",
+        "pouredBreath": "吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会施放跳跃闪电，在彼此相距{jump}码内的玩家之间跳跃（已注入{times}次）。",
+        "pouredHammer": "重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会在玩家脚下迸发震颤裂隙（已注入{times}次）。",
+        "fury": "无主之怒：每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。立刻击杀它。",
+        "coal": "{seconds}秒后煤块爆裂：对你{reach}码内的所有其他玩家造成{min}到{max}点火焰伤害，对你自己造成{selfMin}到{selfMax}点。现在就离开人群。",
+        "tether": "吐息碎片追猎你{seconds}秒。它的狂袭之风每秒对它{reach}码内的其他所有人造成{min}到{max}点自然伤害：把它从人群中拖走。",
+        "chill": "移动速度降低{pct}%，持续{seconds}秒：你从缺口以外的地方穿过了淬火之环。",
+        "weight": "每秒造成{total}点物理伤害（每层{per}点）。每一层都让重锤碎片对你的攻击加重{step}%（当前{harder}%）。持续{seconds}秒；坦克在{swap}层时换坦。"
       },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
@@ -7427,7 +7440,17 @@ export const zh_CN: EnTranslations = {
         "wind": "吐息聚起了狂风！顶着风走，远离边缘！",
         "drawn": "引雷！被标记的人与所有人保持8码距离！",
         "orbs": "风暴宝珠！每个由一名玩家在它爆发前踩上去！",
-        "anvil": "铁砧之重！分摊它：所有未被粉碎的人站到标记下！"
+        "anvil": "铁砧之重！分摊它：所有未被粉碎的人站到标记下！",
+        "intermission": "无主之力在中央聚集力量！它的碎片升起了：在召唤结束前击杀它们！",
+        "toll": "霜凇钟鸣！打断淬火碎片！",
+        "coal": "爆裂煤块！被标记者要在爆裂前把它带离人群！",
+        "pounce": "疾风扑击！被盯上的人要把吐息碎片拖离人群！",
+        "poured": "碎片注入了无主之力！它们的元素会一直留到最后！",
+        "release": "护盾破了！把无主之力拖出中央！",
+        "final": "无主之力大步踏入铁砧的中心！",
+        "awaken": "四个角全部苏醒！无主之力一口气饮下所有力量！",
+        "furySoon": "无主之力即将失去一切克制！全力输出！",
+        "fury": "无主之怒！它在撕裂铁砧：立刻击杀它！"
       }
     },
     "finalOverload": {
@@ -7442,7 +7465,16 @@ export const zh_CN: EnTranslations = {
       "unbound": "脱缚 x{stacks}",
       "barAria": "{quarter}过载 百分之{pct}",
       "activeAria": "当前区域：{quarter}",
-      "groupAria": "无主之力：过载条"
+      "groupAria": "无主之力：过载条",
+      "titleCall": "四角召唤",
+      "titleFinal": "四角皆醒",
+      "call": "护盾 {seconds}",
+      "splinters": "碎片 {count}",
+      "striding": "正走向中央",
+      "enrage": "狂暴倒计时 {seconds}",
+      "fury": "无主之怒 x{stacks}",
+      "poured": "已注入：{elements}",
+      "pouredTimes": "{quarter} x{times}"
     },
     "finalAlert": {
       "frozenLine": "{seconds}秒后解冻：然后与两名或更多其他人站在一起",
@@ -7451,7 +7483,13 @@ export const zh_CN: EnTranslations = {
       "drawnTitle": "引雷！",
       "drawnLine": "{seconds}秒内与所有人保持{reach}码距离",
       "crushedTitle": "粉碎",
-      "crushedLine": "避开下一次铁砧之重（{seconds}秒）"
+      "crushedLine": "避开下一次铁砧之重（{seconds}秒）",
+      "coalTitle": "爆裂煤块！",
+      "coalLine": "离开人群：{seconds}秒后会在{reach}码内的所有人身上爆裂",
+      "tetherTitle": "风之束缚！",
+      "tetherLine": "吐息碎片在追猎你：把它从人群中拖走（{seconds}秒）",
+      "weightTitle": "渐增重压 x{stacks}",
+      "weightLine": "每一层都让它的攻击更重：{swap}层时换坦"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -16744,6 +16782,10 @@ export const zh_CN: EnTranslations = {
       "heart_forge_pour": "熔炉倾泻",
       "heart_final_leaping_bolt": "跳跃雷击",
       "heart_final_anvil": "铁砧之重",
+      "heart_final_call": "四角召唤",
+      "heart_final_shearing_blow": "劈裂重击",
+      "heart_final_rime_toll": "霜凇钟鸣",
+      "heart_final_gale_pounce": "疾风扑击",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "余烬箭",
@@ -26658,6 +26700,18 @@ export const zh_CN: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "滚动余烬"
+      },
+      "heart_final_splinter_heat": {
+        "name": "炽热碎片"
+      },
+      "heart_final_splinter_quench": {
+        "name": "淬火碎片"
+      },
+      "heart_final_splinter_breath": {
+        "name": "吐息碎片"
+      },
+      "heart_final_splinter_hammer": {
+        "name": "重锤碎片"
       },
       "thorn_sprout": {
         "name": "荆棘幼芽"

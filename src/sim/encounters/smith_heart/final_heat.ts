@@ -29,11 +29,13 @@ import {
   FINAL_CASTS,
   FINAL_CUES,
   FINAL_NAMES,
+  type FinalPoolKind,
   finalHash,
   poolTemplate,
   FINAL_TUNING as T,
   whirlTemplate,
 } from './final_ids';
+import { FINAL_PHASE_NAMES, FINAL_PHASES as P } from './final_phase_ids';
 import {
   at,
   beginBar,
@@ -55,7 +57,7 @@ import {
   roll,
   spawnFightObject,
 } from './final_scope';
-import type { FinalSwell } from './final_state';
+import type { FinalPool, FinalSwell } from './final_state';
 import { inWave, laneReach } from './heat_geometry';
 import {
   HEAT_TUNING as H,
@@ -326,26 +328,55 @@ export function markEmbers(s: FinalScope): Entity[] {
   return marked.filter((p) => ranged.includes(p));
 }
 
-/** A burning pool at (x, z) (the oldest goes out past the cap). */
-export function layPool(s: FinalScope, kind: 'ember' | 'forge', x: number, z: number): void {
+/** Each pool kind's radius, life, burn, name and cap (the Cinder Trail's
+ *  are part 2's FINAL_PHASES). */
+function poolSpec(kind: FinalPoolKind) {
+  if (kind === 'ember')
+    return {
+      r: T.emberR,
+      life: T.emberLife,
+      min: T.emberMin,
+      max: T.emberMax,
+      name: FINAL_NAMES.embers,
+      cue: FINAL_CUES.embers as string | null,
+      cap: T.poolCap,
+    };
+  if (kind === 'forge')
+    return {
+      r: T.forgeFireR,
+      life: T.forgeFireLife,
+      min: T.forgeFireMin,
+      max: T.forgeFireMax,
+      name: FINAL_NAMES.forgeFire,
+      cue: FINAL_CUES.forgeFire as string | null,
+      cap: T.poolCap,
+    };
+  return {
+    r: P.trailR,
+    life: P.trailLife,
+    min: P.trailMin,
+    max: P.trailMax,
+    name: FINAL_PHASE_NAMES.trail,
+    cue: null,
+    cap: P.trailCap,
+  };
+}
+
+/** A burning pool at (x, z) (the oldest of its kind goes out past its
+ *  kind's cap: a Cinder Trail never puts out an Ember Mark's pool). */
+export function layPool(s: FinalScope, kind: FinalPoolKind, x: number, z: number): void {
   const st = s.st;
-  const r = kind === 'ember' ? T.emberR : T.forgeFireR;
-  const life = kind === 'ember' ? T.emberLife : T.forgeFireLife;
-  const obj = spawnFightObject(
-    s.ctx,
-    s.inst,
-    poolTemplate(kind),
-    kind === 'ember' ? FINAL_NAMES.embers : FINAL_NAMES.forgeFire,
-    x,
-    z,
-    r,
-  );
-  st.pools.push({ objectId: obj.id, kind, x, z, r, life });
-  while (st.pools.length > T.poolCap) {
-    const old = st.pools.shift();
-    if (old) dropFightObject(s.ctx, s.inst, old.objectId);
+  const spec = poolSpec(kind);
+  const obj = spawnFightObject(s.ctx, s.inst, poolTemplate(kind), spec.name, x, z, spec.r);
+  st.pools.push({ objectId: obj.id, kind, x, z, r: spec.r, life: spec.life });
+  const sameKind = (q: FinalPool) => (kind === 'trail' ? q.kind === 'trail' : q.kind !== 'trail');
+  while (st.pools.filter(sameKind).length > spec.cap) {
+    const old = st.pools.find(sameKind);
+    if (!old) break;
+    st.pools.splice(st.pools.indexOf(old), 1);
+    dropFightObject(s.ctx, s.inst, old.objectId);
   }
-  cueAt(s, kind === 'ember' ? FINAL_CUES.embers : FINAL_CUES.forgeFire, x, z, r);
+  if (spec.cue) cueAt(s, spec.cue, x, z, spec.r);
 }
 
 /** One tick of the marks (their embers drop) and the pools (they burn). */
@@ -383,15 +414,8 @@ export function stepEmbersAndPools(s: FinalScope): void {
     const q = at(s, p);
     const pool = st.pools.find((o) => Math.hypot(q.x - o.x, q.z - o.z) <= o.r);
     if (!pool) continue;
-    const [min, max] =
-      pool.kind === 'ember' ? [T.emberMin, T.emberMax] : [T.forgeFireMin, T.forgeFireMax];
-    hit(
-      s,
-      p,
-      roll(s, min, max),
-      pool.kind === 'ember' ? FINAL_NAMES.embers : FINAL_NAMES.forgeFire,
-      'fire',
-    );
+    const spec = poolSpec(pool.kind);
+    hit(s, p, roll(s, spec.min, spec.max), spec.name, 'fire');
   }
 }
 

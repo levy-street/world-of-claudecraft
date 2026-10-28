@@ -73,4 +73,12 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // by smith_heart_fx/final_fx.ts. Final: its own model (the official
   // pipeline), the same joints and timeline.
   heart_masterless_strength: 'smith_heart_colossus',
+  // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): the
+  // nearest existing bodies of each element, tinted by their entity colour
+  // and drawn two and a half times a player's size; their element's light is
+  // smith_heart_fx/final_phase_fx.ts's. Final: their own models.
+  heart_final_splinter_heat: 'mob_elemental',
+  heart_final_splinter_quench: 'mob_hoard_rime_elemental',
+  heart_final_splinter_breath: 'mob_hoard_storm_caller',
+  heart_final_splinter_hammer: 'skel_golem',
 };

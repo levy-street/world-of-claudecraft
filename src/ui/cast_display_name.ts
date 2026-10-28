@@ -225,6 +225,10 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_heat_fist': true,
   'abilityUi.cast.heart_final_leaping_bolt': true,
   'abilityUi.cast.heart_final_anvil': true,
+  'abilityUi.cast.heart_final_call': true,
+  'abilityUi.cast.heart_final_shearing_blow': true,
+  'abilityUi.cast.heart_final_rime_toll': true,
+  'abilityUi.cast.heart_final_gale_pounce': true,
   // The Wildheart Basin's three bosses.
   'abilityUi.cast.wildheart_beast_pit_quake': true,
   'abilityUi.cast.wildheart_jaguar_heel': true,

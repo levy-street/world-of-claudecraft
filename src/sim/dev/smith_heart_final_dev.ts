@@ -19,6 +19,12 @@
 //   final <mechanic>            one ability now: fist, whirl, embers, freeze,
 //                               cold <n>, ice, wind [deg], bolt, drawn, orbs,
 //                               tremor, anvil, shell
+//   final inter70|inter40       part 2: an intermission now
+//   final splinter <vein>       one Splinter rises out of that quarter now
+//   final killadds | endcall    every Splinter dies / the call ends (they pour)
+//   final last | enrage         the final phase (15 percent) / Masterless Fury
+//   final coal|toll|ring|pounce|circles|shear   a Splinter's signature now
+//                               (encounters/smith_heart/final_phase_dev.ts)
 
 import { SMITH_HEART_DUNGEON, SMITH_HEART_FINAL_BOSS } from '../content/smith_heart';
 import {

@@ -593,7 +593,7 @@ describe('determinism', () => {
 
 describe('the headless full fight', () => {
   for (const tier of ['normal', 'heroic', 'mythic'] as const)
-    it(`a ${tier} raid drags it round all four quarters, burns it down and the floor goes clean`, () => {
+    it(`a ${tier} raid drags it round all four quarters above 70 percent, kills it, the floor goes clean`, () => {
       const f = finalFight(8, 91);
       if (tier !== 'normal') f.dev(`/dev heart final ${tier}`);
       f.pullIn('heat');
@@ -618,8 +618,9 @@ describe('the headless full fight', () => {
             inZone = 0;
           }
         }
-        // The raid burns it down.
-        f.boss().hp -= Math.round(f.boss().maxHp / sec(170));
+        // The raid wears it down to just over its first intermission (part
+        // 2's full fight, 100 to 0, is tests/smith_heart_final_phase.test.ts).
+        f.boss().hp -= Math.round((f.boss().maxHp * 0.28) / sec(170));
         for (const e of f.tick(1)) if (e.type === 'damage' && e.ability) names.add(e.ability);
         if (f.boss().hp <= 0) break;
       }

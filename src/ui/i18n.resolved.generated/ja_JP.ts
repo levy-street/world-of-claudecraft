@@ -4800,7 +4800,20 @@ export const ja_JP: EnTranslations = {
         "wind": "強風が吹く方向へ毎秒{speed}ヤード押し流される。風に向かって歩けば踏みとどまれる（詠唱は中断されない）。吹いている間、縁から{band}ヤード以内にいると毎秒{min}～{max}の自然ダメージを受ける。",
         "drawn": "{seconds}秒間、毎秒あなたから{reach}ヤード以内の他の全プレイヤーへ雷が跳び、それぞれに{min}～{max}の自然ダメージを与える。全員から{reach}ヤード離れよ。",
         "shell": "次に受ける回復{value}を吸収する。",
-        "crushed": "{seconds}秒以内に次の金床の重みの下に立つと、分担ダメージを{mult}倍受ける。もう一方の組に任せよ。"
+        "crushed": "{seconds}秒以内に次の金床の重みの下に立つと、分担ダメージを{mult}倍受ける。もう一方の組に任せよ。",
+        "phaseCall": "四区画の呼び声：欠片が生きている間、中央で{seconds}秒間守られる。欠片1体ごとに{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。全て倒せば障壁は早く砕ける。呼び声の終わりに生き残った欠片は、その元素を戦闘終了までボスに注ぎ込む。",
+        "phaseFight": "体力が{first}%と{second}%になると、守られたまま中央へ踏み込み、最も満ちた区画それぞれから欠片を呼び出す。{final}%で四つの区画すべてが目覚め、最後の抵抗が始まる。",
+        "phaseFinal": "四つの区画すべてが目覚めた：中央の円環に留まり、炎の旋風、軋む氷、跳ねる雷撃、金床の重みを{every}秒ごとに1つずつ順に放つ。{enrage}秒後、あらゆる抑えを失う（主なき憤怒）。",
+        "shield": "集めし剛力：あらゆるダメージを受けず、対象にもできない。",
+        "pouredHeat": "熱が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに炎の旋風を起こす（{times}回注がれた）。",
+        "pouredQuench": "焼き入れが注ぎ込まれた：戦闘終了まで、{reach}ヤード以内に他のプレイヤーが{allies}人未満の者はどこでも冷え続ける。速さは焼き入れの区画の{share}%（{times}回注がれた）。",
+        "pouredBreath": "息吹が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに跳ねる雷撃を放ち、互いに{jump}ヤード以内のプレイヤーの間を跳ぶ（{times}回注がれた）。",
+        "pouredHammer": "槌が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとにプレイヤーの足元で震えの亀裂が噴き出す（{times}回注がれた）。",
+        "fury": "主なき憤怒：{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。今すぐ倒せ。",
+        "coal": "{seconds}秒後に炭が弾ける：あなたから{reach}ヤード以内の他の全プレイヤーに{min}～{max}の火炎ダメージ、あなた自身に{selfMin}～{selfMax}。今すぐ集団から離れろ。",
+        "tether": "息吹の欠片が{seconds}秒間あなたを追う。その打ちつける疾風は、欠片から{reach}ヤード以内の他の全員に毎秒{min}～{max}の自然ダメージを与える：欠片を集団から引き離せ。",
+        "chill": "移動速度が{pct}%低下（{seconds}秒）：焼き入れの環を隙間以外の場所で越えた。",
+        "weight": "毎秒{total}の物理ダメージ（1スタックにつき{per}）。スタックごとに槌の欠片の攻撃が{step}%重くなる（現在{harder}%）。{seconds}秒間持続。タンクは{swap}スタックで交代する。"
       },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
@@ -7427,7 +7440,17 @@ export const ja_JP: EnTranslations = {
         "wind": "息吹が強風を集める！風に向かって歩き、縁から離れろ！",
         "drawn": "招雷！印を受けた者は全員から8ヤード離れろ！",
         "orbs": "嵐の宝珠！破裂する前に1人ずつ踏め！",
-        "anvil": "金床の重み！分け合え：押し潰されていない者は印の下へ！"
+        "anvil": "金床の重み！分け合え：押し潰されていない者は印の下へ！",
+        "intermission": "主なき剛力が中央で力を集める！欠片が現れる：呼び声が終わる前に倒せ！",
+        "toll": "霧氷の鐘！焼き入れの欠片を妨害しろ！",
+        "coal": "弾ける炭！印を受けた者は弾ける前に集団の外へ運べ！",
+        "pounce": "疾風の飛びかかり！狙われた者は息吹の欠片を集団の外へ引き離せ！",
+        "poured": "欠片が主なき剛力に注ぎ込まれる！その元素は最後まで残る！",
+        "release": "障壁が砕けた！主なき剛力を中央から引きずり出せ！",
+        "final": "主なき剛力が金床の中心へと踏み込む！",
+        "awaken": "四つの区画すべてが目覚めた！主なき剛力があらゆる力を一度に飲む！",
+        "furySoon": "主なき剛力があらゆる抑えを失おうとしている！削り切れ！",
+        "fury": "主なき憤怒！金床を引き裂いている：今すぐ倒せ！"
       }
     },
     "finalOverload": {
@@ -7442,7 +7465,16 @@ export const ja_JP: EnTranslations = {
       "unbound": "解放 x{stacks}",
       "barAria": "{quarter}の過負荷 {pct}パーセント",
       "activeAria": "現在の区画：{quarter}",
-      "groupAria": "主なき剛力：過負荷バー"
+      "groupAria": "主なき剛力：過負荷バー",
+      "titleCall": "四区画の呼び声",
+      "titleFinal": "全区画覚醒",
+      "call": "障壁 {seconds}",
+      "splinters": "欠片 {count}",
+      "striding": "中央へ向かっている",
+      "enrage": "激昂まで {seconds}",
+      "fury": "主なき憤怒 x{stacks}",
+      "poured": "注がれた元素：{elements}",
+      "pouredTimes": "{quarter} x{times}"
     },
     "finalAlert": {
       "frozenLine": "{seconds}秒後に解ける：そのあと2人以上と一緒に立て",
@@ -7451,7 +7483,13 @@ export const ja_JP: EnTranslations = {
       "drawnTitle": "招雷！",
       "drawnLine": "{seconds}秒間、全員から{reach}ヤード離れよ",
       "crushedTitle": "押し潰され",
-      "crushedLine": "次の金床の重みには入るな（{seconds}秒）"
+      "crushedLine": "次の金床の重みには入るな（{seconds}秒）",
+      "coalTitle": "弾ける炭！",
+      "coalLine": "集団から離れろ：{seconds}秒後に{reach}ヤード以内の全員を巻き込んで弾ける",
+      "tetherTitle": "風に繋がれた！",
+      "tetherLine": "息吹の欠片があなたを追う：集団から引き離せ（{seconds}秒）",
+      "weightTitle": "募る重み x{stacks}",
+      "weightLine": "スタックごとに攻撃が重くなる：{swap}でタンク交代"
     },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
@@ -16744,6 +16782,10 @@ export const ja_JP: EnTranslations = {
       "heart_forge_pour": "炉の注ぎ",
       "heart_final_leaping_bolt": "跳ねる雷撃",
       "heart_final_anvil": "金床の重み",
+      "heart_final_call": "四区画の呼び声",
+      "heart_final_shearing_blow": "断ち割る一撃",
+      "heart_final_rime_toll": "霧氷の鐘",
+      "heart_final_gale_pounce": "疾風の飛びかかり",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "残り火の矢",
@@ -26658,6 +26700,18 @@ export const ja_JP: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "転がる燃え殻"
+      },
+      "heart_final_splinter_heat": {
+        "name": "熱の欠片"
+      },
+      "heart_final_splinter_quench": {
+        "name": "焼き入れの欠片"
+      },
+      "heart_final_splinter_breath": {
+        "name": "息吹の欠片"
+      },
+      "heart_final_splinter_hammer": {
+        "name": "槌の欠片"
       },
       "thorn_sprout": {
         "name": "茨の芽"

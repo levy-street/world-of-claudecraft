@@ -5,7 +5,8 @@
 
 import type { SmithHeartVein } from '../../content/smith_heart_layout';
 import type { HeartQuarterZone } from '../../content/smith_heart_quarters';
-import type { FinalDifficulty } from './final_ids';
+import type { FinalDifficulty, FinalPoolKind } from './final_ids';
+import type { FinalStage } from './final_phase_ids';
 
 /** A bar in flight on the boss. */
 export interface FinalBar {
@@ -45,10 +46,11 @@ export interface FinalWhirl {
   cooldown: Record<number, number>;
 }
 
-/** A burning pool (embers, the frontal's forge fire). */
+/** A burning pool (embers, the frontal's forge fire, the Heat Splinter's
+ *  Cinder Trail). */
 export interface FinalPool {
   objectId: number;
-  kind: 'ember' | 'forge';
+  kind: FinalPoolKind;
   x: number;
   z: number;
   r: number;
@@ -102,6 +104,80 @@ export interface FinalKitClocks {
   tremor: number;
   anvil: number;
   shell: number;
+}
+
+/** One Splinter of an intermission (part 2). */
+export interface FinalAdd {
+  id: number;
+  vein: SmithHeartVein;
+  /** Seconds still climbing out (nothing harms it, it strikes nobody). */
+  rise: number;
+  /** Shearing Blow's clock. */
+  shear: number;
+  /** Its own signature's two clocks (each Splinter reads its own). */
+  a: number;
+  b: number;
+  /** The bar in flight (Shearing Blow, Rime Toll, Gale Pounce): its id,
+   *  where its feet are planted, its locked facing, its target. */
+  bar: string | null;
+  barAt: { x: number; y: number; z: number } | null;
+  barFacing: number;
+  barTarget: number | null;
+  /** The Heat: the last Cinder Trail patch's spot. */
+  trailAt: { x: number; z: number } | null;
+  /** The Breath: the pounce's quarry and the hunt's seconds and pulse. */
+  quarry: number | null;
+  hunt: number;
+  buffet: number;
+  /** The Hammer: its swing's base (before Mounting Weight). */
+  weapon: { min: number; max: number } | null;
+}
+
+/** A Quenching Ring expanding from where its Splinter stood. */
+export interface FinalRing {
+  objectId: number;
+  x: number;
+  z: number;
+  age: number;
+  gaps: number[];
+  struck: number[];
+}
+
+/** A Bursting Coal on a player. */
+export interface FinalCoal {
+  pid: number;
+  left: number;
+  sourceId: number;
+}
+
+/** Part 2's state: the intermissions, the poured elements, the final phase. */
+export interface FinalPhaseState {
+  stage: FinalStage;
+  /** Intermissions begun (0, 1, 2). */
+  intermissions: number;
+  /** The stride's seconds so far (leap, finalLeap). */
+  leapClock: number;
+  /** Call of the Quarters' seconds left. */
+  callLeft: number;
+  adds: FinalAdd[];
+  /** Splintered Strength's pulses this call, and its clock. */
+  splinterPulses: number;
+  splinterTimer: number;
+  rings: FinalRing[];
+  coals: FinalCoal[];
+  /** Times each element was poured into it. */
+  poured: Record<SmithHeartVein, number>;
+  /** Each poured element's own clock. */
+  pouredClock: Record<SmithHeartVein, number>;
+  /** Seconds Heart Unbound still holds after a call ends. */
+  unboundGrace: number;
+  /** The final phase: its seconds, the mix's turn and clock, the fury. */
+  finalClock: number;
+  mixTurn: number;
+  mixTimer: number;
+  fury: number;
+  furyTimer: number;
+  furyWarned: boolean;
 }
 
 export interface FinalFightState {
@@ -163,4 +239,6 @@ export interface FinalFightState {
   anvil: FinalAnvil | null;
   /** The frontal's swing count last seen (Mythic's watch). */
   cleaveSeen: number;
+  /** Part 2: the intermissions and the final phase. */
+  phase: FinalPhaseState;
 }

@@ -1,6 +1,7 @@
 import { TEMPLE_BOSS_CAST_SCHOOLS } from '../encounters/drowned_temple/ids';
 import { ILVANE_CAST_SCHOOLS } from '../encounters/hollow_crypt/ilvane_ids';
 import { COUNCIL_KICK_SCHOOLS } from '../encounters/smith_heart/council_ids';
+import { FINAL_KICK_SCHOOLS } from '../encounters/smith_heart/final_phase_ids';
 import {
   HOARD_ADD_CAST_SCHOOLS,
   HOARD_CONTROL_CAST_SCHOOLS,
@@ -59,4 +60,7 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   // of the Seam (encounters/smith_heart/council_ids.ts); its heir's song runs
   // under an id registered nowhere.
   ...COUNCIL_KICK_SCHOOLS,
+  // The Masterless Strength's Splinter of the Quench: Rime Toll
+  // (encounters/smith_heart/final_phase_ids.ts).
+  ...FINAL_KICK_SCHOOLS,
 };

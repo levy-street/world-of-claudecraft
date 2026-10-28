@@ -123,6 +123,8 @@ export function bossTank(s: Pick<FinalScope, 'boss' | 'players'>): Entity | null
  *  zone than the one it holds? */
 export function beingDragged(s: FinalScope): boolean {
   if (s.st.rootLeft > 0) return false;
+  // The final phase: it stands in the centre for good (part 2).
+  if (s.st.phase.stage === 'final') return false;
   const tank = bossTank(s);
   if (!tank) return false;
   const p = at(s, tank);

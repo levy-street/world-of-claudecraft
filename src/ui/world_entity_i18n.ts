@@ -424,6 +424,11 @@ const MOB_IDS = [
   'heart_heat_wellkeeper',
   'heart_heat_seedflame',
   'heart_heat_rolling_cinder',
+  // The Masterless Strength's Splinters (encounters/smith_heart/final_adds.ts).
+  'heart_final_splinter_heat',
+  'heart_final_splinter_quench',
+  'heart_final_splinter_breath',
+  'heart_final_splinter_hammer',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
   // Zulgar's Hunting Spear: the usable body a teammate pulls out

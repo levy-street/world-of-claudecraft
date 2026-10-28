@@ -114,7 +114,7 @@ export function finalZoneOf(code: number | undefined): HeartQuarterZone {
 export const FINAL_OBJECTS = {
   /** A Fire Whirl: `<prefix><warn|live>`, moving; its radius in `scale`. */
   whirlPrefix: 'sh_final_whirl_',
-  /** A burning pool: `<prefix><ember|forge>`; its radius in `scale`. */
+  /** A burning pool: `<prefix><ember|forge|trail>`; its radius in `scale`. */
   poolPrefix: 'sh_final_pool_',
   /** A Groaning Ice crack: `<prefix><tenths>` to its break. */
   crackPrefix: 'sh_final_crack_',
@@ -559,16 +559,20 @@ export function whirlOf(templateId: string): 'warn' | 'live' | null {
   return s === 'warn' || s === 'live' ? s : null;
 }
 
+/** A burning pool's kind: Ember Mark's, Forge Fire's, or the Heat
+ *  Splinter's Cinder Trail (part 2). */
+export type FinalPoolKind = 'ember' | 'forge' | 'trail';
+
 /** A burning pool's template by its kind. */
-export function poolTemplate(kind: 'ember' | 'forge'): string {
+export function poolTemplate(kind: FinalPoolKind): string {
   return `${FINAL_OBJECTS.poolPrefix}${kind}`;
 }
 
 /** A burning pool's kind, or null when the template is not one. */
-export function poolOf(templateId: string): 'ember' | 'forge' | null {
+export function poolOf(templateId: string): FinalPoolKind | null {
   if (!templateId.startsWith(FINAL_OBJECTS.poolPrefix)) return null;
   const s = templateId.slice(FINAL_OBJECTS.poolPrefix.length);
-  return s === 'ember' || s === 'forge' ? s : null;
+  return s === 'ember' || s === 'forge' || s === 'trail' ? s : null;
 }
 
 /** The wind's template (`<prefix><warn|blow>_<tenths>`). */

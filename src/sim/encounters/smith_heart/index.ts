@@ -49,6 +49,7 @@ export {
 } from './final';
 export { FINAL_WIND_TAG } from './final_breath';
 export * from './final_ids';
+export * from './final_phase_ids';
 export type { FinalFightState } from './final_state';
 export {
   heatDevTrigger,

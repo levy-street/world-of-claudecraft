@@ -19,10 +19,14 @@
 //   One wipe      the fight ends when the boss stops fighting: every bar,
 //                 footprint and mark gone.
 //
-// Not in this part (part 2): the intermissions at 70 and 40 percent and
-// their adds, the final phase's mix at 15 percent, the Mythic hidden phase,
-// loot. The pull's arrival scene, the body and the room's light are the
-// renderer's (render/smith_heart_fx/final_fx.ts, render/smith_heart/).
+//   Part 2        the intermissions at 70 and 40 percent and their Splinters
+//                 (final_intermission.ts, final_adds.ts), the elements a
+//                 surviving Splinter pours into it and the final phase at 15
+//                 percent with its soft enrage (final_last.ts). Not built: the
+//                 Mythic hidden phase (its hook: final_last.ts
+//                 mythicHiddenPhase), loot. The pull's arrival scene, the body
+//                 and the room's light are the renderer's
+//                 (render/smith_heart_fx/final_fx.ts, render/smith_heart/).
 //
 // Difficulty: the claim's, with a dev switch for a run while the raid has no
 // heroic or mythic tier of its own (FINAL_DIFFICULTY rows). Deterministic:
@@ -37,6 +41,7 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
+import { clearAdds, stepAdds, stepCoals, stepRings } from './final_adds';
 import {
   clearBreath,
   drawLightning,
@@ -79,6 +84,21 @@ import {
   type FinalDifficulty,
   FINAL_TUNING as T,
 } from './final_ids';
+import {
+  beginCall,
+  clearPhaseAuras,
+  freshPhase,
+  holdShaken,
+  holdShielded,
+  holdThreshold,
+  rulesFrozen,
+  showPhase,
+  stepCall,
+  stepStride,
+  watchThresholds,
+} from './final_intermission';
+import { beginFinalPhase, pouredColdRate, stepFinal, stepPoured } from './final_last';
+import { finalPhaseDev, finalPhaseReadout } from './final_phase_dev';
 import { clearQuench, crackIce, encase, numbingFrost, stepCold, stepCracks } from './final_quench';
 import {
   bossZone,
@@ -203,6 +223,7 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     tremors: [],
     anvil: null,
     cleaveSeen: 0,
+    phase: freshPhase(),
   };
 }
 
@@ -337,6 +358,7 @@ function clearFight(
   const players = heartListeners(ctx, inst);
   if (st) {
     const s = { ctx, inst, st, boss };
+    clearAdds(s, players);
     clearHeat(s);
     clearQuench(s, players);
     clearBreath(s, players);
@@ -345,6 +367,7 @@ function clearFight(
   for (const p of players) for (const id of PLAYER_MARKS) dropAura(p, id);
   clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
   clearRules(boss);
+  clearPhaseAuras({ boss });
 }
 
 /** The boss's authored home (world yards and facing): the middle of the
@@ -405,27 +428,59 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   }
   const st = st0 ?? beginFinal(ctx, inst, boss);
   const s = scopeOf(ctx, inst, st, boss);
+  const ph = st.phase;
   st.clock += DT;
   stepBar(s);
-  stepRoot(s);
-  followTank(s);
-  watchZone(s, false);
-  stepOverload(s);
-  stepUnbound(s);
+  if (ph.stage === 'fight') {
+    ph.unboundGrace = Math.max(0, ph.unboundGrace - DT);
+    stepRoot(s);
+    followTank(s);
+    watchZone(s, false);
+    stepOverload(s);
+    stepUnbound(s);
+  } else stepStage(s);
   stepSwells(s);
   stepWhirls(s);
   stepEmbersAndPools(s);
-  stepCold(s, st.zone === 'quench');
+  const live = ph.stage === 'fight' || ph.stage === 'final';
+  const poured = live ? pouredColdRate(s) : 0;
+  const coldHere = ph.stage === 'fight' && st.zone === 'quench';
+  stepCold(s, coldHere || poured > 0, coldHere ? 1 : poured);
   stepCracks(s);
   stepWind(s);
   stepDrawn(s);
   stepOrbs(s);
   stepTremors(s);
   stepAnvil(s);
+  stepAdds(s);
+  stepCoals(s);
+  stepRings(s);
   watchFrontal(s);
-  runKit(s);
-  holdRoot(s);
-  showState(s);
+  if (ph.stage === 'fight') runKit(s);
+  else if (ph.stage === 'final') stepFinal(s);
+  if (live) stepPoured(s);
+  watchThresholds(s);
+  holdThreshold(s);
+  if (ph.stage === 'fight') holdRoot(s);
+  const frozen = rulesFrozen(s);
+  if (frozen) holdShaken(s);
+  showState(s, frozen);
+  showPhase(s);
+}
+
+/** One tick of a stage that is not the quarter fight: the stride into the
+ *  centre (then the call, or the final phase), the call, the final phase
+ *  held in the centre. */
+function stepStage(s: FinalScope): void {
+  const ph = s.st.phase;
+  if (ph.stage === 'leap' || ph.stage === 'finalLeap') {
+    holdShielded(s);
+    if (!stepStride(s)) return;
+    if (ph.stage === 'leap') beginCall(s);
+    else beginFinalPhase(s);
+    return;
+  }
+  if (ph.stage === 'call') stepCall(s);
 }
 
 // ---- dev ----------------------------------------------------------------------------------
@@ -566,7 +621,7 @@ export function finalDevMechanic(
     case 'shell':
       return `Stone Shell on ${stoneShell(s).length} players.`;
     default:
-      return null;
+      return finalPhaseDev(s, verb, arg, me);
   }
 }
 
@@ -580,5 +635,5 @@ export function finalReadout(ctx: SimContext, inst: InstanceSlot): string {
   const bars = HEART_QUARTER_ORDER.map((v) => `${v} ${Math.round(st.overload[v] * 100)}`).join(
     ', ',
   );
-  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), root ${st.rootLeft.toFixed(0)} s, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}.`;
+  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), root ${st.rootLeft.toFixed(0)} s, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}; ${finalPhaseReadout(ctx, st)}.`;
 }

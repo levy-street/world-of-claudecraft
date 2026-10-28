@@ -335,7 +335,14 @@ export function stepOverload(s: FinalScope): void {
 export function stepUnbound(s: FinalScope): void {
   const st = s.st;
   const b = s.boss;
-  if (st.zone !== 'ring' || inFinalPhase(s)) {
+  // Never through an intermission or in the grace after one (part 2: the
+  // centre it was called to never punishes it), never in its final phase.
+  if (
+    st.zone !== 'ring' ||
+    inFinalPhase(s) ||
+    st.phase.stage !== 'fight' ||
+    st.phase.unboundGrace > 0
+  ) {
     if (st.unbound > 0 || auraOf(b, FINAL_AURAS.unbound)) {
       st.unbound = 0;
       st.unboundTimer = 0;
@@ -375,11 +382,12 @@ export function stepUnbound(s: FinalScope): void {
 // ---- what every client reads ---------------------------------------------------------------
 
 /** Write the zone, the base form, the switch mark and the four bars onto the
- *  boss's auras (only when they change). */
-export function showState(s: FinalScope): void {
+ *  boss's auras (only when they change). `frozen`: the switch mark's clock
+ *  holds (an intermission, part 2). */
+export function showState(s: FinalScope, frozen = false): void {
   const st = s.st;
   const b = s.boss;
-  st.shakenLeft = Math.max(0, st.shakenLeft - DT);
+  if (!frozen) st.shakenLeft = Math.max(0, st.shakenLeft - DT);
   const zone = FINAL_ZONE_CODES[st.zone];
   const base = st.baseForm === null ? -1 : FINAL_ZONE_CODES[st.baseForm];
   const mark = Math.ceil(st.shakenLeft);
@@ -397,11 +405,11 @@ export function showState(s: FinalScope): void {
     if (a.value2 !== base) a.value2 = base;
     if (a.value3 !== mark) a.value3 = mark;
   }
-  const active = st.zone === 'ring' ? null : st.zone;
+  const active = st.zone === 'ring' || frozen ? null : st.zone;
   for (const vein of HEART_QUARTER_ORDER) {
     const id = overloadAuraId(vein);
     const v = Math.round(st.overload[vein] * 100);
-    const trend = vein === active ? 1 : v > 0 ? -1 : 0;
+    const trend = vein === active ? 1 : v > 0 && !frozen ? -1 : 0;
     const bar = auraOf(b, id);
     if (!bar) {
       putMarker(b, id, FINAL_NAMES.overload, 3600, b.id, {
