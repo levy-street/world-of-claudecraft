@@ -305,6 +305,9 @@ export interface CharacterState extends ReferralRewardState {
   // absent at zero; a pre-currency save loads its `heroic_mark` bag and bank
   // stacks into it instead.
   heroicMarks?: number;
+  // The Lantern Seals currency balance (src/sim/lantern_seals.ts), the same
+  // shape: absent at zero, a pre-currency save's `lantern_seal` stacks fold in.
+  lanternSeals?: number;
   // Masterwrought materials (phase 04): both optional so pre-materials saves
   // load with the fields at their fresh defaults, and both omitted from
   // serialization while at those defaults so untouched rows stay byte-equal.

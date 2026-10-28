@@ -3613,6 +3613,7 @@ export const vi_VN: EnTranslations = {
       "delveMark": "Dấu Khai Quật",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Hầm Ngục Anh Hùng - tiêu tại quản lý hậu cần Anh Hùng",
+      "lanternSealNote": "Lantern Hall's weekly contracts . spend at the guild quartermaster",
       "honorNote": "Chiến Trường, Đấu Trường và Nhiệm Vụ Thế Giới",
       "delveMarkNote": "Các khai quật đã hoàn thành",
       "wocTokenNote": "Số dư ví được liên kết",

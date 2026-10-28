@@ -1,13 +1,18 @@
 // The Currencies tab's pure view core: every balance the character can spend
-// that is NOT coin, in two groups. Activities: Heroic Marks (a PlayerMeta
-// counter, src/sim/heroic_marks.ts), Honor, Delve Marks and the $WOC token
+// that is NOT coin, in two groups. Activities: Heroic Marks and Lantern Seals
+// (PlayerMeta counters, src/sim/heroic_marks.ts and src/sim/lantern_seals.ts), Honor, Delve Marks and the $WOC token
 // (the account-linked wallet, injected by the painter because it is host state,
 // not IWorld). Factions: one row per allied faction, PENDING until Stage 2 of
 // the World Quests scope chooses the currency model; standing is shown on the
 // Reputation tab and is deliberately not a currency here.
 import { FACTION_IDS, type FactionId } from '../../../sim/factions';
 
-export type ActivityCurrencyId = 'heroic_mark' | 'honor' | 'delve_mark' | 'woc_token';
+export type ActivityCurrencyId =
+  | 'heroic_mark'
+  | 'lantern_seal'
+  | 'honor'
+  | 'delve_mark'
+  | 'woc_token';
 
 export interface ActivityCurrencyRow {
   readonly id: ActivityCurrencyId;
@@ -33,6 +38,7 @@ export interface CurrenciesView {
 
 export interface CurrenciesViewInput {
   readonly heroicMarks: number;
+  readonly lanternSeals: number;
   readonly honor: number;
   readonly lifetimeHonor: number;
   readonly delveMarks: number;
@@ -50,6 +56,7 @@ const whole = (value: number): number =>
 export function buildCurrenciesView(input: CurrenciesViewInput): CurrenciesView {
   const activities: ActivityCurrencyRow[] = [
     { id: 'heroic_mark', amount: whole(input.heroicMarks), lifetime: null, verified: true },
+    { id: 'lantern_seal', amount: whole(input.lanternSeals), lifetime: null, verified: true },
     {
       id: 'honor',
       amount: whole(input.honor),

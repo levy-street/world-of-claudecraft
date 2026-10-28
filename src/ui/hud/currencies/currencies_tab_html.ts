@@ -4,7 +4,7 @@
 // touches), and every icon is the committed currency art.
 import { FACTION_CURRENCY_IDS, type FactionId } from '../../../sim/factions';
 import type { IWorld } from '../../../world_api';
-import { currencyIconHtml, heroicMarkIconHtml } from '../../currency_art';
+import { currencyIconHtml, heroicMarkIconHtml, lanternSealIconHtml } from '../../currency_art';
 import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { walletUiEnabled, wocBalance, wocBalanceVerified } from '../../wallet_balance';
@@ -19,12 +19,14 @@ const whole = (value: number): string => formatNumber(value, { maximumFractionDi
 
 const NAME_KEY: Record<ActivityCurrencyId, TranslationKey> = {
   heroic_mark: 'entities.items.heroic_mark.name' as TranslationKey,
+  lantern_seal: 'entities.items.lantern_seal.name' as TranslationKey,
   honor: 'hudChrome.currencies.honor',
   delve_mark: 'hudChrome.currencies.delveMark',
   woc_token: 'hudChrome.currencies.wocToken',
 };
 const NOTE_KEY: Record<ActivityCurrencyId, TranslationKey> = {
   heroic_mark: 'hudChrome.currencies.heroicMarkNote',
+  lantern_seal: 'hudChrome.currencies.lanternSealNote',
   honor: 'hudChrome.currencies.honorNote',
   delve_mark: 'hudChrome.currencies.delveMarkNote',
   woc_token: 'hudChrome.currencies.wocTokenNote',
@@ -42,7 +44,8 @@ const FACTION_CURRENCY_NOTE_KEY: Record<FactionId, TranslationKey> = {
 };
 
 function icon(id: ActivityCurrencyId): string {
-  return id === 'heroic_mark' ? heroicMarkIconHtml() : currencyIconHtml(id);
+  if (id === 'heroic_mark') return heroicMarkIconHtml();
+  return id === 'lantern_seal' ? lanternSealIconHtml() : currencyIconHtml(id);
 }
 
 function activityRow(row: ActivityCurrencyRow): string {
@@ -74,6 +77,7 @@ function factionRow(row: FactionCurrencyRow): string {
 export function currenciesTabHtml(world: IWorld): string {
   const view = buildCurrenciesView({
     heroicMarks: world.heroicMarks,
+    lanternSeals: world.guildContracts.seals,
     honor: world.honor,
     lifetimeHonor: world.lifetimeHonor,
     delveMarks: world.delveMarks,

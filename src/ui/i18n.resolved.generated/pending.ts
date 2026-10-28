@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "es_ES": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "fr_FR": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "fr_CA": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "de_DE": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "nl_NL": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "pl_PL": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "id_ID": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "tr_TR": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "sv_SE": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "vi_VN": [
+    "hudChrome.currencies.lanternSealNote"
+  ],
+  "da_DK": [
+    "hudChrome.currencies.lanternSealNote"
+  ]
 };

@@ -22421,6 +22421,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.wocToken': 'Токен WoC',
   'hudChrome.currencies.heroicMarkNote':
     'Героические подземелья . тратится у героического интенданта',
+  'hudChrome.currencies.lanternSealNote':
+    'Еженедельные контракты Зала Фонаря . тратится у интенданта гильдии',
   'hudChrome.currencies.honorNote': 'Поля боя, арена и мировые задания',
   'hudChrome.currencies.delveMarkNote': 'Пройденные вылазки',
   'hudChrome.currencies.wocTokenNote': 'Баланс привязанного кошелька',

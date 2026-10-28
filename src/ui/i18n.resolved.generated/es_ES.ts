@@ -3613,6 +3613,7 @@ export const es_ES: EnTranslations = {
       "delveMark": "Marca de expedición",
       "wocToken": "Ficha WoC",
       "heroicMarkNote": "Mazmorras heroicas . gástala con el intendente heroico",
+      "lanternSealNote": "Lantern Hall's weekly contracts . spend at the guild quartermaster",
       "honorNote": "Campos de batalla, la arena y misiones de mundo",
       "delveMarkNote": "Expediciones completadas",
       "wocTokenNote": "Saldo de la cartera vinculada",

@@ -4,6 +4,7 @@ import { sanitizeBankState, savedBankState } from './bank';
 import type { CharacterState } from './character_state';
 import { sanitizeCourierState, savedCourierState } from './courier';
 import { absorbLegacyHeroicMarkSlots, sanitizeHeroicMarks } from './heroic_marks';
+import { absorbLegacyLanternSealSlots, sanitizeLanternSeals } from './lantern_seals';
 import { savedMaterialSlot } from './material_slot_load';
 import * as vaultMod from './materials_vault';
 import { BAG_SOCKETS, restoreMembershipBag } from './membership_bag_slot';
@@ -31,6 +32,9 @@ export function restoreCharacterStorage(
   // still sitting in the bags or bank (both hydrated above), folded in once.
   meta.heroicMarks = sanitizeHeroicMarks(s.heroicMarks);
   absorbLegacyHeroicMarkSlots(meta);
+  // Lantern Seals: the same shape (lantern_seals.ts), legacy `lantern_seal` stacks folded in.
+  meta.lanternSeals = sanitizeLanternSeals(s.lanternSeals);
+  absorbLegacyLanternSealSlots(meta);
   restoreMembershipBag(meta, s);
 }
 
@@ -44,6 +48,7 @@ export function savedCharacterStorage(
   | 'vault'
   | 'weeklyRewards'
   | 'heroicMarks'
+  | 'lanternSeals'
   | 'vendorBuyback'
   | 'courier'
   | 'membershipBag'
@@ -63,11 +68,14 @@ export function savedCharacterStorage(
       : {}),
     // Absent at zero, so a character that never earned a mark saves unchanged.
     ...(meta.heroicMarks > 0 ? { heroicMarks: meta.heroicMarks } : {}),
+    ...((meta.lanternSeals ?? 0) > 0 ? { lanternSeals: meta.lanternSeals } : {}),
   };
 }
 
 /** Live storage owned by this load/save boundary. */
 export interface CharacterVaultStorageState {
+  // The Lantern Seals currency balance (lantern_seals.ts); absent reads as zero.
+  lanternSeals?: number;
   // The per-character Materials Vault: a count per material id with a gold-bought
   // per-material ceiling. Capacity and move math live in materials_vault.ts.
   // Persisted (inside the character save, exactly like inventory/bags/bank).

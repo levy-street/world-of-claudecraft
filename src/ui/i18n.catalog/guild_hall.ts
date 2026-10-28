@@ -15,7 +15,7 @@ export const guildHallStrings = {
   resetIn: 'New contracts in {time}',
   resetSoon: 'New contracts at the next weekly reset',
   contractsIntro:
-    'Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.',
+    'Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals are paid straight to you, once each week.',
   kinds: {
     boss: 'Bounty',
     heroic: 'Heroic Clear',
@@ -70,7 +70,7 @@ export const guildHallStrings = {
     rewardLine: 'Reward: {reward}',
     stamp: 'Sealed',
     sealsTip:
-      "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are bound to you.",
+      "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are a currency bound to you and take no bag space.",
   },
   // the quartermaster's counter (the reworked shop, guild_hall_window.ts)
   shop: {

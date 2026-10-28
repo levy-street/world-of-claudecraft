@@ -170,9 +170,7 @@ const owned = await page.evaluate(() => {
   return {
     mounts: sim.ownedMounts().includes('lantern_hall_destrier'),
     skin: sim.accountCosmetics.weaponSkinIds.includes('lantern_hall_sword'),
-    seals: sim.inventory
-      .filter((s) => s?.itemId === 'lantern_seal')
-      .reduce((n, s) => n + s.count, 0),
+    seals: sim.guildContracts.seals,
   };
 });
 console.log('owned', JSON.stringify(owned));
