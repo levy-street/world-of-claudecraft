@@ -40,9 +40,12 @@ import {
   HEART_KIT_KINDS,
   HEART_KIT_OMIT_TOPS,
   HEART_KIT_SHALLOW,
+  HEART_ROOT_AIM,
   HEART_ROOT_LIFT,
+  HEART_ROOT_OUT,
   heartAltarFrame,
   heartBridgeYaw,
+  heartRootFrame,
   heartRootPoint,
   planHeartRoomKit,
   planHeartVeinPieces,
@@ -158,15 +161,23 @@ describe('Smith Heart Heart kit: the piece list and the shipped GLB', () => {
         [ASSET.root, ...SMITH_HEART_HEART_KIT_PIECES.map((p) => `Kit_${p}`)].sort(),
       );
       expect(materialNames).toEqual(ASSET.materials);
-      expect(statSync(KIT).size).toBeLessThanOrEqual(5 * 1024 * 1024);
+      // Phase 2M: the platform doubled in area (84 to 120 yd across) and
+      // gained its four wall landmarks: 5 MB and 250k became 6.25 MB and
+      // 285k (2L had raised it from 215k for the painted stones).
+      expect(statSync(KIT).size).toBeLessThanOrEqual(6.25 * 1024 * 1024);
       let tris = 0;
       for (const s of shapes.values()) tris += s.triangles;
-      // Phase 2L: the quarters' hand-painted stones (dense painted tops)
-      // and the sculpted spines raised the budget from 215k.
-      expect(tris).toBeLessThanOrEqual(250000);
+      expect(tris).toBeLessThanOrEqual(285000);
     },
   );
 });
+
+/** The platform's centre from the terrace's (phase 2M: moved out with the
+ *  rim, so the bridge between them keeps its length and its ramp). */
+const ROOM_FROM_TERRACE = Math.hypot(
+  HEART_ROOM.x - HEART_TERRACE.x,
+  HEART_ROOM.z - HEART_TERRACE.z,
+);
 
 describe('Smith Heart Heart kit: the walks stay flat where bodies stand', () => {
   it.skipIf(!haveKit)(
@@ -199,7 +210,7 @@ describe('Smith Heart Heart kit: the walks stay flat where bodies stand', () => 
       for (const [s, y, zt] of pts) {
         const t = Math.abs(zt);
         const inTerrace = Math.hypot(s, t) < HEART_TERRACE.r;
-        const inRoom = Math.hypot(70 - s, t) < HEART_ROOM.r;
+        const inRoom = Math.hypot(ROOM_FROM_TERRACE - s, t) < HEART_ROOM.r;
         if (t < 6.9 && !inTerrace && !inRoom) {
           // Nothing stands over the deck.
           expect(y, `s ${s.toFixed(2)} t ${t.toFixed(2)}`).toBeLessThanOrEqual(
@@ -284,20 +295,35 @@ describe('Smith Heart Heart kit: the plan', () => {
       expect(altar.piece).toBe(HEART_ALTAR_PIECES[vein]);
       expect(altar.rise).toBe(HEART_ALTAR_RISE);
       expect(root.piece).toBe('Kit_HeartRoot');
-      expect(root.rot).toBeCloseTo(altar.rot, 9);
+      // Phase 2M: the root stands behind the altar, out of its landmark
+      // (straight out, but the Hammer's, turned to where the crown stands).
+      const rf = heartRootFrame(vein);
+      expect(root.x).toBeCloseTo(rf.x, 9);
+      expect(root.z).toBeCloseTo(rf.z, 9);
+      expect(root.rot).toBeCloseTo(rf.rot, 9);
+      if (HEART_ROOT_AIM[vein].aim === null) {
+        expect(root.rot).toBeCloseTo(altar.rot, 9);
+        expect(Math.hypot(root.x - altar.x, root.z - altar.z)).toBeCloseTo(HEART_ROOT_OUT, 9);
+      }
+      expect(Math.hypot(root.x - HEART_ROOM.x, root.z - HEART_ROOM.z)).toBeCloseTo(
+        Math.hypot(altar.x - HEART_ROOM.x, altar.z - HEART_ROOM.z) + HEART_ROOT_OUT,
+        9,
+      );
       expect(root.y).toBeCloseTo(HEART_ROOM.h + HEART_ROOT_LIFT, 9);
     }
   });
 
-  it('raises each root out of its altar over every walk, well over head height, into the crown', () => {
+  it('raises each root out of its landmark behind its altar, never over the walk, into the crown', () => {
     for (const vein of SMITH_HEART_VEINS) {
       const start = heartRootPoint(vein, 0);
-      const f = heartAltarFrame(vein);
-      expect(Math.hypot(start.x - f.x, start.z - f.z)).toBeLessThan(3);
+      const f = heartRootFrame(vein);
+      // Phase 2M: out of its quarter's wall landmark, behind the altar.
+      expect(Math.hypot(start.x - f.x, start.z - f.z)).toBeCloseTo(2, 6);
       for (let t = 0; t <= 1; t += 0.02) {
         const p = heartRootPoint(vein, t);
         const r = Math.hypot(p.x - HEART_ROOM.x, p.z - HEART_ROOM.z);
-        if (r > 39 && r < HEART_ROOM.r + 1) expect(p.y).toBeGreaterThan(8);
+        expect(r, `${vein} t ${t.toFixed(2)}`).toBeGreaterThan(HEART_ROOM.r + 8);
+        expect(p.y).toBeGreaterThan(8);
       }
       // Its far end lies in the mountain's rock (the crown holds it).
       const end = heartRootPoint(vein, 1);

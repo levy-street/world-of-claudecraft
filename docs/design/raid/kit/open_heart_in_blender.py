@@ -1,7 +1,8 @@
 """The Smith's Heart's final room laid out for review in Blender (phases 2J
-and 2K): the Anvil of the World on its keel with its balustrade, its walk the
-four elemental quarters round the central ring (phase 2K: each quarter's
-seams lit in its vein's colour, the four ridges and their horns, the dais),
+to 2M): the Anvil of the World on its keel with its balustrade, its walk
+(phase 2M) one floor of warm stone round the central circle (its dark rim
+and its well), the four seams and their horns, each quarter's crackle and
+border light in its vein's colour and its wall landmark past the rim,
 the four altars and the roots of the mountain gripping them, the Heart
 Bridge down from the Arrival Terrace with its return portal and its
 standing stones, the heart's bed deep in the chasm, and on the platform the
@@ -11,9 +12,10 @@ pieces round the crystal heart, at rest), a 2 yd figure for scale.
 Run (background renders, then the scene saved for the owner to open):
   blender -b --factory-startup --python open_heart_in_blender.py -- \
       --out DIR [--save scene.blend] [--label fase2l]
-Writes DIR/blender_sala_cuartos_<label>.png (the room from above the
-terrace) and DIR/blender_cresta_<label>.png (a ridge and its horn over the
-Heat and the Breath); --label names them (fase2l by default).
+Writes DIR/blender_sala_<label>.png (the room from above the terrace),
+DIR/blender_cenital_<label>.png (straight down on the whole room) and
+DIR/blender_hito_<label>.png (the Heat's landmark over its quarter);
+--label names them (fase2m by default).
 
 Frames: the room's centre is the origin, the game's north (+Z) is Blender
 -Y, a game yaw r is a Blender turn of r about +Z (heart_room_kit_plan_core.ts,
@@ -33,10 +35,12 @@ from build_smith_heart_hammer_kit import camera, look, scale_figure  # noqa: E40
 from build_smith_heart_heart_kit import BUILDERS, build_heart_kit, preview_materials, setup_render  # noqa: E402
 
 ALTAR_RISE = 1.4
-ROOT_LIFT = 4.4
+ROOT_LIFT = 6.0
+ROOT_OUT = 18.0
 BED_Y = -48.0
-BED_SCALE = 2.4
-TERRACE = (-49.5, 49.5, 4.0)
+BED_SCALE = 3.3
+TERRACE = (-62.25, 62.25, 4.0)
+ALTAR_R = 54.0
 
 
 def place(name, loc, rz=0.0, scale=(1.0, 1.0, 1.0), tilt=(0.0, 0.0)):
@@ -154,18 +158,23 @@ def main():
         place('HeartRidge', (0, 0, 0), rz=-k * math.pi / 2)
         place('HeartRidgeHorn', (0, 0, 0), rz=-k * math.pi / 2)
     place('HeartDais', (0, 0, 0))
+    place('HeartWell', (0, 0, 0))
+    for vein in ('Hammer', 'Breath', 'Quench', 'Heat'):
+        tinted_copy(place(f'Landmark{vein}', (0, 0, 0)), materials[1], VEIN_TINT[vein])
     place('AnvilKeel', (0, 0, 0))
     place('TerraceFloor', TERRACE)
     place('TerraceKeel', TERRACE)
     place('HeartBridge', (TERRACE[0], TERRACE[1], 0.0), rz=-math.pi / 4)
     place('CoreBed', (0, 0, BED_Y), scale=(BED_SCALE, BED_SCALE, BED_SCALE))
     # ---- the altars and their roots (game positions and yaws) ----------------------------------
-    for vein, gx, gz in (('Breath', 0, 36), ('Quench', 36, 0), ('Hammer', 0, -36), ('Heat', -36, 0)):
+    for vein, gx, gz in (('Breath', 0, ALTAR_R), ('Quench', ALTAR_R, 0), ('Hammer', 0, -ALTAR_R),
+                         ('Heat', -ALTAR_R, 0)):
         yaw = math.atan2(-gx, -gz)
         place('Altar' + vein, g2b(gx, 0, gz), rz=yaw, scale=(1.0, 1.0, ALTAR_RISE))
-        place('HeartRoot', g2b(gx, ROOT_LIFT, gz), rz=yaw)
+        back = Vector((gx, gz)).normalized() * ROOT_OUT
+        place('HeartRoot', g2b(gx + back.x, ROOT_LIFT, gz + back.y), rz=yaw)
     # ---- the body, facing the terrace ----------------------------------------------------------
-    colossus(Vector((0, 0, 0)), math.atan2(-49.5, -49.5))
+    colossus(Vector((0, 0, 0)), math.atan2(-62.25, -62.25))
     fig = scale_figure()
     fig.location = (-14, 14, 1.0)
     fig2 = scale_figure().copy()
@@ -175,19 +184,23 @@ def main():
     cam = camera('HeartCam', lens=24)
     cam.data.clip_end = 2000
     scene.camera = cam
-    look(cam, Vector((-112, 104, 58)), Vector((6, -4, -6)))
-    label = arg('--label') or 'fase2l'
-    look(cam, Vector((-92, 86, 70)), Vector((4, -4, -4)))
-    scene.render.filepath = os.path.join(out, f'blender_sala_cuartos_{label}.png')
+    label = arg('--label') or 'fase2m'
+    look(cam, Vector((-128, 118, 96)), Vector((4, -4, -4)))
+    scene.render.filepath = os.path.join(out, f'blender_sala_{label}.png')
     bpy.ops.render.render(write_still=True)
-    cam.data.lens = 32
-    # A ridge (the Heat and the Breath, ridge 3) and its horn over the lip.
-    look(cam, Vector((-4, -10, 7.5)), Vector((-19, -33, 2.5)))
-    scene.render.filepath = os.path.join(out, f'blender_cresta_{label}.png')
+    # Straight down on the whole room (the reference's composition).
+    cam.data.lens = 30
+    look(cam, Vector((0.01, 0.0, 190.0)), Vector((0, 0, 0)))
+    scene.render.filepath = os.path.join(out, f'blender_cenital_{label}.png')
+    bpy.ops.render.render(write_still=True)
+    # The Heat's landmark (west) over its quarter, from the circle.
+    cam.data.lens = 28
+    look(cam, Vector((-26, -8, 16)), Vector((-66, 0, 5)))
+    scene.render.filepath = os.path.join(out, f'blender_hito_{label}.png')
     bpy.ops.render.render(write_still=True)
     # Leave the review camera on the whole room.
     cam.data.lens = 24
-    look(cam, Vector((-112, 104, 58)), Vector((6, -4, -6)))
+    look(cam, Vector((-128, 118, 96)), Vector((4, -4, -4)))
     if arg('--save'):
         bpy.ops.wm.save_as_mainfile(filepath=arg('--save'))
 

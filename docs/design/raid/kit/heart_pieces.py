@@ -97,18 +97,18 @@ from shkit import DRESSED, PAINT, RAW, SP, TAU
 ICE = 2  # the kit's third slot (KitIce)
 
 # ---- measures (the layout's, src/sim/content/smith_heart_layout.ts) ---------------------
-ROOM_R = 42.0
+ROOM_R = 60.0  # phase 2M: 120 yd across
 TERRACE_R = 13.0
-ROOM_FROM_TERRACE = 70.0
+ROOM_FROM_TERRACE = math.hypot(62.25, 62.25)  # phase 2M: moved out with the rim
 BRIDGE_HALF = 7.0
 GATE_S = 22.0
-ALTAR_R = 36.0
-RUNE_RINGS = (14.0, 26.0, 38.5)
+ALTAR_R = 54.0
+RUNE_RINGS = (20.0, 37.0, 55.0)
 # The channels to the altars (bearings: breath north, quench east, hammer
 # south, heat west) and the bearing the bridge lands on.
 CHANNELS = (0.0, 90.0, 180.0, 270.0)
 BRIDGE_BEARING = 225.0
-CHANNEL_END = 34.2
+CHANNEL_END = 52.2
 HUB_R = 1.6
 # The terrace's return portal (game local (-6, +6) of its centre: bearing 315).
 PORTAL_BEARING = 315.0
@@ -282,6 +282,12 @@ def _channel(p, rng, bearing, r0, r1):
                 d += length
 
 
+def _blk(R):
+    """How much longer a rim's blocks run on a great walk (phase 2M: the
+    Anvil's 377 yd round keeps its block count near its old 264)."""
+    return 1.0 if R < 45.0 else 1.35
+
+
 def _rim(p, rng, R, opens, z_lifts=((-1.5, 0.0), (-3.25, -1.5)), newels=(), lamp=True, skip=()):
     """A walk's rim: its carved fascia (two lifts of dressed blocks past the
     lip) and the coped balustrade on it (base course and rounded coping),
@@ -296,7 +302,7 @@ def _rim(p, rng, R, opens, z_lifts=((-1.5, 0.0), (-3.25, -1.5)), newels=(), lamp
             a0 = rng.uniform(0, 6)
             a = a0
             while a < a0 + 360.0 - 1e-6:
-                step = math.degrees(rng.uniform(1.6, 2.9) / R)
+                step = math.degrees(rng.uniform(1.6, 2.9) * _blk(R) / R)
                 b = min(a0 + 360.0, a + step)
                 if a0 + 360.0 - b < math.degrees(0.9 / R):
                     b = a0 + 360.0
@@ -309,7 +315,7 @@ def _rim(p, rng, R, opens, z_lifts=((-1.5, 0.0), (-3.25, -1.5)), newels=(), lamp
         # The string course under the balustrade, a breath proud.
         a = 0.0
         while a < 360.0 - 1e-6:
-            step = math.degrees(rng.uniform(2.0, 3.4) / R)
+            step = math.degrees(rng.uniform(2.0, 3.4) * _blk(R) / R)
             b = min(360.0, a + step)
             mid = (a + b) / 2
             if not is_open(mid, 0.4):
@@ -320,7 +326,7 @@ def _rim(p, rng, R, opens, z_lifts=((-1.5, 0.0), (-3.25, -1.5)), newels=(), lamp
         # The balustrade: a base course of big blocks and a rounded coping.
         a = 0.0
         while a < 360.0 - 1e-6:
-            step = math.degrees(rng.uniform(1.4, 2.3) / R)
+            step = math.degrees(rng.uniform(1.4, 2.3) * _blk(R) / R)
             b = min(360.0, a + step)
             mid = (a + b) / 2
             near_newel = any(abs(((mid - n + 180) % 360) - 180) < math.degrees(0.8 / R) for n in newels)
@@ -368,10 +374,13 @@ def anvil_floor(bpy):
     import quarter_pieces as qp
     qp.joint_bed(p)
     bridge_w = math.degrees(math.asin(BRIDGE_HALF / ROOM_R)) + 0.6
-    horns = [(b, 4.2) for b in qg.rim_ends()]
-    newels = [18.0, 72.0, 108.0, 162.0, 198.0, BRIDGE_BEARING - bridge_w - 1.3, BRIDGE_BEARING + bridge_w + 1.3,
-              252.0, 288.0, 342.0]
-    _rim(p, rng, ROOM_R, [(BRIDGE_BEARING, bridge_w)], newels=newels, skip=horns)
+    horns = [(b, 3.2) for b in qg.rim_ends()]
+    # Phase 2M: each quarter's wall landmark stands on the rim at its
+    # middle (landmark_pieces.py): no balustrade across its foot.
+    marks = [(b, 11.0) for b in qg.LANDMARKS.values()]
+    newels = [16.0, 34.0, 48.0, 76.0, 106.0, 124.0, 138.0, 166.0, 196.0, BRIDGE_BEARING - bridge_w - 1.3,
+              BRIDGE_BEARING + bridge_w + 1.3, 256.0, 286.0, 304.0, 318.0, 346.0]
+    _rim(p, rng, ROOM_R, [(BRIDGE_BEARING, bridge_w)], newels=newels, skip=horns + marks)
     return p
 
 
@@ -478,7 +487,7 @@ def _keel(bpy, p, seed, R, top, depth, voxel, target, buttresses=(), veins=None,
 
 def anvil_keel(bpy):
     p = HSP('Kit_AnvilKeel', seed=5101, ao=0.5, ao_dist=6.0, dust=0.0)
-    _keel(bpy, p, 5101, ROOM_R, -3.25, 34.0, 0.38, 16000, buttresses=CHANNELS,
+    _keel(bpy, p, 5101, ROOM_R, -3.25, 40.0, 0.5, 12000, buttresses=CHANNELS,
           veins={0.0: BREATH_GLOW, 90.0: QUENCH_GLOW, 180.0: HAMMER_GLOW, 270.0: HEAT_GLOW}, root_crystals=12)
     return p
 

@@ -35,6 +35,13 @@ export const SMITH_HEART_HEART_KIT_PIECES = [
   'HeartRidge',
   'HeartRidgeHorn',
   'HeartDais',
+  // Phase 2M: the central circle's sunken well and each quarter's wall
+  // landmark past the rim.
+  'HeartWell',
+  'LandmarkHeat',
+  'LandmarkHammer',
+  'LandmarkQuench',
+  'LandmarkBreath',
   // The Arrival Terrace and its keel, the Heart Bridge.
   'TerraceFloor',
   'TerraceKeel',
@@ -93,6 +100,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/heart_pieces.py',
     'docs/design/raid/kit/quarter_geom.py',
     'docs/design/raid/kit/quarter_pieces.py',
+    'docs/design/raid/kit/landmark_pieces.py',
     'docs/design/raid/kit/build_smith_heart_heart_kit.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',
     'scripts/assets/smith_heart_heart_kit/build.mjs',

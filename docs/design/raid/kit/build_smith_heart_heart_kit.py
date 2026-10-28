@@ -35,6 +35,7 @@ sys.path.insert(0, HERE)
 import shkit  # noqa: E402,F401  (puts the shared dungeon kit on the path)
 import heart_pieces as hp  # noqa: E402
 import quarter_pieces as qp  # noqa: E402
+import landmark_pieces as lp  # noqa: E402
 from build_smith_heart_hammer_kit import camera, look, scale_figure  # noqa: E402
 from hckit import export_kit  # noqa: E402
 
@@ -49,6 +50,13 @@ BUILDERS = {
     'HeartRidge': lambda: qp.heart_ridge(bpy),
     'HeartRidgeHorn': lambda: qp.heart_ridge_horn(bpy),
     'HeartDais': lambda: qp.heart_dais(bpy),
+    # Phase 2M: the central circle's sunken well and each quarter's wall
+    # landmark.
+    'HeartWell': lambda: qp.heart_well(bpy),
+    'LandmarkHeat': lambda: lp.landmark_heat(bpy),
+    'LandmarkHammer': lambda: lp.landmark_hammer(bpy),
+    'LandmarkQuench': lambda: lp.landmark_quench(bpy),
+    'LandmarkBreath': lambda: lp.landmark_breath(bpy),
     'TerraceFloor': lambda: hp.terrace_floor(bpy),
     'TerraceKeel': lambda: hp.terrace_keel(bpy),
     'HeartBridge': lambda: hp.heart_bridge(bpy),

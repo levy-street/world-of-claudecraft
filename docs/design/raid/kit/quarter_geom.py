@@ -1,4 +1,4 @@
-"""The Anvil of the World's four quarters (phase 2K): the pinwheel's own
+"""The Anvil of the World's four quarters (phases 2K to 2M): the pinwheel's own
 numbers, the same as the sim's geometry core
 (src/sim/content/smith_heart_quarters.ts, pinned against each other by
 tests/smith_heart_heart_kit.test.ts through the shipped pieces).
@@ -13,13 +13,19 @@ Pure Python (math only).
 """
 import math
 
-RING_R = 11.0
-RIM_R = 42.0
+RING_R = 16.0
+RIM_R = 60.0
 SWEEP = 85.0
 POWER = 1.5
 RIM_OFFSET = 20.0
-RIDGE_HALF = 1.7
+RIDGE_HALF = 1.8
 ORDER = ('breath', 'quench', 'hammer', 'heat')
+# Phase 2M: the room grew to 120 yd across. Each quarter's wall landmark
+# stands past the rim at its quarter's middle (its altar's bearing), its
+# centre LANDMARK_R out; the altars stand ALTAR_R out at their feet.
+LANDMARK_R = 70.0
+LANDMARKS = {'breath': 0.0, 'quench': 90.0, 'hammer': 180.0, 'heat': 270.0}
+ALTAR_R = 54.0
 
 
 def sweep_share(r):
@@ -71,17 +77,17 @@ def rim_ends():
 # each other by tests/smith_heart_quarters_kit.test.ts). The kit carves a
 # socket there: the paving broken round a pit.
 SOCKETS = (
-    (340.0, 27.0, 8.0),  # hip
-    (20.0, 30.0, 11.0),  # torso
-    (112.0, 29.0, 6.8),  # shoulder L
-    (292.0, 29.0, 6.8),  # shoulder R
-    (150.0, 23.0, 7.8),  # upper arm L
-    (325.0, 21.0, 7.8),  # upper arm R
-    (104.0, 35.0, 7.5),  # forearm L
-    (284.0, 35.0, 7.5),  # forearm R
-    (162.0, 33.0, 5.8),  # fist L
-    (252.0, 31.0, 5.8),  # fist R
-    (62.0, 33.0, 5.7),  # head
+    (340.0, 38.5, 8.0),  # hip
+    (20.0, 43.0, 11.0),  # torso
+    (112.0, 41.5, 6.8),  # shoulder L
+    (292.0, 41.5, 6.8),  # shoulder R
+    (150.0, 33.0, 7.8),  # upper arm L
+    (325.0, 30.0, 7.8),  # upper arm R
+    (104.0, 47.0, 7.5),  # forearm L
+    (284.0, 47.0, 7.5),  # forearm R
+    (162.0, 46.0, 5.8),  # fist L
+    (252.0, 44.0, 5.8),  # fist R
+    (62.0, 46.0, 5.7),  # head
 )
 
 
