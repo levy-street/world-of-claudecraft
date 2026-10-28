@@ -375,11 +375,21 @@ def anvil_floor(bpy):
     qp.joint_bed(p)
     bridge_w = math.degrees(math.asin(BRIDGE_HALF / ROOM_R)) + 0.6
     horns = [(b, 3.2) for b in qg.rim_ends()]
-    # Phase 2M: each quarter's wall landmark stands on the rim at its
-    # middle (landmark_pieces.py): no balustrade across its foot.
-    marks = [(b, 11.0) for b in qg.LANDMARKS.values()]
-    newels = [16.0, 34.0, 48.0, 76.0, 106.0, 124.0, 138.0, 166.0, 196.0, BRIDGE_BEARING - bridge_w - 1.3,
-              BRIDGE_BEARING + bridge_w + 1.3, 256.0, 286.0, 304.0, 318.0, 346.0]
+    # Phase 2M: each quarter's wall landmark stands on the rim (phase 2N:
+    # along its whole run, landmark_pieces.SPAN): no balustrade across its
+    # foot, the cliff meets the walk.
+    import landmark_pieces as lp
+    marks = []
+    for vein, b in qg.LANDMARKS.items():
+        d0, d1 = lp.SPAN[vein]
+        marks.append((b + (d0 + d1) / 2.0, (d1 - d0) / 2.0 - 2.5))
+    # A newel at each end of the balustrade's runs left between them (the
+    # bridge's own close the Hammer's east end).
+    newels = [BRIDGE_BEARING - bridge_w - 1.3, BRIDGE_BEARING + bridge_w + 1.3]
+    for (c, w) in marks:
+        for e in (c - w - 1.2, c + w + 1.2):
+            if all(abs(((e - n + 180) % 360) - 180) > 4.0 for n in newels):
+                newels.append(e % 360.0)
     _rim(p, rng, ROOM_R, [(BRIDGE_BEARING, bridge_w)], newels=newels, skip=horns + marks)
     return p
 

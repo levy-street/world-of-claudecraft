@@ -4,8 +4,9 @@ split by four curved seams in a pinwheel into one quarter per vein (the
 numbers: quarter_geom.py, the sim's smith_heart_quarters.ts). The element
 lives on the edges, never in the floor:
 
-  - Kit_Quarter<Vein>: the quarter's share of the one floor (large irregular
-    slabs laid once over the whole walk, the same stones on both sides of a
+  - Kit_Quarter<Vein>: the quarter's share of the one floor (since phase 2N
+    one flat sheet carrying the broad paint; the runtime paints the slabs on
+    it, laid once over the whole walk, the same stones on both sides of a
     seam), its colour drifted a few percent toward its element
     (`QUARTER_TINT`); its element's crackle bursting out of the central
     circle's rim a short way into it (the Breath's forked storm crackle, the
@@ -42,7 +43,7 @@ import math
 
 import numpy as np
 import quarter_geom as qg
-from gravewyrm_sculpt import Sculpt
+from gravewyrm_sculpt import Sculpt, block
 from gwkit import crystal, slab
 from heart_pieces import HSP, PALE_HI, PALE_LO, _clamp, pale_crystal
 from hckit import GLOW
@@ -854,104 +855,39 @@ class Painter:
         return col
 
 
-def _chip_corners(rng, poly, chance=0.35):
-    """Knock a corner or two off a block (the mason's hammer)."""
-    out = []
-    n = len(poly)
-    for k in range(n):
-        q = poly[k]
-        if rng.random() < chance:
-            a = poly[k - 1]
-            b = poly[(k + 1) % n]
-            la = math.hypot(a[0] - q[0], a[1] - q[1])
-            lb = math.hypot(b[0] - q[0], b[1] - q[1])
-            c = rng.uniform(0.12, 0.42)
-            ta = min(0.4, c / max(1e-6, la))
-            tb = min(0.4, c / max(1e-6, lb))
-            out.append((q[0] + (a[0] - q[0]) * ta, q[1] + (a[1] - q[1]) * ta))
-            out.append((q[0] + (b[0] - q[0]) * tb, q[1] + (b[1] - q[1]) * tb))
-        else:
-            out.append(q)
-    return out
 
 
-def _split_broken(rng, poly):
-    """A block broken in two along a jagged line (each half its own stone)."""
-    cx, cy = _centroid(poly)
-    ang = rng.uniform(0, math.pi)
-    ux, uy = math.cos(ang), math.sin(ang)
-    off = rng.uniform(-0.25, 0.25)
-    jag = Noise(int(rng.random() * 1e6))
-
-    def f(q, sgn):
-        d = (q[0] - cx) * -uy + (q[1] - cy) * ux - off
-        along = (q[0] - cx) * ux + (q[1] - cy) * uy
-        return sgn * (d + 0.18 * float(jag(along * 1.6, 0.3, 0.7))) - 0.035
-
-    halves = []
-    for sgn in (1, -1):
-        h = _simplify(_clip(_densify(poly, 0.2), lambda q, s=sgn: f(q, s)), 0.02)
-        if len(h) >= 3 and abs(_area(h)) > 0.2:
-            halves.append(_ccw(h))
-    return halves
 
 
-def _rubble(p, rng, poly, tones, n=6):
-    """Rubble chips in a missing stone's hole (under the walk's breath)."""
-    cx, cy = _centroid(poly)
-    rad = math.sqrt(abs(_area(poly)) / math.pi)
-    with p.as_kind(RAW):
-        for _ in range(n):
-            a = rng.uniform(0, TAU)
-            r = rad * rng.uniform(0.0, 0.7)
-            sz = rng.uniform(0.12, 0.32)
-            crystal(p, (cx + math.cos(a) * r, cy + math.sin(a) * r, -0.06 + sz * 0.16), (sz * 1.4, sz, sz * 0.38),
-                    p.vary(tones[rng.randrange(len(tones))], 0.1), n=9, boxy=0.6, jitter=0.25,
-                    yaw=rng.uniform(0, TAU))
 
 
-def _clip_segment(poly, a, b):
-    """The part of segment a-b inside a (roughly convex) polygon."""
-    t0, t1 = 0.0, 1.0
-    n = len(poly)
-    pts = _ccw(poly)
-    for k in range(n):
-        p0 = pts[k]
-        p1 = pts[(k + 1) % n]
-        ex, ey = p1[0] - p0[0], p1[1] - p0[1]
-        fa = ex * (a[1] - p0[1]) - ey * (a[0] - p0[0])
-        fb = ex * (b[1] - p0[1]) - ey * (b[0] - p0[0])
-        if fa < 0 and fb < 0:
-            return None
-        if fa < 0 or fb < 0:
-            t = fa / (fa - fb)
-            if fa < 0:
-                t0 = max(t0, t)
-            else:
-                t1 = min(t1, t)
-    if t1 - t0 < 0.05:
-        return None
-    return ((a[0] + (b[0] - a[0]) * t0, a[1] + (b[1] - a[1]) * t0),
-            (a[0] + (b[0] - a[0]) * t1, a[1] + (b[1] - a[1]) * t1))
 
 
-# ================================================================ the one floor (phase 2M)
+# ================================================================ the one floor (phase 2M, 2N)
 # One hand-painted warm stone over the whole walk (the style guide's quiet
-# field, R2): large irregular slabs laid ONCE over the platform (the same
-# seeds for every quarter, so the joints run on unbroken under the seams),
-# each quarter's piece the stones that fall in it, its colour drifted a few
-# percent toward its element (`QUARTER_TINT`): enough to tell them apart,
-# never four floors. The element lives on the edges: each quarter's crackle
-# bursting out of the central circle's rim (`_rim_crackle`) and its border
-# light along the two seams that bound it (`_border_light`).
+# field, R2), each quarter's colour drifted a few percent toward its element
+# (`QUARTER_TINT`): enough to tell them apart, never four floors. Since phase
+# 2N the stone is ONE smooth sheet per quarter carrying only the broad paint
+# (the warm neutral stone, its big value groups, the light pooled mid-quarter,
+# the soot round the circle, the dust toward the wall); the slabs themselves
+# (large and soft, of varied sizes, their joints thin, broken and
+# inconsistent, some vanishing, some deep cracks, chips, patches and wear
+# paths) are painted on it at runtime (src/render/smith_heart/
+# heart_floor_glsl.ts), so the joints run on unbroken across the seams and
+# hold detail close up. The element lives on the edges: each quarter's
+# crackle bursting out of the central circle's rim (`_rim_crackle`) and its
+# border light along the two seams that bound it (`_border_light`).
 
-STONE_TONES = ((0.57, 0.47, 0.43), (0.53, 0.45, 0.42), (0.61, 0.5, 0.45), (0.5, 0.43, 0.41), (0.56, 0.48, 0.45),
-               (0.49, 0.42, 0.4), (0.59, 0.49, 0.44), (0.54, 0.47, 0.45))
-STONE_WARM = (0.63, 0.49, 0.41)
-STONE_COOL = (0.47, 0.44, 0.47)
-STONE_DUST = (0.7, 0.62, 0.55)
-STONE_STAIN = (0.36, 0.3, 0.29)
-FLOOR_DIRT = (0.26, 0.21, 0.2)
+# A warm neutral stone (phase 2N: the pink of 2M drawn toward a sandy grey).
+STONE_TONES = ((0.53, 0.47, 0.42), (0.5, 0.45, 0.41), (0.56, 0.5, 0.44), (0.48, 0.43, 0.4), (0.54, 0.48, 0.43),
+               (0.47, 0.42, 0.39), (0.55, 0.49, 0.43), (0.51, 0.46, 0.42))
+STONE_BASE = (0.5, 0.47, 0.42)
+STONE_WARM = (0.55, 0.5, 0.42)
+STONE_COOL = (0.45, 0.44, 0.45)
+STONE_DUST = (0.66, 0.6, 0.53)
+STONE_STAIN = (0.34, 0.3, 0.28)
+STONE_SOOT = (0.2, 0.18, 0.18)
+FLOOR_DIRT = (0.24, 0.2, 0.19)
 # Each quarter's drift toward its element (a multiply, a few percent of hue,
 # its value kept within a percent of the others): the Breath a breath of
 # violet, the Quench of cold blue, the Hammer of ochre, the Heat of ember
@@ -962,12 +898,15 @@ QUARTER_TINT = {
     'hammer': (1.04, 1.0, 0.93),
     'heat': (1.05, 0.99, 0.94),
 }
-SLAB_SPACING = 6.4
+SHEET_Z = 0.02  # the sheet's top: one flat plane (the runtime paints on it)
+SHEET_STEP = 1.5  # its points' spacing (the broad paint's resolution)
+SHEET_MARGIN = 1.4  # how far short of each seam's line it stops (under the spine's foot)
 # A glow face painted with its green well over its red is a border light
 # (the runtime draws it as the thin line of the quarter's colour along a
 # seam); a grey glow face is the rim's crackle; one under the walk the
 # Heat's fire bed.
 BORDER_TAG = (0.42, 0.86, 0.42)
+BORDER_HALO = 0.75  # the halo's share of the core's tag (linear, its green still 0.29 over its red)
 
 
 def _tinted(c, vein, k=1.0):
@@ -975,61 +914,9 @@ def _tinted(c, vein, k=1.0):
     return tuple(min(1.0, c[j] * (1.0 + (t[j] - 1.0) * k)) for j in range(3))
 
 
-_CELLS = None
-
-
-def floor_cells():
-    """The one floor's stones (Voronoi cells over the whole walk, Blender
-    plan), the same for every quarter's piece."""
-    global _CELLS
-    if _CELLS is not None:
-        return _CELLS
-    import random
-    rng = random.Random(6007)
-    sp = SLAB_SPACING
-    cell = sp * 0.7
-    grid = {}
-    out = []
-    clear = []
-    r0, r1 = qg.RING_R - 3.0, qg.RIM_R + 3.5
-    want = int(math.pi * (r1 * r1 - r0 * r0) / (sp * sp * 0.8))
-    for _ in range(want * 30):
-        if len(out) >= want:
-            break
-        r = math.sqrt(rng.uniform(r0 * r0, r1 * r1))
-        q = qg.bp(r, rng.uniform(0.0, 360.0))
-        # Smaller stones near the circle and the wall (worn, patched), the
-        # biggest across the open middle of each quarter.
-        u = (r - qg.RING_R) / (qg.RIM_R - qg.RING_R)
-        size = 0.78 + 0.5 * math.sin(math.pi * max(0.0, min(1.0, u)))
-        c = sp * size * rng.uniform(0.62, 1.45)
-        gx, gy = int(math.floor(q[0] / cell)), int(math.floor(q[1] / cell))
-        ok = True
-        reach = int(math.ceil(sp * 1.6 / cell)) + 1
-        for ix in range(gx - reach, gx + reach + 1):
-            for iy in range(gy - reach, gy + reach + 1):
-                for j in grid.get((ix, iy), ()):
-                    o = out[j]
-                    if math.hypot(o[0] - q[0], o[1] - q[1]) < 0.5 * (c + clear[j]):
-                        ok = False
-                        break
-                if not ok:
-                    break
-            if not ok:
-                break
-        if ok:
-            grid.setdefault((gx, gy), []).append(len(out))
-            out.append(q)
-            clear.append(c)
-    box = (-qg.RIM_R - 6.0, -qg.RIM_R - 6.0, qg.RIM_R + 6.0, qg.RIM_R + 6.0)
-    cells = _voronoi_cells(out, box, reach=sp * 1.8)
-    _CELLS = cells
-    return cells
-
-
 class StonePainter(Painter):
-    """The one floor's paint: the warm stone with its quarter's drift, dust
-    settled in the hollows, old stains, a wide pale worn lip."""
+    """The socket fragments' paint: the warm stone with its quarter's drift,
+    dust settled in the hollows, old stains, a wide pale worn lip."""
 
     def __init__(self, vein):
         tint = QUARTER_TINT[vein]
@@ -1044,98 +931,175 @@ class StonePainter(Painter):
         col = _mixc(col, STONE_DUST, dust * 0.2)
         stain = np.clip(n.fbm(X * 0.09 - 4.0, Y * 0.09 + 2.0, 6.0, 2) * 2.0 - 0.45, 0.0, 1.0)
         col = _mixc(col, STONE_STAIN, stain * 0.28)
-        # Big painted value groups across the whole floor (squint and the
-        # stones still separate, M4).
         big = 1.0 + 0.09 * n.fbm(X * 0.06 + 1.0, Y * 0.06, 4.0, 2)
         return col * big[:, None]
 
 
-def _hairline(p, rng, part, z_at):
-    """An old hairline crack across a big stone (painted dark, never lit)."""
-    inner = _inset(part, 0.45)
-    if len(inner) < 3 or abs(_area(inner)) < 1.0:
-        return
-    cx, cy = _centroid(part)
-    ang = rng.uniform(0, math.pi)
-    a = (cx - math.cos(ang) * 8, cy - math.sin(ang) * 8)
-    b = (cx + math.cos(ang) * 8, cy + math.sin(ang) * 8)
-    seg = _clip_segment(inner, a, b)
-    if not seg:
-        return
-    line = [seg[0]]
-    m = 6
-    for t in range(1, m):
-        u = t / m
-        line.append((seg[0][0] + (seg[1][0] - seg[0][0]) * u + rng.uniform(-0.2, 0.2),
-                     seg[0][1] + (seg[1][1] - seg[0][1]) * u + rng.uniform(-0.2, 0.2)))
-    line.append(seg[1])
-    z = min(WALK_TOP - 0.004, max(z_at(*q) for q in line) + 0.014)
-    ribbon(p, line, 0.09, z, (0.27, 0.22, 0.21), slot=0, edge=(0.4, 0.34, 0.32))
+_SHEET_NOISE = Noise(6821)
+
+
+def sheet_paint(X, Y, vein):
+    """The sheet's broad paint at Blender (X, Y) (the same field for every
+    quarter, only the drift differs, so the floor runs on unbroken across
+    the seams): the warm neutral stone, its warm and cool companions in big
+    value groups, the light pooled across each quarter's open middle, soot
+    round the central circle, dust drifted toward the wall, old stains."""
+    n = _SHEET_NOISE
+    X = np.asarray(X, dtype=float)
+    Y = np.asarray(Y, dtype=float)
+    R = np.hypot(X, Y)
+    tint = np.asarray(QUARTER_TINT[vein])
+    base = np.asarray(STONE_BASE) * tint
+    warm = np.asarray(STONE_WARM) * tint
+    cool = np.asarray(STONE_COOL) * tint
+    t = np.clip(0.5 + 1.3 * n.fbm(X * 0.035 + 5.0, Y * 0.035 - 3.0, 1.7, 3), 0.0, 1.0)
+    comp = cool[None, :] + (warm - cool)[None, :] * t[:, None]
+    col = base[None, :] + (comp - base[None, :]) * 0.45
+    # Big painted value groups (squint and the floor still holds its shapes,
+    # M4) and the light pooled across the open middle of each quarter.
+    k = 1.0 + 0.08 * n.fbm(X * 0.032 + 1.0, Y * 0.032, 4.0, 3)
+    k = k * (1.0 + 0.07 * np.exp(-((R - 36.0) ** 2) / 260.0))
+    # Toward the wall the light falls off and the dust drifts in.
+    wall = _smooth(qg.RIM_R - 9.0, qg.RIM_R, R)
+    k = k * (1.0 - 0.1 * wall)
+    col = col * k[:, None]
+    dust = np.clip(n.fbm(X * 0.08 + 9.0, Y * 0.08, 2.2, 3) * 1.6 - 0.15, 0.0, 1.0) * (0.25 + 0.75 * wall)
+    col = _mixc(col, np.asarray(STONE_DUST) * tint, dust * 0.3)
+    stain = np.clip(n.fbm(X * 0.07 - 4.0, Y * 0.07 + 2.0, 6.0, 2) * 2.0 - 0.55, 0.0, 1.0)
+    col = _mixc(col, np.asarray(STONE_STAIN) * tint, stain * 0.22)
+    # Soot fanned round the central circle (the heart's breath, centuries of
+    # it), broken by the wear.
+    soot = (1.0 - _smooth(qg.RING_R + 1.0, qg.RING_R + 9.0, R)) * np.clip(
+        0.55 + 1.2 * n.fbm(X * 0.12 + 3.0, Y * 0.12 - 7.0, 3.3, 3), 0.0, 1.0)
+    col = _mixc(col, np.asarray(STONE_SOOT) * tint, soot * 0.38)
+    return np.clip(col, 0.0, 1.0)
+
+
+def _quarter_outline(i, margin, step=0.5):
+    """Quarter i's walk as one closed polygon (Blender plan, ccw): along
+    the ring's arc, out along its second seam, back along the rim's arc and
+    in along its first seam, `margin` yards short of each seam's line."""
+    s0, s1 = qg.sector(i)
+    r_in, r_out = qg.RING_R + 0.35, qg.RIM_R - 0.02
+
+    def seam(edge, sgn, r):
+        return qg.bp(r, qg.wind(edge + sgn * math.degrees(margin / r), r))
+
+    out = []
+    a0 = s0 + math.degrees(margin / r_in)
+    a1 = s1 - math.degrees(margin / r_in)
+    m = max(4, int(math.radians(a1 - a0) * r_in / step))
+    for k in range(m + 1):
+        out.append(qg.bp(r_in, qg.wind(a0 + (a1 - a0) * k / m, r_in)))
+    r = r_in + step
+    while r < r_out:
+        out.append(seam(s1, -1.0, r))
+        r += step
+    a0 = s1 - math.degrees(margin / r_out)
+    a1 = s0 + math.degrees(margin / r_out)
+    m = max(4, int(math.radians(a0 - a1) * r_out / step))
+    for k in range(m + 1):
+        out.append(qg.bp(r_out, qg.wind(a0 + (a1 - a0) * k / m, r_out)))
+    r = r_out - step
+    while r > r_in:
+        out.append(seam(s0, 1.0, r))
+        r -= step
+    return _ccw(_simplify(out, 0.004))
+
+
+def _floor_sheet(p, i, vein, socks):
+    """Quarter i's share of the one floor (see the section note): a flat
+    sheet over its walk, holed round every socket's broken zone (its pit
+    and fragments carry their own), its broad paint in its vertex colour."""
+    import random
+    rng = random.Random(6830 + i)
+    outline = _quarter_outline(i, SHEET_MARGIN)
+    fields = quarter_fields(i, qg.RING_R + 0.3, qg.RIM_R + 0.05, SHEET_MARGIN - 0.05)
+    step = SHEET_STEP
+    coords = [Vector(q) for q in outline]
+    n = len(outline)
+    edges = [(k, (k + 1) % n) for k in range(n)]
+    # The socket zones as constraint chains (the sheet ends at their jagged
+    # edge; the triangles inside are dropped).
+    for s in socks:
+        m = max(16, int(TAU * s.Z / 0.35))
+        ring = []
+        for k in range(m):
+            a = TAU * k / m
+            rz = s.zone_jag(a) + 0.02
+            ring.append((s.c[0] + math.cos(a) * rz, s.c[1] + math.sin(a) * rz))
+        keep = [inside_quarter(q, fields) for q in ring]
+        idx = {}
+        for k, q in enumerate(ring):
+            if keep[k]:
+                idx[k] = len(coords)
+                coords.append(Vector(q))
+        for k in range(m):
+            j = (k + 1) % m
+            if keep[k] and keep[j]:
+                edges.append((idx[k], idx[j]))
+
+    def clear(q, pad):
+        return all(f(q) > pad for f in fields) and all(not s.contains(q, pad) for s in socks)
+
+    xs = [q[0] for q in outline]
+    ys = [q[1] for q in outline]
+    yy = min(ys) + step * 0.5
+    row = 0
+    while yy < max(ys):
+        xx = min(xs) + step * (0.5 if row % 2 else 0.0)
+        while xx < max(xs):
+            q = (xx + rng.uniform(-0.25, 0.25) * step, yy + rng.uniform(-0.25, 0.25) * step)
+            if clear(q, step * 0.42):
+                coords.append(Vector(q))
+            xx += step
+        yy += step * 0.87
+        row += 1
+    vco, _e, tris, _orig, _oe, _of = delaunay_2d_cdt(coords, edges, [list(range(n))], 1, 1e-6)
+    X = np.array([v.x for v in vco])
+    Y = np.array([v.y for v in vco])
+    col = sheet_paint(X, Y, vein)
+    bm = p.bm
+    verts = [bm.verts.new((float(X[k]), float(Y[k]), SHEET_Z)) for k in range(len(vco))]
+    faces = []
+    for t in tris:
+        cx = (X[t[0]] + X[t[1]] + X[t[2]]) / 3.0
+        cy = (Y[t[0]] + Y[t[1]] + Y[t[2]]) / 3.0
+        if any(s.contains((cx, cy)) for s in socks):
+            continue
+        try:
+            faces.append(bm.faces.new([verts[t[0]], verts[t[1]], verts[t[2]]]))
+        except ValueError:
+            pass
+    with p.as_kind(PAINT):
+        p._paint(faces, (1.0, 1.0, 1.0), 0)
+    which = {v: k for k, v in enumerate(verts)}
+    for f in faces:
+        for loop in f.loops:
+            c = col[which[loop.vert]]
+            loop[p.col] = (float(c[0]), float(c[1]), float(c[2]), 1.0)
+    p.facing(faces, (0, 0, 1))
+    return faces
 
 
 def quarter_floor(bpy, vein):
-    """Kit_Quarter<Vein> (phase 2M): this quarter's share of the one floor,
-    its crackle at the circle's rim and its border light (see the module
-    doc)."""
+    """Kit_Quarter<Vein> (phases 2M, 2N): this quarter's share of the one
+    floor, its crackle at the circle's rim and its border light (see the
+    module doc)."""
     i = qg.ORDER.index(vein)
     seeds = {'breath': 6201, 'quench': 6301, 'hammer': 6101, 'heat': 6401}
     p = HSP('Kit_Quarter' + vein.capitalize(), seed=seeds[vein], ao=0.12, ao_dist=0.35, dust=0.0)
     rng = p.rng
-    fields = _walk_fields(i)
     socks = sockets_in(i)
     paint = StonePainter(vein)
     tones = [_tinted(t, vein) for t in STONE_TONES]
-    nw = Noise(6809)
-    nw2 = Noise(6810)
-    import random
-    lay = random.Random(6811)  # the slabs' own draws, shared by every quarter
-    for idx, cell in enumerate(floor_cells()):
-        crng = random.Random(90001 + idx)  # this stone's own (the same in every quarter)
-        # Draw this stone's choices from the shared stream first, so a stone
-        # cut by a seam is the same stone on both sides of it.
-        d_chip = lay.random()
-        d_join = lay.uniform(0.04, 0.1)
-        d_kind = lay.random()
-        d_tone = lay.randrange(len(tones))
-        d_top = lay.uniform(TOP_LO, TOP_HI)
-        d_tilt = (lay.uniform(-0.004, 0.004), lay.uniform(-0.004, 0.004))
-        d_bevel = lay.uniform(0.12, 0.18)
-        d_h = lay.random()
-        d_crack = lay.random()
-        if not cell:
-            continue
-        bx, by = _centroid(cell)
-        if math.hypot(bx, by) < qg.RING_R - 6.0 or math.hypot(bx, by) > qg.RIM_R + 8.0:
-            continue
-        # Bent by a broad shared field (big slabs never ruler-straight: their
-        # sides bow and kink like hand-laid stone) and a finer one.
-        cell = _warp(_densify(_ccw(cell), 0.6), nw, 0.75, 0.07)
-        cell = _simplify(_ccw(_warp(cell, nw2, 0.18, 0.35)), 0.04)
-        if d_chip < 0.45:
-            cell = _chip_corners(crng, cell, 0.18)
-        cell = _inset(cell, d_join)
-        outline = clip_to_quarter(cell, fields, i, tol=0.08)
-        if not outline:
-            continue
-        for piece in _cut_round_sockets(outline, socks):
-            if d_kind < 0.025 and abs(_area(piece)) < 8.0:
-                _rubble(p, crng, piece, tones, 11)
-                continue
-            parts = _split_broken(crng, piece) if d_kind < 0.09 else [piece]
-            for part in parts:
-                tone = p.vary(tones[d_tone], 0.035)
-                info = SlabInfo(tone, part, d_h)
-                tilt = d_tilt if len(parts) == 1 else (rng.uniform(-0.01, 0.01), rng.uniform(-0.01, 0.01))
-                z_at = painted_slab(p, part, d_top, info, paint, bevel=d_bevel, tilt=tilt, spacing=1.15,
-                                    crown=0.012, lip_k=1.2)
-                if z_at and d_crack < 0.22 and abs(_area(part)) > 8.0:
-                    _hairline(p, rng, part, z_at)
+    _floor_sheet(p, i, vein, socks)
     _rim_crackle(p, rng, i, vein, socks)
     _border_light(p, i)
     for s in socks:
-        frags = socket_pit(p, s, _tinted((0.42, 0.36, 0.34), vein), _tinted(FLOOR_DIRT, vein),
-                           _tinted((0.74, 0.66, 0.6), vein))
-        lay_fragments(p, frags, s, tones, paint, _tinted((0.74, 0.66, 0.6), vein))
+        frags = socket_pit(p, s, _tinted((0.42, 0.37, 0.34), vein), _tinted(FLOOR_DIRT, vein),
+                           _tinted((0.72, 0.66, 0.6), vein))
+        lay_fragments(p, frags, s, tones, paint, _tinted((0.72, 0.66, 0.6), vein))
     return p
 
 
@@ -1161,17 +1125,18 @@ def quarter_heat(bpy):
 # ring), its light's width and its scar's.
 CRACKLE = {
     # Storm crackle: forked lightning, sharp zigzags, many forks.
-    'breath': dict(mains=11, step=(0.45, 1.0), turn=0.95, branch=0.32, reach=(6.0, 13.0), w=0.18, scar=0.36,
+    'breath': dict(mains=14, step=(0.45, 1.0), turn=0.95, branch=0.4, reach=(8.0, 17.0), w=0.3, scar=0.55,
                    scar_col=(0.22, 0.2, 0.27)),
     # Frost cracks: near straight, branching at a frost fern's angles, a
-    # rime of pale stone along them.
-    'quench': dict(mains=10, step=(0.6, 1.0), turn=0.22, branch=0.42, reach=(5.5, 11.5), w=0.15, scar=0.48,
+    # rime of pale stone along them, frost crystals at their forks.
+    'quench': dict(mains=13, step=(0.6, 1.0), turn=0.22, branch=0.45, reach=(7.5, 15.0), w=0.26, scar=0.7,
                    scar_col=(0.78, 0.82, 0.88)),
-    # Earth fissures: few, wide, wandering, a dark scar either side.
-    'hammer': dict(mains=8, step=(0.8, 1.5), turn=0.38, branch=0.16, reach=(7.0, 13.5), w=0.28, scar=0.7,
+    # Earth fissures: few, wide, wandering, a dark scar either side, gold
+    # glinting in them.
+    'hammer': dict(mains=11, step=(0.8, 1.5), turn=0.38, branch=0.2, reach=(9.0, 17.0), w=0.42, scar=1.0,
                    scar_col=(0.2, 0.15, 0.1)),
     # Molten cracks: wide glowing seams over a bed of fire, scorched round.
-    'heat': dict(mains=9, step=(0.7, 1.3), turn=0.42, branch=0.24, reach=(7.0, 13.5), w=0.3, scar=0.85,
+    'heat': dict(mains=12, step=(0.7, 1.3), turn=0.42, branch=0.28, reach=(9.0, 17.0), w=0.46, scar=1.2,
                  scar_col=(0.12, 0.06, 0.04)),
 }
 
@@ -1283,13 +1248,17 @@ def _rim_crackle(p, rng, i, vein, socks):
         if vein == 'heat':
             # The bed of fire under a molten crack (the embers rise off it).
             _ribbon_fade(p, line, cfg['scar'] * 1.4, -0.035, 1.0, fade=(f0, f1 * 0.6), edge_k=0.45)
-    if vein == 'hammer':
-        # Gold glints of the geode crystal broken out along its fissures.
-        for (line, _f0, _f1) in lines[:8]:
-            q = line[min(len(line) - 1, 2)]
-            with p.as_kind(PAINT):
-                pale_crystal(p, (q[0], q[1], -0.01), (rng.uniform(-0.4, 0.4), rng.uniform(-0.4, 0.4), 1.0),
-                             0.06, rng.uniform(0.08, 0.12), squash=0.5)
+    if vein in ('hammer', 'quench'):
+        # The Hammer: gold glints of the geode crystal broken out along its
+        # fissures; the Quench: frost crystals grown at its cracks' forks.
+        for (line, f0, _f1) in lines:
+            for j in ((2, 5) if f0 > 0.95 else (1,)):
+                if j >= len(line) or rng.random() < 0.3:
+                    continue
+                q = line[j]
+                with p.as_kind(PAINT):
+                    pale_crystal(p, (q[0], q[1], -0.01), (rng.uniform(-0.4, 0.4), rng.uniform(-0.4, 0.4), 1.0),
+                                 0.05, rng.uniform(0.09, 0.15), squash=0.5)
     return lines
 
 
@@ -1308,7 +1277,14 @@ def _border_light(p, i):
             r += 0.5
         rr = qg.RIM_R - 0.25
         line.append(qg.bp(rr, qg.wind(edge + sgn * math.degrees(off / rr), rr)))
-        faces = ribbon(p, line, 0.16, SKIN + 0.002, BORDER_TAG, slot=GLOW, taper=False)
+        # Phase 2N: a bright core over a dimmer halo (the halo tagged at a
+        # lower value: the runtime reads its value as the light's strength).
+        halo = tuple(c * BORDER_HALO for c in BORDER_TAG)
+        faces = ribbon(p, line, 0.5, SKIN + 0.001, halo, slot=GLOW, taper=False)
+        for f in faces:
+            for loop in f.loops:
+                loop[p.col] = (*halo, 1.0)
+        faces = ribbon(p, line, 0.17, SKIN + 0.003, BORDER_TAG, slot=GLOW, taper=False)
         for f in faces:
             for loop in f.loops:
                 loop[p.col] = (*BORDER_TAG, 1.0)
@@ -1375,6 +1351,26 @@ def heart_ridge(bpy):
                         rot(rz=ang + rng.uniform(-0.22, 0.22))), 0.32)
         if j:
             notches.append(a)
+    # Phase 2N: a chipped spine. Plates of the same rock heaved up along
+    # the crest (sharp, broken, leaning out of line), and bites knocked out
+    # of both arrises all along it.
+    rr = r0 + 1.0
+    while rr < r1 - 0.8:
+        q, ang = at(rr, rng.uniform(-0.2, 0.2))
+        ring = min(1.0, max(0.45, (rr - qg.RING_R + 0.8) / 2.0))
+        h = rng.uniform(0.32, 0.48) * ring
+        f.put(('r1', 'r3', 'r0')[int(rr) % 3],
+              block(np.random.default_rng(int(rr * 100)), (q[0], q[1], h * 0.5 - 0.1),
+                    (rng.uniform(0.9, 1.6), rng.uniform(0.55, 0.85), h + 0.2), cuts=8, chamfer=(0.7, 0.92),
+                    R=rot(rz=ang + rng.uniform(-0.35, 0.35), rx=rng.uniform(-0.25, 0.25)), top_tilt=0.5), 0.12)
+        rr += rng.uniform(0.9, 1.6)
+    rr = r0 + 0.6
+    while rr < r1 - 0.5:
+        q, _ = at(rr, rng.choice((-1.0, 1.0)) * rng.uniform(0.9, 1.5))
+        f.sub(Ellipsoid((q[0], q[1], rng.uniform(0.15, 0.4)), (rng.uniform(0.18, 0.4), rng.uniform(0.15, 0.3),
+                                                              rng.uniform(0.14, 0.26)),
+                        rot(rz=rng.uniform(0, TAU), rx=rng.uniform(-0.5, 0.5))), 0.05)
+        rr += rng.uniform(0.35, 0.8)
     # Faceted and chipped: broad planes and sharp breaks, never smooth.
     f.displace(lambda X, Y, Z: 0.07 * n1.fbm(X * 0.6, Y * 0.6, Z * 0.6, 3)
                + 0.09 * (n1.ridged(X * 1.3, Y * 1.3, Z * 1.6, 2) - 0.5), band=0.6)
@@ -1638,6 +1634,33 @@ def heart_dais(bpy):
             q0 = qg.bp(RIM_OUT - 0.6, b)
             q1 = qg.bp(RIM_OUT + 0.9, b + rng.uniform(-4.0, 4.0))
             f.put('r1', Polyline([(q0[0], q0[1], -0.1), (q1[0], q1[1], -0.3)], [0.75, 0.25]), 0.35)
+    # Phase 2N: layered. A lower course of broken rock round its outer foot
+    # (a step down to the floor), and an inner lip a step under the crest.
+    b = 0.0
+    k = 0
+    while b < 360.0:
+        L = rng.uniform(1.4, 2.4)
+        q = qg.bp(RIM_OUT - 0.25 + rng.uniform(-0.15, 0.15), b)
+        f.put(('r2', 'r3', 'r1')[k % 3],
+              Ellipsoid((q[0], q[1], -0.12), (L * 0.6, rng.uniform(0.75, 0.95), rng.uniform(0.3, 0.4)),
+                        rot(rz=math.radians(b) + rng.uniform(-0.2, 0.2))), 0.2)
+        b += math.degrees(L / RIM_OUT) * rng.uniform(0.85, 1.05)
+        k += 1
+    b = 0.0
+    while b < 360.0:
+        L = rng.uniform(1.2, 2.0)
+        q = qg.bp(WELL_R + 0.55 + rng.uniform(-0.1, 0.1), b)
+        f.put('r2', Ellipsoid((q[0], q[1], 0.02), (L * 0.6, rng.uniform(0.5, 0.65), rng.uniform(0.38, 0.46)),
+                              rot(rz=math.radians(b) + rng.uniform(-0.2, 0.2))), 0.2)
+        b += math.degrees(L / WELL_R) * rng.uniform(0.85, 1.05)
+    # Chipped: bites knocked out of its arrises all round.
+    for _ in range(110):
+        b = rng.uniform(0.0, 360.0)
+        rr = RIM_CREST_R + rng.choice((-1.0, 1.0)) * rng.uniform(0.9, 1.6)
+        q = qg.bp(rr, b)
+        f.sub(Ellipsoid((q[0], q[1], rng.uniform(0.25, 0.6)), (rng.uniform(0.2, 0.45), rng.uniform(0.15, 0.35),
+                                                              rng.uniform(0.15, 0.3)),
+                        rot(rz=rng.uniform(0, TAU), rx=rng.uniform(-0.5, 0.5))), 0.06)
     f.displace(lambda X, Y, Z: 0.07 * n1.fbm(X * 0.6, Y * 0.6, Z * 0.6, 3)
                + 0.1 * (n1.ridged(X * 1.3, Y * 1.3, Z * 1.6, 2) - 0.5), band=0.6)
     # The groove round its crest, and the cracks across its notches.
@@ -1699,6 +1722,45 @@ def heart_dais(bpy):
         for q0, q1 in zip(pts, pts[1:]):
             strip(p, (q0[0], q0[1]), (q1[0], q1[1]), rng.uniform(0.07, 0.12), q0[2] + 0.012, (0.9, 0.9, 0.9),
                   slot=GLOW, z1=q1[2] + 0.012)
+    # Phase 2N: where each quarter's element touches the rim, the rock is
+    # cracked through and lit from inside: forked cracks climbing its outer
+    # face from the floor over its crest (the runtime colours each with the
+    # quarter it opens onto and blazes it with its quarter).
+    for i in range(4):
+        s0, s1 = qg.sector(i)
+        for k in range(14):
+            phi = s0 + 5.0 + (s1 - s0 - 10.0) * (k + rng.uniform(0.15, 0.85)) / 14.0
+            b0 = qg.wind(phi, qg.RING_R)
+            pts = []
+            rr = RIM_OUT + 0.2
+            bb = b0
+            while rr > RIM_CREST_R - rng.uniform(0.2, 1.2):
+                q = qg.bp(rr, bb)
+                z = surf(q)
+                if z is not None:
+                    pts.append((q[0], q[1], z))
+                rr -= rng.uniform(0.25, 0.4)
+                bb += math.degrees(rng.uniform(-0.18, 0.18) / rr)
+            w0 = rng.uniform(0.1, 0.17)
+            for j, (q0, q1) in enumerate(zip(pts, pts[1:])):
+                t = j / max(1, len(pts) - 2)
+                strip(p, (q0[0], q0[1]), (q1[0], q1[1]), w0 * (1.0 - 0.55 * t), q0[2] + 0.014,
+                      (1.0, 1.0, 1.0), slot=GLOW, z1=q1[2] + 0.014)
+            if len(pts) > 4 and rng.random() < 0.6:
+                j = rng.randrange(1, len(pts) - 2)
+                fork = [pts[j]]
+                q = pts[j]
+                ang = math.atan2(q[1], q[0]) + rng.choice((-1.0, 1.0)) * rng.uniform(0.6, 1.1)
+                for _ in range(3):
+                    nx = fork[-1][0] + math.cos(ang) * 0.35
+                    ny = fork[-1][1] + math.sin(ang) * 0.35
+                    z = surf((nx, ny))
+                    if z is None:
+                        break
+                    fork.append((nx, ny, z))
+                for q0, q1 in zip(fork, fork[1:]):
+                    strip(p, (q0[0], q0[1]), (q1[0], q1[1]), w0 * 0.5, q0[2] + 0.014, (0.85, 0.85, 0.85),
+                          slot=GLOW, z1=q1[2] + 0.014)
     # Crystal breaking out of its inner face over the well, leaning in.
     for k in range(40):
         b = 9.0 * k + rng.uniform(-3.0, 3.0)

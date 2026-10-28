@@ -1,4 +1,4 @@
-// The Anvil of the World's walk in the Heart kit (phases 2K to 2M, design doc
+// The Anvil of the World's walk in the Heart kit (phases 2K to 2N, design doc
 // section 5.21; docs/design/raid/kit/quarter_pieces.py and landmark_pieces.py,
 // shipped in public/models/props/smith_heart_heart_kit.glb), pinned against
 // the sim's geometry core (src/sim/content/smith_heart_quarters.ts):
@@ -7,8 +7,9 @@
 //     under the floor telegraphs' lift (nothing hides a footprint);
 //   - phase 2M: ONE floor: the four quarters' stones within a few percent of
 //     each other in value, each drifted toward its element in hue; painted
-//     stone (many painted vertices, never one flat colour), never a lit grid
-//     (the joints' dirt darker than the stones);
+//     stone (since phase 2N one flat sheet carrying the broad paint, the
+//     slabs painted on it at runtime), never a lit grid (the joints' dirt
+//     darker than the stones);
 //   - the element on the edges: each quarter's crackle in its glow slot
 //     bursting out of the central circle's rim a short way into it (the
 //     Heat's over a bed of fire), its border light along both its seams;
@@ -18,8 +19,9 @@
 //   - the central circle: a raised rim of dark rock between the well's edge
 //     and the ring, walkable, its light lit by the ring; the well's floor
 //     flat on the walk inside it, its glow faces the mist tag;
-//   - each quarter's wall landmark past the rim at its quarter's middle,
-//     great and tall, never over the walk;
+//   - each quarter's wall landmark past the rim, since phase 2N its
+//     quarter's outer wall (running along the rim from seam to seam), great
+//     and tall, never over the walk;
 //   - the arrival's sockets: the kit's list is the colossus's, each carved
 //     into the quarter it lies in as a pit;
 //   - the arrival's torn rocks rest in the quarters, never on a seam.
@@ -35,8 +37,12 @@ import {
   ASSET,
   SMITH_HEART_HEART_KIT_PIECES,
 } from '../scripts/assets/smith_heart_heart_kit/build.mjs';
+import { HEART_FLOOR_LOOK } from '../src/render/smith_heart/heart_floor_glsl';
 import { HEART_LANDMARK_PIECES } from '../src/render/smith_heart/heart_landmarks';
-import { HEART_LANDMARK_FRAME } from '../src/render/smith_heart/heart_landmarks_core';
+import {
+  HEART_LANDMARK_FRAME,
+  HEART_LANDMARK_SPAN,
+} from '../src/render/smith_heart/heart_landmarks_core';
 import { HEART_QUARTER_PIECES, HEART_RIDGE_PIECES } from '../src/render/smith_heart/heart_quarters';
 import { HEART_RING_LOOK } from '../src/render/smith_heart/heart_quarters_core';
 import { COLOSSUS_PIECES, colossusRestPoint } from '../src/render/smith_heart_fx/final_fx_core';
@@ -191,8 +197,10 @@ describe('the four quarters in the kit', () => {
         const border = glow.filter((_, i) => gc[i][1] - gc[i][0] > 0.2);
         const crackle = glow.filter((q, i) => gc[i][1] - gc[i][0] <= 0.2 && q[1] > 0.01);
         expect(crackle.length, `${piece} crackle`).toBeGreaterThan(150);
+        // Phase 2N: thicker and reaching further out (still the edge, never
+        // the open middle of the quarter).
         for (const [x, , z] of crackle)
-          expect(Math.hypot(x, z), `${piece} crackle`).toBeLessThan(ringR + 15);
+          expect(Math.hypot(x, z), `${piece} crackle`).toBeLessThan(ringR + 20);
         // It bursts out of the rim: some of it right at its foot.
         expect(
           crackle.some(([x, , z]) => Math.hypot(x, z) < ringR + 1),
@@ -207,7 +215,8 @@ describe('the four quarters in the kit', () => {
           const near = [0, 1, 2, 3]
             .map((k) => ({ k, d: heartRidgeDistance(k, p.x, p.z) }))
             .sort((u, w) => u.d - w.d)[0];
-          expect(near.d, `${piece} border`).toBeLessThan(ridgeHalfWidth + 0.5);
+          // Phase 2N: a core over a softer halo a little wider.
+          expect(near.d, `${piece} border`).toBeLessThan(ridgeHalfWidth + 0.7);
           sides.add(near.k);
         }
         expect(sides.size, piece).toBe(2);
@@ -283,12 +292,25 @@ describe('the four quarters in the kit', () => {
       expect((warm('hammer') / warm('heat')) ** (1 / 2.2)).toBeLessThan(1.05);
       for (const vein of SMITH_HEART_VEINS) {
         const t = tops(vein).map(lum);
-        // Painted: thousands of painted points, their value drifting
-        // (never one flat colour per stone).
-        expect(t.length, vein).toBeGreaterThan(3000);
+        // Painted: since phase 2N the slabs themselves are painted at
+        // runtime (heart_floor_glsl.ts) over one flat sheet; the sheet's
+        // own points carry the broad paint, their value drifting (never
+        // one flat colour).
+        expect(t.length, vein).toBeGreaterThan(1200);
         const m = mean(t);
         const sd = Math.sqrt(mean(t.map((x) => (x - m) * (x - m))));
-        expect(sd / m, vein).toBeGreaterThan(0.08);
+        expect(sd / m, vein).toBeGreaterThan(0.06);
+        // One flat sheet: the open floor's points all at the sheet's
+        // height (the runtime paints only there).
+        const pts = points(HEART_QUARTER_PIECES[vein], 'KitStone').filter(
+          ([x, , z]) => Math.hypot(x, z) > ringR + 19 && Math.hypot(x, z) < rimR - 1,
+        );
+        const sheet = pts.filter(([, y]) => Math.abs(y - HEART_FLOOR_LOOK.sheetY) < 0.004);
+        expect(sheet.length, vein).toBeGreaterThan(400);
+        // Spread over the open floor out to the wall.
+        expect(Math.max(...sheet.map(([x, , z]) => Math.hypot(x, z))), vein).toBeGreaterThan(
+          rimR - 2,
+        );
       }
       // The joints' dirt (the rim piece's bed under the walk) darker than
       // the stones of the quarter round it: no lit grid.
@@ -432,14 +454,25 @@ describe('the four quarters in the kit', () => {
             n++;
           }
         }
-        // Great: well over a body, reading over the balustrade.
-        expect(top, piece).toBeGreaterThan(10);
-        // At its quarter's middle (its altar's bearing).
-        const b = ((Math.atan2(sx / n, sz / n) * 180) / Math.PI + 360) % 360;
+        // Great: well over a body, reading over the balustrade; since
+        // phase 2N a cliff over twenty yards high at its crown.
+        expect(top, piece).toBeGreaterThan(20);
+        // Its quarter's outer wall (phase 2N): its mass in its own quarter,
+        // running along the rim over most of the quarter's arc, from just
+        // past the seam's horn behind it nearly to the next.
         const want = HEART_LANDMARK_FRAME.bearing[vein];
-        expect(Math.abs(((b - want + 540) % 360) - 180), piece).toBeLessThan(6);
+        const [d0, d1] = HEART_LANDMARK_SPAN[vein];
         const mid = at(sx / n, sz / n);
         expect(heartQuarterAt(mid.x, mid.z)).toBe(vein);
+        const offs = pts
+          .filter(([, y]) => y > 2)
+          .map(([x, , z]) => (((Math.atan2(x, z) * 180) / Math.PI - want + 540) % 360) - 180);
+        expect(Math.min(...offs), piece).toBeLessThan(d0 + 6);
+        expect(Math.max(...offs), piece).toBeGreaterThan(d1 - 6);
+        expect(d1 - d0, piece).toBeGreaterThan(50);
+        // Never across a seam's horn (at -25 and +65 round from the altar).
+        expect(Math.min(...offs), piece).toBeGreaterThan(-25);
+        expect(Math.max(...offs), piece).toBeLessThan(65);
         expect(points(piece, 'KitGlow').length, piece).toBeGreaterThan(100);
       }
       // The Quench's is ice (the kit's ice slot).
