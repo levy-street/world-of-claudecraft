@@ -956,7 +956,7 @@ heaving, and a frosty breath in the player's own ear as their bar passes three q
 The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`);
 its voice is a later audition.
 
-### 5.21 The Anvil of the World's four quarters (phases 2K to 2M)
+### 5.21 The Anvil of the World's four quarters (phases 2K to 2N)
 
 The owner's decision (27 Oct 2026): the final boss fights on the Anvil of the World split
 into FOUR QUARTERS by four curved ridges set in a pinwheel round a CENTRAL RING. Each quarter
@@ -1181,6 +1181,90 @@ the landmarks past the rim at their quarters' middles), `tests/smith_heart_quart
 well and the rim's draw, the spots and the bolts), `tests/smith_heart_heart_kit.test.ts` (the
 roots out of the landmarks, the bridge at the new terrace) and the areas, route and render-core
 tests at the new size.
+
+**Phase 2N: the finish raised to AAA (the owner's verdict on 2M: "Hazlo mas AAA").** The
+composition, the sizes, the geometry core, the states, the dev verbs and the fight are 2M's;
+only the finish changed, point by point:
+
+- **The floor.** 2M's Voronoi stones (about 6.4 yd apart, every joint the same dark line) read
+  as pink tiles. Each quarter's share of the one floor is now one flat sheet
+  (`quarter_pieces.py` `_floor_sheet`, `SHEET_Z`) carrying only the broad paint (`sheet_paint`:
+  a warm neutral stone drawn from 2M's pink toward a sandy grey, its big value groups, the
+  light pooled across each quarter's open middle, soot fanned round the circle, dust drifted
+  toward the wall), and the stone is painted on it at runtime (`heart_floor_glsl.ts`, the
+  material `heart_floor.ts`, `HEART_FLOOR_LOOK`): fewer, much larger slabs of varied sizes
+  (a weighted cell field about 8.4 yd across over a bowed plan, laid once over the whole walk
+  so the joints run on across the seams); joints thin and inconsistent (a share fading away
+  along their run, a few deep cracks, the rest broken here and there, chipped where an arris
+  broke); each slab its own value and a touch of hue, a soft pillow of light, a painted light
+  across it, a pale worn arris on its lit side and a darker one away from it, brush strokes
+  along its grain, now and then a hairline crack, a slab broken in two or a patch of small
+  mended stones; worn paths polished pale (round the circle, in from the bridge, out to each
+  altar), soot smudges, dust in the joints toward the wall. On the standard tier the arris and
+  the cracks bend the lit normal and the paths are a touch glossier; the fine detail fades
+  with the pixel's footprint, so the raid camera sees a calm floor and a close one holds
+  detail. Room-local (the vertex's own position), only on the flat sheet (the sockets' tipped
+  fragments keep their own paint); the low tier drops the strokes and the hairlines, the
+  Lambert tier keeps the slabs and the joints.
+- **The wall landmarks.** Each is now its quarter's outer wall (`landmark_pieces.py` `SPAN`,
+  `HEART_LANDMARK_SPAN`): a long broken cliff of the mountain's rock running along the rim from
+  just past the seam's horn behind it nearly to the next (68 degrees of the rim; the Hammer's
+  53, stopping short of the Heart Bridge), low at the lip and climbing back to the crown (20
+  to 30 yd), great heaved blocks of every size staggered and leaning back, its foot heaved down
+  into the chasm under the lip. The Heat: four bundles of basalt columns, the tallest round a
+  crater of lava, lava running down four channels to the lip and falling into the chasm, more
+  lava pouring off both flanks (five falls), veins of fire in the rock. The Hammer: a stepped
+  cliff of ochre granite split by four great clusters of golden crystal (the greatest, 16 yd,
+  bursting toward the platform behind the altar), gold seams down its faces. The Quench: a
+  frost-granite cliff under a forest of fourteen ice spires (up to 30 yd), four frozen falls of
+  long icicles hanging down its face, over the lip and on down the keel. The Breath: storm
+  stone split down its middle, the split's walls veined violet, its halves rising into two
+  great twisted horns (31 and 29 yd) curling toward each other over the split, four lesser
+  horns along the wall, the lightning arcing across the split between the great pair, between
+  the others and down into the quarter (`heartBreathBolts`, thicker and more often). The
+  balustrade opens along each landmark's whole run, so the cliff meets the walk. Awake, the air
+  is heavier and reaches higher (more embers, smoke and motes, taller plumes, broader halos).
+- **The central circle.** The rim is layered (a lower course of broken rock round its outer
+  foot, the crest, an inner lip a step under it) and chipped all round, and where each
+  quarter's element touches it the rock is cracked through and lit (forked cracks climbing its
+  outer face, in the colour of the quarter each side opens onto, blazing with it). The well is
+  marched down a funnel of rock 9 yd deep falling away in seven broken courses, each course's
+  lip catching the heart's light from below (from above the courses read as rings stepping down
+  into the dark), the heart's glow welling up the shaft and pulsing with its beat, six layers of
+  mist (four on the low tier) each drifting and turning its own way, warmer the deeper. The
+  crackle out of the rim is wider and reaches further (8 to 17 yd), with frost crystals at the
+  Quench's forks and gold at the Hammer's, and each quarter's wash carries its element's own
+  life layered under it round the rim (`washFrag`: the storm's forks flashing, frost glinting and
+  spreading, the tremor's rings with gold glinting in them, molten glow flowing out with
+  embers).
+- **The seams.** A chipped spine (plates of rock heaved up along the crest, bites knocked out
+  of both arrises), and each quarter's border light a bright core over a softer halo
+  (`BORDER_HALO`), so every seam reads crisp from above in the colours of the two quarters it
+  bounds.
+- **The room around.** With the landmarks as the quarters' walls, the rest of the frame closes
+  in (`heart_surround.ts`): the abyss's glow under the platform's lip (a warm skirt of light hung
+  under the rim, brightest deep down, and a broad pool of it far below), and a ring of warm dusk
+  haze between the room and the crown so the crown steps back in layers; the core's shafts of
+  light rise close round the lip in the gaps the landmarks leave by each seam's horn
+  (`HEART_CORE_SHAFTS`), never through one.
+- **The crossing and the final phase.** The crossing's wall of light along the seam stands
+  nearly twice as tall and its shockwave is broader. The final phase's column of heart light is
+  no longer one flat cylinder (`heart_ring_column.ts`): three nested sheaths, each narrowing as it
+  rises and turning its own way, streamed with swirling bands that climb, a pulse running up
+  them with every heartbeat, crystal shards torn off the heart riding the column up in spirals,
+  flashing as they turn; the rim, the well, all four edges and all four landmarks blaze with it.
+
+The rules stand: which quarter is awake draws on every tier (the low tier keeps a share of the
+air and the shards); every new material is built with the interior (no light, no texture, no
+new floor rung: the floor paint is the floor's own material, opaque, under every telegraph);
+every point goes through `modelViewMatrix` or the vertex's own room-local position. The kit
+stays inside its 2M budget (285k triangles, 6.25 MB): the floor's slabs left the geometry for
+the shader, which paid for the bigger landmarks. Pinned by
+`tests/smith_heart_room_aaa.test.ts` (the floor's paint, the washes, the well, the column, the
+surround, the shafts in the gaps, the landmarks' runs and the Breath's horns against their
+Blender pieces), `tests/smith_heart_quarters_kit.test.ts` (one flat sheet per quarter, the
+landmarks as the quarters' walls, the crackle's longer reach) and
+`tests/smith_heart_quarters_look.test.ts` (the spots along each landmark's run).
 
 ## 6. Set pieces (phase 2 specs)
 
