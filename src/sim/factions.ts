@@ -2,6 +2,7 @@
 // allied faction identity, zone attribution, standing tiers, and reputation
 // awards. Pure functions; zero RNG, no wall clock, no DOM/Three.js imports.
 
+import { worldPvpReputationAmount } from './pvp/world_pvp_rewards_rules';
 import type { PlayerMeta } from './sim';
 import type { WorldQuestDef } from './types';
 
@@ -298,19 +299,25 @@ export interface AwardStandingResult {
   readonly capped: boolean;
 }
 
-/** Award faction reputation to PlayerMeta, respecting level caps. Pure state mutation. */
+/**
+ * Award faction reputation to PlayerMeta, respecting level caps. Pure state mutation.
+ * Gameplay awards pass `worldPvpBonus: !ctx.worldPvpDisabled` so a fully armed
+ * `/pvp` flag earns its bonus; dev grants omit it and stay exact.
+ */
 export function awardFactionReputation(
   meta: PlayerMeta,
   factionId: FactionId,
   amount: number,
   playerLevel: number,
+  opts: { readonly worldPvpBonus?: boolean } = {},
 ): AwardStandingResult {
   if (!meta.factions) {
     meta.factions = freshFactionReputation();
   }
   const current = meta.factions[factionId] ?? 0;
   const cap = maxStandingForLevel(playerLevel);
-  const add = Math.max(0, Math.floor(amount));
+  const boosted = opts.worldPvpBonus ? worldPvpReputationAmount(amount, meta.worldPvp) : amount;
+  const add = Math.max(0, Math.floor(boosted));
   const newTotal = Math.min(cap, current + add);
   const gained = newTotal - current;
   meta.factions[factionId] = newTotal;

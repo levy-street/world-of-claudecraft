@@ -3451,6 +3451,7 @@ export const es: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Gana títulos permanentes tras {thresholds} de juego con JcJ del mundo activado en el mundo abierto o en instancias JcJ. Desconectarte, morir, las instancias JcE y los santuarios pausan el contador. Desactivarlo lo reinicia.",
       "rewardPaused": "Racha JcJ actual: {time} de juego (en pausa en un santuario)",
       "rewardPausedDead": "Racha JcJ actual: {time} de juego (en pausa mientras estás muerto)",

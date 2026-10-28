@@ -3451,6 +3451,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Optjen permanente titler efter {thresholds} spilletid med verdens-PvP slået til i den åbne verden eller i PvP-instanser. Udlogning, død, PvE-instanser og helligdomme sætter tiden på pause. Slår du PvP fra, nulstilles den.",
       "rewardPaused": "Nuværende PvP-stime: spillet {time} (sat på pause i en helligdom)",
       "rewardPausedDead": "Nuværende PvP-stime: spillet {time} (sat på pause, mens du er død)",

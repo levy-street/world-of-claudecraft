@@ -3451,6 +3451,7 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Nhận danh hiệu vĩnh viễn sau {thresholds} thời gian chơi với PvP Thế Giới bật trong thế giới mở hoặc phụ bản PvP. Đăng xuất, chết, phụ bản PvE và thánh địa tạm dừng bộ đếm. Tắt PvP sẽ đặt lại bộ đếm.",
       "rewardPaused": "Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong thánh địa)",
       "rewardPausedDead": "Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng khi chết)",

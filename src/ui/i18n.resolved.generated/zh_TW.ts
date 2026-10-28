@@ -3451,6 +3451,7 @@ export const zh_TW: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "保持世界PvP開啟可多獲得{percent}的經驗值和陣營聲望。請求關閉時，加成立即停止。",
       "rewardTitles": "開啟世界PvP時，在開放世界或PvP副本中的遊戲時間達到{thresholds}後可獲得永久稱號。登出遊戲、死亡、PvE副本和安全區會暫停計時。關閉PvP會重設計時。",
       "rewardPaused": "目前PvP連續遊戲時間：{time}（在安全區暫停）",
       "rewardPausedDead": "目前PvP連續遊戲時間：{time}（死亡期間暫停）",

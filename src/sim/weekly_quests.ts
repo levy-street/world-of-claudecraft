@@ -169,6 +169,7 @@ export function commendWeeklyQuest(ctx: SimContext, factionId: string, pid?: num
     factionId as FactionId,
     WEEKLY_QUEST_REWARD.commendationStanding,
     player.level,
+    { worldPvpBonus: !ctx.worldPvpDisabled },
   );
   if (result.gained <= 0) return;
   progress.commended = factionId;

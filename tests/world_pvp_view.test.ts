@@ -26,6 +26,10 @@ import {
   worldPvpDefeatLine,
   worldPvpKillLine,
 } from '../src/sim/pvp/world_pvp';
+import {
+  WORLD_PVP_REPUTATION_BONUS,
+  WORLD_PVP_XP_BONUS,
+} from '../src/sim/pvp/world_pvp_rewards_rules';
 import type { Entity } from '../src/sim/types';
 import { ArenaWindow } from '../src/ui/arena_window';
 import {
@@ -140,6 +144,11 @@ describe('buildWorldPvpWindowView', () => {
 });
 
 describe('worldPvpBodyHtml', () => {
+  it('names one bonus percent, so the XP and reputation bonuses must match', () => {
+    expect(WORLD_PVP_XP_BONUS).toBe(0.1);
+    expect(WORLD_PVP_REPUTATION_BONUS).toBe(WORLD_PVP_XP_BONUS);
+  });
+
   it('formats the disarm clock as m:ss through the formatters', () => {
     setLanguage('en');
     expect(disarmClockText(300)).toBe('5:00');
@@ -164,6 +173,9 @@ describe('worldPvpBodyHtml', () => {
     expect(down).toContain('5g'); // the stake cap, through the money formatter
     expect(down).toContain('10%'); // the fraction, through the percent formatter
     expect(down).toContain('/pvp toggles the flag');
+    expect(down).toContain(
+      '<li>Keep World PvP on to earn 10% more experience and faction reputation. Bonuses stop when you request to switch off.</li>',
+    );
     expect(down).toContain('data-focus-key="wpvp-action"');
     const confirming = worldPvpBodyHtml(
       buildWorldPvpWindowView({ info: info(), honor: 3, confirming: true }),
@@ -791,7 +803,7 @@ describe('World PvP reward display', () => {
     expect(view(undefined)).toMatchObject({ rewardPause: null });
   });
 
-  it('displays the title streak rules, without progress in the repaint signature', () => {
+  it('displays the flag bonus and title streak rules, without progress in the repaint signature', () => {
     setLanguage('en');
     const first = buildWorldPvpWindowView({
       info: info({ flagged: true, rewardSeconds: 3600 }),
@@ -805,7 +817,7 @@ describe('World PvP reward display', () => {
     });
     expect(first.sig).toBe(next.sig);
     const html = worldPvpBodyHtml(first);
-    expect(html).not.toContain('more experience and faction reputation');
+    expect(html).toContain('earn 10% more experience and faction reputation');
     expect(html).toContain('with World PvP on in the open world or in PvP instances');
     expect(html).toContain('Logout, death, PvE instances and sanctuaries pause the timer');
     expect(html).toContain('Switching off resets it');

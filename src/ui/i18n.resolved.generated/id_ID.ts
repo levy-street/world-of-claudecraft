@@ -3451,6 +3451,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Dapatkan gelar permanen setelah {thresholds} waktu bermain dengan PvP Dunia aktif di dunia terbuka atau instans PvP. Keluar, kematian, instans PvE, dan suaka menjeda penghitung. Menonaktifkannya mengatur ulang penghitung.",
       "rewardPaused": "Rentetan PvP saat ini: {time} dimainkan (dijeda di suaka)",
       "rewardPausedDead": "Rentetan PvP saat ini: {time} dimainkan (dijeda saat mati)",

@@ -19037,6 +19037,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.worldPvp.realmDisabled'
   | 'hudChrome.worldPvp.record'
   | 'hudChrome.worldPvp.repeatLine'
+  | 'hudChrome.worldPvp.rewardBonus'
   | 'hudChrome.worldPvp.rewardPaused'
   | 'hudChrome.worldPvp.rewardPausedDead'
   | 'hudChrome.worldPvp.rewardPausedInstance'
