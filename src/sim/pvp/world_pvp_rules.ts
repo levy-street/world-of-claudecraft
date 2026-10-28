@@ -113,6 +113,21 @@ export function worldPvpPairHostile(
 }
 
 /**
+ * Is a stealthed player exposed to the open world's fights where they stand,
+ * so that any stranger could become their enemy at will? True on free-for-all
+ * ground (stepping in makes anyone hostile) and for a flagged player on
+ * contested ground (raising the flag is instant). False in a sanctuary, where
+ * nobody can fight. The observation rule uses it to hide such a player from
+ * every non-group viewer: a viewer who is not hostile YET must not see what a
+ * hostile one cannot, or dropping the flag becomes a way to scout stealthers,
+ * re-flag and strike.
+ */
+export function worldPvpStealthExposed(stealthed: Entity, zone: WorldPvpZonePolicy): boolean {
+  if (zone === 'sanctuary') return false;
+  return zone === 'ffa' || !!stealthed.pvpFlag;
+}
+
+/**
  * Does landing a hostile hit mark the attacker (raise their flag)? Only a hit
  * that needed no flag at all can, and that is the free-for-all arm: an UNFLAGGED
  * attacker hitting an UNFLAGGED player. The other three owner cases fall out of
