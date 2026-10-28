@@ -44,7 +44,10 @@ every new piece of conquerable content) follows; `design/reliquary.md` is the sa
 kind of living authoring contract for Reliquary pages (new conquerable unique loot
 authors its pages in the SAME change, pinned by `tests/reliquary_content.test.ts`);
 `design/warfare.md` is the shipped PvP honor/rating reference that
-`src/sim/pvp/CLAUDE.md` requires be kept current. `design/design-language/` holds the
+`src/sim/pvp/CLAUDE.md` requires be kept current; `design/art-direction.md` is the living
+art bible (Painterly World, Painted Actors) that every model, texture, zone look and
+encounter room is reviewed against, with its reference images and their provenance in
+`design/art-direction/`. `design/design-language/` holds the
 approved desktop reference renders (images only, no local doc) that the repo-root
 `DESIGN.md` design-language spec names as its primary references and links by path,
 so keep the filenames stable. **TRAP:**
