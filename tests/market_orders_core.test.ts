@@ -163,6 +163,19 @@ describe('orderCountFromInput', () => {
 });
 
 describe('orderableItem / orderableItemById', () => {
+  it('excludes tracked Clockreel but retains plain-source rare Stormreel', () => {
+    expect(orderableItemById('clockreel_fishing_rod')).toBeNull();
+    expect(orderableMatches('Clockreel Fishing Rod', (item) => item.name)).toEqual([]);
+    expect(orderableItemById('stormreel_fishing_rod')).toBe(ITEMS.stormreel_fishing_rod);
+  });
+
+  it('keeps tracked-quality stackables and bags eligible, matching the grant rule', () => {
+    const stackable = item('stackable', { quality: 'epic', kind: 'potion', stackSize: 20 });
+    const bag = item('bag', { quality: 'epic', kind: 'bag' });
+    expect(orderableItem(stackable)).toBe(true);
+    expect(orderableItem(bag)).toBe(true);
+  });
+
   const catalog: Record<string, ItemDef> = {
     plain: item('plain'),
     q: item('q', { kind: 'quest' } as Partial<ItemDef>),
