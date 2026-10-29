@@ -6047,7 +6047,7 @@ export class Sim {
       // Show-jumping race driver: per-player, server-authoritative, rng-free
       // (runs after movement so prevPos -> pos is this tick's ridden segment).
       this.ctx.tickMountRace(meta);
-      updateTimers(p);
+      updateTimers(p, this.ctx);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
       lap?.('p.auras');

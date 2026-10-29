@@ -53,6 +53,42 @@ describe('/dev god cheat', () => {
     expect(p.devGod).toBe(false);
   });
 
+  it('keeps every cooldown clear while god mode is on', () => {
+    const { sim, pid } = godSim();
+    const p = sim.player;
+    p.cooldowns.set('charge', 15);
+    p.potionCooldownUntil = sim.time + 60;
+    sim.chat('/dev god', pid);
+    expect(p.cooldowns.size).toBe(0);
+    expect(p.potionCooldownUntil).toBeLessThanOrEqual(sim.time);
+    // Cooldowns started mid-god (a cast, a quaff, a drained charge pool) clear on the next tick.
+    p.cooldowns.set('charge', 15);
+    p.gcdRemaining = 1.5;
+    p.potionCooldownUntil = sim.time + 60;
+    p.abilityCharges = {
+      charge: { charges: 0, maxCharges: 2, recharge: 20, rechargeLength: 20, recharges: [20, 40] },
+    };
+    sim.tick();
+    expect(p.cooldowns.size).toBe(0);
+    expect(p.gcdRemaining).toBe(0);
+    expect(p.potionCooldownUntil).toBeLessThanOrEqual(sim.time);
+    expect(p.abilityCharges.charge.charges).toBe(2);
+    // Off again: cooldowns run normally.
+    sim.chat('/dev god', pid);
+    p.cooldowns.set('charge', 15);
+    sim.tick();
+    expect(p.cooldowns.get('charge')).toBeGreaterThan(14);
+  });
+
+  it('does not clear cooldowns for a devGod player when dev commands are off', () => {
+    const { sim } = godSim(false);
+    const p = sim.player;
+    p.devGod = true;
+    p.cooldowns.set('charge', 15);
+    sim.tick();
+    expect(p.cooldowns.get('charge')).toBeGreaterThan(14);
+  });
+
   it('takes ownership of the invulnerability mode when immortal was enabled', () => {
     const { sim, pid } = godSim();
     sim.chat('/dev immortal', pid);
