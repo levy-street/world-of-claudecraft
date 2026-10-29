@@ -1607,6 +1607,7 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "seasonOne": "1. sezóna",
+      "promoClose": "Close promotions",
       "membershipPromo": {
         "open": "Členství v obchodě WOC",
         "close": "Zavřít nabídku členství",

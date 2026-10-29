@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "es_ES": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "fr_FR": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "fr_CA": [
+    "hudChrome.wocStore.promoClose"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "de_DE": [
+    "hudChrome.wocStore.promoClose"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.wocStore.promoClose"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "nl_NL": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "pl_PL": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "id_ID": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "tr_TR": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "sv_SE": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "vi_VN": [
+    "hudChrome.wocStore.promoClose"
+  ],
+  "da_DK": [
+    "hudChrome.wocStore.promoClose"
+  ]
 };

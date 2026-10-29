@@ -4619,6 +4619,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Выкован из сырого метеоритного металла, пока кратер Mirefen ещё светился. Обломки, «слишком горячие для рук», стали космически-чёрными плечами с созвездиями, а вдоль ложа заключили расплавленно-золотое ядро. Арбалет не заряжают болтом — он создаёт его сам: стрелу звёздного пламени, выпущенную как приговор и падающую как его исполнение. Когда Highwatch боялся, что даже бессмертная корона Nythraxis — не худшее под горами, именно это оружие хотели видеть на стене. Цельтесь точно.',
   'hudChrome.wocStore.seasonOne': 'Сезон 1',
+  'hudChrome.wocStore.promoClose': 'Закрыть рекламу',
   'hudChrome.wocStore.membershipPromo.open': 'Членство в магазине WOC',
   'hudChrome.wocStore.membershipPromo.close': 'Закрыть рекламу членства',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Преимущества аккаунта',

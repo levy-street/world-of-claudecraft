@@ -1607,6 +1607,7 @@ export const id_ID: EnTranslations = {
         }
       },
       "seasonOne": "Musim 1",
+      "promoClose": "Close promotions",
       "membershipPromo": {
         "open": "Keanggotaan di Toko WOC",
         "close": "Tutup promosi keanggotaan",

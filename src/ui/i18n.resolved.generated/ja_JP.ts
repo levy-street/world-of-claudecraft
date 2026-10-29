@@ -1607,6 +1607,7 @@ export const ja_JP: EnTranslations = {
         }
       },
       "seasonOne": "シーズン1",
+      "promoClose": "宣伝を閉じる",
       "membershipPromo": {
         "open": "WOCストアのメンバーシップ",
         "close": "メンバーシップの宣伝を閉じる",

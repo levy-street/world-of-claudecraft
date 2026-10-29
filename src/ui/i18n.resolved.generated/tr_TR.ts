@@ -1607,6 +1607,7 @@ export const tr_TR: EnTranslations = {
         }
       },
       "seasonOne": "1. Sezon",
+      "promoClose": "Close promotions",
       "membershipPromo": {
         "open": "WOC Mağazasında üyelik",
         "close": "Üyelik tanıtımını kapat",

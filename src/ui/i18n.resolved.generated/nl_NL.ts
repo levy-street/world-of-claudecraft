@@ -1607,6 +1607,7 @@ export const nl_NL: EnTranslations = {
         }
       },
       "seasonOne": "Seizoen 1",
+      "promoClose": "Close promotions",
       "membershipPromo": {
         "open": "Lidmaatschap in de WOC-winkel",
         "close": "Lidmaatschapsaanbieding sluiten",

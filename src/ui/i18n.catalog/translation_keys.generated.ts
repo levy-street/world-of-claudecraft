@@ -18820,6 +18820,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.needMoreTitle'
   | 'hudChrome.wocStore.owned'
   | 'hudChrome.wocStore.priceChanged'
+  | 'hudChrome.wocStore.promoClose'
   | 'hudChrome.wocStore.rarity.epic'
   | 'hudChrome.wocStore.rarity.legendary'
   | 'hudChrome.wocStore.rarity.rare'
