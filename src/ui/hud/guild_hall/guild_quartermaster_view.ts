@@ -1,7 +1,7 @@
 // Pure view core for Lantern Hall's quartermaster counter (Garrick Holt): the stock as item
 // cards (the offer's art, its price in Lantern Seals, owned / affordable / short), the one
-// selected card's detail (what it gives you, how to use it, the price against the seals in the
-// bags, the buy action, and what its preview stage shows) and each card's hover lines.
+// selected card's detail (what it gives you, how to use it, the price against the seals
+// balance, the buy action, and what its preview stage shows) and each card's hover lines.
 // DOM-free and canvas-free: it NAMES the art (a Book of Deeds crest id, an item id, an Armory
 // skin id) and the stage subject, and the painter resolves the pixels and the 3D.
 //
@@ -17,11 +17,10 @@ import {
   GUILD_QUARTERMASTER_STOCK,
   GUILD_QUARTERMASTER_STOCK_BY_ID,
   type GuildQuartermasterOffer,
-  LANTERN_SEAL_ITEM_ID,
 } from '../../../sim/content/guild_contracts';
 import { WEAPON_SKINS } from '../../../sim/content/weapon_skins';
 import { ITEMS } from '../../../sim/data';
-import type { InvSlot } from '../../../sim/types';
+import type { GuildContractsView } from '../../../sim/guild_contracts';
 import { localizeWeaponSkin } from '../../armory_labels';
 import { deedTitleText, titledDisplayName, titledNameDecoration } from '../../deed_i18n';
 import { deedCrestId } from '../../deeds_view';
@@ -30,11 +29,9 @@ import { mountDisplayName } from '../../mount_labels';
 
 const whole = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
 
-/** The Lantern Seals in the bags. */
-export function lanternSeals(inventory: readonly InvSlot[]): number {
-  let total = 0;
-  for (const slot of inventory) if (slot?.itemId === LANTERN_SEAL_ITEM_ID) total += slot.count;
-  return total;
+/** The Lantern Seals balance: a currency counter (src/sim/lantern_seals.ts), never a bag stack. */
+export function lanternSeals(board: Pick<GuildContractsView, 'seals'>): number {
+  return board.seals;
 }
 
 /** "{count} Lantern Seals", in the locale's own plural form. */
@@ -42,7 +39,7 @@ export function sealCount(count: number): string {
   return tPlural('hudChrome.guildHall.reward', count, { count: whole(count) });
 }
 
-/** Where a card stands against the bags: bought, buyable now, or short of seals. */
+/** Where a card stands against the balance: bought, buyable now, or short of seals. */
 export type GuildShopItemState = 'owned' | 'ready' | 'short';
 
 /** A card's art, by name: the painter resolves the pixels (iconDataUrl for a crest,

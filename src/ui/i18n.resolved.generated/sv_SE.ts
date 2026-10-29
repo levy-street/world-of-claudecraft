@@ -851,7 +851,7 @@ export const sv_SE: EnTranslations = {
       "seals": "Lyktsigill: {count}",
       "resetIn": "Nya kontrakt om {time}",
       "resetSoon": "Nya kontrakt vid nästa veckoåterställning",
-      "contractsIntro": "Tre kontrakt i veckan, samma för varje äventyrare i riket. Du behöver inte skriva under: slutför ett så hamnar dess sigill direkt i dina väskor, en gång varje vecka.",
+      "contractsIntro": "Tre kontrakt i veckan, samma för varje äventyrare i riket. Du behöver inte skriva under: slutför ett så får du dess sigill direkt utbetalda, en gång varje vecka.",
       "kinds": {
         "boss": "Belöningsjakt",
         "heroic": "Heroisk rensning",
@@ -900,7 +900,7 @@ export const sv_SE: EnTranslations = {
         "cardProgress": "{done}/{total} denna vecka",
         "rewardLine": "Belöning: {reward}",
         "stamp": "Förseglat",
-        "sealsTip": "Lyktsigill betalas för Lykthallens veckokontrakt och kan bara användas hos kvartermästaren Garrick Holt. De är bundna till dig."
+        "sealsTip": "Lyktsigill betalas för Lykthallens veckokontrakt och kan bara användas hos kvartermästaren Garrick Holt. De är en valuta som är bunden till dig och tar ingen plats i väskorna."
       },
       "shop": {
         "stockLabel": "Garrick Holts sortiment",
@@ -1607,6 +1607,7 @@ export const sv_SE: EnTranslations = {
         }
       },
       "seasonOne": "Säsong 1",
+      "promoClose": "Stäng kampanjer",
       "membershipPromo": {
         "open": "Medlemskap i WOC-butiken",
         "close": "Stäng medlemskampanjen",
@@ -3451,6 +3452,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Ha världs-PvP påslaget för att få {percent} mer erfarenhet och fraktionsrykte. Bonusarna upphör när du begär att stänga av det.",
       "rewardTitles": "Få permanenta titlar efter {thresholds} spelad tid med världs-PvP påslaget i den öppna världen eller i PvP-instanser. Utloggning, död, PvE-instanser och fristäder pausar tiden. Stänger du av det nollställs tiden.",
       "rewardPaused": "Nuvarande PvP-svit: {time} spelad tid (pausad i en fristad)",
       "rewardPausedDead": "Nuvarande PvP-svit: {time} spelad tid (pausad medan du är död)",
@@ -3613,6 +3615,7 @@ export const sv_SE: EnTranslations = {
       "delveMark": "Delve-märke",
       "wocToken": "WoC-token",
       "heroicMarkNote": "Heroiska dungeons . spenderas på heroisk kvartermästare",
+      "lanternSealNote": "Lykthallens veckokontrakt . använd hos gillets kvartermästare",
       "honorNote": "Slagfält, arena och världsuppdrag",
       "delveMarkNote": "Genomförda grottvandringar",
       "wocTokenNote": "Kopplat plånbokssaldo",
@@ -3821,6 +3824,7 @@ export const sv_SE: EnTranslations = {
       "equipLockout": "Att utrusta det startar en {seconds} sek avkylningstid på dess användning, eller avkylningstiden kvar på talismanen det ersätter om det är längre.",
       "equip": {
         "lastStand": "Att ta skada när du är under {threshold}% hälsa ger ett sköld som absorberar {absorb} skada ({absorbPct}% av ditt maximala hälsa) i {duration} sek. Kan inträffa en gång var {icd} sek.",
+        "lastStandFlat": "Om du tar skada när du har mindre än {threshold}% hälsa får du en sköld som absorberar {absorb} skada i {duration} sek. Kan inträffa en gång var {icd} sek.",
         "hourglass": "Överläkning från dina direkta läkningar lagras i timglasset, upp till {cap} ({capPct}% av ditt maximala hälsa). Lagrad läkning försvinner {fade} sek efter att den sist växte.",
         "twinStrike": "Dina auto-attacker har en {chance}% chans att göra ett extra närkampsslag med huvudhand. Kan inträffa en gång var {icd} sek.",
         "tally": "Dina auto-attacker kritiska slag och dina dödsblow lägger var och en till ett teckenmärke, upp till {max}. Märken varar {duration} sek, uppdaterad när du får ett.",
@@ -17562,7 +17566,7 @@ export const sv_SE: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Taktiskt kamouflage",
-        "description": "Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Attacker eller skada avslutar Taktiskt kamouflage. Använd igen för att träda fram. (Fältkunskap)"
+        "description": "Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Att attackera, ta skada eller kalla på ett djur avslutar Taktiskt kamouflage. Använd igen för att träda fram. Kräver Ensam själ och att du inte har något djur."
       },
       "frostjaw_trap": {
         "name": "Frostkäftsfälla",

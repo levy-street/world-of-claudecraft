@@ -851,7 +851,7 @@ export const id_ID: EnTranslations = {
       "seals": "Segel Lentera: {count}",
       "resetIn": "Kontrak baru dalam {time}",
       "resetSoon": "Kontrak baru pada pengaturan ulang mingguan berikutnya",
-      "contractsIntro": "Tiga kontrak per minggu, sama bagi setiap petualang di realm. Tak perlu mendaftar: selesaikan satu dan segelnya langsung masuk tasmu, sekali setiap minggu.",
+      "contractsIntro": "Tiga kontrak per minggu, sama bagi setiap petualang di realm. Tak perlu mendaftar: selesaikan satu dan segelnya langsung diberikan kepadamu, sekali setiap minggu.",
       "kinds": {
         "boss": "Buruan",
         "heroic": "Penyelesaian Heroik",
@@ -900,7 +900,7 @@ export const id_ID: EnTranslations = {
         "cardProgress": "{done}/{total} minggu ini",
         "rewardLine": "Hadiah: {reward}",
         "stamp": "Disegel",
-        "sealsTip": "Segel Lentera diberikan untuk kontrak mingguan Balai Lentera dan hanya dibelanjakan di Garrick Holt, pengurus perbekalan. Segel terikat padamu."
+        "sealsTip": "Segel Lentera diberikan untuk kontrak mingguan Balai Lentera dan hanya dibelanjakan di Garrick Holt, pengurus perbekalan. Mata uang ini terikat padamu dan tidak memakan ruang tas."
       },
       "shop": {
         "stockLabel": "Persediaan Garrick Holt",
@@ -1607,6 +1607,7 @@ export const id_ID: EnTranslations = {
         }
       },
       "seasonOne": "Musim 1",
+      "promoClose": "Tutup promosi",
       "membershipPromo": {
         "open": "Keanggotaan di Toko WOC",
         "close": "Tutup promosi keanggotaan",
@@ -3451,6 +3452,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Biarkan PvP Dunia aktif untuk memperoleh {percent} lebih banyak pengalaman dan reputasi faksi. Bonus berhenti saat kamu meminta untuk menonaktifkannya.",
       "rewardTitles": "Dapatkan gelar permanen setelah {thresholds} waktu bermain dengan PvP Dunia aktif di dunia terbuka atau instans PvP. Keluar, kematian, instans PvE, dan suaka menjeda penghitung. Menonaktifkannya mengatur ulang penghitung.",
       "rewardPaused": "Rentetan PvP saat ini: {time} dimainkan (dijeda di suaka)",
       "rewardPausedDead": "Rentetan PvP saat ini: {time} dimainkan (dijeda saat mati)",
@@ -3613,6 +3615,7 @@ export const id_ID: EnTranslations = {
       "delveMark": "Merek Galian",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Dungeon Heroik: belanjakan di kepala perlengkapan heroik",
+      "lanternSealNote": "Kontrak mingguan Balai Lentera . belanjakan di pengurus perbekalan guild",
       "honorNote": "Medan Pertempuran, arena, dan Misi Dunia",
       "delveMarkNote": "Galian diselesaikan",
       "wocTokenNote": "Saldo dompet tertaut",
@@ -3821,6 +3824,7 @@ export const id_ID: EnTranslations = {
       "equipLockout": "Memakainya memulai pendinginan {seconds} detik pada penggunaannya, atau pendinginan yang tersisa pada perhiasan yang digantikannya jika lebih lama.",
       "equip": {
         "lastStand": "Menerima kerusakan saat kesehatan di bawah {threshold}% memberikan perisai yang menyerap {absorb} kerusakan ({absorbPct}% kesehatan maksimalmu) selama {duration} detik. Dapat terjadi sekali setiap {icd} detik.",
+        "lastStandFlat": "Menerima kerusakan saat kesehatan di bawah {threshold}% memberikan perisai yang menyerap {absorb} kerusakan selama {duration} detik. Dapat terjadi sekali setiap {icd} detik.",
         "hourglass": "Penyembuhan berlebih dari penyembuh langsung disimpan dalam jam pasir, hingga {cap} ({capPct}% kesehatan maksimalmu). Penyembuhan disimpan hilang {fade} detik setelah terakhir kali tumbuh.",
         "twinStrike": "Pukulan auto-attack kamu memiliki peluang {chance}% untuk membuat ayunan senjata tangan utama jarak dekat ekstra. Dapat terjadi sekali setiap {icd} detik.",
         "tally": "Pukulan auto-attack yang kritis dan pukulan penutupmu menambah tanda centang, hingga {max}. Tanda bertahan {duration} detik, disegarkan setiap kali kamu mendapat tanda.",
@@ -17562,7 +17566,7 @@ export const id_ID: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Kamuflase Taktis",
-        "description": "Menyatu dengan lingkungan: musuh nyaris tidak menyadari kehadiranmu, dan kamu bergerak dengan kecepatan 80%. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. (Bertahan Hidup)"
+        "description": "Menyatu dengan lingkungan: musuh nyaris tidak menyadari kehadiranmu, dan kamu bergerak dengan kecepatan 80%. Menyerang, menerima kerusakan, atau memanggil peliharaan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. Memerlukan Jiwa Kesepian dan tidak memiliki peliharaan."
       },
       "frostjaw_trap": {
         "name": "Jerat Rahang Beku",

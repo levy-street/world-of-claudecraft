@@ -2906,6 +2906,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.statusOffFfa':
     '你的 PvP 旗帜已降下，但在自由混战地带你仍然可以攻击他人或被攻击。',
   'hudChrome.worldPvp.statusOn': '你的 PvP 旗帜已升起。已开启旗帜的玩家可以攻击你。',
+  'hudChrome.worldPvp.rewardBonus':
+    '保持世界PvP开启可多获得{percent}的经验值和阵营声望。请求关闭时，加成立即停止。',
   'hudChrome.worldPvp.rewardTitles':
     '开启世界PvP时，在开放世界或PvP副本中的游戏时间达到{thresholds}后可获得永久称号。退出游戏、死亡、PvE副本和安全区会暂停计时。关闭PvP会重置计时。',
   'hudChrome.worldPvp.rewardPaused': '当前PvP连续游戏时间：{time}（在安全区暂停）',
@@ -4189,6 +4191,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'wallet.bagReconnect': '重新连接钱包',
   'hudChrome.wocStore.collectionLine': '{collection}系列',
   'hudChrome.wocStore.seasonOne': '第一赛季',
+  'hudChrome.wocStore.promoClose': '关闭推广',
   'hudChrome.wocStore.membershipPromo.open': 'WOC 商店中的会员',
   'hudChrome.wocStore.membershipPromo.close': '关闭会员推广',
   'hudChrome.wocStore.membershipPromo.eyebrow': '账号特权',
@@ -7816,7 +7819,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值；若其死亡，则以35%生命值将其复活。',
   'entities.abilities.tactical_camo.name': '战术伪装',
   'entities.abilities.tactical_camo.description':
-    '融入周围环境：敌人几乎察觉不到你，你以80%的速度移动。攻击或受到伤害会打破战术伪装。再次施放即可解除。（野战技艺）',
+    '融入周围环境：敌人几乎察觉不到你，你以80%的速度移动。攻击、受到伤害或召唤宠物会打破战术伪装。再次施放即可解除。需要孤独之魂，且不能有宠物。',
   'entities.abilities.play_dead.name': '装死',
   'entities.abilities.play_dead.description':
     '倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。若在移动中施放，你有 1 秒时间停下，否则移动会结束装死。再次施放即可起身。',
@@ -20963,6 +20966,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '探险印记',
   'hudChrome.currencies.wocToken': 'WoC 代币',
   'hudChrome.currencies.heroicMarkNote': '英雄地下城 . 在英雄军需官处兑换',
+  'hudChrome.currencies.lanternSealNote': '灯火大厅每周契约 . 在公会军需官处兑换',
   'hudChrome.currencies.honorNote': '战场、竞技场与世界任务',
   'hudChrome.currencies.delveMarkNote': '已完成的探险',
   'hudChrome.currencies.wocTokenNote': '已关联钱包的余额',
@@ -21664,6 +21668,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '装备后，其使用效果会进入 {seconds} 秒的冷却；如果被替换的饰品剩余冷却更长，则改为该剩余冷却。',
   'hudChrome.trinkets.equip.lastStand':
     '在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害（你最大生命值的 {absorbPct}%）的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    '在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。',
   'hudChrome.trinkets.equip.hourglass':
     '你的直接治疗产生的过量治疗会储存在沙漏中，最多 {cap} 点（你最大生命值的 {capPct}%）。储存的治疗量在最后一次增加后 {fade} 秒消散。',
   'hudChrome.trinkets.equip.twinStrike':
@@ -23007,7 +23013,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.resetIn': '{time}后发布新契约',
   'hudChrome.guildHall.resetSoon': '下次每周重置时发布新契约',
   'hudChrome.guildHall.contractsIntro':
-    '每周三份契约，王国中的每位冒险者看到的都一样。无需签署：完成其中一份，它的印章就会直接放进你的背包，每周一次。',
+    '每周三份契约，王国中的每位冒险者看到的都一样。无需签署：完成其中一份，你就会直接获得它的印章，每周一次。',
   'hudChrome.guildHall.kinds.boss': '悬赏',
   'hudChrome.guildHall.kinds.heroic': '英雄通关',
   'hudChrome.guildHall.kinds.task': '执行',
@@ -23055,7 +23061,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.rewardLine': '奖励：{reward}',
   'hudChrome.guildHall.board.stamp': '已盖印',
   'hudChrome.guildHall.board.sealsTip':
-    '灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们与你绑定。',
+    '灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们是与你绑定的货币，不占背包空间。',
   'hudChrome.guildHall.shop.stockLabel': '加里克·霍尔特的货品',
   'hudChrome.guildHall.shop.kindMount': '坐骑',
   'hudChrome.guildHall.shop.kindSword': '剑的外观',

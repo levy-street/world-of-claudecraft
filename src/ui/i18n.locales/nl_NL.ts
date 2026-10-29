@@ -639,6 +639,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Facties',
   'hudChrome.currencies.heroicMarkNote':
     'Heroïsche kerkers . besteed bij de heroïsche kwartiermeester',
+  'hudChrome.currencies.lanternSealNote':
+    'Wekelijkse contracten van Lantaarnhal . besteed bij de gildekwartiermeester',
   'hudChrome.currencies.honor': 'Eer',
   'hudChrome.currencies.honorNote': 'Slagvelden, de arena en wereldquests',
   'hudChrome.currencies.intro':
@@ -1120,6 +1122,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je melee en ranged wapen kritieke treffen steken het doelwit in lichtelaaie, voor {tick} Vuur schade elke {every} sec voor {duration} sec. Een nieuwe kritieke treffer vernieuwt het. Schade neemt toe met Attack Power of Ranged Attack Power, wat het hoogste is.',
   'hudChrome.trinkets.equip.lastStand':
     'Schade nemen terwijl onder {threshold}% gezondheid verleent een schild dat {absorb} schade absorbeert ({absorbPct}% van je maximale gezondheid) voor {duration} sec. Kan eenmaal elke {icd} sec voorkomen.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Als je schade oploopt met minder dan {threshold}% gezondheid, krijg je een schild dat {absorb} schade absorbeert gedurende {duration} sec. Kan eenmaal per {icd} sec optreden.',
   'hudChrome.trinkets.equip.storm':
     'Elke spreuk die je cast voegt een lading toe, tot {max}. Ladingen duren {duration} sec, vernieuwd wanneer je er een krijgt.',
   'hudChrome.trinkets.equip.tally':
@@ -20283,6 +20287,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Huidige PvP-reeks: {time} gespeeld (gepauzeerd in PvE-instanties)',
   'hudChrome.worldPvp.rewardProgress': 'Huidige PvP-reeks: {time} gespeeld',
+  'hudChrome.worldPvp.rewardBonus':
+    'Laat Wereld-PvP aanstaan om {percent} meer ervaring en factiereputatie te verdienen. De bonussen stoppen zodra je vraagt om het uit te schakelen.',
   'hudChrome.worldPvp.rewardTitles':
     'Verdien blijvende titels na {thresholds} speeltijd met Wereld-PvP aan in de open wereld of PvP-instanties. Uitloggen, dood, PvE-instanties en heiligdommen pauzeren de teller. Uitschakelen zet hem terug op nul.',
   'hudChrome.worldPvp.skullName': 'Schedel van {name}',
@@ -20325,7 +20331,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Verbruikt genezing over tijd op een bevriend doel om het voor {damage} te genezen. Het aanbrengen van Sporenheling en Tweede Bloei geeft Groenkracht; bij 5 Groenkracht verandert deze knop in Overbloei, die elke bondgenoot met jouw genezing over tijd direct geneest voor 60% van hun resterende genezing. (Kenmerk van Herstel)',
   'entities.abilities.tactical_camo.description':
-    'Ga op in je omgeving: vijanden merken je nauwelijks op en je beweegt op 80% snelheid. Aanvallen of schade oplopen verbreekt Tactische Camouflage. Werp opnieuw om tevoorschijn te komen. (Overleving)',
+    'Ga op in je omgeving: vijanden merken je nauwelijks op en je beweegt op 80% snelheid. Aanvallen, schade oplopen of een huisdier roepen verbreekt Tactische Camouflage. Werp opnieuw om tevoorschijn te komen. Vereist Eenzame ziel en geen huisdier.',
   'entities.abilities.tactical_camo.name': 'Tactische Camouflage',
   'entities.itemSets.grovespring.bonus2':
     'Snelle genezing verbruikt eerst je eigen Sporenheling of Tweede Bloei en geneest 25 procent meer. Ontvangen schade vertraagt je spreuken niet meer.',
@@ -23312,7 +23318,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Contracten van deze week',
   'hudChrome.guildHall.board.rewardLine': 'Beloning: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Lantaarnzegels worden betaald voor de wekelijkse contracten van Lantaarnhal en zijn alleen te besteden bij kwartiermeester Garrick Holt. Ze zijn aan jou gebonden.',
+    'Lantaarnzegels worden betaald voor de wekelijkse contracten van Lantaarnhal en zijn alleen te besteden bij kwartiermeester Garrick Holt. Deze valuta is aan jou gebonden en neemt geen ruimte in je tassen in.',
   'hudChrome.guildHall.board.stamp': 'Verzegeld',
   'hudChrome.guildHall.board.weekProgress': 'Deze week: {done} van {total} contracten voltooid',
   'hudChrome.guildHall.board.weekProgressAria': 'Contracten voltooid deze week',
@@ -23331,7 +23337,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Contract voltooid: {contract}. Je ontvangt {count} Lantaarnzegels.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Drie contracten per week, dezelfde voor elke avonturier in het rijk. Tekenen hoeft niet: voltooi er één en de zegels gaan direct naar je tassen, eenmaal per week.',
+    'Drie contracten per week, dezelfde voor elke avonturier in het rijk. Tekenen hoeft niet: voltooi er één en je krijgt de zegels rechtstreeks uitbetaald, eenmaal per week.',
   'hudChrome.guildHall.emptyBoard':
     'Het bord wordt herschreven. Kom terug na de wekelijkse herstart.',
   'hudChrome.guildHall.goals.boss':
@@ -23610,6 +23616,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedTitle': 'Gestalkt!',
   'hudChrome.wildheartAlert.timeAria': 'Nog {seconds} seconden',
   'hudChrome.wocStore.collections.lantern_hall': 'Lantaarnhal',
+  'hudChrome.wocStore.promoClose': 'Aanbiedingen sluiten',
   'hudChrome.wocStore.membershipPromo.close': 'Lidmaatschapsaanbieding sluiten',
   'hudChrome.wocStore.membershipPromo.cta': 'Nu lid worden',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Accountvoordelen',

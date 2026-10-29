@@ -1329,6 +1329,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'PvP 깃발이 내려가 있지만, 자유 전투 지역에서는 여전히 공격하거나 공격받을 수 있습니다.',
   'hudChrome.worldPvp.statusOn':
     'PvP 깃발이 올라가 있습니다. 깃발을 올린 플레이어가 당신을 공격할 수 있습니다.',
+  'hudChrome.worldPvp.rewardBonus':
+    '월드 PvP를 켜 두면 경험치와 진영 평판을 {percent} 더 얻습니다. 끄기를 요청하면 즉시 보너스가 중단됩니다.',
   'hudChrome.worldPvp.rewardTitles':
     '월드 PvP를 켠 상태로 오픈 월드 또는 PvP 인스턴스에서 플레이한 시간이 {thresholds}에 도달하면 영구 칭호를 얻습니다. 로그아웃, 사망, PvE 인스턴스 및 성역에서는 타이머가 일시 정지됩니다. PvP를 끄면 시간이 초기화됩니다.',
   'hudChrome.worldPvp.rewardPaused': '현재 PvP 유지 시간: {time} (성역에서 일시 정지)',
@@ -2810,6 +2812,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     '미어펜 분화구가 아직 빛날 때 “손댈 수 없을 만큼 뜨거웠던” 잔해인 순수한 운석 별 금속을 벼려 만들었습니다. 망치로 두드려 별자리가 새겨진 우주처럼 검은 활대를 만들고, 대목을 따라 용융 금빛 핵을 가두었습니다. 화살을 메는 대신 별불의 화살을 불러냅니다. 판결처럼 날아가 이야기 하나의 끝처럼 꽂힙니다. 하이워치가 니스락시스의 죽지 않는 왕관조차 봉우리 아래 최악의 것이 아닐 수 있다고 두려워했을 때, 성벽 위에 두고 싶어 했던 무기입니다. 조준을 신중히 하십시오.',
   'hudChrome.wocStore.seasonOne': '시즌 1',
+  'hudChrome.wocStore.promoClose': '홍보 닫기',
   'hudChrome.wocStore.membershipPromo.open': 'WOC 상점의 멤버십',
   'hudChrome.wocStore.membershipPromo.close': '멤버십 홍보 닫기',
   'hudChrome.wocStore.membershipPromo.eyebrow': '계정 혜택',
@@ -6410,7 +6413,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
   'entities.abilities.tactical_camo.name': '전술 위장',
   'entities.abilities.tactical_camo.description':
-    '주변 환경에 녹아듭니다. 적이 거의 알아채지 못하며, 이동 속도가 80%가 됩니다. 공격하거나 피해를 받으면 전술 위장이 해제됩니다. 다시 시전하면 해제됩니다. (야전술)',
+    '주변 환경에 녹아듭니다. 적이 거의 알아채지 못하며, 이동 속도가 80%가 됩니다. 공격하거나 피해를 받거나 소환수를 부르면 전술 위장이 해제됩니다. 다시 시전하면 해제됩니다. 고독한 영혼이 필요하며 소환수가 없어야 합니다.',
   'entities.abilities.play_dead.name': '죽은 척하기',
   'entities.abilities.play_dead.description':
     '땅에 쓰러져 죽은 척합니다. 모두에게 생명력과 집중이 비어 있는 것으로 보입니다. 적은 당신을 잊고, 당신을 대상으로 삼은 적 플레이어는 대상을 잃습니다. 이동하거나 공격하거나 다른 능력을 사용하면 끝납니다. 이동 중에 시전하면 1초 안에 멈춰야 하며, 그렇지 않으면 이동으로 인해 끝납니다. 다시 시전하면 일어납니다.',
@@ -20275,6 +20278,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '델브 징표',
   'hudChrome.currencies.wocToken': 'WoC 토큰',
   'hudChrome.currencies.heroicMarkNote': '영웅 던전 . 영웅 보급관에게서 사용',
+  'hudChrome.currencies.lanternSealNote': '등불 회관 주간 계약 . 길드 보급관에게서 사용',
   'hudChrome.currencies.honorNote': '전장, 투기장, 전역 퀘스트',
   'hudChrome.currencies.delveMarkNote': '완료한 델브',
   'hudChrome.currencies.wocTokenNote': '연동된 지갑 잔액',
@@ -21019,6 +21023,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '착용하면 사용 효과에 {seconds}초의 재사용 대기시간이 시작됩니다. 교체한 장신구의 남은 재사용 대기시간이 더 길면 그 시간이 적용됩니다.',
   'hudChrome.trinkets.equip.lastStand':
     '생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해(최대 생명력의 {absorbPct}%)를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    '생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.',
   'hudChrome.trinkets.equip.hourglass':
     '직접 치유로 발생한 초과 치유량이 모래시계에 저장되며, 최대 {cap}(최대 생명력의 {capPct}%)까지 저장됩니다. 저장된 치유량은 마지막으로 늘어난 뒤 {fade}초가 지나면 사라집니다.',
   'hudChrome.trinkets.equip.twinStrike':
@@ -22463,7 +22469,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.resetIn': '{time} 후 새 계약',
   'hudChrome.guildHall.resetSoon': '다음 주간 초기화에 새 계약',
   'hudChrome.guildHall.contractsIntro':
-    '계약은 일주일에 세 건, 왕국의 모든 모험가에게 똑같이 게시됩니다. 서명할 필요는 없습니다. 하나를 끝까지 해내면 그 인장이 매주 한 번씩 곧바로 가방에 들어옵니다.',
+    '계약은 일주일에 세 건, 왕국의 모든 모험가에게 똑같이 게시됩니다. 서명할 필요는 없습니다. 하나를 끝까지 해내면 그 인장을 매주 한 번씩 바로 지급받습니다.',
   'hudChrome.guildHall.kinds.boss': '현상금',
   'hudChrome.guildHall.kinds.heroic': '영웅 돌파',
   'hudChrome.guildHall.kinds.task': '수행',
@@ -22517,7 +22523,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.rewardLine': '보상: {reward}',
   'hudChrome.guildHall.board.stamp': '봉인됨',
   'hudChrome.guildHall.board.sealsTip':
-    '등불 인장은 등불 회관 주간 계약의 보상으로 지급되며, 보급관 개릭 홀트에게서만 사용할 수 있습니다. 귀속 아이템입니다.',
+    '등불 인장은 등불 회관 주간 계약의 보상으로 지급되며, 보급관 개릭 홀트에게서만 사용할 수 있습니다. 자신에게 귀속되는 화폐이며 가방 공간을 차지하지 않습니다.',
   'hudChrome.guildHall.shop.stockLabel': '개릭 홀트의 판매 목록',
   'hudChrome.guildHall.shop.kindMount': '탈것',
   'hudChrome.guildHall.shop.kindSword': '검 외형',

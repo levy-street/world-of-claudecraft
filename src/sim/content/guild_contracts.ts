@@ -33,7 +33,10 @@ export const LANTERN_HALL_SWORD_SKIN_ID = 'lantern_hall_sword';
 export const LANTERN_HALL_DESTRIER_SEALS = 40;
 export const LANTERN_HALL_SWORD_SEALS = 20;
 
-/** The currency, an inventory token in the Heroic Mark's shape (bound, kept, stacked). */
+/** The currency's item def, RETIRED as a bag item: seals are a PlayerMeta counter
+ *  (src/sim/lantern_seals.ts) like Heroic Marks, and the hub credits this id there. The def
+ *  stays (a shipped id is never deleted) for its name and icon and so a legacy bag or bank
+ *  stack still loads before it is folded into the balance. */
 export const GUILD_CONTRACT_ITEMS: Record<string, ItemDef> = {
   [LANTERN_SEAL_ITEM_ID]: {
     id: LANTERN_SEAL_ITEM_ID,

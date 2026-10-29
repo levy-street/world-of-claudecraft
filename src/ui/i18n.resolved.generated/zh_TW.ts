@@ -851,7 +851,7 @@ export const zh_TW: EnTranslations = {
       "seals": "燈火印章：{count}",
       "resetIn": "{time}後發布新契約",
       "resetSoon": "下次每週重置時發布新契約",
-      "contractsIntro": "每週三份契約，王國中的每位冒險者看到的都一樣。無需簽署：完成其中一份，它的印章就會直接放進你的背包，每週一次。",
+      "contractsIntro": "每週三份契約，王國中的每位冒險者看到的都一樣。無需簽署：完成其中一份，你就會直接獲得它的印章，每週一次。",
       "kinds": {
         "boss": "懸賞",
         "heroic": "英雄通關",
@@ -900,7 +900,7 @@ export const zh_TW: EnTranslations = {
         "cardProgress": "本週 {done}/{total}",
         "rewardLine": "獎勵：{reward}",
         "stamp": "已蓋印",
-        "sealsTip": "燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們與你綁定。"
+        "sealsTip": "燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們是與你綁定的貨幣，不佔背包空間。"
       },
       "shop": {
         "stockLabel": "加里克·霍爾特的貨品",
@@ -1607,6 +1607,7 @@ export const zh_TW: EnTranslations = {
         }
       },
       "seasonOne": "第一賽季",
+      "promoClose": "關閉推廣",
       "membershipPromo": {
         "open": "WOC 商店中的會員",
         "close": "關閉會員推廣",
@@ -3451,6 +3452,7 @@ export const zh_TW: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "保持世界PvP開啟可多獲得{percent}的經驗值和陣營聲望。請求關閉時，加成立即停止。",
       "rewardTitles": "開啟世界PvP時，在開放世界或PvP副本中的遊戲時間達到{thresholds}後可獲得永久稱號。登出遊戲、死亡、PvE副本和安全區會暫停計時。關閉PvP會重設計時。",
       "rewardPaused": "目前PvP連續遊戲時間：{time}（在安全區暫停）",
       "rewardPausedDead": "目前PvP連續遊戲時間：{time}（死亡期間暫停）",
@@ -3613,6 +3615,7 @@ export const zh_TW: EnTranslations = {
       "delveMark": "探險印記",
       "wocToken": "WoC 代幣",
       "heroicMarkNote": "英雄地下城 . 在英雄軍需官處兌換",
+      "lanternSealNote": "燈火大廳每週契約 . 在公會軍需官處兌換",
       "honorNote": "戰場、競技場與世界任務",
       "delveMarkNote": "已完成的探險",
       "wocTokenNote": "已連結錢包的餘額",
@@ -3821,6 +3824,7 @@ export const zh_TW: EnTranslations = {
       "equipLockout": "裝備後，其使用效果會進入 {seconds} 秒的冷卻；如果被替換的飾品剩餘冷卻更長，則改為該剩餘冷卻。",
       "equip": {
         "lastStand": "在生命值低於 {threshold}% 時受到傷害，會獲得一個吸收 {absorb} 點傷害（你最大生命值的 {absorbPct}%）的護盾，持續 {duration} 秒。每 {icd} 秒只能觸發一次。",
+        "lastStandFlat": "在生命值低於 {threshold}% 時受到傷害，會獲得一個吸收 {absorb} 點傷害的護盾，持續 {duration} 秒。每 {icd} 秒只能觸發一次。",
         "hourglass": "你的直接治療產生的過量治療會儲存在沙漏中，最多 {cap} 點（你最大生命值的 {capPct}%）。儲存的治療量在最後一次增加後 {fade} 秒消散。",
         "twinStrike": "你的自動攻擊命中有 {chance}% 的機率額外進行一次主手近戰揮擊。每 {icd} 秒只能觸發一次。",
         "tally": "你的自動攻擊致命一擊和你的最後一擊各增加一個計數標記，最多 {max} 個。標記持續 {duration} 秒，每獲得一個便會刷新。",
@@ -17562,7 +17566,7 @@ export const zh_TW: EnTranslations = {
       },
       "tactical_camo": {
         "name": "戰術偽裝",
-        "description": "融入周圍環境：敵人幾乎察覺不到你，你以 80% 的速度移動。攻擊或受到傷害會打破戰術偽裝。再次施放即可解除。（野戰技藝）"
+        "description": "融入周圍環境：敵人幾乎察覺不到你，你以 80% 的速度移動。攻擊、受到傷害或召喚寵物會打破戰術偽裝。再次施放即可解除。需要孤獨之魂，且不能有寵物。"
       },
       "frostjaw_trap": {
         "name": "霜顎陷阱",

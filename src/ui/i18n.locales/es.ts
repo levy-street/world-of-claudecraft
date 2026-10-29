@@ -738,6 +738,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Moneda de facción: pendiente para la Fase 2',
   'hudChrome.currencies.factions': 'Facciones',
   'hudChrome.currencies.heroicMarkNote': 'Mazmorras heroicas . gástala con el intendente heroico',
+  'hudChrome.currencies.lanternSealNote':
+    'Contratos semanales del Salón del Farol . gástalos con el intendente del gremio',
   'hudChrome.currencies.honor': 'Honor',
   'hudChrome.currencies.honorNote': 'Campos de batalla, la arena y misiones de mundo',
   'hudChrome.currencies.intro':
@@ -20205,6 +20207,8 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.',
   'hudChrome.trinkets.equip.lastStand':
     'Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño durante {duration} s. Puede ocurrir una vez cada {icd} s.',
   'hudChrome.trinkets.equip.hourglass':
     'La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.',
   'hudChrome.trinkets.equip.twinStrike':
@@ -20476,6 +20480,8 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.worldPvp.rewardPausedInstance':
     'Racha JcJ actual: {time} de juego (en pausa en instancias JcE)',
   'hudChrome.worldPvp.rewardProgress': 'Racha JcJ actual: {time} de juego',
+  'hudChrome.worldPvp.rewardBonus':
+    'Mantén activado el JcJ del mundo para obtener un {percent} más de experiencia y reputación de facción. Las bonificaciones terminan cuando solicitas desactivarlo.',
   'hudChrome.worldPvp.rewardTitles':
     'Gana títulos permanentes tras {thresholds} de juego con JcJ del mundo activado en el mundo abierto o en instancias JcJ. Desconectarte, morir, las instancias JcE y los santuarios pausan el contador. Desactivarlo lo reinicia.',
   'hudChrome.worldPvp.skullName': 'Cráneo de {name}',
@@ -20518,7 +20524,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.abilities.swiftmend.specNote_restoration':
     'Consume un efecto de sanación periódica de un objetivo aliado para sanarlo {damage}. Las aplicaciones de Remiendo de Esporas y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a cada aliado con tus efectos de sanación periódica un 60% de la sanación que les quedaba. (Distintivo de Restauración)',
   'entities.abilities.tactical_camo.description':
-    'Confúndete con el entorno: los enemigos apenas te perciben y te mueves al 80% de velocidad. Atacar o recibir daño rompe Camuflaje Táctico. Úsalo de nuevo para salir. (Supervivencia)',
+    'Confúndete con el entorno: los enemigos apenas te perciben y te mueves al 80% de velocidad. Atacar, recibir daño o llamar a una mascota rompe Camuflaje Táctico. Úsalo de nuevo para salir. Requiere Alma solitaria y no tener mascota.',
   'entities.abilities.tactical_camo.name': 'Camuflaje Táctico',
   'entities.itemSets.grovespring.bonus2':
     'Alivio presto consume primero tu Remiendo de Esporas o Segundo Florecer y sana un 25 por ciento más. El daño recibido ya no retrasa tus lanzamientos.',
@@ -23309,6 +23315,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.wildheartAlert.preyTitle': '¡Eres la Presa!',
   'hudChrome.wildheartAlert.stalkedTitle': '¡Acechado!',
   'hudChrome.wocStore.collections.lantern_hall': 'Salón del Farol',
+  'hudChrome.wocStore.promoClose': 'Cerrar promociones',
   'hudChrome.wocStore.membershipPromo.close': 'Cerrar promoción de membresía',
   'hudChrome.wocStore.membershipPromo.cta': 'Únete ahora',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Ventajas de cuenta',
@@ -24568,7 +24575,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.finder.partyRolesNote':
     'Elige una función para cada miembro o deja que conserven la suya.',
   'hudChrome.guildHall.board.sealsTip':
-    'Los sellos del farol se obtienen por los contratos semanales del Salón del Farol y solo se gastan con Garrick Holt, el intendente. Están ligados a ti.',
+    'Los sellos del farol se obtienen por los contratos semanales del Salón del Farol y solo se gastan con Garrick Holt, el intendente. Son una moneda ligada a ti y no ocupan espacio en las bolsas.',
   'hudChrome.guildHall.bought': 'Has comprado el título {title}. Elígelo en el Libro de Gestas.',
   'hudChrome.guildHall.boughtMount': 'Has comprado {mount}. Sus riendas están en tus bolsas.',
   'hudChrome.guildHall.boughtSkin':
@@ -24582,7 +24589,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.guildHall.contractDone.other':
     'Contrato completado: {contract}. Recibes {count} sellos del farol.',
   'hudChrome.guildHall.contractsIntro':
-    'Tres contratos por semana, los mismos para todos los aventureros del reino. No hace falta firmar: completa uno y sus sellos irán directamente a tus bolsas, una vez por semana.',
+    'Tres contratos por semana, los mismos para todos los aventureros del reino. No hace falta firmar: completa uno y recibirás sus sellos directamente, una vez por semana.',
   'hudChrome.guildHall.emptyBoard':
     'Están reescribiendo el tablón. Vuelve después del reinicio semanal.',
   'hudChrome.guildHall.goals.boss':

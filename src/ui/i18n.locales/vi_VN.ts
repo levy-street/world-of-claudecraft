@@ -603,6 +603,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Tiền Tệ Phe Phái: chờ Giai Đoạn 2',
   'hudChrome.currencies.factions': 'Phe Phái',
   'hudChrome.currencies.heroicMarkNote': 'Hầm Ngục Anh Hùng - tiêu tại quản lý hậu cần Anh Hùng',
+  'hudChrome.currencies.lanternSealNote':
+    'Hợp đồng hằng tuần của Sảnh Đèn Lồng . dùng tại quân nhu bang hội',
   'hudChrome.currencies.honor': 'Danh Dự',
   'hudChrome.currencies.honorNote': 'Chiến Trường, Đấu Trường và Nhiệm Vụ Thế Giới',
   'hudChrome.currencies.intro':
@@ -1086,6 +1088,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Các cú đánh tấn công quan trọng vũ khí cận chiến và tầm xa của bạn làm mục tiêu bốc cháy, gây {tick} sát thương Lửa mỗi {every} giây trong {duration} giây. Một cú đánh tấn công quan trọng mới làm mới nó. Sát thương tăng theo Sức Mạnh Tấn Công hoặc Sức Mạnh Tấn Công Tầm Xa, cái nào cao hơn.',
   'hudChrome.trinkets.equip.lastStand':
     'Nhận sát thương trong khi dưới {threshold}% sức khỏe được cấp cho một lá chắn hấp thụ {absorb} sát thương ({absorbPct}% sức khỏe tối đa của bạn) trong {duration} giây. Có thể xảy ra một lần mỗi {icd} giây.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Khi nhận sát thương lúc sức khỏe dưới {threshold}%, bạn nhận được một lá chắn hấp thụ {absorb} sát thương trong {duration} giây. Có thể xảy ra một lần mỗi {icd} giây.',
   'hudChrome.trinkets.equip.storm':
     'Mỗi phép thuật bạn thi triển sẽ thêm một sạc, tối đa {max}. Sạc kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được sạc.',
   'hudChrome.trinkets.equip.tally':
@@ -20098,6 +20102,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong phụ bản PvE)',
   'hudChrome.worldPvp.rewardProgress': 'Chuỗi PvP hiện tại: đã chơi {time}',
+  'hudChrome.worldPvp.rewardBonus':
+    'Giữ PvP Thế Giới bật để nhận thêm {percent} kinh nghiệm và danh vọng phe phái. Phần thưởng cộng thêm dừng ngay khi bạn yêu cầu tắt.',
   'hudChrome.worldPvp.rewardTitles':
     'Nhận danh hiệu vĩnh viễn sau {thresholds} thời gian chơi với PvP Thế Giới bật trong thế giới mở hoặc phụ bản PvP. Đăng xuất, chết, phụ bản PvE và thánh địa tạm dừng bộ đếm. Tắt PvP sẽ đặt lại bộ đếm.',
   'hudChrome.worldPvp.skullName': 'Đầu lâu của {name}',
@@ -20139,7 +20145,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Tiêu hao một hiệu ứng hồi máu theo thời gian trên đồng minh để hồi {damage} máu. Áp dụng Chữa Lành Bào Tử và Nở Hoa Lần Hai tăng Sắc Xanh; khi có 5 Sắc Xanh, nút này thành Mãn Khai, lập tức hồi cho mọi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn 60% lượng hồi máu còn lại. (Đặc trưng của Phục Hồi)',
   'entities.abilities.tactical_camo.description':
-    'Hòa vào môi trường: kẻ địch gần như không nhận thấy bạn, và bạn di chuyển với 80% tốc độ. Tấn công hoặc nhận sát thương phá Ngụy Trang Chiến Thuật. Dùng lại để thoát ra. (Sinh Tồn)',
+    'Hòa vào môi trường: kẻ địch gần như không nhận thấy bạn, và bạn di chuyển với 80% tốc độ. Tấn công, nhận sát thương hoặc gọi thú cưng sẽ phá Ngụy Trang Chiến Thuật. Dùng lại để thoát ra. Cần Linh Hồn Cô Độc và không có thú cưng.',
   'entities.abilities.tactical_camo.name': 'Ngụy Trang Chiến Thuật',
   'entities.itemSets.grovespring.bonus2':
     'Hồi Phục Nhanh ưu tiên tiêu hao Chữa Lành Bào Tử hoặc Nở Hoa Lần Hai của bạn và hồi thêm 25 phần trăm. Sát thương nhận vào không còn làm chậm việc niệm phép.',
@@ -22828,7 +22834,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Hợp Đồng Tuần Này',
   'hudChrome.guildHall.board.rewardLine': 'Phần thưởng: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Ấn Đèn Lồng được trả cho hợp đồng hằng tuần của Sảnh Đèn Lồng, chỉ tiêu tại quân nhu Garrick Holt. Chúng gắn với bạn.',
+    'Ấn Đèn Lồng được trả cho hợp đồng hằng tuần của Sảnh Đèn Lồng và chỉ dùng tại quân nhu Garrick Holt. Đây là tiền tệ gắn với bạn và không chiếm chỗ trong túi.',
   'hudChrome.guildHall.board.stamp': 'Đã Đóng Ấn',
   'hudChrome.guildHall.board.weekProgress': 'Tuần này: hoàn thành {done}/{total} hợp đồng',
   'hudChrome.guildHall.board.weekProgressAria': 'Hợp Đồng Hoàn Thành Tuần Này',
@@ -22846,7 +22852,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hoàn thành hợp đồng: {contract}. Bạn nhận {count} Ấn Đèn Lồng.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Ba hợp đồng mỗi tuần, giống nhau cho mọi nhà thám hiểm trên máy chủ. Không cần ký: hoàn thành một hợp đồng, ấn sẽ vào thẳng túi, mỗi hợp đồng một lần mỗi tuần.',
+    'Ba hợp đồng mỗi tuần, giống nhau cho mọi nhà thám hiểm trên máy chủ. Không cần ký: hoàn thành một hợp đồng, bạn sẽ được nhận ấn trực tiếp, mỗi hợp đồng một lần mỗi tuần.',
   'hudChrome.guildHall.emptyBoard': 'Bảng đang được viết lại. Quay lại sau khi đặt lại tuần.',
   'hudChrome.guildHall.goals.boss': 'Hạ {boss} trong {dungeon}, ở bất kỳ độ khó nào.',
   'hudChrome.guildHall.goals.heroic':
@@ -23100,6 +23106,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedLine':
     'Chạy khỏi báo đốm để tránh cắn. Dẫn xa Thầy Thú để phá Liên Kết Bầy Đàn',
   'hudChrome.wildheartAlert.stalkedTitle': 'Bị Rình Rập!',
+  'hudChrome.wocStore.promoClose': 'Đóng quảng cáo',
   'hudChrome.wocStore.membershipPromo.close': 'Đóng Quảng Bá Thành Viên',
   'hudChrome.wocStore.membershipPromo.cta': 'Tham Gia Ngay',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Ưu Đãi Tài Khoản',

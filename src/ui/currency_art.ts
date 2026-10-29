@@ -14,6 +14,7 @@ export const CURRENCY_IMAGE_IDS: ReadonlySet<string> = new Set([
 
 const CURRENCY_ICON_DIR = '/ui/currency';
 const HEROIC_MARK_IMAGE_URL = '/ui/items/heroic_mark.webp';
+const LANTERN_SEAL_IMAGE_URL = '/ui/items/lantern_seal.webp';
 
 export function currencyImageUrl(id: string): string | null {
   return CURRENCY_IMAGE_IDS.has(id) ? `${CURRENCY_ICON_DIR}/${id}.webp` : null;
@@ -38,4 +39,8 @@ export function currencyIconHtml(id: string): string {
 
 export function heroicMarkIconHtml(): string {
   return `<img class="currency-inline currency-heroic-mark" src="${HEROIC_MARK_IMAGE_URL}" alt="" draggable="false">`;
+}
+
+export function lanternSealIconHtml(): string {
+  return `<img class="currency-inline currency-lantern-seal" src="${LANTERN_SEAL_IMAGE_URL}" alt="" draggable="false">`;
 }

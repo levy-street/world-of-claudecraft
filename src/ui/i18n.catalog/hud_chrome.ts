@@ -970,6 +970,7 @@ export const hudChromeStrings = {
     seasonOne: 'Season 1',
     // The rotating promo card above chat (src/ui/store_promo_card.ts). The
     // Refer a Friend advert takes its title from the referralCards namespace.
+    promoClose: 'Close promotions',
     membershipPromo: {
       open: 'Membership in the WOC Store',
       close: 'Close membership promotion',
@@ -3888,6 +3889,8 @@ export const hudChromeStrings = {
   // number is a resolved value from src/sim/pvp/world_pvp_rules.ts, never a
   // literal in the copy, so a retune never strands the text.
   worldPvp: {
+    rewardBonus:
+      'Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.',
     rewardTitles:
       'Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.',
     rewardPaused: 'Current PvP streak: {time} played (paused in a sanctuary)',
@@ -4135,6 +4138,7 @@ export const hudChromeStrings = {
     delveMark: 'Delve Mark',
     wocToken: 'WoC Token',
     heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
+    lanternSealNote: "Lantern Hall's weekly contracts . spend at the guild quartermaster",
     // Every Honor source a player can reach, the day's Honor world quests
     // included (src/sim/world_quest_honor_slots.ts).
     honorNote: 'Battlegrounds, the arena, and world quests',
@@ -4445,6 +4449,10 @@ export const hudChromeStrings = {
     equip: {
       lastStand:
         'Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.',
+      // The fixed-amount form (the referral charms). Wordy (M16): filled in es
+      // and the five non-Latin locales in this change.
+      lastStandFlat:
+        'Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.',
       hourglass:
         'Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.',
       twinStrike:

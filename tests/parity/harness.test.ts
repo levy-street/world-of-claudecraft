@@ -219,6 +219,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'skin',
       'skinCatalog',
       'specId', // render-only mirror of the chosen spec; meta.talents is sampled
+      'stealthTrail', // presentation-only footprint ring (sim/stealth_footprints.ts)
       'stealthed',
       'vx',
       'vy',
@@ -254,6 +255,8 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'pendingSkinCatalog',
       'pendingSkinItemId',
       'pendingSkinRank',
+      'petAssistCastTick',
+      'petAssistLiveTick',
       'petAssistTargetId',
       'skin',
       'skinCatalog',
@@ -277,8 +280,15 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'damageHistory', // Rewind's ring; only present after a player takes damage
       'castConsumedEmpower', // set only while a cast that consumed an empower resolves
       'castRadiantResonance', // set only while Dawn's Embrace has reserved the proc
+      'stealthTrail', // only present while a stealthed player has left footprints
     ]);
-    const optionalMeta = new Set(['characterId', 'lastWhisperFrom', 'petAssistTargetId']);
+    const optionalMeta = new Set([
+      'characterId',
+      'lastWhisperFrom',
+      'petAssistTargetId',
+      'petAssistCastTick',
+      'petAssistLiveTick',
+    ]);
     for (const k of ENTITY_EXCLUDE) {
       if (!optionalEntity.has(k)) expect(k in entity, `Entity.${k} missing (renamed?)`).toBe(true);
     }

@@ -91,13 +91,24 @@ describe('choice row engine', () => {
     expect(mods.grants.some((g) => g.ability === granted)).toBe(true);
   });
 
-  it('every grant-bearing option is named after its granted ability (i18n free)', () => {
+  it("grant-bearing options use ability names except Lonely Soul's shared Camo grant", () => {
+    let lonelySoulGrants = 0;
     for (const cls of CLASSES) {
       for (const row of CHOICE_ROWS[cls].rows) {
         for (const o of row.options) {
           const g = o.effect.grant?.ability;
           if (!g) continue;
           expect(ABILITIES[g], `${o.id} grants unknown ability ${g}`).toBeTruthy();
+          // Lonely Soul retains its passive identity while granting Tactical Camo
+          // to every hunter spec. Keep this exception tied to that exact choice.
+          if (o.id === 'hun_r8_beastguard') {
+            expect(cls).toBe('hunter');
+            expect(row.level).toBe(8);
+            expect(o.name).toBe('Lonely Soul');
+            expect(g).toBe('tactical_camo');
+            lonelySoulGrants++;
+            continue;
+          }
           const grantHasRiders = (o.effect.ability ?? []).some(
             (mod) => mod.ability === g && (mod.addEffects?.length ?? 0) > 0,
           );
@@ -106,6 +117,7 @@ describe('choice row engine', () => {
         }
       }
     }
+    expect(lonelySoulGrants).toBe(1);
   });
 
   it('build strings round-trip rows', () => {

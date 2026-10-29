@@ -59,7 +59,7 @@ function atGarrick(seals: number, ridingTrained = true) {
   if (seals > 0) s.ctx.addItem(LANTERN_SEAL_ITEM_ID, seals, pid);
   const guildEvents = (): SimEvent[] =>
     s.tick().filter((e: SimEvent) => e.type.startsWith('guildCosmetic'));
-  const sealsLeft = () => s.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid);
+  const sealsLeft = () => s.ctx.players.get(pid)?.lanternSeals ?? 0;
   return { s, pid, meta, guildEvents, sealsLeft };
 }
 
@@ -178,7 +178,7 @@ describe('buying the horse', () => {
     const meta = fresh.players.get(restored);
     if (!meta) throw new Error('no restored meta');
     expect(fresh.ctx.countItem(LANTERN_HALL_DESTRIER_REINS_ID, restored)).toBe(1);
-    expect(fresh.ctx.countItem(LANTERN_SEAL_ITEM_ID, restored)).toBe(0);
+    expect(fresh.ctx.players.get(restored)?.lanternSeals ?? 0).toBe(0);
   });
 });
 

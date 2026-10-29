@@ -630,6 +630,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Fraktionsvaluta: väntar på steg 2',
   'hudChrome.currencies.factions': 'Fraktioner',
   'hudChrome.currencies.heroicMarkNote': 'Heroiska dungeons . spenderas på heroisk kvartermästare',
+  'hudChrome.currencies.lanternSealNote':
+    'Lykthallens veckokontrakt . använd hos gillets kvartermästare',
   'hudChrome.currencies.honor': 'Heder',
   'hudChrome.currencies.honorNote': 'Slagfält, arena och världsuppdrag',
   'hudChrome.currencies.intro':
@@ -1102,6 +1104,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.resetsIn': 'Tavla',
   'hudChrome.trinkets.equip.lastStand':
     'Att ta skada när du är under {threshold}% hälsa ger ett sköld som absorberar {absorb} skada ({absorbPct}% av ditt maximala hälsa) i {duration} sek. Kan inträffa en gång var {icd} sek.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Om du tar skada när du har mindre än {threshold}% hälsa får du en sköld som absorberar {absorb} skada i {duration} sek. Kan inträffa en gång var {icd} sek.',
   'hudChrome.trinkets.equip.tally':
     'Dina auto-attacker kritiska slag och dina dödsblow lägger var och en till ett teckenmärke, upp till {max}. Märken varar {duration} sek, uppdaterad när du får ett.',
   'hudChrome.vehicle.exit': 'Lämna kanon',
@@ -20049,6 +20053,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Nuvarande PvP-svit: {time} spelad tid (pausad i PvE-instanser)',
   'hudChrome.worldPvp.rewardProgress': 'Nuvarande PvP-svit: {time} spelad tid',
+  'hudChrome.worldPvp.rewardBonus':
+    'Ha världs-PvP påslaget för att få {percent} mer erfarenhet och fraktionsrykte. Bonusarna upphör när du begär att stänga av det.',
   'hudChrome.worldPvp.rewardTitles':
     'Få permanenta titlar efter {thresholds} spelad tid med världs-PvP påslaget i den öppna världen eller i PvP-instanser. Utloggning, död, PvE-instanser och fristäder pausar tiden. Stänger du av det nollställs tiden.',
   'hudChrome.worldPvp.skullName': '{name}s skalle',
@@ -20090,7 +20096,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Förbrukar en läkningseffekt över tid på ett vänligt mål för att läka det för {damage}. Planteringar av Sporläkning och Andra blomningen ger Grönska; vid 5 Grönska blir knappen Överblomning, som omedelbart läker varje allierad med dina läkningseffekter över tid för 60% av deras återstående läkning. (signatur för Återställning)',
   'entities.abilities.tactical_camo.description':
-    'Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Attacker eller skada avslutar Taktiskt kamouflage. Använd igen för att träda fram. (Fältkunskap)',
+    'Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Att attackera, ta skada eller kalla på ett djur avslutar Taktiskt kamouflage. Använd igen för att träda fram. Kräver Ensam själ och att du inte har något djur.',
   'entities.abilities.tactical_camo.name': 'Taktiskt kamouflage',
   'entities.itemSets.grovespring.bonus2':
     'Snabb läkning förbrukar din egen Sporläkning eller Andra blomningen först och läker 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.',
@@ -21045,7 +21051,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Veckans kontrakt',
   'hudChrome.guildHall.board.rewardLine': 'Belöning: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Lyktsigill betalas för Lykthallens veckokontrakt och kan bara användas hos kvartermästaren Garrick Holt. De är bundna till dig.',
+    'Lyktsigill betalas för Lykthallens veckokontrakt och kan bara användas hos kvartermästaren Garrick Holt. De är en valuta som är bunden till dig och tar ingen plats i väskorna.',
   'hudChrome.guildHall.board.stamp': 'Förseglat',
   'hudChrome.guildHall.board.weekProgress': 'Denna vecka: {done} av {total} kontrakt slutförda',
   'hudChrome.guildHall.board.weekProgressAria': 'Kontrakt slutförda denna vecka',
@@ -21062,7 +21068,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.contractDone.other':
     'Kontrakt slutfört: {contract}. Du får {count} lyktsigill.',
   'hudChrome.guildHall.contractsIntro':
-    'Tre kontrakt i veckan, samma för varje äventyrare i riket. Du behöver inte skriva under: slutför ett så hamnar dess sigill direkt i dina väskor, en gång varje vecka.',
+    'Tre kontrakt i veckan, samma för varje äventyrare i riket. Du behöver inte skriva under: slutför ett så får du dess sigill direkt utbetalda, en gång varje vecka.',
   'hudChrome.guildHall.done': 'Slutfört denna vecka',
   'hudChrome.guildHall.emptyBoard': 'Tavlan skrivs om. Kom tillbaka efter veckoåterställningen.',
   'hudChrome.guildHall.goals.boss': 'Besegra {boss} i {dungeon}, på valfri svårighetsgrad.',
@@ -21339,6 +21345,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedTitle': 'Förföljd!',
   'hudChrome.wildheartAlert.timeAria': '{seconds} sekunder kvar',
   'hudChrome.wocStore.collections.lantern_hall': 'Lykthallen',
+  'hudChrome.wocStore.promoClose': 'Stäng kampanjer',
   'hudChrome.wocStore.membershipPromo.close': 'Stäng medlemskampanjen',
   'hudChrome.wocStore.membershipPromo.cta': 'Bli medlem nu',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Kontoförmåner',

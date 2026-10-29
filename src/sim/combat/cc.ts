@@ -20,6 +20,27 @@ export function isUnbreakableControlAura(aura: Pick<Aura, 'unbreakableControl'>)
   return aura.unbreakableControl === true;
 }
 
+// The general crowd-control kinds, behind Sim.isControlAura (bound on the seam
+// as ctx.isControlAura). Moved verbatim from Sim.
+export function isControlAuraKind(kind: Aura['kind']): boolean {
+  return kind === 'stun' || kind === 'root' || kind === 'incapacitate' || kind === 'polymorph';
+}
+
+// What Ice Block shrugs off when another source applies it: the control kinds
+// above plus silence, blind, disarm, slow, lockout and tongues (Sim.applyAura's
+// Ice Block arm). Moved verbatim from Sim.
+export function isIceBlockCrowdControlAura(kind: Aura['kind']): boolean {
+  return (
+    isControlAuraKind(kind) ||
+    kind === 'silence' ||
+    kind === 'blind' ||
+    kind === 'disarm' ||
+    kind === 'slow' ||
+    kind === 'lockout' ||
+    kind === 'tongues'
+  );
+}
+
 // The hard-CC kinds that pin a target in place. Exactly the set isRooted below
 // reports, so a caller that needs "held still, and by whom" can walk the auras
 // itself against this set instead of re-listing the kinds and drifting from it

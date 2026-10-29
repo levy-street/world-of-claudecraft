@@ -7,10 +7,11 @@ import { Sim } from '../src/sim/sim';
 import { petCanSeeStealthedTarget } from '../src/sim/threat';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
 
-// Bug: pets could still see and hit stealthed rogues (proximity detection like a
-// mob), and Vanish did not force enemies off the rogue. Pets now perceive stealth
-// exactly like an enemy player (not at all), and entering stealth wipes every
-// hostile hunter's lock. Covers Rogue Duskveil/Smokestep AND Druid Stalk.
+// Pets perceive stealth exactly like an enemy player: the PvP proximity rule
+// (tests/pvp_stealth_detection.test.ts owns its numbers), so a pet out of range
+// is blind and Vanish blinds it at any range. Entering stealth wipes every
+// hostile hunter's lock that can no longer see the caster. Covers Rogue
+// Duskveil/Smokestep AND Druid Stalk.
 
 type TestSim = Sim & { addEntity(entity: Entity): void; nextId: number };
 
@@ -83,10 +84,11 @@ describe('pets cannot see stealthed rogues', () => {
     expect(petCanSeeStealthedTarget(p)).toBe(false);
   });
 
-  it('a pet deals no damage to a stealthed player, but strikes a visible one', () => {
+  it('a pet deals no damage to a stealthed player it cannot detect, but strikes a visible one', () => {
     const sim = rogue();
     const enemyPet = addPet(sim, 999_999); // an enemy pet (owned mob)
     const p = sim.player;
+    enemyPet.pos.z = p.pos.z + 30; // far outside any detection radius
     p.auras.push(stealthAura());
     const blocked = dealDamage(sim.ctx, enemyPet, p, 50, false, 'physical', 'Bite', 'hit');
     expect(blocked).toBe(0);
@@ -100,6 +102,8 @@ describe('pets cannot see stealthed rogues', () => {
     const rival = duelRival(sim, 'warrior');
     const pet = addPet(sim, sim.playerId); // the rogue's own pet, hunting the rival
     const rivalEntity = sim.entities.get(rival)!;
+    rivalEntity.pos.x = pet.pos.x + 30; // far outside the pet's detection radius
+    rivalEntity.pos.z = pet.pos.z;
     pet.aggroTargetId = rival; // a pet's combat target is aggroTargetId
     pet.inCombat = true;
     // Rival slips into stealth directly (no cast, so ONLY the pet-visibility rule

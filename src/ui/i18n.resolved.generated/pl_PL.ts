@@ -851,7 +851,7 @@ export const pl_PL: EnTranslations = {
       "seals": "Pieczęcie Latarni: {count}",
       "resetIn": "Nowe kontrakty za {time}",
       "resetSoon": "Nowe kontrakty przy następnym tygodniowym resecie",
-      "contractsIntro": "Trzy kontrakty tygodniowo, takie same dla każdego poszukiwacza przygód w krainie. Nie trzeba się zapisywać: ukończ kontrakt, a pieczęcie trafią prosto do twoich toreb, raz w tygodniu.",
+      "contractsIntro": "Trzy kontrakty tygodniowo, takie same dla każdego poszukiwacza przygód w krainie. Nie trzeba się zapisywać: ukończ kontrakt, a otrzymasz pieczęcie bezpośrednio, raz w tygodniu.",
       "kinds": {
         "boss": "Nagroda za głowę",
         "heroic": "Ukończenie heroiczne",
@@ -900,7 +900,7 @@ export const pl_PL: EnTranslations = {
         "cardProgress": "{done}/{total} w tym tygodniu",
         "rewardLine": "Nagroda: {reward}",
         "stamp": "Zapieczętowane",
-        "sealsTip": "Pieczęcie Latarni otrzymujesz za tygodniowe kontrakty Sali Latarni i wydajesz wyłącznie u kwatermistrza Garricka Holta. Są przypisane do ciebie."
+        "sealsTip": "Pieczęcie Latarni otrzymujesz za tygodniowe kontrakty Sali Latarni i wydajesz wyłącznie u kwatermistrza Garricka Holta. To przypisana do ciebie waluta, która nie zajmuje miejsca w torbach."
       },
       "shop": {
         "stockLabel": "Oferta Garricka Holta",
@@ -1607,6 +1607,7 @@ export const pl_PL: EnTranslations = {
         }
       },
       "seasonOne": "Sezon 1",
+      "promoClose": "Zamknij promocje",
       "membershipPromo": {
         "open": "Członkostwo w sklepie WOC",
         "close": "Zamknij promocję członkostwa",
@@ -3451,6 +3452,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Pozostaw światowe PvP włączone, aby zdobywać o {percent} więcej doświadczenia i reputacji frakcji. Premie kończą się w chwili wysłania prośby o wyłączenie.",
       "rewardTitles": "Zdobywaj stałe tytuły po {thresholds} czasu gry z włączonym światowym PvP w otwartym świecie lub instancjach PvP. Wylogowanie, śmierć, instancje PvE i sanktuaria wstrzymują licznik. Wyłączenie PvP go zeruje.",
       "rewardPaused": "Obecna seria PvP: rozegrano {time} (wstrzymana w sanktuarium)",
       "rewardPausedDead": "Obecna seria PvP: rozegrano {time} (wstrzymana podczas śmierci)",
@@ -3613,6 +3615,7 @@ export const pl_PL: EnTranslations = {
       "delveMark": "Znak Wyprawy",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Lochowiska heroiczne. Wydaj w kwatermistrzu heroicznym",
+      "lanternSealNote": "Tygodniowe kontrakty Sali Latarni . wydawaj u kwatermistrza gildii",
       "honorNote": "Pola Bitwy, Arena i zadania światowe",
       "delveMarkNote": "Ukończone wyprawy",
       "wocTokenNote": "Saldo połączonego portfela",
@@ -3821,6 +3824,7 @@ export const pl_PL: EnTranslations = {
       "equipLockout": "Wyposażenie go powoduje {seconds} sek cooldown na jego użycie lub cooldown pozostały na talizman, który zastępuje, jeśli ten jest dłuższy.",
       "equip": {
         "lastStand": "Otrzymanie obrażeń poniżej {threshold}% zdrowia udziela ekranu, który pochłania {absorb} obrażeń ({absorbPct}% twojego maksymalnego zdrowia) przez {duration} sek. Może się zdarzyć raz na {icd} sek.",
+        "lastStandFlat": "Otrzymanie obrażeń przy zdrowiu poniżej {threshold}% zapewnia tarczę pochłaniającą {absorb} obrażeń przez {duration} sek. Może wystąpić raz na {icd} sek.",
         "hourglass": "Przeleczenie z twoich bezpośrednich uzdrowień jest przechowywane w klepsydrze, do {cap} ({capPct}% twojego maksymalnego zdrowia). Przechowywane leczenie zanika {fade} sek po ostatnim wzroście.",
         "twinStrike": "Twoje trafienia auto-ataku mają {chance}% szansę na wykonanie dodatkowego zamachu broni głównej melee. Może się zdarzyć raz na {icd} sek.",
         "tally": "Twoje auto-atak trafienia krytyczne i twoje ostateczne ciosy każdorazowo dodają znacznik, do {max}. Znaczniki trwają {duration} sek, odświeżane za każdym razem, gdy zyskasz jeden.",
@@ -17562,7 +17566,7 @@ export const pl_PL: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Kamuflaż taktyczny",
-        "description": "Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. (Sztuka przetrwania)"
+        "description": "Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak, otrzymanie obrażeń lub przywołanie zwierzęcia przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. Wymaga Samotnej duszy i braku zwierzęcia."
       },
       "frostjaw_trap": {
         "name": "Pułapka Mroźnej Paszczy",

@@ -851,7 +851,7 @@ export const cs_CZ: EnTranslations = {
       "seals": "Lucernové pečeti: {count}",
       "resetIn": "Nové zakázky za {time}",
       "resetSoon": "Nové zakázky při příštím týdenním resetu",
-      "contractsIntro": "Tři zakázky týdně, stejné pro každého dobrodruha v říši. Nemusíš se zapisovat: dokonči zakázku a její pečeti dostaneš rovnou do brašen, jednou za týden.",
+      "contractsIntro": "Tři zakázky týdně, stejné pro každého dobrodruha v říši. Nemusíš se zapisovat: dokonči zakázku a její pečeti dostaneš přímo, jednou za týden.",
       "kinds": {
         "boss": "Odměna za hlavu",
         "heroic": "Hrdinské dokončení",
@@ -900,7 +900,7 @@ export const cs_CZ: EnTranslations = {
         "cardProgress": "{done}/{total} tento týden",
         "rewardLine": "Odměna: {reward}",
         "stamp": "Zapečetěno",
-        "sealsTip": "Lucernové pečeti získáváš za týdenní zakázky Síně luceren a utrácíš je pouze u zásobovače Garricka Holta. Jsou vázané na tebe."
+        "sealsTip": "Lucernové pečeti získáváš za týdenní zakázky Síně luceren a utrácíš je pouze u zásobovače Garricka Holta. Jsou měnou vázanou na tebe a nezabírají místo v brašnách."
       },
       "shop": {
         "stockLabel": "Nabídka Garricka Holta",
@@ -1607,6 +1607,7 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "seasonOne": "1. sezóna",
+      "promoClose": "Zavřít nabídky",
       "membershipPromo": {
         "open": "Členství v obchodě WOC",
         "close": "Zavřít nabídku členství",
@@ -3451,6 +3452,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Nech světové PvP zapnuté a získávej o {percent} více zkušeností a reputace u frakce. Bonusy přestanou platit, jakmile požádáš o vypnutí.",
       "rewardTitles": "Získej trvalé tituly po {thresholds} odehraného času se zapnutým světovým PvP v otevřeném světě nebo v PvP instancích. Odhlášení, smrt, PvE instance a útočiště časovač pozastavují. Vypnutí PvP jej vynuluje.",
       "rewardPaused": "Aktuální PvP série: odehráno {time} (pozastaveno v útočišti)",
       "rewardPausedDead": "Aktuální PvP série: odehráno {time} (pozastaveno během smrti)",
@@ -3613,6 +3615,7 @@ export const cs_CZ: EnTranslations = {
       "delveMark": "Výpravní žeton",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Hrdinské dungeony . utrácej u hrdinského intendanta",
+      "lanternSealNote": "Týdenní zakázky Síně luceren . utrácej u cechovního zásobovače",
       "honorNote": "Bitevní pole, aréna a světové úkoly",
       "delveMarkNote": "Dokončené výpravy",
       "wocTokenNote": "Zůstatek propojené peněženky",
@@ -3821,6 +3824,7 @@ export const cs_CZ: EnTranslations = {
       "equipLockout": "Nasazení spustí {seconds}s cooldown na jeho použití, nebo zbývající cooldown cetky, kterou nahrazuje, pokud je delší.",
       "equip": {
         "lastStand": "Utrpění poškození pod {threshold} % zdraví udělí štít, který pohltí {absorb} poškození ({absorbPct} % tvého maximálního zdraví) po dobu {duration} s. Může nastat jednou za {icd} s.",
+        "lastStandFlat": "Když utrpíš poškození se zdravím pod {threshold} %, získáš na {duration} s štít, který pohltí {absorb} poškození. Může se spustit jednou za {icd} s.",
         "hourglass": "Přeléčení z tvých přímých léčení se ukládá do přesýpacích hodin, až do {cap} ({capPct} % tvého maximálního zdraví). Uložené léčení vyprchá {fade} s poté, co naposledy vzrostlo.",
         "twinStrike": "Tvé automatické útoky mají {chance}% šanci provést navíc úder hlavní zbraní na blízko. Může nastat jednou za {icd} s.",
         "tally": "Tvé kritické automatické útoky a tvé smrtící údery přidají zápis, až do {max}. Zápisy trvají {duration} s a obnoví se pokaždé, když nějaký získáš.",
@@ -17562,7 +17566,7 @@ export const cs_CZ: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Taktické maskování",
-        "description": "Splyň s okolím: nepřátelé si tě téměř nevšímají a pohybuješ se 80% rychlostí. Útok nebo utrpěné poškození ukončí Taktické maskování. Dalším sesláním z něj vystoupíš. (Polní umění)"
+        "description": "Splyň s okolím: nepřátelé si tě téměř nevšímají a pohybuješ se 80% rychlostí. Útok, utrpěné poškození nebo přivolání mazlíčka ukončí Taktické maskování. Dalším sesláním z něj vystoupíš. Vyžaduje Osamělou duši a žádného mazlíčka."
       },
       "frostjaw_trap": {
         "name": "Past mrazivé čelisti",

@@ -18,8 +18,8 @@
 import { HEROIC_MARK_CURRENCY_ID } from './content/dungeon_difficulty';
 import type { InvSlot } from './types';
 
-/** True for a reward-list id the hub credits as currency rather than an item. */
-export function isCurrencyGrantId(itemId: string): boolean {
+/** True for the Heroic Marks reward-list id (every currency id: currency_grants.ts). */
+export function isHeroicMarkGrantId(itemId: string): boolean {
   return itemId === HEROIC_MARK_CURRENCY_ID;
 }
 
@@ -65,7 +65,7 @@ export function assertHeroicMarksGrantsFit(
 ): void {
   let balance = holder.heroicMarks;
   for (const item of items) {
-    if (isCurrencyGrantId(item.itemId) && !item.instance) {
+    if (isHeroicMarkGrantId(item.itemId) && !item.instance) {
       balance = creditedHeroicMarks(balance, item.count);
     }
   }

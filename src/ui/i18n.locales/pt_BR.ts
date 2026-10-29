@@ -667,6 +667,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Moeda de facção: Estágio 2 pendente',
   'hudChrome.currencies.factions': 'Facções',
   'hudChrome.currencies.heroicMarkNote': 'Masmorras heroicas. Use com o intendente heroico',
+  'hudChrome.currencies.lanternSealNote':
+    'Contratos semanais do Salão da Lanterna. Use com o intendente da guilda',
   'hudChrome.currencies.honor': 'Honra',
   'hudChrome.currencies.honorNote': 'Campos de batalha, arena e missões de mundo',
   'hudChrome.currencies.intro':
@@ -1069,6 +1071,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Seus acertos críticos de arma corpo a corpo e à distância incendeiam o alvo, causando {tick} de dano de Fogo a cada {every} s durante {duration} s. Um novo acerto crítico o renova. O dano aumenta com o poder de ataque ou o poder de ataque à distância, o que for maior.',
   'hudChrome.trinkets.equip.lastStand':
     'Sofrer dano estando abaixo de {threshold}% de vida concede um escudo que absorve {absorb} de dano ({absorbPct}% da sua vida máxima) por {duration} s. Pode ocorrer uma vez a cada {icd} s.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Sofrer dano estando abaixo de {threshold}% de vida concede um escudo que absorve {absorb} de dano por {duration} s. Pode ocorrer uma vez a cada {icd} s.',
   'hudChrome.trinkets.equip.storm':
     'Cada feitiço que você conjura adiciona uma carga, até {max}. As cargas duram {duration} s, renovadas sempre que você ganha uma.',
   'hudChrome.trinkets.equip.tally':
@@ -20305,6 +20309,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Sequência JxJ atual: {time} jogados (em pausa em instâncias JxA)',
   'hudChrome.worldPvp.rewardProgress': 'Sequência JxJ atual: {time} jogados',
+  'hudChrome.worldPvp.rewardBonus':
+    'Mantenha o JxJ mundial ativo para ganhar {percent} a mais de experiência e reputação de facção. Os bônus acabam quando você solicita a desativação.',
   'hudChrome.worldPvp.rewardTitles':
     'Ganhe títulos permanentes após {thresholds} de jogo com JxJ mundial ativo no mundo aberto ou em instâncias JxJ. Sair, morrer, instâncias JxA e santuários pausam o contador. Desativar reinicia o contador.',
   'hudChrome.worldPvp.skullName': 'Crânio de {name}',
@@ -20346,7 +20352,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Consome um efeito de cura ao longo do tempo em um aliado para curá-lo em {damage}. Aplicações de Cura de Esporos e Segundo Florescer adicionam Verdor; com 5 de Verdor este botão vira Superflorescência, que cura instantaneamente cada aliado com seus efeitos de cura ao longo do tempo em 60% da cura restante. (Assinatura de Restauração)',
   'entities.abilities.tactical_camo.description':
-    'Misture-se ao ambiente: inimigos mal percebem você, e sua velocidade é de 80%. Atacar ou receber dano rompe Camuflagem Tática. Use de novo para sair. (Sobrevivência)',
+    'Misture-se ao ambiente: inimigos mal percebem você, e sua velocidade é de 80%. Atacar, receber dano ou chamar um mascote rompe Camuflagem Tática. Use de novo para sair. Requer Alma Solitária e estar sem mascote.',
   'entities.abilities.tactical_camo.name': 'Camuflagem Tática',
   'entities.itemSets.grovespring.bonus2':
     'Recuperação Rápida consome primeiro sua própria Cura de Esporos ou Segundo Florescer e cura 25 por cento a mais. O dano recebido não atrasa mais seus feitiços.',
@@ -22923,6 +22929,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.preyTitle': 'Você é a Presa!',
   'hudChrome.wildheartAlert.stalkedTitle': 'Espreitado!',
   'hudChrome.wocStore.collections.lantern_hall': 'Salão da Lanterna',
+  'hudChrome.wocStore.promoClose': 'Fechar promoções',
   'hudChrome.wocStore.membershipPromo.close': 'Fechar promoção de assinatura',
   'hudChrome.wocStore.membershipPromo.cta': 'Assine agora',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Vantagens da conta',
@@ -24445,7 +24452,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.partyRolesNote':
     'Escolha uma função para cada membro ou deixe que mantenham a própria.',
   'hudChrome.guildHall.board.sealsTip':
-    'Selos da lanterna são pagos pelos contratos semanais do Salão da Lanterna e gastos apenas com Garrick Holt, o intendente. São vinculados a você.',
+    'Selos da lanterna são pagos pelos contratos semanais do Salão da Lanterna e gastos apenas com Garrick Holt, o intendente. São uma moeda vinculada a você e não ocupam espaço nas bolsas.',
   'hudChrome.guildHall.board.weekProgress': 'Nesta semana: {done} de {total} contratos concluídos',
   'hudChrome.guildHall.bought': 'Você comprou o título {title}. Escolha no Livro dos Feitos.',
   'hudChrome.guildHall.boughtMount': 'Você comprou {mount}. As rédeas estão nas suas bolsas.',
@@ -24460,7 +24467,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.contractDone.other':
     'Contrato concluído: {contract}. Você recebe {count} selos da lanterna.',
   'hudChrome.guildHall.contractsIntro':
-    'Três contratos por semana, iguais para todos os aventureiros do reino. Sem precisar assinar: conclua um e os selos vão direto para suas bolsas, uma vez por semana.',
+    'Três contratos por semana, iguais para todos os aventureiros do reino. Sem precisar assinar: conclua um e você recebe os selos diretamente, uma vez por semana.',
   'hudChrome.guildHall.emptyBoard': 'O quadro está sendo reescrito. Volte após o reinício semanal.',
   'hudChrome.guildHall.goals.boss': 'Derrote {boss} em {dungeon}, em qualquer dificuldade.',
   'hudChrome.guildHall.goals.heroic':

@@ -56,7 +56,7 @@ describe('quest snapshot wire', () => {
       ['wkq', null],
       ['wkexp', 1_893_628_800_000],
       // Lantern Hall's board: the week's three contracts; a past week's done list does not
-      // carry over, the lifetime count does.
+      // carry over, the lifetime count does. The Lantern Seals balance rides the same key.
       [
         'gcon',
         {
@@ -64,6 +64,7 @@ describe('quest snapshot wire', () => {
           offered: guildContractsForWeek(week).map((c) => c.id),
           done: [],
           lifetime: 4,
+          seals: 0,
         },
       ],
     ]);

@@ -43,7 +43,7 @@ export function combineCostMultipliers(a: number | null, b: number | null): numb
   return a * b;
 }
 
-// Called from the single breakStealth funnel on Sim: leaving Duskveil starts
+// Called from the single breakStealth funnel (combat/stealth_break.ts): leaving Duskveil starts
 // the 6 sec linger window. Refreshes, never stacks.
 export function duskLingerOnStealthBreak(ctx: SimContext, e: Entity): void {
   const globals = globalsFor(ctx, e);

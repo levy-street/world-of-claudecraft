@@ -240,31 +240,45 @@ describe('redeemed token armour claim', () => {
     service.onLeave(session);
   });
 
-  it('retains a committed claim until a refresh actually confirms active authority', async () => {
-    vi.useFakeTimers();
-    const { host, session, service } = fixture();
-    service.onJoin(session);
-    vi.mocked(redeemMembershipTokenAtomic).mockResolvedValue({ ok: true, expiresAt: 100_000 });
-    await service.redeem(session);
-    await vi.advanceTimersByTimeAsync(30);
-    expect(host.sim.claimMembershipArmour).not.toHaveBeenCalled();
-    vi.mocked(getMembershipBatch).mockResolvedValue(
-      new Map([
-        [
-          7,
-          {
-            active: true,
-            expiresAt: Date.now() + 60_000,
-            authorizedUntil: Date.now() + 60_000,
-            recurringExpiresAt: null,
-          },
-        ],
-      ]),
-    );
-    await vi.advanceTimersByTimeAsync(31_000);
-    expect(host.sim.claimMembershipArmour).toHaveBeenCalledExactlyOnceWith(session.pid);
-    service.onLeave(session);
-  });
+  it.each([
+    { phase: 0, refreshAt: 31_025 },
+    { phase: 980, refreshAt: 32_025 },
+  ])(
+    'retains a committed claim until a refresh actually confirms active authority (clock phase $phase)',
+    async ({ phase, refreshAt }) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(phase);
+      const { host, session, service } = fixture();
+      service.onJoin(session);
+      vi.mocked(redeemMembershipTokenAtomic).mockResolvedValue({ ok: true, expiresAt: 100_000 });
+      await service.redeem(session);
+      await vi.advanceTimersByTimeAsync(30);
+      expect(getMembershipBatch).toHaveBeenCalledExactlyOnceWith([session.accountId]);
+      expect(host.sim.claimMembershipArmour).not.toHaveBeenCalled();
+      vi.mocked(getMembershipBatch).mockResolvedValue(
+        new Map([
+          [
+            7,
+            {
+              active: true,
+              expiresAt: Date.now() + 60_000,
+              authorizedUntil: Date.now() + 60_000,
+              recurringExpiresAt: null,
+            },
+          ],
+        ]),
+      );
+      // The first read coalesces for 25 ms, then the 30-second cohort rounds
+      // up to a whole second and coalesces for another 25 ms before reading.
+      await vi.advanceTimersByTimeAsync(refreshAt - Date.now() - 1);
+      expect(getMembershipBatch).toHaveBeenCalledTimes(1);
+      expect(host.sim.claimMembershipArmour).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(getMembershipBatch).toHaveBeenCalledTimes(2);
+      expect(host.sim.claimMembershipArmour).toHaveBeenCalledExactlyOnceWith(session.pid);
+      service.onLeave(session);
+    },
+  );
 
   it.each(['rollback', 'projection'] as const)(
     'does not queue a claim after %s failure even when the account was already active',

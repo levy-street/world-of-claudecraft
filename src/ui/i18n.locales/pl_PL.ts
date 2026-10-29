@@ -621,6 +621,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Waluta Frakcji: oczekiwanie na Etap 2',
   'hudChrome.currencies.factions': 'Frakcje',
   'hudChrome.currencies.heroicMarkNote': 'Lochowiska heroiczne. Wydaj w kwatermistrzu heroicznym',
+  'hudChrome.currencies.lanternSealNote':
+    'Tygodniowe kontrakty Sali Latarni . wydawaj u kwatermistrza gildii',
   'hudChrome.currencies.honor': 'Honor',
   'hudChrome.currencies.honorNote': 'Pola Bitwy, Arena i zadania światowe',
   'hudChrome.currencies.intro':
@@ -1103,6 +1105,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Twoje trafienia krytyczne broni melee i ranged zapalają cel, zadając {tick} obrażeń ognia co {every} sek przez {duration} sek. Nowe trafienie krytyczne je odświeża. Obrażenia zwiększają się wraz z Mocą ataku lub Mocą ataku z dystansu, w zależności od tego, która jest wyższa.',
   'hudChrome.trinkets.equip.lastStand':
     'Otrzymanie obrażeń poniżej {threshold}% zdrowia udziela ekranu, który pochłania {absorb} obrażeń ({absorbPct}% twojego maksymalnego zdrowia) przez {duration} sek. Może się zdarzyć raz na {icd} sek.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Otrzymanie obrażeń przy zdrowiu poniżej {threshold}% zapewnia tarczę pochłaniającą {absorb} obrażeń przez {duration} sek. Może wystąpić raz na {icd} sek.',
   'hudChrome.trinkets.equip.storm':
     'Każde zaklęcie, które rzucasz, dodaje ładunek, do {max}. Ładunki trwają {duration} sek, odświeżane za każdym razem, gdy zyskasz jeden.',
   'hudChrome.trinkets.equip.tally':
@@ -20182,6 +20186,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Obecna seria PvP: rozegrano {time} (wstrzymana w instancjach PvE)',
   'hudChrome.worldPvp.rewardProgress': 'Obecna seria PvP: rozegrano {time}',
+  'hudChrome.worldPvp.rewardBonus':
+    'Pozostaw światowe PvP włączone, aby zdobywać o {percent} więcej doświadczenia i reputacji frakcji. Premie kończą się w chwili wysłania prośby o wyłączenie.',
   'hudChrome.worldPvp.rewardTitles':
     'Zdobywaj stałe tytuły po {thresholds} czasu gry z włączonym światowym PvP w otwartym świecie lub instancjach PvP. Wylogowanie, śmierć, instancje PvE i sanktuaria wstrzymują licznik. Wyłączenie PvP go zeruje.',
   'hudChrome.worldPvp.skullName': 'Czaszka gracza {name}',
@@ -20223,7 +20229,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Zużywa efekt leczenia w czasie na przyjaznym celu, lecząc go o {damage}. Zarodnikowe gojenie i nasadzenia Drugiego rozkwitu dodają Zieleń; przy 5 punktach Zieleni ten przycisk staje się Nadrozkwitem, który natychmiast leczy wszystkich sojuszników z twoimi efektami leczenia w czasie o 60% ich pozostałego leczenia. (zdolność charakterystyczna Odnowienia)',
   'entities.abilities.tactical_camo.description':
-    'Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. (Sztuka przetrwania)',
+    'Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak, otrzymanie obrażeń lub przywołanie zwierzęcia przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. Wymaga Samotnej duszy i braku zwierzęcia.',
   'entities.abilities.tactical_camo.name': 'Kamuflaż taktyczny',
   'entities.itemSets.grovespring.bonus2':
     'Szybkie uzdrowienie najpierw zużywa twoje własne Zarodnikowe gojenie lub Drugi rozkwit i leczy o 25 procent więcej. Otrzymane obrażenia nie opóźniają już rzucania zaklęć.',
@@ -20636,6 +20642,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountWithdrawHint': 'Kliknij, aby przenieść ten stos do swoich toreb.',
   'hudChrome.bank.accountWithdrawLead': 'Kliknij przedmiot, aby przenieść go do swoich toreb.',
   'hudChrome.bank.referralArmour': 'Odbierz pancerz przyjaźni',
+  'hudChrome.wocStore.promoClose': 'Zamknij promocje',
   'hudChrome.wocStore.membershipPromo.close': 'Zamknij promocję członkostwa',
   'hudChrome.wocStore.membershipPromo.cta': 'Dołącz teraz',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Korzyści konta',
@@ -20808,7 +20815,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Kontrakty na ten tydzień',
   'hudChrome.guildHall.board.rewardLine': 'Nagroda: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Pieczęcie Latarni otrzymujesz za tygodniowe kontrakty Sali Latarni i wydajesz wyłącznie u kwatermistrza Garricka Holta. Są przypisane do ciebie.',
+    'Pieczęcie Latarni otrzymujesz za tygodniowe kontrakty Sali Latarni i wydajesz wyłącznie u kwatermistrza Garricka Holta. To przypisana do ciebie waluta, która nie zajmuje miejsca w torbach.',
   'hudChrome.guildHall.board.stamp': 'Zapieczętowane',
   'hudChrome.guildHall.board.weekProgress': 'W tym tygodniu: ukończone kontrakty {done} z {total}',
   'hudChrome.guildHall.board.weekProgressAria': 'Kontrakty ukończone w tym tygodniu',
@@ -20827,7 +20834,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Kontrakt ukończony: {contract}. Otrzymane Pieczęcie Latarni: {count}.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Trzy kontrakty tygodniowo, takie same dla każdego poszukiwacza przygód w krainie. Nie trzeba się zapisywać: ukończ kontrakt, a pieczęcie trafią prosto do twoich toreb, raz w tygodniu.',
+    'Trzy kontrakty tygodniowo, takie same dla każdego poszukiwacza przygód w krainie. Nie trzeba się zapisywać: ukończ kontrakt, a otrzymasz pieczęcie bezpośrednio, raz w tygodniu.',
   'hudChrome.guildHall.done': 'Ukończono w tym tygodniu',
   'hudChrome.guildHall.emptyBoard': 'Tablica jest przepisywana. Wróć po tygodniowym resecie.',
   'hudChrome.guildHall.goals.boss':

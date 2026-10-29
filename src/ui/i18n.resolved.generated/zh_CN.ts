@@ -851,7 +851,7 @@ export const zh_CN: EnTranslations = {
       "seals": "灯火印章：{count}",
       "resetIn": "{time}后发布新契约",
       "resetSoon": "下次每周重置时发布新契约",
-      "contractsIntro": "每周三份契约，王国中的每位冒险者看到的都一样。无需签署：完成其中一份，它的印章就会直接放进你的背包，每周一次。",
+      "contractsIntro": "每周三份契约，王国中的每位冒险者看到的都一样。无需签署：完成其中一份，你就会直接获得它的印章，每周一次。",
       "kinds": {
         "boss": "悬赏",
         "heroic": "英雄通关",
@@ -900,7 +900,7 @@ export const zh_CN: EnTranslations = {
         "cardProgress": "本周 {done}/{total}",
         "rewardLine": "奖励：{reward}",
         "stamp": "已盖印",
-        "sealsTip": "灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们与你绑定。"
+        "sealsTip": "灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们是与你绑定的货币，不占背包空间。"
       },
       "shop": {
         "stockLabel": "加里克·霍尔特的货品",
@@ -1607,6 +1607,7 @@ export const zh_CN: EnTranslations = {
         }
       },
       "seasonOne": "第一赛季",
+      "promoClose": "关闭推广",
       "membershipPromo": {
         "open": "WOC 商店中的会员",
         "close": "关闭会员推广",
@@ -3451,6 +3452,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "保持世界PvP开启可多获得{percent}的经验值和阵营声望。请求关闭时，加成立即停止。",
       "rewardTitles": "开启世界PvP时，在开放世界或PvP副本中的游戏时间达到{thresholds}后可获得永久称号。退出游戏、死亡、PvE副本和安全区会暂停计时。关闭PvP会重置计时。",
       "rewardPaused": "当前PvP连续游戏时间：{time}（在安全区暂停）",
       "rewardPausedDead": "当前PvP连续游戏时间：{time}（死亡期间暂停）",
@@ -3613,6 +3615,7 @@ export const zh_CN: EnTranslations = {
       "delveMark": "探险印记",
       "wocToken": "WoC 代币",
       "heroicMarkNote": "英雄地下城 . 在英雄军需官处兑换",
+      "lanternSealNote": "灯火大厅每周契约 . 在公会军需官处兑换",
       "honorNote": "战场、竞技场与世界任务",
       "delveMarkNote": "已完成的探险",
       "wocTokenNote": "已关联钱包的余额",
@@ -3821,6 +3824,7 @@ export const zh_CN: EnTranslations = {
       "equipLockout": "装备后，其使用效果会进入 {seconds} 秒的冷却；如果被替换的饰品剩余冷却更长，则改为该剩余冷却。",
       "equip": {
         "lastStand": "在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害（你最大生命值的 {absorbPct}%）的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。",
+        "lastStandFlat": "在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。",
         "hourglass": "你的直接治疗产生的过量治疗会储存在沙漏中，最多 {cap} 点（你最大生命值的 {capPct}%）。储存的治疗量在最后一次增加后 {fade} 秒消散。",
         "twinStrike": "你的自动攻击命中有 {chance}% 的几率额外进行一次主手近战挥击。每 {icd} 秒只能触发一次。",
         "tally": "你的自动攻击暴击和你的致命一击各增加一个计数标记，最多 {max} 个。标记持续 {duration} 秒，每获得一个便会刷新。",
@@ -17562,7 +17566,7 @@ export const zh_CN: EnTranslations = {
       },
       "tactical_camo": {
         "name": "战术伪装",
-        "description": "融入周围环境：敌人几乎察觉不到你，你以80%的速度移动。攻击或受到伤害会打破战术伪装。再次施放即可解除。（野战技艺）"
+        "description": "融入周围环境：敌人几乎察觉不到你，你以80%的速度移动。攻击、受到伤害或召唤宠物会打破战术伪装。再次施放即可解除。需要孤独之魂，且不能有宠物。"
       },
       "frostjaw_trap": {
         "name": "霜颚陷阱",

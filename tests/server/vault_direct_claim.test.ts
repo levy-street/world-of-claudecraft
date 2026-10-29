@@ -36,6 +36,27 @@ function args() {
 }
 
 describe('direct vault claim transaction', () => {
+  it.each([
+    ['heroic_mark', 'heroicMarks'],
+    ['lantern_seal', 'lanternSeals'],
+  ] as const)(
+    'keeps an overflowing %s claim pending before any connection',
+    async (itemId, field) => {
+      const request = args();
+      request.state[field] = Number.MAX_SAFE_INTEGER - 1;
+      request.claim.items.push({ itemId, count: 1 }, { itemId, count: 1 });
+      const before = structuredClone(request);
+      const connect = vi.fn();
+      const saveCharacter = vi.fn();
+      expect(await commitVaultDirectClaim({ pool: { connect }, saveCharacter }, request)).toBe(
+        'retry',
+      );
+      expect(request).toEqual(before);
+      expect(connect).not.toHaveBeenCalled();
+      expect(saveCharacter).not.toHaveBeenCalled();
+    },
+  );
+
   it('commits the reward snapshot and claim marker on the same client', async () => {
     const queries: string[] = [];
     const client: VaultRewardClient = {

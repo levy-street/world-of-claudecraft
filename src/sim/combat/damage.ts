@@ -283,14 +283,13 @@ export function dealDamage(
   // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
   // owner has the gating quest active/ready may harm it; other hits are a no-op.
   if (questGateBlocksDamage(ctx.players, source, target)) return 0;
-  // A pet (an owned mob) cannot strike a stealthed enemy player, just as it
-  // cannot see or acquire one (pet/pet_ai.ts). No proximity detection, unlike a
-  // wild mob.
+  // A pet (an owned mob) cannot strike a stealthed enemy player it cannot see,
+  // the same PvP proximity rule that governs acquiring one (pet/pet_ai.ts).
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
     target.kind === 'player' &&
-    !petCanSeeStealthedTarget(target)
+    !petCanSeeStealthedTarget(target, source)
   )
     return 0;
   if (target.gm || target.devGod || (target.profilerInvulnerable && ctx.devCommands)) {

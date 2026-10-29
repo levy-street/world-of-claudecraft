@@ -630,6 +630,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Frakční měna: čeká na 2. fázi',
   'hudChrome.currencies.factions': 'Frakce',
   'hudChrome.currencies.heroicMarkNote': 'Hrdinské dungeony . utrácej u hrdinského intendanta',
+  'hudChrome.currencies.lanternSealNote':
+    'Týdenní zakázky Síně luceren . utrácej u cechovního zásobovače',
   'hudChrome.currencies.honor': 'Čest',
   'hudChrome.currencies.honorNote': 'Bitevní pole, aréna a světové úkoly',
   'hudChrome.currencies.intro':
@@ -1107,6 +1109,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tvé kritické zásahy zbraní na blízko i na dálku zapálí cíl a způsobí {tick} ohnivého poškození každých {every} s po dobu {duration} s. Nový kritický zásah to obnoví. Poškození roste se silou útoku nebo útočnou silou na dálku, podle toho, která je vyšší.',
   'hudChrome.trinkets.equip.lastStand':
     'Utrpění poškození pod {threshold} % zdraví udělí štít, který pohltí {absorb} poškození ({absorbPct} % tvého maximálního zdraví) po dobu {duration} s. Může nastat jednou za {icd} s.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Když utrpíš poškození se zdravím pod {threshold} %, získáš na {duration} s štít, který pohltí {absorb} poškození. Může se spustit jednou za {icd} s.',
   'hudChrome.trinkets.equip.storm':
     'Každé kouzlo, které sešleš, přidá nabití, až do {max}. Nabití trvají {duration} s a obnoví se pokaždé, když nějaké získáš.',
   'hudChrome.trinkets.equip.tally':
@@ -19943,6 +19947,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Aktuální PvP série: odehráno {time} (pozastaveno v PvE instancích)',
   'hudChrome.worldPvp.rewardProgress': 'Aktuální PvP série: odehráno {time}',
+  'hudChrome.worldPvp.rewardBonus':
+    'Nech světové PvP zapnuté a získávej o {percent} více zkušeností a reputace u frakce. Bonusy přestanou platit, jakmile požádáš o vypnutí.',
   'hudChrome.worldPvp.rewardTitles':
     'Získej trvalé tituly po {thresholds} odehraného času se zapnutým světovým PvP v otevřeném světě nebo v PvP instancích. Odhlášení, smrt, PvE instance a útočiště časovač pozastavují. Vypnutí PvP jej vynuluje.',
   'hudChrome.worldPvp.skullName': 'Lebka hráče {name}',
@@ -19985,7 +19991,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Spotřebuje průběžný léčivý účinek na přátelském cíli a vyléčí jej o {damage}. Výtrusové hojení a výsadby Druhého květu přidávají Zeleň; při 5 bodech Zeleně se toto tlačítko změní na Překvět, který okamžitě vyléčí všechny spojence s tvými průběžnými léčivými účinky o 60 % jejich zbývajícího léčení. (klíčová schopnost Srdce háje)',
   'entities.abilities.tactical_camo.description':
-    'Splyň s okolím: nepřátelé si tě téměř nevšímají a pohybuješ se 80% rychlostí. Útok nebo utrpěné poškození ukončí Taktické maskování. Dalším sesláním z něj vystoupíš. (Polní umění)',
+    'Splyň s okolím: nepřátelé si tě téměř nevšímají a pohybuješ se 80% rychlostí. Útok, utrpěné poškození nebo přivolání mazlíčka ukončí Taktické maskování. Dalším sesláním z něj vystoupíš. Vyžaduje Osamělou duši a žádného mazlíčka.',
   'entities.abilities.tactical_camo.name': 'Taktické maskování',
   'entities.itemSets.grovespring.bonus2':
     'Rychlé zhojení nejprve spotřebuje tvé vlastní Výtrusové hojení nebo Druhý květ a léčí o 25 procent více. Utrpěné poškození už nezdržuje sesílání kouzel.',
@@ -20394,6 +20400,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountWithdrawHint': 'Kliknutím vyber tento stoh do svých brašen.',
   'hudChrome.bank.accountWithdrawLead': 'Kliknutím na předmět jej přesuň do svých brašen.',
   'hudChrome.bank.referralArmour': 'Vyzvednout zbroj přátelství',
+  'hudChrome.wocStore.promoClose': 'Zavřít nabídky',
   'hudChrome.wocStore.membershipPromo.close': 'Zavřít nabídku členství',
   'hudChrome.wocStore.membershipPromo.cta': 'Přidej se nyní',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Výhody účtu',
@@ -20554,7 +20561,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Zakázky na tento týden',
   'hudChrome.guildHall.board.rewardLine': 'Odměna: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Lucernové pečeti získáváš za týdenní zakázky Síně luceren a utrácíš je pouze u zásobovače Garricka Holta. Jsou vázané na tebe.',
+    'Lucernové pečeti získáváš za týdenní zakázky Síně luceren a utrácíš je pouze u zásobovače Garricka Holta. Jsou měnou vázanou na tebe a nezabírají místo v brašnách.',
   'hudChrome.guildHall.board.stamp': 'Zapečetěno',
   'hudChrome.guildHall.board.weekProgress': 'Tento týden: dokončeno {done} z {total} zakázek',
   'hudChrome.guildHall.board.weekProgressAria': 'Zakázky dokončené tento týden',
@@ -20575,7 +20582,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zakázka dokončena: {contract}. Získané Lucernové pečeti: {count}.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Tři zakázky týdně, stejné pro každého dobrodruha v říši. Nemusíš se zapisovat: dokonči zakázku a její pečeti dostaneš rovnou do brašen, jednou za týden.',
+    'Tři zakázky týdně, stejné pro každého dobrodruha v říši. Nemusíš se zapisovat: dokonči zakázku a její pečeti dostaneš přímo, jednou za týden.',
   'hudChrome.guildHall.done': 'Dokončeno tento týden',
   'hudChrome.guildHall.emptyBoard': 'Nástěnka se přepisuje. Vrať se po týdenním resetu.',
   'hudChrome.guildHall.goals.boss': 'Poraz cíl {boss} v kobce {dungeon} na kteroukoli obtížnost.',

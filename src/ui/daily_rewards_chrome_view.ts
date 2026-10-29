@@ -36,8 +36,8 @@ export function dailyRewardsLoadingHtml(storeEnabled: boolean): string {
     '<span class="cl-spinner" aria-hidden="true"></span>' +
     `<span>${esc(label)}</span></div>`;
   return storeEnabled
-    ? `<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store">${spinner(t('hudChrome.wocStore.loading'), false)}</div>`
-    : `<div class="dr-body woc-store-body">${spinner(t('hudChrome.dailyRewards.loading'), true)}</div>`;
+    ? `<div id="woc-store-panel" class="dr-body woc-store-body window-fill" role="tabpanel" aria-labelledby="woc-store-tab-store">${spinner(t('hudChrome.wocStore.loading'), false)}</div>`
+    : `<div class="dr-body woc-store-body window-fill">${spinner(t('hudChrome.dailyRewards.loading'), true)}</div>`;
 }
 
 export function dailyRewardsSummaryHtml(

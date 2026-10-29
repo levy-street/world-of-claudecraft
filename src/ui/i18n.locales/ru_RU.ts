@@ -3126,6 +3126,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.statusOffFfa':
     'Ваш флаг PvP опущен, но на территории свободного боя вы всё равно можете атаковать и быть атакованным.',
   'hudChrome.worldPvp.statusOn': 'Ваш флаг PvP поднят. Игроки с флагом могут атаковать вас.',
+  'hudChrome.worldPvp.rewardBonus':
+    'При включенном мировом PvP вы получаете на {percent} больше опыта и репутации фракций. Бонусы прекращаются сразу после запроса на отключение.',
   'hudChrome.worldPvp.rewardTitles':
     'Постоянные титулы выдаются за {thresholds} игрового времени с включенным мировым PvP в открытом мире или PvP-инстансах. Выход из игры, смерть, PvE-инстансы и святилища приостанавливают таймер. Отключение PvP сбрасывает его.',
   'hudChrome.worldPvp.rewardPaused':
@@ -4619,6 +4621,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Выкован из сырого метеоритного металла, пока кратер Mirefen ещё светился. Обломки, «слишком горячие для рук», стали космически-чёрными плечами с созвездиями, а вдоль ложа заключили расплавленно-золотое ядро. Арбалет не заряжают болтом — он создаёт его сам: стрелу звёздного пламени, выпущенную как приговор и падающую как его исполнение. Когда Highwatch боялся, что даже бессмертная корона Nythraxis — не худшее под горами, именно это оружие хотели видеть на стене. Цельтесь точно.',
   'hudChrome.wocStore.seasonOne': 'Сезон 1',
+  'hudChrome.wocStore.promoClose': 'Закрыть рекламу',
   'hudChrome.wocStore.membershipPromo.open': 'Членство в магазине WOC',
   'hudChrome.wocStore.membershipPromo.close': 'Закрыть рекламу членства',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Преимущества аккаунта',
@@ -8283,7 +8286,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Подлечивает питомца: если он жив, восстанавливает ему здоровье за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
   'entities.abilities.tactical_camo.name': 'Тактический камуфляж',
   'entities.abilities.tactical_camo.description':
-    'Вы сливаетесь с окружением: враги почти не замечают вас, а скорость передвижения составляет 80%. Атака или получение урона снимает Тактический камуфляж. Примените повторно, чтобы выйти. (Полевая выучка)',
+    'Вы сливаетесь с окружением: враги почти не замечают вас, а скорость передвижения составляет 80%. Атака, получение урона или призыв питомца снимают Тактический камуфляж. Примените повторно, чтобы выйти. Требуется Одинокая душа и отсутствие питомца.',
   'entities.abilities.play_dead.name': 'Притвориться мёртвым',
   'entities.abilities.play_dead.description':
     'Вы падаете на землю и выглядите мёртвым: всем видно, что ваше здоровье и запас концентрации пусты. Враги забывают о вас, а вражеские игроки, выбравшие вас целью, теряют цель. Движение, атака или другая способность прерывают эффект. Если применить способность в движении, у вас есть 1 сек., чтобы остановиться, иначе движение прервёт эффект. Примените повторно, чтобы встать.',
@@ -22421,6 +22424,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.wocToken': 'Токен WoC',
   'hudChrome.currencies.heroicMarkNote':
     'Героические подземелья . тратится у героического интенданта',
+  'hudChrome.currencies.lanternSealNote':
+    'Еженедельные контракты Зала Фонаря . тратится у интенданта гильдии',
   'hudChrome.currencies.honorNote': 'Поля боя, арена и мировые задания',
   'hudChrome.currencies.delveMarkNote': 'Пройденные вылазки',
   'hudChrome.currencies.wocTokenNote': 'Баланс привязанного кошелька',
@@ -23178,6 +23183,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'При надевании его использование уходит на восстановление на {seconds} сек. или на оставшееся время восстановления заменяемого аксессуара, если оно дольше.',
   'hudChrome.trinkets.equip.lastStand':
     'Получая урон при здоровье ниже {threshold}%, вы получаете щит, поглощающий {absorb} ед. урона ({absorbPct}% от максимального здоровья), на {duration} сек. Срабатывает не чаще раза в {icd} сек.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Получая урон при здоровье ниже {threshold}%, вы получаете щит, поглощающий {absorb} ед. урона, на {duration} сек. Срабатывает не чаще раза в {icd} сек.',
   'hudChrome.trinkets.equip.hourglass':
     'Избыточное исцеление от ваших прямых исцелений копится в песочных часах, вплоть до {cap} ед. ({capPct}% от максимального здоровья). Накопленное исцеление исчезает через {fade} сек. после последнего пополнения.',
   'hudChrome.trinkets.equip.twinStrike':
@@ -24654,7 +24661,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.resetIn': 'Новые контракты через {time}',
   'hudChrome.guildHall.resetSoon': 'Новые контракты после еженедельного сброса',
   'hudChrome.guildHall.contractsIntro':
-    'Три контракта в неделю, одни и те же для всех искателей приключений королевства. Подписывать ничего не нужно: выполните контракт, и его печати сразу попадут в ваши сумки, раз в неделю.',
+    'Три контракта в неделю, одни и те же для всех искателей приключений королевства. Подписывать ничего не нужно: выполните контракт, и его печати будут выплачены вам напрямую, раз в неделю.',
   'hudChrome.guildHall.kinds.boss': 'Награда за голову',
   'hudChrome.guildHall.kinds.heroic': 'Героическое прохождение',
   'hudChrome.guildHall.kinds.task': 'Поручение',
@@ -24709,7 +24716,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.rewardLine': 'Награда: {reward}',
   'hudChrome.guildHall.board.stamp': 'Скреплено',
   'hudChrome.guildHall.board.sealsTip':
-    'Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Они привязаны к вам.',
+    'Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Это привязанная к вам валюта, которая не занимает места в сумках.',
   'hudChrome.guildHall.shop.stockLabel': 'Товары Гаррика Холта',
   'hudChrome.guildHall.shop.kindMount': 'Скакун',
   'hudChrome.guildHall.shop.kindSword': 'Облик меча',

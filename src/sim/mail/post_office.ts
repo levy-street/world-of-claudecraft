@@ -1,4 +1,4 @@
-import { assertHeroicMarksGrantsFit } from '../heroic_marks';
+import { assertCurrencyGrantsFit } from '../currency_grants';
 // The Ravenpost: the in-game mail system. A new system module behind SimContext
 // (the market.ts shape): this class OWNS the shared mail book, the mail-id
 // counter, and the mailbox entity ids; the inventory hub (addItem/removeItem/
@@ -802,7 +802,7 @@ export class PostOffice {
       this.result(meta.entityId, 'letterGone');
       return;
     }
-    assertHeroicMarksGrantsFit(meta, m.items);
+    assertCurrencyGrantsFit(meta, m.items);
     // Escrow in the expiry sense (sub-silver coin alone does not count): the
     // clock write at the tail keys on this, the coin grant below on any coin.
     const hadAttachments = mailHoldsEscrow(m);

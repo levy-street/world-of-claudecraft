@@ -4564,9 +4564,13 @@
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
   }
+  /* The desktop store is a flex column whose body shrinks to fit the window;
+     the touch layout keeps its own body cap and block-flow height instead
+     (flex-shrink: 0), so the landscape card sizing it was tuned against holds. */
   body.mobile-touch #daily-rewards-window .woc-store-body {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     padding: 10px;
+    flex-shrink: 0;
   }
   body.mobile-touch .dr-spin-stage {
     width: min(360px, calc(var(--app-vw, 100vw) - 24px), calc(var(--app-vh, 100dvh) - 24px));

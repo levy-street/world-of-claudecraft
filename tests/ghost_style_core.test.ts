@@ -5,12 +5,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   characterGhostLook,
+  ghostLookFor,
   ROGUE_STEALTH_AURA_IDS,
   stealthVeilPalette,
 } from '../src/render/ghost_style_core';
 import { selfBuffAuraId } from '../src/sim/combat/aura_ids';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 const VIEWER = 1;
@@ -134,5 +136,59 @@ describe('characterGhostLook', () => {
         'none',
       ),
     ).toBeNull();
+  });
+});
+
+// Stealth Rework: a stealthed ENEMY the viewer has spotted is neutral (the
+// shimmer's cool rim) whatever the stealth, and red only while targeted. The
+// stealther themself and anyone not hostile keep the stealth's own palette.
+describe('a spotted stealthed enemy', () => {
+  function scene() {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const rogue = sim.entities.get(sim.addPlayer('rogue', 'Shade'))!;
+    rogue.level = 20;
+    rogue.auras.push({
+      id: 'stealth',
+      name: 'Duskveil',
+      kind: 'stealth',
+      remaining: 60,
+      duration: 60,
+      value: 0.5,
+      sourceId: rogue.id,
+      school: 'physical',
+    });
+    rogue.stealthed = true;
+    sim.duelRequest(rogue.id, sim.playerId);
+    sim.duelAccept(rogue.id);
+    for (let i = 0; i < 20 * 5 && sim.duelFor(sim.playerId)?.state !== 'active'; i++) sim.tick();
+    return { sim, rogue };
+  }
+
+  it('is neutral when not targeted and red when targeted, for every stealth', () => {
+    const { sim, rogue } = scene();
+    expect(sim.duelFor(sim.playerId)?.state).toBe('active');
+    sim.player.targetId = null;
+    expect(ghostLookFor(sim, rogue, false, 'none')).toBe('stealth-enemy');
+    sim.player.targetId = rogue.id;
+    expect(ghostLookFor(sim, rogue, false, 'none')).toBe('stealth-enemy-target');
+    rogue.auras = [{ ...rogue.auras[0], id: 'prowl' }]; // a druid's Stalk
+    expect(ghostLookFor(sim, rogue, false, 'none')).toBe('stealth-enemy-target');
+    sim.player.targetId = null;
+    expect(ghostLookFor(sim, rogue, false, 'none')).toBe('stealth-enemy');
+  });
+
+  it('keeps the stealth palette for anyone who is not an enemy', () => {
+    const { sim, rogue } = scene();
+    for (const id of [sim.playerId, rogue.id]) sim.ctx.duels.delete(id);
+    sim.player.targetId = rogue.id;
+    expect(ghostLookFor(sim, rogue, false, 'none')).toBe('stealth-rogue');
+    // The stealther's own body, as their own client draws it.
+    expect(characterGhostLook(rogue.id, rogue, false, 'none')).toBe('stealth-rogue');
+    // A dead stealther is a spirit first; an unstealthed enemy has no veil.
+    expect(ghostLookFor(sim, { ...rogue, ghost: true } as Entity, false, 'none')).toBe('spirit');
+    rogue.auras = [];
+    rogue.stealthed = false;
+    expect(ghostLookFor(sim, rogue, false, 'none')).toBeNull();
   });
 });

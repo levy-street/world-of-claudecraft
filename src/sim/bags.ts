@@ -52,8 +52,8 @@ import {
   poolOccupancyOf,
   totalPoolCapacity,
 } from './bag_pools';
+import { isCurrencyGrantId } from './currency_grants';
 import { ITEMS } from './data';
-import { isCurrencyGrantId } from './heroic_marks';
 import {
   consumeSelectedInventorySlot,
   newestMatchingSlot,
@@ -203,8 +203,8 @@ export function countFit(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): number {
-  // A currency id (Heroic Marks) credits a PlayerMeta counter at the hub, never
-  // a slot, so every capacity gate sees it fit whole (heroic_marks.ts). Only a
+  // A currency id (Heroic Marks, Lantern Seals) credits a PlayerMeta counter at the hub, never
+  // a slot, so every capacity gate sees it fit whole (currency_grants.ts). Only a
   // plain grant: a payload-bearing copy takes the instanced path and a slot.
   if (!instance && isCurrencyGrantId(itemId)) return count;
   const def = ITEMS[itemId];

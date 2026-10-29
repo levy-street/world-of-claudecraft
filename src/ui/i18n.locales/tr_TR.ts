@@ -620,6 +620,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Fraksiyon parası: 2. Aşama bekleniyor',
   'hudChrome.currencies.factions': 'Fraksiyonlar',
   'hudChrome.currencies.heroicMarkNote': 'Kahramanlık zindanları . Kahramanlık idarecisinden harca',
+  'hudChrome.currencies.lanternSealNote':
+    'Fener Salonunun haftalık sözleşmeleri . lonca levazım subayında harca',
   'hudChrome.currencies.honor': 'Onur',
   'hudChrome.currencies.honorNote': 'Savaş alanları, arena ve dünya görevleri',
   'hudChrome.currencies.intro':
@@ -1094,6 +1096,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yakın dövüş ve uzak saldırı kritik vuruşları hedefi tutuşturur, {duration} saniye boyunca her {every} saniyede {tick} Ateş hasarı verirler. Yeni bir kritik vuruş bunu yeniler. Hasar Attack Power veya Ranged Attack Power, hangisi daha yüksekse artar.',
   'hudChrome.trinkets.equip.lastStand':
     '{threshold}% sağlığın altında hasara maruz kaldığında, {duration} saniye boyunca {absorb} hasarı ({absorbPct}% azami sağlığınız) absorbe eden bir kalkan kazanırsın. Her {icd} saniyede bir gerçekleşebilir.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Sağlığın %{threshold} altındayken hasar aldığında, {duration} saniye boyunca {absorb} hasarı emen bir kalkan kazanırsın. Her {icd} saniyede bir gerçekleşebilir.',
   'hudChrome.trinkets.equip.storm':
     'Attığın her büyü en fazla {max} kadar bir yük ekler. Yükler {duration} saniye sürer, bir yük aldığında yenilenir.',
   'hudChrome.trinkets.equip.tally':
@@ -20028,6 +20032,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Mevcut PvP serisi: {time} oynandı (PvE kopyalarında duraklatıldı)',
   'hudChrome.worldPvp.rewardProgress': 'Mevcut PvP serisi: {time} oynandı',
+  'hudChrome.worldPvp.rewardBonus':
+    'Dünya PvP açıkken {percent} daha fazla deneyim ve hizip itibarı kazanırsın. Kapatma isteğinde bulunduğunda bonuslar sona erer.',
   'hudChrome.worldPvp.rewardTitles':
     'Açık dünyada veya PvP kopyalarında Dünya PvP açıkken {thresholds} oynama süresine ulaşarak kalıcı unvanlar kazan. Çıkış yapmak, ölüm, PvE kopyaları ve sığınaklar sayacı duraklatır. Kapatmak sayacı sıfırlar.',
   'hudChrome.worldPvp.skullName': '{name} adlı oyuncunun kafatası',
@@ -20070,7 +20076,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     "Dost bir hedefteki zamana yayılan bir iyileştirme etkisini tüketerek onu {damage} iyileştirir. Spor Şifası ve İkinci Çiçeklenme uygulamaları Yeşillik ekler; 5 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılan iyileştirme etkilerini taşıyan her müttefiki, bu etkilerin kalan iyileştirmesinin %60'ı kadar anında iyileştirir. (Onarım özel yeteneği)",
   'entities.abilities.tactical_camo.description':
-    'Çevrene karış: düşmanlar seni güçlükle fark eder ve %80 hızla hareket edersin. Saldırmak veya hasar almak Taktik Kamuflajı sona erdirir. Ortaya çıkmak için tekrar kullan. (Saha Becerisi)',
+    'Çevrene karış: düşmanlar seni güçlükle fark eder ve %80 hızla hareket edersin. Saldırmak, hasar almak veya evcil hayvan çağırmak Taktik Kamuflajı sona erdirir. Ortaya çıkmak için tekrar kullan. Yalnız Ruh gerektirir ve evcil hayvanın olmamalıdır.',
   'entities.abilities.tactical_camo.name': 'Taktik Kamuflaj',
   'entities.itemSets.grovespring.bonus2':
     'Hızlı İyileştirme önce kendi Spor Şifası veya İkinci Çiçeklenme etkini tüketir ve yüzde 25 daha fazla iyileştirir. Alınan hasar artık büyü kullanımını geciktirmez.',
@@ -20473,6 +20479,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountWithdrawHint': 'Bu yığını çantalarına çekmek için tıkla.',
   'hudChrome.bank.accountWithdrawLead': 'Bir eşyayı çantalarına taşımak için üzerine tıkla.',
   'hudChrome.bank.referralArmour': 'Dostluk zırhını al',
+  'hudChrome.wocStore.promoClose': 'Tanıtımları kapat',
   'hudChrome.wocStore.membershipPromo.close': 'Üyelik tanıtımını kapat',
   'hudChrome.wocStore.membershipPromo.cta': 'Şimdi katıl',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Hesap ayrıcalıkları',
@@ -20641,7 +20648,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Bu haftanın sözleşmeleri',
   'hudChrome.guildHall.board.rewardLine': 'Ödül: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    "Fener Mühürleri, Fener Salonunun haftalık sözleşmeleri için verilir ve yalnızca levazım subayı Garrick Holt'ta harcanır. Sana bağlıdırlar.",
+    "Fener Mühürleri, Fener Salonunun haftalık sözleşmeleri için verilir ve yalnızca levazım subayı Garrick Holt'ta harcanır. Sana bağlı bir para birimidir ve çantada yer kaplamaz.",
   'hudChrome.guildHall.board.stamp': 'Mühürlendi',
   'hudChrome.guildHall.board.weekProgress':
     'Bu hafta: {total} sözleşmeden {done} tanesi tamamlandı',
@@ -20661,7 +20668,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Sözleşme tamamlandı: {contract}. {count} Fener Mührü alıyorsun.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Haftada üç sözleşme, diyardaki her maceracı için aynı. İmza gerekmez: birini bitir, mühürleri haftada bir kez doğrudan çantalarına gelsin.',
+    'Haftada üç sözleşme, diyardaki her maceracı için aynı. İmza gerekmez: birini bitir, mühürleri haftada bir kez doğrudan sana ödensin.',
   'hudChrome.guildHall.done': 'Bu hafta tamamlandı',
   'hudChrome.guildHall.emptyBoard': 'Pano yeniden yazılıyor. Haftalık sıfırlamadan sonra geri gel.',
   'hudChrome.guildHall.goals.boss':

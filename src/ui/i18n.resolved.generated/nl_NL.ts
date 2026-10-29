@@ -851,7 +851,7 @@ export const nl_NL: EnTranslations = {
       "seals": "Lantaarnzegels: {count}",
       "resetIn": "Nieuwe contracten over {time}",
       "resetSoon": "Nieuwe contracten bij de volgende wekelijkse herstart",
-      "contractsIntro": "Drie contracten per week, dezelfde voor elke avonturier in het rijk. Tekenen hoeft niet: voltooi er één en de zegels gaan direct naar je tassen, eenmaal per week.",
+      "contractsIntro": "Drie contracten per week, dezelfde voor elke avonturier in het rijk. Tekenen hoeft niet: voltooi er één en je krijgt de zegels rechtstreeks uitbetaald, eenmaal per week.",
       "kinds": {
         "boss": "Premie",
         "heroic": "Heroïsche voltooiing",
@@ -900,7 +900,7 @@ export const nl_NL: EnTranslations = {
         "cardProgress": "{done}/{total} deze week",
         "rewardLine": "Beloning: {reward}",
         "stamp": "Verzegeld",
-        "sealsTip": "Lantaarnzegels worden betaald voor de wekelijkse contracten van Lantaarnhal en zijn alleen te besteden bij kwartiermeester Garrick Holt. Ze zijn aan jou gebonden."
+        "sealsTip": "Lantaarnzegels worden betaald voor de wekelijkse contracten van Lantaarnhal en zijn alleen te besteden bij kwartiermeester Garrick Holt. Deze valuta is aan jou gebonden en neemt geen ruimte in je tassen in."
       },
       "shop": {
         "stockLabel": "Voorraad van Garrick Holt",
@@ -1607,6 +1607,7 @@ export const nl_NL: EnTranslations = {
         }
       },
       "seasonOne": "Seizoen 1",
+      "promoClose": "Aanbiedingen sluiten",
       "membershipPromo": {
         "open": "Lidmaatschap in de WOC-winkel",
         "close": "Lidmaatschapsaanbieding sluiten",
@@ -3451,6 +3452,7 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Laat Wereld-PvP aanstaan om {percent} meer ervaring en factiereputatie te verdienen. De bonussen stoppen zodra je vraagt om het uit te schakelen.",
       "rewardTitles": "Verdien blijvende titels na {thresholds} speeltijd met Wereld-PvP aan in de open wereld of PvP-instanties. Uitloggen, dood, PvE-instanties en heiligdommen pauzeren de teller. Uitschakelen zet hem terug op nul.",
       "rewardPaused": "Huidige PvP-reeks: {time} gespeeld (gepauzeerd in een heiligdom)",
       "rewardPausedDead": "Huidige PvP-reeks: {time} gespeeld (gepauzeerd tijdens de dood)",
@@ -3613,6 +3615,7 @@ export const nl_NL: EnTranslations = {
       "delveMark": "Delve-embleem",
       "wocToken": "WoC-token",
       "heroicMarkNote": "Heroïsche kerkers . besteed bij de heroïsche kwartiermeester",
+      "lanternSealNote": "Wekelijkse contracten van Lantaarnhal . besteed bij de gildekwartiermeester",
       "honorNote": "Slagvelden, de arena en wereldquests",
       "delveMarkNote": "Delves voltooid",
       "wocTokenNote": "Gekoppeld portefeuillesaldo",
@@ -3821,6 +3824,7 @@ export const nl_NL: EnTranslations = {
       "equipLockout": "Het uitrusten ervan start een {seconds} sec cooldown op het gebruik ervan, of de cooldown die overblijft op het juweel dat het vervangt als dat langer is.",
       "equip": {
         "lastStand": "Schade nemen terwijl onder {threshold}% gezondheid verleent een schild dat {absorb} schade absorbeert ({absorbPct}% van je maximale gezondheid) voor {duration} sec. Kan eenmaal elke {icd} sec voorkomen.",
+        "lastStandFlat": "Als je schade oploopt met minder dan {threshold}% gezondheid, krijg je een schild dat {absorb} schade absorbeert gedurende {duration} sec. Kan eenmaal per {icd} sec optreden.",
         "hourglass": "Overgenezing van je directe genezingen wordt opgeslagen in het zandloper, tot {cap} ({capPct}% van je maximale gezondheid). Opgeslagen genezing vervlauwt {fade} sec nadat het voor het laatst groeide.",
         "twinStrike": "Je auto-attack hits hebben {chance}% kans om een extra main-hand melee swing te maken. Kan eenmaal elke {icd} sec voorkomen.",
         "tally": "Je auto-attack kritieke treffen en je vernietigende slagen voegen elk een telstapel toe, tot {max}. Markeringen duren {duration} sec, vernieuwd wanneer je er een krijgt.",
@@ -17562,7 +17566,7 @@ export const nl_NL: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Tactische Camouflage",
-        "description": "Ga op in je omgeving: vijanden merken je nauwelijks op en je beweegt op 80% snelheid. Aanvallen of schade oplopen verbreekt Tactische Camouflage. Werp opnieuw om tevoorschijn te komen. (Overleving)"
+        "description": "Ga op in je omgeving: vijanden merken je nauwelijks op en je beweegt op 80% snelheid. Aanvallen, schade oplopen of een huisdier roepen verbreekt Tactische Camouflage. Werp opnieuw om tevoorschijn te komen. Vereist Eenzame ziel en geen huisdier."
       },
       "frostjaw_trap": {
         "name": "Vorstkaakval",

@@ -614,6 +614,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Fraktionsmønt: afventer fase 2',
   'hudChrome.currencies.factions': 'Fraktioner',
   'hudChrome.currencies.heroicMarkNote': 'Heroiske fangehuse, brug hos den heroiske kvartermester',
+  'hudChrome.currencies.lanternSealNote':
+    'Lygtehallens ugentlige kontrakter . brug hos lavets kvartermester',
   'hudChrome.currencies.honor': 'Heder',
   'hudChrome.currencies.honorNote': 'Slagmarker, arenaen og verdensopgaver',
   'hudChrome.currencies.intro':
@@ -1090,6 +1092,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dine våben-kritiske slag tænder målet, hvilket giver {tick} Ildskade hvert {every} sek i {duration} sek. Et nyt kritisk slag opdaterer det. Skaden stiger med Angrebskraft eller Fjernkampskraft, hvilken som helst er højere.',
   'hudChrome.trinkets.equip.lastStand':
     'At tage skade under {threshold}% helbred giver et skjold, der absorberer {absorb} skade ({absorbPct}% af dit maksimale helbred) i {duration} sek. Kan ske en gang hver {icd} sek.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Hvis du tager skade, mens dit helbred er under {threshold}%, får du et skjold, der absorberer {absorb} skade i {duration} sek. Kan ske en gang hver {icd} sek.',
   'hudChrome.trinkets.equip.storm':
     'Hver stavekraft du kaster tilføjer en ladning, op til {max}. Ladninger varer {duration} sek, opdateret når du får en.',
   'hudChrome.trinkets.equip.tally':
@@ -20009,6 +20013,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Nuværende PvP-stime: spillet {time} (sat på pause i PvE-instanser)',
   'hudChrome.worldPvp.rewardProgress': 'Nuværende PvP-stime: spillet {time}',
+  'hudChrome.worldPvp.rewardBonus':
+    'Hold verdens-PvP slået til for at få {percent} mere erfaring og fraktionsomdømme. Bonusserne ophører, når du beder om at slå det fra.',
   'hudChrome.worldPvp.rewardTitles':
     'Optjen permanente titler efter {thresholds} spilletid med verdens-PvP slået til i den åbne verden eller i PvP-instanser. Udlogning, død, PvE-instanser og helligdomme sætter tiden på pause. Slår du PvP fra, nulstilles den.',
   'hudChrome.worldPvp.skullName': '{name}s kranie',
@@ -20051,7 +20057,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Bruger en heling-over-tid-effekt på et venligt mål for at hele det for {damage}. Sporeheling og plantninger fra Anden Blomstring giver Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som straks heler alle allierede med dine heling-over-tid-effekter for 60% af deres resterende heling. (signaturevne for Genoprettelse)',
   'entities.abilities.tactical_camo.description':
-    'Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb eller modtaget skade bryder Taktisk Camouflage. Kast igen for at træde frem. (Feltkunst)',
+    'Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb, modtaget skade eller tilkaldelse af et kæledyr bryder Taktisk Camouflage. Kast igen for at træde frem. Kræver Ensom sjæl og intet kæledyr.',
   'entities.abilities.tactical_camo.name': 'Taktisk Camouflage',
   'entities.itemSets.grovespring.bonus2':
     'Hurtig heling bruger først din egen Sporeheling eller Anden Blomstring og heler 25 procent mere. Modtaget skade forsinker ikke længere dine besværgelser.',
@@ -21559,7 +21565,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Ugens kontrakter',
   'hudChrome.guildHall.board.rewardLine': 'Belønning: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Lygtesegl betales for Lygtehallens ugentlige kontrakter og bruges kun hos Garrick Holt, kvartermesteren. De er bundet til dig.',
+    'Lygtesegl betales for Lygtehallens ugentlige kontrakter og bruges kun hos Garrick Holt, kvartermesteren. De er en valuta, der er bundet til dig og ikke optager plads i taskerne.',
   'hudChrome.guildHall.board.stamp': 'Forseglet',
   'hudChrome.guildHall.board.weekProgress': 'Denne uge: {done} af {total} kontrakter fuldført',
   'hudChrome.guildHall.board.weekProgressAria': 'Kontrakter fuldført denne uge',
@@ -21576,7 +21582,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.contractDone.other':
     'Kontrakt fuldført: {contract}. Du modtager {count} lygtesegl.',
   'hudChrome.guildHall.contractsIntro':
-    'Tre kontrakter om ugen, de samme for hver eventyrer i riget. Ingen underskrift nødvendig: gennemfør en, og dens segl går direkte til dine tasker, én gang om ugen.',
+    'Tre kontrakter om ugen, de samme for hver eventyrer i riget. Ingen underskrift nødvendig: gennemfør en, og dens segl udbetales direkte til dig, én gang om ugen.',
   'hudChrome.guildHall.done': 'Fuldført denne uge',
   'hudChrome.guildHall.emptyBoard':
     'Tavlen bliver skrevet om. Kom tilbage efter den ugentlige nulstilling.',
@@ -21853,6 +21859,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedTitle': 'Forfulgt!',
   'hudChrome.wildheartAlert.timeAria': '{seconds} sekunder tilbage',
   'hudChrome.wocStore.collections.lantern_hall': 'Lygtehallen',
+  'hudChrome.wocStore.promoClose': 'Luk kampagner',
   'hudChrome.wocStore.membershipPromo.close': 'Luk medlemskabstilbud',
   'hudChrome.wocStore.membershipPromo.cta': 'Bliv medlem nu',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Kontofordele',

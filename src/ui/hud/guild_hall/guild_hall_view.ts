@@ -32,7 +32,6 @@ export type GuildHallTab = 'contracts' | 'quartermaster';
 
 export interface GuildHallWorld {
   readonly guildContracts: GuildContractsView;
-  readonly inventory: readonly InvSlot[];
   readonly deedsEarned: ReadonlyMap<string, string>;
   ownedMounts(): readonly string[];
   ridingTrained(): boolean;
@@ -171,7 +170,7 @@ export function buildGuildHallView(
   selectedOffer: string | null = null,
 ): GuildHallView {
   const board = world.guildContracts;
-  const seals = lanternSeals(world.inventory);
+  const seals = lanternSeals(board);
   const contracts = board.offered
     .map((id) => GUILD_CONTRACTS_BY_ID[id])
     .filter((contract): contract is GuildContractDef => !!contract)

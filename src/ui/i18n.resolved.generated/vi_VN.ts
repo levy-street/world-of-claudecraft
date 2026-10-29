@@ -851,7 +851,7 @@ export const vi_VN: EnTranslations = {
       "seals": "Ấn Đèn Lồng: {count}",
       "resetIn": "Hợp đồng mới sau {time}",
       "resetSoon": "Hợp Đồng Mới Khi Đặt Lại Tuần Tiếp Theo",
-      "contractsIntro": "Ba hợp đồng mỗi tuần, giống nhau cho mọi nhà thám hiểm trên máy chủ. Không cần ký: hoàn thành một hợp đồng, ấn sẽ vào thẳng túi, mỗi hợp đồng một lần mỗi tuần.",
+      "contractsIntro": "Ba hợp đồng mỗi tuần, giống nhau cho mọi nhà thám hiểm trên máy chủ. Không cần ký: hoàn thành một hợp đồng, bạn sẽ được nhận ấn trực tiếp, mỗi hợp đồng một lần mỗi tuần.",
       "kinds": {
         "boss": "Truy nã",
         "heroic": "Hoàn Thành Anh Hùng",
@@ -900,7 +900,7 @@ export const vi_VN: EnTranslations = {
         "cardProgress": "{done}/{total} tuần này",
         "rewardLine": "Phần thưởng: {reward}",
         "stamp": "Đã Đóng Ấn",
-        "sealsTip": "Ấn Đèn Lồng được trả cho hợp đồng hằng tuần của Sảnh Đèn Lồng, chỉ tiêu tại quân nhu Garrick Holt. Chúng gắn với bạn."
+        "sealsTip": "Ấn Đèn Lồng được trả cho hợp đồng hằng tuần của Sảnh Đèn Lồng và chỉ dùng tại quân nhu Garrick Holt. Đây là tiền tệ gắn với bạn và không chiếm chỗ trong túi."
       },
       "shop": {
         "stockLabel": "Hàng Của Garrick Holt",
@@ -1607,6 +1607,7 @@ export const vi_VN: EnTranslations = {
         }
       },
       "seasonOne": "Mùa 1",
+      "promoClose": "Đóng quảng cáo",
       "membershipPromo": {
         "open": "Tư Cách Thành Viên Trong Cửa Hàng WOC",
         "close": "Đóng Quảng Bá Thành Viên",
@@ -3451,6 +3452,7 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Giữ PvP Thế Giới bật để nhận thêm {percent} kinh nghiệm và danh vọng phe phái. Phần thưởng cộng thêm dừng ngay khi bạn yêu cầu tắt.",
       "rewardTitles": "Nhận danh hiệu vĩnh viễn sau {thresholds} thời gian chơi với PvP Thế Giới bật trong thế giới mở hoặc phụ bản PvP. Đăng xuất, chết, phụ bản PvE và thánh địa tạm dừng bộ đếm. Tắt PvP sẽ đặt lại bộ đếm.",
       "rewardPaused": "Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong thánh địa)",
       "rewardPausedDead": "Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng khi chết)",
@@ -3613,6 +3615,7 @@ export const vi_VN: EnTranslations = {
       "delveMark": "Dấu Khai Quật",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Hầm Ngục Anh Hùng - tiêu tại quản lý hậu cần Anh Hùng",
+      "lanternSealNote": "Hợp đồng hằng tuần của Sảnh Đèn Lồng . dùng tại quân nhu bang hội",
       "honorNote": "Chiến Trường, Đấu Trường và Nhiệm Vụ Thế Giới",
       "delveMarkNote": "Các khai quật đã hoàn thành",
       "wocTokenNote": "Số dư ví được liên kết",
@@ -3821,6 +3824,7 @@ export const vi_VN: EnTranslations = {
       "equipLockout": "Trang Bị nó bắt đầu một thời gian chờ {seconds} giây trong cách sử dụng của nó, hoặc thời gian chờ còn lại trên báu vật nó thay thế nếu cái đó dài hơn.",
       "equip": {
         "lastStand": "Nhận sát thương trong khi dưới {threshold}% sức khỏe được cấp cho một lá chắn hấp thụ {absorb} sát thương ({absorbPct}% sức khỏe tối đa của bạn) trong {duration} giây. Có thể xảy ra một lần mỗi {icd} giây.",
+        "lastStandFlat": "Khi nhận sát thương lúc sức khỏe dưới {threshold}%, bạn nhận được một lá chắn hấp thụ {absorb} sát thương trong {duration} giây. Có thể xảy ra một lần mỗi {icd} giây.",
         "hourglass": "Chữa lành quá mức từ các phép chữa trực tiếp của bạn được lưu trữ trong cát thời gian, tối đa {cap} ({capPct}% sức khỏe tối đa của bạn). Chữa lành được lưu trữ phai mờ {fade} giây sau khi nó lần cuối phát triển.",
         "twinStrike": "Các cú đánh tự động tấn công của bạn có {chance}% cơ hội tạo ra một cuộc vấy tay chính cận chiến thêm. Có thể xảy ra một lần mỗi {icd} giây.",
         "tally": "Các cú đánh tấn công quan trọng tự động tấn công và cú chí mạng của bạn mỗi cái sẽ thêm một dấu tích, tối đa {max}. Dấu kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được dấu.",
@@ -17562,7 +17566,7 @@ export const vi_VN: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Ngụy Trang Chiến Thuật",
-        "description": "Hòa vào môi trường: kẻ địch gần như không nhận thấy bạn, và bạn di chuyển với 80% tốc độ. Tấn công hoặc nhận sát thương phá Ngụy Trang Chiến Thuật. Dùng lại để thoát ra. (Sinh Tồn)"
+        "description": "Hòa vào môi trường: kẻ địch gần như không nhận thấy bạn, và bạn di chuyển với 80% tốc độ. Tấn công, nhận sát thương hoặc gọi thú cưng sẽ phá Ngụy Trang Chiến Thuật. Dùng lại để thoát ra. Cần Linh Hồn Cô Độc và không có thú cưng."
       },
       "frostjaw_trap": {
         "name": "Bẫy Hàm Băng",

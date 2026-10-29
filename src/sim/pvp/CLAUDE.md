@@ -39,7 +39,9 @@ ratings.
   a flagged player never does), the gold stake, the equal split with the killing
   blow taking the remainder, the grey-level rule, and the per-pair DR multiplier
   (shared `HONOR_REPEAT_DR`) over its own `WORLD_PVP_DR_WINDOW_SECONDS` (one
-  hour) window. It also declares `WorldPvpZonePolicy`, the three-answer type the
+  hour) window, and the stealth exposure rule (`worldPvpStealthExposed`: a
+  stealther is exposed when flagged on contested ground or anywhere on
+  free-for-all ground, never in a sanctuary). It also declares `WorldPvpZonePolicy`, the three-answer type the
   next bullet resolves. No ctx, no rng, no clock.
 - `world_pvp_zones.ts` owns the ground policy: which of `'sanctuary'`,
   `'contested'` and `'ffa'` applies at a position (`worldPvpZonePolicyAt`) or to
@@ -121,7 +123,11 @@ ratings.
   included; no pid, no text, no rng; `server/event_frame.ts` strips it from
   client frames), the IWorld readout
   (`worldPvpInfoFor`, whole-second countdown so the self wire elides it), the
-  `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
+  `/pvp` chat arms' entry points, the stealth concealment verdict the
+  server's observation rule asks for a viewer who is not hostile yet
+  (`worldPvpConcealsStealthFrom`: an exposed stealther is hidden from every
+  stranger outside their group, so dropping the flag cannot scout stealthers;
+  pinned by `tests/world_pvp_stealth_observation.test.ts`), and the persisted record (`savedWorldPvpFields`
   / `loadWorldPvpState`, the countdown stored as remaining seconds and
   re-anchored on load; the level gate and the kill switch hold on restore). The
   diminishing returns are per PAIR and live in the session books
@@ -192,7 +198,10 @@ ratings.
   the seven-day counter cap, saved-tick sanitization and the pure 10% XP bonus.
   `grantXp` imports the leaf directly and applies the bonus before rested XP and
   lifetime accounting; pending disarm and the realm kill switch stop it. The
-  multiplier is XP-only and does not change faction reputation.
+  separate 10% reputation bonus (`WORLD_PVP_REPUTATION_BONUS`,
+  `worldPvpReputationAmount`) applies inside `awardFactionReputation` before the
+  standing cap, only for gameplay awards that pass
+  `worldPvpBonus: !ctx.worldPvpDisabled` (dev grants stay exact).
 - `world_pvp_rewards.ts` advances one bounded scalar per connected, armed
   player per tick and grants permanent deeds only at five threshold crossings.
   Dead players, disconnect grace, leaving players, sanctuaries and PvE

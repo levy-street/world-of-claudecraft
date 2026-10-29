@@ -86,6 +86,7 @@ interface World {
   draw(): void;
   programs(): number;
   pixel(): number[];
+  frame(): Uint8Array;
 }
 
 function world(offscreen: boolean): World {
@@ -130,15 +131,15 @@ function world(offscreen: boolean): World {
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
   };
-  const pixel = () => {
-    const out = new Uint8Array(4);
+  const readPixels = (x: number, y: number, width: number, height: number) => {
+    const out = new Uint8Array(width * height * 4);
     if (offscreen) {
-      renderer.readRenderTargetPixels(liveTarget, SIZE / 2, SIZE / 2, 1, 1, out);
+      renderer.readRenderTargetPixels(liveTarget, x, y, width, height, out);
     } else {
       const gl = renderer.getContext();
-      gl.readPixels(SIZE / 2, SIZE / 2, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, out);
+      gl.readPixels(x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, out);
     }
-    return [...out];
+    return out;
   };
   disposers.push(() => {
     compileTarget.dispose();
@@ -153,7 +154,8 @@ function world(offscreen: boolean): World {
     arms,
     draw,
     programs: () => renderer.info.programs?.length ?? 0,
-    pixel,
+    pixel: () => [...readPixels(SIZE / 2, SIZE / 2, 1, 1)],
+    frame: () => readPixels(0, 0, SIZE, SIZE),
   };
 }
 
@@ -864,17 +866,32 @@ describe('the veil palettes on a real driver', () => {
       w.draw();
       const before = w.programs();
       const source = new THREE.MeshStandardMaterial({ map: greyMap(), color: 0x6699cc });
-      const pixels = new Map<string, string>();
+      const frames = new Map<SpiritVeilPalette, Uint8Array>();
       for (const palette of Object.keys(SPIRIT_VEIL_PALETTES) as SpiritVeilPalette[]) {
         const body = veiledBody(w, source, palette);
         w.draw();
+        const first = w.frame();
         w.draw();
         expect(w.programs(), palette).toBe(before);
-        pixels.set(palette, w.pixel().join(','));
+        const rendered = w.frame();
+        // Frozen time and an unchanged body must produce the same pixels, so
+        // incidental frame noise cannot make two palettes appear distinct.
+        expect(rendered, `${palette} is stable across identical draws`).toEqual(first);
+        frames.set(palette, rendered);
         body.removeFromParent();
       }
-      // every palette reads differently at the centre of the body
-      expect(new Set(pixels.values()).size).toBe(pixels.size);
+      // The enemy palettes intentionally share a body and differ at the rim.
+      // Compare the complete rendered appearance, including that silhouette.
+      expect(new Set([...frames.values()].map((rgba) => rgba.join(','))).size).toBe(frames.size);
+      const cool = frames.get('stealth-enemy')!;
+      const red = frames.get('stealth-enemy-target')!;
+      let changedRimPixels = 0;
+      for (let i = 0; i < cool.length; i += 4) {
+        // At the same body pixels the untargeted rim is blue and the targeted
+        // rim is red, with a margin above single-channel quantization noise.
+        if (cool[i + 2] - cool[i] > 8 && red[i] - red[i + 2] > 8) changedRimPixels++;
+      }
+      expect(changedRimPixels).toBeGreaterThan(8);
     });
 
     it(`casts a kept shadow from a single-sided source with zero new programs, ${arm}`, async () => {

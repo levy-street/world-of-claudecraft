@@ -11,6 +11,7 @@ import {
   BEAR_FORM_THREAT_MULT,
   DEFENSIVE_STANCE_THREAT_MULT,
   dropThreat,
+  petCanSeeStealthedTarget,
   RIGHTEOUS_FURY_THREAT_MULT,
 } from '../src/sim/threat';
 import type { Entity, WorldContent } from '../src/sim/types';
@@ -1054,7 +1055,7 @@ describe('hunter pets', () => {
     expect(pet.inCombat).toBe(false);
   });
 
-  it('blocks hunter pet damage against a stealthed enemy player at ANY range', () => {
+  it('lets hunter pet damage land on a stealthed enemy player only inside its detection radius', () => {
     const { sim, pet, rogue } = activePetDuel();
     teleport(sim, pet, 0, 0);
     sim.castAbility('stealth', rogue.id);
@@ -1066,19 +1067,15 @@ describe('hunter pets', () => {
     hit(sim, pet, rogue, 100);
     expect(rogue.hp).toBe(stealthedHp);
 
-    // Point-blank: STILL blocked. A pet gets no close-range stealth detection.
+    // Point-blank: inside the pet's detection radius (Stealth Rework cone), so
+    // the swing lands, exactly as it would for an enemy player standing there.
     teleport(sim, rogue, 1, 0);
-    hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBe(stealthedHp);
-
-    // Step out of stealth and the pet lands its swing.
-    rogue.auras = rogue.auras.filter((a) => a.kind !== 'stealth');
-    rogue.stealthed = false;
+    expect(petCanSeeStealthedTarget(rogue, pet)).toBe(true);
     hit(sim, pet, rogue, 100);
     expect(rogue.hp).toBeLessThan(stealthedHp);
   });
 
-  it('pet target-pick and pet damage agree: both fully block stealth, both clear on unstealth', () => {
+  it('an aggressive pet never auto-picks a stealthed player, even one its damage can reach', () => {
     const { sim, pet, rogue } = activePetDuel();
     sim.setPetMode('aggressive');
     expectDefined(sim.meta(sim.playerId)).lastActiveTick = sim.tickCount;
@@ -1092,24 +1089,20 @@ describe('hunter pets', () => {
     // Anchor at (200, 0), this file's "far away first" offset, where the
     // nearest wild mob sits ~52yd out, beyond PET_AGGRESSIVE_RANGE.
     teleport(sim, pet, 200, 0);
-    teleport(sim, rogue, 203, 0); // point-blank, well inside any aggressive range
+    teleport(sim, rogue, 201, 0); // point-blank, inside the pet's detection radius
     sim.castAbility('stealth', rogue.id);
     expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
     sim.ctx.grid.refresh(sim.entities.values());
-    const stealthedHp = rogue.hp;
+    expect(petCanSeeStealthedTarget(rogue, pet)).toBe(true);
 
-    // Hidden: neither the picker nor the damage path may touch them.
+    // Stealthed: the aggressive stance does not auto-acquire them.
     expect(petPickTarget(sim.ctx, pet, sim.player)).toBeNull();
-    hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBe(stealthedHp);
 
-    // Visible: both paths engage the same point-blank enemy.
+    // Visible: the same point-blank enemy is picked.
     rogue.auras = rogue.auras.filter((a) => a.kind !== 'stealth');
     rogue.stealthed = false;
     sim.ctx.grid.refresh(sim.entities.values());
     expect(petPickTarget(sim.ctx, pet, sim.player)?.id).toBe(rogue.id);
-    hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBeLessThan(stealthedHp);
   });
 
   it('friendly target spells can affect controlled pets', () => {

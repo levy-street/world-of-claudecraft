@@ -5,10 +5,10 @@
 import { addStacked } from '../src/sim/bags';
 import type { CharacterState } from '../src/sim/character_state';
 import {
-  assertHeroicMarksGrantsFit,
-  creditHeroicMarks,
+  assertCurrencyGrantsFit,
+  creditCurrencyGrant,
   isCurrencyGrantId,
-} from '../src/sim/heroic_marks';
+} from '../src/sim/currency_grants';
 import { hoardRewardGrantItems } from '../src/sim/rift/hoard_reward_items';
 import { projectHoardRewardCollections } from '../src/sim/rift/hoard_reward_save';
 import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
@@ -19,13 +19,13 @@ export function addVaultRewardToCharacterState(
   claim: VaultRewardClaim,
   preparedItems?: readonly InvSlot[],
 ): CharacterState {
-  assertHeroicMarksGrantsFit(state, claim.items);
+  assertCurrencyGrantsFit(state, claim.items);
   const capped = claim.items.length === 0 && claim.copper === 0;
   if (!capped) {
-    // Heroic Marks land on the saved balance, exactly as the live hub credits them.
+    // Currency (Heroic Marks) lands on the saved balance, exactly as the live hub credits it.
     const grants = preparedItems ?? hoardRewardGrantItems(claim.items);
     for (const item of grants) {
-      if (isCurrencyGrantId(item.itemId)) creditHeroicMarks(state, item.count);
+      if (isCurrencyGrantId(item.itemId)) creditCurrencyGrant(state, item.itemId, item.count);
       else {
         addStacked(
           state.inventory,

@@ -26,8 +26,8 @@
 // tests/enchant_apply_view.test.ts and deliberately not repeated here.
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { isCurrencyGrantId } from '../src/sim/currency_grants';
 import { ITEMS } from '../src/sim/data';
-import { isCurrencyGrantId } from '../src/sim/heroic_marks';
 import {
   baggedEnchantVictim,
   evaluateApplyEnchantAdmission,

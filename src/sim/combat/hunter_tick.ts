@@ -6,6 +6,7 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { fieldcraftCombatState, TRAILBREAK_AIRBORNE_ID } from './hunter_fieldcraft';
+import { tacticalCamoPetTick } from './hunter_lonely_soul';
 import { playDeadTick } from './hunter_play_dead';
 
 export const TRAILBREAK_LANDING_ID = 'trailbreak_landing';
@@ -34,4 +35,5 @@ export function updateHunterTick(ctx: SimContext, player: Entity): void {
   fieldcraftCombatState(ctx, player);
   playDeadTick(ctx, player);
   trailbreakLandingTick(ctx, player);
+  tacticalCamoPetTick(ctx, player);
 }

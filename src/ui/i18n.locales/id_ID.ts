@@ -624,6 +624,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Mata uang faksi: menunggu Tahap 2',
   'hudChrome.currencies.factions': 'Faksi-faksi',
   'hudChrome.currencies.heroicMarkNote': 'Dungeon Heroik: belanjakan di kepala perlengkapan heroik',
+  'hudChrome.currencies.lanternSealNote':
+    'Kontrak mingguan Balai Lentera . belanjakan di pengurus perbekalan guild',
   'hudChrome.currencies.honor': 'Kehormatan',
   'hudChrome.currencies.honorNote': 'Medan Pertempuran, arena, dan Misi Dunia',
   'hudChrome.currencies.intro':
@@ -1105,6 +1107,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pukulan kritis senjata jarak dekat dan jarak jauh kamu menyalakan target, memberikan {tick} kerusakan Api setiap {every} detik selama {duration} detik. Pukulan kritis baru menyegarkannya. Kerusakan meningkat dengan Kekuatan Serangan atau Kekuatan Serangan Jarak Jauh, mana yang lebih tinggi.',
   'hudChrome.trinkets.equip.lastStand':
     'Menerima kerusakan saat kesehatan di bawah {threshold}% memberikan perisai yang menyerap {absorb} kerusakan ({absorbPct}% kesehatan maksimalmu) selama {duration} detik. Dapat terjadi sekali setiap {icd} detik.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Menerima kerusakan saat kesehatan di bawah {threshold}% memberikan perisai yang menyerap {absorb} kerusakan selama {duration} detik. Dapat terjadi sekali setiap {icd} detik.',
   'hudChrome.trinkets.equip.storm':
     'Setiap mantra yang kamu baca menambah muatan, hingga {max}. Muatan bertahan {duration} detik, disegarkan setiap kali kamu mendapat muatan.',
   'hudChrome.trinkets.equip.tally':
@@ -20257,6 +20261,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Rentetan PvP saat ini: {time} dimainkan (dijeda dalam instans PvE)',
   'hudChrome.worldPvp.rewardProgress': 'Rentetan PvP saat ini: {time} dimainkan',
+  'hudChrome.worldPvp.rewardBonus':
+    'Biarkan PvP Dunia aktif untuk memperoleh {percent} lebih banyak pengalaman dan reputasi faksi. Bonus berhenti saat kamu meminta untuk menonaktifkannya.',
   'hudChrome.worldPvp.rewardTitles':
     'Dapatkan gelar permanen setelah {thresholds} waktu bermain dengan PvP Dunia aktif di dunia terbuka atau instans PvP. Keluar, kematian, instans PvE, dan suaka menjeda penghitung. Menonaktifkannya mengatur ulang penghitung.',
   'hudChrome.worldPvp.skullName': 'Tengkorak {name}',
@@ -20298,7 +20304,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Menghabiskan efek penyembuhan berkala pada target sekutu untuk memulihkannya sebesar {damage}. Penerapan Pemulihan Spora dan Mekar Kedua menambah Kehijauan; pada 5 Kehijauan tombol ini menjadi Mekar Raya, yang langsung memulihkan setiap sekutu dengan efek penyembuhan berkalamu sebesar 60% sisa penyembuhannya. (Ciri khas Pemulihan)',
   'entities.abilities.tactical_camo.description':
-    'Menyatu dengan lingkungan: musuh nyaris tidak menyadari kehadiranmu, dan kamu bergerak dengan kecepatan 80%. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. (Bertahan Hidup)',
+    'Menyatu dengan lingkungan: musuh nyaris tidak menyadari kehadiranmu, dan kamu bergerak dengan kecepatan 80%. Menyerang, menerima kerusakan, atau memanggil peliharaan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. Memerlukan Jiwa Kesepian dan tidak memiliki peliharaan.',
   'entities.abilities.tactical_camo.name': 'Kamuflase Taktis',
   'entities.itemSets.grovespring.bonus2':
     'Pemulihan Cepat menghabiskan Pemulihan Spora atau Mekar Kedua milikmu terlebih dahulu dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantramu.',
@@ -23792,7 +23798,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Kontrak minggu ini',
   'hudChrome.guildHall.board.rewardLine': 'Hadiah: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Segel Lentera diberikan untuk kontrak mingguan Balai Lentera dan hanya dibelanjakan di Garrick Holt, pengurus perbekalan. Segel terikat padamu.',
+    'Segel Lentera diberikan untuk kontrak mingguan Balai Lentera dan hanya dibelanjakan di Garrick Holt, pengurus perbekalan. Mata uang ini terikat padamu dan tidak memakan ruang tas.',
   'hudChrome.guildHall.board.stamp': 'Disegel',
   'hudChrome.guildHall.board.weekProgress': 'Minggu ini: {done} dari {total} kontrak selesai',
   'hudChrome.guildHall.board.weekProgressAria': 'Kontrak selesai minggu ini',
@@ -23811,7 +23817,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kontrak selesai: {contract}. Kamu menerima {count} Segel Lentera.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Tiga kontrak per minggu, sama bagi setiap petualang di realm. Tak perlu mendaftar: selesaikan satu dan segelnya langsung masuk tasmu, sekali setiap minggu.',
+    'Tiga kontrak per minggu, sama bagi setiap petualang di realm. Tak perlu mendaftar: selesaikan satu dan segelnya langsung diberikan kepadamu, sekali setiap minggu.',
   'hudChrome.guildHall.done': 'Selesai minggu ini',
   'hudChrome.guildHall.emptyBoard':
     'Papan sedang ditulis ulang. Kembali setelah pengaturan ulang mingguan.',
@@ -24094,6 +24100,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedTitle': 'Dikuntit!',
   'hudChrome.wildheartAlert.timeAria': 'Tersisa {seconds} detik',
   'hudChrome.wocStore.collections.lantern_hall': 'Balai Lentera',
+  'hudChrome.wocStore.promoClose': 'Tutup promosi',
   'hudChrome.wocStore.membershipPromo.close': 'Tutup promosi keanggotaan',
   'hudChrome.wocStore.membershipPromo.cta': 'Gabung sekarang',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Keuntungan akun',

@@ -197,6 +197,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'pledgeGuild', // server-set display only (guild pledge board)
   'guildTier', // server-set display only (guild colour tier)
   'prevPos', // render interpolation
+  'stealthTrail', // presentation-only footprint ring (sim/stealth_footprints.ts)
   'prevFacing',
   'dungeonEntrySeq', // transient online acknowledgement generation; never read by gameplay
   'netUpdatedAt', // online wire cadence
@@ -266,6 +267,8 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'joinedAt', // session-only clock
   'lastActiveTick', // session-only
   'petAssistTargetId', // session-only; its effect is pinned by the sampled pet + event stream
+  'petAssistCastTick', // session-only bookkeeping for the record above
+  'petAssistLiveTick', // session-only bookkeeping for the record above
   'craftThrottle', // inert since the Craft Cast System retired the shared throttle; session-only
   // Session-only sweep bookkeeping for the withered-then-ready correction
   // (farm_ready.ts): derived from sampled inputs (farmPlots' notified flags +

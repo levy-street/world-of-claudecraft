@@ -667,6 +667,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Factions',
   'hudChrome.currencies.heroicMarkNote':
     "Donjons héroïques . à dépenser auprès de l'intendant héroïque",
+  'hudChrome.currencies.lanternSealNote':
+    "Contrats hebdomadaires du Hall de la Lanterne . à dépenser auprès de l'intendant de guilde",
   'hudChrome.currencies.honor': 'Honneur',
   'hudChrome.currencies.honorNote': 'Champs de bataille, arène et quêtes mondiales',
   'hudChrome.currencies.intro':
@@ -1158,6 +1160,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vos coups critiques d'arme de mêlée et à distance embrasent la cible, infligeant {tick} points de dégâts de Feu toutes les {every} s pendant {duration} s. Un nouveau coup critique rafraîchit l'effet. Les dégâts augmentent avec la puissance d'attaque ou la puissance d'attaque à distance, selon la plus élevée.",
   'hudChrome.trinkets.equip.lastStand':
     "Subir des dégâts en dessous de {threshold}% de vie accorde un bouclier qui absorbe {absorb} points de dégâts ({absorbPct}% de vos points de vie maximum) pendant {duration} s. Ne peut se produire qu'une fois toutes les {icd} s.",
+  'hudChrome.trinkets.equip.lastStandFlat':
+    "Subir des dégâts en dessous de {threshold}% de vie accorde un bouclier qui absorbe {absorb} points de dégâts pendant {duration} s. Ne peut se produire qu'une fois toutes les {icd} s.",
   'hudChrome.trinkets.equip.storm':
     "Chaque sort que vous lancez ajoute une charge, jusqu'à {max}. Les charges durent {duration} s, rafraîchies à chaque nouvelle charge.",
   'hudChrome.trinkets.equip.tally':
@@ -20537,6 +20541,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Série JcJ actuelle : {time} de jeu (en pause dans les instances JcE)',
   'hudChrome.worldPvp.rewardProgress': 'Série JcJ actuelle : {time} de jeu',
+  'hudChrome.worldPvp.rewardBonus':
+    'Gardez le JcJ mondial activé pour gagner {percent} de points d’expérience et de réputation de faction supplémentaires. Les bonus cessent dès que vous demandez sa désactivation.',
   'hudChrome.worldPvp.rewardTitles':
     'Gagnez des titres permanents après {thresholds} de jeu avec le JcJ mondial activé en monde ouvert ou en instance JcJ. Déconnexion, mort, instances JcE et sanctuaires mettent le compteur en pause. Désactiver le JcJ le remet à zéro.',
   'hudChrome.worldPvp.skullName': 'Crâne de {name}',
@@ -20579,7 +20585,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     "Consomme un soin sur la durée d'une cible alliée pour lui rendre {damage} points de vie. Les applications de Soin de spores et Seconde floraison ajoutent de la Verdoyance ; à 5 points, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos soins sur la durée de 60% des soins restants. (Signature de Restauration)",
   'entities.abilities.tactical_camo.description':
-    'Fondez-vous dans le décor : les ennemis vous remarquent à peine et vous vous déplacez à 80% de votre vitesse. Attaquer ou subir des dégâts rompt Camouflage tactique. Relancez pour en sortir. (Survie)',
+    'Fondez-vous dans le décor : les ennemis vous remarquent à peine et vous vous déplacez à 80% de votre vitesse. Attaquer, subir des dégâts ou appeler un familier rompt Camouflage tactique. Relancez pour en sortir. Nécessite Âme solitaire et aucun familier.',
   'entities.abilities.tactical_camo.name': 'Camouflage tactique',
   'entities.itemSets.grovespring.bonus2':
     "Prompte guérison consomme d'abord votre propre Soin de spores ou Seconde floraison et soigne 25 pour cent de plus. Les dégâts subis ne retardent plus vos incantations.",
@@ -21609,7 +21615,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Contrats de la semaine',
   'hudChrome.guildHall.board.rewardLine': 'Récompense : {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    "Les Sceaux de lanterne récompensent les contrats hebdomadaires du Hall de la Lanterne et ne se dépensent que chez Garrick Holt, l'intendant. Ils vous sont liés.",
+    "Les Sceaux de lanterne récompensent les contrats hebdomadaires du Hall de la Lanterne et ne se dépensent que chez Garrick Holt, l'intendant. Cette monnaie vous est liée et ne prend aucune place dans vos sacs.",
   'hudChrome.guildHall.board.stamp': 'Scellé',
   'hudChrome.guildHall.board.weekProgress': 'Cette semaine : {done} contrats terminés sur {total}',
   'hudChrome.guildHall.board.weekProgressAria': 'Contrats terminés cette semaine',
@@ -21630,7 +21636,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Contrat terminé : {contract}. Vous recevez {count} Sceaux de lanterne.',
   'hudChrome.guildHall.contractLabel': '{kind} : {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Trois contrats par semaine, identiques pour chaque aventurier du royaume. Pas besoin de signer : menez-en un à terme et ses sceaux vont directement dans vos sacs, une fois par semaine.',
+    'Trois contrats par semaine, identiques pour chaque aventurier du royaume. Pas besoin de signer : menez-en un à terme et ses sceaux vous sont versés directement, une fois par semaine.',
   'hudChrome.guildHall.emptyBoard':
     'Le tableau est en cours de réécriture. Revenez après la réinitialisation hebdomadaire.',
   'hudChrome.guildHall.goals.boss':
@@ -21921,6 +21927,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedTitle': 'Traqué !',
   'hudChrome.wildheartAlert.timeAria': '{seconds} secondes restantes',
   'hudChrome.wocStore.collections.lantern_hall': 'Hall de la Lanterne',
+  'hudChrome.wocStore.promoClose': 'Fermer les promotions',
   'hudChrome.wocStore.membershipPromo.close': "Fermer la promotion d'abonnement",
   'hudChrome.wocStore.membershipPromo.cta': 'Adhérer maintenant',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Avantages du compte',

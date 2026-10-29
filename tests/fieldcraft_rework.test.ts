@@ -109,13 +109,15 @@ describe('Fieldcraft rework: ability data', () => {
     expect(playDead?.def.castTime).toBe(0);
   });
 
-  it('gives Quickblood 20% Agility and keeps Tactical Camo Fieldcraft-only', () => {
+  it('gives Quickblood 20% Agility and leaves Tactical Camo to Lonely Soul', () => {
     const withMastery = hunter('survival');
     expect(
       computeTalentModifiers('hunter', { ...emptyAllocation(), spec: 'survival' }, 20).stats.agiPct,
     ).toBe(0.2);
     expect(withMastery.player.stats.agi).toBeGreaterThan(hunter(null).player.stats.agi);
-    expect(withMastery.resolvedAbility('tactical_camo')).not.toBeNull();
+    // Stealth Rework: Tactical Camo is granted by Lonely Soul to every spec
+    // (tests/tactical_camo_lonely_soul.test.ts), not by the Fieldcraft spec.
+    expect(withMastery.resolvedAbility('tactical_camo')).toBeNull();
     expect(hunter('beast_mastery').resolvedAbility('tactical_camo')).toBeNull();
     expect(hunter('beast_mastery').resolvedAbility('play_dead')).not.toBeNull();
   });
@@ -228,6 +230,7 @@ describe('Shrapnel Charge', () => {
 describe('Tactical Camo', () => {
   it('moves at 80% and breaks on taking or dealing damage, like Duskveil', () => {
     const sim = hunter();
+    expect(sim.applyTalents({ spec: 'survival', rows: { 8: 'hun_r8_beastguard' } })).toBe(true);
     const base = moveSpeedMult(sim.player);
     sim.castAbility('tactical_camo');
     ticks(sim, 1);

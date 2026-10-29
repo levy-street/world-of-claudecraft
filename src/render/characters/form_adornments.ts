@@ -4,7 +4,7 @@
 // (`setMoonkin`, `setGhost`), its per-frame tick and its teardown; everything
 // else lives here and in the pieces this composes:
 //   form_adornment_core.ts   what a rig wears, and how it moves (pure)
-//   moonwing_adornment.ts    antlers, crescent and wings (THREE)
+//   moonwing_adornment.ts    antlers and crescent (THREE)
 //
 // A set's FIRST mount on this rig rides the visual's injected compile gate
 // (the renderer's gateSwapFlagOnCompile, the same one that stages an unlinked
@@ -76,8 +76,8 @@ export class FormAdornments {
     if (plan.moonwing && !this.moonwing) {
       const piece = new MoonwingAdornment(this.model, plan.antlers);
       this.moonwingElapsed = 0;
-      // Every shift starts folded: the pose still holds the LAST form's
-      // unfurled wings, which would pop the new pair open on its first frame.
+      // Every shift starts at rest: the pose still holds the LAST form's
+      // crescent drift.
       piece.apply(Object.assign(this.pose, createMoonwingPose()));
       this.moonwing = this.mount(piece, this.moonwingLinked);
     } else if (!plan.moonwing && this.moonwing) {
@@ -121,22 +121,14 @@ export class FormAdornments {
 
   /** Advance the pieces one frame. `visible` false (a culled or far-LOD rig,
    *  whose subtree is hidden anyway) skips the pose work and holds the clock;
-   *  so does a set still held behind its gate, so it unfurls on screen. */
-  update(
-    dt: number,
-    moving: boolean,
-    casting: boolean,
-    reducedMotion: boolean,
-    visible: boolean,
-  ): void {
+   *  so does a set still held behind its gate. */
+  update(dt: number, reducedMotion: boolean, visible: boolean): void {
     if (this.disposed) return;
     if (this.release(this.moonwing)) this.moonwingLinked = true;
     if (!visible) return;
     if (this.moonwing && !this.moonwing.held) {
       this.moonwingElapsed += dt;
-      this.moonwing.piece.apply(
-        moonwingPoseInto(this.moonwingElapsed, moving, casting, reducedMotion, this.pose),
-      );
+      this.moonwing.piece.apply(moonwingPoseInto(this.moonwingElapsed, reducedMotion, this.pose));
     }
   }
 

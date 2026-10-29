@@ -228,6 +228,40 @@ describe('nameplate_view - visibility', () => {
   });
 });
 
+// Stealth Rework: a spotted stealthed ENEMY player shows no plate unless it is
+// the viewer's target; the body (its veil) is all a spotter sees until then.
+describe('nameplate_view - stealthed enemy', () => {
+  const stealther = () =>
+    ent({ id: 9, kind: 'player', templateId: 'player', pos: { x: 4, y: 0, z: 0 } });
+  const p = (stealthedEnemy: boolean, targetId: number | null, standIn = false) =>
+    nameplatePlanInto(
+      newNameplatePlan(),
+      stealther(),
+      viewer({ targetId }),
+      2,
+      true,
+      false,
+      true,
+      false,
+      standIn,
+      stealthedEnemy,
+    );
+
+  it('is hidden until targeted, then shown', () => {
+    expect(p(true, null).hidden).toBe(true);
+    expect(p(true, 3).hidden).toBe(true); // someone else is the target
+    expect(p(true, 9).hidden).toBe(false);
+  });
+
+  it('leaves every other player plate alone', () => {
+    expect(p(false, null).hidden).toBe(false);
+  });
+
+  it('a gated body still gets its stand-in plate', () => {
+    expect(p(true, null, true).hidden).toBe(false);
+  });
+});
+
 describe('nameplate_view - urgent (content refreshes every pass)', () => {
   it('is urgent when targeted, very close, or casting; otherwise not', () => {
     const farIdle = ent({ pos: { x: 0, y: 0, z: 40 } });

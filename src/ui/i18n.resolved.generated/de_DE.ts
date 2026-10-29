@@ -851,7 +851,7 @@ export const de_DE: EnTranslations = {
       "seals": "Laternensiegel: {count}",
       "resetIn": "Neue Aufträge in {time}",
       "resetSoon": "Neue Aufträge bei der nächsten wöchentlichen Zurücksetzung",
-      "contractsIntro": "Drei Aufträge pro Woche, dieselben für jeden Abenteurer des Realms. Keine Unterschrift nötig: Schließe einen ab und seine Siegel landen direkt in deinen Taschen, einmal pro Woche.",
+      "contractsIntro": "Drei Aufträge pro Woche, dieselben für jeden Abenteurer des Realms. Keine Unterschrift nötig: Schließe einen ab und seine Siegel werden dir direkt ausgezahlt, einmal pro Woche.",
       "kinds": {
         "boss": "Kopfgeld",
         "heroic": "Heroischer Abschluss",
@@ -900,7 +900,7 @@ export const de_DE: EnTranslations = {
         "cardProgress": "{done}/{total} diese Woche",
         "rewardLine": "Belohnung: {reward}",
         "stamp": "Besiegelt",
-        "sealsTip": "Laternensiegel gibt es für die wöchentlichen Aufträge der Laternenhalle. Sie können nur bei Rüstmeister Garrick Holt ausgegeben werden und sind an dich gebunden."
+        "sealsTip": "Laternensiegel gibt es für die wöchentlichen Aufträge der Laternenhalle. Sie können nur bei Rüstmeister Garrick Holt ausgegeben werden. Diese Währung ist an dich gebunden und belegt keinen Taschenplatz."
       },
       "shop": {
         "stockLabel": "Garrick Holts Waren",
@@ -1607,6 +1607,7 @@ export const de_DE: EnTranslations = {
         }
       },
       "seasonOne": "Saison 1",
+      "promoClose": "Werbeaktionen schließen",
       "membershipPromo": {
         "open": "Mitgliedschaft im WOC-Shop",
         "close": "Mitgliedschaftswerbung schließen",
@@ -3451,6 +3452,7 @@ export const de_DE: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Lass Welt-PvP aktiviert, um {percent} mehr Erfahrung und Fraktionsruf zu erhalten. Die Boni enden, sobald du das Ausschalten anforderst.",
       "rewardTitles": "Verdiene dauerhafte Titel nach {thresholds} Spielzeit mit aktiviertem Welt-PvP in der offenen Welt oder in PvP-Instanzen. Ausloggen, Tod, PvE-Instanzen und Heiligtümer pausieren den Zähler. Ausschalten setzt ihn zurück.",
       "rewardPaused": "Aktuelle PvP-Serie: {time} gespielt (in einem Heiligtum pausiert)",
       "rewardPausedDead": "Aktuelle PvP-Serie: {time} gespielt (während des Todes pausiert)",
@@ -3613,6 +3615,7 @@ export const de_DE: EnTranslations = {
       "delveMark": "Tiefgang-Marke",
       "wocToken": "WoC-Token",
       "heroicMarkNote": "Heroische Dungeons . beim heroischen Quartiermeister ausgeben",
+      "lanternSealNote": "Wöchentliche Aufträge der Laternenhalle . beim Gildenrüstmeister ausgeben",
       "honorNote": "Schlachtfelder, die Arena und Weltquests",
       "delveMarkNote": "Abgeschlossene Tiefgänge",
       "wocTokenNote": "Guthaben der verknüpften Wallet",
@@ -3821,6 +3824,7 @@ export const de_DE: EnTranslations = {
       "equipLockout": "Das Ausrüsten löst eine {seconds} Sek. lange Abklingzeit für seinen Einsatz aus, oder die verbleibende Abklingzeit des ersetzten Schmuckstücks, falls diese länger ist.",
       "equip": {
         "lastStand": "Erleidest du Schaden unter {threshold}% Gesundheit, erhältst du für {duration} Sek. einen Schild, der {absorb} Schaden absorbiert ({absorbPct}% deiner maximalen Gesundheit). Kann nur alle {icd} Sek. einmal ausgelöst werden.",
+        "lastStandFlat": "Erleidest du Schaden unter {threshold}% Gesundheit, erhältst du für {duration} Sek. einen Schild, der {absorb} Schaden absorbiert. Kann nur alle {icd} Sek. einmal ausgelöst werden.",
         "hourglass": "Überheilung aus deinen direkten Heilungen wird in der Sanduhr gespeichert, bis zu {cap} ({capPct}% deiner maximalen Gesundheit). Gespeicherte Heilung verblasst {fade} Sek., nachdem sie zuletzt gewachsen ist.",
         "twinStrike": "Deine automatischen Angriffstreffer haben eine Chance von {chance}%, einen zusätzlichen Nahkampfschlag mit der Haupthand auszuführen. Kann nur alle {icd} Sek. einmal ausgelöst werden.",
         "tally": "Jeder kritische automatische Angriffstreffer und jeder tödliche Treffer fügt eine Kerbe hinzu, bis zu {max}. Kerben halten {duration} Sek. an und werden erneuert, sooft du eine erhältst.",
@@ -17562,7 +17566,7 @@ export const de_DE: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Taktische Tarnung",
-        "description": "Passe dich der Umgebung an: Gegner nehmen dich kaum wahr und du bewegst dich mit 80% Tempo. Angriffe oder erlittener Schaden beenden die taktische Tarnung. Erneut wirken, um hervorzutreten. (Überleben)"
+        "description": "Passe dich der Umgebung an: Gegner nehmen dich kaum wahr und du bewegst dich mit 80% Tempo. Angriffe, erlittener Schaden oder das Rufen eines Begleiters beenden Taktische Tarnung. Erneut wirken, um hervorzutreten. Erfordert Einsame Seele und keinen Begleiter."
       },
       "frostjaw_trap": {
         "name": "Frostkieferfalle",

@@ -851,7 +851,7 @@ export const es: EnTranslations = {
       "seals": "Sellos del farol: {count}",
       "resetIn": "Nuevos contratos en {time}",
       "resetSoon": "Nuevos contratos en el próximo reinicio semanal",
-      "contractsIntro": "Tres contratos por semana, los mismos para todos los aventureros del reino. No hace falta firmar: completa uno y sus sellos irán directamente a tus bolsas, una vez por semana.",
+      "contractsIntro": "Tres contratos por semana, los mismos para todos los aventureros del reino. No hace falta firmar: completa uno y recibirás sus sellos directamente, una vez por semana.",
       "kinds": {
         "boss": "Recompensa por captura",
         "heroic": "Completar en heroico",
@@ -900,7 +900,7 @@ export const es: EnTranslations = {
         "cardProgress": "{done}/{total} esta semana",
         "rewardLine": "Recompensa: {reward}",
         "stamp": "Sellado",
-        "sealsTip": "Los sellos del farol se obtienen por los contratos semanales del Salón del Farol y solo se gastan con Garrick Holt, el intendente. Están ligados a ti."
+        "sealsTip": "Los sellos del farol se obtienen por los contratos semanales del Salón del Farol y solo se gastan con Garrick Holt, el intendente. Son una moneda ligada a ti y no ocupan espacio en las bolsas."
       },
       "shop": {
         "stockLabel": "Mercancía de Garrick Holt",
@@ -1607,6 +1607,7 @@ export const es: EnTranslations = {
         }
       },
       "seasonOne": "Temporada 1",
+      "promoClose": "Cerrar promociones",
       "membershipPromo": {
         "open": "Membresía en la tienda WOC",
         "close": "Cerrar promoción de membresía",
@@ -3451,6 +3452,7 @@ export const es: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Mantén activado el JcJ del mundo para obtener un {percent} más de experiencia y reputación de facción. Las bonificaciones terminan cuando solicitas desactivarlo.",
       "rewardTitles": "Gana títulos permanentes tras {thresholds} de juego con JcJ del mundo activado en el mundo abierto o en instancias JcJ. Desconectarte, morir, las instancias JcE y los santuarios pausan el contador. Desactivarlo lo reinicia.",
       "rewardPaused": "Racha JcJ actual: {time} de juego (en pausa en un santuario)",
       "rewardPausedDead": "Racha JcJ actual: {time} de juego (en pausa mientras estás muerto)",
@@ -3613,6 +3615,7 @@ export const es: EnTranslations = {
       "delveMark": "Marca de expedición",
       "wocToken": "Ficha WoC",
       "heroicMarkNote": "Mazmorras heroicas . gástala con el intendente heroico",
+      "lanternSealNote": "Contratos semanales del Salón del Farol . gástalos con el intendente del gremio",
       "honorNote": "Campos de batalla, la arena y misiones de mundo",
       "delveMarkNote": "Expediciones completadas",
       "wocTokenNote": "Saldo de la cartera vinculada",
@@ -3821,6 +3824,7 @@ export const es: EnTranslations = {
       "equipLockout": "Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.",
       "equip": {
         "lastStand": "Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.",
+        "lastStandFlat": "Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño durante {duration} s. Puede ocurrir una vez cada {icd} s.",
         "hourglass": "La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.",
         "twinStrike": "Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.",
         "tally": "Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.",
@@ -17562,7 +17566,7 @@ export const es: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Camuflaje Táctico",
-        "description": "Confúndete con el entorno: los enemigos apenas te perciben y te mueves al 80% de velocidad. Atacar o recibir daño rompe Camuflaje Táctico. Úsalo de nuevo para salir. (Supervivencia)"
+        "description": "Confúndete con el entorno: los enemigos apenas te perciben y te mueves al 80% de velocidad. Atacar, recibir daño o llamar a una mascota rompe Camuflaje Táctico. Úsalo de nuevo para salir. Requiere Alma solitaria y no tener mascota."
       },
       "frostjaw_trap": {
         "name": "Trampa Fauces de Escarcha",

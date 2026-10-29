@@ -51,7 +51,7 @@ function atGarrick(seals: number) {
   if (seals > 0) s.ctx.addItem(LANTERN_SEAL_ITEM_ID, seals, pid);
   const guildEvents = (): SimEvent[] =>
     s.tick().filter((e: SimEvent) => e.type.startsWith('guildCosmetic'));
-  const sealsLeft = () => s.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid);
+  const sealsLeft = () => s.ctx.players.get(pid)?.lanternSeals ?? 0;
   return { s, pid, guildEvents, sealsLeft };
 }
 

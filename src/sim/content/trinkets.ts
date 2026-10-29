@@ -193,8 +193,16 @@ export type TrinketUse =
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
   /** Bastion Sigil: dropping below `belowHp` of your health raises a shield
-   *  worth `absorb` of your max health, once every `icd` seconds. */
-  | { kind: 'lastStand'; belowHp: number; absorb: number; icd: number; duration: number }
+   *  worth `absorb` of your max health, once every `icd` seconds. With `flat`,
+   *  `absorb` is a fixed amount instead (the referral charms). */
+  | {
+      kind: 'lastStand';
+      belowHp: number;
+      absorb: number;
+      flat?: true;
+      icd: number;
+      duration: number;
+    }
   /** Mender's Hourglass: overhealing you deal fills the hourglass, up to `cap`
    *  of your max health. */
   | { kind: 'hourglass'; cap: number }
@@ -443,15 +451,19 @@ export const CRUCIBLE_TRINKET_ITEM_IDS: readonly string[] = [
 ];
 
 export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freeze({
+  // The referral charms' shields are flat (250, then 350 awakened), not a share of
+  // max health: over half a character's health at the level-10 and 13 bosses that
+  // award them, but under a tenth of a geared level-20 tank's pool (about 4,000),
+  // where the Bastion Sigil's 15% wins.
   referral_hollow_charm: {
     cooldown: 120,
     use: { kind: 'passiveOnly' },
-    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.3, icd: 120, duration: 10 },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 250, flat: true, icd: 120, duration: 10 },
   },
   referral_fog_charm: {
     cooldown: 120,
     use: { kind: 'friendship', duration: 15, stats: 5 },
-    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.3, icd: 120, duration: 10 },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 350, flat: true, icd: 120, duration: 10 },
   },
   bastion_sigil: {
     cooldown: 120,
@@ -690,4 +702,12 @@ export const GAMBLE = Object.freeze({
 
 export function trinketSpec(itemId: string | null | undefined): TrinketSpec | undefined {
   return itemId ? TRINKET_SPECS[itemId] : undefined;
+}
+
+/** The shield a last-stand passive raises for a wearer with `maxHp`. */
+export function lastStandAbsorb(
+  passive: Extract<TrinketPassive, { kind: 'lastStand' }>,
+  maxHp: number,
+): number {
+  return passive.flat ? passive.absorb : Math.round(maxHp * passive.absorb);
 }

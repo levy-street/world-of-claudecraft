@@ -9,11 +9,11 @@ import { emitActivitySelfKeys } from '../server/quest_snapshot_wire';
 import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { bagPools, canAddItem, countFit, fitsAll } from '../src/sim/bags';
 import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
+import { isCurrencyGrantId } from '../src/sim/currency_grants';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   absorbLegacyHeroicMarkSlots,
   creditHeroicMarks,
-  isCurrencyGrantId,
   sanitizeHeroicMarks,
   spendHeroicMarks,
 } from '../src/sim/heroic_marks';

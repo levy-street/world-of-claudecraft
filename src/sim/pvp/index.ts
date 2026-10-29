@@ -177,6 +177,7 @@ export {
   type WorldPvpBooks,
   type WorldPvpMetaState,
   type WorldPvpSavedState,
+  worldPvpConcealsStealthFrom,
   worldPvpDefeatLine,
   worldPvpDisarmRemaining,
   worldPvpForfeitKillLine,
@@ -236,6 +237,7 @@ export {
   worldPvpPairMultiplier,
   worldPvpSplit,
   worldPvpStake,
+  worldPvpStealthExposed,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
 export {

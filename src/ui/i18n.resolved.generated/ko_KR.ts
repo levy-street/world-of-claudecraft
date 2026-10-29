@@ -851,7 +851,7 @@ export const ko_KR: EnTranslations = {
       "seals": "등불 인장: {count}",
       "resetIn": "{time} 후 새 계약",
       "resetSoon": "다음 주간 초기화에 새 계약",
-      "contractsIntro": "계약은 일주일에 세 건, 왕국의 모든 모험가에게 똑같이 게시됩니다. 서명할 필요는 없습니다. 하나를 끝까지 해내면 그 인장이 매주 한 번씩 곧바로 가방에 들어옵니다.",
+      "contractsIntro": "계약은 일주일에 세 건, 왕국의 모든 모험가에게 똑같이 게시됩니다. 서명할 필요는 없습니다. 하나를 끝까지 해내면 그 인장을 매주 한 번씩 바로 지급받습니다.",
       "kinds": {
         "boss": "현상금",
         "heroic": "영웅 돌파",
@@ -900,7 +900,7 @@ export const ko_KR: EnTranslations = {
         "cardProgress": "이번 주 {done}/{total}",
         "rewardLine": "보상: {reward}",
         "stamp": "봉인됨",
-        "sealsTip": "등불 인장은 등불 회관 주간 계약의 보상으로 지급되며, 보급관 개릭 홀트에게서만 사용할 수 있습니다. 귀속 아이템입니다."
+        "sealsTip": "등불 인장은 등불 회관 주간 계약의 보상으로 지급되며, 보급관 개릭 홀트에게서만 사용할 수 있습니다. 자신에게 귀속되는 화폐이며 가방 공간을 차지하지 않습니다."
       },
       "shop": {
         "stockLabel": "개릭 홀트의 판매 목록",
@@ -1607,6 +1607,7 @@ export const ko_KR: EnTranslations = {
         }
       },
       "seasonOne": "시즌 1",
+      "promoClose": "홍보 닫기",
       "membershipPromo": {
         "open": "WOC 상점의 멤버십",
         "close": "멤버십 홍보 닫기",
@@ -3451,6 +3452,7 @@ export const ko_KR: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "월드 PvP를 켜 두면 경험치와 진영 평판을 {percent} 더 얻습니다. 끄기를 요청하면 즉시 보너스가 중단됩니다.",
       "rewardTitles": "월드 PvP를 켠 상태로 오픈 월드 또는 PvP 인스턴스에서 플레이한 시간이 {thresholds}에 도달하면 영구 칭호를 얻습니다. 로그아웃, 사망, PvE 인스턴스 및 성역에서는 타이머가 일시 정지됩니다. PvP를 끄면 시간이 초기화됩니다.",
       "rewardPaused": "현재 PvP 유지 시간: {time} (성역에서 일시 정지)",
       "rewardPausedDead": "현재 PvP 유지 시간: {time} (사망 상태에서 일시 정지)",
@@ -3613,6 +3615,7 @@ export const ko_KR: EnTranslations = {
       "delveMark": "델브 징표",
       "wocToken": "WoC 토큰",
       "heroicMarkNote": "영웅 던전 . 영웅 보급관에게서 사용",
+      "lanternSealNote": "등불 회관 주간 계약 . 길드 보급관에게서 사용",
       "honorNote": "전장, 투기장, 전역 퀘스트",
       "delveMarkNote": "완료한 델브",
       "wocTokenNote": "연동된 지갑 잔액",
@@ -3821,6 +3824,7 @@ export const ko_KR: EnTranslations = {
       "equipLockout": "착용하면 사용 효과에 {seconds}초의 재사용 대기시간이 시작됩니다. 교체한 장신구의 남은 재사용 대기시간이 더 길면 그 시간이 적용됩니다.",
       "equip": {
         "lastStand": "생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해(최대 생명력의 {absorbPct}%)를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.",
+        "lastStandFlat": "생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.",
         "hourglass": "직접 치유로 발생한 초과 치유량이 모래시계에 저장되며, 최대 {cap}(최대 생명력의 {capPct}%)까지 저장됩니다. 저장된 치유량은 마지막으로 늘어난 뒤 {fade}초가 지나면 사라집니다.",
         "twinStrike": "자동 공격이 적중하면 {chance}% 확률로 주무기 근접 공격을 한 번 더 합니다. {icd}초마다 한 번만 발동합니다.",
         "tally": "자동 공격 치명타와 결정타마다 집계 표식을 하나씩 얻으며, 최대 {max}개까지 쌓입니다. 표식은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.",
@@ -17562,7 +17566,7 @@ export const ko_KR: EnTranslations = {
       },
       "tactical_camo": {
         "name": "전술 위장",
-        "description": "주변 환경에 녹아듭니다. 적이 거의 알아채지 못하며, 이동 속도가 80%가 됩니다. 공격하거나 피해를 받으면 전술 위장이 해제됩니다. 다시 시전하면 해제됩니다. (야전술)"
+        "description": "주변 환경에 녹아듭니다. 적이 거의 알아채지 못하며, 이동 속도가 80%가 됩니다. 공격하거나 피해를 받거나 소환수를 부르면 전술 위장이 해제됩니다. 다시 시전하면 해제됩니다. 고독한 영혼이 필요하며 소환수가 없어야 합니다."
       },
       "frostjaw_trap": {
         "name": "서리턱 덫",

@@ -89,7 +89,6 @@ const EXPECTED = {
     'trailbreak',
     'wildheart',
     'shellskin',
-    'tactical_camo',
     'frostjaw_trap',
     'bear_trap',
     'scatterbolt',

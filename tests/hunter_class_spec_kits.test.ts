@@ -21,7 +21,6 @@ const EXCLUSIVE_KITS: Readonly<Record<HunterSpec, readonly string[]>> = {
     'shrapnel_charge',
     'bloodtrail_assault',
     'bloodhook',
-    'tactical_camo',
   ],
 };
 

@@ -659,6 +659,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fraktionen',
   'hudChrome.currencies.heroicMarkNote':
     'Heroische Dungeons . beim heroischen Quartiermeister ausgeben',
+  'hudChrome.currencies.lanternSealNote':
+    'Wöchentliche Aufträge der Laternenhalle . beim Gildenrüstmeister ausgeben',
   'hudChrome.currencies.honor': 'Ehre',
   'hudChrome.currencies.honorNote': 'Schlachtfelder, die Arena und Weltquests',
   'hudChrome.currencies.intro':
@@ -1147,6 +1149,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Deine kritischen Nah- und Fernkampf-Waffentreffer setzen das Ziel in Brand und verursachen alle {every} Sek. {tick} Feuerschaden für {duration} Sek. Ein neuer kritischer Treffer erneuert den Effekt. Der Schaden steigt mit Angriffskraft oder Fernkampf-Angriffskraft, je nachdem, welcher Wert höher ist.',
   'hudChrome.trinkets.equip.lastStand':
     'Erleidest du Schaden unter {threshold}% Gesundheit, erhältst du für {duration} Sek. einen Schild, der {absorb} Schaden absorbiert ({absorbPct}% deiner maximalen Gesundheit). Kann nur alle {icd} Sek. einmal ausgelöst werden.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Erleidest du Schaden unter {threshold}% Gesundheit, erhältst du für {duration} Sek. einen Schild, der {absorb} Schaden absorbiert. Kann nur alle {icd} Sek. einmal ausgelöst werden.',
   'hudChrome.trinkets.equip.storm':
     'Jeder Zauber, den du wirkst, fügt eine Ladung hinzu, bis zu {max}. Ladungen halten {duration} Sek. an und werden erneuert, sooft du eine erhältst.',
   'hudChrome.trinkets.equip.tally':
@@ -20470,6 +20474,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Aktuelle PvP-Serie: {time} gespielt (in PvE-Instanzen pausiert)',
   'hudChrome.worldPvp.rewardProgress': 'Aktuelle PvP-Serie: {time} gespielt',
+  'hudChrome.worldPvp.rewardBonus':
+    'Lass Welt-PvP aktiviert, um {percent} mehr Erfahrung und Fraktionsruf zu erhalten. Die Boni enden, sobald du das Ausschalten anforderst.',
   'hudChrome.worldPvp.rewardTitles':
     'Verdiene dauerhafte Titel nach {thresholds} Spielzeit mit aktiviertem Welt-PvP in der offenen Welt oder in PvP-Instanzen. Ausloggen, Tod, PvE-Instanzen und Heiligtümer pausieren den Zähler. Ausschalten setzt ihn zurück.',
   'hudChrome.worldPvp.skullName': 'Schädel von {name}',
@@ -20512,7 +20518,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Verbraucht einen Heilung-über-Zeit-Effekt auf einem befreundeten Ziel, um es um {damage} zu heilen. Sporenheilung und Pflanzungen von Zweite Blüte gewähren Grünkraft; bei 5 Grünkraft wird diese Taste zu Überblüte, die sofort alle Verbündeten mit deinen Heilung-über-Zeit-Effekten um 60% ihrer verbleibenden Heilung heilt. (Signatur der Wiederherstellung)',
   'entities.abilities.tactical_camo.description':
-    'Passe dich der Umgebung an: Gegner nehmen dich kaum wahr und du bewegst dich mit 80% Tempo. Angriffe oder erlittener Schaden beenden die taktische Tarnung. Erneut wirken, um hervorzutreten. (Überleben)',
+    'Passe dich der Umgebung an: Gegner nehmen dich kaum wahr und du bewegst dich mit 80% Tempo. Angriffe, erlittener Schaden oder das Rufen eines Begleiters beenden Taktische Tarnung. Erneut wirken, um hervorzutreten. Erfordert Einsame Seele und keinen Begleiter.',
   'entities.abilities.tactical_camo.name': 'Taktische Tarnung',
   'entities.itemSets.grovespring.bonus2':
     'Rasche Heilung verbraucht zuerst deine eigene Sporenheilung oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zaubern nicht mehr.',
@@ -21549,7 +21555,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Aufträge dieser Woche',
   'hudChrome.guildHall.board.rewardLine': 'Belohnung: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'Laternensiegel gibt es für die wöchentlichen Aufträge der Laternenhalle. Sie können nur bei Rüstmeister Garrick Holt ausgegeben werden und sind an dich gebunden.',
+    'Laternensiegel gibt es für die wöchentlichen Aufträge der Laternenhalle. Sie können nur bei Rüstmeister Garrick Holt ausgegeben werden. Diese Währung ist an dich gebunden und belegt keinen Taschenplatz.',
   'hudChrome.guildHall.board.stamp': 'Besiegelt',
   'hudChrome.guildHall.board.weekProgress':
     'Diese Woche: {done} von {total} Aufträgen abgeschlossen',
@@ -21569,7 +21575,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Auftrag abgeschlossen: {contract}. Du erhältst {count} Laternensiegel.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Drei Aufträge pro Woche, dieselben für jeden Abenteurer des Realms. Keine Unterschrift nötig: Schließe einen ab und seine Siegel landen direkt in deinen Taschen, einmal pro Woche.',
+    'Drei Aufträge pro Woche, dieselben für jeden Abenteurer des Realms. Keine Unterschrift nötig: Schließe einen ab und seine Siegel werden dir direkt ausgezahlt, einmal pro Woche.',
   'hudChrome.guildHall.emptyBoard':
     'Die Tafel wird neu beschrieben. Komm nach der wöchentlichen Zurücksetzung wieder.',
   'hudChrome.guildHall.goals.boss':
@@ -21859,6 +21865,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedTitle': 'Verfolgt!',
   'hudChrome.wildheartAlert.timeAria': 'Noch {seconds} Sekunden',
   'hudChrome.wocStore.collections.lantern_hall': 'Laternenhalle',
+  'hudChrome.wocStore.promoClose': 'Werbeaktionen schließen',
   'hudChrome.wocStore.membershipPromo.close': 'Mitgliedschaftswerbung schließen',
   'hudChrome.wocStore.membershipPromo.cta': 'Jetzt beitreten',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'Kontovorteile',

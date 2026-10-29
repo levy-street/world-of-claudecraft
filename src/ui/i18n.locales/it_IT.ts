@@ -664,6 +664,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factionPending': 'Valuta di fazione: in attesa della Fase 2',
   'hudChrome.currencies.factions': 'Fazioni',
   'hudChrome.currencies.heroicMarkNote': 'Dungeon eroici . spendi dal quartiermastro eroico',
+  'hudChrome.currencies.lanternSealNote':
+    'Contratti settimanali della Sala della Lanterna . spendi dal quartiermastro della gilda',
   'hudChrome.currencies.honor': 'Onore',
   'hudChrome.currencies.honorNote': 'Campi di battaglia, arena e missioni mondiali',
   'hudChrome.currencies.intro':
@@ -1150,6 +1152,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "I tuoi colpi critici con armi da mischia o a distanza incendiano il bersaglio, infliggendo {tick} danni da Fuoco ogni {every} sec per {duration} sec. Un nuovo colpo critico lo rinnova. Il danno aumenta con la potenza d'attacco o con la potenza d'attacco a distanza, a seconda di quale sia maggiore.",
   'hudChrome.trinkets.equip.lastStand':
     'Subire danno mentre sei sotto il {threshold}% di salute concede uno scudo che assorbe {absorb} danni ({absorbPct}% della tua salute massima) per {duration} sec. Può verificarsi una volta ogni {icd} sec.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Subire danno mentre sei sotto il {threshold}% di salute concede uno scudo che assorbe {absorb} danni per {duration} sec. Può verificarsi una volta ogni {icd} sec.',
   'hudChrome.trinkets.equip.storm':
     'Ogni incantesimo che lanci aggiunge una carica, fino a {max}. Le cariche durano {duration} sec, e si rinnovano ogni volta che ne ottieni una.',
   'hudChrome.trinkets.equip.tally':
@@ -20444,6 +20448,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.rewardPausedInstance':
     'Serie PvP attuale: {time} di gioco (in pausa nelle istanze PvE)',
   'hudChrome.worldPvp.rewardProgress': 'Serie PvP attuale: {time} di gioco',
+  'hudChrome.worldPvp.rewardBonus':
+    'Mantieni attivo il PvP mondiale per ottenere il {percent} in più di esperienza e reputazione di fazione. I bonus terminano quando richiedi di disattivarlo.',
   'hudChrome.worldPvp.rewardTitles':
     'Ottieni titoli permanenti dopo {thresholds} di gioco con PvP mondiale attivo nel mondo aperto o nelle istanze PvP. Disconnessione, morte, istanze PvE e santuari sospendono il timer. Disattivarlo lo azzera.',
   'hudChrome.worldPvp.skullName': 'Teschio di {name}',
@@ -20486,7 +20492,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     'Consuma una cura periodica su un bersaglio amico per curarlo di {damage}. Le applicazioni di Cura delle Spore e Seconda Fioritura aggiungono Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura subito ogni alleato con le tue cure periodiche del 60% delle cure rimanenti. (Tratto distintivo di Ripristino)',
   'entities.abilities.tactical_camo.description':
-    "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare o subire danni interrompe Mimetismo Tattico. Usa di nuovo per uscire. (Sopravvivenza)",
+    "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare, subire danni o chiamare una mascotte interrompe Mimetismo Tattico. Usa di nuovo per uscire. Richiede Anima solitaria e nessuna mascotte.",
   'entities.abilities.tactical_camo.name': 'Mimetismo Tattico',
   'entities.itemSets.grovespring.bonus2':
     'Rapidità di Guarigione consuma prima la tua Cura delle Spore o Seconda Fioritura e cura il 25 per cento in più. I danni subiti non ritardano più il lancio degli incantesimi.',
@@ -21911,7 +21917,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.noticesLabel': 'Contratti di questa settimana',
   'hudChrome.guildHall.board.rewardLine': 'Ricompensa: {reward}',
   'hudChrome.guildHall.board.sealsTip':
-    'I Sigilli della Lanterna si ottengono dai contratti settimanali della Sala della Lanterna e si spendono solo dal quartiermastro Garrick Holt. Sono vincolati a te.',
+    'I Sigilli della Lanterna si ottengono dai contratti settimanali della Sala della Lanterna e si spendono solo dal quartiermastro Garrick Holt. Sono una valuta vincolata a te e non occupano spazio nelle borse.',
   'hudChrome.guildHall.board.stamp': 'Sigillato',
   'hudChrome.guildHall.board.weekProgress':
     'Questa settimana: {done} contratti completati su {total}',
@@ -21933,7 +21939,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Contratto completato: {contract}. Ricevi {count} Sigilli della Lanterna.',
   'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
   'hudChrome.guildHall.contractsIntro':
-    'Tre contratti a settimana, uguali per ogni avventuriero del reame. Non occorre firmare: portane a termine uno e i suoi sigilli andranno direttamente nelle tue borse, una volta a settimana.',
+    'Tre contratti a settimana, uguali per ogni avventuriero del reame. Non occorre firmare: portane a termine uno e riceverai direttamente i suoi sigilli, una volta a settimana.',
   'hudChrome.guildHall.done': 'Completato questa settimana',
   'hudChrome.guildHall.emptyBoard':
     'La bacheca è in aggiornamento. Torna dopo il ripristino settimanale.',
@@ -22222,6 +22228,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedTitle': 'Braccato!',
   'hudChrome.wildheartAlert.timeAria': '{seconds} secondi rimasti',
   'hudChrome.wocStore.collections.lantern_hall': 'Sala della Lanterna',
+  'hudChrome.wocStore.promoClose': 'Chiudi le promozioni',
   'hudChrome.wocStore.membershipPromo.close': "Chiudi la promozione dell'abbonamento",
   'hudChrome.wocStore.membershipPromo.cta': 'Abbonati ora',
   'hudChrome.wocStore.membershipPromo.eyebrow': "Vantaggi dell'account",

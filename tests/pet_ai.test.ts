@@ -876,11 +876,13 @@ describe('petPickTarget: a defensive pet assists against a hostile PLAYER', () =
 });
 
 // A pet perceives a stealthed enemy player EXACTLY like the enemy player its owner
-// is fighting: not at all. No close-range proximity detection (the classic model a
-// mob keeps), so a rogue's Duskveil/Smokestep and a druid's Stalk stay hidden from
-// the pet at any distance, point-blank included.
-describe('a pet never detects a stealthed player, at any range', () => {
-  const POINT_BLANK = 0.5; // right on top of the pet, yet still unseen
+// is fighting: through the PvP detection radius (Stealth Rework; 5 yd in front and
+// 2.5 yd behind at equal level, tests/pvp_stealth_detection.test.ts owns the
+// numbers). A rogue's Duskveil and a druid's Stalk stay hidden beyond it and are
+// spotted point-blank.
+describe('a pet detects a stealthed player only inside its detection radius', () => {
+  const POINT_BLANK = 0.5; // right on top of the pet: inside any detection radius
+  const OUT_OF_RANGE = 8; // beyond the equal-level radius in every direction
   const NORMAL = 6; // an ordinary pull distance, for the unstealthed control
 
   function stealthAura(id = 'stealth'): Aura {
@@ -922,18 +924,25 @@ describe('a pet never detects a stealthed player, at any range', () => {
     return { sim, owner, enemy, pet, enemyPid: b };
   }
 
-  it('does NOT acquire a stealthed rogue (Duskveil), even point-blank', () => {
+  it('does NOT acquire a stealthed rogue (Duskveil) outside its detection radius', () => {
     const { sim, enemy, pet, owner } = stealthedOpponent();
-    place(enemy, POINT_BLANK, 0);
+    place(enemy, OUT_OF_RANGE, 0);
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
   });
 
-  it('does NOT acquire a prowling druid (Stalk) point-blank either', () => {
+  it('does NOT acquire a prowling druid (Stalk) outside it either', () => {
     const { sim, enemy, pet, owner } = stealthedOpponent('prowl');
-    place(enemy, POINT_BLANK, 0);
+    place(enemy, OUT_OF_RANGE, 0);
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
+  it('acquires a stealthed rogue point-blank, inside its detection radius', () => {
+    const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
+    place(enemy, POINT_BLANK, 0);
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
   });
 
   it('unstealthed, the same player is acquired normally', () => {
@@ -947,10 +956,10 @@ describe('a pet never detects a stealthed player, at any range', () => {
 
   // The damage path must answer the same way, or a pet that cannot see a rogue
   // could still hit them (combat/damage.ts).
-  it('the dealDamage stealth gate blocks a point-blank stealthed player, clears on unstealth', () => {
+  it('the dealDamage stealth gate blocks an undetected stealthed player, clears on unstealth', () => {
     const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
     const hpBefore = enemy.hp;
-    place(enemy, POINT_BLANK, 0);
+    place(enemy, OUT_OF_RANGE, 0);
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
     expect(sim.dealDamage(pet, enemy, 10, false, 'physical', null, 'hit')).toBe(0);

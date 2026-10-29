@@ -2906,6 +2906,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.statusOff': '你的 PvP 旗幟已降下。你無法在開放世界中攻擊或被攻擊。',
   'hudChrome.worldPvp.statusOffFfa': '你的 PvP 旗幟已降下，但在自由混戰地帶你仍可攻擊或被攻擊。',
   'hudChrome.worldPvp.statusOn': '你的 PvP 旗幟已升起。已開啟旗幟的玩家可以攻擊你。',
+  'hudChrome.worldPvp.rewardBonus':
+    '保持世界PvP開啟可多獲得{percent}的經驗值和陣營聲望。請求關閉時，加成立即停止。',
   'hudChrome.worldPvp.rewardTitles':
     '開啟世界PvP時，在開放世界或PvP副本中的遊戲時間達到{thresholds}後可獲得永久稱號。登出遊戲、死亡、PvE副本和安全區會暫停計時。關閉PvP會重設計時。',
   'hudChrome.worldPvp.rewardPaused': '目前PvP連續遊戲時間：{time}（在安全區暫停）',
@@ -4189,6 +4191,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'wallet.bagReconnect': '重新連接錢包',
   'hudChrome.wocStore.collectionLine': '{collection}系列',
   'hudChrome.wocStore.seasonOne': '第一賽季',
+  'hudChrome.wocStore.promoClose': '關閉推廣',
   'hudChrome.wocStore.membershipPromo.open': 'WOC 商店中的會員',
   'hudChrome.wocStore.membershipPromo.close': '關閉會員推廣',
   'hudChrome.wocStore.membershipPromo.eyebrow': '帳號特權',
@@ -7817,7 +7820,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值；若其死亡，則以 35% 生命值將其復活。',
   'entities.abilities.tactical_camo.name': '戰術偽裝',
   'entities.abilities.tactical_camo.description':
-    '融入周圍環境：敵人幾乎察覺不到你，你以 80% 的速度移動。攻擊或受到傷害會打破戰術偽裝。再次施放即可解除。（野戰技藝）',
+    '融入周圍環境：敵人幾乎察覺不到你，你以 80% 的速度移動。攻擊、受到傷害或召喚寵物會打破戰術偽裝。再次施放即可解除。需要孤獨之魂，且不能有寵物。',
   'entities.abilities.play_dead.name': '裝死',
   'entities.abilities.play_dead.description':
     '倒地裝死：所有人看到你的生命值和集中值都為空。敵人會遺忘你，正以你為目標的敵方玩家會失去目標。移動、攻擊或使用其他技能都會結束裝死。若在移動中施放，你有 1 秒時間停下，否則移動會結束裝死。再次施放即可起身。',
@@ -20970,6 +20973,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '探險印記',
   'hudChrome.currencies.wocToken': 'WoC 代幣',
   'hudChrome.currencies.heroicMarkNote': '英雄地下城 . 在英雄軍需官處兌換',
+  'hudChrome.currencies.lanternSealNote': '燈火大廳每週契約 . 在公會軍需官處兌換',
   'hudChrome.currencies.honorNote': '戰場、競技場與世界任務',
   'hudChrome.currencies.delveMarkNote': '已完成的探險',
   'hudChrome.currencies.wocTokenNote': '已連結錢包的餘額',
@@ -21672,6 +21676,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '裝備後，其使用效果會進入 {seconds} 秒的冷卻；如果被替換的飾品剩餘冷卻更長，則改為該剩餘冷卻。',
   'hudChrome.trinkets.equip.lastStand':
     '在生命值低於 {threshold}% 時受到傷害，會獲得一個吸收 {absorb} 點傷害（你最大生命值的 {absorbPct}%）的護盾，持續 {duration} 秒。每 {icd} 秒只能觸發一次。',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    '在生命值低於 {threshold}% 時受到傷害，會獲得一個吸收 {absorb} 點傷害的護盾，持續 {duration} 秒。每 {icd} 秒只能觸發一次。',
   'hudChrome.trinkets.equip.hourglass':
     '你的直接治療產生的過量治療會儲存在沙漏中，最多 {cap} 點（你最大生命值的 {capPct}%）。儲存的治療量在最後一次增加後 {fade} 秒消散。',
   'hudChrome.trinkets.equip.twinStrike':
@@ -23023,7 +23029,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.resetIn': '{time}後發布新契約',
   'hudChrome.guildHall.resetSoon': '下次每週重置時發布新契約',
   'hudChrome.guildHall.contractsIntro':
-    '每週三份契約，王國中的每位冒險者看到的都一樣。無需簽署：完成其中一份，它的印章就會直接放進你的背包，每週一次。',
+    '每週三份契約，王國中的每位冒險者看到的都一樣。無需簽署：完成其中一份，你就會直接獲得它的印章，每週一次。',
   'hudChrome.guildHall.kinds.boss': '懸賞',
   'hudChrome.guildHall.kinds.heroic': '英雄通關',
   'hudChrome.guildHall.kinds.task': '執行',
@@ -23071,7 +23077,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.rewardLine': '獎勵：{reward}',
   'hudChrome.guildHall.board.stamp': '已蓋印',
   'hudChrome.guildHall.board.sealsTip':
-    '燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們與你綁定。',
+    '燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們是與你綁定的貨幣，不佔背包空間。',
   'hudChrome.guildHall.shop.stockLabel': '加里克·霍爾特的貨品',
   'hudChrome.guildHall.shop.kindMount': '坐騎',
   'hudChrome.guildHall.shop.kindSword': '劍的外觀',

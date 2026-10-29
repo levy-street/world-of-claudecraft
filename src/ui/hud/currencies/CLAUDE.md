@@ -4,7 +4,7 @@ The character window's Currencies tab: every spendable balance that is not
 coin, so none of them has to sit in the bags to be seen.
 
 - `currencies_view.ts` is the pure core (`UI_PURE_CORES`): the activity rows
-  (the Heroic Marks balance, Honor with its lifetime total, Delve
+  (the Heroic Marks and Lantern Seals balances, Honor with its lifetime total, Delve
   Marks, the $WOC token) and one PENDING row per allied faction. Faction
   currency is a Stage 2 decision of the World Quests scope; standing is not a
   currency and lives on the Reputation tab.
@@ -16,3 +16,6 @@ coin, so none of them has to sit in the bags to be seen.
 - Heroic Marks are a currency counter (`IWorld.heroicMarks`, owned by
   `src/sim/heroic_marks.ts`), not a bag item; the tab and the Heroic
   Quartermaster window read the same balance.
+- Lantern Seals are the same kind of counter (`src/sim/lantern_seals.ts`), read
+  through `IWorld.guildContracts.seals`; the tab and the Guild Hall
+  quartermaster read the same balance.

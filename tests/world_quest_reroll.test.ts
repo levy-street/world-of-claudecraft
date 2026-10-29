@@ -220,6 +220,30 @@ describe('World Quest Reroll Mechanism', () => {
     // At level 20, Automatons WQ awards +100 standing
     expect(meta.factions.automatons).toBe(100);
   });
+
+  it.each([
+    [false, 110],
+    [true, 100],
+  ])(
+    'the World PvP reputation bonus with the realm switch disabled=%s pays %s',
+    (disabled, gained) => {
+      const sim = new Sim({
+        seed: 42,
+        playerClass: 'warrior',
+        autoEquip: true,
+        worldPvpDisabled: disabled,
+      });
+      sim.setPlayerLevel(20);
+      const meta = sim.meta(sim.playerId)!;
+      meta.devWorldQuestCycle = cycle;
+      meta.worldQuestCycle = cycle;
+      const quest = playerActiveWorldQuests(meta, cycle).find((q) => q.zoneId === 'drakelands');
+      if (!quest) throw new Error('Expected Drakelands quest');
+      meta.worldPvp = { flagged: true, disarmAt: null, kills: 0, deaths: 0 };
+      awardWorldQuest(sim.ctx, meta, quest);
+      expect(meta.factions.automatons).toBe(gained);
+    },
+  );
 });
 
 describe('Replacing an in-progress World Quest', () => {

@@ -851,7 +851,7 @@ export const ja_JP: EnTranslations = {
       "seals": "燈火の印章：{count}",
       "resetIn": "新しい契約まで{time}",
       "resetSoon": "新しい契約は次の週次リセットで",
-      "contractsIntro": "契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接バッグに届く。",
+      "contractsIntro": "契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接受け取れる。",
       "kinds": {
         "boss": "討伐依頼",
         "heroic": "ヒロイック踏破",
@@ -900,7 +900,7 @@ export const ja_JP: EnTranslations = {
         "cardProgress": "今週 {done}/{total}",
         "rewardLine": "報酬：{reward}",
         "stamp": "封印済み",
-        "sealsTip": "燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。"
+        "sealsTip": "燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに紐づく通貨で、バッグの容量を使わない。"
       },
       "shop": {
         "stockLabel": "ギャリック・ホルトの品揃え",
@@ -1607,6 +1607,7 @@ export const ja_JP: EnTranslations = {
         }
       },
       "seasonOne": "シーズン1",
+      "promoClose": "宣伝を閉じる",
       "membershipPromo": {
         "open": "WOCストアのメンバーシップ",
         "close": "メンバーシップの宣伝を閉じる",
@@ -3451,6 +3452,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "ワールドPvPを有効にしている間、経験値と勢力の評判の獲得量が{percent}増加します。無効化を要求した時点でボーナスは終了します。",
       "rewardTitles": "ワールドPvPを有効にした状態で、オープンワールドまたはPvPインスタンスでのプレイ時間が{thresholds}に達すると、永続的な称号を獲得します。ログアウト中、死亡中、PvEインスタンス内、聖域ではタイマーが停止します。PvPを無効にするとリセットされます。",
       "rewardPaused": "現在のPvP継続時間：{time}（聖域で一時停止中）",
       "rewardPausedDead": "現在のPvP継続時間：{time}（死亡中のため一時停止中）",
@@ -3613,6 +3615,7 @@ export const ja_JP: EnTranslations = {
       "delveMark": "デルブの印",
       "wocToken": "WoCトークン",
       "heroicMarkNote": "ヒロイックダンジョン . ヒロイック補給官で使用",
+      "lanternSealNote": "燈火の館の週間契約 . ギルドの補給係で使用",
       "honorNote": "戦場、闘技場、ワールドクエスト",
       "delveMarkNote": "完了したデルブ",
       "wocTokenNote": "連携済みウォレットの残高",
@@ -3821,6 +3824,7 @@ export const ja_JP: EnTranslations = {
       "equipLockout": "装備すると使用効果に{seconds}秒のクールダウンが発生する。置き換えた装飾品の残りクールダウンの方が長い場合はそちらになる。",
       "equip": {
         "lastStand": "体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。",
+        "lastStandFlat": "体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージを吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。",
         "hourglass": "直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。",
         "twinStrike": "自動攻撃が命中すると、{chance}%の確率でメインハンドの近接攻撃をもう1回行う。{icd}秒に1回まで発動する。",
         "tally": "自動攻撃のクリティカルヒットととどめの一撃ごとに集計の印を1つ得る（最大{max}）。印は{duration}秒持続し、得るたびに更新される。",
@@ -17562,7 +17566,7 @@ export const ja_JP: EnTranslations = {
       },
       "tactical_camo": {
         "name": "戦術迷彩",
-        "description": "周囲に溶け込む。敵にほとんど気づかれず、移動速度は80%になる。攻撃するかダメージを受けると戦術迷彩は解除される。再使用で解除する。（野戦術）"
+        "description": "周囲に溶け込む。敵にほとんど気づかれず、移動速度は80%になる。攻撃するかダメージを受けるかペットを呼び出すと戦術迷彩は解除される。再使用で解除する。孤独な魂が必要で、ペットがいない場合のみ使用できる。"
       },
       "frostjaw_trap": {
         "name": "霜顎の罠",

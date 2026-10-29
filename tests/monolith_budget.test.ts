@@ -1318,7 +1318,13 @@ const MONOLITHS: MonolithRow[] = [
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 11410,
+    // LOWERED 11410 -> 11401 by the Stealth Rework footprints: breakStealth moved to
+    // src/sim/combat/stealth_break.ts (beside the stealth module), paying for the
+    // stealthFootprints IWorld getter. wc -l, exact count.
+    // LOWERED 11401 -> 11396 by its shimmer band: the Ice Block crowd-control
+    // predicate (and the control-kind set it builds on) moved to combat/cc.ts,
+    // paying for the stealthShimmers IWorld getter. wc -l, exact count.
+    ceiling: 11396,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

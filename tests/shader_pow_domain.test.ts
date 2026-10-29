@@ -145,6 +145,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_rune_vfx.ts': 3,
   'src/render/battleground_ward.ts': 1,
   'src/render/sprites_buddy_flame.ts': 1,
+  // The Stealth Rework shimmer's rim and sparkle band, both bases clamped.
+  'src/render/stealth_shimmer_visual.ts': 2,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
   // Authored Warrior materials are part of the same fail-closed domain scan.
   'src/render/ability_vfx/baked_impact_layers.ts': 1,

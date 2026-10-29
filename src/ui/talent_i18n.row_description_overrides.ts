@@ -175,7 +175,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'El Paso del Velo elimina inmovilizaciones y ralentizaciones, y luego otorga un 50% de velocidad de movimiento durante 3 s.',
     pri_r5_twisted_faith: 'El Paso del Velo te permite lanzar en movimiento durante 4 s.',
-    rog_r11_cheap_trick: 'El Golpe al Vientre ya no requiere el Velo Crepuscular.',
+    rog_r11_cheap_trick:
+      'El Golpe al Vientre ya no requiere el Velo Crepuscular ni cuesta Energía, pero tiene un tiempo de reutilización de 10 s.',
     rog_r14_dusk_economy:
       'Las habilidades cuestan un 50% menos de energía mientras estás en el Velo Crepuscular o envuelto en sombras por el velo, y durante 6 s después de salir del Velo Crepuscular.',
     rog_r20_kill_chain: 'Los golpes letales refrescan el Paso de Humo y otorgan 5 puntos de combo.',
@@ -307,7 +308,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Paso del Velo elimina raíces y ralentizaciones, y luego otorga un 50% de velocidad de movimiento durante 3 s.',
     pri_r5_twisted_faith:
       'Paso del Velo permite al Sacerdote lanzar hechizos en movimiento durante 4 s.',
-    rog_r11_cheap_trick: 'Golpe al Vientre ya no requiere el Velo Crepuscular.',
+    rog_r11_cheap_trick:
+      'Golpe al Vientre ya no requiere el Velo Crepuscular ni cuesta Energía, pero tiene un tiempo de reutilización de 10 s.',
     rog_r14_dusk_economy:
       'Las habilidades cuestan un 50% menos de energía mientras estás en el Velo Crepuscular o envuelto en el velo de sombras, y durante 6 s después de salir del Velo Crepuscular.',
     rog_r20_kill_chain: 'Los golpes letales reinician Paso de Humo y otorgan 5 puntos de combo.',
@@ -434,7 +436,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'Pas du voile retire les immobilisations et les ralentissements, puis octroie 50% de vitesse de déplacement pendant 3 s.',
     pri_r5_twisted_faith: "Pas du voile permet au Prêtre d'incanter en mouvement pendant 4 s.",
-    rog_r11_cheap_trick: 'Coup au ventre ne requiert plus le Voile du crépuscule.',
+    rog_r11_cheap_trick:
+      'Coup au ventre ne requiert plus le Voile du crépuscule et ne coûte pas d’Énergie, mais a un temps de recharge de 10 s.',
     rog_r14_dusk_economy:
       "Les capacités coûtent 50% d'énergie en moins pendant le Voile du crépuscule ou lorsque vous êtes enveloppé par le voile d'ombre, et pendant 6 s après avoir quitté le Voile du crépuscule.",
     rog_r20_kill_chain:
@@ -562,7 +565,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Pas du voile retire les racines et ralentissements, puis confère 50% de vitesse de déplacement pendant 3 s.',
     pri_r5_twisted_faith:
       'Pas du voile permet au prêtre de lancer des sorts en mouvement pendant 4 s.',
-    rog_r11_cheap_trick: 'Coup au ventre ne nécessite plus le Voile du crépuscule.',
+    rog_r11_cheap_trick:
+      'Coup au ventre ne nécessite plus le Voile du crépuscule et ne coûte pas d’Énergie, mais a un temps de recharge de 10 s.',
     rog_r14_dusk_economy:
       "Les techniques coûtent 50% d'énergie en moins tant que vous êtes dans le Voile du crépuscule ou enveloppé d'ombre par le voile, et pendant 6 s après avoir quitté le Voile du crépuscule.",
     rog_r20_kill_chain:
@@ -688,7 +692,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Passo del Velo rimuove radicamenti e rallentamenti, poi concede il 50% di velocità di movimento per 3 sec.',
     pri_r5_twisted_faith:
       'Passo del Velo permette al Sacerdote di lanciare incantesimi in movimento per 4 sec.',
-    rog_r11_cheap_trick: 'Pugno allo Stomaco non richiede più il Velo Crepuscolare.',
+    rog_r11_cheap_trick:
+      'Pugno allo Stomaco non richiede più il Velo Crepuscolare e non costa Energia, ma ha un tempo di recupero di 10 sec.',
     rog_r14_dusk_economy:
       "Le abilità costano il 50% di energia in meno mentre sei nel Velo Crepuscolare o avvolto nell'ombra dal Velo d'Ombra, e per 6 sec dopo aver lasciato il Velo Crepuscolare.",
     rog_r20_kill_chain: 'I colpi mortali rinnovano Passo di Fumo e conferiscono 5 punti combo.',
@@ -815,7 +820,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Schleierschritt entfernt Wurzeleffekte und Verlangsamungen und gewährt anschließend 3 Sek. lang 50% Bewegungstempo.',
     pri_r5_twisted_faith:
       'Schleierschritt erlaubt es dem Priester, 4 Sek. lang während der Bewegung zu wirken.',
-    rog_r11_cheap_trick: 'Magenhieb erfordert nicht länger Duskveil.',
+    rog_r11_cheap_trick:
+      'Magenhieb erfordert nicht länger Duskveil und kostet keine Energie, hat aber eine Abklingzeit von 10 Sek.',
     rog_r14_dusk_economy:
       'Fähigkeiten kosten 50% weniger Energie, während Ihr Euch in Duskveil befindet oder vom Schleier in Schatten gehüllt seid, sowie für 6 Sek. nach dem Verlassen von Duskveil.',
     rog_r20_kill_chain: 'Tödliche Treffer erneuern Rauchschritt und gewähren 5 Combopunkte.',
@@ -939,7 +945,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'Passo do Véu remove enraizamentos e reduções de velocidade, depois concede 50% de velocidade de movimento por 3 s.',
     pri_r5_twisted_faith: 'Passo do Véu permite ao Sacerdote conjurar em movimento por 4 s.',
-    rog_r11_cheap_trick: 'Soco no Estômago não exige mais Duskveil.',
+    rog_r11_cheap_trick:
+      'Soco no Estômago não exige mais Duskveil e não custa Energia, mas tem tempo de recarga de 10 s.',
     rog_r14_dusk_economy:
       'Habilidades custam 50% menos energia enquanto você está em Duskveil ou envolto em sombras pelo véu, e por 6 s após deixar Duskveil.',
     rog_r20_kill_chain: 'Golpes fatais renovam o Passo de Fumaça e concedem 5 pontos de combo.',
@@ -1071,7 +1078,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       '«Шаг сквозь завесу» снимает обездвиживающие и замедляющие эффекты, а затем дает 50% скорости передвижения на 3 сек.',
     pri_r5_twisted_faith:
       '«Шаг сквозь завесу» позволяет жрецу применять заклинания на ходу в течение 4 сек.',
-    rog_r11_cheap_trick: '«Удар под дых» больше не требует «Сумеречной завесы».',
+    rog_r11_cheap_trick:
+      '«Удар под дых» больше не требует «Сумеречной завесы» и не расходует энергию, но его время восстановления составляет 10 сек.',
     rog_r14_dusk_economy:
       'Способности стоят на 50% меньше энергии, пока вы в «Сумеречной завесе» или окутаны ее тенью, а также в течение 6 сек. после выхода из «Сумеречной завесы».',
     rog_r20_kill_chain: 'Смертельные удары обновляют «Дымный шаг» и дают 5 очков серии приемов.',
@@ -1189,7 +1197,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'Krok závoje odstraní zakořenění a zpomalení, poté udělí 50 % rychlosti pohybu na 3 s.',
     pri_r5_twisted_faith: 'Krok závoje umožní knězi sesílat za pohybu po dobu 4 s.',
-    rog_r11_cheap_trick: 'Rána do břicha už nevyžaduje Závoj šera.',
+    rog_r11_cheap_trick:
+      'Rána do břicha už nevyžaduje Závoj šera a nestojí žádnou Energii, ale má dobu přebití 10 s.',
     rog_r14_dusk_economy:
       'Schopnosti stojí o 50 % méně energie, když jsi v Závoji šera nebo pod vlivem Stínového závoje, a ještě 6 s po opuštění Závoje šera.',
     rog_r20_kill_chain: 'Smrtící údery obnoví Kouřový krok a udělí 5 combo bodů.',
@@ -1312,7 +1321,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Sluierstap verwijdert wortels en vertragingen, en verleent daarna 3 sec lang 50% bewegingssnelheid.',
     pri_r5_twisted_faith:
       'Sluierstap staat de Priester toe om 4 sec lang te spreuken terwijl hij beweegt.',
-    rog_r11_cheap_trick: 'Buikstoot vereist niet langer Schemersluier.',
+    rog_r11_cheap_trick:
+      'Buikstoot vereist niet langer Schemersluier en kost geen Energie, maar heeft een afkoeltijd van 10 sec.',
     rog_r14_dusk_economy:
       'Vaardigheden kosten 50% minder energie terwijl je in Schemersluier bent of in de schaduwsluier gehuld bent, en gedurende 6 sec nadat je Schemersluier verlaat.',
     rog_r20_kill_chain: 'Dodelijke klappen vernieuwen Rookstap en verlenen 5 combopunten.',
@@ -1437,7 +1447,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Krok Zasłony usuwa unieruchomienia i spowolnienia, a następnie przyznaje 50% prędkości ruchu na 3 sekundy.',
     pri_r5_twisted_faith:
       'Krok Zasłony pozwala Kapłanowi rzucać zaklęcia podczas ruchu przez 4 sekundy.',
-    rog_r11_cheap_trick: 'Cios w brzuch nie wymaga już Zasłony zmierzchu.',
+    rog_r11_cheap_trick:
+      'Cios w brzuch nie wymaga już Zasłony zmierzchu i nie kosztuje Energii, ale ma czas odnowienia wynoszący 10 sekund.',
     rog_r14_dusk_economy:
       'Umiejętności kosztują o 50% mniej energii, gdy jesteś w Zasłonie zmierzchu lub spowity cieniem zasłony, oraz przez 6 sekund po opuszczeniu Zasłony zmierzchu.',
     rog_r20_kill_chain: 'Zabójcze ciosy odświeżają Dymny krok i przyznają 5 punktów combo.',
@@ -1561,7 +1572,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'Langkah Tabir menghapus akar dan pelambatan, lalu memberi 50% kecepatan gerak selama 3 dtk.',
     pri_r5_twisted_faith: 'Langkah Tabir mengizinkan Pendeta merapal sambil bergerak selama 4 dtk.',
-    rog_r11_cheap_trick: 'Pukulan Ulu Hati tidak lagi membutuhkan Selubung Senja.',
+    rog_r11_cheap_trick:
+      'Pukulan Ulu Hati tidak lagi membutuhkan Selubung Senja dan tidak memakan Energi, tetapi memiliki waktu tunggu 10 dtk.',
     rog_r14_dusk_economy:
       'Kemampuan menghabiskan 50% lebih sedikit energi selagi dalam Selubung Senja atau diselimuti bayangan oleh Tabir Bayangan, dan selama 6 dtk setelah keluar dari Selubung Senja.',
     rog_r20_kill_chain: 'Pukulan pembunuh menyegarkan Langkah Asap dan memberi 5 poin combo.',
@@ -1680,7 +1692,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Perde Adımı kökleri ve yavaşlatmaları kaldırır, ardından 3 sn boyunca %50 hareket hızı kazandırır.',
     pri_r5_twisted_faith:
       'Perde Adımı, Rahibin 4 sn boyunca hareket ederken büyü okumasına izin verir.',
-    rog_r11_cheap_trick: 'Mide Yumruğu artık Alacakaranlık Perdesi gerektirmez.',
+    rog_r11_cheap_trick:
+      'Mide Yumruğu artık Alacakaranlık Perdesi gerektirmez ve Enerji harcamaz, ancak bekleme süresi 10 sn olur.',
     rog_r14_dusk_economy:
       'Alacakaranlık Perdesindeyken ya da perdenin gölgesine bürünmüşken, ve Alacakaranlık Perdesinden çıktıktan sonraki 6 sn boyunca, yetenekler %50 daha az enerji harcar.',
     rog_r20_kill_chain: 'Öldürücü darbeler Duman Adımını yeniler ve 5 kombo puanı kazandırır.',
@@ -1799,7 +1812,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'Slöjsteg tar bort rötter och nedsaktningar, och ger sedan 50% förflyttningshastighet i 3 sek.',
     pri_r5_twisted_faith: 'Slöjsteg låter prästen kasta i rörelse i 4 sek.',
-    rog_r11_cheap_trick: 'Magslag kräver inte längre Skymningsslöja.',
+    rog_r11_cheap_trick:
+      'Magslag kräver inte längre Skymningsslöja och kostar ingen Energi, men har en nedkylningstid på 10 sek.',
     rog_r14_dusk_economy:
       'Förmågor kostar 50% mindre energi medan du är i Skymningsslöja eller höljd i skugga av slöjan, samt i 6 sek efter att du lämnat Skymningsslöja.',
     rog_r20_kill_chain: 'Dödande slag förnyar Rökssteg och ger 5 kombopoäng.',
@@ -1918,7 +1932,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'Bước Màn Che gỡ bỏ hiệu ứng trói chân và làm chậm, sau đó ban 50% tốc độ di chuyển trong 3 giây.',
     pri_r5_twisted_faith: 'Bước Màn Che cho phép Tu Sĩ niệm chú khi đang di chuyển trong 4 giây.',
-    rog_r11_cheap_trick: 'Thụi Bụng không còn yêu cầu Màn Chạng Vạng.',
+    rog_r11_cheap_trick:
+      'Thụi Bụng không còn yêu cầu Màn Chạng Vạng và không tốn Năng Lượng, nhưng có thời gian hồi 10 giây.',
     rog_r14_dusk_economy:
       'Kỹ năng tốn ít hơn 50% năng lượng khi đang trong Màn Chạng Vạng hoặc được tấm màn bao phủ trong bóng tối, và trong 6 giây sau khi rời khỏi Màn Chạng Vạng.',
     rog_r20_kill_chain:
@@ -2038,7 +2053,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'Slørskridt fjerner rødder og nedsættelser og giver derefter 50% bevægelseshastighed i 3 sek.',
     pri_r5_twisted_faith: 'Slørskridt lader dig kaste, mens du bevæger dig, i 4 sek.',
-    rog_r11_cheap_trick: 'Maveslag kræver ikke længere Skumringsslør.',
+    rog_r11_cheap_trick:
+      'Maveslag kræver ikke længere Skumringsslør og koster ingen Energi, men har en nedkølingstid på 10 sek.',
     rog_r14_dusk_economy:
       'Evner koster 50% mindre energi, mens du er i Skumringsslør eller skyggehyllet af sløret, og i 6 sek. efter at have forladt Skumringsslør.',
     rog_r20_kill_chain: 'Dræbende slag fornyer Røgsmut og giver 5 combopoint.',
@@ -2149,7 +2165,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_improved_renew: '守护圣咏使其目标的移动速度提高 40%，持续 3 秒。',
     pri_r5_searing_light: '帷幕步会解除定身和减速效果，随后使移动速度提高 50%，持续 3 秒。',
     pri_r5_twisted_faith: '帷幕步使牧师能够在移动中施法，持续 4 秒。',
-    rog_r11_cheap_trick: '击腹拳不再需要暮帷。',
+    rog_r11_cheap_trick: '击腹拳不再需要暮帷，也不消耗能量，但冷却时间为 10 秒。',
     rog_r14_dusk_economy:
       '处于暮帷中，或被暮帷之影笼罩时，技能消耗的能量降低 50%；离开暮帷后 6 秒内同样有效。',
     rog_r20_kill_chain: '击杀敌人会重置烟遁的冷却，并获得 5 点连击点。',
@@ -2256,7 +2272,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_improved_renew: '守護聖詠會給予其目標 40% 移動速度，持續 3 秒。',
     pri_r5_searing_light: '帷幕步會解除定身與減速效果，接著給予 50% 移動速度，持續 3 秒。',
     pri_r5_twisted_faith: '帷幕步使牧師能在移動中施法，持續 4 秒。',
-    rog_r11_cheap_trick: '掏腹重擊不再需要處於暮紗狀態。',
+    rog_r11_cheap_trick: '掏腹重擊不再需要處於暮紗狀態，也不消耗能量，但冷卻時間為 10 秒。',
     rog_r14_dusk_economy:
       '處於暮紗狀態，或籠罩在暗影纏身效果中時，技能消耗的能量降低 50%；離開暮紗後的 6 秒內同樣有效。',
     rog_r20_kill_chain: '擊殺會重置煙遁步的冷卻，並給予 5 點連擊點。',
@@ -2368,7 +2384,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       'ヴェイルステップは足止めと減速効果を解除し、その後3秒間移動速度を50%上昇させる。',
     pri_r5_twisted_faith: 'ヴェイルステップの使用後4秒間、移動しながら詠唱できるようになる。',
-    rog_r11_cheap_trick: 'みぞおち強打の使用にダスクヴェールが不要になる。',
+    rog_r11_cheap_trick:
+      'みぞおち強打の使用にダスクヴェールが不要になり、エネルギーも消費しないが、クールダウンが10秒になる。',
     rog_r14_dusk_economy:
       'ダスクヴェール中、または影に包まれている間、そしてダスクヴェールを解除してから6秒間は、アビリティの消費エナジーが50%減少する。',
     rog_r20_kill_chain:
@@ -2482,7 +2499,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     pri_r5_searing_light:
       '장막걸음을 사용하면 속박과 감속 효과가 사라지고, 3초 동안 이동 속도가 50% 증가합니다.',
     pri_r5_twisted_faith: '장막걸음을 사용하면 4초 동안 이동하면서 시전할 수 있습니다.',
-    rog_r11_cheap_trick: '명치 가격에 더 이상 황혼장막이 필요하지 않습니다.',
+    rog_r11_cheap_trick:
+      '명치 가격에 더 이상 황혼장막이 필요하지 않고 기력도 소모하지 않지만, 재사용 대기시간이 10초가 됩니다.',
     rog_r14_dusk_economy:
       '황혼장막 상태이거나 그림자에 휩싸인 동안, 그리고 황혼장막에서 벗어난 뒤 6초 동안 능력의 기력 소모가 50% 줄어듭니다.',
     rog_r20_kill_chain:

@@ -908,6 +908,9 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // Stealth Rework footprints: fade bucket + left/right foot placement
+  'src/render/stealth_footprint_core.ts',
+  'src/render/stealth_shimmer_core.ts',
   // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
   'src/render/mount_embers_core.ts',
   // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)

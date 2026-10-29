@@ -1672,9 +1672,9 @@ function returnFlag(
  *  share the kind), refresh the live cache, and pay out the Greater
  *  Invisibility aftereffect each stripped aura owes: a flag grab is a
  *  deliberate, revealing act, and it must end a vanish on exactly the terms
- *  Sim.breakStealth and natural aura expiry do, or grabbing the flag out of
+ *  breakStealth (combat/stealth_break.ts) and natural aura expiry do, or grabbing the flag out of
  *  Greater Invisibility would be the one removal path that silently eats the
- *  damage reduction. The one deliberate difference from Sim.breakStealth is
+ *  damage reduction. The one deliberate difference from breakStealth is
  *  the sweep: it drops the FIRST stealth aura, this drops them all.
  *  Aftereffects are applied AFTER the sweep so an applyAura here can never
  *  shift an index the removal loop is still walking. */

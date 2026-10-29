@@ -851,7 +851,7 @@ export const en_CA: EnTranslations = {
       "seals": "Lantern Seals: {count}",
       "resetIn": "New contracts in {time}",
       "resetSoon": "New contracts at the next weekly reset",
-      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals are paid straight to you, once each week.",
       "kinds": {
         "boss": "Bounty",
         "heroic": "Heroic Clear",
@@ -900,7 +900,7 @@ export const en_CA: EnTranslations = {
         "cardProgress": "{done}/{total} this week",
         "rewardLine": "Reward: {reward}",
         "stamp": "Sealed",
-        "sealsTip": "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are bound to you."
+        "sealsTip": "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are a currency bound to you and take no bag space."
       },
       "shop": {
         "stockLabel": "Garrick Holt's stock",
@@ -1607,6 +1607,7 @@ export const en_CA: EnTranslations = {
         }
       },
       "seasonOne": "Season 1",
+      "promoClose": "Close promotions",
       "membershipPromo": {
         "open": "Membership in the WOC Store",
         "close": "Close membership promotion",
@@ -3451,6 +3452,7 @@ export const en_CA: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
       "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
       "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
@@ -3613,6 +3615,7 @@ export const en_CA: EnTranslations = {
       "delveMark": "Delve Mark",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
+      "lanternSealNote": "Lantern Hall's weekly contracts . spend at the guild quartermaster",
       "honorNote": "Battlegrounds, the arena, and world quests",
       "delveMarkNote": "Delves completed",
       "wocTokenNote": "Linked wallet balance",
@@ -3821,6 +3824,7 @@ export const en_CA: EnTranslations = {
       "equipLockout": "Equipping it starts a {seconds} sec cooldown on its use, or the cooldown left on the trinket it replaces if that is longer.",
       "equip": {
         "lastStand": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.",
         "twinStrike": "Your auto-attack hits have a {chance}% chance to make an extra main-hand melee swing. Can occur once every {icd} sec.",
         "tally": "Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.",
@@ -17562,7 +17566,7 @@ export const en_CA: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking, taking damage, or calling a pet breaks Tactical Camo. Cast again to step out. Requires Lonely Soul and no pet."
       },
       "frostjaw_trap": {
         "name": "Frostjaw Trap",

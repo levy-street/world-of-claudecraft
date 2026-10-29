@@ -851,7 +851,7 @@ export const tr_TR: EnTranslations = {
       "seals": "Fener Mühürleri: {count}",
       "resetIn": "Yeni sözleşmelere kalan süre: {time}",
       "resetSoon": "Yeni sözleşmeler bir sonraki haftalık sıfırlamada",
-      "contractsIntro": "Haftada üç sözleşme, diyardaki her maceracı için aynı. İmza gerekmez: birini bitir, mühürleri haftada bir kez doğrudan çantalarına gelsin.",
+      "contractsIntro": "Haftada üç sözleşme, diyardaki her maceracı için aynı. İmza gerekmez: birini bitir, mühürleri haftada bir kez doğrudan sana ödensin.",
       "kinds": {
         "boss": "Baş Ödülü",
         "heroic": "Kahramanca Tamamlama",
@@ -900,7 +900,7 @@ export const tr_TR: EnTranslations = {
         "cardProgress": "Bu hafta {done}/{total}",
         "rewardLine": "Ödül: {reward}",
         "stamp": "Mühürlendi",
-        "sealsTip": "Fener Mühürleri, Fener Salonunun haftalık sözleşmeleri için verilir ve yalnızca levazım subayı Garrick Holt'ta harcanır. Sana bağlıdırlar."
+        "sealsTip": "Fener Mühürleri, Fener Salonunun haftalık sözleşmeleri için verilir ve yalnızca levazım subayı Garrick Holt'ta harcanır. Sana bağlı bir para birimidir ve çantada yer kaplamaz."
       },
       "shop": {
         "stockLabel": "Garrick Holt'un malları",
@@ -1607,6 +1607,7 @@ export const tr_TR: EnTranslations = {
         }
       },
       "seasonOne": "1. Sezon",
+      "promoClose": "Tanıtımları kapat",
       "membershipPromo": {
         "open": "WOC Mağazasında üyelik",
         "close": "Üyelik tanıtımını kapat",
@@ -3451,6 +3452,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Dünya PvP açıkken {percent} daha fazla deneyim ve hizip itibarı kazanırsın. Kapatma isteğinde bulunduğunda bonuslar sona erer.",
       "rewardTitles": "Açık dünyada veya PvP kopyalarında Dünya PvP açıkken {thresholds} oynama süresine ulaşarak kalıcı unvanlar kazan. Çıkış yapmak, ölüm, PvE kopyaları ve sığınaklar sayacı duraklatır. Kapatmak sayacı sıfırlar.",
       "rewardPaused": "Mevcut PvP serisi: {time} oynandı (sığınakta duraklatıldı)",
       "rewardPausedDead": "Mevcut PvP serisi: {time} oynandı (ölüyken duraklatıldı)",
@@ -3613,6 +3615,7 @@ export const tr_TR: EnTranslations = {
       "delveMark": "Delve İşareti",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Kahramanlık zindanları . Kahramanlık idarecisinden harca",
+      "lanternSealNote": "Fener Salonunun haftalık sözleşmeleri . lonca levazım subayında harca",
       "honorNote": "Savaş alanları, arena ve dünya görevleri",
       "delveMarkNote": "Tamamlanan Delve'ler",
       "wocTokenNote": "Bağlı cüzdan bakiyesi",
@@ -3821,6 +3824,7 @@ export const tr_TR: EnTranslations = {
       "equipLockout": "Bunu kuşanmak kullanımında bir {seconds} saniye bekleme süresi başlatır veya yerine konan harika eşya varsa bu beklemeyi başlatır.",
       "equip": {
         "lastStand": "{threshold}% sağlığın altında hasara maruz kaldığında, {duration} saniye boyunca {absorb} hasarı ({absorbPct}% azami sağlığınız) absorbe eden bir kalkan kazanırsın. Her {icd} saniyede bir gerçekleşebilir.",
+        "lastStandFlat": "Sağlığın %{threshold} altındayken hasar aldığında, {duration} saniye boyunca {absorb} hasarı emen bir kalkan kazanırsın. Her {icd} saniyede bir gerçekleşebilir.",
         "hourglass": "Doğrudan iyileştirmelerden aşırı iyileştirme kumdaki saatte depolanır, en fazla {cap} ({capPct}% azami sağlığınız). Depolanan iyileştirme {fade} saniye son büyüdüğünde belirsizleşir.",
         "twinStrike": "Otomatik saldırı vuruşların {chance}% şansı fazladan bir ana el yakın dövüş salınısı yapmaktır. Her {icd} saniyede bir gerçekleşebilir.",
         "tally": "Otomatik saldırı kritik vuruşların ve birlikte ölüm vuruşlarının her biri en fazla {max} kadar bir sayma işareti ekler. İşaretler {duration} saniye sürer, bir işaret aldığında yenilenir.",
@@ -17562,7 +17566,7 @@ export const tr_TR: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Taktik Kamuflaj",
-        "description": "Çevrene karış: düşmanlar seni güçlükle fark eder ve %80 hızla hareket edersin. Saldırmak veya hasar almak Taktik Kamuflajı sona erdirir. Ortaya çıkmak için tekrar kullan. (Saha Becerisi)"
+        "description": "Çevrene karış: düşmanlar seni güçlükle fark eder ve %80 hızla hareket edersin. Saldırmak, hasar almak veya evcil hayvan çağırmak Taktik Kamuflajı sona erdirir. Ortaya çıkmak için tekrar kullan. Yalnız Ruh gerektirir ve evcil hayvanın olmamalıdır."
       },
       "frostjaw_trap": {
         "name": "Buzçene Tuzağı",

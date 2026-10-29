@@ -232,6 +232,65 @@ describe('WOC authored movement and held props', () => {
     expect(peek(visual).current.getClip().name).toBe('Sit_Down');
     expect(heldProps(visual.root).map((h) => h.parent?.name)).toEqual(['chest', 'chest']);
   });
+
+  // Discord bug report: a rider struck by a mob stood up out of the saddle. The seated loop is
+  // what carries a rider's hips onto the mount, so a full-body hit one-shot over it unseats the
+  // body for the length of the flinch. A seated body keeps its seat; on foot the flinch plays.
+  it('keeps a mounted rider seated through a landed hit', () => {
+    const visual = create();
+    visual.setRidePose({ spread: 0.1, thigh: Math.PI / 2, knee: Math.PI / 2, hips: 0, lean: 0 });
+    tick(visual, { sitting: true }, 90);
+    const seated = peek(visual).current.getClip().name;
+    expect(seated).not.toBe('Woc_Hit');
+    visual.playHit();
+    expect(peek(visual).current.getClip().name).toBe(seated);
+    expect(visual.isMidOneShot).toBe(false);
+    tick(visual, { sitting: true }, 10);
+    expect(peek(visual).current.getClip().name).toBe(seated);
+
+    // dismounted, the same hit flinches as before
+    visual.setRidePose(null);
+    tick(visual, {}, 90);
+    visual.playHit();
+    expect(peek(visual).current.getClip().name).toBe('Woc_Hit');
+  });
+
+  it("still braces a rider's skipped hit, so a dismount lands in the guard", () => {
+    const ride = { spread: 0.1, thigh: Math.PI / 2, knee: Math.PI / 2, hips: 0, lean: 0 };
+    const dismountAfter = (struck: boolean) => {
+      const visual = create();
+      visual.setRidePose(ride);
+      tick(visual, { sitting: true }, 90);
+      if (struck) visual.playHit();
+      visual.setRidePose(null);
+      tick(visual, {}, 20);
+      return peek(visual).baseState;
+    };
+    expect(dismountAfter(false)).toBe('idle');
+    expect(dismountAfter(true)).toBe('combatIdle');
+  });
+
+  it('keeps a rider on a spec-less mount seated too (the chair mount passes no straddle)', () => {
+    const visual = create();
+    visual.setRidePose(null, true);
+    tick(visual, { sitting: true }, 90);
+    const seated = peek(visual).current.getClip().name;
+    visual.playHit();
+    expect(peek(visual).current.getClip().name).toBe(seated);
+    expect(visual.isMidOneShot).toBe(false);
+  });
+
+  it('still flinches a ground-sitter the hit knocks to their feet', () => {
+    // the sim stands a struck sitter up in the same tick (combat/damage.ts), but the
+    // visual's base is only re-solved on its next update, so playHit lands while it is 'sit'
+    const visual = create();
+    tick(visual, { sitting: true }, 90);
+    expect(peek(visual).baseState).toBe('sit');
+    visual.playHit();
+    expect(peek(visual).current.getClip().name).toBe('Woc_Hit');
+    tick(visual, { sitting: false });
+    expect(peek(visual).current.getClip().name).toBe('Woc_Hit');
+  });
 });
 
 describe('WOC attack and shout routing', () => {

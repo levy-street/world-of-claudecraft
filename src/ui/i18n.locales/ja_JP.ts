@@ -1344,6 +1344,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'PvPフラグは下がっていますが、無差別戦闘地帯では引き続き攻撃することも、攻撃されることもあります。',
   'hudChrome.worldPvp.statusOn':
     'PvPフラグは立っています。フラグを立てたプレイヤーから攻撃を受ける可能性があります。',
+  'hudChrome.worldPvp.rewardBonus':
+    'ワールドPvPを有効にしている間、経験値と勢力の評判の獲得量が{percent}増加します。無効化を要求した時点でボーナスは終了します。',
   'hudChrome.worldPvp.rewardTitles':
     'ワールドPvPを有効にした状態で、オープンワールドまたはPvPインスタンスでのプレイ時間が{thresholds}に達すると、永続的な称号を獲得します。ログアウト中、死亡中、PvEインスタンス内、聖域ではタイマーが停止します。PvPを無効にするとリセットされます。',
   'hudChrome.worldPvp.rewardPaused': '現在のPvP継続時間：{time}（聖域で一時停止中）',
@@ -2822,6 +2824,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Mirefenのクレーターがまだ輝いていた頃、生の隕鉄から鍛えられた。「熱すぎて持てない」残骸を叩き、星座を刻んだ宇宙黒の弓部とし、台木に沿って溶融金の核を封じた。ボルトをつがえるのではなく召喚する。宣告のように放たれ、その終わりのように着弾する星火の矢だ。Nythraxisの不死の王冠すら峰の下で最悪のものではないとHighwatchが恐れたとき、城壁に望んだ武器がこれだった。狙いを違えるな。',
   'hudChrome.wocStore.seasonOne': 'シーズン1',
+  'hudChrome.wocStore.promoClose': '宣伝を閉じる',
   'hudChrome.wocStore.membershipPromo.open': 'WOCストアのメンバーシップ',
   'hudChrome.wocStore.membershipPromo.close': 'メンバーシップの宣伝を閉じる',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'アカウント特典',
@@ -6457,7 +6460,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復する。死亡している場合は体力35%で蘇生する。',
   'entities.abilities.tactical_camo.name': '戦術迷彩',
   'entities.abilities.tactical_camo.description':
-    '周囲に溶け込む。敵にほとんど気づかれず、移動速度は80%になる。攻撃するかダメージを受けると戦術迷彩は解除される。再使用で解除する。（野戦術）',
+    '周囲に溶け込む。敵にほとんど気づかれず、移動速度は80%になる。攻撃するかダメージを受けるかペットを呼び出すと戦術迷彩は解除される。再使用で解除する。孤独な魂が必要で、ペットがいない場合のみ使用できる。',
   'entities.abilities.play_dead.name': '死んだふり',
   'entities.abilities.play_dead.description':
     '地面に倒れて死んだふりをする。体力と集中値は全員に空として表示される。敵はあなたを忘れ、あなたをターゲットしている敵プレイヤーはターゲットを失う。移動、攻撃、または他のアビリティの使用で終了する。移動中に使用した場合、1秒以内に止まらないと移動によって終了する。再使用で起き上がる。',
@@ -20325,6 +20328,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': 'デルブの印',
   'hudChrome.currencies.wocToken': 'WoCトークン',
   'hudChrome.currencies.heroicMarkNote': 'ヒロイックダンジョン . ヒロイック補給官で使用',
+  'hudChrome.currencies.lanternSealNote': '燈火の館の週間契約 . ギルドの補給係で使用',
   'hudChrome.currencies.honorNote': '戦場、闘技場、ワールドクエスト',
   'hudChrome.currencies.delveMarkNote': '完了したデルブ',
   'hudChrome.currencies.wocTokenNote': '連携済みウォレットの残高',
@@ -21063,6 +21067,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '装備すると使用効果に{seconds}秒のクールダウンが発生する。置き換えた装飾品の残りクールダウンの方が長い場合はそちらになる。',
   'hudChrome.trinkets.equip.lastStand':
     '体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    '体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージを吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。',
   'hudChrome.trinkets.equip.hourglass':
     '直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。',
   'hudChrome.trinkets.equip.twinStrike':
@@ -22492,7 +22498,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.resetIn': '新しい契約まで{time}',
   'hudChrome.guildHall.resetSoon': '新しい契約は次の週次リセットで',
   'hudChrome.guildHall.contractsIntro':
-    '契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接バッグに届く。',
+    '契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接受け取れる。',
   'hudChrome.guildHall.kinds.boss': '討伐依頼',
   'hudChrome.guildHall.kinds.heroic': 'ヒロイック踏破',
   'hudChrome.guildHall.kinds.task': '遂行',
@@ -22545,7 +22551,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.rewardLine': '報酬：{reward}',
   'hudChrome.guildHall.board.stamp': '封印済み',
   'hudChrome.guildHall.board.sealsTip':
-    '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。',
+    '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに紐づく通貨で、バッグの容量を使わない。',
   'hudChrome.guildHall.shop.stockLabel': 'ギャリック・ホルトの品揃え',
   'hudChrome.guildHall.shop.kindMount': 'マウント',
   'hudChrome.guildHall.shop.kindSword': '剣の外見',

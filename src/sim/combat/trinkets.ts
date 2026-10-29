@@ -21,6 +21,7 @@ import { isPlayerRemovableAura } from '../aura_classify';
 import {
   GAMBLE,
   GAMBLE_FORTUNES,
+  lastStandAbsorb,
   MEDALLION_USE_COOLDOWN_KEY,
   TRINKET_AURA,
   TRINKET_SPECS,
@@ -971,7 +972,7 @@ export function onTrinketDamage(
         kind: 'absorb',
         remaining: passive.duration,
         duration: passive.duration,
-        value: Math.round(target.maxHp * passive.absorb),
+        value: lastStandAbsorb(passive, target.maxHp),
         value2: passive.belowHp,
         sourceId: target.id,
         school: 'holy',

@@ -651,7 +651,9 @@ describe('client crowd protocol', () => {
     server.sim.setPlayerLevel(10, viewer.pid);
     server.sim.setPlayerLevel(10, rogue.pid);
     const v = server.sim.entities.get(viewer.pid)!;
-    placeAt(server, rogue.pid, v.pos.x + 6, v.pos.z);
+    // Beyond the 6 yd an already-visible stealther is kept at equal level (the
+    // Stealth Rework detection cone's held radius, 5 yd plus 1).
+    placeAt(server, rogue.pid, v.pos.x + 8, v.pos.z);
 
     broadcast(server);
     apply();

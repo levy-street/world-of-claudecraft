@@ -851,7 +851,7 @@ export const da_DK: EnTranslations = {
       "seals": "Lygtesegl: {count}",
       "resetIn": "Nye kontrakter om {time}",
       "resetSoon": "Nye kontrakter ved næste ugentlige nulstilling",
-      "contractsIntro": "Tre kontrakter om ugen, de samme for hver eventyrer i riget. Ingen underskrift nødvendig: gennemfør en, og dens segl går direkte til dine tasker, én gang om ugen.",
+      "contractsIntro": "Tre kontrakter om ugen, de samme for hver eventyrer i riget. Ingen underskrift nødvendig: gennemfør en, og dens segl udbetales direkte til dig, én gang om ugen.",
       "kinds": {
         "boss": "Dusør",
         "heroic": "Heroisk gennemførsel",
@@ -900,7 +900,7 @@ export const da_DK: EnTranslations = {
         "cardProgress": "{done}/{total} denne uge",
         "rewardLine": "Belønning: {reward}",
         "stamp": "Forseglet",
-        "sealsTip": "Lygtesegl betales for Lygtehallens ugentlige kontrakter og bruges kun hos Garrick Holt, kvartermesteren. De er bundet til dig."
+        "sealsTip": "Lygtesegl betales for Lygtehallens ugentlige kontrakter og bruges kun hos Garrick Holt, kvartermesteren. De er en valuta, der er bundet til dig og ikke optager plads i taskerne."
       },
       "shop": {
         "stockLabel": "Garrick Holts varer",
@@ -1607,6 +1607,7 @@ export const da_DK: EnTranslations = {
         }
       },
       "seasonOne": "Sæson 1",
+      "promoClose": "Luk kampagner",
       "membershipPromo": {
         "open": "Medlemskab i WOC-butikken",
         "close": "Luk medlemskabstilbud",
@@ -3451,6 +3452,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Hold verdens-PvP slået til for at få {percent} mere erfaring og fraktionsomdømme. Bonusserne ophører, når du beder om at slå det fra.",
       "rewardTitles": "Optjen permanente titler efter {thresholds} spilletid med verdens-PvP slået til i den åbne verden eller i PvP-instanser. Udlogning, død, PvE-instanser og helligdomme sætter tiden på pause. Slår du PvP fra, nulstilles den.",
       "rewardPaused": "Nuværende PvP-stime: spillet {time} (sat på pause i en helligdom)",
       "rewardPausedDead": "Nuværende PvP-stime: spillet {time} (sat på pause, mens du er død)",
@@ -3613,6 +3615,7 @@ export const da_DK: EnTranslations = {
       "delveMark": "Dykkermærke",
       "wocToken": "WoC-mønt",
       "heroicMarkNote": "Heroiske fangehuse, brug hos den heroiske kvartermester",
+      "lanternSealNote": "Lygtehallens ugentlige kontrakter . brug hos lavets kvartermester",
       "honorNote": "Slagmarker, arenaen og verdensopgaver",
       "delveMarkNote": "Dykninger afsluttet",
       "wocTokenNote": "Knyttet pungs saldo",
@@ -3821,6 +3824,7 @@ export const da_DK: EnTranslations = {
       "equipLockout": "At udstyre det starter en {seconds} sek svalkontakt på dets brug, eller svalkonakt efterladt på klinkekuglen den erstatter hvis det er længere.",
       "equip": {
         "lastStand": "At tage skade under {threshold}% helbred giver et skjold, der absorberer {absorb} skade ({absorbPct}% af dit maksimale helbred) i {duration} sek. Kan ske en gang hver {icd} sek.",
+        "lastStandFlat": "Hvis du tager skade, mens dit helbred er under {threshold}%, får du et skjold, der absorberer {absorb} skade i {duration} sek. Kan ske en gang hver {icd} sek.",
         "hourglass": "Overheling fra dine direkte heals gemmes på timeglas, op til {cap} ({capPct}% af dit maksimale helbred). Gemt heling forsvinder {fade} sek efter at det sidste voksede.",
         "twinStrike": "Dine auto-angreb har en {chance}% chance for at lave et ekstra håndslagsvåben slag. Kan ske en gang hver {icd} sek.",
         "tally": "Dine auto-angreb kritiske slag og dine dødsblow hver tilføjer et tal mark, op til {max}. Marker varer {duration} sek, opdateret når du får en.",
@@ -17562,7 +17566,7 @@ export const da_DK: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Taktisk Camouflage",
-        "description": "Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb eller modtaget skade bryder Taktisk Camouflage. Kast igen for at træde frem. (Feltkunst)"
+        "description": "Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb, modtaget skade eller tilkaldelse af et kæledyr bryder Taktisk Camouflage. Kast igen for at træde frem. Kræver Ensom sjæl og intet kæledyr."
       },
       "frostjaw_trap": {
         "name": "Frostkæbefælde",

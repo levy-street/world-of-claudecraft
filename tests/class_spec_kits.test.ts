@@ -15,7 +15,6 @@ const KITS = [
       'mongoose_bite',
       'shrapnel_charge',
       'bloodtrail_assault',
-      'tactical_camo',
     ],
   },
   {
@@ -29,7 +28,6 @@ const KITS = [
       'mongoose_bite',
       'shrapnel_charge',
       'bloodtrail_assault',
-      'tactical_camo',
     ],
   },
   {
@@ -40,7 +38,6 @@ const KITS = [
       'mongoose_bite',
       'shrapnel_charge',
       'bloodtrail_assault',
-      'tactical_camo',
       'hunting_momentum',
       'fieldcraft_reentry',
     ],

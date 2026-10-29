@@ -66,7 +66,7 @@ function setup() {
     persist,
   };
   const purchases = new GuildWeaponPurchases(host);
-  const seals = () => sim.ctx.countItem(LANTERN_SEAL_ITEM_ID, session.pid);
+  const seals = () => sim.ctx.players.get(session.pid)?.lanternSeals ?? 0;
   const bought = () => sim.tick().filter((e) => e.type === 'guildCosmeticBought');
   return { sim, session, queue, persist, host, purchases, seals, bought };
 }

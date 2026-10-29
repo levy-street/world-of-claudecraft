@@ -738,7 +738,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for Low-tier outdoor night light grading in renderer.ts merged over release/v0.45.3.
   // No capture was retaken.
-  '226ef4c9e6962d8c8178bb76993eab7e200076e7c848e6ba76300410e1fa07e4';
+  // Re-minted for the Stealth Rework's enemy stealth look (renderer.ts picks the
+  // veil through ghostLookFor). No capture was retaken.
+  '0f34c9f5d164aab6d86270d272ec3d221ae441642193024024436d944f53d136';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

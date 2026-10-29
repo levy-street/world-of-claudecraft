@@ -851,7 +851,7 @@ export const it_IT: EnTranslations = {
       "seals": "Sigilli della Lanterna: {count}",
       "resetIn": "Nuovi contratti tra {time}",
       "resetSoon": "Nuovi contratti al prossimo ripristino settimanale",
-      "contractsIntro": "Tre contratti a settimana, uguali per ogni avventuriero del reame. Non occorre firmare: portane a termine uno e i suoi sigilli andranno direttamente nelle tue borse, una volta a settimana.",
+      "contractsIntro": "Tre contratti a settimana, uguali per ogni avventuriero del reame. Non occorre firmare: portane a termine uno e riceverai direttamente i suoi sigilli, una volta a settimana.",
       "kinds": {
         "boss": "Taglia",
         "heroic": "Completamento eroico",
@@ -900,7 +900,7 @@ export const it_IT: EnTranslations = {
         "cardProgress": "{done}/{total} questa settimana",
         "rewardLine": "Ricompensa: {reward}",
         "stamp": "Sigillato",
-        "sealsTip": "I Sigilli della Lanterna si ottengono dai contratti settimanali della Sala della Lanterna e si spendono solo dal quartiermastro Garrick Holt. Sono vincolati a te."
+        "sealsTip": "I Sigilli della Lanterna si ottengono dai contratti settimanali della Sala della Lanterna e si spendono solo dal quartiermastro Garrick Holt. Sono una valuta vincolata a te e non occupano spazio nelle borse."
       },
       "shop": {
         "stockLabel": "Assortimento di Garrick Holt",
@@ -1607,6 +1607,7 @@ export const it_IT: EnTranslations = {
         }
       },
       "seasonOne": "Stagione 1",
+      "promoClose": "Chiudi le promozioni",
       "membershipPromo": {
         "open": "Abbonamento nel negozio WOC",
         "close": "Chiudi la promozione dell'abbonamento",
@@ -3451,6 +3452,7 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Mantieni attivo il PvP mondiale per ottenere il {percent} in più di esperienza e reputazione di fazione. I bonus terminano quando richiedi di disattivarlo.",
       "rewardTitles": "Ottieni titoli permanenti dopo {thresholds} di gioco con PvP mondiale attivo nel mondo aperto o nelle istanze PvP. Disconnessione, morte, istanze PvE e santuari sospendono il timer. Disattivarlo lo azzera.",
       "rewardPaused": "Serie PvP attuale: {time} di gioco (in pausa in un santuario)",
       "rewardPausedDead": "Serie PvP attuale: {time} di gioco (in pausa durante la morte)",
@@ -3613,6 +3615,7 @@ export const it_IT: EnTranslations = {
       "delveMark": "Marchio dell'Incursione",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Dungeon eroici . spendi dal quartiermastro eroico",
+      "lanternSealNote": "Contratti settimanali della Sala della Lanterna . spendi dal quartiermastro della gilda",
       "honorNote": "Campi di battaglia, arena e missioni mondiali",
       "delveMarkNote": "Incursioni completate",
       "wocTokenNote": "Saldo del portafoglio collegato",
@@ -3821,6 +3824,7 @@ export const it_IT: EnTranslations = {
       "equipLockout": "Equipaggiarlo avvia un tempo di recupero di {seconds} sec sul suo utilizzo, oppure il tempo di recupero rimasto sul ninnolo che sostituisce, se più lungo.",
       "equip": {
         "lastStand": "Subire danno mentre sei sotto il {threshold}% di salute concede uno scudo che assorbe {absorb} danni ({absorbPct}% della tua salute massima) per {duration} sec. Può verificarsi una volta ogni {icd} sec.",
+        "lastStandFlat": "Subire danno mentre sei sotto il {threshold}% di salute concede uno scudo che assorbe {absorb} danni per {duration} sec. Può verificarsi una volta ogni {icd} sec.",
         "hourglass": "Le cure in eccesso dalle tue cure dirette vengono immagazzinate nella clessidra, fino a {cap} ({capPct}% della tua salute massima). La cura immagazzinata svanisce {fade} sec dopo l'ultimo aumento.",
         "twinStrike": "I tuoi colpi di attacco automatico hanno il {chance}% di probabilità di effettuare un fendente extra con l'arma principale. Può verificarsi una volta ogni {icd} sec.",
         "tally": "I tuoi colpi critici di attacco automatico e i tuoi colpi mortali aggiungono ciascuno una tacca, fino a {max}. Le tacche durano {duration} sec, e si rinnovano ogni volta che ne ottieni una.",
@@ -17562,7 +17566,7 @@ export const it_IT: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Mimetismo Tattico",
-        "description": "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare o subire danni interrompe Mimetismo Tattico. Usa di nuovo per uscire. (Sopravvivenza)"
+        "description": "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare, subire danni o chiamare una mascotte interrompe Mimetismo Tattico. Usa di nuovo per uscire. Richiede Anima solitaria e nessuna mascotte."
       },
       "frostjaw_trap": {
         "name": "Trappola Fauci di Gelo",

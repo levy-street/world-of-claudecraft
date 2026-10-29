@@ -92,6 +92,7 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/seasonal_toys_fx.ts', layer: 'ground', strict: true },
   // the world's own marks
   { file: 'src/render/blob_shadows.ts', layer: 'ground', strict: true },
+
   { file: 'src/render/mob_night_glow.ts', layer: 'ground', strict: true },
   { file: 'src/render/torch_glow_decal.ts', layer: 'ground', strict: true },
   { file: 'src/render/ember_pools.ts', layer: 'ground', strict: true },
@@ -249,6 +250,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },
+  // Stealth Rework footprints: an enemy stealther's trail is information a
+  // player acts on, so it paints over class ground effects (player band, near
+  // the top) and stays under every encounter telegraph.
+  { file: 'src/render/stealth_footprint_visual.ts', layer: 'player', strict: true },
   // player class ability ground VFX
   { file: 'src/render/ability_vfx/decals.ts', layer: 'player', strict: true },
   { file: 'src/render/ability_vfx/ground_auras.ts', layer: 'player', strict: true },

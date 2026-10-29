@@ -45,6 +45,7 @@ import { CHEATER_MARK_AURA_ID } from '../moderation';
 import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
+import { recordStealthFootprints } from '../stealth_footprints';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
@@ -80,6 +81,7 @@ import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
 import { thundercallOnDotTick } from './shaman_thundercall_kit';
 import { stoneboundThreatMultiplier } from './shaman_warspirit';
+import { updatePvpStealthObservers } from './stealth_detection';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
@@ -295,8 +297,10 @@ export function cleanseFriendlyNpcAuras(ctx: SimContext, e: Entity): void {
 
 export function updateAuras(ctx: SimContext, e: Entity): void {
   cleanupCraftedCollectionAuras(ctx, e);
+  recordStealthFootprints(e, ctx.time); // reads last tick's cached stealth flag
   if (e.dead) {
     e.stealthed = e.auras.some((a) => a.kind === 'stealth');
+    updatePvpStealthObservers(ctx, e);
     return;
   }
   if (e.inCombat || e.onGround) {
@@ -591,4 +595,5 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   }
   e.stealthed = e.auras.some((a) => a.kind === 'stealth');
+  updatePvpStealthObservers(ctx, e);
 }

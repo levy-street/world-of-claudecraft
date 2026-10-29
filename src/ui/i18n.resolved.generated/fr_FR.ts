@@ -851,7 +851,7 @@ export const fr_FR: EnTranslations = {
       "seals": "Sceaux de lanterne : {count}",
       "resetIn": "Nouveaux contrats dans {time}",
       "resetSoon": "Nouveaux contrats à la prochaine réinitialisation hebdomadaire",
-      "contractsIntro": "Trois contrats par semaine, identiques pour chaque aventurier du royaume. Pas besoin de signer : menez-en un à terme et ses sceaux vont directement dans vos sacs, une fois par semaine.",
+      "contractsIntro": "Trois contrats par semaine, identiques pour chaque aventurier du royaume. Pas besoin de signer : menez-en un à terme et ses sceaux vous sont versés directement, une fois par semaine.",
       "kinds": {
         "boss": "Prime",
         "heroic": "Victoire héroïque",
@@ -900,7 +900,7 @@ export const fr_FR: EnTranslations = {
         "cardProgress": "{done}/{total} cette semaine",
         "rewardLine": "Récompense : {reward}",
         "stamp": "Scellé",
-        "sealsTip": "Les Sceaux de lanterne récompensent les contrats hebdomadaires du Hall de la Lanterne et ne se dépensent que chez Garrick Holt, l'intendant. Ils vous sont liés."
+        "sealsTip": "Les Sceaux de lanterne récompensent les contrats hebdomadaires du Hall de la Lanterne et ne se dépensent que chez Garrick Holt, l'intendant. Cette monnaie vous est liée et ne prend aucune place dans vos sacs."
       },
       "shop": {
         "stockLabel": "Marchandises de Garrick Holt",
@@ -1607,6 +1607,7 @@ export const fr_FR: EnTranslations = {
         }
       },
       "seasonOne": "Saison 1",
+      "promoClose": "Fermer les promotions",
       "membershipPromo": {
         "open": "Abonnement dans la boutique WOC",
         "close": "Fermer la promotion d'abonnement",
@@ -3451,6 +3452,7 @@ export const fr_FR: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Gardez le JcJ mondial activé pour gagner {percent} de points d’expérience et de réputation de faction supplémentaires. Les bonus cessent dès que vous demandez sa désactivation.",
       "rewardTitles": "Gagnez des titres permanents après {thresholds} de jeu avec le JcJ mondial activé en monde ouvert ou en instance JcJ. Déconnexion, mort, instances JcE et sanctuaires mettent le compteur en pause. Désactiver le JcJ le remet à zéro.",
       "rewardPaused": "Série JcJ actuelle : {time} de jeu (en pause dans un sanctuaire)",
       "rewardPausedDead": "Série JcJ actuelle : {time} de jeu (en pause pendant la mort)",
@@ -3613,6 +3615,7 @@ export const fr_FR: EnTranslations = {
       "delveMark": "Marque de plongée",
       "wocToken": "Jeton WoC",
       "heroicMarkNote": "Donjons héroïques . à dépenser auprès de l'intendant héroïque",
+      "lanternSealNote": "Contrats hebdomadaires du Hall de la Lanterne . à dépenser auprès de l'intendant de guilde",
       "honorNote": "Champs de bataille, arène et quêtes mondiales",
       "delveMarkNote": "Plongées terminées",
       "wocTokenNote": "Solde du portefeuille lié",
@@ -3821,6 +3824,7 @@ export const fr_FR: EnTranslations = {
       "equipLockout": "L'équiper démarre un temps de recharge de {seconds} s sur son utilisation, ou le temps de recharge restant du bijou qu'il remplace si celui-ci est plus long.",
       "equip": {
         "lastStand": "Subir des dégâts en dessous de {threshold}% de vie accorde un bouclier qui absorbe {absorb} points de dégâts ({absorbPct}% de vos points de vie maximum) pendant {duration} s. Ne peut se produire qu'une fois toutes les {icd} s.",
+        "lastStandFlat": "Subir des dégâts en dessous de {threshold}% de vie accorde un bouclier qui absorbe {absorb} points de dégâts pendant {duration} s. Ne peut se produire qu'une fois toutes les {icd} s.",
         "hourglass": "Les soins excédentaires de vos soins directs sont stockés dans le sablier, jusqu'à {cap} ({capPct}% de vos points de vie maximum). Les soins stockés se dissipent {fade} s après leur dernière augmentation.",
         "twinStrike": "Vos coups d'attaque automatique ont {chance}% de chances de porter un coup de mêlée supplémentaire de la main principale. Ne peut se produire qu'une fois toutes les {icd} s.",
         "tally": "Chacun de vos coups critiques d'attaque automatique et de vos coups fatals ajoute une marque de décompte, jusqu'à {max}. Les marques durent {duration} s, rafraîchies à chaque nouvelle marque.",
@@ -17562,7 +17566,7 @@ export const fr_FR: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Camouflage tactique",
-        "description": "Fondez-vous dans le décor : les ennemis vous remarquent à peine et vous vous déplacez à 80% de votre vitesse. Attaquer ou subir des dégâts rompt Camouflage tactique. Relancez pour en sortir. (Survie)"
+        "description": "Fondez-vous dans le décor : les ennemis vous remarquent à peine et vous vous déplacez à 80% de votre vitesse. Attaquer, subir des dégâts ou appeler un familier rompt Camouflage tactique. Relancez pour en sortir. Nécessite Âme solitaire et aucun familier."
       },
       "frostjaw_trap": {
         "name": "Piège Mâchegivre",

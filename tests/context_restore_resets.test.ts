@@ -437,7 +437,7 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
     const owner = new FormAdornments(model, 'composed', () => gate);
     owner.sync(true, false);
     for (const settle of settles.splice(0)) settle();
-    owner.update(0.01, false, false, false, true);
+    owner.update(0.01, false, true);
     owner.sync(false, false);
     owner.sync(true, false);
     // Linked once on this rig: the second mount skips the gate.

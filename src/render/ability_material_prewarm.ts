@@ -211,8 +211,8 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     build: () => buildCoachTrailStandIn(),
   },
   {
-    // Not a cast visual but a form's: Moonwing Form's antlers, crescent and
-    // wings mount on the druid's rig at the shift (characters/form_adornments.ts),
+    // Not a cast visual but a form's: Moonwing Form's antlers and crescent
+    // mount on the druid's rig at the shift (characters/form_adornments.ts),
     // so the first Moonwing in view would otherwise link the glow program and
     // the antler props program inside a live frame.
     id: 'moonwing-adornment',

@@ -851,7 +851,7 @@ export const pt_BR: EnTranslations = {
       "seals": "Selos da lanterna: {count}",
       "resetIn": "Novos contratos em {time}",
       "resetSoon": "Novos contratos no próximo reinício semanal",
-      "contractsIntro": "Três contratos por semana, iguais para todos os aventureiros do reino. Sem precisar assinar: conclua um e os selos vão direto para suas bolsas, uma vez por semana.",
+      "contractsIntro": "Três contratos por semana, iguais para todos os aventureiros do reino. Sem precisar assinar: conclua um e você recebe os selos diretamente, uma vez por semana.",
       "kinds": {
         "boss": "Recompensa por captura",
         "heroic": "Conclusão heroica",
@@ -900,7 +900,7 @@ export const pt_BR: EnTranslations = {
         "cardProgress": "{done}/{total} nesta semana",
         "rewardLine": "Recompensa: {reward}",
         "stamp": "Selado",
-        "sealsTip": "Selos da lanterna são pagos pelos contratos semanais do Salão da Lanterna e gastos apenas com Garrick Holt, o intendente. São vinculados a você."
+        "sealsTip": "Selos da lanterna são pagos pelos contratos semanais do Salão da Lanterna e gastos apenas com Garrick Holt, o intendente. São uma moeda vinculada a você e não ocupam espaço nas bolsas."
       },
       "shop": {
         "stockLabel": "Estoque de Garrick Holt",
@@ -1607,6 +1607,7 @@ export const pt_BR: EnTranslations = {
         }
       },
       "seasonOne": "Temporada 1",
+      "promoClose": "Fechar promoções",
       "membershipPromo": {
         "open": "Assinatura na Loja WOC",
         "close": "Fechar promoção de assinatura",
@@ -3451,6 +3452,7 @@ export const pt_BR: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Mantenha o JxJ mundial ativo para ganhar {percent} a mais de experiência e reputação de facção. Os bônus acabam quando você solicita a desativação.",
       "rewardTitles": "Ganhe títulos permanentes após {thresholds} de jogo com JxJ mundial ativo no mundo aberto ou em instâncias JxJ. Sair, morrer, instâncias JxA e santuários pausam o contador. Desativar reinicia o contador.",
       "rewardPaused": "Sequência JxJ atual: {time} jogados (em pausa em um santuário)",
       "rewardPausedDead": "Sequência JxJ atual: {time} jogados (em pausa enquanto morto)",
@@ -3613,6 +3615,7 @@ export const pt_BR: EnTranslations = {
       "delveMark": "Marca de Incursão",
       "wocToken": "Ficha WoC",
       "heroicMarkNote": "Masmorras heroicas. Use com o intendente heroico",
+      "lanternSealNote": "Contratos semanais do Salão da Lanterna. Use com o intendente da guilda",
       "honorNote": "Campos de batalha, arena e missões de mundo",
       "delveMarkNote": "Incursões concluídas",
       "wocTokenNote": "Saldo da carteira vinculada",
@@ -3821,6 +3824,7 @@ export const pt_BR: EnTranslations = {
       "equipLockout": "Equipá-lo inicia uma recarga de uso de {seconds} s, ou a recarga restante do berloque que ele substitui, se esta for maior.",
       "equip": {
         "lastStand": "Sofrer dano estando abaixo de {threshold}% de vida concede um escudo que absorve {absorb} de dano ({absorbPct}% da sua vida máxima) por {duration} s. Pode ocorrer uma vez a cada {icd} s.",
+        "lastStandFlat": "Sofrer dano estando abaixo de {threshold}% de vida concede um escudo que absorve {absorb} de dano por {duration} s. Pode ocorrer uma vez a cada {icd} s.",
         "hourglass": "A cura excedente das suas curas diretas é armazenada na ampulheta, até {cap} ({capPct}% da sua vida máxima). A cura armazenada se dissipa {fade} s depois da última vez que aumentou.",
         "twinStrike": "Seus acertos de ataque automático têm {chance}% de chance de causar um golpe extra de mão principal. Pode ocorrer uma vez a cada {icd} s.",
         "tally": "Seus acertos críticos de ataque automático e seus golpes fatais adicionam uma marca de contagem cada, até {max}. As marcas duram {duration} s, renovadas sempre que você ganha uma.",
@@ -17562,7 +17566,7 @@ export const pt_BR: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Camuflagem Tática",
-        "description": "Misture-se ao ambiente: inimigos mal percebem você, e sua velocidade é de 80%. Atacar ou receber dano rompe Camuflagem Tática. Use de novo para sair. (Sobrevivência)"
+        "description": "Misture-se ao ambiente: inimigos mal percebem você, e sua velocidade é de 80%. Atacar, receber dano ou chamar um mascote rompe Camuflagem Tática. Use de novo para sair. Requer Alma Solitária e estar sem mascote."
       },
       "frostjaw_trap": {
         "name": "Armadilha Presa Gélida",
