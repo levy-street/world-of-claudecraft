@@ -17,6 +17,7 @@ import type { ResolvedAbility } from '../../../sim/sim';
 import type { AuraKind, PlayerClass } from '../../../sim/types';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from '../../aura_icon_runtime';
 import type { AuraInput } from '../../auras_view';
+import { hudOverlayHost } from '../../hud_overlay_host';
 import { formatNumber } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { actionBarIconBg } from '../action_bar/action_bar_icon_bg';
@@ -214,7 +215,7 @@ export class CooldownManagerController {
     // Floating readouts, not controls: the buttons are never clickable and the
     // same information is on the action bar, so assistive tech skips the copy.
     this.layer.setAttribute('aria-hidden', 'true');
-    doc.body.appendChild(this.layer);
+    hudOverlayHost(doc).appendChild(this.layer);
     this.rebuild();
   }
 

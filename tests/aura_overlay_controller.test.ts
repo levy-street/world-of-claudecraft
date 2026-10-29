@@ -28,6 +28,23 @@ const writers = {
   },
 } as unknown as PainterHostWriters;
 
+describe('AuraOverlayController mount point', () => {
+  it('mounts inside the #ui HUD stacking context so open windows cover it', () => {
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    document.body.appendChild(ui);
+    new AuraOverlayController({
+      doc: document,
+      writers,
+      playerClass: 'warrior',
+      playerName: 'Raido',
+      known: () => known('mortal_strike'),
+      iconUrl: (id) => `/icons/${id}.png`,
+    });
+    expect(document.getElementById('aura-overlays')?.parentElement).toBe(ui);
+  });
+});
+
 describe('AuraOverlayController setup preview', () => {
   it('builds Mage frames from the current specialization and matches shared aura kinds by id', () => {
     const controller = new AuraOverlayController({
