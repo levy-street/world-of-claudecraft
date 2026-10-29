@@ -207,7 +207,7 @@ export class DailyRewardsWindow {
 
   /** Whether the window is currently shown; lets the opener distinguish the toggle direction. */
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.deps.root().style.display === 'flex';
   }
 
   openStore(tab: 'store' | 'memberships' = 'store'): void {
@@ -298,7 +298,7 @@ export class DailyRewardsWindow {
     this.invalidateStoreSurface();
     const root = this.deps.root();
     if (!this.storeEnabled()) this.tab = 'rewards';
-    root.style.display = 'block';
+    root.style.display = 'flex';
     this.deps.onVisibilityChange?.();
     this.ensureShell();
     void this.renderCurrent('open');
@@ -317,7 +317,7 @@ export class DailyRewardsWindow {
 
   close(): void {
     const root = this.deps.root();
-    if (root.style.display !== 'block') {
+    if (root.style.display !== 'flex') {
       this.openerFocus = null;
       return;
     }

@@ -3955,10 +3955,18 @@
   #tooltip .gb-presence-line .gb-rank-chip.gb-rank-leader {
     color: var(--gold);
   }
+  /* The window lives inside the zoomed #ui, so both viewport clamps divide by
+     --window-scale (the shared .window clamp's rule); a raw vh cap re-multiplied
+     by the zoom ran the store off the bottom of the screen at any UI scale above
+     1. It opens as a flex COLUMN (daily_rewards_window.ts sets the inline
+     display:flex): the body shrinks into whatever the cap leaves under the head
+     and tab strip, and once a drag sizes the window its .window-fill body takes
+     the new height instead of running under the clipped edge. */
   #daily-rewards-window {
     top: 24px;
-    width: min(1040px, calc(100vw - 40px));
-    max-height: calc(100vh - 48px);
+    width: min(1040px, calc(var(--app-vw, 100vw) / var(--window-scale) - 40px));
+    max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 48px);
+    flex-direction: column;
     background:
       radial-gradient(circle at 76% 8%, rgb(34 144 191 / 16%), transparent 34%),
       linear-gradient(155deg, #07121b 0%, #081018 52%, #050a0f 100%);
@@ -4026,8 +4034,14 @@
     }
   }
   #daily-rewards-window .woc-store-body {
-    max-height: calc(100vh - 148px);
+    max-height: none;
     padding: 14px;
+  }
+  /* Rewards-only mode has no tab strip: block flow collapsed the header's 8px
+     margin-bottom with this body's 8px margin-top, and the flex column does not
+     collapse margins, so drop one to keep the single 8px gap. */
+  #daily-rewards-window > .panel-title + .dr-body {
+    margin-top: 0;
   }
   .woc-store-hero {
     position: relative;

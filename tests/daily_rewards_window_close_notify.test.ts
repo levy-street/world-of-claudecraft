@@ -98,7 +98,7 @@ describe('DailyRewardsWindow close notification', () => {
     const { win, root, onClose } = makeWindow();
 
     win.toggle();
-    expect(root.style.display).toBe('block');
+    expect(root.style.display).toBe('flex');
     expect(onClose).not.toHaveBeenCalled();
 
     win.toggle();
@@ -144,7 +144,7 @@ describe('DailyRewardsWindow close notification', () => {
 
   it('renders the disabled state without depending on payout history', async () => {
     const root = rootStub();
-    root.style.display = 'block';
+    root.style.display = 'flex';
     const history = vi.fn(async () => {
       throw new Error('history unavailable');
     });
