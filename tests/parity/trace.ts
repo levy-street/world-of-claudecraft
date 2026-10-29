@@ -266,6 +266,8 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'joinedAt', // session-only clock
   'lastActiveTick', // session-only
   'petAssistTargetId', // session-only; its effect is pinned by the sampled pet + event stream
+  'petAssistCastTick', // session-only bookkeeping for the record above
+  'petAssistLiveTick', // session-only bookkeeping for the record above
   'craftThrottle', // inert since the Craft Cast System retired the shared throttle; session-only
   // Session-only sweep bookkeeping for the withered-then-ready correction
   // (farm_ready.ts): derived from sampled inputs (farmPlots' notified flags +

@@ -6109,6 +6109,7 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (p) {
         p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
+        petAi.expireStalePetAssistCast(p, meta, this.tickCount);
         updatePaladinDevotion(p, DT, this.playerMods(meta).global.paladinSacredReserve > 0);
         druidEngineCombatState(this.ctx, p);
         updateHunterTick(this.ctx, p);
