@@ -53,7 +53,9 @@ describe('Hammer Council: Stone Prison', () => {
   it('the rules: 2, 2 and 3 prisoners, Mythic tougher and shorter', () => {
     const { normal, heroic, mythic } = COUNCIL_DIFFICULTY;
     expect([normal.prisonMarks, heroic.prisonMarks, mythic.prisonMarks]).toEqual([2, 2, 3]);
-    expect(mythic.prisonHpMult).toBeGreaterThan(heroic.prisonHpMult);
+    expect(mythic.prisonHpMult).toBe(1.2);
+    expect(MOBS[COUNCIL_PRISON].hpBase * mythic.prisonHpMult).toBe(1200);
+    expect(heroic.prisonHpMult).toBe(1);
     expect(mythic.prisonSeconds).toBeLessThan(heroic.prisonSeconds);
   });
 
@@ -105,6 +107,31 @@ describe('Hammer Council: Stone Prison', () => {
     );
     f.tick(2);
     expect(prisoned(p)).toBeUndefined();
+    expect(st.prisons.some((x) => x.playerId === p.id)).toBe(false);
+    f.tick(ticks(COUNCIL_DIFFICULTY.normal.prisonSeconds) + 2);
+    expect(p.dead).toBe(false);
+  });
+
+  it("the mage's Cold Coffin (stasis) frees its player and takes the block", () => {
+    const f = pulled();
+    imprison(f);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const [pr] = st.prisons;
+    const p = f.sim.ctx.entities.get(pr.playerId) as Entity;
+    f.sim.ctx.applyAura(p, {
+      id: 'ice_block',
+      name: 'Cold Coffin',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: p.id,
+      school: 'frost',
+    });
+    f.tick(2);
+    expect(prisoned(p)).toBeUndefined();
+    expect(f.sim.ctx.entities.get(pr.blockId)).toBeUndefined();
     expect(st.prisons.some((x) => x.playerId === p.id)).toBe(false);
     f.tick(ticks(COUNCIL_DIFFICULTY.normal.prisonSeconds) + 2);
     expect(p.dead).toBe(false);

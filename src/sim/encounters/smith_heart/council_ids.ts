@@ -302,7 +302,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     pillarLimit: 3,
     prisonMarks: 3,
     prisonSeconds: 8,
-    prisonHpMult: 1.4,
+    prisonHpMult: 1.2,
   },
 };
 

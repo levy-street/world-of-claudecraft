@@ -2,9 +2,10 @@
 // the Slabwright's bar shuts a few players (never its foes' tanks while anyone else
 // stands) in blocks of stone, stunned where they stand. Each block is a real target:
 // the raid breaks it to free its player, and when its time runs out it crushes them.
-// It stops with the Slabwright, but the blocks already standing still count down.
+// An immunity that frees from control breaks it too. It stops with the Slabwright, but the blocks already standing still count down.
 // Zero rng in the picks (pickMarks hashes).
 
+import { isInStasis } from '../../combat/cc';
 import { MOBS } from '../../data';
 import { createMob } from '../../entity';
 import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../../instances/difficulty';
@@ -130,7 +131,9 @@ export function stepPrisons(s: CouncilScope): void {
   for (const pr of st.prisons) {
     const p = s.ctx.entities.get(pr.playerId);
     const block = s.ctx.entities.get(pr.blockId);
-    if (!block || block.dead || block.hp <= 0 || !p || p.dead) {
+    // A broken block frees its player; so does an immunity that frees from control
+    // (the mage's Cold Coffin, the one stasis a player can press while stunned).
+    if (!block || block.dead || block.hp <= 0 || !p || p.dead || isInStasis(p)) {
       endPrison(s, pr.playerId, pr.blockId);
       continue;
     }
