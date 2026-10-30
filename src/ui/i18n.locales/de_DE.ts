@@ -16963,7 +16963,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description':
     'Finishing-Move, der das Ziel 30 Sek. lang entblößt: jeder eingesetzte Combopunkt verringert seine Rüstung um 2% (5 Combopunkte: {damage}%).',
   'entities.abilities.faerie_fire.description':
-    'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%.',
+    'Markiert das Ziel 40 Sek. lang. Fernkampfwaffenangriffe behandeln seine Rüstung als um {damage}% niedriger, und Zauber gegen das Ziel erhalten dieselbe Schadenssteigerung, die diese Senkung einem Fernkampfangriff verschafft. Nahkampfangriffe sind nicht betroffen, daher ist es mit Rüstungsspalter kombinierbar.',
   'entities.abilities.ferocious_bite.description':
     'Finishing-Move, der {damage} verursacht. Nur in Katzengestalt.',
   'entities.abilities.ferocious_bite.specNote_feral':

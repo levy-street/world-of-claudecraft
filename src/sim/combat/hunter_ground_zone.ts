@@ -7,9 +7,11 @@
 // armor reduction the channel applied. Draws one rng roll per struck target, in
 // the same hostilesInRadius order the shared pulse uses.
 
+import { ABILITIES } from '../data';
 import type { GroundAoE } from '../entity_roster';
 import type { SimContext } from '../sim_context';
 import { armorReduction } from '../types';
+import { physicalHitArmor } from './witchlight';
 
 export function pulseArmoredGroundAoE(
   ctx: SimContext,
@@ -32,7 +34,8 @@ export function pulseArmoredGroundAoE(
   for (const target of ctx.hostilesInRadius(source, effect.pos, effect.radius)) {
     if (!ctx.hasLineOfSight(source, target)) continue;
     const raw = ctx.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
-    const dmg = Math.round(raw * (1 - armorReduction(ctx.effectiveArmor(target), source.level)));
+    const armor = physicalHitArmor(ctx, target, ABILITIES[effect.abilityId]);
+    const dmg = Math.round(raw * (1 - armorReduction(armor, source.level)));
     ctx.dealDamage(
       source,
       target,

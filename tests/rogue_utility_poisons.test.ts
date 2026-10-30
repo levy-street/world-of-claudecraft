@@ -164,17 +164,18 @@ describe('Melting Acid', () => {
     const armorBefore = effectiveArmor(sim, mob);
     coat(sim, rogue, 'melting_acid');
     swingUntilLanded(sim, rogue, mob);
-    // Faerie Fire is the deeper cut (10%), so the pair reads as 10%, not 15%:
-    // the same rule Sunder Armor and Faerie Fire already share (effectiveArmor).
+    // A full Sunder Armor stack is the deeper cut (10%), so the pair reads as
+    // 10%, not 15%: the max-combine rule effectiveArmor applies to both.
     mob.auras.push({
-      id: 'faerie_fire',
-      name: 'Witchlight',
-      kind: 'faerie_fire',
-      remaining: 40,
-      duration: 40,
+      id: 'sunder_armor',
+      name: 'Armor Shear',
+      kind: 'sunder',
+      remaining: 30,
+      duration: 30,
       value: 0,
+      stacks: 5,
       sourceId: rogue.id,
-      school: 'nature',
+      school: 'physical',
     });
     expect(effectiveArmor(sim, mob)).toBeCloseTo(armorBefore * 0.9, 6);
   });

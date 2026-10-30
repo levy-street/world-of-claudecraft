@@ -690,11 +690,12 @@ export function auraEffectDescriptor(
         : { key: `${KEY}.armorPct`, nums: { pct } };
     }
     case 'faerie_fire':
-      // Fixed-percent armor reduction (does not stack with Sunder).
-      return { key: `${KEY}.armorPct`, nums: { pct: round(FAERIE_FIRE_ARMOR_PCT * 100) } };
+      // Witchlight: softens ranged weapon attacks and spells only, never melee,
+      // so it stacks with Sunder Armor (sim/combat/witchlight.ts).
+      return { key: `${KEY}.witchlightPct`, nums: { pct: round(FAERIE_FIRE_ARMOR_PCT * 100) } };
     case 'melting_acid':
       // Percent armor reduction carried on the aura itself; shares the same
-      // max-combine group as Sunder and Faerie Fire, so it reads identically.
+      // max-combine group as Sunder, so it reads identically.
       return { key: `${KEY}.armorPct`, nums: { pct: pctFromFrac(a.value) } };
     case 'corrode': {
       // Mob corrosion: a FLAT, stacking armor shred (value per stack). Keeps the

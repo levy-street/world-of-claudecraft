@@ -558,9 +558,9 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
-  it('shows Faerie Fire as a fixed percent armor reduction', () => {
+  it('shows Witchlight as the ranged-and-spell armor cut, not a plain armor reduction', () => {
     expect(desc({ kind: 'faerie_fire', value: 0 })).toEqual({
-      key: 'hudChrome.auraEffect.armorPct',
+      key: 'hudChrome.auraEffect.witchlightPct',
       nums: { pct: 10 },
     });
   });

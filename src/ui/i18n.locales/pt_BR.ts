@@ -17316,7 +17316,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Acertar isso com 4 ou mais pontos de combo inicia a Redline por 8 s: Talho Perverso se torna Golpe no Corpo e este botão se torna Golpe de Nocaute (45 mais 35 por ponto de combo, 25% mais forte por nível de Redline, restaura 25 de energia). Gaste-o antes que a Redline termine.',
   'entities.abilities.expose_armor.description':
     'Movimento finalizador que expõe o alvo por 30 s: cada ponto de combo gasto reduz sua armadura em 2% (5 pontos de combo: {damage}%).',
-  'entities.abilities.faerie_fire.description': 'Reduz a armadura do alvo em {damage}% por 40 s.',
+  'entities.abilities.faerie_fire.description':
+    'Marca o alvo por 40 s. Ataques com armas de longo alcance tratam a armadura dele como {damage}% menor, e feitiços contra ele recebem o mesmo aumento de dano que essa redução dá a um ataque de longo alcance. Ataques corpo a corpo não são afetados, então acumula com Retalhar Armadura.',
   'entities.abilities.ferocious_bite.description':
     'Movimento finalizador que causa {damage}. Apenas Forma de Gato.',
   'entities.abilities.ferocious_bite.specNote_feral':

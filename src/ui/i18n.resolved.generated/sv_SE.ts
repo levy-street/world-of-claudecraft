@@ -4935,6 +4935,7 @@ export const sv_SE: EnTranslations = {
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Minskar rustningen med {pct}%",
       "armorPctStacks": "Minskar rustningen med {pct}% ({stacks} stackar)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -18468,7 +18469,7 @@ export const sv_SE: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Häxljus",
-        "description": "Minskar målets rustning med {damage}% i 40 sek."
+        "description": "Märker målet i 40 sek. Avståndsvapenattacker behandlar dess rustning som {damage}% lägre, och besvärjelser mot det får samma skadeökning som den sänkningen ger en avståndsattack. Närstridsattacker påverkas inte, så den staplas med Rustningsklipp."
       },
       "hibernate": {
         "name": "Slummer",

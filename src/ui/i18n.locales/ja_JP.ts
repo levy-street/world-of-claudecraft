@@ -6379,7 +6379,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '脳震盪',
   'entities.abilities.bash.description': '対象を2秒間スタンさせます。ブルーインフォーム専用。',
   'entities.abilities.faerie_fire.name': '魔女火',
-  'entities.abilities.faerie_fire.description': '対象の防御力を40秒間{damage}%下げます。',
+  'entities.abilities.faerie_fire.description':
+    '対象を40秒間マークします。遠隔武器攻撃は対象の防御力を{damage}%低いものとして扱い、対象への呪文は、その低下が遠隔攻撃に与えるのと同じだけダメージが増加します。近接攻撃には影響しないため、装甲切断と重複します。',
   'entities.abilities.hibernate.name': '微睡み',
   'entities.abilities.hibernate.description':
     '標的を最大8秒間深く眠らせます。ダメージを受けると目覚めます。プレイヤーには18秒以内の再使用ごとに持続時間が前回の半分になり、4回目は失敗します。',
@@ -11298,6 +11299,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.allStats': 'すべての能力値を{pct}%上昇させる',
   'hudChrome.auraEffect.armorPct': '防御力を{pct}%低下させる',
   'hudChrome.auraEffect.armorPctStacks': '防御力を{pct}%低下させる({stacks}スタック)',
+  'hudChrome.auraEffect.witchlightPct':
+    '遠隔武器攻撃は防御力を{pct}%低いものとして扱い、呪文はそれに見合う追加ダメージを与える',
   'hudChrome.auraEffect.physVuln': '受ける物理ダメージを{pct}%増加させる',
   'hudChrome.auraEffect.mortalWound': '受ける回復量を{pct}%低下させる',
   'hudChrome.auraEffect.vulnerability': '受けるダメージを{pct}%増加させる',

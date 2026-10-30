@@ -599,21 +599,21 @@ export type AuraKind =
   | 'perfect_moment'
   | 'righteous_fury'
   // Warrior/rogue armor debuff. Now a PERCENTAGE reduction (2% per stack via
-  // effectiveArmor), not a flat armor subtraction. Does not stack with faerie_fire
-  // (effectiveArmor max-combines the two percents).
+  // effectiveArmor), not a flat armor subtraction. Stacks with faerie_fire, which
+  // only softens ranged attacks and spells (combat/witchlight.ts).
   | 'sunder'
   // Mob corrosion (Acid Spit / Ledger Rot): a FLAT, stacking armor shred that
   // subtracts value*stacks. Distinct from the now-percent `sunder` so the two never
   // collide (effectiveArmor subtracts corrode flat, before the percent debuffs).
   | 'corrode'
-  // Druid Faerie Fire: a fixed-percent armor reduction that does NOT stack with
-  // Sunder Armor (effectiveArmor takes the larger of the two percents). Own kind so
-  // it is never summed flat with sunder.
+  // Druid Witchlight (ability id faerie_fire): the ranged-and-spell mirror of
+  // Sunder Armor. Ranged weapon attacks read the target's armor FAERIE_FIRE_ARMOR_PCT
+  // lower and spells take the matching damage increase; melee is untouched, so it
+  // stacks with sunder (combat/witchlight.ts, not effectiveArmor).
   | 'faerie_fire'
   // Rogue Melting Acid: a percent armor reduction whose fraction rides the
   // aura's own `value` (unlike faerie_fire's constant). Joins the same
-  // max-combine group in effectiveArmor, so it never stacks with Sunder Armor
-  // or Faerie Fire.
+  // max-combine group in effectiveArmor, so it never stacks with Sunder Armor.
   | 'melting_acid'
   | 'mortal_wound'
   | 'silence'
@@ -4410,7 +4410,7 @@ export type AbilityEffect =
       /** Classic Expose Armor: stacks applied = combo points spent. */
       perCombo?: boolean;
     }
-  | { type: 'faerieFire'; duration: number } // fixed-percent armor reduction (AuraKind 'faerie_fire')
+  | { type: 'faerieFire'; duration: number } // Witchlight: ranged + spell armor cut (AuraKind 'faerie_fire', combat/witchlight.ts)
   | { type: 'absorbSpentResource'; mult: number; duration: number }
   | { type: 'aoeTaunt'; radius: number }
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
@@ -13540,9 +13540,10 @@ export const RANGED_SPELL_AP_SCALE = 0.15;
 // this only lifts the flat directDamage / DoT / AoE riders.
 export const MELEE_SPELL_AP_SCALE = 0.15;
 // Armor-reduction debuffs as PERCENTAGES (multiplicative on the target's armor).
-// Sunder Armor reduces 2% per stack (5 stacks = 10%); Faerie Fire reduces a flat
-// 10%. They do NOT stack with each other: effectiveArmor takes the larger percent.
-// Mob corrosion (kind 'corrode') is a separate FLAT shred, subtracted before these.
+// Sunder Armor reduces 2% per stack (5 stacks = 10%) for every physical hit.
+// Witchlight (faerie_fire) cuts a further flat 10% for ranged weapon attacks only
+// and gives spells the matching damage increase (combat/witchlight.ts), so the two
+// stack. Mob corrosion (kind 'corrode') is a separate FLAT shred, subtracted first.
 export const SUNDER_ARMOR_PCT_PER_STACK = 0.02;
 export const FAERIE_FIRE_ARMOR_PCT = 0.1;
 

@@ -4935,6 +4935,7 @@ export const pl_PL: EnTranslations = {
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Zmniejsza pancerz o {pct}%",
       "armorPctStacks": "Zmniejsza pancerz o {pct}% ({stacks} nałożeń)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -18468,7 +18469,7 @@ export const pl_PL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Wiedźmie światło",
-        "description": "Zmniejsza pancerz celu o {damage}% na 40 sekund."
+        "description": "Oznacza cel na 40 sekund. Ataki bronią dystansową traktują jego pancerz jako niższy o {damage}%, a zaklęcia przeciw niemu zyskują taki sam wzrost obrażeń, jaki to obniżenie daje atakowi dystansowemu. Ataki wręcz nie są objęte efektem, więc kumuluje się z Rozdarciem pancerza."
       },
       "hibernate": {
         "name": "Uśpienie",

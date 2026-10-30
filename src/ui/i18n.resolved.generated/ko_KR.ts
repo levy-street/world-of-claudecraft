@@ -4935,6 +4935,7 @@ export const ko_KR: EnTranslations = {
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
       "armorPct": "방어도를 {pct}% 감소시킵니다",
       "armorPctStacks": "방어도를 {pct}% 감소시킵니다 ({stacks}중첩)",
+      "witchlightPct": "원거리 무기 공격은 방어도를 {pct}% 낮은 것으로 취급하고, 주문은 그에 맞는 추가 피해를 줍니다",
       "mortalWound": "받는 치유량을 {pct}% 감소시킵니다",
       "vulnerability": "받는 피해를 {pct}% 증가시킵니다",
       "physVuln": "받는 물리 피해를 {pct}% 증가시킵니다",
@@ -18468,7 +18469,7 @@ export const ko_KR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "마녀불빛",
-        "description": "대상의 방어도를 40초 동안 {damage}% 낮춥니다."
+        "description": "대상을 40초 동안 표시합니다. 원거리 무기 공격은 대상의 방어도를 {damage}% 낮은 것으로 취급하며, 대상에게 가하는 주문은 그 감소가 원거리 공격에 주는 것과 같은 만큼 피해가 증가합니다. 근접 공격에는 영향을 주지 않으므로 방어구 절단과 중첩됩니다."
       },
       "hibernate": {
         "name": "깊은 잠",

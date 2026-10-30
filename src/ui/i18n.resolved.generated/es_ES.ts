@@ -4935,6 +4935,7 @@ export const es_ES: EnTranslations = {
       "armorFlatStacks": "Disminuye la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Reduce la armadura un {pct}%",
       "armorPctStacks": "Reduce la armadura un {pct}% ({stacks} acumulaciones)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Disminuye la sanación recibida un {pct}%",
       "vulnerability": "Incrementa el daño recibido un {pct}%",
       "physVuln": "Incrementa el daño físico recibido un {pct}%",
@@ -18468,7 +18469,7 @@ export const es_ES: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Fuego Fatuo",
-        "description": "Reduce la armadura del objetivo un {damage}% durante 40 s."
+        "description": "Marca al objetivo durante 40 s. Los ataques con armas a distancia tratan su armadura como un {damage}% más baja, y los hechizos contra él obtienen el mismo aumento de daño que esa reducción da a un ataque a distancia. Los ataques cuerpo a cuerpo no se ven afectados, así que se acumula con Cizalla de Armadura."
       },
       "hibernate": {
         "name": "Letargo",

@@ -16836,7 +16836,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description':
     'Movimiento final que expone al objetivo durante 30 s: cada punto de combo gastado reduce su armadura un 2% (5 puntos de combo: {damage}%).',
   'entities.abilities.faerie_fire.description':
-    'Reduce la armadura del objetivo un {damage}% durante 40 s.',
+    'Marca al objetivo durante 40 s. Los ataques con armas a distancia tratan su armadura como un {damage}% más baja, y los hechizos contra él obtienen el mismo aumento de daño que esa reducción da a un ataque a distancia. Los ataques cuerpo a cuerpo no se ven afectados, así que se acumula con Cizalla de Armadura.',
   'entities.abilities.ferocious_bite.description':
     'Movimiento final que causa {damage}. Solo en Forma felina.',
   'entities.abilities.ferocious_bite.specNote_feral':

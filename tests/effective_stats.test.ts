@@ -4,12 +4,7 @@
 // not (recalcPlayerStats already folded them).
 import { describe, expect, it } from 'vitest';
 import { effectiveArmorOf, effectiveAttackPowerOf } from '../src/sim/effective_stats';
-import {
-  type Aura,
-  type Entity,
-  FAERIE_FIRE_ARMOR_PCT,
-  SUNDER_ARMOR_PCT_PER_STACK,
-} from '../src/sim/types';
+import { type Aura, type Entity, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
 
 function entity(kind: 'player' | 'mob', armor: number, attackPower: number, auras: Aura[]): Entity {
   return { kind, stats: { armor }, attackPower, auras } as unknown as Entity;
@@ -19,10 +14,15 @@ const aura = (kind: string, value: number, stacks?: number): Aura =>
   ({ kind, value, ...(stacks === undefined ? {} : { stacks }) }) as unknown as Aura;
 
 describe('effectiveArmorOf', () => {
-  it('max-combines Sunder and Faerie Fire instead of adding them', () => {
-    const e = entity('mob', 1000, 0, [aura('sunder', 0, 5), aura('faerie_fire', 0)]);
-    const pct = Math.max(SUNDER_ARMOR_PCT_PER_STACK * 5, FAERIE_FIRE_ARMOR_PCT);
-    expect(effectiveArmorOf(e)).toBe(1000 * (1 - pct));
+  it('leaves Witchlight out of the shared armor read (it only softens ranged hits)', () => {
+    expect(effectiveArmorOf(entity('mob', 1000, 0, [aura('faerie_fire', 0)]))).toBe(1000);
+    const e = entity('mob', 1000, 0, [aura('sunder', 0, 2), aura('faerie_fire', 0)]);
+    expect(effectiveArmorOf(e)).toBe(1000 * (1 - SUNDER_ARMOR_PCT_PER_STACK * 2));
+  });
+
+  it('max-combines Sunder and Melting Acid instead of adding them', () => {
+    const e = entity('mob', 1000, 0, [aura('sunder', 0, 5), aura('melting_acid', 0.05)]);
+    expect(effectiveArmorOf(e)).toBe(1000 * (1 - SUNDER_ARMOR_PCT_PER_STACK * 5));
   });
 
   it('subtracts corrode flat per stack before the percent debuffs, floored at zero', () => {

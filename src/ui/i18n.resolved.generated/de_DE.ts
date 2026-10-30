@@ -4935,6 +4935,7 @@ export const de_DE: EnTranslations = {
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Verringert Rüstung um {pct}%",
       "armorPctStacks": "Verringert Rüstung um {pct}% ({stacks} Stapel)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -18468,7 +18469,7 @@ export const de_DE: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Hexenlicht",
-        "description": "Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%."
+        "description": "Markiert das Ziel 40 Sek. lang. Fernkampfwaffenangriffe behandeln seine Rüstung als um {damage}% niedriger, und Zauber gegen das Ziel erhalten dieselbe Schadenssteigerung, die diese Senkung einem Fernkampfangriff verschafft. Nahkampfangriffe sind nicht betroffen, daher ist es mit Rüstungsspalter kombinierbar."
       },
       "hibernate": {
         "name": "Schlummer",

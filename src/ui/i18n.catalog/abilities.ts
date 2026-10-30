@@ -1352,7 +1352,11 @@ const classAbilityNamesEn = {
       ],
       ['enrage', 'Stoke', 'Generates 20 rage instantly. Bruin Form only.'],
       ['bash', 'Concuss', 'Stuns the target for 2 sec. Bruin Form only.'],
-      ['faerie_fire', 'Witchlight', "Decreases the target's armor by {damage}% for 40 sec."],
+      [
+        'faerie_fire',
+        'Witchlight',
+        'Mark the target for 40 sec. Ranged weapon attacks treat its armor as {damage}% lower, and spells against it gain the same damage increase that cut gives a ranged attack. Melee attacks are not affected, so it stacks with Armor Shear.',
+      ],
       [
         'hibernate',
         'Slumber',

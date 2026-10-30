@@ -4935,6 +4935,7 @@ export const pt_BR: EnTranslations = {
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Reduz a armadura em {pct}%",
       "armorPctStacks": "Reduz a armadura em {pct}% ({stacks} acúmulos)",
+      "witchlightPct": "Ranged weapon attacks treat armor as {pct}% lower, and spells deal the matching extra damage",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -18468,7 +18469,7 @@ export const pt_BR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luz Bruxa",
-        "description": "Reduz a armadura do alvo em {damage}% por 40 s."
+        "description": "Marca o alvo por 40 s. Ataques com armas de longo alcance tratam a armadura dele como {damage}% menor, e feitiços contra ele recebem o mesmo aumento de dano que essa redução dá a um ataque de longo alcance. Ataques corpo a corpo não são afetados, então acumula com Retalhar Armadura."
       },
       "hibernate": {
         "name": "Sono Profundo",

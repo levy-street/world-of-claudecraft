@@ -16491,7 +16491,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Bunu 4 veya daha fazla kombo puanıyla vurmak 8 sn boyunca Redline'ı başlatır: Kötücül Kesik Gövde Darbesine dönüşür ve bu düğme Nakavt Darbesine dönüşür (45 artı kombo puanı başına 35, biriktirilen her Redline kademesinde %25 daha sert vurur, 25 enerji geri kazandırır). Redline bitmeden harca.",
   'entities.abilities.expose_armor.description':
     'Hedefi 30 sn boyunca açığa çıkaran bitirici hamle: harcanan her kombo puanı zırhını %2 azaltır (5 kombo puanı: %{damage}).',
-  'entities.abilities.faerie_fire.description': 'Hedefin zırhını 40 sn boyunca %{damage} azaltır.',
+  'entities.abilities.faerie_fire.description':
+    'Hedefi 40 sn boyunca işaretler. Menzilli silah saldırıları hedefin zırhını %{damage} daha düşük sayar ve hedefe karşı büyüler, bu düşüşün menzilli bir saldırıya sağladığı hasar artışının aynısını kazanır. Yakın dövüş saldırıları etkilenmez, bu yüzden Zırh Kesme ile birikir.',
   'entities.abilities.ferocious_bite.description':
     '{damage} veren bitirici hamle. Yalnızca Kedi Formu.',
   'entities.abilities.ferocious_bite.specNote_feral':

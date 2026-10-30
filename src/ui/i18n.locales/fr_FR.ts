@@ -17089,7 +17089,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description':
     'Technique de finition qui expose la cible pendant 30 s : chaque point de combo dépensé réduit son armure de 2% (5 combo points : {damage}%).',
   'entities.abilities.faerie_fire.description':
-    "Réduit l'armure de la cible de {damage}% pendant 40 s.",
+    "Marque la cible pendant 40 s. Les attaques d'armes à distance considèrent son armure comme réduite de {damage}%, et les sorts contre elle gagnent la même hausse de dégâts que cette réduction apporte à une attaque à distance. Les attaques de mêlée ne sont pas affectées, cet effet se cumule donc avec Cisaillement d'armure.",
   'entities.abilities.ferocious_bite.description':
     'Technique de finition qui inflige {damage}. Forme de chat uniquement.',
   'entities.abilities.ferocious_bite.specNote_feral':

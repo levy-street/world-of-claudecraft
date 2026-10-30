@@ -275,6 +275,11 @@ import {
 } from './warlock_talents';
 import { hasUmbralAnchor, UMBRAL_ANCHOR_ID, umbralAnchorCastError } from './warlock_utility';
 import { castRedHarvest } from './warrior_harvest';
+import {
+  isRangedPhysicalAbility,
+  physicalHitArmor,
+  witchlightArmorlessDamageMult,
+} from './witchlight';
 
 export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'recklessness',
@@ -2441,7 +2446,7 @@ function applyChannelTick(
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
         // physical channels (Volley) are mitigated by armor; spell-school rain is not,
         // mirroring the instant aoeDamage path in effect_dispatch.
-        if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+        if (!isSpell) dmg *= 1 - armorReduction(physicalHitArmor(ctx, m, res.def), p.level);
         ctx.dealDamage(p, m, Math.round(dmg), false, res.def.school, res.def.name, 'hit');
         struck++;
       }
@@ -2492,7 +2497,7 @@ function applyChannelTick(
       for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
         if (!ctx.hasLineOfSight(p, m)) continue;
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
-        if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+        if (!isSpell) dmg *= 1 - armorReduction(physicalHitArmor(ctx, m, res.def), p.level);
         ctx.dealDamage(p, m, Math.round(dmg), false, res.def.school, res.def.name, 'hit');
       }
     }
@@ -2627,6 +2632,10 @@ function applyChannelTick(
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
         dmg *= spellDamageMultFromAuras(src);
+        // A ranged physical channel bolt (Fevered Draw) has no armor step, so
+        // Witchlight reaches it through the armorless multiplier spells get in
+        // dealDamage (which skips physical hits).
+        if (isRangedPhysicalAbility(res.def)) dmg *= witchlightArmorlessDamageMult(src.level, tgt);
         if (res.def.id === 'arcane_missiles' && perfectMomentActive(src)) {
           dmg *= PERFECT_MOMENT_DARTS_DAMAGE_MULT;
         }
