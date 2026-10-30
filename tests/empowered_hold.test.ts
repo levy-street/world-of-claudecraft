@@ -42,9 +42,10 @@ function fixture(overrides: Partial<EmpoweredHoldDeps> = {}) {
   return { handlers, calls, pointer, captured: () => captured };
 }
 
-describe('bindEmpoweredActionHold', () => {
+describe.each(['dragons_breath', 'glacial_front'])('bindEmpoweredActionHold (%s)', (abilityId) => {
+  const ability = { empoweredAbilityIdForSlot: () => abilityId };
   it('a plain press charges the slot, captures the pointer, and release fires it', () => {
-    const f = fixture();
+    const f = fixture(ability);
     f.handlers.pointerdown(f.pointer(false));
     expect(f.calls).toEqual(['press:3', 'prevent']);
     expect(f.captured()).toBe(7);
@@ -53,7 +54,7 @@ describe('bindEmpoweredActionHold', () => {
   });
 
   it('a Shift press is the move gesture: no charge starts and the native drag is left alone', () => {
-    const f = fixture();
+    const f = fixture(ability);
     f.handlers.pointerdown(f.pointer(true));
     expect(f.calls).toEqual([]);
     expect(f.captured()).toBeNull();
@@ -63,7 +64,7 @@ describe('bindEmpoweredActionHold', () => {
     // The old failure: dragging a held Dragon's Breath cancelled the pointer,
     // which released (fired) the half-charged breath. With Shift the hold never
     // started, so the drag's pointercancel has nothing to release.
-    const f = fixture();
+    const f = fixture(ability);
     f.handlers.pointerdown(f.pointer(true));
     f.handlers.pointercancel(f.pointer(true));
     f.handlers.pointerup(f.pointer(true));
