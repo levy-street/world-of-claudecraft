@@ -1366,6 +1366,7 @@ export const ko_KR: EnTranslations = {
         "stackTerms": "지금 결제합니다. 기간이 현재 멤버십 종료일 뒤에 추가되고 이후 이 요금제로 갱신됩니다.",
         "stackCapped": "멤버십은 한 번에 최대 2년까지 보유할 수 있습니다. 갱신일이 가까워지면 다시 시도하세요.",
         "stackUnavailable": "지금은 멤버십 기간을 추가할 수 없습니다. 잠시 후 다시 시도하세요.",
+        "checkoutPending": "결제가 대기 중입니다. 확인을 기다리고 있습니다.",
         "billingBlocked": "멤버십 기간을 추가하기 전에 구독 관리에서 결제 정보를 업데이트하세요.",
         "renewsOn": "{date}에 갱신",
         "endsOn": "멤버십 종료일: {date}",

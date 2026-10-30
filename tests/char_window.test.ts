@@ -29,7 +29,9 @@ import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
+import { charSheetRefreshSigFor } from '../src/ui/char_sheet_sig_core';
 import { STAT_DEFENSE, STAT_GRID, STAT_PANELS } from '../src/ui/char_stats_view';
+import type { CharacterSidebarTab } from '../src/ui/char_view';
 import {
   archetypeTitleText,
   CharWindow,
@@ -715,8 +717,8 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
   });
 
   it('keeps focus on the same control when a signature repaint rebuilds the sheet', () => {
-    // The behavioral arm for the latch's new trigger rate: refreshCharSheetIfChanged
-    // calls renderIfOpen within 500 ms of any signed surface moving, so a
+    // The behavioral arm for the latch's new trigger rate: refreshIfChanged
+    // rebuilds within 500 ms of any signed surface moving, so a
     // keyboard user with focus inside the sheet hits this path ROUTINELY. The
     // rebuilt-element inequality below is the proof this is a real innerHTML
     // wipe and not a no-op the assertion would pass vacuously.
@@ -735,6 +737,148 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       expect(rebuilt).not.toBeNull();
       expect(rebuilt, 'the repaint must really rebuild the control').not.toBe(share);
       expect(document.activeElement).toBe(rebuilt);
+    } finally {
+      document.body.removeChild(root);
+    }
+  });
+
+  it('the slow-band latch repaints the open sheet when a buff moves a stat, not when it only ticks', () => {
+    // The player report: open the sheet, cast a buff or proc something, and the
+    // stats did not move until a reopen. Drives the real window's own latch
+    // (refreshIfChanged, polled by the Hud slow band) fed the real signature.
+    canvasStub();
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    try {
+      const aura = { id: 'battle_shout', stacks: undefined, remaining: 30, value: 50 };
+      const world = {
+        cfg: { playerClass: 'warrior' },
+        player: {
+          name: 'Aurelia',
+          level: 20,
+          skin: 0,
+          stats: {
+            str: 50,
+            agi: 30,
+            sta: 40,
+            int: 20,
+            spi: 25,
+            armor: 900,
+            pvpOffense: 0,
+            pvpDefense: 0,
+            pvpVitality: 0,
+          },
+          attackPower: 140,
+          spellPower: 0,
+          healPower: 0,
+          critChance: 0.05,
+          dodgeChance: 0.04,
+          critRating: 0,
+          hasteRating: 0,
+          hitRating: 0,
+          sharedCritBonus: 0,
+          auras: [] as unknown[],
+        },
+        equipment: {},
+        talentSpec: null,
+        honor: 0,
+        lifetimeHonor: 0,
+        heroicMarks: 0,
+        delveMarks: 0,
+        factions: {},
+        factionCurrencies: {},
+        worldQuestLog: new Map(),
+        worldQuestExpiresAtMs: 0,
+        lifetimeXp: 0,
+        prestigeRank: 0,
+        unlockedMilestones: [],
+        playtimeSeconds: 0,
+        archetypeTitle: null,
+        hobbyCraft: null,
+        activeTitle: null,
+        activeBorder: null,
+        deedsEarned: new Set(),
+        deedStats: { itemsDiscovered: new Set() },
+        reliquaryMarks: new Set(),
+        reliquaryAccountFinds: new Set(),
+        accountDeeds: new Set(),
+        selectedMount: () => null,
+        ownedMounts: () => [],
+        selectMount: () => {},
+        professionsState: { skills: [] },
+      };
+      const renderPreview = vi.fn();
+      const hideTooltip = vi.fn();
+      const win = makeWin(root, {
+        deps: {
+          world: () => world as never,
+          renderPreview,
+          hideTooltip,
+          refreshSig: (tab: CharacterSidebarTab) => charSheetRefreshSigFor(world as never, tab, 0),
+          statCellHtml: (stat: string) =>
+            stat === 'attackPower'
+              ? `<span class="stat-cell" data-stat="attackPower"><b>${world.player.attackPower}</b></span>`
+              : '',
+        },
+      });
+      const poll = (): void => win.refreshIfChanged();
+      // Closed: the poll paints nothing.
+      poll();
+      expect(renderPreview).not.toHaveBeenCalled();
+      win.toggle();
+      expect(win.isOpen).toBe(true);
+      expect(win.activeSidebarTab).toBe('stats');
+      poll();
+      const apText = () => root.querySelector('[data-stat="attackPower"] b')?.textContent;
+      expect(apText()).toBe('140');
+      // The open paint latched its own signature: the first poll is quiet.
+      const rebuilds = renderPreview.mock.calls.length;
+      expect(rebuilds).toBe(1);
+
+      // A buff lands: a new aura and the attack power it grants.
+      world.player.auras = [aura];
+      world.player.attackPower = 190;
+      poll();
+      expect(apText(), 'the open sheet must show the buffed value').toBe('190');
+      expect(renderPreview.mock.calls.length).toBe(rebuilds + 1);
+      // The wipe drops a hovered cell's tooltip (no mouseleave ever fires).
+      expect(hideTooltip).toHaveBeenCalledTimes(1);
+
+      // The buff only ticks its timer: zero rebuilds on repeated polls.
+      aura.remaining = 29.5;
+      poll();
+      poll();
+      expect(renderPreview.mock.calls.length).toBe(rebuilds + 1);
+
+      // A same-tab poll rebuild keeps the side panel's scroll.
+      const panel = root.querySelector<HTMLElement>('#char-sidebar-panel');
+      expect(panel).not.toBeNull();
+      if (panel) panel.scrollTop = 120;
+      world.player.attackPower = 200;
+      poll();
+      const rebuiltPanel = root.querySelector<HTMLElement>('#char-sidebar-panel');
+      expect(rebuiltPanel, 'the poll must really rebuild the panel').not.toBe(panel);
+      expect(rebuiltPanel?.scrollTop).toBe(120);
+      expect(renderPreview.mock.calls.length).toBe(rebuilds + 2);
+
+      // A tab click repaints once, starts the new board at the top, and
+      // re-latches: the next poll does not buy a second rebuild.
+      root.querySelector<HTMLElement>('[data-tab="currencies"]')?.click();
+      expect(win.activeSidebarTab).toBe('currencies');
+      expect(renderPreview.mock.calls.length).toBe(rebuilds + 3);
+      expect(root.querySelector<HTMLElement>('#char-sidebar-panel')?.scrollTop).toBe(0);
+      poll();
+      expect(renderPreview.mock.calls.length).toBe(rebuilds + 3);
+
+      // Closed, a moved stat costs nothing; a reopen paints once and leaves
+      // the next poll quiet.
+      win.close();
+      world.player.attackPower = 250;
+      poll();
+      expect(renderPreview.mock.calls.length).toBe(rebuilds + 3);
+      win.toggle();
+      poll();
+      expect(renderPreview.mock.calls.length).toBe(rebuilds + 4);
     } finally {
       document.body.removeChild(root);
     }

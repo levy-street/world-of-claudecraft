@@ -3,7 +3,7 @@ import type { Entity } from '../types';
 import { fireMageOnSpellHit } from './fire_mage';
 import { frostMageOnSpellHit } from './frost_mage';
 
-export function spellCritBonusFromAuras(p: Entity): number {
+export function spellCritBonusFromAuras(p: Pick<Entity, 'auras'>): number {
   let bonus = 0;
   for (const aura of p.auras) {
     if (aura.kind === 'buff_spellcrit') bonus += aura.value;

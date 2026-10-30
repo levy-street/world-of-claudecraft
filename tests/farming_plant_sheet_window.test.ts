@@ -638,7 +638,7 @@ describe('plant sheet window: harvest mode', () => {
     expect(world.harvestCrop).toHaveBeenCalledTimes(1);
   });
 
-  it('refreshIfChanged is a no-op for a closed sheet and for a PLANT sheet', () => {
+  it('refreshIfChanged is a no-op for a closed sheet and for a PLANT sheet whose view held', () => {
     const win = makeWindow();
     win.refreshIfChanged();
     expect(root.innerHTML).toBe('');
@@ -1046,6 +1046,106 @@ describe('plant sheet window: re-open, event filters, and staleness (the review 
     ];
     win.notifyFarmEvent(denied(BED));
     expect(win.isOpen).toBe(false);
+  });
+
+  it('refreshIfChanged makes PLANT mode live: compost bought under an open sheet enables its knob', () => {
+    // The player bug: open the sheet with no compost, buy compost from the
+    // farmer, and the knob stayed disabled until a reopen.
+    world.inventory = world.inventory.filter((slot) => slot.itemId !== FARM_COMPOST_ITEM_ID);
+    const win = makeWindow();
+    win.open(BED);
+    const compost = () => root.querySelector<HTMLButtonElement>('[data-knob="compost"]');
+    expect(compost()?.disabled).toBe(true);
+    world.inventory = [...world.inventory, { itemId: FARM_COMPOST_ITEM_ID, count: 1 }];
+    win.refreshIfChanged();
+    expect(compost()?.disabled).toBe(false);
+    compost()?.click();
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledWith(BED, WHEAT.id, { compost: true });
+  });
+
+  it('refreshIfChanged repaints a PLANT sheet on a seed count move, keeping picks, focus and the send arm', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.focus();
+    world.inventory = world.inventory.map((slot) =>
+      slot.itemId === WHEAT.seedItemId ? { ...slot, count: 5 } : slot,
+    );
+    win.refreshIfChanged();
+    expect(root.querySelector('.ps-count')?.textContent).toBe('5');
+    expect(root.querySelector('[data-knob="compost"]')?.getAttribute('aria-pressed')).toBe('true');
+    expect((document.activeElement as HTMLElement | null)?.dataset.knob).toBe('compost');
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshIfChanged un-picks a PLANT knob whose supply left the bags', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
+    world.inventory = world.inventory.filter((slot) => slot.itemId !== FARM_COMPOST_ITEM_ID);
+    win.refreshIfChanged();
+    const compost = root.querySelector<HTMLButtonElement>('[data-knob="compost"]');
+    expect(compost?.disabled).toBe(true);
+    expect(compost?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('an unchanged PLANT poll writes nothing, and every paint re-latches the signature', () => {
+    const win = makeWindow();
+    win.open(BED);
+    const node = root.querySelector('[data-plant]');
+    win.refreshIfChanged();
+    win.refreshIfChanged();
+    expect(root.querySelector('[data-plant]')).toBe(node);
+    // A knob toggle is an in-place flip, not a data move: still no rebuild.
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
+    win.refreshIfChanged();
+    expect(root.querySelector('[data-plant]')).toBe(node);
+    // relocalize repaints once and re-latches, so the next poll is idle.
+    win.relocalize();
+    const after = root.querySelector('[data-plant]');
+    expect(after).not.toBe(node);
+    win.refreshIfChanged();
+    expect(root.querySelector('[data-plant]')).toBe(after);
+  });
+
+  it('refreshIfChanged closes a PLANT sheet on death, out of reach, or my plot landing in the bed', () => {
+    const cases: Array<(w: StubWorld) => void> = [
+      (w) => {
+        w.player.dead = true;
+      },
+      (w) => {
+        w.player.pos = { x: 40, y: 0, z: 0 };
+      },
+      (w) => {
+        w.myFarmPlots = [
+          {
+            bedId: BED,
+            cropId: WHEAT.id,
+            plantedAtMs: 0,
+            readyAtMs: 1000,
+            compost: false,
+            watch: false,
+            tonic: false,
+            notified: false,
+            status: 'growing',
+          },
+        ];
+      },
+    ];
+    for (const mutate of cases) {
+      world = new StubWorld();
+      const win = makeWindow();
+      win.open(BED);
+      mutate(world);
+      win.refreshIfChanged();
+      expect(win.isOpen).toBe(false);
+    }
+    expect(world.plantCrop).not.toHaveBeenCalled();
   });
 
   it('relocalize repaints an open sheet and is a no-op on a closed one', () => {

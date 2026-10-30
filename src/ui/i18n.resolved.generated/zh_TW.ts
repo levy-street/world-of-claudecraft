@@ -1366,6 +1366,7 @@ export const zh_TW: EnTranslations = {
         "stackTerms": "立即付款。時長將追加到目前會員的結束時間之後，之後按此方案續訂。",
         "stackCapped": "會員時長最多可同時持有2年。請在接近續訂日期時再試。",
         "stackUnavailable": "目前無法增加會員時長。請稍後再試。",
+        "checkoutPending": "結帳待處理。正在等待確認。",
         "billingBlocked": "增加會員時長前，請先在「管理訂閱」中更新付款資訊。",
         "renewsOn": "將於{date}續訂",
         "endsOn": "會員將於{date}結束",

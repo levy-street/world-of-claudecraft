@@ -3,7 +3,9 @@
 // treasure_map_view.ts: the cropped terrain plate with the X, the digging hint,
 // and what redrawing it a rarity finer would take. Self-mounting: the
 // panel is created beside the other windows on first open, so the static HTML
-// entries stay untouched. Cold chrome, painted only on open and on a click.
+// entries stay untouched. Cold chrome: painted on open, on the upgrade / vault
+// events, and from the Hud slow-band poll only when its signature moved (the held
+// ink count, the map's rarity and site, the map still being in the bags).
 
 import {
   CARTOGRAPHERS_INK_ITEM_ID,
@@ -14,6 +16,12 @@ import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import {
+  captureFocusKey,
+  findFocusKey,
+  restoreFirstEnabled,
+  stampFocusKey,
+} from '../../focus_restore';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import { svgIcon } from '../../ui_icons';
@@ -26,8 +34,33 @@ export interface TreasureMapWindowDeps {
 const NUM0 = { maximumFractionDigits: 0 } as const;
 const pct = (fraction: number) => `${(fraction * 100).toFixed(2)}%`;
 
+type TreasureMapWorld = Pick<IWorld, 'treasureMap' | 'inventory'>;
+
+/** Cartographer's Ink held across the bags (the upgrade note's "held"). */
+function inksHeld(world: TreasureMapWorld): number {
+  return world.inventory.reduce(
+    (sum, slot) => sum + (slot?.itemId === CARTOGRAPHERS_INK_ITEM_ID ? slot.count : 0),
+    0,
+  );
+}
+
+const MAP_ITEM_IDS: ReadonlySet<string> = new Set(Object.values(TREASURE_MAP_ITEM_IDS));
+
+/** Whether the bags still hold a treasure map: sold, destroyed or mailed away,
+ *  the parchment has nothing left to show. ANY rarity counts, not just the read
+ *  map's own: online an upgrade's new rarity (the quest snapshot) and its
+ *  swapped bag item (the inventory delta) can land in different frames, and a
+ *  rarity-exact check would close the window mid-upgrade. */
+function mapInBags(world: TreasureMapWorld): boolean {
+  if (!world.treasureMap) return false;
+  return world.inventory.some((slot) => slot !== null && MAP_ITEM_IDS.has(slot.itemId));
+}
+
 export class TreasureMapWindow {
   private el: HTMLElement | null = null;
+  // The data digest the last paint drew from (see signature()). Latched by every
+  // paint, so an event repaint never buys a second rebuild on the next poll.
+  private lastSig = '';
 
   constructor(private readonly deps: TreasureMapWindowDeps) {}
 
@@ -59,18 +92,36 @@ export class TreasureMapWindow {
     if (this.isOpen) this.render();
   }
 
+  /**
+   * The slow-band poll (Hud.update): ink bought or looted moves the held count,
+   * and the map leaving the bags closes the window. A repeated identical poll
+   * compares one short string and touches no DOM.
+   */
+  refreshIfChanged(): void {
+    if (this.isOpen && this.signature(this.deps.world()) !== this.lastSig) this.render();
+  }
+
+  /** The language fan-out arm: the signature is text-independent, so force one
+   *  rebuild and leave it re-latched. */
+  relocalize(): void {
+    if (this.isOpen) this.render();
+  }
+
+  private signature(world: TreasureMapWorld): string {
+    const map = world.treasureMap;
+    return `${map?.rarity ?? ''}|${map?.siteId ?? ''}|${inksHeld(world)}|${mapInBags(world) ? 1 : 0}`;
+  }
+
   private render(): void {
     const world = this.deps.world();
-    const inks = world.inventory.reduce(
-      (sum, slot) => sum + (slot?.itemId === CARTOGRAPHERS_INK_ITEM_ID ? slot.count : 0),
-      0,
-    );
-    const model = treasureMapModel(world, inks);
+    const model = mapInBags(world) ? treasureMapModel(world, inksHeld(world)) : null;
     const el = this.panel();
+    this.lastSig = this.signature(world);
     if (!model) {
       this.close();
       return;
     }
+    const focusKey = captureFocusKey(el);
     const mapDef = ownEntry(ITEMS, TREASURE_MAP_ITEM_IDS[model.rarity]);
     const title = mapDef ? itemDisplayName(mapDef) : '';
     // The plate is laid out larger than the parchment and shifted so only the
@@ -106,5 +157,7 @@ export class TreasureMapWindow {
       upgrade;
     el.style.display = 'block';
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    stampFocusKey(el, '[data-close]', 'close');
+    if (focusKey !== null) restoreFirstEnabled([findFocusKey(el, focusKey)]);
   }
 }

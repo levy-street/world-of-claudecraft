@@ -13,7 +13,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { catalogCharacterCompletion, isCataloguedRelicItem } from '../src/sim/reliquary';
-import { charSheetRefreshSig } from '../src/ui/char_sheet_sig_core';
+import type { Aura } from '../src/sim/types';
+import {
+  type CharSheetSigWorld,
+  charSheetRefreshSig,
+  charSheetRefreshSigFor,
+} from '../src/ui/char_sheet_sig_core';
 
 const readRaw = (rel: string): string =>
   readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8');
@@ -201,17 +206,31 @@ describe('charSheetRefreshSig', () => {
   });
 });
 
-describe('the HUD latch that converges the open character sheet', () => {
+describe('the latch that converges the open character sheet', () => {
   const hud = read('src/ui/hud.ts');
+  const win = read('src/ui/char_window.ts');
 
   it('reads every signed surface from the world and latches the signature', () => {
-    const at = hud.indexOf('private refreshCharSheetIfChanged(): void {');
-    expect(at, 'refreshCharSheetIfChanged is missing from hud.ts').toBeGreaterThan(-1);
-    const body = hud.slice(at, at + 620);
-    // The HUD hands the live world to the core's own reader (the monolith
-    // ratchet moved the per-field reads out of hud.ts), so the world-fed pins
-    // below hold on charSheetRefreshSigFor instead.
-    expect(body).toContain('const sig = charSheetRefreshSigFor(this.sim);');
+    // The latch lives on CharWindow: the window owns its signature, so every
+    // paint (open, tab click, language switch) re-latches and the next poll
+    // compares equal instead of buying a second rebuild.
+    const at = win.indexOf('refreshIfChanged(): void {');
+    expect(at, 'CharWindow.refreshIfChanged is missing').toBeGreaterThan(-1);
+    const body = win.slice(at, win.indexOf('\n  }\n', at));
+    // Closed reads nothing, and an equal signature returns before any paint.
+    expect(body).toContain('if (!this.isOpen || this.refreshSig() === this.lastSig) return;');
+    expect(body).toContain('this.render();');
+    expect(body).not.toContain('/*');
+    // The tab-aware form with the clock, fed the window's own tab: the clock is
+    // what signs the Reputation countdown's displayed minute, so the union form
+    // would freeze it.
+    expect(win).toContain("return this.deps.refreshSig?.(this.sidebarTab) ?? '';");
+    expect(hud).toContain(
+      'refreshSig: (tab) => charSheetRefreshSigFor(this.sim, tab, Date.now()),',
+    );
+    // Every paint latches what it drew from.
+    const renderAt = win.indexOf('  render(): void {');
+    expect(win.indexOf('this.lastSig = this.refreshSig();', renderAt)).toBeGreaterThan(renderAt);
     const core = read('src/ui/char_sheet_sig_core.ts');
     const coreAt = core.indexOf('export function charSheetRefreshSigFor(');
     expect(coreAt).toBeGreaterThan(-1);
@@ -228,29 +247,14 @@ describe('the HUD latch that converges the open character sheet', () => {
     expect(reader).toContain(
       'accountEntries: world.reliquaryAccountFinds.size + world.accountDeeds.size,',
     );
-    expect(body).toContain('if (sig === this.lastCharSheetSig) return;');
-    expect(body).toContain('this.lastCharSheetSig = sig;');
-    // ORDER, not just presence: hoisting the assignment above the compare
-    // leaves both literals in the body while the sheet never repaints again,
-    // which is the exact staleness this latch exists to fix. The slice must
-    // stay block-comment-free, or a /* commented copy */ of the compare above
-    // a hoisted assignment could satisfy the ordering while the latch is dead
-    // (read() strips line comments only for this file).
-    expect(body).not.toContain('/*');
-    expect(
-      body.indexOf('if (sig === this.lastCharSheetSig) return;'),
-      'the latch must compare before it assigns',
-    ).toBeLessThan(body.indexOf('this.lastCharSheetSig = sig;'));
-    // renderIfOpen, not render: a closed sheet must never be painted.
-    expect(body).toContain('this.charWindow.renderIfOpen();');
   });
 
   it('rides the 2 Hz slow band beside its profession sibling', () => {
-    expect(hud).toContain('if (slowHud) this.refreshCharSheetIfChanged();');
+    expect(hud).toContain('if (slowHud) this.charWindow.refreshIfChanged();');
     // Adjacency to the sibling is the design claim (same band, same cadence),
     // so pin the order rather than mere presence.
     const sibling = hud.indexOf('if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();');
-    const mine = hud.indexOf('if (slowHud) this.refreshCharSheetIfChanged();');
+    const mine = hud.indexOf('if (slowHud) this.charWindow.refreshIfChanged();');
     expect(sibling).toBeGreaterThan(-1);
     expect(mine).toBeGreaterThan(sibling);
   });
@@ -293,5 +297,247 @@ describe('the HUD latch that converges the open character sheet', () => {
     expect(body).toContain('accountDeedLookup(sim.deedsEarned, { deeds: sim.accountDeeds })');
     expect(body).toContain('earnedBorders.has(id)');
     expect(body).toContain('reliquarySheetProgressionHtml(buildReliquarySheetModel(sim))');
+  });
+});
+
+// The widened signature (the "separate decision" the first header deferred, now
+// made): every board the sheet paints, signed off the RAW inputs. Each case below
+// moves exactly ONE input off a full fake world, so a signature that dropped any
+// single input fails the case that names it.
+describe('charSheetRefreshSigFor: the whole sheet', () => {
+  function fakeWorld(): CharSheetSigWorld {
+    return {
+      activeTitle: 'prog_veteran',
+      activeBorder: null,
+      deedsEarned: new Set(['a']),
+      deedStats: { itemsDiscovered: new Set(['x']) },
+      reliquaryMarks: new Set(),
+      ownedMounts: () => [],
+      reliquaryAccountFinds: new Set(),
+      accountDeeds: new Set(),
+      player: {
+        name: 'Aurelia',
+        level: 20,
+        skin: 0,
+        stats: {
+          str: 50,
+          agi: 30,
+          sta: 40,
+          int: 20,
+          spi: 25,
+          armor: 900,
+          pvpOffense: 0,
+          pvpDefense: 0,
+          pvpVitality: 0,
+        },
+        attackPower: 140,
+        spellPower: 0,
+        healPower: 0,
+        critChance: 0.05,
+        dodgeChance: 0.04,
+        critRating: 0,
+        hasteRating: 0,
+        hitRating: 0,
+        auras: [],
+        sharedCritBonus: 0,
+      },
+      equipment: { mainhand: 'rusty_dagger' },
+      talentSpec: 'arms',
+      archetypeTitle: null,
+      hobbyCraft: null,
+      honor: 10,
+      lifetimeHonor: 30,
+      heroicMarks: 2,
+      delveMarks: 1,
+      factions: { rift_watch: 100, church_order: 0, automatons: 0 },
+      factionCurrencies: { rift_watch: 3, church_order: 0, automatons: 0 },
+      worldQuestLog: new Map(),
+      worldQuestExpiresAtMs: 10 * 60_000,
+      lifetimeXp: 12_345,
+      prestigeRank: 0,
+      unlockedMilestones: [],
+      playtimeSeconds: 3_600,
+    };
+  }
+
+  const moves = (
+    mutate: (w: CharSheetSigWorld) => void,
+    tab?: Parameters<typeof charSheetRefreshSigFor>[1],
+    nowMs?: number,
+  ): boolean => {
+    const w = fakeWorld();
+    const before = charSheetRefreshSigFor(w, tab, nowMs);
+    mutate(w);
+    return charSheetRefreshSigFor(w, tab, nowMs) !== before;
+  };
+
+  it('is stable for an unchanged world (a repeated poll never repaints)', () => {
+    const w = fakeWorld();
+    expect(charSheetRefreshSigFor(w)).toBe(charSheetRefreshSigFor(w));
+    expect(charSheetRefreshSigFor(w, 'reputation', 1_000)).toBe(
+      charSheetRefreshSigFor(w, 'reputation', 1_000),
+    );
+  });
+
+  it('still moves for the original deeds and Reliquary terms', () => {
+    expect(moves((w) => (w.activeTitle = null))).toBe(true);
+    expect(moves((w) => (w.activeBorder = 'deepward'))).toBe(true);
+    expect(moves((w) => (w.deedsEarned = new Set(['a', 'b'])))).toBe(true);
+    expect(moves((w) => (w.ownedMounts = () => ['m']))).toBe(true);
+  });
+
+  it.each([
+    ['player name (a rename)', (w: CharSheetSigWorld) => (w.player.name = 'Aurelian')],
+    ['level up', (w: CharSheetSigWorld) => (w.player.level = 21)],
+    ['portrait skin', (w: CharSheetSigWorld) => (w.player.skin = 2)],
+    ['archetype title', (w: CharSheetSigWorld) => (w.archetypeTitle = 'smith_miner')],
+    ['hobby craft', (w: CharSheetSigWorld) => (w.hobbyCraft = 'cooking')],
+    ['honor balance in the header', (w: CharSheetSigWorld) => (w.honor = 11)],
+    ['worn equipment', (w: CharSheetSigWorld) => (w.equipment = { mainhand: 'other_blade' })],
+  ])('moves on the always-shown header and paperdoll: %s', (_name, mutate) => {
+    // On every tab, including a narrowed one that is not the stats board.
+    expect(moves(mutate)).toBe(true);
+    expect(moves(mutate, 'currencies')).toBe(true);
+  });
+
+  it.each([
+    ['strength (a buff or proc)', (w: CharSheetSigWorld) => (w.player.stats.str = 55)],
+    ['agility', (w: CharSheetSigWorld) => (w.player.stats.agi = 35)],
+    ['stamina', (w: CharSheetSigWorld) => (w.player.stats.sta = 45)],
+    ['intellect', (w: CharSheetSigWorld) => (w.player.stats.int = 25)],
+    ['spirit', (w: CharSheetSigWorld) => (w.player.stats.spi = 30)],
+    ['armor', (w: CharSheetSigWorld) => (w.player.stats.armor = 950)],
+    ['warfare offense', (w: CharSheetSigWorld) => (w.player.stats.pvpOffense = 0.012)],
+    ['warfare defense', (w: CharSheetSigWorld) => (w.player.stats.pvpDefense = 0.012)],
+    ['warfare vitality', (w: CharSheetSigWorld) => (w.player.stats.pvpVitality = 0.012)],
+    ['attack power', (w: CharSheetSigWorld) => (w.player.attackPower = 175)],
+    ['spell power', (w: CharSheetSigWorld) => (w.player.spellPower = 10)],
+    ['heal power', (w: CharSheetSigWorld) => (w.player.healPower = 10)],
+    ['crit chance', (w: CharSheetSigWorld) => (w.player.critChance = 0.06)],
+    ['dodge chance', (w: CharSheetSigWorld) => (w.player.dodgeChance = 0.041)],
+    ['crit rating', (w: CharSheetSigWorld) => (w.player.critRating = 5)],
+    ['haste rating', (w: CharSheetSigWorld) => (w.player.hasteRating = 5)],
+    ['hit rating', (w: CharSheetSigWorld) => (w.player.hitRating = 5)],
+    ['shared crit bonus', (w: CharSheetSigWorld) => (w.player.sharedCritBonus = 0.01)],
+    ['talent spec', (w: CharSheetSigWorld) => (w.talentSpec = 'fury')],
+  ])('moves on the stat boards: %s', (_name, mutate) => {
+    expect(moves(mutate)).toBe(true);
+    expect(moves(mutate, 'stats')).toBe(true);
+  });
+
+  it('does NOT move on aura churn that moves no displayed number', () => {
+    // The sheet draws no aura: a mob DoT landing, a debuff stacking, or a timer
+    // ticking must not rebuild it in combat.
+    const w = fakeWorld();
+    const aura = (id: string, kind: string, value: number, remaining: number) =>
+      ({ id, kind, value, remaining }) as unknown as Aura;
+    w.player.auras = [aura('renew', 'hot', 30, 12)];
+    const before = charSheetRefreshSigFor(w, 'stats');
+    w.player.auras = [aura('renew', 'hot', 30, 11.5), aura('rend', 'dot', 9, 6)];
+    expect(charSheetRefreshSigFor(w, 'stats')).toBe(before);
+    w.player.auras = [];
+    expect(charSheetRefreshSigFor(w, 'stats')).toBe(before);
+    // Control: the buff's effect on a shown number does move it.
+    w.player.attackPower += 55;
+    expect(charSheetRefreshSigFor(w, 'stats')).not.toBe(before);
+  });
+
+  it('moves on a spell crit aura (the Spell Crit cell adds it at paint time), not on its timer', () => {
+    const w = fakeWorld();
+    const aura = (kind: string, value: number, remaining: number, value2?: number) =>
+      ({ id: kind, kind, value, value2, remaining }) as unknown as Aura;
+    const before = charSheetRefreshSigFor(w, 'stats');
+    w.player.auras = [aura('buff_spellcrit', 0.05, 30)];
+    const buffed = charSheetRefreshSigFor(w, 'stats');
+    expect(buffed).not.toBe(before);
+    w.player.auras = [aura('buff_spellcrit', 0.05, 29.5)];
+    expect(charSheetRefreshSigFor(w, 'stats')).toBe(buffed);
+    // Sacred form's spell crit rides value2, so it signs too.
+    w.player.auras = [aura('sacred_form', 0, 60, 0.08)];
+    expect(charSheetRefreshSigFor(w, 'stats')).not.toBe(before);
+    // Off the Stats tab the cell is not on screen, so the aura is not signed.
+    w.player.auras = [];
+    const rep = charSheetRefreshSigFor(w, 'reputation');
+    w.player.auras = [aura('buff_spellcrit', 0.05, 30)];
+    expect(charSheetRefreshSigFor(w, 'reputation')).toBe(rep);
+  });
+
+  it('signs the stat boards only where they show', () => {
+    const w = fakeWorld();
+    const before = charSheetRefreshSigFor(w, 'reputation');
+    w.player.attackPower += 55;
+    w.talentSpec = 'fury';
+    expect(charSheetRefreshSigFor(w, 'reputation')).toBe(before);
+  });
+
+  it('does NOT move for a sub-display stat wobble', () => {
+    expect(moves((w) => (w.player.attackPower = 140.0001))).toBe(false);
+    expect(moves((w) => (w.player.critChance = 0.0500001))).toBe(false);
+  });
+
+  it.each([
+    [
+      'faction standing',
+      (w: CharSheetSigWorld) => (w.factions = { ...w.factions, rift_watch: 150 }),
+    ],
+    [
+      'a world quest completed',
+      (w: CharSheetSigWorld) =>
+        (w.worldQuestLog = new Map([['wq1', { state: 'completed' } as never]])),
+    ],
+    [
+      // worldQuestLog.size alone: the done count stays 0, only the size moves.
+      'a new world quest taken (not completed)',
+      (w: CharSheetSigWorld) =>
+        (w.worldQuestLog = new Map([['wq1', { state: 'active' } as never]])),
+    ],
+  ])('moves on the Reputation board: %s', (_name, mutate) => {
+    expect(moves(mutate)).toBe(true);
+    expect(moves(mutate, 'reputation')).toBe(true);
+    // Narrowed to another board, the hidden tab's move costs no repaint.
+    expect(moves(mutate, 'stats')).toBe(false);
+  });
+
+  it('signs the Reputation reset countdown by its displayed minute, only with a clock', () => {
+    const w = fakeWorld();
+    const at = (now: number) => charSheetRefreshSigFor(w, 'reputation', now);
+    // The countdown rounds UP to whole minutes: 10:00 left and 9:30 left both
+    // print "10 minutes", so polls inside that minute compare equal ...
+    expect(at(0)).toBe(at(30_000));
+    // ... and crossing into the next displayed minute (9:00 left) moves it.
+    expect(at(60_000)).not.toBe(at(30_000));
+    // Past the deadline the countdown reads its unknown face; still signed.
+    expect(at(11 * 60_000)).not.toBe(at(60_000));
+    // Without a clock, no countdown term: the union form stays clock-free.
+    expect(charSheetRefreshSigFor(w)).toBe(charSheetRefreshSigFor(w));
+  });
+
+  it.each([
+    ['heroic marks', (w: CharSheetSigWorld) => (w.heroicMarks = 3)],
+    ['lifetime honor', (w: CharSheetSigWorld) => (w.lifetimeHonor = 31)],
+    ['delve marks', (w: CharSheetSigWorld) => (w.delveMarks = 2)],
+    [
+      'a faction currency',
+      (w: CharSheetSigWorld) => (w.factionCurrencies = { ...w.factionCurrencies, automatons: 1 }),
+    ],
+  ])('moves on the Currencies board: %s', (_name, mutate) => {
+    expect(moves(mutate)).toBe(true);
+    expect(moves(mutate, 'currencies')).toBe(true);
+    expect(moves(mutate, 'progression')).toBe(false);
+  });
+
+  it.each([
+    ['total XP (and so the virtual level)', (w: CharSheetSigWorld) => (w.lifetimeXp = 12_400)],
+    ['prestige rank', (w: CharSheetSigWorld) => (w.prestigeRank = 1)],
+    ['a milestone unlock', (w: CharSheetSigWorld) => (w.unlockedMilestones = ['m1'])],
+    ['the Time Played minute', (w: CharSheetSigWorld) => (w.playtimeSeconds = 3_660)],
+  ])('moves on the Progression board: %s', (_name, mutate) => {
+    expect(moves(mutate)).toBe(true);
+    expect(moves(mutate, 'progression')).toBe(true);
+    expect(moves(mutate, 'reputation', 0)).toBe(false);
+  });
+
+  it('does NOT move inside one Time Played minute', () => {
+    expect(moves((w) => (w.playtimeSeconds = 3_659), 'progression')).toBe(false);
   });
 });

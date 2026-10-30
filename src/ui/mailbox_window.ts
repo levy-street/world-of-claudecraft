@@ -22,7 +22,7 @@ import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { knownLetterId, tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { formatMoney, formatNumber, t } from './i18n';
 import {
@@ -85,6 +85,9 @@ export class MailboxWindow {
   private openedId: number | null = null;
   private attachments: InvSlot[] = [];
   private lastSig = '';
+  // The Send tab's parcel-row signature (see refreshParcelsIfChanged): what the
+  // staged chips render from the live bags, latched by every renderParcels().
+  private lastParcelSig = '';
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
   // Recipient autocomplete state (Send tab only).
@@ -350,7 +353,13 @@ export class MailboxWindow {
       if (performance.now() - this.openedAt > MAIL_INFO_GRACE_MS) this.close();
       return;
     }
-    if (this.tab === 'send') return; // typed inputs: rebuilt only on actions
+    if (this.tab === 'send') {
+      // Typed inputs: the form is rebuilt only on actions. The parcel row alone
+      // follows the bags (a staged stack sold, mailed or looted under the open
+      // letter moves its chip limits and source details).
+      this.refreshParcelsIfChanged();
+      return;
+    }
     const sig = this.sig(info);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -861,9 +870,35 @@ export class MailboxWindow {
     appendMaterialSourcesActionAfter(element, itemName, displayedSources, openCurrent);
   }
 
+  // The Send tab's live parcel patch: repaints ONLY the parcel row (the #1695
+  // narrow path), never the recipient, subject, body or coin fields. Skipped
+  // while a chip's quantity field has focus, since its value is a commit the
+  // player has not made yet (change fires on blur); the sig stays unmoved so
+  // the next poll catches up once focus leaves.
+  private refreshParcelsIfChanged(): void {
+    const parcels = this.deps.root().querySelector<HTMLElement>('#mail-parcels');
+    if (!parcels) return;
+    if (focusedWithin(parcels)?.classList.contains('mail-parcel-qty-input')) return;
+    if (this.parcelSig() === this.lastParcelSig) return;
+    this.renderParcels();
+  }
+
+  // What renderParcels paints from the live bags: each staged slot, its count
+  // ceiling (the stepper max and the +/- disabled states), and the planned
+  // material sources (the chip's source details). An empty row reads no bags.
+  private parcelSig(): string {
+    if (this.attachments.length === 0) return '';
+    return JSON.stringify([
+      this.attachments.map((s) => [s.itemId, s.count, s.instance ?? null]),
+      this.attachments.map((_, i) => this.parcelCountCeiling(i)),
+      plannedMailParcelSources(this.deps.world().inventory, this.attachments),
+    ]);
+  }
+
   private renderParcels(): void {
     const parcels = this.deps.root().querySelector<HTMLElement>('#mail-parcels');
     if (!parcels) return;
+    this.lastParcelSig = this.parcelSig();
     // A +/- click rebuilds this whole container, which would otherwise drop
     // keyboard focus to <body>; remember which control (by item + role) had
     // it so the rebuilt equivalent can reclaim it below. The shared helper

@@ -1366,6 +1366,7 @@ export const en_CA: EnTranslations = {
         "stackTerms": "Paid now. The time is added to the end of your current membership, then it renews on this plan.",
         "stackCapped": "You can hold up to 2 years of membership at once. Try again closer to your renewal date.",
         "stackUnavailable": "Adding membership time is unavailable right now. Try again shortly.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Update your payment details in Manage subscription before adding membership time.",
         "renewsOn": "Renews on {date}",
         "endsOn": "Membership ends on {date}",

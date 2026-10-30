@@ -346,6 +346,7 @@ const UI_PURE_CORES = [
   'src/ui/proc_overlay_view.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_chrome_view.ts',
+  'src/ui/daily_rewards_tasks_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/death_recap_view.ts',
   'src/ui/death_screen_view.ts',
@@ -521,6 +522,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/vendor/crucible_vendor_view.ts',
   'src/ui/hud/vendor/warfare_vendor_view.ts',
   'src/ui/hud/vendor/train_view.ts',
+  'src/ui/hud/vendor/service_window_refresh_core.ts',
   'src/ui/hud/vendor/train_learn_core.ts',
   'src/ui/hud/vendor/unbind_view.ts',
   'src/ui/card_duel_view.ts',
@@ -3287,6 +3289,9 @@ const UI_DOM_MODULES = [
   'src/ui/world_quest_ley_fx_controller.ts',
   'src/ui/hud/vendor/buy_quantity_prompt_window.ts',
   'src/ui/hud/vendor/heroic_vendor_window.ts',
+  // The service-window refresh latch: reads the shown roots and the open
+  // buy prompt / confirm dialog off the document before a slow-band rebuild.
+  'src/ui/hud/vendor/service_window_refresh.ts',
   'src/ui/hud/vendor/crucible_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',

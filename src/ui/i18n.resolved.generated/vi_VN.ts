@@ -1366,6 +1366,7 @@ export const vi_VN: EnTranslations = {
         "stackTerms": "Thanh toán ngay. Thời gian được cộng vào cuối kỳ thành viên hiện tại, sau đó tư cách thành viên sẽ được gia hạn theo gói này.",
         "stackCapped": "Bạn có thể tích lũy tối đa 2 năm thành viên cùng lúc. Vui lòng thử lại khi gần đến ngày gia hạn.",
         "stackUnavailable": "Hiện không thể thêm thời gian thành viên. Vui lòng thử lại sau ít phút.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Cập nhật thông tin thanh toán trong Quản Lý Đăng Ký trước khi thêm thời gian thành viên.",
         "renewsOn": "Gia hạn vào {date}",
         "endsOn": "Tư cách thành viên kết thúc vào {date}",

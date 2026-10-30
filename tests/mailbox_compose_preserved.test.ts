@@ -8,8 +8,9 @@
 // only rebuilds the parcels row. Drives the REAL MailboxWindow against a jsdom
 // container (the bags_window_instance_marker idiom), through the real send-tab
 // button and the real stageParcel entry the bags window calls.
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot } from '../src/sim/types';
+import { plannedMailParcelSources } from '../src/ui/mail_parcel_sources_view';
 import { MailboxWindow, type MailboxWindowDeps } from '../src/ui/mailbox_window';
 import type { IWorld } from '../src/world_api';
 
@@ -33,7 +34,10 @@ function fakeWorld(inventory: InvSlot[]): IWorld {
   } as unknown as IWorld;
 }
 
-function openSendTab(inventory: InvSlot[]): { win: MailboxWindow; root: HTMLElement } {
+function openSendTab(
+  inventory: InvSlot[],
+  extra: Partial<MailboxWindowDeps> = {},
+): { win: MailboxWindow; root: HTMLElement } {
   const root = document.createElement('div');
   document.body.appendChild(root);
   const noop = (): void => {};
@@ -50,6 +54,7 @@ function openSendTab(inventory: InvSlot[]): { win: MailboxWindow; root: HTMLElem
     restoreFocus: noop,
     showError: noop,
     syncBags: noop,
+    ...extra,
   };
   const win = new MailboxWindow(deps);
   win.open();
@@ -162,5 +167,120 @@ describe('mailbox: the typeable parcel quantity field', () => {
     typeQty(root, '2');
     (root.querySelectorAll('.mail-parcel-step')[1] as HTMLButtonElement).click(); // plus
     expect(qtyInput(root).value).toBe('3');
+  });
+});
+
+describe('mailbox: the Send tab parcel row follows the bags while the letter is open', () => {
+  // refreshIfChanged used to return early on the Send tab, so a staged chip's
+  // quantity limits froze at whatever the bags held when it was attached.
+  const qtyInput = (root: HTMLElement): HTMLInputElement | null =>
+    root.querySelector<HTMLInputElement>('.mail-parcel-qty-input');
+
+  it('repaints only the parcel row when the staged stack changes, keeping the typed letter', () => {
+    const fang: InvSlot = { itemId: 'wolf_fang', count: 4 };
+    const { win, root } = openSendTab([fang]);
+    win.stageParcel('wolf_fang');
+    expect(qtyInput(root)?.max).toBe('4');
+    const to = root.querySelector<HTMLInputElement>('#mail-to') as HTMLInputElement;
+    to.value = 'Mira';
+
+    fang.count = 7; // looted more under the open letter
+    win.refreshIfChanged();
+
+    expect(qtyInput(root)?.max).toBe('7');
+    expect(to.isConnected).toBe(true);
+    expect(to.value).toBe('Mira');
+  });
+
+  it('an unchanged repeat poll does not rebuild the parcel row', () => {
+    const { win, root } = openSendTab([{ itemId: 'wolf_fang', count: 4 }]);
+    win.stageParcel('wolf_fang');
+    const before = root.querySelector('.mail-parcel-chip');
+    win.refreshIfChanged();
+    win.refreshIfChanged();
+    expect(root.querySelector('.mail-parcel-chip')).toBe(before);
+  });
+
+  it('repaints the parcel row when only the planned material sources move (count and max unchanged)', () => {
+    const ore: InvSlot = {
+      itemId: 'copper_ore',
+      count: 4,
+      materialSources: [{ source: { signer: 'Ana' }, count: 4 }],
+    };
+    const inventory = [ore];
+    const { win, root } = openSendTab(inventory);
+    win.stageParcel('copper_ore');
+    const chip = root.querySelector('.mail-parcel-chip');
+    expect(chip).not.toBeNull();
+    expect(qtyInput(root)?.max).toBe('4');
+    const staged = [{ itemId: 'copper_ore', count: Number(qtyInput(root)?.value) }];
+    const planBefore = JSON.stringify(plannedMailParcelSources(inventory, staged));
+    const to = root.querySelector<HTMLInputElement>('#mail-to') as HTMLInputElement;
+    to.value = 'Mira';
+
+    // A restack under the open letter: same stack size, new provenance split.
+    ore.materialSources = [
+      { source: { signer: 'Ana' }, count: 2 },
+      { source: { signer: 'Bru' }, count: 2 },
+    ];
+    // Only the plannedMailParcelSources term moved; the count ceiling did not.
+    expect(JSON.stringify(plannedMailParcelSources(inventory, staged))).not.toBe(planBefore);
+    win.refreshIfChanged();
+
+    const rebuilt = root.querySelector('.mail-parcel-chip');
+    expect(rebuilt).not.toBeNull();
+    expect(rebuilt).not.toBe(chip);
+    expect(qtyInput(root)?.max).toBe('4');
+    expect(to.isConnected).toBe(true);
+    expect(to.value).toBe('Mira');
+    // And it re-latched: the next poll keeps the rebuilt chip.
+    win.refreshIfChanged();
+    expect(root.querySelector('.mail-parcel-chip')).toBe(rebuilt);
+  });
+
+  it("refreshes a chip's source details (not just its max) when the staged stack's sources move", () => {
+    document.body.classList.add('mobile-touch');
+    try {
+      const ore: InvSlot = {
+        itemId: 'copper_ore',
+        count: 3,
+        materialSources: [{ source: { signer: 'Ana' }, count: 3 }],
+      };
+      const openMaterialSources = vi.fn();
+      const { win, root } = openSendTab([ore], { openMaterialSources });
+      win.stageParcel('copper_ore');
+      const detailsButton = () =>
+        root.querySelector<HTMLButtonElement>('.mail-parcel-chip .material-sources-action');
+      const before = detailsButton();
+      expect(before).not.toBeNull();
+
+      ore.materialSources = [{ source: { signer: 'Bru' }, count: 3 }];
+      win.refreshIfChanged();
+
+      const after = detailsButton();
+      expect(after).not.toBeNull();
+      expect(after).not.toBe(before);
+      after?.click();
+      expect(openMaterialSources).toHaveBeenCalledTimes(1);
+      expect(openMaterialSources.mock.calls[0][0].sources).toEqual([
+        { source: { signer: 'Bru' }, count: 3 },
+      ]);
+    } finally {
+      document.body.classList.remove('mobile-touch');
+    }
+  });
+
+  it('holds off while a chip quantity field has focus, then catches up', () => {
+    const fang: InvSlot = { itemId: 'wolf_fang', count: 4 };
+    const { win, root } = openSendTab([fang]);
+    win.stageParcel('wolf_fang');
+    const qty = qtyInput(root) as HTMLInputElement;
+    qty.focus();
+    fang.count = 9;
+    win.refreshIfChanged();
+    expect(qtyInput(root)).toBe(qty); // not rebuilt under the caret
+    qty.blur();
+    win.refreshIfChanged();
+    expect(qtyInput(root)?.max).toBe('9');
   });
 });

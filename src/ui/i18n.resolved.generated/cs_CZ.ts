@@ -1366,6 +1366,7 @@ export const cs_CZ: EnTranslations = {
         "stackTerms": "Platba proběhne ihned. Doba se přidá na konec tvého současného členství, které se pak obnoví podle tohoto plánu.",
         "stackCapped": "Najednou můžeš mít předplacené až 2 roky členství. Zkus to znovu blíže k datu obnovení.",
         "stackUnavailable": "Dobu členství momentálně nelze přidat. Zkus to znovu za chvíli.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Než přidáš dobu členství, aktualizuj své platební údaje v části Spravovat předplatné.",
         "renewsOn": "Obnoví se {date}",
         "endsOn": "Členství končí {date}",

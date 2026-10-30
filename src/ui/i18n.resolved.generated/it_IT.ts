@@ -1366,6 +1366,7 @@ export const it_IT: EnTranslations = {
         "stackTerms": "Pagamento immediato. Il tempo viene aggiunto alla fine dell'abbonamento attuale, che poi si rinnova con questo piano.",
         "stackCapped": "Puoi accumulare fino a 2 anni di abbonamento alla volta. Riprova quando si avvicina la data di rinnovo.",
         "stackUnavailable": "Al momento non è possibile aggiungere tempo all'abbonamento. Riprova tra poco.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Aggiorna i dati di pagamento in Gestisci abbonamento prima di aggiungere tempo all'abbonamento.",
         "renewsOn": "Si rinnova il {date}",
         "endsOn": "L'abbonamento termina il {date}",

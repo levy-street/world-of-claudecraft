@@ -1366,6 +1366,7 @@ export const fr_CA: EnTranslations = {
         "stackTerms": "Paiement immédiat. La durée est ajoutée à la fin de votre abonnement actuel, puis celui-ci se renouvelle selon cette formule.",
         "stackCapped": "Vous pouvez cumuler jusqu'à 2 ans d'abonnement à la fois. Réessayez à l'approche de votre date de renouvellement.",
         "stackUnavailable": "L'ajout de temps d'abonnement est indisponible pour le moment. Réessayez dans quelques instants.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Mettez à jour vos informations de paiement dans Gérer l'abonnement avant d'ajouter du temps d'abonnement.",
         "renewsOn": "Renouvellement le {date}",
         "endsOn": "L'abonnement se termine le {date}",

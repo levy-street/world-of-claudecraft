@@ -28,6 +28,12 @@ import {
 } from '../../entity_display_core';
 import { itemDisplayName, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import {
+  captureFocusKey,
+  findFocusKey,
+  restoreFirstEnabled,
+  stampFocusKey,
+} from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -72,6 +78,10 @@ export interface QuestLogWindowDeps extends PainterHostPresentation {
   openReferralCards?(): void;
 }
 
+/** The scroll regions a poll rebuild carries across: the quest list, the detail
+ *  pane, and the detail body that scrolls inside it. */
+const SCROLLERS = ['.ql-list', '.ql-detail', '.ql-detail-body'] as const;
+
 export class QuestLogWindow {
   // The selected quest id. Hud's "/share" command reads it through `selectedQuestId`
   // (it links the selected quest into party chat), so the painter owns the single
@@ -79,6 +89,9 @@ export class QuestLogWindow {
   private selected: string | null = null;
   private openerFocus: HTMLElement | null = null;
   private readonly collapsedGroups = new Set<string>(['completed']);
+  // The data digest the last paint drew from (see signature()). Latched by every
+  // paint, so an explicit render() never buys a second rebuild on the next poll.
+  private lastSig = '';
 
   constructor(private readonly deps: QuestLogWindowDeps) {}
 
@@ -135,8 +148,55 @@ export class QuestLogWindow {
     if (restoreFocus) this.deps.restoreFocus(target);
   }
 
+  /** An explicit repaint (open, a click, a referral snapshot): focus goes to the
+   *  window's first control, the inline window's open behaviour. */
   render(): void {
+    this.paint(false);
+  }
+
+  /**
+   * The slow-band poll (Hud.update): rebuild only when the log's data moved (a
+   * kill ticked an objective, a quest turned ready, was accepted or handed in
+   * elsewhere, the spec that picks the reward choices changed). A repeated
+   * identical poll compares one short string and touches no DOM.
+   */
+  refreshIfChanged(): void {
+    if (!this.isOpen || this.signature() === this.lastSig) return;
+    // The wipe removes a hovered reward, which never fires mouseleave.
+    this.deps.hideTooltip();
+    this.paint(true);
+  }
+
+  /** The language fan-out arm: the signature is text-independent, so force one
+   *  rebuild (keeping the player's place) and leave it re-latched. */
+  relocalize(): void {
+    if (this.isOpen) this.paint(true);
+  }
+
+  /**
+   * Everything the list and detail render from, as ids, states and counts (no
+   * text, so a locale switch never moves it; relocalize() covers that). The
+   * referral rows are not here: their own snapshotChanged hook repaints them.
+   */
+  private signature(): string {
+    const world = this.deps.world();
+    let sig = `${this.selected ?? ''}|${world.questsDone.size}|${world.talents.spec ?? ''}|${
+      this.selected && this.tracking().isTracked(this.selected) ? 1 : 0
+    }`;
+    for (const q of world.questLog.values()) {
+      sig += `|${q.questId}:${q.state}:${q.counts.join(',')}:${q.resolvedCounts?.join(',') ?? ''}:${q.selection ?? ''}`;
+    }
+    return sig;
+  }
+
+  /** `keepPlace` is the poll / relocalize rebuild: carry focus and the scroll
+   *  offsets across instead of moving focus to the first control. */
+  private paint(keepPlace: boolean): void {
     const el = this.deps.root();
+    const focusKey = keepPlace ? captureFocusKey(el) : null;
+    const scrolls = keepPlace
+      ? SCROLLERS.map((sel) => el.querySelector(sel)?.scrollTop ?? 0)
+      : null;
     const world = this.deps.world();
     const quests = [...world.questLog.values()];
     const view = buildQuestLogView({
@@ -182,6 +242,7 @@ export class QuestLogWindow {
         button.type = 'button';
         button.className = 'ql-item ui-btn';
         button.dataset.referralQuest = row.id;
+        button.dataset.focusKey = `referral:${row.id}`;
         button.textContent = referralText('questWithFriend', {
           quest: referralText(`milestones.${row.id}`),
           friend: row.friendName,
@@ -193,6 +254,7 @@ export class QuestLogWindow {
       cards.type = 'button';
       cards.className = 'ql-item ui-btn';
       cards.textContent = referralText('browseCards');
+      cards.dataset.focusKey = 'referral-cards';
       cards.addEventListener('click', () => this.deps.openReferralCards?.());
       section.append(cards);
       list.prepend(section);
@@ -214,6 +276,7 @@ export class QuestLogWindow {
         toggle.type = 'button';
         toggle.className = 'ql-group-toggle ui-btn';
         toggle.dataset.questGroup = group.id;
+        toggle.dataset.focusKey = `group:${group.id}`;
         toggle.setAttribute('aria-expanded', String(!group.collapsed));
         toggle.innerHTML = `<span class="ql-group-chevron" aria-hidden="true">${svgIcon(group.collapsed ? 'next' : 'prev')}</span><span>${esc(name)}</span><span class="ql-group-count">${esc(summary)}</span>`;
         toggle.addEventListener('click', () => {
@@ -244,6 +307,7 @@ export class QuestLogWindow {
           // Row identity for the island coach's press-this-next glow (the
           // bootcamp overlay toggles .qd-coach by this attribute).
           button.dataset.quest = item.questId;
+          button.dataset.focusKey = `quest:${item.questId}`;
           button.setAttribute('aria-pressed', item.selected ? 'true' : 'false');
           if (item.selected) button.setAttribute('aria-current', 'true');
           button.setAttribute(
@@ -278,7 +342,20 @@ export class QuestLogWindow {
       .root()
       .querySelector('[data-close]')
       ?.addEventListener('click', () => this.close());
-    this.deps.focusFirstInteractive(el);
+    stampFocusKey(el, '[data-close]', 'close');
+    this.lastSig = this.signature();
+    if (!scrolls) {
+      this.deps.focusFirstInteractive(el);
+      return;
+    }
+    SCROLLERS.forEach((sel, i) => {
+      const scroller = el.querySelector(sel);
+      if (scroller) scroller.scrollTop = scrolls[i];
+    });
+    // Only a control that HAD focus in here is handed back: a poll must never
+    // pull focus out of chat or another window.
+    if (focusKey !== null)
+      restoreFirstEnabled([findFocusKey(el, focusKey), findFocusKey(el, 'close')]);
   }
 
   private renderDetail(detail: HTMLElement, d: QuestDetailModel, playerName: string): void {
@@ -311,6 +388,7 @@ export class QuestLogWindow {
     // focusable, so the scroll region itself is the keyboard stop, named by the
     // quest title (axe scrollable-region-focusable; the char window precedent).
     body.tabIndex = 0;
+    body.dataset.focusKey = 'detail';
     body.setAttribute('role', 'region');
     body.setAttribute('aria-labelledby', 'ql-detail-title');
     body.innerHTML = html;
@@ -333,6 +411,7 @@ export class QuestLogWindow {
     showMap.type = 'button';
     showMap.textContent = t('hudChrome.finder.showOnMap');
     showMap.dataset.questShowMap = d.questId;
+    showMap.dataset.focusKey = 'show-map';
     // The SELECTED quest's own objective (or turn-in) position, resolved by the
     // same rule the atlas rail's Show Route uses. A quest with no resolvable
     // position (unknown content, no placed NPC) disables the control rather than
@@ -348,6 +427,7 @@ export class QuestLogWindow {
     track.className = 'ui-btn';
     track.type = 'button';
     track.dataset.questTrack = d.questId;
+    track.dataset.focusKey = 'track';
     track.setAttribute('aria-pressed', tracked ? 'true' : 'false');
     track.textContent = t(tracked ? 'hudChrome.mapAtlas.untrack' : 'hudChrome.mapAtlas.track');
     track.addEventListener('click', () => {
@@ -358,6 +438,7 @@ export class QuestLogWindow {
     abandon.className = 'ui-btn ui-btn--red';
     abandon.type = 'button';
     abandon.textContent = t('questUi.log.abandon');
+    abandon.dataset.focusKey = 'abandon';
     abandon.addEventListener('click', () => {
       const questId = this.selected;
       if (!questId) return;

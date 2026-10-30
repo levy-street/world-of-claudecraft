@@ -2137,6 +2137,13 @@ export class OptionsWindow {
     this.keyboardWindow.repaint();
   }
 
+  /** The keyboard overview pop-out itself, for the Hud slow-band poll. The pop-out
+   *  is its own managed window with its own signature (KeyboardMapWindow); the
+   *  options menu stays cold and is never polled. */
+  get keyboardPopout(): KeyboardMapWindow {
+    return this.keyboardWindow;
+  }
+
   /** Forget a row capture in progress AND disarm it, so the one-shot never
    *  fires on a later keypress against a panel that has moved on. */
   private dropKeyCapture(): void {

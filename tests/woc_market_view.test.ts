@@ -818,6 +818,28 @@ describe('wocMarketViewSig', () => {
     expect(withReason('burn_missing')).not.toBe(withReason('unexpected_credit'));
   });
 
+  it('moves when a sell row re-rolls quality or gains an enchant in the SAME slot', () => {
+    // The row renders its quality frame and its copy's payload, so an index:itemId
+    // digest left the sell picker showing the old copy until something else moved.
+    const sellSig = (inventory: InvSlot[]) =>
+      wocMarketViewSig(buildWocMarketView(sigInput({ tab: 'sell', inventory })));
+    const plain = sellSig([
+      { itemId: rareEquipId, count: 1, instance: { rolled: { quality: 'epic' } } },
+    ]);
+    const rerolled = sellSig([
+      { itemId: rareEquipId, count: 1, instance: { rolled: { quality: 'legendary' } } },
+    ]);
+    const enchanted = sellSig([
+      { itemId: rareEquipId, count: 1, instance: { rolled: { quality: 'epic' }, enchant: 'x' } },
+    ]);
+    expect(rerolled).not.toBe(plain);
+    expect(enchanted).not.toBe(plain);
+    // Same copy, same digest: an unchanged poll never rebuilds.
+    expect(
+      sellSig([{ itemId: rareEquipId, count: 1, instance: { rolled: { quality: 'epic' } } }]),
+    ).toBe(plain);
+  });
+
   it('digests non-ready models to their kind string', () => {
     expect(wocMarketViewSig(buildWocMarketView(makeInput({ capable: false })))).toBe('unavailable');
     expect(wocMarketViewSig(buildWocMarketView(makeInput({ status: null })))).toBe('loading');

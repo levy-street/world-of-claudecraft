@@ -13,6 +13,18 @@ const badge = (html: string, id: string): string =>
   html.split(`data-membership-badge="${id}"`)[1]?.split('</article>')[0] ?? '';
 
 describe('membership plan badges', () => {
+  it.each(['none', 'canceled', 'incomplete_expired'] as const)(
+    'describes a blocked %s checkout as pending, not a payment-method failure',
+    (status) => {
+      const state = { ...SUBSCRIPTION_OFF, available: true, status, plans, canManage: true };
+      expect(subscriptionPurchase(state, 'game_monthly', NOW)).toBe('pending');
+      const html = subscriptionOffersHtml(state, false, false, false, false, '', NOW);
+      expect(html).toContain('Checkout pending');
+      expect(html).not.toContain('Update your payment details');
+      expect(html).not.toContain('Not subscribed');
+      expect(html).not.toContain('data-subscription-action="checkout"');
+    },
+  );
   it('shows one priced badge per plan with benefits, annual mount and trial terms', () => {
     const html = subscriptionOffersHtml(
       {

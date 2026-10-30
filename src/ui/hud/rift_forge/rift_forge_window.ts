@@ -13,7 +13,10 @@
 // reason into its localized status line; a refusal is never silent.
 //
 // Cold painter contract (src/ui/CLAUDE.md): no layout reads, no driver of its
-// own; the row list rebuilds whole on render and rewires its buttons.
+// own; the row list rebuilds whole on render and rewires its buttons. The Hud
+// slow band polls refreshIfChanged(), which rebuilds only when the essence,
+// the gem counts or a band's id / level / sockets moved (loot landing, a bag
+// edit), carrying each row's picked gem and the focused control across.
 
 import type { RiftGemId } from '../../../sim/content/rift/items';
 import { ITEMS } from '../../../sim/data';
@@ -24,13 +27,20 @@ import { markDialogRoot } from '../../dialog_root';
 import { npcGreeting } from '../../entity_display_core';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import {
+  captureFocusKey,
+  findFocusKey,
+  focusedWithin,
+  focusKeyAttr,
+  restoreFirstEnabled,
+} from '../../focus_restore';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { iconDataUrl } from '../../icons';
 import { compareStatLabelKey } from '../../item_affix_tooltip';
 import { itemNameColor } from '../../item_name_color';
 import { lootQualityAriaName, lootQualityBadgeHtml } from '../../loot_quality_view';
 import { svgIcon } from '../../ui_icons';
-import { buildRiftForgeView, type RiftForgeRingRow } from './rift_forge_view';
+import { buildRiftForgeView, type RiftForgeRingRow, type RiftForgeView } from './rift_forge_view';
 
 export interface RiftForgeWindowDeps {
   root(): HTMLElement;
@@ -70,6 +80,28 @@ const RIFT_FORGE_NPC_ID = 'riftwright_maelis';
 /** How long a click may hold the row controls waiting for its result event. */
 const BUSY_BACKSTOP_MS = 6000;
 
+/** The data the forge renders: essence, every gem count, and each band's
+ *  identity, place, tier, ladder step, item level and sockets. Text-free, so
+ *  the language switch re-renders through relocalize() instead. */
+export function riftForgeSig(view: RiftForgeView): string {
+  const gems = view.gems.map((g) => g.count).join(',');
+  const rings = view.rings
+    .map(
+      (r) =>
+        `${ringKey(r)}:${r.tier}:${r.upgradeLevel}/${r.maxUpgradeLevel}:${r.itemLevel}:${r.gems.join('+')}/${r.gemSlots}`,
+    )
+    .join(';');
+  return `${view.essence}|${gems}|${rings}`;
+}
+
+/** A band's identity across rebuilds: its item and where it sits. A row INDEX
+ *  is not one (a band looted into an earlier bag slot shifts every row after
+ *  it), so focus and the picked gem are carried by this key. */
+function ringKey(r: RiftForgeRingRow): string {
+  const at = r.source.kind === 'bag' ? `bag${r.source.slotIndex}` : r.source.slot;
+  return `${r.itemId}@${at}`;
+}
+
 export class RiftForgeWindow {
   private openerFocus: HTMLElement | null = null;
   /** The last outcome's localized status line (null = nothing to say). */
@@ -83,6 +115,11 @@ export class RiftForgeWindow {
    *  act() reads the flag. */
   private busy = false;
   private busyTimer: ReturnType<typeof setTimeout> | null = null;
+  /** riftForgeSig of the last render; every render re-latches it. */
+  private lastSig: string | null = null;
+  /** ringKey per row of the last render, so a rebuild carries each picked gem
+   *  to the same band. Emptied on open: a reopen starts with no picks. */
+  private paintedKeys: string[] = [];
 
   constructor(private readonly deps: RiftForgeWindowDeps) {}
 
@@ -98,6 +135,7 @@ export class RiftForgeWindow {
     this.openerFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.status = null;
+    this.paintedKeys = [];
     this.deps.root().style.display = 'flex';
     this.deps.onVisibilityChange?.();
     this.render();
@@ -147,6 +185,34 @@ export class RiftForgeWindow {
     this.render();
   }
 
+  /** The Hud slow-band poll: rebuild only when the forge's data moved. Held
+   *  while a click awaits its result (onResult repaints then) and while a
+   *  gem picker has focus (its native list may be open), leaving the latch
+   *  unmoved so the next poll catches up. */
+  refreshIfChanged(): void {
+    if (!this.isOpen || this.busy) return;
+    const el = this.deps.root();
+    if (focusedWithin(el)?.tagName === 'SELECT') return;
+    if (riftForgeSig(this.buildView()) === this.lastSig) return;
+    const key = captureFocusKey(el);
+    // The band list scrolls on its own; a poll must not throw it to the top.
+    const scrollTop = el.querySelector('.rf-body')?.scrollTop ?? 0;
+    this.render();
+    const body = el.querySelector<HTMLElement>('.rf-body');
+    if (body && scrollTop > 0) body.scrollTop = scrollTop;
+    if (key !== null)
+      restoreFirstEnabled([findFocusKey(el, key), el.querySelector<HTMLElement>('[data-close]')]);
+  }
+
+  private buildView(): RiftForgeView {
+    const world = this.deps.world();
+    return buildRiftForgeView({
+      inventory: world.inventory,
+      equipment: world.equipment,
+      equipmentInstances: world.equipmentInstances,
+    });
+  }
+
   private releaseBusy(): void {
     this.busy = false;
     if (this.busyTimer !== null) clearTimeout(this.busyTimer);
@@ -157,11 +223,15 @@ export class RiftForgeWindow {
     const el = this.deps.root();
     const world = this.deps.world();
     markDialogRoot(el, { labelledBy: 'rift-forge-title' });
-    const view = buildRiftForgeView({
-      inventory: world.inventory,
-      equipment: world.equipment,
-      equipmentInstances: world.equipmentInstances,
+    const view = this.buildView();
+    this.lastSig = riftForgeSig(view);
+    // Each band's picked gem survives the rebuild, carried by its ringKey.
+    const picked = new Map<string, string>();
+    el.querySelectorAll<HTMLSelectElement>('select[data-gem]').forEach((s) => {
+      const key = this.paintedKeys[Number(s.dataset.gem)];
+      if (key !== undefined) picked.set(key, s.value);
     });
+    this.paintedKeys = view.rings.map(ringKey);
     const gems = view.gems
       .map(
         (g) =>
@@ -196,6 +266,10 @@ export class RiftForgeWindow {
       `<div class="rf-wallet">${essence}${gems}</div>` +
       `<div class="rf-body window-fill" role="region" aria-labelledby="rift-forge-title">${rows}</div>` +
       status;
+    el.querySelectorAll<HTMLSelectElement>('select[data-gem]').forEach((s) => {
+      const value = picked.get(this.paintedKeys[Number(s.dataset.gem)] ?? '');
+      if (value !== undefined && [...s.options].some((o) => o.value === value)) s.value = value;
+    });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     this.wire(el, view.rings);
   }
@@ -225,6 +299,7 @@ export class RiftForgeWindow {
   }
 
   private rowHtml(r: RiftForgeRingRow, index: number): string {
+    const key = ringKey(r);
     const item = ITEMS[r.itemId];
     const name = lootQualityAriaName(item ? itemDisplayName(item) : r.itemId, r.instance);
     const color = item ? ` style="color:${itemNameColor(item)}"` : '';
@@ -252,7 +327,7 @@ export class RiftForgeWindow {
     const upgradeBtn =
       r.nextUpgradeCost === null || r.nextItemLevel === null
         ? `<span class="rf-max">${esc(t('hudChrome.riftForge.upgradeMax'))}</span>`
-        : `<button type="button" class="btn rf-btn" data-upgrade="${index}"${off(r.canUpgrade)}>${esc(
+        : `<button type="button" class="btn rf-btn" data-upgrade="${index}"${focusKeyAttr(`upgrade:${key}`)}${off(r.canUpgrade)}>${esc(
             t('hudChrome.riftForge.upgradeBtn', {
               level: n(r.nextItemLevel),
               cost: n(r.nextUpgradeCost),
@@ -269,8 +344,8 @@ export class RiftForgeWindow {
     const socketControls =
       r.socketable.length === 0
         ? `<span class="rf-max">${esc(t('hudChrome.riftForge.noGems'))}</span>`
-        : `<select class="rf-select" data-gem="${index}" aria-label="${esc(t('hudChrome.riftForge.gemPickAria'))}">${gemOptions}</select>` +
-          `<button type="button" class="btn rf-btn" data-socket="${index}"${off(true)}>${esc(t('hudChrome.riftForge.socketBtn'))}</button>`;
+        : `<select class="rf-select" data-gem="${index}"${focusKeyAttr(`gem:${key}`)} aria-label="${esc(t('hudChrome.riftForge.gemPickAria'))}">${gemOptions}</select>` +
+          `<button type="button" class="btn rf-btn" data-socket="${index}"${focusKeyAttr(`socket:${key}`)}${off(true)}>${esc(t('hudChrome.riftForge.socketBtn'))}</button>`;
     const replaceHint = r.replaces
       ? `<div class="rf-hint">${esc(
           t('hudChrome.riftForge.socketReplaceHint', { gem: this.itemName(r.replaces) }),

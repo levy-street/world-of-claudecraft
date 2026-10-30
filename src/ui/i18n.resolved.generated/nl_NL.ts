@@ -1366,6 +1366,7 @@ export const nl_NL: EnTranslations = {
         "stackTerms": "Je betaalt nu. De tijd wordt toegevoegd aan het einde van je huidige lidmaatschap, waarna het volgens dit plan wordt verlengd.",
         "stackCapped": "Je kunt maximaal 2 jaar lidmaatschap tegelijk opbouwen. Probeer het opnieuw wanneer je verlengingsdatum dichterbij is.",
         "stackUnavailable": "Lidmaatschapstijd toevoegen is momenteel niet mogelijk. Probeer het over even opnieuw.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Werk je betaalgegevens bij onder Abonnement beheren voordat je lidmaatschapstijd toevoegt.",
         "renewsOn": "Wordt verlengd op {date}",
         "endsOn": "Lidmaatschap eindigt op {date}",

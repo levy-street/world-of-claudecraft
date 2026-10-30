@@ -258,3 +258,130 @@ describe('talents loadout menu: the active build is marked', () => {
     expect(painter).not.toContain("pick.setAttribute('aria-pressed'");
   });
 });
+
+describe('talents_window: live refresh (the Hud slow-band poll)', () => {
+  function mutationsDuring(root: HTMLElement, run: () => void): number {
+    const observer = new MutationObserver(() => undefined);
+    observer.observe(root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      characterData: true,
+    });
+    run();
+    const count = observer.takeRecords().length;
+    observer.disconnect();
+    return count;
+  }
+
+  function openRows(level: { value: number }) {
+    const rows = rowTreeFor('warrior') ?? [];
+    if (rows.length < 2) throw new Error('fixture needs at least two warrior rows');
+    const allocation: TalentAllocation = { spec: 'arms', rows: {} };
+    const state = {
+      allocation,
+      active: -1,
+      loadouts: [] as { name: string; alloc: TalentAllocation; bar: (string | null)[] }[],
+    };
+    const root = document.createElement('div');
+    root.id = 'talents-window';
+    root.style.display = 'none';
+    document.body.appendChild(root);
+    const win = new TalentsWindow(
+      stubDeps({
+        root: () => root,
+        playerClass: () => 'warrior',
+        playerLevel: () => level.value,
+        currentAllocation: () => state.allocation,
+        activeLoadout: () => state.active,
+        loadouts: () => state.loadouts,
+        currentBar: () => [],
+        captureFocus: () => null,
+      }),
+    );
+    win.open();
+    root.querySelector<HTMLElement>('.tal-tab[data-tab="rows"]')?.click();
+    return { root, win, rows, state };
+  }
+
+  it('unlocks a newly reachable row when the player levels with the window open', () => {
+    const level = { value: 1 };
+    const { root, win, rows } = openRows(level);
+    const top = rows[rows.length - 1];
+    const rowOf = () =>
+      root.querySelector<HTMLButtonElement>(`.tal-row-opt[data-row-level="${top.level}"]`);
+    expect(rowOf()?.closest('.tal-row')?.classList.contains('locked')).toBe(true);
+    level.value = top.level;
+    win.refreshIfChanged();
+    expect(rowOf()?.closest('.tal-row')?.classList.contains('locked')).toBe(false);
+  });
+
+  it('shows a row pick, spec or loadout change made elsewhere (/talents, an authority echo)', () => {
+    const { root, win, rows, state } = openRows({ value: 60 });
+    const row = rows[0];
+    const option = row.options[0];
+    state.allocation = { spec: 'arms', rows: { [row.level]: option.id } };
+    win.refreshIfChanged();
+    expect(
+      root
+        .querySelector(`.tal-row-opt[data-row-level="${row.level}"][data-option-id="${option.id}"]`)
+        ?.getAttribute('aria-pressed'),
+    ).toBe('true');
+    state.loadouts = [{ name: 'Raid', alloc: state.allocation, bar: [] }];
+    state.active = 0;
+    win.refreshIfChanged();
+    expect(root.querySelector('.tal-loadout-name')?.textContent).toBe('Raid');
+  });
+
+  it('does no DOM work on a repeated identical poll, and latches on render and relocalize', () => {
+    const { root, win } = openRows({ value: 60 });
+    expect(mutationsDuring(root, () => win.refreshIfChanged())).toBe(0);
+    win.render();
+    expect(mutationsDuring(root, () => win.refreshIfChanged())).toBe(0);
+    expect(mutationsDuring(root, () => win.relocalize())).toBeGreaterThan(0);
+    expect(mutationsDuring(root, () => win.refreshIfChanged())).toBe(0);
+  });
+
+  it('keeps focus on the same row option across a poll rebuild', () => {
+    const level = { value: 60 };
+    const { root, win, rows } = openRows(level);
+    const option = rows[0].options[1] ?? rows[0].options[0];
+    const selector = `.tal-row-opt[data-row-level="${rows[0].level}"][data-option-id="${option.id}"]`;
+    const before = root.querySelector<HTMLButtonElement>(selector);
+    if (!before || before.disabled) throw new Error('fixture option must be enabled');
+    before.focus();
+    level.value = 59;
+    win.refreshIfChanged();
+    const after = root.querySelector<HTMLButtonElement>(selector);
+    expect(after).not.toBe(before);
+    expect(document.activeElement).toBe(after);
+  });
+
+  it('keeps the #tal-body scroll position across a poll rebuild', () => {
+    const level = { value: 1 };
+    const { root, win, rows } = openRows(level);
+    const before = root.querySelector<HTMLElement>('#tal-body');
+    if (!before) throw new Error('fixture needs #tal-body');
+    before.scrollTop = 80;
+    level.value = rows[rows.length - 1].level;
+    win.refreshIfChanged();
+    const after = root.querySelector<HTMLElement>('#tal-body');
+    expect(after).not.toBeNull();
+    expect(after).not.toBe(before);
+    expect(after?.scrollTop).toBe(80);
+  });
+
+  it('holds the poll while the loadout menu is open, then catches up once it closes', () => {
+    const level = { value: 1 };
+    const { root, win, rows } = openRows(level);
+    root.querySelector<HTMLButtonElement>('[data-act="loadout-menu"]')?.click();
+    expect(root.querySelector('.tal-loadout-menu')).not.toBeNull();
+    level.value = rows[rows.length - 1].level;
+    expect(mutationsDuring(root, () => win.refreshIfChanged())).toBe(0);
+    expect(root.querySelector('.tal-loadout-menu')).not.toBeNull();
+    root.querySelector<HTMLButtonElement>('[data-act="loadout-menu"]')?.click();
+    expect(root.querySelector('.tal-loadout-menu')).toBeNull();
+    win.refreshIfChanged();
+    expect(root.querySelectorAll('.tal-row.locked')).toHaveLength(0);
+  });
+});

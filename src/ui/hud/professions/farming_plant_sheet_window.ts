@@ -6,8 +6,9 @@
 // this module paints them and sends the one verb per mode. Cold: paints on
 // open, on a seed re-pick, on a deny for this bed, on a farmReady while in
 // harvest mode, and from the Hud-polled refreshIfChanged when the harvest
-// plot's status moved (paintedStatus is that one memo); no clock, no layout
-// read, no driver of its own.
+// plot's status moved (paintedStatus) or the plant view's data moved
+// (paintedPlantSig: a seed, compost or tonic bought, sold or unlocked under
+// an open sheet); no clock, no layout read, no driver of its own.
 //
 // THE SIM'S EVENTS ARE THE FEEDBACK: each control sends exactly once per
 // activation (pendingSend, mirrored onto aria-busy) and the sheet stays open.
@@ -99,6 +100,12 @@ export class PlantSheetWindow {
    *  poll compares the live plot against it. Cleared on close and fresh open,
    *  re-latched by every harvest paint (relocalize included). */
   private paintedStatus: FarmPlotStatus | null = null;
+  /** Plant mode's memo: the JSON of the plant view the body was last painted
+   *  from (seed rows and counts, locked rows, the selection, every knob's
+   *  affordability and legs). The refreshIfChanged poll rebuilds the view from
+   *  the same inputs and repaints only when it moved. Cleared on close and
+   *  fresh open, re-latched by every plant paint (relocalize included). */
+  private paintedPlantSig: string | null = null;
   /** Bumped on every fresh open and close. Each painted send control captures
    *  the value it was built under, so a detached control from an earlier open
    *  (another bed, or the same bed re-opened on a new planting) sends nothing. */
@@ -158,6 +165,7 @@ export class PlantSheetWindow {
     const plot = plots.find((row) => row.bedId === bedId);
     this.subject = this.mode === 'harvest' && plot ? harvestSubjectOf(plot) : null;
     this.paintedStatus = null;
+    this.paintedPlantSig = null;
     this.generation++;
     this.selectedCropId = null;
     this.choices = { compost: false, watch: false, tonic: false };
@@ -172,21 +180,29 @@ export class PlantSheetWindow {
     if (this.isOpen) this.paint();
   }
 
-  /** The cold poll for an OPEN HARVEST sheet (the Hud's slow band; plant mode
-   *  is untouched). Online, events and snapshots arrive in separate frames, so
-   *  a farmReady can repaint before the fplot delta that flips the plot and
-   *  leave the control stale; this catches the flip once the snapshot lands.
-   *  Compares the live plot against the last painted status: identical means
-   *  no DOM write; dead, out of reach, plot gone or replaced closes; a status
-   *  move on the same planting repaints once, keeping focus and the send arm. */
+  /** The cold poll for an OPEN sheet, either mode (the Hud's slow band).
+   *  Dead or out of reach closes. HARVEST: online, events and snapshots arrive
+   *  in separate frames, so a farmReady can repaint before the fplot delta that
+   *  flips the plot and leave the control stale; this catches the flip once
+   *  the snapshot lands. Compares the live plot against the last painted
+   *  status: identical means no DOM write; plot gone or replaced closes; a
+   *  status move on the same planting repaints once. PLANT: the bags can move
+   *  under an open sheet (compost bought from the farmer, a seed mailed in),
+   *  so the plant view is rebuilt from the same inputs paint() reads and
+   *  compared against the painted one; identical means no DOM write, a move
+   *  repaints once. Either repaint keeps focus, the send arm and the knob picks
+   *  (paint itself un-picks a knob that stopped being affordable). */
   refreshIfChanged(): void {
-    if (!this.isOpen || this.mode !== 'harvest' || this.bedId === null || !this.subject) return;
-    const world = this.deps.world();
-    if (world.player.dead || !this.bedInReach(this.bedId)) {
-      this.close();
+    if (!this.isOpen || this.bedId === null) return;
+    if (this.mode === 'plant') {
+      if (this.closeIfUnreachable(this.bedId)) return;
+      const view = this.buildPlantView(this.bedId);
+      // A null view (my plot landed in this bed) closes through paint().
+      if (view === null || JSON.stringify(view) !== this.paintedPlantSig) this.paint();
       return;
     }
-    const view = buildHarvestSheetView(this.bedId, world.myFarmPlots, this.subject);
+    if (!this.subject || this.closeIfUnreachable(this.bedId)) return;
+    const view = buildHarvestSheetView(this.bedId, this.deps.world().myFarmPlots, this.subject);
     if (view === null) {
       this.close();
       return;
@@ -216,6 +232,7 @@ export class PlantSheetWindow {
     this.bedId = null;
     this.subject = null;
     this.paintedStatus = null;
+    this.paintedPlantSig = null;
     this.generation++;
     this.setPendingSend(false);
     this.deps.restoreFocus(this.openerFocus);
@@ -259,15 +276,7 @@ export class PlantSheetWindow {
       this.paintHarvest(this.bedId);
       return;
     }
-    const world = this.deps.world();
-    const view = buildPlantSheetView({
-      bedId: this.bedId,
-      inventory: world.inventory,
-      myFarmPlots: world.myFarmPlots,
-      farmingSkill:
-        world.professionsState.skills.find((row) => row.professionId === 'farming')?.skill ?? 0,
-      selectedCropId: this.selectedCropId,
-    });
+    const view = this.buildPlantView(this.bedId);
     if (view === null) {
       // The bed became the caller's own plot under an open sheet (a repaint
       // racing a just-landed plant): nothing left to offer here.
@@ -275,6 +284,7 @@ export class PlantSheetWindow {
       return;
     }
     this.selectedCropId = view.selectedCropId;
+    this.paintedPlantSig = JSON.stringify(view);
     // A knob that stopped being affordable un-picks itself, so the choices
     // sent can never include a payment the sheet is showing as short.
     for (const knob of view.knobs) {
@@ -285,6 +295,29 @@ export class PlantSheetWindow {
       this.bodyHtml(view),
       this.plantFootHtml(view),
     );
+  }
+
+  /** The plant view over the LIVE world: the one builder paint() and the
+   *  refreshIfChanged poll share, so the poll's signature and the painted
+   *  body can never be read from different inputs. */
+  private buildPlantView(bedId: string): PlantSheetViewModel | null {
+    const world = this.deps.world();
+    return buildPlantSheetView({
+      bedId,
+      inventory: world.inventory,
+      myFarmPlots: world.myFarmPlots,
+      farmingSkill:
+        world.professionsState.skills.find((row) => row.professionId === 'farming')?.skill ?? 0,
+      selectedCropId: this.selectedCropId,
+    });
+  }
+
+  /** The poll's reach gate, shared by both modes: a dead player, or one who
+   *  walked out of the sim's own reach of this bed, closes the sheet. */
+  private closeIfUnreachable(bedId: string): boolean {
+    if (!this.deps.world().player.dead && this.bedInReach(bedId)) return false;
+    this.close();
+    return true;
   }
 
   /** Harvest mode: the frozen planting's produce, its authoritative status, and

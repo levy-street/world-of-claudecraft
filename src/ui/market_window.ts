@@ -33,6 +33,7 @@ import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement, dropdownClipBounds } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { captureFormDraft, restoreFormDraft } from './form_draft';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -80,6 +81,7 @@ import { localizedMarketSearch } from './market_search_localized_core';
 import { sweepEligibleRow } from './market_sweep_core';
 import { MarketSweepPanel } from './market_sweep_panel';
 import {
+  buildMarketSell,
   buildMarketView,
   COPPER_PER_GOLD,
   COPPER_PER_SILVER,
@@ -180,6 +182,16 @@ export class MarketWindow {
   // needs to land once the server's async echo catches up, via a narrow
   // DOM-only patch. See refreshSellPriceRef.
   private lastSellPriceRefSig = '';
+  // The Sell tab's live-stock signatures, the same narrow-patch doctrine as
+  // lastSellPriceRefSig. The staged stack's bag count moves under an open form
+  // (a listing escrowed some, loot or a mail added more), and so does the note's
+  // used/max listing count once the snapshot echoes a new listing. The shape sig
+  // (no data, pick-empty, or the form with or without its quantity row) forces a
+  // draft-preserving rebuild only when the form's STRUCTURE must change; the
+  // count and the note are patched in place so typed quantity and price survive.
+  private lastSellShapeSig = '';
+  private lastSellHave = 0;
+  private lastSellNoteSig = '';
   private openerFocus: HTMLElement | null = null;
   // Armed by onReconnected() and cleared by the next refreshIfChanged() that
   // actually observes a post-reconnect MarketInfo. onReconnected() fires
@@ -391,6 +403,7 @@ export class MarketWindow {
     this.resolvePendingReconnectResync(info);
     if (this.tab === 'sell') {
       this.refreshSellPriceRef(info);
+      this.refreshSellStock(info);
       return;
     }
     if (this.tab === 'browse') this.sweep.refresh(this.deps.root());
@@ -468,6 +481,97 @@ export class MarketWindow {
     const html = priceRef !== undefined ? this.sellPriceRefHtml(priceRef) : '';
     ref.innerHTML = html;
     status.innerHTML = html;
+  }
+
+  // The Sell tab's live stock and listing-cap patch, refreshSellPriceRef's
+  // sibling: renders only from state the client already mirrors (the bags and
+  // the market echo), never a new request. A structural change (the staged stack
+  // ran out, grew past one so the quantity row must appear, or the market data
+  // arrived after a no-data paint) rebuilds the body once with the typed fields
+  // carried across (form_draft); anything else patches the "of N" label, the
+  // quantity input's max (the typed value is left alone; the List click clamps
+  // to the live count), and the note's listing count in place.
+  private refreshSellStock(info: MarketInfo | null): void {
+    const body = this.deps.root().querySelector<HTMLElement>('#market-body');
+    if (!body) return;
+    const have = this.sellHaveNow();
+    const shape = this.sellShapeSig(info !== null, have);
+    if (shape !== this.lastSellShapeSig) {
+      const draft = captureFormDraft(body);
+      this.renderContent(); // re-stamps every Sell signature
+      restoreFormDraft(body, draft);
+      return;
+    }
+    if (!info) return;
+    const noteSig = this.sellNoteSig(info);
+    if (noteSig !== this.lastSellNoteSig) {
+      const note = body.querySelector<HTMLElement>('.mkt-note');
+      if (note) {
+        this.lastSellNoteSig = noteSig;
+        note.textContent = this.sellNoteText(info);
+      }
+    }
+    if (have !== this.lastSellHave) {
+      const qty = body.querySelector<HTMLInputElement>('#mkt-qty');
+      const of = body.querySelector<HTMLElement>('.mkt-qty-of');
+      if (!qty || !of) return; // single-copy form: no quantity row to patch
+      this.lastSellHave = have;
+      qty.max = String(have);
+      of.textContent = this.sellQuantityOfText(have);
+    }
+  }
+
+  // Latch the Sell body's structure as just painted, so the next poll's compare
+  // is against what is on screen (an explicit render never buys a second one).
+  private stampSellShape(): void {
+    this.lastSellShapeSig = this.sellShapeSig(
+      this.deps.world().marketInfo !== null,
+      this.sellHaveNow(),
+    );
+  }
+
+  // What the staged item's form can sell right now: an instanced staging is its
+  // one copy while the bags still hold it (by value: the online mirror rebuilds
+  // payload objects), a fungible one is the live bag count.
+  private sellHaveNow(): number {
+    const itemId = this.sellItemId;
+    if (!itemId) return 0;
+    if (!this.sellInstance) return this.fungibleBagCount(itemId);
+    const staged = JSON.stringify(this.sellInstance);
+    const held = this.deps
+      .world()
+      .inventory.some(
+        (slot) =>
+          slot?.itemId === itemId && slot.instance && JSON.stringify(slot.instance) === staged,
+      );
+    return held ? 1 : 0;
+  }
+
+  // The Sell body's structure, read through the same pure core renderSell paints
+  // from so the two cannot disagree on which state a stock count lands in.
+  private sellShapeSig(hasInfo: boolean, have: number): string {
+    if (!hasInfo) return 'no-data';
+    const view = buildMarketSell(this.sellItemId, have, this.sellInstance);
+    if (view.state !== 'form') return view.state;
+    return `form|${view.form.itemId}|${view.form.have > 1 ? 'qty' : 'one'}`;
+  }
+
+  private sellNoteSig(meta: MarketSellMeta): string {
+    return `${meta.cutPct}|${meta.myListingCount}|${meta.maxListings}`;
+  }
+
+  private sellNoteText(meta: MarketSellMeta): string {
+    return t('itemUi.market.sellNote', {
+      cut: formatNumber(meta.cutPct, { maximumFractionDigits: 0 }),
+      used: formatNumber(meta.myListingCount, { maximumFractionDigits: 0 }),
+      max: formatNumber(meta.maxListings, { maximumFractionDigits: 0 }),
+    });
+  }
+
+  private sellQuantityOfText(have: number): string {
+    return t('itemUi.market.quantityOf', {
+      count: formatNumber(have, { maximumFractionDigits: 0 }),
+    });
   }
 
   // The price-ref signature, shared by renderSell's initial stamp and
@@ -772,15 +876,12 @@ export class MarketWindow {
         rarity: this.rarityFilter,
       },
       sellItemId: this.sellItemId,
-      sellHave: this.sellItemId
-        ? this.sellInstance
-          ? 1
-          : this.fungibleBagCount(this.sellItemId)
-        : 0,
+      sellHave: this.sellHaveNow(),
       sellInstance: this.sellInstance,
     });
     if (view.kind === 'no-data') {
       body.innerHTML = `<div class="mkt-empty">${esc(t('itemUi.market.noMerchant'))}</div>`;
+      if (this.tab === 'sell') this.stampSellShape();
       return;
     }
     if (view.kind === 'browse') {
@@ -789,6 +890,9 @@ export class MarketWindow {
     }
     if (view.kind === 'sell') {
       this.renderSell(body, view.body, view.meta);
+      // Stamped AFTER the paint: the cannot-market branch clears the staged
+      // item, and the latch must describe the state the next poll will read.
+      this.stampSellShape();
       return;
     }
     if (view.kind === 'orders') {
@@ -1142,13 +1246,9 @@ export class MarketWindow {
   }
 
   private renderSell(body: HTMLElement, view: MarketSellBody, meta: MarketSellMeta): void {
-    body.innerHTML = `<div class="mkt-note">${esc(
-      t('itemUi.market.sellNote', {
-        cut: formatNumber(meta.cutPct, { maximumFractionDigits: 0 }),
-        used: formatNumber(meta.myListingCount, { maximumFractionDigits: 0 }),
-        max: formatNumber(meta.maxListings, { maximumFractionDigits: 0 }),
-      }),
-    )}</div>`;
+    body.innerHTML = `<div class="mkt-note">${esc(this.sellNoteText(meta))}</div>`;
+    this.lastSellNoteSig = this.sellNoteSig(meta);
+    this.lastSellHave = view.state === 'form' ? view.form.have : 0;
     if (view.state === 'pick-empty') {
       const pick = document.createElement('div');
       pick.className = 'mkt-sell-pick ui-card empty';
@@ -1208,7 +1308,7 @@ export class MarketWindow {
     form.className = 'mkt-price-form';
     const qtyRow =
       have > 1
-        ? `<div class="mkt-price-row"><label for="mkt-qty">${esc(t('itemUi.market.quantity'))}</label><input class="coininput ui-input" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag">${esc(t('itemUi.market.quantityOf', { count: formatNumber(have, { maximumFractionDigits: 0 }) }))}</span></div>`
+        ? `<div class="mkt-price-row"><label for="mkt-qty">${esc(t('itemUi.market.quantity'))}</label><input class="coininput ui-input" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag mkt-qty-of">${esc(this.sellQuantityOfText(have))}</span></div>`
         : '';
     form.innerHTML =
       qtyRow +
@@ -1223,12 +1323,14 @@ export class MarketWindow {
     listBtn.textContent = t('itemUi.market.listButton');
     listBtn.addEventListener('click', () => {
       const root = this.deps.root();
+      // Clamp to the LIVE count, not the one this closure captured at build:
+      // refreshSellStock patches the cap in place without rebuilding the form.
       const qty =
         have > 1
           ? Math.max(
               1,
               Math.min(
-                have,
+                this.sellHaveNow(),
                 parseInt((root.querySelector('#mkt-qty') as HTMLInputElement)?.value || '1', 10) ||
                   1,
               ),

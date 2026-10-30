@@ -1366,6 +1366,7 @@ export const pt_BR: EnTranslations = {
         "stackTerms": "O pagamento é feito agora. O tempo é adicionado ao final da sua assinatura atual, que depois será renovada neste plano.",
         "stackCapped": "Você pode acumular até 2 anos de assinatura de uma vez. Tente novamente quando a data de renovação estiver mais próxima.",
         "stackUnavailable": "Não é possível adicionar tempo de assinatura no momento. Tente novamente em breve.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Atualize seus dados de pagamento em Gerenciar assinatura antes de adicionar tempo de assinatura.",
         "renewsOn": "Renova em {date}",
         "endsOn": "A assinatura termina em {date}",

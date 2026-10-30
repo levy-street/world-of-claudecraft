@@ -1366,6 +1366,7 @@ export const id_ID: EnTranslations = {
         "stackTerms": "Dibayar sekarang. Waktunya ditambahkan setelah masa keanggotaanmu saat ini berakhir, lalu keanggotaan diperpanjang dengan paket ini.",
         "stackCapped": "Kamu dapat mengakumulasi hingga 2 tahun keanggotaan sekaligus. Coba lagi mendekati tanggal perpanjanganmu.",
         "stackUnavailable": "Penambahan waktu keanggotaan tidak tersedia saat ini. Coba lagi sebentar lagi.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Perbarui detail pembayaranmu di Kelola langganan sebelum menambahkan waktu keanggotaan.",
         "renewsOn": "Diperbarui pada {date}",
         "endsOn": "Keanggotaan berakhir pada {date}",

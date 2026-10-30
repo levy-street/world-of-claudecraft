@@ -21,6 +21,7 @@ import { SPEC_CARD_INFO } from './class_details_data';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, findFocusKey, restoreFirstEnabled, stampFocusKey } from './focus_restore';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
@@ -122,6 +123,10 @@ export class TalentsWindow {
   // The document-level dismiss handler while the loadout menu is open (cleared
   // on close, and on repaint because a re-render wipes the menu's DOM).
   private dismissLoadoutMenu: ((e: Event) => void) | null = null;
+  // The data digest the last paint drew from (see signature()). Latched by every
+  // paint, so the click repaints and the authority echo never buy a second
+  // rebuild on the next poll.
+  private lastSig = '';
 
   constructor(private readonly deps: TalentsWindowDeps) {
     window.addEventListener('resize', () => {
@@ -130,6 +135,10 @@ export class TalentsWindow {
       const body = root.querySelector<HTMLElement>('#tal-body');
       if (body) this.fitBodyToWindow(root, body);
     });
+  }
+
+  get isOpen(): boolean {
+    return this.deps.root().style.display === 'block';
   }
 
   open(): void {
@@ -148,8 +157,72 @@ export class TalentsWindow {
   }
 
   render(): void {
+    this.paint(false);
+  }
+
+  /**
+   * The slow-band poll (Hud.update): rebuild only when what the window draws
+   * from moved (a level-up unlocking a row, a spec / row / loadout change made
+   * through /talents, a late online authority echo). Skipped while the loadout
+   * menu is open, since a rebuild wipes it; lastSig stays put so the first poll
+   * after it closes catches up. A repeated identical poll touches no DOM.
+   */
+  refreshIfChanged(): void {
+    if (!this.isOpen) return;
+    if (this.dismissLoadoutMenu !== null) return;
+    if (this.signature() === this.lastSig) return;
+    // The wipe removes a hovered node, which never fires mouseleave.
+    this.deps.hideTooltip();
+    this.paint(true);
+  }
+
+  /** The language fan-out arm: the signature is text-independent, so force one
+   *  rebuild (keeping the player's place) and leave it re-latched. */
+  relocalize(): void {
+    if (this.isOpen) this.paint(true);
+  }
+
+  /** Ids, levels and names only (loadout names are player text, not locale). */
+  private signature(): string {
+    return JSON.stringify([
+      this.deps.playerClass(),
+      this.deps.playerLevel(),
+      this.deps.currentAllocation(),
+      this.deps.activeLoadout(),
+      this.deps.loadouts().map((loadout) => loadout.name),
+    ]);
+  }
+
+  /** `keepPlace` is the poll / relocalize rebuild: carry focus on the roving
+   *  controls and the body's scroll offset across the wipe. */
+  private paint(keepPlace: boolean): void {
     const root = this.deps.root();
     if (root.style.display !== 'block') return;
+    const focusKey = keepPlace ? captureFocusKey(root) : null;
+    const scroll = keepPlace ? (root.querySelector('#tal-body')?.scrollTop ?? 0) : 0;
+    this.drawWindow(root);
+    this.stampFocusKeys(root);
+    this.lastSig = this.signature();
+    if (!keepPlace) return;
+    const body = root.querySelector('#tal-body');
+    if (body) body.scrollTop = scroll;
+    if (focusKey !== null)
+      restoreFirstEnabled([findFocusKey(root, focusKey), findFocusKey(root, 'close')]);
+  }
+
+  /** Key the controls a player can stand on, so a poll rebuild finds them again. */
+  private stampFocusKeys(root: HTMLElement): void {
+    stampFocusKey(root, '[data-close]', 'close');
+    stampFocusKey(root, '[data-act="loadout-menu"]', 'loadout');
+    for (const tab of root.querySelectorAll<HTMLElement>('.tal-tab'))
+      tab.dataset.focusKey = `tab:${tab.dataset.tab ?? ''}`;
+    for (const action of root.querySelectorAll<HTMLElement>('.tal-foot-actions [data-menu-action]'))
+      action.dataset.focusKey = `foot:${action.dataset.menuAction ?? ''}`;
+    for (const option of root.querySelectorAll<HTMLElement>('.tal-row-opt'))
+      option.dataset.focusKey = `opt:${option.dataset.rowLevel}:${option.dataset.optionId}`;
+  }
+
+  private drawWindow(root: HTMLElement): void {
     // A repaint wipes the loadout menu's DOM; drop its document listener too.
     this.closeLoadoutMenu(root);
     markDialogRoot(root, { label: t('game.talents.title') });
@@ -287,6 +360,7 @@ export class TalentsWindow {
           index === (selectedIndex >= 0 ? selectedIndex : 0) ? '0' : '-1',
         );
         head.setAttribute('aria-label', `${specName}, ${roleLabel(spec.role)}`);
+        head.dataset.focusKey = `spec:${spec.id}`;
         head.addEventListener('keydown', (event) => {
           const keyEvent = event as KeyboardEvent;
           if (keyEvent.key === 'Enter' || keyEvent.key === ' ') {
@@ -305,6 +379,7 @@ export class TalentsWindow {
       // tooltip so a new player can read what each does before committing.
       for (const exEl of Array.from(panel.querySelectorAll<HTMLElement>('.ts-ex'))) {
         const id = exEl.dataset.ability ?? '';
+        exEl.dataset.focusKey = `ex:${spec.id}:${id}`;
         exEl.setAttribute('aria-label', signatureName(id));
         this.deps.attachTooltip(
           exEl,
@@ -318,6 +393,7 @@ export class TalentsWindow {
       viewBtn.type = 'button';
       viewBtn.className = `ts-view-talents ui-btn${entry.selected ? ' primary ui-btn--gold' : ''}${info?.examples.length ? ' has-ex' : ''}`;
       viewBtn.textContent = t('hudChrome.specPanel.viewTalents');
+      viewBtn.dataset.focusKey = `view:${spec.id}`;
       viewBtn.addEventListener('click', (event) => {
         event.stopPropagation();
         this.activateSpec(entry);

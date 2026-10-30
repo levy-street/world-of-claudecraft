@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending':
+    '결제가 대기 중입니다. 확인을 기다리고 있습니다.',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '{every}초마다 {cast}초 시전 후 {radius}야드 안의 모두에게 {min}~{max} 피해를 줍니다. 꿰뚫린 플레이어는 거리와 관계없이 {pinMult}배 피해를 받습니다.',
   'bossJournal.wildheart.zulgar.spearSummary':

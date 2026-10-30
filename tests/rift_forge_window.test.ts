@@ -283,6 +283,125 @@ describe('RiftForgeWindow', () => {
     expect(calls).toHaveLength(2);
   });
 
+  describe('refreshIfChanged (the Hud slow-band poll)', () => {
+    it('rebuilds when loot lands and essence or a gem count moves', () => {
+      win.open();
+      expect(text()).toContain('Rift Essence: 9');
+      inventory.push({ itemId: RIFT_ESSENCE_ITEM_ID, count: 4 });
+      win.refreshIfChanged();
+      expect(text()).toContain('Rift Essence: 13');
+      inventory.push({ itemId: RIFT_GEM_IDS[0], count: 1 });
+      win.refreshIfChanged();
+      const pick = root.querySelector<HTMLSelectElement>('[data-gem]');
+      expect([...(pick?.options ?? [])].map((o) => o.value)).toEqual([
+        RIFT_GEM_IDS[0],
+        RIFT_GEM_IDS[2],
+      ]);
+    });
+
+    it("rebuilds when a band's level or sockets move", () => {
+      win.open();
+      if (gear.instance.rift) gear.instance.rift.upgradeLevel = 3;
+      win.refreshIfChanged();
+      expect(text()).toContain('Rift upgrade 3/5');
+      gear.instance.rift?.gems.push(RIFT_GEM_IDS[1]);
+      win.refreshIfChanged();
+      expect(text()).toContain('Rift gems 1/2');
+    });
+
+    it('an unchanged repeat poll does not rebuild', () => {
+      win.open();
+      const card = root.querySelector('.rf-ring');
+      win.refreshIfChanged();
+      win.refreshIfChanged();
+      expect(root.querySelector('.rf-ring')).toBe(card);
+    });
+
+    it("keeps each row's picked gem and the focused control across the rebuild", () => {
+      inventory.push({ itemId: RIFT_GEM_IDS[0], count: 1 });
+      win.open();
+      const pick = () => root.querySelector<HTMLSelectElement>('[data-gem]');
+      (pick() as HTMLSelectElement).value = RIFT_GEM_IDS[2];
+      root.querySelector<HTMLButtonElement>('[data-socket]')?.focus();
+      inventory.push({ itemId: RIFT_ESSENCE_ITEM_ID, count: 1 });
+      win.refreshIfChanged();
+      expect(text()).toContain('Rift Essence: 10');
+      expect(pick()?.value).toBe(RIFT_GEM_IDS[2]);
+      expect(document.activeElement).toBe(root.querySelector('[data-socket]'));
+    });
+
+    it('carries the pick and focus to the SAME band when a new band shifts the rows', () => {
+      inventory.push({ itemId: RIFT_GEM_IDS[0], count: 1 });
+      win.open();
+      (root.querySelector('select[data-gem]') as HTMLSelectElement).value = RIFT_GEM_IDS[2];
+      root.querySelector<HTMLButtonElement>('[data-socket]')?.focus();
+      // A second band lands in the EARLIER bag slot: the original band's row
+      // index moves from 0 to 1, its bag slot does not.
+      inventory[0] = { itemId: gear.itemId, count: 1, instance: structuredClone(gear.instance) };
+      win.refreshIfChanged();
+      const picks = [...root.querySelectorAll<HTMLSelectElement>('select[data-gem]')];
+      expect(picks).toHaveLength(2);
+      expect(picks[0].value, 'the newcomer starts unpicked').toBe(RIFT_GEM_IDS[0]);
+      expect(picks[1].value, 'the pick followed its band').toBe(RIFT_GEM_IDS[2]);
+      expect(document.activeElement).toBe(root.querySelectorAll('[data-socket]')[1]);
+    });
+
+    it("keeps the band list's scroll offset across a poll rebuild", () => {
+      win.open();
+      const body = root.querySelector<HTMLElement>('.rf-body');
+      if (body) body.scrollTop = 120;
+      inventory.push({ itemId: RIFT_ESSENCE_ITEM_ID, count: 1 });
+      win.refreshIfChanged();
+      const rebuilt = root.querySelector<HTMLElement>('.rf-body');
+      expect(rebuilt, 'the poll must really rebuild the list').not.toBe(body);
+      expect(rebuilt?.scrollTop).toBe(120);
+    });
+
+    it('a reopen starts with no carried pick', () => {
+      inventory.push({ itemId: RIFT_GEM_IDS[0], count: 1 });
+      win.open();
+      (root.querySelector('select[data-gem]') as HTMLSelectElement).value = RIFT_GEM_IDS[2];
+      win.close();
+      win.open();
+      expect(root.querySelector<HTMLSelectElement>('select[data-gem]')?.value).toBe(
+        RIFT_GEM_IDS[0],
+      );
+    });
+
+    it('relocalize re-latches: the next unchanged poll does not rebuild', () => {
+      win.open();
+      win.relocalize();
+      const card = root.querySelector('.rf-ring');
+      win.refreshIfChanged();
+      expect(root.querySelector('.rf-ring')).toBe(card);
+    });
+
+    it('holds while a gem picker has focus or a click awaits its result', async () => {
+      win.open();
+      root.querySelector<HTMLSelectElement>('[data-gem]')?.focus();
+      inventory.push({ itemId: RIFT_ESSENCE_ITEM_ID, count: 1 });
+      win.refreshIfChanged();
+      expect(text()).toContain('Rift Essence: 9');
+      // The latch stayed unmoved: once the picker lets go, the poll catches up.
+      (document.activeElement as HTMLElement).blur();
+      win.refreshIfChanged();
+      expect(text()).toContain('Rift Essence: 10');
+
+      outcome = new Promise<boolean>(() => {}) as unknown as { ok: boolean };
+      root.querySelector<HTMLButtonElement>('[data-upgrade]')?.click();
+      await Promise.resolve();
+      inventory.push({ itemId: RIFT_ESSENCE_ITEM_ID, count: 1 });
+      win.refreshIfChanged();
+      expect(text()).toContain('Rift Essence: 10');
+    });
+
+    it('is inert while closed', () => {
+      inventory.push({ itemId: RIFT_ESSENCE_ITEM_ID, count: 1 });
+      win.refreshIfChanged();
+      expect(root.innerHTML).toBe('');
+    });
+  });
+
   it('close restores focus to the opener and is idempotent', () => {
     win.open();
     win.close();

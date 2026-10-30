@@ -23,12 +23,15 @@ function rig() {
   const keybinds = new Keybinds();
   const armed: (((code: string | null) => void) | null)[] = [];
   let depsReads = 0;
+  // What each action-bar slot holds (Hud.slotActionName's answer), so a test can
+  // drag an ability onto the bar under an open board.
+  const slotNames = new Map<string, string>();
   const traps: { root: () => HTMLElement; opener: HTMLElement; released: boolean[] }[] = [];
   const deps = (): KeyboardMapPaintDeps => {
     depsReads++;
     return {
       bindings: () => keybinds.snapshot(),
-      actionName: (id) => `name:${id}`,
+      actionName: (id) => slotNames.get(id) ?? `name:${id}`,
       actionCategory: () => 'Movement',
       categories: () => [{ id: 'Movement', label: 'Movement' }],
       layer: '',
@@ -62,7 +65,7 @@ function rig() {
     },
   });
   const root = () => document.querySelector<HTMLElement>('#keyboard-map-window');
-  return { win, root, ui, armed, traps, keybinds, depsReads: () => depsReads };
+  return { win, root, ui, armed, traps, keybinds, slotNames, depsReads: () => depsReads };
 }
 
 describe('KeyboardMapWindow', () => {
@@ -143,5 +146,150 @@ describe('KeyboardMapWindow', () => {
     r.win.relocalize();
     expect(r.depsReads()).toBe(reads + 2);
     expect(r.win.isOpen).toBe(true);
+  });
+});
+
+describe('KeyboardMapWindow: live refresh (the Hud slow-band poll)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  function mutationsDuring(root: HTMLElement, run: () => void): number {
+    const observer = new MutationObserver(() => undefined);
+    observer.observe(root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      characterData: true,
+    });
+    run();
+    const count = observer.takeRecords().length;
+    observer.disconnect();
+    return count;
+  }
+
+  /** The cap a slot action is bound to, and its painted action name. */
+  function slotCap(r: ReturnType<typeof rig>): { code: string; text: () => string | undefined } {
+    r.keybinds.bind('slot3', 0, 'KeyW');
+    return {
+      code: 'KeyW',
+      text: () =>
+        r.root()?.querySelector('[data-code="KeyW"] .kbm-action')?.textContent ?? undefined,
+    };
+  }
+
+  it('repaints a slot cap when an ability is dragged onto the bar while the pop-out is open', () => {
+    const r = rig();
+    const cap = slotCap(r);
+    r.win.open();
+    expect(cap.text()).toBe('name:slot3');
+    r.slotNames.set('slot3', 'Heroic Strike');
+    r.win.refreshIfChanged();
+    expect(cap.text()).toBe('Heroic Strike');
+  });
+
+  it('does no DOM work on a repeated identical poll, or after repaint() and relocalize()', () => {
+    const r = rig();
+    slotCap(r);
+    r.win.open();
+    const root = r.root();
+    if (!root) throw new Error('no window');
+    expect(mutationsDuring(root, () => r.win.refreshIfChanged())).toBe(0);
+    r.keybinds.bind('slot4', 0, 'KeyE');
+    r.win.repaint();
+    expect(mutationsDuring(root, () => r.win.refreshIfChanged())).toBe(0);
+    r.win.relocalize();
+    expect(mutationsDuring(root, () => r.win.refreshIfChanged())).toBe(0);
+  });
+
+  it('holds the poll while a key capture is armed, then catches up once it clears', () => {
+    const r = rig();
+    const cap = slotCap(r);
+    r.win.open();
+    r.root()?.querySelector<HTMLButtonElement>('[data-code="KeyW"]')?.click();
+    const capture = r.armed.at(-1);
+    expect(capture).toBeTruthy();
+    r.slotNames.set('slot3', 'Heroic Strike');
+    r.win.refreshIfChanged();
+    // The capture survived the poll and the cap still shows the old name.
+    expect(r.armed.at(-1)).toBe(capture);
+    expect(cap.text()).toBe('name:slot3');
+    // The player cancels (Escape fires the capture with null): the next poll catches up.
+    capture?.(null);
+    r.win.refreshIfChanged();
+    expect(cap.text()).toBe('Heroic Strike');
+  });
+
+  /** The first letter cap with nothing bound on it (the assign arm's target). */
+  function emptyLetterCap(r: ReturnType<typeof rig>): HTMLButtonElement {
+    const cap = [...(r.root()?.querySelectorAll<HTMLButtonElement>('.kbm-key[data-code]') ?? [])]
+      .filter((cell) => /^Key[A-Z]$/.test(cell.dataset.code ?? ''))
+      .find((cell) => !cell.disabled && cell.querySelector('.kbm-action') === null);
+    if (!cap) throw new Error('fixture needs an unbound letter cap');
+    return cap;
+  }
+
+  it('holds the poll while the assign row is shown (no capture armed), then catches up once it closes', () => {
+    const r = rig();
+    const cap = slotCap(r);
+    r.win.open();
+    const armedBefore = r.armed.length;
+    emptyLetterCap(r).click();
+    // The assign arm arms no capture: only the action row holds the board busy.
+    expect(r.armed).toHaveLength(armedBefore);
+    const actions = () => r.root()?.querySelector<HTMLElement>('.kbm-actions');
+    const row = actions();
+    expect(row?.hidden).toBe(false);
+    expect(row?.childElementCount).toBe(2);
+    r.slotNames.set('slot3', 'Heroic Strike');
+    r.win.refreshIfChanged();
+    // The poll held: the row is still up and the cap still shows the old name.
+    expect(actions()).toBe(row);
+    expect(actions()?.hidden).toBe(false);
+    expect(cap.text()).toBe('name:slot3');
+    // Cancel closes the row: the next poll shows the moved name.
+    const cancel = row?.querySelector<HTMLButtonElement>('button.btn');
+    expect(cancel?.textContent).toBe(t('hudChrome.actionBar.cancel'));
+    cancel?.click();
+    expect(actions()?.hidden).toBe(true);
+    r.win.refreshIfChanged();
+    expect(cap.text()).toBe('Heroic Strike');
+  });
+
+  it('picks up a bindings-only change (no slot name moved) on the poll', () => {
+    const r = rig();
+    r.win.open();
+    const free = emptyLetterCap(r);
+    const code = free.dataset.code ?? '';
+    const text = (c: string) =>
+      r.root()?.querySelector(`[data-code="${c}"] .kbm-action`)?.textContent ?? undefined;
+    expect(text('KeyW')).toBe('name:forward');
+    expect(text(code)).toBeUndefined();
+    // A rebind made elsewhere (the options panel): forward moves off W.
+    expect(r.keybinds.bind('forward', 0, code)).toBe(true);
+    r.win.refreshIfChanged();
+    expect(text(code)).toBe('name:forward');
+    expect(text('KeyW')).not.toBe('name:forward');
+  });
+
+  it('keeps focus on the focused cap across a poll repaint', () => {
+    const r = rig();
+    slotCap(r);
+    r.win.open();
+    r.root()?.querySelector<HTMLButtonElement>('[data-code="KeyA"]')?.focus();
+    r.slotNames.set('slot3', 'Heroic Strike');
+    r.win.refreshIfChanged();
+    expect(document.activeElement).toBe(r.root()?.querySelector('[data-code="KeyA"]'));
+  });
+
+  it('does nothing while closed', () => {
+    const r = rig();
+    slotCap(r);
+    r.win.open();
+    r.win.close();
+    const root = r.root();
+    if (!root) throw new Error('no window');
+    r.slotNames.set('slot3', 'Heroic Strike');
+    expect(mutationsDuring(root, () => r.win.refreshIfChanged())).toBe(0);
   });
 });
