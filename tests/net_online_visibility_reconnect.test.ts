@@ -25,6 +25,7 @@ class StubWebSocket {
   onopen: (() => void) | null = null;
   onmessage: ((ev: { data: unknown }) => void) | null = null;
   onclose: (() => void) | null = null;
+  onerror: (() => void) | null = null;
   readyState = StubWebSocket.OPEN;
   bufferedAmount = 0;
   sent: string[] = [];
@@ -139,6 +140,139 @@ function withDomStubs<T>(fn: (doc: FakeDocument, harness: TimerHarness) => T): T
 }
 
 describe('ClientWorld visibilitychange reconnect (mobile background/foreground)', () => {
+  it('keeps the latest transport usable through rapid replacements and stale callbacks', () => {
+    withDomStubs((doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const lost = vi.fn();
+      const ended = vi.fn();
+      world.onConnectionLost = lost;
+      world.onDisconnect = ended;
+      const first = StubWebSocket.instances[0];
+      first.onmessage?.({ data: JSON.stringify({ t: 'hello', pid: 1, seed: 42 }) });
+      const stale = [first.onopen, first.onmessage, first.onclose] as const;
+      first.readyState = StubWebSocket.CLOSING;
+      doc.setVisible(true);
+      harness.fire(harness.timers[0].id);
+      const second = StubWebSocket.instances[1];
+      const secondClosed = second.onclose;
+      // Browser errors have no application callback; the ensuing close drives retry.
+      expect(second.onerror).toBeNull();
+      second.onerror?.();
+      expect(harness.timers).toHaveLength(0);
+      second.readyState = StubWebSocket.CLOSED;
+      secondClosed?.();
+      secondClosed?.();
+      expect(harness.timers).toHaveLength(1);
+      harness.fire(harness.timers[0].id);
+      const latest = StubWebSocket.instances[2];
+      latest.onopen?.();
+      latest.onmessage?.({ data: JSON.stringify({ t: 'hello', pid: 3, seed: 42 }) });
+      const latestClose = latest.onclose;
+      stale[0]?.();
+      stale[1]?.({ data: JSON.stringify({ t: 'hello', pid: 999, seed: 42 }) });
+      stale[1]?.({ data: JSON.stringify({ t: 'error', error: 'not authenticated' }) });
+      first.onerror?.();
+      first.readyState = StubWebSocket.CLOSED;
+      stale[2]?.();
+      stale[2]?.();
+      expect(first.onopen).toBeNull();
+      expect(first.onmessage).toBeNull();
+      expect(first.onclose).toBeNull();
+      expect(latest.onclose).toBe(latestClose);
+      expect(world.playerId).toBe(3);
+      expect(world.connected).toBe(true);
+      expect(world.flushInput(1_000)).toBe(true);
+      expect(first.sent).toEqual([]);
+      expect(ended).not.toHaveBeenCalled();
+      expect(lost).toHaveBeenCalledTimes(2);
+      expect(harness.timers).toHaveLength(0);
+      expect(StubWebSocket.instances).toHaveLength(3);
+      world.close();
+      latest.onclose?.();
+      expect(latest.onopen).toBeNull();
+      expect(latest.onmessage).toBeNull();
+      expect(latest.onclose).toBeNull();
+      expect(harness.timers).toHaveLength(0);
+    });
+  });
+
+  it.each(['open', 'retrying'] as const)(
+    'ends an intentional logout without retry (%s)',
+    (phase) => {
+      withDomStubs((doc, harness) => {
+        const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+        const socket = StubWebSocket.instances[0];
+        socket.onmessage?.({ data: JSON.stringify({ t: 'hello', pid: 1, seed: 42 }) });
+        const closed = socket.onclose;
+        if (phase === 'retrying') {
+          socket.readyState = StubWebSocket.CLOSED;
+          closed?.();
+          expect(harness.timers).toHaveLength(1);
+        }
+        world.sendLogout();
+        expect(world.connected).toBe(false);
+        expect(world.flushInput(1_000)).toBe(false);
+        expect(socket.sent.filter((raw) => JSON.parse(raw).t === 'logout')).toHaveLength(
+          phase === 'open' ? 1 : 0,
+        );
+        socket.readyState = StubWebSocket.CLOSED;
+        closed?.();
+        doc.setVisible(true);
+        expect(harness.timers).toHaveLength(0);
+        expect(doc.listenerCount()).toBe(0);
+        expect(StubWebSocket.instances).toHaveLength(1);
+        expect(socket.onopen).toBeNull();
+        expect(socket.onmessage).toBeNull();
+        expect(socket.onclose).toBeNull();
+        world.close();
+      });
+    },
+  );
+
+  it.each(['connecting', 'connected'] as const)(
+    'ignores a retired socket close after its replacement is %s',
+    (phase) => {
+      withDomStubs((doc, harness) => {
+        const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+        const lost = vi.fn();
+        world.onConnectionLost = lost;
+        const first = StubWebSocket.instances[0];
+        first.onmessage?.({ data: JSON.stringify({ t: 'hello', pid: 1, seed: 42 }) });
+        expect(world.connected).toBe(true);
+
+        // Foreground recovery starts before the old close handshake finishes.
+        first.readyState = StubWebSocket.CLOSING;
+        doc.setVisible(true);
+        expect(harness.timers).toHaveLength(1);
+        harness.fire(harness.timers[0].id);
+        const second = StubWebSocket.instances[1];
+        second.readyState = StubWebSocket.CONNECTING;
+        if (phase === 'connected') {
+          second.readyState = StubWebSocket.OPEN;
+          second.onopen?.();
+          second.onmessage?.({ data: JSON.stringify({ t: 'hello', pid: 1, seed: 42 }) });
+        }
+
+        first.readyState = StubWebSocket.CLOSED;
+        first.onclose?.();
+        expect(harness.timers).toHaveLength(0);
+        expect(lost).toHaveBeenCalledTimes(1);
+        expect(world.connected).toBe(phase === 'connected');
+        expect(StubWebSocket.instances).toHaveLength(2);
+        if (phase === 'connected') expect(world.flushInput(1_000)).toBe(true);
+
+        // A genuine drop of the replacement still gets exactly one retry.
+        second.readyState = StubWebSocket.CLOSED;
+        second.onclose?.();
+        expect(harness.timers).toHaveLength(1);
+        expect(lost).toHaveBeenCalledTimes(2);
+        world.close();
+        expect(harness.timers).toHaveLength(0);
+        expect(doc.listenerCount()).toBe(0);
+      });
+    },
+  );
+
   it('keeps action bars read-only through spectate exit and reconnect until the owner snapshot', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
@@ -196,6 +330,28 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       expect(doc.listenerCount()).toBe(1);
       world.close();
+      expect(doc.listenerCount()).toBe(0);
+    });
+  });
+
+  it('ignores queued transport callbacks after close without restoring a session', () => {
+    withDomStubs((doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const socket = StubWebSocket.instances[0];
+      const opened = socket.onopen;
+      const received = socket.onmessage;
+      const closed = socket.onclose;
+      const ended = vi.fn();
+      world.onDisconnect = ended;
+      world.close();
+      opened?.();
+      received?.({ data: JSON.stringify({ t: 'hello', pid: 1, seed: 42 }) });
+      received?.({ data: JSON.stringify({ t: 'error', error: 'not authenticated' }) });
+      closed?.();
+      expect(world.connected).toBe(false);
+      expect(socket.sent).toEqual([]);
+      expect(ended).not.toHaveBeenCalled();
+      expect(harness.timers).toHaveLength(0);
       expect(doc.listenerCount()).toBe(0);
     });
   });

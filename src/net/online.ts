@@ -297,8 +297,9 @@ import { applyFerryWire, clientFerryView } from './transport_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { whoRosterFromFrame } from './who_frame_wire';
-import { buildWebSocketAuthMessage, buildWebSocketUrl } from './world_auth_message';
+import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
+import { openWorldSocket } from './world_socket';
 
 export { buildWebSocketAuthMessage, buildWebSocketUrl } from './world_auth_message';
 
@@ -1804,19 +1805,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   private openSocket(): void {
-    // when a realm was picked, connect to that realm's origin; otherwise the
-    // page's own host
-    const wsUrl = this.base
-      ? `${this.base.replace(/^http/, 'ws')}/ws`
-      : buildWebSocketUrl(location.protocol, location.host);
-    this.ws = new WebSocket(wsUrl);
-    this.ws.onopen = () => {
-      this.ws.send(
-        JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
-      );
-    };
-    this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
-    this.ws.onclose = () => this.socketClosed();
+    this.ws = openWorldSocket(
+      this.base,
+      JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
+      {
+        isCurrent: (socket) => !this.sessionEnded && this.ws === socket,
+        onMessage: (raw) => this.onMessage(raw),
+        onClose: () => this.socketClosed(),
+      },
+    );
   }
 
   // A dropped socket schedules a reconnect with exponential backoff: the
@@ -1878,6 +1875,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // sendLogout() calls it before the logout frame, so the final edit is not
     // lost to a deliberate logout within the debounce window.
     this.actionBarUploader.flush();
+    this.connected = false;
     this.sessionEnded = true;
     this.worldInteractionRequests?.reset();
     // RIFT_REGIONS (src/sim/colliders.ts) is a module-level registry keyed by
@@ -1904,7 +1902,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   close(): void {
     this.endSession();
-    this.ws.onclose = null;
     this.ws.close();
   }
   // Signal a deliberate logout to the server so it skips linkdead grace and
