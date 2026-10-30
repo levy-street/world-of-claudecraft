@@ -155,7 +155,6 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     seedWaves: 0,
     seeds: [],
     zoneTimer: T.zoneFirst,
-    zoneRuns: 0,
     zoneRun: null,
     zones: [],
     cinderTimer: T.cinderFirst,

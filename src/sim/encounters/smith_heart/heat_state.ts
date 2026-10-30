@@ -169,7 +169,6 @@ export interface HeatFightState {
   seedWaves: number;
   seeds: HeatSeed[];
   zoneTimer: number;
-  zoneRuns: number;
   zoneRun: HeatZoneRun | null;
   zones: HeatZone[];
   cinderTimer: number;

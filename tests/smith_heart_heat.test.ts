@@ -499,6 +499,18 @@ describe('Guardian of the Heat: phase 2', () => {
     }
   });
 
+  it('Wakefire always runs from the giant outward, run after run', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    for (let run = 0; run < 8; run++) {
+      f.dev('/dev heart heat zones');
+      expect(st.zoneRun?.order).toEqual([0, 1, 2]);
+    }
+  });
+
   it('Wakefire ignites its three bands one after another, striking only who stands in each', () => {
     const f = pulled(3);
     f.dev('/dev heart heat phase 2');
@@ -511,8 +523,7 @@ describe('Guardian of the Heat: phase 2', () => {
     if (!st) throw new Error('no fight');
     f.dev('/dev heart heat zones');
     const order = st.zoneRun?.order ?? [];
-    expect([...order].sort()).toEqual([0, 1, 2]);
-    expect(order[1]).toBe(1);
+    expect(order).toEqual([0, 1, 2]);
     const ev = f.tick(ticks(T.zoneWarn + 0.1));
     // Only the first band has ignited.
     const first = [p0, p1, p2][order[0]];

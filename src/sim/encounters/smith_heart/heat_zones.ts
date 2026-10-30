@@ -3,27 +3,19 @@
 // round the wellspring (near the guardian, the middle, the back), one after
 // another.
 //
-//   A run      every 34 s (first 16 s into phase 2): the bands in order from
-//              the guardian outward, or from the back inward (hashed run by
-//              run); each band warns 4 s (its ring builds on the floor), then
-//              ignites (a massive blow to everyone in it) and burns 2 s more.
+//   A run      every 34 s (first 16 s into phase 2): the bands always in order
+//              from the guardian outward (melee, casters, the far shore); each
+//              band warns 4 s (its ring builds on the floor), then ignites (a
+//              massive blow to everyone in it) and burns 2 s more.
 //              The next band begins its warning 2.5 s after the last began,
 //              so the raid steps into the band that has just burned.
 //
-// Deterministic: the order is hashed; the only rng draws are the damage
-// rolls, in player order.
+// Deterministic: the only rng draws are the damage rolls, in player order.
 
 import { HEARTH_WELL } from '../../content/smith_heart_layout';
 import { DT, type Entity } from '../../types';
 import { inBand } from './heat_geometry';
-import {
-  HEAT_CUES,
-  HEAT_NAMES,
-  heatHash,
-  HEAT_TUNING as T,
-  ZONE_BANDS,
-  zoneTemplate,
-} from './heat_ids';
+import { HEAT_CUES, HEAT_NAMES, HEAT_TUNING as T, ZONE_BANDS, zoneTemplate } from './heat_ids';
 import {
   at,
   cueAt,
@@ -38,17 +30,14 @@ import {
 import type { HeatZone } from './heat_state';
 import { heatSay } from './heat_voice';
 
-/** The order of run `run`: outward or inward. */
-export function zoneOrder(run: number): number[] {
-  return heatHash(run, 13) % 2 === 0 ? [0, 1, 2] : [2, 1, 0];
-}
+/** Every run's order: from the guardian outward. */
+const ZONE_ORDER: readonly number[] = [0, 1, 2];
 
 /** Begin a Wakefire run now. Exported for the dev trigger. */
 export function startZones(s: HeatScope): void {
   const st = s.st;
   st.zoneTimer = T.zoneEvery;
-  st.zoneRun = { order: zoneOrder(st.zoneRuns), next: 0, stepIn: 0 };
-  st.zoneRuns++;
+  st.zoneRun = { order: [...ZONE_ORDER], next: 0, stepIn: 0 };
   raidWarn(s, s.boss, 'zones', 'Wakefire! The Hearth ignites band by band: step out!');
   heatSay(s, s.boss, 'zones');
 }
