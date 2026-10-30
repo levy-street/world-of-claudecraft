@@ -64,11 +64,17 @@ export interface QuenchBlade {
   home: number;
   x: number;
   z: number;
+  /** Its distance along the loop round the lake (quench_geometry.ts routePoint). */
+  s: number;
+  /** When it last struck each player, by entity id (the fight's clock). */
+  struck: Record<number, number>;
 }
 
 /** An echo's footprint waiting at a blade. */
 export interface QuenchEcho {
   objectId: number;
+  /** The blade it fires from (index into the fight's blades). */
+  blade: number;
   kind: QuenchEchoKind;
   x: number;
   z: number;
@@ -103,6 +109,8 @@ export interface QuenchFightState {
   finished: boolean;
   /** Seconds since the pull. */
   clock: number;
+  /** A dev switch: the blades hold still (`/dev heart quench wander off`). */
+  wanderOff: boolean;
   /** The fight's half: the Lake, the blades waking, the Echoes. */
   half: 'lake' | 'wake' | 'echoes';
   bar: QuenchBar | null;

@@ -1,6 +1,7 @@
 // The Smith's four blades of ice under the Guardian of the Quench (docs/
 // design/raid/smith_heart.md section 7.3).
 //
+//   Wandering     from the awakening they glide round the lake (quench_wander.ts).
 //   Sunk          four great swords sunk point first round the lake (claim
 //                 objects, round combat walls): scenery through phase 1.
 //   The blades wake at half health: the guardian raises its arms (a 4 s bar,
@@ -37,6 +38,7 @@ import {
   inEchoReach,
   laneHoleSpots,
   type QPoint,
+  routeStart,
   segmentDistance,
   shelteredByBlade,
 } from './quench_geometry';
@@ -74,6 +76,7 @@ import {
 } from './quench_scope';
 import type { QuenchBlade, QuenchFightState } from './quench_state';
 import { quenchSay } from './quench_voice';
+import { stepWander } from './quench_wander';
 
 /** A blade's wall stands as long as the claim (it never runs out). */
 const BLADE_WALL_LIFE = 1e9;
@@ -121,7 +124,8 @@ export function syncQuenchWalls(ctx: SimContext, inst: InstanceSlot): void {
  *  engine wall state with it. */
 function setBladeObject(e: Entity, state: QuenchBladeState): void {
   e.templateId = bladeTemplate(state);
-  if (state === 'fly') e.kitObject = undefined;
+  // Awake it moves, so it stands as no wall (a crossing's flight, the gliding).
+  if (state === 'fly' || state === 'float') e.kitObject = undefined;
   else e.kitObject ??= { kind: 'wall', remaining: BLADE_WALL_LIFE };
 }
 
@@ -131,7 +135,8 @@ function setBladeObject(e: Entity, state: QuenchBladeState): void {
 export function ensureBladeWalls(ctx: SimContext, inst: InstanceSlot): boolean {
   let fresh = false;
   claimBlades(ctx, inst).forEach((e, i) => {
-    if (!e || e.kitObject || bladeStateOf(e.templateId) === 'fly') return;
+    const state = e ? bladeStateOf(e.templateId) : null;
+    if (!e || e.kitObject || state === 'fly' || state === 'float') return;
     e.kitObject = { kind: 'wall', remaining: BLADE_WALL_LIFE };
     // Faced as its home is (as a reset sinks it), from the claim's first tick.
     e.facing = QUENCH_BLADE_SPOTS[i].rot;
@@ -147,7 +152,7 @@ export function bladesAtHome(ctx: SimContext, inst: InstanceSlot): QuenchBlade[]
   claimBlades(ctx, inst).forEach((e, i) => {
     if (!e) return;
     const sp = QUENCH_BLADE_SPOTS[i];
-    out.push({ objectId: e.id, home: i, x: sp.x, z: sp.z });
+    out.push({ objectId: e.id, home: i, x: sp.x, z: sp.z, s: routeStart(i), struck: {} });
   });
   return out;
 }
@@ -171,7 +176,7 @@ export function sinkBlades(ctx: SimContext, inst: InstanceSlot): void {
 }
 
 /** The blades' places now (the ones not in flight). */
-function standing(s: QuenchScope): QPoint[] {
+function standing(s: QuenchScope): QuenchBlade[] {
   const d = s.st.dance;
   return s.st.blades.filter((_, i) => !(d && d.phase === 'fly' && (i === d.a || i === d.b)));
 }
@@ -269,6 +274,7 @@ export function spawnEchoes(
     e.facing = facing;
     s.st.echoes.push({
       objectId: e.id,
+      blade: s.st.blades.indexOf(b),
       kind,
       x: b.x,
       z: b.z,
@@ -345,6 +351,18 @@ export function landEcho(s: QuenchScope, echo: QuenchFightState['echoes'][number
   return hit;
 }
 
+/** A waiting echo stays with its blade (not one in flight), footprint and all. */
+function followBlade(s: QuenchScope, ec: QuenchFightState['echoes'][number]): void {
+  const d = s.st.dance;
+  if (d && d.phase === 'fly' && (ec.blade === d.a || ec.blade === d.b)) return;
+  const b = s.st.blades[ec.blade];
+  if (!b) return;
+  ec.x = b.x;
+  ec.z = b.z;
+  const e = s.ctx.entities.get(ec.objectId);
+  if (e) moveFightObject(s.ctx, s.inst, e, b.x, b.z);
+}
+
 function stepEchoes(s: QuenchScope): void {
   const st = s.st;
   if (st.echoes.length === 0) return;
@@ -356,6 +374,7 @@ function stepEchoes(s: QuenchScope): void {
       else keep.push(ec);
       continue;
     }
+    followBlade(s, ec);
     ec.remaining -= DT;
     if (ec.remaining > 1e-9) {
       keep.push(ec);
@@ -501,6 +520,9 @@ function stepDance(s: QuenchScope): void {
     A.z = d.to.z;
     B.x = d.from.x;
     B.z = d.from.z;
+    const onLoop = A.s;
+    A.s = B.s;
+    B.s = onLoop;
     for (const e of [ea, eb]) {
       if (!e) continue;
       setBladeObject(e, 'float');
@@ -522,6 +544,7 @@ function stepDance(s: QuenchScope): void {
 /** One tick of the blades: their facing, the echoes, the crossing. */
 export function stepBlades(s: QuenchScope): void {
   stepBladeFacing(s);
+  stepWander(s);
   stepEchoes(s);
   stepDance(s);
 }

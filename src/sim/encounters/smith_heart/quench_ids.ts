@@ -146,14 +146,37 @@ export interface QuenchDifficultyRules {
   /** The blades cross the lake in pairs (phase 2). */
   dance: boolean;
   echoRule: QuenchEchoRule;
+  /** How fast the blades glide round the lake in phase 2 (yards a second). */
+  wanderSpeed: number;
 }
 
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
-  normal: { damageMult: 1, splashR: 6, splashCold: 25, dance: false, echoRule: 'copy' },
+  normal: {
+    damageMult: 1,
+    splashR: 6,
+    splashCold: 25,
+    dance: false,
+    echoRule: 'copy',
+    wanderSpeed: 1.5,
+  },
   // Contagious cold: a shatter splashes further and harder.
-  heroic: { damageMult: 1.25, splashR: 10, splashCold: 45, dance: true, echoRule: 'copy' },
-  // Exactly heroic for now: the seam for one later mythic-only mechanic.
-  mythic: { damageMult: 1.25, splashR: 10, splashCold: 45, dance: true, echoRule: 'copy' },
+  heroic: {
+    damageMult: 1.25,
+    splashR: 10,
+    splashCold: 45,
+    dance: true,
+    echoRule: 'copy',
+    wanderSpeed: 1.5,
+  },
+  // Heroic with faster blades: the seam for one later mythic-only mechanic.
+  mythic: {
+    damageMult: 1.25,
+    splashR: 10,
+    splashCold: 45,
+    dance: true,
+    echoRule: 'copy',
+    wanderSpeed: 3.5,
+  },
 };
 
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
@@ -252,6 +275,18 @@ export const QUENCH_TUNING = {
   danceWarn: 3,
   danceFly: 1.2,
   laneHalf: 2.5,
+  // Phase 2: a gliding blade's touch (reach, damage, cold, throw, a player's
+  // seconds before it can strike them again), and the thin ice behind it.
+  wanderHitR: 2.5,
+  wanderMin: 120,
+  wanderMax: 150,
+  wanderCold: 10,
+  wanderKnock: 7,
+  wanderHitGap: 3,
+  thinIceLen: 12,
+  thinIceR: 3,
+  /** The pale line a blade draws ahead of itself on the floor (yards). */
+  frostLineLen: 10,
   crossMin: 300,
   crossMax: 350,
   laneCrack: 2,

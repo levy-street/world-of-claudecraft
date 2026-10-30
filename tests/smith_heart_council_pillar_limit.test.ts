@@ -68,10 +68,10 @@ function land(f: CouncilFight): SimEvent[] {
 }
 
 describe('Hammer Council: Narrow Shelter', () => {
-  it('the limits: Normal none, Heroic 4, Mythic 2', () => {
+  it('the limits: Normal none, Heroic 4, Mythic 3', () => {
     expect(COUNCIL_DIFFICULTY.normal.pillarLimit).toBeNull();
     expect(COUNCIL_DIFFICULTY.heroic.pillarLimit).toBe(4);
-    expect(COUNCIL_DIFFICULTY.mythic.pillarLimit).toBe(2);
+    expect(COUNCIL_DIFFICULTY.mythic.pillarLimit).toBe(3);
   });
 
   it('normal: any number hide behind one pillar', () => {
@@ -104,15 +104,15 @@ describe('Hammer Council: Narrow Shelter', () => {
     ).toBeGreaterThan(0);
   });
 
-  it('mythic: two are safe, a third is not', () => {
-    const safe = pulled(2, 'mythic');
-    const two = hide(safe, 2);
+  it('mythic: three are safe, a fourth is not', () => {
+    const safe = pulled(3, 'mythic');
+    const three = hide(safe, 3);
     const evSafe = land(safe);
-    for (const p of two) expect(wrathOn(evSafe, p)).toEqual([]);
-    const f = pulled(3, 'mythic');
-    const three = hide(f, 3);
+    for (const p of three) expect(wrathOn(evSafe, p)).toEqual([]);
+    const f = pulled(4, 'mythic');
+    const four = hide(f, 4);
     const ev = land(f);
-    for (const p of three) expect(wrathOn(ev, p).length).toBe(1);
+    for (const p of four) expect(wrathOn(ev, p).length).toBe(1);
   });
 
   it('the caster wears the limit through the bar, and only then', () => {

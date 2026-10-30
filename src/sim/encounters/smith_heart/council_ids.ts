@@ -281,7 +281,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     rockOutlivesSlabwright: true,
     soulInTheStone: true,
     slabwrightShoulders: true,
-    pillarLimit: 2,
+    pillarLimit: 3,
   },
 };
 

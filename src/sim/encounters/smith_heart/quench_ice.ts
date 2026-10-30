@@ -32,6 +32,7 @@ import {
   huddlesOf,
   insideRimewall,
   onLakeIce,
+  onThinIce,
   type QBody,
   type QHole,
 } from './quench_geometry';
@@ -105,7 +106,9 @@ function stepStrain(s: QuenchScope): void {
       }
     }
     if (best >= 0) {
-      if (!st.strain[best].loaded) st.strain[best].t += DT;
+      // The thin ice a gliding blade leaves strains twice as fast.
+      const thin = st.half === 'echoes' && onThinIce(st.blades, h.x, h.z);
+      if (!st.strain[best].loaded) st.strain[best].t += thin ? DT * 2 : DT;
       st.strain[best].loaded = true;
     } else st.strain.push({ x: h.x, z: h.z, t: DT, loaded: true });
   }

@@ -42,6 +42,12 @@ import { sfx } from '../../game/sfx';
 import { QuenchAudio } from '../../game/smith_heart_quench_audio';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
+  type QPoint,
+  routePoint,
+  routeProject,
+} from '../../sim/encounters/smith_heart/quench_geometry';
+import {
+  bladeStateOf,
   crackOf,
   echoOf,
   laneOf,
@@ -316,6 +322,9 @@ function slotFor<S extends { id: number }>(pool: S[], id: number): S | null {
   return null;
 }
 
+const _here: QPoint = { x: 0, z: 0 };
+const _there: QPoint = { x: 0, z: 0 };
+
 export class QuenchFightFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -332,6 +341,11 @@ export class QuenchFightFx {
   private readonly echoFans: FanSlot[] = [];
   private readonly splashFans: FanSlot[] = [];
   private readonly lane: TelegraphLane;
+  /** The wandering blades' floor: the loop ahead of each and the thin ice behind. */
+  private readonly aheadLanes: TelegraphLane[] = [];
+  private readonly thinLanes: TelegraphLane[] = [];
+  private readonly bladeIds: number[] = [];
+  private routeAt = 0;
   private laneId = -1;
   private laneBorn = 0;
   private laneTemplate = '';
@@ -415,6 +429,14 @@ export class QuenchFightFx {
       });
     fans(P.frozen, 10, this.splashFans, 360, C.danger);
     this.lane = this.kit.lane(11);
+    for (let i = 0; i < 4; i++) {
+      const ahead = this.kit.lane(9);
+      ahead.group.visible = false;
+      this.aheadLanes.push(ahead);
+      const thin = this.kit.lane(7);
+      thin.group.visible = false;
+      this.thinLanes.push(thin);
+    }
 
     // ---- the instanced floor discs ----
     const disc = new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2);
@@ -815,10 +837,12 @@ export class QuenchFightFx {
       this.laneId = -1;
       this.lane.group.visible = false;
     }
+    this.bladeIds.length = 0;
     for (const id of live) {
       const e = world.entities.get(id);
       if (!e) continue;
       const kind = quenchObjectKind(e.templateId);
+      if (kind === 'blade' && bladeStateOf(e.templateId) === 'float') this.bladeIds.push(id);
       if (kind === 'crack' || kind === 'echo') {
         const pool = kind === 'crack' ? this.crackFans : this.echoFans;
         const slot = slotFor(pool, id);
@@ -977,6 +1001,7 @@ export class QuenchFightFx {
         this.kit.paintFan(s.fan, { fill, clock: this.clock, range: shape.range });
       }
     }
+    this.paintRoutes(world);
     // Heroic's crossing lane.
     const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
     const lof = lane ? laneOf(lane.templateId) : null;
@@ -999,6 +1024,61 @@ export class QuenchFightFx {
       this.kit.paintLane(this.lane, { fill, clock: this.clock, range: half * 2 });
       this.lane.group.visible = true;
     } else this.lane.group.visible = false;
+  }
+
+  /** The wandering blades' floor, on every tier (where a blade goes next and where
+   *  the ice is thin are actionable): a tenth of a second is plenty for a walk this
+   *  slow, the blade itself glides every frame. */
+  private paintRoutes(world: IWorld): void {
+    if (this.clock < this.routeAt) return;
+    this.routeAt = this.clock + 0.1;
+    const o = this.origin;
+    for (let i = 0; i < this.aheadLanes.length; i++) {
+      const e = i < this.bladeIds.length ? world.entities.get(this.bladeIds[i]) : undefined;
+      const ahead = this.aheadLanes[i];
+      const thin = this.thinLanes[i];
+      if (!e || !o) {
+        ahead.group.visible = false;
+        thin.group.visible = false;
+        continue;
+      }
+      _here.x = e.pos.x - o.x;
+      _here.z = e.pos.z - o.z;
+      const s = routeProject(_here);
+      routePoint(s + T.frostLineLen, _there);
+      this.drapeRoute(ahead, o, _here, _there, T.wanderHitR, C.accent, 0.35);
+      routePoint(s - T.thinIceLen, _there);
+      this.drapeRoute(thin, o, _here, _there, T.thinIceR, C.accent, 0.12);
+    }
+  }
+
+  private drapeRoute(
+    lane: TelegraphLane,
+    o: { x: number; z: number },
+    from: QPoint,
+    to: QPoint,
+    half: number,
+    color: number,
+    fill: number,
+  ): void {
+    const ax = o.x + from.x;
+    const az = o.z + from.z;
+    const dx = to.x - from.x;
+    const dz = to.z - from.z;
+    const length = Math.hypot(dx, dz);
+    this.kit.drapeLane(
+      lane,
+      this.groundY,
+      ax,
+      this.groundY(ax, az),
+      az,
+      Math.atan2(dx, dz),
+      length,
+      half,
+      { color, accent: color },
+    );
+    this.kit.paintLane(lane, { fill, clock: this.clock, range: length, front: 0 });
+    lane.group.visible = true;
   }
 
   // ---- the bodies: cold, warmth, the freeze, the water ----------------------------------

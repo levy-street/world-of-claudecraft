@@ -252,6 +252,79 @@ export function shelteredByBlade(
   return false;
 }
 
+// ---- the blades' loop -----------------------------------------------------------------
+
+/** The loop's corners (the blades' homes, in order) and the distance along it at
+ *  each. */
+const ROUTE_AT: readonly number[] = (() => {
+  const at = [0];
+  for (let i = 0; i < QUENCH_BLADE_SPOTS.length; i++) {
+    const a = QUENCH_BLADE_SPOTS[i];
+    const b = QUENCH_BLADE_SPOTS[(i + 1) % QUENCH_BLADE_SPOTS.length];
+    at.push(at[i] + Math.hypot(b.x - a.x, b.z - a.z));
+  }
+  return at;
+})();
+
+/** The loop's length (yards). */
+export function routeLength(): number {
+  return ROUTE_AT[QUENCH_BLADE_SPOTS.length];
+}
+
+/** Where blade `home` starts on the loop. */
+export function routeStart(home: number): number {
+  return ROUTE_AT[home];
+}
+
+/** The loop's point `s` yards along it (any `s`: it wraps). Fills `out` when given,
+ *  so a painter allocates nothing. */
+export function routePoint(s: number, out: QPoint = { x: 0, z: 0 }): QPoint {
+  const L = routeLength();
+  const w = ((s % L) + L) % L;
+  let i = 0;
+  while (i < QUENCH_BLADE_SPOTS.length - 1 && w >= ROUTE_AT[i + 1]) i++;
+  const a = QUENCH_BLADE_SPOTS[i];
+  const b = QUENCH_BLADE_SPOTS[(i + 1) % QUENCH_BLADE_SPOTS.length];
+  const k = (w - ROUTE_AT[i]) / Math.max(1e-6, ROUTE_AT[i + 1] - ROUTE_AT[i]);
+  out.x = a.x + (b.x - a.x) * k;
+  out.z = a.z + (b.z - a.z) * k;
+  return out;
+}
+
+/** The distance along the loop of its point nearest `p` (the painter reads a
+ *  blade's place on the loop from its mirrored position). */
+export function routeProject(p: QPoint): number {
+  let best = 0;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < QUENCH_BLADE_SPOTS.length; i++) {
+    const a = QUENCH_BLADE_SPOTS[i];
+    const b = QUENCH_BLADE_SPOTS[(i + 1) % QUENCH_BLADE_SPOTS.length];
+    const dx = b.x - a.x;
+    const dz = b.z - a.z;
+    const len2 = Math.max(1e-6, dx * dx + dz * dz);
+    const k = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / len2));
+    const d = Math.hypot(a.x + dx * k - p.x, a.z + dz * k - p.z);
+    if (d < bestD) {
+      bestD = d;
+      best = ROUTE_AT[i] + k * Math.sqrt(len2);
+    }
+  }
+  return best;
+}
+
+/** Is (x, z) on the thin ice a blade leaves: within `thinIceR` of the loop's
+ *  `thinIceLen` yards behind it? */
+export function onThinIce(blades: readonly { s: number }[], x: number, z: number): boolean {
+  const p: QPoint = { x: 0, z: 0 };
+  for (const b of blades) {
+    for (let back = 0; back <= T.thinIceLen; back += T.thinIceR) {
+      routePoint(b.s - back, p);
+      if (Math.hypot(p.x - x, p.z - z) <= T.thinIceR) return true;
+    }
+  }
+  return false;
+}
+
 // ---- heroic: the crossing -------------------------------------------------------------
 
 /** The pairs of blades that may cross (by index), in the order they are

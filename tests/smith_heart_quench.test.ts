@@ -341,7 +341,8 @@ describe('Guardian of the Quench: the blades and their echoes', () => {
     for (const e of f.objects(QUENCH_OBJECTS.bladePrefix)) {
       expect(bladeStateOf(e.templateId)).toBe('float');
       expect(e.kind).toBe('object');
-      expect(e.kitObject?.kind).toBe('wall');
+      // Awake it glides, so it stands as no wall.
+      expect(e.kitObject).toBeUndefined();
     }
   });
 
@@ -416,6 +417,7 @@ describe('Guardian of the Quench: the blades and their echoes', () => {
   it('behind a blade, on the side away from the attack, is always safe', () => {
     const f = pulled(5);
     awake(f);
+    f.dev('/dev heart quench wander off');
     f.dev('/dev heart quench breath');
     const facing = f.state()?.bar?.facing ?? 0;
     const blade = blades(f)[1];
@@ -482,6 +484,7 @@ describe('Guardian of the Quench: the blades and their echoes', () => {
     // is struck by its echo; one in that blade's lee is not.
     const f = pulled(5);
     awake(f);
+    f.dev('/dev heart quench wander off');
     f.dev('/dev heart quench breath');
     const facing = f.state()?.bar?.facing ?? Number.NaN;
     const blade = blades(f)[0];
@@ -509,6 +512,7 @@ describe('Guardian of the Quench: heroic, the crossing', () => {
     const f = pulled(5);
     f.dev('/dev heart quench heroic');
     awake(f);
+    f.dev('/dev heart quench wander off');
     const before = blades(f);
     f.dev('/dev heart quench dance');
     const st = f.state();
@@ -559,6 +563,7 @@ describe('Guardian of the Quench: heroic, the crossing', () => {
     const f = pulled(5);
     f.dev('/dev heart quench heroic');
     awake(f);
+    f.dev('/dev heart quench wander off');
     const before = blades(f);
     f.dev('/dev heart quench dance');
     const st = f.state();
@@ -585,12 +590,16 @@ describe('Guardian of the Quench: heroic, the crossing', () => {
     expect(dist(f.local(ea), before[ib])).toBeLessThan(0.01);
   });
 
-  it('never crosses on normal; mythic is heroic whole behind its own switch', () => {
+  it('never crosses on normal; mythic is heroic with faster blades, behind its own switch', () => {
     const f = pulled(2);
     awake(f);
     f.tick(ticks(T.danceFirst + T.danceEvery + 2));
     expect(f.state()?.dances).toBe(0);
-    expect(QUENCH_DIFFICULTY.mythic).toEqual(QUENCH_DIFFICULTY.heroic);
+    // Heroic whole, but for the blades' speed.
+    expect({
+      ...QUENCH_DIFFICULTY.mythic,
+      wanderSpeed: QUENCH_DIFFICULTY.heroic.wanderSpeed,
+    }).toEqual(QUENCH_DIFFICULTY.heroic);
     f.dev('/dev heart quench mythic');
     expect(f.state()?.difficulty).toBe('mythic');
     f.dev('/dev heart quench mythic off');

@@ -156,6 +156,7 @@ function freshState(
     echoes: [],
     deepenTimer: T.deepenEvery,
     deepenStacks: 0,
+    wanderOff: false,
     danceTimer: T.danceFirst,
     dances: 0,
     lastPair: -1,
@@ -440,6 +441,10 @@ export function quenchDevTrigger(
     s.boss.castingAbility = null;
     startBreath(s);
     return 'Quenching Breath, and every blade echoes it.';
+  }
+  if (verb === 'wander') {
+    s.st.wanderOff = arg === 'off';
+    return s.st.wanderOff ? 'The blades hold still.' : 'The blades glide.';
   }
   if (verb === 'dance' || verb === 'cross') {
     if (s.st.half !== 'echoes') wakeNow(s);
