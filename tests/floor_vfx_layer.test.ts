@@ -412,6 +412,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // FINAL_KIT_FLOOR, pinned untied in tests/smith_heart_final_kit_fx.test.ts);
   // its whirls, orbs, ice, shells and anvil are bodies at the default order.
   { file: 'src/render/smith_heart_fx/final_kit_fx.ts', layer: 'encounter', strict: true },
+  // The Breath's Knotted Gale: its floor discs on HEART_FLOOR's own rungs; the ball,
+  // the funnels and the burst are bodies at the default order.
+  { file: 'src/render/smith_heart_fx/breath_heart_fx.ts', layer: 'encounter', strict: false },
   // Its element telegraphs (the Quench's frost, the Breath's storm, the
   // Hammer's granite, the Heat's molten basalt): char, glow and curtain on
   // the kit's own rungs (FINAL_KIT_FLOOR).

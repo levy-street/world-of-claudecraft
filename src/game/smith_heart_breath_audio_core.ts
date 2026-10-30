@@ -52,6 +52,13 @@ export const BREATH_CUE_SOUNDS: Readonly<Record<string, BreathSound>> = {
   [BREATH_CUES.swell]: S('swell', 0.55, 'source', 1, 1.5),
   [BREATH_CUES.toss]: S('toss', 0.85, 'target', 1, 0.25),
   [BREATH_CUES.calmLand]: S('calm_land', 0.8, 'point'),
+  // The Knotted Gale reuses the fight's samples (its own are a later pass).
+  [BREATH_CUES.knotLand]: S('strike', 1, 'point', 0.7),
+  [BREATH_CUES.portalOpen]: S('calm_land', 0.9, 'point', 0.8),
+  [BREATH_CUES.knotTake]: S('toss', 0.8, 'point', 0.75),
+  [BREATH_CUES.portalHop]: S('toss', 1, 'target', 1.2),
+  [BREATH_CUES.knotThrow]: S('fork', 1, 'point', 0.8),
+  [BREATH_CUES.knotBurst]: S('discharge', 1, 'point', 0.8),
   [BREATH_CUES.anchor]: S('calm_land', 0.4, 'target', 1.35, 0.2),
   [BREATH_CUES.fall]: S('fall', 0.9, 'point', 1, 0.4),
 };

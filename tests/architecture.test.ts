@@ -719,6 +719,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/council_alert_view.ts',
   'src/ui/hud/dungeon/quench_alert_view.ts',
   'src/ui/hud/dungeon/final_alert_view.ts',
+  'src/ui/hud/dungeon/knot_alert_view.ts',
   'src/ui/hud/dungeon/heart_overload_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
@@ -1091,6 +1092,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/breath_kit_plan_core.ts',
   'src/render/smith_heart/breath_air_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
+  'src/render/smith_heart_fx/breath_heart_fx_core.ts',
   // The Quench vein (phase 2H): its kit's plan, the shared lip walls, its
   // frost on the mountain, its air and weather, its guardian's effects.
   'src/render/smith_heart/quench_kit_plan_core.ts',

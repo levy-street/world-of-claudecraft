@@ -708,8 +708,8 @@ describe('Guardian of the Breath: heroic', () => {
     }
   });
 
-  it('mythic is heroic whole, behind its own dev switch', () => {
-    expect(BREATH_DIFFICULTY.mythic).toEqual(BREATH_DIFFICULTY.heroic);
+  it('mythic is heroic whole plus the Knotted Gale, behind its own dev switch', () => {
+    expect(BREATH_DIFFICULTY.mythic).toEqual({ ...BREATH_DIFFICULTY.heroic, stormHeart: true });
     const f = pulled(2);
     expect(f.state()?.difficulty).toBe('normal');
     f.dev('/dev heart breath mythic');

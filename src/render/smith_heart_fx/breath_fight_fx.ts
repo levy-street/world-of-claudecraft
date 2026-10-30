@@ -94,6 +94,7 @@ import {
   type WindFieldLook,
   windFieldLook,
 } from './breath_fight_fx_core';
+import { BreathHeartFx } from './breath_heart_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
 
 const SCAN_SEC = 0.1;
@@ -576,6 +577,8 @@ export class BreathFightFx {
   /** The wind's bearing as a direction (rewritten in place each frame). */
   private readonly windDir = { x: 0, z: 1 };
   /** The audio's entity and ground reads, bound once (not per event). */
+  /** Mythic's Knotted Gale, a part of this painter (breath_heart_fx.ts). */
+  private readonly heart: BreathHeartFx;
   private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
   private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private readonly cradledIds: number[] = [];
@@ -962,6 +965,16 @@ export class BreathFightFx {
       this.root.add(mesh);
       this.scorches.push({ mesh, mat, born: -99, live: false });
     }
+    this.heart = new BreathHeartFx({
+      root: this.root,
+      particles: this.particles,
+      uTime: this.uTime,
+      density: this.density,
+      geometries: this.geometries,
+      materials: this.materials,
+      groundY: (x, z) => this.groundY(x, z),
+      shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -1052,6 +1065,7 @@ export class BreathFightFx {
     if (!this.world || this.disposed) return false;
     const world = this.world;
     this.audio.event(ev, this.lookup, this.groundAt);
+    if (this.heart.handleEvent(ev, world, this.origin)) return true;
     if (ev.type === 'spellfxAt') {
       if (!breathFightClaims(ev.ability)) return false;
       const r = ev.radius ?? 3;
@@ -1123,6 +1137,7 @@ export class BreathFightFx {
     this.paintObjects(world, dt);
     this.paintMarks(world, dt);
     this.paintBars(world);
+    this.heart.update(world, dt);
     this.updateBolts();
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -1172,6 +1187,7 @@ export class BreathFightFx {
       this.rosterSeen = world.entityRosterVersion;
       this.discover(world, origin);
     }
+    this.heart.beginScan();
     this.objectIds.length = 0;
     this.cradledIds.length = 0;
     this.guardianId = -1;
@@ -1187,6 +1203,7 @@ export class BreathFightFx {
         const kind = breathObjectKind(e.templateId);
         if (kind === 'wind') this.windId = e.id;
         else if (kind) this.objectIds.push(e.id);
+        else this.heart.takeObject(e);
       } else if (e.kind === 'mob') {
         this.guardianId = e.id;
         let stacks = 0;
@@ -1202,9 +1219,11 @@ export class BreathFightFx {
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
           else if (a.id === BREATH_AURAS.drawn) this.drawnMarks.take(e.id);
           else if (a.id === BREATH_AURAS.cradled) this.cradledIds.push(e.id);
+          else this.heart.takeAura(e, a.id);
         }
       }
     }
+    this.heart.endScan();
     this.anchorMarks.end();
     this.pinnedMarks.end();
     this.drawnMarks.end();
@@ -1276,6 +1295,7 @@ export class BreathFightFx {
   }
 
   private leave(): void {
+    this.heart.leave();
     this.origin = null;
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;

@@ -57,6 +57,7 @@ const ALL_IDS: DungeonPromptId[] = [
   'council',
   'quench',
   'final',
+  'knot',
   'temple',
   'kitUse',
 ];
