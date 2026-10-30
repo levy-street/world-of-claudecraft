@@ -52,6 +52,14 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import {
+  HEART_REBIRTH_BEATS,
+  type HeartCollapseStage,
+  heartRebirthBeats,
+  newHeartCollapseView,
+  readHeartCollapse,
+} from '../smith_heart/heart_collapse_core';
+import { type HeartQuarterSeed, heartQuarterSeeds } from '../smith_heart/heart_quarters_core';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   awakenSpot,
@@ -179,6 +187,19 @@ export class FinalPhaseFx {
   private bossId = -1;
   private clock = 0;
   private seed = 0x51ad;
+  private lastDt = 0;
+  private readonly hiddenView = newHeartCollapseView();
+  private hiddenStage: HeartCollapseStage = 'none';
+  private hiddenClock = 0;
+  private hiddenBeats = 0;
+  private warnTick = 0;
+  /** A few spots on each quarter's floor (instance-local), for its rock and dust. */
+  private readonly quarterSeeds: Record<SmithHeartVein, HeartQuarterSeed[]> = {
+    breath: heartQuarterSeeds('breath', 14, 53),
+    quench: heartQuarterSeeds('quench', 14, 53),
+    hammer: heartQuarterSeeds('hammer', 14, 53),
+    heat: heartQuarterSeeds('heat', 14, 53),
+  };
   private active = false;
   private disposed = false;
   private originX = 0;
@@ -451,6 +472,7 @@ export class FinalPhaseFx {
     if (ev.type === 'spellfxAt') {
       const x = ev.x;
       const z = ev.z;
+      if (ev.ability && this.hiddenMoment(ev.ability, x, z)) return true;
       switch (ev.ability) {
         case Q.leap:
           this.dustAt(x, z, 40, 10);
@@ -648,18 +670,144 @@ export class FinalPhaseFx {
 
   private pourFrom(src: Entity, boss: Entity): void {
     const vein = finalAddVein(src.templateId) ?? 'heat';
+    this.pourAt(src.pos.x, src.pos.z, vein, boss);
+    this.pillarAt(src.pos.x, src.pos.z, SPLINTER_LOOKS[vein].color, 1.8, 16, 1.4);
+    this.motesAt(src.pos.x, src.pos.z, vein, 50, 3);
+    this.particles.shockRing(boss.pos.x, boss.pos.z, SPLINTER_LOOKS[vein].color, 14, 0.8);
+    this.shake(boss.pos.x, boss.pos.z, 0.4, 100);
+  }
+
+  /** A beam of `vein`'s light from world (x, z) into the boss. */
+  private pourAt(x: number, z: number, vein: SmithHeartVein, boss: Entity): void {
     const slot =
       this.beams.find((b) => this.clock - b.born > POUR_SECONDS) ??
       this.beams.reduce((a, b) => (a.born < b.born ? a : b));
     slot.born = this.clock;
     slot.bossId = boss.id;
-    slot.from.set(src.pos.x, this.groundY(src.pos.x, src.pos.z) + 2.5, src.pos.z);
+    slot.from.set(x, this.groundY(x, z) + 2.5, z);
     slot.color.value.setHex(SPLINTER_LOOKS[vein].color);
     slot.mesh.visible = true;
-    this.pillarAt(src.pos.x, src.pos.z, SPLINTER_LOOKS[vein].color, 1.8, 16, 1.4);
-    this.motesAt(src.pos.x, src.pos.z, vein, 50, 3);
-    this.particles.shockRing(boss.pos.x, boss.pos.z, SPLINTER_LOOKS[vein].color, 14, 0.8);
-    this.shake(boss.pos.x, boss.pos.z, 0.4, 100);
+  }
+
+  /** Mythic's hidden phase (cues): the moments, cosmetic over the room's own
+   *  collapse (../smith_heart/heart_collapse.ts). True when it was one. */
+  private hiddenMoment(ability: string, x: number, z: number): boolean {
+    switch (ability) {
+      case Q.kneel:
+        this.dustAt(x, z, 30, 8);
+        this.shake(x, z, 0.5, 140);
+        return true;
+      case Q.rebirth:
+        return true;
+      case Q.unmade:
+        for (let i = 0; i < HEART_QUARTER_ORDER.length; i++)
+          this.particles.shockRing(
+            x,
+            z,
+            SPLINTER_LOOKS[HEART_QUARTER_ORDER[i]].color,
+            46 + i * 14,
+            1.2 + i * 0.2,
+          );
+        this.dustAt(x, z, 60, 26);
+        this.shake(x, z, 1.1, 160);
+        return true;
+      case Q.quarterCrack: {
+        const v = this.veinNear(x, z);
+        this.particles.shockRing(x, z, SPLINTER_LOOKS[v].color, 26, 1);
+        this.dustAt(x, z, 50, 22);
+        this.shake(x, z, 0.55, 160);
+        return true;
+      }
+      case Q.quarterFall: {
+        const v = this.veinNear(x, z);
+        this.fallBurst(v);
+        this.shake(x, z, 1.2, 180);
+        return true;
+      }
+      case Q.bodyFall:
+        this.dustAt(x, z, 14, 3);
+        return true;
+      case Q.ringCrack:
+        this.particles.shockRing(x, z, 0xffc070, 18, 1);
+        this.dustAt(x, z, 40, 14);
+        this.shake(x, z, 0.8, 160);
+        return true;
+      case Q.ringBreak:
+        for (let i = 0; i < 4; i++)
+          this.particles.shockRing(x, z, 0xffc070, 18 + i * 16, 0.8 + i * 0.25);
+        this.dustAt(x, z, 80, 16);
+        this.shake(x, z, 1.4, 200);
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /** A quarter breaks: dust and sparks of its element up off the whole floor. */
+  private fallBurst(vein: SmithHeartVein): void {
+    for (const s of this.quarterSeeds[vein]) {
+      const x = this.originX + s.x;
+      const z = this.originZ + s.z;
+      this.dustAt(x, z, 8, 5);
+      this.sparkAt(x, z, VEIN_RGB[vein], 4, 4);
+    }
+  }
+
+  /** One frame of the hidden phase: the Heart's beats pouring the four quarters
+   *  into the boss, the warned quarter shaking itself apart. */
+  private paintHidden(boss: Entity): void {
+    readHeartCollapse(boss.auras, this.hiddenView);
+    const h = this.hiddenView;
+    if (h.stage !== this.hiddenStage) {
+      this.hiddenStage = h.stage;
+      this.hiddenClock = 0;
+      this.hiddenBeats = 0;
+    }
+    if (h.stage === 'none') return;
+    this.hiddenClock += this.lastDt;
+    const x = boss.pos.x;
+    const z = boss.pos.z;
+    if (h.stage === 'rebirth') {
+      const beats = heartRebirthBeats(this.hiddenClock);
+      if (beats > this.hiddenBeats) {
+        this.hiddenBeats = beats;
+        const k = beats / HEART_REBIRTH_BEATS.length;
+        for (const v of HEART_QUARTER_ORDER) {
+          const s = heartQuarterSpot(v);
+          const wx = this.originX + s.x;
+          const wz = this.originZ + s.z;
+          this.pourAt(wx, wz, v, boss);
+          this.particles.shockRing(x, z, SPLINTER_LOOKS[v].color, 10 + 34 * k, 0.8);
+          if (beats === 1 || beats === HEART_REBIRTH_BEATS.length)
+            this.pillarAt(wx, wz, SPLINTER_LOOKS[v].color, 2.6, 26, 2.2);
+        }
+        this.shake(x, z, 0.3 + 0.9 * k, 160);
+      }
+      return;
+    }
+    if (h.stage !== 'collapse') return;
+    // The warned quarter: rock shaking loose, a growl in the camera each second.
+    const next = h.next;
+    if (next && next !== 'ring' && h.seconds <= P.fallWarn) {
+      const seeds = this.quarterSeeds[next];
+      if (this.rand() < 0.7 * this.density) {
+        const s = seeds[Math.floor(this.rand() * seeds.length) % seeds.length];
+        this.dustAt(this.originX + s.x, this.originZ + s.z, 3, 3);
+        this.sparkAt(this.originX + s.x, this.originZ + s.z, VEIN_RGB[next], 2, 2);
+      }
+      this.warnTick -= this.lastDt;
+      if (this.warnTick <= 0) {
+        this.warnTick = 1;
+        this.shake(x, z, 0.16 + 0.1 * (P.fallWarn - h.seconds), 180);
+      }
+    } else if (next === 'ring') {
+      this.warnTick -= this.lastDt;
+      if (this.warnTick <= 0) {
+        this.warnTick = 0.8;
+        this.shake(x, z, 0.5, 180);
+        this.dustAt(x, z, 6, 12);
+      }
+    }
   }
 
   private shatterAt(x: number, z: number): void {
@@ -714,6 +862,7 @@ export class FinalPhaseFx {
     const world = this.world;
     if (!world || this.disposed) return;
     this.clock += dt;
+    this.lastDt = dt;
     this.uTime.value = this.clock;
     const me = world.entities.get(world.playerId);
     const def = DUNGEONS.smith_heart;
@@ -825,6 +974,7 @@ export class FinalPhaseFx {
       else if (a.id === A.fury) fury = Math.round(a.value || a.stacks || 1);
     }
     const stage = finalStageOf(phase?.value);
+    this.paintHidden(boss);
     const x = boss.pos.x;
     const z = boss.pos.z;
     const y = this.groundY(x, z);

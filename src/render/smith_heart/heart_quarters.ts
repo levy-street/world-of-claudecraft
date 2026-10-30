@@ -48,6 +48,8 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
+import { buildHeartCollapse } from './heart_collapse';
+import { heartCollapseView, heartLandmarkFall } from './heart_collapse_core';
 import { heartFloorMaterial } from './heart_floor';
 import {
   heartKitMeshes,
@@ -297,6 +299,7 @@ function curtainGeometry(k: number): THREE.BufferGeometry {
 }
 
 interface QuarterRig {
+  floor: THREE.Object3D | null;
   glow: THREE.ShaderMaterial;
   wash: THREE.ShaderMaterial;
   shade: THREE.ShaderMaterial;
@@ -304,6 +307,7 @@ interface QuarterRig {
 }
 
 interface RidgeRig {
+  pieces: THREE.Object3D[];
   glows: THREE.ShaderMaterial[];
   shocks: THREE.ShaderMaterial[];
   curtain: THREE.ShaderMaterial;
@@ -359,6 +363,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       }
       group.add(floor);
     }
+    const floorPiece = floor ?? null;
     const wash = new THREE.ShaderMaterial({
       name: `smithHeartQuarterWash:${vein}`,
       uniforms: {
@@ -405,7 +410,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     shadeMesh.renderOrder = floorVfxRenderOrder('ground', 3);
     shadeMesh.name = `heartQuarterShade:${vein}`;
     group.add(shadeMesh);
-    rigs.set(vein, { glow, wash, shade, air: [] });
+    rigs.set(vein, { floor: floorPiece, glow, wash, shade, air: [] });
   }
   const rig = (v: SmithHeartVein) => rigs.get(v) as QuarterRig;
   const addAir = (
@@ -611,6 +616,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
   // ---- the ridges -----------------------------------------------------------------------------
   const ridges: RidgeRig[] = [];
   for (let k = 0; k < 4; k++) {
+    const ridgePieces: THREE.Object3D[] = [];
     const ridgeGlow = (name: string) =>
       glowMaterial(name, RIDGE_GLOW_FRAG, {
         uColor: { value: new THREE.Color(HEART_GOLD) },
@@ -646,6 +652,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         if (lowGfx) m.castShadow = false;
       }
       group.add(spine);
+      ridgePieces.push(spine);
     }
     const horn = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, HEART_RIDGE_PIECES.horn);
     if (horn) {
@@ -658,6 +665,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         if (lowGfx) m.castShadow = false;
       }
       group.add(horn);
+      ridgePieces.push(horn);
     }
     const shockMat = (name: string, vert: string, color: number, hot: number, alpha: number) =>
       new THREE.ShaderMaterial({
@@ -725,6 +733,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     curtainMesh.name = `heartRidgeCurtain:${k}`;
     group.add(curtainMesh);
     ridges.push({
+      pieces: ridgePieces,
       glows: [spineGlow, hornGlow],
       shocks: [sparks, dust],
       curtain,
@@ -854,6 +863,10 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
   const landmarks = buildHeartLandmarks(lowGfx, centre);
   group.add(landmarks.group);
 
+  // ---- the Anvil falling apart (Mythic's hidden phase) --------------------------------------
+  const collapse = buildHeartCollapse(lowGfx, centre);
+  group.add(collapse.group);
+
   // ---- the frame ------------------------------------------------------------------------------
   const state = newHeartQuartersState();
   const set = (u: THREE.IUniform, v: number, digits = 1000) => {
@@ -866,20 +879,27 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
   return {
     group,
     update(key, now, dt, dark) {
-      const boss = dark > 0.01 ? null : heartQuarterBoss(key);
+      collapse.update(key, dt);
+      // The collapse dims the room but the quarters still left burn on.
+      const collapsing = heartCollapseView(key)?.stage === 'collapse';
+      const boss = dark > 0.01 && !collapsing ? null : heartQuarterBoss(key);
       stepHeartQuarters(state, boss, now, dt);
       const lit = (v: SmithHeartVein) => heartQuarterLit(state.quarters[v]);
       const awakeRoom = state.mode !== 'asleep';
       for (const vein of SMITH_HEART_VEINS) {
         const q = state.quarters[vein];
         const r = rig(vein);
+        // A quarter that has fallen: no floor, no light, no air of its own.
+        const fallT = collapse.fallT(vein);
+        const whole = fallT >= 0 ? 0 : 1;
+        if (r.floor && r.floor.visible !== (whole === 1)) r.floor.visible = whole === 1;
         set(r.glow.uniforms.uBase, q.base);
         // The quarter's idle life (the Heat's smoulder) wakes with the room.
         set(r.glow.uniforms.uIdle, awakeRoom ? P[vein].idle * (1 - dark) : 0);
         set(r.glow.uniforms.uAwake, q.awake);
         set(r.glow.uniforms.uFront, q.front, 100);
         set(r.glow.uniforms.uDark, dark);
-        set(r.wash.uniforms.uAwake, q.awake);
+        set(r.wash.uniforms.uAwake, q.awake * whole);
         set(r.wash.uniforms.uFront, q.front, 100);
         set(r.wash.uniforms.uDark, dark);
         const shadeLevel = state.mode === 'rest' || state.mode === 'asleep' ? 0.88 : P[vein].shade;
@@ -887,7 +907,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         set(r.shade.uniforms.uAwake, q.awake);
         set(r.shade.uniforms.uFront, q.front, 100);
         for (const m of r.air) {
-          set(m.uniforms.uLit, q.awake * (1 - dark));
+          set(m.uniforms.uLit, q.awake * (1 - dark) * whole);
           set(m.uniforms.uFront, q.front, 100);
           if (m.uniforms.uDark) set(m.uniforms.uDark, dark);
         }
@@ -896,12 +916,17 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         landmarks.set(
           vein,
           q.base * 4 + (awakeRoom ? P[vein].idle * 0.5 : 0),
-          heartLandmarkLit(q),
+          heartLandmarkLit(q) * whole,
           dark,
         );
+        const lf = heartLandmarkFall(fallT);
+        landmarks.topple(vein, lf.tilt, lf.drop, lf.gone);
       }
       for (let k = 0; k < 4; k++) {
         const [va, vb] = heartRidgeNeighbours(k);
+        // A ridge between two fallen quarters has nothing left to stand on.
+        const standing = collapse.fallT(va) < 1 || collapse.fallT(vb) < 1;
+        for (const p of ridges[k].pieces) if (p.visible !== standing) p.visible = standing;
         const qa = state.quarters[va];
         const qb = state.quarters[vb];
         const wa = lit(va);

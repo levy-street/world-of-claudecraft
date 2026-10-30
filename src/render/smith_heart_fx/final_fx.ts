@@ -50,6 +50,7 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX, sharedUniforms } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import { heartCollapseView, noteHeartCollapse } from '../smith_heart/heart_collapse_core';
 import { noteHeartFinalDeath } from '../smith_heart/heart_final_core';
 import { heartBeamMaterial } from '../smith_heart/heart_fx_materials';
 import {
@@ -271,6 +272,8 @@ export class FinalFx {
   private readonly pieces: PieceRig[];
   private readonly view = newHeartSealView();
   private readonly heartPos = new THREE.Vector3();
+  /** The fake death's kneel, 0 to 1. */
+  private kneel = 0;
   private readonly wrist = [new THREE.Vector3(), new THREE.Vector3()];
   private readonly elbow = [new THREE.Vector3(), new THREE.Vector3()];
   private built = false;
@@ -658,13 +661,16 @@ export class FinalFx {
     // The quarter it stands in wakes (phase 2K, the interior paints it):
     // only once the body is whole and while it stands; the final look only
     // in its final phase (phase 2L).
+    // Mythic's hidden phase: the room's collapse reads the same auras.
+    noteHeartCollapse(this.slotKey, boss.auras);
+    const hidden = heartCollapseView(this.slotKey);
     noteHeartQuarterBoss(
       this.slotKey,
       boss.pos.x - o.x,
       boss.pos.z - o.z,
       engaged,
       !boss.dead && t >= ARRIVAL_WAVE_AT,
-      engaged && heartFinalPhase(boss.hp, boss.maxHp),
+      engaged && (heartFinalPhase(boss.hp, boss.maxHp) || hidden?.stage === 'collapse'),
       // Part 2: the quarters whose Splinters live through a call.
       finalPhaseMaskOf(boss),
     );
@@ -822,6 +828,14 @@ export class FinalFx {
       w.y += (tgt.wrist.y - w.y) * follow;
       w.z += (tgt.wrist.z - w.z) * follow;
     }
+    // The fake death: it sinks to its knees, bowed; the rebirth lifts it.
+    const stage = heartCollapseView(this.slotKey)?.stage;
+    const kneelTo = this.deadAt < 0 && stage === 'kneel' ? 1 : 0;
+    const kneelRate = stage === 'rebirth' ? 0.2 : kneelTo === 1 ? 0.9 : 1.5;
+    const kneelD = kneelTo - this.kneel;
+    this.kneel += Math.sign(kneelD) * Math.min(Math.abs(kneelD), kneelRate * dt);
+    this.body.position.y = -3.6 * this.kneel * this.kneel * (3 - 2 * this.kneel);
+    lean += 0.75 * this.kneel;
     this.lean += (lean - this.lean) * Math.min(1, dt * 6);
     const breath = colossusBreath(this.clock);
     const part =
@@ -986,6 +1000,15 @@ export class FinalFx {
             ? pourGather(this.castProgress) * 0.7
             : 0;
       flare = c * 0.35 + Math.max(0, 1 - (this.clock - this.burstAt) / 0.4) * 0.8;
+    }
+    // The fake death dims the heart; each beat of the rebirth flares it, hard.
+    const hv = heartCollapseView(this.slotKey);
+    if (!dead && hv && hv.stage !== 'none') {
+      if (hv.stage === 'kneel') heartLevel *= 1 - 0.8 * this.kneel;
+      if (hv.stage === 'rebirth') {
+        heartLevel *= 0.5 + 0.5 * Math.min(1, hv.beats / 6);
+        flare = Math.max(flare, hv.beat * 1.5);
+      }
     }
     this.heartMat.uniforms.uLevel.value = heartLevel;
     this.heartMat.uniforms.uFlare.value = flare;

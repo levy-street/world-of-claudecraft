@@ -5,6 +5,19 @@
 // real kill, a reset restoring the floor, determinism.
 
 import { describe, expect, it } from 'vitest';
+import {
+  HEART_COLLAPSE_LOOK,
+  HEART_REBIRTH_BEATS,
+  heartLandmarkFall,
+  heartRebirthBeat,
+  heartRebirthBeats,
+  heartSlabPose,
+  heartSlabsLive,
+  newHeartCollapseState,
+  newHeartCollapseView,
+  readHeartCollapse,
+  stepHeartCollapse,
+} from '../src/render/smith_heart/heart_collapse_core';
 import type { SmithHeartVein } from '../src/sim/content/smith_heart_layout';
 import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import {
@@ -366,5 +379,77 @@ describe('the collapse', () => {
 
   it('the ring is exactly what stays: the geometry the kill reads', () => {
     expect(heartQuarterAt(HEART_ROOM.x + HEART_QUARTERS.ringR - 0.1, HEART_ROOM.z)).toBe('ring');
+  });
+});
+
+describe('the room reads it (heart_collapse_core.ts)', () => {
+  it('reads the stage, the fallen mask, the next and the seconds off the auras', () => {
+    const f = toFinal();
+    toCollapse(f);
+    f.dev('/dev heart final fall');
+    f.tick(1);
+    const view = newHeartCollapseView();
+    readHeartCollapse(f.boss().auras, view);
+    expect(view.stage).toBe('collapse');
+    expect(view.fallen).toBe(f.state()?.phase.fallenMask);
+    expect(view.next).toBe(f.state()?.phase.hidden?.order[1]);
+    expect(view.seconds).toBeGreaterThan(0);
+    readHeartCollapse([], view);
+    expect(view.stage).toBe('none');
+    expect(view.fallen).toBe(0);
+  });
+
+  it('a quarter falls, the warned one cracks, a reset rises back whole', () => {
+    const s = newHeartCollapseState();
+    const v = newHeartCollapseView();
+    v.stage = 'collapse';
+    v.next = 'heat';
+    v.seconds = 20;
+    stepHeartCollapse(s, v, 0.05);
+    for (let i = 0; i < 40; i++) stepHeartCollapse(s, v, 0.05);
+    expect(s.quarters.heat.crack).toBeCloseTo(HEART_COLLAPSE_LOOK.nextMark, 3);
+    v.seconds = P.fallWarn;
+    for (let i = 0; i < 40; i++) stepHeartCollapse(s, v, 0.05);
+    expect(s.quarters.heat.crack).toBe(1);
+    expect(s.quarters.heat.t).toBe(-1);
+    v.fallen = quarterBit('heat');
+    v.next = 'breath';
+    stepHeartCollapse(s, v, 0.05);
+    expect(s.quarters.heat.t).toBe(0);
+    expect(s.quarters.heat.crack).toBe(0);
+    for (let i = 0; i < 40; i++) stepHeartCollapse(s, v, 0.05);
+    const dimOne = s.dim;
+    expect(dimOne).toBeGreaterThan(HEART_COLLAPSE_LOOK.dimRisen);
+    v.stage = 'none';
+    v.fallen = 0;
+    v.next = null;
+    for (let i = 0; i < 400; i++) stepHeartCollapse(s, v, 0.05);
+    expect(s.quarters.heat.t).toBe(-1);
+    expect(s.dim).toBe(0);
+  });
+
+  it('a late arrival sees the floor already gone, no replayed fall', () => {
+    const s = newHeartCollapseState();
+    const v = newHeartCollapseView();
+    v.stage = 'collapse';
+    v.fallen = quarterBit('quench');
+    stepHeartCollapse(s, v, 0.05);
+    expect(s.quarters.quench.t).toBe(HEART_COLLAPSE_LOOK.fallSeconds);
+    expect(heartSlabsLive(s.quarters.quench.t)).toBe(false);
+  });
+
+  it('the beats close up and harden; slabs go from the wall inward; the landmark topples', () => {
+    expect(heartRebirthBeats(P.rebirthSeconds)).toBe(HEART_REBIRTH_BEATS.length);
+    expect(HEART_REBIRTH_BEATS[HEART_REBIRTH_BEATS.length - 1]).toBeLessThan(P.rebirthSeconds);
+    const last = HEART_REBIRTH_BEATS[HEART_REBIRTH_BEATS.length - 1];
+    expect(heartRebirthBeat(last)).toBeGreaterThan(heartRebirthBeat(HEART_REBIRTH_BEATS[0]));
+    const out = { drop: 0, turn: 0, gone: false };
+    const { ringR, rimR } = HEART_QUARTERS;
+    heartSlabPose(rimR, 0, 0.8, out);
+    const outer = out.drop;
+    heartSlabPose(ringR + 2, 0, 0.8, out);
+    expect(outer).toBeGreaterThan(out.drop);
+    expect(heartLandmarkFall(-1).tilt).toBe(0);
+    expect(heartLandmarkFall(HEART_COLLAPSE_LOOK.fallSeconds).gone).toBe(true);
   });
 });

@@ -27,6 +27,7 @@ import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
+import { heartCollapseDim } from './heart_collapse_core';
 import { inBreathLight, inHeatLight, inQuenchLight } from './heart_environment';
 import { heartFinalDarkness } from './heart_final_core';
 import { buildHeartGates } from './heart_gates';
@@ -261,7 +262,8 @@ export async function buildSmithHeartInterior(
       // The heart going dark when the Masterless Strength falls (phase 2J):
       // the core in its bed, the rune rings, the altars, the roots and the
       // channels with it.
-      const dark = heartFinalDarkness(slot, now);
+      // Mythic's fake death and the collapse dim it too (heart_collapse_core.ts).
+      const dark = Math.max(heartFinalDarkness(slot, now), heartCollapseDim(slot));
       room.setHeart(1 - dark);
       heartKit?.setHeart(1 - dark);
       for (const v of SMITH_HEART_VEINS) {

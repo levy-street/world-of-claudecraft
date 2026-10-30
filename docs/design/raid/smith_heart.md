@@ -2026,6 +2026,10 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart breath heart burst` | burst the balls now |
 | `/dev heart final quarter <zone>` | zone breath, quench, hammer, heat or ring: move the final boss (never its home) into the middle of that quarter of the Anvil of the World, or onto the central ring's centre (ring also sets it to its final phase, 15 percent of its health, and pulls it onto you: the final look); the quarter it stands in wakes (section 5.21) |
 | `/dev heart final` | the Masterless Strength's readout (difficulty, health, the zone it stands in, its base form, the root, the switch mark, Heart Unbound, the four bars, switches and bursts); every `final` verb enters the run first |
+| `/dev heart final hidden` | Mythic only: its health to 1 percent, the hidden phase starts now |
+| `/dev heart final collapse` | the hidden phase with its scene skipped (at 20 percent or more) |
+| `/dev heart final fall [quarter]` | that quarter (or the next) falls now; the 30 s clock runs on from it |
+| `/dev heart final crack` | every quarter gone, the central ring cracking now |
 | `/dev heart final pull` | set you down beside it and pull it (it takes root in the quarter it stands in) |
 | `/dev heart final reset` | the boss whole, home and out of its fight; every footprint and mark gone |
 | `/dev heart final normal`, `heroic`, `mythic` | this run's tier for the fight; a live fight takes it at once |
@@ -2150,3 +2154,16 @@ captures and review before the next:
    playtested?
 4. Resolved (phase 2C, owner): the dais has a second way in, the North Stair from the
    Ring's north, so a raid finishing in the north no longer walks round the Ring.
+
+#### The hidden phase (Mythic only; Jose's approved design; `final_hidden.ts`)
+
+| Step | What happens | Where |
+|---|---|---|
+| The fake death | A damage floor stops it at 1 percent; it kneels (4 s, sketch), every ability and Splinter gone, nothing harms it, the room goes dark | `final_hidden.ts`, `heart_collapse_core.ts` |
+| The rebirth | The Heart beats (6 s, sketch), the four colours pour into it, its health climbs to exactly 20 percent | `final_hidden.ts`, `final_phase_fx.ts` |
+| The collapse | Every 30 s a quarter falls after 5 s of warning cracks (its floor safe until then), fullest Overload bar first: the bars as the final phase switched them off, ties as the Splinters'. The mix and the poured elements run on; Masterless Fury does not | `final_hidden.ts` |
+| The floor | A fallen quarter is a kill zone over the standing collision (`hiddenFallenAt`, ring lip 0.4 yd), the same test the abyss is drawn with; whatever shields a player, they die; the corpse lies on the ring; nothing is placed over it | `final_scope.ts` `standingSpot`, `heart_collapse.ts` |
+| The end | 120 s: the last quarter falls and the ring cracks, 5 s later it breaks: a wipe (Anvil's End). A real kill ends the fight as any kill does; a kill, a wipe or a reset brings the floor back | `final_hidden.ts` |
+
+Names IP-checked on 30 Oct 2026 (exact phrase, one search each, no game use found): Unmade Anvil, Anvil's End.
+

@@ -27,7 +27,12 @@ import type { SmithHeartVein } from '../../sim/content/smith_heart_layout';
 import { sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { heartKitMeshes, SMITH_HEART_HEART_KIT_URL } from './heart_kit';
-import { heartBreathBolts, heartLandmarkSpots } from './heart_landmarks_core';
+import {
+  HEART_LANDMARK_FRAME,
+  heartBreathBolts,
+  heartLandmarkPoint,
+  heartLandmarkSpots,
+} from './heart_landmarks_core';
 import {
   BOLT_VERT,
   LANDMARK_BILLOW_VERT,
@@ -58,6 +63,7 @@ export const HEART_LANDMARK_AIR = {
 
 /** One landmark's rig: its light and its air, read every frame. */
 interface LandmarkRig {
+  piece: THREE.Object3D | null;
   glow: THREE.ShaderMaterial;
   air: THREE.ShaderMaterial[];
 }
@@ -67,6 +73,8 @@ export interface HeartLandmarks {
   /** Each quarter's landmark: `quiet` its asleep glow (0 to 1), `lit` how
    *  awake (0 to 1); `dark` the heart's fall (0 burning, 1 dark). */
   set(vein: SmithHeartVein, quiet: number, lit: number, dark: number): void;
+  /** Mythic's collapse: the landmark toppling in over its fallen quarter. */
+  topple(vein: SmithHeartVein, tilt: number, drop: number, gone: boolean): void;
 }
 
 /** The air's bounds round a landmark (room-local). */
@@ -107,6 +115,10 @@ function airMat(
 
 /** The four landmarks (instance-local, the room's centre `centre`). Needs
  *  the Heart kit (built with the quarters once it has landed). */
+const _axis = new THREE.Vector3();
+const _foot = new THREE.Vector3();
+const _swung = new THREE.Vector3();
+
 export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): HeartLandmarks {
   const group = new THREE.Group();
   group.name = 'smithHeartLandmarks';
@@ -144,7 +156,7 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
       }
       group.add(piece);
     }
-    rigs.set(vein, { glow, air: [] });
+    rigs.set(vein, { piece, glow, air: [] });
   }
   group.add(heartMaterialCarriers([...rigs.values()].map((r) => r.glow)));
   const rig = (v: SmithHeartVein) => rigs.get(v) as LandmarkRig;
@@ -332,6 +344,20 @@ export function buildHeartLandmarks(lowGfx: boolean, centre: THREE.Vector3): Hea
         set(m.uniforms.uLit, lit * (1 - dark));
         if (m.uniforms.uQuiet) set(m.uniforms.uQuiet, quiet * (1 - dark));
       }
+    },
+    topple(vein, tilt, drop, gone) {
+      const piece = rig(vein).piece;
+      if (!piece) return;
+      if (piece.visible === gone) piece.visible = !gone;
+      if (gone) return;
+      // About its foot on the rim, in toward the room's centre (room-local).
+      const foot = heartLandmarkPoint(vein, HEART_LANDMARK_FRAME.r - 8, 0, 0);
+      _axis.set(foot.z, 0, -foot.x).normalize();
+      piece.quaternion.setFromAxisAngle(_axis, -tilt);
+      _foot.set(foot.x, 0, foot.z);
+      _swung.copy(_foot).applyQuaternion(piece.quaternion);
+      piece.position.copy(centre).add(_foot).sub(_swung);
+      piece.position.y -= drop;
     },
   };
 }
