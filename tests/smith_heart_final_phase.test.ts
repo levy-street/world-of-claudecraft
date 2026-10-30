@@ -59,6 +59,7 @@ const hits = (ev: SimEvent[], name: string, target?: number): Damage[] =>
   );
 const aura = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
 const sec = (s: number) => Math.round(s * 20);
+const HEART_QUARTER_SPOT_RING = heartQuarterSpot('ring');
 
 /** Strike the boss as a raider would (its floors and its shield hold). */
 function strike(f: FinalFight, amount: number): void {
@@ -109,8 +110,9 @@ describe('the pure part 2', () => {
     expect(veinsOfMask(ALL_QUARTERS_MASK)).toEqual([...HEART_QUARTER_ORDER]);
     expect(veinsOfMask(quarterBit('hammer'))).toEqual(['hammer']);
     expect(P.finalAt).toBe(HEART_FINAL_PHASE_SHARE);
-    for (const tier of ['normal', 'heroic', 'mythic'] as const)
+    for (const tier of ['normal', 'heroic'] as const)
       expect(FINAL_PHASE_DIFFICULTY[tier].hiddenPhase).toBe(false);
+    expect(FINAL_PHASE_DIFFICULTY.mythic.hiddenPhase).toBe(true);
   });
 
   it('every Splinter is a real mob template bigger than a player that raises nobody', () => {
@@ -590,6 +592,8 @@ describe('the headless full fight, 100 to 0', () => {
             }
           }
         }
+        // The collapse: the raid stands on the ring, the only floor that stays.
+        if (stage === 'collapse') f.gather(HEART_QUARTER_SPOT_RING.x, HEART_QUARTER_SPOT_RING.z, 5);
         // The raid burns the boss, and its Splinters first while they live.
         const adds = splinters(f).filter((e) => !e.damageImmune);
         if (adds.length > 0)

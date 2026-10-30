@@ -27,8 +27,12 @@
 // Poured Heat, Quench, Breath and Hammer, Masterless Fury: no game use found.
 // Cinder Trail and Storm Orb are the raid's own, already checked.
 
-import type { SmithHeartVein } from '../../content/smith_heart_layout';
-import { HEART_QUARTER_ORDER } from '../../content/smith_heart_quarters';
+import { HEART_ROOM, type SmithHeartVein } from '../../content/smith_heart_layout';
+import {
+  HEART_QUARTER_ORDER,
+  HEART_QUARTERS,
+  heartQuarterAt,
+} from '../../content/smith_heart_quarters';
 import type { Aura } from '../../types';
 import type { FinalDifficulty } from './final_ids';
 
@@ -83,6 +87,10 @@ export const FINAL_PHASE_AURAS = {
   tether: 'heart_final_tethered',
   /** On players: chilled by a Quenching Ring (a slow). */
   chill: 'heart_final_ring_chill',
+  /** On the boss through the collapse (Mythic): the Unmade Anvil. `value`
+   *  the fallen quarters' mask, `value2` what falls next (hiddenNextCode),
+   *  `value3` the seconds until it does. */
+  hidden: 'heart_final_hidden',
 } as const;
 
 /** One poured element's aura id on the boss. */
@@ -143,6 +151,22 @@ export const FINAL_PHASE_CUES = {
   awaken: 'heart_final_awaken',
   /** Masterless Fury pulses (spellfx 'nova' on the boss). */
   fury: 'heart_final_fury',
+  /** Mythic, 1 percent: it kneels, the room goes dark (spellfxAt, centre). */
+  kneel: 'heart_final_kneel',
+  /** The Heart beats and drinks the quarters (spellfxAt at the centre). */
+  rebirth: 'heart_final_rebirth',
+  /** Healed, the Anvil starts to break (spellfxAt at the centre). */
+  unmade: 'heart_final_unmade',
+  /** A quarter's warning cracks (spellfxAt at its middle). */
+  quarterCrack: 'heart_final_quarter_crack',
+  /** A quarter breaks and falls (spellfxAt at its middle). */
+  quarterFall: 'heart_final_quarter_fall',
+  /** A body falls with the floor (spellfxAt where it stood). */
+  bodyFall: 'heart_final_body_fall',
+  /** The central ring starts cracking (spellfxAt at the centre). */
+  ringCrack: 'heart_final_ring_crack',
+  /** The central ring breaks: the wipe (spellfxAt at the centre). */
+  ringBreak: 'heart_final_ring_break',
 } as const;
 
 /** The damage, aura and mob names (combat log, nameplates, the buff bar;
@@ -165,6 +189,10 @@ export const FINAL_PHASE_NAMES = {
   tether: 'Wind-Tethered',
   buffet: 'Buffeting Gale',
   fury: 'Masterless Fury',
+  unmade: 'Unmade Anvil',
+  anvilEnd: "Anvil's End",
+  /** A fall with a quarter: the fall's own name (breath_void.ts). */
+  falling: 'Falling',
   poured: {
     heat: 'Poured Heat',
     quench: 'Poured Quench',
@@ -180,8 +208,19 @@ export const FINAL_PHASE_NAMES = {
  *  leap       an intermission begins: the boss strides into the centre;
  *  call       shielded in the centre, it channels while its Splinters live;
  *  finalLeap  15 percent: it strides into the centre;
- *  final      the final phase: all four quarters awake, the mix, the enrage. */
-export type FinalStage = 'fight' | 'leap' | 'call' | 'finalLeap' | 'final';
+ *  final      the final phase: all four quarters awake, the mix, the enrage;
+ *  kneel      Mythic, 1 percent: the fake death, nothing harms it;
+ *  rebirth    the Heart beats and heals it, nothing harms it;
+ *  collapse   the quarters fall one by one, then the ring. */
+export type FinalStage =
+  | 'fight'
+  | 'leap'
+  | 'call'
+  | 'finalLeap'
+  | 'final'
+  | 'kneel'
+  | 'rebirth'
+  | 'collapse';
 
 export const FINAL_STAGE_CODES: Readonly<Record<FinalStage, number>> = {
   fight: 0,
@@ -189,6 +228,9 @@ export const FINAL_STAGE_CODES: Readonly<Record<FinalStage, number>> = {
   call: 2,
   finalLeap: 3,
   final: 4,
+  kneel: 5,
+  rebirth: 6,
+  collapse: 7,
 };
 
 /** The stage a phase aura's code names (unknown: the fight). */
@@ -226,8 +268,8 @@ export interface FinalPhaseRules {
   weightStep: number;
   /** Gale Pounce's Storm Orbs round the Breath Splinter. */
   pounceOrbs: number;
-  /** The Mythic hidden phase (to be designed with Jose): the clean hook,
-   *  false everywhere until it exists. */
+  /** The hidden phase (final_hidden.ts): he stops at 1 percent, rises to 20
+   *  and the Anvil falls apart under the raid. False: he dies at 0. */
   hiddenPhase: boolean;
 }
 
@@ -257,7 +299,7 @@ export const FINAL_PHASE_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalPhase
     ringGaps: 2,
     weightStep: 0.2,
     pounceOrbs: 3,
-    hiddenPhase: false,
+    hiddenPhase: true,
   },
 };
 
@@ -407,6 +449,25 @@ export const FINAL_PHASES = {
   furyMin: 120,
   furyMax: 140,
   furyRise: 0.35,
+
+  // -- the hidden phase (Mythic; Jose's numbers: 1, 20, 30 and the 120 s they
+  // add up to; the scene's and the warnings' lengths are sketches) --
+  /** Its share where it stops and kneels. */
+  hiddenAt: 0.01,
+  /** The fake death: it kneels this long, the room dark and still. */
+  kneelSeconds: 4,
+  /** The rebirth: the Heart beats this long, healing it to `rebirthTo`. */
+  rebirthSeconds: 6,
+  rebirthTo: 0.2,
+  /** A quarter falls every this long from the collapse's start. */
+  fallEvery: 30,
+  /** Its warning cracks this long before (its floor still safe). */
+  fallWarn: 5,
+  /** The ring cracks this long after the last quarter, then breaks. */
+  ringWarn: 5,
+  /** The ring's lip past `ringR`: the dais's outer foot, where a fallen
+   *  quarter's edge is drawn and where it starts to kill. */
+  ringLip: 0.4,
 } as const;
 
 /** The final phase's mix, in turn. */
@@ -433,6 +494,40 @@ export function pickAddQuarters(
       return fb !== fa ? fb - fa : rank(a) - rank(b);
     })
     .slice(0, Math.max(0, Math.min(4, n)));
+}
+
+/** The order the quarters fall in: the frozen Overload bars, fullest first,
+ *  ties as the Splinters' (the quarter it stood in last, then clockwise). */
+export function hiddenFallOrder(
+  bars: Readonly<Record<SmithHeartVein, number>>,
+  lastQuarter: SmithHeartVein | null,
+): SmithHeartVein[] {
+  return pickAddQuarters(bars, lastQuarter, 4);
+}
+
+/** Is instance-local (x, z) over a fallen quarter (`mask`: quarterBit)? The
+ *  one test the kill, the placements and the painter share. */
+export function hiddenFallenAt(mask: number, x: number, z: number): boolean {
+  if (mask === 0) return false;
+  const zone = heartQuarterAt(x, z);
+  if (zone === 'ring') return false;
+  // The dais's foot is still the ring's.
+  const r = Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z);
+  return (mask & quarterBit(zone)) !== 0 && r >= HEART_QUARTERS.ringR + FINAL_PHASES.ringLip;
+}
+
+/** The code of what falls next on the hidden aura: 0 nothing, 1 to 4 a
+ *  quarter (HEART_QUARTER_ORDER's index plus one), 5 the ring. */
+export function hiddenNextCode(next: SmithHeartVein | 'ring' | null): number {
+  if (next === null) return 0;
+  return next === 'ring' ? 5 : HEART_QUARTER_ORDER.indexOf(next) + 1;
+}
+
+/** What a code names. */
+export function hiddenNextOf(code: number | undefined): SmithHeartVein | 'ring' | null {
+  const i = Math.round(code ?? 0);
+  if (i === 5) return 'ring';
+  return i >= 1 && i <= 4 ? HEART_QUARTER_ORDER[i - 1] : null;
 }
 
 /** Splintered Strength's scale on its `k`-th pulse (0 the first). */

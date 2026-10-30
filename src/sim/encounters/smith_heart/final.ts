@@ -22,9 +22,8 @@
 //   Part 2        the intermissions at 70 and 40 percent and their Splinters
 //                 (final_intermission.ts, final_adds.ts), the elements a
 //                 surviving Splinter pours into it and the final phase at 15
-//                 percent with its soft enrage (final_last.ts). Not built: the
-//                 Mythic hidden phase (its hook: final_last.ts
-//                 mythicHiddenPhase), loot. The pull's arrival scene, the body
+//                 percent with its soft enrage (final_last.ts), Mythic's hidden
+//                 phase at 1 percent (final_hidden.ts). Not built: loot. The pull's arrival scene, the body
 //                 and the room's light are the renderer's
 //                 (render/smith_heart_fx/final_fx.ts, render/smith_heart/).
 //
@@ -97,6 +96,7 @@ import {
   stepStride,
   watchThresholds,
 } from './final_intermission';
+import { showHidden, stepHidden, watchHidden } from './final_hidden';
 import { beginFinalPhase, pouredColdRate, stepFinal, stepPoured } from './final_last';
 import { finalPhaseDev, finalPhaseReadout } from './final_phase_dev';
 import { clearQuench, crackIce, encase, numbingFrost, stepCold, stepCracks } from './final_quench';
@@ -442,7 +442,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   stepSwells(s);
   stepWhirls(s);
   stepEmbersAndPools(s);
-  const live = ph.stage === 'fight' || ph.stage === 'final';
+  const live = ph.stage === 'fight' || ph.stage === 'final' || ph.stage === 'collapse';
   const poured = live ? pouredColdRate(s) : 0;
   const coldHere = ph.stage === 'fight' && st.zone === 'quench';
   stepCold(s, coldHere || poured > 0, coldHere ? 1 : poured);
@@ -459,6 +459,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   if (ph.stage === 'fight') runKit(s);
   else if (ph.stage === 'final') stepFinal(s);
   if (live) stepPoured(s);
+  watchHidden(s);
   watchThresholds(s);
   holdThreshold(s);
   if (ph.stage === 'fight') holdRoot(s);
@@ -466,6 +467,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   if (frozen) holdShaken(s);
   showState(s, frozen);
   showPhase(s);
+  showHidden(s);
 }
 
 /** One tick of a stage that is not the quarter fight: the stride into the
@@ -481,6 +483,7 @@ function stepStage(s: FinalScope): void {
     return;
   }
   if (ph.stage === 'call') stepCall(s);
+  else stepHidden(s);
 }
 
 // ---- dev ----------------------------------------------------------------------------------

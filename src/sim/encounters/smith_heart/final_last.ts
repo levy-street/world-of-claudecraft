@@ -21,9 +21,9 @@
 //   Masterless Fury  the soft enrage: two minutes into the final phase it
 //                    pulses the raid every 2 s, harder each pulse (warned 10 s
 //                    before; the HUD counts it down).
-//   The hidden phase Mythic's, to be designed with Jose: `mythicHiddenPhase`
-//                    is its clean hook (FINAL_PHASE_DIFFICULTY `hiddenPhase`,
-//                    false everywhere until it exists).
+//   The hidden phase Mythic's (FINAL_PHASE_DIFFICULTY `hiddenPhase`): at 1
+//                    percent final_hidden.ts takes over. Its order reads the
+//                    bars as this phase switches them off (`hiddenBars`).
 //
 // Deterministic: every pick is the kits' own (hashed); the only rng draws
 // are the damage rolls, in claim-player order.
@@ -94,19 +94,12 @@ export function stepPoured(s: FinalScope): void {
 
 // ---- the final phase ------------------------------------------------------------------------
 
-/** Mythic's hidden phase: the clean hook (to be designed with Jose). Returns
- *  true when it took the final phase's place; nothing does yet. */
-export function mythicHiddenPhase(s: FinalScope): boolean {
-  if (!phaseRules(s).hiddenPhase) return false;
-  return false;
-}
-
 /** The final phase begins (it stands in the centre): all four quarters
  *  awake, the bars off, the mix's clock, the enrage's. */
 export function beginFinalPhase(s: FinalScope): void {
   const st = s.st;
   const ph = st.phase;
-  if (mythicHiddenPhase(s)) return;
+  if (phaseRules(s).hiddenPhase) ph.hiddenBars = { ...st.overload };
   ph.stage = 'final';
   ph.finalClock = 0;
   ph.mixTurn = 0;
@@ -168,14 +161,20 @@ export function furyPulse(s: FinalScope): void {
     hit(s, p, Math.round(roll(s, P.furyMin, P.furyMax) * furyScale(ph.fury)), N.fury, 'arcane');
 }
 
+/** One tick of the mix's clock (the final phase, the collapse). */
+export function stepMix(s: FinalScope): void {
+  const ph = s.st.phase;
+  ph.mixTimer -= DT;
+  if (ph.mixTimer <= 1e-9 && mixTurn(s)) ph.mixTimer = P.mixEvery;
+  else if (ph.mixTimer <= 1e-9) ph.mixTimer = 0;
+}
+
 /** One tick of the final phase: held in the centre, the mix, the enrage. */
 export function stepFinal(s: FinalScope): void {
   const ph = s.st.phase;
   if (!s.st.bar) pinCentre(s);
   ph.finalClock += DT;
-  ph.mixTimer -= DT;
-  if (ph.mixTimer <= 1e-9 && mixTurn(s)) ph.mixTimer = P.mixEvery;
-  else if (ph.mixTimer <= 1e-9) ph.mixTimer = 0;
+  stepMix(s);
   if (!ph.furyWarned && ph.finalClock >= P.enrageAfter - P.enrageWarnAt - 1e-9) {
     ph.furyWarned = true;
     raidWarn(

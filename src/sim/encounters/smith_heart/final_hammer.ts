@@ -23,6 +23,7 @@
 // Deterministic: every pick is hashed (pickPlayers); the only rng draws are
 // the damage rolls, in player order.
 
+import { HEART_QUARTERS } from '../../content/smith_heart_quarters';
 import { DT, type Entity } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
 import {
@@ -109,10 +110,9 @@ export function stepTremors(s: FinalScope): void {
 /** Where the Anvil's mark stands for a bearing round the boss (Mythic). */
 function orbitSpot(s: FinalScope, angle: number): FPoint {
   const b = local(s.ctx, s.inst, s.boss);
-  return onFloor(
-    { x: b.x + Math.sin(angle) * T.anvilOrbitR, z: b.z + Math.cos(angle) * T.anvilOrbitR },
-    T.anvilR,
-  );
+  // With a quarter fallen it turns tight round the boss, over the ring only.
+  const r = s.st.phase.fallenMask !== 0 ? HEART_QUARTERS.ringR - 5 : T.anvilOrbitR;
+  return onFloor({ x: b.x + Math.sin(angle) * r, z: b.z + Math.cos(angle) * r }, T.anvilR);
 }
 
 /** Begin Weight of the Anvil on a hashed player's spot (or `forced`).

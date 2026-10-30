@@ -4810,6 +4810,9 @@ export const zh_TW: EnTranslations = {
         "phaseCall": "四角召喚：只要碎片還活著，它就在中央受到護盾保護{seconds}秒。每個碎片每{every}秒對整個團隊造成{min}至{max}點傷害，每次脈動提高{rise}%。將它們全部擊殺可提前打破護盾；召喚結束時仍存活的碎片會把自己的元素注入它體內，直到戰鬥結束。",
         "phaseFight": "生命值降到{first}%和{second}%時，它會在護盾保護下走入中央，從最滿的幾個角各召出一個碎片。降到{final}%時四個角全部甦醒，開始最後的抵抗。",
         "phaseFinal": "四個角已全部甦醒：它停留在中央圓環，每{every}秒依序施放一種技能：火焰旋風、呻吟之冰、跳躍閃電、鐵砧之重。{enrage}秒後它將失去一切克制（無主之怒）。",
+        "phaseKneel": "It kneels. Nothing harms it.",
+        "phaseRebirth": "The Heart beats. Nothing harms it until it rises at {percent}% health.",
+        "unmade": "Every {every} sec a whole quarter of the Anvil falls, the one with the fullest Overload bar first, after {warn} sec of warning cracks. Anyone standing on it falls and dies. {ring} sec after the last quarter the central ring breaks and kills everyone.",
         "shield": "聚集之力：免疫所有傷害，且無法被選為目標。",
         "pouredHeat": "熾熱注入其中：直到戰鬥結束，無論它站在哪裡，每{every}秒都會掀起火焰旋風（已注入{times}次）。",
         "pouredQuench": "淬火注入其中：直到戰鬥結束，{reach}碼內其他玩家少於{allies}名的人在任何地方都會變冷，速度為淬火之角的{share}%（已注入{times}次）。",
@@ -7481,10 +7484,22 @@ export const zh_TW: EnTranslations = {
         "final": "無主之力大步踏入鐵砧的中心！",
         "awaken": "四個角全部甦醒！無主之力一口氣飲下所有力量！",
         "furySoon": "無主之力即將失去一切克制！全力輸出！",
-        "fury": "無主之怒！它在撕裂鐵砧：立刻擊殺它！"
+        "fury": "無主之怒！它在撕裂鐵砧：立刻擊殺它！",
+        "rebirth": "The Heart beats! The Masterless Strength drinks the four quarters and rises again!",
+        "unmade": "The Anvil of the World is breaking apart! Kill the Masterless Strength before the last stone falls!",
+        "crackHeat": "The Heat's quarter is cracking! Get off it before it falls!",
+        "crackQuench": "The Quench's quarter is cracking! Get off it before it falls!",
+        "crackBreath": "The Breath's quarter is cracking! Get off it before it falls!",
+        "crackHammer": "The Hammer's quarter is cracking! Get off it before it falls!",
+        "ringCrack": "Only the central ring is left, and it is cracking! Kill it now!"
       }
     },
     "finalOverload": {
+      "kneeling": "It kneels",
+      "rising": "The Heart beats",
+      "fallsIn": "{quarter} falls in {seconds}",
+      "ringFallsIn": "The ring breaks in {seconds}",
+      "allFallen": "Nothing is left",
       "title": "過載",
       "heat": "Heat",
       "quench": "淬火",

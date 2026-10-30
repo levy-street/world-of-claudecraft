@@ -4810,6 +4810,9 @@ export const ko_KR: EnTranslations = {
         "phaseCall": "네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다.",
         "phaseFight": "생명력이 {first}%와 {second}%가 되면 보호막을 두른 채 중앙으로 걸어 들어가, 가장 많이 찬 구역마다 파편을 하나씩 불러냅니다. {final}%에서는 네 구역이 모두 깨어나 마지막 저항이 시작됩니다.",
         "phaseFinal": "네 구역이 모두 깨어났습니다: 중앙 원에 머물며 불의 회오리, 신음하는 얼음, 튀어 오르는 번개, 모루의 무게를 {every}초마다 하나씩 차례로 시전합니다. {enrage}초 후에는 모든 절제를 잃습니다(주인 없는 분노).",
+        "phaseKneel": "It kneels. Nothing harms it.",
+        "phaseRebirth": "The Heart beats. Nothing harms it until it rises at {percent}% health.",
+        "unmade": "Every {every} sec a whole quarter of the Anvil falls, the one with the fullest Overload bar first, after {warn} sec of warning cracks. Anyone standing on it falls and dies. {ring} sec after the last quarter the central ring breaks and kills everyone.",
         "shield": "모은 힘: 모든 피해에 면역이며 대상으로 지정할 수 없습니다.",
         "pouredHeat": "열기가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 불의 회오리를 일으킵니다({times}회 쏟아부어짐).",
         "pouredQuench": "담금질이 쏟아부어졌습니다: 전투가 끝날 때까지 {reach}미터 안에 다른 플레이어가 {allies}명 미만인 사람은 어디서든 추워집니다. 속도는 담금질 구역의 {share}%입니다({times}회 쏟아부어짐).",
@@ -7481,10 +7484,22 @@ export const ko_KR: EnTranslations = {
         "final": "주인 없는 힘이 모루의 심장부로 걸어 들어간다!",
         "awaken": "네 구역이 모두 깨어났다! 주인 없는 힘이 모든 힘을 한꺼번에 마신다!",
         "furySoon": "주인 없는 힘이 모든 절제를 잃으려 한다! 몰아붙여 쓰러뜨려라!",
-        "fury": "주인 없는 분노! 모루를 찢어발긴다: 지금 처치하라!"
+        "fury": "주인 없는 분노! 모루를 찢어발긴다: 지금 처치하라!",
+        "rebirth": "The Heart beats! The Masterless Strength drinks the four quarters and rises again!",
+        "unmade": "The Anvil of the World is breaking apart! Kill the Masterless Strength before the last stone falls!",
+        "crackHeat": "The Heat's quarter is cracking! Get off it before it falls!",
+        "crackQuench": "The Quench's quarter is cracking! Get off it before it falls!",
+        "crackBreath": "The Breath's quarter is cracking! Get off it before it falls!",
+        "crackHammer": "The Hammer's quarter is cracking! Get off it before it falls!",
+        "ringCrack": "Only the central ring is left, and it is cracking! Kill it now!"
       }
     },
     "finalOverload": {
+      "kneeling": "It kneels",
+      "rising": "The Heart beats",
+      "fallsIn": "{quarter} falls in {seconds}",
+      "ringFallsIn": "The ring breaks in {seconds}",
+      "allFallen": "Nothing is left",
       "title": "과부하",
       "heat": "Heat",
       "quench": "담금질",

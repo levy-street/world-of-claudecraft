@@ -8,6 +8,10 @@
 //   endcall               the call ends now (the living Splinters pour in)
 //   last                  its health to 15 percent: the final phase's stride
 //   enrage                Masterless Fury now (the final phase begun first)
+//   hidden                its health to 1 percent: the hidden phase starts now
+//   collapse              the hidden phase with its scene skipped
+//   fall [vein]           that quarter (or the next) falls now
+//   crack                 every quarter gone, the ring cracking now
 //   coal | toll | ring | pounce | circles | shear
 //                         a living Splinter's signature now
 
@@ -19,6 +23,7 @@ import {
   addBody,
   dropAdd,
   markCoals,
+  phaseRules,
   raiseCircles,
   raiseRing,
   raiseSplinter,
@@ -26,6 +31,7 @@ import {
   startShear,
   startToll,
 } from './final_adds';
+import { beginCollapse, beginKneel, devCrack, devFall } from './final_hidden';
 import { beginFinalStride, beginIntermission, endCall, shareHp } from './final_intermission';
 import { furyPulse } from './final_last';
 import { FINAL_PHASES as P } from './final_phase_ids';
@@ -105,6 +111,33 @@ export function finalPhaseDev(
       furyPulse(s);
       return 'Masterless Fury.';
     }
+    case 'hidden':
+    case 'collapse': {
+      if (!phaseRules(s).hiddenPhase)
+        return 'The hidden phase is Mythic only (/dev heart final mythic).';
+      if (ph.stage === 'collapse') return 'The collapse already runs.';
+      if (!ph.hidden) {
+        b.hp = Math.min(b.hp, shareHp(b.maxHp, P.hiddenAt));
+        beginKneel(s);
+      }
+      if (verb === 'hidden') return 'It kneels at 1 percent: the hidden phase begins.';
+      b.hp = Math.max(b.hp, shareHp(b.maxHp, P.rebirthTo));
+      beginCollapse(s);
+      return 'The collapse begins (the scene skipped).';
+    }
+    case 'fall': {
+      if (ph.stage !== 'collapse') return 'No collapse runs (use collapse first).';
+      const v = HEART_QUARTER_ORDER.includes(arg as SmithHeartVein)
+        ? (arg as SmithHeartVein)
+        : null;
+      const fell = devFall(s, v);
+      return fell ? `The quarter of the ${fell} falls.` : 'That quarter has already fallen.';
+    }
+    case 'crack': {
+      if (ph.stage !== 'collapse') return 'No collapse runs (use collapse first).';
+      devCrack(s);
+      return 'Every quarter gone: the ring cracks.';
+    }
     case 'coal': {
       const h = need('heat');
       return h ? `Bursting Coal on ${markCoals(s, h.e).length}.` : 'No Splinter of the Heat.';
@@ -159,6 +192,8 @@ export function finalPhaseReadout(ctx: SimContext, st: FinalFightState): string 
       ? `, call ${Math.ceil(ph.callLeft)} s`
       : ph.stage === 'final'
         ? `, final ${Math.floor(ph.finalClock)} s, fury ${ph.fury}`
-        : '';
+        : ph.stage === 'collapse' && ph.hidden
+          ? `, collapse ${Math.floor(ph.hidden.clock)} s, fallen ${ph.hidden.order.slice(0, ph.hidden.fallen).join(' ')}, next ${ph.hidden.order[ph.hidden.fallen] ?? 'the ring'}`
+          : '';
   return `phase ${ph.stage} (intermissions ${ph.intermissions}${extra}), Splinters ${adds.length > 0 ? adds.join(', ') : 'none'}, poured ${poured.length > 0 ? poured.join(', ') : 'none'}`;
 }

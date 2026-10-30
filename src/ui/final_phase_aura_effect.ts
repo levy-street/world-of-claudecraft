@@ -43,6 +43,14 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
             rise: pct(P.splinterRise),
           },
         };
+      if (stage === 'kneel') return { key: `${KEY}.phaseKneel`, nums: {} };
+      if (stage === 'rebirth')
+        return { key: `${KEY}.phaseRebirth`, nums: { percent: pct(P.rebirthTo) } };
+      if (stage === 'collapse')
+        return {
+          key: `${KEY}.unmade`,
+          nums: { every: P.fallEvery, warn: P.fallWarn, ring: P.ringWarn },
+        };
       if (stage === 'final' || stage === 'finalLeap')
         return {
           key: `${KEY}.phaseFinal`,
@@ -57,6 +65,11 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
         },
       };
     }
+    case A.hidden:
+      return {
+        key: `${KEY}.unmade`,
+        nums: { every: P.fallEvery, warn: P.fallWarn, ring: P.ringWarn },
+      };
     case A.shield:
     case A.rising:
       return { key: `${KEY}.shield`, nums: {} };

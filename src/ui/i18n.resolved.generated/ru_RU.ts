@@ -4810,6 +4810,9 @@ export const ru_RU: EnTranslations = {
         "phaseCall": "Зов четвертей: пока живы его осколки, он {seconds} с стоит в центре под щитом. Каждый осколок каждые {every} с наносит всему рейду от {min} до {max} ед. урона, с каждым импульсом на {rise}% больше. Убейте их всех, чтобы разбить щит раньше; осколок, живой к концу зова, вливает свою стихию в босса до конца боя.",
         "phaseFight": "При {first}% и {second}% здоровья он под щитом уходит в центр и вызывает по осколку из самых полных четвертей. При {final}% пробуждаются все четыре четверти: начинается его последний бой.",
         "phaseFinal": "Пробудились все четыре четверти: он остаётся в центральном круге и по очереди, каждые {every} с, применяет Огненный вихрь, Стонущий лёд, Скачущую молнию и Тяжесть наковальни. Через {enrage} с он теряет всякую сдержанность (Ярость без хозяина).",
+        "phaseKneel": "It kneels. Nothing harms it.",
+        "phaseRebirth": "The Heart beats. Nothing harms it until it rises at {percent}% health.",
+        "unmade": "Every {every} sec a whole quarter of the Anvil falls, the one with the fullest Overload bar first, after {warn} sec of warning cracks. Anyone standing on it falls and dies. {ring} sec after the last quarter the central ring breaks and kills everyone.",
         "shield": "Собранная сила: невосприимчив к любому урону, его нельзя выбрать целью.",
         "pouredHeat": "В него влит Жар: до конца боя, где бы он ни стоял, каждые {every} с он поднимает Огненные вихри (влит {times} раз).",
         "pouredQuench": "В него влита Закалка: до конца боя всякий, рядом с кем в пределах {reach} м меньше {allies} других игроков, мёрзнет где угодно, со скоростью {share}% от четверти Закалки (влита {times} раз).",
@@ -7481,10 +7484,22 @@ export const ru_RU: EnTranslations = {
         "final": "Сила без хозяина шагает в самое сердце Наковальни!",
         "awaken": "Пробудились все четыре четверти! Сила без хозяина пьёт все силы сразу!",
         "furySoon": "Сила без хозяина вот-вот потеряет всякую сдержанность! Добивайте!",
-        "fury": "Ярость без хозяина! Она разрывает Наковальню: убейте её сейчас!"
+        "fury": "Ярость без хозяина! Она разрывает Наковальню: убейте её сейчас!",
+        "rebirth": "The Heart beats! The Masterless Strength drinks the four quarters and rises again!",
+        "unmade": "The Anvil of the World is breaking apart! Kill the Masterless Strength before the last stone falls!",
+        "crackHeat": "The Heat's quarter is cracking! Get off it before it falls!",
+        "crackQuench": "The Quench's quarter is cracking! Get off it before it falls!",
+        "crackBreath": "The Breath's quarter is cracking! Get off it before it falls!",
+        "crackHammer": "The Hammer's quarter is cracking! Get off it before it falls!",
+        "ringCrack": "Only the central ring is left, and it is cracking! Kill it now!"
       }
     },
     "finalOverload": {
+      "kneeling": "It kneels",
+      "rising": "The Heart beats",
+      "fallsIn": "{quarter} falls in {seconds}",
+      "ringFallsIn": "The ring breaks in {seconds}",
+      "allFallen": "Nothing is left",
       "title": "Перегрузка",
       "heat": "Heat",
       "quench": "Закалка",

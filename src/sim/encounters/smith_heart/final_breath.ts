@@ -59,6 +59,7 @@ import {
   raidWarn,
   roll,
   spawnFightObject,
+  standingSpot,
 } from './final_scope';
 
 /** The tag the final's wind carries in its `value3` (the kernel ignores it
@@ -250,7 +251,10 @@ export function raiseOrbs(
     const h = finalHash(s.boss.id + (opts.salt ?? 0), st.casts * 17 + i);
     const ang = ((h % 360) * Math.PI) / 180;
     const r = near + (h % span);
-    const spot = onFloor({ x: b.x + Math.sin(ang) * r, z: b.z + Math.cos(ang) * r }, 3);
+    const spot = standingSpot(
+      s,
+      onFloor({ x: b.x + Math.sin(ang) * r, z: b.z + Math.cos(ang) * r }, 3),
+    );
     const obj = spawnFightObject(
       s.ctx,
       s.inst,

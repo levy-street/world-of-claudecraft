@@ -6050,6 +6050,10 @@ export const hudChromeStrings = {
         'At {first}% and {second}% health it strides into the centre, shielded, and calls a Splinter out of each of its fullest quarters. At {final}% all four quarters wake for its last stand.',
       phaseFinal:
         'All four quarters are awake: it stays in the central ring and casts Fire Whirls, Groaning Ice, Leaping Bolt and Weight of the Anvil in turn, one every {every} sec. After {enrage} sec it loses all restraint (Masterless Fury).',
+      phaseKneel: 'It kneels. Nothing harms it.',
+      phaseRebirth: 'The Heart beats. Nothing harms it until it rises at {percent}% health.',
+      unmade:
+        'Every {every} sec a whole quarter of the Anvil falls, the one with the fullest Overload bar first, after {warn} sec of warning cracks. Anyone standing on it falls and dies. {ring} sec after the last quarter the central ring breaks and kills everyone.',
       shield: 'Gathered Strength: immune to all damage and cannot be targeted.',
       pouredHeat:
         'The Heat poured into it: it raises Fire Whirls every {every} sec wherever it stands, for the rest of the fight (poured {times} times).',
@@ -10476,11 +10480,24 @@ export const hudChromeStrings = {
       awaken: 'All four quarters wake! The Masterless Strength drinks every strength at once!',
       furySoon: 'The Masterless Strength is about to lose all restraint! Burn it down!',
       fury: 'Masterless Fury! It tears the Anvil apart: kill it now!',
+      rebirth: 'The Heart beats! The Masterless Strength drinks the four quarters and rises again!',
+      unmade:
+        'The Anvil of the World is breaking apart! Kill the Masterless Strength before the last stone falls!',
+      crackHeat: "The Heat's quarter is cracking! Get off it before it falls!",
+      crackQuench: "The Quench's quarter is cracking! Get off it before it falls!",
+      crackBreath: "The Breath's quarter is cracking! Get off it before it falls!",
+      crackHammer: "The Hammer's quarter is cracking! Get off it before it falls!",
+      ringCrack: 'Only the central ring is left, and it is cracking! Kill it now!',
     },
   },
   // The Masterless Strength's raid HUD (src/ui/hud/dungeon/heart_overload_view.ts):
   // the four Overload bars, the root and the switch mark. Wordy (M16).
   finalOverload: {
+    kneeling: 'It kneels',
+    rising: 'The Heart beats',
+    fallsIn: '{quarter} falls in {seconds}',
+    ringFallsIn: 'The ring breaks in {seconds}',
+    allFallen: 'Nothing is left',
     title: 'Overload',
     heat: 'Heat',
     quench: 'Quench',

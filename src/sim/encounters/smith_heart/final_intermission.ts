@@ -88,6 +88,9 @@ export function freshPhase(): FinalPhaseState {
     fury: 0,
     furyTimer: 0,
     furyWarned: false,
+    hiddenBars: null,
+    hidden: null,
+    fallenMask: 0,
   };
 }
 
@@ -354,6 +357,7 @@ export function holdShaken(s: FinalScope): void {
 export function awakeMask(s: Pick<FinalScope, 'ctx' | 'st'>): number {
   const ph = s.st.phase;
   if (ph.stage === 'final') return ALL_QUARTERS_MASK;
+  if (ph.stage === 'collapse') return ALL_QUARTERS_MASK & ~ph.fallenMask;
   let m = 0;
   for (const a of ph.adds) if (addBody(s, a)) m |= quarterBit(a.vein);
   return m;
@@ -408,6 +412,7 @@ export function clearPhaseAuras(s: Pick<FinalScope, 'boss'>): void {
   dropAura(b, A.phase);
   dropAura(b, A.shield);
   dropAura(b, A.fury);
+  dropAura(b, A.hidden);
   for (const v of HEART_QUARTER_ORDER) dropAura(b, pouredAuraId(v));
   clearCastIf(b, C.call);
   b.damageFloorHp = undefined;
@@ -418,15 +423,16 @@ export function clearPhaseAuras(s: Pick<FinalScope, 'boss'>): void {
 }
 
 /** The floor that holds the next threshold (none once the final phase has
- *  begun). */
+ *  begun; on a tier with the hidden phase, 1 percent until it starts). */
 export function holdThreshold(s: FinalScope): void {
   const ph = s.st.phase;
   const b = s.boss;
   let share: number | null = null;
-  if (ph.stage !== 'final' && ph.stage !== 'finalLeap') {
+  if (ph.hidden) share = null;
+  else if (ph.stage !== 'final' && ph.stage !== 'finalLeap') {
     share =
       ph.intermissions < P.intermissionAt.length ? P.intermissionAt[ph.intermissions] : P.finalAt;
-  }
+  } else if (phaseRules(s).hiddenPhase) share = P.hiddenAt;
   const want = share === null ? undefined : shareHp(b.maxHp, share);
   if (b.damageFloorHp !== want) b.damageFloorHp = want;
 }

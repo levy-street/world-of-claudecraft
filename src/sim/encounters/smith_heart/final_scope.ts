@@ -13,6 +13,7 @@ import type { Entity } from '../../types';
 import { pickMarkTargets, startBar } from '../sunken_bastion/claim';
 import { local } from './fight_kit';
 import type { FinalDifficultyRules } from './final_ids';
+import { FINAL_PHASES, hiddenFallenAt } from './final_phase_ids';
 import type { FinalFightState } from './final_state';
 
 export {
@@ -105,6 +106,25 @@ export function onFloor(p: FPoint, rimPad = 2): FPoint {
   return { x: c.x + (p.x - c.x) * k, z: c.z + (p.z - c.z) * k };
 }
 
+/** Is a point over a fallen quarter (Mythic's collapse)? */
+export function overTheVoid(s: Pick<FinalScope, 'st'>, p: FPoint): boolean {
+  return hiddenFallenAt(s.st.phase.fallenMask, p.x, p.z);
+}
+
+/** Where a mechanic may stand on what is left of the floor: `p` itself, else
+ *  `near` (the player it aims at), else the ring on the same bearing. Nothing
+ *  is ever placed over the void; with no quarter fallen it returns `p`. */
+export function standingSpot(s: Pick<FinalScope, 'st'>, p: FPoint, near?: FPoint): FPoint {
+  if (!overTheVoid(s, p)) return p;
+  if (near && !overTheVoid(s, near)) return near;
+  const d = Math.max(1e-6, fromCentre(p));
+  const r = Math.min(d, HEART_QUARTERS.ringR + FINAL_PHASES.ringLip - 3);
+  return {
+    x: HEART_ROOM.x + ((p.x - HEART_ROOM.x) / d) * r,
+    z: HEART_ROOM.z + ((p.z - HEART_ROOM.z) / d) * r,
+  };
+}
+
 /** Sim facing (0 = +z) from `a` toward `b`. */
 export function facingTo(a: FPoint, b: FPoint): number {
   return Math.atan2(b.x - a.x, b.z - a.z);
@@ -124,7 +144,7 @@ export function bossTank(s: Pick<FinalScope, 'boss' | 'players'>): Entity | null
 export function beingDragged(s: FinalScope): boolean {
   if (s.st.rootLeft > 0) return false;
   // The final phase: it stands in the centre for good (part 2).
-  if (s.st.phase.stage === 'final') return false;
+  if (s.st.phase.stage === 'final' || s.st.phase.stage === 'collapse') return false;
   const tank = bossTank(s);
   if (!tank) return false;
   const p = at(s, tank);

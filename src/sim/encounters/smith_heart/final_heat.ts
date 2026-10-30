@@ -51,11 +51,13 @@ import {
   local,
   moveFightObject,
   onFloor,
+  overTheVoid,
   pickPlayers,
   putMarker,
   raidWarn,
   roll,
   spawnFightObject,
+  standingSpot,
 } from './final_scope';
 import type { FinalPool, FinalSwell } from './final_state';
 import { inWave, laneReach } from './heat_geometry';
@@ -214,7 +216,11 @@ export function raiseWhirls(s: FinalScope): number {
     const heading = ((h % 360) * Math.PI) / 180;
     const p = at(s, v);
     // It rises a few yards off them, so the first step is a dodge.
-    const spot = onFloor({ x: p.x - Math.sin(heading) * 5, z: p.z - Math.cos(heading) * 5 }, 3);
+    const spot = standingSpot(
+      s,
+      onFloor({ x: p.x - Math.sin(heading) * 5, z: p.z - Math.cos(heading) * 5 }, 3),
+      p,
+    );
     const obj = spawnFightObject(
       s.ctx,
       s.inst,
@@ -267,6 +273,12 @@ export function stepWhirls(s: FinalScope): void {
       w.heading = facingTo(next, HEART_ROOM);
       obj.facing = w.heading;
       next = onFloor(next, T.whirlR);
+    }
+    // At a fallen quarter's edge: it turns for the centre, never out over it.
+    if (overTheVoid(s, next)) {
+      w.heading = facingTo(p, HEART_ROOM);
+      obj.facing = w.heading;
+      next = p;
     }
     moveFightObject(s.ctx, s.inst, obj, next.x, next.z);
     for (const id of Object.keys(w.cooldown)) {

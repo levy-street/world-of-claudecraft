@@ -150,6 +150,24 @@ export interface FinalCoal {
   sourceId: number;
 }
 
+/** The hidden phase's state (Mythic, final_hidden.ts). */
+export interface FinalHiddenState {
+  /** Seconds in this stage of the scene (kneel, rebirth). */
+  scene: number;
+  /** Its health as the rebirth began. */
+  fromHp: number;
+  /** The quarters' fall order (the frozen bars). */
+  order: SmithHeartVein[];
+  /** The collapse's seconds so far. */
+  clock: number;
+  /** Quarters fallen so far. */
+  fallen: number;
+  /** The next fall's warning has been given. */
+  warned: boolean;
+  /** The ring has broken: nothing stands. */
+  broken: boolean;
+}
+
 /** Part 2's state: the intermissions, the poured elements, the final phase. */
 export interface FinalPhaseState {
   stage: FinalStage;
@@ -178,6 +196,13 @@ export interface FinalPhaseState {
   fury: number;
   furyTimer: number;
   furyWarned: boolean;
+  /** Mythic: the Overload bars as the final phase switched them off (the
+   *  hidden phase's order reads them). */
+  hiddenBars: Record<SmithHeartVein, number> | null;
+  /** Mythic: the hidden phase, once it has begun. */
+  hidden: FinalHiddenState | null;
+  /** The fallen quarters (quarterBit); 0 outside the collapse. */
+  fallenMask: number;
 }
 
 export interface FinalFightState {

@@ -108,7 +108,7 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
 }
 
 /** Set a body (alive or dead) down on the floor at world (x, z), at rest. */
-function layOnFloor(ctx: SimContext, p: Entity, x: number, z: number): void {
+export function layOnFloor(ctx: SimContext, p: Entity, x: number, z: number): void {
   const at = ctx.groundPos(x, z);
   p.pos = at;
   p.prevPos = { ...at };

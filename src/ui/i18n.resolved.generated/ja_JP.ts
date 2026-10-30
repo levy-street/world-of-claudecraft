@@ -4810,6 +4810,9 @@ export const ja_JP: EnTranslations = {
         "phaseCall": "四区画の呼び声：欠片が生きている間、中央で{seconds}秒間守られる。欠片1体ごとに{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。全て倒せば障壁は早く砕ける。呼び声の終わりに生き残った欠片は、その元素を戦闘終了までボスに注ぎ込む。",
         "phaseFight": "体力が{first}%と{second}%になると、守られたまま中央へ踏み込み、最も満ちた区画それぞれから欠片を呼び出す。{final}%で四つの区画すべてが目覚め、最後の抵抗が始まる。",
         "phaseFinal": "四つの区画すべてが目覚めた：中央の円環に留まり、炎の旋風、軋む氷、跳ねる雷撃、金床の重みを{every}秒ごとに1つずつ順に放つ。{enrage}秒後、あらゆる抑えを失う（主なき憤怒）。",
+        "phaseKneel": "It kneels. Nothing harms it.",
+        "phaseRebirth": "The Heart beats. Nothing harms it until it rises at {percent}% health.",
+        "unmade": "Every {every} sec a whole quarter of the Anvil falls, the one with the fullest Overload bar first, after {warn} sec of warning cracks. Anyone standing on it falls and dies. {ring} sec after the last quarter the central ring breaks and kills everyone.",
         "shield": "集めし剛力：あらゆるダメージを受けず、対象にもできない。",
         "pouredHeat": "熱が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに炎の旋風を起こす（{times}回注がれた）。",
         "pouredQuench": "焼き入れが注ぎ込まれた：戦闘終了まで、{reach}ヤード以内に他のプレイヤーが{allies}人未満の者はどこでも冷え続ける。速さは焼き入れの区画の{share}%（{times}回注がれた）。",
@@ -7481,10 +7484,22 @@ export const ja_JP: EnTranslations = {
         "final": "主なき剛力が金床の中心へと踏み込む！",
         "awaken": "四つの区画すべてが目覚めた！主なき剛力があらゆる力を一度に飲む！",
         "furySoon": "主なき剛力があらゆる抑えを失おうとしている！削り切れ！",
-        "fury": "主なき憤怒！金床を引き裂いている：今すぐ倒せ！"
+        "fury": "主なき憤怒！金床を引き裂いている：今すぐ倒せ！",
+        "rebirth": "The Heart beats! The Masterless Strength drinks the four quarters and rises again!",
+        "unmade": "The Anvil of the World is breaking apart! Kill the Masterless Strength before the last stone falls!",
+        "crackHeat": "The Heat's quarter is cracking! Get off it before it falls!",
+        "crackQuench": "The Quench's quarter is cracking! Get off it before it falls!",
+        "crackBreath": "The Breath's quarter is cracking! Get off it before it falls!",
+        "crackHammer": "The Hammer's quarter is cracking! Get off it before it falls!",
+        "ringCrack": "Only the central ring is left, and it is cracking! Kill it now!"
       }
     },
     "finalOverload": {
+      "kneeling": "It kneels",
+      "rising": "The Heart beats",
+      "fallsIn": "{quarter} falls in {seconds}",
+      "ringFallsIn": "The ring breaks in {seconds}",
+      "allFallen": "Nothing is left",
       "title": "過負荷",
       "heat": "Heat",
       "quench": "焼き入れ",

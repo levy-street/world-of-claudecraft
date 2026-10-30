@@ -30,7 +30,9 @@ import {
 } from '../../../sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS,
+  FINAL_PHASES,
   finalStageOf,
+  hiddenNextOf,
   pouredAuraId,
   quarterBit,
   veinsOfMask,
@@ -152,7 +154,8 @@ export function buildOverloadView(boss: OverloadBoss | null, out: OverloadView):
   const stage = finalStageOf(phase?.value);
   const mask = Math.round(phase?.value2 ?? 0);
   out.frozen = stage === 'leap' || stage === 'call' || stage === 'finalLeap';
-  out.barsOff = stage === 'final';
+  out.barsOff =
+    stage === 'final' || stage === 'kneel' || stage === 'rebirth' || stage === 'collapse';
   for (const row of out.rows) {
     const bar = auraOf(boss.auras, overloadAuraId(row.vein));
     row.pct = Math.max(0, Math.min(100, Math.round(bar?.value ?? 0)));
@@ -221,6 +224,26 @@ function phaseLines(
     });
   } else if (stage === 'leap' || stage === 'finalLeap') {
     out.phase = t('hudChrome.finalOverload.striding');
+  } else if (stage === 'kneel') {
+    out.phase = t('hudChrome.finalOverload.kneeling');
+  } else if (stage === 'rebirth') {
+    out.phase = t('hudChrome.finalOverload.rising');
+    out.phaseUrgent = true;
+  } else if (stage === 'collapse') {
+    // What falls next and when (the hidden aura): always urgent, the bar is
+    // the fight's clock now.
+    const h = auraOf(boss.auras, FINAL_PHASE_AURAS.hidden);
+    const next = hiddenNextOf(h?.value2);
+    const left = Math.max(0, Math.round(h?.value3 ?? 0));
+    out.phaseUrgent = next === 'ring' || left <= FINAL_PHASES.fallWarn;
+    if (next === null) out.phase = t('hudChrome.finalOverload.allFallen');
+    else if (next === 'ring')
+      out.phase = t('hudChrome.finalOverload.ringFallsIn', { seconds: whole(left) });
+    else
+      out.phase = t('hudChrome.finalOverload.fallsIn', {
+        quarter: t(`hudChrome.finalOverload.${next}`),
+        seconds: whole(left),
+      });
   } else if (stage === 'final') {
     const fury = auraOf(boss.auras, FINAL_PHASE_AURAS.fury);
     const furyStacks = Math.round(fury?.value ?? fury?.stacks ?? 0);
