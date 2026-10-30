@@ -87,6 +87,137 @@ beforeEach(() => setDitherFadeEnabledForTest(false));
 afterEach(() => setDitherFadeEnabledForTest(null));
 
 describe('transport ship view', () => {
+  it('places the shipped wheel rim aft of its pedestal in the merged ferry geometry', async () => {
+    const gltf = await loadGlb();
+    const lod = gltf.scene.getObjectByName('LOD0');
+    const wheel = gltf.scene.getObjectByName('Wheel');
+    if (!lod || !wheel || wheel.parent !== lod) throw new Error('ship wheel hierarchy changed');
+    // Isolate the real wheel mesh so the template's static merge cannot mix its
+    // vertices with the hull. Production still performs its normal conversion
+    // and merge, including the wheel correction, on this same shipped GLB.
+    for (const child of [...lod.children]) if (child !== wheel) lod.remove(child);
+    gltf.animations = [];
+
+    function wheelDepths(url: string): { rim: number; pedestal: number } {
+      const template = internals.buildTemplate(gltf, url);
+      const mergedLod = template.root.getObjectByName('LOD0');
+      if (!mergedLod) throw new Error('missing merged LOD0');
+      const wheelNode = mergedLod.getObjectByName('Wheel');
+      if (!wheelNode) throw new Error('missing wheel node');
+      // The renderer removes the source meshes after baking them into LOD0.
+      expect(meshesUnder(wheelNode)).toHaveLength(0);
+      const merged = mergedLod.children.filter((child) => (child as THREE.Mesh).isMesh);
+      expect(merged.length).toBeGreaterThan(0);
+      let rimZ = 0;
+      let standZ = 0;
+      let rimCount = 0;
+      let standCount = 0;
+      for (const child of merged) {
+        const positions = (child as THREE.Mesh).geometry.getAttribute('position');
+        for (let i = 0; i < positions.count; i++) {
+          const x = positions.getX(i);
+          const y = positions.getY(i);
+          const z = positions.getZ(i);
+          // The wide spokes/rim are clear of the narrow pedestal. Its foot
+          // lies below the rim, so these regions identify both actual parts.
+          if (Math.abs(x) > 0.5 && y > 6.7) {
+            rimZ += z;
+            rimCount++;
+          }
+          if (Math.abs(x) < 0.4 && y < 6.5) {
+            standZ += z;
+            standCount++;
+          }
+        }
+      }
+      expect(rimCount).toBeGreaterThan(0);
+      expect(standCount).toBeGreaterThan(0);
+      return { rim: rimZ / rimCount, pedestal: standZ / standCount };
+    }
+
+    // A control exercises the same merge without the ferry-specific correction:
+    // the uncorrected shipped wheel is on the bow (+Z) side of the pedestal.
+    const uncorrected = wheelDepths('uncorrected-control');
+    expect(uncorrected.rim).toBeGreaterThan(uncorrected.pedestal);
+    const ferry = wheelDepths(URL);
+    expect(ferry.rim).toBeLessThan(ferry.pedestal);
+  });
+
+  it('orients a shared ferry model regardless of which definition populates the cache first', async () => {
+    const models = internals.models as Record<string, string>;
+    const alias = 'testSharedFerry';
+    const unrelated = 'testUnrelatedShip';
+    const otherUrl = '/models/props/eastbrook_ferry.glb.other';
+    models[alias] = URL;
+    models[unrelated] = otherUrl;
+    const gltf = await loadGlb();
+    const lod = gltf.scene.getObjectByName('LOD0');
+    const wheel = gltf.scene.getObjectByName('Wheel');
+    if (!lod || !wheel || wheel.parent !== lod) throw new Error('ship wheel hierarchy changed');
+    for (const child of [...lod.children]) if (child !== wheel) lod.remove(child);
+    gltf.animations = [];
+
+    const depths = (view: TransportShipView) => {
+      const merged = view.group.getObjectByName('LOD0');
+      if (!merged) throw new Error('missing merged LOD0');
+      let rim = 0;
+      let pedestal = 0;
+      let rimCount = 0;
+      let pedestalCount = 0;
+      for (const mesh of meshesUnder(merged)) {
+        const positions = mesh.geometry.getAttribute('position');
+        for (let i = 0; i < positions.count; i++) {
+          const x = positions.getX(i);
+          const y = positions.getY(i);
+          const z = positions.getZ(i);
+          if (Math.abs(x) > 0.5 && y > 6.7) {
+            rim += z;
+            rimCount++;
+          }
+          if (Math.abs(x) < 0.4 && y < 6.5) {
+            pedestal += z;
+            pedestalCount++;
+          }
+        }
+      }
+      expect(rimCount).toBeGreaterThan(0);
+      expect(pedestalCount).toBeGreaterThan(0);
+      return { rim: rim / rimCount, pedestal: pedestal / pedestalCount };
+    };
+    const make = (key: string) => {
+      const view = buildTransportShipView({ key, x: X, z: Z, rot: 0, baseY: BASE_Y });
+      if (!view) throw new Error(`missing ship ${key}`);
+      return view;
+    };
+    try {
+      for (const order of [
+        ['eastbrookFerry', alias],
+        [alias, 'eastbrookFerry'],
+      ]) {
+        resetTransportShipCaches();
+        internals.setLoadedGltfForTest(URL, gltf);
+        const first = make(order[0]);
+        const second = make(order[1]);
+        expect(depths(first).rim).toBeLessThan(depths(first).pedestal);
+        expect(depths(second).rim).toBeLessThan(depths(second).pedestal);
+        const firstLod = first.group.getObjectByName('LOD0');
+        const secondLod = second.group.getObjectByName('LOD0');
+        if (!firstLod || !secondLod) throw new Error('missing merged LOD0');
+        expect(meshesUnder(firstLod)[0].geometry).toBe(meshesUnder(secondLod)[0].geometry);
+      }
+      resetTransportShipCaches();
+      internals.setLoadedGltfForTest(otherUrl, gltf);
+      const control = depths(make(unrelated));
+      expect(control.rim).toBeGreaterThan(control.pedestal);
+    } finally {
+      delete models[alias];
+      delete models[unrelated];
+      internals.setLoadedGltfForTest(otherUrl, null);
+      resetTransportShipCaches();
+      internals.setLoadedGltfForTest(URL, await loadGlb());
+    }
+  });
+
   it('knows exactly the ship keys the sim moors hulls for', () => {
     expect(Object.keys(internals.models).sort()).toEqual(Object.keys(TRANSPORT_SHIP_HULLS).sort());
     expect(isTransportShipKey('eastbrookFerry')).toBe(true);

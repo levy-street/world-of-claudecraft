@@ -37,8 +37,9 @@ import {
 
 /** decorProps key -> model. The sim's hull layouts use the same keys
  *  (src/sim/content/transport_ships.ts). */
+const EASTBROOK_FERRY_MODEL_URL = '/models/props/eastbrook_ferry.glb';
 const TRANSPORT_SHIP_MODELS: Readonly<Record<string, string>> = {
-  eastbrookFerry: '/models/props/eastbrook_ferry.glb',
+  eastbrookFerry: EASTBROOK_FERRY_MODEL_URL,
 };
 
 const LOD_NAMES = ['LOD0', 'LOD1', 'LOD2', 'LOD3'] as const;
@@ -236,8 +237,15 @@ function mergeStatic(anchor: THREE.Object3D, live: ReadonlySet<THREE.Object3D>):
   }
 }
 
-function buildTemplate(gltf: LoadedGltf): ShipTemplate {
+function buildTemplate(gltf: LoadedGltf, url: string): ShipTemplate {
   const root = gltf.scene.clone(true);
+  if (url === EASTBROOK_FERRY_MODEL_URL) {
+    // The shipped Wheel node's pivot is at its pedestal. Its rim faces the
+    // bow, placing the helmsman in front of it looking aft; turn the whole
+    // assembly so the helmsman stands aft and faces the bow. Do this before
+    // static merging, without changing the hull or its simulation layout.
+    root.getObjectByName('Wheel')?.rotateY(Math.PI);
+  }
   root.traverse((node) => {
     const mesh = node as THREE.Mesh;
     if (!mesh.isMesh) return;
@@ -337,7 +345,7 @@ function templateFor(key: string): ShipTemplate {
   if (!template) {
     const gltf = loaded.get(url);
     if (!gltf) throw new Error(`transport ship model was not preloaded: ${url}`);
-    template = buildTemplate(gltf);
+    template = buildTemplate(gltf, url);
     templates.set(tkey, template);
     loaded.delete(url);
     releaseGltf(url);
