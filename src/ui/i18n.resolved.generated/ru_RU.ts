@@ -7367,7 +7367,7 @@ export const ru_RU: EnTranslations = {
         "cradle": "{player} поднят в бурю! Соберитесь под ним!",
         "drawn": "Притянутая молния на {player}! Уводите удары к краю!",
         "stormGust": "Собирается штормовой порыв! Держитесь против ветра!",
-        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",

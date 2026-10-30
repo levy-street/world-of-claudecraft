@@ -7367,7 +7367,7 @@ export const zh_CN: EnTranslations = {
         "cradle": "{player}被举入了风暴！到他的下方集合！",
         "drawn": "引雷落在{player}身上！把落雷引向边缘！",
         "stormGust": "风暴阵风正在聚集！顶住风！",
-        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",

@@ -7367,7 +7367,7 @@ export const es_ES: EnTranslations = {
         "cradle": "{player} is lifted into the storm! Gather beneath them!",
         "drawn": "Drawn Lightning on {player}! Lead the strikes to the edge!",
         "stormGust": "A storm gust gathers! Brace against the wind!",
-        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",

@@ -7367,7 +7367,7 @@ export const ja_JP: EnTranslations = {
         "cradle": "{player}が嵐の中へ持ち上げられた！その真下に集まれ！",
         "drawn": "{player}に招雷！落雷を縁へ導け！",
         "stormGust": "嵐の突風が集まる！風に備えろ！",
-        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",

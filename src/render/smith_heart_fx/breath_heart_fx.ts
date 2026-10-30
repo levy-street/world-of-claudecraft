@@ -318,7 +318,7 @@ export class BreathHeartFx {
           side.floor,
           new THREE.MeshBasicMaterial({
             name: `smithHeartPortalLetter${side.tag}`,
-            color: 0xffffff,
+            color: 0x06202a,
             transparent: true,
             depthWrite: false,
             toneMapped: false,

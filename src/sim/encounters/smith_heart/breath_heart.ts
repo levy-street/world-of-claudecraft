@@ -134,7 +134,7 @@ export function startHeart(s: BreathScope, count: number): boolean {
     s,
     s.boss,
     'knot',
-    'A Knotted Gale falls! Carry it through the portals and throw it into the void!',
+    'A Knotted Gale falls! Carry it to a gap and throw it into the void!',
   );
   if (a && b)
     raidWarn(s, s.boss, 'knotPortals', `Portal A on ${a.name}, Portal B on ${b.name}!`, {

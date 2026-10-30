@@ -7367,7 +7367,7 @@ export const ko_KR: EnTranslations = {
         "cradle": "{player} 님이 폭풍 속으로 들어 올려졌습니다! 그 아래로 모이세요!",
         "drawn": "{player} 님에게 끌려오는 번개! 낙뢰를 가장자리로 유도하세요!",
         "stormGust": "폭풍 돌풍이 모입니다! 바람에 대비하세요!",
-        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knot": "A Knotted Gale falls! Carry it to a gap and throw it into the void!",
         "knotPortals": "Portal A on {a}, Portal B on {b}!",
         "knotTaken": "{player} takes up the Knotted Gale!",
         "knotDropped": "{player} falls! The Knotted Gale is free again!",

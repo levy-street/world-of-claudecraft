@@ -28,8 +28,8 @@ void main() {
   arms = pow(arms, 2.0);
   float rim = smoothstep(0.82, 0.96, r) * (1.0 - smoothstep(0.96, 1.0, r));
   float eye = 1.0 - smoothstep(0.0, 0.3, r);
-  vec3 col = uColor * (0.25 + 1.1 * arms * (1.0 - r * 0.5)) + uColor * rim * 1.7 + vec3(1.0) * eye * 0.8;
-  gl_FragColor = vec4(col, (0.55 * arms + rim + eye * 0.8 + 0.18) * uOpen);
+  vec3 col = uColor * (0.25 + 1.1 * arms * (1.0 - r * 0.5)) + uColor * rim * 1.7 + vec3(1.0) * eye * 0.3;
+  gl_FragColor = vec4(col, (0.55 * arms + rim + eye * 0.3 + 0.18) * uOpen);
 }
 `;
 
