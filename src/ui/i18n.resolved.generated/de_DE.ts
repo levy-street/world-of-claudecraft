@@ -7412,6 +7412,7 @@ export const de_DE: EnTranslations = {
         "keepers": "Wellkeepers rise from the wellspring! Tank them, and keep their marks away from the Wellspawn!",
         "seeds": "Hearthseeds fall! Drop them together and run!",
         "zones": "Wakefire! The Hearth ignites band by band: step out!",
+        "wheel": "The Hearth turns! Get to the dark slice!",
         "cinder": "A Rolling Cinder falls! Strike it back before it reaches its quarry!"
       },
       "say": {

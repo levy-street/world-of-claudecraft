@@ -7412,6 +7412,7 @@ export const zh_CN: EnTranslations = {
         "keepers": "涌泉看守从涌泉中升起！坦住它们，让它们的印记远离涌泉之子！",
         "seeds": "炉心火种落下了！集中放下然后快跑！",
         "zones": "苏醒之火！炉心一圈接一圈地燃起：快出去！",
+        "wheel": "The Hearth turns! Get to the dark slice!",
         "cinder": "滚动余烬落下了！在它追上猎物之前把它打退！"
       },
       "say": {

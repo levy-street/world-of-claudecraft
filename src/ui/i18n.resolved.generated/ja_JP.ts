@@ -7412,6 +7412,7 @@ export const ja_JP: EnTranslations = {
         "keepers": "湧泉の守り手が現れた！引きつけて、その印を湧泉の落とし子から遠ざけろ！",
         "seeds": "炉床の種が降ってくる！まとめて落として走れ！",
         "zones": "目覚めの炎！炉床が帯ごとに燃え上がる：外へ出ろ！",
+        "wheel": "The Hearth turns! Get to the dark slice!",
         "cinder": "転がる燃え殻が落ちてきた！獲物に届く前に打ち返せ！"
       },
       "say": {

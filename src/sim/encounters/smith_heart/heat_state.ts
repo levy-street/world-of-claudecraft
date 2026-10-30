@@ -86,6 +86,17 @@ export interface HeatZone {
 }
 
 /** A Wakefire run: the bands in their order, the next one's start. */
+/** One round of the Wheel of the Hearth on the floor. */
+export interface HeatWheelRound {
+  safe: number;
+  state: 'warn' | 'burn';
+  remaining: number;
+  tick: number;
+  /** The red slices' objects, in slice order. */
+  reds: number[];
+  safeId: number;
+}
+
 export interface HeatZoneRun {
   order: number[];
   next: number;
@@ -170,6 +181,13 @@ export interface HeatFightState {
   seeds: HeatSeed[];
   zoneTimer: number;
   zoneRun: HeatZoneRun | null;
+  /** The Wheel of the Hearth (Mythic): its clock, how many ran, this run's safe
+   *  slices, the next round's index, the rounds on the floor. */
+  wheelTimer: number;
+  wheelRuns: number;
+  wheelSafes: number[];
+  wheelNext: number;
+  wheelRounds: HeatWheelRound[];
   zones: HeatZone[];
   cinderTimer: number;
   cindersCalled: number;

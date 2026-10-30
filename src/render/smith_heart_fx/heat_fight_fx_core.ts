@@ -26,7 +26,9 @@ import {
   riverOf,
   swellLaneOf,
   HEAT_TUNING as T,
+  WHEEL_ARCS_DEG,
   wellOf,
+  wheelOf,
   ZONE_BANDS,
   zoneOf,
 } from '../../sim/encounters/smith_heart/heat_ids';
@@ -72,6 +74,7 @@ export const HEAT_FIGHT_REACH = 70;
 // ---- the objects ---------------------------------------------------------------------
 
 export type HeatObjectKind =
+  | 'wheel'
   | 'well'
   | 'fist'
   | 'lane'
@@ -87,6 +90,7 @@ const O = HEAT_OBJECTS;
 
 /** Which of the fight's objects a template is, or null. */
 export function heatObjectKind(templateId: string): HeatObjectKind | null {
+  if (templateId.startsWith(HEAT_OBJECTS.wheelPrefix)) return 'wheel';
   if (!templateId.startsWith('sh_heat_')) return null;
   if (wellOf(templateId) !== null) return 'well';
   if (templateId === O.wave) return 'wave';
@@ -247,6 +251,12 @@ export function zoneLook(
   return out;
 }
 
+/** A Wheel slice's bearings (radians, sim facing), for the shader's clip. */
+export function wheelArc(slice: number): { from: number; to: number } {
+  const a = WHEEL_ARCS_DEG[Math.max(0, Math.min(WHEEL_ARCS_DEG.length - 1, slice))];
+  return { from: (a[0] * Math.PI) / 180, to: (a[1] * Math.PI) / 180 };
+}
+
 /** A band's inner and outer radius (yards). */
 export function zoneRadii(band: number): readonly [number, number] {
   return ZONE_BANDS[Math.max(0, Math.min(ZONE_BANDS.length - 1, band))];
@@ -298,6 +308,7 @@ function memo<T>(decode: (id: string) => T): (id: string) => T {
 /** riverOf, zoneOf and heatTimedOf for the painters' frame paths. */
 export const riverOfCached = memo(riverOf);
 export const zoneOfCached = memo(zoneOf);
+export const wheelOfCached = memo(wheelOf);
 export const wellOfCached = memo(wellOf);
 const timedCaches = new Map<string, (id: string) => number | null>();
 export function heatTimedOfCached(prefix: string, templateId: string): number | null {

@@ -305,6 +305,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.quenchAlert.coldAria",
     "hudChrome.quenchAlert.coldBar",
@@ -629,6 +630,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.quenchAlert.coldAria",
     "hudChrome.quenchAlert.coldBar",
@@ -956,6 +958,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -1291,6 +1294,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -1627,6 +1631,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -1962,6 +1967,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -2009,7 +2015,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.council.warn.crowded",
     "hudChrome.council.warn.prison",
     "hudChrome.council.warn.shoulder",
-    "hudChrome.finalOverload.heat"
+    "hudChrome.finalOverload.heat",
+    "hudChrome.heatGuardian.warn.wheel"
   ],
   "zh_TW": [
     "abilityUi.cast.heart_gale_bolt",
@@ -2022,7 +2029,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.council.warn.crowded",
     "hudChrome.council.warn.prison",
     "hudChrome.council.warn.shoulder",
-    "hudChrome.finalOverload.heat"
+    "hudChrome.finalOverload.heat",
+    "hudChrome.heatGuardian.warn.wheel"
   ],
   "ko_KR": [
     "abilityUi.cast.heart_gale_bolt",
@@ -2035,7 +2043,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.council.warn.crowded",
     "hudChrome.council.warn.prison",
     "hudChrome.council.warn.shoulder",
-    "hudChrome.finalOverload.heat"
+    "hudChrome.finalOverload.heat",
+    "hudChrome.heatGuardian.warn.wheel"
   ],
   "ja_JP": [
     "abilityUi.cast.heart_gale_bolt",
@@ -2048,7 +2057,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.council.warn.crowded",
     "hudChrome.council.warn.prison",
     "hudChrome.council.warn.shoulder",
-    "hudChrome.finalOverload.heat"
+    "hudChrome.finalOverload.heat",
+    "hudChrome.heatGuardian.warn.wheel"
   ],
   "pt_BR": [
     "abilityUi.cast.heart_bellows_gust",
@@ -2349,6 +2359,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -2396,7 +2407,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.council.warn.crowded",
     "hudChrome.council.warn.prison",
     "hudChrome.council.warn.shoulder",
-    "hudChrome.finalOverload.heat"
+    "hudChrome.finalOverload.heat",
+    "hudChrome.heatGuardian.warn.wheel"
   ],
   "cs_CZ": [
     "abilityUi.cast.heart_bellows_gust",
@@ -2697,6 +2709,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -3032,6 +3045,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -3367,6 +3381,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -3702,6 +3717,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -4037,6 +4053,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -4372,6 +4389,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -4707,6 +4725,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",
@@ -5042,6 +5061,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.heatGuardian.warn.overflow",
     "hudChrome.heatGuardian.warn.seeds",
     "hudChrome.heatGuardian.warn.wellspawn",
+    "hudChrome.heatGuardian.warn.wheel",
     "hudChrome.heatGuardian.warn.zones",
     "hudChrome.priest.bombLabel",
     "hudChrome.priest.bombReady",

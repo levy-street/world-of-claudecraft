@@ -42,6 +42,10 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `quench_rim.ts` | The shore ice: the ring of oriented combat walls that keeps the fight on the lake, rising at the pull, falling at a wipe or the kill. |
 | `quench_voice.ts` | What the guardian SAYS (`hudChrome.quenchGuardian.say.*`, `QUENCH_LINES` the same English). |
 | `quench.ts` | The coordinator: the pull, the half, the wipe's reset, the fall, the dev tier switch (`setQuenchDevTier`) and the `/dev heart quench` triggers and readout. |
+| `heat_wheel.ts` | The Guardian of the Heat's Wheel of the Hearth (Mythic): four slices round the wellspring, three rounds back to back. |
+| `council_shoulder.ts` | The Hammer Council's Shouldered Stone (Mythic): the Slabwright's ward while another member stands within reach. |
+| `council_prison.ts` | The Hammer Council's Stone Prison: real blocks round stunned players, broken by the raid or by a stasis immunity, crushing them when their time runs out. |
+| `quench_wander.ts` | The Guardian of the Quench's wandering blades: the loop round the lake, a passing blade's strike. |
 | `heat_ids.ts` | Leaf: the Guardian of the Heat's cast, aura, object, mob and cue ids, the names (`HEAT_NAMES`), the per-difficulty rules (`HEAT_DIFFICULTY`: the overflows' adds, Seedflames, bolts, the cinder's speed, a quarter more damage; mythic is heroic whole, its `mythicRule` the seam), the phases' kits (`HEAT_PHASE_KIT`, 1 to 3 on every tier), the SKETCH tuning (`HEAT_TUNING`) and the objects' template codecs (`heatTimed`, `swellLaneTemplate`, `riverTemplate`, `zoneTemplate`, `wellTemplate`). |
 | `heat_geometry.ts` | PURE over the layout (no SimContext, for the bots and the renderer to reuse): the Hearth's floor (`inHearthFloor`, `floorReach`), the wellspring (`wellDistance`, `inWell`, `beyondFlare`), Wakefire's bands (`inBand`), the lanes and a wave's wall (`inLane`, `inWave`, `swellBearings`), the posts (`WELLSPAWN_SPOTS`, `WELLKEEPER_SPOTS`, `SHORE_POINTS`). |
 | `heat_state.ts` | Type-only: `HeatFightState` (`Entity.smithHeartHeat` on the guardian). |

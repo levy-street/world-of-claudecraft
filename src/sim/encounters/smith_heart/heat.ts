@@ -27,7 +27,7 @@
 // heroic tier of its own. Heroic and mythic end with phase 3 like normal;
 // their pressure is the overflows' adds, the Seedflames, faster cinders and a
 // quarter more damage. Mythic is a prototype behind its own switch and, for
-// now, heroic whole (heat_ids.ts HEAT_DIFFICULTY, its mythicRule the seam).
+// heroic whole plus the Wheel of the Hearth (heat_ids.ts HEAT_DIFFICULTY, heat_wheel.ts).
 //
 // Deterministic: every pick is hashed or ordered; the only rng draws are the
 // damage rolls, in claim-player order. Every visible state rides existing
@@ -91,6 +91,7 @@ import {
   stepTrails,
   stepWellspawn,
 } from './heat_wellspawn';
+import { startWheel, stepWheel } from './heat_wheel';
 import { clearZones, startZones, stepZones } from './heat_zones';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
@@ -155,6 +156,11 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     seedWaves: 0,
     seeds: [],
     zoneTimer: T.zoneFirst,
+    wheelTimer: T.wheelFirst,
+    wheelRuns: 0,
+    wheelSafes: [],
+    wheelNext: 0,
+    wheelRounds: [],
     zoneRun: null,
     zones: [],
     cinderTimer: T.cinderFirst,
@@ -286,6 +292,7 @@ function enterPhase(s: HeatScope, phase: HeatPhase): void {
   st.fistTimer = Math.min(st.fistTimer, 6);
   st.seedTimer = T.seedFirst;
   st.zoneTimer = T.zoneFirst;
+  st.wheelTimer = T.wheelFirst;
   st.cinderTimer = T.cinderFirst;
 }
 
@@ -379,6 +386,10 @@ function startMechanics(s: HeatScope): void {
   if (kit.zones) {
     st.zoneTimer -= DT;
     if (st.zoneTimer <= 1e-9) startZones(s);
+    if (s.rules.wheel) {
+      st.wheelTimer -= DT;
+      if (st.wheelTimer <= 1e-9) startWheel(s);
+    }
   }
   if (kit.cinders) {
     st.cinderTimer -= DT;
@@ -486,6 +497,7 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepWellFire(s);
   stepSeeds(s);
   stepZones(s);
+  stepWheel(s);
   stepCinders(s);
   stepWellspawn(s);
   stepKeepers(s);
@@ -585,6 +597,10 @@ export function heatDevTrigger(
   }
   if (verb === 'flare') return `Hearth Flare (${flare(s).length} struck).`;
   if (verb === 'seeds') return `${dropSeeds(s)} Hearthseeds fall.`;
+  if (verb === 'wheel') {
+    startWheel(s);
+    return 'The Wheel of the Hearth turns.';
+  }
   if (verb === 'zones') {
     startZones(s);
     return 'Wakefire: the bands ignite one after another.';

@@ -15696,6 +15696,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.heatGuardian.warn.overflow'
   | 'hudChrome.heatGuardian.warn.seeds'
   | 'hudChrome.heatGuardian.warn.wellspawn'
+  | 'hudChrome.heatGuardian.warn.wheel'
   | 'hudChrome.heatGuardian.warn.zones'
   | 'hudChrome.hill.callout.dominating'
   | 'hudChrome.hill.callout.godlike'

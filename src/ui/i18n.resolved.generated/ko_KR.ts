@@ -7412,6 +7412,7 @@ export const ko_KR: EnTranslations = {
         "keepers": "샘지기가 샘에서 솟아오른다! 붙잡아 두고 그 표식을 샘의 자식들에게서 떼어 놓아라!",
         "seeds": "화로 씨앗이 떨어진다! 한데 모아 떨어뜨리고 달려라!",
         "zones": "깨어나는 불! 화로가 띠마다 타오른다: 밖으로 나가라!",
+        "wheel": "The Hearth turns! Get to the dark slice!",
         "cinder": "구르는 잉걸불이 떨어진다! 먹잇감에 닿기 전에 쳐내라!"
       },
       "say": {

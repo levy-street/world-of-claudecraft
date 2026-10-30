@@ -90,6 +90,8 @@ export const HEAT_OBJECTS = {
   seedPrefix: 'sh_heat_seed_',
   /** Wakefire: `<prefix><band>_<warn|burn>_<tenths>` (bands round the well). */
   zonePrefix: 'sh_heat_zone_',
+  /** Mythic: a slice of the Wheel of the Hearth (wheelTemplate). */
+  wheelPrefix: 'sh_heat_wheel_',
   /** Where a Rolling Cinder will land: `<prefix><tenths>`. */
   fallPrefix: 'sh_heat_fall_',
   /** A cinder's burning landing spot: `<prefix><tenths>` of its life. */
@@ -173,6 +175,7 @@ export const HEAT_NAMES = {
   trail: 'Cinder Trail',
   seed: 'Hearthseed',
   zone: 'Wakefire',
+  wheel: 'Wheel of the Hearth',
   cinder: 'Rolling Cinder',
   cinderLand: 'Cinder Scorch',
   hunted: 'Hunted',
@@ -183,7 +186,7 @@ export const HEAT_NAMES = {
 
 /** The fight's difficulty. Each tier is one HEAT_DIFFICULTY row; mythic is a
  *  dev-switched prototype (heat.ts setHeatDevTier) and, for now, the heroic
- *  row whole: a later mythic-only mechanic is the `mythicRule` field and its
+ *  row whole: its mythic-only mechanic is the `wheel` field and its
  *  own module, never a branch on a tier's name. */
 export type HeatDifficulty = 'normal' | 'heroic' | 'mythic';
 
@@ -198,8 +201,8 @@ export interface HeatDifficultyRules {
   bolts: number;
   /** A Rolling Cinder's speed (yards a second; a player runs 7). */
   cinderSpeed: number;
-  /** The seam for one later mythic-only mechanic (none yet). */
-  mythicRule: null;
+  /** The Wheel of the Hearth (heat_wheel.ts). */
+  wheel: boolean;
 }
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
@@ -209,7 +212,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     seedHatch: false,
     bolts: 2,
     cinderSpeed: 3.2,
-    mythicRule: null,
+    wheel: false,
   },
   heroic: {
     damageMult: 1.25,
@@ -217,16 +220,16 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     seedHatch: true,
     bolts: 3,
     cinderSpeed: 4.4,
-    mythicRule: null,
+    wheel: false,
   },
-  // Exactly heroic for now: the seam for one later mythic-only mechanic.
+  // Heroic whole, plus the Wheel of the Hearth.
   mythic: {
     damageMult: 1.25,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
     cinderSpeed: 4.4,
-    mythicRule: null,
+    wheel: true,
   },
 };
 
@@ -354,6 +357,18 @@ export const HEAT_TUNING = {
   // Wakefire (phases 2 and 3).
   zoneFirst: 16,
   zoneEvery: 34,
+  // The Wheel of the Hearth (Mythic): its clock, a round's warning, its burn and
+  // bite (the same order as Wakefire's), how far out its slices reach.
+  wheelFirst: 24,
+  wheelEvery: 40,
+  wheelWarn: 4,
+  wheelBurn: 1.5,
+  wheelTick: 0.5,
+  wheelMin: 900,
+  wheelMax: 1000,
+  wheelBurnMin: 220,
+  wheelBurnMax: 260,
+  wheelOuter: 70,
   zoneWarn: 4,
   /** The next band begins its warning this long after the last began. */
   zoneStep: 2.5,
@@ -434,6 +449,38 @@ export const ZONE_BANDS: readonly (readonly [number, number])[] = [
   [19, 31],
   [31, 70],
 ];
+
+/** The Wheel of the Hearth: how many slices, and how many rounds in a run. */
+export const WHEEL_SLICES = 4;
+export const WHEEL_ROUNDS = 3;
+
+/** A slice's bearings round the wellspring (sim facing, degrees): 45 degrees each
+ *  over the shore, the two ends taking in the floor behind it. */
+export const WHEEL_ARCS_DEG: readonly (readonly [number, number])[] = [
+  [-90, 45],
+  [45, 90],
+  [90, 135],
+  [135, 270],
+];
+
+export type HeatWheelState = 'warn' | 'burn' | 'safe';
+
+/** A Wheel slice's template: which, its state, its seconds. */
+export function wheelTemplate(slice: number, state: HeatWheelState, seconds: number): string {
+  return `${HEAT_OBJECTS.wheelPrefix}${slice}_${state}_${Math.round(seconds * 10)}`;
+}
+
+export function wheelOf(
+  templateId: string,
+): { slice: number; state: HeatWheelState; seconds: number } | null {
+  if (!templateId.startsWith(HEAT_OBJECTS.wheelPrefix)) return null;
+  const [a, state, t] = templateId.slice(HEAT_OBJECTS.wheelPrefix.length).split('_');
+  const slice = Number(a);
+  const n = Number(t);
+  if (!Number.isInteger(slice) || slice < 0 || slice >= WHEEL_SLICES) return null;
+  if (state !== 'warn' && state !== 'burn' && state !== 'safe') return null;
+  return Number.isInteger(n) && n >= 0 ? { slice, state, seconds: n / 10 } : null;
+}
 
 /** The overflow rivers' bearing `i` (sim facing, radians). */
 export function riverBearing(i: number): number {

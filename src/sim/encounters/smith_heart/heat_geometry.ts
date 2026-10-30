@@ -14,7 +14,7 @@
 //                  the shore points a Rolling Cinder lands on
 
 import { FORGE_POINTS, HEART_ROOM, HEARTH_WELL } from '../../content/smith_heart_layout';
-import { HEAT_TUNING as T, ZONE_BANDS } from './heat_ids';
+import { HEAT_TUNING as T, WHEEL_ARCS_DEG, ZONE_BANDS } from './heat_ids';
 
 export interface HPoint {
   x: number;
@@ -50,6 +50,14 @@ export function inWell(x: number, z: number): boolean {
 /** Is (x, z) out of the guardian's reach, where Hearth Flare strikes? */
 export function beyondFlare(x: number, z: number): boolean {
   return wellDistance(x, z) > T.flareReach;
+}
+
+/** Which slice of the Wheel of the Hearth (x, z) stands in (WHEEL_ARCS_DEG). */
+export function wheelSliceAt(x: number, z: number): number {
+  let deg = (Math.atan2(x - HEARTH_WELL.x, z - HEARTH_WELL.z) * 180) / Math.PI;
+  if (deg < -90) deg += 360;
+  for (let i = 0; i < WHEEL_ARCS_DEG.length; i++) if (deg < WHEEL_ARCS_DEG[i][1]) return i;
+  return WHEEL_ARCS_DEG.length - 1;
 }
 
 /** Is (x, z) in Wakefire band `band` (0 near, 1 the middle, 2 the back)? */

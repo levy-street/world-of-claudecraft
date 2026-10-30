@@ -29,6 +29,7 @@ import {
 } from './heat_scope';
 import type { HeatZone } from './heat_state';
 import { heatSay } from './heat_voice';
+import { clearWheel } from './heat_wheel';
 
 /** Every run's order: from the guardian outward. */
 const ZONE_ORDER: readonly number[] = [0, 1, 2];
@@ -116,4 +117,5 @@ export function clearZones(s: Pick<HeatScope, 'ctx' | 'inst' | 'st'>): void {
   for (const z of s.st.zones) dropFightObject(s.ctx, s.inst, z.objectId);
   s.st.zones = [];
   s.st.zoneRun = null;
+  clearWheel(s);
 }

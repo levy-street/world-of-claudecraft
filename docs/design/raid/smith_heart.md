@@ -1630,8 +1630,9 @@ guardian cannot be pushed past an overflow before it happens.
 | Wakefire | Phases 2 and 3, every 34 s (first 16 s into phase 2): the floor ignites in three bands round the wellspring (8 to 19 yd, 19 to 31, 31 and out), always from the guardian outward (melee, casters, the far shore). Each band warns 4 s, ignites (900 to 1,000 to everyone in it) and burns 2 s more (220 to 260 every half second); the next begins its warning 2.5 s after the last, so the raid steps into the band that has just burned | `heat_zones.ts` |
 | Phase 3 (40 to 0) | The Rolling Cinders, Wakefire, the fist | `heat_cinders.ts` |
 | Rolling Cinder | Every 45 s (first 8 s in) a great living fireball falls on the shore (2 s of warning, 300 to 340 within 4 yd, the spot burning 8 s; at most six burn at once, the oldest going out), then rolls after one hashed player (Hunted shows who; 3.2 yd a second on Normal, 4.4 on Heroic, nothing slows it). If it reaches them they die and those within 3 yd take 600 to 700; the cinder is spent. Its quarry gone, it picks another. It is a ward: any strike lands one point and knocks it 6 yd back, then Cooling Crust holds it against knockback for 5 s, so the raid assigns who strikes it and when. Nothing kills it | `heat_cinders.ts`, `heat_cinder_ward.ts` |
+| Wheel of the Hearth (Mythic) | Phases 2 and 3, every 40 s (first 24 s in): the shore round the wellspring is cut in four slices (`WHEEL_ARCS_DEG`). Three turn red, warn 4 s, erupt (900 to 1,000 to everyone in them past the lip) and burn 1.5 s more (220 to 260 every half second); the fourth stays dark. Three rounds back to back (`WHEEL_ROUNDS`): as one erupts the next shows, its safe slice one or two away, so the raid crosses as the fire dies | `heat_wheel.ts` |
 | Heroic | A quarter more damage on every mechanic, the overflows' adds, the Seedflames, three Falling Cinders, faster cinders | `HEAT_DIFFICULTY` |
-| Mythic | Not now: one more `HEAT_DIFFICULTY` row, today heroic's whole, behind its own dev switch (`/dev heart heat mythic`); `mythicRule` is the seam for one later mythic-only mechanic | `heat.ts` `setHeatDevTier` |
+| Mythic | Heroic whole plus the Wheel of the Hearth, one more `HEAT_DIFFICULTY` row, behind its own dev switch (`/dev heart heat mythic`) | `heat.ts` `setHeatDevTier` |
 | One wipe | The fight ends when the guardian stops fighting: every bar, footprint, add and mark gone, the wellspring calm | `heat.ts` (`resetHeat`) |
 | Its fall | The Heat vein and the seal's quarter light as before (seal.ts reads the guardian's death) | `heat.ts` |
 
@@ -2074,6 +2075,7 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart heat flare` | Hearth Flare now (everyone out of its reach) |
 | `/dev heart heat seeds` | Hearthseeds fall under the raid now |
 | `/dev heart heat zones` | a Wakefire run begins now |
+| `/dev heart heat wheel` | a Wheel of the Hearth begins now |
 | `/dev heart heat ember` (or `cinder`) | a Rolling Cinder falls now |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
