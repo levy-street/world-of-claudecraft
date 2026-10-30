@@ -184,31 +184,15 @@ describe('#1608: potionHp/potionMana ladder', () => {
     ['mana_potion', ZONE3_ZONE.levelRange[1]],
   ];
 
-  // Measured fractions after the 11n vendor floor: 0.894/0.792/0.721 by rung.
-  // The band bracketed the items.ts header's stated "72-90%" (floor 0.70, not
-  // 0.72, because the lowest live fraction cleared 0.72 by only 0.0009; the
-  // ceiling 0.92 left the top fraction real slack so an unrelated
-  // one-point priest base-hp retune did not red a potion suite; the golden
-  // pin below is the change detector for the values themselves, this band
-  // guards against pool drift).
-  //
-  // 2026-09-11, the class health table (docs/design/class-health-table-2026-09-11.md):
-  // the priest's base pool grew from 123/240/387 to 198/408/653 at the three
-  // bracket tops (2 Stamina per level, 15 HP per level), so the SAME ladder now
-  // restores 0.556/0.466/0.427. That is the "fixed heals get relatively weaker"
-  // consequence the stamina audit named, and it is deliberately NOT absorbed
-  // here: re-sizing the ladder back to 72-90% means 143-178 / 294-367 / 470-588
-  // on the vendor rungs, the crafted alchemy ladder alongside (its values are
-  // quoted in the guide prose in every locale), and the vendor-versus-crafted
-  // ordering law below, so it is its own PR: issue #4000. Until then this band
-  // pins the measured fractions so the ladder cannot drift further unnoticed.
+  // The design target is 72-90%; the 70-92% regression band leaves
+  // tolerance for future small changes to the actual priest health pools.
   it.each(HP_TIERS)(
-    "%s restores its measured fraction (0.40-0.60) of a priest's base hp pool at its bracket top, pending the ladder re-size",
+    "%s restores 70-92% of a priest's base hp pool at its bracket top",
     (itemId, topLevel) => {
       const { maxHp } = basePoolAt('priest', topLevel);
       const fraction = potionHp(itemId) / maxHp;
-      expect(fraction).toBeGreaterThanOrEqual(0.4);
-      expect(fraction).toBeLessThanOrEqual(0.6);
+      expect(fraction).toBeGreaterThanOrEqual(0.7);
+      expect(fraction).toBeLessThanOrEqual(0.92);
     },
   );
 
@@ -238,12 +222,14 @@ describe('#1608: potionHp/potionMana ladder', () => {
 
   // Golden pin: catches an accidental future edit to the tuned ladder without a
   // deliberate matching change to this test's target-fraction assertions above.
-  // The 11n vendor floor moved healing_potion to 279 and the two upper mana
-  // rungs to 226/354; the minor and lesser hp rungs stayed put (qr-11n-NINE).
+  // The healing values were resized for the current class-health table (#4000).
   it('pins the exact retuned values', () => {
-    expect(potionHp('minor_healing_potion')).toBe(110);
-    expect(potionHp('lesser_healing_potion')).toBe(190);
-    expect(potionHp('healing_potion')).toBe(279);
+    expect(potionHp('minor_healing_potion')).toBe(177);
+    expect(potionHp('lesser_healing_potion')).toBe(323);
+    expect(potionHp('healing_potion')).toBe(471);
+    expect(potionHp('silverleaf_healing_draught')).toBe(193);
+    expect(potionHp('goldleaf_healing_draught')).toBe(340);
+    expect(potionHp('sunpetal_healing_draught')).toBe(566);
     expect(potionMana('minor_mana_potion')).toBe(145);
     expect(potionMana('lesser_mana_potion')).toBe(226);
     expect(potionMana('mana_potion')).toBe(354);

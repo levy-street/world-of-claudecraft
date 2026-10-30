@@ -1076,10 +1076,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // vendor potionHp/potionMana machinery (instant, in-combat, shared cooldown);
   // elixirs reuse the elixir_of_the_bear shape (a temporary buff_sta aura on
   // use). Every rung strictly EXCEEDS its vendor-tier equivalent in items.ts
-  // (minor/lesser/healing_potion, minor/lesser/mana_potion; #1608 retuned that
-  // ladder, and the 11n vendor floor then lowered the vendor line onto the
-  // 10/15/20 margin ladder BELOW this one, healing_potion 279 and mana_potion
-  // 354, while these crafted ceilings stayed frozen per R5): heal <= 335,
+  // (minor/lesser/healing_potion, minor/lesser/mana_potion). The healing
+  // ladder was resized for the current class-health table (#4000): heal <= 566,
   // mana <= 425, elixir buff_sta <= 12 for <= 900s (elixir_of_the_bear). The three
   // elixir aura display names are localized client-side through the sim_i18n
   // aura matcher (AURA_NAME_KEY), the same path as 'Might of the Bear'. Never
@@ -1089,7 +1087,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sheenleaf Healing Draught',
     kind: 'potion',
     quality: 'common',
-    potionHp: 120,
+    potionHp: 193,
     sellValue: 12,
   },
   silverleaf_mana_draught: {
@@ -1113,7 +1111,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Goldleaf Healing Draught',
     kind: 'potion',
     quality: 'uncommon',
-    potionHp: 200,
+    potionHp: 340,
     sellValue: 22,
   },
   goldleaf_mana_draught: {
@@ -1137,7 +1135,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sunpetal Healing Draught',
     kind: 'potion',
     quality: 'rare',
-    potionHp: 335,
+    potionHp: 566,
     sellValue: 32,
   },
   sunpetal_mana_draught: {

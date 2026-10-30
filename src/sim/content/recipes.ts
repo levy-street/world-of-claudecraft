@@ -4493,20 +4493,9 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // the rung's own register. Input 82 vs output 16 (the goldleaf_scroll
     // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 16 < input 82; no
     // prior recipe crafts it (recipeForResultItem); common, below the ceiling.
-    // Re-picked by the 11l QA from healing_potion (then 320 HP, sellValue 32): at
-    // rung 25 that potion out-healed the trainer's OWN rung-25 row
-    // recipe_goldleaf_healing_draught (200 HP for a 140 bill) at 82 and sat
-    // within 15 HP of the rung-50 rare draught (335 HP for 344), on the one
-    // shared potion cooldown, which inverted alchemy's ladder (R21 in
-    // reverse: the shipped rows go dead for anyone holding tallow). The
-    // lesser potion (190 HP) sits UNDER the rung-25 draught and above the
-    // rung-0 pair (110 and 120 HP), so the ladder keeps its order; the
-    // vendor's own 320 HP potion at 170 already undercut the draught's 140
-    // bill PER POINT OF HEALING (0.53 copper an HP against 0.70), a
-    // pre-existing tension that is the maintainer's, not this row's. (11n
-    // vendor floor: that potion is 279 HP since the nerf, 0.61 an HP, so
-    // the tension narrowed but still stands, and the gap to the rung-50
-    // rare draught widened from 15 HP to 56.)
+    // Re-picked by 11l QA from the standard potion to preserve the alchemy
+    // ladder. After issue #4000 the Lesser restores 323 HP, below the
+    // 340 HP Goldleaf draught and above the 177 / 193 HP bottom pair.
     // Discounted bills (requiredReagentCountFor): specialization only, candles
     // 2 to 1, 77 vs 16; specialization plus self-signed lands on the same
     // floor, 77 vs 16 (the herb and the vial are already 1), still
@@ -4517,8 +4506,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // tallow sink held under the doctrine's list-count-only clause whose one
     // use is the alchemy skill gain a tallow-holder buys with it; recorded by
     // the 11l QA as a tuning read beside the oiled boots, not an exclusion
-    // (the trainer's own rung-25 draught does not dominate it: 190 HP common
-    // for 82 against 200 HP uncommon for 140).
+    // (the trainer's own rung-25 draught does not dominate it: 323 HP common
+    // for 82 against 340 HP uncommon for 140).
     reagents: [
       { itemId: 'tallow_candle', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },

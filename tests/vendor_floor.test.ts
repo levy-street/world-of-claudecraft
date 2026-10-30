@@ -105,9 +105,9 @@ const PAIRS: VendorPair[] = [
     axis: 'potionHp',
     rung: 'standard',
     vendorId: 'healing_potion',
-    vendorValue: 279,
+    vendorValue: 471,
     craftedId: 'sunpetal_healing_draught',
-    craftedValue: 335,
+    craftedValue: 566,
     marginPct: 20,
   },
   {
@@ -480,14 +480,14 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
     },
   );
 
-  it('the exempt consumable magnitudes kept their pre-phase values', () => {
+  it('the exempt consumable magnitudes keep the approved values', () => {
     expect(liveMagnitude('minor_healing_potion', 'potionHp'), 'minor_healing_potion potionHp').toBe(
-      110,
+      177,
     );
     expect(
       liveMagnitude('lesser_healing_potion', 'potionHp'),
       'lesser_healing_potion potionHp',
-    ).toBe(190);
+    ).toBe(323);
     expect(liveMagnitude('tough_jerky', 'foodHp'), 'tough_jerky foodHp').toBe(61);
   });
 
