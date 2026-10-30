@@ -5935,6 +5935,8 @@ export const hudChromeStrings = {
       resonance:
         "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
       memory: 'Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.',
+      prisoned:
+        'Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.',
       pillarLimit:
         "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
       shouldered:
@@ -10233,6 +10235,7 @@ export const hudChromeStrings = {
       wrath: "Mountain's Wrath! Hide behind a pillar!",
       shoulder: 'The Slabwright hardens beside its kin: pull it away!',
       crowded: 'Too many behind one pillar! It could not shield them all.',
+      prison: 'Stone Prison on {players}! Break them out!',
       enrage: "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
       weight: "Hammer's Weight on {player}: swap tanks!",
       wake: 'Wake the Stone: pillars rise under {players}! Stand where the cover should go.',

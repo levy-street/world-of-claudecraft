@@ -825,6 +825,7 @@ const mergeStringsEn = {
       heart_hammers_weight: "Hammer's Weight",
       heart_wake_the_stone: 'Wake the Stone',
       heart_falling_rock: 'Falling Rock',
+      heart_stone_prison: 'Stone Prison',
       heart_seam_bolt: 'Seam Bolt',
       heart_song_of_the_seam: 'Song of the Seam',
       heart_song_of_the_seam_unbroken: 'Song of the Seam',

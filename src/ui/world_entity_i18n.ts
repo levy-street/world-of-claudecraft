@@ -424,6 +424,7 @@ const MOB_IDS = [
   'heart_heat_wellkeeper',
   'heart_heat_seedflame',
   'heart_heat_rolling_cinder',
+  'heart_stone_prison',
   // The Masterless Strength's Splinters (encounters/smith_heart/final_adds.ts).
   'heart_final_splinter_heat',
   'heart_final_splinter_quench',

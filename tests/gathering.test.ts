@@ -401,7 +401,10 @@ describe('isHarvestableCorpse', () => {
     // The Guardian of the Heat's four untagged adds (Wellspawn, Wellkeeper,
     // Seedflame, Rolling Cinder): 319.
     expect(untagged).toContain(MOBS.heart_heat_rolling_cinder);
-    expect(untagged).toHaveLength(319);
+    // The Masterless Strength's four Splinters and the Hammer Council's Stone
+    // Prison block, untagged too: 324.
+    expect(untagged).toContain(MOBS.heart_stone_prison);
+    expect(untagged).toHaveLength(324);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

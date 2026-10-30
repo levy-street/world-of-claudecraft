@@ -67,6 +67,8 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // The Rolling Cinder: a bodyless target under the ball of the first flame
   // smith_heart_fx/heat_cinder_fx.ts draws.
   heart_heat_rolling_cinder: 'smith_heart_rolling_cinder',
+  // Stone Prison's block: a bodyless target under the stone council_prison_fx.ts draws.
+  heart_stone_prison: 'smith_heart_stone_prison',
   // ---- the final boss -----------------------------------------------------------
   // Phase 2J: the Masterless Strength is a bodyless target; its body (the
   // colossus of the Heart kit's rock pieces round the crystal heart) is drawn

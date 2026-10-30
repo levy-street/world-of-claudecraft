@@ -1604,6 +1604,7 @@ const baseEnTable = {
   'aura.heartMemoryOfStone': 'Memory of Stone',
   'aura.heartShoulderedStone': 'Shouldered Stone',
   'aura.heartNarrowShelter': 'Narrow Shelter',
+  'aura.heartStonePrison': 'Stone Prison',
   // The Guardian of the Breath (encounters/smith_heart/breath_ids.ts
   // BREATH_NAMES): its damage and aura names. EXACT through the mechanic
   // reverse map (Bellows Gust keeps its key; Charged Ground shares the Buried
@@ -26979,6 +26980,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Memory of Stone': 'aura.heartMemoryOfStone',
   'Shouldered Stone': 'aura.heartShoulderedStone',
   'Narrow Shelter': 'aura.heartNarrowShelter',
+  'Stone Prison': 'aura.heartStonePrison',
   'Bellows Wind': 'aura.heartBellowsWind',
   'Indrawn Breath': 'aura.heartIndrawnBreath',
   'Pressed to the Rim': 'mechanic.heartPressedToTheRim',

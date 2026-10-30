@@ -4746,6 +4746,7 @@ export const ja_JP: EnTranslations = {
         "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。",
         "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。",
         "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。",
+        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
         "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
@@ -7278,6 +7279,7 @@ export const ja_JP: EnTranslations = {
         "wrath": "山の怒り！柱の陰に隠れろ！",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "crowded": "Too many behind one pillar! It could not shield them all.",
+        "prison": "Stone Prison on {players}! Break them out!",
         "enrage": "山の怒りが速まった！山の怒りがずっと早く来る。",
         "weight": "{player}に槌の重み：タンク交代！",
         "wake": "石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。",
@@ -16796,6 +16798,7 @@ export const ja_JP: EnTranslations = {
       "heart_hammers_weight": "槌の重み",
       "heart_wake_the_stone": "石の目覚め",
       "heart_falling_rock": "落石",
+      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "鉱脈の矢",
       "heart_song_of_the_seam": "鉱脈の歌",
       "heart_song_of_the_seam_unbroken": "鉱脈の歌",
@@ -26704,6 +26707,9 @@ export const ja_JP: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "転がる燃え殻"
+      },
+      "heart_stone_prison": {
+        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "熱の欠片"

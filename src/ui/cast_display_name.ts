@@ -211,6 +211,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_hammers_weight': true,
   'abilityUi.cast.heart_wake_the_stone': true,
   'abilityUi.cast.heart_falling_rock': true,
+  'abilityUi.cast.heart_stone_prison': true,
   'abilityUi.cast.heart_seam_bolt': true,
   'abilityUi.cast.heart_song_of_the_seam': true,
   'abilityUi.cast.heart_song_of_the_seam_unbroken': true,

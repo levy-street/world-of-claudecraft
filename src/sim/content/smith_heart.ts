@@ -19,7 +19,7 @@ import {
   BREATH_TUNING,
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
-import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
+import { COUNCIL_PRISON, COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import {
   FINAL_ADD_MOBS,
   FINAL_PHASE_NAMES,
@@ -548,6 +548,30 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 2.4,
     color: 0xfff2c0,
+  },
+  // Stone Prison's block (encounters/smith_heart/council_prison.ts): a real target
+  // round a player, walked and timed by the encounter. Health a SKETCH: two of
+  // them a few seconds of the raid's whole damage.
+  [COUNCIL_PRISON]: {
+    id: COUNCIL_PRISON,
+    name: 'Stone Prison',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    hpBase: 1000,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 60,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    ccImmune: true,
+    slowImmune: true,
+    xpMult: 0,
+    loot: [],
+    scale: 1,
+    color: 0x7a6a58,
   },
   // ---- the final boss ------------------------------------------------------------
   // The strength without its master (design doc 7.5). Its fight is the

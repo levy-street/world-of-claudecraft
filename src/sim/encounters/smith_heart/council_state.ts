@@ -80,6 +80,9 @@ export interface CouncilFightState {
   clock: number;
   /** When Shouldered Stone may warn the raid again (on the fight's clock). */
   shoulderWarnAt: number;
+  /** Seconds to Stone Prison's next bar, and the blocks standing. */
+  prisonTimer: number;
+  prisons: { playerId: number; blockId: number; remaining: number }[];
   /** The Wrath holder's energy, 0 to 100. */
   energy: number;
   /** Wraths landed this pull (the soft enrage reads it). */

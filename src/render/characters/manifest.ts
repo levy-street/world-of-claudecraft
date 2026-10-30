@@ -4188,6 +4188,14 @@ export const VISUALS: Record<string, VisualDef> = {
   // effects draw (smith_heart_fx/council_bodies.ts) until their own models
   // ship. Bound off the goleling's rig (never seen); height times the
   // template's scale is the body's (about 2 to 2.5 times a player).
+  smith_heart_stone_prison: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.4,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 1.6,
+  },
   smith_heart_slabwright: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.15,

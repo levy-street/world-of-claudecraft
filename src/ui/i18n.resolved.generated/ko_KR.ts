@@ -4746,6 +4746,7 @@ export const ko_KR: EnTranslations = {
         "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.",
         "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.",
         "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.",
+        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
         "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
@@ -7278,6 +7279,7 @@ export const ko_KR: EnTranslations = {
         "wrath": "산의 분노! 기둥 뒤에 숨으세요!",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "crowded": "Too many behind one pillar! It could not shield them all.",
+        "prison": "Stone Prison on {players}! Break them out!",
         "enrage": "산의 분노가 빨라집니다! 이제 산의 분노가 훨씬 빨리 옵니다.",
         "weight": "{player}에게 망치의 무게: 탱커 교대!",
         "wake": "돌 깨우기: {players} 아래에서 기둥이 솟아오릅니다! 엄폐물이 필요한 곳에 서세요.",
@@ -16796,6 +16798,7 @@ export const ko_KR: EnTranslations = {
       "heart_hammers_weight": "망치의 무게",
       "heart_wake_the_stone": "돌 깨우기",
       "heart_falling_rock": "낙석",
+      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "광맥 화살",
       "heart_song_of_the_seam": "광맥의 노래",
       "heart_song_of_the_seam_unbroken": "광맥의 노래",
@@ -26704,6 +26707,9 @@ export const ko_KR: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "구르는 잉걸불"
+      },
+      "heart_stone_prison": {
+        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "열기의 파편"

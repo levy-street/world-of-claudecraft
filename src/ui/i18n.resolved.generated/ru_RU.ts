@@ -4746,6 +4746,7 @@ export const ru_RU: EnTranslations = {
         "rockMark": "Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Мифический режим: колонна души в пределах {soulReach} м вместо этого теряет метку души и рушится, когда их не останется. Героический и мифический режимы: урон выше на {heroic}%.",
         "resonance": "Если простоять в пределах {reach} м от колонны {seconds} с подряд, от неё откалывается кусок, и снова каждые {seconds} с, пока вы рядом. Снять нельзя: переждите Гнев горы у самой повреждённой колонны и держитесь подальше от целых. Мифический режим: у колонны души то же ожидание снимает с неё метку души ({singerSeconds} с у колонны Певца Жилы), и без меток она рушится.",
         "memory": "Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота.",
+        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
         "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
@@ -7278,6 +7279,7 @@ export const ru_RU: EnTranslations = {
         "wrath": "Гнев горы! Спрячьтесь за колонной!",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "crowded": "Too many behind one pillar! It could not shield them all.",
+        "prison": "Stone Prison on {players}! Break them out!",
         "enrage": "Гнев горы нарастает! Теперь Гнев горы приходит гораздо чаще.",
         "weight": "Тяжесть Молота на {player}: смена танков!",
         "wake": "Пробуждение камня: колонны поднимутся под {players}! Встаньте там, где нужно укрытие.",
@@ -16796,6 +16798,7 @@ export const ru_RU: EnTranslations = {
       "heart_hammers_weight": "Тяжесть Молота",
       "heart_wake_the_stone": "Пробуждение камня",
       "heart_falling_rock": "Камнепад",
+      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "Стрела жилы",
       "heart_song_of_the_seam": "Песнь жилы",
       "heart_song_of_the_seam_unbroken": "Песнь жилы",
@@ -26704,6 +26707,9 @@ export const ru_RU: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "Катящийся уголь"
+      },
+      "heart_stone_prison": {
+        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "Осколок Жара"

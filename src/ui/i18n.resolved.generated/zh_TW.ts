@@ -4746,6 +4746,7 @@ export const zh_TW: EnTranslations = {
         "rockMark": "結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：傷害提高{heroic}%。",
         "resonance": "在石柱{reach}碼內連續站立{seconds}秒會震落它的一塊，之後每多待{seconds}秒再震落一塊。無法移除：在最破損的石柱旁躲過山岳之怒，遠離完好的石柱。傳奇難度：在靈魂石柱旁等待同樣的時間會改為擊碎它的一個靈魂印記（礦脈歌者的石柱為{singerSeconds}秒），印記耗盡時碎裂。",
         "memory": "造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。",
+        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
         "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
@@ -7278,6 +7279,7 @@ export const zh_TW: EnTranslations = {
         "wrath": "山岳之怒！躲到石柱後面！",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "crowded": "Too many behind one pillar! It could not shield them all.",
+        "prison": "Stone Prison on {players}! Break them out!",
         "enrage": "山岳的怒火加速了！山岳之怒會來得更快。",
         "weight": "{player}受到重錘之壓：換坦克！",
         "wake": "喚醒岩石：石柱將在{players}腳下升起！站到需要掩體的地方。",
@@ -16796,6 +16798,7 @@ export const zh_TW: EnTranslations = {
       "heart_hammers_weight": "重錘之壓",
       "heart_wake_the_stone": "喚醒岩石",
       "heart_falling_rock": "落石",
+      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "礦脈箭",
       "heart_song_of_the_seam": "礦脈之歌",
       "heart_song_of_the_seam_unbroken": "礦脈之歌",
@@ -26704,6 +26707,9 @@ export const zh_TW: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "滾動餘燼"
+      },
+      "heart_stone_prison": {
+        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "熾熱碎片"

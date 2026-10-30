@@ -14,6 +14,8 @@
 export const COUNCIL_GUARDIAN = 'heart_hammer_guardian';
 export const COUNCIL_SLABWRIGHT = 'heart_slabwright';
 export const COUNCIL_SEAM_SINGER = 'heart_seam_singer';
+/** Stone Prison's block round a player: a real target (never a member). */
+export const COUNCIL_PRISON = 'heart_stone_prison';
 
 /** A council member's role (its original job). */
 export type CouncilRole = 'guardian' | 'slabwright' | 'singer';
@@ -68,6 +70,8 @@ export const COUNCIL_CASTS = {
   wake: 'heart_wake_the_stone',
   /** The Slabwright marks the player the rock falls on. */
   rock: 'heart_falling_rock',
+  /** The Slabwright shuts players in blocks of stone. */
+  prison: 'heart_stone_prison',
   /** The Seam Singer's kickable bolt. */
   bolt: 'heart_seam_bolt',
   /** The Seam Singer's kickable song (Resonance on three, one if kicked). */
@@ -109,6 +113,8 @@ export const COUNCIL_AURAS = {
   /** Heroic and Mythic: on the Wrath's caster through its bar: value2 = how
    *  many players one pillar can shield (what the client's runes read). */
   pillarLimit: 'heart_narrow_shelter',
+  /** Shut in a block of stone: stunned until it breaks or crushes them. */
+  prisoned: 'heart_stone_prison',
   /** Mythic: on the Seam Singer's soul pillar, one stack per pulse the
    *  Endless Song has sung (value = the next pulse's multiplier). The
    *  pillar is an object: the sim never ticks it, the council sets it. */
@@ -194,6 +200,7 @@ export const COUNCIL_NAMES = {
   memory: 'Memory of Stone',
   shouldered: 'Shouldered Stone',
   pillarLimit: 'Narrow Shelter',
+  prison: 'Stone Prison',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
   echo: 'Echo of Wrath',
@@ -240,6 +247,11 @@ export interface CouncilDifficultyRules {
   /** Narrow Shelter: how many players one pillar shields from the Wrath, or
    *  null for no limit (council_wrath.ts landWrath). */
   pillarLimit: number | null;
+  /** Stone Prison: how many it shuts in, the seconds to break them out, and how
+   *  much tougher than its template each block stands. */
+  prisonMarks: number;
+  prisonSeconds: number;
+  prisonHpMult: number;
 }
 
 export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
@@ -255,6 +267,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     soulInTheStone: false,
     slabwrightShoulders: false,
     pillarLimit: null,
+    prisonMarks: 2,
+    prisonSeconds: 10,
+    prisonHpMult: 1,
   },
   heroic: {
     wakeMarks: 2,
@@ -268,6 +283,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     soulInTheStone: false,
     slabwrightShoulders: false,
     pillarLimit: 4,
+    prisonMarks: 2,
+    prisonSeconds: 10,
+    prisonHpMult: 1,
   },
   // Everything heroic has, the inheritances stronger, and the souls.
   mythic: {
@@ -282,6 +300,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     soulInTheStone: true,
     slabwrightShoulders: true,
     pillarLimit: 3,
+    prisonMarks: 3,
+    prisonSeconds: 8,
+    prisonHpMult: 1.4,
   },
 };
 
@@ -295,6 +316,10 @@ export const COUNCIL_TUNING = {
   shoulderWarnGap: 20,
   // Narrow Shelter: the share of the Wrath everyone behind a crowded pillar takes.
   crowdShare: 0.5,
+  // Stone Prison: its first bar, the time between two, and the bar itself.
+  prisonFirst: 20,
+  prisonEvery: 40,
+  prisonCast: 1.5,
   // The pillars.
   pillarCap: 7,
   /** The most integrity any pillar template carries. */

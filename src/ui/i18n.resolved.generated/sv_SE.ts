@@ -4746,6 +4746,7 @@ export const sv_SE: EnTranslations = {
         "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroic}% more damage.",
         "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
         "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.",
+        "prisoned": "Shut in a block of stone: you cannot act. Your allies must break the block before this ends, or it crushes you.",
         "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
@@ -7278,6 +7279,7 @@ export const sv_SE: EnTranslations = {
         "wrath": "Mountain's Wrath! Hide behind a pillar!",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "crowded": "Too many behind one pillar! It could not shield them all.",
+        "prison": "Stone Prison on {players}! Break them out!",
         "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
         "weight": "Hammer's Weight on {player}: swap tanks!",
         "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
@@ -16796,6 +16798,7 @@ export const sv_SE: EnTranslations = {
       "heart_hammers_weight": "Hammer's Weight",
       "heart_wake_the_stone": "Wake the Stone",
       "heart_falling_rock": "Falling Rock",
+      "heart_stone_prison": "Stone Prison",
       "heart_seam_bolt": "Seam Bolt",
       "heart_song_of_the_seam": "Song of the Seam",
       "heart_song_of_the_seam_unbroken": "Song of the Seam",
@@ -26704,6 +26707,9 @@ export const sv_SE: EnTranslations = {
       },
       "heart_heat_rolling_cinder": {
         "name": "Rolling Cinder"
+      },
+      "heart_stone_prison": {
+        "name": "Stone Prison"
       },
       "heart_final_splinter_heat": {
         "name": "Splinter of the Heat"

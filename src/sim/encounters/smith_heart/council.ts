@@ -64,6 +64,7 @@ import {
   settlePillars,
   stepRubble,
 } from './council_pillars';
+import { clearPrisons, landPrisonBar, startPrison, stepPrisons } from './council_prison';
 import {
   type CouncilScope,
   damageMult,
@@ -187,6 +188,8 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     finished: false,
     clock: 0,
     shoulderWarnAt: 0,
+    prisonTimer: T.prisonFirst,
+    prisons: [],
     energy: 0,
     wraths: 0,
     weightTimer: T.weightFirst,
@@ -317,6 +320,9 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
     case COUNCIL_CASTS.rock:
       landRockBar(s, body);
       return;
+    case COUNCIL_CASTS.prison:
+      landPrisonBar(s, body);
+      return;
     case COUNCIL_CASTS.bolt:
       landBolt(s, body, bar.targetId);
       return;
@@ -368,6 +374,7 @@ function startBars(s: CouncilScope): void {
   st.weightTimer -= DT;
   st.wakeTimer -= DT;
   st.rockTimer -= DT;
+  st.prisonTimer -= DT;
   st.boltTimer -= DT;
   st.songTimer -= DT;
   if (st.songDue !== null) st.songDue -= DT;
@@ -381,6 +388,7 @@ function startBars(s: CouncilScope): void {
   startSong(s);
   if (st.wakeTimer <= 0) startWake(s);
   if (st.rockTimer <= 0) startRock(s);
+  if (st.prisonTimer <= 0) startPrison(s);
   if (st.weightTimer <= 0) startWeight(s);
   if (st.boltTimer <= 0) startBolt(s);
 }
@@ -445,6 +453,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     const s = scopeOf(ctx, inst, st, bodies);
     clearStone(s);
     clearSong(s);
+    clearPrisons(s);
     clearRubble(ctx, inst, st);
     // The tank keeps no Weight past the fight.
     dropClaimWeight(ctx, inst);
@@ -536,6 +545,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   }
   syncMemory(s);
   stepShoulder(s);
+  stepPrisons(s);
   stepCouncilVoice(s);
   stepBars(s);
   fillEnergy(s);
@@ -648,6 +658,11 @@ export function councilDevTrigger(
     cut('slabwright');
     s.st.rock = null;
     return startRock(s) ? 'Falling Rock.' : 'The Slabwright has fallen or is busy.';
+  }
+  if (verb === 'prison') {
+    return startPrison(s)
+      ? 'Stone Prison.'
+      : 'The Slabwright has fallen, is busy or holds its blocks.';
   }
   if (verb === 'bolt') {
     cut('singer');

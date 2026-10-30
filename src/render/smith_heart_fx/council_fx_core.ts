@@ -665,3 +665,9 @@ export function pillarShelterCounts(
     if (best >= 0) out[best]++;
   }
 }
+
+/** Stone Prison's block at `health` (0 to 1): whole at full health, a little
+ *  smaller as it breaks, always big enough to hold its player. */
+export function prisonBlockScale(health: number): number {
+  return 1.05 + 0.35 * Math.max(0, Math.min(1, health));
+}

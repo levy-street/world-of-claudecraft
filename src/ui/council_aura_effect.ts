@@ -67,6 +67,8 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
         key: `${KEY}.shouldered`,
         nums: { pct: pct(a.value), reach: T.shoulderReach },
       };
+    case COUNCIL_AURAS.prisoned:
+      return { key: `${KEY}.prisoned`, nums: {} };
     case COUNCIL_AURAS.pillarLimit:
       return {
         key: `${KEY}.pillarLimit`,
