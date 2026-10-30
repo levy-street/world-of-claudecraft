@@ -412,6 +412,7 @@ import {
   GFX,
   getActiveGfxProfile,
   graphicsPresetLabel,
+  refreshBootGfxProfile,
   resolveGfxProfile,
 } from './render/gfx';
 import { hazardPaletteModeOf } from './render/nythraxis_hazard_palette_core';
@@ -1339,6 +1340,7 @@ async function startGame(
   // module import any more, because decoding them merely to show the LAUNCHER
   // crossed WKWebView's per-process ceiling: a 12 GB iPhone 17 Pro was killed
   // 1.6 s in and reloaded forever).
+  refreshBootGfxProfile();
   const deferredStarted = beginDeferredPreloads();
   console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
   // Lazy locale flip: fetch the active locale's chunk (plus the deed and reliquary locale
