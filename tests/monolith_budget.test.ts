@@ -2577,7 +2577,8 @@ const MONOLITHS: MonolithRow[] = [
     // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
     // controllers now build over one seam object (store_spend_controllers.ts).
     // Summary and countdown formatting live in daily_rewards_chrome_view.ts.
-    ceiling: 1249,
+    // Membership painting and reward task markup now live in tested siblings.
+    ceiling: 1235,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

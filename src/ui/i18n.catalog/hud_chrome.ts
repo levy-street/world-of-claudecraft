@@ -841,6 +841,22 @@ export const hudChromeStrings = {
       hintBelowMin: 'The Exchange minimum price is {usd}.',
     },
   },
+  // Store purchase dialogs (src/ui/purchase_reward_dialogs.ts): the loot window a paid
+  // reward opens in game, and the congratulation after a membership starts.
+  purchaseLoot: {
+    title: 'Your purchase has arrived',
+    description:
+      'Collect it now. If your bags are full it is kept as overflow, and anything you leave for later waits in your mailbox.',
+    collect: 'Collect',
+    later: 'Later',
+  },
+  membershipWelcome: {
+    title: 'Congratulations!',
+    body: 'Your membership is active. Enjoy every membership benefit, adventurer!',
+    bodyUntil:
+      'Your membership is active until {date}. Enjoy every membership benefit, adventurer!',
+    close: 'Onward',
+  },
   wocStore: {
     subscription: {
       title: 'Game subscription',
@@ -860,6 +876,23 @@ export const hudChromeStrings = {
       annualPending:
         'Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.',
       annualDelivered: 'Your bundle mount key has been delivered by mail.',
+      // Memberships tab columns (src/ui/store_subscription_offers.ts): art, purchase,
+      // then the description.
+      monthlyArtAlt: 'A knight in membership armour beside the winged courier donkey',
+      annualArtAlt:
+        'A knight in membership armour with the courier donkey and the Nightwing Chimaera mount',
+      tokenArtAlt: 'A golden membership token',
+      annualAllBenefits: 'All the benefits of a monthly membership.',
+      annualPerMonth: 'Just {price} per month, saving {percent} compared with paying monthly.',
+      annualMountInfo:
+        'Includes the Nightwing Chimaera mount for every character on your account. Its soulbound reins arrive in a loot window on the character that buys it. One per account, and it stays yours after membership ends.',
+      annualArriving:
+        'Your mount reins appear in a loot window on this character once the paid charge settles. If the trial is active, they arrive after the first payment.',
+      annualArrived: 'Your mount reins have arrived. Collect them from the loot window.',
+      tokenDescription:
+        'A membership token you receive in game. Redeem it for 30 days of membership, or trade it with other players and sell it at the auction house.',
+      tokenArriving:
+        'Your token appears in a loot window on this character once the payment settles.',
       tokenTitle: 'Tradable membership token',
       tokenPrice: '{price} for 30 days',
       benefitsTitle: 'Active membership benefits',
@@ -885,11 +918,14 @@ export const hudChromeStrings = {
       // is added onto the end of their current membership.
       addMonth: 'Add 1 month',
       addYear: 'Add 12 months',
+      // A monthly member's annual purchase: switches to yearly renewal after the added year.
+      upgradeAnnual: 'Upgrade to 12 months',
       stackTerms:
         'Paid now. The time is added to the end of your current membership, then it renews on this plan.',
       stackCapped:
         'You can hold up to 2 years of membership at once. Try again closer to your renewal date.',
       stackUnavailable: 'Adding membership time is unavailable right now. Try again shortly.',
+      checkoutPending: 'Checkout pending. Waiting for confirmation.',
       billingBlocked:
         'Update your payment details in Manage subscription before adding membership time.',
       renewsOn: 'Renews on {date}',

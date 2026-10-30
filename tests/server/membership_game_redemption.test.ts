@@ -26,7 +26,7 @@ function fixture() {
   const session = { accountId: 7, characterId: 11, pid: 1, leaseNonce: 'nonce' } as ClientSession;
   const host: ConstructorParameters<typeof MembershipGameServices>[0] = {
     sim: {
-      ctx: { trades: new Map(), onInventoryChangedForQuests: vi.fn() },
+      ctx: { trades: new Map(), onInventoryChangedForQuests: vi.fn(), emit: vi.fn() },
       meta: () => meta,
       entities: new Map([[1, { membershipActive: true }]]),
       setMembership: vi.fn(),
@@ -75,6 +75,13 @@ describe('live membership redemption', () => {
     expect(service.isBusy(7)).toBe(false);
     expect(host.quarantine).not.toHaveBeenCalled();
     expect(host.sim.claimMembershipArmour).not.toHaveBeenCalled();
+    // The redeeming player gets the congratulation dialog with the new end date.
+    expect(host.sim.ctx.emit).toHaveBeenCalledExactlyOnceWith({
+      type: 'membershipRedeemed',
+      days: 30,
+      expiresAt: 12345,
+      pid: 1,
+    });
   });
 
   it('does not consume or acknowledge a proven rollback', async () => {
@@ -82,6 +89,7 @@ describe('live membership redemption', () => {
     vi.mocked(redeemMembershipTokenAtomic).mockResolvedValue({ ok: false, reason: 'retry' });
     await service.redeem(session, 0);
     expect(inventory[0].count).toBe(2);
+    expect(host.sim.ctx.emit).not.toHaveBeenCalled();
     expect(host.acknowledge).not.toHaveBeenCalled();
     expect(host.quarantine).not.toHaveBeenCalled();
     expect(host.sim.claimMembershipArmour).not.toHaveBeenCalled();

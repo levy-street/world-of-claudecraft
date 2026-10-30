@@ -1330,6 +1330,18 @@ export const sv_SE: EnTranslations = {
         "hintBelowMin": "Börsens lägsta pris är {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Your purchase has arrived",
+      "description": "Collect it now. If your bags are full it is kept as overflow, and anything you leave for later waits in your mailbox.",
+      "collect": "Collect",
+      "later": "Later"
+    },
+    "membershipWelcome": {
+      "title": "Congratulations!",
+      "body": "Your membership is active. Enjoy every membership benefit, adventurer!",
+      "bodyUntil": "Your membership is active until {date}. Enjoy every membership benefit, adventurer!",
+      "close": "Onward"
+    },
     "wocStore": {
       "subscription": {
         "title": "Spelprenumeration",
@@ -1344,6 +1356,16 @@ export const sv_SE: EnTranslations = {
         "annualClaim": "Hämta paketets riddjur",
         "annualPending": "Återvänd till den karaktär som gjorde köpet efter betalning för att hämta paketets riddjur. Om betalningen behandlas eller provperioden är aktiv, försök igen efter den betalda debiteringen.",
         "annualDelivered": "Nyckeln till ditt paketriddjur har levererats med posten.",
+        "monthlyArtAlt": "A knight in membership armour beside the winged courier donkey",
+        "annualArtAlt": "A knight in membership armour with the courier donkey and the Nightwing Chimaera mount",
+        "tokenArtAlt": "A golden membership token",
+        "annualAllBenefits": "All the benefits of a monthly membership.",
+        "annualPerMonth": "Just {price} per month, saving {percent} compared with paying monthly.",
+        "annualMountInfo": "Includes the Nightwing Chimaera mount for every character on your account. Its soulbound reins arrive in a loot window on the character that buys it. One per account, and it stays yours after membership ends.",
+        "annualArriving": "Your mount reins appear in a loot window on this character once the paid charge settles. If the trial is active, they arrive after the first payment.",
+        "annualArrived": "Your mount reins have arrived. Collect them from the loot window.",
+        "tokenDescription": "A membership token you receive in game. Redeem it for 30 days of membership, or trade it with other players and sell it at the auction house.",
+        "tokenArriving": "Your token appears in a loot window on this character once the payment settles.",
         "tokenTitle": "Överlåtbar medlemspollett",
         "tokenPrice": "{price} för 30 dagar",
         "benefitsTitle": "Förmåner med aktivt medlemskap",
@@ -1363,9 +1385,11 @@ export const sv_SE: EnTranslations = {
         "subscribe": "Prenumerera",
         "addMonth": "Lägg till 1 månad",
         "addYear": "Lägg till 12 månader",
+        "upgradeAnnual": "Upgrade to 12 months",
         "stackTerms": "Betalningen sker nu. Tiden läggs till efter ditt nuvarande medlemskap, som sedan förnyas enligt denna plan.",
         "stackCapped": "Du kan samla upp till 2 års medlemskap åt gången. Försök igen närmare ditt förnyelsedatum.",
         "stackUnavailable": "Det går inte att lägga till medlemstid just nu. Försök igen om en stund.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Uppdatera dina betalningsuppgifter under Hantera prenumeration innan du lägger till medlemstid.",
         "renewsOn": "Förnyas den {date}",
         "endsOn": "Medlemskapet upphör den {date}",

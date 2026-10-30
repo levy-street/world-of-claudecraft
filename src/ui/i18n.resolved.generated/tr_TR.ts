@@ -1330,6 +1330,18 @@ export const tr_TR: EnTranslations = {
         "hintBelowMin": "Borsa'da asgari fiyat {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Your purchase has arrived",
+      "description": "Collect it now. If your bags are full it is kept as overflow, and anything you leave for later waits in your mailbox.",
+      "collect": "Collect",
+      "later": "Later"
+    },
+    "membershipWelcome": {
+      "title": "Congratulations!",
+      "body": "Your membership is active. Enjoy every membership benefit, adventurer!",
+      "bodyUntil": "Your membership is active until {date}. Enjoy every membership benefit, adventurer!",
+      "close": "Onward"
+    },
     "wocStore": {
       "subscription": {
         "title": "Oyun aboneliği",
@@ -1344,6 +1356,16 @@ export const tr_TR: EnTranslations = {
         "annualClaim": "Paket bineğini al",
         "annualPending": "Paket bineğini almak için ödemeden sonra satın alımı yapan karaktere dön. Ödeme işleniyorsa veya deneme süresi etkinse ücret alındıktan sonra tekrar dene.",
         "annualDelivered": "Paket binek anahtarın postayla teslim edildi.",
+        "monthlyArtAlt": "A knight in membership armour beside the winged courier donkey",
+        "annualArtAlt": "A knight in membership armour with the courier donkey and the Nightwing Chimaera mount",
+        "tokenArtAlt": "A golden membership token",
+        "annualAllBenefits": "All the benefits of a monthly membership.",
+        "annualPerMonth": "Just {price} per month, saving {percent} compared with paying monthly.",
+        "annualMountInfo": "Includes the Nightwing Chimaera mount for every character on your account. Its soulbound reins arrive in a loot window on the character that buys it. One per account, and it stays yours after membership ends.",
+        "annualArriving": "Your mount reins appear in a loot window on this character once the paid charge settles. If the trial is active, they arrive after the first payment.",
+        "annualArrived": "Your mount reins have arrived. Collect them from the loot window.",
+        "tokenDescription": "A membership token you receive in game. Redeem it for 30 days of membership, or trade it with other players and sell it at the auction house.",
+        "tokenArriving": "Your token appears in a loot window on this character once the payment settles.",
         "tokenTitle": "Takas edilebilir üyelik jetonu",
         "tokenPrice": "30 gün için {price}",
         "benefitsTitle": "Etkin üyelik avantajları",
@@ -1363,9 +1385,11 @@ export const tr_TR: EnTranslations = {
         "subscribe": "Abone ol",
         "addMonth": "1 ay ekle",
         "addYear": "12 ay ekle",
+        "upgradeAnnual": "Upgrade to 12 months",
         "stackTerms": "Ödeme şimdi alınır. Süre, mevcut üyeliğinin sonuna eklenir; ardından üyeliğin bu planla yenilenir.",
         "stackCapped": "Bir seferde en fazla 2 yıllık üyelik süresi biriktirebilirsin. Yenileme tarihin yaklaştığında tekrar dene.",
         "stackUnavailable": "Üyelik süresi ekleme şu anda kullanılamıyor. Kısa süre sonra tekrar dene.",
+        "checkoutPending": "Checkout pending. Waiting for confirmation.",
         "billingBlocked": "Üyelik süresi eklemeden önce Aboneliği yönet bölümünden ödeme bilgilerini güncelle.",
         "renewsOn": "Yenileme tarihi: {date}",
         "endsOn": "Üyelik bitiş tarihi: {date}",

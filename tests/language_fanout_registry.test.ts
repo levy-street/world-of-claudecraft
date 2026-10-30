@@ -792,6 +792,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'paintedStoreBody / paintedStoreMarkup retain the RESOLVED store markup and the element it was written into, compared against freshly built markup in replaceStoreBody, so a locale change produces different markup and repaints. Same write-elision shape as claudium_window.',
   },
   {
+    file: 'store_membership_controller.ts',
+    memos: ['paintedMarkup'],
+    reason:
+      'paintedMarkup retains resolved membership markup, compared against freshly localized subscription HTML on every render. A locale change changes the resolved markup and repaints without a separate data invalidation signal.',
+  },
+  {
     file: 'guild_bank_log_window.ts',
     memos: ['lastAnnounced', 'lastFooter'],
     reason:
@@ -1740,7 +1746,8 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(39);
+      // 40: the extracted membership controller compares resolved localized markup.
+    ).toBe(40);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

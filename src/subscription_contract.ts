@@ -176,7 +176,7 @@ export function subscriptionLink(value: unknown, action: SubscriptionAction): Su
       typeof stripe === 'object' &&
       Object.keys(stripe).length === 2 &&
       typeof stripe.clientSecret === 'string' &&
-      /^cs_(test|live)_[A-Za-z0-9_]{1,500}$/.test(stripe.clientSecret) &&
+      /^cs_(test|live)_[A-Za-z0-9_%]{1,500}$/.test(stripe.clientSecret) &&
       typeof stripe.publishableKey === 'string' &&
       /^pk_(test|live)_[A-Za-z0-9]{1,255}$/.test(stripe.publishableKey)
     )

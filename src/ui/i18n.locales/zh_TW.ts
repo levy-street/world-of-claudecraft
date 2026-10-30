@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending': '結帳待處理。正在等待確認。',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '每{every}秒施法{cast}秒，對{radius}碼內所有玩家造成{min}至{max}點傷害。被釘住的玩家無論距離多遠都會受到{pinMult}倍傷害。',
   'bossJournal.wildheart.zulgar.spearSummary':
@@ -1974,6 +1975,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.membershipSlotLocked': '開通會員以解鎖此背包欄位。',
   'hudChrome.bags.membershipSlotHint':
     '會員有效期間可額外裝備一個背包。會員到期後，背包和物品會安全保留。',
+  'hudChrome.purchaseLoot.title': '你的購買物品已送達',
+  'hudChrome.purchaseLoot.description':
+    '現在領取吧。如果背包已滿，物品會作為溢出物品保留；留待之後領取的物品會保存在你的信箱中。',
+  'hudChrome.purchaseLoot.collect': '領取',
+  'hudChrome.purchaseLoot.later': '稍後',
+  'hudChrome.membershipWelcome.title': '恭喜！',
+  'hudChrome.membershipWelcome.body': '你的會員資格已生效。盡情享受所有會員福利吧，冒險者！',
+  'hudChrome.membershipWelcome.bodyUntil':
+    '你的會員資格有效期至{date}。盡情享受所有會員福利吧，冒險者！',
+  'hudChrome.membershipWelcome.close': '出發',
   'hudChrome.wocStore.subscription.benefitBag': '可在會員背包欄位額外裝備一個背包。',
   'hudChrome.wocStore.subscription.benefitArmour':
     '領取稀有品質的靈魂綁定護甲和萬變法杖。屬性配合您的職業與專精，物品等級始終比角色等級高5級。裝備全部7件護甲可多獲得20%經驗。',
@@ -2046,6 +2057,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountDepositLead': '點擊物品將其送入{name}的銀行。',
   'hudChrome.bank.accountBankEmpty': '此銀行是空的。',
   'hudChrome.bank.accountBagsEmpty': '你的背包是空的。',
+  'hudChrome.wocStore.subscription.monthlyArtAlt': '身穿會員盔甲的騎士與帶翼的信使驢',
+  'hudChrome.wocStore.subscription.annualArtAlt': '身穿會員盔甲的騎士、信使驢與夜翼奇美拉坐騎',
+  'hudChrome.wocStore.subscription.tokenArtAlt': '金色會員代幣',
+  'hudChrome.wocStore.subscription.annualAllBenefits': '包含月度會員的全部福利。',
+  'hudChrome.wocStore.subscription.annualPerMonth': '折合每月{price}，比按月付費便宜{percent}。',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    '包含夜翼奇美拉坐騎，帳號下所有角色皆可使用。其靈魂綁定的韁繩會在購買角色的拾取視窗中送達。每個帳號限一次，會員到期後仍歸你所有。',
+  'hudChrome.wocStore.subscription.annualArriving':
+    '付費扣款完成後，坐騎韁繩會出現在此角色的拾取視窗中。如果試用期仍在進行，韁繩將在首次付款後送達。',
+  'hudChrome.wocStore.subscription.annualArrived': '你的坐騎韁繩已送達。請在拾取視窗中領取。',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    '一枚在遊戲中獲得的會員代幣。兌換後可獲得30天會員資格，也可以與其他玩家交易或在拍賣場出售。',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    '付款完成後，你的代幣會出現在此角色的拾取視窗中。',
   'hudChrome.wocStore.subscription.tokenTitle': '可交易會員代幣',
   'hudChrome.wocStore.subscription.tokenPrice': '30天{price}',
   'hudChrome.wocStore.subscription.tokenTerms':
@@ -2080,6 +2105,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.subscribe': '訂閱',
   'hudChrome.wocStore.subscription.addMonth': '增加1個月',
   'hudChrome.wocStore.subscription.addYear': '增加12個月',
+  'hudChrome.wocStore.subscription.upgradeAnnual': '升級為12個月',
   'hudChrome.wocStore.subscription.stackTerms':
     '立即付款。時長將追加到目前會員的結束時間之後，之後按此方案續訂。',
   'hudChrome.wocStore.subscription.stackCapped':

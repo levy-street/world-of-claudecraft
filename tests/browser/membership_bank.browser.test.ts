@@ -46,7 +46,7 @@ it('keeps membership claim and every character tab reachable on a short landscap
   }
 });
 
-it('keeps both membership token purchase controls touch sized', async () => {
+it('keeps the membership token buy control touch sized, with no collect button', async () => {
   await page.viewport(844, 390);
   document.body.className = 'mobile-touch game-active';
   const hooks = {
@@ -62,8 +62,10 @@ it('keeps both membership token purchase controls touch sized', async () => {
   await store.refresh();
   const root = host('daily-rewards-window');
   root.innerHTML = store.html();
+  // The token arrives in a loot window, so the buy button is the only purchase control.
   const controls = root.querySelectorAll<HTMLElement>('[data-membership-purchase-action]');
-  expect(controls.length).toBe(2);
+  expect(controls.length).toBe(1);
+  expect(controls[0].dataset.membershipPurchaseAction).toBe('buy');
   for (const control of controls)
     expect(control.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
 });

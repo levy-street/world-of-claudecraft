@@ -41,17 +41,17 @@ interface CurvePoint extends OpenWorldMobScale {
 }
 
 // Multipliers by mob level, piecewise-linear between points and flat past the
-// last one. Level 1 is never scaled: the tutorial shore and the first quests
-// stay as gentle as they were. Full strength from level 8: health x3.25, melee
-// and mechanic damage x1.35, armor unchanged (owner pick, 2026-10-06). Bench
-// result, median same-level kill over all 19 DPS specs in today's solo gear:
-// 15.6 / 13.6 / 13.2 seconds at levels 10 / 14 / 20 (was 4.5 to 6), 12 to 13 of
-// the 19 inside 12 to 20 seconds at every level. Health x3.0 fell to 11.4
-// seconds by level 20, under the band.
+// last one. Health stays on the authored ladder through level 5, then gains
+// 0.15 per level through 20. The level-20 target remains x3.25 (owner pick,
+// 2026-10-06); the v0.45 curve reached it at level 8 and made early fights too
+// long. Damage keeps that original curve, and armor stays unchanged. The
+// intermediate knots preserve damage interpolation, not health level bands.
 export const OPEN_WORLD_MOB_CURVE: readonly CurvePoint[] = [
   { level: 1, health: 1, damage: 1, armor: 1 },
-  { level: 3, health: 1.7, damage: 1.1225, armor: 1 },
-  { level: 8, health: 3.25, damage: 1.35, armor: 1 },
+  { level: 3, health: 1, damage: 1.1225, armor: 1 },
+  { level: 5, health: 1, damage: 1.2135, armor: 1 },
+  { level: 8, health: 1.45, damage: 1.35, armor: 1 },
+  { level: 20, health: 3.25, damage: 1.35, armor: 1 },
 ];
 
 const NEUTRAL: OpenWorldMobScale = { health: 1, damage: 1, armor: 1 };
@@ -78,20 +78,32 @@ export function openWorldMobScale(level: number): OpenWorldMobScale {
   return scaleOf(points[points.length - 1]);
 }
 
-// Templates the curve leaves alone: decoration and practice targets, open-world
-// elites (already carrying createMob's elite multiplier and bespoke health
-// pools), world bosses (participant-scaled health of their own), and puzzle
+// Templates the curve leaves alone: decoration and practice targets,
+// world bosses (participant-scaled health of their own), and puzzle
 // objects whose health is a hit count, not a fight (the 1 HP egg clutches,
 // quest-gated destructibles, zero-XP props).
 export function isOpenWorldTuned(template: MobTemplate): boolean {
   if (template.dummy || template.ambient || template.friendlyPracticeTarget) return false;
-  if (template.elite || template.worldBoss || template.requiresQuestId) return false;
+  if (template.worldBoss || template.requiresQuestId) return false;
   return template.xpMult !== 0;
+}
+
+function templateScale(template: MobTemplate, level: number): OpenWorldMobScale {
+  const scale = openWorldMobScale(level);
+  if (!template.elite) return scale;
+  // Use the normal-mob design anchor (40 + 18 * level, spell-ranks.md) as a
+  // FLOOR, not a multiplier on an elite's already enlarged authored pool.
+  // createMob applies the existing elite x2.3 after this transform. Strong
+  // named elites retain their authored health; weak elites cannot fall below
+  // the scaled elite baseline. Elite damage and armor remain authored.
+  const authoredHp = template.hpBase + template.hpPerLevel * (level - 1);
+  const normalHp = (40 + 18 * level) * scale.health;
+  return { health: Math.max(1, normalHp / authoredHp), damage: 1, armor: 1 };
 }
 
 export function openWorldMobTemplate(template: MobTemplate, level: number): MobTemplate {
   if (!isOpenWorldTuned(template)) return template;
-  const scale = openWorldMobScale(level);
+  const scale = templateScale(template, level);
   if (scale.health === 1 && scale.damage === 1 && scale.armor === 1) return template;
   return {
     ...template,
@@ -110,7 +122,7 @@ export function openWorldMobTemplate(template: MobTemplate, level: number): MobT
 // the melee swing it lands between, support heals with the larger pool.
 export function applyOpenWorldMobTuning(mob: Entity, template: MobTemplate): void {
   if (!isOpenWorldTuned(template)) return;
-  const scale = openWorldMobScale(mob.level);
+  const scale = templateScale(template, mob.level);
   if (scale.damage !== 1) mob.mechanicDamageMult = scale.damage;
   if (scale.health !== 1) mob.mechanicHealMult = scale.health;
 }
