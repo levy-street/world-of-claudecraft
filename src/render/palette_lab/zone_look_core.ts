@@ -321,7 +321,7 @@ export interface DisplayModel {
   gain: readonly [number, number, number];
   /** Tone-mapping exposure (the look's multiplier over a base of 1). */
   exposure: number;
-  /** The cel look's display saturation (1 without `?cel=on`). */
+  /** The cel look's display saturation (1 unless `celsat` sets one; the default is 1). */
   celSaturation: number;
 }
 
@@ -499,7 +499,7 @@ export type LookSelections = Record<string, string>;
 /** The chosen default look per zone (day / general). */
 export const DEFAULT_ZONE_SELECTIONS: Readonly<LookSelections> = {
   proving_shore: 'skyward-isles',
-  eastbrook_vale: 'skyward-isles',
+  eastbrook_vale: 'painted-vale',
   mirefen_marsh: 'jade-wetland',
   thornpeak_heights: 'alpine-clear',
   farshore_isle: 'tropic-lagoon',
@@ -516,6 +516,7 @@ export const DEFAULT_ZONE_SELECTIONS: Readonly<LookSelections> = {
 
 /** Per-zone night look override when a zone's night look differs from day. */
 export const DEFAULT_ZONE_NIGHT_SELECTIONS: Readonly<LookSelections> = {
+  eastbrook_vale: 'painted-vale-night',
   thornpeak_heights: 'sky-island-gold',
   drakelands: 'obsidian-teal',
   frostveil: 'violet-whiteout',
@@ -579,6 +580,41 @@ function lerpHexToWhite(hex: number, t: number): number {
 
 const hx = (n: number): string => `0x${(n & 0xffffff).toString(16).padStart(6, '0')}`;
 const num = (n: number): string => String(Number(n.toFixed(3)));
+const quoted = (text: string): string => `'${text.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+
+/**
+ * The look as a `zone_looks.ts` CURATED entry, every field resolved: paste it
+ * over the zone's authored patch and that look comes back exactly as tuned
+ * live (`__paletteLab.tweak`). Numbers keep three decimals. A look still on
+ * its zone's shipped haze keeps that scene hex by leaving the fog colour out.
+ * (`lookToShippingSnippet` is the other export: the stock TABLE rows.)
+ */
+export function lookToPatchSnippet(look: ZoneLook): string {
+  const g = look.ground;
+  const f = look.fog;
+  const l = look.light;
+  const s = look.sky;
+  const w = look.water;
+  const gr = look.grade;
+  const r = look.render;
+  const fogColor = f.sceneColor === undefined ? `color: ${hx(f.color)}, ` : '';
+  return [
+    '{',
+    `  id: ${quoted(look.id)},`,
+    `  name: ${quoted(look.name)},`,
+    `  note: ${quoted(look.note)},`,
+    `  ground: { grass: ${hx(g.grass)}, grassDark: ${hx(g.grassDark)}, grassYellow: ${hx(g.grassYellow)}, dirt: ${hx(g.dirt)}, sand: ${hx(g.sand)} },`,
+    `  fog: { ${fogColor}near: ${num(f.near)}, far: ${num(f.far)} },`,
+    `  light: { hemiSky: ${hx(l.hemiSky)}, hemiGround: ${hx(l.hemiGround)}, sun: ${hx(l.sun)}, sunScale: ${num(l.sunScale)}, hemiScale: ${num(l.hemiScale)}, envScale: ${num(l.envScale)} },`,
+    `  godRays: ${num(look.godRays)},`,
+    `  sky: { zenith: ${hx(s.zenith)}, horizon: ${hx(s.horizon)}, amount: ${num(s.amount)}, cloudKeep: ${num(s.cloudKeep)}, intensity: ${num(s.intensity)} },`,
+    `  water: { deep: ${hx(w.deep)}, shallow: ${hx(w.shallow)}, sky: ${hx(w.sky)}, scatter: ${hx(w.scatter)} },`,
+    `  grade: { exposure: ${num(gr.exposure)}, temperature: ${num(gr.temperature)}, tint: ${num(gr.tint)}, contrast: ${num(gr.contrast)}, saturation: ${num(gr.saturation)}, vibrance: ${num(gr.vibrance)}, shadowTint: ${hx(gr.shadowTint)}, shadowAmt: ${num(gr.shadowAmt)}, highlightTint: ${hx(gr.highlightTint)}, highlightAmt: ${num(gr.highlightAmt)}, lift: ${num(gr.lift)}, greenHue: ${num(gr.greenHue)}, greenSat: ${num(gr.greenSat)}, greenVal: ${num(gr.greenVal)} },`,
+    `  bloom: { strength: ${num(look.bloom.strength)}, threshold: ${num(look.bloom.threshold)} },`,
+    `  render: { rim: ${num(r.rim)}, rimPower: ${num(r.rimPower)}, rimColor: ${r.rimColor === null ? 'null' : hx(r.rimColor)}, aoTint: ${hx(r.aoTint)}, aoScale: ${num(r.aoScale)}, shadowStrength: ${num(r.shadowStrength)}, meadowCoverage: ${num(r.meadowCoverage)}, meadowHeight: ${num(r.meadowHeight)}, meadowWidth: ${num(r.meadowWidth)}, canopyLift: ${num(r.canopyLift)} },`,
+    '},',
+  ].join('\n');
+}
 
 /**
  * The look as the table rows it ships as: paste into terrain_palette.ts

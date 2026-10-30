@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => {
     terrain: prepare(),
     water: prepare(),
     stone: prepare(),
+    paintedWallDetail: prepare(),
     surface: prepare(),
     canopy: prepare(),
     greatTree: prepare(),
@@ -43,6 +44,9 @@ vi.mock('../src/render/water', () => ({
 }));
 vi.mock('../src/render/detail_normals', () => ({
   prepareStoneDetailProfileAssets: mocks.stone,
+}));
+vi.mock('../src/render/painted_wall_detail', () => ({
+  preparePaintedWallDetailProfileAssets: mocks.paintedWallDetail,
 }));
 vi.mock('../src/render/worn_stone', () => ({
   prepareSurfaceDetailProfileAssets: mocks.surface,
@@ -209,6 +213,7 @@ const prepareSpies = [
   mocks.wickharborWharf,
   mocks.wickharborHarbor,
   mocks.mirefenTavern,
+  mocks.paintedWallDetail,
 ];
 
 beforeEach(() => {
@@ -240,6 +245,8 @@ describe('graphics profile asset preparation', () => {
     expect(mocks.paintedTowns).toHaveBeenCalledWith(target);
     // ...and so does the painted Mirefen tavern (its .half / .quarter texture-tier files)
     expect(mocks.mirefenTavern).toHaveBeenCalledWith(target);
+    // the re-baked walls' detail normal loads only for a Standard TARGET profile
+    expect(mocks.paintedWallDetail).toHaveBeenCalledWith(target);
     for (const prepare of [
       mocks.armoury,
       mocks.mailbox,

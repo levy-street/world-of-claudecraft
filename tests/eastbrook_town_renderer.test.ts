@@ -184,13 +184,24 @@ function stallSourceAsset(): THREE.Group {
   return source;
 }
 
-/** Whether a working-space colour is the sRGB hex. */
-function colorIs(color: THREE.BufferAttribute, index: number, hex: number): boolean {
+/** Whether a working-space colour is the sRGB hex times one scalar: the merged
+ *  batch's dressing (src/render/eastbrook_surface_dressing.ts) multiplies each
+ *  placement's vertex colours by its seeded value and its grime, never its
+ *  hue, so the paint a vertex wears is still recognizable by its ratios. */
+function colorIsScaled(color: THREE.BufferAttribute, index: number, hex: number): boolean {
   const target = new THREE.Color(hex);
+  const r = color.getX(index);
+  const g = color.getY(index);
+  const b = color.getZ(index);
+  const scale =
+    (r * target.r + g * target.g + b * target.b) /
+    (target.r * target.r + target.g * target.g + target.b * target.b);
   return (
-    Math.abs(color.getX(index) - target.r) < 1e-6 &&
-    Math.abs(color.getY(index) - target.g) < 1e-6 &&
-    Math.abs(color.getZ(index) - target.b) < 1e-6
+    scale > 0.75 &&
+    scale < 1.1 &&
+    Math.abs(r - target.r * scale) < 1e-5 &&
+    Math.abs(g - target.g * scale) < 1e-5 &&
+    Math.abs(b - target.b * scale) < 1e-5
   );
 }
 
@@ -500,9 +511,13 @@ describe('Eastbrook town renderer', () => {
     // opaque batch + the monument's 2 + the vault's 8). Buildings and roof-hide
     // targets are the six rows plus the vault: 12 to 7. These are the FIXTURE's
     // numbers; the shipped models draw their own mesh counts.
+    // Re-pinned for the painted civic bench: the three benches left the micro
+    // batch for their own painted materials and draw as ONE InstancedMesh per
+    // mesh of the model (the fixture's one), so colorDraws 30 to 31 and
+    // shadowDraws 23 to 24; the micro batches stay two.
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({
-      colorDraws: 30,
-      shadowDraws: 23,
+      colorDraws: 31,
+      shadowDraws: 24,
       buildingCount: 7,
       roofHideTargetCount: 7,
       microBatchCount: 2,
@@ -531,10 +546,12 @@ describe('Eastbrook town renderer', () => {
     const position = batch.geometry.getAttribute('position') as THREE.BufferAttribute;
     const color = batch.geometry.getAttribute('color') as THREE.BufferAttribute;
     expect(color.itemSize).toBe(3);
-    // No flag colour survives anywhere in the batch: blue and red were canopy only.
+    // No flag colour survives anywhere in the batch: blue and red were canopy
+    // only. Compared up to the dressing's scalar (value and grime), so a
+    // shaded flag vertex still counts as a surviving flag.
     for (let index = 0; index < color.count; index++) {
-      expect(colorIs(color, index, CLOTH_BLUE), `vertex ${index}`).toBe(false);
-      expect(colorIs(color, index, CLOTH_RED), `vertex ${index}`).toBe(false);
+      expect(colorIsScaled(color, index, CLOTH_BLUE), `vertex ${index}`).toBe(false);
+      expect(colorIsScaled(color, index, CLOTH_RED), `vertex ${index}`).toBe(false);
     }
     const variants = EASTBROOK_LAYOUT.market.stalls.map((stall) =>
       stallCanopyVariant(stall.canopyVariant),
@@ -549,21 +566,25 @@ describe('Eastbrook town renderer', () => {
         if (Math.hypot(dx, dz) > 2) continue;
         const height = position.getY(index) - ground;
         for (const variant of ['gold', 'green'] as const) {
-          if (!colorIs(color, index, STALL_CANOPY_COLORS[variant])) continue;
+          if (!colorIsScaled(color, index, STALL_CANOPY_COLORS[variant])) continue;
           counts[variant]++;
+          // the canopy's settled sag dips it a few centimetres, never past the line
           expect(height, `${stall.id} canopy height`).toBeGreaterThanOrEqual(STALL_CANOPY_MIN_Y);
         }
-        if (colorIs(color, index, CLOTH_CREAM)) {
+        if (colorIsScaled(color, index, CLOTH_CREAM)) {
           // The sack on the counter keeps its cream; the cream panel does not.
           counts.cream++;
           expect(height, `${stall.id} cream height`).toBeLessThan(STALL_CANOPY_MIN_Y);
         }
       }
       // Three panels of 24 corners, minus the corners two adjacent panels now
-      // share (same place, normal, colour and cell), all in the stall's own colour.
+      // share (same place, normal, colour and cell), all in the stall's own
+      // colour; the world-scale atlas tiling clips the panels along its repeat
+      // lines, which only adds corners.
       expect(counts[own], stall.id).toBeGreaterThan(24);
       expect(counts[own === 'gold' ? 'green' : 'gold'], stall.id).toBe(0);
-      expect(counts.cream, stall.id).toBe(24);
+      // The sack's 24 corners, and any its own repeat-line clip adds.
+      expect(counts.cream, stall.id).toBeGreaterThanOrEqual(24);
     }
   });
 
@@ -1138,7 +1159,8 @@ describe('Eastbrook town renderer', () => {
     // three meshes each, so the census is 30: 18 placed meshes, the 2 micro
     // batches, the monument's 2 and the Weekly Vault's 8 (the last two were
     // already inside the 45).
-    expect(meshes).toHaveLength(30);
+    // Re-pinned for the painted civic bench: its instanced mesh joins them, 31.
+    expect(meshes).toHaveLength(31);
     const placedBuildings = EASTBROOK_LAYOUT.buildings.filter((building) =>
       isPlacedBuildingAsset(building.assetId),
     );
@@ -1175,8 +1197,22 @@ describe('Eastbrook town renderer', () => {
     expect(
       hallMeshes.every((mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial'),
     ).toBe(true);
+    // The painted civic benches keep their own GLB materials like the
+    // monument: Lambert on Low, carrying the model's own map and colour, no
+    // vertex colour and never the atlas.
+    const benchMeshes = templateMeshes.filter((mesh) => mesh.name === 'eastbrookCivicBenches');
+    expect(benchMeshes).toHaveLength(1);
+    for (const bench of benchMeshes) {
+      expect(bench).toBeInstanceOf(THREE.InstancedMesh);
+      expect((bench as THREE.InstancedMesh).count).toBe(EASTBROOK_LAYOUT.civic.benches.length);
+      const material = bench.material as THREE.MeshLambertMaterial;
+      expect(material.type).toBe('MeshLambertMaterial');
+      expect(material.vertexColors).toBe(false);
+      expect(material.color.getHex()).toBe(0x789abc);
+    }
     const microBatchMeshes = templateMeshes.filter(
-      (mesh) => !monumentMeshes.includes(mesh) && !hallMeshes.includes(mesh),
+      (mesh) =>
+        !monumentMeshes.includes(mesh) && !hallMeshes.includes(mesh) && !benchMeshes.includes(mesh),
     );
     expect(microBatchMeshes).toHaveLength(2);
     // The template pipeline swaps to shared Lambert vertex-color materials on
@@ -1241,7 +1277,7 @@ describe('Eastbrook town renderer', () => {
     expect(new Set(placedMeshes.map((mesh) => mesh.material)).size).toBe(18);
     // The same counts as the Standard build pinned above: the tier swaps
     // materials, never meshes or shadow casters.
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 30, shadowDraws: 23 });
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 31, shadowDraws: 24 });
   });
 
   it('mirrors exactly the first real wall chord after each asymmetric gate socket', async () => {
@@ -1656,13 +1692,34 @@ describe('Eastbrook repeated placement triangle budget', () => {
     // reasoning, and the two levers left unpulled, are on `hardCeiling` in
     // src/render/eastbrook_town.ts. The 33,000 target is unchanged and is now
     // missed by a wide margin rather than a narrow one.
-    expect(budget.assetTriangles).toBe(56_347);
+    // Re-pinned for the surface pass (src/render/eastbrook_surface_dressing.ts):
+    // the Weekly Vault now wears the tiled surface atlas, and the hall as DRAWN
+    // clips every face larger than one atlas repeat along the repeat grid, so
+    // its procedural triangles move 4,572 (the shape, still the count of the
+    // exported vault.glb) to 5,698 and the runtime total 60,919 to 62,045,
+    // under the 64,000 ceiling. The merged stall, bench and fence batch is
+    // clipped the same way at build time; the aggregate above counts its
+    // artifact triangles, as it always has.
+    // Re-pinned for the painted civic bench: the three square benches swapped
+    // the dungeon kit's bench (348 triangles) for the painted Eastbrook bench
+    // (1,480), so the aggregate moves 56,347 to 59,743 and the runtime total
+    // 62,045 to 65,441, OVER the 64,000 ceiling below. That ceiling is the
+    // owner's (the measured total plus a twentieth): the bench needs to come
+    // in at 999 triangles or fewer, or the ceiling has to move.
+    // Re-pinned for the lighter painted bench: regenerated through the same
+    // prop lane at a 500-face limit it is 440 triangles, so the three benches
+    // shed 3,120 and the aggregate moves 59,743 to 56,623 and the runtime total
+    // 65,441 to 62,321, back under the 64,000 ceiling with the ceiling unmoved.
+    expect(
+      budget.assets.find((asset) => asset.assetUrl.endsWith('eastbrook_painted_bench.glb')),
+    ).toMatchObject({ instances: 3, trianglesPerInstance: 440 });
+    expect(budget.assetTriangles).toBe(56_623);
     expect(budget.maximumFoundationTriangles).toBe(0);
-    expect(budget.proceduralTriangles).toBe(4_572);
+    expect(budget.proceduralTriangles).toBe(5_698);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles + budget.proceduralTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(60_919);
+    expect(budget.maximumRuntimeTriangles).toBe(62_321);
     expect(budget.hardCeiling).toBe(64_000);
     expect(
       budget.maximumRuntimeTriangles,

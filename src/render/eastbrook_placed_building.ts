@@ -15,11 +15,26 @@
 //   - the glow: a weakly authored emissive channel is lifted over the bloom
 //     threshold, exactly as a placed asset's is;
 //   - the file: the profile's texture tier of the model, same geometry.
+// Two surface touches ride on top, both plain material values (no shader
+// layer, no new program, and a clone, the camera fade's twin included, copies
+// both): the baked relief is lifted per atlas role, and each building's walls
+// and roof take a small seeded colour variation (placed_building_surface_core.ts).
+// One shader layer rides the re-baked walls only (painted_wall_detail.ts): their
+// atlas alpha is a stone mask the layer keeps out of opacity, and on the Standard
+// tiers a shared tiling detail normal carries the stones' relief. It is decided
+// per mesh (the re-baked walls carry uv1, the looks do not) and re-attached on
+// every hook-preserving clone, so the fade twin keys the same program.
 import * as THREE from 'three';
 import type { PaintedTownId } from '../sim/painted_towns';
 import { GFX } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
+import { applyPaintedWallDetail } from './painted_wall_detail';
+import {
+  placedBuildingReliefScale,
+  placedBuildingSurfaceRole,
+  placedBuildingTint,
+} from './placed_building_surface_core';
 
 /** What a placed building record carries: every town's makePlacedBuilding
  *  builds this shape. */
@@ -92,14 +107,48 @@ function liftWeakEmissive(material: PlacedSourceMaterial): void {
   }
 }
 
+/** Which standing building a material clone dresses: seeds its colour variation. */
+export interface PlacedBuildingLook {
+  readonly town: PlacedTown;
+  readonly buildingId: string;
+}
+
+/** userData key recording the relief factor already applied to a material, so
+ *  a second pass (a clone of a clone, a future load-time pass) never stacks. */
+const RELIEF_APPLIED_KEY = 'placedBuildingRelief';
+
+/** Lift the baked relief of a painted material by its role's factor (both
+ *  normalScale components, so the loader's tangent sign survives). Idempotent. */
+function liftBakedRelief(material: THREE.MeshStandardMaterial): void {
+  if (!material.normalMap || material.userData[RELIEF_APPLIED_KEY] !== undefined) return;
+  const scale = placedBuildingReliefScale(material.name);
+  material.normalScale.multiplyScalar(scale);
+  material.userData[RELIEF_APPLIED_KEY] = scale;
+}
+
+function tintForLook(
+  material: THREE.Material,
+  look: PlacedBuildingLook | undefined,
+): readonly [number, number, number] | null {
+  if (!look) return null;
+  return placedBuildingTint(look.town, look.buildingId, placedBuildingSurfaceRole(material.name));
+}
+
 /**
  * The per-building clone of one of the model's materials. The Standard tiers
  * keep the GLB material whole; the Lambert tiers downgrade like every town
  * material, carrying everything a Lambert can still say about it (the leaf
  * cards' cutout and both-sides draw included, or they would draw as solid
- * quads).
+ * quads). `look` names the standing building, for its colour variation;
+ * `geometry` is the mesh's, which says whether its walls were re-baked
+ * (painted_wall_detail.ts takes the material on both arms when they were).
  */
-export function placedBuildingMaterial(source: THREE.Material): THREE.Material {
+export function placedBuildingMaterial(
+  source: THREE.Material,
+  look?: PlacedBuildingLook,
+  geometry?: THREE.BufferGeometry,
+): THREE.Material {
+  const tint = tintForLook(source, look);
   if (GFX.standardMaterials) {
     // The hook-preserving clone and nothing more: the camera fade's gate twin
     // (occluder_fade_gate.ts) is cloned the same way, so the program the twin
@@ -107,9 +156,15 @@ export function placedBuildingMaterial(source: THREE.Material): THREE.Material {
     // registry does not carry (the loader's leaf edge fade) is deliberately
     // not copied by hand: the twin would not carry it, and the first fade
     // would link its program cold in a live frame. The leaf cards keep their
-    // authored cutout.
+    // authored cutout. The relief lift and the tint are uniform VALUES, which
+    // the twin's own clone copies, so they key no program of their own.
     const clone = cloneMaterialWithHooks(source) as PlacedSourceMaterial;
     liftWeakEmissive(clone);
+    const standard = clone as THREE.MeshStandardMaterial;
+    if (standard.isMeshStandardMaterial) liftBakedRelief(standard);
+    if (tint && clone.color) clone.color.multiply(new THREE.Color(tint[0], tint[1], tint[2]));
+    // Last, over the hook-preserving clone, where material_clone_hooks.ts re-attaches it.
+    applyPaintedWallDetail(clone, geometry);
     return clone;
   }
   const from = source as PlacedSourceMaterial;
@@ -123,10 +178,14 @@ export function placedBuildingMaterial(source: THREE.Material): THREE.Material {
     opacity: source.opacity,
     depthWrite: source.depthWrite,
   });
+  if (tint) lambert.color.multiply(new THREE.Color(tint[0], tint[1], tint[2]));
   if (from.emissive) lambert.emissive = from.emissive.clone();
   if (from.emissiveMap) lambert.emissiveMap = from.emissiveMap;
   if (from.emissiveIntensity !== undefined) lambert.emissiveIntensity = from.emissiveIntensity;
   lambert.name = source.name;
+  // The Lambert walls carry no normal map: only the mask guard, so a transparent fade
+  // never reads the atlas's stone mask as coverage.
+  applyPaintedWallDetail(lambert, geometry);
   return lambert;
 }
 
@@ -172,7 +231,8 @@ export function buildPlacedTownBuilding(
     child.castShadow = !isInterior;
     child.receiveShadow = true;
     const list = Array.isArray(child.material) ? child.material : [child.material];
-    const cloned = list.map((material) => placedBuildingMaterial(material));
+    const look: PlacedBuildingLook = { town, buildingId: building.id };
+    const cloned = list.map((material) => placedBuildingMaterial(material, look, child.geometry));
     child.material = Array.isArray(child.material) ? cloned : cloned[0];
     for (const material of cloned) occluderFadeRecordFor(mats, material, child);
   });

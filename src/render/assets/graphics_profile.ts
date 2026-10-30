@@ -40,6 +40,7 @@ import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailb
 import { prepareMirefenTavernAssets, resetMirefenTavernCaches } from '../mirefen_tavern';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
 import { preparePaintedTownProfileAssets, resetPaintedTownProfileCaches } from '../painted_towns';
+import { preparePaintedWallDetailProfileAssets } from '../painted_wall_detail';
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
@@ -67,6 +68,8 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
   (target) => prepareTerrainProfileAssets(target),
   (target) => prepareWaterProfileAssets(target),
   (target) => prepareStoneDetailProfileAssets(target),
+  // the re-baked painted walls' shared detail normal (Standard profiles only)
+  (target) => preparePaintedWallDetailProfileAssets(target),
   (target) => prepareSurfaceDetailProfileAssets(target),
   (target) => prepareCanopyDetailProfileAssets(target),
   (target) => prepareGreatTreeProfileAssets(target),

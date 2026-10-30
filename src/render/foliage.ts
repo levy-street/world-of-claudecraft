@@ -146,6 +146,7 @@ import {
 } from './ground_decor_prewarm';
 import { ghostHideGeometry, withInstancedDitherFade } from './instanced_dither_fade';
 import { InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import { meadowPatchAccent, meadowPatchContext, meadowPatchGrows } from './meadow_patch_core';
 import {
   advanceInstanceCountInto,
   farFieldDensityFractionForValues,
@@ -2567,6 +2568,7 @@ function buildGrassRing(
     2.2,
     15,
   );
+  const patch = meadowPatchContext(seed, activeContent);
 
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
@@ -2867,17 +2869,16 @@ function buildGrassRing(
         // and slightly past its hedge line, and across the meadow patches a
         // little beyond where the flowers stop
         const gardenBedTuft = tuftBiome === 'garden' && gardenLushGrassAt(x, z);
-        // Meadow patchiness: the same soil noise that darkens the ground
-        // palette decides where grass actually grows. Dense stands on the
-        // lush dark-green patches thin to near-bare yellowed ground between
-        // them, so the meadow reads as growth following the soil instead of
-        // a uniform scatter of models. Squaring hardens the patch edges.
+        // Meadow patchiness: the soil noise thins tufts between lush patches;
+        // in Eastbrook the clump field all grass layers share decides instead.
         const lushness = groundLushnessAt(x, z, seed);
         const density =
           (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) *
           (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1)) *
           ((lush ? 0.52 : 0.42) + 1.7 * lushness * lushness);
         if (r > density) continue;
+        const rd = roadDistance(x, z);
+        if (!meadowPatchGrows(patch, x, z, rd, hashAt(i, j, 7))) continue;
         const h = terrainHeight(x, z, seed);
         if (foliageShoreSkip(x, z, h, seed)) continue;
         // no tufts floating over a boolean cut's opening
@@ -2888,7 +2889,6 @@ function buildGrassRing(
         // The maker's painted no-grass discs. Third and last consumer of the
         // layer (sim/grass_clear.ts), which until now had none at all.
         if (grassClearedAt(activeContent.grassClear, x, z)) continue;
-        const rd = roadDistance(x, z);
         if (rd < 2.2 || insidePavedGrassExclusion(x, z)) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
         if (insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85)) continue;
@@ -2903,11 +2903,11 @@ function buildGrassRing(
         // anchors too, the frost/garden idiom, which is not what fen wants)
         const fenTuft = tuftBiome === 'fen';
         if (!fenTuft) {
-          const [sx, sy] = taperTuftScales(edgeTaperCtx, x, z, rd, r, lush, lushness);
+          const [sx, sy] = taperTuftScales(edgeTaperCtx, x, z, rd, r, lush, lushness, patch.sample);
           q.setFromAxisAngle(up, r * 12.4);
           m.compose(v.set(x, h, z), q, sv.set(sx, sy, sx));
           im.setMatrixAt(n, m);
-          const accent = GRASS_ACCENT[tuftBiome] ?? [1, 1, 1];
+          const accent = meadowPatchAccent(patch.sample, GRASS_ACCENT[tuftBiome]);
           groundGrassColorAt(x, z, seed, c);
           c.setRGB(
             tuftTintChannel(c.r, GRASS_TINT_GAIN[0] * accent[0]),

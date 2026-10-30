@@ -105,12 +105,21 @@ export function mobGlowStrength(distSq: number, glowAmount: number): number {
 
 // The character rim (pbr_fragment_shader.ts, cranked underground by uRimBoost) is
 // already the cheapest silhouette separator the renderer owns: one shared uniform,
-// no extra draw, every rig at once. Outdoors it sits at 1; after dark it lifts by
-// this much, which is enough to hold a moonlit edge on a body against dark ground
-// without reading as a cartoon outline.
-const NIGHT_RIM_LIFT = 0.85;
+// no extra draw, every rig at once. Outdoors it is an AFTER-DARK layer: off by day,
+// it comes up with the night to NIGHT_RIM_BOOST, which is enough to hold a moonlit
+// edge on a body against dark ground without reading as a cartoon outline.
+//
+// Off by day, by measurement (2026-10-29, Eastbrook's painted look at noon): the rim
+// is a cool emissive that ignores the albedo, so on dark armour and cloth it laid a
+// grey-blue film instead of lighting an edge, about 38 percent of the drawn luma of a
+// shaded NPC's dark plates and the largest cool term an actor's own material added on
+// every body measured. By day
+// an actor's rim is the zone look's own warm one, which lights the albedo instead
+// (palette_lab/lab_lighting.ts; art bible section 3: "a warm rim light").
+const DAY_RIM_BOOST = 0;
+const NIGHT_RIM_BOOST = 1.85;
 
-/** `sharedUniforms.uRimBoost` for an outdoor frame: 1 by day, lifted at night. */
+/** `sharedUniforms.uRimBoost` for an outdoor frame: 0 by day, lifted at night. */
 export function nightRimBoost(nightLight: number): number {
-  return 1 + ramp(nightLight, MOB_ON, MOB_FULL) * NIGHT_RIM_LIFT;
+  return DAY_RIM_BOOST + ramp(nightLight, MOB_ON, MOB_FULL) * (NIGHT_RIM_BOOST - DAY_RIM_BOOST);
 }

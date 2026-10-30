@@ -1,0 +1,24 @@
+{
+  "textureUrl": "/textures/structures/painted_stone_wall_normal.ktx2",
+  "uvAttribute": "TEXCOORD_1",
+  "threeAttribute": "uv1",
+  "uvUnits": "tile: the painted tile repeats exactly once per 1.0 of uv1",
+  "tileWorldYards": 4.1079,
+  "stoneWidthYards": {
+    "p25": 0.744,
+    "median": 0.95,
+    "p75": 1.176
+  },
+  "uAxis": "cross(worldUp, faceNormal), heading snapped to 15 degree steps (right-handed: u right, v up, normal out)",
+  "vAxis": "world up on walls; up the slope on sloped faces",
+  "normalConvention": "tangent space, OpenGL: +R along +u, +G along +v, +B out of the surface",
+  "encoding": "KTX2 UASTC, linear (non-sRGB), RGB, full mip chain",
+  "flippedAtEncode": true,
+  "flipMeaning": "increasing v samples UP the stone tile with flipY=false (the KTX2 default)",
+  "wrap": "RepeatWrapping on both axes",
+  "mask": "walls baseColor ALPHA: 1 re-tiled painted stone, 0 original atlas, feathered",
+  "maskWarning": "the walls are opaque glTF materials: the mask alpha must never reach opacity. The camera-fade twin is transparent, so reset diffuseColor.a to opacity after map_fragment (Standard and Lambert twins alike).",
+  "walls": "materials named painted_walls@<building> on primitives that carry TEXCOORD_1 (the six Eastbrook defaults, all tiers); the town looks carry neither",
+  "atlasNormalInsideMask": "flat: the detail normal alone carries the stones there",
+  "suggestedStrength": 1.8
+}

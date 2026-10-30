@@ -76,8 +76,9 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   `.ktx2` SIBLING next to each source and never deletes it: the runtime opts in per
   consumer (`loadSkinTexInto` in `src/render/characters/assets.ts` for `textures/skins/`
   atlases; `src/render/terrain.ts` and `src/render/worn_stone.ts` via `ktx2SiblingUrl` for
-  their linear maps, with the six splat COLOUR layers and `GroundAO_Packed.png` deliberately
-  excluded, see `tests/surface_texture_ktx2.test.ts`), and `base.png` thumbnail sources are
+  their linear maps, with the splat COLOUR layers, the painted `*_Height.webp` maps and
+  `GroundAO_Packed.png` deliberately excluded, see `tests/surface_texture_ktx2.test.ts`),
+  and `base.png` thumbnail sources are
   skipped. Run it after adding or repainting a standalone source. The terrain and
   worn-surface sets are flipY-consumed and MUST be regenerated with the flip baked
   (`node scripts/assets/compress_standalone_textures.mjs --flip <files>`): a
@@ -85,6 +86,30 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   correction, and a re-run that drops the flag passes every byte-level check while
   sampling upside down (`tests/surface_texture_ktx2.test.ts` greps this exact
   command).
+- **`painted_ground/`** turns the hand-painted ground sources (`src/*.png`, prompts in
+  `PROMPTS.md`) into the terrain splat layers: `build_painted_ground.mjs` (+
+  `lib/painted_ground_core.mjs`: Moisan periodic seam heal, low-frequency de-light,
+  directional isotropize against generator banding, colour landing, height, gentle GL
+  normal) writes every `Painted*` file `src/render/terrain_painted_ground_core.ts`
+  `PAINTED_GROUND_LAYERS` names, runs the `--flip` KTX2 step on the normals itself, and
+  rebuilds `GroundAO_Packed.png` (R/G/B from the painted layers fitted to the shader's
+  centring constants, A the Ground080 sand AO), so `buildSplatMaterial` keeps one relief
+  sampler. Repaint = replace a source PNG, run `npx tsx
+  scripts/assets/painted_ground/build_painted_ground.mjs` (tsx: it imports the src/ core),
+  regenerate the media manifest.
+  `preview_painted_ground.mjs` renders a top-down albedo lookdev of the shipped layers
+  through the shader's own blend (the core's JS twins), no browser needed.
+- **`painted_armor/`** repaints the WOC class armour colour atlases so the albedo carries the
+  light (art bible section 3): `paint_armor.mjs` (the driver, recipe and knobs in its header)
+  bakes each set's key, occlusion, edge and brush measures in headless Blender
+  (`bake_armor.py`), paints them into the set's ORIGINAL atlas read from git
+  (`composite_armor.py`), then encodes ONE UASTC full atlas cut along its top level (top file
+  + medium file, `woc_character/ktx2_levels.mjs`) and the ETC1S low atlas, and splices only
+  the colour images (`painted_buildings/lib/glb_image_splice.mjs`). A rebuild of the armour
+  files (`woc_character/build_woc_split.mjs`) writes the unpainted atlases back: re-run it
+  after, then re-pin `export_split.json`, the size ceilings and the media manifest. The
+  runtime half, a light touch over these atlases, is
+  `src/render/characters/woc_armor_paint_core.ts`.
 - **`compress_sky_hdr.mjs`** (+ `lib/sky_hdr_compression_core.mjs`) is the HDR twin of the
   step above, for the biome sky domes under `public/env/`. Each committed `.hdr` master
   produces three KTX2 UASTC HDR files (`_2k` and `_1k` for the two dome tiers, `_512` for
@@ -100,11 +125,27 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   missing; a plain ASTC HDR encode uploads raw on every device and black-skies the rest.
   `tests/sky_ktx2_assets.test.ts` pins that byte, the dimensions and the manifest rows.
   Re-run after repainting a sky, then regenerate the media manifest.
+- **`compress_sky_ldr.mjs`** (+ `lib/sky_ldr_compression_core.mjs`) is the LDR twin for the
+  PAINTED skies (today the Eastbrook Vale day and night, `skies_in/vale_painted_*.png`, which
+  replaced the vale_day HDRI as the vale and beach dome and IBL). It needs `ktx`, not
+  `basisu`: per variant it resizes to an exact 2:1 (a non-2:1 source is stretched, never
+  cropped), blends the left and right edges into one seam-free colour, fills the zenith rows
+  toward one colour so the pole cannot pinch, bakes the bottom-first flip, and writes UASTC LDR
+  + zstd tagged sRGB, single level (the UASTC over ETC1S banding numbers are at
+  `buildKtxLdrSkyArgs`). The dome variants also get a gentle brush edge boost (`SKY_SHARPEN`,
+  never on the 512). The day ships `_2k`, `_1k` and the `_512` PMREM source; a night ships the
+  two dome tiers only, with its painted stars removed (`removePointStarsInPlace`: isolated
+  points and big four-point stars go, thin cloud rims stay, holes are filled from the sky round
+  them) and their density in ALPHA (`starDensityAlpha`, RGBA encode), which the dome's painted
+  star layer (`src/render/sky_painted_stars_glsl.ts`) reads. To repaint: overwrite the PNG, run
+  `node scripts/assets/compress_sky_ldr.mjs`, then `node scripts/build_media_manifest.mjs
+  generate`, and paste the printed `glow u` into `sky.ts` if the painted sun or moonlit glow
+  moved. The runtime half is `src/render/sky_painted_core.ts`; `tests/sky_ktx2_assets.test.ts`
+  pins the sRGB DFD, the night's alpha channel, dimensions, level count and manifest rows.
 - **One-shot and maintenance tools**, each with its recipe in its own header: the zone prop
   bakes (`build_willowfen_props.mjs` and its `*_props.mjs` siblings: one-shot weld + bounded
   simplify recipes over maintainer-local source packs; copy the willowfen recipe for a new
-  zone drop), `pack_ground_ao.mjs` (packs the splat ground relief channels into one RGBA so
-  `buildSplatMaterial` stays under the fragment sampler limit), `declare_orm_occlusion.mjs`
+  zone drop), `declare_orm_occlusion.mjs`
   (declares the packed ORM red channel as `occlusionTexture` on shipped GLBs so three.js
   builds an aoMap, zero new texture bytes), `foliage_vertex_pipeline.mjs` /
   `optimize_foliage_vertices.mjs` (deterministic finalization of the shipped foliage GLBs;

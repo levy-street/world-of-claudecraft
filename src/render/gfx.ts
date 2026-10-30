@@ -20,9 +20,10 @@ import './final_color_nan_guard';
 // above, inert unless the dev-only `?palette=on` flag is set.
 import './palette_lab/lab_lighting';
 import { CANOPY_TAPS_AO_ONLY, CANOPY_TAPS_FULL, CANOPY_TAPS_OFF } from './canopy_detail_tier_core';
-// The opt-in cel-shading look (`?cel=on`): importing installs its light ramp
-// at module scope, for the same reason as the NaN guard above; the material
-// ink follows the active profile (activateGfxProfile below).
+// The cel-shading look (on by default in browsers, `?cel=off` disables it):
+// importing installs its light ramp at module scope, for the same reason as the
+// NaN guard above; the material ink follows the active profile
+// (activateGfxProfile below) and is never built while the ink is retired.
 import { celShadingSettings, syncCelMaterialInk } from './cel_shading';
 import { celNeedsGradePass } from './cel_shading_core';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
@@ -1665,8 +1666,9 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       };
     }
   }
-  // Cel-shading R&D look (`?cel=on`): its ink rides the output grade, so Low
-  // takes the grade-only chain instead of the direct path (celNeedsGradePass).
+  // Cel-shading look: an INKED look (`celink` above 0; the default retires the
+  // ink) rides the output grade, so Low takes the grade-only chain instead of
+  // the direct path (celNeedsGradePass); without ink Low keeps its direct path.
   // Explicit `?gfxo=` overrides still win: they apply after this.
   if (celNeedsGradePass(celShadingSettings(), settings.gradePass, hints?.platform)) {
     settings = { ...settings, gradePass: true };
@@ -2253,7 +2255,8 @@ export function activateGfxProfile(profile: GfxProfile): GfxProfile {
   activeGfxProfile = activated;
   gfxProfileEpoch = epoch;
   // Cel look only: a chain with no output grade has nowhere to draw the post
-  // ink, so its materials carry the outline instead (no-op without ?cel=on).
+  // ink, so its materials carry the outline instead (a no-op under `?cel=off`
+  // and while the ink is retired, the default).
   syncCelMaterialInk(!settings.gradePass);
   return activated;
 }

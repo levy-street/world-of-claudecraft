@@ -201,15 +201,19 @@ export function graveOffset(i: number): { x: number; z: number } {
 // ---------------------------------------------------------------------------
 
 /**
- * bench.glb native bounding proportions, measured from the shipped GLB
- * (dequantized accessor bounds x node transforms): height and depth as
- * fractions of the native width. The rebuild renderer scales a bench
- * uniformly by min(width / nativeX, depth / nativeZ) and lets the height
+ * The civic bench model's native bounding proportions (the painted Eastbrook
+ * bench, eastbrook_painted_bench.glb: 1.83593 x 0.60002 x 0.90169), measured
+ * from the shipped GLB (dequantized accessor bounds x node transforms): height
+ * and depth as fractions of the native width. The rebuild renderer scales a
+ * bench uniformly by min(width / nativeX, depth / nativeZ) and lets the height
  * follow (eastbrook_town.ts), so the drawn seat height is a pure function of
- * the authored footprint. For the civic 1.8 x 0.6 benches this lands at 0.40.
+ * the authored footprint. The bench is backless, its top a full-depth seat,
+ * so the drawn top IS the seat. Its trestle feet flare a little past the seat,
+ * so the depth sets the fit: for the civic 1.8 x 0.6 benches this lands at
+ * 0.399 (the dungeon kit bench it replaced stood 0.40).
  */
-export const BENCH_NATIVE_HEIGHT_PER_WIDTH = 0.28568;
-export const BENCH_NATIVE_DEPTH_PER_WIDTH = 0.42851;
+export const BENCH_NATIVE_HEIGHT_PER_WIDTH = 0.32682;
+export const BENCH_NATIVE_DEPTH_PER_WIDTH = 0.49113;
 
 /** Drawn top of an authored bench footprint (yards above its ground). */
 export function benchDrawnHeight(w: number, d: number): number {

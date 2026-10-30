@@ -86,12 +86,19 @@ const WOC_SIZE_BUDGETS = {
   /** A beard that ships in a file of its own. head_type_a_beard_handlebar: 61,656. */
   beard: 65_000,
   /** One armor set's low file (its colour atlas 1024 x 512 since the 2026-10-05 rebuild,
-   *  PR 4360 review N3). female_druid_low: 214,100. */
-  armorLow: 225_000,
-  /** Its medium file. male_warrior_medium: 787,392. */
-  armorMedium: 827_000,
+   *  PR 4360 review N3). female_druid_low: 214,100; since the painted armour (2026-10-29)
+   *  female_priest_low: 223,452; since the ChatGPT repaint female_priest_low: 227,028, and
+   *  the budget raised from 225,000 by the owner (2026-10-29) so the far tier keeps the repaint
+   *  too (ETC1S codes a smoothed or flattened atlas larger, so there was no trim to make). */
+  armorLow: 230_000,
+  /** Its medium file. male_warrior_medium: 787,392; since the painted armour
+   *  male_paladin_medium: 792,620; since the warriors' ChatGPT repaint male_warrior_medium:
+   *  820,800; since the paladin's set was kept to white and gold male_paladin_medium:
+   *  831,988, and the budget raised from 827,000 by the owner (2026-10-30). */
+  armorMedium: 835_000,
   /** Its top file (2026-10-03): the top mip level of each of the medium file's maps.
-   *  male_warrior_top: 1,600,368. */
+   *  male_warrior_top: 1,600,368; since the painted armour 1,582,976; since the warriors'
+   *  ChatGPT repaint 1,676,280. */
   armorTop: 1_681_000,
   /** One class under-armor atlas (512 x 512 since the 2026-10-05 rebuild, PR 4360 review
    *  N3). female_paladin_underarmor: 44,299. */
@@ -100,12 +107,34 @@ const WOC_SIZE_BUDGETS = {
 
 /** The high tier, which has no file of its own: a set's medium and top files together, what
  *  the local player downloads for its own set (the whole high file's budget, unchanged: it
- *  already sits within 5% of the largest pair, the male warrior's 2,387,760). */
+ *  already sits within 5% of the largest pair, the male warrior's 2,387,760; since the
+ *  warriors' ChatGPT repaint 2,497,080). */
 const WOC_HIGH_PAIR_BUDGET = 2.5 * MB;
 
 /** Every shipped WOC file (relative to the split directory), at its size when it last shrank,
  *  rounded up to the next KiB. */
 const CEILINGS: Readonly<Record<string, number>> = {
+  // Every armor file re-pinned again 2026-10-30 (the owner's clean-up of the repaint,
+  // scripts/assets/painted_armor/composite_armor.py steps 8 to 11): a shadow toe on every set,
+  // a softer shade and a black level on the cloth sets, the hidden and inner sides of thin
+  // plates painted like their seen sides, and the paladin's set kept to white and gold. 48
+  // files grew and 6 shrank (39.04 MB to 40.04 MB), the lifted shadows carrying more of the
+  // brushwork. Each takes the next KiB of its new size.
+  // Every armor file re-pinned again 2026-10-29 (the owner's call: a ChatGPT hand-painted
+  // repaint of each set's colour atlas, registered back onto its UV layout, and one steel
+  // across each set, scripts/assets/painted_armor/repaint_armor.py): 46 files grew and 8
+  // shrank (36.57 MB to 39.04 MB against the unpainted files, +6.75%), the brushwork encoding
+  // larger, the most on the plain cloth sets (male_warlock_top +24.5%). Each takes the next
+  // KiB of its new size.
+  // Every armor file re-pinned 2026-10-29 (the painted armour: the owner's call for a
+  // hand-painted look, scripts/assets/painted_armor/paint_armor.mjs): each set's colour atlas
+  // now carries its painted light, crease occlusion, edge highlights and brushwork, re-encoded
+  // with the build's own settings; geometry, the normal, data and glow atlases and every other
+  // byte are what they were. 26 files grew and 28 shrank (36.57 MB to 36.84 MB, +0.75%): the
+  // smoothed colour blocks encode smaller, the painted edges and strokes larger, the most on
+  // the pale cloth sets (male_priest_top +14.4%, the largest) and the least on the grainy
+  // plate sets (female_warrior_top -11.0%). Every file takes the next KiB of its new size,
+  // all inside their budgets.
   // Re-pinned 2026-10-03 (level of detail), every changed file at the next KiB of its new size.
   // Every base, low and medium armor file and head file now carries a mid and a far index list
   // per primitive (the WOC_lod extension, scripts/assets/woc_character/lod_indices.mjs): about
@@ -148,59 +177,59 @@ const CEILINGS: Readonly<Record<string, number>> = {
   'anims_female.glb': 683008,
   'anims_male.glb': 666624,
   'armor/female_druid_low.glb': 216064,
-  'armor/female_druid_medium.glb': 687104,
-  'armor/female_druid_top.glb': 1230848, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_hunter_low.glb': 208896,
-  'armor/female_hunter_medium.glb': 621568,
-  'armor/female_hunter_top.glb': 1043456, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_mage_low.glb': 206848,
-  'armor/female_mage_medium.glb': 605184,
-  'armor/female_mage_top.glb': 949248, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_paladin_low.glb': 201728,
-  'armor/female_paladin_medium.glb': 664576,
-  'armor/female_paladin_top.glb': 1186816, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_priest_low.glb': 214016,
-  'armor/female_priest_medium.glb': 662528,
-  'armor/female_priest_top.glb': 1078272, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_rogue_low.glb': 204800,
-  'armor/female_rogue_medium.glb': 620544,
-  'armor/female_rogue_top.glb': 987136, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_shaman_low.glb': 211968,
-  'armor/female_shaman_medium.glb': 732160,
-  'armor/female_shaman_top.glb': 1334272, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_warlock_low.glb': 200704,
-  'armor/female_warlock_medium.glb': 570368,
-  'armor/female_warlock_top.glb': 865280, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_warrior_low.glb': 208896,
-  'armor/female_warrior_medium.glb': 733184,
-  'armor/female_warrior_top.glb': 1545216, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_druid_low.glb': 192512,
-  'armor/male_druid_medium.glb': 680960,
-  'armor/male_druid_top.glb': 1283072, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_hunter_low.glb': 195584,
-  'armor/male_hunter_medium.glb': 710656,
-  'armor/male_hunter_top.glb': 1321984, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_mage_low.glb': 209920,
-  'armor/male_mage_medium.glb': 625664,
-  'armor/male_mage_top.glb': 992256, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_paladin_low.glb': 195584,
-  'armor/male_paladin_medium.glb': 737280,
-  'armor/male_paladin_top.glb': 1385472, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_priest_low.glb': 210944,
-  'armor/male_priest_medium.glb': 637952,
-  'armor/male_priest_top.glb': 1029120, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_rogue_low.glb': 177152,
-  'armor/male_rogue_medium.glb': 610304,
-  'armor/male_rogue_top.glb': 1045504, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_shaman_low.glb': 184320,
-  'armor/male_shaman_medium.glb': 702464,
-  'armor/male_shaman_top.glb': 1325056, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_warlock_low.glb': 197632,
-  'armor/male_warlock_medium.glb': 548864,
-  'armor/male_warlock_top.glb': 823296, // 2026-10-03: new, the medium maps' top levels
-  'armor/male_warrior_low.glb': 189440,
-  'armor/male_warrior_medium.glb': 787456,
-  'armor/male_warrior_top.glb': 1600512, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_druid_medium.glb': 695296,
+  'armor/female_druid_top.glb': 1203200, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_hunter_low.glb': 211968,
+  'armor/female_hunter_medium.glb': 652288,
+  'armor/female_hunter_top.glb': 1098752, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_mage_low.glb': 216064,
+  'armor/female_mage_medium.glb': 693248,
+  'armor/female_mage_top.glb': 1203200, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_paladin_low.glb': 207872,
+  'armor/female_paladin_medium.glb': 705536,
+  'armor/female_paladin_top.glb': 1240064, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_priest_low.glb': 229376,
+  'armor/female_priest_medium.glb': 772096,
+  'armor/female_priest_top.glb': 1383424, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_rogue_low.glb': 208896,
+  'armor/female_rogue_medium.glb': 673792,
+  'armor/female_rogue_top.glb': 1142784, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_shaman_low.glb': 215040,
+  'armor/female_shaman_medium.glb': 739328,
+  'armor/female_shaman_top.glb': 1306624, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_warlock_low.glb': 208896,
+  'armor/female_warlock_medium.glb': 663552,
+  'armor/female_warlock_top.glb': 1136640, // 2026-10-03: new, the medium maps' top levels
+  'armor/female_warrior_low.glb': 215040,
+  'armor/female_warrior_medium.glb': 729088,
+  'armor/female_warrior_top.glb': 1451008, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_druid_low.glb': 193536,
+  'armor/male_druid_medium.glb': 710656,
+  'armor/male_druid_top.glb': 1328128, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_hunter_low.glb': 200704,
+  'armor/male_hunter_medium.glb': 743424,
+  'armor/male_hunter_top.glb': 1377280, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_mage_low.glb': 219136,
+  'armor/male_mage_medium.glb': 720896,
+  'armor/male_mage_top.glb': 1273856, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_paladin_low.glb': 200704,
+  'armor/male_paladin_medium.glb': 832512,
+  'armor/male_paladin_top.glb': 1619968, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_priest_low.glb': 225280,
+  'armor/male_priest_medium.glb': 747520,
+  'armor/male_priest_top.glb': 1345536, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_rogue_low.glb': 181248,
+  'armor/male_rogue_medium.glb': 645120,
+  'armor/male_rogue_top.glb': 1147904, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_shaman_low.glb': 187392,
+  'armor/male_shaman_medium.glb': 729088,
+  'armor/male_shaman_top.glb': 1380352, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_warlock_low.glb': 204800,
+  'armor/male_warlock_medium.glb': 644096,
+  'armor/male_warlock_top.glb': 1089536, // 2026-10-03: new, the medium maps' top levels
+  'armor/male_warrior_low.glb': 201728,
+  'armor/male_warrior_medium.glb': 821248,
+  'armor/male_warrior_top.glb': 1673216, // 2026-10-03: new, the medium maps' top levels
   // Bases lowered 2026-10-01 (owner: the old heads never ship): the split build measures the
   // handoff's original face, then strips it (build_woc_split.mjs stripOriginalFace), so a base
   // is the rig, the body and its map. The female base dropped from 1381016 to 344976 bytes and

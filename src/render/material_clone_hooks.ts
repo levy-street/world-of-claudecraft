@@ -25,9 +25,11 @@ import { reattachBiomeHazeToClone } from './biome_haze_field';
 import { reapplyArmorDyeToClone } from './characters/armor_dye';
 import { reapplyEnvSheenToClone } from './characters/env_sheen';
 import { reattachGloamClimbToClone } from './characters/gloam_climb';
+import { reapplyWocArmorPaintToClone } from './characters/woc_armor_paint';
 import { reapplyWocHeadTintToClone } from './characters/woc_head_tint';
 import { addRimGlow, hasRimGlow } from './gfx';
 import { reapplyInstancedDitherFadeToClone } from './instanced_dither_fade';
+import { reapplyPaintedWallDetailToClone } from './painted_wall_detail';
 import { reapplyVertexColorEmissiveToClone } from './vertex_color_emissive';
 import { reapplySurfaceDetailToClone } from './worn_stone';
 
@@ -37,7 +39,8 @@ import { reapplySurfaceDetailToClone } from './worn_stone';
  * then the dormant Gloamveil climb every lit rig material carries,
  * then zone haze as surfaceMat attaches it at creation, then surface detail,
  * then the vertex-colour emissive layer, then the per-instance ghost dither, then
- * the env sheen, then the WOC head tint:
+ * the env sheen, then the WOC armour paint, then the painted walls' detail, then the WOC
+ * head tint:
  * each later layer chains the previous hook into its own cache key). Only layers the source actually had are
  * re-attached, so a clone never gains a patch its source never carried, which
  * would break program identity just as badly.
@@ -81,6 +84,14 @@ export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE
   // env sheen as the last layer of its GFX.standardMaterials arm. Reads the scale
   // applyEnvSheen records in userData; a no-op for unsheened materials.
   reapplyEnvSheenToClone(clone);
+  // The WOC armour paint, which the same factory attaches after the env sheen on both of
+  // its arms (characters/woc_armor_paint.ts); a no-op for a source that never carried it.
+  reapplyWocArmorPaintToClone(source, clone);
+  // The re-baked painted walls' mask guard and stone relief (painted_wall_detail.ts):
+  // placedBuildingMaterial attaches it over its own hook-preserving clone, so it wraps
+  // every layer above. No material carries both it and the head tint below (one is a
+  // building's walls, the other a character's head); a no-op for any other source.
+  reapplyPaintedWallDetailToClone(source, clone);
   // Truly last: the WOC head dressing wraps an already hook-preserving clone and
   // puts the head/skin tint on top, so its program key folds in every layer above.
   // The clone shares the source's tint uniforms (a player's chosen colours keep

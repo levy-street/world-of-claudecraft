@@ -2,9 +2,11 @@ import { createHash } from 'node:crypto';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
+  GRASS_SHADE_LIFT,
   patchCanopyDetailShaderSource,
   patchConstantUpNormalVertexShader,
   patchGrassFragmentShader,
+  patchGrassShadeLiftFragment,
   reuseDiffuseMapSampleForEmissive,
 } from '../src/render/foliage_shader_core';
 
@@ -183,5 +185,35 @@ describe('foliage shader core', () => {
     ).toBe('ed6ec1277c0d9ee73867aea67772ff7269bac31ded37330a48bcd8f9b8e0b17c');
     expect(sharedMap).not.toContain('#include <emissivemap_fragment>');
     expect(sharedMap).toContain('totalEmissiveRadiance *= sampledDiffuseColor.rgb;');
+  });
+});
+
+describe('patchGrassShadeLiftFragment', () => {
+  const standard = THREE.ShaderLib.standard.fragmentShader;
+
+  it('adds an albedo-scaled indirect lift right after the lights resolve', () => {
+    const out = patchGrassShadeLiftFragment(standard);
+    const anchor = out.indexOf('#include <lights_fragment_end>');
+    const lift = out.indexOf('reflectedLight.indirectDiffuse += diffuseColor.rgb * 0.160;');
+    expect(anchor).toBeGreaterThan(-1);
+    expect(lift).toBeGreaterThan(anchor);
+    // before the AO and the final light sum read the indirect term
+    expect(lift).toBeLessThan(out.indexOf('#include <aomap_fragment>'));
+  });
+
+  it('keeps shaded grass green without flattening it: a small fraction', () => {
+    expect(GRASS_SHADE_LIFT).toBeGreaterThan(0.08);
+    expect(GRASS_SHADE_LIFT).toBeLessThan(0.3);
+  });
+
+  it('is idempotent, and works on the Lambert path the Low tier draws', () => {
+    const once = patchGrassShadeLiftFragment(standard);
+    expect(patchGrassShadeLiftFragment(once)).toBe(once);
+    const lambert = patchGrassShadeLiftFragment(THREE.ShaderLib.lambert.fragmentShader);
+    expect(lambert).toContain('reflectedLight.indirectDiffuse += diffuseColor.rgb * 0.160;');
+  });
+
+  it('throws when the pinned three anchor moves', () => {
+    expect(() => patchGrassShadeLiftFragment('void main() {}')).toThrow(/lights_fragment_end/);
   });
 });

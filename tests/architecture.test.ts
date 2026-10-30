@@ -168,6 +168,7 @@ describe('live graphics profile architecture', () => {
     const directDeferredProfiles = [
       ['terrain.ts', 'prepareTerrainProfileAssets'],
       ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
+      ['painted_wall_detail.ts', 'preparePaintedWallDetailProfileAssets'],
       ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
       ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
       ['great_tree_prewarm.ts', 'prepareGreatTreeProfileAssets'],
@@ -1241,6 +1242,10 @@ const RENDER_PURE_CORES = [
   'src/render/characters/woc_autoattack_core.ts',
   'src/render/characters/woc_armor_core.ts',
   'src/render/characters/woc_armor_merge_core.ts',
+  // the painted WOC armour: the metal response caps, the paint-over GLSL and its knobs
+  'src/render/characters/woc_armor_paint_core.ts',
+  // the actors' share of the sky reflection (VisualDef.envSheen): the GLSL line and its key
+  'src/render/characters/env_sheen_core.ts',
   'src/render/characters/death_grounding_core.ts',
   'src/render/characters/stonebound_shell_core.ts',
   'src/render/characters/form_adornment_core.ts',
@@ -1418,6 +1423,14 @@ const RENDER_PURE_CORES = [
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
   'src/render/eastbrook_stall_canopy_core.ts',
+  // the Eastbrook surface atlas tiled at world scale (eastbrook_surface_dressing.ts)
+  'src/render/eastbrook_surface_tiling_core.ts',
+  // the settled lean, bow, sag and wobble of procedural town geometry
+  'src/render/town_shape_imperfection_core.ts',
+  // the painted Tidehold buildings' relief lift and colour variation
+  'src/render/placed_building_surface_core.ts',
+  // the re-baked painted walls: stone-mask guard, uv1 detail normal GLSL, gate and knobs
+  'src/render/painted_wall_detail_core.ts',
   'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
@@ -1484,6 +1497,8 @@ const RENDER_PURE_CORES = [
   'src/render/terrain_grid_core.ts',
   'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
+  // the painted ground: layer table, cover masks, height blend GLSL + twins
+  'src/render/terrain_painted_ground_core.ts',
   'src/render/vehicle_exhaust_core.ts',
   'src/render/vehicle_steering_core.ts',
   'src/render/vehicle_suspension_core.ts',
@@ -1509,6 +1524,9 @@ const RENDER_PURE_CORES = [
   'src/render/prewarm_resume.ts',
   'src/render/resident_scenery_core.ts',
   'src/render/sky_residency_core.ts',
+  'src/render/sky_painted_core.ts',
+  // the vale sky's painted cloud layer: its layout, drift and GLSL (sky.ts)
+  'src/render/sky_clouds_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
@@ -1555,6 +1573,13 @@ const RENDER_PURE_CORES = [
   'src/render/cut_cavity_core.ts',
   'src/render/grass_edge_taper_core.ts',
   'src/render/grass_interaction_core.ts',
+  // the Eastbrook painted meadow: its scope, the clump field the three grass
+  // layers share, the clustered vale bushes, and the CPU twin of the painted
+  // ground's macro texture the blades read its masks through
+  'src/render/meadow_scope_core.ts',
+  'src/render/meadow_patch_core.ts',
+  'src/render/meadow_bush_core.ts',
+  'src/render/painted_ground_macro_core.ts',
   'src/render/sprites_buddy_flame_core.ts',
   'src/render/characters/decal_texture_size_core.ts',
 ].map((rel) => join(repoRoot, rel));

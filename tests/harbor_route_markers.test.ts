@@ -211,8 +211,9 @@ describe('harbor route markers: placement clear of the boarding path', () => {
 
 describe('harbor route markers: nothing moored in front of them', () => {
   it('keeps every moored ship well away from each marker (Wickharbor pair moved to the Beacon dock)', () => {
+    // the kit hulls, plus the painted merchant ship riding off Eastbrook
     const ships = (PROPS.decorProps ?? []).filter(
-      (d) => d.key === 'hexShipBlue' && d.float !== undefined,
+      (d) => (d.key === 'hexShipBlue' || d.key === 'eastbrookPaintedShip') && d.float !== undefined,
     );
     // the two hulls that lay off the deepwater pier's south side, hiding the sign
     for (const [x, z] of [
@@ -235,7 +236,10 @@ describe('harbor route markers: nothing moored in front of them', () => {
     }
     for (const m of HARBOR_ROUTE_MARKERS) {
       for (const d of ships) {
-        const gap = Math.hypot(d.x - m.x, d.z - m.z) - (d.r ?? 4);
+        // a hull that collides as a box reaches its corners, not its clearance circle
+        const reach =
+          d.hw !== undefined && d.hd !== undefined ? Math.hypot(d.hw, d.hd) : (d.r ?? 4);
+        const gap = Math.hypot(d.x - m.x, d.z - m.z) - reach;
         expect(gap, `${m.berth} vs ship at (${d.x}, ${d.z})`).toBeGreaterThan(12);
       }
     }

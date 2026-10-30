@@ -41,8 +41,10 @@ describe('zone-scoped sky assets', () => {
     expect(loadKtx2Texture).toHaveBeenCalledTimes(2);
     // The dome takes the single-slot `large` lane; the small PMREM source does
     // not, so it cannot sit behind a 1.6 MB dome fetch on a biome crossing.
-    expect(loadKtx2Texture).toHaveBeenNthCalledWith(1, '/env/vale_day_2k.ktx2', { large: true });
-    expect(loadKtx2Texture).toHaveBeenNthCalledWith(2, '/env/vale_day_512.ktx2');
+    expect(loadKtx2Texture).toHaveBeenNthCalledWith(1, '/env/vale_painted_day_2k.ktx2', {
+      large: true,
+    });
+    expect(loadKtx2Texture).toHaveBeenNthCalledWith(2, '/env/vale_painted_env_512.ktx2');
     // All shipped backdrop strengths are zero: dead 8k panoramas must not be
     // fetched merely because their biome's HDRI is requested.
     expect(loadTexture).not.toHaveBeenCalled();
@@ -144,7 +146,7 @@ describe('zone-scoped sky assets', () => {
     // be handed the disposed texture straight back out of the promise cache.
     expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_2k.ktx2');
     expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_512.ktx2');
-    expect(releaseKtx2Texture).not.toHaveBeenCalledWith('/env/vale_day_2k.ktx2');
+    expect(releaseKtx2Texture).not.toHaveBeenCalledWith('/env/vale_painted_day_2k.ktx2');
 
     // The per-biome fetch memo is gone too, so the re-ensure really re-fetches.
     loadKtx2Texture.mockClear();
@@ -214,7 +216,7 @@ describe('zone-scoped sky assets', () => {
   });
 
   it('never disposes a sky two biome keys share through an aliased url', async () => {
-    // beach reuses the vale day sky, cave/volcano the marsh overcast:
+    // beach reuses the vale's painted day sky, cave/volcano the marsh overcast:
     // loadKtx2Texture hands both keys the SAME transcoded texture, so a
     // per-key dispose would blank the other key's dome.
     const decoded = new Map<string, THREE.CompressedTexture>();
@@ -236,7 +238,7 @@ describe('zone-scoped sky assets', () => {
 
       expect(sky.releaseSkyBiomeAssets(['beach'])).toEqual(['beach']);
       expect(disposed).not.toHaveBeenCalled();
-      expect(releaseKtx2Texture).not.toHaveBeenCalledWith('/env/vale_day_2k.ktx2');
+      expect(releaseKtx2Texture).not.toHaveBeenCalledWith('/env/vale_painted_day_2k.ktx2');
       expect(sky.hasSkyHdriAssets(['vale'])).toBe(true);
       expect(sky.hasSkyHdriAssets(['beach'])).toBe(false);
 
@@ -244,7 +246,7 @@ describe('zone-scoped sky assets', () => {
       view.dispose();
       expect(sky.releaseSkyBiomeAssets(['vale'])).toEqual(['vale']);
       expect(disposed).toHaveBeenCalled();
-      expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/vale_day_2k.ktx2');
+      expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/vale_painted_day_2k.ktx2');
     } finally {
       loadKtx2Texture.mockImplementation(async () => new THREE.CompressedTexture([], 2, 1));
     }
@@ -441,7 +443,7 @@ describe('zone-scoped sky assets', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(loadKtx2Texture).toHaveBeenCalledWith('/env/vale_day_1k.ktx2', { large: true });
+    expect(loadKtx2Texture).toHaveBeenCalledWith('/env/vale_painted_day_1k.ktx2', { large: true });
     expect(sky.residentSkyBiomes()).toEqual([]);
 
     view.setCameraPos(0, 400, 0);
@@ -449,7 +451,7 @@ describe('zone-scoped sky assets', () => {
     await Promise.resolve();
 
     expect(loadKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_1k.ktx2', { large: true });
-    expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/vale_day_1k.ktx2');
+    expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/vale_painted_day_1k.ktx2');
 
     view.dispose();
     expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_1k.ktx2');

@@ -7,15 +7,25 @@ import { describe, expect, it } from 'vitest';
 // three properties the live regression taught us to guard.
 describe('meadow paint ring', () => {
   const terrain = readFileSync(new URL('../src/render/terrain.ts', import.meta.url), 'utf8');
+  const paintedCore = readFileSync(
+    new URL('../src/render/terrain_painted_ground_core.ts', import.meta.url),
+    'utf8',
+  );
 
   it('gates the ring on the shared carpet uniform in BOTH shader arms', () => {
-    // the snippet is spliced via one shared constant, so presence of the
-    // constant plus two splice sites is the both-arms guarantee
+    // the ring is picked once (the stock snippet, or the painted ground's own
+    // ring on the built-in world) and spliced through one local, so the
+    // selection plus two splice sites is the both-arms guarantee
     expect(terrain).toContain('const GRASS_PAINT_RING_GLSL');
+    expect(terrain).toContain(
+      'const ring = painted ? paintedGrassGlsl(MEADOW_CARPET_FADE_START) : GRASS_PAINT_RING_GLSL;',
+    );
     // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal shader template source.
-    const splices = terrain.split('${GRASS_PAINT_RING_GLSL}').length - 1;
+    const splices = terrain.split('${ring}').length - 1;
     expect(splices, 'rich and plain arms both splice the ring').toBe(2);
     expect(terrain).toContain('uCarpetRing.z > 0.0');
+    // the painted ring keeps the same shared-uniform gate
+    expect(paintedCore).toContain('if ( uCarpetRing.z > 0.0 ) {');
   });
 
   it('reuses the carpet fade constant so the two fades cannot drift', () => {

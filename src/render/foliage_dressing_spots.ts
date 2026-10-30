@@ -19,6 +19,7 @@ import {
 import { hashAt, insideDressingExclusion, insideHighwatchGuildGround } from './foliage_core';
 import { parterreBushSpots } from './garden_parterre_core';
 import { GFX } from './gfx';
+import { meadowBushSpots } from './meadow_bush_core';
 
 export type DressKind = 'bush' | 'bushFlowers' | 'fern' | 'mushroom';
 
@@ -230,6 +231,12 @@ export function generateDressing(seed: number): DressingSpot[] {
       const [sMin, sRange] = DRESS_SCALE[kind];
       out.push({ x, z, kind, scale: (sMin + hashAt(gx, gz, 45) * sRange) * scaleBoost });
     }
+  }
+  // Eastbrook's clustered undergrowth along verges, wall bases, rocks and tree
+  // feet (meadow_bush_core.ts): the same spots on every tier, drawn by the
+  // bucket meshes the scatter above already fills (instances, no draw call)
+  for (const spot of meadowBushSpots(seed, activeContent)) {
+    out.push({ x: spot.x, z: spot.z, kind: spot.kind, scale: spot.scale });
   }
   // the Evergarden's clipped hedges and rose centerpieces, laid out by the
   // parterre plan instead of the hash scatter above

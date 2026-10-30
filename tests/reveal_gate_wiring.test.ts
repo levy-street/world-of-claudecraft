@@ -289,16 +289,19 @@ describe('reveal gate wiring (source pins)', () => {
       '../src/render/eastbrook_town.ts',
       'eastbrook-town-static',
       'roofVisibilityPlan.visible &&\n          townRootVisible(reveal, staticPiecewise, buildingRootBase + index);',
+      // the painted civic benches (drawn from their own GLB) are clutter too
+      'const clutterTargetCount = microBatchCount + civicBenches.length;',
     ],
     [
       'fenbridge',
       '../src/render/fenbridge_town.ts',
       'fenbridge-town-static',
       'visibilityPlan.visible &&\n          townRootVisible(reveal, staticPiecewise, buildingRootBase + index);',
+      'const microBatchCount = microBatches.length;',
     ],
   ])(
     '%s resolves its static cull and its buildings through the town reveal policy',
-    (_town, path, key, buildingWrite) => {
+    (_town, path, key, buildingWrite, clutterDecl) => {
       const source = read(path);
       // The policy call must decide what the cull loop applies, in that order:
       // policy, latch, the per-root piecewise pass, then the visibility
@@ -311,13 +314,18 @@ describe('reveal gate wiring (source pins)', () => {
         'townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);',
       );
       // Since 28539d3de5c the micro (clutter) batches also answer to their own
-      // fog reach; every batch still passes through the piecewise hold.
+      // fog reach; every batch still passes through the piecewise hold. The
+      // clutter count is declared before the loop that reads it (Eastbrook's
+      // takes in its painted benches, which share the same cull and hold).
+      const clutterCount = clutterDecl.slice('const '.length, clutterDecl.indexOf(' ='));
+      const clutterAt = anchor(source, clutterDecl);
       const cullAt = anchor(
         source,
         'staticCullTargets[index].visible =\n' +
-          '          (index >= microBatchCount || microVisible) &&\n' +
+          `          (index >= ${clutterCount} || microVisible) &&\n` +
           '          townRootVisible(reveal, staticPiecewise, index);',
       );
+      expect(clutterAt).toBeLessThan(cullAt);
       const baseAt = anchor(source, 'const buildingRootBase = staticCullTargets.length;');
       const buildingAt = anchor(source, buildingWrite);
       expect(policyAt).toBeLessThan(keyAt);

@@ -322,8 +322,9 @@ describe('civic bench (rebuild furniture)', () => {
   it('strides up onto the seat with no jump, and off again clean', () => {
     // Re-pinned 2026-08 for the harbor move (d19aa33f76): the civic benches
     // ring the market square now; this is the SOUTH bench at (-14, -104.9),
-    // rot 0, drawn 1.8 x 0.6 x 0.40: the 0.40 seat sits inside
-    // MAX_STEP_HEIGHT, so a plain walk climbs it like a kerb, and the
+    // rot 0, drawn 1.8 x 0.6 x 0.399 (the painted bench, about the 0.40 the
+    // kit bench it replaced stood): the seat sits inside MAX_STEP_HEIGHT, so a plain
+    // walk climbs it like a kerb, and the
     // far-side walk-off crosses toward the square and re-seats on terrain.
     const sim = makeSim();
     teleport(sim, -14, -104.9 - 1.3, 0);

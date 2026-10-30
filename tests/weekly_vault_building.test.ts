@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   buildEastbrookWeeklyVault,
+  WEEKLY_VAULT_DRAWN_TRIANGLES,
   WEEKLY_VAULT_TRIANGLES,
 } from '../src/render/eastbrook_weekly_vault';
 import { colliderInternalsForTest } from '../src/sim/colliders';
@@ -105,7 +106,15 @@ describe('Eastbrook independent stone vault', () => {
         expect(object.receiveShadow).toBe(true);
       }
     });
-    expect(triangles).toBe(WEEKLY_VAULT_TRIANGLES);
+    // Re-pinned for the surface pass (eastbrook_surface_dressing.ts): the
+    // SHAPE is still WEEKLY_VAULT_TRIANGLES (the boxes vault.glb was exported
+    // from, pinned against that file in eastbrook_vault_placement.test.ts);
+    // the drawn hall clips every face larger than one atlas repeat along the
+    // repeat grid and its tall faces through the grime band, so it draws
+    // 1,126 more. Thin metal trim and hidden faces are not subdivided.
+    expect(WEEKLY_VAULT_TRIANGLES).toBe(4572);
+    expect(triangles).toBe(WEEKLY_VAULT_DRAWN_TRIANGLES);
+    expect(WEEKLY_VAULT_DRAWN_TRIANGLES).toBe(5698);
     expect(meshes).toBe(8);
     expect(hideTarget.mats).toHaveLength(8);
     expect(hideTarget.x).toBe(EASTBROOK_LAYOUT.weeklyVault.x);

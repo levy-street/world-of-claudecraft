@@ -17,6 +17,7 @@ import {
   eastbrookTownInternalsForTest,
 } from '../src/render/eastbrook_town';
 import { gfxInternalsForTest } from '../src/render/gfx';
+import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 
 let restoreGfx: (() => void) | null = null;
 
@@ -204,15 +205,22 @@ describe('Eastbrook shared surface atlas', () => {
         // model's own, never the town atlas.
         let kitAncestor = false;
         let placedAncestor = false;
+        let paintedBench = false;
         for (let node: THREE.Object3D | null = object; node; node = node.parent) {
           const assetId = node.userData?.assetId as string | undefined;
           if (assetId?.startsWith('/models/biome/')) kitAncestor = true;
+          // the painted civic bench keeps its own GLB materials, like a kit shell
+          if (assetId === EASTBROOK_LAYOUT.civic.benches[0].assetId) paintedBench = true;
           const assetUrl = node.userData?.assetUrl as string | undefined;
           if (assetUrl?.startsWith(PLACED_ASSET_PREFIX)) placedAncestor = true;
         }
         const material = object.material as THREE.MeshLambertMaterial;
         expect(material).toBeInstanceOf(THREE.MeshLambertMaterial);
         if (kitAncestor) return;
+        if (paintedBench) {
+          expect(material.map).not.toBe(atlas);
+          return;
+        }
         if (placedAncestor) {
           placedMeshes++;
           expect(root).toBe(town.group);

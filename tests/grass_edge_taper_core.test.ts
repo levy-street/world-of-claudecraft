@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { eastbrookGrassExclusions } from '../src/render/foliage_core';
 import {
   buildingFootprintEdgeTaper,
+  createGrassClearanceIndex,
   createGrassEdgeTaperContext,
   createWorldGrassEdgeTaperContext,
   GRASS_EDGE_MIN_COVERAGE_SCALE,
@@ -13,12 +14,14 @@ import {
   GRASS_HUB_TAPER_SPAN,
   GRASS_ROAD_INNER_RADIUS,
   GRASS_ROAD_TAPER_SPAN,
+  grassClearanceAt,
   grassClearEdgeTaper,
   grassEdgeCoverageScale,
   grassEdgeHeightScale,
   grassEdgeTaperAt,
   grassEdgeWidthScale,
   hubEdgeTaper,
+  meadowScopedEdgeTaper,
   roadEdgeTaper,
   taperTuftScales,
   townExclusionEdgeTaper,
@@ -184,6 +187,7 @@ describe('grass edge taper core', () => {
       0.5,
       true,
       0.8,
+      null,
       [0, 0],
     );
     const [sxFar, syFar] = taperTuftScales(
@@ -194,6 +198,7 @@ describe('grass edge taper core', () => {
       0.5,
       true,
       0.8,
+      null,
       [0, 0],
     );
     expect(syNear).toBeLessThan(syFar);
@@ -208,6 +213,86 @@ describe('grass edge taper core', () => {
       expect(src, file).toContain('grassEdgeWidthScale(edgeTaper)');
     }
     const foliage = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
-    expect(foliage).toContain('taperTuftScales(edgeTaperCtx, x, z, rd, r, lush, lushness)');
+    // the trailing argument is the meadow patch sample (meadow_patch_core.ts)
+    expect(foliage).toContain(
+      'taperTuftScales(edgeTaperCtx, x, z, rd, r, lush, lushness, patch.sample)',
+    );
+  });
+
+  it('answers clearance to any exclusion and to built edges only, out to its reach', () => {
+    const exclusions = [
+      { kind: 'obb' as const, id: 'wall', x: 0, z: 0, halfWidth: 4, halfDepth: 1, rotation: 0 },
+      { kind: 'circle' as const, id: 'house:serviceApron', x: 20, z: 0, radius: 1.5 },
+    ];
+    const index = createGrassClearanceIndex(exclusions, [], [{ x: -20, z: 0, r: 2 }], 0.5, 4);
+    const out: [number, number] = [0, 0];
+    // inside the padded wall box: zero to both
+    expect(grassClearanceAt(index, 0, 1.2, 4, out)).toEqual([0, 0]);
+    // 1.5 past the wall's padded long side (halfDepth 1 + padding 0.5)
+    const [any, edge] = grassClearanceAt(index, 1, 3, 4, out);
+    expect(any).toBeCloseTo(1.5, 9);
+    expect(edge).toBeCloseTo(1.5, 9);
+    // an apron clears but grows no edge: its clearance reads on [0] only
+    const nearApron = grassClearanceAt(index, 20 + 1.5 + 0.5 + 1, 0, 4, out);
+    expect(nearApron[0]).toBeCloseTo(1, 9);
+    expect(nearApron[1]).toBe(4);
+    // a painted no-grass disc likewise
+    const nearDisc = grassClearanceAt(index, -20 + 2 + 1.25, 0, 4, out);
+    expect(nearDisc[0]).toBeCloseTo(1.25, 9);
+    expect(nearDisc[1]).toBe(4);
+    // past the reach both cap there, and a span over the reach is clamped to it
+    expect(grassClearanceAt(index, 0, 30, 4, out)).toEqual([4, 4]);
+    expect(grassClearanceAt(index, 0, 30, 9, out)).toEqual([4, 4]);
+  });
+
+  it('steps the stock taper aside in proportion to the meadow scope weight', () => {
+    for (const stock of [0, 0.2, 0.7, 1]) {
+      expect(meadowScopedEdgeTaper(0, stock)).toBe(stock);
+      expect(meadowScopedEdgeTaper(1, stock)).toBe(1);
+      const half = meadowScopedEdgeTaper(0.5, stock);
+      expect(half).toBeCloseTo(1 - (1 - stock) * 0.5, 12);
+      expect(half).toBeGreaterThanOrEqual(stock);
+    }
+  });
+
+  it('sizes a card tuft from the meadow patch sample when one is given', () => {
+    const exclusions = eastbrookGrassExclusions(
+      PROPS.buildings,
+      true,
+      BUILTIN_WORLD.services?.noticeboards ?? [],
+    );
+    const worldCtx = createWorldGrassEdgeTaperContext(BUILTIN_WORLD, exclusions, 0.35, 2.2, 15);
+    const x = -28;
+    const z = -94;
+    const rd = roadDistance(x, z);
+    const stock = [...taperTuftScales(worldCtx, x, z, rd, 0.5, true, 0.8, null, [0, 0])];
+    // scope 0: exactly the stock answer, whatever the multipliers say
+    const outside = taperTuftScales(
+      worldCtx,
+      x,
+      z,
+      rd,
+      0.5,
+      true,
+      0.8,
+      { scope: 0, width: 1, height: 1 },
+      [0, 0],
+    );
+    expect(outside).toEqual(stock);
+    // scope 1: the stock taper steps aside and the clump size applies
+    const untapered = taperTuftScales(worldCtx, 60, 60, Infinity, 0.5, true, 0.8, null, [0, 0]);
+    const inside = taperTuftScales(
+      worldCtx,
+      x,
+      z,
+      rd,
+      0.5,
+      true,
+      0.8,
+      { scope: 1, width: 0.95, height: 1.3 },
+      [0, 0],
+    );
+    expect(inside[0]).toBeCloseTo(untapered[0] * 0.95, 9);
+    expect(inside[1]).toBeCloseTo(untapered[1] * 1.3, 9);
   });
 });

@@ -6,12 +6,21 @@
 // src/render/eastbrook_surface_atlas.ts address all three textures at once.
 //
 // Height comes from the color atlas's high-key luminance (192..255 per cell by
-// construction, see surface_atlas.mjs). Normals are central differences taken
-// WITHIN each 128px cell (neighbor lookups wrap inside the cell, never across
-// cells) and the derivatives fade to flat across the 4px border band that the
-// renderer's CELL_PADDING_PIXELS inset never samples directly, so mip bleed at
-// cell seams stays neutral. Roughness is a per-cell base value (spec "cells"
-// table) modulated by the same luminance so surfaces break up.
+// construction, see surface_atlas.mjs). The renderer TILES each cell at world
+// scale (src/render/eastbrook_surface_tiling_core.ts): one repeat is the
+// cell's usable square, the 120px period inside the 4px padding, and the
+// period wraps onto itself. So the bake works on that period:
+//   - the height is softened by a 3x3 tent and differentiated with CLAMPED
+//     neighbours at the period's edges, never across them, so the colour
+//     cell's own wrap seam (the painted cells are not seamless) cannot bake a
+//     ridge into every repeat line;
+//   - the 4px padding band holds the period's WRAPPED values (the left band
+//     repeats the period's right edge, and so on), so bilinear filtering at a
+//     repeat line blends with the texels the next repeat starts on, where the
+//     old bake faded the band flat and every tile line would have read as a
+//     smooth groove.
+// Roughness is a per-cell base value (spec "cells" table) modulated by the
+// same luminance so surfaces break up; it takes the same wrapped padding.
 //
 // Contract mirror of build_surface_atlas.mjs: a spec JSON pins source/output
 // sha256 + dimensions + byte ceilings; --check recomputes and compares,
@@ -29,15 +38,22 @@ const ATLAS_PIXELS = 512;
 const GRID_SIZE = 4;
 const CELL_PIXELS = ATLAS_PIXELS / GRID_SIZE;
 const CELL_PADDING_PIXELS = 4;
+// One repeat of a tiled cell: the usable square inside the padding.
+const PERIOD_START = CELL_PADDING_PIXELS;
+const PERIOD_PIXELS = CELL_PIXELS - CELL_PADDING_PIXELS * 2;
 // The base atlas normalizes every cell into this high-key luminance band.
 const HEIGHT_LUMINANCE_MIN = 192;
 const HEIGHT_LUMINANCE_MAX = 255;
 const ROUGHNESS_LUMINANCE_SWING = 0.08;
 // Photographic grain in the source atlas turns into per-pixel derivative
 // speckle that both looks noisy under light and defeats lossless webp. A 3x3
-// tent blur of the height field (wrapped within the cell) plus channel
-// quantization keeps the relief shapes while landing under the byte ceiling.
-const NORMAL_QUANT_STEP = 6;
+// tent blur of the height field plus channel quantization keeps the relief
+// shapes while landing under the byte ceiling. The step was 6 (42 levels a
+// channel, 2.7 degree facets) when the renderer drew the map at 0.6; at the
+// tiled town's 1.4 those facets would band into 6 degree terraces on smooth
+// slopes. Step 4 (64 levels) keeps the terraces near 2.5 degrees at 1.4 and
+// still lands under the 128 KiB ceiling (step 3 measured 157 KB).
+const NORMAL_QUANT_STEP = 4;
 // Same integer luma weights the color-atlas builder uses (surface_atlas.mjs).
 const LUMINANCE_RED = 54;
 const LUMINANCE_GREEN = 183;
@@ -148,18 +164,30 @@ function cellHeightField(rgb, row, column) {
   return heights;
 }
 
-/** 3x3 tent blur, neighbor lookups wrapped WITHIN the cell. */
+/** Clamp a cell coordinate into the period [PERIOD_START, PERIOD_START + PERIOD_PIXELS). */
+function inPeriod(coordinate) {
+  return Math.min(PERIOD_START + PERIOD_PIXELS - 1, Math.max(PERIOD_START, coordinate));
+}
+
+/** The period texel a padding texel repeats: the period wraps onto itself. */
+function wrappedIntoPeriod(coordinate) {
+  return (
+    PERIOD_START + ((((coordinate - PERIOD_START) % PERIOD_PIXELS) + PERIOD_PIXELS) % PERIOD_PIXELS)
+  );
+}
+
+/** 3x3 tent blur over the period, neighbour lookups CLAMPED to the period. */
 function blurredHeightField(heights) {
   const blurred = new Float64Array(CELL_PIXELS * CELL_PIXELS);
   const weights = [1, 2, 1];
-  for (let y = 0; y < CELL_PIXELS; y += 1) {
-    for (let x = 0; x < CELL_PIXELS; x += 1) {
+  for (let y = PERIOD_START; y < PERIOD_START + PERIOD_PIXELS; y += 1) {
+    for (let x = PERIOD_START; x < PERIOD_START + PERIOD_PIXELS; x += 1) {
       let sum = 0;
       let weightSum = 0;
       for (let dy = -1; dy <= 1; dy += 1) {
-        const sampleY = (y + dy + CELL_PIXELS) % CELL_PIXELS;
+        const sampleY = inPeriod(y + dy);
         for (let dx = -1; dx <= 1; dx += 1) {
-          const sampleX = (x + dx + CELL_PIXELS) % CELL_PIXELS;
+          const sampleX = inPeriod(x + dx);
           const weight = weights[dy + 1] * weights[dx + 1];
           sum += heights[sampleY * CELL_PIXELS + sampleX] * weight;
           weightSum += weight;
@@ -175,34 +203,26 @@ function quantized(byte) {
   return Math.min(255, Math.round(byte / NORMAL_QUANT_STEP) * NORMAL_QUANT_STEP);
 }
 
-/** 0 at the cell edge, 1 once CELL_PADDING_PIXELS in: fades derivatives flat
- *  across the padding band so mips never smear one cell's relief into the next. */
-function borderFade(x, y) {
-  const edgeDistance = Math.min(x, y, CELL_PIXELS - 1 - x, CELL_PIXELS - 1 - y);
-  return Math.min(1, edgeDistance / CELL_PADDING_PIXELS);
-}
-
 function bakeCell(heights, cell, normalPixels, roughPixels, row, column) {
   const smoothed = blurredHeightField(heights);
   for (let y = 0; y < CELL_PIXELS; y += 1) {
-    // Neighbor rows wrap WITHIN the cell, never across cells.
-    const yUp = (y + CELL_PIXELS - 1) % CELL_PIXELS;
-    const yDown = (y + 1) % CELL_PIXELS;
+    // Padding texels take the period texel they wrap to.
+    const py = y >= PERIOD_START && y < PERIOD_START + PERIOD_PIXELS ? y : wrappedIntoPeriod(y);
+    // One-sided differences at the period's edges: never across the seam.
+    const yUp = inPeriod(py - 1);
+    const yDown = inPeriod(py + 1);
     for (let x = 0; x < CELL_PIXELS; x += 1) {
-      const xLeft = (x + CELL_PIXELS - 1) % CELL_PIXELS;
-      const xRight = (x + 1) % CELL_PIXELS;
-      const height = heights[y * CELL_PIXELS + x];
-      const fade = borderFade(x, y);
+      const px = x >= PERIOD_START && x < PERIOD_START + PERIOD_PIXELS ? x : wrappedIntoPeriod(x);
+      const xLeft = inPeriod(px - 1);
+      const xRight = inPeriod(px + 1);
+      const height = heights[py * CELL_PIXELS + px];
       const dx =
-        (smoothed[y * CELL_PIXELS + xRight] - smoothed[y * CELL_PIXELS + xLeft]) *
-        0.5 *
-        cell.strengthX *
-        fade;
+        ((smoothed[py * CELL_PIXELS + xRight] - smoothed[py * CELL_PIXELS + xLeft]) /
+          (xRight - xLeft)) *
+        cell.strengthX;
       const dy =
-        (smoothed[yDown * CELL_PIXELS + x] - smoothed[yUp * CELL_PIXELS + x]) *
-        0.5 *
-        cell.strengthY *
-        fade;
+        ((smoothed[yDown * CELL_PIXELS + px] - smoothed[yUp * CELL_PIXELS + px]) / (yDown - yUp)) *
+        cell.strengthY;
       // Tangent-space heightfield normal, OpenGL convention (+Y = up in UV
       // space). Pixel y grows downward while v grows upward, so the green
       // channel takes +dHeight/dPixelY.

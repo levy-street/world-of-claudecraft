@@ -8,9 +8,13 @@ import {
   displayFromRadiance,
   fogSceneHex,
   gradeUniformValues,
+  groundKey,
+  hexToLinear,
   hexToSrgb01,
   isNeutralGrade,
+  type LookPatch,
   lookDisplayModel,
+  lookToPatchSnippet,
   lookToShippingSnippet,
   NEUTRAL_GRADE,
   parseSelections,
@@ -18,9 +22,11 @@ import {
   resolveZoneLookId,
   STOCK_GRADE_GAIN,
   STOCK_LOOK_ID,
+  STOCK_RENDER,
   skyUniformValues,
   stockLookFor,
   whiteBalanceGains,
+  type ZoneLook,
 } from '../src/render/palette_lab/zone_look_core';
 import { ZONE_LOOKS } from '../src/render/palette_lab/zone_looks';
 import { BIOME_PALETTE } from '../src/render/terrain_palette';
@@ -271,5 +277,210 @@ describe('curated look data', () => {
         expect(look.note, where).not.toMatch(/[\u2013\u2014]/);
       }
     }
+  });
+});
+
+describe('Eastbrook Vale painted look', () => {
+  const stock = stockLookFor('vale', WATER, BLOOM);
+  const eastbrook = (id: string): ZoneLook => {
+    const patch = (ZONE_LOOKS.eastbrook_vale ?? []).find((l) => l.id === id);
+    if (!patch) throw new Error(`eastbrook_vale has no look ${id}`);
+    return applyLookPatch(stock, patch);
+  };
+  const day = eastbrook('painted-vale');
+  const night = eastbrook('painted-vale-night');
+  const highKey = eastbrook('skyward-isles');
+  const luminance = (hex: number): number => {
+    const [r, g, b] = hexToLinear(hex);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  // What a hemisphere actually pours in: its scale times its colour's level.
+  const fill = (look: ZoneLook): number => look.light.hemiScale * luminance(look.light.hemiSky);
+  // The vale's painted sky (sky.ts) pours about this share of the retired photo
+  // sky's IBL energy (the sky workstream's measurement), so its envScale reads
+  // against today's looks only after this factor.
+  const PAINTED_SKY_IBL = 0.46;
+  const hue = (hex: number): number => {
+    const [r, g, b] = hexToSrgb01(hex);
+    const max = Math.max(r, g, b);
+    const d = max - Math.min(r, g, b);
+    if (d === 0) return 0;
+    const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return (h * 60 + 360) % 360;
+  };
+  const warmth = (hex: number): number => {
+    const [r, , b] = hexToLinear(hex);
+    return r / Math.max(b, 1e-6);
+  };
+
+  it('resolves Eastbrook to Painted Vale by day and its night companion after dark', () => {
+    expect(DEFAULT_ZONE_SELECTIONS.eastbrook_vale).toBe('painted-vale');
+    expect(DEFAULT_ZONE_NIGHT_SELECTIONS.eastbrook_vale).toBe('painted-vale-night');
+    const resolve = (zone: string, isNight: boolean) =>
+      resolveZoneLookId(zone, DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, isNight);
+    expect(resolve('eastbrook_vale', false)).toBe('painted-vale');
+    expect(resolve('eastbrook_vale', true)).toBe('painted-vale-night');
+    // The other two Skyward Isles zones keep it day and night.
+    for (const zone of ['proving_shore', 'galecrest']) {
+      expect(resolve(zone, false), zone).toBe('skyward-isles');
+      expect(resolve(zone, true), zone).toBe('skyward-isles');
+    }
+  });
+
+  it('leaves every other zone on the look it already shipped', () => {
+    const { eastbrook_vale: _day, ...otherDay } = DEFAULT_ZONE_SELECTIONS;
+    expect(otherDay).toEqual({
+      proving_shore: 'skyward-isles',
+      mirefen_marsh: 'jade-wetland',
+      thornpeak_heights: 'alpine-clear',
+      farshore_isle: 'tropic-lagoon',
+      galecrest: 'skyward-isles',
+      evergarden: 'afternoon-reverie',
+      willowfen: 'spring-watercolour',
+      palmreach: 'lagoon-turquoise',
+      veiled_hollow: 'rosewater-twilight',
+      nightbloom: 'fae-pink',
+      drakelands: 'ashfall',
+      frostveil: 'glacier-teal',
+      amberfall: 'sky-island-gold',
+    });
+    const { eastbrook_vale: _night, ...otherNight } = DEFAULT_ZONE_NIGHT_SELECTIONS;
+    expect(otherNight).toEqual({
+      thornpeak_heights: 'sky-island-gold',
+      drakelands: 'obsidian-teal',
+      frostveil: 'violet-whiteout',
+      amberfall: 'sky-island-gold',
+    });
+  });
+
+  it('is darker and moodier than the high-key look it replaces', () => {
+    // Tuned by eye in game against the reference frames: the shade deepens
+    // hard (a quarter to under half the high key's sky fill, less image light)
+    // while the warm key rises, for the light-pool contrast those frames have.
+    expect(fill(day)).toBeLessThan(fill(highKey) * 0.45);
+    expect(fill(day)).toBeGreaterThan(fill(highKey) * 0.25);
+    // The image light, in the retired photo sky's units (the painted vale sky
+    // pours PAINTED_SKY_IBL of its energy): well under the high key's, never mud.
+    const ibl = day.light.envScale * PAINTED_SKY_IBL;
+    expect(ibl).toBeLessThan(highKey.light.envScale * 0.6);
+    expect(ibl).toBeGreaterThanOrEqual(0.6);
+    expect(day.grade.exposure).toBeLessThanOrEqual(1);
+    expect(day.grade.exposure).toBeGreaterThanOrEqual(0.85);
+    // The key is BRIGHTER than the old one (the warmer hex carries less
+    // luminance, and its scale more than makes up for it): lit pools pop
+    // against the deeper shade.
+    const key = (look: ZoneLook) => look.light.sunScale * luminance(look.light.sun);
+    expect(key(day) / key(highKey)).toBeGreaterThan(1.1);
+    expect(key(day) / key(highKey)).toBeLessThan(1.4);
+    expect(day.grade.contrast).toBeGreaterThanOrEqual(1.04);
+    expect(day.grade.contrast).toBeLessThanOrEqual(1.16);
+    expect(day.grade.saturation).toBeGreaterThanOrEqual(0.98);
+    expect(day.grade.saturation).toBeLessThanOrEqual(1.06);
+    expect(day.grade.vibrance).toBeLessThanOrEqual(0.15);
+    expect(day.bloom.strength).toBeLessThanOrEqual(0.35);
+    expect(day.bloom.threshold).toBeGreaterThanOrEqual(1.2);
+  });
+
+  it('lights warm and shades cool, with earthy painted ground', () => {
+    expect(warmth(day.light.sun)).toBeGreaterThan(2);
+    expect(warmth(day.light.hemiSky)).toBeLessThan(0.7);
+    expect(warmth(day.grade.highlightTint)).toBeGreaterThan(1.5);
+    expect(warmth(day.grade.shadowTint)).toBeLessThan(0.5);
+    expect(day.grade.shadowAmt).toBeGreaterThanOrEqual(0.3);
+    expect(day.grade.shadowAmt).toBeLessThanOrEqual(0.5);
+    expect(day.grade.highlightAmt).toBeGreaterThanOrEqual(0.1);
+    expect(day.grade.highlightAmt).toBeLessThanOrEqual(0.15);
+    expect(day.grade.greenHue).toBeLessThan(0);
+    expect(day.grade.greenHue).toBeGreaterThanOrEqual(-8);
+    // Yellow-green grass in the light, teal-green in the lush shade, ochre dirt.
+    expect(hue(day.ground.grass)).toBeGreaterThan(75);
+    expect(hue(day.ground.grass)).toBeLessThan(110);
+    expect(hue(day.ground.grassYellow)).toBeGreaterThan(50);
+    expect(hue(day.ground.grassYellow)).toBeLessThan(hue(day.ground.grass));
+    expect(hue(day.ground.grassDark)).toBeGreaterThan(130);
+    expect(hue(day.ground.grassDark)).toBeLessThan(170);
+    expect(hue(day.ground.dirt)).toBeGreaterThan(20);
+    expect(hue(day.ground.dirt)).toBeLessThan(45);
+    // A soft blue-teal haze, a painted horizon's distance.
+    expect(hue(day.fog.color)).toBeGreaterThan(175);
+    expect(hue(day.fog.color)).toBeLessThan(215);
+    expect(day.fog.near).toBeGreaterThanOrEqual(90);
+    expect(day.fog.near).toBeLessThanOrEqual(120);
+    expect(day.fog.far).toBeGreaterThanOrEqual(600);
+    expect(day.fog.far).toBeLessThanOrEqual(700);
+  });
+
+  it('leaves the painted sky and the meadow to their own work, with a small warm rim', () => {
+    for (const look of [day, night]) {
+      // The gradient arm at zero: the dome's painted sky is never repainted.
+      expect(look.sky.amount, look.id).toBe(0);
+      expect(look.render.meadowCoverage, look.id).toBe(STOCK_RENDER.meadowCoverage);
+      expect(look.render.meadowHeight, look.id).toBe(STOCK_RENDER.meadowHeight);
+      expect(look.render.meadowWidth, look.id).toBe(STOCK_RENDER.meadowWidth);
+      expect(look.render.rim, look.id).toBeGreaterThan(0);
+      expect(look.render.rim, look.id).toBeLessThanOrEqual(0.35);
+    }
+    expect(day.render.rimColor).not.toBeNull();
+    expect(warmth(day.render.rimColor ?? 0)).toBeGreaterThan(1.5);
+  });
+
+  it('switches to night without a re-bake, a water snap or a grass re-place', () => {
+    expect(groundKey(night.ground)).toBe(groundKey(day.ground));
+    expect(night.water).toEqual(day.water);
+    expect(night.fog.near).toBe(day.fog.near);
+    expect(night.fog.far).toBe(day.fog.far);
+    expect(night.render.meadowCoverage).toBe(day.render.meadowCoverage);
+    expect(night.render.meadowHeight).toBe(day.render.meadowHeight);
+    expect(night.render.meadowWidth).toBe(day.render.meadowWidth);
+  });
+
+  it('keeps the night moonlit blue, warm at the lamps and readable', () => {
+    // More fill than the day look: the renderer's night already halves it.
+    expect(fill(night)).toBeGreaterThan(fill(day));
+    expect(fill(night)).toBeLessThan(fill(highKey));
+    expect(night.light.envScale).toBeGreaterThanOrEqual(day.light.envScale);
+    expect(night.light.envScale * PAINTED_SKY_IBL).toBeLessThan(highKey.light.envScale);
+    expect(warmth(night.light.hemiSky)).toBeLessThan(warmth(day.light.hemiSky));
+    expect(warmth(night.light.sun)).toBeLessThan(1);
+    expect(warmth(night.grade.shadowTint)).toBeLessThan(0.5);
+    expect(warmth(night.grade.highlightTint)).toBeGreaterThan(1.5);
+    // Never crushed black: a real lift, no extra contrast, no exposure cut.
+    expect(night.grade.lift).toBeGreaterThanOrEqual(0.08);
+    expect(night.grade.contrast).toBeLessThanOrEqual(1);
+    expect(night.grade.exposure).toBeGreaterThanOrEqual(1);
+    expect(night.godRays).toBe(0);
+  });
+});
+
+describe('lookToPatchSnippet (paste a tuned look back into zone_looks.ts)', () => {
+  const stock = stockLookFor('vale', WATER, BLOOM);
+  const parse = (snippet: string): LookPatch =>
+    new Function(`return ${snippet.trim().replace(/,$/, '')};`)() as LookPatch;
+
+  it('round-trips a curated look exactly, every field resolved', () => {
+    for (const id of ['painted-vale', 'painted-vale-night']) {
+      const patch = (ZONE_LOOKS.eastbrook_vale ?? []).find((l) => l.id === id);
+      expect(patch, id).toBeDefined();
+      const look = applyLookPatch(stock, patch as LookPatch);
+      const snippet = lookToPatchSnippet(look);
+      expect(snippet.startsWith('{\n')).toBe(true);
+      expect(snippet.endsWith('},')).toBe(true);
+      expect(applyLookPatch(stock, parse(snippet))).toEqual(look);
+    }
+  });
+
+  it('keeps a look on its shipped haze by leaving the fog colour out, and quotes text safely', () => {
+    const look = applyLookPatch(stock, {
+      id: 'x',
+      name: "Jo's Look",
+      note: "A note with a \\ backslash and a quote: '",
+      grade: { contrast: 1.2 },
+    });
+    const snippet = lookToPatchSnippet(look);
+    expect(snippet).toContain('fog: { near: ');
+    const back = applyLookPatch(stock, parse(snippet));
+    expect(back).toEqual(look);
+    expect(back.fog.sceneColor).toBe(BIOME_FOG.vale.color);
+    expect(back.name).toBe("Jo's Look");
   });
 });

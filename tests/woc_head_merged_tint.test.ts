@@ -18,6 +18,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { applyEnvSheen } from '../src/render/characters/env_sheen';
+import { envSheenGlsl } from '../src/render/characters/env_sheen_core';
 import {
   createSurfaceResponseMaterial,
   surfaceResponseUniforms,
@@ -993,7 +994,7 @@ describe('attachWocHeadMergedTint: composing with the hooks a material already w
     expect(wrapped.customProgramCacheKey()).toContain('env-sheen:0.250');
     const { fragmentShader } = compile(wrapped);
     // the sheen scales by the fragment's metalness, which is now the SLOT's
-    const sheen = fragmentShader.indexOf('radiance *= mix( 0.250, 1.0, metalnessFactor );');
+    const sheen = fragmentShader.indexOf(envSheenGlsl(0.25));
     const fed = fragmentShader.indexOf(
       '#define metalness uWocHmSurf[wocSlot].x\n#include <metalnessmap_fragment>',
     );

@@ -1,7 +1,15 @@
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  EASTBROOK_ATLAS_CELL_PADDING_PIXELS,
+  EASTBROOK_ATLAS_COLUMNS,
+  EASTBROOK_ATLAS_PIXELS,
+  EASTBROOK_ATLAS_ROWS,
+  eastbrookAtlasCellRect,
+} from './eastbrook_surface_tiling_core';
 import { GFX, surfaceMat } from './gfx';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { renderLayerDisabled } from './render_dev_flags';
 import { applySurfaceDetail, type SurfaceFamily } from './worn_stone';
 
@@ -11,11 +19,19 @@ export const EASTBROOK_SURFACE_ATLAS_URL = '/textures/eastbrook_surface_atlas.we
 // address all three textures at once. Both are non-color data.
 export const EASTBROOK_SURFACE_NORMAL_URL = '/textures/eastbrook_surface_normal.webp';
 export const EASTBROOK_SURFACE_ROUGH_URL = '/textures/eastbrook_surface_rough.webp';
-// Subtle relief for the cozy low-poly art style, not photoreal depth.
-export const EASTBROOK_SURFACE_NORMAL_SCALE = 0.6;
-export const EASTBROOK_SURFACE_ATLAS_SIZE = 512;
-export const EASTBROOK_SURFACE_ATLAS_COLUMNS = 4;
-export const EASTBROOK_SURFACE_ATLAS_ROWS = 4;
+// Relief strength of the baked atlas normal. It was 0.6 while one cell was
+// stretched over a whole mesh and the baked slopes were blurred across it;
+// with the cells tiled at world scale (eastbrook_surface_tiling_core.ts) the
+// same bake carries mortar, plank and shingle edges at 60 to 100 texels a
+// yard, and 1.4 lets them catch the light (90th-percentile slope 0.19 in the
+// bake, about 15 degrees at this scale). The bake's own per-cell strengths
+// (scripts/assets/specs/eastbrook_town_surface_pbr.json) keep canvas and
+// granite grain gentle, so the lift reads as relief, not noise; the rough
+// atlas keeps every cell at 0.7 or above except metal and crystal.
+export const EASTBROOK_SURFACE_NORMAL_SCALE = 1.4;
+export const EASTBROOK_SURFACE_ATLAS_SIZE = EASTBROOK_ATLAS_PIXELS;
+export const EASTBROOK_SURFACE_ATLAS_COLUMNS = EASTBROOK_ATLAS_COLUMNS;
+export const EASTBROOK_SURFACE_ATLAS_ROWS = EASTBROOK_ATLAS_ROWS;
 
 export const EASTBROOK_SURFACE_CELLS = Object.freeze({
   darkStoneBlocks: 0,
@@ -39,9 +55,8 @@ export const EASTBROOK_SURFACE_CELLS = Object.freeze({
 export type EastbrookSurfaceSemantic = keyof typeof EASTBROOK_SURFACE_CELLS;
 type SemanticAtVertex = EastbrookSurfaceSemantic | ((index: number) => EastbrookSurfaceSemantic);
 
-const CELL_PADDING_PIXELS = 4;
-const CELL_SIZE_UV = 1 / EASTBROOK_SURFACE_ATLAS_COLUMNS;
-const CELL_PADDING_UV = CELL_PADDING_PIXELS / EASTBROOK_SURFACE_ATLAS_SIZE;
+/** Padding of each cell in the atlas (the inset the synthesized UVs keep). */
+export const EASTBROOK_SURFACE_CELL_PADDING_PIXELS = EASTBROOK_ATLAS_CELL_PADDING_PIXELS;
 
 let loadedAtlas: THREE.Texture | null = null;
 let loadedNormal: THREE.Texture | null = null;
@@ -121,17 +136,17 @@ function cellUv(
   localU: number,
   localV: number,
 ): readonly [number, number] {
-  const cell = EASTBROOK_SURFACE_CELLS[semantic];
-  const column = cell % EASTBROOK_SURFACE_ATLAS_COLUMNS;
-  const rowFromTop = Math.floor(cell / EASTBROOK_SURFACE_ATLAS_COLUMNS);
-  const usable = CELL_SIZE_UV - CELL_PADDING_UV * 2;
-  return [
-    column * CELL_SIZE_UV + CELL_PADDING_UV + localU * usable,
-    1 - (rowFromTop + 1) * CELL_SIZE_UV + CELL_PADDING_UV + localV * usable,
-  ];
+  const rect = eastbrookAtlasCellRect(EASTBROOK_SURFACE_CELLS[semantic]);
+  return [rect.u0 + localU * rect.size, rect.v0 + localV * rect.size];
 }
 
-/** Clone loader-owned geometry and synthesize TEXCOORD_0 into one atlas cell per vertex. */
+/**
+ * Clone loader-owned geometry and synthesize TEXCOORD_0 into one atlas cell per
+ * vertex, one cell stretched over the geometry's bounding box. This is the
+ * props' mapping (mailbox, noticeboard, chest, Armoury): small enough that one
+ * repeat a prop reads right. The town's merged batch and the Weekly Vault
+ * retile these cells at world scale afterwards (eastbrook_surface_dressing.ts).
+ */
 export function eastbrookSurfaceGeometry(
   source: THREE.BufferGeometry,
   semanticAtVertex: SemanticAtVertex,
@@ -251,17 +266,21 @@ export function eastbrookSemanticForMaterial(name: string): EastbrookSurfaceSema
 }
 
 // ---------------------------------------------------------------------------
-// Triplanar surface detail OVER the baked atlas. The baked PBR companions
-// stretch one 124px cell across an entire building face (cell UVs come from
-// bounding-box normalization), so their relief is far too low-frequency to
-// read on a keep wall: the town judged FLAT with them alone. The world-space
-// triplanar layer tiles at real-world scale on top, kept conservative
-// (~0.3) so the two never fight; per-cell strengths taper it on canvas,
-// metal, and crystal so one merged vertex-colored batch still reads right.
+// Triplanar surface detail OVER the baked atlas. It was added when the baked
+// PBR companions stretched one 120px cell across an entire mesh (bounding-box
+// UVs) and the town judged FLAT with them alone. The merged town batch and
+// the Weekly Vault now tile the cells at world scale with the stronger
+// EASTBROOK_SURFACE_NORMAL_SCALE, so the atlas carries its own painted relief
+// and the photographic layer (the stone family's running-bond mortar, over
+// every cell the mask lets through) is down to a whisper of grain on top:
+// at its old 0.3 it drew a second, unrelated block pattern across the painted
+// one. The per-cell mask still tapers it on canvas, metal, and crystal.
+// Single-semantic materials (TRIPLANAR_BY_SEMANTIC, the Grand Armoury kit)
+// keep their routed families and strengths.
 // ---------------------------------------------------------------------------
 
-/** Conservative triplanar strength over the baked atlas. */
-export const EASTBROOK_TRIPLANAR_STRENGTH = 0.3;
+/** Triplanar strength over the tiled atlas on the merged multi-semantic batches. */
+export const EASTBROOK_TRIPLANAR_STRENGTH = 0.18;
 
 /** Per-semantic triplanar family for materials with ONE semantic (the Grand
  *  Armoury's named materials). null = keep clean (crystal glow). */
@@ -343,6 +362,60 @@ export function applyEastbrookTownSurfaceDetail(material: THREE.Material): THREE
     cellMask: TOWN_CELL_MASK,
   });
   return material;
+}
+
+/**
+ * The town's atlas surface material for a procedural building part (the
+ * Weekly Vault): the same white-times-vertex-colour atlas material the merged
+ * batch draws with (shared surfaceMat entry, the baked normal and roughness
+ * companions on the Standard tiers, the merged-batch triplanar layer on top),
+ * as a hook-preserving per-building CLONE so the camera fade can ghost it.
+ * Metalness stays the part's own; roughness comes from the rough atlas when
+ * it is bound. Without the atlas (it failed to load) the part falls back to
+ * the plain vertex-colour material it drew with before.
+ */
+export interface EastbrookAtlasTextures {
+  atlas?: THREE.Texture;
+  normal?: THREE.Texture;
+  rough?: THREE.Texture;
+}
+
+export function eastbrookAtlasPartMaterial(
+  part: { metalness: number; roughness: number },
+  textures: EastbrookAtlasTextures = {
+    atlas: eastbrookSurfaceAtlasTexture(),
+    normal: eastbrookSurfaceNormalTexture(),
+    rough: eastbrookSurfaceRoughnessTexture(),
+  },
+): THREE.Material {
+  const atlas = textures.atlas;
+  if (!atlas) {
+    return cloneMaterialWithHooks(
+      surfaceMat({
+        color: 0xffffff,
+        vertexColors: true,
+        metalness: part.metalness,
+        roughness: part.roughness,
+      }),
+    );
+  }
+  const standard = GFX.standardMaterials;
+  const normalMap = standard ? textures.normal : undefined;
+  const roughnessMap = standard ? textures.rough : undefined;
+  const shared = surfaceMat({
+    color: 0xffffff,
+    map: atlas,
+    vertexColors: true,
+    normalMap,
+    roughnessMap,
+    roughness: roughnessMap ? 1 : part.roughness,
+    metalness: part.metalness,
+    flatShading: !standard,
+  });
+  if (shared instanceof THREE.MeshStandardMaterial && shared.normalMap) {
+    shared.normalScale.setScalar(EASTBROOK_SURFACE_NORMAL_SCALE);
+  }
+  return applyEastbrookTownSurfaceDetail(cloneMaterialWithHooks(shared));
 }
 
 export function eastbrookMaterialUsesAtlas(

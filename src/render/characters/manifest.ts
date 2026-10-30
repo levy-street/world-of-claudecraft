@@ -207,6 +207,7 @@ import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import type { ChargeGlowSpec } from './charge_glow_core';
 import type { ClipTrackDrops } from './clip_track_drops';
+import { WOC_ENV_SHEEN } from './env_sheen_core';
 import type { EyeGlowSpec } from './eye_glow_core';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { GlowPulseSet } from './glow_pulse_core';
@@ -549,7 +550,8 @@ export interface VisualDef {
   envMapIntensity?: number;
   /** How much of the sky environment's reflection the body's NON-METAL surfaces keep
    *  (standard tiers; env_sheen.ts). A dark authored atlas reads that albedo-free
-   *  reflection as one grey film over cloth, leather and skin; metal keeps its own. */
+   *  reflection as one grey film over cloth, leather and skin; metal keeps a larger share
+   *  of its own (env_sheen_core.ts WOC_ENV_SHEEN_METAL). Every WOC body: WOC_ENV_SHEEN. */
   envSheen?: number;
   /** Force a fully diffuse surface response on the body materials: zero
    *  metalness, full roughness, and the metallic/roughness maps dropped, so
@@ -963,10 +965,6 @@ export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = 
  *  Renderer exists (woc_entry_preload.ts), so no player body in the world waits
  *  on them. Its armor streams per set, at the graphics setting's texture tier
  *  (woc_armor_dressing.ts). */
-/** The share of the sky reflection a WOC body's cloth, leather and skin keep (VisualDef.envSheen):
- *  measured in game against the dark authored atlases, where the full reflection read as a
- *  grey film at noon and a quarter keeps a hint of sky without it. */
-const WOC_ENV_SHEEN = 0.25;
 
 // The body, the rig's own library, and the hand-keyed movement/emote/autoattack
 // library layered over it (woc_keyed_animations.ts); all three share one bind pose.

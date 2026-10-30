@@ -143,7 +143,7 @@ describe('the promoted placements', () => {
   it('keep each bench in proportion and walk-through, as custom worlds always had it', () => {
     for (const bench of EASTBROOK_LAYOUT.civic.benches) {
       const p = byName(bench.id);
-      const natural = TOWN_DRESSING_NATURAL['dungeon/bench'];
+      const natural = TOWN_DRESSING_NATURAL['props/eastbrook_painted_bench'];
       const fit = Math.min(bench.width / natural.x, bench.depth / natural.z);
       const box = drawnBox(p);
       expect(box.x).toBeCloseTo(bench.width, 3);
@@ -330,6 +330,9 @@ describe('town-styled placements', () => {
     }
     expect(isTownStyledPlacedPath('/models/props/fence.glb')).toBe(false);
     expect(isTownStyledPlacedPath('/models/dungeon/bench.glb')).toBe(false);
+    // the painted bench is Eastbrook's own but keeps its own painted
+    // materials, in the town and in a placement alike
+    expect(isTownStyledPlacedPath('/models/props/eastbrook_painted_bench.glb')).toBe(false);
   });
 });
 

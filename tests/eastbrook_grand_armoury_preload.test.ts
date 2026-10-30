@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   loadGltf: vi.fn(),
   loadTexture: vi.fn(),
+  loadKtx2Texture: vi.fn(),
   releaseGltf: vi.fn(),
   registerPreload: vi.fn(),
 }));
@@ -19,6 +20,7 @@ function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: mocks.loadGltf,
   loadTexture: mocks.loadTexture,
+  loadKtx2Texture: mocks.loadKtx2Texture,
   releaseGltf: mocks.releaseGltf,
 }));
 
@@ -48,6 +50,9 @@ describe('Eastbrook Grand Armoury preload', () => {
     const atlas = new THREE.Texture();
     const textureLoad = deferred<THREE.Texture>();
     mocks.loadTexture.mockReturnValue(textureLoad.promise);
+    // The painted walls' shared detail normal (painted_wall_detail.ts) prepares alongside the
+    // landmark; it resolves at once, so the gate below waits on the landmark's own loads only.
+    mocks.loadKtx2Texture.mockResolvedValue(new THREE.Texture());
 
     const module = await import('../src/render/eastbrook_grand_armoury');
 

@@ -1436,7 +1436,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for Low-tier outdoor night light grading in renderer.ts merged over release/v0.45.3.
   // No capture was retaken.
-  '026d82d080ba1a60519879800df499ed038a1a6dbd7e1415a74cd5459e1c1533';
+  // Re-minted for the painted-world graphics upgrade: eastbrook_town.ts and
+  // eastbrook_layout.ts moved with the painted props and cobbles. No capture was retaken.
+  'f69e6a2c528405d5be6731f07909891a2517740edc62cdc6222e7c0721fcc7dd';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1492,7 +1494,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for Low-tier outdoor night light grading in renderer.ts merged over release/v0.45.3.
   // No capture was retaken.
-  '226ef4c9e6962d8c8178bb76993eab7e200076e7c848e6ba76300410e1fa07e4';
+  // Re-minted for the painted-world graphics upgrade: eastbrook_town.ts and
+  // eastbrook_layout.ts moved with the painted props and cobbles. No capture was retaken.
+  'ec4a9420fe4ddb5084407f8b1d8c9038728f9b22bc7224453b3d5ea19fe4000e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2899,7 +2903,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // from the swept evidence. No capture was retaken.
       // Low-tier outdoor night light grading in renderer.ts merged over
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
-    ).toBe('e58b234300b60d1252d1eb5e043071936adfc3ca961704332d8da166f6635af3');
+      // The painted-world graphics upgrade: recomputed from the swept evidence.
+      // No capture was retaken.
+    ).toBe('f659775c41c9732da927341e6df20d62b51d7dfc26c98027bcb6af9b8b7ae286');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

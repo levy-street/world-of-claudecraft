@@ -1,13 +1,15 @@
-<!-- src/render/palette_lab/: the per-zone palette lab, a TEMPORARY dev tool for
-     choosing each zone's colour look in game. Render-local rules live in
-     src/render/CLAUDE.md; this file is the lab's own. -->
+<!-- src/render/palette_lab/: the per-zone look system (the shipped zone
+     palettes) plus its dev panel for choosing each zone's look in game.
+     Render-local rules live in src/render/CLAUDE.md; this file is the lab's own. -->
 
-# src/render/palette_lab/: per-zone palette lab (`?palette=on`)
+# src/render/palette_lab/: per-zone looks and the palette lab panel
 
-A dev tool for art direction: walk the world, click a look in the panel, and
-the zone around you changes to it on the spot. Opt-in by URL (`?palette=on`,
-usually beside `?cel=on`); without the flag nothing here loads and every
-shader compiles byte for byte as shipped.
+The shipped zone palette system: every zone wears its chosen look
+(`DEFAULT_ZONE_SELECTIONS`, plus `DEFAULT_ZONE_NIGHT_SELECTIONS` after dark).
+The look runtime is ON by default in browsers; `?palette=off` (or `0`) turns it
+off, and then nothing here loads and every shader compiles byte for byte as
+the stock tables ship. The art-direction panel (walk the world, click a look,
+the zone changes on the spot) mounts only in a DEV build with `?palette=on`.
 
 ## What a look is
 `zone_look_core.ts` `ZoneLook`: ground palette (BIOME_PALETTE's five tones),
@@ -63,19 +65,41 @@ golden, moody), overridable per look:
 - The renderer is reached ONLY through `window.__game` plus public surfaces:
   `renderer.ts` and `main.ts` carry no line for the lab (both are at zero
   monolith headroom). The runtime chunk is a dynamic import in
-  `palette_lab_boot.ts`, which only `post.ts` imports, so a normal session never
-  fetches it and the guide and editor graphs (which reach `gfx.ts` and the flag
-  leaf) never contain it; `tests/guide.test.ts` scans for exactly that.
+  `palette_lab_boot.ts`, which only `post.ts` imports, so a `?palette=off`
+  session never fetches it and the guide and editor graphs (which reach
+  `gfx.ts` and the flag leaf) never contain it; `tests/guide.test.ts` scans for
+  exactly that.
+
+## Tuning a look live (and shipping it)
+- Dev build (`npm run dev`) at `/?palette=on`: the panel lists the zone's looks
+  (Alt+[ / Alt+] step, Alt+0..9 pick, hold Alt+\\ for stock) and freezes the
+  clock (Dawn / Noon / Night ...), so a night look is picked and tuned at Night.
+- Console, any build: `__paletteLab.tweak({ light: { hemiScale: 3 }, grade:
+  { exposure: 0.95 } })` edits the chosen look for the session (snaps on screen;
+  the ground re-bakes over a second or two). Never the stock look.
+- Paste back: `copy(__paletteLab.patch())` is the tuned look as a `zone_looks.ts`
+  CURATED entry (`lookToPatchSnippet`, every field resolved); paste it over the
+  authored patch. "Copy look" puts the same entry, plus the stock-table rows
+  (`lookToShippingSnippet`), on the clipboard.
+- Panel picks persist in localStorage (`woc.paletteLab.selections.v3`, and the
+  night twin): "Reset zone" / "Reset all" return to the shipped defaults, or a
+  stale pick masks a new default.
+- Cel knobs are URL params read at load (reload to flip): `celmix`, `celsoft`,
+  `celink`, `celsat` and friends (`cel_shading_core.ts`).
 
 ## Rules
 - Fog and light rows are per BIOME: zones that share a biome (the vale zones)
   share them, so the runtime writes the row from the zone the player
   stands in. Ground looks are per zone.
+- A night look (`DEFAULT_ZONE_NIGHT_SELECTIONS`) should keep the day look's
+  ground, water and meadow arms: the switch at dusk re-bakes a changed ground,
+  snaps a changed water and re-places changed grass.
 - The stock look is the A/B reference and is never edited (`tweak` refuses it).
 - Panel text is dev-channel English (the perf overlay precedent); it never
   ships in a normal session.
 - Console: `__paletteLab.apply(id)`, `.looks()`, `.tweak({ light: { hemiScale: 3 } })`,
-  `.snippet()` (the chosen look as table rows, also behind "Copy look").
+  `.patch()` (the chosen look as a zone_looks.ts entry) and `.snippet()` (as
+  table rows); "Copy look" copies both.
 
 ## Tests
 `tests/palette_lab_zone_look_core.test.ts` (stock fidelity, patching, the display

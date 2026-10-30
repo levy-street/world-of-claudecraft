@@ -18,6 +18,35 @@ export interface PatchedShaderSource {
   fragmentShader: string;
 }
 
+/**
+ * Shaded-grass lift, as a fraction of the blade's own albedo added to its
+ * indirect diffuse. Grass passes light through its blades, so a blade in a
+ * neighbour's cast shadow or on the shade side never goes near-black: under
+ * the painted vale's deep blue fill the shaded blades read as dark green, not
+ * black. Albedo-scaled, so dark and light blades keep their contrast.
+ */
+export const GRASS_SHADE_LIFT = 0.16;
+
+/** Add the shaded-grass lift right after the lights resolve. Idempotent;
+ *  throws when three's anchor moved. */
+export function patchGrassShadeLiftFragment(
+  fragmentShader: string,
+  lift: number = GRASS_SHADE_LIFT,
+): string {
+  const marker = '// WOC_GRASS_SHADE_LIFT';
+  if (fragmentShader.includes(marker)) return fragmentShader;
+  const anchor = '#include <lights_fragment_end>';
+  if (!fragmentShader.includes(anchor)) {
+    throw new Error('pinned three lights_fragment_end anchor changed');
+  }
+  return fragmentShader.replace(
+    anchor,
+    `${anchor}
+      ${marker}
+      reflectedLight.indirectDiffuse += diffuseColor.rgb * ${lift.toFixed(3)};`,
+  );
+}
+
 /** Replace a known all-up normal attribute with the exact shader constant. */
 export function patchConstantUpNormalVertexShader(vertexShader: string): string {
   return vertexShader.replace(

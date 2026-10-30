@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { paintedGroundDeclarationsGlsl } from '../src/render/terrain_painted_ground_core';
 
 // The splat terrain fragment shader lives against the WebGL guarantee of 16
 // texture image units, and a program past the limit FAILS TO LINK: no error
@@ -45,13 +46,34 @@ describe('terrain splat sampler budget', () => {
     return body.slice(0, body.indexOf('`'));
   }
 
-  it('keeps the six albedo photos packed in one sampler2DArray', () => {
+  it('keeps the eight albedo layers packed in one sampler2DArray', () => {
     expect(terrain).toContain('uniform sampler2DArray uAlb;');
     // the pack and the shader agree on the layer order, pinned value-for-value
-    expect(terrain).toContain(
-      "SPLAT_ALBEDO_LAYERS = ['grassC', 'dirtC', 'rockC', 'sandC', 'mudC', 'snowC']",
-    );
-    for (const [i, layer] of ['GRASS', 'DIRT', 'ROCK', 'SAND', 'MUD', 'SNOW'].entries()) {
+    // (the painted cobble and leaf-litter layers append, so every older index
+    // keeps its meaning)
+    const list = /SPLAT_ALBEDO_LAYERS = \[([^\]]*)\] as const;/.exec(terrain);
+    expect(list, 'SPLAT_ALBEDO_LAYERS literal').not.toBeNull();
+    const keys = [...(list?.[1] ?? '').matchAll(/'([A-Za-z]+)'/g)].map((m) => m[1]);
+    expect(keys).toEqual([
+      'grassC',
+      'dirtC',
+      'rockC',
+      'sandC',
+      'mudC',
+      'snowC',
+      'cobbleC',
+      'leafC',
+    ]);
+    for (const [i, layer] of [
+      'GRASS',
+      'DIRT',
+      'ROCK',
+      'SAND',
+      'MUD',
+      'SNOW',
+      'COBBLE',
+      'LEAF',
+    ].entries()) {
       expect(terrain).toContain(`const float WOC_L_${layer} = ${i}.0;`);
     }
     // no stray per-photo colour sampler resurrects outside the array
@@ -76,6 +98,10 @@ describe('terrain splat sampler budget', () => {
     const spliced = samplerNames(terrain);
     const paintSet = samplerNames(glslConst(paint, 'PAINT_LAYER_UNIFORMS_GLSL'));
     const hazeSet = samplerNames(glslConst(haze, 'BIOME_HAZE_DECLARATIONS'));
+    // The painted ground (terrain_painted_ground_core.ts) splices uniforms
+    // and a tap function but NO sampler: its heights ride the albedo alpha
+    // and its masks reuse uMacro. A sampler added there would land here.
+    expect(samplerNames(paintedGroundDeclarationsGlsl())).toEqual([]);
     // vacuity floors: each scan really is finding its set
     expect(spliced).toEqual(
       expect.arrayContaining(['uAlb', 'uNrm', 'uMacro', 'uGroundAO', 'uGrassBake']),

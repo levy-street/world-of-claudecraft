@@ -1,7 +1,8 @@
-// Palette lab panel: the in-game DOM surface (`?palette=on` only). A temporary
-// DEV tool, so its text is dev-channel English like the perf overlay and the
-// Ignivar placer, never a player string: the panel only exists behind the
-// opt-in flag and never ships in a normal session.
+// Palette lab panel: the in-game DOM surface (`?palette=on` in a dev build only;
+// the look runtime itself runs by default). A DEV tool, so its text is
+// dev-channel English like the perf overlay and the Ignivar placer, never a
+// player string: the panel only exists behind the dev-build flag and never
+// ships in a normal session.
 //
 // Click a card to wear that look; Alt+[ / Alt+] step through the zone's
 // looks; hold Alt+\ (or the Stock button) to flash the shipped look for an
@@ -179,9 +180,15 @@ export function mountPaletteLabPanel(h: PaletteLabPanelHandlers): PaletteLabPane
   });
   const list = el('div', 'wpl-list');
   const foot = el('div', 'wpl-foot');
-  const copyAll = button('Copy all', 'Copy every chosen look as table rows', () => h.onCopy(true));
+  const copyAll = button(
+    'Copy all',
+    'Copy every chosen look as table rows plus zone_looks.ts entries',
+    () => h.onCopy(true),
+  );
   foot.append(
-    button('Copy look', 'Copy this zone’s look as table rows', () => h.onCopy(false)),
+    button('Copy look', 'Copy this zone’s look as table rows plus a zone_looks.ts entry', () =>
+      h.onCopy(false),
+    ),
     copyAll,
     button('Reset zone', 'Back to the shipped look here', () => h.onResetZone()),
     button('Reset all', 'Back to the shipped look everywhere', () => h.onResetAll()),

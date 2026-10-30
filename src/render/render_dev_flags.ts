@@ -14,6 +14,9 @@
 //                 sphere tests more than it hates the draws
 //   worndetail  - the whole triplanar surface-detail family layer (worn_stone)
 //   ebdetail    - the Eastbrook town triplanar-over-atlas layer only
+//   walldetail  - the re-baked painted walls' tiling stone relief (painted_wall_detail.ts,
+//                 parsed by its own core: `off` keeps the stone-mask guard and draws no
+//                 relief, a number sets the strength)
 //   bladegrass  - the near-field blade-grass carpet
 //   canopy      - the canopy clump-detail layer
 //   n8ao        - the N8AO ambient-occlusion pass

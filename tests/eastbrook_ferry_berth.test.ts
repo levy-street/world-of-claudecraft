@@ -71,10 +71,13 @@ describe('Eastbrook ferry berth', () => {
 
   it('records the harbor it displaced: one hull retired, boats and buoys moved to open water', () => {
     const props = PROPS.decorProps ?? [];
-    expect(props.some((p) => p.key === 'hexShipBlue' && p.x === -115 && p.z === -45)).toBe(false);
-    expect(props.some((p) => p.key === 'hexShipBlue' && p.x === -115 && p.z === -63)).toBe(false);
+    // the kit hull, or the painted merchant ship that replaced it in Eastbrook
+    const isHull = (key: string): boolean =>
+      key === 'hexShipBlue' || key === 'eastbrookPaintedShip';
+    expect(props.some((p) => isHull(p.key) && p.x === -115 && p.z === -45)).toBe(false);
+    expect(props.some((p) => isHull(p.key) && p.x === -115 && p.z === -63)).toBe(false);
     expect(
-      props.filter((p) => p.key === 'hexShipBlue' && p.x === -170 && p.z === -22),
+      props.filter((p) => p.key === 'eastbrookPaintedShip' && p.x === -170 && p.z === -22),
     ).toHaveLength(1);
     expect(
       props.filter((p) => p.key === 'seaBoatFishing' && p.x === -113 && p.z === -46),

@@ -1067,14 +1067,14 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     // The churchyard's iron rails are walk-through dressing, so the clear-path
     // check above cannot see them; the route to the Pale Keeper still keeps to
     // the way in (the gap the rails leave at the yard's north-east corner). A
-    // drawn rail runs about 3.85 yd along its own local x; 1.95 is a hair
-    // over its half length.
-    const RAIL_HALF_LENGTH = 1.95;
+    // drawn rail (the painted kerb-and-bars section) runs 3.4 yd along its own
+    // local x, pillar face to pillar face; 1.75 is a hair over its half length.
+    const RAIL_HALF_LENGTH = 1.75;
     const graveyard = EASTBROOK_LAYOUT.services.graveyard.position;
     const rails = (ZONE1_PROPS.decorProps ?? [])
       .filter(
         (prop) =>
-          prop.key === 'gardenIronFence' &&
+          prop.key === 'eastbrookPaintedFence' &&
           Math.hypot(prop.x - graveyard.x, prop.z - graveyard.z) < 30,
       )
       .map((prop) => ({

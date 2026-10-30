@@ -975,11 +975,17 @@ const MONUMENT = {
 // 0.6 yards between a bench back and the plinth: snug rather than roomy, and
 // the most the square can give once the statue is this size. Anything wider
 // reds tests/eastbrook_layout_suite.test.ts on the lane clearance.
+//
+// The graphics pass swapped the dungeon kit's bench for the painted Eastbrook
+// bench, which keeps its own painted textures (render/eastbrook_town.ts draws
+// it from its own GLB, not the vertex-coloured batch). Same 1.8 x 0.6 boxes,
+// turns and ring; its seat stands 0.40 tall at this fit (sim/prop_layout.ts).
 const BENCH_RING_RADIUS = 4.1;
+const CIVIC_BENCH_ASSET = '/models/props/eastbrook_painted_bench.glb';
 const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_north',
-    '/models/dungeon/bench.glb',
+    CIVIC_BENCH_ASSET,
     { x: CIVIC_FEATURE_CENTER.x, z: CIVIC_FEATURE_CENTER.z + BENCH_RING_RADIUS },
     1.8,
     0.6,
@@ -987,7 +993,7 @@ const BENCHES = [
   ),
   makeObbPlacement(
     'eastbrook_civic_bench_south',
-    '/models/dungeon/bench.glb',
+    CIVIC_BENCH_ASSET,
     { x: CIVIC_FEATURE_CENTER.x, z: CIVIC_FEATURE_CENTER.z - BENCH_RING_RADIUS },
     1.8,
     0.6,
@@ -995,7 +1001,7 @@ const BENCHES = [
   ),
   makeObbPlacement(
     'eastbrook_civic_bench_west',
-    '/models/dungeon/bench.glb',
+    CIVIC_BENCH_ASSET,
     { x: CIVIC_FEATURE_CENTER.x + BENCH_RING_RADIUS, z: CIVIC_FEATURE_CENTER.z },
     1.8,
     0.6,

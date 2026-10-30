@@ -1,5 +1,10 @@
-// Ink outlines for the cel-shading R&D look (`?cel=on`, cel_shading_core.ts), as
-// a GLSL arm the output grade pass compiles in under CEL_INK (post_output_grade.ts).
+// Ink outlines for the cel-shading look (cel_shading_core.ts), as a GLSL arm the
+// output grade pass compiles in under CEL_INK (post_output_grade.ts). The ink is
+// RETIRED by default (ink 0, saturation 1: `celInkArmActive` is false, and
+// `celInkSettings()` in cel_shading.ts is null); `celink` / `celsat` bring it
+// back for an A/B. A zero ink strength returns before the first depth tap
+// (`celInkAmount`), so an arm built for the saturation alone costs one uniform
+// branch and a mix.
 // It rides the grade the way the FXAA arm does: no pass, no target of its own,
 // and the taps reuse the grade's own uInputUvRect remap and clamp, so the
 // region-remapped grade-only chain (Medium) keeps its dynamic resolution. It
@@ -50,9 +55,11 @@ export const CEL_INK_GLSL = /* glsl */ `
   }
 
   float celInkAmount(vec2 uv, vec2 uvMax) {
+    // No ink (retired, or a non-perspective camera): not one depth tap.
+    if (uCelInk.x <= 0.0) return 0.0;
     float ic = celInvDist(uv);
     float fade = 1.0 - smoothstep(${f(CEL_INK_FADE_NEAR)}, ${f(CEL_INK_FADE_FAR)}, 1.0 / max(ic, 1e-6));
-    if (fade <= 0.0 || uCelInk.x <= 0.0) return 0.0;
+    if (fade <= 0.0) return 0.0;
     vec2 o = uCelTap;
     float e = min(
       min(celSecondDiff(uv, vec2(o.x, 0.0), ic, uvMax), celSecondDiff(uv, vec2(0.0, o.y), ic, uvMax)),

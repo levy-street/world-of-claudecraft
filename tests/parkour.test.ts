@@ -608,7 +608,7 @@ describe('step-up cannot manufacture speed', () => {
       }
       return sim.player.pos.z - startZ;
     };
-    // Kerb-height standables (the civic bench draws 0.40 tall, well inside
+    // Kerb-height standables (the civic bench draws 0.399 tall, well inside
     // MAX_STEP_HEIGHT) laid across the lane every 1.8 yd: every crossing is
     // a fresh step-up commit (up, along the seat, off the far side).
     const staircase = Array.from({ length: 8 }, (_, i) => ({

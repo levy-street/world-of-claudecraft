@@ -2109,28 +2109,74 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // mouth, where its calm pad reshapes no shore, and the fishing hull
     // (x -122, z -54, under the ferry) moved into the freed gap north of the
     // pier.
-    { key: 'hexShipBlue', x: -170, z: -22, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
+    // The graphics upgrade swapped the KayKit pieces on this quay and in the
+    // churchyard for hand-painted models (render/props.ts eastbrookPainted*),
+    // each authored at its predecessor's native size so every row keeps its
+    // scale and with it the terrain calm pad that scale sizes. The colliders
+    // follow the new art: the merchant ship collides as its hull's box
+    // (bowsprit tip to stern, the beam at the waterline) and rides a deeper
+    // draft, its keel being a V where the kit hull's was flat (the seabed
+    // under its whole box is at least 1.48 yd deep); r stays the clearance
+    // radius the pads read.
+    {
+      key: 'eastbrookPaintedShip',
+      x: -170,
+      z: -22,
+      rot: 1.55,
+      scale: 7,
+      r: 4.6,
+      hw: 2.7,
+      hd: 9,
+      h: 10.8,
+      float: 1.2,
+    },
     // a smaller fishing hull riding the gap between the ferry pier and the
     // north working pier
     { key: 'seaBoatFishing', x: -113, z: -46, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
     // dinghies riding the water in the pier gaps, Wickharbor-style
     // the two dinghies pulled off the pad and into real water beside the piers
-    { key: 'hexBoat', x: -107.5, z: -47, rot: 0.7, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: -107, z: -61, rot: -1.9, scale: 6, float: 0.1 },
+    // (the painted dinghy's hull is deeper than the kit one, so it sits a
+    // little lower in the water; at least 0.87 yd of sea under each)
+    { key: 'eastbrookPaintedBoat', x: -107.5, z: -47, rot: 0.7, scale: 6, float: 0.2 },
+    { key: 'eastbrookPaintedBoat', x: -107, z: -61, rot: -1.9, scale: 6, float: 0.2 },
     // Round 6 (owner): a rowboat hauled up the strand north of the quay, the
     // beached pose the Palmreach shore uses (a hull with no float rides the
     // ground it stands on). The two south of the quay left with the shore
     // camp's move down the strand (the World of ClaudeCraft Studio map).
     { key: 'rowboat', x: -100, z: -33, rot: 2.4, scale: 1, r: 1.4, h: 1.2 },
-    // the small watch tower on the quay's north shoulder, eyes on the fairway
-    { key: 'hexWatchtower', x: -89, z: -41, rot: -2.3, scale: 6.5, r: 2.4, h: 12 },
+    // the small watch tower on the quay's north shoulder, eyes on the fairway:
+    // a round fieldstone tower 11 yd tall whose door and steps face the quay;
+    // r is its flared footing (2.8 covers the base all round)
+    { key: 'eastbrookPaintedWatchtower', x: -89, z: -41, rot: -2.3, scale: 6.5, r: 2.8, h: 11 },
     // tidy quay dressing: the anchor by the tower, cargo clustered at the
-    // boardwalk roots rather than scattered
-    { key: 'hexAnchor', x: -87.5, z: -44.5, rot: -0.9, scale: 6 },
-    { key: 'hexCrateBig', x: -95.5, z: -44, rot: 0.3, scale: 5, r: 1.2, h: 2 },
-    { key: 'hexCrateOpen', x: -95.5, z: -46.2, rot: -0.5, scale: 5, r: 1.1, h: 1.6 },
-    { key: 'hexSack', x: -95.8, z: -62, rot: 1.1, scale: 5 },
-    { key: 'hexBarrel', x: -95.4, z: -64, rot: 0, scale: 5, r: 1, h: 1.8 },
+    // boardwalk roots rather than scattered. The crates collide as their real
+    // boxes (r is the box's clearance circle), the barrel as its belly; the
+    // anchor and the sack stay walk-through dressing.
+    { key: 'eastbrookPaintedAnchor', x: -87.5, z: -44.5, rot: -0.9, scale: 6 },
+    {
+      key: 'eastbrookPaintedCrate',
+      x: -95.5,
+      z: -44,
+      rot: 0.3,
+      scale: 5,
+      r: 0.82,
+      hw: 0.58,
+      hd: 0.58,
+      h: 1.05,
+    },
+    {
+      key: 'eastbrookPaintedFishCrate',
+      x: -95.5,
+      z: -46.2,
+      rot: -0.5,
+      scale: 5,
+      r: 0.79,
+      hw: 0.56,
+      hd: 0.56,
+      h: 0.75,
+    },
+    { key: 'eastbrookPaintedSack', x: -95.8, z: -62, rot: 1.1, scale: 5 },
+    { key: 'eastbrookPaintedBarrel', x: -95.4, z: -64, rot: 0, scale: 5, r: 0.52, h: 1.06 },
     // The three extra homes moved into EASTBROOK_LAYOUT.buildings (round 3):
     // as first-class houses they get lots, skirts, and lit windows there.
     // Flower plantings along the lamplit streets (owner refinement round 3):
@@ -2156,22 +2202,24 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // 10.2 yd north the chapel went): iron rails on three sides at a
     // 3.4 yd pitch, walk-through dressing with no colliders, round the graves
     // beside the chapel's north wall, the open side toward the square. The
-    // smithy stands on the old yard's rise.
-    { key: 'gardenIronFence', x: 38.11, z: -89.76, rot: CHURCHYARD_END_RAIL },
-    { key: 'gardenIronFence', x: 40.9, z: -91.68, rot: CHURCHYARD_END_RAIL },
-    { key: 'gardenIronFence', x: 43.66, z: -93.58, rot: CHURCHYARD_END_RAIL },
-    { key: 'gardenIronFence', x: 46.45, z: -95.49, rot: CHURCHYARD_END_RAIL },
-    { key: 'gardenIronFence', x: 49.25, z: -97.4, rot: CHURCHYARD_END_RAIL },
-    { key: 'gardenIronFence', x: 49.67, z: -99.77, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 47.72, z: -102.56, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 45.79, z: -105.31, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 43.87, z: -108.1, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 41.93, z: -110.88, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 40, z: -113.65, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 29.45, z: -94.16, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 27.46, z: -96.91, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 25.52, z: -99.66, rot: CHURCHYARD_SIDE_RAIL },
-    { key: 'gardenIronFence', x: 23.67, z: -102.49, rot: CHURCHYARD_SIDE_RAIL },
+    // smithy stands on the old yard's rise. Each rail is one painted section
+    // (a mossy fieldstone kerb with spear-tipped iron bars between two capped
+    // pillars) exactly 3.4 yd long, so the runs close pillar to pillar.
+    { key: 'eastbrookPaintedFence', x: 38.11, z: -89.76, rot: CHURCHYARD_END_RAIL },
+    { key: 'eastbrookPaintedFence', x: 40.9, z: -91.68, rot: CHURCHYARD_END_RAIL },
+    { key: 'eastbrookPaintedFence', x: 43.66, z: -93.58, rot: CHURCHYARD_END_RAIL },
+    { key: 'eastbrookPaintedFence', x: 46.45, z: -95.49, rot: CHURCHYARD_END_RAIL },
+    { key: 'eastbrookPaintedFence', x: 49.25, z: -97.4, rot: CHURCHYARD_END_RAIL },
+    { key: 'eastbrookPaintedFence', x: 49.67, z: -99.77, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 47.72, z: -102.56, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 45.79, z: -105.31, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 43.87, z: -108.1, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 41.93, z: -110.88, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 40, z: -113.65, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 29.45, z: -94.16, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 27.46, z: -96.91, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 25.52, z: -99.66, rot: CHURCHYARD_SIDE_RAIL },
+    { key: 'eastbrookPaintedFence', x: 23.67, z: -102.49, rot: CHURCHYARD_SIDE_RAIL },
     // a bloom against the west rails
     { key: 'shrubFlowering', x: 47.97, z: -96.06, rot: 0.39, scale: 0.95 },
     // the two yews that shaded the old churchyard, set out where that map

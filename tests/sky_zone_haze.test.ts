@@ -16,6 +16,40 @@ import { skyZoneHazeInternalsForTest } from '../src/render/sky';
 
 const { skyFrag } = skyZoneHazeInternalsForTest;
 
+describe('the painted cloud passes in the composed dome', () => {
+  it('lays the day clouds before the cycle grade, the moonlit ones on the night share, the veil round the stars', () => {
+    for (const haze of [false, true]) {
+      const frag = skyFrag(haze);
+      const day = frag.indexOf('paintedCloud = paintedSkyClouds(dir) * cloudW;');
+      const grade = frag.indexOf('c *= uDayNight;');
+      const nightClouds = frag.indexOf('paintedMoonClouds(paintedCloud) * nightShare');
+      const nightReplace = frag.indexOf('c = c * (1.0 - nightShare) + night;');
+      const veilOpen = frag.indexOf('vec3 paintedPreStars = c;');
+      const classicStars = frag.indexOf('if (uStarAmt > 0.001)');
+      const veilClose = frag.indexOf('c = paintedPreStars + (c - paintedPreStars)');
+      const fogBand = frag.indexOf('c = mix(uFog, c, smoothstep(0.1, 0.36, dir.y));');
+      for (const at of [
+        day,
+        grade,
+        nightClouds,
+        nightReplace,
+        veilOpen,
+        classicStars,
+        veilClose,
+        fogBand,
+      ]) {
+        expect(at).toBeGreaterThan(-1);
+      }
+      expect(day).toBeLessThan(grade);
+      expect(grade).toBeLessThan(nightClouds);
+      expect(nightClouds).toBeLessThan(nightReplace);
+      expect(veilOpen).toBeLessThan(classicStars);
+      expect(classicStars).toBeLessThan(veilClose);
+      expect(veilClose).toBeLessThan(fogBand);
+    }
+  });
+});
+
 describe('the composed dome fragment', () => {
   it('without a field is exactly the legacy shader: no haze identifier at all', () => {
     expect(skyFrag(false)).not.toContain('uHaze');

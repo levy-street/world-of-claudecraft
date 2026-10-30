@@ -140,15 +140,20 @@ describe('mobGlowStrength (per-character distance fade)', () => {
 });
 
 describe('nightRimBoost (the free silhouette separator)', () => {
-  it('is exactly 1 by day: an untouched daylight look', () => {
-    expect(nightRimBoost(0)).toBe(1);
-    expect(nightRimBoost(0.2)).toBe(1);
+  it('is exactly 0 by day: no cool emissive film over dark actors in daylight', () => {
+    // The rim ignores the albedo, so by day it laid a grey-blue film over dark armour
+    // and cloth (2026-10-29, Eastbrook's painted look at noon); the zone look's warm,
+    // albedo-lit rim is the actor rim by day (palette_lab/lab_lighting.ts).
+    expect(nightRimBoost(0)).toBe(0);
+    expect(nightRimBoost(0.2)).toBe(0);
+    expect(nightRimBoost(0.52)).toBe(0);
   });
 
-  it('lifts at night but stays well under the dungeon crank', () => {
-    // DUNGEON_RIM_BOOST is 2.4 in renderer.ts: outdoors at night must read as a
-    // moonlit edge, not as the underground silhouette rescue.
-    expect(nightRimBoost(1)).toBeGreaterThan(1);
+  it('reaches the same full-night edge it always did, still under the dungeon crank', () => {
+    // DUNGEON_RIM_BOOST is 2.4 in interior_light_rig.ts: outdoors at night must read as
+    // a moonlit edge, not as the underground silhouette rescue.
+    expect(nightRimBoost(1)).toBeCloseTo(1.85, 10);
+    expect(nightRimBoost(0.88)).toBeCloseTo(1.85, 10);
     expect(nightRimBoost(1)).toBeLessThan(2.4);
   });
 
@@ -162,7 +167,7 @@ describe('nightRimBoost (the free silhouette separator)', () => {
     // both come up on the same ramp, so a body's edge and its ground pool
     // arrive together instead of one leading the other by minutes
     for (const n of [0, 0.4, 0.52, 0.7, 1]) {
-      expect(nightRimBoost(n) > 1).toBe(mobGlowAmount(n) > 0);
+      expect(nightRimBoost(n) > 0).toBe(mobGlowAmount(n) > 0);
     }
   });
 });

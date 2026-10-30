@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { celShadingSettings } from './cel_shading';
+import { celInkSettings } from './cel_shading';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
 import {
@@ -234,11 +234,12 @@ export function buildComposer(
     isWebGL2: webgl.capabilities.isWebGL2,
     msaaSamples: GFX.msaaSamples,
   });
-  // The cel-shading R&D look (`?cel=on`): its ink rides the output grade and
-  // reads scene depth. N8AO chains already hold it; every RenderPass chain
-  // keeps composer depth as a texture instead of a renderbuffer (resolved
-  // when multisampled), including High and up with AO switched off.
-  const celLook = celShadingSettings();
+  // The cel ink (`?celink=` above 0; the default painted look retires it):
+  // it rides the output grade and reads scene depth. N8AO chains already hold
+  // it; every RenderPass chain keeps composer depth as a texture instead of a
+  // renderbuffer (resolved when multisampled), including High and up with AO
+  // switched off. With the ink off this is null, so no depth texture is built.
+  const celLook = celInkSettings();
   const celDepthOnComposer = celLook !== null && plan.scene.pass === 'render';
   // HalfFloat keeps >1 colors for bloom. N8AO owns beauty depth, so its
   // composer target is color-only. RenderPass keeps depth only on the one

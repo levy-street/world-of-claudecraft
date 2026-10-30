@@ -664,11 +664,11 @@ describe('the hold and the leash still rule a caster no route reaches', () => {
 // The same sight rule in the open world, on a world caster (Corrupted Priest
 // Malric's Mindfracture, an instant petSpell) with one of the world's own
 // props between him and his target: the authored quay watch tower (zone1
-// decorProp hexWatchtower at (-89, -41), r 2.4, h 12) stands 5 yd east of the
+// decorProp eastbrookPaintedWatchtower at (-89, -41), r 2.8, h 11) stands 5 yd east of the
 // player's spot. The pair has moved twice: the prop 5 yd east of the origin
 // went when #4525 moved Eastbrook, and the Wolf Run garrison watch tower at
 // (27, -13) that replaced it went with the genshin artstyle merge
-// (8bff2cec638), so the pair now uses the same model on the quay. Out here no
+// (8bff2cec638), so the pair now uses the quay's watch tower. Out here no
 // route is planned (chase_route.ts keeps routes to instances): he closes
 // straight, the slide fan rounds the prop, and the leash and the stall are
 // what they always were.

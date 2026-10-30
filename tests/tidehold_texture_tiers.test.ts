@@ -159,6 +159,104 @@ describe('tidehold texture-tier files', () => {
   });
 });
 
+// The six buildings Eastbrook stands had their walls re-baked with smaller
+// hand-painted stones (scripts/assets/painted_buildings/rebake_walls.mjs). In
+// every tier each walls primitive gains TEXCOORD_1 (the stone tile's own
+// coordinates, which the shared detail normal tiles along) and the walls
+// colour atlas gains an ALPHA slice (the stone mask that detail blends by);
+// no other part of the model moves and every picture keeps its size. The
+// looks below were baked before and carry neither, so a look is compared
+// with its default minus that one UV set.
+const REBAKED_WALLS = ['bank', 'hall', 'house_b', 'shop_a', 'smithy', 'tavern'];
+
+/** `glb` without the appended TEXCOORD_1 sets: the attribute off every
+ *  primitive and its accessors (appended last, so no other index moves). */
+function withoutDetailUv(glb: Glb): Glb {
+  const json = JSON.parse(JSON.stringify(glb.json));
+  const uv1 = new Set<number>();
+  for (const mesh of json.meshes) {
+    for (const prim of mesh.primitives) {
+      if (prim.attributes.TEXCOORD_1 === undefined) continue;
+      uv1.add(prim.attributes.TEXCOORD_1);
+      delete prim.attributes.TEXCOORD_1;
+    }
+  }
+  if (uv1.size) {
+    const first = Math.min(...uv1);
+    expect([...uv1].sort((a, b) => a - b)).toEqual(
+      Array.from({ length: json.accessors.length - first }, (_, i) => first + i),
+    );
+    json.accessors = json.accessors.slice(0, first);
+  }
+  return { json, bin: glb.bin };
+}
+
+/** The KTX2 data format descriptor's colour model, transfer function and
+ *  sample count (one per channel slice: ETC1S RGB plus alpha is two). */
+function ktx2Format(bytes: Buffer): { model: number; transfer: number; samples: number } {
+  const dfd = bytes.readUInt32LE(48);
+  const block = dfd + 4;
+  const blockSize = bytes.readUInt16LE(block + 6);
+  return {
+    model: bytes[block + 8],
+    transfer: bytes[block + 10],
+    samples: (blockSize - 24) / 16,
+  };
+}
+
+describe('the re-baked Eastbrook walls', () => {
+  it.each(
+    REBAKED_WALLS.flatMap((b) => ['.glb', '.half.glb', '.quarter.glb'].map((t) => `${b}${t}`)),
+  )('%s carries TEXCOORD_1 on exactly its walls primitives and a masked walls colour', (file) => {
+    const glb = read(file);
+    const stem = file.replace(/\..*$/, '');
+    let walls = 0;
+    for (const mesh of glb.json.meshes) {
+      for (const prim of mesh.primitives) {
+        const isWalls = glb.json.materials[prim.material].name === `painted_walls@${stem}`;
+        expect(prim.attributes.TEXCOORD_1 !== undefined, `${file} ${mesh.name}`).toBe(isWalls);
+        if (!isWalls) continue;
+        walls++;
+        const uv1 = glb.json.accessors[prim.attributes.TEXCOORD_1];
+        const pos = glb.json.accessors[prim.attributes.POSITION];
+        expect([uv1.componentType, uv1.type, uv1.count]).toEqual([5126, 'VEC2', pos.count]);
+      }
+    }
+    expect(walls, file).toBeGreaterThan(0);
+    // the walls colour: sRGB ETC1S with an alpha slice (the stone mask)
+    expect(ktx2Format(imageBytes(glb, `${stem}_walls_color`))).toEqual({
+      model: 163,
+      transfer: 2,
+      samples: 2,
+    });
+  });
+
+  it('ships the shared detail normal at the contract url', () => {
+    const contract = JSON.parse(
+      fs.readFileSync(
+        path.resolve(
+          __dirname,
+          '..',
+          'scripts/assets/painted_buildings/detail_normal_contract.json',
+        ),
+        'utf8',
+      ),
+    );
+    expect(contract.textureUrl).toBe('/textures/structures/painted_stone_wall_normal.ktx2');
+    expect(contract.uvAttribute).toBe('TEXCOORD_1');
+    expect(contract.flippedAtEncode).toBe(true);
+    expect(MEDIA_ASSETS[contract.textureUrl.replace(/^\/+/, '')]).toBeDefined();
+    const bytes = fs.readFileSync(
+      path.resolve(__dirname, '..', 'public', contract.textureUrl.slice(1)),
+    );
+    expect([bytes.readUInt32LE(20), bytes.readUInt32LE(24)]).toEqual([512, 512]);
+    expect(bytes.readUInt32LE(40), 'a full mip chain').toBe(10);
+    expect(bytes.readUInt32LE(44), 'zstd supercompression').toBe(2);
+    // UASTC (166), linear transfer (1), RGB in one slice
+    expect(ktx2Format(bytes)).toEqual({ model: 166, transfer: 1, samples: 1 });
+  });
+});
+
 // The Fenrire look (Fenbridge's buildings, src/sim/fenbridge_layout.ts): the
 // same models re-baked wearing the moss-grown town maps. A look is only sound
 // while it is the same model with other pictures and nothing else: the town's
@@ -181,7 +279,7 @@ describe('the Fenrire look', () => {
   )('%s is %s with other pictures and nothing else', (lookFile, baseFile) => {
     const base = read(baseFile);
     const look = read(lookFile);
-    expect(shape(look)).toBe(shape(base));
+    expect(shape(look)).toBe(shape(withoutDetailUv(base)));
     expect(images(look)).toEqual(images(base).map((img) => ({ ...img, mime: 'image/ktx2' })));
     // ...and really repainted: the walls atlas is not the default look's bytes
     const walls = `${baseFile.replace(/\..*$/, '')}_walls_color`;
@@ -234,7 +332,7 @@ describe('the Highwatch look', () => {
   )('%s is %s with other pictures and nothing else', (lookFile, baseFile) => {
     const base = read(baseFile);
     const look = read(lookFile);
-    expect(shape(look)).toBe(shape(base));
+    expect(shape(look)).toBe(shape(withoutDetailUv(base)));
     expect(images(look)).toEqual(images(base).map((img) => ({ ...img, mime: 'image/ktx2' })));
     // ...and really repainted: the walls (ashlar) and roof (slates) atlases are
     // not the default look's bytes
@@ -309,7 +407,7 @@ describe.each(Object.entries(TOWN_LOOKS))('the %s town look', (look, buildings) 
   )('%s is %s with other pictures and nothing else', (lookFile, baseFile) => {
     const base = read(baseFile);
     const own = read(lookFile);
-    expect(shape(own)).toBe(shape(base));
+    expect(shape(own)).toBe(shape(withoutDetailUv(base)));
     expect(images(own)).toEqual(images(base).map((img) => ({ ...img, mime: 'image/ktx2' })));
     // ...and really repainted: the walls and roof atlases are not the default
     // look's bytes

@@ -51,9 +51,18 @@ describe('isCanvasDrawableImage', () => {
   it('guards the splat pack: the predicate runs before drawImage in terrain.ts', () => {
     const terrain = readFileSync(new URL('../src/render/terrain.ts', import.meta.url), 'utf8');
     const gate = terrain.indexOf('isCanvasDrawableImage(raw) ? raw : undefined');
-    const draw = terrain.indexOf('ctx.drawImage(img');
+    // the painted pack draws through one flipped-draw helper, fed only by drawableImage()
+    const draw = terrain.indexOf('c.drawImage(img');
     expect(gate).toBeGreaterThan(-1);
     expect(draw).toBeGreaterThan(-1);
     expect(gate).toBeLessThan(draw);
+    for (const call of terrain.match(/drawFlipped\(ctx, (\w+)\)/g) ?? []) {
+      const arg = call.slice('drawFlipped(ctx, '.length, -1);
+      expect(terrain, `${arg} reaches the draw through the guard`).toMatch(
+        new RegExp(`const ${arg} = (\\w+ \\? )?drawableImage\\(`),
+      );
+    }
+    expect(terrain.match(/drawFlipped\(ctx, /g)?.length).toBeGreaterThan(0);
+    expect(terrain.match(/\.drawImage\(/g)).toHaveLength(1);
   });
 });

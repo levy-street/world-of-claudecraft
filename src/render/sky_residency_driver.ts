@@ -3,6 +3,8 @@ import type { ZoneDef } from '../sim/types';
 import { GFX } from './gfx';
 import {
   currentDomeBiomes,
+  ensurePaintedClouds,
+  ensurePaintedNightSky,
   ensureSkyBiomeAssets,
   pinSkyBiomeAssets,
   readySkyBiomes,
@@ -74,6 +76,11 @@ export class SkyResidencyDriver {
     return this.skyResidencyRegionListCache;
   }
   private readonly skyResidencyEnsuring = new Set<SkyKey>();
+  // Painted-night warms in flight (warmPaintedNight), and the keys whose night
+  // fetch came back empty on this renderer: those keep the day sky's own darkened
+  // night rather than re-asking the network on every recheck.
+  private readonly paintedNightWarming = new Set<SkyKey>();
+  private readonly paintedNightAbandoned = new Set<SkyKey>();
 
   /** Drop one biome's prefiltered environment render target once its sky assets
    *  have been released. Never touches the bound IBL (the pinned set already
@@ -144,6 +151,73 @@ export class SkyResidencyDriver {
       });
   }
 
+  /** Fetch, upload and hand to the dome one biome's painted night sky
+   *  (sky_painted_core.ts): the same pinned, generation-guarded, idle-paced shape
+   *  as ensureSkyResidency, for the optional night layer of a sky already on
+   *  screen. The upload is one queued idle unit, never a live-frame bind: the dome
+   *  keeps the slot on its day placeholder until admitPaintedNight, then fades the
+   *  night in. */
+  private warmPaintedNight(biome: SkyKey): void {
+    if (this.host.isShutdown() || this.paintedNightWarming.has(biome)) return;
+    if (this.paintedNightAbandoned.has(biome)) return;
+    this.paintedNightWarming.add(biome);
+    const unpin = pinSkyBiomeAssets([biome]);
+    const generation = this.host.lifecycleGeneration();
+    const live = (): boolean =>
+      !this.host.isShutdown() && generation === this.host.lifecycleGeneration();
+    void (async () => {
+      const texture = await ensurePaintedNightSky(biome);
+      if (!live()) return;
+      if (!texture) {
+        this.paintedNightAbandoned.add(biome);
+        return;
+      }
+      await this.host.prewarmTextureInIdle(texture);
+      if (!live()) return;
+      this.host.skyView().admitPaintedNight(biome, texture);
+    })()
+      .catch((err) => {
+        console.warn(`Painted night sky warm failed: ${biome}`, err);
+      })
+      .finally(() => {
+        unpin();
+        this.paintedNightWarming.delete(biome);
+      });
+  }
+
+  // The painted cloud atlas warm (sky_clouds_core.ts) in flight, and whether its fetch
+  // came back empty on this renderer (the dome then keeps the painted day sky alone).
+  private paintedCloudsWarming = false;
+  private paintedCloudsAbandoned = false;
+
+  /** Fetch, upload and hand to the dome the painted cloud atlas, the same idle-paced,
+   *  generation-guarded shape as warmPaintedNight: the upload is one queued idle unit, never
+   *  a live-frame bind, and the dome fades the clouds in once it is admitted. */
+  private warmPaintedClouds(): void {
+    if (this.host.isShutdown() || this.paintedCloudsWarming || this.paintedCloudsAbandoned) return;
+    this.paintedCloudsWarming = true;
+    const generation = this.host.lifecycleGeneration();
+    const live = (): boolean =>
+      !this.host.isShutdown() && generation === this.host.lifecycleGeneration();
+    void (async () => {
+      const texture = await ensurePaintedClouds();
+      if (!live()) return;
+      if (!texture) {
+        this.paintedCloudsAbandoned = true;
+        return;
+      }
+      await this.host.prewarmTextureInIdle(texture);
+      if (!live()) return;
+      this.host.skyView().admitPaintedClouds(texture);
+    })()
+      .catch((err) => {
+        console.warn('Painted cloud atlas warm failed', err);
+      })
+      .finally(() => {
+        this.paintedCloudsWarming = false;
+      });
+  }
+
   /**
    * Bound the per-biome sky stores: release the decoded HDRs (plus their
    * prefiltered environments) of biomes the camera has left far behind, and
@@ -207,5 +281,13 @@ export class SkyResidencyDriver {
     });
     for (const biome of releaseSkyBiomeAssets(plan.evict)) this.evictEnvironmentBiome(biome);
     for (const biome of plan.ensure) this.ensureSkyResidency(biome);
+    // The painted nights of the skies this dome draws: fetched at background
+    // priority and uploaded on the idle lane once their day sky is on screen, so
+    // a session pays for the night only where it can see it (released with the
+    // day set when the eviction above lets the biome go).
+    for (const biome of this.host.skyView().paintedNightsToWarm()) this.warmPaintedNight(biome);
+    // The painted clouds of a sky this dome draws, the same way (kept for the session once
+    // uploaded: one atlas, shared by every sky that carries clouds).
+    if (this.host.skyView().paintedCloudsToWarm()) this.warmPaintedClouds();
   }
 }

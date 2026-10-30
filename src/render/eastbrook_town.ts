@@ -34,13 +34,14 @@ import {
   eastbrookSurfaceRoughnessTexture,
   eastbrookTownSemanticForColor,
 } from './eastbrook_surface_atlas';
+import { dressEastbrookPlacement, type EastbrookPlacementKind } from './eastbrook_surface_dressing';
 import {
   type EastbrookRoofVisibilityTarget,
   eastbrookFogVisible,
   eastbrookRoofVisibilityPlanInto,
   newEastbrookRoofVisibilityPlan,
 } from './eastbrook_town_visibility_core';
-import { buildEastbrookWeeklyVault, WEEKLY_VAULT_TRIANGLES } from './eastbrook_weekly_vault';
+import { buildEastbrookWeeklyVault, WEEKLY_VAULT_DRAWN_TRIANGLES } from './eastbrook_weekly_vault';
 import { indexExactVertexTuples } from './exact_index_geometry';
 import { EMISSIVE_GLOW, GFX, type GfxSettings, surfaceMat } from './gfx';
 import { type KitWindowPane, kitWindowPanes } from './kit_window_panes_core';
@@ -290,8 +291,7 @@ function toFloatAttr(
   return new THREE.BufferAttribute(out, itemSize);
 }
 
-function materialColor(material: THREE.Material, url: string): THREE.Color {
-  if (url === EASTBROOK_LAYOUT.civic.benches[0].assetId) return new THREE.Color(0x735238);
+function materialColor(material: THREE.Material): THREE.Color {
   const source = material as THREE.Material & { color?: THREE.Color };
   return source.color?.clone() ?? new THREE.Color(0xffffff);
 }
@@ -340,7 +340,7 @@ function geometryFromMesh(
   const normal = source.getAttribute('normal');
   if (normal) geometry.setAttribute('normal', toFloatAttr(normal, 3));
   const sourceColor = source.getAttribute('color');
-  const tint = materialColor(material, url);
+  const tint = materialColor(material);
   const colors = new Float32Array(position.count * 3);
   for (let index = 0; index < position.count; index++) {
     colors[index * 3] = (sourceColor?.getX(index) ?? 1) * tint.r;
@@ -478,13 +478,15 @@ function isKitBuildingAsset(url: string): boolean {
  * judgement call: its baked albedo carries the carving that makes it a statue
  * rather than a shape, and the owner rejected the palette-colour version on
  * sight, so it draws as its own textured prop. The placed Tidehold buildings
- * are painted: every wall and roof carries its relief in its own atlases.
+ * are painted: every wall and roof carries its relief in its own atlases, and
+ * so is the civic bench (the painted Eastbrook bench, buildCivicBenches).
  */
 function keepsOwnMaterials(url: string): boolean {
   return (
     isKitBuildingAsset(url) ||
     isPlacedBuildingAsset(url) ||
-    url === EASTBROOK_LAYOUT.civic.monument.assetId
+    url === EASTBROOK_LAYOUT.civic.monument.assetId ||
+    url === EASTBROOK_LAYOUT.civic.benches[0].assetId
   );
 }
 
@@ -933,12 +935,26 @@ function buildBuilding(
   };
 }
 
+/** A merged-batch placement's dressing (eastbrook_surface_dressing.ts): its
+ *  layout id seeds its settled shape and value, its kind picks the sag. */
+interface PlacedDressing {
+  key: string;
+  kind: EastbrookPlacementKind;
+  size: THREE.Vector3;
+}
+
 function addPlacedGeometry(
   out: THREE.BufferGeometry[],
   geometry: THREE.BufferGeometry | null,
   matrix: THREE.Matrix4,
+  dressing?: PlacedDressing & { surface: boolean },
 ): void {
-  if (geometry) out.push(geometry.clone().applyMatrix4(matrix));
+  if (!geometry) return;
+  out.push(
+    dressing
+      ? dressEastbrookPlacement(geometry, matrix, dressing)
+      : geometry.clone().applyMatrix4(matrix),
+  );
 }
 
 function placementMatrix(
@@ -1013,11 +1029,14 @@ function buildMicroBatches(
 ): MicroBatchBuild {
   const opaque: THREE.BufferGeometry[] = [];
   const emissive: THREE.BufferGeometry[] = [];
-  const add = (url: string, matrix: THREE.Matrix4): void => {
+  // Each placement tiles the atlas at world scale, takes its grime and a
+  // settled shape seeded by its id; the emissive part moves with it.
+  const add = (url: string, matrix: THREE.Matrix4, key: string, kind: EastbrookPlacementKind) => {
     const template = templates.get(url);
     if (!template) throw new Error(`Eastbrook town template is missing: ${url}`);
-    addPlacedGeometry(opaque, template.opaque, matrix);
-    addPlacedGeometry(emissive, template.emissive, matrix);
+    const dressing = { key, kind, size: template.size };
+    addPlacedGeometry(opaque, template.opaque, matrix, { ...dressing, surface: true });
+    addPlacedGeometry(emissive, template.emissive, matrix, { ...dressing, surface: false });
   };
 
   // The monument is NOT in this batch: it keeps its own textured materials and
@@ -1026,31 +1045,13 @@ function buildMicroBatches(
   // nothing at all (see the note on the civic flag in addPlacedCivicEmissiveGeometry).
 
   // A document that owns the square's dressing as placements
-  // (promotedScenery.authoredTownDressing) draws the benches, stalls and yard
-  // fences itself, so these three loops stand down together.
+  // (promotedScenery.authoredTownDressing) draws the stalls and yard fences
+  // itself, so these loops stand down together (and the benches with them,
+  // buildCivicBenches). The benches left this batch for their own painted
+  // materials.
   const dressingPromoted = activeWorldPromoted('authoredTownDressing');
-  const benches = dressingPromoted ? [] : EASTBROOK_LAYOUT.civic.benches;
   const stalls = dressingPromoted ? [] : EASTBROOK_LAYOUT.market.stalls;
   const fences = dressingPromoted ? [] : EASTBROOK_LAYOUT.fences;
-
-  for (const bench of benches) {
-    const template = templates.get(bench.assetId);
-    if (!template) throw new Error(`Eastbrook town template is missing: ${bench.assetId}`);
-    const horizontalScale = Math.min(bench.width / template.size.x, bench.depth / template.size.z);
-    add(
-      bench.assetId,
-      placementMatrix(
-        template,
-        bench.position.x,
-        groundAt(bench.position.x, bench.position.z),
-        bench.position.z,
-        bench.rotation,
-        bench.width,
-        template.size.y * horizontalScale,
-        bench.depth,
-      ),
-    );
-  }
 
   for (const stall of stalls) {
     const key = stallTemplateKey(stall.assetId, stall.canopyVariant);
@@ -1068,6 +1069,8 @@ function buildMicroBatches(
         stall.height,
         stall.depth,
       ),
+      stall.id,
+      'stall',
     );
   }
 
@@ -1088,6 +1091,8 @@ function buildMicroBatches(
         fence.width,
         placement.pitch,
       ),
+      fence.id,
+      'fence',
     );
   }
 
@@ -1113,6 +1118,74 @@ function buildMicroBatches(
     batches.push(mesh);
   }
   return { batches };
+}
+
+/**
+ * The square's three benches: the painted Eastbrook bench, drawn from its own
+ * GLB with its own painted materials (keepsOwnMaterials) as ONE InstancedMesh
+ * per mesh of the model, each instance the same box fit the batch gave the
+ * kit bench (placementMatrix: width and depth fit, height follows the native
+ * aspect). Shares the loader's geometry; the material is one hook-preserving
+ * clone (kitMaterial) every instance draws. A document that owns the square's
+ * dressing draws its own benches, so none are built.
+ */
+function buildCivicBenches(
+  templates: ReadonlyMap<string, TownAssetTemplate>,
+  groundAt: GroundAt,
+): THREE.InstancedMesh[] {
+  const benches = activeWorldPromoted('authoredTownDressing') ? [] : EASTBROOK_LAYOUT.civic.benches;
+  if (benches.length === 0) return [];
+  const url = EASTBROOK_LAYOUT.civic.benches[0].assetId;
+  const template = templates.get(url);
+  if (!template?.raw) throw new Error(`Eastbrook town template is missing: ${url}`);
+  // The loader cache is immutable: settle the clone's matrices, never the source's.
+  const scene = template.raw.clone(true);
+  scene.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(scene);
+  // base centred on the origin, bottom at y 0 (the template frame placementMatrix fits)
+  const toBase = new THREE.Matrix4().makeTranslation(
+    -(box.min.x + box.max.x) / 2,
+    -box.min.y,
+    -(box.min.z + box.max.z) / 2,
+  );
+  const placements = benches.map((bench) => {
+    const horizontalScale = Math.min(bench.width / template.size.x, bench.depth / template.size.z);
+    return placementMatrix(
+      template,
+      bench.position.x,
+      groundAt(bench.position.x, bench.position.z),
+      bench.position.z,
+      bench.rotation,
+      bench.width,
+      template.size.y * horizontalScale,
+      bench.depth,
+    );
+  });
+  const meshes: THREE.InstancedMesh[] = [];
+  scene.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const local = toBase.clone().multiply(child.matrixWorld);
+    const material = Array.isArray(child.material)
+      ? child.material.map((m) => kitMaterial(m))
+      : kitMaterial(child.material);
+    const mesh = new THREE.InstancedMesh(child.geometry, material, placements.length);
+    mesh.name = 'eastbrookCivicBenches';
+    for (let index = 0; index < placements.length; index++) {
+      mesh.setMatrixAt(index, placements[index].clone().multiply(local));
+    }
+    mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingBox();
+    mesh.computeBoundingSphere();
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.frustumCulled = true;
+    mesh.userData.assetId = url;
+    mesh.userData.benchIds = benches.map((bench) => bench.id);
+    mesh.userData.neverRoofHideTarget = true;
+    meshes.push(mesh);
+  });
+  return meshes;
 }
 
 interface WallInstancePlacement {
@@ -1315,6 +1388,12 @@ function buildFromTemplates(
   const microBatches = microBuild.batches;
   const microBatchCount = microBatches.length;
   for (const batch of microBatches) group.add(batch);
+  // The painted benches: square clutter like the batches (the same fog cull,
+  // the same reveal hold, so their own program links under the gate before
+  // they first show), drawn from their own GLB materials.
+  const civicBenches = buildCivicBenches(templates, groundAt);
+  for (const bench of civicBenches) group.add(bench);
+  const clutterTargetCount = microBatchCount + civicBenches.length;
   // The monument's living half: the honouree's name projected off both honour
   // plates, and the lantern halos and embers. Additive and text, which a merged
   // opaque batch cannot carry, so it is its own small group beside the batches.
@@ -1345,7 +1424,7 @@ function buildFromTemplates(
     throw new Error(`Eastbrook town template is missing: ${EASTBROOK_LAYOUT.wall.assetId}`);
   const wallBatches = buildWallBatches(wallTemplate, groundAt, atlas);
   for (const batch of wallBatches) group.add(batch);
-  const staticCullTargets: THREE.Object3D[] = [...microBatches, ...wallBatches];
+  const staticCullTargets: THREE.Object3D[] = [...microBatches, ...civicBenches, ...wallBatches];
   // The reveal gate compiles the buildings with the static batches: their
   // per-building materials are not shared with any batch, so a building
   // outside the roots linked cold on the frame its own fog cull first showed
@@ -1482,7 +1561,7 @@ function buildFromTemplates(
       townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);
       for (let index = 0; index < staticCullTargets.length; index++) {
         staticCullTargets[index].visible =
-          (index >= microBatchCount || microVisible) &&
+          (index >= clutterTargetCount || microVisible) &&
           townRootVisible(reveal, staticPiecewise, index);
       }
       // Buildings keep their own fog cull and roof fade, but their FIRST
@@ -1674,7 +1753,8 @@ export function eastbrookTownTriangleBudget(
   const maximumFoundationTriangles =
     EASTBROOK_LAYOUT.buildings.filter((building) => !isPlacedBuildingAsset(building.assetId))
       .length * 12;
-  const proceduralTriangles = WEEKLY_VAULT_TRIANGLES;
+  // The vault as DRAWN: its shape subdivided where the atlas tiles.
+  const proceduralTriangles = WEEKLY_VAULT_DRAWN_TRIANGLES;
   const maximumRuntimeTriangles = assetTriangles + maximumFoundationTriangles + proceduralTriangles;
   // The Tidehold rebuild: the eleven kit shells (21,924 triangles between
   // them) gave way to six painted buildings (46,128, furniture included), so

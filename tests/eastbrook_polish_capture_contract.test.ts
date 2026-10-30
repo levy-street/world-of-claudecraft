@@ -738,7 +738,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for Low-tier outdoor night light grading in renderer.ts merged over release/v0.45.3.
   // No capture was retaken.
-  '226ef4c9e6962d8c8178bb76993eab7e200076e7c848e6ba76300410e1fa07e4';
+  // Re-minted for the painted-world graphics upgrade: eastbrook_town.ts and
+  // eastbrook_layout.ts moved with the painted props and cobbles. No capture was retaken.
+  'ec4a9420fe4ddb5084407f8b1d8c9038728f9b22bc7224453b3d5ea19fe4000e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

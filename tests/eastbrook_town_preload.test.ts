@@ -160,20 +160,23 @@ describe('Eastbrook town preload', () => {
       // Re-pinned 2026-10 for the Tidehold rebuild: the kit buildings are gone
       // from the town's set and the six placed buildings take their place in
       // this rule, for the same reason: every clone draws the painted atlases
-      // of its model's loader-cache scene. What is left to release is the four
-      // assets the vertex-colour bake copies out of: the stall, the wall wing,
-      // the bench and the fence.
+      // of its model's loader-cache scene. What is left to release is the
+      // assets the vertex-colour bake copies out of: the stall, the wall wing
+      // and the fence. The painted civic bench joined the kept set: its one
+      // InstancedMesh draws the loader's own geometry and painted textures.
       const keepsOwnMaterials = (url: string): boolean =>
-        url.startsWith('/models/tidehold/') || url === EASTBROOK_LAYOUT.civic.monument.assetId;
+        url.startsWith('/models/tidehold/') ||
+        url === EASTBROOK_LAYOUT.civic.monument.assetId ||
+        url === EASTBROOK_LAYOUT.civic.benches[0].assetId;
       expect(allUrls.filter(keepsOwnMaterials)).toEqual([
         ...placedUrls,
         EASTBROOK_LAYOUT.civic.monument.assetId,
+        EASTBROOK_LAYOUT.civic.benches[0].assetId,
       ]);
       const released = allUrls.filter((url) => !keepsOwnMaterials(url));
       expect(released).toEqual([
         EASTBROOK_LAYOUT.market.stalls[0].assetId,
         EASTBROOK_LAYOUT.wall.assetId,
-        EASTBROOK_LAYOUT.civic.benches[0].assetId,
         EASTBROOK_LAYOUT.fences[0].assetId,
       ]);
       expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(released);

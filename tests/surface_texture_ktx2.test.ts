@@ -4,9 +4,11 @@
 // (src/render/worn_stone.ts) and the shared stone detail normal
 // (src/render/detail_normals.ts).
 //
-// Those 1024x1024 ambientCG maps used to come through loadTexture, so each one
-// decoded to a full RGBA bitmap (plus its generated mip chain) and stayed that
-// way for the whole session. They now ship a `.ktx2` sibling written by
+// Those 1024x1024 maps (ambientCG, and the painted ground's normals written by
+// scripts/assets/painted_ground/build_painted_ground.mjs) used to come
+// through loadTexture, so each one decoded to a full RGBA bitmap (plus its
+// generated mip chain) and stayed that way for the whole session. They now
+// ship a `.ktx2` sibling written by
 // scripts/assets/compress_standalone_textures.mjs and are requested through
 // loadKtx2Texture, which uploads the compressed blocks as-is.
 //
@@ -49,17 +51,18 @@ const SS_ZSTD = 2;
 const readSource = (rel: string): string => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 /** Splat layers terrain.ts asks for, read off its prepareTerrainTex calls,
- *  with the srgb flag: the srgb=true COLOUR layers are pack sources for
- *  buildSplatAlbedoArray's drawImage and must stay raw (see below). One row
- *  per FILE: a call whose file argument is a conditional (the snow layer picks
- *  Snow010A for the built-in world and Snow004 for an authored map) yields a
- *  row for every file literal it can resolve to, so neither arm escapes. */
+ *  with the srgb flag: the srgb=true COLOUR layers and the painted HEIGHT
+ *  maps are pack sources for buildSplatAlbedoArray's drawImage and must stay
+ *  raw (see below). One row per FILE: a call whose file argument is a
+ *  conditional (the snow layer picks Snow010A for the built-in world and
+ *  Snow004 for an authored map) yields a row for every file literal it can
+ *  resolve to, so neither arm escapes. */
 function terrainReferencesWithFlags(): { key: string; logical: string; srgb: boolean }[] {
   const src = readSource('src/render/terrain.ts');
   const calls = [
     ...src.matchAll(/prepareTerrainTex\(\s*'([^']+)',([^;]*?),\s*(true|false),?\s*\)/g),
   ].flatMap((m) => {
-    const files = [...m[2].matchAll(/'([A-Za-z0-9_]+\.(?:jpg|png))'/g)].map((f) => f[1]);
+    const files = [...m[2].matchAll(/'([A-Za-z0-9_]+\.(?:jpg|png|webp))'/g)].map((f) => f[1]);
     if (files.length === 0) throw new Error(`prepareTerrainTex('${m[1]}') names no file literal`);
     return files.map((file) => ({
       key: m[1],
@@ -132,10 +135,21 @@ const u32 = (buf: Buffer, off: number): number => buf.readUInt32LE(off);
 
 // Tight vacuity floor (tests/CLAUDE.md): the exact number of distinct source
 // images the three render modules reference and the conversion run produced.
-// A dropped splat layer or family channel cannot hide under it.
-const SHIPPED_SURFACE_TEXTURES = 32;
-/** The one referenced source that stays a raw image, pinned below. */
+// A dropped splat layer or family channel cannot hide under it. (33 since the
+// painted ground: the splat rock normal is PaintedRock_NormalGL now, so
+// Rock026_NormalGL is worn_stone's alone instead of shared.)
+const SHIPPED_SURFACE_TEXTURES = 33;
+/** The one referenced PNG, a raw packed data texture, pinned below. */
 const PACKED_DATA_TEXTURE = `${TERRAIN_DIR}/GroundAO_Packed.png`;
+/** The painted layers' height maps: linear-data pack sources, raw like the
+ *  colour layers (buildSplatAlbedoArray draws them into the albedo alpha). */
+const PAINTED_HEIGHT_MAPS = [
+  'PaintedGrass_Height.webp',
+  'PaintedDirt_Height.webp',
+  'PaintedRock_Height.webp',
+  'PaintedCobble_Height.webp',
+  'PaintedLeaves_Height.webp',
+].map((f) => `${TERRAIN_DIR}/${f}`);
 
 describe('surface texture KTX2 compression (shipped assets)', () => {
   it('ships a valid KTX2 sibling for every terrain/structure jpg the renderer references', () => {
@@ -191,7 +205,7 @@ describe('surface texture KTX2 compression (shipped assets)', () => {
     }
   });
 
-  it('leaves the six colour layers raw: they are drawImage pack sources for the splat albedo array', () => {
+  it('leaves the eight colour layers raw: they are drawImage pack sources for the splat albedo array', () => {
     // buildSplatAlbedoArray drawImages each colour layer into the packed
     // DataArrayTexture; a CompressedTexture's image is a plain descriptor
     // that passes a width check and then throws inside drawImage, which took
@@ -199,13 +213,13 @@ describe('surface texture KTX2 compression (shipped assets)', () => {
     // is the resident form wherever the colours load, so compressing the
     // pack source bought nothing anyway.
     const colours = terrainColourReferences();
-    // Six colour LAYERS over seven files: snowC resolves to Snow010A on the
+    // Eight colour LAYERS over nine files: snowC resolves to Snow010A on the
     // built-in world and Snow004 on an authored map, and both are pack sources.
     const colourKeys = terrainReferencesWithFlags()
       .filter((c) => c.srgb)
       .map((c) => c.key);
-    expect(new Set(colourKeys).size).toBe(6);
-    expect(colours.length).toBe(7);
+    expect(new Set(colourKeys).size).toBe(8);
+    expect(colours.length).toBe(9);
     for (const logical of colours) {
       expect(fs.existsSync(onDisk(logical)), `${logical} source missing`).toBe(true);
       expect(
@@ -236,6 +250,23 @@ describe('surface texture KTX2 compression (shipped assets)', () => {
     expect(MEDIA_ASSETS[`${TERRAIN_DIR}/GroundAO_Packed.ktx2`]).toBeUndefined();
   });
 
+  it('leaves the painted height maps raw: lossless data the albedo pack draws into its alpha', () => {
+    // The same drawImage contract as the colour layers, and lossless data
+    // besides: the height blend thresholds on these bytes, so neither a
+    // block encode nor a CompressedTexture (no drawable image) may stand in.
+    const referenced = referencedSurfaceTextures();
+    expect(referenced.filter((u) => u.endsWith('.webp')).sort()).toEqual(
+      [...PAINTED_HEIGHT_MAPS].sort(),
+    );
+    for (const logical of PAINTED_HEIGHT_MAPS) {
+      expect(fs.existsSync(onDisk(logical)), `${logical} missing`).toBe(true);
+      expect(MEDIA_ASSETS[logical], `${logical} missing from the media manifest`).toBeTruthy();
+      expect(MEDIA_ASSETS[logical.replace(/\.webp$/, '.ktx2')]).toBeUndefined();
+    }
+    // the load route: only a jpg that is NOT colour goes compressed
+    expect(readSource('src/render/terrain.ts')).toContain(".endsWith('.jpg') && !srgb");
+  });
+
   it('pins the one channel a family does not ship, so the on-disk filter is exercised', () => {
     // worn_stone's metal family sets aoSpan 0 precisely because ambientCG
     // Metal013 ships no AmbientOcclusion map; the derived set must be filtered
@@ -247,8 +278,10 @@ describe('surface texture KTX2 compression (shipped assets)', () => {
 
   it('converts only the referenced pack files: the unused siblings beside them stay raw', () => {
     // Both pack directories ship spare maps no runtime module reads
-    // (Bricks076B, Gravel024, the Rock026 Color/NormalGL variants' neighbours).
-    // Converting a whole --dir would have shipped those too.
+    // (Bricks076B, Gravel024, the Rock026 Color/NormalGL variants' neighbours,
+    // and since the painted ground the retired Grass001/Ground023 normals,
+    // whose orphaned siblings were deleted). Converting a whole --dir would
+    // have shipped those too.
     const referenced = new Set(referencedSurfaceTextures());
     const spares: string[] = [];
     for (const dir of [TERRAIN_DIR, STRUCTURES_DIR]) {
@@ -259,6 +292,11 @@ describe('surface texture KTX2 compression (shipped assets)', () => {
       }
     }
     expect(spares.length).toBeGreaterThan(0);
+    // the photo layers the painted set retired: their sources stay (the
+    // editor's texture library lists Grass001), their siblings do not
+    for (const retired of ['Grass001_NormalGL.jpg', 'Ground023_NormalGL.jpg']) {
+      expect(spares).toContain(`${TERRAIN_DIR}/${retired}`);
+    }
     for (const logical of spares) {
       expect(
         fs.existsSync(ktx2SiblingPath(onDisk(logical))),

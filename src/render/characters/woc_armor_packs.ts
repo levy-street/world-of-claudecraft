@@ -69,6 +69,7 @@ import {
   wocArmorPackUrl,
   wocArmorTierFor,
 } from './woc_armor_core';
+import { markWocArmorPaintScene } from './woc_armor_paint';
 import {
   assembleWocArmorTop,
   disposeWocArmorTopParse,
@@ -412,6 +413,8 @@ function loadFile(url: string, record: PackEntry): void {
  *  put on the work queue (after the listeners: one that builds a body on the spot, a
  *  portrait, prepares the pack itself and leaves the queue nothing to do). */
 function landed(url: string, record: PackEntry): void {
+  // every material of an armour file draws the painted armour (woc_armor_paint.ts)
+  if (record.scene) markWocArmorPaintScene(record.scene);
   record.generation = ++generations;
   residency.noteResident(url, clock());
   for (const listener of readyListeners) {

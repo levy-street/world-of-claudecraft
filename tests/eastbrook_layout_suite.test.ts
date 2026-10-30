@@ -886,7 +886,7 @@ describe('authoritative Eastbrook replacement plan', () => {
     ).toEqual([
       {
         id: 'eastbrook_civic_bench_north',
-        assetId: '/models/dungeon/bench.glb',
+        assetId: '/models/props/eastbrook_painted_bench.glb',
         position: { x: -14.75, z: -97.9 },
         rotation: Math.PI,
         width: 1.8,
@@ -894,7 +894,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_civic_bench_south',
-        assetId: '/models/dungeon/bench.glb',
+        assetId: '/models/props/eastbrook_painted_bench.glb',
         position: { x: -14.75, z: -106.1 },
         rotation: 0,
         width: 1.8,
@@ -902,7 +902,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_civic_bench_west',
-        assetId: '/models/dungeon/bench.glb',
+        assetId: '/models/props/eastbrook_painted_bench.glb',
         position: { x: -10.65, z: -102 },
         rotation: Math.PI / 2,
         width: 1.8,

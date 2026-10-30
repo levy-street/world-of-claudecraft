@@ -8,6 +8,20 @@
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { sharedUniforms } from '../src/render/gfx';
+import { MEADOW_CARPET_FADE_START } from '../src/render/meadow_tuning';
+import {
+  PAINTED_COBBLE_LANE_SLOTS,
+  PAINTED_GROUND_TUNING,
+  paintedBumpGlsl,
+  paintedCoverGlsl,
+  paintedDetailNormalTapsGlsl,
+  paintedDirtFlatGlsl,
+  paintedGrassGlsl,
+  paintedGroundDeclarationsGlsl,
+  paintedHeightBlendGlsl,
+  paintedSubLayerAlbedoGlsl,
+  paintedSubLayerTermsGlsl,
+} from '../src/render/terrain_painted_ground_core';
 
 interface FakeShader {
   uniforms: Record<string, THREE.IUniform>;
@@ -29,9 +43,25 @@ function braceDepthAt(source: string, offset: number): number {
   return depth;
 }
 
-async function compileTerrainShader(preset: string): Promise<FakeShader> {
+async function compileTerrainShader(
+  preset: string,
+  world: { authored?: boolean; bake?: boolean } = {},
+): Promise<FakeShader> {
   vi.resetModules();
   vi.stubGlobal('location', { search: `?gfx=${preset}` });
+  // the fresh module graph's own world and bake singletons
+  const data = await import('../src/sim/data');
+  data.setActiveWorldContent(world.authored ? { ...data.BUILTIN_WORLD } : null);
+  const bakeModule = await import('../src/render/grass_ground_bake');
+  bakeModule.setGrassGroundBake(
+    world.bake
+      ? {
+          owner: {} as THREE.WebGLRenderer,
+          texture: new THREE.Texture(),
+          mean: [0.9, 0.9, 0.9],
+        }
+      : null,
+  );
   const { terrainInternalsForTest } = await import('../src/render/terrain');
   const shader: FakeShader = {
     uniforms: {},
@@ -105,11 +135,13 @@ describe('insane terrain fragment shader', () => {
           macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;`,
     );
     // The presence-mask cull composes with the detail-distance fade: the
-    // fine octave taps skip both when a layer is chunk-uniform absent AND
-    // past the wocDetailFade band where their maps have mipped flat.
+    // painted dirt normal taps skip both when the layer (and every bare-earth
+    // patch carved from the grass) is absent AND past the wocDetailFade band
+    // where their maps have mipped flat. (The photo-era fine octaves this
+    // pinned are authored-map only now; see the near-field test below.)
     expect(fragmentShader).toContain(
-      `if ( (wocHasDirt || wocHasRock) && wocNearDetail )
-          fineHard = WOC_NRM(tuv * 2.4, WOC_N_ROCK).xy * 2.0 - 1.0;`,
+      `if ( (wocHasDirt || wocEarthM > 0.0) && wocNearDetail ) {
+          vec2 wocUvD = tuv * 0.55;`,
     );
   });
 
@@ -183,14 +215,15 @@ describe('insane terrain fragment shader', () => {
       'if (upW >= max(wocTAN.x, wocTAN.z) && upW > 0.55 && pDist < 36.0) {',
     );
     // The Studio merge names the splat weights wocHW so authored maps can
-    // height-blend them; in the built-in world nothing runs between the copy
-    // and the sum, so this is the release's plain vSplatR-weighted composite.
+    // height-blend them; in the built-in world the PAINTED height blend runs
+    // between the copy and the sum (terrain_painted_ground_core.ts), and the
+    // carved cover layers add their terms to the release's weighted sum.
     expect(fragmentShader).toContain(
-      'vec4 wocHW = vSplatR;\n' +
+      `vec4 wocHW = vSplatR;${paintedHeightBlendGlsl()}\n` +
         '        vec3 alb = grassAlb * wocHW.x\n' +
         '                 + dirtAlb * wocHW.y\n' +
         '                 + rockAlb * wocHW.z\n' +
-        '                 + sandAlb * wocHW.w;',
+        `                 + sandAlb * wocHW.w${paintedSubLayerTermsGlsl(null)};`,
     );
     expect(fragmentShader).toContain(
       'diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;',
@@ -201,7 +234,7 @@ describe('insane terrain fragment shader', () => {
     expect(finalAccumulationDepth).toBe(mapDepth);
   });
 
-  it('skips the near-field-only relief taps once their signal has mipped away', () => {
+  it('skips the near-field-only relief taps once their signal has mipped away', async () => {
     // Both gates exist to stop the shader paying texture taps for a value the
     // mip chain has already flattened. Each one has to be a real branch (the
     // taps must sit INSIDE it, not behind a multiply-by-zero) and each has to
@@ -223,6 +256,30 @@ describe('insane terrain fragment shader', () => {
     );
     expect(fragmentShader).toContain('if (wocDetailN > 0.0) {');
     const detailGate = fragmentShader.indexOf('if (wocDetailN > 0.0) {');
+    // The built-in (painted) program: each painted map at its albedo's two
+    // anti-repeat UVs, no fine octaves (a scaled painted stroke is noise).
+    for (const tap of [
+      'WOC_NRM(tuv, WOC_N_GRASS)',
+      'WOC_NRM(wocRotUv(tuv, ',
+      'WOC_NRM(wocUvD, WOC_N_DIRT)',
+      'WOC_NRM(wocRotUv(wocUvD, ',
+      'WOC_NRM(tuv * 0.6, WOC_N_ROCK)',
+      'WOC_NRM(tuv, WOC_N_SAND)',
+    ]) {
+      expect(fragmentShader.indexOf(tap), tap).toBeGreaterThan(detailGate);
+    }
+    for (const photoEra of [
+      'WOC_NRM(combT + grassJitter, WOC_N_GRASS)',
+      'WOC_NRM(tuv * 2.4, WOC_N_ROCK)',
+      'WOC_NRM(combT * 3.0, WOC_N_GRASS)',
+      'WOC_NRM(tuv * 1.8, WOC_N_ROCK)',
+    ]) {
+      expect(fragmentShader, photoEra).not.toContain(photoEra);
+    }
+    // An authored map keeps the photo-era taps, all inside the same gate.
+    const authoredFrag = (await compileTerrainShader('insane', { authored: true })).fragmentShader;
+    const authoredGate = authoredFrag.indexOf('if (wocDetailN > 0.0) {');
+    expect(authoredGate).toBeGreaterThan(-1);
     for (const tap of [
       'WOC_NRM(combT + grassJitter, WOC_N_GRASS)',
       'WOC_NRM(tuv * 0.55, WOC_N_DIRT)',
@@ -232,8 +289,14 @@ describe('insane terrain fragment shader', () => {
       'WOC_NRM(combT * 3.0, WOC_N_GRASS)',
       'WOC_NRM(tuv * 1.8, WOC_N_ROCK)',
     ]) {
-      expect(fragmentShader.indexOf(tap)).toBeGreaterThan(detailGate);
+      expect(authoredFrag.indexOf(tap), tap).toBeGreaterThan(authoredGate);
     }
+    expect(authoredFrag).toContain(
+      `if ( (wocHasDirt || wocHasRock) && wocNearDetail )
+          fineHard = WOC_NRM(tuv * 2.4, WOC_N_ROCK).xy * 2.0 - 1.0;`,
+    );
+    const data = await import('../src/sim/data');
+    data.setActiveWorldContent(null);
     // The distance fade rides the same multiply as the slope fade, so a
     // fragment at the gate edge reaches it continuously.
     expect(fragmentShader).toContain('detN *= smoothstep(0.5, 0.82, vWNorm.y) * wocDetailN;');
@@ -337,6 +400,137 @@ describe('insane terrain fragment shader', () => {
       expect(shader.fragmentShader).toBe(before);
       expect(shader.uniforms.uReliefSteps.value).toBe(1);
     });
+  });
+});
+
+describe('painted ground splice (terrain_painted_ground_core.ts)', () => {
+  // The cover breakup, town cobbles and height blend are ONE variant on every
+  // splat tier: the generated blocks take no tier input, and each tier's
+  // program must carry them byte for byte.
+  const blocks = (): string[] => [
+    paintedGroundDeclarationsGlsl(),
+    paintedCoverGlsl(),
+    paintedDirtFlatGlsl(),
+    paintedSubLayerAlbedoGlsl(),
+    paintedHeightBlendGlsl(),
+    paintedDetailNormalTapsGlsl(),
+    paintedBumpGlsl(),
+  ];
+
+  it.each(['medium', 'high', 'ultra', 'insane'])(
+    'the %s built-in program carries every painted block, identically',
+    async (preset) => {
+      const shader = await compileTerrainShader(preset, { bake: true });
+      for (const block of blocks()) expect(shader.fragmentShader).toContain(block);
+      expect(shader.fragmentShader).toContain(paintedGrassGlsl(MEADOW_CARPET_FADE_START));
+      expect(shader.fragmentShader).toContain(paintedSubLayerTermsGlsl('vtint35'));
+      // the painted grass owns the carpet ring: the photo-era ring is gone
+      expect(shader.fragmentShader).not.toContain('wocPlainGrain');
+      // the photo-era dirt grit and micro-soften taps are not compiled
+      expect(shader.fragmentShader).not.toContain('WOC_ALB(tuv * 1.8, WOC_L_ROCK)');
+      expect(shader.fragmentShader).not.toContain('vec3(tuv * 0.55, WOC_L_DIRT), 2.0)');
+      expect(shader.fragmentShader.match(/{/g) ?? []).toHaveLength(
+        (shader.fragmentShader.match(/}/g) ?? []).length,
+      );
+    },
+  );
+
+  it('binds the painted uniforms: the Eastbrook cobble footprint and the macro z-score stats', async () => {
+    const shader = await compileTerrainShader('medium');
+    const towns = shader.uniforms.uCobbleTowns.value as THREE.Vector4[];
+    expect(towns).toHaveLength(2);
+    // Eastbrook's hub (-14, -100) with full cobbles to twice its 26 yd town radius
+    expect(towns[0].toArray()).toEqual([-14, -100, 26 * 2, 26 * 2.6]);
+    // and its main street laid on past the footprint to the docks, a segment a slot: from
+    // where it leaves the square's full cobble to its end on the quay walk, then a spare
+    const lanes = (shader.uniforms.uCobbleLanes.value as THREE.Vector4[]).map((v) => v.toArray());
+    expect(lanes).toHaveLength(PAINTED_COBBLE_LANE_SLOTS);
+    expect(lanes[0]).toEqual([-56, -88, -62, -76]);
+    expect(lanes[4]).toEqual([-88, -60, -92, -56]);
+    expect(lanes[5][0]).toBeGreaterThan(1e4);
+    expect(shader.fragmentShader).toContain(
+      `uniform vec4 uCobbleLanes[${PAINTED_COBBLE_LANE_SLOTS}];`,
+    );
+    // the box round them, grown by the lane's reach, gates the loop
+    const reach = PAINTED_GROUND_TUNING.cobbleLaneOuter;
+    expect((shader.uniforms.uCobbleLaneBox.value as THREE.Vector4).toArray()).toEqual([
+      -92 - reach,
+      -88 - reach,
+      -56 + reach,
+      -56 + reach,
+    ]);
+    const frag = shader.fragmentShader;
+    const gate = frag.indexOf('all(greaterThanEqual(vWPos.xz, uCobbleLaneBox.xy))');
+    expect(gate).toBeGreaterThan(-1);
+    expect(gate).toBeLessThan(frag.indexOf('vec4 l = uCobbleLanes[i];'));
+    // the spare slot can never match a distance
+    expect(towns[1].w).toBeLessThan(0);
+    expect((shader.uniforms.uPaintedCover.value as THREE.Vector2).toArray()).toEqual([1, 1]);
+    // the mocked macro texture has no canvas: the fallback stats, as 1/sd
+    expect((shader.uniforms.uMacroStats.value as THREE.Vector2).toArray()).toEqual([0.5, 20]);
+    // no bake: the tint-neutral painted grass is recoloured for the 35% arm
+    expect(shader.fragmentShader).toContain('uniform vec3 uGrassFallbackTint;');
+    expect(shader.uniforms.uGrassFallbackTint).toBeDefined();
+  });
+
+  it('derives the height relief at the top level of main, after the detail normals', async () => {
+    // Screen-space derivatives are undefined inside non-uniform control flow:
+    // the relief block must sit in a bare block straight under main, never
+    // inside the detail-normal gate or any other branch.
+    const shader = await compileTerrainShader('ultra', { bake: true });
+    const frag = shader.fragmentShader;
+    const mainDepth = braceDepthAt(frag, frag.indexOf('vec2 tuv ='));
+    const detailSum = frag.indexOf('normal = normalize(normal + tbn * vec3(detN, 0.0));');
+    const bump = frag.indexOf('vec2 wocBumpD = vec2(dFdx(wocBumpH), dFdy(wocBumpH));');
+    expect(detailSum).toBeGreaterThan(-1);
+    expect(bump).toBeGreaterThan(detailSum);
+    expect(braceDepthAt(frag, detailSum)).toBe(mainDepth);
+    expect(braceDepthAt(frag, bump)).toBe(mainDepth + 1);
+    // the bare block opens right before it (no if / for)
+    const open = frag.lastIndexOf('{', bump);
+    expect(frag.slice(frag.lastIndexOf('\n', open), open).trim()).toBe('');
+    // the cliff wall relief still layers on after it
+    expect(frag.indexOf('WOC_NRM(vWPos.yz * 0.132, WOC_N_ROCK)')).toBeGreaterThan(bump);
+    // the painted detail gains are the named knobs
+    const T = PAINTED_GROUND_TUNING;
+    expect(frag).toContain(`* wocNW.x * ${T.normalGainGrass.toFixed(4)}`);
+    expect(frag).toContain(`* wocNW.y * ${T.normalGainDirt.toFixed(4)} * dirtDetail`);
+    expect(frag).toContain(`* wocNW.z * ${T.normalGainRock.toFixed(4)} * (1.0 - wallW)`);
+    // the composite relief height is written by the height blend
+    expect(frag.indexOf('wocBumpH = dot(wb4,')).toBeGreaterThan(
+      frag.indexOf('float bwin = max(win,'),
+    );
+  });
+
+  it('an authored map keeps the Studio height blend and compiles no painted ground', async () => {
+    const shader = await compileTerrainShader('insane', { authored: true, bake: true });
+    expect(shader.fragmentShader).not.toContain('wocPaintedTap');
+    expect(shader.fragmentShader).not.toContain('uCobbleTowns');
+    expect(shader.fragmentShader).not.toContain('uCobbleLanes');
+    expect(shader.fragmentShader).not.toContain('uCobbleLaneBox');
+    expect(shader.fragmentShader).not.toContain('wocBumpNormal');
+    expect(shader.fragmentShader).toContain('* wocNW.x * 0.85');
+    expect(shader.fragmentShader).toContain('wocHW = sum > 1e-5 ? b / sum : vSplatR;');
+    // the authored bake arm keeps the photo-era carpet ring
+    expect(shader.fragmentShader).toContain('wocPlainGrain');
+    expect(shader.uniforms.uCobbleTowns).toBeUndefined();
+    expect(shader.uniforms.uCobbleLanes).toBeUndefined();
+    expect(shader.uniforms.uCobbleLaneBox).toBeUndefined();
+    vi.unstubAllGlobals();
+    const data = await import('../src/sim/data');
+    data.setActiveWorldContent(null);
+  });
+
+  it('?tpainted=off is the A/B switch back to the plain built-in composite', async () => {
+    const shader = await compileTerrainShader('medium&tpainted=off');
+    expect(shader.fragmentShader).not.toContain('wocPaintedTap');
+    expect(shader.fragmentShader).toContain(
+      'vec4 wocHW = vSplatR;\n' +
+        '        vec3 alb = grassAlb * wocHW.x\n' +
+        '                 + dirtAlb * wocHW.y\n' +
+        '                 + rockAlb * wocHW.z\n' +
+        '                 + sandAlb * wocHW.w;',
+    );
   });
 });
 

@@ -277,7 +277,7 @@ describe('the climb move', () => {
     // only sat below the ceiling because a scatter prop's standable top
     // happened to slide under the body and raise that floor; a streetlamp
     // respacing later moved the found spot and broke the accident. The
-    // deliberate version: a civic-spec bench (drawn top 0.40) under the body
+    // deliberate version: a civic-spec bench (drawn top 0.399) under the body
     // supplies the raised support floor, and a level terrain stamp (the jail
     // pad mechanism) under the approach kills grade sensitivity. Prop
     // seating reads the un-stamped heightfield by design (the skipEdits arm

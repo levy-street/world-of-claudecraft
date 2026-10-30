@@ -377,6 +377,31 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
   flowerGlow: { url: '/models/props/flower_glow.glb', kit: 'hollow' },
   shrubFlowering: { url: '/models/props/shrub_flowering.glb', kit: 'hollow' },
+  // Eastbrook Vale's hand-painted harbour and churchyard props: Tripo
+  // image-to-3D models of the art lead's painted concepts (scripts/asset_pipeline
+  // prop lane). They replace the shared KayKit pieces in zone1 only; Galecrest
+  // and the Evergarden keep the kit files. Each is authored at its KayKit
+  // predecessor's native size, so the zone1 rows keep their `scale` (which also
+  // sizes each row's terrain calm pad); the churchyard rail is world scale. One
+  // kit is safe: every model's material carries its own tripo_material_<uuid>
+  // name, so the (kit, name) dedupe never hands one file's texture to another,
+  // and its own normal and roughness maps keep it off the worn-stone fallback.
+  eastbrookPaintedShip: { url: '/models/props/eastbrook_painted_ship.glb', kit: 'ebPainted' },
+  // the rowing dinghy (the key keeps "Boat" for the ferry-lane boat sweep)
+  eastbrookPaintedBoat: { url: '/models/props/eastbrook_painted_dinghy.glb', kit: 'ebPainted' },
+  eastbrookPaintedWatchtower: {
+    url: '/models/props/eastbrook_painted_watchtower.glb',
+    kit: 'ebPainted',
+  },
+  eastbrookPaintedAnchor: { url: '/models/props/eastbrook_painted_anchor.glb', kit: 'ebPainted' },
+  eastbrookPaintedCrate: { url: '/models/props/eastbrook_painted_crate.glb', kit: 'ebPainted' },
+  eastbrookPaintedFishCrate: {
+    url: '/models/props/eastbrook_painted_fishcrate.glb',
+    kit: 'ebPainted',
+  },
+  eastbrookPaintedSack: { url: '/models/props/eastbrook_painted_sack.glb', kit: 'ebPainted' },
+  eastbrookPaintedBarrel: { url: '/models/props/eastbrook_painted_barrel.glb', kit: 'ebPainted' },
+  eastbrookPaintedFence: { url: '/models/props/eastbrook_painted_fence.glb', kit: 'ebPainted' },
   // The Drakelands castle structure set: KayKit Dungeon Remastered (CC0) pieces
   // at walkable scale (shipped by scripts/assets/specs/drakelands_castle.json):
   // curtain walls, gates, stairs, battlement barriers, floors, red banners,

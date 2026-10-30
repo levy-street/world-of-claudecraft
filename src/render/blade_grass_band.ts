@@ -48,7 +48,10 @@ import {
   insideGrassHubExclusion,
   insidePavedGrassExclusion,
 } from './foliage_core';
-import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
+import {
+  patchConstantUpNormalVertexShader,
+  patchGrassShadeLiftFragment,
+} from './foliage_shader_core';
 import { foliageShoreSkip } from './foliage_shore_gate_core';
 import { GFX, sharedUniforms } from './gfx';
 import {
@@ -59,12 +62,19 @@ import {
   grassEdgeHeightScale,
   grassEdgeTaperAt,
   grassEdgeWidthScale,
+  meadowScopedEdgeTaper,
 } from './grass_edge_taper_core';
 import { getGrassGroundBake } from './grass_ground_bake';
 import {
   attachGrassInteractionUniforms,
   grassBladeInteractionGlsl,
 } from './grass_interaction_core';
+import {
+  applyMeadowPatchTint,
+  MEADOW_PATCH_MAX_STRETCH,
+  meadowPatchContext,
+  meadowPatchGrows,
+} from './meadow_patch_core';
 import {
   GRASS_PAINT_TRIM,
   MEADOW_BAND_BASE_RECOVER_Y,
@@ -209,14 +219,22 @@ export function buildBladeGrassBand(
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
-    sh.fragmentShader = sh.fragmentShader.replace(
-      '#include <normal_fragment_begin>',
-      `#include <normal_fragment_begin>
+    sh.fragmentShader = patchGrassShadeLiftFragment(
+      sh.fragmentShader.replace(
+        '#include <normal_fragment_begin>',
+        `#include <normal_fragment_begin>
       #ifdef DOUBLE_SIDED
         normal *= faceDirection;
       #endif`,
+      ),
     );
   };
+
+  const activeContent = getActiveWorldContent();
+  // the carpet's Eastbrook meadow patch (meadow_patch_core.ts), the SAME shared
+  // context: the two layers grow one meadow
+  const meadowPatch = meadowPatchContext(seed, activeContent);
+  const patch = meadowPatch.sample;
 
   // the carpet's sector split, verbatim: one mesh per sector of the slot grid,
   // all on this one geometry and material (blade_grass_sector_pool.ts)
@@ -225,7 +243,7 @@ export function buildBladeGrassBand(
     axis: bladeSectorAxis(),
     geometry: geo,
     material: mat,
-    clusterPad: clusterPlacementPad(geo),
+    clusterPad: clusterPlacementPad(geo) * (meadowPatch.scope ? MEADOW_PATCH_MAX_STRETCH : 1),
   });
   for (const mesh of sectorPool.meshes) group.add(mesh);
 
@@ -246,7 +264,6 @@ export function buildBladeGrassBand(
     return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
   };
 
-  const activeContent = getActiveWorldContent();
   const townExclusions = eastbrookGrassExclusions(
     activeContent.props.buildings,
     isBuiltinWorldContent(activeContent),
@@ -274,6 +291,8 @@ export function buildBladeGrassBand(
       const rd = roadDistance(x, z);
       ok = r1 < baseCoverage;
       if (ok) ok = rd > GRASS_ROAD_INNER_RADIUS;
+      // the carpet's meadow patch gate, same salt
+      if (ok) ok = meadowPatchGrows(meadowPatch, x, z, rd, hash(ci, cj, 7));
       // The maker's painted no-grass discs, same as the near carpet: a city
       // floor has to be clear in BOTH bands or the meadow reappears the moment
       // the player steps back from it.
@@ -289,20 +308,25 @@ export function buildBladeGrassBand(
         if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          const edgeTaper = grassEdgeTaperAt(edgeTaperCtx, x, z, rd);
+          const edgeTaper = meadowScopedEdgeTaper(
+            patch.scope,
+            grassEdgeTaperAt(edgeTaperCtx, x, z, rd),
+          );
           if (r1 < baseCoverage * grassEdgeCoverageScale(edgeTaper)) {
             const baseScale = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
-            const s = baseScale * grassEdgeWidthScale(edgeTaper);
+            const s = baseScale * grassEdgeWidthScale(edgeTaper) * patch.width;
             q.setFromAxisAngle(up, r1 * 12.9);
             const rLean = hash(ci, cj, 5);
             leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
-            q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
+            q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21 * patch.lean));
             const sy =
               meadowClusterHeight(baseScale, lush, hash(ci, cj, 6)) *
-              grassEdgeHeightScale(edgeTaper);
+              grassEdgeHeightScale(edgeTaper) *
+              patch.height;
             m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
             groundGrassColorAt(x, z, seed, c);
             c.multiplyScalar(1.18);
+            applyMeadowPatchTint(patch, c);
             sectorPool.place(slot, m, c);
             return;
           }

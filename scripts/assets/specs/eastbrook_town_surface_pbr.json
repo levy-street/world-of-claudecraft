@@ -11,7 +11,7 @@
   "normal": {
     "path": "public/textures/eastbrook_surface_normal.webp",
     "url": "/textures/eastbrook_surface_normal.webp",
-    "sha256": "905e7210b9f3d0c7ea252dccb93dc319cc75153ea27968d4ae243ccdd7695424",
+    "sha256": "04b24d455665177ccb459439ec38936ec1704881d7c73ae5cc0d357abbe3038b",
     "width": 512,
     "height": 512,
     "format": "webp",
@@ -20,7 +20,7 @@
   "rough": {
     "path": "public/textures/eastbrook_surface_rough.webp",
     "url": "/textures/eastbrook_surface_rough.webp",
-    "sha256": "c236f266a99480a437a66b2d54ba86e7ce344f0569d20ba2f45cde53fd75f02e",
+    "sha256": "7c288f95b2be2955a16c07e441093bf553a3088af4cd3570b7cce86fcebe5232",
     "width": 512,
     "height": 512,
     "format": "webp",
@@ -40,9 +40,15 @@
     },
     "cellPixels": 128,
     "cellPaddingPixels": 4,
+    "tiledPeriod": {
+      "startPixels": 4,
+      "pixels": 120,
+      "padding": "wrapped-period-values"
+    },
     "heightLuminanceRange": [192, 255],
-    "heightBlur": "3x3-tent-wrapped-within-cell",
-    "normalQuantStep": 6,
+    "heightBlur": "3x3-tent-clamped-to-period",
+    "derivative": "central-difference-one-sided-at-period-edges",
+    "normalQuantStep": 4,
     "normalBlueChannel": "constant-255",
     "roughnessLuminanceSwing": 0.08,
     "luminance": {
@@ -96,14 +102,14 @@
       "index": 5,
       "id": "darkForgedMetal",
       "surface": "metal",
-      "normalStrength": [0.9, 0.9],
+      "normalStrength": [1.3, 1.3],
       "roughnessBase": 0.5
     },
     {
       "index": 6,
       "id": "warmGoldMetal",
       "surface": "metal",
-      "normalStrength": [0.9, 0.9],
+      "normalStrength": [1.3, 1.3],
       "roughnessBase": 0.5
     },
     {
@@ -117,14 +123,14 @@
       "index": 8,
       "id": "blueCreamCanvas",
       "surface": "canvas",
-      "normalStrength": [1.0, 1.0],
+      "normalStrength": [0.4, 0.4],
       "roughnessBase": 0.9
     },
     {
       "index": 9,
       "id": "redCreamCanvas",
       "surface": "canvas",
-      "normalStrength": [1.0, 1.0],
+      "normalStrength": [0.4, 0.4],
       "roughnessBase": 0.9
     },
     {
@@ -159,14 +165,14 @@
       "index": 14,
       "id": "lightGrayStone",
       "surface": "stone",
-      "normalStrength": [2.2, 2.2],
+      "normalStrength": [1.2, 1.2],
       "roughnessBase": 0.8
     },
     {
       "index": 15,
       "id": "mediumGrayStone",
       "surface": "stone",
-      "normalStrength": [2.2, 2.2],
+      "normalStrength": [1.2, 1.2],
       "roughnessBase": 0.8
     }
   ]

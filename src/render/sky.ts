@@ -25,11 +25,42 @@ import {
   paletteLabEnabled,
   paletteSkyUniforms,
 } from './palette_lab';
+import {
+  hasSkyClouds,
+  SKY_CLOUD_ATLAS_URL,
+  SKY_CLOUDS_DECLARATIONS,
+  SKY_CLOUDS_FUNCTIONS,
+  SKY_CLOUDS_GLSL,
+  SKY_CLOUDS_NIGHT_GLSL,
+  SKY_CLOUDS_STAR_VEIL_CLOSE,
+  SKY_CLOUDS_STAR_VEIL_OPEN,
+  skyCloudArmWeight,
+  skyCloudPositions,
+  skyCloudRects,
+  stepSkyCloudFade,
+} from './sky_clouds_core';
+import {
+  PAINTED_DAY_TUNE,
+  PAINTED_NIGHT_TUNE,
+  paintedNightArms,
+  paintedNightOffsetU,
+  paintedNightStarScale,
+  paintedNightWeight,
+  paintedStarLayerScale,
+  type SkyTune,
+  stepPaintedNightFade,
+} from './sky_painted_core';
+import {
+  PAINTED_STARS_DECLARATIONS,
+  PAINTED_STARS_FUNCTIONS,
+  PAINTED_STARS_GLSL,
+} from './sky_painted_stars_glsl';
 import type { SkyResidencyRegion } from './sky_residency_core';
 import { skyTexture } from './textures';
 
-// HDRI sky dome. Cloud cover comes from the sky HDRIs themselves; there is
-// no separate sprite cloud layer.
+// HDRI sky dome. Cloud cover comes from the sky panoramas themselves, and over
+// the painted vale sky also from a drifting layer of painted clouds
+// (sky_clouds_core.ts, one atlas drawn in the dome's own program).
 //
 // High tier: the dome fragment shader samples real Poly Haven equirect HDRIs
 // (one per biome) by view direction, cross-fading two maps across the same
@@ -66,14 +97,19 @@ const SKY_FAR_DEPTH = 'gl_Position.z = gl_Position.w;';
 // day sky over the vale band. It rides the same tables under a widened key.
 export type SkyKey = BiomeId | 'farshore';
 
-const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number }> = {
+const HDRI_TUNE: Record<SkyKey, SkyTune> = {
+  // Eastbrook Vale's PAINTED day sky (skies_in/vale_painted_day.png, LDR sRGB KTX2
+  // by scripts/assets/compress_sky_ldr.mjs): the GPU's sRGB decode hands the shader
+  // linear light like every HDR sky here, so only the level needed retuning, and
+  // sky_painted_core.ts carries the calibration against the photo sky it replaced.
+  vale: PAINTED_DAY_TUNE,
   // clamp reined in from 2.6 with the contrast pass, so the re-expanded cloud
   // tops do not just feed the bloom smear instead
-  vale: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
   marsh: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
   peaks: { gain: 0.48, clamp: 1.7, contrast: 1.15 },
-  // Paint-only biomes reuse the closest shipped sky (no new HDRI downloads).
-  beach: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
+  // Paint-only biomes reuse the closest shipped sky (no new HDRI downloads); the
+  // beach aliases the vale's painted sky and takes its grade.
+  beach: PAINTED_DAY_TUNE,
   desert: { gain: 0.55, clamp: 2.2 },
   volcano: { gain: 0.5, clamp: 2.0 },
   cave: { gain: 0.55, clamp: 2.0 },
@@ -118,11 +154,17 @@ const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number
 // RGBE decode); where it exposes neither, three transcodes to RGBA half, which
 // costs exactly what the Radiance path already did. The `.hdr` files stay in
 // public/env as the encoder's input, never as a runtime fallback.
+//
+// The one exception is the vale (and the beach that aliases it): a hand-painted
+// sky, LDR by nature, shipped as UASTC LDR sRGB KTX2 by
+// scripts/assets/compress_sky_ldr.mjs from skies_in/vale_painted_day.png. It rides
+// these same tables and loader; the sRGB decode happens in the GPU sampler, so the
+// shader needs no second arm, only its own grade (HDRI_TUNE above).
 const BIOME_SKY_2K: Record<SkyKey, string> = {
-  vale: '/env/vale_day_2k.ktx2',
+  vale: '/env/vale_painted_day_2k.ktx2',
   marsh: '/env/marsh_overcast_2k.ktx2',
   peaks: '/env/peaks_dawn_2k.ktx2',
-  beach: '/env/vale_day_2k.ktx2',
+  beach: '/env/vale_painted_day_2k.ktx2',
   desert: '/env/peaks_dawn_2k.ktx2',
   volcano: '/env/marsh_overcast_2k.ktx2',
   cave: '/env/marsh_overcast_2k.ktx2',
@@ -140,10 +182,10 @@ const BIOME_SKY_2K: Record<SkyKey, string> = {
 };
 
 const BIOME_SKY_1K: Record<SkyKey, string> = {
-  vale: '/env/vale_day_1k.ktx2',
+  vale: '/env/vale_painted_day_1k.ktx2',
   marsh: '/env/marsh_overcast_1k.ktx2',
   peaks: '/env/peaks_dawn_1k.ktx2',
-  beach: '/env/vale_day_1k.ktx2',
+  beach: '/env/vale_painted_day_1k.ktx2',
   desert: '/env/peaks_dawn_1k.ktx2',
   volcano: '/env/marsh_overcast_1k.ktx2',
   cave: '/env/marsh_overcast_1k.ktx2',
@@ -164,12 +206,15 @@ const BIOME_SKY_1K: Record<SkyKey, string> = {
 // CompressedTexture cannot be resized at load time the way the Radiance path's
 // `maxWidth: 512` resampled decoded pixels. Same downscale, baked by the
 // encoder from the 1k master (with a box filter, where the runtime used
-// nearest-neighbour).
+// nearest-neighbour). The vale's comes from its painted ENV sky: the day sky as
+// first painted, big clouds and all, so the ambient light carries the cloud cover
+// the painted cloud layer draws over the dome's clear base (lit by the clear base
+// alone the world goes twice as blue in shade).
 const BIOME_SKY_ENV: Record<SkyKey, string> = {
-  vale: '/env/vale_day_512.ktx2',
+  vale: '/env/vale_painted_env_512.ktx2',
   marsh: '/env/marsh_overcast_512.ktx2',
   peaks: '/env/peaks_dawn_512.ktx2',
-  beach: '/env/vale_day_512.ktx2',
+  beach: '/env/vale_painted_env_512.ktx2',
   desert: '/env/peaks_dawn_512.ktx2',
   volcano: '/env/marsh_overcast_512.ktx2',
   cave: '/env/marsh_overcast_512.ktx2',
@@ -205,6 +250,34 @@ function shouldUseLiteHdri(): boolean {
 }
 
 const BIOME_SKY = shouldUseLiteHdri() ? BIOME_SKY_1K : BIOME_SKY_2K;
+
+// Painted NIGHT skies (sky_painted_core.ts): a key listed here crossfades its dome
+// from the day sky to this painting through dusk, on the painting's own grade
+// instead of the day sky's darkened night. Dome tiers only, from
+// skies_in/vale_painted_night.png by compress_sky_ldr.mjs: the night IBL stays the
+// day env darkened by the cycle (renderer.ts updateEnvBiome), so no 512 night
+// source ships. Fetched at background priority once its biome's dome is on screen,
+// uploaded on the idle GPU lane (SkyResidencyDriver), released with the day set.
+const BIOME_NIGHT_SKY_2K: Partial<Record<SkyKey, string>> = {
+  vale: '/env/vale_painted_night_2k.ktx2',
+  beach: '/env/vale_painted_night_2k.ktx2',
+};
+
+const BIOME_NIGHT_SKY_1K: Partial<Record<SkyKey, string>> = {
+  vale: '/env/vale_painted_night_1k.ktx2',
+  beach: '/env/vale_painted_night_1k.ktx2',
+};
+
+const BIOME_NIGHT_SKY = shouldUseLiteHdri() ? BIOME_NIGHT_SKY_1K : BIOME_NIGHT_SKY_2K;
+
+// The u of each night painting's moonlit horizon glow, printed by
+// compress_sky_ldr.mjs (`glow u`); the dome turns it to the midnight moon
+// (sky_painted_core.ts PAINTED_NIGHT_ANCHOR_U).
+const PAINTED_NIGHT_GLOW_U: Partial<Record<SkyKey, number>> = {
+  // the clear night base the painted clouds drift over (compress_sky_ldr.mjs measures 0.504)
+  vale: 0.504,
+  beach: 0.504,
+};
 
 const BIOME_BACKDROP_8K: Record<SkyKey, string> = {
   vale: '/env/vale_backdrop.webp',
@@ -372,10 +445,12 @@ const BIOME_BACKDROP = shouldUseLiteBackdrop() ? BIOME_BACKDROP_4K : BIOME_BACKD
 // tmp/analyze_hdr.mjs; realm-sky values printed by the conversion pipeline
 // (the injected sun spot, identical at both tiers).
 const HDRI_SUN_U: Record<SkyKey, number> = {
-  vale: 0.595,
+  // the painted vale day's golden sun glow, just above its horizon (compress_sky_ldr.mjs
+  // measures 0.718 to 0.720 across the tiers of the clear base sky the cloud layer rides on)
+  vale: 0.719,
   marsh: 0.657,
   peaks: 0.631,
-  beach: 0.595,
+  beach: 0.719,
   desert: 0.631,
   volcano: 0.657,
   cave: 0.657,
@@ -396,12 +471,13 @@ const HDRI_SUN_U: Record<SkyKey, number> = {
 // tonemap, so channels above 1 are fine). White = untouched. Every realm sky
 // now carries its own baked color (rose dusk, red storm, blue twilight,
 // sunset gold, day blue), so the heavy grades that faked those moods over
-// shared photographs are retired.
+// shared photographs are retired. The painted vale sky is graded in the painting
+// itself, so it (and the beach that aliases it) stays untouched.
 const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
-  vale: [0.94, 1.04, 1.14],
+  vale: [1, 1, 1],
   marsh: [0.94, 1.04, 1.14],
   peaks: [0.95, 1.03, 1.12],
-  beach: [0.94, 1.05, 1.14],
+  beach: [1, 1, 1],
   desert: [1, 1, 1],
   volcano: [1, 1, 1],
   cave: [1, 1, 1],
@@ -446,6 +522,13 @@ const skyAssetsInFlight = new Set<SkyKey>();
 // about to be re-uploaded, leaving GPU backing no store owns until renderer
 // teardown. Refcounted so overlapping lanes compose.
 const skyAssetPins = new Map<SkyKey, number>();
+// The painted night skies (BIOME_NIGHT_SKY), apart from the day set on purpose: a
+// night is optional, so it never gates readiness, arrival or the prewarm. Its own
+// fetch memo and in-flight set follow the day stores' rules above, and
+// releaseSkyBiomeAssets gives it back with its biome's day set.
+const nightSkyStore: Partial<Record<SkyKey, THREE.Texture>> = {};
+const nightSkyTasks = new Map<string, Promise<THREE.Texture | null>>();
+const nightSkyInFlight = new Set<SkyKey>();
 
 /** Pin biomes against release for the duration of a warm lane. Returns the
  *  matching unpin: call it in a finally, exactly once per pin. */
@@ -550,6 +633,93 @@ export function ensureSkyBiomeAssets(
   return Promise.all(tasks).then(() => undefined);
 }
 
+/** The night fetch memo's key: biome plus url, like skyAssetTaskKey. */
+function nightSkyTaskKey(biome: SkyKey, url: string): string {
+  return `${biome}|${url}`;
+}
+
+/** Whether a sky key ships a painted night sky the dome crossfades to at dusk. */
+export function hasPaintedNightSky(biome: SkyKey): boolean {
+  return BIOME_NIGHT_SKY[biome] !== undefined;
+}
+
+/**
+ * Fetch one biome's painted night sky into its store. BACKGROUND priority on the
+ * shared texture lane, never the single-slot dome lane: it is a fetch ahead of need
+ * (the crossfade opens late in the afternoon), and a background load on a one-slot
+ * queue would hold a demanded dome fetch of the next biome crossing behind it.
+ * Resolves the texture, or null for a key without a night, a profile that fetches no
+ * sky textures, or a failed fetch (the dome then keeps the day sky's own darkened
+ * night, and the dropped memo lets a later ensure retry). The caller pins the biome
+ * across its whole warm (pinSkyBiomeAssets), exactly like the day lanes.
+ */
+export function ensurePaintedNightSky(
+  biome: SkyKey,
+  target: Readonly<GfxSettings> = GFX,
+): Promise<THREE.Texture | null> {
+  const url = BIOME_NIGHT_SKY[biome];
+  if (!url || !target.standardMaterials) return Promise.resolve(null);
+  const resident = nightSkyStore[biome];
+  if (resident) return Promise.resolve(resident);
+  const taskKey = nightSkyTaskKey(biome, url);
+  const existing = nightSkyTasks.get(taskKey);
+  if (existing) return existing;
+  nightSkyInFlight.add(biome);
+  const task = loadKtx2Texture(url, { priority: 'background' })
+    .then((tex): THREE.Texture | null => {
+      const ready = finishSkyTexture(tex, true);
+      nightSkyStore[biome] = ready;
+      return ready;
+    })
+    .catch((err: unknown) => {
+      nightSkyTasks.delete(taskKey);
+      console.warn(`[sky] painted night sky fetch failed: ${url}`, err);
+      return null;
+    })
+    .finally(() => {
+      nightSkyInFlight.delete(biome);
+    });
+  nightSkyTasks.set(taskKey, task);
+  return task;
+}
+
+// The painted cloud atlas (sky_clouds_core.ts): one texture for the session, fetched the
+// first time a dome binds a sky with clouds (the residency driver's warmPaintedClouds) and
+// kept from then on, like the shared stores of other session-wide dressing.
+let cloudAtlas: THREE.Texture | null = null;
+let cloudAtlasTask: Promise<THREE.Texture | null> | null = null;
+
+/**
+ * Fetch the painted cloud atlas. BACKGROUND priority on the shared texture lane, like the
+ * painted nights: a fetch ahead of need, never on the single-slot dome lane. Resolves the
+ * texture, or null on a profile that fetches no sky textures or a failed fetch (the dome
+ * then shows the painted day sky alone, and the dropped memo lets a later warm retry). The
+ * atlas has one level and is drawn near one texel a pixel: linear, clamped, no mips.
+ */
+export function ensurePaintedClouds(
+  target: Readonly<GfxSettings> = GFX,
+): Promise<THREE.Texture | null> {
+  if (!target.standardMaterials) return Promise.resolve(null);
+  if (cloudAtlas) return Promise.resolve(cloudAtlas);
+  if (cloudAtlasTask) return cloudAtlasTask;
+  cloudAtlasTask = loadKtx2Texture(SKY_CLOUD_ATLAS_URL, { priority: 'background' })
+    .then((tex): THREE.Texture => {
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = false;
+      cloudAtlas = tex;
+      return tex;
+    })
+    .catch((err: unknown) => {
+      cloudAtlasTask = null;
+      console.warn(`[sky] painted cloud atlas fetch failed: ${SKY_CLOUD_ATLAS_URL}`, err);
+      return null;
+    });
+  return cloudAtlasTask;
+}
+
 // Live dome bindings, one per HDRI SkyView: the biomes whose decoded textures
 // are assigned into that dome's uSkyA/uSkyB (and backdrop) uniforms right now.
 // This is the second line of defense behind the renderer's pinned set, so a
@@ -577,15 +747,17 @@ export function currentDomeBiomes(): SkyKey[] {
   return [...bound];
 }
 
-/** Biomes holding ANY decoded sky asset (dome HDR, PMREM source or backdrop):
- *  the memory-accurate residency set the eviction plan reasons over, unlike
- *  skyBiomeAssetsResident, which answers the stricter "safe to prewarm" question. */
+/** Biomes holding ANY decoded sky asset (dome HDR, PMREM source, backdrop or
+ *  painted night): the memory-accurate residency set the eviction plan reasons
+ *  over, unlike skyBiomeAssetsResident, which answers the stricter "safe to
+ *  prewarm" question. */
 export function residentSkyBiomes(): SkyKey[] {
   return SKY_KEYS.filter(
     (biome) =>
       hdriStore[biome] !== undefined ||
       envHdriStore[biome] !== undefined ||
-      backdropStore[biome] !== undefined,
+      backdropStore[biome] !== undefined ||
+      nightSkyStore[biome] !== undefined,
   );
 }
 
@@ -596,12 +768,14 @@ export function residentSkyBiomes(): SkyKey[] {
  *  reach, so the resident sky read as free before this existed. */
 export function skyResidencyTextures(): THREE.Texture[] {
   const held = new Set<THREE.Texture>();
-  for (const store of [hdriStore, envHdriStore, backdropStore]) {
+  for (const store of [hdriStore, envHdriStore, backdropStore, nightSkyStore]) {
     for (const biome of SKY_KEYS) {
       const texture = store[biome];
       if (texture) held.add(texture);
     }
   }
+  // the painted cloud atlas (sky_clouds_core.ts), held for the session once fetched
+  if (cloudAtlas) held.add(cloudAtlas);
   return [...held];
 }
 
@@ -649,32 +823,63 @@ function releaseSkySlot(
   releaseKtx2Texture(url);
 }
 
+/** releaseSkySlot's twin for the painted nights, whose table is partial and whose
+ *  claims are their own memo; the same alias rule (the beach shares the vale's
+ *  night texture) and the same dispose-plus-cache-release step. */
+function releaseNightSkySlot(biome: SkyKey, dropping: ReadonlySet<SkyKey>): void {
+  const texture = nightSkyStore[biome];
+  delete nightSkyStore[biome];
+  const url = BIOME_NIGHT_SKY[biome];
+  if (!url || !texture) return;
+  const claimed = SKY_KEYS.some(
+    (other) =>
+      !dropping.has(other) &&
+      BIOME_NIGHT_SKY[other] === url &&
+      (nightSkyStore[other] !== undefined || nightSkyTasks.has(nightSkyTaskKey(other, url))),
+  );
+  if (claimed) return;
+  texture.dispose();
+  releaseKtx2Texture(url);
+}
+
 /**
  * Give one or more biomes' decoded sky assets back: dispose the dome HDR, the
- * PMREM source and the backdrop, drop the fetch memo, and drop the loader's
- * cache entries so a later ensureSkyBiomeAssets re-fetches from scratch.
+ * PMREM source, the backdrop and the painted night, drop the fetch memos, and
+ * drop the loader's cache entries so a later ensure re-fetches from scratch.
  *
  * Refuses (silently skips) any biome bound into a live dome's uniforms, any
- * biome whose fetch is still in flight, and any biome a warm lane pinned
- * (pinSkyBiomeAssets). Returns the biomes actually released, so the caller can
- * evict whatever it derived from them (the renderer's prefiltered environment
+ * biome whose fetch (day or night) is still in flight, and any biome a warm lane
+ * pinned (pinSkyBiomeAssets). Returns the biomes actually released, so the caller
+ * can evict whatever it derived from them (the renderer's prefiltered environment
  * render targets).
  */
 export function releaseSkyBiomeAssets(biomes: readonly SkyKey[]): SkyKey[] {
   const bound = new Set(currentDomeBiomes());
   const dropping = new Set<SkyKey>();
   for (const biome of biomes) {
-    if (bound.has(biome) || skyAssetsInFlight.has(biome) || skyAssetPins.has(biome)) continue;
+    if (
+      bound.has(biome) ||
+      skyAssetsInFlight.has(biome) ||
+      nightSkyInFlight.has(biome) ||
+      skyAssetPins.has(biome)
+    ) {
+      continue;
+    }
     dropping.add(biome);
   }
   if (dropping.size === 0) return [];
   // Drop every memo first: hdrUrlStillClaimed reads it as a claim, and a memo
   // left behind for a dropped biome would both retain its aliases' urls and
   // make the next ensure resolve instantly against empty stores.
-  for (const biome of dropping) skyAssetTasks.delete(skyAssetTaskKey(biome));
+  for (const biome of dropping) {
+    skyAssetTasks.delete(skyAssetTaskKey(biome));
+    const nightUrl = BIOME_NIGHT_SKY[biome];
+    if (nightUrl) nightSkyTasks.delete(nightSkyTaskKey(biome, nightUrl));
+  }
   for (const biome of dropping) {
     releaseSkySlot(hdriStore, BIOME_SKY, biome, dropping);
     releaseSkySlot(envHdriStore, BIOME_SKY_ENV, biome, dropping);
+    releaseNightSkySlot(biome, dropping);
     const backdrop = backdropStore[biome];
     delete backdropStore[biome];
     if (backdrop) {
@@ -784,6 +989,19 @@ export interface SkyView {
   biomeAt(x: number, z: number): BiomeBlend;
   /** temporally eased blend currently painted by the dome */
   currentBiomeBlend(): Readonly<BiomeBlend>;
+  /** The painted-night keys this dome draws (its bound pair) whose night texture
+   *  is not yet uploaded on THIS renderer: the residency driver's warm list. Empty
+   *  on the low tier, which keeps the day sky's own darkened night. */
+  paintedNightsToWarm(): SkyKey[];
+  /** The residency driver's report that `texture`, a biome's painted night, is
+   *  uploaded on this renderer, so the dome may bind it and fade it in. */
+  admitPaintedNight(biome: SkyKey, texture: THREE.Texture): void;
+  /** Whether this dome binds a sky with painted clouds (sky_clouds_core.ts) whose atlas is
+   *  not yet uploaded on THIS renderer. Always false on the low tier. */
+  paintedCloudsToWarm(): boolean;
+  /** The residency driver's report that the cloud atlas is uploaded on this renderer, so
+   *  the dome may bind it and fade the clouds in. */
+  admitPaintedClouds(texture: THREE.Texture): void;
   /** Drop this dome's uniform binding from the module's live-binding set, so a
    *  replaced renderer's dome stops pinning biomes against eviction. */
   dispose(): void;
@@ -838,7 +1056,13 @@ const skyFrag = (zoneHaze: boolean, paletteSky = false): string => /* glsl */ `$
   uniform vec3 uFog; // current scene fog color (biome + day/night graded)
   uniform float uLiftA; // 1 = mask the HDRI's photographed horizon hills
   uniform float uLiftB;
-  varying vec3 vDir;
+  uniform sampler2D uNightA; // per-arm painted night sky (sky_painted_core.ts); an arm
+  uniform sampler2D uNightB; // without one holds its own day sky at zero weight
+  uniform vec2 uNightW;      // per-arm painted-night weight: dusk crossfade x residency fade
+  uniform float uNightOffA;  // u offset turning each night painting's glow to the moon
+  uniform float uNightOffB;
+  uniform vec3 uNightTune;   // the painted nights' own grade (gain, clamp, contrast)
+${PAINTED_STARS_DECLARATIONS}${SKY_CLOUDS_DECLARATIONS}  varying vec3 vDir;
 
   vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec3 tune, float lift) {
     // lift resamples low view angles from just above the photographed ridge
@@ -898,6 +1122,7 @@ const skyFrag = (zoneHaze: boolean, paletteSky = false): string => /* glsl */ `$
     return col;
   }
 
+${PAINTED_STARS_FUNCTIONS}${SKY_CLOUDS_FUNCTIONS}
   void main() {
     vec3 dir = normalize(vDir);
     vec3 c = mix(sampleSky(uSkyA, dir, uOffA, uTuneA, uLiftA), sampleSky(uSkyB, dir, uOffB, uTuneB, uLiftB), uMix);
@@ -911,7 +1136,7 @@ const skyFrag = (zoneHaze: boolean, paletteSky = false): string => /* glsl */ `$
       c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     }
     c *= mix(uTintA, uTintB, uMix); // biome grade
-${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome grade and the dark night multiply:
+${SKY_CLOUDS_GLSL}${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome grade and the dark night multiply:
     // (1) desaturate toward night, so the day HDRI greys out to moonlight
     // instead of reading as a dimmed daytime photograph; (2) pour a warm
     // dawn/dusk glow into the horizon band around the live sun azimuth while
@@ -919,6 +1144,27 @@ ${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome
     float cycleLum = dot(c, vec3(0.2126, 0.7152, 0.0722));
     c = mix(c, vec3(cycleLum), uNightDesat);
     c *= uDayNight;                 // world day/night grade
+    // A painted night (sky_painted_core.ts) takes its arm's share of the dome
+    // through dusk, on its OWN grade instead of the desaturation and the dark
+    // multiply above: it is painted dark already, and graded again it would crush
+    // to black. Each arm's weight is zero by day and for every sky without a
+    // painted night, so the branch is skipped and the dome is exactly the day
+    // path; the glow, the stars and the fog band below still land on top. The
+    // replaced share comes off the blended day colour, which is exact at either
+    // end of a biome blend and when both arms carry the same weight; inside a
+    // night-time crossing between a painted and an unpainted sky it trades a
+    // little of one darkened day sky for the other, both near black by then.
+    float nightShare = mix(uNightW.x, uNightW.y, uMix);
+    if (nightShare > 0.0) {
+      vec3 night = vec3(0.0);
+      if (uNightW.x > 0.0) {
+        night += (1.0 - uMix) * uNightW.x * sampleSky(uNightA, dir, uNightOffA, uNightTune, 0.0);
+      }
+      if (uNightW.y > 0.0) {
+        night += uMix * uNightW.y * sampleSky(uNightB, dir, uNightOffB, uNightTune, 0.0);
+      }
+${SKY_CLOUDS_NIGHT_GLSL}      c = c * (1.0 - nightShare) + night;
+    }
     // The dawn/dusk glow lands AFTER the dark multiply: the sunset sky is the
     // brightest thing in the frame at the horizon crossing, so the grade must
     // not dim it (uDuskWarm is zero through deep night, so nothing leaks).
@@ -953,8 +1199,8 @@ ${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome
     // The sun and moon discs are billboard sprites (see renderer.ts) so they stay
     // perfect circles on screen; the dome only carries the sky and the stars.
     // stars: a fine field of small twinkling points at hash-jittered spots, only
-    // above the horizon, fading in as the sky darkens
-    if (uStarAmt > 0.001) {
+    // above the horizon, fading in as the sky darkens (veiled behind the painted clouds)
+${SKY_CLOUDS_STAR_VEIL_OPEN}    if (uStarAmt > 0.001) {
       // THREE NESTED EARLY-OUTS, and none of them changes a pixel. The field
       // is six hash12 (a sin each) plus a twinkle sine plus an atan/asin pair
       // on EVERY sky pixel of every night frame, and almost all of it lands on
@@ -980,7 +1226,9 @@ ${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome
         }
       }
     }
-    // Horizon fog band: blend the dome into the scene's fog color at low view
+    // The painted star layer (sky_painted_stars_glsl.ts) over the painted night's
+    // share, after the classic field it replaces and before the fog band.
+${PAINTED_STARS_GLSL}${SKY_CLOUDS_STAR_VEIL_CLOSE}    // Horizon fog band: blend the dome into the scene's fog color at low view
     // angles, so fully fogged geometry (far trees, unloaded land, distant
     // mobs) melts into the sky instead of standing above the haze wall as
     // cutouts. Fogged geometry lands at EXACTLY the fog color, so the band
@@ -1096,6 +1344,24 @@ export function ensureSkyAssetsAt(
 function sunOffsetU(biome: SkyKey, sunDir: THREE.Vector3): number {
   const sunU = Math.atan2(sunDir.z, sunDir.x) / (2 * Math.PI) + 0.5;
   return HDRI_SUN_U[biome] - sunU;
+}
+
+// The IBL source's own glow u where it is a different painting from the dome's (the
+// vale's env sky is its first painted day: compress_sky_ldr.mjs measured 0.659 to 0.669).
+const ENV_SUN_U: Partial<Record<SkyKey, number>> = { vale: 0.665, beach: 0.665 };
+
+/** The u offset that turns a key's IBL source's sun glow to the live sun. */
+function envSunOffsetU(biome: SkyKey, sunDir: THREE.Vector3): number {
+  const env = ENV_SUN_U[biome];
+  if (env === undefined) return sunOffsetU(biome, sunDir);
+  return env - (Math.atan2(sunDir.z, sunDir.x) / (2 * Math.PI) + 0.5);
+}
+
+// u offset that turns a key's painted night glow to the midnight moon (0 for a key
+// without a painted night: its slot is never sampled).
+function nightOffsetU(biome: SkyKey): number {
+  const glow = PAINTED_NIGHT_GLOW_U[biome];
+  return glow === undefined ? 0 : paintedNightOffsetU(glow);
 }
 
 interface BasicSkyUniforms {
@@ -1378,6 +1644,13 @@ export function buildSky(
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
       currentBiomeBlend: () => current,
+      // The cheap dome keeps the day sky's own darkened night: no painted night
+      // is fetched, uploaded or bound on this tier.
+      paintedNightsToWarm: () => [],
+      admitPaintedNight: () => undefined,
+      // nor painted clouds: the cheap dome draws the painted day sky alone
+      paintedCloudsToWarm: () => false,
+      admitPaintedClouds: () => undefined,
       dispose: () => {
         disposed = true;
         for (const [url, tex] of lowUrlTextures) {
@@ -1424,6 +1697,27 @@ export function buildSky(
     uFog: { value: new THREE.Color(0x7095bd) },
     uLiftA: { value: BIOME_HORIZON_LIFT[start.from] },
     uLiftB: { value: BIOME_HORIZON_LIFT[start.to] },
+    // Painted nights: until one is uploaded each slot holds its arm's own day sky
+    // (already resident), at zero weight, so it is bound but never sampled.
+    uNightA: { value: hdriStore[start.from] as THREE.Texture },
+    uNightB: { value: hdriStore[start.to] as THREE.Texture },
+    uNightW: { value: new THREE.Vector2(0, 0) },
+    uNightOffA: { value: nightOffsetU(start.from) },
+    uNightOffB: { value: nightOffsetU(start.to) },
+    uNightTune: {
+      value: new THREE.Vector3(
+        PAINTED_NIGHT_TUNE.gain,
+        PAINTED_NIGHT_TUNE.clamp,
+        PAINTED_NIGHT_TUNE.contrast ?? 1,
+      ),
+    },
+    uPaintStarAmt: { value: 0 },
+    // Painted clouds (sky_clouds_core.ts): until the atlas is uploaded the slot holds the
+    // arm's own day sky at zero weight, bound but never sampled.
+    uClouds: { value: hdriStore[start.from] as THREE.Texture },
+    uCloudW: { value: new THREE.Vector2(0, 0) },
+    uCloudPos: { value: skyCloudPositions(0) },
+    uCloudRect: { value: skyCloudRects() },
   };
   // Distant-zone atmosphere on the horizon band: same compile-time gate and
   // SHARED uniform objects as the terrain layers (the renderer builds the
@@ -1457,33 +1751,93 @@ export function buildSky(
   // the binding reports both and nothing in flight can be released underneath.
   const readBinding = (): readonly SkyKey[] => [boundFrom, boundTo, current.from, current.to];
   domeBindings.add(readBinding);
+
+  // Painted nights (sky_painted_core.ts). `nightTextures` holds the ones the
+  // residency driver uploaded on THIS renderer (admitPaintedNight): per view,
+  // because a graphics rebuild's new renderer owns fresh GL state and must upload
+  // them again before they bind. A context restore needs nothing from it: the
+  // dome re-uploads every texture bound in its uniforms inside the restore's held
+  // first frame, exactly as it does its day pair. An entry whose texture is no
+  // longer the store's (released, then fetched again) is dropped on read, so a
+  // disposed texture is never bound.
+  const nightTextures = new Map<SkyKey, THREE.Texture>();
+  const nightFade = new Map<SkyKey, number>();
+  let nightCycleWeight = 0;
+  let nightShare = 0;
+  const admittedNight = (biome: SkyKey): THREE.Texture | null => {
+    const texture = nightTextures.get(biome);
+    if (!texture) return null;
+    if (nightSkyStore[biome] === texture) return texture;
+    nightTextures.delete(biome);
+    nightFade.delete(biome);
+    return null;
+  };
+  const stepNightFade = (biome: SkyKey, texture: THREE.Texture | null, dt: number): number => {
+    if (!hasPaintedNightSky(biome)) return 0;
+    const fade = stepPaintedNightFade(nightFade.get(biome) ?? 0, texture !== null, dt);
+    nightFade.set(biome, fade);
+    return fade;
+  };
+  // Painted clouds: the atlas once the residency driver uploaded it on THIS renderer
+  // (admitPaintedClouds), and its fade in.
+  let cloudTexture: THREE.Texture | null = null;
+  let cloudFade = 0;
+  const applyClouds = (dt: number): void => {
+    if (cloudTexture !== null && cloudAtlas !== cloudTexture) cloudTexture = null;
+    cloudFade = stepSkyCloudFade(cloudFade, cloudTexture !== null, dt);
+    uniforms.uCloudW.value.set(
+      skyCloudArmWeight(boundFrom, cloudFade),
+      skyCloudArmWeight(boundTo, cloudFade),
+    );
+  };
+  // Writes the night slots and weights for the bound pair; `dt` advances the
+  // residency fades (zero re-applies a new cycle weight without stepping them).
+  const applyPaintedNight = (dt: number): void => {
+    const texA = admittedNight(boundFrom);
+    const texB = boundTo === boundFrom ? texA : admittedNight(boundTo);
+    const fadeA = stepNightFade(boundFrom, texA, dt);
+    const fadeB = boundTo === boundFrom ? fadeA : stepNightFade(boundTo, texB, dt);
+    uniforms.uNightA.value = texA ?? uniforms.uSkyA.value;
+    uniforms.uNightB.value = texB ?? uniforms.uSkyB.value;
+    const arms = paintedNightArms(nightCycleWeight, fadeA, fadeB, uniforms.uMix.value);
+    uniforms.uNightW.value.set(arms.a, arms.b);
+    nightShare = arms.share;
+  };
+
   return {
     dome,
     setCameraPos(x: number, z: number, dt: number): void {
       const target = biomeBlendAt(x, z);
-      if (!hasSkyHdriAssets([target.from, target.to])) return;
-      stepEnvironmentBlend(current, target, dt, SKY_ENVIRONMENT_RESPONSE);
-      if (current.from !== boundFrom || current.to !== boundTo) {
-        uniforms.uSkyA.value = hdriStore[current.from] as THREE.Texture;
-        uniforms.uSkyB.value = hdriStore[current.to] as THREE.Texture;
-        uniforms.uOffA.value = sunOffsetU(current.from, sun);
-        uniforms.uOffB.value = sunOffsetU(current.to, sun);
-        uniforms.uTuneA.value.copy(tuneVec(current.from));
-        uniforms.uTuneB.value.copy(tuneVec(current.to));
-        uniforms.uBackdropA.value = backdropTex(current.from);
-        uniforms.uBackdropB.value = backdropTex(current.to);
-        uniforms.uBackdropBiasA.value = BACKDROP_Y_BIAS[current.from];
-        uniforms.uBackdropBiasB.value = BACKDROP_Y_BIAS[current.to];
-        uniforms.uBackdropAmtA.value = BIOME_BACKDROP_STRENGTH[current.from];
-        uniforms.uBackdropAmtB.value = BIOME_BACKDROP_STRENGTH[current.to];
-        uniforms.uTintA.value.copy(tintVec(current.from));
-        uniforms.uTintB.value.copy(tintVec(current.to));
-        uniforms.uLiftA.value = BIOME_HORIZON_LIFT[current.from];
-        uniforms.uLiftB.value = BIOME_HORIZON_LIFT[current.to];
-        boundFrom = current.from;
-        boundTo = current.to;
+      // Never step the blend onto a sky that is not resident: the dome holds its
+      // pair instead of binding an undefined texture (the eviction fail-soft).
+      if (hasSkyHdriAssets([target.from, target.to])) {
+        stepEnvironmentBlend(current, target, dt, SKY_ENVIRONMENT_RESPONSE);
+        if (current.from !== boundFrom || current.to !== boundTo) {
+          uniforms.uSkyA.value = hdriStore[current.from] as THREE.Texture;
+          uniforms.uSkyB.value = hdriStore[current.to] as THREE.Texture;
+          uniforms.uOffA.value = sunOffsetU(current.from, sun);
+          uniforms.uOffB.value = sunOffsetU(current.to, sun);
+          uniforms.uTuneA.value.copy(tuneVec(current.from));
+          uniforms.uTuneB.value.copy(tuneVec(current.to));
+          uniforms.uBackdropA.value = backdropTex(current.from);
+          uniforms.uBackdropB.value = backdropTex(current.to);
+          uniforms.uBackdropBiasA.value = BACKDROP_Y_BIAS[current.from];
+          uniforms.uBackdropBiasB.value = BACKDROP_Y_BIAS[current.to];
+          uniforms.uBackdropAmtA.value = BIOME_BACKDROP_STRENGTH[current.from];
+          uniforms.uBackdropAmtB.value = BIOME_BACKDROP_STRENGTH[current.to];
+          uniforms.uTintA.value.copy(tintVec(current.from));
+          uniforms.uTintB.value.copy(tintVec(current.to));
+          uniforms.uLiftA.value = BIOME_HORIZON_LIFT[current.from];
+          uniforms.uLiftB.value = BIOME_HORIZON_LIFT[current.to];
+          uniforms.uNightOffA.value = nightOffsetU(current.from);
+          uniforms.uNightOffB.value = nightOffsetU(current.to);
+          boundFrom = current.from;
+          boundTo = current.to;
+        }
+        uniforms.uMix.value = current.t;
       }
-      uniforms.uMix.value = current.t;
+      applyPaintedNight(dt);
+      applyClouds(dt);
     },
     setDayNight(mul: readonly [number, number, number]): void {
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
@@ -1492,13 +1846,23 @@ export function buildSky(
       uniforms.uSunDirLive.value.copy(liveSunDir);
       uniforms.uDuskWarm.value = duskWarm;
       uniforms.uNightDesat.value = nightDesat;
+      // The dusk crossfade reads the same night grade the desaturation does.
+      nightCycleWeight = paintedNightWeight(nightDesat);
+      applyPaintedNight(0);
     },
     setFog(color: THREE.Color): void {
       uniforms.uFog.value.copy(color);
     },
     setStars(starAmt: number, time: number): void {
-      uniforms.uStarAmt.value = starAmt;
+      // Over a painted night the painted star layer takes the share the classic field
+      // gives up (an exact 1 and 0 wherever no painted night shows).
+      uniforms.uStarAmt.value = starAmt * paintedNightStarScale(nightShare);
+      uniforms.uPaintStarAmt.value = starAmt * paintedStarLayerScale(nightShare);
       uniforms.uTime.value = time;
+      // the painted clouds' drift, once a frame (a uniform array write in place)
+      if (uniforms.uCloudW.value.x > 0 || uniforms.uCloudW.value.y > 0) {
+        skyCloudPositions(time, uniforms.uCloudPos.value);
+      }
     },
     envTexture(biome: SkyKey): THREE.Texture | null {
       return envHdriStore[biome] ?? envDomeFallback(biome);
@@ -1515,12 +1879,40 @@ export function buildSky(
       // train), so the effective lookup azimuth stays alpha + theta and
       // matching the dome still needs theta = +off*2pi. (A negated value
       // lands the env sun 2x the offset away from the dome's.)
-      return sunOffsetU(biome, sun) * 2 * Math.PI;
+      return envSunOffsetU(biome, sun) * 2 * Math.PI;
     },
     biomeAt: biomeBlendAt,
     currentBiomeBlend: () => current,
+    paintedNightsToWarm(): SkyKey[] {
+      const wanted: SkyKey[] = [];
+      for (const biome of new Set([boundFrom, boundTo, current.from, current.to])) {
+        if (hasPaintedNightSky(biome) && admittedNight(biome) === null) wanted.push(biome);
+      }
+      return wanted;
+    },
+    paintedCloudsToWarm(): boolean {
+      if (cloudTexture !== null && cloudAtlas === cloudTexture) return false;
+      return [boundFrom, boundTo, current.from, current.to].some((key) => hasSkyClouds(key));
+    },
+    admitPaintedClouds(texture: THREE.Texture): void {
+      // A report for a texture the store no longer holds is stale: ignore it.
+      if (cloudAtlas !== texture) return;
+      cloudTexture = texture;
+      uniforms.uClouds.value = texture;
+      applyClouds(0);
+    },
+    admitPaintedNight(biome: SkyKey, texture: THREE.Texture): void {
+      // A report for a texture the store no longer holds is stale: ignore it, and
+      // the next warm pass uploads the current one.
+      if (!hasPaintedNightSky(biome) || nightSkyStore[biome] !== texture) return;
+      nightTextures.set(biome, texture);
+      // Bound now (already uploaded), shown from the next frames' fade.
+      applyPaintedNight(0);
+    },
     dispose(): void {
       domeBindings.delete(readBinding);
+      nightTextures.clear();
+      nightFade.clear();
       if (liveDome === dome) liveDome = null;
     },
   };

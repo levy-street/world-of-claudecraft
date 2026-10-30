@@ -1,13 +1,15 @@
-// Real-WebGL pin for the cel-shading R&D light ramp (cel_shading_core.ts). The
+// Real-WebGL pin for the cel-shading light ramp (cel_shading_core.ts). The
 // Node suite pins the chunk TEXT; only a real driver can say the patched
 // directional loop preprocesses, compiles and links under every lit material
-// kind with a casting sun (USE_SHADOWMAP defined), and that it bands the light:
-// in the stock chunk a face at NL 0.9 and one at NL 0.5 differ, under the ramp
-// they read the same lit level, and a face past the terminator gets no sun.
+// kind with a casting sun (USE_SHADOWMAP defined), and that it shapes the light:
+// at mix 1 (the old full cut) a face at NL 0.9 and one at NL 0.5 read the same
+// lit level and a face past the terminator gets no sun; at the default mix (a
+// 10 percent accent) the same faces stay within a tenth of the stock lambert;
+// at mix 0 the chunk is not patched at all.
 
 import * as THREE from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
-import { CEL_SHADING_DEFAULTS } from '../../src/render/cel_shading_core';
+import { CEL_SHADING_DEFAULTS, type CelShadingSettings } from '../../src/render/cel_shading_core';
 import { OutputGradePass } from '../../src/render/post_output_grade';
 
 type Kind = 'standard' | 'lambert' | 'phong' | 'toon';
@@ -21,6 +23,18 @@ const STOCK_OPAQUE = THREE.ShaderChunk.opaque_fragment;
 const { installCelShading, syncCelMaterialInk } = await import('../../src/render/cel_shading');
 const DEFAULT_INSTALL_CHUNK = THREE.ShaderChunk.lights_fragment_begin;
 const SIZE = 8;
+// The old default: the full banded cut with its crisp edge.
+const FULL_CEL: CelShadingSettings = { ...CEL_SHADING_DEFAULTS, mix: 1, softness: 0.025 };
+// Ink paths only build for an inked look (the default retires the ink).
+const INKED: CelShadingSettings = { ...CEL_SHADING_DEFAULTS, ink: 0.85, saturation: 1.12 };
+
+/** The JS twin of the default ramp at shadow 1: 90 percent stock, 10 percent band. */
+function defaultRampLevel(nl: number): number {
+  const d = CEL_SHADING_DEFAULTS;
+  const lo = Math.max(0.01, d.edge - d.softness);
+  const t = Math.min(1, Math.max(0, (nl - lo) / (d.edge + d.softness - lo)));
+  return (1 - d.mix) * nl + d.mix * d.lit * t * t * (3 - 2 * t);
+}
 
 afterAll(() => {
   THREE.ShaderChunk.lights_fragment_begin = STOCK_CHUNK;
@@ -104,7 +118,7 @@ describe('cel light ramp on a real WebGL context', () => {
     expect(DEFAULT_INSTALL_CHUNK).not.toBe(STOCK_CHUNK);
   });
 
-  it('bands the sun where the stock chunk falls off with NL', () => {
+  it('bands the sun at mix 1 where the stock chunk falls off with NL', () => {
     // Measure the stock look on the stock chunk, then install the ramp anew.
     THREE.ShaderChunk.lights_fragment_begin = STOCK_CHUNK;
     const stockErrors: string[] = [];
@@ -116,7 +130,7 @@ describe('cel light ramp on a real WebGL context', () => {
     expect(stockHigh).toBeCloseTo(0.9, 2);
     expect(stockMid).toBeCloseTo(0.5, 2);
 
-    expect(installCelShading(CEL_SHADING_DEFAULTS)).toBe(true);
+    expect(installCelShading(FULL_CEL)).toBe(true);
     const celErrors: string[] = [];
     const cel = makeRenderer(celErrors);
     const celHigh = lambertLevel(cel, 0.9);
@@ -125,21 +139,52 @@ describe('cel light ramp on a real WebGL context', () => {
     compileAll(cel);
     cel.dispose();
     expect(celErrors).toEqual([]);
-    expect(celHigh).toBeCloseTo(CEL_SHADING_DEFAULTS.lit, 2);
-    expect(celMid).toBeCloseTo(CEL_SHADING_DEFAULTS.lit, 2);
+    expect(celHigh).toBeCloseTo(FULL_CEL.lit, 2);
+    expect(celMid).toBeCloseTo(FULL_CEL.lit, 2);
     expect(celGrazing).toBeCloseTo(0, 3);
+  });
+
+  it('the default ramp is a 10 percent accent over the stock lambert', () => {
+    THREE.ShaderChunk.lights_fragment_begin = STOCK_CHUNK;
+    expect(installCelShading(CEL_SHADING_DEFAULTS)).toBe(true);
+    const errors: string[] = [];
+    const cel = makeRenderer(errors);
+    for (const nl of [0.9, 0.5, 0.2, 0.05]) {
+      const level = lambertLevel(cel, nl);
+      expect(level).toBeCloseTo(defaultRampLevel(nl), 2);
+      expect(Math.abs(level - nl)).toBeLessThanOrEqual(CEL_SHADING_DEFAULTS.mix + 0.01);
+    }
+    compileAll(cel);
+    cel.dispose();
+    expect(errors).toEqual([]);
+  });
+
+  it('mix 0 leaves the stock chunk and the stock lambert exactly', () => {
+    THREE.ShaderChunk.lights_fragment_begin = STOCK_CHUNK;
+    expect(installCelShading({ ...CEL_SHADING_DEFAULTS, mix: 0 })).toBe(false);
+    expect(THREE.ShaderChunk.lights_fragment_begin).toBe(STOCK_CHUNK);
+    const errors: string[] = [];
+    const renderer = makeRenderer(errors);
+    expect(lambertLevel(renderer, 0.5)).toBeCloseTo(0.5, 2);
+    renderer.dispose();
+    expect(errors).toEqual([]);
   });
 });
 
 describe('cel outlines compile on a real WebGL context', () => {
   it('material ink (Low, iPhone) links under every lit material kind', () => {
-    expect(syncCelMaterialInk(true, CEL_SHADING_DEFAULTS)).toBe(true);
+    expect(syncCelMaterialInk(true, INKED)).toBe(true);
     const errors: string[] = [];
     const renderer = makeRenderer(errors);
     compileAll(renderer);
     renderer.dispose();
-    expect(syncCelMaterialInk(false, CEL_SHADING_DEFAULTS)).toBe(false);
+    expect(syncCelMaterialInk(false, INKED)).toBe(false);
     expect(errors).toEqual([]);
+  });
+
+  it('the retired ink (the default look) never patches the material chunk', () => {
+    expect(syncCelMaterialInk(true, CEL_SHADING_DEFAULTS)).toBe(false);
+    expect(THREE.ShaderChunk.opaque_fragment).toBe(STOCK_OPAQUE);
   });
 
   it('the grade ink arm (Medium and up) links and reads a depth texture', () => {

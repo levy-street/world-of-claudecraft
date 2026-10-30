@@ -28,7 +28,7 @@ import { terrainHeight } from '../sim/world';
 export const TOWN_DRESSING_NATURAL: Readonly<Record<string, { x: number; y: number; z: number }>> =
   {
     'props/eastbrook_market_stall': { x: 2.8, y: 2.7, z: 2.2001 },
-    'dungeon/bench': { x: 1.75, y: 0.4999, z: 0.7499 },
+    'props/eastbrook_painted_bench': { x: 1.8359, y: 0.6, z: 0.9017 },
     'props/fence': { x: 0.791, y: 0.326, z: 0.0259 },
     'props/fenbridge_mirelight_cistern': { x: 3.6, y: 2.6001, z: 3.6 },
     'props/fenbridge_provision_stall': { x: 3.2, y: 2.8, z: 1.5998 },

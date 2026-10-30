@@ -77,6 +77,7 @@ import {
   type LookPatch,
   type LookSelections,
   lookDisplayModel,
+  lookToPatchSnippet,
   lookToShippingSnippet,
   parseSelections,
   resolveZoneLookId,
@@ -189,6 +190,9 @@ export interface PaletteLabApi {
   current(): { zone: string | null; look: string };
   setTime(phase: number | null): void;
   snippet(zoneId?: string): string;
+  /** The zone's chosen look (tweaks included) as a zone_looks.ts CURATED entry,
+   *  ready to paste over its authored patch: `copy(__paletteLab.patch())`. */
+  patch(zoneId?: string): string;
   /** Live-edit the current zone's chosen look for this session (console use):
    *  `__paletteLab.tweak({ light: { hemiScale: 3 }, grade: { lift: 0.05 } })`. */
   tweak(patch: Omit<LookPatch, 'id' | 'name' | 'note'>): boolean;
@@ -379,6 +383,12 @@ class PaletteLabRuntime implements PaletteLabApi {
       : '';
   }
 
+  patch(zoneId?: string): string {
+    const zone = zoneId ? this.zonesById.get(zoneId) : this.zone;
+    const look = zone ? this.groundLook(zone) : null;
+    return look && look.id !== STOCK_LOOK_ID ? lookToPatchSnippet(look) : '';
+  }
+
   tweak(patch: Omit<LookPatch, 'id' | 'name' | 'note'>): boolean {
     if (!this.zone) return false;
     const list = this.looksFor(this.zone);
@@ -438,9 +448,17 @@ class PaletteLabRuntime implements PaletteLabApi {
     const zones = all ? ZONES.filter((z) => this.selections[z.id]) : this.zone ? [this.zone] : [];
     const text = [
       `// Palette lab selections: ${JSON.stringify(this.selections)}`,
-      ...zones.map((z) =>
-        lookToShippingSnippet(z.id, z.biome, this.groundLook(z), this.celSaturation),
-      ),
+      ...zones.map((z) => {
+        const look = this.groundLook(z);
+        const shipping = lookToShippingSnippet(z.id, z.biome, look, this.celSaturation);
+        // The stock look is the reference, never a curated entry to paste back.
+        if (look.id === STOCK_LOOK_ID) return shipping;
+        return [
+          shipping,
+          `// zone_looks.ts CURATED.${z.id} entry (paste over the authored '${look.id}' patch):`,
+          lookToPatchSnippet(look),
+        ].join('\n');
+      }),
     ].join('\n\n');
     console.info(text);
     try {

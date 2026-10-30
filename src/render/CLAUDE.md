@@ -903,32 +903,46 @@ GPU work signs. Each rule names its seam and its guard.
   `src/dev/outfit_audit.ts`): a call sited inside `initGfxTier` alone reaches only the
   world renderer, and a per-site call is easy to miss on one of the others. Guard:
   `tests/final_color_nan_guard.test.ts`.
-- **Cel-shading R&D look (`?cel=on`, opt-in, reload to flip).** `cel_shading_core.ts`
-  reads the URL knobs (`cellight=off`, `celbands=2|3`, `celedge`, `cellit`, `celmid`,
-  `celink`, `celinkwidth`, `celsat`) and builds the toon ramp, a patch over the
-  DIRECTIONAL loop of `lights_fragment_begin` only (point lights and the hemisphere
-  fill stay smooth); `cel_shading.ts` installs it at module scope (the template above).
-  Exactly one outline path draws per chain. With an output grade (Medium and up), the
-  depth-based ink is the grade's `CEL_INK` arm (`post_cel_ink_glsl.ts`, wired like the
-  FXAA arm: no pass, no target, taps clamped to the region); it reads N8AO's beauty
-  depth, or on any RenderPass chain (including AO-off High and up) the current
-  composer read buffer's own depth texture. The look
-  turns the grade on for Low (`celNeedsGradePass`, applied in `settingsFor` before the
-  `?gfxo=` overrides), so Low draws the same ink as Medium. iOS keeps its memory-driven
-  no-grade profile; there `syncCelMaterialInk` (driven from `activateGfxProfile`)
-  inserts a material ink block into `opaque_fragment` instead: a rim on the geometric
-  normal gated on curvature per yard and on distance, plus the saturation. It reads
-  weakly on hard-edged low-poly models, which is why Low takes the grade instead. No flag means the stock chunks byte
-  for byte and no ink define. Guards: `tests/cel_shading_core.test.ts`,
+- **Cel light ramp (default on in browsers, `?cel=off` disables, reload to flip).**
+  `cel_shading_core.ts` reads the URL knobs (`cellight=off`, `celbands=2|3`, `celmix`,
+  `celsoft`, `celedge`, `cellit`, `celmid`, `celink`, `celinkwidth`, `celsat`) and
+  builds the ramp, a patch over the DIRECTIONAL loop of `lights_fragment_begin` only
+  (point lights and the hemisphere fill stay smooth); `cel_shading.ts` installs it at
+  module scope (the template above). The shipped look is the art bible's painted world
+  (`docs/design/art-direction.md`): `mix` 0.1 blends 10 percent of a soft band
+  (`softness` 0.1) over the stock smooth light, and the ink is retired (`ink` 0,
+  saturation 1), so `celInkSettings()` is null: no depth texture on the composer, no
+  ink taps, no material ink, and `celNeedsGradePass` no longer forces a grade on Low.
+  With `celink` above 0 (an A/B arm) exactly one outline path draws per chain: with an
+  output grade the depth-based ink is the grade's `CEL_INK` arm (`post_cel_ink_glsl.ts`,
+  wired like the FXAA arm), and the look turns the grade on for Low; iOS keeps its
+  memory-driven no-grade profile and takes the material ink in `opaque_fragment`
+  (`syncCelMaterialInk`). Guards: `tests/cel_shading_core.test.ts`,
   `tests/post_output_grade.test.ts` and the real-WebGL
   `tests/browser/cel_shading.browser.test.ts`.
-- **Palette lab (`?palette=on`, dev tool).** `palette_lab/` swaps a zone's whole colour
+- **Zone looks and the palette lab (looks on by default, `?palette=off` disables; `?palette=on`
+  opens the dev panel).** `palette_lab/` swaps a zone's whole colour
   look live (ground palette, fog/light rows, sky gradient, water, bloom, display grade);
   its own `CLAUDE.md` has the model. Every shader arm it adds is compile-time behind the
-  flag (the grade's `PALETTE_GRADE` define, the dome's gradient block), so a normal session
-  builds the stock shaders byte for byte. The ground re-bake rides
+  flag (the grade's `PALETTE_GRADE` define, the dome's gradient block), so a `?palette=off`
+  session builds the stock shaders byte for byte. The ground re-bake rides
   `ground_palette_override_core.ts` (main thread, the zone build worker and the far vista
   re-read it by version) and `renderer.editor.recolorGround` (colour buffers only).
+- **The re-baked painted walls (`painted_wall_detail.ts` over `painted_wall_detail_core.ts`,
+  `?walldetail=off|<strength>`, reload to flip).** The Eastbrook Tidehold models' walls
+  carry a second UV set in tile units and a stone mask in their colour atlas ALPHA
+  (`scripts/assets/painted_buildings/detail_normal_contract.json`). `placedBuildingMaterial`
+  decides the layer per mesh: a `painted_walls@<model>` on a geometry with `uv1` takes the
+  MASK guard on every tier (the alpha is restored to `opacity` right after `map_fragment`, so
+  a transparent camera-fade draw never drops the plaster and panes), plus on the Standard
+  tiers the shared tiling detail normal on a `uv1` derivative frame, weighted by mask,
+  strength and a stone-size distance fade. Everything else (the looks, old files, roofs,
+  props) keeps its exact program. One program per variant (a constant key token), the fade
+  twin re-attached by `material_clone_hooks.ts`, linked behind the town's reveal gate; the
+  texture rides `material.uniforms` so the gate's upload lane finds it (the
+  `wall_finishes.ts` precedent). Its sign never borrows `normalScale` (whose y is the
+  atlas's glTF flip). Guards: `tests/painted_wall_detail_core.test.ts`,
+  `tests/painted_wall_detail.test.ts`.
 - **No new queue, no new lane, no fourth gate.** New work rides
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),
@@ -1264,7 +1278,8 @@ collision/movement.
   `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
   the worn surface-detail layer, the armour dye that carries a player's outfit
   colorway `characters/armor_dye.ts`, the vertex-colour emissive layer both towns'
-  lit building materials carry, `vertex_color_emissive.ts`) both renders un-patched AND links a whole new
+  lit building materials carry, `vertex_color_emissive.ts`, the re-baked painted walls'
+  mask and relief, `painted_wall_detail.ts`) both renders un-patched AND links a whole new
   program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
   re-attaches exactly the layers the source carried, in the source's order, so
   the composed key comes out identical and the clone reuses the linked program.

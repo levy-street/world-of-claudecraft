@@ -123,7 +123,7 @@ describe('ranged petSpell casters keep the classic caster loop', () => {
   it('in spell range but with a world prop in the way, it begins no cast and goes to close instead', () => {
     const { sim, p } = makeSim();
     // The same pair moved to (-94, -41), where the authored quay watch tower
-    // (zone1 hexWatchtower at (-89, -41)) stands 5 yd east of the player and
+    // (zone1 eastbrookPaintedWatchtower at (-89, -41)) stands 5 yd east of the player and
     // breaks the line. The prop 5 yd east of the origin went when #4525 moved
     // Eastbrook, and the Wolf Run watch tower at (27, -13) the pair used next
     // went with the genshin artstyle merge (8bff2cec638); its next cast is a

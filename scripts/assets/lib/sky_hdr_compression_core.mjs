@@ -13,7 +13,9 @@ import path from 'node:path';
  *
  * `night_*.hdr` is deliberately absent: it is an orphan on disk that no sky
  * table points at (the Nightbloom uses nightbloom_dream), so encoding it would
- * ship dead bytes.
+ * ship dead bytes. So is `vale_day`: the vale (and the beach) now draw the
+ * PAINTED vale skies, LDR, encoded by compress_sky_ldr.mjs instead. Its `.hdr`
+ * masters stay for the editor's skybox picker (src/render/assets/skyboxes.ts).
  */
 export const SKY_HDR_STEMS = [
   'amber_sunset',
@@ -28,7 +30,6 @@ export const SKY_HDR_STEMS = [
   'nightbloom_dream',
   'palmreach_day',
   'peaks_dawn',
-  'vale_day',
   'wraithwood_gloom',
 ];
 

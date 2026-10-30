@@ -88,6 +88,27 @@ import {
   refreshPaintFieldLive,
 } from './terrain_paint_layers';
 import { paintTexturedCellsIn } from './terrain_paint_tint';
+import {
+  FALLBACK_MACRO_STATS,
+  grassFallbackTint,
+  type MacroStats,
+  macroStatsOf,
+  NEUTRAL_HEIGHT_BYTE,
+  PAINTED_GROUND_LAYERS,
+  PAINTED_GROUND_TUNING,
+  paintedBumpGlsl,
+  paintedCoverGlsl,
+  paintedDetailNormalTapsGlsl,
+  paintedDirtFlatGlsl,
+  paintedGrassGlsl,
+  paintedGroundDeclarationsGlsl,
+  paintedHeightBlendGlsl,
+  paintedSubLayerAlbedoGlsl,
+  paintedSubLayerTermsGlsl,
+  resolveCobbleLaneBox,
+  resolveCobbleLanes,
+  resolveCobbleTowns,
+} from './terrain_painted_ground_core';
 import { TERRAIN_TONES } from './terrain_palette';
 import {
   chunkIntersectsRegion,
@@ -129,9 +150,12 @@ export const CHUNK_SIZE = 60;
 const IDLE_BUILD_TIMEOUT_MS = 200;
 
 // ---------------------------------------------------------------------------
-// Real PBR splat layers (ambientCG 1K, shipped under public/textures/terrain).
-// Kicked off at module import and registered with the preload gate, so by the
-// time buildTerrain runs the resolved textures are available synchronously.
+// The splat layers (shipped under public/textures/terrain). Grass, dirt, rock,
+// cobble and leaf litter are the PAINTED set (terrain_painted_ground_core.ts,
+// rebuilt from scripts/assets/painted_ground/src by build_painted_ground.mjs);
+// sand, mud and snow are still the ambientCG 1K photo sets. Registered with
+// the deferred preload gate, so by the time buildTerrain runs the resolved
+// textures are available synchronously.
 // ---------------------------------------------------------------------------
 
 const TERRAIN_TEX: Record<string, THREE.Texture> = {};
@@ -147,12 +171,14 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
   // 1024x1024 RGBA bitmap each, and they bind directly as samplers. The
   // vertical flip is baked into the container at compress time, so `srgb`
   // here only still selects the anisotropy budget.
-  // The six COLOUR layers deliberately stay raw JPG: buildSplatAlbedoArray
+  // The COLOUR layers deliberately stay raw JPG: buildSplatAlbedoArray
   // drawImages them into the packed DataArrayTexture (a CompressedTexture's
   // image is not a CanvasImageSource, and binding one here took the renderer
   // down at world build), and on every tier that loads them the packed array
   // is the resident form anyway, so compressing the pack SOURCE bought
-  // nothing. GroundAO_Packed.png is also NOT converted: it is a packed DATA
+  // nothing. The painted layers' *_Height.webp are pack sources the same way
+  // (they land in the albedo array's alpha). GroundAO_Packed.png is also NOT
+  // converted: it is a packed DATA
   // texture whose measured per-channel statistics are baked into shader
   // constants (see the "Measured sds" comment below), and a lossy block
   // encode would shift them.
@@ -176,23 +202,27 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
 /** Prepare the terrain texture channel selected by an explicit target profile. */
 export function prepareTerrainProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
   if (!target.terrainSplat) return Promise.resolve();
+  // The painted layers' file names are pinned against PAINTED_GROUND_LAYERS by
+  // tests/terrain_painted_ground_core.test.ts: the converter writes exactly
+  // these. The painted grass is TINT-NEUTRAL (the bake arm lifts it onto the
+  // blade bake's mean and the vertex tint paints it zone green), dirt and rock
+  // sit on the photo sets' measured means so the per-biome tints still land.
   const tasks = [
-    prepareTerrainTex('grassC', 'Grass001_Color.jpg', true),
-    prepareTerrainTex('grassN', 'Grass001_NormalGL.jpg', false),
-    // Ground023 (leaf-littered packed earth), not Ground048: at the splat tile
-    // scale 048 is one uniform high-frequency crumble (measured large/fine
-    // luminance-std ratio 0.21, saturation 0.39, R/G 1.35) and paths read as
-    // pink carpet. 023 carries real medium-scale features (ratio 0.47), an
-    // earthier desaturated hue (R/G 1.15, saturation 0.26), a clean row/col
-    // variance ratio (1.34, no corduroy) and a usable AO map (sd 0.117).
-    prepareTerrainTex('dirtC', 'Ground023_Color.jpg', true),
-    prepareTerrainTex('dirtN', 'Ground023_NormalGL.jpg', false),
-    // Rock026 (fractured cliff plates), not Rock051: Rock051's striations are
-    // directional (anisotropy 2.57), and wall-projecting them at one scale is
-    // what gave mountainsides the vertical corduroy. Rock051 stays on disk for
-    // voxel_terrain.
-    prepareTerrainTex('rockC', 'Rock026_Color.jpg', true),
-    prepareTerrainTex('rockN', 'Rock026_NormalGL.jpg', false),
+    prepareTerrainTex('grassC', 'PaintedGrass_Color.jpg', true),
+    prepareTerrainTex('grassN', 'PaintedGrass_NormalGL.jpg', false),
+    prepareTerrainTex('grassH', 'PaintedGrass_Height.webp', false),
+    prepareTerrainTex('dirtC', 'PaintedDirt_Color.jpg', true),
+    prepareTerrainTex('dirtN', 'PaintedDirt_NormalGL.jpg', false),
+    prepareTerrainTex('dirtH', 'PaintedDirt_Height.webp', false),
+    prepareTerrainTex('rockC', 'PaintedRock_Color.jpg', true),
+    prepareTerrainTex('rockN', 'PaintedRock_NormalGL.jpg', false),
+    prepareTerrainTex('rockH', 'PaintedRock_Height.webp', false),
+    // Town cobbles and leaf litter: albedo + height only (no normal slot; their
+    // painted light and shade carry the form).
+    prepareTerrainTex('cobbleC', 'PaintedCobble_Color.jpg', true),
+    prepareTerrainTex('cobbleH', 'PaintedCobble_Height.webp', false),
+    prepareTerrainTex('leafC', 'PaintedLeaves_Color.jpg', true),
+    prepareTerrainTex('leafH', 'PaintedLeaves_Height.webp', false),
     prepareTerrainTex('sandC', 'Ground080_Color.jpg', true),
     prepareTerrainTex('sandN', 'Ground080_NormalGL.jpg', false),
     prepareTerrainTex('mudC', 'Ground071_Color.jpg', true),
@@ -210,13 +240,13 @@ export function prepareTerrainProfileAssets(target: Readonly<GfxSettings>): Prom
       isBuiltinWorldActive() ? 'Snow010A_Color.jpg' : 'Snow004_Color.jpg',
       true,
     ),
-    // The packs' relief channels, packed offline into one RGBA texture by
-    // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
-    // A sand AO): one sampler instead of four keeps the splat material under
-    // the 16-sampler fragment limit. B is a Rock026+Rock060 displacement blend,
-    // not an AO map: Rock026's authored AO is near-white, and displacement is
-    // the honest cavity signal for the new rocks. Linear data: cavity = dark,
-    // open surface = bright.
+    // The layers' relief channels, packed offline into one RGBA texture by
+    // scripts/assets/painted_ground/build_painted_ground.mjs (R painted grass
+    // cavity, G painted dirt cavity, B painted rock height, A the Ground080
+    // sand AO): one sampler instead of four keeps the splat material under the
+    // 16-sampler fragment limit. Each channel is FITTED to the mean and spread
+    // GROUND_RELIEF_GLSL centres it on, so the shader constants stay true.
+    // Linear data: cavity = dark, open surface = bright.
     prepareTerrainTex('groundAO', 'GroundAO_Packed.png', false),
   ];
   return Promise.all(tasks).then(() => undefined);
@@ -242,7 +272,10 @@ export function hasTerrainSplatAssets(): boolean {
 
 /** Narrow read of the loaded grass splat layers for interiors that reuse the
  *  overworld ground look (the Wildheart Basin floor). Undefined until the
- *  boot preload resolves; callers must fall back to their own material. */
+ *  boot preload resolves; callers must fall back to their own material.
+ *  The painted grass colour is TINT-NEUTRAL (grey mean): a consumer tints it
+ *  (terrain_painted_ground_core.ts grassFallbackTint restores the photo
+ *  layer's green). */
 export function terrainSplatTexture(key: 'grassC' | 'grassN'): THREE.Texture | undefined {
   return TERRAIN_TEX[key];
 }
@@ -775,8 +808,10 @@ const GROUND_RELIEF_GLSL = /* glsl */ `
 // Per-layer parallax amplitudes (replacing the one global WOC_PARALLAX_SCALE
 // 0.16): one amplitude across height fields with different contrast means the
 // weak layers show nothing, because effective depth = amplitude x channel sd.
-// Measured sds of GroundAO_Packed (remeasured from the shipped 512px file):
-// R grass 0.0775, G dirt 0.1168, B rock 0.1136, A sand 0.0559. Each
+// The sds of GroundAO_Packed's channels: R grass 0.0775, G dirt 0.1168, B
+// rock 0.1136, A sand 0.0559 (the painted-ground converter FITS R, G and B to
+// exactly these, scripts/assets/painted_ground/lib/painted_ground_core.mjs
+// GROUND_AO_PACK, pinned by tests/terrain_painted_ground_core.test.ts). Each
 // amplitude below = target depth / sd, so one sd of a layer's height signal
 // walks the projection by that layer's TARGET depth (UV units): grass 0.010
 // (soft turf, gentle tussocks), dirt 0.022 (clods and stones stand up),
@@ -819,8 +854,8 @@ float wocGroundHeight(vec2 uv, vec4 sw) {
     aoDirt = texture2D(uGroundAO, uv * 0.55).g;
   if ( vTerrainSplatPresence.z > 0.5 )
     aoRock = texture2D(uGroundAO, uv * 0.6).b;
-  // means measured by scripts/assets/pack_ground_ao.mjs; B (rock) is the
-  // Rock026/Rock060 displacement blend, centred like the AO channels so the
+  // the channel means the painted-ground converter fits its relief to; B
+  // (rock) is the painted rock's height, centred like the AO channels so the
   // signal stays zero-mean and mips fade it out with distance
   return (aoBase.r - 0.812) * sw.x
        + (aoDirt - 0.897) * sw.y
@@ -964,8 +999,12 @@ const GRASS_PAINT_RING_GLSL = `
 // ban; anti-tiling comes from the jitter phase drift and the hue wander
 // only. The comb-frame locals stay declared at both tiers because the
 // detail-normal chunk and the tussock shade still sample through them.
-function grassBakeAlbedoGlsl(rich: boolean): string {
+// `painted` (the built-in world's painted ground) mixes the painted grass
+// layer over the strokes and owns the carpet ring (paintedGrassGlsl), the
+// same on both tiers.
+function grassBakeAlbedoGlsl(rich: boolean, painted: boolean): string {
   const uvScale = (1 / GRASS_BAKE_PATCH_YARDS).toFixed(6);
+  const ring = painted ? paintedGrassGlsl(MEADOW_CARPET_FADE_START) : GRASS_PAINT_RING_GLSL;
   const comb = rich
     ? `vec2 grassJitter = vec2(0.0);
         if ( wocHasGrass ) {
@@ -984,7 +1023,7 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         if ( wocHasGrass ) {
           grassAlb = texture2D(uGrassBake, wocTPlane * ${uvScale} + grassJitter).rgb;
           float bakeHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);${GRASS_PAINT_RING_GLSL}
+          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);${ring}
         }`
     : `vec2 combT = tuv;
         vec2 grassJitter = vec2(0.0);
@@ -992,7 +1031,7 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         vec2 combPerp = vec2(0.0, 1.0);
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
-          grassAlb = texture2D(uGrassBake, wocTPlane * ${uvScale}).rgb;${GRASS_PAINT_RING_GLSL}
+          grassAlb = texture2D(uGrassBake, wocTPlane * ${uvScale}).rgb;${ring}
         }`;
   return comb;
 }
@@ -1045,7 +1084,16 @@ function plainGrassLift(
 
 /** Layer order of the packed albedo array; the shader's WOC_L_* constants
  *  mirror these indices and the budget test pins the two lists together. */
-export const SPLAT_ALBEDO_LAYERS = ['grassC', 'dirtC', 'rockC', 'sandC', 'mudC', 'snowC'] as const;
+export const SPLAT_ALBEDO_LAYERS = [
+  'grassC',
+  'dirtC',
+  'rockC',
+  'sandC',
+  'mudC',
+  'snowC',
+  'cobbleC',
+  'leafC',
+] as const;
 const SPLAT_ALBEDO_SIZE = 1024;
 
 // The shader half of the pack: WOC_ALB replaces what used to be a
@@ -1058,7 +1106,9 @@ const SPLAT_ALBEDO_GLSL = `
         const float WOC_L_ROCK = 2.0;
         const float WOC_L_SAND = 3.0;
         const float WOC_L_MUD = 4.0;
-        const float WOC_L_SNOW = 5.0;`;
+        const float WOC_L_SNOW = 5.0;
+        const float WOC_L_COBBLE = 6.0;
+        const float WOC_L_LEAF = 7.0;`;
 
 interface SplatAlbedoArray {
   texture: THREE.DataArrayTexture;
@@ -1072,14 +1122,51 @@ interface SplatAlbedoArray {
 let splatAlbedoCache: SplatAlbedoArray | null = null;
 
 /**
- * Pack the six albedo photos into one DataArrayTexture. Carries the old
+ * Pack the albedo layers into one DataArrayTexture. Carries the old
  * per-texture FAIL-SAFE forward: a layer whose image has not resolved is
  * filled neutral mid-grey (quietly wrong) instead of three's default white
  * (loudly wrong). Rows are written bottom-up so each layer samples exactly
  * as the flipY image textures it replaces. Cached once complete; a build
  * that had to fill any placeholder re-packs on the next world build, when
  * the deferred preload has had time to land.
+ *
+ * ALPHA carries each painted layer's height (its *_Height.webp, drawn with the
+ * same flip so it lands texel for texel on the colour): the painted height
+ * blend reads it off the very albedo tap it already takes, so the heights
+ * cost no sampler, no tap and no memory (the array always held an unused
+ * opaque alpha). A layer without a height map packs NEUTRAL_HEIGHT_BYTE, the
+ * shader's height zero. The array is sRGB8_ALPHA8, whose alpha is linear.
  */
+
+/** Mean and spread of the macro noise texture's red channel, read back off
+ *  its canvas once per material build (the painted ground's masks work in
+ *  z-scores of it); the fallback wherever it cannot be read back (no 2D
+ *  context, a stand-in texture in tests). */
+function macroTextureStats(tex: THREE.Texture): MacroStats {
+  const canvas = tex.image as HTMLCanvasElement | undefined;
+  if (!canvas || typeof canvas.getContext !== 'function' || !canvas.width || !canvas.height) {
+    return FALLBACK_MACRO_STATS;
+  }
+  try {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return FALLBACK_MACRO_STATS;
+    return macroStatsOf(ctx.getImageData(0, 0, canvas.width, canvas.height).data, 4);
+  } catch {
+    return FALLBACK_MACRO_STATS;
+  }
+}
+
+/** The height map's terrain texture key for each painted albedo slot. */
+const SPLAT_HEIGHT_KEY: ReadonlyMap<string, string> = new Map(
+  PAINTED_GROUND_LAYERS.map((layer) => [layer.albedoKey, layer.heightKey]),
+);
+
+/** A drawable image out of a loaded terrain texture, or undefined. */
+function drawableImage(tex: THREE.Texture | undefined): CanvasImageSource | undefined {
+  const raw = tex?.image as unknown;
+  const img = isCanvasDrawableImage(raw) ? raw : undefined;
+  return (img as { width?: number } | undefined)?.width ? img : undefined;
+}
 
 function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArray {
   if (splatAlbedoCache?.complete) return splatAlbedoCache;
@@ -1091,25 +1178,36 @@ function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArr
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   let complete = true;
   let grassMean: [number, number, number] | null = null;
+  // bottom-up rows: DataArrayTexture never flips, the Image textures did
+  const drawFlipped = (c: CanvasRenderingContext2D, img: CanvasImageSource): Uint8ClampedArray => {
+    c.save();
+    c.translate(0, size);
+    c.scale(1, -1);
+    c.drawImage(img, 0, 0, size, size);
+    c.restore();
+    return c.getImageData(0, 0, size, size).data;
+  };
   for (let layer = 0; layer < SPLAT_ALBEDO_LAYERS.length; layer++) {
-    const raw = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as unknown;
-    const img = isCanvasDrawableImage(raw) ? raw : undefined;
-    const w = (img as { width?: number } | undefined)?.width;
+    const img = drawableImage(t[SPLAT_ALBEDO_LAYERS[layer]]);
     const dst = data.subarray(layer * size * size * 4, (layer + 1) * size * size * 4);
-    if (!ctx || !img || !w) {
+    if (!ctx || !img) {
       dst.fill(96); // the neutral fail-safe shade the per-texture bind used
-      for (let i = 3; i < dst.length; i += 4) dst[i] = 255;
+      for (let i = 3; i < dst.length; i += 4) dst[i] = NEUTRAL_HEIGHT_BYTE;
       complete = false;
       continue;
     }
-    ctx.save();
-    // bottom-up rows: DataArrayTexture never flips, the Image textures did
-    ctx.translate(0, size);
-    ctx.scale(1, -1);
-    ctx.drawImage(img, 0, 0, size, size);
-    ctx.restore();
-    const px = ctx.getImageData(0, 0, size, size).data;
+    const px = drawFlipped(ctx, img);
     dst.set(px);
+    const heightKey = SPLAT_HEIGHT_KEY.get(SPLAT_ALBEDO_LAYERS[layer]);
+    const heightImg = heightKey ? drawableImage(t[heightKey]) : undefined;
+    if (heightImg) {
+      const hp = drawFlipped(ctx, heightImg);
+      for (let i = 3; i < dst.length; i += 4) dst[i] = hp[i - 3];
+    } else {
+      for (let i = 3; i < dst.length; i += 4) dst[i] = NEUTRAL_HEIGHT_BYTE;
+      // a painted layer whose height has not landed packs flat and re-packs
+      if (heightKey) complete = false;
+    }
     if (SPLAT_ALBEDO_LAYERS[layer] === 'grassC') {
       let r = 0;
       let g = 0;
@@ -1341,6 +1439,19 @@ function buildSplatMaterial(
   // plane UVs, height-blended layer seams, the sin-free snow glint) are for
   // authored maps; the built-in world compiles the shader it shipped with.
   const authoredLook = !isBuiltinWorldActive();
+  // The painted ground's cover breakup, town cobbles and painted height blend
+  // (terrain_painted_ground_core.ts): the built-in world, every splat tier,
+  // one variant. Authored maps keep the Studio's own height blend below.
+  // ?tpainted=off is the dev A/B and perf-attribution switch.
+  const painted = !authoredLook && !renderLayerDisabled('tpainted');
+  // Detail-normal gains: the painted program's knobs, else the photo-era ones.
+  const normalGain = painted
+    ? {
+        grass: PAINTED_GROUND_TUNING.normalGainGrass.toFixed(4),
+        dirt: PAINTED_GROUND_TUNING.normalGainDirt.toFixed(4),
+        rock: PAINTED_GROUND_TUNING.normalGainRock.toFixed(4),
+      }
+    : { grass: '0.85', dirt: '0.72', rock: '1.05' };
   // The height-blend half of the splat composite (see the HEIGHT BLEND note in
   // the map_fragment patch); the built-in world keeps the plain weighted sum.
   const heightBlend = authoredLook
@@ -1383,6 +1494,7 @@ function buildSplatMaterial(
       grassBake !== null,
       zoneHaze,
       nightLights,
+      painted,
     ]
       .map(Number)
       .join('')}${terrainReliefLevel()}`;
@@ -1395,6 +1507,10 @@ function buildSplatMaterial(
   // normal set packs flat (buildSplatNormalArray).
   const albedo = buildSplatAlbedoArray(t);
   const normals = buildSplatNormalArray(t);
+  // Every painted-ground mask works in macro z-scores, measured off the very
+  // texture this material binds (its values depend on how far textures.ts's
+  // shared LCG had run), so coverage holds whatever the blobs came out as.
+  const macroStats = painted ? macroTextureStats(macro) : FALLBACK_MACRO_STATS;
   // The map's painted ground TEXTURES (cobbles, paving, tiles...): resolved
   // from the active content at material build, compile-time gated like the
   // grass bake so the shipped overworld (no texture paint) keeps its exact
@@ -1442,6 +1558,20 @@ function buildSplatMaterial(
       uMacro: { value: macro },
       uGroundAO: { value: t.groundAO },
     });
+    if (painted) {
+      sh.uniforms.uCobbleTowns = {
+        value: resolveCobbleTowns(activeZoneList()).map((v) => new THREE.Vector4(...v)),
+      };
+      const cobbleLanes = resolveCobbleLanes(activeZoneList());
+      sh.uniforms.uCobbleLanes = { value: cobbleLanes.map((v) => new THREE.Vector4(...v)) };
+      sh.uniforms.uCobbleLaneBox = {
+        value: new THREE.Vector4(...resolveCobbleLaneBox(cobbleLanes)),
+      };
+      sh.uniforms.uPaintedCover = { value: new THREE.Vector2(1, 1) };
+      sh.uniforms.uMacroStats = {
+        value: new THREE.Vector2(macroStats.mean, 1 / macroStats.sd),
+      };
+    }
     if (paintUniforms) Object.assign(sh.uniforms, paintUniforms);
     if (grassBake) {
       sh.uniforms.uGrassBake = { value: grassBake.texture };
@@ -1452,6 +1582,12 @@ function buildSplatMaterial(
       // blown-out ground.
       sh.uniforms.uCarpetRing = sharedUniforms.uCarpetRing;
       sh.uniforms.uPlainLift = { value: plainGrassLift(albedo.grassMean, grassBake.mean) };
+    } else {
+      // No bake: the grass layer is tinted only 35%, so the tint-neutral
+      // painted grass is multiplied back onto the photo grass's green.
+      sh.uniforms.uGrassFallbackTint = {
+        value: new THREE.Vector3(...grassFallbackTint(albedo.grassMean)),
+      };
     }
     // The live terrain-detail shed level (terrain_detail_shed_core.ts), by shared reference.
     if (terrainReliefLevel() >= 2) sh.uniforms.uReliefSteps = sharedUniforms.uReliefSteps;
@@ -1512,11 +1648,12 @@ function buildSplatMaterial(
         uniform sampler2DArray uAlb;
         uniform sampler2DArray uNrm;
         uniform sampler2D uMacro, uGroundAO;
-        ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uCarpetRing;\n        uniform vec3 uPlainLift;' : ''}
+        ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uCarpetRing;\n        uniform vec3 uPlainLift;' : 'uniform vec3 uGrassFallbackTint;'}
         ${hasPaint ? PAINT_LAYER_UNIFORMS_GLSL : ''}
         ${terrainReliefLevel() >= 2 ? 'uniform float uReliefSteps;' : ''}
         ${SPLAT_ALBEDO_GLSL}
         ${SPLAT_NORMAL_GLSL}
+        ${painted ? paintedGroundDeclarationsGlsl() : ''}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
       )
@@ -1632,6 +1769,14 @@ function buildSplatMaterial(
           float restScale = (1.0 - shaped) / rest;
           vSplatR = vec4(vSplat.x * restScale, shaped, vSplat.z * restScale, vSplat.w * restScale);
         }
+        // Painted layer heights (albedo alpha, 0.5 = flat), the carved cover
+        // weights (leaf, earth, cobble) and the weights the detail normals and
+        // roughness read. Declared on every variant; only the painted height
+        // blend writes the last two, so elsewhere they are the plain splat.
+        float wocDirtH = 0.5;
+        float wocRockH = 0.5;
+        vec3 wocHW2 = vec3(0.0);
+        vec4 wocNW = vSplatR;
         // Offset parallax: slide the ground UVs along the view ray by the
         // AO height proxy, so the painted clods and stones stand up at
         // grazing angles instead of reading as a decal on flat ground. Each
@@ -1663,7 +1808,7 @@ function buildSplatMaterial(
         // seam-free by construction and the far field drops around a dozen
         // texture taps per fragment.
         float wocDetailFade = 1.0 - smoothstep(46.0, 62.0, wocCamDist);
-        bool wocNearDetail = wocDetailFade > 0.001;
+        bool wocNearDetail = wocDetailFade > 0.001;${painted ? paintedCoverGlsl() : ''}
         ${
           // upW feeds both the parallax fade and the cavity slope fade; emit
           // it once whenever any relief level is active.
@@ -1830,7 +1975,7 @@ function buildSplatMaterial(
           // With the ground bake active, both tiers take the baked-blade
           // grass layer instead (one true-scale tap; see grassBakeAlbedoGlsl).
           grassBake
-            ? grassBakeAlbedoGlsl(richTerrainSplat())
+            ? grassBakeAlbedoGlsl(richTerrainSplat(), painted)
             : richTerrainSplat()
               ? `vec2 grassJitter = vec2(0.0);
         if ( wocHasGrass && wocNearDetail ) {
@@ -1890,7 +2035,7 @@ function buildSplatMaterial(
         // macro-scale term whose whole job is to keep the FAR field from
         // washing into one uniform green sheet.
         float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
+        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT) * uGrassFallbackTint;
         }`
               : `// No-relief tiers: the plain two-octave anti-tiling mix (the
         // 90-degree-rotated coarse octave still kills the shared repeat).
@@ -1906,7 +2051,7 @@ function buildSplatMaterial(
           grassAlb = mix(
             WOC_ALB(tuv, WOC_L_GRASS),
             WOC_ALB(vec2(-tuv.y, tuv.x) * 0.31, WOC_L_GRASS),
-            0.56 + (macro2 - 0.5) * 0.3);
+            0.56 + (macro2 - 0.5) * 0.3) * uGrassFallbackTint;
         }`
         }
         // Tussock height-shade (the worn_stone round-7 idiom): sd-normalized
@@ -1936,10 +2081,13 @@ function buildSplatMaterial(
         float pathCore = 0.0;
         float pathEdge = 0.0;
         float gravelW = 0.0;
-        if ( wocHasDirt ) {
+        if ( wocHasDirt${painted ? ' || wocEarthM > 0.0' : ''} ) {
+        ${painted ? paintedDirtFlatGlsl() : ''}
         ${
-          richTerrainSplat()
-            ? `// --- de-carpeted dirt: multi-scale soil instead of one speckle ---
+          painted
+            ? ''
+            : richTerrainSplat()
+              ? `// --- de-carpeted dirt: multi-scale soil instead of one speckle ---
         // A rotated second dirt octave (0.63x the base 0.8 scale, 37 degrees:
         // cos 0.799 and sin 0.601 folded into the constants), lerped by a
         // ~9yd macro mask: the two scales can never phase-align into one
@@ -1955,8 +2103,14 @@ function buildSplatMaterial(
         // mean (a forced-coarse mip of the same tap) so the path reads as
         // packed earth with embedded stones, not carpet pile. The macro
         // octaves below run on the softened base, so patch structure stays.
-        dirtFlat = mix(dirtFlat, textureLod(uAlb, vec3(tuv * 0.55, WOC_L_DIRT), 2.0).rgb, 0.30);
-        // Two macro octaves hand the soil the low-frequency structure a photo
+        dirtFlat = mix(dirtFlat, textureLod(uAlb, vec3(tuv * 0.55, WOC_L_DIRT), 2.0).rgb, 0.30);`
+              : `// Simple-splat tiers: one dirt tap; the wear bands below still
+        // apply so trails keep their compacted-core read.
+        vec3 dirtFlat = WOC_ALB(tuv * 0.55, WOC_L_DIRT);`
+        }
+        ${
+          richTerrainSplat()
+            ? `// Two macro octaves hand the soil the low-frequency structure a
         // tile cannot carry: ~6yd value mottling (footworn patches) and ~20yd
         // value plus grey-brown hue drift (damp hollows). Both reuse uMacro.
         float dirtMac6 = texture2D(uMacro, vWPos.xz * 0.17 + 0.61).r - 0.5;
@@ -1964,9 +2118,7 @@ function buildSplatMaterial(
         dirtFlat *= 1.0 + dirtMac6 * 0.11 + dirtMac20 * 0.15;
         vec3 dirtGrey = vec3(dot(dirtFlat, vec3(0.35, 0.45, 0.2))) * vec3(1.0, 0.97, 0.9);
         dirtFlat = mix(dirtFlat, dirtGrey, clamp(0.24 + dirtMac20 * 0.4, 0.0, 0.65));`
-            : `// Simple-splat tiers: one dirt tap; the wear bands below still
-        // apply so trails keep their compacted-core read.
-        vec3 dirtFlat = WOC_ALB(tuv * 0.55, WOC_L_DIRT);`
+            : ''
         }
         // Path wear across the trail: the vertex dirt weight sits near 0.85
         // at a trail's core and feathers out over ~1.4yd at the margin, so it
@@ -1982,7 +2134,7 @@ function buildSplatMaterial(
         if ( wocHasMud )
           dirtFlat = mix(dirtFlat, WOC_ALB(tuv * 0.8, WOC_L_MUD), vExtra.x);
         ${
-          richTerrainSplat()
+          richTerrainSplat() && !painted
             ? `// Trails read as packed grit, not smooth brown paint: fold a
         // high-frequency rock tap into the dry dirt (no new sampler, the
         // material sits at 15 of 16). The weight fades with the marsh mud
@@ -2010,11 +2162,15 @@ function buildSplatMaterial(
         // outcrops share one tiling period.
         vec2 rockUv2 = vec2(tuv.x * 0.203 - tuv.y * 0.260, tuv.x * 0.260 + tuv.y * 0.203);
         float rockOctMask = texture2D(uMacro, vWPos.xz * 0.033 + 0.83).r;
+        vec4 wocRF = texture(uAlb, vec3(tuv * 0.6, WOC_L_ROCK));
+        wocRockH = wocRF.a;
         vec3 rockFlat = mix(
-          WOC_ALB(tuv * 0.6, WOC_L_ROCK),
+          wocRF.rgb,
           WOC_ALB(rockUv2, WOC_L_ROCK),
           0.2 + rockOctMask * 0.5);`
-            : 'vec3 rockFlat = WOC_ALB(tuv * 0.6, WOC_L_ROCK);'
+            : `vec4 wocRF = texture(uAlb, vec3(tuv * 0.6, WOC_L_ROCK));
+        wocRockH = wocRF.a;
+        vec3 rockFlat = wocRF.rgb;`
         }
         // macro2 (hoisted above the grass blend) also drives the wall plate
         // mix, so plate zones vary across a mountainside without spending a
@@ -2050,8 +2206,8 @@ function buildSplatMaterial(
         rockAlb *= mix(vec3(0.94, 0.98, 1.05), vec3(1.06, 1.02, 0.94), rockDrift);
         // Cliff cavity: groundShade's planar AO fades out by slope on purpose
         // (its XZ projection streaks on banks), which left steep faces
-        // shadeless. Re-sample the packed B channel (the Rock026/Rock060
-        // displacement blend) through the same wall-planar frames as the
+        // shadeless. Re-sample the packed B channel (the painted rock's
+        // height) through the same wall-planar frames as the
         // projected rock albedo, at the coarse octave only, so it shades
         // whole fracture plates rather than re-tracing the fine tiling the
         // albedo mix just broke up. Centred on the channel's measured mean
@@ -2089,7 +2245,7 @@ function buildSplatMaterial(
             / max(dot(textureLod(uAlb, vec3(tuv, WOC_L_SAND), 12.0).rgb, WOC_SAND_LUMA), 1e-3);
           sandAlb = vColor.rgb * ${SAND_PAINT_GAIN.toFixed(4)}
             * mix(1.0, clamp(sandGrain, 0.6, 1.4), ${SAND_PAINT_GRAIN.toFixed(4)});
-        }
+        }${painted ? paintedSubLayerAlbedoGlsl() : ''}
         ${
           grassBake
             ? `// Per-layer tint (meadow continuum): the baked grass layer is
@@ -2117,11 +2273,11 @@ function buildSplatMaterial(
         // already took this fragment. WOC_HBLEND_WINDOW is how much height
         // difference still counts as a tie - small is a hard interlocking
         // edge, large decays to the old linear blend.
-        vec4 wocHW = vSplatR;${heightBlend}
+        vec4 wocHW = vSplatR;${heightBlend}${painted ? paintedHeightBlendGlsl() : ''}
         vec3 alb = grassAlb * vtint * ${(GRASS_PAINT_GAIN / 2).toFixed(4)} * wocHW.x
                  + (dirtAlb * wocHW.y
                  + rockAlb * wocHW.z) * vtint35
-                 + sandAlb * wocHW.w;`
+                 + sandAlb * wocHW.w${painted ? paintedSubLayerTermsGlsl('vtint35') : ''};`
             : `// HEIGHT BLEND between the splat layers, instead of a plain weighted
         // sum. A linear lerp fades one texture into the next over the whole
         // transition band, which is what makes a boundary read as a soft
@@ -2138,11 +2294,11 @@ function buildSplatMaterial(
         // already took this fragment. WOC_HBLEND_WINDOW is how much height
         // difference still counts as a tie - small is a hard interlocking
         // edge, large decays to the old linear blend.
-        vec4 wocHW = vSplatR;${heightBlend}
+        vec4 wocHW = vSplatR;${heightBlend}${painted ? paintedHeightBlendGlsl() : ''}
         vec3 alb = grassAlb * wocHW.x
                  + dirtAlb * wocHW.y
                  + rockAlb * wocHW.z
-                 + sandAlb * wocHW.w;`
+                 + sandAlb * wocHW.w${painted ? paintedSubLayerTermsGlsl(null) : ''};`
         }
         // snow cover on the peaks/rim, by baked per-vertex weight
         if ( wocHasSnow )
@@ -2229,6 +2385,9 @@ function buildSplatMaterial(
         float plateHi = smoothstep(0.02, 0.14, wallCav);
         roughnessFactor = mix(roughnessFactor, mix(0.95, 0.8, plateHi),
           vSplatR.z * wallW * (1.0 - vExtra.y));
+        // the painted cover layers (zero weight off the painted ground)
+        roughnessFactor = mix(roughnessFactor, ${PAINTED_GROUND_TUNING.roughLeaf.toFixed(2)}, wocHW2.x);
+        roughnessFactor = mix(roughnessFactor, ${PAINTED_GROUND_TUNING.roughCobble.toFixed(2)}, wocHW2.z);
         // wet shoreline (wetW from the albedo chunk): soaked sand and dirt
         // tighten toward a glossy wave-washed sheen instead of staying bone-dry matte
         roughnessFactor = mix(roughnessFactor, min(roughnessFactor, 0.34), wetW);
@@ -2289,13 +2448,19 @@ function buildSplatMaterial(
         float wocDetailN = 1.0 - smoothstep(WOC_DETAIL_N_NEAR, WOC_DETAIL_N_FAR, wocCamDist);
         if (wocDetailN > 0.0) {
         vec2 gNxy = vec2(0.0);
-        if ( wocHasGrass && wocNearDetail ) {
+        vec3 dN = vec3(0.0);
+        ${
+          painted
+            ? // the painted grass and dirt normals follow their albedo's
+              // anti-repeat copy (terrain_painted_ground_core.ts)
+              paintedDetailNormalTapsGlsl()
+            : `if ( wocHasGrass && wocNearDetail ) {
           vec3 gN = WOC_NRM(combT + grassJitter, WOC_N_GRASS).xyz * 2.0 - 1.0;
           gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
         }
-        vec3 dN = vec3(0.0);
         if ( wocHasDirt && wocNearDetail )
-          dN = WOC_NRM(tuv * 0.55, WOC_N_DIRT).xyz * 2.0 - 1.0;
+          dN = WOC_NRM(tuv * 0.55, WOC_N_DIRT).xyz * 2.0 - 1.0;`
+        }
         vec3 rN = vec3(0.0);
         if ( wocHasRock && wocNearDetail )
           rN = WOC_NRM(tuv * 0.6, WOC_N_ROCK).xyz * 2.0 - 1.0;
@@ -2303,7 +2468,9 @@ function buildSplatMaterial(
         if ( wocHasSand && wocNearDetail )
           sN = WOC_NRM(tuv, WOC_N_SAND).xyz * 2.0 - 1.0;
         ${
-          richTerrainSplat()
+          // The painted program carries no fine octaves: a 2.4x or 3x tap of
+          // a painted normal is a scaled-down stroke, read as noise.
+          richTerrainSplat() && !painted
             ? `// A second octave at 4x the base tiling: without it the ground is one
         // blurred frequency underfoot and reads as plastic. Two taps rather
         // than one per layer, since the octave only supplies grain and its
@@ -2337,10 +2504,12 @@ function buildSplatMaterial(
         // cores are packed smoother than their kicked-up margins (pathCore
         // from the albedo chunk)
         float dirtDetail = (1.0 - vExtra.x * 0.35) * (1.0 - pathCore * 0.3);
-        detN = (gNxy + fineSoft * 0.32) * vSplatR.x * 0.85
-             + (dN.xy + fineHard * 0.35 + gvN * gravelW * 0.3) * vSplatR.y * 0.72 * dirtDetail
-             + (rN.xy + fineHard * 0.55) * vSplatR.z * 1.05 * (1.0 - wallW)
-             + (sN.xy + fineSoft * 0.35) * vSplatR.w * mix(0.15, 0.05, wetW);
+        // wocNW: the splat weights after the painted height blend (the plain
+        // splat elsewhere), so leaf litter and cobbles carry no turf grain
+        detN = (gNxy + fineSoft * 0.32) * wocNW.x * ${normalGain.grass}
+             + (dN.xy + fineHard * 0.35 + gvN * gravelW * 0.3) * wocNW.y * ${normalGain.dirt} * dirtDetail
+             + (rN.xy + fineHard * 0.55) * wocNW.z * ${normalGain.rock} * (1.0 - wallW)
+             + (sN.xy + fineSoft * 0.35) * wocNW.w * mix(0.15, 0.05, wetW);
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
         // Planar-XZ UVs stretch on steep faces and the detail normals smear
         // into vertical streaks there; fade them out by slope and let the
@@ -2358,7 +2527,7 @@ function buildSplatMaterial(
             : ''
         }
         }
-        normal = normalize(normal + tbn * vec3(detN, 0.0));
+        normal = normalize(normal + tbn * vec3(detN, 0.0));${painted ? paintedBumpGlsl() : ''}
         ${hasPaint ? PAINT_NORMAL_GLSL : ''}
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the

@@ -12,7 +12,14 @@ vi.mock('../../src/render/gfx', () => ({
   GFX: state.gfx,
   sharedUniforms: { uTime: { value: 0 } },
 }));
-vi.mock('../../src/render/cel_shading', () => ({ celShadingSettings: () => state.look }));
+// Both getters serve the case's look: this composer test pins the depth wiring of
+// a BUILT ink arm (plain ink 0 against ink 0.85), so the arm is built in both
+// renders. The real gate (no arm for the default ink 0 and saturation 1) is
+// pinned in tests/cel_shading_core.test.ts (celInkArmActive, celInkSettings).
+vi.mock('../../src/render/cel_shading', () => ({
+  celShadingSettings: () => state.look,
+  celInkSettings: () => state.look,
+}));
 // The palette lab look is on by default since the genshin overhaul
 // (8bff2cec638), so importing post.ts boots its runtime chunk, whose graph
 // needs more of gfx.ts than this mock serves: the import then rejects

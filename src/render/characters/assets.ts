@@ -131,6 +131,7 @@ import { WOC_ANATOMY_TOP, type WocArmorDetail, wocArmorTierFor } from './woc_arm
 import { attachWocArmorAtBuild, type WocArmorFile } from './woc_armor_dressing';
 import { clearIdleWocArmorMerges } from './woc_armor_merge';
 import { prepareWocArmorTier, wocArmorResidentScenes } from './woc_armor_packs';
+import { applyWocArmorPaint } from './woc_armor_paint';
 import { startWocCrowdPrefetch, wocCrowdPrefetchStarted } from './woc_crowd_prefetch';
 import { loadWocEntryFiles } from './woc_entry_preload';
 import { clearIdleWocHeadMerges } from './woc_head_merge';
@@ -2867,6 +2868,8 @@ function buildTintedClone(
     if (envMapIntensity !== undefined) std.envMapIntensity = envMapIntensity;
     if (envSheen !== undefined) applyEnvSheen(std, envSheen);
   }
+  // WOC armour, on every tier: the painted metal response and paint-over, as the last layer
+  applyWocArmorPaint(mat, src);
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role, authored, selfIllumination);
   return mat;
 }
