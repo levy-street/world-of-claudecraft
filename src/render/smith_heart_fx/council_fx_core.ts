@@ -613,3 +613,12 @@ export function slabTalon(
   out.z = z + Math.cos(a) * r;
   return out;
 }
+
+/** Shouldered Stone's shell as it closes on the Slabwright: `t` seconds since it
+ *  hardened and the body's height give its scale (a third of its size to whole
+ *  in 0.35 s). */
+export function shoulderShellScale(t: number, bodyHeight: number): number {
+  const whole = bodyHeight * 0.36;
+  const k = Math.min(1, Math.max(0, t / 0.35));
+  return whole * (0.33 + 0.67 * k * (2 - k));
+}

@@ -1602,6 +1602,7 @@ const baseEnTable = {
   'mechanic.heartEndlessSong': 'Endless Song',
   'aura.heartResonance': 'Resonance',
   'aura.heartMemoryOfStone': 'Memory of Stone',
+  'aura.heartShoulderedStone': 'Shouldered Stone',
   // The Guardian of the Breath (encounters/smith_heart/breath_ids.ts
   // BREATH_NAMES): its damage and aura names. EXACT through the mechanic
   // reverse map (Bellows Gust keeps its key; Charged Ground shares the Buried
@@ -26975,6 +26976,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Endless Song': 'mechanic.heartEndlessSong',
   Resonance: 'aura.heartResonance',
   'Memory of Stone': 'aura.heartMemoryOfStone',
+  'Shouldered Stone': 'aura.heartShoulderedStone',
   'Bellows Wind': 'aura.heartBellowsWind',
   'Indrawn Breath': 'aura.heartIndrawnBreath',
   'Pressed to the Rim': 'mechanic.heartPressedToTheRim',

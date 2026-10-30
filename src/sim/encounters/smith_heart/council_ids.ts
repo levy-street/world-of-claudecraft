@@ -103,6 +103,9 @@ export const COUNCIL_AURAS = {
   resonance: 'heart_resonance',
   /** On a council member: one stack per fallen member, more damage dealt. */
   memory: 'heart_memory_of_stone',
+  /** Heroic and Mythic: on the Slabwright while another living member stands
+   *  within reach, far less damage taken (council_shoulder.ts). */
+  shouldered: 'heart_shouldered_stone',
   /** Mythic: on the Seam Singer's soul pillar, one stack per pulse the
    *  Endless Song has sung (value = the next pulse's multiplier). The
    *  pillar is an object: the sim never ticks it, the council sets it. */
@@ -186,6 +189,7 @@ export const COUNCIL_NAMES = {
   song: 'Song of the Seam',
   resonance: 'Resonance',
   memory: 'Memory of Stone',
+  shouldered: 'Shouldered Stone',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
   echo: 'Echo of Wrath',
@@ -226,6 +230,9 @@ export interface CouncilDifficultyRules {
   /** Soul in the Stone: a fallen member's soul takes a pillar
    *  (council_soul.ts). */
   soulInTheStone: boolean;
+  /** Shouldered Stone: the Slabwright hardens beside another member
+   *  (council_shoulder.ts). */
+  slabwrightShoulders: boolean;
 }
 
 export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
@@ -239,6 +246,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     heirFillSeconds: 35,
     rockOutlivesSlabwright: false,
     soulInTheStone: false,
+    slabwrightShoulders: false,
   },
   heroic: {
     wakeMarks: 2,
@@ -250,6 +258,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     heirFillSeconds: 35,
     rockOutlivesSlabwright: false,
     soulInTheStone: false,
+    slabwrightShoulders: true,
   },
   // Everything heroic has, the inheritances stronger, and the souls.
   mythic: {
@@ -262,12 +271,18 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     heirFillSeconds: 30,
     rockOutlivesSlabwright: true,
     soulInTheStone: true,
+    slabwrightShoulders: true,
   },
 };
 
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const COUNCIL_TUNING = {
+  // Shouldered Stone (Heroic, Mythic): its reach (yards, body to body), the
+  // share of damage it stops, and the least time between two raid warnings.
+  shoulderReach: 10,
+  shoulderWard: 0.8,
+  shoulderWarnGap: 20,
   // The pillars.
   pillarCap: 7,
   /** The most integrity any pillar template carries. */

@@ -89,6 +89,7 @@ import {
 } from './council_fx_core';
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
 import { CouncilShelters } from './council_shelter_fx';
+import { CouncilShoulderFx } from './council_shoulder_fx';
 import { CouncilSoakFx } from './council_soak_fx';
 import { CouncilSoulFx } from './council_soul_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
@@ -325,6 +326,7 @@ export class CouncilFx {
   private readonly shelters: CouncilShelters;
   /** The soak's countdown rim, beacon and the rock's shadow. */
   private readonly soak: CouncilSoakFx;
+  private readonly shoulder: CouncilShoulderFx;
   /** When the Wrath's shelters were last laid (the host clock), or -1. */
   private wrathLaidAt = -1;
   /** The council's sounds (game/smith_heart_council_audio.ts), fed by this
@@ -415,6 +417,7 @@ export class CouncilFx {
     this.pillarsFx = new CouncilPillarsFx(host, carrier);
     this.shelters = new CouncilShelters(host, this.pillarsFx);
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
+    this.shoulder = new CouncilShoulderFx(host);
     this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
     const ringGeo = new THREE.RingGeometry(0.93, 1, 96, 1).rotateX(-Math.PI / 2);
@@ -764,6 +767,7 @@ export class CouncilFx {
     this.updateStreams(world, dt);
     this.updateEnergy(world, dt);
     this.updateWrathShelters(world);
+    this.shoulder.update(dt);
     this.audio.update(dt, (id) => world.entities.get(id));
     this.debris.update(dt);
     this.particles.update(this.clock);
@@ -780,6 +784,7 @@ export class CouncilFx {
     // The pillars and the rubble.
     this.pillarsFx.beginScan();
     this.soulFx.beginScan();
+    this.shoulder.beginScan();
     this.audio.beginScan();
     for (const m of this.marks) m.seen = false;
     for (const r of this.rocks) r.seen = false;
@@ -792,7 +797,10 @@ export class CouncilFx {
     if (here) {
       for (const e of world.entities.values()) {
         if (e.kind === 'mob') {
-          if (!e.dead && councilRoleOf(e.templateId) !== null) this.audio.see(e, 'member');
+          if (!e.dead && councilRoleOf(e.templateId) !== null) {
+            this.audio.see(e, 'member');
+            this.shoulder.see(e);
+          }
           if (
             holder < 0 &&
             !e.dead &&
@@ -831,6 +839,7 @@ export class CouncilFx {
     // What the scan no longer saw.
     this.pillarsFx.endScan();
     this.soulFx.endScan();
+    this.shoulder.endScan();
     this.audio.endScan();
     for (const m of this.marks) {
       if (m.playerId >= 0 && !m.seen) this.freeMark(m);

@@ -4745,7 +4745,8 @@ export const ja_JP: EnTranslations = {
         "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：ダメージ{heroic}%増加。",
         "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。",
         "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。",
-        "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。"
+        "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。",
+        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
         "wind": "息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。",
@@ -7274,6 +7275,7 @@ export const ja_JP: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "山の怒り！柱の陰に隠れろ！",
+        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "enrage": "山の怒りが速まった！山の怒りがずっと早く来る。",
         "weight": "{player}に槌の重み：タンク交代！",
         "wake": "石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。",

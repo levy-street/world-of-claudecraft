@@ -5935,6 +5935,8 @@ export const hudChromeStrings = {
       resonance:
         "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
       memory: 'Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.',
+      shouldered:
+        'Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them.',
     },
     // The Smith's Heart's Guardian of the Breath (src/ui/breath_aura_effect.ts).
     breathGuardian: {
@@ -10227,6 +10229,7 @@ export const hudChromeStrings = {
   council: {
     warn: {
       wrath: "Mountain's Wrath! Hide behind a pillar!",
+      shoulder: 'The Slabwright hardens beside its kin: pull it away!',
       enrage: "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
       weight: "Hammer's Weight on {player}: swap tanks!",
       wake: 'Wake the Stone: pillars rise under {players}! Stand where the cover should go.',

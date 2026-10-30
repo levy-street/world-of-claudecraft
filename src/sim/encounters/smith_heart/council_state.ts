@@ -78,6 +78,8 @@ export interface CouncilFightState {
   finished: boolean;
   /** Seconds since the pull. */
   clock: number;
+  /** When Shouldered Stone may warn the raid again (on the fight's clock). */
+  shoulderWarnAt: number;
   /** The Wrath holder's energy, 0 to 100. */
   energy: number;
   /** Wraths landed this pull (the soft enrage reads it). */

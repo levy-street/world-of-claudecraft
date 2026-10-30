@@ -62,6 +62,11 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
         key: `${KEY}.memory`,
         nums: { pct: pct(a.value), per: pct(T.memoryPerFallen) },
       };
+    case COUNCIL_AURAS.shouldered:
+      return {
+        key: `${KEY}.shouldered`,
+        nums: { pct: pct(a.value), reach: T.shoulderReach },
+      };
     default:
       return null;
   }

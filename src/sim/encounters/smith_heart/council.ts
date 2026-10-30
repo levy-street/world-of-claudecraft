@@ -72,6 +72,7 @@ import {
   quarryPlayers,
   raidWarn,
 } from './council_scope';
+import { stepShoulder } from './council_shoulder';
 import {
   applyResonance,
   clearSong,
@@ -185,6 +186,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     difficulty,
     finished: false,
     clock: 0,
+    shoulderWarnAt: 0,
     energy: 0,
     wraths: 0,
     weightTimer: T.weightFirst,
@@ -453,6 +455,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     const b = bodies[r];
     if (!b) continue;
     dropAuraById(b, COUNCIL_AURAS.memory);
+    dropAuraById(b, COUNCIL_AURAS.shouldered);
     if (b.dead && anyAlive) regrowHead(ctx, b, 1);
     b.resource = 0;
   }
@@ -532,6 +535,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
     if (b && !living(b) && !st.fallen.includes(r)) noteFallen(s, r, b);
   }
   syncMemory(s);
+  stepShoulder(s);
   stepCouncilVoice(s);
   stepBars(s);
   fillEnergy(s);

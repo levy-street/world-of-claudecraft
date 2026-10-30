@@ -4745,7 +4745,8 @@ export const fr_FR: EnTranslations = {
         "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroic}% more damage.",
         "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroic}% more damage.",
         "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
-        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council."
+        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.",
+        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
@@ -7274,6 +7275,7 @@ export const fr_FR: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "Mountain's Wrath! Hide behind a pillar!",
+        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
         "weight": "Hammer's Weight on {player}: swap tanks!",
         "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",

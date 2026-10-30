@@ -4745,7 +4745,8 @@ export const ko_KR: EnTranslations = {
         "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: 피해 {heroic}% 증가.",
         "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.",
         "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.",
-        "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%."
+        "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.",
+        "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
         "wind": "숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 가장자리 벽에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 벽이 무너진 곳에서는 막아 줄 것이 없어 공허로 떨어집니다.",
@@ -7274,6 +7275,7 @@ export const ko_KR: EnTranslations = {
     "council": {
       "warn": {
         "wrath": "산의 분노! 기둥 뒤에 숨으세요!",
+        "shoulder": "The Slabwright hardens beside its kin: pull it away!",
         "enrage": "산의 분노가 빨라집니다! 이제 산의 분노가 훨씬 빨리 옵니다.",
         "weight": "{player}에게 망치의 무게: 탱커 교대!",
         "wake": "돌 깨우기: {players} 아래에서 기둥이 솟아오릅니다! 엄폐물이 필요한 곳에 서세요.",
