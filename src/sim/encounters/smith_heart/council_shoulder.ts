@@ -1,5 +1,5 @@
 // The Hammer Council's Shouldered Stone (docs/design/raid/smith_heart.md section
-// 7.1), Heroic and Mythic: the Slabwright takes far less damage while another
+// 7.1), Mythic only: the Slabwright takes far less damage while another
 // living member stands within reach, so one tank holds the Guardian with the
 // Seam Singer and the other takes the Slabwright away. The other two have no
 // such rule. The aura is the shared 'shield_wall' ward (combat/damage.ts), kept

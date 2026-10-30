@@ -103,7 +103,7 @@ export const COUNCIL_AURAS = {
   resonance: 'heart_resonance',
   /** On a council member: one stack per fallen member, more damage dealt. */
   memory: 'heart_memory_of_stone',
-  /** Heroic and Mythic: on the Slabwright while another living member stands
+  /** Mythic: on the Slabwright while another living member stands
    *  within reach, far less damage taken (council_shoulder.ts). */
   shouldered: 'heart_shouldered_stone',
   /** Mythic: on the Seam Singer's soul pillar, one stack per pulse the
@@ -258,7 +258,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     heirFillSeconds: 35,
     rockOutlivesSlabwright: false,
     soulInTheStone: false,
-    slabwrightShoulders: true,
+    slabwrightShoulders: false,
   },
   // Everything heroic has, the inheritances stronger, and the souls.
   mythic: {
@@ -278,7 +278,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const COUNCIL_TUNING = {
-  // Shouldered Stone (Heroic, Mythic): its reach (yards, body to body), the
+  // Shouldered Stone (Mythic): its reach (yards, body to body), the
   // share of damage it stops, and the least time between two raid warnings.
   shoulderReach: 10,
   shoulderWard: 0.8,

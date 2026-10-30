@@ -1,4 +1,4 @@
-// The Hammer Council's Shouldered Stone over a REAL Sim claim: Heroic and Mythic
+// The Hammer Council's Shouldered Stone over a REAL Sim claim: Mythic
 // only, the Slabwright alone, on while another living member stands within
 // reach and off when it is pulled away; the raid hears it, and a wipe takes it.
 
@@ -52,32 +52,32 @@ const warns = (ev: SimEvent[]) =>
   ev.filter((e) => e.type === 'chat' && e.textKey === 'hudChrome.council.warn.shoulder');
 
 describe('Hammer Council: Shouldered Stone', () => {
-  it('is Heroic and Mythic only', () => {
+  it('is Mythic only', () => {
     expect(COUNCIL_DIFFICULTY.normal.slabwrightShoulders).toBe(false);
-    expect(COUNCIL_DIFFICULTY.heroic.slabwrightShoulders).toBe(true);
+    expect(COUNCIL_DIFFICULTY.heroic.slabwrightShoulders).toBe(false);
     expect(COUNCIL_DIFFICULTY.mythic.slabwrightShoulders).toBe(true);
-    const f = pulled();
-    place(f, CLOSE);
-    f.tick();
-    expect(shouldered(f.bodies().slabwright)).toBeUndefined();
-  });
-
-  for (const tier of ['heroic', 'mythic'] as const) {
-    it(`${tier}: hardens within reach, and only the Slabwright`, () => {
+    for (const tier of [undefined, 'heroic'] as const) {
       const f = pulled(tier);
       place(f, CLOSE);
       f.tick();
-      const b = f.bodies();
-      const aura = shouldered(b.slabwright);
-      expect(aura?.kind).toBe('shield_wall');
-      expect(aura?.value).toBe(0.8);
-      expect(shouldered(b.guardian)).toBeUndefined();
-      expect(shouldered(b.singer)).toBeUndefined();
-    });
-  }
+      expect(shouldered(f.bodies().slabwright)).toBeUndefined();
+    }
+  });
+
+  it('mythic: hardens within reach, and only the Slabwright', () => {
+    const f = pulled('mythic');
+    place(f, CLOSE);
+    f.tick();
+    const b = f.bodies();
+    const aura = shouldered(b.slabwright);
+    expect(aura?.kind).toBe('shield_wall');
+    expect(aura?.value).toBe(0.8);
+    expect(shouldered(b.guardian)).toBeUndefined();
+    expect(shouldered(b.singer)).toBeUndefined();
+  });
 
   it('drops when it is pulled out of reach', () => {
-    const f = pulled('heroic');
+    const f = pulled('mythic');
     place(f, CLOSE);
     f.tick();
     expect(shouldered(f.bodies().slabwright)).toBeDefined();
@@ -87,7 +87,7 @@ describe('Hammer Council: Shouldered Stone', () => {
   });
 
   it('one member within reach is enough, a fallen one is not company', () => {
-    const f = pulled('heroic');
+    const f = pulled('mythic');
     place(f, FAR);
     const b = f.bodies();
     if (!b.singer) throw new Error('no singer');
@@ -101,7 +101,7 @@ describe('Hammer Council: Shouldered Stone', () => {
   });
 
   it('warns the raid, then not again within its gap', () => {
-    const f = pulled('heroic');
+    const f = pulled('mythic');
     place(f, FAR);
     f.tick();
     place(f, CLOSE);
@@ -114,7 +114,7 @@ describe('Hammer Council: Shouldered Stone', () => {
   });
 
   it('a reset takes it', () => {
-    const f = pulled('heroic');
+    const f = pulled('mythic');
     place(f, CLOSE);
     f.tick();
     const b = f.bodies();
