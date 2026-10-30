@@ -7514,6 +7514,7 @@ export const ko_KR: EnTranslations = {
       "groupAria": "주인 없는 힘: 과부하 막대",
       "titleCall": "네 구역의 부름",
       "titleFinal": "모든 구역 각성",
+      "titleUnmade": "무너지는 모루",
       "call": "보호막 {seconds}",
       "splinters": "파편 {count}",
       "striding": "중앙으로 이동 중",

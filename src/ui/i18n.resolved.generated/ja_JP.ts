@@ -7514,6 +7514,7 @@ export const ja_JP: EnTranslations = {
       "groupAria": "主なき剛力：過負荷バー",
       "titleCall": "四区画の呼び声",
       "titleFinal": "全区画覚醒",
+      "titleUnmade": "崩れゆく金床",
       "call": "障壁 {seconds}",
       "splinters": "欠片 {count}",
       "striding": "中央へ向かっている",

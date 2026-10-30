@@ -10513,6 +10513,7 @@ export const hudChromeStrings = {
     // Part 2: the intermission, the final phase, the poured elements.
     titleCall: 'Call of the Quarters',
     titleFinal: 'All quarters awake',
+    titleUnmade: 'The Unmade Anvil',
     call: 'Shield {seconds}',
     splinters: 'Splinters {count}',
     striding: 'Striding to the centre',

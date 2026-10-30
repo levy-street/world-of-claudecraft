@@ -26295,6 +26295,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.warn.crackBreath': "Четверть Дыхания трескается! Уходите с неё, пока она не рухнула!",
   'hudChrome.finalBoss.warn.crackHammer': "Четверть Молота трескается! Уходите с неё, пока она не рухнула!",
   'hudChrome.finalBoss.warn.ringCrack': "Осталось лишь центральное кольцо, и оно трескается! Убейте его сейчас!",
+  'hudChrome.finalOverload.titleUnmade': "Рушащаяся Наковальня",
   'hudChrome.finalOverload.kneeling': "Преклонил колени",
   'hudChrome.finalOverload.rising': "Сердце бьётся",
   'hudChrome.finalOverload.fallsIn': "{quarter}: обвал через {seconds}",

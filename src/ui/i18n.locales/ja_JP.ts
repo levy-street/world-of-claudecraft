@@ -25816,6 +25816,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.warn.crackBreath': "息吹の区画にひびが走る！崩れ落ちる前に離れろ！",
   'hudChrome.finalBoss.warn.crackHammer': "槌の区画にひびが走る！崩れ落ちる前に離れろ！",
   'hudChrome.finalBoss.warn.ringCrack': "残るは中央の環のみ、それもひび割れている！今すぐ倒せ！",
+  'hudChrome.finalOverload.titleUnmade': "崩れゆく金床",
   'hudChrome.finalOverload.kneeling': "膝をついた",
   'hudChrome.finalOverload.rising': "心臓が脈打つ",
   'hudChrome.finalOverload.fallsIn': "{quarter}の崩落まで {seconds}",

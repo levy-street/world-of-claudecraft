@@ -7514,6 +7514,7 @@ export const ru_RU: EnTranslations = {
       "groupAria": "Сила без хозяина: шкалы перегрузки",
       "titleCall": "Зов четвертей",
       "titleFinal": "Все четверти пробуждены",
+      "titleUnmade": "Рушащаяся Наковальня",
       "call": "Щит {seconds}",
       "splinters": "Осколки {count}",
       "striding": "Идёт в центр",

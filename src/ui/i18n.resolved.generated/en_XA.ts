@@ -7514,6 +7514,7 @@ export const en_XA: EnTranslations = {
       "groupAria": "[Ţĥé Ɱášţéŕļéšš Šţŕéñĝţĥ: Óʋéŕļóáð ƀáŕš]",
       "titleCall": "[Çáļļ óƒ ţĥé Ɋúáŕţéŕš]",
       "titleFinal": "[Áļļ ɋúáŕţéŕš áŵáķé]",
+      "titleUnmade": "[Ţĥé Úñɱáðé Áñʋíļ]",
       "call": "[Šĥíéļð {seconds}]",
       "splinters": "[Šþļíñţéŕš {count}]",
       "striding": "[Šţŕíðíñĝ ţó ţĥé çéñţŕé]",

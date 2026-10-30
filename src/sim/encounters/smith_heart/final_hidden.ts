@@ -35,6 +35,7 @@ import { clearAdds, phaseRules } from './final_adds';
 import { clearBreath } from './final_breath';
 import { clearHammer } from './final_hammer';
 import { clearHeat } from './final_heat';
+import { FINAL_AURAS } from './final_ids';
 import { dropShield, dropWhatItHeld, pinCentre, shareHp } from './final_intermission';
 import { stepMix } from './final_last';
 import {
@@ -115,6 +116,7 @@ export function beginKneel(s: FinalScope): void {
   clearCastIf(s.boss, C.call);
   dropShield(s);
   dropAura(s.boss, A.fury);
+  dropAura(s.boss, FINAL_AURAS.unbound);
   ph.fury = 0;
   for (const v of Object.keys(st.overload) as SmithHeartVein[]) {
     st.overload[v] = 0;

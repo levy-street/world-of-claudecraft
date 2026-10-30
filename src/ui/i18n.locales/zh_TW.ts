@@ -24490,6 +24490,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.warn.crackBreath': "吐息區域正在開裂！在它墜落前離開！",
   'hudChrome.finalBoss.warn.crackHammer': "重錘區域正在開裂！在它墜落前離開！",
   'hudChrome.finalBoss.warn.ringCrack': "只剩中央圓環，而它也在開裂！立刻擊殺它！",
+  'hudChrome.finalOverload.titleUnmade': "崩解的鐵砧",
   'hudChrome.finalOverload.kneeling': "它跪下了",
   'hudChrome.finalOverload.rising': "心臟搏動",
   'hudChrome.finalOverload.fallsIn': "{quarter}將在 {seconds} 後墜落",

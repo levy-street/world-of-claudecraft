@@ -191,7 +191,9 @@ export function buildOverloadView(boss: OverloadBoss | null, out: OverloadView):
       : '';
   phaseLines(boss, stage, phase, out);
   out.title = out.barsOff
-    ? t('hudChrome.finalOverload.titleFinal')
+    ? stage === 'final' || stage === 'kneel'
+      ? t('hudChrome.finalOverload.titleFinal')
+      : t('hudChrome.finalOverload.titleUnmade')
     : out.frozen
       ? t('hudChrome.finalOverload.titleCall')
       : t('hudChrome.finalOverload.title');

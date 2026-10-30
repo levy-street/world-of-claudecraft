@@ -7514,6 +7514,7 @@ export const zh_CN: EnTranslations = {
       "groupAria": "无主之力：过载条",
       "titleCall": "四角召唤",
       "titleFinal": "四角皆醒",
+      "titleUnmade": "崩解的铁砧",
       "call": "护盾 {seconds}",
       "splinters": "碎片 {count}",
       "striding": "正走向中央",

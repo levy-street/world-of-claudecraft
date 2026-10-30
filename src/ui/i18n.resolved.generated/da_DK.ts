@@ -7514,6 +7514,7 @@ export const da_DK: EnTranslations = {
       "groupAria": "The Masterless Strength: Overload bars",
       "titleCall": "Call of the Quarters",
       "titleFinal": "All quarters awake",
+      "titleUnmade": "The Unmade Anvil",
       "call": "Shield {seconds}",
       "splinters": "Splinters {count}",
       "striding": "Striding to the centre",

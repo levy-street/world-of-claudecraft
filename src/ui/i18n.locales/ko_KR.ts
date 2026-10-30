@@ -25829,6 +25829,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.warn.crackBreath': "숨결의 구역에 금이 간다! 무너지기 전에 벗어나라!",
   'hudChrome.finalBoss.warn.crackHammer': "망치의 구역에 금이 간다! 무너지기 전에 벗어나라!",
   'hudChrome.finalBoss.warn.ringCrack': "중앙 고리만 남았고, 그마저 갈라지고 있다! 지금 처치하라!",
+  'hudChrome.finalOverload.titleUnmade': "무너지는 모루",
   'hudChrome.finalOverload.kneeling': "무릎을 꿇었다",
   'hudChrome.finalOverload.rising': "심장이 고동친다",
   'hudChrome.finalOverload.fallsIn': "{quarter} 붕괴까지 {seconds}",
