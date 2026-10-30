@@ -22,6 +22,8 @@
 //     the Thunder's Cradle (objects, their radius in `scale`), the lifted
 //     player (carried in the air: carried_body.ts), the marked conductor
 //     (an aura), the pinned (an aura);
+//   - mythic's Knotted Gale: the balls and portals (objects, the fuse in the
+//     ball's template), the marked and the carrier (auras);
 //   - the guardian's bars (cast ids below) and its storm body and the
 //     storm's swell (auras on it), the moments as `spellfx` cues.
 
@@ -70,6 +72,12 @@ export const BREATH_AURAS = {
   stormForm: 'heart_breath_storm_unbound',
   /** On the guardian: one stack per pulse of the swelling storm. */
   swell: 'heart_breath_swelling_storm',
+  /** Mythic, the Knotted Gale: the player whose feet open Portal A or B. */
+  portalA: 'heart_breath_portal_a',
+  portalB: 'heart_breath_portal_b',
+  /** Mythic: carrying a Knotted Gale (value: the walk's factor; its life is
+   *  the fuse). No wind, pull, blast or throw moves this body either. */
+  laden: 'heart_breath_laden',
 } as const;
 
 /** The fight's object templates (their radius rides `scale`). */
@@ -89,6 +97,12 @@ export const BREATH_OBJECTS = {
   /** The Thunder's Cradle's gather circle under the lifted player
    *  (`<prefix><tenths>` of hold); it also carries them. */
   cradlePrefix: 'sh_breath_cradle_',
+  /** Mythic: a Knotted Gale, `<prefix><free|held>_<tenths of fuse left>`
+   *  (knotTemplate), its radius (the pick-up's) in `scale`. */
+  knotPrefix: 'sh_breath_knot_',
+  /** Mythic: the two wind portals, their radius in `scale`. */
+  portalA: 'sh_breath_portal_a',
+  portalB: 'sh_breath_portal_b',
 } as const;
 
 /** The spellfx ability ids of the fight's moments. */
@@ -115,6 +129,19 @@ export const BREATH_CUES = {
   /** A player goes over the lip of a gap (spellfxAt 'burst' where they
    *  left the floor). */
   fall: 'heart_breath_fall',
+  /** A Knotted Gale drops (spellfxAt 'burst', radius = its pick-up). */
+  knotLand: 'heart_breath_knot_land',
+  /** A portal opens (spellfxAt 'burst', radius = the portal). */
+  portalOpen: 'heart_breath_portal_open',
+  /** A player takes a Knotted Gale up (spellfxAt 'burst'). */
+  knotTake: 'heart_breath_knot_take',
+  /** The carrier crosses from Portal A to Portal B (spellfx 'nova' on them,
+   *  after the move: the landing). */
+  portalHop: 'heart_breath_portal_hop',
+  /** A Knotted Gale goes into the void (spellfxAt 'burst' at the lip). */
+  knotThrow: 'heart_breath_knot_throw',
+  /** A Knotted Gale bursts (spellfxAt 'nova', radius = the Cornice). */
+  knotBurst: 'heart_breath_knot_burst',
 } as const;
 
 /** The damage and aura names (combat log, floating text, the buff bar;
@@ -138,7 +165,18 @@ export const BREATH_NAMES = {
   stormForm: 'Storm Unbound',
   swell: 'Swelling Storm',
   calm: 'Circle of Calm',
+  knot: 'Knotted Gale',
+  laden: 'Gale-Laden',
+  portalA: 'Portal A',
+  portalB: 'Portal B',
 } as const;
+
+/** The English line the carrier reads crossing the portals (re-localized by
+ *  src/ui/sim_i18n.ts, EXACT matcher). */
+export const KNOT_HOP_TEXT = 'The portal tears you across the Cornice, gale and all.';
+/** The error a throw away from any gap reads (same matcher). */
+export const KNOT_NOT_AT_LIP_ERROR =
+  'You must stand at the lip of a gap to throw the Knotted Gale.';
 
 // ---- difficulty -----------------------------------------------------------------------
 
@@ -165,6 +203,8 @@ export interface BreathDifficultyRules {
   stormGusts: boolean;
   /** The Thunder's Cradle wants at least this many under it. */
   cradleSoakers: number;
+  /** The Knotted Gale (breath_heart.ts): its balls, portals and carriers. */
+  stormHeart: boolean;
 }
 
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
@@ -176,6 +216,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     looseGales: false,
     stormGusts: false,
     cradleSoakers: 4,
+    stormHeart: false,
   },
   heroic: {
     windSpeed: 4.4,
@@ -185,9 +226,9 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     looseGales: true,
     stormGusts: true,
     cradleSoakers: 5,
+    stormHeart: false,
   },
-  // Exactly heroic for now (the circle rule included): the seam for one
-  // later mythic-only mechanic.
+  // Heroic whole (the circle rule included), plus the Knotted Gale.
   mythic: {
     windSpeed: 4.4,
     gustThrow: 22,
@@ -196,6 +237,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     looseGales: true,
     stormGusts: true,
     cradleSoakers: 5,
+    stormHeart: true,
   },
 };
 
@@ -322,6 +364,33 @@ export const BREATH_TUNING = {
   barGap: 1.2,
   /** How far below the Cornice a fallen body is dead for sure (yards). */
   voidDepth: 25,
+  // Mythic: the Knotted Gale (breath_heart.ts).
+  /** A ball's fuse, and how long the marks run before their portals open. */
+  heartFuse: 20,
+  heartMark: 5,
+  /** Phase 1: the first ball, the rest, at most this many; a start waits out
+   *  the indrawn breath and any time too short for a whole fuse before it. */
+  heartFirst: 12,
+  heartEvery: 45,
+  heartWindRuns: 3,
+  /** Phase 2 (two balls): seconds after the barrage, then this often. */
+  heartStormFirst: 15,
+  heartStormEvery: 60,
+  /** The carrier's walk. NOT Jose's "about half": at half speed the walk from
+   *  the farthest floor to a gap takes 9 s of a 20 s fuse and nobody needs a
+   *  portal (the Cornice is too small; tests/smith_heart_breath_heart.test.ts
+   *  pins the walk's length). A quarter makes a badly placed portal the burst
+   *  the design asks for. */
+  heartWalkMult: 0.25,
+  /** How near a ball a player takes it up, and a portal's mouth (yards). */
+  heartPickR: 2.5,
+  heartPortalR: 2.5,
+  /** How far from a gap's reach the lip still counts for the throw (yards). */
+  heartLipReach: 4,
+  /** A ball drops at least this far from every gap, and the second this far
+   *  from the first, both relaxed step by step if the floor cannot give it. */
+  heartFar: 26,
+  heartApart: 18,
 } as const;
 
 // ---- pure helpers ---------------------------------------------------------------------
@@ -467,6 +536,20 @@ export function calmOf(templateId: string): { state: BreathCalmState; seconds: n
   if (state !== 'land' && state !== 'hold' && state !== 'spent') return null;
   const t = Number(tenths);
   return Number.isInteger(t) && t >= 0 ? { state, seconds: t / 10 } : null;
+}
+
+/** A Knotted Gale's template: on the floor or carried, and its fuse left. */
+export function knotTemplate(state: 'free' | 'held', fuse: number): string {
+  return `${BREATH_OBJECTS.knotPrefix}${state}_${tenthsOf(fuse)}`;
+}
+
+/** A Knotted Gale template's state and fuse, or null. */
+export function knotOf(templateId: string): { state: 'free' | 'held'; fuse: number } | null {
+  if (!templateId.startsWith(BREATH_OBJECTS.knotPrefix)) return null;
+  const [state, tenths] = templateId.slice(BREATH_OBJECTS.knotPrefix.length).split('_');
+  if (state !== 'free' && state !== 'held') return null;
+  const t = Number(tenths);
+  return Number.isInteger(t) && t >= 0 ? { state, fuse: t / 10 } : null;
 }
 
 /** A timed spot's template (a strike's warning, charged ground's life, the

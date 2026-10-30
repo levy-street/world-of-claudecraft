@@ -18619,6 +18619,7 @@
   #heart-council-alert,
   #heart-quench-alert,
   #heart-final-alert,
+  #heart-knot-alert,
   #temple-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
@@ -18632,6 +18633,7 @@
   body.show-actionbar3 #heart-council-alert,
   body.show-actionbar3 #heart-quench-alert,
   body.show-actionbar3 #heart-final-alert,
+  body.show-actionbar3 #heart-knot-alert,
   body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
@@ -18645,6 +18647,7 @@
   body.mobile-touch #heart-council-alert,
   body.mobile-touch #heart-quench-alert,
   body.mobile-touch #heart-final-alert,
+  body.mobile-touch #heart-knot-alert,
   body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
@@ -19236,6 +19239,41 @@
      cold in the frost tone, freezing and the freeze in the hostile tone, the
      Ember Mark in the fire tone, Drawn Lightning in the storm's violet,
      Crushed in the Hammer's gold. */
+  /* The Knotted Gale (Mythic, knot_alert_view.ts): Portal A in the storm's teal,
+     Portal B in its violet (the floor's colours), the load in gold, the lip in
+     the hostile tone. The panel is the throw's button while the player carries. */
+  #heart-knot-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+  }
+  #heart-knot-alert.is-pressable {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  #heart-knot-alert.is-portalB {
+    border-color: var(--color-debuff-shadow);
+  }
+  #heart-knot-alert.is-carry {
+    border-color: var(--color-gold-300);
+  }
+  #heart-knot-alert.is-lip {
+    border-color: var(--color-debuff-fire);
+  }
   #heart-final-alert {
     position: absolute;
     left: 50%;

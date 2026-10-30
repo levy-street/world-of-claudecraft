@@ -4751,6 +4751,9 @@ export const ko_KR: EnTranslations = {
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
+        "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
+        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 가장자리 벽에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 벽이 무너진 곳에서는 막아 줄 것이 없어 공허로 떨어집니다.",
         "draw": "수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 이에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 풀무 돌풍이 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 {throw}야드 바깥으로 날려 보냅니다.",
         "pinned": "바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해.",
@@ -7338,6 +7341,20 @@ export const ko_KR: EnTranslations = {
         "timeAria": "{seconds}초 남음"
       }
     },
+    "knotAlert": {
+      "aTitle": "You are Portal A!",
+      "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
+      "bTitle": "You are Portal B!",
+      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "carryTitle": "You carry the Knotted Gale!",
+      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "lipTitle": "Throw it now!",
+      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
+      "throwKey": "Press {key} at the lip to throw",
+      "throwTap": "Tap here at the lip to throw",
+      "throwClick": "Click here at the lip to throw",
+      "throwAria": "Throw the Knotted Gale into the void"
+    },
     "breathGuardian": {
       "warn": {
         "inhale": "수호자가 숨을 들이쉽니다! 입 앞의 소용돌이에 들어가지 마세요!",
@@ -7349,7 +7366,14 @@ export const ko_KR: EnTranslations = {
         "fork": "{player} 님에게 튀어 오르는 번개! 산개하세요!",
         "cradle": "{player} 님이 폭풍 속으로 들어 올려졌습니다! 그 아래로 모이세요!",
         "drawn": "{player} 님에게 끌려오는 번개! 낙뢰를 가장자리로 유도하세요!",
-        "stormGust": "폭풍 돌풍이 모입니다! 바람에 대비하세요!"
+        "stormGust": "폭풍 돌풍이 모입니다! 바람에 대비하세요!",
+        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotTaken": "{player} takes up the Knotted Gale!",
+        "knotDropped": "{player} falls! The Knotted Gale is free again!",
+        "knotFell": "{player} takes the Knotted Gale into the void!",
+        "knotThrown": "{player} hurls the Knotted Gale into the void!",
+        "knotBurst": "The Knotted Gale bursts!"
       },
       "say": {
         "guardian_pull": "산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.",

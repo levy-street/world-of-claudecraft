@@ -49,7 +49,6 @@ import {
   BREATH_TUNING as T,
 } from './breath_ids';
 import {
-  anchored,
   auraOf,
   type BreathScope,
   beginBar,
@@ -57,6 +56,7 @@ import {
   dropAura,
   dropBreathObject,
   guardianFree,
+  heldFast,
   livePlayers,
   local,
   moveBreathObject,
@@ -204,7 +204,7 @@ function syncWindAuras(s: BreathScope): void {
       dropWindFrom(p, s.boss.id);
       continue;
     }
-    const held = anchored(p) || p.carriedBy !== undefined;
+    const held = heldFast(p) || p.carriedBy !== undefined;
     if (held || !blowing) dropAura(p, WIND_DRIFT_AURA);
     if (held || !pulling) dropAura(p, WIND_PULL_AURA);
     if (held) continue;
@@ -241,7 +241,7 @@ function stepPinned(s: BreathScope): void {
   const heading = (st.wind.bearing * Math.PI) / 180;
   const still = new Set<number>();
   for (const p of livePlayers(s)) {
-    if (!blowing || anchored(p)) continue;
+    if (!blowing || heldFast(p)) continue;
     const at = local(s.ctx, s.inst, p);
     if (!pinnedAgainstRim(at.x, at.z, heading)) continue;
     still.add(p.id);

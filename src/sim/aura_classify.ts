@@ -95,6 +95,9 @@ const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
   'heart_breath_pinned',
   'heart_breath_drawn_lightning',
   'heart_breath_calm_spent',
+  'heart_breath_portal_a',
+  'heart_breath_portal_b',
+  'heart_breath_laden',
   // The Guardian of the Quench's cold bar (encounters/smith_heart/quench_ids.ts):
   // the hazard every player watches, so it sits on the debuff bar.
   'heart_quench_cold',

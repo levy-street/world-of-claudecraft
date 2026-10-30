@@ -76,6 +76,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       council: true,
       quench: false,
       final: false,
+      knot: false,
       temple: true,
       kitUse: false,
     });
@@ -115,6 +116,7 @@ describe('dungeon prompt policy: the shared slot', () => {
     council: false,
     quench: false,
     final: false,
+    knot: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,

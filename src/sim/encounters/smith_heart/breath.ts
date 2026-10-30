@@ -51,6 +51,7 @@ import {
   windObject,
 } from './breath_gale';
 import { breathHash } from './breath_geometry';
+import { clearHeart, heartDevTrigger, stepHeart } from './breath_heart';
 import {
   BLOW_BEARINGS,
   BREATH_AURAS,
@@ -157,6 +158,9 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     gustTimer: T.gustFirst,
     cradle: null,
     drawn: null,
+    heart: null,
+    heartTimer: T.heartFirst,
+    heartRuns: 0,
     casts: 0,
     said: {},
   };
@@ -249,6 +253,7 @@ function clearFight(
     clearCalm(ctx, inst, st);
     clearGales(ctx, inst, st);
     clearStorm(ctx, inst, st);
+    clearHeart(ctx, inst, st);
     dropBreathObject(ctx, inst, st.vortex?.objectId ?? null);
     st.vortex = null;
     st.pinned = {};
@@ -341,6 +346,7 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepWind(s);
   stepThessaly(s);
   stepStorm(s);
+  stepHeart(s);
   stepOverLip(s);
   startWindBars(s);
   startStormBars(s);
@@ -379,7 +385,12 @@ function cutBar(s: BreathScope): void {
 }
 
 /** `/dev heart breath <what>`: the reply line, or null for an unknown verb. */
-export function breathDevTrigger(ctx: SimContext, inst: InstanceSlot, what: string): string | null {
+export function breathDevTrigger(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  what: string,
+  pid?: number,
+): string | null {
   const [verb, arg] = what.trim().split(/\s+/);
   if (verb === 'reset') {
     const boss = breathGuardian(ctx, inst);
@@ -410,6 +421,16 @@ export function breathDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
   const s = breathScopeForDev(ctx, inst);
   if (!s) return 'This run holds no living Guardian of the Breath.';
   const st = s.st;
+  if (verb === 'heart' || verb === 'portal' || verb === 'carry' || verb === 'burst') {
+    // The Knotted Gale is mythic's alone: the try-out switches the run over.
+    if (st.difficulty !== 'mythic') {
+      setBreathDevTier(inst, 'mythic', true);
+      st.difficulty = 'mythic';
+      s.rules = BREATH_DIFFICULTY.mythic;
+    }
+    const words = what.trim().split(/\s+/);
+    return heartDevTrigger(s, verb === 'heart' ? words.slice(1) : words, pid);
+  }
   if (verb === 'phase2' || verb === 'p2' || verb === 'storm') {
     if (st.half !== 'wind') return 'The storm has already broken.';
     s.boss.hp = Math.min(s.boss.hp, Math.floor(s.boss.maxHp * T.stormAt));

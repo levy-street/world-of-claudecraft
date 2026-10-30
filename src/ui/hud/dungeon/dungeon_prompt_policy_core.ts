@@ -38,6 +38,7 @@ export type DungeonPromptId =
   | 'council'
   | 'quench'
   | 'final'
+  | 'knot'
   | 'temple'
   | 'kitUse';
 
@@ -53,6 +54,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   council: true,
   quench: false,
   final: false,
+  knot: false,
   temple: true,
   kitUse: false,
 };
@@ -78,6 +80,7 @@ export interface DungeonPromptSlotState {
   quench: boolean;
   /** The Smith's Heart's Masterless Strength alert (its cold, its marks). */
   final: boolean;
+  knot: boolean;
   temple: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
   cryptSoft: boolean;
@@ -99,6 +102,7 @@ export function usePromptYields(s: DungeonPromptSlotState): boolean {
     s.temple ||
     s.council ||
     s.quench ||
-    s.final
+    s.final ||
+    s.knot
   );
 }

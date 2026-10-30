@@ -28,6 +28,7 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `breath_void.ts` | The void and the tether: a body over a gap's lip said once (`stepOverLip`), every body come down in the void dead in the fight or out of it whatever shields it (`stepVoidDeaths`: the fall's hit, then a death of its own for an immunity; a real game master set back on the floor instead), its body laid back on the floor by its gap (`voidCorpseSpot`), and the guardian held to its Cornice (`tetherGuardian`: a target off the floor and its climb leaves the threat table, a step off the floor is undone to `floorSpot`). |
 | `breath_thessaly.ts` | Captain Thessaly's circle of calm (land, hold, spent; three seats, the anchor, heroic's Calm Spent); nothing once the storm has broken. |
 | `breath_storm.ts` | The storm breaking and its barrage, the strikes and charged ground, the Leaping Bolt, the Thunder's Cradle (carried, `carried_body.ts`), Drawn Lightning, the swelling storm. |
+| `breath_heart.ts` | Mythic's Knotted Gale (working name the Storm Heart, hence the ids): the balls and their fuse, the two portals opened at their marked players' feet, the carrier's load (`heldFast`, the crawl in `player_motion.ts`), the one-way crossing, the throw (`tryThrowKnot`: the interact press), the burst, the `heart` dev verbs. |
 | `breath_voice.ts` | What the guardian and Thessaly SAY (`hudChrome.breathGuardian.say.*`, `BREATH_LINES` the same English). |
 | `breath.ts` | The coordinator: the pull, the bar, the halves, the wipe's reset, the fall, the dev tier switch (`setBreathDevTier`) and the `/dev heart breath` triggers and readout. |
 | `fight_kit.ts` | The guardians' shared plumbing (the Breath's and the Quench's): the living test, the claim-local position, the fight's objects (spawn, drop, move), the quiet markers, the aura lookups; `breath_scope.ts` re-exports it. |
@@ -100,7 +101,7 @@ Rules:
   the online mirror), `tests/smith_heart_council_voice.test.ts` (the lines and the mythic
   player text); the Breath: `tests/smith_heart_breath.test.ts` (on
   `tests/helpers/breath_fight.ts`), `tests/smith_heart_breath_ui.test.ts`,
-  `tests/smith_heart_breath_wire.test.ts`, `tests/smith_heart_breath_void.test.ts`, `tests/wind_drift.test.ts`,
+  `tests/smith_heart_breath_wire.test.ts`, `tests/smith_heart_breath_void.test.ts`, `tests/smith_heart_breath_heart.test.ts`, `tests/wind_drift.test.ts`,
   `tests/wind_drift_online.test.ts`; the Quench: `tests/smith_heart_quench.test.ts` (on
   `tests/helpers/quench_fight.ts`), `tests/smith_heart_quench_ui.test.ts`,
   `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`; the Heat:

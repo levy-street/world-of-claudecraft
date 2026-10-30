@@ -5944,6 +5944,12 @@ export const hudChromeStrings = {
     },
     // The Smith's Heart's Guardian of the Breath (src/ui/breath_aura_effect.ts).
     breathGuardian: {
+      portalA:
+        'When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.',
+      portalB:
+        'When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.',
+      laden:
+        'You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.',
       wind: "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
       draw: 'The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.',
       pinned:
@@ -10306,6 +10312,20 @@ export const hudChromeStrings = {
   // The Smith's Heart's Guardian of the Breath (encounters/smith_heart/
   // breath*.ts): the raid warnings of its fight and what the guardian and
   // Captain Thessaly SAY (breath_voice.ts BREATH_LINES, the same English).
+  knotAlert: {
+    aTitle: 'You are Portal A!',
+    aLine: 'It opens at your feet in {seconds} sec. Stand near the Knotted Gale.',
+    bTitle: 'You are Portal B!',
+    bLine: 'It opens at your feet in {seconds} sec. Stand at the lip of a gap.',
+    carryTitle: 'You carry the Knotted Gale!',
+    carryLine: 'Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.',
+    lipTitle: 'Throw it now!',
+    lipLine: 'You stand at the lip of a gap. It bursts in {seconds} sec.',
+    throwKey: 'Press {key} at the lip to throw',
+    throwTap: 'Tap here at the lip to throw',
+    throwClick: 'Click here at the lip to throw',
+    throwAria: 'Throw the Knotted Gale into the void',
+  },
   breathGuardian: {
     warn: {
       inhale: 'The Guardian draws breath! Keep out of the vortex before its mouth!',
@@ -10318,6 +10338,13 @@ export const hudChromeStrings = {
       cradle: '{player} is lifted into the storm! Gather beneath them!',
       drawn: 'Drawn Lightning on {player}! Lead the strikes to the edge!',
       stormGust: 'A storm gust gathers! Brace against the wind!',
+      knot: 'A Knotted Gale falls! Carry it through the portals and throw it into the void!',
+      knotPortals: 'Portal A on {a}, Portal B on {b}!',
+      knotTaken: '{player} takes up the Knotted Gale!',
+      knotDropped: '{player} falls! The Knotted Gale is free again!',
+      knotFell: '{player} takes the Knotted Gale into the void!',
+      knotThrown: '{player} hurls the Knotted Gale into the void!',
+      knotBurst: 'The Knotted Gale bursts!',
     },
     say: {
       guardian_pull:

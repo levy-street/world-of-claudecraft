@@ -4751,6 +4751,9 @@ export const zh_CN: EnTranslations = {
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
+        "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
+        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "气息守护者的风以每秒{speed}码的速度将你带往它吹去的方向。逆风而行便能站稳，它不会打断你的施法。被压在边缘的墙上时，你每秒受到{pinMin}到{pinMax}点伤害。墙壁破损处没有任何阻挡：你会坠入虚空。",
         "draw": "守护者吸气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后风箱狂风对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们向外击飞{throw}码。",
         "pinned": "被风压在边缘的墙上：在风停歇或你离开墙边之前，每秒受到{min}到{max}点伤害。",
@@ -7338,6 +7341,20 @@ export const zh_CN: EnTranslations = {
         "timeAria": "剩余{seconds}秒"
       }
     },
+    "knotAlert": {
+      "aTitle": "You are Portal A!",
+      "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
+      "bTitle": "You are Portal B!",
+      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "carryTitle": "You carry the Knotted Gale!",
+      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "lipTitle": "Throw it now!",
+      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
+      "throwKey": "Press {key} at the lip to throw",
+      "throwTap": "Tap here at the lip to throw",
+      "throwClick": "Click here at the lip to throw",
+      "throwAria": "Throw the Knotted Gale into the void"
+    },
     "breathGuardian": {
       "warn": {
         "inhale": "守护者正在吸气！别站在它嘴前的漩涡里！",
@@ -7349,7 +7366,14 @@ export const zh_CN: EnTranslations = {
         "fork": "跳跃雷击落在{player}身上！散开！",
         "cradle": "{player}被举入了风暴！到他的下方集合！",
         "drawn": "引雷落在{player}身上！把落雷引向边缘！",
-        "stormGust": "风暴阵风正在聚集！顶住风！"
+        "stormGust": "风暴阵风正在聚集！顶住风！",
+        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotTaken": "{player} takes up the Knotted Gale!",
+        "knotDropped": "{player} falls! The Knotted Gale is free again!",
+        "knotFell": "{player} takes the Knotted Gale into the void!",
+        "knotThrown": "{player} hurls the Knotted Gale into the void!",
+        "knotBurst": "The Knotted Gale bursts!"
       },
       "say": {
         "guardian_pull": "你们爬上山巅，是来偷走它的气息吗？那就与我一同呼吸吧。",

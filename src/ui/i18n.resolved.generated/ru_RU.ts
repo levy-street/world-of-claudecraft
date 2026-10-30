@@ -4751,6 +4751,9 @@ export const ru_RU: EnTranslations = {
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
+        "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
+        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "Ветер Стража Дыхания несёт вас туда, куда дует, со скоростью {speed} ярда в секунду. Идите против него, чтобы устоять: он не прерывает заклинания. Прижатые к стене края, вы получаете от {pinMin} до {pinMax} урона каждую секунду. Там, где стена разрушена, ничто вас не удержит: вы падаете в пустоту.",
         "draw": "Страж делает вдох и тянет вас к себе со скоростью {speed} ярда в секунду. Его вихрь наносит от {min} до {max} урона каждые {tick} сек. всем, кто стоит перед его пастью. Затем Порыв мехов наносит от {gustMin} до {gustMax} урона всем на Карнизе и отбрасывает их на {throw} ярдов наружу.",
         "pinned": "Ветер прижал вас к стене края: от {min} до {max} урона каждую секунду, пока ветер не стихнет или вы не отойдёте от стены.",
@@ -7338,6 +7341,20 @@ export const ru_RU: EnTranslations = {
         "timeAria": "Осталось {seconds} с"
       }
     },
+    "knotAlert": {
+      "aTitle": "You are Portal A!",
+      "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
+      "bTitle": "You are Portal B!",
+      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "carryTitle": "You carry the Knotted Gale!",
+      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "lipTitle": "Throw it now!",
+      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
+      "throwKey": "Press {key} at the lip to throw",
+      "throwTap": "Tap here at the lip to throw",
+      "throwClick": "Click here at the lip to throw",
+      "throwAria": "Throw the Knotted Gale into the void"
+    },
     "breathGuardian": {
       "warn": {
         "inhale": "Страж делает вдох! Не стойте в вихре перед его пастью!",
@@ -7349,7 +7366,14 @@ export const ru_RU: EnTranslations = {
         "fork": "Скачущая молния на {player}! Рассредоточьтесь!",
         "cradle": "{player} поднят в бурю! Соберитесь под ним!",
         "drawn": "Притянутая молния на {player}! Уводите удары к краю!",
-        "stormGust": "Собирается штормовой порыв! Держитесь против ветра!"
+        "stormGust": "Собирается штормовой порыв! Держитесь против ветра!",
+        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotTaken": "{player} takes up the Knotted Gale!",
+        "knotDropped": "{player} falls! The Knotted Gale is free again!",
+        "knotFell": "{player} takes the Knotted Gale into the void!",
+        "knotThrown": "{player} hurls the Knotted Gale into the void!",
+        "knotBurst": "The Knotted Gale bursts!"
       },
       "say": {
         "guardian_pull": "Вы взобрались на вершину горы, чтобы украсть её дыхание? Тогда дышите вместе со мной.",

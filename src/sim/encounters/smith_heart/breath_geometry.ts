@@ -133,6 +133,64 @@ export function circleClear(x: number, z: number, r: number): boolean {
   return true;
 }
 
+/** How far (x, z) lies from the nearest gap's reach (yards; 0 inside one). */
+export function gapDistance(x: number, z: number): number {
+  let d = Number.POSITIVE_INFINITY;
+  for (const g of CORNICE_GAPS) d = Math.min(d, Math.hypot(x - g.x, z - g.z) - g.r);
+  return Math.max(0, d);
+}
+
+/** Is (x, z) on the floor at the lip of a gap (the Knotted Gale's throw)? */
+export function atGapLip(x: number, z: number): boolean {
+  return inBreathArena(x, z) && gapDistance(x, z) <= T.heartLipReach;
+}
+
+/** The Cornice's floor on a coarse grid, each spot's distance from the gaps
+ *  (built once: a fixed list of the layout's, in a fixed order). */
+let floorGrid: { x: number; z: number; far: number }[] | null = null;
+export function knotGrid(): readonly { x: number; z: number; far: number }[] {
+  if (floorGrid) return floorGrid;
+  const out: { x: number; z: number; far: number }[] = [];
+  for (let x = C.x - C.rx - 20; x <= C.x + C.rx + 20; x += 2)
+    for (let z = C.z - C.rz - 4; z <= C.z + C.rz + 4; z += 2)
+      if (circleClear(x, z, T.heartPickR)) out.push({ x, z, far: gapDistance(x, z) });
+  floorGrid = out;
+  return out;
+}
+
+/** Where a Knotted Gale drops: hashed over the floor farthest from the gaps
+ *  (`T.heartFar` from all of them) and `T.heartApart` from `other`; each bar
+ *  drops a little at a time if the floor cannot meet it. */
+export function knotSpot(
+  salt: number,
+  other: { x: number; z: number } | null = null,
+): { x: number; z: number } {
+  const grid = knotGrid();
+  for (let relax = 0; relax <= 30; relax += 2) {
+    const far = T.heartFar - relax;
+    const apart = T.heartApart - relax / 2;
+    const fits = grid.filter(
+      (g) => g.far >= far && (other === null || Math.hypot(g.x - other.x, g.z - other.z) >= apart),
+    );
+    if (fits.length > 0) return fits[breathHash(salt, 41) % fits.length];
+  }
+  return { x: C.x, z: C.z };
+}
+
+/** The lip nearest (x, z): the floor just inside a gap's reach. */
+export function nearestLipSpot(x: number, z: number): { x: number; z: number } {
+  let best: (typeof CORNICE_GAPS)[number] = CORNICE_GAPS[0];
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const g of CORNICE_GAPS) {
+    const d = Math.hypot(x - g.x, z - g.z);
+    if (d < bestD) {
+      best = g;
+      bestD = d;
+    }
+  }
+  return voidCorpseSpot(best.x, best.z);
+}
+
 /** Loose gale `k`'s place `t` seconds into its run (heroic): a slow, wide,
  *  deterministic wander over the Cornice (an ellipse on two incommensurate
  *  beats), never out to the rim. */

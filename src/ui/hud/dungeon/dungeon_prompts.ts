@@ -78,6 +78,7 @@ import {
   type KitUseBody,
   KitUseSceneScan,
 } from './kit_use_prompt_view';
+import { buildKnotAlertView, KNOT_ALERT_KINDS } from './knot_alert_view';
 import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
@@ -155,6 +156,7 @@ export class DungeonPrompts {
   private readonly council: EncounterAlert;
   private readonly quench: EncounterAlert;
   private readonly final: EncounterAlert;
+  private readonly knot: EncounterAlert;
   private readonly overload: HeartOverloadPanel;
   private readonly overloadView = makeOverloadView();
   private readonly finalScan = new HeartFinalScan();
@@ -180,6 +182,7 @@ export class DungeonPrompts {
     council: false,
     quench: false,
     final: false,
+    knot: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -222,6 +225,11 @@ export class DungeonPrompts {
       id: 'heart-final-alert',
       className: 'ui-panel-strong encounter-alert heart-final-alert',
       kinds: FINAL_ALERT_KINDS,
+    });
+    this.knot = new EncounterAlert(deps, {
+      id: 'heart-knot-alert',
+      className: 'ui-panel-strong encounter-alert heart-knot-alert',
+      kinds: KNOT_ALERT_KINDS,
     });
     this.overload = new HeartOverloadPanel(deps);
     this.temple = new EncounterAlert(deps, {
@@ -324,6 +332,17 @@ export class DungeonPrompts {
       ? buildFinalAlertView({ auras: p.auras, dead: p.dead })
       : HINT_HIDDEN;
     this.final.paint(final);
+    // The Knotted Gale's part in the fight (the panel is the throw's button).
+    const knot = dungeonPromptEnabled('knot', hints)
+      ? buildKnotAlertView({
+          auras: p.auras,
+          pos: p.pos,
+          dead: p.dead,
+          interactKey: f.interactKey,
+          touch: f.touch,
+        })
+      : HINT_HIDDEN;
+    this.knot.paint(knot);
     this.overload.paint(buildOverloadView(this.finalScan.frame(f.world), this.overloadView));
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
@@ -345,6 +364,7 @@ export class DungeonPrompts {
     slot.council = council.visible;
     slot.quench = quench.visible;
     slot.final = final.visible;
+    slot.knot = knot.visible;
     slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
     slot.wildheartSoft = wildheartSoft;
@@ -376,6 +396,7 @@ export class DungeonPrompts {
     this.council.dispose();
     this.quench.dispose();
     this.final.dispose();
+    this.knot.dispose();
     this.overload.dispose();
     this.temple.dispose();
     this.kitUse.dispose();

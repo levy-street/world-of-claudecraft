@@ -29,6 +29,7 @@ import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { authoredMapActive } from './data';
 import { deckCeilingAt } from './deck_ceiling';
+import { BREATH_AURAS } from './encounters/smith_heart/breath_ids';
 import { guardAndReportPose } from './finite_pose_guard';
 import { stepLadder } from './ladders';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
@@ -296,6 +297,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
       cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
     }
+    // A Knotted Gale's weight (the Guardian of the Breath, Mythic): a load, not
+    // a snare, so slow immunity never lifts it (like the delivery cargo above).
+    if (a.id === BREATH_AURAS.laden) cargo = Math.min(cargo, a.value);
     // Groveheart's Sporemender Form walks 20% slower. A form penalty, not a
     // snare: slow immunity never lifts it, and it scales the final speed so a
     // Loping Stride burst or a slow still applies on top of the slower pace.

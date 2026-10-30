@@ -10,6 +10,7 @@ export {
   tickBreathGuardian,
 } from './breath';
 export * from './breath_geometry';
+export { heartDevTrigger, startHeart, tryThrowKnot } from './breath_heart';
 export * from './breath_ids';
 export type { BreathFightState } from './breath_state';
 

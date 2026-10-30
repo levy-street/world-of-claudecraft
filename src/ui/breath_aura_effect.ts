@@ -50,6 +50,12 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       };
     case BREATH_AURAS.pinned:
       return { key: `${KEY}.pinned`, nums: { min: T.pinMin, max: T.pinMax } };
+    case BREATH_AURAS.portalA:
+      return { key: `${KEY}.portalA` };
+    case BREATH_AURAS.portalB:
+      return { key: `${KEY}.portalB` };
+    case BREATH_AURAS.laden:
+      return { key: `${KEY}.laden`, nums: { walk: pct(T.heartWalkMult) } };
     case BREATH_AURAS.anchor:
       return { key: `${KEY}.anchor` };
     case BREATH_AURAS.spent:

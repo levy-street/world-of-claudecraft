@@ -75,6 +75,36 @@ export interface BreathDrawn {
   next: number;
 }
 
+/** Mythic: one Knotted Gale (instance-local place; held, the carrier's). */
+export interface BreathKnot {
+  objectId: number;
+  x: number;
+  z: number;
+  fuse: number;
+  carrierId: number | null;
+}
+
+/** Mythic: one round of the Knotted Gale (breath_heart.ts). */
+export interface BreathHeart {
+  knots: BreathKnot[];
+  /** Seconds left on the portal marks (0: they have ended). */
+  mark: number;
+  /** Who wears each mark (null: none, or a dev force opened it). */
+  markA: number | null;
+  markB: number | null;
+  /** Who may not take a ball this round (the marks' players). */
+  bearers: number[];
+  portalA: { objectId: number; x: number; z: number } | null;
+  portalB: { objectId: number; x: number; z: number } | null;
+  /** The last spot on the floor of each marked player and carrier: where a
+   *  portal opens or a ball drops when its body has left the floor. */
+  floorSpots: Record<number, { x: number; z: number }>;
+  /** Carriers who crossed and have not yet left Portal A's mouth. */
+  crossed: number[];
+  /** Throw presses since the last tick (the interact command). */
+  presses: number[];
+}
+
 export interface BreathFightState {
   kind: 'breath';
   difficulty: BreathDifficulty;
@@ -118,6 +148,10 @@ export interface BreathFightState {
   gustTimer: number;
   cradle: BreathCradle | null;
   drawn: BreathDrawn | null;
+  /** Mythic: the Knotted Gale's round, its clock and the rounds so far. */
+  heart: BreathHeart | null;
+  heartTimer: number;
+  heartRuns: number;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
   /** Lines said this pull: `<speaker>_<moment>` to the fight clock. */

@@ -4751,6 +4751,9 @@ export const ja_JP: EnTranslations = {
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
+        "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
+        "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。",
         "draw": "守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、ふいごの突風が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、{throw}ヤード外へ吹き飛ばす。",
         "pinned": "風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。",
@@ -7338,6 +7341,20 @@ export const ja_JP: EnTranslations = {
         "timeAria": "残り{seconds}秒"
       }
     },
+    "knotAlert": {
+      "aTitle": "You are Portal A!",
+      "aLine": "It opens at your feet in {seconds} sec. Stand near the Knotted Gale.",
+      "bTitle": "You are Portal B!",
+      "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
+      "carryTitle": "You carry the Knotted Gale!",
+      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "lipTitle": "Throw it now!",
+      "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
+      "throwKey": "Press {key} at the lip to throw",
+      "throwTap": "Tap here at the lip to throw",
+      "throwClick": "Click here at the lip to throw",
+      "throwAria": "Throw the Knotted Gale into the void"
+    },
     "breathGuardian": {
       "warn": {
         "inhale": "守護者が息を吸い込む！口の前の渦に入るな！",
@@ -7349,7 +7366,14 @@ export const ja_JP: EnTranslations = {
         "fork": "{player}に跳ねる雷撃！散開しろ！",
         "cradle": "{player}が嵐の中へ持ち上げられた！その真下に集まれ！",
         "drawn": "{player}に招雷！落雷を縁へ導け！",
-        "stormGust": "嵐の突風が集まる！風に備えろ！"
+        "stormGust": "嵐の突風が集まる！風に備えろ！",
+        "knot": "A Knotted Gale falls! Carry it through the portals and throw it into the void!",
+        "knotPortals": "Portal A on {a}, Portal B on {b}!",
+        "knotTaken": "{player} takes up the Knotted Gale!",
+        "knotDropped": "{player} falls! The Knotted Gale is free again!",
+        "knotFell": "{player} takes the Knotted Gale into the void!",
+        "knotThrown": "{player} hurls the Knotted Gale into the void!",
+        "knotBurst": "The Knotted Gale bursts!"
       },
       "say": {
         "guardian_pull": "山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。",

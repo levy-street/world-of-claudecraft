@@ -128,7 +128,16 @@ export function pickMarks(
   busy: ReadonlySet<number> = new Set(),
 ): Entity[] {
   const salt = s.st.casts * 13 + 5;
-  return pickMarkTargets(s.boss, s.players, count, salt, busy);
+  // Mythic: nothing else marks the Knotted Gale's marked or its carriers.
+  const heart = s.st.heart;
+  const taken = heart
+    ? new Set([
+        ...busy,
+        ...heart.bearers,
+        ...heart.knots.flatMap((k) => (k.carrierId === null ? [] : [k.carrierId])),
+      ])
+    : busy;
+  return pickMarkTargets(s.boss, s.players, count, salt, taken);
 }
 
 /** Every mechanic's damage factor: the difficulty's and the body's own. */
@@ -183,6 +192,11 @@ export function anchored(e: Entity): boolean {
   return e.auras.some((a) => a.id === BREATH_AURAS.anchor);
 }
 
+/** Anchored, or weighed down by a Knotted Gale: the same no-push rule. */
+export function heldFast(e: Entity): boolean {
+  return e.auras.some((a) => a.id === BREATH_AURAS.anchor || a.id === BREATH_AURAS.laden);
+}
+
 // ---- the void-safe throw ------------------------------------------------------------------
 
 /**
@@ -199,7 +213,7 @@ export function throwPlayer(
   uz: number,
   distance: number,
 ): number {
-  if (anchored(p) || p.carriedBy !== undefined) return 0;
+  if (heldFast(p) || p.carriedBy !== undefined) return 0;
   const startY = p.pos.y;
   const moved = displaceAlong(s.ctx, p, ux, uz, distance);
   if (moved <= 0) return 0;
