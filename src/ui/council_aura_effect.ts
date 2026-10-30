@@ -67,6 +67,11 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
         key: `${KEY}.shouldered`,
         nums: { pct: pct(a.value), reach: T.shoulderReach },
       };
+    case COUNCIL_AURAS.pillarLimit:
+      return {
+        key: `${KEY}.pillarLimit`,
+        nums: { limit: a.value2 ?? 0, share: pct(T.crowdShare) },
+      };
     default:
       return null;
   }

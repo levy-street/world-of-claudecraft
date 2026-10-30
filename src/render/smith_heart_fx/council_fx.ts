@@ -87,6 +87,7 @@ import {
   WEIGHT_DROP_SECONDS,
   wakeGhost,
 } from './council_fx_core';
+import { CouncilLimitFx } from './council_limit_fx';
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
 import { CouncilShelters } from './council_shelter_fx';
 import { CouncilShoulderFx } from './council_shoulder_fx';
@@ -327,6 +328,9 @@ export class CouncilFx {
   /** The soak's countdown rim, beacon and the rock's shadow. */
   private readonly soak: CouncilSoakFx;
   private readonly shoulder: CouncilShoulderFx;
+  private readonly limitFx: CouncilLimitFx;
+  /** The players the Wrath's runes count (refilled at their pace). */
+  private readonly limitPlayers: Entity[] = [];
   /** When the Wrath's shelters were last laid (the host clock), or -1. */
   private wrathLaidAt = -1;
   /** The council's sounds (game/smith_heart_council_audio.ts), fed by this
@@ -418,6 +422,7 @@ export class CouncilFx {
     this.shelters = new CouncilShelters(host, this.pillarsFx);
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
     this.shoulder = new CouncilShoulderFx(host);
+    this.limitFx = new CouncilLimitFx(host, this.pillarsFx);
     this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
     const ringGeo = new THREE.RingGeometry(0.93, 1, 96, 1).rotateX(-Math.PI / 2);
@@ -1453,6 +1458,26 @@ export class CouncilFx {
     }
   }
 
+  /** Narrow Shelter's gems for this Wrath, when its caster wears the limit. */
+  private layLimit(world: IWorld, caster: Entity): void {
+    const limit = auraById(caster, COUNCIL_AURAS.pillarLimit)?.value2 ?? 0;
+    if (limit <= 0) {
+      this.limitFx.hide();
+      return;
+    }
+    this.limitPlayers.length = 0;
+    for (const p of world.entities.values()) {
+      if (p.kind !== 'player' || p.dead) continue;
+      if (Math.hypot(p.pos.x - caster.pos.x, p.pos.z - caster.pos.z) > T.wrathRadius) continue;
+      this.limitPlayers.push(p);
+    }
+    const players = this.limitPlayers;
+    this.limitFx.lay(caster.pos.x, caster.pos.z, limit, players.length, (i, out) => {
+      out.x = players[i].pos.x;
+      out.z = players[i].pos.z;
+    });
+  }
+
   /** Mountain's Wrath's bar on its holder: the real shadow behind every
    *  pillar that covers from it, laid as the bar begins and again as the
    *  pillars change, fading in over the bar's first moments. */
@@ -1462,6 +1487,7 @@ export class CouncilFx {
     if (!casting || !e) {
       if (this.wrathLaidAt >= 0) {
         this.shelters.hide('wrath');
+        this.limitFx.hide();
         this.wrathLaidAt = -1;
       }
       return;
@@ -1469,6 +1495,7 @@ export class CouncilFx {
     if (this.wrathLaidAt < 0 || this.clock - this.wrathLaidAt > 0.25) {
       this.wrathLaidAt = this.clock;
       this.shelters.lay('wrath', e.pos.x, e.pos.z, T.wrathRadius);
+      this.layLimit(world, e);
     }
     const fill = Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal));
     this.shelters.paint('wrath', Math.min(0.92, 0.45 + fill * 2));

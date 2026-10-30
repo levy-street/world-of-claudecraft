@@ -4746,6 +4746,7 @@ export const nl_NL: EnTranslations = {
         "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroic}% more damage.",
         "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
         "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.",
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
@@ -7276,6 +7277,7 @@ export const nl_NL: EnTranslations = {
       "warn": {
         "wrath": "Mountain's Wrath! Hide behind a pillar!",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "crowded": "Too many behind one pillar! It could not shield them all.",
         "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
         "weight": "Hammer's Weight on {player}: swap tanks!",
         "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",

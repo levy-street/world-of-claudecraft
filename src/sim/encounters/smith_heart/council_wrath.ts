@@ -20,7 +20,7 @@
 // walls. Zero rng in every pick; the draws are the damage rolls.
 
 import { DT, type Entity } from '../../types';
-import { clearCastIf, heavySwing } from '../sunken_bastion/claim';
+import { clearCastIf, dropAuraById, heavySwing } from '../sunken_bastion/claim';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -87,9 +87,31 @@ export function startWrath(s: CouncilScope): boolean {
     null,
     holder.heir,
   );
+  wearPillarLimit(s, holder.body);
   raidWarn(s, holder.body, 'wrath', "Mountain's Wrath! Hide behind a pillar!");
   if (!holder.heir) councilSay(s, holder.role, 'wrath');
   return true;
+}
+
+/** Narrow Shelter on the caster through its bar: the limit the client's runes
+ *  read, and the rule its tooltip says. */
+function wearPillarLimit(s: CouncilScope, caster: Entity): void {
+  const limit = s.rules.pillarLimit;
+  if (limit === null) return;
+  s.ctx.applyAura(caster, {
+    id: COUNCIL_AURAS.pillarLimit,
+    name: COUNCIL_NAMES.pillarLimit,
+    kind: 'vulnerability',
+    remaining: 3600,
+    duration: 3600,
+    permanent: true,
+    value: 0,
+    value2: limit,
+    stacks: 1,
+    sourceId: caster.id,
+    school: 'physical',
+    undispellable: true,
+  });
 }
 
 /** The Wrath lands: who it strikes, which pillars took it for whom. Returns
@@ -98,6 +120,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
   const { ctx, inst, st } = s;
   st.energy = 0;
   st.wraths++;
+  dropAuraById(caster, COUNCIL_AURAS.pillarLimit);
   ctx.emit({
     type: 'spellfx',
     sourceId: caster.id,
@@ -111,7 +134,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
   // stands in the sight line, so a player it alone hides is struck anyway.
   const pillars = all.some((p) => p.soul) ? all.filter((p) => !p.soul) : all;
   const souls = pillars === all ? null : all.filter((p) => p.soul);
-  const shields = new Set<number>();
+  const shields = new Map<number, Entity[]>();
   let struck = 0;
   for (const p of s.players) {
     if (p.dead) continue;
@@ -130,10 +153,42 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
       continue;
     }
     const cover = pillarBetween(pillars, caster.pos, p.pos);
-    if (cover) shields.add(cover.e.id);
+    if (cover) {
+      const behind = shields.get(cover.e.id);
+      if (behind) behind.push(p);
+      else shields.set(cover.e.id, [p]);
+    }
   }
   // Each pillar that shielded someone takes the blast for them, once.
-  for (const pl of pillars) if (shields.has(pl.e.id)) crackPillar(ctx, inst, st, pl);
+  // One too many behind it (Narrow Shelter) and each of them takes a share too.
+  const limit = s.rules.pillarLimit;
+  let crowded = false;
+  for (const pl of pillars) {
+    const behind = shields.get(pl.e.id);
+    if (!behind) continue;
+    if (limit !== null && behind.length > limit) {
+      crowded = true;
+      for (const p of behind) {
+        const amount = heir
+          ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
+          : roll(s, caster, T.wrathMin, T.wrathMax);
+        ctx.dealDamage(
+          caster,
+          p,
+          Math.round(amount * T.crowdShare),
+          false,
+          'physical',
+          COUNCIL_NAMES.wrath,
+          'hit',
+          true,
+        );
+        struck++;
+      }
+    }
+    crackPillar(ctx, inst, st, pl);
+  }
+  if (crowded)
+    raidWarn(s, caster, 'crowded', 'Too many behind one pillar! It could not shield them all.');
   // Normal: the song is owed now, so its Resonance runs out before the next.
   if (s.rules.songAfterWrath) st.songDue = T.songAfterWrath;
   if (st.wraths === T.enrageAfterWraths)
@@ -189,4 +244,5 @@ export function landWeight(s: CouncilScope, g: Entity, targetId: number | null):
 /** Clear the job's bars off a body (a reset, a death). */
 export function clearWrathBars(b: Entity): void {
   clearCastIf(b, COUNCIL_CASTS.wrath, COUNCIL_CASTS.weight);
+  dropAuraById(b, COUNCIL_AURAS.pillarLimit);
 }

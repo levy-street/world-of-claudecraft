@@ -4746,6 +4746,7 @@ export const ru_RU: EnTranslations = {
         "rockMark": "Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Мифический режим: колонна души в пределах {soulReach} м вместо этого теряет метку души и рушится, когда их не останется. Героический и мифический режимы: урон выше на {heroic}%.",
         "resonance": "Если простоять в пределах {reach} м от колонны {seconds} с подряд, от неё откалывается кусок, и снова каждые {seconds} с, пока вы рядом. Снять нельзя: переждите Гнев горы у самой повреждённой колонны и держитесь подальше от целых. Мифический режим: у колонны души то же ожидание снимает с неё метку души ({singerSeconds} с у колонны Певца Жилы), и без меток она рушится.",
         "memory": "Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота.",
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
@@ -7276,6 +7277,7 @@ export const ru_RU: EnTranslations = {
       "warn": {
         "wrath": "Гнев горы! Спрячьтесь за колонной!",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "crowded": "Too many behind one pillar! It could not shield them all.",
         "enrage": "Гнев горы нарастает! Теперь Гнев горы приходит гораздо чаще.",
         "weight": "Тяжесть Молота на {player}: смена танков!",
         "wake": "Пробуждение камня: колонны поднимутся под {players}! Встаньте там, где нужно укрытие.",

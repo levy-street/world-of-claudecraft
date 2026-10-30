@@ -622,3 +622,46 @@ export function shoulderShellScale(t: number, bodyHeight: number): number {
   const k = Math.min(1, Math.max(0, t / 0.35));
   return whole * (0.33 + 0.67 * k * (2 - k));
 }
+
+/** Narrow Shelter's gems on one pillar: how many are lit, and whether it holds
+ *  one too many. */
+export function shelterRunes(count: number, limit: number): { lit: number; over: boolean } {
+  return { lit: Math.min(count, limit), over: count > limit };
+}
+
+/** How many of `nPlayers` hide behind each of `nPillars` from a blast at (sx, sz):
+ *  each counts for the nearest pillar on its line, the sim's own test
+ *  (council_pillars.ts pillarBetween; `r` already holds its breath). Fills `out`. */
+export function pillarShelterCounts(
+  sx: number,
+  sz: number,
+  players: readonly { x: number; z: number }[],
+  nPlayers: number,
+  pillars: readonly { x: number; z: number; r: number }[],
+  nPillars: number,
+  out: number[],
+): void {
+  for (let i = 0; i < nPillars; i++) out[i] = 0;
+  for (let k = 0; k < nPlayers; k++) {
+    const dx = players[k].x - sx;
+    const dz = players[k].z - sz;
+    const len2 = dx * dx + dz * dz;
+    if (len2 < 1e-9) continue;
+    let best = -1;
+    let bestT = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < nPillars; i++) {
+      const px = pillars[i].x - sx;
+      const pz = pillars[i].z - sz;
+      const t = (px * dx + pz * dz) / len2;
+      if (t <= 0 || t >= 1) continue;
+      const cx = px - dx * t;
+      const cz = pz - dz * t;
+      if (cx * cx + cz * cz > pillars[i].r * pillars[i].r) continue;
+      if (t < bestT) {
+        bestT = t;
+        best = i;
+      }
+    }
+    if (best >= 0) out[best]++;
+  }
+}

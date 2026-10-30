@@ -106,6 +106,9 @@ export const COUNCIL_AURAS = {
   /** Mythic: on the Slabwright while another living member stands
    *  within reach, far less damage taken (council_shoulder.ts). */
   shouldered: 'heart_shouldered_stone',
+  /** Heroic and Mythic: on the Wrath's caster through its bar: value2 = how
+   *  many players one pillar can shield (what the client's runes read). */
+  pillarLimit: 'heart_narrow_shelter',
   /** Mythic: on the Seam Singer's soul pillar, one stack per pulse the
    *  Endless Song has sung (value = the next pulse's multiplier). The
    *  pillar is an object: the sim never ticks it, the council sets it. */
@@ -190,6 +193,7 @@ export const COUNCIL_NAMES = {
   resonance: 'Resonance',
   memory: 'Memory of Stone',
   shouldered: 'Shouldered Stone',
+  pillarLimit: 'Narrow Shelter',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
   echo: 'Echo of Wrath',
@@ -233,6 +237,9 @@ export interface CouncilDifficultyRules {
   /** Shouldered Stone: the Slabwright hardens beside another member
    *  (council_shoulder.ts). */
   slabwrightShoulders: boolean;
+  /** Narrow Shelter: how many players one pillar shields from the Wrath, or
+   *  null for no limit (council_wrath.ts landWrath). */
+  pillarLimit: number | null;
 }
 
 export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
@@ -247,6 +254,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     rockOutlivesSlabwright: false,
     soulInTheStone: false,
     slabwrightShoulders: false,
+    pillarLimit: null,
   },
   heroic: {
     wakeMarks: 2,
@@ -259,6 +267,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     rockOutlivesSlabwright: false,
     soulInTheStone: false,
     slabwrightShoulders: false,
+    pillarLimit: 4,
   },
   // Everything heroic has, the inheritances stronger, and the souls.
   mythic: {
@@ -272,6 +281,7 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     rockOutlivesSlabwright: true,
     soulInTheStone: true,
     slabwrightShoulders: true,
+    pillarLimit: 2,
   },
 };
 
@@ -283,6 +293,8 @@ export const COUNCIL_TUNING = {
   shoulderReach: 10,
   shoulderWard: 0.8,
   shoulderWarnGap: 20,
+  // Narrow Shelter: the share of the Wrath everyone behind a crowded pillar takes.
+  crowdShare: 0.5,
   // The pillars.
   pillarCap: 7,
   /** The most integrity any pillar template carries. */

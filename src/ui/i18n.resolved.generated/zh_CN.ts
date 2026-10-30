@@ -4746,6 +4746,7 @@ export const zh_CN: EnTranslations = {
         "rockMark": "结束时，一块巨石砸向你：{total}点伤害由{radius}码内的所有人分担。若不足{soakers}人分担，每人多受{penalty}%伤害，且全团受到{tremorMin}到{tremorMax}点伤害。{radius}码内的每根石柱都会损失一块，所以要远离掩体分担。史诗难度：{soulReach}码内的灵魂石柱改为失去一个灵魂印记，印记耗尽时碎裂。英雄和史诗难度：伤害提高{heroic}%。",
         "resonance": "在石柱{reach}码内连续站立{seconds}秒会震落它的一块，之后每多待{seconds}秒再震落一块。无法移除：在最破损的石柱旁躲过山岳之怒，远离完好的石柱。史诗难度：在灵魂石柱旁等待同样的时间会改为击碎它的一个灵魂印记（矿脉歌者的石柱为{singerSeconds}秒），印记耗尽时碎裂。",
         "memory": "造成的伤害提高{pct}%：重锤议会每倒下一名成员提高{per}%。",
+        "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast.",
         "shouldered": "Takes {pct}% less damage while another living member of the Hammer Council stands within {reach} yd. Pull the Slabwright away from them."
       },
       "breathGuardian": {
@@ -7276,6 +7277,7 @@ export const zh_CN: EnTranslations = {
       "warn": {
         "wrath": "山岳之怒！躲到石柱后面！",
         "shoulder": "The Slabwright hardens beside its kin: pull it away!",
+        "crowded": "Too many behind one pillar! It could not shield them all.",
         "enrage": "山岳的怒火加速了！山岳之怒会来得更快。",
         "weight": "{player}受到重锤之压：换坦克！",
         "wake": "唤醒岩石：石柱将在{players}脚下升起！站到需要掩体的地方。",
