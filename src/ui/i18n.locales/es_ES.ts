@@ -536,36 +536,4 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min; solo tú y tu grupo podéis verla. El primer enemigo que la active sangra por {damage} de daño Físico durante 15 s y queda ralentizado un 50% durante 4 s. El daño aumenta con el poder de ataque a distancia. Solo puede haber una Trampa para Osos activa a la vez. Puede coexistir con tu Trampa Fauces de Escarcha. Colocar otra Trampa para Osos reemplaza la anterior.',
   'entities.abilities.frostjaw_trap.description':
     'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo podéis verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
-  'hudChrome.membershipWelcome.body':
-    'Tu membresía está activa. ¡Disfruta de todos los beneficios de la membresía, aventurero!',
-  'hudChrome.membershipWelcome.bodyUntil':
-    'Tu membresía está activa hasta el {date}. ¡Disfruta de todos los beneficios de la membresía, aventurero!',
-  'hudChrome.membershipWelcome.close': 'Adelante',
-  'hudChrome.membershipWelcome.title': '¡Felicidades!',
-  'hudChrome.purchaseLoot.collect': 'Recoger',
-  'hudChrome.purchaseLoot.description':
-    'Recoge tu compra ahora. Si tus bolsas están llenas, se guardará como excedente. Lo que dejes para más tarde te esperará en el buzón.',
-  'hudChrome.purchaseLoot.later': 'Más tarde',
-  'hudChrome.purchaseLoot.title': 'Tu compra ha llegado',
-  'hudChrome.wocStore.subscription.annualAllBenefits':
-    'Todos los beneficios de una membresía mensual.',
-  'hudChrome.wocStore.subscription.annualArrived':
-    'Las riendas de tu montura han llegado. Recógelas en la ventana de botín.',
-  'hudChrome.wocStore.subscription.annualArriving':
-    'Las riendas de tu montura aparecerán en la ventana de botín de este personaje cuando se complete el cobro. Si la prueba está activa, llegarán después del primer pago.',
-  'hudChrome.wocStore.subscription.annualArtAlt':
-    'Un caballero con armadura de membresía junto al burro mensajero y la montura Quimera de Ala Nocturna',
-  'hudChrome.wocStore.subscription.annualMountInfo':
-    'Incluye la montura Quimera de Ala Nocturna para todos los personajes de tu cuenta. Sus riendas ligadas al alma llegan a la ventana de botín del personaje que la compra. Una por cuenta, y sigue siendo tuya cuando termina la membresía.',
-  'hudChrome.wocStore.subscription.annualPerMonth':
-    'Solo {price} al mes, con un ahorro del {percent} respecto al pago mensual.',
-  'hudChrome.wocStore.subscription.checkoutPending': 'Compra pendiente. Esperando confirmación.',
-  'hudChrome.wocStore.subscription.monthlyArtAlt':
-    'Un caballero con armadura de membresía junto al burro mensajero alado',
-  'hudChrome.wocStore.subscription.tokenArriving':
-    'Tu ficha aparecerá en la ventana de botín de este personaje cuando se complete el pago.',
-  'hudChrome.wocStore.subscription.tokenArtAlt': 'Una ficha de membresía dorada',
-  'hudChrome.wocStore.subscription.tokenDescription':
-    'Una ficha de membresía que recibes en el juego. Canjéala por 30 días de membresía, o intercámbiala con otros jugadores y véndela en la casa de subastas.',
-  'hudChrome.wocStore.subscription.upgradeAnnual': 'Cambiar a 12 meses',
 };

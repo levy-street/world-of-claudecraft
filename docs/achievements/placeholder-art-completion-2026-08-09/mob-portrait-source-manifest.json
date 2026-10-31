@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "532fc34f78cc7e81214d84272c92ef971055f56c64167c72f31472e31e43ed34",
+  "rendererFingerprint": "62769378878f05d6b44a916bdb3145f710872f92ef9e6ab6bfd2d72385fd01ef",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "156",
-    "browserVersion": "Chrome/156.0.8078.48",
+    "browserVersion": "Chrome/156.0.8078.74",
     "requestedBackend": "swiftshader",
     "fingerprint": "9d557a3eb124d4b56ba598134261e432742c42c2c3e6c918df522c59de3d290d"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6838630,
-      "sha256": "4c29a199cbeb82ff592f4067d793ffb6f810e7708ddbe97b8f663f44810f4c22",
+      "bytes": 6843349,
+      "sha256": "7622f08da9908015ba1a13363086c172379fbd1cccba48ad3ec51b64ea672518",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7529,7 +7529,7 @@
           "url": "models/creatures/muster_effigy.glb",
           "path": "public/models/creatures/muster_effigy.glb",
           "bytes": 182308,
-          "sha256": "1982752a896e603be8b80932e096ff959ac31406f699582c78f010777fca8d4a"
+          "sha256": "be06dfba785186d35e7478a150e4e91c79e125053a324ef944265616e9c1d00e"
         },
         "idle": "Idle",
         "height": 6.7,
@@ -7546,7 +7546,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "15816b2425d93602729010e51cb5df2f286ae60f7e02539c8a43e62d017c9417",
+      "sourceFingerprint": "be9afeaaabe5479545c14f910f71551c43d56585271b8d46cb692c7c1d727fa5",
       "output": {
         "path": "public/ui/mobs/muster_effigy.webp",
         "bytes": 3978,
