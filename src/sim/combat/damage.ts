@@ -630,12 +630,13 @@ export function dealDamage(
   // Tank Toll (pvp/tank_restraint.ts): any hostile player-vs-player damage
   // stamps both controllers as fighting players (the 5 second window that also
   // gates the self-heal cut), THEN a committed tank's damage to a hostile
-  // PLAYER is cut by 30%, the opening hit included. A pet, guardian or creature
-  // target takes full damage. Source-side, so an already-final share is never
-  // cut twice. Draws no rng.
+  // player OR anything a hostile player controls (a pet, guardian or totem) is
+  // cut by 30%, the opening hit included. A creature no player controls never
+  // reaches this arm and takes full damage. Source-side, so an already-final
+  // share is never cut twice. Draws no rng.
   if (hostilePvpHit && sourcePlayer && targetPlayer) {
     notePvpExchange(sourcePlayer, targetPlayer, ctx.time);
-    if (!alreadyFinal && !resolvedHpLoss && target.kind === 'player') {
+    if (!alreadyFinal && !resolvedHpLoss) {
       const mult = tankPvpDamageMult(sourcePlayer, ctx.players.get(sourcePlayer.id), ctx.time);
       if (mult !== 1) amount = Math.max(0, Math.round(amount * mult));
     }

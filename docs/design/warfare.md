@@ -110,7 +110,8 @@ the badge jewelry.
 ## Tank Toll: tanks fight players at reduced output
 
 Owner rule (v0.46): committed tanks were near unkillable in PvP, so a tank
-fighting another player deals 30 percent less damage to players and heals
+fighting another player deals 30 percent less damage to players and their
+pets and heals
 themselves for 30 percent less (`TANK_PVP_DAMAGE_PENALTY`,
 `TANK_PVP_SELF_HEAL_PENALTY` in `src/sim/pvp/tank_restraint.ts`).
 
@@ -136,9 +137,10 @@ The rule has two halves:
   player), until `PVP_EXCHANGE_LINGER_SECONDS` (5, the classic combat linger)
   pass with no further hostile player damage either way. A flagged tank who is
   not trading player damage wears the debuff at no cost. While active:
-  - damage the tank (or anything they control) deals to a hostile PLAYER is
-    cut, applied after the WARFARE Offense and Defense step and before absorb
-    shields; creatures and player pets take full damage;
+  - damage the tank (or anything they control) deals to a hostile player, or
+    to anything a hostile player controls (a pet, guardian or totem), is cut,
+    applied after the WARFARE Offense and Defense step and before absorb
+    shields; creatures no player controls take full damage;
   - every heal the tank casts on themselves is cut: direct heals through
     `applyHeal`, their own heal-over-time ticks, and Second Wind. Heals from
     other players, heals the tank casts on others, potions, food and natural

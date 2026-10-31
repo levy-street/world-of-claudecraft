@@ -136,7 +136,7 @@ describe('PvP tank restraint: damage', () => {
     expect(hit(sim, foe, tank)).toBe(100);
   });
 
-  it('cuts only damage to players: creatures and player pets take full damage', () => {
+  it('cuts damage to hostile players and their pets, never to creatures', () => {
     const { sim, tank, foe, mob } = arena(PROT_WARRIOR);
     hit(sim, foe, tank);
     expect(hit(sim, tank, mob)).toBe(100);
@@ -145,8 +145,16 @@ describe('PvP tank restraint: damage', () => {
     pet.hostile = false;
     pet.maxHp = pet.hp = 1_000_000;
     (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
-    expect(hit(sim, tank, pet)).toBe(100);
+    expect(hit(sim, tank, pet)).toBe(70);
     expect(hit(sim, tank, foe)).toBe(70);
+    // The opening hit on a pet already pays it (the pet's owner is a player).
+    const fresh = arena(PROT_WARRIOR);
+    const freshPet = createMob(fresh.sim.nextId++, MOBS.forest_wolf, 20, { ...fresh.foe.pos });
+    freshPet.ownerId = fresh.foe.id;
+    freshPet.hostile = false;
+    freshPet.maxHp = freshPet.hp = 1_000_000;
+    (fresh.sim as unknown as { addEntity(e: Entity): void }).addEntity(freshPet);
+    expect(hit(fresh.sim, fresh.tank, freshPet)).toBe(70);
   });
 
   it("a tank's pet hitting a hostile player pays the cut too", () => {

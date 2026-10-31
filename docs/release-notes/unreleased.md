@@ -2,7 +2,7 @@
 
 - Tank Toll: tanks in PvP now wear the Tank Toll debuff. While a tank is trading damage
   with another player (dealt or taken in the last 5 seconds), the damage they deal to
-  players and their self-heals are reduced by 30%. Tanks are Protection warriors and
+  players (and their pets) and their self-heals are reduced by 30%. Tanks are Protection warriors and
   paladins, Feral druids in Bruin Form, and Enhancement shamans with Stonebound Weapon.
   It applies with /pvp on, in battlegrounds, arenas and duels; creatures still take full
   damage.

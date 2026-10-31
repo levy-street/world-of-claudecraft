@@ -29,10 +29,10 @@ ratings.
 - `tank_restraint.ts` owns the PvP tank restraint math (pure leaf, no
   ctx/rng/clock): a committed tank (`isCommittedTank`,
   `combat/tank_crit_immunity.ts`) who dealt or took hostile player damage
-  within `PVP_EXCHANGE_LINGER_SECONDS` deals 30% less damage to players and
-  heals themselves for 30% less. `combat/damage.ts` stamps
-  `Entity.pvpExchangeAt` on both controllers and cuts damage to a hostile
-  player; `combat/heal.ts` (`applyHeal`) and `combat/auras.ts` (own HoT ticks,
+  within `PVP_EXCHANGE_LINGER_SECONDS` deals 30% less damage to players (and
+  their pets, guardians and totems) and heals themselves for 30% less.
+  `combat/damage.ts` stamps `Entity.pvpExchangeAt` on both controllers and
+  cuts damage to anything a hostile player controls; `combat/heal.ts` (`applyHeal`) and `combat/auras.ts` (own HoT ticks,
   Second Wind) apply the self-heal cut.
 - `tank_toll.ts` owns the visible Tank Toll debuff behind it: `updateTankToll`
   (on the zone pass beside Vitality) puts the inert, permanent, undispellable
