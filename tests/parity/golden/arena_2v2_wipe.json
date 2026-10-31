@@ -710,7 +710,7 @@
       "tick": 102,
       "time": 5.1,
       "nextId": 1015,
-      "state": "505de79c",
+      "state": "28c15486",
       "events": "1d399b4a",
       "rng": {
         "draws": 537,
@@ -1171,6 +1171,7 @@
             "z": -1148
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.05,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -1277,6 +1278,7 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.05,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -1357,7 +1359,7 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 1015,
-      "state": "5cbecd2a",
+      "state": "43ea6a30",
       "events": "b563aeaa",
       "rng": {
         "draws": 545,
@@ -1922,6 +1924,7 @@
             "z": -1148
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -2028,6 +2031,7 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.05,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -2079,6 +2083,7 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.1,
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
@@ -2108,7 +2113,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1015,
-      "state": "f841bff4",
+      "state": "3d33e9ce",
       "events": "741638a5",
       "rng": {
         "draws": 761,
@@ -2119,7 +2124,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1015,
-      "state": "97e6530c",
+      "state": "dfd6df3c",
       "events": "741638a5",
       "rng": {
         "draws": 1026,
@@ -2130,7 +2135,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1015,
-      "state": "15503d1d",
+      "state": "88f9c125",
       "events": "741638a5",
       "rng": {
         "draws": 1335,
@@ -2141,7 +2146,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1015,
-      "state": "a8f7a443",
+      "state": "135737bf",
       "events": "741638a5",
       "rng": {
         "draws": 1668,
@@ -2152,7 +2157,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 1015,
-      "state": "0137c8ed",
+      "state": "8448744b",
       "events": "e79e3029",
       "rng": {
         "draws": 1881,
@@ -2163,7 +2168,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1015,
-      "state": "9433a640",
+      "state": "ba010b04",
       "events": "741638a5",
       "rng": {
         "draws": 2018,
@@ -2729,6 +2734,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -2838,6 +2844,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.05,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -2890,6 +2897,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.1,
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
@@ -2919,7 +2927,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1015,
-      "state": "9433a640",
+      "state": "ba010b04",
       "events": "741638a5",
       "rng": {
         "draws": 2018,
@@ -3485,6 +3493,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.1,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -3594,6 +3603,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.05,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -3646,6 +3656,7 @@
             "z": -40
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.1,
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {

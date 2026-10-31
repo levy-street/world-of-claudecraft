@@ -535,7 +535,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 1015,
-      "state": "2afd61ea",
+      "state": "e485011c",
       "events": "7790f359",
       "rng": {
         "draws": 3961,
@@ -546,7 +546,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 1015,
-      "state": "b8770409",
+      "state": "1eff465b",
       "events": "ad091ff2",
       "rng": {
         "draws": 4044,
@@ -557,7 +557,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 1015,
-      "state": "2fa66b2d",
+      "state": "16a0b1e3",
       "events": "657b46d9",
       "rng": {
         "draws": 4120,
@@ -568,7 +568,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 1015,
-      "state": "f13e1186",
+      "state": "a6f0364c",
       "events": "eca61d6e",
       "rng": {
         "draws": 4198,
@@ -579,7 +579,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 1015,
-      "state": "6cb4fc2b",
+      "state": "86c8a235",
       "events": "eca61d6e",
       "rng": {
         "draws": 4300,
@@ -590,7 +590,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 1015,
-      "state": "84fbea0c",
+      "state": "c5573e4e",
       "events": "eca61d6e",
       "rng": {
         "draws": 4405,
@@ -601,7 +601,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 1015,
-      "state": "5df70af1",
+      "state": "85c7b96d",
       "events": "d104f495",
       "rng": {
         "draws": 4476,
@@ -612,7 +612,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 1015,
-      "state": "b0d19edf",
+      "state": "5fc7bb5f",
       "events": "118b8c30",
       "rng": {
         "draws": 4573,
@@ -623,7 +623,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 1015,
-      "state": "66cf0f70",
+      "state": "21531a7e",
       "events": "4631ff4f",
       "rng": {
         "draws": 4651,
@@ -634,7 +634,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 1015,
-      "state": "6c544e5f",
+      "state": "13fb3d89",
       "events": "0917a498",
       "rng": {
         "draws": 4745,
@@ -645,7 +645,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 1015,
-      "state": "9d150357",
+      "state": "4114d3e1",
       "events": "e8af42fc",
       "rng": {
         "draws": 4836,
@@ -656,7 +656,7 @@
       "tick": 573,
       "time": 28.65,
       "nextId": 1015,
-      "state": "3ea4af07",
+      "state": "8eb48c55",
       "events": "741638a5",
       "rng": {
         "draws": 4864,
@@ -1103,6 +1103,7 @@
             "z": -1268
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 23.15,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -1209,6 +1210,7 @@
             "z": -1228
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 23.15,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
