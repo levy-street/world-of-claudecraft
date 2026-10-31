@@ -11261,7 +11261,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
   'hudChrome.auraEffect.carriedFlag': '敵の旗を運搬中です。このバフを解除すると旗を落とします。',
   'hudChrome.auraEffect.carryingFreight': '荷物を運搬中です。移動速度が{pct}%低下します。',
-  'hudChrome.auraEffect.tankToll': 'タンクとして、他のプレイヤーに与えるダメージと自己回復量が{pct}%減少します',
+  'hudChrome.auraEffect.tankToll':
+    'タンクとして、他のプレイヤーに与えるダメージと自己回復量が{pct}%減少します',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
   'hudChrome.auraEffect.heatingUp':

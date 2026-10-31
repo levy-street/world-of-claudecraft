@@ -12,6 +12,8 @@ import {
   isPlayerRemovableAura,
 } from '../src/sim/aura_classify';
 import {
+  TANK_PVP_DAMAGE_PENALTY,
+  TANK_PVP_SELF_HEAL_PENALTY,
   TANK_TOLL_AURA_ID,
   TANK_TOLL_AURA_NAME,
   tankTollApplies,
@@ -130,6 +132,10 @@ describe('Tank Toll: the aura itself', () => {
     expect(isDispellableAura(aura, false)).toBe(false);
     expect(isPlayerRemovableAura(aura)).toBe(false);
     expect(isPartyFrameRelevantAura(aura)).toBe(false);
+  });
+
+  it('quotes one figure for both cuts, so the two penalties must stay equal', () => {
+    expect(TANK_PVP_SELF_HEAL_PENALTY).toBe(TANK_PVP_DAMAGE_PENALTY);
   });
 
   it('explains the rule with the live 30% figure', () => {
