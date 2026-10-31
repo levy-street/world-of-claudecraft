@@ -106,6 +106,7 @@ import { groundHeight, mobGroundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { proximityAggroSees } from './aggro_sight';
 import { isAmbientMob, updateAmbientMob } from './ambient';
+import { enforceBossArena } from './boss_arena_guard';
 import { splashNearbyMobs } from './boss_collateral';
 import { tickBossCorpseSink } from './boss_corpse_sink';
 import { resetBossRangedMechanics, tickBossRangedMechanics } from './boss_ranged_mechanics';
@@ -332,6 +333,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   mob.combatTimer += DT;
+  if (enforceBossArena(ctx, mob)) return;
 
   // The Coinsack Scurrier (rift/hoard_goblin.ts) never aggroes or swings: it
   // only runs, and its own tick owns the escape bar and the payout.

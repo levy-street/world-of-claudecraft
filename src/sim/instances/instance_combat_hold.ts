@@ -29,6 +29,10 @@
 // obey neither the sight rule nor the route planner (mob/encounter_body.ts).
 // Pinned by tests/mob_cast_line_of_sight.test.ts.
 //
+// Authored boss arenas are an exception: mob/boss_arena_guard.ts rejects
+// outside attacks and resets their bosses when the fighting floor is abandoned
+// or the boss is dragged out. This hold still governs ordinary instance mobs.
+//
 // Scope: the dungeon and raid slots in ctx.instances. Rifts and delves keep
 // their own instance records and the open-world rules (the hate-table reach in
 // threat.ts THREAT_DROP_RANGE, the leashes, the evade-home stall).

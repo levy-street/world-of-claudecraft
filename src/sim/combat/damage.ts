@@ -46,6 +46,7 @@ import { membershipActive } from '../membership';
 import { wearsMembershipArmour } from '../membership_armour';
 import { perfectMembershipArmour } from '../membership_armour_progression';
 import { isMembershipWeapon, membershipWeaponShape } from '../membership_weapon';
+import { bossArenaBlocksDamage } from '../mob/boss_arena_guard';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
@@ -333,6 +334,7 @@ export function dealDamage(
   // is immune while stuck, then becomes attackable once it phases to its target.
   if (
     isEvadingWildMob(target) ||
+    bossArenaBlocksDamage(ctx, target, source) ||
     (target.kind === 'mob' && target.ownerId === null && isImmuneInPlace(target))
   ) {
     if (direct && source) {
