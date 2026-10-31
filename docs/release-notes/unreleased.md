@@ -1,5 +1,10 @@
 # Unreleased
 
+- PvP tank restraint: a tank fighting another player deals 30% less damage and heals
+  themselves for 30% less. Tanks are Protection warriors and paladins, Feral druids in
+  Bruin Form, and Enhancement shamans with Stonebound Weapon. It starts the moment the
+  tank deals or takes damage from a hostile player (open-world /pvp, battlegrounds,
+  arenas, duels) and ends 5 seconds after the last such hit.
 - Materials Vault: ten upgrades instead of five, each adding 100 per material (up to
   1000), priced 2g, 4g, 7g, 12g, 20g, 32g, 50g, 75g, 110g, 160g (472g total). Existing
   upgrades keep their count, so a vault with five upgrades now holds 500 of each material.

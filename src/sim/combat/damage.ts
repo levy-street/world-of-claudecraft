@@ -66,7 +66,9 @@ import {
   releaseCorpseHarvest,
 } from '../professions/corpse_harvest_session';
 import {
+  notePvpExchange,
   pvpDamageMultiplier,
+  tankPvpDamageMult,
   worldPvpOnOwnedPetDamaged,
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
@@ -614,16 +616,36 @@ export function dealDamage(
   // no player controls stay byte-identical. dealDamage receives post-mitigation
   // damage, so this deterministic step sits after the upstream armor/resist roll
   // and before absorb shields.
+  const hostilePvpHit =
+    amount > 0 &&
+    !!source &&
+    !!sourcePlayer &&
+    !!targetPlayer &&
+    sourcePlayer.id !== targetPlayer.id &&
+    ctx.isHostileTo(source, target);
+  if (!resolvedHpLoss && hostilePvpHit && sourcePlayer && targetPlayer) {
+    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
+  }
+
+  // PvP tank restraint (pvp/tank_restraint.ts): any hostile player-vs-player
+  // damage stamps both controllers as fighting players, THEN a committed tank
+  // in that state deals 30% less, so the opening hit already pays it. The
+  // penalty is source-side (skipped for an already-final share) and covers
+  // every target while the exchange lingers. Draws no rng.
+  if (hostilePvpHit && sourcePlayer && targetPlayer) {
+    notePvpExchange(sourcePlayer, targetPlayer, ctx.time);
+  }
   if (
+    !alreadyFinal &&
     !resolvedHpLoss &&
     amount > 0 &&
     source &&
     sourcePlayer &&
-    targetPlayer &&
-    sourcePlayer.id !== targetPlayer.id &&
-    ctx.isHostileTo(source, target)
+    source.id !== target.id &&
+    sourcePlayer.pvpExchangeAt !== undefined
   ) {
-    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
+    const mult = tankPvpDamageMult(sourcePlayer, ctx.players.get(sourcePlayer.id), ctx.time);
+    if (mult !== 1) amount = Math.max(0, Math.round(amount * mult));
   }
 
   if (

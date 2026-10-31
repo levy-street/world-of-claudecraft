@@ -8262,6 +8262,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  gear's health bonus never reaches raid content. Absent means the open
    *  world, where it applies; battlegrounds and arenas apply it too. */
   pvpVitalityActive?: boolean;
+  /** Sim time (seconds) of this entity's last hostile player-vs-player damage
+   *  exchange, dealt or taken (src/sim/pvp/tank_restraint.ts). Absent until the
+   *  first one; transient combat state, never persisted or wired. */
+  pvpExchangeAt?: number;
   /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
    *  via setCheaterMark at join restore and when an operator applies or lifts a
    *  mark; never true offline, never user-settable. Cosmetic: nothing reads it

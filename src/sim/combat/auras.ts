@@ -43,6 +43,7 @@ import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
 import { isPersistentEngineAura } from '../persistent_aura';
+import { tankPvpSelfHealMult } from '../pvp';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
@@ -169,7 +170,10 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
   }
   const secondWindPct = ctx.playerMods(meta).global.secondWindPctPerSec;
   if (secondWindPct > 0 && p.hp > 0 && p.hp < p.maxHp * SECOND_WIND_THRESHOLD) {
-    const heal = Math.min(Math.round(p.maxHp * secondWindPct * 2), p.maxHp - p.hp);
+    const heal = Math.min(
+      Math.round(p.maxHp * secondWindPct * 2 * tankPvpSelfHealMult(p, p, meta, ctx.time)),
+      p.maxHp - p.hp,
+    );
     if (heal > 0) {
       p.hp += heal;
       ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
@@ -488,8 +492,13 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           const healer = ctx.entities.get(a.sourceId);
           // Sporemender Form scales its wearer's HoT ticks live (exactly 1 for
           // every other healer, so their tick arithmetic is unchanged).
+          // A HoT the player keeps on themselves pays the PvP tank restraint
+          // (pvp/tank_restraint.ts); exactly 1 for everyone else.
           const intended = Math.round(
-            a.value * sporemenderHealingDoneMult(healer) * ctx.healingTakenMult(e),
+            a.value *
+              sporemenderHealingDoneMult(healer) *
+              ctx.healingTakenMult(e) *
+              (healer ? tankPvpSelfHealMult(healer, e, ctx.players.get(e.id), ctx.time) : 1),
           );
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;

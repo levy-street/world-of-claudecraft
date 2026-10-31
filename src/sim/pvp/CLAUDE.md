@@ -26,6 +26,14 @@ ratings.
   outside a battleground or arena match) and flips `Entity.pvpVitalityActive`,
   recalculating only players whose state changed; `entity.ts` applies the
   fraction to maxHp. Pinned by the `WARFARE Vitality` block in `tests/honor.test.ts`.
+- `tank_restraint.ts` owns the PvP tank restraint (pure leaf, no ctx/rng/clock):
+  a committed tank (`isCommittedTank`, `combat/tank_crit_immunity.ts`) who dealt
+  or took hostile player damage within `PVP_EXCHANGE_LINGER_SECONDS` deals 30%
+  less damage and heals themselves for 30% less. `combat/damage.ts` stamps
+  `Entity.pvpExchangeAt` on both controllers and applies the damage cut;
+  `combat/heal.ts` (`applyHeal`) and `combat/auras.ts` (own HoT ticks, Second
+  Wind) apply the self-heal cut. Rules in `docs/design/warfare.md`, "Tank
+  restraint"; pinned by `tests/tank_pvp_restraint.test.ts`.
 - `honor_persist.ts` owns the persisted form of the honor ledger and its daily
   DR window (`savedHonorState` / `loadHonorState`), moved out of the Sim
   coordinator's serialize/load so a new honor field lands here, not in `sim.ts`.

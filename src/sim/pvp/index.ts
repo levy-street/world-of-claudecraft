@@ -162,6 +162,16 @@ export {
   storeLootedSkulls,
   WORLD_PVP_SKULL_BAG_ITEM_ID,
 } from './skull_bag';
+export {
+  inPvpExchange,
+  notePvpExchange,
+  PVP_EXCHANGE_LINGER_SECONDS,
+  TANK_PVP_DAMAGE_PENALTY,
+  TANK_PVP_SELF_HEAL_PENALTY,
+  tankPvpDamageMult,
+  tankPvpRestrained,
+  tankPvpSelfHealMult,
+} from './tank_restraint';
 export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {
   isWorldPvpFlagged,
