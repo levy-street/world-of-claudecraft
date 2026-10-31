@@ -51,6 +51,7 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   // Cosmetic and mechanically inert (value 0, no stat fold): listed here only so
   // the countdown sorts into the debuff bar rather than sitting among the buffs.
   'cheater_mark',
+  'tank_toll', // inert PvP rule marker (pvp/tank_toll.ts): a debuff, never a buff
 ]);
 
 /**
@@ -214,6 +215,8 @@ const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set([
 const PARTY_FRAME_EXCLUDED_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'sated',
   'cheater_mark',
+  // Tank Toll: a standing PvP rule marker, nothing a healer acts on
+  'tank_toll',
   // a worn pumpkin or a trick: cosmetic, never worth a healer's frame slot
   'seasonal_cosmetic',
 ]);

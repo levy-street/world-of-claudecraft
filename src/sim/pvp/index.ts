@@ -172,6 +172,13 @@ export {
   tankPvpRestrained,
   tankPvpSelfHealMult,
 } from './tank_restraint';
+export {
+  TANK_TOLL_AURA_ID,
+  TANK_TOLL_AURA_NAME,
+  tankTollApplies,
+  tankTollAura,
+  updateTankToll,
+} from './tank_toll';
 export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {
   isWorldPvpFlagged,

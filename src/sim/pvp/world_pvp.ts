@@ -58,6 +58,7 @@ import { grantHonor } from './honor';
 import { pvpIdentityOf } from './pvp_identity';
 import { notePvpResurrectAtDeath } from './pvp_resurrect';
 import { loadSkullBag, savedSkullBag, skullBagInfoFor } from './skull_bag';
+import { updateTankToll } from './tank_toll';
 import { updatePvpVitality } from './vitality';
 import {
   announceWorldPvpBountyCollected,
@@ -525,6 +526,9 @@ export function updateWorldPvp(ctx: SimContext): void {
     // WARFARE Vitality rides this pass but not the world switch: battlegrounds
     // and arenas grant it on a realm with world PvP turned off too.
     updatePvpVitality(ctx);
+    // Tank Toll rides the same pass and the same reasoning: battlegrounds,
+    // arenas and duels show it on a realm with world PvP turned off too.
+    updateTankToll(ctx);
     // Spoils ride the zone pass but not the world switch either: a body that
     // dropped spoils before an operator flipped the switch still settles.
     sweepWorldPvpSpoils(ctx);

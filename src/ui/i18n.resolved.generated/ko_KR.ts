@@ -4799,6 +4799,7 @@ export const ko_KR: EnTranslations = {
       "internalCooldown": "타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다",
       "carriedFlag": "적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.",
       "carryingFreight": "화물을 운반 중입니다. 이동 속도가 {pct}% 감소합니다.",
+      "tankToll": "탱커로서 다른 플레이어에게 주는 피해와 자가 치유량이 {pct}% 감소합니다",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
       "crit": "치명타 확률이 {pct}% 증가합니다",

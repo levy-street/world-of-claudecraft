@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "es_ES": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "fr_FR": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "fr_CA": [
+    "hudChrome.auraEffect.tankToll"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "de_DE": [
+    "hudChrome.auraEffect.tankToll"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.auraEffect.tankToll"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "nl_NL": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "pl_PL": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "id_ID": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "tr_TR": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "sv_SE": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "vi_VN": [
+    "hudChrome.auraEffect.tankToll"
+  ],
+  "da_DK": [
+    "hudChrome.auraEffect.tankToll"
+  ]
 };

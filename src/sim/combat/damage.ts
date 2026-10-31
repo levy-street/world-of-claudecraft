@@ -627,25 +627,18 @@ export function dealDamage(
     amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
   }
 
-  // PvP tank restraint (pvp/tank_restraint.ts): any hostile player-vs-player
-  // damage stamps both controllers as fighting players, THEN a committed tank
-  // in that state deals 30% less, so the opening hit already pays it. The
-  // penalty is source-side (skipped for an already-final share) and covers
-  // every target while the exchange lingers. Draws no rng.
+  // Tank Toll (pvp/tank_restraint.ts): any hostile player-vs-player damage
+  // stamps both controllers as fighting players (the 5 second window that also
+  // gates the self-heal cut), THEN a committed tank's damage to a hostile
+  // PLAYER is cut by 30%, the opening hit included. A pet, guardian or creature
+  // target takes full damage. Source-side, so an already-final share is never
+  // cut twice. Draws no rng.
   if (hostilePvpHit && sourcePlayer && targetPlayer) {
     notePvpExchange(sourcePlayer, targetPlayer, ctx.time);
-  }
-  if (
-    !alreadyFinal &&
-    !resolvedHpLoss &&
-    amount > 0 &&
-    source &&
-    sourcePlayer &&
-    source.id !== target.id &&
-    sourcePlayer.pvpExchangeAt !== undefined
-  ) {
-    const mult = tankPvpDamageMult(sourcePlayer, ctx.players.get(sourcePlayer.id), ctx.time);
-    if (mult !== 1) amount = Math.max(0, Math.round(amount * mult));
+    if (!alreadyFinal && !resolvedHpLoss && target.kind === 'player') {
+      const mult = tankPvpDamageMult(sourcePlayer, ctx.players.get(sourcePlayer.id), ctx.time);
+      if (mult !== 1) amount = Math.max(0, Math.round(amount * mult));
+    }
   }
 
   if (

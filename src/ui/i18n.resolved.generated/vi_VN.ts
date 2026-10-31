@@ -4799,6 +4799,7 @@ export const vi_VN: EnTranslations = {
       "internalCooldown": "Hiệu ứng này chưa thể kích hoạt lại cho đến khi hết thời gian chờ",
       "carriedFlag": "Bạn đang mang cờ địch. Hủy hiệu ứng này để thả nó xuống.",
       "carryingFreight": "Bạn đang vận chuyển hàng. Tốc độ di chuyển giảm {pct}%.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
       "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
       "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
       "crit": "Tăng tỉ lệ chí mạng thêm {pct}%",

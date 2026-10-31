@@ -4799,6 +4799,7 @@ export const en: EnTranslations = {
       "internalCooldown": "This effect cannot trigger again until the timer expires",
       "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "crit": "Increases critical strike chance by {pct}%",

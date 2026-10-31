@@ -734,6 +734,13 @@ export type AuraKind =
   // carry: applied at the pickup, removed by clearCarrierAuras on every path the
   // flag leaves the carrier.
   | 'flag_carried'
+  // Tank Toll (pvp/tank_toll.ts): the visible marker of the PvP tank
+  // restraint, worn by a committed tank wherever players can fight them. Its
+  // own kind so nothing keys on it: no combat reader, no stat recalc, no
+  // dispel (physical school plus undispellable). The 30% cuts it names live in
+  // combat/damage.ts and the heal paths, gated by the exchange window, never by
+  // this aura.
+  | 'tank_toll'
   // Eastbrook freight World Quest: an inert, public marker worn exactly while
   // the player carries a crate. The movement kernel applies its value as the
   // cargo speed multiplier; no combat or stat-recalc path consumes it.

@@ -4799,6 +4799,7 @@ export const tr_TR: EnTranslations = {
       "internalCooldown": "Bu etki, süre dolana kadar yeniden tetiklenemez",
       "carriedFlag": "Düşman sancağını taşıyorsun. Onu bırakmak için bu güçlendirmeyi iptal et.",
       "carryingFreight": "Kargo taşıyorsun. Hareket hızı {pct}% azalıyor.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
       "battleStance": "Savaş Duruşu: %10 daha fazla öfke üretimi",
       "berserkerStance": "Berserker Duruşu: kritikler %3 daha sık gerçekleşir ve %3 daha sert vurur",
       "crit": "Kritik vuruş şansını {pct}% artırır",

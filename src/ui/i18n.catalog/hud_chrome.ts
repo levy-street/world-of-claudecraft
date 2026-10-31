@@ -6014,6 +6014,10 @@ export const hudChromeStrings = {
     // affordance is spelled out, so the player can find it without folklore.
     carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
     carryingFreight: 'You are carrying freight. Movement speed is reduced by {pct}%.',
+    // Tank Toll, the PvP tank restraint marker (src/sim/pvp/tank_toll.ts).
+    // {pct} is TANK_PVP_DAMAGE_PENALTY (equal to the self-heal penalty).
+    tankToll:
+      'As a tank, the damage you deal to other players and your self heals are reduced by {pct}%',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',

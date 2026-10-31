@@ -107,12 +107,12 @@ piece in the same slot carries (`WARFARE_CASTER_STAMINA_PREMIUM_SHARE`), which
 closes most of the cloth gap in honor gear; jewelry is excluded so it stays below
 the badge jewelry.
 
-## Tank restraint: tanks fight players at reduced output
+## Tank Toll: tanks fight players at reduced output
 
 Owner rule (v0.46): committed tanks were near unkillable in PvP, so a tank
-fighting another player deals 30 percent less damage and heals themselves for
-30 percent less (`TANK_PVP_DAMAGE_PENALTY`, `TANK_PVP_SELF_HEAL_PENALTY` in
-`src/sim/pvp/tank_restraint.ts`).
+fighting another player deals 30 percent less damage to players and heals
+themselves for 30 percent less (`TANK_PVP_DAMAGE_PENALTY`,
+`TANK_PVP_SELF_HEAL_PENALTY` in `src/sim/pvp/tank_restraint.ts`).
 
 Who is a tank is the shared `isCommittedTank` rule
 (`src/sim/combat/tank_crit_immunity.ts`): a Protection warrior or paladin, a
@@ -120,23 +120,34 @@ Feral druid while in Bruin Form, an Enhancement shaman while the Stonebound
 Weapon posture is up. Form and posture are read live, so leaving Bruin Form or
 swapping to Galeheart drops the restraint on the next hit or heal.
 
-When it applies: from the first hostile player-vs-player damage the tank deals
-or takes (a hostile player's pet, guardian or totem counts as that player),
-until `PVP_EXCHANGE_LINGER_SECONDS` (5, the classic combat linger) pass with no
-further hostile player damage either way. Any hostile pairing starts it: a
-`/pvp` fight, free-for-all ground, a battleground, an arena or a duel. A mob no
-player controls never starts or refreshes it. While it holds:
+The rule has two halves:
 
-- every point of damage the tank (or anything they control) deals is cut,
-  creatures included, applied after the WARFARE Offense and Defense step and
-  before absorb shields;
-- every heal the tank casts on themselves is cut: direct heals through
-  `applyHeal`, their own heal-over-time ticks, and Second Wind. Heals from
-  other players, heals the tank casts on others, potions, food and natural
-  regeneration are untouched.
+- **The debuff (visible).** `src/sim/pvp/tank_toll.ts` puts the Tank Toll
+  debuff on a committed tank wherever players can fight them: the `/pvp` flag
+  raised, a battleground or arena seat, an active duel, or a live PvP exchange
+  (free-for-all ground needs no flag). It syncs on the world PvP zone pass
+  (twice a second, also on a realm with world PvP switched off), is re-applied
+  after a death or clean-slate wipe strips it, and comes off when the tank
+  leaves PvP or stops tanking. It is inert (its own `tank_toll` kind, value 0),
+  permanent, physical school plus `undispellable` so nothing can shed it, and
+  kept off party and raid frames.
+- **The cuts (active).** From the first hostile player-vs-player damage the
+  tank deals or takes (a hostile player's pet, guardian or totem counts as that
+  player), until `PVP_EXCHANGE_LINGER_SECONDS` (5, the classic combat linger)
+  pass with no further hostile player damage either way. A flagged tank who is
+  not trading player damage wears the debuff at no cost. While active:
+  - damage the tank (or anything they control) deals to a hostile PLAYER is
+    cut, applied after the WARFARE Offense and Defense step and before absorb
+    shields; creatures and player pets take full damage;
+  - every heal the tank casts on themselves is cut: direct heals through
+    `applyHeal`, their own heal-over-time ticks, and Second Wind. Heals from
+    other players, heals the tank casts on others, potions, food and natural
+    regeneration are untouched.
 
-The exchange stamp (`Entity.pvpExchangeAt`) is transient combat state, never
-saved or sent to clients. Pinned by `tests/tank_pvp_restraint.test.ts`.
+Duels count like every other hostile pairing. The exchange stamp
+(`Entity.pvpExchangeAt`) is transient combat state, never saved or sent to
+clients. Pinned by `tests/tank_pvp_restraint.test.ts` and
+`tests/tank_toll.test.ts`.
 
 ## Stat budgets, and why honor gear is not a PvE shortcut
 

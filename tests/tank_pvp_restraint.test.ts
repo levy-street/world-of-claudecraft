@@ -136,34 +136,41 @@ describe('PvP tank restraint: damage', () => {
     expect(hit(sim, foe, tank)).toBe(100);
   });
 
-  it('starts when the tank TAKES player damage, and covers creatures while it lasts', () => {
+  it('cuts only damage to players: creatures and player pets take full damage', () => {
     const { sim, tank, foe, mob } = arena(PROT_WARRIOR);
-    expect(hit(sim, tank, mob)).toBe(100);
-    expect(hit(sim, foe, tank)).toBe(100);
-    expect(hit(sim, tank, mob)).toBe(70);
-  });
-
-  it('ends 5 seconds after the last player-vs-player hit', () => {
-    const { sim, tank, foe, mob } = arena(PROT_WARRIOR);
-    expect(hit(sim, tank, foe)).toBe(70);
-    sim.time += 4.9;
-    expect(hit(sim, tank, mob)).toBe(70);
-    sim.time += 0.2;
-    expect(hit(sim, tank, mob)).toBe(100);
-    // A fresh exchange (taken this time) restarts it.
     hit(sim, foe, tank);
-    expect(hit(sim, tank, mob)).toBe(70);
+    expect(hit(sim, tank, mob)).toBe(100);
+    const pet = createMob(sim.nextId++, MOBS.forest_wolf, 20, { ...foe.pos });
+    pet.ownerId = foe.id;
+    pet.hostile = false;
+    pet.maxHp = pet.hp = 1_000_000;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
+    expect(hit(sim, tank, pet)).toBe(100);
+    expect(hit(sim, tank, foe)).toBe(70);
   });
 
-  it('a hostile player pet hitting the tank starts it too', () => {
-    const { sim, tank, foe, mob } = arena(PROT_WARRIOR);
+  it("a tank's pet hitting a hostile player pays the cut too", () => {
+    const { sim, tank, foe } = arena(PROT_WARRIOR);
+    const pet = createMob(sim.nextId++, MOBS.forest_wolf, 20, { ...tank.pos });
+    pet.ownerId = tank.id;
+    pet.hostile = false;
+    pet.maxHp = pet.hp = 1_000_000;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
+    expect(hit(sim, pet, foe)).toBe(100 * (1 - TANK_PVP_DAMAGE_PENALTY));
+  });
+
+  it('opens the 5 second exchange window on a hit taken from a player pet', () => {
+    const { sim, tank, foe } = arena(PROT_WARRIOR);
     const pet = createMob(sim.nextId++, MOBS.forest_wolf, 20, { ...foe.pos });
     pet.ownerId = foe.id;
     pet.hostile = false;
     pet.maxHp = pet.hp = 1_000_000;
     (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
     hit(sim, pet, tank);
-    expect(hit(sim, tank, mob)).toBe(100 * (1 - TANK_PVP_DAMAGE_PENALTY));
+    expect(inPvpExchange(tank, sim.time)).toBe(true);
+    expect(heal(sim, tank, tank)).toBe(70);
+    sim.time += PVP_EXCHANGE_LINGER_SECONDS;
+    expect(inPvpExchange(tank, sim.time)).toBe(false);
   });
 
   it('never applies in pure PvE or against a friendly player', () => {

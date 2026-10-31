@@ -13233,6 +13233,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': 'Снижает наносимый урон на {pct}%',
   'hudChrome.auraEffect.carryingFreight':
     'Вы несёте груз. Скорость передвижения снижена на {pct}%.',
+  'hudChrome.auraEffect.tankToll': 'Как танк, вы наносите другим игрокам меньше урона, а ваше самоисцеление слабее: оба эффекта снижены на {pct}%',
   'hudChrome.auraEffect.carriedFlag':
     'Вы несете вражеский флаг. Отмените этот эффект, чтобы бросить его.',
   'hudChrome.auraEffect.elementalConvergencePrimed':

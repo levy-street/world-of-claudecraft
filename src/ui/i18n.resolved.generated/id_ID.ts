@@ -4799,6 +4799,7 @@ export const id_ID: EnTranslations = {
       "internalCooldown": "Efek ini tidak dapat terpicu lagi hingga penghitung waktu berakhir",
       "carriedFlag": "Kamu membawa bendera musuh. Batalkan buff ini untuk menjatuhkannya.",
       "carryingFreight": "Anda sedang membawa kargo. Kecepatan gerak berkurang {pct}%.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
       "battleStance": "Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak",
       "berserkerStance": "Kuda-kuda Berserker: kritis 3% lebih sering dan menghantam 3% lebih keras",
       "crit": "Meningkatkan peluang serangan kritis sebesar {pct}%",
