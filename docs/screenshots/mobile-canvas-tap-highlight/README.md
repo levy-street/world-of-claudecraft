@@ -1,0 +1,3 @@
+Matched browser-compositor captures from the same controlled canvas fixture, using the shipped stylesheet, `Input`, `MobileControls`, and mob hover cursor. Genuine Chromium touch input releases over the white test target. These are isolated input/canvas captures, not gameplay or affected-phone screenshots.
+
+Before, the native blue tap highlight tints the full canvas even though its backing pixels and camera do not change. After, the canvas-only stylesheet rule suppresses that overlay and the pick callback still fires once. Ordinary HUD controls retain their native feedback. The regression lives in `tests/browser/world_canvas_tap_highlight.browser.test.ts`; real-world hit picking and gestures were checked separately in the local offline game.

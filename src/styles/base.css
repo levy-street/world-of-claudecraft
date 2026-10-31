@@ -232,6 +232,9 @@
     height: var(--app-vh);
     display: block;
     z-index: 0;
+    /* Interactive hover cursors make this whole canvas a browser tap target.
+       The game draws click feedback; a native highlight would tint the viewport. */
+    -webkit-tap-highlight-color: transparent;
   }
   /* Ghost (spirit) mode: drain the world to greyscale, the classic WoW death look.
      Applied to the 3D canvas only so the HUD / resurrect prompt stay legible. Toggled
