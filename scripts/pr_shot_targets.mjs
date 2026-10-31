@@ -4351,10 +4351,19 @@ export const TARGETS = [
           polling: 200,
         })
         .catch(() => {});
-      const icon = await page.$('#debuff-bar > *');
-      if (icon) {
-        await icon.hover();
-        await pollForSize(page, '#tooltip', 10, 300);
+      // Hover the first VISIBLE debuff (the painter pools hidden nodes, which are
+      // not hoverable); a base without the feature has none, and that is fine.
+      const handles = await page.$$('#debuff-bar > *');
+      for (const h of handles) {
+        const box = await h.boundingBox();
+        if (!box || box.width === 0) continue;
+        try {
+          await h.hover();
+          await pollForSize(page, '#tooltip', 10, 300);
+        } catch {
+          // Nothing hoverable: the shot still shows the debuff row as it is.
+        }
+        break;
       }
       await wait(400);
       const region = await page.evaluate(() => {
