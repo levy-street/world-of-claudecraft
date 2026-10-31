@@ -924,7 +924,8 @@ describe('the PvP promise: Season 2 is the PvP upgrade over a full Season 1 kit'
 });
 
 describe('the crowd-control promise: no set makes heavy control spammable', () => {
-  // Player stuns carry no PvP diminishing returns here (src/sim/stun_dr.ts), so
+  // Player stuns other than the rogue's carry no PvP diminishing returns here
+  // (src/sim/stun_dr.ts, stunDiminishesInPvp), so
   // a cooldown cut on a stun is pure extra stun time; fears, roots, pulls and
   // lockouts ride ladders but still gain uptime. Every Season 2 set that
   // shortens a control ability's cooldown, flat or through a cast-triggered

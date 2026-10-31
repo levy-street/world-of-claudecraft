@@ -23,6 +23,17 @@ const CONTROLLED_STUNS = new Set([
   'sun_gods_verdict',
 ]);
 
+// The rogue stuns that DO walk the PvP ladder (see the balance-pass note on
+// crowdControlDurationAfterDr). Each keeps its classic bucket above, so Gut
+// Punch (openerStun) and Low Blow (controlledStun) still diminish
+// independently of each other.
+const PVP_DIMINISHED_STUNS = new Set(['cheap_shot', 'kidney_shot']);
+
+/** True when a stun from this ability walks the PvP diminishing-returns ladder. */
+export function stunDiminishesInPvp(abilityId: string | undefined): boolean {
+  return abilityId !== undefined && PVP_DIMINISHED_STUNS.has(abilityId);
+}
+
 export function stunDrCategory(abilityId: string): CrowdControlDrCategory {
   if (OPENER_STUNS.has(abilityId)) return 'openerStun';
   if (CONTROLLED_STUNS.has(abilityId)) return 'controlledStun';
@@ -73,6 +84,13 @@ const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
  * returns. They operate differently from fear: short flat durations behind
  * real cooldowns, so the ladder only made banked stuns (Twin Gavels) feel
  * broken. Fear, polymorph, root, and school lockouts keep their ladders.
+ *
+ * Rogue stuns are the exception (`stunDiminishesInPvp`, keyed on the stunning
+ * ability's id): Gut Punch has no cooldown once Cheap Trick lifts its stealth
+ * gate, so with no ladder a rogue chained it between Low Blows and held a
+ * player stunned for a whole duel. They walk the shared 100/50/25/immune
+ * ladder on the stun reset window; a stun that passes no ability id, or any
+ * other ability's, stays exempt and never writes a DR stage.
  */
 export function crowdControlDurationAfterDr(
   now: number,
@@ -81,11 +99,12 @@ export function crowdControlDurationAfterDr(
   target: Entity,
   category: CrowdControlDrCategory,
   duration: number,
+  abilityId?: string,
 ): number | null {
   if (source.kind !== 'player' || target.kind !== 'player' || !isHostileTo(source, target)) {
     return duration;
   }
-  if (isStunDrCategory(category)) return duration;
+  if (isStunDrCategory(category) && !stunDiminishesInPvp(abilityId)) return duration;
   const existing = target.ccDr.get(category);
   const stage = existing && existing.resetAt > now ? existing.stage : 0;
   const reset =
@@ -118,8 +137,8 @@ export function crowdControlDurationAfterDr(
  *
  * The two are layered rather than fused because they are separate mechanisms.
  * The ladder has five distinct exits inside its hostile branch and they do not
- * all want the same treatment: stuns take an early return that exempts them
- * from the ladder (see the balance-pass comment on `crowdControlDurationAfterDr`)
+ * all want the same treatment: exempt stuns take an early return that skips
+ * the ladder (see the balance-pass comment on `crowdControlDurationAfterDr`)
  * but NOT from the set reduction, and a DR-immune target returns null, which
  * means "apply nothing" and must pass through untouched rather than being
  * multiplied. Applying the reduction at the generic ladder exit alone would
@@ -137,8 +156,17 @@ export function diminishedCrowdControlDuration(
   target: Entity,
   category: CrowdControlDrCategory,
   duration: number,
+  abilityId?: string,
 ): number | null {
-  const base = crowdControlDurationAfterDr(now, isHostileTo, source, target, category, duration);
+  const base = crowdControlDurationAfterDr(
+    now,
+    isHostileTo,
+    source,
+    target,
+    category,
+    duration,
+    abilityId,
+  );
   if (base === null) return null; // already DR-immune: apply nothing at all
   if (source.kind !== 'player' || target.kind !== 'player') return base;
   if (!isHostileTo(source, target)) return base;

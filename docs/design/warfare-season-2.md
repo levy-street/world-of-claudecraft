@@ -184,7 +184,8 @@ everywhere. These rules hold them together:
 Playtest feedback (Oath Chain's pull plus kick, speed after a cast, two thin bonuses) and an
 owner-requested audit of every cooldown cut on a crowd-control ability. Player stuns carry no
 PvP diminishing returns in this game (`src/sim/stun_dr.ts`), so a stun cooldown cut is pure
-extra stun time. The per-spec sections below keep the original drafts; these rows supersede
+extra stun time. (Later revision: the rogue's Gut Punch and Low Blow now walk the PvP ladder,
+`stunDiminishesInPvp`; every other player stun is still exempt.) The per-spec sections below keep the original drafts; these rows supersede
 them, and the shipped tooltip text is the source of truth.
 
 | Set | Tier | Was | Now | Why |

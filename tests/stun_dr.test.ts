@@ -5,6 +5,7 @@ import {
   crowdControlDurationAfterDr,
   diminishedCrowdControlDuration,
   isStunDrCategory,
+  stunDiminishesInPvp,
   stunDrCategory,
 } from '../src/sim/stun_dr';
 import type { CrowdControlDrCategory, Entity } from '../src/sim/types';
@@ -127,7 +128,7 @@ describe('crowdControlDurationAfterDr / diminishedCrowdControlDuration', () => {
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(0.5);
   });
 
-  it('leaves stun categories (openerStun/controlledStun/randomStun) undiminished', () => {
+  it('leaves stun categories (openerStun/controlledStun/randomStun) undiminished with no ability id', () => {
     const stunCategories: CrowdControlDrCategory[] = ['openerStun', 'controlledStun', 'randomStun'];
     for (const category of stunCategories) {
       const { source, target } = players();
@@ -135,6 +136,86 @@ describe('crowdControlDurationAfterDr / diminishedCrowdControlDuration', () => {
         expect(crowdControlDurationAfterDr(0, hostile, source, target, category, 3)).toBe(3);
       }
     }
+  });
+
+  it('puts only the rogue stuns on the stun ladder', () => {
+    expect(stunDiminishesInPvp('cheap_shot')).toBe(true);
+    expect(stunDiminishesInPvp('kidney_shot')).toBe(true);
+    for (const id of ['hammer_of_justice', 'pounce', 'bash', 'charge', 'faultline', undefined]) {
+      expect(stunDiminishesInPvp(id), String(id)).toBe(false);
+    }
+  });
+
+  it('walks Gut Punch and Low Blow down 100/50/25/immune, each in its own bucket', () => {
+    const { source, target } = players();
+    const gutPunch = () =>
+      crowdControlDurationAfterDr(0, hostile, source, target, 'openerStun', 4, 'cheap_shot');
+    expect(gutPunch()).toBe(4);
+    expect(gutPunch()).toBe(2);
+    expect(gutPunch()).toBe(1);
+    expect(gutPunch()).toBeNull();
+    // Opener immunity leaves the controlled bucket fresh.
+    const lowBlow = () =>
+      crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 7, 'kidney_shot');
+    expect(lowBlow()).toBe(7);
+    expect(lowBlow()).toBe(3.5);
+    // The stun reset window (18 sec) restarts the ladder.
+    expect(
+      crowdControlDurationAfterDr(18.5, hostile, source, target, 'openerStun', 4, 'cheap_shot'),
+    ).toBe(4);
+  });
+
+  it('keeps another stun exempt in a bucket a rogue stun has spent, and writes no stage', () => {
+    const { source, target } = players();
+    for (let i = 0; i < 3; i++) {
+      crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 7, 'kidney_shot');
+    }
+    for (let i = 0; i < 3; i++) {
+      expect(
+        crowdControlDurationAfterDr(
+          0,
+          hostile,
+          source,
+          target,
+          'controlledStun',
+          3,
+          'hammer_of_justice',
+        ),
+      ).toBe(3);
+    }
+    expect(target.ccDr.get('controlledStun')?.stage).toBe(3);
+  });
+
+  it('never diminishes a rogue stun outside hostile PvP', () => {
+    const { source, target } = players();
+    const wolf = mob();
+    for (let i = 0; i < 4; i++) {
+      expect(
+        crowdControlDurationAfterDr(0, friendly, source, target, 'openerStun', 4, 'cheap_shot'),
+      ).toBe(4);
+      expect(
+        crowdControlDurationAfterDr(0, hostile, source, wolf, 'openerStun', 4, 'cheap_shot'),
+      ).toBe(4);
+    }
+  });
+
+  it('layers the set reduction over a diminished rogue stun and passes immunity through', () => {
+    const { source, target } = players();
+    target.ccDurationReduction = 0.25;
+    const lowBlow = () =>
+      diminishedCrowdControlDuration(
+        0,
+        hostile,
+        source,
+        target,
+        'controlledStun',
+        8,
+        'kidney_shot',
+      );
+    expect(lowBlow()).toBe(6);
+    expect(lowBlow()).toBe(3);
+    expect(lowBlow()).toBe(1.5);
+    expect(lowBlow()).toBeNull();
   });
 
   it('a fresh DR stage arrives once the reset window has passed', () => {
