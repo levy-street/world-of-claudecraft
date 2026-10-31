@@ -4295,6 +4295,85 @@ export const TARGETS = [
       return { clip: { x, y, width, height } };
     },
   },
+  // Tank Toll (src/sim/pvp/tank_toll.ts): the PvP tank restraint debuff and its
+  // tooltip. Driven through the real paths: /dev level and a talent spec make a
+  // committed tank, the player stands on contested ground (a sanctuary refuses
+  // the flag), and the real /pvp chat command raises it; the zone pass then puts
+  // the debuff on. The recipe hovers the debuff for its tooltip and clips the
+  // debuff row plus the tooltip. On a base without the feature the same recipe
+  // shows an empty debuff row, which is the BEFORE frame.
+  {
+    key: 'tank-toll',
+    label: 'Tank Toll debuff and tooltip on a flagged Protection warrior',
+    when: ['sim/pvp/tank_toll', 'sim/pvp/tank_restraint'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Thorgar', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        mobile: true,
+        charClass: 'warrior',
+        charName: 'Thorgar',
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      const spot = { x: 60, z: 700 }; // Thornpeak Heights: contested open ground
+      const staged = await page.evaluate(async (spot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev level 20');
+        await sleep(300);
+        sim.applyTalents({ spec: 'prot', rows: {} }, sim.primaryId);
+        world.chat(`/dev tp ${spot.x} ${spot.z}`);
+        await sleep(600);
+        const player = sim.player;
+        player.pos = sim.groundPos(spot.x, spot.z);
+        player.prevPos = { ...player.pos };
+        sim.rebucket?.(player);
+        game.hud.closeAll?.();
+        world.chat('/pvp');
+        await sleep(1500);
+        return { ok: true, flagged: player.pvpFlag === true };
+      }, spot);
+      if (!staged.ok) throw new Error(staged.reason);
+      await awaitVeilSettled(page);
+      await sweepOverlays(page, 8);
+      // The debuff row has a child only once the zone pass applied Tank Toll; on a
+      // base without the feature it stays empty, so a short wait then move on.
+      await page
+        .waitForFunction(() => (document.getElementById('debuff-bar')?.children.length ?? 0) > 0, {
+          timeout: 8000,
+          polling: 200,
+        })
+        .catch(() => {});
+      const icon = await page.$('#debuff-bar > *');
+      if (icon) {
+        await icon.hover();
+        await pollForSize(page, '#tooltip', 10, 300);
+      }
+      await wait(400);
+      const region = await page.evaluate(() => {
+        const rects = ['debuff-bar', 'buff-bar', 'tooltip']
+          .map((id) => document.getElementById(id))
+          .filter((el) => el && getComputedStyle(el).display !== 'none')
+          .map((el) => el.getBoundingClientRect())
+          .filter((r) => r.width > 0 && r.height > 0);
+        if (rects.length === 0) return null;
+        const pad = 12;
+        const x = Math.max(0, Math.min(...rects.map((r) => r.left)) - pad);
+        const y = Math.max(0, Math.min(...rects.map((r) => r.top)) - pad);
+        const right = Math.min(window.innerWidth, Math.max(...rects.map((r) => r.right)) + pad);
+        const bottom = Math.min(window.innerHeight, Math.max(...rects.map((r) => r.bottom)) + pad);
+        return { x, y, width: right - x, height: bottom - y };
+      });
+      return region ? { clip: region } : { clip: '#ui' };
+    },
+  },
   {
     key: 'aura-strip',
     label: 'Player buff and debuff strips under a full raid-buff load',
