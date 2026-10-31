@@ -15,8 +15,9 @@
 // linger the sim's own combat flag uses (sim.ts engaged pass,
 // `combatTimer < 5`). Any hostile pairing counts, so open-world /pvp fights,
 // free-for-all ground, battlegrounds, arenas and duels all qualify; a mob no
-// player controls never starts or refreshes it. While it holds, ALL of the
-// tank's damage pays it, including damage to creatures.
+// player controls never starts or refreshes it. The damage cut applies only to
+// hits on a hostile player or anything they control (pets, guardians, totems);
+// creatures no player controls always take full damage (combat/damage.ts).
 //
 // The exchange stamp (`Entity.pvpExchangeAt`, sim seconds) is transient combat
 // state: never persisted, never on the wire. Pure leaf: no SimContext, no rng,
