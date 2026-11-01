@@ -28,7 +28,7 @@ import { Vfx } from '../src/render/vfx';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
 import { installCastVfxCanvasStub } from './helpers/cast_vfx_headless';
 
-const FULL: MagmaBurstPlan = { strands: 3, drips: true, fireRing: true };
+const FULL: MagmaBurstPlan = { strands: 2, drips: true, fireRing: true };
 const DT = 1 / 60;
 
 interface StripCall {
@@ -36,6 +36,7 @@ interface StripCall {
   width: number;
   color: number;
   light: number;
+  midY: number;
 }
 interface BurstCall {
   kind: string;
@@ -67,8 +68,8 @@ function harness(lights: TrackedLightHost | null = null) {
     [2, new THREE.Vector3(14, 1.2, 0)],
   ]);
   const braids = new MagmaBraids({
-    strip: (_pts, count, width, color, light) => {
-      strips.push({ count, width, color: color.getHex(), light });
+    strip: (pts, count, width, color, light) => {
+      strips.push({ count, width, color: color.getHex(), light, midY: pts[10].y });
     },
     burst: (_x, y, _z, _c, _n, _p, kind, _d, delay) => {
       bursts.push({ kind, delay: delay ?? 0, y });
@@ -92,8 +93,8 @@ function fly(braids: MagmaBraids, head: THREE.Vector3, to = new THREE.Vector3(14
   }
 }
 
-describe('MagmaBraids: three strands ride the orb', () => {
-  it('draws every strand as core, body and glow, core first, each ending on the orb', () => {
+describe('MagmaBraids: two strands ride the growing orb', () => {
+  it('draws both strands layer first (all cores, then bodies, then glows), ending on the orb', () => {
     const { braids, strips } = harness();
     const head = new THREE.Vector3(0, 1.5, 0);
     const handle = braids.spawn(1, 2, head, FULL);
@@ -103,15 +104,67 @@ describe('MagmaBraids: three strands ride the orb', () => {
     expect(tip.distanceTo(head)).toBeLessThan(1e-3);
     strips.length = 0;
     braids.draw();
-    expect(strips.length).toBe(3 * 3);
-    for (let k = 0; k < 3; k++) {
-      const [core, body, glow] = strips.slice(k * 3, k * 3 + 3);
+    expect(strips.length).toBe(2 * 3);
+    const n = MAGMA_STRANDS.length;
+    for (let k = 0; k < n; k++) {
+      const core = strips[k];
+      const body = strips[n + k];
+      const glow = strips[2 * n + k];
       expect(core.color).toBe(MAGMA_STRANDS[k].core);
       expect(body.color).toBe(MAGMA_STRANDS[k].body);
       expect(glow.color).toBe(MAGMA_STRANDS[k].glow);
       expect(core.width).toBeLessThan(body.width);
       expect(body.width).toBeLessThan(glow.width);
     }
+  });
+
+  it('the orb grows as it flies: progress climbs, the strands thin, the light grows', () => {
+    const lights = fakeLights();
+    const { braids, strips } = harness(lights.host);
+    const head = new THREE.Vector3(0, 1.5, 0);
+    const handle = braids.spawn(1, 2, head, FULL);
+    head.set(1.2, 1.48, 0); // just off the hand: a zero-length channel draws nothing
+    braids.advance(DT, true);
+    const early = {
+      p: braids.progressOf(handle),
+      w: 0,
+      light: lights.writes[lights.writes.length - 1],
+    };
+    strips.length = 0;
+    braids.draw();
+    early.w = strips[0].width;
+    head.set(12, 1.25, 0);
+    braids.advance(DT, true);
+    const late = {
+      p: braids.progressOf(handle),
+      w: 0,
+      light: lights.writes[lights.writes.length - 1],
+    };
+    strips.length = 0;
+    braids.draw();
+    late.w = strips[0].width;
+    expect(early.p).toBeLessThan(0.1);
+    expect(late.p).toBeGreaterThan(0.8);
+    expect(late.w).toBeLessThan(early.w);
+    expect(late.light.intensity).toBeGreaterThan(early.light.intensity * 2);
+  });
+
+  it('reduced motion holds the twist still; full motion keeps it turning', () => {
+    const still = harness();
+    const h1 = new THREE.Vector3(6, 1.4, 0);
+    still.braids.spawn(1, 2, h1, FULL);
+    const midYs = (h: ReturnType<typeof harness>, rm: boolean) => {
+      h.braids.advance(DT * 6, rm);
+      h.strips.length = 0;
+      h.braids.draw();
+      return h.strips[0].midY;
+    };
+    const a = midYs(still, true);
+    expect(midYs(still, true)).toBeCloseTo(a, 6);
+    const moving = harness();
+    moving.braids.spawn(1, 2, new THREE.Vector3(6, 1.4, 0), FULL);
+    const b = midYs(moving, false);
+    expect(Math.abs(midYs(moving, false) - b)).toBeGreaterThan(1e-4);
   });
 
   it('drips lava in flight on the full plan, and not on the lean plan', () => {
@@ -123,17 +176,17 @@ describe('MagmaBraids: three strands ride the orb', () => {
 
     const lean = harness();
     const h2 = new THREE.Vector3(0, 1.5, 0);
-    lean.braids.spawn(1, 2, h2, { strands: 2, drips: false, fireRing: false });
+    lean.braids.spawn(1, 2, h2, { strands: 1, drips: false, fireRing: false });
     fly(lean.braids, h2);
     expect(lean.bursts.length).toBe(0);
     lean.strips.length = 0;
     lean.braids.draw();
-    expect(lean.strips.length).toBe(2 * 3);
+    expect(lean.strips.length).toBe(1 * 3);
   });
 });
 
 describe('MagmaBraids: the impact', () => {
-  it('drains the strands, crumbles them hand-end first, lights a ring of fire, then ends', () => {
+  it('drains the strands and crumbles them as the drain passes, on its own clock', () => {
     const lights = fakeLights();
     const { braids, strips, bursts } = harness(lights.host);
     const head = new THREE.Vector3(0, 1.5, 0);
@@ -141,35 +194,51 @@ describe('MagmaBraids: the impact', () => {
     fly(braids, head);
     bursts.length = 0;
     braids.impact(handle, new THREE.Vector3(14, 1.2, 0));
+    // nothing is scheduled through the shared delayed-burst pool
+    expect(bursts.length).toBe(0);
+    const drawnPoints = () => {
+      strips.length = 0;
+      braids.draw();
+      return strips.reduce((sum, st) => sum + st.count, 0);
+    };
+    braids.advance(DT, false);
+    const early = drawnPoints();
+    const flakesEarly = bursts.filter((b) => b.kind === 'debris').length;
+    braids.advance(BRAID_DRAIN_S * 0.6, false);
+    expect(drawnPoints()).toBeLessThan(early);
+    expect(bursts.filter((b) => b.kind === 'debris').length).toBeGreaterThan(flakesEarly);
+    braids.advance(BRAID_DRAIN_S, false);
+    expect(drawnPoints()).toBe(0);
     const flakes = bursts.filter((b) => b.kind === 'debris');
-    const fire = bursts.filter((b) => b.kind === 'embers');
-    expect(flakes.length).toBeGreaterThan(6);
-    // staggered by the drain: from the hand end first, all within the drain
-    const delays = flakes.map((b) => b.delay);
-    expect(Math.max(...delays)).toBeLessThanOrEqual(BRAID_DRAIN_S + 1e-6);
-    expect(Math.min(...delays)).toBeLessThan(0.05);
-    expect(fire.length).toBeGreaterThanOrEqual(40); // the ring, in waves
-    expect(new Set(fire.map((b) => b.delay)).size).toBeGreaterThan(1);
-    for (const f of fire) expect(f.y).toBeCloseTo(0.1); // on the ground
+    expect(flakes.length).toBeGreaterThan(10);
+    for (const b of bursts) expect(b.delay).toBe(0);
     // a second impact is ignored
     const n = bursts.length;
     braids.impact(handle, new THREE.Vector3(14, 1.2, 0));
     expect(bursts.length).toBe(n);
+  });
 
-    const drawnPoints = () => {
-      strips.length = 0;
-      braids.draw();
-      return strips.reduce((a, s) => a + s.count, 0);
-    };
-    braids.advance(DT, false);
-    const early = drawnPoints();
-    braids.advance(BRAID_DRAIN_S * 0.6, false);
-    const mid = drawnPoints();
-    expect(mid).toBeLessThan(early); // the strands drain into the target
-    braids.advance(BRAID_DRAIN_S, false);
-    expect(drawnPoints()).toBe(0);
-    expect(braids.activeCount()).toBe(1); // the ring of fire still burns (light)
-    braids.advance(FIRE_RING_S, false);
+  it('the ring of fire burns in waves across its whole life, on the ground, then the braid ends', () => {
+    const lights = fakeLights();
+    const { braids, bursts } = harness(lights.host);
+    const head = new THREE.Vector3(0, 1.5, 0);
+    const handle = braids.spawn(1, 2, head, FULL);
+    fly(braids, head);
+    bursts.length = 0;
+    braids.impact(handle, new THREE.Vector3(14, 1.2, 0));
+    const fire = () => bursts.filter((b) => b.kind === 'embers');
+    const seen: number[] = [];
+    for (let t = 0; t < FIRE_RING_S + 0.1; t += DT) {
+      braids.advance(DT, false);
+      seen.push(fire().length);
+    }
+    expect(fire().length).toBe(4 * 14);
+    for (const f of fire()) expect(f.y).toBeCloseTo(0.1);
+    // the waves land at distinct moments spread over the ring's life
+    const steps = seen.filter((c, i) => i > 0 && c > seen[i - 1]).length;
+    expect(steps).toBe(4);
+    const lastWaveFrame = seen.findIndex((c) => c === 4 * 14);
+    expect(lastWaveFrame * DT).toBeGreaterThan(0.6);
     expect(braids.activeCount()).toBe(0);
     expect(lights.released).toEqual([7]);
   });
@@ -208,18 +277,30 @@ describe('MagmaBraids: the impact', () => {
     expect(braids.activeCount()).toBe(0);
   });
 
-  it('reduced motion holds the flight light steady', () => {
+  it('reduced motion: the flight light only grows with the orb, it never flickers', () => {
     const lights = fakeLights();
     const { braids } = harness(lights.host);
     const head = new THREE.Vector3(0, 1.5, 0);
     braids.spawn(1, 2, head, FULL);
-    const seen = new Set<number>();
+    const seen: number[] = [];
     for (let f = 0; f < 20; f++) {
       head.x += 26 * DT;
       braids.advance(DT, true);
-      seen.add(lights.writes[lights.writes.length - 1].intensity);
+      seen.push(lights.writes[lights.writes.length - 1].intensity);
     }
-    expect(seen.size).toBe(1);
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeGreaterThanOrEqual(seen[i - 1]);
+    // with motion on, the same flight flickers (some frame dims below the last)
+    const lit = fakeLights();
+    const moving = harness(lit.host);
+    const h2 = new THREE.Vector3(0, 1.5, 0);
+    moving.braids.spawn(1, 2, h2, FULL);
+    const vals: number[] = [];
+    for (let f = 0; f < 40; f++) {
+      h2.x += 26 * DT * 0.2;
+      moving.braids.advance(DT, false);
+      vals.push(lit.writes[lit.writes.length - 1].intensity);
+    }
+    expect(vals.some((v, i) => i > 0 && v < vals[i - 1])).toBe(true);
   });
 });
 

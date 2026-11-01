@@ -1,6 +1,8 @@
-// Pure core of the Magma Burst triple braid (the Shaman's lava_burst): three
-// molten strands that spiral around each other from the caster's hand into the
-// flying magma orb, the per-strand look, and what each budget tier draws.
+// Pure core of the Magma Burst braid (the Shaman's lava_burst): two molten
+// strands that spiral around each other from the caster's hand into the flying
+// magma orb, which SWELLS as the strands pour into it (a small bead at the
+// hand, a full molten orb at arrival), the per-strand look, the growth curves
+// the orb, the strands and the light share, and what each budget tier draws.
 // Three-, DOM- and i18n-free; the clock and every position come in as plain
 // numbers, so a test drives it directly. The Three-side owner is
 // magma_braid.ts, which draws these points as ribbon strips, drips lava off
@@ -35,13 +37,43 @@ export interface StrandStyle {
   core: number;
 }
 
-/** The three strands: deep red-orange, white-hot, and orange, evenly spaced
- * around the twist. With two strands (low quality) the first two draw. */
+/** The two strands: deep red-orange and white-hot, half a turn apart, so
+ * they braid around each other instead of running side by side. */
 export const MAGMA_STRANDS: readonly StrandStyle[] = [
   { phase: 0, width: 1, glow: 0xd9300f, body: 0xff7a1a, core: 0xffd23f },
-  { phase: (Math.PI * 2) / 3, width: 0.8, glow: 0xb8260c, body: 0xff9a2e, core: 0xfff6d6 },
-  { phase: (Math.PI * 4) / 3, width: 0.9, glow: 0xd9300f, body: 0xff6a12, core: 0xffd23f },
+  { phase: Math.PI, width: 0.85, glow: 0xb8260c, body: 0xff9a2e, core: 0xfff6d6 },
 ];
+
+/** The orb's size at the hand and at arrival, as a multiple of its authored
+ * size: it leaves as a bead and arrives as a full molten orb. */
+export const ORB_SCALE_START = 0.45;
+export const ORB_SCALE_END = 2;
+
+/** How far along its flight a projectile is, 0 at launch to 1 at arrival,
+ * from the distance it started at and the distance left. A degenerate start
+ * (launched on top of its target) reads as arrived. */
+export function flightProgress(startDist: number, distLeft: number): number {
+  if (!(startDist > 1e-3)) return 1;
+  return Math.min(1, Math.max(0, 1 - distLeft / startDist));
+}
+
+/** The orb's size multiplier at a flight progress. */
+export function orbScale(progress: number): number {
+  const p = Math.min(1, Math.max(0, progress));
+  return ORB_SCALE_START + (ORB_SCALE_END - ORB_SCALE_START) * p;
+}
+
+/** The strands thin as they empty into the orb. */
+export function strandWidthScale(progress: number): number {
+  const p = Math.min(1, Math.max(0, progress));
+  return 1.2 - 0.5 * p;
+}
+
+/** The travelling light grows with the orb: intensity and range multipliers. */
+export function flightLightScale(progress: number): number {
+  const p = Math.min(1, Math.max(0, progress));
+  return 0.45 + 0.95 * p;
+}
 
 const basis: Basis = { dx: 0, dy: 0, dz: 0, sx: 0, sy: 0, sz: 0, ux: 0, uy: 0, uz: 0 };
 
@@ -107,7 +139,7 @@ export function impactLightGain(since: number): number {
 }
 
 export interface MagmaBurstPlan {
-  /** Strands drawn (3 normally, 2 at low VFX quality). */
+  /** Strands drawn (two, braided). */
   strands: number;
   /** Lava dripping off the strands in flight. */
   drips: boolean;
@@ -116,14 +148,14 @@ export interface MagmaBurstPlan {
 }
 
 /** VFX quality (the render budget's 0..1 level) below which the braid sheds
- * its third strand and its drips. */
+ * its drips. */
 export const BRAID_FULL_QUALITY = 0.5;
 
 /**
  * What a Magma Burst draws on a given ability-VFX budget tier and VFX quality:
  * tier 0 the full braid, drips and ring of fire; tier 1 the braid alone;
  * tier 2 (the spam floor) nothing, which keeps the color-only heavy bolt.
- * Falling quality sheds the third strand and the drips. Cosmetic only: the
+ * Falling quality sheds the drips. Cosmetic only: the
  * flight time and the hit are identical on every arm.
  */
 export function magmaBurstPlan(tier: number, quality = 1): MagmaBurstPlan | null {
@@ -131,7 +163,7 @@ export function magmaBurstPlan(tier: number, quality = 1): MagmaBurstPlan | null
   const full = tier === 0;
   const rich = quality >= BRAID_FULL_QUALITY;
   return {
-    strands: rich ? 3 : 2,
+    strands: MAGMA_STRANDS.length,
     drips: full && rich,
     fireRing: full,
   };

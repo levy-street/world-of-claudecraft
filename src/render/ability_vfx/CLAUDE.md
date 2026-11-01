@@ -78,10 +78,14 @@ old look. Pinned by `tests/stepped_leader.test.ts` and
 
 Magma Burst (the Shaman's `lava_burst`) follows the same rider shape:
 `magma_burst.ts` routes its heavyBolt cue onto a molten-orb projectile head
-(`../vfx.ts` `moltenOrbProjectile`) ridden by three helical lava strands
-(`magma_braid.ts`, pure helix and plan math in the registered
-`magma_braid_core.ts`), drawn in the same held ribbon pass and lit through the
-same `TrackedLightHost`. Unlike Arc Bolt it keeps the archetype sequencer: its
+(`../vfx.ts` `moltenOrbProjectile`) ridden by two braided lava strands
+(`magma_braid.ts`, pure helix, growth and plan math in the registered
+`magma_braid_core.ts`). One flight progress drives the orb swelling from a
+bead to a full orb, the strands thinning as they pour into it, and the light
+growing with it; the strands draw in the same held ribbon pass (layer first,
+cores before glows), the crumble and the ring of fire run on the braid's own
+clock (never the shared delayed-burst pool: its slots are few and its delays
+cap at 0.2 s), and the light is the same `TrackedLightHost` slot. Unlike Arc Bolt it keeps the archetype sequencer: its
 class-owned spec (`../shaman_vfx_specs.ts`, registered) supplies the `orb`
 windup and an impact stack the braid starts with `awaitTravel` and fires at
 ARRIVAL (`AbilityVfxFx.magmaBraid` / `magmaBraidImpact`). Pinned by

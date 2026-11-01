@@ -3,22 +3,25 @@ import type { TrackedLightHost } from '../light_pulses';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import type { ParticleBurstKind } from './fx';
 import {
-  BRAID_DRAIN_S,
   BRAID_PTS,
   drainedFraction,
   FIRE_RING_RADIUS,
   FIRE_RING_S,
   fillStrand,
+  flightLightScale,
+  flightProgress,
   impactLightGain,
   MAGMA_STRANDS,
   type MagmaBurstPlan,
+  strandWidthScale,
 } from './magma_braid_core';
 import type { AbilityVfxRibbons } from './ribbons';
 import { flightLightGain } from './stepped_leader_core';
 
-// The Magma Burst triple braid (the Shaman's lava_burst): three molten strands
-// spiral from the caster's hand into the flying magma orb (the pooled Vfx
-// projectile drawn with its molten-orb head), dripping lava as they go; when
+// The Magma Burst braid (the Shaman's lava_burst): two molten strands spiral
+// from the caster's hand into the flying magma orb (the pooled Vfx projectile
+// drawn with its molten-orb head), which swells as they pour into it while the
+// strands thin and the light it casts grows; they drip lava as they go; when
 // the orb lands they drain into the target and crumble, and a ring of fire
 // burns at its feet. The archetype sequencer owns the rest of the impact (the
 // flipbook, rings, debris, smoke, scorch) and fires it at the same arrival.
@@ -32,11 +35,17 @@ const SLOTS = 4;
 const ROOT_FRAC = 0.62; // anchor fallback when the hand cannot be sampled
 const DRIP_EVERY_S = 0.06;
 const FLAKE_EVERY = 4; // one crumbling flake per this many strand points
+const RING_WAVES = 4;
+const RING_POINTS = 14;
+/** When each ring-of-fire wave fires, seconds after the burst. */
+function ringWaveAt(w: number): number {
+  return 0.05 + (w * (FIRE_RING_S - 0.4)) / RING_WAVES;
+}
 
 const LIGHT_FLIGHT = 0xff8a3a;
 const LIGHT_IMPACT = 0xffb060;
-const FLIGHT_INTENSITY = 7;
-const FLIGHT_RANGE = 9;
+const FLIGHT_INTENSITY = 10;
+const FLIGHT_RANGE = 10;
 const IMPACT_INTENSITY = 24;
 const IMPACT_RANGE = 15;
 const LIGHT_RELEASE_FADE = 0.15;
@@ -71,6 +80,12 @@ interface BraidSlot {
   age: number;
   dripTimer: number;
   plan: MagmaBurstPlan;
+  /** Distance to the target at launch, and the flight progress since. */
+  startDist: number;
+  progress: number;
+  /** After impact: the next strand point to crumble, and the next ring wave. */
+  flakeNext: number;
+  ringWave: number;
   strands: Float32Array[];
   counts: number[];
   light: number;
@@ -108,6 +123,7 @@ export class MagmaBraids {
   private lights: TrackedLightHost | null = null;
   private readonly pts: THREE.Vector3[] = [];
   private readonly root = new THREE.Vector3();
+  private readonly aim = new THREE.Vector3();
   private reducedMotion = false;
 
   constructor(private host: MagmaBraidHost) {
@@ -123,7 +139,11 @@ export class MagmaBraids {
         since: 0,
         age: 0,
         dripTimer: 0,
-        plan: { strands: 3, drips: true, fireRing: true },
+        plan: { strands: MAGMA_STRANDS.length, drips: true, fireRing: true },
+        startDist: 0,
+        progress: 0,
+        flakeNext: 1,
+        ringWave: 0,
         strands: MAGMA_STRANDS.map(() => new Float32Array(BRAID_PTS * 3)),
         counts: MAGMA_STRANDS.map(() => 0),
         light: -1,
@@ -172,6 +192,8 @@ export class MagmaBraids {
     s.age = 0;
     s.dripTimer = 0;
     s.plan = plan;
+    s.progress = 0;
+    s.startDist = this.host.anchor(targetId, 0.5, this.aim) ? head.distanceTo(this.aim) : 0;
     for (let k = 0; k < s.counts.length; k++) s.counts[k] = 0;
     s.light = this.lights ? this.lights.track() : -1;
     this.shape(s);
@@ -191,29 +213,15 @@ export class MagmaBraids {
     s.landed = true;
     s.head = null;
     s.since = 0;
+    s.progress = 1;
     s.impact.copy(at);
     // Shape the braid one last time so it ends ON the impact point.
     this.shapeTo(s, at.x, at.y, at.z);
-    // Each strand crumbles from the hand end first, as the drain passes it.
-    for (let k = 0; k < s.plan.strands; k++) {
-      const pts = s.strands[k];
-      const n = s.counts[k];
-      for (let i = 1; i < n - 1; i += FLAKE_EVERY) {
-        const f = i / (n - 1);
-        this.host.burst(
-          pts[i * 3],
-          pts[i * 3 + 1],
-          pts[i * 3 + 2],
-          0x5a2410,
-          1,
-          0.22,
-          'debris',
-          0.9,
-          f * BRAID_DRAIN_S,
-        );
-      }
-    }
-    if (s.plan.fireRing) this.fireRing(at);
+    // The crumble and the ring of fire run on this braid's own clock in
+    // advance() (never through the shared delayed-burst pool, whose slots are
+    // few and whose delays are capped far below the ring's life).
+    s.flakeNext = 1;
+    s.ringWave = 0;
     // The flash stands back toward the caster so it lights the target's facing
     // side and the ground, not the inside of the struck mesh.
     const pts = s.strands[0];
@@ -265,33 +273,43 @@ export class MagmaBraids {
         x,
         y,
         z,
-        s.age,
+        // reduced motion holds the twist still rather than spinning it
+        this.reducedMotion ? 0 : s.age,
         MAGMA_STRANDS[k].phase,
       );
     }
   }
 
-  private fireRing(at: THREE.Vector3): void {
-    const POINTS = 14;
-    const WAVES = 4;
-    for (let w = 0; w < WAVES; w++) {
-      const delay = 0.05 + (w * (FIRE_RING_S - 0.4)) / WAVES;
-      for (let i = 0; i < POINTS; i++) {
-        const a = (i / POINTS) * Math.PI * 2 + w * 0.2;
-        const x = at.x + Math.cos(a) * FIRE_RING_RADIUS;
-        const z = at.z + Math.sin(a) * FIRE_RING_RADIUS;
-        this.host.burst(
-          x,
-          this.host.groundY(x, z) + 0.1,
-          z,
-          0xff7a1a,
-          2,
-          0.32,
-          'embers',
-          0.55,
-          delay,
-        );
+  /** Emit every fire-ring wave whose time has come (one per call at most per
+   *  wave), immediately, from the braid's own impact clock. */
+  private fireRingWaves(s: BraidSlot): void {
+    while (s.ringWave < RING_WAVES && s.since >= ringWaveAt(s.ringWave)) {
+      this.fireRingWave(s.impact, s.ringWave);
+      s.ringWave++;
+    }
+  }
+
+  private fireRingWave(at: THREE.Vector3, w: number): void {
+    for (let i = 0; i < RING_POINTS; i++) {
+      const a = (i / RING_POINTS) * Math.PI * 2 + w * 0.2;
+      const x = at.x + Math.cos(a) * FIRE_RING_RADIUS;
+      const z = at.z + Math.sin(a) * FIRE_RING_RADIUS;
+      this.host.burst(x, this.host.groundY(x, z) + 0.1, z, 0xff7a1a, 2, 0.32, 'embers', 0.55);
+    }
+  }
+
+  /** Crumble each strand as the drain passes over it, hand end first. */
+  private crumble(s: BraidSlot): void {
+    const drained = drainedFraction(s.since);
+    const n = s.counts[0];
+    if (n < 3) return;
+    while (s.flakeNext < n - 1 && s.flakeNext / (n - 1) <= drained) {
+      const i = s.flakeNext;
+      for (let k = 0; k < s.plan.strands; k++) {
+        const p = s.strands[k];
+        this.host.burst(p[i * 3], p[i * 3 + 1], p[i * 3 + 2], 0x5a2410, 1, 0.22, 'debris', 0.9);
       }
+      s.flakeNext += FLAKE_EVERY;
     }
   }
 
@@ -308,12 +326,27 @@ export class MagmaBraids {
           continue;
         }
         this.shape(s);
+        if (this.host.anchor(s.targetId, 0.5, this.aim))
+          s.progress = flightProgress(s.startDist, head.distanceTo(this.aim));
         if (s.plan.drips) this.drip(s, dt);
+        // the light grows with the orb: a bead's glow at the hand, a full
+        // molten orb's light on the ground by the time it arrives
+        const grow = flightLightScale(s.progress);
         const gain = flightLightGain(reducedMotion ? 1 : Math.random());
-        this.light(s, head.x, head.y, head.z, FLIGHT_INTENSITY * gain, LIGHT_FLIGHT, FLIGHT_RANGE);
+        this.light(
+          s,
+          head.x,
+          head.y,
+          head.z,
+          FLIGHT_INTENSITY * gain * grow,
+          LIGHT_FLIGHT,
+          FLIGHT_RANGE * grow,
+        );
         continue;
       }
       s.since += dt;
+      this.crumble(s);
+      if (s.plan.fireRing) this.fireRingWaves(s);
       const end = s.plan.fireRing ? FIRE_RING_S : SHORT_TAIL_S;
       if (s.since >= end) {
         this.release(s);
@@ -359,33 +392,42 @@ export class MagmaBraids {
   }
 
   /** Emit every live braid's strips; valid only inside the ribbon pool's
-   *  drawHeld callback (the pack is open there). Core strips go first: the
-   *  shared pool accepts or refuses a strip whole, so under vertex pressure
-   *  the dim outer layer is what drops. */
+   *  drawHeld callback (the pack is open there). LAYER first across every
+   *  braid and strand (all cores, then all bodies, then all glows): the shared
+   *  pool accepts or refuses a strip whole, so under vertex pressure the dim
+   *  outer glow is what drops, never a strand's core. */
   draw(): void {
     const strip = this.host.strip;
-    for (const s of this.slots) {
-      if (!s.active) continue;
-      const drained = s.landed ? drainedFraction(s.since) : 0;
-      if (drained >= 1) continue;
-      const fade = 1 - drained * 0.5;
-      for (let k = 0; k < s.plan.strands; k++) {
-        const n = s.counts[k];
-        const start = Math.floor(drained * (n - 1));
-        const m = n - start;
-        if (m < 2) continue;
-        const src = s.strands[k];
-        for (let i = 0; i < m; i++) {
-          const j = (start + i) * 3;
-          this.pts[i].set(src[j], src[j + 1], src[j + 2]);
+    for (let layer = 0; layer < 3; layer++) {
+      for (const s of this.slots) {
+        if (!s.active) continue;
+        const drained = s.landed ? drainedFraction(s.since) : 0;
+        if (drained >= 1) continue;
+        const fade = 1 - drained * 0.5;
+        const thin = strandWidthScale(s.progress); // the strands empty into the orb
+        for (let k = 0; k < s.plan.strands; k++) {
+          const n = s.counts[k];
+          const start = Math.floor(drained * (n - 1));
+          const m = n - start;
+          if (m < 2) continue;
+          const src = s.strands[k];
+          for (let i = 0; i < m; i++) {
+            const j = (start + i) * 3;
+            this.pts[i].set(src[j], src[j + 1], src[j + 2]);
+          }
+          const c = STRAND_COLORS[k];
+          const w = c.width * thin;
+          if (layer === 0) strip(this.pts, m, 0.12 * w, c.core, 1.6 * fade, 0.3);
+          else if (layer === 1) strip(this.pts, m, 0.38 * w, c.body, 1.1 * fade, 0.3);
+          else strip(this.pts, m, 0.85 * w, c.glow, 0.55 * fade, 0.3);
         }
-        const c = STRAND_COLORS[k];
-        const w = c.width;
-        strip(this.pts, m, 0.09 * w, c.core, 1.6 * fade, 0.3);
-        strip(this.pts, m, 0.27 * w, c.body, 1.1 * fade, 0.3);
-        strip(this.pts, m, 0.6 * w, c.glow, 0.55 * fade, 0.3);
       }
     }
+  }
+
+  /** Probe readout: a live braid's flight progress (0 at launch, 1 landed). */
+  progressOf(handle: number): number {
+    return this.slotOf(handle)?.progress ?? -1;
   }
 
   /** Probe readout: a live braid's first-strand end point. */

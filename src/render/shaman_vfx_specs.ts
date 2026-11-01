@@ -3,9 +3,10 @@ import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
 // Magma Burst (lava_burst), the Elemental Shaman's molten nuke. Before this
 // spec it had no authored identity and drew the renderer's generic heavy bolt.
 // Prompt contract: "A molten orb swells between the Shaman's hands while
-// casting, then flies on three twisting strands of lava that drip as they go;
-// the orb lands in a fire flash with sparks, debris, smoke and a scorch, the
-// strands drain and crumble, and a ring of fire burns at the target's feet."
+// casting, then flies on two braided strands of lava that pour into it, so it
+// swells from a bead to a full orb, dripping as they go; the orb lands in a
+// fire flash with sparks, debris, smoke and a scorch, the strands drain and
+// crumble, and a ring of fire burns at the target's feet. It lights the world."
 //
 // The flight and the strands are bespoke (ability_vfx/magma_burst.ts and
 // magma_braid.ts ride the pooled projectile); this spec supplies the shared
@@ -20,7 +21,6 @@ export const MAGMA_BURST_VFX_SPEC = {
   vr: 1,
   db: 1,
   sm: 1,
-  li: 0.9,
   b: { v: 26, h: 1.6 },
   lg: 3,
   wu: 2,
@@ -46,6 +46,7 @@ export const MAGMA_BURST_VFX_FULL_SPEC = {
     sparks: 40,
     debris: true,
     smoke: true,
-    light: 0.9,
+    // no sequencer light: the braid's tracked light owns the impact flash, so
+    // the read is the same on every tier (a pulse would stack on rich tiers)
   },
 } satisfies AbilityVfxFullSpec;

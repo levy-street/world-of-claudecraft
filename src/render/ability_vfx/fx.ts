@@ -490,7 +490,10 @@ export class AbilityVfxFx implements SequencerHost {
   // The Magma Burst triple braid (magma_braid.ts) and the archetype sequence
   // each braid fires at arrival, keyed by the braid's handle.
   private braids: MagmaBraids;
-  private braidSeq = new Map<number, SeqSlot>();
+  // Each entry keeps the identity the slot was started with: a held slot can be
+  // stolen by a later cast (the pool reuses the oldest), and a stale entry must
+  // never land or cancel someone else's sequence.
+  private braidSeq = new Map<number, { slot: SeqSlot; caster: number; ability: string }>();
   private decals: GroundDecals;
   private overlay: OverlaySprites;
   private pillars: LightPillars;
@@ -1874,24 +1877,27 @@ export class AbilityVfxFx implements SequencerHost {
     const seq = spec
       ? this.sequencer.start(this, abilityId, spec, sourceId, targetId, colorHex, tier, true)
       : null;
-    if (seq) this.braidSeq.set(handle, seq);
+    if (seq) this.braidSeq.set(handle, { slot: seq, caster: sourceId, ability: abilityId });
     return handle;
+  }
+  private takeBraidSeq(handle: number): SeqSlot | null {
+    const held = this.braidSeq.get(handle);
+    if (!held) return null;
+    this.braidSeq.delete(handle);
+    const { slot } = held;
+    return slot.active && slot.casterId === held.caster && slot.abilityId === held.ability
+      ? slot
+      : null;
   }
   magmaBraidImpact(handle: number, at: THREE.Vector3): void {
     this.braids.impact(handle, at);
-    const seq = this.braidSeq.get(handle);
-    if (seq) {
-      this.braidSeq.delete(handle);
-      this.sequencer.triggerImpact(this, seq, at.x, at.y, at.z);
-    }
+    const seq = this.takeBraidSeq(handle);
+    if (seq) this.sequencer.triggerImpact(this, seq, at.x, at.y, at.z);
   }
   magmaBraidLost(handle: number): void {
     this.braids.lost(handle);
-    const seq = this.braidSeq.get(handle);
-    if (seq) {
-      this.braidSeq.delete(handle);
-      this.sequencer.cancel(seq);
-    }
+    const seq = this.takeBraidSeq(handle);
+    if (seq) this.sequencer.cancel(seq);
   }
   /** Live braids (probe/test readout). */
   magmaBraidCount(): number {

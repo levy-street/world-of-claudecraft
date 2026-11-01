@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { flightProgress, orbScale } from './ability_vfx/magma_braid_core';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { tagCastVfxEngine } from './cast_vfx_family';
@@ -329,6 +330,8 @@ interface Projectile {
   // A molten magma orb head (Magma Burst): white-hot core, orange halo, two
   // embers circling it; the triple braid (ability_vfx/magma_braid.ts) rides it.
   orb?: boolean;
+  // The orb's distance to its target at launch: it swells with its flight.
+  startDist?: number;
 }
 
 /** Options for a lightning projectile whose flight another effect rides. */
@@ -2780,6 +2783,10 @@ export class Vfx {
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
       if (pr.orb) {
+        // It swells as it flies (the braid pours into it): a bead at the hand,
+        // a full molten orb at arrival.
+        pr.startDist ??= dist;
+        const g = orbScale(flightProgress(pr.startDist, dist));
         // The molten orb: a crusty fire blob (fire_01) round a white-hot flare
         // core, two embers circling it, and the odd glob flung off. Lives about
         // two frames, so the head never strings out into a trail. (glowCore is
@@ -2792,33 +2799,46 @@ export class Vfx {
           0,
           0,
           pr.trailColor,
-          2.3,
+          2.3 * g,
           0.035,
           0,
           SPR.firePuff,
         );
         // a second blob, offset, so the molten body reads dense, not sparse
         this.spawn(
-          pr.pos.x + 0.08,
-          pr.pos.y - 0.06,
+          pr.pos.x + 0.08 * g,
+          pr.pos.y - 0.06 * g,
           pr.pos.z,
           0,
           0,
           0,
           pr.trailColor,
-          1.9,
+          1.9 * g,
           0.035,
           0,
           SPR.firePuff,
         );
-        this.spawn(pr.pos.x, pr.pos.y, pr.pos.z, 0, 0, 0, pr.coreColor, 1.5, 0.035, 0, SPR.flash);
-        const spin = pr.ttl * 12;
+        this.spawn(
+          pr.pos.x,
+          pr.pos.y,
+          pr.pos.z,
+          0,
+          0,
+          0,
+          pr.coreColor,
+          1.5 * g,
+          0.035,
+          0,
+          SPR.flash,
+        );
+        // reduced motion holds the embers still rather than circling
+        const spin = reducedMotion ? 0.6 : pr.ttl * 12;
         for (let k = 0; k < 2; k++) {
           const a = spin + k * Math.PI;
           this.spawn(
-            pr.pos.x + Math.cos(a) * 0.6,
-            pr.pos.y + Math.sin(a) * 0.25,
-            pr.pos.z + Math.sin(a) * 0.6,
+            pr.pos.x + Math.cos(a) * 0.6 * g,
+            pr.pos.y + Math.sin(a) * 0.25 * g,
+            pr.pos.z + Math.sin(a) * 0.6 * g,
             0,
             0,
             0,
