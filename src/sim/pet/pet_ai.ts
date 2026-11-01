@@ -73,6 +73,9 @@ import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
 import { tryUseWarlockPetSkill } from './warlock_pet_skills';
 
+// The sim's engaged pass expires Assist's cast record through this namespace.
+export { expireStalePetAssistCast } from './pet_assist';
+
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const PET_LEASH = 40; // yards from the owner before a pet gives up its target
 const PET_FOLLOW_DISTANCE = 3.5;
