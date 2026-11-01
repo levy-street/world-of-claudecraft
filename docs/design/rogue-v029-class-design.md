@@ -75,9 +75,12 @@ a content-revision free repick, the hunter pattern from PR #2218.
    `vulnerability` aura fold; the party-utility pick).
 2. Foul Play [mod + small hook]: Eye Jab and Sap cost no energy, and your own
    poison and bleed ticks no longer break your Eye Jab incapacitate.
-3. Cheap Trick [small hook]: Gut Punch no longer requires Duskveil. Mid-fight
-   stun access, the PvP pick (relaxes the ability's stealth requirement via a
-   talent flag, the same family as the shipped positional checks).
+3. Cheap Trick [small hook]: Gut Punch no longer requires Duskveil, but has a
+   10 sec cooldown. Mid-fight stun access, the PvP pick (relaxes the ability's
+   stealth requirement via a talent flag, the same family as the shipped
+   positional checks). The cooldown keeps it from chaining: PvP stuns carry no
+   diminishing returns, so without it the stun held ~98% uptime
+   (tests/cheap_trick_stunlock.test.ts).
 
 ### Level 14, kit management. Decision: stealth economy vs poison economy vs builder rhythm
 
