@@ -46,6 +46,33 @@ const LANDMARK_FLAVOUR: Record<string, string> = {
     float hot = fl * 0.75 + wave * 0.15;`,
 };
 
+/** The Heat's falls of lava (its glow faces under the walk: flat sheets in
+ *  the kit, `landmark_pieces.py` `_fall`): painted as a real fall instead of one
+ *  flat red, crust carried down in long streaks with fire showing between them,
+ *  hotter in its broad streams while the quarter wakes, breaking up into
+ *  separate strands as it drops into the abyss. Across a fall is the arc round
+ *  the room for those over the lip, the radius for those off the flanks; their
+ *  sum runs across both. */
+const HEAT_FALL = /* glsl */ `
+  if (vP.y < -0.25) {
+    float across = atan(vP.x, vP.z) * length(vP.xz) + length(vP.xz);
+    float down = vP.y * 0.1 + uTime * 0.42;
+    float stream = lfNoise(vec2(across * 0.62, down * 0.55));
+    float strand = lfNoise(vec2(across * 2.3 + 11.0, down * 1.25));
+    float body = stream * 0.62 + strand * 0.38;
+    float drop = smoothstep(-5.0, -30.0, vP.y);
+    if (body < 0.2 + 0.5 * drop) discard;
+    float fire = smoothstep(0.46, 0.68, body);
+    float core = smoothstep(0.62, 0.78, body);
+    vec3 crust = mix(vec3(0.075, 0.03, 0.022), vec3(0.2, 0.065, 0.03), strand);
+    float heat = mix(0.32 + 0.6 * uQuiet, 1.0, uLit);
+    vec3 lava = mix(uColor, uHot, core * (0.35 + 0.65 * uLit));
+    vec3 fall = mix(crust, lava * (0.7 + 0.8 * uLit), fire * heat);
+    gl_FragColor = vec4(fall * (1.0 - 0.85 * uDark), 1.0);
+    #include <colorspace_fragment>
+    return;
+  }`;
+
 /** A landmark's light (its kit glow slot): its quiet glow while its quarter
  *  sleeps, blazing with its element's life as its quarter wakes. */
 export function landmarkGlowFrag(vein: string): string {
@@ -58,7 +85,15 @@ uniform float uTime;
 uniform float uDark;
 varying vec3 vShade;
 varying vec3 vP;
+float lfHash(vec2 q) { return fract(sin(dot(q, vec2(127.1, 311.7))) * 43758.5453); }
+float lfNoise(vec2 q) {
+  vec2 i = floor(q);
+  vec2 u = fract(q);
+  u = u * u * (3.0 - 2.0 * u);
+  return mix(mix(lfHash(i), lfHash(i + vec2(1.0, 0.0)), u.x), mix(lfHash(i + vec2(0.0, 1.0)), lfHash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
 void main() {
+  ${vein === 'heat' ? HEAT_FALL : ''}
   ${LANDMARK_FLAVOUR[vein]}
   float level = mix(uQuiet * (0.85 + 0.15 * sin(uTime * 1.1 + vP.y * 0.3)), 1.15 * flav, uLit);
   vec3 white = vec3(1.0, 0.97, 0.9);
