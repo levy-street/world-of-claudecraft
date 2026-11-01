@@ -1330,6 +1330,18 @@ export const pl_PL: EnTranslations = {
         "hintBelowMin": "Minimalna cena na Giełdzie to {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Twój zakup dotarł",
+      "description": "Odbierz swój zakup teraz. Jeśli twoje torby są pełne, zostanie przechowany jako nadmiar. Wszystko, co zostawisz na później, będzie czekać w twojej skrzynce pocztowej.",
+      "collect": "Odbierz",
+      "later": "Później"
+    },
+    "membershipWelcome": {
+      "title": "Gratulacje!",
+      "body": "Twoje członkostwo jest aktywne. Korzystaj ze wszystkich jego korzyści, poszukiwaczu przygód!",
+      "bodyUntil": "Twoje członkostwo jest aktywne do {date}. Korzystaj ze wszystkich jego korzyści, poszukiwaczu przygód!",
+      "close": "Naprzód"
+    },
     "wocStore": {
       "subscription": {
         "title": "Subskrypcja gry",
@@ -1344,6 +1356,16 @@ export const pl_PL: EnTranslations = {
         "annualClaim": "Odbierz wierzchowca z pakietu",
         "annualPending": "Po zapłacie wróć do postaci, która dokonała zakupu, aby odebrać wierzchowca z pakietu. Jeśli płatność jest przetwarzana lub trwa okres próbny, spróbuj ponownie po pobraniu opłaty.",
         "annualDelivered": "Klucz do wierzchowca z pakietu został dostarczony pocztą.",
+        "monthlyArtAlt": "Rycerz w zbroi członkowskiej obok skrzydlatego osła kurierskiego",
+        "annualArtAlt": "Rycerz w zbroi członkowskiej z osłem kurierskim i wierzchowcem Chimerą Nocnego Skrzydła",
+        "tokenArtAlt": "Złoty żeton członkostwa",
+        "annualAllBenefits": "Wszystkie korzyści miesięcznego członkostwa.",
+        "annualPerMonth": "Tylko {price} miesięcznie, oszczędzasz {percent} w porównaniu z płatnością co miesiąc.",
+        "annualMountInfo": "Zawiera wierzchowca Chimerę Nocnego Skrzydła dla każdej postaci na twoim koncie. Jego związane z duszą wodze trafiają do okna łupów postaci, która go kupi. Jeden na konto i pozostaje twój po zakończeniu członkostwa.",
+        "annualArriving": "Wodze twojego wierzchowca pojawią się w oknie łupów tej postaci po rozliczeniu płatności. Jeśli trwa okres próbny, dotrą po pierwszej płatności.",
+        "annualArrived": "Wodze twojego wierzchowca dotarły. Odbierz je w oknie łupów.",
+        "tokenDescription": "Żeton członkostwa, który otrzymujesz w grze. Wymień go na 30 dni członkostwa lub handluj nim z innymi graczami i sprzedaj go w domu aukcyjnym.",
+        "tokenArriving": "Twój żeton pojawi się w oknie łupów tej postaci po rozliczeniu płatności.",
         "tokenTitle": "Zbywalny żeton członkostwa",
         "tokenPrice": "{price} za 30 dni",
         "benefitsTitle": "Korzyści aktywnego członkostwa",
@@ -1363,9 +1385,11 @@ export const pl_PL: EnTranslations = {
         "subscribe": "Subskrybuj",
         "addMonth": "Dodaj 1 miesiąc",
         "addYear": "Dodaj 12 miesięcy",
+        "upgradeAnnual": "Przejdź na 12 miesięcy",
         "stackTerms": "Płatność następuje teraz. Czas zostanie dodany na koniec obecnego członkostwa, które następnie odnowi się zgodnie z tym planem.",
         "stackCapped": "Możesz zgromadzić maksymalnie 2 lata członkostwa naraz. Spróbuj ponownie bliżej daty odnowienia.",
         "stackUnavailable": "Dodawanie czasu członkostwa jest obecnie niedostępne. Spróbuj ponownie za chwilę.",
+        "checkoutPending": "Zakup w toku. Oczekiwanie na potwierdzenie.",
         "billingBlocked": "Zaktualizuj dane płatności w sekcji Zarządzaj subskrypcją, zanim dodasz czas członkostwa.",
         "renewsOn": "Odnowienie: {date}",
         "endsOn": "Członkostwo kończy się {date}",

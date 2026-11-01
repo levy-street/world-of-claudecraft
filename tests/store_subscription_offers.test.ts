@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { GAME_SUBSCRIPTION_PLANS, SUBSCRIPTION_OFF } from '../src/subscription_contract';
 import {
   addMonthsSeconds,
+  annualMonthlyValue,
+  MEMBERSHIP_ART_DIR,
   subscriptionOffersHtml,
   subscriptionPurchase,
 } from '../src/ui/store_subscription_offers';
@@ -13,6 +15,18 @@ const badge = (html: string, id: string): string =>
   html.split(`data-membership-badge="${id}"`)[1]?.split('</article>')[0] ?? '';
 
 describe('membership plan badges', () => {
+  it.each(['none', 'canceled', 'incomplete_expired'] as const)(
+    'describes a blocked %s checkout as pending, not a payment-method failure',
+    (status) => {
+      const state = { ...SUBSCRIPTION_OFF, available: true, status, plans, canManage: true };
+      expect(subscriptionPurchase(state, 'game_monthly', NOW)).toBe('pending');
+      const html = subscriptionOffersHtml(state, false, false, false, '', NOW);
+      expect(html).toContain('Checkout pending');
+      expect(html).not.toContain('Update your payment details');
+      expect(html).not.toContain('Not subscribed');
+      expect(html).not.toContain('data-subscription-action="checkout"');
+    },
+  );
   it('shows one priced badge per plan with benefits, annual mount and trial terms', () => {
     const html = subscriptionOffersHtml(
       {
@@ -23,7 +37,6 @@ describe('membership plan badges', () => {
         trialEligible: true,
         trialDays: 7,
       },
-      false,
       false,
       false,
       false,
@@ -41,10 +54,15 @@ describe('membership plan badges', () => {
       expect(html).toContain(text);
     expect(html).not.toContain('Claudium');
     expect(badge(html, 'game_monthly')).not.toContain('Nightwing');
-    for (const id of ['game_monthly', 'game_annual']) {
-      expect(badge(html, id)).toContain('Unlock 10 additional character slots.');
+    expect(badge(html, 'game_monthly')).toContain('Unlock 10 additional character slots.');
+    // Annual: every monthly benefit by reference, the cheaper monthly rate, and the mount.
+    expect(badge(html, 'game_annual')).not.toContain('Unlock 10 additional character slots.');
+    expect(badge(html, 'game_annual')).toContain('All the benefits of a monthly membership.');
+    expect(badge(html, 'game_annual')).toContain(
+      'Just $4.17 per month, saving 17% compared with paying monthly.',
+    );
+    for (const id of ['game_monthly', 'game_annual'])
       expect(badge(html, id)).toContain('Start 7-day free trial');
-    }
     expect(html).not.toContain('$60.00');
     expect(html.match(/data-subscription-action="checkout"/g)).toHaveLength(2);
   });
@@ -52,7 +70,6 @@ describe('membership plan badges', () => {
   it('does not promise trial or rewards through a legacy monthly service', () => {
     const html = subscriptionOffersHtml(
       { ...SUBSCRIPTION_OFF, available: true, canCheckout: true },
-      false,
       false,
       false,
       false,
@@ -78,9 +95,10 @@ describe('membership plan badges', () => {
       stackLimit: NOW + 730 * DAY,
       canManage: true,
     };
-    const html = subscriptionOffersHtml(state, false, false, false, false, '', NOW);
+    const html = subscriptionOffersHtml(state, false, false, false, '', NOW);
     expect(badge(html, 'game_monthly')).toContain('Add 1 month');
-    expect(badge(html, 'game_annual')).toContain('Add 12 months');
+    // A monthly member's annual purchase reads as the upgrade it is.
+    expect(badge(html, 'game_annual')).toContain('Upgrade to 12 months');
     expect(html).toContain('added to the end of your current membership');
     expect(html).toContain('Renews on');
     expect(html).toContain('data-subscription-action="portal"');
@@ -105,9 +123,10 @@ describe('membership plan badges', () => {
     };
     expect(subscriptionPurchase(state, 'game_monthly', NOW)).toBe('stack');
     expect(subscriptionPurchase(state, 'game_annual', NOW)).toBe('capped');
-    const html = subscriptionOffersHtml(state, false, false, false, false, '', NOW);
+    const html = subscriptionOffersHtml(state, false, false, false, '', NOW);
     expect(badge(html, 'game_annual')).toMatch(/data-subscription-action="checkout"[^>]*disabled/);
     expect(badge(html, 'game_annual')).toContain('up to 2 years of membership');
+    expect(badge(html, 'game_annual')).toContain('Add 12 months');
     expect(badge(html, 'game_monthly')).not.toContain('disabled');
   });
 
@@ -126,7 +145,6 @@ describe('membership plan badges', () => {
       false,
       false,
       false,
-      false,
       '',
       NOW,
     );
@@ -135,7 +153,48 @@ describe('membership plan badges', () => {
     expect(html).toContain('data-subscription-action="portal"');
   });
 
-  it('keeps the annual mount collection and the token badge in the same tab', () => {
+  it('puts each column art first, then the purchase controls, then the description', () => {
+    const html = subscriptionOffersHtml(
+      {
+        ...SUBSCRIPTION_OFF,
+        available: true,
+        canCheckout: true,
+        plans,
+        trialEligible: false,
+        trialDays: 7,
+      },
+      false,
+      false,
+      false,
+      '',
+      NOW,
+    );
+    const columns: [string, string, string][] = [
+      ['game_monthly', 'monthly.webp', 'beside the winged courier donkey'],
+      ['game_annual', 'annual.webp', 'with the courier donkey and the Nightwing Chimaera mount'],
+    ];
+    for (const [id, art, alt] of columns) {
+      const column = badge(html, id);
+      expect(column).toContain(`src="${MEMBERSHIP_ART_DIR}/${art}"`);
+      expect(column).toContain(alt);
+      const order = [
+        'membership-badge-art',
+        'membership-badge-price',
+        'data-subscription-action',
+        'membership-badge-details',
+      ].map((marker) => column.indexOf(marker));
+      expect(order.every((at) => at >= 0)).toBe(true);
+      expect([...order].sort((a, b) => a - b)).toEqual(order);
+    }
+  });
+
+  it('values the annual plan from the advertised prices', () => {
+    expect(annualMonthlyValue(5000, 500)).toEqual({ perMonthCents: 417, saving: 1 - 5000 / 6000 });
+    expect(annualMonthlyValue(6000, 500).saving).toBe(0);
+    expect(annualMonthlyValue(7000, 500).saving).toBe(0);
+  });
+
+  it('has no collect buttons; the status reports the annual mount delivery', () => {
     const html = subscriptionOffersHtml(
       {
         ...SUBSCRIPTION_OFF,
@@ -148,13 +207,12 @@ describe('membership plan badges', () => {
       true,
       true,
       false,
-      false,
       '<article data-membership-badge="membership_token"></article>',
       NOW,
     );
-    expect(html).toContain('data-subscription-mount-claim');
+    expect(html).not.toContain('data-subscription-mount-claim');
     expect(html).toContain('data-membership-badge="membership_token"');
-    expect(html).toContain(' disabled');
+    expect(html).toContain('Your mount reins appear in a loot window');
   });
 
   it('adds calendar months in UTC seconds', () => {

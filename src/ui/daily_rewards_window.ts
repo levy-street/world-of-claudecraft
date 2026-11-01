@@ -22,15 +22,12 @@ import {
 import { dailyRewardsHistoryHtml, dailyRewardsLeaderboardHtml } from './daily_rewards_ranks_view';
 import { SpinOverlay } from './daily_rewards_spin_controller';
 import { spinSectionHtml } from './daily_rewards_spin_view';
-import {
-  buildDailyRewardsView,
-  type DailyRewardsView,
-  dailyRewardTaskDescription,
-} from './daily_rewards_view';
+import { dailyRewardsTasksHtml } from './daily_rewards_tasks_view';
+import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
 import { dailyRewardsWalletCardHtml } from './daily_rewards_wallet_card_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
-import { captureFocusKey, findFocusKey, focusedWithin, focusKeyAttr } from './focus_restore';
+import { captureFocusKey, focusedWithin, focusKeyAttr } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import { MountInspect } from './mount_inspect_controller';
 import { hydratePortraits } from './portrait_chip';
@@ -46,6 +43,7 @@ import {
   StoreFocusStash,
 } from './store_focus_policy';
 import { armoryInspectDeps, mountInspectDeps } from './store_inspect_deps';
+import { StoreMembershipController } from './store_membership_controller';
 import type { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { storeSpendControllers } from './store_spend_controllers';
 import { StoreSubscription } from './store_subscription';
@@ -156,6 +154,7 @@ export class DailyRewardsWindow {
   private storePriceChanged = false;
   private paintedStoreBody: HTMLElement | null = null;
   private paintedStoreMarkup: string | null = null;
+  private readonly membershipPainter = new StoreMembershipController();
   private charterSection = emptyCharterSection();
   private charterNotice: CharterNotice | null = null;
   private charterAnnounceSeq = 0;
@@ -505,38 +504,46 @@ export class DailyRewardsWindow {
     if (this.storeRequestIsCurrent(generation)) this.paintStore(body, opts);
   }
 
-  /** The Memberships tab: a cold section that refreshes on entry and after a checkout
-   *  completes, never on the store's background poll. */
+  /** Reuse the store's 15-second poll for status only. Reward claims stay on entry
+   *  and explicit actions; unchanged status preserves the existing DOM. */
   private async renderMemberships(
     focus: 'open' | null,
     opts: { background?: boolean } = {},
   ): Promise<void> {
+    if (!this.isOpen || this.tab !== 'memberships') return;
+    if (
+      opts.background &&
+      (document.visibilityState === 'hidden' || this.subscription.refreshBlocked)
+    )
+      return;
     const root = this.deps.root();
     const body = root.querySelector<HTMLElement>('.dr-body');
     if (!body) return;
     if (focus === 'open')
       root.querySelector<HTMLButtonElement>('[data-woc-store-tab="memberships"]')?.focus();
-    if (opts.background) return;
     const seq = ++this.renderSeq;
-    this.storeLoading = true;
-    this.storeRuntime.setLoading(this.storeLoading);
+    if (!opts.background) {
+      this.storeLoading = true;
+      this.storeRuntime.setLoading(this.storeLoading);
+    }
     try {
-      await this.subscription.refresh();
+      await this.subscription.refresh(opts.background === true);
     } finally {
-      if (seq === this.renderSeq) {
+      if (!opts.background && seq === this.renderSeq) {
         this.storeLoading = false;
         this.storeRuntime.setLoading(this.storeLoading);
       }
     }
     if (!this.isOpen || this.tab !== 'memberships' || seq !== this.renderSeq) return;
-    const focusKey = captureFocusKey(body);
-    // Not store markup: returning to the Cosmetic Store tab must repaint it.
+    if (opts.background && this.subscription.refreshBlocked) return;
+    // Returning to the Cosmetic Store tab must repaint its body.
     this.paintedStoreBody = null;
-    body.innerHTML =
-      this.subscription.html() ||
-      `<div class="dr-empty" role="status">${esc(t('hudChrome.wocStore.membershipsUnavailable'))}</div>`;
-    this.subscription.bind(body, () => void this.renderMemberships(null));
-    if (focusKey) findFocusKey(body, focusKey)?.focus();
+    this.membershipPainter.paint(
+      root,
+      body,
+      this.subscription,
+      () => void this.renderMemberships(null),
+    );
   }
 
   private storeRequestIsCurrent(generation: number): boolean {
@@ -550,6 +557,7 @@ export class DailyRewardsWindow {
   /** Invalidate Store snapshot/spend and Rewards body writes together; prompt
    *  teardown also clears inert and runs the decision's cancel policy. */
   private invalidateStoreSurface(): void {
+    this.membershipPainter.reset();
     this.renderSeq += 1;
     this.storeRuntime.invalidateSurface();
     this.storeLoading = false;
@@ -1180,7 +1188,7 @@ export class DailyRewardsWindow {
       dailyRewardsSummaryHtml(view, Date.now()) +
       dailyRewardsWalletCardHtml(view) +
       spinSectionHtml(view) +
-      this.tasksHtml(view) +
+      dailyRewardsTasksHtml(view) +
       dailyRewardsLeaderboardHtml(view.status) +
       dailyRewardsHistoryHtml(view.history);
     body.querySelector<HTMLButtonElement>('[data-spin]')?.addEventListener('click', () => {
@@ -1223,27 +1231,5 @@ export class DailyRewardsWindow {
         time: dailyRewardsRemainingText(resetAt, Date.now()),
       });
     });
-  }
-
-  private tasksHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
-    const rows = view.status.tasks
-      .map((task) => {
-        const multiplier =
-          typeof task.multiplier === 'number' && Number.isFinite(task.multiplier)
-            ? `<em>${esc(t('hudChrome.dailyRewards.taskMultiplier', { multiplier: formatNumber(task.multiplier, { maximumFractionDigits: 2 }) }))}</em>`
-            : '';
-        const description = dailyRewardTaskDescription(
-          task.type,
-          task.description,
-          t('hudChrome.dailyRewards.oneVsOneExcluded'),
-        );
-        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
-      })
-      .join('');
-    return (
-      `<section class="dr-section ui-card"><h3>${esc(t('hudChrome.dailyRewards.tasks'))}</h3>` +
-      `<ul class="dr-tasks">${rows}</ul>` +
-      `</section>`
-    );
   }
 }

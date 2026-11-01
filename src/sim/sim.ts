@@ -3476,6 +3476,7 @@ export class Sim {
       meta.mailWelcomed = true;
       if (!opts?.bot) this.postOffice.sendWelcome(meta);
     }
+    if (!opts?.bot) this.postOffice.announcePurchaseParcels(meta);
     // Book of Deeds retro-on-join, after the saved state is fully restored
     // (deeds_restore.ts): the discovery seed, the retro fallbacks, the full
     // evaluator pass (retro: true events), and the account ledger self seed.

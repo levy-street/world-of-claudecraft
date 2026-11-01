@@ -26400,4 +26400,36 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'seasonal.tricks.gourdlight_trick_fumes': 'Vapores verdes',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Huesos traqueteantes',
   'seasonal.tricks.gourdlight_trick_strawling': 'Apariencia de ser de paja',
+  'hudChrome.membershipWelcome.body':
+    'Tu membresía está activa. ¡Disfruta de todos los beneficios de la membresía, aventurero!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Tu membresía está activa hasta el {date}. ¡Disfruta de todos los beneficios de la membresía, aventurero!',
+  'hudChrome.membershipWelcome.close': 'Adelante',
+  'hudChrome.membershipWelcome.title': '¡Felicidades!',
+  'hudChrome.purchaseLoot.collect': 'Recoger',
+  'hudChrome.purchaseLoot.description':
+    'Recoge tu compra ahora. Si tus bolsas están llenas, se guardará como excedente. Lo que dejes para más tarde te esperará en el buzón.',
+  'hudChrome.purchaseLoot.later': 'Más tarde',
+  'hudChrome.purchaseLoot.title': 'Tu compra ha llegado',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Todos los beneficios de una membresía mensual.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Las riendas de tu montura han llegado. Recógelas en la ventana de botín.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Las riendas de tu montura aparecerán en la ventana de botín de este personaje cuando se complete el cobro. Si la prueba está activa, llegarán después del primer pago.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Un caballero con armadura de membresía junto al burro mensajero y la montura Quimera de Ala Nocturna',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Incluye la montura Quimera de Ala Nocturna para todos los personajes de tu cuenta. Sus riendas ligadas al alma llegan a la ventana de botín del personaje que la compra. Una por cuenta, y sigue siendo tuya cuando termina la membresía.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Solo {price} al mes, con un ahorro del {percent} respecto al pago mensual.',
+  'hudChrome.wocStore.subscription.checkoutPending': 'Compra pendiente. Esperando confirmación.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Un caballero con armadura de membresía junto al burro mensajero alado',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Tu ficha aparecerá en la ventana de botín de este personaje cuando se complete el pago.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Una ficha de membresía dorada',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Una ficha de membresía que recibes en el juego. Canjéala por 30 días de membresía, o intercámbiala con otros jugadores y véndela en la casa de subastas.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Cambiar a 12 meses',
 };

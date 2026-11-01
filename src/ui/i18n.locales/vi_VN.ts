@@ -25811,4 +25811,36 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Khói Xanh',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Xương Lạch Cạch',
   'seasonal.tricks.gourdlight_trick_strawling': 'Dáng Người Rơm',
+  'hudChrome.membershipWelcome.body':
+    'Tư cách thành viên của bạn đã có hiệu lực. Hãy tận hưởng mọi quyền lợi thành viên, nhà thám hiểm!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Tư cách thành viên của bạn có hiệu lực đến {date}. Hãy tận hưởng mọi quyền lợi thành viên, nhà thám hiểm!',
+  'hudChrome.membershipWelcome.close': 'Tiến lên',
+  'hudChrome.membershipWelcome.title': 'Chúc mừng!',
+  'hudChrome.purchaseLoot.collect': 'Nhận',
+  'hudChrome.purchaseLoot.description':
+    'Nhận món hàng ngay. Nếu túi đã đầy, món hàng sẽ được giữ ở phần vượt sức chứa. Những gì bạn để dành nhận sau sẽ chờ trong hộp thư.',
+  'hudChrome.purchaseLoot.later': 'Để sau',
+  'hudChrome.purchaseLoot.title': 'Món hàng của bạn đã đến',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Tất cả quyền lợi của gói thành viên hằng tháng.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Dây cương thú cưỡi của bạn đã đến. Hãy nhận trong cửa sổ chiến lợi phẩm.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Dây cương thú cưỡi sẽ xuất hiện trong cửa sổ chiến lợi phẩm của nhân vật này khi thanh toán hoàn tất. Nếu đang dùng thử, dây cương sẽ đến sau lần thanh toán đầu tiên.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Một hiệp sĩ mặc giáp thành viên bên lừa chuyển phát và thú cưỡi Chimera Cánh Đêm',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Bao gồm thú cưỡi Chimera Cánh Đêm cho mọi nhân vật trong tài khoản. Dây cương khóa hồn xuất hiện trong cửa sổ chiến lợi phẩm của nhân vật mua. Mỗi tài khoản một con, và vẫn là của bạn sau khi tư cách thành viên kết thúc.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Chỉ {price} mỗi tháng, tiết kiệm {percent} so với thanh toán hằng tháng.',
+  'hudChrome.wocStore.subscription.checkoutPending': 'Đang chờ hoàn tất giao dịch. Đợi xác nhận.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Một hiệp sĩ mặc giáp thành viên bên lừa chuyển phát có cánh',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Thẻ của bạn sẽ xuất hiện trong cửa sổ chiến lợi phẩm của nhân vật này khi thanh toán hoàn tất.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Một thẻ thành viên màu vàng',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Thẻ thành viên bạn nhận trong trò chơi. Đổi thẻ lấy 30 ngày thành viên, hoặc giao dịch với người chơi khác và bán tại nhà đấu giá.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Nâng cấp lên 12 tháng',
 };

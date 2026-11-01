@@ -59,6 +59,19 @@ vi.mock('../server/db', () => ({
   })),
 }));
 
+// As in game_sessions.test.ts, wire/save fixtures do not start the separately
+// tested referral outbox or its constructor-owned polling timer.
+vi.mock('../server/referral_game_adapter', () => ({
+  ReferralGameAdapter: class {
+    cards = { isBusy: () => false };
+    attach() {}
+    detach() {}
+    observe() {}
+    command() {}
+    async stop() {}
+  },
+}));
+
 import { createBackgroundDbGate } from '../server/background_db_gate';
 import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosmetic_op_guard';
 import {
@@ -74,7 +87,6 @@ import { gameMetricsCounters } from '../server/http/game_signals';
 import { MembershipGameServices } from '../server/membership_game_services';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
-import { ReferralGameAdapter } from '../server/referral_game_adapter';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
@@ -139,6 +151,20 @@ import {
   joinServer,
   lastSnap,
 } from './helpers/bare_client';
+
+beforeEach(() => {
+  // Wire fixtures supply their own state. Account-service hydration has separate
+  // suites and cannot use this file's deliberately minimal DB mock. Leaving it
+  // running creates hundreds of async fixture errors that can outlive teardown.
+  const hydration = GameServer.prototype as unknown as {
+    initSocial(): Promise<void>;
+    sendSocialSnapshot(characterId: number): Promise<void>;
+  };
+  vi.spyOn(hydration, 'initSocial').mockResolvedValue();
+  vi.spyOn(hydration, 'sendSocialSnapshot').mockResolvedValue();
+  vi.spyOn(MembershipGameServices.prototype, 'onJoin').mockImplementation(() => {});
+});
+afterEach(() => vi.restoreAllMocks());
 
 // Wire round-trip fixtures only read the player entity they build, never ambient
 // world content, so strip camps/npcs/ground objects to keep each direct Sim cheap
@@ -3066,15 +3092,6 @@ describe('legendary celebration events reach the client (phase 13)', () => {
 
 describe('autosaves', () => {
   beforeEach(() => {
-    // Join-time social, referral and membership reads share this gate too.
-    // Their own suites cover admission; isolate them here so these exact
-    // permit counts measure only the real save producers and FIFO ordering.
-    vi.spyOn(
-      GameServer.prototype as unknown as { initSocial(): Promise<void> },
-      'initSocial',
-    ).mockResolvedValue();
-    vi.spyOn(ReferralGameAdapter.prototype, 'attach').mockImplementation(() => {});
-    vi.spyOn(MembershipGameServices.prototype, 'onJoin').mockImplementation(() => {});
     vi.mocked(saveCharacterState).mockReset();
     vi.mocked(saveCharacterState).mockResolvedValue(true);
     vi.mocked(saveCharacterAndGuildBankState).mockReset();
@@ -3088,7 +3105,6 @@ describe('autosaves', () => {
     vi.mocked(saveMailPartitions).mockReset();
     vi.mocked(saveMailPartitions).mockResolvedValue();
   });
-  afterEach(() => vi.restoreAllMocks());
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
     const server = new GameServer();

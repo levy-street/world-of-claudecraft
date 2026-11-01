@@ -1330,6 +1330,18 @@ export const es: EnTranslations = {
         "hintBelowMin": "El precio mínimo de la Bolsa es {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Tu compra ha llegado",
+      "description": "Recoge tu compra ahora. Si tus bolsas están llenas, se guardará como excedente. Lo que dejes para más tarde te esperará en el buzón.",
+      "collect": "Recoger",
+      "later": "Más tarde"
+    },
+    "membershipWelcome": {
+      "title": "¡Felicidades!",
+      "body": "Tu membresía está activa. ¡Disfruta de todos los beneficios de la membresía, aventurero!",
+      "bodyUntil": "Tu membresía está activa hasta el {date}. ¡Disfruta de todos los beneficios de la membresía, aventurero!",
+      "close": "Adelante"
+    },
     "wocStore": {
       "subscription": {
         "title": "Suscripción al juego",
@@ -1344,6 +1356,16 @@ export const es: EnTranslations = {
         "annualClaim": "Recoger montura del paquete",
         "annualPending": "Vuelve al personaje comprador después del pago para recoger la montura del paquete. Si el pago se está procesando o la prueba está activa, inténtalo de nuevo después del cargo de pago.",
         "annualDelivered": "La llave de la montura de tu paquete se ha entregado por correo.",
+        "monthlyArtAlt": "Un caballero con armadura de membresía junto al burro mensajero alado",
+        "annualArtAlt": "Un caballero con armadura de membresía junto al burro mensajero y la montura Quimera de Ala Nocturna",
+        "tokenArtAlt": "Una ficha de membresía dorada",
+        "annualAllBenefits": "Todos los beneficios de una membresía mensual.",
+        "annualPerMonth": "Solo {price} al mes, con un ahorro del {percent} respecto al pago mensual.",
+        "annualMountInfo": "Incluye la montura Quimera de Ala Nocturna para todos los personajes de tu cuenta. Sus riendas ligadas al alma llegan a la ventana de botín del personaje que la compra. Una por cuenta, y sigue siendo tuya cuando termina la membresía.",
+        "annualArriving": "Las riendas de tu montura aparecerán en la ventana de botín de este personaje cuando se complete el cobro. Si la prueba está activa, llegarán después del primer pago.",
+        "annualArrived": "Las riendas de tu montura han llegado. Recógelas en la ventana de botín.",
+        "tokenDescription": "Una ficha de membresía que recibes en el juego. Canjéala por 30 días de membresía, o intercámbiala con otros jugadores y véndela en la casa de subastas.",
+        "tokenArriving": "Tu ficha aparecerá en la ventana de botín de este personaje cuando se complete el pago.",
         "tokenTitle": "Ficha de membresía intercambiable",
         "tokenPrice": "{price} por 30 días",
         "benefitsTitle": "Ventajas de membresía activas",
@@ -1363,9 +1385,11 @@ export const es: EnTranslations = {
         "subscribe": "Suscribirse",
         "addMonth": "Añadir 1 mes",
         "addYear": "Añadir 12 meses",
+        "upgradeAnnual": "Cambiar a 12 meses",
         "stackTerms": "Se paga ahora. El tiempo se añade al final de tu membresía actual y después se renueva con este plan.",
         "stackCapped": "Puedes acumular hasta 2 años de membresía a la vez. Inténtalo de nuevo cuando se acerque la fecha de renovación.",
         "stackUnavailable": "Ahora no se puede añadir tiempo de membresía. Inténtalo de nuevo en breve.",
+        "checkoutPending": "Compra pendiente. Esperando confirmación.",
         "billingBlocked": "Actualiza tus datos de pago en Gestionar suscripción antes de añadir tiempo de membresía.",
         "renewsOn": "Se renueva el {date}",
         "endsOn": "La membresía termina el {date}",

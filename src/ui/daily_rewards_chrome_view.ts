@@ -26,6 +26,7 @@ export function wocStoreTabsHtml(): string {
     `<button id="woc-store-tab-memberships" class="ui-seg-tab" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="memberships">${esc(t('hudChrome.wocStore.membershipsTab'))}</button>` +
     '</div>' +
     `<span class="woc-store-loading" data-woc-store-loading role="status" aria-live="polite" aria-label="${esc(t('hudChrome.wocStore.loading'))}" aria-busy="false"><i aria-hidden="true"></i></span>` +
+    '<span class="visually-hidden" data-membership-announcement role="status" aria-live="polite" aria-atomic="true"></span>' +
     `<span class="visually-hidden" data-charter-live role="status" aria-live="polite" aria-atomic="true"></span></div>`
   );
 }

@@ -1330,6 +1330,18 @@ export const da_DK: EnTranslations = {
         "hintBelowMin": "Børsens mindstepris er {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Dit køb er ankommet",
+      "description": "Hent dit køb nu. Hvis dine tasker er fulde, opbevares det som overskud. Alt, hvad du gemmer til senere, venter i din postkasse.",
+      "collect": "Hent",
+      "later": "Senere"
+    },
+    "membershipWelcome": {
+      "title": "Tillykke!",
+      "body": "Dit medlemskab er aktivt. Nyd alle medlemsfordelene, eventyrer!",
+      "bodyUntil": "Dit medlemskab er aktivt indtil {date}. Nyd alle medlemsfordelene, eventyrer!",
+      "close": "Fremad"
+    },
     "wocStore": {
       "subscription": {
         "title": "Spilabonnement",
@@ -1344,6 +1356,16 @@ export const da_DK: EnTranslations = {
         "annualClaim": "Hent pakkens ridedyr",
         "annualPending": "Vend tilbage til den købende figur efter betalingen for at hente pakkens ridedyr. Hvis betalingen behandles, eller prøveperioden er aktiv, prøv igen efter den betalte opkrævning.",
         "annualDelivered": "Nøglen til dit pakkeridedyr er leveret med posten.",
+        "monthlyArtAlt": "En ridder i medlemsrustning ved siden af det bevingede kureræsel",
+        "annualArtAlt": "En ridder i medlemsrustning med kureræslet og den natvingede kimære som ridedyr",
+        "tokenArtAlt": "En gylden medlemskabspolet",
+        "annualAllBenefits": "Alle fordelene ved et månedligt medlemskab.",
+        "annualPerMonth": "Kun {price} om måneden, så du sparer {percent} i forhold til månedlig betaling.",
+        "annualMountInfo": "Indeholder den natvingede kimære som ridedyr for alle figurer på din konto. Dens sjælebundne tøjler ankommer i et byttevindue hos den figur, der køber den. Én pr. konto, og den forbliver din, når medlemskabet slutter.",
+        "annualArriving": "Dit ridedyrs tøjler vises i denne figurs byttevindue, når betalingen er gennemført. Hvis prøveperioden er aktiv, ankommer de efter den første betaling.",
+        "annualArrived": "Dit ridedyrs tøjler er ankommet. Hent dem i byttevinduet.",
+        "tokenDescription": "En medlemskabspolet, du modtager i spillet. Indløs den til 30 dages medlemskab, eller byt den med andre spillere og sælg den i auktionshuset.",
+        "tokenArriving": "Din polet vises i denne figurs byttevindue, når betalingen er gennemført.",
         "tokenTitle": "Omsættelig medlemskabspolet",
         "tokenPrice": "{price} for 30 dage",
         "benefitsTitle": "Fordele ved aktivt medlemskab",
@@ -1363,9 +1385,11 @@ export const da_DK: EnTranslations = {
         "subscribe": "Abonner",
         "addMonth": "Tilføj 1 måned",
         "addYear": "Tilføj 12 måneder",
+        "upgradeAnnual": "Skift til 12 måneder",
         "stackTerms": "Betaling sker nu. Tiden lægges til i slutningen af dit nuværende medlemskab, som derefter fornys med denne plan.",
         "stackCapped": "Du kan samle op til 2 års medlemskab ad gangen. Prøv igen tættere på din fornyelsesdato.",
         "stackUnavailable": "Det er ikke muligt at tilføje medlemstid lige nu. Prøv igen om lidt.",
+        "checkoutPending": "Købet afventer gennemførelse. Venter på bekræftelse.",
         "billingBlocked": "Opdater dine betalingsoplysninger under Administrer abonnement, før du tilføjer medlemstid.",
         "renewsOn": "Fornyes den {date}",
         "endsOn": "Medlemskabet slutter den {date}",

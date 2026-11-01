@@ -26194,4 +26194,37 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Groene dampen',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Rammelende botten',
   'seasonal.tricks.gourdlight_trick_strawling': 'Strolinggedaante',
+  'hudChrome.membershipWelcome.body':
+    'Je lidmaatschap is actief. Geniet van alle lidmaatschapsvoordelen, avonturier!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Je lidmaatschap is actief tot {date}. Geniet van alle lidmaatschapsvoordelen, avonturier!',
+  'hudChrome.membershipWelcome.close': 'Vooruit',
+  'hudChrome.membershipWelcome.title': 'Gefeliciteerd!',
+  'hudChrome.purchaseLoot.collect': 'Ophalen',
+  'hudChrome.purchaseLoot.description':
+    'Haal je aankoop nu op. Als je tassen vol zijn, wordt deze als overschot bewaard. Alles wat je voor later laat liggen, wacht in je brievenbus.',
+  'hudChrome.purchaseLoot.later': 'Later ophalen',
+  'hudChrome.purchaseLoot.title': 'Je aankoop is aangekomen',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Alle voordelen van een maandelijks lidmaatschap.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'De teugels van je rijdier zijn aangekomen. Haal ze op in het buitvenster.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'De teugels van je rijdier verschijnen in het buitvenster van dit personage zodra de betaling is verwerkt. Als de proefperiode actief is, komen ze na de eerste betaling aan.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Een ridder in lidmaatschapspantser met de koeriersezel en het rijdier Nachtvleugelchimera',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Bevat het rijdier Nachtvleugelchimera voor elk personage op je account. De zielsgebonden teugels verschijnen in een buitvenster op het personage dat het koopt. Eén per account, en het blijft van jou nadat je lidmaatschap eindigt.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Slechts {price} per maand, een besparing van {percent} ten opzichte van maandelijks betalen.',
+  'hudChrome.wocStore.subscription.checkoutPending':
+    'Aankoop in behandeling. Wachten op bevestiging.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Een ridder in lidmaatschapspantser naast de gevleugelde koeriersezel',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Je munt verschijnt in het buitvenster van dit personage zodra de betaling is verwerkt.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Een gouden lidmaatschapsmunt',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Een lidmaatschapsmunt die je in het spel ontvangt. Wissel deze in voor 30 dagen lidmaatschap, of verhandel deze met andere spelers en verkoop deze in het veilinghuis.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Overstappen op 12 maanden',
 };

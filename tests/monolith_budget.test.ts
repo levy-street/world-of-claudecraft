@@ -1861,7 +1861,8 @@ const MONOLITHS: MonolithRow[] = [
     // Membership boot wiring lives with its service factory.
     // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 9696,
+    // Final-save retry and sweep policy now live in character_final_save.ts.
+    ceiling: 9666,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2577,7 +2578,8 @@ const MONOLITHS: MonolithRow[] = [
     // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
     // controllers now build over one seam object (store_spend_controllers.ts).
     // Summary and countdown formatting live in daily_rewards_chrome_view.ts.
-    ceiling: 1249,
+    // Membership painting and reward task markup now live in tested siblings.
+    ceiling: 1235,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

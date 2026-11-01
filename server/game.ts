@@ -100,6 +100,7 @@ import {
   type StableTimerWireVersion,
 } from '../src/world_api';
 import { sameAppearance } from '../src/world_api/appearance';
+import { accountAdmissionsFor } from './account_admission';
 import { AccountBuddiesService } from './account_buddies_service';
 import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
@@ -156,6 +157,8 @@ import {
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
 import { characterBlobBytesP99 } from './character_blob_size';
+import { CharacterDepartures } from './character_departures';
+import { saveCharacterSnapshot, saveDepartingCharacter } from './character_final_save';
 import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
 import { acknowledgeSessionSaveEffects } from './character_save_acknowledge';
 import { applyCharacterSaveFixups } from './character_save_fixups';
@@ -433,6 +436,7 @@ import { runPeriodicSaveFlush } from './periodic_save_flush';
 import * as presence from './presence_privacy';
 import { decodeReferralAction } from './referral_command';
 import { ReferralGameAdapter } from './referral_game_adapter';
+import { saveShutdownCharacters } from './shutdown_lifecycle';
 import { VaultGameServices, type VaultMailSaveCapture } from './vault_game_services';
 import { dispatchVehicleCommand } from './vehicle_command_wire';
 import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
@@ -561,9 +565,6 @@ const WIRE_CACHE_SWEEP_TICKS = 1200;
 const EVENT_RADIUS = 90;
 const AUTOSAVE_SECONDS = 30;
 const SAVE_CONCURRENCY = 4;
-const LEAVE_SAVE_MAX_ATTEMPTS = 5;
-const LEAVE_SAVE_RETRY_BASE_MS = 250;
-const LEAVE_SAVE_RETRY_MAX_MS = 4000;
 // Queue depth past which the shared market serial writer warns (rate-limited
 // to once a minute): the observable form of the accepted dirty-book-autosave
 // coupling documented at the writer's declaration.
@@ -1532,6 +1533,7 @@ export class GameServer {
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private draining = false;
+  private readonly departures = new CharacterDepartures();
   private holderTierInterval: NodeJS.Timeout | null = null;
   private keepaliveInterval: NodeJS.Timeout | null = null;
   // Wall-clock ms at which the keepalive sweep last ran, so a sweep can tell whether
@@ -3145,6 +3147,7 @@ export class GameServer {
         appearance?: Record<string, unknown> | null;
       } = {},
   ): ClientSession | { error: string } {
+    if (this.draining) return { error: 'The realm is temporarily unavailable.' };
     // Cap live characters per account; planJoin handles GM and linkdead exceptions.
     const sameCharacter = this.sessionsByCharacterId.get(characterId) ?? null;
     const { plan, linkdeadOthers } = planAccountJoin({
@@ -3645,6 +3648,7 @@ export class GameServer {
     ws: WebSocket,
     opts: { withMarket?: boolean } = {},
   ): boolean {
+    if (this.draining) return false; // The final sweep owns these sessions now.
     // A late close/error from a socket that a resume already replaced must
     // not tear down the live session riding the new socket.
     if (session.ws !== ws) return false;
@@ -3713,6 +3717,7 @@ export class GameServer {
     clientError: string,
     leaveReason: string,
   ): Promise<void> {
+    if (this.departures.sealed) return Promise.resolve();
     this.send(session, { t: 'error', error: clientError });
     try {
       session.ws.close();
@@ -3722,7 +3727,11 @@ export class GameServer {
     return this.leave(session, leaveReason);
   }
 
-  async leave(session: ClientSession, _reason: string): Promise<void> {
+  leave(session: ClientSession, _reason: string): Promise<void> {
+    return this.departures.run(session, () => this.finishLeave(session));
+  }
+
+  private async finishLeave(session: ClientSession): Promise<void> {
     if (session.left || !this.clients.has(session.pid)) return;
     const departingPresence = presence.copyPresenceSubject(session);
     forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid, !session.escrowQuarantined);
@@ -3818,38 +3827,21 @@ export class GameServer {
     // already disconnected, so there is no one to show their own notice to.
   }
 
-  private async saveCharacterOnLeave(session: ClientSession): Promise<void> {
-    for (let attempt = 1; attempt <= LEAVE_SAVE_MAX_ATTEMPTS; attempt++) {
-      try {
-        // Flush the character AND the World Market together: a Market escrow
-        // straddles both (item out of bags, into a listing), and the autosave
-        // timer only persists the market every 30s. Without this, a crash right
-        // after the leave-flush of bags would tear the escrow in half (item lost
-        // or duplicated). saveCharacter(withMarket) writes both in one transaction.
-        await this.saveCharacter(session, { withMarket: true, final: true });
-        return;
-      } catch (err) {
-        if (attempt === LEAVE_SAVE_MAX_ATTEMPTS) {
-          console.error(`save on leave failed after ${attempt} attempts for ${session.name}:`, err);
-          // This session will never save again, so any guild books it
-          // dirtied are permanently unflushable: the live book is ahead of
-          // durable truth with no session left to converge it, and the
-          // disband guard (which scans session marks) loses sight of it the
-          // moment this session tears down. Reconcile now, exactly like the
-          // fence-out arm (Guild Bank Phase 3 QA).
-          if (session.dirtyGuildBanks.size > 0) {
-            this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
-          }
-          return;
+  private saveCharacterOnLeave(session: ClientSession): Promise<void> {
+    return saveDepartingCharacter(
+      session.name,
+      () => this.saveCharacter(session, { withMarket: true, final: true }),
+      () => session.escrowQuarantined,
+      (error) => {
+        this.departures.recordFailure(error);
+        // Preserve the existing ordinary departure cleanup policy. During a
+        // shutdown retain the entity and lease instead of discarding unsaved RAM.
+        if (this.draining) throw error;
+        if (session.dirtyGuildBanks.size > 0) {
+          this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
         }
-        const retryMs = Math.min(
-          LEAVE_SAVE_RETRY_BASE_MS * 2 ** (attempt - 1),
-          LEAVE_SAVE_RETRY_MAX_MS,
-        );
-        console.error(`save on leave failed for ${session.name}; retrying in ${retryMs}ms:`, err);
-        await new Promise<void>((resolve) => setTimeout(resolve, retryMs));
-      }
-    }
+      },
+    );
   }
 
   /** A post-mutation ledger projection failure makes the live character
@@ -4450,36 +4442,17 @@ export class GameServer {
     }
   }
 
-  private async saveAllSnapshot(reason: string): Promise<void> {
-    const sessions = [...this.clients.values()];
-    let next = 0;
-    const worker = async () => {
-      for (;;) {
-        const session = sessions[next++];
-        if (!session) return;
-        await this.saveCharacterWithBackgroundPermit(session).catch((err) =>
-          console.error(`${reason} failed for ${session.name}:`, err),
-        );
-      }
-    };
-    await Promise.all(Array.from({ length: Math.min(SAVE_CONCURRENCY, sessions.length) }, worker));
-    // SHUTDOWN gets a second pass over whoever is still dirty. A guild book
-    // whose escrow replay stalled on another officer's not-yet-durable work
-    // keeps its mark and resolves on the session's NEXT save, and at shutdown
-    // there is otherwise no next save: the residue would go durable unrecorded
-    // and heal only if the realm came back with both officers online. One
-    // extra pass is enough because the first pass made every other session's
-    // work durable. The 30 s autosave sweep does not need it (its next tick is
-    // the retry) and must not pay for it.
-    if (reason !== 'shutdown') return;
-    const stillDirty = sessions.filter((s) => s.dirtyGuildBanks.size > 0);
-    for (const session of stillDirty) {
-      // FINAL: there is no pass three, so a refusal here resolves now rather
-      // than waiting for a retry that will never come.
-      await this.saveCharacterWithBackgroundPermit(session, { final: true }).catch((err) =>
-        console.error(`${reason} retry failed for ${session.name}:`, err),
-      );
-    }
+  private saveAllSnapshot(reason: string): Promise<void> {
+    return saveCharacterSnapshot(
+      [...this.clients.values()],
+      reason,
+      SAVE_CONCURRENCY,
+      (session, final) => this.saveCharacterWithBackgroundPermit(session, { final }),
+    );
+  }
+
+  saveForShutdown(): Promise<void> {
+    return saveShutdownCharacters(this.departures, () => this.saveAll('shutdown'));
   }
 
   // The World Market is shared global state, persisted as a single JSONB blob.
@@ -5515,14 +5488,13 @@ export class GameServer {
     );
   }
 
-  // Force-close every live session for the account. A bearer token is a reusable
-  // wire credential, not a per-socket identity: an earlier revision tried to spare
-  // the caller's own session by comparing the live socket's auth token against the
-  // request's bearer token, but a stolen/shared token authenticates identically on
-  // both, so that comparison could just as easily spare an attacker's connection.
-  // Kick unconditionally; a legitimate caller's own other tab reconnects with the
-  // fresh credentials the same as any other client would.
+  // Cancel pending admissions before closing every live session for this account.
+  // Never spare a socket by bearer equality: a stolen/shared token authenticates
+  // identically on both the caller's connection and an attacker's connection.
+  // Kick unconditionally; legitimate tabs reconnect with fresh credentials.
+  // The process-local fence also catches stale token reads still in flight.
   disconnectAccount(accountId: number, reason: string): void {
+    accountAdmissionsFor(this).invalidate(accountId);
     for (const session of [...this.clients.values()]) {
       if (session.accountId !== accountId) continue;
       void this.kickSession(session, reason, 'moderation action');

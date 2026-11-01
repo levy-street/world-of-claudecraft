@@ -1330,6 +1330,18 @@ export const nl_NL: EnTranslations = {
         "hintBelowMin": "De minimumprijs van de Beurs is {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Je aankoop is aangekomen",
+      "description": "Haal je aankoop nu op. Als je tassen vol zijn, wordt deze als overschot bewaard. Alles wat je voor later laat liggen, wacht in je brievenbus.",
+      "collect": "Ophalen",
+      "later": "Later ophalen"
+    },
+    "membershipWelcome": {
+      "title": "Gefeliciteerd!",
+      "body": "Je lidmaatschap is actief. Geniet van alle lidmaatschapsvoordelen, avonturier!",
+      "bodyUntil": "Je lidmaatschap is actief tot {date}. Geniet van alle lidmaatschapsvoordelen, avonturier!",
+      "close": "Vooruit"
+    },
     "wocStore": {
       "subscription": {
         "title": "Spelabonnement",
@@ -1344,6 +1356,16 @@ export const nl_NL: EnTranslations = {
         "annualClaim": "Bundelrijdier ophalen",
         "annualPending": "Keer na betaling terug naar het kopende personage om het bundelrijdier op te halen. Wordt de betaling verwerkt of loopt de proefperiode nog, probeer het dan na de betaalde afschrijving opnieuw.",
         "annualDelivered": "De sleutel voor je bundelrijdier is per post bezorgd.",
+        "monthlyArtAlt": "Een ridder in lidmaatschapspantser naast de gevleugelde koeriersezel",
+        "annualArtAlt": "Een ridder in lidmaatschapspantser met de koeriersezel en het rijdier Nachtvleugelchimera",
+        "tokenArtAlt": "Een gouden lidmaatschapsmunt",
+        "annualAllBenefits": "Alle voordelen van een maandelijks lidmaatschap.",
+        "annualPerMonth": "Slechts {price} per maand, een besparing van {percent} ten opzichte van maandelijks betalen.",
+        "annualMountInfo": "Bevat het rijdier Nachtvleugelchimera voor elk personage op je account. De zielsgebonden teugels verschijnen in een buitvenster op het personage dat het koopt. Eén per account, en het blijft van jou nadat je lidmaatschap eindigt.",
+        "annualArriving": "De teugels van je rijdier verschijnen in het buitvenster van dit personage zodra de betaling is verwerkt. Als de proefperiode actief is, komen ze na de eerste betaling aan.",
+        "annualArrived": "De teugels van je rijdier zijn aangekomen. Haal ze op in het buitvenster.",
+        "tokenDescription": "Een lidmaatschapsmunt die je in het spel ontvangt. Wissel deze in voor 30 dagen lidmaatschap, of verhandel deze met andere spelers en verkoop deze in het veilinghuis.",
+        "tokenArriving": "Je munt verschijnt in het buitvenster van dit personage zodra de betaling is verwerkt.",
         "tokenTitle": "Verhandelbare lidmaatschapsmunt",
         "tokenPrice": "{price} voor 30 dagen",
         "benefitsTitle": "Voordelen van actief lidmaatschap",
@@ -1363,9 +1385,11 @@ export const nl_NL: EnTranslations = {
         "subscribe": "Abonneren",
         "addMonth": "1 maand toevoegen",
         "addYear": "12 maanden toevoegen",
+        "upgradeAnnual": "Overstappen op 12 maanden",
         "stackTerms": "Je betaalt nu. De tijd wordt toegevoegd aan het einde van je huidige lidmaatschap, waarna het volgens dit plan wordt verlengd.",
         "stackCapped": "Je kunt maximaal 2 jaar lidmaatschap tegelijk opbouwen. Probeer het opnieuw wanneer je verlengingsdatum dichterbij is.",
         "stackUnavailable": "Lidmaatschapstijd toevoegen is momenteel niet mogelijk. Probeer het over even opnieuw.",
+        "checkoutPending": "Aankoop in behandeling. Wachten op bevestiging.",
         "billingBlocked": "Werk je betaalgegevens bij onder Abonnement beheren voordat je lidmaatschapstijd toevoegt.",
         "renewsOn": "Wordt verlengd op {date}",
         "endsOn": "Lidmaatschap eindigt op {date}",

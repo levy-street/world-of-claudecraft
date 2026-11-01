@@ -862,6 +862,7 @@ import {
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
+import { PurchaseRewardDialogs, showMembershipWelcome } from './purchase_reward_dialogs';
 import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
 import { playerPvpRisk } from './pvp_risk_core';
 import {
@@ -6070,6 +6071,7 @@ export class Hud {
     openReferralCards: () => this.referralCards.open(),
   });
   private readonly treasureMapWindow = new TreasureMapWindow({ world: () => this.sim });
+  private readonly purchaseRewards = new PurchaseRewardDialogs((id) => this.sim.mailTake(id));
   private readonly worldQuestPuzzleWindow = new WorldQuestPuzzleWindow({
     document,
     world: () => this.sim,
@@ -11896,6 +11898,12 @@ export class Hud {
           break;
         case 'realmBuilder':
           presentRealmBuilder(this.realmBuilderPopup, this.renderer, ev.current, ev.past);
+          break;
+        case 'purchaseParcels':
+          this.purchaseRewards.offer(ev.parcels);
+          break;
+        case 'membershipRedeemed':
+          showMembershipWelcome(ev.expiresAt);
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their

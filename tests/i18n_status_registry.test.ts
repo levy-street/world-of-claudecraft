@@ -512,7 +512,7 @@ describe('i18n status registry: hash sensitivity (srcHash includes the placehold
 });
 
 describe('i18n status registry: determinism (status.json is gitignored - no committed bytes to diff)', () => {
-  // src/ui/i18n.status.json is build/test-only (~4.7 MB) and gitignored, so the old
+  // src/ui/i18n.status.json is build/test-only (~67.5 MB) and gitignored, so the old
   // committed-bytes `git ls-files` + `git diff --exit-code` freshness check no longer
   // applies (pretest / the CI i18n:gen step regenerate it before any test reads it).
   // Reproducibility is instead proven by double-generating into two PERTURBED-env temp
@@ -520,9 +520,9 @@ describe('i18n status registry: determinism (status.json is gitignored - no comm
   // non-deterministic scanner makes this throw. The summary is likewise gitignored and
   // covered by the same double-generation check (both files are in outFiles below).
   // Double-generates by spawning the scanner (cold Node + esbuild bundle of the TS
-  // source) TWICE, so the default 5s per-test budget is too tight on a loaded CI
-  // runner (a single cold scan is already ~1-3s there). Give it a generous timeout;
-  // the assertion is about byte-identity, not speed.
+  // source) TWICE. The v0.45.5 release job completed this work in 30.7s, just past
+  // the former 30s allowance. Allow 60s for the larger registry on a loaded runner;
+  // this checks byte-identity across both complete scans, not scanner performance.
   it('regenerates status.json + the summary byte-identically across two perturbed-env runs', () => {
     expect(() =>
       assertDeterministic({
@@ -530,7 +530,7 @@ describe('i18n status registry: determinism (status.json is gitignored - no comm
         outFiles: ['i18n.status.json', 'i18n.status.summary.json'],
       }),
     ).not.toThrow();
-  }, 30_000);
+  }, 60_000);
 });
 
 describe('i18n status summary: audit rollup cross-checks the full registry', () => {

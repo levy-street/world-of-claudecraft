@@ -25875,4 +25875,37 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Gröna ångor',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Rasslande ben',
   'seasonal.tricks.gourdlight_trick_strawling': 'Halmvätteskepnad',
+  'hudChrome.membershipWelcome.body':
+    'Ditt medlemskap är aktivt. Njut av alla medlemsförmåner, äventyrare!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Ditt medlemskap är aktivt till {date}. Njut av alla medlemsförmåner, äventyrare!',
+  'hudChrome.membershipWelcome.close': 'Framåt',
+  'hudChrome.membershipWelcome.title': 'Grattis!',
+  'hudChrome.purchaseLoot.collect': 'Hämta',
+  'hudChrome.purchaseLoot.description':
+    'Hämta ditt köp nu. Om dina väskor är fulla sparas det som överskott. Allt du lämnar till senare väntar i din brevlåda.',
+  'hudChrome.purchaseLoot.later': 'Senare',
+  'hudChrome.purchaseLoot.title': 'Ditt köp har anlänt',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Alla förmåner med ett månatligt medlemskap.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Ditt riddjurs tyglar har anlänt. Hämta dem i bytesfönstret.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Ditt riddjurs tyglar visas i den här karaktärens bytesfönster när betalningen har slutförts. Om provperioden är aktiv anländer de efter den första betalningen.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'En riddare i medlemsrustning med kuriråsnan och riddjuret nattvingad chimär',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Innehåller riddjuret nattvingad chimär för alla karaktärer på ditt konto. Dess själsbundna tyglar anländer i ett bytesfönster hos karaktären som köper den. En per konto, och den förblir din när medlemskapet tar slut.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Bara {price} per månad, vilket sparar {percent} jämfört med månadsbetalning.',
+  'hudChrome.wocStore.subscription.checkoutPending':
+    'Köpet väntar på att slutföras. Väntar på bekräftelse.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'En riddare i medlemsrustning bredvid den bevingade kuriråsnan',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Din pollett visas i den här karaktärens bytesfönster när betalningen har slutförts.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'En gyllene medlemspollett',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'En medlemspollett som du får i spelet. Lös in den mot 30 dagars medlemskap, eller handla med andra spelare och sälj den på auktionshuset.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Byt till 12 månader',
 };

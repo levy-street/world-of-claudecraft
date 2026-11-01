@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.45.4",
+  "version": "0.45.5",
   "private": true,
   "license": "MIT",
   "author": {
@@ -323,7 +323,11 @@
       "undici@6": "^6.29.1",
       "undici@7": "^7.30.1",
       "source-map-js@1": "^1.2.2",
-      "follow-redirects@1": "^1.16.1"
+      "follow-redirects@1": "^1.16.2",
+      "glob@10": "^14.0.2",
+      "glob@13": "^14.0.2",
+      "minimatch@9": "^11.0.1",
+      "minimatch@10": "^11.0.1"
     },
     "auditConfig": {
       "ignoreGhsas": [
@@ -334,7 +338,8 @@
         "GHSA-mjw6-4jj6-33hc",
         "GHSA-ch52-4w7c-c8xp",
         "GHSA-mrhx-c7xc-m3w5",
-        "GHSA-gcqx-w48m-w2h4"
+        "GHSA-gcqx-w48m-w2h4",
+        "GHSA-g3hv-75wg-m249"
       ]
     },
     "onlyBuiltDependencies": [

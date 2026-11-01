@@ -26392,4 +26392,36 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Fumi verdi',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Ossa tintinnanti',
   'seasonal.tricks.gourdlight_trick_strawling': 'Aspetto da omino di paglia',
+  'hudChrome.membershipWelcome.body':
+    'Il tuo abbonamento è attivo. Goditi tutti i vantaggi dell’abbonamento, avventuriero!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Il tuo abbonamento è attivo fino al {date}. Goditi tutti i vantaggi dell’abbonamento, avventuriero!',
+  'hudChrome.membershipWelcome.close': 'Avanti',
+  'hudChrome.membershipWelcome.title': 'Congratulazioni!',
+  'hudChrome.purchaseLoot.collect': 'Ritira',
+  'hudChrome.purchaseLoot.description':
+    'Ritira ora il tuo acquisto. Se le borse sono piene, viene conservato come eccedenza. Tutto ciò che lasci per dopo ti aspetterà nella casella di posta.',
+  'hudChrome.purchaseLoot.later': 'Più tardi',
+  'hudChrome.purchaseLoot.title': 'Il tuo acquisto è arrivato',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Tutti i vantaggi di un abbonamento mensile.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Le redini della tua cavalcatura sono arrivate. Ritirale dalla finestra del bottino.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Le redini della tua cavalcatura appariranno nella finestra del bottino di questo personaggio quando l’addebito sarà completato. Se la prova è attiva, arriveranno dopo il primo pagamento.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Un cavaliere con armatura da abbonamento insieme all’asino corriere e alla cavalcatura Chimera Ala Notturna',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Include la cavalcatura Chimera Ala Notturna per tutti i personaggi del tuo account. Le sue redini vincolate all’anima arrivano nella finestra del bottino del personaggio che la acquista. Una per account, e resta tua dopo la fine dell’abbonamento.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Solo {price} al mese, con un risparmio del {percent} rispetto al pagamento mensile.',
+  'hudChrome.wocStore.subscription.checkoutPending': 'Acquisto in sospeso. In attesa di conferma.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Un cavaliere con armatura da abbonamento accanto all’asino corriere alato',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Il tuo gettone apparirà nella finestra del bottino di questo personaggio quando il pagamento sarà completato.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Un gettone di abbonamento dorato',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Un gettone di abbonamento che ricevi nel gioco. Riscattalo per 30 giorni di abbonamento, oppure scambialo con altri giocatori e vendilo alla casa d’aste.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Passa a 12 mesi',
 };

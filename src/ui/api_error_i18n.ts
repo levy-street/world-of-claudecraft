@@ -357,6 +357,7 @@ export function userFacingApiError(err: unknown): string {
   if (suspended) return t('errors.api.accountSuspended', { date: suspended[1] });
 
   const normalized = text.toLowerCase();
+  if (normalized === 'the realm is temporarily unavailable.') return t('serverUnavailable.heading');
   if (normalized.startsWith('too many attempts')) return t('errors.api.tooManyAttempts');
   // The Discord rate-limit bucket (server/discord.ts) answers a bare { error: 'rate
   // limited' } 429; resolve it to the same "slow down" message rather than leaking the

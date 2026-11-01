@@ -1330,6 +1330,18 @@ export const fr_CA: EnTranslations = {
         "hintBelowMin": "Le prix minimum de la Bourse est de {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Votre achat est arrivé",
+      "description": "Récupérez votre achat maintenant. Si vos sacs sont pleins, il est conservé en surplus. Tout ce que vous laissez pour plus tard vous attend dans votre boîte aux lettres.",
+      "collect": "Récupérer",
+      "later": "Plus tard"
+    },
+    "membershipWelcome": {
+      "title": "Félicitations !",
+      "body": "Votre abonnement est actif. Profitez de tous ses avantages, aventurier !",
+      "bodyUntil": "Votre abonnement est actif jusqu’au {date}. Profitez de tous ses avantages, aventurier !",
+      "close": "En avant"
+    },
     "wocStore": {
       "subscription": {
         "title": "Abonnement au jeu",
@@ -1344,6 +1356,16 @@ export const fr_CA: EnTranslations = {
         "annualClaim": "Récupérer la monture de l'offre",
         "annualPending": "Revenez sur le personnage acheteur après le paiement pour récupérer la monture de l'offre. Si le paiement est en cours ou si l'essai est actif, réessayez après le prélèvement payant.",
         "annualDelivered": "La clé de votre monture d'offre a été livrée par courrier.",
+        "monthlyArtAlt": "Un chevalier en armure d’abonnement à côté de l’âne coursier ailé",
+        "annualArtAlt": "Un chevalier en armure d’abonnement avec l’âne coursier et la monture Chimère Aile-de-nuit",
+        "tokenArtAlt": "Un jeton d’abonnement doré",
+        "annualAllBenefits": "Tous les avantages d’un abonnement mensuel.",
+        "annualPerMonth": "Seulement {price} par mois, soit {percent} d’économie par rapport au paiement mensuel.",
+        "annualMountInfo": "Comprend la monture Chimère Aile-de-nuit pour tous les personnages de votre compte. Ses rênes liées à l’âme arrivent dans une fenêtre de butin sur le personnage qui l’achète. Une par compte, et elle reste à vous après la fin de l’abonnement.",
+        "annualArriving": "Les rênes de votre monture apparaîtront dans la fenêtre de butin de ce personnage une fois le paiement encaissé. Si l’essai est actif, elles arriveront après le premier paiement.",
+        "annualArrived": "Les rênes de votre monture sont arrivées. Récupérez-les dans la fenêtre de butin.",
+        "tokenDescription": "Un jeton d’abonnement que vous recevez en jeu. Échangez-le contre 30 jours d’abonnement, ou échangez-le avec d’autres joueurs et vendez-le à l’hôtel des ventes.",
+        "tokenArriving": "Votre jeton apparaîtra dans la fenêtre de butin de ce personnage une fois le paiement encaissé.",
         "tokenTitle": "Jeton d'abonnement échangeable",
         "tokenPrice": "{price} pour 30 jours",
         "benefitsTitle": "Avantages de l'abonnement actif",
@@ -1363,9 +1385,11 @@ export const fr_CA: EnTranslations = {
         "subscribe": "S'abonner",
         "addMonth": "Ajouter 1 mois",
         "addYear": "Ajouter 12 mois",
+        "upgradeAnnual": "Passer à 12 mois",
         "stackTerms": "Paiement immédiat. La durée est ajoutée à la fin de votre abonnement actuel, puis celui-ci se renouvelle selon cette formule.",
         "stackCapped": "Vous pouvez cumuler jusqu'à 2 ans d'abonnement à la fois. Réessayez à l'approche de votre date de renouvellement.",
         "stackUnavailable": "L'ajout de temps d'abonnement est indisponible pour le moment. Réessayez dans quelques instants.",
+        "checkoutPending": "Achat en attente. En attente de confirmation.",
         "billingBlocked": "Mettez à jour vos informations de paiement dans Gérer l'abonnement avant d'ajouter du temps d'abonnement.",
         "renewsOn": "Renouvellement le {date}",
         "endsOn": "L'abonnement se termine le {date}",

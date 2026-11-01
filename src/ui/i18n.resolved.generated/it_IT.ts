@@ -1330,6 +1330,18 @@ export const it_IT: EnTranslations = {
         "hintBelowMin": "Il prezzo minimo della Borsa è {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Il tuo acquisto è arrivato",
+      "description": "Ritira ora il tuo acquisto. Se le borse sono piene, viene conservato come eccedenza. Tutto ciò che lasci per dopo ti aspetterà nella casella di posta.",
+      "collect": "Ritira",
+      "later": "Più tardi"
+    },
+    "membershipWelcome": {
+      "title": "Congratulazioni!",
+      "body": "Il tuo abbonamento è attivo. Goditi tutti i vantaggi dell’abbonamento, avventuriero!",
+      "bodyUntil": "Il tuo abbonamento è attivo fino al {date}. Goditi tutti i vantaggi dell’abbonamento, avventuriero!",
+      "close": "Avanti"
+    },
     "wocStore": {
       "subscription": {
         "title": "Abbonamento di gioco",
@@ -1344,6 +1356,16 @@ export const it_IT: EnTranslations = {
         "annualClaim": "Ritira la cavalcatura del pacchetto",
         "annualPending": "Dopo il pagamento torna al personaggio che ha effettuato l'acquisto per ritirare la cavalcatura del pacchetto. Se il pagamento è in elaborazione o la prova è attiva, riprova dopo l'addebito.",
         "annualDelivered": "La chiave della cavalcatura del pacchetto è stata consegnata per posta.",
+        "monthlyArtAlt": "Un cavaliere con armatura da abbonamento accanto all’asino corriere alato",
+        "annualArtAlt": "Un cavaliere con armatura da abbonamento insieme all’asino corriere e alla cavalcatura Chimera Ala Notturna",
+        "tokenArtAlt": "Un gettone di abbonamento dorato",
+        "annualAllBenefits": "Tutti i vantaggi di un abbonamento mensile.",
+        "annualPerMonth": "Solo {price} al mese, con un risparmio del {percent} rispetto al pagamento mensile.",
+        "annualMountInfo": "Include la cavalcatura Chimera Ala Notturna per tutti i personaggi del tuo account. Le sue redini vincolate all’anima arrivano nella finestra del bottino del personaggio che la acquista. Una per account, e resta tua dopo la fine dell’abbonamento.",
+        "annualArriving": "Le redini della tua cavalcatura appariranno nella finestra del bottino di questo personaggio quando l’addebito sarà completato. Se la prova è attiva, arriveranno dopo il primo pagamento.",
+        "annualArrived": "Le redini della tua cavalcatura sono arrivate. Ritirale dalla finestra del bottino.",
+        "tokenDescription": "Un gettone di abbonamento che ricevi nel gioco. Riscattalo per 30 giorni di abbonamento, oppure scambialo con altri giocatori e vendilo alla casa d’aste.",
+        "tokenArriving": "Il tuo gettone apparirà nella finestra del bottino di questo personaggio quando il pagamento sarà completato.",
         "tokenTitle": "Gettone di abbonamento scambiabile",
         "tokenPrice": "{price} per 30 giorni",
         "benefitsTitle": "Vantaggi dell'abbonamento attivo",
@@ -1363,9 +1385,11 @@ export const it_IT: EnTranslations = {
         "subscribe": "Abbonati",
         "addMonth": "Aggiungi 1 mese",
         "addYear": "Aggiungi 12 mesi",
+        "upgradeAnnual": "Passa a 12 mesi",
         "stackTerms": "Pagamento immediato. Il tempo viene aggiunto alla fine dell'abbonamento attuale, che poi si rinnova con questo piano.",
         "stackCapped": "Puoi accumulare fino a 2 anni di abbonamento alla volta. Riprova quando si avvicina la data di rinnovo.",
         "stackUnavailable": "Al momento non è possibile aggiungere tempo all'abbonamento. Riprova tra poco.",
+        "checkoutPending": "Acquisto in sospeso. In attesa di conferma.",
         "billingBlocked": "Aggiorna i dati di pagamento in Gestisci abbonamento prima di aggiungere tempo all'abbonamento.",
         "renewsOn": "Si rinnova il {date}",
         "endsOn": "L'abbonamento termina il {date}",

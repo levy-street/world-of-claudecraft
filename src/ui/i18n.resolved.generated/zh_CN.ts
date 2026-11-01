@@ -1330,6 +1330,18 @@ export const zh_CN: EnTranslations = {
         "hintBelowMin": "交易所最低价格为 {usd}。"
       }
     },
+    "purchaseLoot": {
+      "title": "你的购买物品已到达",
+      "description": "现在领取吧。如果背包已满，物品会作为溢出物品保留；留待以后领取的物品会保存在你的邮箱中。",
+      "collect": "领取",
+      "later": "稍后"
+    },
+    "membershipWelcome": {
+      "title": "恭喜！",
+      "body": "你的会员资格已生效。尽情享受所有会员福利吧，冒险者！",
+      "bodyUntil": "你的会员资格有效期至{date}。尽情享受所有会员福利吧，冒险者！",
+      "close": "出发"
+    },
     "wocStore": {
       "subscription": {
         "title": "游戏订阅",
@@ -1344,6 +1356,16 @@ export const zh_CN: EnTranslations = {
         "annualClaim": "领取礼包坐骑",
         "annualPending": "付款后，请返回购买礼包的角色领取坐骑。如果付款正在处理或仍在试用期，请在付费成功后重试。",
         "annualDelivered": "礼包坐骑钥匙已通过邮件送达。",
+        "monthlyArtAlt": "身穿会员盔甲的骑士与带翼的信使驴",
+        "annualArtAlt": "身穿会员盔甲的骑士、信使驴与夜翼奇美拉坐骑",
+        "tokenArtAlt": "金色会员代币",
+        "annualAllBenefits": "包含月度会员的全部福利。",
+        "annualPerMonth": "折合每月{price}，比按月付费便宜{percent}。",
+        "annualMountInfo": "包含夜翼奇美拉坐骑，账号下所有角色均可使用。其灵魂绑定的缰绳会在购买角色的拾取窗口中送达。每个账号限一次，会员到期后仍归你所有。",
+        "annualArriving": "付费扣款完成后，坐骑缰绳会出现在此角色的拾取窗口中。如果试用期仍在进行，缰绳将在首次付款后送达。",
+        "annualArrived": "你的坐骑缰绳已送达。请在拾取窗口中领取。",
+        "tokenDescription": "一枚在游戏中获得的会员代币。兑换后可获得30天会员资格，也可以与其他玩家交易或在拍卖行出售。",
+        "tokenArriving": "付款完成后，你的代币会出现在此角色的拾取窗口中。",
         "tokenTitle": "可交易会员代币",
         "tokenPrice": "30天{price}",
         "benefitsTitle": "有效会员权益",
@@ -1363,9 +1385,11 @@ export const zh_CN: EnTranslations = {
         "subscribe": "订阅",
         "addMonth": "增加1个月",
         "addYear": "增加12个月",
+        "upgradeAnnual": "升级为12个月",
         "stackTerms": "立即付款。时长将追加到当前会员的结束时间之后，之后按此方案续订。",
         "stackCapped": "会员时长最多可同时持有2年。请在临近续订日期时再试。",
         "stackUnavailable": "目前无法增加会员时长。请稍后再试。",
+        "checkoutPending": "结账待处理。正在等待确认。",
         "billingBlocked": "增加会员时长前，请先在“管理订阅”中更新付款信息。",
         "renewsOn": "将于{date}续订",
         "endsOn": "会员将于{date}结束",

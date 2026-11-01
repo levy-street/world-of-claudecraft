@@ -617,7 +617,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     expect(writes).toBe(3);
   });
 
-  it('reads subscription status on Memberships entry but never on background polls', async () => {
+  it('reads subscription status on Memberships entry and background polls, not the Cosmetic Store', async () => {
     const snapshot = vi.fn(async () => ({
       available: false,
       status: 'none' as const,
@@ -639,18 +639,20 @@ describe('DailyRewardsWindow store refresh behavior', () => {
       storeSnapshot: async () => ({ available: false, balance: null, items: [] }),
     });
     const runner = store as unknown as {
+      tab: 'store' | 'memberships';
       renderStore(focus: null, opts?: { background: boolean }): Promise<void>;
       renderMemberships(focus: null, opts?: { background: boolean }): Promise<void>;
     };
     // The Cosmetic Store tab no longer carries the membership section.
     await runner.renderStore(null);
     expect(snapshot).not.toHaveBeenCalled();
+    runner.tab = 'memberships';
     await runner.renderMemberships(null);
     expect(snapshot).toHaveBeenCalledTimes(1);
     for (let i = 0; i < 4; i++) await runner.renderMemberships(null, { background: true });
-    expect(snapshot).toHaveBeenCalledTimes(1);
+    expect(snapshot).toHaveBeenCalledTimes(5);
     await runner.renderMemberships(null);
-    expect(snapshot).toHaveBeenCalledTimes(2);
+    expect(snapshot).toHaveBeenCalledTimes(6);
   });
 
   it('preserves the last successful store state when a background snapshot is unavailable', async () => {

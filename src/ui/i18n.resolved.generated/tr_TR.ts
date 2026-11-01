@@ -1330,6 +1330,18 @@ export const tr_TR: EnTranslations = {
         "hintBelowMin": "Borsa'da asgari fiyat {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Satın aldıkların geldi",
+      "description": "Satın aldıklarını şimdi al. Çantaların doluysa kapasite fazlası olarak saklanır. Sonraya bıraktıkların posta kutunda seni bekler.",
+      "collect": "Al",
+      "later": "Daha sonra"
+    },
+    "membershipWelcome": {
+      "title": "Tebrikler!",
+      "body": "Üyeliğin aktif. Tüm üyelik avantajlarının tadını çıkar, maceracı!",
+      "bodyUntil": "Üyeliğin {date} tarihine kadar aktif. Tüm üyelik avantajlarının tadını çıkar, maceracı!",
+      "close": "İleri"
+    },
     "wocStore": {
       "subscription": {
         "title": "Oyun aboneliği",
@@ -1344,6 +1356,16 @@ export const tr_TR: EnTranslations = {
         "annualClaim": "Paket bineğini al",
         "annualPending": "Paket bineğini almak için ödemeden sonra satın alımı yapan karaktere dön. Ödeme işleniyorsa veya deneme süresi etkinse ücret alındıktan sonra tekrar dene.",
         "annualDelivered": "Paket binek anahtarın postayla teslim edildi.",
+        "monthlyArtAlt": "Kanatlı kurye eşeğinin yanında üyelik zırhı giymiş bir şövalye",
+        "annualArtAlt": "Kurye eşeği ve Gece Kanadı Kimera bineğiyle birlikte üyelik zırhı giymiş bir şövalye",
+        "tokenArtAlt": "Altın bir üyelik jetonu",
+        "annualAllBenefits": "Aylık üyeliğin tüm avantajları.",
+        "annualPerMonth": "Aylık ödemeye kıyasla {percent} tasarrufla ayda yalnızca {price}.",
+        "annualMountInfo": "Hesabındaki tüm karakterler için Gece Kanadı Kimera bineğini içerir. Ruha bağlı dizginleri satın alan karakterin ganimet penceresine gelir. Hesap başına bir tane ve üyelik bittikten sonra da senin kalır.",
+        "annualArriving": "Bineğinin dizginleri ödeme tamamlandığında bu karakterin ganimet penceresinde görünür. Deneme süresi aktifse ilk ödemeden sonra gelir.",
+        "annualArrived": "Bineğinin dizginleri geldi. Ganimet penceresinden al.",
+        "tokenDescription": "Oyun içinde aldığın bir üyelik jetonu. 30 günlük üyelik için kullan veya diğer oyuncularla takas edip müzayede evinde sat.",
+        "tokenArriving": "Jetonun ödeme tamamlandığında bu karakterin ganimet penceresinde görünür.",
         "tokenTitle": "Takas edilebilir üyelik jetonu",
         "tokenPrice": "30 gün için {price}",
         "benefitsTitle": "Etkin üyelik avantajları",
@@ -1363,9 +1385,11 @@ export const tr_TR: EnTranslations = {
         "subscribe": "Abone ol",
         "addMonth": "1 ay ekle",
         "addYear": "12 ay ekle",
+        "upgradeAnnual": "12 aya yükselt",
         "stackTerms": "Ödeme şimdi alınır. Süre, mevcut üyeliğinin sonuna eklenir; ardından üyeliğin bu planla yenilenir.",
         "stackCapped": "Bir seferde en fazla 2 yıllık üyelik süresi biriktirebilirsin. Yenileme tarihin yaklaştığında tekrar dene.",
         "stackUnavailable": "Üyelik süresi ekleme şu anda kullanılamıyor. Kısa süre sonra tekrar dene.",
+        "checkoutPending": "Satın alma beklemede. Onay bekleniyor.",
         "billingBlocked": "Üyelik süresi eklemeden önce Aboneliği yönet bölümünden ödeme bilgilerini güncelle.",
         "renewsOn": "Yenileme tarihi: {date}",
         "endsOn": "Üyelik bitiş tarihi: {date}",

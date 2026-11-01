@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending': 'Оформление покупки ожидает подтверждения.',
   "bossJournal.wildheart.zulgar.pulseSummaryRework": "Каждые {every} сек. он читает заклинание {cast} сек. и наносит от {min} до {max} урона всем в радиусе {radius} ярд. Пригвождённые получают в {pinMult} раза больше урона на любом расстоянии.",
   "bossJournal.wildheart.zulgar.spearSummary": "За {cast} сек. пригвождает игрока, кроме танка; танка выбирает, если больше никого нет. Обездвиживание длится до {seconds} сек. и наносит {bleed} урона каждые {tick} сек.",
   "bossJournal.wildheart.zulgar.spearResponse": "Выберите копьё и взаимодействуйте с ним в пределах {range} ярд.: извлечение занимает {pull} сек. Урон его не прерывает. Если на террасе нет свободных союзников, жертва может освободиться сама за {self} сек.",
@@ -2124,6 +2125,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.membershipSlotLocked': 'Оформите подписку, чтобы открыть эту ячейку сумки.',
   'hudChrome.bags.membershipSlotHint':
     'Активная подписка позволяет надеть ещё одну сумку. После её окончания сумка и предметы сохраняются.',
+  'hudChrome.purchaseLoot.title': "Ваша покупка доставлена",
+  'hudChrome.purchaseLoot.description': "Заберите её сейчас. Если сумки заполнены, предмет сохранится сверх лимита, а всё, что вы оставите на потом, будет ждать в почтовом ящике.",
+  'hudChrome.purchaseLoot.collect': "Забрать",
+  'hudChrome.purchaseLoot.later': "Позже",
+  'hudChrome.membershipWelcome.title': "Поздравляем!",
+  'hudChrome.membershipWelcome.body': "Ваше членство активно. Наслаждайтесь всеми преимуществами членства, искатель приключений!",
+  'hudChrome.membershipWelcome.bodyUntil': "Ваше членство активно до {date}. Наслаждайтесь всеми преимуществами членства, искатель приключений!",
+  'hudChrome.membershipWelcome.close': "Вперёд",
   'hudChrome.wocStore.subscription.benefitBag':
     'Наденьте дополнительную сумку в ячейку по подписке.',
   'hudChrome.wocStore.subscription.benefitArmour':
@@ -2209,6 +2218,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Нажмите на предмет, чтобы отправить его в банк персонажа {name}.',
   'hudChrome.bank.accountBankEmpty': 'Этот банк пуст.',
   'hudChrome.bank.accountBagsEmpty': 'Ваши сумки пусты.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt': 'Рыцарь в доспехах членства рядом с крылатым ослом-курьером',
+  'hudChrome.wocStore.subscription.annualArtAlt': 'Рыцарь в доспехах членства с ослом-курьером и ездовой Ночнокрылой химерой',
+  'hudChrome.wocStore.subscription.tokenArtAlt': "Золотой жетон членства",
+  'hudChrome.wocStore.subscription.annualAllBenefits': "Все преимущества месячного членства.",
+  'hudChrome.wocStore.subscription.annualPerMonth': "Выходит {price} в месяц, на {percent} дешевле, чем при помесячной оплате.",
+  'hudChrome.wocStore.subscription.annualMountInfo': "Включает ездовую Ночнокрылую химеру для всех персонажей учётной записи. Персональные поводья приходят в окне добычи персонажу, который совершил покупку. Одна на учётную запись и остаётся вашей после окончания членства.",
+  'hudChrome.wocStore.subscription.annualArriving': "Поводья появятся в окне добычи этого персонажа, когда платёж пройдёт. Если идёт пробный период, они придут после первой оплаты.",
+  'hudChrome.wocStore.subscription.annualArrived': "Поводья доставлены. Заберите их в окне добычи.",
+  'hudChrome.wocStore.subscription.tokenDescription': "Жетон членства, который вы получаете в игре. Используйте его, чтобы получить 30 дней членства, или обменяйте другим игрокам и продайте на аукционе.",
+  'hudChrome.wocStore.subscription.tokenArriving': "Жетон появится в окне добычи этого персонажа, когда платёж пройдёт.",
   'hudChrome.wocStore.subscription.tokenTitle': 'Передаваемый жетон членства',
   'hudChrome.wocStore.subscription.tokenPrice': '{price} за 30 дней',
   'hudChrome.wocStore.subscription.tokenTerms':
@@ -2244,6 +2263,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.subscribe': 'Подписаться',
   'hudChrome.wocStore.subscription.addMonth': 'Добавить 1 месяц',
   'hudChrome.wocStore.subscription.addYear': 'Добавить 12 месяцев',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Перейти на 12 месяцев',
   'hudChrome.wocStore.subscription.stackTerms':
     'Оплата сейчас. Срок добавляется к концу текущего членства, затем подписка продлевается по этому тарифу.',
   'hudChrome.wocStore.subscription.stackCapped':

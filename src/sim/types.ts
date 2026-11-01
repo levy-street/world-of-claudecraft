@@ -1,6 +1,7 @@
 import type { CourierAccountExchange, CourierBankExchange } from './courier';
 import { cloneItemProvenance, type ItemTrackedKind } from './item_provenance';
 import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
+import type { PurchaseParcelView } from './mail/purchase_parcels';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
 import type { MaterialComposition } from './material_sources';
@@ -9953,6 +9954,12 @@ export type SimEvent = { pid?: number } & (
       z: number;
     }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
+  // A paid store reward landed in (or still waits in) this player's mailbox: the
+  // client opens a loot window that takes it from anywhere (mail/purchase_parcels.ts).
+  | { type: 'purchaseParcels'; parcels: PurchaseParcelView[] }
+  // The server redeemed a membership token for this player: a congratulation
+  // dialog. `expiresAt` is the new membership end in Unix ms (server-emitted only).
+  | { type: 'membershipRedeemed'; days: number; expiresAt: number | null }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the
   // sim never books guild events); declared here so the one client event

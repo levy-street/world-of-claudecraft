@@ -1330,6 +1330,18 @@ export const sv_SE: EnTranslations = {
         "hintBelowMin": "Börsens lägsta pris är {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Ditt köp har anlänt",
+      "description": "Hämta ditt köp nu. Om dina väskor är fulla sparas det som överskott. Allt du lämnar till senare väntar i din brevlåda.",
+      "collect": "Hämta",
+      "later": "Senare"
+    },
+    "membershipWelcome": {
+      "title": "Grattis!",
+      "body": "Ditt medlemskap är aktivt. Njut av alla medlemsförmåner, äventyrare!",
+      "bodyUntil": "Ditt medlemskap är aktivt till {date}. Njut av alla medlemsförmåner, äventyrare!",
+      "close": "Framåt"
+    },
     "wocStore": {
       "subscription": {
         "title": "Spelprenumeration",
@@ -1344,6 +1356,16 @@ export const sv_SE: EnTranslations = {
         "annualClaim": "Hämta paketets riddjur",
         "annualPending": "Återvänd till den karaktär som gjorde köpet efter betalning för att hämta paketets riddjur. Om betalningen behandlas eller provperioden är aktiv, försök igen efter den betalda debiteringen.",
         "annualDelivered": "Nyckeln till ditt paketriddjur har levererats med posten.",
+        "monthlyArtAlt": "En riddare i medlemsrustning bredvid den bevingade kuriråsnan",
+        "annualArtAlt": "En riddare i medlemsrustning med kuriråsnan och riddjuret nattvingad chimär",
+        "tokenArtAlt": "En gyllene medlemspollett",
+        "annualAllBenefits": "Alla förmåner med ett månatligt medlemskap.",
+        "annualPerMonth": "Bara {price} per månad, vilket sparar {percent} jämfört med månadsbetalning.",
+        "annualMountInfo": "Innehåller riddjuret nattvingad chimär för alla karaktärer på ditt konto. Dess själsbundna tyglar anländer i ett bytesfönster hos karaktären som köper den. En per konto, och den förblir din när medlemskapet tar slut.",
+        "annualArriving": "Ditt riddjurs tyglar visas i den här karaktärens bytesfönster när betalningen har slutförts. Om provperioden är aktiv anländer de efter den första betalningen.",
+        "annualArrived": "Ditt riddjurs tyglar har anlänt. Hämta dem i bytesfönstret.",
+        "tokenDescription": "En medlemspollett som du får i spelet. Lös in den mot 30 dagars medlemskap, eller handla med andra spelare och sälj den på auktionshuset.",
+        "tokenArriving": "Din pollett visas i den här karaktärens bytesfönster när betalningen har slutförts.",
         "tokenTitle": "Överlåtbar medlemspollett",
         "tokenPrice": "{price} för 30 dagar",
         "benefitsTitle": "Förmåner med aktivt medlemskap",
@@ -1363,9 +1385,11 @@ export const sv_SE: EnTranslations = {
         "subscribe": "Prenumerera",
         "addMonth": "Lägg till 1 månad",
         "addYear": "Lägg till 12 månader",
+        "upgradeAnnual": "Byt till 12 månader",
         "stackTerms": "Betalningen sker nu. Tiden läggs till efter ditt nuvarande medlemskap, som sedan förnyas enligt denna plan.",
         "stackCapped": "Du kan samla upp till 2 års medlemskap åt gången. Försök igen närmare ditt förnyelsedatum.",
         "stackUnavailable": "Det går inte att lägga till medlemstid just nu. Försök igen om en stund.",
+        "checkoutPending": "Köpet väntar på att slutföras. Väntar på bekräftelse.",
         "billingBlocked": "Uppdatera dina betalningsuppgifter under Hantera prenumeration innan du lägger till medlemstid.",
         "renewsOn": "Förnyas den {date}",
         "endsOn": "Medlemskapet upphör den {date}",

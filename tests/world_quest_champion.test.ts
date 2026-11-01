@@ -200,7 +200,7 @@ describe('the world quest champion encore', () => {
     expect(worldQuestChampionState(sim.ctx, QUEST_ID)).toBeUndefined();
   });
 
-  it('scales the level-7 Sableweb Lurker champion to twice a tuned spider rather than 1850 HP', () => {
+  it('scales the level-7 Sableweb Lurker champion to twice a progressively tuned spider', () => {
     const sim = new Sim({ seed: 31, playerClass: 'warrior', devCommands: true });
     const meta = sim.meta(sim.playerId);
     if (!meta) throw new Error('player meta fixture');
@@ -211,7 +211,7 @@ describe('the world quest champion encore', () => {
     expect(mob).toBeDefined();
     expect(mob?.templateId).toBe('webwood_spider');
     expect(mob?.level).toBe(7);
-    expect(mob?.maxHp).toBe(740);
+    expect(mob?.maxHp).toBe(328);
   });
 
   it('never promotes a training dummy into a site champion', () => {

@@ -20,6 +20,7 @@ import { basename, join, normalize, relative } from 'node:path';
 import { REPO_ROOT } from './env.mjs';
 import { weaponFamilyFor } from './families.mjs';
 import { inspectGlb } from './glb.mjs';
+import { findGlbReferences } from './glb_source_references.mjs';
 import { renderHeldPreviews, renderSkinThumb, renderThumb } from './preview.mjs';
 
 export const LIBRARY_DIR = join(REPO_ROOT, 'tmp/asset_pipeline/library');
@@ -264,11 +265,15 @@ export function collectInventory() {
     ),
     chromas: parseMechChromas(readFileSync(join(REPO_ROOT, 'src/sim/content/skins.ts'), 'utf8')),
   };
-  const haystack = sourceHaystack();
+  const models = walk(join(REPO_ROOT, 'public/models')).filter((f) => f.endsWith('.glb'));
+  const references = findGlbReferences(
+    sourceHaystack(),
+    models.map((f) => basename(f)),
+  );
   const assets = [];
 
   // 1. Every GLB under public/models.
-  for (const abs of walk(join(REPO_ROOT, 'public/models')).filter((f) => f.endsWith('.glb'))) {
+  for (const abs of models) {
     const rel = slashPath(relative(join(REPO_ROOT, 'public'), abs)); // models/...
     const parts = rel.split('/');
     const category = parts[1] === 'chars' ? `chars/${parts[2]}` : parts[1];
@@ -281,7 +286,7 @@ export function collectInventory() {
       path: rel,
       abs,
       bytes: statSync(abs).size,
-      registration: { referenced: haystack.includes(`${name}.glb`) },
+      registration: { referenced: references.has(`${name}.glb`) },
     };
     if (category === 'weapons') {
       const grip = registries.accessory.get(name) ?? null;
