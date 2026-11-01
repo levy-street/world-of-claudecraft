@@ -13,6 +13,7 @@ import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
 import { warriorReadinessBit } from '../warrior_readiness_core';
+import { ARC_BOLT_ABILITY, type ArcBoltPrimitives, playArcBolt } from './arc_bolt';
 import { HarvestDetonations } from './harvest_detonation';
 import {
   drawWarriorAreaContact,
@@ -83,7 +84,7 @@ export interface AbilityVfxPrimitives {
     scale?: number,
     color?: number,
   ): void;
-  lightningProjectile(sourceId: number, targetId: number, color?: number): void;
+  lightningProjectile: ArcBoltPrimitives['lightningProjectile'];
   burst(
     at: VfxPoint,
     school: string,
@@ -827,6 +828,15 @@ export class AbilityVfx {
     switch (ev.fx) {
       case 'projectile':
       case 'heavyBolt': {
+        // Arc Overload's echo is an Arc Bolt cue on the projectile arm: the
+        // same stepped leader, drawn smaller (arc_bolt.ts).
+        if (
+          ability === ARC_BOLT_ABILITY &&
+          playArcBolt(this.deps.vfx, fx, ev.sourceId, ev.targetId, plan.color, tier, true)
+        ) {
+          this.spawned++;
+          break;
+        }
         // A player ranged shot's draw animation rides the projectile launch
         // cue; keep it when this painter claims the event.
         if (ev.attackAnimation === 'ranged-shot' && !plan.whirl) {
@@ -899,6 +909,19 @@ export class AbilityVfx {
         break;
       }
       case 'lightning':
+        if (
+          ability === ARC_BOLT_ABILITY &&
+          playArcBolt(this.deps.vfx, fx, ev.sourceId, ev.targetId, plan.color, tier, false)
+        ) {
+          // The stepped leader stages its own impact at ARRIVAL, so the
+          // compressed instant sequence (impact at 0.15 s) stays off.
+          this.spawned++;
+          if (!plan.whirl) {
+            this.mobThrowFallback(ev.sourceId, ability);
+            this.releaseGesture(ev.sourceId, ability);
+          }
+          break;
+        }
         this.deps.vfx.lightningProjectile(ev.sourceId, ev.targetId, plan.color);
         this.spawned++;
         if (tier < 2) {

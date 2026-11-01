@@ -84,6 +84,8 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   fx.setWorldLightDelegate((at, school, intensity, duration, range) =>
     h.light.pulse(at, school, intensity, duration, range),
   );
+  // The Arc Bolt leader's moving light borrows a pulse-pool slot (no new light).
+  fx.setTrackedLightHost(h.light);
   // The raid trinket relics' pooled scene objects, built hidden here so the
   // cast-VFX prewarm links them with the rest of the 'vfx' programs.
   const trinketRelics = new TrinketRelics({

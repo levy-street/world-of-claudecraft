@@ -797,6 +797,7 @@ const RENDER_PURE_CORES = [
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
   'src/render/ability_vfx/signature_core.ts',
+  'src/render/ability_vfx/stepped_leader_core.ts',
   'src/render/ability_vfx/warrior_attention_core.ts',
   'src/render/ability_vfx/warrior_insult_core.ts',
   'src/render/camera_impact_core.ts',

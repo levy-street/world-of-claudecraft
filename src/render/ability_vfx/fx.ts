@@ -14,6 +14,7 @@ import {
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { CAST_VFX_ENGINE, type CastVfxSpawnGate } from '../cast_vfx_family';
+import type { TrackedLightHost } from '../light_pulses';
 import { tanHalfVerticalFov } from '../vfx_screen_bounds_core';
 import type { WarriorFuryStateAura, WarriorFuryStateKind } from '../warrior_fury_state_core';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
@@ -56,6 +57,8 @@ import {
   type SpiritCompileGate,
 } from './spirits';
 import type { SteelSweepRange } from './steel_sweep';
+import { SteppedLeaderBolts } from './stepped_leader';
+import type { ArcBoltLeaderPlan } from './stepped_leader_core';
 import { WarriorAttention } from './warrior_attention';
 import { drawWarriorControlMark, evictDecorationForWarriorMark } from './warrior_control_marks';
 import { type WarriorFlashStyle, warriorFlashStyle } from './warrior_flash';
@@ -478,6 +481,9 @@ export class AbilityVfxFx implements SequencerHost {
   private guardDt = 0;
   private guardFacing = (id: number) => this.facingAt(id) ?? null;
   private rings: ShockRings;
+  // The Arc Bolt stepped leader (stepped_leader.ts): draws through the ribbon
+  // pool's held pass and moves one tracked pulse-pool light.
+  private leaders: SteppedLeaderBolts;
   private decals: GroundDecals;
   private overlay: OverlaySprites;
   private pillars: LightPillars;
@@ -703,6 +709,28 @@ export class AbilityVfxFx implements SequencerHost {
     this.baked = new BakedImpactLayers(scene, textureReady);
     this.fragments = new SolidImpactFragments(scene);
     this.rings = new ShockRings(scene, tex, groundY);
+    this.leaders = new SteppedLeaderBolts({
+      strip: (points, count, width, color, light, taper) =>
+        this.ribbons.appendStrip(points, count, width, color, light, taper),
+      crack: (fx, fy, fz, tx, ty, tz, colorHex, life, width, jagScale, delay) =>
+        this.ribbons.spawnBoltPoints(
+          fx,
+          fy,
+          fz,
+          tx,
+          ty,
+          tz,
+          colorHex,
+          life,
+          width,
+          jagScale,
+          delay,
+        ),
+      anchor,
+      hand: (id, out) => this.handSample?.(id, 0, out) ?? false,
+      ring: (x, y, z, radius, colorHex) =>
+        this.rings.spawn(x, y, z, radius, 0.45, colorHex, 1.2 * this.intensity(), true),
+    });
     this.decals = new GroundDecals(scene, tex, groundY);
     this.overlay = new OverlaySprites(scene, tex);
     this.pillars = new LightPillars(scene);
@@ -1773,6 +1801,34 @@ export class AbilityVfxFx implements SequencerHost {
       fractured,
     );
   }
+  // ---- Arc Bolt stepped leader (stepped_leader.ts) -------------------------
+  /** The moving-light seam (the renderer's pulse pool); null = no light. */
+  setTrackedLightHost(host: TrackedLightHost | null): void {
+    this.leaders.setLightHost(host);
+  }
+  /** Start a leader riding a projectile's live head; returns its handle. */
+  steppedLeader(
+    sourceId: number,
+    targetId: number,
+    head: THREE.Vector3,
+    plan: ArcBoltLeaderPlan,
+  ): number {
+    if (this.disposed) return -1;
+    return this.leaders.spawn(sourceId, targetId, head, plan);
+  }
+  steppedLeaderImpact(handle: number, at: THREE.Vector3): void {
+    this.leaders.impact(handle, at);
+  }
+  steppedLeaderLost(handle: number): void {
+    this.leaders.lost(handle);
+  }
+  /** Live stepped leaders (probe/test readout). */
+  steppedLeaderCount(): number {
+    return this.leaders.activeCount();
+  }
+  private drawLeaders = (): void => {
+    this.leaders.draw();
+  };
   setWorldLightDelegate(
     callback:
       | ((
@@ -2477,7 +2533,14 @@ export class AbilityVfxFx implements SequencerHost {
     this.furyAudio.update(this, dt);
     // Pack after the sequence emits this frame's contacts, so the visible
     // wound and native weapon contact share one frame. Advance each pool once.
-    this.ribbons.update(dt, camPosScratch, reducedMotion, undefined, this.drawPriorityStorms);
+    this.leaders.advance(dt, reducedMotion);
+    this.ribbons.update(
+      dt,
+      camPosScratch,
+      reducedMotion,
+      this.drawLeaders,
+      this.drawPriorityStorms,
+    );
     this.furyStates.draw(
       this.frame,
       dt,
@@ -2546,6 +2609,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.warriorStorms.clear();
     this.furyAudio.clear();
     this.contactBursts.clear();
+    this.leaders.clear();
     this.ribbons.clear();
     this.baked.clear();
     this.fragments.clear();

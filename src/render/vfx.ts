@@ -320,6 +320,22 @@ interface Projectile {
   // trail and impact flash; mechanics and speed are untouched.
   scale?: number;
   onImpact?: (position: THREE.Vector3) => void;
+  // Called when the projectile is dropped WITHOUT arriving (target gone, ttl
+  // spent), so an owner riding it (the Arc Bolt leader) can stand down.
+  onLost?: () => void;
+  // Lightning head drawn as a small hot tip instead of the zig-zag streak: the
+  // stepped leader (ability_vfx/stepped_leader.ts) draws the channel itself.
+  tip?: boolean;
+}
+
+/** Options for a lightning projectile whose flight another effect rides. */
+export interface LightningProjectileOpts {
+  /** Draw only a small hot tip; the rider draws the bolt body. */
+  tip?: boolean;
+  /** Arrival at the target (the impact point is a scratch vector: copy it). */
+  onImpact?: (position: THREE.Vector3) => void;
+  /** Dropped without arriving. */
+  onLost?: () => void;
 }
 
 interface BubbleBeam {
@@ -1176,9 +1192,16 @@ export class Vfx {
   // it arrives, no flash-then-wait), but its flying head renders as a short jagged
   // blue-white electric streak instead of a round glowing comet (the shape is
   // drawn in the projectile update loop). Original procedural effect (no assets).
-  lightningProjectile(sourceId: number, targetId: number, color?: number): void {
+  // Returns the projectile's LIVE head position (moved in place every frame
+  // until it lands), or null when the caster has no anchor.
+  lightningProjectile(
+    sourceId: number,
+    targetId: number,
+    color?: number,
+    opts?: LightningProjectileOpts,
+  ): THREE.Vector3 | null {
     const from = this.anchor(sourceId, 0.62);
-    if (!from) return;
+    if (!from) return null;
     // A color override tints the bolt per ability: the head stays pushed toward
     // white so it still reads as a hot electric core.
     const head =
@@ -1190,13 +1213,20 @@ export class Vfx {
       targetId,
       color: new THREE.Color(color ?? 0x66b8ff).multiplyScalar(hdr(1.7)), // electric blue (impact tint)
       coreColor: head.multiplyScalar(hdr(3.0)), // hot white-blue head
-      trailColor: new THREE.Color(color ?? 0x3f9bff).multiplyScalar(hdr(1.9)), // crackle
+      // crackle; a tipped head wears the stepped leader's violet plasma corona
+      trailColor: new THREE.Color(opts?.tip ? 0xa56cff : (color ?? 0x3f9bff)).multiplyScalar(
+        hdr(1.9),
+      ),
       speed: 26,
       ttl: 3,
       coreSprite: SPR.glowCore,
       trailSprite: SPR.sparkle,
       lightning: true,
+      tip: opts?.tip,
+      onImpact: opts?.onImpact,
+      onLost: opts?.onLost,
     });
+    return this.projectiles[this.projectiles.length - 1].pos;
   }
 
   // A talent proc arming: a tight ascending double-helix of bright motes around
@@ -2660,6 +2690,7 @@ export class Vfx {
       const target = this.anchor(pr.targetId, 0.5, this.homingScratch);
       if (!target || pr.ttl <= 0) {
         this.projectiles.splice(i, 1);
+        pr.onLost?.();
         continue;
       }
       const dir = this.homingDir.subVectors(target, pr.pos);
@@ -2713,7 +2744,52 @@ export class Vfx {
       const uz = dir.z / dist;
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
-      if (pr.lightning) {
+      if (pr.lightning && pr.tip) {
+        // A rider draws the channel: the head is only a small hot tip with a
+        // violet corona and the odd spark flung off it.
+        // Lives about two frames, so the tip never strings out into a trail.
+        this.spawn(
+          pr.pos.x,
+          pr.pos.y,
+          pr.pos.z,
+          0,
+          0,
+          0,
+          pr.coreColor,
+          0.5,
+          0.035,
+          0,
+          SPR.glowCore,
+        );
+        this.spawn(
+          pr.pos.x,
+          pr.pos.y,
+          pr.pos.z,
+          0,
+          0,
+          0,
+          pr.trailColor,
+          0.9,
+          0.035,
+          0,
+          SPR.glowCore,
+        );
+        if (Math.random() < 0.45) {
+          this.spawn(
+            pr.pos.x,
+            pr.pos.y,
+            pr.pos.z,
+            (Math.random() - 0.5) * 3,
+            Math.random() * 1.5,
+            (Math.random() - 0.5) * 3,
+            pr.coreColor,
+            0.16,
+            0.22,
+            4,
+            SPR.sparkle,
+          );
+        }
+      } else if (pr.lightning) {
         // The flying head is a short jagged electric streak trailing back along
         // the travel direction: a few segments, each kicked perpendicular for the
         // zig-zag, so it reads as a lightning bolt shape rather than a round comet.

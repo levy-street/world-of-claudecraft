@@ -1203,6 +1203,21 @@ export class AbilityVfxRibbons {
     this.add(points, count, width, this.heldColor, light, 0.1, 1, null, 0, true);
   }
 
+  /** Immediate plain-energy strip (the bolt look, not the Warrior filament),
+   *  valid only inside update's drawHeld callback. taper 0 keeps the width
+   *  constant; 1 pinches both ends. */
+  appendStrip(
+    points: THREE.Vector3[],
+    count: number,
+    width: number,
+    color: THREE.Color,
+    light: number,
+    taper: number,
+  ): void {
+    if (!this.spawnGate.allows(CAST_VFX_ENGINE)) return;
+    this.add(points, count, width, color, light, taper);
+  }
+
   /** End one resolved throw, or every throw involving a dead participant. */
   cancelWarriorHammer(entityId: number, targetId?: number): void {
     for (const t of this.trails) {
