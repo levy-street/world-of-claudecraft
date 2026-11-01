@@ -45,7 +45,7 @@ import {
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scalePrimaryHealing } from '../primary_healing';
 import { scheduleProjectile } from '../projectile_travel';
-import { worldPvpOnPlayerAided } from '../pvp';
+import { damageBeforeTankCut, restrainedPlannedHeal, worldPvpOnPlayerAided } from '../pvp';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -827,10 +827,15 @@ export function runEffects(
               school: ability.school,
             };
             if (selfHealDamageFrac !== undefined) {
-              const plannedHeal = Math.round(amount * selfHealDamageFrac);
+              // Planned from the damage before the PvP tank cut, then the heal
+              // pays the self-heal cut once (pvp/tank_restraint_heal.ts).
+              const plannedHeal = Math.round(
+                damageBeforeTankCut(ctx, p, strikeTarget, amount) * selfHealDamageFrac,
+              );
               const healed = ctx.applyHeal(p, p, plannedHeal, ability.name, ability.id, false);
               if (ability.id === 'hammer_of_grace' && mods.global.paladinRecurringGrace > 0) {
-                applyRecurringGraceShield(ctx, p, Math.max(0, plannedHeal - healed));
+                const overheal = restrainedPlannedHeal(ctx, p, plannedHeal) - healed;
+                applyRecurringGraceShield(ctx, p, Math.max(0, overheal));
               }
             }
           },
@@ -1055,10 +1060,15 @@ export function runEffects(
         }
         if (eff.selfHealDamageFrac !== undefined) {
           if (effectiveDamage > 0) {
-            const plannedHeal = Math.round(effectiveDamage * eff.selfHealDamageFrac);
+            // Planned from the damage before the PvP tank cut, then the heal
+            // pays the self-heal cut once (pvp/tank_restraint_heal.ts).
+            const plannedHeal = Math.round(
+              damageBeforeTankCut(ctx, p, target, effectiveDamage) * eff.selfHealDamageFrac,
+            );
             const healed = ctx.applyHeal(p, p, plannedHeal, ability.name, ability.id, false);
             if (ability.id === 'hammer_of_grace' && mods.global.paladinRecurringGrace > 0) {
-              applyRecurringGraceShield(ctx, p, Math.max(0, plannedHeal - healed));
+              const overheal = restrainedPlannedHeal(ctx, p, plannedHeal) - healed;
+              applyRecurringGraceShield(ctx, p, Math.max(0, overheal));
             }
           }
         }

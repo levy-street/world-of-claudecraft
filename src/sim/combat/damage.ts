@@ -69,6 +69,7 @@ import {
   notePvpExchange,
   pvpDamageMultiplier,
   tankPvpDamageMult,
+  tankPvpShieldBurn,
   worldPvpOnOwnedPetDamaged,
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
@@ -694,11 +695,22 @@ export function dealDamage(
   // through the target's absorbs once and must not be soaked a second time.
   if (!resolvedHpLoss && amount > 0) {
     cleanupCraftedCollectionAuras(ctx, target);
+    // Tank Toll (pvp/tank_restraint.ts): a hostile player's hit burns a
+    // restrained tank's OWN shields at double rate, so each shield point soaks
+    // half a point of damage. Exactly 1 (the classic one-for-one soak) for
+    // every other hit, wearer and shield. Draws no rng.
+    const shieldBurn =
+      hostilePvpHit && target.kind === 'player'
+        ? tankPvpShieldBurn(target, ctx.players.get(target.id), ctx.time)
+        : 1;
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
       const a = target.auras[i];
       if (a.kind !== 'absorb') continue;
-      const soaked = Math.min(a.value, amount);
-      a.value -= soaked;
+      const burn = shieldBurn !== 1 && a.sourceId === target.id ? shieldBurn : 1;
+      const soaked =
+        burn === 1 ? Math.min(a.value, amount) : Math.min(amount, Math.ceil(a.value / burn));
+      if (burn === 1) a.value -= soaked;
+      else a.value = Math.max(0, a.value - soaked * burn);
       amount -= soaked;
       totalAbsorbed += soaked;
       emitAbsorbCredit(ctx, a, target, soaked);

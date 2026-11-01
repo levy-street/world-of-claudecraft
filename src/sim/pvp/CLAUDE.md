@@ -31,8 +31,12 @@ ratings.
   `combat/tank_crit_immunity.ts`) who dealt or took hostile player damage
   within `PVP_EXCHANGE_LINGER_SECONDS` deals 30% less damage to players (and
   their pets, guardians and totems) and heals themselves for 30% less.
-  `combat/damage.ts` stamps `Entity.pvpExchangeAt` on both controllers and
-  cuts damage to anything a hostile player controls; `combat/heal.ts` (`applyHeal`) and `combat/auras.ts` (own HoT ticks,
+  Hostile player hits also burn the tank's own shields at double rate
+  (`TANK_PVP_SHIELD_BURN`, the absorb loop in `combat/damage.ts`).
+  `tank_restraint_heal.ts` plans damage-derived self-heals (Hammer of Grace)
+  from the damage before the tank cut and keeps Recurring Grace from shielding
+  the cut share. `combat/damage.ts` stamps `Entity.pvpExchangeAt` on both
+  controllers and cuts damage to anything a hostile player controls; `combat/heal.ts` (`applyHeal`) and `combat/auras.ts` (own HoT ticks,
   Second Wind) apply the self-heal cut.
 - `tank_toll.ts` owns the visible Tank Toll debuff behind it: `updateTankToll`
   (on the zone pass beside Vitality) puts the inert, permanent, undispellable

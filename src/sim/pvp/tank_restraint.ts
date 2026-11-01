@@ -74,3 +74,19 @@ export function tankPvpSelfHealMult(
   if (source.id !== target.id) return 1;
   return tankPvpRestrained(target, meta, now) ? 1 - TANK_PVP_SELF_HEAL_PENALTY : 1;
 }
+
+/** Shield points a hostile player's hit burns for each point of damage a
+ *  restrained tank's OWN shield soaks (owner rule, v0.46: players deal double
+ *  damage to tank shields). Shields someone else cast on the tank are spared. */
+export const TANK_PVP_SHIELD_BURN = 2;
+
+/** How many shield points one point of a hostile player's damage burns from
+ *  `target`'s self-cast shields: TANK_PVP_SHIELD_BURN while `target` is a
+ *  restrained tank, 1 otherwise. The caller decides the hit is hostile PvP. */
+export function tankPvpShieldBurn(
+  target: Entity,
+  meta: CommittedTankMeta | undefined,
+  now: number,
+): number {
+  return tankPvpRestrained(target, meta, now) ? TANK_PVP_SHIELD_BURN : 1;
+}

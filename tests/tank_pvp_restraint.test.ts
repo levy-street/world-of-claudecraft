@@ -15,6 +15,7 @@ import {
   PVP_EXCHANGE_LINGER_SECONDS,
   TANK_PVP_DAMAGE_PENALTY,
   TANK_PVP_SELF_HEAL_PENALTY,
+  TANK_PVP_SHIELD_BURN,
   tankPvpDamageMult,
   tankPvpSelfHealMult,
 } from '../src/sim/pvp';
@@ -259,5 +260,55 @@ describe('PvP tank restraint: self-healing', () => {
     hit(sim, tank, foe);
     expect(hotTick(tank.id)).toBe(70);
     expect(hotTick(ally.id)).toBe(100);
+  });
+});
+
+describe('PvP tank restraint: shields', () => {
+  const ward = (sourceId: number, value: number) => ({
+    id: 'test_ward',
+    name: 'Test Ward',
+    kind: 'absorb' as const,
+    remaining: 10,
+    duration: 10,
+    value,
+    sourceId,
+    school: 'holy' as const,
+  });
+  const wardOf = (e: Entity) => e.auras.find((a) => a.id === 'test_ward');
+
+  it("burns a restrained tank's own shield at double rate against players", () => {
+    expect(TANK_PVP_SHIELD_BURN).toBe(2);
+    const { sim, tank, foe } = arena(PROT_WARRIOR);
+    tank.auras.push(ward(tank.id, 100));
+    expect(hit(sim, foe, tank, 40)).toBe(0);
+    expect(wardOf(tank)?.value).toBe(20);
+    // 20 shield points soak only 10 more damage; the other 30 reach health.
+    expect(hit(sim, foe, tank, 40)).toBe(30);
+    expect(wardOf(tank)).toBeUndefined();
+  });
+
+  it('rounds an odd last shield point in the tank favour', () => {
+    const { sim, tank, foe } = arena(PROT_WARRIOR);
+    tank.auras.push(ward(tank.id, 15));
+    expect(hit(sim, foe, tank, 10)).toBe(2);
+    expect(wardOf(tank)).toBeUndefined();
+  });
+
+  it('spares shields someone else cast on the tank, and creature hits', () => {
+    const { sim, tank, foe, ally, mob } = arena(PROT_WARRIOR);
+    tank.auras.push(ward(ally.id, 100));
+    expect(hit(sim, foe, tank, 40)).toBe(0);
+    expect(wardOf(tank)?.value).toBe(60);
+    tank.auras = tank.auras.filter((a) => a.id !== 'test_ward');
+    tank.auras.push(ward(tank.id, 100));
+    expect(hit(sim, mob, tank, 40)).toBe(0);
+    expect(wardOf(tank)?.value).toBe(60);
+  });
+
+  it('leaves a non-tank shield one-for-one', () => {
+    const { sim, tank, foe } = arena({ cls: 'warrior', spec: 'arms' });
+    tank.auras.push(ward(tank.id, 100));
+    expect(hit(sim, foe, tank, 40)).toBe(0);
+    expect(wardOf(tank)?.value).toBe(60);
   });
 });

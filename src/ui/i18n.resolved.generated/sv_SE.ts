@@ -4799,7 +4799,7 @@ export const sv_SE: EnTranslations = {
       "internalCooldown": "Denna effekt kan inte utlösas igen förrän timern löper ut",
       "carriedFlag": "Du bär på fiendens flagga. Avbryt den här förstärkningen för att tappa den.",
       "carryingFreight": "Du bär frakt. Förflyttningshastigheten är reducerad med {pct}%.",
-      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Stridsställning: 10% mer raserigenerering",
       "berserkerStance": "Bärsärkaställning: kritiska träffar sker 3% oftare och slår 3% hårdare",
       "crit": "Ökar kritisk träffchans med {pct}%",

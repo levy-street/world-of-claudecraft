@@ -168,10 +168,13 @@ export {
   PVP_EXCHANGE_LINGER_SECONDS,
   TANK_PVP_DAMAGE_PENALTY,
   TANK_PVP_SELF_HEAL_PENALTY,
+  TANK_PVP_SHIELD_BURN,
   tankPvpDamageMult,
   tankPvpRestrained,
   tankPvpSelfHealMult,
+  tankPvpShieldBurn,
 } from './tank_restraint';
+export { damageBeforeTankCut, restrainedPlannedHeal } from './tank_restraint_heal';
 export {
   TANK_TOLL_AURA_ID,
   TANK_TOLL_AURA_NAME,

@@ -4799,7 +4799,7 @@ export const it_IT: EnTranslations = {
       "internalCooldown": "Questo effetto non può attivarsi di nuovo prima che il timer scada",
       "carriedFlag": "Stai portando la bandiera nemica. Annulla questo effetto per lasciarla cadere.",
       "carryingFreight": "Stai trasportando un carico. La velocità di movimento è ridotta del {pct}%.",
-      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
       "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
       "crit": "Aumenta la probabilità di colpo critico del {pct}%",

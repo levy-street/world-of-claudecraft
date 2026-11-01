@@ -12452,7 +12452,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': '造成的伤害降低 {pct}%',
   'hudChrome.auraEffect.carriedFlag': '你正携带敌方旗帜。取消该增益即可丢下旗帜。',
   'hudChrome.auraEffect.carryingFreight': '你正在搬运货物。移动速度降低 {pct}%。',
-  'hudChrome.auraEffect.tankToll': '作为坦克，你对其他玩家造成的伤害和你的自我治疗效果降低 {pct}%',
+  'hudChrome.auraEffect.tankToll':
+    '作为坦克，你对其他玩家造成的伤害和你的自我治疗效果降低 {pct}%，且玩家对你的护盾造成双倍伤害',
   'hudChrome.auraEffect.elementalConvergencePrimed': '你的下一个不同元素学派法术将触发元素汇聚',
   'hudChrome.auraEffect.heatingUp':
     '你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发',

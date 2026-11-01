@@ -144,7 +144,16 @@ The rule has two halves:
   - every heal the tank casts on themselves is cut: direct heals through
     `applyHeal`, their own heal-over-time ticks, and Second Wind. Heals from
     other players, heals the tank casts on others, potions, food and natural
-    regeneration are untouched.
+    regeneration are untouched. A heal that is a share of damage dealt
+    (`selfHealDamageFrac`, Hammer of Grace) is planned from the damage BEFORE
+    the tank cut, so it pays the self-heal cut once (`pvp/tank_restraint_heal.ts`
+    `damageBeforeTankCut`), and Recurring Grace shields only the overheal left
+    after the self-heal cut (`restrainedPlannedHeal`), so the cut share never
+    comes back as an absorb;
+  - a hostile player's hit (or their pet's) burns the tank's OWN shields at
+    double rate (`TANK_PVP_SHIELD_BURN`): each shield point soaks half a point
+    of damage, an odd last point rounding in the tank's favour. Shields someone
+    else cast on the tank, and every creature hit, soak one for one.
 
 Duels count like every other hostile pairing. The exchange stamp
 (`Entity.pvpExchangeAt`) is transient combat state, never saved or sent to

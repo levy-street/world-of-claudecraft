@@ -4799,7 +4799,7 @@ export const nl_NL: EnTranslations = {
       "internalCooldown": "Dit effect kan niet opnieuw worden geactiveerd voordat de timer afloopt",
       "carriedFlag": "Je draagt de vlag van de vijand. Zeg deze buff op om hem te laten vallen.",
       "carryingFreight": "Je draagt vracht. Bewegingssnelheid is verminderd met {pct}%.",
-      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Strijdhouding: 10% meer woedeopbouw",
       "berserkerStance": "Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder",
       "crit": "Verhoogt kans op kritieke treffers met {pct}%",

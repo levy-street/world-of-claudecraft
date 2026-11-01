@@ -4799,7 +4799,7 @@ export const da_DK: EnTranslations = {
       "internalCooldown": "Denne effekt kan ikke udløses igen, før timeren udløber",
       "carriedFlag": "Du bærer fjendens flag. Annuller denne styrkelse for at tabe det.",
       "carryingFreight": "Du bærer last. Bevægelseshastighed er reduceret med {pct}%.",
-      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Kampstilling: 10% mere raserigenerering",
       "berserkerStance": "Berserkerstilling: kritiske slag rammer 3% oftere og slår 3% hårdere",
       "crit": "Øger chancen for kritiske slag med {pct}%",

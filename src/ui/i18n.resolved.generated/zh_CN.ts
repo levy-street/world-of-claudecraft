@@ -4799,7 +4799,7 @@ export const zh_CN: EnTranslations = {
       "internalCooldown": "计时结束前此效果无法再次触发",
       "carriedFlag": "你正携带敌方旗帜。取消该增益即可丢下旗帜。",
       "carryingFreight": "你正在搬运货物。移动速度降低 {pct}%。",
-      "tankToll": "作为坦克，你对其他玩家造成的伤害和你的自我治疗效果降低 {pct}%",
+      "tankToll": "作为坦克，你对其他玩家造成的伤害和你的自我治疗效果降低 {pct}%，且玩家对你的护盾造成双倍伤害",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
       "crit": "暴击几率提高 {pct}%",

@@ -4799,7 +4799,7 @@ export const es: EnTranslations = {
       "internalCooldown": "Este efecto no puede volver a activarse hasta que termine el temporizador",
       "carriedFlag": "Llevas la bandera enemiga. Cancela este beneficio para soltarla.",
       "carryingFreight": "Llevas carga. Tu velocidad de movimiento se reduce un {pct}%.",
-      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Actitud de Batalla: un 10% más de generación de ira",
       "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "crit": "Aumenta la probabilidad de golpe crítico un {pct}%",

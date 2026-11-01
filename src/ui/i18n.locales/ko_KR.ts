@@ -11238,7 +11238,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.',
   'hudChrome.auraEffect.carryingFreight': '화물을 운반 중입니다. 이동 속도가 {pct}% 감소합니다.',
   'hudChrome.auraEffect.tankToll':
-    '탱커로서 다른 플레이어에게 주는 피해와 자가 치유량이 {pct}% 감소합니다',
+    '탱커로서 다른 플레이어에게 주는 피해와 자가 치유량이 {pct}% 감소하며, 플레이어가 당신의 보호막에 주는 피해가 두 배가 됩니다',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다',
   'hudChrome.auraEffect.heatingUp':

@@ -4799,7 +4799,7 @@ export const de_DE: EnTranslations = {
       "internalCooldown": "Dieser Effekt kann erst erneut auslösen, wenn der Timer abgelaufen ist",
       "carriedFlag": "Ihr tragt die gegnerische Flagge. Hebt diesen Effekt auf, um sie fallen zu lassen.",
       "carryingFreight": "Du trägst Fracht. Verringert dein Bewegungstempo um {pct}%.",
-      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Kampfhaltung: 10% mehr Wuterzeugung",
       "berserkerStance": "Berserkerhaltung: Kritische Treffer gelingen 3% öfter und treffen 3% härter",
       "crit": "Erhöht kritische Trefferchance um {pct}%",
