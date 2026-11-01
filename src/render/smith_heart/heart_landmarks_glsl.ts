@@ -218,12 +218,16 @@ void main() {
 }`;
 
 /** The well's floor (the central circle's Kit_HeartWell glow faces, the
- *  mist tag): drawn as a sunken well under the walk. The eye's ray through
- *  each point is carried down into a cylinder of the well's radius: it
- *  meets either the well's wall (the dark rock falling away, veins of each
- *  quarter's light in it) or its bed (crystal round the heart's light), and
- *  passes layers of drifting mist on the way; the quarters lit colour the
- *  side that opens onto them, the final phase blazes it white-gold. */
+ *  mist tag): drawn as a sunken well under the walk, the raid's floor in the
+ *  final phase. The eye's ray through each point is carried down a funnel of
+ *  rock in broken courses, and the point it meets is found exactly (a coarse
+ *  walk, then halving the step): a fixed walk's jumps were the stepped mosaic
+ *  this drew until the AAA pass. It meets either the wall (dark rock in strokes
+ *  round the funnel, each course's lip catching the heart's light from below,
+ *  veins of each quarter's light in it) or the bed (facets of crystal round the
+ *  heart's light), and passes soft layers of drifting mist on the way; the
+ *  quarters lit colour the side that opens onto them, the final phase lifts the
+ *  whole well toward the heart's white-gold without burning its paint out. */
 export const WELL_VERT = /* glsl */ `
 varying vec3 vP;
 varying vec3 vEye;
@@ -275,6 +279,16 @@ float wfbm(vec2 q) {
   v += 0.08 * wn(q);
   return v;
 }
+// Is the point (the ray at depth z) past the funnel's wall? Each course a
+// steep wall and a shelf rounded onto the next, its plan wandering a little:
+// continuous, so the halving finds a clean edge.
+bool wellOutside(vec2 q, float z, float R, float course) {
+  float c = z / course;
+  float ci = floor(c);
+  float shelf = ci + smoothstep(0.7, 1.0, c - ci);
+  float wander = sin(atan(q.x, q.y) * 5.0 + ci * 2.1) * 0.3 + sin(atan(q.x, q.y) * 11.0 - ci * 1.3) * 0.14;
+  return length(q) > R * (1.0 - 0.055 * shelf) + wander;
+}
 vec3 quarterAt(vec2 q, out float lit) {
   float b = degrees(atan(q.x, q.y));
   float phi = mod(b + ${f(sweepDeg)} - (${f(firstDeg)}), 360.0);
@@ -288,6 +302,7 @@ vec3 quarterAt(vec2 q, out float lit) {
 void main() {
   const float R = ${f(wellR)};
   const float DEPTH = ${f(depth)};
+  const float COURSE = DEPTH / 7.0;
   vec3 V = normalize(vEye);
   vec3 D = -V;
   float dy = max(0.08, -D.y);
@@ -295,21 +310,24 @@ void main() {
   vec2 d = D.xz;
   vec3 heart = vec3(1.0, 0.86, 0.55);
   float beat = 0.82 + 0.18 * sin(uTime * 2.856);
-  // Phase 2N: a funnel of rock falling away in broken courses, the eye's
-  // ray marched down it. From above its narrowing courses read as rings
-  // stepping down into the dark; from the side its wall rises over the bed.
-  float t = 0.0;
-  float depthAt = DEPTH;
+  // A coarse walk down the funnel, then the crossing found by halving.
+  float z0 = 0.0;
+  float z1 = DEPTH;
   float wallHit = 0.0;
-  vec2 hp = p;
-  for (int k = 1; k <= 28; k++) {
-    float z = DEPTH * float(k) / 28.0;
-    vec2 q = p + d * (z / dy);
-    float course = floor(z / (DEPTH / 7.0));
-    float rw = R * (1.0 - 0.055 * course - 0.012 * z) + 0.35 * sin(atan(q.x, q.y) * 7.0 + course * 2.1);
-    if (length(q) > rw) { depthAt = z; hp = q; wallHit = 1.0; break; }
-    hp = q;
+  for (int k = 1; k <= 14; k++) {
+    float z = DEPTH * float(k) / 14.0;
+    if (wellOutside(p + d * (z / dy), z, R, COURSE)) { z1 = z; wallHit = 1.0; break; }
+    z0 = z;
   }
+  if (wallHit > 0.5) {
+    for (int k = 0; k < 6; k++) {
+      float z = 0.5 * (z0 + z1);
+      if (wellOutside(p + d * (z / dy), z, R, COURSE)) z1 = z;
+      else z0 = z;
+    }
+  }
+  float depthAt = z1;
+  vec2 hp = p + d * (z1 / dy);
   float qlit;
   vec3 qc = quarterAt(hp, qlit);
   float deep = clamp(depthAt / DEPTH, 0.0, 1.0);
@@ -317,28 +335,36 @@ void main() {
   // The heart's light from below, pulsing up the well.
   float pulseUp = 0.5 + 0.5 * sin(uTime * 2.856 - depthAt * 0.9);
   if (wallHit > 0.5) {
-    // The wall: dark rock in falling courses, each course's lip catching
-    // the heart's light from below, veins of the quarters' light in it.
+    // The wall: strokes running round the funnel on each course, every course
+    // its own value, its lip paler where the heart's light catches it.
     float bear = atan(hp.x, hp.y);
-    float cf = fract(depthAt / (DEPTH / 7.0));
-    float strata = wfbm(vec2(bear * 6.0, depthAt * 1.3));
-    vec3 rock = mix(vec3(0.02, 0.018, 0.024), vec3(0.075, 0.062, 0.066), strata);
-    float lip = smoothstep(0.75, 1.0, cf);
-    col = rock * (1.0 - 0.5 * deep) * (0.7 + 0.6 * (1.0 - cf));
-    col += heart * lip * (0.06 + 0.2 * deep) * (0.4 + 0.6 * uRing) * (0.6 + 0.4 * pulseUp);
-    float vein = smoothstep(0.6, 0.78, wfbm(vec2(bear * 9.0, depthAt * 0.7 - uTime * 0.12)));
-    col += mix(heart * 0.45, qc * 1.1, qlit) * vein * (0.2 + 0.8 * max(uRing, qlit)) * (0.35 + 0.65 * deep);
+    float arc = bear * R;
+    float cc = depthAt / COURSE;
+    float ci = floor(cc);
+    float cf = cc - ci;
+    float cone = fract(sin(ci * 12.9898 + 4.1) * 43758.5453);
+    float stroke = wfbm(vec2(arc * 0.2 + ci * 7.0, depthAt * 1.5));
+    vec3 rock = mix(vec3(0.05, 0.042, 0.048), vec3(0.135, 0.108, 0.1), stroke * (0.7 + 0.5 * cone));
+    float lip = smoothstep(0.72, 0.95, cf);
+    float under = 1.0 - smoothstep(0.0, 0.32, cf);
+    col = rock * (1.0 - 0.45 * deep) * (0.82 + 0.3 * cone) * (1.0 - 0.45 * under);
+    col += heart * rock * lip * (2.4 + 5.0 * deep) * (0.45 + 0.55 * uRing) * (0.7 + 0.3 * pulseUp);
+    float vein = 1.0 - smoothstep(0.0, 0.03, abs(wfbm(vec2(arc * 0.13, depthAt * 0.4 - uTime * 0.03)) - 0.5));
+    col += mix(heart * 0.5, qc * 1.1, qlit) * vein * (0.1 + 0.9 * max(uRing * 0.6, qlit)) * (0.3 + 0.7 * deep);
   } else {
-    // The bed: dark crystal round the heart's light, the quarters' colours
-    // where they open.
+    // The bed: facets of crystal round the heart's light, the quarters'
+    // colours where they open.
     float rr = length(hp) / (R * 0.55);
-    float cells = wfbm(hp * 0.42);
-    float facet = smoothstep(0.5, 0.72, wfbm(hp * 1.1 + 7.0));
-    vec3 bed = mix(vec3(0.02, 0.018, 0.026), vec3(0.075, 0.06, 0.065), cells);
+    float ang = atan(hp.x, hp.y);
+    float n = ang * 13.0 / 6.2831853 + 0.6 * wfbm(hp * 0.16);
+    float fi = floor(n);
+    float fa = fract(sin(fi * 78.233 + 1.7) * 43758.5453);
+    float side = smoothstep(0.0, 0.5, fract(n)) * (1.0 - smoothstep(0.5, 1.0, fract(n)));
+    vec3 bed = mix(vec3(0.05, 0.04, 0.055), vec3(0.15, 0.115, 0.12), fa);
     float core = exp(-rr * rr * 3.0);
-    col = bed * (0.6 + 0.6 * facet);
-    col += heart * (0.08 + 0.9 * core) * uRing * beat * (0.35 + 1.0 * facet * facet);
-    col += qc * qlit * facet * smoothstep(0.7, 1.0, rr) * 0.3;
+    col = bed * (0.72 + 0.5 * side);
+    col += heart * (0.05 + 0.85 * core) * uRing * beat * (0.45 + 0.55 * fa);
+    col += qc * qlit * side * smoothstep(0.7, 1.0, rr) * 0.3;
   }
   // The heart's glow welling up the shaft (a soft column of light seen
   // through the mist, stronger toward the bed).
@@ -355,12 +381,12 @@ void main() {
     vec2 q = p + d * (z / dy);
     float sw = uTime * (0.02 + 0.012 * float(k)) * (mod(float(k), 2.0) > 0.5 ? -1.0 : 1.0);
     mat2 turn = mat2(cos(sw), -sin(sw), sin(sw), cos(sw));
-    float n = wfbm(turn * q * (0.07 + 0.012 * float(k)) + vec2(float(k) * 3.1, 1.7 + uTime * 0.01));
-    n = smoothstep(0.2, 0.95, n);
+    float n = wfbm(turn * q * (0.055 + 0.01 * float(k)) + vec2(float(k) * 3.1, 1.7 + uTime * 0.01));
+    n = smoothstep(0.3, 0.8, n);
     float am = n * (0.1 + 0.035 * float(k)) * (1.0 - mist);
     float warm = float(k) / 5.0;
     vec3 tint = mix(vec3(0.2, 0.18, 0.24), heart * 0.55, (0.15 + 0.6 * warm) * (0.3 + 0.7 * uRing));
-    mistC += tint * am * (0.7 + 0.5 * uRing + 0.4 * pulseUp * uRing + 1.2 * uBlaze);
+    mistC += tint * am * (0.7 + 0.5 * uRing + 0.4 * pulseUp * uRing + 0.45 * uBlaze);
     mist += am;
   }
   col = col * (1.0 - mist) + mistC;
@@ -368,8 +394,8 @@ void main() {
   float rp = length(p);
   float pr = (1.0 - uPulse) * R;
   col += vec3(1.0, 0.95, 0.85) * uPulse * exp(-(rp - pr) * (rp - pr) / 4.0) * 1.2;
-  col *= 1.0 + uBlaze * (1.6 + 0.8 * sin(uTime * 4.2 - rp * 0.6));
-  col += heart * uBlaze * 0.35 * exp(-rp * rp / 40.0);
+  col *= 1.0 + uBlaze * (0.42 + 0.18 * sin(uTime * 4.2 - rp * 0.6));
+  col += heart * uBlaze * 0.22 * exp(-rp * rp / 60.0);
   // The rim's shadow on the well's lip (its inner face looming over it).
   col *= 0.4 + 0.6 * smoothstep(R, R - 2.2, rp);
   gl_FragColor = vec4(col * (1.0 - 0.88 * uDark), 1.0);
