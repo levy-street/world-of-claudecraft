@@ -10322,7 +10322,8 @@ export const hudChromeStrings = {
     bTitle: 'You are Portal B!',
     bLine: 'It opens at your feet in {seconds} sec. Stand at the lip of a gap.',
     carryTitle: 'You carry the Knotted Gale!',
-    carryLine: 'Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.',
+    carryLine:
+      'Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.',
     lipTitle: 'Throw it now!',
     lipLine: 'You stand at the lip of a gap. It bursts in {seconds} sec.',
     throwKey: 'Press {key} at the lip to throw',

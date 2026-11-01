@@ -25750,37 +25750,60 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.shutDown': '{killer}が{victim}をシャットダウン！',
   'abilityUi.cast.heart_final_leaping_bolt': '跳ねる雷撃',
   'abilityUi.cast.heart_final_anvil': '金床の重み',
-  'hudChrome.auraEffect.finalBoss.stateHeat': '熱を飲む：玄武岩の拳がプレイヤーの立つ場所を打ち砕き、そこから溶岩のうねりが三方へ広がり、炎の旋風が床を横切る。ヒロイックでは燠火の印が遠隔のプレイヤーの足元に炎を落とし、ミシックでは正面攻撃が炉の火を残す。',
-  'hudChrome.auraEffect.finalBoss.stateQuench': '焼き入れを飲む：{reach}ヤード以内に他のプレイヤーが{allies}人未満の者は冷え続け、凍りつく。ヒロイックでは印を受けたプレイヤーの足元の氷が割れ、ミシックでは正面攻撃が移動速度を{slow}%下げる。',
-  'hudChrome.auraEffect.finalBoss.stateBreath': '息吹を飲む：強風がレイドを縁へ押しやり、跳ねる雷撃が互いに{jump}ヤード以内にいるプレイヤーの間を跳ぶ。ヒロイックでは招雷がプレイヤーに印をつけ、ミシックでは嵐の宝珠をそれぞれ1人で取らねばならない。',
-  'hudChrome.auraEffect.finalBoss.stateHammer': '槌を飲む：震えの亀裂がプレイヤーの足元で噴き出し、金床の重みが印の中にいる全員に打撃を分け合わせる。ヒロイックでは石の殻が回復を吸収し、金床を分け合った者は押し潰される。ミシックでは金床の印がボスの周りを回る。',
-  'hudChrome.auraEffect.finalBoss.stateRing': '中央の円環ではどの区画も飲まない。体力{pct}%を超えている間、そこで毎秒「解き放たれし心」が1つ増える。',
-  'hudChrome.auraEffect.finalBoss.overloadHeat': '熱の過負荷、{value}%。ボスが熱の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
-  'hudChrome.auraEffect.finalBoss.overloadQuench': '焼き入れの過負荷、{value}%。ボスが焼き入れの区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
-  'hudChrome.auraEffect.finalBoss.overloadBreath': '息吹の過負荷、{value}%。ボスが息吹の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
-  'hudChrome.auraEffect.finalBoss.overloadHammer': '槌の過負荷、{value}%。ボスが槌の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
-  'hudChrome.auraEffect.finalBoss.root': '区画に入ってから{seconds}秒間根付く：根付きが終わるまで引きずり出せない。',
-  'hudChrome.auraEffect.finalBoss.unbound': 'スタック1つごとに毎秒レイド全体へ{per}のダメージ（現在{total}）。中央の円環に立つ間、毎秒スタックが増える。円環から引きずり出せば終わる。',
-  'hudChrome.auraEffect.finalBoss.shaken': 'この効果の間、区画の切り替えで受けるダメージが{mult}倍になる（{baseMin}～{baseMax}ではなく{min}～{max}）。切り替えのたびに{seconds}秒に更新される。',
-  'hudChrome.auraEffect.finalBoss.cold': '冷気{value}/100。{reach}ヤード以内に他のプレイヤーが{allies}人未満の間は毎秒{rise}上がり、そろえば下がる。100で霜に閉ざされ、{freeze}秒間スタンし、{min}～{max}の冷気ダメージを受ける。',
-  'hudChrome.auraEffect.finalBoss.frozen': 'スタン中。一人で立っていたため凍りついた：焼き入れを飲んでいる間は、{allies}人以上の他のプレイヤーの{reach}ヤード以内にいること。',
+  'hudChrome.auraEffect.finalBoss.stateHeat':
+    '熱を飲む：玄武岩の拳がプレイヤーの立つ場所を打ち砕き、そこから溶岩のうねりが三方へ広がり、炎の旋風が床を横切る。ヒロイックでは燠火の印が遠隔のプレイヤーの足元に炎を落とし、ミシックでは正面攻撃が炉の火を残す。',
+  'hudChrome.auraEffect.finalBoss.stateQuench':
+    '焼き入れを飲む：{reach}ヤード以内に他のプレイヤーが{allies}人未満の者は冷え続け、凍りつく。ヒロイックでは印を受けたプレイヤーの足元の氷が割れ、ミシックでは正面攻撃が移動速度を{slow}%下げる。',
+  'hudChrome.auraEffect.finalBoss.stateBreath':
+    '息吹を飲む：強風がレイドを縁へ押しやり、跳ねる雷撃が互いに{jump}ヤード以内にいるプレイヤーの間を跳ぶ。ヒロイックでは招雷がプレイヤーに印をつけ、ミシックでは嵐の宝珠をそれぞれ1人で取らねばならない。',
+  'hudChrome.auraEffect.finalBoss.stateHammer':
+    '槌を飲む：震えの亀裂がプレイヤーの足元で噴き出し、金床の重みが印の中にいる全員に打撃を分け合わせる。ヒロイックでは石の殻が回復を吸収し、金床を分け合った者は押し潰される。ミシックでは金床の印がボスの周りを回る。',
+  'hudChrome.auraEffect.finalBoss.stateRing':
+    '中央の円環ではどの区画も飲まない。体力{pct}%を超えている間、そこで毎秒「解き放たれし心」が1つ増える。',
+  'hudChrome.auraEffect.finalBoss.overloadHeat':
+    '熱の過負荷、{value}%。ボスが熱の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
+  'hudChrome.auraEffect.finalBoss.overloadQuench':
+    '焼き入れの過負荷、{value}%。ボスが焼き入れの区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
+  'hudChrome.auraEffect.finalBoss.overloadBreath':
+    '息吹の過負荷、{value}%。ボスが息吹の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
+  'hudChrome.auraEffect.finalBoss.overloadHammer':
+    '槌の過負荷、{value}%。ボスが槌の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。',
+  'hudChrome.auraEffect.finalBoss.root':
+    '区画に入ってから{seconds}秒間根付く：根付きが終わるまで引きずり出せない。',
+  'hudChrome.auraEffect.finalBoss.unbound':
+    'スタック1つごとに毎秒レイド全体へ{per}のダメージ（現在{total}）。中央の円環に立つ間、毎秒スタックが増える。円環から引きずり出せば終わる。',
+  'hudChrome.auraEffect.finalBoss.shaken':
+    'この効果の間、区画の切り替えで受けるダメージが{mult}倍になる（{baseMin}～{baseMax}ではなく{min}～{max}）。切り替えのたびに{seconds}秒に更新される。',
+  'hudChrome.auraEffect.finalBoss.cold':
+    '冷気{value}/100。{reach}ヤード以内に他のプレイヤーが{allies}人未満の間は毎秒{rise}上がり、そろえば下がる。100で霜に閉ざされ、{freeze}秒間スタンし、{min}～{max}の冷気ダメージを受ける。',
+  'hudChrome.auraEffect.finalBoss.frozen':
+    'スタン中。一人で立っていたため凍りついた：焼き入れを飲んでいる間は、{allies}人以上の他のプレイヤーの{reach}ヤード以内にいること。',
   'hudChrome.auraEffect.finalBoss.underIce': 'スタン中：割れた氷から落ちた。',
   'hudChrome.auraEffect.finalBoss.numbing': '正面攻撃により、{seconds}秒間移動速度が{pct}%低下。',
-  'hudChrome.auraEffect.finalBoss.ember': '{seconds}秒後、足元に燠火が落ち、半径{radius}ヤードの溜まりとして{life}秒間くすぶり、中にいる者に毎秒{min}～{max}の火炎ダメージを与える。印を受けた他のプレイヤーと同じ隅に集まり、それから離れよ。',
-  'hudChrome.auraEffect.finalBoss.wind': '強風が吹く方向へ毎秒{speed}ヤード押し流される。風に向かって歩けば踏みとどまれる（詠唱は中断されない）。吹いている間、縁から{band}ヤード以内にいると毎秒{min}～{max}の自然ダメージを受ける。',
-  'hudChrome.auraEffect.finalBoss.drawn': '{seconds}秒間、毎秒あなたから{reach}ヤード以内の他の全プレイヤーへ雷が跳び、それぞれに{min}～{max}の自然ダメージを与える。全員から{reach}ヤード離れよ。',
+  'hudChrome.auraEffect.finalBoss.ember':
+    '{seconds}秒後、足元に燠火が落ち、半径{radius}ヤードの溜まりとして{life}秒間くすぶり、中にいる者に毎秒{min}～{max}の火炎ダメージを与える。印を受けた他のプレイヤーと同じ隅に集まり、それから離れよ。',
+  'hudChrome.auraEffect.finalBoss.wind':
+    '強風が吹く方向へ毎秒{speed}ヤード押し流される。風に向かって歩けば踏みとどまれる（詠唱は中断されない）。吹いている間、縁から{band}ヤード以内にいると毎秒{min}～{max}の自然ダメージを受ける。',
+  'hudChrome.auraEffect.finalBoss.drawn':
+    '{seconds}秒間、毎秒あなたから{reach}ヤード以内の他の全プレイヤーへ雷が跳び、それぞれに{min}～{max}の自然ダメージを与える。全員から{reach}ヤード離れよ。',
   'hudChrome.auraEffect.finalBoss.shell': '次に受ける回復{value}を吸収する。',
-  'hudChrome.auraEffect.finalBoss.crushed': '{seconds}秒以内に次の金床の重みの下に立つと、分担ダメージを{mult}倍受ける。もう一方の組に任せよ。',
+  'hudChrome.auraEffect.finalBoss.crushed':
+    '{seconds}秒以内に次の金床の重みの下に立つと、分担ダメージを{mult}倍受ける。もう一方の組に任せよ。',
   'hudChrome.finalBoss.warn.enterHeat': '主なき剛力が熱を飲んだ！拳とうねりと旋風をかわせ！',
-  'hudChrome.finalBoss.warn.enterQuench': '主なき剛力が焼き入れを飲んだ！固まれ、さもなくば凍りつくぞ！',
+  'hudChrome.finalBoss.warn.enterQuench':
+    '主なき剛力が焼き入れを飲んだ！固まれ、さもなくば凍りつくぞ！',
   'hudChrome.finalBoss.warn.enterBreath': '主なき剛力が息吹を飲んだ！散開して風に向かって進め！',
   'hudChrome.finalBoss.warn.enterHammer': '主なき剛力が槌を飲んだ！亀裂から出て、金床を分け合え！',
   'hudChrome.finalBoss.warn.burst': '過負荷！力が金床を突き破る！',
   'hudChrome.finalBoss.warn.burstHeavy': '過負荷！力が金床を突き破って噴き出す！身構えて回復せよ！',
-  'hudChrome.finalBoss.warn.burstLethal': '過負荷！力が金床を突き破って噴き出す！これを生き延びる者はいない！',
-  'hudChrome.finalBoss.warn.nearFull': '過負荷のバーが満タン間近！力を次の区画へ引きずるか、破裂の前にレイドを回復せよ！',
-  'hudChrome.finalBoss.warn.nearFullHeavy': '過負荷のバーが満タン間近！力を次の区画へ引きずれ：破裂は重い、回復して防御スキルを使え！',
-  'hudChrome.finalBoss.warn.nearFullLethal': '過負荷のバーが満タン間近！今すぐ力を次の区画へ引きずれ：破裂はレイドを全滅させる！',
+  'hudChrome.finalBoss.warn.burstLethal':
+    '過負荷！力が金床を突き破って噴き出す！これを生き延びる者はいない！',
+  'hudChrome.finalBoss.warn.nearFull':
+    '過負荷のバーが満タン間近！力を次の区画へ引きずるか、破裂の前にレイドを回復せよ！',
+  'hudChrome.finalBoss.warn.nearFullHeavy':
+    '過負荷のバーが満タン間近！力を次の区画へ引きずれ：破裂は重い、回復して防御スキルを使え！',
+  'hudChrome.finalBoss.warn.nearFullLethal':
+    '過負荷のバーが満タン間近！今すぐ力を次の区画へ引きずれ：破裂はレイドを全滅させる！',
   'hudChrome.finalBoss.warn.unbound': '中央で力が解き放たれた！引きずり出せ！',
   'hudChrome.finalBoss.warn.embers': '燠火が遠隔に降る！印を一つの隅に集めてから離れろ！',
   'hudChrome.finalBoss.warn.ice': '足元の氷がきしむ！割れる前に降りろ！',
@@ -25799,7 +25822,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.barAria': '{quarter}の過負荷 {pct}パーセント',
   'hudChrome.finalOverload.activeAria': '現在の区画：{quarter}',
   'hudChrome.finalOverload.groupAria': '主なき剛力：過負荷バー',
-  'hudChrome.auraEffect.finalBoss.phaseFight': '体力が{first}%と{second}%になると、守られたまま中央へ踏み込み、最も満ちた区画それぞれから欠片を呼び出す。{final}%で四つの区画すべてが目覚め、最後の抵抗が始まる。',
+  'hudChrome.auraEffect.finalBoss.phaseFight':
+    '体力が{first}%と{second}%になると、守られたまま中央へ踏み込み、最も満ちた区画それぞれから欠片を呼び出す。{final}%で四つの区画すべてが目覚め、最後の抵抗が始まる。',
   'abilityUi.cast.heart_final_call': '四区画の呼び声',
   'abilityUi.cast.heart_final_shearing_blow': '断ち割る一撃',
   'abilityUi.cast.heart_final_gale_pounce': '疾風の飛びかかり',
@@ -25808,47 +25832,67 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_final_splinter_quench.name': '焼き入れの欠片',
   'entities.mobs.heart_final_splinter_breath.name': '息吹の欠片',
   'entities.mobs.heart_final_splinter_hammer.name': '槌の欠片',
-  'hudChrome.auraEffect.finalBoss.phaseCall': '四区画の呼び声：欠片が生きている間、中央で{seconds}秒間守られる。欠片1体ごとに{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。全て倒せば障壁は早く砕ける。呼び声の終わりに生き残った欠片は、その元素を戦闘終了までボスに注ぎ込む。',
-  'hudChrome.finalBoss.warn.rebirth': "心臓が脈打つ！主なき剛力は四つの区画を飲み干し、再び立ち上がる！",
-  'hudChrome.finalBoss.warn.unmade': "世界の金床が崩れ落ちていく！最後の石が落ちる前に主なき剛力を倒せ！",
-  'hudChrome.finalBoss.warn.crackHeat': "熱の区画にひびが走る！崩れ落ちる前に離れろ！",
-  'hudChrome.finalBoss.warn.crackQuench': "焼き入れの区画にひびが走る！崩れ落ちる前に離れろ！",
-  'hudChrome.finalBoss.warn.crackBreath': "息吹の区画にひびが走る！崩れ落ちる前に離れろ！",
-  'hudChrome.finalBoss.warn.crackHammer': "槌の区画にひびが走る！崩れ落ちる前に離れろ！",
-  'hudChrome.finalBoss.warn.ringCrack': "残るは中央の環のみ、それもひび割れている！今すぐ倒せ！",
-  'hudChrome.finalOverload.titleUnmade': "崩れゆく金床",
-  'hudChrome.finalOverload.kneeling': "膝をついた",
-  'hudChrome.finalOverload.rising': "心臓が脈打つ",
-  'hudChrome.finalOverload.fallsIn': "{quarter}の崩落まで {seconds}",
-  'hudChrome.finalOverload.ringFallsIn': "環の崩壊まで {seconds}",
-  'hudChrome.finalOverload.allFallen': "何も残っていない",
-  'hudChrome.auraEffect.finalBoss.phaseKneel': "膝をついている。あらゆる攻撃が効かない。",
-  'hudChrome.auraEffect.finalBoss.phaseRebirth': "心臓が脈打っている。体力{percent}%で立ち上がるまで、あらゆる攻撃が効かない。",
-  'hudChrome.auraEffect.finalBoss.unmade': "{every}秒ごとに金床の区画がまるごと崩れ落ちる。オーバーロードのバーが最も満ちていた区画から順に、{warn}秒のひび割れの警告の後に落ちる。その上に立つ者は落ちて死ぬ。最後の区画の{ring}秒後に中央の環が砕け、全員が死ぬ。",
-  'hudChrome.auraEffect.finalBoss.phaseFinal': '四つの区画すべてが目覚めた：中央の円環に留まり、炎の旋風、軋む氷、跳ねる雷撃、金床の重みを{every}秒ごとに1つずつ順に放つ。{enrage}秒後、あらゆる抑えを失う（主なき憤怒）。',
-  'hudChrome.auraEffect.finalBoss.shield': '集めし剛力：あらゆるダメージを受けず、対象にもできない。',
-  'hudChrome.auraEffect.finalBoss.pouredHeat': '熱が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに炎の旋風を起こす（{times}回注がれた）。',
-  'hudChrome.auraEffect.finalBoss.pouredQuench': '焼き入れが注ぎ込まれた：戦闘終了まで、{reach}ヤード以内に他のプレイヤーが{allies}人未満の者はどこでも冷え続ける。速さは焼き入れの区画の{share}%（{times}回注がれた）。',
-  'hudChrome.auraEffect.finalBoss.pouredBreath': '息吹が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに跳ねる雷撃を放ち、互いに{jump}ヤード以内のプレイヤーの間を跳ぶ（{times}回注がれた）。',
-  'hudChrome.auraEffect.finalBoss.pouredHammer': '槌が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとにプレイヤーの足元で震えの亀裂が噴き出す（{times}回注がれた）。',
-  'hudChrome.auraEffect.finalBoss.fury': '主なき憤怒：{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。今すぐ倒せ。',
-  'hudChrome.auraEffect.finalBoss.coal': '{seconds}秒後に炭が弾ける：あなたから{reach}ヤード以内の他の全プレイヤーに{min}～{max}の火炎ダメージ、あなた自身に{selfMin}～{selfMax}。今すぐ集団から離れろ。',
-  'hudChrome.auraEffect.finalBoss.tether': '息吹の欠片が{seconds}秒間あなたを追う。その打ちつける疾風は、欠片から{reach}ヤード以内の他の全員に毎秒{min}～{max}の自然ダメージを与える：欠片を集団から引き離せ。',
-  'hudChrome.auraEffect.finalBoss.chill': '移動速度が{pct}%低下（{seconds}秒）：焼き入れの環を隙間以外の場所で越えた。',
-  'hudChrome.auraEffect.finalBoss.weight': '毎秒{total}の物理ダメージ（1スタックにつき{per}）。スタックごとに槌の欠片の攻撃が{step}%重くなる（現在{harder}%）。{seconds}秒間持続。タンクは{swap}スタックで交代する。',
+  'hudChrome.auraEffect.finalBoss.phaseCall':
+    '四区画の呼び声：欠片が生きている間、中央で{seconds}秒間守られる。欠片1体ごとに{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。全て倒せば障壁は早く砕ける。呼び声の終わりに生き残った欠片は、その元素を戦闘終了までボスに注ぎ込む。',
+  'hudChrome.finalBoss.warn.rebirth':
+    '心臓が脈打つ！主なき剛力は四つの区画を飲み干し、再び立ち上がる！',
+  'hudChrome.finalBoss.warn.unmade':
+    '世界の金床が崩れ落ちていく！最後の石が落ちる前に主なき剛力を倒せ！',
+  'hudChrome.finalBoss.warn.crackHeat': '熱の区画にひびが走る！崩れ落ちる前に離れろ！',
+  'hudChrome.finalBoss.warn.crackQuench': '焼き入れの区画にひびが走る！崩れ落ちる前に離れろ！',
+  'hudChrome.finalBoss.warn.crackBreath': '息吹の区画にひびが走る！崩れ落ちる前に離れろ！',
+  'hudChrome.finalBoss.warn.crackHammer': '槌の区画にひびが走る！崩れ落ちる前に離れろ！',
+  'hudChrome.finalBoss.warn.ringCrack': '残るは中央の環のみ、それもひび割れている！今すぐ倒せ！',
+  'hudChrome.finalOverload.titleUnmade': '崩れゆく金床',
+  'hudChrome.finalOverload.kneeling': '膝をついた',
+  'hudChrome.finalOverload.rising': '心臓が脈打つ',
+  'hudChrome.finalOverload.fallsIn': '{quarter}の崩落まで {seconds}',
+  'hudChrome.finalOverload.ringFallsIn': '環の崩壊まで {seconds}',
+  'hudChrome.finalOverload.allFallen': '何も残っていない',
+  'hudChrome.auraEffect.finalBoss.phaseKneel': '膝をついている。あらゆる攻撃が効かない。',
+  'hudChrome.auraEffect.finalBoss.phaseRebirth':
+    '心臓が脈打っている。体力{percent}%で立ち上がるまで、あらゆる攻撃が効かない。',
+  'hudChrome.auraEffect.finalBoss.unmade':
+    '{every}秒ごとに金床の区画がまるごと崩れ落ちる。オーバーロードのバーが最も満ちていた区画から順に、{warn}秒のひび割れの警告の後に落ちる。その上に立つ者は落ちて死ぬ。最後の区画の{ring}秒後に中央の環が砕け、全員が死ぬ。',
+  'hudChrome.auraEffect.finalBoss.phaseFinal':
+    '四つの区画すべてが目覚めた：中央の円環に留まり、炎の旋風、軋む氷、跳ねる雷撃、金床の重みを{every}秒ごとに1つずつ順に放つ。{enrage}秒後、あらゆる抑えを失う（主なき憤怒）。',
+  'hudChrome.auraEffect.finalBoss.shield':
+    '集めし剛力：あらゆるダメージを受けず、対象にもできない。',
+  'hudChrome.auraEffect.finalBoss.pouredHeat':
+    '熱が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに炎の旋風を起こす（{times}回注がれた）。',
+  'hudChrome.auraEffect.finalBoss.pouredQuench':
+    '焼き入れが注ぎ込まれた：戦闘終了まで、{reach}ヤード以内に他のプレイヤーが{allies}人未満の者はどこでも冷え続ける。速さは焼き入れの区画の{share}%（{times}回注がれた）。',
+  'hudChrome.auraEffect.finalBoss.pouredBreath':
+    '息吹が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに跳ねる雷撃を放ち、互いに{jump}ヤード以内のプレイヤーの間を跳ぶ（{times}回注がれた）。',
+  'hudChrome.auraEffect.finalBoss.pouredHammer':
+    '槌が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとにプレイヤーの足元で震えの亀裂が噴き出す（{times}回注がれた）。',
+  'hudChrome.auraEffect.finalBoss.fury':
+    '主なき憤怒：{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。今すぐ倒せ。',
+  'hudChrome.auraEffect.finalBoss.coal':
+    '{seconds}秒後に炭が弾ける：あなたから{reach}ヤード以内の他の全プレイヤーに{min}～{max}の火炎ダメージ、あなた自身に{selfMin}～{selfMax}。今すぐ集団から離れろ。',
+  'hudChrome.auraEffect.finalBoss.tether':
+    '息吹の欠片が{seconds}秒間あなたを追う。その打ちつける疾風は、欠片から{reach}ヤード以内の他の全員に毎秒{min}～{max}の自然ダメージを与える：欠片を集団から引き離せ。',
+  'hudChrome.auraEffect.finalBoss.chill':
+    '移動速度が{pct}%低下（{seconds}秒）：焼き入れの環を隙間以外の場所で越えた。',
+  'hudChrome.auraEffect.finalBoss.weight':
+    '毎秒{total}の物理ダメージ（1スタックにつき{per}）。スタックごとに槌の欠片の攻撃が{step}%重くなる（現在{harder}%）。{seconds}秒間持続。タンクは{swap}スタックで交代する。',
   'hudChrome.finalAlert.coalTitle': '弾ける炭！',
-  'hudChrome.finalAlert.coalLine': '集団から離れろ：{seconds}秒後に{reach}ヤード以内の全員を巻き込んで弾ける',
+  'hudChrome.finalAlert.coalLine':
+    '集団から離れろ：{seconds}秒後に{reach}ヤード以内の全員を巻き込んで弾ける',
   'hudChrome.finalAlert.tetherTitle': '風に繋がれた！',
   'hudChrome.finalAlert.tetherLine': '息吹の欠片があなたを追う：集団から引き離せ（{seconds}秒）',
   'hudChrome.finalAlert.weightTitle': '募る重み x{stacks}',
   'hudChrome.finalAlert.weightLine': 'スタックごとに攻撃が重くなる：{swap}でタンク交代',
-  'hudChrome.finalBoss.warn.awaken': '四つの区画すべてが目覚めた！主なき剛力があらゆる力を一度に飲む！',
+  'hudChrome.finalBoss.warn.awaken':
+    '四つの区画すべてが目覚めた！主なき剛力があらゆる力を一度に飲む！',
   'hudChrome.finalBoss.warn.coal': '弾ける炭！印を受けた者は弾ける前に集団の外へ運べ！',
   'hudChrome.finalBoss.warn.final': '主なき剛力が金床の中心へと踏み込む！',
   'hudChrome.finalBoss.warn.fury': '主なき憤怒！金床を引き裂いている：今すぐ倒せ！',
   'hudChrome.finalBoss.warn.furySoon': '主なき剛力があらゆる抑えを失おうとしている！削り切れ！',
-  'hudChrome.finalBoss.warn.intermission': '主なき剛力が中央で力を集める！欠片が現れる：呼び声が終わる前に倒せ！',
-  'hudChrome.finalBoss.warn.pounce': '疾風の飛びかかり！狙われた者は息吹の欠片を集団の外へ引き離せ！',
+  'hudChrome.finalBoss.warn.intermission':
+    '主なき剛力が中央で力を集める！欠片が現れる：呼び声が終わる前に倒せ！',
+  'hudChrome.finalBoss.warn.pounce':
+    '疾風の飛びかかり！狙われた者は息吹の欠片を集団の外へ引き離せ！',
   'hudChrome.finalBoss.warn.poured': '欠片が主なき剛力に注ぎ込まれる！その元素は最後まで残る！',
   'hudChrome.finalBoss.warn.release': '障壁が砕けた！主なき剛力を中央から引きずり出せ！',
   'hudChrome.finalBoss.warn.toll': '霧氷の鐘！焼き入れの欠片を妨害しろ！',

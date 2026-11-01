@@ -24405,27 +24405,45 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.shutDown': '{killer}终结了{victim}！',
   'abilityUi.cast.heart_final_leaping_bolt': '跳跃雷击',
   'abilityUi.cast.heart_final_anvil': '铁砧之重',
-  'hudChrome.auraEffect.finalBoss.stateHeat': '饮下炽热：玄武岩之拳砸向一名玩家所在的位置，三道熔岩涌浪从那里滚滚而出，火焰旋风在地面上穿行。英雄难度下，余烬印记会在远程玩家脚下落下火焰；史诗难度下，它的正面攻击会留下熔炉之火。',
-  'hudChrome.auraEffect.finalBoss.stateQuench': '饮下淬火：{reach}码内其他玩家少于{allies}名的人会越来越冷并被冻结。英雄难度下，被标记玩家脚下的冰面会碎裂；史诗难度下，它的正面攻击会减速{slow}%。',
-  'hudChrome.auraEffect.finalBoss.stateBreath': '饮下吐息：狂风把团队推向边缘，跳跃雷击会在彼此相距{jump}码以内的玩家之间跳跃。英雄难度下，引雷会标记玩家；史诗难度下，每个风暴宝珠都必须由一名玩家拾取。',
-  'hudChrome.auraEffect.finalBoss.stateHammer': '饮下重锤：震颤裂痕在玩家脚下爆发，铁砧之重把伤害分摊给标记内的所有人。英雄难度下，石壳会吸收治疗，铁砧的分摊者会被粉碎；史诗难度下，铁砧的标记会绕着它旋转。',
-  'hudChrome.auraEffect.finalBoss.stateRing': '身处中央圆环时，它不饮下任何一角的力量。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。',
-  'hudChrome.auraEffect.finalBoss.overloadHeat': '炽热过载，已满{value}%。首领站在炽热区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
-  'hudChrome.auraEffect.finalBoss.overloadQuench': '淬火过载，已满{value}%。首领站在淬火区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
-  'hudChrome.auraEffect.finalBoss.overloadBreath': '吐息过载，已满{value}%。首领站在吐息区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
-  'hudChrome.auraEffect.finalBoss.overloadHammer': '重锤过载，已满{value}%。首领站在重锤区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
-  'hudChrome.auraEffect.finalBoss.root': '进入一个区域后扎根{seconds}秒：扎根结束前无法把它拖出去。',
-  'hudChrome.auraEffect.finalBoss.unbound': '每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。',
-  'hudChrome.auraEffect.finalBoss.shaken': '持续期间，切换区域对你造成的伤害提高至{mult}倍（{min}至{max}点，而非{baseMin}至{baseMax}点）。每次切换都会将其刷新为{seconds}秒。',
-  'hudChrome.auraEffect.finalBoss.cold': '寒冷值{value}/100。{reach}码内其他玩家少于{allies}名时每秒上升{rise}点，达到人数后下降。达到100时你会被霜封住：昏迷{freeze}秒并受到{min}至{max}点冰霜伤害。',
-  'hudChrome.auraEffect.finalBoss.frozen': '昏迷。你因独自站立而被冻结：在它饮下淬火时，保持在{allies}名或更多其他玩家的{reach}码内。',
+  'hudChrome.auraEffect.finalBoss.stateHeat':
+    '饮下炽热：玄武岩之拳砸向一名玩家所在的位置，三道熔岩涌浪从那里滚滚而出，火焰旋风在地面上穿行。英雄难度下，余烬印记会在远程玩家脚下落下火焰；史诗难度下，它的正面攻击会留下熔炉之火。',
+  'hudChrome.auraEffect.finalBoss.stateQuench':
+    '饮下淬火：{reach}码内其他玩家少于{allies}名的人会越来越冷并被冻结。英雄难度下，被标记玩家脚下的冰面会碎裂；史诗难度下，它的正面攻击会减速{slow}%。',
+  'hudChrome.auraEffect.finalBoss.stateBreath':
+    '饮下吐息：狂风把团队推向边缘，跳跃雷击会在彼此相距{jump}码以内的玩家之间跳跃。英雄难度下，引雷会标记玩家；史诗难度下，每个风暴宝珠都必须由一名玩家拾取。',
+  'hudChrome.auraEffect.finalBoss.stateHammer':
+    '饮下重锤：震颤裂痕在玩家脚下爆发，铁砧之重把伤害分摊给标记内的所有人。英雄难度下，石壳会吸收治疗，铁砧的分摊者会被粉碎；史诗难度下，铁砧的标记会绕着它旋转。',
+  'hudChrome.auraEffect.finalBoss.stateRing':
+    '身处中央圆环时，它不饮下任何一角的力量。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。',
+  'hudChrome.auraEffect.finalBoss.overloadHeat':
+    '炽热过载，已满{value}%。首领站在炽热区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
+  'hudChrome.auraEffect.finalBoss.overloadQuench':
+    '淬火过载，已满{value}%。首领站在淬火区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
+  'hudChrome.auraEffect.finalBoss.overloadBreath':
+    '吐息过载，已满{value}%。首领站在吐息区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
+  'hudChrome.auraEffect.finalBoss.overloadHammer':
+    '重锤过载，已满{value}%。首领站在重锤区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。',
+  'hudChrome.auraEffect.finalBoss.root':
+    '进入一个区域后扎根{seconds}秒：扎根结束前无法把它拖出去。',
+  'hudChrome.auraEffect.finalBoss.unbound':
+    '每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。',
+  'hudChrome.auraEffect.finalBoss.shaken':
+    '持续期间，切换区域对你造成的伤害提高至{mult}倍（{min}至{max}点，而非{baseMin}至{baseMax}点）。每次切换都会将其刷新为{seconds}秒。',
+  'hudChrome.auraEffect.finalBoss.cold':
+    '寒冷值{value}/100。{reach}码内其他玩家少于{allies}名时每秒上升{rise}点，达到人数后下降。达到100时你会被霜封住：昏迷{freeze}秒并受到{min}至{max}点冰霜伤害。',
+  'hudChrome.auraEffect.finalBoss.frozen':
+    '昏迷。你因独自站立而被冻结：在它饮下淬火时，保持在{allies}名或更多其他玩家的{reach}码内。',
   'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你从碎裂的冰面掉了下去。',
   'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻击减速{pct}%，持续{seconds}秒。',
-  'hudChrome.auraEffect.finalBoss.ember': '{seconds}秒后余烬会落在你的脚下，在{radius}码的范围内阴燃{life}秒，每秒对其中的任何人造成{min}至{max}点火焰伤害。与其他被标记的玩家站到同一个角落，然后离开。',
-  'hudChrome.auraEffect.finalBoss.wind': '狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。',
-  'hudChrome.auraEffect.finalBoss.drawn': '在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。',
+  'hudChrome.auraEffect.finalBoss.ember':
+    '{seconds}秒后余烬会落在你的脚下，在{radius}码的范围内阴燃{life}秒，每秒对其中的任何人造成{min}至{max}点火焰伤害。与其他被标记的玩家站到同一个角落，然后离开。',
+  'hudChrome.auraEffect.finalBoss.wind':
+    '狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。',
+  'hudChrome.auraEffect.finalBoss.drawn':
+    '在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。',
   'hudChrome.auraEffect.finalBoss.shell': '吸收你受到的下{value}点治疗。',
-  'hudChrome.auraEffect.finalBoss.crushed': '{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。',
+  'hudChrome.auraEffect.finalBoss.crushed':
+    '{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。',
   'hudChrome.finalBoss.warn.enterHeat': '无主之力饮下了炽热！躲开拳头、涌浪和旋风！',
   'hudChrome.finalBoss.warn.enterQuench': '无主之力饮下了淬火！靠在一起，否则会冻结！',
   'hudChrome.finalBoss.warn.enterBreath': '无主之力饮下了吐息！散开并顶着风走！',
@@ -24433,9 +24451,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.warn.burst': '过载！力量冲破了铁砧！',
   'hudChrome.finalBoss.warn.burstHeavy': '过载！力量冲破了铁砧！稳住并治疗！',
   'hudChrome.finalBoss.warn.burstLethal': '过载！力量冲破了铁砧！无人能够幸存！',
-  'hudChrome.finalBoss.warn.nearFull': '一条过载条即将充满！把力量拖往下一区域，或在爆发前把团队抬满血！',
-  'hudChrome.finalBoss.warn.nearFullHeavy': '一条过载条即将充满！把力量拖往下一区域：爆发伤害很重，抬满血并使用减伤技能！',
-  'hudChrome.finalBoss.warn.nearFullLethal': '一条过载条即将充满！立刻把力量拖往下一区域：爆发会杀死整个团队！',
+  'hudChrome.finalBoss.warn.nearFull':
+    '一条过载条即将充满！把力量拖往下一区域，或在爆发前把团队抬满血！',
+  'hudChrome.finalBoss.warn.nearFullHeavy':
+    '一条过载条即将充满！把力量拖往下一区域：爆发伤害很重，抬满血并使用减伤技能！',
+  'hudChrome.finalBoss.warn.nearFullLethal':
+    '一条过载条即将充满！立刻把力量拖往下一区域：爆发会杀死整个团队！',
   'hudChrome.finalBoss.warn.unbound': '力量在中央脱缚了！把它拖出去！',
   'hudChrome.finalBoss.warn.embers': '余烬落向远程！把印记集中到一个角落，然后离开！',
   'hudChrome.finalBoss.warn.ice': '冰面在你脚下呻吟！在它碎裂之前离开！',
@@ -24454,7 +24475,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.barAria': '{quarter}过载 百分之{pct}',
   'hudChrome.finalOverload.activeAria': '当前区域：{quarter}',
   'hudChrome.finalOverload.groupAria': '无主之力：过载条',
-  'hudChrome.auraEffect.finalBoss.phaseFight': '生命值降到{first}%和{second}%时，它会在护盾保护下走入中央，从最满的几个角各召出一个碎片。降到{final}%时四个角全部苏醒，开始最后的抵抗。',
+  'hudChrome.auraEffect.finalBoss.phaseFight':
+    '生命值降到{first}%和{second}%时，它会在护盾保护下走入中央，从最满的几个角各召出一个碎片。降到{final}%时四个角全部苏醒，开始最后的抵抗。',
   'abilityUi.cast.heart_final_call': '四角召唤',
   'abilityUi.cast.heart_final_shearing_blow': '劈裂重击',
   'abilityUi.cast.heart_final_gale_pounce': '疾风扑击',
@@ -24463,34 +24485,47 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_final_splinter_quench.name': '淬火碎片',
   'entities.mobs.heart_final_splinter_breath.name': '吐息碎片',
   'entities.mobs.heart_final_splinter_hammer.name': '重锤碎片',
-  'hudChrome.auraEffect.finalBoss.phaseCall': '四角召唤：只要碎片还活着，它就在中央受到护盾保护{seconds}秒。每个碎片每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。将它们全部击杀可提前打破护盾；召唤结束时仍存活的碎片会把自己的元素注入它体内，直到战斗结束。',
-  'hudChrome.finalBoss.warn.rebirth': "心脏搏动！无主之力饮尽四方区域，再度站起！",
-  'hudChrome.finalBoss.warn.unmade': "世界铁砧正在崩塌！在最后一块石头坠落前击杀无主之力！",
-  'hudChrome.finalBoss.warn.crackHeat': "炽热区域正在开裂！在它坠落前离开！",
-  'hudChrome.finalBoss.warn.crackQuench': "淬火区域正在开裂！在它坠落前离开！",
-  'hudChrome.finalBoss.warn.crackBreath': "吐息区域正在开裂！在它坠落前离开！",
-  'hudChrome.finalBoss.warn.crackHammer': "重锤区域正在开裂！在它坠落前离开！",
-  'hudChrome.finalBoss.warn.ringCrack': "只剩中央圆环，而它也在开裂！立刻击杀它！",
-  'hudChrome.finalOverload.titleUnmade': "崩解的铁砧",
-  'hudChrome.finalOverload.kneeling': "它跪下了",
-  'hudChrome.finalOverload.rising': "心脏搏动",
-  'hudChrome.finalOverload.fallsIn': "{quarter}将在 {seconds} 后坠落",
-  'hudChrome.finalOverload.ringFallsIn': "圆环将在 {seconds} 后破碎",
-  'hudChrome.finalOverload.allFallen': "什么也不剩了",
-  'hudChrome.auraEffect.finalBoss.phaseKneel': "它跪下了。任何攻击都无法伤害它。",
-  'hudChrome.auraEffect.finalBoss.phaseRebirth': "心脏正在搏动。在它以{percent}%生命值站起之前，任何攻击都无法伤害它。",
-  'hudChrome.auraEffect.finalBoss.unmade': "每{every}秒铁砧的一整块区域坠落，过载条最满的区域最先，坠落前有{warn}秒裂纹警告。站在其上的人会一同坠落并死亡。最后一块区域坠落{ring}秒后，中央圆环破碎，所有人死亡。",
-  'hudChrome.auraEffect.finalBoss.phaseFinal': '四个角已全部苏醒：它停留在中央圆环，每{every}秒依次施放一种技能：火焰旋风、呻吟之冰、跳跃闪电、铁砧之重。{enrage}秒后它将失去一切克制（无主之怒）。',
+  'hudChrome.auraEffect.finalBoss.phaseCall':
+    '四角召唤：只要碎片还活着，它就在中央受到护盾保护{seconds}秒。每个碎片每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。将它们全部击杀可提前打破护盾；召唤结束时仍存活的碎片会把自己的元素注入它体内，直到战斗结束。',
+  'hudChrome.finalBoss.warn.rebirth': '心脏搏动！无主之力饮尽四方区域，再度站起！',
+  'hudChrome.finalBoss.warn.unmade': '世界铁砧正在崩塌！在最后一块石头坠落前击杀无主之力！',
+  'hudChrome.finalBoss.warn.crackHeat': '炽热区域正在开裂！在它坠落前离开！',
+  'hudChrome.finalBoss.warn.crackQuench': '淬火区域正在开裂！在它坠落前离开！',
+  'hudChrome.finalBoss.warn.crackBreath': '吐息区域正在开裂！在它坠落前离开！',
+  'hudChrome.finalBoss.warn.crackHammer': '重锤区域正在开裂！在它坠落前离开！',
+  'hudChrome.finalBoss.warn.ringCrack': '只剩中央圆环，而它也在开裂！立刻击杀它！',
+  'hudChrome.finalOverload.titleUnmade': '崩解的铁砧',
+  'hudChrome.finalOverload.kneeling': '它跪下了',
+  'hudChrome.finalOverload.rising': '心脏搏动',
+  'hudChrome.finalOverload.fallsIn': '{quarter}将在 {seconds} 后坠落',
+  'hudChrome.finalOverload.ringFallsIn': '圆环将在 {seconds} 后破碎',
+  'hudChrome.finalOverload.allFallen': '什么也不剩了',
+  'hudChrome.auraEffect.finalBoss.phaseKneel': '它跪下了。任何攻击都无法伤害它。',
+  'hudChrome.auraEffect.finalBoss.phaseRebirth':
+    '心脏正在搏动。在它以{percent}%生命值站起之前，任何攻击都无法伤害它。',
+  'hudChrome.auraEffect.finalBoss.unmade':
+    '每{every}秒铁砧的一整块区域坠落，过载条最满的区域最先，坠落前有{warn}秒裂纹警告。站在其上的人会一同坠落并死亡。最后一块区域坠落{ring}秒后，中央圆环破碎，所有人死亡。',
+  'hudChrome.auraEffect.finalBoss.phaseFinal':
+    '四个角已全部苏醒：它停留在中央圆环，每{every}秒依次施放一种技能：火焰旋风、呻吟之冰、跳跃闪电、铁砧之重。{enrage}秒后它将失去一切克制（无主之怒）。',
   'hudChrome.auraEffect.finalBoss.shield': '聚集之力：免疫所有伤害，且无法被选为目标。',
-  'hudChrome.auraEffect.finalBoss.pouredHeat': '炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会掀起火焰旋风（已注入{times}次）。',
-  'hudChrome.auraEffect.finalBoss.pouredQuench': '淬火注入其中：直到战斗结束，{reach}码内其他玩家少于{allies}名的人在任何地方都会变冷，速度为淬火之角的{share}%（已注入{times}次）。',
-  'hudChrome.auraEffect.finalBoss.pouredBreath': '吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会施放跳跃闪电，在彼此相距{jump}码内的玩家之间跳跃（已注入{times}次）。',
-  'hudChrome.auraEffect.finalBoss.pouredHammer': '重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会在玩家脚下迸发震颤裂隙（已注入{times}次）。',
-  'hudChrome.auraEffect.finalBoss.fury': '无主之怒：每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。立刻击杀它。',
-  'hudChrome.auraEffect.finalBoss.coal': '{seconds}秒后煤块爆裂：对你{reach}码内的所有其他玩家造成{min}到{max}点火焰伤害，对你自己造成{selfMin}到{selfMax}点。现在就离开人群。',
-  'hudChrome.auraEffect.finalBoss.tether': '吐息碎片追猎你{seconds}秒。它的狂袭之风每秒对它{reach}码内的其他所有人造成{min}到{max}点自然伤害：把它从人群中拖走。',
-  'hudChrome.auraEffect.finalBoss.chill': '移动速度降低{pct}%，持续{seconds}秒：你从缺口以外的地方穿过了淬火之环。',
-  'hudChrome.auraEffect.finalBoss.weight': '每秒造成{total}点物理伤害（每层{per}点）。每一层都让重锤碎片对你的攻击加重{step}%（当前{harder}%）。持续{seconds}秒；坦克在{swap}层时换坦。',
+  'hudChrome.auraEffect.finalBoss.pouredHeat':
+    '炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会掀起火焰旋风（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.pouredQuench':
+    '淬火注入其中：直到战斗结束，{reach}码内其他玩家少于{allies}名的人在任何地方都会变冷，速度为淬火之角的{share}%（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.pouredBreath':
+    '吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会施放跳跃闪电，在彼此相距{jump}码内的玩家之间跳跃（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.pouredHammer':
+    '重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会在玩家脚下迸发震颤裂隙（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.fury':
+    '无主之怒：每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。立刻击杀它。',
+  'hudChrome.auraEffect.finalBoss.coal':
+    '{seconds}秒后煤块爆裂：对你{reach}码内的所有其他玩家造成{min}到{max}点火焰伤害，对你自己造成{selfMin}到{selfMax}点。现在就离开人群。',
+  'hudChrome.auraEffect.finalBoss.tether':
+    '吐息碎片追猎你{seconds}秒。它的狂袭之风每秒对它{reach}码内的其他所有人造成{min}到{max}点自然伤害：把它从人群中拖走。',
+  'hudChrome.auraEffect.finalBoss.chill':
+    '移动速度降低{pct}%，持续{seconds}秒：你从缺口以外的地方穿过了淬火之环。',
+  'hudChrome.auraEffect.finalBoss.weight':
+    '每秒造成{total}点物理伤害（每层{per}点）。每一层都让重锤碎片对你的攻击加重{step}%（当前{harder}%）。持续{seconds}秒；坦克在{swap}层时换坦。',
   'hudChrome.finalAlert.coalTitle': '爆裂煤块！',
   'hudChrome.finalAlert.coalLine': '离开人群：{seconds}秒后会在{reach}码内的所有人身上爆裂',
   'hudChrome.finalAlert.tetherTitle': '风之束缚！',
@@ -24502,7 +24537,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.warn.final': '无主之力大步踏入铁砧的中心！',
   'hudChrome.finalBoss.warn.fury': '无主之怒！它在撕裂铁砧：立刻击杀它！',
   'hudChrome.finalBoss.warn.furySoon': '无主之力即将失去一切克制！全力输出！',
-  'hudChrome.finalBoss.warn.intermission': '无主之力在中央聚集力量！它的碎片升起了：在召唤结束前击杀它们！',
+  'hudChrome.finalBoss.warn.intermission':
+    '无主之力在中央聚集力量！它的碎片升起了：在召唤结束前击杀它们！',
   'hudChrome.finalBoss.warn.pounce': '疾风扑击！被盯上的人要把吐息碎片拖离人群！',
   'hudChrome.finalBoss.warn.poured': '碎片注入了无主之力！它们的元素会一直留到最后！',
   'hudChrome.finalBoss.warn.release': '护盾破了！把无主之力拖出中央！',

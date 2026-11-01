@@ -73,6 +73,7 @@ import {
   stepSwells,
   stepWhirls,
 } from './final_heat';
+import { showHidden, stepHidden, watchHidden } from './final_hidden';
 import {
   FINAL_AURAS,
   FINAL_BOSS,
@@ -96,7 +97,6 @@ import {
   stepStride,
   watchThresholds,
 } from './final_intermission';
-import { showHidden, stepHidden, watchHidden } from './final_hidden';
 import { beginFinalPhase, pouredColdRate, stepFinal, stepPoured } from './final_last';
 import { finalPhaseDev, finalPhaseReadout } from './final_phase_dev';
 import { clearQuench, crackIce, encase, numbingFrost, stepCold, stepCracks } from './final_quench';
