@@ -31,7 +31,15 @@ fs.mkdirSync(OUT, { recursive: true });
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: false,
-  args: [`--window-size=${W},${H + 100}`, '--use-angle=d3d11', '--ignore-gpu-blocklist'],
+  args: [
+    `--window-size=${W},${H + 100}`,
+    '--window-position=-2400,0',
+    '--disable-renderer-backgrounding',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-background-timer-throttling',
+    '--use-angle=d3d11',
+    '--ignore-gpu-blocklist',
+  ],
   defaultViewport: { width: W, height: H },
   protocolTimeout: 240000,
 });
@@ -127,6 +135,21 @@ try {
       const buf = await page.screenshot();
       fs.writeFileSync(path.join(OUT, `${a[0]}.png`), buf);
       console.log('shot', a[0]);
+    } else if (kind === 'pose') {
+      console.log(
+        'pose',
+        a[0] ?? '',
+        await page.evaluate(() => {
+          const p = window.__game.world.player;
+          return JSON.stringify({
+            y: +p.pos.y.toFixed(1),
+            carried: p.carriedBy,
+            dead: p.dead,
+            stunned: p.auras.some((x) => x.kind === 'stun'),
+            cam: +window.__game.renderer.camera.position.y.toFixed(1),
+          });
+        }),
+      );
     } else if (kind === 'wait') {
       await sleep(a[0]);
     } else if (kind === 'hide') {

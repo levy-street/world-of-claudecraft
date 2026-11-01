@@ -166,6 +166,19 @@ export interface FinalHiddenState {
   warned: boolean;
   /** The ring has broken: nothing stands. */
   broken: boolean;
+  /** The collapse's clock when each quarter fell (its floor goes from then on). */
+  fellAt: Partial<Record<SmithHeartVein, number>>;
+  /** The bodies on their way down (final_plunge.ts). */
+  plunges: FinalPlunge[];
+}
+
+/** A body falling with the floor: its seconds so far, where it fell from, its way. */
+export interface FinalPlunge {
+  playerId: number;
+  clock: number;
+  fromY: number;
+  vx: number;
+  vz: number;
 }
 
 /** Part 2's state: the intermissions, the poured elements, the final phase. */

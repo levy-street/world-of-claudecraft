@@ -325,16 +325,16 @@ export function heartFallRanges(
  *  drops, slow to start and turning slowly, as something very heavy does. */
 export const HEART_FALL_LOOK = {
   /** How long a cell gives before it goes, how far it sinks and tips meanwhile. */
-  give: 0.42,
+  give: P.cellGive,
   giveDrop: 0.55,
   giveTurn: 0.05,
-  gravity: 21,
+  gravity: P.plungeGravity,
   /** Gone past this: under the heart's bed's surface by then. */
   depth: 92,
   /** A cell's first start (the wall's), the last (the ring's), the scatter. */
-  first: 0.05,
-  spread: 1.05,
-  scatter: 0.3,
+  first: P.cellFirst,
+  spread: P.cellSpread,
+  scatter: P.cellScatter,
   turnBase: 0.1,
   turnRange: 0.28,
   /** The keel's masses go from under the floor first. */
@@ -410,7 +410,7 @@ export function heartFallDone(): number {
 }
 
 /** The floor's warning stays lit over a cell until it has gone: 1 at the break, 0 once
- *  the last of the floor has left (the sim kills from the first instant). */
+ *  the last of the floor has left (a body goes as its own stretch does: hiddenCellGoes). */
 export function heartFallEdgeLight(t: number): number {
   const L = HEART_FALL_LOOK;
   if (t < 0) return 0;

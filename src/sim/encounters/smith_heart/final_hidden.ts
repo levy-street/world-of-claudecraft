@@ -11,26 +11,25 @@
 //   The collapse    every 30 s a whole quarter breaks (5 s of warning cracks, its
 //                   floor still safe), fullest Overload bar first, the bars as the
 //                   final phase switched them off; ties as the Splinters'. A body
-//                   on a fallen quarter dies at once, whatever shields it, as in
-//                   the Cornice's void (breath_void.ts) and its corpse lies at the
-//                   ring's edge, so no resurrection lands over the void. The mix
-//                   and the poured elements run on; Masterless Fury does not: the
-//                   collapse is the enrage.
+//                   whose stretch of floor has gone falls, and dies at the bottom
+//                   whatever shields it (final_plunge.ts). The mix and the poured
+//                   elements run on; Masterless Fury does not: the collapse is
+//                   the enrage.
 //   The end         after the last quarter (120 s) the ring cracks, then breaks: a
 //                   wipe (council_prison.ts `crush`). A real kill ends the fight
 //                   as any kill does; a kill, a wipe or a reset leaves no floor
 //                   gone (the fallen mask lives on this fight's state and its aura).
 //
 // A fallen quarter is a kill zone over the standing collision, on both hosts:
-// the floor cannot truly open. The painter draws the exact same test
+// the floor cannot truly open, so a body's fall is a carried pose. The painter
+// draws the exact same test
 // (hiddenFallenAt). Everything a client reads rides the phase aura and the
 // hidden aura (no wire or IWorld change).
 
 import { HEART_ROOM, type SmithHeartVein } from '../../content/smith_heart_layout';
 import { HEART_QUARTERS, heartQuarterSpot } from '../../content/smith_heart_quarters';
-import { DT, type Entity } from '../../types';
+import { DT } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
-import { layOnFloor } from './breath_void';
 import { clearAdds, phaseRules } from './final_adds';
 import { clearBreath } from './final_breath';
 import { clearHammer } from './final_hammer';
@@ -48,6 +47,7 @@ import {
   FINAL_PHASE_CUES as Q,
   quarterBit,
 } from './final_phase_ids';
+import { finishFall, stepFalls, stepPlunges } from './final_plunge';
 import { clearQuench } from './final_quench';
 import {
   at,
@@ -133,6 +133,8 @@ export function beginKneel(s: FinalScope): void {
     fallen: 0,
     warned: false,
     broken: false,
+    fellAt: {},
+    plunges: [],
   };
   ph.stage = 'kneel';
   holdScene(s);
@@ -204,6 +206,7 @@ function dropQuarter(s: FinalScope, vein: SmithHeartVein): void {
   h.fallen++;
   h.warned = false;
   ph.fallenMask |= quarterBit(vein);
+  h.fellAt[vein] = h.clock;
   dropObjectsOn(s);
   const spot = heartQuarterSpot(vein);
   cueAt(s, Q.quarterFall, spot.x, spot.z, 30, SCHOOL[vein]);
@@ -212,40 +215,13 @@ function dropQuarter(s: FinalScope, vein: SmithHeartVein): void {
   raidWarn(s, 'ringCrack', 'Only the central ring is left, and it is cracking! Kill it now!');
 }
 
-/** A body goes down with the floor: dead whatever shields it, its corpse at
- *  the ring's edge; a real game master is set back on the ring instead. */
-function fall(s: FinalScope, p: Entity, name: string, from: Entity | null): void {
-  const o = s.ctx.instanceOriginOf(s.inst);
-  const here = at(s, p);
-  const dx = here.x - HEART_ROOM.x;
-  const dz = here.z - HEART_ROOM.z;
-  const d = Math.max(1e-6, Math.hypot(dx, dz));
-  const r = Math.min(d, HEART_QUARTERS.ringR - 1.5);
-  const backX = o.x + HEART_ROOM.x + (dx / d) * r;
-  const backZ = o.z + HEART_ROOM.z + (dz / d) * r;
-  if (p.gm || (p.profilerInvulnerable && s.ctx.devCommands)) {
-    layOnFloor(s.ctx, p, backX, backZ);
-    return;
-  }
-  cueAt(s, Q.bodyFall, here.x, here.z, 3, 'physical');
-  s.ctx.dealDamage(from, p, p.hp + p.maxHp * 10, false, 'physical', name, 'hit', true);
-  if (!p.dead) s.ctx.handleDeath(p, from, name);
-  layOnFloor(s.ctx, p, backX, backZ);
-}
-
-/** Every living body over a fallen quarter goes down this tick. */
-function stepFalls(s: FinalScope): void {
-  for (const p of s.players) {
-    if (p.dead || p.ghost) continue;
-    if (overTheVoid(s, at(s, p))) fall(s, p, N.falling, null);
-  }
-}
-
 /** The ring breaks: nothing is left to stand on. */
 function stepRingBroken(s: FinalScope): void {
   for (const p of s.players) {
     if (p.dead || p.ghost || p.gm || (p.profilerInvulnerable && s.ctx.devCommands)) continue;
-    fall(s, p, N.anvilEnd, s.boss);
+    const here = at(s, p);
+    cueAt(s, Q.bodyFall, here.x, here.z, 3, 'physical');
+    finishFall(s, p, N.anvilEnd, s.boss);
   }
 }
 
@@ -270,6 +246,7 @@ function stepCollapse(s: FinalScope): void {
     h.broken = true;
     cueAt(s, Q.ringBreak, HEART_ROOM.x, HEART_ROOM.z, HEART_QUARTERS.ringR, 'arcane');
   }
+  stepPlunges(s);
   stepFalls(s);
   if (h.broken) stepRingBroken(s);
 }

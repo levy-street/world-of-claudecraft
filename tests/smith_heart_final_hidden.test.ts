@@ -30,6 +30,7 @@ import { FINAL_OBJECTS } from '../src/sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS as A,
   FINAL_PHASE_DIFFICULTY,
+  hiddenCellGoes,
   hiddenFallenAt,
   hiddenFallOrder,
   hiddenNextCode,
@@ -43,6 +44,8 @@ import { type FinalFight, finalFight } from './helpers/final_fight';
 
 const sec = (s: number) => Math.round(s * 20);
 const aura = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
+/** Long enough for any stretch of floor to go and a body on it to reach the bottom. */
+const WHOLE_FALL = 2 + P.plungeSeconds;
 const strike = (f: FinalFight, amount: number) =>
   f.sim.ctx.dealDamage(f.players[1], f.boss(), amount, false, 'physical', 'Strike', 'hit');
 
@@ -232,28 +235,109 @@ describe('the collapse', () => {
     f.put(survivor, safe.x, safe.z);
     shielded.damageImmune = true;
     f.dev('/dev heart final fall');
-    f.tick(1);
+    f.tick(sec(WHOLE_FALL));
     expect(doomed.dead).toBe(true);
     expect(shielded.dead).toBe(true);
     expect(survivor.dead).toBe(false);
     // The corpse lies on the ring: no resurrection lands over the void.
     const d = f.local(doomed);
     expect(heartQuarterAt(d.x, d.z)).toBe('ring');
+    expect(doomed.pos.y).toBeGreaterThan(-1);
   });
 
-  it('walking onto fallen floor later kills too', () => {
+  it('a body stands until its own stretch of floor has gone, then really falls', () => {
+    const f = toFinal();
+    toCollapse(f);
+    const v = f.state()?.phase.hidden?.order[0] as SmithHeartVein;
+    const spot = heartQuarterSpot(v);
+    const p = f.players[2];
+    f.put(p, spot.x, spot.z);
+    const floor = p.pos.y;
+    f.dev('/dev heart final fall');
+    const goes = hiddenCellGoes(Math.hypot(spot.x - HEART_ROOM.x, spot.z - HEART_ROOM.z));
+    f.tick(sec(goes) - 2);
+    expect(p.pos.y).toBe(floor);
+    expect(p.carriedBy).toBeUndefined();
+    // Its floor goes: down it drops, held by nothing, past all control, still alive.
+    f.tick(sec(1) + 2);
+    expect(p.dead).toBe(false);
+    expect(p.carriedBy).toBe(p.id);
+    expect(f.sim.ctx.isStunned(p)).toBe(true);
+    const a = p.pos.y;
+    expect(a).toBeLessThan(floor - 3);
+    f.tick(sec(0.5));
+    expect(p.pos.y).toBeLessThan(a - 3);
+    expect(p.dead).toBe(false);
+    // At the bottom it is dead, and nothing is left holding it.
+    const ev = f.tick(sec(P.plungeSeconds));
+    expect(p.dead).toBe(true);
+    expect(p.carriedBy).toBeUndefined();
+    expect(aura(p, A.plunge)).toBeUndefined();
+    expect(f.state()?.phase.hidden?.plunges).toEqual([]);
+    expect(ev.some((e) => e.type === 'damage' && e.ability === N.falling)).toBe(true);
+  });
+
+  it('it falls deep and keeps the way of the step that took it over', () => {
     const f = toFinal();
     toCollapse(f);
     const v = f.state()?.phase.hidden?.order[0] as SmithHeartVein;
     f.dev('/dev heart final fall');
-    f.tick(1);
+    f.tick(sec(WHOLE_FALL));
+    // Walk off the ring's edge with real steps, straight over the fallen quarter.
+    const spot = heartQuarterSpot(v);
+    const dx = spot.x - HEART_ROOM.x;
+    const dz = spot.z - HEART_ROOM.z;
+    const d = Math.hypot(dx, dz);
+    const p = f.players[2];
+    const edge = HEART_QUARTERS.ringR - 1;
+    f.put(p, HEART_ROOM.x + (dx / d) * edge, HEART_ROOM.z + (dz / d) * edge);
+    for (let i = 0; i < sec(3) && p.carriedBy === undefined; i++) f.walkStep(p, spot.x, spot.z);
+    expect(p.carriedBy).toBe(p.id);
+    const from = f.local(p);
+    const r0 = Math.hypot(from.x - HEART_ROOM.x, from.z - HEART_ROOM.z);
+    let deepest = 0;
+    let r1 = r0;
+    for (let i = 0; i < sec(P.plungeSeconds) - 2; i++) {
+      f.tick(1);
+      deepest = Math.min(deepest, p.pos.y);
+      const q = f.local(p);
+      r1 = Math.hypot(q.x - HEART_ROOM.x, q.z - HEART_ROOM.z);
+    }
+    expect(deepest).toBeLessThan(-40);
+    // It carried on outward, clear of the edge it stepped off.
+    expect(r1).toBeGreaterThan(r0 + 2);
+  });
+
+  it('a body can outrun the break to the ring', () => {
+    const f = toFinal();
+    toCollapse(f);
+    const v = f.state()?.phase.hidden?.order[0] as SmithHeartVein;
+    const spot = heartQuarterSpot(v);
+    const p = f.players[2];
+    f.put(p, spot.x, spot.z);
+    f.dev('/dev heart final fall');
+    f.tick(2);
+    f.put(p, HEART_ROOM.x, HEART_ROOM.z);
+    f.tick(sec(WHOLE_FALL));
+    expect(p.dead).toBe(false);
+    expect(p.carriedBy).toBeUndefined();
+  });
+
+  it('walking onto fallen floor later drops it at once, and kills too', () => {
+    const f = toFinal();
+    toCollapse(f);
+    const v = f.state()?.phase.hidden?.order[0] as SmithHeartVein;
+    f.dev('/dev heart final fall');
+    f.tick(sec(WHOLE_FALL));
     const spot = heartQuarterSpot(v);
     f.put(f.players[2], spot.x, spot.z);
     f.tick(1);
+    expect(f.players[2].carriedBy).toBe(f.players[2].id);
+    f.tick(sec(WHOLE_FALL));
     expect(f.players[2].dead).toBe(true);
   });
 
-  it('a game master is set back on the ring instead', () => {
+  it('a game master falls too, and is set back on the ring alive', () => {
     const f = toFinal();
     toCollapse(f);
     const v = f.state()?.phase.hidden?.order[0] as SmithHeartVein;
@@ -262,10 +346,56 @@ describe('the collapse', () => {
     gm.gm = true;
     f.put(gm, spot.x, spot.z);
     f.dev('/dev heart final fall');
-    f.tick(1);
+    f.tick(sec(WHOLE_FALL));
     expect(gm.dead).toBe(false);
+    expect(gm.carriedBy).toBeUndefined();
     const here = f.local(gm);
     expect(heartQuarterAt(here.x, here.z)).toBe('ring');
+    expect(gm.pos.y).toBeGreaterThan(-1);
+  });
+
+  it('a fight ending mid-fall sets the body back on the ring, alive', () => {
+    for (const end of ['kill', 'reset'] as const) {
+      const f = toFinal();
+      toCollapse(f);
+      const v = f.state()?.phase.hidden?.order[0] as SmithHeartVein;
+      const spot = heartQuarterSpot(v);
+      const p = f.players[2];
+      f.put(p, spot.x, spot.z);
+      f.dev('/dev heart final fall');
+      for (let i = 0; i < sec(4) && p.carriedBy === undefined; i++) f.tick(1);
+      f.tick(sec(0.6));
+      expect(p.carriedBy).toBe(p.id);
+      if (end === 'kill') {
+        strike(f, f.boss().maxHp * 2);
+        f.tick(2);
+      } else f.dev('/dev heart final reset');
+      expect(p.dead, end).toBe(false);
+      expect(p.carriedBy, end).toBeUndefined();
+      expect(aura(p, A.plunge), end).toBeUndefined();
+      const here = f.local(p);
+      expect(heartQuarterAt(here.x, here.z), end).toBe('ring');
+      expect(p.pos.y, end).toBeGreaterThan(-1);
+    }
+  });
+
+  it('dying on the way down leaves the corpse on the ring', () => {
+    const f = toFinal();
+    toCollapse(f);
+    const v = f.state()?.phase.hidden?.order[0] as SmithHeartVein;
+    const spot = heartQuarterSpot(v);
+    const p = f.players[2];
+    f.put(p, spot.x, spot.z);
+    f.dev('/dev heart final fall');
+    for (let i = 0; i < sec(4) && p.carriedBy === undefined; i++) f.tick(1);
+    f.tick(sec(0.6));
+    f.sim.ctx.handleDeath(p, null, 'Strike');
+    f.tick(2);
+    expect(p.dead).toBe(true);
+    expect(p.carriedBy).toBeUndefined();
+    const here = f.local(p);
+    expect(heartQuarterAt(here.x, here.z)).toBe('ring');
+    expect(p.pos.y).toBeGreaterThan(-1);
   });
 
   it('nothing is placed or left over fallen floor', () => {

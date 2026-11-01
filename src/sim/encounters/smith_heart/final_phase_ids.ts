@@ -91,6 +91,8 @@ export const FINAL_PHASE_AURAS = {
    *  the fallen quarters' mask, `value2` what falls next (hiddenNextCode),
    *  `value3` the seconds until it does. */
   hidden: 'heart_final_hidden',
+  /** On a player going down with the floor (an unbreakable stun: final_plunge.ts). */
+  plunge: 'heart_final_plunge',
 } as const;
 
 /** One poured element's aura id on the boss. */
@@ -468,6 +470,18 @@ export const FINAL_PHASES = {
   /** The ring's lip past `ringR`: the dais's outer foot, where a fallen
    *  quarter's edge is drawn and where it starts to kill. */
   ringLip: 0.4,
+  /** How a quarter's floor goes, from the wall in toward the ring (seconds): each
+   *  stretch gives this long, the wall's starts after `cellFirst`, the ring's
+   *  `cellSpread` later, and each scatters by up to `cellScatter`. The kit's break
+   *  (heart_collapse_core.ts) and the fall of a body on it read the same numbers. */
+  cellGive: 0.42,
+  cellFirst: 0.05,
+  cellSpread: 1.05,
+  cellScatter: 0.3,
+  /** A body whose floor has gone: its fall (yards a second squared, as the kit's
+   *  stone) and how long until it is dead, by then deep in the dark over the heart. */
+  plungeGravity: 21,
+  plungeSeconds: 2.4,
 } as const;
 
 /** The final phase's mix, in turn. */
@@ -514,6 +528,16 @@ export function hiddenFallenAt(mask: number, x: number, z: number): boolean {
   // The dais's foot is still the ring's.
   const r = Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z);
   return (mask & quarterBit(zone)) !== 0 && r >= HEART_QUARTERS.ringR + FINAL_PHASES.ringLip;
+}
+
+/** How many seconds after its quarter falls the floor `r` yards from the room's centre
+ *  has gone from under a body: the wall's first, the ring's last, in the middle of each
+ *  stretch's scatter. */
+export function hiddenCellGoes(r: number): number {
+  const { ringR, rimR } = HEART_QUARTERS;
+  const u = Math.max(0, Math.min(1, (r - ringR) / (rimR - ringR)));
+  const P = FINAL_PHASES;
+  return P.cellGive + P.cellFirst + (1 - u) * P.cellSpread + P.cellScatter / 2;
 }
 
 /** The code of what falls next on the hidden aura: 0 nothing, 1 to 4 a

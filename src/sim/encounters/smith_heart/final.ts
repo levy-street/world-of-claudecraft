@@ -99,6 +99,7 @@ import {
 } from './final_intermission';
 import { beginFinalPhase, pouredColdRate, stepFinal, stepPoured } from './final_last';
 import { finalPhaseDev, finalPhaseReadout } from './final_phase_dev';
+import { clearPlunges } from './final_plunge';
 import { clearQuench, crackIce, encase, numbingFrost, stepCold, stepCracks } from './final_quench';
 import {
   bossZone,
@@ -358,6 +359,7 @@ function clearFight(
   const players = heartListeners(ctx, inst);
   if (st) {
     const s = { ctx, inst, st, boss };
+    clearPlunges(s);
     clearAdds(s, players);
     clearHeat(s);
     clearQuench(s, players);
