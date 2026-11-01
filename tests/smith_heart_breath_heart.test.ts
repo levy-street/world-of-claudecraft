@@ -5,6 +5,7 @@
 // text. The online path: tests/smith_heart_breath_heart_wire.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import { carriesLoad, movesCaster } from '../src/sim/combat/carried_load';
 import { CORNICE_GAPS } from '../src/sim/content/smith_heart_layout';
 import {
   atGapLip,
@@ -325,6 +326,35 @@ describe('Knotted Gale: the round', () => {
     f.put(walker, B.x, B.z);
     f.tick(1);
     expect(Math.hypot(f.local(walker).x - A.x, f.local(walker).z - A.z)).toBeLessThan(0.5);
+  });
+
+  it('the carrier moves on foot only: charge and blink are refused, unbilled', () => {
+    const f = mythic();
+    round(f);
+    const p = third(f);
+    const free = f.players.find(
+      (e) => e !== p && !f.state()?.heart?.bearers.includes(e.id),
+    ) as Entity;
+    carry(f, p);
+    expect(carriesLoad(p)).toBe(true);
+    expect(carriesLoad(free)).toBe(false);
+    for (const type of ['charge', 'blinkForward', 'repositionToAim', 'hunterTrailbreak'])
+      expect(movesCaster([{ type }]), type).toBe(true);
+    expect(movesCaster([{ type: 'damage' }])).toBe(false);
+    // The warrior's real charge on the guardian: the carrier stays, unbilled; a free
+    // player at the same range goes, so it is the load that stopped it.
+    const boss = f.local(f.boss());
+    const cast = (who: Entity) => {
+      f.put(who, boss.x + 16, boss.z);
+      who.targetId = f.boss().id;
+      who.cooldowns.delete('charge');
+      f.sim.castAbility('charge', who.id);
+    };
+    cast(p);
+    expect(p.chargeTargetId ?? null).toBeNull();
+    expect(p.cooldowns.get('charge') ?? 0).toBe(0);
+    cast(free);
+    expect(free.chargeTargetId).toBe(f.boss().id);
   });
 
   it('throws at the lip of ANY gap, and refuses anywhere else', () => {
