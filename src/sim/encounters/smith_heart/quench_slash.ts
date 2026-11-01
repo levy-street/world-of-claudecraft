@@ -1,9 +1,10 @@
 // The blades' slashes (docs/design/raid/smith_heart.md section 7.3): every so often
 // the awake blades mark players, in order, and go for each in turn. The mark's line
-// runs from its blade through the player and past them, following them until it locks
-// a moment before the blade flies: the marked lead it clear of the raid, then step off
-// it. The flight strikes and throws whoever stands on the line once. The blade stays
-// where it lands, so the next line starts from somewhere new. On Mythic one blade
+// runs from its blade through the player and on across the whole lake, following them
+// until it locks a moment before the blade flies: the marked lead it clear of the raid,
+// then step off it. The flight strikes whoever stands on the line once and goes through
+// them, moving no one. The blade stays where it lands, across the lake, so the next
+// line starts from somewhere new. On Mythic one blade
 // makes the whole round, each slash starting where the last one ended.
 //
 // One line at a time: a mark waits its number. Zero rng in the picks (hashed); the
@@ -205,7 +206,6 @@ function fly(s: QuenchScope, slash: QuenchSlash): void {
     slash.struck.push(p.id);
     frostHit(s, p, roll(s, T.crossMin, T.crossMax), QUENCH_NAMES.cross);
     addCold(s, p, T.crossCold);
-    if (blade) s.ctx.applyKnockback(blade, p, T.slashKnock);
   }
 }
 

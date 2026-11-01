@@ -241,22 +241,20 @@ export const QUENCH_TUNING = {
   deepenStep: 0.1,
   // The slashes: seconds to the first after a wake, between rounds with two blades
   // and with four, the line's lock before the blade flies, the flight, the breath
-  // between two slashes, how far past the mark the line runs and how far in from the
-  // shore ice it stops, its shortest, its half width, its hit and throw.
+  // between two slashes, how far in from the shore ice the line stops, its shortest,
+  // its half width, its hit.
   slashFirst: 8,
   slashAfterWake: 6,
   slashEveryLake: 20,
   slashEveryAwake: 15,
   slashLock: 0.8,
-  slashFly: 0.6,
+  slashFly: 0.35,
   slashGap: 0.6,
-  slashPast: 8,
-  slashRimMargin: 3,
+  slashRimMargin: 2,
   slashMinLength: 4,
-  laneHalf: 2.5,
+  laneHalf: 1.8,
   crossMin: 300,
   crossMax: 350,
-  slashKnock: 7,
   // The shore ice.
   rimRise: 2.5,
   /** Seconds of plain melee after a bar lands before the next begins. */

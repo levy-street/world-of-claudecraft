@@ -202,7 +202,7 @@ describe('QuenchBladesFx over a fake world on a 20 Hz clock', () => {
     // Eased: slow off the mark and onto it, fastest mid-lane, never a jump.
     expect(steps[1]).toBeLessThan(steps[Math.floor(n / 2)] * 0.3);
     expect(steps[n - 1]).toBeLessThan(steps[Math.floor(n / 2)] * 0.3);
-    for (let i = 1; i < n; i++) expect(Math.abs(steps[i] - steps[i - 1])).toBeLessThan(0.25);
+    for (let i = 1; i < n; i++) expect(Math.abs(steps[i] - steps[i - 1])).toBeLessThan(0.6);
     expect(Math.hypot(h.position.x - (o.x + end.x), h.position.z - (o.z + end.z))).toBeLessThan(
       0.3,
     );

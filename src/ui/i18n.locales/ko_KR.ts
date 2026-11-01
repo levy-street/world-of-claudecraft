@@ -22681,7 +22681,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.warn.marks':
     '칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!',
   'hudChrome.auraEffect.quenchGuardian.marked':
-    '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받고 밀려납니다.',
+    '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다.',
   'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
   'hudChrome.quenchAlert.markedLine': '선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.',
   'hudChrome.quenchGuardian.warn.wake':
@@ -22705,7 +22705,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    '대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더하며 밀쳐 냅니다.',
+    '대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더합니다.',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     '호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).',
   'abilityUi.cast.heart_quench_blades_wake': '검의 각성',

@@ -1,7 +1,7 @@
 // The blades' slashes over a REAL Sim claim: two blades wake with the pull and the
 // other two at half health; a round marks players in order and each blade flies down a
-// line that follows its mark until it locks; the flight strikes, chills and throws what
-// is on the line once, and never the tank while anyone else stands; the blade stays
+// line across the whole lake that follows its mark until it locks; the flight strikes and
+// chills what is on the line once, moves no one, and never the tank while anyone else stands; the blade stays
 // where it landed; a wipe sends everything home.
 
 import { describe, expect, it } from 'vitest';
@@ -14,6 +14,7 @@ import {
   QUENCH_AURAS,
   QUENCH_CASTS,
   QUENCH_DIFFICULTY,
+  QUENCH_LAKE_MIDDLE,
   QUENCH_NAMES,
   QUENCH_OBJECTS,
   segmentDistance,
@@ -180,13 +181,32 @@ describe('Guardian of the Quench: the marks', () => {
 });
 
 describe('Guardian of the Quench: the line', () => {
-  it('runs from the blade through the mark and past them, in whole yards, and stops short of the shore ice', () => {
+  it('runs from the blade through the mark across the whole lake, in whole yards, stopping short of the shore ice', () => {
     const from = { x: QUENCH_BLADE_SPOTS[0].x, z: QUENCH_BLADE_SPOTS[0].z };
-    const target = { x: from.x + 6, z: from.z + 8 };
+    // Toward the lake's middle, 10 yd off.
+    const way = Math.atan2(QUENCH_LAKE_MIDDLE.x - from.x, QUENCH_LAKE_MIDDLE.z - from.z);
+    const target = { x: from.x + Math.sin(way) * 10, z: from.z + Math.cos(way) * 10 };
     const l = slashLine(from, target, 0);
-    expect(l.facing).toBeCloseTo(Math.atan2(6, 8));
+    expect(l.facing).toBeCloseTo(way);
     expect(Number.isInteger(l.length)).toBe(true);
-    expect(l.length).toBeGreaterThanOrEqual(T.slashMinLength);
+    // A target at arm's length still gets the whole crossing, the same as a far one.
+    expect(l.length).toBeGreaterThan(20);
+    const near = slashLine(from, { x: from.x + Math.sin(way), z: from.z + Math.cos(way) }, 0);
+    expect(near.facing).toBeCloseTo(l.facing);
+    expect(near.length).toBe(l.length);
+    const farOnLine = {
+      x: from.x + Math.sin(l.facing) * 200,
+      z: from.z + Math.cos(l.facing) * 200,
+    };
+    expect(slashLine(from, farOnLine, 0).length).toBe(l.length);
+    // One yard further would be past the margin.
+    expect(
+      insideRimewall(
+        from.x + Math.sin(l.facing) * (l.length + 1),
+        from.z + Math.cos(l.facing) * (l.length + 1),
+        T.slashRimMargin,
+      ),
+    ).toBe(false);
     // However far the target, the end stays inside the ring.
     for (let a = 0; a < 16; a++) {
       const far = { x: from.x + Math.sin(a) * 200, z: from.z + Math.cos(a) * 200 };
@@ -234,13 +254,15 @@ describe('Guardian of the Quench: the line', () => {
 });
 
 describe('Guardian of the Quench: the flight', () => {
-  it('a mark who stays on the line is struck, chilled and thrown, once', () => {
+  it('a mark who stays on the line is struck and chilled once, and the blade goes through without moving them', () => {
     const f = twoAwake(4);
     spread(f);
     const slash = round(f);
     const p = playerOf(f, slash.marks[0]);
     const coldBefore = f.state()?.chill[p.id]?.cold ?? 0;
+    const spot = f.local(p);
     const ev = f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim + T.slashFly) + 2);
+    expect(Math.hypot(f.local(p).x - spot.x, f.local(p).z - spot.z)).toBeLessThan(0.01);
     const hits = hitsOf(ev, QUENCH_NAMES.cross, p.id);
     expect(hits.length).toBe(1);
     expect((f.state()?.chill[p.id]?.cold ?? 0) - coldBefore).toBeGreaterThan(T.crossCold * 0.5);

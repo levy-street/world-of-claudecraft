@@ -4770,8 +4770,8 @@ export const da_DK: EnTranslations = {
         "frozen": "Encased in rime: you cannot act. When it ends the ice shatters: you take {min} to {max} Frost damage and become Frost-Brittle, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).",
         "brittle": "Takes {pct}% more damage from all sources.",
         "trapped": "Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you.",
-        "awake": "The Smith's four blades are awake. Each round more players are marked, and a blade flies down a line through each in turn. It locks {lock} sec before the blade flies, then strikes anyone on it for {min} to {max} Frost damage, adds {cold} cold and throws them.",
-        "marked": "You are number {order} of {count}: a blade will fly down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies, so step off then, or take {min} to {max} Frost damage, {cold} cold and a throw.",
+        "awake": "The Smith's four blades are awake. Each round more players are marked, and a blade flies across the lake down a line through each in turn. It locks {lock} sec before the blade flies, then strikes anyone on it for {min} to {max} Frost damage and adds {cold} cold.",
+        "marked": "You are number {order} of {count}: a blade will fly across the lake down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies, so step off then, or take {min} to {max} Frost damage and {cold} cold.",
         "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far)."
       },
       "heatGuardian": {

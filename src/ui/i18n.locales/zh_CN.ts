@@ -23191,7 +23191,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.warn.crack': '抱团的人群下冰面在呻吟！散开！',
   'hudChrome.quenchGuardian.warn.marks': '利刃标记了{list}！把它们引离团队！',
   'hudChrome.auraEffect.quenchGuardian.marked':
-    '你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害、{cold}点寒冷并被击退。',
+    '你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害和{cold}点寒冷。',
   'hudChrome.quenchAlert.markedTitle': '利刃在追猎你！（{count}人中第{order}个）',
   'hudChrome.quenchAlert.markedLine': '把直线引离团队，锁定时立刻离开。',
   'hudChrome.quenchGuardian.warn.wake': '铸匠之刃挣脱湖面！注意它们瞄准何处！',
@@ -23213,7 +23213,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '踏穿冰面掉进冰冷的水中：无法移动，每秒受到{min}到{max}点冰霜伤害，寒意不断上升。{seconds}秒后你会爬上岸边。仅凭冰水绝不会致死。',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    '铸匠的四把利刃已苏醒。每一轮会有更多玩家被标记，利刃依次沿穿过他们的直线飞出。直线在利刃飞出前{lock}秒锁定，随后对线上的目标造成{min}到{max}点冰霜伤害，增加{cold}点寒冷并将其击退。',
+    '铸匠的四把利刃已苏醒。每一轮会有更多玩家被标记，利刃依次沿穿过他们的直线飞出。直线在利刃飞出前{lock}秒锁定，随后对线上的目标造成{min}到{max}点冰霜伤害，增加{cold}点寒冷。',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     '湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。',
   'abilityUi.cast.heart_quench_blades_wake': '诸刃苏醒',

@@ -227,10 +227,10 @@ export function inAttackReach(
 // ---- the slashes ----------------------------------------------------------------------
 
 /**
- * A slash's line from `from` through `target`, `slashPast` yards beyond them and no
- * nearer the shore ice than its margin. Its length is whole yards, the way the object's
- * template carries it, so the sim and every client read one line. `fallback` faces it
- * when the target stands on the blade.
+ * A slash's line from `from` through `target` and on across the whole lake, stopping
+ * only its margin short of the shore ice, however near the target stands. Its length is
+ * whole yards, the way the object's template carries it, so the sim and every client
+ * read one line. `fallback` faces it when the target stands on the blade.
  */
 export function slashLine(
   from: QPoint,
@@ -241,7 +241,7 @@ export function slashLine(
   const dz = target.z - from.z;
   const d = Math.hypot(dx, dz);
   const facing = d < 1e-6 ? fallback : Math.atan2(dx, dz);
-  let length = Math.max(T.slashMinLength, Math.round(d + T.slashPast));
+  let length = Math.ceil(2 * Math.max(R.rx, R.rz));
   while (length > T.slashMinLength) {
     const x = from.x + Math.sin(facing) * length;
     const z = from.z + Math.cos(facing) * length;
