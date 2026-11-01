@@ -4,8 +4,8 @@
 // wakeFillStep, bladeFlight, bladeBank) and the painter
 // (quench_blades_fx.ts) over a fake world whose objects move only on a 20 Hz
 // clock while the frames run at 60: the drawn blade never steps, the
-// awakening rises every frame, and the crossing is drawn on the sim's eased
-// curve (danceEase) from the lane's two ends, leaning and banking.
+// awakening rises every frame, and a slash is drawn on the sim's eased
+// curve (slashEase) from the lane's two ends, leaning and banking.
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -20,10 +20,10 @@ import {
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   bladeTemplate,
-  danceEase,
   laneTemplate,
   QUENCH_CASTS,
   QUENCH_GUARDIAN,
+  slashEase,
   QUENCH_TUNING as T,
 } from '../src/sim/encounters/smith_heart/quench_ids';
 import type { Entity } from '../src/sim/types';
@@ -55,12 +55,12 @@ describe('the blades motion cores', () => {
   it('draws the flight on the sim curve, its speed peaking mid-lane, banking within reason', () => {
     const out = { x: 0, z: 0, speed: 0 };
     for (const k of [0, 0.25, 0.5, 0.75, 1]) {
-      bladeFlight(0, 0, 40, 0, k * T.danceFly, out);
-      expect(out.x).toBeCloseTo(40 * danceEase(k), 6);
+      bladeFlight(0, 0, 40, 0, k * T.slashFly, out);
+      expect(out.x).toBeCloseTo(40 * slashEase(k), 6);
     }
     expect(bladeFlight(0, 0, 40, 0, 0, out).speed).toBe(0);
-    expect(bladeFlight(0, 0, 40, 0, T.danceFly / 2, out).speed).toBeCloseTo(1);
-    expect(bladeFlight(0, 0, 40, 0, T.danceFly * 2, out).x).toBe(40);
+    expect(bladeFlight(0, 0, 40, 0, T.slashFly / 2, out).speed).toBeCloseTo(1);
+    expect(bladeFlight(0, 0, 40, 0, T.slashFly * 2, out).x).toBe(40);
     expect(Math.abs(bladeBank(50, 1, 1))).toBeLessThanOrEqual(0.45);
     expect(bladeBank(0, 1, 1)).toBeGreaterThan(0);
     expect(bladeBank(0, 1, -1)).toBeLessThan(0);
@@ -160,16 +160,23 @@ describe('QuenchBladesFx over a fake world on a 20 Hz clock', () => {
     fx.dispose();
   });
 
-  it('the crossing is drawn from the lane ends on the eased curve, leaning into its speed', () => {
+  it('a slash is drawn along its line on the eased curve, leaning into its speed', () => {
     const { fx, world, entities, holder, blades } = rig();
     for (let i = 0; i < 20; i++) fx.update(1 / 60);
     const a = BLADE_HOMES[0];
     const b = BLADE_HOMES[2];
-    const mid = { x: o.x + (a.x + b.x) / 2, z: o.z + (a.z + b.z) / 2 };
-    const half = Math.hypot(b.x - a.x, b.z - a.z) / 2;
-    const lane = entity(30, 'object', laneTemplate('fly', T.danceFly), mid.x, mid.z);
-    lane.facing = Math.atan2(b.x - a.x, b.z - a.z);
-    lane.scale = half;
+    // Whole yards, as the sim makes every line: a little short of the other home.
+    const length = Math.floor(Math.hypot(b.x - a.x, b.z - a.z));
+    const facing = Math.atan2(b.x - a.x, b.z - a.z);
+    const end = { x: a.x + Math.sin(facing) * length, z: a.z + Math.cos(facing) * length };
+    const lane = entity(
+      30,
+      'object',
+      laneTemplate('fly', T.slashFly, length),
+      o.x + a.x,
+      o.z + a.z,
+    );
+    lane.facing = facing;
     entities.set(lane.id, lane);
     world.entityRosterVersion++;
     for (let i = 0; i < 8; i++) fx.update(1 / 60);
@@ -180,12 +187,12 @@ describe('QuenchBladesFx over a fake world on a 20 Hz clock', () => {
     let last = { ...from };
     let leaned = 0;
     let clock = 0;
-    for (let i = 0; i < Math.round(T.danceFly * 60); i++) {
+    for (let i = 0; i < Math.round(T.slashFly * 60); i++) {
       clock += 1 / 60;
       // The object moves on the sim's 20 Hz clock only.
-      const k = danceEase(Math.floor(clock * 20) / 20 / T.danceFly);
-      blades[0].pos.x = o.x + a.x + (b.x - a.x) * k;
-      blades[0].pos.z = o.z + a.z + (b.z - a.z) * k;
+      const k = slashEase(Math.floor(clock * 20) / 20 / T.slashFly);
+      blades[0].pos.x = o.x + a.x + (end.x - a.x) * k;
+      blades[0].pos.z = o.z + a.z + (end.z - a.z) * k;
       fx.update(1 / 60);
       steps.push(Math.hypot(h.position.x - last.x, h.position.z - last.z));
       last = { x: h.position.x, z: h.position.z };
@@ -196,7 +203,9 @@ describe('QuenchBladesFx over a fake world on a 20 Hz clock', () => {
     expect(steps[1]).toBeLessThan(steps[Math.floor(n / 2)] * 0.3);
     expect(steps[n - 1]).toBeLessThan(steps[Math.floor(n / 2)] * 0.3);
     for (let i = 1; i < n; i++) expect(Math.abs(steps[i] - steps[i - 1])).toBeLessThan(0.25);
-    expect(Math.hypot(h.position.x - (o.x + b.x), h.position.z - (o.z + b.z))).toBeLessThan(0.3);
+    expect(Math.hypot(h.position.x - (o.x + end.x), h.position.z - (o.z + end.z))).toBeLessThan(
+      0.3,
+    );
     expect(leaned).toBeGreaterThan(0.4);
     fx.dispose();
   });

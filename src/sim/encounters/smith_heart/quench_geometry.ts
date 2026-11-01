@@ -1,9 +1,8 @@
 // The Frozen Lake's geometry for the Guardian of the Quench (design doc
 // section 7.3), pure over the layout and the authored field: who stands in
 // the fight, the shore ice's ring, the huddles and their warmth, the holes and
-// where a trapped body climbs out, the echoes' footprints, the safe lee
-// behind each blade and heroic's crossing lanes. Instance-local yards
-// throughout. No SimContext, no rng (the picks are hashed), so the raid
+// where a trapped body climbs out, the guardian's cone and a slash's line.
+// Instance-local yards throughout. No SimContext, no rng (the picks are hashed), so the raid
 // bots' tactics (scripts/lib) can reuse it.
 
 import {
@@ -13,7 +12,7 @@ import {
   SMITH_HEART_FIELD,
 } from '../../content/smith_heart_layout';
 import { authoredFieldSurfaceAt } from '../../instances/authored_field';
-import { quenchHash, QUENCH_TUNING as T } from './quench_ids';
+import { QUENCH_TUNING as T } from './quench_ids';
 
 const F = SMITH_HEART_FIELD;
 const L = QUENCH.lake;
@@ -199,12 +198,7 @@ export function climbOutSpot(
   return { x: hole.x + Math.sin(base) * d, z: hole.z + Math.cos(base) * d };
 }
 
-// ---- the echoes -----------------------------------------------------------------------
-
-/** A unit along a facing (sim yaw: 0 = +z). */
-function along(facing: number): QPoint {
-  return { x: Math.sin(facing), z: Math.cos(facing) };
-}
+// ---- the attacks ----------------------------------------------------------------------
 
 const wrap = (a: number): number => {
   let v = a;
@@ -215,7 +209,7 @@ const wrap = (a: number): number => {
 
 /** Does an attack from `origin` facing `facing` (a cone or arc of `arcDeg`,
  *  `range` deep) cover `p`? */
-export function inEchoReach(
+export function inAttackReach(
   origin: QPoint,
   facing: number,
   p: QPoint,
@@ -230,121 +224,31 @@ export function inEchoReach(
   return Math.abs(wrap(Math.atan2(dx, dz) - facing)) <= (arcDeg * Math.PI) / 360 + 1e-9;
 }
 
-/** Is `p` in the lee of the blade at `blade` from an attack facing `facing`:
- *  behind it (on the side away from the attack) and within `r`? There the
- *  cold breaks on the blade's ice: always safe. */
-export function inBladeLee(blade: QPoint, facing: number, p: QPoint, r: number = T.leeR): boolean {
-  const u = along(facing);
-  const dx = p.x - blade.x;
-  const dz = p.z - blade.z;
-  if (Math.hypot(dx, dz) > r) return false;
-  return dx * u.x + dz * u.z < 0;
-}
+// ---- the slashes ----------------------------------------------------------------------
 
-/** Is `p` sheltered behind any of `blades` from an attack facing `facing`? */
-export function shelteredByBlade(
-  blades: readonly QPoint[],
-  facing: number,
-  p: QPoint,
-  r: number = T.leeR,
-): boolean {
-  for (const b of blades) if (inBladeLee(b, facing, p, r)) return true;
-  return false;
-}
-
-// ---- the blades' loop -----------------------------------------------------------------
-
-/** The loop's corners (the blades' homes, in order) and the distance along it at
- *  each. */
-const ROUTE_AT: readonly number[] = (() => {
-  const at = [0];
-  for (let i = 0; i < QUENCH_BLADE_SPOTS.length; i++) {
-    const a = QUENCH_BLADE_SPOTS[i];
-    const b = QUENCH_BLADE_SPOTS[(i + 1) % QUENCH_BLADE_SPOTS.length];
-    at.push(at[i] + Math.hypot(b.x - a.x, b.z - a.z));
+/**
+ * A slash's line from `from` through `target`, `slashPast` yards beyond them and no
+ * nearer the shore ice than its margin. Its length is whole yards, the way the object's
+ * template carries it, so the sim and every client read one line. `fallback` faces it
+ * when the target stands on the blade.
+ */
+export function slashLine(
+  from: QPoint,
+  target: QPoint,
+  fallback: number,
+): { facing: number; length: number } {
+  const dx = target.x - from.x;
+  const dz = target.z - from.z;
+  const d = Math.hypot(dx, dz);
+  const facing = d < 1e-6 ? fallback : Math.atan2(dx, dz);
+  let length = Math.max(T.slashMinLength, Math.round(d + T.slashPast));
+  while (length > T.slashMinLength) {
+    const x = from.x + Math.sin(facing) * length;
+    const z = from.z + Math.cos(facing) * length;
+    if (insideRimewall(x, z, T.slashRimMargin)) break;
+    length--;
   }
-  return at;
-})();
-
-/** The loop's length (yards). */
-export function routeLength(): number {
-  return ROUTE_AT[QUENCH_BLADE_SPOTS.length];
-}
-
-/** Where blade `home` starts on the loop. */
-export function routeStart(home: number): number {
-  return ROUTE_AT[home];
-}
-
-/** The loop's point `s` yards along it (any `s`: it wraps). Fills `out` when given,
- *  so a painter allocates nothing. */
-export function routePoint(s: number, out: QPoint = { x: 0, z: 0 }): QPoint {
-  const L = routeLength();
-  const w = ((s % L) + L) % L;
-  let i = 0;
-  while (i < QUENCH_BLADE_SPOTS.length - 1 && w >= ROUTE_AT[i + 1]) i++;
-  const a = QUENCH_BLADE_SPOTS[i];
-  const b = QUENCH_BLADE_SPOTS[(i + 1) % QUENCH_BLADE_SPOTS.length];
-  const k = (w - ROUTE_AT[i]) / Math.max(1e-6, ROUTE_AT[i + 1] - ROUTE_AT[i]);
-  out.x = a.x + (b.x - a.x) * k;
-  out.z = a.z + (b.z - a.z) * k;
-  return out;
-}
-
-/** The distance along the loop of its point nearest `p` (the painter reads a
- *  blade's place on the loop from its mirrored position). */
-export function routeProject(p: QPoint): number {
-  let best = 0;
-  let bestD = Number.POSITIVE_INFINITY;
-  for (let i = 0; i < QUENCH_BLADE_SPOTS.length; i++) {
-    const a = QUENCH_BLADE_SPOTS[i];
-    const b = QUENCH_BLADE_SPOTS[(i + 1) % QUENCH_BLADE_SPOTS.length];
-    const dx = b.x - a.x;
-    const dz = b.z - a.z;
-    const len2 = Math.max(1e-6, dx * dx + dz * dz);
-    const k = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / len2));
-    const d = Math.hypot(a.x + dx * k - p.x, a.z + dz * k - p.z);
-    if (d < bestD) {
-      bestD = d;
-      best = ROUTE_AT[i] + k * Math.sqrt(len2);
-    }
-  }
-  return best;
-}
-
-/** Is (x, z) on the thin ice a blade leaves: within `thinIceR` of the loop's
- *  `thinIceLen` yards behind it? */
-export function onThinIce(blades: readonly { s: number }[], x: number, z: number): boolean {
-  const p: QPoint = { x: 0, z: 0 };
-  for (const b of blades) {
-    for (let back = 0; back <= T.thinIceLen; back += T.thinIceR) {
-      routePoint(b.s - back, p);
-      if (Math.hypot(p.x - x, p.z - z) <= T.thinIceR) return true;
-    }
-  }
-  return false;
-}
-
-// ---- heroic: the crossing -------------------------------------------------------------
-
-/** The pairs of blades that may cross (by index), in the order they are
- *  dealt from: the two diagonals, then the four sides. */
-export const CROSSING_PAIRS: readonly (readonly [number, number])[] = [
-  [0, 2],
-  [1, 3],
-  [0, 1],
-  [1, 2],
-  [2, 3],
-  [3, 0],
-];
-
-/** The `k`-th crossing of a pull salted by `salt`: a hashed pair, never the
- *  last one again. Returns its index into CROSSING_PAIRS. */
-export function crossingPair(salt: number, k: number, last: number): number {
-  const n = CROSSING_PAIRS.length;
-  let i = quenchHash(salt, k) % n;
-  if (i === last) i = (i + 1 + (quenchHash(salt, k + 97) % (n - 1))) % n;
-  return i;
+  return { facing, length };
 }
 
 /** The distance from `p` to the segment a-b. */
@@ -355,25 +259,4 @@ export function segmentDistance(a: QPoint, b: QPoint, p: QPoint): number {
   const t =
     len2 < 1e-9 ? 0 : Math.max(0, Math.min(1, ((p.x - a.x) * vx + (p.z - a.z) * vz) / len2));
   return Math.hypot(p.x - (a.x + vx * t), p.z - (a.z + vz * t));
-}
-
-/** Where the crossing's cracked lane opens into holes: every `every` yards
- *  along a-b, clear of both ends (where the blades now float) by `endPad`. */
-export function laneHoleSpots(
-  a: QPoint,
-  b: QPoint,
-  every: number = T.laneHoleEvery,
-  endPad = 4,
-): QPoint[] {
-  const len = Math.hypot(b.x - a.x, b.z - a.z);
-  const out: QPoint[] = [];
-  const usable = len - endPad * 2;
-  if (usable <= 0) return out;
-  const n = Math.max(1, Math.floor(usable / every) + 1);
-  const step = n > 1 ? usable / (n - 1) : 0;
-  for (let i = 0; i < n; i++) {
-    const d = (n > 1 ? endPad + step * i : len / 2) / len;
-    out.push({ x: a.x + (b.x - a.x) * d, z: a.z + (b.z - a.z) * d });
-  }
-  return out;
 }

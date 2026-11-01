@@ -4,7 +4,7 @@
 // fight from the players' auras, the guardian's bars and auras, and the
 // fight's objects (quench_ids.ts says which).
 
-import type { QuenchDifficulty, QuenchEchoKind } from './quench_ids';
+import type { QuenchDifficulty } from './quench_ids';
 
 /** A bar the guardian runs for the fight. */
 export interface QuenchBar {
@@ -64,41 +64,27 @@ export interface QuenchBlade {
   home: number;
   x: number;
   z: number;
-  /** Its distance along the loop round the lake (quench_geometry.ts routePoint). */
-  s: number;
-  /** When it last struck each player, by entity id (the fight's clock). */
-  struck: Record<number, number>;
+  /** Out of the ice and free to slash. */
+  awake: boolean;
 }
 
-/** An echo's footprint waiting at a blade. */
-export interface QuenchEcho {
-  objectId: number;
-  /** The blade it fires from (index into the fight's blades). */
+/** A round of slashes: the marks in order and the one under way. */
+export interface QuenchSlash {
+  /** The marked, by entity id, in their order. */
+  marks: number[];
+  /** The mark under way (index into `marks`). */
+  step: number;
+  /** The blade flying this mark (index into `blades`; -1 before the first). */
   blade: number;
-  kind: QuenchEchoKind;
-  x: number;
-  z: number;
-  facing: number;
-  /** Seconds to its landing (then its blast shows for a moment). */
-  remaining: number;
-  /** Seconds its blast still shows after landing (0: not landed yet). */
-  shown: number;
-  /** It repeats the guardian's breath bar now running (a cut bar drops it). */
-  ofBar?: true;
-}
-
-/** Heroic: two blades crossing the lake. */
-export interface QuenchDance {
-  /** CROSSING_PAIRS index and its two blades (indices into `blades`). */
-  pair: number;
-  a: number;
-  b: number;
+  /** The line's object (-1 between two marks). */
   laneId: number;
-  phase: 'warn' | 'fly' | 'crack';
+  phase: 'aim' | 'fly' | 'rest';
   remaining: number;
+  /** Where the line starts, the way it runs and its whole length. */
   from: { x: number; z: number };
-  to: { x: number; z: number };
-  /** Players the flying blades have already struck. */
+  facing: number;
+  length: number;
+  /** Players this flight has already struck. */
   struck: number[];
 }
 
@@ -109,16 +95,12 @@ export interface QuenchFightState {
   finished: boolean;
   /** Seconds since the pull. */
   clock: number;
-  /** A dev switch: the blades hold still (`/dev heart quench wander off`). */
-  wanderOff: boolean;
-  /** The fight's half: the Lake, the blades waking, the Echoes. */
-  half: 'lake' | 'wake' | 'echoes';
+  /** The fight's half: two blades awake, the others waking, all four. */
+  half: 'lake' | 'wake' | 'awake';
   bar: QuenchBar | null;
   /** Breath after a bar before the next begins. */
   gap: number;
   breathTimer: number;
-  /** Tempering Strike's swing count as last seen (a reset is a strike). */
-  cleaveSeen: number;
   /** The shore ice: its slabs' objects and seconds until it stands. */
   rim: { ids: number[]; rising: number };
   chill: Record<number, QuenchChill>;
@@ -129,13 +111,12 @@ export interface QuenchFightState {
   /** Seconds before the water can take a player who just climbed out. */
   grace: Record<number, number>;
   blades: QuenchBlade[];
-  echoes: QuenchEcho[];
   deepenTimer: number;
   deepenStacks: number;
-  danceTimer: number;
-  dances: number;
-  lastPair: number;
-  dance: QuenchDance | null;
+  slashTimer: number;
+  /** Blades sent so far (the rotation among the awake). */
+  slashes: number;
+  slash: QuenchSlash | null;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
   /** Lines said this pull: `<moment>` to the fight clock. */

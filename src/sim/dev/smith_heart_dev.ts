@@ -63,15 +63,14 @@
 //   /dev heart quench <what>         pull (onto the Frozen Lake and pull it),
 //                                    reset (whole again, the lake whole),
 //                                    heroic [on|off] or mythic [on|off] (this
-//                                    run's fight), phase2 (the blades wake
-//                                    now, the guardian at half), blades (the
-//                                    blades awake at once, no bar), cold <n>
+//                                    run's fight), phase2 (the other blades
+//                                    wake now, the guardian at half), blades
+//                                    (all four awake at once, no bar), cold <n>
 //                                    (set my cold bar), burst (freeze me
 //                                    solid now), hole (open a hole under me),
 //                                    crack (crack the ice under me), breath
-//                                    (Quenching Breath now), echo [strike]
-//                                    (a breath, or a strike, echoed by every
-//                                    blade), dance (two blades cross)
+//                                    (Quenching Breath now), slash (a round of
+//                                    slashes now)
 //   /dev heart heat                  the Guardian of the Heat's readout
 //   /dev heart heat <what>           pull (onto the Hearth's shore and pull
 //                                    it), reset (whole again in its

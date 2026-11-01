@@ -4,19 +4,21 @@
 //  - the cold (the bar's aura: its value 0 to 100, its trend): rising, it
 //    says how to warm up; past three quarters it turns urgent; falling in a
 //    huddle, it says the huddle warms and the ice will crack under it;
+//  - marked for a slash: the player's number in the round, the bar the time
+//    until their slash has landed, the line how to lead it;
 //  - encased in rime (the freeze): the bar is the time to the shatter and
 //    the line tells the raid to step away;
 //  - under the ice (the water): the bar is the time to the climb out.
 // It is a live gauge the player steers by (never advisory: the hints setting
 // does not hide it), shown the whole fight on every graphics tier. Priority:
-// the freeze over the water over the bar. The painter is the shared encounter
+// the freeze over the water over the mark over the bar. The painter is the shared encounter
 // alert's (encounter_alert_painter.ts); every decision is here.
 
 import { QUENCH_AURAS, QUENCH_TUNING as T } from '../../../sim/encounters/smith_heart/quench_ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
-export type QuenchAlertKind = 'cold' | 'freezing' | 'warm' | 'frozen' | 'water';
+export type QuenchAlertKind = 'cold' | 'freezing' | 'warm' | 'frozen' | 'water' | 'marked';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const QUENCH_ALERT_KINDS: readonly QuenchAlertKind[] = [
@@ -25,6 +27,7 @@ export const QUENCH_ALERT_KINDS: readonly QuenchAlertKind[] = [
   'warm',
   'frozen',
   'water',
+  'marked',
 ];
 
 /** Past this much cold (of 100) a rising bar is urgent. */
@@ -81,12 +84,38 @@ function timed(kind: QuenchAlertKind, title: string, mark: AlertAura): QuenchAle
   };
 }
 
+/** Marked for a slash: its number, the time until it has landed. */
+function markedView(mark: AlertAura): QuenchAlertLive {
+  const left = Math.max(0, mark.remaining ?? 0);
+  const total = Math.max(1e-6, mark.duration ?? 1);
+  const seconds = whole(left);
+  const title = t('hudChrome.quenchAlert.markedTitle', {
+    order: whole(mark.value ?? 1),
+    count: whole(mark.value2 ?? 1),
+  });
+  return {
+    visible: true,
+    kind: 'marked',
+    title,
+    line: t('hudChrome.quenchAlert.markedLine'),
+    hint: '',
+    key: '',
+    progress: Math.max(0, Math.min(1, left / total)),
+    progressAria: t('hudChrome.quenchAlert.timeAria', { seconds }),
+    barLabel: '',
+    pressable: false,
+    buttonAria: title,
+  };
+}
+
 export function buildQuenchAlertView(input: QuenchAlertInput): QuenchAlertView {
   if (input.dead) return HIDDEN;
   const frozen = auraOf(input.auras, QUENCH_AURAS.frozen);
   if (frozen) return timed('frozen', t('hudChrome.quenchAlert.frozenTitle'), frozen);
   const water = auraOf(input.auras, QUENCH_AURAS.trapped);
   if (water) return timed('water', t('hudChrome.quenchAlert.waterTitle'), water);
+  const marked = auraOf(input.auras, QUENCH_AURAS.marked);
+  if (marked) return markedView(marked);
   const cold = auraOf(input.auras, QUENCH_AURAS.cold);
   if (!cold) return HIDDEN;
   const value = Math.max(0, Math.min(T.coldMax, cold.value ?? 0));

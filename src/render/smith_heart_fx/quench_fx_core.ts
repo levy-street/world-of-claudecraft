@@ -185,12 +185,12 @@ export function strikeSpikes(
 
 /** Pool sizes at full density (the low tier thins the emitted counts). */
 export const QUENCH_FX_POOLS = {
-  /** Strike sets: the guardian's two in flight and the four blades' echoes. */
-  spikes: 6,
+  /** Strike sets: the guardian's two in flight. */
+  spikes: 2,
   spikesPerStrike: 18,
-  /** Breath sets: the guardian's and the four blades' echoes. */
-  breaths: 5,
+  /** Breath sets: the guardian's. */
+  breaths: 1,
   /** The frost fans: every breath and strike set's, one creeping. */
-  frosts: 12,
+  frosts: 4,
   telegraphs: 2,
 } as const;

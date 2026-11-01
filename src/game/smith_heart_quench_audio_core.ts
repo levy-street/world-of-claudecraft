@@ -44,7 +44,6 @@ export const QUENCH_CUE_SOUNDS: Readonly<Record<string, QuenchSound>> = {
   [QUENCH_CUES.climb]: S('climb', 0.7, 'target', 1, 0.2),
   [QUENCH_CUES.wake]: S('wake', 1, 'source'),
   // The four blades echo together: one voice, cooled.
-  [QUENCH_CUES.echo]: S('echo', 0.9, 'point', 1, 0.3),
   [QUENCH_CUES.cross]: S('cross', 1, 'point', 1, 0.5),
   [QUENCH_CUES.rim]: S('rim', 0.9, 'source', 1, 1),
   [QUENCH_CUES.thaw]: S('rim', 0.7, 'source', 0.85, 1),

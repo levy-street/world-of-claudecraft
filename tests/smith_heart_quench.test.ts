@@ -15,19 +15,11 @@ import { describe, expect, it } from 'vitest';
 import { QUENCH_BLADE_SPOTS, QUENCH_RIMEWALL } from '../src/sim/content/smith_heart_layout';
 import {
   bladeStateOf,
-  CROSSING_PAIRS,
   coldStep,
   crackOf,
-  danceEase,
-  echoDelay,
-  echoOf,
-  echoReach,
   huddlesOf,
-  inBladeLee,
-  inEchoReach,
+  inAttackReach,
   insideRimewall,
-  laneHoleSpots,
-  laneOf,
   QUENCH_AURAS,
   QUENCH_CASTS,
   QUENCH_DIFFICULTY,
@@ -77,15 +69,12 @@ function setCold(f: QuenchFight, e: Entity, v: number): void {
   st.chill[e.id] = { cold: v, frozen: 0 };
 }
 
-/** The blades' current spots (the fight's own view). */
-function blades(f: QuenchFight): { x: number; z: number }[] {
-  return (f.state()?.blades ?? []).map((b) => ({ x: b.x, z: b.z }));
-}
-
 /** Wake the blades at once (dev, no bar). */
 function awake(f: QuenchFight): void {
   expect(f.dev('/dev heart quench blades')).toBe(true);
-  expect(f.state()?.half).toBe('echoes');
+  expect(f.state()?.half).toBe('awake');
+  const st = f.state();
+  if (st) st.slashTimer = 999;
 }
 
 const warnKeys = (ev: readonly SimEvent[]) =>
@@ -317,305 +306,47 @@ describe('Guardian of the Quench: the ice gives way', () => {
   });
 });
 
-describe('Guardian of the Quench: the blades and their echoes', () => {
-  it('at half health the guardian raises its arms and the four blades tear free and float', () => {
-    const f = pulled(4);
-    expect(f.objects(QUENCH_OBJECTS.bladePrefix).map((e) => bladeStateOf(e.templateId))).toEqual([
-      'sunk',
-      'sunk',
-      'sunk',
-      'sunk',
-    ]);
-    const b = f.boss();
-    b.hp = Math.floor(b.maxHp * 0.49);
-    const ev = until(f, () => b.castingAbility === QUENCH_CASTS.wake, 4);
-    expect(b.castingAbility).toBe(QUENCH_CASTS.wake);
-    expect(f.state()?.half).toBe('wake');
-    expect(warnKeys(ev)).toContain('hudChrome.quenchGuardian.warn.wake');
-    expect(
-      f.objects(QUENCH_OBJECTS.bladePrefix).every((e) => bladeStateOf(e.templateId) === 'wake'),
-    ).toBe(true);
-    until(f, () => f.state()?.half === 'echoes', T.wakeCast + 1);
-    expect(f.state()?.half).toBe('echoes');
-    expect(has(b, QUENCH_AURAS.awake)).toBe(true);
-    for (const e of f.objects(QUENCH_OBJECTS.bladePrefix)) {
-      expect(bladeStateOf(e.templateId)).toBe('float');
-      expect(e.kind).toBe('object');
-      // Awake it glides, so it stands as no wall.
-      expect(e.kitObject).toBeUndefined();
-    }
-  });
-
-  it('every breath is echoed by each blade 3 s after it lands (2 s below a quarter), facing the way the guardian faced', () => {
-    for (const low of [false, true]) {
-      const f = pulled(4);
-      awake(f);
-      const b = f.boss();
-      if (low) b.hp = Math.floor(b.maxHp * 0.2);
-      f.dev('/dev heart quench breath');
-      const facing = f.state()?.bar?.facing ?? Number.NaN;
-      const echoes = f.objects(QUENCH_OBJECTS.echoPrefix);
-      expect(echoes.length).toBe(4);
-      const delay = echoDelay(low ? 0.2 : 0.6);
-      expect(delay).toBe(low ? T.echoDelayLow : T.echoDelay);
-      for (const e of echoes) {
-        expect(e.facing).toBeCloseTo(facing, 6);
-        expect(echoOf(e.templateId)).toEqual({
-          kind: 'breath',
-          seconds: Math.round((T.breathCast + delay) * 10) / 10,
-          hit: false,
-        });
-        expect(e.scale).toBe(T.echoBreathRange);
-      }
-      // A raider in front of a blade, down the breath's line.
-      const blade = blades(f)[0];
-      const victim = f.players[3];
-      f.put(victim, blade.x + Math.sin(facing) * 9, blade.z + Math.cos(facing) * 9);
-      const ev = f.tick(ticks(T.breathCast + delay) - 2);
-      expect(hitsOf(ev, QUENCH_NAMES.echoBreath, victim.id)).toEqual([]);
-      const land = f.tick(4);
-      expect(hitsOf(land, QUENCH_NAMES.echoBreath, victim.id).length).toBe(1);
-      expect(
-        f.objects(QUENCH_OBJECTS.echoPrefix).every((e) => echoOf(e.templateId)?.hit === true),
-      ).toBe(true);
-      f.tick(ticks(T.echoShow) + 2);
-      expect(f.objects(QUENCH_OBJECTS.echoPrefix)).toEqual([]);
-    }
-  });
-
-  it('turning the guardian aims the echoes: their facing follows the tank', () => {
-    const f = pulled(4);
-    awake(f);
-    const b = f.boss();
-    const tank = f.players.find((p) => p.id === b.aggroTargetId);
-    if (!tank) throw new Error('no tank');
-    const seen: { want: number; got: number }[] = [];
-    for (const [x, z] of [
-      [198, -12],
-      [208, -2],
-      [190, 8],
-    ]) {
-      f.put(tank, x, z);
-      f.tick(ticks(1));
-      f.dev('/dev heart quench breath');
-      const want = Math.atan2(tank.pos.x - b.pos.x, tank.pos.z - b.pos.z);
-      const echoes = f.objects(QUENCH_OBJECTS.echoPrefix).filter((e) => {
-        const o = echoOf(e.templateId);
-        return o?.kind === 'breath' && !o.hit;
-      });
-      expect(echoes.length).toBe(4);
-      for (const e of echoes) seen.push({ want, got: e.facing });
-      f.tick(ticks(T.breathCast + T.echoDelay + T.echoShow) + 4);
-    }
-    for (const { want, got } of seen) {
-      expect(Math.cos(got - want)).toBeGreaterThan(0.999);
-    }
-    // Three turns, three different aims.
-    expect(new Set(seen.map((v) => Math.round(v.got * 10))).size).toBe(3);
-  });
-
-  it('behind a blade, on the side away from the attack, is always safe', () => {
-    const f = pulled(5);
-    awake(f);
-    f.dev('/dev heart quench wander off');
-    f.dev('/dev heart quench breath');
-    const facing = f.state()?.bar?.facing ?? 0;
-    const blade = blades(f)[1];
-    const [, , front, behind, aside] = f.players;
-    const ux = Math.sin(facing);
-    const uz = Math.cos(facing);
-    f.put(front, blade.x + ux * 6, blade.z + uz * 6);
-    f.put(behind, blade.x - ux * 3, blade.z - uz * 3);
-    // Well behind, but out of the lee's reach: not sheltered (it may or may
-    // not stand in another echo; the rule is the lee itself).
-    f.put(aside, blade.x - ux * (T.leeR + 3), blade.z - uz * (T.leeR + 3));
-    expect(inBladeLee(blade, facing, f.local(behind))).toBe(true);
-    expect(inBladeLee(blade, facing, f.local(aside))).toBe(false);
-    const ev = f.tick(ticks(T.breathCast + T.echoDelay) + 4);
-    expect(hitsOf(ev, QUENCH_NAMES.echoBreath, front.id).length).toBeGreaterThan(0);
-    expect(hitsOf(ev, QUENCH_NAMES.echoBreath, behind.id)).toEqual([]);
-    expect(hitsOf(ev, QUENCH_NAMES.breath, behind.id)).toEqual([]);
-  });
-
-  it("Tempering Strike's swing raises a strike echo at every blade, landing 3 s later", () => {
+describe('Guardian of the Quench: phase 2', () => {
+  it('the breath strikes whoever stands in its cone; no blade shelters anyone', () => {
     const f = pulled(3);
     awake(f);
-    const ev = until(
-      f,
-      () =>
-        f.objects(QUENCH_OBJECTS.echoPrefix).some((e) => echoOf(e.templateId)?.kind === 'strike'),
-      30,
-    );
-    const echoes = f.objects(QUENCH_OBJECTS.echoPrefix);
-    expect(echoes.length).toBe(4);
-    // The same tick as the swing's cleave cue.
-    const last = ev.slice(-80);
-    expect(
-      last.some(
-        (e) => e.type === 'spellfx' && (e as { ability?: string }).ability === 'brood_cleave',
-      ),
-    ).toBe(true);
-    expect(echoOf(echoes[0].templateId)?.seconds).toBe(T.echoDelay);
-    expect(echoes[0].facing).toBeCloseTo(f.boss().facing, 1);
-    expect(echoes[0].scale).toBe(T.echoStrikeRange);
-  });
-
-  it("an echo strikes wider than the attack it repeats (Jose's playtest), the lee unchanged", () => {
-    // The pure reach: 40 degrees off the line at 12 yd is outside the
-    // guardian's own breath (70 degrees: 35 each side) but inside its echo
-    // (90: 45 each side); 25 yd down the line is past the breath's 22 and
-    // inside the echo's 28.
-    const o = { x: 0, z: 0 };
-    const off = (deg: number, d: number) => ({
-      x: Math.sin((deg * Math.PI) / 180) * d,
-      z: Math.cos((deg * Math.PI) / 180) * d,
-    });
-    const own = { range: T.breathRange, arcDeg: T.breathArcDeg };
-    const echo = echoReach('breath');
-    expect(inEchoReach(o, 0, off(40, 12), own.range, own.arcDeg)).toBe(false);
-    expect(inEchoReach(o, 0, off(40, 12), echo.range, echo.arcDeg)).toBe(true);
-    expect(inEchoReach(o, 0, off(0, 25), own.range, own.arcDeg)).toBe(false);
-    expect(inEchoReach(o, 0, off(0, 25), echo.range, echo.arcDeg)).toBe(true);
-    expect(inEchoReach(o, 0, off(50, 12), echo.range, echo.arcDeg)).toBe(false);
-    const strike = echoReach('strike');
-    expect(inEchoReach(o, 0, off(60, 10), T.strikeRange, T.strikeArcDeg)).toBe(false);
-    expect(inEchoReach(o, 0, off(60, 10), strike.range, strike.arcDeg)).toBe(true);
-    // Over the real sim: a raider 40 degrees off a blade's line, 12 yd out,
-    // is struck by its echo; one in that blade's lee is not.
-    const f = pulled(5);
-    awake(f);
-    f.dev('/dev heart quench wander off');
+    const b = f.boss();
+    const tank = f.players[0];
+    b.aggroTargetId = tank.id;
+    const from = f.local(b);
+    f.put(tank, from.x, from.z + 6);
+    f.tick(1);
     f.dev('/dev heart quench breath');
-    const facing = f.state()?.bar?.facing ?? Number.NaN;
-    const blade = blades(f)[0];
-    const [, , , wide, lee] = f.players;
-    const a = facing + (40 * Math.PI) / 180;
-    f.put(wide, blade.x + Math.sin(a) * 12, blade.z + Math.cos(a) * 12);
-    f.put(lee, blade.x - Math.sin(facing) * 3, blade.z - Math.cos(facing) * 3);
-    expect(T.leeR).toBe(5);
-    const ev = f.tick(ticks(T.breathCast + T.echoDelay) + 4);
-    expect(hitsOf(ev, QUENCH_NAMES.echoBreath, wide.id).length).toBeGreaterThan(0);
-    expect(hitsOf(ev, QUENCH_NAMES.echoBreath, lee.id)).toEqual([]);
+    const bar = f.state()?.bar;
+    expect(bar).not.toBeNull();
+    const ev = f.tick(ticks(T.breathCast) + 2);
+    expect(
+      inAttackReach(from, bar?.facing ?? 0, f.local(tank), T.breathRange, T.breathArcDeg),
+    ).toBe(true);
+    expect(hitsOf(ev, QUENCH_NAMES.breath, tank.id).length).toBe(1);
   });
 
   it('the cold deepens every 20 s once the blades wake (the soft enrage)', () => {
-    const f = pulled(2);
+    const f = pulled(3);
     awake(f);
-    f.tick(ticks(T.deepenEvery * 2) + 2);
+    expect(f.state()?.deepenStacks).toBe(0);
+    f.tick(ticks(T.deepenEvery) + 2);
+    expect(f.state()?.deepenStacks).toBe(1);
+    f.tick(ticks(T.deepenEvery));
     expect(f.state()?.deepenStacks).toBe(2);
     expect(aura(f.boss(), QUENCH_AURAS.deepening)?.stacks).toBe(2);
   });
 });
 
-describe('Guardian of the Quench: heroic, the crossing', () => {
-  it('two blades swap places along a telegraphed lane that strikes and cracks into holes', () => {
-    const f = pulled(5);
-    f.dev('/dev heart quench heroic');
-    awake(f);
-    f.dev('/dev heart quench wander off');
-    const before = blades(f);
-    f.dev('/dev heart quench dance');
-    const st = f.state();
-    if (!st?.dance) throw new Error('no crossing');
-    const [ia, ib] = CROSSING_PAIRS[st.dance.pair];
-    const lane = f.objects(QUENCH_OBJECTS.lanePrefix)[0];
-    expect(laneOf(lane.templateId)).toEqual({ state: 'warn', seconds: T.danceWarn });
-    // A raider in the lane's middle (away from the guardian's own spot).
-    const victim = f.players[4];
-    const mid = { x: (before[ia].x + before[ib].x) / 2, z: (before[ia].z + before[ib].z) / 2 };
-    const t = 0.3;
-    const on = {
-      x: before[ia].x + (before[ib].x - before[ia].x) * t,
-      z: before[ia].z + (before[ib].z - before[ia].z) * t,
-    };
-    f.put(victim, on.x, on.z);
-    expect(dist(f.local(lane), mid)).toBeLessThan(0.01);
-    f.tick(ticks(T.danceWarn) + 1);
-    const flying = f
-      .objects(QUENCH_OBJECTS.bladePrefix)
-      .filter((e) => bladeStateOf(e.templateId) === 'fly');
-    expect(flying.length).toBe(2);
-    expect(flying.every((e) => !e.kitObject)).toBe(true);
-    const ev = f.tick(ticks(T.danceFly) + 2);
-    expect(hitsOf(ev, QUENCH_NAMES.cross, victim.id).length).toBe(1);
-    // Swapped.
-    const after = blades(f);
-    expect(dist(after[ia], before[ib])).toBeLessThan(0.01);
-    expect(dist(after[ib], before[ia])).toBeLessThan(0.01);
-    for (const i of [ia, ib]) {
-      const e = f.sim.ctx.entities.get(st.blades[i].objectId);
-      expect(e && bladeStateOf(e.templateId)).toBe('float');
-    }
-    // The lane cracks, then opens into holes along it.
-    const spots = laneHoleSpots(before[ia], before[ib]);
-    expect(f.objects(QUENCH_OBJECTS.crackPrefix).length).toBe(spots.length);
-    f.tick(ticks(T.laneCrack) + 2);
-    expect(f.objects(QUENCH_OBJECTS.hole).length).toBe(spots.length);
-    expect(f.objects(QUENCH_OBJECTS.lanePrefix)).toEqual([]);
-  });
-
-  it('the blades fly eased in and out, on the one curve the painter draws (danceEase)', () => {
-    expect(danceEase(0)).toBe(0);
-    expect(danceEase(1)).toBe(1);
-    expect(danceEase(0.5)).toBeCloseTo(0.5);
-    expect(danceEase(0.1)).toBeLessThan(0.05);
-    expect(danceEase(0.9)).toBeGreaterThan(0.95);
-    const f = pulled(5);
-    f.dev('/dev heart quench heroic');
-    awake(f);
-    f.dev('/dev heart quench wander off');
-    const before = blades(f);
-    f.dev('/dev heart quench dance');
-    const st = f.state();
-    if (!st?.dance) throw new Error('no crossing');
-    const [ia, ib] = CROSSING_PAIRS[st.dance.pair];
-    f.tick(ticks(T.danceWarn) + 1);
-    const ea = f.sim.ctx.entities.get(st.blades[ia].objectId);
-    if (!ea) throw new Error('blade');
-    const span = dist(before[ia], before[ib]);
-    // Sampled every tick: slow off the mark, fastest mid-lane, slow onto it.
-    const steps: number[] = [];
-    let last = f.local(ea);
-    for (let i = 0; i < ticks(T.danceFly); i++) {
-      f.tick(1);
-      const now = f.local(ea);
-      steps.push(dist(now, last));
-      last = now;
-    }
-    const n = steps.length;
-    const mid = steps[Math.floor(n / 2)];
-    expect(steps[0]).toBeLessThan(mid * 0.3);
-    expect(steps[n - 2]).toBeLessThan(mid * 0.3);
-    expect(mid).toBeGreaterThan((span / n) * 1.3);
-    expect(dist(f.local(ea), before[ib])).toBeLessThan(0.01);
-  });
-
-  it('never crosses on normal; mythic is heroic with faster blades, behind its own switch', () => {
-    const f = pulled(2);
-    awake(f);
-    f.tick(ticks(T.danceFirst + T.danceEvery + 2));
-    expect(f.state()?.dances).toBe(0);
-    // Heroic whole, but for the blades' speed.
-    expect({
-      ...QUENCH_DIFFICULTY.mythic,
-      wanderSpeed: QUENCH_DIFFICULTY.heroic.wanderSpeed,
-    }).toEqual(QUENCH_DIFFICULTY.heroic);
-    f.dev('/dev heart quench mythic');
-    expect(f.state()?.difficulty).toBe('mythic');
-    f.dev('/dev heart quench mythic off');
-    expect(f.state()?.difficulty).toBe('normal');
-  });
-});
-
 describe('Guardian of the Quench: the wipe and the fall', () => {
-  it('a wipe puts the lake back: no bars, frost, holes, echoes or lanes, the blades sunk home, the shore ice down', () => {
+  it('a wipe puts the lake back: no bars, frost, holes, marks or lines, the blades sunk home, the shore ice down', () => {
     const f = pulled(4);
     f.dev('/dev heart quench heroic');
     f.dev('/dev heart quench hole', f.players[1].id);
     f.dev('/dev heart quench crack', f.players[2].id);
     awake(f);
     f.dev('/dev heart quench breath');
-    f.dev('/dev heart quench dance');
+    f.dev('/dev heart quench slash');
     f.tick(ticks(4));
     for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
     f.tick(ticks(3), false);
@@ -623,7 +354,6 @@ describe('Guardian of the Quench: the wipe and the fall', () => {
     for (const prefix of [
       QUENCH_OBJECTS.crackPrefix,
       QUENCH_OBJECTS.hole,
-      QUENCH_OBJECTS.echoPrefix,
       QUENCH_OBJECTS.lanePrefix,
       QUENCH_OBJECTS.rimRise,
       QUENCH_OBJECTS.rim,
@@ -647,7 +377,7 @@ describe('Guardian of the Quench: the wipe and the fall', () => {
       const at = f.local(e);
       expect(QUENCH_BLADE_SPOTS.some((s) => dist(s, at) < 0.01)).toBe(true);
     }
-    // The crossing was in flight at the wipe: still one blade per home.
+    // A blade was away from home at the wipe: still one blade per home.
     const homes = bl.map((e) => QUENCH_BLADE_SPOTS.findIndex((s) => dist(s, f.local(e)) < 0.01));
     expect(new Set(homes).size).toBe(4);
   });
@@ -662,22 +392,6 @@ describe('Guardian of the Quench: the wipe and the fall', () => {
     f.dev('/dev heart quench reset');
     for (const id of [QUENCH_AURAS.cold, QUENCH_AURAS.warmth, QUENCH_AURAS.trapped])
       expect(has(gone, id), id).toBe(false);
-  });
-
-  it('a cut breath takes its echoes with it; a landed one keeps them', () => {
-    const f = pulled(3);
-    awake(f);
-    // Breath echoes only (the template's `b_`; a strike's swing raises its own).
-    f.dev('/dev heart quench breath');
-    expect(f.objects(`${QUENCH_OBJECTS.echoPrefix}b_`).length).toBe(4);
-    f.boss().castingAbility = null;
-    const ev = f.tick(ticks(T.breathCast + 4));
-    expect(f.objects(`${QUENCH_OBJECTS.echoPrefix}b_`)).toEqual([]);
-    for (const p of f.players) expect(hitsOf(ev, QUENCH_NAMES.echoBreath, p.id)).toEqual([]);
-    f.tick(ticks(T.barGap + 1));
-    f.dev('/dev heart quench breath');
-    f.tick(ticks(T.breathCast) + 2);
-    expect(f.objects(`${QUENCH_OBJECTS.echoPrefix}b_`).length).toBe(4);
   });
 
   it("its fall lights the Quench vein and the seal's quarter; the shore ice falls and the lake refreezes", () => {

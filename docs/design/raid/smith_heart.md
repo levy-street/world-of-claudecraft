@@ -1496,7 +1496,7 @@ the bots to reuse later).
 | The swelling storm | After the barrage, every 5 s: 35 to 42 nature to everyone on the Cornice, each pulse 8 percent harder than the first, without end (a stack of `heart_breath_swelling_storm` on the guardian): the soft enrage | `breath_storm.ts` (`swellMult`) |
 | Heroic | Every number 25 percent higher, the wind 4.4 yd a second and the exhale's throw 22 yd, the Cradle wants 5, plus: Calm Spent (an anchor that ran out leaves its player unable to take another for 60 s: the raid rotates them); loose gales (three wander the Cornice on deterministic paths for 20 s after each exhale, 120 to 150 and an 11 yd toss to whoever they touch, once per player per gale in 2 s; a toss can carry a body out through a gap); storm gusts (in phase 2, every 24 s: a 2 s telegraph, then a 3.5 s gust toward a bearing, pushing like a blow, no circles). The raid has no heroic tier yet, so a dev run switches it on (`/dev heart breath heroic`) | `breath_ids.ts` (`BREATH_DIFFICULTY`) |
 | Mythic | Heroic whole, plus the Knotted Gale (next row), behind its own dev switch (`/dev heart breath mythic`); `BREATH_DIFFICULTY.mythic.stormHeart`, so Normal and Heroic do not change by one rng draw. |
-| The Knotted Gale (Mythic, `breath_heart.ts`) | A ball of compressed storm drops far from the gaps with a 20 s fuse; out of time it kills the whole raid on the Cornice, whatever shields them. Two non-tanks are marked Portal A and Portal B; after 5 s each portal opens exactly where its player stands (one who fell through a gap opens it at the lip they left). A third player steps on the ball and carries it: a quarter speed (half would let anyone walk to a gap inside the fuse: the Cornice is too small) and no wind, pull, blast or throw moves them. The carrier in Portal A comes out at Portal B (one way, nobody else), and the interact press at the lip of ANY gap throws the ball into the void. A dead carrier drops it where they fell, still ticking, free to anyone but the marked; a carrier who goes over a lip takes it along, which counts as thrown. Phase 1: from 12 s, about every 45 s, three at most, a start waiting out the indrawn breath and any spell too short for a whole fuse before it. Phase 2: two balls and one pair of portals, 15 s after the barrage and then about every 60 s, never during it. A ball alive when the storm breaks keeps ticking. Thessaly's circles do not change. |
+| The Knotted Gale (Mythic, `breath_heart.ts`) | A ball of compressed storm drops far from the gaps with a 20 s fuse; out of time it kills the whole raid on the Cornice, whatever shields them. Two non-tanks are marked Portal A and Portal B; after 5 s each portal opens exactly where its player stands (one who fell through a gap opens it at the lip they left). A third player steps on the ball and carries it: a quarter speed (half would let anyone walk to a gap inside the fuse: the Cornice is too small) and no wind, pull, blast or throw moves them.Anyone who walks into either portal comes out at the other, ball or no ball, once per walk in: one portal by the ball and one by a gap lets the carrier go out empty-handed and come back with it (the owner's change of 2026-11-01). A dead carrier drops it where they fell, still ticking, free to anyone but the marked; a carrier who goes over a lip takes it along, which counts as thrown. Phase 1: from 12 s, about every 45 s, three at most, a start waiting out the indrawn breath and any spell too short for a whole fuse before it. Phase 2: two balls and one pair of portals, 15 s after the barrage and then about every 60 s, never during it. A ball alive when the storm breaks keeps ticking. Thessaly's circles do not change. |
 | One wipe | The fight ends when the guardian stops fighting: the wind still, every circle, anchor, spent mark, pin, vortex, gale, strike, patch and cradle gone, the lifted set down, the stone body back. Thessaly stays at her post; the gaps are the Cornice's, they stay | `breath.ts` (`resetBreath`) |
 
 **Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor) for a
@@ -1539,7 +1539,7 @@ as a playable Normal and Heroic prototype: every number below is a SKETCH, unmea
 be calibrated with the meters harness. The code is `src/sim/encounters/smith_heart/
 quench*.ts` (the leaf `quench_ids.ts`: ids, rules, tuning; the geometry
 `quench_geometry.ts`, pure, for the bots to reuse later: the huddles, the holes and where a
-body climbs out, the echoes' reach, the lee behind a blade, the crossing's lanes). It
+body climbs out, the guardian's cone, a slash's line). It
 avoids the other bosses' patterns: no cover (the Council), no constant movement (the
 Breath), no walk to a spot to clear a debuff (Ignivar; the shelf's braziers stay scenery),
 no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in round holes).
@@ -1550,17 +1550,211 @@ no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in ro
 | The cold | Every player in the basin carries a cold bar (0 to 100; an aura whose `value` is the bar and `value2` its trend). Alone it rises 100 / 30 a second (full in about 30 s); within 6 yd of 2 or more other players (a huddle, the warmth aura) it falls 6 a second instead. Frozen and trapped players give no warmth | `quench_cold.ts` |
 | Encased in Rime | At full: frozen solid 4 s (an unbreakable stun; its ring shows the splash on the ice) and the bar resets. Then the ice shatters: 220 to 260 Frost to them (Shattering Cold), +25 cold to everyone within 6 yd, and Frost-Brittle (+20 percent damage taken, 15 s). A splash that fills a bar freezes that player too (a chain) | `quench_cold.ts` |
 | The ice gives way | A huddle (3+ warm players together, `huddlesOf`) strains the ice where it stands; a spot loaded 8 s (its middle within 4 yd of where it began) cracks: 2.5 s of groaning ice (its footprint at the hole's exact 3.5 yd), then a round hole of freezing water. An unloaded spot heals at half a second a second, so a group that keeps moving never breaks through. The holes stay the whole fight (past 30 the oldest skins over), so the safe ice shrinks | `quench_ice.ts` |
-| Under the Ice | A body whose middle goes inside a hole's rim (walking in, standing where one opens, a crossing's lane) falls in: held 4 s (an unbreakable root, re-applied if a class escape breaks it), 150 to 180 on the plunge and 100 to 120 each second, +30 cold (the bar stops one short of full in the water), then set on the rim 1 yd past it, with 1.5 s before the water can take it again. The water never kills on its own: its hits stop one point short (`survivableHit`). The guardian walks over the water (its own cold) | `quench_ice.ts` |
+| Under the Ice | A body whose middle goes inside a hole's rim (walking in, standing where one opens) falls in: held 4 s (an unbreakable root, re-applied if a class escape breaks it), 150 to 180 on the plunge and 100 to 120 each second, +30 cold (the bar stops one short of full in the water), then set on the rim 1 yd past it, with 1.5 s before the water can take it again. The water never kills on its own: its hits stop one point short (`survivableHit`). The guardian walks over the water (its own cold) | `quench_ice.ts` |
 | Quenching Breath | Kept: 2.5 s bar every 14 s (first at 6), planted, its 22 yd 70 degree cone locked toward the tank at the start (the tank turns it from the raid), 240 to 280 Frost and +20 cold. The record is encounter-driven now (the fight starts and lands it) | `quench_attacks.ts` |
-| Tempering Strike | Kept: the template's swing cleave (every 4th landed swing, 100 degrees, 8 yd); the fight watches for it to raise its echoes | content `arcCleave`, `quench_attacks.ts` |
-| The blades wake | At half health, a 4 s bar (planted, arms raised): the Smith's four blades of ice sunk round the lake (claim objects, round combat walls) tear free and float upright at their places, a blue light in each; objects, never bodies, so nothing can target or harm them | `quench_blades.ts` |
-| The wandering blades | Phase 2, every tier: the four blades glide round the lake on one fixed loop through their homes (`routePoint`), 1.5 yd a second on Normal and Heroic, 3.5 on Mythic (`wanderSpeed`); they no longer stand as walls. An echo follows its blade until it lands, so the lee moves too. A blade passing within 2.5 yd strikes for 120 to 150, adds 10 cold and knocks 7 yd aside, once per player per 3 s. The 12 yd of loop behind a blade are thin ice (`onThinIce`): a huddle within 3 yd of them strains the ice twice as fast. A blade held for a crossing waits until it lands, and the two swap places on the loop. On every tier a pale line shows the loop ahead of each blade and a fainter one the thin ice behind it | `quench_wander.ts`, `quench_geometry.ts`, `quench_fight_fx.ts` |
-| The echoes | Phase 2: every Quenching Breath and Tempering Strike is repeated by each standing blade 3 s after the guardian's own lands (2 s below a quarter health), from the blade's place and facing the way the guardian's attack faced (the tank aims them). All four footprints show the moment the guardian begins (the breath's bar, the strike's swing). Echo of the Breath 260 to 300 and +20 cold over 28 yd and 90 degrees (the guardian's own breath 22 yd and 70); Echo of the Strike 200 to 240 and +10 cold over 12 yd and 130 degrees (its own strike 8 yd and 100): Jose's playtest asked for bigger footprints (`QUENCH_TUNING` `echoBreathRange`, `echoBreathArcDeg`, `echoStrikeRange`, `echoStrikeArcDeg`, read by `echoReach` for the sim and the painter) | `quench_blades.ts`, `quench_attacks.ts` |
-| The lee | Behind each blade (the half disc on the side away from the way the attacks face, the blade's back to its own echo) within 5 yd is always safe: the cold breaks on the blade's ice, the guardian's own breath and every echo alike | `quench_geometry.ts` `inBladeLee` |
+| Tempering Strike | Kept: the template's swing cleave (every 4th landed swing, 100 degrees, 8 yd) | content `arcCleave`, `quench_attacks.ts` |
+| The blades wake | In two steps, each a 4 s bar (planted, arms raised): two opposite blades of the Smith's four (claim objects, round combat walls while sunk) as the shore ice stands, the other two at half health (the second half begins). They tear free and float upright at their places, a blue light in each; objects, never bodies, so nothing can harm them, and awake they are no walls | `quench_blades.ts` |
+| The slashes | The owner's change of 2026-11-01, replacing the echoes, the lee, the wandering loop and heroic's crossing, which filled a room the raid must also huddle in (the reference is Sire Denathrius's Impale). Every 20 s with two blades awake, 15 s with four, a round marks non-tanks in a hashed order: 1 then 2 on Normal, 2 then 3 on Heroic, 2 then 4 on Mythic, numbered on an aura. In turn, each mark gets a line from a blade through them and 8 yd beyond (short of the shore ice), which follows them for its warning (3 s, 2.5 s, 2 s) and locks 0.8 s before the blade flies: the marked leave the huddle to aim it clear of the raid, then step off. The 0.6 s flight strikes everyone on the line once: 300 to 350 Frost, +20 cold, a throw. The blade stays where it lands, so the next line starts somewhere new. Normal and Heroic rotate the awake blades; on Mythic one blade makes the round, each slash from where the last ended. A mark gone before the lock is skipped | `quench_slash.ts`, `slashLine` |
+| Deepening Cold (soft enrage) | Through phase 2, every 20 s the cold rises 10 percent faster, without end (a stack on the guardian) | `quench_cold.ts` |
+| Heroic | Every damage number 25 percent higher, contagious cold (a shatter splashes 10 yd and adds 45 cold, so one careless player sets off a chain) and the slashes' row above | `quench_ids.ts` (`QUENCH_DIFFICULTY`) |
+| Mythic | Heroic's numbers and the slashes' row above, behind its own dev switch (`/dev heart quench mythic`) | `quench_ids.ts` (`QUENCH_DIFFICULTY`) |
+| One wipe | The fight ends when no living member fights: every fallen member stands up whole at its place (`Entity.regrown`: no reward twice), the five columns stand whole again, the risen pillars, marks, rubble, Weight and stacks go | `council.ts` (`resetCouncil`), `council_pillars.ts` (`restorePillars`) |
+| One kill | Complete only when all three are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`) and every credit wait on all three; the risen pillars sink back into the floor | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
+| Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing. A carved column has 2 integrity (whole, then cracked) and a risen pillar 1 (`councilPillarFull`), in its template id and stands as a round combat wall (`COMBAT_WALL_SHAPES`): it blocks bodies and the Wrath's sight line, offline and online (`net/combat_wall_wire.ts`). At 0 it falls: its wall goes that tick, rubble lies 8 s and bites 90 to 110 a second, then it is gone. The columns are the field's `encounterOwned` props: the field builds no collider for them | `council_pillars.ts` |
+| Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource (the target frame draws it, the snapshot carries it); after the 4th Wrath it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
+| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see; every pillar that stood between it and at least one player loses a piece (once, however many it shielded) | `council_wrath.ts` (`landWrath`), `council_pillars.ts` (`pillarBetween`) |
+| Hammer's Weight | Every 18 s (first at 10): a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
+| Hammerfall | Kept: the frontal arc reads well and keeps the raid off the Guardian's side (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
+| Wake the Stone | Every 30 s (first at 14): a 1.2 s bar, then 1 player (2 on heroic, never more than the cap allows) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot: on the floor, 6.5 yd from another pillar, 4.5 from a council body), 120 to 150 and a throw to everyone within 3 yd | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
+| Falling Rock | Every 25 s (first at 9): a 1.2 s bar, then one player wears the soak for 5 s; 1,350 split between everyone within 6 yd (fewer than 3 under it: each takes half as much again and the whole raid takes 140 to 170, the Rockfall Tremor); every pillar within 6 yd of its face loses a piece | `council_stone.ts` |
+| Seam Bolt | Every 8 s: a 2 s kickable bar at a random player in sight, 300 to 340 nature; it lands only on a player still in sight | `council_song.ts` |
+| Song of the Seam | A 3 s kickable bar: sung out, Resonance on 3 players; kicked, on 1. Normal: it starts 1 s after a Wrath lands, so its Resonance (15 s) is over long before the next Wrath (at least 22 s away even in the soft enrage). Heroic: its own clock (first at 20, every 24), so the two overlap | `council_song.ts` |
+| Resonance | 15 s, a ring round the player; standing within 3.5 yd of a pillar's face for 3 s in a row knocks a piece off it, then the 3 s start again; nothing cleanses it (the play: hide behind the most damaged pillar at Wrath, keep off the whole ones). Not a walk-to-cleanse mark (Ignivar's Brand of the Pyre is one) | `council_song.ts` |
+| The stone remembers | When one falls, every survivor gains a stack of Memory of Stone (+15 percent damage dealt each) and takes up its job in a worse form: the Slabwright's pillars rise under RANDOM players on a locked spot with a 2 s warning (the Falling Rock stops with it); the Singer's song is sung by a survivor on 3 players and no kick stops it (the bolt stops with it); the Guardian's energy passes to a survivor (from empty) with a shorter Wrath (fills in 35 s, a 3 s bar, 380 to 450; Hammer's Weight stops with it). The heir is the first survivor in `JOB_HEIRS`; the last one carries every job | `council_scope.ts` (`jobHolder`), `council.ts` |
+| Stone Prison | Every 40 s (first at 20): a 1.5 s bar from the Slabwright, then 2 players (3 on Mythic; never its foes' tanks while anyone else stands) are stunned inside a block of stone, a real target (1,000 health, 1,200 on Mythic). Break it and its player is free, as a stasis immunity does too (the mage's Cold Coffin); 10 s later (8 on Mythic) it crushes them. It stops with the Slabwright; blocks standing still count down | `council_prison.ts`, `council_prison_fx.ts` |
+| Narrow Shelter (Heroic 4, Mythic 3) | One pillar shields only so many players from Mountain's Wrath; with more behind it each of them takes half the blast (`crowdShare`) and the raid is warned. The Echo of Wrath keeps no limit. The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`); on each standing pillar's sheltered side a row of gems, one per player it can shield, lit as they hide, red past the limit, on every tier | `council_wrath.ts`, `council_limit_fx.ts` |
+| Shouldered Stone (Mythic) | Within 10 yd of another living member (body to body) the Slabwright takes 80 percent less damage (the shared `shield_wall` ward), so one tank holds the Guardian with the Seam Singer and the other takes the Slabwright away; the other two have no such rule. A raid warning at most every 20 s. Its look: a shell of granite plates with gold cracks and an ochre thread to each member within reach, on every tier; the shell bursts into rock when it is pulled away | `council_shoulder.ts`, `council_shoulder_fx.ts` |
+| Heroic | All the above, plus Resonance overlapping the Wrath, Wake the Stone marking 2, every standing pillar pulsing 60 to 75 nature on whoever stands within 3 yd of its face every 2 s (Restless Stone), and every council number 25 percent higher. The raid has no heroic tier yet (`HEROIC_DUNGEON_IDS`), so a dev run switches it on (`/dev heart council heroic`) | `council_ids.ts` (`COUNCIL_DIFFICULTY`) |
+| Mythic | A prototype behind a dev switch until the game has a mythic tier: one more `COUNCIL_DIFFICULTY` row (see "Mythic" below) | `council_ids.ts`, `council_soul.ts` |
+
+**Health (sketch, unmeasured).** Planning raid DPS about 600 (ten players at level 20;
+Varkhul's measured adds DPS was a median of 696 on heroic), a 4.5 minute fight at about 85
+percent uptime (the Wraths, the soaks, the moves): about 137,000 after the elite factor,
+split by role: the Guardian 22,000 base (50,600), the Slabwright 19,500 (44,850), the Seam
+Singer 18,000 (41,400). The old guardian's single 32,000 (73,600) was a one-mechanic
+blockout's.
+
+**Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
+1,345 health, `docs/design/class-health-table-2026-09-11.md`) and the dungeon rework's
+bands (a must-avoid hit 35 to 45 percent, a raid pulse 8 to 15): the Wrath about 40 percent
+of a cloth pool, a full soak's share about 35 percent with 3 under it, a thin soak or a
+second Weight a fumble that does not one-shot from full on normal.
+
+Kill order is the strategy: the Guardian first leaves the energy with a survivor on a
+shorter cycle; the Slabwright first trades chosen cover for random pillars on a 2 s warning;
+the Singer first makes Resonance unstoppable on three. Every order runs to the finish
+(pinned for all six in `tests/smith_heart_council.test.ts`); survivability on normal is to be
+measured in the playtest.
+
+Role jobs: tanks swap on Hammer's Weight and keep the three off the pillars the raid needs;
+healers recover after each Wrath and each soak; damage dealers kick the Song (and the bolt),
+put the Wake marks where cover is needed and gather three for the rock away from cover;
+Resonance carriers wait out the Wrath by the most damaged pillar.
+
+IP check (2026-10-25, exact phrase plus coined token on the major game wikis): Slabwright,
+Seam Singer, Hammer Council, Hammer's Weight, Wake the Stone, Seam Bolt, Song of the Seam,
+Memory of Stone, Rockfall Tremor, Crumbled Stone and Restless Stone returned no game use
+(CLEAR); Falling Rock (already shipped by the Buried Hoards) and Resonance are generic
+English.
+
+#### Mythic: Soul in the Stone (prototype, behind a dev switch until the game has a mythic tier)
+
+Designed with the owner (2026-10-26). The game has no mythic tier, so the council's own
+difficulty gained a `'mythic'` row reached only through `/dev heart council mythic on`
+(dev-gated like `heroic`; turning one on turns the other off). No global difficulty, no
+instance selector, and normal and heroic resolve exactly as before (their tests are
+unchanged, and `tests/smith_heart_council_mythic.test.ts` pins that neither ever holds a
+soul pillar). Every number here is a SKETCH, unmeasured.
+
+| Piece | Rule | Where |
+|---|---|---|
+| Heroic and more | Everything heroic has: Resonance overlapping the Wrath, Wake the Stone marking 2, the pillars' pulse, every number 25 percent higher | `COUNCIL_DIFFICULTY.mythic` |
+| Stronger inheritances | The Slabwright fallen: the random pillars rise under 2 players on a 1.5 s warning (`heirRiseWarn`; the locked spot's template carries it, `councilRiseSpotTemplate`, so every client fills the warning to the moment it rises). The Singer fallen: the unbroken song rings on 4 (`heirSongMarks`). The Guardian fallen: the heir's energy fills in 30 s, its Wrath a 3 s bar (`heirFillSeconds`). The last one carries every job | `council_stone.ts`, `council_song.ts`, `council_wrath.ts` |
+| The rock and Resonance never stop | With the Slabwright fallen, its first living heir keeps casting Falling Rock on its timer (`rockOutlivesSlabwright`, `rockCaster`); Resonance already outlives the Singer through the song's heir. They are the only things that break a soul pillar, so a living member always supplies both (pinned for all six kill orders) | `council_stone.ts` |
+| Soul in the Stone | When a member falls, its soul flows into the most intact standing pillar (highest integrity; on a tie the nearest to the body, then the lower id; `soulHost`). With no pillar standing, a fresh one rises where the body lies to hold it. It counts toward the cap of 7 but is never refused. A second fall while one stands takes a second pillar: two soul pillars at once is the punishment | `council_soul.ts` (`takeSoul`) |
+| The soul pillar | Its template id carries the soul, the pillar's kind and its 3 soul pips (`councilSoulTemplate`), so every client draws it with no wire change. Immune to every normal blow (`crackPillar` refuses it; pillars are objects, never targetable). It shields nobody from Mountain's Wrath or the Echo (its wall still stands: a player it alone hides is struck), but it keeps its collider | `council_soul.ts`, `council_wrath.ts` |
+| Its pips | Only two things strike one off: a Falling Rock landing within 6 yd of its face, and a Resonance carrier standing within 3.5 yd of it for 3 s (the timer restarts; by the Singer's soul, 1.5 s) | `council_stone.ts`, `council_song.ts` (`strikeSoulPip`) |
+| At 0 pips | It bursts (its soul dissipates, the usual collapse and rubble) and its behaviour stops. No reward: the survivors keep their Memory of Stone and their mythic inheritance | `council_soul.ts` |
+| The end and the wipe | The last fall crumbles every soul pillar with the council (no rubble left). A wipe stands the five columns whole again (a column a soul took is a plain column again, a walked one goes back to its socket) and the risen ones go | `council_soul.ts` (`crumbleSouls`), `council_pillars.ts` (`restorePillars`) |
+| Guardian's soul: Echo of Wrath | Every 20 s (first 12 s after the soul takes the stone) the pillar's own 3 s bar (`heart_echo_of_wrath`, never kicked), then 60 percent of a Wrath's roll on every player within 45 yd with no other (soulless) pillar between them and it; each pillar that shields someone loses a piece, like the Wrath. With the energy inherited too, the raid needs cover from two sources at once | `council_soul.ts` (`landEcho`) |
+| Slabwright's soul: the Walking Slab | The pillar drags itself at 1.5 yd a second toward the largest group (the player with the most others within 8 yd, roster order on a tie; its group's centre), re-picked every 3 s, swerving round other pillars and the council's bodies and kept on the pit floor. Its wall moves with it (offline and online: the entity's position rides the snapshot and the combat-wall view follows it, its collider anchored on a half-yard grid in both worlds, `wallAnchor`, so the slot's collider index rebuilds a few times a second rather than every tick). Within 1.5 yd of its face: 380 to 440 and a throw, once per player every 1.5 s (Walking Slab); within 4 yd: 70 to 85 each second (Stone Drag). It shields nothing | `council_soul.ts` (`largestGroup`) |
+| Singer's soul: the Endless Song | A raid-wide pulse every 3 s (first 3 s after), 45 to 55 nature, each pulse 12 percent of the first louder, capped at 4 times it (`endlessSongMult`). The pulse count is a stack of an aura on the pillar and the clock to the next pulse is the pillar's own bar (`heart_endless_song`), so clients read both | `council_soul.ts` |
+
+The Resonance and Falling Rock tooltips (and the personal alert while a soul pillar stands)
+state the mythic soul-pip rule. The Echo's cover is pillars only (the Quarry floor is open, so
+no terrain hides anyone from it). Switched mid-fight (the dev lines), mythic applies whole
+(`council_soul.ts` `syncSoulsToTier`): off mythic every soul leaves its pillar, which stands
+plain, whole and quiet where it was; onto it every member already fallen takes its soul, in
+fall order, and a soul whose pillar burst is never taken again.
+
+The cover's fairness (polish pass): the line of sight is not widened. The Wrath's cover is the
+pillar's wall (radius 2.6 for a column, 2.2 for a risen pillar) and the carved column's shaft
+is only 1.5 yd round (its plinth 2.2), so a player who sees the stone between them and the
+caster is always covered, with room to spare; the Echo's (`pillarBetween`) is the wall plus a
+0.35 breath. The fix was the drawing: the shelter was a needle from the pillar's centre a full
+pillar narrower than the real shadow, and is now the real shadow.
+
+The Walking Slab's moving wall (polish pass): its half-yard anchor never held (its floor
+height and yaw changed every tick, so the slot republished and the whole field's cell index
+rebuilt every step, about 0.25 ms a tick on a ten-player claim). A walking round wall now
+anchors its height and yaw too (`combat_wall_state.ts` `wallPlacement`), and a walled list
+is indexed as its base's cells with only the walls filed over them
+(`interior_collider_cells.ts` `noteAppendedColliders`): about 0.03 ms a tick.
+
+Deterministic: every pick is ordered (integrity, distance, id; the group by roster order);
+the only rng draws are the damage rolls, in claim-player order, and only on mythic (no
+soul pillar ever stands on normal or heroic, so their draw order is untouched).
+
+The play it asks for: kill order now also decides which soul the raid carries; the soak
+and the Resonance carriers have a second duty (bring the rock and the marked to the soul
+pillar, away from the cover the Wrath and the Echo need); the Echo and the inherited Wrath
+want cover from two directions; the Walking Slab punishes a stacked raid; the Endless Song
+is a clock that only breaking its pillar stops.
+
+IP check (2026-10-26, exact phrase plus coined token on the major game wikis): Soul in the
+Stone, Echo of Wrath, Walking Slab and Endless Song returned no game use (CLEAR; the
+nearest were a Hytale "SoulStone" mod, Hearthstone's Echo keyword, Remnant 2's Ruin Slab,
+Final Fantasy's Nameless Song, all different). The grind's working name "Grinding Stone"
+sat too close to Guild Wars 2's "Grinding Stones" skill and shipped as Stone Drag (CLEAR).
+
+### 7.2 Guardian of the Breath
+
+The Storm Cornice's boss (`heart_breath_guardian`, id frozen: its death lights the Breath
+vein and the seal's quarter exactly as before), one body and two halves, with Captain
+Thessaly fighting beside the raid. Designed with the owner (2026-10-26) and built as a
+playable Normal and Heroic prototype: every number below is a SKETCH, unmeasured, to be
+calibrated with the meters harness. The code is `src/sim/encounters/smith_heart/breath*.ts`
+(the leaf `breath_ids.ts`: ids, rules, tuning; the geometry `breath_geometry.ts`, pure, for
+the bots to reuse later).
+
+| Piece | Rule | Where |
+|---|---|---|
+| The bellows breathes | From the pull, a calm of 3 s, then the wind's telegraph (2.5 s: the coming bearing drawn across the floor, the guardian turning), a 10 s blow toward one bearing across the whole Cornice, then a calm whose last 2.5 s telegraph the next bearing. The calm (telegraph included) is 5 s at full health and shortens to 3 s at half (`calmSeconds`). The bearings turn through `BLOW_BEARINGS` (182, 22, 300, 128, 332, 75: four at a gap's throat, two at a walled stretch, each a wide turn from the last), the start hashed per pull | `breath_gale.ts` |
+| The push | Every non-anchored player on the Cornice (its plateau and the climb's top inside the gate) wears the kernel's wind aura: 3.2 yd a second on normal, 4.4 on heroic and mythic (a run is 7: against the harder wind a run still gains about 2.6 yd a second, with effort; `BREATH_DIFFICULTY` `windSpeed`). The shared motion kernel adds it to the step through the same gates and collision (`src/sim/wind_drift.ts`), so a player walks against it, keeps casting while it carries them (it is no input), and both hosts step the same push: the online client PREDICTS it (only a blow's first and last ticks are ever replayed) | `breath_gale.ts`, `player_motion.ts` |
+| The rim | Where the wall stands, a body the wind presses against it (the floor ends within 1.3 yd downwind, no gap there) takes 90 to 110 nature every second (Pressed to the Rim). At a gap there is no wall: the body walks off the lip and falls into the void, on every difficulty; a body come to rest down there (a fall, or a throw that carried it over) is dead, in the fight or out of it, whatever shields it (a GM, `/dev god`, an immunity: the void finishes what the fall's hit could not, `breath_void.ts`). The guardian never follows anyone off the Cornice: a target off its floor leaves its threat table, and a step off the floor is undone (`tetherGuardian`) | `breath_gale.ts`, `breath_geometry.ts` |
+| Captain Thessaly | The Highwatch captain (an NPC, `heart_captain_thessaly`, no quests) stands at the head of the Cornice climb, inside the gate (the wind never moves her). Through the Wind half only, every 20 s (first at 9) she plants a circle of calm (3.5 yd) 12 yd upwind of the guardian for the blow now blowing or the next: a 2 s telegraph where it lands, then 6 s holding. The first three players to step in are anchored for 15 s: no wind, pull, blast or throw moves them (damage still lands). Then it reads spent. She speaks at the pull, each circle (three lines in turn), the indrawn breath, the storm, a fall, the victory and a wipe | `breath_thessaly.ts`, `breath_voice.ts` |
+| The indrawn breath | About every 45 s (first at 38), only between blows: a 5 s bar, planted, the guardian turned toward the raid (the tank aside). The wind turns and draws everyone toward it at 4 yd a second (the kernel's pull aura, stopping 3.5 yd short); a vortex 7 yd before its mouth (4.5 yd) bites 90 to 110 every half second. Then Bellows Gust (its old id: the old gust merged into the exhale), a 1.5 s bar, then 160 to 200 to everyone on the Cornice and an 18 yd throw outward, 22 on heroic and mythic (`BREATH_DIFFICULTY` `gustThrow`; the anchored keep their feet; a throw through a gap is a fall). The wind then comes back from a calm | `breath_gale.ts` |
+| Storm Lance | Kept, unchanged: the trash kit's own line (34 yd, 2.5 yd half width, every 11 s, 240 to 280), in both halves; the fight's bars wait for it | content `trashKit.line` |
+| The storm breaks | At half health, the guardian free: a 4 s bar, planted. The wind stops at once (no blow, pull or circle; the anchors already given run out), the guardian draws it in and freezes, then tears open into its body of lightning (`heart_breath_storm_unbound` on it). For 10 s a volley of strikes every 0.8 s: one on a player where they stand, one hashed over the floor (never at a gap), each a 1.6 s warning, then 320 to 380 within 3.5 yd (Breaking Storm) | `breath_storm.ts` |
+| Leaping Bolt | Phase 2, every 22 s: a 2.5 s bar at a hashed non-tank, then 240 to 280 on them, jumping to the nearest player not yet struck within 8 yd, again and again (up to nine jumps): spread | `breath_storm.ts` (`forkPath`) |
+| Thunder's Cradle | Phase 2, every 40 s: a 1.5 s bar at a hashed non-tank; they are lifted 5 yd into the storm (carried, an unbreakable stun) over a 6 yd gather circle. 6 s on, the discharge: 2,600 split between everyone under it, the lifted included. Fewer than 4 under it (5 on heroic): each share 60 percent heavier and everyone on the Cornice takes 180 to 220 (Cradle Backlash): lethal for one or two. Then they are set down | `breath_storm.ts` (`cradleShare`) |
+| Drawn Lightning | Phase 2, every 30 s: a 1 s bar at a hashed non-tank; for 10 s a strike falls where they stand every 2 s (a 1.2 s warning, 280 to 320 within 3 yd), each leaving charged ground (3 yd, 60 to 75 every second for 18 s): they walk the edge to keep the floor clean | `breath_storm.ts` |
+| The swelling storm | After the barrage, every 5 s: 35 to 42 nature to everyone on the Cornice, each pulse 8 percent harder than the first, without end (a stack of `heart_breath_swelling_storm` on the guardian): the soft enrage | `breath_storm.ts` (`swellMult`) |
+| Heroic | Every number 25 percent higher, the wind 4.4 yd a second and the exhale's throw 22 yd, the Cradle wants 5, plus: Calm Spent (an anchor that ran out leaves its player unable to take another for 60 s: the raid rotates them); loose gales (three wander the Cornice on deterministic paths for 20 s after each exhale, 120 to 150 and an 11 yd toss to whoever they touch, once per player per gale in 2 s; a toss can carry a body out through a gap); storm gusts (in phase 2, every 24 s: a 2 s telegraph, then a 3.5 s gust toward a bearing, pushing like a blow, no circles). The raid has no heroic tier yet, so a dev run switches it on (`/dev heart breath heroic`) | `breath_ids.ts` (`BREATH_DIFFICULTY`) |
+| Mythic | Heroic whole, plus the Knotted Gale (next row), behind its own dev switch (`/dev heart breath mythic`); `BREATH_DIFFICULTY.mythic.stormHeart`, so Normal and Heroic do not change by one rng draw. |
+| The Knotted Gale (Mythic, `breath_heart.ts`) | A ball of compressed storm drops far from the gaps with a 20 s fuse; out of time it kills the whole raid on the Cornice, whatever shields them. Two non-tanks are marked Portal A and Portal B; after 5 s each portal opens exactly where its player stands (one who fell through a gap opens it at the lip they left). A third player steps on the ball and carries it: a quarter speed (half would let anyone walk to a gap inside the fuse: the Cornice is too small) and no wind, pull, blast or throw moves them.Anyone who walks into either portal comes out at the other, ball or no ball, once per walk in: one portal by the ball and one by a gap lets the carrier go out empty-handed and come back with it (the owner's change of 2026-11-01). A dead carrier drops it where they fell, still ticking, free to anyone but the marked; a carrier who goes over a lip takes it along, which counts as thrown. Phase 1: from 12 s, about every 45 s, three at most, a start waiting out the indrawn breath and any spell too short for a whole fuse before it. Phase 2: two balls and one pair of portals, 15 s after the barrage and then about every 60 s, never during it. A ball alive when the storm breaks keeps ticking. Thessaly's circles do not change. |
+| One wipe | The fight ends when the guardian stops fighting: the wind still, every circle, anchor, spent mark, pin, vortex, gale, strike, patch and cradle gone, the lifted set down, the stone body back. Thessaly stays at her post; the gaps are the Cornice's, they stay | `breath.ts` (`resetBreath`) |
+
+**Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor) for a
+4.5 minute fight at about 85 percent uptime and the bot raid's measured 400 to 460 a
+second (the council's anchor): the Wind half runs to about 2.2 minutes, the Storm after.
+
+**Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
+1,345 health) and the dungeon rework's bands: the pin about 8 percent a second (leave the
+wall), the vortex about 15 percent a second (never stand before the mouth), a strike about
+30 percent (a must-avoid), the Leaping Bolt about 20 percent per player it reaches, a full
+Cradle share about 55 percent with four under it, the swell's first pulse about 3 percent
+rising without end.
+
+Role jobs: tanks keep the guardian in the middle and turn it from the raid for the indrawn
+breath; everyone walks against the blows and keeps off the walls and away from the gaps
+the wind points at; three take Thessaly's circle when the wind is strongest (on heroic in
+turns); healers recover the exhale and the Cradle; in phase 2 the raid spreads for the
+bolt, gathers under the lifted, spreads again, and the marked conductor leads the strikes
+to the edge.
+
+IP check (2026-10-27, exact phrase plus coined token on the major game wikis): Thunder's
+Cradle, Drawn Lightning, Storm Unbound, Circle of Calm, Anchored in Calm, Calm Spent, Loose
+Gale, Breath Vortex, Bellows Wind, Indrawn Breath, Pressed to the Rim, Breaking Storm and
+Cradle Backlash returned no game use (CLEAR; the nearest were Pathfinder's spell "Draw the
+Lightning", Skyrim's "Unbounded Storms", Guild Wars 2's "Gale Breath", all different).
+Swelling Storm appears only as a fan homebrew spell on a D&D blog: generic English, kept.
+The bolt's working name "Forking Bolt" sat too close to Magic: The Gathering's "Forked Bolt"
+(and its Korean fill matched the shaman's Chain Lightning) and shipped as Leaping Bolt
+(CLEAR; the nearest, Baldur's Gate 3's "Leaping Static", is different). The brief's own
+warnings were kept: no "Eye of the Storm", "Lightning Rod", "Squall Line", "Static Shock",
+"Wind Burst" or "Cyclone". Bellows Gust, Storm Lance, Charged Ground (the Buried Hoard's)
+and Captain Thessaly were already shipped.
+
+### 7.3 Guardian of the Quench
+
+The Frozen Lake's boss (`heart_quench_guardian`, id frozen: its death lights the Quench vein
+and the seal's quarter exactly as before), "together, but not for too long": warmth comes
+from huddling, and huddling breaks the ice. Designed with the owner (2026-10-27) and built
+as a playable Normal and Heroic prototype: every number below is a SKETCH, unmeasured, to
+be calibrated with the meters harness. The code is `src/sim/encounters/smith_heart/
+quench*.ts` (the leaf `quench_ids.ts`: ids, rules, tuning; the geometry
+`quench_geometry.ts`, pure, for the bots to reuse later: the huddles, the holes and where a
+body climbs out, the guardian's cone, a slash's line). It
+avoids the other bosses' patterns: no cover (the Council), no constant movement (the
+Breath), no walk to a spot to clear a debuff (Ignivar; the shelf's braziers stay scenery),
+no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in round holes).
+
+| Piece | Rule | Where |
+|---|---|---|
+| The shore ice | At the pull the lake's edge heaves up into a ring of jagged ice (28 slabs, 2.5 s rising, then oriented combat walls), so the whole fight stays on the lake's ice (the shelf's rock never cracks, and a raid could otherwise huddle on it for ever). A body still on the shelf when it closes is set down inside. It falls at a wipe and at the kill | `quench_rim.ts`, layout `QUENCH_RIMEWALL` |
+| The cold | Every player in the basin carries a cold bar (0 to 100; an aura whose `value` is the bar and `value2` its trend). Alone it rises 100 / 30 a second (full in about 30 s); within 6 yd of 2 or more other players (a huddle, the warmth aura) it falls 6 a second instead. Frozen and trapped players give no warmth | `quench_cold.ts` |
+| Encased in Rime | At full: frozen solid 4 s (an unbreakable stun; its ring shows the splash on the ice) and the bar resets. Then the ice shatters: 220 to 260 Frost to them (Shattering Cold), +25 cold to everyone within 6 yd, and Frost-Brittle (+20 percent damage taken, 15 s). A splash that fills a bar freezes that player too (a chain) | `quench_cold.ts` |
+| The ice gives way | A huddle (3+ warm players together, `huddlesOf`) strains the ice where it stands; a spot loaded 8 s (its middle within 4 yd of where it began) cracks: 2.5 s of groaning ice (its footprint at the hole's exact 3.5 yd), then a round hole of freezing water. An unloaded spot heals at half a second a second, so a group that keeps moving never breaks through. The holes stay the whole fight (past 30 the oldest skins over), so the safe ice shrinks | `quench_ice.ts` |
+| Under the Ice | A body whose middle goes inside a hole's rim (walking in, standing where one opens) falls in: held 4 s (an unbreakable root, re-applied if a class escape breaks it), 150 to 180 on the plunge and 100 to 120 each second, +30 cold (the bar stops one short of full in the water), then set on the rim 1 yd past it, with 1.5 s before the water can take it again. The water never kills on its own: its hits stop one point short (`survivableHit`). The guardian walks over the water (its own cold) | `quench_ice.ts` |
+| Quenching Breath | Kept: 2.5 s bar every 14 s (first at 6), planted, its 22 yd 70 degree cone locked toward the tank at the start (the tank turns it from the raid), 240 to 280 Frost and +20 cold. The record is encounter-driven now (the fight starts and lands it) | `quench_attacks.ts` |
+| Tempering Strike | Kept: the template's swing cleave (every 4th landed swing, 100 degrees, 8 yd) | content `arcCleave`, `quench_attacks.ts` |
+| The blades wake | In two steps, each a 4 s bar (planted, arms raised): two opposite blades of the Smith's four (claim objects, round combat walls while sunk) as the shore ice stands, the other two at half health (the second half begins). They tear free and float upright at their places, a blue light in each; objects, never bodies, so nothing can harm them, and awake they are no walls | `quench_blades.ts` |
+| The slashes | The owner's change of 2026-11-01, replacing the echoes, the lee, the wandering loop and heroic's crossing, which filled a room the raid must also huddle in (the reference is Sire Denathrius's Impale). Every 20 s with two blades awake, 15 s with four, a round marks non-tanks in a hashed order: 1 then 2 on Normal, 2 then 3 on Heroic, 2 then 4 on Mythic, numbered on an aura. In turn, each mark gets a line from a blade through them and 8 yd beyond (short of the shore ice), which follows them for its warning (3 s, 2.5 s, 2 s) and locks 0.8 s before the blade flies: the marked leave the huddle to aim it clear of the raid, then step off. The 0.6 s flight strikes everyone on the line once: 300 to 350 Frost, +20 cold, a throw. The blade stays where it lands, so the next line starts somewhere new. Normal and Heroic rotate the awake blades; on Mythic one blade makes the round, each slash from where the last ended. A mark gone before the lock is skipped | `quench_slash.ts`, `slashLine` |
 | Deepening Cold (soft enrage) | Through phase 2, every 20 s the cold rises 10 percent faster, without end (a stack on the guardian) | `quench_cold.ts` |
 | Heroic | Every damage number 25 percent higher, plus: contagious cold (a shatter splashes 10 yd and adds 45 cold, so one careless player sets off a chain) and the crossing (phase 2, every 40 s, first 20 s after the wake: two blades, a hashed pair never the same twice running, swap places in a straight line (across the lake or along its side): 3 s lane telegraph, a 1.2 s flight that strikes anyone in its 2.5 yd lane for 300 to 350 and +20 cold, then the lane cracks into holes every 7 yd) | `quench_ids.ts` `QUENCH_DIFFICULTY` |
 | Mythic | Not now: one more `QUENCH_DIFFICULTY` row, today heroic's whole, behind its own dev switch (`/dev heart quench mythic`). The seam for a mythic-only mechanic is the rules' `echoRule` (today `copy` on every tier; the candidate, true mirrors where two blades copy and two reverse by colour, is one more value) | `quench.ts` `setQuenchDevTier` |
-| One wipe | The fight ends when the guardian stops fighting: every bar, cold mark, crack, hole, echo and lane gone, the held set out of the water, the blades sunk at home, the shore ice down | `quench.ts` (`resetQuench`) |
+| One wipe | The fight ends when the guardian stops fighting: every bar, cold mark, crack, hole, slash mark and line gone, the held set out of the water, the blades sunk at home, the shore ice down | `quench.ts` (`resetQuench`) |
 | Its fall | The Quench vein and the seal's quarter light as before (seal.ts reads the guardian's death); the shore ice falls and the lake refreezes whole (every hole gone), so the walk back is safe | `quench.ts` (`finishQuench`) |
 
 **Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the
@@ -1568,23 +1762,20 @@ Breath's anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a s
 
 **Damage and cold (sketch, unmeasured).** Anchored to the level-20 cloth reference (about
 1,135 to 1,345 health): a shatter about 20 percent (plus Frost-Brittle), the water about
-55 percent over its 4 s and never lethal alone, an echo about 22 percent, the crossing
-about 27 percent. The cold rewards huddling about a third of the time: an 8 s huddle buys
+55 percent over its 4 s and never lethal alone, a slash about 27 percent. The cold rewards huddling about a third of the time: an 8 s huddle buys
 back about 14 s alone, so the raid huddles, moves, and huddles again.
 
-Role jobs: the tank keeps the guardian where its breath and, in phase 2, its echoes point
-away from the raid; everyone keeps their bar down by huddling in threes and fours and moves
-the huddle before the ice gives; nobody stands next to a frozen player; in phase 2 the
-huddles form behind the blades when an attack comes; healers cover the water and the
-shatters.
+Role jobs: the tank keeps the guardian where its breath points away from the raid; everyone
+keeps their bar down by huddling in threes and fours and moves the huddle before the ice
+gives; nobody stands next to a frozen player; the marked leave the huddle to aim their line
+clear of it, then step off; healers cover the water, the shatters and the slashes.
 
 IP check (2026-10-27, exact phrase plus coined token on the major game wikis): Quenching
-Cold, Huddled Warmth, Shattering Cold, Frost-Brittle, Deepening Cold, Crossing Blade,
-Echo of the Breath, Echo of the Strike and Encased in Rime returned no game use (CLEAR).
+Cold, Huddled Warmth, Shattering Cold, Frost-Brittle, Deepening Cold, Crossing Blade and
+Encased in Rime returned no game use (CLEAR).
 "Frozen Solid", the first name for the freeze, is a World of Warcraft boss mechanic (the
 Frostwrought Dominator's and Melidrussa Chillworn's, the former also a "stand near two
-others" rule) and was renamed Encased in Rime before shipping; "Echoed Strike" sat close to
-Diablo II's "Echoing Strike" and became Echo of the Strike. Under the Ice, Freezing Water,
+others" rule) and was renamed Encased in Rime before shipping. Under the Ice, Freezing Water,
 Groaning Ice, Open Water, Shore Ice, Smith's Blade and The Blades Wake are plain English
 (generic, kept). The brief's warnings were kept: no "Frostbite", "Flash Freeze", "Biting
 Cold", "Frost Beacon", "Unchained Magic", "Ice Tomb", "Icebound" or "Mirror Image".

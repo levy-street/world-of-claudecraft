@@ -16,9 +16,10 @@
 //     warmth, the frozen, the brittle and the trapped are auras too;
 //   - the ice: the cracks and the holes (objects, their radius in `scale`);
 //   - the Smith's four blades (claim objects, their state in the template,
-//     their place and facing on the entity), the echoes' footprints (objects
-//     at each blade, the attack's facing on the entity, the reach in
-//     `scale`), heroic's crossing lane (an object at its middle, along it);
+//     their place and facing on the entity), a slash's line (an object at its
+//     blade, the way it runs in its facing, its state and length in the
+//     template), a slash's mark (an aura: `value` its number, `value2` the
+//     round's count);
 //   - the shore ice raised round the lake (objects, combat walls once up);
 //   - the guardian's bars (cast ids below), its awake marker and the
 //     deepening cold's stacks (auras on it), the moments as `spellfx` cues.
@@ -53,6 +54,8 @@ export const QUENCH_AURAS = {
   trapped: 'heart_quench_trapped',
   /** On the guardian through phase 2: the four blades are awake. */
   awake: 'heart_quench_blades_awake',
+  /** Marked for a slash: `value` its number in the round, `value2` the round's count. */
+  marked: 'heart_quench_slash_mark',
   /** On the guardian: one stack per deepening of the cold (phase 2). */
   deepening: 'heart_quench_deepening',
 } as const;
@@ -65,10 +68,7 @@ export const QUENCH_OBJECTS = {
   hole: 'sh_quench_hole',
   /** One of the Smith's four blades: `<prefix><state>` (bladeTemplate). */
   bladePrefix: 'sh_quench_blade_',
-  /** An echo's footprint at a blade: `<prefix><b|s>_<tenths|hit>`
-   *  (echoTemplate); the attack's facing on the entity. */
-  echoPrefix: 'sh_quench_echo_',
-  /** Heroic: the crossing lane between two blades (laneTemplate). */
+  /** A slash's line, from its blade along the entity's facing (laneTemplate). */
   lanePrefix: 'sh_quench_lane_',
   /** The shore ice: rising (no wall yet), then up (a combat wall). */
   rimRise: 'sh_quench_rim_rise',
@@ -90,9 +90,7 @@ export const QUENCH_CUES = {
   climb: 'heart_quench_climb',
   /** The four blades tear free and stand (spellfx 'nova' on the guardian). */
   wake: 'heart_quench_wake',
-  /** An echo lands (spellfxAt 'burst' at its blade, radius = its reach). */
-  echo: 'heart_quench_echo',
-  /** Heroic: two blades fly across the lake (spellfxAt at the lane's middle). */
+  /** A blade flies its line (spellfxAt at the line's middle). */
   cross: 'heart_quench_cross',
   /** The shore ice heaves up round the lake (spellfx 'nova' on the guardian). */
   rim: 'heart_quench_rim',
@@ -114,8 +112,6 @@ export const QUENCH_NAMES = {
   breath: 'Quenching Breath',
   wake: 'The Blades Wake',
   awake: 'The Blades Awake',
-  echoBreath: 'Echo of the Breath',
-  echoStrike: 'Echo of the Strike',
   cross: 'Crossing Blade',
   deepening: 'Deepening Cold',
   crack: 'Groaning Ice',
@@ -127,15 +123,10 @@ export const QUENCH_NAMES = {
 // ---- difficulty -----------------------------------------------------------------------
 
 /** The fight's difficulty. Each tier is one QUENCH_DIFFICULTY row; mythic is
- *  a dev-switched prototype (quench.ts setQuenchDevTier) and, for now, the
- *  heroic row whole: a later mythic-only mechanic is one more field here and
- *  its own module, never a branch on a tier's name. */
+ *  a dev-switched prototype (quench.ts setQuenchDevTier): a mythic-only
+ *  mechanic is one more field here and its own module, never a branch on a
+ *  tier's name. */
 export type QuenchDifficulty = 'normal' | 'heroic' | 'mythic';
-
-/** How the echoes take the guardian's facing: `copy` (every blade the same
- *  way: today's rule on every tier). The mythic candidate, true mirrors (two
- *  blades copy and two reverse, by colour), is one more value here. */
-export type QuenchEchoRule = 'copy';
 
 export interface QuenchDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
@@ -143,11 +134,13 @@ export interface QuenchDifficultyRules {
   /** A shatter's splash: how far, and how much cold it adds. */
   splashR: number;
   splashCold: number;
-  /** The blades cross the lake in pairs (phase 2). */
-  dance: boolean;
-  echoRule: QuenchEchoRule;
-  /** How fast the blades glide round the lake in phase 2 (yards a second). */
-  wanderSpeed: number;
+  /** How many players a round of slashes marks, with two blades awake and with four. */
+  slashMarksLake: number;
+  slashMarksAwake: number;
+  /** A mark's warning: seconds from its line showing to its blade flying. */
+  slashAim: number;
+  /** One blade makes the whole round, each slash from where the last ended. */
+  slashChain: boolean;
 }
 
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
@@ -155,27 +148,30 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     damageMult: 1,
     splashR: 6,
     splashCold: 25,
-    dance: false,
-    echoRule: 'copy',
-    wanderSpeed: 1.5,
+    slashMarksLake: 1,
+    slashMarksAwake: 2,
+    slashAim: 3,
+    slashChain: false,
   },
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
     damageMult: 1.25,
     splashR: 10,
     splashCold: 45,
-    dance: true,
-    echoRule: 'copy',
-    wanderSpeed: 1.5,
+    slashMarksLake: 2,
+    slashMarksAwake: 3,
+    slashAim: 2.5,
+    slashChain: false,
   },
-  // Heroic with faster blades: the seam for one later mythic-only mechanic.
+  // Every round one blade, slash after slash from where the last one ended.
   mythic: {
     damageMult: 1.25,
     splashR: 10,
     splashCold: 45,
-    dance: true,
-    echoRule: 'copy',
-    wanderSpeed: 3.5,
+    slashMarksLake: 2,
+    slashMarksAwake: 4,
+    slashAim: 2,
+    slashChain: true,
   },
 };
 
@@ -196,10 +192,8 @@ export const QUENCH_TUNING = {
   shatterMax: 260,
   brittleSeconds: 15,
   brittlePct: 0.2,
-  /** Cold a hit adds: the guardian's breath and its echo, an echoed strike,
-   *  the crossing blade, a fall through the ice. */
+  /** Cold a hit adds: the guardian's breath, a slash, a fall through the ice. */
   breathCold: 20,
-  echoStrikeCold: 10,
   crossCold: 20,
   plungeCold: 30,
   // The ice (phase 1 and 2).
@@ -237,61 +231,32 @@ export const QUENCH_TUNING = {
   // At half health: the blades wake.
   wakeAt: 0.5,
   wakeCast: 4,
-  // Phase 2: the echoes.
-  /** Each echo lands this long after the guardian's own attack; below
-   *  lowAt health, sooner. */
-  echoDelay: 3,
-  echoDelayLow: 2,
-  lowAt: 0.25,
-  echoBreathMin: 260,
-  echoBreathMax: 300,
-  echoStrikeMin: 200,
-  echoStrikeMax: 240,
-  /** An echo strikes wider and further than the guardian's own attack
-   *  (Jose's playtest: the blades' footprints were too small to fear; the
-   *  lee behind a blade stays `leeR`). Its breath's echo: 28 yd and 90
-   *  degrees (the guardian's own breath 22 and 70); its strike's echo: 12
-   *  yd and 130 degrees (the strike's own 8 and 100). `echoReach` reads
-   *  them for the sim and the painter alike. */
-  echoBreathRange: 28,
-  echoBreathArcDeg: 90,
-  echoStrikeRange: 12,
-  echoStrikeArcDeg: 130,
   /** Tempering Strike: the template's swing cleave (every 4th landed swing,
-   *  its arc and reach; content/smith_heart.ts reads these), and its echo. */
+   *  its arc and reach; content/smith_heart.ts reads these). */
   strikeEvery: 4,
   strikeArcDeg: 100,
   strikeRange: 8,
-  /** Behind a blade (away from the attack), within this, is always safe. */
-  leeR: 5,
-  /** An echo's footprint stays this long after it lands (its blast). */
-  echoShow: 0.6,
   // Phase 2: the deepening cold (the soft enrage).
   deepenEvery: 20,
   deepenStep: 0.1,
-  // Heroic phase 2: the blades cross.
-  danceFirst: 20,
-  danceEvery: 40,
-  danceWarn: 3,
-  danceFly: 1.2,
+  // The slashes: seconds to the first after a wake, between rounds with two blades
+  // and with four, the line's lock before the blade flies, the flight, the breath
+  // between two slashes, how far past the mark the line runs and how far in from the
+  // shore ice it stops, its shortest, its half width, its hit and throw.
+  slashFirst: 8,
+  slashAfterWake: 6,
+  slashEveryLake: 20,
+  slashEveryAwake: 15,
+  slashLock: 0.8,
+  slashFly: 0.6,
+  slashGap: 0.6,
+  slashPast: 8,
+  slashRimMargin: 3,
+  slashMinLength: 4,
   laneHalf: 2.5,
-  // Phase 2: a gliding blade's touch (reach, damage, cold, throw, a player's
-  // seconds before it can strike them again), and the thin ice behind it.
-  wanderHitR: 2.5,
-  wanderMin: 120,
-  wanderMax: 150,
-  wanderCold: 10,
-  wanderKnock: 7,
-  wanderHitGap: 3,
-  thinIceLen: 12,
-  thinIceR: 3,
-  /** The pale line a blade draws ahead of itself on the floor (yards). */
-  frostLineLen: 10,
   crossMin: 300,
   crossMax: 350,
-  laneCrack: 2,
-  laneHoleR: 2.5,
-  laneHoleEvery: 7,
+  slashKnock: 7,
   // The shore ice.
   rimRise: 2.5,
   /** Seconds of plain melee after a bar lands before the next begins. */
@@ -300,28 +265,12 @@ export const QUENCH_TUNING = {
 
 // ---- pure helpers ---------------------------------------------------------------------
 
-/** An echo's footprint at its blade: the reach and arc it strikes (wider
- *  than the attack it repeats). The sim's hit and the painter's footprint
- *  both read this. */
-export function echoReach(kind: QuenchEchoKind): { arcDeg: number; range: number } {
-  const T = QUENCH_TUNING;
-  return kind === 'breath'
-    ? { arcDeg: T.echoBreathArcDeg, range: T.echoBreathRange }
-    : { arcDeg: T.echoStrikeArcDeg, range: T.echoStrikeRange };
-}
-
-/** The crossing's flight at linear fraction `k` (0..1) of its time: eased
- *  in and out (the blade gathers speed off its mark and settles onto the
- *  other's), so the sim's blades, the lane's hits and the painter's blade
- *  all ride one curve. Pure. */
-export function danceEase(k: number): number {
+/** A slash's flight at linear fraction `k` (0..1) of its time: eased in and
+ *  out, so the sim's blade, the line's hits and the painter's blade all ride
+ *  one curve. Pure. */
+export function slashEase(k: number): number {
   const c = Math.max(0, Math.min(1, k));
   return c * c * (3 - 2 * c);
-}
-
-/** Seconds between the guardian's attack and its echoes at `hpFrac`. */
-export function echoDelay(hpFrac: number): number {
-  return hpFrac <= QUENCH_TUNING.lowAt ? QUENCH_TUNING.echoDelayLow : QUENCH_TUNING.echoDelay;
 }
 
 /** The cold's rise multiplier with `stacks` of the deepening cold. */
@@ -361,7 +310,7 @@ export function crackOf(templateId: string): number | null {
 }
 
 /** A blade's states: sunk in the lake, waking (tearing free), floating
- *  upright, flying (heroic's crossing). */
+ *  upright, flying (a slash). */
 export type QuenchBladeState = 'sunk' | 'wake' | 'float' | 'fly';
 const BLADE_STATES: readonly QuenchBladeState[] = ['sunk', 'wake', 'float', 'fly'];
 
@@ -375,41 +324,23 @@ export function bladeStateOf(templateId: string): QuenchBladeState | null {
   return BLADE_STATES.includes(s) ? s : null;
 }
 
-/** Which attack an echo repeats: Quenching Breath's cone or Tempering
- *  Strike's arc. */
-export type QuenchEchoKind = 'breath' | 'strike';
+/** A slash's line: its warning, then the flight. */
+export type QuenchLaneState = 'warn' | 'fly';
 
-/** An echo's template: its kind and the seconds to its landing, or its blast
- *  once landed (`hit`). */
-export function echoTemplate(kind: QuenchEchoKind, seconds: number | 'hit'): string {
-  const k = kind === 'breath' ? 'b' : 's';
-  return `${QUENCH_OBJECTS.echoPrefix}${k}_${seconds === 'hit' ? 'hit' : tenthsOf(seconds)}`;
+/** A line's template: its state, that state's seconds and its length in whole yards
+ *  (the sim rounds the line to a whole length, so both read the same one). */
+export function laneTemplate(state: QuenchLaneState, seconds: number, length: number): string {
+  return `${QUENCH_OBJECTS.lanePrefix}${state}_${tenthsOf(seconds)}_${Math.round(length)}`;
 }
 
-/** An echo template's kind and seconds to land (null once it has hit). */
-export function echoOf(
+export function laneOf(
   templateId: string,
-): { kind: QuenchEchoKind; seconds: number | null; hit: boolean } | null {
-  if (!templateId.startsWith(QUENCH_OBJECTS.echoPrefix)) return null;
-  const [k, t] = templateId.slice(QUENCH_OBJECTS.echoPrefix.length).split('_');
-  const kind = k === 'b' ? 'breath' : k === 's' ? 'strike' : null;
-  if (!kind) return null;
-  if (t === 'hit') return { kind, seconds: null, hit: true };
-  const n = Number(t);
-  return Number.isInteger(n) && n >= 0 ? { kind, seconds: n / 10, hit: false } : null;
-}
-
-/** Heroic's crossing lane: its warning, the flight, its crack. */
-export type QuenchLaneState = 'warn' | 'fly' | 'crack';
-
-export function laneTemplate(state: QuenchLaneState, seconds: number): string {
-  return `${QUENCH_OBJECTS.lanePrefix}${state}_${tenthsOf(seconds)}`;
-}
-
-export function laneOf(templateId: string): { state: QuenchLaneState; seconds: number } | null {
+): { state: QuenchLaneState; seconds: number; length: number } | null {
   if (!templateId.startsWith(QUENCH_OBJECTS.lanePrefix)) return null;
-  const [state, t] = templateId.slice(QUENCH_OBJECTS.lanePrefix.length).split('_');
-  if (state !== 'warn' && state !== 'fly' && state !== 'crack') return null;
+  const [state, t, l] = templateId.slice(QUENCH_OBJECTS.lanePrefix.length).split('_');
+  if (state !== 'warn' && state !== 'fly') return null;
   const n = Number(t);
-  return Number.isInteger(n) && n >= 0 ? { state, seconds: n / 10 } : null;
+  const length = Number(l);
+  if (!Number.isInteger(n) || n < 0 || !Number.isInteger(length) || length < 0) return null;
+  return { state, seconds: n / 10, length };
 }

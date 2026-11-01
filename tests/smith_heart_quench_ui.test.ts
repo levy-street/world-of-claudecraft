@@ -29,7 +29,7 @@ describe('Guardian of the Quench: what the raid reads', () => {
     const events: SimEvent[] = [];
     f.dev('/dev heart quench pull');
     events.push(...f.tick(20 * 4));
-    // A huddle that cracks the ice, a freeze, the blades, a crossing.
+    // A huddle that cracks the ice, a freeze, the blades, the marks.
     f.put(f.players[2], 184, 14);
     f.put(f.players[3], 186, 14);
     f.put(f.players[4], 185, 16);
@@ -41,12 +41,12 @@ describe('Guardian of the Quench: what the raid reads', () => {
     events.push(...f.tick(20 * 6));
     f.dev('/dev heart quench breath');
     events.push(...f.tick(20 * 6));
-    f.dev('/dev heart quench dance');
+    f.dev('/dev heart quench slash');
     events.push(...f.tick(20 * 6));
     const mine = events.filter((e): e is Chat => e.type === 'chat' && e.pid === f.pids[0]);
     const warns = mine.filter((c) => c.channel === 'raidWarning');
     const keys = new Set(warns.map((w) => w.textKey));
-    for (const k of ['rim', 'crack', 'frozen', 'wake', 'cross'])
+    for (const k of ['rim', 'crack', 'frozen', 'wake', 'marks'])
       expect(keys, k).toContain(`hudChrome.quenchGuardian.warn.${k}`);
     for (const w of warns) {
       expect(w.textKey?.startsWith('hudChrome.quenchGuardian.warn.')).toBe(true);
@@ -96,8 +96,19 @@ describe('Guardian of the Quench: tooltips and names', () => {
     const awake = say(
       auraEffectDescriptor({ id: QUENCH_AURAS.awake, kind: 'internal_cd', value: 0 }),
     );
-    expect(awake).toContain(`${T.echoDelay} sec after`);
-    expect(awake).toContain('always safe');
+    expect(awake).toContain(`${T.slashLock} sec before`);
+    expect(awake).toContain(`${T.crossMin} to ${T.crossMax}`);
+    const marked = say(
+      auraEffectDescriptor({
+        id: QUENCH_AURAS.marked,
+        kind: 'internal_cd',
+        value: 2,
+        value2: 3,
+      }),
+    );
+    expect(marked).toContain('number 2 of 3');
+    expect(marked).toContain(`${T.slashLock} sec before`);
+    expect(marked).toContain(`${T.crossMin} to ${T.crossMax}`);
     const deep = say(
       auraEffectDescriptor({
         id: QUENCH_AURAS.deepening,
@@ -131,6 +142,19 @@ describe('Guardian of the Quench: tooltips and names', () => {
 describe('Guardian of the Quench: the cold bar over the action bar', () => {
   it('shows the bar, warns past three quarters, glows warm in a huddle, and counts the freeze and the water', () => {
     expect(buildQuenchAlertView({ auras: [] }).visible).toBe(false);
+    // A slash's mark takes the bar's place: its number and the time, under the freeze.
+    const mark = { id: QUENCH_AURAS.marked, remaining: 2, duration: 4, value: 2, value2: 3 };
+    const marked = buildQuenchAlertView({
+      auras: [{ id: QUENCH_AURAS.cold, value: 40, value2: 1 }, mark],
+    });
+    if (!marked.visible) throw new Error('hidden');
+    expect(marked.kind).toBe('marked');
+    expect(marked.title).toContain('2 of 3');
+    expect(marked.progress).toBeCloseTo(0.5);
+    const held = buildQuenchAlertView({
+      auras: [mark, { id: QUENCH_AURAS.frozen, remaining: 2, duration: 4 }],
+    });
+    expect(held.visible && held.kind).toBe('frozen');
     const rising = buildQuenchAlertView({
       auras: [{ id: QUENCH_AURAS.cold, value: 40, value2: 1 }],
     });

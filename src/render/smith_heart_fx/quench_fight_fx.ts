@@ -18,13 +18,8 @@
 //    hole of freezing water (dark deep water, a churn, a rim of broken white
 //    ice); a trapped player held to the waist in churning water; the
 //    plunge's and the climb's splashes;
-//  - the echoes: each footprint at the sim's own echo reach and arc at its
-//    blade (the shared floor telegraph in danger with a hot edge, filling to
-//    its landing; no safe ring is drawn, Jose's playtest: only the danger);
-//    landing, the guardian's own freezing gust or ice over the echo's whole
-//    reach (QuenchFx through `echoLook`);
-//  - heroic's crossing: the lane between the two blades (the shared floor
-//    telegraph), the flight's wake;
+//  - a slash: its line from the blade through the marked player (the shared floor
+//    telegraph, following them until it locks), the flight's wake;
 //  - the shore ice: slabs of jagged ice heaving up round the lake at the
 //    pull, standing through the fight, sinking and breaking at its end; the
 //    lake refreezing over its holes at the guardian's fall.
@@ -42,14 +37,8 @@ import { sfx } from '../../game/sfx';
 import { QuenchAudio } from '../../game/smith_heart_quench_audio';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
-  type QPoint,
-  routePoint,
-  routeProject,
-} from '../../sim/encounters/smith_heart/quench_geometry';
-import {
   bladeStateOf,
   crackOf,
-  echoOf,
   laneOf,
   QUENCH_AURAS,
   QUENCH_CUES,
@@ -70,8 +59,6 @@ import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   QUENCH_FIGHT_COLORS as C,
   crackLook,
-  echoFill,
-  echoShape,
   type FrostLook,
   fightHash,
   frostCrystal,
@@ -322,9 +309,6 @@ function slotFor<S extends { id: number }>(pool: S[], id: number): S | null {
   return null;
 }
 
-const _here: QPoint = { x: 0, z: 0 };
-const _there: QPoint = { x: 0, z: 0 };
-
 export class QuenchFightFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -338,17 +322,10 @@ export class QuenchFightFx {
   private readonly audio = new QuenchAudio(sfx);
   // The footprints (every tier).
   private readonly crackFans: FanSlot[] = [];
-  private readonly echoFans: FanSlot[] = [];
   private readonly splashFans: FanSlot[] = [];
   private readonly lane: TelegraphLane;
-  /** The wandering blades' floor: the loop ahead of each and the thin ice behind. */
-  private readonly aheadLanes: TelegraphLane[] = [];
-  private readonly thinLanes: TelegraphLane[] = [];
-  private readonly bladeIds: number[] = [];
-  private routeAt = 0;
   private laneId = -1;
   private laneBorn = 0;
-  private laneTemplate = '';
   // The instanced pools.
   private readonly holes: THREE.InstancedMesh;
   private readonly holeSlots: ObjectSlot[] = [];
@@ -377,9 +354,6 @@ export class QuenchFightFx {
   private guardianId = -1;
   private rosterSeen = Number.NaN;
   private origin: { x: number; z: number } | null = null;
-  private echoLook:
-    | ((kind: 'breath' | 'strike', x: number, z: number, yaw: number) => void)
-    | null = null;
   private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
   private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private scanTimer = 0;
@@ -421,22 +395,8 @@ export class QuenchFightFx {
       }
     };
     fans(P.cracks, 8, this.crackFans, 360, C.danger);
-    fans(P.echoes, 12, this.echoFans, echoShape('breath').arcDeg, C.danger);
-    for (const s of this.echoFans)
-      this.kit.layOutFan(s.fan, echoShape('breath').arcDeg, {
-        color: C.danger,
-        accent: C.dangerHot,
-      });
     fans(P.frozen, 10, this.splashFans, 360, C.danger);
     this.lane = this.kit.lane(11);
-    for (let i = 0; i < 4; i++) {
-      const ahead = this.kit.lane(9);
-      ahead.group.visible = false;
-      this.aheadLanes.push(ahead);
-      const thin = this.kit.lane(7);
-      thin.group.visible = false;
-      this.thinLanes.push(thin);
-    }
 
     // ---- the instanced floor discs ----
     const disc = new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2);
@@ -669,12 +629,6 @@ export class QuenchFightFx {
       .catch(() => {});
   }
 
-  /** The guardian's own breath and strike looks, lent by QuenchFx: an echo
-   *  landing at a blade plays the very same gust or ice. */
-  setEchoLook(fn: (kind: 'breath' | 'strike', x: number, z: number, yaw: number) => void): void {
-    this.echoLook = fn;
-  }
-
   private rand(): number {
     this.seed = (Math.imul(this.seed, 1664525) + 1013904223) | 0;
     return (this.seed >>> 0) / 4294967296;
@@ -699,7 +653,6 @@ export class QuenchFightFx {
       const r = ev.radius ?? 3;
       if (ev.ability === QUENCH_CUES.shatter) this.shatterAt(ev.x, ev.z, r);
       else if (ev.ability === QUENCH_CUES.hole) this.holeOpens(ev.x, ev.z, r);
-      else if (ev.ability === QUENCH_CUES.echo) this.echoLands(ev.x, ev.z);
       else if (ev.ability === QUENCH_CUES.cross) this.crossing(ev.x, ev.z, r);
       return true;
     }
@@ -819,7 +772,7 @@ export class QuenchFightFx {
   /** Every fight object to its slot (released when gone). */
   private assign(world: IWorld): void {
     const live = this.objectIds;
-    for (const pool of [this.crackFans, this.echoFans])
+    for (const pool of [this.crackFans])
       for (const s of pool)
         if (s.id >= 0 && !live.includes(s.id)) {
           s.id = -1;
@@ -837,26 +790,19 @@ export class QuenchFightFx {
       this.laneId = -1;
       this.lane.group.visible = false;
     }
-    this.bladeIds.length = 0;
     for (const id of live) {
       const e = world.entities.get(id);
       if (!e) continue;
       const kind = quenchObjectKind(e.templateId);
-      if (kind === 'blade' && bladeStateOf(e.templateId) === 'float') this.bladeIds.push(id);
-      if (kind === 'crack' || kind === 'echo') {
-        const pool = kind === 'crack' ? this.crackFans : this.echoFans;
-        const slot = slotFor(pool, id);
+      if (kind === 'crack') {
+        const slot = slotFor(this.crackFans, id);
         if (!slot) continue;
         if (slot.id !== id) {
           slot.id = id;
           slot.born = this.clock;
           slot.template = e.templateId;
           slot.fan.group.visible = true;
-          if (kind === 'echo') {
-            const of = echoOf(e.templateId);
-            const shape = echoShape(of?.kind ?? 'breath');
-            this.kit.layOutFan(slot.fan, shape.arcDeg, { color: C.danger, accent: C.dangerHot });
-          } else this.audio.crack(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
+          this.audio.crack(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
         } else if (slot.template !== e.templateId) {
           slot.template = e.templateId;
           slot.born = this.clock;
@@ -877,9 +823,9 @@ export class QuenchFightFx {
           this.rimFalling = -1;
         }
       } else if (kind === 'lane') {
-        if (this.laneId !== id || this.laneTemplate !== e.templateId) {
+        // A new line starts its warning over; the line following its mark does not.
+        if (this.laneId !== id) {
           this.laneId = id;
-          this.laneTemplate = e.templateId;
           this.laneBorn = this.clock;
         }
       }
@@ -890,7 +836,7 @@ export class QuenchFightFx {
     this.origin = null;
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;
-    for (const s of [...this.crackFans, ...this.echoFans, ...this.splashFans]) {
+    for (const s of [...this.crackFans, ...this.splashFans]) {
       s.id = -1;
       s.fan.group.visible = false;
     }
@@ -978,107 +924,25 @@ export class QuenchFightFx {
     this.holes.instanceMatrix.needsUpdate = true;
     this.holes.visible = h > 0;
     if (this.holes.instanceColor) this.holes.instanceColor.needsUpdate = true;
-    // The echoes' footprints (danger only: no safe ring is drawn).
-    for (const s of this.echoFans) {
-      const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
-      if (!e) continue;
-      const of = echoOf(e.templateId);
-      if (!of) continue;
-      const shape = echoShape(of.kind);
-      const y = this.groundY(e.pos.x, e.pos.z);
-      this.kit.drapeFan(s.fan, this.groundY, e.pos.x, y, e.pos.z, e.facing, shape.range);
-      if (of.hit) {
-        const fade = Math.max(0, 1 - (this.clock - s.born) / T.echoShow);
-        this.kit.paintFan(s.fan, {
-          fill: 1,
-          clock: this.clock,
-          range: shape.range,
-          fade,
-          front: 0,
-        });
-      } else {
-        const fill = echoFill(this.clock - s.born, of.seconds ?? 1);
-        this.kit.paintFan(s.fan, { fill, clock: this.clock, range: shape.range });
-      }
-    }
-    this.paintRoutes(world);
-    // Heroic's crossing lane.
+    // A slash's line, from its blade along its facing.
     const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
     const lof = lane ? laneOf(lane.templateId) : null;
     if (lane && lof && lof.state === 'warn') {
-      const half = lane.scale;
-      const ax = lane.pos.x - Math.sin(lane.facing) * half;
-      const az = lane.pos.z - Math.cos(lane.facing) * half;
       this.kit.drapeLane(
         this.lane,
         this.groundY,
-        ax,
-        this.groundY(ax, az),
-        az,
+        lane.pos.x,
+        this.groundY(lane.pos.x, lane.pos.z),
+        lane.pos.z,
         lane.facing,
-        half * 2,
+        lof.length,
         T.laneHalf,
         { color: C.danger, accent: C.accent },
       );
       const fill = Math.min(1, (this.clock - this.laneBorn) / Math.max(0.1, lof.seconds));
-      this.kit.paintLane(this.lane, { fill, clock: this.clock, range: half * 2 });
+      this.kit.paintLane(this.lane, { fill, clock: this.clock, range: lof.length });
       this.lane.group.visible = true;
     } else this.lane.group.visible = false;
-  }
-
-  /** The wandering blades' floor, on every tier (where a blade goes next and where
-   *  the ice is thin are actionable): a tenth of a second is plenty for a walk this
-   *  slow, the blade itself glides every frame. */
-  private paintRoutes(world: IWorld): void {
-    if (this.clock < this.routeAt) return;
-    this.routeAt = this.clock + 0.1;
-    const o = this.origin;
-    for (let i = 0; i < this.aheadLanes.length; i++) {
-      const e = i < this.bladeIds.length ? world.entities.get(this.bladeIds[i]) : undefined;
-      const ahead = this.aheadLanes[i];
-      const thin = this.thinLanes[i];
-      if (!e || !o) {
-        ahead.group.visible = false;
-        thin.group.visible = false;
-        continue;
-      }
-      _here.x = e.pos.x - o.x;
-      _here.z = e.pos.z - o.z;
-      const s = routeProject(_here);
-      routePoint(s + T.frostLineLen, _there);
-      this.drapeRoute(ahead, o, _here, _there, T.wanderHitR, C.accent, 0.35);
-      routePoint(s - T.thinIceLen, _there);
-      this.drapeRoute(thin, o, _here, _there, T.thinIceR, C.accent, 0.12);
-    }
-  }
-
-  private drapeRoute(
-    lane: TelegraphLane,
-    o: { x: number; z: number },
-    from: QPoint,
-    to: QPoint,
-    half: number,
-    color: number,
-    fill: number,
-  ): void {
-    const ax = o.x + from.x;
-    const az = o.z + from.z;
-    const dx = to.x - from.x;
-    const dz = to.z - from.z;
-    const length = Math.hypot(dx, dz);
-    this.kit.drapeLane(
-      lane,
-      this.groundY,
-      ax,
-      this.groundY(ax, az),
-      az,
-      Math.atan2(dx, dz),
-      length,
-      half,
-      { color, accent: color },
-    );
-    this.kit.paintLane(lane, { fill, clock: this.clock, range: length, front: 0 });
-    lane.group.visible = true;
   }
 
   // ---- the bodies: cold, warmth, the freeze, the water ----------------------------------
@@ -1442,35 +1306,7 @@ export class QuenchFightFx {
     });
   }
 
-  /** An echo landed at a blade: the guardian's own gust or ice from it. */
-  private echoLands(x: number, z: number): void {
-    const world = this.world;
-    if (!world || !this.echoLook) return;
-    let best: Entity | null = null;
-    let bestD = 2;
-    for (const id of this.objectIds) {
-      const e = world.entities.get(id);
-      if (!e || !echoOf(e.templateId)) continue;
-      const d = Math.hypot(e.pos.x - x, e.pos.z - z);
-      if (d < bestD) {
-        bestD = d;
-        best = e;
-      }
-    }
-    // The object may have arrived after the scan: look it up from the roster.
-    if (!best)
-      for (const e of world.entities.values()) {
-        if (e.kind !== 'object' || !echoOf(e.templateId)) continue;
-        const d = Math.hypot(e.pos.x - x, e.pos.z - z);
-        if (d < bestD) {
-          bestD = d;
-          best = e;
-        }
-      }
-    const of = best ? echoOf(best.templateId) : null;
-    if (best && of) this.echoLook(of.kind, x, z, best.facing);
-  }
-
+  /** A blade flies its line. */
   private crossing(x: number, z: number, half: number): void {
     const y = this.groundY(x, z);
     this.particles.shockRing(x, z, 0xbfeaff, half, 0.8);

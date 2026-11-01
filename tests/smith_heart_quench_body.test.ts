@@ -5,7 +5,7 @@
 // one-shots map to their motions, every pose and the fall are finite; the
 // fight's objects decode to their kinds, the frost on a body follows the cold
 // bar, the cracks fill to their hole, the blades tear free and float, the
-// echoes wear the attack's exact shape, the warmth's threads stay within the
+// the warmth's threads stay within the
 // sim's reach, and the shore ice rises once.
 
 import { readFileSync } from 'node:fs';
@@ -38,7 +38,6 @@ import {
   BLADE_TIP,
   bladeLook,
   crackLook,
-  echoShape,
   frostLook,
   frozenLook,
   QUENCH_FIGHT_POOLS,
@@ -54,8 +53,6 @@ import { QUENCH_RIMEWALL } from '../src/sim/content/smith_heart_layout';
 import {
   bladeTemplate,
   crackTemplate,
-  echoReach,
-  echoTemplate,
   laneTemplate,
   QUENCH_AURAS,
   QUENCH_CASTS,
@@ -212,9 +209,7 @@ describe('quench_fight_fx_core: the fight on the ice', () => {
   it("decodes every one of the fight's objects to its kind, and nothing else", () => {
     expect(quenchObjectKind(crackTemplate(2.5))).toBe('crack');
     expect(quenchObjectKind(QUENCH_OBJECTS.hole)).toBe('hole');
-    expect(quenchObjectKind(echoTemplate('breath', 3))).toBe('echo');
-    expect(quenchObjectKind(echoTemplate('strike', 'hit'))).toBe('echo');
-    expect(quenchObjectKind(laneTemplate('warn', 3))).toBe('lane');
+    expect(quenchObjectKind(laneTemplate('warn', 3, 12))).toBe('lane');
     expect(quenchObjectKind(QUENCH_OBJECTS.rim)).toBe('rim');
     expect(quenchObjectKind(QUENCH_OBJECTS.rimRise)).toBe('rimRise');
     expect(quenchObjectKind(bladeTemplate('float'))).toBe('blade');
@@ -223,7 +218,7 @@ describe('quench_fight_fx_core: the fight on the ice', () => {
   });
 
   it('claims its own cues and leaves the rest to the generic bursts', () => {
-    for (const cue of [QUENCH_CUES.freeze, QUENCH_CUES.shatter, QUENCH_CUES.echo, QUENCH_CUES.rim])
+    for (const cue of [QUENCH_CUES.freeze, QUENCH_CUES.shatter, QUENCH_CUES.cross, QUENCH_CUES.rim])
       expect(quenchFightClaims(cue), cue).toBe(true);
     expect(quenchFightClaims('frostbolt')).toBe(false);
     expect(quenchFightClaims(null)).toBe(false);
@@ -272,21 +267,6 @@ describe('quench_fight_fx_core: the fight on the ice', () => {
       expect(f.upright).toBe(1);
       expect(Math.abs(f.lift - (BLADE_TIP + BLADE_FLOAT_LIFT))).toBeLessThanOrEqual(0.25);
     }
-  });
-
-  it("draws each echo at the sim's own echo reach, clearly wider than the attack's", () => {
-    // The painter and the sim read one table (quench_ids.ts echoReach).
-    expect(echoShape('breath')).toEqual({ arcDeg: T.echoBreathArcDeg, range: T.echoBreathRange });
-    expect(echoShape('strike')).toEqual({ arcDeg: T.echoStrikeArcDeg, range: T.echoStrikeRange });
-    expect(echoShape('breath')).toEqual(echoReach('breath'));
-    expect(echoShape('strike')).toEqual(echoReach('strike'));
-    // Jose's playtest: bigger than before (the guardian's own 22 yd 70 deg,
-    // 8 yd 100 deg), and the lee stays 5.
-    expect(T.echoBreathRange).toBe(28);
-    expect(T.echoBreathArcDeg).toBe(90);
-    expect(T.echoStrikeRange).toBe(12);
-    expect(T.echoStrikeArcDeg).toBe(130);
-    expect(T.leeR).toBe(5);
   });
 
   it("threads warmth only between bodies within the sim's reach, capped", () => {

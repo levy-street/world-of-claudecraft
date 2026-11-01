@@ -4753,7 +4753,7 @@ export const en: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
         "draw": "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.",
         "pinned": "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
@@ -4770,7 +4770,8 @@ export const en: EnTranslations = {
         "frozen": "Encased in rime: you cannot act. When it ends the ice shatters: you take {min} to {max} Frost damage and become Frost-Brittle, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).",
         "brittle": "Takes {pct}% more damage from all sources.",
         "trapped": "Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you.",
-        "awake": "The Smith's four blades are awake. {delay} sec after each Quenching Breath and Tempering Strike lands ({low} sec below {lowPct}% health), every blade repeats it from where it floats, facing the same way. Behind a blade, on the side away from the attack, is always safe.",
+        "awake": "The Smith's four blades are awake. Each round more players are marked, and a blade flies down a line through each in turn. It locks {lock} sec before the blade flies, then strikes anyone on it for {min} to {max} Frost damage, adds {cold} cold and throws them.",
+        "marked": "You are number {order} of {count}: a blade will fly down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies, so step off then, or take {min} to {max} Frost damage, {cold} cold and a throw.",
         "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far)."
       },
       "heatGuardian": {
@@ -7350,7 +7351,7 @@ export const en: EnTranslations = {
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7403,22 +7404,23 @@ export const en: EnTranslations = {
         "rim": "The shore ice heaves up! Get onto the lake!",
         "frozen": "{player} is frozen solid! Step away before the ice shatters!",
         "crack": "The ice groans under the huddle! Move apart!",
-        "wake": "The Smith's blades tear free of the lake! Stand behind a blade when they strike!",
-        "cross": "Two blades cross the lake! Clear their path!"
+        "wake": "The Smith's blades tear free of the lake! Watch where they aim!",
+        "marks": "The blades mark {list}! Lead them clear of the raid!"
       },
       "say": {
         "pull": "Warm blood on my lake. It will not stay warm for long.",
         "shatter": "Frozen through. Now break.",
         "hole": "The ice remembers every step. Stand together, and it gives.",
-        "wake": "Blades of the Smith, wake! Answer every blow I strike!",
-        "echo": "Whatever I strike, they strike again.",
-        "cross": "Cross, blades! Cut them a new shore!",
+        "wake": "Blades of the Smith, wake! Hunt them across the ice!",
+        "cross": "Go, blades! Cut them from the warmth!",
         "deepen": "Feel it? The cold is going deeper.",
         "wipe": "Still. Silent. Quenched.",
         "death": "The cold... lets go... The Quench is yours."
       }
     },
     "quenchAlert": {
+      "markedTitle": "A blade hunts you! ({order} of {count})",
+      "markedLine": "Lead its line away from the raid, then step off when it locks.",
       "coldTitle": "Cold",
       "freezingTitle": "Freezing!",
       "warmTitle": "Huddled warmth",

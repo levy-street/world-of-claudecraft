@@ -1640,8 +1640,6 @@ const baseEnTable = {
   'mechanic.heartFreezingWater': 'Freezing Water',
   'aura.heartUnderTheIce': 'Under the Ice',
   'aura.heartBladesAwake': 'The Blades Awake',
-  'mechanic.heartEchoOfTheBreath': 'Echo of the Breath',
-  'mechanic.heartEchoOfTheStrike': 'Echo of the Strike',
   'mechanic.heartCrossingBlade': 'Crossing Blade',
   'aura.heartDeepeningCold': 'Deepening Cold',
   // The Guardian of the Heat (encounters/smith_heart/heat_ids.ts HEAT_NAMES):
@@ -27016,8 +27014,6 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Freezing Water': 'mechanic.heartFreezingWater',
   'Under the Ice': 'aura.heartUnderTheIce',
   'The Blades Awake': 'aura.heartBladesAwake',
-  'Echo of the Breath': 'mechanic.heartEchoOfTheBreath',
-  'Echo of the Strike': 'mechanic.heartEchoOfTheStrike',
   'Crossing Blade': 'mechanic.heartCrossingBlade',
   'Deepening Cold': 'aura.heartDeepeningCold',
   'The First Wellspring': 'mechanic.heartFirstWellspring',

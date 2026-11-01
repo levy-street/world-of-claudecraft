@@ -13,25 +13,27 @@
 //                      the holes stay, so the raid keeps moving its huddles.
 //                      Quenching Breath and Tempering Strike stay
 //                      (quench_attacks.ts).
-//   The blades wake    at half health the Smith's four blades tear free and
-//                      float upright round the lake (quench_blades.ts).
-//   The Echoes (50-0)  every breath and strike is repeated by each blade 3 s
-//                      later (2 s below a quarter), facing the way the
-//                      guardian's did: behind a blade is always safe. The
-//                      cold deepens every 20 s (the soft enrage).
-//   Heroic             the blades cross the lake in pairs (their lane strikes
-//                      and cracks into holes); a shatter splashes further
-//                      and harder (contagious cold).
+//   The blades wake    two of the Smith's four blades tear free as the fight
+//                      begins, the other two at half health (quench_blades.ts).
+//   The slashes        every so often the awake blades mark players, in order,
+//                      and fly at each down a line that follows them until it
+//                      locks (quench_slash.ts): more marks with four blades
+//                      awake, and on heroic.
+//   Phase 2 (50-0)     all four blades awake; the cold deepens every 20 s (the
+//                      soft enrage).
+//   Heroic             a shatter splashes further and harder (contagious cold).
+//   Mythic             one blade makes a whole round, each slash from where the
+//                      last one ended.
 //   One wipe           the fight ends when the guardian stops fighting: every
-//                      bar, frost, crack, hole, echo and lane gone, the held
+//                      bar, frost, crack, hole, mark and line gone, the held
 //                      climbed out, the blades sunk home, the shore ice down.
 //   Its fall           lights the Quench vein and the seal's quarter as
 //                      before (seal.ts reads the guardian's death); the shore
 //                      ice falls and the lake refreezes whole.
 //
 // Difficulty: the claim's, with a dev switch for a run while the raid has no
-// heroic tier of its own; mythic is a prototype behind its own switch and,
-// for now, heroic whole (quench_ids.ts QUENCH_DIFFICULTY).
+// heroic tier of its own; mythic is a prototype behind its own switch
+// (quench_ids.ts QUENCH_DIFFICULTY).
 //
 // Deterministic: every pick is hashed or ordered; the only rng draws are the
 // damage rolls, in claim-player order. Every visible state rides existing
@@ -43,19 +45,17 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
-import { landBreath, startBreath, watchStrike } from './quench_attacks';
+import { landBreath, startBreath } from './quench_attacks';
 import {
   bladesAtHome,
   claimBlades,
   clearBladeMarks,
   clearBlades,
-  dropBarEchoes,
   ensureBladeWalls,
+  firstWakeDue,
   landWake,
-  spawnEchoes,
-  startCrossing,
+  setBladeObject,
   startWake,
-  stepBlades,
   wakeDue,
 } from './quench_blades';
 import {
@@ -87,6 +87,7 @@ import {
   living,
   type QuenchScope,
 } from './quench_scope';
+import { clearSlashes, startSlashes, stepSlashes } from './quench_slash';
 import type { QuenchFightState } from './quench_state';
 import { quenchSay } from './quench_voice';
 
@@ -144,7 +145,6 @@ function freshState(
     bar: null,
     gap: 0,
     breathTimer: T.breathFirst,
-    cleaveSeen: boss.swingCleaveCount ?? 0,
     rim: { ids: [], rising: 0 },
     chill: {},
     strain: [],
@@ -153,14 +153,11 @@ function freshState(
     trapped: {},
     grace: {},
     blades: bladesAtHome(ctx, inst),
-    echoes: [],
     deepenTimer: T.deepenEvery,
     deepenStacks: 0,
-    wanderOff: false,
-    danceTimer: T.danceFirst,
-    dances: 0,
-    lastPair: -1,
-    dance: null,
+    slashTimer: T.slashFirst,
+    slashes: 0,
+    slash: null,
     casts: 0,
     said: {},
   };
@@ -191,8 +188,6 @@ function landBar(s: QuenchScope): void {
   s.st.gap = T.barGap;
   if (bar.castId === QUENCH_CASTS.breath) {
     landBreath(s, bar.facing);
-    // Its echoes are past the bar now: nothing can take them back.
-    for (const ec of s.st.echoes) delete ec.ofBar;
   } else if (bar.castId === QUENCH_CASTS.wake) landWake(s);
 }
 
@@ -206,10 +201,8 @@ function stepBar(s: QuenchScope): void {
   if (b.castingAbility !== bar.castId) {
     s.st.bar = null;
     s.st.gap = T.barGap;
-    // The awakening always completes (a cut bar never strands the blades);
-    // a cut breath takes its echoes with it.
+    // The awakening always completes (a cut bar never strands the blades).
     if (bar.castId === QUENCH_CASTS.wake) landWake(s);
-    else if (bar.castId === QUENCH_CASTS.breath) dropBarEchoes(s);
     return;
   }
   holdPlanted(s);
@@ -227,6 +220,10 @@ function stepBar(s: QuenchScope): void {
 function startBars(s: QuenchScope): void {
   s.st.breathTimer -= DT;
   const free = guardianFree(s);
+  if (s.st.clock >= T.rimRise && firstWakeDue(s, free)) {
+    startWake(s);
+    return;
+  }
   if (wakeDue(s, free)) {
     startWake(s);
     return;
@@ -254,6 +251,7 @@ function clearFight(
       dropAura(p, QUENCH_AURAS.trapped);
     }
     clearIce({ ctx, inst, st });
+    clearSlashes({ ctx, inst }, st);
     clearBlades(ctx, inst, st);
     dropRim(ctx, inst, st);
     st.chill = {};
@@ -339,10 +337,9 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   st.clock += DT;
   stepRim(s);
   stepBar(s);
-  watchStrike(s);
   stepCold(s);
   stepIce(s);
-  stepBlades(s);
+  stepSlashes(s);
   stepDeepening(s);
   startBars(s);
 }
@@ -369,9 +366,14 @@ function cutBar(s: QuenchScope): void {
 
 /** Wake the blades at once (no bar), for a dev trigger that needs them. */
 function wakeNow(s: QuenchScope): void {
-  if (s.st.half === 'echoes') return;
+  if (s.st.half === 'awake') return;
   cutBar(s);
   s.boss.castingAbility = null;
+  s.st.half = 'wake';
+  for (const b of s.st.blades) {
+    const e = s.ctx.entities.get(b.objectId);
+    if (e && !b.awake) setBladeObject(e, 'wake');
+  }
   landWake(s);
 }
 
@@ -417,13 +419,20 @@ export function quenchDevTrigger(
     s.boss.hp = Math.min(s.boss.hp, Math.floor(s.boss.maxHp * T.wakeAt));
     cutBar(s);
     s.boss.castingAbility = null;
+    // The first two up now if the fight has not raised them; the bar is the others'.
+    if (!s.st.blades.some((b) => b.awake)) {
+      startWake(s);
+      cutBar(s);
+      s.boss.castingAbility = null;
+      landWake(s);
+    }
     startWake(s);
-    return 'The guardian raises its arms: the blades tear free (the guardian at half health).';
+    return 'The guardian raises its arms: the other blades tear free (the guardian at half health).';
   }
   if (verb === 'blades' || verb === 'wake') {
-    if (s.st.half === 'echoes') return 'The blades are already awake.';
+    if (s.st.half === 'awake') return 'The blades are already awake.';
     wakeNow(s);
-    return 'The four blades stand awake round the lake.';
+    return 'All four blades stand awake round the lake.';
   }
   if (verb === 'breath') {
     cutBar(s);
@@ -431,25 +440,9 @@ export function quenchDevTrigger(
     startBreath(s);
     return 'Quenching Breath.';
   }
-  if (verb === 'echo') {
-    if (s.st.half !== 'echoes') wakeNow(s);
-    if (arg === 'strike') {
-      const n = spawnEchoes(s, 'strike', s.boss.facing, T.echoDelay);
-      return `Tempering Strike echoes at ${n} blades in ${T.echoDelay} s.`;
-    }
-    cutBar(s);
-    s.boss.castingAbility = null;
-    startBreath(s);
-    return 'Quenching Breath, and every blade echoes it.';
-  }
-  if (verb === 'wander') {
-    s.st.wanderOff = arg === 'off';
-    return s.st.wanderOff ? 'The blades hold still.' : 'The blades glide.';
-  }
-  if (verb === 'dance' || verb === 'cross') {
-    if (s.st.half !== 'echoes') wakeNow(s);
-    s.st.dance = null;
-    return startCrossing(s) ? 'Two blades cross the lake.' : 'The blades cannot cross now.';
+  if (verb === 'slash') {
+    if (!s.st.blades.some((b) => b.awake)) wakeNow(s);
+    return startSlashes(s) ? 'The blades mark their targets.' : 'A round is under way already.';
   }
   if (!me || me.dead) return 'You are not standing on the lake.';
   const here = at(s, me);

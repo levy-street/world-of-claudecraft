@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest';
 // aura's value and trend), the huddle's warmth, the freeze and the water
 // (auras), the shore ice's slabs, the cracks and the holes (objects, their
 // radius in scale), the Smith's four blades (their state in the template,
-// their place and facing), the echoes' footprints (the attack's facing and
-// reach), heroic's crossing lane and the blades in flight. This drives the
+// their place and facing), a slash's line (its facing and its length in the
+// template), its mark and the blade in flight. This drives the
 // REAL server snapshot path into the real online mirror (ClientWorld, on the
 // browser's stable timer wire) and checks each one arrives. Db is mocked so no
 // Postgres runs (mirrors afk_wire.test.ts).
@@ -26,9 +26,9 @@ vi.mock('../server/db', () => ({
 import { GameServer } from '../server/game';
 import {
   bladeStateOf,
-  echoOf,
   laneOf,
   QUENCH_AURAS,
+  QUENCH_DIFFICULTY,
   QUENCH_GUARDIAN,
   QUENCH_OBJECTS,
   QUENCH_TUNING as T,
@@ -57,7 +57,7 @@ function joinAt(server: Any, id: number, name: string, stable: boolean) {
 }
 
 describe('the Guardian of the Quench over the wire', () => {
-  it('reaches the online mirror: the cold, the ice, the water, the blades, the echoes and the crossing', () => {
+  it('reaches the online mirror: the cold, the ice, the water, the blades and the slashes', () => {
     const saved = process.env.ALLOW_DEV_COMMANDS;
     process.env.ALLOW_DEV_COMMANDS = '1';
     let server: Any;
@@ -138,10 +138,10 @@ describe('the Guardian of the Quench over the wire', () => {
     // The climb out lands where the server put it.
     expect(Math.hypot(me().pos.x - serverMe.pos.x, me().pos.z - serverMe.pos.z)).toBeLessThan(0.5);
 
-    // The blades: sunk, then awake and floating.
-    expect(objects(QUENCH_OBJECTS.bladePrefix).map((e: Any) => bladeStateOf(e.templateId))).toEqual(
-      ['sunk', 'sunk', 'sunk', 'sunk'],
-    );
+    // The blades: two up with the pull, the rest sunk, then all four floating.
+    const states = objects(QUENCH_OBJECTS.bladePrefix).map((e: Any) => bladeStateOf(e.templateId));
+    expect(states.filter((x: Any) => x === 'float').length).toBe(2);
+    expect(states.filter((x: Any) => x === 'sunk').length).toBe(2);
     sim.chat('/dev heart quench blades', a.pid);
     run(0.5);
     for (const e of objects(QUENCH_OBJECTS.bladePrefix))
@@ -149,43 +149,31 @@ describe('the Guardian of the Quench over the wire', () => {
     const boss = onClient((e) => e.kind === 'mob' && e.templateId === QUENCH_GUARDIAN)[0];
     expect(aura(boss, QUENCH_AURAS.awake)).toBeDefined();
 
-    // An echoed breath: four footprints, the guardian's facing, the reach.
-    sim.chat('/dev heart quench breath', a.pid);
-    run(0.3);
-    const serverBoss = sim.entities.get(boss.id);
-    const facing = serverBoss.smithHeartQuench.bar.facing;
-    const echoes = objects(QUENCH_OBJECTS.echoPrefix).filter(
-      (e: Any) => echoOf(e.templateId)?.kind === 'breath',
-    );
-    expect(echoes.length).toBe(4);
-    for (const e of echoes) {
-      expect(e.facing).toBeCloseTo(facing, 1);
-      expect(e.scale).toBe(T.echoBreathRange);
-    }
-    run(T.breathCast + T.echoDelay + 0.2);
-    expect(
-      objects(QUENCH_OBJECTS.echoPrefix).some((e: Any) => echoOf(e.templateId)?.hit === true),
-    ).toBe(true);
-
-    // Heroic's crossing: the lane, the blades in flight and their swap.
-    sim.chat('/dev heart quench heroic', a.pid);
-    sim.chat('/dev heart quench dance', a.pid);
+    // A slash: the mark's number on its aura, the line turning with its mark, then
+    // the blade in flight on the client, and the line gone once it lands.
+    // (A round the fight's own clock began stands in the way: let it finish.)
+    const fight = sim.entities.get(boss.id).smithHeartQuench;
+    while (fight.slash) run(0.2);
+    fight.slashTimer = 999;
+    sim.chat('/dev heart quench slash', a.pid);
     run(0.3);
     const lane = objects(QUENCH_OBJECTS.lanePrefix)[0];
-    expect(laneOf(lane.templateId)?.state).toBe('warn');
-    run(T.danceWarn + 0.3);
+    const lof = laneOf(lane.templateId);
+    expect(lof?.state).toBe('warn');
+    expect(lof?.length).toBeGreaterThanOrEqual(T.slashMinLength);
+    const round = fight.slash;
+    const serverLane = sim.entities.get(round.laneId);
+    expect(lane.facing).toBeCloseTo(serverLane.facing, 1);
+    const markId = round.marks[0];
+    const marked = onClient((e) => e.id === markId)[0];
+    expect(aura(marked, QUENCH_AURAS.marked)?.value).toBe(1);
+    run(QUENCH_DIFFICULTY.normal.slashAim - 0.1);
     const flying = objects(QUENCH_OBJECTS.bladePrefix).filter(
       (e: Any) => bladeStateOf(e.templateId) === 'fly',
     );
-    expect(flying.length).toBe(2);
-    const p0 = { ...flying[0].pos };
-    run(0.4);
-    expect(Math.hypot(flying[0].pos.x - p0.x, flying[0].pos.z - p0.z)).toBeGreaterThan(2);
-    const serverBlade = sim.entities.get(flying[0].id);
-    expect(
-      Math.hypot(flying[0].pos.x - serverBlade.pos.x, flying[0].pos.z - serverBlade.pos.z),
-    ).toBeLessThan(2.5);
-    run(T.danceFly + T.laneCrack + 0.5);
+    expect(flying.length).toBe(1);
+    expect(laneOf(objects(QUENCH_OBJECTS.lanePrefix)[0].templateId)?.state).toBe('fly');
+    run(T.slashFly + 0.3);
     expect(objects(QUENCH_OBJECTS.lanePrefix)).toEqual([]);
     for (const e of objects(QUENCH_OBJECTS.bladePrefix))
       expect(bladeStateOf(e.templateId)).toBe('float');

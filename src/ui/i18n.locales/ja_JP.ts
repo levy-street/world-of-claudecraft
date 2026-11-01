@@ -22692,15 +22692,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.warn.rim': '岸の氷がせり上がる！湖の上へ移れ！',
   'hudChrome.quenchGuardian.warn.frozen': '{player}が凍りついた！氷が砕ける前に離れろ！',
   'hudChrome.quenchGuardian.warn.crack': '固まった集団の下で氷がきしむ！散らばれ！',
-  'hudChrome.quenchGuardian.warn.wake':
-    '鍛冶師の剣が湖から引き抜かれた！打ち込まれる時は剣の陰に立て！',
-  'hudChrome.quenchGuardian.warn.cross': '二本の剣が湖を横切る！その進路から離れろ！',
+  'hudChrome.quenchGuardian.warn.marks': '剣が{list}を狙う！レイドから離れて引きつけろ！',
+  'hudChrome.auraEffect.quenchGuardian.marked':
+    'あなたは{count}人中{order}番目だ。剣があなたを貫く線を飛んでくる。線をレイドから離せ。線は剣が飛ぶ{lock}秒前に固定されるので、その時に線から外れないと{min}から{max}の冷気ダメージと冷え{cold}を受けて吹き飛ばされる。',
+  'hudChrome.quenchAlert.markedTitle': '剣があなたを狙っている！({count}人中{order}番目)',
+  'hudChrome.quenchAlert.markedLine': '線をレイドから離し、固定されたら線から外れろ。',
+  'hudChrome.quenchGuardian.warn.wake': '鍛冶師の剣が湖から解き放たれる！狙いを見極めろ！',
   'hudChrome.quenchGuardian.say.pull': '我が湖に温かい血か。その温もりも長くは続かぬ。',
   'hudChrome.quenchGuardian.say.shatter': '芯まで凍った。さあ、砕けよ。',
   'hudChrome.quenchGuardian.say.hole': '氷はすべての足音を覚えている。寄り集まれば、崩れる。',
-  'hudChrome.quenchGuardian.say.wake': '鍛冶師の剣よ、目覚めよ！我が一撃のすべてに応えよ！',
-  'hudChrome.quenchGuardian.say.echo': '我が打つものは、剣もまた打つ。',
-  'hudChrome.quenchGuardian.say.cross': '交われ、剣よ！奴らに新たな岸を刻め！',
+  'hudChrome.quenchGuardian.say.wake': '鍛冶師の剣よ、目覚めよ！氷の上で奴らを狩れ！',
+  'hudChrome.quenchGuardian.say.cross': '行け、剣よ！奴らを温もりから切り離せ！',
   'hudChrome.quenchGuardian.say.deepen': '感じるか？冷気がさらに深くなっていく。',
   'hudChrome.quenchGuardian.say.wipe': '静まり、黙し、焼き入れられた。',
   'hudChrome.quenchGuardian.say.death': '冷気が……離れていく……焼き入れはお前たちのものだ。',
@@ -22714,7 +22716,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    '鍛冶師の四本の剣が目覚めている。焼き入れの吐息と焼き戻しの一撃が決まるたび、{delay}秒後（体力{lowPct}%未満では{low}秒後）に、すべての剣が浮かぶ場所から同じ向きでそれを繰り返す。剣の陰、攻撃と反対側は常に安全だ。',
+    '鍛冶師の四本の剣が目覚めている。戦いの中で複数のプレイヤーが印を受け、剣がそれぞれを貫く線を順に飛ぶ。線は剣が飛ぶ{lock}秒前に固定され、線上の者に{min}から{max}の冷気ダメージを与え、冷え{cold}を加えて吹き飛ばす。',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     '湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。',
   'abilityUi.cast.heart_quench_blades_wake': '剣の目覚め',

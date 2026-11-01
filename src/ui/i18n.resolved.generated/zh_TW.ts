@@ -4753,7 +4753,7 @@ export const zh_TW: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。被壓在邊緣的牆上時，你每秒受到{pinMin}到{pinMax}點傷害。牆壁破損處沒有任何阻擋：你會墜入虛空。",
         "draw": "守護者吸氣，以每秒{speed}碼的速度將你拉向牠。牠嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後風箱狂風對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們向外擊飛{throw}碼。",
         "pinned": "被風壓在邊緣的牆上：在風停歇或你離開牆邊之前，每秒受到{min}到{max}點傷害。",
@@ -4770,7 +4770,8 @@ export const zh_TW: EnTranslations = {
         "frozen": "被霜封住：無法行動。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害並陷入霜脆狀態，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。",
         "brittle": "受到的所有傷害提高{pct}%。",
         "trapped": "踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。",
-        "awake": "鐵匠的四把刃已甦醒。每次淬火吐息與回火打擊命中後{delay}秒（生命值低於{lowPct}%時為{low}秒），每把刃都會在漂浮之處朝同一方向重複它。站在刃後、背對攻擊的一側，永遠安全。",
+        "awake": "鑄匠的四把利刃已甦醒。每一輪會有更多玩家被標記，利刃依次沿穿過他們的直線飛出。直線在利刃飛出前{lock}秒鎖定，隨後對線上的目標造成{min}到{max}點冰霜傷害，增加{cold}點寒冷並將其擊退。",
+        "marked": "你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害、{cold}點寒冷並被擊退。",
         "deepening": "湖的寒意上升快了{total}%：自刃甦醒後每{every}秒再快{step}%（目前{stacks}次）。"
       },
       "heatGuardian": {
@@ -7350,7 +7351,7 @@ export const zh_TW: EnTranslations = {
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7403,22 +7404,23 @@ export const zh_TW: EnTranslations = {
         "rim": "岸冰隆起！快到湖面上去！",
         "frozen": "{player}被凍透了！在冰碎裂之前離開！",
         "crack": "抱團的人群下冰面在呻吟！散開！",
-        "wake": "鐵匠之刃從湖中掙脫！它們出擊時站到刃後！",
-        "cross": "兩把刃橫越湖面！離開它們的路徑！"
+        "wake": "鑄匠之刃掙脫湖面！注意它們瞄準何處！",
+        "marks": "利刃標記了{list}！把它們引離團隊！"
       },
       "say": {
         "pull": "我的湖上來了溫熱的血。它不會溫熱太久。",
         "shatter": "凍透了。現在，碎裂吧。",
         "hole": "冰記得每一步。聚在一起，它便會崩塌。",
-        "wake": "鐵匠之刃，甦醒吧！回應我的每一擊！",
-        "echo": "我擊打的，它們也會再擊一次。",
-        "cross": "交錯吧，刃！為他們劈出新的湖岸！",
+        "wake": "鑄匠之刃，醒來！在冰面上獵殺他們！",
+        "cross": "去吧，利刃！將他們與溫暖斬斷！",
         "deepen": "感覺到了嗎？寒意正越來越深。",
         "wipe": "靜止。無聲。淬火已成。",
         "death": "寒意……放手了……淬火歸你們了。"
       }
     },
     "quenchAlert": {
+      "markedTitle": "利刃在追獵你！（{count}人中第{order}個）",
+      "markedLine": "把直線引離團隊，鎖定時立刻離開。",
       "coldTitle": "寒意",
       "freezingTitle": "快凍僵了！",
       "warmTitle": "抱團取暖",

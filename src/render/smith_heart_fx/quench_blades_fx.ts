@@ -3,23 +3,20 @@
 // 7.3), hosted by ../rift_death_zone.ts. The fight owns the blades' bodies
 // (the claim's blade objects: the kit draws no sunk blade of its own), so this
 // draws all four whatever the fight is doing, read from IWorld (each blade
-// object's state, place and facing, the guardian's awakening bar, the echoes
-// held at the blades):
+// object's state, place and facing, the guardian's awakening bar, a slash's
+// line):
 //  - sunk: the Quench kit's Kit_SunkBlade point first in the lake, as the
 //    vein always showed it;
 //  - waking (the guardian's 4 s bar): trembling, light running up its
 //    fuller, then wrenched up out of the ice, the ice bursting upward round
 //    it, its point shown, standing upright;
 //  - floating: upright a breath over the ice, bobbing, a blue light in it, its
-//    broad face turned the way the guardian's attacks would echo (the blade
-//    turns with the guardian) and a chevron of its light on the ice before it;
-//    blazing while an echo is held at it;
-//  - flying (heroic's crossing): along the lane on the sim's own eased curve
-//    (`danceEase`: off its mark slowly, fastest mid-lane, settling onto the
-//    other's), leaning into its speed, banking, a trailing wake of frost
-//    laid on the ice and shards behind it;
+//    broad face turned along its line while it aims, blazing as it does;
+//  - flying (a slash): along its line on the sim's own eased curve (`slashEase`:
+//    off its mark, fastest mid-line, settling at the end), leaning into its speed,
+//    banking, a trailing wake of frost laid on the ice and shards behind it;
 //  - left behind in the lake where it was sunk: a ring of broken ice.
-// The blades are what the echoes come from: their place, light and facing
+// The blades are what the slashes come from: their place, light and facing
 // draw on EVERY tier; the shards, mist and glints thin on the low tier.
 // Every motion is smooth whatever the snapshot rate (Jose's playtest: the
 // blades moved roughly online): the drawn blade follows its object, the
@@ -36,7 +33,7 @@ import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
   bladeStateOf,
-  echoOf,
+  laneOf,
   QUENCH_CASTS,
   QUENCH_GUARDIAN,
   QUENCH_OBJECTS,
@@ -84,37 +81,14 @@ const KIT_LEAN = 0.17;
 const _look: BladeLook = { lift: 0, upright: 0, light: 0, shake: 0 };
 const _e = new THREE.Euler();
 
-/** The chevron of a blade's light on the ice before it. */
-const CHEVRON_VERT = /* glsl */ `
+const SOCKET_VERT = /* glsl */ `
 varying vec2 vUv;
 void main() {
   vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-const CHEVRON_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform float uTime;
-uniform vec3 uColor;
-varying vec2 vUv;
-void main() {
-  vec2 p = vUv - 0.5;
-  // Two chevrons pointing +v, flowing forward.
-  float d = 1.0;
-  for (int i = 0; i < 2; i++) {
-    float off = fract(uTime * 0.6 + float(i) * 0.5) * 0.6 - 0.3;
-    float y = p.y - off;
-    float c = abs(y + abs(p.x) * 0.9);
-    d = min(d, c);
-  }
-  float line = 1.0 - smoothstep(0.02, 0.06, d);
-  float mask = (1.0 - smoothstep(0.32, 0.5, abs(p.x))) * (1.0 - smoothstep(0.3, 0.5, abs(p.y)));
-  gl_FragColor = vec4(uColor * (1.0 + line), line * mask * uAlpha);
-  #include <colorspace_fragment>
-}
-`;
 /** The ring of broken ice a blade leaves in the lake once torn out. */
-const SOCKET_VERT = CHEVRON_VERT;
 const SOCKET_FRAG = /* glsl */ `
 uniform float uAlpha;
 uniform vec3 uDark;
@@ -151,8 +125,6 @@ interface BladeView {
   tip: THREE.Mesh;
   core: THREE.Sprite;
   halo: THREE.Sprite;
-  chevron: THREE.Mesh;
-  chevronMat: THREE.ShaderMaterial;
   socket: THREE.Mesh;
   socketMat: THREE.ShaderMaterial;
   state: QuenchBladeState;
@@ -187,14 +159,13 @@ export class QuenchBladesFx {
   private readonly materials: THREE.Material[] = [];
   private readonly blades: BladeView[] = [];
   /** One fuller glow per blade (one program: the same shader), so a blade
-   *  holding an echo blazes on its own. */
+   *  whose line aims blazes on its own. */
   private readonly glowMats: THREE.ShaderMaterial[];
   private readonly coreMat: THREE.SpriteMaterial;
   private readonly haloMat: THREE.SpriteMaterial;
   private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>;
   private readonly glowTex: THREE.Texture | null;
   private readonly bladeIds: number[] = [];
-  private readonly heldIds = new Set<number>();
   private rosterSeen = Number.NaN;
   private guardianId = -1;
   private laneId = -1;
@@ -285,9 +256,8 @@ export class QuenchBladesFx {
       standInGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
     }
     this.geometries.push(standInGeo);
-    const chevronGeo = new THREE.PlaneGeometry(3.2, 3.2).rotateX(-Math.PI / 2);
     const socketGeo = new THREE.PlaneGeometry(5.6, 5.6).rotateX(-Math.PI / 2);
-    this.geometries.push(chevronGeo, socketGeo);
+    this.geometries.push(socketGeo);
     const iceMat = heartKitSlotMaterial('ice');
     const kitsIn = heartKitLoaded(QUENCH_KIT);
     BLADE_HOMES.forEach((home, i) => {
@@ -314,19 +284,6 @@ export class QuenchBladesFx {
       halo.position.set(0, 5, 0);
       halo.scale.set(5, 9, 1);
       frame.add(core, halo);
-      const chevronMat = new THREE.ShaderMaterial({
-        name: 'smithHeartQuenchBladeChevron',
-        uniforms: {
-          uAlpha: { value: 0 },
-          uTime: this.uTime,
-          uColor: { value: new THREE.Color(C.bladeLight) },
-        },
-        vertexShader: CHEVRON_VERT,
-        fragmentShader: CHEVRON_FRAG,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      });
       const socketMat = new THREE.ShaderMaterial({
         name: 'smithHeartQuenchBladeSocket',
         uniforms: {
@@ -342,18 +299,13 @@ export class QuenchBladesFx {
         polygonOffsetFactor: -2,
         polygonOffsetUnits: -2,
       });
-      this.materials.push(chevronMat, socketMat);
-      const chevron = new THREE.Mesh(chevronGeo, chevronMat);
-      chevron.name = 'smithHeartQuenchBladeChevron';
-      chevron.renderOrder = floorVfxRenderOrder('encounter', 15);
-      chevron.visible = false;
-      chevron.frustumCulled = false;
+      this.materials.push(socketMat);
       const socket = new THREE.Mesh(socketGeo, socketMat);
       socket.name = 'smithHeartQuenchBladeSocket';
       socket.renderOrder = floorVfxRenderOrder('encounter', 1);
       socket.visible = false;
       socket.frustumCulled = false;
-      this.root.add(holder, chevron, socket);
+      this.root.add(holder, socket);
       holder.visible = false;
       this.blades.push({
         home: i,
@@ -364,8 +316,6 @@ export class QuenchBladesFx {
         tip,
         core,
         halo,
-        chevron,
-        chevronMat,
         socket,
         socketMat,
         state: 'sunk',
@@ -486,14 +436,12 @@ export class QuenchBladesFx {
       this.bladeIds.length = 0;
       this.guardianId = -1;
       this.laneId = -1;
-      this.heldIds.clear();
       for (const e of world.entities.values()) {
         if (e.kind === 'mob' && e.templateId === QUENCH_GUARDIAN) this.guardianId = e.id;
         else if (e.kind === 'object' && e.templateId.startsWith(QUENCH_OBJECTS.lanePrefix))
           this.laneId = e.id;
         else if (e.kind === 'object' && bladeStateOf(e.templateId) !== null)
           this.bladeIds.push(e.id);
-        else if (e.kind === 'object' && echoOf(e.templateId)) this.heldIds.add(e.id);
       }
       this.bladeIds.sort((a, b) => a - b);
       // Each blade object to its view, by id (stable through a crossing).
@@ -509,20 +457,14 @@ export class QuenchBladesFx {
 
   private hide(b: BladeView): void {
     b.holder.visible = false;
-    b.chevron.visible = false;
     b.socket.visible = false;
   }
 
-  /** Is an echo held at (x, z) now (a blade about to echo)? */
-  private echoHeldAt(world: IWorld, x: number, z: number): boolean {
-    for (const id of this.heldIds) {
-      const e = world.entities.get(id);
-      if (!e) continue;
-      const of = echoOf(e.templateId);
-      if (!of || of.hit) continue;
-      if (Math.hypot(e.pos.x - x, e.pos.z - z) < 1.5) return true;
-    }
-    return false;
+  /** Is a slash's line aiming from (x, z) now? */
+  private lineAimsFrom(world: IWorld, x: number, z: number): boolean {
+    const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
+    if (!lane || laneOf(lane.templateId)?.state !== 'warn') return false;
+    return Math.hypot(lane.pos.x - x, lane.pos.z - z) < 1.5;
   }
 
   // ---- the pose ----------------------------------------------------------------------------
@@ -538,7 +480,7 @@ export class QuenchBladesFx {
     if (state !== b.state) {
       if (state === 'wake') b.burstDone = false;
       if (state === 'float' && b.state === 'wake') this.risenBurst(e);
-      if (state === 'fly') this.beginFlight(world, b, e);
+      if (state === 'fly') this.beginFlight(world, b);
       b.state = state;
       b.since = 0;
     } else b.since += dt;
@@ -569,8 +511,8 @@ export class QuenchBladesFx {
     const floor = this.groundY(b.px, b.pz);
     b.holder.visible = true;
     b.holder.position.set(b.px, floor, b.pz);
-    // The yaw: its sunk yaw while sunk, else its face to the echo's way; in
-    // flight its point along the lane.
+    // The yaw: its sunk yaw while sunk, else its object's facing (along its line
+    // while it aims); in flight its point along the line.
     const home = BLADE_HOMES[b.home];
     const flying = state === 'fly';
     let want = state === 'sunk' ? home.rot : e.facing;
@@ -595,8 +537,8 @@ export class QuenchBladesFx {
     _e.set(flying ? 0.15 + 0.45 * speed : 0, 0, KIT_LEAN * look.upright + b.bank, 'YXZ');
     b.frame.rotation.copy(_e);
     b.tip.visible = b.lift > 0.4;
-    // Its light: dim sunk, blazing while it holds an echo.
-    const held = state !== 'sunk' && this.echoHeldAt(world, e.pos.x, e.pos.z);
+    // Its light: dim sunk, blazing while its line aims.
+    const held = state !== 'sunk' && this.lineAimsFrom(world, e.pos.x, e.pos.z);
     const light = Math.min(1.6, look.light + (held ? 0.6 + 0.3 * Math.sin(this.clock * 14) : 0));
     b.core.visible = light > 0.2;
     b.halo.visible = light > 0.2;
@@ -605,18 +547,6 @@ export class QuenchBladesFx {
     (this.glowMats[b.home].uniforms.uColor.value as THREE.Color)
       .setHex(C.bladeLight)
       .multiplyScalar(0.8 + 1.4 * Math.max(look.light, held ? 1.2 : 0));
-    // Its chevron before it on the ice (the way its echoes run).
-    const awake = state === 'float';
-    b.chevron.visible = awake;
-    if (awake) {
-      const ax = Math.sin(b.yaw);
-      const az = Math.cos(b.yaw);
-      const cx = b.px + ax * 3.4;
-      const cz = b.pz + az * 3.4;
-      b.chevron.position.set(cx, this.groundY(cx, cz) + 0.09, cz);
-      b.chevron.rotation.y = b.yaw;
-      b.chevronMat.uniforms.uAlpha.value = held ? 1 : 0.55;
-    }
     // The torn socket at its home once it has risen out of the lake.
     const torn = state !== 'sunk' && b.lift > 0.5;
     b.socket.visible = torn;
@@ -630,30 +560,19 @@ export class QuenchBladesFx {
     if (flying && !fresh) this.frostWake(lastX, lastZ, b.px, b.pz, floor, speed);
   }
 
-  /** A crossing begins: the flight is drawn from the lane's end nearer the
-   *  blade to the other (the sim flies the same line), else from where it
-   *  stands to its object (no lane seen yet). */
-  private beginFlight(world: IWorld, b: BladeView, e: Entity): void {
+  /** A slash begins: the flight is drawn along its line (the sim flies the same
+   *  one), else it follows its object (no line seen yet). */
+  private beginFlight(world: IWorld, b: BladeView): void {
     const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
-    const fromX = b.placed ? b.px : e.pos.x;
-    const fromZ = b.placed ? b.pz : e.pos.z;
+    const lof = lane ? laneOf(lane.templateId) : null;
     b.flyT = 0;
-    if (lane && lane.scale > 0) {
-      const ux = Math.sin(lane.facing) * lane.scale;
-      const uz = Math.cos(lane.facing) * lane.scale;
-      const ax = lane.pos.x - ux;
-      const az = lane.pos.z - uz;
-      const bx = lane.pos.x + ux;
-      const bz = lane.pos.z + uz;
-      const nearA = Math.hypot(fromX - ax, fromZ - az) <= Math.hypot(fromX - bx, fromZ - bz);
-      b.flyAX = nearA ? ax : bx;
-      b.flyAZ = nearA ? az : bz;
-      b.flyBX = nearA ? bx : ax;
-      b.flyBZ = nearA ? bz : az;
-      b.flying = true;
-      return;
-    }
     b.flying = false;
+    if (!lane || !lof) return;
+    b.flyAX = lane.pos.x;
+    b.flyAZ = lane.pos.z;
+    b.flyBX = lane.pos.x + Math.sin(lane.facing) * lof.length;
+    b.flyBZ = lane.pos.z + Math.cos(lane.facing) * lof.length;
+    b.flying = true;
   }
 
   /** The flight's wake: frost laid on the ice along the path it drew this

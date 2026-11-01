@@ -4753,7 +4753,7 @@ export const ru_RU: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "Ветер Стража Дыхания несёт вас туда, куда дует, со скоростью {speed} ярда в секунду. Идите против него, чтобы устоять: он не прерывает заклинания. Прижатые к стене края, вы получаете от {pinMin} до {pinMax} урона каждую секунду. Там, где стена разрушена, ничто вас не удержит: вы падаете в пустоту.",
         "draw": "Страж делает вдох и тянет вас к себе со скоростью {speed} ярда в секунду. Его вихрь наносит от {min} до {max} урона каждые {tick} сек. всем, кто стоит перед его пастью. Затем Порыв мехов наносит от {gustMin} до {gustMax} урона всем на Карнизе и отбрасывает их на {throw} ярдов наружу.",
         "pinned": "Ветер прижал вас к стене края: от {min} до {max} урона каждую секунду, пока ветер не стихнет или вы не отойдёте от стены.",
@@ -4770,7 +4770,8 @@ export const ru_RU: EnTranslations = {
         "frozen": "Скован инеем: вы не можете действовать. Когда эффект закончится, лёд разлетится: вы получите от {min} до {max} ед. урона от магии льда и станете Хрупким от мороза, а все в пределах {radius} м от вас получат {cold} холода ({heroicRadius} м и {heroicCold} холода в героическом режиме).",
         "brittle": "Получаемый урон от всех источников увеличен на {pct}%.",
         "trapped": "Вы провалились сквозь лёд в ледяную воду: вы не можете двигаться, каждую секунду получаете от {min} до {max} ед. урона от магии льда, и ваш холод растёт. Через {seconds} сек вы выбираетесь на край. Сама вода никогда не убивает.",
-        "awake": "Четыре клинка Кузнеца пробудились. Через {delay} сек после каждого Закаляющего дыхания и Закаляющего удара ({low} сек при здоровье ниже {lowPct}%) каждый клинок повторяет его со своего места, в ту же сторону. За клинком, с противоположной от атаки стороны, всегда безопасно.",
+        "awake": "Четыре клинка Кузнеца пробудились. В каждом раунде метку получают больше игроков, и клинок по очереди летит вдоль линии через каждого из них. Линия фиксируется за {lock} сек. до вылета клинка, затем наносит всем на ней от {min} до {max} ед. урона от магии льда, добавляет {cold} холода и отбрасывает.",
+        "marked": "Вы номер {order} из {count}: клинок полетит вдоль линии через вас. Уведите линию от рейда. Она фиксируется за {lock} сек. до вылета клинка, тогда и сойдите с неё, иначе получите от {min} до {max} ед. урона от магии льда, {cold} холода и будете отброшены.",
         "deepening": "Холод озера растёт на {total}% быстрее: на {step}% больше каждые {every} сек с пробуждения клинков ({stacks} раз)."
       },
       "heatGuardian": {
@@ -7350,7 +7351,7 @@ export const ru_RU: EnTranslations = {
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7403,22 +7404,23 @@ export const ru_RU: EnTranslations = {
         "rim": "Береговой лёд вздымается! На озеро!",
         "frozen": "{player} промерзает насквозь! Отойдите, пока лёд не разлетелся!",
         "crack": "Лёд стонет под толпой! Разойдитесь!",
-        "wake": "Клинки Кузнеца вырываются из озера! Когда они бьют, вставайте за клинок!",
-        "cross": "Два клинка пересекают озеро! Уйдите с их пути!"
+        "wake": "Клинки Кузнеца вырываются из озера! Следите, куда они целятся!",
+        "marks": "Клинки выбрали цели: {list}! Уводите их от рейда!"
       },
       "say": {
         "pull": "Тёплая кровь на моём озере. Тёплой она пробудет недолго.",
         "shatter": "Промёрз насквозь. Теперь разбейся.",
         "hole": "Лёд помнит каждый шаг. Встаньте вместе, и он не выдержит.",
-        "wake": "Клинки Кузнеца, проснитесь! Отвечайте на каждый мой удар!",
-        "echo": "Что бью я, то бьют и они.",
-        "cross": "Скреститесь, клинки! Прорежьте им новый берег!",
+        "wake": "Клинки Кузнеца, проснитесь! Загоните их на льду!",
+        "cross": "Вперёд, клинки! Отсеките их от тепла!",
         "deepen": "Чувствуете? Холод уходит глубже.",
         "wipe": "Тихо. Безмолвно. Закалено.",
         "death": "Холод... отпускает... Закалка ваша."
       }
     },
     "quenchAlert": {
+      "markedTitle": "За вами охотится клинок! ({order} из {count})",
+      "markedLine": "Уведите линию от рейда и сойдите с неё, когда она зафиксируется.",
       "coldTitle": "Холод",
       "freezingTitle": "Вы замерзаете!",
       "warmTitle": "Тепло группы",

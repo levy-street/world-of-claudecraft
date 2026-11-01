@@ -23205,14 +23205,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.warn.rim': '岸冰隆起！快到湖面上去！',
   'hudChrome.quenchGuardian.warn.frozen': '{player}被凍透了！在冰碎裂之前離開！',
   'hudChrome.quenchGuardian.warn.crack': '抱團的人群下冰面在呻吟！散開！',
-  'hudChrome.quenchGuardian.warn.wake': '鐵匠之刃從湖中掙脫！它們出擊時站到刃後！',
-  'hudChrome.quenchGuardian.warn.cross': '兩把刃橫越湖面！離開它們的路徑！',
+  'hudChrome.quenchGuardian.warn.marks': '利刃標記了{list}！把它們引離團隊！',
+  'hudChrome.auraEffect.quenchGuardian.marked':
+    '你是{count}人中的第{order}個：利刃將沿穿過你的直線飛來。把直線引離團隊。直線在利刃飛出前{lock}秒鎖定，屆時請離開，否則將受到{min}到{max}點冰霜傷害、{cold}點寒冷並被擊退。',
+  'hudChrome.quenchAlert.markedTitle': '利刃在追獵你！（{count}人中第{order}個）',
+  'hudChrome.quenchAlert.markedLine': '把直線引離團隊，鎖定時立刻離開。',
+  'hudChrome.quenchGuardian.warn.wake': '鑄匠之刃掙脫湖面！注意它們瞄準何處！',
   'hudChrome.quenchGuardian.say.pull': '我的湖上來了溫熱的血。它不會溫熱太久。',
   'hudChrome.quenchGuardian.say.shatter': '凍透了。現在，碎裂吧。',
   'hudChrome.quenchGuardian.say.hole': '冰記得每一步。聚在一起，它便會崩塌。',
-  'hudChrome.quenchGuardian.say.wake': '鐵匠之刃，甦醒吧！回應我的每一擊！',
-  'hudChrome.quenchGuardian.say.echo': '我擊打的，它們也會再擊一次。',
-  'hudChrome.quenchGuardian.say.cross': '交錯吧，刃！為他們劈出新的湖岸！',
+  'hudChrome.quenchGuardian.say.wake': '鑄匠之刃，醒來！在冰面上獵殺他們！',
+  'hudChrome.quenchGuardian.say.cross': '去吧，利刃！將他們與溫暖斬斷！',
   'hudChrome.quenchGuardian.say.deepen': '感覺到了嗎？寒意正越來越深。',
   'hudChrome.quenchGuardian.say.wipe': '靜止。無聲。淬火已成。',
   'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火歸你們了。',
@@ -23226,7 +23229,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    '鐵匠的四把刃已甦醒。每次淬火吐息與回火打擊命中後{delay}秒（生命值低於{lowPct}%時為{low}秒），每把刃都會在漂浮之處朝同一方向重複它。站在刃後、背對攻擊的一側，永遠安全。',
+    '鑄匠的四把利刃已甦醒。每一輪會有更多玩家被標記，利刃依次沿穿過他們的直線飛出。直線在利刃飛出前{lock}秒鎖定，隨後對線上的目標造成{min}到{max}點冰霜傷害，增加{cold}點寒冷並將其擊退。',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     '湖的寒意上升快了{total}%：自刃甦醒後每{every}秒再快{step}%（目前{stacks}次）。',
   'abilityUi.cast.heart_quench_blades_wake': '諸刃甦醒',

@@ -3,12 +3,11 @@
 // 7.3): the cold on the players' bodies and the huddle's warmth, the freeze
 // and its shatter, the ice cracking under a lingering huddle and the holes of
 // freezing water, a trapped player, the shore ice, the Smith's four blades
-// (sunk, waking, floating, flying), the echoes' footprints and the safe lee
-// behind each blade, heroic's crossing lane. The sim's numbers are read
+// (sunk, waking, floating, flying), a slash's line. The sim's numbers are read
 // (quench_ids.ts, the layout), never tuned here.
 //
 // Readability (binding): the cold's frost on every body, every crack, hole,
-// echo footprint, lee, lane and the splash's ring round a frozen player draw
+// line and the splash's ring round a frozen player draw
 // at their exact sizes on EVERY tier; only the mist, the motes, the glints,
 // the splashes and the shakes thin.
 //
@@ -23,13 +22,11 @@ import {
 import {
   bladeStateOf,
   crackOf,
-  danceEase,
-  echoOf,
-  echoReach,
   laneOf,
   QUENCH_CUES,
   QUENCH_OBJECTS,
   type QuenchBladeState,
+  slashEase,
   QUENCH_TUNING as T,
 } from '../../sim/encounters/smith_heart/quench_ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
@@ -43,9 +40,6 @@ export const QUENCH_FIGHT_COLORS = {
   danger: TELEGRAPH_THREAT_COLORS.danger,
   lethal: TELEGRAPH_THREAT_COLORS.lethal,
   control: TELEGRAPH_THREAT_COLORS.control,
-  /** An echo's footprint's accent: the danger's own hot light, never the
-   *  ice's blue (it must read as a hit at a glance). */
-  dangerHot: 0xffc08a,
   /** The ice's accent on the telegraphs. */
   accent: 0xbfeaff,
   /** The huddle's warmth. */
@@ -81,7 +75,7 @@ export const QUENCH_FIGHT_REACH = QUENCH.shelf.rx + 30;
 
 // ---- the objects ---------------------------------------------------------------------
 
-export type QuenchObjectKind = 'crack' | 'hole' | 'echo' | 'lane' | 'rim' | 'rimRise' | 'blade';
+export type QuenchObjectKind = 'crack' | 'hole' | 'lane' | 'rim' | 'rimRise' | 'blade';
 
 /** Which of the fight's objects a template is, or null. */
 export function quenchObjectKind(templateId: string): QuenchObjectKind | null {
@@ -89,7 +83,6 @@ export function quenchObjectKind(templateId: string): QuenchObjectKind | null {
   if (templateId === QUENCH_OBJECTS.rim) return 'rim';
   if (templateId === QUENCH_OBJECTS.rimRise) return 'rimRise';
   if (crackOf(templateId) !== null) return 'crack';
-  if (echoOf(templateId) !== null) return 'echo';
   if (laneOf(templateId) !== null) return 'lane';
   if (bladeStateOf(templateId) !== null) return 'blade';
   return null;
@@ -103,7 +96,6 @@ const CLAIMED: ReadonlySet<string> = new Set([
   QUENCH_CUES.plunge,
   QUENCH_CUES.climb,
   QUENCH_CUES.wake,
-  QUENCH_CUES.echo,
   QUENCH_CUES.cross,
   QUENCH_CUES.rim,
   QUENCH_CUES.thaw,
@@ -207,7 +199,7 @@ export interface BladeLook {
   lift: number;
   /** 0 its sunk lean (the kit's), 1 upright. */
   upright: number;
-  /** Its light (0..1, more while an echo is held). */
+  /** Its light (0..1, more while its line aims). */
   light: number;
   /** A tremble while it tears free. */
   shake: number;
@@ -286,9 +278,9 @@ export function wakeFillStep(cur: number, read: number, dt: number, total: numbe
   return clamp01(next);
 }
 
-/** A crossing blade's drawn spot `t` seconds into its flight from (ax, az)
- *  to (bx, bz): on the sim's own eased curve (`danceEase`), so the drawn
- *  blade is where the lane strikes; `speed` its share of the flight's peak
+/** A slashing blade's drawn spot `t` seconds into its flight from (ax, az)
+ *  to (bx, bz): on the sim's own eased curve (`slashEase`), so the drawn
+ *  blade is where the line strikes; `speed` its share of the flight's peak
  *  (0..1: its lean, its bank and its wake read it). */
 export function bladeFlight(
   ax: number,
@@ -298,8 +290,8 @@ export function bladeFlight(
   t: number,
   out: { x: number; z: number; speed: number },
 ): { x: number; z: number; speed: number } {
-  const k = clamp01(T.danceFly > 0 ? t / T.danceFly : 1);
-  const e = danceEase(k);
+  const k = clamp01(T.slashFly > 0 ? t / T.slashFly : 1);
+  const e = slashEase(k);
   out.x = ax + (bx - ax) * e;
   out.z = az + (bz - az) * e;
   out.speed = 4 * k * (1 - k);
@@ -307,8 +299,8 @@ export function bladeFlight(
 }
 
 /** A blade's bank (roll, radians): into its turn (its yaw rate, radians a
- *  second), and in flight a slight lean to its own side (`side` +1 or -1:
- *  the two crossing blades bank apart as they pass), at most 0.45. */
+ *  second), and in flight a slight lean to its own side (`side` +1 or -1),
+ *  at most 0.45. */
 export function bladeBank(yawRate: number, speed: number, side: number): number {
   const b = -yawRate * 0.12 + 0.22 * side * clamp01(speed);
   return Math.max(-0.45, Math.min(0.45, b));
@@ -317,22 +309,6 @@ export function bladeBank(yawRate: number, speed: number, side: number): number 
 /** The blades' homes and their sunk yaws (the layout's). */
 export const BLADE_HOMES = QUENCH_BLADE_SPOTS;
 export const BLADE_HEIGHT = QUENCH_BLADE_H;
-
-// ---- the echoes and the lee ----------------------------------------------------------
-
-/** An echo's footprint: the sim's own arc and reach for it (`echoReach`,
- *  wider than the attack it repeats). The lee behind a blade is not drawn
- *  (Jose's playtest: two rings at a blade read alike); only this danger
- *  footprint is, so its edge is where the hit ends. */
-export function echoShape(kind: 'breath' | 'strike'): { arcDeg: number; range: number } {
-  return echoReach(kind);
-}
-
-/** An echo's telegraph `elapsed` seconds after it showed, `total` to its
- *  landing: the fill (0..1). */
-export function echoFill(elapsed: number, total: number): number {
-  return clamp01(total > 0 ? elapsed / total : 1);
-}
 
 // ---- the warmth ----------------------------------------------------------------------
 
@@ -417,7 +393,6 @@ export const QUENCH_FIGHT_POOLS = {
   links: 24,
   cracks: 16,
   holes: T.holeMax,
-  echoes: 8,
   rimSlabs: QUENCH_RIMEWALL.segments,
   splashRings: 10,
 } as const;

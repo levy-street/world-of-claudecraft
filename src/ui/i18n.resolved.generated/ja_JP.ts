@@ -4753,7 +4753,7 @@ export const ja_JP: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。",
         "draw": "守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、ふいごの突風が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、{throw}ヤード外へ吹き飛ばす。",
         "pinned": "風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。",
@@ -4770,7 +4770,8 @@ export const ja_JP: EnTranslations = {
         "frozen": "霜に閉ざされている：行動できない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受けて霜脆化状態になり、{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。",
         "brittle": "あらゆる攻撃から受けるダメージが{pct}%増加する。",
         "trapped": "氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。",
-        "awake": "鍛冶師の四本の剣が目覚めている。焼き入れの吐息と焼き戻しの一撃が決まるたび、{delay}秒後（体力{lowPct}%未満では{low}秒後）に、すべての剣が浮かぶ場所から同じ向きでそれを繰り返す。剣の陰、攻撃と反対側は常に安全だ。",
+        "awake": "鍛冶師の四本の剣が目覚めている。戦いの中で複数のプレイヤーが印を受け、剣がそれぞれを貫く線を順に飛ぶ。線は剣が飛ぶ{lock}秒前に固定され、線上の者に{min}から{max}の冷気ダメージを与え、冷え{cold}を加えて吹き飛ばす。",
+        "marked": "あなたは{count}人中{order}番目だ。剣があなたを貫く線を飛んでくる。線をレイドから離せ。線は剣が飛ぶ{lock}秒前に固定されるので、その時に線から外れないと{min}から{max}の冷気ダメージと冷え{cold}を受けて吹き飛ばされる。",
         "deepening": "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。"
       },
       "heatGuardian": {
@@ -7350,7 +7351,7 @@ export const ja_JP: EnTranslations = {
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7403,22 +7404,23 @@ export const ja_JP: EnTranslations = {
         "rim": "岸の氷がせり上がる！湖の上へ移れ！",
         "frozen": "{player}が凍りついた！氷が砕ける前に離れろ！",
         "crack": "固まった集団の下で氷がきしむ！散らばれ！",
-        "wake": "鍛冶師の剣が湖から引き抜かれた！打ち込まれる時は剣の陰に立て！",
-        "cross": "二本の剣が湖を横切る！その進路から離れろ！"
+        "wake": "鍛冶師の剣が湖から解き放たれる！狙いを見極めろ！",
+        "marks": "剣が{list}を狙う！レイドから離れて引きつけろ！"
       },
       "say": {
         "pull": "我が湖に温かい血か。その温もりも長くは続かぬ。",
         "shatter": "芯まで凍った。さあ、砕けよ。",
         "hole": "氷はすべての足音を覚えている。寄り集まれば、崩れる。",
-        "wake": "鍛冶師の剣よ、目覚めよ！我が一撃のすべてに応えよ！",
-        "echo": "我が打つものは、剣もまた打つ。",
-        "cross": "交われ、剣よ！奴らに新たな岸を刻め！",
+        "wake": "鍛冶師の剣よ、目覚めよ！氷の上で奴らを狩れ！",
+        "cross": "行け、剣よ！奴らを温もりから切り離せ！",
         "deepen": "感じるか？冷気がさらに深くなっていく。",
         "wipe": "静まり、黙し、焼き入れられた。",
         "death": "冷気が……離れていく……焼き入れはお前たちのものだ。"
       }
     },
     "quenchAlert": {
+      "markedTitle": "剣があなたを狙っている！({count}人中{order}番目)",
+      "markedLine": "線をレイドから離し、固定されたら線から外れろ。",
       "coldTitle": "冷気",
       "freezingTitle": "凍えている！",
       "warmTitle": "身を寄せた温もり",

@@ -8,7 +8,6 @@
 //   shatter  a player's frozen ice shatters (at most once in SAY_EVERY)
 //   hole     the ice gives way under a huddle (at most once in SAY_EVERY)
 //   wake     it raises its arms and the four blades tear free
-//   echo     the blades' first echo
 //   cross    heroic: two blades cross the lake (at most once in SAY_EVERY)
 //   deepen   the cold deepens past its third step
 //   wipe     the raid lies still on the ice
@@ -26,7 +25,6 @@ export type QuenchMoment =
   | 'shatter'
   | 'hole'
   | 'wake'
-  | 'echo'
   | 'cross'
   | 'deepen'
   | 'wipe'
@@ -38,9 +36,8 @@ export const QUENCH_LINES: Readonly<Record<QuenchMoment, string>> = {
   pull: 'Warm blood on my lake. It will not stay warm for long.',
   shatter: 'Frozen through. Now break.',
   hole: 'The ice remembers every step. Stand together, and it gives.',
-  wake: 'Blades of the Smith, wake! Answer every blow I strike!',
-  echo: 'Whatever I strike, they strike again.',
-  cross: 'Cross, blades! Cut them a new shore!',
+  wake: 'Blades of the Smith, wake! Hunt them across the ice!',
+  cross: 'Go, blades! Cut them from the warmth!',
   deepen: 'Feel it? The cold is going deeper.',
   wipe: 'Still. Silent. Quenched.',
   death: 'The cold... lets go... The Quench is yours.',

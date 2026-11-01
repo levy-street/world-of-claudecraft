@@ -222,7 +222,7 @@ export function stepCold(s: QuenchScope): void {
 /** Phase 2: the cold deepens every 20 s, without end. */
 export function stepDeepening(s: QuenchScope): void {
   const st = s.st;
-  if (st.half !== 'echoes') return;
+  if (st.half !== 'awake') return;
   st.deepenTimer -= DT;
   if (st.deepenTimer > 1e-9) return;
   st.deepenTimer += T.deepenEvery;

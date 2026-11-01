@@ -22678,16 +22678,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.warn.frozen':
     '{player}님이 꽁꽁 얼어붙었습니다! 얼음이 깨지기 전에 물러나세요!',
   'hudChrome.quenchGuardian.warn.crack': '뭉친 무리 아래에서 얼음이 삐걱입니다! 흩어지세요!',
+  'hudChrome.quenchGuardian.warn.marks':
+    '칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!',
+  'hudChrome.auraEffect.quenchGuardian.marked':
+    '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받고 밀려납니다.',
+  'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
+  'hudChrome.quenchAlert.markedLine': '선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.',
   'hudChrome.quenchGuardian.warn.wake':
-    '대장장이의 검들이 호수에서 뽑혀 나옵니다! 공격이 올 때는 검 뒤에 서세요!',
-  'hudChrome.quenchGuardian.warn.cross': '두 자루의 검이 호수를 가로지릅니다! 경로에서 벗어나세요!',
+    '대장장이의 칼날들이 호수에서 뜯겨 나옵니다! 어디를 겨누는지 살피세요!',
   'hudChrome.quenchGuardian.say.pull': '내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.',
   'hudChrome.quenchGuardian.say.shatter': '속까지 얼었구나. 이제 부서져라.',
   'hudChrome.quenchGuardian.say.hole': '얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.',
   'hudChrome.quenchGuardian.say.wake':
-    '대장장이의 검이여, 깨어나라! 내가 내리치는 모든 일격에 응답하라!',
-  'hudChrome.quenchGuardian.say.echo': '내가 치는 것을, 검들도 다시 친다.',
-  'hudChrome.quenchGuardian.say.cross': '교차하라, 검들이여! 저들에게 새 기슭을 새겨라!',
+    '대장장이의 칼날들아, 깨어나라! 얼음 위에서 놈들을 사냥하라!',
+  'hudChrome.quenchGuardian.say.cross': '가라, 칼날들아! 놈들을 온기에서 떼어 내라!',
   'hudChrome.quenchGuardian.say.deepen': '느껴지느냐? 냉기가 더 깊어지고 있다.',
   'hudChrome.quenchGuardian.say.wipe': '고요하다. 잠잠하다. 담금질되었다.',
   'hudChrome.quenchGuardian.say.death': '냉기가... 물러난다... 담금질은 너희의 것이다.',
@@ -22701,7 +22705,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.trapped':
     '얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    '대장장이의 네 자루 검이 깨어났습니다. 담금질 숨결과 담금질 일격이 적중할 때마다 {delay}초 뒤(생명력 {lowPct}% 미만에서는 {low}초 뒤) 모든 검이 떠 있는 자리에서 같은 방향으로 그것을 되풀이합니다. 검 뒤, 공격 반대편은 언제나 안전합니다.',
+    '대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더하며 밀쳐 냅니다.',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     '호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).',
   'abilityUi.cast.heart_quench_blades_wake': '검의 각성',

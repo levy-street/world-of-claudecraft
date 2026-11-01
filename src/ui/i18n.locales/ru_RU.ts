@@ -24872,15 +24872,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.warn.frozen':
     '{player} промерзает насквозь! Отойдите, пока лёд не разлетелся!',
   'hudChrome.quenchGuardian.warn.crack': 'Лёд стонет под толпой! Разойдитесь!',
+  'hudChrome.quenchGuardian.warn.marks':
+    'Клинки выбрали цели: {list}! Уводите их от рейда!',
+  'hudChrome.auraEffect.quenchGuardian.marked':
+    'Вы номер {order} из {count}: клинок полетит вдоль линии через вас. Уведите линию от рейда. Она фиксируется за {lock} сек. до вылета клинка, тогда и сойдите с неё, иначе получите от {min} до {max} ед. урона от магии льда, {cold} холода и будете отброшены.',
+  'hudChrome.quenchAlert.markedTitle':
+    'За вами охотится клинок! ({order} из {count})',
+  'hudChrome.quenchAlert.markedLine':
+    'Уведите линию от рейда и сойдите с неё, когда она зафиксируется.',
   'hudChrome.quenchGuardian.warn.wake':
-    'Клинки Кузнеца вырываются из озера! Когда они бьют, вставайте за клинок!',
-  'hudChrome.quenchGuardian.warn.cross': 'Два клинка пересекают озеро! Уйдите с их пути!',
+    'Клинки Кузнеца вырываются из озера! Следите, куда они целятся!',
   'hudChrome.quenchGuardian.say.pull': 'Тёплая кровь на моём озере. Тёплой она пробудет недолго.',
   'hudChrome.quenchGuardian.say.shatter': 'Промёрз насквозь. Теперь разбейся.',
   'hudChrome.quenchGuardian.say.hole': 'Лёд помнит каждый шаг. Встаньте вместе, и он не выдержит.',
-  'hudChrome.quenchGuardian.say.wake': 'Клинки Кузнеца, проснитесь! Отвечайте на каждый мой удар!',
-  'hudChrome.quenchGuardian.say.echo': 'Что бью я, то бьют и они.',
-  'hudChrome.quenchGuardian.say.cross': 'Скреститесь, клинки! Прорежьте им новый берег!',
+  'hudChrome.quenchGuardian.say.wake':
+    'Клинки Кузнеца, проснитесь! Загоните их на льду!',
+  'hudChrome.quenchGuardian.say.cross':
+    'Вперёд, клинки! Отсеките их от тепла!',
   'hudChrome.quenchGuardian.say.deepen': 'Чувствуете? Холод уходит глубже.',
   'hudChrome.quenchGuardian.say.wipe': 'Тихо. Безмолвно. Закалено.',
   'hudChrome.quenchGuardian.say.death': 'Холод... отпускает... Закалка ваша.',
@@ -24895,7 +24903,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.trapped':
     'Вы провалились сквозь лёд в ледяную воду: вы не можете двигаться, каждую секунду получаете от {min} до {max} ед. урона от магии льда, и ваш холод растёт. Через {seconds} сек вы выбираетесь на край. Сама вода никогда не убивает.',
   'hudChrome.auraEffect.quenchGuardian.awake':
-    'Четыре клинка Кузнеца пробудились. Через {delay} сек после каждого Закаляющего дыхания и Закаляющего удара ({low} сек при здоровье ниже {lowPct}%) каждый клинок повторяет его со своего места, в ту же сторону. За клинком, с противоположной от атаки стороны, всегда безопасно.',
+    'Четыре клинка Кузнеца пробудились. В каждом раунде метку получают больше игроков, и клинок по очереди летит вдоль линии через каждого из них. Линия фиксируется за {lock} сек. до вылета клинка, затем наносит всем на ней от {min} до {max} ед. урона от магии льда, добавляет {cold} холода и отбрасывает.',
   'hudChrome.auraEffect.quenchGuardian.deepening':
     'Холод озера растёт на {total}% быстрее: на {step}% больше каждые {every} сек с пробуждения клинков ({stacks} раз).',
   'abilityUi.cast.heart_quench_blades_wake': 'Пробуждение клинков',

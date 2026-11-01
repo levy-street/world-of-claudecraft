@@ -4753,7 +4753,7 @@ export const ko_KR: EnTranslations = {
       "breathGuardian": {
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the lip of a gap. You cannot carry the Knotted Gale this round.",
-        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Walk into Portal A to come out at Portal B, then press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
+        "laden": "You carry a Knotted Gale: you walk at {walk}% speed and no wind, pull, blast or throw can move you. Either portal takes you to the other. Press Interact at the lip of any gap to throw it into the void. When this ends it bursts and kills everyone on the Cornice.",
         "wind": "숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 가장자리 벽에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 벽이 무너진 곳에서는 막아 줄 것이 없어 공허로 떨어집니다.",
         "draw": "수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 이에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 풀무 돌풍이 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 {throw}야드 바깥으로 날려 보냅니다.",
         "pinned": "바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해.",
@@ -4770,7 +4770,8 @@ export const ko_KR: EnTranslations = {
         "frozen": "서리에 갇힘: 행동할 수 없습니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고 서리 취약 상태가 되며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).",
         "brittle": "모든 공격으로부터 받는 피해가 {pct}% 증가합니다.",
         "trapped": "얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.",
-        "awake": "대장장이의 네 자루 검이 깨어났습니다. 담금질 숨결과 담금질 일격이 적중할 때마다 {delay}초 뒤(생명력 {lowPct}% 미만에서는 {low}초 뒤) 모든 검이 떠 있는 자리에서 같은 방향으로 그것을 되풀이합니다. 검 뒤, 공격 반대편은 언제나 안전합니다.",
+        "awake": "대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더하며 밀쳐 냅니다.",
+        "marked": "{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받고 밀려납니다.",
         "deepening": "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회)."
       },
       "heatGuardian": {
@@ -7350,7 +7351,7 @@ export const ko_KR: EnTranslations = {
       "bTitle": "You are Portal B!",
       "bLine": "It opens at your feet in {seconds} sec. Stand at the lip of a gap.",
       "carryTitle": "You carry the Knotted Gale!",
-      "carryLine": "Walk into Portal A, then throw it from the lip of a gap. It bursts in {seconds} sec.",
+      "carryLine": "Either portal takes you to the other. Throw it from the lip of a gap. It bursts in {seconds} sec.",
       "lipTitle": "Throw it now!",
       "lipLine": "You stand at the lip of a gap. It bursts in {seconds} sec.",
       "throwKey": "Press {key} at the lip to throw",
@@ -7403,22 +7404,23 @@ export const ko_KR: EnTranslations = {
         "rim": "기슭의 얼음이 솟아오릅니다! 호수 위로 올라가세요!",
         "frozen": "{player}님이 꽁꽁 얼어붙었습니다! 얼음이 깨지기 전에 물러나세요!",
         "crack": "뭉친 무리 아래에서 얼음이 삐걱입니다! 흩어지세요!",
-        "wake": "대장장이의 검들이 호수에서 뽑혀 나옵니다! 공격이 올 때는 검 뒤에 서세요!",
-        "cross": "두 자루의 검이 호수를 가로지릅니다! 경로에서 벗어나세요!"
+        "wake": "대장장이의 칼날들이 호수에서 뜯겨 나옵니다! 어디를 겨누는지 살피세요!",
+        "marks": "칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!"
       },
       "say": {
         "pull": "내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.",
         "shatter": "속까지 얼었구나. 이제 부서져라.",
         "hole": "얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.",
-        "wake": "대장장이의 검이여, 깨어나라! 내가 내리치는 모든 일격에 응답하라!",
-        "echo": "내가 치는 것을, 검들도 다시 친다.",
-        "cross": "교차하라, 검들이여! 저들에게 새 기슭을 새겨라!",
+        "wake": "대장장이의 칼날들아, 깨어나라! 얼음 위에서 놈들을 사냥하라!",
+        "cross": "가라, 칼날들아! 놈들을 온기에서 떼어 내라!",
         "deepen": "느껴지느냐? 냉기가 더 깊어지고 있다.",
         "wipe": "고요하다. 잠잠하다. 담금질되었다.",
         "death": "냉기가... 물러난다... 담금질은 너희의 것이다."
       }
     },
     "quenchAlert": {
+      "markedTitle": "칼날이 당신을 노립니다! ({count}명 중 {order}번째)",
+      "markedLine": "선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.",
       "coldTitle": "냉기",
       "freezingTitle": "얼어붙는 중!",
       "warmTitle": "모여서 얻은 온기",

@@ -71,7 +71,19 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
     case QUENCH_AURAS.awake:
       return {
         key: `${KEY}.awake`,
-        nums: { delay: T.echoDelay, low: T.echoDelayLow, lowPct: pct(T.lowAt) },
+        nums: { lock: T.slashLock, min: T.crossMin, max: T.crossMax, cold: T.crossCold },
+      };
+    case QUENCH_AURAS.marked:
+      return {
+        key: `${KEY}.marked`,
+        nums: {
+          order: a.value ?? 1,
+          count: a.value2 ?? 1,
+          lock: T.slashLock,
+          min: T.crossMin,
+          max: T.crossMax,
+          cold: T.crossCold,
+        },
       };
     case QUENCH_AURAS.deepening:
       return {
