@@ -200,7 +200,7 @@ await pageA.waitForSelector('.armory-section .armory-card img', { timeout: 12000
 await sleep(350);
 await pageA.evaluate(() => {
   const win = document.querySelector('#daily-rewards-window');
-  if (win && win.style.display !== 'block') window.__game.hud.toggleDailyRewards();
+  if (win && getComputedStyle(win).display === 'none') window.__game.hud.toggleDailyRewards();
 });
 await pageA.screenshot({ path: 'tmp/armory_store.png' });
 await tidyHud(pageA);

@@ -39,6 +39,8 @@ function armoryCard(index: number): string {
 describe('mobile Armory landscape layout', () => {
   it('keeps a complete cosmetic card within the store body height', () => {
     const store = host('daily-rewards-window');
+    // The shipped open state (daily_rewards_window.ts opens a flex column).
+    store.style.display = 'flex';
     store.classList.add('store-active');
     store.innerHTML =
       '<div class="panel-title"><span>WOC Store</span>' +

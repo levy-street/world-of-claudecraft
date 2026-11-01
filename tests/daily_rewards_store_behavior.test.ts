@@ -109,7 +109,7 @@ function rootStub(body: Record<string, unknown> | null = null): HTMLElement {
     setAttribute: vi.fn(),
   };
   return {
-    style: { display: 'block' },
+    style: { display: 'flex' },
     querySelector(selector: string) {
       if (selector === '.dr-body') return body;
       if (selector === '[data-woc-store-loading]') return indicator;
@@ -187,7 +187,7 @@ describe('DailyRewardsWindow store intent', () => {
       dataset: {} as Record<string, string>,
     });
     const intentRoot = {
-      style: { display: 'block' },
+      style: { display: 'flex' },
       classList: chrome().classList,
       querySelector: (selector: string) => (selector === '.dr-body' ? body : chrome()),
       querySelectorAll: () => [],
@@ -343,7 +343,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
   });
 
   function pendingRewardsHarness() {
-    document.body.innerHTML = '<section id="daily-test" style="display: block"></section>';
+    document.body.innerHTML = '<section id="daily-test" style="display: flex"></section>';
     const root = document.getElementById('daily-test') as HTMLElement;
     let resolveStatus!: (status: DailyRewardStatus) => void;
     const status = new Promise<DailyRewardStatus>((resolve) => (resolveStatus = resolve));
@@ -391,7 +391,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     h.resolveStatus(rewardStatus());
     await pending;
 
-    expect(h.root.style.display).toBe('block');
+    expect(h.root.style.display).toBe('flex');
     expect(h.internals.tab).toBe('store');
     expect(h.paint).not.toHaveBeenCalled();
     h.window.close();
@@ -490,7 +490,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     expect(toggle).toHaveBeenCalledOnce();
     expect((window as unknown as { tab: string }).tab).toBe('store');
 
-    root.style.display = 'block';
+    root.style.display = 'flex';
     toggle.mockClear();
     const renderCurrent = vi
       .spyOn(
@@ -897,7 +897,7 @@ function charterHarness(
     '<button type="button" data-woc-store-tab="store">Store</button>' +
     '</div>' +
     '<div id="woc-store-panel" class="dr-body woc-store-body"></div>';
-  root.style.display = 'block';
+  root.style.display = 'flex';
   document.body.appendChild(root);
   const body = root.querySelector<HTMLElement>('.dr-body') as HTMLElement;
   const window_ = new DailyRewardsWindow({
@@ -1629,7 +1629,7 @@ describe('WOC Store Strongbox charters', () => {
     h.window.refreshIfChanged();
     expect(h.paints.count).toBe(quiet);
 
-    h.root.style.display = 'block';
+    h.root.style.display = 'flex';
     h.internals.tab = 'rewards';
     h.window.refreshIfChanged();
     expect(h.paints.count).toBe(quiet);

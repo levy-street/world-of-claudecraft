@@ -106,6 +106,17 @@ const mobileCss = readSource('../src/styles/hud.mobile.css');
 const hudChromeCatalog = readSource('../src/ui/i18n.catalog/hud_chrome.ts');
 
 describe('WOC Store window contract', () => {
+  it('opens as a flex column whose body fills a resized window', () => {
+    // components.css makes #daily-rewards-window a flex column; only an inline
+    // display:flex lays it out as one (a .window opens by inline display), and
+    // the body must be the .window-fill child or a dragged-shorter window clips
+    // rows the player can never scroll to.
+    expect(storeWindow).toContain("root.style.display = 'flex';");
+    expect(storeWindow).toContain("return this.deps.root().style.display === 'flex';");
+    expect(storeWindow).not.toContain("'block'");
+    expect(dailyRewardsChrome.match(/class="dr-body woc-store-body window-fill"/g)).toHaveLength(2);
+  });
+
   it('opens on the Cosmetic Store tab beside Memberships, with no Daily Rewards tab', () => {
     expect(storeWindow).toContain("private tab: 'store' | 'memberships' | 'rewards' = 'store'");
     expect(dailyRewardsChrome).toContain('data-woc-store-tab="store"');

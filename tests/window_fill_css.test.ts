@@ -63,6 +63,22 @@ describe('resized-window fill CSS', () => {
     );
   });
 
+  it('makes the WOC Store window a scale-aware flex column with a fill body', () => {
+    // #daily-rewards-window sits inside the zoomed #ui: a raw vh cap ran it off
+    // the bottom of the screen above 100% UI scale, and the body's own vh cap
+    // left a dragged-shorter window clipping rows nobody could scroll to.
+    expect(components).toContain(
+      '#daily-rewards-window { top: 24px; width: min(1040px, calc(var(--app-vw, 100vw) / var(--window-scale) - 40px)); max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 48px); flex-direction: column;',
+    );
+    expect(components).toContain(
+      '#daily-rewards-window .woc-store-body { max-height: none; padding: 14px; }',
+    );
+    // Rewards-only mode (no tab strip) keeps the one 8px gap block flow collapsed to.
+    expect(components).toContain(
+      '#daily-rewards-window > .panel-title + .dr-body { margin-top: 0; }',
+    );
+  });
+
   it('drops the tab strip margin that block-flow used to collapse', () => {
     // Under block flow .panel-title's 8px margin-bottom collapsed with .lb-tabs'
     // 8px margin-top into one 8px gap. Flex does not collapse margins, so keeping
