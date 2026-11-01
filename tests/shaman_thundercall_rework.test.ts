@@ -387,6 +387,71 @@ describe('Thundercall v0.44 Magma Burst and Magma Surge', () => {
     expect(shaman.cooldowns.has('lava_burst')).toBe(true);
   });
 
+  it('a Magma Burst pressed with a surge up is instant and spends the surge', () => {
+    const { sim, shaman } = setup();
+    landNoCrit(sim);
+    vi.spyOn(sim.rng, 'chance').mockReturnValue(true);
+    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 12);
+    vi.restoreAllMocks();
+    landNoCrit(sim);
+    shaman.gcdRemaining = 0;
+    shaman.resource = shaman.maxResource;
+    sim.castAbility('lava_burst', shaman.id);
+    // Never on the cast bar, so the timed-completion reset can never see it.
+    expect(shaman.castingAbility).toBeNull();
+    expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(false);
+    expect(shaman.cooldowns.get('lava_burst')).toBeGreaterThan(7);
+  });
+
+  it('a Magma Burst queued in the cast tail fires instantly off a mid-cast surge', () => {
+    const { sim, shaman, target } = setup();
+    target.auras.push({ ...cinderDot(shaman), tickTimer: 1 });
+    vi.spyOn(sim.rng, 'chance').mockImplementation((p: number) =>
+      p === MAGMA_SURGE_CHANCE ? shaman.castingAbility === 'lava_burst' : p >= 0.5,
+    );
+    shaman.resource = shaman.maxResource;
+    shaman.gcdRemaining = 0;
+    sim.castAbility('lava_burst', shaman.id);
+    const events: SimEvent[] = [];
+    while (shaman.castingAbility === 'lava_burst' && shaman.castRemaining > 0.2) {
+      events.push(...sim.tick());
+    }
+    expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(true);
+    // A press inside the cast tail queues, then fires when the cast completes.
+    shaman.resource = shaman.maxResource;
+    sim.castAbility('lava_burst', shaman.id);
+    expect(shaman.queuedCastAbility).toBe('lava_burst');
+    for (let tick = 0; tick < 6 && shaman.queuedCastAbility; tick++) events.push(...sim.tick());
+    expect(shaman.queuedCastAbility ?? null).toBeNull();
+    expect(shaman.castingAbility).toBeNull();
+    expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(false);
+    expect(shaman.cooldowns.get('lava_burst')).toBeGreaterThan(7);
+    events.push(...run(sim, 40));
+    expect(hits(events, 'Magma Burst')).toHaveLength(2);
+  });
+
+  it('a cancelled Magma Burst keeps a mid-cast surge and leaves the spell ready', () => {
+    const { sim, shaman, target } = setup();
+    target.auras.push({ ...cinderDot(shaman), tickTimer: 0.5 });
+    vi.spyOn(sim.rng, 'chance').mockImplementation((p: number) =>
+      p === MAGMA_SURGE_CHANCE ? shaman.castingAbility === 'lava_burst' : p >= 0.5,
+    );
+    shaman.resource = shaman.maxResource;
+    shaman.gcdRemaining = 0;
+    sim.castAbility('lava_burst', shaman.id);
+    run(sim, 20);
+    expect(shaman.castingAbility).toBe('lava_burst');
+    expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(true);
+    sim.ctx.cancelCast(shaman);
+    expect(shaman.castingAbility).toBeNull();
+    expect(shaman.cooldowns.has('lava_burst')).toBe(false);
+    shaman.gcdRemaining = 0;
+    shaman.resource = shaman.maxResource;
+    sim.castAbility('lava_burst', shaman.id);
+    expect(shaman.castingAbility).toBeNull();
+    expect(shaman.cooldowns.get('lava_burst')).toBeGreaterThan(7);
+  });
+
   it('a hard-cast Magma Burst with no surge keeps its cooldown', () => {
     const { sim, shaman } = setup();
     landNoCrit(sim);
