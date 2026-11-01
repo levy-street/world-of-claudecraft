@@ -4189,6 +4189,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'wallet.bagReconnect': '重新連接錢包',
   'hudChrome.wocStore.collectionLine': '{collection}系列',
   'hudChrome.wocStore.seasonOne': '第一賽季',
+  'hudChrome.wocStore.promoClose': '關閉推廣',
   'hudChrome.wocStore.membershipPromo.open': 'WOC 商店中的會員',
   'hudChrome.wocStore.membershipPromo.close': '關閉會員推廣',
   'hudChrome.wocStore.membershipPromo.eyebrow': '帳號特權',

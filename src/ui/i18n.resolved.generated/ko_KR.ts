@@ -1607,6 +1607,7 @@ export const ko_KR: EnTranslations = {
         }
       },
       "seasonOne": "시즌 1",
+      "promoClose": "홍보 닫기",
       "membershipPromo": {
         "open": "WOC 상점의 멤버십",
         "close": "멤버십 홍보 닫기",

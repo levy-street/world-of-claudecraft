@@ -1607,6 +1607,7 @@ export const da_DK: EnTranslations = {
         }
       },
       "seasonOne": "Sæson 1",
+      "promoClose": "Close promotions",
       "membershipPromo": {
         "open": "Medlemskab i WOC-butikken",
         "close": "Luk medlemskabstilbud",

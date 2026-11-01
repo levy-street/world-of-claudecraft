@@ -970,6 +970,7 @@ export const hudChromeStrings = {
     seasonOne: 'Season 1',
     // The rotating promo card above chat (src/ui/store_promo_card.ts). The
     // Refer a Friend advert takes its title from the referralCards namespace.
+    promoClose: 'Close promotions',
     membershipPromo: {
       open: 'Membership in the WOC Store',
       close: 'Close membership promotion',

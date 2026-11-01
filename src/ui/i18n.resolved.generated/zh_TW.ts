@@ -1607,6 +1607,7 @@ export const zh_TW: EnTranslations = {
         }
       },
       "seasonOne": "第一賽季",
+      "promoClose": "關閉推廣",
       "membershipPromo": {
         "open": "WOC 商店中的會員",
         "close": "關閉會員推廣",

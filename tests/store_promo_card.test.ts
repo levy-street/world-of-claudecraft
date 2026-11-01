@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   mountStorePromoCard,
   nextStorePromoIndex,
+  REFERRAL_PROMO_FRIEND_GOAL,
   STORE_PROMO_RETIRE_GUARD_MS,
   STORE_PROMO_ROTATE_MS,
   type StorePromoSlide,
@@ -103,14 +104,14 @@ class FakeElement {
 
 const armoryLabels = {
   open: 'WOC Store',
-  close: 'Close WOC Store',
+  close: 'Close promotions',
   season: 'Season 1',
   title: 'The Armory',
   cta: 'WOC Store',
 };
 const referralLabels = {
   open: 'Refer a Friend',
-  close: 'Close Refer a Friend promotion',
+  close: 'Close promotions',
   season: 'Adventure together',
   title: 'Refer a Friend',
   cta: 'Invite friends',
@@ -237,7 +238,7 @@ describe('store promo card', () => {
 
     const close = host.querySelector('.store-promo-card-close');
     expect(close?.className).toContain('ui-x-btn');
-    expect(close?.getAttribute('aria-label')).toBe('Close WOC Store');
+    expect(close?.getAttribute('aria-label')).toBe('Close promotions');
     close?.dispatch('click');
 
     expect(onOpenStore).not.toHaveBeenCalled();
@@ -262,7 +263,7 @@ describe('store promo card', () => {
     expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
     expect(open?.getAttribute('aria-label')).toBe('Refer a Friend');
     expect(host.querySelector('.store-promo-card-close')?.getAttribute('aria-label')).toBe(
-      'Close Refer a Friend promotion',
+      'Close promotions',
     );
 
     card?.dispatch('mouseenter');
@@ -276,18 +277,20 @@ describe('store promo card', () => {
     );
   });
 
-  it('retires only the advert it closes or opens, removing the card after the last', () => {
+  it('retires only the advert it opens, removing the card after the last', () => {
     vi.useFakeTimers();
     const { host, returnTarget } = fixture();
+    const onArmory = vi.fn();
     const onReferral = vi.fn();
     const onDismiss = vi.fn();
     mountStorePromoCard(asHtml(host), {
-      slides: [armorySlide(), referralSlide(onReferral)],
+      slides: [armorySlide(onArmory), referralSlide(onReferral)],
       returnFocusTo: () => asHtml(returnTarget),
       onDismiss,
     });
 
-    host.querySelector('.store-promo-card-close')?.dispatch('click');
+    host.querySelector('.store-promo-card-open')?.dispatch('click');
+    expect(onArmory).toHaveBeenCalledOnce();
     expect(host.querySelector('.store-promo-card')).not.toBeNull();
     expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
     expect(onDismiss).not.toHaveBeenCalled();
@@ -326,38 +329,49 @@ describe('store promo card', () => {
     expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
   });
 
-  it('keeps focus on close while adverts remain, then returns it to the chest', () => {
+  it('closes every advert with one click and returns focus to the chest', () => {
     vi.useFakeTimers();
     const { document, host, returnTarget } = fixture();
+    const onDismiss = vi.fn();
+    const opens = [vi.fn(), vi.fn(), vi.fn()];
     mountStorePromoCard(asHtml(host), {
-      slides: [armorySlide(), referralSlide()],
+      slides: [
+        armorySlide(opens[0]),
+        {
+          id: 'membership',
+          image: '/ui/store/membership-promo.webp',
+          labels: armoryLabels,
+          onOpen: opens[1],
+        },
+        referralSlide(opens[2]),
+      ],
       returnFocusTo: () => asHtml(returnTarget),
+      onDismiss,
     });
-    const close = host.querySelector('.store-promo-card-close');
 
-    close?.dispatch('click');
-    expect(document.activeElement).toBe(close);
-    expect(close?.getAttribute('aria-label')).toBe('Close Refer a Friend promotion');
-
-    vi.advanceTimersByTime(STORE_PROMO_RETIRE_GUARD_MS);
-    close?.dispatch('click');
-    expect(document.activeElement).toBe(returnTarget);
+    host.querySelector('.store-promo-card-close')?.dispatch('click');
     expect(host.querySelector('.store-promo-card')).toBeNull();
+    expect(onDismiss).toHaveBeenCalledOnce();
+    expect(document.activeElement).toBe(returnTarget);
+    expect(vi.getTimerCount()).toBe(0);
+    for (const open of opens) expect(open).not.toHaveBeenCalled();
   });
 
   it('ignores a second click that lands inside the retire guard', () => {
     vi.useFakeTimers();
     const { host, returnTarget } = fixture();
+    const onArmory = vi.fn();
     const onDismiss = vi.fn();
     mountStorePromoCard(asHtml(host), {
-      slides: [armorySlide(), referralSlide()],
+      slides: [armorySlide(onArmory), referralSlide()],
       returnFocusTo: () => asHtml(returnTarget),
       onDismiss,
     });
-    const close = host.querySelector('.store-promo-card-close');
+    const open = host.querySelector('.store-promo-card-open');
 
-    close?.dispatch('click');
-    close?.dispatch('click');
+    open?.dispatch('click');
+    open?.dispatch('click');
+    expect(onArmory).toHaveBeenCalledOnce();
     expect(onDismiss).not.toHaveBeenCalled();
     expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
   });
@@ -398,8 +412,8 @@ describe('store promo card', () => {
       onDismiss,
     });
 
-    // Close Refer a Friend, leaving membership as the only advert.
-    host.querySelector('.store-promo-card-close')?.dispatch('click');
+    // Open Refer a Friend, leaving membership as the only advert.
+    host.querySelector('.store-promo-card-open')?.dispatch('click');
     expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/membership-promo.webp');
     member = true;
     vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS);
@@ -450,6 +464,9 @@ describe('store promo card', () => {
     expect(hud).toContain('openStore: () => this.openWocStore(),');
     expect(hud).toContain('openReferralCards: () => this.referralCards.open(),');
     expect(hud).toContain('membershipActive: () => this.sim.player?.membershipActive === true,');
+    expect(hud).toContain(
+      'referralFriendsCompleted: () => this.sim.referralCardsSnapshot()?.completedFriends ?? null,',
+    );
     expect(hud).toContain('this.storePromoCard?.relocalize(storePromoLabels());');
   });
 
@@ -521,6 +538,7 @@ describe('store promo card', () => {
       openMemberships: vi.fn(),
       openReferralCards: vi.fn(),
       membershipActive: () => member,
+      referralFriendsCompleted: () => 0,
     };
     const slides = storePromoSlides(deps);
     expect(slides.map((slide) => slide.id)).toEqual(['armory', 'membership', 'referral']);
@@ -538,6 +556,73 @@ describe('store promo card', () => {
     expect(slides[1].available?.()).toBe(true);
     member = true;
     expect(slides[1].available?.()).toBe(false);
+  });
+
+  it('hides Refer a Friend once the referrer has completed five friends', () => {
+    let completed: number | null = null;
+    const slides = storePromoSlides({
+      openStore: vi.fn(),
+      openMemberships: vi.fn(),
+      openReferralCards: vi.fn(),
+      membershipActive: () => false,
+      referralFriendsCompleted: () => completed,
+    });
+    const referral = slides.find((slide) => slide.id === 'referral');
+    expect(REFERRAL_PROMO_FRIEND_GOAL).toBe(5);
+    // Before the first referral snapshot arrives the advert still shows.
+    expect(referral?.available?.()).toBe(true);
+    completed = 4;
+    expect(referral?.available?.()).toBe(true);
+    completed = 5;
+    expect(referral?.available?.()).toBe(false);
+    completed = 7;
+    expect(referral?.available?.()).toBe(false);
+  });
+
+  it('skips Refer a Friend in the live rotation once five friends complete', () => {
+    vi.useFakeTimers();
+    const { host, returnTarget } = fixture();
+    let completed: number | null = 4;
+    const slides = storePromoSlides({
+      openStore: vi.fn(),
+      openMemberships: vi.fn(),
+      openReferralCards: vi.fn(),
+      membershipActive: () => true,
+      referralFriendsCompleted: () => completed,
+    });
+    mountStorePromoCard(asHtml(host), { slides, returnFocusTo: () => asHtml(returnTarget) });
+    const armory = '/ui/store/season-01-armory-promo.webp';
+
+    vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS);
+    expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
+    completed = 5;
+    for (let i = 0; i < 4; i++) {
+      vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS);
+      expect(activeSlide(host)?.querySelector('img')?.src).toBe(armory);
+    }
+  });
+
+  it('closes the card even right after opening an advert', () => {
+    vi.useFakeTimers();
+    const { host, returnTarget } = fixture();
+    const onDismiss = vi.fn();
+    mountStorePromoCard(asHtml(host), {
+      slides: [armorySlide(), referralSlide()],
+      returnFocusTo: () => asHtml(returnTarget),
+      onDismiss,
+    });
+
+    host.querySelector('.store-promo-card-open')?.dispatch('click');
+    host.querySelector('.store-promo-card-close')?.dispatch('click');
+    expect(onDismiss).toHaveBeenCalledOnce();
+    expect(host.querySelector('.store-promo-card')).toBeNull();
+  });
+
+  it('gives every advert the one card-wide close label', () => {
+    const labels = storePromoLabels();
+    expect(labels.armory.close).toBe('Close promotions');
+    expect(labels.membership.close).toBe('Close promotions');
+    expect(labels.referral.close).toBe('Close promotions');
   });
 
   it('uses a comfortably sized close target on the promo card', () => {

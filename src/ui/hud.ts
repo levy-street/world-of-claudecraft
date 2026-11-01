@@ -16537,6 +16537,7 @@ export class Hud {
         openMemberships: () => this.openWocStore('memberships'),
         openReferralCards: () => this.referralCards.open(),
         membershipActive: () => this.sim.player?.membershipActive === true,
+        referralFriendsCompleted: () => this.sim.referralCardsSnapshot()?.completedFriends ?? null,
       }),
       returnFocusTo: () => document.getElementById('daily-rewards-button'),
       onDismiss: () => {

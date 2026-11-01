@@ -2810,6 +2810,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     '미어펜 분화구가 아직 빛날 때 “손댈 수 없을 만큼 뜨거웠던” 잔해인 순수한 운석 별 금속을 벼려 만들었습니다. 망치로 두드려 별자리가 새겨진 우주처럼 검은 활대를 만들고, 대목을 따라 용융 금빛 핵을 가두었습니다. 화살을 메는 대신 별불의 화살을 불러냅니다. 판결처럼 날아가 이야기 하나의 끝처럼 꽂힙니다. 하이워치가 니스락시스의 죽지 않는 왕관조차 봉우리 아래 최악의 것이 아닐 수 있다고 두려워했을 때, 성벽 위에 두고 싶어 했던 무기입니다. 조준을 신중히 하십시오.',
   'hudChrome.wocStore.seasonOne': '시즌 1',
+  'hudChrome.wocStore.promoClose': '홍보 닫기',
   'hudChrome.wocStore.membershipPromo.open': 'WOC 상점의 멤버십',
   'hudChrome.wocStore.membershipPromo.close': '멤버십 홍보 닫기',
   'hudChrome.wocStore.membershipPromo.eyebrow': '계정 혜택',

@@ -1607,6 +1607,7 @@ export const en_XA: EnTranslations = {
         }
       },
       "seasonOne": "[Šéášóñ 1]",
+      "promoClose": "[Çļóšé þŕóɱóţíóñš]",
       "membershipPromo": {
         "open": "[Ɱéɱƀéŕšĥíþ íñ ţĥé ŴÓÇ Šţóŕé]",
         "close": "[Çļóšé ɱéɱƀéŕšĥíþ þŕóɱóţíóñ]",

@@ -1607,6 +1607,7 @@ export const ru_RU: EnTranslations = {
         }
       },
       "seasonOne": "Сезон 1",
+      "promoClose": "Закрыть рекламу",
       "membershipPromo": {
         "open": "Членство в магазине WOC",
         "close": "Закрыть рекламу членства",

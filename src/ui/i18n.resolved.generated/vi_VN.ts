@@ -1607,6 +1607,7 @@ export const vi_VN: EnTranslations = {
         }
       },
       "seasonOne": "Mùa 1",
+      "promoClose": "Close promotions",
       "membershipPromo": {
         "open": "Tư Cách Thành Viên Trong Cửa Hàng WOC",
         "close": "Đóng Quảng Bá Thành Viên",

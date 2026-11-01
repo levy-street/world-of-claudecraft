@@ -1607,6 +1607,7 @@ export const zh_CN: EnTranslations = {
         }
       },
       "seasonOne": "第一赛季",
+      "promoClose": "关闭推广",
       "membershipPromo": {
         "open": "WOC 商店中的会员",
         "close": "关闭会员推广",

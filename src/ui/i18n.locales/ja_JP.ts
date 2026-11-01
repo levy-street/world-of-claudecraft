@@ -2822,6 +2822,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Mirefenのクレーターがまだ輝いていた頃、生の隕鉄から鍛えられた。「熱すぎて持てない」残骸を叩き、星座を刻んだ宇宙黒の弓部とし、台木に沿って溶融金の核を封じた。ボルトをつがえるのではなく召喚する。宣告のように放たれ、その終わりのように着弾する星火の矢だ。Nythraxisの不死の王冠すら峰の下で最悪のものではないとHighwatchが恐れたとき、城壁に望んだ武器がこれだった。狙いを違えるな。',
   'hudChrome.wocStore.seasonOne': 'シーズン1',
+  'hudChrome.wocStore.promoClose': '宣伝を閉じる',
   'hudChrome.wocStore.membershipPromo.open': 'WOCストアのメンバーシップ',
   'hudChrome.wocStore.membershipPromo.close': 'メンバーシップの宣伝を閉じる',
   'hudChrome.wocStore.membershipPromo.eyebrow': 'アカウント特典',

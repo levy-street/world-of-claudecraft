@@ -49,6 +49,11 @@ export const STORE_PROMO_GAP_PX = 10;
 export const STORE_PROMO_ROTATE_MS = 9000;
 /** Clicks this soon after a retire are ignored, so a double click retires one advert. */
 export const STORE_PROMO_RETIRE_GUARD_MS = 450;
+/**
+ * Completed friends that earn the last Refer a Friend reward tier; a referrer who
+ * reached it has nothing left to earn, so the advert stops showing to them.
+ */
+export const REFERRAL_PROMO_FRIEND_GOAL = 5;
 
 /** Visual height reserved above chat for the proportional promo plus its CSS gap. */
 export function storePromoReservedHeight(width: number, uiScale = 1): number {
@@ -81,24 +86,26 @@ export function storePromoLabels(): Record<
   'armory' | 'membership' | 'referral',
   StorePromoCardLabels
 > {
+  // One close button dismisses every advert, so it carries one label.
+  const close = t('hudChrome.wocStore.promoClose');
   return {
     armory: {
       open: t('hudChrome.wocStore.title'),
-      close: t('hudChrome.wocStore.close'),
+      close,
       season: t('hudChrome.wocStore.seasonOne'),
       title: t('hudChrome.wocStore.armoryTitle'),
       cta: t('hudChrome.wocStore.title'),
     },
     membership: {
       open: t('hudChrome.wocStore.membershipPromo.open'),
-      close: t('hudChrome.wocStore.membershipPromo.close'),
+      close,
       season: t('hudChrome.wocStore.membershipPromo.eyebrow'),
       title: t('hudChrome.wocStore.membershipPromo.title'),
       cta: t('hudChrome.wocStore.membershipPromo.cta'),
     },
     referral: {
       open: t('referralCards.title'),
-      close: t('hudChrome.wocStore.referralPromo.close'),
+      close,
       season: t('hudChrome.wocStore.referralPromo.eyebrow'),
       title: t('referralCards.title'),
       cta: t('hudChrome.wocStore.referralPromo.cta'),
@@ -111,6 +118,8 @@ export interface StorePromoSlideDeps {
   openMemberships(): void;
   openReferralCards(): void;
   membershipActive(): boolean;
+  /** Friends who completed a stamp card with this account; null before the first snapshot. */
+  referralFriendsCompleted(): number | null;
 }
 
 /** The adverts the card rotates through, in order, with the current locale's copy. */
@@ -137,6 +146,7 @@ export function storePromoSlides(deps: StorePromoSlideDeps): StorePromoSlide[] {
       image: '/ui/store/referral-promo.webp',
       labels: labels.referral,
       onOpen: deps.openReferralCards,
+      available: () => (deps.referralFriendsCompleted() ?? 0) < REFERRAL_PROMO_FRIEND_GOAL,
     },
   ];
 }
@@ -152,8 +162,8 @@ interface SlideView {
 
 /**
  * Mount the desktop-web promotion directly above the movable chat frame. One
- * card rotates through its adverts; each close button retires only the advert
- * it shows, and the card removes itself once every advert is gone.
+ * card rotates through its adverts; opening an advert retires only that one,
+ * while the close button dismisses the whole card in a single click.
  */
 export function mountStorePromoCard(
   host: HTMLElement,
@@ -321,12 +331,11 @@ export function mountStorePromoCard(
   close.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (ignoreClick()) return;
-    retireCurrent();
-    // While adverts remain, focus stays on this close button (it now names the
-    // next advert); once the card is gone, it returns to the permanent chest.
-    if (dismissed) deps.returnFocusTo()?.focus();
-    else close.focus();
+    // Closing ends the whole card, so a double click cannot over-retire and
+    // the retire guard does not apply here.
+    if (dismissed) return;
+    dismiss();
+    deps.returnFocusTo()?.focus();
   });
 
   return { dismiss, relocalize };
