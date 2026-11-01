@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import { ARC_BOLT_ABILITY, playArcBolt } from '../src/render/ability_vfx/arc_bolt';
+import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
+import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import { SteppedLeaderBolts } from '../src/render/ability_vfx/stepped_leader';
 import {
   AFTERGLOW_END_S,
@@ -18,6 +20,8 @@ import {
   resolveGfxProfile,
 } from '../src/render/gfx';
 import { LightPulses, type TrackedLightHost } from '../src/render/light_pulses';
+import { createVfxAnchor } from '../src/render/vfx_anchor';
+import { installCastVfxCanvasStub } from './helpers/cast_vfx_headless';
 
 const FULL: ArcBoltLeaderPlan = { scale: 1, branches: true, restrike: true };
 const DT = 1 / 60;
@@ -462,5 +466,92 @@ describe('playArcBolt: Arc Bolt routes its cue onto the stepped leader', () => {
     const f = fakes(null);
     expect(playArcBolt(f.vfx, f.fx, 1, 2, 0x8fd0ff, 0, false)).toBe(true);
     expect(f.fx.steppedLeader).not.toHaveBeenCalled();
+  });
+});
+
+describe('the real painter routes Arc Bolt onto the stepped leader', () => {
+  function rig() {
+    installCastVfxCanvasStub();
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 400);
+    const place = (id: number) => ({ x: id * 6, z: 0 });
+    const anchor = createVfxAnchor((id, pose) => {
+      const at = place(id);
+      pose.x = at.x;
+      pose.y = 0;
+      pose.z = at.z;
+      pose.height = 2;
+      return true;
+    });
+    const fx = new AbilityVfxFx(
+      scene,
+      camera,
+      anchor,
+      () => 0,
+      () => 0,
+    );
+    const launches: Array<{ args: unknown[] }> = [];
+    const record = () => () => {};
+    const painter = new AbilityVfx(
+      {
+        fx,
+        vfx: {
+          projectile: record(),
+          lightningProjectile: (...args: unknown[]) => {
+            launches.push({ args });
+            return new THREE.Vector3(0, 1.2, 0);
+          },
+          burst: record(),
+          nova: record(),
+          tick: record(),
+          shoutwave: record(),
+          buffSwirl: record(),
+          beam: record(),
+        },
+        anchor: (id, heightFrac) => ({ ...place(id), y: heightFrac * 2 }),
+        spawnAoeRing: () => {},
+        triggerAttack: () => {},
+        localPlayerId: () => 1,
+        isWarrior: () => false,
+        isLivingWarrior: () => false,
+        isMob: () => false,
+        castingAbilityOf: () => null,
+        castVfxAdmit: () => true,
+        castVfxReady: () => true,
+      },
+      () => 0,
+    );
+    return { fx, painter, launches };
+  }
+  const cue = (fx: string, ability: string) => ({
+    type: 'spellfx' as const,
+    sourceId: 1,
+    targetId: 2,
+    school: 'nature',
+    fx,
+    ability,
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('the Arc Bolt cast cue launches a tipped projectile ridden by a leader', () => {
+    const { fx, painter, launches } = rig();
+    expect(painter.handleSpellfx(cue('lightning', 'lightning_bolt'))).toBe(true);
+    expect(launches.length).toBe(1);
+    expect((launches[0].args[3] as { tip?: boolean } | undefined)?.tip).toBe(true);
+    expect(fx.steppedLeaderCount()).toBe(1);
+  });
+
+  it('the Arc Overload echo (a projectile cue) rides a leader too', () => {
+    const { fx, painter, launches } = rig();
+    expect(painter.handleSpellfx(cue('projectile', 'lightning_bolt'))).toBe(true);
+    expect(launches.length).toBe(1);
+    expect(fx.steppedLeaderCount()).toBe(1);
+  });
+
+  it("another ability's lightning cue keeps the old look: no leader, no tip", () => {
+    const { fx, painter, launches } = rig();
+    painter.handleSpellfx(cue('lightning', 'chain_lightning'));
+    expect(fx.steppedLeaderCount()).toBe(0);
+    for (const l of launches) expect(l.args[3]).toBeUndefined();
   });
 });

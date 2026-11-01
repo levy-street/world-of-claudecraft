@@ -61,6 +61,21 @@ layers behind the `index.ts` barrel:
   of the entry. Anything new added to `prewarmSpawn` that a live frame would
   SEE must not be added here.
 
+Arc Bolt (the Shaman's `lightning_bolt`, and its Arc Overload echo) is a bespoke
+read beside the gallery anatomy: `arc_bolt.ts` routes both of its spellfx cues
+onto a stepped lightning leader (`stepped_leader.ts`, pure path and envelope math
+in the registered `stepped_leader_core.ts`) that RIDES the pooled `../vfx.ts`
+lightning projectile (`lightningProjectile` returns the live head and takes
+`tip`/`onImpact`/`onLost`) and stages its return stroke at ARRIVAL, never on the
+compressed 0.15 s instant clock. It owns no material: it draws through the ribbon
+pool's held pass (`appendStrip`), reached through closures so the cast-gate
+attribution walk credits the mesh to `ribbons` alone. Its light is ONE slot
+borrowed from the pulse pool (`../light_pulses.ts` `TrackedLightHost`), never a
+new light; a tracked slot never steals, and an ordinary pulse may take it back on
+the one-light tier. Other `'lightning'` cues (the nature trinket procs) keep the
+old look. Pinned by `tests/stepped_leader.test.ts` and
+`tests/stepped_leader_core.test.ts`.
+
 `spirits.ts` (`SpiritApparitions`) discipline: do NOT imitate the naive gallery
 code it ports. One cached PUPPET per creature GLB, whose meshes all share ONE
 additive ghost material, so a spawn only attaches the cached puppet to a pooled
