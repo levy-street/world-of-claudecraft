@@ -665,3 +665,5 @@ Bastion, Drowned Temple, Gravewyrm Sanctum and Wildheart Basin illustrations fol
 the project's dungeon settings, with no third-party reference images.
 
 Lychgate Buckler, Bastion Kite Shield and Barrowfield Tower Shield inventory icons are project-generated art made with OpenAI built-in image generation. [Prompts and provenance](docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json). Project asset, with the project only.
+
+Tank Toll debuff icon (`public/ui/auras/tank_toll.webp`) is project-generated art made with OpenAI built-in image generation, following Furyogen's red -30% sketch and approved by Reuben. [Prompt and provenance](docs/achievements/tank-toll-icon-2026-11-01/accepted-art.json). Project asset, with the project only.

@@ -4104,8 +4104,8 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // A blood brand-sigil watched by a bone eye: branded, and seen.
   cheater_mark: r('shadow', 'blood', ['sigil_rune', { p: 'eye', ...BR, pal: 'bone' }], ['glow']),
   // Tank Toll (src/sim/pvp/tank_toll.ts): the PvP tank restraint marker, a
-  // steel shield paying a gold coin. Procedural stand-in until its painted
-  // art lands in AURA_FILE_IMAGE_IDS.
+  // steel shield paying a gold coin as fallback while the red -30% icon
+  // loads from AURA_FILE_IMAGE_IDS.
   tank_toll: r('blood', 'steel', ['shield', { p: 'coin', ...BR, pal: 'gold' }]),
   // Nythraxis's Impaled (src/sim/nythraxis_bone_spike.ts): an encounter-owned
   // stun with no ability record and no painted art, so without this row the
@@ -5412,6 +5412,7 @@ export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
   'shaman_wayfarer_grace_icd',
   'soul_fragments',
   'stomp_stun',
+  'tank_toll',
   'thronebane_arc_slow',
   'unstuck_sickness',
   'verdance',

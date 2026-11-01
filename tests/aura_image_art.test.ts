@@ -22,6 +22,7 @@ describe('exact runtime aura paintings', () => {
     'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json';
   const masterwroughtManifest =
     'docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json';
+  const tankTollManifest = 'docs/achievements/tank-toll-icon-2026-11-01/accepted-art.json';
   const secondPassManifestSha256 =
     'bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe';
   const externalAuraArt = new Map([
@@ -175,6 +176,10 @@ describe('exact runtime aura paintings', () => {
         prompt: string;
       }>;
     };
+    const tankToll = JSON.parse(
+      readFileSync(path.join(process.cwd(), tankTollManifest), 'utf8'),
+    ) as typeof masterwrought;
+    expect(tankToll.assets.map(({ auraId }) => auraId)).toEqual(['tank_toll']);
     const committed = readdirSync(auraArtDir).sort();
     const committedIds = committed
       .filter((name) => name.endsWith('.webp') && !name.startsWith('mob_'))
@@ -284,12 +289,29 @@ describe('exact runtime aura paintings', () => {
             },
           ] as const,
       ),
+      ...tankToll.assets.map(
+        (asset) =>
+          [
+            asset.auraId,
+            {
+              auraId: asset.auraId,
+              sourceFile: asset.sourceFile,
+              sourceBytes: asset.sourceBytes,
+              sourceSha256: asset.sourceSha256,
+              acceptedSha256: asset.acceptedSha256,
+              acceptedBytes: asset.acceptedBytes,
+              acceptedArtManifest: tankTollManifest,
+              references: asset.references.map(({ path: referencePath }) => referencePath),
+              sourceProvenance: asset.sourceProvenance,
+            },
+          ] as const,
+      ),
     ]);
 
     expect(committed.filter((name) => name !== 'mapping.json' && !name.endsWith('.webp'))).toEqual(
       [],
     );
-    expect(expectedIds).toHaveLength(86);
+    expect(expectedIds).toHaveLength(87);
     expect(committedIds).toEqual(expectedIds);
     expect(mappedIds).toEqual(expectedIds);
     expect([...acceptedById.keys()].sort()).toEqual(expectedIds);
@@ -402,6 +424,7 @@ describe('exact runtime aura paintings', () => {
         fearManifest,
         mobManifest,
         masterwroughtManifest,
+        tankTollManifest,
       ]),
     );
     expect(mapping.externalAssets.map(({ auraId, runtimeUrl }) => [auraId, runtimeUrl])).toEqual([

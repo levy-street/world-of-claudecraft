@@ -11,7 +11,8 @@
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-elixir-aura-art.json",
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-fear-aura-art.json",
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json",
-    "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json"
+    "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json",
+    "docs/achievements/tank-toll-icon-2026-11-01/accepted-art.json"
   ],
   "externalAssets": [
     {
@@ -4103,6 +4104,22 @@
       "acceptedBytes": 3468,
       "acceptedArtManifest": "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json",
       "sourceProvenance": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/root-special.json"
+    },
+    {
+      "auraId": "tank_toll",
+      "sourceProvenance": "docs/achievements/tank-toll-icon-2026-11-01/accepted-art.json",
+      "sourceFile": "exec-c8480138-e1e0-459e-9bb3-c471d0ef5362.png",
+      "sourceBytes": 1187290,
+      "sourceSha256": "f64319406431f9b836a97d0b18ac406ae6c0120d89dfd2b36d5789f131263a1e",
+      "acceptedSha256": "6c2572e51d2d73a6720210e4cba3b569ce178ab6cf99723bd35558738202d756",
+      "acceptedBytes": 8914,
+      "references": [],
+      "prompt": "Create a single square game debuff icon following this exact simple design: very large bright crimson-red text '-30%' centered on a nearly black charcoal background, with one thick straight red horizontal bar above the text and one below it. The minus sign, digits 30, and percent symbol must be unmistakably readable as '-30%' even when the icon is reduced to 32x32 pixels. Use heavy bold condensed clean lettering, generous stroke thickness, very tight but clear spacing. Text takes up almost the entire width, balanced central composition, horizontal bars spanning 85 percent of the square. Strong red-on-black contrast, subtly luminous red edges, crisp flat shapes with only minimal polish suitable for a classic fantasy MMORPG status debuff. This is a production game icon, not a screenshot or mockup. No shield, no coin, no objects, no ornamental border, no extra text, no interface, no watermark. Full bleed opaque square dark background. Exact text: '-30%'.",
+      "output": "tank_toll.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "acceptedArtManifest": "docs/achievements/tank-toll-icon-2026-11-01/accepted-art.json"
     }
   ]
 }
