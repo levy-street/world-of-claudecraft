@@ -548,6 +548,9 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
 
   it('builds the cell under the player next once they are inside the zone', () => {
     const queue = createCellBuildQueue(ordered, GRID, near, () => player);
+    // Through its 2x2 block's even/even corner first (see the super-chunk
+    // test below), then the player's own cell.
+    expect(queue.next()).toEqual([10, 10]);
     expect(queue.next()).toEqual([11, 11]);
     // Then outward from the player, nearest first, while anything is near them.
     for (const cell of [queue.next(), queue.next()]) {
@@ -560,9 +563,11 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
   it('follows the player as they move during the build', () => {
     let focus = player;
     const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
+    expect(queue.next()).toEqual([10, 10]);
     expect(queue.next()).toEqual([11, 11]);
-    focus = centre([9, 6]);
-    expect(queue.next()).toEqual([9, 6]);
+    focus = centre([8, 7]);
+    expect(queue.next()).toEqual([8, 6]);
+    expect(queue.next()).toEqual([8, 7]);
   });
 
   it('keeps the precomputed order while the viewer is outside the zone or unknown', () => {
@@ -579,8 +584,8 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
     let focus: { x: number; z: number } | null = centre([12, 6]);
     const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
     expect(queue.next()).toEqual(ordered[0]);
-    focus = player;
-    expect(queue.next()).toEqual([11, 11]);
+    focus = centre([10, 10]);
+    expect(queue.next()).toEqual([10, 10]);
   });
 
   it('hands out every cell exactly once and never mutates its input', () => {
@@ -594,5 +599,48 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
     expect(queue.remaining).toBe(0);
     expect(out.map((c) => c.join(',')).sort()).toEqual(cells.map((c) => c.join(',')).sort());
     expect(ordered.map((cell) => cell.join(','))).toEqual(snapshot);
+  });
+
+  it('claims the 2x2 corner before an odd cell so the far-band super-chunk still merges', () => {
+    // terrain.ts merges a 2x2 block only when its even/even corner is claimed
+    // while all four cells are unbuilt; an odd cell first splits the block
+    // into four meshes for the rest of the session.
+    const queue = createCellBuildQueue(ordered, GRID, near, () => centre([9, 9]));
+    expect(queue.next()).toEqual([8, 8]);
+    expect(queue.next()).toEqual([9, 9]);
+  });
+
+  it('takes an odd cell directly once its corner is already gone', () => {
+    let focus: { x: number; z: number } | null = null;
+    const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
+    expect(queue.next()).toEqual([6, 6]); // ordered[0]: the entry cell
+    focus = centre([7, 7]);
+    expect(queue.next()).toEqual([7, 7]);
+  });
+
+  it('falls back to the precomputed order when nothing is left near the player', () => {
+    const queue = createCellBuildQueue(ordered, GRID, CHUNK_SIZE / 4, () => centre([11, 11]));
+    expect(queue.next()).toEqual([10, 10]); // the corner of the player's block
+    expect(queue.next()).toEqual([11, 11]);
+    const rest = ordered.filter(
+      ([cx, cz]) => !(cx === 11 && cz === 11) && !(cx === 10 && cz === 10),
+    );
+    expect(queue.next()).toEqual(rest[0]);
+  });
+
+  it('counts a cell exactly at the radius as near', () => {
+    const queue = createCellBuildQueue(
+      [
+        [10, 6],
+        [8, 6],
+        [6, 6],
+      ],
+      GRID,
+      CHUNK_SIZE * 2,
+      () => centre([6, 6]),
+    );
+    expect(queue.next()).toEqual([6, 6]);
+    // (8, 6) sits exactly two cells away; (10, 6) is next in the fixed order.
+    expect(queue.next()).toEqual([8, 6]);
   });
 });

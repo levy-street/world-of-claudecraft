@@ -2682,8 +2682,10 @@ export interface TerrainView {
    * would wall the island in at the unbuilt mainland (island_isolation_core).
    */
   groundResidency(view: { x: number; z: number }): { grid: ChunkGrid; isPending: GroundPendingAt };
-  /** hides chunks that sit entirely past the fog far plane */
-  update(camX: number, camZ: number, fogFar: number): void;
+  /** hides chunks that sit entirely past the fog far plane; (focusX, focusZ)
+   *  is where the viewer stands (default: the camera), which an in-flight
+   *  zone build follows when choosing its next chunk */
+  update(camX: number, camZ: number, fogFar: number, focusX?: number, focusZ?: number): void;
   /**
    * Releases every chunk owned by `zone`: removes its mesh from `group`,
    * disposes its geometry (the material is shared across every chunk and
@@ -2828,8 +2830,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   }
   const chunks: ChunkRec[] = [];
   let lastVisibilityX = Number.NaN;
-  // The camera position from the latest update(): a zone build re-reads it at
-  // every claim so the chunks under a player who walked in mid-build come next
+  // The viewer focus from the latest update() (the player, or the editor
+  // camera's target; never the third-person camera, which trails behind in
+  // the zone just left): a zone build re-reads it at every claim so the
+  // chunks under a player who walked in mid-build come next
   // (createCellBuildQueue). Mutated in place (update runs every frame); null
   // from the focus getter until the first frame.
   const buildFocus = { x: Number.NaN, z: Number.NaN };
@@ -3602,9 +3606,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       loadedZones.delete(zone.id);
       escalatedZones.delete(zone.id);
     },
-    update(camX: number, camZ: number, fogFar: number): void {
-      buildFocus.x = camX;
-      buildFocus.z = camZ;
+    update(camX: number, camZ: number, fogFar: number, focusX = camX, focusZ = camZ): void {
+      buildFocus.x = focusX;
+      buildFocus.z = focusZ;
       if (
         camX === lastVisibilityX &&
         camZ === lastVisibilityZ &&

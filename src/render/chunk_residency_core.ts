@@ -330,8 +330,9 @@ export interface CellBuildQueue {
  * viewer is outside the zone, or nothing is left near them) the precomputed
  * order continues unchanged, so a prepare for a zone the player is not in (a
  * neighbour, a ferry destination behind a loading screen) behaves exactly as
- * before. The radius matches orderCellsForEntry's for the same reason: the far
- * band's row-major tail keeps its 2x2 super-chunk merge.
+ * before. The radius matches orderCellsForEntry's, and a pick always goes
+ * through its 2x2 block's even/even corner first while that corner is queued,
+ * so the far band's super-chunk merge still forms near the player.
  *
  * Does not mutate `ordered`.
  */
@@ -369,8 +370,22 @@ export function createCellBuildQueue(
   return {
     next() {
       if (queue.length === 0) return undefined;
-      const i = nearestToFocus();
-      return i >= 0 ? queue.splice(i, 1)[0] : queue.shift();
+      let i = nearestToFocus();
+      if (i < 0) return queue.shift();
+      // The terrain claims a 2x2 super-chunk only from its even/even corner
+      // and only while all four cells are unbuilt, so claiming an odd cell
+      // first would split that block into four meshes for the rest of the
+      // session. Hand out the corner instead: its claim either merges (and
+      // covers the cell asked for in the same job) or builds a single, and
+      // the asked-for cell then comes on the next pick.
+      const [cx, cz] = queue[i];
+      if (cx % 2 !== 0 || cz % 2 !== 0) {
+        const ex = cx - (cx % 2);
+        const ez = cz - (cz % 2);
+        const corner = queue.findIndex(([qx, qz]) => qx === ex && qz === ez);
+        if (corner >= 0) i = corner;
+      }
+      return queue.splice(i, 1)[0];
     },
     get remaining() {
       return queue.length;
