@@ -384,8 +384,9 @@ and the existing achievement sound. The reveal respects both reduced-motion
 settings. Failed requests, initial snapshots and replayed snapshots cannot create
 a celebration. Consent and error prompts retain priority.
 
-Both referral trinket forms absorb 30% of current maximum health for 10 seconds
-when damage leaves the wearer below 35% health, with a 120-second internal cooldown.
+The referral trinkets absorb a flat amount (250 for Oathkeeper's Heart, 350 for
+the awakened form) for 10 seconds when damage leaves the wearer below 35% health,
+with a 120-second internal cooldown.
 The evolved active remains +5 to all five primary stats for 15 seconds. Their
 display names are Oathkeeper's Heart and Awakened Oathkeeper's Heart; saved IDs
 remain referral_hollow_charm and referral_fog_charm.

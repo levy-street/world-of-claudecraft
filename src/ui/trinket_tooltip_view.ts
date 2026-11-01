@@ -16,6 +16,7 @@ import { seedburstDamage, spiritJaguarBite } from '../sim/combat/wildheart_trink
 import {
   GAMBLE,
   type GambleFortune,
+  lastStandAbsorb,
   type TrinketPassive,
   type TrinketSpec,
   type TrinketUse,
@@ -116,11 +117,13 @@ function passiveLine(
   let values: InterpolationValues;
   switch (p.kind) {
     case 'lastStand':
-      key = 'hudChrome.trinkets.equip.lastStand';
+      key = p.flat
+        ? 'hudChrome.trinkets.equip.lastStandFlat'
+        : 'hudChrome.trinkets.equip.lastStand';
       values = {
         threshold: pct(p.belowHp),
-        absorb: n(Math.round(viewer.maxHp * p.absorb)),
-        absorbPct: pct(p.absorb),
+        absorb: n(lastStandAbsorb(p, viewer.maxHp)),
+        ...(p.flat ? {} : { absorbPct: pct(p.absorb) }),
         duration: n(p.duration),
         icd: n(p.icd),
       };

@@ -20205,6 +20205,8 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.',
   'hudChrome.trinkets.equip.lastStand':
     'Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.',
+  'hudChrome.trinkets.equip.lastStandFlat':
+    'Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño durante {duration} s. Puede ocurrir una vez cada {icd} s.',
   'hudChrome.trinkets.equip.hourglass':
     'La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.',
   'hudChrome.trinkets.equip.twinStrike':

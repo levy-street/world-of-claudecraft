@@ -3821,6 +3821,7 @@ export const da_DK: EnTranslations = {
       "equipLockout": "At udstyre det starter en {seconds} sek svalkontakt på dets brug, eller svalkonakt efterladt på klinkekuglen den erstatter hvis det er længere.",
       "equip": {
         "lastStand": "At tage skade under {threshold}% helbred giver et skjold, der absorberer {absorb} skade ({absorbPct}% af dit maksimale helbred) i {duration} sek. Kan ske en gang hver {icd} sek.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Overheling fra dine direkte heals gemmes på timeglas, op til {cap} ({capPct}% af dit maksimale helbred). Gemt heling forsvinder {fade} sek efter at det sidste voksede.",
         "twinStrike": "Dine auto-angreb har en {chance}% chance for at lave et ekstra håndslagsvåben slag. Kan ske en gang hver {icd} sek.",
         "tally": "Dine auto-angreb kritiske slag og dine dødsblow hver tilføjer et tal mark, op til {max}. Marker varer {duration} sek, opdateret når du får en.",

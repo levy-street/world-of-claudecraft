@@ -3821,6 +3821,7 @@ export const zh_CN: EnTranslations = {
       "equipLockout": "装备后，其使用效果会进入 {seconds} 秒的冷却；如果被替换的饰品剩余冷却更长，则改为该剩余冷却。",
       "equip": {
         "lastStand": "在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害（你最大生命值的 {absorbPct}%）的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。",
+        "lastStandFlat": "在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。",
         "hourglass": "你的直接治疗产生的过量治疗会储存在沙漏中，最多 {cap} 点（你最大生命值的 {capPct}%）。储存的治疗量在最后一次增加后 {fade} 秒消散。",
         "twinStrike": "你的自动攻击命中有 {chance}% 的几率额外进行一次主手近战挥击。每 {icd} 秒只能触发一次。",
         "tally": "你的自动攻击暴击和你的致命一击各增加一个计数标记，最多 {max} 个。标记持续 {duration} 秒，每获得一个便会刷新。",

@@ -3821,6 +3821,7 @@ export const tr_TR: EnTranslations = {
       "equipLockout": "Bunu kuşanmak kullanımında bir {seconds} saniye bekleme süresi başlatır veya yerine konan harika eşya varsa bu beklemeyi başlatır.",
       "equip": {
         "lastStand": "{threshold}% sağlığın altında hasara maruz kaldığında, {duration} saniye boyunca {absorb} hasarı ({absorbPct}% azami sağlığınız) absorbe eden bir kalkan kazanırsın. Her {icd} saniyede bir gerçekleşebilir.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Doğrudan iyileştirmelerden aşırı iyileştirme kumdaki saatte depolanır, en fazla {cap} ({capPct}% azami sağlığınız). Depolanan iyileştirme {fade} saniye son büyüdüğünde belirsizleşir.",
         "twinStrike": "Otomatik saldırı vuruşların {chance}% şansı fazladan bir ana el yakın dövüş salınısı yapmaktır. Her {icd} saniyede bir gerçekleşebilir.",
         "tally": "Otomatik saldırı kritik vuruşların ve birlikte ölüm vuruşlarının her biri en fazla {max} kadar bir sayma işareti ekler. İşaretler {duration} saniye sürer, bir işaret aldığında yenilenir.",

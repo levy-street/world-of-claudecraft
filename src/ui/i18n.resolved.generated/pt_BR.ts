@@ -3821,6 +3821,7 @@ export const pt_BR: EnTranslations = {
       "equipLockout": "Equipá-lo inicia uma recarga de uso de {seconds} s, ou a recarga restante do berloque que ele substitui, se esta for maior.",
       "equip": {
         "lastStand": "Sofrer dano estando abaixo de {threshold}% de vida concede um escudo que absorve {absorb} de dano ({absorbPct}% da sua vida máxima) por {duration} s. Pode ocorrer uma vez a cada {icd} s.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "A cura excedente das suas curas diretas é armazenada na ampulheta, até {cap} ({capPct}% da sua vida máxima). A cura armazenada se dissipa {fade} s depois da última vez que aumentou.",
         "twinStrike": "Seus acertos de ataque automático têm {chance}% de chance de causar um golpe extra de mão principal. Pode ocorrer uma vez a cada {icd} s.",
         "tally": "Seus acertos críticos de ataque automático e seus golpes fatais adicionam uma marca de contagem cada, até {max}. As marcas duram {duration} s, renovadas sempre que você ganha uma.",

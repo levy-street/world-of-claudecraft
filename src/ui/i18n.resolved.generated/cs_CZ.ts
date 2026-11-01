@@ -3821,6 +3821,7 @@ export const cs_CZ: EnTranslations = {
       "equipLockout": "Nasazení spustí {seconds}s cooldown na jeho použití, nebo zbývající cooldown cetky, kterou nahrazuje, pokud je delší.",
       "equip": {
         "lastStand": "Utrpění poškození pod {threshold} % zdraví udělí štít, který pohltí {absorb} poškození ({absorbPct} % tvého maximálního zdraví) po dobu {duration} s. Může nastat jednou za {icd} s.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Přeléčení z tvých přímých léčení se ukládá do přesýpacích hodin, až do {cap} ({capPct} % tvého maximálního zdraví). Uložené léčení vyprchá {fade} s poté, co naposledy vzrostlo.",
         "twinStrike": "Tvé automatické útoky mají {chance}% šanci provést navíc úder hlavní zbraní na blízko. Může nastat jednou za {icd} s.",
         "tally": "Tvé kritické automatické útoky a tvé smrtící údery přidají zápis, až do {max}. Zápisy trvají {duration} s a obnoví se pokaždé, když nějaký získáš.",

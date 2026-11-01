@@ -45,11 +45,11 @@ const n = (v: number) => formatNumber(v, { maximumFractionDigits: 0 });
 const EXPECTED: Record<string, { equip?: string; use?: string }> = {
   referral_hollow_charm: {
     equip:
-      'Equip: Taking damage while below 35% health grants a shield that absorbs 1,500 damage (30% of your maximum health) for 10 sec. Can occur once every 120 sec.',
+      'Equip: Taking damage while below 35% health grants a shield that absorbs 250 damage for 10 sec. Can occur once every 120 sec.',
   },
   referral_fog_charm: {
     equip:
-      'Equip: Taking damage while below 35% health grants a shield that absorbs 1,500 damage (30% of your maximum health) for 10 sec. Can occur once every 120 sec.',
+      'Equip: Taking damage while below 35% health grants a shield that absorbs 350 damage for 10 sec. Can occur once every 120 sec.',
     use: 'Use: Increase your Strength, Agility, Stamina, Intellect, and Spirit by 5 for 15 seconds. (2 min cooldown)',
   },
   bastion_sigil: {

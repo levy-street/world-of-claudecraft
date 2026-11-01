@@ -3821,6 +3821,7 @@ export const it_IT: EnTranslations = {
       "equipLockout": "Equipaggiarlo avvia un tempo di recupero di {seconds} sec sul suo utilizzo, oppure il tempo di recupero rimasto sul ninnolo che sostituisce, se più lungo.",
       "equip": {
         "lastStand": "Subire danno mentre sei sotto il {threshold}% di salute concede uno scudo che assorbe {absorb} danni ({absorbPct}% della tua salute massima) per {duration} sec. Può verificarsi una volta ogni {icd} sec.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Le cure in eccesso dalle tue cure dirette vengono immagazzinate nella clessidra, fino a {cap} ({capPct}% della tua salute massima). La cura immagazzinata svanisce {fade} sec dopo l'ultimo aumento.",
         "twinStrike": "I tuoi colpi di attacco automatico hanno il {chance}% di probabilità di effettuare un fendente extra con l'arma principale. Può verificarsi una volta ogni {icd} sec.",
         "tally": "I tuoi colpi critici di attacco automatico e i tuoi colpi mortali aggiungono ciascuno una tacca, fino a {max}. Le tacche durano {duration} sec, e si rinnovano ogni volta che ne ottieni una.",

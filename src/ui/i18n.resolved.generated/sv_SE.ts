@@ -3821,6 +3821,7 @@ export const sv_SE: EnTranslations = {
       "equipLockout": "Att utrusta det startar en {seconds} sek avkylningstid på dess användning, eller avkylningstiden kvar på talismanen det ersätter om det är längre.",
       "equip": {
         "lastStand": "Att ta skada när du är under {threshold}% hälsa ger ett sköld som absorberar {absorb} skada ({absorbPct}% av ditt maximala hälsa) i {duration} sek. Kan inträffa en gång var {icd} sek.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Överläkning från dina direkta läkningar lagras i timglasset, upp till {cap} ({capPct}% av ditt maximala hälsa). Lagrad läkning försvinner {fade} sek efter att den sist växte.",
         "twinStrike": "Dina auto-attacker har en {chance}% chans att göra ett extra närkampsslag med huvudhand. Kan inträffa en gång var {icd} sek.",
         "tally": "Dina auto-attacker kritiska slag och dina dödsblow lägger var och en till ett teckenmärke, upp till {max}. Märken varar {duration} sek, uppdaterad när du får ett.",

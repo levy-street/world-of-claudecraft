@@ -3821,6 +3821,7 @@ export const es_ES: EnTranslations = {
       "equipLockout": "Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.",
       "equip": {
         "lastStand": "Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.",
+        "lastStandFlat": "Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño durante {duration} s. Puede ocurrir una vez cada {icd} s.",
         "hourglass": "La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.",
         "twinStrike": "Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.",
         "tally": "Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.",

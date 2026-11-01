@@ -4445,6 +4445,10 @@ export const hudChromeStrings = {
     equip: {
       lastStand:
         'Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.',
+      // The fixed-amount form (the referral charms). Wordy (M16): filled in es
+      // and the five non-Latin locales in this change.
+      lastStandFlat:
+        'Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.',
       hourglass:
         'Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.',
       twinStrike:

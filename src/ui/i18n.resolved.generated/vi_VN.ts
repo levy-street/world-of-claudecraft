@@ -3821,6 +3821,7 @@ export const vi_VN: EnTranslations = {
       "equipLockout": "Trang Bị nó bắt đầu một thời gian chờ {seconds} giây trong cách sử dụng của nó, hoặc thời gian chờ còn lại trên báu vật nó thay thế nếu cái đó dài hơn.",
       "equip": {
         "lastStand": "Nhận sát thương trong khi dưới {threshold}% sức khỏe được cấp cho một lá chắn hấp thụ {absorb} sát thương ({absorbPct}% sức khỏe tối đa của bạn) trong {duration} giây. Có thể xảy ra một lần mỗi {icd} giây.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Chữa lành quá mức từ các phép chữa trực tiếp của bạn được lưu trữ trong cát thời gian, tối đa {cap} ({capPct}% sức khỏe tối đa của bạn). Chữa lành được lưu trữ phai mờ {fade} giây sau khi nó lần cuối phát triển.",
         "twinStrike": "Các cú đánh tự động tấn công của bạn có {chance}% cơ hội tạo ra một cuộc vấy tay chính cận chiến thêm. Có thể xảy ra một lần mỗi {icd} giây.",
         "tally": "Các cú đánh tấn công quan trọng tự động tấn công và cú chí mạng của bạn mỗi cái sẽ thêm một dấu tích, tối đa {max}. Dấu kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được dấu.",

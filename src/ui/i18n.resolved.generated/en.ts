@@ -3821,6 +3821,7 @@ export const en: EnTranslations = {
       "equipLockout": "Equipping it starts a {seconds} sec cooldown on its use, or the cooldown left on the trinket it replaces if that is longer.",
       "equip": {
         "lastStand": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.",
         "twinStrike": "Your auto-attack hits have a {chance}% chance to make an extra main-hand melee swing. Can occur once every {icd} sec.",
         "tally": "Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.",

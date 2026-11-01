@@ -3821,6 +3821,7 @@ export const ja_JP: EnTranslations = {
       "equipLockout": "装備すると使用効果に{seconds}秒のクールダウンが発生する。置き換えた装飾品の残りクールダウンの方が長い場合はそちらになる。",
       "equip": {
         "lastStand": "体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。",
+        "lastStandFlat": "体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージを吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。",
         "hourglass": "直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。",
         "twinStrike": "自動攻撃が命中すると、{chance}%の確率でメインハンドの近接攻撃をもう1回行う。{icd}秒に1回まで発動する。",
         "tally": "自動攻撃のクリティカルヒットととどめの一撃ごとに集計の印を1つ得る（最大{max}）。印は{duration}秒持続し、得るたびに更新される。",

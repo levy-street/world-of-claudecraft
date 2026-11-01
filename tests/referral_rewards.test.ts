@@ -232,7 +232,7 @@ describe('live referral reward behavior', () => {
   });
 
   it.each([REFERRAL_HOLLOW_TRINKET, REFERRAL_FOG_TRINKET])(
-    '%s grants a 30% maximum-health shield matching its tooltip at two health scales',
+    '%s grants its flat shield, matching its tooltip, at two health scales',
     (itemId) => {
       for (const level of [10, 20]) {
         const state = hollow();
@@ -244,13 +244,13 @@ describe('live referral reward behavior', () => {
         onTrinketDamage(sim.ctx, null, player, 1, 'physical', true, null);
         const shield = player.auras.find((a) => a.id === TRINKET_AURA.lastStand)!;
         expect(shield).toMatchObject({
-          value: Math.round(maxHp * 0.3),
+          value: itemId === REFERRAL_HOLLOW_TRINKET ? 250 : 350,
           duration: 10,
           value2: 0.35,
         });
         const tooltip = trinketTooltipLineTexts(itemId, player)[0].text;
         expect(tooltip).toContain(`absorbs ${formatNumber(shield.value)} damage`);
-        expect(tooltip).toContain('30% of your maximum health');
+        expect(tooltip).not.toContain('maximum health');
         expect(player.auras.find((a) => a.id === TRINKET_AURA.lastStandIcd)?.duration).toBe(120);
         player.auras = player.auras.filter((a) => a !== shield);
         onTrinketDamage(sim.ctx, null, player, 1, 'physical', true, null);

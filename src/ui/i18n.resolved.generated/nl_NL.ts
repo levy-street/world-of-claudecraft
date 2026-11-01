@@ -3821,6 +3821,7 @@ export const nl_NL: EnTranslations = {
       "equipLockout": "Het uitrusten ervan start een {seconds} sec cooldown op het gebruik ervan, of de cooldown die overblijft op het juweel dat het vervangt als dat langer is.",
       "equip": {
         "lastStand": "Schade nemen terwijl onder {threshold}% gezondheid verleent een schild dat {absorb} schade absorbeert ({absorbPct}% van je maximale gezondheid) voor {duration} sec. Kan eenmaal elke {icd} sec voorkomen.",
+        "lastStandFlat": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage for {duration} sec. Can occur once every {icd} sec.",
         "hourglass": "Overgenezing van je directe genezingen wordt opgeslagen in het zandloper, tot {cap} ({capPct}% van je maximale gezondheid). Opgeslagen genezing vervlauwt {fade} sec nadat het voor het laatst groeide.",
         "twinStrike": "Je auto-attack hits hebben {chance}% kans om een extra main-hand melee swing te maken. Kan eenmaal elke {icd} sec voorkomen.",
         "tally": "Je auto-attack kritieke treffen en je vernietigende slagen voegen elk een telstapel toe, tot {max}. Markeringen duren {duration} sec, vernieuwd wanneer je er een krijgt.",

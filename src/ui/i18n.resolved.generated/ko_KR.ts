@@ -3821,6 +3821,7 @@ export const ko_KR: EnTranslations = {
       "equipLockout": "착용하면 사용 효과에 {seconds}초의 재사용 대기시간이 시작됩니다. 교체한 장신구의 남은 재사용 대기시간이 더 길면 그 시간이 적용됩니다.",
       "equip": {
         "lastStand": "생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해(최대 생명력의 {absorbPct}%)를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.",
+        "lastStandFlat": "생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.",
         "hourglass": "직접 치유로 발생한 초과 치유량이 모래시계에 저장되며, 최대 {cap}(최대 생명력의 {capPct}%)까지 저장됩니다. 저장된 치유량은 마지막으로 늘어난 뒤 {fade}초가 지나면 사라집니다.",
         "twinStrike": "자동 공격이 적중하면 {chance}% 확률로 주무기 근접 공격을 한 번 더 합니다. {icd}초마다 한 번만 발동합니다.",
         "tally": "자동 공격 치명타와 결정타마다 집계 표식을 하나씩 얻으며, 최대 {max}개까지 쌓입니다. 표식은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.",
