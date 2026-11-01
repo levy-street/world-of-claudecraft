@@ -8,8 +8,9 @@
 //   - the well marched down a funnel of rock, its mist in layers lit from
 //     below, its depth deeper than 2M's;
 //   - the column of the final phase layered (three sheaths turning their
-//     own ways, shards riding it up), hidden while the ring rests, a share
-//     of the shards on the low tier;
+//     own ways, splinters riding it up), hidden while the ring rests, a share
+//     of the splinters on the low tier (its shape in
+//     tests/smith_heart_final_room_aaa.test.ts);
 //   - the abyss's glow under the lip and the haze before the crown, dark
 //     with the heart;
 //   - the landmarks' runs and the Breath's horns the same numbers as their

@@ -1020,7 +1020,7 @@ same online and offline; no wire change):
 | A quarter awake | its seams ignite in its vein's colour, the flood running out of the ring to the rim with a bright front, its light washed over its stones; its element rises off it: the Breath's dust devils and wind streaks along the spiral, the Hammer's ochre-gold grit and a tremor running out through its slabs every few seconds (the grit hopping, dust lifting), the Quench's frost mist and crystal growing along its frost veins as the flood reaches them, the Heat's embers off its fire crystal and molten light flowing out along its seams; the ridges bordering it glow in its colour, a curtain of light rising off their veins |
 | The other three | dark: their stones dimmed (a multiply shade under the wash), a faint glow left in their seams so the room still reads as four quarters |
 | A crossing | the old quarter's light drains back into the ring (a pulse through the dais), the new one floods out of it a breath later, and a shockwave races both ways along the ridge the boss crossed from where it crossed, its curtain flaring tall, sparks thrown up and falling back |
-| The final look | the boss in the ring with a fight on: all four quarters awake at once, the ring blazing (the dais's crystal, a column of its light, motes of the four veins spiralling up out of its kerb) |
+| The final look | the boss in the ring with a fight on: all four quarters awake at once, the ring blazing (the dais's crystal, a column of its light standing over every head, slivers of the four veins spiralling up out of its kerb) |
 | Resting | the boss in the ring before the pull: every quarter's seams breathing faintly, the ring warm |
 | Asleep, fallen | before the arrival's shockwave and once the heart goes dark: all of it dark with the room |
 
@@ -1265,6 +1265,42 @@ surround, the shafts in the gaps, the landmarks' runs and the Breath's horns aga
 Blender pieces), `tests/smith_heart_quarters_kit.test.ts` (one flat sheet per quarter, the
 landmarks as the quarters' walls, the crackle's longer reach) and
 `tests/smith_heart_quarters_look.test.ts` (the spots along each landmark's run).
+
+**The AAA pass, first batch (1 Nov 2026, the items of the visual audit that needed no Blender).**
+Render only. The rest of the room's weak points (wall landmarks, roots, rock under a fallen
+quarter, the Anvil) wait for the Blender batch.
+- **The room's rock.** Its thousands of white and gold dots were the crown's crystal veins: a
+  position read through each face's normal at this slot's world coordinates (a hundred thousand
+  yards out), so a slightly bent face turned the thin vein line to speckle. The navy came from
+  the Heart's light itself: the world's blue sky map at 0.26 on every shaded face (the same cause
+  2F fixed in the Ring). The crown now paints big value groups on the room's own round coordinates,
+  each quarter's colour a broad wash low on the rock, the shared fracture calmed
+  (`heart_crown_core.ts`); the sky map is a trace, the fill a grey violet
+  (`SMITH_HEART_CORE_LIGHT`).
+- **The Quench and the Cornice.** The crown covered their far walls too. It now paints only for a
+  camera in the Heart (`uHeartCore`, the sky's own area blend, `setHeartRockCore`), and the Quench's
+  frost takes those walls for every other camera.
+- **The red zigzag.** It was a fall of lava of the Heat's landmark (`Kit_LandmarkHeat`, its flank
+  fall, `landmark_pieces.py` `_fall`), one flat sheet of the glow slot. The shader paints every fall
+  in streams of crust and fire breaking up as they drop (`HEAT_FALL`, `heart_landmarks_glsl.ts`).
+- **The well.** The stepped mosaic was the fixed walk down the funnel. It now finds the wall exactly
+  (a coarse walk, then halving the step, `wellOutside`), with a course's strokes on the point it
+  found, facets of crystal on its bed, and a final phase that lifts it without burning it out.
+- **The column.** It says that the last act has begun, over the ring, seen from anywhere in the room
+  over every head. Each sheath is now a lathe (flaring out of the well, a waist over the boss's head,
+  opening above), its light gone at its silhouette and in strands winding up it, thin below
+  `HEART_RING_COLUMN.clear`: the boss and a falling quarter stay in plain view. Its diamonds are
+  thin splinters, the kerb's balls thin slivers in the four veins' colours (`BLAZE_FRAG`).
+- **The cracks asleep.** The flat ribbon with a black band round it (its glow ribbon and its scar in
+  the floor's slot) is now a cut in the stone: the ribbon's shade gives each side as a wall of a V
+  (one facing the floor's painted light, one in shadow) down to a dark throat with a thread of the
+  quarter's glow (`quarterGlowFrag`), and the scar is cut away to the odd chip until the flood
+  reaches it (`heartFloorScar`). A crack the flood has reached is exactly what it was.
+- **The floor and the shadow.** The smoke on the floor and the cobalt in the player's shadow were the
+  same sky map. The floor's strokes are broader and each slab's value varies more. The shadow's rough
+  edge is the game's shadow map, global, and stays.
+
+Pinned by `tests/smith_heart_final_room_aaa.test.ts`.
 
 **The fight on the quarters (the final boss, mechanics part 1, 28 Oct 2026).** The room now
 carries its fight: the quarter the boss stands in is the strength it drinks and its kit, the
