@@ -19,9 +19,10 @@ export const LEADER_KINKS_PER_STEP = 2;
 /** Lateral kink size relative to the vertical one (see stepLeader). */
 export const LATERAL_SHARE = 0.6;
 /** Point capacity of the main channel: three points per step (two kinks plus
- * the head sample), ample for the longest flight (30 yd at 26 yd/s is 23
- * steps, 70 points). */
-export const LEADER_MAX_PTS = 96;
+ * the head sample) over the projectile's whole 3 s ttl (60 steps), so even a
+ * bolt homing on a fleeing target never runs out; a full path only slides
+ * its last point. */
+export const LEADER_MAX_PTS = 192;
 /** Branch cap per bolt and the points each forked tendril carries. */
 export const LEADER_MAX_BRANCHES = 8;
 export const BRANCH_PTS = 6;
@@ -358,20 +359,34 @@ export interface ArcBoltLeaderPlan {
    * overload echo; the painter also drops it under reduced motion, so nothing
    * strobes for a player who asked for less motion). */
   restrike: boolean;
+  /** The wide violet plasma layer (shed at low VFX quality). */
+  aura: boolean;
 }
 
+/** VFX quality (the render budget's 0..1 level) below which the leader sheds
+ * its branches, and below which it also sheds the plasma aura. */
+export const LEADER_BRANCH_QUALITY = 0.5;
+export const LEADER_AURA_QUALITY = 0.3;
+
 /**
- * What an Arc Bolt draws on a given ability-VFX budget tier: tier 0 the full
- * leader, tier 1 the leader without branches or restrike, tier 2 (the spam
- * floor) nothing, which keeps the legacy color-only projectile. The Arc
- * Overload echo is the same bolt drawn smaller.
+ * What an Arc Bolt draws on a given ability-VFX budget tier and VFX quality:
+ * tier 0 the full leader, tier 1 the leader without branches or restrike,
+ * tier 2 (the spam floor) nothing, which keeps the legacy color-only
+ * projectile. Falling quality sheds branches, then the plasma aura. The Arc
+ * Overload echo is the same bolt drawn smaller. Cosmetic only: the strike's
+ * timing and the hit it marks are identical on every arm.
  */
-export function arcBoltLeaderPlan(tier: number, overload: boolean): ArcBoltLeaderPlan | null {
+export function arcBoltLeaderPlan(
+  tier: number,
+  overload: boolean,
+  quality = 1,
+): ArcBoltLeaderPlan | null {
   if (tier >= 2) return null;
   const full = tier === 0;
   return {
     scale: overload ? 0.7 : 1,
-    branches: full,
+    branches: full && quality >= LEADER_BRANCH_QUALITY,
     restrike: full && !overload,
+    aura: quality >= LEADER_AURA_QUALITY,
   };
 }

@@ -1816,6 +1816,11 @@ export class AbilityVfxFx implements SequencerHost {
     if (this.disposed) return -1;
     return this.leaders.spawn(sourceId, targetId, head, plan);
   }
+  /** The whole leader at once, then the stroke (the Arc Overload echo). */
+  steppedLeaderStrike(sourceId: number, targetId: number, plan: ArcBoltLeaderPlan): boolean {
+    if (this.disposed) return false;
+    return this.leaders.strike(sourceId, targetId, plan);
+  }
   steppedLeaderImpact(handle: number, at: THREE.Vector3): void {
     this.leaders.impact(handle, at);
   }
@@ -2650,6 +2655,7 @@ export class AbilityVfxFx implements SequencerHost {
       }
     };
     release(() => this.clear());
+    release(() => this.leaders.setLightHost(null));
     this.worldLightCb = null;
     release(() => this.ribbons.dispose());
     release(() => this.baked.dispose());

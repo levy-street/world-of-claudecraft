@@ -651,7 +651,11 @@ GPU work signs. Each rule names its seam and its guard.
   in the world scene, packed each render with the live sources first because the
   lit programs stop their point loop at the first black slot. A new point light in
   the world scene is a carrier source (marked, and in a listed registry), never a
-  light three gathers itself. Guards: `tests/render_light_census_pin.test.ts` (the
+  light three gathers itself. A cosmetic light that MOVES (the Arc Bolt leader)
+  borrows a pulse-pool slot through `light_pulses.ts` `TrackedLightHost`
+  (`track`/`setTracked`/`releaseTracked`) instead of minting one: a tracked slot
+  never steals and never takes the last untracked slot, and an ordinary pulse may
+  take it back. Guards: `tests/render_light_census_pin.test.ts` (the
   allowlist of every non-point light constructed under `src/render`),
   `tests/point_light_budget.test.ts` and `tests/point_light_carriers.test.ts` (the
   allowlist of every point-light producer and its route to a carrier). There is

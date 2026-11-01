@@ -1,5 +1,17 @@
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Vfx's sprite atlas loads through the asset loader; the contract tests below
+// build a real Vfx, so stub the loader the way cast_vfx_engine_family does.
+vi.mock('../src/render/assets/loader', () => ({
+  loadTexture: vi.fn(async () => ({ image: null })),
+  releaseTexture: vi.fn(),
+}));
+vi.mock('../src/render/assets/preload', () => ({
+  registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn(),
+}));
+
 import type { GraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import { ARC_BOLT_ABILITY, playArcBolt } from '../src/render/ability_vfx/arc_bolt';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
@@ -20,10 +32,11 @@ import {
   resolveGfxProfile,
 } from '../src/render/gfx';
 import { LightPulses, type TrackedLightHost } from '../src/render/light_pulses';
+import { Vfx } from '../src/render/vfx';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
 import { installCastVfxCanvasStub } from './helpers/cast_vfx_headless';
 
-const FULL: ArcBoltLeaderPlan = { scale: 1, branches: true, restrike: true };
+const FULL: ArcBoltLeaderPlan = { scale: 1, branches: true, restrike: true, aura: true };
 const DT = 1 / 60;
 
 interface StripCall {
@@ -117,8 +130,11 @@ describe('SteppedLeaderBolts: the leader rides the projectile', () => {
     const main = strips.filter((s) => s.count > 10);
     expect(main.length).toBe(3);
     expect(new Set(main.map((s) => s.color)).size).toBe(3);
-    expect(main[0].width).toBeGreaterThan(main[1].width);
-    expect(main[1].width).toBeGreaterThan(main[2].width);
+    // core first, then glow, then the wide aura: the shared pool refuses a
+    // strip whole, so under vertex pressure the dim outer layer is what drops
+    expect(main[0].width).toBeLessThan(main[1].width);
+    expect(main[1].width).toBeLessThan(main[2].width);
+    expect(main[0].light).toBeGreaterThan(main[2].light);
   });
 
   it('a stepped leader is carved at the step cadence, not every frame', () => {
@@ -159,7 +175,7 @@ describe('SteppedLeaderBolts: the leader rides the projectile', () => {
 
     const lean = harness();
     const h2 = new THREE.Vector3(0, 1.5, 0);
-    lean.bolts.spawn(1, 2, h2, { scale: 1, branches: false, restrike: false });
+    lean.bolts.spawn(1, 2, h2, { scale: 1, branches: false, restrike: false, aura: true });
     flyTo(lean.bolts, h2, new THREE.Vector3(14, 1.2, 0));
     lean.strips.length = 0;
     lean.bolts.draw();
@@ -408,6 +424,7 @@ describe('playArcBolt: Arc Bolt routes its cue onto the stepped leader', () => {
       steppedLeader: vi.fn(
         (_s: number, _t: number, _head: THREE.Vector3, _plan: ArcBoltLeaderPlan) => 42,
       ),
+      steppedLeaderStrike: vi.fn((_s: number, _t: number, _plan: ArcBoltLeaderPlan) => true),
       steppedLeaderImpact: vi.fn(),
       steppedLeaderLost: vi.fn(),
     };
@@ -437,6 +454,7 @@ describe('playArcBolt: Arc Bolt routes its cue onto the stepped leader', () => {
       scale: 1,
       branches: true,
       restrike: true,
+      aura: true,
     });
     const at = new THREE.Vector3(9, 9, 9);
     f.captured().onImpact?.(at);
@@ -445,14 +463,25 @@ describe('playArcBolt: Arc Bolt routes its cue onto the stepped leader', () => {
     expect(f.fx.steppedLeaderLost).toHaveBeenCalledWith(42);
   });
 
-  it('the overload echo rides a smaller leader', () => {
+  it('the overload echo strikes at once (its damage lands on the cast tick), smaller', () => {
     const f = fakes(new THREE.Vector3());
-    playArcBolt(f.vfx, f.fx, 1, 2, 0x8fd0ff, 0, true);
-    expect(f.fx.steppedLeader.mock.calls[0][3]).toEqual({
+    expect(playArcBolt(f.vfx, f.fx, 1, 2, 0x8fd0ff, 0, true)).toBe(true);
+    expect(f.calls.length).toBe(0); // no flying projectile for the echo
+    expect(f.fx.steppedLeader).not.toHaveBeenCalled();
+    expect(f.fx.steppedLeaderStrike.mock.calls[0][2]).toEqual({
       scale: 0.7,
       branches: true,
       restrike: false,
+      aura: true,
     });
+  });
+
+  it('low VFX quality reaches the plan: branches go first, then the aura', () => {
+    const f = fakes(new THREE.Vector3());
+    playArcBolt(f.vfx, f.fx, 1, 2, 0x8fd0ff, 0, false, 0.4);
+    expect(f.fx.steppedLeader.mock.calls[0][3]).toMatchObject({ branches: false, aura: true });
+    playArcBolt(f.vfx, f.fx, 1, 2, 0x8fd0ff, 0, false, 0.1);
+    expect(f.fx.steppedLeader.mock.calls[1][3]).toMatchObject({ branches: false, aura: false });
   });
 
   it('the spam-floor tier declines, so the painter keeps its color-only projectile', () => {
@@ -541,10 +570,10 @@ describe('the real painter routes Arc Bolt onto the stepped leader', () => {
     expect(fx.steppedLeaderCount()).toBe(1);
   });
 
-  it('the Arc Overload echo (a projectile cue) rides a leader too', () => {
+  it('the Arc Overload echo (a projectile cue) strikes at once with a leader', () => {
     const { fx, painter, launches } = rig();
     expect(painter.handleSpellfx(cue('projectile', 'lightning_bolt'))).toBe(true);
-    expect(launches.length).toBe(1);
+    expect(launches.length).toBe(0);
     expect(fx.steppedLeaderCount()).toBe(1);
   });
 
@@ -553,5 +582,130 @@ describe('the real painter routes Arc Bolt onto the stepped leader', () => {
     painter.handleSpellfx(cue('lightning', 'chain_lightning'));
     expect(fx.steppedLeaderCount()).toBe(0);
     for (const l of launches) expect(l.args[3]).toBeUndefined();
+  });
+});
+
+describe('SteppedLeaderBolts: failsafes and the instant strike', () => {
+  it('an orphan leader (its projectile went without a callback) stands down with its light', () => {
+    const lights = fakeLights();
+    const { bolts } = harness(lights.host);
+    bolts.spawn(1, 2, new THREE.Vector3(0, 1.5, 0), FULL); // the head never moves
+    for (let t = 0; t < 3.5; t += DT) bolts.advance(DT, false);
+    expect(bolts.activeCount()).toBe(0);
+    expect(lights.released.length).toBe(1);
+  });
+
+  it('strike() carves the whole path to the target and strokes at once', () => {
+    const lights = fakeLights();
+    const { bolts, strips, rings } = harness(lights.host);
+    expect(bolts.strike(1, 2, { ...FULL, scale: 0.7, restrike: false })).toBe(true);
+    expect(rings.length).toBe(1);
+    bolts.advance(DT, false);
+    strips.length = 0;
+    bolts.draw();
+    const channel = strips.filter((st) => st.count > 10);
+    expect(channel.length).toBeGreaterThan(0);
+    expect(Math.max(...strips.map((st) => st.light))).toBeGreaterThan(2); // stroke, not leader
+    const lit = lights.writes[lights.writes.length - 1];
+    expect(lit.x).toBeGreaterThan(10); // the flash stands at the far (target) end
+  });
+
+  it('strike() refuses a target with no anchor and claims nothing', () => {
+    const lights = fakeLights();
+    const { bolts, anchors } = harness(lights.host);
+    anchors.delete(2);
+    expect(bolts.strike(1, 2, FULL)).toBe(false);
+    expect(bolts.activeCount()).toBe(0);
+    expect(lights.writes.length).toBe(0);
+  });
+
+  it('reduced motion: a steady flight light and a stroke light held to the engine clamp', () => {
+    const lights = fakeLights();
+    const { bolts } = harness(lights.host);
+    const head = new THREE.Vector3(0, 1.5, 0);
+    const handle = bolts.spawn(1, 2, head, FULL);
+    const seen = new Set<number>();
+    for (let f = 0; f < 20; f++) {
+      head.x += 26 * DT;
+      bolts.advance(DT, true);
+      seen.add(lights.writes[lights.writes.length - 1].intensity);
+    }
+    expect(seen.size).toBe(1); // no flicker
+    bolts.impact(handle, head.clone());
+    let peak = 0;
+    for (let t = 0; t < 0.6; t += DT) {
+      bolts.advance(DT, true);
+      peak = Math.max(peak, lights.writes[lights.writes.length - 1].intensity);
+    }
+    expect(peak).toBeLessThanOrEqual(6);
+    expect(peak).toBeGreaterThan(0);
+  });
+});
+
+describe('LightPulses: moving lights never take the last ordinary slot', () => {
+  it('on a pool of four, at most three slots can be tracked', () => {
+    const lp = new LightPulses(new THREE.Scene());
+    const cap = lp.lights.length;
+    const tokens: number[] = [];
+    for (let i = 0; i < cap + 1; i++) tokens.push(lp.track());
+    const held = tokens.filter((t) => t >= 0).length;
+    expect(held).toBe(cap > 1 ? cap - 1 : 1);
+  });
+});
+
+describe('Vfx: the lightning projectile contract the leader rides', () => {
+  function rig() {
+    installCastVfxCanvasStub();
+    const at = new Map<number, THREE.Vector3>([
+      [1, new THREE.Vector3(0, 1, 0)],
+      [2, new THREE.Vector3(10, 1, 0)],
+    ]);
+    const vfx = new Vfx(new THREE.Scene(), (id, _frac, out) => {
+      const p = at.get(id);
+      return p ? (out ?? new THREE.Vector3()).copy(p) : null;
+    });
+    return { vfx, at };
+  }
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('returns the live head, moved in place, and calls onImpact once on arrival', () => {
+    const { vfx } = rig();
+    const onImpact = vi.fn();
+    const onLost = vi.fn();
+    const head = vfx.lightningProjectile(1, 2, 0x8fd0ff, { tip: true, onImpact, onLost });
+    expect(head).toBeInstanceOf(THREE.Vector3);
+    const x0 = head?.x ?? 0;
+    vfx.update(DT);
+    expect(head?.x).toBeGreaterThan(x0);
+    for (let i = 0; i < 120 && onImpact.mock.calls.length === 0; i++) vfx.update(DT);
+    expect(onImpact).toHaveBeenCalledTimes(1);
+    for (let i = 0; i < 10; i++) vfx.update(DT);
+    expect(onImpact).toHaveBeenCalledTimes(1);
+    expect(onLost).not.toHaveBeenCalled();
+  });
+
+  it('calls onLost when the target vanishes mid-flight', () => {
+    const { vfx, at } = rig();
+    const onImpact = vi.fn();
+    const onLost = vi.fn();
+    vfx.lightningProjectile(1, 2, 0x8fd0ff, { tip: true, onImpact, onLost });
+    vfx.update(DT);
+    at.delete(2);
+    vfx.update(DT);
+    expect(onLost).toHaveBeenCalledTimes(1);
+    expect(onImpact).not.toHaveBeenCalled();
+  });
+
+  it('calls onLost when cleared mid-flight', () => {
+    const { vfx } = rig();
+    const onLost = vi.fn();
+    vfx.lightningProjectile(1, 2, 0x8fd0ff, { tip: true, onLost });
+    vfx.clear();
+    expect(onLost).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns null and launches nothing for a caster with no anchor', () => {
+    const { vfx } = rig();
+    expect(vfx.lightningProjectile(9, 2, 0x8fd0ff, { tip: true })).toBeNull();
   });
 });

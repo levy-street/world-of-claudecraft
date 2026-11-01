@@ -6,6 +6,8 @@ import {
   createLeaderPath,
   flightLightGain,
   followHead,
+  LEADER_AURA_QUALITY,
+  LEADER_BRANCH_QUALITY,
   LEADER_KINKS_PER_STEP,
   type LeaderPath,
   leaderCapacity,
@@ -243,13 +245,41 @@ describe('strokeLightPosition: the flash stands off the struck body', () => {
 
 describe('arcBoltLeaderPlan: what each budget tier draws', () => {
   it('tier 0 is the full leader, tier 1 drops branches and the restrike, tier 2 draws none', () => {
-    expect(arcBoltLeaderPlan(0, false)).toEqual({ scale: 1, branches: true, restrike: true });
-    expect(arcBoltLeaderPlan(1, false)).toEqual({ scale: 1, branches: false, restrike: false });
+    expect(arcBoltLeaderPlan(0, false)).toEqual({
+      scale: 1,
+      branches: true,
+      restrike: true,
+      aura: true,
+    });
+    expect(arcBoltLeaderPlan(1, false)).toEqual({
+      scale: 1,
+      branches: false,
+      restrike: false,
+      aura: true,
+    });
     expect(arcBoltLeaderPlan(2, false)).toBeNull();
   });
 
   it('the Arc Overload echo is the same bolt, smaller and without a restrike', () => {
-    expect(arcBoltLeaderPlan(0, true)).toEqual({ scale: 0.7, branches: true, restrike: false });
+    expect(arcBoltLeaderPlan(0, true)).toEqual({
+      scale: 0.7,
+      branches: true,
+      restrike: false,
+      aura: true,
+    });
     expect(arcBoltLeaderPlan(2, true)).toBeNull();
+  });
+
+  it('falling VFX quality sheds branches first, then the plasma aura, never the bolt', () => {
+    expect(arcBoltLeaderPlan(0, false, LEADER_BRANCH_QUALITY)).toMatchObject({ branches: true });
+    expect(arcBoltLeaderPlan(0, false, LEADER_BRANCH_QUALITY - 0.01)).toMatchObject({
+      branches: false,
+      aura: true,
+    });
+    expect(arcBoltLeaderPlan(0, false, LEADER_AURA_QUALITY - 0.01)).toMatchObject({
+      branches: false,
+      aura: false,
+    });
+    expect(arcBoltLeaderPlan(0, false, 0)).not.toBeNull();
   });
 });

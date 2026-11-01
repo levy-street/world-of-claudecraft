@@ -832,9 +832,19 @@ export class AbilityVfx {
         // same stepped leader, drawn smaller (arc_bolt.ts).
         if (
           ability === ARC_BOLT_ABILITY &&
-          playArcBolt(this.deps.vfx, fx, ev.sourceId, ev.targetId, plan.color, tier, true)
+          playArcBolt(
+            this.deps.vfx,
+            fx,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            tier,
+            true,
+            this.quality,
+          )
         ) {
-          this.spawned++;
+          // the leader, its stroke and the impact stack
+          this.spawned += 3;
           break;
         }
         // A player ranged shot's draw animation rides the projectile launch
@@ -911,11 +921,21 @@ export class AbilityVfx {
       case 'lightning':
         if (
           ability === ARC_BOLT_ABILITY &&
-          playArcBolt(this.deps.vfx, fx, ev.sourceId, ev.targetId, plan.color, tier, false)
+          playArcBolt(
+            this.deps.vfx,
+            fx,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            tier,
+            false,
+            this.quality,
+          )
         ) {
           // The stepped leader stages its own impact at ARRIVAL, so the
-          // compressed instant sequence (impact at 0.15 s) stays off.
-          this.spawned++;
+          // compressed instant sequence (impact at 0.15 s) stays off. Counted:
+          // the tipped projectile, the leader, and its arrival impact stack.
+          this.spawned += 3;
           if (!plan.whirl) {
             this.mobThrowFallback(ev.sourceId, ability);
             this.releaseGesture(ev.sourceId, ability);

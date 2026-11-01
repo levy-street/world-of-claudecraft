@@ -738,7 +738,9 @@ export class Vfx {
 
   clear(): void {
     if (this.disposed) return;
-    this.projectiles.length = 0;
+    // A rider (the Arc Bolt leader) must hear that its projectile is gone.
+    const dropped = this.projectiles.splice(0);
+    for (const pr of dropped) pr.onLost?.();
     this.pendingBursts.length = 0;
     this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
@@ -1208,8 +1210,9 @@ export class Vfx {
       color === undefined
         ? new THREE.Color(0xeaf6ff)
         : new THREE.Color(color).lerp(new THREE.Color(0xffffff), 0.6);
+    const pos = from.clone();
     this.projectiles.push({
-      pos: from.clone(),
+      pos,
       targetId,
       color: new THREE.Color(color ?? 0x66b8ff).multiplyScalar(hdr(1.7)), // electric blue (impact tint)
       coreColor: head.multiplyScalar(hdr(3.0)), // hot white-blue head
@@ -1226,7 +1229,7 @@ export class Vfx {
       onImpact: opts?.onImpact,
       onLost: opts?.onLost,
     });
-    return this.projectiles[this.projectiles.length - 1].pos;
+    return pos;
   }
 
   // A talent proc arming: a tight ascending double-helix of bright motes around

@@ -116,12 +116,17 @@ export class LightPulses implements TrackedLightHost {
   }
 
   /**
-   * Claim a free slot for a moving light, or -1 when every slot is busy (a
-   * tracked light never steals: impacts and procs keep priority). The light
-   * stays dark until the owner's first setTracked.
+   * Claim a free slot for a moving light, or -1 when none can be spared (a
+   * tracked light never steals: impacts and procs keep priority). On a pool of
+   * more than one, tracked lights never hold the LAST untracked slot, so a
+   * crowd of moving lights cannot crowd ordinary pulses onto one slot. The
+   * light stays dark until the owner's first setTracked.
    */
   track(): number {
     const cap = Math.min(this.capacity(), this.pool.length);
+    let untracked = 0;
+    for (let i = 0; i < cap; i++) if (!this.pool[i].tracked) untracked++;
+    if (cap > 1 && untracked <= 1) return -1;
     for (let i = 0; i < cap; i++) {
       const p = this.pool[i];
       if (p.remaining > 0 || p.tracked) continue;

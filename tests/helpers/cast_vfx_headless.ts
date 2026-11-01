@@ -209,7 +209,12 @@ export function castGateRig(
       fx,
       vfx: {
         projectile: record('projectile'),
-        lightningProjectile: record('lightningProjectile'),
+        // A real launch returns the live head; the rig's flight is not
+        // simulated, so it returns null (the Arc Bolt leader then stands down).
+        lightningProjectile: (..._args: unknown[]) => {
+          vfxCalls.push('lightningProjectile');
+          return null;
+        },
         burst: record('burst'),
         nova: record('nova'),
         tick: record('tick'),

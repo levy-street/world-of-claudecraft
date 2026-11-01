@@ -39,6 +39,7 @@ const JAG = 0.5; // kink size relative to one step's length
 const BRANCH_LEN_MIN = 1.4; // yards
 const BRANCH_LEN_MAX = 3.4;
 const ROOT_FRAC = 0.62; // anchor fallback when the hand cannot be sampled
+const TARGET_FRAC = 0.5; // the projectile's own aim height
 
 // Palette: white-hot core, electric blue glow, violet plasma aura.
 const CORE = new THREE.Color(0xf2f8ff);
@@ -50,11 +51,22 @@ const LIGHT_STROKE = 0xdfeaff;
 const LIGHT_AFTERGLOW = 0xa98bff;
 
 // Light: the leader tip lights the ground it crosses; the stroke floods the
-// impact. Ranges in yards, intensities in the pulse pool's units.
-const FLIGHT_INTENSITY = 9;
-const FLIGHT_RANGE = 10;
-const STROKE_INTENSITY = 30;
-const STROKE_RANGE = 18;
+// impact. Ranges in yards, intensities in the pulse pool's units. The stroke
+// sits above the engine's per-cue clamp (6 at 8 yd, fx.ts worldLightAt) on
+// purpose: it lasts 70 ms and must read on sunlit ground, the game being
+// day-only. Under reduced motion it drops to that clamp and stops flickering.
+const FLIGHT_INTENSITY = 7;
+const FLIGHT_RANGE = 9;
+const STROKE_INTENSITY = 22;
+const STROKE_RANGE = 15;
+const CALM_LIGHT_CAP = 6;
+const CALM_STROKE_GAIN = 0.55; // stroke strip brightness under reduced motion
+// The projectile's own ttl is 3 s: a leader still unlanded past this is an
+// orphan (its projectile went without a callback) and stands down.
+const MAX_FLIGHT_S = 3.3;
+// Instant strike (the Arc Overload echo): step length when carving the whole
+// path in one go, matching the riding leader's 26 yd/s x 50 ms step.
+const STRIKE_STEP_YD = 1.3;
 const LIGHT_RELEASE_FADE = 0.12;
 const LIGHT_STANDOFF = 1.3; // yards back along the channel from the impact
 const LIGHT_LIFT = 0.5;
@@ -101,6 +113,7 @@ export class SteppedLeaderBolts {
   private readonly pts: THREE.Vector3[] = [];
   private readonly env: StrokeEnvelope = { stroke: 0, afterglow: 0, done: false };
   private readonly root = new THREE.Vector3();
+  private readonly aim = new THREE.Vector3();
   private reducedMotion = false;
 
   constructor(private host: SteppedLeaderHost) {
@@ -123,7 +136,7 @@ export class SteppedLeaderBolts {
         branchBorn: new Array(LEADER_MAX_BRANCHES).fill(0),
         branchCount: 0,
         age: 0,
-        plan: { scale: 1, branches: true, restrike: true },
+        plan: { scale: 1, branches: true, restrike: true, aura: true },
         restrike: true,
         light: -1,
         impact: new THREE.Vector3(),
@@ -148,21 +161,64 @@ export class SteppedLeaderBolts {
    * place until it lands). Returns a handle for impact()/lost(), or -1.
    */
   spawn(sourceId: number, targetId: number, head: THREE.Vector3, plan: ArcBoltLeaderPlan): number {
-    let index = this.slots.findIndex((s) => !s.active);
-    if (index < 0) {
-      // all busy: recycle the oldest
-      index = 0;
-      for (let i = 1; i < this.slots.length; i++) {
-        if (this.slots[i].age > this.slots[index].age) index = i;
-      }
-      this.release(this.slots[index]);
-    }
+    const index = this.claim();
     const s = this.slots[index];
+    this.begin(s, sourceId, targetId, plan);
+    s.head = head;
+    followHead(s.path, head.x, head.y, head.z);
+    return index + s.gen * SLOTS;
+  }
+
+  /**
+   * The whole leader in one go, then the stroke at once: the Arc Overload
+   * echo, whose damage the sim applies on the tick it is cast (a flying echo
+   * showed its number up to a second before its strike). False when either
+   * end has no anchor.
+   */
+  strike(sourceId: number, targetId: number, plan: ArcBoltLeaderPlan): boolean {
+    if (!this.host.anchor(targetId, TARGET_FRAC, this.aim)) return false;
+    const index = this.claim();
+    const s = this.slots[index];
+    this.begin(s, sourceId, targetId, plan);
+    const p = s.path.xyz;
+    const ox = p[0];
+    const oy = p[1];
+    const oz = p[2];
+    const len = Math.hypot(this.aim.x - ox, this.aim.y - oy, this.aim.z - oz);
+    const steps = Math.max(1, Math.ceil(len / STRIKE_STEP_YD));
+    for (let i = 1; i <= steps; i++) {
+      const f = i / steps;
+      const tipIndex = s.path.count - 1;
+      const carved = stepLeader(
+        s.path,
+        ox + (this.aim.x - ox) * f,
+        oy + (this.aim.y - oy) * f,
+        oz + (this.aim.z - oz) * f,
+        JAG,
+        Math.random,
+      );
+      if (carved) this.maybeBranch(s, tipIndex);
+    }
+    this.impact(index + s.gen * SLOTS, this.aim);
+    return true;
+  }
+
+  /** A free slot, or the oldest one recycled. */
+  private claim(): number {
+    for (let i = 0; i < this.slots.length; i++) if (!this.slots[i].active) return i;
+    let index = 0;
+    for (let i = 1; i < this.slots.length; i++) {
+      if (this.slots[i].age > this.slots[index].age) index = i;
+    }
+    this.release(this.slots[index]);
+    return index;
+  }
+
+  private begin(s: LeaderSlot, sourceId: number, targetId: number, plan: ArcBoltLeaderPlan): void {
     s.active = true;
     s.gen++;
     s.sourceId = sourceId;
     s.targetId = targetId;
-    s.head = head;
     s.landed = false;
     s.since = 0;
     s.stepTimer = 0;
@@ -170,11 +226,10 @@ export class SteppedLeaderBolts {
     s.branchCount = 0;
     s.plan = plan;
     s.restrike = plan.restrike;
+    s.head = null;
     this.origin(s, this.root);
     resetLeaderPath(s.path, this.root.x, this.root.y, this.root.z);
-    followHead(s.path, head.x, head.y, head.z);
     s.light = this.lights ? this.lights.track() : -1;
-    return index + s.gen * SLOTS;
   }
 
   private slotOf(handle: number): LeaderSlot | null {
@@ -248,7 +303,7 @@ export class SteppedLeaderBolts {
       if (this.origin(s, this.root)) setLeaderOrigin(s.path, this.root.x, this.root.y, this.root.z);
       if (!s.landed) {
         const head = s.head;
-        if (!head) {
+        if (!head || s.age > MAX_FLIGHT_S) {
           this.release(s);
           continue;
         }
@@ -267,7 +322,7 @@ export class SteppedLeaderBolts {
           head.x,
           head.y,
           head.z,
-          FLIGHT_INTENSITY * flightLightGain(Math.random()),
+          FLIGHT_INTENSITY * flightLightGain(reducedMotion ? 1 : Math.random()),
           LIGHT_FLIGHT,
           FLIGHT_RANGE,
         );
@@ -282,10 +337,11 @@ export class SteppedLeaderBolts {
       }
       const gain = strokeLightGain(s.since, restrike);
       const color = this.env.stroke > 0 ? LIGHT_STROKE : LIGHT_AFTERGLOW;
+      const peak = reducedMotion ? CALM_LIGHT_CAP : STROKE_INTENSITY;
       // Stand the flash off the struck body toward the channel, so it lights
       // the target's facing side and the ground, not the inside of the mesh.
       const l = s.lightAt;
-      this.light(s, l.x, l.y, l.z, STROKE_INTENSITY * gain, color, STROKE_RANGE);
+      this.light(s, l.x, l.y, l.z, peak * gain, color, STROKE_RANGE);
     }
   }
 
@@ -335,42 +391,45 @@ export class SteppedLeaderBolts {
   /** Emit every live leader's strips; valid only inside the ribbon pool's
    *  drawHeld callback (the pack is open there). */
   draw(): void {
+    // Core strips go first: the shared ribbon pool accepts or refuses a strip
+    // whole, so under vertex pressure the dim outer layers are what drops.
     const strip = this.host.strip;
+    const calm = this.reducedMotion;
     for (const s of this.slots) {
       if (!s.active) continue;
       const k = s.plan.scale;
-      const fl = 0.75 + Math.random() * 0.25;
+      const fl = calm ? 0.9 : 0.75 + Math.random() * 0.25;
       if (!s.landed) {
         // the dim leader: faint, crackling, persistent
         const n = this.load(s.path);
-        strip(this.pts, n, 0.6 * k, PLASMA, 0.4 * fl, 0.15);
-        strip(this.pts, n, 0.24 * k, BLUE, 1.0 * fl, 0.15);
         strip(this.pts, n, 0.075 * k, CORE, 1.6 * fl, 0.15);
+        strip(this.pts, n, 0.24 * k, BLUE, 1.0 * fl, 0.15);
+        if (s.plan.aura) strip(this.pts, n, 0.6 * k, PLASMA, 0.4 * fl, 0.15);
         for (let b = 0; b < s.branchCount; b++) {
           const fade = Math.max(0.35, 1 - (s.age - s.branchBorn[b]) * 1.2);
           const m = this.load(s.branches[b]);
-          strip(this.pts, m, 0.15 * k, BLUE, 0.8 * fade * fl, 0.6);
           strip(this.pts, m, 0.045 * k, CORE, 1.2 * fade * fl, 0.6);
+          strip(this.pts, m, 0.15 * k, BLUE, 0.8 * fade * fl, 0.6);
         }
         continue;
       }
-      strokeEnvelopeAt(s.since, s.restrike && !this.reducedMotion, this.env);
+      strokeEnvelopeAt(s.since, s.restrike && !calm, this.env);
       const n = this.load(s.path);
       if (this.env.stroke > 0) {
         // the return stroke: the whole carved path and its branches blaze
-        const g = this.env.stroke;
-        strip(this.pts, n, 1.1 * k, PLASMA, 0.8 * g, 0.1);
-        strip(this.pts, n, 0.55 * k, BLUE, 2.2 * g, 0.1);
+        const g = this.env.stroke * (calm ? CALM_STROKE_GAIN : 1);
         strip(this.pts, n, 0.18 * k, CORE, 3.2 * g, 0.1);
+        strip(this.pts, n, 0.55 * k, BLUE, 2.2 * g, 0.1);
+        if (s.plan.aura) strip(this.pts, n, 1.1 * k, PLASMA, 0.8 * g, 0.1);
         for (let b = 0; b < s.branchCount; b++) {
           const m = this.load(s.branches[b]);
-          strip(this.pts, m, 0.24 * k, BLUE, 1.6 * g, 0.5);
           strip(this.pts, m, 0.075 * k, CORE, 2.4 * g, 0.5);
+          strip(this.pts, m, 0.24 * k, BLUE, 1.6 * g, 0.5);
         }
       } else if (this.env.afterglow > 0) {
         const a = this.env.afterglow;
-        strip(this.pts, n, 0.6 * k, PLASMA, 0.6 * a, 0.1);
         strip(this.pts, n, 0.12 * k, PLASMA_PINK, 1.0 * a, 0.1);
+        if (s.plan.aura) strip(this.pts, n, 0.6 * k, PLASMA, 0.6 * a, 0.1);
         for (let b = 0; b < s.branchCount; b++) {
           const m = this.load(s.branches[b]);
           strip(this.pts, m, 0.1 * k, PLASMA, 0.45 * a, 0.5);
