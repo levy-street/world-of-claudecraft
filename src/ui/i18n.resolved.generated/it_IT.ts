@@ -3451,6 +3451,7 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Ottieni titoli permanenti dopo {thresholds} di gioco con PvP mondiale attivo nel mondo aperto o nelle istanze PvP. Disconnessione, morte, istanze PvE e santuari sospendono il timer. Disattivarlo lo azzera.",
       "rewardPaused": "Serie PvP attuale: {time} di gioco (in pausa in un santuario)",
       "rewardPausedDead": "Serie PvP attuale: {time} di gioco (in pausa durante la morte)",

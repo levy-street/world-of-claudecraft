@@ -287,6 +287,39 @@ describe('the commendation', () => {
     expect(sim.weeklyQuest?.commended).toBe('rift_watch');
   });
 
+  it('adds the 10 percent World PvP reputation bonus while the flag is fully armed', () => {
+    const sim = finished();
+    sim.setWorldPvpFlag(true);
+    const meta = sim.meta(sim.playerId);
+    expect(meta?.worldPvp?.flagged).toBe(true);
+    sim.commendWeeklyQuest('rift_watch');
+    expect(meta?.factions.rift_watch).toBe(1100);
+    expect(eventsOf(sim, 'loot').map((event) => (event as { text: string }).text)).toContain(
+      '+1100 Rift Watch Standing.',
+    );
+  });
+
+  it('pays the commendation without the World PvP bonus when the realm disables it', () => {
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      devCommands: true,
+      worldPvpDisabled: true,
+    });
+    sim.resetDay = '2026-09-10';
+    sim.chat('/dev weekly');
+    sim.tick();
+    sim.chat('/dev level 20');
+    sim.chooseWeeklyQuest('wk_dungeons');
+    for (let i = 0; i < 3; i++) sim.chat('/dev weekly credit');
+    sim.tick();
+    const meta = sim.meta(sim.playerId)!;
+    // Even a stale armed record must not bypass the realm switch.
+    meta.worldPvp = { flagged: true, disarmAt: null, kills: 0, deaths: 0 };
+    sim.commendWeeklyQuest('rift_watch');
+    expect(meta.factions.rift_watch).toBe(1000);
+  });
+
   it('refuses before the charge is finished, an unknown faction, and a faction with no headroom', () => {
     const sim = armed();
     sim.chooseWeeklyQuest('wk_dungeons');

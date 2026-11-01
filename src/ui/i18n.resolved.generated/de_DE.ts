@@ -3451,6 +3451,7 @@ export const de_DE: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Verdiene dauerhafte Titel nach {thresholds} Spielzeit mit aktiviertem Welt-PvP in der offenen Welt oder in PvP-Instanzen. Ausloggen, Tod, PvE-Instanzen und Heiligtümer pausieren den Zähler. Ausschalten setzt ihn zurück.",
       "rewardPaused": "Aktuelle PvP-Serie: {time} gespielt (in einem Heiligtum pausiert)",
       "rewardPausedDead": "Aktuelle PvP-Serie: {time} gespielt (während des Todes pausiert)",

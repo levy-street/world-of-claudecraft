@@ -636,7 +636,9 @@ export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQ
 
   const factionId = worldQuestFaction(quest);
   const standingAward = worldQuestStandingReward(quest, level);
-  const standingResult = awardFactionReputation(meta, factionId, standingAward, level);
+  const standingResult = awardFactionReputation(meta, factionId, standingAward, level, {
+    worldPvpBonus: !ctx.worldPvpDisabled,
+  });
   if (standingResult.gained > 0) {
     // Standing feeds the prog_<faction>_* meter deeds; no narrow key covers
     // PlayerMeta.factions, so the award site requests a full pass.

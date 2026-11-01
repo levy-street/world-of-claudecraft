@@ -192,7 +192,10 @@ ratings.
   the seven-day counter cap, saved-tick sanitization and the pure 10% XP bonus.
   `grantXp` imports the leaf directly and applies the bonus before rested XP and
   lifetime accounting; pending disarm and the realm kill switch stop it. The
-  multiplier is XP-only and does not change faction reputation.
+  separate 10% reputation bonus (`WORLD_PVP_REPUTATION_BONUS`,
+  `worldPvpReputationAmount`) applies inside `awardFactionReputation` before the
+  standing cap, only for gameplay awards that pass
+  `worldPvpBonus: !ctx.worldPvpDisabled` (dev grants stay exact).
 - `world_pvp_rewards.ts` advances one bounded scalar per connected, armed
   player per tick and grants permanent deeds only at five threshold crossings.
   Dead players, disconnect grace, leaving players, sanctuaries and PvE

@@ -3451,6 +3451,7 @@ export const pt_BR: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Ganhe títulos permanentes após {thresholds} de jogo com JxJ mundial ativo no mundo aberto ou em instâncias JxJ. Sair, morrer, instâncias JxA e santuários pausam o contador. Desativar reinicia o contador.",
       "rewardPaused": "Sequência JxJ atual: {time} jogados (em pausa em um santuário)",
       "rewardPausedDead": "Sequência JxJ atual: {time} jogados (em pausa enquanto morto)",

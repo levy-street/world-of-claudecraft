@@ -227,7 +227,9 @@ function awardClueHuntStanding(ctx: SimContext, meta: PlayerMeta, def: ClueHuntD
   const factionId = clueHuntFaction(def);
   const player = ctx.entities.get(meta.entityId);
   if (!factionId || !player) return;
-  const result = awardFactionReputation(meta, factionId, CLUE_HUNT_STANDING, player.level);
+  const result = awardFactionReputation(meta, factionId, CLUE_HUNT_STANDING, player.level, {
+    worldPvpBonus: !ctx.worldPvpDisabled,
+  });
   if (result.gained <= 0) return;
   // Standing feeds the prog_<faction>_* meter deeds (no narrow dirty key), and
   // the receipt reuses the world-quest standing line the client re-localizes.

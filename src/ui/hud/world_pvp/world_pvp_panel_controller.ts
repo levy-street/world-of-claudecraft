@@ -8,7 +8,10 @@
 // tab reads as a sibling of the Thornhollow Fields panel, not a new dialect.
 
 import { audio } from '../../../game/audio';
-import { WORLD_PVP_TITLE_THRESHOLDS } from '../../../sim/pvp/world_pvp_rewards_rules';
+import {
+  WORLD_PVP_TITLE_THRESHOLDS,
+  WORLD_PVP_XP_BONUS,
+} from '../../../sim/pvp/world_pvp_rewards_rules';
 import type { IWorld } from '../../../world_api';
 import { clockSeconds } from '../../clock_seconds_core';
 import { durationText } from '../../duration_text';
@@ -83,6 +86,9 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
     `</div>`;
   const stakes = view.stakes;
   const stakeRows = [
+    // One percent covers both bonuses; tests/world_pvp_view.test.ts pins the
+    // XP and reputation constants equal so the line cannot drift.
+    t('hudChrome.worldPvp.rewardBonus', { percent: pct(WORLD_PVP_XP_BONUS * 100) }),
     t('hudChrome.worldPvp.rewardTitles', {
       thresholds: formatList(
         WORLD_PVP_TITLE_THRESHOLDS.map(({ hours }) =>

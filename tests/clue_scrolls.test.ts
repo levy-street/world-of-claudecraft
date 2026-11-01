@@ -87,8 +87,19 @@ afterEach(() => {
   CLUE_HUNT_TEST_POOL.length = 0;
 });
 
-function huntSim(seed = 4711, level = CLUE_SCROLL_MIN_LEVEL, autoEquip = true): Sim {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip, devCommands: true });
+function huntSim(
+  seed = 4711,
+  level = CLUE_SCROLL_MIN_LEVEL,
+  autoEquip = true,
+  worldPvpDisabled = false,
+): Sim {
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip,
+    devCommands: true,
+    worldPvpDisabled,
+  });
   sim.setPlayerLevel(level);
   sim.utcDay = '2026-08-31';
   sim.resetDay = '2026-08-31';
@@ -696,6 +707,30 @@ describe('the dig step (using the scroll on the spot)', () => {
     ).toEqual([[[TREASURE_CASKET_ITEM_ID, 1]]]);
     expect(ofType(evs, 'clueHuntDone')).toHaveLength(1);
   });
+
+  it.each([
+    [false, Math.floor(CLUE_HUNT_STANDING * 1.1)],
+    [true, CLUE_HUNT_STANDING],
+  ])(
+    'the casket standing for an armed player with the realm switch disabled=%s is %s',
+    (disabled, expected) => {
+      const sim = huntSim(4711, CLUE_SCROLL_MIN_LEVEL, true, disabled);
+      const meta = metaOf(sim);
+      startHunt(sim);
+      advanceTo(sim, 4);
+      sim.addItem(CLUE_SCROLL_ITEM_ID, 1);
+      placeAt(sim, DIG_SPOT.x + 2, DIG_SPOT.z - 2);
+      sim.drainEvents();
+      meta.worldPvp = { flagged: true, disarmAt: null, kills: 0, deaths: 0 };
+      const standingBefore = meta.factions?.automatons ?? 0;
+      sim.useItem(CLUE_SCROLL_ITEM_ID);
+      expect(CLUE_HUNT_STANDING).toBe(150);
+      expect((meta.factions?.automatons ?? 0) - standingBefore).toBe(disabled ? 150 : 165);
+      expect(ofType(sim.drainEvents(), 'loot').map((ev) => ev.text)).toContain(
+        `+${expected} Automatons Standing.`,
+      );
+    },
+  );
 
   it('refuses off the spot, keeps the scroll on a dig, and the last step hands the casket', () => {
     const sim = huntSim();

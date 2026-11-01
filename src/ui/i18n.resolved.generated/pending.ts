@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "es_ES": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "fr_FR": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "fr_CA": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "de_DE": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "nl_NL": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "pl_PL": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "id_ID": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "tr_TR": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "sv_SE": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "vi_VN": [
+    "hudChrome.worldPvp.rewardBonus"
+  ],
+  "da_DK": [
+    "hudChrome.worldPvp.rewardBonus"
+  ]
 };

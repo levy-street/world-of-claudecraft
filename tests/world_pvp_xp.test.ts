@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { grantXp } from '../src/sim/combat/damage';
 import { BUILTIN_WORLD } from '../src/sim/data';
-import { awardFactionReputation } from '../src/sim/factions';
+import { awardFactionReputation, maxStandingForLevel } from '../src/sim/factions';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -87,10 +87,41 @@ describe('World PvP XP bonus', () => {
     grantXp(sim.ctx, -10, meta);
     expect(meta.lifetimeXp).toBe(before);
   });
-  it('preserves faction reputation without an extra PvP multiplier', () => {
+  it('awards exactly 10 percent extra faction reputation while armed', () => {
+    const { sim, pid, meta } = fixture(MAX_LEVEL);
+    const bonus = { worldPvpBonus: true };
+    expect(awardFactionReputation(meta, 'rift_watch', 100, MAX_LEVEL, bonus).gained).toBe(100);
+    sim.setWorldPvpFlag(true, pid);
+    expect(meta.worldPvp!.flagged).toBe(true);
+    expect(awardFactionReputation(meta, 'rift_watch', 100, MAX_LEVEL, bonus).gained).toBe(110);
+    // Rounds down, and non-positive awards stay inert.
+    expect(awardFactionReputation(meta, 'rift_watch', 19, MAX_LEVEL, bonus).gained).toBe(20);
+    expect(awardFactionReputation(meta, 'rift_watch', 0, MAX_LEVEL, bonus).gained).toBe(0);
+    expect(meta.factions.rift_watch).toBe(230);
+  });
+  it('stops the reputation bonus during pending disarm and for exact grants', () => {
     const { sim, pid, meta } = fixture(MAX_LEVEL);
     sim.setWorldPvpFlag(true, pid);
+    // Callers that do not opt in (the dev grant) stay exact.
     expect(awardFactionReputation(meta, 'rift_watch', 100, MAX_LEVEL).gained).toBe(100);
+    sim.time += 10;
+    sim.setWorldPvpFlag(false, pid);
+    expect(meta.worldPvp!.disarmAt).not.toBeNull();
+    expect(
+      awardFactionReputation(meta, 'rift_watch', 100, MAX_LEVEL, { worldPvpBonus: true }).gained,
+    ).toBe(100);
+  });
+  it('applies the reputation bonus before the standing cap clamps it', () => {
+    const { sim, pid, meta } = fixture(MAX_LEVEL);
+    sim.setWorldPvpFlag(true, pid);
+    // 105 headroom: the unboosted 100 would fit, the boosted 110 is clamped.
+    meta.factions.rift_watch = maxStandingForLevel(MAX_LEVEL) - 105;
+    const result = awardFactionReputation(meta, 'rift_watch', 100, MAX_LEVEL, {
+      worldPvpBonus: true,
+    });
+    expect(result.gained).toBe(105);
+    expect(result.capped).toBe(true);
+    expect(meta.factions.rift_watch).toBe(maxStandingForLevel(MAX_LEVEL));
   });
   it('does not boost a stored flag-down record', () => {
     const { sim, meta } = fixture();

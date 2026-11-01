@@ -3451,6 +3451,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Získej trvalé tituly po {thresholds} odehraného času se zapnutým světovým PvP v otevřeném světě nebo v PvP instancích. Odhlášení, smrt, PvE instance a útočiště časovač pozastavují. Vypnutí PvP jej vynuluje.",
       "rewardPaused": "Aktuální PvP série: odehráno {time} (pozastaveno v útočišti)",
       "rewardPausedDead": "Aktuální PvP série: odehráno {time} (pozastaveno během smrti)",

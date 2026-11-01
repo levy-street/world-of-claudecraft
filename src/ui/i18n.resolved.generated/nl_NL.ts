@@ -3451,6 +3451,7 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardBonus": "Keep World PvP on to earn {percent} more experience and faction reputation. Bonuses stop when you request to switch off.",
       "rewardTitles": "Verdien blijvende titels na {thresholds} speeltijd met Wereld-PvP aan in de open wereld of PvP-instanties. Uitloggen, dood, PvE-instanties en heiligdommen pauzeren de teller. Uitschakelen zet hem terug op nul.",
       "rewardPaused": "Huidige PvP-reeks: {time} gespeeld (gepauzeerd in een heiligdom)",
       "rewardPausedDead": "Huidige PvP-reeks: {time} gespeeld (gepauzeerd tijdens de dood)",

@@ -810,6 +810,15 @@ describe('/dev rep', () => {
     });
   });
 
+  it('grants the exact amount even with the World PvP flag armed', () => {
+    const sim = devSim();
+    sim.chat('/dev level 20');
+    const meta = sim.meta(sim.player.id)!;
+    meta.worldPvp = { flagged: true, disarmAt: null, kills: 0, deaths: 0 };
+    sim.chat('/dev rep rift_watch 100');
+    expect(meta.factions.rift_watch).toBe(100);
+  });
+
   it('rejects an unknown faction and is inert without devCommands', () => {
     const sim = devSim();
     sim.chat('/dev rep nobody 100');
