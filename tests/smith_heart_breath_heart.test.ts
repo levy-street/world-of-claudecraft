@@ -344,11 +344,12 @@ describe('Knotted Gale: the round', () => {
     // The warrior's real charge on the guardian: the carrier stays, unbilled; a free
     // player at the same range goes, so it is the load that stopped it.
     const boss = f.local(f.boss());
+    for (const pid of f.pids) f.sim.setPlayerLevel(20, pid);
     const cast = (who: Entity) => {
       f.put(who, boss.x + 16, boss.z);
       who.targetId = f.boss().id;
       who.cooldowns.delete('charge');
-      f.sim.castAbility('charge', who.id);
+      f.sim.castAbility('charge', f.pids[f.players.indexOf(who)]);
     };
     cast(p);
     expect(p.chargeTargetId ?? null).toBeNull();
