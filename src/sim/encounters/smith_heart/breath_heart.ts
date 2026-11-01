@@ -9,8 +9,10 @@
 //                 opens it at the lip it left). No second chance.
 //   The carrier   a third player walks onto the ball and takes it up: a crawl,
 //                 and no wind, pull, blast or throw moves them (heldFast).
-//   The crossing  the carrier in Portal A comes out at Portal B: one way, and
-//                 nobody else crosses.
+//   The crossing  anyone walking into either portal comes out at the other, ball
+//                 or no ball: the carrier may go out empty-handed for a far ball
+//                 and come back with it. Once per walk in: a body must step clear
+//                 before it can cross again.
 //   The throw     the interact press at the lip of ANY gap ends that ball (the
 //                 Iron Cage's seam: no new wire command). A carrier who goes
 //                 over a lip takes it with them: that counts as thrown.
@@ -160,6 +162,43 @@ function openPortal(s: BreathScope, heart: BreathHeart, side: Side, at: { x: num
   );
   heart[key] = { objectId: e.id, x: at.x, z: at.z };
   cue(s, BREATH_CUES.portalOpen, at.x, at.z, T.heartPortalR);
+  // Whoever it opened under (its own marked player) has not walked in.
+  for (const p of s.players) {
+    const here = local(s.ctx, s.inst, p);
+    if (inPortal(here, heart[key]) && !heart.crossed.includes(p.id)) heart.crossed.push(p.id);
+  }
+}
+
+function inPortal(at: { x: number; z: number }, portal: BreathHeart['portalA']): boolean {
+  return portal !== null && Math.hypot(at.x - portal.x, at.z - portal.z) < T.heartPortalR;
+}
+
+/** Everyone on the floor walking into an open portal comes out at the other. */
+function stepPortals(s: BreathScope, heart: BreathHeart): void {
+  const A = heart.portalA;
+  const B = heart.portalB;
+  if (!A || !B) return;
+  for (const p of s.players) {
+    const at = local(s.ctx, s.inst, p);
+    const inA = inPortal(at, A);
+    if (!inA && !inPortal(at, B)) {
+      heart.crossed = heart.crossed.filter((id) => id !== p.id);
+      continue;
+    }
+    if (heart.crossed.includes(p.id) || !onFloor(p, at) || p.carriedBy !== undefined) continue;
+    heart.crossed.push(p.id);
+    const to = inA ? B : A;
+    const o = s.ctx.instanceOriginOf(s.inst);
+    displacePlayer(s.ctx, p, { x: o.x + to.x, z: o.z + to.z, facing: p.facing }, KNOT_HOP_TEXT);
+    s.ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: p.id,
+      school: 'nature',
+      fx: 'nova',
+      ability: BREATH_CUES.portalHop,
+    });
+  }
 }
 
 /** Where a mark's portal opens: at its player's feet; if they have left the
@@ -243,7 +282,8 @@ function takeKnot(s: BreathScope, k: BreathKnot, p: Entity): void {
   raidWarn(s, s.boss, 'knotTaken', `${p.name} takes up the Knotted Gale!`, { player: p.name });
 }
 
-/** Each carrier's tick: dead, gone or over a lip, else the ball rides with them. */
+/** Each carrier's tick: dead, gone or over a lip, else the ball rides with them
+ *  (through a portal too: stepPortals has already moved them). */
 function stepCarriers(s: BreathScope, heart: BreathHeart): void {
   for (const k of [...heart.knots]) {
     if (k.carrierId === null) continue;
@@ -271,24 +311,6 @@ function stepCarriers(s: BreathScope, heart: BreathHeart): void {
         loseKnot(s, heart, k, p);
       } else freeKnot(s, k, p, last ? { ...k, ...last } : undefined);
       continue;
-    }
-    // Portal A's mouth: across to Portal B, once for each walk in.
-    const A = heart.portalA;
-    const B = heart.portalB;
-    const inA = A !== null && Math.hypot(at.x - A.x, at.z - A.z) < T.heartPortalR;
-    if (!inA) heart.crossed = heart.crossed.filter((id) => id !== p.id);
-    else if (B && !heart.crossed.includes(p.id)) {
-      heart.crossed.push(p.id);
-      const o = s.ctx.instanceOriginOf(s.inst);
-      displacePlayer(s.ctx, p, { x: o.x + B.x, z: o.z + B.z, facing: p.facing }, KNOT_HOP_TEXT);
-      s.ctx.emit({
-        type: 'spellfx',
-        sourceId: p.id,
-        targetId: p.id,
-        school: 'nature',
-        fx: 'nova',
-        ability: BREATH_CUES.portalHop,
-      });
     }
     const now = local(s.ctx, s.inst, p);
     if (now.x !== k.x || now.z !== k.z) {
@@ -387,6 +409,7 @@ function stepLive(s: BreathScope, heart: BreathHeart): void {
       endMarks(s, heart);
     }
   }
+  stepPortals(s, heart);
   stepCarriers(s, heart);
   stepThrows(s, heart);
   stepPickups(s, heart);

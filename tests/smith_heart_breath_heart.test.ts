@@ -264,31 +264,67 @@ describe('Knotted Gale: the round', () => {
     expect(Math.abs((load?.remaining ?? 0) - knot.fuse)).toBeLessThan(0.2);
   });
 
-  it('the crossing is one way and the carrier alone', () => {
+  it('a marked player standing where the portal opens is not thrown across', () => {
+    const f = mythic();
+    const h = round(f);
+    const a = f.players.find((e) => e.id === h.markA) as Entity;
+    const b = f.players.find((e) => e.id === h.markB) as Entity;
+    f.put(a, -10, 190);
+    f.put(b, 10, 190);
+    f.tick(ticks(T.heartMark) + 2);
+    const A = h.portalA as NonNullable<typeof h.portalA>;
+    const B = h.portalB as NonNullable<typeof h.portalB>;
+    expect(Math.hypot(f.local(a).x - A.x, f.local(a).z - A.z)).toBeLessThan(1.5);
+    expect(Math.hypot(f.local(b).x - B.x, f.local(b).z - B.z)).toBeLessThan(1.5);
+  });
+
+  it('anyone crosses, both ways, with or without the ball', () => {
     const f = mythic();
     const h = round(f);
     const walker = third(f);
     const p = f.players.find((e) => e !== walker && !h.bearers.includes(e.id)) as Entity;
-    carry(f, p);
     f.tick(ticks(T.heartMark));
     const A = h.portalA as NonNullable<typeof h.portalA>;
     const B = h.portalB as NonNullable<typeof h.portalB>;
-    // Anybody else stepping in: nothing.
+    // No ball, A to B: told so.
     f.put(walker, A.x, A.z);
-    f.tick(2);
-    expect(Math.hypot(f.local(walker).x - A.x, f.local(walker).z - A.z)).toBeLessThan(1.5);
-    // The carrier in B: nothing either.
-    f.put(p, B.x, B.z);
-    f.tick(2);
-    expect(Math.hypot(f.local(p).x - B.x, f.local(p).z - B.z)).toBeLessThan(1.5);
-    // The carrier in A: out at B, and told so.
-    f.put(p, A.x, A.z);
     const evs = f.tick(1);
-    expect(Math.hypot(f.local(p).x - B.x, f.local(p).z - B.z)).toBeLessThan(0.5);
+    expect(Math.hypot(f.local(walker).x - B.x, f.local(walker).z - B.z)).toBeLessThan(0.5);
     expect(evs.some((e) => e.type === 'log' && e.text === KNOT_HOP_TEXT)).toBe(true);
     expect(evs.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.portalHop)).toBe(true);
+    // No ball, B to A.
+    f.put(p, B.x, B.z);
+    f.tick(1);
+    expect(Math.hypot(f.local(p).x - A.x, f.local(p).z - A.z)).toBeLessThan(0.5);
+    // The ball rides along, the way the carrier came back.
+    carry(f, p);
+    f.put(p, B.x, B.z);
+    f.tick(1);
     const at = f.local(p);
+    expect(Math.hypot(at.x - A.x, at.z - A.z)).toBeLessThan(0.5);
     expect(h.knots[0].x).toBe(at.x);
+    expect(h.knots[0].z).toBe(at.z);
+  });
+
+  it('one crossing per walk in: no bouncing until the body steps clear', () => {
+    const f = mythic();
+    const h = round(f);
+    const walker = third(f);
+    f.tick(ticks(T.heartMark));
+    const A = h.portalA as NonNullable<typeof h.portalA>;
+    const B = h.portalB as NonNullable<typeof h.portalB>;
+    f.put(walker, A.x, A.z);
+    f.tick(1);
+    // Standing in B after the hop: it stays there.
+    f.tick(10);
+    expect(Math.hypot(f.local(walker).x - B.x, f.local(walker).z - B.z)).toBeLessThan(0.5);
+    // Clear of both, then back in B: across again.
+    const clear = { x: (A.x + B.x) / 2 + T.heartPortalR * 2, z: (A.z + B.z) / 2 };
+    f.put(walker, clear.x, clear.z);
+    f.tick(1);
+    f.put(walker, B.x, B.z);
+    f.tick(1);
+    expect(Math.hypot(f.local(walker).x - A.x, f.local(walker).z - A.z)).toBeLessThan(0.5);
   });
 
   it('throws at the lip of ANY gap, and refuses anywhere else', () => {

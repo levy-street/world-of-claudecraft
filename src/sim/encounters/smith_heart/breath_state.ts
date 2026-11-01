@@ -99,7 +99,8 @@ export interface BreathHeart {
   /** The last spot on the floor of each marked player and carrier: where a
    *  portal opens or a ball drops when its body has left the floor. */
   floorSpots: Record<number, { x: number; z: number }>;
-  /** Carriers who crossed and have not yet left Portal A's mouth. */
+  /** Bodies standing in a portal they did not walk into (they just crossed, or it
+   *  opened under them): no crossing until they step clear. */
   crossed: number[];
   /** Throw presses since the last tick (the interact command). */
   presses: number[];
