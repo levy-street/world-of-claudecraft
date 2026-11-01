@@ -309,9 +309,10 @@ describe('entry detail horizon admission', () => {
         prewarmFrame.split('sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar)').length - 1,
       ).toBe(painters.length);
       expect(liveFrame.split('sceneryFar,').length - 1).toBe(painters.length);
-      // Terrain keeps the wide cull far at both sites: the same literal call, twice.
+      // Terrain keeps the wide cull far at both sites: the same literal call, twice
+      // (the trailing focus is the player the zone build follows, not a far).
       const terrainCall =
-        'this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);';
+        'this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar, focusX, focusZ);';
       expect(source.split(terrainCall).length - 1).toBe(2);
       expect(source).not.toContain(
         'this.terrainView.update(this.camera.position.x, this.camera.position.z, sceneryFar',

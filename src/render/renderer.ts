@@ -4987,7 +4987,7 @@ export class Renderer {
       fogFar,
       this.camera.position.y,
     );
-    this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar, focusX, focusZ);
     this.authoredLayers?.updateDecals(this.camera.position.x, this.camera.position.z, fogFar);
     this.farTerrainView.update(
       this.camera.position.x,
@@ -11399,7 +11399,7 @@ export class Renderer {
         }
       }
     }
-    this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar, focusX, focusZ);
     this.authoredLayers?.updateDecals(this.camera.position.x, this.camera.position.z, fogFar);
     this.farTerrainView.update(
       this.camera.position.x,

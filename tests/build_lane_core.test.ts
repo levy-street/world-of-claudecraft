@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runBoundedLane } from '../src/render/build_lane_core';
+import { runBoundedLane, runBoundedPull } from '../src/render/build_lane_core';
 
 // The runner that keeps the zone-build worker pool fed. Three properties carry
 // the whole design: submission follows the nearest-first order the caller
@@ -131,5 +131,54 @@ describe('bounded build lane', () => {
     });
     expect(order).toEqual([0, 1, 2]);
     expect(peak).toBe(1);
+  });
+});
+
+describe('bounded pull lane', () => {
+  it('asks for the next item only once a slot frees, so priority can change mid-lane', async () => {
+    const gates = [deferred(), deferred(), deferred()];
+    const pulls: number[] = [];
+    let priority = 0;
+    let n = 0;
+    const lane = runBoundedPull(
+      () => {
+        if (n >= 3) return undefined;
+        pulls.push(priority);
+        return { item: n++ };
+      },
+      1,
+      async (item) => {
+        await gates[item].promise;
+      },
+    );
+    await Promise.resolve();
+    // One slot: only the first item was pulled before it completes.
+    expect(pulls).toEqual([0]);
+    priority = 7;
+    gates[0].resolve();
+    await new Promise((r) => setTimeout(r, 0));
+    // The second pull saw the priority as it stood when the slot freed.
+    expect(pulls).toEqual([0, 7]);
+    gates[1].resolve();
+    gates[2].resolve();
+    await lane;
+    expect(pulls).toEqual([0, 7, 7]);
+  });
+
+  it('stops pulling once the caller cancels', async () => {
+    let pulled = 0;
+    let stop = false;
+    await runBoundedPull(
+      () => {
+        pulled++;
+        return { item: pulled };
+      },
+      2,
+      async (item) => {
+        if (item === 3) stop = true;
+      },
+      { shouldStop: () => stop },
+    );
+    expect(pulled).toBe(3);
   });
 });

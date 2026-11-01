@@ -1,13 +1,15 @@
 // PURE (unit-tested, Three-free, DOM-free): the bounded-concurrency runner the
 // zone build uses to keep a worker pool fed.
 //
-// A zone's cells are ordered nearest-first, and that order is the whole point of
-// the ordering pass, so submission walks the list in order and never reorders
-// it. Only COMPLETION is unordered: whichever worker finishes first attaches
-// first. `limit` is the pool's worker count, so exactly as many jobs are in
-// flight as there are threads to run them; a plain sequential await would leave
-// every worker but one idle, and an unbounded fan-out would post the whole zone
-// at once and lose the nearest-first arrival order entirely.
+// Submission follows the order the caller supplies and never reorders it; the
+// zone build uses the PULL form (runBoundedPull), which asks for each next cell
+// only when a slot frees, so its order can follow a player who walks into the
+// zone mid-build (chunk_residency_core.createCellBuildQueue). runBoundedLane is
+// the same runner over a fixed list. Only COMPLETION is unordered: whichever
+// worker finishes first attaches first. `limit` is the pool's worker count, so
+// exactly as many jobs are in flight as there are threads to run them; a plain
+// sequential await would leave every worker but one idle, and an unbounded
+// fan-out would post the whole zone at once and lose the arrival order.
 //
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts).
 
@@ -35,12 +37,36 @@ export async function runBoundedLane<T>(
   start: (item: T, index: number) => Promise<void>,
   opts?: BoundedLaneOptions,
 ): Promise<void> {
+  let i = 0;
+  await runBoundedPull(
+    () => (i < items.length ? { item: items[i++] } : undefined),
+    limit,
+    start,
+    opts,
+  );
+}
+
+/**
+ * The pull form of runBoundedLane: `next` is asked for the next item only once
+ * a slot is free, never ahead of time, so a caller whose priority changes while
+ * the lane runs (the zone build following the player) decides each submission
+ * with current information. Same limit, stop and error contract; an undefined
+ * result ends the lane.
+ */
+export async function runBoundedPull<T>(
+  next: () => { item: T } | undefined,
+  limit: number,
+  start: (item: T, index: number) => Promise<void>,
+  opts?: BoundedLaneOptions,
+): Promise<void> {
   const max = Math.max(1, Math.floor(limit));
   const inFlight = new Set<Promise<void>>();
-  for (let i = 0; i < items.length; i++) {
+  for (let i = 0; ; i++) {
     if (opts?.shouldStop?.()) break;
+    const pulled = next();
+    if (!pulled) break;
     const index = i;
-    const job: Promise<void> = start(items[index], index)
+    const job: Promise<void> = start(pulled.item, index)
       .catch((error: unknown) => {
         opts?.onError?.(error, index);
       })

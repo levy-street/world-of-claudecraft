@@ -273,13 +273,14 @@ export function fogFarForBuiltGround(
  * point first, nearest first, then everything else in its original row-major
  * order.
  *
- * This is the "which chunk next" seam. A player can enter a zone anywhere (a
- * returning character's logout spot, a walked boundary crossing), so row-major
- * order alone can leave them standing on not-yet-built terrain. Only the near
- * neighbourhood is reordered: the tail keeps row-major order so the far band's
- * 2x2 super-chunk merge still forms. Replacing this with a globally
- * nearest-first queue is a swap of this one function, not a change to the zone
- * lane that calls it.
+ * This is the STARTING half of the "which chunk next" seam; createCellBuildQueue
+ * below is the other half, re-picking at every claim once the player is inside
+ * the zone. A player can enter a zone anywhere (a returning character's logout
+ * spot, a walked boundary crossing), so row-major order alone can leave them
+ * standing on not-yet-built terrain. Only the near neighbourhood is reordered:
+ * the tail keeps row-major order so the far band's 2x2 super-chunk merge still
+ * forms. A globally nearest-first queue would replace these two functions, not
+ * the zone lane that calls them.
  *
  * Returns a new array; the input is not modified.
  */
@@ -301,4 +302,102 @@ export function orderCellsForEntry(
   const nearbySet = new Set(nearby);
   nearby.sort((a, b) => distance(a) - distance(b));
   return [...nearby, ...ordered.filter((cell) => !nearbySet.has(cell))];
+}
+
+/** Where the viewer is right now, or null when unknown. */
+export type BuildFocus = () => { x: number; z: number } | null;
+
+/** One zone's remaining cells, handed out one claim at a time. */
+export interface CellBuildQueue {
+  /** The next cell to claim, removed from the queue; undefined when empty. */
+  next(): [number, number] | undefined;
+  readonly remaining: number;
+}
+
+/**
+ * A zone's build order that follows the viewer once they are inside the zone.
+ *
+ * orderCellsForEntry fixes the order when the build STARTS, around a guessed
+ * entry point. A background prepare can run for tens of seconds on a slow
+ * machine, and the player can walk in somewhere else (along the border, or
+ * after the guess was taken from a camera that has since moved). Their cell
+ * then sits in the row-major tail, possibly last of the whole zone, and they
+ * stand on missing ground with the fog clamp pinned to its floor until the
+ * zone finishes (reported as 30 to 40 seconds of "fog" after a walked
+ * crossing, with trees floating over the void).
+ *
+ * So each claim asks again: when `focus()` lies in one of THIS zone's cells,
+ * the remaining cell nearest it within `nearRadius` goes next. Otherwise (the
+ * viewer is outside the zone, or nothing is left near them) the precomputed
+ * order continues unchanged, so a prepare for a zone the player is not in (a
+ * neighbour, a ferry destination behind a loading screen) behaves exactly as
+ * before. The radius matches orderCellsForEntry's. When `canMerge` says a
+ * picked cell's 2x2 block could still become one super-chunk, the pick goes
+ * through the block's even/even corner first (the only cell whose claim
+ * merges), so the far band's merge still forms near the player; everywhere
+ * else the player's own cell goes first.
+ *
+ * Does not mutate `ordered`.
+ */
+export function createCellBuildQueue(
+  ordered: readonly (readonly [number, number])[],
+  grid: ChunkGrid,
+  nearRadius: number,
+  focus: BuildFocus,
+  /** Whether the 2x2 block whose even/even corner is (cx, cz) could still be
+   *  claimed as one super-chunk. Omitted: no block ever merges. */
+  canMerge: (cx: number, cz: number) => boolean = () => false,
+): CellBuildQueue {
+  const queue: [number, number][] = ordered.map(([cx, cz]) => [cx, cz]);
+  const owned = new Set(queue.map(([cx, cz]) => cz * grid.countX + cx));
+  const nearestToFocus = (): number => {
+    const f = focus();
+    if (!f) return -1;
+    const fcx = chunkCellX(grid, f.x);
+    const fcz = chunkCellZ(grid, f.z);
+    if (fcx < 0 || fcz < 0 || fcx >= grid.countX || fcz >= grid.countZ) return -1;
+    if (!owned.has(fcz * grid.countX + fcx)) return -1;
+    let best = -1;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < queue.length; i++) {
+      const [cx, cz] = queue[i];
+      const d = Math.hypot(
+        grid.originX + (cx + 0.5) * grid.size - f.x,
+        grid.originZ + (cz + 0.5) * grid.size - f.z,
+      );
+      // Strictly nearer wins, so a tie keeps the earlier (precomputed) cell.
+      if (d <= nearRadius && d < bestDistance) {
+        best = i;
+        bestDistance = d;
+      }
+    }
+    return best;
+  };
+  return {
+    next() {
+      if (queue.length === 0) return undefined;
+      let i = nearestToFocus();
+      if (i < 0) return queue.shift();
+      // The terrain claims a 2x2 super-chunk only from its even/even corner
+      // and only while all four cells are unbuilt, so claiming an odd cell
+      // first would split a mergeable block into four meshes for the rest of
+      // the session. Hand out the corner instead: its claim merges and covers
+      // the cell asked for in the same job. Blocks that can never merge (any
+      // band but the far one) skip the detour, so it never delays the cell
+      // under the player for nothing.
+      const [cx, cz] = queue[i];
+      if (cx % 2 !== 0 || cz % 2 !== 0) {
+        const ex = cx - (cx % 2);
+        const ez = cz - (cz % 2);
+        if (canMerge(ex, ez)) {
+          const corner = queue.findIndex(([qx, qz]) => qx === ex && qz === ez);
+          if (corner >= 0) i = corner;
+        }
+      }
+      return queue.splice(i, 1)[0];
+    },
+    get remaining() {
+      return queue.length;
+    },
+  };
 }
