@@ -7,6 +7,19 @@
 // layer mocked (the guild_stamp_fence idiom).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// These fixtures drive real guild state and escrow, not the separately tested
+// referral outbox. Do not construct its polling timer against the partial DB.
+vi.mock('../server/referral_game_adapter', () => ({
+  ReferralGameAdapter: class {
+    cards = { isBusy: () => false };
+    attach() {}
+    detach() {}
+    observe() {}
+    command() {}
+    async stop() {}
+  },
+}));
+
 const dbMock = vi.hoisted(() => ({
   // biome-ignore lint/suspicious/noExplicitAny: the hoisted double predates its typed impl
   saveCharacterState: vi.fn(async (..._args: any[]) => true),
@@ -250,6 +263,15 @@ const guildSaveLedgerRows = (callIndex = 0): readonly Record<string, unknown>[] 
 };
 
 beforeEach(() => {
+  // Guild membership is explicitly seated by stampMember or the real guild
+  // command hooks below. Account-social hydration has its own tests and must
+  // not race these fixtures with reads the partial DB cannot answer.
+  const hydration = GameServer.prototype as unknown as {
+    initSocial(): Promise<void>;
+    sendSocialSnapshot(characterId: number): Promise<void>;
+  };
+  vi.spyOn(hydration, 'initSocial').mockResolvedValue();
+  vi.spyOn(hydration, 'sendSocialSnapshot').mockResolvedValue();
   paidGuildCreateMock.mockReset();
   paidGuildCreateMock.mockImplementation(
     async (_deps: unknown, args: { fee: { batchKey: string } }) => ({
@@ -306,6 +328,7 @@ beforeEach(() => {
   );
   dbMock.loadGuildBankRows.mockResolvedValue([]);
 });
+afterEach(() => vi.restoreAllMocks());
 
 describe('loadGuildBanksIntoSim (the boot load, against a REAL Sim)', () => {
   it('injects parsed rows, gives no-row guilds an empty book, and verifies has()', () => {

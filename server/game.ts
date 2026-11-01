@@ -100,6 +100,7 @@ import {
   type StableTimerWireVersion,
 } from '../src/world_api';
 import { sameAppearance } from '../src/world_api/appearance';
+import { accountAdmissionsFor } from './account_admission';
 import { AccountBuddiesService } from './account_buddies_service';
 import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
@@ -5515,14 +5516,13 @@ export class GameServer {
     );
   }
 
-  // Force-close every live session for the account. A bearer token is a reusable
-  // wire credential, not a per-socket identity: an earlier revision tried to spare
-  // the caller's own session by comparing the live socket's auth token against the
-  // request's bearer token, but a stolen/shared token authenticates identically on
-  // both, so that comparison could just as easily spare an attacker's connection.
-  // Kick unconditionally; a legitimate caller's own other tab reconnects with the
-  // fresh credentials the same as any other client would.
+  // Cancel pending admissions before closing every live session for this account.
+  // Never spare a socket by bearer equality: a stolen/shared token authenticates
+  // identically on both the caller's connection and an attacker's connection.
+  // Kick unconditionally; legitimate tabs reconnect with fresh credentials.
+  // The process-local fence also catches stale token reads still in flight.
   disconnectAccount(accountId: number, reason: string): void {
+    accountAdmissionsFor(this).invalidate(accountId);
     for (const session of [...this.clients.values()]) {
       if (session.accountId !== accountId) continue;
       void this.kickSession(session, reason, 'moderation action');
