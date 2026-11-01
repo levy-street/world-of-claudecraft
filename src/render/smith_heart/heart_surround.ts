@@ -44,14 +44,26 @@ const SKIRT_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uK;
 uniform float uTime;
+uniform vec4 uFallen;
 varying float vV;
 varying float vAng;
+float gone(float mid) {
+  float d = abs(mod(vAng * 57.29578 - mid + 180.0, 360.0) - 180.0);
+  return 1.0 - smoothstep(38.0, 50.0, d);
+}
 void main() {
+  // A fallen quarter's rim has gone: no skirt hangs on the air there.
+  float left = 1.0 - clamp(
+    gone(20.0) * uFallen.x + gone(110.0) * uFallen.y + gone(200.0) * uFallen.z + gone(290.0) * uFallen.w,
+    0.0,
+    1.0
+  );
+  if (left < 0.003) discard;
   // Brightest deep down (the abyss's light), fading up to the lip; slow
   // tongues of it licking up the keel.
   float up = vV;
   float tongue = 0.6 + 0.4 * sin(vAng * 11.0 + sin(vAng * 3.0 + uTime * 0.4) * 2.0 - uTime * 0.6);
-  float a = uK * (1.0 - smoothstep(0.15, 1.0, up)) * (0.55 + 0.45 * tongue) * smoothstep(0.0, 0.08, up);
+  float a = left * uK * (1.0 - smoothstep(0.15, 1.0, up)) * (0.55 + 0.45 * tongue) * smoothstep(0.0, 0.08, up);
   gl_FragColor = vec4(uColor * a, 1.0);
   #include <colorspace_fragment>
 }`;
@@ -94,6 +106,8 @@ export interface HeartSurround {
   /** `ring`: the ring's light (0 to 1, the room awake); `blaze`: the final
    *  phase's; `dark`: the heart's fall. */
   set(ring: number, blaze: number, dark: number): void;
+  /** Each quarter's rim gone (HEART_QUARTER_ORDER, 0 standing, 1 fallen). */
+  setFallen(a: number, b: number, c: number, d: number): void;
 }
 
 function band(r: number, y0: number, y1: number): THREE.BufferGeometry {
@@ -129,7 +143,10 @@ export function buildHeartSurround(centre: THREE.Vector3): HeartSurround {
       side: THREE.DoubleSide,
       fog: false,
     });
-  const skirt = glow('smithHeartAbyssSkirt', 0xff9a3c, SKIRT_VERT, SKIRT_FRAG);
+  const fallen = new THREE.Vector4(0, 0, 0, 0);
+  const skirt = glow('smithHeartAbyssSkirt', 0xff9a3c, SKIRT_VERT, SKIRT_FRAG, {
+    uFallen: { value: fallen },
+  });
   // The skirt's uv.y runs 0 at its foot to 1 at the lip.
   add(band(S.skirt.r, S.skirt.bottom, S.skirt.top), skirt, 'heartAbyssSkirt');
   const pool = glow('smithHeartAbyssPool', 0xff8a30, POOL_VERT, POOL_FRAG, {
@@ -167,6 +184,10 @@ export function buildHeartSurround(centre: THREE.Vector3): HeartSurround {
       set(skirt.uniforms.uK, (0.5 + 0.35 * ring + 0.8 * blaze) * live);
       set(pool.uniforms.uK, (0.18 + 0.12 * ring + 0.3 * blaze) * live);
       set(haze.uniforms.uK, 0.55 * (0.4 + 0.6 * live));
+    },
+    setFallen(a, b, c, d) {
+      if (fallen.x !== a || fallen.y !== b || fallen.z !== c || fallen.w !== d)
+        fallen.set(a, b, c, d);
     },
   };
 }

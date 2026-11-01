@@ -22,6 +22,7 @@ import {
   type SmithHeartVein,
 } from '../../sim/content/smith_heart_layout';
 import { sharedUniforms } from '../gfx';
+import type { HeartFallAltar } from './heart_collapse_rig';
 import {
   ensureHeartKit,
   heartKitLoaded,
@@ -32,6 +33,7 @@ import {
 } from './heart_kit';
 import { HEART_PLATFORM_ORDER } from './heart_quarters_core';
 import {
+  HEART_ALTAR_PIECES,
   HEART_KIT_KINDS,
   planHeartCoreBed,
   planHeartRoomKit,
@@ -96,6 +98,8 @@ export interface HeartRoomKit {
   setVein(vein: SmithHeartVein, level: number): void;
   /** The heart's bed: its crystal burning (1) or dark (0). */
   setHeart(level: number): void;
+  /** A vein's altar, moved with its quarter when it falls (heart_collapse_rig.ts). */
+  altar(vein: SmithHeartVein): HeartFallAltar | null;
 }
 
 const tmp = new THREE.Matrix4();
@@ -136,6 +140,7 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
     group.add(bed);
   }
   const glows = new Map<SmithHeartVein, THREE.ShaderMaterial>();
+  const altars = new Map<SmithHeartVein, HeartFallAltar>();
   for (const vein of SMITH_HEART_VEINS) {
     const glow = heartVeinGlowMaterial(SMITH_HEART_VEIN_COLORS[vein], `smithHeartVeinGlow:${vein}`);
     glows.set(vein, glow);
@@ -145,6 +150,8 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
       holder.name = `${p.piece}:${vein}`;
       holder.matrixAutoUpdate = false;
       holder.matrix.copy(heartKitPlacementMatrix(p, tmp));
+      if (p.piece === HEART_ALTAR_PIECES[vein])
+        altars.set(vein, { holder, rest: holder.matrix.clone(), x: p.x, z: p.z });
       for (const m of holder.children) {
         if (!(m instanceof THREE.Mesh)) continue;
         if (m.name.endsWith(':glow')) m.material = glow;
@@ -165,5 +172,6 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
       const k = 0.12 + 0.88 * Math.max(0, Math.min(1, level));
       if (bedGlow.color.r !== k) bedGlow.color.setScalar(k);
     },
+    altar: (vein) => altars.get(vein) ?? null,
   };
 }

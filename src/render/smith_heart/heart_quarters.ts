@@ -49,7 +49,8 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { buildHeartCollapse } from './heart_collapse';
-import { heartCollapseView, heartLandmarkFall } from './heart_collapse_core';
+import { heartCollapseView, heartHornT, heartLandmarkFall } from './heart_collapse_core';
+import type { HeartFallAltar } from './heart_collapse_rig';
 import { heartFloorMaterial } from './heart_floor';
 import {
   heartKitMeshes,
@@ -113,9 +114,9 @@ export const HEART_QUARTER_PIECES: Readonly<Record<SmithHeartVein, string>> = {
   quench: 'Kit_QuarterQuench',
   heat: 'Kit_QuarterHeat',
 };
-/** A ridge's spine on the walk and its horn past the rim (one of each,
- *  turned a quarter per ridge). */
-export const HEART_RIDGE_PIECES = { spine: 'Kit_HeartRidge', horn: 'Kit_HeartRidgeHorn' } as const;
+/** A ridge's spine on the walk (its two halves: `HEART_RIDGE_HALVES`) and its horn past
+ *  the rim, one of each turned a quarter per ridge. */
+export const HEART_RIDGE_PIECES = { horn: 'Kit_HeartRidgeHorn' } as const;
 
 /** The faint white-gold of the heart a ridge glows with when neither of its
  *  quarters is awake. */
@@ -299,15 +300,17 @@ function curtainGeometry(k: number): THREE.BufferGeometry {
 }
 
 interface QuarterRig {
-  floor: THREE.Object3D | null;
   glow: THREE.ShaderMaterial;
   wash: THREE.ShaderMaterial;
   shade: THREE.ShaderMaterial;
+  shadeMesh: THREE.Mesh;
+  washMesh: THREE.Mesh;
   air: THREE.ShaderMaterial[];
 }
 
 interface RidgeRig {
-  pieces: THREE.Object3D[];
+  horn: THREE.Object3D | null;
+  spineGlow: THREE.ShaderMaterial;
   glows: THREE.ShaderMaterial[];
   shocks: THREE.ShaderMaterial[];
   curtain: THREE.ShaderMaterial;
@@ -326,9 +329,19 @@ function windDir(r: number): HeartAirV3 {
   return [dx / l, 0, dz / l];
 }
 
+const _hornAxis = new THREE.Vector3();
+const _hornUp = new THREE.Vector3(0, 1, 0);
+const _hornTilt = new THREE.Quaternion();
+const _hornTurn = new THREE.Quaternion();
+const _hornFoot = new THREE.Vector3();
+const _hornMoved = new THREE.Vector3();
+
 /** The quarters dressed and their light (instance-local). Needs the Heart
  *  kit (the interior builds this only once it has landed). */
-export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
+export function buildHeartQuarters(
+  lowGfx: boolean,
+  altars: (vein: SmithHeartVein) => HeartFallAltar | null,
+): HeartQuarters {
   const group = new THREE.Group();
   group.name = 'smithHeartQuarters';
   const centre = new THREE.Vector3(HEART_ROOM.x, HEART_ROOM.h, HEART_ROOM.z);
@@ -348,22 +361,8 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       uFront: { value: HEART_QUARTERS.ringR },
       uGain: { value: P[vein].seams },
     });
-    const floor = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, HEART_QUARTER_PIECES[vein]);
-    if (floor) {
-      floor.name = `${HEART_QUARTER_PIECES[vein]}:${vein}`;
-      floor.position.copy(centre);
-      for (const m of floor.children) {
-        if (!(m instanceof THREE.Mesh)) continue;
-        if (m.name.endsWith(':glow')) m.material = glow;
-        // Phase 2N: the slabs, joints, wear and soot painted on the sheet.
-        if (m.name.endsWith(':stone')) m.material = heartFloorMaterial(lowGfx);
-        // A floor a breath over the walk casts nothing worth a shadow.
-        m.castShadow = false;
-        m.renderOrder = HEART_PLATFORM_ORDER.floor;
-      }
-      group.add(floor);
-    }
-    const floorPiece = floor ?? null;
+    // Its floor (phase 2N: the slabs, joints, wear and soot painted on the sheet) is
+    // drawn by the fall rig (heart_collapse_rig.ts) with this glow.
     const wash = new THREE.ShaderMaterial({
       name: `smithHeartQuarterWash:${vein}`,
       uniforms: {
@@ -410,7 +409,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     shadeMesh.renderOrder = floorVfxRenderOrder('ground', 3);
     shadeMesh.name = `heartQuarterShade:${vein}`;
     group.add(shadeMesh);
-    rigs.set(vein, { floor: floorPiece, glow, wash, shade, air: [] });
+    rigs.set(vein, { glow, wash, shade, shadeMesh, washMesh, air: [] });
   }
   const rig = (v: SmithHeartVein) => rigs.get(v) as QuarterRig;
   const addAir = (
@@ -616,7 +615,6 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
   // ---- the ridges -----------------------------------------------------------------------------
   const ridges: RidgeRig[] = [];
   for (let k = 0; k < 4; k++) {
-    const ridgePieces: THREE.Object3D[] = [];
     const ridgeGlow = (name: string) =>
       glowMaterial(name, RIDGE_GLOW_FRAG, {
         uColor: { value: new THREE.Color(HEART_GOLD) },
@@ -633,27 +631,6 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     spineGlow.depthWrite = false;
     const hornGlow = ridgeGlow(`smithHeartRidgeHornGlow:${k}`);
     const turn = (k * Math.PI) / 2;
-    const spine = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, HEART_RIDGE_PIECES.spine);
-    if (spine) {
-      spine.name = `${HEART_RIDGE_PIECES.spine}:${k}`;
-      spine.position.copy(centre);
-      // The pieces are ridge 0: a quarter turn per ridge (three's yaw turns a
-      // bearing clockwise, the same way the ridges follow each other).
-      spine.rotation.y = turn;
-      for (const m of spine.children) {
-        if (!(m instanceof THREE.Mesh)) continue;
-        if (m.name.endsWith(':glow')) {
-          m.material = spineGlow;
-          m.renderOrder = HEART_PLATFORM_ORDER.spineGlow;
-        } else {
-          m.material = heartKitSlotMaterial('spine');
-          m.renderOrder = HEART_PLATFORM_ORDER.spine;
-        }
-        if (lowGfx) m.castShadow = false;
-      }
-      group.add(spine);
-      ridgePieces.push(spine);
-    }
     const horn = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, HEART_RIDGE_PIECES.horn);
     if (horn) {
       horn.name = `${HEART_RIDGE_PIECES.horn}:${k}`;
@@ -665,7 +642,6 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         if (lowGfx) m.castShadow = false;
       }
       group.add(horn);
-      ridgePieces.push(horn);
     }
     const shockMat = (name: string, vert: string, color: number, hot: number, alpha: number) =>
       new THREE.ShaderMaterial({
@@ -733,7 +709,8 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     curtainMesh.name = `heartRidgeCurtain:${k}`;
     group.add(curtainMesh);
     ridges.push({
-      pieces: ridgePieces,
+      horn: horn ?? null,
+      spineGlow,
       glows: [spineGlow, hornGlow],
       shocks: [sparks, dust],
       curtain,
@@ -864,7 +841,17 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
   group.add(landmarks.group);
 
   // ---- the Anvil falling apart (Mythic's hidden phase) --------------------------------------
-  const collapse = buildHeartCollapse(lowGfx, centre);
+  const collapse = buildHeartCollapse(
+    lowGfx,
+    centre,
+    {
+      floor: heartFloorMaterial(lowGfx),
+      quarterGlow: (v) => rig(v).glow,
+      ridgeGlow: (k) => ridges[k].spineGlow,
+      daisGlow,
+    },
+    altars,
+  );
   group.add(collapse.group);
 
   // ---- the frame ------------------------------------------------------------------------------
@@ -874,6 +861,23 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
     if (u.value !== k) u.value = k;
   };
   const gold = new THREE.Color(HEART_GOLD);
+  /** A horn going with its quarter: it leans out over the void from its foot and drops. */
+  const paintHorn = (horn: THREE.Object3D | null, k: number, t: number) => {
+    if (!horn) return;
+    const f = heartLandmarkFall(t);
+    if (horn.visible === f.gone) horn.visible = !f.gone;
+    if (f.gone) return;
+    const b = ((HEART_QUARTERS.rimOffsetDeg + 45) * Math.PI) / 180;
+    // In ridge 0's frame: its foot on the rim, tipping outward about the tangent there.
+    _hornAxis.set(Math.cos(b), 0, -Math.sin(b));
+    _hornTilt.setFromAxisAngle(_hornAxis, f.tilt * 1.2);
+    _hornFoot.set(Math.sin(b) * HEART_QUARTERS.rimR, 0, Math.cos(b) * HEART_QUARTERS.rimR);
+    _hornMoved.copy(_hornFoot).applyQuaternion(_hornTilt);
+    _hornFoot.sub(_hornMoved).applyAxisAngle(_hornUp, (k * Math.PI) / 2);
+    _hornTurn.setFromAxisAngle(_hornUp, (k * Math.PI) / 2);
+    horn.quaternion.copy(_hornTurn).multiply(_hornTilt);
+    horn.position.set(centre.x, centre.y - f.drop, centre.z).add(_hornFoot);
+  };
   const ca = new THREE.Color();
   const cb = new THREE.Color();
   return {
@@ -892,7 +896,8 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         // A quarter that has fallen: no floor, no light, no air of its own.
         const fallT = collapse.fallT(vein);
         const whole = fallT >= 0 ? 0 : 1;
-        if (r.floor && r.floor.visible !== (whole === 1)) r.floor.visible = whole === 1;
+        if (r.shadeMesh.visible !== (whole === 1)) r.shadeMesh.visible = whole === 1;
+        if (r.washMesh.visible !== (whole === 1)) r.washMesh.visible = whole === 1;
         set(r.glow.uniforms.uBase, q.base);
         // The quarter's idle life (the Heat's smoulder) wakes with the room.
         set(r.glow.uniforms.uIdle, awakeRoom ? P[vein].idle * (1 - dark) : 0);
@@ -924,9 +929,10 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       }
       for (let k = 0; k < 4; k++) {
         const [va, vb] = heartRidgeNeighbours(k);
-        // A ridge between two fallen quarters has nothing left to stand on.
-        const standing = collapse.fallT(va) < 1 || collapse.fallT(vb) < 1;
-        for (const p of ridges[k].pieces) if (p.visible !== standing) p.visible = standing;
+        // A ridge's spine goes half with each quarter (heart_collapse_rig.ts); its horn
+        // with the first of the two.
+        const anyDown = collapse.fallT(va) >= 0 || collapse.fallT(vb) >= 0 ? 0 : 1;
+        paintHorn(ridges[k].horn, k, heartHornT(collapse.fallT(va), collapse.fallT(vb)));
         const qa = state.quarters[va];
         const qb = state.quarters[vb];
         const wa = lit(va);
@@ -959,7 +965,7 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
         const cu = r.curtain.uniforms;
         (cu.uColor.value as THREE.Color).copy(r.color);
         (cu.uShockColor.value as THREE.Color).copy(ca).lerp(cb, 0.5);
-        set(cu.uLit, awake * (1 - dark));
+        set(cu.uLit, awake * (1 - dark) * anyDown);
         set(cu.uFront, front, 100);
         set(cu.uShockR, shock.r, 100);
         set(cu.uShockAge, shock.age);
@@ -984,6 +990,9 @@ export function buildHeartQuarters(lowGfx: boolean): HeartQuarters {
       set(blazeMat.uniforms.uBlaze, state.blaze * (1 - dark));
       column.set(state.blaze, dark);
       surround.set(state.ring, state.blaze, dark);
+      const gone = (i: number) =>
+        Math.min(1, Math.max(0, collapse.fallT(HEART_QUARTER_ORDER[i]) + 1));
+      surround.setFallen(gone(0), gone(1), gone(2), gone(3));
     },
   };
 }

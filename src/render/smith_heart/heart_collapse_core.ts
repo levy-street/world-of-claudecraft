@@ -259,6 +259,170 @@ export function heartSlabsLive(t: number): boolean {
   );
 }
 
+// ---- the real pieces' fall ----------------------------------------------------------------
+
+// A cut kit piece (docs/design/raid/kit/quarter_split.py) tags each vertex in a byte:
+// class * 64 + chunk. Chunk 0 stays when its quarter falls, chunk 1 and up are its break
+// cells (a keel's: its masses). Class 0 is the surface, drawn whole; 1 broken rock its
+// own fall shows; 2 and 3 broken rock it shows while it stands and its counter-clockwise
+// (2) or clockwise (3) neighbour has fallen.
+
+/** A tag's chunk. */
+export function heartFallChunk(tag: number): number {
+  return tag & 63;
+}
+
+/** A tag's class. */
+export function heartFallClass(tag: number): number {
+  return tag >> 6;
+}
+
+export interface HeartFallRange {
+  start: number;
+  count: number;
+}
+
+export interface HeartFallRanges {
+  /** The triangles sorted by tag (class, then chunk). */
+  index: Uint16Array | Uint32Array;
+  /** Each tag's run of indices. */
+  byTag: Map<number, HeartFallRange>;
+  /** Class 0's run: what a whole floor draws. */
+  surface: HeartFallRange;
+}
+
+/** Sort a tagged piece's triangles by tag and find each tag's run: one index buffer, so
+ *  the whole floor, each falling cell and each neighbour's rock draw a run of it. */
+export function heartFallRanges(
+  index: ArrayLike<number>,
+  tags: ArrayLike<number>,
+): HeartFallRanges {
+  const lists = new Map<number, number[]>();
+  for (let i = 0; i + 2 < index.length; i += 3) {
+    const tag = tags[index[i]];
+    let l = lists.get(tag);
+    if (!l) {
+      l = [];
+      lists.set(tag, l);
+    }
+    l.push(index[i], index[i + 1], index[i + 2]);
+  }
+  const out = tags.length > 65535 ? new Uint32Array(index.length) : new Uint16Array(index.length);
+  const byTag = new Map<number, HeartFallRange>();
+  let at = 0;
+  let surface = 0;
+  for (const tag of [...lists.keys()].sort((a, b) => a - b)) {
+    const l = lists.get(tag) as number[];
+    out.set(l, at);
+    byTag.set(tag, { start: at, count: l.length });
+    at += l.length;
+    if (heartFallClass(tag) === 0) surface = at;
+  }
+  return { index: out, byTag, surface: { start: 0, count: surface } };
+}
+
+/** How a falling piece goes (yards, seconds): a beat where it gives and tips, then it
+ *  drops, slow to start and turning slowly, as something very heavy does. */
+export const HEART_FALL_LOOK = {
+  /** How long a cell gives before it goes, how far it sinks and tips meanwhile. */
+  give: 0.42,
+  giveDrop: 0.55,
+  giveTurn: 0.05,
+  gravity: 21,
+  /** Gone past this: under the heart's bed's surface by then. */
+  depth: 92,
+  /** A cell's first start (the wall's), the last (the ring's), the scatter. */
+  first: 0.05,
+  spread: 1.05,
+  scatter: 0.3,
+  turnBase: 0.1,
+  turnRange: 0.28,
+  /** The keel's masses go from under the floor first. */
+  keelOuter: 0,
+  keelInner: 0.45,
+} as const;
+
+/** The chasm's layers of light under a fallen quarter (yards under the walk): the heart's
+ *  own light far down, smoke in it nearer the hole. */
+export const HEART_FALL_DEPTH: readonly { y: number; r: number; k: number; scale: number }[] = [
+  { y: -18, r: 72, k: 0.05, scale: 0.05 },
+  { y: -28, r: 74, k: 0.11, scale: 0.038 },
+  { y: -37, r: 78, k: 0.24, scale: 0.026 },
+];
+/** The veil of dark air over the heart's bed (it stands lit as a plate from up here): the
+ *  bed sinks into it, burning through at the heart. */
+export const HEART_FALL_VEIL = { y: -39, r: 130 } as const;
+
+/** How strong the heart burns for slot `key`, the room's darkness `dark` given: the room
+ *  dims through the collapse, but a fallen quarter opens onto the heart itself, awake. */
+export function heartCollapseHeartLevel(key: string, dark: number): number {
+  const v = memory.get(key);
+  return v && v.stage === 'collapse' && v.fallen !== 0 ? 1 : 1 - dark;
+}
+
+export interface HeartChunkPose {
+  drop: number;
+  turn: number;
+  gone: boolean;
+}
+
+function fallFrom(delay: number, h: number, t: number, out: HeartChunkPose): void {
+  const L = HEART_FALL_LOOK;
+  const d = t - delay;
+  out.gone = false;
+  if (d <= -L.give) {
+    out.drop = 0;
+    out.turn = 0;
+    return;
+  }
+  if (d <= 0) {
+    const k = 1 + d / L.give;
+    const e = k * k * (3 - 2 * k);
+    out.drop = L.giveDrop * e;
+    out.turn = L.giveTurn * e;
+    return;
+  }
+  out.drop = L.giveDrop + 0.5 * L.gravity * d * d;
+  out.turn = L.giveTurn + d * (L.turnBase + h * L.turnRange);
+  out.gone = out.drop > L.depth;
+}
+
+/** A break cell whose middle lies `r` from the room's centre (`h`: its own 0 to 1), `t`
+ *  seconds into its quarter's fall: it breaks from the wall in toward the raid. */
+export function heartCellPose(r: number, h: number, t: number, out: HeartChunkPose): void {
+  const L = HEART_FALL_LOOK;
+  const { ringR, rimR } = HEART_QUARTERS;
+  const u = Math.max(0, Math.min(1, (r - ringR) / (rimR - ringR)));
+  fallFrom(L.give + L.first + (1 - u) * L.spread + h * L.scatter, h, t, out);
+}
+
+/** One of a quarter's keel masses (`mass` 3 the inner one). */
+export function heartKeelPose(mass: number, h: number, t: number, out: HeartChunkPose): void {
+  const L = HEART_FALL_LOOK;
+  fallFrom(L.give + (mass === 3 ? L.keelInner : L.keelOuter), h * 0.4, t, out);
+}
+
+/** When the last real piece of a quarter has gone. */
+export function heartFallDone(): number {
+  const L = HEART_FALL_LOOK;
+  const fallTime = Math.sqrt((2 * (L.depth - L.giveDrop)) / L.gravity);
+  return L.give + L.first + L.spread + L.scatter + fallTime;
+}
+
+/** The floor's warning stays lit over a cell until it has gone: 1 at the break, 0 once
+ *  the last of the floor has left (the sim kills from the first instant). */
+export function heartFallEdgeLight(t: number): number {
+  const L = HEART_FALL_LOOK;
+  if (t < 0) return 0;
+  const end = L.give + L.first + L.spread + L.scatter + 0.5;
+  return Math.max(0, 1 - t / end);
+}
+
+/** A quarter's ridge horn: it goes with the first of its two quarters to fall. */
+export function heartHornT(ta: number, tb: number): number {
+  return Math.max(ta, tb);
+}
+
 /** The landmark's topple `t` seconds into the fall: its tilt in toward the room
  *  (radians), its drop (yards), and whether it has gone from sight. */
 export function heartLandmarkFall(t: number): { tilt: number; drop: number; gone: boolean } {

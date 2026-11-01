@@ -1,7 +1,7 @@
-// The Anvil falling apart's shaders (heart_collapse.ts): the abyss where a quarter
-// was (depth faked by parallax along the view ray, in the mesh's own yards, so the
-// instance bands' far coordinates never touch it) and the warning cracks glowing in
-// the quarter's element.
+// The Anvil falling apart's shaders (heart_collapse.ts): the ring's abyss at the very
+// end (depth faked by parallax along the view ray, in the mesh's own yards, so the
+// instance bands' far coordinates never touch it), the warning cracks glowing in the
+// quarter's element, the ember line along a fallen quarter's exact edge, and the dust.
 
 const NOISE = /* glsl */ `
 float hH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -23,6 +23,125 @@ void main() {
   // The camera in the mesh's own yards (direction only: the parallax's ray).
   vCam = cameraPosition - modelMatrix[3].xyz;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+/** The ember line on the ground left standing: brightest on the exact edge, broken up
+ *  along it, a slow glow that keeps the edge readable on every tier. */
+export const LIP_VERT = /* glsl */ `
+attribute float aEdge;
+varying vec3 vL;
+varying float vEdge;
+void main() {
+  vL = position;
+  vEdge = aEdge;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+export const LIP_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uHeat;
+uniform vec3 uColor;
+uniform vec3 uHot;
+varying vec3 vL;
+varying float vEdge;
+${NOISE}
+void main() {
+  float n = hF(vL.xz * 0.7 + vec2(uTime * 0.05, 0.0));
+  float reach = 1.0 - smoothstep(0.1 + 0.5 * n, 0.95, vEdge);
+  float line = 1.0 - smoothstep(0.0, 0.22, vEdge);
+  float beat = 0.82 + 0.18 * sin(uTime * 1.7 + n * 9.0);
+  vec3 col = mix(uColor, uHot, line * (0.35 + 0.65 * uHeat));
+  col *= (reach * 0.42 + line * 0.75) * (0.75 + 1.6 * uHeat) * beat;
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+/** The depth under a fallen quarter: a layer of the heart's light and its smoke, soft at
+ *  its edge, each layer its own drift, so looking down through the hole has parallax. */
+export const DEPTH_VERT = /* glsl */ `
+varying vec3 vL;
+void main() {
+  vL = position;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+export const DEPTH_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uK;
+uniform float uScale;
+uniform float uSeed;
+varying vec3 vL;
+${NOISE}
+void main() {
+  float r = length(vL.xz);
+  vec2 p = vL.xz * uScale + uSeed;
+  float n = hF(p + vec2(uTime * 0.035, -uTime * 0.05));
+  float m = hF(p * 2.3 - vec2(uTime * 0.06, uTime * 0.02));
+  float smoke = smoothstep(0.3, 0.8, n) * (0.55 + 0.45 * m);
+  float edge = 1.0 - smoothstep(34.0, 76.0, r);
+  float beat = 0.85 + 0.15 * sin(uTime * 2.856);
+  // The heart's own light welling up under the ring, through the smoke further out.
+  float well = 1.0 - smoothstep(8.0, 52.0, r);
+  vec3 col = mix(vec3(1.0, 0.33, 0.07), vec3(1.0, 0.72, 0.36), smoke * smoke + well * well * 0.4);
+  gl_FragColor = vec4(col * (smoke * edge + well * well * 0.5) * uK * beat, 1.0);
+}`;
+
+/** The veil of dark air over the heart's bed: thin at the heart, thick out at the bed's
+ *  rim, drifting, gone before the crown. */
+export const VEIL_FRAG = /* glsl */ `
+uniform float uTime;
+varying vec3 vL;
+${NOISE}
+void main() {
+  float r = length(vL.xz);
+  float n = hF(vL.xz * 0.03 + vec2(uTime * 0.012, -uTime * 0.02));
+  float a = mix(0.62, 0.97, smoothstep(10.0, 62.0, r)) * (1.0 - smoothstep(92.0, 130.0, r));
+  a = clamp(a - (n - 0.5) * 0.18, 0.0, 1.0);
+  gl_FragColor = vec4(vec3(0.03, 0.017, 0.014), a);
+}`;
+
+/** The dust out of the breaks: heavy soft puffs in the room's own frame. Each starts
+ *  with the floor under it (from the wall in), most hanging and spreading over the
+ *  hole, some sinking away with what fell, lit warm from under as they go down. */
+export const DUST_VERT = /* glsl */ `
+attribute vec2 aCorner;
+attribute vec4 aParams;
+uniform float uFall;
+varying vec2 vCorner;
+varying float vA;
+varying float vLow;
+void main() {
+  float r0 = length(position.xz);
+  float u = clamp((r0 - 16.0) / 44.0, 0.0, 1.0);
+  float t = uFall - (0.45 + (1.0 - u) * 1.1 + aParams.x * 0.9);
+  float life = 2.6 + 2.6 * aParams.y;
+  float k = clamp(t / life, 0.0, 1.0);
+  vec3 p = position;
+  float sinks = step(0.62, aParams.z);
+  p.y = 0.5 + (1.0 - sinks) * (1.4 + 3.2 * aParams.w) * (1.0 - exp(-t * 0.9))
+      - sinks * (2.0 * t + 4.0 * t * t);
+  p.x += (aParams.w - 0.5) * 5.0 * k;
+  p.z += (aParams.y - 0.5) * 5.0 * k;
+  vCorner = aCorner;
+  vA = step(0.0, t) * smoothstep(0.0, 0.12, k) * (1.0 - k) * (1.0 - k) * (0.28 + 0.3 * aParams.w);
+  vLow = clamp(-p.y / 40.0, 0.0, 1.0);
+  float size = (2.6 + 4.6 * aParams.x) * (0.55 + 1.5 * k) * step(0.0, t);
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  mv.xy += aCorner * size;
+  gl_Position = projectionMatrix * mv;
+}`;
+
+export const DUST_FRAG = /* glsl */ `
+uniform vec3 uColor;
+uniform vec3 uGlow;
+varying vec2 vCorner;
+varying float vA;
+varying float vLow;
+void main() {
+  float d = length(vCorner);
+  float a = (1.0 - smoothstep(0.1, 1.0, d)) * vA;
+  if (a < 0.004) discard;
+  gl_FragColor = vec4(mix(uColor, uGlow, vLow * 0.55), a);
+  #include <colorspace_fragment>
 }`;
 
 /** The abyss: nearly black, smoke of the chasm's gold light far below, embers

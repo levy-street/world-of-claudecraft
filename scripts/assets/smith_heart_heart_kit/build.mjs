@@ -22,19 +22,35 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 
 /** Every piece of the kit (docs/design/raid/smith_heart.md, section 5.17). */
 export const SMITH_HEART_HEART_KIT_PIECES = [
-  // The Anvil of the World: its walk and balustrade, its keel.
+  // The Anvil of the World cut along the sim's quarters for Mythic's hidden phase
+  // (docs/design/raid/kit/quarter_split.py): what stays on the ring (the bed, the
+  // column under it), each quarter's walk and balustrade, each quarter's keel.
   'AnvilFloor',
+  'AnvilFloorBreath',
+  'AnvilFloorQuench',
+  'AnvilFloorHammer',
+  'AnvilFloorHeat',
   'AnvilKeel',
+  'AnvilKeelBreath',
+  'AnvilKeelQuench',
+  'AnvilKeelHammer',
+  'AnvilKeelHeat',
   // The walk as four elemental quarters round the central ring (phase 2K):
-  // each quarter's paving, one ridge's spine and its horn (the runtime turns
-  // them for all four), the central ring's dais.
+  // each quarter's paving, one ridge's spine cut down its line (A the side of its
+  // own quarter, B the next's) and its horn (the runtime turns them for all four),
+  // the central ring's dais and each quarter's share of its foot.
   'QuarterHammer',
   'QuarterBreath',
   'QuarterQuench',
   'QuarterHeat',
-  'HeartRidge',
+  'HeartRidgeA',
+  'HeartRidgeB',
   'HeartRidgeHorn',
   'HeartDais',
+  'HeartDaisFootBreath',
+  'HeartDaisFootQuench',
+  'HeartDaisFootHammer',
+  'HeartDaisFootHeat',
   // Phase 2M: the central circle's sunken well and each quarter's wall
   // landmark past the rim.
   'HeartWell',
@@ -100,6 +116,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/heart_pieces.py',
     'docs/design/raid/kit/quarter_geom.py',
     'docs/design/raid/kit/quarter_pieces.py',
+    'docs/design/raid/kit/quarter_split.py',
     'docs/design/raid/kit/landmark_pieces.py',
     'docs/design/raid/kit/build_smith_heart_heart_kit.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',

@@ -6,7 +6,10 @@ the colossus's rock pieces and the floor marks they leave (heart_pieces.py).
 
 Run (background, one scene):
   blender -b --factory-startup --python build_smith_heart_heart_kit.py -- \
-      [--closeups DIR] [--views front,top] [--pieces A,B] [--save out.blend]
+      [--closeups DIR] [--views front,top] [--pieces A,B] [--save out.blend] \
+      [--save-base base.blend | --from-base base.blend]
+(--save-base keeps the uncut build, --from-base starts from it: to iterate on the cut
+alone, in seconds.)
 
 Writes smith_heart_heart_kit_components.glb next to this file (a full build
 only; `--pieces` builds a subset for review renders and writes nothing); the
@@ -17,6 +20,10 @@ Phase 2K rebuilt the platform's walk as four elemental quarters set in a
 pinwheel round a central ring (quarter_pieces.py, quarter_geom.py): the
 quarters' paving, one ridge (turned a quarter for each of the four), the
 dais; Kit_AnvilFloor keeps the rim.
+
+A full build then cuts the platform along the sim's quarters for Mythic's hidden phase
+(quarter_split.py, its doc has the pieces and their vertex tags): a quarter can really
+fall, each piece's whole surface exactly what it was.
 
 Pieces are named Kit_* (the runtime bakes each by name, heart_kit.ts) on the
 kit's three slots: KitStone (lit: the granite, the basalt, the frost stone),
@@ -36,6 +43,7 @@ import shkit  # noqa: E402,F401  (puts the shared dungeon kit on the path)
 import heart_pieces as hp  # noqa: E402
 import quarter_pieces as qp  # noqa: E402
 import landmark_pieces as lp  # noqa: E402
+import quarter_split as qs  # noqa: E402
 from build_smith_heart_hammer_kit import camera, look, scale_figure  # noqa: E402
 from hckit import export_kit  # noqa: E402
 
@@ -218,8 +226,20 @@ def main():
     if only:
         want = only.split(',')
         names = [n for n in names if n in want]
-    parts, materials = build_heart_kit('SmithHeartHeartKit_ROOT', names)
+    if arg('--from-base'):
+        # A saved uncut build (--save-base): iterate on the cut alone.
+        bpy.ops.wm.open_mainfile(filepath=arg('--from-base'))
+        materials = [bpy.data.materials[n] for n in ('KitStone', 'KitGlow', 'KitIce')]
+        parts = [o for o in bpy.data.objects if o.name.startswith('Kit_')]
+    else:
+        parts, materials = build_heart_kit('SmithHeartHeartKit_ROOT', names)
+    if arg('--save-base'):
+        bpy.ops.wm.save_as_mainfile(filepath=arg('--save-base'))
     if not only:
+        # The platform cut along the sim's quarters (quarter_split.py).
+        qs.split_kit(bpy, materials, bpy.data.objects['SmithHeartHeartKit_ROOT'])
+        parts = [o for o in bpy.data.objects if o.name.startswith('Kit_')]
+        print('KIT_TRIANGLES', sum(len(o.data.polygons) for o in parts), 'polygons')
         export_kit(os.path.join(HERE, 'smith_heart_heart_kit_components.glb'))
     preview_materials(materials)
     if arg('--closeups'):

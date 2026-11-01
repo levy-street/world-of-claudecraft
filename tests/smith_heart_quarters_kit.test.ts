@@ -37,6 +37,7 @@ import {
   ASSET,
   SMITH_HEART_HEART_KIT_PIECES,
 } from '../scripts/assets/smith_heart_heart_kit/build.mjs';
+import { HEART_RIDGE_HALVES } from '../src/render/smith_heart/heart_collapse_rig';
 import { HEART_FLOOR_LOOK } from '../src/render/smith_heart/heart_floor_glsl';
 import { HEART_LANDMARK_PIECES } from '../src/render/smith_heart/heart_landmarks';
 import {
@@ -62,6 +63,8 @@ const haveKit = existsSync(ASSET.target);
 type V3 = [number, number, number];
 type C3 = [number, number, number];
 const shapes = new Map<string, Map<string, V3[]>>();
+/** Each piece's surface alone (broken rock is never drawn whole: class 0 of its tag). */
+const surfaces = new Map<string, Map<string, V3[]>>();
 const colours = new Map<string, Map<string, C3[]>>();
 
 beforeAll(async () => {
@@ -75,6 +78,7 @@ beforeAll(async () => {
     const name = node.getName();
     if (!name.startsWith('Kit_')) continue;
     const by = new Map<string, V3[]>();
+    const sby = new Map<string, V3[]>();
     const cby = new Map<string, C3[]>();
     const m = node.getWorldMatrix();
     for (const prim of node.getMesh()?.listPrimitives() ?? []) {
@@ -83,6 +87,7 @@ beforeAll(async () => {
       const col = prim.getAttribute('COLOR_0');
       const mat = prim.getMaterial()?.getName() ?? '';
       const list = by.get(mat) ?? [];
+      const slist = sby.get(mat) ?? [];
       const clist = cby.get(mat) ?? [];
       const e: number[] = [];
       const c: number[] = [];
@@ -98,18 +103,22 @@ beforeAll(async () => {
           // Normalized integer colours read as 0..1 through the accessor.
           const k = col.getNormalized() || col.getComponentType() === 5126 ? 1 : 1 / 255;
           clist.push([c[0] * k, c[1] * k, c[2] * k]);
+          if (Math.round(c[3] * k * 255) >> 6 === 0 || Math.round(c[3] * k * 255) === 255)
+            slist.push(list[list.length - 1]);
         }
       }
       by.set(mat, list);
+      sby.set(mat, slist);
       cby.set(mat, clist);
     }
     shapes.set(name, by);
+    surfaces.set(name, sby);
     colours.set(name, cby);
   }
 });
 
-const points = (name: string, material?: string): V3[] => {
-  const s = shapes.get(name);
+const points = (name: string, material?: string, surfaceOnly = false): V3[] => {
+  const s = (surfaceOnly ? surfaces : shapes).get(name);
   if (!s) throw new Error(`no kit piece ${name}`);
   if (material) return s.get(material) ?? [];
   return [...s.values()].flat();
@@ -151,7 +160,8 @@ describe('the four quarters in the kit', () => {
       'QuarterBreath',
       'QuarterQuench',
       'QuarterHeat',
-      'HeartRidge',
+      'HeartRidgeA',
+      'HeartRidgeB',
       'HeartRidgeHorn',
       'HeartDais',
       'HeartWell',
@@ -164,7 +174,8 @@ describe('the four quarters in the kit', () => {
     // The sockets are the quarters' own since phase 2L.
     expect(SMITH_HEART_HEART_KIT_PIECES).not.toContain('TornSocket');
     for (const v of SMITH_HEART_VEINS) expect(HEART_QUARTER_PIECES[v]).toMatch(/^Kit_Quarter/);
-    expect(HEART_RIDGE_PIECES).toEqual({ spine: 'Kit_HeartRidge', horn: 'Kit_HeartRidgeHorn' });
+    expect(HEART_RIDGE_PIECES).toEqual({ horn: 'Kit_HeartRidgeHorn' });
+    expect(HEART_RIDGE_HALVES).toEqual({ a: 'Kit_HeartRidgeA', b: 'Kit_HeartRidgeB' });
   });
 
   it.skipIf(!haveKit)(
@@ -173,7 +184,7 @@ describe('the four quarters in the kit', () => {
       for (const vein of SMITH_HEART_VEINS) {
         const piece = HEART_QUARTER_PIECES[vein];
         let inside = 0;
-        for (const [x, y, z] of points(piece)) {
+        for (const [x, y, z] of points(piece, undefined, true)) {
           const r = Math.hypot(x, z);
           expect(r, `${piece} r`).toBeLessThanOrEqual(rimR + 0.15);
           expect(r, `${piece} r`).toBeGreaterThanOrEqual(ringR - 0.4);
@@ -314,17 +325,19 @@ describe('the four quarters in the kit', () => {
       }
       // The joints' dirt (the rim piece's bed under the walk) darker than
       // the stones of the quarter round it: no lit grid.
-      const bed = points('Kit_AnvilFloor', 'KitStone');
-      const bedCol = colourOf('Kit_AnvilFloor', 'KitStone');
       for (const vein of SMITH_HEART_VEINS) {
+        const piece = `Kit_AnvilFloor${vein.charAt(0).toUpperCase()}${vein.slice(1)}`;
+        const bed = points(piece, 'KitStone');
+        const bedCol = colourOf(piece, 'KitStone');
         const dirt: number[] = [];
         bed.forEach(([x, y, z], i) => {
           if (Math.abs(y + 0.06) > 0.005) return;
           const p = at(x, z);
           if ([0, 1, 2, 3].some((k) => heartRidgeDistance(k, p.x, p.z) < 3)) return;
-          if (heartQuarterAt(p.x, p.z) === vein) dirt.push(lum(bedCol[i]));
+          dirt.push(lum(bedCol[i]));
         });
-        expect(dirt.length, vein).toBeGreaterThan(50);
+        // Coarse since it lies wholly under the sheet (the budget went to the fall).
+        expect(dirt.length, vein).toBeGreaterThan(30);
         expect(mean(dirt), vein).toBeLessThan(v[vein] * 0.75);
       }
     },
@@ -335,7 +348,13 @@ describe('the four quarters in the kit', () => {
     () => {
       let onWalk = 0;
       let crest = 0;
-      for (const [x, y, z] of points('Kit_HeartRidge')) {
+      const spine = [
+        ...points(HEART_RIDGE_HALVES.a, 'KitStone', true),
+        ...points(HEART_RIDGE_HALVES.b, 'KitStone', true),
+        ...points(HEART_RIDGE_HALVES.a, 'KitGlow', true),
+        ...points(HEART_RIDGE_HALVES.b, 'KitGlow', true),
+      ];
+      for (const [x, y, z] of spine) {
         const r = Math.hypot(x, z);
         // The spine ends at the rim (the horn goes on).
         expect(r, 'spine r').toBeLessThan(rimR + 0.9);
@@ -355,7 +374,8 @@ describe('the four quarters in the kit', () => {
       expect(onWalk).toBeGreaterThan(400);
       // A spine, not a kerb (phase 2K's crest was a quarter of a yard).
       expect(crest).toBeGreaterThan(0.42);
-      expect(points('Kit_HeartRidge', 'KitGlow').length).toBeGreaterThan(100);
+      expect(points(HEART_RIDGE_HALVES.a, 'KitGlow').length).toBeGreaterThan(50);
+      expect(points(HEART_RIDGE_HALVES.b, 'KitGlow').length).toBeGreaterThan(50);
       let top = 0;
       for (const [x, y, z] of points('Kit_HeartRidgeHorn')) {
         const r = Math.hypot(x, z);

@@ -43,6 +43,9 @@ export const HEART_KIT_OMIT_TOPS: readonly string[] = [
 ];
 /** The bridge stands on the kit's arch: the field keeps a shallow keel there. */
 export const HEART_KIT_SHALLOW: readonly string[] = ['heart_bridge'];
+/** The field's own rock the kit's replaces: none under the Anvil, so nothing stands in a
+ *  fallen quarter's hole (Mythic's hidden phase). */
+export const HEART_KIT_NO_SKIRT: readonly string[] = ['heart_anvil'];
 /** The lathe keels (heart_room.ts) the kit's own keels replace. */
 export const HEART_KIT_KEELS: readonly string[] = ['heart_anvil', 'heart_terrace'];
 
@@ -152,7 +155,9 @@ export function heartRootPoint(
 }
 
 /** Every static Heart kit placement (the altars and the roots are painted
- *  apart, each with its vein's glow: `planHeartVeinPieces`). */
+ *  apart, each with its vein's glow: `planHeartVeinPieces`; each quarter's own
+ *  platform pieces apart too: heart_collapse_rig.ts). What is left of the Anvil
+ *  here is what stays on the ring. */
 export function planHeartRoomKit(): HeartKitPlacement[] {
   return [
     { piece: 'Kit_AnvilFloor', x: HEART_ROOM.x, y: HEART_ROOM.h, z: HEART_ROOM.z, rot: 0 },

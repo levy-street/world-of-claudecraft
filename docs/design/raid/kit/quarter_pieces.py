@@ -572,19 +572,20 @@ def painted_slab(p, outline, top, info, paint, bevel=0.1, tilt=(0.0, 0.0), spaci
 
 # ---- the joints' dirt (Kit_AnvilFloor's bed) -------------------------------------------------
 def joint_bed(p, z=-0.06):
-    """The dirt the floor's slabs are set in (only seen in their joints): a
-    polar sheet over the whole walk, one dark warm dirt with each quarter's
-    drift (blended across its seams), a hole under every socket (its pit
-    and apron carry their own). The well's floor covers its middle."""
+    """The dirt under the floor: a polar sheet over the whole walk, one dark
+    warm dirt with each quarter's drift (blended across its seams), a hole
+    under every socket (its pit and apron carry their own). The well's floor
+    covers its middle. Coarse: since phase 2N's painted sheet lies over it,
+    nothing sees it (the budget went to the quarters' real fall)."""
     bm = p.bm
     socks = all_sockets()
     n1 = Noise(7001)
     radii = [qg.RING_R - 3.2]
     while radii[-1] < qg.RIM_R + 0.05:
-        radii.append(min(qg.RIM_R + 0.08, radii[-1] + 2.4))
+        radii.append(min(qg.RIM_R + 0.08, radii[-1] + 6.0))
     rows = []
     for r in radii:
-        m = max(8, int(math.ceil(TAU * max(r, 0.5) / 2.6)))
+        m = max(8, int(math.ceil(TAU * max(r, 0.5) / 6.5)))
         rows.append([(r, 360.0 * k / m) for k in range(m)])
 
     def dirt(x, y):

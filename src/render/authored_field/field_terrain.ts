@@ -65,6 +65,8 @@ export interface FieldTerrainOptions {
    *  running down to the void floor, so the dungeon's own trusses show. The
    *  sim's lip colliders are unchanged. */
   shallow?: { surfaces: ReadonlySet<string>; depth: number };
+  /** Surfaces with no skirt (a kit's own rock stands there and can fall away). */
+  noSkirt?: ReadonlySet<string>;
   /** The cliff faces' rock: fractured slabs (the default), level bedded
    *  strata (a shelf cut into a mountain), or a glacier crevasse wall (annual
    *  layers and meltwater flutes, a little glossier: wet ice). */
@@ -157,6 +159,7 @@ export function buildAuthoredFieldTerrain(
     rowStep: opts.lowGfx ? 6 : 3,
     flare: 0.22,
     ...(opts.shallow ? { shallow: opts.shallow } : {}),
+    ...(opts.noSkirt ? { noSkirt: opts.noSkirt } : {}),
     ...(opts.cliffPaint ? { paint: opts.cliffPaint } : {}),
     ...(opts.cliffRock === 'glacier' ? { uvScale: GLACIER_CLIFF_UV } : {}),
   });

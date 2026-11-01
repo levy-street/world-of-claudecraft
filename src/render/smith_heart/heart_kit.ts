@@ -135,8 +135,19 @@ export function mergeHeartKitParts(list: readonly THREE.BufferGeometry[]): THREE
 function bakeNode(node: THREE.Object3D): HeartBakedPiece {
   node.updateWorldMatrix(true, true);
   const parts: Record<HeartKitSlot, THREE.BufferGeometry[]> = { stone: [], glow: [], ice: [] };
+  const tags: Record<HeartKitSlot, number[]> = { stone: [], glow: [], ice: [] };
+  let tagged = false;
   node.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
+    const material = Array.isArray(child.material) ? child.material[0] : child.material;
+    const slot = slotOf(material?.name ?? '');
+    // The vertex alpha carries a cut piece's fall tag (heart_collapse_core.ts).
+    const colour = child.geometry.getAttribute('color');
+    for (let i = 0; colour && i < colour.count; i++) {
+      const tag = colour.itemSize === 4 ? Math.round(colour.getComponent(i, 3) * 255) : 255;
+      if (tag !== 255) tagged = true;
+      tags[slot].push(tag);
+    }
     const geometry = new THREE.BufferGeometry();
     for (const name of ['position', 'normal', 'color']) {
       const attr = child.geometry.getAttribute(name);
@@ -150,13 +161,14 @@ function bakeNode(node: THREE.Object3D): HeartBakedPiece {
     if (child.geometry.index) geometry.setIndex(child.geometry.index.clone());
     geometry.applyMatrix4(child.matrixWorld);
     if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
-    const material = Array.isArray(child.material) ? child.material[0] : child.material;
-    parts[slotOf(material?.name ?? '')].push(geometry);
+    parts[slot].push(geometry);
   });
   const out: HeartBakedPiece = {};
   for (const slot of HEART_KIT_SLOTS) {
     if (parts[slot].length === 0) continue;
-    out[slot] = markSharedGeometry(mergeHeartKitParts(parts[slot]));
+    const merged = markSharedGeometry(mergeHeartKitParts(parts[slot]));
+    if (tagged) merged.userData.heartFallTags = Uint8Array.from(tags[slot]);
+    out[slot] = merged;
     for (const g of parts[slot]) g.dispose();
   }
   return out;

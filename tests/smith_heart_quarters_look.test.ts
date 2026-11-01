@@ -277,7 +277,7 @@ describe('the painter', () => {
   };
 
   it('wakes the boss quarter, its wash and its air, the others dark; the washes on the ground rung', () => {
-    const q = buildHeartQuarters(false);
+    const q = buildHeartQuarters(false, () => null);
     const mats = materialsOf(q.group);
     // The washes: one per quarter, on the ground rung.
     const washes: THREE.Object3D[] = [];
@@ -319,8 +319,8 @@ describe('the painter', () => {
   });
 
   it('draws the same lights on every tier, only fewer motes on the low one', () => {
-    const hi = buildHeartQuarters(false);
-    const lo = buildHeartQuarters(true);
+    const hi = buildHeartQuarters(false, () => null);
+    const lo = buildHeartQuarters(true, () => null);
     expect([...materialsOf(lo.group).keys()].sort()).toEqual(
       [...materialsOf(hi.group).keys()].sort(),
     );
@@ -338,7 +338,7 @@ describe('the painter', () => {
   });
 
   it('writes every point through modelViewMatrix (camera-relative)', () => {
-    for (const m of materialsOf(buildHeartQuarters(false).group).values()) {
+    for (const m of materialsOf(buildHeartQuarters(false, () => null).group).values()) {
       expect(m.vertexShader, m.name).toMatch(/modelViewMatrix/);
       expect(m.vertexShader, m.name).not.toMatch(/viewMatrix\s*\*\s*(modelMatrix|vec4)/);
     }
@@ -388,7 +388,11 @@ describe('the quarters read apart (phase 2L)', () => {
     expect(src).toMatch(/heartKitSlotMaterial\('spine'\)/);
     expect(src).toMatch(/spineGlow\.depthWrite = false/);
     expect(src).toMatch(/renderOrder = HEART_PLATFORM_ORDER\.spine;/);
-    expect(src).toMatch(/renderOrder = HEART_PLATFORM_ORDER\.floor;/);
+    // The floors and the ridges' spines whole, in the fall rig (heart_collapse_rig.ts).
+    const rig = readFileSync('src/render/smith_heart/heart_collapse_rig.ts', 'utf8');
+    expect(rig).toMatch(/stoneOrder: O\.floor/);
+    expect(rig).toMatch(/stoneOrder: O\.spine/);
+    expect(rig).toMatch(/heartKitSlotMaterial\('spine'\)/);
     const kit = readFileSync('src/render/smith_heart/heart_room_kit.ts', 'utf8');
     expect(kit).toMatch(/Kit_AnvilFloor:[\s\S]*HEART_PLATFORM_ORDER\.floor/);
   });
@@ -401,8 +405,8 @@ describe('the quarters read apart (phase 2L)', () => {
     ).toBeGreaterThan(500);
     expect(A.quench.mist + A.quench.frost + A.quench.crystals).toBeGreaterThan(350);
     expect(A.heat.embers + A.heat.haze + A.heat.flames).toBeGreaterThan(350);
-    const hi = buildHeartQuarters(false).group;
-    const lo = buildHeartQuarters(true).group;
+    const hi = buildHeartQuarters(false, () => null).group;
+    const lo = buildHeartQuarters(true, () => null).group;
     const names = (g: THREE.Object3D) => {
       const out: string[] = [];
       g.traverse((o) => {
@@ -451,7 +455,7 @@ describe('the edges awake (phase 2M)', () => {
   });
 
   it("lights the boss quarter's landmark, the others quiet, all four in the final look, dark with the heart", () => {
-    const q = buildHeartQuarters(false);
+    const q = buildHeartQuarters(false, () => null);
     const mats = materialsOf(q.group);
     const lm = (v: string) => mats.get(`smithHeartLandmarkGlow:${v}`)?.uniforms;
     for (const v of SMITH_HEART_VEINS) expect(lm(v), v).toBeDefined();
@@ -488,7 +492,7 @@ describe('the edges awake (phase 2M)', () => {
   });
 
   it('draws the circle: its rim as a spine (no depth write), its well a floor through modelViewMatrix', () => {
-    const mats = materialsOf(buildHeartQuarters(false).group);
+    const mats = materialsOf(buildHeartQuarters(false, () => null).group);
     const well = mats.get('smithHeartWell');
     expect(well).toBeDefined();
     expect(well?.vertexShader).toMatch(/modelViewMatrix/);
@@ -546,8 +550,8 @@ describe('the edges awake (phase 2M)', () => {
       });
       return n;
     };
-    const hi = buildHeartQuarters(false).group;
-    const lo = buildHeartQuarters(true).group;
+    const hi = buildHeartQuarters(false, () => null).group;
+    const lo = buildHeartQuarters(true, () => null).group;
     expect(quads(lo, 'heartLandmarkEmbers:heat')).toBeLessThan(
       quads(hi, 'heartLandmarkEmbers:heat'),
     );

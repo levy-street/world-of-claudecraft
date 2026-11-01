@@ -773,6 +773,9 @@ export interface FieldCliffOptions {
   /** Surfaces whose drop into the void stops `depth` yards under their top
    *  (open air under a catwalk; the dungeon draws its own trusses there). */
   shallow?: { surfaces: ReadonlySet<string>; depth: number };
+  /** Surfaces with no skirt at all (a kit's own rock stands there and can fall away:
+   *  the Smith's Heart's Anvil). */
+  noSkirt?: ReadonlySet<string>;
   /** The faces' vertex paint (default `cliffColor`). */
   paint?: CliffPaint;
   /** Texture repeats per yard on the faces (default 0.12). */
@@ -1017,6 +1020,7 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
     let ring = densify(renderOutline(s), opts.columnStep);
     if (signedArea(ring) < 0) ring = ring.reverse();
     planRisers(def, index, ring, out, paint);
+    if (opts.noSkirt?.has(s.id)) continue;
     // The skirt stands only where this surface owns the ground inside its
     // outline: a later surface across it (a stair cut down through the lip)
     // draws its own sides there (field_skirt_core.ts).
