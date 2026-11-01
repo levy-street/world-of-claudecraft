@@ -27,6 +27,12 @@ beforeEach(() => {
 });
 
 describe('userFacingApiError code-first resolution', () => {
+  it('localizes shutdown admission refusal through the existing unavailable copy', () => {
+    expect(userFacingApiError(new Error('The realm is temporarily unavailable.'))).toBe(
+      t('serverUnavailable.heading'),
+    );
+  });
+
   it('resolves a stable code to its apiError key, beating the prose message', () => {
     // The message would prose-resolve to errors.api.notAuthenticated ('Not
     // authenticated.'); the code is a structural one with a different English value,

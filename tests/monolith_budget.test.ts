@@ -1861,7 +1861,8 @@ const MONOLITHS: MonolithRow[] = [
     // Membership boot wiring lives with its service factory.
     // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 9696,
+    // Final-save retry and sweep policy now live in character_final_save.ts.
+    ceiling: 9666,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
