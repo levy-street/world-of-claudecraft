@@ -35,12 +35,36 @@ export async function runBoundedLane<T>(
   start: (item: T, index: number) => Promise<void>,
   opts?: BoundedLaneOptions,
 ): Promise<void> {
+  let i = 0;
+  await runBoundedPull(
+    () => (i < items.length ? { item: items[i++] } : undefined),
+    limit,
+    start,
+    opts,
+  );
+}
+
+/**
+ * The pull form of runBoundedLane: `next` is asked for the next item only once
+ * a slot is free, never ahead of time, so a caller whose priority changes while
+ * the lane runs (the zone build following the player) decides each submission
+ * with current information. Same limit, stop and error contract; an undefined
+ * result ends the lane.
+ */
+export async function runBoundedPull<T>(
+  next: () => { item: T } | undefined,
+  limit: number,
+  start: (item: T, index: number) => Promise<void>,
+  opts?: BoundedLaneOptions,
+): Promise<void> {
   const max = Math.max(1, Math.floor(limit));
   const inFlight = new Set<Promise<void>>();
-  for (let i = 0; i < items.length; i++) {
+  for (let i = 0; ; i++) {
     if (opts?.shouldStop?.()) break;
+    const pulled = next();
+    if (!pulled) break;
     const index = i;
-    const job: Promise<void> = start(items[index], index)
+    const job: Promise<void> = start(pulled.item, index)
       .catch((error: unknown) => {
         opts?.onError?.(error, index);
       })

@@ -302,3 +302,78 @@ export function orderCellsForEntry(
   nearby.sort((a, b) => distance(a) - distance(b));
   return [...nearby, ...ordered.filter((cell) => !nearbySet.has(cell))];
 }
+
+/** Where the viewer is right now, or null when unknown. */
+export type BuildFocus = () => { x: number; z: number } | null;
+
+/** One zone's remaining cells, handed out one claim at a time. */
+export interface CellBuildQueue {
+  /** The next cell to claim, removed from the queue; undefined when empty. */
+  next(): [number, number] | undefined;
+  readonly remaining: number;
+}
+
+/**
+ * A zone's build order that follows the viewer once they are inside the zone.
+ *
+ * orderCellsForEntry fixes the order when the build STARTS, around a guessed
+ * entry point. A background prepare can run for tens of seconds on a slow
+ * machine, and the player can walk in somewhere else (along the border, or
+ * after the guess was taken from a camera that has since moved). Their cell
+ * then sits in the row-major tail, possibly last of the whole zone, and they
+ * stand on missing ground with the fog clamp pinned to its floor until the
+ * zone finishes (reported as 30 to 40 seconds of "fog" after a walked
+ * crossing, with trees floating over the void).
+ *
+ * So each claim asks again: when `focus()` lies in one of THIS zone's cells,
+ * the remaining cell nearest it within `nearRadius` goes next. Otherwise (the
+ * viewer is outside the zone, or nothing is left near them) the precomputed
+ * order continues unchanged, so a prepare for a zone the player is not in (a
+ * neighbour, a ferry destination behind a loading screen) behaves exactly as
+ * before. The radius matches orderCellsForEntry's for the same reason: the far
+ * band's row-major tail keeps its 2x2 super-chunk merge.
+ *
+ * Does not mutate `ordered`.
+ */
+export function createCellBuildQueue(
+  ordered: readonly (readonly [number, number])[],
+  grid: ChunkGrid,
+  nearRadius: number,
+  focus: BuildFocus,
+): CellBuildQueue {
+  const queue: [number, number][] = ordered.map(([cx, cz]) => [cx, cz]);
+  const owned = new Set(queue.map(([cx, cz]) => cz * grid.countX + cx));
+  const nearestToFocus = (): number => {
+    const f = focus();
+    if (!f) return -1;
+    const fcx = chunkCellX(grid, f.x);
+    const fcz = chunkCellZ(grid, f.z);
+    if (fcx < 0 || fcz < 0 || fcx >= grid.countX || fcz >= grid.countZ) return -1;
+    if (!owned.has(fcz * grid.countX + fcx)) return -1;
+    let best = -1;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < queue.length; i++) {
+      const [cx, cz] = queue[i];
+      const d = Math.hypot(
+        grid.originX + (cx + 0.5) * grid.size - f.x,
+        grid.originZ + (cz + 0.5) * grid.size - f.z,
+      );
+      // Strictly nearer wins, so a tie keeps the earlier (precomputed) cell.
+      if (d <= nearRadius && d < bestDistance) {
+        best = i;
+        bestDistance = d;
+      }
+    }
+    return best;
+  };
+  return {
+    next() {
+      if (queue.length === 0) return undefined;
+      const i = nearestToFocus();
+      return i >= 0 ? queue.splice(i, 1)[0] : queue.shift();
+    },
+    get remaining() {
+      return queue.length;
+    },
+  };
+}

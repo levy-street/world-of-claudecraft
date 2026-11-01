@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   type ChunkGrid,
+  createCellBuildQueue,
   fogFarForBuiltGround,
   GROUND_VIEW_CONE_MARGIN,
   type GroundPendingAt,
@@ -516,5 +517,82 @@ describe('chunk build order (the which-chunk-next seam)', () => {
   it('leaves order alone when nothing is within the near radius', () => {
     const ordered = orderCellsForEntry(cells, GRID, { x: 20_000, z: 20_000 }, CHUNK_SIZE * 3);
     expect(ordered).toEqual(cells);
+  });
+});
+
+describe('chunk build queue (the order follows a player who walks in mid-build)', () => {
+  const cells: [number, number][] = [];
+  for (let cz = 6; cz <= 11; cz++) for (let cx = 6; cx <= 11; cx++) cells.push([cx, cz]);
+  const centre = ([cx, cz]: readonly [number, number]): { x: number; z: number } => ({
+    x: GRID.originX + (cx + 0.5) * GRID.size,
+    z: GRID.originZ + (cz + 0.5) * GRID.size,
+  });
+  const near = CHUNK_SIZE * 3;
+  // The build started around one corner of the zone (the guessed entry), and
+  // the player then walked in at the opposite corner.
+  const entry = centre([6, 6]);
+  const player = centre([11, 11]);
+  const ordered = orderCellsForEntry(cells, GRID, entry, near);
+  const drain = (queue: { next(): [number, number] | undefined }): [number, number][] => {
+    const out: [number, number][] = [];
+    for (let cell = queue.next(); cell; cell = queue.next()) out.push(cell);
+    return out;
+  };
+
+  it('a fixed entry order builds the cell under a player who entered elsewhere near last', () => {
+    // The reported bug: 30 to 40 seconds standing on missing ground, because
+    // the player's own cell waits behind most of the zone.
+    const index = ordered.findIndex(([cx, cz]) => cx === 11 && cz === 11);
+    expect(index).toBeGreaterThan(ordered.length / 2);
+  });
+
+  it('builds the cell under the player next once they are inside the zone', () => {
+    const queue = createCellBuildQueue(ordered, GRID, near, () => player);
+    expect(queue.next()).toEqual([11, 11]);
+    // Then outward from the player, nearest first, while anything is near them.
+    for (const cell of [queue.next(), queue.next()]) {
+      expect(cell).toBeDefined();
+      const c = centre(cell as [number, number]);
+      expect(Math.hypot(c.x - player.x, c.z - player.z)).toBeLessThanOrEqual(CHUNK_SIZE + 1e-6);
+    }
+  });
+
+  it('follows the player as they move during the build', () => {
+    let focus = player;
+    const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
+    expect(queue.next()).toEqual([11, 11]);
+    focus = centre([9, 6]);
+    expect(queue.next()).toEqual([9, 6]);
+  });
+
+  it('keeps the precomputed order while the viewer is outside the zone or unknown', () => {
+    // No focus yet (no frame rendered), a focus in a cell this zone does not
+    // own (a neighbour prepare, a ferry destination), and a focus off the grid.
+    const outside = centre([12, 6]);
+    for (const focus of [null, outside, { x: 1e6, z: 1e6 }]) {
+      const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
+      expect(drain(queue)).toEqual(ordered);
+    }
+  });
+
+  it('switches to the player only from the claim after they cross in', () => {
+    let focus: { x: number; z: number } | null = centre([12, 6]);
+    const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
+    expect(queue.next()).toEqual(ordered[0]);
+    focus = player;
+    expect(queue.next()).toEqual([11, 11]);
+  });
+
+  it('hands out every cell exactly once and never mutates its input', () => {
+    const snapshot = ordered.map((cell) => cell.join(','));
+    let step = 0;
+    const queue = createCellBuildQueue(ordered, GRID, near, () =>
+      centre(cells[step++ % cells.length]),
+    );
+    expect(queue.remaining).toBe(cells.length);
+    const out = drain(queue);
+    expect(queue.remaining).toBe(0);
+    expect(out.map((c) => c.join(',')).sort()).toEqual(cells.map((c) => c.join(',')).sort());
+    expect(ordered.map((cell) => cell.join(','))).toEqual(snapshot);
   });
 });

@@ -25,9 +25,14 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
-import { runBoundedLane } from './build_lane_core';
+import { runBoundedPull } from './build_lane_core';
 import { isCanvasDrawableImage } from './canvas_drawable';
-import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
+import {
+  type ChunkGrid,
+  createCellBuildQueue,
+  type GroundPendingAt,
+  orderCellsForEntry,
+} from './chunk_residency_core';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
 import {
   cellCountsAsPending,
@@ -2823,6 +2828,13 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   }
   const chunks: ChunkRec[] = [];
   let lastVisibilityX = Number.NaN;
+  // The camera position from the latest update(): a zone build re-reads it at
+  // every claim so the chunks under a player who walked in mid-build come next
+  // (createCellBuildQueue). Mutated in place (update runs every frame); null
+  // from the focus getter until the first frame.
+  const buildFocus = { x: Number.NaN, z: Number.NaN };
+  const currentBuildFocus = (): { x: number; z: number } | null =>
+    Number.isFinite(buildFocus.x) ? buildFocus : null;
   let lastVisibilityZ = Number.NaN;
   let lastVisibilityFar = Number.NaN;
   let lastVisibilityChunkCount = -1;
@@ -3429,6 +3441,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         0,
       );
       const total = Math.max(1, normalSlices + cells.length);
+      // Claimed one cell at a time, so the order can follow a player who walks
+      // into this zone while it is still building.
+      const queue = createCellBuildQueue(cells, grid, CHUNK_SIZE * 3, currentBuildFocus);
       let done = 0;
       if (normalTex && normalRegions.length > 0) {
         for (const region of normalRegions) {
@@ -3449,8 +3464,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         normalTex.needsUpdate = true;
       }
       if (idlePace) {
-        for (const [cx, cz] of cells) {
+        for (let cell = queue.next(); cell; cell = queue.next()) {
           if (cancelled) return;
+          const [cx, cz] = cell;
           const job = claimCell(zone.id, cx, cz);
           if (
             job &&
@@ -3474,8 +3490,11 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         // caller's own catch (the arrival chain's fatal overlay) sees it,
         // instead of a silent permanent hole under the fog clamp.
         let firstError: unknown;
-        await runBoundedLane(
-          cells,
+        await runBoundedPull(
+          () => {
+            const cell = queue.next();
+            return cell ? { item: cell } : undefined;
+          },
           zoneBuildPool()?.size ?? 1,
           async ([cx, cz]) => {
             const job = claimCell(zone.id, cx, cz);
@@ -3584,6 +3603,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       escalatedZones.delete(zone.id);
     },
     update(camX: number, camZ: number, fogFar: number): void {
+      buildFocus.x = camX;
+      buildFocus.z = camZ;
       if (
         camX === lastVisibilityX &&
         camZ === lastVisibilityZ &&
