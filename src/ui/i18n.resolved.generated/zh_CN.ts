@@ -7405,7 +7405,8 @@ export const zh_CN: EnTranslations = {
         "frozen": "{player}被冻透了！在冰碎裂之前离开！",
         "crack": "抱团的人群下冰面在呻吟！散开！",
         "wake": "铸匠之刃挣脱湖面！注意它们瞄准何处！",
-        "marks": "利刃标记了{list}！把它们引离团队！"
+        "marks": "利刃标记了{list}！把它们引离团队！",
+        "flurry": "所有利刃同时出猎！躲开直线！"
       },
       "say": {
         "pull": "我的湖上来了温热的血。它不会温热太久。",
@@ -7413,6 +7414,7 @@ export const zh_CN: EnTranslations = {
         "hole": "冰记得每一步。聚在一起，它便会崩塌。",
         "wake": "铸匠之刃，醒来！在冰面上猎杀他们！",
         "cross": "去吧，利刃！将他们与温暖斩断！",
+        "flurry": "所有利刃！所有锋刃！别让任何人站在我的湖上！",
         "deepen": "感觉到了吗？寒意正越来越深。",
         "wipe": "静止。无声。淬火已成。",
         "death": "寒意……放手了……淬火归你们了。"
@@ -16853,6 +16855,7 @@ export const zh_CN: EnTranslations = {
       "heart_breath_thunders_cradle": "雷霆摇篮",
       "heart_breath_drawn_lightning": "引雷",
       "heart_quench_blades_wake": "诸刃苏醒",
+      "heart_quench_blades_hunt": "利刃狩猎",
       "heart_heat_fist": "玄武岩之拳",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "测试新星",

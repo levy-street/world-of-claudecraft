@@ -323,9 +323,7 @@ export class QuenchFightFx {
   // The footprints (every tier).
   private readonly crackFans: FanSlot[] = [];
   private readonly splashFans: FanSlot[] = [];
-  private readonly lane: TelegraphLane;
-  private laneId = -1;
-  private laneBorn = 0;
+  private readonly lanes: { lane: TelegraphLane; id: number; born: number }[] = [];
   // The instanced pools.
   private readonly holes: THREE.InstancedMesh;
   private readonly holeSlots: ObjectSlot[] = [];
@@ -396,7 +394,11 @@ export class QuenchFightFx {
     };
     fans(P.cracks, 8, this.crackFans, 360, C.danger);
     fans(P.frozen, 10, this.splashFans, 360, C.danger);
-    this.lane = this.kit.lane(11);
+    for (let i = 0; i < P.lanes; i++) {
+      const lane = this.kit.lane(11);
+      lane.group.visible = false;
+      this.lanes.push({ lane, id: -1, born: 0 });
+    }
 
     // ---- the instanced floor discs ----
     const disc = new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2);
@@ -786,10 +788,11 @@ export class QuenchFightFx {
         rimLost = true;
       }
     if (rimLost && this.rimFalling < 0) this.beginRimFall();
-    if (this.laneId >= 0 && !live.includes(this.laneId)) {
-      this.laneId = -1;
-      this.lane.group.visible = false;
-    }
+    for (const l of this.lanes)
+      if (l.id >= 0 && !live.includes(l.id)) {
+        l.id = -1;
+        l.lane.group.visible = false;
+      }
     for (const id of live) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -823,10 +826,11 @@ export class QuenchFightFx {
           this.rimFalling = -1;
         }
       } else if (kind === 'lane') {
-        // A new line starts its warning over; the line following its mark does not.
-        if (this.laneId !== id) {
-          this.laneId = id;
-          this.laneBorn = this.clock;
+        // A new line starts its warning; the line following its mark goes on with it.
+        const slot = slotFor(this.lanes, id);
+        if (slot && slot.id !== id) {
+          slot.id = id;
+          slot.born = this.clock;
         }
       }
     }
@@ -840,8 +844,10 @@ export class QuenchFightFx {
       s.id = -1;
       s.fan.group.visible = false;
     }
-    this.lane.group.visible = false;
-    this.laneId = -1;
+    for (const l of this.lanes) {
+      l.id = -1;
+      l.lane.group.visible = false;
+    }
     for (const s of this.holeSlots) s.id = -1;
     for (const s of this.rimSlots) {
       s.id = -1;
@@ -924,12 +930,16 @@ export class QuenchFightFx {
     this.holes.instanceMatrix.needsUpdate = true;
     this.holes.visible = h > 0;
     if (this.holes.instanceColor) this.holes.instanceColor.needsUpdate = true;
-    // A slash's line, from its blade along its facing.
-    const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
-    const lof = lane ? laneOf(lane.templateId) : null;
-    if (lane && lof && lof.state === 'warn') {
+    // The slashes' lines, each from its blade along its facing.
+    for (const l of this.lanes) {
+      const lane = l.id >= 0 ? world.entities.get(l.id) : undefined;
+      const lof = lane ? laneOf(lane.templateId) : null;
+      if (!lane || !lof || lof.state !== 'warn') {
+        l.lane.group.visible = false;
+        continue;
+      }
       this.kit.drapeLane(
-        this.lane,
+        l.lane,
         this.groundY,
         lane.pos.x,
         this.groundY(lane.pos.x, lane.pos.z),
@@ -939,10 +949,10 @@ export class QuenchFightFx {
         T.laneHalf,
         { color: C.danger, accent: C.accent },
       );
-      const fill = Math.min(1, (this.clock - this.laneBorn) / Math.max(0.1, lof.seconds));
-      this.kit.paintLane(this.lane, { fill, clock: this.clock, range: lof.length });
-      this.lane.group.visible = true;
-    } else this.lane.group.visible = false;
+      const fill = Math.min(1, (this.clock - l.born) / Math.max(0.1, lof.seconds));
+      this.kit.paintLane(l.lane, { fill, clock: this.clock, range: lof.length });
+      l.lane.group.visible = true;
+    }
   }
 
   // ---- the bodies: cold, warmth, the freeze, the water ----------------------------------

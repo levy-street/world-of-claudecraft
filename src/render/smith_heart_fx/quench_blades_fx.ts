@@ -168,7 +168,7 @@ export class QuenchBladesFx {
   private readonly bladeIds: number[] = [];
   private rosterSeen = Number.NaN;
   private guardianId = -1;
-  private laneId = -1;
+  private readonly laneIds: number[] = [];
   /** The awakening's bar as last read, its length, and the fill drawn. */
   private wakeRead = 0;
   private wakeTotal = 4;
@@ -435,11 +435,11 @@ export class QuenchBladesFx {
       this.rosterSeen = world.entityRosterVersion;
       this.bladeIds.length = 0;
       this.guardianId = -1;
-      this.laneId = -1;
+      this.laneIds.length = 0;
       for (const e of world.entities.values()) {
         if (e.kind === 'mob' && e.templateId === QUENCH_GUARDIAN) this.guardianId = e.id;
         else if (e.kind === 'object' && e.templateId.startsWith(QUENCH_OBJECTS.lanePrefix))
-          this.laneId = e.id;
+          this.laneIds.push(e.id);
         else if (e.kind === 'object' && bladeStateOf(e.templateId) !== null)
           this.bladeIds.push(e.id);
       }
@@ -460,11 +460,19 @@ export class QuenchBladesFx {
     b.socket.visible = false;
   }
 
+  /** The line starting where (x, z) stands (its blade's own), if any. */
+  private lineFrom(world: IWorld, x: number, z: number): Entity | null {
+    for (const id of this.laneIds) {
+      const lane = world.entities.get(id);
+      if (lane && Math.hypot(lane.pos.x - x, lane.pos.z - z) < 1.5) return lane;
+    }
+    return null;
+  }
+
   /** Is a slash's line aiming from (x, z) now? */
   private lineAimsFrom(world: IWorld, x: number, z: number): boolean {
-    const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
-    if (!lane || laneOf(lane.templateId)?.state !== 'warn') return false;
-    return Math.hypot(lane.pos.x - x, lane.pos.z - z) < 1.5;
+    const lane = this.lineFrom(world, x, z);
+    return !!lane && laneOf(lane.templateId)?.state === 'warn';
   }
 
   // ---- the pose ----------------------------------------------------------------------------
@@ -480,7 +488,7 @@ export class QuenchBladesFx {
     if (state !== b.state) {
       if (state === 'wake') b.burstDone = false;
       if (state === 'float' && b.state === 'wake') this.risenBurst(e);
-      if (state === 'fly') this.beginFlight(world, b);
+      if (state === 'fly') this.beginFlight(world, b, e);
       b.state = state;
       b.since = 0;
     } else b.since += dt;
@@ -562,8 +570,8 @@ export class QuenchBladesFx {
 
   /** A slash begins: the flight is drawn along its line (the sim flies the same
    *  one), else it follows its object (no line seen yet). */
-  private beginFlight(world: IWorld, b: BladeView): void {
-    const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
+  private beginFlight(world: IWorld, b: BladeView, e: Entity): void {
+    const lane = this.lineFrom(world, e.pos.x, e.pos.z);
     const lof = lane ? laneOf(lane.templateId) : null;
     b.flyT = 0;
     b.flying = false;

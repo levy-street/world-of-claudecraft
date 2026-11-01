@@ -37,6 +37,8 @@ export const QUENCH_CASTS = {
   breath: 'heart_quenching_breath',
   /** At half health: it raises its arms and the four blades tear free. */
   wake: 'heart_quench_blades_wake',
+  /** Mythic, at a quarter health: its arms raised while every blade hunts. */
+  flurry: 'heart_quench_blades_hunt',
 } as const;
 
 /** The auras the fight puts on players and on the guardian. */
@@ -141,6 +143,8 @@ export interface QuenchDifficultyRules {
   slashAim: number;
   /** One blade makes the whole round, each slash from where the last ended. */
   slashChain: boolean;
+  /** The Blades Hunt, the interphase at a quarter health (quench_flurry.ts). */
+  flurry: boolean;
 }
 
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
@@ -152,6 +156,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     slashMarksAwake: 2,
     slashAim: 3,
     slashChain: false,
+    flurry: false,
   },
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
@@ -162,6 +167,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     slashMarksAwake: 3,
     slashAim: 2.5,
     slashChain: false,
+    flurry: false,
   },
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
@@ -172,6 +178,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     slashMarksAwake: 4,
     slashAim: 2,
     slashChain: true,
+    flurry: true,
   },
 };
 
@@ -255,6 +262,13 @@ export const QUENCH_TUNING = {
   laneHalf: 1.8,
   crossMin: 300,
   crossMax: 350,
+  // Mythic's interphase: at what health, how long, its line's warning, the seconds
+  // between two slashes at its start and at its end.
+  flurryAt: 0.25,
+  flurrySeconds: 20,
+  flurryAim: 1,
+  flurryGapStart: 1.5,
+  flurryGapEnd: 1,
   // The shore ice.
   rimRise: 2.5,
   /** Seconds of plain melee after a bar lands before the next begins. */

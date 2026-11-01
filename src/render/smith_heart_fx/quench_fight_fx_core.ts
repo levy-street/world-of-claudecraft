@@ -393,6 +393,8 @@ export const QUENCH_FIGHT_POOLS = {
   links: 24,
   cracks: 16,
   holes: T.holeMax,
+  /** Lines at once: one per awake blade at most. */
+  lanes: 4,
   rimSlabs: QUENCH_RIMEWALL.segments,
   splashRings: 10,
 } as const;

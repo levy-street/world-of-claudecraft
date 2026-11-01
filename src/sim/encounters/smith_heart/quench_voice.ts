@@ -26,6 +26,7 @@ export type QuenchMoment =
   | 'hole'
   | 'wake'
   | 'cross'
+  | 'flurry'
   | 'deepen'
   | 'wipe'
   | 'death';
@@ -38,6 +39,7 @@ export const QUENCH_LINES: Readonly<Record<QuenchMoment, string>> = {
   hole: 'The ice remembers every step. Stand together, and it gives.',
   wake: 'Blades of the Smith, wake! Hunt them across the ice!',
   cross: 'Go, blades! Cut them from the warmth!',
+  flurry: 'Every blade! Every edge! Leave nothing standing on my lake!',
   deepen: 'Feel it? The cold is going deeper.',
   wipe: 'Still. Silent. Quenched.',
   death: 'The cold... lets go... The Quench is yours.',

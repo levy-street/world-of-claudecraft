@@ -840,6 +840,7 @@ const mergeStringsEn = {
       heart_breath_drawn_lightning: 'Drawn Lightning',
       // The Guardian of the Quench's awakening (encounters/smith_heart/quench_ids.ts).
       heart_quench_blades_wake: 'The Blades Wake',
+      heart_quench_blades_hunt: 'The Blades Hunt',
       // The Guardian of the Heat's bar (encounters/smith_heart/heat_ids.ts).
       heart_heat_fist: 'Basalt Fist',
       // The player's own bar while kicking a Soul Brazier over (the trash

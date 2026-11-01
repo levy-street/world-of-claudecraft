@@ -303,7 +303,8 @@ function stepWater(s: QuenchScope): void {
 
 /** One tick of the ice: the strain, the cracks, the water. */
 export function stepIce(s: QuenchScope): void {
-  stepStrain(s);
+  // The interphase is for dodging: no huddle strains the ice while it lasts.
+  if (!s.st.flurry) stepStrain(s);
   stepCracks(s);
   stepWater(s);
 }

@@ -68,24 +68,36 @@ export interface QuenchBlade {
   awake: boolean;
 }
 
-/** A round of slashes: the marks in order and the one under way. */
-export interface QuenchSlash {
-  /** The marked, by entity id, in their order. */
-  marks: number[];
-  /** The mark under way (index into `marks`). */
-  step: number;
-  /** The blade flying this mark (index into `blades`; -1 before the first). */
+/** A slash's line: its blade, its object and how far along it is. */
+export interface QuenchLine {
+  /** The blade flying it (index into `blades`; -1 before the first). */
   blade: number;
   /** The line's object (-1 between two marks). */
   laneId: number;
   phase: 'aim' | 'fly' | 'rest';
   remaining: number;
+  /** Its warning's whole length (seconds; what the painter fills to). */
+  warn: number;
   /** Where the line starts, the way it runs and its whole length. */
   from: { x: number; z: number };
   facing: number;
   length: number;
   /** Players this flight has already struck. */
   struck: number[];
+}
+
+/** A round of slashes: the marks in order and the one under way. */
+export interface QuenchSlash extends QuenchLine {
+  /** The marked, by entity id, in their order. */
+  marks: number[];
+  /** The mark under way (index into `marks`). */
+  step: number;
+}
+
+/** Mythic's interphase under way: its lines out and the wait for the next. */
+export interface QuenchFlurry {
+  lines: QuenchLine[];
+  gap: number;
 }
 
 export interface QuenchFightState {
@@ -117,6 +129,9 @@ export interface QuenchFightState {
   /** Blades sent so far (the rotation among the awake). */
   slashes: number;
   slash: QuenchSlash | null;
+  flurry: QuenchFlurry | null;
+  /** The interphase has come (it comes once). */
+  flurryDone: boolean;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
   /** Lines said this pull: `<moment>` to the fight clock. */

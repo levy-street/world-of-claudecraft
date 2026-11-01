@@ -23,7 +23,8 @@
 //                      soft enrage).
 //   Heroic             a shatter splashes further and harder (contagious cold).
 //   Mythic             one blade makes a whole round, each slash from where the
-//                      last one ended.
+//                      last one ended; at a quarter health, The Blades Hunt
+//                      (quench_flurry.ts).
 //   One wipe           the fight ends when the guardian stops fighting: every
 //                      bar, frost, crack, hole, mark and line gone, the held
 //                      climbed out, the blades sunk home, the shore ice down.
@@ -66,6 +67,7 @@ import {
   stepCold,
   stepDeepening,
 } from './quench_cold';
+import { clearFlurry, endFlurry, flurryDue, startFlurry, stepFlurry } from './quench_flurry';
 import { clearIce, openHole, startCrack, stepIce } from './quench_ice';
 import {
   QUENCH_AURAS,
@@ -158,6 +160,8 @@ function freshState(
     slashTimer: T.slashFirst,
     slashes: 0,
     slash: null,
+    flurry: null,
+    flurryDone: false,
     casts: 0,
     said: {},
   };
@@ -189,6 +193,7 @@ function landBar(s: QuenchScope): void {
   if (bar.castId === QUENCH_CASTS.breath) {
     landBreath(s, bar.facing);
   } else if (bar.castId === QUENCH_CASTS.wake) landWake(s);
+  else if (bar.castId === QUENCH_CASTS.flurry) endFlurry(s);
 }
 
 /** The bar in flight: planted, counting down, landing. A bar cut by
@@ -203,6 +208,7 @@ function stepBar(s: QuenchScope): void {
     s.st.gap = T.barGap;
     // The awakening always completes (a cut bar never strands the blades).
     if (bar.castId === QUENCH_CASTS.wake) landWake(s);
+    else if (bar.castId === QUENCH_CASTS.flurry) endFlurry(s);
     return;
   }
   holdPlanted(s);
@@ -226,6 +232,10 @@ function startBars(s: QuenchScope): void {
   }
   if (wakeDue(s, free)) {
     startWake(s);
+    return;
+  }
+  if (flurryDue(s, free)) {
+    startFlurry(s);
     return;
   }
   if (!free || s.st.half === 'wake') return;
@@ -252,6 +262,7 @@ function clearFight(
     }
     clearIce({ ctx, inst, st });
     clearSlashes({ ctx, inst }, st);
+    clearFlurry({ ctx, inst }, st);
     clearBlades(ctx, inst, st);
     dropRim(ctx, inst, st);
     st.chill = {};
@@ -263,7 +274,8 @@ function clearFight(
     clearColdMarks(p);
     dropAura(p, QUENCH_AURAS.trapped);
   }
-  clearCastIf(boss, QUENCH_CASTS.breath, QUENCH_CASTS.wake);
+  clearCastIf(boss, QUENCH_CASTS.breath, QUENCH_CASTS.wake, QUENCH_CASTS.flurry);
+  boss.damageImmune = false;
   clearBladeMarks(boss);
   dropAura(boss, QUENCH_AURAS.deepening);
 }
@@ -340,6 +352,7 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepCold(s);
   stepIce(s);
   stepSlashes(s);
+  stepFlurry(s);
   stepDeepening(s);
   startBars(s);
 }
@@ -439,6 +452,12 @@ export function quenchDevTrigger(
     s.boss.castingAbility = null;
     startBreath(s);
     return 'Quenching Breath.';
+  }
+  if (verb === 'flurry' || verb === 'hunt') {
+    if (s.st.half !== 'awake') wakeNow(s);
+    cutBar(s);
+    s.boss.castingAbility = null;
+    return startFlurry(s) ? 'The Blades Hunt.' : 'It is under way, or a blade is in flight.';
   }
   if (verb === 'slash') {
     if (!s.st.blades.some((b) => b.awake)) wakeNow(s);

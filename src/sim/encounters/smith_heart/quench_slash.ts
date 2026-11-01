@@ -39,7 +39,7 @@ import {
   roll,
   spawnFightObject,
 } from './quench_scope';
-import type { QuenchFightState, QuenchSlash } from './quench_state';
+import type { QuenchFightState, QuenchLine, QuenchSlash } from './quench_state';
 import { quenchSay } from './quench_voice';
 
 /** Who the blades may mark: not the tank, nor anyone who cannot move, unless nobody
@@ -65,25 +65,74 @@ function nextBlade(s: QuenchScope): number {
   return awake[s.st.slashes++ % awake.length];
 }
 
-function lineEnd(slash: QuenchSlash): QPoint {
+function lineEnd(line: QuenchLine): QPoint {
   return {
-    x: slash.from.x + Math.sin(slash.facing) * slash.length,
-    z: slash.from.z + Math.cos(slash.facing) * slash.length,
+    x: line.from.x + Math.sin(line.facing) * line.length,
+    z: line.from.z + Math.cos(line.facing) * line.length,
   };
 }
 
-/** The current mark's line toward where they stand now. */
-function aimLine(s: QuenchScope, slash: QuenchSlash, target: Entity): void {
-  const line = slashLine(slash.from, at(s, target), slash.facing);
-  slash.facing = line.facing;
-  slash.length = line.length;
-  const lane = s.ctx.entities.get(slash.laneId);
+/** A line toward where its target stands now. */
+function aimLine(s: QuenchScope, line: QuenchLine, target: Entity): void {
+  const next = slashLine(line.from, at(s, target), line.facing);
+  line.facing = next.facing;
+  line.length = next.length;
+  const lane = s.ctx.entities.get(line.laneId);
   if (lane) {
-    lane.facing = line.facing;
-    lane.templateId = laneTemplate('warn', s.rules.slashAim, line.length);
+    lane.facing = next.facing;
+    lane.templateId = laneTemplate('warn', line.warn, next.length);
   }
-  const blade = s.ctx.entities.get(s.st.blades[slash.blade].objectId);
-  if (blade) blade.facing = line.facing;
+  const blade = s.ctx.entities.get(s.st.blades[line.blade].objectId);
+  if (blade) blade.facing = next.facing;
+}
+
+/** Fill `line` for `blade` going through `target` in `seconds`, its object spawned. */
+function layLine(
+  s: QuenchScope,
+  line: QuenchLine,
+  blade: number,
+  target: Entity,
+  seconds: number,
+): void {
+  const b = s.st.blades[blade];
+  line.blade = blade;
+  line.from = { x: b.x, z: b.z };
+  line.phase = 'aim';
+  line.remaining = seconds;
+  line.warn = seconds;
+  line.struck = [];
+  line.laneId = spawnFightObject(
+    s.ctx,
+    s.inst,
+    laneTemplate('warn', seconds, T.slashMinLength),
+    QUENCH_NAMES.cross,
+    b.x,
+    b.z,
+    1,
+  ).id;
+  aimLine(s, line, target);
+}
+
+/** A new line for the interphase. */
+export function openLine(
+  s: QuenchScope,
+  blade: number,
+  target: Entity,
+  seconds: number,
+): QuenchLine {
+  const line: QuenchLine = {
+    blade,
+    laneId: -1,
+    phase: 'aim',
+    remaining: seconds,
+    warn: seconds,
+    from: { x: 0, z: 0 },
+    facing: s.boss.facing,
+    length: T.slashMinLength,
+    struck: [],
+  };
+  layLine(s, line, blade, target, seconds);
+  return line;
 }
 
 function endRound(s: QuenchScope): void {
@@ -106,23 +155,8 @@ function beginStep(s: QuenchScope, slash: QuenchSlash): void {
       continue;
     }
     if (!s.rules.slashChain || slash.blade < 0) slash.blade = nextBlade(s);
-    const b = s.st.blades[slash.blade];
-    if (!b) break;
-    slash.from = { x: b.x, z: b.z };
-    slash.phase = 'aim';
-    slash.remaining = s.rules.slashAim;
-    slash.struck = [];
-    const lane = spawnFightObject(
-      s.ctx,
-      s.inst,
-      laneTemplate('warn', s.rules.slashAim, T.slashMinLength),
-      QUENCH_NAMES.cross,
-      b.x,
-      b.z,
-      1,
-    );
-    slash.laneId = lane.id;
-    aimLine(s, slash, target);
+    if (!s.st.blades[slash.blade]) break;
+    layLine(s, slash, slash.blade, target, s.rules.slashAim);
     return;
   }
   endRound(s);
@@ -131,7 +165,7 @@ function beginStep(s: QuenchScope, slash: QuenchSlash): void {
 /** A round now: the marks, in order. Exported for the dev trigger. */
 export function startSlashes(s: QuenchScope): boolean {
   const st = s.st;
-  if (st.slash || !st.blades.some((b) => b.awake)) return false;
+  if (st.slash || st.flurry || !st.blades.some((b) => b.awake)) return false;
   const count = st.half === 'lake' ? s.rules.slashMarksLake : s.rules.slashMarksAwake;
   st.casts++;
   const picked = pickMarks(s, count);
@@ -143,6 +177,7 @@ export function startSlashes(s: QuenchScope): boolean {
     laneId: -1,
     phase: 'aim',
     remaining: 0,
+    warn: 0,
     from: { x: 0, z: 0 },
     facing: 0,
     length: T.slashMinLength,
@@ -165,60 +200,57 @@ export function startSlashes(s: QuenchScope): boolean {
 }
 
 /** The line has locked and its time is up: the blade flies. */
-function launch(s: QuenchScope, slash: QuenchSlash): void {
-  slash.phase = 'fly';
-  slash.remaining = T.slashFly;
-  const lane = s.ctx.entities.get(slash.laneId);
-  if (lane) lane.templateId = laneTemplate('fly', T.slashFly, slash.length);
-  const blade = s.ctx.entities.get(s.st.blades[slash.blade].objectId);
+export function launchLine(s: QuenchScope, line: QuenchLine): void {
+  line.phase = 'fly';
+  line.remaining = T.slashFly;
+  const lane = s.ctx.entities.get(line.laneId);
+  if (lane) lane.templateId = laneTemplate('fly', T.slashFly, line.length);
+  const blade = s.ctx.entities.get(s.st.blades[line.blade].objectId);
   if (blade) setBladeObject(blade, 'fly');
   syncQuenchWalls(s.ctx, s.inst);
   const o = s.ctx.instanceOriginOf(s.inst);
-  const to = lineEnd(slash);
+  const to = lineEnd(line);
   s.ctx.emit({
     type: 'spellfxAt',
-    x: o.x + (slash.from.x + to.x) / 2,
-    z: o.z + (slash.from.z + to.z) / 2,
+    x: o.x + (line.from.x + to.x) / 2,
+    z: o.z + (line.from.z + to.z) / 2,
     school: 'frost',
     fx: 'burst',
-    radius: slash.length / 2,
+    radius: line.length / 2,
     ability: QUENCH_CUES.cross,
   });
 }
 
-/** One flight tick: the blade on the eased curve, striking what it passes. */
-function fly(s: QuenchScope, slash: QuenchSlash): void {
-  const to = lineEnd(slash);
+/** One flight tick: the blade on the eased curve, striking what it passes. The
+ *  interphase's slashes bring no cold. */
+export function flyLine(s: QuenchScope, line: QuenchLine): void {
+  const to = lineEnd(line);
   const pt = (k: number): QPoint => ({
-    x: slash.from.x + (to.x - slash.from.x) * k,
-    z: slash.from.z + (to.z - slash.from.z) * k,
+    x: line.from.x + (to.x - line.from.x) * k,
+    z: line.from.z + (to.z - line.from.z) * k,
   });
-  const a = pt(slashEase(1 - (slash.remaining + DT) / T.slashFly));
-  const b = pt(slashEase(1 - Math.max(0, slash.remaining) / T.slashFly));
-  const bl = s.st.blades[slash.blade];
+  const a = pt(slashEase(1 - (line.remaining + DT) / T.slashFly));
+  const b = pt(slashEase(1 - Math.max(0, line.remaining) / T.slashFly));
+  const bl = s.st.blades[line.blade];
   bl.x = b.x;
   bl.z = b.z;
   const blade = s.ctx.entities.get(bl.objectId);
   if (blade) moveFightObject(s.ctx, s.inst, blade, b.x, b.z);
   for (const p of livePlayers(s)) {
-    if (slash.struck.includes(p.id)) continue;
+    if (line.struck.includes(p.id)) continue;
     if (segmentDistance(a, b, at(s, p)) > T.laneHalf) continue;
-    slash.struck.push(p.id);
+    line.struck.push(p.id);
     frostHit(s, p, roll(s, T.crossMin, T.crossMax), QUENCH_NAMES.cross);
-    addCold(s, p, T.crossCold);
+    if (!s.st.flurry) addCold(s, p, T.crossCold);
   }
 }
 
-/** The blade is down where the line ended: the mark is spent. */
-function land(s: QuenchScope, slash: QuenchSlash): void {
-  const blade = s.ctx.entities.get(s.st.blades[slash.blade].objectId);
+/** The blade is down where the line ended, the line gone. */
+export function landLine(s: QuenchScope, line: QuenchLine): void {
+  const blade = s.ctx.entities.get(s.st.blades[line.blade].objectId);
   if (blade) setBladeObject(blade, 'float');
-  dropFightObject(s.ctx, s.inst, slash.laneId);
-  slash.laneId = -1;
-  const p = s.ctx.entities.get(slash.marks[slash.step]);
-  if (p) dropAura(p, QUENCH_AURAS.marked);
-  slash.phase = 'rest';
-  slash.remaining = T.slashGap;
+  dropFightObject(s.ctx, s.inst, line.laneId);
+  line.laneId = -1;
 }
 
 /** One tick of the slashes. */
@@ -226,8 +258,8 @@ export function stepSlashes(s: QuenchScope): void {
   const st = s.st;
   const slash = st.slash;
   if (!slash) {
-    // The blades wait out the guardian's awakening of the others.
-    if (st.half === 'wake' || !st.blades.some((b) => b.awake)) return;
+    // The blades wait out the guardian's awakening of the others, and the interphase.
+    if (st.flurry || st.half === 'wake' || !st.blades.some((b) => b.awake)) return;
     st.slashTimer -= DT;
     if (st.slashTimer <= 1e-9) startSlashes(s);
     return;
@@ -246,12 +278,18 @@ export function stepSlashes(s: QuenchScope): void {
       }
       aimLine(s, slash, target);
     }
-    if (slash.remaining <= 1e-9) launch(s, slash);
+    if (slash.remaining <= 1e-9) launchLine(s, slash);
     return;
   }
   if (slash.phase === 'fly') {
-    fly(s, slash);
-    if (slash.remaining <= 1e-9) land(s, slash);
+    flyLine(s, slash);
+    if (slash.remaining <= 1e-9) {
+      landLine(s, slash);
+      const p = s.ctx.entities.get(slash.marks[slash.step]);
+      if (p) dropAura(p, QUENCH_AURAS.marked);
+      slash.phase = 'rest';
+      slash.remaining = T.slashGap;
+    }
     return;
   }
   if (slash.remaining > 1e-9) return;

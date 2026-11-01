@@ -70,7 +70,7 @@
 //                                    solid now), hole (open a hole under me),
 //                                    crack (crack the ice under me), breath
 //                                    (Quenching Breath now), slash (a round of
-//                                    slashes now)
+//                                    slashes now), flurry (The Blades Hunt now)
 //   /dev heart heat                  the Guardian of the Heat's readout
 //   /dev heart heat <what>           pull (onto the Hearth's shore and pull
 //                                    it), reset (whole again in its

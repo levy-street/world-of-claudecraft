@@ -10385,6 +10385,7 @@ export const hudChromeStrings = {
       crack: 'The ice groans under the huddle! Move apart!',
       wake: "The Smith's blades tear free of the lake! Watch where they aim!",
       marks: 'The blades mark {list}! Lead them clear of the raid!',
+      flurry: 'Every blade hunts at once! Dodge the lines!',
     },
     say: {
       pull: 'Warm blood on my lake. It will not stay warm for long.',
@@ -10392,6 +10393,7 @@ export const hudChromeStrings = {
       hole: 'The ice remembers every step. Stand together, and it gives.',
       wake: 'Blades of the Smith, wake! Hunt them across the ice!',
       cross: 'Go, blades! Cut them from the warmth!',
+      flurry: 'Every blade! Every edge! Leave nothing standing on my lake!',
       deepen: 'Feel it? The cold is going deeper.',
       wipe: 'Still. Silent. Quenched.',
       death: 'The cold... lets go... The Quench is yours.',

@@ -199,7 +199,9 @@ export function stepCold(s: QuenchScope): void {
       const here = at(s, p);
       others = warmNeighbours({ id: p.id, x: here.x, z: here.z }, donors);
     }
-    const step = coldStep(others, mult);
+    // The interphase holds the cold: a huddle still warms, nothing else moves it.
+    const raw = coldStep(others, mult);
+    const step = st.flurry && raw > 0 ? 0 : raw;
     setWarm(s, p, !trapped && others >= T.warmNeed);
     const cap = trapped ? T.coldMax - 1 : T.coldMax;
     c.cold = Math.max(0, Math.min(cap, c.cold + step * DT));
@@ -222,7 +224,7 @@ export function stepCold(s: QuenchScope): void {
 /** Phase 2: the cold deepens every 20 s, without end. */
 export function stepDeepening(s: QuenchScope): void {
   const st = s.st;
-  if (st.half !== 'awake') return;
+  if (st.half !== 'awake' || st.flurry) return;
   st.deepenTimer -= DT;
   if (st.deepenTimer > 1e-9) return;
   st.deepenTimer += T.deepenEvery;

@@ -7405,7 +7405,8 @@ export const ko_KR: EnTranslations = {
         "frozen": "{player}님이 꽁꽁 얼어붙었습니다! 얼음이 깨지기 전에 물러나세요!",
         "crack": "뭉친 무리 아래에서 얼음이 삐걱입니다! 흩어지세요!",
         "wake": "대장장이의 칼날들이 호수에서 뜯겨 나옵니다! 어디를 겨누는지 살피세요!",
-        "marks": "칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!"
+        "marks": "칼날들이 {list}을(를) 표적으로 삼습니다! 공격대에서 멀리 유인하세요!",
+        "flurry": "모든 칼날이 한꺼번에 사냥에 나섭니다! 선을 피하세요!"
       },
       "say": {
         "pull": "내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.",
@@ -7413,6 +7414,7 @@ export const ko_KR: EnTranslations = {
         "hole": "얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.",
         "wake": "대장장이의 칼날들아, 깨어나라! 얼음 위에서 놈들을 사냥하라!",
         "cross": "가라, 칼날들아! 놈들을 온기에서 떼어 내라!",
+        "flurry": "모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!",
         "deepen": "느껴지느냐? 냉기가 더 깊어지고 있다.",
         "wipe": "고요하다. 잠잠하다. 담금질되었다.",
         "death": "냉기가... 물러난다... 담금질은 너희의 것이다."
@@ -16853,6 +16855,7 @@ export const ko_KR: EnTranslations = {
       "heart_breath_thunders_cradle": "천둥의 요람",
       "heart_breath_drawn_lightning": "끌려오는 번개",
       "heart_quench_blades_wake": "검의 각성",
+      "heart_quench_blades_hunt": "칼날의 사냥",
       "heart_heat_fist": "현무암 주먹",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
       "trash_demo_nova": "시험용 폭발",

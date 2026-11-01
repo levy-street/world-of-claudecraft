@@ -22684,6 +22684,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다.',
   'hudChrome.quenchAlert.markedTitle': '칼날이 당신을 노립니다! ({count}명 중 {order}번째)',
   'hudChrome.quenchAlert.markedLine': '선을 공격대에서 멀리 유도하고, 고정되면 비켜서세요.',
+  'abilityUi.cast.heart_quench_blades_hunt': '칼날의 사냥',
+  'hudChrome.quenchGuardian.warn.flurry': '모든 칼날이 한꺼번에 사냥에 나섭니다! 선을 피하세요!',
+  'hudChrome.quenchGuardian.say.flurry':
+    '모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!',
   'hudChrome.quenchGuardian.warn.wake':
     '대장장이의 칼날들이 호수에서 뜯겨 나옵니다! 어디를 겨누는지 살피세요!',
   'hudChrome.quenchGuardian.say.pull': '내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.',

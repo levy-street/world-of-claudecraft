@@ -7405,7 +7405,8 @@ export const ja_JP: EnTranslations = {
         "frozen": "{player}が凍りついた！氷が砕ける前に離れろ！",
         "crack": "固まった集団の下で氷がきしむ！散らばれ！",
         "wake": "鍛冶師の剣が湖から解き放たれる！狙いを見極めろ！",
-        "marks": "剣が{list}を狙う！レイドから離れて引きつけろ！"
+        "marks": "剣が{list}を狙う！レイドから離れて引きつけろ！",
+        "flurry": "すべての剣が一斉に狩りを始める！線を避けろ！"
       },
       "say": {
         "pull": "我が湖に温かい血か。その温もりも長くは続かぬ。",
@@ -7413,6 +7414,7 @@ export const ja_JP: EnTranslations = {
         "hole": "氷はすべての足音を覚えている。寄り集まれば、崩れる。",
         "wake": "鍛冶師の剣よ、目覚めよ！氷の上で奴らを狩れ！",
         "cross": "行け、剣よ！奴らを温もりから切り離せ！",
+        "flurry": "すべての剣よ！すべての刃よ！我が湖に立つものを残すな！",
         "deepen": "感じるか？冷気がさらに深くなっていく。",
         "wipe": "静まり、黙し、焼き入れられた。",
         "death": "冷気が……離れていく……焼き入れはお前たちのものだ。"
@@ -16853,6 +16855,7 @@ export const ja_JP: EnTranslations = {
       "heart_breath_thunders_cradle": "雷のゆりかご",
       "heart_breath_drawn_lightning": "招雷",
       "heart_quench_blades_wake": "剣の目覚め",
+      "heart_quench_blades_hunt": "剣の狩り",
       "heart_heat_fist": "玄武岩の拳",
       "kituse_sanctum_topple_brazier": "火鉢倒し",
       "trash_demo_nova": "テストノヴァ",

@@ -24880,6 +24880,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'За вами охотится клинок! ({order} из {count})',
   'hudChrome.quenchAlert.markedLine':
     'Уведите линию от рейда и сойдите с неё, когда она зафиксируется.',
+  'abilityUi.cast.heart_quench_blades_hunt':
+    'Охота клинков',
+  'hudChrome.quenchGuardian.warn.flurry':
+    'Все клинки охотятся разом! Уклоняйтесь от линий!',
+  'hudChrome.quenchGuardian.say.flurry':
+    'Все клинки! Все лезвия! Не оставьте на моём озере ни одного стоящего!',
   'hudChrome.quenchGuardian.warn.wake':
     'Клинки Кузнеца вырываются из озера! Следите, куда они целятся!',
   'hudChrome.quenchGuardian.say.pull': 'Тёплая кровь на моём озере. Тёплой она пробудет недолго.',

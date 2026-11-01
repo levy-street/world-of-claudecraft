@@ -374,7 +374,11 @@ export function quenchBodyAction(
   input: QuenchBodyInput,
   out: QuenchBodyActionState = { action: 'idle', k: 0 },
 ): QuenchBodyActionState {
-  if (input.castId === QUENCH_CASTS.wake) {
+  if (input.castId === QUENCH_CASTS.flurry) {
+    // Arms held up through the whole of it.
+    out.action = 'wake';
+    out.k = 1;
+  } else if (input.castId === QUENCH_CASTS.wake) {
     out.action = 'wake';
     out.k = clamp01(input.castFill);
   } else if (input.castId === QUENCH_CASTS.breath) {
