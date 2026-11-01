@@ -166,7 +166,7 @@ export function heartFloorPaint(lowGfx: boolean): string {
     wear *= 0.55 + 0.45 * hfNoise(p * 0.16 + 4.0);
     hfWear = wear;
     // Each slab's own value, a touch of hue, a light painted across it.
-    float tone = 0.86 + 0.28 * hs;
+    float tone = 0.8 + 0.4 * hs;
     vec2 ld = vec2(${f(L.light[0])}, ${f(L.light[1])});
     float lit = clamp(dot(q - c1, ld) * 1.6, -1.0, 1.0);
     tone *= 1.0 + 0.07 * lit;
@@ -183,9 +183,11 @@ export function heartFloorPaint(lowGfx: boolean): string {
     float ang = hs3 * 3.14159;
     mat2 rot = mat2(cos(ang), -sin(ang), sin(ang), cos(ang));
     vec2 sp = rot * p;
-    float stroke = hfNoise(sp * vec2(0.45, 2.1) + hs * 40.0) - 0.5;
-    float mottle = hfFbm(p * 0.95 + hs * 13.0) - 0.5;
-    col *= 1.0 + (0.075 * stroke + 0.06 * mottle) * near * (1.0 - 0.6 * wear);`
+    float stroke = hfNoise(sp * vec2(0.34, 1.7) + hs * 40.0) - 0.5;
+    float stroke2 = hfNoise(sp * vec2(0.9, 4.6) + hs * 23.0) - 0.5;
+    float brush = smoothstep(-0.16, 0.16, stroke) - 0.5;
+    col *= 1.0 + (0.17 * brush + 0.07 * stroke2) * (0.35 + 0.65 * near) * (1.0 - 0.6 * wear);
+    col = mix(col, col * vec3(0.95, 0.98, 1.06), smoothstep(0.1, 0.45, stroke2 + 0.35 * stroke) * 0.5);`
     }
     // A patch of small mended stones (their own little joints).
     float mend = step(hs, ${f(L.patch)});
