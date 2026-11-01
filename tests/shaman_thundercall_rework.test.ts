@@ -17,6 +17,7 @@ import {
   MAGMA_BURST_THUNDER,
   MAGMA_SURGE_CHANCE,
   magmaBurstCritBonus,
+  MAGMA_SURGE_DURATION,
   rollArcOverload,
   STORMBREAK_MANA_FRACTION,
   THUNDERCALL_CINDER_JOLT_DURATION,
@@ -322,13 +323,80 @@ describe('Thundercall v0.44 Magma Burst and Magma Surge', () => {
     expect(chance2).not.toHaveBeenCalled();
   });
 
-  it('draws no surge roll for a tick that dealt nothing or while Magma Burst is being cast', () => {
+  it('draws no surge roll for a tick that dealt nothing', () => {
     const { sim, shaman } = setup();
     const chance = vi.spyOn(sim.rng, 'chance');
     thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 0);
-    shaman.castingAbility = 'lava_burst';
-    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 12);
     expect(chance).not.toHaveBeenCalled();
+  });
+
+  it('rolls a surge for a tick that lands while Magma Burst is being cast', () => {
+    const { sim, shaman } = setup();
+    shaman.castingAbility = 'lava_burst';
+    const chance = vi.spyOn(sim.rng, 'chance').mockReturnValue(true);
+    thundercallOnDotTick(sim.ctx, shaman, cinderDot(shaman), 12);
+    expect(chance).toHaveBeenCalledWith(MAGMA_SURGE_CHANCE);
+    const surge = shaman.auras.find((aura) => aura.id === MAGMA_SURGE_ID);
+    expect(surge?.duration).toBe(12);
+    expect(surge?.remaining).toBe(12);
+  });
+
+  it('a surge taken mid hard cast lets a second Magma Burst follow instantly', () => {
+    const { sim, shaman, target } = setup();
+    expect(MAGMA_SURGE_DURATION).toBe(12);
+    // The Cinder Jolt tick lands 1 sec into the 2 sec Magma Burst cast bar.
+    target.auras.push({ ...cinderDot(shaman), tickTimer: 1 });
+    // Surge only on a tick that lands while Magma Burst is on the cast bar, so
+    // no later tick can reset the cooldown behind the assertions; every
+    // hit-table roll lands and every crit fails.
+    vi.spyOn(sim.rng, 'chance').mockImplementation((p: number) =>
+      p === MAGMA_SURGE_CHANCE ? shaman.castingAbility === 'lava_burst' : p >= 0.5,
+    );
+    shaman.resource = shaman.maxResource;
+    shaman.gcdRemaining = 0;
+    sim.castAbility('lava_burst', shaman.id);
+    expect(shaman.castingAbility).toBe('lava_burst');
+
+    const events: SimEvent[] = [];
+    let surgedMidCast = false;
+    for (let tick = 0; tick < 20 * 4 && shaman.castingAbility === 'lava_burst'; tick++) {
+      events.push(...sim.tick());
+      if (shaman.castingAbility === 'lava_burst') {
+        surgedMidCast ||= shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID);
+      }
+    }
+    expect(surgedMidCast).toBe(true);
+    expect(shaman.castingAbility).toBeNull();
+    // The hard cast completed and armed its cooldown, and the mid-cast surge
+    // cleared it again; the surge stays up for the follow-up cast.
+    expect(shaman.cooldowns.has('lava_burst')).toBe(false);
+    const surge = shaman.auras.find((aura) => aura.id === MAGMA_SURGE_ID);
+    expect(surge?.remaining).toBeGreaterThan(MAGMA_SURGE_DURATION - 1.5);
+
+    // The surged follow-up completes the moment it is pressed and arms the
+    // full cooldown, which no tick resets since none surges off the cast bar.
+    shaman.gcdRemaining = 0;
+    shaman.resource = shaman.maxResource;
+    sim.castAbility('lava_burst', shaman.id);
+    events.push(...sim.tick());
+    expect(shaman.castingAbility).toBeNull();
+    expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(false);
+    expect(shaman.cooldowns.get('lava_burst')).toBeGreaterThan(7);
+    events.push(...run(sim, 40));
+    expect(hits(events, 'Magma Burst')).toHaveLength(2);
+    expect(shaman.cooldowns.has('lava_burst')).toBe(true);
+  });
+
+  it('a hard-cast Magma Burst with no surge keeps its cooldown', () => {
+    const { sim, shaman } = setup();
+    landNoCrit(sim);
+    shaman.resource = shaman.maxResource;
+    shaman.gcdRemaining = 0;
+    sim.castAbility('lava_burst', shaman.id);
+    expect(shaman.castingAbility).toBe('lava_burst');
+    run(sim, 20 * 3);
+    expect(shaman.castingAbility).toBeNull();
+    expect(shaman.cooldowns.get('lava_burst')).toBeGreaterThan(4);
   });
 
   it('surges from a real Cinder Jolt tick in the aura loop', () => {

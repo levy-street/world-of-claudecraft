@@ -244,6 +244,7 @@ import {
   stonehearthStormcastMendingHealMult,
 } from './shaman_stonehearth';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
+import { thundercallOnTimedCastCompleted } from './shaman_thundercall_kit';
 import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
 import {
   onStormcastConsumed,
@@ -771,6 +772,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         ? { ...res, empowerLevel: res.def.empowerStages }
         : res;
       applyAbility(ctx, p, meta, resolved);
+      thundercallOnTimedCastCompleted(ctx, p, castId);
     }
     clearRadiantResonanceReservation(p);
     // the aim point is consumed by the resolved area effects; drop it so a later

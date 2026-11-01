@@ -4863,7 +4863,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+      'Deal $d Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 12 sec instant. A surge during a Magma Burst cast also clears the cooldown that cast starts, so you can follow it with the instant one. Damage increases with Spell Power. (Thundercall)',
   },
   // The Wrath-era Thunderstorm: the spec's panic button. The 8% mana return
   // is applied by combat/shaman_thundercall_kit.ts; the knockback is not
