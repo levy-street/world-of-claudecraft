@@ -11,9 +11,18 @@
 // negative (src/render/smith_heart/CLAUDE.md).
 
 import { HEART_QUARTERS } from '../../sim/content/smith_heart_quarters';
+import { HEART_FLOOR_LOOK } from './heart_floor_glsl';
 import { HEART_QUARTERS_LOOK } from './heart_quarters_core';
 
 const f = (v: number) => (Number.isInteger(v) ? `${v}.0` : `${v}`);
+/** A sleeping crack: its half width (yards, the kit's main lines, about) and the
+ *  painted light it is lit by, the floor's own (`HEART_FLOOR_LOOK.light`). */
+const CRACK_HALF_WIDTH = 0.2;
+const CRACK_LIGHT = (() => {
+  const [x, z] = HEART_FLOOR_LOOK.light;
+  const l = Math.hypot(x, z);
+  return [x / l, z / l];
+})();
 const RING = f(HEART_QUARTERS.ringR);
 const RIM = f(HEART_QUARTERS.rimR);
 const SHOCK_SPEED = f(HEART_QUARTERS_LOOK.shockSpeed);
@@ -98,6 +107,13 @@ uniform float uTime;
 uniform float uDark;
 varying vec3 vShade;
 varying vec3 vP;
+float wh(vec2 q) { return fract(sin(dot(q, vec2(127.1, 311.7))) * 43758.5453); }
+float wn(vec2 q) {
+  vec2 i = floor(q);
+  vec2 u = fract(q);
+  u = u * u * (3.0 - 2.0 * u);
+  return mix(mix(wh(i), wh(i + vec2(1.0, 0.0)), u.x), mix(wh(i + vec2(0.0, 1.0)), wh(i + vec2(1.0, 1.0)), u.x), u.y);
+}
 void main() {
   float r = length(vP.xz);
   float ang = atan(vP.x, vP.z);
@@ -131,7 +147,35 @@ void main() {
   lit += mix(uColor, white, 0.6) * edge * 1.7 * vShade.r;
   lit += uHot * smoothstep(0.9, 1.0, vShade.r) * 0.4 * max(inside, uIdle);
   vec3 dark = uColor * 0.04;
-  gl_FragColor = vec4((dark + lit) * (1.0 - 0.85 * uDark), 1.0);
+  vec3 awakeC = dark + lit;
+  // Asleep (the AAA pass): a crack cut into the stone, never a ribbon of flat
+  // colour. The ribbon's own shade rises from its edges to its middle, so its
+  // slope in the plan gives each side of the crack as a wall of a V cut down to
+  // that middle: the wall facing the floor's painted light a broken pale stone,
+  // the other in shadow, the throat dark, and only a thread down the deepest
+  // middle keeps its quarter's quiet glow; the flood's front lights it.
+  vec2 pdx = dFdx(vP.xz);
+  vec2 pdy = dFdy(vP.xz);
+  float sdx = dFdx(vShade.r);
+  float sdy = dFdy(vShade.r);
+  float pdet = pdx.x * pdy.y - pdx.y * pdy.x;
+  vec2 slope = abs(pdet) > 1e-9
+    ? vec2(sdx * pdy.y - sdy * pdx.y, sdy * pdx.x - sdx * pdy.x) / pdet
+    : vec2(0.0);
+  float slopeLen = length(slope);
+  vec2 toMiddle = slopeLen > 1e-5 ? slope / slopeLen : vec2(0.0);
+  // How far down the wall (0 the arris, 1 the throat): a shade is half its
+  // middle's at the edge, and the slope gives that middle's own value.
+  float mid = slopeLen * ${CRACK_HALF_WIDTH.toFixed(2)} * 2.0;
+  float cut = mid > 1e-4 ? clamp((vShade.r / mid - 0.5) * 2.0, 0.0, 1.0) : 1.0;
+  float faced = 0.5 + 0.5 * dot(toMiddle, vec2(${CRACK_LIGHT[0].toFixed(3)}, ${CRACK_LIGHT[1].toFixed(3)}));
+  float wall = wn(vP.xz * 2.3);
+  vec3 stone = mix(vec3(0.05, 0.038, 0.032), vec3(0.2, 0.15, 0.115), faced * faced) * (0.75 + 0.5 * wall);
+  vec3 throat = vec3(0.01, 0.008, 0.009);
+  float thread = smoothstep(0.84, 1.0, cut) * smoothstep(0.42, 0.72, wn(vP.xz * 0.55 + 5.0));
+  vec3 asleep = mix(stone, throat, smoothstep(0.18, 0.6, cut)) + uColor * thread * min(level, 0.5) * 1.4;
+  float wake = clamp(max(inside, edge) * 2.0, 0.0, 1.0);
+  gl_FragColor = vec4(mix(asleep, awakeC, wake) * (1.0 - 0.85 * uDark), 1.0);
   #include <colorspace_fragment>
 }`;
 }

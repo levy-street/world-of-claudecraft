@@ -51,7 +51,7 @@ import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air
 import { buildHeartCollapse } from './heart_collapse';
 import { heartCollapseView, heartHornT, heartLandmarkFall } from './heart_collapse_core';
 import type { HeartFallAltar } from './heart_collapse_rig';
-import { heartFloorMaterial } from './heart_floor';
+import { heartFloorMaterial, setHeartFloorQuarter } from './heart_floor';
 import {
   heartKitMeshes,
   heartKitPiece,
@@ -972,6 +972,10 @@ export function buildHeartQuarters(
         set(cu.uShockR, shock.r, 100);
         set(cu.uShockAge, shock.age);
         set(cu.uDark, dark);
+      }
+      for (const [i, vein] of HEART_QUARTER_ORDER.entries()) {
+        const q = state.quarters[vein];
+        setHeartFloorQuarter(i, q.awake, q.front);
       }
       const du = daisGlow.uniforms;
       (du.uQ.value as THREE.Vector4).set(

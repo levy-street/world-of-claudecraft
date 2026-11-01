@@ -25,6 +25,13 @@
 // float32 wobble far out in the instance band). Only the flat sheet takes the
 // paint (an up-facing face at the sheet's height): the sockets' tipped
 // fragments and pits keep their own. Pure strings, Three-free.
+//
+// A crack's scar (the wide band under its light) only stands whole in a quarter
+// the flood has reached: in a sleeping one it is cut away to the odd chip broken
+// off the crack's edge, the painted sheet showing through under it, so a sleeping
+// crack has no outline (`heartFloorScar`).
+
+import { HEART_QUARTERS } from '../../sim/content/smith_heart_quarters';
 
 /** The look's numbers (yards, shares). */
 export const HEART_FLOOR_LOOK = {
@@ -56,6 +63,10 @@ export const HEART_FLOOR_LOOK = {
 
 const f = (v: number) => (Number.isInteger(v) ? `${v}.0` : `${v}`);
 const L = HEART_FLOOR_LOOK;
+const Q = HEART_QUARTERS;
+/** The height of a crackle's scar (quarter_pieces.py `_rim_crackle`, SKIN less a
+ *  hair): the flat band of one colour laid under each crack's light. */
+const SCAR_Y = 0.036;
 
 /** The vertex half: the room-local point and the face's facing. */
 export const HEART_FLOOR_VERT_HEAD = /* glsl */ `
@@ -70,6 +81,8 @@ export function heartFloorFragHead(lowGfx: boolean): string {
   return /* glsl */ `
 varying vec3 vHfP;
 varying float vHfUp;
+uniform vec4 uHfAwake;
+uniform vec4 uHfFront;
 float hfHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 vec2 hfHash2(vec2 p) {
   return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
@@ -248,6 +261,31 @@ export function heartFloorPaint(lowGfx: boolean): string {
     grit = mix(grit, base * 0.2, deepK);
     col = mix(col, grit, clamp(joint, 0.0, 1.0));
     diffuseColor.rgb = col;
+  }
+  ${heartFloorScar()}`;
+}
+
+/** A crackle's scar in a sleeping quarter (the flood's front not yet over it):
+ *  mostly cut away, the odd chip kept a paler broken stone. The quarter by the
+ *  sim's own unwinding of the sweep (`heartQuarterIndexAt`). */
+function heartFloorScar(): string {
+  const first = -45 + Q.rimOffsetDeg;
+  return /* glsl */ `
+  if (vHfUp > 0.9995 && abs(vHfP.y - ${f(SCAR_Y)}) < 0.004) {
+    vec2 sp = vHfP.xz;
+    float sr = length(sp);
+    float su = 1.0 - clamp((sr - ${f(Q.ringR)}) / ${f(Q.rimR - Q.ringR)}, 0.0, 1.0);
+    float sweep = ${f(Q.sweepDeg)} * pow(su, ${f(Q.power)});
+    float sphi = mod(degrees(atan(sp.x, sp.y)) + sweep - (${f(first)}), 360.0);
+    float si = floor(sphi / 90.0);
+    float sa = si < 0.5 ? uHfAwake.x : si < 1.5 ? uHfAwake.y : si < 2.5 ? uHfAwake.z : uHfAwake.w;
+    float sf = si < 0.5 ? uHfFront.x : si < 1.5 ? uHfFront.y : si < 2.5 ? uHfFront.z : uHfFront.w;
+    float sInside = sa * (1.0 - smoothstep(sf - 2.2, sf, sr));
+    if (sInside < 0.5) {
+      float chip = hfFbm(sp * 2.9 + 3.0);
+      if (chip < 0.68) discard;
+      diffuseColor.rgb = diffuseColor.rgb * 0.4 + vec3(0.1, 0.08, 0.068) * (0.8 + 0.5 * hfNoise(sp * 5.0));
+    }
   }`;
 }
 
