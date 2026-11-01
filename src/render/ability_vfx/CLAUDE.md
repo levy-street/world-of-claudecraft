@@ -76,6 +76,17 @@ the one-light tier. Other `'lightning'` cues (the nature trinket procs) keep the
 old look. Pinned by `tests/stepped_leader.test.ts` and
 `tests/stepped_leader_core.test.ts`.
 
+Magma Burst (the Shaman's `lava_burst`) follows the same rider shape:
+`magma_burst.ts` routes its heavyBolt cue onto a molten-orb projectile head
+(`../vfx.ts` `moltenOrbProjectile`) ridden by three helical lava strands
+(`magma_braid.ts`, pure helix and plan math in the registered
+`magma_braid_core.ts`), drawn in the same held ribbon pass and lit through the
+same `TrackedLightHost`. Unlike Arc Bolt it keeps the archetype sequencer: its
+class-owned spec (`../shaman_vfx_specs.ts`, registered) supplies the `orb`
+windup and an impact stack the braid starts with `awaitTravel` and fires at
+ARRIVAL (`AbilityVfxFx.magmaBraid` / `magmaBraidImpact`). Pinned by
+`tests/magma_braid.test.ts` and `tests/magma_braid_core.test.ts`.
+
 `spirits.ts` (`SpiritApparitions`) discipline: do NOT imitate the naive gallery
 code it ports. One cached PUPPET per creature GLB, whose meshes all share ONE
 additive ghost material, so a spawn only attaches the cached puppet to a pooled
