@@ -2208,32 +2208,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // tests/consumables.test.ts) at BASE stats (no gear) at the TOP level of its
   // intended zone bracket (ZONE1/2/3_ZONE.levelRange[1] in content/zone{1,2,3}.ts:
   // 7/13/20), the hardest point in the bracket for the tier to still feel worth
-  // the cooldown. That landed potionHp around 72-90% and potionMana around 53-66%
-  // of the reference pool as it stood before the 2026-09-11 class health table;
-  // the priest pool then grew by roughly six tenths (2 Stamina per level, 15 HP
-  // per level), so the hp ladder now restores about 43-56% and its re-size is
-  // owed as its own change, issue #4000 (tests/consumables.test.ts pins the
-  // measured fractions meanwhile; the mana ladder is untouched, Intellect per
-  // level and base mana did not move). The intent stands: a real, meaningful topper-upper rather than a sliver,
-  // with headroom against a geared character's larger pool (gear only grows the
-  // pool from here, so a geared cast of the same level sees a SMALLER fraction
-  // than the pinned floor, same as any flat-value consumable; the fix is that the
-  // floor itself is now generous, not that it tracks gear). Every tier in this
-  // ladder must stay BELOW the matching profession_items.ts alchemy draught (the
-  // crafted line is a strict upgrade over the vendor equivalent): keep the two in
-  // lockstep if either changes. Since the 11n vendor floor, this line sits the
-  // margin ladder (10/15/20 percent by rung) below the crafted draughts, so the
-  // crafted line is the generous fraction and the vendor line is the floor.
-  // Both-sourced (also crafted by recipe), magnitude-exempt per 11n-BOTH /
-  // qr-11n-NINE: a nerf would hit the crafted arm. The bottom hp rung's
-  // +9.1 percent vs silverleaf_healing_draught 120 is recorded EXEMPT, not a
-  // miss.
+  // the cooldown. The healing ladder restores 72-90% of the priest pool;
+  // the mana ladder restores about 53-66% of the paladin pool. Geared players
+  // have larger pools and see a smaller fraction from the same flat amount.
+  // Each crafted draught strictly exceeds its vendor equivalent. The top rung
+  // retains the 20% crafted margin; the minor and lesser healing potions are
+  // both-sourced and magnitude-exempt under qr-11n-NINE.
   minor_healing_potion: {
     id: 'minor_healing_potion',
     name: 'Minor Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 110,
+    potionHp: 177,
     sellValue: 8,
     buyValue: 40,
   },
@@ -2277,7 +2263,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Lesser Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 190,
+    potionHp: 323,
     sellValue: 16,
     buyValue: 85,
   },
@@ -2292,14 +2278,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 16,
     buyValue: 85,
   },
-  // Vendor nerf (11n-D-13): sunpetal_healing_draught 335 / 1.20 (top rung,
-  // 20 percent), floored; crafted margin +20.1 percent.
+  // Sunpetal Healing Draught 566 / 1.20, floored: the crafted top rung
+  // retains a margin above 20 percent (issue #4000).
   healing_potion: {
     id: 'healing_potion',
     name: 'Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 279,
+    potionHp: 471,
     sellValue: 32,
     buyValue: 170,
   },

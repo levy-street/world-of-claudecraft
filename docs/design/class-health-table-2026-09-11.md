@@ -129,17 +129,13 @@ best-in-slot" reads 1,312 against its real parse kit's 1,722), which is one of t
 
 ## Two things the larger pools exposed
 
-- **The potion ladder is sized against the old priest pool.** The vendor healing potions
-  (110 / 190 / 279) restored 72 to 90 percent of a naked priest at the three zone
-  bracket tops; on the new pools (198 / 408 / 653) they restore 56 / 47 / 43 percent, and
-  the crafted alchemy ladder (120 / 200 / 335) the same. This is the "fixed heals get
-  relatively weaker" consequence the stamina audit named. Restoring the documented
-  fractions means roughly 143 to 178, 294 to 367 and 470 to 588 on the vendor rungs, the
-  crafted ladder alongside (its values are quoted in the guide prose in every locale)
-  and the vendor-versus-crafted ordering law, so it is its own PR, issue 4000; this one
-  pins the measured fractions so the ladder cannot drift further unnoticed. The mana
-  ladder is out of that issue's scope: Intellect per level and base mana did not move,
-  so the mana potion band still holds.
+- **The potion ladder needed resizing for the larger priest pools.** The former
+  vendor values (110 / 190 / 279) restored 56 / 47 / 43 percent at levels
+  7 / 13 / 20. Issue #4000 resizes them to 177 / 323 / 471, restoring
+  89.39 / 79.17 / 72.13 percent of the 198 / 408 / 653 base pools. The
+  crafted healing draughts are 193 / 340 / 566 and remain strict upgrades.
+  The top crafted rung keeps its 20 percent margin; the lower both-sourced
+  vendor potions remain exempt under qr-11n-NINE. Mana potions are unchanged.
 - **Sacrilegious March lingered a tick on pools not divisible by five.** The drain
   clamps health to a ceiling-rounded floor and then tested the fraction, so on a
   677-HP warlock the clamped value sat a hair above 20 percent and the march ended one
@@ -148,6 +144,5 @@ best-in-slot" reads 1,312 against its real parse kit's 1,722), which is one of t
 
 ## Still owed
 
-The potion ladder re-size above. The PBE duel and Varkhul heroic checks the gear PR owes
-cover this change as well; the drift cleanup and the identity-aware item score are
+The PBE duel and Varkhul heroic checks the gear PR owes cover this change as well; the drift cleanup and the identity-aware item score are
 unchanged by it.
