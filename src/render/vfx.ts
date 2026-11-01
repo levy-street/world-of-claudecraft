@@ -326,6 +326,9 @@ interface Projectile {
   // Lightning head drawn as a small hot tip instead of the zig-zag streak: the
   // stepped leader (ability_vfx/stepped_leader.ts) draws the channel itself.
   tip?: boolean;
+  // A molten magma orb head (Magma Burst): white-hot core, orange halo, two
+  // embers circling it; the triple braid (ability_vfx/magma_braid.ts) rides it.
+  orb?: boolean;
 }
 
 /** Options for a lightning projectile whose flight another effect rides. */
@@ -1226,6 +1229,35 @@ export class Vfx {
       trailSprite: SPR.sparkle,
       lightning: true,
       tip: opts?.tip,
+      onImpact: opts?.onImpact,
+      onLost: opts?.onLost,
+    });
+    return pos;
+  }
+
+  // Magma Burst's flying head: a molten orb that another effect rides (the
+  // triple braid). Same homing, speed and arrival burst as every projectile;
+  // returns the LIVE head position, or null when the caster has no anchor.
+  moltenOrbProjectile(
+    sourceId: number,
+    targetId: number,
+    color?: number,
+    opts?: Omit<LightningProjectileOpts, 'tip'>,
+  ): THREE.Vector3 | null {
+    const from = this.anchor(sourceId, 0.62);
+    if (!from) return null;
+    const pos = from.clone();
+    this.projectiles.push({
+      pos,
+      targetId,
+      color: new THREE.Color(color ?? 0xff7a1a).multiplyScalar(hdr(1.7)), // impact burst tint
+      coreColor: new THREE.Color(0xfff2c0).multiplyScalar(hdr(3.0)), // white-hot core
+      trailColor: new THREE.Color(color ?? 0xff7a1a).multiplyScalar(hdr(1.9)), // molten halo
+      speed: 26,
+      ttl: 3,
+      coreSprite: SPR.glowCore,
+      trailSprite: SPR.sparkle,
+      orb: true,
       onImpact: opts?.onImpact,
       onLost: opts?.onLost,
     });
@@ -2747,10 +2779,11 @@ export class Vfx {
       const uz = dir.z / dist;
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
-      if (pr.lightning && pr.tip) {
-        // A rider draws the channel: the head is only a small hot tip with a
-        // violet corona and the odd spark flung off it.
-        // Lives about two frames, so the tip never strings out into a trail.
+      if (pr.orb) {
+        // The molten orb: a crusty fire blob (fire_01) round a white-hot flare
+        // core, two embers circling it, and the odd glob flung off. Lives about
+        // two frames, so the head never strings out into a trail. (glowCore is
+        // a ring-shaped sprite: it read as a hollow ring here.)
         this.spawn(
           pr.pos.x,
           pr.pos.y,
@@ -2758,12 +2791,66 @@ export class Vfx {
           0,
           0,
           0,
-          pr.coreColor,
-          0.5,
+          pr.trailColor,
+          2.3,
           0.035,
           0,
-          SPR.glowCore,
+          SPR.firePuff,
         );
+        // a second blob, offset, so the molten body reads dense, not sparse
+        this.spawn(
+          pr.pos.x + 0.08,
+          pr.pos.y - 0.06,
+          pr.pos.z,
+          0,
+          0,
+          0,
+          pr.trailColor,
+          1.9,
+          0.035,
+          0,
+          SPR.firePuff,
+        );
+        this.spawn(pr.pos.x, pr.pos.y, pr.pos.z, 0, 0, 0, pr.coreColor, 1.5, 0.035, 0, SPR.flash);
+        const spin = pr.ttl * 12;
+        for (let k = 0; k < 2; k++) {
+          const a = spin + k * Math.PI;
+          this.spawn(
+            pr.pos.x + Math.cos(a) * 0.6,
+            pr.pos.y + Math.sin(a) * 0.25,
+            pr.pos.z + Math.sin(a) * 0.6,
+            0,
+            0,
+            0,
+            pr.coreColor,
+            0.14,
+            0.035,
+            0,
+            SPR.sparkle,
+          );
+        }
+        if (Math.random() < 0.3) {
+          this.spawn(
+            pr.pos.x,
+            pr.pos.y,
+            pr.pos.z,
+            (Math.random() - 0.5) * 2,
+            Math.random() * 1.2,
+            (Math.random() - 0.5) * 2,
+            pr.trailColor,
+            0.2,
+            0.4,
+            6,
+            SPR.flame,
+          );
+        }
+      } else if (pr.lightning && pr.tip) {
+        // A rider draws the channel: the head is only a small hot tip with a
+        // violet corona and the odd spark flung off it.
+        // Lives about two frames, so the tip never strings out into a trail.
+        // A flare (a hot point in a soft halo), never glowCore: that sprite is
+        // ring-shaped and read as a hollow circle on the tip.
+        this.spawn(pr.pos.x, pr.pos.y, pr.pos.z, 0, 0, 0, pr.coreColor, 0.7, 0.035, 0, SPR.flash);
         this.spawn(
           pr.pos.x,
           pr.pos.y,
@@ -2775,7 +2862,7 @@ export class Vfx {
           0.9,
           0.035,
           0,
-          SPR.glowCore,
+          SPR.glowSoft,
         );
         if (Math.random() < 0.45) {
           this.spawn(

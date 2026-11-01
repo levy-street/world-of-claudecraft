@@ -47,6 +47,7 @@ import {
   SOUL_LANCE_VFX_FULL_SPEC,
   SOUL_LANCE_VFX_SPEC,
 } from './necromancy_vfx_specs';
+import { MAGMA_BURST_VFX_FULL_SPEC, MAGMA_BURST_VFX_SPEC } from './shaman_vfx_specs';
 import { TRINKET_VFX_FULL_SPECS, TRINKET_VFX_SPECS } from './trinket_vfx_specs';
 import {
   EMBERKIN_FELBOLT_VFX_FULL_SPEC,
@@ -85,6 +86,7 @@ export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
   if (abilityId === 'pin') return PIN_VFX_SPEC;
   if (abilityId === 'lunge') return LUNGE_VFX_SPEC;
   if (abilityId === 'hamstring_bite') return HAMSTRING_BITE_VFX_SPEC;
+  if (abilityId === 'lava_burst') return MAGMA_BURST_VFX_SPEC;
   return ABILITY_VFX_SPECS[abilityId];
 }
 
@@ -114,6 +116,7 @@ export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | unde
   if (abilityId === 'pin') return PIN_VFX_FULL_SPEC;
   if (abilityId === 'lunge') return LUNGE_VFX_FULL_SPEC;
   if (abilityId === 'hamstring_bite') return HAMSTRING_BITE_VFX_FULL_SPEC;
+  if (abilityId === 'lava_burst') return MAGMA_BURST_VFX_FULL_SPEC;
   return ABILITY_VFX_FULL_SPECS[abilityId];
 }
 

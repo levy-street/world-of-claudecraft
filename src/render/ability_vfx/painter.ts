@@ -15,6 +15,7 @@ import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
 import { warriorReadinessBit } from '../warrior_readiness_core';
 import { ARC_BOLT_ABILITY, type ArcBoltPrimitives, playArcBolt } from './arc_bolt';
 import { HarvestDetonations } from './harvest_detonation';
+import { MAGMA_BURST_ABILITY, type MagmaBurstPrimitives, playMagmaBurst } from './magma_burst';
 import {
   drawWarriorAreaContact,
   drawWarriorStormPulse,
@@ -85,6 +86,7 @@ export interface AbilityVfxPrimitives {
     color?: number,
   ): void;
   lightningProjectile: ArcBoltPrimitives['lightningProjectile'];
+  moltenOrbProjectile?: MagmaBurstPrimitives['moltenOrbProjectile'];
   burst(
     at: VfxPoint,
     school: string,
@@ -845,6 +847,29 @@ export class AbilityVfx {
         ) {
           // the leader, its stroke and the impact stack
           this.spawned += 3;
+          break;
+        }
+        // Magma Burst: a molten orb on three twisting strands of lava, its
+        // impact stack held for the ARRIVAL (magma_burst.ts).
+        if (
+          ability === MAGMA_BURST_ABILITY &&
+          playMagmaBurst(
+            this.deps.vfx,
+            fx,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            tier,
+            this.quality,
+          )
+        ) {
+          // the orb, the braid, and the held impact stack
+          this.spawned += 3;
+          if (!plan.whirl) {
+            this.mobThrowFallback(ev.sourceId, ability);
+            this.releaseGesture(ev.sourceId, ability);
+          }
           break;
         }
         // A player ranged shot's draw animation rides the projectile launch

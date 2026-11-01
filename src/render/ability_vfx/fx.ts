@@ -32,6 +32,8 @@ import { FuryAudioQueue } from './fury_audio';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { GroundAuras } from './ground_auras';
 import { HeldWarriorStorm } from './held_warrior_storm';
+import { MagmaBraids } from './magma_braid';
+import type { MagmaBurstPlan } from './magma_braid_core';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
 import type { BakedKind, FragmentKind } from './production_assets';
@@ -42,6 +44,7 @@ import {
   type RibbonAnchor,
 } from './ribbons';
 import { ShockRings } from './rings';
+import type { SeqSlot } from './sequencer';
 import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
 import { SIGNATURE_CONTACT_TIME } from './signature_core';
@@ -484,6 +487,10 @@ export class AbilityVfxFx implements SequencerHost {
   // The Arc Bolt stepped leader (stepped_leader.ts): draws through the ribbon
   // pool's held pass and moves one tracked pulse-pool light.
   private leaders: SteppedLeaderBolts;
+  // The Magma Burst triple braid (magma_braid.ts) and the archetype sequence
+  // each braid fires at arrival, keyed by the braid's handle.
+  private braids: MagmaBraids;
+  private braidSeq = new Map<number, SeqSlot>();
   private decals: GroundDecals;
   private overlay: OverlaySprites;
   private pillars: LightPillars;
@@ -730,6 +737,15 @@ export class AbilityVfxFx implements SequencerHost {
       hand: (id, out) => this.handSample?.(id, 0, out) ?? false,
       ring: (x, y, z, radius, colorHex) =>
         this.rings.spawn(x, y, z, radius, 0.45, colorHex, 1.2 * this.intensity(), true),
+    });
+    this.braids = new MagmaBraids({
+      strip: (points, count, width, color, light, taper) =>
+        this.ribbons.appendStrip(points, count, width, color, light, taper),
+      burst: (x, y, z, colorHex, count, power, kind, duration, delay) =>
+        this.burstAt(x, y, z, colorHex, count, power, kind, duration, delay),
+      anchor,
+      hand: (id, out) => this.handSample?.(id, 0, out) ?? false,
+      groundY: (x, z) => this.groundY(x, z),
     });
     this.decals = new GroundDecals(scene, tex, groundY);
     this.overlay = new OverlaySprites(scene, tex);
@@ -1805,6 +1821,7 @@ export class AbilityVfxFx implements SequencerHost {
   /** The moving-light seam (the renderer's pulse pool); null = no light. */
   setTrackedLightHost(host: TrackedLightHost | null): void {
     this.leaders.setLightHost(host);
+    this.braids.setLightHost(host);
   }
   /** Start a leader riding a projectile's live head; returns its handle. */
   steppedLeader(
@@ -1833,7 +1850,53 @@ export class AbilityVfxFx implements SequencerHost {
   }
   private drawLeaders = (): void => {
     this.leaders.draw();
+    this.braids.draw();
   };
+
+  // ---- Magma Burst triple braid (magma_braid.ts) ----------------------------
+  /**
+   * Start a braid riding a molten orb's live head, plus the ability's archetype
+   * sequence held for travel (release flash and windup now, the impact stack at
+   * arrival). Returns the braid's handle for magmaBraidImpact / magmaBraidLost.
+   */
+  magmaBraid(
+    abilityId: string,
+    spec: AbilityVfxFullSpec | undefined,
+    sourceId: number,
+    targetId: number,
+    head: THREE.Vector3,
+    plan: MagmaBurstPlan,
+    colorHex: number,
+    tier: number,
+  ): number {
+    if (this.disposed) return -1;
+    const handle = this.braids.spawn(sourceId, targetId, head, plan);
+    const seq = spec
+      ? this.sequencer.start(this, abilityId, spec, sourceId, targetId, colorHex, tier, true)
+      : null;
+    if (seq) this.braidSeq.set(handle, seq);
+    return handle;
+  }
+  magmaBraidImpact(handle: number, at: THREE.Vector3): void {
+    this.braids.impact(handle, at);
+    const seq = this.braidSeq.get(handle);
+    if (seq) {
+      this.braidSeq.delete(handle);
+      this.sequencer.triggerImpact(this, seq, at.x, at.y, at.z);
+    }
+  }
+  magmaBraidLost(handle: number): void {
+    this.braids.lost(handle);
+    const seq = this.braidSeq.get(handle);
+    if (seq) {
+      this.braidSeq.delete(handle);
+      this.sequencer.cancel(seq);
+    }
+  }
+  /** Live braids (probe/test readout). */
+  magmaBraidCount(): number {
+    return this.braids.activeCount();
+  }
   setWorldLightDelegate(
     callback:
       | ((
@@ -2539,6 +2602,7 @@ export class AbilityVfxFx implements SequencerHost {
     // Pack after the sequence emits this frame's contacts, so the visible
     // wound and native weapon contact share one frame. Advance each pool once.
     this.leaders.advance(dt, reducedMotion);
+    this.braids.advance(dt, reducedMotion);
     this.ribbons.update(
       dt,
       camPosScratch,
@@ -2615,6 +2679,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.furyAudio.clear();
     this.contactBursts.clear();
     this.leaders.clear();
+    this.braids.clear();
+    this.braidSeq.clear();
     this.ribbons.clear();
     this.baked.clear();
     this.fragments.clear();
@@ -2656,6 +2722,7 @@ export class AbilityVfxFx implements SequencerHost {
     };
     release(() => this.clear());
     release(() => this.leaders.setLightHost(null));
+    release(() => this.braids.setLightHost(null));
     this.worldLightCb = null;
     release(() => this.ribbons.dispose());
     release(() => this.baked.dispose());
