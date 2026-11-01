@@ -4,10 +4,9 @@
 // grey; the Heart is a chamber deep in the mountain over the Smith's own
 // heart. So, big value groups only (the mountain stays calm):
 //   - the granite darkened and warmed, a breath of violet in its shade;
-//   - thin veins of crystal wandering through the faces in the four veins'
-//     colours (the north quarter the Breath's, the east the Quench's, the
-//     south the Hammer's, the west the Heat's: each altar's own quarter),
-//     sparse, thicker low over the chasm;
+//   - each quarter's colour washed low over the rock behind it (the north
+//     quarter the Breath's, the east the Quench's, the south the Hammer's, the
+//     west the Heat's: each altar's own quarter), fading as it climbs;
 //   - the heart's light from below on every face turned down toward it.
 // The weight fades in past the chasm's open air and out at the Heart's edge,
 // so the main map never takes it. Three-free, DOM-free, deterministic; the
@@ -46,25 +45,57 @@ function vec3(hex: number): string {
   return `vec3( ${r.toFixed(3)}, ${g.toFixed(3)}, ${b.toFixed(3)} )`;
 }
 
+/** The crown's weight in the shader: the rock's place, and only for a camera
+ *  in the Heart (`uHeartCore`, the sky's own area blend): the walls it covers are
+ *  also the far walls of the Quench and of the Cornice's long view, and those
+ *  keep their own paint. */
 const WEIGHT_GLSL = `vec2 cL = vRockCutWorld.xz - uHeartSlot - vec2( ${HEART_ROOM.x.toFixed(1)}, ${HEART_ROOM.z.toFixed(1)} );
           float cR = length( cL );
           float cW = smoothstep( ${HEART_CROWN.in0.toFixed(1)}, ${HEART_CROWN.in1.toFixed(1)}, cR )
-            * ( 1.0 - smoothstep( ${HEART_CROWN.out0.toFixed(1)}, ${HEART_CROWN.out1.toFixed(1)}, cR ) );`;
+            * ( 1.0 - smoothstep( ${HEART_CROWN.out0.toFixed(1)}, ${HEART_CROWN.out1.toFixed(1)}, cR ) )
+            * uHeartCore;`;
 
-/** The crown's granite (the rock's colour pass: `diffuseColor` changed). */
+/** The crown's granite (the rock's colour pass: `diffuseColor` changed):
+ *  painted in big value groups on the room's own round coordinates (the arc
+ *  round the room, the height), never on anything read off a normal: broad
+ *  masses drifting warm umber to cool slate, long strokes along the beds, the
+ *  ledges a value paler. */
 export function heartCrownColorGlsl(): string {
   return `{
           ${WEIGHT_GLSL}
           if ( cW > 0.001 ) {
-            vec3 cRock = diffuseColor.rgb * vec3( 0.6, 0.53, 0.55 ) + vec3( 0.01, 0.006, 0.012 );
+            float cU = atan( cL.x, cL.y ) * cR;
+            float cY = vRockCutWorld.y;
+            float cMass = rockFrostNoise( vec2( cU * 0.021, cY * 0.027 ) + 3.0 ) * 0.65
+              + rockFrostNoise( vec2( cU * 0.052 + cY * 0.012, cY * 0.066 ) + 9.0 ) * 0.35;
+            float cStroke = rockFrostNoise( vec2( cU * 0.035 + cY * 0.03, cY * 0.42 ) + 17.0 );
+            float cUp = smoothstep( 0.3, 0.75, normalize( vRockCutN ).y );
+            vec3 cRock = diffuseColor.rgb * vec3( 0.66, 0.6, 0.6 );
+            cRock *= mix( vec3( 0.56, 0.58, 0.7 ), vec3( 1.36, 1.16, 1.0 ), smoothstep( 0.32, 0.68, cMass ) );
+            cRock *= 0.82 + 0.36 * smoothstep( 0.35, 0.65, cStroke );
+            cRock = mix( cRock, cRock * 1.35 + vec3( 0.02, 0.016, 0.014 ), cUp * smoothstep( 0.4, 0.62, cMass ) );
             diffuseColor.rgb = mix( diffuseColor.rgb, cRock, cW );
           }
         }`;
 }
 
-/** The crown's crystal veins and the heart's light from below (the rock's
- *  emissive pass: `totalEmissiveRadiance` added to; reads the frost's noise,
- *  `rockFrostNoise`). */
+/** The crown's faces lit from their own plain normal (most of the way): the
+ *  rock's fracture layer turns grazing faces to hard black marble, and the
+ *  crown's paint carries the surface instead (before the rock's lights:
+ *  `normal` changed; the standard tier). */
+export function heartCrownCalmGlsl(): string {
+  return `{
+          ${WEIGHT_GLSL}
+          if ( cW > 0.001 ) normal = normalize( mix( normal, nonPerturbedNormal, cW * 0.85 ) );
+        }`;
+}
+
+/** The heart's light from below on the faces turned down to it, and each
+ *  quarter's own colour low on the rock behind its landmark (a broad wash,
+ *  never a line: the thin crystal veins this drew until the AAA pass were read
+ *  off a face's normal at this slot's huge world coordinates, a hundred
+ *  thousand yards out, and broke into thousands of dots). The rock's emissive
+ *  pass: `totalEmissiveRadiance` added to. */
 export function heartCrownEmissiveGlsl(): string {
   const C = SMITH_HEART_VEIN_COLORS;
   return `{
@@ -84,18 +115,11 @@ export function heartCrownEmissiveGlsl(): string {
             int cj = int( mod( cI + 1.0, 4.0 ) );
             vec3 cA0 = ci == 0 ? cv0 : ci == 1 ? cv1 : ci == 2 ? cv2 : cv3;
             vec3 cA1 = cj == 0 ? cv0 : cj == 1 ? cv1 : cj == 2 ? cv2 : cv3;
-            vec3 cVein = mix( cA0, cA1, smoothstep( 0.8, 1.0, cF ) );
-            vec2 cT = normalize( vec2( -cN.z, cN.x ) + vec2( 1e-4, 0.0 ) );
-            float cU = dot( vRockCutWorld.xz, cT );
-            float cLine = rockFrostNoise( vec2( cU * 0.045, vRockCutWorld.y * 0.03 ) );
-            float cV = 1.0 - smoothstep( 0.0, 0.02, abs( cLine - 0.5 ) );
-            float cMask = smoothstep( 0.56, 0.76, rockFrostNoise( vec2( cU * 0.012 + 7.0, vRockCutWorld.y * 0.011 ) ) );
-            float cLow = 1.0 - smoothstep( -20.0, 70.0, vRockCutWorld.y );
-            totalEmissiveRadiance += cVein * cV * cMask * cW * ( 0.3 + 0.7 * cLow ) * 0.85;
-            // The heart's light from below on the faces turned down to it.
+            vec3 cVein = mix( cA0, cA1, smoothstep( 0.6, 1.0, cF ) );
+            float cLow = 1.0 - smoothstep( -30.0, 46.0, vRockCutWorld.y );
+            totalEmissiveRadiance += cVein * diffuseColor.rgb * cW * cLow * cLow * 0.34;
             float cDown = max( 0.0, -cN.y );
-            totalEmissiveRadiance += vec3( 0.5, 0.27, 0.1 ) * diffuseColor.rgb * cDown * cW
-              * ( 1.0 - smoothstep( -30.0, 40.0, vRockCutWorld.y ) ) * 1.3;
+            totalEmissiveRadiance += vec3( 0.5, 0.27, 0.1 ) * diffuseColor.rgb * cDown * cW * cLow * 1.3;
           }
         }`;
 }

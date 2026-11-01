@@ -11,7 +11,11 @@
 // HEART_ROCK_SHADE_FLOOR).
 
 import * as THREE from 'three';
-import { heartCrownColorGlsl, heartCrownEmissiveGlsl } from './heart_crown_core';
+import {
+  heartCrownCalmGlsl,
+  heartCrownColorGlsl,
+  heartCrownEmissiveGlsl,
+} from './heart_crown_core';
 import { HEART_ROCK_CUT_FAR, HEART_ROCK_CUT_NEAR, HEART_ROCK_STRATA } from './heart_rock_plan_core';
 import { heatSootGlsl } from './heat_soot_core';
 import { QUENCH_FROST_NOISE_GLSL, quenchFrostGlsl } from './quench_frost_core';
@@ -20,6 +24,15 @@ import { QUENCH_FROST_NOISE_GLSL, quenchFrostGlsl } from './quench_frost_core';
  *  Quench's frost, phase 2H; the Heat's basalt, phase 2I): one rock material serves every slot, and only
  *  one Smith's Heart field draws at a time, so its frame driver sets it. */
 const HEART_ROCK_SLOT = { value: new THREE.Vector2() };
+
+/** Is the camera in the Heart (the sky's area blend, 0 to 1)? The crown's paint
+ *  and the Quench's frost hand the walls they share over by it. */
+const HEART_ROCK_CORE = { value: 0 };
+
+/** Tell the rock's material how far the camera is in the Heart (the frame driver). */
+export function setHeartRockCore(k: number): void {
+  HEART_ROCK_CORE.value = k;
+}
 
 /** Tell the rock's material which slot is drawn (the interior's frame driver). */
 export function setHeartRockSlot(ox: number, oz: number): void {
@@ -59,7 +72,7 @@ export function heartRockBedGlsl(): string {
         }`;
 }
 
-const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|soot2i|crown2j|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
+const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|soot2i|crownAaa|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
 
 /** Wire the cutaway into a rock material (before any other layer: those
  *  compose with it). */
@@ -68,6 +81,7 @@ export function applyRockCutaway(mat: THREE.Material): void {
   mat.onBeforeCompile = (shader, renderer) => {
     prev?.call(mat, shader, renderer);
     shader.uniforms.uHeartSlot = HEART_ROCK_SLOT;
+    shader.uniforms.uHeartCore = HEART_ROCK_CORE;
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
@@ -90,7 +104,7 @@ export function applyRockCutaway(mat: THREE.Material): void {
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        `#include <common>\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;\nuniform vec2 uHeartSlot;\n${QUENCH_FROST_NOISE_GLSL}`,
+        `#include <common>\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;\nuniform vec2 uHeartSlot;\nuniform float uHeartCore;\n${QUENCH_FROST_NOISE_GLSL}`,
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -109,6 +123,10 @@ ${heartRockBedGlsl()}
 ${quenchFrostGlsl()}
 ${heatSootGlsl()}
 ${heartCrownColorGlsl()}`,
+      )
+      .replace(
+        '#include <lights_physical_fragment>',
+        `${heartCrownCalmGlsl()}\n#include <lights_physical_fragment>`,
       )
       .replace(
         '#include <emissivemap_fragment>',

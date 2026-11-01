@@ -10,7 +10,8 @@
 //   - the field's own cliff faces (the landings' and the shelf's drops)
 //     painted in the same frost granite, snow along their lips.
 // The weight fades in past the Ring's light and out toward the Breath and
-// the Heart, so no edge steps at a line. Three-free, DOM-free,
+// the Heart (only for a camera in the Heart, `uHeartCore`: seen from the Quench
+// its walls stay frost all the way round), so no edge steps at a line. Three-free, DOM-free,
 // deterministic; the GLSL below runs the same arithmetic in the rock's
 // material (heart_rock_cutaway.ts), instance-local from the slot's origin.
 
@@ -65,7 +66,7 @@ export function quenchFrostGlsl(): string {
           vec2 qL = vRockCutWorld.xz - uHeartSlot;
           float qW = smoothstep( ${f(F.x0)}, ${f(F.x1)}, qL.x )
             * smoothstep( ${f(F.ring0)}, ${f(F.ring1)}, length( qL ) )
-            * smoothstep( ${f(F.heart0)}, ${f(F.heart1)}, length( qL - vec2( ${f(F.heartX)}, ${f(F.heartZ)} ) ) );
+            * mix( 1.0, smoothstep( ${f(F.heart0)}, ${f(F.heart1)}, length( qL - vec2( ${f(F.heartX)}, ${f(F.heartZ)} ) ) ), uHeartCore );
           qW *= 1.0 - smoothstep( ${f(F.breathZ0)}, ${f(F.breathZ1)}, qL.y )
             * ( 1.0 - smoothstep( ${f(F.breathX0)}, ${f(F.breathX1)}, qL.x ) );
           if ( qW > 0.001 ) {

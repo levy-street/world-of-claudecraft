@@ -302,16 +302,19 @@ export const SMITH_HEART_HAMMER_LIGHT = {
  *  side. */
 export const SMITH_HEART_CORE_FOG = { color: 0x1c1424, near: 80, far: 520 } as const;
 
-/** The Heart's light rig. */
+/** The Heart's light rig. The sky's reflection stays a trace (`env`, as in
+ *  the Ring): the world's blue sky map at 0.26 washed every shaded face and
+ *  every cast shadow in the room a saturated cobalt. The fill is a grey violet
+ *  instead, so the shade reads cool and never black (the painted world's L1). */
 export const SMITH_HEART_CORE_LIGHT = {
-  sun: 1.5,
-  hemi: 0.9,
-  env: 0.26,
+  sun: 1.3,
+  hemi: 2.6,
+  env: 0.03,
   rim: 2.3,
-  sunColor: 0xffe2b8,
-  hemiSky: 0x3a2e58,
+  sunColor: 0xfff0dc,
+  hemiSky: 0x88849a,
   /** The heart's gold from below. */
-  hemiGround: 0x8a5424,
+  hemiGround: 0x7c5c42,
   rimColor: 0xffc880,
   /** High over the terrace's side of the chasm (from the ground toward it,
    *  phase 2J): the raid crossing the bridge sees the colossus lit, its

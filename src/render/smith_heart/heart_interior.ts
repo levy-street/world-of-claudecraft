@@ -45,7 +45,7 @@ import { buildHeartProps, buildHeartWalls } from './heart_props';
 import { buildHeartQuarters } from './heart_quarters';
 import { buildHeartRivers } from './heart_rivers';
 import { dressHeartMountain, ensureHeartRockKit } from './heart_rock';
-import { setHeartRockSlot } from './heart_rock_cutaway';
+import { setHeartRockCore, setHeartRockSlot } from './heart_rock_cutaway';
 import { buildHeartRoom } from './heart_room';
 import {
   buildHeartRoomKit,
@@ -255,6 +255,7 @@ export async function buildSmithHeartInterior(
       }
       blend = heartAreaBlend(blend, inSmithHeartRoom(local.x, local.z), dt);
       sky.setCore(blend);
+      setHeartRockCore(blend);
       breathBlend = heartAreaBlend(breathBlend, inBreathLight(local.x, local.z), dt);
       sky.setBreath(breathBlend);
       quenchBlend = heartAreaBlend(quenchBlend, inQuenchLight(local.x, local.z), dt);
