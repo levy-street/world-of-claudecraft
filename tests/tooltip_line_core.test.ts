@@ -256,9 +256,15 @@ describe('one module owns TooltipLineClass for the whole family', () => {
 
   it('the core is the only module in src/ that declares the type', () => {
     const offenders = tsFilesUnder(path.join(__dirname, '..', 'src'))
-      .filter(({ full }) =>
-        /export\s+type\s+TooltipLineClass\b/.test(codeOnly(readFileSync(full, 'utf8'))),
-      )
+      .filter(({ full }) => {
+        const source = readFileSync(full, 'utf8');
+        // Keep the whole corpus, but avoid stripping comments from large
+        // generated catalogs that cannot contain the declaration being checked.
+        return (
+          source.includes('TooltipLineClass') &&
+          /export\s+type\s+TooltipLineClass\b/.test(codeOnly(source))
+        );
+      })
       .map(({ file }) => `src/${file}`);
     expect(offenders).toEqual(['src/ui/tooltip_line_core.ts']);
   });
