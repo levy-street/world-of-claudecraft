@@ -1467,6 +1467,9 @@ export class CharacterVisual {
   // `blend` chases 0/1 off it, so dismounting unwinds the legs instead of
   // dropping them.
   private rideSpec: MountRideSpec | null = null;
+  // Seated on a presented mount, spec or not (the Lanternback's chair has none): playHit
+  // keeps such a rider in the saddle.
+  private riding = false;
   private rideBlend = 0;
   /** How far the arms have taken up the reins (ride_pose.ts), eased like the legs. */
   private rideArmBlend = 0;
@@ -2690,10 +2693,12 @@ export class CharacterVisual {
    * shown and null the rest of the time, and the pose is applied after the
    * mixer in the same slot as the ledge climb. Mounts without a ride spec keep
    * the plain seated loop, the Lanternback's rider is in a CHAIR, where a
-   * straddle would be wrong.
+   * straddle would be wrong. `riding` says whether the body is in a saddle at all,
+   * so a spec-less mount still counts; it defaults to having a spec.
    */
-  setRidePose(spec: MountRideSpec | null): void {
+  setRidePose(spec: MountRideSpec | null, riding = spec !== null): void {
     this.rideSpec = spec;
+    this.riding = riding;
   }
 
   /**
@@ -3194,6 +3199,13 @@ export class CharacterVisual {
 
   playHit(): void {
     if (this.deadLock || this.currentIsOneShot || this.hitCooldown > 0) return;
+    // A rider keeps the saddle. The seated loop is what puts the hips on the mount, and the
+    // full-body flinch replacing it stood the rider up on its back for the length of the clip.
+    // The hit still braces the body, so a dismount after it lands in the guard.
+    if (this.riding && this.baseState === 'sit') {
+      if (this.def.clips.combatIdle) this.braceUntil = extendBrace(this.braceUntil, this.clock);
+      return;
+    }
     const clips = this.def.clips.hit;
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
