@@ -546,27 +546,30 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
     expect(index).toBeGreaterThan(ordered.length / 2);
   });
 
+  const anyMerges = (): boolean => true;
+  const dist = (cell: readonly [number, number], f: { x: number; z: number }): number => {
+    const c = centre(cell);
+    return Math.hypot(c.x - f.x, c.z - f.z);
+  };
+
   it('builds the cell under the player next once they are inside the zone', () => {
     const queue = createCellBuildQueue(ordered, GRID, near, () => player);
-    // Through its 2x2 block's even/even corner first (see the super-chunk
-    // test below), then the player's own cell.
-    expect(queue.next()).toEqual([10, 10]);
     expect(queue.next()).toEqual([11, 11]);
-    // Then outward from the player, nearest first, while anything is near them.
-    for (const cell of [queue.next(), queue.next()]) {
-      expect(cell).toBeDefined();
-      const c = centre(cell as [number, number]);
-      expect(Math.hypot(c.x - player.x, c.z - player.z)).toBeLessThanOrEqual(CHUNK_SIZE + 1e-6);
-    }
+    // Then outward from the player: (10, 11) and (11, 10) tie at one cell, and
+    // the tie keeps the precomputed order (strictly nearer wins).
+    const tied = ordered.filter(
+      (cell) => dist(cell, player) === CHUNK_SIZE && !(cell[0] === 11 && cell[1] === 11),
+    );
+    expect(tied).toHaveLength(2);
+    expect(queue.next()).toEqual(tied[0]);
+    expect(queue.next()).toEqual(tied[1]);
   });
 
   it('follows the player as they move during the build', () => {
     let focus = player;
     const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
-    expect(queue.next()).toEqual([10, 10]);
     expect(queue.next()).toEqual([11, 11]);
     focus = centre([8, 7]);
-    expect(queue.next()).toEqual([8, 6]);
     expect(queue.next()).toEqual([8, 7]);
   });
 
@@ -575,7 +578,7 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
     // own (a neighbour prepare, a ferry destination), and a focus off the grid.
     const outside = centre([12, 6]);
     for (const focus of [null, outside, { x: 1e6, z: 1e6 }]) {
-      const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
+      const queue = createCellBuildQueue(ordered, GRID, near, () => focus, anyMerges);
       expect(drain(queue)).toEqual(ordered);
     }
   });
@@ -584,15 +587,19 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
     let focus: { x: number; z: number } | null = centre([12, 6]);
     const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
     expect(queue.next()).toEqual(ordered[0]);
-    focus = centre([10, 10]);
-    expect(queue.next()).toEqual([10, 10]);
+    focus = player;
+    expect(queue.next()).toEqual([11, 11]);
   });
 
   it('hands out every cell exactly once and never mutates its input', () => {
     const snapshot = ordered.map((cell) => cell.join(','));
     let step = 0;
-    const queue = createCellBuildQueue(ordered, GRID, near, () =>
-      centre(cells[step++ % cells.length]),
+    const queue = createCellBuildQueue(
+      ordered,
+      GRID,
+      near,
+      () => centre(cells[step++ % cells.length]),
+      anyMerges,
     );
     expect(queue.remaining).toBe(cells.length);
     const out = drain(queue);
@@ -601,30 +608,58 @@ describe('chunk build queue (the order follows a player who walks in mid-build)'
     expect(ordered.map((cell) => cell.join(','))).toEqual(snapshot);
   });
 
-  it('claims the 2x2 corner before an odd cell so the far-band super-chunk still merges', () => {
+  it('claims a mergeable 2x2 block through its corner, whichever axis is odd', () => {
     // terrain.ts merges a 2x2 block only when its even/even corner is claimed
     // while all four cells are unbuilt; an odd cell first splits the block
     // into four meshes for the rest of the session.
-    const queue = createCellBuildQueue(ordered, GRID, near, () => centre([9, 9]));
-    expect(queue.next()).toEqual([8, 8]);
-    expect(queue.next()).toEqual([9, 9]);
+    const cases: Array<{ at: [number, number]; corner: [number, number] }> = [
+      { at: [9, 9], corner: [8, 8] }, // both odd
+      { at: [9, 8], corner: [8, 8] }, // x odd only
+      { at: [8, 9], corner: [8, 8] }, // z odd only
+    ];
+    for (const { at, corner } of cases) {
+      const asked: string[] = [];
+      const queue = createCellBuildQueue(
+        ordered,
+        GRID,
+        near,
+        () => centre(at),
+        (cx, cz) => {
+          asked.push(`${cx},${cz}`);
+          return true;
+        },
+      );
+      expect(queue.next()).toEqual(corner);
+      expect(asked).toEqual([corner.join(',')]);
+      expect(queue.next()).toEqual(at);
+    }
+  });
+
+  it('never detours through a corner whose block cannot merge', () => {
+    // Every band but the far one builds single chunks, so the detour would
+    // only delay the cell under the player.
+    const queue = createCellBuildQueue(
+      ordered,
+      GRID,
+      near,
+      () => player,
+      () => false,
+    );
+    expect(queue.next()).toEqual([11, 11]);
   });
 
   it('takes an odd cell directly once its corner is already gone', () => {
     let focus: { x: number; z: number } | null = null;
-    const queue = createCellBuildQueue(ordered, GRID, near, () => focus);
+    const queue = createCellBuildQueue(ordered, GRID, near, () => focus, anyMerges);
     expect(queue.next()).toEqual([6, 6]); // ordered[0]: the entry cell
     focus = centre([7, 7]);
     expect(queue.next()).toEqual([7, 7]);
   });
 
   it('falls back to the precomputed order when nothing is left near the player', () => {
-    const queue = createCellBuildQueue(ordered, GRID, CHUNK_SIZE / 4, () => centre([11, 11]));
-    expect(queue.next()).toEqual([10, 10]); // the corner of the player's block
+    const queue = createCellBuildQueue(ordered, GRID, CHUNK_SIZE / 4, () => player);
     expect(queue.next()).toEqual([11, 11]);
-    const rest = ordered.filter(
-      ([cx, cz]) => !(cx === 11 && cz === 11) && !(cx === 10 && cz === 10),
-    );
+    const rest = ordered.filter(([cx, cz]) => !(cx === 11 && cz === 11));
     expect(queue.next()).toEqual(rest[0]);
   });
 

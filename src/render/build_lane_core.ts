@@ -1,13 +1,15 @@
 // PURE (unit-tested, Three-free, DOM-free): the bounded-concurrency runner the
 // zone build uses to keep a worker pool fed.
 //
-// A zone's cells are ordered nearest-first, and that order is the whole point of
-// the ordering pass, so submission walks the list in order and never reorders
-// it. Only COMPLETION is unordered: whichever worker finishes first attaches
-// first. `limit` is the pool's worker count, so exactly as many jobs are in
-// flight as there are threads to run them; a plain sequential await would leave
-// every worker but one idle, and an unbounded fan-out would post the whole zone
-// at once and lose the nearest-first arrival order entirely.
+// Submission follows the order the caller supplies and never reorders it; the
+// zone build uses the PULL form (runBoundedPull), which asks for each next cell
+// only when a slot frees, so its order can follow a player who walks into the
+// zone mid-build (chunk_residency_core.createCellBuildQueue). runBoundedLane is
+// the same runner over a fixed list. Only COMPLETION is unordered: whichever
+// worker finishes first attaches first. `limit` is the pool's worker count, so
+// exactly as many jobs are in flight as there are threads to run them; a plain
+// sequential await would leave every worker but one idle, and an unbounded
+// fan-out would post the whole zone at once and lose the arrival order.
 //
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts).
 

@@ -273,13 +273,14 @@ export function fogFarForBuiltGround(
  * point first, nearest first, then everything else in its original row-major
  * order.
  *
- * This is the "which chunk next" seam. A player can enter a zone anywhere (a
- * returning character's logout spot, a walked boundary crossing), so row-major
- * order alone can leave them standing on not-yet-built terrain. Only the near
- * neighbourhood is reordered: the tail keeps row-major order so the far band's
- * 2x2 super-chunk merge still forms. Replacing this with a globally
- * nearest-first queue is a swap of this one function, not a change to the zone
- * lane that calls it.
+ * This is the STARTING half of the "which chunk next" seam; createCellBuildQueue
+ * below is the other half, re-picking at every claim once the player is inside
+ * the zone. A player can enter a zone anywhere (a returning character's logout
+ * spot, a walked boundary crossing), so row-major order alone can leave them
+ * standing on not-yet-built terrain. Only the near neighbourhood is reordered:
+ * the tail keeps row-major order so the far band's 2x2 super-chunk merge still
+ * forms. A globally nearest-first queue would replace these two functions, not
+ * the zone lane that calls them.
  *
  * Returns a new array; the input is not modified.
  */
@@ -330,9 +331,11 @@ export interface CellBuildQueue {
  * viewer is outside the zone, or nothing is left near them) the precomputed
  * order continues unchanged, so a prepare for a zone the player is not in (a
  * neighbour, a ferry destination behind a loading screen) behaves exactly as
- * before. The radius matches orderCellsForEntry's, and a pick always goes
- * through its 2x2 block's even/even corner first while that corner is queued,
- * so the far band's super-chunk merge still forms near the player.
+ * before. The radius matches orderCellsForEntry's. When `canMerge` says a
+ * picked cell's 2x2 block could still become one super-chunk, the pick goes
+ * through the block's even/even corner first (the only cell whose claim
+ * merges), so the far band's merge still forms near the player; everywhere
+ * else the player's own cell goes first.
  *
  * Does not mutate `ordered`.
  */
@@ -341,6 +344,9 @@ export function createCellBuildQueue(
   grid: ChunkGrid,
   nearRadius: number,
   focus: BuildFocus,
+  /** Whether the 2x2 block whose even/even corner is (cx, cz) could still be
+   *  claimed as one super-chunk. Omitted: no block ever merges. */
+  canMerge: (cx: number, cz: number) => boolean = () => false,
 ): CellBuildQueue {
   const queue: [number, number][] = ordered.map(([cx, cz]) => [cx, cz]);
   const owned = new Set(queue.map(([cx, cz]) => cz * grid.countX + cx));
@@ -374,16 +380,19 @@ export function createCellBuildQueue(
       if (i < 0) return queue.shift();
       // The terrain claims a 2x2 super-chunk only from its even/even corner
       // and only while all four cells are unbuilt, so claiming an odd cell
-      // first would split that block into four meshes for the rest of the
-      // session. Hand out the corner instead: its claim either merges (and
-      // covers the cell asked for in the same job) or builds a single, and
-      // the asked-for cell then comes on the next pick.
+      // first would split a mergeable block into four meshes for the rest of
+      // the session. Hand out the corner instead: its claim merges and covers
+      // the cell asked for in the same job. Blocks that can never merge (any
+      // band but the far one) skip the detour, so it never delays the cell
+      // under the player for nothing.
       const [cx, cz] = queue[i];
       if (cx % 2 !== 0 || cz % 2 !== 0) {
         const ex = cx - (cx % 2);
         const ez = cz - (cz % 2);
-        const corner = queue.findIndex(([qx, qz]) => qx === ex && qz === ez);
-        if (corner >= 0) i = corner;
+        if (canMerge(ex, ez)) {
+          const corner = queue.findIndex(([qx, qz]) => qx === ex && qz === ez);
+          if (corner >= 0) i = corner;
+        }
       }
       return queue.splice(i, 1)[0];
     },

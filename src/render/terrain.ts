@@ -3300,22 +3300,17 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     }
     return out;
   };
-  // One cell's claim: decides super-chunk vs single, marks every cell the
-  // resulting chunk will cover as built, and returns its geometry job (null
-  // when the cell is already owned). Synchronous on purpose, so the pipelined
-  // fast arm claims cells in exactly the order it submits them.
-  const claimCell = (zoneId: string, cx: number, cz: number): ChunkJob | null => {
-    const cell = cz * chunksX + cx;
-    if (built.has(cell)) return null;
-    const x0 = GRID_X0 + cx * CHUNK_SIZE;
-    const z0 = GRID_Z0 + cz * CHUNK_SIZE;
+  // Whether the 2x2 block whose even/even corner is (cx, cz) can still be
+  // claimed as one far-band super-chunk. claimCell builds on it, and the zone
+  // build queue asks it before detouring through a block's corner.
+  const superChunkMergeable = (zoneId: string, cx: number, cz: number): boolean => {
     const superCells = [
       [cx, cz],
       [cx + 1, cz],
       [cx, cz + 1],
       [cx + 1, cz + 1],
     ] as const;
-    const superOk =
+    return (
       cx % 2 === 0 &&
       cz % 2 === 0 &&
       cx + 1 < chunksX &&
@@ -3332,9 +3327,27 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
           // size would blow the Uint16 index budget.
           detailSpacingAt(sx0, sz0, CHUNK_SIZE, Infinity) === Infinity
         );
-      });
-    if (superOk) {
-      for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
+      })
+    );
+  };
+  // One cell's claim: decides super-chunk vs single, marks every cell the
+  // resulting chunk will cover as built, and returns its geometry job (null
+  // when the cell is already owned). Synchronous on purpose, so the pipelined
+  // fast arm claims cells in exactly the order it submits them.
+  const claimCell = (zoneId: string, cx: number, cz: number): ChunkJob | null => {
+    const cell = cz * chunksX + cx;
+    if (built.has(cell)) return null;
+    const x0 = GRID_X0 + cx * CHUNK_SIZE;
+    const z0 = GRID_Z0 + cz * CHUNK_SIZE;
+    if (superChunkMergeable(zoneId, cx, cz)) {
+      for (const [sx, sz] of [
+        [cx, cz],
+        [cx + 1, cz],
+        [cx, cz + 1],
+        [cx + 1, cz + 1],
+      ] as const) {
+        built.add(sz * chunksX + sx);
+      }
       const ring = lodRingForRect(x0, z0, CHUNK_SIZE * 2);
       return {
         x0,
@@ -3430,8 +3443,8 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     const cellsPerSlice = 4;
     const task = (async () => {
       // Build order is the "which chunk next" seam, and it lives in the pure
-      // core so a later globally nearest-first queue replaces one function
-      // instead of the zone lane around it.
+      // core: orderCellsForEntry sets the starting order and the queue below
+      // re-picks at every claim to follow the player once they are inside.
       const cells = orderCellsForEntry(
         zoneCells(zone),
         grid,
@@ -3447,7 +3460,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       const total = Math.max(1, normalSlices + cells.length);
       // Claimed one cell at a time, so the order can follow a player who walks
       // into this zone while it is still building.
-      const queue = createCellBuildQueue(cells, grid, CHUNK_SIZE * 3, currentBuildFocus);
+      const queue = createCellBuildQueue(cells, grid, CHUNK_SIZE * 3, currentBuildFocus, (ex, ez) =>
+        superChunkMergeable(zone.id, ex, ez),
+      );
       let done = 0;
       if (normalTex && normalRegions.length > 0) {
         for (const region of normalRegions) {
@@ -3482,7 +3497,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         }
       } else {
         // Gating pacing PIPELINES: one job per pool worker in flight, submitted
-        // in the nearest-first order above, attached on this thread as each one
+        // in the queue's order (pulled as each slot frees), attached on this thread as each one
         // lands (so completion order can differ from submission order, which
         // only decides which nearby chunk appears a frame sooner). Without a
         // pool, or for a cell whose worker build failed, the chunk is built

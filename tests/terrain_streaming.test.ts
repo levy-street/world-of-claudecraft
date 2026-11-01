@@ -668,7 +668,7 @@ describe('progressive terrain build', () => {
   // left the player on unbuilt ground (fog clamp at its floor, trees floating
   // over the void) for 30 to 40 s, because the cell order was fixed at start.
   for (const pace of ['idle', 'fast'] as const) {
-    it(`a ${pace}-paced build follows the player who walks in mid-build, not the stale entry point`, async () => {
+    it(`the ${pace}-paced build follows the player who walks in mid-build, not the stale entry point`, async () => {
       vi.resetModules();
       mockEmptyAssetLoads();
       const { buildTerrain, CHUNK_SIZE } = await import('../src/render/terrain');
@@ -690,18 +690,30 @@ describe('progressive terrain build', () => {
         return d(cell) > d(best) ? cell : best;
       });
       const player = centre(far);
-      // The camera is deliberately elsewhere: the build follows the player
+      // The build starts with the player at the entry, then they walk to the
+      // far cell once the first chunk has landed. The camera stays put at the
+      // entry the whole time (same position, same far, so update() takes its
+      // unchanged-visibility early return): the build must follow the player
       // focus, never the trailing third-person camera.
-      terrain.update(entry.x, entry.z, 10_000, player.x, player.z);
+      terrain.update(entry.x, entry.z, 10_000, entry.x, entry.z);
 
       // Sampled per progress tick, because one timer advance can drain a whole
       // fast-paced build.
+      let chunksWhenPlayerMoved = -1;
       let chunksWhenPlayerGroundLanded = -1;
       const task = terrain.ensureZone(
         zone,
         () => {
+          const chunks = terrain.group.children.length;
+          if (chunksWhenPlayerMoved < 0 && chunks > 0) {
+            chunksWhenPlayerMoved = chunks;
+            // One frame with nothing changed, so the next one (only the focus
+            // moved) hits update()'s unchanged-visibility early return.
+            terrain.update(entry.x, entry.z, 10_000, entry.x, entry.z);
+            terrain.update(entry.x, entry.z, 10_000, player.x, player.z);
+          }
           if (chunksWhenPlayerGroundLanded < 0 && !isPending(far[0], far[1])) {
-            chunksWhenPlayerGroundLanded = terrain.group.children.length;
+            chunksWhenPlayerGroundLanded = chunks;
           }
         },
         { pace, priority: entry },
@@ -710,11 +722,13 @@ describe('progressive terrain build', () => {
       await task;
       expect(terrain.isZoneLoaded(zone.id)).toBe(true);
       const total = terrain.group.children.length;
-      expect(total).toBeGreaterThan(4);
-      // Its own chunk, possibly behind its 2x2 block's corner: nowhere near the
-      // whole zone the fixed order made it wait for.
-      expect(chunksWhenPlayerGroundLanded).toBeGreaterThan(0);
-      expect(chunksWhenPlayerGroundLanded).toBeLessThanOrEqual(2);
+      expect(total).toBeGreaterThan(6);
+      // The player's ground was still owed when they moved (the fixed order
+      // builds it last), then arrived within a couple of chunks of the move:
+      // nowhere near the whole zone the fixed order made it wait for.
+      expect(chunksWhenPlayerMoved).toBeGreaterThan(0);
+      expect(chunksWhenPlayerGroundLanded).toBeGreaterThan(chunksWhenPlayerMoved);
+      expect(chunksWhenPlayerGroundLanded).toBeLessThanOrEqual(chunksWhenPlayerMoved + 2);
     });
   }
 

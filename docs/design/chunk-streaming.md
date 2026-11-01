@@ -198,8 +198,11 @@ nothing (`INSTANCE_X_BASE` is 99,400).
 
 **New module: `src/render/chunk_residency_core.ts`** (Three-free pure core,
 registered in `RENDER_PURE_CORES`). Owns the chunk lattice type, the
-nearest-unbuilt-ground query, the fog clamp, and `orderCellsForEntry` (the
-"which chunk next" seam, moved out of `terrain.ts`'s `ensureZone`).
+nearest-unbuilt-ground query, the fog clamp, and the "which chunk next" seam
+(moved out of `terrain.ts`'s `ensureZone`): `orderCellsForEntry` sets a zone's
+starting order around its entry point, and `createCellBuildQueue` re-picks at
+every claim, building the cells nearest the player first once they are inside
+the zone, so a walked crossing mid-build never waits behind the rest of the zone.
 
 **The clamp query is an exact bounded outward ring walk**, per the ORDER MATTERS
 note above: no frontier-radius cache, no assumption about the built set's shape.
