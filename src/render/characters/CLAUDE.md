@@ -321,11 +321,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 - Form adornments: `form_adornments.ts`, the per-rig owner `CharacterVisual`
   holds and drives from the `setMoonkin` edge the renderer already sends, over
   the pure `form_adornment_core.ts` (what a rig wears, the pose math) and its
-  painter, `moonwing_adornment.ts` (antlers, crescent, wings), with its canvas
+  painter, `moonwing_adornment.ts` (antlers, crescent; no wings), with its canvas
   art in `form_adornment_textures.ts` and the shared marker and glow recipe in
   `rig_fx.ts`. Moonwing is the only form that wears one: Gloamveil's face veil
   was sized for one head and is gone (see the Gloamveil entry above). Pieces
-  ride the rig's `head`/`chest` bones, carry the
+  ride the rig's `head` bone, carry the
   `weaponVfxMesh` marker so no overlay swap, spirit veil or caster sweep
   touches them, hide under a ghost or stealth body, and their shared kits are
   prewarmed through `ABILITY_MATERIAL_SOURCES`; a rig's first mount of a set

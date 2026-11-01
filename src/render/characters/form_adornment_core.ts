@@ -2,8 +2,8 @@
 // on the body it keeps. Moonwing Form (the druid's `form_moonkin`) does NOT
 // swap to a creature rig; it only tints the base body, so on its own it reads
 // as a recolour. The adornments give it a silhouette of its own: the classic
-// druid antlers grown back, a crescent between them and a pair of moonlit
-// wings.
+// druid antlers grown back and a crescent between them. (It used to grow a
+// pair of moonlit wings on the back too; they were cut.)
 //
 // Gloamveil (the Shadow priest's `form_shadow`), the other form that keeps its
 // body, wears NO adornment: its look is a shader layer on the body itself plus
@@ -22,7 +22,7 @@ export type AdornmentBody = 'composed' | 'classRig' | 'replacement';
 
 /** Which adornment pieces a character rig wears this frame. */
 export interface FormAdornmentPlan {
-  /** Crescent and wings: every Moonwing rig (they float clear of any head). */
+  /** Crescent: every Moonwing rig (it floats clear of any head). */
   moonwing: boolean;
   /** Antlers: only a composed body. The legacy class rig (`player_druid`,
    *  druid.glb) already wears its antlered hood, and a replacement body has no
@@ -41,12 +41,6 @@ export function formAdornmentPlan(moonkin: boolean, body: AdornmentBody): FormAd
 
 /** The per-frame Moonwing pose, in the painter's own units. */
 export interface MoonwingPose {
-  /** 0 folded against the back, 1 fully unfurled. Eases in on the shift. */
-  unfurl: number;
-  /** Slow wingbeat, radians added to the spread. */
-  beat: number;
-  /** Radians the wings sweep back while moving (negative opens them). */
-  sweep: number;
   /** Crescent bob above its rest height, rig units. */
   crescentLift: number;
   /** Crescent sway, radians about the facing axis. */
@@ -54,40 +48,24 @@ export interface MoonwingPose {
 }
 
 export function createMoonwingPose(): MoonwingPose {
-  return { unfurl: 0, beat: 0, sweep: 0, crescentLift: 0, crescentSway: 0 };
-}
-
-/** Seconds the wings take to unfurl after the shift. */
-export const MOONWING_UNFURL_SECONDS = 0.45;
-
-function smoothstep(value: number): number {
-  const t = Math.max(0, Math.min(1, value));
-  return t * t * (3 - 2 * t);
+  return { crescentLift: 0, crescentSway: 0 };
 }
 
 /**
- * The Moonwing pose at `elapsed` seconds into the form. Moving sweeps the wings
- * back; casting opens them. Reduced motion holds the fully unfurled rest pose
- * (no unfurl ease, no beat, no bob), so the form still reads at once.
+ * The Moonwing pose at `elapsed` seconds into the form: the crescent's slow
+ * bob and sway. Reduced motion holds it still at rest.
  */
 export function moonwingPoseInto(
   elapsed: number,
-  moving: boolean,
-  casting: boolean,
   reducedMotion: boolean,
   out: MoonwingPose,
 ): MoonwingPose {
   if (reducedMotion) {
-    out.unfurl = 1;
-    out.beat = 0;
     out.crescentLift = 0;
     out.crescentSway = 0;
   } else {
-    out.unfurl = smoothstep(elapsed / MOONWING_UNFURL_SECONDS);
-    out.beat = Math.sin(elapsed * 1.7) * 0.07;
     out.crescentLift = Math.sin(elapsed * 1.1) * 0.035;
     out.crescentSway = Math.sin(elapsed * 0.7) * 0.06;
   }
-  out.sweep = casting ? -0.14 : moving ? 0.22 : 0;
   return out;
 }

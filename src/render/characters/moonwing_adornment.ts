@@ -1,9 +1,10 @@
 // Moonwing Form's adornments, the THREE half of form_adornment_core.ts: the
 // classic druid antlers (the antlered hood druid.glb always wore, which the
-// composed body has no piece for), a crescent moon between them, and a pair of
-// moonlit feather wings on the back.
+// composed body has no piece for) and a crescent moon between them. No wings:
+// the form used to grow a pair of glowing feather wings on the back, cut so
+// the silhouette reads as the druid, not a fairy.
 //
-// Everything is parented to the rig's own bones (`head`, `chest`), so it rides
+// Everything is parented to the rig's own `head` bone, so it rides
 // every clip, mount seat and far-LOD hide the body does with no plumbing of its
 // own. Geometry and materials are module-level kits shared by every Moonwing on
 // screen and never disposed (the halo.ts doctrine); a rig only adds and removes
@@ -15,20 +16,17 @@
 // instead of linking in a live frame.
 //
 // Units are raw KayKit bone space (the halo's). Placement was measured against
-// the modular head (x +-0.45, crown ~0.81, hair to ~1.04, face at +z) and the
-// druid kit's back piece (chest space z down to -0.61), then tuned by capture
+// the modular head (x +-0.45, crown ~0.81, hair to ~1.04, face at +z), then
+// tuned by capture
 // (scripts/form_adornment_shot.mjs).
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { surfaceMat } from '../gfx';
 import { markSharedGeometry } from '../shared_resource';
 import type { MoonwingPose } from './form_adornment_core';
-import { crescentTexture, wingTexture } from './form_adornment_textures';
+import { crescentTexture } from './form_adornment_textures';
 import { markRigFx, rigGlowMaterial, tagStandInForTextureUpload } from './rig_fx';
 
-/** Moonlit violet on the wings, a shade under the moonkin_form cast VFX
- *  colour so the additive layer reads violet over the tinted body. */
-const WING_COLOR = 0xa47cf0;
 /** Warm moonlight on the crescent: the moonkin star motes' pale gold. */
 const CRESCENT_COLOR = 0xfff2c0;
 /** Bone antlers, with a faint violet moonglow so they belong to the form. */
@@ -40,13 +38,6 @@ const WRAP_COLOR = 0x6e4a2c;
 
 /** Crescent rest point between the antlers, head-bone space. */
 export const CRESCENT_REST = { y: 1.24, z: -0.05, size: 0.4 } as const;
-/** Wing root on the back, chest-bone space (x mirrors per side). */
-export const WING_ROOT = { x: 0.14, y: 0.12, z: -0.62 } as const;
-/** Wing swing about the spine, radians: folded along the back vs unfurled. */
-const WING_FOLDED = 1.25;
-const WING_OPEN = 0.42;
-/** Resting lift of the wingtips, radians. */
-const WING_LIFT = 0.1;
 
 type Point = readonly [x: number, y: number, z: number, radius: number];
 
@@ -78,11 +69,6 @@ const ANTLER_TINES: readonly (readonly Point[])[] = [
 /** The wrap band: where on the beam's first segment it sits (just where the
  *  antler leaves the skull), and its size. */
 const WRAP = { t: 0.82, radius: 0.084, length: 0.08 } as const;
-
-/** One wing's plane, chest-bone units. The wing texture puts its root at
- *  WING_TEXTURE_ROOT (uv), which the geometry moves onto the pivot. */
-const WING_SIZE = { width: 1.2, height: 1.08 } as const;
-const WING_TEXTURE_ROOT = 0.06;
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -161,33 +147,17 @@ function buildWraps(): THREE.BufferGeometry {
   return mergedOrThrow(parts, 'wrap');
 }
 
-/** One wing (side +1 = right), in its own pivot space: a single plane lying
- *  in the XY plane, its textured root on the origin and the wing reaching out
- *  and up. The left wing is the right one mirrored (double-sided material). */
-function buildWing(side: 1 | -1): THREE.BufferGeometry {
-  const { width, height } = WING_SIZE;
-  const geo = new THREE.PlaneGeometry(width, height);
-  geo.translate(width * (0.5 - WING_TEXTURE_ROOT), height * (0.5 - WING_TEXTURE_ROOT), 0);
-  if (side < 0) geo.scale(-1, 1, 1);
-  geo.computeBoundingSphere();
-  return geo;
-}
-
 interface MoonwingKit {
-  wing: THREE.MeshBasicMaterial;
   crescent: THREE.MeshBasicMaterial;
   antlerGeometry: THREE.BufferGeometry;
   wrapGeometry: THREE.BufferGeometry;
   crescentGeometry: THREE.PlaneGeometry;
-  leftWingGeometry: THREE.BufferGeometry;
-  rightWingGeometry: THREE.BufferGeometry;
 }
 
 let kit: MoonwingKit | null = null;
 
 function moonwingKit(): MoonwingKit {
   kit ??= {
-    wing: rigGlowMaterial('moonwing_adornment:wing-glow', wingTexture(), WING_COLOR),
     crescent: rigGlowMaterial(
       'moonwing_adornment:crescent-glow',
       crescentTexture(),
@@ -198,8 +168,6 @@ function moonwingKit(): MoonwingKit {
     crescentGeometry: markSharedGeometry(
       new THREE.PlaneGeometry(CRESCENT_REST.size, CRESCENT_REST.size),
     ),
-    leftWingGeometry: markSharedGeometry(buildWing(-1)),
-    rightWingGeometry: markSharedGeometry(buildWing(1)),
   };
   return kit;
 }
@@ -220,9 +188,9 @@ function antlerMaterials(): { bone: THREE.Material; wrap: THREE.Material } {
 
 /** Every material a Moonwing rig can draw, for the prewarm registration. */
 export function moonwingMaterials(): THREE.Material[] {
-  const { wing, crescent } = moonwingKit();
+  const { crescent } = moonwingKit();
   const { bone, wrap } = antlerMaterials();
-  return [wing, crescent, bone, wrap];
+  return [crescent, bone, wrap];
 }
 
 function mesh(
@@ -241,14 +209,12 @@ function mesh(
 export class MoonwingAdornment {
   readonly head: THREE.Group | null = null;
   readonly crescent: THREE.Mesh | null = null;
-  readonly leftWing: THREE.Group | null = null;
-  readonly rightWing: THREE.Group | null = null;
   /** Every group this set parented into the rig (form_adornments.ts holds
    *  them hidden until their programs link, and hides them under a ghost). */
   readonly roots: readonly THREE.Object3D[];
 
-  /** `model` is the rig subtree holding the `head` and `chest` bones; a rig
-   *  missing one simply goes without those pieces. */
+  /** `model` is the rig subtree holding the `head` bone; a rig missing it
+   *  simply goes without the pieces. */
   constructor(model: THREE.Object3D, antlers: boolean) {
     const k = moonwingKit();
     const headBone = model.getObjectByName('head');
@@ -267,36 +233,11 @@ export class MoonwingAdornment {
       this.head = head;
       this.crescent = crescent;
     }
-    const chestBone = model.getObjectByName('chest');
-    if (chestBone) {
-      this.leftWing = this.attachWing(chestBone, -1, k.leftWingGeometry, k.wing);
-      this.rightWing = this.attachWing(chestBone, 1, k.rightWingGeometry, k.wing);
-    }
-    this.roots = [this.head, this.leftWing, this.rightWing].filter(
-      (root): root is THREE.Group => root !== null,
-    );
-  }
-
-  private attachWing(
-    chest: THREE.Object3D,
-    side: 1 | -1,
-    geometry: THREE.BufferGeometry,
-    material: THREE.Material,
-  ): THREE.Group {
-    const pivot = markRigFx(new THREE.Group());
-    pivot.name = side > 0 ? 'moonwing_wing_right' : 'moonwing_wing_left';
-    pivot.position.set(WING_ROOT.x * side, WING_ROOT.y, WING_ROOT.z);
-    pivot.add(mesh(geometry, material, `${pivot.name}_feathers`, 1));
-    chest.add(pivot);
-    return pivot;
+    this.roots = this.head ? [this.head] : [];
   }
 
   /** Pose the pieces for this frame (form_adornment_core.moonwingPoseInto). */
   apply(pose: MoonwingPose): void {
-    const swing = WING_FOLDED + (WING_OPEN - WING_FOLDED) * pose.unfurl + pose.sweep;
-    const lift = (WING_LIFT + pose.beat) * pose.unfurl;
-    this.rightWing?.rotation.set(0, swing, lift);
-    this.leftWing?.rotation.set(0, -swing, -lift);
     if (this.crescent) {
       this.crescent.position.y = CRESCENT_REST.y + pose.crescentLift;
       this.crescent.rotation.z = 0.35 + pose.crescentSway;
@@ -309,7 +250,7 @@ export class MoonwingAdornment {
   }
 }
 
-/** The hidden prewarm stand-in: a bare `head` + `chest` pair wearing the full
+/** The hidden prewarm stand-in: a bare `head` bone wearing the full
  *  set (antlers included), so the compile lane links every program a live
  *  Moonwing draws. Its meshes carry the `vfx` render category, which is what
  *  the ability-primitives manifest entry walks to upload textures, so the
@@ -317,19 +258,10 @@ export class MoonwingAdornment {
  *  the character's category). */
 export function buildMoonwingStandIn(): THREE.Group {
   const root = new THREE.Group();
-  const chest = new THREE.Group();
-  chest.name = 'chest';
   const head = new THREE.Group();
   head.name = 'head';
-  chest.add(head);
-  root.add(chest);
-  new MoonwingAdornment(root, true).apply({
-    unfurl: 1,
-    beat: 0,
-    sweep: 0,
-    crescentLift: 0,
-    crescentSway: 0,
-  });
+  root.add(head);
+  new MoonwingAdornment(root, true).apply({ crescentLift: 0, crescentSway: 0 });
   tagStandInForTextureUpload(root);
   return root;
 }

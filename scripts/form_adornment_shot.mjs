@@ -1,5 +1,5 @@
 // Before/after capture for the shapeshift forms that keep their body
-// (Moonwing Form's antlers, crescent and wings; Gloamveil's look on the body
+// (Moonwing Form's antlers and crescent; Gloamveil's look on the body
 // and the floor, whose fuller rig is scripts/gloamveil_look_shot.mjs). Needs a Vite dev
 // client (offline world only, no server):
 //
