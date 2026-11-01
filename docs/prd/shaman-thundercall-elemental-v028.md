@@ -193,7 +193,7 @@ to play next to the other damage specs.
 | Arc Overload (`lightning_overload`, passive, level 10) | TBC Lightning Overload 5/5 | Arc Bolt and Skybranch hits that deal damage have a 20 percent chance to strike their first target again for 50 percent of that hit's damage and grant 1 Thunder. |
 | Lightning Mastery (spec baseline) | Classic Lightning Mastery 5/5 | Arc Bolt and Skybranch cast one third faster (rank-4 Arc Bolt 3.0 to 2.0 sec before haste). |
 | Magma Burst (`lava_burst`, level 12, rank 2 at 20) | Wrath Lava Burst | 2.0 sec cast, 8 sec cooldown, Fire. Always crits a target carrying the caster's own Cinder Jolt. Grants no Thunder. |
-| Magma Surge | Cataclysm Lava Surge | Each Cinder Jolt tick that deals damage has a 20 percent chance to reset Magma Burst and make the next one instant (10 sec window, action-bar glow). No roll while Magma Burst is being hard-cast. |
+| Magma Surge | Cataclysm Lava Surge | Each Cinder Jolt tick that deals damage has a 20 percent chance to reset Magma Burst and make the next one instant (12 sec window, action-bar glow). A tick during a Magma Burst hard cast rolls too; a surge gained mid-cast also clears the cooldown that cast arms on completion, so the instant Magma Burst can follow back to back. |
 | Stormbreak (`thunderstorm`, level 16) | Wrath Thunderstorm | Instant, 45 sec cooldown: Nature damage and a 50 percent slow for 5 sec within 10 yards, and 8 percent of maximum Mana back. The knockback is not modelled (no mob displacement primitive). |
 | Offensive spec bonus | tuning | `spec_output_tuning.ts` elemental spell bonus 0.13 to 0.05, paying for the above. |
 
