@@ -85,6 +85,7 @@ function liveWindupHarness() {
     fragments: noopUpdate,
     spiritHammers: { beginFrame: vi.fn(), endFrame: vi.fn() },
     ribbons: { update: vi.fn(), drawHeads: vi.fn() },
+    leaders: { advance: vi.fn(), draw: vi.fn(), clear: vi.fn() },
     rings: noopUpdate,
     flipbooks: noopUpdate,
     decals: { update: vi.fn(), setCameraPosition: vi.fn() },
