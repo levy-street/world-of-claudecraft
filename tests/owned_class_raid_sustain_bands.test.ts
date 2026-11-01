@@ -84,8 +84,10 @@ describe('owned-class raid-level balance harness (sustain bands)', () => {
       // measured on the integrated tree solo; in a lane at workers=2 it shared
       // the runner with the level-20 harness marathon and run 31288946173
       // killed it at 600s. Diet: 1 scenario x 3 specs x 2 seeds, ~56s measured
-      // local.
+      // local. Release shard 3 in run 41264341198 completed the same diet
+      // workload in 256.471s under contention, beyond the old 240s timeout.
+      // Allow 300s without changing seeds, fight windows, or balance bands.
     },
-    FULL_SWEEP ? 1_800_000 : 240_000,
+    FULL_SWEEP ? 1_800_000 : 300_000,
   );
 });
