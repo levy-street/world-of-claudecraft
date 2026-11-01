@@ -6,8 +6,12 @@ function worldStub(overrides: Partial<Record<string, unknown>> = {}): IWorld {
   return {
     // A legacy bag stack is deliberately present: the tab must read the
     // currency balance, never count the bags.
-    inventory: [{ itemId: 'heroic_mark', count: 7 }],
+    inventory: [
+      { itemId: 'heroic_mark', count: 7 },
+      { itemId: 'lantern_seal', count: 99 },
+    ],
     heroicMarks: 12,
+    guildContracts: { week: '', offered: [], done: [], lifetime: 0, seals: 31 },
     honor: 340,
     lifetimeHonor: 1_200,
     delveMarks: 5,
@@ -21,6 +25,12 @@ describe('currencies tab html', () => {
     expect(html).toContain('class="char-cur-row is-heroic_mark"');
     expect(html).toContain('Heroic Mark');
     expect(html).toContain('>12<');
+    // Lantern Seals: the guild's currency balance (never the legacy bag stack of 99)
+    expect(html).toContain('class="char-cur-row is-lantern_seal"');
+    expect(html).toContain('Lantern Seal');
+    expect(html).toContain('currency-lantern-seal');
+    expect(html).toContain('>31<');
+    expect(html).not.toContain('>99<');
     expect(html).toContain('class="char-cur-row is-honor"');
     expect(html).toContain('>340<');
     expect(html).toContain('Lifetime 1,200');

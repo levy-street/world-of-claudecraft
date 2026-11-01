@@ -11,7 +11,7 @@
 //
 // Server-authoritative like the Heroic Quartermaster (instances/heroic_vendor.ts): the client
 // only sends intent; everything re-validates here. Synchronous rewards land before seals
-// leave the bags. Online account rewards reserve seals in the host's save FIFO and commit
+// leave the balance (a currency counter, lantern_seals.ts). Online account rewards reserve seals in the host's save FIFO and commit
 // the character charge and account grant together before publishing success.
 // Refusals are structured events (the client owns every visible string). Draws no rng.
 
@@ -19,7 +19,6 @@ import { DEEDS } from './content/deeds';
 import {
   GUILD_QUARTERMASTER_STOCK_BY_ID,
   type GuildQuartermasterOffer,
-  LANTERN_SEAL_ITEM_ID,
 } from './content/guild_contracts';
 import {
   GUILD_QUARTERMASTER_NPC_ID,
@@ -29,6 +28,7 @@ import {
 import { WEAPON_SKINS } from './content/weapon_skins';
 import { ITEMS } from './data';
 import { grantDeed } from './deeds';
+import { sanitizeLanternSeals, spendLanternSeals } from './lantern_seals';
 import { mountOwned } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -132,7 +132,7 @@ export function buyGuildCosmetic(
     refuse('owned');
     return;
   }
-  if (ctx.countItem(LANTERN_SEAL_ITEM_ID, meta.entityId) < offer.seals) {
+  if (sanitizeLanternSeals(meta.lanternSeals) < offer.seals) {
     refuse('seals');
     return;
   }
@@ -152,7 +152,8 @@ export function buyGuildCosmetic(
     return;
   }
   if (!grantOffer(ctx, meta, offer, account)) return;
-  ctx.removeItem(LANTERN_SEAL_ITEM_ID, offer.seals, meta.entityId);
+  // the balance rides the heavy `gcon` key: a spend must mark the self record dirty
+  if (spendLanternSeals(meta, offer.seals)) meta.wireRev++;
   ctx.emit({ type: 'guildCosmeticBought', offerId, pid: meta.entityId });
 }
 
@@ -175,8 +176,9 @@ export function reserveGuildWeaponSkin(
       return false;
     },
   });
-  if (!valid) return null;
-  ctx.removeItem(LANTERN_SEAL_ITEM_ID, offer.seals, pid);
+  const meta = ctx.players.get(pid);
+  if (!valid || !meta || !spendLanternSeals(meta, offer.seals)) return null;
+  meta.wireRev++;
   return offer;
 }
 

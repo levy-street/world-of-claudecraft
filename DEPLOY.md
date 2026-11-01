@@ -277,6 +277,14 @@ For off-box safety, sync the directory to S3 occasionally:
   Keep the fleet stopped until validation succeeds, then start only the chosen
   version everywhere. Never leave both the scalar and re-injected units: the next
   roll forward would fold them twice. Merely restarting the old binary is unsupported.
+- **Lantern Seals currency rollback (mixed fleet)**: the same shape as Heroic Marks above.
+  From the release that made Lantern Seals a currency, the balance rides
+  `characters.state.lanternSeals` and a character's first load folds its old
+  `lantern_seal` bag and bank stacks into it (`src/sim/lantern_seals.ts`). A binary that
+  predates it autosaves the blob WITHOUT `lanternSeals` and erases that character's
+  balance, so roll it out to EVERY realm process in one deploy pass. Rolling back past it
+  follows the Heroic Marks procedure above with `lanternSeals` and `lantern_seal` (stack
+  size 100) in place of `heroicMarks` and `heroic_mark`.
 - **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
   `characters.state`, which is written whole, so a server binary that predates the
   farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases

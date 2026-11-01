@@ -69,7 +69,7 @@ function fakeBoss(templateId: string): Entity {
 
 function seals(s: Sim): number {
   const pid = s.player.id;
-  return s.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid);
+  return s.ctx.players.get(pid)?.lanternSeals ?? 0;
 }
 
 describe("the week's board", () => {
@@ -201,7 +201,7 @@ describe('contract credit', () => {
       grant,
     );
     expect(t.guildContracts.done).toContain('gc_task_dgn_vael_thralls');
-    expect(t.ctx.countItem(LANTERN_SEAL_ITEM_ID, t.player.id)).toBe(3);
+    expect(t.ctx.players.get(t.player.id)?.lanternSeals ?? 0).toBe(3);
   });
 
   it('draws no randomness: no rng draw rides a payment', () => {
@@ -303,11 +303,11 @@ describe('the quartermaster', () => {
     const events = s.tick();
     expect(events.some((e: SimEvent) => e.type === 'guildCosmeticBought')).toBe(true);
     expect(meta.deedsEarned.has(offer.deedId)).toBe(true);
-    expect(s.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid)).toBe(1);
+    expect(s.ctx.players.get(pid)?.lanternSeals ?? 0).toBe(1);
     s.ctx.addItem(LANTERN_SEAL_ITEM_ID, offer.seals, pid);
     s.buyGuildCosmetic(offer.id);
     expect(reasons()).toEqual(['owned']);
-    expect(s.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid)).toBe(offer.seals + 1);
+    expect(s.ctx.players.get(pid)?.lanternSeals ?? 0).toBe(offer.seals + 1);
   });
 });
 
@@ -424,7 +424,7 @@ describe('the contracts across weeks, milestones and the save', () => {
       done: ['gc_boss_morthen'],
       lifetime: 1,
     });
-    expect(t.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid)).toBe(1);
+    expect(t.ctx.players.get(pid)?.lanternSeals ?? 0).toBe(1);
     const old = { ...state };
     delete old.worldQuests;
     const oldPid = t.addPlayer('warrior', 'Old', { state: old });
@@ -473,7 +473,7 @@ describe('the quartermaster at the edges', () => {
     s.player.dead = true;
     s.buyGuildCosmetic(offer.id);
     expect(guildEvents()).toEqual([]);
-    expect(s.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid)).toBe(offer.seals);
+    expect(s.ctx.players.get(pid)?.lanternSeals ?? 0).toBe(offer.seals);
     expect(meta.deedsEarned.has(offer.deedId)).toBe(false);
   });
 });

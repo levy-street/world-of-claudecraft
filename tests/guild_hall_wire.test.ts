@@ -52,7 +52,13 @@ describe('the ClientWorld mirror of the board', () => {
   it('decodes gcon when present, keeps the mirror when absent, and clears on reset', () => {
     const client = bareClient(7);
     const offered = guildContractsForWeek('wk_5').map((c) => c.id);
-    expect(client.guildContracts).toEqual({ week: '', offered: [], done: [], lifetime: 0 });
+    expect(client.guildContracts).toEqual({
+      week: '',
+      offered: [],
+      done: [],
+      lifetime: 0,
+      seals: 0,
+    });
     client.applyQuestSelfSnapshot({
       gcon: { week: 'wk_5', offered, done: [offered[2]], lifetime: 3 },
     } as never);
@@ -61,23 +67,49 @@ describe('the ClientWorld mirror of the board', () => {
       offered,
       done: [offered[2]],
       lifetime: 3,
+      seals: 0,
     });
     // a delta without the key leaves the mirror as it was
     client.applyQuestSelfSnapshot({} as never);
     expect(client.guildContracts.done).toEqual([offered[2]]);
     // a malformed record is the empty board, never a half-read one
     client.applyQuestSelfSnapshot({ gcon: 'nope' } as never);
-    expect(client.guildContracts).toEqual({ week: '', offered: [], done: [], lifetime: 0 });
+    expect(client.guildContracts).toEqual({
+      week: '',
+      offered: [],
+      done: [],
+      lifetime: 0,
+      seals: 0,
+    });
     client.applyQuestSelfSnapshot({
       gcon: { week: 7, offered, done: [], lifetime: 'many' },
     } as never);
-    expect(client.guildContracts).toEqual({ week: '', offered, done: [], lifetime: 0 });
+    expect(client.guildContracts).toEqual({ week: '', offered, done: [], lifetime: 0, seals: 0 });
     client.applyQuestSelfSnapshot({
       gcon: { week: 'wk_5', offered, done: [], lifetime: 1 },
     } as never);
     expect(client.guildContracts.lifetime).toBe(1);
+    // a seals move reports a change so balance-priced windows repaint; a same-balance
+    // board does not
+    expect(
+      client.applyQuestSelfSnapshot({
+        gcon: { week: 'wk_5', offered, done: [], lifetime: 1, seals: 9 },
+      } as never),
+    ).toBe(true);
+    expect(client.guildContracts.seals).toBe(9);
+    expect(
+      client.applyQuestSelfSnapshot({
+        gcon: { week: 'wk_5', offered, done: [offered[0]], lifetime: 2, seals: 9 },
+      } as never),
+    ).toBe(false);
     // a reconnect clears it
     client.resetQuestWorldWireState();
-    expect(client.guildContracts).toEqual({ week: '', offered: [], done: [], lifetime: 0 });
+    expect(client.guildContracts).toEqual({
+      week: '',
+      offered: [],
+      done: [],
+      lifetime: 0,
+      seals: 0,
+    });
   });
 });

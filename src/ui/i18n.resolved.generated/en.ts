@@ -851,7 +851,7 @@ export const en: EnTranslations = {
       "seals": "Lantern Seals: {count}",
       "resetIn": "New contracts in {time}",
       "resetSoon": "New contracts at the next weekly reset",
-      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals are paid straight to you, once each week.",
       "kinds": {
         "boss": "Bounty",
         "heroic": "Heroic Clear",
@@ -900,7 +900,7 @@ export const en: EnTranslations = {
         "cardProgress": "{done}/{total} this week",
         "rewardLine": "Reward: {reward}",
         "stamp": "Sealed",
-        "sealsTip": "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are bound to you."
+        "sealsTip": "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are a currency bound to you and take no bag space."
       },
       "shop": {
         "stockLabel": "Garrick Holt's stock",
@@ -3613,6 +3613,7 @@ export const en: EnTranslations = {
       "delveMark": "Delve Mark",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
+      "lanternSealNote": "Lantern Hall's weekly contracts . spend at the guild quartermaster",
       "honorNote": "Battlegrounds, the arena, and world quests",
       "delveMarkNote": "Delves completed",
       "wocTokenNote": "Linked wallet balance",

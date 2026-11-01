@@ -4,10 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PaidGuildCreateDeps } from '../server/guild_create_db';
 import type { GuildWeaponPurchaseSave } from '../server/guild_weapon_purchase_db';
 import type { CharacterState } from '../src/sim/character_state';
-import {
-  LANTERN_HALL_SWORD_SKIN_ID,
-  LANTERN_SEAL_ITEM_ID,
-} from '../src/sim/content/guild_contracts';
+import { LANTERN_HALL_SWORD_SKIN_ID } from '../src/sim/content/guild_contracts';
 
 const url = process.env.TEST_DATABASE_URL;
 const schema = 'guild_weapon_purchase_verify';
@@ -27,7 +24,8 @@ d('guild weapon atomic purchase on PostgreSQL', () => {
       pos: { x: 1, z: 2 },
       facing: 0,
       equipment: {},
-      inventory: [{ itemId: LANTERN_SEAL_ITEM_ID, count: seals }],
+      inventory: [],
+      lanternSeals: seals,
       questLog: [],
       questsDone: [],
     }) as CharacterState;
@@ -45,12 +43,8 @@ d('guild weapon atomic purchase on PostgreSQL', () => {
     purchase(args(id), signal, deps());
   const balance = async (id = 41) =>
     Number(
-      (
-        await pool.query(
-          "SELECT state->'inventory'->0->>'count' AS seals FROM characters WHERE id=$1",
-          [id],
-        )
-      ).rows[0].seals,
+      (await pool.query("SELECT state->>'lanternSeals' AS seals FROM characters WHERE id=$1", [id]))
+        .rows[0].seals,
     );
   const skins = async () =>
     (await pool.query('SELECT skin_ids FROM account_weapon_cosmetics WHERE account_id=7')).rows[0]

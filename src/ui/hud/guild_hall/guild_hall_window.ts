@@ -111,7 +111,7 @@ export class GuildHallWindow {
   // on its minute cadence below, so it stays out of it.
   private sig(): string {
     const world = this.deps.world();
-    const seals = lanternSeals(world.inventory);
+    const seals = lanternSeals(world.guildContracts);
     const owned = guildShopOwnedFlags(guildShopInput(world, seals));
     return JSON.stringify([
       world.guildContracts,
@@ -406,7 +406,10 @@ export class GuildHallWindow {
   /** A stock card's hover card, through the shared tooltip's classes. */
   private offerTipHtml(offerId: string): string {
     const world = this.deps.world();
-    const tip = guildShopTooltip(offerId, guildShopInput(world, lanternSeals(world.inventory)));
+    const tip = guildShopTooltip(
+      offerId,
+      guildShopInput(world, lanternSeals(world.guildContracts)),
+    );
     if (!tip) return '';
     return (
       `<div class="tt-title">${esc(tip.title)}</div>` +

@@ -5,7 +5,7 @@ import { isAutoEquipGearKind, maybeAutoEquip } from '../auto_equip';
 import type { TreasureMapRarity } from '../content/treasure_maps';
 import { ITEMS } from '../data';
 import { grantEarnedHeroicMarks } from '../earned_heroic_marks';
-import { assertHeroicMarksGrantsFit, isCurrencyGrantId } from '../heroic_marks';
+import { assertHeroicMarksGrantsFit, isHeroicMarkGrantId } from '../heroic_marks';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, type InvSlot } from '../types';
 import { hoardRewardGrantItems } from './hoard_reward_items';
@@ -32,7 +32,7 @@ export function grantHoardReward(
   assertHeroicMarksGrantsFit(reservedAtClear ? meta : { heroicMarks: 0 }, reward.items);
   const grants = preparedItems ?? hoardRewardGrantItems(reward.items);
   for (const item of grants) {
-    if (isCurrencyGrantId(item.itemId)) {
+    if (isHeroicMarkGrantId(item.itemId)) {
       if (reservedAtClear) ctx.addItem(item.itemId, item.count, pid);
       else grantEarnedHeroicMarks(ctx, pid, item.count);
     } else {

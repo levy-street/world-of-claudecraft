@@ -3613,6 +3613,7 @@ export const zh_CN: EnTranslations = {
       "delveMark": "探险印记",
       "wocToken": "WoC 代币",
       "heroicMarkNote": "英雄地下城 . 在英雄军需官处兑换",
+      "lanternSealNote": "灯火大厅每周契约 . 在公会军需官处兑换",
       "honorNote": "战场、竞技场与世界任务",
       "delveMarkNote": "已完成的探险",
       "wocTokenNote": "已关联钱包的余额",

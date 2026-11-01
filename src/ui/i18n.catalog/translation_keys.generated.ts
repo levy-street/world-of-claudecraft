@@ -14234,6 +14234,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.currencies.honor'
   | 'hudChrome.currencies.honorNote'
   | 'hudChrome.currencies.intro'
+  | 'hudChrome.currencies.lanternSealNote'
   | 'hudChrome.currencies.lifetime'
   | 'hudChrome.currencies.riftWatchMark'
   | 'hudChrome.currencies.riftWatchMarkNote'

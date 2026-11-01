@@ -1,8 +1,8 @@
 // Shared inventory mutation for the instance-grant hub. Source-aware items use exact
 // source-aware packing; other items retain their existing per-copy semantics.
 import { addStacked, stackSizeOf } from './bags';
+import { creditCurrencyGrant, isCurrencyGrantId } from './currency_grants';
 import { ITEMS } from './data';
-import { creditHeroicMarks, isCurrencyGrantId } from './heroic_marks';
 import { canStackInstancePayloads } from './item_instance_merge';
 import type { MaterialComposition } from './material_sources';
 import { isStackProvenanceItemId } from './stack_provenance_ids';
@@ -30,17 +30,17 @@ export interface InventoryGrantOptions {
 }
 
 /** The plain (payload-free) grant mutation behind Sim.addItem: stack the copies
- *  into the bags, or, for a currency id (Heroic Marks), credit its counter and
+ *  into the bags, or, for a currency id (Heroic Marks, Lantern Seals), credit its counter and
  *  touch no slot. The hub's receipt, discovery and Reliquary bookkeeping run
  *  the same either way, so a marks grant reads exactly as it did as an item. */
 export function grantPlainStack(
-  meta: { inventory: InvSlot[]; heroicMarks: number },
+  meta: { inventory: InvSlot[]; heroicMarks: number; lanternSeals?: number },
   itemId: string,
   count: number,
   opts?: InventoryGrantOptions,
 ): void {
   if (isCurrencyGrantId(itemId)) {
-    creditHeroicMarks(meta, count);
+    creditCurrencyGrant(meta, itemId, count);
     return;
   }
   addStacked(

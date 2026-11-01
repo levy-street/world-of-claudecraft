@@ -20325,6 +20325,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': 'デルブの印',
   'hudChrome.currencies.wocToken': 'WoCトークン',
   'hudChrome.currencies.heroicMarkNote': 'ヒロイックダンジョン . ヒロイック補給官で使用',
+  'hudChrome.currencies.lanternSealNote': '燈火の館の週間契約 . ギルドの補給係で使用',
   'hudChrome.currencies.honorNote': '戦場、闘技場、ワールドクエスト',
   'hudChrome.currencies.delveMarkNote': '完了したデルブ',
   'hudChrome.currencies.wocTokenNote': '連携済みウォレットの残高',

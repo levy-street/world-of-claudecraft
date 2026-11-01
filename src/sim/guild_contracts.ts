@@ -20,6 +20,7 @@ import {
   type GuildContractDef,
   LANTERN_SEAL_ITEM_ID,
 } from './content/guild_contracts';
+import { sanitizeLanternSeals } from './lantern_seals';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -80,12 +81,14 @@ export function guildContractProgress(
   return progress;
 }
 
-/** The read the window draws: the week, its three contracts' ids, which are done, the count. */
+/** The read the window draws: the week, its three contracts' ids, which are done, the count,
+ *  and the character's Lantern Seals balance (a currency counter, lantern_seals.ts). */
 export interface GuildContractsView {
   readonly week: string;
   readonly offered: readonly string[];
   readonly done: readonly string[];
   readonly lifetime: number;
+  readonly seals: number;
 }
 
 export function guildContractsView(
@@ -101,6 +104,7 @@ export function guildContractsView(
     offered,
     done: current ? [...progress.done] : [],
     lifetime: progress?.lifetime ?? 0,
+    seals: sanitizeLanternSeals(meta?.lanternSeals),
   };
 }
 
@@ -119,7 +123,8 @@ function completes(
   return contract.taskDeedId !== undefined && tasks.includes(contract.taskDeedId);
 }
 
-/** Pay one contract to one character: marked done for the week, the seals into the bags, the
+/** Pay one contract to one character: marked done for the week, the seals onto the currency
+ *  balance (the hub credits LANTERN_SEAL_ITEM_ID as currency, never a bag slot), the
  *  milestone deeds through `grant`, a personal event for the client's toast. */
 function payContract(
   ctx: SimContext,

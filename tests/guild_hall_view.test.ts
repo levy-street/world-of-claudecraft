@@ -80,12 +80,13 @@ function input(over: Partial<GuildShopInput> = {}): GuildShopInput {
   };
 }
 
-function board(done: string[] = []): GuildContractsView {
+function board(done: string[] = [], seals = 0): GuildContractsView {
   return {
     week: WEEK,
     offered: guildContractsForWeek(WEEK).map((c) => c.id),
     done,
     lifetime: done.length,
+    seals,
   };
 }
 
@@ -97,8 +98,7 @@ function world(
   skins: string[] = [],
 ) {
   return {
-    guildContracts: board(done),
-    inventory: seals > 0 ? [{ itemId: LANTERN_SEAL_ITEM_ID, count: seals }] : [],
+    guildContracts: board(done, seals),
     deedsEarned: new Map(owned.map((id) => [id, '2026-10-16'])),
     ownedMounts: () => mounts,
     ridingTrained: () => true,
@@ -150,7 +150,7 @@ describe('the guild window view core', () => {
     ]);
     // an empty board says so instead of drawing no cards
     const empty = buildGuildHallView(
-      { ...world(0), guildContracts: { week: '', offered: [], done: [], lifetime: 0 } },
+      { ...world(0), guildContracts: { week: '', offered: [], done: [], lifetime: 0, seals: 0 } },
       0,
       'contracts',
     );
@@ -169,7 +169,7 @@ describe('the guild window view core', () => {
   });
 
   it('reads the same from the online mirror as from the offline world', () => {
-    // ClientWorld's shape: the board decoded off the wire (gcon), the bags and the Book mirrored
+    // ClientWorld's shape: the board and seals decoded off the wire (gcon), the Book mirrored
     const done = [board().offered[0]];
     const sim = world(
       7,
@@ -181,7 +181,6 @@ describe('the guild window view core', () => {
     const mirror = {
       ...sim,
       guildContracts: decodeGuildContractsWire(JSON.parse(JSON.stringify(sim.guildContracts))),
-      inventory: sim.inventory.map((slot) => ({ ...slot })),
       deedsEarned: new Map(sim.deedsEarned),
       ownedMounts: () => [...sim.ownedMounts()],
       accountCosmetics: { weaponSkinIds: [...sim.accountCosmetics.weaponSkinIds] },
@@ -415,14 +414,11 @@ describe('the guild window view core', () => {
     expect(guildShopTooltip('phantom', input())).toBeNull();
   });
 
-  it('counts seals across stacks and reads the reset in days and hours', () => {
-    expect(
-      lanternSeals([
-        { itemId: LANTERN_SEAL_ITEM_ID, count: 3 },
-        { itemId: 'heroic_mark', count: 9 },
-        { itemId: LANTERN_SEAL_ITEM_ID, count: 4 },
-      ]),
-    ).toBe(7);
+  it('reads seals off the currency balance, never the bags, and the reset in days and hours', () => {
+    expect(lanternSeals(board([], 7))).toBe(7);
+    // a legacy bag stack is not the balance: only the counter counts
+    const legacy = { ...world(0), inventory: [{ itemId: LANTERN_SEAL_ITEM_ID, count: 40 }] };
+    expect(buildGuildHallView(legacy, 0, 'quartermaster').seals).toBe(0);
     const now = Date.UTC(2026, 9, 16, 0, 0);
     expect(guildResetText(now + (2 * 86_400 + 5 * 3_600) * 1000, now)).toBe(
       'New contracts in 2 days and 5 hours',
@@ -635,7 +631,7 @@ describe('the guild window painter', () => {
       'active:true',
     ]);
     // a repaint (the seals moved) re-attaches the same stage: no second context
-    w.inventory = [{ itemId: LANTERN_SEAL_ITEM_ID, count: 6 }];
+    w.guildContracts = { ...w.guildContracts, seals: 6 };
     win.refreshIfChanged();
     expect(root.querySelector('.gh-stage-mount')).toBe(stage);
     expect(stageLog.built).toBe(1);
@@ -755,18 +751,24 @@ describe('the online mirror', () => {
         done: [offered[0], 7],
         lifetime: 4.6,
       }),
-    ).toEqual({ week: WEEK, offered, done: [offered[0]], lifetime: 4 });
+    ).toEqual({ week: WEEK, offered, done: [offered[0]], lifetime: 4, seals: 0 });
+    // the seals balance rides the same key, sanitized to a whole, non-negative count
+    expect(decodeGuildContractsWire({ week: WEEK, offered, done: [], seals: 12.7 }).seals).toBe(12);
+    expect(decodeGuildContractsWire({ week: WEEK, offered, done: [], seals: -3 }).seals).toBe(0);
+    expect(decodeGuildContractsWire({ week: WEEK, offered, done: [], seals: 'x' }).seals).toBe(0);
     expect(decodeGuildContractsWire(null)).toEqual({
       week: '',
       offered: [],
       done: [],
       lifetime: 0,
+      seals: 0,
     });
     expect(decodeGuildContractsWire([1, 2])).toEqual({
       week: '',
       offered: [],
       done: [],
       lifetime: 0,
+      seals: 0,
     });
   });
 });

@@ -3613,6 +3613,7 @@ export const ja_JP: EnTranslations = {
       "delveMark": "デルブの印",
       "wocToken": "WoCトークン",
       "heroicMarkNote": "ヒロイックダンジョン . ヒロイック補給官で使用",
+      "lanternSealNote": "燈火の館の週間契約 . ギルドの補給係で使用",
       "honorNote": "戦場、闘技場、ワールドクエスト",
       "delveMarkNote": "完了したデルブ",
       "wocTokenNote": "連携済みウォレットの残高",

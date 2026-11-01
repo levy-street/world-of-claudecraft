@@ -7,15 +7,23 @@ const woc = { enabled: true, balance: 12, verified: true };
 describe('currencies view', () => {
   it('shows the Heroic Marks currency balance as a whole number, never a bag count', () => {
     const view = (heroicMarks: number) =>
-      buildCurrenciesView({ heroicMarks, honor: 0, lifetimeHonor: 0, delveMarks: 0, woc });
+      buildCurrenciesView({
+        heroicMarks,
+        lanternSeals: 0,
+        honor: 0,
+        lifetimeHonor: 0,
+        delveMarks: 0,
+        woc,
+      });
     expect(view(12.9).activities[0]).toMatchObject({ id: 'heroic_mark', amount: 12 });
     expect(view(-4).activities[0].amount).toBe(0);
     expect(view(Number.NaN).activities[0].amount).toBe(0);
   });
 
-  it('lists the four activity balances in a fixed order with Honor carrying its lifetime total', () => {
+  it('lists the five activity balances in a fixed order with Honor carrying its lifetime total', () => {
     const view = buildCurrenciesView({
       heroicMarks: 3,
+      lanternSeals: 8,
       honor: 340,
       lifetimeHonor: 1_200,
       delveMarks: 5,
@@ -23,19 +31,22 @@ describe('currencies view', () => {
     });
     expect(view.activities.map((row) => row.id)).toEqual([
       'heroic_mark',
+      'lantern_seal',
       'honor',
       'delve_mark',
       'woc_token',
     ]);
     expect(view.activities[0].amount).toBe(3);
-    expect(view.activities[1]).toMatchObject({ amount: 340, lifetime: 1_200 });
-    expect(view.activities[2].amount).toBe(5);
-    expect(view.activities[3]).toMatchObject({ amount: 12, verified: true });
+    expect(view.activities[1].amount).toBe(8);
+    expect(view.activities[2]).toMatchObject({ amount: 340, lifetime: 1_200 });
+    expect(view.activities[3].amount).toBe(5);
+    expect(view.activities[4]).toMatchObject({ amount: 12, verified: true });
   });
 
   it('omits the token when the wallet UI is off and reports null when no wallet is linked', () => {
     const off = buildCurrenciesView({
       heroicMarks: 0,
+      lanternSeals: 0,
       honor: 0,
       lifetimeHonor: 0,
       delveMarks: 0,
@@ -44,6 +55,7 @@ describe('currencies view', () => {
     expect(off.activities.map((row) => row.id)).not.toContain('woc_token');
     const unlinked = buildCurrenciesView({
       heroicMarks: 0,
+      lanternSeals: 0,
       honor: 0,
       lifetimeHonor: 0,
       delveMarks: 0,
@@ -55,18 +67,20 @@ describe('currencies view', () => {
   it('clamps corrupt balances to zero instead of painting a negative', () => {
     const view = buildCurrenciesView({
       heroicMarks: 0,
+      lanternSeals: 0,
       honor: -5,
       lifetimeHonor: Number.NaN,
       delveMarks: -1,
       woc,
     });
-    expect(view.activities[1]).toMatchObject({ amount: 0, lifetime: 0 });
-    expect(view.activities[2].amount).toBe(0);
+    expect(view.activities[2]).toMatchObject({ amount: 0, lifetime: 0 });
+    expect(view.activities[3].amount).toBe(0);
   });
 
   it('prepares one row per allied faction with real balance', () => {
     const view = buildCurrenciesView({
       heroicMarks: 0,
+      lanternSeals: 0,
       honor: 0,
       lifetimeHonor: 0,
       delveMarks: 0,
