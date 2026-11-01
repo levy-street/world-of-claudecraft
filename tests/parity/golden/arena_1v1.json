@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1013,
-      "state": "60a553a3",
+      "state": "3b5c1ef5",
       "events": "d4e598c3",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1013,
-      "state": "47b040c2",
+      "state": "05012b06",
       "events": "741638a5",
       "rng": {
         "draws": 965,
@@ -393,6 +393,7 @@
             "z": -1148
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.05,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -442,6 +443,7 @@
             "z": -1108
           },
           "potionCooldownUntil": -1,
+          "pvpExchangeAt": 5.05,
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {

@@ -4799,6 +4799,7 @@ export const ja_JP: EnTranslations = {
       "internalCooldown": "タイマー終了までこの効果は再発動しない",
       "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
       "carryingFreight": "荷物を運搬中です。移動速度が{pct}%低下します。",
+      "tankToll": "タンクとして、他のプレイヤーに与えるダメージと自己回復量が{pct}%減少し、プレイヤーからシールドへのダメージが2倍になります",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
       "crit": "クリティカル率を{pct}%上昇させる",

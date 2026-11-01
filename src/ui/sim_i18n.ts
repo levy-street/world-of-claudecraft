@@ -1711,6 +1711,7 @@ const baseEnTable = {
   // The sim authors the aura name in English; this row is what stops the debuff
   // bar and combat log shipping that English to all 21 locales.
   'aura.cheaterMark': 'Marked as a Cheater',
+  'aura.tankToll': 'Tank Toll',
   'aura.oldBlood': 'Old Blood',
   'aura.verdance': 'Verdance',
   'aura.lopingStride': 'Loping Stride',
@@ -26651,6 +26652,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // no gate catches: the sanction would read "Marked as a Cheater" in all 21
   // locales. Keep this string byte-identical to the aura's `name`.
   'Marked as a Cheater': 'aura.cheaterMark',
+  // The PvP tank restraint marker (tankTollAura in src/sim/pvp/tank_toll.ts);
+  // byte-identical to TANK_TOLL_AURA_NAME.
+  'Tank Toll': 'aura.tankToll',
   'Old Blood': 'aura.oldBlood',
   Verdance: 'aura.verdance',
   'Loping Stride': 'aura.lopingStride',

@@ -66,7 +66,10 @@ import {
   releaseCorpseHarvest,
 } from '../professions/corpse_harvest_session';
 import {
+  notePvpExchange,
   pvpDamageMultiplier,
+  tankPvpDamageMult,
+  tankPvpShieldBurn,
   worldPvpOnOwnedPetDamaged,
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
@@ -614,16 +617,30 @@ export function dealDamage(
   // no player controls stay byte-identical. dealDamage receives post-mitigation
   // damage, so this deterministic step sits after the upstream armor/resist roll
   // and before absorb shields.
-  if (
-    !resolvedHpLoss &&
+  const hostilePvpHit =
     amount > 0 &&
-    source &&
-    sourcePlayer &&
-    targetPlayer &&
+    !!source &&
+    !!sourcePlayer &&
+    !!targetPlayer &&
     sourcePlayer.id !== targetPlayer.id &&
-    ctx.isHostileTo(source, target)
-  ) {
+    ctx.isHostileTo(source, target);
+  if (!resolvedHpLoss && hostilePvpHit && sourcePlayer && targetPlayer) {
     amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
+  }
+
+  // Tank Toll (pvp/tank_restraint.ts): any hostile player-vs-player damage
+  // stamps both controllers as fighting players (the 5 second window that also
+  // gates the self-heal cut), THEN a committed tank's damage to a hostile
+  // player OR anything a hostile player controls (a pet, guardian or totem) is
+  // cut by 30%, the opening hit included. A creature no player controls never
+  // reaches this arm and takes full damage. Source-side, so an already-final
+  // share is never cut twice. Draws no rng.
+  if (hostilePvpHit && sourcePlayer && targetPlayer) {
+    notePvpExchange(sourcePlayer, targetPlayer, ctx.time);
+    if (!alreadyFinal && !resolvedHpLoss) {
+      const mult = tankPvpDamageMult(sourcePlayer, ctx.players.get(sourcePlayer.id), ctx.time);
+      if (mult !== 1) amount = Math.max(0, Math.round(amount * mult));
+    }
   }
 
   if (
@@ -678,11 +695,22 @@ export function dealDamage(
   // through the target's absorbs once and must not be soaked a second time.
   if (!resolvedHpLoss && amount > 0) {
     cleanupCraftedCollectionAuras(ctx, target);
+    // Tank Toll (pvp/tank_restraint.ts): a hostile player's hit burns a
+    // restrained tank's OWN shields at double rate, so each shield point soaks
+    // half a point of damage. Exactly 1 (the classic one-for-one soak) for
+    // every other hit, wearer and shield. Draws no rng.
+    const shieldBurn =
+      hostilePvpHit && target.kind === 'player'
+        ? tankPvpShieldBurn(target, ctx.players.get(target.id), ctx.time)
+        : 1;
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
       const a = target.auras[i];
       if (a.kind !== 'absorb') continue;
-      const soaked = Math.min(a.value, amount);
-      a.value -= soaked;
+      const burn = shieldBurn !== 1 && a.sourceId === target.id ? shieldBurn : 1;
+      const soaked =
+        burn === 1 ? Math.min(a.value, amount) : Math.min(amount, Math.ceil(a.value / burn));
+      if (burn === 1) a.value -= soaked;
+      else a.value = Math.max(0, a.value - soaked * burn);
       amount -= soaked;
       totalAbsorbed += soaked;
       emitAbsorbCredit(ctx, a, target, soaked);

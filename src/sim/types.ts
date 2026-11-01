@@ -734,6 +734,13 @@ export type AuraKind =
   // carry: applied at the pickup, removed by clearCarrierAuras on every path the
   // flag leaves the carrier.
   | 'flag_carried'
+  // Tank Toll (pvp/tank_toll.ts): the visible marker of the PvP tank
+  // restraint, worn by a committed tank wherever players can fight them. Its
+  // own kind so nothing keys on it: no combat reader, no stat recalc, no
+  // dispel (physical school plus undispellable). The 30% cuts it names live in
+  // combat/damage.ts and the heal paths, gated by the exchange window, never by
+  // this aura.
+  | 'tank_toll'
   // Eastbrook freight World Quest: an inert, public marker worn exactly while
   // the player carries a crate. The movement kernel applies its value as the
   // cargo speed multiplier; no combat or stat-recalc path consumes it.
@@ -8262,6 +8269,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  gear's health bonus never reaches raid content. Absent means the open
    *  world, where it applies; battlegrounds and arenas apply it too. */
   pvpVitalityActive?: boolean;
+  /** Sim time (seconds) of this entity's last hostile player-vs-player damage
+   *  exchange, dealt or taken (src/sim/pvp/tank_restraint.ts). Absent until the
+   *  first one; transient combat state, never persisted or wired. */
+  pvpExchangeAt?: number;
   /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
    *  via setCheaterMark at join restore and when an operator applies or lifts a
    *  mark; never true offline, never user-settable. Cosmetic: nothing reads it

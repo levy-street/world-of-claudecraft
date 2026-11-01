@@ -26,6 +26,27 @@ ratings.
   outside a battleground or arena match) and flips `Entity.pvpVitalityActive`,
   recalculating only players whose state changed; `entity.ts` applies the
   fraction to maxHp. Pinned by the `WARFARE Vitality` block in `tests/honor.test.ts`.
+- `tank_restraint.ts` owns the PvP tank restraint math (pure leaf, no
+  ctx/rng/clock): a committed tank (`isCommittedTank`,
+  `combat/tank_crit_immunity.ts`) who dealt or took hostile player damage
+  within `PVP_EXCHANGE_LINGER_SECONDS` deals 30% less damage to players (and
+  their pets, guardians and totems) and heals themselves for 30% less.
+  Hostile player hits also burn the tank's own shields at double rate
+  (`TANK_PVP_SHIELD_BURN`, the absorb loop in `combat/damage.ts`).
+  `tank_restraint_heal.ts` plans damage-derived self-heals (Hammer of Grace)
+  from the damage before the tank cut and keeps Recurring Grace from shielding
+  the cut share. `combat/damage.ts` stamps `Entity.pvpExchangeAt` on both
+  controllers and cuts damage to anything a hostile player controls; `combat/heal.ts` (`applyHeal`) and `combat/auras.ts` (own HoT ticks,
+  Second Wind) apply the self-heal cut.
+- `tank_toll.ts` owns the visible Tank Toll debuff behind it: `updateTankToll`
+  (on the zone pass beside Vitality) puts the inert, permanent, undispellable
+  `tank_toll` aura on a committed tank in any PvP context (`/pvp` flag via the
+  `Entity.pvpFlag` mirror, battleground or arena seat, active duel, live
+  exchange) and removes it otherwise. It reads the flag mirror rather than
+  importing `world_pvp.ts`, which calls it. Name re-localized by
+  `src/ui/sim_i18n.ts` (`aura.tankToll`), tooltip by `src/ui/aura_effect.ts`.
+  Rules in `docs/design/warfare.md`, "Tank Toll"; pinned by
+  `tests/tank_pvp_restraint.test.ts` and `tests/tank_toll.test.ts`.
 - `honor_persist.ts` owns the persisted form of the honor ledger and its daily
   DR window (`savedHonorState` / `loadHonorState`), moved out of the Sim
   coordinator's serialize/load so a new honor field lands here, not in `sim.ts`.

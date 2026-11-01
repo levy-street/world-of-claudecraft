@@ -4799,6 +4799,7 @@ export const pl_PL: EnTranslations = {
       "internalCooldown": "Ten efekt nie może się ponownie uruchomić, dopóki nie upłynie jego czas",
       "carriedFlag": "Niesiesz wrogą flagę. Anuluj to wzmocnienie, aby ją upuścić.",
       "carryingFreight": "Nosisz ładunek. Prędkość ruchu zmniejszona o {pct}%.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Postawa bojowa: generowanie wściekłości zwiększone o 10%",
       "berserkerStance": "Postawa berserkera: trafienia krytyczne o 3% częstsze i o 3% silniejsze",
       "crit": "Zwiększa szansę na trafienie krytyczne o {pct}%",

@@ -12859,6 +12859,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.suddenDeath'
   | 'hudChrome.auraEffect.sureCrit'
   | 'hudChrome.auraEffect.sweepingStrikes'
+  | 'hudChrome.auraEffect.tankToll'
   | 'hudChrome.auraEffect.temple.brokenVoice'
   | 'hudChrome.auraEffect.temple.scoreWard'
   | 'hudChrome.auraEffect.temple.spentVoice'

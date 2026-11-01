@@ -132,6 +132,8 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'stun',
         'sun_verdict',
         'sunder',
+        // Inert PvP rule marker (src/sim/pvp/tank_toll.ts): a debuff, never a buff.
+        'tank_toll',
         'tongues',
         'vuln_source',
         'vulnerability',

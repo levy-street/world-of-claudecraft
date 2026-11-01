@@ -106,6 +106,8 @@ import {
   NYTHRAXIS_ENRAGE_HASTE_BONUS,
 } from '../sim/nythraxis_enrage_clock';
 import { NYTHRAXIS_KINGS_WRATH_AURA_ID } from '../sim/nythraxis_kings_wrath';
+import { TANK_PVP_DAMAGE_PENALTY } from '../sim/pvp/tank_restraint';
+import { TANK_TOLL_AURA_ID } from '../sim/pvp/tank_toll';
 import type { AuraKind } from '../sim/types';
 import {
   CAT_FORM_MOVE_MULT,
@@ -523,6 +525,11 @@ export function auraEffectDescriptor(
   // otherwise undiscoverable and this hover is the only surface that can teach it.
   if (a.id === 'bg_carried_flag' && a.kind === 'flag_carried') {
     return { key: `${KEY}.carriedFlag`, nums: {} };
+  }
+  // Tank Toll: the PvP tank restraint marker. The aura is inert (value 0); the
+  // percent is the live restraint constant the damage and self-heal cuts use.
+  if (a.id === TANK_TOLL_AURA_ID && a.kind === 'tank_toll') {
+    return { key: `${KEY}.tankToll`, nums: { pct: Math.round(TANK_PVP_DAMAGE_PENALTY * 100) } };
   }
   if (a.id === 'world_quest_delivery_cargo' && a.kind === 'world_quest_cargo') {
     return {

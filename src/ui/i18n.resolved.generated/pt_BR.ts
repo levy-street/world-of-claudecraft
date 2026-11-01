@@ -4799,6 +4799,7 @@ export const pt_BR: EnTranslations = {
       "internalCooldown": "Este efeito não pode ser acionado novamente até o temporizador expirar",
       "carriedFlag": "Você está carregando a bandeira inimiga. Cancele este benefício para soltá-la.",
       "carryingFreight": "Você está carregando carga. Sua velocidade de movimento é reduzida em {pct}%.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Postura de Batalha: 10% mais geração de raiva",
       "berserkerStance": "Postura de Berserker: críticos 3% mais frequentes e 3% mais fortes",
       "crit": "Aumenta a chance de acerto crítico em {pct}%",

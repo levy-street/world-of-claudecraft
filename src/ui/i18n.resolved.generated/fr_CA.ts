@@ -4799,6 +4799,7 @@ export const fr_CA: EnTranslations = {
       "internalCooldown": "Cet effet ne peut pas se redéclencher tant que le délai n'est pas écoulé",
       "carriedFlag": "Vous portez le drapeau ennemi. Annulez cette amélioration pour le lâcher.",
       "carryingFreight": "Vous transportez du fret. Votre vitesse de déplacement est réduite de {pct}%.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Posture de combat : génération de rage accrue de 10%",
       "berserkerStance": "Posture de berserker : coups critiques 3% plus fréquents et 3% plus puissants",
       "crit": "Accroît les chances de coup critique de {pct}%",

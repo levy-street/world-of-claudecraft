@@ -4799,6 +4799,7 @@ export const cs_CZ: EnTranslations = {
       "internalCooldown": "Tento efekt nelze spustit znovu, dokud nevyprší časovač",
       "carriedFlag": "Neseš nepřátelskou vlajku. Zrušením tohoto efektu ji upustíš.",
       "carryingFreight": "Neseš náklad. Rychlost pohybu je snížena o {pct} %.",
+      "tankToll": "As a tank, the damage you deal to other players and your self heals are reduced by {pct}%, and players deal double damage to your shields",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",

@@ -27,7 +27,7 @@
 
 import { recordQueueHealing } from '../instances/queue_participation';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
-import { worldPvpOnPlayerAided } from '../pvp';
+import { tankPvpSelfHealMult, worldPvpOnPlayerAided } from '../pvp';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
@@ -139,7 +139,8 @@ export function applyHeal(
           paladinHealingDoneMultiplier(source) *
           sporemenderHealingDoneMult(source) *
           hexOutputMult(ctx, source) *
-          healingTakenMult(ctx, target),
+          healingTakenMult(ctx, target) *
+          tankPvpSelfHealMult(source, target, ctx.players.get(target.id), ctx.time),
       );
   const beforeAbsorb = healed;
   healed = consumeHealAbsorb(ctx, target, healed);
