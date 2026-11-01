@@ -13773,7 +13773,7 @@ export const en: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 12 sec instant. A surge during a Magma Burst cast also clears the cooldown that cast starts, so you can follow it with the instant one. Damage increases with Spell Power. (Thundercall)"
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 12 sec instant. A surge during a Magma Burst cast also clears the cooldown of that cast, so you can follow it with the instant one. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
