@@ -600,8 +600,8 @@ void main() {
   gl_Position = projectionMatrix * mv;
 }`;
 
-/** The final phase's blaze: motes of the four veins spiralling up out of
- *  the ring's kerb. */
+/** The final phase's blaze: slivers of the four veins' light spiralling up out
+ *  of the ring's kerb (`aParams.w` picks each one's vein; never balls). */
 export const BLAZE_VERT = /* glsl */ `
 uniform float uTime;
 uniform float uBlaze;
@@ -618,11 +618,30 @@ void main() {
   vec3 p = vec3(sin(ang) * rad, h * 24.0, cos(ang) * rad);
   vFade = sin(3.14159 * h) * uBlaze;
   vHot = aParams.w;
-  float size = (0.24 + 0.36 * aParams.y) * (1.0 + h);
+  float size = (0.028 + 0.055 * aParams.y) * (1.0 + 0.7 * h);
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  mv.xy += aCorner * size * step(0.002, vFade);
+  mv.xy += aCorner * vec2(1.0, 3.4) * size * step(0.002, vFade);
   vCorner = aCorner;
   gl_Position = projectionMatrix * mv;
+}`;
+
+/** A sliver of the blaze: soft, tall and thin, in its vein's colour. */
+export const BLAZE_FRAG = /* glsl */ `
+uniform vec3 uV0;
+uniform vec3 uV1;
+uniform vec3 uV2;
+uniform vec3 uV3;
+varying vec2 vCorner;
+varying float vFade;
+varying float vHot;
+void main() {
+  float d = length(vCorner);
+  float a = (1.0 - smoothstep(0.1, 1.0, d)) * vFade;
+  if (a < 0.003) discard;
+  float w = vHot * 4.0;
+  vec3 c = w < 1.0 ? uV0 : w < 2.0 ? uV1 : w < 3.0 ? uV2 : uV3;
+  gl_FragColor = vec4(mix(c, vec3(1.0, 0.96, 0.86), 0.4) * a * 1.5, 1.0);
+  #include <colorspace_fragment>
 }`;
 
 /** The Quench's crystals growing along its seams (an instanced spike, each

@@ -339,6 +339,37 @@ export const HEART_QUARTER_PALETTE: Readonly<
  *  foot), the rim's outer foot, and how deep the shader draws the well. */
 export const HEART_RING_LOOK = { wellR: 13.4, rimOut: 16.4, depth: 9 } as const;
 
+/** The column's measures: its sheaths (radius at the foot, at the waist, at
+ *  the top, how many strands and how fast they wind, how hot), its height and
+ *  where its waist sits, the height it stays thin under (a body's, the boss's
+ *  included), the splinters (the high tier's count). */
+export const HEART_RING_COLUMN = {
+  height: 96,
+  waist: 0.26,
+  clear: [7, 30],
+  sheaths: [
+    { foot: 3.4, mid: 1.1, top: 1.9, strands: 2, spin: 1.1, hot: 1 },
+    { foot: 8.2, mid: 2.5, top: 4.2, strands: 3, spin: -0.7, hot: 0.45 },
+    { foot: 12.4, mid: 4.2, top: 7.4, strands: 4, spin: 0.45, hot: 0 },
+  ],
+  shards: 90,
+} as const;
+
+/** A sheath's radius `t` of the way up (0 foot, 1 top): flaring out of the
+ *  well, drawn in to its waist, opening again above it. Pure. */
+export function heartRingSheathRadius(
+  s: { foot: number; mid: number; top: number },
+  t: number,
+): number {
+  const w = HEART_RING_COLUMN.waist;
+  if (t <= w) {
+    const u = t / w;
+    return s.mid + (s.foot - s.mid) * (1 - u) * (1 - u);
+  }
+  const u = (t - w) / (1 - w);
+  return s.mid + (s.top - s.mid) * u * u * (3 - 2 * u);
+}
+
 /** The opaque platform's draw order (phase 2L): the floors (the quarters,
  *  the rim's dirt bed, the dais) first, then each ridge's spine drawn with no
  *  depth write and its light over it, then everything else. A floor

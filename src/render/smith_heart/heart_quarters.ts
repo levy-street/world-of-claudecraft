@@ -77,6 +77,7 @@ import {
   stepHeartQuarters,
 } from './heart_quarters_core';
 import {
+  BLAZE_FRAG,
   BLAZE_VERT,
   BREATH_DEVIL_VERT,
   BREATH_SHEET_VERT,
@@ -796,12 +797,13 @@ export function buildHeartQuarters(
     uniforms: {
       uTime: sharedUniforms.uTime,
       uBlaze: { value: 0 },
-      uColor: { value: new THREE.Color(0xffd690) },
-      uHotColor: { value: new THREE.Color(0xffffff) },
-      uAlpha: { value: 1 },
+      uV0: vein4[0],
+      uV1: vein4[1],
+      uV2: vein4[2],
+      uV3: vein4[3],
     },
     vertexShader: BLAZE_VERT,
-    fragmentShader: MOTE_FRAG,
+    fragmentShader: BLAZE_FRAG,
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
