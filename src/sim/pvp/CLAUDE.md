@@ -39,7 +39,9 @@ ratings.
   a flagged player never does), the gold stake, the equal split with the killing
   blow taking the remainder, the grey-level rule, and the per-pair DR multiplier
   (shared `HONOR_REPEAT_DR`) over its own `WORLD_PVP_DR_WINDOW_SECONDS` (one
-  hour) window. It also declares `WorldPvpZonePolicy`, the three-answer type the
+  hour) window, and the stealth exposure rule (`worldPvpStealthExposed`: a
+  stealther is exposed when flagged on contested ground or anywhere on
+  free-for-all ground, never in a sanctuary). It also declares `WorldPvpZonePolicy`, the three-answer type the
   next bullet resolves. No ctx, no rng, no clock.
 - `world_pvp_zones.ts` owns the ground policy: which of `'sanctuary'`,
   `'contested'` and `'ffa'` applies at a position (`worldPvpZonePolicyAt`) or to
@@ -121,7 +123,11 @@ ratings.
   included; no pid, no text, no rng; `server/event_frame.ts` strips it from
   client frames), the IWorld readout
   (`worldPvpInfoFor`, whole-second countdown so the self wire elides it), the
-  `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
+  `/pvp` chat arms' entry points, the stealth concealment verdict the
+  server's observation rule asks for a viewer who is not hostile yet
+  (`worldPvpConcealsStealthFrom`: an exposed stealther is hidden from every
+  stranger outside their group, so dropping the flag cannot scout stealthers;
+  pinned by `tests/world_pvp_stealth_observation.test.ts`), and the persisted record (`savedWorldPvpFields`
   / `loadWorldPvpState`, the countdown stored as remaining seconds and
   re-anchored on load; the level gate and the kill switch hold on restore). The
   diminishing returns are per PAIR and live in the session books

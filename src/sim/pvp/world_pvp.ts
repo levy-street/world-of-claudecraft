@@ -92,6 +92,7 @@ import {
   worldPvpPairMultiplier,
   worldPvpSplit,
   worldPvpStake,
+  worldPvpStealthExposed,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
 import { placeWorldPvpSpoils, sweepWorldPvpSpoils, worldPvpSpoilsLine } from './world_pvp_spoils';
@@ -596,6 +597,32 @@ export function isWorldPvpHostile(ctx: SimContext, attacker: Entity, target: Ent
   if (zoneA !== 'ffa' && !(attacker.pvpFlag && target.pvpFlag)) return false;
   const zoneB = worldPvpZonePolicyAt(target.pos.x, target.pos.z);
   return worldPvpPairHostile(attacker, target, sameParty, zoneA, zoneB);
+}
+
+/**
+ * Must a stealthed player be hidden from this viewer because the open world
+ * could make them enemies at will? The server's observation rule asks it for a
+ * viewer who is NOT hostile right now (a hostile one never sees a stealther at
+ * all): an unflagged stranger beside a flagged rogue could raise the flag
+ * instantly, and a stranger outside a free-for-all zone could step in, so
+ * letting either one see the rogue turns dropping the flag into a scouting
+ * tool (see, re-flag, strike where the rogue stood). Party and raid members
+ * are never enemies and keep seeing their own. Outside the open world's rules
+ * (a live battleground or arena, the jail, a realm with World PvP off) the
+ * answer is false and the ordinary detection rule stands. Reads the
+ * stealther's ground live, like the hostility arm. Draws no rng.
+ */
+export function worldPvpConcealsStealthFrom(
+  ctx: SimContext,
+  viewer: Entity,
+  stealthed: Entity,
+): boolean {
+  if (viewer.kind !== 'player' || stealthed.kind !== 'player') return false;
+  if (viewer.id === stealthed.id || ctx.worldPvpDisabled) return false;
+  if (viewer.jailed || stealthed.jailed) return false;
+  if (inInstancedPvp(ctx, viewer.id) || inInstancedPvp(ctx, stealthed.id)) return false;
+  if (inSameParty(ctx, viewer.id, stealthed.id)) return false;
+  return worldPvpStealthExposed(stealthed, worldPvpZonePolicyAt(stealthed.pos.x, stealthed.pos.z));
 }
 
 function controllerOf(ctx: SimContext, source: Entity | null): Entity | null {

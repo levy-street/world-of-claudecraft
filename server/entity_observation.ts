@@ -1,3 +1,4 @@
+import { worldPvpConcealsStealthFrom } from '../src/sim/pvp';
 import type { Sim } from '../src/sim/sim';
 import { stealthDetectionRadius } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
@@ -27,6 +28,11 @@ export function canObserveEntity(sim: Sim, viewer: Entity, entity: Entity, d2: n
   const duel = sim.duelFor(viewer.id);
   const duelingEachOther = duel !== null && (duel.a === entity.id || duel.b === entity.id);
   if (sameParty && !duelingEachOther) return true;
+  // A viewer who is not hostile YET but could be at will (an unflagged
+  // stranger beside a flagged stealther, or one just outside a free-for-all
+  // zone) sees no more than an enemy: otherwise dropping the flag scouts
+  // stealthers, and raising it again (instant) strikes where they stood.
+  if (worldPvpConcealsStealthFrom(sim.ctx, viewer, entity)) return false;
   // isHostileTo is false for every dead viewer, so without this a corpse or a
   // ghost would fall through to the friendly detection radius below and see
   // stealthed enemies a living enemy never sees.
