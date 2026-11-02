@@ -182,9 +182,16 @@ describe('Spell Power end-to-end through the sim', () => {
 
     // The dummy is only ever hit by our single Frostbolt (the wolf swings at the
     // mage, not the dummy), so its HP delta IS the spell's damage.
+    // The bolt can be RESISTED on the spell hit table (rng-stream dependent: the
+    // Studio town rework (#4593) moved camp mobs, which shifts their wander
+    // draws, and seed 7's first bolt is now resisted), so recast until one lands, like the
+    // Shadow Word Pain case above. Each attempt waits out the cast, its
+    // pushback from the wolf's swings and the bolt's flight.
     const before = dummy.hp;
-    sim.castAbility('frostbolt', p.id);
-    for (let i = 0; i < 80 && dummy.hp === before; i++) sim.tick();
+    for (let attempt = 0; attempt < 8 && dummy.hp === before; attempt++) {
+      sim.castAbility('frostbolt', p.id);
+      for (let i = 0; i < 100 && dummy.hp === before; i++) sim.tick();
+    }
     const dealt = before - dummy.hp;
     expect(dealt).toBeGreaterThan(0);
     // a non-crit hit lands in [min+bonus, max+bonus]; that floor exceeds the no-SP

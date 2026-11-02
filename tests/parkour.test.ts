@@ -76,7 +76,12 @@ function findFlatCourse(len: number): { x: number; z0: number } {
   throw new Error('no flat course found');
 }
 
-const COURSE = findFlatCourse(18);
+// 32 yd, not just the authored props' 18: the kernel runs (80 ticks of held
+// forward) carry the body about 28 yd past z0, and the end of the run must
+// land on the same flat dry strip. With 18 the Studio town rework's (#4593)
+// Eastbrook terrain edits made the first match a strip whose run-out ends in
+// the sea.
+const COURSE = findFlatCourse(32);
 
 // A steep on-wall footing on the west rim, measured with terrainSteepnessAt,
 // the SAME rounded-cell sampler the kernel's slope and coyote gates read, so

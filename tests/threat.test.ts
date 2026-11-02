@@ -1005,7 +1005,11 @@ describe('hunter pets', () => {
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.castAbility('tame_beast');
-    for (let i = 0; i < 20 * 7; i++) sim.tick(); // 6s cast
+    // 6s cast; wait for the pet rather than a fixed 7s, since the beast can
+    // wander into aggro range mid-cast and its swings push the cast back (the
+    // Studio town rework (#4593) pinned the wolf camp's mobs to authored spots,
+    // and seed 42's nearest wolf, now a different mob, does).
+    for (let i = 0; i < 20 * 9 && !sim.petOf(sim.playerId); i++) sim.tick();
     const pet = expectDefined(sim.petOf(sim.playerId));
     return { sim, wolf: pet, originalWolfId };
   }
@@ -1270,7 +1274,11 @@ describe('hunter pets', () => {
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.castAbility('tame_beast');
-    for (let i = 0; i < 20 * 7; i++) sim.tick(); // 6s cast
+    // 6s cast; wait for the pet rather than a fixed 7s, since the beast can
+    // wander into aggro range mid-cast and its swings push the cast back (the
+    // Studio town rework (#4593) pinned the wolf camp's mobs to authored spots,
+    // and seed 42's nearest wolf, now a different mob, does).
+    for (let i = 0; i < 20 * 9 && !sim.petOf(sim.playerId); i++) sim.tick();
     const pet = expectDefined(sim.petOf(sim.playerId));
     expect(pet.id).not.toBe(originalWolfId);
     expect(pet.ownerId).toBe(sim.playerId);
@@ -1348,8 +1356,12 @@ describe('hunter pets', () => {
   it('pet behavior modes gate automatic target selection', () => {
     const { sim, wolf: pet } = tamedSetup();
     const boar = nearestMob(sim, 'wild_boar');
-    teleport(sim, sim.player, boar.pos.x + 6, boar.pos.z);
-    teleport(sim, pet, boar.pos.x + 7, boar.pos.z);
+    // West of the boar: the Studio town rework (#4593) pinned the boar camp's
+    // mobs to authored spots, and a second boar now stands 10 yd east, close
+    // enough to the old east-side spot to aggro the pet and win its aggressive
+    // pick.
+    teleport(sim, sim.player, boar.pos.x - 6, boar.pos.z);
+    teleport(sim, pet, boar.pos.x - 7, boar.pos.z);
 
     sim.setPetMode('passive');
     sim.targetEntity(boar.id);
@@ -1791,7 +1803,8 @@ describe('untargetable-mob self-heal (#113/#99)', () => {
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.castAbility('tame_beast');
-    for (let i = 0; i < 20 * 7; i++) sim.tick();
+    // 6s cast plus any pushback from the beast's swings (see tamedSetup)
+    for (let i = 0; i < 20 * 9 && !sim.petOf(sim.playerId); i++) sim.tick();
     const pet = expectDefined(sim.petOf(sim.playerId));
     expect(pet.ownerId).toBe(sim.playerId);
     expect(pet.hostile).toBe(false); // pets stay neutral; the self-heal must not touch owned mobs

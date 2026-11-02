@@ -183,13 +183,25 @@ const FERAL_LOADOUT = {
 // tank probe at 42920 re-rolls the same way: wolf incoming 216 to 246, bear
 // 139 to 155 (37 percent less, inside the 30 to 42 percent bounds); its threat
 // product (214.5) and Marrowbreak snap (1012.44) stayed in band.
+// RE-MEASURED 2026-11-02 for the three live-mob arms, at the commit settling
+// that rework into the shipped rules (the quay pad raised to 0, the hub yard
+// moved to the Sableweb practice ground, moved stations, NPCs and gather
+// nodes). No druid, combat or tuning code moved; the world content re-rolls
+// the shared stream once more. Moongrove 6186/260/6187/7 to 6388/227/6389/7,
+// wildfang 6680/216/7827.62/12 to 6538/218/7661.267/10, bruin 3259/130/
+// 12168.97625/6 to 3400/137/12090.1475/6. Neighbouring seeds 42421 to 42428:
+// moongrove 6021 to 6712 damage, 197 to 271 incoming, 7 payoffs on every one;
+// wildfang 6333 to 7385 damage, 159 to 288 incoming, 12 payoffs on six of the
+// eight and 10 on two; bruin 3298 to 3610 damage, 111 to 156 incoming, 6
+// payoffs on every one. The tank probe at 42920 did not move (wolf 246, bear
+// 155, threat product 214.5, Marrowbreak snap 1012.44).
 const LIVE_MOB_MEASURED = {
   // Release merge: the caster picker excludes healer gear; Bruin gains its new
   // double-swing/rage cadence. Authored-world wander also changes shared RNG.
   // Re-measured at 42420 with the unchanged 8% bands and exact payoff counts.
-  moongrove: { damage: 6186, incomingDamage: 260, threat: 6187, payoffs: 7 },
-  wildfang: { damage: 6680, incomingDamage: 216, threat: 7827.62, payoffs: 12 },
-  bruin: { damage: 3259, incomingDamage: 130, threat: 12168.97625, payoffs: 6 },
+  moongrove: { damage: 6388, incomingDamage: 227, threat: 6389, payoffs: 7 },
+  wildfang: { damage: 6538, incomingDamage: 218, threat: 7661.267, payoffs: 10 },
+  bruin: { damage: 3400, incomingDamage: 137, threat: 12090.1475, payoffs: 6 },
 } as const;
 const BRUIN_TANK_MEASURED = {
   wolfIncomingDamage: 246,
