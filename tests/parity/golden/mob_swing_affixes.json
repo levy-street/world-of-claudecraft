@@ -174,7 +174,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1030,
-      "state": "f3a86c6f",
+      "state": "0fc95b7c",
       "events": "3d567fe0",
       "rng": {
         "draws": 55,
@@ -185,7 +185,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1030,
-      "state": "0d5ace29",
+      "state": "a2d7eea2",
       "events": "09e2cb16",
       "rng": {
         "draws": 100,
@@ -196,7 +196,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1030,
-      "state": "e2f965bc",
+      "state": "57d39e97",
       "events": "4723a6ef",
       "rng": {
         "draws": 322,
@@ -207,7 +207,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1030,
-      "state": "edb088c5",
+      "state": "445643fe",
       "events": "741638a5",
       "rng": {
         "draws": 322,
@@ -254,9 +254,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:wolf_run"
             ]
           },
           "deedsEarned": [
@@ -750,7 +747,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 1030,
-      "state": "a825f859",
+      "state": "3e1c4512",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -797,9 +794,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:wolf_run"
             ]
           },
           "deedsEarned": [

@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1025,
-      "state": "6e8ce004",
+      "state": "6eba4180",
       "events": "772d6648",
       "rng": {
         "draws": 0,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1025,
-      "state": "2c592eaf",
+      "state": "5e84efb3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1025,
-      "state": "94508402",
+      "state": "f67e1d96",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1025,
-      "state": "27b62946",
+      "state": "5d60383a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1025,
-      "state": "09551cab",
+      "state": "1cc8ae8f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1025,
-      "state": "f2644ad2",
+      "state": "7ed03f66",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -161,9 +161,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:wolf_run"
             ]
           },
           "delveClears": {},
@@ -243,9 +240,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:wolf_run"
             ]
           },
           "delveClears": {},
