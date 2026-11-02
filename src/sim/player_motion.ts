@@ -296,7 +296,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     // Groveheart's Sporemender Form walks 20% slower. A form penalty, not a
     // snare: slow immunity never lifts it, and it scales the final speed so a
     // Loping Stride burst or a slow still applies on top of the slower pace.
-    if (a.kind === SPOREMENDER_FORM_KIND) formPace = SPOREMENDER_MOVE_SPEED_MULT;
+    // It is the druid's own gait, so a mounted rider (the form is mount-safe,
+    // combat/forms.ts) rides at the mount's full speed.
+    if (a.kind === SPOREMENDER_FORM_KIND && !e.mountKey) formPace = SPOREMENDER_MOVE_SPEED_MULT;
   }
   speed *= formPassive;
   // Hunting Momentum (Fieldcraft): +15% per stack, its own layer like the form

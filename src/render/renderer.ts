@@ -9824,7 +9824,7 @@ export class Renderer {
         if (isPaladinWingAura(a)) hasPaladinWings = true;
         if (isOathChainAura(a) && oathChainSourceId === null) oathChainSourceId = a.sourceId;
       }
-      const requestedForm = requestedCharacterForm(formMask);
+      const requestedForm = requestedCharacterForm(formMask, e.mountKey !== '');
       const polyed = requestedForm === 'sheep';
       const bear = requestedForm === 'bear';
       const ghostWolf = requestedForm === 'cat' && hasGhostWolf;

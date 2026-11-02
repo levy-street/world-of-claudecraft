@@ -143,6 +143,15 @@ describe('character form visual selection', () => {
     );
   });
 
+  it('keeps a mounted Sporemender rider on the base body, and only that form', () => {
+    const spore = maskFor([{ kind: 'form_sporemender' }]);
+    expect(requestedCharacterForm(spore, true)).toBe('base');
+    expect(requestedCharacterForm(spore, false)).toBe('sporemender');
+    // Every other form request is untouched by the mounted flag.
+    expect(requestedCharacterForm(maskFor([{ kind: 'form_bear' }]), true)).toBe('bear');
+    expect(requestedCharacterForm(maskFor([{ kind: 'polymorph' }]), true)).toBe('sheep');
+  });
+
   it('keeps the base visual through a failed Lich build, then swaps after a later retry', () => {
     const base = { id: 'base' };
     const lich = { id: 'lich' };
