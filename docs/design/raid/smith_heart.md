@@ -2288,7 +2288,7 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart breath circle` | Captain Thessaly plants a circle of calm now (refused once the storm has broken) |
 | `/dev heart breath inhale` | the indrawn breath now (then Bellows Gust) |
 | `/dev heart breath tornado` (`gale`) | three loose gales now, on any tier |
-| `/dev heart breath gust [deg]` | a phase-2 storm gust now, on any tier |
+| `/dev heart breath gust [deg]` | a phase-2 storm gust now, on any tier; in the Wind half it plays (telegraph, gust), then the blow cycle resumes from a calm without spending a turn |
 | `/dev heart breath chain` (`fork`), `eye` (`cradle`), `conductor` (`drawn`) | the Leaping Bolt, the Thunder's Cradle or Drawn Lightning now, on a hashed player |
 | `/dev heart quench` | the Guardian of the Quench's readout (difficulty, health, half, your cold, holes, cracks, the next breath, the deepening) |
 | `/dev heart quench pull` | set you down on the Frozen Lake beside the guardian and pull it |

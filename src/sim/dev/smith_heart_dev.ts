@@ -57,7 +57,8 @@
 //                                    now), blow [deg|n|ne|e|se|s|sw|w|nw],
 //                                    calm, circle (Thessaly's), inhale, chain,
 //                                    eye, conductor, tornado, gust [deg] (a
-//                                    phase-2 gust); our names work too: fork,
+//                                    phase-2 gust; in the Wind half it plays,
+//                                    then the blows resume); our names work too: fork,
 //                                    cradle, drawn, gale
 //   /dev heart quench                the Guardian of the Quench's readout
 //   /dev heart quench <what>         pull (onto the Frozen Lake and pull it),

@@ -139,7 +139,14 @@ function stepCycle(s: BreathScope): void {
     if (first) breathSay(s, s.boss, 'guardian', 'blow');
     return;
   }
-  if (w.phase === 'blow') beginCalm(s);
+  // A storm gust forced into the Wind half (the dev trigger: the fight's own
+  // gusts are phase 2's) plays out, then the cycle resumes from a calm,
+  // spending no turn of the blow rotation.
+  if (w.phase === 'gustgather') {
+    setWind(s, 'gust', T.gustSeconds, w.bearing);
+    return;
+  }
+  if (w.phase === 'blow' || w.phase === 'gust') beginCalm(s);
 }
 
 /** Phase 2, heroic: the short gusts on their own clock. */
