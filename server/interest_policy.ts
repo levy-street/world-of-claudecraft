@@ -6,6 +6,7 @@
 // a thin consumer.
 
 import { bgOriginAt, isBgPos } from '../src/sim/data';
+import { stealthDetectionRadius } from '../src/sim/threat';
 import { type Entity, PLAYER_INTEREST_DROP_RADIUS, PLAYER_INTEREST_RADIUS } from '../src/sim/types';
 
 // Interest management: new entities enter interest at the shared sim edge
@@ -82,4 +83,58 @@ export function bgWideInterestApplies(
   const subjectId = e.kind === 'player' ? e.id : e.ownerId;
   if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
   return viewerBgTeam?.includes(subjectId) ?? false;
+}
+
+// The slice of the sim that the stealth observation rule reads. The live Sim
+// satisfies it structurally; a Vitest passes a stub.
+export interface StealthObservationWorld {
+  readonly entities: ReadonlyMap<number, Entity>;
+  isHostileTo(attacker: Entity, target: Entity): boolean;
+  partyOf(pid: number): { readonly members: readonly number[] } | null;
+  duelFor(pid: number): { readonly a: number; readonly b: number } | null;
+}
+
+// The stealthed PLAYER whose concealment decides whether `e` ships, or null when
+// stealth does not apply to `e`. A player answers for themselves. A summoned mob
+// (pet, demon, elemental, undead, guardian, totem) answers for its stealthed
+// OWNER: a pet left standing at an invisible owner's heel would leak the owner's
+// position by proxy (the same reasoning bgWideInterestApplies uses). A summon
+// that is fighting (inCombat: it holds a live target) stays visible, so an enemy
+// can always see, target and answer whatever is hitting them.
+export function stealthSubject(e: Entity, entities: ReadonlyMap<number, Entity>): Entity | null {
+  if (e.kind === 'player') return isStealthed(e) ? e : null;
+  if (e.ownerId === null || e.inCombat) return null;
+  const owner = entities.get(e.ownerId);
+  if (owner === undefined || owner.kind !== 'player' || !isStealthed(owner)) return null;
+  return owner;
+}
+
+// Whether `viewer` may receive `e` in its snapshot, given stealth. Runs ahead of
+// every interest-radius branch, so a hidden entity ships nowhere. `d2` is the
+// squared viewer-to-`e` distance the broadcast pass already computed. Allies keep
+// sight of a stealthed party member (unless the two are dueling); hostile viewers
+// never see a stealthed subject; anyone else detects it only inside the classic
+// level-scaled radius, measured to the stealthed PLAYER, never to their summon.
+export function canObserveEntity(
+  world: StealthObservationWorld,
+  viewer: Entity,
+  e: Entity,
+  d2: number,
+): boolean {
+  const hidden = stealthSubject(e, world.entities);
+  if (hidden === null || hidden.id === viewer.id) return true;
+  if (world.isHostileTo(viewer, hidden)) return false;
+  const party = world.partyOf(viewer.id);
+  const sameParty = party?.members.includes(hidden.id) ?? false;
+  const duel = world.duelFor(viewer.id);
+  const duelingEachOther = duel !== null && (duel.a === hidden.id || duel.b === hidden.id);
+  if (sameParty && !duelingEachOther) return true;
+  let hiddenD2 = d2;
+  if (hidden !== e) {
+    const dx = hidden.pos.x - viewer.pos.x;
+    const dz = hidden.pos.z - viewer.pos.z;
+    hiddenD2 = dx * dx + dz * dz;
+  }
+  const radius = stealthDetectionRadius(viewer, hidden, INTEREST_RADIUS);
+  return hiddenD2 <= radius * radius;
 }

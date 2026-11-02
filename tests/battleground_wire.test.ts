@@ -47,6 +47,7 @@ import {
 import type { ClientWorld } from '../src/net/online';
 import { BG_FLAG_Z, BG_PLAY_HALF_X, BG_PLAY_HALF_Z } from '../src/sim/battleground_layout';
 import { battlegroundOrigin, bgOriginAt } from '../src/sim/data';
+import { summonPet } from '../src/sim/pet/pet_commands';
 import type { BgMatch } from '../src/sim/social/battleground';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
 import type { BgInfo, BgPlayerInfo } from '../src/world_api';
@@ -120,6 +121,13 @@ function snap(sent: FakeClient['sent']): BgSnapshot {
 
 function snapIds(sent: FakeClient['sent']): number[] {
   return snap(sent).ents.map((row) => row.id);
+}
+
+// Every id the last snapshot keeps alive: full or lite rows PLUS the bare `keep`
+// ids of settled entities (a settled entity ships no row but is still present).
+function presentIds(sent: FakeClient['sent']): number[] {
+  const last = snap(sent) as BgSnapshot & { keep?: number[] };
+  return [...last.ents.map((row) => row.id), ...(last.keep ?? [])];
 }
 
 function eventList(sent: Array<{ t?: unknown; list?: unknown }>): SimEvent[] {
@@ -513,6 +521,49 @@ describe('match-scoped interest: own team and field objects, never enemy players
       foe.stealthed = true;
       snapshotBroadcaster(server).broadcastSnapshots();
       expect(snapIds(bg.wsA.sent)).not.toContain(bg.foeC.pid);
+    });
+  });
+
+  it("a stealthed enemy's pet hides with them, and reappears once it fights", () => {
+    // A pet left at an invisible owner's heel would leak the owner's position by
+    // proxy, so the summon inherits its owner's concealment (stealthSubject in
+    // server/interest_policy.ts). A pet that is fighting stays visible.
+    withDevCommands(() => {
+      const server = new GameServer();
+      const bg = start2v2(server);
+      const mine = bg.match.flags[bg.myTeam].home;
+      const toward = bg.match.flags[1 - bg.myTeam].home.z > mine.z ? 1 : -1;
+      placeAt(server, bg.allyA.pid, mine.x, mine.z);
+      placeAt(server, bg.foeC.pid, mine.x, mine.z + toward * 30);
+      const foe = server.sim.entities.get(bg.foeC.pid);
+      expect(foe, `entity ${bg.foeC.pid} exists`).toBeDefined();
+      if (!foe) return;
+      summonPet(server.sim.ctx, foe, 'emberkin');
+      const pet = server.sim.petOf(foe.id);
+      expect(pet, 'the foe owns a summoned demon').not.toBeNull();
+      if (!pet) return;
+      placeAt(server, pet.id, foe.pos.x + 2, foe.pos.z);
+      pet.inCombat = false;
+      // visible first: owner and pet both ship to the enemy viewer
+      snapshotBroadcaster(server).broadcastSnapshots();
+      expect(presentIds(bg.wsA.sent)).toContain(bg.foeC.pid);
+      expect(presentIds(bg.wsA.sent)).toContain(pet.id);
+      // the owner stealths: owner AND pet vanish from the enemy snapshot...
+      foe.stealthed = true;
+      snapshotBroadcaster(server).broadcastSnapshots();
+      expect(presentIds(bg.wsA.sent)).not.toContain(bg.foeC.pid);
+      expect(presentIds(bg.wsA.sent)).not.toContain(pet.id);
+      // ...but the owner's own teammate still tracks both
+      placeAt(server, bg.foeD.pid, mine.x + 5, mine.z + toward * 30);
+      foe.stealthed = true;
+      snapshotBroadcaster(server).broadcastSnapshots();
+      expect(presentIds(bg.wsD.sent)).toContain(bg.foeC.pid);
+      expect(presentIds(bg.wsD.sent)).toContain(pet.id);
+      // a pet that is fighting is never invisible to the side it can hit
+      pet.inCombat = true;
+      snapshotBroadcaster(server).broadcastSnapshots();
+      expect(presentIds(bg.wsA.sent)).not.toContain(bg.foeC.pid);
+      expect(presentIds(bg.wsA.sent)).toContain(pet.id);
     });
   });
 });
