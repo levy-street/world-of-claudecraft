@@ -33,7 +33,7 @@ const SEXTON_HOUSE = paintedTownBuilding({
   model: 'house_a',
   look: LOOK,
   anchor: { x: 376.92, z: 1397.26 },
-  rotation: 1.3614, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 1.3614, // Studio town rework (#4593)
   scale: 1.4,
 });
 

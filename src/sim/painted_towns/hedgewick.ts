@@ -39,7 +39,7 @@ const INN = paintedTownBuilding({
   model: 'tavern',
   look: LOOK,
   anchor: { x: 338.85, z: 782.26 },
-  rotation: 3.7001, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.7001, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The chapel (hall, 1.0: a five-yard portal already): where the hexagon church
@@ -52,7 +52,7 @@ const CHAPEL = paintedTownBuilding({
   model: 'hall',
   look: LOOK,
   anchor: { x: 288.66, z: 789.75 },
-  rotation: 3.159, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.159, // Studio town rework (#4593)
   scale: 1,
 });
 // The green house (house_b, 1.3, sealed): north of the green between the
@@ -64,7 +64,7 @@ const GREEN_HOUSE = paintedTownBuilding({
   model: 'house_b',
   look: LOOK,
   anchor: { x: 317.37, z: 834.74 },
-  rotation: 1.1868, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 1.1868, // Studio town rework (#4593)
   scale: 1.3,
 });
 // The pond house (house_a, 1.4, sealed): the wedge between the pond road and
@@ -76,7 +76,7 @@ const POND_HOUSE = paintedTownBuilding({
   model: 'house_a',
   look: LOOK,
   anchor: { x: 344.91, z: 823.4 },
-  rotation: 5.9865, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 5.9865, // Studio town rework (#4593)
   scale: 1.4,
 });
 

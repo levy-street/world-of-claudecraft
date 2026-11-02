@@ -15,6 +15,7 @@
 //  3. Reachability: a BFS walk under the player climb gate (swimming
 //     allowed) connects each pad to a road.
 import { describe, expect, it } from 'vitest';
+import { PRACTICE_ROW_MARKS } from '../src/sim/content/practice_dummies';
 import { CAMPS, DUNGEON_X_THRESHOLD, PROPS } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import {
@@ -355,9 +356,10 @@ describe('every placement is walkable from the road network', () => {
     }
     // OCCUPANCY FLOOR. Every pad here is skipped when its skirt is dropped, so a
     // calmSkirtWidth regression that returned null everywhere would empty this
-    // arm and pass green over nothing. 901 walk today; the floor sits under that
-    // with room for ordinary roster churn.
-    expect(walked, 'the escape sweep walked almost no pads').toBeGreaterThanOrEqual(800);
+    // arm and pass green over nothing. 792 walk today (911 before the Studio
+    // town rework, #4593, removed every tent and a few hundred other scenery
+    // records); the floor sits under that with room for ordinary roster churn.
+    expect(walked, 'the escape sweep walked almost no pads').toBeGreaterThanOrEqual(700);
     expect(failures, failures.join('; ')).toEqual([]);
   });
 
@@ -406,16 +408,22 @@ describe('the reported spots', () => {
   });
 
   it('the Highwatch training dummy is reachable, not a ledge', () => {
-    // The radius-0 camp at (-40, 648): the pre-fix skirt compressed ~12yd
-    // of divergence into 4.4yd of ring (a 5.9 grade wall at r=8).
+    // The radius-0 camp, reported at (-40, 648): the pre-fix skirt compressed
+    // ~12yd of divergence into 4.4yd of ring (a 5.9 grade wall at r=8). The
+    // Studio town rework (#4593) moved the practice row, so the probe follows
+    // the dummy to its new mark (practice_dummies.ts PRACTICE_ROW_MARKS).
+    const { x: dx, z: dz } = PRACTICE_ROW_MARKS.training_dummy;
+    expect(
+      CAMPS.some((c) => c.mobId === 'training_dummy' && c.center.x === dx && c.center.z === dz),
+    ).toBe(true);
     for (let r = 5; r <= 20; r += 1) {
       for (let i = 0; i < 8; i++) {
         const a = (i / 8) * Math.PI * 2;
-        const hIn = terrainHeight(-40 + Math.cos(a) * (r - 1), 648 + Math.sin(a) * (r - 1), SEED);
-        const hOut = terrainHeight(-40 + Math.cos(a) * r, 648 + Math.sin(a) * r, SEED);
-        expect(Math.abs(hOut - hIn)).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
+        const hIn = terrainHeight(dx + Math.cos(a) * (r - 1), dz + Math.sin(a) * (r - 1), SEED);
+        const hOut = terrainHeight(dx + Math.cos(a) * r, dz + Math.sin(a) * r, SEED);
+        expect(Math.abs(hOut - hIn), `r=${r} spoke ${i}`).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
       }
     }
-    expect(reachesRoad(-40, 648)).toBe(true);
+    expect(reachesRoad(dx, dz)).toBe(true);
   });
 });

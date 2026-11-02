@@ -34,7 +34,7 @@ const INN = paintedTownBuilding({
   model: 'tavern',
   look: LOOK,
   anchor: { x: -343.21, z: 1395.14 },
-  rotation: 3.6303, // Studio town rework (#4593) // Studio town rework (#4593) HUB),
+  rotation: 3.6303, // Studio town rework (#4593) HUB),
   scale: 1.2,
 });
 // The moon shrine (the old kit chapel): south of the Nightbloom Rest graves,
@@ -48,7 +48,7 @@ const SHRINE = paintedTownBuilding({
   model: 'hall',
   look: LOOK,
   anchor: { x: -387.26, z: 1400.73 },
-  rotation: 4.0317, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 4.0317, // Studio town rework (#4593)
   scale: 1,
 });
 // A house north-north-east between the Barrow road and the Gloamfield road
@@ -59,7 +59,7 @@ const HOUSE = paintedTownBuilding({
   model: 'house_c',
   look: LOOK,
   anchor: { x: -380.76, z: 1445.52 },
-  rotation: 5.9865, // Studio town rework (#4593) // Studio town rework (#4593) HUB),
+  rotation: 5.9865, // Studio town rework (#4593) HUB),
   scale: 1.4,
 });
 

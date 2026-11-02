@@ -155,16 +155,18 @@ describe('the Highwatch town view', () => {
         expect(Math.hypot(x - hub.x, z - hub.z), building.id).toBeLessThan(KIT.cullRadius);
       }
     }
-    // the smithy stands on its terrace about 44 yards out: a camera just past
-    // its far corner, in fog 20 yards deep, is 57 yards from the hub, where a
-    // circle of the hub ring plus its margin (32) answered hidden
-    const smithy = HIGHWATCH_LAYOUT.buildings.find((b) => b.id === 'highwatch_smithy');
-    if (!smithy) throw new Error('missing smithy');
-    const camX = smithy.reach.center.x + smithy.reach.halfWidth + 0.7;
-    const camZ = smithy.reach.center.z + smithy.reach.halfDepth + 1.5;
+    // the gate chapel stands on the north road about 84 yards out (the Studio
+    // town rework, #4593, moved it there; the smithy it replaces in this pin
+    // came in to about 46): a camera just past its far corner, in fog 20 yards
+    // deep, is well past a circle of the hub ring plus its margin (32), which
+    // answered hidden
+    const chapel = HIGHWATCH_LAYOUT.buildings.find((b) => b.id === 'highwatch_gate_chapel');
+    if (!chapel) throw new Error('missing chapel');
+    const camX = chapel.reach.center.x + chapel.reach.halfWidth + 0.7;
+    const camZ = chapel.reach.center.z + chapel.reach.halfDepth + 1.5;
     expect(Math.hypot(camX - hub.x, camZ - hub.z)).toBeGreaterThan(20 + 32);
     view.update(camX, 12, camZ, camX - 1, 11, camZ - 1, 20, 0.05);
-    expect(buildingGroup(view.group, smithy.id).visible).toBe(true);
+    expect(buildingGroup(view.group, chapel.id).visible).toBe(true);
   });
 
   it('builds an empty root for a world that does not carry the town', () => {

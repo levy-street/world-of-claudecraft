@@ -332,7 +332,8 @@ describe('the walk surface belongs to the shipped world only', () => {
 describe('Ondrel, his camp and the shore-rocks stay within reach', () => {
   it('Ondrel stands on his own authored spot, on natural ground, clear of every solid', () => {
     const def = NPCS.tidewatcher_ondrel;
-    expect(def.pos).toEqual({ x: -66, z: 786 });
+    // the Studio town rework (#4593) moved his post from (-66, 786)
+    expect(def.pos).toEqual({ x: -57.11, z: 781.53 });
     const sim = makeSim();
     const npc = [...sim.entities.values()].find((e) => e.templateId === 'tidewatcher_ondrel');
     expect(npc).toBeDefined();

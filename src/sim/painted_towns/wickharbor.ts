@@ -38,7 +38,7 @@ const INN = paintedTownBuilding({
   model: 'tavern',
   look: LOOK,
   anchor: { x: 431.77, z: 333.58 },
-  rotation: 3.6303, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.6303, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The smithy (smithy, 1.3, walk-in): the square's north-east corner, where
@@ -51,7 +51,7 @@ const SMITHY = paintedTownBuilding({
   model: 'smithy',
   look: LOOK,
   anchor: { x: 382.88, z: 370.6 },
-  rotation: 0, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 0, // Studio town rework (#4593)
   scale: 1.3,
 });
 // The market hall (shop_a, 1.3, walk-in): the square's north-west corner,
@@ -65,7 +65,7 @@ const MARKET = paintedTownBuilding({
   model: 'shop_a',
   look: LOOK,
   anchor: { x: 411.85, z: 391.84 },
-  rotation: 4.6949, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 4.6949, // Studio town rework (#4593)
   scale: 1.3,
 });
 // The downs house (house_a, 1.4, sealed): beside the churchyard where the
@@ -76,7 +76,7 @@ const DOWNS_HOUSE = paintedTownBuilding({
   model: 'house_a',
   look: LOOK,
   anchor: { x: 382.66, z: 338.3 },
-  rotation: 2.9322, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 2.9322, // Studio town rework (#4593)
   scale: 1.4,
 });
 // The Windway house (house_a, 1.4, sealed): beyond the smithy where the kit
@@ -88,7 +88,7 @@ const WINDWAY_HOUSE = paintedTownBuilding({
   model: 'house_a',
   look: LOOK,
   anchor: { x: 342.34, z: 375.42 },
-  rotation: 0.2269, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 0.2269, // Studio town rework (#4593)
   scale: 1.4,
 });
 

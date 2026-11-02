@@ -190,10 +190,12 @@ describe('banker chest model and placement', () => {
       // behind and beside him (the kit town hall's facade stood directly
       // behind him and pushed it to the front corner). Petra's rebuilt exterior
       // teller still keeps the bank facade directly behind her, so her first
-      // fully clear spot is in front.
+      // fully clear spot is in front. The Studio town rework (#4593) stood
+      // Aldous Crane out on the open north road at Highwatch, so the ground
+      // behind him is clear and he takes the first candidate too.
       bursar_fernando: [1.15, -1.6],
       bursar_petra_vell: [2.0, 0.9],
-      bursar_aldous_crane: [2.0, 0.9],
+      bursar_aldous_crane: [1.15, -1.6],
     };
     for (const [templateId, expected] of Object.entries(expectedOffsets)) {
       const entity = placedBuiltInBanker(templateId);

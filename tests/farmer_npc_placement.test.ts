@@ -29,7 +29,8 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // the north-lane site): a re-seat is a deliberate content edit that also
 // moves the terrain atlas, the Eastbrook chunk digest, the map plates and
 // every golden (deviation (bh)), so it must red HERE first, by literal, not
-// only in the full-suite-only seal family.
+// only in the full-suite-only seal family. The Studio town rework (#4593)
+// re-seated Jessica, Hollis and Verbena beside their patches' new sites.
 const FARMERS: readonly {
   id: string;
   patchId: string;
@@ -40,7 +41,7 @@ const FARMERS: readonly {
     id: 'farmer_jessica',
     patchId: 'patch_eastbrook',
     zoneId: 'eastbrook_vale',
-    seat: { x: -15.5, z: -81.5 },
+    seat: { x: -85.26, z: -71.07 },
   },
   {
     id: 'farmer_teasel',
@@ -52,13 +53,13 @@ const FARMERS: readonly {
     id: 'farmer_hollis',
     patchId: 'patch_thornpeak',
     zoneId: 'thornpeak_heights',
-    seat: { x: -18, z: 695.5 },
+    seat: { x: -50.96, z: 652.48 },
   },
   {
     id: 'farmer_verbena',
     patchId: 'patch_evergarden',
     zoneId: 'evergarden',
-    seat: { x: 348.5, z: 867 },
+    seat: { x: 353.14, z: 863.59 },
   },
 ];
 

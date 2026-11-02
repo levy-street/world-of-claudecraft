@@ -740,6 +740,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
+  // Re-minted for the Studio town rework (#4593), which moved the smithy, the
+  // quay cottage, the vault and the town's NPC stands in eastbrook_layout.ts.
+  // No capture was retaken.
   'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {

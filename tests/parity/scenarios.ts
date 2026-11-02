@@ -23,6 +23,7 @@
 
 import { supportHeightAt } from '../../src/sim/colliders';
 import { CORPSE_DURATION } from '../../src/sim/combat/damage';
+import { farmBedById } from '../../src/sim/content/farm_patches';
 import {
   arenaOrigin,
   DELVES,
@@ -6000,16 +6001,27 @@ export const FARM_GOLDEN_WIN_YIELD_SEED = 7;
 export const FARM_GOLDEN_PADDING_CYCLES = 36;
 
 function professionsFarmingSession(seed = 1): Scenario {
-  // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
-  // bed_eastbrook_1 at 16,30 and bed_eastbrook_2 at 21,30). Beds sit on a 5
-  // yard pitch, which is INTERACT_RANGE, so the midpoint below is 2.5yd from
-  // each and one stand point reaches both: no teleport between the plants, and
-  // none between the harvests. The Phase 5 extension (deviation (z)) then
-  // moves to the Thornpeak patch (content/farm_patches.ts bed_thornpeak_1 at
-  // -23,685) for the tier-3 seed-back beat.
+  // Two neighbouring beds of the Eastbrook allotments (content/farm_patches.ts
+  // bed_eastbrook_1 and bed_eastbrook_2). Beds sit on a 5 yard pitch, which is
+  // INTERACT_RANGE, so their midpoint is 2.5yd from each and one stand point
+  // reaches both: no teleport between the plants, and none between the
+  // harvests. The Phase 5 extension (deviation (z)) then moves to the Thornpeak
+  // patch (bed_thornpeak_1) for the tier-3 seed-back beat. Stand points are read
+  // from the bed table, so a patch move (the Studio town rework, #4593, moved
+  // both) carries the scenario with it.
   const BED_READY = 'bed_eastbrook_1';
   const BED_WITHERED = 'bed_eastbrook_2';
   const BED_T3 = 'bed_thornpeak_1';
+  const bedAt = (id: string): { x: number; z: number } => {
+    const bed = farmBedById(id);
+    if (!bed) throw new Error(`farming_session: no bed ${id}`);
+    return bed;
+  };
+  const PAIR_MID = {
+    x: (bedAt(BED_READY).x + bedAt(BED_WITHERED).x) / 2,
+    z: (bedAt(BED_READY).z + bedAt(BED_WITHERED).z) / 2,
+  };
+  const T3_STAND = bedAt(BED_T3);
   const CROP = 'vale_wheat';
   return {
     name: 'farming_session',
@@ -6062,11 +6074,8 @@ function professionsFarmingSession(seed = 1): Scenario {
       sim.addItem('vale_wheat_seed', 2, pid);
       // The step-12 hoe gate: plantCrop now refuses without a wieldable hoe.
       sim.addItem('garden_hoe', 1, pid);
-      // Midway between bed_eastbrook_1 (-24, -84) and bed_eastbrook_2 (-19, -84),
-      // both in reach. The patch moved from the north lane (beds at z 30) to the
-      // rebuilt town's north-east edge at the release/v0.41.0 merge, when the
-      // second wolf run landed on the old site.
-      teleport(sim, p, -21.5, -84);
+      // Midway between bed_eastbrook_1 and bed_eastbrook_2, both in reach.
+      teleport(sim, p, PAIR_MID.x, PAIR_MID.z);
 
       // Plant one: the first two draws of the session.
       plantCrop(sim.ctx, p, meta, BED_READY, CROP);
@@ -6156,7 +6165,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // also drains the toniced harvest's queued gain BEFORE the proficiency
       // write below, so the write is the last word.
       rec.tick(FARM_PLANT_WINDOW_TICKS);
-      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      teleport(sim, p, T3_STAND.x, T3_STAND.z); // bed_thornpeak_1
       meta.gatheringProficiency.farming = 75;
       sim.addItem('skysilver_hoe', 1, pid);
       sim.addItem('highland_barley_seed', 1, pid);
@@ -6184,7 +6193,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // fact: a draw or a repeat here moves the event digest and nothing
       // else in the suite would see it. ----
       sim.addItem('vale_wheat_seed', 1, pid);
-      teleport(sim, p, -21.5, -84); // back to the freed Eastbrook bed (the pair's midpoint)
+      teleport(sim, p, PAIR_MID.x, PAIR_MID.z); // back to the freed Eastbrook bed (the pair's midpoint)
       // Ride out the t3 plant's flavor cast remainder (its harvest landed
       // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
       rec.tick(FARM_PLANT_WINDOW_TICKS);
@@ -6286,7 +6295,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       padFinal.survivalRoll = 0.99;
       harvestCrop(sim.ctx, p, meta, BED_WITHERED);
       meta.gatheringProficiency.farming = 75; // restore for the tier-3 beat
-      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      teleport(sim, p, T3_STAND.x, T3_STAND.z); // bed_thornpeak_1
       sim.addItem('highland_barley_seed', 1, pid);
       rec.tick(FARM_PLANT_WINDOW_TICKS);
       plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');

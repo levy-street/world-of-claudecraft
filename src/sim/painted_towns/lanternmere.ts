@@ -24,7 +24,7 @@ const INN = paintedTownBuilding({
   model: 'tavern',
   look: LOOK,
   anchor: { x: -337.24, z: 2070.74 },
-  rotation: 1.5708, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 1.5708, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The chapel: east of the square, its door facing the inn's across the well and
@@ -47,7 +47,7 @@ const HOUSE = paintedTownBuilding({
   model: 'house_a',
   look: LOOK,
   anchor: { x: -383.19, z: 2057.22 },
-  rotation: 5.62, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 5.62, // Studio town rework (#4593)
   scale: 1.4,
 });
 

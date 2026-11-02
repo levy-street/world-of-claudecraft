@@ -63,7 +63,7 @@ const WATCH_HOUSE = paintedTownBuilding({
   model: 'house_a',
   look: LOOK,
   anchor: { x: 303.8, z: 51.33 },
-  rotation: 3.1416, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.1416, // Studio town rework (#4593)
   scale: 1.4,
 });
 

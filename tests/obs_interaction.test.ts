@@ -266,10 +266,12 @@ describe('RL interactable observation parity', () => {
   it('advertises the Chronicler when the shipped board is 4.5 yards away and the Chronicler is 4.8', () => {
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md): the board and the toolworks
-    // are no longer neighbors, so the shipped-placement pairing swaps to
-    // chronicler_saul, the NPC the plan seats at the noticeboard. The standAt
-    // literal is the circle intersection of r=4.5 around the board (5, -89)
-    // and r=4.8 around Saul (10.2, -87.5); only those two sit in scan range.
+    // are no longer neighbors, so the pairing swaps to chronicler_saul. The
+    // Studio town rework (#4593) stood Saul down by the bank, far from the
+    // board, so the fixture now walks him back to his former stand beside
+    // it, (10.2, -87.5), as a literal. The standAt literal is the circle
+    // intersection of r=4.5 around the board (5, -89) and r=4.8 around that
+    // stand; only those two sit in scan range.
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
     const board = entityByTemplate(sim, 'noticeboard_eastbrook');
     const saul = entityByTemplate(sim, 'chronicler_saul');
@@ -277,6 +279,7 @@ describe('RL interactable observation parity', () => {
     // adds interactables of its own, and the claim under test is
     // board-vs-Saul priority, not who is nearest overall.
     parkOtherInteractables(sim, board, saul);
+    moveTo(sim, saul, { x: 10.2, z: -87.5 });
     const player = standAt(sim, {
       x: 6.305857720281236,
       z: -84.69364009697496,

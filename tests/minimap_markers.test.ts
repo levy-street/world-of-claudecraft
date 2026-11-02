@@ -1208,13 +1208,17 @@ describe('station markers (Professions 2.0)', () => {
   // 23-31 yards out, inside the rim.
   const VIEW_POS = { x: -14, z: -102 };
 
-  function makeStationWorld(shape: 'sim' | 'client', over: Record<string, unknown> = {}): IWorld {
+  function makeStationWorld(
+    shape: 'sim' | 'client',
+    over: Record<string, unknown> = {},
+    viewPos: { x: number; z: number } = VIEW_POS,
+  ): IWorld {
     const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
     const player = {
       id: 1,
       kind: 'player',
       name: 'Me',
-      pos: { ...VIEW_POS },
+      pos: { ...viewPos },
       facing: 0,
       dead: false,
       lootable: false,
@@ -1329,9 +1333,12 @@ describe('station markers (Professions 2.0)', () => {
     return buildMarkers(world).filter((m) => m.kind === 'farm-patch');
   }
 
-  // The Eastbrook allotments (-21.5, -81.5) sit 20 yd from the civic center,
-  // inside the rim from VIEW_POS; the tier-2 Mirefen site (z 341) is far
-  // beyond it.
+  // The Eastbrook allotments sit inside the rim from FARM_VIEW_POS; the tier-2
+  // Mirefen site (z 341) is far beyond it. The Studio town rework (#4593)
+  // moved the allotments west of the bank quay (-81.31, -78.54), about 71 yd
+  // from the civic center and so past the rim from VIEW_POS, so the patch
+  // viewer stands about 16 yd from them instead.
+  const FARM_VIEW_POS = { x: -70, z: -90 };
   const NEAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_eastbrook');
   const FAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_mirefen');
 
@@ -1339,13 +1346,15 @@ describe('station markers (Professions 2.0)', () => {
     expect(NEAR_PATCH).toBeDefined();
     if (!NEAR_PATCH) return;
     for (const shape of ['sim', 'client'] as const) {
-      const markers = farmMarkers(makeStationWorld(shape, { farmPatches: FARM_PATCHES }));
+      const markers = farmMarkers(
+        makeStationWorld(shape, { farmPatches: FARM_PATCHES }, FARM_VIEW_POS),
+      );
       expect(markers, shape).toEqual([
         {
           kind: 'farm-patch',
           patchId: 'patch_eastbrook',
-          mx: S / 2 - (NEAR_PATCH.x - VIEW_POS.x) * PPY,
-          my: S / 2 - (NEAR_PATCH.z - VIEW_POS.z) * PPY,
+          mx: S / 2 - (NEAR_PATCH.x - FARM_VIEW_POS.x) * PPY,
+          my: S / 2 - (NEAR_PATCH.z - FARM_VIEW_POS.z) * PPY,
         },
       ]);
     }
@@ -1354,7 +1363,9 @@ describe('station markers (Professions 2.0)', () => {
   it('culls a patch beyond the rim and a zone with no patch at all', () => {
     expect(FAR_PATCH).toBeDefined();
     if (!FAR_PATCH) return;
-    expect(farmMarkers(makeStationWorld('sim', { farmPatches: [FAR_PATCH] }))).toEqual([]);
+    expect(
+      farmMarkers(makeStationWorld('sim', { farmPatches: [FAR_PATCH] }, FARM_VIEW_POS)),
+    ).toEqual([]);
     expect(farmMarkers(makeStationWorld('sim', { farmPatches: [] }))).toEqual([]);
   });
 
@@ -1399,23 +1410,29 @@ describe('station markers (Professions 2.0)', () => {
   });
 
   it('is viewer-invariant: quest, social, and profession state never change the set', () => {
-    const base = farmMarkers(makeStationWorld('sim', { farmPatches: FARM_PATCHES }));
+    const base = farmMarkers(makeStationWorld('sim', { farmPatches: FARM_PATCHES }, FARM_VIEW_POS));
     expect(base).toHaveLength(1);
-    const busy = makeStationWorld('client', {
-      farmPatches: FARM_PATCHES,
-      questState: () => 'available',
-      nodeHarvestableByMe: () => false,
-      socialInfo: {
-        friends: [{ id: 20, name: 'Friend', online: true }],
-        blocks: [],
-        guild: { id: 1, name: 'G', rank: 'member', members: [] },
+    const busy = makeStationWorld(
+      'client',
+      {
+        farmPatches: FARM_PATCHES,
+        questState: () => 'available',
+        nodeHarvestableByMe: () => false,
+        socialInfo: {
+          friends: [{ id: 20, name: 'Friend', online: true }],
+          blocks: [],
+          guild: { id: 1, name: 'G', rank: 'member', members: [] },
+        },
       },
-    });
+      FARM_VIEW_POS,
+    );
     expect(farmMarkers(busy)).toEqual(base);
   });
 
   it('draws patches before the player arrow (draw order: the arrow stays on top)', () => {
-    const markers = buildMarkers(makeStationWorld('sim', { farmPatches: FARM_PATCHES }));
+    const markers = buildMarkers(
+      makeStationWorld('sim', { farmPatches: FARM_PATCHES }, FARM_VIEW_POS),
+    );
     expect(markers[markers.length - 1].kind).toBe('player');
     const lastPatch = markers.map((m) => m.kind).lastIndexOf('farm-patch');
     expect(lastPatch).toBeGreaterThanOrEqual(0);
@@ -1441,9 +1458,8 @@ describe('minimap corpse marker (ghost run)', () => {
 
 // The gather-node marker's locked dimension. The viewer stands ON
 // the new tier-2 mirefen vein (ore_mirefen_t2), where the rim covers exactly
-// five nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
-// wood_mirefen_1, herb_mirefen_3 (all tier 1) and the tier-2 vein itself at
-// the map centre. Actionable info on every preset: locked resolves from the
+// four nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
+// herb_mirefen_3 (all tier 1) and the tier-2 vein itself at the map centre. Actionable info on every preset: locked resolves from the
 // bags, never a graphics knob.
 //
 // The count has moved twice with content, re-minted each time rather than
@@ -1451,9 +1467,10 @@ describe('minimap corpse marker (ghost run)', () => {
 // (60, 380) pool) moved onto dry shore 47.0 yards out, past the 43.53-yard
 // rim; the v0.32.0 merge then moved the anchor vein itself off (48,352)
 // (an expansion collider took the spot), and from (36,350) wood_mirefen_1
-// sits back inside the rim at 32.8 yards. That widens the coverage the arms
-// below care about: an ore vein a pick unlocks beside a herb patch AND a
-// wood stand it does not.
+// sits back inside the rim at 32.8 yards. It read four again when the Studio
+// town rework (#4593) moved wood_mirefen_1 to (-32.58, 379.49), about 75
+// yards out, far past the rim. The herb patch still gives the arms below a
+// node the pick does not unlock beside the ore veins it does.
 describe('gather-node markers: the locked dimension', () => {
   const T2 = { x: 36, z: 350 }; // ore_mirefen_t2, pinned literally (moved at the v0.32.0 merge)
 
@@ -1510,7 +1527,7 @@ describe('gather-node markers: the locked dimension', () => {
 
   it('a toolless viewer sees EVERY node locked (#2343: bare hands never gather)', () => {
     const markers = gatherMarkers(makeGatherWorld('sim'));
-    expect(markers.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    expect(markers.map((m) => m.locked)).toEqual([true, true, true, true]);
     // The centre marker is the tier-2 vein under the viewer, still ready:
     // locked is the tool dimension, never the respawn one.
     const centre = markers.find((m) => m.mx === S / 2 && m.my === S / 2);
@@ -1525,17 +1542,17 @@ describe('gather-node markers: the locked dimension', () => {
         gatheringProficiency: { mining: 40 },
       }),
     );
-    // GATHER_NODES rim order: ore t1, ore t1, wood t1, herb t1, ore t2
-    // (centre): the pick unlocks the ores alone; the wood stand and the herb
-    // patch both stay locked without their own implements.
-    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    // GATHER_NODES rim order: ore t1, ore t1, herb t1, ore t2 (centre): the
+    // pick unlocks the ores alone; the herb patch stays locked without its
+    // own implement.
+    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, false]);
     // The R22 degrade arm: the SAME pick with the counter short works as its
     // best wieldable lower tier, so the tier-1 ores open and the tier-2
     // centre vein still locks (owned is not fully earned).
     const unearned = gatherMarkers(
       makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
     );
-    expect(unearned.map((m) => m.locked)).toEqual([false, false, true, true, true]);
+    expect(unearned.map((m) => m.locked)).toEqual([false, false, true, true]);
     // Locked composes WITH the respawn dimension, never replaces it: a
     // cooling locked vein keeps ready=false (the silhouette the painter keeps
     // readable under the locked tint).
@@ -1589,19 +1606,18 @@ describe('gather-node markers: the locked dimension', () => {
     const unearnedClient = gatherMarkers(
       makeGatherWorld('client', { inventory: PICK, gatheringProficiency: { mining: 0 } }),
     );
-    expect(unearnedSim.map((m) => m.locked)).toEqual([false, false, true, true, true]);
+    expect(unearnedSim.map((m) => m.locked)).toEqual([false, false, true, true]);
     expect(unearnedClient).toEqual(unearnedSim);
     // The same pick at the pick's own requirement flips the ore rows open
-    // (rim order: ore t1, ore t1, wood t1, herb t1, ore t2 at the centre);
-    // the wood stand and the herb patch keep locking for want of their own
-    // implements, in both shapes.
+    // (rim order: ore t1, ore t1, herb t1, ore t2 at the centre); the herb
+    // patch keeps locking for want of its own implement, in both shapes.
     const earnedSim = gatherMarkers(
       makeGatherWorld('sim', { inventory: PICK, gatheringProficiency: { mining: 40 } }),
     );
     const earnedClient = gatherMarkers(
       makeGatherWorld('client', { inventory: PICK, gatheringProficiency: { mining: 40 } }),
     );
-    expect(earnedSim.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    expect(earnedSim.map((m) => m.locked)).toEqual([false, false, true, false]);
     expect(earnedClient).toEqual(earnedSim);
     // The pair genuinely discriminates: the counter, and nothing else, moved
     // the vector, so this parity assertion is not two copies of one constant.

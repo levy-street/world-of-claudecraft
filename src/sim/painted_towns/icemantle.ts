@@ -26,7 +26,7 @@ const CHAPEL = paintedTownBuilding({
   model: 'hall',
   look: LOOK,
   anchor: { x: -52.68, z: 1607.43 },
-  rotation: 5.969, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 5.969, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The trade hall (the kit 'inn' record that stood for it): west of the plaza
@@ -37,7 +37,7 @@ const TRADE_HALL = paintedTownBuilding({
   model: 'shop_a',
   look: LOOK,
   anchor: { x: -13.64, z: 1573.14 },
-  rotation: 1.5882, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 1.5882, // Studio town rework (#4593)
   scale: 1.5,
 });
 // A house on the high shelf across the Shiverfen road from the chapel (sealed),
@@ -48,7 +48,7 @@ const SHELF_HOUSE = paintedTownBuilding({
   model: 'house_c',
   look: LOOK,
   anchor: { x: -49.12, z: 1555.48 },
-  rotation: 4.1713, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 4.1713, // Studio town rework (#4593)
   scale: 1.4,
 });
 

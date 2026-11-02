@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
+import { insidePrism } from '../src/sim/colliders_authored/prism';
 import {
   EASTBROOK_FERRY_HULL,
   eastbrookFerryHalfBeam,
@@ -54,7 +55,9 @@ function outline(): { deck: [number, number][]; keel: [number, number][] } {
 
 function inside(c: Collider, x: number, z: number): boolean {
   if (c.type === 'circle') return Math.hypot(x - c.x, z - c.z) < c.r;
-  if (c.type === 'prism') throw new Error('unexpected prism collider');
+  // an authored placement's Collision Master volume (the Studio town rework, #4593,
+  // stood a collidable pine on the Eastbrook shore inside the lane's query box)
+  if (c.type === 'prism') return insidePrism(c, x, z);
   const cos = Math.cos(-c.rot);
   const sin = Math.sin(-c.rot);
   const lx = (x - c.x) * cos + (z - c.z) * sin;

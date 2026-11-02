@@ -401,8 +401,10 @@ const ON_A_DRY_SHORE_WITH_WATER_IN_REACH = { x: 210, z: -24 }; // dry underfoot,
 const ON_MAZE_WALL_POCKET = { x: -232, z: 452 }; // steep, and encloses its own standable foot
 // Inside the sealed quay cottage (EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage):
 // re-staged there when the genshin artstyle merge (8bff2cec638) cleared the
-// Wolf Run barracks the old (17, -6) fixture sat inside.
-const DEEP_INSIDE_A_BUILDING = { x: -59, z: -55 }; // standable ground is 4yd out
+// Wolf Run barracks the old (17, -6) fixture sat inside, and re-staged again
+// at the cottage's new anchor when the Studio town rework (#4593) moved it
+// from (-59.11, -51.35) to (-53.46, -47.24).
+const DEEP_INSIDE_A_BUILDING = { x: -57, z: -50 }; // standable ground is 4yd out
 const ON_THE_EASTBROOK_NORTH_LANE = { x: 0, z: 10 }; // the road itself: dry, flat, unblocked
 
 const MAZE_WALL_FLOOD_BOX = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);

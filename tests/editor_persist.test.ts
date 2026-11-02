@@ -157,9 +157,9 @@ describe('CustomMap build + projection', () => {
     const fenbridgeInn = BUILTIN_WORLD.props.buildings.find(
       ({ id }) => id === 'fenbridge_crooked_reed_inn',
     );
-    const highwatchForge = BUILTIN_WORLD.props.stalls.find(
-      ({ x, z, smithy }) => x === -4.5 && z === 673.5 && smithy,
-    );
+    // The Studio town rework (#4593) removed the Highwatch forge stall, so the
+    // exterior stall pinned here is the Galecrest stables feed stall.
+    const stablesFeedStall = BUILTIN_WORLD.props.stalls.find(({ x, z }) => x === 365 && z === 603);
     const templeCampfire = BUILTIN_WORLD.props.campfires.find(([x, z]) => x === -63 && z === 788);
     expect(exteriorValeMine).toBeDefined();
     expect(fenbridgeInn).toMatchObject({
@@ -169,7 +169,7 @@ describe('CustomMap build + projection', () => {
     });
     expect(fenbridgeInn?.x).toBeCloseTo(21.403452673548912, 6);
     expect(fenbridgeInn?.z).toBeCloseTo(297.9037795860382, 6);
-    expect(highwatchForge).toBeDefined();
+    expect(stablesFeedStall).toBeDefined();
     expect(templeCampfire).toBeDefined();
     expect(world.props.mines).toContainEqual(exteriorValeMine);
     expect(world.props.buildings).toContainEqual(fenbridgeInn);
@@ -180,11 +180,11 @@ describe('CustomMap build + projection', () => {
     expect(
       world.props.stalls.some(({ id }) => id === FENBRIDGE_LAYOUT.civic.provisionStall.id),
     ).toBe(true);
-    expect(world.props.stalls).toContainEqual(highwatchForge);
+    expect(world.props.stalls).toContainEqual(stablesFeedStall);
     expect(world.props.campfires).toContainEqual(templeCampfire);
     expect(world.props.mines.find(({ x, z }) => x === -38 && z === 138)).not.toBe(exteriorValeMine);
-    expect(world.props.stalls.find(({ x, z }) => x === -4.5 && z === 673.5)).not.toBe(
-      highwatchForge,
+    expect(world.props.stalls.find(({ x, z }) => x === 365 && z === 603)).not.toBe(
+      stablesFeedStall,
     );
     expect(world.props.campfires.find(([x, z]) => x === -63 && z === 788)).not.toBe(templeCampfire);
     expect(world.props.docks[0]).not.toBe(BUILTIN_WORLD.props.docks[0]);
@@ -198,7 +198,12 @@ describe('CustomMap build + projection', () => {
     );
     expect(townBuildings.length).toBeGreaterThan(0);
     expect(ids(editable.props.buildings)).toEqual(expect.arrayContaining(townBuildings));
-    expect(editable.props.buildings.length).toBeLessThan(BUILTIN_WORLD.props.buildings.length);
+    // The Studio town rework (#4593) removed the last exterior buildings (the
+    // Galecrest stables barn and the lone cottages), so every shipped building is
+    // town-owned now and the editable map keeps them all, in order.
+    expect(editable.props.buildings.map(({ id }) => id)).toEqual(
+      BUILTIN_WORLD.props.buildings.map(({ id }) => id),
+    );
   });
 
   it('customMapFromContent deep-clones (independent of later edits)', () => {

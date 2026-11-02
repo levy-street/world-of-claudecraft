@@ -91,9 +91,11 @@ describe('gather node rendering', () => {
 
     // 120 nodes in 57 batches through v0.33.0; the phase 20 density pass
     // (the +36 bottom-three set) took the content to 156 nodes and 69
-    // batches. This is the ?gathercoarse=off A/B arm.
-    expect(expectedBatches.size).toBe(69);
-    expect(meshes).toHaveLength(69);
+    // batches. The Studio town rework (#4593) moved wood_eastbrook_2 north
+    // out of the z < 0 band, folding its batch into the band-0 Eastbrook wood
+    // batch: 68. This is the ?gathercoarse=off A/B arm.
+    expect(expectedBatches.size).toBe(68);
+    expect(meshes).toHaveLength(68);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(activeGatherNodes().length);
     for (const mesh of meshes) {
       const nodeIds = mesh.userData.gatherNodeIds as string[];

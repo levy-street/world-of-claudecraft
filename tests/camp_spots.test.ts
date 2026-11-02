@@ -37,7 +37,7 @@ function wolves(sim: Sim): Entity[] {
   );
 }
 
-function after(sim: Sim): { draws: number[]; nextId: number } {
+function streamAfter(sim: Sim): { draws: number[]; nextId: number } {
   const nextId = (sim as unknown as { nextId: number }).nextId;
   const draws: number[] = [];
   for (let i = 0; i < 6; i++) draws.push(sim.rng.next());
@@ -89,11 +89,11 @@ describe('a reworked camp in a real Sim', () => {
   });
 
   it('leaves the shared stream and the entity ids exactly where the shipped camp left them', () => {
-    const shipped = after(makeSim([BASE]));
-    const reworked = after(makeSim([REWORKED]));
+    const shipped = streamAfter(makeSim([BASE]));
+    const reworked = streamAfter(makeSim([REWORKED]));
     expect(reworked).toEqual(shipped);
     // Non-vacuous: really changing the count DOES move the stream.
-    const recounted = after(makeSim([{ ...BASE, count: 2 }]));
+    const recounted = streamAfter(makeSim([{ ...BASE, count: 2 }]));
     expect(recounted.draws).not.toEqual(shipped.draws);
   });
 
@@ -113,6 +113,9 @@ describe('the map document keeps spots and retired slots', () => {
       version: 1,
       meta: { name: 'spots' },
       content: {
+        // One usable zone: without it the sanitizer has nothing to play and
+        // returns null before it ever reaches the camps.
+        zones: [{ id: 'spots', name: 'Spots', zMin: 500, zMax: 700, hub: { x: 600, z: 600 } }],
         camps: [
           {
             ...BASE,
@@ -123,7 +126,9 @@ describe('the map document keeps spots and retired slots', () => {
         ],
       },
     });
-    const camps = doc?.content?.camps ?? [];
+    expect(doc).not.toBeNull();
+    const camps = doc?.content.camps ?? [];
+    expect(camps).toHaveLength(2);
     expect(camps[0].spots).toEqual([
       { x: 606, z: 604 },
       { x: 594, z: 598 },

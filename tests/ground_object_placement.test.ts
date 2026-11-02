@@ -337,7 +337,12 @@ describe('the Stolen Supply Crates lie in the relocated bandit camps', () => {
     expect(def).toBeDefined();
     expect(def?.positions).toHaveLength(6);
     const banditCamps = CAMPS.filter((c) => c.mobId === 'vale_bandit');
-    expect(banditCamps).toHaveLength(2);
+    // The two shipped bandit camps, plus the lone bandit the Studio town rework
+    // (#4593) stood at (67.2, 40.95) (content/studio_rework_camps.ts, offStream).
+    expect(banditCamps).toHaveLength(3);
+    expect(banditCamps.filter((c) => c.offStream).map((c) => c.center)).toEqual([
+      { x: 67.2, z: 40.95 },
+    ]);
     for (const p of def?.positions ?? []) {
       const inBanditCamp = banditCamps.some(
         (camp) => Math.hypot(p.x - camp.center.x, p.z - camp.center.z) <= camp.radius,

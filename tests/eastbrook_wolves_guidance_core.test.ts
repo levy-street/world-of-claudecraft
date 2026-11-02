@@ -137,10 +137,11 @@ describe('wolves guidance geometry and visibility', () => {
 describe('wolves guidance follows Marshal where he stands', () => {
   beforeEach(() => resetWolvesGuideCache());
   afterEach(() => setActiveWorldContent(BUILTIN_WORLD));
-  // A map can move Marshal Redbrook (the Studio "Eastbrook and Mirefen
-  // changes" map stands him on the quay beside the ferry bell); the golden
-  // guidance must lead to the NPC the player can see, not the code layout.
-  const MOVED = { x: -86.2, z: -44.4 };
+  // A map can move Marshal Redbrook; the golden guidance must lead to the NPC
+  // the player can see, not the code layout. The Studio town rework (#4593)
+  // made his quay stand beside the ferry bell the layout spot itself, so the
+  // moved map here stands him back at his former square stand, as a literal.
+  const MOVED = { x: 1.5, z: -95.3 };
   const marshalAt = (pos: { x: number; z: number }, dead = false) =>
     new Map([
       [7, { kind: 'mob', templateId: 'forest_wolf', pos: { x: -10, z: 6 } }],

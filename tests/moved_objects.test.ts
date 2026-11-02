@@ -259,7 +259,10 @@ describe('moved objects: practice dummies', () => {
       [objectMoveKey('practiceDummy', HUB_HEALING_DUMMY_ID)]: { x: -72, z: -58 },
       [objectMoveKey('practiceDummy', healingRow.mobId)]: { x: -60, z: -30 },
     });
-    const shipped = new Sim({ seed: 5, playerClass: 'priest', world: { ...BUILTIN_WORLD } });
+    // The baseline carries no object moves at all, not BUILTIN_WORLD's: since
+    // the Studio town rework (#4593) the live touch-up moves the hub dummies and
+    // deletes the healing-ground row, and movedWorld replaces those moves.
+    const shipped = new Sim({ seed: 5, playerClass: 'priest', world: movedWorld({}) });
     const moved = new Sim({ seed: 5, playerClass: 'priest', world });
     const a = spawnRows(shipped);
     const b = spawnRows(moved);

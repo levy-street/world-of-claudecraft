@@ -30,7 +30,7 @@ const INN = paintedTownBuilding({
   model: 'tavern',
   look: LOOK,
   anchor: { x: -78.79, z: 1025.6 },
-  rotation: 6.0039, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 6.0039, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The shrine (the old hollow chapel): south of the tree, its door and bell tower
@@ -41,7 +41,7 @@ const SHRINE = paintedTownBuilding({
   model: 'hall',
   look: LOOK,
   anchor: { x: 2.33, z: 968.41 },
-  rotation: 3.4208, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.4208, // Studio town rework (#4593)
   scale: 1,
 });
 // The market (Fenna's stores): west of the tree between the west and south-west
@@ -52,7 +52,7 @@ const MARKET = paintedTownBuilding({
   model: 'shop_a',
   look: LOOK,
   anchor: { x: 3.89, z: 1021.6 },
-  rotation: 2.9322, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 2.9322, // Studio town rework (#4593)
   scale: 1.5,
 });
 // The smithy (the old forges): north of the inn, its door and forge shelter on
@@ -63,7 +63,7 @@ const SMITHY = paintedTownBuilding({
   model: 'smithy',
   look: LOOK,
   anchor: { x: -58.58, z: 1061.97 },
-  rotation: 4.5379, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 4.5379, // Studio town rework (#4593)
   scale: 1.3,
 });
 // A wayhouse on the Duskfall road, south of it, its door on the road (sealed).
@@ -73,7 +73,7 @@ const WAYHOUSE = paintedTownBuilding({
   model: 'house_c',
   look: LOOK,
   anchor: { x: -91.6, z: 991.9 },
-  rotation: 2.5656, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 2.5656, // Studio town rework (#4593)
   scale: 1.4,
 });
 

@@ -39,7 +39,7 @@ const INN = paintedTownBuilding({
   model: 'tavern',
   look: LOOK,
   anchor: { x: -298.51, z: 798.15 },
-  rotation: 3.1416, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.1416, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The provisioner's shop (shop_a, 1.5: the door clears 4.9): the square's
@@ -54,7 +54,7 @@ const SHOP = paintedTownBuilding({
   model: 'shop_a',
   look: LOOK,
   anchor: { x: -332.99, z: 829.32 },
-  rotation: 3.6826, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.6826, // Studio town rework (#4593)
   scale: SHOP_SCALE,
 });
 // The strand house (house_a, 1.4, sealed): the square's west side, its door
@@ -66,7 +66,7 @@ const HOUSE = paintedTownBuilding({
   model: 'house_a',
   look: LOOK,
   anchor: { x: -280.71, z: 825.39 },
-  rotation: 1.309, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 1.309, // Studio town rework (#4593)
   scale: 1.4,
 });
 

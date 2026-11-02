@@ -76,7 +76,7 @@ describe('world audio routing', () => {
     expect(footstepSurfaceAt(SEED, DUNGEON_X_THRESHOLD + 1, 0, 0, true)).toBe('stone');
   });
 
-  it('builds stable point sources for every campfire and both built-in smithies', () => {
+  it('builds stable point sources for every campfire and the built-in smithy', () => {
     const sources = buildWorldAmbientSources(SEED);
     const campfires = sources.filter((source) => source.kind === 'campfire');
     const forges = sources.filter((source) => source.kind === 'forge');
@@ -97,10 +97,11 @@ describe('world audio routing', () => {
       (building) => building.id === 'eastbrook_smithy',
     );
     expect(eastbrookSmithy).toBeDefined();
-    expect(PROPS.stalls.filter((stall) => stall.smithy)).toHaveLength(1);
+    // The Studio town rework (#4593) removed Highwatch's smithy stall (Armorer
+    // Hode's, at (-4.5, 673.5)), so Eastbrook's smithy is the one forge left.
+    expect(PROPS.stalls.filter((stall) => stall.smithy)).toEqual([]);
     expect(forges.map(({ x, z }) => [x, z])).toEqual([
       [eastbrookSmithy?.position.x, eastbrookSmithy?.position.z],
-      [-4.5, 673.5],
     ]);
     // the Mirefen tavern's room bed, anchored at the hall's middle (built-in world only)
     expect(sources.filter((source) => source.kind === 'tavern')).toEqual([
@@ -154,7 +155,14 @@ describe('world audio routing', () => {
   });
 
   it('uses active custom props without leaking Eastbrook ambient anchors', () => {
-    const props = clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props);
+    const cloned = clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props);
+    // The built-in world ships no smithy stall since the Studio town rework
+    // (#4593), so the custom map authors one: the forge arm reads it from the
+    // active props, never the Eastbrook smithy.
+    const props = {
+      ...cloned,
+      stalls: [...cloned.stalls, { x: -4.5, z: 673.5, rot: -0.6, r: 1.7, smithy: true as const }],
+    };
     setActiveWorldContent({ ...BUILTIN_WORLD, props });
 
     const sources = buildWorldAmbientSources(SEED);

@@ -188,7 +188,7 @@ describe('Warmarshal Draven Kole: the world build is untouched', () => {
 });
 
 describe('Warmarshal Draven Kole: the placement clears all three suites', () => {
-  it('stands inside the Highwatch hub, in the quartermaster row but not on Vex', () => {
+  it('stands inside the Highwatch hub, beside the armorer but not on him', () => {
     const hub = ZONE3_ZONE.hub;
     const fromHub = Math.hypot(KOLE.pos.x - hub.x, KOLE.pos.z - hub.z);
     expect(fromHub).toBeLessThan(hub.radius);
@@ -196,12 +196,14 @@ describe('Warmarshal Draven Kole: the placement clears all three suites', () => 
     expect(KOLE.pos.z).toBeGreaterThanOrEqual(ZONE3_ZONE.zMin);
     expect(KOLE.pos.z).toBeLessThan(ZONE3_ZONE.zMax);
 
-    const vex = NPCS.heroic_quartermaster.pos;
-    const toVex = Math.hypot(KOLE.pos.x - vex.x, KOLE.pos.z - vex.z);
-    // NOT Vex's exact coordinates (what a naive "next to Vex" produces), and
-    // inside the four-to-six yard spacing the rest of the row already runs at.
-    expect(toVex).toBeGreaterThanOrEqual(4);
-    expect(toVex).toBeLessThanOrEqual(6);
+    // The Studio town rework (#4593) broke up the quartermaster row: Kole now
+    // stands beside Armorer Hode, Vex across the hub from both of them.
+    const hode = NPCS.armorer_hode.pos;
+    const toHode = Math.hypot(KOLE.pos.x - hode.x, KOLE.pos.z - hode.z);
+    // NOT Hode's exact coordinates (what a naive "next to Hode" produces), and
+    // inside the four-to-six yard spacing the old row ran at.
+    expect(toHode).toBeGreaterThanOrEqual(4);
+    expect(toHode).toBeLessThanOrEqual(6);
 
     // And clear of everyone else: no other authored NPC is closer than the row's
     // own spacing floor.

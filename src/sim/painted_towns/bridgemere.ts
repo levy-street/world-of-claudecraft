@@ -39,7 +39,7 @@ const INN = paintedTownBuilding({
   model: 'tavern',
   look: LOOK,
   anchor: { x: -360.21, z: 366.55 },
-  rotation: 0, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 0, // Studio town rework (#4593)
   scale: 1,
 });
 // The barrow chapel: across the bridge at the Willowfen Barrow, between the
@@ -54,7 +54,7 @@ const CHAPEL = paintedTownBuilding({
   model: 'hall',
   look: LOOK,
   anchor: { x: -349.4, z: 300 },
-  rotation: 3.351, // Studio town rework (#4593) // Studio town rework (#4593)
+  rotation: 3.351, // Studio town rework (#4593)
   scale: 1,
 });
 

@@ -108,7 +108,7 @@ const CHAPEL = makePlacedTownBuilding(
     // road and its door looking north at the gate and the square: Brother
     // Aldric keeps the door inside the hub circle, as he kept his old spot
     anchor: { x: 34.25, z: 736.45 },
-    rotation: 0.8029, // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593)
+    rotation: 0.8029, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
@@ -134,7 +134,7 @@ const COUNTING_HOUSE = makePlacedTownBuilding(
     kind: 'house',
     // east of the square, its counter and awning on the square
     anchor: { x: -30.24, z: 699.1 },
-    rotation: 0.5934, // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593)
+    rotation: 0.5934, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
@@ -158,7 +158,7 @@ const WATCH_HOUSE = makePlacedTownBuilding(
     kind: 'house',
     // west of the Fenbridge road at the south gate, its door on the road
     anchor: { x: 13.86, z: 627.8 },
-    rotation: 2.4784, // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593)
+    rotation: 2.4784, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 0.386, z: 0.23, width: 12.764, height: 19.58, depth: 16.264 },
@@ -178,7 +178,7 @@ const SMITHY = makePlacedTownBuilding(
     kind: 'house',
     // the north-west terrace, the forge shelter at its west end
     anchor: { x: -45.8, z: 665.35 },
-    rotation: 4.9218, // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593) // Studio town rework (#4593)
+    rotation: 4.9218, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 12.781, depth: 11.69 },

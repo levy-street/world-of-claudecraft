@@ -164,7 +164,12 @@ describe('custom-map terrain seam', () => {
     const baseAtOrigin = terrainHeight(0, 0, SEED); // default content
     setActiveWorldContent({
       ...BUILTIN_WORLD,
-      terrainEdits: [{ x: 0, z: 0, radius: 25, delta: 12, falloff: 'smooth' }],
+      // Keep the shipped touch-up's own edits: the Studio town rework (#4593) sculpts
+      // the ground at the origin too, so replacing them would move the baseline.
+      terrainEdits: [
+        ...(BUILTIN_WORLD.terrainEdits ?? []),
+        { x: 0, z: 0, radius: 25, delta: 12, falloff: 'smooth' },
+      ],
     });
     // Smooth falloff is 1.0 at the centre, so the centre rises by exactly delta.
     expect(terrainHeight(0, 0, SEED)).toBeCloseTo(baseAtOrigin + 12, 6);

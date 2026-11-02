@@ -219,9 +219,11 @@ describe('active-world noticeboard service', () => {
           Math.hypot(right.pos.x - board.pos.x, right.pos.z - board.pos.z),
       )[0];
     if (!nearestService) throw new Error('missing service NPC near noticeboard');
-    expect(nearestService.templateId).toBe('chronicler_saul');
+    // The Studio town rework (#4593) moved Chronicler Saul down by the bank,
+    // so Foreman Odell is now the nearest service NPC to the board.
+    expect(nearestService.templateId).toBe('foreman_odell');
     expect(Math.hypot(nearestService.pos.x - board.pos.x, nearestService.pos.z - board.pos.z)).toBe(
-      5.412023651093922,
+      8.453590952961942,
     );
 
     const talkToNpc = vi.spyOn(sim, 'talkToNpc');
