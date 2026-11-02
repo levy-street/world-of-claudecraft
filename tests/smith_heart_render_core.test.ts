@@ -85,6 +85,7 @@ import {
   observeHeartSealMarker,
 } from '../src/render/smith_heart/heart_seal_core';
 import {
+  hammerEnvSolids,
   heartGateSolids,
   heartPropSolids,
   heartRingSolids,
@@ -720,6 +721,8 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     ...heartRockSolids(),
     // The Ring kit's jambs, spires and parapets (phase 2F).
     ...heartRingSolids(),
+    // The Hammer vein's painted ruins and lips.
+    ...hammerEnvSolids(),
   ];
   const seal = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 0.5, z: HEART_SEAL.z };
   const portalEye = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 9, z: HEART_SEAL.z };

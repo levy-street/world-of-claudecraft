@@ -36,6 +36,7 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `heart_props.ts` | Instances the recipes (shared unit geometry, `surfaceMat` tones) and the crags (one instanced draw per rock shape, the shared triplanar rock on them; none deep in the Hammer vein, whose stepped granite stands in for them); the placeholders of the kinds a kit draws stand apart (`kitOwned`) so the kit takes their place. |
 | `heart_kit_core.ts` / `heart_kit.ts` | A vein's Blender kit: the placement record (PURE), then the loader and baker (each Kit_* node split by slot: KitStone lit with the shared triplanar rock, KitGlow emissive), the instancer (culling cells, stretch and shear for the edge modules), the slot program warmers built with every interior, the late-landing swap. |
 | `hammer_kit_plan_core.ts` / `hammer_kit.ts` | PURE plan and painter of the Hammer vein's kit: every vein prop fitted with its piece (the colossi kneeling on the first step, carved out of the terraces), the worked faces, rims and lips along every cliff run of the vein (the shared edge planner), and the render-only dressing (the great cliffs crowning the top step, `HAMMER_CROWN`; scaffold, hoists, spoil, chips, the floor's crack inlays, the collapse spot's overhang, the Balcony's lookouts). The sculpted quarry rock is `docs/design/raid/kit/hammer_cliff.py`. |
+| `hammer_env_plan_core.ts` / `hammer_env_kit.ts` / `hammer_env_flames.ts` / `hammer_env_rock_paint.ts` | The Hammer vein's painted rebuild (design doc section 5.22; `public/models/props/smith_heart_hammer_env_kit.glb`, from `docs/design/raid/kit/build_smith_heart_hammer_env_kit.py`): the PURE plan of what stands in for what on the old plans' own spots (`hammerEnvSwap`, `fitHammerEnvRock`), the new ruins on the terraces (`planHammerEnvArena`) and what is frozen (`HAMMER_ENV_FROZEN`: anything a mechanic hangs on, and the colossi); the painter (each painting one texture on one shared program, the floors through the field's `topMaterial` seam, the sky's dusk); the fire bowls' flames; the cliff painting on the heightfield and the field's cliff faces (`hammerEnvWeight`). Fetched at the raid's door, never at boot. The old kit's GLB stays as it was: the Council's bodies are built from it. |
 | `heart_rock_plan_core.ts` / `heart_rock.ts` | PURE plan and painter of the mountain's rock kit (`public/models/props/smith_heart_rock_kit.glb`, from `docs/design/raid/kit/build_smith_heart_rock_kit.py`): the sculpted faces laid in bands along contours of the clearance over the whole main map and the Heart (`planHeartRock`: fronts on their contour, feet sunk, crests reaching the next band, far builds high up), the lips hanging under every walk's brink (`planHeartLips`); one lit material, wide culling cells, no shadow, upper bands shed on the low tier. The loose crags stand in until the kit lands. |
 | `heart_rock_cutaway.ts` | The rock's material discards its fragments near the camera (a camera zoomed out past an arena's rim stands in the mountain), and keeps a shade floor of its own colour (`HEART_ROCK_SHADE_FLOOR`, phase 2F). |
 | `ring_kit_plan_core.ts` / `ring_kit.ts` | PURE plan and painter of the Ring's kit (phase 2F: `public/models/props/smith_heart_ring_kit.glb`, from `docs/design/raid/kit/build_smith_heart_ring_kit.py`): the Ring's paving, curb, foot and channels, both stairs tread by tread with their chutes, every stair's stringers and parapets, the dais, the standing stones, the cairns, the mouths' jambs and sills; the field tops it draws in their place (`RING_KIT_OMIT_TOPS`), the fascias' depth the lips start under, the spires' spots and veins. |
@@ -136,6 +137,9 @@ Rules:
 - One mesh hook (the sky's), pinned in `tests/point_light_carriers.test.ts`; floor marks
   (rivers, seal, portal discs and rings, rune rings) on the floor ladder's ground rung
   with literal steps, registered strict in `tests/floor_vfx_layer.test.ts`.
+- The Hammer vein's painted kit only ever swaps looks: a swapped piece keeps its old
+  placement, its front clear of every walk (`hammerEnvFrontClear`), and nothing in
+  `HAMMER_ENV_FROZEN` is swapped. Pinned by `tests/smith_heart_hammer_env.test.ts`.
 - No render-only solid stands in the raid's key sightlines (every 10 degrees of the Ring
   and the Balcony tip to the seal and the portal's eye, the Balcony tip to each vein
   mouth), and no main-map eye sees into the Heart through the mountain. A new solid
@@ -144,7 +148,8 @@ Rules:
 Tests: `tests/smith_heart_render_core.test.ts` (mountain, crags, sightlines, rivers,
 seal memory and fill, portal and hop timelines, chains, keels, core, gate poses, props,
 light budget), `tests/smith_heart_areas.test.ts` (areas, score, the Heart's air),
-`tests/smith_heart_hammer_kit.test.ts` (the Hammer kit's GLB and its plan) and
+`tests/smith_heart_hammer_kit.test.ts` (the Hammer kit's GLB and its plan),
+`tests/smith_heart_hammer_env.test.ts` (the painted rebuild's GLB and plan) and
 `tests/smith_heart_hammer_fx.test.ts` (the vein's air, the guardian's and the Slab's
 effects), `tests/smith_heart_rock_kit.test.ts` (the rock kit and its plan) and
 `tests/smith_heart_ring_kit.test.ts` (the Ring kit, its plan and the seal's moments),

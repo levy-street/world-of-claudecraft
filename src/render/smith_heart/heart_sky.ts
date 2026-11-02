@@ -33,6 +33,7 @@ import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import {
   SMITH_HEART_BREATH_FOG,
+  SMITH_HEART_HAMMER_FOG,
   SMITH_HEART_HEAT_FOG,
   SMITH_HEART_HEAT_LIGHT,
   SMITH_HEART_QUENCH_FOG,
@@ -41,6 +42,8 @@ import {
 
 export interface HeartSkyOptions {
   lowGfx: boolean;
+  /** The Hammer vein's painted dusk, once the painted kit has landed. */
+  hammerSky?: THREE.Texture | null;
   /** Called once per drawn frame (the interior's frame driver), with the
    *  camera's world position. */
   onFrame: (camera: THREE.Vector3) => void;
@@ -75,6 +78,9 @@ uniform vec3 uQuenchSun;
 uniform float uHeat;
 uniform vec3 uHeatHorizon;
 uniform vec3 uHeatSun;
+uniform float uHammer;
+uniform sampler2D uHammerSky;
+uniform vec3 uHammerHorizon;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -245,6 +251,16 @@ vec3 heatSky(vec3 d, float up) {
   col += vec3(0.3, 0.19, 0.09) * exp(-a * 3.4) * 0.6;
   return col;
 }
+vec3 hammerSky(vec3 d, float up) {
+  // The painted dusk wrapped round the dome, drifting slow; its low haze meets the
+  // area's fog colour at the horizon. An explicit level: the wrap's seam has a
+  // jump in u a derivative would turn into a line of the smallest mip.
+  float u = atan(d.x, d.z) / 6.2831853 + 0.5 + uTime * 0.0006;
+  // A glTF texture reads top down: v 0 is the painting's top, the deep zenith.
+  float v = clamp(0.8 - max(up, 0.0) * 1.15, 0.005, 0.995);
+  vec3 painted = textureLod(uHammerSky, vec2(u, v), 0.0).rgb;
+  return mix(uHammerHorizon, painted, smoothstep(-0.03, 0.09, up));
+}
 vec3 coreSky(vec3 d, float up) {
   // Ember-violet night: warm low (the heart's light on the high air), deep
   // violet-black overhead.
@@ -277,10 +293,11 @@ void main() {
   float up = d.y;
   vec3 col = vec3(0.0);
   if (uCore < 0.999) {
-    col = uBreath < 0.999 && uQuench < 0.999 && uHeat < 0.999 ? stormSky(d, up) : vec3(0.0);
+    col = uBreath < 0.999 && uQuench < 0.999 && uHeat < 0.999 && uHammer < 0.999 ? stormSky(d, up) : vec3(0.0);
     if (uBreath > 0.001) col = mix(col, breathSky(d, up), uBreath);
     if (uQuench > 0.001) col = mix(col, quenchSky(d, up), uQuench);
     if (uHeat > 0.001) col = mix(col, heatSky(d, up), uHeat);
+    if (uHammer > 0.001) col = mix(col, hammerSky(d, up), uHammer);
   }
   if (uCore > 0.001) col = mix(col, coreSky(d, up), uCore);
   gl_FragColor = vec4(col, 1.0);
@@ -298,6 +315,9 @@ export interface HeartSky {
   setQuench(k: number): void;
   /** Blend the main map's storm toward the Heat's smoke over the Hearth. */
   setHeat(k: number): void;
+  /** Blend the main map's storm toward the Hammer's painted dusk (no-op with no
+   *  painting: the painted kit has not landed). */
+  setHammer(k: number): void;
 }
 
 /** The dome (and the slot's frame driver). */
@@ -320,6 +340,9 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
         value: new THREE.Vector3(...SMITH_HEART_QUENCH_LIGHT.keyDirection).normalize(),
       },
       uHeat: { value: 0 },
+      uHammer: { value: 0 },
+      uHammerSky: { value: opts.hammerSky ?? null },
+      uHammerHorizon: { value: new THREE.Color(SMITH_HEART_HAMMER_FOG.color) },
       uHeatHorizon: { value: new THREE.Color(SMITH_HEART_HEAT_FOG.color) },
       uHeatSun: {
         value: new THREE.Vector3(...SMITH_HEART_HEAT_LIGHT.keyDirection).normalize(),
@@ -346,8 +369,15 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
   let breath = -1;
   let quench = -1;
   let heat = -1;
+  let hammer = -1;
   return {
     mesh,
+    setHammer(k) {
+      const q = opts.hammerSky ? Math.round(k * 200) / 200 : 0;
+      if (q === hammer) return;
+      hammer = q;
+      material.uniforms.uHammer.value = q;
+    },
     setHeat(k) {
       const q = Math.round(k * 200) / 200;
       if (q === heat) return;

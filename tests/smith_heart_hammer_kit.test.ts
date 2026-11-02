@@ -464,7 +464,7 @@ describe('hammer_walk_plan_core: the Gallery walk (phase 2E)', () => {
   it('paves the Gallery in worn flags, its own ground, and lays fallen blocks at its edges', () => {
     expect(fieldGroundFamily('paving')).toBe('paving');
     expect(fieldFamilyUvScale('paving')).toBeCloseTo(1 / 10, 9);
-    for (const id of HAMMER_WALK_SURFACES)
+    for (const id of [...HAMMER_WALK_SURFACES].filter((s) => s !== 'hammer_pit'))
       expect(F.surfaces.find((s) => s.id === id)?.ground, id).toBe('paving');
     // A painted floor, never one flat colour.
     const lum: number[] = [];

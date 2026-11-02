@@ -10,6 +10,13 @@
 // props'), and the bands past the second shed on the low tier.
 
 import type * as THREE from 'three';
+import { hammerEnvKitReady, instanceHammerEnv } from './hammer_env_kit';
+import {
+  fitHammerEnvLip,
+  fitHammerEnvNeedle,
+  fitHammerEnvRock,
+  hammerEnvOwnsRock,
+} from './hammer_env_plan_core';
 import {
   ensureHeartKit,
   heartKitLoaded,
@@ -39,14 +46,34 @@ export function heartRockKitReady(): boolean {
 
 /** The mountain's rock (instance-local). */
 export function buildHeartRock(lowGfx: boolean): THREE.Group {
-  return instanceHeartKit(
+  const rock = [...planHeartRock(), ...planHeartUnderCliffs()];
+  const lips = planHeartLips();
+  const needles = planHeartNeedles();
+  // The Hammer vein's own rock is the painted kit's once it has landed.
+  const painted = hammerEnvKitReady();
+  const old = (p: { x: number; z: number }) => !painted || !hammerEnvOwnsRock(p);
+  const group = instanceHeartKit(
     SMITH_HEART_ROCK_KIT_URL,
-    [...planHeartRock(), ...planHeartUnderCliffs(), ...planHeartLips(), ...planHeartNeedles()],
+    [...rock.filter(old), ...lips.filter(old), ...needles.filter(old)],
     lowGfx,
     'smithHeartRock',
     ROCK_CELL,
     'rock',
   );
+  if (painted) {
+    group.add(
+      instanceHammerEnv(
+        [
+          ...rock.filter(hammerEnvOwnsRock).map(fitHammerEnvRock),
+          ...lips.filter(hammerEnvOwnsRock).map(fitHammerEnvLip),
+          ...needles.filter(hammerEnvOwnsRock).map(fitHammerEnvNeedle),
+        ],
+        lowGfx,
+        'smithHeartHammerEnvRock',
+      ),
+    );
+  }
+  return group;
 }
 
 /** The rock when its kit has landed (the crags then never draw); otherwise

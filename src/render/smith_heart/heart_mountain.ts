@@ -6,6 +6,7 @@
 
 import * as THREE from 'three';
 import { detailedSurfaceMat } from '../worn_stone';
+import type { HammerRockPaint } from './hammer_env_rock_paint';
 import {
   HAMMER_ROCK_GAIN,
   HAMMER_ROCK_MIX,
@@ -59,7 +60,7 @@ function hammerStepShade(step: { k: number; f: number }): number {
 }
 
 /** Build the mountain (instance-local). */
-export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
+export function buildHeartMountain(lowGfx: boolean, paint?: HammerRockPaint | null): THREE.Mesh {
   const g = heartMountainGrid(lowGfx ? 5 : 3);
   const count = g.nx * g.nz;
   const positions = new Float32Array(count * 3);
@@ -146,16 +147,15 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
   geometry.setIndex(index);
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
-  const mesh = new THREE.Mesh(
-    geometry,
-    // The shared triplanar rock (natural fracture) on the tiers that draw it:
-    // the faceted mass reads as stone, not as painted card.
-    detailedSurfaceMat(
-      { color: 0xffffff, vertexColors: true, roughness: 0.95, flatShading: true },
-      'rock',
-      { strength: 0.55 },
-    ),
+  // The shared triplanar rock (natural fracture) on the tiers that draw it:
+  // the faceted mass reads as stone, not as painted card.
+  const stone = detailedSurfaceMat(
+    { color: 0xffffff, vertexColors: true, roughness: 0.95, flatShading: true },
+    'rock',
+    { strength: 0.55 },
   );
+  // The Hammer vein's stretch of it wears the vein's painted rock.
+  const mesh = new THREE.Mesh(geometry, paint ? paint(stone) : stone);
   mesh.name = 'smithHeartMountain';
   mesh.matrixAutoUpdate = false;
   return mesh;

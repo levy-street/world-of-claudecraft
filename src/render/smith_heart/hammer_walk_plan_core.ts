@@ -1,7 +1,7 @@
-// Pure plan of the Hammer Gallery's walk dressing (phase 2E; the pieces are
+// Pure plan of the Hammer vein's walk dressing (phase 2E; the pieces are
 // the Hammer kit's, docs/design/raid/kit/walk_pieces.py, painted with the
 // rest of the kit by hammer_kit.ts): a worn kerb along every lip of the
-// Gallery's paths and landings where they fall into the chasm, broken away
+// Gallery's paths and landings, and of the arena, where they fall into the chasm, broken away
 // here and there into a rubble edge, and the masons' chain rail set into the
 // brink past the kerb, a post or two lost along the way. The fallen blocks
 // lying on the walk are layout props (`sh_fallen_block`, on colliders), the
@@ -17,7 +17,8 @@ import { planFieldEdgePieces } from '../authored_field/field_edge_plan_core';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { heartHash } from './heart_plan_core';
 
-/** The Gallery's walked floors (their lips over the chasm take the kerb). */
+/** The walked floors whose lips over the chasm take the kerb: the Gallery's and
+ *  the arena's. */
 export const HAMMER_WALK_SURFACES: ReadonlySet<string> = new Set([
   'gallery_upper',
   'gallery_h1',
@@ -25,6 +26,7 @@ export const HAMMER_WALK_SURFACES: ReadonlySet<string> = new Set([
   'gallery_h2',
   'gallery_lower',
   'gallery_h3',
+  'hammer_pit',
 ]);
 
 /** A kerb or rail module's half length at stretch 1 (yards). */
@@ -51,7 +53,7 @@ export function railClear(x: number, z: number, rot: number, stretch: number): b
   return true;
 }
 
-/** The kerb and the rail along the Gallery's lips. */
+/** The kerb and the rail along the Gallery's and the arena's lips. */
 export function planHammerWalk(): HeartKitPlacement[] {
   const F = SMITH_HEART_FIELD;
   const edges = planFieldEdgePieces(F, {

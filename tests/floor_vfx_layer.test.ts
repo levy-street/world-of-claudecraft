@@ -433,6 +433,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // the Hammer vein's fire bowls: upright flames over bowls on a terrace, never on a floor
+  'src/render/smith_heart/hammer_env_flames.ts',
   // pooled ability VFX families that stand up from the ground
   'src/render/ability_vfx/flipbooks.ts',
   'src/render/ability_vfx/overlay_sprites.ts',

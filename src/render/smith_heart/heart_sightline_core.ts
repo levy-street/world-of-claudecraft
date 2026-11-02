@@ -14,6 +14,13 @@
 import { SMITH_HEART_GATES } from '../../sim/content/smith_heart';
 import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
+import {
+  fitHammerEnvLip,
+  HAMMER_ENV_ARCADE,
+  HAMMER_ENV_ROCK,
+  hammerEnvNewSolids,
+  hammerEnvOwnsRock,
+} from './hammer_env_plan_core';
 import { heartGatePartPose, heartGateParts, heartGateRig } from './heart_gates_core';
 import { HEART_PROP_RECIPES, type HeartPart, heartPropBase } from './heart_plan_core';
 import {
@@ -242,6 +249,50 @@ export function heartSightlineHits(
     }
   }
   return hits;
+}
+
+/** The Hammer vein's painted rebuild's new solids (the ruins on the terraces, the
+ *  piers past the Gallery) and its lips, wider than the lips they stand in for. */
+export function hammerEnvSolids(): HeartSolid[] {
+  const out: HeartSolid[] = [];
+  for (const p of hammerEnvNewSolids()) {
+    const k = p.scale ?? 1;
+    const arcade = p.piece === 'Env_Arcade';
+    const hw = (arcade ? HAMMER_ENV_ARCADE.w / 2 : 3.2) * k;
+    const hh = (arcade ? HAMMER_ENV_ARCADE.h / 2 : 7) * k;
+    const hd = (arcade ? HAMMER_ENV_ARCADE.d / 2 : 3.2) * k;
+    out.push({
+      kind: 'box',
+      x: arcade ? p.x - Math.sin(p.rot) * hd : p.x,
+      y: p.y + hh,
+      z: arcade ? p.z - Math.cos(p.rot) * hd : p.z,
+      hw,
+      hh,
+      hd,
+      yaw: p.rot,
+      what: `hammer env ${p.piece} (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+    });
+  }
+  for (const old of planHeartLips()) {
+    if (!hammerEnvOwnsRock(old)) continue;
+    const p = fitHammerEnvLip(old);
+    const m = HAMMER_ENV_ROCK[p.piece.replace(/Far$/, '')];
+    const k = p.scale ?? 1;
+    const hh = (m.h * k * (p.rise ?? 1)) / 2;
+    const hd = (m.d * k) / 2;
+    out.push({
+      kind: 'box',
+      x: p.x - Math.sin(p.rot) * hd,
+      y: p.y + hh,
+      z: p.z - Math.cos(p.rot) * hd,
+      hw: (m.w * k * (p.stretch ?? 1)) / 2,
+      hh,
+      hd,
+      yaw: p.rot,
+      what: `hammer env lip (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+    });
+  }
+  return out;
 }
 
 /** The Ring kit's render-only solids (phase 2F; its standing stones, cairns

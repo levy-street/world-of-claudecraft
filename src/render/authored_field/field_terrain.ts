@@ -12,6 +12,7 @@ import {
   FIELD_TOP_FAMILIES,
   type FieldMeshData,
   type FieldTopFamily,
+  type FieldTopOptions,
   GLACIER_CLIFF_UV,
   planFieldCliffs,
   planFieldTops,
@@ -79,6 +80,12 @@ export interface FieldTerrainOptions {
    *  Lake draws its ice with depth): handed the family's detail pair, it
    *  returns the material that family's mesh draws with. */
   topMaterial?: Partial<Record<FieldTopFamily, (pair: DetailPair) => THREE.Material>>;
+  /** A dungeon's own version of the cliff faces' material. */
+  cliffMaterial?: (material: THREE.Material) => THREE.Material;
+  /** A surface's ground as drawn (FieldTopOptions.drawnGround). */
+  drawnGround?: FieldTopOptions['drawnGround'];
+  /** A surface's texture coordinates (FieldTopOptions.drawnUv). */
+  drawnUv?: FieldTopOptions['drawnUv'];
 }
 
 /** Build the ground of a field: tops (one mesh per texture family) and cliffs. */
@@ -92,6 +99,8 @@ export function buildAuthoredFieldTerrain(
     maxEdge: opts.maxEdge ?? (opts.lowGfx ? 6 : 3),
     layerLift: 0,
     ...(opts.omitTops ? { omit: opts.omitTops } : {}),
+    ...(opts.drawnGround ? { drawnGround: opts.drawnGround } : {}),
+    ...(opts.drawnUv ? { drawnUv: opts.drawnUv } : {}),
   });
   const rock =
     opts.cliffRock === 'strata'
@@ -164,15 +173,16 @@ export function buildAuthoredFieldTerrain(
     ...(opts.cliffRock === 'glacier' ? { uvScale: GLACIER_CLIFF_UV } : {}),
   });
   if (cliffs.positions.length > 0) {
+    const material = surfaceMat({
+      map: rock.map,
+      normalMap: opts.lowGfx ? undefined : rock.normalMap,
+      vertexColors: true,
+      roughness: opts.cliffRock === 'glacier' ? 0.62 : 0.95,
+      side: THREE.DoubleSide,
+    });
     const mesh = new THREE.Mesh(
       geometryOf(cliffs, true),
-      surfaceMat({
-        map: rock.map,
-        normalMap: opts.lowGfx ? undefined : rock.normalMap,
-        vertexColors: true,
-        roughness: opts.cliffRock === 'glacier' ? 0.62 : 0.95,
-        side: THREE.DoubleSide,
-      }),
+      opts.cliffMaterial ? opts.cliffMaterial(material) : material,
     );
     mesh.name = 'fieldCliffs';
     mesh.castShadow = !opts.lowGfx;

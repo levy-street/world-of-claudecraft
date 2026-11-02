@@ -37,7 +37,10 @@ Sources of truth, in order:
 | Gate collision and state engine (shared) | `src/sim/instances/dungeon_gates.ts` |
 | Authored open-air field engine (shared) | `src/sim/instances/authored_field/` (see its `CLAUDE.md`) |
 | Placeholder looks (the one list phase 2 replaces) | `src/render/characters/smith_heart_placeholder_looks.ts` |
+| The Hammer Vein Warder's own body, the first row replaced (Tripo P2, a 1024 ETC1S atlas painted over in ChatGPT, a stone rig and clips built in Blender, the tracks that only hold the rest pose dropped at build), its template slowed to the pace that run keeps its feet on the floor at | `public/models/creatures/heart_hammer_warder.glb` from `scripts/assets/specs/heart_hammer_warder.json`, `smith_heart_hammer_warder` in `src/render/characters/manifest.ts`, pinned by `tests/smith_heart_hammer_warder_body.test.ts` |
+| The Slabwright's own body, the Council's first (Tripo P2, a painted 1024 ETC1S atlas, a stone rig and 16 clips built in Blender, the tracks that only hold the rest pose dropped at build), its provisional pieces no longer drawn while their dust and rings still play | `public/models/creatures/heart_slabwright.glb` from `scripts/assets/specs/heart_slabwright.json`, `smith_heart_slabwright` in `src/render/characters/manifest.ts`, `COUNCIL_MODELLED` in `src/render/smith_heart_fx/council_bodies_core.ts`, pinned by `tests/smith_heart_slabwright_body.test.ts` |
 | The Hammer vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_hammer_kit.py` (the sculpted quarry rock: `hammer_cliff.py`), `scripts/assets/smith_heart_hammer_kit/build.mjs`, `src/render/smith_heart/hammer_kit_plan_core.ts`, `src/render/smith_heart/heart_kit.ts` |
+| The Hammer vein's painted rebuild (the owner's style guide: the mountain, the risers, the walk, the arena's ruins, the floors and the sky, section 5.22) | `docs/design/raid/kit/build_smith_heart_hammer_env_kit.py` (sources `docs/design/raid/kit/hammer_env_src/`), `scripts/assets/smith_heart_hammer_env_kit/`, `src/render/smith_heart/hammer_env_plan_core.ts`, `hammer_env_kit.ts`, `hammer_env_rock_paint.ts`, pinned by `tests/smith_heart_hammer_env.test.ts` |
 | The Hammer vein's air and light | `src/render/smith_heart/hammer_air_core.ts`, `src/render/smith_heart/heart_environment.ts` (`smithHeartHammer`) |
 | The mountain's rock kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_rock_kit.py` (the sculpts: `rock_sculpt.py`), `scripts/assets/smith_heart_rock_kit/build.mjs`, `src/render/smith_heart/heart_rock_plan_core.ts`, `src/render/smith_heart/heart_rock.ts` |
 | The Gallery's walk (paving, kerb, chain rail, fallen blocks) | the `paving` ground (`field_textures.ts` `pavingDetail`), `docs/design/raid/kit/walk_pieces.py`, `src/render/smith_heart/hammer_walk_plan_core.ts`, `sh_fallen_block` in the layout |
@@ -1313,6 +1316,44 @@ crowns; the altar drags and Forge Wrath's cover behind them are superseded by th
 design and gone with the sketch kit. The quarter awake and the crossing's shockwave (above)
 now read with the fight: the boss's seams take its quarter's colour, the switch throws a
 shockwave in the four veins' light over the Anvil.
+
+### 5.22 The Hammer vein's painted rebuild
+
+The owner's ask: rebuild the Earth section to the painted style guide (slate-violet
+stacked cliffs with moss caps, a paved walk behind heavy chains, a ruined amphitheatre
+under a painted dusk), low poly with the paintings doing the work, the look only and
+no mechanic moved, and the rock around the mobs a cool foil to their warm ochre stone.
+Nothing here touches `src/sim/`.
+
+**Sources.** ChatGPT painted every texture and a FRONT, LEFT and BACK sheet for each
+big model; Tripo P2 built the four models from those sheets; Blender stands them on the
+kit's frame and builds the rest as low-poly masonry and iron. The texture sizes follow
+what the eye gets: the floors, the two great cliffs and the arcade at 1024, the
+outcrop and the tiles at 512, the moss and the iron at 256, and nothing past
+1024. Prompts and Tripo task ids: `docs/design/raid/kit/hammer_env_src/README.md`.
+
+| Piece | Now | Stands in for |
+|---|---|---|
+| The mountain | Painted cliff stacks, bluffs and outcrops on the old plan's own spots and contours, brush strokes from the cliff painting laid over each atlas in world space so a sixty yard face stays painted up close | `Kit_Rock*` in the vein (`fitHammerEnvRock`, `fitHammerEnvLip`, `fitHammerEnvNeedle`) |
+| What the kit leaves bare | The heightfield and the field's cliff faces wear the cliff painting and moss, faded by `hammerEnvWeight` so the other veins draw as they did | `hammer_env_rock_paint.ts` |
+| The terraces | Risers as the amphitheatre's seats, a stair down one in nine, the pit's retaining wall coursed cut stone, flush with its lip | `Kit_QuarryFace*`, `Kit_QuarryRim*` |
+| The arena's back | A ring of broken arcades on the top step with banners on their piers, whole and broken columns stepping up the seats, fallen drums, rubble, iron rings, fire bowls | `Kit_GreatCliff*`, `Kit_RubblePile`, `planHammerEnvArena` |
+| The walk | Painted flags on the Gallery, the Cleft and the stairs (`HAMMER_ENV_PAVED`, drawn only: the layout keeps its grounds), a chunky kerb, a heavy rusted chain on iron posts, moss-capped boulders on the fallen blocks' colliders | `Kit_WalkCurb*`, `Kit_WalkRail`, `Kit_FallenBlock*` |
+| The air | The dome wraps the painted dusk in the vein (`inHammerSky`), the fog and fill go cool violet, the sun a paler gold | `heart_sky.ts`, `smithHeartHammer` |
+| The far skyline | The neighbouring veins' rock behind the vein, for a camera in the vein, wears a broad low-contrast paint and loses light with distance (`HEART_ROCK_FAR_PAINT`, `HAMMER_ENV_DEPTH` in `src/render/smith_heart/heart_rock_cutaway.ts`). The vein's own rock, its floors and its fog are untouched. | A busy, evenly lit pattern that sat on one plane with the near rock |
+
+**Frozen.** What a mechanic hangs on or what stands round the boss stays the old kit's
+(`HAMMER_ENV_FROZEN`): the Council's pillars and sockets, the Slab and its frame, the Pit
+Mouth, the collapse spot's overhang and the colossi. The owner updates those separately.
+The old kit's GLB is unchanged: the Council's bodies are built from its pieces.
+
+**Budget.** A swapped piece is a tenth of what it replaces (a riser 240 triangles from
+2,350, a rail 440 from 2,180, a great cliff gone from 13,000). The kit is fetched when the
+raid's interior is built, never at boot. If it has not landed in time the old look draws
+until the interior is next built: a slower look, never a missing wall. Readability: the
+floors are low contrast and cool so telegraphs and the warm mobs read over them; every new
+solid stands on a terrace nobody reaches or past a lip, in the sightline pin
+(`hammerEnvSolids`). The low tier sheds the ruins and upper bands, never the floors' paint.
 
 ## 6. Set pieces (phase 2 specs)
 

@@ -11,7 +11,8 @@
 // Env: SHOT_URL (http://127.0.0.1:5186/), SHOT_W / SHOT_H (1600x900),
 // SHOT_PRESET (4), SHOT_ONLY (comma list of shot names), SHOT_JSON (a JSON
 // list of ad-hoc shots in the SHOTS row format, replacing the list),
-// SHOT_MOSAIC=1 (four shots to a 2x2 sheet at half size).
+// SHOT_MOSAIC=1 (four shots to a 2x2 sheet at half size), SHOT_KEEP_PACKS=1 (leave the
+// vein's trash packs alive).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -59,7 +60,11 @@ const list = process.env.SHOT_JSON ? JSON.parse(process.env.SHOT_JSON) : SHOTS;
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: [`--window-size=${W},${H}`, '--use-angle=d3d11', '--ignore-gpu-blocklist'],
+  args: [
+    `--window-size=${W},${H}`,
+    `--use-angle=${process.env.SHOT_ANGLE ?? (process.platform === 'darwin' ? 'metal' : 'd3d11')}`,
+    '--ignore-gpu-blocklist',
+  ],
   defaultViewport: { width: W, height: H },
   protocolTimeout: 240000,
 });
@@ -93,7 +98,8 @@ try {
   };
   for (const c of ['/dev level 20', '/dev god', '/dev noaggro', '/dev heart enter'])
     await chat(c, 1500);
-  for (const p of ['h1', 'h2', 'h3']) await chat(`/dev heart kill pack ${p}`, 300);
+  if (process.env.SHOT_KEEP_PACKS !== '1')
+    for (const p of ['h1', 'h2', 'h3']) await chat(`/dev heart kill pack ${p}`, 300);
   await page.waitForFunction(
     () => {
       let found = false;
