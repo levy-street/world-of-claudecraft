@@ -376,7 +376,7 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the Emberbristle Broom, the goblin rocket sled, the Lantern Hall Destrier, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the Emberbristle Broom, the goblin rocket sled, the Lantern Hall Destrier, Wraith the Deadstrier, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
@@ -385,6 +385,9 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
       'models/mounts/emberbristle_broom.glb',
       'models/mounts/goblin_rocket_sled.glb',
       'models/mounts/lantern_hall_destrier.glb',
+      // the colour rides only the flame shells, whose material ossuary_flames.ts
+      // replaces on attach, so the Low Lambert swap never reaches them
+      'models/mounts/ossuary_charger.glb',
       'models/mounts/rickshaw_mount.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
